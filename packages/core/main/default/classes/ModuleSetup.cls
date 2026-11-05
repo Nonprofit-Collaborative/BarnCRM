@@ -7,12 +7,12 @@
  */
 @NamespaceAccessible
 public interface ModuleSetup {
-    /**
-     * Runs the package's setup steps exactly as its install does, then adds the package's key to
-     * the setup marker (`ModuleSetups.markRan`). Safe to run twice. Never throws: a failure is
-     * written to the Error Log, as at an install.
-     *
-     * @param installerId the person who stands in for the installer, or null for none
-     */
-    void runSetup(Id installerId);
+	/**
+	 * Runs the package's setup steps exactly as its install does, then adds the package's key to
+	 * the setup marker (`ModuleSetups.markRan`). Safe to run twice. Never throws: a failure is
+	 * written to the Error Log, as at an install.
+	 *
+	 * @param installerId the person who stands in for the installer, or null for none
+	 */
+	void runSetup(Id installerId);
 }

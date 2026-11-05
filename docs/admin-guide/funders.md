@@ -45,8 +45,10 @@ finishes, BarnCRM does three things on its own:
 Then open the **BarnCRM Funders** app from the App Launcher. Its tabs are **Grant Pipeline**,
 **Board Dashboard**, **Grant Calendar**, **Grants**, **Grant Requirements**, **Grant Answers**,
 **Funder Report Templates** (admins only), **Reports** and **Error Log**; Grant Pipeline and
-Grants also join the BarnCRM apps. Run Health Check's **Schedule all nightly jobs** fix once to start the
-morning reminder job (see [Reminders](#reminders)).
+Grants also join the BarnCRM apps. The morning reminder job is a step of
+[BarnCRM Nightly Jobs](nightly-jobs.md), which a new install schedules; if Health Check says
+the nightly run is not scheduled, run its **Schedule all nightly jobs** fix once (see
+[Reminders](#reminders)).
 
 ## Roles and Permission Sets
 
@@ -246,9 +248,9 @@ Each due date is reminded once. If the funder moves the date and you change **Du
 date is reminded again. When nobody active can be reminded, nothing is sent, and Health Check
 still lists the requirement once it is overdue.
 
-The job is called **BarnCRM Grant Reminders**. Health Check's **Schedule all nightly jobs** fix
-schedules it with BarnCRM's other nightly jobs; it shows on the nightly jobs list as **Grant
-Requirement Reminders, 6:00 AM**. It does nothing while Funders is turned off or both reminder
+The job is a step of [BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run, and shows on
+the Nightly Jobs panel as **Grant Requirement Reminders** (6:00 AM). It has no switch of its own;
+Health Check's **Schedule all nightly jobs** fix schedules the run if it is not. It does nothing while Funders is turned off or both reminder
 settings are off.
 
 ## Answer Library

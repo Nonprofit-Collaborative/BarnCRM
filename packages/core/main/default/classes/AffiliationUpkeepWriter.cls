@@ -23,19 +23,19 @@
  *   affiliations) are the ones the saving user may not be able to edit.
  */
 public without sharing class AffiliationUpkeepWriter {
-    /** Takes the primary flag off affiliations that lost it. */
-    public static void clearPrimaryFlags(List<Affiliation__c> flagsToClear) {
-        if (flagsToClear == null || flagsToClear.isEmpty()) {
-            return;
-        }
-        Database.update(flagsToClear, true, AccessLevel.SYSTEM_MODE);
-    }
+	/** Takes the primary flag off affiliations that lost it. */
+	public static void clearPrimaryFlags(List<Affiliation__c> flagsToClear) {
+		if (flagsToClear == null || flagsToClear.isEmpty()) {
+			return;
+		}
+		Database.update(flagsToClear, true, AccessLevel.SYSTEM_MODE);
+	}
 
-    /** Writes the Primary Affiliation field on people held as contacts or as accounts. */
-    public static void savePrimaries(List<SObject> people) {
-        if (people == null || people.isEmpty()) {
-            return;
-        }
-        Database.update(people, true, AccessLevel.SYSTEM_MODE);
-    }
+	/** Writes the Primary Affiliation field on people held as contacts or as accounts. */
+	public static void savePrimaries(List<SObject> people) {
+		if (people == null || people.isEmpty()) {
+			return;
+		}
+		Database.update(people, true, AccessLevel.SYSTEM_MODE);
+	}
 }

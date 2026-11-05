@@ -4,50 +4,50 @@
  * after a naming pattern changes. R-H14.
  */
 public with sharing class HouseholdNamingBatch implements Database.Batchable<SObject>, Database.Stateful {
-    public Integer householdsRead = 0;
-    public Integer householdsChanged = 0;
+	public Integer householdsRead = 0;
+	public Integer householdsChanged = 0;
 
-    /**
-     * Households left untouched because they already carry a native Nonprofit Cloud
-     * household group, mutual exclusion (product-plan Section 11.2 item 9): BarnCRM
-     * never rewrites the name or greetings of an Account somebody else's household model
-     * owns.
-     */
-    public Integer householdsSkippedNative = 0;
+	/**
+	 * Households left untouched because they already carry a native Nonprofit Cloud
+	 * household group, mutual exclusion (product-plan Section 11.2 item 9): BarnCRM
+	 * never rewrites the name or greetings of an Account somebody else's household model
+	 * owns.
+	 */
+	public Integer householdsSkippedNative = 0;
 
-    public Database.QueryLocator start(Database.BatchableContext context) {
-        return HouseholdSelector.getHouseholdsForRecomputeLocator();
-    }
+	public Database.QueryLocator start(Database.BatchableContext context) {
+		return HouseholdSelector.getHouseholdsForRecomputeLocator();
+	}
 
-    public void execute(Database.BatchableContext context, List<SObject> scope) {
-        Set<Id> householdIds = new Map<Id, SObject>(scope).keySet();
-        householdsRead += householdIds.size();
-        // applyNaming leaves out the native households, asking once for the whole scope, and
-        // says which they were.
-        Set<Id> nativeHouseholds = new Set<Id>();
-        householdsChanged += HouseholdNamingService.applyNaming(householdIds, nativeHouseholds);
-        householdsSkippedNative += nativeHouseholds.size();
-    }
+	public void execute(Database.BatchableContext context, List<SObject> scope) {
+		Set<Id> householdIds = new Map<Id, SObject>(scope).keySet();
+		householdsRead += householdIds.size();
+		// applyNaming leaves out the native households, asking once for the whole scope, and
+		// says which they were.
+		Set<Id> nativeHouseholds = new Set<Id>();
+		householdsChanged += HouseholdNamingService.applyNaming(householdIds, nativeHouseholds);
+		householdsSkippedNative += nativeHouseholds.size();
+	}
 
-    /**
-     * The counts stay on the job (read, rewritten, and left alone because the household is a
-     * native Nonprofit Cloud one) so that the settings page can report what happened, and the
-     * person who started the recompute is told (Q-04).
-     */
-    public void finish(Database.BatchableContext context) {
-        JobNotifier.aboutSettings(
-            UserInfo.getUserId(),
-            System.Label.Core_JobNotice_HouseholdNaming,
-            false,
-            String.format(
-                System.Label.Core_JobNotice_HouseholdNamingBody,
-                new List<Object>{
-                    householdsRead.format(),
-                    householdsChanged.format(),
-                    householdsSkippedNative.format()
-                }
-            ),
-            JobNotifier.SECTION_HOUSEHOLD_NAMES
-        );
-    }
+	/**
+	 * The counts stay on the job (read, rewritten, and left alone because the household is a
+	 * native Nonprofit Cloud one) so that the settings page can report what happened, and the
+	 * person who started the recompute is told (Q-04).
+	 */
+	public void finish(Database.BatchableContext context) {
+		JobNotifier.aboutSettings(
+			UserInfo.getUserId(),
+			System.Label.Core_JobNotice_HouseholdNaming,
+			false,
+			String.format(
+				System.Label.Core_JobNotice_HouseholdNamingBody,
+				new List<Object>{
+					householdsRead.format(),
+					householdsChanged.format(),
+					householdsSkippedNative.format()
+				}
+			),
+			JobNotifier.SECTION_HOUSEHOLD_NAMES
+		);
+	}
 }

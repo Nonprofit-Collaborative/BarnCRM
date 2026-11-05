@@ -2,7 +2,7 @@
 
 Scripts for the Org Optimizer page (its sections, Storage and Limits, Unused Setup) and Health Check (findings, fix buttons, read-only view, the Home tile). Setup detail: [Org Optimizer](../admin-guide/org-optimizer.md), [Health Check](../admin-guide/health-check.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data, and the read-only reports (Health Check, storage, limits, field utilization) read the real org. Do not select a fix button that changes an org-wide setting. In **BarnCRM Settings**, **General**, the **Org Optimizer and Health Check** feature is **On**. Data Quality, Duplicates and Field Utilization have their own scripts in [Data Manager and job history](data-manager-and-job-history.md) and [Duplicates](duplicates.md).
+Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data, and the read-only reports (Health Check, storage, limits, Field Use) read the real org. Do not select a fix button that changes an org-wide setting. In **BarnCRM Settings**, **General**, the **Org Optimizer and Health Check** feature is **On**. Data Quality, Duplicates and Field Use have their own scripts in [Data Manager and job history](data-manager-and-job-history.md) and [Duplicates](duplicates.md).
 
 ## T-HC-01: Org Optimizer Sections for an Admin
 
@@ -13,13 +13,16 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In the BarnCRM app, open the **Org Optimizer** tab. | The page name **Org Optimizer** once (no second title card), then **What in your org needs attention, one section at a time.** On your first visit **About This Tool** is open with a **Learn More** link that opens the admin guide in a new tab. **Overview** is selected. |
-| 2 | Read **Overview**. | Tiles with an icon and one line each, under **Check Your Data** (**Data Quality**, **Field Utilization**, **Data Dictionary**, **AI-Readiness Export**) and **Check Your Setup** (**Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**, **Setup Changes**, **Access Explorer**). **Errors** has a badge (**{n} New** or **All Clear**); **Health Check** has **Not Run Yet** on a new org, otherwise the last run's result. No **Duplicates** (they are on the **Duplicate Matching** tab). |
-| 3 | Look at the vertical tabs. | **Overview**, **Data Quality**, **Field Utilization**, **Data Dictionary**, **AI-Readiness Export**, **Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**, **Setup Changes**, **Access Explorer**. Each section has one heading and no card inside the page's card. |
+| 2 | Read **Overview**. | Tiles with an icon and one line each, under **Check Your Data** (**Data Quality**, **Field Use**, **Data Dictionary**, **AI-Readiness Export**) and **Check Your Setup** (**Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**, **Setup Changes**, **Access Explorer**). **Errors** has a badge (**{n} New** or **All Clear**); **Health Check** has **Not Run Yet** on a new org, otherwise the last run's result. No **Duplicates** (they are on the **Duplicate Matching** tab). |
+| 3 | Look at the section list on the left. | The same look as **BarnCRM Settings**: each section with its icon (the Overview tile's icon), **Overview** first, then **Check Your Data** (**Data Quality**, **Field Use**, **Data Dictionary**, **AI-Readiness Export**) and **Check Your Setup** (**Health Check**, **Errors**, **Storage and Limits**, **Unused Setup**, **Setup Changes**, **Access Explorer**). Each section has one heading and no card inside the page's card. |
+| 3a | Choose **Storage and Limits** in the list with the keyboard (Tab to the list, arrow keys, Enter). | The section opens and the focus moves to it; a screen reader reads **Storage and Limits**. |
+| 3b | Narrow the window below tablet width (or open the page on a phone). | The list is replaced by a **Show** box at the top. Choose **Unused Setup** in it: the section opens below and the focus moves to it. Widen the window again: the list is back with **Unused Setup** selected. |
 | 4 | Select the **Errors** tile. | The **Errors** section opens with the **Error Log** card: a count of new entries (or **Nothing has gone wrong. There is nothing to read here.**) and **Open the Error Log**. |
-| 5 | Choose **Health Check**. | Where the tile said **Not Run Yet**: an illustration, **Health Check Runs When You Ask**, **Health Check reads your org's setup, which can take a few seconds, so it runs only when you ask.** and **Run Health Check**. Where the tile showed a result: the same badge, **Last run** with a date and time, **{n} to fix, {n} to be aware of, {n} for your information.** matching the tile, and **Run Now**. Either way no check runs and no findings show yet. |
-| 6 | Click **Run Health Check** (or **Run Now**). | **Reading your org**, then the Health Check report with **What We Found in Your Org** and grouped findings. |
-| 7 | Choose **Overview**, then **Health Check** again. | On **Overview** the **Health Check** tile shows the run's result (**Errors: {n}**, **Warnings: {n}** or **Passed**). Back on **Health Check**, the same report shows without running again. |
-| 7a | Open **BarnCRM Settings**, **Health** (this runs Health Check), then reload **Org Optimizer**. | The **Health Check** tile shows that run's result, and the **Health Check** section shows the same run under **Last run**, never **Health Check Runs When You Ask** beside a tile with warnings (owner QA, 2026-10-31). |
+| 5 | Choose **Health Check**. | Where the tile said **Not Run Yet**: an illustration, **Health Check Runs When You Ask**, **Health Check reads your org's setup, which can take a few seconds, so it runs only when you ask.** and **Run Health Check**. Where the tile showed a result: the same badge, **Last run** with a date and time, **{n} to fix, {n} to be aware of, {n} for your information.** matching the tile, and **Run Again**. Either way no check runs and no findings show yet. |
+| 6 | Click **Run Health Check** (or **Run Again**). | **Reading your org**, then the Health Check report with **What We Found in Your Org** and grouped findings. The button now reads **Run Again**. |
+| 7 | Choose **Overview**, then **Health Check** again. | On **Overview** the **Health Check** tile shows the run's result in the report's own words (**Needs Fixing: {n}**, **Worth Knowing: {n}** or **All Clear**). Back on **Health Check**, the same report shows without running again. |
+| 7a | Run Health Check from BarnCRM Home's Health Check tile, then reload **Org Optimizer**. | The **Health Check** tile shows that run's result, and the **Health Check** section shows the same run under **Last run**, never **Health Check Runs When You Ask** beside a tile with a result (owner QA, 2026-10-31). |
+| 7b | Open `/lightning/n/Data_Hygiene?c__section=healthCheck`, then `/lightning/n/Data_Hygiene?c__section=errors`. | The page opens straight at **Health Check** (the stored run, nothing runs), then at **Errors**. `c__section=nothing` opens on **Overview**. |
 | 8 | Choose **Data Quality**, then **Storage and Limits**, then **Overview**. | **Data Quality** has **{n} Need Attention** or **All Clear**; **Storage and Limits** has **Data Storage {n}%**. Reload the page: **About This Tool** is now closed. |
 
 **Cleanup:** None.
@@ -38,7 +41,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Remove **BarnCRM Find and Export** from the staff user.
 
-## T-HC-03: Health Check Report and Re-Run
+## T-HC-03: Health Check Report and Run Again
 
 **Purpose:** Confirm the full report reads the org, groups findings and re-runs.
 **Prerequisites:** admin. Setup Assistant steps you skipped (for example the module and access steps) add findings beyond the ones named here: read them, they are expected, and they do not fail this script.
@@ -46,12 +49,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings** and choose **Health**. | **Health Check**, **What BarnCRM found in your org, and what to do about it.** The card **What We Found in Your Org** shows what was detected (for example **Person Accounts enabled**), **Coexistence mode** and **Recommended**. |
-| 2 | Read the findings. | Grouped under **Your Org**, **Licenses**, **Access** and **Settings**. Each has a severity (**Needs fixing**, **Worth knowing** or **Information**), a title, a sentence on what to do and, for most, a button. |
+| 1 | Open **Org Optimizer**, choose **Health Check** and click **Run Health Check** (or **Run Again**). | **Health Check**, **What BarnCRM found in your org, and what to do about it.** The part **What We Found in Your Org** shows what was detected (for example **Person Accounts enabled**), **Coexistence mode** and **Recommended**. |
+| 2 | Read the findings. | Grouped under **Your Org**, **Licenses**, **Access** and **Settings**. Each has a severity icon read as **Needs Fixing**, **Worth Knowing** or **Information**, a title in Title Case, a sentence on what to do and, for most, a button. |
 | 3 | Find **Your Org at a Glance**. | An **Information** finding that ends by saying Shield Platform Encryption cannot be detected from inside the app. |
 | 4 | Find the automation finding. | **Automation Is Running Normally**, **Information**. |
 | 5 | Look for a fiscal year finding. | With a standard fiscal year in Setup (the default), there is none. An org that uses a custom fiscal year shows **Your Org Uses a Custom Fiscal Year**, **Information**, naming the start month, with no button. |
-| 6 | Click **Re-Run**. | **Reading your org**, then the report again. |
+| 6 | Click **Run Again**. | **Reading your org**, then the report again. |
+| 7 | If **Use Recommended Mode** shows, click it. | The confirm box reads **Coexistence mode (how BarnCRM shares people and households with NPSP or Nonprofit Cloud) changes from ... to ....** Click **Cancel**: nothing changes. |
 
 **Cleanup:** None.
 
@@ -62,12 +66,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **BarnCRM Settings**, **Health**, find **Nightly Jobs Are Not Scheduled**. | It names the jobs, for example **Error digest email**, **Empty household tidy-up**, and has **Schedule All Nightly Jobs**. |
+| 1 | On **Org Optimizer**, **Health Check**, click **Run Health Check** (or **Run Again**) and find **Nightly Jobs Are Not Scheduled**. | It names the jobs, for example **Error Digest Email**, **Empty Household Tidy-Up**, and has **Schedule All Nightly Jobs**. |
 | 2 | Click **Schedule All Nightly Jobs**. | A dialog **Before This Fix Runs**: **This is what the fix will do. Nothing changes until you confirm.**, the same list, **Confirm** and **Cancel**. |
 | 3 | Press Escape. | The dialog closes and focus returns to the button. Nothing is scheduled. |
 | 4 | Click **Schedule All Nightly Jobs**, then **Confirm**. | **Done. Scheduled: ...** naming each job, and the report re-runs. **Nightly Jobs Are Not Scheduled** is gone. |
 | 5 | In **BarnCRM Settings**, open **General** and scroll to **Recent Changes**. | The top entry starts **Health Check:** with the button's name, your name and the time. |
-| 6 | Open **BarnCRM Settings**, **Error Log**. | The **Error Digest** panel shows as scheduled, so the job can be stopped on its own page. The seasonal address swap is not on the list unless **Turn On Seasonal Addresses** is ticked on the **Addresses** page, and then it is scheduled already. |
+| 6 | Open **BarnCRM Settings**, **Error Log**. | The **Error Digest** panel shows as scheduled, so the job can be stopped on its own page. The seasonal address swap is not on the list unless **Turn on seasonal addresses** is ticked on the **Addresses** page, and then it is scheduled already. |
 
 **Cleanup:** None. Leave the jobs scheduled.
 
@@ -78,10 +82,10 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **BarnCRM Settings**, **Health**, click **Re-Run**. | **1 Household Has Nobody in It** (or **N Households Have Nobody in Them**), **Information**, with **The first is linked below.** or **The first N are linked below.** |
+| 1 | On **Org Optimizer**, **Health Check**, click **Run Again**. | **1 Household Has Nobody in It** (or **N Households Have Nobody in Them**), **Information**, with **The first is linked below.** or **The first N are linked below.** |
 | 2 | Look for a fix button on it. | None: what to do with an empty household is your decision. |
 | 3 | Click the `Empty Test Household` link. | The household opens, unchanged. |
-| 4 | Delete `Empty Test Household`, return and **Re-Run**. | The count drops by one (the finding is gone if it was the only one). |
+| 4 | Delete `Empty Test Household`, return and **Run Again**. | The count drops by one (the finding is gone if it was the only one). |
 
 **Cleanup:** None.
 
@@ -101,13 +105,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-HC-07: Health Check's Last Result on Home
 
-**Purpose:** Confirm Home shows the last full run instead of running each time, and Run Now refreshes it.
+**Purpose:** Confirm Home shows the last full run instead of running each time, and Run Health Check (Run Again after the first run) refreshes it.
 **Prerequisites:** admin.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the BarnCRM home page. | The Health Check tile shows **Last Run** with a date and time and **N to fix, N to be aware of, N for your information.**, or **Health Check has not run yet. Click Run Now to check this org.** |
-| 2 | Click **Run Now**. | **Reading your org**, then the whole report in the tile. |
+| 1 | Open the BarnCRM home page. | The Health Check tile shows **Last Run** with a date and time and **N to fix, N to be aware of, N for your information.**, and **Run Again**, or **Health Check has not run yet. Click Run Health Check to check this org.** and **Run Health Check**. |
+| 2 | Click **Run Health Check** (or **Run Again**). | **Reading your org**, then the whole report in the tile. |
 | 3 | Reload the home page. | **Last Run** shows the time of step 2, with its counts. |
 
 **Cleanup:** None.
@@ -132,7 +136,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Org Optimizer**, choose **Unused Setup**. | **Nothing here is changed for you. Open each item in Setup and decide whether to remove it.** Then twelve checks (five of them under **Technical Debt**, see T-HC-16), including **Active Users Who Have Not Logged In for 90 Days**, **Permission Sets Nobody Is Assigned**, **Reports Not Run for 365 Days**, **Email Templates Never Used**, **Inactive Flows**, **Scheduled Jobs Owned by Inactive Users**, **Objects Near Their Custom Field Limit**, **Record Types No Record Uses, or Inactive**. |
+| 1 | Open **Org Optimizer**, choose **Unused Setup**. | **Nothing here is changed for you. Open each item in Setup and decide whether to remove it.** Then seven checks, and a closed part titled **For Developers: Old Code and Flows** with five more (see T-HC-16), including **Active Users Who Have Not Logged In for 90 Days**, **Permission Sets Nobody Is Assigned**, **Reports Not Run for 365 Days**, **Email Templates Never Used**, **Scheduled Jobs Owned by Inactive Users**, **Objects Near Their Custom Field Limit**, **Record Types No Record Uses, or Inactive**. |
 | 2 | Read a check with a count above 0. | The count in a warning-colored badge, up to five names, and **Open in Setup** with a new-window icon. A check the org does not allow reads **Could not check: your access or this org does not allow it.** |
 | 3 | Click **Open in Setup** on one check. | The matching Setup page opens. Nothing was removed. |
 | 4 | In **BarnCRM Settings**, **Org Optimizer**, set **Days before a user is unused** to `10` and click **Save**. | Nothing is saved; the value is marked as outside its range (30 to 365). |
@@ -142,13 +146,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-HC-16: Technical Debt Checks Follow the Old API Version Setting
 
-**Purpose:** Confirm the Technical Debt checks list Apex and flows on old API versions, state what they do not cover, and follow a bounded setting.
+**Purpose:** Confirm the technical debt checks (For Developers: Old Code and Flows) list Apex and flows on old API versions, state what they do not cover, and follow a bounded setting.
 **Prerequisites:** admin.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Org Optimizer**, choose **Unused Setup**. | Two headings: **Unused Setup** and **Technical Debt**. Under **Technical Debt**, a line reading "Covers Apex classes, Apex triggers and flows... Not covered: validation rules, workflow rules, process builders...". |
-| 2 | Read the checks under **Technical Debt**. | **Active Apex Classes Below API Version 50**, **Active Apex Triggers Below API Version 50**, **Flows Below API Version 50**, **Active Flows With No Description** and **Inactive Flows**, each with a count and **Open in Setup**. |
+| 1 | Open **Org Optimizer**, choose **Unused Setup**. | Below the Unused Setup checks, a closed part titled **For Developers: Old Code and Flows** with an arrow; its checks are hidden. |
+| 1a | Select the title (or Tab to it and press Enter). | It opens (a screen reader reads it as expanded), with a line reading "Covers Apex classes, Apex triggers and flows... Not covered: validation rules, workflow rules, process builders...". Select it again: it closes. Open it for the next steps. |
+| 2 | Read the checks under **For Developers: Old Code and Flows**. | **Active Apex Classes Below API Version 50**, **Active Apex Triggers Below API Version 50**, **Flows Below API Version 50**, **Active Flows With No Description** and **Inactive Flows**, each with a count and **Open in Setup**. |
 | 3 | In **BarnCRM Settings**, **Org Optimizer**, set **Old API version** to `10` and click **Save**. | Nothing is saved; the value is marked as outside its range (21 to 80). |
 | 4 | Set it to `80`, **Save**, then **Refresh**. | The three version checks read **Below API Version 80**; **Active Apex Classes** shows a count above 0 with up to five names. |
 | 5 | Click **Open in Setup** on **Active Apex Classes**. | The Apex Classes page opens. Nothing was changed. |
@@ -163,7 +168,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As the admin, open **Org Optimizer** and choose **Data Dictionary**. | **Data Dictionary**, a **Kinds of Record** picker with **Account**, **Contact** and Core's data objects (such as **Address** and **Relationship**) already under **Selected**, **Include Fill Rates** unticked, **Build Dictionary** enabled and **Download CSV** disabled. **Choose kinds of record and press Build Dictionary.** shows. |
-| 2 | Move everything except **Account** out of **Selected**, then click **Build Dictionary**. | A progress bar, then **Described 1 of 1 kinds of record.** and a table of Account's fields sorted by **Field**, with **Object**, **API Name**, **Type**, **Length**, **Precision**, **Required**, **Unique**, **External ID**, **Custom**, **Picklist Values**, **Help Text**, **Formula** and **Related To**. No **Fill Rate** column. |
+| 2 | Move everything except **Account** out of **Selected**, then click **Build Dictionary**. | A progress bar, then **Described 1 of 1 kinds of record.** and a table of Account's fields sorted by **Field**, with **Kind of Record**, **API Name**, **Type**, **Length**, **Precision**, **Required**, **Unique**, **External ID**, **Custom**, **Picklist Values**, **Help Text**, **Formula** and **Related To**. No **Fill Rate** column. |
 | 3 | Find **Name**, **Website** and **Is Organization**. | **Name** is **Required**: Yes. **Website** has type url and **Custom**: No. **Is Organization** has **Custom**: Yes and its formula in **Formula**. **Parent Account** has **Related To**: Account. |
 | 4 | Tick **Include Fill Rates** and click **Build Dictionary**. | The progress line reads **Counting fill rates for Account.** while it counts, then a **Fill Rate** column appears. **Phone** shows a percentage; **Is Organization** (a formula) and checkboxes are blank. |
 | 5 | Click **Download CSV**. | A file named **Data_Dictionary-** and today's date ending .csv downloads, and **Downloaded {n} fields.** shows. Open it in a spreadsheet: a header row starting **Object**, **Object API Name**, **Field**, then one row per field with the same values, and **Fill Rate** as a percentage such as 33.3%. |
@@ -197,15 +202,15 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As the admin, open **Org Optimizer** and choose the **Access Explorer** tile. | **Access Explorer**, **Who can see or change what, and why. Every view only reads, except Change Field Access, which shows each change before it is made.**, a **Show** choice with **By Person or Permission Set** selected, **Look Up** set to **Person**, and **Choose a person or permission set to see their access.** |
-| 2 | Type the first two letters of the staff user's name in **Person** and choose them. | **Access Comes From** lists their profile (**Profile**), then **Team Member** (**Permission Set Group**, **Includes** BarnCRM Staff and the other sets in the role). A **Kinds of Record** table follows, sorted by name, with **Read**, **Create**, **Edit**, **Delete**, **View All**, **Modify All** and **Granted By**. **Relationship** has **Read**, **Create**, **Edit** and **Delete** as **Yes**, and **Granted By** reads **Team Member (through BarnCRM Staff)**. |
-| 3 | Choose **Relationship** in **Field Access For**. | A **Fields** table with **Field**, **API Name**, **Read**, **Edit** and **Granted By**. **Description** shows **Yes** for **Read** and **Edit**; **Relationship Number** (Name) shows **Always**. |
+| 2 | Type the first two letters of the staff user's name in **Person** and choose them. | **Access Comes From** lists their profile (**Profile**), then **Team Member (BarnCRM role)** (**Kind** **Permission Set Group**, **Includes** BarnCRM Staff and the other sets in the role). A **Kinds of Record** table follows, sorted by name, with **Read**, **Create**, **Edit**, **Delete**, **View All**, **Modify All** and **Granted By**. **Relationship** has **Read**, **Create**, **Edit** and **Delete** as **Yes**, and **Granted By** reads **Team Member (through BarnCRM Staff)**. |
+| 3 | Choose **Relationship** in **Field Access For**. | A **Fields** table with **Field**, **Read**, **Edit** and **Granted By**, and no **API Name**. **Description** shows **Yes** for **Read** and **Edit**; **Relationship Number** (Name) shows **Always**. Turn on **Show technical names** at the top: **API Name** columns appear in the **Kinds of Record** and **Fields** tables and the **Field Access For** list adds API names in brackets. Turn it off again. |
 | 4 | Type one letter in **Person**. | No search runs and nothing is listed until a second letter is typed. |
 | 5 | Choose **By Kind of Record**, then **Relationship** in **Kind of Record**. | **Who Gives Access** lists profiles, then permission set groups, then permission sets, with **Kind**, the six permissions and **Active People**. **Team Member** is there with at least 1 active person, and **System Administrator** shows **View All** and **Modify All** (it gives Modify All Data). **People With Access** lists active people by name with **Granted By**. |
 | 6 | Choose **Description** in **Field**. | **Who Gives Access** now shows **Read** and **Edit** only, and **People With Access** reloads. Choose **Relationship Number**: **Anyone who can read this kind of record can see this field. Salesforce does not let it be restricted.** and no tables. |
 | 7 | In an org with more than 50 active people with access, click **Show More**. | The next 50 people are added below, in name order, with no one listed twice. **Show More** disappears after the last page. |
 | 8 | Choose **By Person or Permission Set**, set **Look Up** to **Permission Set**, type `Staff` and choose **BarnCRM Staff** (**Permission Set**). | **Access Comes From** lists only **BarnCRM Staff**, and the table shows only what it gives: **Relationship** with **Granted By** **BarnCRM Staff**. |
-| 9 | Search `Team` and choose **Team Member** (**Permission Set Group**). | **Access Comes From** shows **Team Member** with **Includes** naming its sets, and **Relationship**'s **Granted By** reads **Team Member (through BarnCRM Staff)**. |
-| 10 | Choose **BarnCRM Permission Sets**. | The BarnCRM roles first (such as **BarnCRM Admin Group** and **Team Member**), then the BarnCRM permission sets, each with **Active People**. Below: **The Tab Access Check is scheduled hourly. Next run:** and a time, or, if it is not scheduled, a message pointing to Health Check. |
+| 9 | Search `Team` and choose **Team Member (BarnCRM role), Permission Set Group**. | **Access Comes From** shows **Team Member (BarnCRM role)** with **Includes** naming its sets, and **Relationship**'s **Granted By** reads **Team Member (through BarnCRM Staff)**. |
+| 10 | Choose **BarnCRM Roles and Extra Permissions**. | The BarnCRM roles first, each named with **(BarnCRM role)** (such as **Team Member (BarnCRM role)**) and **Kind** **Permission Set Group**, then the BarnCRM permission sets, the extra permissions named with **(extra permission)** (such as **BarnCRM Bulk Update (extra permission)**) and **Kind** **Permission Set**, each with **Active People**. Below: **The Tab Access Check is scheduled hourly. Next run:** and a time, or, if it is not scheduled, a message pointing to Health Check. |
 | 11 | Click **Download CSV** under any table. | A file named **Access_Explorer-** and today's date ending .csv downloads with the table's columns and rows, and **Downloaded {n} rows.** shows. |
 | 12 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **Access Explorer** tile or tab. |
 | 13 | As the admin, open **BarnCRM Settings**, then the **Access** page, and click **Open Access Explorer**. | **Org Optimizer** opens on the **Access Explorer** section. |
@@ -239,15 +244,15 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Error Log**. Set **Digest frequency** to **Once a week**. | **Send Weekly Admin Summary** is shown ticked with a **Default** badge. |
+| 1 | Open **BarnCRM Settings**, **Error Log**. Set **Digest frequency** to **Once a week**. | **Send weekly admin summary** is shown ticked with a **Default** badge. |
 | 2 | In **Error Digest**, click **Send Now** in an org with no new entries, no failed jobs, no duplicates waiting, no limit at 80 percent and no Setup change kept since the last digest. | The panel says there was nothing new and no email goes out. |
 | 3 | Make a Contact Import fail (load a file, then break the job) and, if the org has an active duplicate rule, save a duplicate Contact past the alert. Click **Send Now**. | An email arrives titled **BarnCRM: Weekly Admin Summary**. Under **Admin Summary** it lists **Failed BarnCRM jobs** with a link to each and **Duplicates waiting for review**. No record content is in it. |
 | 4 | Add a New Error Log entry (for example by running a failing action), then **Send Now**. | The email is titled **BarnCRM: 1 new Error Log entries** and carries the error counts first, then the **Admin Summary**. |
-| 5 | Untick **Send Weekly Admin Summary**, save, and **Send Now** again after step 3's problems are still present. | No summary section is sent; with no new entries, no email. |
+| 5 | Untick **Send weekly admin summary**, save, and **Send Now** again after step 3's problems are still present. | No summary section is sent; with no new entries, no email. |
 | 6 | Set **Digest frequency** back to **Every day** and **Send Now** with a New entry. | The email has the error counts only, with no **Admin Summary**. |
-| 7 | Set **Digest frequency** to **Once a week** and tick **Send Weekly Admin Summary**. In Setup, change the help text of any Contact field. Open **Org Optimizer**, **Setup Changes**, click **Copy New Changes Now**, wait a minute, then **Send Now** in **Error Digest**. | Under **Admin Summary**: **Setup changes since the last digest: {n} (see Org Optimizer, Setup Changes)**, counting your change (counted once, by when it was kept: a second **Send Now** after the next digest does not count it again). |
+| 7 | Set **Digest frequency** to **Once a week** and tick **Send weekly admin summary**. In Setup, change the help text of any Contact field. Open **Org Optimizer**, **Setup Changes**, click **Copy New Changes Now**, wait a minute, then **Send Now** in **Error Digest**. | Under **Admin Summary**: **Setup changes since the last digest: {n} (see Org Optimizer, Setup Changes)**, counting your change (counted once, by when it was kept: a second **Send Now** after the next digest does not count it again). |
 
-**Cleanup:** Restore **Digest frequency** and **Send Weekly Admin Summary** to their earlier values, and change the help text from step 7 back.
+**Cleanup:** Restore **Digest frequency** and **Send weekly admin summary** to their earlier values, and change the help text from step 7 back.
 
 ## T-HC-14: Setup Changes Keeps Who Changed What
 
@@ -264,11 +269,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 6 | Type the field's label in **Search** and click **Search**. | Only changes that mention it. Add a second word that is not in any of them: **No kept change matches these filters.** |
 | 7 | Clear **Search**. Choose a **Section**, and set **From** to today. | Only today's changes in that section. Set **To** to yesterday and click **Search**: **From is after To.** and nothing is asked of the server. |
 | 8 | Clear the filters and click **Download CSV**. | A file named **Setup_Changes-** and today's date ending .csv downloads, and **Saved {n} changes as CSV.** shows. Its header row is **Changed At**, **Changed By**, **Logged In As**, **Section**, **Action**, **What Changed**. |
-| 9 | In **BarnCRM Settings**, **Org Optimizer**, find **Days to Keep Setup Changes**. Set it to `100` and click **Save**. | Shows **730** before you change it. Nothing is saved; the value is marked as outside its range (180 to 3,650). |
-| 10 | Open **Org Optimizer**, **Health Check**, and run it. | If the nightly jobs finding lists jobs, **Setup changes copy** is one of them unless step 3 already scheduled it. |
+| 9 | In **BarnCRM Settings**, **Org Optimizer**, find **Days to keep setup changes**. Set it to `100` and click **Save**. | Shows **730** before you change it. Nothing is saved; the value is marked as outside its range (180 to 3,650). |
+| 10 | Open **Org Optimizer**, **Health Check**, and run it. | If the nightly jobs finding lists jobs, **Setup Changes Copy** is one of them unless step 3 already scheduled it. |
 | 11 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **Setup Changes** tile or tab. |
 
-**Cleanup:** Change the help text from step 5 back. The copied **Setup Change** records stay until the nightly copy deletes them after **Days to Keep Setup Changes**; nobody edits or deletes them by hand.
+**Cleanup:** Change the help text from step 5 back. The copied **Setup Change** records stay until the nightly copy deletes them after **Days to keep setup changes**; nobody edits or deletes them by hand.
 
 ## T-HC-15: AI-Readiness Export Downloads a Pack With Sensitive Fields Handled
 
@@ -341,9 +346,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 4 | Click **Retire Check**. | Find opens in a new tab with the query loaded. |
 | 5 | Look at **Retire a Field**. | Five steps: edit the records above, check Salesforce's own uses (Open in Setup), back up the values (Open in Find), hide the field, delete it in Setup (Open in Setup). Ticking two shows **2 of 5 steps done**. Nothing is deleted. |
 | 6 | In **Rollup Builder**, make a rollup that counts Contacts with **Test Retire** not blank on their organization; then repeat step 3. | The rollup is listed under **Rollups** (Named in: Filter on counted records). |
-| 7 | Click **Show Uses of the Whole Object**. | The title becomes **Where Used: Contact**, the list shows setup that works on Contact, and **Retire a Field** is gone. Click **Show Uses of This Field** to go back. |
+| 7 | Click **Show Uses of the Whole Kind of Record**. | The title becomes **Where Used: Contact**, the list shows setup that works on Contact (Named in: Works on this kind of record), and **Retire a Field** is gone. Click **Show Uses of This Field** to go back. |
 | 8 | Repeat step 3 for the standard field **Last Name**. | The last step says the field can't be deleted and to keep it hidden. |
-| 9 | Choose **Field Utilization**, count **Contact**, and choose **Where Used** on a row; then open a Contact with the **Record Inspector**, inspect it and click the **Where Used** button beside **Test Retire**. | The same window opens from both places. |
+| 9 | Choose **Field Use**, count **Contact**, and choose **Where Used** on a row; then open a Contact with the **Record Inspector**, inspect it and click the **Where Used** button beside **Test Retire**. | The same window opens from both places. |
 | 10 | With Programs installed, give a program an eligibility rule on **Referral Source**, then run **Where Used** for the Enrollment field **Referral Source**. | The program is listed under **Programs** (Named in: Eligibility Rules) with an "If deleted" line and a link that opens the program. |
 | 11 | With Logic Models installed, give an indicator a computed source counted by a date field, then run **Where Used** for that date field. | The indicator is listed under **Indicators** (Named in: Source Definition) with a link that opens its logic model. |
 

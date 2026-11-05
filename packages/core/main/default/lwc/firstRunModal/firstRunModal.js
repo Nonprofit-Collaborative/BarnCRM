@@ -8,7 +8,6 @@ import FEATURES_QUESTION from '@salesforce/label/c.Core_FirstRun_FeaturesQuestio
 import ALL_OPTION from '@salesforce/label/c.Core_FirstRun_AllOption';
 import CHOOSE_OPTION from '@salesforce/label/c.Core_FirstRun_ChooseOption';
 import FINISH from '@salesforce/label/c.Core_ModuleSetup_FinishButton';
-import ADMIN_NEEDED from '@salesforce/label/c.Core_FirstRun_AdminNeeded';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import STANDARD_NAME from '@salesforce/label/c.Core_SuiteChoice_StandardName';
 import NONPROFIT_NAME from '@salesforce/label/c.Core_SuiteChoice_NonprofitName';
@@ -43,8 +42,13 @@ export default class FirstRunModal extends LightningModal {
     get modulesNote() {
       return helpText('Core', 'Core_FirstRun_ModulesNote');
     },
+    get staysOn() {
+      return helpText('Core', 'Core_FirstRun_StaysOnWarning');
+    },
     finish: FINISH,
-    adminNeeded: ADMIN_NEEDED,
+    get adminNeeded() {
+      return helpText('Core', 'Core_FirstRun_AdminNeeded');
+    },
     close: CLOSE
   };
 
@@ -100,11 +104,16 @@ export default class FirstRunModal extends LightningModal {
     return this.mode === CHOOSE;
   }
 
+  get isAll() {
+    return this.mode === ALL;
+  }
+
   get features() {
     return ((this.state && this.state.features) || []).map((feature) => ({
       ...feature,
-      checked: feature.isOn || !this.unticked.has(feature.key),
-      disabled: feature.isOn || this.busy
+      // A feature that waits (its row says why, RT-04) cannot be ticked; one already on stays.
+      checked: feature.isOn || (!feature.blockedReason && !this.unticked.has(feature.key)),
+      disabled: feature.isOn || this.busy || Boolean(feature.blockedReason)
     }));
   }
 
@@ -137,7 +146,7 @@ export default class FirstRunModal extends LightningModal {
 
   async handleFinish() {
     const keys = this.features
-      .filter((feature) => !this.isChoosing || feature.checked)
+      .filter((feature) => (this.isChoosing ? feature.checked : !feature.blockedReason))
       .map((feature) => feature.key);
     this.busy = true;
     this.errorMessage = undefined;

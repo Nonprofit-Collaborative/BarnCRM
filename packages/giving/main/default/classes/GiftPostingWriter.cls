@@ -24,10 +24,10 @@
  * records the running user cannot see.
  */
 public with sharing class GiftPostingWriter {
-    public static void save(List<Gift__c> gifts) {
-        if (gifts == null || gifts.isEmpty()) {
-            return;
-        }
-        Database.update(gifts, true, AccessLevel.SYSTEM_MODE);
-    }
+	public static void save(List<Gift__c> gifts) {
+		if (gifts == null || gifts.isEmpty()) {
+			return;
+		}
+		Database.update(gifts, true, AccessLevel.SYSTEM_MODE);
+	}
 }

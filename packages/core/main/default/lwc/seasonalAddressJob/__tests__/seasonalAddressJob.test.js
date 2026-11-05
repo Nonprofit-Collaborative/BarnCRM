@@ -3,6 +3,19 @@ import SeasonalAddressJob from 'c/seasonalAddressJob';
 import getSwap from '@salesforce/apex/SeasonalAddressController.getSwap';
 import runNow from '@salesforce/apex/SeasonalAddressController.runNow';
 import { refreshApex } from '@salesforce/apex';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_SeasonalAddress_ScheduleActive: 'The swap runs every night at 12:30 AM.',
+  Core_SeasonalAddress_NotScheduled:
+    'The nightly swap is not scheduled, so seasonal addresses will not move on their own.',
+  Core_SeasonalAddress_SwitchedOff:
+    'Seasonal Addresses is off, so seasonal addresses will not move on their own.',
+  Core_SeasonalAddress_RunNowStarted:
+    'The swap has started. Refresh this page in a minute to see what it did.',
+  Core_SeasonalAddress_Stale: 'The swap is scheduled but has not run in more than 36 hours.',
+  Core_SeasonalAddress_NeverRun: 'The seasonal address swap has not run yet.'
+});
 
 jest.mock(
   '@salesforce/apex/SeasonalAddressController.getSwap',
@@ -24,46 +37,6 @@ jest.mock('@salesforce/apex', () => ({ refreshApex: jest.fn(() => Promise.resolv
 jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: true }), {
   virtual: true
 });
-
-jest.mock(
-  '@salesforce/label/c.Core_SeasonalAddress_ScheduleActive',
-  () => ({ default: 'The swap runs every night at 12:30 AM.' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Core_SeasonalAddress_NotScheduled',
-  () => ({
-    default: 'The nightly swap is not scheduled, so seasonal addresses will not move on their own.'
-  }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Core_SeasonalAddress_SwitchedOff',
-  () => ({
-    default: 'Seasonal Addresses is off, so seasonal addresses will not move on their own.'
-  }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Core_SeasonalAddress_RunNowStarted',
-  () => ({ default: 'The swap has started. Refresh this page in a minute to see what it did.' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Core_SeasonalAddress_Stale',
-  () => ({ default: 'The swap is scheduled but has not run in more than 36 hours.' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Core_SeasonalAddress_NeverRun',
-  () => ({ default: 'The seasonal address swap has not run yet.' }),
-  { virtual: true }
-);
 
 const RAN_LAST_NIGHT = {
   canManage: true,

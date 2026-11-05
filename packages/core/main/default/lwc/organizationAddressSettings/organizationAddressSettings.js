@@ -3,14 +3,10 @@ import hasManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Setti
 import getOrganizationAddress from '@salesforce/apex/SettingsController.getOrganizationAddress';
 import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
 import SAVE from '@salesforce/label/c.Core_OrganizationAddress_Save';
-import SAVED from '@salesforce/label/c.Core_OrganizationAddress_Saved';
-import FILL_REQUIRED from '@salesforce/label/c.Core_OrganizationAddress_FillRequired';
-import LOAD_ERROR from '@salesforce/label/c.Core_OrganizationAddress_LoadError';
-import SAVE_ERROR from '@salesforce/label/c.Core_Settings_SaveErrorMessage';
 import getCompanyAddress from '@salesforce/apex/SettingsController.getCompanyAddress';
 import NOT_SET from '@salesforce/label/c.Core_Settings_NotSet';
-import COMPANY_SUGGESTION from '@salesforce/label/c.Core_OrganizationAddress_CompanySuggestion';
 import USE_COMPANY from '@salesforce/label/c.Core_OrganizationAddress_UseCompany';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The address parts in the order they are printed. */
 const PRINT_ORDER = [
@@ -32,6 +28,8 @@ const PRINT_ORDER = [
  * Information address is offered: Use This Address fills the block, and Save saves it.
  */
 export default class OrganizationAddressSettings extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = { save: SAVE, notSet: NOT_SET, useCompany: USE_COMPANY };
 
   values = {};
@@ -63,6 +61,11 @@ export default class OrganizationAddressSettings extends LightningElement {
   }
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     return this.load();
   }
 
@@ -76,7 +79,7 @@ export default class OrganizationAddressSettings extends LightningElement {
     const oneLine = PRINT_ORDER.map((key) => this.companyAddress[key])
       .filter((value) => value)
       .join(', ');
-    return COMPANY_SUGGESTION.replace('{0}', oneLine);
+    return helpText('Core', 'Core_OrganizationAddress_CompanySuggestion').replace('{0}', oneLine);
   }
 
   async load() {
@@ -85,7 +88,7 @@ export default class OrganizationAddressSettings extends LightningElement {
       this.saved = { ...parts };
       this.values = { ...parts };
     } catch {
-      this.showError(LOAD_ERROR);
+      this.showError(helpText('Core', 'Core_OrganizationAddress_LoadError'));
       return;
     }
     if (this.canEdit) {
@@ -115,17 +118,20 @@ export default class OrganizationAddressSettings extends LightningElement {
     }
     const block = this.template.querySelector('c-organization-address');
     if (block && block.reportValidity() === false) {
-      this.showError(FILL_REQUIRED);
+      this.showError(helpText('Core', 'Core_OrganizationAddress_FillRequired'));
       return;
     }
     try {
       await saveSettings({ values: { ...this.values } });
       this.saved = { ...this.values };
       this.messageIsError = false;
-      this.message = SAVED;
+      this.message = helpText('Core', 'Core_OrganizationAddress_Saved');
       this.dispatchEvent(new CustomEvent('settingssaved'));
     } catch (error) {
-      this.showError((error && error.body && error.body.message) || SAVE_ERROR);
+      this.showError(
+        (error && error.body && error.body.message) ||
+          helpText('Core', 'Core_Settings_SaveErrorMessage')
+      );
     }
   }
 

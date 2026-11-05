@@ -1,37 +1,19 @@
 /**
- * The nightly Import row cleanup's schedule (R-IR5). Health Check lists it among the
- * nightly jobs and its Schedule all nightly jobs fix starts it (`NightlyJobs`, ADR-0075). When
- * rows are deleted is the Import setting Delete Import Rows; Never keeps them, so the job
- * needs no stop button of its own.
+ * The old Import row cleanup schedule (R-IR5), kept as a shell. The cleanup is now a pass of the
+ * nightly Record Cleanup step (`RecordRetentionBatch`, ADR-0166 nightly-job-dispatcher), which
+ * follows the Import setting Delete Import Rows; Never keeps the rows.
+ *
+ * Still schedulable: an org upgraded from before the nightly run may have this job scheduled on
+ * its own, and when it fires it adopts the old schedules (R-NJ5), this one included, and the
+ * nightly run does the work.
  */
 public with sharing class ImportRowPurgeScheduler implements Schedulable {
-    /** The name the scheduled job carries, so it is found again rather than doubled. */
-    public static final String JOB_NAME = 'BarnCRM Import Row Cleanup';
+	/** The name the job was scheduled under; the nightly run adopts it as a retired key. */
+	public static final String JOB_NAME = 'BarnCRM Import Row Cleanup';
 
-    /** A quarter past one: clear of the seasonal addresses at 0:30 and the rollups at 2:00. */
-    private static final String NIGHTLY_CRON = '0 15 1 * * ?';
-
-    public void execute(SchedulableContext context) {
-        Database.executeBatch(new ImportRowPurgeBatch(), ImportRowPurgeBatch.CHUNK_SIZE);
-    }
-
-    /** Starts the nightly cleanup, or does nothing when it is already scheduled. */
-    public static Id start() {
-        return ScheduledJobSelector.ensure(JOB_NAME, NIGHTLY_CRON, new ImportRowPurgeScheduler());
-    }
-
-    /** True when the nightly cleanup is scheduled. */
-    public static Boolean isScheduled() {
-        return ScheduledJobSelector.isScheduled(JOB_NAME);
-    }
-
-    /** The cleanup as Health Check's nightly jobs list sees it. */
-    public static NightlyJob nightlyJob() {
-        return new NamedNightlyJob(
-            System.Label.Core_HealthCheck_JobImportRows,
-            JOB_NAME,
-            NIGHTLY_CRON,
-            new ImportRowPurgeScheduler()
-        );
-    }
+	public void execute(SchedulableContext context) {
+		if (context != null) {
+			NightlyJobs.adoptOldSchedules();
+		}
+	}
 }

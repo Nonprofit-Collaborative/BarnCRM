@@ -70,6 +70,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: empty cells clear the field, per column</shortDescription>
-        <value>Empty cells clear the field (update and upsert)</value>
+        <value>Empty cells clear the field (updates)</value>
     </labels>
 </CustomLabels>

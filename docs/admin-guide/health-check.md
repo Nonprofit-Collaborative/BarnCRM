@@ -23,26 +23,33 @@ install is off until you turn it on: choose **Turn On** in that row in **BarnCRM
 [BarnCRM Settings](barncrm-settings.md). Once it is on there is nothing else to enable and
 nothing to configure.
 
+Health Check's one home is **Org Optimizer**:
+
 1. Open the **BarnCRM Admin** app.
-2. Click the **BarnCRM Settings** tab.
-3. Choose **Health** in the left navigation. The report is there.
-4. Click **Re-Run** whenever you want a fresh look. On this page Health Check reads your
-   org each time it opens.
+2. Click the **Org Optimizer** tab and choose **Health Check** (in the list on the left, or
+   in the **Show** box on a phone).
+3. The section shows the last full run. Click **Run Health Check** the first time, and
+   **Run Again** whenever you want a fresh look.
+
+**BarnCRM Settings**, **Health** keeps Health Check's settings and an **Open Health Check**
+link that opens this section.
 
 An administrator also finds Health Check on the BarnCRM home page, under the setup
 checklist. Home does not run every check each time it opens, because a full run reads a lot
 of your org and Home is the page everyone opens first. Instead it shows a summary of the last
-result: a badge (**Errors: 2**, **Warnings: 3**, **Passed**, or **Not Run Yet**, the same
-badge as the Health Check tile in Org Optimizer), when Health Check last ran in full for an
+result: a badge (**Needs Fixing: 2**, **Worth Knowing: 3**, **All Clear**, or **Not Run
+Yet**, the same badge as the Health Check tile in Org Optimizer, in the same words as the
+report's findings), when Health Check last ran in full for an
 administrator, and how many findings it had to fix, to be aware of and for your information.
-Click **Run Now** to run it in full there and see the whole report, with each finding as a
-row (the same component, and the same rows, as Org Optimizer's Health Check tab). Until
-Health Check has run once, Home says so and offers **Run Now**. A run by
+Click **Run Health Check** to run it in full there and see the whole report, with each finding as a
+row (the same component, and the same rows, as Org Optimizer's Health Check section); after
+that the button reads **Run Again**. Until
+Health Check has run once, Home says so and offers **Run Health Check**. A run by
 someone without the **Manage BarnCRM Settings** permission is not kept as the last result,
 because it skips the access checks.
 
-The settings console is the way in that always works, including for staff who do not see
-the home page copy and for an org where someone removed it from the page.
+Org Optimizer is the way in that always works, including for an org where someone removed
+the home page copy from the page.
 
 To act on a finding you need the **Manage BarnCRM Settings** permission, which the
 BarnCRM Admin role includes. Without it you can still read most of the report: the page says
@@ -58,8 +65,8 @@ Maria has just installed BarnCRM into her organization's Salesforce org. Person 
 are on, and nothing else that keeps households is installed. She has not set anything up
 yet.
 
-1. Maria opens the **BarnCRM Admin** app, clicks **BarnCRM Settings**, and chooses
-   **Health**.
+1. Maria opens the **BarnCRM Admin** app, clicks **Org Optimizer**, chooses **Health
+   Check**, and clicks **Run Health Check**.
 2. The first card is **What We Found in Your Org**. It says Person Accounts are enabled.
    Under it, the card shows the mode this org is in now and the mode BarnCRM recommends:
    **Standalone**.
@@ -72,17 +79,19 @@ yet.
    say so before she loads data.
 5. The next finding is amber: **Coexistence Mode Is Not Confirmed Yet**. It explains which
    mode BarnCRM recommends for what it found. There is a button, **Use Recommended Mode**.
-6. Maria clicks **Use Recommended Mode**. The page saves Standalone and re-runs. The amber
+6. Maria clicks **Use Recommended Mode**. The confirm box says what changes, starting
+   **Coexistence mode (how BarnCRM shares people and households with NPSP or Nonprofit Cloud)
+   changes from**, and she clicks **Confirm**. The page saves Standalone and re-runs. The amber
    finding is replaced by a blue one: **Coexistence Mode Matches Your Org**. If household
    membership were still set to the person's account, the red finding **Household
    membership does not fit Person Accounts** would offer its own one-click fix.
 7. Under **Access** there is a red finding: **No One Is Assigned the BarnCRM Admin Role**.
    She clicks **Open the Access Page**, which takes her to the Access section of BarnCRM
-   Settings, adds herself, and comes back to Health.
+   Settings, adds herself, and comes back to Org Optimizer's Health Check.
 8. Another finding is amber: **4 Users Cannot See the App**. Four active users have a
    Salesforce license but none of the BarnCRM roles, so the BarnCRM app is invisible to
    them. She clicks **Open the Access Page** again and assigns roles.
-9. She clicks **Re-Run**. The red finding is gone, the amber ones are gone, and what is left
+9. She clicks **Run Again**. The red finding is gone, the amber ones are gone, and what is left
    is blue: her org shape, the mode, and **Automation Is Running Normally**.
 
 Total time: about five minutes, most of it assigning roles.
@@ -121,7 +130,7 @@ Nothing is broken today.
 | Settings | With the Rollup Builder module: whether any of the totals BarnCRM ships are missing from the Rollup Builder. |
 | Settings | Whether any BarnCRM automation is missing its on and off switch on the Automation page. |
 | Settings | Whether any import template BarnCRM ships is missing from the Import page. |
-| Settings | Whether any BarnCRM nightly job is not scheduled: the seasonal address swap (only while **Turn On Seasonal Addresses** is on), the error digest, the empty household tidy-up and the Setup changes copy (see [Setup Changes](setup-changes.md)), plus the nightly jobs of any module that registers them. With the Rollup Builder module that is the rollup recalculation. With Giving that is the installment top up, the installments overdue pass and the donor levels pass. With Mirror it is the Opportunity mirror's nightly run, and only once a mirror direction is chosen. The acknowledgment send is never listed, because it emails donors: schedule it yourself on its own page when you want it. |
+| Settings | Whether the one nightly run, **BarnCRM Nightly Jobs**, or the hourly tab access check is not scheduled. The nightly run takes every BarnCRM nightly job in turn, Core's and each installed module's (see [Nightly Jobs](nightly-jobs.md)); each job is switched on and off on its own page. |
 | Settings | Whether any scheduled BarnCRM job belongs to a person who has been deactivated. A scheduled job runs as the person who scheduled it, and stops running the day that person is deactivated, while it still looks scheduled on its page. |
 | Settings | Whether Core or any installed module never ran the setup steps its package install runs, which happens when source is copied into an org by hand (**Setup never ran for** followed by the names). Its **Finish Setup** button runs those steps. |
 | Settings | With the Rollup Builder module: whether a total is set to be recalculated nightly while the nightly run is not scheduled. |
@@ -188,7 +197,7 @@ undone on their own page:
 | **Shipped totals are missing** | Creates the missing totals exactly as shipped. Each one starts calculating straight away, as it would have from install. Your own totals are not touched, and a shipped total whose field one of your own active totals already writes is skipped and named, so the two never overwrite each other. | Switch a total off in the Rollup Builder. Do not delete it: a deleted shipped total comes back the next time totals are restored or the package is upgraded (see Rollups). |
 | **Automation switches are missing** | Creates the missing switches, each set to its shipped default, so nothing that runs now stops. An automation that always runs (with Giving, such as the receipt lock) is listed with its switch locked. | Switch any automation off on the Automation page. |
 | **Shipped import templates are missing** | Creates the missing templates. | There is no undo in the app: the Import page cannot delete or switch off a template. A template does nothing until somebody picks it for an import. |
-| **Nightly Jobs Are Not Scheduled** | Schedules every job the finding lists, each at its usual time, to run as you. A job that is already scheduled is left alone. | Stop any one of them on its own page: the Rollup Builder, the Addresses section and the Error Log section of BarnCRM Settings, the Nightly jobs page for Giving, and the Opportunity mirror page for Mirror. |
+| **Nightly Jobs Are Not Scheduled** | Replaces any job still scheduled on its own from an earlier version, then schedules the nightly run and the hourly check, to run as you. One already scheduled is left alone. | Switch any one job off on its own page: the Rollup Builder, the Addresses section and the Error Log section of BarnCRM Settings, the Nightly jobs page for Giving, and the Opportunity mirror page for Mirror. The **Nightly Jobs** panel on the General section lists them all. |
 | **Scheduled Jobs Belong to a Deactivated Person** | Stops each job the finding lists and schedules it again at its usual time, to run as you. The end of a running automation pause is scheduled again too. A job Health Check never schedules for you, such as the acknowledgment send (it emails donors), is stopped and named, so you can schedule it again on its own page. | Stop any one of them on its own page, as for the finding above. |
 | **Setup never ran for** a package (Core or a module) | Runs the setup steps the package's install runs, for every package the finding names, with you standing in for the installer, then records that they ran: for Core, its automation switches, import templates, coexistence mode, hourly tab access check and your BarnCRM Admin access; for a module, its own switches, templates, shipped totals and records, and its administrator access. The panel says **Done. Setup steps ran for:** and the names. This is a recovery step for source copied into an org by hand: install BarnCRM as packages, which run these steps themselves. The same button is on the module's row on the Modules page. | Each step only adds what is missing, so there is nothing to undo; switch off anything you do not want on its own page. |
 | **Coexistence Mode Is Not Confirmed**, **Household Membership Does Not Fit Person Accounts**, **No New Person Is Getting a Household** | As described in the walkthrough and Common mistakes. | Change the setting back in BarnCRM Settings. |
@@ -210,7 +219,7 @@ the records themselves.
 | Finding | Who is counted | Who is not counted | What to do |
 |---|---|---|---|
 | **People are not in a household** (amber) | With household membership on the person's account: every contact with no account. With membership records: every person, contact or person account, with no current membership (no end date, or one still to come). | A contact whose account is an organization: that person belongs to the organization. With membership records, a contact linked straight to a household: the separate membership finding covers it. Nobody at all while automatic household creation is off, because then a person without a household is your choice. | Open each linked person. With membership on the account, set the account to a household. With membership records, add them from the household's members panel. |
-| **Households have nobody in them** (blue) | Households with no contact on them, or with membership records, no current member. | Organizations. | Open each linked household and add a member, merge it into another household, or delete it. Some are kept on purpose, for example when **Delete Empty Households** is off (BarnCRM Settings, People and Households), or when merging two people emptied it: a merge never deletes a household, because records can still point at it, so merge it into the kept person's household (see Duplicates). A household kept because gifts or other records are credited to it, such as volunteer hours, is kept on purpose too: deleting it removes that link from those records. |
+| **Households have nobody in them** (blue) | Households with no contact on them, or with membership records, no current member. | Organizations. | Open each linked household and add a member, merge it into another household, or delete it. Some are kept on purpose, for example when **Delete empty households** is off (BarnCRM Settings, People and Households), or when merging two people emptied it: a merge never deletes a household, because records can still point at it, so merge it into the kept person's household (see Duplicates). A household kept because gifts or other records are credited to it, such as volunteer hours, is kept on purpose too: deleting it removes that link from those records. |
 
 Each finding counts up to 1,000 and then says **More than 1,000**, so a large org gets its
 answer quickly, and links the first five records, oldest first. The counts use your own

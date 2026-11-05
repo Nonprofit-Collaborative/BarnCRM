@@ -11,62 +11,62 @@
  */
 @NamespaceAccessible
 public with sharing class LogicModelsWhereUsedExtension implements WhereUsedExtension {
-    private static final String KIND = 'computedIndicator';
+	private static final String KIND = 'computedIndicator';
 
-    @NamespaceAccessible
-    public LogicModelsWhereUsedExtension() {
-        // Built by name from Core (WhereUsedExtensions), so it needs a public constructor.
-    }
+	@NamespaceAccessible
+	public LogicModelsWhereUsedExtension() {
+		// Built by name from Core (WhereUsedExtensions), so it needs a public constructor.
+	}
 
-    public List<WhereUsedService.Reference> references(WhereUsedService.Target target) {
-        List<WhereUsedService.Reference> found = new List<WhereUsedService.Reference>();
-        if (target.isObject()) {
-            // The object a computed indicator counts is its saved query's, which Core lists.
-            return found;
-        }
-        for (Indicator__c indicator : [
-            SELECT
-                Id,
-                Name,
-                Source_Definition__c,
-                Source_Query__r.Object_Name__c,
-                Element__r.Logic_Model__c
-            FROM Indicator__c
-            WHERE Source__c = :IndicatorSourceService.COMPUTED AND Source_Query__c != NULL
-            WITH SYSTEM_MODE
-            ORDER BY Name
-            LIMIT 2000
-        ]) {
-            if (sourceNames(target, indicator)) {
-                found.add(
-                    new WhereUsedService.Reference(
-                            KIND,
-                            Schema.SObjectType.Indicator__c.getLabelPlural(),
-                            indicator.Name,
-                            indicator.Id
-                        )
-                        .addPart(
-                            Schema.SObjectType.Indicator__c.fields.Source_Definition__c.getLabel()
-                        )
-                        .withBreaks(System.Label.Core_WhereUsed_BreaksModuleRecord)
-                        .withRecordEdit(indicator.Element__r?.Logic_Model__c)
-                );
-            }
-        }
-        return found;
-    }
+	public List<WhereUsedService.Reference> references(WhereUsedService.Target target) {
+		List<WhereUsedService.Reference> found = new List<WhereUsedService.Reference>();
+		if (target.isObject()) {
+			// The object a computed indicator counts is its saved query's, which Core lists.
+			return found;
+		}
+		for (Indicator__c indicator : [
+			SELECT
+				Id,
+				Name,
+				Source_Definition__c,
+				Source_Query__r.Object_Name__c,
+				Element__r.Logic_Model__c
+			FROM Indicator__c
+			WHERE Source__c = :IndicatorSourceService.COMPUTED AND Source_Query__c != NULL
+			WITH SYSTEM_MODE
+			ORDER BY Name
+			LIMIT 2000
+		]) {
+			if (sourceNames(target, indicator)) {
+				found.add(
+					new WhereUsedService.Reference(
+							KIND,
+							Schema.SObjectType.Indicator__c.getLabelPlural(),
+							indicator.Name,
+							indicator.Id
+						)
+						.addPart(
+							Schema.SObjectType.Indicator__c.fields.Source_Definition__c.getLabel()
+						)
+						.withBreaks(System.Label.Core_WhereUsed_BreaksModuleRecord)
+						.withRecordEdit(indicator.Element__r?.Logic_Model__c)
+				);
+			}
+		}
+		return found;
+	}
 
-    /** True when the source's date field or counted field, read from its query's object, is the target. */
-    @TestVisible
-    private static Boolean sourceNames(WhereUsedService.Target target, Indicator__c indicator) {
-        IndicatorSourceService.Definition definition = IndicatorSourceService.parse(
-            indicator.Source_Definition__c
-        );
-        String objectName = indicator.Source_Query__r?.Object_Name__c;
-        if (definition == null || String.isBlank(objectName)) {
-            return false;
-        }
-        return target.matchesPath(objectName, definition.dateField) ||
-            target.matchesPath(objectName, definition.field);
-    }
+	/** True when the source's date field or counted field, read from its query's object, is the target. */
+	@TestVisible
+	private static Boolean sourceNames(WhereUsedService.Target target, Indicator__c indicator) {
+		IndicatorSourceService.Definition definition = IndicatorSourceService.parse(
+			indicator.Source_Definition__c
+		);
+		String objectName = indicator.Source_Query__r?.Object_Name__c;
+		if (definition == null || String.isBlank(objectName)) {
+			return false;
+		}
+		return target.matchesPath(objectName, definition.dateField) ||
+			target.matchesPath(objectName, definition.field);
+	}
 }

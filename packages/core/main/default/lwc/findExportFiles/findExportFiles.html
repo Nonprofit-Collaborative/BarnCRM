@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <template lwc:if={hasError}>
         <c-barn-notice
             class="slds-var-m-vertical_small"
@@ -8,21 +9,33 @@
         ></c-barn-notice>
     </template>
     <template lwc:if={job}>
-        <div class={statusClass} role="status" aria-live="polite" data-id="export-files-status">
-            <p data-id="status-line">{statusLine}</p>
-            <template lwc:if={hasFiles}>
-                <p class="slds-var-m-top_x-small">{labels.files}</p>
-                <ul class="slds-list_dotted">
-                    <template for:each={files} for:item="file">
-                        <li key={file.documentId} data-id="file">
-                            <a href={file.url} target="_blank" rel="noopener noreferrer"
-                                >{file.title}<lightning-icon class="slds-var-m-left_xx-small" icon-name="utility:new_window" size="xx-small"></lightning-icon
-                                ><span class="slds-assistive-text">{labels.newTab}</span></a
-                            >
-                        </li>
+        <div class="slds-var-m-vertical_small" role="status" aria-live="polite" data-id="export-files-status">
+            <template lwc:if={showMeter}>
+                <c-barn-meter
+                    data-id="export-meter"
+                    label={labels.meterLabel}
+                    value={progressValue}
+                    value-text={statusLine}
+                ></c-barn-meter>
+            </template>
+            <template lwc:else>
+                <c-barn-notice variant={noticeVariant} message={statusLine} data-id="status-notice">
+                    <template lwc:if={hasFiles}>
+                        <p class="slds-var-m-top_x-small">{labels.files}</p>
+                        <ul class="slds-list_dotted">
+                            <template for:each={files} for:item="file">
+                                <li key={file.documentId} data-id="file">
+                                    <a href={file.url} target="_blank" rel="noopener noreferrer"
+                                        >{file.title}<lightning-icon class="slds-var-m-left_xx-small" icon-name="utility:new_window" size="xx-small"></lightning-icon
+                                        ><span class="slds-assistive-text">{labels.newTab}</span></a
+                                    >
+                                </li>
+                            </template>
+                        </ul>
                     </template>
-                </ul>
+                </c-barn-notice>
             </template>
         </div>
+    </template>
     </template>
 </template>

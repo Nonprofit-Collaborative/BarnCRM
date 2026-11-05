@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_HubHome_AutomationPausedBanner</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: banner shown while all packaged automation is paused</shortDescription>
-        <value>BarnCRM automation is paused. Households and greetings are not being updated until it resumes.</value>
-    </labels>
-    <labels>
         <fullName>Core_HubHome_ErrorTileHeading</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -17,12 +9,12 @@
         <value>Errors to Review</value>
     </labels>
     <labels>
-        <fullName>Core_HubHome_LoadErrorMessage</fullName>
+        <fullName>Core_HubHome_QuickLinkGiftEntry</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: message shown when part of the home page could not load</shortDescription>
-        <value>The home page could not load everything. The error is recorded in the Error Log.</value>
+        <protected>false</protected>
+        <shortDescription>Hub home: Quick Links tile for the Giving Quick Gift Entry tab</shortDescription>
+        <value>Quick Gift Entry</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_QuickLinkOrganizations</fullName>
@@ -49,14 +41,6 @@
         <value>Welcome to BarnCRM</value>
     </labels>
     <labels>
-        <fullName>Core_HubHome_WelcomeMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: the sentence under the page heading</shortDescription>
-        <value>Start with the setup checklist below. You can leave and come back: your progress is saved.</value>
-    </labels>
-    <labels>
         <fullName>Core_HubHome_RecurringHeading</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -77,24 +61,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Hub home: link to the Import tab</shortDescription>
-        <value>Go to Import</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_WelcomeMessageReady</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: welcome sentence once setup is done, or for staff who do not run setup</shortDescription>
-        <value>Your households, people and organizations are in the tabs above.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_WarningAltText</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: what a screen reader says for the warning icon on a tile</shortDescription>
-        <value>Warning</value>
+        <shortDescription>Hub home and setup checklist: button that opens Super Importer</shortDescription>
+        <value>Open Super Importer</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_BadgeOverdue</fullName>
@@ -103,21 +71,5 @@
         <protected>false</protected>
         <shortDescription>Overdue badge: a late nightly job tile; Funders Grant Calendar overdue mark</shortDescription>
         <value>Overdue</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_QuickLinkHouseholdsLine</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: the line on the Households quick link tile</shortDescription>
-        <value>Every household and its members.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_QuickLinkOrganizationsLine</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: the line on the Organizations quick link tile</shortDescription>
-        <value>Every organization and its affiliations.</value>
     </labels>
 </CustomLabels>

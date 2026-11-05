@@ -9,60 +9,12 @@
         <value>Setup Changes</value>
     </labels>
     <labels>
-        <fullName>Core_SetupChanges_Kept</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: {0} is the count kept, {1} oldest day, {2} newest day</shortDescription>
-        <value>Kept: {0} changes, from {1} to {2}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_NothingKept</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: shown when no change has been copied yet</shortDescription>
-        <value>Nothing is kept yet. Press Copy New Changes Now to copy the last 180 days of Setup changes.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_Scheduled</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: copy status; {0} is the days each change is kept</shortDescription>
-        <value>New changes are copied every night at 1:30 and kept for {0} days.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_NotScheduled</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: copy status when the nightly job is not scheduled</shortDescription>
-        <value>The nightly copy is not scheduled. Copy New Changes Now schedules it, and so does Health Check.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_CopyRunning</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: shown while a copy is waiting or running</shortDescription>
-        <value>A copy is running. Press Refresh in a minute or two to see the new changes.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupChanges_CopyNow</fullName>
         <categories>SetupChanges</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Setup Changes: button that copies new changes now</shortDescription>
         <value>Copy New Changes Now</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_CopyStarted</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: shown after Copy New Changes Now starts a copy</shortDescription>
-        <value>The copy has started and runs in the background. Press Refresh in a minute or two to see the new changes.</value>
     </labels>
     <labels>
         <fullName>Core_SetupChanges_From</fullName>
@@ -95,46 +47,6 @@
         <protected>false</protected>
         <shortDescription>Setup Changes: search box label</shortDescription>
         <value>Search</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_Downloaded</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: after a download; {0} is the number of rows saved</shortDescription>
-        <value>Saved {0} changes as CSV.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_More</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: {0} rows shown, {1} the most a download holds</shortDescription>
-        <value>Showing the newest {0} matches. Narrow the filters, or use Download CSV for up to {1}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_ScanStopped</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: search stopped early; {0} is the rows looked at</shortDescription>
-        <value>This search looked at the newest {0} kept changes and stopped. Narrow the dates or the section to search older ones.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_DatesReversed</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: From is after To</shortDescription>
-        <value>From is after To. Choose a From day on or before the To day.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_ErrorBadDate</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: a date filter is not a day; {0} is what was given</shortDescription>
-        <value>{0} is not a day. Choose the day from the calendar.</value>
     </labels>
     <labels>
         <fullName>Core_SetupChanges_ColChangedAt</fullName>
@@ -175,29 +87,5 @@
         <protected>false</protected>
         <shortDescription>Setup Changes: column for Salesforce's sentence for the change</shortDescription>
         <value>What Changed</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_LogCannotRead</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: Error Log entry; {0} is Salesforce's message</shortDescription>
-        <value>The Setup Changes copy could not read the Setup Audit Trail, so nothing was copied. Schedule it as a user with View Setup and Configuration. Salesforce said: {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_LogNotCopied</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: Error Log entry; {0} is the count, {1} the first error</shortDescription>
-        <value>The Setup Changes copy could not keep {0} changes. First error: {1}</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupChanges_LogNotRemoved</fullName>
-        <categories>SetupChanges</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup Changes: Error Log entry; {0} is the count, {1} the first error</shortDescription>
-        <value>The Setup Changes copy could not delete {0} changes older than the days to keep. First error: {1}</value>
     </labels>
 </CustomLabels>

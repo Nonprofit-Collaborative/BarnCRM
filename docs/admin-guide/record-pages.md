@@ -41,8 +41,8 @@ and the lists do not stack into one long page:
 
 The actions bar and the sidebar (activity, Potential Duplicates, Record Inspector) stay outside
 the tabs. The top of the sidebar holds the **Record Glance** host, where an installed module
-can add a small summary card (Giving adds **Giving at a Glance**, see
-[A donor's giving on their record](donor-records.md)); with no module it shows nothing.
+can add a small summary card, for example a giving summary. With no module that adds one, it
+shows nothing and takes no space.
 
 What changes with the record:
 

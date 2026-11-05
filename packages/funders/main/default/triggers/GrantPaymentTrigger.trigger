@@ -4,13 +4,13 @@
  * bypassable from the settings console unless its row always runs (ADR-0017, ADR-0024).
  */
 trigger GrantPaymentTrigger on Grant_Payment__c(
-    before insert,
-    before update,
-    before delete,
-    after insert,
-    after update,
-    after delete,
-    after undelete
+	before insert,
+	before update,
+	before delete,
+	after insert,
+	after update,
+	after delete,
+	after undelete
 ) {
-    TriggerDispatcher.run('Grant_Payment__c');
+	TriggerDispatcher.run('Grant_Payment__c');
 }

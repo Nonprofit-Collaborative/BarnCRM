@@ -1,5 +1,10 @@
 import { LightningElement, api, wire, track } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import HouseholdAddMemberModal from 'c/householdAddMemberModal';
+import { iconFor } from 'c/barnIcons';
+import { initialsOf, opensElsewhere, recordHref } from 'c/recordRows';
+import { followLinkInWorkspace } from 'c/workspaceTabs';
 import { refreshApex } from '@salesforce/apex';
 import { getRecord, updateRecord } from 'lightning/uiRecordApi';
 import { getObjectInfo, getObjectInfos } from 'lightning/uiObjectInfoApi';
@@ -14,18 +19,13 @@ import makePrimaryMembership from '@salesforce/apex/HouseholdOfPersonController.
 import TITLE from '@salesforce/label/c.Core_HouseholdMembersPanel_Title';
 import EMPTY_HEADING from '@salesforce/label/c.Core_HouseholdMembersPanel_EmptyHeading';
 import ACTIONS_FOR from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
-import NOT_A_HOUSEHOLD from '@salesforce/label/c.Core_HouseholdMembersPanel_NotAHousehold';
 import PRIMARY from '@salesforce/label/c.Core_HouseholdMembersPanel_Primary';
 import DECEASED from '@salesforce/label/c.Core_HouseholdMembersPanel_Deceased';
 import ADD_MEMBER from '@salesforce/label/c.Core_HouseholdMembersPanel_AddMember';
 import MOVE_MEMBER from '@salesforce/label/c.Core_HouseholdMembersPanel_MoveMember';
-import MOVE_SUCCESS from '@salesforce/label/c.Core_HouseholdMembersPanel_MoveSuccess';
-import ADD_SUCCESS from '@salesforce/label/c.Core_HouseholdMembersPanel_AddSuccess';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import MAKE_PRIMARY from '@salesforce/label/c.Core_HouseholdPanel_MakePrimary';
-import MAKE_PRIMARY_SUCCESS from '@salesforce/label/c.Core_HouseholdPanel_MakePrimarySuccess';
-import MAKE_PRIMARY_FAILED from '@salesforce/label/c.Core_HouseholdPanel_MakePrimaryFailed';
 import LOADING from '@salesforce/label/c.Core_HouseholdPanel_Loading';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -36,22 +36,20 @@ const JUNCTION = 'Junction';
 const SOURCE_ACCOUNT = 'Account';
 const MAKE_PRIMARY_ACTION = 'makePrimary';
 
-/** "MG" for "Maria Garcia": the first letters of the first and last words of the name. */
-function initialsOf(name) {
-  const words = String(name || '')
-    .trim()
-    .split(/\s+/)
-    .filter((word) => word);
-  if (!words.length) {
-    return '';
-  }
-  const first = Array.from(words[0])[0];
-  const last = words.length > 1 ? Array.from(words[words.length - 1])[0] : '';
-  return `${first}${last}`.toUpperCase();
-}
+/** The move picker shows each household's city, so two households of one name differ. */
+const HOUSEHOLD_DISPLAY_INFO = Object.freeze({
+  primaryField: 'Name',
+  additionalFields: ['BillingCity']
+});
 
-export default class HouseholdMembersPanel extends LightningElement {
+export default class HouseholdMembersPanel extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
+
+  @wire(EnclosingTabId) enclosingTabId;
+
+  icons = { household: iconFor('Households') };
+
+  householdDisplayInfo = HOUSEHOLD_DISPLAY_INFO;
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -69,7 +67,9 @@ export default class HouseholdMembersPanel extends LightningElement {
       return helpText('Core', 'Core_HouseholdMembersPanel_Empty');
     },
     emptyHeading: EMPTY_HEADING,
-    notAHousehold: NOT_A_HOUSEHOLD,
+    get notAHousehold() {
+      return helpText('Core', 'Core_HouseholdMembersPanel_NotAHousehold');
+    },
     primary: PRIMARY,
     deceased: DECEASED,
     addMember: ADD_MEMBER,
@@ -230,6 +230,7 @@ export default class HouseholdMembersPanel extends LightningElement {
         ...member,
         isPrimary,
         initials: initialsOf(member.name),
+        href: recordHref(member.personId),
         badges: this.badgesFor(member, isPrimary),
         canMove,
         canMakePrimary,
@@ -269,12 +270,32 @@ export default class HouseholdMembersPanel extends LightningElement {
   badgesFor(member, isPrimary) {
     const badges = [];
     if (isPrimary) {
-      badges.push({ key: `${member.personId}-primary`, text: PRIMARY });
+      badges.push({
+        key: `${member.personId}-primary`,
+        text: PRIMARY,
+        status: 'success',
+        iconName: 'utility:favorite'
+      });
     }
     if (member.isDeceased) {
-      badges.push({ key: `${member.personId}-deceased`, text: DECEASED });
+      badges.push({ key: `${member.personId}-deceased`, text: DECEASED, status: 'neutral' });
     }
     return badges;
+  }
+
+  /** A member's name opens their record; in a console, as a subtab beside the household. */
+  handleOpenRecord(event) {
+    const recordId = event.currentTarget.dataset.recordId;
+    const pageReference = {
+      type: 'standard__recordPage',
+      attributes: { recordId, actionName: 'view' }
+    };
+    const navigate = () => this[NavigationMixin.Navigate](pageReference);
+    if (followLinkInWorkspace(this, event, { recordId }, navigate) || opensElsewhere(event)) {
+      return;
+    }
+    event.preventDefault();
+    navigate();
   }
 
   /** Add Member opens its own dialog; the list refreshes once someone was added. */
@@ -289,7 +310,7 @@ export default class HouseholdMembersPanel extends LightningElement {
       return undefined;
     }
     this.errorMessage = undefined;
-    this.toast(ADD_SUCCESS, 'success');
+    this.toast(helpText('Core', 'Core_HouseholdMembersPanel_AddSuccess'), 'success');
     return this.refresh();
   }
 
@@ -328,7 +349,7 @@ export default class HouseholdMembersPanel extends LightningElement {
         this.movingPersonId = undefined;
         this.targetHouseholdId = undefined;
         this.errorMessage = undefined;
-        this.toast(MOVE_SUCCESS, 'success');
+        this.toast(helpText('Core', 'Core_HouseholdMembersPanel_MoveSuccess'), 'success');
         return this.refresh();
       })
       .catch((error) => {
@@ -354,11 +375,16 @@ export default class HouseholdMembersPanel extends LightningElement {
     return write
       .then(() => {
         this.errorMessage = undefined;
-        this.toast(MAKE_PRIMARY_SUCCESS.replace('{0}', name), 'success');
+        this.toast(
+          helpText('Core', 'Core_HouseholdPanel_MakePrimarySuccess').replace('{0}', name),
+          'success'
+        );
         return this.refresh();
       })
       .catch((error) => {
-        this.errorMessage = this.isJunctionMode ? this.readError(error) : MAKE_PRIMARY_FAILED;
+        this.errorMessage = this.isJunctionMode
+          ? this.readError(error)
+          : helpText('Core', 'Core_HouseholdPanel_MakePrimaryFailed');
       })
       .finally(() => {
         this.busy = false;

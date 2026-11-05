@@ -12,8 +12,6 @@ import NEW_COUNT from '@salesforce/label/c.Core_ErrorLogTile_NewCount';
 import ACKNOWLEDGE from '@salesforce/label/c.Core_ErrorLogTile_Acknowledge';
 import VIEW_ALL from '@salesforce/label/c.Core_ErrorLogTile_ViewAll';
 import OPEN_ENTRY from '@salesforce/label/c.Core_ErrorLogTile_OpenEntry';
-import READ_ONLY from '@salesforce/label/c.Core_ErrorLogTile_ReadOnly';
-import ACTION_FAILED from '@salesforce/label/c.Core_ErrorLog_ActionFailed';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -39,7 +37,9 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
     acknowledge: ACKNOWLEDGE,
     viewAll: VIEW_ALL,
     openEntry: OPEN_ENTRY,
-    readOnly: READ_ONLY
+    get readOnly() {
+      return helpText('Core', 'Core_ErrorLogTile_ReadOnly');
+    }
   };
 
   tile;
@@ -56,7 +56,7 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
       this.tile = result.data;
       this.errorMessage = undefined;
     } else if (result.error) {
-      this.errorMessage = bodyMessage(result.error, ACTION_FAILED);
+      this.errorMessage = bodyMessage(result.error, helpText('Core', 'Core_ErrorLog_ActionFailed'));
     }
   }
 
@@ -67,6 +67,11 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
   get newCountLabel() {
     const more = this.tile && this.tile.newCountCapped ? '+' : '';
     return this.labels.newCount.replace('{0}', `${this.newCount}${more}`);
+  }
+
+  /** Unread errors are a warning; none is a good state (the visual standard's vocabulary). */
+  get newCountStatus() {
+    return this.newCount > 0 ? 'warning' : 'success';
   }
 
   get entries() {
@@ -106,7 +111,7 @@ export default class ErrorLogTile extends NavigationMixin(LightningElement) {
         this.tile = tile;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Core', 'Core_ErrorLog_ActionFailed'));
       })
       .finally(() => {
         this.busy = false;

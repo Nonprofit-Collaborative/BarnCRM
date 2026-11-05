@@ -12,12 +12,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Find** tab. | Under the page header: "Find records, then export them, save the query, or change them all at once." and **New Query**. On a first visit **About This Tool** is open with "Choose an object, the columns and conditions, then run, save or export. Find shows only what your own access allows." and **Learn More**. **Object** and **Saved queries** pickers, and an empty state **Choose What to Find**: "Pick an object, or open a saved query, to start." |
-| 2 | In **Object**, choose **Contact**. | **Columns** (with **Available fields** and **Columns, in order**), **Add fields from**, **Conditions**, **Sort by** and **Rows to show** appear. **Conditions** reads "No conditions yet, so every record matches." |
+| 1 | Open the **Find** tab. | Under the page header: "Find records, then export them, save the search, or change them all at once." and **New Search**. On a first visit **About This Tool** is open with "Choose what kind of record to find, which columns to show and which records to include. Then run it, save it or export it. Find shows only what your own access allows." and **Learn More**. **Kind of record** and **Saved searches** pickers, and an empty state **Choose What to Find**: "Pick a kind of record, or open a saved search, to start." |
+| 2 | In **Kind of record**, choose **Contact**. | **Columns** (with **Available fields** and **Columns, in order**), **Add fields from**, **Conditions**, **Sort by** and **Rows to show** appear. **Conditions** reads "No conditions yet, so every record matches." |
 | 3 | In **Columns**, move **First Name**, **Last Name** and **Email** to **Columns, in order**. | The three fields are listed in that order. |
 | 4 | Under **Conditions**, select **Add Condition**. Choose **Last Name**, **equals**, and type `Garcia`. | The condition is complete; no message under it. |
-| 5 | Open **Show Query** (closed until you open it). Read **Query (read only)**, and point at its help icon. | It shows a SOQL query on Contact with a WHERE clause on LastName equal to Garcia. The help reads "The query Find runs, in SOQL, for anyone who wants to check it or copy it. To type or paste a query instead, use Type a query." |
-| 6 | In **Sort by**, choose **First Name**; in **Direction**, **Ascending**. Select **Run**. | The table lists the Garcia contacts sorted by first name, including Harper Garcia and Luis Garcia. Under **Results**, the line above it reads "N rows found." with N the number of rows. |
+| 5 | Open **Show Query** (closed until you open it). Read **Technical query (SOQL), read only**, and point at its help icon. | It shows a SOQL query on Contact with a WHERE clause on LastName equal to Garcia. The help reads "The query Find runs, in SOQL, for anyone who wants to check it or copy it. To type or paste a query instead, use Type a query." |
+| 6 | In **Sort by**, choose **First Name**; in **Direction**, **A to Z or Oldest First**. Select **Run**. | The table lists the Garcia contacts sorted by first name, including Harper Garcia and Luis Garcia. Under **Results**, the line above it reads "N rows found." with N the number of rows. |
 | 7 | Change the condition value to `Nobodyzz` and select **Run**. | An empty state **No Matching Records**: "No records match these conditions." |
 
 **Cleanup:** none. Keep the page open for T-FIND-02 if you like.
@@ -36,6 +36,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | Change the condition to **Last Name**, **equals**, `Garcia`. Add a second condition **First Name**, **equals**, `Harper`. Tick **Use custom condition logic** and type `1` in **Condition logic**. | "The condition logic must use every condition. Add condition 2 to it, or remove the condition." |
 | 6 | Change the logic to `1 AND 3`. | "The condition logic names condition 3, which does not exist." |
 | 7 | Change the logic to `1 AND 2` and select **Run**. | One row: Harper Garcia. |
+| 8 | Add a third condition **Email**, **is not blank**, and set the logic to `1 AND (2 OR 3)`. Select Move Up on condition 3 twice. | The conditions read Email, Last Name, First Name, and the logic reads `2 AND (3 OR 1)`. Each move is announced ("..., position 2 of 3."). |
+| 9 | Drag condition 1 by its handle below condition 3 (or focus the handle, press Space, Down twice, Space). | The order and the logic update the same way; the first condition's Move Up and the last one's Move Down are disabled. |
+| 10 | With **Last Name** and **First Name** chosen under **Columns**, use Move Down on **Last Name** in the column order list, then select **Run**. | The result columns show First Name before Last Name. |
 
 **Cleanup:** none.
 
@@ -78,7 +81,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Run a Contact query with no conditions and three columns, as in T-FIND-04. | Rows are shown. |
-| 2 | In the **Export** menu, choose **Export to Files**. | "Export to Files started. You can leave this page: BarnCRM tells you when the files are ready." Then "Exporting: X of Y chunks done." |
+| 2 | In the **Export** menu, choose **Export to Files**. | "Export to Files started. You can leave this page: BarnCRM tells you when the files are ready." Then "Exporting: N% done." |
 | 3 | Wait until it finishes. | "Ready: 1 CSV files in your Files (Owned by Me). Delete them there once downloaded." and **Files:** with a link to the file. A bell notification arrives. |
 | 4 | Open **Files**, **Owned by Me**. | The CSV is there, named for the object, the date and the part. It holds every contact. |
 
@@ -92,15 +95,15 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, build the T-FIND-01 query. Type `Test Garcias` in **Query name** and select **Save**. | "Saved Test Garcias." |
-| 2 | Select **New Query**, then open **Test Garcias** from **Saved queries**. | The object, columns, condition and sort come back as saved. |
-| 3 | Type `Test Garcias copy` in **Query name**, open the **More Query Actions** menu next to **Save**, and choose **Save As**. | "Saved Test Garcias copy." Both are listed in **Saved queries**. |
+| 1 | As admin, build the T-FIND-01 query. Type `Test Garcias` in **Search name** and select **Save**. | "Saved Test Garcias." |
+| 2 | Select **New Search**, then open **Test Garcias** from **Saved searches**. | The object, columns, condition and sort come back as saved. |
+| 3 | Type `Test Garcias copy` in **Search name**, open the **More Search Actions** menu next to **Save**, and choose **Save As**. | "Saved Test Garcias copy." Both are listed in **Saved searches**. |
 | 4 | Open **Test Garcias**, tick **Show to everyone who uses Find**, and select **Save**. | Saved. |
-| 5 | Log in as staff, open **Find**, and open **Saved queries**. | **Test Garcias** is listed as "Test Garcias (shared by" plus the admin's name. **Test Garcias copy** is not listed. |
+| 5 | Log in as staff, open **Find**, and open **Saved searches**. | **Test Garcias** is listed as "Test Garcias (shared by" plus the admin's name. **Test Garcias copy** is not listed. |
 | 6 | As staff, open the shared query and select **Run**. | The same Garcia rows. **Save** and, in the menu next to it, **Delete** are disabled for it; **Save As** is enabled. |
-| 7 | As admin, open **Test Garcias** and choose **Delete** in the menu next to **Save**. | A dialog "Delete This Saved Query?" says "Test Garcias will be deleted. This cannot be undone." and "This query is shared with everyone who uses Find. Deleting it removes it for all of them." |
+| 7 | As admin, open **Test Garcias** and choose **Delete** in the menu next to **Save**. | A dialog "Delete This Saved Search?" says "Test Garcias will be deleted. This cannot be undone." and "This query is shared with everyone who uses Find. Deleting it removes it for all of them." |
 | 8 | Select **Keep It**. | The dialog closes; the query is still listed. |
-| 9 | Choose **Delete** again, then **Delete** in the dialog. | "Deleted Test Garcias." It is gone from **Saved queries** for admin and staff. |
+| 9 | Choose **Delete** again, then **Delete** in the dialog. | "Deleted Test Garcias." It is gone from **Saved searches** for admin and staff. |
 
 **Cleanup:** delete **Test Garcias copy**; remove **BarnCRM Find and Export** from staff.
 
@@ -160,6 +163,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 2 | Select **Show More** twice. | 75 rows; the line reads "Showing 75 of 200 rows." |
 | 3 | In the **Export** menu, choose **Export to CSV** and open the file. | Every contact (about 440 with sample data), not 75 or 200. |
 | 4 | Open the **Change Records** menu. | **Super Transformer** and, last, **Bulk Delete**. |
-| 5 | Choose **Super Transformer**. | The **Super Transformer** panel opens right under the buttons, above **Results**. Select **Close**; nothing changed. |
+| 5 | Choose **Super Transformer**. | The **Super Transformer** page opens with **Contact** and the Find conditions already filled in (no panel opens in Find). Nothing has run or changed. Go back to Find. |
+| 6 | Choose **Bulk Delete**, then **Preview**. | The **Bulk Delete** panel opens right under the buttons, above **Results**. Select **Close** without typing the count; nothing was deleted. |
 
 **Cleanup:** none (nothing was changed or deleted).

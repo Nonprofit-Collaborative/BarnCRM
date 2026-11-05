@@ -4,13 +4,13 @@
  * bypassable from the settings console unless its row always runs (ADR-0017, ADR-0024).
  */
 trigger VolunteerJobTrigger on Volunteer_Job__c(
-    before insert,
-    before update,
-    before delete,
-    after insert,
-    after update,
-    after delete,
-    after undelete
+	before insert,
+	before update,
+	before delete,
+	after insert,
+	after update,
+	after delete,
+	after undelete
 ) {
-    TriggerDispatcher.run('Volunteer_Job__c');
+	TriggerDispatcher.run('Volunteer_Job__c');
 }

@@ -75,7 +75,10 @@ cleans up her data, and check what removing a module would cost.
    first: BarnCRM Rollup Builder. This module needs them.", install the modules it names
    first: Salesforce refuses Giving, Volunteers and Mirror until BarnCRM Rollup Builder is
    installed, and Mirror until Giving is too.
-3. On the **Giving** row, click **Turn Off**. The row says **Installed and off**. Giving's
+3. On the **Giving** row, click **Turn Off**. A window asks first: "Turn off BarnCRM Giving?
+   Its automation stops (for example totals stop updating) and its records stay. Its tabs stay
+   visible; to hide them from someone, change their role on the Access page." Click **Turn
+   Off** to go ahead, or **Cancel** to leave it on. The row says **Installed and off**. Giving's
    automation stops: new gifts are not added to totals and no acknowledgment is queued, until
    you turn it back on. Automation that protects your records, such as the lock on a posted
    gift, keeps running. Your records stay exactly as they are.

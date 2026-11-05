@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_PicklistUsage_DatesProgress</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Picklist usage: Last Used progress; {0} read, {1} total</shortDescription>
-        <value>Finding Last Used dates: read {0} of {1} records.</value>
-    </labels>
-    <labels>
-        <fullName>Core_PicklistUsage_DatesStopped</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Picklist usage: Last Used stopped; {0} read, {1} total, {2} fields</shortDescription>
-        <value>Finding Last Used dates stopped after {0} of {1} records, so Last Used is blank for: {2}. Select Continue to carry on from there.</value>
-    </labels>
-    <labels>
         <fullName>Core_PicklistUsage_Title</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>
@@ -31,38 +15,6 @@
         <protected>false</protected>
         <shortDescription>Picklist usage: button</shortDescription>
         <value>Show Picklist Value Usage</value>
-    </labels>
-    <labels>
-        <fullName>Core_PicklistUsage_Progress</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Picklist usage: progress; {0} done, {1} total</shortDescription>
-        <value>Checked {0} of {1} picklist fields.</value>
-    </labels>
-    <labels>
-        <fullName>Core_PicklistUsage_NoFields</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Picklist usage: no picklist fields</shortDescription>
-        <value>This kind of record has no picklist fields you can read.</value>
-    </labels>
-    <labels>
-        <fullName>Core_PicklistUsage_NotChecked</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Picklist usage: fields that could not be checked; {0} is the list</shortDescription>
-        <value>Could not check: {0}. The Error Log has the details.</value>
-    </labels>
-    <labels>
-        <fullName>Core_PicklistUsage_Truncated</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Picklist usage: values cut; {0} is the field list</shortDescription>
-        <value>Only the 500 most used values in the data are shown for: {0}.</value>
     </labels>
     <labels>
         <fullName>Core_PicklistUsage_ColLastUsed</fullName>

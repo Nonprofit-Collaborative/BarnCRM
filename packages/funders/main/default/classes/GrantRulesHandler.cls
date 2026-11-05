@@ -5,34 +5,34 @@
  */
 @NamespaceAccessible
 public with sharing class GrantRulesHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public GrantRulesHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public GrantRulesHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'GrantRulesHandler';
-    }
+	public override String getName() {
+		return 'GrantRulesHandler';
+	}
 
-    public override void beforeInsert() {
-        GrantService.checkPrograms((List<Grant__c>) Trigger.new);
-        GrantFundService.checkFunds((List<Grant__c>) Trigger.new);
-    }
+	public override void beforeInsert() {
+		GrantService.checkPrograms((List<Grant__c>) newRecords());
+		GrantFundService.checkFunds((List<Grant__c>) newRecords());
+	}
 
-    public override void beforeUpdate() {
-        List<Grant__c> programChanged = new List<Grant__c>();
-        List<Grant__c> fundChanged = new List<Grant__c>();
-        Map<Id, Grant__c> oldById = (Map<Id, Grant__c>) Trigger.oldMap;
-        for (Grant__c grant : (List<Grant__c>) Trigger.new) {
-            Grant__c old = oldById.get(grant.Id);
-            if (grant.Program_Id__c != old.Program_Id__c) {
-                programChanged.add(grant);
-            }
-            if (grant.Fund_Id__c != old.Fund_Id__c) {
-                fundChanged.add(grant);
-            }
-        }
-        GrantService.checkPrograms(programChanged);
-        GrantFundService.checkFunds(fundChanged);
-    }
+	public override void beforeUpdate() {
+		List<Grant__c> programChanged = new List<Grant__c>();
+		List<Grant__c> fundChanged = new List<Grant__c>();
+		Map<Id, Grant__c> oldById = (Map<Id, Grant__c>) oldRecordsById();
+		for (Grant__c grant : (List<Grant__c>) newRecords()) {
+			Grant__c old = oldById.get(grant.Id);
+			if (grant.Program_Id__c != old.Program_Id__c) {
+				programChanged.add(grant);
+			}
+			if (grant.Fund_Id__c != old.Fund_Id__c) {
+				fundChanged.add(grant);
+			}
+		}
+		GrantService.checkPrograms(programChanged);
+		GrantFundService.checkFunds(fundChanged);
+	}
 }

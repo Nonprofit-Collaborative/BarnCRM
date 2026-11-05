@@ -14,41 +14,41 @@
  */
 @IsTest
 public class PersonAccountTestShape {
-    public static final String NO_PERSON_ACCOUNTS = 'Skipped: this org does not store people as accounts (the Platform-only shape, ADR-0013).';
-    public static final String NO_PERSON_TYPE_FOR_USER = 'This org stores people as accounts but gives the running user none of its person record types, so person account coverage cannot run. Run scripts/org/grant-person-record-type.sh <alias> to give the System Administrator profile one.';
+	public static final String NO_PERSON_ACCOUNTS = 'Skipped: this org does not store people as accounts (the Platform-only shape, ADR-0013).';
+	public static final String NO_PERSON_TYPE_FOR_USER = 'This org stores people as accounts but gives the running user none of its person record types, so person account coverage cannot run. Run scripts/org/grant-person-record-type.sh <alias> to give the System Administrator profile one.';
 
-    /**
-     * Null when the running user can create real person accounts here, and NO_PERSON_ACCOUNTS
-     * in an org that has none. Fails the calling test, with NO_PERSON_TYPE_FOR_USER, in an org
-     * that has person accounts but gives the running user no person record type.
-     */
-    public static String skipReason() {
-        Schema.DescribeSObjectResult account = Account.SObjectType.getDescribe(
-            SObjectDescribeOptions.DEFERRED
-        );
-        if (!OrgShapeDetector.hasPersonAccounts()) {
-            Assert.isFalse(
-                account.fields.getMap().containsKey('personcontactid'),
-                'The detector and the schema agree that this org has no person accounts'
-            );
-            return logged(NO_PERSON_ACCOUNTS);
-        }
-        if (OrgShapeDetector.creatablePersonRecordTypeId() == null) {
-            Map<Id, Schema.RecordTypeInfo> infos = account.getRecordTypeInfosById();
-            for (Id personType : OrgShapeDetector.personAccountRecordTypeIds()) {
-                Schema.RecordTypeInfo info = infos.get(personType);
-                Assert.isFalse(
-                    info != null && info.isAvailable(),
-                    'No person record type is available to the running user, so none can be created'
-                );
-            }
-            Assert.fail(NO_PERSON_TYPE_FOR_USER);
-        }
-        return null;
-    }
+	/**
+	 * Null when the running user can create real person accounts here, and NO_PERSON_ACCOUNTS
+	 * in an org that has none. Fails the calling test, with NO_PERSON_TYPE_FOR_USER, in an org
+	 * that has person accounts but gives the running user no person record type.
+	 */
+	public static String skipReason() {
+		Schema.DescribeSObjectResult account = Account.SObjectType.getDescribe(
+			SObjectDescribeOptions.DEFERRED
+		);
+		if (!OrgShapeDetector.hasPersonAccounts()) {
+			Assert.isFalse(
+				account.fields.getMap().containsKey('personcontactid'),
+				'The detector and the schema agree that this org has no person accounts'
+			);
+			return logged(NO_PERSON_ACCOUNTS);
+		}
+		if (OrgShapeDetector.creatablePersonRecordTypeId() == null) {
+			Map<Id, Schema.RecordTypeInfo> infos = account.getRecordTypeInfosById();
+			for (Id personType : OrgShapeDetector.personAccountRecordTypeIds()) {
+				Schema.RecordTypeInfo info = infos.get(personType);
+				Assert.isFalse(
+					info != null && info.isAvailable(),
+					'No person record type is available to the running user, so none can be created'
+				);
+			}
+			Assert.fail(NO_PERSON_TYPE_FOR_USER);
+		}
+		return null;
+	}
 
-    private static String logged(String reason) {
-        System.debug(LoggingLevel.WARN, reason);
-        return reason;
-    }
+	private static String logged(String reason) {
+		System.debug(LoggingLevel.WARN, reason);
+		return reason;
+	}
 }

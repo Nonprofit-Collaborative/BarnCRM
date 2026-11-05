@@ -4,13 +4,13 @@
  * bypassable from the settings console unless its row always runs (ADR-0017, ADR-0024).
  */
 trigger ShiftScheduleTrigger on Shift_Schedule__c(
-    before insert,
-    before update,
-    before delete,
-    after insert,
-    after update,
-    after delete,
-    after undelete
+	before insert,
+	before update,
+	before delete,
+	after insert,
+	after update,
+	after delete,
+	after undelete
 ) {
-    TriggerDispatcher.run('Shift_Schedule__c');
+	TriggerDispatcher.run('Shift_Schedule__c');
 }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Checks the packaged help text catalogs (ADR-NEXT help-text-json).
+"""Checks the packaged help text catalogs (ADR-0164 help-text-json).
 
 Help and guidance prose lives in one JSON static resource per package, BarnHelp_<Package>
 (packages/<dir>/main/default/staticresources/BarnHelp_<Package>.json), shaped

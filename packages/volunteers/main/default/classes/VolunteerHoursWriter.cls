@@ -24,15 +24,15 @@
  * records the running user cannot see.
  */
 public with sharing class VolunteerHoursWriter {
-    /**
-     * Saves each entry on its own (all or none off), so one the user can see but not edit, or
-     * one a rule refuses, comes back as a failed result for the service to report and never
-     * stops the others.
-     */
-    public static List<Database.SaveResult> save(List<Volunteer_Hours__c> entries) {
-        if (entries == null || entries.isEmpty()) {
-            return new List<Database.SaveResult>();
-        }
-        return Database.update(entries, false, AccessLevel.SYSTEM_MODE);
-    }
+	/**
+	 * Saves each entry on its own (all or none off), so one the user can see but not edit, or
+	 * one a rule refuses, comes back as a failed result for the service to report and never
+	 * stops the others.
+	 */
+	public static List<Database.SaveResult> save(List<Volunteer_Hours__c> entries) {
+		if (entries == null || entries.isEmpty()) {
+			return new List<Database.SaveResult>();
+		}
+		return Database.update(entries, false, AccessLevel.SYSTEM_MODE);
+	}
 }

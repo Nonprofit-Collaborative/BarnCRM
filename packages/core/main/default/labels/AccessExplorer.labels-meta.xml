@@ -1,46 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_AccessExplorer_PermissionRequired</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: no permission</shortDescription>
-        <value>You need the Manage BarnCRM Settings permission to use Access Explorer.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_UnknownObject</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: unknown object, {0} is the name asked for</shortDescription>
-        <value>There is no kind of record you can explore named "{0}".</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_UnknownField</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: unknown field, {0} is the name asked for</shortDescription>
-        <value>There is no field named "{0}" on this kind of record.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_UnknownSubject</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: person or permission set not found</shortDescription>
-        <value>That person or permission set could not be found. Search for it again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_UnexpectedError</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: unexpected error</shortDescription>
-        <value>Access Explorer could not read your org's access. The details are in the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Core_AccessExplorer_Through</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>
@@ -78,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Access explorer: view name</shortDescription>
-        <value>BarnCRM Permission Sets</value>
+        <value>BarnCRM Roles and Extra Permissions</value>
     </labels>
     <labels>
         <fullName>Core_AccessExplorer_LookUp</fullName>
@@ -95,22 +55,6 @@
         <protected>false</protected>
         <shortDescription>Access explorer: search placeholder</shortDescription>
         <value>Type at least two letters of a name</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_NoMatches</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: search found nothing</shortDescription>
-        <value>Nothing matches that name.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_ChooseSubject</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: empty state before a choice</shortDescription>
-        <value>Choose a person or permission set to see their access.</value>
     </labels>
     <labels>
         <fullName>Core_AccessExplorer_KindProfile</fullName>
@@ -201,52 +145,12 @@
         <value>Show More</value>
     </labels>
     <labels>
-        <fullName>Core_AccessExplorer_Truncated</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: {0} is the most listed</shortDescription>
-        <value>More than {0} profiles and permission sets give access. The first {0} are listed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_TabCheckScheduled</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: followed by a date and time</shortDescription>
-        <value>The Tab Access Check is scheduled hourly. Next run:</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_TabCheckNotScheduled</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: tab check not scheduled</shortDescription>
-        <value>The Tab Access Check is not scheduled, so people given a BarnCRM role in Setup do not get its tabs. Run Health Check and use Schedule All Nightly Jobs.</value>
-    </labels>
-    <labels>
         <fullName>Core_AccessExplorer_Download</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shared: button that downloads a table as a CSV file</shortDescription>
         <value>Download CSV</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_Downloaded</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: {0} is the number of rows</shortDescription>
-        <value>Downloaded {0} rows.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessExplorer_NothingToShow</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access explorer: empty table</shortDescription>
-        <value>Nothing to show.</value>
     </labels>
     <labels>
         <fullName>Core_AccessExplorer_Yes</fullName>

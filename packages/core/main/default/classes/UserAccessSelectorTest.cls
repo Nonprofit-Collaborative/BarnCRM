@@ -7,74 +7,74 @@
  */
 @IsTest(testFor='ApexClass:UserAccessSelector')
 private class UserAccessSelectorTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.admin();
+	}
 
-    @IsTest
-    static void noGroupNamesMeansNobody() {
-        System.runAs(TestUsers.admin()) {
-            System.assert(
-                UserAccessSelector.getAssignedUserIds(null).isEmpty(),
-                'No group names asked about means no people found.'
-            );
-            System.assert(
-                UserAccessSelector.getAssignedUserIds(new Set<String>()).isEmpty(),
-                'An empty set of group names finds nobody rather than everybody.'
-            );
-            System.assertEquals(
-                0,
-                UserAccessSelector.countActiveAssignees(null),
-                'Counting nothing counts nobody.'
-            );
-            System.assertEquals(
-                0,
-                UserAccessSelector.countActiveAssignees(new Set<String>()),
-                'Counting an empty set counts nobody.'
-            );
-        }
-    }
+	@IsTest
+	static void noGroupNamesMeansNobody() {
+		System.runAs(TestUsers.admin()) {
+			System.assert(
+				UserAccessSelector.getAssignedUserIds(null).isEmpty(),
+				'No group names asked about means no people found.'
+			);
+			System.assert(
+				UserAccessSelector.getAssignedUserIds(new Set<String>()).isEmpty(),
+				'An empty set of group names finds nobody rather than everybody.'
+			);
+			System.assertEquals(
+				0,
+				UserAccessSelector.countActiveAssignees(null),
+				'Counting nothing counts nobody.'
+			);
+			System.assertEquals(
+				0,
+				UserAccessSelector.countActiveAssignees(new Set<String>()),
+				'Counting an empty set counts nobody.'
+			);
+		}
+	}
 
-    @IsTest
-    static void noPermissionSetNamesMeansNobody() {
-        System.runAs(TestUsers.admin()) {
-            System.assert(
-                UserAccessSelector.getPermissionSetAssigneeIds(null).isEmpty(),
-                'No permission set names asked about means no people found.'
-            );
-            System.assert(
-                UserAccessSelector.getPermissionSetAssigneeIds(new Set<String>()).isEmpty(),
-                'An empty set of permission set names finds nobody.'
-            );
-            System.assertEquals(
-                0,
-                UserAccessSelector.countActiveDirectAssignees(null),
-                'Counting nothing counts nobody.'
-            );
-            System.assertEquals(
-                0,
-                UserAccessSelector.countActiveDirectAssignees(new Set<String>()),
-                'Counting an empty set counts nobody.'
-            );
-        }
-    }
+	@IsTest
+	static void noPermissionSetNamesMeansNobody() {
+		System.runAs(TestUsers.admin()) {
+			System.assert(
+				UserAccessSelector.getPermissionSetAssigneeIds(null).isEmpty(),
+				'No permission set names asked about means no people found.'
+			);
+			System.assert(
+				UserAccessSelector.getPermissionSetAssigneeIds(new Set<String>()).isEmpty(),
+				'An empty set of permission set names finds nobody.'
+			);
+			System.assertEquals(
+				0,
+				UserAccessSelector.countActiveDirectAssignees(null),
+				'Counting nothing counts nobody.'
+			);
+			System.assertEquals(
+				0,
+				UserAccessSelector.countActiveDirectAssignees(new Set<String>()),
+				'Counting an empty set counts nobody.'
+			);
+		}
+	}
 
-    @IsTest
-    static void thePackagedGroupsAreQueryable() {
-        System.runAs(TestUsers.admin()) {
-            Test.startTest();
-            Set<Id> assigned = UserAccessSelector.getAssignedUserIds(
-                HealthCheckService.BARNCRM_GROUPS
-            );
-            Integer standardUsers = UserAccessSelector.countActiveStandardUsersExcluding(assigned);
-            Test.stopTest();
+	@IsTest
+	static void thePackagedGroupsAreQueryable() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			Set<Id> assigned = UserAccessSelector.getAssignedUserIds(
+				HealthCheckService.BARNCRM_GROUPS
+			);
+			Integer standardUsers = UserAccessSelector.countActiveStandardUsersExcluding(assigned);
+			Test.stopTest();
 
-            System.assertNotEquals(null, assigned, 'The query runs against the packaged groups.');
-            System.assert(
-                standardUsers >= 0,
-                'Counting the people with no role always produces a number.'
-            );
-        }
-    }
+			System.assertNotEquals(null, assigned, 'The query runs against the packaged groups.');
+			System.assert(
+				standardUsers >= 0,
+				'Counting the people with no role always produces a number.'
+			);
+		}
+	}
 }

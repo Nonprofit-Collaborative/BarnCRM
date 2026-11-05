@@ -11,6 +11,20 @@ import {
   sectionOptions,
   csvRows
 } from '../setupChangeModel';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_SetupChanges_Kept: 'Kept: {0} changes, from {1} to {2}.',
+  Core_SetupChanges_NothingKept: 'Nothing kept.',
+  Core_SetupChanges_Scheduled: 'Copied nightly, kept {0} days.',
+  Core_SetupChanges_NotScheduled: 'Not scheduled.',
+  Core_SetupChanges_CopyRunning: 'Running.',
+  Core_SetupChanges_CopyStarted: 'Started.',
+  Core_SetupChanges_More: 'Showing {0}; download up to {1}.',
+  Core_SetupChanges_ScanStopped: 'Stopped after {0}.',
+  Core_SetupChanges_Downloaded: 'Saved {0}.',
+  Core_SetupChanges_DatesReversed: 'Reversed.'
+});
 
 jest.mock('@salesforce/apex/SetupChangeController.getSummary', () => ({ default: jest.fn() }), {
   virtual: true
@@ -23,52 +37,6 @@ jest.mock('@salesforce/apex/SetupChangeController.copyNow', () => ({ default: je
 });
 jest.mock('@salesforce/i18n/locale', () => ({ default: 'en-US' }), { virtual: true });
 jest.mock('@salesforce/i18n/timeZone', () => ({ default: 'UTC' }), { virtual: true });
-jest.mock(
-  '@salesforce/label/c.Core_SetupChanges_Kept',
-  () => ({ default: 'Kept: {0} changes, from {1} to {2}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SetupChanges_NothingKept',
-  () => ({ default: 'Nothing kept.' }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SetupChanges_Scheduled',
-  () => ({ default: 'Copied nightly, kept {0} days.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SetupChanges_NotScheduled',
-  () => ({ default: 'Not scheduled.' }),
-  {
-    virtual: true
-  }
-);
-jest.mock('@salesforce/label/c.Core_SetupChanges_CopyRunning', () => ({ default: 'Running.' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Core_SetupChanges_CopyStarted', () => ({ default: 'Started.' }), {
-  virtual: true
-});
-jest.mock(
-  '@salesforce/label/c.Core_SetupChanges_More',
-  () => ({ default: 'Showing {0}; download up to {1}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SetupChanges_ScanStopped',
-  () => ({ default: 'Stopped after {0}.' }),
-  { virtual: true }
-);
-jest.mock('@salesforce/label/c.Core_SetupChanges_Downloaded', () => ({ default: 'Saved {0}.' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Core_SetupChanges_DatesReversed', () => ({ default: 'Reversed.' }), {
-  virtual: true
-});
 jest.mock(
   '@salesforce/label/c.Core_SetupChanges_AllSections',
   () => ({ default: 'All Sections' }),
@@ -209,7 +177,7 @@ describe('c-setup-change-log', () => {
     await flush();
 
     expect(getChanges).not.toHaveBeenCalled();
-    expect(find(element, 'error').textContent.trim()).toBe('Reversed.');
+    expect(find(element, 'error').message).toBe('Reversed.');
   });
 
   it('shows the empty state when nothing matches', async () => {
@@ -230,7 +198,7 @@ describe('c-setup-change-log', () => {
     await flush();
 
     expect(copyNow).toHaveBeenCalledTimes(1);
-    expect(find(element, 'notice').textContent.trim()).toBe('Started.');
+    expect(find(element, 'notice').message).toBe('Started.');
     expect(find(element, 'copy-status').textContent.trim()).toBe('Running.');
   });
 
@@ -238,7 +206,8 @@ describe('c-setup-change-log', () => {
     getSummary.mockRejectedValue({ body: { message: 'No access.' } });
     const element = await render();
 
-    expect(find(element, 'error').textContent.trim()).toBe('No access.');
+    expect(find(element, 'error').message).toBe('No access.');
+    expect(find(element, 'error').variant).toBe('error');
   });
 
   it('downloads every match up to the export size as a defused CSV', async () => {
@@ -272,7 +241,7 @@ describe('c-setup-change-log', () => {
       '2026-10-31 10:00:00,Pat Admin,,Customize Accounts,changedFieldLabel,"\'=Changed, the ""Phone"" label"'
     );
     expect(name).toMatch(/^Setup_Changes-\d{4}-\d{2}-\d{2}\.csv$/);
-    expect(find(element, 'notice').textContent.trim()).toBe('Saved 1.');
+    expect(find(element, 'notice').message).toBe('Saved 1.');
   });
 });
 

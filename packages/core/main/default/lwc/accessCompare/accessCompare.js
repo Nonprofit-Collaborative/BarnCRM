@@ -1,10 +1,10 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import searchPeople from '@salesforce/apex/AccessExplorerController.searchPeople';
 import searchPermissionSets from '@salesforce/apex/AccessExplorerController.searchPermissionSets';
 import getAccess from '@salesforce/apex/AccessExplorerController.getAccess';
 import getFieldAccess from '@salesforce/apex/AccessExplorerController.getFieldAccess';
 import { format, messageFrom, downloadCsv } from 'c/findCsv';
-import { withDetails } from 'c/accessExplorerRows';
+import { withDetails, barnName, shownColumns, nameOptions } from 'c/accessExplorerRows';
 import {
   OBJECT_FLAGS,
   FIELD_FLAGS,
@@ -19,19 +19,15 @@ import PEOPLE from '@salesforce/label/c.Core_SettingsGroup_People';
 import SETS from '@salesforce/label/c.Core_AccessCompare_Sets';
 import FIRST from '@salesforce/label/c.Core_AccessCompare_First';
 import SECOND from '@salesforce/label/c.Core_AccessCompare_Second';
-import CHOOSE from '@salesforce/label/c.Core_AccessCompare_Choose';
 import SIMILARITY from '@salesforce/label/c.Core_AccessCompare_Similarity';
 import DIFFERENCES_ONLY from '@salesforce/label/c.Core_AccessCompare_DifferencesOnly';
 import KINDS_HEADING from '@salesforce/label/c.Core_AccessCompare_KindsHeading';
 import FIELDS_FOR from '@salesforce/label/c.Core_AccessCompare_FieldsFor';
 import FIELDS_HEADING from '@salesforce/label/c.Core_AccessCompare_FieldsHeading';
-import COUNTS from '@salesforce/label/c.Core_AccessCompare_Counts';
 import NO_DIFFERENCES from '@salesforce/label/c.Core_AccessCompare_NoDifferences';
-import ONLY_IN from '@salesforce/label/c.Core_AccessCompare_OnlyIn';
 import NONE from '@salesforce/label/c.Core_AccessCompare_None';
 import COL_DIFFERENCE from '@salesforce/label/c.Core_AccessCompare_ColDifference';
 import SEARCH_PLACEHOLDER from '@salesforce/label/c.Core_AccessExplorer_SearchPlaceholder';
-import NO_MATCHES from '@salesforce/label/c.Core_AccessExplorer_NoMatches';
 import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
 import KIND_PROFILE from '@salesforce/label/c.Core_AccessExplorer_KindProfile';
 import KIND_GROUP from '@salesforce/label/c.Core_AccessExplorer_KindGroup';
@@ -46,10 +42,20 @@ import COL_DELETE from '@salesforce/label/c.Core_AccessExplorer_ColDelete';
 import COL_VIEW_ALL from '@salesforce/label/c.Core_AccessExplorer_ColViewAll';
 import COL_MODIFY_ALL from '@salesforce/label/c.Core_AccessExplorer_ColModifyAll';
 import DOWNLOAD from '@salesforce/label/c.Core_AccessExplorer_Download';
-import DOWNLOADED from '@salesforce/label/c.Core_AccessExplorer_Downloaded';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_BASE = 'Access_Explorer_Compare';
+/** A role or extra permission named as the Access page names it (admin-9); Access Explorer has loaded the help. */
+const nameOf = (choice) =>
+  barnName(choice.label, choice.barnKind, {
+    get role() {
+      return helpText('Core', 'Core_AccessExplorer_RoleName');
+    },
+    get extraPermission() {
+      return helpText('Core', 'Core_AccessExplorer_ExtraPermissionName');
+    }
+  });
 const SEARCH_DELAY = 300;
 const KINDS = { profile: KIND_PROFILE, group: KIND_GROUP, permissionSet: KIND_SET };
 const FLAG_WORDS = {
@@ -78,16 +84,33 @@ const blankSide = (key, label) => ({
  * administrators reach.
  */
 export default class AccessCompare extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
+  /** Show the API Name column and API names in the picker (Access Explorer's toggle). */
+  @api showTechnicalNames = false;
+
   labels = {
     compare: COMPARE,
-    choose: CHOOSE,
+    get choose() {
+      return helpText('Core', 'Core_AccessCompare_Choose');
+    },
     differencesOnly: DIFFERENCES_ONLY,
     kindsHeading: KINDS_HEADING,
     fieldsFor: FIELDS_FOR,
     fieldsHeading: FIELDS_HEADING,
     noDifferences: NO_DIFFERENCES,
     searchPlaceholder: SEARCH_PLACEHOLDER,
-    noMatches: NO_MATCHES,
+    get noMatches() {
+      return helpText('Core', 'Core_AccessExplorer_NoMatches');
+    },
     download: DOWNLOAD,
     loading: LOADING
   };
@@ -124,12 +147,16 @@ export default class AccessCompare extends LightningElement {
       noResults: Array.isArray(side.results) && side.results.length === 0,
       resultItems: (side.results || []).map((choice) => ({
         ...choice,
-        text: [choice.label, KINDS[choice.detail] || choice.detail, choice.isActive ? '' : INACTIVE]
+        text: [
+          nameOf(choice),
+          KINDS[choice.detail] || choice.detail,
+          choice.isActive ? '' : INACTIVE
+        ]
           .filter(Boolean)
           .join(', ')
       })),
       heading: side.subject
-        ? withDetails(side.subject.label, [
+        ? withDetails(nameOf(side.subject), [
             KINDS[side.subject.detail] || side.subject.detail,
             side.subject.isActive ? '' : INACTIVE
           ])
@@ -143,14 +170,14 @@ export default class AccessCompare extends LightningElement {
 
   /** Each side's name; two identical names fall back to First and Second. */
   get names() {
-    const [a, b] = this.sides.map((side) => (side.subject ? side.subject.label : side.label));
+    const [a, b] = this.sides.map((side) => (side.subject ? nameOf(side.subject) : side.label));
     return a === b ? [FIRST, SECOND] : [a, b];
   }
 
   get words() {
     return {
       flags: FLAG_WORDS,
-      onlyIn: ONLY_IN,
+      onlyIn: helpText('Core', 'Core_AccessCompare_OnlyIn'),
       nameA: this.names[0],
       nameB: this.names[1],
       none: NONE
@@ -180,26 +207,37 @@ export default class AccessCompare extends LightningElement {
     const byName = new Map();
     for (const side of this.sides) {
       for (const row of side.subject ? side.subject.objects : []) {
-        byName.set(row.name, `${row.label} (${row.name})`);
+        byName.set(row.name, row.label);
       }
     }
-    return [...byName.entries()]
-      .map(([value, label]) => ({ value, label }))
-      .sort((x, y) => x.label.localeCompare(y.label));
+    return nameOptions(
+      [...byName.entries()]
+        .map(([value, label]) => ({ value, label }))
+        .sort((x, y) => x.label.localeCompare(y.label)),
+      this.showTechnicalNames
+    );
   }
 
   /** Both tables, by name: columns, the rows shown and a count line (the CSV uses the same). */
   get tables() {
-    const columns = (first) => [
-      { label: first, fieldName: 'label' },
-      { label: COL_API_NAME, fieldName: 'name' },
-      { label: this.names[0], fieldName: 'aText', wrapText: true },
-      { label: this.names[1], fieldName: 'bText', wrapText: true },
-      { label: COL_DIFFERENCE, fieldName: 'difference', wrapText: true }
-    ];
+    const columns = (first) =>
+      shownColumns(
+        [
+          { label: first, fieldName: 'label' },
+          { label: COL_API_NAME, fieldName: 'name', technical: true },
+          { label: this.names[0], fieldName: 'aText', wrapText: true },
+          { label: this.names[1], fieldName: 'bText', wrapText: true },
+          { label: COL_DIFFERENCE, fieldName: 'difference', wrapText: true }
+        ],
+        this.showTechnicalNames
+      );
     const shown = (diff) => {
       const rows = visibleRows(diff, this.differencesOnly);
-      const count = format(COUNTS, String(countDifferences(diff)), String(diff.length));
+      const count = format(
+        helpText('Core', 'Core_AccessCompare_Counts'),
+        String(countDifferences(diff)),
+        String(diff.length)
+      );
       return { rows, count, empty: rows.length === 0 };
     };
     return {
@@ -315,6 +353,9 @@ export default class AccessCompare extends LightningElement {
       path: column.fieldName
     }));
     downloadCsv(FILE_BASE, columns, table.rows);
-    this.noticeMessage = format(DOWNLOADED, String(table.rows.length));
+    this.noticeMessage = format(
+      helpText('Core', 'Core_AccessExplorer_Downloaded'),
+      String(table.rows.length)
+    );
   }
 }

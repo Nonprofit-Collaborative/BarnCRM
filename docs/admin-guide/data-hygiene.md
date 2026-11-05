@@ -68,7 +68,7 @@ paused for the load. She wants to know what the load left behind.
 
 | Check | Exactly what is counted | Why it matters | What to do |
 |---|---|---|---|
-| **People with No Household** | With household membership on the person's account (the simple way): every contact with no account. With membership records (the flexible way): every person, contact or person account, with no current membership (no end date, or one still to come), leaving out a contact whose account is an organization or a household. | A person in no household is left out of household names, greetings, totals and mailings. Most come from a load with automation paused. | Add each person to a household. If **Create Households Automatically** is off on purpose, some of these may be your choice. |
+| **People with No Household** | With household membership on the person's account (the simple way): every contact with no account. With membership records (the flexible way): every person, contact or person account, with no current membership (no end date, or one still to come), leaving out a contact whose account is an organization or a household. | A person in no household is left out of household names, greetings, totals and mailings. Most come from a load with automation paused. | Add each person to a household. If **Create households automatically** is off on purpose, some of these may be your choice. |
 | **Households with Nobody in Them** | Households (record type Household) whose **Member Count** is zero or empty. | An empty household still shows up in lists, reports and mailings. | Add a member, merge it into another household, or delete it (see [Household merge and split](household-merge-split.md)). In an org with Salesforce Nonprofit Cloud households, a household that is also one of those keeps its members in Nonprofit Cloud and can be listed here; the check then carries a note. Never delete such a household: its Nonprofit Cloud household group is deleted with it. |
 | **Memberships That Name Nobody** | Household membership records with neither a contact nor an account: the person was deleted while automation was switched off. | Such a record counts for nobody, but it still sits on the household's related list. | Delete them. They hold nothing but the household and the dates. |
 | **Addresses That Belong to Nobody** | Address records with no household, organization or person: the record they belonged to was deleted. | They are kept on purpose (an address is history), but nobody will ever see them from a record page. | Delete them, or set an owner if the address should be kept. |
@@ -96,13 +96,13 @@ shows at once. Find's export reads every matching record.
 
 1. Press **Open in Find** next to a check. BarnCRM saves the check's query as one of your own
    saved queries, named **Data Quality:** followed by the check's name, not shared with anyone,
-   and opens the Find tab. (Queries saved before the rename, named **Data hygiene:**, are
+   and opens the Find tab with a short message, **Opened Data Quality: ... in Find.** (Queries saved before the rename, named **Data hygiene:**, are
    renamed **Data Quality:** when BarnCRM is upgraded. If you already have a **Data Quality:**
    query of the same name, that newer one is kept and the old one is left as it was, for you to
    delete in Find if you like.)
 2. Find opens that query with its object, columns, conditions and sort filled in, and runs it.
    The list is ready to read, **Export to CSV**, or change. The query also stays under
-   **Saved queries** for next time.
+   **Saved searches** for next time.
 3. Pressing **Open in Find** again later puts that saved query back to the check's own query,
    so your copy always matches what Data Quality counted. To keep a version you changed, use
    **Save as** in Find and give it another name.
@@ -123,7 +123,7 @@ They answer different questions:
 | Fixes | Some findings have a fix button for a setup problem with one right answer. | Never changes anything. You work through the records in Find, by export, or with Super Transformer. |
 
 The two counts for people with no household are the same question asked the same way, but
-Health Check reports it only while **Create Households Automatically** is on, and Data
+Health Check reports it only while **Create households automatically** is on, and Data
 Quality reports it always. For empty households, Health Check reads the memberships themselves
 and Data Quality reads **Member Count**, so that the check can open in Find. They disagree
 only when a Member Count is out of date, for example after a load with automation paused, and

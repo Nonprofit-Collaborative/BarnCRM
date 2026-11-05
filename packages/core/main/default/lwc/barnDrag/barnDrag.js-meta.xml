@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    UX kit: drag and drop for lists, boards and diagrams, with pointer (touch after a press and
+    hold) and keyboard paths and announcements. Framework free; exposed so every package can
+    import it.
+  </description>
+  <isExposed>true</isExposed>
+</LightningComponentBundle>

@@ -110,9 +110,19 @@ describe('c-data-manager', () => {
     ]);
     expect(groups[3].tiles.map((tile) => tile.name)).toEqual(['delete']);
     tiles(element).forEach((tile) => {
-      expect(tile.iconName).toMatch(/^standard:\w+$/);
+      expect(tile.iconName).toMatch(/^(standard|custom):\w+$/);
       expect(tile.description).toBeTruthy();
     });
+    // A tile that opens a tab carries that tab's icon (c/barnIcons).
+    const icons = Object.fromEntries(tiles(element).map((tile) => [tile.name, tile.iconName]));
+    expect(icons).toEqual(
+      expect.objectContaining({
+        import: 'custom:custom18',
+        find: 'custom:custom39',
+        optimizer: 'custom:custom94',
+        duplicates: 'custom:custom90'
+      })
+    );
   });
 
   it('shows a tile for each tool the person may use', async () => {
@@ -123,8 +133,76 @@ describe('c-data-manager', () => {
       'import',
       'find',
       'optimizer',
+      'duplicates',
       'delete'
     ]);
+    const titles = Object.fromEntries(tiles(element).map((tile) => [tile.name, tile.label]));
+    expect(titles.find).toBe('c.Core_Find_Title');
+    expect(titles.duplicates).toBe('c.Core_DuplicateMatching_Title');
+  });
+
+  it('opens Duplicate Matching from its tile', async () => {
+    const element = await render();
+    select(element, 'duplicates');
+    await flush();
+    expect(mockNavigate).toHaveBeenLastCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Duplicate_Matching' }
+    });
+  });
+
+  it('lists the tasks that match what is typed, and opens the tool of the one chosen', async () => {
+    const element = await render();
+    const input = one(element, 'task-input');
+    expect(input.label).toBe('c.Core_DataManager_TaskSearch');
+    expect(input.placeholder).toBe('c.Core_DataManager_TaskSearchPlaceholder');
+    expect(one(element, 'task-none')).toBeNull();
+
+    input.value = 'merge two households';
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    const results = element.shadowRoot.querySelectorAll('[data-id="task-result"]');
+    expect(results[0].textContent).toContain('Merge two households');
+    expect(results[0].dataset.tool).toBe('duplicates');
+    results[0].click();
+    await flush();
+    expect(mockNavigate).toHaveBeenLastCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Duplicate_Matching' }
+    });
+  });
+
+  it('leaves out tasks for tools the person may not use, and says when nothing matches', async () => {
+    const element = await render();
+    const input = one(element, 'task-input');
+
+    // Bulk Update Records is off in this test, so Super Transformer's tasks are not offered.
+    input.value = 'fix capital letters in names';
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    const tools = Array.from(element.shadowRoot.querySelectorAll('[data-id="task-result"]')).map(
+      (result) => result.dataset.tool
+    );
+    expect(tools).not.toContain('update');
+
+    input.value = 'zebra';
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(element.shadowRoot.querySelectorAll('[data-id="task-result"]')).toHaveLength(0);
+    expect(one(element, 'task-none').textContent).toContain('c.Core_DataManager_TaskSearchNone');
+  });
+
+  it('asks before a delete task opens Find, as the tile does', async () => {
+    BarnConfirmModal.open.mockResolvedValueOnce(false);
+    const element = await render();
+    const input = one(element, 'task-input');
+    input.value = 'delete test records';
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    element.shadowRoot.querySelector('[data-id="task-result"][data-tool="delete"]').click();
+    await flush();
+    expect(BarnConfirmModal.open).toHaveBeenCalled();
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it('has no Open buttons and no warning bar: the warning lives in the confirm box', async () => {
@@ -248,7 +326,7 @@ describe('c-data-manager', () => {
       'GroupCheck',
       'GroupCareful',
       'ImportTitle',
-      'FindTitle',
+      'TaskSearch',
       'DeleteTitle',
       'MappingsHeading',
       'MappingsEmpty',
@@ -275,7 +353,7 @@ describe('c-data-manager', () => {
 
   it('keeps each tile line to 12 words or fewer', () => {
     const fs = require('fs');
-    // The tile lines are help text: Core's help catalog holds them (ADR-NEXT help-text-json).
+    // The tile lines are help text: Core's help catalog holds them (ADR-0164 help-text-json).
     const { texts } = JSON.parse(
       fs.readFileSync('packages/core/main/default/staticresources/BarnHelp_Core.json', 'utf8')
     );
@@ -285,6 +363,7 @@ describe('c-data-manager', () => {
       'UpdateText',
       'DeleteText',
       'OptimizerText',
+      'DuplicatesText',
       'WeeklyExportText',
       'RecycleBinText',
       'DataImportWizardText'
@@ -326,7 +405,8 @@ describe('c-data-manager', () => {
     const element = await render();
     getMappings.error({});
     await flush();
-    expect(one(element, 'mappings-error').textContent).toContain('c.Core_UnexpectedError');
+    expect(one(element, 'mappings-error').message).toBe('c.Core_UnexpectedError');
+    expect(one(element, 'mappings-error').variant).toBe('error');
   });
 
   it('shows an empty state that opens Import, and a templates error', async () => {

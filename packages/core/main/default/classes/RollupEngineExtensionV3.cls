@@ -6,10 +6,10 @@
  */
 @NamespaceAccessible
 public interface RollupEngineExtensionV3 {
-    /**
-     * Called by the settings service after a save changed settings, with the settings object's
-     * API name and the API names of the fields that changed, both without a namespace prefix.
-     * The engine acts only for its own settings: the nightly run moves when its hour changes.
-     */
-    void afterSettingsSaved(String settingsObject, Set<String> changedKeys);
+	/**
+	 * Called by the settings service after a save changed settings, with the settings object's
+	 * API name and the API names of the fields that changed, both without a namespace prefix.
+	 * The engine acts only for its own settings: the nightly run moves when its hour changes.
+	 */
+	void afterSettingsSaved(String settingsObject, Set<String> changedKeys);
 }

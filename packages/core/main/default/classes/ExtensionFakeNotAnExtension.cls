@@ -4,5 +4,5 @@
  */
 @IsTest
 public class ExtensionFakeNotAnExtension {
-    public Integer value = 1;
+	public Integer value = 1;
 }

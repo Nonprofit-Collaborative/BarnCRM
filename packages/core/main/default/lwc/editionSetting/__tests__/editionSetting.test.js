@@ -112,7 +112,7 @@ describe('c-edition-setting', () => {
     switchButtons(element)[0].click();
     await flushPromises();
 
-    expect(find(element, 'error').textContent).toBe('No permission');
+    expect(find(element, 'error').message).toBe('No permission');
     expect(find(element, 'saved')).toBeNull();
   });
 

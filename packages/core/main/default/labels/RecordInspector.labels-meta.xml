@@ -49,14 +49,6 @@
         <value>Copied {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RecordInspector_CopyFailed</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Record Inspector message when the browser refuses to copy.</shortDescription>
-        <value>Your browser did not allow copying. Select the API name and copy it by hand.</value>
-    </labels>
-    <labels>
         <fullName>Core_RecordInspector_Count</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -73,14 +65,6 @@
         <value>{0} of {1} fields</value>
     </labels>
     <labels>
-        <fullName>Core_RecordInspector_NoMatch</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Record Inspector message when a search matches nothing.</shortDescription>
-        <value>No field matches your search.</value>
-    </labels>
-    <labels>
         <fullName>Core_RecordInspector_Empty</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -95,21 +79,5 @@
         <protected>false</protected>
         <shortDescription>Record Inspector marker for a value that was cut.</shortDescription>
         <value>Shortened</value>
-    </labels>
-    <labels>
-        <fullName>Core_RecordInspector_ErrorNoPermission</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Record Inspector refusal: no Manage BarnCRM Settings permission.</shortDescription>
-        <value>The Record Inspector needs the Manage BarnCRM Settings permission. Ask your BarnCRM admin to assign it to you.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RecordInspector_ErrorNotFound</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Record Inspector refusal: the record cannot be read.</shortDescription>
-        <value>This record could not be found, or you cannot read it.</value>
     </labels>
 </CustomLabels>

@@ -26,8 +26,9 @@ run does anything.
 3. Back in **BarnCRM Settings**, under **Commitments and Installments**, turn on **Send pledge
    reminders**. Until you do, the Pledge Reminders page says reminders are off.
 4. Press **Send Reminders Now** to run once, or turn on **Run every night** on the Pledge
-   Reminders page to have the run happen at 3:15 each morning. The nightly run only does
-   anything while **Send Pledge Reminders** is on, so you can stop reminders at any time by
+   Reminders page to switch on the Pledge Reminders step of [BarnCRM Nightly Jobs](nightly-jobs.md), the one
+   nightly run, so it happens at 3:15 each morning. The step only does
+   anything while **Send pledge reminders** is on, so you can stop reminders at any time by
    clearing that setting.
 
 ## Steps
@@ -103,7 +104,7 @@ again on its own with a fixed reason, so no email row is left Queued.
    Save.
 4. Create a pledge for a donor with an email address, starting seven days ago. Its first
    installment is seven days overdue.
-5. Back in **BarnCRM Settings**, turn on **Send Pledge Reminders**. Return to the Pledge
+5. Back in **BarnCRM Settings**, turn on **Send pledge reminders**. Return to the Pledge
    Reminders page: **Emails** reads 1.
 6. Press **Send Reminders Now**. The log shows one reminder, `Week late`, by email, with its
    status, and the same row is on the **Pledge Reminders Log** tab. Press the button again:

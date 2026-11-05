@@ -75,6 +75,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>PersonSameNameController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>HubController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -84,6 +88,10 @@
   </classAccesses>
   <classAccesses>
     <apexClass>ModuleManagerController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>NightlyJobsController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>

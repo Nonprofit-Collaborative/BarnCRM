@@ -2,6 +2,11 @@ import { createElement } from 'lwc';
 import FindExportFiles from 'c/findExportFiles';
 import startServerExport from '@salesforce/apex/FindController.startServerExport';
 import serverExportStatus from '@salesforce/apex/FindController.serverExportStatus';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_Find_ExportFilesDone: 'Ready: {0} files.'
+});
 
 jest.mock('@salesforce/apex/FindController.startServerExport', () => ({ default: jest.fn() }), {
   virtual: true
@@ -9,18 +14,6 @@ jest.mock('@salesforce/apex/FindController.startServerExport', () => ({ default:
 jest.mock('@salesforce/apex/FindController.serverExportStatus', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_Find_ExportFilesProgress',
-  () => ({ default: 'Exporting: {0} of {1} chunks done.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_Find_ExportFilesDone',
-  () => ({ default: 'Ready: {0} files.' }),
-  {
-    virtual: true
-  }
-);
 
 // eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
@@ -80,12 +73,18 @@ describe('c-find-export-files', () => {
       queryJson: '{"version":1}',
       labelsJson: '{"LastName":"Last Name"}'
     });
-    expect(one(element, 'status-line').textContent).toBe('Exporting: 1 of 4 chunks done.');
+    // While it runs, a bar shows the share written, in percent (not parts).
+    const meter = one(element, 'export-meter');
+    expect(meter.value).toBe(25);
+    expect(meter.valueText).toBe('c.Core_Find_ExportFilesProgress');
+    expect(one(element, 'status-notice')).toBeNull();
 
     poll();
     await flush();
     expect(serverExportStatus).toHaveBeenCalledWith({ jobId: '707000000000001', tag: 'abc123' });
-    expect(one(element, 'status-line').textContent).toBe('Ready: 2 files.');
+    expect(one(element, 'export-meter')).toBeNull();
+    expect(one(element, 'status-notice').message).toBe('Ready: 2 files.');
+    expect(one(element, 'status-notice').variant).toBe('success');
     const links = [...element.shadowRoot.querySelectorAll('[data-id="file"] a')];
     expect(links.map((link) => link.getAttribute('href'))).toEqual([
       '/sfc/servlet.shepherd/document/download/069000000000001',

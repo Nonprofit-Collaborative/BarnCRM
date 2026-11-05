@@ -39,7 +39,9 @@ runs. This is the step that makes a payment turn Overdue on its own.
 Open **BarnCRM Settings**, choose **Giving**, and choose **Open** on **Nightly Jobs**.
 The page opens with a line for each job, then one button.
 
-Choose **Schedule Nightly Run**. Three jobs are scheduled at once:
+Choose **Schedule Nightly Run**. Three jobs are switched on at once, as steps of
+[BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run (the button also schedules that
+run when it is not scheduled yet):
 
 | Job | Runs at | What it does |
 |---|---|---|

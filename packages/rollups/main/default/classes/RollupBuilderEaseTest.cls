@@ -7,27 +7,27 @@
  */
 @IsTest(testFor='ApexClass:RollupBuilderController')
 private class RollupBuilderEaseTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.adminWith('Rollup_Builder_Admin');
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.adminWith('Rollup_Builder_Admin');
+	}
 
-    @IsTest
-    static void theModelSaysWhenEachModeRecalculates() {
-        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            RollupBuilderController.BuilderModel model = RollupBuilderController.getModel();
+	@IsTest
+	static void theModelSaysWhenEachModeRecalculates() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			RollupBuilderController.BuilderModel model = RollupBuilderController.getModel();
 
-            System.Assert.areEqual(
-                RollupScheduler.nightlyTime(),
-                model.nightlyTime,
-                'Every night and Both say the hour'
-            );
-            System.Assert.areEqual(
-                RollupService.recalculatesInTheSave(),
-                model.inSave,
-                'Instantly says whether it is after the save or during it'
-            );
-            System.Assert.isFalse(model.inSave, 'After the save is the default');
-        }
-    }
+			System.Assert.areEqual(
+				RollupScheduler.nightlyTime(),
+				model.nightlyTime,
+				'Every night and Both say the hour'
+			);
+			System.Assert.areEqual(
+				RollupService.recalculatesInTheSave(),
+				model.inSave,
+				'Instantly says whether it is after the save or during it'
+			);
+			System.Assert.isFalse(model.inSave, 'After the save is the default');
+		}
+	}
 }

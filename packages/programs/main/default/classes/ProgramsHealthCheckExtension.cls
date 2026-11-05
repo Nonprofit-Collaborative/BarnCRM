@@ -18,122 +18,122 @@
  */
 @NamespaceAccessible
 public with sharing class ProgramsHealthCheckExtension implements HealthCheckExtension {
-    @TestVisible
-    private static final String KEY = 'program_enrollments_open_after_end';
-    @TestVisible
-    private static final String NPC_KEY = 'nonprofit_cloud_program_management_present';
+	@TestVisible
+	private static final String KEY = 'program_enrollments_open_after_end';
+	@TestVisible
+	private static final String NPC_KEY = 'nonprofit_cloud_program_management_present';
 
-    /** The Nonprofit Cloud Program Management objects, looked up by name only. */
-    private static final String NPC_PROGRAM = 'Program'; // detection-only: describe key, reported only
-    private static final String NPC_ENROLLMENT = 'ProgramEnrollment'; // detection-only: describe key, reported only
-    private static final List<String> NPC_PROGRAM_OBJECTS = new List<String>{
-        NPC_PROGRAM,
-        NPC_ENROLLMENT
-    };
+	/** The Nonprofit Cloud Program Management objects, looked up by name only. */
+	private static final String NPC_PROGRAM = 'Program'; // detection-only: describe key, reported only
+	private static final String NPC_ENROLLMENT = 'ProgramEnrollment'; // detection-only: describe key, reported only
+	private static final List<String> NPC_PROGRAM_OBJECTS = new List<String>{
+		NPC_PROGRAM,
+		NPC_ENROLLMENT
+	};
 
-    /** Test seam: stands in for the org's answer to whether those objects are here. */
-    @TestVisible
-    private static Boolean npcProgramsOverride;
+	/** Test seam: stands in for the org's answer to whether those objects are here. */
+	@TestVisible
+	private static Boolean npcProgramsOverride;
 
-    /** Counts stop here, and the finding says "more than" this many. */
-    @TestVisible
-    private static Integer countCap = 1000;
+	/** Counts stop here, and the finding says "more than" this many. */
+	@TestVisible
+	private static Integer countCap = 1000;
 
-    /** How many example enrollments the finding links to. */
-    private static final Integer LINKS_SHOWN = 5;
+	/** How many example enrollments the finding links to. */
+	private static final Integer LINKS_SHOWN = 5;
 
-    @NamespaceAccessible
-    public ProgramsHealthCheckExtension() {
-        // Built by name from Core (HealthCheckExtensions), so it needs a public constructor.
-    }
+	@NamespaceAccessible
+	public ProgramsHealthCheckExtension() {
+		// Built by name from Core (HealthCheckExtensions), so it needs a public constructor.
+	}
 
-    public List<HealthCheckService.Finding> findings() {
-        List<HealthCheckService.Finding> found = new List<HealthCheckService.Finding>();
-        if (
-            !HealthCheckService.canManageSettings() ||
-            ModuleManagerService.turnedOff().contains(ProgramsAccessSync.MODULE_NAME.toLowerCase())
-        ) {
-            return found;
-        }
-        if (Schema.SObjectType.Enrollment__c.isAccessible()) {
-            try {
-                HealthCheckService.Finding finding = openAfterEnd();
-                if (finding != null) {
-                    found.add(finding);
-                }
-            } catch (Exception e) {
-                found.add(HealthCheckService.checkFailed(KEY, e));
-            }
-        }
-        if (hasNonprofitCloudPrograms()) {
-            found.add(
-                new HealthCheckService.Finding(
-                    NPC_KEY,
-                    Label.Programs_HealthCheck_NpcProgramsTitle,
-                    Label.Programs_HealthCheck_NpcProgramsDetail,
-                    HealthCheckService.SEVERITY_INFO,
-                    HealthCheckService.CATEGORY_ORG_SHAPE
-                )
-            );
-        }
-        return found;
-    }
+	public List<HealthCheckService.Finding> findings() {
+		List<HealthCheckService.Finding> found = new List<HealthCheckService.Finding>();
+		if (
+			!HealthCheckService.canManageSettings() ||
+			ModuleManagerService.turnedOff().contains(ProgramsAccessSync.MODULE_NAME.toLowerCase())
+		) {
+			return found;
+		}
+		if (Schema.SObjectType.Enrollment__c.isAccessible()) {
+			try {
+				HealthCheckService.Finding finding = openAfterEnd();
+				if (finding != null) {
+					found.add(finding);
+				}
+			} catch (Exception e) {
+				found.add(HealthCheckService.checkFailed(KEY, e));
+			}
+		}
+		if (hasNonprofitCloudPrograms()) {
+			found.add(
+				new HealthCheckService.Finding(
+					NPC_KEY,
+					Label.Programs_HealthCheck_NpcProgramsTitle,
+					Label.Programs_HealthCheck_NpcProgramsDetail,
+					HealthCheckService.SEVERITY_INFO,
+					HealthCheckService.CATEGORY_ORG_SHAPE
+				)
+			);
+		}
+		return found;
+	}
 
-    /** True when every Nonprofit Cloud Program Management object named above is in the org. */
-    @TestVisible
-    private static Boolean hasNonprofitCloudPrograms() {
-        if (npcProgramsOverride != null) {
-            return npcProgramsOverride;
-        }
-        Map<String, Schema.SObjectType> described = NamespaceUtil.globalDescribe();
-        for (String objectName : NPC_PROGRAM_OBJECTS) {
-            if (!described.containsKey(objectName.toLowerCase())) {
-                return false;
-            }
-        }
-        return true;
-    }
+	/** True when every Nonprofit Cloud Program Management object named above is in the org. */
+	@TestVisible
+	private static Boolean hasNonprofitCloudPrograms() {
+		if (npcProgramsOverride != null) {
+			return npcProgramsOverride;
+		}
+		Map<String, Schema.SObjectType> described = NamespaceUtil.globalDescribe();
+		for (String objectName : NPC_PROGRAM_OBJECTS) {
+			if (!described.containsKey(objectName.toLowerCase())) {
+				return false;
+			}
+		}
+		return true;
+	}
 
-    private static HealthCheckService.Finding openAfterEnd() {
-        Date today = Date.today();
-        Integer cap = countCap + 1;
-        List<Enrollment__c> open = [
-            SELECT Id, Name
-            FROM Enrollment__c
-            WHERE
-                Stage__c IN :EnrollmentService.OPEN_STAGES
-                AND (Program__r.Status__c = 'Completed'
-                OR Program__r.End_Date__c < :today)
-            WITH USER_MODE
-            ORDER BY Program__r.Name, Name
-            LIMIT :cap
-        ];
-        if (open.isEmpty()) {
-            return null;
-        }
-        Integer howMany = open.size();
-        String counted = howMany > countCap
-            ? String.format(
-                  Label.Core_HealthCheck_OrphansMoreThan,
-                  new List<Object>{ countCap.format() }
-              )
-            : howMany.format();
-        List<HealthCheckService.Link> links = new List<HealthCheckService.Link>();
-        for (Integer i = 0; i < howMany && i < LINKS_SHOWN; i++) {
-            links.add(new HealthCheckService.Link(open[i]));
-        }
-        return new HealthCheckService.Finding(
-                KEY,
-                howMany == 1
-                    ? Label.Programs_HealthCheck_OpenAfterEndTitleOne
-                    : String.format(
-                          Label.Programs_HealthCheck_OpenAfterEndTitle,
-                          new List<Object>{ counted }
-                      ),
-                Label.Programs_HealthCheck_OpenAfterEndDetail,
-                HealthCheckService.SEVERITY_INFO,
-                HealthCheckService.CATEGORY_SETTINGS
-            )
-            .withLinks(links);
-    }
+	private static HealthCheckService.Finding openAfterEnd() {
+		Date today = Date.today();
+		Integer cap = countCap + 1;
+		List<Enrollment__c> open = [
+			SELECT Id, Name
+			FROM Enrollment__c
+			WHERE
+				Stage__c IN :EnrollmentService.OPEN_STAGES
+				AND (Program__r.Status__c = 'Completed'
+				OR Program__r.End_Date__c < :today)
+			WITH USER_MODE
+			ORDER BY Program__r.Name, Name
+			LIMIT :cap
+		];
+		if (open.isEmpty()) {
+			return null;
+		}
+		Integer howMany = open.size();
+		String counted = howMany > countCap
+			? String.format(
+					Label.Core_HealthCheck_OrphansMoreThan,
+					new List<Object>{ countCap.format() }
+			  )
+			: howMany.format();
+		List<HealthCheckService.Link> links = new List<HealthCheckService.Link>();
+		for (Integer i = 0; i < howMany && i < LINKS_SHOWN; i++) {
+			links.add(new HealthCheckService.Link(open[i]));
+		}
+		return new HealthCheckService.Finding(
+				KEY,
+				howMany == 1
+					? Label.Programs_HealthCheck_OpenAfterEndTitleOne
+					: String.format(
+							Label.Programs_HealthCheck_OpenAfterEndTitle,
+							new List<Object>{ counted }
+					  ),
+				Label.Programs_HealthCheck_OpenAfterEndDetail,
+				HealthCheckService.SEVERITY_INFO,
+				HealthCheckService.CATEGORY_SETTINGS
+			)
+			.withLinks(links);
+	}
 }

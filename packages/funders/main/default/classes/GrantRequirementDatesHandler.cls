@@ -6,23 +6,23 @@
  */
 @NamespaceAccessible
 public with sharing class GrantRequirementDatesHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public GrantRequirementDatesHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public GrantRequirementDatesHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'GrantRequirementDatesHandler';
-    }
+	public override String getName() {
+		return 'GrantRequirementDatesHandler';
+	}
 
-    public override void beforeInsert() {
-        GrantRequirementService.fillSubmittedDates((List<Grant_Requirement__c>) Trigger.new, null);
-    }
+	public override void beforeInsert() {
+		GrantRequirementService.fillSubmittedDates((List<Grant_Requirement__c>) newRecords(), null);
+	}
 
-    public override void beforeUpdate() {
-        GrantRequirementService.fillSubmittedDates(
-            (List<Grant_Requirement__c>) Trigger.new,
-            (Map<Id, Grant_Requirement__c>) Trigger.oldMap
-        );
-    }
+	public override void beforeUpdate() {
+		GrantRequirementService.fillSubmittedDates(
+			(List<Grant_Requirement__c>) newRecords(),
+			(Map<Id, Grant_Requirement__c>) oldRecordsById()
+		);
+	}
 }

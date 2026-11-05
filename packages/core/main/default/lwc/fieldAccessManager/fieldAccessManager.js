@@ -1,4 +1,4 @@
-import { LightningElement, wire } from 'lwc';
+import { LightningElement, api, wire } from 'lwc';
 import getStatus from '@salesforce/apex/FieldAccessController.getStatus';
 import searchSets from '@salesforce/apex/FieldAccessController.searchSets';
 import getFields from '@salesforce/apex/FieldAccessController.getFields';
@@ -21,11 +21,10 @@ import {
   previewRows,
   filterFields
 } from 'c/fieldAccessPlan';
+import { shownColumns, nameOptions } from 'c/accessExplorerRows';
 
 import SETS from '@salesforce/label/c.Core_AccessCompare_Sets';
 import SETS_PLACEHOLDER from '@salesforce/label/c.Core_FieldAccess_SetsPlaceholder';
-import CHOOSE_SETS from '@salesforce/label/c.Core_FieldAccess_ChooseSets';
-import NO_MATCHES from '@salesforce/label/c.Core_AccessExplorer_NoMatches';
 import KIND_OF_RECORD from '@salesforce/label/c.Core_AccessExplorer_KindOfRecord';
 import OBJECT_ACCESS from '@salesforce/label/c.Core_FieldAccess_ObjectAccess';
 import NO_CHANGE from '@salesforce/label/c.Core_FieldAccess_NoChange';
@@ -47,11 +46,7 @@ import COL_ACCESS from '@salesforce/label/c.Core_Access_PageTitle';
 import WHOLE_RECORD from '@salesforce/label/c.Core_FieldAccess_WholeRecord';
 import REMOVE from '@salesforce/label/c.Core_Find_Remove';
 import CLEAR from '@salesforce/label/c.Core_BulkUpdate_ActionClear';
-import NO_CHANGES from '@salesforce/label/c.Core_FieldAccess_NoChanges';
-import CONFLICT from '@salesforce/label/c.Core_FieldAccess_Conflict';
 import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
-import PREVIEW_SUMMARY from '@salesforce/label/c.Core_FieldAccess_PreviewSummary';
-import TOO_MANY_ROWS from '@salesforce/label/c.Core_FieldAccess_TooManyRows';
 import COL_SET from '@salesforce/label/c.Core_AccessExplorer_KindSet';
 import COL_AFTER from '@salesforce/label/c.Core_Import_ChangesAfter';
 import COL_WHY from '@salesforce/label/c.Core_FieldAccess_ColWhy';
@@ -60,10 +55,8 @@ import WHY_NEEDED from '@salesforce/label/c.Core_FieldAccess_WhyNeeded';
 import WHY_REMOVED from '@salesforce/label/c.Core_FieldAccess_WhyRemoved';
 import APPLY from '@salesforce/label/c.Core_FieldAccess_Apply';
 import CONFIRM_TITLE from '@salesforce/label/c.Core_FieldAccess_ConfirmTitle';
-import CONFIRM_MESSAGE from '@salesforce/label/c.Core_FieldAccess_ConfirmMessage';
 import CONFIRM_BUTTON from '@salesforce/label/c.Core_FieldAccess_ConfirmButton';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import APPLIED from '@salesforce/label/c.Core_FieldAccess_Applied';
 import RECENT_HEADING from '@salesforce/label/c.Core_Settings_RecentChangesHeading';
 import COL_WHEN from '@salesforce/label/c.Core_FieldAccess_ColWhen';
 import COL_BY from '@salesforce/label/c.Core_FieldAccess_ColBy';
@@ -73,9 +66,6 @@ import COL_STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
 import COL_UNDO_UNTIL from '@salesforce/label/c.Core_FieldAccess_ColUndoUntil';
 import UNDO from '@salesforce/label/c.Core_AutoMerge_Undo';
 import UNDO_TITLE from '@salesforce/label/c.Core_FieldAccess_UndoConfirmTitle';
-import UNDO_MESSAGE from '@salesforce/label/c.Core_FieldAccess_UndoConfirmMessage';
-import UNDONE from '@salesforce/label/c.Core_FieldAccess_Undone';
-import NO_RECENT from '@salesforce/label/c.Core_FieldAccess_NoRecent';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -106,6 +96,9 @@ const text = (fieldName, label, extra = {}) => ({ label, fieldName, ...extra });
  * its words are c/fieldAccessPlan (framework free); every check and write is FieldAccessController.
  */
 export default class FieldAccessManager extends LightningElement {
+  /** Show the API Name column and API names in the picker (Access Explorer's toggle). */
+  @api showTechnicalNames = false;
+
   helpReady = isHelpLoaded('Core');
 
   labels = {
@@ -114,7 +107,9 @@ export default class FieldAccessManager extends LightningElement {
     },
     sets: SETS,
     setsPlaceholder: SETS_PLACEHOLDER,
-    noMatches: NO_MATCHES,
+    get noMatches() {
+      return helpText('Core', 'Core_AccessExplorer_NoMatches');
+    },
     kindOfRecord: KIND_OF_RECORD,
     objectAccess: OBJECT_ACCESS,
     fieldsHeading: FIELDS_HEADING,
@@ -123,11 +118,15 @@ export default class FieldAccessManager extends LightningElement {
     add: ADD,
     changesHeading: CHANGES_HEADING,
     clear: CLEAR,
-    noChanges: NO_CHANGES,
+    get noChanges() {
+      return helpText('Core', 'Core_FieldAccess_NoChanges');
+    },
     preview: PREVIEW,
     apply: APPLY,
     recentHeading: RECENT_HEADING,
-    noRecent: NO_RECENT,
+    get noRecent() {
+      return helpText('Core', 'Core_FieldAccess_NoRecent');
+    },
     refresh: REFRESH,
     loading: LOADING
   };
@@ -143,12 +142,21 @@ export default class FieldAccessManager extends LightningElement {
     { label: WORD_EDIT, value: EDIT },
     { label: WORD_NONE, value: NONE }
   ];
-  fieldColumns = [
-    text('label', COL_FIELD),
-    text('name', COL_API_NAME),
-    text('nowText', COL_NOW),
-    text('noteText', COL_NOTE, { initialWidth: 110 })
-  ];
+  get fieldColumns() {
+    return shownColumns(
+      [
+        text('label', COL_FIELD),
+        text('name', COL_API_NAME, { technical: true }),
+        text('nowText', COL_NOW),
+        text('noteText', COL_NOTE, { initialWidth: 110 })
+      ],
+      this.showTechnicalNames
+    );
+  }
+
+  get objectOptions() {
+    return nameOptions(this.objectChoices, this.showTechnicalNames);
+  }
   itemColumns = [
     text('objectLabel', KIND_OF_RECORD),
     text('fieldText', COL_FIELD),
@@ -187,7 +195,7 @@ export default class FieldAccessManager extends LightningElement {
   ];
 
   status;
-  objectOptions = [];
+  objectChoices = [];
   term = '';
   results;
   sets = [];
@@ -223,10 +231,7 @@ export default class FieldAccessManager extends LightningElement {
   @wire(listObjects)
   wiredObjects({ data, error }) {
     if (data) {
-      this.objectOptions = data.map((option) => ({
-        value: option.value,
-        label: `${option.label} (${option.value})`
-      }));
+      this.objectChoices = data;
     } else if (error) {
       this.errorMessage = messageFrom(error);
     }
@@ -260,7 +265,10 @@ export default class FieldAccessManager extends LightningElement {
   }
 
   get chooseSetsText() {
-    return format(CHOOSE_SETS, this.status ? this.status.maxSets : '');
+    return format(
+      helpText('Core', 'Core_FieldAccess_ChooseSets'),
+      this.status ? this.status.maxSets : ''
+    );
   }
 
   get resultItems() {
@@ -309,7 +317,9 @@ export default class FieldAccessManager extends LightningElement {
 
   get conflictMessage() {
     const labels = conflicts(this.items);
-    return labels.length ? format(CONFLICT, labels.join(', ')) : undefined;
+    return labels.length
+      ? format(helpText('Core', 'Core_FieldAccess_Conflict'), labels.join(', '))
+      : undefined;
   }
 
   get previewDisabled() {
@@ -323,13 +333,17 @@ export default class FieldAccessManager extends LightningElement {
     return {
       rows: previewRows(this.preview.rows, WORDS),
       summary: format(
-        PREVIEW_SUMMARY,
+        helpText('Core', 'Core_FieldAccess_PreviewSummary'),
         this.preview.changed,
         this.preview.setCount,
         this.preview.unchanged
       ),
       tooMany: this.preview.tooMany
-        ? format(TOO_MANY_ROWS, this.preview.changed, this.preview.maxRows)
+        ? format(
+            helpText('Core', 'Core_FieldAccess_TooManyRows'),
+            this.preview.changed,
+            this.preview.maxRows
+          )
         : undefined,
       applyDisabled: this.loading || this.preview.tooMany || this.preview.changed === 0
     };
@@ -502,7 +516,11 @@ export default class FieldAccessManager extends LightningElement {
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: CONFIRM_TITLE,
-      message: format(CONFIRM_MESSAGE, count, this.preview.setCount),
+      message: format(
+        helpText('Core', 'Core_FieldAccess_ConfirmMessage'),
+        count,
+        this.preview.setCount
+      ),
       confirmLabel: CONFIRM_BUTTON,
       cancelLabel: CANCEL
     });
@@ -513,7 +531,11 @@ export default class FieldAccessManager extends LightningElement {
     this.errorMessage = undefined;
     try {
       const done = await applyChange({ changeJson: this.changeJson, confirmedCount: count });
-      this.noticeMessage = format(APPLIED, done.changed, done.refused);
+      this.noticeMessage = format(
+        helpText('Core', 'Core_FieldAccess_Applied'),
+        done.changed,
+        done.refused
+      );
       this.errorMessage = done.failures.length ? done.failures.join(' ') : undefined;
       this.preview = undefined;
       this.items = [];
@@ -543,7 +565,7 @@ export default class FieldAccessManager extends LightningElement {
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: UNDO_TITLE,
-      message: UNDO_MESSAGE,
+      message: helpText('Core', 'Core_FieldAccess_UndoConfirmMessage'),
       confirmLabel: UNDO,
       cancelLabel: CANCEL
     });
@@ -554,7 +576,12 @@ export default class FieldAccessManager extends LightningElement {
     this.errorMessage = undefined;
     try {
       const done = await undoChange({ jobId: job.id });
-      this.noticeMessage = format(UNDONE, done.changed, done.kept, done.refused);
+      this.noticeMessage = format(
+        helpText('Core', 'Core_FieldAccess_Undone'),
+        done.changed,
+        done.kept,
+        done.refused
+      );
       this.errorMessage = done.failures.length ? done.failures.join(' ') : undefined;
       if (this.objectName && !this.noSets) {
         await this.loadFields();

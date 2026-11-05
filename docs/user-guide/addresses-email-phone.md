@@ -35,8 +35,8 @@ automatically and carries a **Primary** badge.
 - If you edit a household's **Billing Address** field, the new address becomes the
   household's primary address, and everyone in the household moves with it except a person
   with an address of their own. If your org's setting is **Nobody moves until you choose**,
-  only the household moves until someone chooses **Update Everyone's Address** on its
-  primary address card.
+  only the household moves until someone chooses **Give This Address to Members** from the
+  **More** menu of its primary address.
 
 ## To Make an Address the Primary
 
@@ -58,7 +58,7 @@ addresses someone still uses, such as a home and a work address. To record a mov
 You should see: the new address at the top with the **Primary** badge and "Since" today's date.
 The old address moves into **Former Addresses**, with the day it started (when known) to today.
 The same happens when the household's or person's own address field is changed, or when
-**Use for Whole Household** moves the household.
+**Move the Household Here** moves the household.
 
 ## To See Former Addresses
 
@@ -68,13 +68,16 @@ October 1, 2026". Click it again to close it.
 
 ## To Mark an Address Former, Undeliverable or Current
 
-1. On the **Addresses** card, click the status menu (the small arrow) on the address.
+1. On the **Addresses** card, click the **More** menu (the small arrow) on the address.
 2. Choose **Mark as Former**, **Mark as Undeliverable** or **Mark as Current**.
+
+The same menu has **Edit**, which opens the address in the standard edit form. The address
+type at the top of each line opens the address record.
 
 You should see: "The address status is saved." **Mark as Former** ends the address today
 (unless it already has an end date) and moves it into **Former Addresses**; the primary address
 cannot be marked Former. **Mark as Undeliverable** is for mail that comes back: the address
-gets an **Undeliverable** badge, and if it is the primary, a red warning on the card asks you
+gets a red **Undeliverable** badge, and if it is the primary, a warning on the card asks you
 to add the new address. **Mark as Current** brings a former address back and clears its end
 date. You can also change **Status**, **Start Date** and **End Date** on the address record.
 
@@ -83,11 +86,11 @@ date. You can also change **Status**, **Start Date** and **End Date** on the add
 Use this when a person's own address becomes the household's, for example when the family
 moves into the home one of them already had.
 
-1. Open the person. On the **Addresses** card, click **Use for Whole Household** on their
-   address. (Seasonal addresses do not offer it.)
+1. Open the person. On the **Addresses** card, open the **More** menu of their address and
+   choose **Move the Household Here**. (Seasonal addresses do not offer it.)
 2. If the person belongs to more than one household, choose one under **Which household?**.
    Their own household is listed first.
-3. Click **Use for Whole Household** in the confirmation, or **Cancel**.
+3. Click **Move the Household Here** in the confirmation, or **Cancel**.
 
 You should see: "The household now uses this address." The household gets this address as
 its primary, and everyone in it without an address of their own moves to it. If it is the
@@ -100,16 +103,17 @@ Use this to bring people back to the household's address, or, if your org's **Ad
 Updates** setting is **Nobody moves until you choose**, to move them after the household's
 address changes.
 
-1. Open the household. On the **Addresses** card, click **Update Everyone's Address** on the
-   primary address.
+1. Open the household. On the **Addresses** card, open the **More** menu of the primary
+   address and choose **Give This Address to Members**.
 2. The confirmation lists who will get this address, and who has an address of their own.
    Tick anyone with their own address who should move too; the rest stay where they are.
-3. Click **Update Everyone's Address** in the confirmation, or **Cancel**.
+3. Click **Give This Address to Members** in the confirmation, or **Cancel**.
 
 You should see: "Everyone's address has been updated." A person you ticked keeps their own
 address on their card, without the **Primary** badge.
 
-If you cannot see either button, you can read addresses but not change them. Ask your admin.
+If the **More** menu offers neither move, you can read addresses but not change them. Ask your
+admin.
 
 ## To Add a Seasonal Address
 

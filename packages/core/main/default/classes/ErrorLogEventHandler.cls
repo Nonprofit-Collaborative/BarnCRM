@@ -19,48 +19,48 @@
  * It never throws. A failure here would retry the event and could loop.
  */
 public without sharing class ErrorLogEventHandler {
-    private static final String DEFAULT_SEVERITY = 'Error';
-    private static final Set<String> SEVERITIES = new Set<String>{
-        'Info',
-        'Warning',
-        'Error',
-        'Critical'
-    };
+	private static final String DEFAULT_SEVERITY = 'Error';
+	private static final Set<String> SEVERITIES = new Set<String>{
+		'Info',
+		'Warning',
+		'Error',
+		'Critical'
+	};
 
-    public static void handle(List<Error_Log_Event__e> events) {
-        if (events == null || events.isEmpty()) {
-            return;
-        }
-        List<Error_Log__c> entries = new List<Error_Log__c>();
-        for (Error_Log_Event__e event : events) {
-            entries.add(
-                new Error_Log__c(
-                    Timestamp__c = event.CreatedDate == null ? System.now() : event.CreatedDate,
-                    User__c = event.CreatedById,
-                    Context__c = event.Context__c,
-                    Message__c = event.Message__c,
-                    Technical_Detail__c = event.Technical_Detail__c,
-                    Record_Reference__c = event.Record_Reference__c,
-                    Object_Name__c = event.Object_Name__c,
-                    Severity__c = SEVERITIES.contains(event.Severity__c)
-                        ? event.Severity__c
-                        : DEFAULT_SEVERITY,
-                    Status__c = 'New'
-                )
-            );
-        }
-        try {
-            Database.insert(entries, false, AccessLevel.SYSTEM_MODE);
-        } catch (Exception failedToLog) {
-            // Deliberate last resort: this is the write that turns an Error Log event into the
-            // Error_Log__c row, so when it itself fails there is nowhere left to record the
-            // failure but the debug log. Kept intentionally (PMD AvoidDebugStatements finding
-            // accepted, not suppressed).
-            System.debug(
-                LoggingLevel.ERROR,
-                'BarnCRM could not write an Error Log record from an event: ' +
-                failedToLog.getMessage()
-            );
-        }
-    }
+	public static void handle(List<Error_Log_Event__e> events) {
+		if (events == null || events.isEmpty()) {
+			return;
+		}
+		List<Error_Log__c> entries = new List<Error_Log__c>();
+		for (Error_Log_Event__e event : events) {
+			entries.add(
+				new Error_Log__c(
+					Timestamp__c = event.CreatedDate == null ? System.now() : event.CreatedDate,
+					User__c = event.CreatedById,
+					Context__c = event.Context__c,
+					Message__c = event.Message__c,
+					Technical_Detail__c = event.Technical_Detail__c,
+					Record_Reference__c = event.Record_Reference__c,
+					Object_Name__c = event.Object_Name__c,
+					Severity__c = SEVERITIES.contains(event.Severity__c)
+						? event.Severity__c
+						: DEFAULT_SEVERITY,
+					Status__c = 'New'
+				)
+			);
+		}
+		try {
+			Database.insert(entries, false, AccessLevel.SYSTEM_MODE);
+		} catch (Exception failedToLog) {
+			// Deliberate last resort: this is the write that turns an Error Log event into the
+			// Error_Log__c row, so when it itself fails there is nowhere left to record the
+			// failure but the debug log. Kept intentionally (PMD AvoidDebugStatements finding
+			// accepted, not suppressed).
+			System.debug(
+				LoggingLevel.ERROR,
+				'BarnCRM could not write an Error Log record from an event: ' +
+				failedToLog.getMessage()
+			);
+		}
+	}
 }

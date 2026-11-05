@@ -1,38 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_ModuleManager_UnknownModuleError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Module Manager: the module is not installed or cannot be switched</shortDescription>
-        <value>That module is not installed here, or it cannot be turned on and off. Click Check again to refresh the list.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ModuleManager_SaveErrorMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Module Manager: a turn on or off failed</shortDescription>
-        <value>The module could not be switched. Nothing was changed. Try again, and if it fails again, check the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ModuleManager_LoadErrorMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Module Manager: the list or report could not be read</shortDescription>
-        <value>The module list could not be read. Reload the page, and if it fails again, check the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ModuleManager_AccessErrorMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Module Manager: the admin permission set could not be given</shortDescription>
-        <value>The module is on, but its administrator access could not be given to you. Give it on the Access page or in Setup.</value>
-    </labels>
-    <labels>
         <fullName>Core_ModuleManager_StatusOn</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -55,22 +23,6 @@
         <protected>true</protected>
         <shortDescription>Module Manager: status of an installed module turned off</shortDescription>
         <value>Installed and off</value>
-    </labels>
-    <labels>
-        <fullName>Core_ModuleManager_NoInstallLink</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Module Manager: no published version to install</shortDescription>
-        <value>No install link is published for this module yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ModuleManager_InstallFirst</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Module Manager: modules to install before this one; {0} is their names</shortDescription>
-        <value>Install these first: {0}. This module needs them.</value>
     </labels>
     <labels>
         <fullName>Core_ModuleManager_TurnOffButton</fullName>
@@ -105,22 +57,6 @@
         <value>Open Installed Packages</value>
     </labels>
     <labels>
-        <fullName>Core_ModuleManager_TabsNotice</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Module Manager: turning off does not hide tabs</shortDescription>
-        <value>Turning a module off stops its automation and keeps its records. It does not hide its tabs: to hide a module from someone, change their role on the Access page.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ModuleManager_ReadOnlyNotice</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Module Manager: the reader cannot switch modules</shortDescription>
-        <value>You can see the modules but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission.</value>
-    </labels>
-    <labels>
         <fullName>Core_ModuleManager_NonprofitTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -135,13 +71,5 @@
         <protected>true</protected>
         <shortDescription>Module Manager: checkbox that shows or hides the nonprofit modules</shortDescription>
         <value>Show Nonprofit Modules</value>
-    </labels>
-    <labels>
-        <fullName>Core_ModuleManager_NonprofitHidden</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Module Manager: installed nonprofit modules are hidden; {0} is how many</shortDescription>
-        <value>Installed nonprofit modules hidden: {0}</value>
     </labels>
 </CustomLabels>

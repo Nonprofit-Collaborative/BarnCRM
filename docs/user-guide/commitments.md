@@ -31,9 +31,11 @@ If the card says "No payments have been generated for this commitment yet.", cli
 
 ## To See What Is Overdue or Coming Up
 
-The payments are Installment records. They are not a tab in the BarnCRM Fundraising app.
+The payments are Installment records, with their own **Installments** tab in the BarnCRM
+Fundraising app. The overdue count is also on **Fundraising Home**; click it to open the
+**Overdue** list.
 
-1. Open the App Launcher, search for **Installments**, and open it.
+1. In **BarnCRM Fundraising**, open the **Installments** tab.
 2. Choose the list view **Overdue**, or **Upcoming 30 Days**.
 
 You should see: each payment with its commitment and what was expected. A payment turns **Overdue** a few days after its due date, overnight.

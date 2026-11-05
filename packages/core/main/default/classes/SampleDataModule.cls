@@ -27,25 +27,25 @@
  */
 @NamespaceAccessible
 public interface SampleDataModule {
-    /** The module's stable name, matching the name it announces to module detection, for example 'Giving'. */
-    String moduleName();
+	/** The module's stable name, matching the name it announces to module detection, for example 'Giving'. */
+	String moduleName();
 
-    /** The module's own label for the number the status card shows, for example 'Gifts'. */
-    String countLabel();
+	/** The module's own label for the number the status card shows, for example 'Gifts'. */
+	String countLabel();
 
-    /** How many of the records this number stands for are loaded right now. */
-    Integer countLoaded();
+	/** How many of the records this number stands for are loaded right now. */
+	Integer countLoaded();
 
-    /**
-     * Whether any of this module's sample records is still in the org, including ones its
-     * removal kept because records of the organization's own point at them. While one is,
-     * the card offers Remove sample data again, so the admin can finish once they are moved.
-     */
-    Boolean hasSampleRecords();
+	/**
+	 * Whether any of this module's sample records is still in the org, including ones its
+	 * removal kept because records of the organization's own point at them. While one is,
+	 * the card offers Remove sample data again, so the admin can finish once they are moved.
+	 */
+	Boolean hasSampleRecords();
 
-    /** Starts this module's load chain. Called once, after Core's own records exist. */
-    void enqueueLoad();
+	/** Starts this module's load chain. Called once, after Core's own records exist. */
+	void enqueueLoad();
 
-    /** Starts this module's removal. Called before Core's own records are removed. */
-    void enqueueRemove();
+	/** Starts this module's removal. Called before Core's own records are removed. */
+	void enqueueRemove();
 }

@@ -1,8 +1,9 @@
 <template>
+    <template lwc:if={helpReady}>
     <lightning-card title={labels.heading} icon-name="standard:address">
         <div class="slds-var-p-horizontal_medium">
             <template lwc:if={errorMessage}>
-                <p class="slds-text-color_error" data-id="load-error" role="alert">{errorMessage}</p>
+                <c-barn-notice variant="error" message={errorMessage} data-id="load-error"></c-barn-notice>
             </template>
             <template lwc:elseif={lastRun}>
                 <p data-id="seasonal-last-run">
@@ -16,39 +17,38 @@
                     ></lightning-formatted-date-time>
                 </p>
                 <template lwc:if={lastRunSummary}>
-                    <p class="slds-text-body_small" data-id="seasonal-last-run-summary">
+                    <p class="slds-text-body_small slds-text-color_weak" data-id="seasonal-last-run-summary">
                         {lastRunSummary}
                     </p>
                 </template>
             </template>
             <template lwc:elseif={loaded}>
-                <lightning-badge label={labels.notRun} data-id="seasonal-not-run"></lightning-badge>
-                <p data-id="seasonal-never">{labels.never}</p>
+                <c-barn-status-badge
+                    status="not run"
+                    label={labels.notRun}
+                    data-id="seasonal-not-run"
+                ></c-barn-status-badge>
+                <p class="slds-text-body_small slds-text-color_weak" data-id="seasonal-never">{labels.never}</p>
             </template>
             <template lwc:if={notScheduled}>
-                <p
-                    class="slds-text-body_small"
+                <c-barn-notice
+                    message={labels.notScheduled}
                     data-id="seasonal-not-scheduled"
-                    role="status"
-                    aria-live="polite"
-                >
-                    {labels.notScheduled}
-                </p>
+                    class="slds-var-m-vertical_x-small"
+                ></c-barn-notice>
             </template>
             <template lwc:if={stale}>
-                <lightning-badge
-                    class="slds-theme_warning"
+                <c-barn-status-badge
+                    status="overdue"
                     label={labels.overdue}
                     data-id="seasonal-overdue"
-                ></lightning-badge>
-                <p data-id="seasonal-stale" role="status" aria-live="polite">
-                    <lightning-icon
-                        icon-name="utility:warning"
-                        size="x-small"
-                        alternative-text={labels.warning}
-                    ></lightning-icon>
-                    {labels.stale}
-                </p>
+                ></c-barn-status-badge>
+                <c-barn-notice
+                    variant="warning"
+                    message={labels.stale}
+                    data-id="seasonal-stale"
+                    class="slds-var-m-vertical_x-small"
+                ></c-barn-notice>
             </template>
             <lightning-button
                 variant="base"
@@ -58,4 +58,5 @@
             ></lightning-button>
         </div>
     </lightning-card>
+    </template>
 </template>

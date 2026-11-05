@@ -7,7 +7,7 @@ import checkField from '@salesforce/apex/ImportNewFieldController.checkField';
 import findField from '@salesforce/apex/ImportNewFieldController.findField';
 import { apiNameFrom, distinctValues, suggestField } from './fieldSuggestions';
 
-import OBJECT from '@salesforce/label/c.Core_MatchLogic_Object';
+import OBJECT from '@salesforce/label/c.Core_FieldUtilization_ChooseLabel';
 import LABEL from '@salesforce/label/c.Core_ImportNewField_LabelField';
 import API_NAME from '@salesforce/label/c.Core_AccessExplorer_ColApiName';
 import TYPE from '@salesforce/label/c.Core_ImportNewField_TypeField';
@@ -19,11 +19,7 @@ import NO_PERMISSION_SET from '@salesforce/label/c.Core_ImportNewField_NoPermiss
 import CREATE from '@salesforce/label/c.Core_ImportNewField_CreateButton';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import REFRESH from '@salesforce/label/c.Core_ImportNewField_RefreshButton';
-import CREATING from '@salesforce/label/c.Core_ImportNewField_Creating';
-import STILL_WAITING from '@salesforce/label/c.Core_ImportNewField_StillWaiting';
-import NO_CONNECTION from '@salesforce/label/c.Core_ImportNewField_NoConnection';
 import DETAILS from '@salesforce/label/c.Core_ImportNewField_DetailsField';
-import NOT_FOUND from '@salesforce/label/c.Core_ImportNewField_NotFound';
 import UNEXPECTED from '@salesforce/label/c.Core_UnexpectedError';
 import TYPE_TEXT from '@salesforce/label/c.Core_ImportNewField_TypeText';
 import TYPE_LONG_TEXT from '@salesforce/label/c.Core_ImportNewField_TypeLongTextArea';
@@ -93,7 +89,9 @@ export default class ImportNewFieldModal extends LightningModal {
     create: CREATE,
     cancel: CANCEL,
     refresh: REFRESH,
-    noConnection: NO_CONNECTION,
+    get noConnection() {
+      return helpText('Core', 'Core_ImportNewField_NoConnection');
+    },
     get setupSteps() {
       return helpText('Core', 'Core_ImportNewField_SetupSteps');
     },
@@ -212,7 +210,7 @@ export default class ImportNewFieldModal extends LightningModal {
   async handleCreate() {
     this.errorMessage = undefined;
     this.busy = true;
-    this.status = CREATING;
+    this.status = helpText('Core', 'Core_ImportNewField_Creating');
     let jobId;
     try {
       jobId = await createField({
@@ -250,7 +248,7 @@ export default class ImportNewFieldModal extends LightningModal {
     } else if (outcome.state === FAILED) {
       this.fail(outcome.message);
     } else if (attempt >= MAX_POLLS) {
-      this.fail(STILL_WAITING);
+      this.fail(helpText('Core', 'Core_ImportNewField_StillWaiting'));
     } else {
       await new Promise((resolve) => {
         // eslint-disable-next-line @lwc/lwc/no-async-operation
@@ -272,7 +270,7 @@ export default class ImportNewFieldModal extends LightningModal {
       if (outcome.state === CREATED) {
         this.finish(outcome);
       } else {
-        this.fail(NOT_FOUND);
+        this.fail(helpText('Core', 'Core_ImportNewField_NotFound'));
       }
     } catch (error) {
       this.fail(this.errorText(error));

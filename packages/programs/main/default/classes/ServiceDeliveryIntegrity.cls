@@ -20,108 +20,108 @@
  *    back; the log is then re-read in user mode, so the hidden row still does not show.
  */
 public without sharing class ServiceDeliveryIntegrity {
-    /** Whether the running user may change a delivery's attendance and quantity at all. */
-    public static Boolean canChange() {
-        Schema.DescribeSObjectResult deliveries = Schema.SObjectType.Service_Delivery__c;
-        return deliveries.isUpdateable() &&
-            Schema.SObjectType.Service_Delivery__c.fields.Attendance__c.isUpdateable() &&
-            Schema.SObjectType.Service_Delivery__c.fields.Quantity__c.isUpdateable();
-    }
+	/** Whether the running user may change a delivery's attendance and quantity at all. */
+	public static Boolean canChange() {
+		Schema.DescribeSObjectResult deliveries = Schema.SObjectType.Service_Delivery__c;
+		return deliveries.isUpdateable() &&
+			Schema.SObjectType.Service_Delivery__c.fields.Attendance__c.isUpdateable() &&
+			Schema.SObjectType.Service_Delivery__c.fields.Quantity__c.isUpdateable();
+	}
 
-    /** As `canChange`, and the user may also set a delivery's session (P-11). */
-    public static Boolean canChangeSession() {
-        return canChange() &&
-            Schema.SObjectType.Service_Delivery__c.fields.Session__c.isUpdateable();
-    }
+	/** As `canChange`, and the user may also set a delivery's session (P-11). */
+	public static Boolean canChangeSession() {
+		return canChange() &&
+			Schema.SObjectType.Service_Delivery__c.fields.Session__c.isUpdateable();
+	}
 
-    /**
-     * For each of these people, their delivery of this session, or else their delivery of the
-     * session's service and day that names no session, whoever logged it (R-SD7). Keyed by the
-     * person's contact or account Id; the first one made wins, as in the log.
-     */
-    public static Map<Id, Id> existingSessionDeliveryIds(
-        Id sessionId,
-        Id serviceId,
-        Date deliveryDate,
-        Set<Id> personIds
-    ) {
-        Map<Id, Id> byPerson = new Map<Id, Id>();
-        if (sessionId == null || serviceId == null || deliveryDate == null || personIds.isEmpty()) {
-            return byPerson;
-        }
-        for (Service_Delivery__c delivery : [
-            SELECT Id, Contact__c, Account__c
-            FROM Service_Delivery__c
-            WHERE
-                Service__c = :serviceId
-                AND Delivery_Date__c = :deliveryDate
-                AND (Session__c = :sessionId
-                OR Session__c = NULL)
-                AND (Contact__c IN :personIds
-                OR Account__c IN :personIds)
-            WITH SYSTEM_MODE
-            ORDER BY Session__c NULLS LAST, CreatedDate, Name
-        ]) {
-            Id person = delivery.Contact__c != null ? delivery.Contact__c : delivery.Account__c;
-            if (!byPerson.containsKey(person)) {
-                byPerson.put(person, delivery.Id);
-            }
-        }
-        return byPerson;
-    }
+	/**
+	 * For each of these people, their delivery of this session, or else their delivery of the
+	 * session's service and day that names no session, whoever logged it (R-SD7). Keyed by the
+	 * person's contact or account Id; the first one made wins, as in the log.
+	 */
+	public static Map<Id, Id> existingSessionDeliveryIds(
+		Id sessionId,
+		Id serviceId,
+		Date deliveryDate,
+		Set<Id> personIds
+	) {
+		Map<Id, Id> byPerson = new Map<Id, Id>();
+		if (sessionId == null || serviceId == null || deliveryDate == null || personIds.isEmpty()) {
+			return byPerson;
+		}
+		for (Service_Delivery__c delivery : [
+			SELECT Id, Contact__c, Account__c
+			FROM Service_Delivery__c
+			WHERE
+				Service__c = :serviceId
+				AND Delivery_Date__c = :deliveryDate
+				AND (Session__c = :sessionId
+				OR Session__c = NULL)
+				AND (Contact__c IN :personIds
+				OR Account__c IN :personIds)
+			WITH SYSTEM_MODE
+			ORDER BY Session__c NULLS LAST, CreatedDate, Name
+		]) {
+			Id person = delivery.Contact__c != null ? delivery.Contact__c : delivery.Account__c;
+			if (!byPerson.containsKey(person)) {
+				byPerson.put(person, delivery.Id);
+			}
+		}
+		return byPerson;
+	}
 
-    /**
-     * The existing delivery for each of these people on this service and day, keyed by the
-     * person's contact or account Id, whoever logged it. The first one made wins, as in the log.
-     */
-    public static Map<Id, Id> existingDeliveryIds(
-        Id serviceId,
-        Date deliveryDate,
-        Set<Id> personIds
-    ) {
-        Map<Id, Id> byPerson = new Map<Id, Id>();
-        if (serviceId == null || deliveryDate == null || personIds.isEmpty()) {
-            return byPerson;
-        }
-        for (Service_Delivery__c delivery : [
-            SELECT Id, Contact__c, Account__c
-            FROM Service_Delivery__c
-            WHERE
-                Service__c = :serviceId
-                AND Delivery_Date__c = :deliveryDate
-                AND (Contact__c IN :personIds
-                OR Account__c IN :personIds)
-            WITH SYSTEM_MODE
-            ORDER BY CreatedDate, Name
-        ]) {
-            Id person = delivery.Contact__c != null ? delivery.Contact__c : delivery.Account__c;
-            if (!byPerson.containsKey(person)) {
-                byPerson.put(person, delivery.Id);
-            }
-        }
-        return byPerson;
-    }
+	/**
+	 * The existing delivery for each of these people on this service and day, keyed by the
+	 * person's contact or account Id, whoever logged it. The first one made wins, as in the log.
+	 */
+	public static Map<Id, Id> existingDeliveryIds(
+		Id serviceId,
+		Date deliveryDate,
+		Set<Id> personIds
+	) {
+		Map<Id, Id> byPerson = new Map<Id, Id>();
+		if (serviceId == null || deliveryDate == null || personIds.isEmpty()) {
+			return byPerson;
+		}
+		for (Service_Delivery__c delivery : [
+			SELECT Id, Contact__c, Account__c
+			FROM Service_Delivery__c
+			WHERE
+				Service__c = :serviceId
+				AND Delivery_Date__c = :deliveryDate
+				AND (Contact__c IN :personIds
+				OR Account__c IN :personIds)
+			WITH SYSTEM_MODE
+			ORDER BY CreatedDate, Name
+		]) {
+			Id person = delivery.Contact__c != null ? delivery.Contact__c : delivery.Account__c;
+			if (!byPerson.containsKey(person)) {
+				byPerson.put(person, delivery.Id);
+			}
+		}
+		return byPerson;
+	}
 
-    /**
-     * Writes attendance and quantity onto existing rows the user may not be able to see, and the
-     * session where the change names one (R-SD7).
-     */
-    public static void changeHidden(List<Service_Delivery__c> changes) {
-        if (changes.isEmpty()) {
-            return;
-        }
-        List<Service_Delivery__c> plain = new List<Service_Delivery__c>();
-        for (Service_Delivery__c change : changes) {
-            Service_Delivery__c written = new Service_Delivery__c(
-                Id = change.Id,
-                Attendance__c = change.Attendance__c,
-                Quantity__c = change.Quantity__c
-            );
-            if (change.Session__c != null) {
-                written.Session__c = change.Session__c;
-            }
-            plain.add(written);
-        }
-        Database.update(plain, true, AccessLevel.SYSTEM_MODE);
-    }
+	/**
+	 * Writes attendance and quantity onto existing rows the user may not be able to see, and the
+	 * session where the change names one (R-SD7).
+	 */
+	public static void changeHidden(List<Service_Delivery__c> changes) {
+		if (changes.isEmpty()) {
+			return;
+		}
+		List<Service_Delivery__c> plain = new List<Service_Delivery__c>();
+		for (Service_Delivery__c change : changes) {
+			Service_Delivery__c written = new Service_Delivery__c(
+				Id = change.Id,
+				Attendance__c = change.Attendance__c,
+				Quantity__c = change.Quantity__c
+			);
+			if (change.Session__c != null) {
+				written.Session__c = change.Session__c;
+			}
+			plain.add(written);
+		}
+		Database.update(plain, true, AccessLevel.SYSTEM_MODE);
+	}
 }

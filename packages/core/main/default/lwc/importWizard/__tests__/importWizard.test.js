@@ -31,6 +31,12 @@ import getSeveralObjects from '@salesforce/apex/ImportController.getSeveralObjec
 import suggestSheetMapping from '@salesforce/apex/ImportController.suggestSheetMapping';
 import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
 import { readSheetNames, readXlsx } from '../xlsx';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_Import_CreatesSummary: 'This file can create: {0}.',
+  Core_Import_DetectSuggested: 'Suggested: {0}'
+});
 
 jest.mock('@salesforce/label/c.Core_Format_Pair', () => ({ default: '{0}: {1}' }), {
   virtual: true
@@ -48,11 +54,6 @@ jest.mock(
   { virtual: true }
 );
 // And for what a template creates (D-136).
-jest.mock(
-  '@salesforce/label/c.Core_Import_CreatesSummary',
-  () => ({ default: 'This file can create: {0}.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/label/c.Core_Import_LoadsSummary', () => ({ default: 'Loads: {0}' }), {
   virtual: true
 });
@@ -165,11 +166,6 @@ jest.mock('@salesforce/label/c.Core_Import_SheetOption', () => ({ default: '{0} 
 jest.mock('@salesforce/label/c.Core_Format_Pair', () => ({ default: '{0}: {1}' }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_Import_DetectSuggested',
-  () => ({ default: 'Suggested: {0}' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/apex/ImportController.copyTemplate', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -492,7 +488,7 @@ describe('the import wizard', () => {
     await flush();
     click(element, 'create-copy');
     await flush();
-    expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="message"]').message).toBe(
       'Give the template a name.'
     );
     expect(element.shadowRoot.querySelector('[data-id="copy-name"]')).not.toBeNull();
@@ -576,7 +572,9 @@ describe('the import wizard', () => {
     await flush();
 
     expect(element.shadowRoot.querySelector('[data-id="template"]')).not.toBeNull();
-    expect(element.shadowRoot.textContent).toContain('Give this file a source name.');
+    expect(element.shadowRoot.querySelector('[data-id="message"]').message).toContain(
+      'Give this file a source name.'
+    );
   });
 
   it('does not save anything when the recurring mark is left alone', async () => {
@@ -645,7 +643,7 @@ describe('the import wizard', () => {
     await chooseFile(element, 'Last Name,Email');
     // Labels are stubbed by their identifier under jest; the wording itself lives in
     // Import.labels-meta.xml and is quoted in the admin guide.
-    expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="message"]').message).toBe(
       'c.Core_Import_NoHeaderRow'
     );
     expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(0);
@@ -656,7 +654,7 @@ describe('the import wizard', () => {
     click(element, 'next');
     await flush();
     await chooseFile(element, 'not really a workbook', 'donors.xlsx');
-    expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="message"]').message).toBe(
       'c.Core_Import_XlsxUnreadable'
     );
     expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(0);
@@ -800,7 +798,7 @@ describe('the import wizard', () => {
       .querySelector('[data-id="sheets"]')
       .dispatchEvent(new CustomEvent('change', { detail: { value: ['Empty'] } }));
     await flush();
-    expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="message"]').message).toBe(
       'c.Core_Import_NoHeaderRow'
     );
     expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(0);
@@ -853,7 +851,9 @@ describe('the import wizard', () => {
     click(element, 'next');
     await flush();
     await chooseFile(element);
-    const picker = element.shadowRoot.querySelectorAll('[data-id="column-row"] lightning-combobox');
+    const picker = element.shadowRoot.querySelectorAll(
+      '[data-id="column-row"] c-import-field-picker'
+    );
     picker[2].dispatchEvent(new CustomEvent('change', { detail: { value: 'Contact1.Phone' } }));
     await flush();
     click(element, 'next');
@@ -882,6 +882,28 @@ describe('the import wizard', () => {
     expect(startCommit).toHaveBeenCalledWith({ batchId: 'a02' });
   });
 
+  it('names how many rows the commit button imports (admin-20)', async () => {
+    const element = await open();
+    click(element, 'next');
+    await flush();
+    await chooseFile(element);
+    click(element, 'next');
+    await flush();
+    click(element, 'dry-run');
+    await flush();
+    const label = element.shadowRoot.querySelector('[data-id="commit"]').label;
+    expect(label).toMatch(/Core_Import_Commit(All|Some)Button/);
+  });
+
+  it('shows a visible drop area around the file upload (drag and drop item 6)', async () => {
+    const element = await open();
+    click(element, 'next');
+    await flush();
+    const area = element.shadowRoot.querySelector('[data-id="drop-area"]');
+    expect(area).not.toBeNull();
+    expect(area.querySelector('[data-id="file"]').label).toBe('c.Core_Import_DropFileLabel');
+  });
+
   it('leaves the commit button disabled while the dry run is still going', async () => {
     startDryRun.mockResolvedValue({ ...DRY_RUN_BATCH, status: 'Dry run', isFinished: false });
     const element = await open();
@@ -899,7 +921,7 @@ describe('the import wizard', () => {
     getTemplates.mockRejectedValue({ body: { message: 'That mapping no longer exists.' } });
     const element = render();
     await flush();
-    expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="message"]').message).toBe(
       'That mapping no longer exists.'
     );
   });
@@ -943,7 +965,7 @@ describe('the import wizard', () => {
     click(element, 'next');
     await flush();
     await chooseFile(element);
-    const picker = element.shadowRoot.querySelector('[data-id="column-row"] lightning-combobox');
+    const picker = element.shadowRoot.querySelector('[data-id="column-row"] c-import-field-picker');
     expect(picker.options).toEqual(
       expect.arrayContaining([
         { value: 'Contact1.LastName', label: 'Person: last name' },
@@ -1032,7 +1054,7 @@ describe('the import wizard', () => {
     click(element, 'next');
     await flush();
     await chooseFile(element);
-    const picker = element.shadowRoot.querySelector('[data-id="column-row"] lightning-combobox');
+    const picker = element.shadowRoot.querySelector('[data-id="column-row"] c-import-field-picker');
     const labels = picker.options.map((option) => option.label);
     expect(labels).toContain('Gift: amount');
     expect(labels).not.toContain('Gift: amount (kept with the row, not loaded yet)');
@@ -1061,7 +1083,7 @@ describe('the import wizard', () => {
     await flush();
     await chooseFile(element);
     const pickers = element.shadowRoot.querySelectorAll(
-      '[data-id="column-row"] lightning-combobox'
+      '[data-id="column-row"] c-import-field-picker'
     );
     const labels = pickers[0].options.map((option) => option.label);
     expect(labels.some((label) => label.startsWith('Gift'))).toBe(false);
@@ -1147,7 +1169,7 @@ describe('the import wizard', () => {
     await flush();
     const field = element.shadowRoot.querySelector('[data-id="person-field"]');
     expect(field.value).toBe('Member_Number__c');
-    expect(element.shadowRoot.querySelector('[data-id="person-field-warning"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="person-field-warning"]').message).toBe(
       'c.Core_Import_MatchFieldNotMapped'
     );
     click(element, 'dry-run');
@@ -1167,7 +1189,7 @@ describe('the import wizard', () => {
     click(element, 'next');
     await flush();
     await chooseFile(element);
-    const picker = element.shadowRoot.querySelector('[data-id="column-row"] lightning-combobox');
+    const picker = element.shadowRoot.querySelector('[data-id="column-row"] c-import-field-picker');
     const values = picker.options.map((option) => option.value);
     expect(values).toEqual(
       expect.arrayContaining([
@@ -1196,7 +1218,7 @@ describe('the import wizard', () => {
     click(element, 'next');
     await flush();
     await chooseFile(element);
-    const picker = element.shadowRoot.querySelector('[data-id="column-row"] lightning-combobox');
+    const picker = element.shadowRoot.querySelector('[data-id="column-row"] c-import-field-picker');
     const values = picker.options.map((option) => option.value);
     expect(values).toEqual(
       expect.arrayContaining([
@@ -1598,7 +1620,7 @@ describe('the import wizard', () => {
       click(element, 'download');
       await flush();
       expect(written.split('\r\n').filter((line) => line.length > 0)).toHaveLength(4);
-      expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+      expect(element.shadowRoot.querySelector('[data-id="message"]').message).toBe(
         'c.Core_Import_ExceptionsCapped'
       );
     });
@@ -1610,7 +1632,7 @@ describe('the import wizard', () => {
       click(element, 'download');
       await flush();
       expect(written).toBeUndefined();
-      expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+      expect(element.shadowRoot.querySelector('[data-id="message"]').message).toBe(
         'Cursor expired.'
       );
     });
@@ -1733,7 +1755,7 @@ describe('the import wizard', () => {
       click(element, 'download-results');
       await flush();
       expect(written.split('\r\n').filter((line) => line.length > 0)).toHaveLength(4);
-      expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+      expect(element.shadowRoot.querySelector('[data-id="message"]').message).toBe(
         'c.Core_Import_ResultsCapped'
       );
     });
@@ -1841,10 +1863,10 @@ describe('the import wizard', () => {
       expect(rows(element)[0].querySelector('[data-id="guess"]')).toBeNull();
       const guess = rows(element)[1].querySelector('[data-id="guess"]');
       expect(guess).not.toBeNull();
-      const badge = guess.querySelector('.slds-badge');
-      expect(badge.classList.contains('slds-theme_warning')).toBe(true);
-      expect(badge.textContent).toContain('c.Core_Import_GuessBadge');
-      expect(badge.querySelector('.slds-assistive-text').textContent).toBe(
+      const badge = guess.querySelector('c-barn-status-badge');
+      expect(badge.status).toBe('attention');
+      expect(badge.label).toBe('c.Core_Import_GuessBadge');
+      expect(guess.querySelector('.slds-assistive-text').textContent).toBe(
         'c.Core_Import_GuessBadgeHelp'
       );
       expect(element.shadowRoot.querySelector('[data-id="guess-pending"]')).not.toBeNull();
@@ -1855,7 +1877,7 @@ describe('the import wizard', () => {
       expect(rows(element)[1].querySelector('[data-id="guess"]')).toBeNull();
       expect(element.shadowRoot.querySelector('[data-id="guess-pending"]')).toBeNull();
       expect(nextDisabled(element)).toBe(false);
-      expect(rows(element)[1].querySelector('lightning-combobox').value).toBe('Contact1.Email');
+      expect(rows(element)[1].querySelector('c-import-field-picker').value).toBe('Contact1.Email');
     });
 
     it('accepts every guess at once, and never sends the flag with the mapping', async () => {
@@ -1874,7 +1896,7 @@ describe('the import wizard', () => {
 
     it('treats choosing another field as checking the guess', async () => {
       const element = await toColumns();
-      const picker = rows(element)[1].querySelector('lightning-combobox');
+      const picker = rows(element)[1].querySelector('c-import-field-picker');
       picker.dispatchEvent(new CustomEvent('change', { detail: { value: 'Ignore' } }));
       await flush();
       expect(rows(element)[1].querySelector('[data-id="guess"]')).toBeNull();
@@ -2119,6 +2141,7 @@ describe('the import wizard loading one object', () => {
     expect(element.shadowRoot.querySelectorAll('[data-id="column-row"]')).toHaveLength(3);
     const conflict = element.shadowRoot.querySelector('[data-id="sheet-conflict"]');
     expect(conflict.textContent).toContain('Accounts: Account');
+    expect(conflict.variant).toBe('error');
     expect(element.shadowRoot.querySelector('[data-id="next"]').disabled).toBe(true);
     expect(suggestObject).toHaveBeenCalledTimes(1);
 
@@ -2173,7 +2196,7 @@ describe('the import wizard loading one object', () => {
     expect(element.shadowRoot.querySelector('[data-id="new-object"]').value).toBe('Account');
     const badge = element.shadowRoot.querySelector('[data-id="detection-guess"]');
     expect(badge).not.toBeNull();
-    expect(badge.classList.contains('slds-theme_warning')).toBe(true);
+    expect(badge.querySelector('c-barn-status-badge').status).toBe('attention');
 
     suggestObject.mockResolvedValue({
       objectName: 'Account',
@@ -2231,7 +2254,7 @@ describe('the import wizard loading one object', () => {
     await flush();
     click(element, 'create-object-template');
     await flush();
-    expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="message"]').message).toBe(
       'c.Core_Import_NoDeleteForObject'
     );
   });
@@ -2240,10 +2263,10 @@ describe('the import wizard loading one object', () => {
     const element = await toColumnsStep();
     expect(getObjectFields).toHaveBeenCalledWith({ templateId: 'a05' });
     const pickers = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
-    const values = pickers[0].querySelector('lightning-combobox').options.map((o) => o.value);
+    const values = pickers[0].querySelector('c-import-field-picker').options.map((o) => o.value);
     expect(values).toEqual(['Ignore', 'Record.Id', 'Record.Session_Key__c', 'Record.Program__c']);
     // A suggestion outside the object is not shown as chosen.
-    expect(pickers[2].querySelector('lightning-combobox').value).toBe('Ignore');
+    expect(pickers[2].querySelector('c-import-field-picker').value).toBe('Ignore');
     const lookups = element.shadowRoot.querySelectorAll('[data-id="lookup-field"]');
     expect(lookups).toHaveLength(1);
     expect(lookups[0].value).toBe('Name');
@@ -2389,7 +2412,7 @@ describe('the import wizard loading one object', () => {
     await flush();
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
     rows[2]
-      .querySelector('lightning-combobox')
+      .querySelector('c-import-field-picker')
       .dispatchEvent(new CustomEvent('change', { detail: { value: 'Record.Id' } }));
     await flush();
     click(element, 'next');
@@ -2422,7 +2445,7 @@ describe('the import wizard loading one object', () => {
     const element = await toColumnsStep();
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
     rows[2]
-      .querySelector('lightning-combobox')
+      .querySelector('c-import-field-picker')
       .dispatchEvent(new CustomEvent('change', { detail: { value: 'Record.Id' } }));
     await flush();
     click(element, 'next');
@@ -2527,7 +2550,7 @@ describe('the import wizard loading one object', () => {
       related: 'Attendance__c.Session__c'
     });
     const rows = element.shadowRoot.querySelectorAll('[data-id="column-row"]');
-    const picker = rows[2].querySelector('lightning-combobox');
+    const picker = rows[2].querySelector('c-import-field-picker');
     expect(picker.options.map((o) => o.value)).toContain('Related.Status__c');
     picker.dispatchEvent(new CustomEvent('change', { detail: { value: 'Related.Status__c' } }));
     await flush();
@@ -2623,7 +2646,7 @@ describe('the import wizard loading one object', () => {
     const element = await toRetryableResults();
     await chooseRetryFile(element, 'Last Name,Notes\nOkafor,');
     expect(openRetry).not.toHaveBeenCalled();
-    expect(element.shadowRoot.querySelector('[data-id="message"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="message"]').message).toBe(
       'c.Core_Import_RetryColumnsMissing'
     );
   });
@@ -2847,7 +2870,7 @@ describe('the import wizard loading several objects from one upload (R-IT20)', (
       'Program',
       'Room'
     ]);
-    const targets = rows.map((row) => row.querySelector('lightning-combobox').value);
+    const targets = rows.map((row) => row.querySelector('c-import-field-picker').value);
     expect(targets).toEqual([
       'Program__c.Name',
       'Program__c.Code__c',

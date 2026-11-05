@@ -9,6 +9,6 @@
  */
 @NamespaceAccessible
 public interface RecordGlanceExtension {
-    /** The card for one Contact or Account, or null. */
-    RecordGlance.Card glance(Id recordId);
+	/** The card for one Contact or Account, or null. */
+	RecordGlance.Card glance(Id recordId);
 }

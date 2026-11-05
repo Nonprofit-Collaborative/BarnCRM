@@ -7,7 +7,6 @@ import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import SHOW_STEPS from '@salesforce/label/c.Core_SetupNote_ShowSteps';
 import NOT_DONE from '@salesforce/label/c.Core_SetupNote_NotDone';
-import METADATA_UNCONFIRMED from '@salesforce/label/c.Core_SetupNote_Metadata_Unconfirmed';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
@@ -16,7 +15,7 @@ import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
  * SettingsController.getSetupChecks when BarnCRM can read the answer. Core sections only: a
  * module's notes go on the module's own settings page (ADR-0020).
  */
-const NOTES = {
+const NOTES = () => ({
   general: [
     {
       key: 'metadata',
@@ -31,7 +30,7 @@ const NOTES = {
       },
       link: 'apexSettings',
       check: 'metadata',
-      unconfirmed: METADATA_UNCONFIRMED
+      unconfirmed: helpText('Core', 'Core_SetupNote_Metadata_Unconfirmed')
     }
   ],
   'duplicate matching': [
@@ -95,7 +94,7 @@ const NOTES = {
       link: 'permissionSets'
     }
   ]
-};
+});
 
 /** A steps label holds the clicks separated by `|`; each becomes one numbered step. */
 function splitSteps(steps) {
@@ -166,7 +165,7 @@ export default class SettingsSetupNotes extends LightningElement {
     if (Array.isArray(this._notes)) {
       return this._notes;
     }
-    return NOTES[String(this._section || '').toLowerCase()] || [];
+    return NOTES()[String(this._section || '').toLowerCase()] || [];
   }
 
   get shownNotes() {

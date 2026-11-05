@@ -8,8 +8,8 @@
  * and the figures should move as soon as a gift is saved.
  */
 public with sharing class RecordGlanceController {
-    @AuraEnabled
-    public static List<RecordGlance.Card> getCards(Id recordId) {
-        return RecordGlanceExtensions.cardsFor(recordId);
-    }
+	@AuraEnabled
+	public static List<RecordGlance.Card> getCards(Id recordId) {
+		return RecordGlanceExtensions.cardsFor(recordId);
+	}
 }

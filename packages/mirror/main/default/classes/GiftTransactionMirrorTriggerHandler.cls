@@ -7,27 +7,27 @@
  */
 @NamespaceAccessible
 public with sharing class GiftTransactionMirrorTriggerHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public GiftTransactionMirrorTriggerHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public GiftTransactionMirrorTriggerHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return GiftTransactionMirrorService.AUTOMATION_NAME;
-    }
+	public override String getName() {
+		return GiftTransactionMirrorService.AUTOMATION_NAME;
+	}
 
-    public override void beforeInsert() {
-        GiftTransactionMirrorService.checkLinks((List<Gift__c>) Trigger.new, null);
-    }
+	public override void beforeInsert() {
+		GiftTransactionMirrorService.checkLinks((List<Gift__c>) newRecords(), null);
+	}
 
-    public override void beforeUpdate() {
-        GiftTransactionMirrorService.checkLinks(
-            (List<Gift__c>) Trigger.new,
-            (Map<Id, Gift__c>) Trigger.oldMap
-        );
-    }
+	public override void beforeUpdate() {
+		GiftTransactionMirrorService.checkLinks(
+			(List<Gift__c>) newRecords(),
+			(Map<Id, Gift__c>) oldRecordsById()
+		);
+	}
 
-    public override void afterDelete() {
-        GiftTransactionMirrorService.warnDeleted((List<Gift__c>) Trigger.old);
-    }
+	public override void afterDelete() {
+		GiftTransactionMirrorService.warnDeleted((List<Gift__c>) oldRecords());
+	}
 }

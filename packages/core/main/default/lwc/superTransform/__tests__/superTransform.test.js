@@ -14,6 +14,23 @@ import loadSavedList from '@salesforce/apex/BulkUpdateController.loadSavedList';
 import saveSavedList from '@salesforce/apex/BulkUpdateController.saveSavedList';
 import renameSavedList from '@salesforce/apex/BulkUpdateController.renameSavedList';
 import deleteSavedList from '@salesforce/apex/BulkUpdateController.deleteSavedList';
+import * as navigation from 'lightning/navigation';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_SuperTransform_SavedSaved: 'Saved the list {0}.',
+  Core_SuperTransform_SavedLoaded: 'Loaded the list {0}.',
+  Core_SuperTransform_SavedSkipped: 'Loaded the list {0}. {1} change(s) were left out.',
+  Core_SuperTransform_SavedMissingFields: 'The list {0} was not loaded: {1}.',
+  Core_SuperTransform_SavedRenamed: 'Renamed the list to {0}.',
+  Core_SuperTransform_SavedDeleted: 'Deleted the list {0}.',
+  Core_SuperTransform_MatchCount: '{0} {1} match.',
+  Core_SuperTransform_NoFilter: 'No condition is set. This changes every {0}: {1} records.',
+  Core_SuperTransform_OverLimit: '{0} records match, more than the {1} one run may change.',
+  Core_SuperTransform_AlreadyHeld: '{0} of the {1} records shown already have these values.',
+  Core_SuperTransform_ConfirmMessage: 'Change {0} on {1} {2}.',
+  Core_BulkUpdate_Summary: '{0} matched: {1} updated, {2} unchanged, {3} failed.'
+});
 
 jest.mock('@salesforce/apex/BulkUpdateController.getSavedLists', () => ({ default: jest.fn() }), {
   virtual: true
@@ -30,36 +47,6 @@ jest.mock('@salesforce/apex/BulkUpdateController.renameSavedList', () => ({ defa
 jest.mock('@salesforce/apex/BulkUpdateController.deleteSavedList', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_SavedSaved',
-  () => ({ default: 'Saved the list {0}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_SavedLoaded',
-  () => ({ default: 'Loaded the list {0}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_SavedSkipped',
-  () => ({ default: 'Loaded the list {0}. {1} change(s) were left out.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_SavedMissingFields',
-  () => ({ default: 'The list {0} was not loaded: {1}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_SavedRenamed',
-  () => ({ default: 'Renamed the list to {0}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_SavedDeleted',
-  () => ({ default: 'Deleted the list {0}.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/label/c.Core_Format_Parenthetical', () => ({ default: '{0} ({1})' }), {
   virtual: true
 });
@@ -88,36 +75,6 @@ jest.mock('@salesforce/apex/BulkUpdateController.start', () => ({ default: jest.
 jest.mock('@salesforce/apex/BulkUpdateController.getJob', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_MatchCount',
-  () => ({ default: '{0} {1} match.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_NoFilter',
-  () => ({ default: 'No condition is set. This changes every {0}: {1} records.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_OverLimit',
-  () => ({ default: '{0} records match, more than the {1} one run may change.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_AlreadyHeld',
-  () => ({ default: '{0} of the {1} records shown already have these values.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_ConfirmMessage',
-  () => ({ default: 'Change {0} on {1} {2}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_BulkUpdate_Summary',
-  () => ({ default: '{0} matched: {1} updated, {2} unchanged, {3} failed.' }),
-  { virtual: true }
-);
 
 const OBJECTS = [
   { label: 'Account', value: 'Account' },
@@ -248,7 +205,7 @@ describe('c-super-transform', () => {
     expect(q(element, 'count').textContent).toBe('3 Contacts match.');
     const warnings = qa(element, 'warning');
     expect(warnings).toHaveLength(1);
-    expect(warnings[0].textContent).toContain('every Contact: 3 records');
+    expect(warnings[0].message).toContain('every Contact: 3 records');
   });
 
   it('counts again, once, after the conditions rest, and sends the filter', async () => {
@@ -278,7 +235,7 @@ describe('c-super-transform', () => {
     await flush();
     await chooseContact(element);
     await setTitle(element, 'Coordinator');
-    const texts = Array.from(qa(element, 'warning')).map((w) => w.textContent);
+    const texts = Array.from(qa(element, 'warning')).map((w) => w.message);
     expect(texts.some((text) => text.includes('more than the'))).toBe(true);
     expect(q(element, 'preview').disabled).toBe(true);
   });
@@ -395,7 +352,7 @@ describe('c-super-transform', () => {
         object: 'Contact',
         changes: [{ field: 'Title', action: 'set', value: 'Coordinator' }]
       });
-      expect(q(element, 'notice-message').textContent).toBe('Saved the list Tidy titles.');
+      expect(q(element, 'notice-message').message).toBe('Saved the list Tidy titles.');
       expect(q(element, 'saved-pick').value).toBe('a0S1');
     });
 
@@ -422,7 +379,7 @@ describe('c-super-transform', () => {
       expect(JSON.parse(countMatches.mock.calls[0][0].queryJson).filter.conditions).toHaveLength(1);
       const steps = element.shadowRoot.querySelector('c-import-column-transforms');
       expect(steps.transforms).toEqual([{ op: 'trim' }]);
-      expect(q(element, 'notice-message').textContent).toBe(
+      expect(q(element, 'notice-message').message).toBe(
         'Loaded the list Tidy titles. 1 change(s) were left out.'
       );
       expect(q(element, 'preview').disabled).toBe(false);
@@ -443,8 +400,8 @@ describe('c-super-transform', () => {
       await flush();
       q(element, 'saved-load').click();
       await flush();
-      expect(q(element, 'error-message').textContent).toContain('Gone__c, Account.Nothing__c');
-      expect(q(element, 'error-message').textContent).toContain('Tidy titles');
+      expect(q(element, 'error-message').message).toContain('Gone__c, Account.Nothing__c');
+      expect(q(element, 'error-message').message).toContain('Tidy titles');
       expect(getTargets).not.toHaveBeenCalled();
       expect(q(element, 'step-changes')).not.toBeNull();
       expect(q(element, 'object').value).toBeUndefined();
@@ -467,7 +424,7 @@ describe('c-super-transform', () => {
       q(element, 'saved-rename').click();
       await flush();
       expect(renameSavedList).toHaveBeenCalledWith({ recordId: 'a0S1', name: 'Titles' });
-      expect(q(element, 'notice-message').textContent).toBe('Renamed the list to Titles.');
+      expect(q(element, 'notice-message').message).toBe('Renamed the list to Titles.');
     });
 
     it('deletes only after the confirmation', async () => {
@@ -488,7 +445,7 @@ describe('c-super-transform', () => {
       await flush();
       await flush();
       expect(deleteSavedList).toHaveBeenCalledWith({ recordId: 'a0S1' });
-      expect(q(element, 'notice-message').textContent).toBe('Deleted the list Tidy titles.');
+      expect(q(element, 'notice-message').message).toBe('Deleted the list Tidy titles.');
       expect(q(element, 'saved-none')).not.toBeNull();
     });
   });
@@ -575,6 +532,97 @@ describe('c-super-transform', () => {
     await setTitle(element, 'Coordinator');
     q(element, 'preview').click();
     await flush();
-    expect(q(element, 'error-message').textContent).toBe('No contacts match.');
+    expect(q(element, 'error-message').message).toBe('No contacts match.');
+  });
+
+  describe('started from Find (admin-14)', () => {
+    const FILTER = {
+      op: 'AND',
+      conditions: [{ field: 'Title', operator: 'equals', value: 'Coordinator' }]
+    };
+    const RELATED = [{ relationship: 'Cases', mode: 'has', filter: null }];
+
+    async function startFrom(start) {
+      const element = mount();
+      navigation.CurrentPageReference.emit({ state: { c__start: JSON.stringify(start) } });
+      await flush();
+      await rest();
+      await flush();
+      return element;
+    }
+
+    it('opens on the kind of record and conditions Find handed over, and runs nothing', async () => {
+      const element = await startFrom({ object: 'Contact', filter: FILTER });
+      expect(q(element, 'object').value).toBe('Contact');
+      expect(q(element, 'step-changes')).not.toBeNull();
+      expect(JSON.parse(countMatches.mock.calls[0][0].queryJson)).toEqual({
+        version: 1,
+        object: 'Contact',
+        fields: ['Id'],
+        filter: FILTER
+      });
+      expect(q(element, 'notice-message').message).toBe('c.Core_SuperTransform_FromFind');
+      expect(startUpdate).not.toHaveBeenCalled();
+      expect(previewSample).not.toHaveBeenCalled();
+    });
+
+    it('keeps the conditions on related records in the count and the run', async () => {
+      const element = await startFrom({ object: 'Contact', filter: FILTER, related: RELATED });
+      expect(JSON.parse(countMatches.mock.calls[0][0].queryJson).related).toEqual(RELATED);
+      expect(q(element, 'notice-message').message).toBe('c.Core_SuperTransform_FromFindRelated');
+      await setTitle(element, 'Coordinator');
+      q(element, 'preview').click();
+      await flush();
+      expect(JSON.parse(previewSample.mock.calls[0][0].queryJson).related).toEqual(RELATED);
+    });
+
+    it('drops the related conditions when the person chooses another kind of record', async () => {
+      const element = await startFrom({ object: 'Contact', filter: FILTER, related: RELATED });
+      countMatches.mockClear();
+      q(element, 'object').dispatchEvent(
+        new CustomEvent('change', { detail: { value: 'Account' } })
+      );
+      await flush();
+      await rest();
+      await flush();
+      expect(JSON.parse(countMatches.mock.calls[0][0].queryJson)).toEqual({
+        version: 1,
+        object: 'Account',
+        fields: ['Id']
+      });
+    });
+
+    it('says so, and leaves the page empty, for a kind of record the person may not change', async () => {
+      const element = await startFrom({ object: 'Gift__c', filter: FILTER });
+      expect(q(element, 'error-message').message).toBe('c.Core_SuperTransform_StartNoObject');
+      expect(q(element, 'object').value).toBeUndefined();
+      expect(getTargets).not.toHaveBeenCalled();
+    });
+
+    it('ignores a link whose start cannot be read', async () => {
+      const element = mount();
+      navigation.CurrentPageReference.emit({ state: { c__start: '{not json' } });
+      await flush();
+      expect(q(element, 'error-message')).toBeNull();
+      expect(q(element, 'object').value).toBeUndefined();
+    });
+  });
+
+  it('shows the run as a percent, not parts', async () => {
+    BarnConfirmModal.open = jest.fn().mockResolvedValue(true);
+    getJob.mockResolvedValue({ ...FINISHED, running: true, chunksDone: 1, chunksTotal: 4 });
+    startUpdate.mockResolvedValue({ ...FINISHED, running: true, chunksDone: 1, chunksTotal: 4 });
+    const element = mount();
+    await flush();
+    await chooseContact(element);
+    await setTitle(element, 'Coordinator');
+    q(element, 'preview').click();
+    await flush();
+    q(element, 'run').click();
+    await flush();
+    await flush();
+    const meter = q(element, 'progress');
+    expect(meter.value).toBe(25);
+    expect(meter.valueText).toBe('c.Core_SuperTransform_Progress');
   });
 });

@@ -172,7 +172,7 @@ describe('c-where-used-modal', () => {
     findReferences.mockRejectedValue({ body: { message: 'You need the permission.' } });
     const { element } = await render({ objectName: 'Contact', fieldName: 'Email' });
 
-    expect(one(element, '[data-id="error"]').textContent).toContain('You need the permission.');
+    expect(one(element, '[data-id="error"]').message).toContain('You need the permission.');
     expect(one(element, '[data-id="retire"]')).toBeNull();
   });
 });

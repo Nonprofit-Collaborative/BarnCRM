@@ -14,9 +14,9 @@ objects, loads through **One Kind of Record** (section 9).
 
 ### What Are You Importing?
 
-A path across the top of the **Import** tab shows its six steps: **Choose File Type**, **Upload
-File**, **Check Columns**, **Match Rows**, **Preview** and **Results**. **Back** is always at the
-bottom left and the step's main button at the bottom right.
+A path across the top of the **Super Importer** tab shows its six steps: **What You Are
+Importing**, **Upload File**, **Check Columns**, **Match Rows**, **Preview** and **Results**.
+**Back** is always at the bottom left and the step's main button at the bottom right.
 
 The first step asks what the file holds. Each choice is a card that says what it creates.
 Choose one and its templates show below the cards; choose another card to change your mind.
@@ -26,8 +26,8 @@ The cards work like radio buttons: Tab reaches them and the arrow keys move betw
 |---|---|---|
 | **People and Organizations** | People, a second person on the same row, households, organizations and the links between people and organizations, with their mailing addresses. A file of organizations only works too. You choose the template; the first one is chosen for you. | Sections 3, 4 and 8 |
 | **Gifts** | Gifts with the people and organizations who gave them. Shown only when one of your active templates loads gifts, which means the Giving module is installed. | [Importing gifts](gift-import.md) |
-| **One Kind of Record** | Creates, updates or upserts the records of any one object you may load, such as program sessions or one of your own objects. You choose the object and name a new template. | Section 9 |
-| **Several Objects in One File** | Records of several objects from one file: a sheet for each object, or several objects on one row (`Account.Name` and `Contact.LastName`), each record linked to the records it points at, such as programs, their sessions and the attendees. You choose the objects and name a new template. | Section 9, "Several Objects in One File" |
+| **One Kind of Record** | Adds new records or updates ones you already have, for any one kind of record you may load, such as program sessions or your own records. You choose the kind of record and name a new template. | Section 9 |
+| **Several Kinds of Record in One File** | Records of several kinds from one file: a sheet for each kind of record, or several kinds on one row (`Account.Name` and `Contact.LastName`), each record linked to the records it points at, such as programs, their sessions and the attendees. You choose the kinds of record and name a new template. | Section 9, "Several Kinds of Record in One File" |
 | **Delete the Records a File Lists** | Sends the records whose IDs the file lists to the Recycle Bin, after a preview and a confirmed count. Shown only to people with **Bulk Delete Records**. As **One Kind of Record**, with **Delete by record ID** chosen for you. | Section 9, "Deleting the records a file lists" |
 | **Your Templates** | Every active template in your org: the ones BarnCRM and your modules ship and the ones you made, each with its description, what it creates and when it last loaded a file. | Sections 2 and 6 |
 
@@ -46,7 +46,7 @@ removed and the values it changed are put back (section 5).
 Import is part of the **Data Manager** feature, which on a new install is off until you turn
 it on: choose **Turn On** in the **Data Manager** row in **BarnCRM Settings**, **General**
 (or leave it ticked in first-run setup); see [BarnCRM Settings](barncrm-settings.md). Once it
-is on, the **Import** tab is for anyone with the **Manage BarnCRM Settings** permission. Open it from the **Data Manager** tab in the BarnCRM app: choose **Import a File**
+is on, the **Super Importer** tab (called **Import** in earlier versions) is for anyone with the **Manage BarnCRM Settings** permission. Open it from the **Data Manager** tab in the BarnCRM app: choose **Super Importer**
 (see [Data Manager](data-manager.md)). If you do not see the tile, ask whoever set up your org
 to give you the BarnCRM Admin role on the **Access** page.
 
@@ -58,19 +58,21 @@ and undo deadline. In reports and list views look for **Data Jobs**; the object'
 A few things are worth knowing before your first large file:
 
 1. Open **BarnCRM Settings** and choose **Import**.
-2. **Rows per chunk** controls how many rows are processed at a time. Leave it at 200.
+2. **Records per batch in imports** controls how many rows are processed at a time. Leave it at 200.
+   A row that BarnCRM's own automation cannot handle is rejected on its own; the other rows of its
+   batch still load ([When Automation Fails on One Record](automation-control.md#when-automation-fails-on-one-record)).
    Lower it to 50 if your org has a lot of custom automation and an import fails with a
    limit error; raise it only if a very large file is running slowly and nothing else
    fires on save.
 3. **Days an import can be undone** is 30 unless you change it, and can be anything from 1
    to 365. Each import keeps the window it was imported with.
-   **Rows in a trial import** is how many of a file's first rows **Try the First Rows**
+   **Rows in a trial import** is how many of a file's first rows **Import the First {n} Rows**
    imports before the rest (section 3, step 8). It is 25 unless you change it, from 1 to
    2,000, and the wizard lets you change it for one file.
-4. **Delete Import Rows** is **After 30 Days** unless you change it to **Once Complete**,
+4. **Delete import rows** is **After 30 Days** unless you change it to **Once Complete**,
    **After 90 Days** or **Never**. See [How long the rows are kept](#how-long-the-rows-are-kept).
-5. **Import** on the same page has an **Open Import** button, which is the same
-   place the **Import** tab takes you.
+5. **Import** on the same page has an **Open Super Importer** button, which is the same
+   place the **Super Importer** tab takes you.
 6. With the Giving module installed, the same page has the two payment matching settings
    ([Importing gifts](gift-import.md), section 2).
 
@@ -108,10 +110,12 @@ Cloud](migrating-from-nonprofit-cloud.md) and [Migrating from NPSP](migrating-fr
 You need a CSV file (or another text file whose columns are separated by semicolons, tabs or
 pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five or six rows.
 
-1. Open the **Import** tab. Under **What Are You Importing?**, choose **People and
+1. Open the **Super Importer** tab. Under **What Are You Importing?**, choose **People and
    Organizations**. **People and Organizations List** (or **Generic contact list** in an older
    org) is chosen for you; select **Next**.
-2. Select **Upload file** and choose your file. BarnCRM reads the header row and shows
+2. Drop your file on the dashed **Upload or drop a file here** area, or select **Choose File**
+   in it and pick the file (on a phone, the file picker is the way). The area appears on this
+   step and wherever the wizard asks for a file. BarnCRM reads the header row and shows
    you every column it found. The **Examples** column shows up to three values from the
    column's first rows, one per line, so you can see the column holds what its mapping says
    (a long value is cut short, and an empty cell shows as "(blank)").
@@ -127,7 +131,15 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    across the chosen sheets.
 3. Check the columns. Each column shows what BarnCRM thinks it is, for example
    "Email" for a column headed `Email Address`. Change anything that is wrong from the
-   picker beside it. A column you do not want loaded is set to **Do not load**, and its
+   picker beside it: select it and type part of a field's name to search (an object such as
+   Contact has over 100 fields). **Do not load** stays at the top of the list, fields are
+   grouped under **Person**, **Second person** and **Organization** for a people file, and a
+   field another column already loads into is marked **In use**. The Down arrow moves into
+   the list, Enter chooses, Escape closes. When columns are still on **Do not load**, a
+   **Suggested Fields** list beside the table shows fields that look like their headings:
+   drag one onto a column to map it (press and hold on a phone; with the keyboard press Space
+   on a field, the Left and Right arrows pick a column, Space again drops). The picker does the
+   same job without dragging. A column you do not want loaded is set to **Do not load**, and its
    values are kept on the staged row but written nowhere. A column only a module could
    load (an amount or a date, for example) is offered only when that module is installed;
    without it, BarnCRM suggests **Do not load** for it. The template remembers your
@@ -164,22 +176,27 @@ pipes) or an Excel workbook (.xlsx). A small one is best for the first run: five
    twelve rows of the file becomes one person with one household, not twelve.
 7. If the preview is wrong, fix the file or the template and preview again. Nothing you
    have done so far has changed a record.
-8. When the preview is right, select **Import These Rows**. Processing runs in the background and
+8. When the preview is right, select **Import All {n} Rows** ({n} is the number of rows in your
+   file; when the preview rejects some, the button reads **Import {m} of {n} Rows**, the rows
+   that will load). Processing runs in the background and
    the screen updates as it goes. The import does what the preview showed: it uses the columns,
    values and matching choices the preview ran with, even if you or someone else has changed
    the template since. A change to the template counts from the next preview.
 
    For a large file, try the first rows for real first. The preview writes nothing, so a
    validation rule, a required field or one of your org's own flows is first met when rows are
-   saved. Under **Try the First Rows**, check the number (25 unless your org changed it in
-   BarnCRM Settings, Import section, **Rows in a trial import**; you can change it for this
-   file) and select **Import the First Rows**. Only those rows are saved; the results screen
+   saved. Above the footer, the box **Not sure? Try a few rows first.** holds the number (25
+   unless your org changed it in BarnCRM Settings, Import section, **Rows in a trial import**;
+   you can change it for this file) and a button that names it, **Import the First 25 Rows**. Only those rows are saved; the results screen
    shows what became of them. If they are right, select **Import the Remaining Rows**: the rest
    of the file goes into the same import, under the same columns and matching choices, and one
    undo removes both parts. If they are wrong, undo the import (section 5), fix the file or the
    template, and upload it again. An import whose trial has run cannot be previewed again.
 9. The results screen shows the same four counts for what actually happened, the run log,
-   and links to the records. Select **Download**, then **Download Results**, to get every row of the file back as
+   and links to the records. **See Every Row** opens the list of every row of this import
+   (the data job's **Import Rows**), so a row you want to look at, or report on, is one click
+   away. The **Import Rows** tab no longer sits in the Admin app's navigation; this link, and a
+   rejected row's own page, are how you reach it. Select **Download**, then **Download Results**, to get every row of the file back as
    a CSV with what became of it: its outcome (Created, Updated, Matched, Rejected or Skipped),
    the Salesforce record IDs it resulted in (person, second person, household, organization,
    and a gift or other record a module loaded), the reason for a rejected row, and the row's
@@ -210,7 +227,10 @@ Most contact lists give a couple one line: two names, one address. Map the secon
 person's columns to **Contact 2** and BarnCRM puts both people in the same household. The
 shipped **Couples and Households** template already maps columns headed "Contact 1 ..." and
 "Contact 2 ..." (section 2). You get one household with two members, not two households, and it works the same way
-whether your org keeps people as contacts or as person accounts.
+whether your org keeps people as contacts or as person accounts. The shipped templates follow
+how your org stores people: as person accounts only when Person Accounts are on and the
+household model is Junction; an org that has Person Accounts on but keeps people as contacts in
+households imports contacts. Upgrading an org that had them wrong fixes the shipped templates.
 
 Where your org keeps people as person accounts, map the columns exactly as you would for
 contacts (Email, Mailing Street, Email Opt Out and so on). BarnCRM writes each to the
@@ -274,7 +294,7 @@ It does not touch anything else.
 With Giving, a gift with a receipt is never removed, and neither is its donor ([Importing
 gifts](gift-import.md), section 6).
 
-1. Open the **Import** tab. **Recent Imports** lists your last imports, newest first, with
+1. Open the **Super Importer** tab. **Recent Imports** lists your last imports, newest first, with
    the date each one can be undone until.
 2. Select **Undo** beside the import. BarnCRM counts what it would remove (people,
    households and organizations, and gifts with Giving) and how many changed values it would put back, and shows
@@ -330,7 +350,7 @@ affects imports you run afterwards.
 Every row of every file is kept as an Import Row so you can see what happened to it, correct
 and retry a rejected row ([Super Importer rows](import-rows.md)), download the rejected rows
 and check what a re-import changed. Rows take storage, so a nightly job deletes the rows of a
-complete import (Complete, Failed or undone) by **Delete Import Rows** in **BarnCRM
+complete import (Complete, Failed or undone) by **Delete import rows** in **BarnCRM
 Settings**, **Import**:
 
 | Choice | The rows of a complete import are deleted |
@@ -347,9 +367,10 @@ progress) keeps them. The import itself stays: its counts, run log and file name
 undo, which never reads the rows. A preview whose rows were deleted cannot be committed, and a
 row that was deleted cannot be retried: upload the file again.
 
-The job is called **Import row cleanup**. Health Check reports it when it is not scheduled, and
-its **Schedule All Nightly Jobs** fix schedules it. It runs at a quarter past one in the
-morning.
+The nightly **Record Cleanup** job applies this choice (it runs at twenty past one in the
+morning, as part of the nightly run Health Check reports on). Record Cleanup also deletes an
+import you started and abandoned in Draft, Parsing or Preview, with its rows, once it is
+older than **Days to keep import history** (365 days by default; see [Nightly Jobs](nightly-jobs.md)).
 
 ## 6. Files That Arrive Every Month
 
@@ -357,7 +378,7 @@ Some files come back on a schedule: a monthly export from your payment processor
 quarterly list from a partner. Mark the template you use for one as recurring and the Hub
 keeps track of it for you.
 
-1. Open the **Import** tab and choose the template.
+1. Open the **Super Importer** tab and choose the template.
 2. Select **This file arrives regularly**, and give the source a name you will recognize,
    for example "Monthly processor export". The name is required while the box is ticked.
 3. Select **Next** and import the file as usual.
@@ -377,7 +398,7 @@ with it. Two people files with different layouts, such as a monthly membership e
 event sign-up list, should each have their own template, so one does not overwrite the
 other's choices.
 
-1. Open the **Import** tab and choose **People and Organizations** or **Gifts**, then the
+1. Open the **Super Importer** tab and choose **People and Organizations** or **Gifts**, then the
    template closest to your file.
 2. Select **Start a New Template From This One**. **New template name** starts as "Copy of"
    and the template's name; change it, for example to "Event sign-ups".
@@ -641,7 +662,7 @@ organization the rule found nobody for: a file of work emails, for example, can 
 Ramirez by her name and phone if your rule for people compares those. What it risks: your
 duplicate rules are usually looser than **Email exact**, so a row can be loaded into somebody who
 is only similar. Every row matched this way has **Matched By Duplicate Rule** ticked and the run
-log says there are such rows, so read them in the dry run before you commit (report on Import
+log says there are such rows, so read them in the preview before you commit (report on Import
 Rows, or open the import's rows). A row whose two people the rules match to one record is
 rejected. When a rule finds more than one
 record, **When more than one record matches** decides, as for any match. Only organizations are
@@ -671,9 +692,9 @@ them, the matching step says so, and the run log says the rule above was used al
 org keeps people as person accounts, a contact import never takes a person account as the
 person a contact rule matched, and a person account duplicate rule counts for those people
 only, and an account rule for organizations; turn on the one you need. Turn a rule on as
-[Duplicates](duplicates.md) describes. A dry run matches only records that are already
+[Duplicates](duplicates.md) describes. A preview matches only records that are already
 there: a person an earlier row of the same file creates is found by the rule above, never by a
-duplicate rule, so the commit can match a few more rows than the dry run did. For a file that
+duplicate rule, so the commit can match a few more rows than the preview did. For a file that
 loads one object, see "Your duplicate rules" in section 9.
 
 **Your own fields.** The column list includes the fields your org added to people (contacts)
@@ -716,7 +737,7 @@ records the first one created or updated.
 Not every file is people. A spreadsheet of program sessions, a corrected export of one of your
 own objects, or volunteer hours from a sign-in sheet each describe one kind of record. **Load
 one object** (the **One Kind of Record** card) loads a file into a single object, including your org's own custom objects, with
-the same dry run, results, journal and undo as any import.
+the same preview, results, journal and undo as any import.
 
 A module can also ship a ready-made template that loads one object, such as a sheet of
 volunteer hours. It appears under **Your Templates** like any shipped template, but only in an org
@@ -724,9 +745,9 @@ that has the object and every field it uses, and where the template's people (Co
 person Accounts) match yours; otherwise it is left out, and the reason is on the Error Log
 (Health Check). You can edit it or switch it off like any other template.
 
-1. Open the **Import** tab and choose **One Kind of Record** (or **Delete the Records a File
+1. Open the **Super Importer** tab and choose **One Kind of Record** (or **Delete the Records a File
    Lists**). A template you made before is under **Your Templates**. For a file of several
-   objects, see "Several Objects in One File" below.
+   objects, see "Several Kinds of Record in One File" below.
 2. Not sure which object? Under **Suggest the object from a file**, choose the file first.
    BarnCRM suggests the object its headings, sheet names or file name point at, in that order
    (for example `Contact.First Name`, a **Contacts** sheet, or `contacts_2026.xlsx`; dates,
@@ -761,7 +782,7 @@ person Accounts) match yours; otherwise it is left out, and the reason is on the
    A workbook with several sheets loads them all into the template's one object. When the
    chosen sheets point at different objects, the step lists each sheet with its object and
    **Next** waits: clear the sheets for the other objects, or go back and choose the object
-   they point at. To load each sheet into its own object, use **Several Objects in One File**
+   they point at. To load each sheet into its own object, use **Several Kinds of Record in One File**
    (below).
 5. For a column that fills a lookup (a field that points at another record), a second picker
    says how the file names that record: **Salesforce record ID** (the default), the record's
@@ -772,7 +793,7 @@ person Accounts) match yours; otherwise it is left out, and the reason is on the
 
    **Large objects.** Salesforce finds a record quickly by its ID, its name, an email, and a
    field marked External ID or Unique. Matching by any other field reads the whole object, so
-   on an object holding more than 100,000 records you can see, the dry run is refused and names
+   on an object holding more than 100,000 records you can see, the preview is refused and names
    the field. Choose one of those fields instead, or ask your Salesforce administrator to mark
    the field External ID.
 6. On the next step choose what each row does:
@@ -816,16 +837,16 @@ a record (so it never appears for contacts and accounts, which load by Update on
 - **One record, one row.** A record that an earlier row of the file already creates or updates
   is set aside before the choice. A row whose only matches are records earlier rows update is
   rejected, so no record is changed twice by one file.
-- **Dry run and commit agree, with one limit.** The rules are asked only about records that
+- **Preview and commit agree, with one limit.** The rules are asked only about records that
   were there before the import, and records earlier rows load are set aside, so the commit
-  chooses as the dry run did. The limit: duplicate rules compare field values, so a value an
+  chooses as the preview did. The limit: duplicate rules compare field values, so a value an
   earlier row of the commit changes on some record can make the rules match that record (or
-  stop matching it) for a later row, where the dry run, which changed nothing, saw the old
-  values. Compare the commit's results with the dry run's when one file both updates and adds
+  stop matching it) for a later row, where the preview, which changed nothing, saw the old
+  values. Compare the commit's results with the preview's when one file both updates and adds
   similar records.
 - **Read before you commit.** Duplicate rules are looser than a record ID or key, so a row can
   update a record that is only similar. Every row matched this way has **Matched By Duplicate
-  Rule** ticked and the run log says so: check those rows in the dry run.
+  Rule** ticked and the run log says so: check those rows in the preview.
 - **No rule, or a rule that fails.** If no duplicate rule is switched on for the object, the
   run log says so and every row is matched by its ID or key alone. If a rule is switched on but
   Salesforce could not run it, each row that would create a record is rejected with that reason
@@ -883,7 +904,7 @@ ID**; every other column is ignored, and it loads no related records.
    with every field you can see, as a CSV file. Type that number into **Type the number of
    records to confirm**, then press **Delete**. The panel shows the delete's progress.
 3. The delete runs as a bulk delete: in chunks of up to 200, as you, with each record listed in
-   the journal. A record deleted or hidden from you since the dry run is left alone and counted;
+   the journal. A record deleted or hidden from you since the preview is left alone and counted;
    a record Salesforce refuses is listed with the reason.
 4. Once it starts, the job moves from the import history to **Data Jobs** on the **Data
    Manager** tab, where **Undo** brings the records back from the Recycle Bin within the bulk
@@ -892,14 +913,14 @@ ID**; every other column is ignored, and it loads no related records.
 A file naming more records than the **Bulk delete run limit** (default 10,000) is refused at
 the confirm step: split the file.
 
-### Several Objects in One File
+### Several Kinds of Record in One File
 
 One file often holds several kinds of record: programs, their sessions and the attendees, a
 legacy system's accounts and their notes, or an export with `Account.Name` and
-`Contact.LastName` on the same row. **Several Objects in One File** loads them all in one
-import, with one dry run, one set of results and one undo.
+`Contact.LastName` on the same row. **Several Kinds of Record in One File** loads them all in one
+import, with one preview, one set of results and one undo.
 
-1. Open the **Import** tab and choose **Several Objects in One File**.
+1. Open the **Super Importer** tab and choose **Several Kinds of Record in One File**.
 2. Not sure which objects? Under **Suggest the object from a file**, choose the file first.
    BarnCRM reads each sheet's name and headings, as for one object, and chooses every object
    they point at under **Objects to load**. Add or remove objects there; the order you list
@@ -937,7 +958,7 @@ How it loads:
 - **Records on other sheets are linked by a column you pick.** On a sheet of attendees, map a
   column to the field that points at the session and, in its second picker, say how the column
   names the session: its record ID, or a field such as a session code (section 9, step 5). The
-  dry run cannot find a session the same file creates yet, so it leaves that lookup for the
+  preview cannot find a session the same file creates yet, so it leaves that lookup for the
   commit and the run log says so.
 - **A row loads an object only when it has a value for it.** A sheet of sessions does not create
   attendees, even with a value for every row set for attendees.
@@ -966,7 +987,7 @@ their parents, and puts back the values it changed.
 **Templates made before this update** that load related records with one object still load the
 same way: the first row of a key loads the parent, later rows add a related record, each row's
 related record is its second resulting record, and the run log counts them. To change one, start
-a **Several Objects in One File** template with both objects.
+a **Several Kinds of Record in One File** template with both objects.
 
 ## 10. Changing Values as They Load
 
@@ -977,7 +998,11 @@ file of the same kind is fixed too.
 
 1. On the columns step, select **Change Values** beside a column.
 2. Select **Add a Change** and pick one. Changes run in the order listed, and you can add up
-   to ten to one column:
+   to ten to one column. To change the order, use the **Move Up** and **Move Down** arrows
+   beside a change, or drag it by its handle (mouse or pen; on a touch screen press and hold
+   the handle first). With the keyboard, focus the handle, press Space, use the arrow keys and
+   press Space again; Escape cancels. The preview updates and a screen reader hears the new
+   position:
 
 | Change | What it does | Example |
 |---|---|---|
@@ -1024,8 +1049,8 @@ columns step, under **Rows to Load**; they are saved with the template like the 
   skipped and says which earlier row it repeats. Spaces at the ends and capitals are ignored,
   and a row whose key columns are all empty is never skipped for this.
 
-A skipped row is not rejected: it is decided when the file is uploaded, before the dry run, and
-the dry run, the commit and the run log all count it as skipped ("12 rows were skipped by Skip
+A skipped row is not rejected: it is decided when the file is uploaded, before the preview, and
+the preview, the commit and the run log all count it as skipped ("12 rows were skipped by Skip
 Rows Where or One Row Per"). **View rows** lists each one with its reason; it is not in the rejected
 rows file. To load a skipped row after all, change the rule and upload the file again.
 
@@ -1038,7 +1063,7 @@ deleted values in Excel. It is off for every column until you tick it.
   clears.
 - Records the load creates are not affected: there is nothing to clear.
 - A required field or a checkbox cannot be cleared; the run log says so and leaves it.
-- The dry run says how many values the commit would clear ("Empty cells would clear 37
+- The preview says how many values the commit would clear ("Empty cells would clear 37
   values"), and the commit's run log how many it cleared. Each cleared value is
   journaled, so **Undo** (section 5) puts it back, unless someone has given the field a value
   since.

@@ -9,22 +9,6 @@
         <value>Open Duplicate Rules in Setup</value>
     </labels>
     <labels>
-        <fullName>Core_MatchSource_RowCapReached</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Error Log warning: {0} is the match source, {1} the row cap</shortDescription>
-        <value>Match source {0} reached its limit of {1} rows in one lookup, so some duplicates may be missed. If its values are very common, consider deactivating it on the Duplicate Matching tab, Matching Logic.</value>
-    </labels>
-    <labels>
-        <fullName>Core_MatchSource_BudgetSpent</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Error Log warning: {0} is the match source not read</shortDescription>
-        <value>Match source {0} was skipped because this run had used most of its database queries or rows, so some duplicates may be missed. Run the duplicate scan or import again with fewer records at a time.</value>
-    </labels>
-    <labels>
         <fullName>Core_Duplicates_DismissButton</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>
@@ -33,84 +17,12 @@
         <value>Not a Duplicate</value>
     </labels>
     <labels>
-        <fullName>Core_Duplicates_DismissSuccess</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: dismiss done</shortDescription>
-        <value>Noted. This suggestion will not come back.</value>
-    </labels>
-    <labels>
         <fullName>Core_Duplicates_DismissedCount</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Duplicates panel: dismissed suggestion count label</shortDescription>
         <value>Dismissed suggestions</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ErrorNoActiveRule</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates: scan refused, no active duplicate rule</shortDescription>
-        <value>No duplicate rule for people or accounts is switched on, so there is nothing to scan with. Open Duplicate Rules in Setup and activate the standard rules, then scan again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ErrorNoSuggestion</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates: the suggestion no longer exists</shortDescription>
-        <value>This suggestion is no longer there. Somebody may have merged or dismissed it already. Refresh the page.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ErrorNoSuggestionAccess</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates: refusal when the user cannot use duplicate record sets.</shortDescription>
-        <value>You need the BarnCRM Duplicate Review permission set to scan, dismiss or merge from here. Salesforce gives it only to users with a Sales Cloud or Service Cloud license.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ErrorNotReviewable</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates: refusal for a suggestion that is not about people or households.</shortDescription>
-        <value>This suggestion is not about people or households, so it cannot be reviewed here.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ErrorNotThisPair</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates: refusal when a merge names records the suggestion does not.</shortDescription>
-        <value>Those households are not the ones in this suggestion. Refresh the page and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ErrorPermissionRequired</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates: action needs Manage BarnCRM Settings</shortDescription>
-        <value>Scanning, dismissing and merging from this panel need the Manage BarnCRM Settings permission. Ask your BarnCRM admin.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ErrorScanRunning</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates: a scan is already running</shortDescription>
-        <value>A duplicate scan is already running. Wait for it to finish, choose Refresh, and then scan again if you need to.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ErrorUnexpected</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates: unexpected error</shortDescription>
-        <value>Something went wrong and it has been recorded in the Error Log. Try again, and if it happens again, tell your administrator.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_LastScan</fullName>
@@ -169,44 +81,12 @@
         <value>keeping</value>
     </labels>
     <labels>
-        <fullName>Core_Duplicates_MergeSuccess</fullName>
+        <fullName>Core_Duplicates_CompareMerge</fullName>
         <categories>Duplicates</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Duplicates panel: merge done</shortDescription>
-        <value>The two households are now one.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_NoRulesNotice</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: no active rule notice</shortDescription>
-        <value>No duplicate rule for people or accounts is switched on, so nothing is being checked. Activate the standard rules in Setup to use this panel.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_NoSuggestionAccessNotice</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: why no suggestions are shown without the license bound access.</shortDescription>
-        <value>Suggestions need duplicate record set access, given only with Sales or Service Cloud licenses. Rules still run on save.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_PeopleMergeNotice</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: how to merge two people</shortDescription>
-        <value>To merge two people, open either one and use Compare and merge on the Potential Duplicates card.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ReadOnlyNotice</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: read only notice</shortDescription>
-        <value>You can see this list. Scanning, dismissing and merging here need the Manage BarnCRM Settings permission.</value>
+        <shortDescription>Duplicates panel: button that opens a person pair's first record to merge</shortDescription>
+        <value>Compare and Merge</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_RulesHeading</fullName>
@@ -223,54 +103,6 @@
         <protected>false</protected>
         <shortDescription>Duplicates panel: scan button</shortDescription>
         <value>Scan for Duplicates</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ScanFinished</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates: log entry when a scan finishes. {0} objects, {1} new pairs.</shortDescription>
-        <value>Duplicate scan of {0} finished: {1} new possible duplicates recorded.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ScanFinishedWithFailures</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates: scan finished with failures. {0} objects, {1} pairs, {2} failed.</shortDescription>
-        <value>Duplicate scan of {0} finished: {1} new possible duplicates recorded, but {2} batches of up to 50 records could not be checked. See the Error Log, fix the cause, and scan again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ScanRunning</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: a scan is running</shortDescription>
-        <value>A scan is running. Refresh the page in a minute to see what it found.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ScanStarted</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: scan started message</shortDescription>
-        <value>Scan started. It runs in the background, and suggestions appear here as they are found.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ShowingCount</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: how many suggestions are listed. {0} shown, {1} total.</shortDescription>
-        <value>Showing {0} of {1} suggestions, newest first.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ShowingCountMore</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: count past the cap; {0} shown, {1} the cap</shortDescription>
-        <value>Showing {0} of more than {1} suggestions, newest first.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_EmptyHeading</fullName>
@@ -295,14 +127,6 @@
         <protected>false</protected>
         <shortDescription>Duplicates panel: screen reader text after Different; {0} first record</shortDescription>
         <value>from {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_Duplicates_ComparedWithFirst</fullName>
-        <categories>Duplicates</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicates panel: line on a suggestion of three or more; {0} first record</shortDescription>
-        <value>Each record is compared with {0}, the first one.</value>
     </labels>
     <labels>
         <fullName>Core_Duplicates_Blank</fullName>

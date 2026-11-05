@@ -10,1755 +10,1758 @@
  */
 @NamespaceAccessible
 public with sharing class ImportObjectSchema {
-    @NamespaceAccessible
-    public static final String OPERATION_INSERT = 'Insert';
-    @NamespaceAccessible
-    public static final String OPERATION_UPDATE = 'Update by record Id';
-    /** Each row updates the record a field the user chose finds (R-IT12). */
-    @NamespaceAccessible
-    public static final String OPERATION_UPDATE_BY_FIELD = 'Update by a matching field';
-    @NamespaceAccessible
-    public static final String OPERATION_UPSERT = 'Upsert by external ID';
-    /** Deletes the records a file names, through the bulk delete job (R-BD7). */
-    @NamespaceAccessible
-    public static final String OPERATION_DELETE = 'Delete by record Id';
-
-    /**
-     * The most records an object may hold, counted in the user's access, for a field it does not
-     * index to be matched on (R-IT13, the large object guard).
-     */
-    @NamespaceAccessible
-    public static final Integer LARGE_OBJECT_ROWS = 100000;
-
-    /** The guard's ceiling, lowered by a test so it need not make 100,000 records. */
-    @TestVisible
-    private static Integer largeObjectRows = LARGE_OBJECT_ROWS;
-
-    /** Whether each object is over the guard's ceiling, counted once per transaction. */
-    private static Map<Schema.SObjectType, Boolean> large = new Map<Schema.SObjectType, Boolean>();
-
-    /** The field types a row or a lookup may be matched on beyond the record ID (R-IT13). */
-    private static final Set<Schema.DisplayType> MATCH_TYPES = new Set<Schema.DisplayType>{
-        Schema.DisplayType.STRING,
-        Schema.DisplayType.EMAIL,
-        Schema.DisplayType.PHONE
-    };
-
-    @NamespaceAccessible
-    public static final String LOOKUP_REJECT = 'Reject the row';
-    @NamespaceAccessible
-    public static final String LOOKUP_LEAVE_EMPTY = 'Leave it empty';
-
-    /** The attribute a row names its record by under Update by record Id. */
-    @NamespaceAccessible
-    public static final String ID_ATTRIBUTE = 'Id';
-
-    /** The objects a one-object load may only update (R-IT14): people and organizations. */
-    private static final Set<Schema.SObjectType> UPDATE_ONLY = new Set<Schema.SObjectType>{
-        Account.SObjectType,
-        Contact.SObjectType
-    };
-
-    /** The field types a file's text is read into; any other is not offered. */
-    @NamespaceAccessible
-    public static final Set<Schema.DisplayType> TEXT_TYPES = new Set<Schema.DisplayType>{
-        Schema.DisplayType.STRING,
-        Schema.DisplayType.TEXTAREA,
-        Schema.DisplayType.EMAIL,
-        Schema.DisplayType.PHONE,
-        Schema.DisplayType.URL,
-        Schema.DisplayType.PICKLIST,
-        Schema.DisplayType.MULTIPICKLIST,
-        Schema.DisplayType.ENCRYPTEDSTRING,
-        Schema.DisplayType.COMBOBOX
-    };
-
-    /** The global describe, asked once per transaction. */
-    private static Map<String, Schema.SObjectType> globalDescribe;
-
-    /** Each object's fields, described once per transaction. */
-    private static Map<Schema.SObjectType, Map<String, Schema.SObjectField>> fieldMaps = new Map<Schema.SObjectType, Map<String, Schema.SObjectField>>();
-
-    // -------------------------------------------------------------------------------------
-    // The template's choices
-    // -------------------------------------------------------------------------------------
-
-    /** True when this template loads one object rather than people and organizations. */
-    @NamespaceAccessible
-    public static Boolean loadsOneObject(Import_Template__c template) {
-        return template != null && String.isNotBlank(template.Target_Object__c);
-    }
-
-    /** The object this template loads, or null when the org has none of that name. */
-    @NamespaceAccessible
-    public static Schema.SObjectType typeOf(Import_Template__c template) {
-        return template == null ? null : typeNamed(template.Target_Object__c);
-    }
-
-    /** The object of this API name in this org, or null. */
-    @NamespaceAccessible
-    public static Schema.SObjectType typeNamed(String objectName) {
-        if (String.isBlank(objectName)) {
-            return null;
-        }
-        if (globalDescribe == null) {
-            globalDescribe = NamespaceUtil.globalDescribe();
-        }
-        String lower = objectName.trim().toLowerCase();
-        Schema.SObjectType found = globalDescribe.get(lower);
-        return found != null
-            ? found
-            : globalDescribe.get(NamespaceUtil.prefix().toLowerCase() + lower);
-    }
-
-    /** The template's load operation; an empty or unknown one is Insert. */
-    @NamespaceAccessible
-    public static String operationOf(Import_Template__c template) {
-        String chosen = template == null ? null : template.Load_Operation__c;
-        for (
-            String known : new List<String>{
-                OPERATION_UPDATE,
-                OPERATION_UPDATE_BY_FIELD,
-                OPERATION_UPSERT,
-                OPERATION_DELETE
-            }
-        ) {
-            if (known.equalsIgnoreCase(chosen)) {
-                return known;
-            }
-        }
-        return OPERATION_INSERT;
-    }
-
-    /**
-     * The template's operation as this object allows it: people and organizations keep the two
-     * updates (R-IT14) and a delete by record Id (R-BD7); anything else becomes Update by record Id.
-     */
-    @NamespaceAccessible
-    public static String operationFor(Schema.SObjectType type, Import_Template__c template) {
-        String chosen = operationOf(template);
-        return updatesOnly(type) &&
-            !neverCreates(chosen) &&
-            chosen != OPERATION_DELETE
-            ? OPERATION_UPDATE
-            : chosen;
-    }
-
-    /** Whether a lookup that finds no record leaves the lookup empty rather than rejecting. */
-    @NamespaceAccessible
-    public static Boolean leavesLookupEmpty(Import_Template__c template) {
-        return template != null &&
-            LOOKUP_LEAVE_EMPTY.equalsIgnoreCase(template.Lookup_Not_Found__c);
-    }
-
-    /**
-     * The field an upsert or an update by a matching field finds rows' records by, as describe
-     * names it, or null when it cannot.
-     */
-    @NamespaceAccessible
-    public static String keyFieldOf(Import_Template__c template) {
-        if (template == null) {
-            return null;
-        }
-        Schema.SObjectType type = typeOf(template);
-        return operationOf(template) == OPERATION_UPDATE_BY_FIELD
-            ? matchField(type, template.Load_Match_Field__c)
-            : keyField(type, template.Load_Match_Field__c);
-    }
-
-    /** True for the operations that change records and never create them. */
-    @NamespaceAccessible
-    public static Boolean neverCreates(String operation) {
-        return operation == OPERATION_UPDATE || operation == OPERATION_UPDATE_BY_FIELD;
-    }
-
-    /** True when a one-object load may only update records of this object (R-IT14). */
-    @NamespaceAccessible
-    public static Boolean updatesOnly(Schema.SObjectType type) {
-        return type != null && UPDATE_ONLY.contains(type);
-    }
-
-    // -------------------------------------------------------------------------------------
-    // What the wizard offers
-    // -------------------------------------------------------------------------------------
-
-    /**
-     * The objects a template may load (R-IT14): those `DataProtectedFields` admits that the
-     * user can read and query and can create or edit records of, sorted by label. Found in
-     * describe, so every object the org has is a candidate and Core names none.
-     */
-    @NamespaceAccessible
-    public static List<ImportMapping.Target> loadableObjects() {
-        Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
-        for (Schema.DescribeSObjectResult described : loadableDescribes()) {
-            byLabel.put(
-                described.getLabel() + '|' + described.getName(),
-                new ImportMapping.Target(described.getName(), described.getLabel())
-            );
-        }
-        return sortedValues(byLabel);
-    }
-
-    /** The describe of each object a template may load (R-IT14), in no order. */
-    private static List<Schema.DescribeSObjectResult> loadableDescribes() {
-        if (globalDescribe == null) {
-            globalDescribe = NamespaceUtil.globalDescribe();
-        }
-        List<Schema.DescribeSObjectResult> result = new List<Schema.DescribeSObjectResult>();
-        for (Schema.SObjectType type : globalDescribe.values()) {
-            Schema.DescribeSObjectResult described = type.getDescribe(
-                SObjectDescribeOptions.DEFERRED
-            );
-            Boolean writable = updatesOnly(type)
-                ? described.isUpdateable()
-                : described.isCreateable() || described.isUpdateable();
-            if (
-                !described.isAccessible() ||
-                !described.isQueryable() ||
-                !writable ||
-                DataProtectedFields.objectRefusal(type) != null
-            ) {
-                continue;
-            }
-            result.add(described);
-        }
-        return result;
-    }
-
-    // -------------------------------------------------------------------------------------
-    // What a file's names say (C-49a)
-    // -------------------------------------------------------------------------------------
-
-    /**
-     * The objects detection chooses among, set by a test so its names are unique by
-     * construction whatever objects the org has (Nonprofit Cloud adds many).
-     */
-    @TestVisible
-    private static List<Schema.SObjectType> detectionObjectsForTest;
-
-    /** The object each sheet points at, and the one suggested for the whole file. */
-    @NamespaceAccessible
-    public class Detection {
-        /** The suggested object's API name, or null. */
-        @NamespaceAccessible
-        public String suggested;
-        /** Each sheet's object API name (null where it names none), in the order given. */
-        @NamespaceAccessible
-        public List<String> bySheet = new List<String>();
-        /**
-         * Every object each sheet's two-part headings name, in the order they first appear, for
-         * an upload of several objects (R-IT20).
-         */
-        @NamespaceAccessible
-        public List<List<String>> namedBySheet = new List<List<String>>();
-        /** The label of every object named above, by API name. */
-        @NamespaceAccessible
-        public Map<String, String> labels = new Map<String, String>();
-        /** True when the suggested object is a best guess from a near spelling (C-49e). */
-        @NamespaceAccessible
-        public Boolean suggestedGuessed = false;
-        /** For each sheet, whether its object is a best guess (C-49e). */
-        @NamespaceAccessible
-        public List<Boolean> guessedBySheet = new List<Boolean>();
-    }
-
-    /**
-     * The object a file points at (C-49a), for a one-object load with no object chosen yet: for
-     * each sheet, from its two-part headings and then its name; for the file, the first sheet
-     * that names one, then the file name. Exact matches only, among the objects the user may
-     * load, by label, plural label or API name.
-     *
-     * @param fileName the file's name, extension included
-     * @param sheetNames each sheet's name (one blank name for a text file)
-     * @param headersBySheet each sheet's headings, in the same order
-     */
-    @NamespaceAccessible
-    public static Detection detectObject(
-        String fileName,
-        List<String> sheetNames,
-        List<List<String>> headersBySheet
-    ) {
-        List<Schema.DescribeSObjectResult> loadable = new List<Schema.DescribeSObjectResult>();
-        if (detectionObjectsForTest == null) {
-            loadable = loadableDescribes();
-        } else {
-            for (Schema.SObjectType type : detectionObjectsForTest) {
-                loadable.add(type.getDescribe(SObjectDescribeOptions.DEFERRED));
-            }
-        }
-        Map<String, String> keys = objectKeys(loadable);
-        DescribedFieldKeys fields = new DescribedFieldKeys();
-        Detection result = new Detection();
-        for (Integer i = 0; i < sheetNames.size(); i++) {
-            List<String> headers = i < headersBySheet.size() ? headersBySheet[i] : null;
-            String found = ImportHeaderParser.objectOfHeaders(headers, keys, fields);
-            if (found == null) {
-                found = ImportHeaderParser.objectOfName(sheetNames[i], keys);
-            }
-            result.bySheet.add(found);
-            result.guessedBySheet.add(false);
-            if (result.suggested == null) {
-                result.suggested = found;
-            }
-            result.namedBySheet.add(namedObjects(headers, keys, fields));
-        }
-        if (result.suggested == null) {
-            result.suggested = ImportHeaderParser.objectOfFileName(fileName, keys);
-        }
-        if (result.suggested == null) {
-            guessObject(result, fileName, sheetNames, keys);
-        }
-        Set<String> anyNamed = new Set<String>();
-        for (List<String> named : result.namedBySheet) {
-            anyNamed.addAll(named);
-        }
-        for (Schema.DescribeSObjectResult described : loadable) {
-            Boolean named =
-                described.getName() == result.suggested ||
-                result.bySheet.contains(described.getName()) ||
-                anyNamed.contains(described.getName());
-            if (named) {
-                result.labels.put(described.getName(), described.getLabel());
-            }
-        }
-        return result;
-    }
-
-    /**
-     * When nothing in the file names an object exactly, a near spelling of a sheet's name, then
-     * of the file's name ("Contcts.csv"), as a best guess the wizard flags (C-49e).
-     */
-    private static void guessObject(
-        Detection result,
-        String fileName,
-        List<String> sheetNames,
-        Map<String, String> keys
-    ) {
-        for (Integer i = 0; i < sheetNames.size(); i++) {
-            ImportHeaderParser.Found named = ImportHeaderParser.objectOfNameOrGuess(
-                sheetNames[i],
-                keys
-            );
-            if (named != null) {
-                result.bySheet[i] = named.name;
-                result.guessedBySheet[i] = named.guessed;
-                if (result.suggested == null) {
-                    result.suggested = named.name;
-                    result.suggestedGuessed = named.guessed;
-                }
-            }
-        }
-        if (result.suggested == null) {
-            ImportHeaderParser.Found named = ImportHeaderParser.objectOfFileNameOrGuess(
-                fileName,
-                keys
-            );
-            if (named != null) {
-                result.suggested = named.name;
-                result.suggestedGuessed = named.guessed;
-            }
-        }
-    }
-
-    /** Every object these headings name as two-part headings, in the order first named. */
-    private static List<String> namedObjects(
-        List<String> headers,
-        Map<String, String> keys,
-        DescribedFieldKeys fields
-    ) {
-        List<String> result = new List<String>();
-        for (String header : headers == null ? new List<String>() : headers) {
-            ImportHeaderParser.Resolved named = ImportHeaderParser.resolve(header, keys, fields);
-            if (named != null && !result.contains(named.objectName)) {
-                result.add(named.objectName);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * The mapping suggested for one sheet of an upload of several objects (R-IT20): a heading
-     * that is a field of the sheet's object maps to it; a two-part heading to the field of the
-     * listed object it names (`Contact.LastName` on a sheet of accounts); any other is Do not
-     * load. Targets are `<object API name>.<field>`, each field once.
-     *
-     * @param types the objects the upload loads
-     * @param sheetType the sheet's object, or null for none
-     * @param headers the sheet's headings
-     */
-    @NamespaceAccessible
-    public static ImportMapping suggestSeveralMapping(
-        List<Schema.SObjectType> types,
-        Schema.SObjectType sheetType,
-        List<String> headers
-    ) {
-        ImportMapping mapping = new ImportMapping();
-        List<Schema.DescribeSObjectResult> listed = new List<Schema.DescribeSObjectResult>();
-        for (Schema.SObjectType type : types) {
-            if (type != null) {
-                listed.add(type.getDescribe(SObjectDescribeOptions.DEFERRED));
-            }
-        }
-        Map<String, String> keys = objectKeys(listed);
-        DescribedFieldKeys fields = new DescribedFieldKeys();
-        Map<String, String> known = sheetType == null
-            ? new Map<String, String>()
-            : fieldKeys(sheetType);
-        String sheetName = sheetType == null
-            ? null
-            : sheetType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
-        List<String> given = headers == null ? new List<String>() : headers;
-        List<String> targets = new List<String>();
-        List<Boolean> named = new List<Boolean>();
-        Set<String> used = new Set<String>();
-        // Exact readings first, across every heading, so a guess never takes their field.
-        for (String header : given) {
-            String field = known.get(normalized(header));
-            String target = field == null ? null : sheetName + '.' + field;
-            if (target == null) {
-                ImportHeaderParser.Resolved reading = ImportHeaderParser.resolve(
-                    header,
-                    keys,
-                    fields
-                );
-                target = reading == null ? null : reading.objectName + '.' + reading.fieldName;
-            }
-            named.add(target != null);
-            targets.add(target != null && used.add(target.toLowerCase()) ? target : null);
-        }
-        // Then a best guess for each heading nothing names exactly (C-49e).
-        Map<String, String> guessable = guessableKeys(known);
-        List<Boolean> guessed = new List<Boolean>();
-        for (Integer i = 0; i < given.size(); i++) {
-            String target = null;
-            if (!named[i]) {
-                String field = sheetName == null
-                    ? null
-                    : ImportHeaderParser.guess(given[i], guessable);
-                target = field == null ? null : sheetName + '.' + field;
-                if (target == null) {
-                    ImportHeaderParser.Resolved reading = ImportHeaderParser.resolveOrGuess(
-                        given[i],
-                        keys,
-                        fields
-                    );
-                    target = reading == null || !reading.guessed
-                        ? null
-                        : reading.objectName + '.' + reading.fieldName;
-                }
-            }
-            Boolean guessMaps = target != null && used.add(target.toLowerCase());
-            if (guessMaps) {
-                targets[i] = target;
-            }
-            guessed.add(guessMaps);
-        }
-        for (Integer i = 0; i < given.size(); i++) {
-            mapping.columns.add(column(given[i], targets[i], guessed[i]));
-        }
-        return mapping;
-    }
-
-    /** A suggested column: Do not load without a target, and flagged when a guess (C-49e). */
-    private static ImportMapping.Column column(String header, String target, Boolean guessed) {
-        ImportMapping.Column result = new ImportMapping.Column(
-            header,
-            target == null ? ImportMapping.TARGET_IGNORE : target
-        );
-        if (target != null && guessed) {
-            result.guessed = true;
-        }
-        return result;
-    }
-
-    /**
-     * A field map without the record ID's spellings: a column is never guessed to be the
-     * record ID, which decides which records an update changes (C-49e).
-     */
-    private static Map<String, String> guessableKeys(Map<String, String> known) {
-        Map<String, String> result = new Map<String, String>();
-        for (String key : known.keySet()) {
-            if (known.get(key) != ID_ATTRIBUTE) {
-                result.put(key, known.get(key));
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Each object's spellings, normalized: label, plural label, API name, and the API name
-     * without the namespace and without "__c". A spelling two objects share names neither.
-     */
-    private static Map<String, String> objectKeys(List<Schema.DescribeSObjectResult> objects) {
-        Map<String, String> keys = new Map<String, String>();
-        for (Schema.DescribeSObjectResult described : objects) {
-            String name = described.getName();
-            String local = localName(name.toLowerCase());
-            for (
-                String spelling : new List<String>{
-                    described.getLabel(),
-                    described.getLabelPlural(),
-                    name,
-                    local,
-                    local.removeEnd('__c')
-                }
-            ) {
-                ImportHeaderParser.putKey(keys, spelling, name);
-            }
-        }
-        return keys;
-    }
-
-    /** An object's field spellings from describe, for `ImportHeaderParser`, read once per use. */
-    private class DescribedFieldKeys implements ImportHeaderParser.FieldKeys {
-        private Map<String, Map<String, String>> byObject = new Map<String, Map<String, String>>();
-
-        public Map<String, String> keysOf(String objectName) {
-            if (!byObject.containsKey(objectName)) {
-                byObject.put(objectName, fieldKeys(typeNamed(objectName)));
-            }
-            return byObject.get(objectName);
-        }
-    }
-
-    /**
-     * The operations a load of this object may use: the two updates only for people (R-IT14),
-     * and Delete by record Id for a person who may bulk delete records of it (R-BD7).
-     */
-    @NamespaceAccessible
-    public static List<String> operationsFor(Schema.SObjectType type) {
-        List<String> result = updatesOnly(type)
-            ? new List<String>{ OPERATION_UPDATE, OPERATION_UPDATE_BY_FIELD }
-            : new List<String>{
-                  OPERATION_INSERT,
-                  OPERATION_UPDATE,
-                  OPERATION_UPDATE_BY_FIELD,
-                  OPERATION_UPSERT
-              };
-        if (deleteRefusal(type) == null) {
-            result.add(OPERATION_DELETE);
-        }
-        return result;
-    }
-
-    /**
-     * Why the running user may not delete records of this object by file, or null (R-BD7): the
-     * bulk delete permission and the bulk delete's object rules (R-BD4).
-     */
-    @NamespaceAccessible
-    public static String deleteRefusal(Schema.SObjectType type) {
-        if (!FeatureManagement.checkPermission(BulkDeleteController.PERMISSION)) {
-            return Label.Core_Import_ErrorDeleteNeedsPermission;
-        }
-        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
-        String reason = BulkDeleteService.objectReason(described);
-        return reason == null
-            ? null
-            : String.format(
-                  Label.Core_BulkDelete_ErrorObject,
-                  new List<String>{ described.getLabelPlural(), reason }
-              );
-    }
-
-    /**
-     * The fields a column may fill (R-IT12): the record ID first, then every field the user may
-     * create or edit that is not protected and holds a type a file's text can be read into,
-     * sorted by label. Values are field API names.
-     */
-    @NamespaceAccessible
-    public static List<ImportMapping.Target> writableFields(Schema.SObjectType type) {
-        List<ImportMapping.Target> result = new List<ImportMapping.Target>{
-            new ImportMapping.Target(ID_ATTRIBUTE, Label.Core_Import_RecordIdOption)
-        };
-        if (type == null) {
-            return result;
-        }
-        Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
-        for (Schema.SObjectField token : fieldsOf(type).values()) {
-            Schema.DescribeFieldResult field = token.getDescribe();
-            if (isWritable(type, field)) {
-                byLabel.put(
-                    field.getLabel() + '|' + field.getName(),
-                    new ImportMapping.Target(field.getName(), field.getLabel())
-                );
-            }
-        }
-        result.addAll(sortedValues(byLabel));
-        return result;
-    }
-
-    /**
-     * The fields an upsert may match on (R-IT12): the object's External ID fields holding text
-     * or an email that the user may read. Upsert is the platform's own meaning, so a unique
-     * field that is not an external ID is not offered.
-     */
-    @NamespaceAccessible
-    public static List<ImportMapping.Target> keyFields(Schema.SObjectType type) {
-        List<ImportMapping.Target> result = new List<ImportMapping.Target>();
-        for (Schema.DescribeFieldResult field : ImportMatcher.matchableFields(type)) {
-            if (field.isExternalId()) {
-                result.add(new ImportMapping.Target(field.getName(), field.getLabel()));
-            }
-        }
-        return result;
-    }
-
-    /** The field's API name when an upsert may match on it, or null. Blank is null. */
-    @NamespaceAccessible
-    public static String keyField(Schema.SObjectType type, String fieldName) {
-        if (type == null || String.isBlank(fieldName)) {
-            return null;
-        }
-        for (ImportMapping.Target candidate : keyFields(type)) {
-            if (sameField(candidate.value, fieldName)) {
-                return candidate.value;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * The fields rows or lookups may be matched on beyond the record ID (R-IT12, R-IT13): every
-     * text, email or phone field of the object that the user may read and filter on, sorted by
-     * label. The large object guard (`unselective`) decides later whether one may be searched.
-     */
-    @NamespaceAccessible
-    public static List<ImportMapping.Target> matchFields(Schema.SObjectType type) {
-        Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
-        if (type == null) {
-            return new List<ImportMapping.Target>();
-        }
-        for (Schema.SObjectField token : fieldsOf(type).values()) {
-            Schema.DescribeFieldResult field = token.getDescribe();
-            if (
-                MATCH_TYPES.contains(field.getType()) &&
-                field.isAccessible() &&
-                field.isFilterable()
-            ) {
-                byLabel.put(
-                    field.getLabel() + '|' + field.getName(),
-                    new ImportMapping.Target(field.getName(), field.getLabel())
-                );
-            }
-        }
-        return sortedValues(byLabel);
-    }
-
-    /** The field's API name when rows may be matched on it (`matchFields`), or null. */
-    @NamespaceAccessible
-    public static String matchField(Schema.SObjectType type, String fieldName) {
-        if (type == null || String.isBlank(fieldName)) {
-            return null;
-        }
-        for (ImportMapping.Target candidate : matchFields(type)) {
-            if (sameField(candidate.value, fieldName)) {
-                return candidate.value;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Whether the platform indexes this field, so a search by it stays quick on any number of
-     * records (R-IT13): the record ID, the name field, a field marked External ID or Unique, and
-     * a standard Email field (Email, or PersonEmail on a person Account, R-VH3; the query planner
-     * leads an Account PersonEmail filter with the Contact Email index). Custom indexes cannot be
-     * seen from Apex, so they are not counted.
-     */
-    @NamespaceAccessible
-    public static Boolean isIndexed(Schema.SObjectType type, String fieldName) {
-        if (ID_ATTRIBUTE.equalsIgnoreCase(fieldName)) {
-            return true;
-        }
-        Schema.SObjectField token = fieldNamed(type, fieldName);
-        if (token == null) {
-            return false;
-        }
-        Schema.DescribeFieldResult field = token.getDescribe();
-        return field.isNameField() ||
-            field.isExternalId() ||
-            field.isUnique() ||
-            (!field.isCustom() &&
-            field.getType() == Schema.DisplayType.EMAIL &&
-            (field.getName() == 'Email' ||
-            field.getName() == 'PersonEmail'));
-    }
-
-    /**
-     * Why rows cannot be matched on this field of this object, or null (R-IT13, the large object
-     * guard): a field the platform does not index, on an object holding more than
-     * LARGE_OBJECT_ROWS records the user can see, would be searched by reading the whole object,
-     * which is slow and can time out. Counted once per object per transaction, the count capped
-     * one past the ceiling.
-     */
-    @NamespaceAccessible
-    public static String unselective(Schema.SObjectType type, String fieldName) {
-        if (type == null || String.isBlank(fieldName) || isIndexed(type, fieldName)) {
-            return null;
-        }
-        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
-        if (!large.containsKey(type)) {
-            Integer counted = Database.countQueryWithBinds(
-                'SELECT COUNT() FROM ' +
-                    String.escapeSingleQuotes(described.getName()) +
-                    ' LIMIT :cap',
-                new Map<String, Object>{ 'cap' => largeObjectRows + 1 },
-                AccessLevel.USER_MODE
-            );
-            large.put(type, counted > largeObjectRows);
-        }
-        if (!large.get(type)) {
-            return null;
-        }
-        return String.format(
-            Label.Core_Import_ErrorFieldNotSelective,
-            new List<String>{
-                labelOf(type, fieldName),
-                described.getLabelPlural(),
-                largeObjectRows.format()
-            }
-        );
-    }
-
-    /**
-     * The fields a lookup column may name its parent by (R-IT13): the record ID, the parent's
-     * name field, and any text, email or phone field of the parent the user may read and filter
-     * on (`matchFields`). A lookup that can point at more than one object is named by record ID
-     * only, as is a field that is not a lookup of this object.
-     */
-    @NamespaceAccessible
-    public static List<ImportMapping.Target> parentFields(
-        Schema.SObjectType type,
-        String lookupName
-    ) {
-        List<ImportMapping.Target> result = new List<ImportMapping.Target>{
-            new ImportMapping.Target(ID_ATTRIBUTE, Label.Core_Import_RecordIdOption)
-        };
-        Schema.SObjectType parent = parentOf(type, lookupName);
-        if (parent == null) {
-            return result;
-        }
-        Set<String> offered = new Set<String>();
-        String nameField = nameFieldOf(parent);
-        if (nameField != null) {
-            Schema.DescribeFieldResult name = fieldNamed(parent, nameField).getDescribe();
-            result.add(new ImportMapping.Target(name.getName(), name.getLabel()));
-            offered.add(name.getName().toLowerCase());
-        }
-        for (ImportMapping.Target field : matchFields(parent)) {
-            if (!offered.contains(field.value.toLowerCase())) {
-                result.add(field);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * The one object this lookup field of this object points at, or null when it is not a
-     * lookup, points at several objects, or the object has no such field.
-     */
-    @NamespaceAccessible
-    public static Schema.SObjectType parentOf(Schema.SObjectType type, String lookupName) {
-        if (type == null) {
-            return null;
-        }
-        Schema.SObjectField token = fieldNamed(type, lookupName);
-        if (token == null) {
-            return null;
-        }
-        List<Schema.SObjectType> parents = token.getDescribe().getReferenceTo();
-        return parents.size() == 1 ? parents[0] : null;
-    }
-
-    /** The parent field as describe names it when a lookup may name its parent by it, or null. */
-    @NamespaceAccessible
-    public static String parentField(Schema.SObjectType parent, String fieldName) {
-        if (parent == null || String.isBlank(fieldName)) {
-            return null;
-        }
-        String nameField = nameFieldOf(parent);
-        if (nameField != null && sameField(nameField, fieldName)) {
-            return nameField;
-        }
-        return matchField(parent, fieldName);
-    }
-
-    /** The object's name field when the user may read and filter on it, or null. */
-    @NamespaceAccessible
-    public static String nameFieldOf(Schema.SObjectType type) {
-        if (type == null) {
-            return null;
-        }
-        for (Schema.SObjectField token : fieldsOf(type).values()) {
-            Schema.DescribeFieldResult field = token.getDescribe();
-            if (field.isNameField() && field.isAccessible() && field.isFilterable()) {
-                return field.getName();
-            }
-        }
-        return null;
-    }
-
-    /**
-     * A mapping suggested from a file's header row (R-IT12): a heading that is a writable
-     * field's label or API name, ignoring case, spaces and punctuation, is mapped to it, and Id
-     * or Record Id to the record ID. A second heading for one field is left for the
-     * administrator.
-     *
-     * A heading that names this object and a field together ("Contact.First Name", "Phone
-     * (Contact)", C-49a) maps to that field; the whole heading is tried as a field first, and a
-     * heading naming another object is Do not load.
-     *
-     * Once every exact heading is mapped, a heading nothing names exactly gets a best guess
-     * from a near spelling of a field ("Frist Name", "Contcts.Emial"), flagged as guessed for
-     * the administrator to accept (C-49e). Never the record ID, and never a field already taken.
-     */
-    @NamespaceAccessible
-    public static ImportMapping suggestMapping(Schema.SObjectType type, List<String> headers) {
-        ImportMapping mapping = new ImportMapping();
-        if (headers == null) {
-            return mapping;
-        }
-        Map<String, String> known = fieldKeys(type);
-        Map<String, String> thisObject = type == null
-            ? new Map<String, String>()
-            : objectKeys(
-                  new List<Schema.DescribeSObjectResult>{
-                      type.getDescribe(SObjectDescribeOptions.DEFERRED)
-                  }
-              );
-        DescribedFieldKeys fields = new DescribedFieldKeys();
-        Set<String> used = new Set<String>();
-        List<String> targets = new List<String>();
-        List<Boolean> named = new List<Boolean>();
-        for (String header : headers) {
-            String field = known.get(normalized(header));
-            if (field == null && !thisObject.isEmpty()) {
-                ImportHeaderParser.Resolved reading = ImportHeaderParser.resolve(
-                    header,
-                    thisObject,
-                    fields
-                );
-                field = reading == null ? null : reading.fieldName;
-            }
-            named.add(field != null);
-            targets.add(field != null && used.add(field) ? field : null);
-        }
-        Map<String, String> guessable = guessableKeys(known);
-        for (Integer i = 0; i < headers.size(); i++) {
-            String field = null;
-            if (!named[i] && type != null) {
-                // A heading naming this object reads as object plus field, so it never takes
-                // a whole-heading guess; one naming another object is not guessed onto this
-                // one at all (D-150).
-                Boolean namesThis =
-                    !thisObject.isEmpty() && ImportHeaderParser.namesObject(headers[i], thisObject);
-                Boolean namesOther =
-                    !namesThis && ImportHeaderParser.namesObject(headers[i], allObjectKeys());
-                if (!namesThis && !namesOther) {
-                    field = ImportHeaderParser.guess(headers[i], guessable);
-                }
-                if (field == null && !namesOther && !thisObject.isEmpty()) {
-                    ImportHeaderParser.Resolved reading = ImportHeaderParser.resolveOrGuess(
-                        headers[i],
-                        thisObject,
-                        fields
-                    );
-                    field = reading == null || !reading.guessed ? null : reading.fieldName;
-                }
-            }
-            Boolean guessMaps = field != null && used.add(field);
-            String target = guessMaps ? field : targets[i];
-            mapping.columns.add(
-                column(
-                    headers[i],
-                    target == null ? null : ImportMapping.ENTITY_RECORD + '.' + target,
-                    guessMaps
-                )
-            );
-        }
-        return mapping;
-    }
-
-    private static Map<String, String> allObjectKeysCache;
-
-    /** Every object's API name by its normalized spelling, to tell a heading that names one. */
-    private static Map<String, String> allObjectKeys() {
-        if (allObjectKeysCache == null) {
-            allObjectKeysCache = new Map<String, String>();
-            for (String name : Schema.getGlobalDescribe().keySet()) {
-                allObjectKeysCache.put(normalized(localName(name).removeEnd('__c')), name);
-                allObjectKeysCache.put(normalized(name), name);
-            }
-        }
-        return allObjectKeysCache;
-    }
-
-    /**
-     * A writable field's API name by each normalized spelling (label, API name, API name without
-     * the namespace and "__c"), and the record ID by Id, Record Id and Salesforce Record Id. The
-     * first field to claim a spelling keeps it. Not cached: what is writable is the running
-     * user's access.
-     */
-    private static Map<String, String> fieldKeys(Schema.SObjectType type) {
-        Map<String, String> known = new Map<String, String>{
-            'id' => ID_ATTRIBUTE,
-            'recordid' => ID_ATTRIBUTE,
-            'salesforcerecordid' => ID_ATTRIBUTE
-        };
-        if (type != null) {
-            for (Schema.SObjectField token : fieldsOf(type).values()) {
-                Schema.DescribeFieldResult field = token.getDescribe();
-                if (!isWritable(type, field)) {
-                    continue;
-                }
-                for (
-                    String spelling : new List<String>{
-                        normalized(field.getLabel()),
-                        normalized(localName(field.getName().toLowerCase()).removeEnd('__c')),
-                        normalized(field.getName())
-                    }
-                ) {
-                    if (!known.containsKey(spelling)) {
-                        known.put(spelling, field.getName());
-                    }
-                }
-            }
-        }
-        return known;
-    }
-
-    // -------------------------------------------------------------------------------------
-    // Refusals before any row is read
-    // -------------------------------------------------------------------------------------
-
-    /**
-     * Why this template cannot load its rows, or null (R-IT12, R-IT14): an object that is gone
-     * or protected, an operation people do not allow, access the operation needs and the user
-     * lacks, no column mapped to the object, the key column an update or an upsert needs, a
-     * value for every row that names the record, and a field searched by that the large object
-     * guard refuses (R-IT13). Asked when a run starts and in every chunk.
-     */
-    @NamespaceAccessible
-    public static String refusal(Import_Template__c template, ImportMapping mapping) {
-        if (mapping != null && mapping.loadsSeveralObjects()) {
-            return severalRefusal(template, mapping);
-        }
-        Schema.SObjectType type = typeOf(template);
-        String refused = DataProtectedFields.objectRefusal(type);
-        if (refused != null) {
-            return refused;
-        }
-        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
-        List<String> plural = new List<String>{ described.getLabelPlural() };
-        String operation = operationOf(template);
-        Boolean byId = operation == OPERATION_UPDATE || operation == OPERATION_DELETE;
-        if (operation == OPERATION_DELETE) {
-            String cannotDelete = deleteRefusal(type);
-            if (cannotDelete != null) {
-                return cannotDelete;
-            }
-        } else if (updatesOnly(type) && !neverCreates(operation)) {
-            return String.format(Label.Core_Import_ErrorPeopleUpdateOnly, plural);
-        }
-        if (!canRun(described, operation)) {
-            return String.format(Label.Core_Import_ErrorObjectNoAccess, plural);
-        }
-        ImportMapping given = mapping == null ? new ImportMapping() : mapping;
-        Set<String> attributes = given.recordAttributes();
-        if (attributes.isEmpty()) {
-            return Label.Core_Import_ErrorNothingMapped;
-        }
-        String key = byId ? ID_ATTRIBUTE : null;
-        if (byId && !attributes.contains(ID_ATTRIBUTE.toLowerCase())) {
-            return Label.Core_Import_ErrorIdColumnMissing;
-        }
-        if (operation == OPERATION_UPSERT || operation == OPERATION_UPDATE_BY_FIELD) {
-            Boolean byKey = operation == OPERATION_UPSERT;
-            String chosen = template.Load_Match_Field__c;
-            if (String.isBlank(chosen)) {
-                return byKey
-                    ? Label.Core_Import_ErrorKeyFieldRequired
-                    : Label.Core_Import_ErrorMatchFieldRequired;
-            }
-            key = byKey ? keyField(type, chosen) : matchField(type, chosen);
-            if (key == null) {
-                return String.format(
-                    byKey
-                        ? Label.Core_Import_ErrorKeyFieldUnusable
-                        : Label.Core_Import_ErrorMatchFieldUnusable,
-                    new List<String>{ chosen.trim().abbreviate(80) }
-                );
-            }
-            if (!mapsField(attributes, key)) {
-                return String.format(
-                    byKey
-                        ? Label.Core_Import_ErrorKeyColumnMissing
-                        : Label.Core_Import_ErrorMatchColumnMissing,
-                    new List<String>{ labelOf(type, key) }
-                );
-            }
-        }
-        if (key != null && givesEveryRow(given, key)) {
-            return String.format(
-                Label.Core_Import_ErrorKeyForEveryRow,
-                new List<String>{
-                    key == ID_ATTRIBUTE ? Label.Core_Import_RecordIdOption : labelOf(type, key)
-                }
-            );
-        }
-        String slow = slowSearch(type, key, given);
-        return slow != null ? slow : relatedRefusal(template, type, operation, given);
-    }
-
-    /**
-     * The large object guard over every field this template searches by (R-IT13): the field
-     * rows find their record by, and each lookup column's parent field.
-     */
-    private static String slowSearch(Schema.SObjectType type, String key, ImportMapping mapping) {
-        String refused = key == null ? null : unselective(type, key);
-        return refused != null ? refused : slowLookups(type, mapping.lookupFieldsByAttribute());
-    }
-
-    /** The same guard over the lookup columns of one object, keyed by lookup field. */
-    private static String slowLookups(Schema.SObjectType type, Map<String, String> lookups) {
-        String refused;
-        for (String attribute : lookups.keySet()) {
-            Schema.SObjectType parent = parentOf(type, attribute);
-            String field = parentField(parent, lookups.get(attribute));
-            refused = field == null ? null : unselective(parent, field);
-            if (refused != null) {
-                return refused;
-            }
-        }
-        return null;
-    }
-
-    // -------------------------------------------------------------------------------------
-    // Related records (R-IT17)
-    // -------------------------------------------------------------------------------------
-
-    /** True when this one-object template also creates related records from its rows. */
-    @NamespaceAccessible
-    public static Boolean loadsRelated(Import_Template__c template) {
-        return loadsOneObject(template) && String.isNotBlank(template.Related_Object__c);
-    }
-
-    /** The template's related object, or null for none or one the org does not have. */
-    @NamespaceAccessible
-    public static Schema.SObjectType relatedTypeOf(Import_Template__c template) {
-        return loadsRelated(template) ? typeNamed(template.Related_Object__c) : null;
-    }
-
-    /**
-     * The related object's field that points at the parent, as describe names it, when it is a
-     * lookup or master-detail to the parent object alone that the user may fill in on a new
-     * record; else null.
-     */
-    @NamespaceAccessible
-    public static String relatedParentField(
-        Schema.SObjectType parent,
-        Schema.SObjectType related,
-        String fieldName
-    ) {
-        Schema.SObjectField token = related == null ? null : fieldNamed(related, fieldName);
-        return parent != null && token != null ? pointsAt(token.getDescribe(), parent) : null;
-    }
-
-    /** The field's name when it points at this object alone and may be filled in, or null. */
-    private static String pointsAt(Schema.DescribeFieldResult field, Schema.SObjectType parent) {
-        List<Schema.SObjectType> parents = field.getReferenceTo();
-        return parents.size() == 1 &&
-            parents[0] == parent &&
-            field.isCreateable()
-            ? field.getName()
-            : null;
-    }
-
-    /**
-     * The related records a load of this object may create (R-IT17): each object a load may
-     * insert (R-IT14) with a field pointing at this object alone that the user may fill in.
-     * Values are `Object.Field`; labels name the object and the field.
-     */
-    @NamespaceAccessible
-    public static List<ImportMapping.Target> relatedOptions(Schema.SObjectType type) {
-        Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
-        if (type == null) {
-            return new List<ImportMapping.Target>();
-        }
-        for (Schema.ChildRelationship relationship : type.getDescribe().getChildRelationships()) {
-            String field = pointsAt(relationship.getField().getDescribe(), type);
-            Schema.SObjectType child = relationship.getChildSObject();
-            if (field == null || insertRefusal(child) != null) {
-                continue;
-            }
-            Schema.DescribeSObjectResult described = child.getDescribe(
-                SObjectDescribeOptions.DEFERRED
-            );
-            String label = String.format(
-                Label.Core_Format_Parenthetical,
-                new List<String>{ described.getLabel(), labelOf(child, field) }
-            );
-            String value = described.getName() + '.' + field;
-            byLabel.put(label + '|' + value, new ImportMapping.Target(value, label));
-        }
-        return sortedValues(byLabel);
-    }
-
-    /** Why a load may not create records of this object (R-IT14), or null. */
-    @NamespaceAccessible
-    public static String insertRefusal(Schema.SObjectType type) {
-        String refused = DataProtectedFields.objectRefusal(type);
-        if (refused != null) {
-            return refused;
-        }
-        Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
-        return updatesOnly(type) || !canRun(described, OPERATION_INSERT)
-            ? String.format(
-                  Label.Core_Import_ErrorRelatedObjectUnusable,
-                  new List<String>{ described.getLabelPlural() }
-              )
-            : null;
-    }
-
-    /**
-     * Why this template's related records cannot load (R-IT17), or null: Insert, which has no
-     * parent key; a related object a load may not create; a parent field that does not point at
-     * the target object alone or that the user may not fill in; and the large object guard over
-     * the related lookup columns.
-     */
-    private static String relatedRefusal(
-        Import_Template__c template,
-        Schema.SObjectType type,
-        String operation,
-        ImportMapping mapping
-    ) {
-        if (!loadsRelated(template)) {
-            return null;
-        }
-        if (operation == OPERATION_INSERT) {
-            return Label.Core_Import_ErrorRelatedNeedsKey;
-        }
-        Schema.SObjectType related = relatedTypeOf(template);
-        String refused = insertRefusal(related);
-        if (refused != null) {
-            return refused;
-        }
-        if (relatedParentField(type, related, template.Related_Parent_Field__c) == null) {
-            return String.format(
-                Label.Core_Import_ErrorRelatedFieldUnusable,
-                new List<String>{
-                    related.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel(),
-                    type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
-                }
-            );
-        }
-        return slowLookups(related, mapping.lookupFieldsByAttribute(ImportMapping.ENTITY_RELATED));
-    }
-
-    // -------------------------------------------------------------------------------------
-    // Load steps: one object, related records, several objects (R-IT20; ADR-0147)
-    // -------------------------------------------------------------------------------------
-
-    /**
-     * One object a chunk loads, in load order (R-IT20). A one-object template is one step;
-     * with related records (R-IT17) two, the related record linked to its row's record; an
-     * upload of several objects one per object, parents first.
-     */
-    public class Step {
-        /** The step as a one-object template: its object, operation and key field. */
-        public Import_Template__c template;
-        /** The step's columns and values for every row, as `Record` targets. */
-        public ImportMapping mapping;
-        /** The entity the step's columns have in the template's mapping. */
-        public String entity;
-        public Schema.SObjectType type;
-        /** For each earlier step this object points at, that step's index to the field. */
-        public Map<Integer, String> links = new Map<Integer, String>();
-        /** Later rows of a key load nothing new and link to the first row's record. */
-        public Boolean groupsRepeats = false;
-        /** Writes the record key's digest on the row, so later chunks see repeats. */
-        public Boolean keepsDigest = false;
-        /** Every row loads the step, even one without a value for it. */
-        public Boolean everyRow = false;
-        /** A row loads the step only with a value of its own, not one for every row. */
-        public Boolean needsOwnValue = false;
-        /** The related records of R-IT17, which keep their own row results. */
-        public Boolean related = false;
-
-        /** The object's label, or the name the mapping gives when the org has no such object. */
-        public String label() {
-            return type == null
-                ? entity
-                : type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
-        }
-    }
-
-    /** The link field of each child and parent object, worked out once a transaction. */
-    private static Map<String, String> linkFields = new Map<String, String>();
-
-    /**
-     * Every object an upload of several objects lists, mapped or not, in load order, for the
-     * wizard to offer (R-IT20). Empty for any other template.
-     */
-    public static List<Step> listedSteps(Import_Template__c template, ImportMapping mapping) {
-        return mapping != null && mapping.loadsSeveralObjects()
-            ? severalSteps(template, mapping, false)
-            : new List<Step>();
-    }
-
-    /** The steps a chunk of this template loads, in load order (R-IT17, R-IT20). */
-    public static List<Step> steps(Import_Template__c template, ImportMapping mapping) {
-        ImportMapping given = mapping == null ? new ImportMapping() : mapping;
-        if (given.loadsSeveralObjects()) {
-            return severalSteps(template, given, true);
-        }
-        Step record = new Step();
-        record.template = template;
-        record.mapping = given;
-        record.entity = ImportMapping.ENTITY_RECORD;
-        record.type = typeOf(template);
-        record.everyRow = true;
-        record.keepsDigest = true;
-        List<Step> result = new List<Step>{ record };
-        if (!loadsRelated(template)) {
-            return result;
-        }
-        // Related records (R-IT17) are a second step: always created, linked to the row's record.
-        record.groupsRepeats = true;
-        Step related = new Step();
-        related.template = stepTemplate(
-            template,
-            template.Related_Object__c,
-            OPERATION_INSERT,
-            null
-        );
-        related.template.Use_Duplicate_Rules__c = false;
-        related.mapping = given.forEntity(ImportMapping.ENTITY_RELATED);
-        related.entity = ImportMapping.ENTITY_RELATED;
-        related.type = relatedTypeOf(template);
-        related.related = true;
-        related.links.put(
-            0,
-            relatedParentField(record.type, related.type, template.Related_Parent_Field__c)
-        );
-        result.add(related);
-        return result;
-    }
-
-    /**
-     * An upload of several objects (R-IT20): a step per object, parents before the objects that
-     * point at them, in the mapping's order otherwise and where two point at each other. Each
-     * step links to every earlier step its object points at; a parent that finds records by a
-     * key groups its repeated keys, and the first such step keeps the row's digest.
-     */
-    private static List<Step> severalSteps(
-        Import_Template__c template,
-        ImportMapping mapping,
-        Boolean mappedOnly
-    ) {
-        List<Step> listed = new List<Step>();
-        for (ImportMapping.ObjectStep each : mapping.objects) {
-            if (each == null || String.isBlank(each.entity)) {
-                continue;
-            }
-            Step step = new Step();
-            step.entity = each.entity.trim();
-            step.type = typeNamed(step.entity);
-            step.template = stepTemplate(template, step.entity, each.operation, each.keyField);
-            step.mapping = mapping.forEntity(step.entity);
-            step.needsOwnValue = true;
-            // An object no column or value fills loads nothing, so it is left out of a load.
-            if (!mappedOnly || !step.mapping.recordAttributes().isEmpty()) {
-                listed.add(step);
-            }
-        }
-        List<Step> ordered = loadOrder(listed);
-        Boolean digestTaken = false;
-        for (Integer i = 0; i < ordered.size(); i++) {
-            Step step = ordered[i];
-            for (Integer parent = 0; parent < i; parent++) {
-                String field = linkField(step.type, ordered[parent].type);
-                if (field != null) {
-                    step.links.put(parent, field);
-                    ordered[parent].groupsRepeats =
-                        operationOf(ordered[parent].template) != OPERATION_INSERT;
-                }
-            }
-        }
-        for (Step step : ordered) {
-            if (!digestTaken && operationOf(step.template) != OPERATION_INSERT) {
-                step.keepsDigest = true;
-                digestTaken = true;
-            }
-        }
-        return ordered;
-    }
-
-    /** The template as one step's: its object, operation and key field, no related records. */
-    private static Import_Template__c stepTemplate(
-        Import_Template__c template,
-        String objectName,
-        String operation,
-        String keyField
-    ) {
-        Import_Template__c result = template.clone(true, true);
-        result.Target_Object__c = objectName;
-        result.Load_Operation__c = String.isBlank(operation) ? OPERATION_INSERT : operation;
-        result.Load_Match_Field__c = keyField;
-        result.Related_Object__c = null;
-        result.Related_Parent_Field__c = null;
-        return result;
-    }
-
-    /**
-     * The steps in load order: each step after every listed object it points at, the mapping's
-     * order breaking ties. Where objects point at each other, the one waiting for the fewest
-     * goes first, the mapping's order breaking ties.
-     */
-    private static List<Step> loadOrder(List<Step> listed) {
-        List<Step> result = new List<Step>();
-        Set<Integer> placed = new Set<Integer>();
-        while (placed.size() < listed.size()) {
-            Integer next = null;
-            Integer fewest = null;
-            for (Integer i = 0; i < listed.size(); i++) {
-                Integer waits = placed.contains(i) ? null : waitingFor(listed, placed, i);
-                if (waits != null && (fewest == null || waits < fewest)) {
-                    next = i;
-                    fewest = waits;
-                }
-            }
-            placed.add(next);
-            result.add(listed[next]);
-        }
-        return result;
-    }
-
-    /** How many unplaced listed objects this step's object points at. */
-    private static Integer waitingFor(List<Step> listed, Set<Integer> placed, Integer index) {
-        Integer result = 0;
-        for (Integer other = 0; other < listed.size(); other++) {
-            if (
-                other != index &&
-                !placed.contains(other) &&
-                linkField(listed[index].type, listed[other].type) != null
-            ) {
-                result++;
-            }
-        }
-        return result;
-    }
-
-    /**
-     * The field of the child object that links a record to its row's parent (R-IT20): a lookup
-     * or master-detail to the parent alone that the user may fill in. With several, the one
-     * named after the parent (`AccountId`, `Account__c`), else the first by API name. Null for
-     * none, and for an object and itself.
-     */
-    @NamespaceAccessible
-    public static String linkField(Schema.SObjectType child, Schema.SObjectType parent) {
-        if (child == null || parent == null || child == parent) {
-            return null;
-        }
-        String pair = String.valueOf(child) + '>' + String.valueOf(parent);
-        if (linkFields.containsKey(pair)) {
-            return linkFields.get(pair);
-        }
-        List<String> names = new List<String>();
-        String preferred = null;
-        String parentName = localName(
-                parent.getDescribe(SObjectDescribeOptions.DEFERRED).getName().toLowerCase()
-            )
-            .removeEnd('__c');
-        for (Schema.SObjectField token : fieldsOf(child).values()) {
-            Schema.DescribeFieldResult field = token.getDescribe();
-            String name = field.getName().toLowerCase();
-            // A person account's own fields (PersonContactId, PersonReportsToId, __pc) never link.
-            Boolean personField =
-                child == Account.SObjectType &&
-                ((!field.isCustom() && name.startsWith('person')) || name.endsWith('__pc'));
-            if (
-                field.getType() != Schema.DisplayType.REFERENCE ||
-                !field.isCreateable() ||
-                personField ||
-                pointsAt(field, parent) == null ||
-                DataProtectedFields.isProtected(child, field.getName())
-            ) {
-                continue;
-            }
-            names.add(field.getName());
-            String bare = localName(field.getName().toLowerCase());
-            if (bare == parentName + 'id' || bare == parentName + '__c') {
-                preferred = field.getName();
-            }
-        }
-        names.sort();
-        String found = preferred != null ? preferred : names.isEmpty() ? null : names[0];
-        linkFields.put(pair, found);
-        return found;
-    }
-
-    /**
-     * Why the objects of an upload of several objects cannot be saved (R-IT20), or null: none,
-     * one the org does not have or listed twice, a delete, or a column mapped to an object the
-     * upload does not load.
-     */
-    @NamespaceAccessible
-    public static String severalObjectsProblem(ImportMapping mapping) {
-        if (mapping == null || !mapping.loadsSeveralObjects()) {
-            return null;
-        }
-        Set<String> listed = new Set<String>();
-        for (ImportMapping.ObjectStep each : mapping.objects) {
-            Schema.SObjectType type = each == null ? null : typeNamed(each.entity);
-            if (type == null) {
-                return Label.Core_Data_ObjectUnknown;
-            }
-            Schema.DescribeSObjectResult described = type.getDescribe(
-                SObjectDescribeOptions.DEFERRED
-            );
-            if (!listed.add(described.getName().toLowerCase())) {
-                return String.format(
-                    Label.Core_Import_ErrorSeveralObjectsRepeated,
-                    new List<String>{ described.getLabel() }
-                );
-            }
-            if (OPERATION_DELETE.equalsIgnoreCase(each.operation)) {
-                return Label.Core_Import_ErrorSeveralObjectsDelete;
-            }
-        }
-        for (ImportMapping.Column column : mapping.columns) {
-            if (column == null || ImportMapping.isIgnored(column.target)) {
-                continue;
-            }
-            Schema.SObjectType type = typeNamed(ImportMapping.entityOf(column.target));
-            String name = type == null
-                ? ''
-                : type.getDescribe(SObjectDescribeOptions.DEFERRED).getName().toLowerCase();
-            if (!listed.contains(name)) {
-                return String.format(
-                    Label.Core_Import_ErrorSeveralObjectsColumn,
-                    new List<String>{
-                        column.source,
-                        ImportMapping.entityOf(column.target).abbreviate(80)
-                    }
-                );
-            }
-        }
-        return null;
-    }
-
-    /** The first refusal of an upload of several objects, naming its object (R-IT20). */
-    private static String severalRefusal(Import_Template__c template, ImportMapping mapping) {
-        String problem = severalObjectsProblem(mapping);
-        if (problem != null) {
-            return problem;
-        }
-        List<Step> steps = steps(template, mapping);
-        if (steps.isEmpty()) {
-            return Label.Core_Import_ErrorNothingMapped;
-        }
-        for (Step step : steps) {
-            String refused = refusal(step.template, step.mapping);
-            if (refused != null) {
-                return String.format(
-                    Label.Core_Format_Pair,
-                    new List<String>{ step.label(), refused }
-                );
-            }
-        }
-        return null;
-    }
-
-    /** Whether the user's object access allows the operation. */
-    private static Boolean canRun(Schema.DescribeSObjectResult described, String operation) {
-        if (!described.isAccessible() || !described.isQueryable()) {
-            return false;
-        }
-        if (operation == OPERATION_INSERT) {
-            return described.isCreateable();
-        }
-        if (neverCreates(operation)) {
-            return described.isUpdateable();
-        }
-        if (operation == OPERATION_DELETE) {
-            return described.isDeletable();
-        }
-        return described.isCreateable() && described.isUpdateable();
-    }
-
-    /** Whether a value for every row (R-IB14) fills this attribute: every row one record. */
-    private static Boolean givesEveryRow(ImportMapping mapping, String fieldName) {
-        for (ImportMapping.Assignment assignment : mapping.defaults) {
-            if (
-                assignment != null &&
-                !ImportMapping.isIgnored(assignment.target) &&
-                ImportMapping.ENTITY_RECORD.equalsIgnoreCase(
-                    ImportMapping.entityOf(assignment.target)
-                ) &&
-                String.isNotBlank(assignment.value) &&
-                mapsField(
-                    new Set<String>{ ImportMapping.attributeOf(assignment.target).toLowerCase() },
-                    fieldName
-                )
-            ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /** Whether one of these attributes names this field, with or without the namespace. */
-    @NamespaceAccessible
-    public static Boolean mapsField(Set<String> attributes, String fieldName) {
-        String lower = fieldName.toLowerCase();
-        return attributes.contains(lower) || attributes.contains(localName(lower));
-    }
-
-    // -------------------------------------------------------------------------------------
-    // Reading a cell as its field's type
-    // -------------------------------------------------------------------------------------
-
-    /**
-     * Why this value cannot be written to this field, or null when it can (R-IT12): text longer
-     * than the field, or a value that cannot be read as the field's type.
-     */
-    @NamespaceAccessible
-    public static String unreadable(String value, Schema.DescribeFieldResult field) {
-        Integer length = field.getLength();
-        if (
-            TEXT_TYPES.contains(field.getType()) &&
-            length != null &&
-            length > 0 &&
-            value.length() > length
-        ) {
-            return String.format(
-                Label.Core_Import_ErrorValueTooLong,
-                new List<String>{ field.getLabel(), String.valueOf(length) }
-            );
-        }
-        Object converted;
-        try {
-            converted = typed(value, field);
-        } catch (Exception notReadable) {
-            converted = null;
-        }
-        if (converted == null) {
-            return String.format(
-                Label.Core_Import_ErrorValueUnreadable,
-                new List<String>{ field.getLabel(), value.abbreviate(80) }
-            );
-        }
-        return null;
-    }
-
-    /**
-     * A value as its field's type. A date is read as ISO 8601 (2026-10-12) or in the running
-     * user's locale; a date and time as ISO 8601 or in the locale; a number as
-     * `ImportValues.number` reads it, so "$1,250.00", "1 250,50" in a locale that writes it so
-     * and "(45.00)" load; a checkbox as `checkbox` reads it.
-     * Returns null, or throws, when the value cannot be read. Lookups are not read here.
-     */
-    @NamespaceAccessible
-    public static Object typed(String value, Schema.DescribeFieldResult field) {
-        Schema.DisplayType kind = field.getType();
-        String trimmed = value == null ? '' : value.trim();
-        if (TEXT_TYPES.contains(kind)) {
-            return value;
-        }
-        if (kind == Schema.DisplayType.BOOLEAN) {
-            return checkbox(trimmed);
-        }
-        if (
-            kind == Schema.DisplayType.CURRENCY ||
-            kind == Schema.DisplayType.DOUBLE ||
-            kind == Schema.DisplayType.PERCENT
-        ) {
-            return ImportValues.number(trimmed);
-        }
-        if (kind == Schema.DisplayType.INTEGER || kind == Schema.DisplayType.LONG) {
-            // A whole number, however it is written; "12.5" is not one.
-            Decimal whole = ImportValues.number(trimmed);
-            if (whole == null || whole != whole.round(System.RoundingMode.DOWN)) {
-                return null;
-            }
-            if (kind == Schema.DisplayType.LONG) {
-                return whole.longValue();
-            }
-            return Math.abs(whole) > 2147483647 ? null : whole.intValue();
-        }
-        if (kind == Schema.DisplayType.DATE) {
-            return dateOf(trimmed);
-        }
-        if (kind == Schema.DisplayType.DATETIME) {
-            return datetimeOf(trimmed);
-        }
-        if (kind == Schema.DisplayType.TIME) {
-            return timeOf(trimmed);
-        }
-        return null;
-    }
-
-    /** The spellings a file uses for a ticked checkbox, lower case (canonical model R-IT11). */
-    private static final Set<String> CHECKED = new Set<String>{
-        'true',
-        'yes',
-        'y',
-        '1',
-        'x',
-        'checked',
-        'on',
-        't'
-    };
-
-    /** The spellings a file uses for a cleared checkbox, lower case (canonical model R-IT11). */
-    private static final Set<String> CLEARED = new Set<String>{
-        'false',
-        'no',
-        'n',
-        '0',
-        'off',
-        'f'
-    };
-
-    /**
-     * A checkbox value as every import reads it (R-IT11): true or false, ignoring case and
-     * surrounding spaces, or null for a blank value or one that is neither, which is never read
-     * as cleared. The people import and the one-object load share this one reading.
-     */
-    @NamespaceAccessible
-    public static Boolean checkbox(String value) {
-        String lower = value == null ? '' : value.trim().toLowerCase();
-        if (CHECKED.contains(lower)) {
-            return true;
-        }
-        if (CLEARED.contains(lower)) {
-            return false;
-        }
-        return null;
-    }
-
-    private static Date dateOf(String value) {
-        if (Pattern.matches('\\d{4}-\\d{1,2}-\\d{1,2}', value)) {
-            return Date.valueOf(value);
-        }
-        return Date.parse(value);
-    }
-
-    private static Datetime datetimeOf(String value) {
-        if (Pattern.matches('\\d{4}-\\d{1,2}-\\d{1,2} \\d{1,2}:\\d{2}(:\\d{2})?', value)) {
-            return Datetime.valueOf(value.countMatches(':') == 1 ? value + ':00' : value);
-        }
-        if (Pattern.matches('\\d{4}-\\d{2}-\\d{2}T.*', value)) {
-            return (Datetime) JSON.deserialize('"' + value + '"', Datetime.class);
-        }
-        return Datetime.parse(value);
-    }
-
-    private static Time timeOf(String value) {
-        if (!Pattern.matches('\\d{1,2}:\\d{2}(:\\d{2})?', value)) {
-            return null;
-        }
-        List<String> parts = value.split(':');
-        Integer hours = Integer.valueOf(parts[0]);
-        Integer minutes = Integer.valueOf(parts[1]);
-        Integer seconds = parts.size() > 2 ? Integer.valueOf(parts[2]) : 0;
-        if (hours > 23 || minutes > 59 || seconds > 59) {
-            return null;
-        }
-        return Time.newInstance(hours, minutes, seconds, 0);
-    }
-
-    // -------------------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------------------
-
-    /**
-     * Whether a column may fill this field: the user may create or edit it, it is not
-     * protected, and a file's text can be read into it (a lookup is read as its parent).
-     */
-    @NamespaceAccessible
-    public static Boolean isWritable(Schema.SObjectType type, Schema.DescribeFieldResult field) {
-        Schema.DisplayType kind = field.getType();
-        Boolean readableType =
-            kind == Schema.DisplayType.REFERENCE ||
-            TEXT_TYPES.contains(kind) ||
-            kind == Schema.DisplayType.BOOLEAN ||
-            kind == Schema.DisplayType.CURRENCY ||
-            kind == Schema.DisplayType.DOUBLE ||
-            kind == Schema.DisplayType.PERCENT ||
-            kind == Schema.DisplayType.INTEGER ||
-            kind == Schema.DisplayType.LONG ||
-            kind == Schema.DisplayType.DATE ||
-            kind == Schema.DisplayType.DATETIME ||
-            kind == Schema.DisplayType.TIME;
-        return readableType &&
-            (field.isCreateable() || field.isUpdateable()) &&
-            !DataProtectedFields.isProtected(type, field.getName());
-    }
-
-    /** Each object's fields by lower case API name, described once per transaction. */
-    @NamespaceAccessible
-    public static Map<String, Schema.SObjectField> fieldsOf(Schema.SObjectType type) {
-        if (type == null) {
-            return new Map<String, Schema.SObjectField>();
-        }
-        if (!fieldMaps.containsKey(type)) {
-            fieldMaps.put(type, type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap());
-        }
-        return fieldMaps.get(type);
-    }
-
-    /** The field of this name, with or without the package's namespace, or null. */
-    @NamespaceAccessible
-    public static Schema.SObjectField fieldNamed(Schema.SObjectType type, String fieldName) {
-        if (String.isBlank(fieldName)) {
-            return null;
-        }
-        Map<String, Schema.SObjectField> fields = fieldsOf(type);
-        String lower = fieldName.trim().toLowerCase();
-        Schema.SObjectField found = fields.get(lower);
-        return found != null ? found : fields.get(NamespaceUtil.prefix().toLowerCase() + lower);
-    }
-
-    /** A field's label, or its name when the object has no such field. */
-    @NamespaceAccessible
-    public static String labelOf(Schema.SObjectType type, String fieldName) {
-        Schema.SObjectField token = fieldNamed(type, fieldName);
-        return token == null ? fieldName : token.getDescribe().getLabel();
-    }
-
-    /** A lower case API name without this package's namespace. */
-    @NamespaceAccessible
-    public static String localName(String lowerCaseName) {
-        String prefix = NamespaceUtil.prefix();
-        prefix = prefix == null ? '' : prefix.toLowerCase();
-        return String.isNotBlank(prefix) && lowerCaseName.startsWith(prefix)
-            ? lowerCaseName.removeStart(prefix)
-            : lowerCaseName;
-    }
-
-    /** Whether a name given in a template is this field, with or without the namespace. */
-    private static Boolean sameField(String describedName, String given) {
-        String lower = given.trim().toLowerCase();
-        String described = describedName.toLowerCase();
-        return described == lower || localName(described) == localName(lower);
-    }
-
-    /** A heading or a name folded for comparison: lower case, letters and digits only. */
-    private static String normalized(String text) {
-        return text == null ? '' : text.toLowerCase().replaceAll('[^a-z0-9]', '');
-    }
-
-    private static List<ImportMapping.Target> sortedValues(
-        Map<String, ImportMapping.Target> byLabel
-    ) {
-        List<String> labels = new List<String>(byLabel.keySet());
-        labels.sort();
-        List<ImportMapping.Target> result = new List<ImportMapping.Target>();
-        for (String label : labels) {
-            result.add(byLabel.get(label));
-        }
-        return result;
-    }
+	@NamespaceAccessible
+	public static final String OPERATION_INSERT = 'Insert';
+	@NamespaceAccessible
+	public static final String OPERATION_UPDATE = 'Update by record Id';
+	/** Each row updates the record a field the user chose finds (R-IT12). */
+	@NamespaceAccessible
+	public static final String OPERATION_UPDATE_BY_FIELD = 'Update by a matching field';
+	@NamespaceAccessible
+	public static final String OPERATION_UPSERT = 'Upsert by external ID';
+	/** Deletes the records a file names, through the bulk delete job (R-BD7). */
+	@NamespaceAccessible
+	public static final String OPERATION_DELETE = 'Delete by record Id';
+
+	/**
+	 * The most records an object may hold, counted in the user's access, for a field it does not
+	 * index to be matched on (R-IT13, the large object guard).
+	 */
+	@NamespaceAccessible
+	public static final Integer LARGE_OBJECT_ROWS = 100000;
+
+	/** The guard's ceiling, lowered by a test so it need not make 100,000 records. */
+	@TestVisible
+	private static Integer largeObjectRows = LARGE_OBJECT_ROWS;
+
+	/** Whether each object is over the guard's ceiling, counted once per transaction. */
+	private static Map<Schema.SObjectType, Boolean> large = new Map<Schema.SObjectType, Boolean>();
+
+	/** The field types a row or a lookup may be matched on beyond the record ID (R-IT13). */
+	private static final Set<Schema.DisplayType> MATCH_TYPES = new Set<Schema.DisplayType>{
+		Schema.DisplayType.STRING,
+		Schema.DisplayType.EMAIL,
+		Schema.DisplayType.PHONE
+	};
+
+	@NamespaceAccessible
+	public static final String LOOKUP_REJECT = 'Reject the row';
+	@NamespaceAccessible
+	public static final String LOOKUP_LEAVE_EMPTY = 'Leave it empty';
+
+	/** The attribute a row names its record by under Update by record Id. */
+	@NamespaceAccessible
+	public static final String ID_ATTRIBUTE = 'Id';
+
+	/** The objects a one-object load may only update (R-IT14): people and organizations. */
+	private static final Set<Schema.SObjectType> UPDATE_ONLY = new Set<Schema.SObjectType>{
+		Account.SObjectType,
+		Contact.SObjectType
+	};
+
+	/** The field types a file's text is read into; any other is not offered. */
+	@NamespaceAccessible
+	public static final Set<Schema.DisplayType> TEXT_TYPES = new Set<Schema.DisplayType>{
+		Schema.DisplayType.STRING,
+		Schema.DisplayType.TEXTAREA,
+		Schema.DisplayType.EMAIL,
+		Schema.DisplayType.PHONE,
+		Schema.DisplayType.URL,
+		Schema.DisplayType.PICKLIST,
+		Schema.DisplayType.MULTIPICKLIST,
+		Schema.DisplayType.ENCRYPTEDSTRING,
+		Schema.DisplayType.COMBOBOX
+	};
+
+	/** The global describe, asked once per transaction. */
+	private static Map<String, Schema.SObjectType> globalDescribe;
+
+	/** Each object's fields, described once per transaction. */
+	private static Map<Schema.SObjectType, Map<String, Schema.SObjectField>> fieldMaps = new Map<Schema.SObjectType, Map<String, Schema.SObjectField>>();
+
+	// -------------------------------------------------------------------------------------
+	// The template's choices
+	// -------------------------------------------------------------------------------------
+
+	/** True when this template loads one object rather than people and organizations. */
+	@NamespaceAccessible
+	public static Boolean loadsOneObject(Import_Template__c template) {
+		return template != null && String.isNotBlank(template.Target_Object__c);
+	}
+
+	/** The object this template loads, or null when the org has none of that name. */
+	@NamespaceAccessible
+	public static Schema.SObjectType typeOf(Import_Template__c template) {
+		return template == null ? null : typeNamed(template.Target_Object__c);
+	}
+
+	/** The object of this API name in this org, or null. */
+	@NamespaceAccessible
+	public static Schema.SObjectType typeNamed(String objectName) {
+		if (String.isBlank(objectName)) {
+			return null;
+		}
+		if (globalDescribe == null) {
+			globalDescribe = NamespaceUtil.globalDescribe();
+		}
+		String lower = objectName.trim().toLowerCase();
+		Schema.SObjectType found = globalDescribe.get(lower);
+		return found != null
+			? found
+			: globalDescribe.get(NamespaceUtil.prefix().toLowerCase() + lower);
+	}
+
+	/** The template's load operation; an empty or unknown one is Insert. */
+	@NamespaceAccessible
+	public static String operationOf(Import_Template__c template) {
+		String chosen = template == null ? null : template.Load_Operation__c;
+		for (
+			String known : new List<String>{
+				OPERATION_UPDATE,
+				OPERATION_UPDATE_BY_FIELD,
+				OPERATION_UPSERT,
+				OPERATION_DELETE
+			}
+		) {
+			if (known.equalsIgnoreCase(chosen)) {
+				return known;
+			}
+		}
+		return OPERATION_INSERT;
+	}
+
+	/**
+	 * The template's operation as this object allows it: people and organizations keep the two
+	 * updates (R-IT14) and a delete by record Id (R-BD7); anything else becomes Update by record Id.
+	 */
+	@NamespaceAccessible
+	public static String operationFor(Schema.SObjectType type, Import_Template__c template) {
+		String chosen = operationOf(template);
+		return updatesOnly(type) &&
+			!neverCreates(chosen) &&
+			chosen != OPERATION_DELETE
+			? OPERATION_UPDATE
+			: chosen;
+	}
+
+	/** Whether a lookup that finds no record leaves the lookup empty rather than rejecting. */
+	@NamespaceAccessible
+	public static Boolean leavesLookupEmpty(Import_Template__c template) {
+		return template != null &&
+			LOOKUP_LEAVE_EMPTY.equalsIgnoreCase(template.Lookup_Not_Found__c);
+	}
+
+	/**
+	 * The field an upsert or an update by a matching field finds rows' records by, as describe
+	 * names it, or null when it cannot.
+	 */
+	@NamespaceAccessible
+	public static String keyFieldOf(Import_Template__c template) {
+		if (template == null) {
+			return null;
+		}
+		Schema.SObjectType type = typeOf(template);
+		return operationOf(template) == OPERATION_UPDATE_BY_FIELD
+			? matchField(type, template.Load_Match_Field__c)
+			: keyField(type, template.Load_Match_Field__c);
+	}
+
+	/** True for the operations that change records and never create them. */
+	@NamespaceAccessible
+	public static Boolean neverCreates(String operation) {
+		return operation == OPERATION_UPDATE || operation == OPERATION_UPDATE_BY_FIELD;
+	}
+
+	/** True when a one-object load may only update records of this object (R-IT14). */
+	@NamespaceAccessible
+	public static Boolean updatesOnly(Schema.SObjectType type) {
+		return type != null && UPDATE_ONLY.contains(type);
+	}
+
+	// -------------------------------------------------------------------------------------
+	// What the wizard offers
+	// -------------------------------------------------------------------------------------
+
+	/**
+	 * The objects a template may load (R-IT14): those `DataProtectedFields` admits that the
+	 * user can read and query and can create or edit records of, sorted by label. Found in
+	 * describe, so every object the org has is a candidate and Core names none.
+	 */
+	@NamespaceAccessible
+	public static List<ImportMapping.Target> loadableObjects() {
+		Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
+		for (Schema.DescribeSObjectResult described : loadableDescribes()) {
+			byLabel.put(
+				described.getLabel() + '|' + described.getName(),
+				new ImportMapping.Target(described.getName(), described.getLabel())
+			);
+		}
+		return sortedValues(byLabel);
+	}
+
+	/** The describe of each object a template may load (R-IT14), in no order. */
+	private static List<Schema.DescribeSObjectResult> loadableDescribes() {
+		if (globalDescribe == null) {
+			globalDescribe = NamespaceUtil.globalDescribe();
+		}
+		List<Schema.DescribeSObjectResult> result = new List<Schema.DescribeSObjectResult>();
+		for (Schema.SObjectType type : globalDescribe.values()) {
+			Schema.DescribeSObjectResult described = type.getDescribe(
+				SObjectDescribeOptions.DEFERRED
+			);
+			Boolean writable = updatesOnly(type)
+				? described.isUpdateable()
+				: described.isCreateable() || described.isUpdateable();
+			if (
+				!described.isAccessible() ||
+				!described.isQueryable() ||
+				!writable ||
+				DataProtectedFields.objectRefusal(type) != null
+			) {
+				continue;
+			}
+			result.add(described);
+		}
+		return result;
+	}
+
+	// -------------------------------------------------------------------------------------
+	// What a file's names say (C-49a)
+	// -------------------------------------------------------------------------------------
+
+	/**
+	 * The objects detection chooses among, set by a test so its names are unique by
+	 * construction whatever objects the org has (Nonprofit Cloud adds many).
+	 */
+	@TestVisible
+	private static List<Schema.SObjectType> detectionObjectsForTest;
+
+	/** The object each sheet points at, and the one suggested for the whole file. */
+	@NamespaceAccessible
+	public class Detection {
+		/** The suggested object's API name, or null. */
+		@NamespaceAccessible
+		public String suggested;
+		/** Each sheet's object API name (null where it names none), in the order given. */
+		@NamespaceAccessible
+		public List<String> bySheet = new List<String>();
+		/**
+		 * Every object each sheet's two-part headings name, in the order they first appear, for
+		 * an upload of several objects (R-IT20).
+		 */
+		@NamespaceAccessible
+		public List<List<String>> namedBySheet = new List<List<String>>();
+		/** The label of every object named above, by API name. */
+		@NamespaceAccessible
+		public Map<String, String> labels = new Map<String, String>();
+		/** True when the suggested object is a best guess from a near spelling (C-49e). */
+		@NamespaceAccessible
+		public Boolean suggestedGuessed = false;
+		/** For each sheet, whether its object is a best guess (C-49e). */
+		@NamespaceAccessible
+		public List<Boolean> guessedBySheet = new List<Boolean>();
+	}
+
+	/**
+	 * The object a file points at (C-49a), for a one-object load with no object chosen yet: for
+	 * each sheet, from its two-part headings and then its name; for the file, the first sheet
+	 * that names one, then the file name. Exact matches only, among the objects the user may
+	 * load, by label, plural label or API name.
+	 *
+	 * @param fileName the file's name, extension included
+	 * @param sheetNames each sheet's name (one blank name for a text file)
+	 * @param headersBySheet each sheet's headings, in the same order
+	 */
+	@NamespaceAccessible
+	public static Detection detectObject(
+		String fileName,
+		List<String> sheetNames,
+		List<List<String>> headersBySheet
+	) {
+		List<Schema.DescribeSObjectResult> loadable = new List<Schema.DescribeSObjectResult>();
+		if (detectionObjectsForTest == null) {
+			loadable = loadableDescribes();
+		} else {
+			for (Schema.SObjectType type : detectionObjectsForTest) {
+				loadable.add(type.getDescribe(SObjectDescribeOptions.DEFERRED));
+			}
+		}
+		Map<String, String> keys = objectKeys(loadable);
+		DescribedFieldKeys fields = new DescribedFieldKeys();
+		Detection result = new Detection();
+		for (Integer i = 0; i < sheetNames.size(); i++) {
+			List<String> headers = i < headersBySheet.size() ? headersBySheet[i] : null;
+			String found = ImportHeaderParser.objectOfHeaders(headers, keys, fields);
+			if (found == null) {
+				found = ImportHeaderParser.objectOfName(sheetNames[i], keys);
+			}
+			result.bySheet.add(found);
+			result.guessedBySheet.add(false);
+			if (result.suggested == null) {
+				result.suggested = found;
+			}
+			result.namedBySheet.add(namedObjects(headers, keys, fields));
+		}
+		if (result.suggested == null) {
+			result.suggested = ImportHeaderParser.objectOfFileName(fileName, keys);
+		}
+		if (result.suggested == null) {
+			guessObject(result, fileName, sheetNames, keys);
+		}
+		Set<String> anyNamed = new Set<String>();
+		for (List<String> named : result.namedBySheet) {
+			anyNamed.addAll(named);
+		}
+		for (Schema.DescribeSObjectResult described : loadable) {
+			Boolean named =
+				described.getName() == result.suggested ||
+				result.bySheet.contains(described.getName()) ||
+				anyNamed.contains(described.getName());
+			if (named) {
+				result.labels.put(described.getName(), described.getLabel());
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * When nothing in the file names an object exactly, a near spelling of a sheet's name, then
+	 * of the file's name ("Contcts.csv"), as a best guess the wizard flags (C-49e).
+	 */
+	private static void guessObject(
+		Detection result,
+		String fileName,
+		List<String> sheetNames,
+		Map<String, String> keys
+	) {
+		for (Integer i = 0; i < sheetNames.size(); i++) {
+			ImportHeaderParser.Found named = ImportHeaderParser.objectOfNameOrGuess(
+				sheetNames[i],
+				keys
+			);
+			if (named != null) {
+				result.bySheet[i] = named.name;
+				result.guessedBySheet[i] = named.guessed;
+				if (result.suggested == null) {
+					result.suggested = named.name;
+					result.suggestedGuessed = named.guessed;
+				}
+			}
+		}
+		if (result.suggested == null) {
+			ImportHeaderParser.Found named = ImportHeaderParser.objectOfFileNameOrGuess(
+				fileName,
+				keys
+			);
+			if (named != null) {
+				result.suggested = named.name;
+				result.suggestedGuessed = named.guessed;
+			}
+		}
+	}
+
+	/** Every object these headings name as two-part headings, in the order first named. */
+	private static List<String> namedObjects(
+		List<String> headers,
+		Map<String, String> keys,
+		DescribedFieldKeys fields
+	) {
+		List<String> result = new List<String>();
+		for (String header : headers == null ? new List<String>() : headers) {
+			ImportHeaderParser.Resolved named = ImportHeaderParser.resolve(header, keys, fields);
+			if (named != null && !result.contains(named.objectName)) {
+				result.add(named.objectName);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * The mapping suggested for one sheet of an upload of several objects (R-IT20): a heading
+	 * that is a field of the sheet's object maps to it; a two-part heading to the field of the
+	 * listed object it names (`Contact.LastName` on a sheet of accounts); any other is Do not
+	 * load. Targets are `<object API name>.<field>`, each field once.
+	 *
+	 * @param types the objects the upload loads
+	 * @param sheetType the sheet's object, or null for none
+	 * @param headers the sheet's headings
+	 */
+	@NamespaceAccessible
+	public static ImportMapping suggestSeveralMapping(
+		List<Schema.SObjectType> types,
+		Schema.SObjectType sheetType,
+		List<String> headers
+	) {
+		ImportMapping mapping = new ImportMapping();
+		List<Schema.DescribeSObjectResult> listed = new List<Schema.DescribeSObjectResult>();
+		for (Schema.SObjectType type : types) {
+			if (type != null) {
+				listed.add(type.getDescribe(SObjectDescribeOptions.DEFERRED));
+			}
+		}
+		Map<String, String> keys = objectKeys(listed);
+		DescribedFieldKeys fields = new DescribedFieldKeys();
+		Map<String, String> known = sheetType == null
+			? new Map<String, String>()
+			: fieldKeys(sheetType);
+		String sheetName = sheetType == null
+			? null
+			: sheetType.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
+		List<String> given = headers == null ? new List<String>() : headers;
+		List<String> targets = new List<String>();
+		List<Boolean> named = new List<Boolean>();
+		Set<String> used = new Set<String>();
+		// Exact readings first, across every heading, so a guess never takes their field.
+		for (String header : given) {
+			String field = known.get(normalized(header));
+			String target = field == null ? null : sheetName + '.' + field;
+			if (target == null) {
+				ImportHeaderParser.Resolved reading = ImportHeaderParser.resolve(
+					header,
+					keys,
+					fields
+				);
+				target = reading == null ? null : reading.objectName + '.' + reading.fieldName;
+			}
+			named.add(target != null);
+			targets.add(target != null && used.add(target.toLowerCase()) ? target : null);
+		}
+		// Then a best guess for each heading nothing names exactly (C-49e).
+		Map<String, String> guessable = guessableKeys(known);
+		List<Boolean> guessed = new List<Boolean>();
+		for (Integer i = 0; i < given.size(); i++) {
+			String target = null;
+			if (!named[i]) {
+				String field = sheetName == null
+					? null
+					: ImportHeaderParser.guess(given[i], guessable);
+				target = field == null ? null : sheetName + '.' + field;
+				if (target == null) {
+					ImportHeaderParser.Resolved reading = ImportHeaderParser.resolveOrGuess(
+						given[i],
+						keys,
+						fields
+					);
+					target = reading == null || !reading.guessed
+						? null
+						: reading.objectName + '.' + reading.fieldName;
+				}
+			}
+			Boolean guessMaps = target != null && used.add(target.toLowerCase());
+			if (guessMaps) {
+				targets[i] = target;
+			}
+			guessed.add(guessMaps);
+		}
+		for (Integer i = 0; i < given.size(); i++) {
+			mapping.columns.add(column(given[i], targets[i], guessed[i]));
+		}
+		return mapping;
+	}
+
+	/** A suggested column: Do not load without a target, and flagged when a guess (C-49e). */
+	private static ImportMapping.Column column(String header, String target, Boolean guessed) {
+		ImportMapping.Column result = new ImportMapping.Column(
+			header,
+			target == null ? ImportMapping.TARGET_IGNORE : target
+		);
+		if (target != null && guessed) {
+			result.guessed = true;
+		}
+		return result;
+	}
+
+	/**
+	 * A field map without the record ID's spellings: a column is never guessed to be the
+	 * record ID, which decides which records an update changes (C-49e).
+	 */
+	private static Map<String, String> guessableKeys(Map<String, String> known) {
+		Map<String, String> result = new Map<String, String>();
+		for (String key : known.keySet()) {
+			if (known.get(key) != ID_ATTRIBUTE) {
+				result.put(key, known.get(key));
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Each object's spellings, normalized: label, plural label, API name, and the API name
+	 * without the namespace and without "__c". A spelling two objects share names neither.
+	 */
+	private static Map<String, String> objectKeys(List<Schema.DescribeSObjectResult> objects) {
+		Map<String, String> keys = new Map<String, String>();
+		for (Schema.DescribeSObjectResult described : objects) {
+			String name = described.getName();
+			String local = localName(name.toLowerCase());
+			for (
+				String spelling : new List<String>{
+					described.getLabel(),
+					described.getLabelPlural(),
+					name,
+					local,
+					local.removeEnd('__c')
+				}
+			) {
+				ImportHeaderParser.putKey(keys, spelling, name);
+			}
+		}
+		return keys;
+	}
+
+	/** An object's field spellings from describe, for `ImportHeaderParser`, read once per use. */
+	private class DescribedFieldKeys implements ImportHeaderParser.FieldKeys {
+		private Map<String, Map<String, String>> byObject = new Map<String, Map<String, String>>();
+
+		public Map<String, String> keysOf(String objectName) {
+			if (!byObject.containsKey(objectName)) {
+				byObject.put(objectName, fieldKeys(typeNamed(objectName)));
+			}
+			return byObject.get(objectName);
+		}
+	}
+
+	/**
+	 * The operations a load of this object may use: the two updates only for people (R-IT14),
+	 * and Delete by record Id for a person who may bulk delete records of it (R-BD7).
+	 */
+	@NamespaceAccessible
+	public static List<String> operationsFor(Schema.SObjectType type) {
+		List<String> result = updatesOnly(type)
+			? new List<String>{ OPERATION_UPDATE, OPERATION_UPDATE_BY_FIELD }
+			: new List<String>{
+					OPERATION_INSERT,
+					OPERATION_UPDATE,
+					OPERATION_UPDATE_BY_FIELD,
+					OPERATION_UPSERT
+			  };
+		if (deleteRefusal(type) == null) {
+			result.add(OPERATION_DELETE);
+		}
+		return result;
+	}
+
+	/**
+	 * Why the running user may not delete records of this object by file, or null (R-BD7): the
+	 * bulk delete permission and the bulk delete's object rules (R-BD4).
+	 */
+	@NamespaceAccessible
+	public static String deleteRefusal(Schema.SObjectType type) {
+		if (!FeatureManagement.checkPermission(BulkDeleteController.PERMISSION)) {
+			return BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsPermission');
+		}
+		Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+		String reason = BulkDeleteService.objectReason(described);
+		return reason == null
+			? null
+			: String.format(
+					BarnHelp.text('Core', 'Core_BulkDelete_ErrorObject'),
+					new List<String>{ described.getLabelPlural(), reason }
+			  );
+	}
+
+	/**
+	 * The fields a column may fill (R-IT12): the record ID first, then every field the user may
+	 * create or edit that is not protected and holds a type a file's text can be read into,
+	 * sorted by label. Values are field API names.
+	 */
+	@NamespaceAccessible
+	public static List<ImportMapping.Target> writableFields(Schema.SObjectType type) {
+		List<ImportMapping.Target> result = new List<ImportMapping.Target>{
+			new ImportMapping.Target(ID_ATTRIBUTE, Label.Core_Import_RecordIdOption)
+		};
+		if (type == null) {
+			return result;
+		}
+		Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
+		for (Schema.SObjectField token : fieldsOf(type).values()) {
+			Schema.DescribeFieldResult field = token.getDescribe();
+			if (isWritable(type, field)) {
+				byLabel.put(
+					field.getLabel() + '|' + field.getName(),
+					new ImportMapping.Target(field.getName(), field.getLabel())
+				);
+			}
+		}
+		result.addAll(sortedValues(byLabel));
+		return result;
+	}
+
+	/**
+	 * The fields an upsert may match on (R-IT12): the object's External ID fields holding text
+	 * or an email that the user may read. Upsert is the platform's own meaning, so a unique
+	 * field that is not an external ID is not offered.
+	 */
+	@NamespaceAccessible
+	public static List<ImportMapping.Target> keyFields(Schema.SObjectType type) {
+		List<ImportMapping.Target> result = new List<ImportMapping.Target>();
+		for (Schema.DescribeFieldResult field : ImportMatcher.matchableFields(type)) {
+			if (field.isExternalId()) {
+				result.add(new ImportMapping.Target(field.getName(), field.getLabel()));
+			}
+		}
+		return result;
+	}
+
+	/** The field's API name when an upsert may match on it, or null. Blank is null. */
+	@NamespaceAccessible
+	public static String keyField(Schema.SObjectType type, String fieldName) {
+		if (type == null || String.isBlank(fieldName)) {
+			return null;
+		}
+		for (ImportMapping.Target candidate : keyFields(type)) {
+			if (sameField(candidate.value, fieldName)) {
+				return candidate.value;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * The fields rows or lookups may be matched on beyond the record ID (R-IT12, R-IT13): every
+	 * text, email or phone field of the object that the user may read and filter on, sorted by
+	 * label. The large object guard (`unselective`) decides later whether one may be searched.
+	 */
+	@NamespaceAccessible
+	public static List<ImportMapping.Target> matchFields(Schema.SObjectType type) {
+		Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
+		if (type == null) {
+			return new List<ImportMapping.Target>();
+		}
+		for (Schema.SObjectField token : fieldsOf(type).values()) {
+			Schema.DescribeFieldResult field = token.getDescribe();
+			if (
+				MATCH_TYPES.contains(field.getType()) &&
+				field.isAccessible() &&
+				field.isFilterable()
+			) {
+				byLabel.put(
+					field.getLabel() + '|' + field.getName(),
+					new ImportMapping.Target(field.getName(), field.getLabel())
+				);
+			}
+		}
+		return sortedValues(byLabel);
+	}
+
+	/** The field's API name when rows may be matched on it (`matchFields`), or null. */
+	@NamespaceAccessible
+	public static String matchField(Schema.SObjectType type, String fieldName) {
+		if (type == null || String.isBlank(fieldName)) {
+			return null;
+		}
+		for (ImportMapping.Target candidate : matchFields(type)) {
+			if (sameField(candidate.value, fieldName)) {
+				return candidate.value;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Whether the platform indexes this field, so a search by it stays quick on any number of
+	 * records (R-IT13): the record ID, the name field, a field marked External ID or Unique, and
+	 * a standard Email field (Email, or PersonEmail on a person Account, R-VH3; the query planner
+	 * leads an Account PersonEmail filter with the Contact Email index). Custom indexes cannot be
+	 * seen from Apex, so they are not counted.
+	 */
+	@NamespaceAccessible
+	public static Boolean isIndexed(Schema.SObjectType type, String fieldName) {
+		if (ID_ATTRIBUTE.equalsIgnoreCase(fieldName)) {
+			return true;
+		}
+		Schema.SObjectField token = fieldNamed(type, fieldName);
+		if (token == null) {
+			return false;
+		}
+		Schema.DescribeFieldResult field = token.getDescribe();
+		return field.isNameField() ||
+			field.isExternalId() ||
+			field.isUnique() ||
+			(!field.isCustom() &&
+			field.getType() == Schema.DisplayType.EMAIL &&
+			(field.getName() == 'Email' ||
+			field.getName() == 'PersonEmail'));
+	}
+
+	/**
+	 * Why rows cannot be matched on this field of this object, or null (R-IT13, the large object
+	 * guard): a field the platform does not index, on an object holding more than
+	 * LARGE_OBJECT_ROWS records the user can see, would be searched by reading the whole object,
+	 * which is slow and can time out. Counted once per object per transaction, the count capped
+	 * one past the ceiling.
+	 */
+	@NamespaceAccessible
+	public static String unselective(Schema.SObjectType type, String fieldName) {
+		if (type == null || String.isBlank(fieldName) || isIndexed(type, fieldName)) {
+			return null;
+		}
+		Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+		if (!large.containsKey(type)) {
+			Integer counted = Database.countQueryWithBinds(
+				'SELECT COUNT() FROM ' +
+					String.escapeSingleQuotes(described.getName()) +
+					' LIMIT :cap',
+				new Map<String, Object>{ 'cap' => largeObjectRows + 1 },
+				AccessLevel.USER_MODE
+			);
+			large.put(type, counted > largeObjectRows);
+		}
+		if (!large.get(type)) {
+			return null;
+		}
+		return String.format(
+			BarnHelp.text('Core', 'Core_Import_ErrorFieldNotSelective'),
+			new List<String>{
+				labelOf(type, fieldName),
+				described.getLabelPlural(),
+				largeObjectRows.format()
+			}
+		);
+	}
+
+	/**
+	 * The fields a lookup column may name its parent by (R-IT13): the record ID, the parent's
+	 * name field, and any text, email or phone field of the parent the user may read and filter
+	 * on (`matchFields`). A lookup that can point at more than one object is named by record ID
+	 * only, as is a field that is not a lookup of this object.
+	 */
+	@NamespaceAccessible
+	public static List<ImportMapping.Target> parentFields(
+		Schema.SObjectType type,
+		String lookupName
+	) {
+		List<ImportMapping.Target> result = new List<ImportMapping.Target>{
+			new ImportMapping.Target(ID_ATTRIBUTE, Label.Core_Import_RecordIdOption)
+		};
+		Schema.SObjectType parent = parentOf(type, lookupName);
+		if (parent == null) {
+			return result;
+		}
+		Set<String> offered = new Set<String>();
+		String nameField = nameFieldOf(parent);
+		if (nameField != null) {
+			Schema.DescribeFieldResult name = fieldNamed(parent, nameField).getDescribe();
+			result.add(new ImportMapping.Target(name.getName(), name.getLabel()));
+			offered.add(name.getName().toLowerCase());
+		}
+		for (ImportMapping.Target field : matchFields(parent)) {
+			if (!offered.contains(field.value.toLowerCase())) {
+				result.add(field);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * The one object this lookup field of this object points at, or null when it is not a
+	 * lookup, points at several objects, or the object has no such field.
+	 */
+	@NamespaceAccessible
+	public static Schema.SObjectType parentOf(Schema.SObjectType type, String lookupName) {
+		if (type == null) {
+			return null;
+		}
+		Schema.SObjectField token = fieldNamed(type, lookupName);
+		if (token == null) {
+			return null;
+		}
+		List<Schema.SObjectType> parents = token.getDescribe().getReferenceTo();
+		return parents.size() == 1 ? parents[0] : null;
+	}
+
+	/** The parent field as describe names it when a lookup may name its parent by it, or null. */
+	@NamespaceAccessible
+	public static String parentField(Schema.SObjectType parent, String fieldName) {
+		if (parent == null || String.isBlank(fieldName)) {
+			return null;
+		}
+		String nameField = nameFieldOf(parent);
+		if (nameField != null && sameField(nameField, fieldName)) {
+			return nameField;
+		}
+		return matchField(parent, fieldName);
+	}
+
+	/** The object's name field when the user may read and filter on it, or null. */
+	@NamespaceAccessible
+	public static String nameFieldOf(Schema.SObjectType type) {
+		if (type == null) {
+			return null;
+		}
+		for (Schema.SObjectField token : fieldsOf(type).values()) {
+			Schema.DescribeFieldResult field = token.getDescribe();
+			if (field.isNameField() && field.isAccessible() && field.isFilterable()) {
+				return field.getName();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * A mapping suggested from a file's header row (R-IT12): a heading that is a writable
+	 * field's label or API name, ignoring case, spaces and punctuation, is mapped to it, and Id
+	 * or Record Id to the record ID. A second heading for one field is left for the
+	 * administrator.
+	 *
+	 * A heading that names this object and a field together ("Contact.First Name", "Phone
+	 * (Contact)", C-49a) maps to that field; the whole heading is tried as a field first, and a
+	 * heading naming another object is Do not load.
+	 *
+	 * Once every exact heading is mapped, a heading nothing names exactly gets a best guess
+	 * from a near spelling of a field ("Frist Name", "Contcts.Emial"), flagged as guessed for
+	 * the administrator to accept (C-49e). Never the record ID, and never a field already taken.
+	 */
+	@NamespaceAccessible
+	public static ImportMapping suggestMapping(Schema.SObjectType type, List<String> headers) {
+		ImportMapping mapping = new ImportMapping();
+		if (headers == null) {
+			return mapping;
+		}
+		Map<String, String> known = fieldKeys(type);
+		Map<String, String> thisObject = type == null
+			? new Map<String, String>()
+			: objectKeys(
+					new List<Schema.DescribeSObjectResult>{
+						type.getDescribe(SObjectDescribeOptions.DEFERRED)
+					}
+			  );
+		DescribedFieldKeys fields = new DescribedFieldKeys();
+		Set<String> used = new Set<String>();
+		List<String> targets = new List<String>();
+		List<Boolean> named = new List<Boolean>();
+		for (String header : headers) {
+			String field = known.get(normalized(header));
+			if (field == null && !thisObject.isEmpty()) {
+				ImportHeaderParser.Resolved reading = ImportHeaderParser.resolve(
+					header,
+					thisObject,
+					fields
+				);
+				field = reading == null ? null : reading.fieldName;
+			}
+			named.add(field != null);
+			targets.add(field != null && used.add(field) ? field : null);
+		}
+		Map<String, String> guessable = guessableKeys(known);
+		for (Integer i = 0; i < headers.size(); i++) {
+			String field = null;
+			if (!named[i] && type != null) {
+				// A heading naming this object reads as object plus field, so it never takes
+				// a whole-heading guess; one naming another object is not guessed onto this
+				// one at all (D-150).
+				Boolean namesThis =
+					!thisObject.isEmpty() && ImportHeaderParser.namesObject(headers[i], thisObject);
+				Boolean namesOther =
+					!namesThis && ImportHeaderParser.namesObject(headers[i], allObjectKeys());
+				if (!namesThis && !namesOther) {
+					field = ImportHeaderParser.guess(headers[i], guessable);
+				}
+				if (field == null && !namesOther && !thisObject.isEmpty()) {
+					ImportHeaderParser.Resolved reading = ImportHeaderParser.resolveOrGuess(
+						headers[i],
+						thisObject,
+						fields
+					);
+					field = reading == null || !reading.guessed ? null : reading.fieldName;
+				}
+			}
+			Boolean guessMaps = field != null && used.add(field);
+			String target = guessMaps ? field : targets[i];
+			mapping.columns.add(
+				column(
+					headers[i],
+					target == null ? null : ImportMapping.ENTITY_RECORD + '.' + target,
+					guessMaps
+				)
+			);
+		}
+		return mapping;
+	}
+
+	private static Map<String, String> allObjectKeysCache;
+
+	/** Every object's API name by its normalized spelling, to tell a heading that names one. */
+	private static Map<String, String> allObjectKeys() {
+		if (allObjectKeysCache == null) {
+			allObjectKeysCache = new Map<String, String>();
+			for (String name : Schema.getGlobalDescribe().keySet()) {
+				allObjectKeysCache.put(normalized(localName(name).removeEnd('__c')), name);
+				allObjectKeysCache.put(normalized(name), name);
+			}
+		}
+		return allObjectKeysCache;
+	}
+
+	/**
+	 * A writable field's API name by each normalized spelling (label, API name, API name without
+	 * the namespace and "__c"), and the record ID by Id, Record Id and Salesforce Record Id. The
+	 * first field to claim a spelling keeps it. Not cached: what is writable is the running
+	 * user's access.
+	 */
+	private static Map<String, String> fieldKeys(Schema.SObjectType type) {
+		Map<String, String> known = new Map<String, String>{
+			'id' => ID_ATTRIBUTE,
+			'recordid' => ID_ATTRIBUTE,
+			'salesforcerecordid' => ID_ATTRIBUTE
+		};
+		if (type != null) {
+			for (Schema.SObjectField token : fieldsOf(type).values()) {
+				Schema.DescribeFieldResult field = token.getDescribe();
+				if (!isWritable(type, field)) {
+					continue;
+				}
+				for (
+					String spelling : new List<String>{
+						normalized(field.getLabel()),
+						normalized(localName(field.getName().toLowerCase()).removeEnd('__c')),
+						normalized(field.getName())
+					}
+				) {
+					if (!known.containsKey(spelling)) {
+						known.put(spelling, field.getName());
+					}
+				}
+			}
+		}
+		return known;
+	}
+
+	// -------------------------------------------------------------------------------------
+	// Refusals before any row is read
+	// -------------------------------------------------------------------------------------
+
+	/**
+	 * Why this template cannot load its rows, or null (R-IT12, R-IT14): an object that is gone
+	 * or protected, an operation people do not allow, access the operation needs and the user
+	 * lacks, no column mapped to the object, the key column an update or an upsert needs, a
+	 * value for every row that names the record, and a field searched by that the large object
+	 * guard refuses (R-IT13). Asked when a run starts and in every chunk.
+	 */
+	@NamespaceAccessible
+	public static String refusal(Import_Template__c template, ImportMapping mapping) {
+		if (mapping != null && mapping.loadsSeveralObjects()) {
+			return severalRefusal(template, mapping);
+		}
+		Schema.SObjectType type = typeOf(template);
+		String refused = DataProtectedFields.objectRefusal(type);
+		if (refused != null) {
+			return refused;
+		}
+		Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+		List<String> plural = new List<String>{ described.getLabelPlural() };
+		String operation = operationOf(template);
+		Boolean byId = operation == OPERATION_UPDATE || operation == OPERATION_DELETE;
+		if (operation == OPERATION_DELETE) {
+			String cannotDelete = deleteRefusal(type);
+			if (cannotDelete != null) {
+				return cannotDelete;
+			}
+		} else if (updatesOnly(type) && !neverCreates(operation)) {
+			return String.format(
+				BarnHelp.text('Core', 'Core_Import_ErrorPeopleUpdateOnly'),
+				plural
+			);
+		}
+		if (!canRun(described, operation)) {
+			return String.format(BarnHelp.text('Core', 'Core_Import_ErrorObjectNoAccess'), plural);
+		}
+		ImportMapping given = mapping == null ? new ImportMapping() : mapping;
+		Set<String> attributes = given.recordAttributes();
+		if (attributes.isEmpty()) {
+			return BarnHelp.text('Core', 'Core_Import_ErrorNothingMapped');
+		}
+		String key = byId ? ID_ATTRIBUTE : null;
+		if (byId && !attributes.contains(ID_ATTRIBUTE.toLowerCase())) {
+			return BarnHelp.text('Core', 'Core_Import_ErrorIdColumnMissing');
+		}
+		if (operation == OPERATION_UPSERT || operation == OPERATION_UPDATE_BY_FIELD) {
+			Boolean byKey = operation == OPERATION_UPSERT;
+			String chosen = template.Load_Match_Field__c;
+			if (String.isBlank(chosen)) {
+				return byKey
+					? BarnHelp.text('Core', 'Core_Import_ErrorKeyFieldRequired')
+					: BarnHelp.text('Core', 'Core_Import_ErrorMatchFieldRequired');
+			}
+			key = byKey ? keyField(type, chosen) : matchField(type, chosen);
+			if (key == null) {
+				return String.format(
+					byKey
+						? BarnHelp.text('Core', 'Core_Import_ErrorKeyFieldUnusable')
+						: BarnHelp.text('Core', 'Core_Import_ErrorMatchFieldUnusable'),
+					new List<String>{ chosen.trim().abbreviate(80) }
+				);
+			}
+			if (!mapsField(attributes, key)) {
+				return String.format(
+					byKey
+						? BarnHelp.text('Core', 'Core_Import_ErrorKeyColumnMissing')
+						: BarnHelp.text('Core', 'Core_Import_ErrorMatchColumnMissing'),
+					new List<String>{ labelOf(type, key) }
+				);
+			}
+		}
+		if (key != null && givesEveryRow(given, key)) {
+			return String.format(
+				BarnHelp.text('Core', 'Core_Import_ErrorKeyForEveryRow'),
+				new List<String>{
+					key == ID_ATTRIBUTE ? Label.Core_Import_RecordIdOption : labelOf(type, key)
+				}
+			);
+		}
+		String slow = slowSearch(type, key, given);
+		return slow != null ? slow : relatedRefusal(template, type, operation, given);
+	}
+
+	/**
+	 * The large object guard over every field this template searches by (R-IT13): the field
+	 * rows find their record by, and each lookup column's parent field.
+	 */
+	private static String slowSearch(Schema.SObjectType type, String key, ImportMapping mapping) {
+		String refused = key == null ? null : unselective(type, key);
+		return refused != null ? refused : slowLookups(type, mapping.lookupFieldsByAttribute());
+	}
+
+	/** The same guard over the lookup columns of one object, keyed by lookup field. */
+	private static String slowLookups(Schema.SObjectType type, Map<String, String> lookups) {
+		String refused;
+		for (String attribute : lookups.keySet()) {
+			Schema.SObjectType parent = parentOf(type, attribute);
+			String field = parentField(parent, lookups.get(attribute));
+			refused = field == null ? null : unselective(parent, field);
+			if (refused != null) {
+				return refused;
+			}
+		}
+		return null;
+	}
+
+	// -------------------------------------------------------------------------------------
+	// Related records (R-IT17)
+	// -------------------------------------------------------------------------------------
+
+	/** True when this one-object template also creates related records from its rows. */
+	@NamespaceAccessible
+	public static Boolean loadsRelated(Import_Template__c template) {
+		return loadsOneObject(template) && String.isNotBlank(template.Related_Object__c);
+	}
+
+	/** The template's related object, or null for none or one the org does not have. */
+	@NamespaceAccessible
+	public static Schema.SObjectType relatedTypeOf(Import_Template__c template) {
+		return loadsRelated(template) ? typeNamed(template.Related_Object__c) : null;
+	}
+
+	/**
+	 * The related object's field that points at the parent, as describe names it, when it is a
+	 * lookup or master-detail to the parent object alone that the user may fill in on a new
+	 * record; else null.
+	 */
+	@NamespaceAccessible
+	public static String relatedParentField(
+		Schema.SObjectType parent,
+		Schema.SObjectType related,
+		String fieldName
+	) {
+		Schema.SObjectField token = related == null ? null : fieldNamed(related, fieldName);
+		return parent != null && token != null ? pointsAt(token.getDescribe(), parent) : null;
+	}
+
+	/** The field's name when it points at this object alone and may be filled in, or null. */
+	private static String pointsAt(Schema.DescribeFieldResult field, Schema.SObjectType parent) {
+		List<Schema.SObjectType> parents = field.getReferenceTo();
+		return parents.size() == 1 &&
+			parents[0] == parent &&
+			field.isCreateable()
+			? field.getName()
+			: null;
+	}
+
+	/**
+	 * The related records a load of this object may create (R-IT17): each object a load may
+	 * insert (R-IT14) with a field pointing at this object alone that the user may fill in.
+	 * Values are `Object.Field`; labels name the object and the field.
+	 */
+	@NamespaceAccessible
+	public static List<ImportMapping.Target> relatedOptions(Schema.SObjectType type) {
+		Map<String, ImportMapping.Target> byLabel = new Map<String, ImportMapping.Target>();
+		if (type == null) {
+			return new List<ImportMapping.Target>();
+		}
+		for (Schema.ChildRelationship relationship : type.getDescribe().getChildRelationships()) {
+			String field = pointsAt(relationship.getField().getDescribe(), type);
+			Schema.SObjectType child = relationship.getChildSObject();
+			if (field == null || insertRefusal(child) != null) {
+				continue;
+			}
+			Schema.DescribeSObjectResult described = child.getDescribe(
+				SObjectDescribeOptions.DEFERRED
+			);
+			String label = String.format(
+				Label.Core_Format_Parenthetical,
+				new List<String>{ described.getLabel(), labelOf(child, field) }
+			);
+			String value = described.getName() + '.' + field;
+			byLabel.put(label + '|' + value, new ImportMapping.Target(value, label));
+		}
+		return sortedValues(byLabel);
+	}
+
+	/** Why a load may not create records of this object (R-IT14), or null. */
+	@NamespaceAccessible
+	public static String insertRefusal(Schema.SObjectType type) {
+		String refused = DataProtectedFields.objectRefusal(type);
+		if (refused != null) {
+			return refused;
+		}
+		Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
+		return updatesOnly(type) || !canRun(described, OPERATION_INSERT)
+			? String.format(
+					BarnHelp.text('Core', 'Core_Import_ErrorRelatedObjectUnusable'),
+					new List<String>{ described.getLabelPlural() }
+			  )
+			: null;
+	}
+
+	/**
+	 * Why this template's related records cannot load (R-IT17), or null: Insert, which has no
+	 * parent key; a related object a load may not create; a parent field that does not point at
+	 * the target object alone or that the user may not fill in; and the large object guard over
+	 * the related lookup columns.
+	 */
+	private static String relatedRefusal(
+		Import_Template__c template,
+		Schema.SObjectType type,
+		String operation,
+		ImportMapping mapping
+	) {
+		if (!loadsRelated(template)) {
+			return null;
+		}
+		if (operation == OPERATION_INSERT) {
+			return BarnHelp.text('Core', 'Core_Import_ErrorRelatedNeedsKey');
+		}
+		Schema.SObjectType related = relatedTypeOf(template);
+		String refused = insertRefusal(related);
+		if (refused != null) {
+			return refused;
+		}
+		if (relatedParentField(type, related, template.Related_Parent_Field__c) == null) {
+			return String.format(
+				BarnHelp.text('Core', 'Core_Import_ErrorRelatedFieldUnusable'),
+				new List<String>{
+					related.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel(),
+					type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
+				}
+			);
+		}
+		return slowLookups(related, mapping.lookupFieldsByAttribute(ImportMapping.ENTITY_RELATED));
+	}
+
+	// -------------------------------------------------------------------------------------
+	// Load steps: one object, related records, several objects (R-IT20; ADR-0147)
+	// -------------------------------------------------------------------------------------
+
+	/**
+	 * One object a chunk loads, in load order (R-IT20). A one-object template is one step;
+	 * with related records (R-IT17) two, the related record linked to its row's record; an
+	 * upload of several objects one per object, parents first.
+	 */
+	public class Step {
+		/** The step as a one-object template: its object, operation and key field. */
+		public Import_Template__c template;
+		/** The step's columns and values for every row, as `Record` targets. */
+		public ImportMapping mapping;
+		/** The entity the step's columns have in the template's mapping. */
+		public String entity;
+		public Schema.SObjectType type;
+		/** For each earlier step this object points at, that step's index to the field. */
+		public Map<Integer, String> links = new Map<Integer, String>();
+		/** Later rows of a key load nothing new and link to the first row's record. */
+		public Boolean groupsRepeats = false;
+		/** Writes the record key's digest on the row, so later chunks see repeats. */
+		public Boolean keepsDigest = false;
+		/** Every row loads the step, even one without a value for it. */
+		public Boolean everyRow = false;
+		/** A row loads the step only with a value of its own, not one for every row. */
+		public Boolean needsOwnValue = false;
+		/** The related records of R-IT17, which keep their own row results. */
+		public Boolean related = false;
+
+		/** The object's label, or the name the mapping gives when the org has no such object. */
+		public String label() {
+			return type == null
+				? entity
+				: type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel();
+		}
+	}
+
+	/** The link field of each child and parent object, worked out once a transaction. */
+	private static Map<String, String> linkFields = new Map<String, String>();
+
+	/**
+	 * Every object an upload of several objects lists, mapped or not, in load order, for the
+	 * wizard to offer (R-IT20). Empty for any other template.
+	 */
+	public static List<Step> listedSteps(Import_Template__c template, ImportMapping mapping) {
+		return mapping != null && mapping.loadsSeveralObjects()
+			? severalSteps(template, mapping, false)
+			: new List<Step>();
+	}
+
+	/** The steps a chunk of this template loads, in load order (R-IT17, R-IT20). */
+	public static List<Step> steps(Import_Template__c template, ImportMapping mapping) {
+		ImportMapping given = mapping == null ? new ImportMapping() : mapping;
+		if (given.loadsSeveralObjects()) {
+			return severalSteps(template, given, true);
+		}
+		Step record = new Step();
+		record.template = template;
+		record.mapping = given;
+		record.entity = ImportMapping.ENTITY_RECORD;
+		record.type = typeOf(template);
+		record.everyRow = true;
+		record.keepsDigest = true;
+		List<Step> result = new List<Step>{ record };
+		if (!loadsRelated(template)) {
+			return result;
+		}
+		// Related records (R-IT17) are a second step: always created, linked to the row's record.
+		record.groupsRepeats = true;
+		Step related = new Step();
+		related.template = stepTemplate(
+			template,
+			template.Related_Object__c,
+			OPERATION_INSERT,
+			null
+		);
+		related.template.Use_Duplicate_Rules__c = false;
+		related.mapping = given.forEntity(ImportMapping.ENTITY_RELATED);
+		related.entity = ImportMapping.ENTITY_RELATED;
+		related.type = relatedTypeOf(template);
+		related.related = true;
+		related.links.put(
+			0,
+			relatedParentField(record.type, related.type, template.Related_Parent_Field__c)
+		);
+		result.add(related);
+		return result;
+	}
+
+	/**
+	 * An upload of several objects (R-IT20): a step per object, parents before the objects that
+	 * point at them, in the mapping's order otherwise and where two point at each other. Each
+	 * step links to every earlier step its object points at; a parent that finds records by a
+	 * key groups its repeated keys, and the first such step keeps the row's digest.
+	 */
+	private static List<Step> severalSteps(
+		Import_Template__c template,
+		ImportMapping mapping,
+		Boolean mappedOnly
+	) {
+		List<Step> listed = new List<Step>();
+		for (ImportMapping.ObjectStep each : mapping.objects) {
+			if (each == null || String.isBlank(each.entity)) {
+				continue;
+			}
+			Step step = new Step();
+			step.entity = each.entity.trim();
+			step.type = typeNamed(step.entity);
+			step.template = stepTemplate(template, step.entity, each.operation, each.keyField);
+			step.mapping = mapping.forEntity(step.entity);
+			step.needsOwnValue = true;
+			// An object no column or value fills loads nothing, so it is left out of a load.
+			if (!mappedOnly || !step.mapping.recordAttributes().isEmpty()) {
+				listed.add(step);
+			}
+		}
+		List<Step> ordered = loadOrder(listed);
+		Boolean digestTaken = false;
+		for (Integer i = 0; i < ordered.size(); i++) {
+			Step step = ordered[i];
+			for (Integer parent = 0; parent < i; parent++) {
+				String field = linkField(step.type, ordered[parent].type);
+				if (field != null) {
+					step.links.put(parent, field);
+					ordered[parent].groupsRepeats =
+						operationOf(ordered[parent].template) != OPERATION_INSERT;
+				}
+			}
+		}
+		for (Step step : ordered) {
+			if (!digestTaken && operationOf(step.template) != OPERATION_INSERT) {
+				step.keepsDigest = true;
+				digestTaken = true;
+			}
+		}
+		return ordered;
+	}
+
+	/** The template as one step's: its object, operation and key field, no related records. */
+	private static Import_Template__c stepTemplate(
+		Import_Template__c template,
+		String objectName,
+		String operation,
+		String keyField
+	) {
+		Import_Template__c result = template.clone(true, true);
+		result.Target_Object__c = objectName;
+		result.Load_Operation__c = String.isBlank(operation) ? OPERATION_INSERT : operation;
+		result.Load_Match_Field__c = keyField;
+		result.Related_Object__c = null;
+		result.Related_Parent_Field__c = null;
+		return result;
+	}
+
+	/**
+	 * The steps in load order: each step after every listed object it points at, the mapping's
+	 * order breaking ties. Where objects point at each other, the one waiting for the fewest
+	 * goes first, the mapping's order breaking ties.
+	 */
+	private static List<Step> loadOrder(List<Step> listed) {
+		List<Step> result = new List<Step>();
+		Set<Integer> placed = new Set<Integer>();
+		while (placed.size() < listed.size()) {
+			Integer next = null;
+			Integer fewest = null;
+			for (Integer i = 0; i < listed.size(); i++) {
+				Integer waits = placed.contains(i) ? null : waitingFor(listed, placed, i);
+				if (waits != null && (fewest == null || waits < fewest)) {
+					next = i;
+					fewest = waits;
+				}
+			}
+			placed.add(next);
+			result.add(listed[next]);
+		}
+		return result;
+	}
+
+	/** How many unplaced listed objects this step's object points at. */
+	private static Integer waitingFor(List<Step> listed, Set<Integer> placed, Integer index) {
+		Integer result = 0;
+		for (Integer other = 0; other < listed.size(); other++) {
+			if (
+				other != index &&
+				!placed.contains(other) &&
+				linkField(listed[index].type, listed[other].type) != null
+			) {
+				result++;
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * The field of the child object that links a record to its row's parent (R-IT20): a lookup
+	 * or master-detail to the parent alone that the user may fill in. With several, the one
+	 * named after the parent (`AccountId`, `Account__c`), else the first by API name. Null for
+	 * none, and for an object and itself.
+	 */
+	@NamespaceAccessible
+	public static String linkField(Schema.SObjectType child, Schema.SObjectType parent) {
+		if (child == null || parent == null || child == parent) {
+			return null;
+		}
+		String pair = String.valueOf(child) + '>' + String.valueOf(parent);
+		if (linkFields.containsKey(pair)) {
+			return linkFields.get(pair);
+		}
+		List<String> names = new List<String>();
+		String preferred = null;
+		String parentName = localName(
+				parent.getDescribe(SObjectDescribeOptions.DEFERRED).getName().toLowerCase()
+			)
+			.removeEnd('__c');
+		for (Schema.SObjectField token : fieldsOf(child).values()) {
+			Schema.DescribeFieldResult field = token.getDescribe();
+			String name = field.getName().toLowerCase();
+			// A person account's own fields (PersonContactId, PersonReportsToId, __pc) never link.
+			Boolean personField =
+				child == Account.SObjectType &&
+				((!field.isCustom() && name.startsWith('person')) || name.endsWith('__pc'));
+			if (
+				field.getType() != Schema.DisplayType.REFERENCE ||
+				!field.isCreateable() ||
+				personField ||
+				pointsAt(field, parent) == null ||
+				DataProtectedFields.isProtected(child, field.getName())
+			) {
+				continue;
+			}
+			names.add(field.getName());
+			String bare = localName(field.getName().toLowerCase());
+			if (bare == parentName + 'id' || bare == parentName + '__c') {
+				preferred = field.getName();
+			}
+		}
+		names.sort();
+		String found = preferred != null ? preferred : names.isEmpty() ? null : names[0];
+		linkFields.put(pair, found);
+		return found;
+	}
+
+	/**
+	 * Why the objects of an upload of several objects cannot be saved (R-IT20), or null: none,
+	 * one the org does not have or listed twice, a delete, or a column mapped to an object the
+	 * upload does not load.
+	 */
+	@NamespaceAccessible
+	public static String severalObjectsProblem(ImportMapping mapping) {
+		if (mapping == null || !mapping.loadsSeveralObjects()) {
+			return null;
+		}
+		Set<String> listed = new Set<String>();
+		for (ImportMapping.ObjectStep each : mapping.objects) {
+			Schema.SObjectType type = each == null ? null : typeNamed(each.entity);
+			if (type == null) {
+				return BarnHelp.text('Core', 'Core_Data_ObjectUnknown');
+			}
+			Schema.DescribeSObjectResult described = type.getDescribe(
+				SObjectDescribeOptions.DEFERRED
+			);
+			if (!listed.add(described.getName().toLowerCase())) {
+				return String.format(
+					BarnHelp.text('Core', 'Core_Import_ErrorSeveralObjectsRepeated'),
+					new List<String>{ described.getLabel() }
+				);
+			}
+			if (OPERATION_DELETE.equalsIgnoreCase(each.operation)) {
+				return BarnHelp.text('Core', 'Core_Import_ErrorSeveralObjectsDelete');
+			}
+		}
+		for (ImportMapping.Column column : mapping.columns) {
+			if (column == null || ImportMapping.isIgnored(column.target)) {
+				continue;
+			}
+			Schema.SObjectType type = typeNamed(ImportMapping.entityOf(column.target));
+			String name = type == null
+				? ''
+				: type.getDescribe(SObjectDescribeOptions.DEFERRED).getName().toLowerCase();
+			if (!listed.contains(name)) {
+				return String.format(
+					BarnHelp.text('Core', 'Core_Import_ErrorSeveralObjectsColumn'),
+					new List<String>{
+						column.source,
+						ImportMapping.entityOf(column.target).abbreviate(80)
+					}
+				);
+			}
+		}
+		return null;
+	}
+
+	/** The first refusal of an upload of several objects, naming its object (R-IT20). */
+	private static String severalRefusal(Import_Template__c template, ImportMapping mapping) {
+		String problem = severalObjectsProblem(mapping);
+		if (problem != null) {
+			return problem;
+		}
+		List<Step> steps = steps(template, mapping);
+		if (steps.isEmpty()) {
+			return BarnHelp.text('Core', 'Core_Import_ErrorNothingMapped');
+		}
+		for (Step step : steps) {
+			String refused = refusal(step.template, step.mapping);
+			if (refused != null) {
+				return String.format(
+					Label.Core_Format_Pair,
+					new List<String>{ step.label(), refused }
+				);
+			}
+		}
+		return null;
+	}
+
+	/** Whether the user's object access allows the operation. */
+	private static Boolean canRun(Schema.DescribeSObjectResult described, String operation) {
+		if (!described.isAccessible() || !described.isQueryable()) {
+			return false;
+		}
+		if (operation == OPERATION_INSERT) {
+			return described.isCreateable();
+		}
+		if (neverCreates(operation)) {
+			return described.isUpdateable();
+		}
+		if (operation == OPERATION_DELETE) {
+			return described.isDeletable();
+		}
+		return described.isCreateable() && described.isUpdateable();
+	}
+
+	/** Whether a value for every row (R-IB14) fills this attribute: every row one record. */
+	private static Boolean givesEveryRow(ImportMapping mapping, String fieldName) {
+		for (ImportMapping.Assignment assignment : mapping.defaults) {
+			if (
+				assignment != null &&
+				!ImportMapping.isIgnored(assignment.target) &&
+				ImportMapping.ENTITY_RECORD.equalsIgnoreCase(
+					ImportMapping.entityOf(assignment.target)
+				) &&
+				String.isNotBlank(assignment.value) &&
+				mapsField(
+					new Set<String>{ ImportMapping.attributeOf(assignment.target).toLowerCase() },
+					fieldName
+				)
+			) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/** Whether one of these attributes names this field, with or without the namespace. */
+	@NamespaceAccessible
+	public static Boolean mapsField(Set<String> attributes, String fieldName) {
+		String lower = fieldName.toLowerCase();
+		return attributes.contains(lower) || attributes.contains(localName(lower));
+	}
+
+	// -------------------------------------------------------------------------------------
+	// Reading a cell as its field's type
+	// -------------------------------------------------------------------------------------
+
+	/**
+	 * Why this value cannot be written to this field, or null when it can (R-IT12): text longer
+	 * than the field, or a value that cannot be read as the field's type.
+	 */
+	@NamespaceAccessible
+	public static String unreadable(String value, Schema.DescribeFieldResult field) {
+		Integer length = field.getLength();
+		if (
+			TEXT_TYPES.contains(field.getType()) &&
+			length != null &&
+			length > 0 &&
+			value.length() > length
+		) {
+			return String.format(
+				BarnHelp.text('Core', 'Core_Import_ErrorValueTooLong'),
+				new List<String>{ field.getLabel(), String.valueOf(length) }
+			);
+		}
+		Object converted;
+		try {
+			converted = typed(value, field);
+		} catch (Exception notReadable) {
+			converted = null;
+		}
+		if (converted == null) {
+			return String.format(
+				BarnHelp.text('Core', 'Core_Import_ErrorValueUnreadable'),
+				new List<String>{ field.getLabel(), value.abbreviate(80) }
+			);
+		}
+		return null;
+	}
+
+	/**
+	 * A value as its field's type. A date is read as ISO 8601 (2026-10-12) or in the running
+	 * user's locale; a date and time as ISO 8601 or in the locale; a number as
+	 * `ImportValues.number` reads it, so "$1,250.00", "1 250,50" in a locale that writes it so
+	 * and "(45.00)" load; a checkbox as `checkbox` reads it.
+	 * Returns null, or throws, when the value cannot be read. Lookups are not read here.
+	 */
+	@NamespaceAccessible
+	public static Object typed(String value, Schema.DescribeFieldResult field) {
+		Schema.DisplayType kind = field.getType();
+		String trimmed = value == null ? '' : value.trim();
+		if (TEXT_TYPES.contains(kind)) {
+			return value;
+		}
+		if (kind == Schema.DisplayType.BOOLEAN) {
+			return checkbox(trimmed);
+		}
+		if (
+			kind == Schema.DisplayType.CURRENCY ||
+			kind == Schema.DisplayType.DOUBLE ||
+			kind == Schema.DisplayType.PERCENT
+		) {
+			return ImportValues.number(trimmed);
+		}
+		if (kind == Schema.DisplayType.INTEGER || kind == Schema.DisplayType.LONG) {
+			// A whole number, however it is written; "12.5" is not one.
+			Decimal whole = ImportValues.number(trimmed);
+			if (whole == null || whole != whole.round(System.RoundingMode.DOWN)) {
+				return null;
+			}
+			if (kind == Schema.DisplayType.LONG) {
+				return whole.longValue();
+			}
+			return Math.abs(whole) > 2147483647 ? null : whole.intValue();
+		}
+		if (kind == Schema.DisplayType.DATE) {
+			return dateOf(trimmed);
+		}
+		if (kind == Schema.DisplayType.DATETIME) {
+			return datetimeOf(trimmed);
+		}
+		if (kind == Schema.DisplayType.TIME) {
+			return timeOf(trimmed);
+		}
+		return null;
+	}
+
+	/** The spellings a file uses for a ticked checkbox, lower case (canonical model R-IT11). */
+	private static final Set<String> CHECKED = new Set<String>{
+		'true',
+		'yes',
+		'y',
+		'1',
+		'x',
+		'checked',
+		'on',
+		't'
+	};
+
+	/** The spellings a file uses for a cleared checkbox, lower case (canonical model R-IT11). */
+	private static final Set<String> CLEARED = new Set<String>{
+		'false',
+		'no',
+		'n',
+		'0',
+		'off',
+		'f'
+	};
+
+	/**
+	 * A checkbox value as every import reads it (R-IT11): true or false, ignoring case and
+	 * surrounding spaces, or null for a blank value or one that is neither, which is never read
+	 * as cleared. The people import and the one-object load share this one reading.
+	 */
+	@NamespaceAccessible
+	public static Boolean checkbox(String value) {
+		String lower = value == null ? '' : value.trim().toLowerCase();
+		if (CHECKED.contains(lower)) {
+			return true;
+		}
+		if (CLEARED.contains(lower)) {
+			return false;
+		}
+		return null;
+	}
+
+	private static Date dateOf(String value) {
+		if (Pattern.matches('\\d{4}-\\d{1,2}-\\d{1,2}', value)) {
+			return Date.valueOf(value);
+		}
+		return Date.parse(value);
+	}
+
+	private static Datetime datetimeOf(String value) {
+		if (Pattern.matches('\\d{4}-\\d{1,2}-\\d{1,2} \\d{1,2}:\\d{2}(:\\d{2})?', value)) {
+			return Datetime.valueOf(value.countMatches(':') == 1 ? value + ':00' : value);
+		}
+		if (Pattern.matches('\\d{4}-\\d{2}-\\d{2}T.*', value)) {
+			return (Datetime) JSON.deserialize('"' + value + '"', Datetime.class);
+		}
+		return Datetime.parse(value);
+	}
+
+	private static Time timeOf(String value) {
+		if (!Pattern.matches('\\d{1,2}:\\d{2}(:\\d{2})?', value)) {
+			return null;
+		}
+		List<String> parts = value.split(':');
+		Integer hours = Integer.valueOf(parts[0]);
+		Integer minutes = Integer.valueOf(parts[1]);
+		Integer seconds = parts.size() > 2 ? Integer.valueOf(parts[2]) : 0;
+		if (hours > 23 || minutes > 59 || seconds > 59) {
+			return null;
+		}
+		return Time.newInstance(hours, minutes, seconds, 0);
+	}
+
+	// -------------------------------------------------------------------------------------
+	// Helpers
+	// -------------------------------------------------------------------------------------
+
+	/**
+	 * Whether a column may fill this field: the user may create or edit it, it is not
+	 * protected, and a file's text can be read into it (a lookup is read as its parent).
+	 */
+	@NamespaceAccessible
+	public static Boolean isWritable(Schema.SObjectType type, Schema.DescribeFieldResult field) {
+		Schema.DisplayType kind = field.getType();
+		Boolean readableType =
+			kind == Schema.DisplayType.REFERENCE ||
+			TEXT_TYPES.contains(kind) ||
+			kind == Schema.DisplayType.BOOLEAN ||
+			kind == Schema.DisplayType.CURRENCY ||
+			kind == Schema.DisplayType.DOUBLE ||
+			kind == Schema.DisplayType.PERCENT ||
+			kind == Schema.DisplayType.INTEGER ||
+			kind == Schema.DisplayType.LONG ||
+			kind == Schema.DisplayType.DATE ||
+			kind == Schema.DisplayType.DATETIME ||
+			kind == Schema.DisplayType.TIME;
+		return readableType &&
+			(field.isCreateable() || field.isUpdateable()) &&
+			!DataProtectedFields.isProtected(type, field.getName());
+	}
+
+	/** Each object's fields by lower case API name, described once per transaction. */
+	@NamespaceAccessible
+	public static Map<String, Schema.SObjectField> fieldsOf(Schema.SObjectType type) {
+		if (type == null) {
+			return new Map<String, Schema.SObjectField>();
+		}
+		if (!fieldMaps.containsKey(type)) {
+			fieldMaps.put(type, type.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap());
+		}
+		return fieldMaps.get(type);
+	}
+
+	/** The field of this name, with or without the package's namespace, or null. */
+	@NamespaceAccessible
+	public static Schema.SObjectField fieldNamed(Schema.SObjectType type, String fieldName) {
+		if (String.isBlank(fieldName)) {
+			return null;
+		}
+		Map<String, Schema.SObjectField> fields = fieldsOf(type);
+		String lower = fieldName.trim().toLowerCase();
+		Schema.SObjectField found = fields.get(lower);
+		return found != null ? found : fields.get(NamespaceUtil.prefix().toLowerCase() + lower);
+	}
+
+	/** A field's label, or its name when the object has no such field. */
+	@NamespaceAccessible
+	public static String labelOf(Schema.SObjectType type, String fieldName) {
+		Schema.SObjectField token = fieldNamed(type, fieldName);
+		return token == null ? fieldName : token.getDescribe().getLabel();
+	}
+
+	/** A lower case API name without this package's namespace. */
+	@NamespaceAccessible
+	public static String localName(String lowerCaseName) {
+		String prefix = NamespaceUtil.prefix();
+		prefix = prefix == null ? '' : prefix.toLowerCase();
+		return String.isNotBlank(prefix) && lowerCaseName.startsWith(prefix)
+			? lowerCaseName.removeStart(prefix)
+			: lowerCaseName;
+	}
+
+	/** Whether a name given in a template is this field, with or without the namespace. */
+	private static Boolean sameField(String describedName, String given) {
+		String lower = given.trim().toLowerCase();
+		String described = describedName.toLowerCase();
+		return described == lower || localName(described) == localName(lower);
+	}
+
+	/** A heading or a name folded for comparison: lower case, letters and digits only. */
+	private static String normalized(String text) {
+		return text == null ? '' : text.toLowerCase().replaceAll('[^a-z0-9]', '');
+	}
+
+	private static List<ImportMapping.Target> sortedValues(
+		Map<String, ImportMapping.Target> byLabel
+	) {
+		List<String> labels = new List<String>(byLabel.keySet());
+		labels.sort();
+		List<ImportMapping.Target> result = new List<ImportMapping.Target>();
+		for (String label : labels) {
+			result.add(byLabel.get(label));
+		}
+		return result;
+	}
 }

@@ -51,7 +51,7 @@ describe('c-feature-settings', () => {
     expect(all(element, 'feature-row')).toHaveLength(2);
     const buttons = all(element, 'turn-on');
     expect(buttons.map((button) => button.dataset.key)).toEqual(['Relationships']);
-    expect(all(element, 'state').map((state) => state.textContent)).toEqual(['c.Core_Feature_On']);
+    expect(all(element, 'state').map((state) => state.label)).toEqual(['c.Core_Feature_On']);
   });
 
   it('offers no Turn on to someone who cannot manage settings', async () => {
@@ -127,7 +127,7 @@ describe('c-feature-settings', () => {
     all(element, 'turn-on')[0].click();
     await flushPromises();
 
-    expect(all(element, 'error')[0].textContent).toBe('Could not turn it on.');
+    expect(all(element, 'error')[0].message).toBe('Could not turn it on.');
   });
 
   it('tells the console nothing when the confirmation is cancelled', async () => {
@@ -141,5 +141,27 @@ describe('c-feature-settings', () => {
     await flushPromises();
 
     expect(turnedOn).not.toHaveBeenCalled();
+  });
+
+  it('says why a feature waits and disables its Turn On', async () => {
+    getFeatures.mockResolvedValue({
+      canEdit: true,
+      features: [
+        {
+          key: 'HouseholdUpkeep',
+          name: 'Household Upkeep',
+          description: 'Households.',
+          isOn: false,
+          blockedReason: 'NPSP households are still in use.'
+        },
+        { key: 'Relationships', name: 'Relationships', description: 'Both sides.', isOn: false }
+      ]
+    });
+    const element = await build();
+
+    expect(all(element, 'blocked').map((notice) => notice.message)).toEqual([
+      'NPSP households are still in use.'
+    ]);
+    expect(all(element, 'turn-on').map((button) => button.disabled)).toEqual([true, false]);
   });
 });

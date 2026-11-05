@@ -5,83 +5,83 @@
  */
 @IsTest(testFor='ApexClass:ModuleAccessSyncs')
 private class ModuleAccessSyncsTest {
-    @TestSetup
-    static void createAdmin() {
-        TestUsers.admin();
-    }
+	@TestSetup
+	static void createAdmin() {
+		TestUsers.admin();
+	}
 
-    private class SyncRefusedException extends Exception {
-    }
+	private class SyncRefusedException extends Exception {
+	}
 
-    /** A sync that counts how often it is asked, and can fail. */
-    private class RecordingSync implements ModuleAccessSync {
-        public Integer asked = 0;
-        private final Boolean fails;
+	/** A sync that counts how often it is asked, and can fail. */
+	private class RecordingSync implements ModuleAccessSync {
+		public Integer asked = 0;
+		private final Boolean fails;
 
-        RecordingSync(Boolean fails) {
-            this.fails = fails;
-        }
+		RecordingSync(Boolean fails) {
+			this.fails = fails;
+		}
 
-        public void requestSync() {
-            asked++;
-            if (fails) {
-                throw new SyncRefusedException('Refused');
-            }
-        }
-    }
+		public void requestSync() {
+			asked++;
+			if (fails) {
+				throw new SyncRefusedException('Refused');
+			}
+		}
+	}
 
-    @IsTest
-    static void theNightlyCheckAsksEveryModuleEvenWhenOneFails() {
-        System.runAs(TestUsers.admin()) {
-            RecordingSync failing = new RecordingSync(true);
-            RecordingSync working = new RecordingSync(false);
-            ModuleAccessSyncs.overrides.put('Example_Failing', failing);
-            ModuleAccessSyncs.overrides.put('Example_Working', working);
+	@IsTest
+	static void theNightlyCheckAsksEveryModuleEvenWhenOneFails() {
+		System.runAs(TestUsers.admin()) {
+			RecordingSync failing = new RecordingSync(true);
+			RecordingSync working = new RecordingSync(false);
+			ModuleAccessSyncs.overrides.put('Example_Failing', failing);
+			ModuleAccessSyncs.overrides.put('Example_Working', working);
 
-            Test.startTest();
-            new TabAccessScheduler().execute(null);
-            Test.stopTest();
+			Test.startTest();
+			new TabAccessScheduler().execute(null);
+			Test.stopTest();
 
-            Assert.areEqual(1, failing.asked, 'The failing sync was asked, and its failure logged');
-            Assert.areEqual(1, working.asked, 'And it did not stop the next one');
-        }
-    }
+			Assert.areEqual(1, failing.asked, 'The failing sync was asked, and its failure logged');
+			Assert.areEqual(1, working.asked, 'And it did not stop the next one');
+		}
+	}
 
-    @IsTest
-    static void turningOnAsksOnlyThatModule() {
-        System.runAs(TestUsers.admin()) {
-            RecordingSync volunteers = new RecordingSync(false);
-            RecordingSync other = new RecordingSync(false);
-            ModuleAccessSyncs.overrides.put('Example_Volunteers', volunteers);
-            ModuleAccessSyncs.overrides.put('Example_Other', other);
+	@IsTest
+	static void turningOnAsksOnlyThatModule() {
+		System.runAs(TestUsers.admin()) {
+			RecordingSync volunteers = new RecordingSync(false);
+			RecordingSync other = new RecordingSync(false);
+			ModuleAccessSyncs.overrides.put('Example_Volunteers', volunteers);
+			ModuleAccessSyncs.overrides.put('Example_Other', other);
 
-            Test.startTest();
-            ModuleAccessSyncs.requestFor('Example_Volunteers');
-            ModuleAccessSyncs.requestFor('Example_Absent');
-            Test.stopTest();
+			Test.startTest();
+			ModuleAccessSyncs.requestFor('Example_Volunteers');
+			ModuleAccessSyncs.requestFor('Example_Absent');
+			Test.stopTest();
 
-            Assert.areEqual(1, volunteers.asked, 'The module turned on is asked');
-            Assert.areEqual(0, other.asked, 'No other module is asked');
-        }
-    }
+			Assert.areEqual(1, volunteers.asked, 'The module turned on is asked');
+			Assert.areEqual(0, other.asked, 'No other module is asked');
+		}
+	}
 
-    @IsTest
-    static void aMissingOrWrongClassIsSkipped() {
-        System.runAs(TestUsers.admin()) {
-            Exception thrown;
+	@IsTest
+	static void aMissingOrWrongClassIsSkipped() {
+		System.runAs(TestUsers.admin()) {
+			Exception thrown;
 
-            Test.startTest();
-            try {
-                // No class Example_MissingAccessSync exists.
-                ModuleAccessSyncs.requestFor('Example_Missing');
-                // ModuleAccessSync is the interface itself, which cannot be built.
-                ModuleAccessSyncs.requestFor('Module');
-            } catch (Exception e) {
-                thrown = e;
-            }
-            Test.stopTest();
+			Test.startTest();
+			try {
+				// No class Example_MissingAccessSync exists.
+				ModuleAccessSyncs.requestFor('Example_Missing');
+				// ModuleAccessSync is the interface itself, which cannot be built.
+				ModuleAccessSyncs.requestFor('Module');
+			} catch (Exception e) {
+				thrown = e;
+			}
+			Test.stopTest();
 
-            Assert.isNull(thrown, 'A missing or wrong class never gets in the way: ' + thrown);
-        }
-    }
+			Assert.isNull(thrown, 'A missing or wrong class never gets in the way: ' + thrown);
+		}
+	}
 }

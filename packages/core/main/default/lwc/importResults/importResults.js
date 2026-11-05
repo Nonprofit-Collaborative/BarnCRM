@@ -1,4 +1,6 @@
 import { LightningElement, api } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
+import seeEveryRow from '@salesforce/label/c.Core_Import_SeeEveryRow';
 
 import previewWouldCreate from '@salesforce/label/c.Core_Import_PreviewWouldCreate';
 import previewWouldUpdate from '@salesforce/label/c.Core_Import_PreviewWouldUpdate';
@@ -12,14 +14,12 @@ import runLogHeading from '@salesforce/label/c.Core_Import_RunLogHeading';
 import rejectedHeading from '@salesforce/label/c.Core_Import_RejectedHeading';
 import rowNumberHeader from '@salesforce/label/c.Core_Import_ResultsRow';
 import reasonHeader from '@salesforce/label/c.Core_Import_ResultsReason';
-import noRejectedRows from '@salesforce/label/c.Core_Import_NoRejectedRows';
-import rejectedShownOf from '@salesforce/label/c.Core_Import_RejectedShownOf';
-import runningMessage from '@salesforce/label/c.Core_Import_RunningMessage';
 import loadingAltText from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import changedValuesHeading from '@salesforce/label/c.Core_Import_ChangedValuesHeading';
 import columnHeader from '@salesforce/label/c.Core_Import_ColumnHeader';
 import beforeHeader from '@salesforce/label/c.Core_Import_ChangesBefore';
 import afterHeader from '@salesforce/label/c.Core_Import_ChangesAfter';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * What an import did, or on a dry run what it would do: the four counts, the run log, and
@@ -30,7 +30,17 @@ import afterHeader from '@salesforce/label/c.Core_Import_ChangesAfter';
  * presentational: the wizard fetches and passes everything in.
  * See docs/admin-guide/importing.md.
  */
-export default class ImportResults extends LightningElement {
+export default class ImportResults extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   /** The batch view from ImportController. */
   @api batch;
   /** The rejected rows of that batch, already fetched. */
@@ -43,14 +53,36 @@ export default class ImportResults extends LightningElement {
     rejectedHeading,
     rowNumberHeader,
     reasonHeader,
-    noRejectedRows,
-    runningMessage,
+    get noRejectedRows() {
+      return helpText('Core', 'Core_Import_NoRejectedRows');
+    },
+    get runningMessage() {
+      return helpText('Core', 'Core_Import_RunningMessage');
+    },
     loadingAltText,
     changedValuesHeading,
     columnHeader,
     beforeHeader,
-    afterHeader
+    afterHeader,
+    seeEveryRow
   };
+
+  /** Every row of this import is on the data job's Import Rows list (admin-22). */
+  get canSeeRows() {
+    return Boolean(this.batch && this.batch.id && this.batch.isFinished && this.batch.rowCount > 0);
+  }
+
+  handleSeeEveryRow() {
+    this[NavigationMixin.Navigate]({
+      type: 'standard__recordRelationshipPage',
+      attributes: {
+        recordId: this.batch.id,
+        objectApiName: 'Import_Batch__c',
+        relationshipApiName: 'Import_Rows',
+        actionName: 'view'
+      }
+    });
+  }
 
   get hasChangedValues() {
     return Array.isArray(this.changedValues) && this.changedValues.length > 0;
@@ -110,7 +142,7 @@ export default class ImportResults extends LightningElement {
     const shown = Array.isArray(this.rejectedRows) ? this.rejectedRows.length : 0;
     const total = (this.batch && this.batch.rejected) || 0;
     return shown > 0 && total > shown
-      ? rejectedShownOf
+      ? helpText('Core', 'Core_Import_RejectedShownOf')
           .replace('{0}', shown.toLocaleString())
           .replace('{1}', total.toLocaleString())
       : '';

@@ -7,30 +7,22 @@ import { groupReferences, retireSteps, doneCount } from './whereUsedModel';
 
 import TITLE from '@salesforce/label/c.Core_WhereUsed_Title';
 import LOADING from '@salesforce/label/c.Core_WhereUsed_Loading';
-import NOT_CHECKED from '@salesforce/label/c.Core_WhereUsed_NotChecked';
 import OPEN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
-import INCOMPLETE from '@salesforce/label/c.Core_WhereUsed_Incomplete';
-import NONE from '@salesforce/label/c.Core_WhereUsed_None';
-import NONE_OBJECT from '@salesforce/label/c.Core_WhereUsed_NoneObject';
-import COUNT from '@salesforce/label/c.Core_WhereUsed_Count';
-import COUNT_ONE from '@salesforce/label/c.Core_WhereUsed_CountOne';
 import NAMED_IN from '@salesforce/label/c.Core_WhereUsed_NamedIn';
 import BREAKS from '@salesforce/label/c.Core_WhereUsed_Breaks';
 import SHOW_OBJECT from '@salesforce/label/c.Core_WhereUsed_ShowObject';
 import SHOW_FIELD from '@salesforce/label/c.Core_WhereUsed_ShowField';
 import RETIRE_TITLE from '@salesforce/label/c.Core_WhereUsed_RetireTitle';
-import STEP_NO_REFERENCES from '@salesforce/label/c.Core_WhereUsed_StepNoReferences';
-import STEP_CANNOT_DELETE from '@salesforce/label/c.Core_WhereUsed_StepCannotDelete';
 import OPEN_FIND from '@salesforce/label/c.Core_DataHygiene_OpenInFind';
 import PROGRESS from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
-const STEP_TEXT = {
+const STEP_TEXT = () => ({
   get references() {
     return helpText('Core', 'Core_WhereUsed_StepReferences');
   },
-  noReferences: STEP_NO_REFERENCES,
+  noReferences: helpText('Core', 'Core_WhereUsed_StepNoReferences'),
   get salesforce() {
     return helpText('Core', 'Core_WhereUsed_StepSalesforce');
   },
@@ -43,8 +35,8 @@ const STEP_TEXT = {
   get delete() {
     return helpText('Core', 'Core_WhereUsed_StepDelete');
   },
-  cannotDelete: STEP_CANNOT_DELETE
-};
+  cannotDelete: helpText('Core', 'Core_WhereUsed_StepCannotDelete')
+});
 
 /**
  * Where Used and Retire a Field (C-59, admin guide where-used.md): which BarnCRM setup records
@@ -63,9 +55,13 @@ export default class WhereUsedModal extends LightningModal {
 
   labels = {
     loading: LOADING,
-    notChecked: NOT_CHECKED,
+    get notChecked() {
+      return helpText('Core', 'Core_WhereUsed_NotChecked');
+    },
     openSetup: OPEN_SETUP,
-    incomplete: INCOMPLETE,
+    get incomplete() {
+      return helpText('Core', 'Core_WhereUsed_Incomplete');
+    },
     retireTitle: RETIRE_TITLE,
     get retireIntro() {
       return helpText('Core', 'Core_WhereUsed_RetireIntro');
@@ -140,11 +136,15 @@ export default class WhereUsedModal extends LightningModal {
 
   get countText() {
     const count = this.hasReferences ? this.result.references.length : 0;
-    return count === 1 ? COUNT_ONE : format(COUNT, String(count));
+    return count === 1
+      ? helpText('Core', 'Core_WhereUsed_CountOne')
+      : format(helpText('Core', 'Core_WhereUsed_Count'), String(count));
   }
 
   get noneText() {
-    return this.wholeObject ? NONE_OBJECT : NONE;
+    return this.wholeObject
+      ? helpText('Core', 'Core_WhereUsed_NoneObject')
+      : helpText('Core', 'Core_WhereUsed_None');
   }
 
   get showEmpty() {
@@ -182,7 +182,7 @@ export default class WhereUsedModal extends LightningModal {
     const findUrl = this.result && this.result.findUrl;
     return retireSteps(this.result).map((step) => ({
       ...step,
-      text: STEP_TEXT[step.key],
+      text: STEP_TEXT()[step.key],
       checked: this.ticked.has(step.key),
       linkUrl: step.link === 'setup' ? this.setupUrl : step.link === 'find' ? findUrl : null,
       linkLabel: step.link === 'find' ? OPEN_FIND : OPEN_SETUP

@@ -49,8 +49,8 @@ install and no Setup step. Once it is on, two things are worth setting once.
    - **Nobody moves until you choose**: editing one person's address gives that person an
      address of their own, as above, and a change to the household's address (a new primary
      on its card, an edit to its billing address) changes the household only. Its people keep
-     their mailing address until you choose **Update Everyone's Address** on the household's
-     primary address card (see "Moving a household on purpose" below). The seasonal swap is
+     their mailing address until you choose **Give This Address to Members** from the **More**
+     menu of the household's primary address (see "Moving a household on purpose" below). The seasonal swap is
      the one exception: it still moves everyone in the household who has no address of their
      own, because the dates were chosen in advance. Choose this if your team checks every
      move before a mailing goes out.
@@ -58,7 +58,7 @@ install and no Setup step. Once it is on, two things are worth setting once.
 
 Then turn on the seasonal address swap, which is off until you turn it on.
 
-5. Stay on the **Addresses** page and tick **Turn On Seasonal Addresses**, then choose **Save**.
+5. Stay on the **Addresses** page and tick **Turn on seasonal addresses**, then choose **Save**.
    BarnCRM schedules the nightly job for you: there is no separate button to press.
 6. Under **Seasonal Address Swap** the message now reads "The swap runs every night at
    12:30 AM, in your organization's time zone" and the date of the next run appears under it.
@@ -68,7 +68,7 @@ Then turn on the seasonal address swap, which is off until you turn it on.
    works. Refresh the page after a minute: **Seasonal Addresses Last Swapped** shows the time
    it finished and a sentence saying how many addresses moved.
 
-Saving the **Turn On Seasonal Addresses** box again when the job is already scheduled changes nothing, so
+Saving the **Turn on seasonal addresses** box again when the job is already scheduled changes nothing, so
 the job is never scheduled twice. Untick it and choose **Save** to stop the job. **Run the
 swap now** works whether the switch is on or off.
 
@@ -77,7 +77,7 @@ gives you, to save the switch or to use **Run the Swap Now**. Everyone else sees
 last run and cannot change either.
 
 There is nothing to do in Setup. Scheduling Apex is normally a Setup task, and BarnCRM
-does not ask you to do that: the **Turn On Seasonal Addresses** switch is the supported way to
+does not ask you to do that: the **Turn on seasonal addresses** switch is the supported way to
 schedule the swap. The Module Manager switches whole modules on and off; the seasonal swap
 belongs to Core, which is always on, so it is scheduled here. If your organization already
 ran the nightly swap before this switch existed, the upgrade turns the switch on for you and
@@ -162,23 +162,23 @@ own gets the new mailing address.
 
 ## Moving a Household on Purpose
 
-Two buttons on the **Addresses** card move a household when you decide to, whatever
-**Address Updates** is set to. They need the same access as **Set as Primary**: edit on
-addresses, and on the household and its people. Nothing is deleted: the address each one
-replaces stays on the card as history.
+Two choices in an address's **More** menu on the **Addresses** card move a household when you
+decide to, whatever **Address Updates** is set to. They need the same access as **Set as
+Primary**: edit on addresses, and on the household and its people. Nothing is deleted: the
+address each one replaces stays on the card as history.
 
-- **Use for Whole Household**, on a person's own address card (not a seasonal one). The
+- **Move the Household Here**, on a person's own address (not a seasonal one). The
   household gets a new primary address copied from this one, and everyone in it who has no
   address of their own moves to it. The person stops having an address of their own in use
   (their cards stay, as history), so from now on they move with the household. In the
   flexible way of belonging, if they are a current member of more than one household the
   confirmation asks which, their own household first; choosing another household moves that household
   and leaves the person's own address in use.
-- **Update Everyone's Address**, on the household's primary address card. A confirmation lists
+- **Give This Address to Members**, on the household's primary address. A confirmation lists
   who will get this address (everyone in the household with no address of their own) and who
   has an address of their own. Those are left where they are unless you tick them; a ticked
   person stops having an address of their own in use and gets the household's address. Choose
-  **Update Everyone's Address** in the confirmation to go ahead, or **Cancel**. In the flexible
+  **Give This Address to Members** in the confirmation to go ahead, or **Cancel**. In the flexible
   way of belonging, a person whose own household is another one is not listed.
 
 Neither move reaches someone marked **Deceased**: they are not moved and not listed. When
@@ -188,7 +188,7 @@ two people in the list share a name, each shows their birthdate, for example "Sa
 Both confirmations open in a dialog over the page, so nothing on the card moves while you
 decide; **Escape** or **Cancel** closes it with nothing changed.
 
-With **Nobody moves until you choose**, **Update Everyone's Address** is how a household's
+With **Nobody moves until you choose**, **Give This Address to Members** is how a household's
 new address reaches its people. In the other two settings it is how you bring someone with an
 address of their own back to the household's address.
 
@@ -201,8 +201,8 @@ and an **End Date**, so the card can tell where someone lives now from where the
 different place from the primary it replaces, the old one gets today as its **End Date** and
 becomes **Former**, and the new one gets today as its **Start Date**. That happens however the
 new primary arrives: added on the card with **Primary** ticked, typed into the household's
-billing address or a person's mailing address, **Use for Whole Household**, or an import. A
-person whose own address **Use for Whole Household** or **Update Everyone's Address** stops
+billing address or a person's mailing address, **Move the Household Here**, or an import. A
+person whose own address **Move the Household Here** or **Give This Address to Members** stops
 using is ended the same way, unless the household's address is the same place. BarnCRM keeps
 these dates and the status itself, so a person whose access to addresses does not include the
 three fields (for example access from a profile, without a BarnCRM permission set) still saves
@@ -242,17 +242,19 @@ included, and the address number. Nothing is ticked on a new install, so the car
 its usual fields. A field someone cannot see is left out for them, and a field the card
 already shows is not repeated.
 
-**How the card looks.** Each address is its own box with a map pin, its type and its badges
-(**Primary**, **Undeliverable**) at the top with the **Change Status** menu at the right, the
-address under them, and the buttons below. The buttons wrap onto a new line in a narrow sidebar or on a
-phone. A record with no address yet shows **No Addresses Yet** with an **Add Address** button.
+**How the card looks.** The addresses are a list divided by lines. Each line has the address
+icon, its type (a link to the address record) and its badges (**Primary** with a star,
+**Undeliverable** in red) at the top with the **More** menu at the right, the address under
+them, and **Set as Primary** below. **More** holds **Edit** (the standard edit form), the
+status choices, and the household move the address allows. Former addresses sit on shaded
+lines. A record with no address yet shows **No Addresses Yet** with an **Add Address** button.
 
 ## A Five-Minute Walkthrough for the Seasonal Swap
 
 Still the Garcia household, and still five minutes. This time you are proving to yourself
 that the nightly job really works, before the winter mailing goes out.
 
-1. Open **BarnCRM Settings** and choose **Addresses**. If **Turn On Seasonal Addresses** is not
+1. Open **BarnCRM Settings** and choose **Addresses**. If **Turn on seasonal addresses** is not
    ticked, tick it and choose **Save**.
 2. Open **The Garcia Family** and look at the **Addresses** card. The Arizona address you
    added is of type **Seasonal** and reads "Used from January 1 to March 31". The **Primary**
@@ -302,10 +304,10 @@ not their household (their household is the one they are the primary member of, 
 one they joined first). They stay put when the household's primary changes, when its billing
 address is edited, and when the seasonal swap moves it. This is how a student stays at their
 dorm, or an adult child at their own home, while the rest of the household moves. To bring a
-person back to the household's address, choose **Update Everyone's Address** on the
+person back to the household's address, choose **Give This Address to Members** on the
 household's primary address and tick them; see "Moving a household on purpose". With
 **Address Updates** set to **Nobody moves until you choose**, a household change reaches
-nobody until you choose that button, except the seasonal swap.
+nobody until you choose it, except the seasonal swap.
 
 **Typing a state or country as a code in an org with State and Country Picklists.** With the
 picklists on, the standard address boxes take a full name ("Illinois", "United States") as
@@ -368,7 +370,7 @@ address and marking it primary over deleting the old one: the old address is the
 where a mailing actually went.
 
 **Expecting the swap to happen without turning it on.** Entering seasonal dates is not enough:
-**Turn On Seasonal Addresses** has to be ticked and saved once, on the Addresses page of BarnCRM
+**Turn on seasonal addresses** has to be ticked and saved once, on the Addresses page of BarnCRM
 Settings, which schedules the nightly job. Until you do that, the page says so in as many
 words and the home page tile says the swap has not run. If
 the tile ever says the swap is scheduled but has not run in more than 36 hours, choose

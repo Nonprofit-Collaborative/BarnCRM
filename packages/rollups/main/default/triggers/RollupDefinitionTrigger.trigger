@@ -9,13 +9,13 @@
  * for the same reason: it must not be switched off with a handler.
  */
 trigger RollupDefinitionTrigger on Rollup_Definition__c(
-    before insert,
-    before update,
-    before delete
+	before insert,
+	before update,
+	before delete
 ) {
-    RollupSelector.clearCache();
-    if (Trigger.isInsert || Trigger.isUpdate) {
-        RollupDefinitionGuard.check(Trigger.new, Trigger.oldMap);
-    }
-    TriggerDispatcher.run('Rollup_Definition__c');
+	RollupSelector.clearCache();
+	if (Trigger.isInsert || Trigger.isUpdate) {
+		RollupDefinitionGuard.check(Trigger.new, Trigger.oldMap);
+	}
+	TriggerDispatcher.run('Rollup_Definition__c');
 }

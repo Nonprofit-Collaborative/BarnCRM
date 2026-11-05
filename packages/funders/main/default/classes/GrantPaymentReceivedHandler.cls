@@ -7,35 +7,35 @@
  */
 @NamespaceAccessible
 public with sharing class GrantPaymentReceivedHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public GrantPaymentReceivedHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public GrantPaymentReceivedHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'GrantPaymentReceivedHandler';
-    }
+	public override String getName() {
+		return 'GrantPaymentReceivedHandler';
+	}
 
-    public override void beforeInsert() {
-        GrantPaymentService.fillReceivedDates((List<Grant_Payment__c>) Trigger.new, null);
-    }
+	public override void beforeInsert() {
+		GrantPaymentService.fillReceivedDates((List<Grant_Payment__c>) newRecords(), null);
+	}
 
-    public override void beforeUpdate() {
-        GrantPaymentService.fillReceivedDates(
-            (List<Grant_Payment__c>) Trigger.new,
-            (Map<Id, Grant_Payment__c>) Trigger.oldMap
-        );
-    }
+	public override void beforeUpdate() {
+		GrantPaymentService.fillReceivedDates(
+			(List<Grant_Payment__c>) newRecords(),
+			(Map<Id, Grant_Payment__c>) oldRecordsById()
+		);
+	}
 
-    public override void afterInsert() {
-        GrantPaymentService.syncLedger((List<Grant_Payment__c>) Trigger.new, false);
-    }
+	public override void afterInsert() {
+		GrantPaymentService.syncLedger((List<Grant_Payment__c>) newRecords(), false);
+	}
 
-    public override void afterUpdate() {
-        GrantPaymentService.syncLedger((List<Grant_Payment__c>) Trigger.new, false);
-    }
+	public override void afterUpdate() {
+		GrantPaymentService.syncLedger((List<Grant_Payment__c>) newRecords(), false);
+	}
 
-    public override void beforeDelete() {
-        GrantPaymentService.syncLedger((List<Grant_Payment__c>) Trigger.old, true);
-    }
+	public override void beforeDelete() {
+		GrantPaymentService.syncLedger((List<Grant_Payment__c>) oldRecords(), true);
+	}
 }

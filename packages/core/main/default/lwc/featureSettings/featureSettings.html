@@ -1,16 +1,28 @@
 <template>
-    <div class="slds-scoped-notification slds-theme_warning slds-var-m-bottom_small" role="note" data-id="one-way-warning">
-        <p class="slds-text-body_regular">{labels.warning}</p>
-    </div>
+    <template lwc:if={helpReady}>
+    <c-barn-notice
+        class="slds-var-m-bottom_small"
+        variant="warning"
+        message={labels.warning}
+        data-id="one-way-warning"
+    ></c-barn-notice>
 
     <template lwc:if={loaded}>
         <ul class="slds-has-dividers_bottom-space" data-id="feature-list">
-            <template for:each={features} for:item="feature">
+            <template for:each={rows} for:item="feature">
                 <li key={feature.key} class="slds-item" data-id="feature-row" data-key={feature.key}>
                     <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
                         <div class="slds-col slds-grow">
                             <p class="slds-text-heading_x-small">{feature.name}</p>
                             <p class="slds-text-body_small slds-text-color_weak">{feature.description}</p>
+                            <template lwc:if={feature.blockedReason}>
+                                <c-barn-notice
+                                    class="slds-var-m-top_xx-small"
+                                    variant="warning"
+                                    message={feature.blockedReason}
+                                    data-id="blocked"
+                                ></c-barn-notice>
+                            </template>
                         </div>
                         <div class="slds-col slds-grow-none slds-var-p-left_small">
                             <template lwc:if={feature.showTurnOn}>
@@ -19,12 +31,12 @@
                                     title={feature.buttonLabel}
                                     data-key={feature.key}
                                     data-id="turn-on"
-                                    disabled={isBusy}
+                                    disabled={feature.turnOnDisabled}
                                     onclick={handleTurnOn}
                                 ></lightning-button>
                             </template>
                             <template lwc:else>
-                                <span class={feature.stateClass} data-id="state">{feature.stateLabel}</span>
+                                <c-barn-status-badge status={feature.stateStatus} label={feature.stateLabel} data-id="state"></c-barn-status-badge>
                             </template>
                         </div>
                     </div>
@@ -37,6 +49,7 @@
         <p class="slds-text-color_success slds-var-m-top_x-small" role="status" data-id="saved">{savedMessage}</p>
     </template>
     <template lwc:if={errorMessage}>
-        <p class="slds-text-color_error slds-var-m-top_x-small" role="alert" data-id="error">{errorMessage}</p>
+        <c-barn-notice class="slds-var-m-top_x-small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+    </template>
     </template>
 </template>

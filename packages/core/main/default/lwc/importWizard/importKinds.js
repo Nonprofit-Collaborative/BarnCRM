@@ -4,7 +4,6 @@ import kindObjectTitle from '@salesforce/label/c.Core_Import_KindObjectTitle';
 import kindSeveralTitle from '@salesforce/label/c.Core_Import_KindSeveralTitle';
 import kindDeleteTitle from '@salesforce/label/c.Core_Import_KindDeleteTitle';
 import kindTemplatesTitle from '@salesforce/label/c.Core_Import_KindTemplatesTitle';
-import createsSummary from '@salesforce/label/c.Core_Import_CreatesSummary';
 import loadsSummary from '@salesforce/label/c.Core_Import_LoadsSummary';
 import loadsRelatedSummary from '@salesforce/label/c.Core_Import_LoadsRelatedSummary';
 import deletesSummary from '@salesforce/label/c.Core_Import_DeletesSummary';
@@ -182,5 +181,7 @@ export function createsText(template, operation) {
     entities.add('Affiliation');
   }
   const kinds = ENTITY_KINDS.filter(([entity]) => entities.has(entity)).map(([, text]) => text);
-  return kinds.length > 0 ? format(createsSummary, kinds.join(', ')) : '';
+  return kinds.length > 0
+    ? format(helpText('Core', 'Core_Import_CreatesSummary'), kinds.join(', '))
+    : '';
 }

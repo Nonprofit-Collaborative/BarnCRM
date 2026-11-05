@@ -31,10 +31,15 @@ To change them:
    it is the only place the three patterns are edited: they are not also listed as
    separate rows. Searching the settings for a pattern, for example `greeting`, takes you
    to the panel.
-3. Change any of the three patterns. A preview of five sample households updates as you
-   type, so you can see the result before you save. The samples ship with the product; they
-   are not your own households.
-4. Click **Save** to save the three patterns.
+3. Change any of the three patterns. Under each pattern is a row of parts: `{FirstName}`,
+   `{LastName}`, `{Salutation}`, `and` and `Family`. Click a part (or Tab to it and press
+   Enter) to add it where the cursor is in that pattern, or drag it onto any pattern box to
+   drop it where you let go; dragging works with a finger on a touch screen too. A screen
+   reader announces each part added. Typing the braces by hand still works. A preview of five
+   sample households updates as you type or add a part, so you can see the result before you
+   save. The samples ship with the product; they are not your own households.
+4. Click **Save**, at the top of the panel next to **Saves on its own**, to save the three
+   patterns.
 5. Whether people who have died stay in the household name is a separate row in the console,
    saved by the console's own **Save**, not by the patterns' Save. They are always left out
    of the informal greeting.

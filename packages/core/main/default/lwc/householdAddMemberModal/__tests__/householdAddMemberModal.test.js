@@ -3,7 +3,15 @@ import HouseholdAddMemberModal from 'c/householdAddMemberModal';
 import searchPeople from '@salesforce/apex/HouseholdOfPersonController.searchPeople';
 import addExistingPerson from '@salesforce/apex/HouseholdOfPersonController.addExistingPerson';
 import addNewPerson from '@salesforce/apex/HouseholdOfPersonController.addNewPerson';
+import findSameName from '@salesforce/apex/PersonSameNameController.findSameName';
+import { setHelpTextForTest, clearHelpTextForTest } from 'c/barnHelpText';
+import { describeSameNamePerson, joinName } from '../sameNameHint';
 
+jest.mock(
+  '@salesforce/apex/PersonSameNameController.findSameName',
+  () => ({ default: jest.fn(() => Promise.resolve([])) }),
+  { virtual: true }
+);
 jest.mock(
   '@salesforce/apex/HouseholdOfPersonController.searchPeople',
   () => ({ default: jest.fn(() => Promise.resolve([])) }),
@@ -137,9 +145,10 @@ describe('c-household-add-member-modal', () => {
     root.querySelector('.add-existing-button').dispatchEvent(new CustomEvent('click'));
     await flush();
 
-    expect(root.querySelector('[role="alert"]').textContent).toContain(
+    expect(root.querySelector('c-barn-notice.add-error').message).toBe(
       'That person could not be added.'
     );
+    expect(root.querySelector('c-barn-notice.add-error').variant).toBe('error');
     expect(closed).not.toHaveBeenCalled();
   });
 
@@ -168,9 +177,171 @@ describe('c-household-add-member-modal', () => {
     root.querySelector('.add-new-save-button').dispatchEvent(new CustomEvent('click'));
     await flush();
 
-    expect(root.querySelector('[role="alert"]').textContent).toContain(
+    expect(root.querySelector('c-barn-notice.add-error').message).toBe(
       'Enter at least a last name.'
     );
     expect(closed).not.toHaveBeenCalled();
+  });
+
+  describe('same-name hint (people-giving-24)', () => {
+    const ANA = {
+      id: '003000000000010AAA',
+      name: 'Ana Garcia',
+      city: 'Tampa',
+      householdName: 'Garcia Household'
+    };
+
+    beforeEach(() => {
+      setHelpTextForTest({
+        Core_PersonSameName_Hint: 'Already in BarnCRM: {0}.',
+        Core_PersonSameName_Use: 'Use this person instead?'
+      });
+    });
+
+    afterEach(() => {
+      clearHelpTextForTest();
+    });
+
+    it('names the existing person with city and household, and switches to them', async () => {
+      findSameName.mockResolvedValue([ANA]);
+      addExistingPerson.mockResolvedValue();
+      const { root, closed } = open(true);
+      await flush();
+      type(root, '.add-new-first-name', 'Ana');
+      type(root, '.add-new-last-name', 'Garcia');
+      jest.runAllTimers();
+      await flush();
+
+      expect(findSameName).toHaveBeenLastCalledWith({
+        firstName: 'Ana',
+        lastName: 'Garcia',
+        excludeHouseholdId: HOUSEHOLD_ID
+      });
+      const hint = root.querySelector('c-barn-notice.same-name-hint');
+      expect(hint.message).toBe('Already in BarnCRM: Ana Garcia, Tampa (Garcia Household).');
+      expect(hint.actionLabel).toBe('Use this person instead?');
+      hint.dispatchEvent(new CustomEvent('action'));
+      await flush();
+
+      expect(addExistingPerson).toHaveBeenCalledWith({
+        householdId: HOUSEHOLD_ID,
+        personId: ANA.id
+      });
+      expect(closed).toHaveBeenCalledWith(true);
+    });
+
+    it('asks nothing until the last name has two letters', async () => {
+      const { root } = open(true);
+      await flush();
+      type(root, '.add-new-last-name', 'G');
+      jest.runAllTimers();
+      await flush();
+
+      expect(findSameName).not.toHaveBeenCalled();
+      expect(root.querySelector('c-barn-notice.same-name-hint')).toBeNull();
+    });
+
+    it('shows the hint in the simple way too, from the contact form fields', async () => {
+      findSameName.mockResolvedValue([ANA]);
+      const { root } = open(false);
+      await flush();
+      const last = root.querySelector('.form-last-name');
+      last.dispatchEvent(new CustomEvent('change', { detail: { value: 'Garcia' } }));
+      jest.runAllTimers();
+      await flush();
+
+      expect(root.querySelector('c-barn-notice.same-name-hint')).not.toBeNull();
+    });
+  });
+
+  describe('person mode (inline new person)', () => {
+    function openPerson() {
+      const element = createElement('c-household-add-member-modal', {
+        is: HouseholdAddMemberModal
+      });
+      Object.assign(element, { label: 'New Person', mode: 'person' });
+      const closed = jest.fn();
+      element.addEventListener('close', (event) => closed(event.detail));
+      document.body.appendChild(element);
+      return { closed, root: element.shadowRoot };
+    }
+
+    it('shows the contact form with email and address and no household field', async () => {
+      const { root } = openPerson();
+      await flush();
+
+      const names = Array.from(root.querySelectorAll('lightning-input-field')).map(
+        (field) => field.fieldName
+      );
+      expect(names).toEqual(
+        expect.arrayContaining([
+          'FirstName',
+          'LastName',
+          'Email',
+          'MailingStreet',
+          'MailingCity',
+          'MailingPostalCode'
+        ])
+      );
+      expect(names).not.toContain('AccountId');
+      expect(root.querySelector('.add-search-input')).toBeNull();
+    });
+
+    it('resolves the new person as { id, name } once the platform saved them', async () => {
+      const { root, closed } = openPerson();
+      await flush();
+      root
+        .querySelector('.form-first-name')
+        .dispatchEvent(new CustomEvent('change', { detail: { value: 'Wei' } }));
+      root
+        .querySelector('.form-last-name')
+        .dispatchEvent(new CustomEvent('change', { detail: { value: 'Lee' } }));
+      root
+        .querySelector('lightning-record-edit-form')
+        .dispatchEvent(new CustomEvent('success', { detail: { id: '003000000000011AAA' } }));
+
+      expect(closed).toHaveBeenCalledWith({ id: '003000000000011AAA', name: 'Wei Lee' });
+    });
+
+    it('resolves the existing person when the same-name hint is used, without asking Apex to join', async () => {
+      findSameName.mockResolvedValue([{ id: '003000000000010AAA', name: 'Ana Garcia' }]);
+      const { root, closed } = openPerson();
+      await flush();
+      root
+        .querySelector('.form-last-name')
+        .dispatchEvent(new CustomEvent('change', { detail: { value: 'Garcia' } }));
+      jest.runAllTimers();
+      await flush();
+
+      expect(findSameName).toHaveBeenLastCalledWith({
+        firstName: '',
+        lastName: 'Garcia',
+        excludeHouseholdId: null
+      });
+      root.querySelector('c-barn-notice.same-name-hint').dispatchEvent(new CustomEvent('action'));
+
+      expect(closed).toHaveBeenCalledWith({ id: '003000000000010AAA', name: 'Ana Garcia' });
+      expect(addExistingPerson).not.toHaveBeenCalled();
+    });
+
+    it('resolves nothing on Cancel', async () => {
+      const { root, closed } = openPerson();
+      await flush();
+      root.querySelector('.add-cancel-button').click();
+
+      expect(closed).toHaveBeenCalledTimes(1);
+      expect(closed.mock.calls[0][0]).toBeFalsy();
+    });
+  });
+
+  describe('sameNameHint module', () => {
+    it('leaves out an unknown city or household', () => {
+      expect(describeSameNamePerson({ name: 'Ana Garcia' })).toBe('Ana Garcia');
+      expect(
+        describeSameNamePerson({ name: 'Ana Garcia', householdName: 'Garcia Household' })
+      ).toBe('Ana Garcia (Garcia Household)');
+      expect(describeSameNamePerson(null)).toBe('');
+      expect(joinName(' Wei ', undefined)).toBe('Wei');
+    });
   });
 });

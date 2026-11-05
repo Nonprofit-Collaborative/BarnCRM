@@ -8,26 +8,26 @@
  */
 @NamespaceAccessible
 public with sharing class MessagingEmailSender implements EmailSender {
-    @NamespaceAccessible
-    public List<EmailSendOutcome> send(List<Messaging.SingleEmailMessage> messages) {
-        List<EmailSendOutcome> outcomes = new List<EmailSendOutcome>();
-        if (messages == null || messages.isEmpty()) {
-            return outcomes;
-        }
-        for (Messaging.SendEmailResult result : Messaging.sendEmail(messages, false)) {
-            if (result.isSuccess()) {
-                outcomes.add(EmailSendOutcome.succeeded());
-            } else {
-                List<Messaging.SendEmailError> errors = result.getErrors();
-                outcomes.add(
-                    EmailSendOutcome.failed(
-                        errors == null || errors.isEmpty()
-                            ? null
-                            : errors[0].getMessage()?.left(255)
-                    )
-                );
-            }
-        }
-        return outcomes;
-    }
+	@NamespaceAccessible
+	public List<EmailSendOutcome> send(List<Messaging.SingleEmailMessage> messages) {
+		List<EmailSendOutcome> outcomes = new List<EmailSendOutcome>();
+		if (messages == null || messages.isEmpty()) {
+			return outcomes;
+		}
+		for (Messaging.SendEmailResult result : Messaging.sendEmail(messages, false)) {
+			if (result.isSuccess()) {
+				outcomes.add(EmailSendOutcome.succeeded());
+			} else {
+				List<Messaging.SendEmailError> errors = result.getErrors();
+				outcomes.add(
+					EmailSendOutcome.failed(
+						errors == null || errors.isEmpty()
+							? null
+							: errors[0].getMessage()?.left(255)
+					)
+				);
+			}
+		}
+		return outcomes;
+	}
 }

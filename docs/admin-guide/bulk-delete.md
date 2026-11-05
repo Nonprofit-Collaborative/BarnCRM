@@ -63,7 +63,10 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
 3. Press **Preview**. BarnCRM says how many records match, for example 112, shows the first five
    by name, and lists what is deleted with each one, one badge per kind of related record
    (for a contact, for example, its household memberships if your org deletes them with the
-   contact).
+   contact). BarnCRM's own kinds come first, then Salesforce's; sharing, history and feed rows
+   are left out, and a long list ends with "and N more kinds". One match reads "1 Contact
+   matches". When nothing matches, the panel says **No Records Match** and offers no download,
+   confirm box or Delete button.
 4. Optional, and recommended: press **Download a Backup First** (the info icon beside it says
    what the file holds). BarnCRM reads all 112
    records, with every field you can see, and saves them as a CSV file (the same format as
@@ -71,7 +74,7 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
    after the Recycle Bin has emptied. Related records deleted with them are not in it.
 5. Type `112` into **Type the number of records to confirm**, then press **Delete 112
    records**.
-6. The progress bar shows the chunks done. It checks every 3 seconds for the first minute and
+6. The progress bar shows the percent done. It checks every 3 seconds for the first minute and
    every 10 seconds after that, and tries once more if a check fails before it shows an
    error. When it finishes, the panel says how many records
    matched, how many were deleted and how many were refused, with the reason for each
@@ -139,4 +142,4 @@ Every record of the second copy has the description `Gala sign-up, copy 2`.
 | Data Job | Rows Deleted | How many records the bulk delete deleted. |
 | Data Job | Rows Rejected | How many records the platform refused, each with its reason in the journal. |
 | BarnCRM Settings, Import | Bulk delete run limit | The most records one bulk delete may delete. Default 10,000, at most 48,000. |
-| BarnCRM Settings, Import | Bulk chunk size | Records each chunk of a Super Transformer run or bulk delete handles. Default and highest 200, lowest 10. |
+| BarnCRM Settings, Import | Records per batch in background jobs | Records each chunk of a Super Transformer run or bulk delete handles. Default and highest 200, lowest 10. |

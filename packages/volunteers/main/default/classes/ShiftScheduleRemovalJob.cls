@@ -9,65 +9,65 @@
  * shifts a coordinator can delete by hand.
  */
 public with sharing class ShiftScheduleRemovalJob implements Queueable {
-    /** Shifts per transaction: well inside the 10,000 rows one transaction may delete. */
-    public static final Integer SHIFTS_PER_JOB = 5000;
+	/** Shifts per transaction: well inside the 10,000 rows one transaction may delete. */
+	public static final Integer SHIFTS_PER_JOB = 5000;
 
-    private static final String LOG_CONTEXT = 'ShiftScheduleRemovalJob';
+	private static final String LOG_CONTEXT = 'ShiftScheduleRemovalJob';
 
-    /** Set by a test to split a few shifts across jobs. */
-    @TestVisible
-    private static Integer shiftsPerJobOverride;
+	/** Set by a test to split a few shifts across jobs. */
+	@TestVisible
+	private static Integer shiftsPerJobOverride;
 
-    private final List<Id> shiftIds;
+	private final List<Id> shiftIds;
 
-    public ShiftScheduleRemovalJob(List<Id> shiftIds) {
-        this.shiftIds = shiftIds;
-    }
+	public ShiftScheduleRemovalJob(List<Id> shiftIds) {
+		this.shiftIds = shiftIds;
+	}
 
-    /** Queues the removal of these shifts, when there are any. */
-    public static void queue(Set<Id> shiftIds) {
-        if (shiftIds == null || shiftIds.isEmpty()) {
-            return;
-        }
-        enqueue(new List<Id>(shiftIds));
-    }
+	/** Queues the removal of these shifts, when there are any. */
+	public static void queue(Set<Id> shiftIds) {
+		if (shiftIds == null || shiftIds.isEmpty()) {
+			return;
+		}
+		enqueue(new List<Id>(shiftIds));
+	}
 
-    public void execute(QueueableContext context) {
-        try {
-            Integer perJob = shiftsPerJobOverride == null ? SHIFTS_PER_JOB : shiftsPerJobOverride;
-            Set<Id> now = new Set<Id>();
-            List<Id> later = new List<Id>();
-            for (Id shiftId : shiftIds) {
-                if (now.size() < perJob) {
-                    now.add(shiftId);
-                } else {
-                    later.add(shiftId);
-                }
-            }
-            ShiftScheduleService.removeShifts(now);
-            if (!later.isEmpty()) {
-                enqueue(later);
-            }
-        } catch (Exception removalFailure) {
-            ErrorLogger.log(removalFailure, LOG_CONTEXT);
-        }
-    }
+	public void execute(QueueableContext context) {
+		try {
+			Integer perJob = shiftsPerJobOverride == null ? SHIFTS_PER_JOB : shiftsPerJobOverride;
+			Set<Id> now = new Set<Id>();
+			List<Id> later = new List<Id>();
+			for (Id shiftId : shiftIds) {
+				if (now.size() < perJob) {
+					now.add(shiftId);
+				} else {
+					later.add(shiftId);
+				}
+			}
+			ShiftScheduleService.removeShifts(now);
+			if (!later.isEmpty()) {
+				enqueue(later);
+			}
+		} catch (Exception removalFailure) {
+			ErrorLogger.log(removalFailure, LOG_CONTEXT);
+		}
+	}
 
-    private static void enqueue(List<Id> shiftIds) {
-        if (Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
-            ErrorLogger.logMessage(
-                'No queueable job was left to remove ' +
-                    shiftIds.size() +
-                    ' future shifts of deleted shift schedules.',
-                LOG_CONTEXT,
-                ErrorLogger.SEVERITY_WARNING
-            );
-            return;
-        }
-        try {
-            System.enqueueJob(new ShiftScheduleRemovalJob(shiftIds));
-        } catch (Exception notQueued) {
-            ErrorLogger.log(notQueued, LOG_CONTEXT);
-        }
-    }
+	private static void enqueue(List<Id> shiftIds) {
+		if (Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
+			ErrorLogger.logMessage(
+				'No queueable job was left to remove ' +
+					shiftIds.size() +
+					' future shifts of deleted shift schedules.',
+				LOG_CONTEXT,
+				ErrorLogger.SEVERITY_WARNING
+			);
+			return;
+		}
+		try {
+			System.enqueueJob(new ShiftScheduleRemovalJob(shiftIds));
+		} catch (Exception notQueued) {
+			ErrorLogger.log(notQueued, LOG_CONTEXT);
+		}
+	}
 }

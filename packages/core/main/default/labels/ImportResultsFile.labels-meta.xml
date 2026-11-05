@@ -9,14 +9,6 @@
         <value>Download Results</value>
     </labels>
     <labels>
-        <fullName>Core_Import_ResultsCapped</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Results file is capped; {0} is the rows it holds, {1} the import's rows</shortDescription>
-        <value>The results file holds the first {0} of {1} rows, the most one download can read.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_ResultsRow</fullName>
         <categories>Import</categories>
         <language>en_US</language>

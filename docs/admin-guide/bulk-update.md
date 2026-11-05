@@ -2,12 +2,12 @@
 
 ## 1. What It Does
 
-**Super Transformer** changes up to five fields on every record a [Find](find.md) query returns, in
-one go. Most bulk changes start in [Super Transformer](super-transform.md): the **Super
-Transformer** tile on the Data Manager tab opens it, and it runs this same Super Transformer run without a
-Find query. This page covers starting from Find instead, which suits a saved query: run it,
-then choose **Change Records**, **Super Transformer**. The **Open Find** button under **Data Jobs**
-on the Super Transformer page opens Find with a note. For each field
+**Super Transformer** changes up to five fields on every record that matches its conditions, in
+one go. The **Super Transformer** tile on the Data Manager tab opens it, and the same page opens
+from [Find](find.md): run a search, then choose **Change Records**, **Super Transformer**, and
+Super Transformer opens already filled in with the search's kind of record and conditions
+(there is no second change screen in Find). The **Open Find** button under **Data Jobs** on the
+Super Transformer page opens Find with a note. For each field
 you choose one of:
 
 - **Set to a value**: every record gets the same value, for example Mailing City "Portland".
@@ -20,7 +20,7 @@ you choose one of:
 
 Before anything changes, BarnCRM counts the records that match and shows the first five, each
 with the value before and the value after. You type that number to confirm. The update then
-runs in the background, in chunks of up to 200 records (the **Bulk chunk size** setting), and
+runs in the background, in chunks of up to 200 records (the **Records per batch in background jobs** setting), and
 the page shows its progress.
 
 Every change is recorded in the import journal, so for as long as an import can be undone (30
@@ -60,15 +60,18 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
 
 1. Open **Find**. Choose **Account**, add the column **Billing City**, and add the condition
    **Billing City**, **equals**, `springfield`. Press **Run**.
-2. Open the **Change Records** menu and choose **Super Transformer**. The Super Transformer panel opens
-   right under the buttons, with its steps along the top: **Choose Changes**, **Confirm**,
-   **Run**. It uses the query as it is now; changing the query closes the panel.
-3. Under **Changes**, choose the field **Billing City**, **Set to a value**, and type
-   `Springfield`. To change a second field, press **Add a Change** (up to five).
+2. Open the **Change Records** menu and choose **Super Transformer**. The **Super Transformer**
+   page opens with **Account** and the **Billing City** condition already filled in, and a
+   notice saying Find handed them over and nothing has changed. The conditions are the search's
+   own, including any conditions on related records (those stay in the count but are not shown
+   on the page); changing the kind of record starts the page over.
+3. Under **3. What to Change**, choose the field **Billing City**, **Set To**, and type
+   `Springfield`. To change a second field, press **Add a Field** (up to five).
 4. Press **Preview**. BarnCRM says how many records match, for example 37, and shows the first
-   five with the value before and after.
-5. Type `37` into **Type the number of records to confirm**, then press **Update 37 records**.
-6. The progress bar shows the chunks done. It checks every 3 seconds for the first minute and
+   25 with the value before and after.
+5. Press **Run Super Transformer** and confirm. Over 200 records the confirmation asks you to
+   type the number first.
+6. The progress bar shows the percent done. It checks every 3 seconds for the first minute and
    every 10 seconds after that, and tries once more if a check fails before it shows an
    error. When it finishes, the panel says how many records
    were updated, how many already held the new value and how many failed, with the reason for
@@ -140,7 +143,8 @@ Springfield should now say "Springfield" with a capital S; some were typed in lo
 
 **Change with steps** changes each record's own value rather than giving every record the same
 one. Choose the field, choose **Change with steps**, then **Add a Change** (up to ten). Steps run
-in the order listed:
+in the order listed; move one with its **Move Up** and **Move Down** arrows, or drag it by its
+handle (press and hold on a touch screen; Space and the arrow keys from the keyboard):
 
 | Step | What it does | Example |
 |---|---|---|
@@ -195,4 +199,4 @@ Deleting the records a query returns is a separate tool with its own permission:
 | Data Job | Rows Matched | How many records already held the new values and were not saved. |
 | Data Job | Rows Rejected | How many records the platform refused, each with its reason in the journal. |
 | BarnCRM Settings, Import | Super Transformer run limit | The most records one Super Transformer run may change. Default 48,000, at most 48,000. |
-| BarnCRM Settings, Import | Bulk chunk size | Records each chunk of a Super Transformer run or bulk delete handles. Default and highest 200, lowest 10; a job keeps the size it started with. |
+| BarnCRM Settings, Import | Records per batch in background jobs | Records each chunk of a Super Transformer run or bulk delete handles. Default and highest 200, lowest 10; a job keeps the size it started with. |

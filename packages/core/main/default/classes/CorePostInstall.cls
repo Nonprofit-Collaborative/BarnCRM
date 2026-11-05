@@ -64,334 +64,359 @@
  * Error Log instead.
  */
 public with sharing class CorePostInstall implements InstallHandler, ModuleSetup {
-    private static final String ACCESS_CONTEXT = 'CorePostInstall.grantInstallerAccess';
-    private static final String MODE_CONTEXT = 'CorePostInstall.applyRecommendedMode';
-    private static final String SWITCH_CONTEXT = 'CorePostInstall.ensureAutomationSwitches';
-    private static final String TEMPLATE_CONTEXT = 'CorePostInstall.ensureImportTemplates';
-    private static final String FEATURE_CONTEXT = 'CorePostInstall.markFeaturesOff';
-    private static final String EDITION_CONTEXT = 'CorePostInstall.saveEditionOnAnUpgrade';
-    private static final String TAB_CHECK_CONTEXT = 'CorePostInstall.scheduleTabAccessCheck';
-    private static final String SEASONAL_CONTEXT = 'CorePostInstall.alignSeasonalAddresses';
-    private static final String ORGANIZATION_CONTEXT = 'CorePostInstall.storeOrganizationRecordType';
-    private static final String SAVED_QUERY_CONTEXT = 'CorePostInstall.renameDataQualityQueries';
+	private static final String ACCESS_CONTEXT = 'CorePostInstall.grantInstallerAccess';
+	private static final String MODE_CONTEXT = 'CorePostInstall.applyRecommendedMode';
+	private static final String SWITCH_CONTEXT = 'CorePostInstall.ensureAutomationSwitches';
+	private static final String TEMPLATE_CONTEXT = 'CorePostInstall.ensureImportTemplates';
+	private static final String FEATURE_CONTEXT = 'CorePostInstall.markFeaturesOff';
+	private static final String EDITION_CONTEXT = 'CorePostInstall.saveEditionOnAnUpgrade';
+	private static final String TAB_CHECK_CONTEXT = 'CorePostInstall.scheduleTabAccessCheck';
+	private static final String NIGHTLY_CONTEXT = 'CorePostInstall.scheduleNightlyRun';
+	private static final String SEASONAL_CONTEXT = 'CorePostInstall.alignSeasonalAddresses';
+	private static final String ORGANIZATION_CONTEXT = 'CorePostInstall.storeOrganizationRecordType';
+	private static final String SAVED_QUERY_CONTEXT = 'CorePostInstall.renameDataQualityQueries';
 
-    /**
-     * Core checkboxes that ship on and were added in an upgrade, oldest first: each is turned on
-     * once in an org that saved its settings before it existed (`ShippedDefaultUpgrades`, QA-F2).
-     * Append only; `scripts/ci/check-setting-defaults.py` fails the build when a new ship-on
-     * checkbox is missing here.
-     */
-    @TestVisible
-    private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-        BarnCRM_Settings__c.Error_Digest_Include_Admin_Summary__c
-    };
+	/**
+	 * Core checkboxes that ship on and were added in an upgrade, oldest first: each is turned on
+	 * once in an org that saved its settings before it existed (`ShippedDefaultUpgrades`, QA-F2).
+	 * Append only; `scripts/ci/check-setting-defaults.py` fails the build when a new ship-on
+	 * checkbox is missing here.
+	 */
+	@TestVisible
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
+		BarnCRM_Settings__c.Error_Digest_Include_Admin_Summary__c
+	};
 
-    /** Test seam: true lets a test see the hourly tab access check scheduled. */
-    @TestVisible
-    private static Boolean scheduleTabCheckInTests = false;
+	/** Test seam: true lets a test see the hourly tab access check scheduled. */
+	@TestVisible
+	private static Boolean scheduleTabCheckInTests = false;
 
-    /**
-     * Test seam: true lets a test see an existing seasonal swap schedule adopted on an upgrade.
-     * Off in tests otherwise, because what the org the tests run in has scheduled is not the
-     * test's to depend on.
-     */
-    @TestVisible
-    private static Boolean adoptSeasonalScheduleInTests = false;
+	/**
+	 * Test seam: true lets a test see an existing seasonal swap schedule adopted on an upgrade.
+	 * Off in tests otherwise, because what the org the tests run in has scheduled is not the
+	 * test's to depend on.
+	 */
+	@TestVisible
+	private static Boolean adoptSeasonalScheduleInTests = false;
 
-    /**
-     * What every Error Log entry written by an install or upgrade starts with, including the
-     * retry job's. The Hub home page counts them to say how the install went.
-     */
-    private static final String CONTEXT_PREFIX = 'CorePostInstall';
+	/** Test seam: true lets a test see the nightly run scheduled by a new install. */
+	@TestVisible
+	private static Boolean scheduleNightlyInTests = false;
 
-    /**
-     * Called by the platform after the package is installed or upgraded.
-     *
-     * @param context what the platform knows about this install
-     */
-    public void onInstall(InstallContext context) {
-        if (context == null) {
-            return;
-        }
-        Boolean isUpgrade = context.previousVersion() != null;
-        run(!isUpgrade, isUpgrade, context.installerId());
-    }
+	/**
+	 * What every Error Log entry written by an install or upgrade starts with, including the
+	 * retry job's. The Hub home page counts them to say how the install went.
+	 */
+	private static final String CONTEXT_PREFIX = 'CorePostInstall';
 
-    /**
-     * The same steps for an org built by deploying the source rather than installing a package,
-     * which runs no install handler: `scripts/org/deploy-packages.sh` calls this once Core is
-     * deployed, and a developer can run it as anonymous Apex. The person running it stands in
-     * for the installer.
-     *
-     * Safe on an org that already has BarnCRM: one that has saved its settings or holds a
-     * household is treated as an upgrade, so its feature list, a saved edition, its coexistence
-     * mode, switches and templates stay exactly as the administrator left them. Only an org with
-     * neither is marked as a new install, so first-run setup comes up there as it does after a
-     * package install. Running it again changes nothing. Never throws.
-     */
-    public static void runAsSourceDeploy() {
-        new CorePostInstall().runSetup(UserInfo.getUserId());
-    }
+	/**
+	 * Called by the platform after the package is installed or upgraded.
+	 *
+	 * @param context what the platform knows about this install
+	 */
+	public void onInstall(InstallContext context) {
+		if (context == null) {
+			return;
+		}
+		Boolean isUpgrade = context.previousVersion() != null;
+		run(!isUpgrade, isUpgrade, context.installerId());
+	}
 
-    /**
-     * The same steps as `runAsSourceDeploy`, with the given person standing in for the
-     * installer: what Finish Setup runs (FS1, `ModuleSetups`). Never throws.
-     *
-     * Outside an install the BarnCRM Admin grant is made only to the person running it, and only
-     * when they could assign permission sets in Setup themselves (ADR-0121). The grant runs in
-     * system mode, so without that check a person holding Manage BarnCRM Settings from an org's
-     * own permission set could give themselves BarnCRM Admin through Finish Setup or the Health
-     * Check fix. The rest of setup runs either way.
-     *
-     * @param installerId the person to give BarnCRM Admin, or null for nobody
-     */
-    public void runSetup(Id installerId) {
-        Boolean alreadySetUp = true;
-        try {
-            alreadySetUp = hasBeenSetUp();
-        } catch (Exception e) {
-            // Unsure means existing: marking a working org as new would turn its features off.
-            ErrorLogger.log(e, FEATURE_CONTEXT);
-        }
-        run(!alreadySetUp, alreadySetUp, mayGrantOutsideInstall(installerId) ? installerId : null);
-    }
+	/**
+	 * The same steps for an org built by deploying the source rather than installing a package,
+	 * which runs no install handler: `scripts/org/deploy-packages.sh` calls this once Core is
+	 * deployed, and a developer can run it as anonymous Apex. The person running it stands in
+	 * for the installer.
+	 *
+	 * Safe on an org that already has BarnCRM: one that has saved its settings or holds a
+	 * household is treated as an upgrade, so its feature list, a saved edition, its coexistence
+	 * mode, switches and templates stay exactly as the administrator left them. Only an org with
+	 * neither is marked as a new install, so first-run setup comes up there as it does after a
+	 * package install. Running it again changes nothing. Never throws.
+	 */
+	public static void runAsSourceDeploy() {
+		new CorePostInstall().runSetup(UserInfo.getUserId());
+	}
 
-    /**
-     * Whether the system mode BarnCRM Admin grant may go to this person outside an install:
-     * only the running user, and only one who holds Assign Permission Sets or Manage Users.
-     */
-    @TestVisible
-    private static Boolean mayGrantOutsideInstall(Id installerId) {
-        return installerId != null &&
-            installerId == UserInfo.getUserId() &&
-            AccessService.canAssignPermissionSets();
-    }
+	/**
+	 * The same steps as `runAsSourceDeploy`, with the given person standing in for the
+	 * installer: what Finish Setup runs (FS1, `ModuleSetups`). Never throws.
+	 *
+	 * Outside an install the BarnCRM Admin grant is made only to the person running it, and only
+	 * when they could assign permission sets in Setup themselves (ADR-0121). The grant runs in
+	 * system mode, so without that check a person holding Manage BarnCRM Settings from an org's
+	 * own permission set could give themselves BarnCRM Admin through Finish Setup or the Health
+	 * Check fix. The rest of setup runs either way.
+	 *
+	 * @param installerId the person to give BarnCRM Admin, or null for nobody
+	 */
+	public void runSetup(Id installerId) {
+		Boolean alreadySetUp = true;
+		try {
+			alreadySetUp = hasBeenSetUp();
+		} catch (Exception e) {
+			// Unsure means existing: marking a working org as new would turn its features off.
+			ErrorLogger.log(e, FEATURE_CONTEXT);
+		}
+		run(!alreadySetUp, alreadySetUp, mayGrantOutsideInstall(installerId) ? installerId : null);
+	}
 
-    /**
-     * Whether the org already uses BarnCRM: its settings have been saved, or a household exists.
-     * Either makes a source deploy an upgrade rather than a new install.
-     */
-    @TestVisible
-    private static Boolean hasBeenSetUp() {
-        if (BarnCRM_Settings__c.getOrgDefaults().Id != null) {
-            return true;
-        }
-        Id householdType = HouseholdService.householdRecordTypeId();
-        if (householdType == null) {
-            return false;
-        }
-        Integer households = [
-            SELECT COUNT()
-            FROM Account
-            WHERE RecordTypeId = :householdType
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return households > 0;
-    }
+	/**
+	 * Whether the system mode BarnCRM Admin grant may go to this person outside an install:
+	 * only the running user, and only one who holds Assign Permission Sets or Manage Users.
+	 */
+	@TestVisible
+	private static Boolean mayGrantOutsideInstall(Id installerId) {
+		return installerId != null &&
+			installerId == UserInfo.getUserId() &&
+			AccessService.canAssignPermissionSets();
+	}
 
-    private void run(Boolean isNewInstall, Boolean isUpgrade, Id installerId) {
-        markFeaturesOffOnANewInstall(isNewInstall);
-        renameStoredEdition();
-        saveEditionOnAnUpgrade(isUpgrade);
-        applyRecommendedMode();
-        storeOrganizationRecordType();
-        AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
-        ImportTemplateService.materializeDefaultsDuringInstall(TEMPLATE_CONTEXT);
-        // Every install and upgrade gives the BarnCRM Tab sets of the features that are on to
-        // whoever had those tabs before (ADR-0124); queued, since it writes setup objects. It
-        // never throws.
-        TabAccessService.requestSync();
-        scheduleTabAccessCheck();
-        alignSeasonalAddresses(isUpgrade);
-        renameDataQualityQueries();
-        ShippedDefaultUpgrades.apply(
-            ModuleSetups.CORE,
-            BarnCRM_Settings__c.SObjectType,
-            SHIPPED_ON_ADDED_IN_UPGRADES
-        );
-        ModuleSetups.markRan(ModuleSetups.CORE);
-        if (installerId == null) {
-            return;
-        }
-        grantInstallerAccess(installerId);
-    }
+	/**
+	 * Whether the org already uses BarnCRM: its settings have been saved, or a household exists.
+	 * Either makes a source deploy an upgrade rather than a new install.
+	 */
+	@TestVisible
+	private static Boolean hasBeenSetUp() {
+		if (BarnCRM_Settings__c.getOrgDefaults().Id != null) {
+			return true;
+		}
+		Id householdType = HouseholdService.householdRecordTypeId();
+		if (householdType == null) {
+			return false;
+		}
+		Integer households = [
+			SELECT COUNT()
+			FROM Account
+			WHERE RecordTypeId = :householdType
+			WITH SYSTEM_MODE
+			LIMIT 1
+		];
+		return households > 0;
+	}
 
-    /**
-     * A new install starts with every Core feature off until first-run setup (ADR-0124). An
-     * upgrade leaves the list empty, which means every feature is on, so an existing org loses
-     * nothing it used.
-     */
-    private void markFeaturesOffOnANewInstall(Boolean isNewInstall) {
-        try {
-            if (isNewInstall) {
-                FeatureSwitchService.markNewInstall();
-            }
-        } catch (Exception e) {
-            ErrorLogger.log(e, FEATURE_CONTEXT);
-        }
-    }
+	private void run(Boolean isNewInstall, Boolean isUpgrade, Id installerId) {
+		markFeaturesOffOnANewInstall(isNewInstall);
+		renameStoredEdition();
+		saveEditionOnAnUpgrade(isUpgrade);
+		applyRecommendedMode();
+		storeOrganizationRecordType();
+		AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
+		ImportTemplateService.materializeDefaultsDuringInstall(TEMPLATE_CONTEXT);
+		// Every install and upgrade gives the BarnCRM Tab sets of the features that are on to
+		// whoever had those tabs before (ADR-0124); queued, since it writes setup objects. It
+		// never throws.
+		TabAccessService.requestSync();
+		scheduleTabAccessCheck();
+		alignSeasonalAddresses(isUpgrade);
+		// R-NJ5: the separate nightly schedules of an earlier version become the nightly run.
+		// After the seasonal alignment, which reads the old seasonal job. Never throws.
+		NightlyJobs.adoptOldSchedules();
+		scheduleNightlyRunOnANewInstall(isNewInstall);
+		renameDataQualityQueries();
+		ShippedDefaultUpgrades.apply(
+			ModuleSetups.CORE,
+			BarnCRM_Settings__c.SObjectType,
+			SHIPPED_ON_ADDED_IN_UPGRADES
+		);
+		ModuleSetups.markRan(ModuleSetups.CORE);
+		if (installerId == null) {
+			return;
+		}
+		grantInstallerAccess(installerId);
+	}
 
-    /**
-     * An upgraded org with no edition saved gets the one the Setup Assistant recommends, or the
-     * Standard Edition when nothing points to the Nonprofit one (what BarnCRM already shows with
-     * no edition). Its features are all on, so without this the first-run window would stand in
-     * front of an org that is already working (ADR-0124).
-     */
-    private void saveEditionOnAnUpgrade(Boolean isUpgrade) {
-        try {
-            if (isUpgrade && String.isBlank(SettingsService.getSettings().Suite__c)) {
-                String suite = SetupAssistantService.recommendedSuite();
-                SettingsService.saveSystemValue(
-                    'Suite__c',
-                    suite == null ? ModuleDetectionService.SUITE_STANDARD : suite
-                );
-            }
-        } catch (Exception e) {
-            ErrorLogger.log(e, EDITION_CONTEXT);
-        }
-    }
+	/**
+	 * A new install starts with every Core feature off until first-run setup (ADR-0124). An
+	 * upgrade leaves the list empty, which means every feature is on, so an existing org loses
+	 * nothing it used.
+	 */
+	private void markFeaturesOffOnANewInstall(Boolean isNewInstall) {
+		try {
+			if (isNewInstall) {
+				FeatureSwitchService.markNewInstall();
+			}
+		} catch (Exception e) {
+			ErrorLogger.log(e, FEATURE_CONTEXT);
+		}
+	}
 
-    /**
-     * Rewrites an edition stored before ADR-0143 (`0143-edition-internal-values.md`): `Community`
-     * becomes `Standard` and `Impact` becomes `Nonprofit`. Saved as bookkeeping, with no Recent
-     * Changes row, because nobody changed the edition. Any other value is left alone, so a second
-     * run changes nothing. Never throws.
-     */
-    private void renameStoredEdition() {
-        try {
-            String stored = SettingsService.getSettings().Suite__c;
-            String renamed = String.isBlank(stored)
-                ? null
-                : ModuleDetectionService.SUITE_BY_OLD_VALUE.get(stored.trim().toLowerCase());
-            if (renamed != null) {
-                SettingsService.saveBookkeeping(new Map<String, Object>{ 'Suite__c' => renamed });
-            }
-        } catch (Exception e) {
-            ErrorLogger.log(e, EDITION_CONTEXT);
-        }
-    }
+	/**
+	 * An upgraded org with no edition saved gets the one the Setup Assistant recommends, or the
+	 * Standard Edition when nothing points to the Nonprofit one (what BarnCRM already shows with
+	 * no edition). Its features are all on, so without this the first-run window would stand in
+	 * front of an org that is already working (ADR-0124).
+	 */
+	private void saveEditionOnAnUpgrade(Boolean isUpgrade) {
+		try {
+			if (isUpgrade && String.isBlank(SettingsService.getSettings().Suite__c)) {
+				String suite = SetupAssistantService.recommendedSuite();
+				SettingsService.saveSystemValue(
+					'Suite__c',
+					suite == null ? ModuleDetectionService.SUITE_STANDARD : suite
+				);
+			}
+		} catch (Exception e) {
+			ErrorLogger.log(e, EDITION_CONTEXT);
+		}
+	}
 
-    /**
-     * Schedules the hourly tab access check, the safety net for roles given outside BarnCRM's
-     * Access page (ADR-0124). `start` finds a job already scheduled by name, so a reinstall or an
-     * upgrade never doubles it, and it moves a job still on the old nightly cron to hourly. Skipped in tests unless a test asks, so that a test of something
-     * else does not leave a scheduled job that runs at `Test.stopTest`.
-     */
-    private void scheduleTabAccessCheck() {
-        if (Test.isRunningTest() && !scheduleTabCheckInTests) {
-            return;
-        }
-        try {
-            TabAccessScheduler.start();
-        } catch (Exception e) {
-            ErrorLogger.log(e, TAB_CHECK_CONTEXT);
-        }
-    }
+	/**
+	 * Rewrites an edition stored before ADR-0143 (`0143-edition-internal-values.md`): `Community`
+	 * becomes `Standard` and `Impact` becomes `Nonprofit`. Saved as bookkeeping, with no Recent
+	 * Changes row, because nobody changed the edition. Any other value is left alone, so a second
+	 * run changes nothing. Never throws.
+	 */
+	private void renameStoredEdition() {
+		try {
+			String stored = SettingsService.getSettings().Suite__c;
+			String renamed = String.isBlank(stored)
+				? null
+				: ModuleDetectionService.SUITE_BY_OLD_VALUE.get(stored.trim().toLowerCase());
+			if (renamed != null) {
+				SettingsService.saveBookkeeping(new Map<String, Object>{ 'Suite__c' => renamed });
+			}
+		} catch (Exception e) {
+			ErrorLogger.log(e, EDITION_CONTEXT);
+		}
+	}
 
-    /**
-     * Makes the seasonal swap schedule match the Seasonal Addresses switch. An upgrade first
-     * turns the switch on for an org that already runs the job, then the job is scheduled when
-     * the switch is on and it is missing. A new install has the switch off, so nothing is
-     * scheduled for it. Never throws.
-     */
-    private void alignSeasonalAddresses(Boolean isUpgrade) {
-        try {
-            if (isUpgrade && (!Test.isRunningTest() || adoptSeasonalScheduleInTests)) {
-                SeasonalAddressScheduler.adoptExistingSchedule();
-            }
-            SeasonalAddressScheduler.scheduleIfEnabled();
-        } catch (Exception e) {
-            ErrorLogger.log(e, SEASONAL_CONTEXT);
-        }
-    }
+	/**
+	 * Schedules the hourly tab access check, the safety net for roles given outside BarnCRM's
+	 * Access page (ADR-0124). `start` finds a job already scheduled by name, so a reinstall or an
+	 * upgrade never doubles it, and it moves a job still on the old nightly cron to hourly. Skipped in tests unless a test asks, so that a test of something
+	 * else does not leave a scheduled job that runs at `Test.stopTest`.
+	 */
+	private void scheduleTabAccessCheck() {
+		if (Test.isRunningTest() && !scheduleTabCheckInTests) {
+			return;
+		}
+		try {
+			TabAccessScheduler.start();
+		} catch (Exception e) {
+			ErrorLogger.log(e, TAB_CHECK_CONTEXT);
+		}
+	}
 
-    /**
-     * Puts the recommended coexistence mode in force on an org that has never chosen one, and
-     * leaves an org that has exactly as its administrator left it. Like every step here it
-     * never throws: an org left in the shipped default is what Health Check exists to report,
-     * and an install the platform rolled back is not.
-     */
-    private void applyRecommendedMode() {
-        try {
-            CoexistenceService.applyRecommendedIfUnset();
-        } catch (Exception e) {
-            ErrorLogger.log(e, MODE_CONTEXT);
-        }
-    }
+	/**
+	 * A new install schedules the nightly run, so its steps run once an admin switches them on
+	 * without anyone scheduling it by hand. Idempotent (an existing schedule is kept) and it
+	 * leaves every step switch as it is. An upgrade is left to `adoptOldSchedules`. Never throws.
+	 */
+	private void scheduleNightlyRunOnANewInstall(Boolean isNewInstall) {
+		if (!isNewInstall || (Test.isRunningTest() && !scheduleNightlyInTests)) {
+			return;
+		}
+		try {
+			NightlyJobs.start();
+		} catch (Exception e) {
+			ErrorLogger.log(e, NIGHTLY_CONTEXT);
+		}
+	}
 
-    /**
-     * Renames the saved queries "Open in Find" made before the tool was named Data Quality, so
-     * it keeps updating them (D-140). Finds nothing on a second run. Never throws.
-     */
-    private void renameDataQualityQueries() {
-        try {
-            DataHygieneService.renameLegacySavedQueries();
-        } catch (Exception e) {
-            ErrorLogger.log(e, SAVED_QUERY_CONTEXT);
-        }
-    }
+	/**
+	 * Makes the seasonal swap schedule match the Seasonal Addresses switch. An upgrade first
+	 * turns the switch on for an org that already runs the job, then the job is scheduled when
+	 * the switch is on and it is missing. A new install has the switch off, so nothing is
+	 * scheduled for it. Never throws.
+	 */
+	private void alignSeasonalAddresses(Boolean isUpgrade) {
+		try {
+			if (isUpgrade && (!Test.isRunningTest() || adoptSeasonalScheduleInTests)) {
+				SeasonalAddressScheduler.adoptExistingSchedule();
+			}
+			SeasonalAddressScheduler.scheduleIfEnabled();
+		} catch (Exception e) {
+			ErrorLogger.log(e, SEASONAL_CONTEXT);
+		}
+	}
 
-    /**
-     * Stores the record type for organizations when none is stored, or the stored one is no
-     * longer an active candidate, so the setting is never blank or stale (ADR-0141, R-O5).
-     * Detection picks one the org already has, or No record type; no record type is created,
-     * activated or made visible, and No record type or a usable stored one is never replaced.
-     * Never throws.
-     */
-    private void storeOrganizationRecordType() {
-        try {
-            AccountKinds.storeDetectedIfBlank();
-        } catch (Exception e) {
-            ErrorLogger.log(e, ORGANIZATION_CONTEXT);
-        }
-    }
+	/**
+	 * Puts the recommended coexistence mode in force on an org that has never chosen one, and
+	 * leaves an org that has exactly as its administrator left it. Like every step here it
+	 * never throws: an org left in the shipped default is what Health Check exists to report,
+	 * and an install the platform rolled back is not.
+	 */
+	private void applyRecommendedMode() {
+		try {
+			CoexistenceService.applyRecommendedIfUnset();
+		} catch (Exception e) {
+			ErrorLogger.log(e, MODE_CONTEXT);
+		}
+	}
 
-    /**
-     * How many problems the install and its upgrades have logged that nobody has looked at,
-     * so that the Hub home page can say whether setup completed rather than looking the same
-     * after a good install and a partly failed one. Null for a person who cannot read the
-     * Error Log: what they cannot see is not evidence either way.
-     *
-     * A read shown to somebody, so it runs in user mode (ADR-0021). It sits on this class
-     * rather than on the Hub's own controller because the contexts it counts are declared
-     * here, and a count that drifted from them would be confidently wrong.
-     *
-     * The count stops at `cap + 1`, like every Error Log count on the home page (ADMIN-8); the
-     * home model reads it, so the page makes one server call rather than two.
-     */
-    public static Integer countInstallProblemsUpTo(Integer cap) {
-        if (!ErrorLogCountSelector.isReadable()) {
-            return null;
-        }
-        String pattern = CONTEXT_PREFIX + '%';
-        String moduleSetups = ModuleSetups.CONTEXT;
-        String statusNew = ErrorLogger.STATUS_NEW;
-        Integer readUpTo = cap + 1;
-        return [
-            SELECT COUNT()
-            FROM Error_Log__c
-            WHERE
-                (Context__c LIKE :pattern
-                OR Context__c = :moduleSetups)
-                AND Status__c = :statusNew
-            WITH USER_MODE
-            LIMIT :readUpTo
-        ];
-    }
+	/**
+	 * Renames the saved queries "Open in Find" made before the tool was named Data Quality, so
+	 * it keeps updating them (D-140). Finds nothing on a second run. Never throws.
+	 */
+	private void renameDataQualityQueries() {
+		try {
+			DataHygieneService.renameLegacySavedQueries();
+		} catch (Exception e) {
+			ErrorLogger.log(e, SAVED_QUERY_CONTEXT);
+		}
+	}
 
-    /**
-     * Queues the job that gives the installer the BarnCRM Admin permission set and then the
-     * BarnCRM Admin role. Queued rather than done here because both are setup object writes
-     * and this transaction has already written ordinary records (see the class comment).
-     *
-     * @param installerId the person who installed or upgraded the package
-     */
-    private void grantInstallerAccess(Id installerId) {
-        try {
-            System.enqueueJob(new CorePostInstallRetryQueueable(installerId));
-        } catch (Exception e) {
-            ErrorLogger.log(e, ACCESS_CONTEXT);
-        }
-    }
+	/**
+	 * Stores the record type for organizations when none is stored, or the stored one is no
+	 * longer an active candidate, so the setting is never blank or stale (ADR-0141, R-O5).
+	 * Detection picks one the org already has, or No record type; no record type is created,
+	 * activated or made visible, and No record type or a usable stored one is never replaced.
+	 * Never throws.
+	 */
+	private void storeOrganizationRecordType() {
+		try {
+			AccountKinds.storeDetectedIfBlank();
+		} catch (Exception e) {
+			ErrorLogger.log(e, ORGANIZATION_CONTEXT);
+		}
+	}
+
+	/**
+	 * How many problems the install and its upgrades have logged that nobody has looked at,
+	 * so that the Hub home page can say whether setup completed rather than looking the same
+	 * after a good install and a partly failed one. Null for a person who cannot read the
+	 * Error Log: what they cannot see is not evidence either way.
+	 *
+	 * A read shown to somebody, so it runs in user mode (ADR-0021). It sits on this class
+	 * rather than on the Hub's own controller because the contexts it counts are declared
+	 * here, and a count that drifted from them would be confidently wrong.
+	 *
+	 * The count stops at `cap + 1`, like every Error Log count on the home page (ADMIN-8); the
+	 * home model reads it, so the page makes one server call rather than two.
+	 */
+	public static Integer countInstallProblemsUpTo(Integer cap) {
+		if (!ErrorLogCountSelector.isReadable()) {
+			return null;
+		}
+		String pattern = CONTEXT_PREFIX + '%';
+		String moduleSetups = ModuleSetups.CONTEXT;
+		String statusNew = ErrorLogger.STATUS_NEW;
+		Integer readUpTo = cap + 1;
+		return [
+			SELECT COUNT()
+			FROM Error_Log__c
+			WHERE
+				(Context__c LIKE :pattern
+				OR Context__c = :moduleSetups)
+				AND Status__c = :statusNew
+			WITH USER_MODE
+			LIMIT :readUpTo
+		];
+	}
+
+	/**
+	 * Queues the job that gives the installer the BarnCRM Admin permission set and then the
+	 * BarnCRM Admin role. Queued rather than done here because both are setup object writes
+	 * and this transaction has already written ordinary records (see the class comment).
+	 *
+	 * @param installerId the person who installed or upgraded the package
+	 */
+	private void grantInstallerAccess(Id installerId) {
+		try {
+			System.enqueueJob(new CorePostInstallRetryQueueable(installerId));
+		} catch (Exception e) {
+			ErrorLogger.log(e, ACCESS_CONTEXT);
+		}
+	}
 }

@@ -10,10 +10,10 @@
  */
 @NamespaceAccessible
 public interface SetupAssistantExtension {
-    /**
-     * The steps this package contributes. A step whose key is one of Core's adds its fields to
-     * that step and, when it carries a label or description, replaces Core's wording; any other
-     * key is a new step, placed by its sort order. Never null.
-     */
-    List<SetupAssistantService.Step> contributions();
+	/**
+	 * The steps this package contributes. A step whose key is one of Core's adds its fields to
+	 * that step and, when it carries a label or description, replaces Core's wording; any other
+	 * key is a new step, placed by its sort order. Never null.
+	 */
+	List<SetupAssistantService.Step> contributions();
 }

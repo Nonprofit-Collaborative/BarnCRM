@@ -9,140 +9,12 @@
         <value>NPSP household adoption</value>
     </labels>
     <labels>
-        <fullName>Core_NpspAdoption_ErrorNoPermission</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal when the user lacks Manage BarnCRM Settings.</shortDescription>
-        <value>You need the Manage BarnCRM Settings permission to adopt NPSP households. Ask your BarnCRM admin.</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_ErrorJunctionMode</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal while household membership is Junction.</shortDescription>
-        <value>Household membership is set to membership records, and NPSP households keep their people on each contact&apos;s account. Set Household membership to Contact on the General page, then adopt.</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_ErrorNothingToAdopt</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal when no NPSP household is left to adopt.</shortDescription>
-        <value>There are no NPSP households left to adopt, or none you can see.</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_ErrorNothingToUndo</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal when a run has nothing left to undo.</shortDescription>
-        <value>This adoption has nothing left to undo.</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_ErrorCountChanged</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal when the count changed. {0} now, {1} confirmed.</shortDescription>
-        <value>{0} households match now, not the {1} you confirmed. Refresh the panel and confirm the new number.</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_ErrorRunning</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal while another adoption or undo runs.</shortDescription>
-        <value>An adoption or undo is already running. Wait for it to finish, then try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_RunSummary</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error Log Info entry after a run. {0} adopted, {1} skipped, {2} refused.</shortDescription>
-        <value>NPSP household adoption finished: {0} adopted, {1} skipped because you cannot edit them, {2} refused (each refusal has its own Error Log entry).</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_UndoSummary</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error Log Info entry after an undo. {0} put back, {1} not put back.</shortDescription>
-        <value>NPSP household adoption undo finished: {0} put back, {1} not put back (the reason is on each Household Adoption record).</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_NoteGone</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Undo note: the account was deleted.</shortDescription>
-        <value>The account no longer exists.</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_NoteNotHousehold</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Undo note: the account is no longer a household.</shortDescription>
-        <value>The account is no longer a household, so it was left as it is.</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_NoteNoAccess</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Undo note: the user cannot edit the account.</shortDescription>
-        <value>You cannot edit this account.</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_NoteRefused</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Undo note: Salesforce refused the save. {0} is its reason.</shortDescription>
-        <value>Salesforce refused the change: {0}</value>
-    </labels>
-    <labels>
         <fullName>Core_NpspAdoption_Title</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading of the NPSP household adoption panel.</shortDescription>
         <value>Adopt NPSP Households</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_NotAvailable</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when the org has no NPSP household marker.</shortDescription>
-        <value>BarnCRM found no NPSP household accounts in this org.</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_CandidateCount</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>How many households can be adopted. {0} is the number.</shortDescription>
-        <value>{0} NPSP households can be adopted.</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_MoreThanLimit</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>More households than one run takes. {0} is the run limit.</shortDescription>
-        <value>More households than that are waiting. One run adopts up to {0}; run it again for the rest.</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_NoneLeft</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when nothing is left to adopt.</shortDescription>
-        <value>Every NPSP household you can see is already a BarnCRM household.</value>
     </labels>
     <labels>
         <fullName>Core_NpspAdoption_SampleCaption</fullName>
@@ -177,14 +49,6 @@
         <value>Adopt Households</value>
     </labels>
     <labels>
-        <fullName>Core_NpspAdoption_ConfirmMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Adopt confirmation text. {0} is the number of households.</shortDescription>
-        <value>{0} household accounts become BarnCRM households. No NPSP field changes, and you can undo it from this section.</value>
-    </labels>
-    <labels>
         <fullName>Core_NpspAdoption_TypeToAdopt</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -201,28 +65,12 @@
         <value>Adopt</value>
     </labels>
     <labels>
-        <fullName>Core_NpspAdoption_Running</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown while a run or undo is in progress.</shortDescription>
-        <value>An adoption or undo is running. This section updates by itself.</value>
-    </labels>
-    <labels>
         <fullName>Core_NpspAdoption_LastRun</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading for the newest run.</shortDescription>
         <value>Last adoption</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_LastRunCounts</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Newest run counts. {0} adopted, {1} undone, {2} not put back.</shortDescription>
-        <value>{0} adopted, {1} undone, {2} not put back.</value>
     </labels>
     <labels>
         <fullName>Core_NpspAdoption_UndoButton</fullName>
@@ -233,27 +81,11 @@
         <value>Undo This Adoption</value>
     </labels>
     <labels>
-        <fullName>Core_NpspAdoption_UndoMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Undo confirmation text. {0} is the number of households.</shortDescription>
-        <value>{0} households go back to the record type, greetings, primary contact and custom name they had before.</value>
-    </labels>
-    <labels>
         <fullName>Core_NpspAdoption_TypeToUndo</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Label of the typed count before undoing. {0} is the number.</shortDescription>
         <value>Type {0} to undo</value>
-    </labels>
-    <labels>
-        <fullName>Core_NpspAdoption_Started</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown after a run or undo starts.</shortDescription>
-        <value>Started. This section updates as it runs.</value>
     </labels>
 </CustomLabels>

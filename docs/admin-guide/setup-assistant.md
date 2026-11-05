@@ -15,8 +15,8 @@ identity step, and a first gift to check everything with, which makes nine steps
 numbers the steps as they appear with Giving installed and marks what comes from Giving.
 Without Giving, the steps after step three move up by one.
 
-Nothing it asks is permanent. Every answer is a setting you can change later on the
-BarnCRM Settings page, and you can re-run the whole assistant whenever your organization
+Nothing it asks is permanent, except that a feature once on stays on. Every answer is a
+setting you can change later on the BarnCRM Settings page, and you can re-run the whole assistant whenever your organization
 changes. The edition is the one answer you give once, and you give it before the assistant:
 until an administrator finishes the first-run setup window (see
 [BarnCRM Settings, First-run setup](barncrm-settings.md#first-run-setup)), the home page shows
@@ -43,9 +43,15 @@ in place under its name; click any other step's name to open that one instead. A
 Settings** link to the settings section its answers live in.
 
 When every step is done, the assistant collapses to a small **Setup Complete** tile that
-shows how many steps you finished. The tile has a **Reopen Setup** button, so the assistant
-is always one click away, and it opens straight back on the first step rather than on the
-completion screen.
+shows how many steps you finished. **Reopen Setup** is the tile's only button, so the
+assistant is always one click away, and it opens straight back on the first step rather than
+on the completion screen. The reopened checklist has a **Start Setup Again** link under the
+steps. It asks first: "Clear every step's Done and Skipped mark? Your settings stay as they
+are." Confirm, and the checklist starts again from the first step with every saved setting
+still in place.
+
+A step that fills in a setting says "This step is marked done as soon as you save an answer."
+under its questions; a step you finish yourself is marked done when you click **Next**.
 
 On a phone or other narrow screen, where the home page's columns stack, the **Setup
 Checklist** shows at the top of the page while setup is unfinished, so it is the first thing
@@ -320,10 +326,10 @@ Two buttons, and you may use either, both, or neither:
 - **Load the Sample Data** puts about two hundred realistic households, people, and
   organizations in your org so you can practise on something that is not your real data.
   You can remove it again from the same panel.
-- **Import a Spreadsheet** opens the Import tab, where you upload your file, map your
+- **Open Super Importer** opens Super Importer, where you upload your file, map your
   columns, run a preview, and see what would happen before anything is created.
 
-If the Import tab is not in your org yet, the step says so rather than sending you to a
+If Super Importer is not in your org yet, the step says so rather than sending you to a
 page that does not exist, and the same is true of the sample data loader.
 
 **What Maria sees:** both buttons. She loads the sample data, because her real export is
@@ -343,10 +349,10 @@ Click **Finish**. The assistant shows the completion screen: a **You Are Ready**
 check illustration, every step with its status, and how long setup took, measured from the
 first change you made.
 
-**What Maria sees:** **You Are Ready**, her nine steps, and "Time taken: 21 minutes". Two buttons sit
-under the summary: **Reopen Setup** walks the steps again with her answers intact, and
-**Start Setup Again** forgets the progress it recorded so the checklist starts from the
-first step. Neither of them empties a setting: a step whose answer is already saved stays
+**What Maria sees:** **You Are Ready**, her nine steps, and "Time taken: 21 minutes". One button sits
+under the summary: **Reopen Setup** walks the steps again with her answers intact. In the
+reopened checklist, **Start Setup Again** (after its confirmation) forgets the progress it
+recorded so the checklist starts from the first step. Neither of them empties a setting: a step whose answer is already saved stays
 finished, because it is.
 
 ## Common Mistakes

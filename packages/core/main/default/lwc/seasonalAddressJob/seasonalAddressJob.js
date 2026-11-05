@@ -8,15 +8,7 @@ import runNow from '@salesforce/apex/SeasonalAddressController.runNow';
 
 import TITLE from '@salesforce/label/c.Core_SeasonalAddress_PageTitle';
 import HUB_TITLE from '@salesforce/label/c.Core_SeasonalAddress_HubTitle';
-import NEVER_RUN from '@salesforce/label/c.Core_SeasonalAddress_NeverRun';
-import NOT_SCHEDULED from '@salesforce/label/c.Core_SeasonalAddress_NotScheduled';
-import SCHEDULE_ACTIVE from '@salesforce/label/c.Core_SeasonalAddress_ScheduleActive';
-import SWITCHED_OFF from '@salesforce/label/c.Core_SeasonalAddress_SwitchedOff';
 import RUN_NOW from '@salesforce/label/c.Core_SeasonalAddress_RunNow';
-import RUN_NOW_STARTED from '@salesforce/label/c.Core_SeasonalAddress_RunNowStarted';
-import STALE from '@salesforce/label/c.Core_SeasonalAddress_Stale';
-import READ_ONLY from '@salesforce/label/c.Core_SeasonalAddress_ReadOnly';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_SeasonalAddress_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -46,13 +38,25 @@ export default class SeasonalAddressJob extends LightningElement {
       return helpText('Core', 'Core_SeasonalAddress_PageIntro');
     },
     lastRunTitle: HUB_TITLE,
-    neverRun: NEVER_RUN,
-    notScheduled: NOT_SCHEDULED,
-    switchedOff: SWITCHED_OFF,
-    scheduleActive: SCHEDULE_ACTIVE,
+    get neverRun() {
+      return helpText('Core', 'Core_SeasonalAddress_NeverRun');
+    },
+    get notScheduled() {
+      return helpText('Core', 'Core_SeasonalAddress_NotScheduled');
+    },
+    get switchedOff() {
+      return helpText('Core', 'Core_SeasonalAddress_SwitchedOff');
+    },
+    get scheduleActive() {
+      return helpText('Core', 'Core_SeasonalAddress_ScheduleActive');
+    },
     runNow: RUN_NOW,
-    stale: STALE,
-    readOnly: READ_ONLY
+    get stale() {
+      return helpText('Core', 'Core_SeasonalAddress_Stale');
+    },
+    get readOnly() {
+      return helpText('Core', 'Core_SeasonalAddress_ReadOnly');
+    }
   };
 
   swap;
@@ -68,7 +72,7 @@ export default class SeasonalAddressJob extends LightningElement {
       this.swap = result.data;
       this.errorMessage = undefined;
     } else if (result.error) {
-      this.errorMessage = UNEXPECTED_ERROR;
+      this.errorMessage = helpText('Core', 'Core_SeasonalAddress_UnexpectedError');
     }
   }
 
@@ -139,7 +143,7 @@ export default class SeasonalAddressJob extends LightningElement {
   }
 
   handleRunNow() {
-    this.runAction(runNow(), RUN_NOW_STARTED);
+    this.runAction(runNow(), helpText('Core', 'Core_SeasonalAddress_RunNowStarted'));
   }
 
   async runAction(promise, notice) {
@@ -153,7 +157,10 @@ export default class SeasonalAddressJob extends LightningElement {
         await refreshApex(this.wiredSwapResult);
       }
     } catch (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(
+        error,
+        helpText('Core', 'Core_SeasonalAddress_UnexpectedError')
+      );
     } finally {
       this.busy = false;
     }

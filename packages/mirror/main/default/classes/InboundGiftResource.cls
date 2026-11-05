@@ -8,15 +8,15 @@
  */
 @RestResource(urlMapping='/v1/gifts')
 global with sharing class InboundGiftResource {
-    @HttpPost
-    global static void create() {
-        RestRequest request = RestContext.request;
-        InboundGiftResult result = InboundGiftService.recordBody(
-            request == null ? null : request.requestBody
-        );
-        RestResponse response = RestContext.response;
-        response.statusCode = InboundGiftResult.httpStatus(result);
-        response.addHeader('Content-Type', 'application/json');
-        response.responseBody = Blob.valueOf(JSON.serialize(result, true));
-    }
+	@HttpPost
+	global static void create() {
+		RestRequest request = RestContext.request;
+		InboundGiftResult result = InboundGiftService.recordBody(
+			request == null ? null : request.requestBody
+		);
+		RestResponse response = RestContext.response;
+		response.statusCode = InboundGiftResult.httpStatus(result);
+		response.addHeader('Content-Type', 'application/json');
+		response.responseBody = Blob.valueOf(JSON.serialize(result, true));
+	}
 }

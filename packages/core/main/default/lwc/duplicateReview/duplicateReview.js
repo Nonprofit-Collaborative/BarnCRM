@@ -16,41 +16,30 @@ import RULES_HEADING from '@salesforce/label/c.Core_Duplicates_RulesHeading';
 import RULE_ACTIVE from '@salesforce/label/c.Core_Feature_On';
 import RULE_INACTIVE from '@salesforce/label/c.Core_Feature_Off';
 import ACTIVATE_LINK from '@salesforce/label/c.Core_Duplicates_ActivateLink';
-import NO_RULES_NOTICE from '@salesforce/label/c.Core_Duplicates_NoRulesNotice';
 import SCAN_BUTTON from '@salesforce/label/c.Core_Duplicates_ScanButton';
-import SCAN_STARTED from '@salesforce/label/c.Core_Duplicates_ScanStarted';
-import SCAN_RUNNING from '@salesforce/label/c.Core_Duplicates_ScanRunning';
 import LAST_SCAN from '@salesforce/label/c.Core_Duplicates_LastScan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import SUGGESTIONS_HEADING from '@salesforce/label/c.Core_Duplicates_SuggestionsHeading';
 import OBJECT_PERSON from '@salesforce/label/c.Core_Section_Person';
 import OBJECT_HOUSEHOLD from '@salesforce/label/c.Core_Section_Household';
-import PEOPLE_MERGE_NOTICE from '@salesforce/label/c.Core_Duplicates_PeopleMergeNotice';
+import COMPARE_MERGE from '@salesforce/label/c.Core_Duplicates_CompareMerge';
 import MERGE_BUTTON from '@salesforce/label/c.Core_Duplicates_MergeButton';
 import MERGE_HEADING from '@salesforce/label/c.Core_Duplicates_MergeHeading';
 import MERGE_KEEP_LABEL from '@salesforce/label/c.Core_Duplicates_MergeKeepLabel';
 import MERGE_KEEPING from '@salesforce/label/c.Core_Duplicates_MergeKeeping';
 import MERGE_DROPPING from '@salesforce/label/c.Core_Duplicates_MergeDropping';
 import MERGE_CONFIRM from '@salesforce/label/c.Core_Duplicates_MergeConfirm';
-import MERGE_SUCCESS from '@salesforce/label/c.Core_Duplicates_MergeSuccess';
 import DISMISS_BUTTON from '@salesforce/label/c.Core_Duplicates_DismissButton';
 import DISMISS_HEADING from '@salesforce/label/c.Core_Duplicates_DismissButton';
 import DISMISS_REASON_LABEL from '@salesforce/label/c.Core_Import_ResultsReason';
-import DISMISS_SUCCESS from '@salesforce/label/c.Core_Duplicates_DismissSuccess';
 import DISMISSED_COUNT from '@salesforce/label/c.Core_Duplicates_DismissedCount';
 import VIEW_DISMISSED from '@salesforce/label/c.Core_FieldUtilization_HistoryView';
-import READ_ONLY from '@salesforce/label/c.Core_Duplicates_ReadOnlyNotice';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Duplicates_ErrorUnexpected';
-import NO_ACCESS from '@salesforce/label/c.Core_Duplicates_NoSuggestionAccessNotice';
-import SHOWING_COUNT from '@salesforce/label/c.Core_Duplicates_ShowingCount';
-import SHOWING_COUNT_MORE from '@salesforce/label/c.Core_Duplicates_ShowingCountMore';
 import SHOW_MORE from '@salesforce/label/c.Core_AccessExplorer_ShowMore';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Duplicates_EmptyHeading';
 import COUNT_ALT from '@salesforce/label/c.Core_Duplicates_CountAlt';
 import DIFFERENT from '@salesforce/label/c.Core_Duplicates_Different';
 import DIFFERENT_FROM from '@salesforce/label/c.Core_Duplicates_DifferentFrom';
-import COMPARED_WITH_FIRST from '@salesforce/label/c.Core_Duplicates_ComparedWithFirst';
 import BLANK from '@salesforce/label/c.Core_Duplicates_Blank';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupPath } from 'c/setupLinks';
@@ -77,16 +66,20 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     title: TITLE,
     rulesHeading: RULES_HEADING,
     activateLink: ACTIVATE_LINK,
-    noRulesNotice: NO_RULES_NOTICE,
+    get noRulesNotice() {
+      return helpText('Core', 'Core_Duplicates_NoRulesNotice');
+    },
     scanButton: SCAN_BUTTON,
-    scanRunning: SCAN_RUNNING,
+    get scanRunning() {
+      return helpText('Core', 'Core_Duplicates_ScanRunning');
+    },
     lastScan: LAST_SCAN,
     refresh: REFRESH,
     suggestionsHeading: SUGGESTIONS_HEADING,
     get empty() {
       return helpText('Core', 'Core_Duplicates_Empty');
     },
-    peopleMergeNotice: PEOPLE_MERGE_NOTICE,
+    compareMerge: COMPARE_MERGE,
     merge: MERGE_BUTTON,
     mergeHeading: MERGE_HEADING,
     get mergeBody() {
@@ -105,8 +98,12 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     dismissReasonLabel: DISMISS_REASON_LABEL,
     dismissedCount: DISMISSED_COUNT,
     viewDismissed: VIEW_DISMISSED,
-    readOnly: READ_ONLY,
-    noAccess: NO_ACCESS,
+    get readOnly() {
+      return helpText('Core', 'Core_Duplicates_ReadOnlyNotice');
+    },
+    get noAccess() {
+      return helpText('Core', 'Core_Duplicates_NoAccessNotice');
+    },
     cancel: CANCEL,
     showMore: SHOW_MORE,
     emptyHeading: EMPTY_HEADING,
@@ -186,7 +183,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
       this.errorMessage = undefined;
       this.announceCount();
     } catch (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_Duplicates_ErrorUnexpected'));
     } finally {
       this.busy = false;
     }
@@ -225,9 +222,9 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     return this.view ? this.view.lastScanSummary : undefined;
   }
 
-  get lastScanSummaryClass() {
-    const failed = !!(this.view && this.view.lastScanHadFailures);
-    return `slds-text-body_small slds-var-m-top_x-small${failed ? ' slds-text-color_error' : ''}`;
+  /** A scan that could not check some records says so in a warning notice, not red text. */
+  get lastScanHadFailures() {
+    return !!(this.view && this.view.lastScanHadFailures);
   }
 
   /** False when the viewer's license gives no access to duplicate record sets. */
@@ -261,7 +258,9 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     if (!this.moreNotCounted && total <= shown) {
       return undefined;
     }
-    const template = this.moreNotCounted ? SHOWING_COUNT_MORE : SHOWING_COUNT;
+    const template = this.moreNotCounted
+      ? helpText('Core', 'Core_Duplicates_ShowingCountMore')
+      : helpText('Core', 'Core_Duplicates_ShowingCount');
     return template.replace('{0}', shown).replace('{1}', total);
   }
 
@@ -304,11 +303,17 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
         setId: suggestion.setId,
         reason: suggestion.reason,
         canMerge: suggestion.canMerge === true,
+        // Two people merge with Salesforce's own Compare and merge, on the first one's page.
+        isPeople: suggestion.canMerge !== true && records.length > 0 && !records[0].isHousehold,
+        firstRecordId: records.length ? records[0].recordId : undefined,
         dismissOpen: this.dismissing === suggestion.setId,
         mergeOpen: !!this.merging && this.merging.setId === suggestion.setId,
         // A suggestion can hold three or more records: each is compared with the first.
         isGroup: records.length > 2,
-        comparedWithFirst: COMPARED_WITH_FIRST.replace('{0}', first),
+        comparedWithFirst: helpText('Core', 'Core_Duplicates_ComparedWithFirst').replace(
+          '{0}',
+          first
+        ),
         records: this.sideBySide(records)
       };
     });
@@ -376,11 +381,6 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     return this.suggestions.length > this.visibleCount;
   }
 
-  /** The note on merging two people, shown once above the list when a shown pair is people. */
-  get showAnyPeopleNotice() {
-    return this.visibleSuggestions.some((suggestion) => !suggestion.canMerge);
-  }
-
   handleShowMore() {
     this.focusFrom = this.visibleCount;
     this.visibleCount += PAGE_SIZE;
@@ -407,7 +407,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
   // ------------------------------------------------------------------ scan and refresh
 
   handleScan() {
-    this.runAction(startScan(), SCAN_STARTED);
+    this.runAction(startScan(), helpText('Core', 'Core_Duplicates_ScanStarted'));
   }
 
   handleRefresh() {
@@ -424,6 +424,24 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
         attributes: { recordId, actionName: 'view' }
       })
     );
+  }
+
+  /**
+   * Compare and Merge on a person pair (admin-17): opens the first person's record page, where
+   * the Potential Duplicates card runs Salesforce's own compare and merge (Salesforce gives no
+   * supported link to its compare screen). In a console it opens as a subtab.
+   */
+  handleCompareClick(event) {
+    const recordId = event.target.dataset.recordId;
+    const navigate = () =>
+      this[NavigationMixin.Navigate]({
+        type: 'standard__recordPage',
+        attributes: { recordId, actionName: 'view' }
+      });
+    // A button has no link to fall back on, so outside a console it navigates itself.
+    if (!followLinkInWorkspace(this, event, { recordId }, navigate)) {
+      navigate();
+    }
   }
 
   handleViewDismissed() {
@@ -450,7 +468,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     this.dismissing = undefined;
     this.runAction(
       dismissSuggestion({ duplicateRecordSetId: setId, reason: this.dismissReason }),
-      DISMISS_SUCCESS
+      helpText('Core', 'Core_Duplicates_DismissSuccess')
     );
   }
 
@@ -489,7 +507,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
       }
     } catch (error) {
       if (request === this.previewRequest) {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(error, helpText('Core', 'Core_Duplicates_ErrorUnexpected'));
         this.merging = undefined;
       }
     } finally {
@@ -544,7 +562,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     this.mergePreview = undefined;
     this.runAction(
       mergeHouseholds({ duplicateRecordSetId: setId, survivorId, victimId, fieldChoices: {} }),
-      MERGE_SUCCESS
+      helpText('Core', 'Core_Duplicates_MergeSuccess')
     );
   }
 
@@ -573,7 +591,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
       this.noticeMessage = notice;
       this.announceCount();
     } catch (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_Duplicates_ErrorUnexpected'));
     } finally {
       this.busy = false;
     }

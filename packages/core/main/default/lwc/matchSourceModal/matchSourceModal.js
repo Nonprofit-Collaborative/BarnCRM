@@ -12,8 +12,8 @@ import FIND_FIELDS from '@salesforce/label/c.Core_MatchLogic_FindFields';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
-import LOAD_ERROR from '@salesforce/label/c.Core_CmdtManager_LoadError';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const TYPE_NAME = 'Match_Source__mdt';
 const ADDRESS = 'Address';
@@ -34,6 +34,8 @@ const FIELDS = [
  * source when editing, or empty when adding.
  */
 export default class MatchSourceModal extends LightningModal {
+  helpReady = isHelpLoaded('Core');
+
   /** The source being edited ({ developerName, label, values }), or empty for a new one. */
   @api source;
   /** The comparison choices ({ label, value }) from the Matching Logic view. */
@@ -58,6 +60,11 @@ export default class MatchSourceModal extends LightningModal {
   busy = false;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     const values = {};
     FIELDS.forEach((name) => {
       values[name] = '';
@@ -121,7 +128,7 @@ export default class MatchSourceModal extends LightningModal {
       this.errorMessage = undefined;
     } catch (error) {
       this.objectFields = undefined;
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_CmdtManager_LoadError'));
     }
   }
 
@@ -140,7 +147,7 @@ export default class MatchSourceModal extends LightningModal {
       });
       this.close({ jobId, label: form.label });
     } catch (error) {
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_CmdtManager_LoadError'));
     } finally {
       this.busy = false;
     }

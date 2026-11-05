@@ -15,94 +15,94 @@
  */
 @NamespaceAccessible
 public with sharing class ProgramsErasureExtension implements PersonErasureExtension {
-    @NamespaceAccessible
-    public ProgramsErasureExtension() {
-        return;
-    }
+	@NamespaceAccessible
+	public ProgramsErasureExtension() {
+		return;
+	}
 
-    /** The module keeps nothing on the person's own record. */
-    public Set<Schema.SObjectField> fieldsToKeep(Schema.SObjectType personType) {
-        return new Set<Schema.SObjectField>();
-    }
+	/** The module keeps nothing on the person's own record. */
+	public Set<Schema.SObjectField> fieldsToKeep(Schema.SObjectType personType) {
+		return new Set<Schema.SObjectField>();
+	}
 
-    public List<PersonErasure.Change> erase(Id personId) {
-        List<PersonErasure.Change> changes = new List<PersonErasure.Change>();
-        List<Case_Note__c> notes = CaseNoteSelector.selectAllAbout(personId);
-        if (!notes.isEmpty()) {
-            List<Id> ids = new List<Id>();
-            for (Case_Note__c note : notes) {
-                ids.add(note.Id);
-            }
-            try {
-                Database.delete(notes, true, AccessLevel.USER_MODE);
-            } catch (Exception refused) {
-                throw new PersonErasure.ErasureException(Label.Programs_Erase_NeedProgramsAdmin);
-            }
-            changes.add(
-                new PersonErasure.Change(
-                    PersonErasure.DELETED,
-                    Case_Note__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-                        .getLabelPlural(),
-                    ids,
-                    null
-                )
-            );
-        }
-        List<Referral__c> referrals = ReferralSelector.selectAllAbout(personId);
-        if (!referrals.isEmpty()) {
-            List<Id> referralIds = new List<Id>();
-            for (Referral__c referral : referrals) {
-                referralIds.add(referral.Id);
-            }
-            try {
-                Database.delete(referrals, true, AccessLevel.USER_MODE);
-            } catch (Exception refused) {
-                throw new PersonErasure.ErasureException(Label.Programs_Erase_NeedProgramsAdmin);
-            }
-            changes.add(
-                new PersonErasure.Change(
-                    PersonErasure.DELETED,
-                    Referral__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-                        .getLabelPlural(),
-                    referralIds,
-                    null
-                )
-            );
-        }
-        // Goals are typed text about the person too (R-GL6); their steps go with them.
-        List<Goal__c> goals = CaseNoteSelector.selectGoalsAbout(personId);
-        if (!goals.isEmpty()) {
-            List<Id> goalIds = new List<Id>();
-            for (Goal__c goal : goals) {
-                goalIds.add(goal.Id);
-            }
-            try {
-                Database.delete(goals, true, AccessLevel.USER_MODE);
-            } catch (Exception refused) {
-                throw new PersonErasure.ErasureException(Label.Programs_Erase_NeedProgramsAdmin);
-            }
-            changes.add(
-                new PersonErasure.Change(
-                    PersonErasure.DELETED,
-                    Goal__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-                        .getLabelPlural(),
-                    goalIds,
-                    null
-                )
-            );
-        }
-        Integer enrollments = CaseNoteSelector.countEnrollmentsOf(personId);
-        if (enrollments > 0) {
-            changes.add(
-                new PersonErasure.Change(
-                    PersonErasure.KEPT,
-                    Enrollment__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-                        .getLabelPlural(),
-                    enrollments,
-                    Label.Programs_Erase_EnrollmentsKept
-                )
-            );
-        }
-        return changes;
-    }
+	public List<PersonErasure.Change> erase(Id personId) {
+		List<PersonErasure.Change> changes = new List<PersonErasure.Change>();
+		List<Case_Note__c> notes = CaseNoteSelector.selectAllAbout(personId);
+		if (!notes.isEmpty()) {
+			List<Id> ids = new List<Id>();
+			for (Case_Note__c note : notes) {
+				ids.add(note.Id);
+			}
+			try {
+				Database.delete(notes, true, AccessLevel.USER_MODE);
+			} catch (Exception refused) {
+				throw new PersonErasure.ErasureException(Label.Programs_Erase_NeedProgramsAdmin);
+			}
+			changes.add(
+				new PersonErasure.Change(
+					PersonErasure.DELETED,
+					Case_Note__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+						.getLabelPlural(),
+					ids,
+					null
+				)
+			);
+		}
+		List<Referral__c> referrals = ReferralSelector.selectAllAbout(personId);
+		if (!referrals.isEmpty()) {
+			List<Id> referralIds = new List<Id>();
+			for (Referral__c referral : referrals) {
+				referralIds.add(referral.Id);
+			}
+			try {
+				Database.delete(referrals, true, AccessLevel.USER_MODE);
+			} catch (Exception refused) {
+				throw new PersonErasure.ErasureException(Label.Programs_Erase_NeedProgramsAdmin);
+			}
+			changes.add(
+				new PersonErasure.Change(
+					PersonErasure.DELETED,
+					Referral__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+						.getLabelPlural(),
+					referralIds,
+					null
+				)
+			);
+		}
+		// Goals are typed text about the person too (R-GL6); their steps go with them.
+		List<Goal__c> goals = CaseNoteSelector.selectGoalsAbout(personId);
+		if (!goals.isEmpty()) {
+			List<Id> goalIds = new List<Id>();
+			for (Goal__c goal : goals) {
+				goalIds.add(goal.Id);
+			}
+			try {
+				Database.delete(goals, true, AccessLevel.USER_MODE);
+			} catch (Exception refused) {
+				throw new PersonErasure.ErasureException(Label.Programs_Erase_NeedProgramsAdmin);
+			}
+			changes.add(
+				new PersonErasure.Change(
+					PersonErasure.DELETED,
+					Goal__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+						.getLabelPlural(),
+					goalIds,
+					null
+				)
+			);
+		}
+		Integer enrollments = CaseNoteSelector.countEnrollmentsOf(personId);
+		if (enrollments > 0) {
+			changes.add(
+				new PersonErasure.Change(
+					PersonErasure.KEPT,
+					Enrollment__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+						.getLabelPlural(),
+					enrollments,
+					Label.Programs_Erase_EnrollmentsKept
+				)
+			);
+		}
+		return changes;
+	}
 }

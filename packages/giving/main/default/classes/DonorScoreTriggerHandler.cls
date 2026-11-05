@@ -8,35 +8,35 @@
  */
 @NamespaceAccessible
 public with sharing class DonorScoreTriggerHandler extends TriggerHandler {
-    private static final String CONTEXT = 'Donor score assignment';
+	private static final String CONTEXT = 'Donor score assignment';
 
-    @NamespaceAccessible
-    public DonorScoreTriggerHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public DonorScoreTriggerHandler() {
+		return;
+	}
 
-    public override void beforeInsert() {
-        score();
-    }
+	public override void beforeInsert() {
+		score();
+	}
 
-    public override void beforeUpdate() {
-        score();
-    }
+	public override void beforeUpdate() {
+		score();
+	}
 
-    private void score() {
-        List<SObject> records = newRecords();
-        if (records == null || records.isEmpty()) {
-            return;
-        }
-        try {
-            // The registry switch already decided this handler runs, so score without re-checking.
-            DonorScoreService.Cutoffs cutoffs = DonorScoreService.cutoffs();
-            for (SObject record : records) {
-                DonorScoreService.score(record, cutoffs);
-            }
-        } catch (Exception failure) {
-            // Scoring must not stop somebody saving a household or a person.
-            ErrorLogger.log(failure, CONTEXT);
-        }
-    }
+	private void score() {
+		List<SObject> records = newRecords();
+		if (records == null || records.isEmpty()) {
+			return;
+		}
+		try {
+			// The registry switch already decided this handler runs, so score without re-checking.
+			DonorScoreService.Cutoffs cutoffs = DonorScoreService.cutoffs();
+			for (SObject record : records) {
+				DonorScoreService.score(record, cutoffs);
+			}
+		} catch (Exception failure) {
+			// Scoring must not stop somebody saving a household or a person.
+			ErrorLogger.log(failure, CONTEXT);
+		}
+	}
 }

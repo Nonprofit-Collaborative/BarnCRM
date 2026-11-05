@@ -1,372 +1,387 @@
 @IsTest(testFor='ApexClass:ImportNewFieldService, ApexClass:ImportNewFieldController')
 private class ImportNewFieldServiceTest {
-    private static final List<String> FIELD_ADMIN = new List<String>{
-        'BarnCRM_Admin',
-        'BarnCRM_Metadata_Admin'
-    };
-    private static final String SUCCESS = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="http://soap.sforce.com/2006/04/metadata"><soapenv:Body><createMetadataResponse><result><fullName>Account.Shirt_Size__c</fullName><success>true</success></result></createMetadataResponse></soapenv:Body></soapenv:Envelope>';
-    private static final String REFUSED = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="http://soap.sforce.com/2006/04/metadata"><soapenv:Body><createMetadataResponse><result><errors><message>Too many custom fields</message><statusCode>LIMIT_EXCEEDED</statusCode></errors><fullName>Account.Shirt_Size__c</fullName><success>false</success></result></createMetadataResponse></soapenv:Body></soapenv:Envelope>';
-    private static final String FAULT = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Body><soapenv:Fault><faultcode>sf:INVALID_SESSION_ID</faultcode><faultstring>INVALID_SESSION_ID: Invalid Session ID</faultstring></soapenv:Fault></soapenv:Body></soapenv:Envelope>';
+	private static final List<String> FIELD_ADMIN = new List<String>{
+		'BarnCRM_Admin',
+		'BarnCRM_Metadata_Admin'
+	};
+	private static final String SUCCESS = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="http://soap.sforce.com/2006/04/metadata"><soapenv:Body><createMetadataResponse><result><fullName>Account.Shirt_Size__c</fullName><success>true</success></result></createMetadataResponse></soapenv:Body></soapenv:Envelope>';
+	private static final String REFUSED = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns="http://soap.sforce.com/2006/04/metadata"><soapenv:Body><createMetadataResponse><result><errors><message>Too many custom fields</message><statusCode>LIMIT_EXCEEDED</statusCode></errors><fullName>Account.Shirt_Size__c</fullName><success>false</success></result></createMetadataResponse></soapenv:Body></soapenv:Envelope>';
+	private static final String FAULT = '<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><soapenv:Body><soapenv:Fault><faultcode>sf:INVALID_SESSION_ID</faultcode><faultstring>INVALID_SESSION_ID: Invalid Session ID</faultstring></soapenv:Fault></soapenv:Body></soapenv:Envelope>';
 
-    private static String lastBody;
+	private static String lastBody;
 
-    private class MetadataMock implements HttpCalloutMock {
-        private final String body;
+	private class MetadataMock implements HttpCalloutMock {
+		private final String body;
 
-        MetadataMock(String body) {
-            this.body = body;
-        }
+		MetadataMock(String body) {
+			this.body = body;
+		}
 
-        public HttpResponse respond(HttpRequest request) {
-            lastBody = request.getBody();
-            HttpResponse response = new HttpResponse();
-            response.setStatusCode(body == FAULT ? 500 : 200);
-            response.setBody(body);
-            return response;
-        }
-    }
+		public HttpResponse respond(HttpRequest request) {
+			lastBody = request.getBody();
+			HttpResponse response = new HttpResponse();
+			response.setStatusCode(body == FAULT ? 500 : 200);
+			response.setBody(body);
+			return response;
+		}
+	}
 
-    @TestSetup
-    static void createUsers() {
-        TestUsers.withPermissionSets(FIELD_ADMIN);
-        TestUsers.admin();
-    }
+	@TestSetup
+	static void createUsers() {
+		TestUsers.withPermissionSets(FIELD_ADMIN);
+		TestUsers.admin();
+	}
 
-    private static ImportNewFieldService.FieldRequest picklist(String apiName) {
-        ImportNewFieldService.FieldRequest request = new ImportNewFieldService.FieldRequest();
-        request.objectApiName = 'Account';
-        request.label = 'Shirt Size';
-        request.apiName = apiName;
-        request.type = 'Picklist';
-        request.values = new List<String>{ 'S', 'M & L' };
-        return request;
-    }
+	private static ImportNewFieldService.FieldRequest picklist(String apiName) {
+		ImportNewFieldService.FieldRequest request = new ImportNewFieldService.FieldRequest();
+		request.objectApiName = 'Account';
+		request.label = 'Shirt Size';
+		request.apiName = apiName;
+		request.type = 'Picklist';
+		request.values = new List<String>{ 'S', 'M & L' };
+		return request;
+	}
 
-    private static void connectedAdmin() {
-        ImportNewFieldService.systemPermissionOverride = true;
-        ImportNewFieldService.connectedOverride = true;
-        ImportNewFieldService.calloutStatusOverride = 'Enabled';
-    }
+	private static void connectedAdmin() {
+		ImportNewFieldService.systemPermissionOverride = true;
+		ImportNewFieldService.connectedOverride = true;
+		ImportNewFieldService.calloutStatusOverride = 'Enabled';
+	}
 
-    private static String alternateEmail() {
-        return NamespaceUtil.qualify('Alternate_Email');
-    }
+	private static String alternateEmail() {
+		return NamespaceUtil.qualify('Alternate_Email');
+	}
 
-    @IsTest
-    static void createsTheFieldAndMapsItOnceDescribed() {
-        System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
-            connectedAdmin();
-            Test.setMock(HttpCalloutMock.class, new MetadataMock(SUCCESS));
-            Test.startTest();
-            Id jobId = ImportNewFieldController.createField(JSON.serialize(picklist('Shirt_Size')));
-            Test.stopTest();
-            Test.getEventBus().deliver();
+	@IsTest
+	static void createsTheFieldAndMapsItOnceDescribed() {
+		System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
+			connectedAdmin();
+			Test.setMock(HttpCalloutMock.class, new MetadataMock(SUCCESS));
+			Test.startTest();
+			Id jobId = ImportNewFieldController.createField(JSON.serialize(picklist('Shirt_Size')));
+			Test.stopTest();
+			Test.getEventBus().deliver();
 
-            Assert.isTrue(lastBody.contains('<met:createMetadata>'), lastBody);
-            Assert.isTrue(lastBody.contains('<met:fullName>Account.Shirt_Size__c</met:fullName>'));
-            Assert.isTrue(lastBody.contains('<met:fullName>M &amp; L</met:fullName>'), 'escaped');
-            Assert.isTrue(lastBody.contains('<met:type>Picklist</met:type>'));
-            Assert.areEqual(
-                0,
-                [SELECT COUNT() FROM Error_Log__c WHERE Severity__c = 'Error' WITH SYSTEM_MODE],
-                'nothing logged'
-            );
-            // The created field is read from describe; an existing field stands in for it.
-            ImportNewFieldService.Outcome outcome = ImportNewFieldController.checkField(
-                jobId,
-                'Account',
-                alternateEmail()
-            );
-            Assert.areEqual(ImportNewFieldService.CREATED, outcome.state);
-            Assert.areEqual(alternateEmail() + '__c', outcome.fieldValue);
-        }
-    }
+			Assert.isTrue(lastBody.contains('<met:createMetadata>'), lastBody);
+			Assert.isTrue(lastBody.contains('<met:fullName>Account.Shirt_Size__c</met:fullName>'));
+			Assert.isTrue(lastBody.contains('<met:fullName>M &amp; L</met:fullName>'), 'escaped');
+			Assert.isTrue(lastBody.contains('<met:type>Picklist</met:type>'));
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Error_Log__c WHERE Severity__c = 'Error' WITH SYSTEM_MODE],
+				'nothing logged'
+			);
+			// The created field is read from describe; an existing field stands in for it.
+			ImportNewFieldService.Outcome outcome = ImportNewFieldController.checkField(
+				jobId,
+				'Account',
+				alternateEmail()
+			);
+			Assert.areEqual(ImportNewFieldService.CREATED, outcome.state);
+			Assert.areEqual(alternateEmail() + '__c', outcome.fieldValue);
+		}
+	}
 
-    /**
-     * The failed job's one Error Log entry, delivered from ErrorLogger's event, names the reason,
-     * and the poll reports it.
-     */
-    private static void assertReported(
-        ImportNewFieldService.Outcome outcome,
-        String reason,
-        Id jobId
-    ) {
-        List<Error_Log__c> logged = [
-            SELECT Message__c, Context__c
-            FROM Error_Log__c
-            WHERE Severity__c = 'Error'
-            WITH SYSTEM_MODE
-        ];
-        Assert.areEqual(1, logged.size(), 'One entry for job ' + jobId);
-        Assert.isTrue(logged[0].Message__c.contains(reason), logged[0].Message__c);
-        Assert.areEqual(logged[0].Message__c, outcome.message, logged[0].Context__c);
-    }
+	/**
+	 * The failed job's one Error Log entry, delivered from ErrorLogger's event, names the reason,
+	 * and the poll reports it.
+	 */
+	private static void assertReported(
+		ImportNewFieldService.Outcome outcome,
+		String reason,
+		Id jobId
+	) {
+		List<Error_Log__c> logged = [
+			SELECT Message__c, Context__c
+			FROM Error_Log__c
+			WHERE Severity__c = 'Error'
+			WITH SYSTEM_MODE
+		];
+		Assert.areEqual(1, logged.size(), 'One entry for job ' + jobId);
+		Assert.isTrue(logged[0].Message__c.contains(reason), logged[0].Message__c);
+		Assert.areEqual(logged[0].Message__c, outcome.message, logged[0].Context__c);
+	}
 
-    @IsTest
-    static void aRefusedFieldIsLoggedAndReported() {
-        System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
-            connectedAdmin();
-            Test.setMock(HttpCalloutMock.class, new MetadataMock(REFUSED));
-            Test.startTest();
-            Id jobId = ImportNewFieldService.start(picklist('Shirt_Size'));
-            Test.stopTest();
-            Test.getEventBus().deliver();
+	@IsTest
+	static void aRefusedFieldIsLoggedAndReported() {
+		System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
+			connectedAdmin();
+			Test.setMock(HttpCalloutMock.class, new MetadataMock(REFUSED));
+			Test.startTest();
+			Id jobId = ImportNewFieldService.start(picklist('Shirt_Size'));
+			Test.stopTest();
+			Test.getEventBus().deliver();
 
-            ImportNewFieldService.Outcome outcome = ImportNewFieldService.check(
-                jobId,
-                'Account',
-                'Shirt_Size'
-            );
-            Assert.areEqual(ImportNewFieldService.FAILED, outcome.state);
-            assertReported(outcome, 'Too many custom fields', jobId);
-        }
-    }
+			ImportNewFieldService.Outcome outcome = ImportNewFieldService.check(
+				jobId,
+				'Account',
+				'Shirt_Size'
+			);
+			Assert.areEqual(ImportNewFieldService.FAILED, outcome.state);
+			assertReported(outcome, 'Too many custom fields', jobId);
+		}
+	}
 
-    @IsTest
-    static void aConnectionFaultIsLoggedInPlainWords() {
-        System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
-            connectedAdmin();
-            Test.setMock(HttpCalloutMock.class, new MetadataMock(FAULT));
-            Test.startTest();
-            Id jobId = ImportNewFieldService.start(picklist('Shirt_Size'));
-            Test.stopTest();
-            Test.getEventBus().deliver();
+	@IsTest
+	static void aConnectionFaultIsLoggedInPlainWords() {
+		System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
+			connectedAdmin();
+			Test.setMock(HttpCalloutMock.class, new MetadataMock(FAULT));
+			Test.startTest();
+			Id jobId = ImportNewFieldService.start(picklist('Shirt_Size'));
+			Test.stopTest();
+			Test.getEventBus().deliver();
 
-            ImportNewFieldService.Outcome outcome = ImportNewFieldService.check(
-                jobId,
-                'Account',
-                'Shirt_Size'
-            );
-            Assert.areEqual(ImportNewFieldService.FAILED, outcome.state);
-            assertReported(outcome, 'INVALID_SESSION_ID', jobId);
-        }
-    }
+			ImportNewFieldService.Outcome outcome = ImportNewFieldService.check(
+				jobId,
+				'Account',
+				'Shirt_Size'
+			);
+			Assert.areEqual(ImportNewFieldService.FAILED, outcome.state);
+			assertReported(outcome, 'INVALID_SESSION_ID', jobId);
+		}
+	}
 
-    @IsTest
-    static void refusesWithoutThePermissions() {
-        System.runAs(TestUsers.admin()) {
-            ImportNewFieldService.systemPermissionOverride = true;
-            ImportNewFieldService.connectedOverride = true;
-            Assert.isFalse(ImportNewFieldService.connection().canCreate, 'no Metadata Admin');
-            try {
-                ImportNewFieldService.start(picklist('Shirt_Size'));
-                Assert.fail('Expected a refusal');
-            } catch (ImportNewFieldService.NewFieldException e) {
-                Assert.areEqual(Label.Core_ImportNewField_NoPermission, e.getMessage());
-            }
-        }
-        System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
-            ImportNewFieldService.systemPermissionOverride = false;
-            try {
-                ImportNewFieldController.createField(JSON.serialize(picklist('Shirt_Size')));
-                Assert.fail('Expected a refusal');
-            } catch (AuraHandledException e) {
-                Assert.areEqual(Label.Core_ImportNewField_NoPermission, e.getMessage());
-            }
-        }
-    }
+	@IsTest
+	static void refusesWithoutThePermissions() {
+		System.runAs(TestUsers.admin()) {
+			ImportNewFieldService.systemPermissionOverride = true;
+			ImportNewFieldService.connectedOverride = true;
+			Assert.isFalse(ImportNewFieldService.connection().canCreate, 'no Metadata Admin');
+			try {
+				ImportNewFieldService.start(picklist('Shirt_Size'));
+				Assert.fail('Expected a refusal');
+			} catch (ImportNewFieldService.NewFieldException e) {
+				Assert.areEqual(
+					BarnHelp.text('Core', 'Core_ImportNewField_NoPermission'),
+					e.getMessage()
+				);
+			}
+		}
+		System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
+			ImportNewFieldService.systemPermissionOverride = false;
+			try {
+				ImportNewFieldController.createField(JSON.serialize(picklist('Shirt_Size')));
+				Assert.fail('Expected a refusal');
+			} catch (AuraHandledException e) {
+				Assert.areEqual(
+					BarnHelp.text('Core', 'Core_ImportNewField_NoPermission'),
+					e.getMessage()
+				);
+			}
+		}
+	}
 
-    @IsTest
-    static void refusesWithoutAConnection() {
-        System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
-            ImportNewFieldService.systemPermissionOverride = true;
-            ImportNewFieldService.connectedOverride = false;
-            Assert.isFalse(ImportNewFieldController.getConnection().connected);
-            try {
-                ImportNewFieldService.start(picklist('Shirt_Size'));
-                Assert.fail('Expected a refusal');
-            } catch (ImportNewFieldService.NewFieldException e) {
-                Assert.areEqual(Label.Core_ImportNewField_NotConnected, e.getMessage());
-            }
-            Assert.isTrue(ImportNewFieldController.setUpConnection().canCreate);
-            // Refresh Fields after creating the field in Setup.
-            Assert.areEqual(
-                ImportNewFieldService.CREATED,
-                ImportNewFieldController.findField('Account', alternateEmail() + '__c').state
-            );
-            Assert.areEqual(
-                ImportNewFieldService.RUNNING,
-                ImportNewFieldController.findField('Account', 'Not_Created_Yet').state
-            );
-        }
-    }
+	@IsTest
+	static void refusesWithoutAConnection() {
+		System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
+			ImportNewFieldService.systemPermissionOverride = true;
+			ImportNewFieldService.connectedOverride = false;
+			Assert.isFalse(ImportNewFieldController.getConnection().connected);
+			try {
+				ImportNewFieldService.start(picklist('Shirt_Size'));
+				Assert.fail('Expected a refusal');
+			} catch (ImportNewFieldService.NewFieldException e) {
+				Assert.areEqual(
+					BarnHelp.text('Core', 'Core_ImportNewField_NotConnected'),
+					e.getMessage()
+				);
+			}
+			Assert.isTrue(ImportNewFieldController.setUpConnection().canCreate);
+			// Refresh Fields after creating the field in Setup.
+			Assert.areEqual(
+				ImportNewFieldService.CREATED,
+				ImportNewFieldController.findField('Account', alternateEmail() + '__c').state
+			);
+			Assert.areEqual(
+				ImportNewFieldService.RUNNING,
+				ImportNewFieldController.findField('Account', 'Not_Created_Yet').state
+			);
+		}
+	}
 
-    /** QA v21 D3: a Named Credential with callouts off is set up, not connected. */
-    @IsTest
-    static void aConnectionWithCalloutsOffNeedsTheSetupStep() {
-        System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
-            ImportNewFieldService.systemPermissionOverride = true;
-            ImportNewFieldService.connectedOverride = true;
-            ImportNewFieldService.calloutStatusOverride = 'Disabled';
-            ImportNewFieldService.Connection connection = ImportNewFieldController.getConnection();
-            Assert.isFalse(connection.connected, 'callouts off is not connected');
-            Assert.isTrue(connection.calloutsOff, 'the panel shows the Setup step');
-            try {
-                ImportNewFieldService.start(picklist('Shirt_Size'));
-                Assert.fail('Expected a refusal');
-            } catch (ImportNewFieldService.NewFieldException e) {
-                Assert.areEqual(Label.Core_ImportNewField_CalloutsOff, e.getMessage());
-            }
-            ImportNewFieldService.calloutStatusOverride = 'Enabled';
-            connection = ImportNewFieldController.getConnection();
-            Assert.isTrue(connection.connected && !connection.calloutsOff, 'turned on in Setup');
-        }
-        System.runAs(TestUsers.admin()) {
-            ImportNewFieldService.systemPermissionOverride = true;
-            Assert.isFalse(
-                ImportNewFieldController.getConnection().calloutsOff,
-                'only someone who may create fields is shown the step'
-            );
-        }
-    }
+	/** QA v21 D3: a Named Credential with callouts off is set up, not connected. */
+	@IsTest
+	static void aConnectionWithCalloutsOffNeedsTheSetupStep() {
+		System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
+			ImportNewFieldService.systemPermissionOverride = true;
+			ImportNewFieldService.connectedOverride = true;
+			ImportNewFieldService.calloutStatusOverride = 'Disabled';
+			ImportNewFieldService.Connection connection = ImportNewFieldController.getConnection();
+			Assert.isFalse(connection.connected, 'callouts off is not connected');
+			Assert.isTrue(connection.calloutsOff, 'the panel shows the Setup step');
+			try {
+				ImportNewFieldService.start(picklist('Shirt_Size'));
+				Assert.fail('Expected a refusal');
+			} catch (ImportNewFieldService.NewFieldException e) {
+				Assert.areEqual(
+					BarnHelp.text('Core', 'Core_ImportNewField_CalloutsOff'),
+					e.getMessage()
+				);
+			}
+			ImportNewFieldService.calloutStatusOverride = 'Enabled';
+			connection = ImportNewFieldController.getConnection();
+			Assert.isTrue(connection.connected && !connection.calloutsOff, 'turned on in Setup');
+		}
+		System.runAs(TestUsers.admin()) {
+			ImportNewFieldService.systemPermissionOverride = true;
+			Assert.isFalse(
+				ImportNewFieldController.getConnection().calloutsOff,
+				'only someone who may create fields is shown the step'
+			);
+		}
+	}
 
-    @IsTest
-    static void readsTheCalloutStatusSafely() {
-        System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
-            // No Named Credential in a test: the ConnectApi read fails and counts as off.
-            Assert.isFalse(ImportNewFieldService.calloutsEnabled());
-        }
-    }
+	@IsTest
+	static void readsTheCalloutStatusSafely() {
+		System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
+			// No Named Credential in a test: the ConnectApi read fails and counts as off.
+			Assert.isFalse(ImportNewFieldService.calloutsEnabled());
+		}
+	}
 
-    @IsTest
-    static void refusesANameAlreadyOnTheObject() {
-        System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
-            connectedAdmin();
-            try {
-                ImportNewFieldService.start(picklist(alternateEmail()));
-                Assert.fail('Expected a refusal');
-            } catch (ImportNewFieldService.NewFieldException e) {
-                Assert.areEqual(Label.Core_ImportNewField_NameTaken, e.getMessage());
-            }
-        }
-    }
+	@IsTest
+	static void refusesANameAlreadyOnTheObject() {
+		System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
+			connectedAdmin();
+			try {
+				ImportNewFieldService.start(picklist(alternateEmail()));
+				Assert.fail('Expected a refusal');
+			} catch (ImportNewFieldService.NewFieldException e) {
+				Assert.areEqual(
+					BarnHelp.text('Core', 'Core_ImportNewField_NameTaken'),
+					e.getMessage()
+				);
+			}
+		}
+	}
 
-    // runs-as: deploying user (pure logic: validates a request against describe, no DML or SOQL)
-    @IsTest
-    static void checksNamesTypesAndValues() {
-        ImportNewFieldService.FieldRequest request = picklist('Order');
-        Assert.isTrue(String.join(ImportNewFieldService.problems(request), ' ').contains('Order'));
-        for (String bad : new List<String>{ '1st', 'Two__Bars', 'Ends_', 'Has Space', '' }) {
-            request.apiName = bad;
-            Assert.areEqual(
-                new List<String>{ Label.Core_ImportNewField_NameInvalid },
-                ImportNewFieldService.problems(request),
-                bad
-            );
-        }
-        request.apiName = 'Shirt_Size';
-        request.values = new List<String>{ 'S', 's' };
-        Assert.areEqual(
-            new List<String>{ Label.Core_ImportNewField_PicklistInvalid },
-            ImportNewFieldService.problems(request)
-        );
-        request.type = 'Text';
-        request.length = 300;
-        Assert.areEqual(
-            new List<String>{ Label.Core_ImportNewField_LengthInvalid },
-            ImportNewFieldService.problems(request)
-        );
-        request.type = 'Currency';
-        request.scale = 2;
-        Assert.isTrue(ImportNewFieldService.problems(request).isEmpty());
-        String xml = ImportNewFieldService.fieldXml(request);
-        Assert.isTrue(xml.contains('<met:precision>18</met:precision><met:scale>2</met:scale>'));
-        request.type = 'Formula';
-        request.objectApiName = 'No_Such_Object__c';
-        Assert.areEqual(2, ImportNewFieldService.problems(request).size());
-    }
+	// runs-as: deploying user (pure logic: validates a request against describe, no DML or SOQL)
+	@IsTest
+	static void checksNamesTypesAndValues() {
+		ImportNewFieldService.FieldRequest request = picklist('Order');
+		Assert.isTrue(String.join(ImportNewFieldService.problems(request), ' ').contains('Order'));
+		for (String bad : new List<String>{ '1st', 'Two__Bars', 'Ends_', 'Has Space', '' }) {
+			request.apiName = bad;
+			Assert.areEqual(
+				new List<String>{ BarnHelp.text('Core', 'Core_ImportNewField_NameInvalid') },
+				ImportNewFieldService.problems(request),
+				bad
+			);
+		}
+		request.apiName = 'Shirt_Size';
+		request.values = new List<String>{ 'S', 's' };
+		Assert.areEqual(
+			new List<String>{ BarnHelp.text('Core', 'Core_ImportNewField_PicklistInvalid') },
+			ImportNewFieldService.problems(request)
+		);
+		request.type = 'Text';
+		request.length = 300;
+		Assert.areEqual(
+			new List<String>{ BarnHelp.text('Core', 'Core_ImportNewField_LengthInvalid') },
+			ImportNewFieldService.problems(request)
+		);
+		request.type = 'Currency';
+		request.scale = 2;
+		Assert.isTrue(ImportNewFieldService.problems(request).isEmpty());
+		String xml = ImportNewFieldService.fieldXml(request);
+		Assert.isTrue(xml.contains('<met:precision>18</met:precision><met:scale>2</met:scale>'));
+		request.type = 'Formula';
+		request.objectApiName = 'No_Such_Object__c';
+		Assert.areEqual(2, ImportNewFieldService.problems(request).size());
+	}
 
-    /**
-     * BarnCRM's own object, with no master-detail parent, so object Read has no dependency on
-     * another object (Account Read can depend on Contact Read, for example with Person Accounts).
-     */
-    private static String ownObject() {
-        return NamespaceUtil.qualify('Error_Log') + '__c';
-    }
+	/**
+	 * BarnCRM's own object, with no master-detail parent, so object Read has no dependency on
+	 * another object (Account Read can depend on Contact Read, for example with Person Accounts).
+	 */
+	private static String ownObject() {
+		return NamespaceUtil.qualify('Error_Log') + '__c';
+	}
 
-    private static String ownField() {
-        return NamespaceUtil.qualify('Context') + '__c';
-    }
+	private static String ownField() {
+		return NamespaceUtil.qualify('Context') + '__c';
+	}
 
-    private static PermissionSet permissionSet(String name, Boolean objectRead) {
-        PermissionSet created = new PermissionSet(Name = name, Label = name.replace('_', ' '));
-        insert as system created;
-        if (objectRead) {
-            insert as system new ObjectPermissions(
-                ParentId = created.Id,
-                SobjectType = ownObject(),
-                PermissionsRead = true
-            );
-        }
-        return created;
-    }
+	private static PermissionSet permissionSet(String name, Boolean objectRead) {
+		PermissionSet created = new PermissionSet(Name = name, Label = name.replace('_', ' '));
+		insert as system created;
+		if (objectRead) {
+			insert as system new ObjectPermissions(
+				ParentId = created.Id,
+				SobjectType = ownObject(),
+				PermissionsRead = true
+			);
+		}
+		return created;
+	}
 
-    private static List<FieldPermissions> fieldRows(Id parentId) {
-        return [
-            SELECT PermissionsRead, PermissionsEdit
-            FROM FieldPermissions
-            WHERE ParentId = :parentId AND Field = :(ownObject() + '.' + ownField())
-            WITH SYSTEM_MODE
-        ];
-    }
+	private static List<FieldPermissions> fieldRows(Id parentId) {
+		return [
+			SELECT PermissionsRead, PermissionsEdit
+			FROM FieldPermissions
+			WHERE ParentId = :parentId AND Field = :(ownObject() + '.' + ownField())
+			WITH SYSTEM_MODE
+		];
+	}
 
-    @IsTest
-    static void grantsAccessThroughTheChosenPermissionSet() {
-        System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
-            PermissionSet chosen = permissionSet('Barn_Test_Chosen', true);
-            List<String> skipped = ImportNewFieldService.grantAccess(
-                ownObject(),
-                ownField(),
-                chosen.Id,
-                'test'
-            );
-            ImportNewFieldService.grantAccess(ownObject(), ownField(), chosen.Id, 'test');
+	@IsTest
+	static void grantsAccessThroughTheChosenPermissionSet() {
+		System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
+			PermissionSet chosen = permissionSet('Barn_Test_Chosen', true);
+			List<String> skipped = ImportNewFieldService.grantAccess(
+				ownObject(),
+				ownField(),
+				chosen.Id,
+				'test'
+			);
+			ImportNewFieldService.grantAccess(ownObject(), ownField(), chosen.Id, 'test');
 
-            List<FieldPermissions> rows = fieldRows(chosen.Id);
-            Assert.areEqual(1, rows.size(), 'granted once, however often it runs');
-            Assert.isTrue(rows[0].PermissionsRead && rows[0].PermissionsEdit);
-            for (String each : skipped) {
-                Assert.isFalse(each.contains('Barn Test Chosen'), each);
-            }
-        }
-    }
+			List<FieldPermissions> rows = fieldRows(chosen.Id);
+			Assert.areEqual(1, rows.size(), 'granted once, however often it runs');
+			Assert.isTrue(rows[0].PermissionsRead && rows[0].PermissionsEdit);
+			for (String each : skipped) {
+				Assert.isFalse(each.contains('Barn Test Chosen'), each);
+			}
+		}
+	}
 
-    /** A permission set without Read on the object is skipped in words; object access is not widened. */
-    @IsTest
-    static void skipsAPermissionSetThatCannotReadTheObject() {
-        System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
-            PermissionSet chosen = permissionSet('Barn_Test_No_Read', false);
-            List<String> skipped = ImportNewFieldService.grantAccess(
-                ownObject(),
-                ownField(),
-                chosen.Id,
-                'test'
-            );
+	/** A permission set without Read on the object is skipped in words; object access is not widened. */
+	@IsTest
+	static void skipsAPermissionSetThatCannotReadTheObject() {
+		System.runAs(TestUsers.withPermissionSets(FIELD_ADMIN)) {
+			PermissionSet chosen = permissionSet('Barn_Test_No_Read', false);
+			List<String> skipped = ImportNewFieldService.grantAccess(
+				ownObject(),
+				ownField(),
+				chosen.Id,
+				'test'
+			);
 
-            Assert.isTrue(fieldRows(chosen.Id).isEmpty(), 'no field access without object Read');
-            Assert.areEqual(
-                0,
-                [
-                    SELECT COUNT()
-                    FROM ObjectPermissions
-                    WHERE ParentId = :chosen.Id AND SobjectType = :ownObject()
-                    WITH SYSTEM_MODE
-                ],
-                'object access not widened'
-            );
-            String reported;
-            for (String each : skipped) {
-                if (each.contains('Barn Test No Read')) {
-                    reported = each;
-                }
-            }
-            Assert.isNotNull(reported, String.join(skipped, ' | '));
-            Assert.isTrue(
-                reported.contains(
-                    Schema.getGlobalDescribe().get(ownObject()).getDescribe().getLabel()
-                ),
-                reported
-            );
-        }
-    }
+			Assert.isTrue(fieldRows(chosen.Id).isEmpty(), 'no field access without object Read');
+			Assert.areEqual(
+				0,
+				[
+					SELECT COUNT()
+					FROM ObjectPermissions
+					WHERE ParentId = :chosen.Id AND SobjectType = :ownObject()
+					WITH SYSTEM_MODE
+				],
+				'object access not widened'
+			);
+			String reported;
+			for (String each : skipped) {
+				if (each.contains('Barn Test No Read')) {
+					reported = each;
+				}
+			}
+			Assert.isNotNull(reported, String.join(skipped, ' | '));
+			Assert.isTrue(
+				reported.contains(
+					Schema.getGlobalDescribe().get(ownObject()).getDescribe().getLabel()
+				),
+				reported
+			);
+		}
+	}
 }

@@ -14,17 +14,17 @@
  * to one setting: nothing else in the feature knows which implementation is in use.
  */
 public with sharing class BlobToPdfReceiptRenderer implements ReceiptRenderer {
-    public Blob render(String html) {
-        if (String.isBlank(html)) {
-            throw new ReceiptRendererException(Label.Giving_Receipt_NothingToRender);
-        }
-        return Blob.toPdf(html);
-    }
+	public Blob render(String html) {
+		if (String.isBlank(html)) {
+			throw new ReceiptRendererException(Label.Giving_Receipt_NothingToRender);
+		}
+		return Blob.toPdf(html);
+	}
 
-    public String describe() {
-        return 'Visualforce PDF rendering service (Blob.toPdf)';
-    }
+	public String describe() {
+		return 'Visualforce PDF rendering service (Blob.toPdf)';
+	}
 
-    public class ReceiptRendererException extends Exception {
-    }
+	public class ReceiptRendererException extends Exception {
+	}
 }

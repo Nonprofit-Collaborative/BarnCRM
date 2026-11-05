@@ -6,11 +6,25 @@ import HEADING from '@salesforce/label/c.Core_HubModules_Title';
 import LINK from '@salesforce/label/c.Core_HubModules_ManagerLink';
 import STATUS_ON from '@salesforce/label/c.Core_ModuleManager_StatusOn';
 import STATUS_OFF from '@salesforce/label/c.Core_ModuleManager_StatusOff';
-import LOAD_ERROR from '@salesforce/label/c.Core_ModuleManager_LoadErrorMessage';
 import OPEN_APP from '@salesforce/label/c.Core_ModuleManager_OpenApp';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const MODULES_SECTION = 'Modules';
 const NOT_INSTALLED = 'NotInstalled';
+
+// Each module app's logo, a content asset its own package ships (vis-core-12). A module with
+// no app of its own shows the avatar's fallback icon.
+const LOGOS = {
+  Giving: 'BarnCRM_Fundraising_Logo',
+  Volunteers: 'BarnCRM_Volunteers_Logo',
+  Programs: 'BarnCRM_Programs_Logo',
+  Funders: 'BarnCRM_Funders_Logo',
+  LogicModels: 'BarnCRM_Logic_Models_Logo'
+};
+
+function logoUrl(name) {
+  return LOGOS[name] ? `/file-asset/${LOGOS[name]}` : undefined;
+}
 
 /**
  * The installed BarnCRM modules and whether each is on, on the BarnCRM home page. It reads the
@@ -18,6 +32,8 @@ const NOT_INSTALLED = 'NotInstalled';
  * A module with an app of its own links to it, so people find where the module's work is done.
  */
 export default class HubModules extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
   labels = { heading: HEADING, link: LINK, openApp: OPEN_APP };
 
   rows = [];
@@ -25,6 +41,11 @@ export default class HubModules extends NavigationMixin(LightningElement) {
 
   // The Module Manager's own call is not cacheable, so it is called here rather than wired.
   async connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     try {
       const data = await getState();
       this.rows = ((data && data.modules) || [])
@@ -33,15 +54,13 @@ export default class HubModules extends NavigationMixin(LightningElement) {
           name: module.name,
           displayName: module.label || module.name,
           appUrl: module.appUrl,
+          logoUrl: logoUrl(module.name),
           statusText: module.status === 'Off' ? STATUS_OFF : STATUS_ON,
-          badgeClass:
-            module.status === 'Off'
-              ? 'slds-badge slds-var-m-left_x-small'
-              : 'slds-badge slds-theme_success slds-var-m-left_x-small'
+          status: module.status === 'Off' ? 'off' : 'on'
         }));
       this.errorMessage = undefined;
     } catch {
-      this.errorMessage = LOAD_ERROR;
+      this.errorMessage = helpText('Core', 'Core_ModuleManager_LoadErrorMessage');
     }
   }
 
@@ -55,7 +74,7 @@ export default class HubModules extends NavigationMixin(LightningElement) {
         state: { [link.sectionKey]: MODULES_SECTION }
       });
     } catch {
-      this.errorMessage = LOAD_ERROR;
+      this.errorMessage = helpText('Core', 'Core_ModuleManager_LoadErrorMessage');
     }
   }
 }

@@ -25,22 +25,6 @@
         <value>{0} already has this relationship with {1}. Open {2} to change it.</value>
     </labels>
     <labels>
-        <fullName>Core_Relationship_DuplicateHidden</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Save refused: relationship on file that this user cannot see</shortDescription>
-        <value>This relationship already exists. Ask your BarnCRM admin to look at the existing one.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Relationship_DuplicateInSave</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Save refused: the same relationship appears twice in one save</shortDescription>
-        <value>The same relationship is in this save twice. Remove one of them and save again.</value>
-    </labels>
-    <labels>
         <fullName>Core_Relationship_EmptyHeading</fullName>
         <categories>Relationships</categories>
         <language>en_US</language>
@@ -49,12 +33,12 @@
         <value>No Relationships Yet</value>
     </labels>
     <labels>
-        <fullName>Core_Relationship_LoadFailed</fullName>
+        <fullName>Core_Relationship_EndAction</fullName>
         <categories>Relationships</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Relationship card: the list of relationships could not be read</shortDescription>
-        <value>BarnCRM could not read this person's relationships. Refresh the page, and if it happens again ask your BarnCRM admin to check that you can read relationships.</value>
+        <shortDescription>Relationship and affiliation row menu: set the End Date to today</shortDescription>
+        <value>End It</value>
     </labels>
     <labels>
         <fullName>Core_Relationship_Loading</fullName>
@@ -70,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Save refused: both contact and account lookup filled in for one person</shortDescription>
-        <value>A relationship names one record for each person. Fill in either the person or the person account on each side, not both.</value>
+        <value>Choose each person once: fill in one person field on each side of the relationship, not two.</value>
     </labels>
     <labels>
         <fullName>Core_Relationship_PersonRequired</fullName>
@@ -81,51 +65,11 @@
         <value>A relationship needs a person on each side.</value>
     </labels>
     <labels>
-        <fullName>Core_Relationship_RemoveFailed</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Relationship card: the relationship could not be deleted</shortDescription>
-        <value>BarnCRM could not remove that relationship. Check that you can delete relationships, and if it happens again ask your BarnCRM admin to check the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Relationship_RemoveSuccess</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Relationship card: confirmation after both sides are deleted</shortDescription>
-        <value>Relationship removed from both people.</value>
-    </labels>
-    <labels>
         <fullName>Core_Relationship_SamePerson</fullName>
         <categories>Relationships</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Save refused: the two sides name the same person</shortDescription>
         <value>A relationship needs two different people.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Relationship_SaveFailed</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Relationship card: the new relationship could not be saved</shortDescription>
-        <value>That relationship could not be saved. Check the message on the form and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Relationship_SaveSuccess</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Relationship card: confirmation after a relationship is saved</shortDescription>
-        <value>Relationship saved, and the other person's record now shows it too.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Relationship_SyncFailed</fullName>
-        <categories>Relationships</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Save refused: the other side of the relationship could not be written</shortDescription>
-        <value>BarnCRM could not update the other side of this relationship, so nothing was saved. The Error Log has the details.</value>
     </labels>
 </CustomLabels>

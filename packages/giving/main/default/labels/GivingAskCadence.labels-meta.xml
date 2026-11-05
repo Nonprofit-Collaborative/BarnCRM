@@ -30,6 +30,6 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: the ask reminders job and when it runs</shortDescription>
-    <value>Ask Reminders, 3:30 AM</value>
+    <value>Ask Reminders</value>
   </labels>
 </CustomLabels>

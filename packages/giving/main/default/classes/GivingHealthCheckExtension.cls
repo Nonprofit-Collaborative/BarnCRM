@@ -9,12 +9,12 @@
  */
 @NamespaceAccessible
 public with sharing class GivingHealthCheckExtension implements HealthCheckExtension {
-    @NamespaceAccessible
-    public GivingHealthCheckExtension() {
-        return;
-    }
+	@NamespaceAccessible
+	public GivingHealthCheckExtension() {
+		return;
+	}
 
-    public List<HealthCheckService.Finding> findings() {
-        return HealthCheckGivingChecks.findings();
-    }
+	public List<HealthCheckService.Finding> findings() {
+		return HealthCheckGivingChecks.findings();
+	}
 }

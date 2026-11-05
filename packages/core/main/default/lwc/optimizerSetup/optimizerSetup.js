@@ -11,7 +11,6 @@ import CHECK_FLOWS from '@salesforce/label/c.Core_OrgOptimizer_CheckInactiveFlow
 import CHECK_JOBS from '@salesforce/label/c.Core_OrgOptimizer_CheckJobsOfInactiveUsers';
 import CHECK_FIELD_LIMIT from '@salesforce/label/c.Core_OrgOptimizer_CheckFieldLimit';
 import CHECK_RECORD_TYPES from '@salesforce/label/c.Core_OrgOptimizer_CheckRecordTypes';
-import COULD_NOT_CHECK from '@salesforce/label/c.Core_OrgOptimizer_CouldNotCheck';
 import OPEN_IN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
 import MORE_THAN from '@salesforce/label/c.Core_HealthCheck_OrphansMoreThan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
@@ -29,7 +28,8 @@ import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
  * Org Optimizer's Unused Setup section (admin guide org-optimizer.md): one line per check with
  * its count, up to five names, and a link to its Setup page. Read only; read when the section
  * is opened and on Refresh. Admin only: the shell shows it only with Manage BarnCRM Settings,
- * and the controller checks again.
+ * and the controller checks again. The technical debt checks sit in a collapsed part, "For
+ * Developers: Old Code and Flows", closed each time the section opens (admin-21).
  */
 export default class OptimizerSetup extends LightningElement {
   helpReady = isHelpLoaded('Core');
@@ -47,6 +47,8 @@ export default class OptimizerSetup extends LightningElement {
   result;
   errorMessage;
   loading = false;
+  /** The For Developers part starts closed. */
+  debtOpen = false;
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -105,11 +107,8 @@ export default class OptimizerSetup extends LightningElement {
     const cap = this.result ? this.result.countCap : 0;
     return ((this.result && this.result.findings) || []).map((finding) => {
       let countText = String(finding.count);
-      // A count is a badge, in warning colors when the check found something.
-      let countClass = finding.count > 0 ? 'slds-badge slds-theme_warning' : 'slds-badge';
       if (finding.failed) {
-        countText = COULD_NOT_CHECK;
-        countClass = 'slds-text-color_weak';
+        countText = helpText('Core', 'Core_OrgOptimizer_CouldNotCheck');
       } else if (finding.moreThan) {
         countText = format(MORE_THAN, cap);
       }
@@ -118,26 +117,31 @@ export default class OptimizerSetup extends LightningElement {
         ...finding,
         title: this.titleFor(finding.key),
         countText,
-        countClass,
+        // A count is a status badge: a warning when the check found something, else neutral.
+        countStatus: finding.count > 0 ? 'warning' : 'neutral',
+        countHideIcon: !(finding.count > 0),
         examplesText: examples.join(', '),
         hasExamples: examples.length > 0
       };
     });
   }
 
-  /** The unused setup checks, then the technical debt checks; the heading shows only when both exist. */
+  /**
+   * The unused setup checks under the section's own heading, then the technical debt checks in
+   * a collapsed part with its own title, closed until opened (admin-21).
+   */
   get sections() {
     const all = this.findings;
     const debt = all.filter((finding) => finding.kind === 'debt');
     const unused = all.filter((finding) => finding.kind !== 'debt');
-    const both = debt.length > 0 && unused.length > 0;
     const sections = [
       {
         kind: 'unused',
         sectionId: 'unused-section',
         listId: 'findings',
         heading: UNUSED_HEADING,
-        showHeading: both,
+        wrapperClass: 'slds-var-m-bottom_medium',
+        open: true,
         findings: unused
       }
     ];
@@ -147,12 +151,21 @@ export default class OptimizerSetup extends LightningElement {
         sectionId: 'debt-section',
         listId: 'debt-findings',
         heading: DEBT_HEADING,
-        showHeading: true,
+        collapsible: true,
+        open: this.debtOpen,
+        expandedText: this.debtOpen ? 'true' : 'false',
+        wrapperClass: `slds-section slds-var-m-bottom_medium${this.debtOpen ? ' slds-is-open' : ''}`,
+        contentId: 'debt-content',
+        contentClass: 'slds-section__content',
         intro: helpText('Core', 'Core_TechDebt_DebtIntro'),
         findings: debt
       });
     }
     return sections;
+  }
+
+  handleToggleDebt() {
+    this.debtOpen = !this.debtOpen;
   }
 
   handleRefresh() {

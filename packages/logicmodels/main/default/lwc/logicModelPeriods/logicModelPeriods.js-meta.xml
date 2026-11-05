@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    A logic model's shared reporting periods in the builder: the list, Add Period, Remove and
+    Add Period to Every Indicator (canonical model R-LM4).
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

@@ -1,10 +1,14 @@
 <template>
+    <template lwc:if={helpReady}>
   <lightning-modal-header label={label}></lightning-modal-header>
   <lightning-modal-body>
     <template lwc:if={errorMessage}>
-      <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">
-        {errorMessage}
-      </p>
+      <c-barn-notice
+        class="slds-show slds-var-m-bottom_small"
+        variant="error"
+        message={errorMessage}
+        data-id="error"
+      ></c-barn-notice>
     </template>
     <lightning-input
       data-id="form-name"
@@ -81,4 +85,5 @@
       onclick={handleSave}
     ></lightning-button>
   </lightning-modal-footer>
+    </template>
 </template>

@@ -16,7 +16,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | Type `greeting`. | A **Search Results** list appears under the box as you type. |
 | 3 | Press Tab until focus is on the result **Formal greeting pattern**, then press Enter. | The **People and Households** section opens on the right, the page scrolls to the **Preview and Recompute** panel and focus is on its heading. |
 | 4 | Press Shift+Tab until focus is in the **Sections** list, then press Tab or Shift+Tab to reach **General** and press Enter. | The General section shows. Every section in the list can be reached with Tab and opened with Enter. |
-| 5 | Open **Households** again with the keyboard. Tab to the checkbox **Create Households Automatically** and press Space. | The checkbox changes state. A screen reader announces "1 unsaved change", and a save bar with **Discard** and **Save** docks to the bottom. |
+| 5 | Open **Households** again with the keyboard. Tab to the checkbox **Create households automatically** and press Space. | The checkbox changes state. A screen reader announces "1 unsaved change", and a save bar with **Discard** and **Save** docks to the bottom. |
 | 6 | Tab to **Discard** in the save bar and press Enter. | The checkbox returns to its original state, the bar goes away and nothing is saved. On **General**, **Recent Changes** has no new row. |
 | 7 | Tab to the info icon under the same setting and press Enter, then Tab to **Learn More** beside it and press Enter. | The description opens in a popover. The help page opens in a new browser tab. | The help page opens in a new browser tab. Close it; focus is back on the Settings page. |
 | 8 | Press Tab through the rest of the section. | Focus never lands on something invisible, and the order follows the page from top to bottom. |
@@ -30,11 +30,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Find** tab in the **BarnCRM** app. Tab to the **Object** box. | Focus ring on **Object**, placeholder **Choose an object**. |
-| 2 | Press Enter or Down Arrow, use the arrow keys to reach **Households**, press Enter. | The **Columns** chooser, **Conditions**, **Sort by** and the **Query (read only)** box appear. |
+| 1 | Open the **Find** tab in the **BarnCRM** app. Tab to the **Kind of record** box. | Focus ring on **Kind of record**, placeholder **Choose a kind of record**. |
+| 2 | Press Enter or Down Arrow, use the arrow keys to reach **Households**, press Enter. | The **Columns** chooser, **Conditions**, **Sort by** and the **Technical query (SOQL), read only** box appear. |
 | 3 | Tab into **Columns**. In the available list use the arrow keys to pick a field, then Tab to the move right button and press Enter. | The field moves to the chosen list. |
 | 4 | Tab to **Run** and press Enter. | A line **N rows found.** appears above the results table (N is a number), and the results table lists households. |
-| 5 | Tab to **Query name** and type `A11y check`. Tab to **Save** and press Enter. | A green notice reads **Saved A11y check.** The **Saved queries** box shows the query. |
+| 5 | Tab to **Search name** and type `A11y check`. Tab to **Save** and press Enter. | A green notice reads **Saved A11y check.** The **Saved searches** box shows the query. |
 | 6 | Tab through the results table. | Focus enters the table and arrow keys move between cells. |
 
 **Cleanup:** Keep the saved query for T-A11Y-03, then delete it there.
@@ -47,12 +47,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In Find, with **A11y check** open, Tab to **Delete** and press Enter. | A dialog opens with the heading **Delete This Saved Query?**, the text **A11y check will be deleted. This cannot be undone.** and two buttons, **Keep It** and **Delete**. Focus is inside the dialog. |
+| 1 | In Find, with **A11y check** open, Tab to **Delete** and press Enter. | A dialog opens with the heading **Delete This Saved Search?**, the text **A11y check will be deleted. This cannot be undone.** and two buttons, **Keep It** and **Delete**. Focus is inside the dialog. |
 | 2 | Press Tab repeatedly (at least six times). | Focus cycles only through the dialog's close button, **Keep It** and **Delete**. It never reaches the Find page behind the dialog. |
 | 3 | Press Shift+Tab repeatedly. | Focus cycles backwards through the same three controls. |
 | 4 | Press Escape. | The dialog closes. The query is not deleted. Focus is back on the **Delete** button. |
 | 5 | Press Enter on **Delete** again, Tab to **Keep It**, press Enter. | The dialog closes, the query is kept and focus is back on **Delete**. |
-| 6 | Press Enter on **Delete** again, Tab to the dialog's **Delete** button, press Enter. | The dialog closes and a notice reads **Deleted A11y check.** The query is gone from **Saved queries**. |
+| 6 | Press Enter on **Delete** again, Tab to the dialog's **Delete** button, press Enter. | The dialog closes and a notice reads **Deleted A11y check.** The query is gone from **Saved searches**. |
 
 **Cleanup:** None (the query is deleted in step 6).
 
@@ -110,8 +110,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **People and Households**, Tab to the info icon under **Create Households Automatically**. | Announced as **About Create a household automatically**, a button. Press Enter: the description is read. |
-| 2 | Tab to **Learn More** beside it. | Announced as **Learn More (opens in a new tab)**, inside the group **Create Households Automatically**. |
+| 1 | In **BarnCRM Settings**, **People and Households**, Tab to the info icon under **Create households automatically**. | Announced as **About Create a household automatically**, a button. Press Enter: the description is read. |
+| 2 | Tab to **Learn More** beside it. | Announced as **Learn More (opens in a new tab)**, inside the group **Create households automatically**. |
 | 3 | Open a Garcia household from the **Households** tab (for example **The Garcia Family**). In the **Members** panel, Tab to the first member's actions menu. | Announced as **Actions for** plus the member's own name (for example **Actions for Harper Garcia**), not just "Actions". |
 | 4 | Press Enter on the menu, then the arrow keys. | The menu opens and reads **Make Primary** and **Move to Another Household** where you may use them; Escape closes it and returns focus to the menu button. |
 | 5 | In Find, run any Households query. | The screen reader announces the **N rows found.** line without you moving focus to it. |
@@ -129,7 +129,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Set browser zoom to 200 percent. Open **BarnCRM Settings**. | The **Sections** list stacks above the settings instead of beside them. All text is readable; no setting is cut off. |
-| 2 | Open **Find**, choose **Households**, press **Run**. | The **Saved queries** and **Object** boxes stack one per line. The page itself does not scroll sideways; only the results table may scroll inside its own area. |
+| 2 | Open **Find**, choose **Households**, press **Run**. | The **Saved searches** and **Kind of record** boxes stack one per line. The page itself does not scroll sideways; only the results table may scroll inside its own area. |
 | 3 | Open **Quick Gift Entry**. | Every field label and the **Save** and **Save and New** buttons are visible. Buttons wrap to a new line rather than overlap. |
 | 4 | Open the **Import** tab and go to **Check Columns** with the sample file. | The columns table scrolls inside its own area; the path, **Back** and **Next** stay readable (the path may show only the current step). |
 | 5 | Open a household record page. | The **Members** panel shows each member's tile (initials, name, badges, menu) without overlap, and each address card's buttons wrap instead of overlapping. |

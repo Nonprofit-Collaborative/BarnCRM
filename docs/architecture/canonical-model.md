@@ -810,8 +810,8 @@ found nothing moves the covered window on, and a run that could not send leaves 
 was, so no entry is counted twice or dropped. A run reads at most the newest 2,000 entries
 and says "more than 2,000" beyond that, so a flooded Error Log cannot stop the digest. A
 digest that is scheduled but has not run for two days is a Health Check warning (ADR-0055).
-**R-E6 Entries are kept for a set time.** Each run of the daily Error Log job (the digest's)
-first starts a batch that deletes every entry, whatever its Status, created more than
+**R-E6 Entries are kept for a set time.** The nightly Record Cleanup step (R-NJ8), as one of
+its passes, deletes every entry, whatever its Status, created more than
 `Error_Log_Retention_Days__c` days before (default 180, 0 keeps every entry). The delete is
 package upkeep in system mode (ADR-0021) and puts the entries in the Recycle Bin. Saving the
 setting deletes nothing (owner decision, 2026-10-13, ADMIN-26).
@@ -896,6 +896,35 @@ scheduled for, so it can never end a newer pause. A pause in effect that no job 
 scheduled to end, or that ends more than 24 hours ahead, is a Health Check warning. Neither
 the pause nor its end moves any automation's switch, and neither touches an Always Runs
 automation (R-A4).
+**R-A6 A failure refuses only its own records.** When a packaged automation fails during a
+save of several records, only the records the failure belongs to are refused, with the
+friendly message, and the rest of the save goes ahead, in before and after contexts. The
+dispatcher finds them by undoing the failed attempt to a savepoint and running the
+automations again over halves of the records; it refuses the records not yet cleared together
+when the transaction lacks the room to try again. A failure of an Always Runs automation still
+refuses every record in front of it. The failure is logged once, and each record refused while
+narrowing gets its own Error Log entry naming its row (ADR-0165 dispatcher errors and
+Automation Control).
+**R-A7 Automation Control pauses or bypasses per org, profile or user.** The BarnCRM
+Automation Control setting holds Pause All and Bypass (both off by default) at the org default,
+a profile or a user; the value for a save is the running user's as the platform resolves a
+hierarchy setting. When either applies, every packaged automation that is not Always Runs is
+skipped, alongside the per-transaction bypass, the timed pause and the switch, which all stay.
+Every shipped flow template ends when either applies, and the Check BarnCRM Automation action
+answers an organization's own flow the same way, adding the timed pause and the switch of a
+flow listed as `Flow:` plus its API name. Resuming the timed pause queues the household
+catch-up and the waiting rollups; skipped saves are not replayed (ADR-0165 dispatcher errors
+and Automation Control).
+**R-A8 The Automation page manages Automation Control, own flows and the catch-up.** Writes
+require Manage BarnCRM Settings and are logged as setting changes. The org default row is always
+shown (both boxes false until saved) and is never deleted; a profile or user row is added with
+Bypass true, saved per box, and deleted by Remove. A setting row is written and read in system
+mode (`AutomationSettingsWriter`, ADR-0021), its owner checked to be this org, a Profile or a
+User. An org's own flow is listed only when `FlowDefinitionView` has its API name, as an
+Automation Setting with `Automation_Name__c` `Flow:` plus the API name, Enabled true,
+Always Runs false and Is Package Default false; only such rows can be removed, and listing or
+removing never changes the flow. Catch Up Now queues the household catch-up, the household
+names recompute and the waiting rollups.
 
 ### Salesforce implementation
 
@@ -907,7 +936,11 @@ automation (R-A4).
   admin reads it.
 - **Shipped defaults:** `Automation_Registry__mdt` (Section 13).
 - **Org-level pause:** `BarnCRM_Settings__c.Automation_Paused_Until__c`.
-- **Service:** `AutomationControl`, `TriggerDispatcher`.
+- **Automation Control:** `BarnCRM_Automation_Control__c`, a public hierarchy custom setting
+  (public so that an organization's own formulas, validation rules and flows read it through
+  `$Setup`), with `Pause_All__c` (Checkbox, default false) and `Bypass__c` (Checkbox, default
+  false) (R-A7).
+- **Service:** `AutomationControl`, `TriggerDispatcher`, `CheckAutomationAction`.
 
 ---
 
@@ -935,7 +968,9 @@ what. Required by the C-03 acceptance criterion that every settings change is lo
 **R-S1** Every write through the settings service produces exactly one Setting Change
 record per setting actually changed. Saving a page without changing anything writes
 nothing.
-**R-S2** Setting Change records are never edited or deleted by packaged code.
+**R-S2** Setting Change records are never edited by packaged code. The nightly run's Record
+Cleanup step deletes those changed more than `Setting_Change_Retention_Days__c` days ago (default
+730, from 180 to 3,650; architect review L-08).
 **R-S3** Values are stored as text so that any setting type can be audited uniformly.
 **R-S4** A value that is not set is recorded as nothing, never as empty text. Unset and
 cleared are the same state on a hierarchy custom setting, the platform stores empty text
@@ -1085,7 +1120,7 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 | `Error_Digest_Covered_Until__c` | datetime | empty | The end of the window the last digest run covered; the next digest counts entries created after it. Written by the job. |
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
 | `Error_Digest_Last_Run_Summary__c` | text (255) | empty | What the last digest run did, in one sentence. Written by the job. |
-| `Error_Log_Retention_Days__c` | number(4, 0) | 180 | How many days an Error Log entry is kept before the daily Error Log job deletes it (R-E6). 0 keeps every entry; otherwise 1 to 3,650. Added 2026-10-13 (owner decision, ADMIN-26). |
+| `Error_Log_Retention_Days__c` | number(4, 0) | 180 | How many days an Error Log entry is kept before the nightly Record Cleanup deletes it (R-E6). 0 keeps every entry; otherwise 1 to 3,650. Added 2026-10-13 (owner decision, ADMIN-26). |
 
 ### v0.7 keys
 
@@ -1097,7 +1132,7 @@ Section 29E, R-BD2). Shown in the console's Import section.
 | `Find_Export_Row_Limit__c` | integer | 50000 | The most rows one Find export writes (R-SQ3). From 1 to 500,000; empty reads as 50,000. |
 | `Bulk_Update_Run_Limit__c` | integer | 48000 | The most records one Super Transformer run may change (R-BU2); its label is **Super Transformer run limit**. From 1 to 48,000; empty or out of range reads as the nearest end. |
 | `Bulk_Delete_Run_Limit__c` | integer | 10000 | The most records one bulk delete may delete (R-BD2). From 1 to 48,000; empty reads as 10,000, out of range as the nearest end. |
-| `Import_Row_Deletion__c` | picklist(Once_Complete, After_30_Days, After_90_Days, Never) | After_30_Days | Delete Import Rows: when the nightly Import row cleanup deletes the staged rows of a complete import (R-IR5, ADR-0149). Stored as text (ADR-0019); a blank or unknown value reads as After_30_Days. Replaces `Import_Row_Retention_Days__c` (a number of days, D-40), which is removed. |
+| `Import_Row_Deletion__c` | picklist(Once_Complete, After_30_Days, After_90_Days, Never) | After_30_Days | Delete Import Rows: when the nightly Record Cleanup deletes the staged rows of a complete import (R-IR5, ADR-0149). Stored as text (ADR-0019); a blank or unknown value reads as After_30_Days. Replaces `Import_Row_Retention_Days__c` (a number of days, D-40), which is removed. |
 | `Bulk_Chunk_Size__c` | integer | 200 | Records each chunk of a bulk update or bulk delete handles (R-BU2, R-BD2). From 10 to 200; empty reads as 200, out of range as the nearest end. Stamped on the job when it starts. |
 
 ### v0.8 keys
@@ -1185,6 +1220,18 @@ default; the two choices are stored as text (ADR-0019).
 | `Fuzzy_Match_Threshold__c` | integer | 90 | How alike two names must be, in percent, before the scan pairs two people by name (R-DP7). From 80 to 100; out of range reads as the nearest end. |
 | `Merge_Default_Rule__c` | picklist(Keep master, Not blank, Most recent, Oldest record, Most complete) | Not blank | The merge rule of every person field with no active Merge Rule row (R-DP8). |
 | `Auto_Merge_Exact_Match__c` | picklist(Name and email, Name and phone, Name, email and phone, Name and birthdate) | Name and email | What two people must share exactly before auto-merge takes them (R-DP9). |
+| `Merge_Journal_Retention_Days__c` | integer | 365 | Days a Merge Journal row is kept before the nightly Record Cleanup step deletes it (architect review L-08); an older merge can no longer be undone. From 30 to 3,650; empty reads as 365, out of range as the nearest end. |
+
+### Record retention keys
+
+Added by architect review L-08. Each is read by the nightly run's Record Cleanup step (Section
+29ZR); empty reads as the default, out of range as the nearest end.
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Setting_Change_Retention_Days__c` | integer | 730 | Days a Setting Change row is kept (R-S2). From 180 to 3,650. General section. |
+| `Import_History_Retention_Days__c` | integer | 365 | Days a finished import or bulk job (`Import_Batch__c`, with its rows and journal) is kept once its undo window has closed. An import left in Draft, Parsing or Dry run and never committed (an abandoned wizard) is deleted, with its rows, once it is that many days old. From 30 to 3,650. Import section. |
+| `Field_Utilization_Retention_Days__c` | integer | 730 | Days a saved Field Utilization Snapshot row is kept (R-FU7). From 90 to 3,650. Org Optimizer section. |
 
 ### Health Check keys
 
@@ -3496,8 +3543,8 @@ place of its raw value (a corrected blank is a blank cell) and every other colum
 uploaded. Corrections are written in system mode under ADR-0021, after that check.
 
 **R-IR5 Retention.** The Import setting Delete Import Rows (`Import_Row_Deletion__c`)
-decides when the nightly Import row cleanup (`ImportRowPurgeScheduler`, listed in Health
-Check's nightly jobs) deletes a batch's rows: Once Complete (on the first nightly run after
+decides when the nightly Record Cleanup step (R-NJ8; a pass of `RecordRetentionBatch`, which
+replaced the separate Import row cleanup job) deletes a batch's rows: Once Complete (on the first nightly run after
 the batch is complete), After 30 Days (the default, and what a blank or unknown value reads
 as), After 90 Days, or Never (ADR-0149, Brandon 2026-10-30, superseding the number of days
 of D-40 and plan Section 4.9's purge on commit). A batch is complete when its last commit
@@ -4550,7 +4597,8 @@ report a year later.
 **R-IN5 The nightly passes are switched on in the console and visible there.** Nothing in
 the Giving module marks an installment Overdue or extends a recurring schedule until an
 administrator schedules the nightly jobs from the Nightly Jobs page of the Nonprofit
-Settings console, and the same page stops them (ADR-0031). Each pass records when it last
+Settings console, and the same page stops them (ADR-0031). Since the nightly run (R-NJ1),
+Schedule and Stop turn the four Giving steps' switches on and off (R-NJ4). Each pass records when it last
 finished and one sentence saying what it did, whether or not it changed anything, so a
 pass that ran and found nothing overdue reads differently from a pass that never ran. The
 console warns that a pass is stale only when the jobs are scheduled: an org that has not
@@ -6153,7 +6201,7 @@ segment qualifies each custom name for the org. The built document adds `Email` 
 for people, a limit of 200 rows, and one more condition joined by AND to the template's logic:
 `Deceased__c` equals false for people, `Is_Organization__c` equals true for organizations
 (households are accounts too). A template's name is a custom label and its description is help
-text in the Giving help catalog (`BarnHelp_Giving`, ADR-NEXT help-text-json). The five
+text in the Giving help catalog (`BarnHelp_Giving`, ADR-0164 help-text-json). The five
 templates:
 
 | Key | Name | Filter |
@@ -8446,8 +8494,10 @@ platform deletes with a parent are not in it.
   chunk read; `ImportUndoService` and `ImportUndoBatch` handle the Update operation.
 - **Permission:** custom permission `Bulk_Update_Records`, in `BarnCRM_Admin` and in its own
   permission set `BarnCRM_Bulk_Update`, assigned beside `BarnCRM_Find_And_Export`.
-- **UI:** component `bulkUpdate`, opened from Find's results with the query, and on the Super
-  Transformer tab (app page `Bulk_Update`) listing recent Super Transformer runs with their progress and undo.
+- **UI:** component `superTransform` on the Super Transformer tab (app page `Bulk_Update`),
+  listing recent Super Transformer runs with their progress and undo. Find's Change Records menu
+  opens that tab with the query's object, filter and `related` conditions in the page state key
+  `start` (the former `bulkUpdate` panel inside Find is gone; one change screen).
 
 ---
 
@@ -8499,8 +8549,9 @@ says so.
 call (10 when the object holds more than 100,000 records); each call reads the record totals
 again. Nothing is stored until the person chooses "Save Utilization Snapshot"; the save checks each
 row's object, field and record type against describe and caps Filled Count at Record Count.
-Rows are never edited and no job deletes them; old rows are cleared with Bulk delete or any
-standard delete.
+Rows are never edited. The nightly run's Record Cleanup step deletes rows taken more than
+`Field_Utilization_Retention_Days__c` days ago (default 730, from 90 to 3,650; architect review
+L-08); Bulk delete or any standard delete clears them sooner.
 **R-FU8 Previous count shown.** The page shows the object's latest saved count next to the
 current one, with the change in percentage points.
 **R-FU9 Picklist value usage (C-57).** On request, for each single-select picklist field the
@@ -9791,8 +9842,8 @@ Cancelled.
   applies R-SSC4 and R-SSC5 and queues `ShiftScheduleGenerator`; nightly job `ShiftScheduleBatch`,
   started at 3:00 AM by `VolunteersScheduler` (job name `BarnCRM Volunteer Schedules`; Health
   Check and the Nightly Jobs list call it "Volunteer Schedules, 3:00 AM"), which
-  `VolunteersNightlyJobProvider` (`NightlyJobProvider`) supplies, so Health Check's "Schedule all
-  nightly jobs" fix schedules it. The shift deletes of R-SSC4 and R-SSC5 and the writes to Created
+  `VolunteersNightlyJobProvider` (`NightlyStepProvider`) supplies as a step of the one nightly
+  run (Section 29ZR). The shift deletes of R-SSC4 and R-SSC5 and the writes to Created
   Through, Shifts Kept and Rebuild Pending run in system mode: they are the schedule's own bookkeeping, which a
   Coordinator or Staff user who may edit the schedule cannot do with their own delete and field
   access. Shifts are created in user mode.
@@ -9968,11 +10019,11 @@ when?" long after Setup has forgotten. The copy is read only: BarnCRM never chan
 **R-SU1 Source.** Rows come only from `SetupAuditTrail`, read with SOQL. BarnCRM reads the
 trail and writes only its own copy; it never changes Setup.
 
-**R-SU2 Copy.** The nightly job "BarnCRM Setup Changes Copy" (1:30, listed among Health
-Check's nightly jobs) copies every trail row made at or after the newest kept row's Changed At,
+**R-SU2 Copy.** The nightly step "BarnCRM Setup Changes Copy" (1:30 in the nightly run,
+R-NJ2) copies every trail row made at or after the newest kept row's Changed At,
 or every row the trail holds when nothing is kept yet. A row already kept is found by its Audit
 Trail ID and not stored again. An administrator can also run the same copy from the page
-(**Copy New Changes Now**), which schedules the nightly job when it is not scheduled.
+(**Copy New Changes Now**), which schedules the nightly run when it is not scheduled.
 
 **R-SU3 Who can read the trail.** Salesforce lets a user read the trail only with View Setup
 and Configuration. The copy runs as the user who scheduled it, or who pressed Copy New Changes
@@ -11050,6 +11101,7 @@ per program.
 | Description | long text | no | What the model covers, for a funder or a new board member. |
 | Program | record identifier (text) | no | The program the model is for, when it is not the organization's. A record identifier, not a reference: Logic Models never depends on Programs (R-LM2). |
 | Scope Key | text | yes (set by BarnCRM) | `Organization`, or the program's identifier. Unique, so a scope has one model. |
+| Periods | long text (JSON) | no | The model's shared reporting periods (v1.0, modules-23, R-LM4): `{"version": 1, "periods": [{"name": "2026 Q1", "startDate": "2026-01-01", "endDate": "2026-03-31"}]}`. |
 
 ### Relationships
 
@@ -11072,6 +11124,17 @@ that is not a well-formed record identifier is refused. The 15-character form is
 **R-LM3 Deleting a model deletes its parts.** Its elements, links, indicators and periods go with
 it.
 
+**R-LM4 Shared reporting periods (v1.0, modules-23).** A model keeps a list of reporting periods
+(name, start date, end date; for example `2026 Q1` to `Q4` and `FY2026`) so its indicators line
+up in the report (R-IN7). Each needs a name of at most 80 characters and an end date not before
+its start; two periods with the same start and end dates are refused; the list is kept in start
+date order, at most 60. The list is a template, not a link: **Add Period to Every Indicator**
+creates that period (name and dates, no target or result) on every indicator of the model that
+has no period with the same dates, and **Use the Model's Periods** on one indicator creates every
+model period it lacks, both in user mode and keeping R-IP2. Changing or deleting a model period
+changes no indicator period, and an indicator's own typed periods stay possible. Stored as JSON
+in `Periods__c` (plan 9.9).
+
 ### Salesforce implementation
 
 - **Object:** `Logic_Model__c`, name field Text, label Logic Model Name, sharing Public Read/Write.
@@ -11081,6 +11144,7 @@ it.
 | Description | `Description__c` | Long Text Area(32768) |
 | Program | `Program_Id__c` | Text(18) |
 | Scope Key | `Scope_Key__c` | Text(18), unique, not case sensitive |
+| Periods | `Periods__c` | Long Text Area(32768) |
 
 - **Trigger:** `LogicModelTrigger`, through the Core dispatcher; handler `LogicModelScopeHandler`
   (R-LM1, R-LM2), reading every model without sharing through `LogicModelIntegritySelector`.
@@ -11255,8 +11319,26 @@ sum field is a number and a unique field is groupable, each resolved through the
 describe. A record belongs to every period whose start and end dates hold its date (a date-time
 read in the running user's time zone).
 
+**R-IN8 Computed starters (v1.0, modules-22).** Under Computed, a Logic Models Admin can pick a
+starter instead of a saved query; BarnCRM then writes the Find saved query for them (a private
+Saved Query they own, named after the starter and the record chosen, at most 80 characters) and
+saves the source from it, so R-IN4 applies unchanged. The starters are configuration in
+`IndicatorStarterService`, each naming objects and fields by API name only and offered only when
+its object exists in the org (`NamespaceUtil.packagedObjectType`; Logic Models never references
+another module's schema):
+
+| Starter | Object | Filter | Date field | Works out | Asks for |
+|---|---|---|---|---|---|
+| People served by a service | Service Delivery (Programs) | Service is the one chosen; Attendance is not an absence | Delivery Date | Count Unique of Contact | a Service (required) |
+| Services delivered | Service Delivery (Programs) | Service is the one chosen; Attendance is not an absence | Delivery Date | Count | a Service (required) |
+| Approved volunteer hours | Volunteer Hours (Volunteers) | Status is Approved; Volunteer Job is the one chosen, when chosen | Date Worked | Sum of Hours | a Volunteer Job (optional) |
+| Grants awarded | Grant (Funders) | Stage is Awarded; Program is the one chosen, when chosen and Programs is installed | Decision Date | Count | a Program (optional) |
+
+The record chosen is a record identifier written into the query's filter, so the saved query and
+the indicator keep working however the record is renamed.
+
 **R-IN5 Refresh.** A batch, one indicator at a time, started by Refresh Results, by saving a
-computed source, and nightly (job BarnCRM Indicator Results, a `NightlyJobProvider` job). The
+computed source, and nightly (step BarnCRM Indicator Results of the nightly run, Section 29ZR). The
 query compiles as the running user; its records are read in system mode, so the result is the
 organization's figure whatever the runner's sharing. Every period that has started gets its
 Result Value (zero when no record falls in it); a period not yet started is left alone; Computed
@@ -12049,6 +12131,16 @@ Restored with the reason in Note. Member Count is left as written.
 `BarnCRM_Admin` is granted the object, Read and View All. Rows are written only by the
 adoption job in system mode (ADR-0021).
 
+**R-HA6 Household Upkeep waits while NPSP households are in use (RT-04).** NPSP households are
+in use while NPSP still creates household accounts (the org default of
+`npe01__Contacts_And_Orgs_Settings__c` has `npe01__Account_Processor__c` = `Household Account`,
+or the setting has no org default row, NPSP's own default) or while any Account matches R-HA1.
+Both are read by describe in `NpspHouseholdSource.householdsInUse()` (system mode, once per
+transaction, a read failure answers not in use and is logged); with neither name in the org the
+answer is no. While in use, turning on Household Upkeep is refused with the reason, first-run
+setup leaves it out instead of failing, and its Features row shows the reason whether it is on
+or off. Nothing BarnCRM or NPSP stores is changed.
+
 ### Salesforce implementation
 
 - **Object** `Household_Adoption__c`, auto number Name `HA-{000000}`, sharing Private, reports
@@ -12066,12 +12158,100 @@ adoption job in system mode (ADR-0021).
 - **NPSP fields read, never written** (names built at run time, read only when describe finds
   them and the user may read them): `npe01__SYSTEM_AccountType__c`, `npo02__Formal_Greeting__c`,
   `npo02__Informal_Greeting__c`, `npe01__One2OneContact__c`, `npo02__SYSTEM_CUSTOM_NAMING__c`,
-  and the Account record type `HH_Account`.
+  and the Account record type `HH_Account`; for R-HA6, NPSP's hierarchy setting
+  `npe01__Contacts_And_Orgs_Settings__c` and its `npe01__Account_Processor__c` (org default only).
 - **Classes:** `NpspHouseholdSource` (describe-only reads of NPSP, the test seam),
   `NpspHouseholdAdoptionService` (preview, start, undo, status), `NpspHouseholdAdoptionBatch`
   (adopt and undo chunks), `NpspHouseholdAdoptionController` (thin, plain JSON shapes). The
   panel is `npspHouseholdAdoption`, shown on the General page of BarnCRM Settings only when
   NPSP is detected, the coexistence mode is NPSP, or rows exist.
+
+---
+
+## 29ZR. Nightly Job
+
+### Definition
+
+One step of BarnCRM's nightly run, or the run itself: its on/off switch where it has one, and
+what happened the last time it ran (architect review RT-10 and L-10, ADR-0166
+nightly-job-dispatcher). The steps themselves are code, registered by Core and by each module;
+a row exists only to remember a switch or a result.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Key | text(80) | yes | The step's key: the name its own scheduled job carried before the nightly run, such as `BarnCRM Import Row Cleanup`; `BarnCRM Nightly Jobs` for the run itself. One row per key. |
+| Switch | picklist(On, Off) | no | The step's on/off switch, for a step that has one; blank reads as the step's shipped value. |
+| Last Started | datetime | no | When the step (or run) last started. |
+| Last Finished | datetime | no | When it last finished, skipped or failed. |
+| Last Outcome | picklist(Running, Done, Done With Errors, Failed, Skipped, Gave Up Waiting) | no | How the last run of the step ended. |
+| Last Message | text(255) | no | The error of a failed step, or what the run waited for. |
+
+### Rules
+
+**R-NJ1 One schedule.** BarnCRM keeps two scheduled jobs for good: "BarnCRM Nightly Jobs"
+(every day at 00:00 in the scheduling user's time zone) and the hourly "BarnCRM Tab Access
+Check". The run schedules a one-time "BarnCRM Nightly Jobs Continue" only to resume after a long
+wait. No step has a scheduled job of its own.
+
+**R-NJ2 Steps and order.** A step is a key, a label, a time of day and the work it starts. Core
+registers its own; a module registers its steps through `NightlyStepProvider`, found by class
+name, so Core names no module. Steps run one at a time, ordered by time of day (ties in the
+order registered). Each starts at its time of day or when the step before has finished,
+whichever is later.
+
+**R-NJ3 When a step has finished.** When no batch, queueable or future job the run's user
+started since the step began is holding, queued, preparing or processing. Checked every two
+minutes; after six hours the step is recorded Gave Up Waiting and the run moves on. A step whose
+jobs failed or reported errors is Done With Errors; a step whose start threw is Failed, with the
+error logged and in Last Message.
+
+**R-NJ4 Switches.** A step whose on/off was its own schedule (Error Digest, Rollups, the four
+Giving jobs, Acknowledgments, Pledge Reminders, the Opportunity and Gift Transaction mirrors) has
+a switch, set by the Schedule and Stop buttons on its own page, org-wide. Shipped on, except
+Acknowledgments and Pledge Reminders (shipped off). A step whose on/off is a setting reads that
+setting. A step that is off is recorded Skipped.
+
+**R-NJ5 Adopting old schedules.** Every scheduled job named by a step's key is aborted; a step
+with a switch whose job was scheduled has its switch turned On; when anything was adopted, the
+nightly run is scheduled. Run at install, upgrade and Finish Setup by Core and by each module, at
+the start of each nightly run, by Health Check's fix, and when an old job fires. Never throws.
+
+**R-NJ6 A run still going at midnight.** The new run supersedes it: the old run stops at its
+next check, and the new run's first step waits for the work the old step started.
+
+**R-NJ8 Record Cleanup.** A Core step at 1:20 deletes, oldest first and in system mode, the
+history rows past their retention (architect review L-08): Setting Change (R-S2), Merge Journal,
+finished imports and bulk jobs whose undo window has closed, and imports abandoned in Draft,
+Parsing or Dry run (never committed) once as old (journal and rows first, then the batch),
+Field Utilization Snapshot (R-FU7), Error Log entries (R-E6) and the staged rows of complete
+imports by Delete Import Rows (R-IR5), each by its key in Section 12 ("Record retention keys",
+`Merge_Journal_Retention_Days__c`, `Error_Log_Retention_Days__c`, `Import_Row_Deletion__c`).
+The step runs without sharing, since a cleanup limited to what its scheduler can see would leave
+rows for ever. A pass that fails is logged and the next pass runs.
+**R-NJ7 Administrators only.** Only `BarnCRM_Admin` is granted the object, Read and View All.
+Rows are written only by BarnCRM code in system mode (ADR-0021); switches change through the
+pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
+
+### Salesforce implementation
+
+- **Object** `Nightly_Job__c`, Name is the key (Text 80), sharing Private, reports on, no
+  activities, feeds, history or search.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Switch | `Switch__c` | Picklist (On, Off), restricted |
+| Last Started | `Last_Started__c` | DateTime |
+| Last Finished | `Last_Finished__c` | DateTime |
+| Last Outcome | `Last_Outcome__c` | Picklist (Running, Done, Done With Errors, Failed, Skipped, Gave Up Waiting), restricted |
+| Last Message | `Last_Message__c` | Text(255) |
+
+- **Classes:** `NightlyStep` (one step), `NightlyStepProvider` (a module's steps),
+  `NightlyJobs` (the registry, switches, results, scheduling and adoption), `NightlyRun` (the
+  run: schedulable and queueable). Each former scheduler class keeps its `start`, `stop`,
+  `isScheduled` and `nextRunAt` for its page, now reading and writing its step's switch. The
+  panel is `nightlyJobsPanel`, on the General page of BarnCRM Settings.
 
 ---
 
@@ -12416,6 +12596,13 @@ mirrors the primary member).
 | 0.16 | 2026-11-02 | Logic Models L-06 (ADR-0163 `0163-funders-reporting-links.md`). `Grant_Requirement__c` (29ZI) gains Logic Model Outcome (`Outcome_Id__c`, Text(18)), a Logic Models element named by record identifier, with rule R-GQ6. Neither module references the other. |
 | 0.16 | 2026-11-02 | Funders F-06 (ADR-0163 `0163-funders-reporting-links.md`). New Section 29ZO Funder Report Template (`Funder_Report_Template__c` and the shipped `Funder_Report_Template_Default__mdt`), rules R-FT1 to R-FT3. |
 | 0.16 | 2026-11-02 | Funders F-07 (ADR-0163 `0163-funders-reporting-links.md`). Grant (29ZH) gains rule R-GN9, the board dashboard (revenue mix, concentration, restricted balances), read from grants and, by describe, Giving and the F-03 ledger; no new object or field. |
+| v1.0 | 2026-11-04 | One nightly job dispatcher (architect review RT-10, L-10, ADR-0166 nightly-job-dispatcher). New Core object Nightly Job (`Nightly_Job__c`, 29ZR) with rules R-NJ1 to R-NJ7: one nightly schedule runs every step in sequence, each step keeping its switch and last result; about 19 separate scheduled jobs are replaced and adopted on upgrade. R-SU2 and R-IN5 read the nightly run instead of their own jobs. |
+| v1.0 | 2026-11-04 | Record retention (architect review L-08). `BarnCRM_Settings__c` gains `Merge_Journal_Retention_Days__c` (365), `Setting_Change_Retention_Days__c` (730), `Import_History_Retention_Days__c` (365) and `Field_Utilization_Retention_Days__c` (730). New rule R-NJ8 (the Record Cleanup step); R-S2 and R-FU7 amended. No object added. |
+| v1.0 | 2026-11-04 | Core pre-batch review (CPR-22, CPR-41). Rule R-NJ8 (Record Cleanup) gains passes for Error Log entries (R-E6) and the staged rows of complete imports (R-IR5), which replace the separate Import row cleanup step and the Error Log delete that rode on the daily digest; it also deletes imports abandoned in Draft, Parsing or Dry run after Days to Keep Import History. No object or field added. |
+| 0.17 | 2026-11-04 | Dispatcher error contract (RT-05, ADR-0165 dispatcher errors and Automation Control). Section 10 gains rule R-A6: a failure refuses only its own records, the rest of the save goes ahead. No object or field added. |
+| 0.17 | 2026-11-04 | BarnCRM Automation Control (RT-13, same ADR). New hierarchy custom setting `BarnCRM_Automation_Control__c` with `Pause_All__c` and `Bypass__c` (Section 10, rule R-A7), read by the dispatcher, every shipped flow template and the Check BarnCRM Automation action. |
+| 0.17 | 2026-11-04 | Automation page manages Automation Control (RT-13, same ADR, decisions 2.6 to 2.8). Section 10 gains rule R-A8: org, profile and user rows edited in the console, an org's own flows listed as `Flow:` switch rows, and Catch Up Now. No object or field added. |
+| 0.17 | 2026-11-04 | Household Upkeep and NPSP (RT-04). Household Adoption (Section 29ZQ) gains rule R-HA6: Household Upkeep cannot be turned on while NPSP households are in use, detected by describe. No object or field added. |
 
 ---
 ## 32. Entity ownership by package
@@ -12522,6 +12709,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Indicator | Logic Models | 0.14 (L-02) | 29ZF |
 | Indicator Period | Logic Models | 0.14 (L-02) | 29ZG |
 | Household Adoption | Core | 0.17 (X-05) | 29ZQ |
+| Nightly Job | Core | v1.0 (architect review RT-10) | 29ZR |
 | Funders entities | Funders | v0.9 | 30 |
 | Grant | Funders | 0.16 (F-01) | 29ZH |
 | Grant Requirement | Funders | 0.16 (F-02) | 29ZI |

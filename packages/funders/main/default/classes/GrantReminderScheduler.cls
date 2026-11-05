@@ -9,27 +9,32 @@
  * A separate class from the batch, so a change to the batch deploys while the job is scheduled.
  */
 public with sharing class GrantReminderScheduler implements Schedulable {
-    /** The name the scheduled job carries, so it can be found again. */
-    public static final String JOB_NAME = 'BarnCRM Grant Reminders';
+	/** The name the scheduled job carries, so it can be found again. */
+	public static final String JOB_NAME = 'BarnCRM Grant Reminders';
 
-    /** A test gives it a name of its own, because the org a test runs in may already have it. */
-    @TestVisible
-    private static String jobNameInUse = JOB_NAME;
+	/** A test gives it a name of its own, because the org a test runs in may already have it. */
+	@TestVisible
+	private static String jobNameInUse = JOB_NAME;
 
-    /** Six in the morning, before the working day. */
-    private static final String MORNING_CRON = '0 0 6 * * ?';
+	public void execute(SchedulableContext context) {
+		if (context != null) {
+			// Still scheduled on its own from before the nightly run (R-NJ5).
+			NightlyJobs.adoptOldSchedules();
+		}
+		GrantReminderBatch.startMorning();
+	}
 
-    public void execute(SchedulableContext context) {
-        GrantReminderBatch.startMorning();
-    }
-
-    /** The morning job as Health Check's nightly jobs list sees it (ADR-0075). */
-    public static NightlyJob nightlyJob() {
-        return new NamedNightlyJob(
-            System.Label.Funders_NightlyJobs_RemindersName,
-            jobNameInUse,
-            MORNING_CRON,
-            new GrantReminderScheduler()
-        );
-    }
+	/**
+	 * The job as a step of the nightly run (ADR-0166 nightly-job-dispatcher): six in the
+	 * morning, before the working day.
+	 */
+	public static NightlyStep step() {
+		return new NightlyStep(
+			jobNameInUse,
+			System.Label.Funders_NightlyJobs_RemindersName,
+			6,
+			0,
+			new GrantReminderScheduler()
+		);
+	}
 }

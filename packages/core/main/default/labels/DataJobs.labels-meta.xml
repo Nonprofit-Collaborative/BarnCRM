@@ -61,24 +61,8 @@
         <categories>DataJobs</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data job history: the kind of a job that imported a file</shortDescription>
-        <value>Import</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataJobs_ImportSummary</fullName>
-        <categories>DataJobs</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import counts: {0} rows, {1} created, {2} updated, {3} matched, {4} rejected</shortDescription>
-        <value>{0} rows: {1} created, {2} updated, {3} matched, {4} rejected.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataJobs_ImportSummaryOne</fullName>
-        <categories>DataJobs</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>One-row import: {0} row, {1} created, {2} updated, {3} matched, {4} rejected</shortDescription>
-        <value>{0} row: {1} created, {2} updated, {3} matched, {4} rejected.</value>
+        <shortDescription>Data job history: kind of a job that imported a file (the import tool's name)</shortDescription>
+        <value>Super Importer</value>
     </labels>
     <labels>
         <fullName>Core_DataJobs_Started</fullName>

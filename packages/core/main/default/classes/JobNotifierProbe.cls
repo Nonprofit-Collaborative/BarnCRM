@@ -5,8 +5,8 @@
  */
 @IsTest
 public class JobNotifierProbe implements Schedulable {
-    public void execute(SchedulableContext context) {
-        Id starter = JobNotifier.starter();
-        insert new Account(Name = starter == null ? 'Starter: none' : 'Starter: ' + starter);
-    }
+	public void execute(SchedulableContext context) {
+		Id starter = JobNotifier.starter();
+		insert new Account(Name = starter == null ? 'Starter: none' : 'Starter: ' + starter);
+	}
 }

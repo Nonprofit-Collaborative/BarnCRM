@@ -9,48 +9,48 @@
  */
 @NamespaceAccessible
 public with sharing class VolunteerShiftTriggerHandler extends TriggerHandler {
-    private static final String START_FORMAT = 'd MMM yyyy, h:mm a';
-    private static final Integer NAME_LENGTH = 80;
+	private static final String START_FORMAT = 'd MMM yyyy, h:mm a';
+	private static final Integer NAME_LENGTH = 80;
 
-    @NamespaceAccessible
-    public VolunteerShiftTriggerHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public VolunteerShiftTriggerHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'VolunteerShiftTriggerHandler';
-    }
+	public override String getName() {
+		return 'VolunteerShiftTriggerHandler';
+	}
 
-    public override void beforeInsert() {
-        nameUnnamed((List<Volunteer_Shift__c>) Trigger.new);
-    }
+	public override void beforeInsert() {
+		nameUnnamed((List<Volunteer_Shift__c>) newRecords());
+	}
 
-    public override void beforeUpdate() {
-        nameUnnamed((List<Volunteer_Shift__c>) Trigger.new);
-    }
+	public override void beforeUpdate() {
+		nameUnnamed((List<Volunteer_Shift__c>) newRecords());
+	}
 
-    private static void nameUnnamed(List<Volunteer_Shift__c> shifts) {
-        List<Volunteer_Shift__c> unnamed = new List<Volunteer_Shift__c>();
-        Set<Id> jobIds = new Set<Id>();
-        for (Volunteer_Shift__c shift : shifts) {
-            if (String.isBlank(shift.Name) && shift.Volunteer_Job__c != null) {
-                unnamed.add(shift);
-                jobIds.add(shift.Volunteer_Job__c);
-            }
-        }
-        if (unnamed.isEmpty()) {
-            return;
-        }
-        Map<Id, String> jobNames = VolunteerJobSelector.selectNamesByIds(jobIds);
-        for (Volunteer_Shift__c shift : unnamed) {
-            String jobName = jobNames.get(shift.Volunteer_Job__c);
-            if (jobName == null) {
-                continue;
-            }
-            String name = shift.Start_Time__c == null
-                ? jobName
-                : jobName + ': ' + shift.Start_Time__c.format(START_FORMAT);
-            shift.Name = name.abbreviate(NAME_LENGTH);
-        }
-    }
+	private static void nameUnnamed(List<Volunteer_Shift__c> shifts) {
+		List<Volunteer_Shift__c> unnamed = new List<Volunteer_Shift__c>();
+		Set<Id> jobIds = new Set<Id>();
+		for (Volunteer_Shift__c shift : shifts) {
+			if (String.isBlank(shift.Name) && shift.Volunteer_Job__c != null) {
+				unnamed.add(shift);
+				jobIds.add(shift.Volunteer_Job__c);
+			}
+		}
+		if (unnamed.isEmpty()) {
+			return;
+		}
+		Map<Id, String> jobNames = VolunteerJobSelector.selectNamesByIds(jobIds);
+		for (Volunteer_Shift__c shift : unnamed) {
+			String jobName = jobNames.get(shift.Volunteer_Job__c);
+			if (jobName == null) {
+				continue;
+			}
+			String name = shift.Start_Time__c == null
+				? jobName
+				: jobName + ': ' + shift.Start_Time__c.format(START_FORMAT);
+			shift.Name = name.abbreviate(NAME_LENGTH);
+		}
+	}
 }

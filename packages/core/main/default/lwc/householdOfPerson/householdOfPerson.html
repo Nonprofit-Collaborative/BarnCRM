@@ -1,6 +1,7 @@
 <template>
-    <lightning-card title={label.title} icon-name="standard:household">
-        <div class="slds-var-m-around_medium slds-is-relative">
+    <template lwc:if={helpReady}>
+    <lightning-card title={label.title} icon-name={icons.household}>
+        <div class="slds-var-p-horizontal_medium slds-is-relative">
             <template if:true={isLoading}>
                 <lightning-spinner alternative-text={label.loading} size="small"></lightning-spinner>
             </template>
@@ -13,27 +14,48 @@
                 ></c-barn-empty-state>
             </template>
 
-            <template for:each={households} for:item="household">
-                <div key={household.householdId} class="slds-var-m-bottom_small household-row">
-                    <a
-                        href={household.url}
-                        class="slds-text-heading_small household-link"
-                        data-record-id={household.householdId}
-                        onclick={handleHouseholdClick}
-                    >{household.name}</a>
-                    <p class="slds-text-body_small member-count">{household.memberCountText}</p>
-                    <template if:true={household.formalGreeting}>
-                        <p class="slds-text-body_small formal-greeting">
-                            <span class="slds-text-title">{label.formalGreeting}:</span>
-                            {household.formalGreeting}
-                        </p>
+            <template if:true={hasHouseholds}>
+                <ul class="slds-has-dividers_bottom-space">
+                    <template for:each={households} for:item="household">
+                        <li key={household.householdId} class="slds-item household-row">
+                            <div class="slds-media slds-media_center slds-media_small">
+                                <div class="slds-media__figure" aria-hidden="true">
+                                    <lightning-avatar
+                                        variant="circle"
+                                        size="small"
+                                        fallback-icon-name="standard:household"
+                                    ></lightning-avatar>
+                                </div>
+                                <div class="slds-media__body">
+                                    <h3 class="slds-text-heading_small">
+                                        <a
+                                            href={household.url}
+                                            class="household-link"
+                                            data-record-id={household.householdId}
+                                            onclick={handleHouseholdClick}
+                                        >{household.name}</a>
+                                    </h3>
+                                    <p class="slds-text-body_small slds-text-color_weak member-count">{household.memberCountText}</p>
+                                    <template if:true={household.formalGreeting}>
+                                        <p class="slds-text-body_small slds-text-color_weak formal-greeting">
+                                            {label.formalGreeting}: {household.formalGreeting}
+                                        </p>
+                                    </template>
+                                </div>
+                            </div>
+                        </li>
                     </template>
-                </div>
+                </ul>
             </template>
 
             <template if:true={errorMessage}>
-                <div class="slds-text-color_error slds-var-m-top_small" role="alert">{errorMessage}</div>
+                <c-barn-notice
+                    class="slds-var-m-top_small error-message"
+                    variant="error"
+                    message={errorMessage}
+                ></c-barn-notice>
             </template>
         </div>
     </lightning-card>
+    </template>
 </template>

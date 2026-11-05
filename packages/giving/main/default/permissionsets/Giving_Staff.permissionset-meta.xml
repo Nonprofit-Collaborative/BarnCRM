@@ -32,6 +32,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>FundraisingHomeController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>GiftBatchController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -1557,6 +1561,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Fund__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Fundraising_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

@@ -11,77 +11,77 @@
  */
 @NamespaceAccessible
 public with sharing class DataProtectionExtensions {
-    /** The class names dependent packages register, in the order they are asked. */
-    @NamespaceAccessible
-    public static final List<String> EXTENSION_CLASSES = new List<String>{
-        'GivingDataProtectionExtension'
-    };
+	/** The class names dependent packages register, in the order they are asked. */
+	@NamespaceAccessible
+	public static final List<String> EXTENSION_CLASSES = new List<String>{
+		'GivingDataProtectionExtension'
+	};
 
-    /** Injected by Core's tests, since no other package is there to resolve. */
-    @TestVisible
-    private static List<DataProtectionExtension> overrides = new List<DataProtectionExtension>();
+	/** Injected by Core's tests, since no other package is there to resolve. */
+	@TestVisible
+	private static List<DataProtectionExtension> overrides = new List<DataProtectionExtension>();
 
-    /** Set by Core's tests to see the org as having no extension beyond those injected. */
-    @TestVisible
-    private static Boolean noneForTest = false;
+	/** Set by Core's tests to see the org as having no extension beyond those injected. */
+	@TestVisible
+	private static Boolean noneForTest = false;
 
-    /** Every protected object, gathered once per transaction. */
-    private static Set<Schema.SObjectType> gathered;
+	/** Every protected object, gathered once per transaction. */
+	private static Set<Schema.SObjectType> gathered;
 
-    /** The objects every installed extension protects. */
-    @NamespaceAccessible
-    public static Set<Schema.SObjectType> protectedObjects() {
-        if (gathered == null) {
-            gathered = new Set<Schema.SObjectType>();
-            List<DataProtectionExtension> extensions = new List<DataProtectionExtension>(overrides);
-            if (noneForTest != true) {
-                for (String className : EXTENSION_CLASSES) {
-                    DataProtectionExtension extension = resolve(className);
-                    if (extension != null) {
-                        extensions.add(extension);
-                    }
-                }
-            }
-            for (DataProtectionExtension extension : extensions) {
-                try {
-                    Set<Schema.SObjectType> objects = extension.protectedObjects();
-                    if (objects != null) {
-                        gathered.addAll(objects);
-                    }
-                } catch (Exception failed) {
-                    ErrorLogger.log(failed, 'DataProtectionExtensions.protectedObjects');
-                }
-            }
-            gathered.remove(null);
-        }
-        return gathered;
-    }
+	/** The objects every installed extension protects. */
+	@NamespaceAccessible
+	public static Set<Schema.SObjectType> protectedObjects() {
+		if (gathered == null) {
+			gathered = new Set<Schema.SObjectType>();
+			List<DataProtectionExtension> extensions = new List<DataProtectionExtension>(overrides);
+			if (noneForTest != true) {
+				for (String className : EXTENSION_CLASSES) {
+					DataProtectionExtension extension = resolve(className);
+					if (extension != null) {
+						extensions.add(extension);
+					}
+				}
+			}
+			for (DataProtectionExtension extension : extensions) {
+				try {
+					Set<Schema.SObjectType> objects = extension.protectedObjects();
+					if (objects != null) {
+						gathered.addAll(objects);
+					}
+				} catch (Exception failed) {
+					ErrorLogger.log(failed, 'DataProtectionExtensions.protectedObjects');
+				}
+			}
+			gathered.remove(null);
+		}
+		return gathered;
+	}
 
-    /** Clears what was gathered, for a test that changes the extensions mid-transaction. */
-    @TestVisible
-    private static void reset() {
-        gathered = null;
-    }
+	/** Clears what was gathered, for a test that changes the extensions mid-transaction. */
+	@TestVisible
+	private static void reset() {
+		gathered = null;
+	}
 
-    private static DataProtectionExtension resolve(String className) {
-        Type extensionType = NamespaceUtil.resolveType(className);
-        if (extensionType == null) {
-            return null;
-        }
-        Object candidate;
-        try {
-            candidate = extensionType.newInstance();
-        } catch (Exception cannotBuild) {
-            ErrorLogger.log(cannotBuild, 'DataProtectionExtensions.resolve');
-            return null;
-        }
-        if (candidate instanceof DataProtectionExtension) {
-            return (DataProtectionExtension) candidate;
-        }
-        ErrorLogger.log(
-            new System.TypeException(className + ' does not implement DataProtectionExtension'),
-            'DataProtectionExtensions.resolve'
-        );
-        return null;
-    }
+	private static DataProtectionExtension resolve(String className) {
+		Type extensionType = NamespaceUtil.resolveType(className);
+		if (extensionType == null) {
+			return null;
+		}
+		Object candidate;
+		try {
+			candidate = extensionType.newInstance();
+		} catch (Exception cannotBuild) {
+			ErrorLogger.log(cannotBuild, 'DataProtectionExtensions.resolve');
+			return null;
+		}
+		if (candidate instanceof DataProtectionExtension) {
+			return (DataProtectionExtension) candidate;
+		}
+		ErrorLogger.log(
+			new System.TypeException(className + ' does not implement DataProtectionExtension'),
+			'DataProtectionExtensions.resolve'
+		);
+		return null;
+	}
 }

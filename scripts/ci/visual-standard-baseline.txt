@@ -1,27 +1,5 @@
 # Screens built before the visual standard: path rule count (scripts/ci/check-visual-standard.py).
 # Lower a count, or delete a line, when a screen adopts the kit. Never raise one.
-packages/core/main/default/lwc/aiReadinessExport/aiReadinessExport.html table-stacked 1
-packages/core/main/default/lwc/automationControl/automationControl.html solid-box 2
-packages/core/main/default/lwc/bulkDelete/bulkDelete.html solid-box 3
-packages/core/main/default/lwc/bulkUpdate/bulkUpdate.html solid-box 2
-packages/core/main/default/lwc/bulkUpdate/bulkUpdate.html table-stacked 1
-packages/core/main/default/lwc/dataJobHistory/dataJobHistory.html solid-box 2
-packages/core/main/default/lwc/errorLogTile/errorLogTile.html solid-box 1
-packages/core/main/default/lwc/filterBuilder/filterBuilder.html solid-box 2
-packages/core/main/default/lwc/findRecords/findRecords.html solid-box 2
-packages/core/main/default/lwc/householdMergeSplit/householdMergeSplit.html table-stacked 1
-packages/core/main/default/lwc/householdNamingSettings/householdNamingSettings.html table-stacked 1
-packages/core/main/default/lwc/importResults/importResults.html table-stacked 2
-packages/core/main/default/lwc/importRowCorrection/importRowCorrection.html table-stacked 1
-packages/core/main/default/lwc/importWizard/importWizard.html solid-box 1
-packages/core/main/default/lwc/importWizard/importWizard.html table-stacked 1
-packages/core/main/default/lwc/npspHouseholdAdoption/npspHouseholdAdoption.html table-stacked 1
-packages/core/main/default/lwc/recordInspector/recordInspector.html solid-box 1
-packages/core/main/default/lwc/recordInspector/recordInspector.html table-stacked 1
-packages/core/main/default/lwc/sampleDataManager/sampleDataManager.html solid-box 1
-packages/core/main/default/lwc/setupStepModules/setupStepModules.js badge-inverse 1
-packages/core/main/default/lwc/superTransform/superTransform.html solid-box 1
-packages/core/main/default/lwc/superTransform/superTransform.html table-stacked 1
 packages/funders/main/default/lwc/fundersBoard/fundersBoard.html table-stacked 4
 packages/funders/main/default/lwc/grantSchedule/grantSchedule.html table-stacked 2
 packages/giving/main/default/lwc/commitmentSchedulePreview/commitmentSchedulePreview.html table-stacked 1
@@ -29,8 +7,6 @@ packages/giving/main/default/lwc/giftBatchEntry/giftBatchEntry.html table-stacke
 packages/giving/main/default/lwc/quickGiftEntry/quickGiftEntry.html solid-box 2
 packages/giving/main/default/lwc/receiptActions/receiptActions.html table-stacked 1
 packages/giving/main/default/lwc/receiptSettings/receiptSettings.html table-stacked 1
-packages/logicmodels/main/default/lwc/logicModelIndicators/logicModelIndicators.html table-stacked 1
-packages/logicmodels/main/default/lwc/logicModelReport/logicModelReport.html table-stacked 1
 packages/rollups/main/default/lwc/rollupBuilder/rollupBuilder.html solid-box 2
 packages/rollups/main/default/lwc/rollupDefinitions/rollupDefinitions.html solid-box 3
 packages/rollups/main/default/lwc/rollupDefinitions/rollupDefinitions.html table-stacked 2

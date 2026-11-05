@@ -14,286 +14,286 @@
  */
 @IsTest(testFor='ApexClass:ReceiptLogoSource')
 private class ReceiptBrandingTest {
-    private static final Date GIFT_DATE = Date.newInstance(2026, 4, 12);
+	private static final Date GIFT_DATE = Date.newInstance(2026, 4, 12);
 
-    /** A template that says nothing about the organization, which is the case the block exists for. */
-    private static final String BARE_TEMPLATE = '<p>Dear {{DonorName}}, thank you for your gift of {{Amount}} received on {{GiftDate}}.</p>';
+	/** A template that says nothing about the organization, which is the case the block exists for. */
+	private static final String BARE_TEMPLATE = '<p>Dear {{DonorName}}, thank you for your gift of {{Amount}} received on {{GiftDate}}.</p>';
 
-    @TestSetup
-    static void setUp() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            ReceiptTestDataFactory.setUpReceipting();
-        }
-    }
+	@TestSetup
+	static void setUp() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			ReceiptTestDataFactory.setUpReceipting();
+		}
+	}
 
-    private static String receiptFrom(String templateBody) {
-        Gift__c gift = ReceiptTestDataFactory.plainCashGift(null, 250, GIFT_DATE);
-        return ReceiptContentBuilder.forGift(
-            gift,
-            'Sam Whitfield',
-            'HFH-2026-000010',
-            Date.newInstance(2027, 1, 15),
-            templateBody
-        );
-    }
+	private static String receiptFrom(String templateBody) {
+		Gift__c gift = ReceiptTestDataFactory.plainCashGift(null, 250, GIFT_DATE);
+		return ReceiptContentBuilder.forGift(
+			gift,
+			'Sam Whitfield',
+			'HFH-2026-000010',
+			Date.newInstance(2027, 1, 15),
+			templateBody
+		);
+	}
 
-    private static Id insertLogoFile() {
-        ContentVersion version = new ContentVersion(
-            Title = 'Receipt logo',
-            PathOnClient = 'logo.png',
-            VersionData = Blob.valueOf('not really a png, and no test can say whether one renders')
-        );
-        insert version;
-        Id documentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :version.Id]
-        .ContentDocumentId;
-        Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
-        giving.SetupOwnerId = UserInfo.getOrganizationId();
-        giving.Receipt_Logo_Document_Id__c = documentId;
-        upsert giving;
-        ReceiptLogoSource.reset();
-        return documentId;
-    }
+	private static Id insertLogoFile() {
+		ContentVersion version = new ContentVersion(
+			Title = 'Receipt logo',
+			PathOnClient = 'logo.png',
+			VersionData = Blob.valueOf('not really a png, and no test can say whether one renders')
+		);
+		insert version;
+		Id documentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :version.Id]
+		.ContentDocumentId;
+		Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
+		giving.SetupOwnerId = UserInfo.getOrganizationId();
+		giving.Receipt_Logo_Document_Id__c = documentId;
+		upsert giving;
+		ReceiptLogoSource.reset();
+		return documentId;
+	}
 
-    private static void setLogoDelivery(String route, Boolean printLogo) {
-        Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
-        giving.SetupOwnerId = UserInfo.getOrganizationId();
-        giving.Receipt_Logo_Delivery__c = route;
-        giving.Receipt_Print_Logo__c = printLogo;
-        upsert giving;
-        ReceiptLogoSource.reset();
-    }
+	private static void setLogoDelivery(String route, Boolean printLogo) {
+		Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
+		giving.SetupOwnerId = UserInfo.getOrganizationId();
+		giving.Receipt_Logo_Delivery__c = route;
+		giving.Receipt_Print_Logo__c = printLogo;
+		upsert giving;
+		ReceiptLogoSource.reset();
+	}
 
-    @IsTest
-    static void aTemplateThatNamesNoOrganizationStillProducesADocumentThatDoes() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Test.startTest();
-            String html = receiptFrom(BARE_TEMPLATE);
-            Test.stopTest();
+	@IsTest
+	static void aTemplateThatNamesNoOrganizationStillProducesADocumentThatDoes() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Test.startTest();
+			String html = receiptFrom(BARE_TEMPLATE);
+			Test.stopTest();
 
-            Assert.isTrue(
-                html.contains('<p class="orgname">Hope For Homes</p>'),
-                'The legal name is printed above the letter: ' + html
-            );
-            Assert.isTrue(
-                html.contains(
-                    '<p class="orgaddress">14 Bridge Street<br/>Suite 3<br/>Springfield, IL 62701</p>'
-                ),
-                'So is the address, one line per part, City, State and Zip together: ' + html
-            );
-            Assert.isTrue(
-                html.contains('12-3456789'),
-                'The tax identification number is on it, as it always was: ' + html
-            );
-        }
-    }
+			Assert.isTrue(
+				html.contains('<p class="orgname">Hope For Homes</p>'),
+				'The legal name is printed above the letter: ' + html
+			);
+			Assert.isTrue(
+				html.contains(
+					'<p class="orgaddress">14 Bridge Street<br/>Suite 3<br/>Springfield, IL 62701</p>'
+				),
+				'So is the address, one line per part, City, State and Zip together: ' + html
+			);
+			Assert.isTrue(
+				html.contains('12-3456789'),
+				'The tax identification number is on it, as it always was: ' + html
+			);
+		}
+	}
 
-    /**
-     * A letter saved before the package printed the letterhead keeps its own block, and the
-     * package does not print the name a second time (ADR-0065 point 3).
-     */
-    @IsTest
-    static void aLetterWithTheOldLetterheadBlockIsNotGivenASecondCopyOfIt() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Test.startTest();
-            String html = receiptFrom(
-                '<div class="letterhead"><h1>{{OrganizationName}}</h1></div>' + BARE_TEMPLATE
-            );
-            Test.stopTest();
+	/**
+	 * A letter saved before the package printed the letterhead keeps its own block, and the
+	 * package does not print the name a second time (ADR-0065 point 3).
+	 */
+	@IsTest
+	static void aLetterWithTheOldLetterheadBlockIsNotGivenASecondCopyOfIt() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Test.startTest();
+			String html = receiptFrom(
+				'<div class="letterhead"><h1>{{OrganizationName}}</h1></div>' + BARE_TEMPLATE
+			);
+			Test.stopTest();
 
-            Assert.isFalse(
-                html.contains('class="orgname"'),
-                'The package does not print a name the letter already printed: ' + html
-            );
-            Assert.isTrue(
-                html.contains('<h1>Hope For Homes</h1>'),
-                'The letter prints it: ' + html
-            );
-        }
-    }
+			Assert.isFalse(
+				html.contains('class="orgname"'),
+				'The package does not print a name the letter already printed: ' + html
+			);
+			Assert.isTrue(
+				html.contains('<h1>Hope For Homes</h1>'),
+				'The letter prints it: ' + html
+			);
+		}
+	}
 
-    /**
-     * The letterhead is code, not template (ADR-0065 point 2). A letter that only mentions the
-     * organization in a sentence used to lose the letterhead, because the test was for the token.
-     */
-    @IsTest
-    static void aLetterThatMentionsTheOrganizationInASentenceStillGetsTheLetterhead() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Test.startTest();
-            String html = receiptFrom(
-                '<p>Thank you for supporting {{OrganizationName}}, {{DonorName}}.</p>'
-            );
-            Test.stopTest();
+	/**
+	 * The letterhead is code, not template (ADR-0065 point 2). A letter that only mentions the
+	 * organization in a sentence used to lose the letterhead, because the test was for the token.
+	 */
+	@IsTest
+	static void aLetterThatMentionsTheOrganizationInASentenceStillGetsTheLetterhead() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Test.startTest();
+			String html = receiptFrom(
+				'<p>Thank you for supporting {{OrganizationName}}, {{DonorName}}.</p>'
+			);
+			Test.stopTest();
 
-            Assert.isTrue(
-                html.contains('<p class="orgname">Hope For Homes</p>'),
-                'The letterhead prints above the letter: ' + html
-            );
-            Assert.isTrue(
-                html.contains('Thank you for supporting Hope For Homes'),
-                'And the sentence keeps its token: ' + html
-            );
-        }
-    }
+			Assert.isTrue(
+				html.contains('<p class="orgname">Hope For Homes</p>'),
+				'The letterhead prints above the letter: ' + html
+			);
+			Assert.isTrue(
+				html.contains('Thank you for supporting Hope For Homes'),
+				'And the sentence keeps its token: ' + html
+			);
+		}
+	}
 
-    @IsTest
-    static void theAddressTokenMergesTheWholeAddressOnOneLine() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Test.startTest();
-            String html = receiptFrom('<p>Send to {{OrganizationAddress}}.</p>');
-            Test.stopTest();
+	@IsTest
+	static void theAddressTokenMergesTheWholeAddressOnOneLine() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Test.startTest();
+			String html = receiptFrom('<p>Send to {{OrganizationAddress}}.</p>');
+			Test.stopTest();
 
-            Assert.isTrue(
-                html.contains('Send to 14 Bridge Street, Suite 3, Springfield, IL 62701.'),
-                'Inside a sentence the address is one line: ' + html
-            );
-        }
-    }
+			Assert.isTrue(
+				html.contains('Send to 14 Bridge Street, Suite 3, Springfield, IL 62701.'),
+				'Inside a sentence the address is one line: ' + html
+			);
+		}
+	}
 
-    @IsTest
-    static void anOrganizationWithNoAddressPrintsNoAddressBlock() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
-            core.Organization_Street__c = null;
-            core.Organization_Street_2__c = null;
-            core.Organization_City__c = null;
-            core.Organization_State__c = null;
-            core.Organization_Postal_Code__c = null;
-            core.Organization_Country__c = null;
-            upsert core;
+	@IsTest
+	static void anOrganizationWithNoAddressPrintsNoAddressBlock() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
+			core.Organization_Street__c = null;
+			core.Organization_Street_2__c = null;
+			core.Organization_City__c = null;
+			core.Organization_State__c = null;
+			core.Organization_Postal_Code__c = null;
+			core.Organization_Country__c = null;
+			upsert core;
 
-            Test.startTest();
-            String html = receiptFrom(BARE_TEMPLATE);
-            Test.stopTest();
+			Test.startTest();
+			String html = receiptFrom(BARE_TEMPLATE);
+			Test.stopTest();
 
-            Assert.isFalse(
-                html.contains('class="orgaddress"'),
-                'The address is optional, so a blank one leaves no empty paragraph: ' + html
-            );
-            Assert.isTrue(
-                html.contains('<p class="orgname">Hope For Homes</p>'),
-                'The name still prints: ' + html
-            );
-        }
-    }
+			Assert.isFalse(
+				html.contains('class="orgaddress"'),
+				'The address is optional, so a blank one leaves no empty paragraph: ' + html
+			);
+			Assert.isTrue(
+				html.contains('<p class="orgname">Hope For Homes</p>'),
+				'The name still prints: ' + html
+			);
+		}
+	}
 
-    @IsTest
-    static void anOrganizationWithNoLogoGetsADocumentWithNoImage() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Test.startTest();
-            String html = receiptFrom(BARE_TEMPLATE);
-            Test.stopTest();
+	@IsTest
+	static void anOrganizationWithNoLogoGetsADocumentWithNoImage() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Test.startTest();
+			String html = receiptFrom(BARE_TEMPLATE);
+			Test.stopTest();
 
-            Assert.isFalse(html.contains('<img'), 'No logo uploaded means no image: ' + html);
-        }
-    }
+			Assert.isFalse(html.contains('<img'), 'No logo uploaded means no image: ' + html);
+		}
+	}
 
-    @IsTest
-    static void theShippedRouteAddressesTheFileByItsDownloadUrl() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            System.runAs(ReceiptTestDataFactory.issuer()) {
-                insertLogoFile();
-                setLogoDelivery(null, true);
+	@IsTest
+	static void theShippedRouteAddressesTheFileByItsDownloadUrl() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			System.runAs(ReceiptTestDataFactory.issuer()) {
+				insertLogoFile();
+				setLogoDelivery(null, true);
 
-                Test.startTest();
-                String html = receiptFrom(BARE_TEMPLATE);
-                Test.stopTest();
+				Test.startTest();
+				String html = receiptFrom(BARE_TEMPLATE);
+				Test.stopTest();
 
-                Assert.isTrue(
-                    html.contains('/sfc/servlet.shepherd/version/download/'),
-                    'The shipped route is the file download URL (ADR-0016): ' + html
-                );
-                Assert.isTrue(html.contains('width: 40mm'), 'The shipped width is used: ' + html);
-            }
+				Assert.isTrue(
+					html.contains('/sfc/servlet.shepherd/version/download/'),
+					'The shipped route is the file download URL (ADR-0016): ' + html
+				);
+				Assert.isTrue(html.contains('width: 40mm'), 'The shipped width is used: ' + html);
+			}
 
-        }
-    }
+		}
+	}
 
-    @IsTest
-    static void theEmbeddedRouteInlinesTheBytes() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            System.runAs(ReceiptTestDataFactory.issuer()) {
-                insertLogoFile();
-                setLogoDelivery(ReceiptLogoSource.ROUTE_EMBEDDED_IMAGE, true);
+	@IsTest
+	static void theEmbeddedRouteInlinesTheBytes() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			System.runAs(ReceiptTestDataFactory.issuer()) {
+				insertLogoFile();
+				setLogoDelivery(ReceiptLogoSource.ROUTE_EMBEDDED_IMAGE, true);
 
-                Test.startTest();
-                String html = receiptFrom(BARE_TEMPLATE);
-                Test.stopTest();
+				Test.startTest();
+				String html = receiptFrom(BARE_TEMPLATE);
+				Test.stopTest();
 
-                Assert.isTrue(
-                    html.contains('data:image/png;base64,'),
-                    'The second route ADR-0016 names inlines the image: ' + html
-                );
-            }
+				Assert.isTrue(
+					html.contains('data:image/png;base64,'),
+					'The second route ADR-0016 names inlines the image: ' + html
+				);
+			}
 
-        }
-    }
+		}
+	}
 
-    @IsTest
-    static void theDocumentServerRouteAddressesTheImageServer() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            System.runAs(ReceiptTestDataFactory.issuer()) {
-                insertLogoFile();
-                setLogoDelivery(ReceiptLogoSource.ROUTE_DOCUMENT_SERVER, true);
+	@IsTest
+	static void theDocumentServerRouteAddressesTheImageServer() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			System.runAs(ReceiptTestDataFactory.issuer()) {
+				insertLogoFile();
+				setLogoDelivery(ReceiptLogoSource.ROUTE_DOCUMENT_SERVER, true);
 
-                Test.startTest();
-                String html = receiptFrom(BARE_TEMPLATE);
-                Test.stopTest();
+				Test.startTest();
+				String html = receiptFrom(BARE_TEMPLATE);
+				Test.stopTest();
 
-                Assert.isTrue(
-                    html.contains('servlet.ImageServer'),
-                    'The third route ADR-0016 names is the image server: ' + html
-                );
-            }
+				Assert.isTrue(
+					html.contains('servlet.ImageServer'),
+					'The third route ADR-0016 names is the image server: ' + html
+				);
+			}
 
-        }
-    }
+		}
+	}
 
-    @IsTest
-    static void turningTheLogoOffProducesADocumentWithoutIt() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            System.runAs(ReceiptTestDataFactory.issuer()) {
-                insertLogoFile();
-                setLogoDelivery(null, false);
+	@IsTest
+	static void turningTheLogoOffProducesADocumentWithoutIt() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			System.runAs(ReceiptTestDataFactory.issuer()) {
+				insertLogoFile();
+				setLogoDelivery(null, false);
 
-                Test.startTest();
-                String html = receiptFrom(BARE_TEMPLATE);
-                Test.stopTest();
+				Test.startTest();
+				String html = receiptFrom(BARE_TEMPLATE);
+				Test.stopTest();
 
-                Assert.isFalse(html.contains('<img'), 'Off means off: ' + html);
-                Assert.isTrue(
-                    html.contains('Hope For Homes'),
-                    'A receipt with no images is still a receipt: ' + html
-                );
-            }
+				Assert.isFalse(html.contains('<img'), 'Off means off: ' + html);
+				Assert.isTrue(
+					html.contains('Hope For Homes'),
+					'A receipt with no images is still a receipt: ' + html
+				);
+			}
 
-        }
-    }
+		}
+	}
 
-    /**
-     * A logo that cannot be found is a log entry, never a failed document. This is the case an
-     * organization will actually hit if the file is not shared with the person issuing receipts.
-     */
-    @IsTest
-    static void aLogoThatCannotBeFoundStillProducesADocument() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
-            giving.SetupOwnerId = UserInfo.getOrganizationId();
-            giving.Receipt_Logo_Document_Id__c = FakeIds.of(ContentDocument.SObjectType, 0);
-            upsert giving;
-            ReceiptLogoSource.reset();
+	/**
+	 * A logo that cannot be found is a log entry, never a failed document. This is the case an
+	 * organization will actually hit if the file is not shared with the person issuing receipts.
+	 */
+	@IsTest
+	static void aLogoThatCannotBeFoundStillProducesADocument() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
+			giving.SetupOwnerId = UserInfo.getOrganizationId();
+			giving.Receipt_Logo_Document_Id__c = FakeIds.of(ContentDocument.SObjectType, 0);
+			upsert giving;
+			ReceiptLogoSource.reset();
 
-            Test.startTest();
-            String html = receiptFrom(BARE_TEMPLATE);
-            Test.stopTest();
+			Test.startTest();
+			String html = receiptFrom(BARE_TEMPLATE);
+			Test.stopTest();
 
-            Assert.isFalse(
-                html.contains('<img'),
-                'Nothing is printed for a file that is not there.'
-            );
-            Assert.isTrue(
-                html.contains('Hope For Homes'),
-                'The document is produced anyway: ' + html
-            );
-        }
-    }
+			Assert.isFalse(
+				html.contains('<img'),
+				'Nothing is printed for a file that is not there.'
+			);
+			Assert.isTrue(
+				html.contains('Hope For Homes'),
+				'The document is produced anyway: ' + html
+			);
+		}
+	}
 }

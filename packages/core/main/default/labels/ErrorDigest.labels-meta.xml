@@ -41,14 +41,6 @@
         <value>Sent {0} new entries to {1} people.</value>
     </labels>
     <labels>
-        <fullName>Core_ErrorDigest_UnknownRecipients</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error digest recipients refused; {0} lists the addresses.</shortDescription>
-        <value>The error digest goes only to active users of this Salesforce org. These addresses do not belong to one: {0}.</value>
-    </labels>
-    <labels>
         <fullName>Core_ErrorDigest_Subject</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -145,22 +137,6 @@
         <value>the platform gave no reason</value>
     </labels>
     <labels>
-        <fullName>Core_ErrorDigest_PermissionRequired</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error digest panel: the permission a change needs.</shortDescription>
-        <value>Scheduling or sending the error digest needs the Manage BarnCRM Settings permission, which comes with the BarnCRM Admin role.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorDigest_UnexpectedError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error digest panel: unexpected failure.</shortDescription>
-        <value>Something went wrong with the error digest. The details are in the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Core_ErrorDigest_PageTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -183,22 +159,6 @@
         <protected>false</protected>
         <shortDescription>Error digest panel: the job has never run.</shortDescription>
         <value>Never</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorDigest_NotScheduled</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error digest panel: the job is not scheduled.</shortDescription>
-        <value>Not scheduled: no digest is sent.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorDigest_ScheduleActive</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error digest panel: the job is scheduled; the next run follows.</shortDescription>
-        <value>Scheduled every morning at 7:00 AM, in your organization's time zone. Next run:</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_ScheduleButton</fullName>
@@ -239,22 +199,6 @@
         <protected>false</protected>
         <shortDescription>Error digest panel: the default recipients.</shortDescription>
         <value>everyone with the Manage BarnCRM Settings permission:</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorDigest_NoRecipients</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error digest panel: nobody would receive it.</shortDescription>
-        <value>nobody yet. List your users' email addresses below, or give someone the BarnCRM Admin role.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorDigest_ReadOnly</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error digest panel: read only notice.</shortDescription>
-        <value>You can see the error digest but not change it. Ask for the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorDigest_Capped</fullName>

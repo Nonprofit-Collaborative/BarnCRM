@@ -12,48 +12,61 @@
  * month, and a package that started mailing donors on install would deserve everything it got.
  */
 public with sharing class AcknowledgmentScheduler implements Schedulable {
-    /** The name the scheduled job carries, so the page can find it again. */
-    public static final String JOB_NAME = 'BarnCRM Giving Acknowledgments';
+	/** The name the scheduled job carries, so the page can find it again. */
+	public static final String JOB_NAME = 'BarnCRM Giving Acknowledgments';
 
-    /**
-     * Quarter to three in the morning: after the installment top up, the overdue pass and the
-     * donor levels, so a gift that arrived overnight has its totals and its level before the
-     * donor is thanked for it.
-     */
-    private static final String NIGHTLY_CRON = '0 45 2 * * ?';
+	private static final String LOG_CONTEXT = 'AcknowledgmentScheduler.execute';
 
-    private static final String LOG_CONTEXT = 'AcknowledgmentScheduler.execute';
+	public void execute(SchedulableContext context) {
+		if (context != null) {
+			// Still scheduled on its own from before the nightly run (R-NJ5).
+			NightlyJobs.adoptOldSchedules();
+		}
+		try {
+			if (!AcknowledgmentService.isEnabled()) {
+				// Switched off since the schedule was started. Nothing to do, and nothing wrong.
+				return;
+			}
+			AcknowledgmentRunService.startEmailRun();
+		} catch (Exception nightlyFailure) {
+			// A scheduled job's exception goes nowhere a person will ever look, so it goes here.
+			ErrorLogger.log(nightlyFailure, LOG_CONTEXT);
+		}
+	}
 
-    public void execute(SchedulableContext context) {
-        try {
-            if (!AcknowledgmentService.isEnabled()) {
-                // Switched off since the schedule was started. Nothing to do, and nothing wrong.
-                return;
-            }
-            AcknowledgmentRunService.startEmailRun();
-        } catch (Exception nightlyFailure) {
-            // A scheduled job's exception goes nowhere a person will ever look, so it goes here.
-            ErrorLogger.log(nightlyFailure, LOG_CONTEXT);
-        }
-    }
+	/** Switches the nightly send on, scheduling the nightly run when it is not (R-NJ4). */
+	public static Id start() {
+		return NightlyJobs.turnOn(JOB_NAME);
+	}
 
-    /** Starts the nightly send, or does nothing when it is already scheduled. */
-    public static Id start() {
-        return ScheduledJobSelector.ensure(JOB_NAME, NIGHTLY_CRON, new AcknowledgmentScheduler());
-    }
+	/** Switches the nightly send off. The queue stays exactly as it is. */
+	public static void stop() {
+		NightlyJobs.turnOff(JOB_NAME);
+	}
 
-    /** Stops the nightly send. The queue stays exactly as it is. */
-    public static void stop() {
-        ScheduledJobSelector.stopNamed(JOB_NAME);
-    }
+	/** True when the nightly send is switched on and the nightly run is scheduled. */
+	public static Boolean isScheduled() {
+		return NightlyJobs.isStepScheduled(JOB_NAME, false);
+	}
 
-    /** True when the nightly send is scheduled. */
-    public static Boolean isScheduled() {
-        return ScheduledJobSelector.isScheduled(JOB_NAME);
-    }
+	/** When the nightly send is next due, or null when it is not scheduled. */
+	public static Datetime nextRunAt() {
+		return isScheduled() ? NightlyJobs.nextRunAt(step()) : null;
+	}
 
-    /** When the nightly send is next due, or null when it is not scheduled. */
-    public static Datetime nextRunAt() {
-        return ScheduledJobSelector.nextFireTime(JOB_NAME);
-    }
+	/**
+	 * The send as a step of the nightly run (ADR-0166 nightly-job-dispatcher): quarter to three,
+	 * after the installment top up and the overdue pass, so a gift that arrived overnight has its
+	 * totals before the donor is thanked. Shipped off: it emails donors.
+	 */
+	public static NightlyStep step() {
+		return new NightlyStep(
+				JOB_NAME,
+				System.Label.Giving_Acknowledgments_Title,
+				2,
+				45,
+				new AcknowledgmentScheduler()
+			)
+			.withSwitch(false);
+	}
 }

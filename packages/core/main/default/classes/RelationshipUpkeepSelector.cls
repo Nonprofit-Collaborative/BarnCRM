@@ -25,95 +25,95 @@
  *   may not be able to see.
  */
 public without sharing class RelationshipUpkeepSelector {
-    /**
-     * Every relationship described from one of these people: the pool the service searches for
-     * a record that is already the other side. Not shown to anyone.
-     */
-    public static List<Relationship__c> selectByFromPersonIds(Set<Id> personIds) {
-        if (personIds == null || personIds.isEmpty()) {
-            return new List<Relationship__c>();
-        }
-        return [
-            SELECT
-                Id,
-                Contact__c,
-                Person_Account__c,
-                Related_Contact__c,
-                Related_Person_Account__c,
-                Type__c,
-                Reciprocal_Type__c,
-                Status__c,
-                Start_Date__c,
-                End_Date__c,
-                Description__c,
-                Reciprocal_Relationship__c,
-                Is_Reciprocal_Managed__c,
-                CreatedDate
-            FROM Relationship__c
-            WHERE Contact__c IN :personIds OR Person_Account__c IN :personIds
-            WITH SYSTEM_MODE
-            ORDER BY Status__c, CreatedDate DESC
-            LIMIT 10000
-        ];
-    }
+	/**
+	 * Every relationship described from one of these people: the pool the service searches for
+	 * a record that is already the other side. Not shown to anyone.
+	 */
+	public static List<Relationship__c> selectByFromPersonIds(Set<Id> personIds) {
+		if (personIds == null || personIds.isEmpty()) {
+			return new List<Relationship__c>();
+		}
+		return [
+			SELECT
+				Id,
+				Contact__c,
+				Person_Account__c,
+				Related_Contact__c,
+				Related_Person_Account__c,
+				Type__c,
+				Reciprocal_Type__c,
+				Status__c,
+				Start_Date__c,
+				End_Date__c,
+				Description__c,
+				Reciprocal_Relationship__c,
+				Is_Reciprocal_Managed__c,
+				CreatedDate
+			FROM Relationship__c
+			WHERE Contact__c IN :personIds OR Person_Account__c IN :personIds
+			WITH SYSTEM_MODE
+			ORDER BY Status__c, CreatedDate DESC
+			LIMIT 10000
+		];
+	}
 
-    /** The other sides with these ids, as the service compares and writes them. */
-    public static List<Relationship__c> selectByIds(Set<Id> relationshipIds) {
-        if (relationshipIds == null || relationshipIds.isEmpty()) {
-            return new List<Relationship__c>();
-        }
-        return [
-            SELECT
-                Id,
-                Contact__c,
-                Person_Account__c,
-                Related_Contact__c,
-                Related_Person_Account__c,
-                Type__c,
-                Reciprocal_Type__c,
-                Status__c,
-                Start_Date__c,
-                End_Date__c,
-                Description__c,
-                Reciprocal_Relationship__c,
-                Is_Reciprocal_Managed__c,
-                CreatedDate
-            FROM Relationship__c
-            WHERE Id IN :relationshipIds
-            WITH SYSTEM_MODE
-            LIMIT 10000
-        ];
-    }
+	/** The other sides with these ids, as the service compares and writes them. */
+	public static List<Relationship__c> selectByIds(Set<Id> relationshipIds) {
+		if (relationshipIds == null || relationshipIds.isEmpty()) {
+			return new List<Relationship__c>();
+		}
+		return [
+			SELECT
+				Id,
+				Contact__c,
+				Person_Account__c,
+				Related_Contact__c,
+				Related_Person_Account__c,
+				Type__c,
+				Reciprocal_Type__c,
+				Status__c,
+				Start_Date__c,
+				End_Date__c,
+				Description__c,
+				Reciprocal_Relationship__c,
+				Is_Reciprocal_Managed__c,
+				CreatedDate
+			FROM Relationship__c
+			WHERE Id IN :relationshipIds
+			WITH SYSTEM_MODE
+			LIMIT 10000
+		];
+	}
 
-    /**
-     * Managed relationships in the recycle bin described from one of these people, most
-     * recently deleted first: the other sides a restore may bring back (PEOPLE-21). ALL ROWS
-     * is what reaches the recycle bin; the IsDeleted filter keeps live records out.
-     */
-    public static List<Relationship__c> selectDeletedByFromPersonIds(Set<Id> personIds) {
-        if (personIds == null || personIds.isEmpty()) {
-            return new List<Relationship__c>();
-        }
-        return [
-            SELECT
-                Id,
-                Contact__c,
-                Person_Account__c,
-                Related_Contact__c,
-                Related_Person_Account__c,
-                Type__c,
-                Reciprocal_Relationship__c,
-                Is_Reciprocal_Managed__c
-            FROM Relationship__c
-            WHERE
-                (Contact__c IN :personIds
-                OR Person_Account__c IN :personIds)
-                AND IsDeleted = TRUE
-                AND Is_Reciprocal_Managed__c = TRUE
-            WITH SYSTEM_MODE
-            ORDER BY SystemModstamp DESC
-            LIMIT 10000
-            ALL ROWS
-        ];
-    }
+	/**
+	 * Managed relationships in the recycle bin described from one of these people, most
+	 * recently deleted first: the other sides a restore may bring back (PEOPLE-21). ALL ROWS
+	 * is what reaches the recycle bin; the IsDeleted filter keeps live records out.
+	 */
+	public static List<Relationship__c> selectDeletedByFromPersonIds(Set<Id> personIds) {
+		if (personIds == null || personIds.isEmpty()) {
+			return new List<Relationship__c>();
+		}
+		return [
+			SELECT
+				Id,
+				Contact__c,
+				Person_Account__c,
+				Related_Contact__c,
+				Related_Person_Account__c,
+				Type__c,
+				Reciprocal_Relationship__c,
+				Is_Reciprocal_Managed__c
+			FROM Relationship__c
+			WHERE
+				(Contact__c IN :personIds
+				OR Person_Account__c IN :personIds)
+				AND IsDeleted = TRUE
+				AND Is_Reciprocal_Managed__c = TRUE
+			WITH SYSTEM_MODE
+			ORDER BY SystemModstamp DESC
+			LIMIT 10000
+			ALL ROWS
+		];
+	}
 }

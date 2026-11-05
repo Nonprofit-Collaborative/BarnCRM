@@ -13,7 +13,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Giving**, and open **Campaign Sync**. | The **Campaign Sync** card says `Campaign sync is off. Switch on Copy appeals to Campaigns in the Giving section of BarnCRM Settings, then come back to sync your appeals.` No **Sync all appeals** button shows. |
-| 2 | In **Giving**, tick **Copy Appeals to Campaigns** and save. | The setting saves. |
+| 2 | In **Giving**, tick **Copy appeals to campaigns** and save. | The setting saves. |
 | 3 | Open **Campaign Sync** again. | `Campaign sync is on. Saving an appeal creates or updates its Campaign.` and `0 of 7 appeals have a Campaign.` **Sync all appeals** is enabled. |
 | 4 | Click **Sync all appeals**. | `Sync all appeals is running in the background. Reload this page in a minute to see new counts. Anything that could not be copied is in the Error Log.` |
 | 5 | Wait a minute and reload the page. | `7 of 7 appeals have a Campaign.` |
@@ -48,9 +48,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 |---|---|---|
 | 1 | As read-only, open the App Launcher and search `Campaign Sync`. | No **Campaign Sync** item is found. |
 | 2 | As staff, open the **Campaign Sync** tab from the App Launcher. | The card shows `You cannot create and edit Campaigns, so appeals you save get no Campaign...` and `Only someone with the Manage BarnCRM Settings permission can sync all appeals.` **Sync all appeals** is disabled. |
-| 3 | As admin, in **BarnCRM Settings**, **Giving**, untick **Copy Appeals to Campaigns** and save. | The setting saves. |
+| 3 | As admin, in **BarnCRM Settings**, **Giving**, untick **Copy appeals to campaigns** and save. | The setting saves. |
 | 4 | Change the **Goal** of `Giving Tuesday` to 9,000 and save. Reload its Campaign. | Expected Revenue is still 7,500. Every Campaign is still there. |
-| 5 | Tick **Copy Appeals to Campaigns** again and save `Giving Tuesday` once more. | The Campaign's Expected Revenue is 9,000. |
+| 5 | Tick **Copy appeals to campaigns** again and save `Giving Tuesday` once more. | The Campaign's Expected Revenue is 9,000. |
 
 **Cleanup:** remove the **Campaign Sync** permission set from staff.
 
@@ -100,7 +100,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 2 | Set **Opportunity mirror start date** to today and save. Reopen the page. | `Direction: Opportunities to Gifts. Won Opportunities closed on or after <today> become gifts.` |
 | 3 | Create a won Opportunity of 60, closed today, with Luis Garcia's account and Luis as primary contact. Click **Run Now** and wait a minute. | A gift of 60 appears on Luis Garcia's record. In **Gifts and Their Opportunities** its **Opportunity ID** names that Opportunity. |
 | 4 | Create a won Opportunity of 80 closed last month and click **Run Now**. | No gift of 80 is made. |
-| 5 | Click **Schedule Nightly Run**. | `Next nightly run: <date> 1:30 AM`. The button changes to **Stop Nightly Run**. |
+| 5 | Click **Schedule Nightly Run**. | `Next nightly run: <date> 1:30 AM`. The button changes to **Stop Nightly Run**. The mirror is now a switched-on step of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md), the one nightly run. |
 | 6 | Click **Stop Nightly Run** (undo). | `The nightly run is not scheduled.` The button changes back to **Schedule Nightly Run**. |
 
 **Cleanup:** set **Opportunity mirror direction** to **Off**; delete the 60 gift and the two Opportunities.

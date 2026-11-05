@@ -17,14 +17,13 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **Find**. Choose **Contact**, add **First Name**, **Last Name** and **Title**, add the condition **Last Name** **equals** `Garcia`, and select **Run**. | The Garcia contacts are listed. Note the count N from "N rows found." |
-| 2 | Open **Change Records** and choose **Super Transformer**. | A panel **Super Transformer** opens under the buttons, with the path **Choose Changes**, **Confirm**, **Run**: "Change up to five fields on every record this query returns, with your own access. Nothing changes until you confirm." |
-| 3 | Under **Changes**, choose **Title** in **Field**, **Set to a value** in **What to do**, and type `test title` in **New Value**. | The change is complete. **Add a Change** is enabled. |
-| 4 | Select **Preview**. | "N records match. The first ones, before and after:" and a table with **Record**, **Before** (empty) and **After** (`test title`) for up to five records. The four columns are equal width, and a long value wraps onto more lines inside its cell instead of stretching the table past the panel. |
-| 5 | Type a number other than N in **Type the number of records to confirm**. | The **Update N records** button stays disabled. |
-| 6 | Type N. | **Update N records** is enabled. |
-| 7 | Select **Update N records**. | "Super Transformer started. It keeps running if you leave this page." then "Updating: X of Y chunks done." |
-| 8 | Wait for it to finish. | "N matched: N updated, 0 already held the new values, 0 failed." and "To undo it, open Data Jobs on the Data Manager tab." |
-| 9 | Select **Run** in Find again. | Every Garcia contact's **Title** reads `test title`. |
+| 2 | Open **Change Records** and choose **Super Transformer**. | The **Super Transformer** tab opens already filled in: **1. Kind of Record** reads **Contact**, **2. Which Records** shows the condition **Last Name** **equals** `Garcia`, **Matching Records** shows N, and a notice reads "Find handed over its kind of record and conditions. Choose what to change, then preview. Nothing has changed yet." Nothing has run. |
+| 3 | Under **3. What to Change**, choose **Title** in **Field**, keep **Set To** in **Action**, and type `test title` in **New Value**. | The change is complete. **Add a Field** is enabled. |
+| 4 | Select **Preview**. | "N records match. The first N, before and after:" and a table with **Record** and **Title**: each **Title** cell shows "(blank)", an arrow, then `test title`. The table scrolls sideways on a phone instead of stacking. |
+| 5 | Select **Run Super Transformer**, then **Cancel**. | A confirmation reads "Change Title on N Contacts." Nothing changed. |
+| 6 | Select **Run Super Transformer** again, then **Run**. Over 200 records the box also asks you to type the number; type a different number first. | With a wrong number **Run** stays disabled. When it is accepted, "Super Transformer started. It keeps running if you leave this page." then a bar with "Updating: N% done." (a percent, never parts of a batch). |
+| 7 | Wait for it to finish. | "N matched: N updated, 0 already held the new values, 0 failed." and "To undo this run, press Undo on it under Data Jobs below." |
+| 8 | Go back to Find and select **Run** again. | Every Garcia contact's **Title** reads `test title`. |
 
 **Cleanup:** keep the job for T-BULK-02, which undoes it.
 
@@ -102,11 +101,13 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 3 | Select **Preview**. | A line saying 3 records match, "The first ones:" with the three names, and any related records Salesforce deletes with them, as badges, under "Salesforce also deletes these related records with them, and brings them back with an undo:". |
 | 4 | Select **Download a Backup First**. | "Reading records for the download..." then "Downloaded 3 records. Nothing has been deleted yet." A CSV with the three contacts and every field you can see downloads. |
 | 5 | Type `2` in **Type the number of records to confirm**. | **Delete 3 records** stays disabled. |
-| 6 | Type `3` and select **Delete 3 records**. | "The bulk delete started..." then "Deleting: X of Y chunks done." and finally "3 matched: 3 deleted, 0 refused." with "To bring these records back, use Undo next to the job under Data Jobs on the Data Manager tab." |
+| 6 | Type `3` and select **Delete 3 records**. | "The bulk delete started..." then "Deleting: N% done." and finally "3 matched: 3 deleted, 0 refused." with "To bring these records back, use Undo next to the job under Data Jobs on the Data Manager tab." |
 | 7 | Run the Find query again. | "No records match these conditions." Their three households still exist (emptied households are kept). |
 | 8 | Open **Data Manager**, **Data Jobs**, choose **Bulk deletes** in **Show**, and select **Undo** beside the job. | "Undo brings back 3 records from the Recycle Bin, except any no longer there. Type 3 to confirm." |
 | 9 | Type `3`, select **Undo Bulk Delete**, and **Refresh** until **Undone**. | **Undone**. |
 | 10 | Run the Find query again. | Del1, Del2 and Del3 are back, each in their household. |
+| 11 | Change the query to match one contact (**First Name** equals `Del1`), **Run**, and select **Preview** in a new Bulk Delete panel. | The line reads "1 Contact matches. It is:". The related-records badges list BarnCRM's kinds first and no Share, History or Feed kinds; a long list ends with "and N more kinds". |
+| 12 | Change the query to match nobody (**First Name** equals `Nobodyhere`) and **Preview**. | **No Records Match** (or "No records match this query, so there is nothing to delete."), with no list, download, confirm box or **Delete** button. |
 
 **Cleanup:** keep the contacts for T-BULK-07 and T-BULK-08, then delete them and their households.
 
@@ -124,14 +125,14 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 ## T-BULK-08: Delete by File
 
-**Purpose:** confirm Load one object's Delete by record ID dry runs a file, then deletes and can be undone like a bulk delete.
+**Purpose:** confirm Load one object's Delete by record ID previews a file, then deletes and can be undone like a bulk delete.
 **Prerequisites:** admin with **BarnCRM Bulk Delete**; the record ID of Del1 (from its address bar) saved as a CSV `delete-ids.csv` with heading `Id` and that one ID.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the Import tab (Data Manager, **Import a File**, **Open**). Under **What Are You Importing?**, choose **Delete the Records a File Lists**, choose **Contact**, name the template `Test delete by file`, and select **Create**. | The new template is chosen, already on **Delete by record ID**, and the line under it reads "Deletes: Contact". |
 | 2 | Select **Next**, upload `delete-ids.csv`, map **Id** to **Salesforce record ID** if needed, and select **Next**. | **What each row does** includes **Delete by record ID**, with its risk text ending "undo from Data Jobs on the Data Manager tab within 15 days." |
-| 3 | Choose **Delete by record ID** and select **Preview**. | The dry run finds 1 record. A delete panel opens: "Delete every record this dry run found, with your own access..." with **Download these records first**, **Type the number of records to confirm** and the delete button. |
+| 3 | Choose **Delete by record ID** and select **Preview**. | The preview finds 1 record. A delete panel opens: "Delete every record the preview found, with your own access..." with **Download these records first**, **Type the number of records to confirm** and the delete button. |
 | 4 | Type `1` and select **Delete 1 records**. | "1 matched: 1 deleted, 0 refused." Del1 is gone; Del2 and Del3 remain. |
 | 5 | Undo the job from **Data Jobs** on the **Data Manager** tab (type `1`, **Undo Bulk Delete**, **Refresh**). | **Undone**. Del1 is back. |
 | 6 | On the Import tab, check **Recent Imports**. | The import's own Undo never undoes a delete: the job is either not offered there, or its Undo is refused with "This is a bulk delete. Undo it from Data Jobs on the Data Manager tab, which brings the records back from the Recycle Bin." |
@@ -164,9 +165,9 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Data Manager** and choose the **Super Transformer** tile. | The **Super Transformer** tab opens on **1. Object**, with no Find note. On a first visit a tip "Bulk Changes Start Here" says to start from Find only for a saved query. Go back. |
-| 2 | Open **Find**. Choose **Contact**, add **Title**, add the condition **Last Name** **equals** `Garcia`, select **Run**, then **Change Records**, **Super Transformer**. | The **Super Transformer** panel shows a path **Choose Changes**, **Confirm**, **Run**, on **Choose Changes**, and **Add a Change**. |
-| 3 | Choose **Title**, **Set to a value**, type `x`, and select **Preview**. | The path moves to **Confirm**. Select **Close**; nothing changed. |
+| 1 | Open **Data Manager** and choose the **Super Transformer** tile. | The **Super Transformer** tab opens on **1. Kind of Record**, with no Find note. On a first visit a tip "Bulk Changes Start Here" says to start from Find only for a saved query. Go back. |
+| 2 | Open **Find**. Choose **Contact**, add **Title**, add the condition **Last Name** **equals** `Garcia`, select **Run**, then **Change Records**, **Super Transformer**. | The **Super Transformer** tab opens with **Contact** and the Garcia condition already filled in, and nothing run. There is no second bulk update panel in Find. |
+| 3 | Choose **Title**, keep **Set To**, type `x`, and select **Preview**. | A before and after table shows. Go back to Find without running; nothing changed. |
 | 4 | Choose **Change Records**, **Bulk Delete**, then **Preview**. | The **Bulk Delete** panel's path **Preview**, **Confirm**, **Run** is on **Confirm**. Any related records deleted with them show as badges. **Download a Backup First** has an info icon whose popover says what the file holds. Select **Close** without typing the count. |
 | 5 | Open **Data Manager**, choose the **Delete Many Records** tile, then **Continue**. | **Find** opens with "Bulk Delete starts here: find the records, press Run, then choose Change Records, Bulk Delete." |
 | 6 | On **Data Manager**, under **Data Jobs**, select **Open Find**. | **Find** opens with a note: "Super Transformer can start here: find the records, press Run, then choose Change Records, Super Transformer." (the way to start from a saved query) |
@@ -181,8 +182,8 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Super Transformer** tab. | The tab reads **Super Transformer**. Five numbered steps show above **Data Jobs**: **1. Object**, **2. Which Records**, **3. What to Change**, **4. Preview**, **5. Run**. Steps 2 and 3 say "Choose an object first." **Preview** and **Run Super Transformer** are disabled. |
-| 2 | Type `cont` in **Search Objects**, then open **Object**. | Only objects whose name contains "cont" are listed. No BarnCRM bookkeeping object (Data Job, Error Log) is offered anywhere in the list. Choose **Contact**. |
+| 1 | Open the **Super Transformer** tab. | The tab reads **Super Transformer**. Five numbered steps show above **Data Jobs**: **1. Kind of Record**, **2. Which Records**, **3. What to Change**, **4. Preview**, **5. Run**. Steps 2 and 3 say "Choose a kind of record first." **Preview** and **Run Super Transformer** are disabled. |
+| 2 | Type `cont` in **Search Kinds of Record**, then open **Kind of record**. | Only kinds of record whose name contains "cont" are listed. No BarnCRM bookkeeping object (Data Job, Error Log) is offered anywhere in the list. Choose **Contact**. |
 | 3 | Wait a moment without adding a condition. | **Matching Records** shows the number of contacts with an **Every Record** badge, and a warning: "No condition is set. This changes every Contact: N records." |
 | 4 | Add the condition **Last Name** **equals** `Garcia`. | After about half a second the count changes to the number of Garcia contacts (note it as N) and the warning goes away. |
 | 5 | Under **3. What to Change**, choose **Title**, keep **Set To**, and type `st test`. Then press **Add a Field**, choose a picklist field (for example **Salutation**). | The second row's **New Value** is a dropdown of the picklist's values. Remove the second row with its delete icon. |
@@ -233,7 +234,7 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 2 | Choose **Contact**, add **Last Name** **equals** `Sttest`, choose **First Name**, choose **Fix Name Capitals**. Type `Sttest list` in **List Name**. | **Save as New List** is enabled. |
 | 3 | Press **Save as New List**. | "Saved the list Sttest list." **Saved List** now offers "Sttest list (Contact)" and has it chosen. |
 | 4 | Type `Sttest list` again and press **Save as New List** a second time. | A red message says a saved list named Sttest list already exists. No second list appears. |
-| 5 | Choose **Account** under **1. Object** (the changes clear). Choose **Sttest list** in **Saved List** and press **Load List**. | "Loaded the list Sttest list." The object is **Contact**, the condition **Last Name** **equals** `Sttest` is back, and **First Name** shows **Change With Steps** with the two name steps. **Matching Records** counts again. Nothing has run. |
+| 5 | Choose **Account** under **1. Kind of Record** (the changes clear). Choose **Sttest list** in **Saved List** and press **Load List**. | "Loaded the list Sttest list." The kind of record is **Contact**, the condition **Last Name** **equals** `Sttest` is back, and **First Name** shows **Change With Steps** with the two name steps. **Matching Records** counts again. Nothing has run. |
 | 6 | Press **Preview** and check the table, but do not run. | The preview works as for any other change; no record has changed. |
 | 6a | Create a text field `Sttest_Temp__c` on Contact (Setup, Object Manager). In **Super Transformer** add the conditions **Last Name** **equals** `Sttest` and **Sttest Temp** **equals** `x`, save the list as `Sttest stale`, then delete the field in Setup and reload **Super Transformer**. Choose **Contact** and press **Preview** on any change first, so the page is filled in, then load **Sttest stale**. | The list is not loaded: a red message says the list Sttest stale was not loaded because its conditions use fields that are gone or that you cannot read, naming `Sttest_Temp__c`, and to edit or delete the saved list. The page, its object, conditions and changes are exactly as you left them. Delete **Sttest stale** afterwards. |
 | 7 | Log in as the second user, open **Super Transformer**. | **Sttest list (Contact)** is offered. Choose it, type `Sttest names` in **List Name** and press **Rename List**: "Renamed the list to Sttest names." |

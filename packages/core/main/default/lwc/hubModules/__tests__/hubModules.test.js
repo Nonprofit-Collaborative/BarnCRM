@@ -88,11 +88,13 @@ describe('c-hub-modules', () => {
       'Giving',
       'Mirror'
     ]);
-    expect(all(element, 'module-status').map((n) => n.textContent)).toEqual([
+    expect(all(element, 'module-status').map((n) => n.label)).toEqual([
       'c.Core_ModuleManager_StatusOn',
       'c.Core_ModuleManager_StatusOff',
       'c.Core_ModuleManager_StatusOn'
     ]);
+    // On is success, Off is neutral: one status vocabulary (vis-core-1).
+    expect(all(element, 'module-status').map((n) => n.status)).toEqual(['on', 'off', 'on']);
   });
 
   it('says the list could not load rather than showing an empty list', async () => {
@@ -134,6 +136,9 @@ describe('c-hub-modules', () => {
     expect(links).toHaveLength(1);
     expect(links[0].getAttribute('href')).toBe('/lightning/app/06m000000000001');
     expect(links[0].textContent).toContain('c.Core_ModuleManager_OpenApp');
+    const logos = all(element, 'module-logo');
+    expect(logos[1].src).toBe('/file-asset/BarnCRM_Fundraising_Logo');
+    expect(logos[2].src).toBeUndefined();
   });
 
   it('opens the Modules section of BarnCRM Settings by page reference', async () => {

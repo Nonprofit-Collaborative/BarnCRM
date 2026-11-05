@@ -5,11 +5,11 @@
  * TriggerHandler.
  */
 public with sharing class PreferredPhoneContactHandler extends TriggerHandler {
-    public override void beforeInsert() {
-        PreferredPhoneService.apply((List<Contact>) newRecords());
-    }
+	public override void beforeInsert() {
+		PreferredPhoneService.apply((List<Contact>) newRecords());
+	}
 
-    public override void beforeUpdate() {
-        PreferredPhoneService.apply((List<Contact>) newRecords());
-    }
+	public override void beforeUpdate() {
+		PreferredPhoneService.apply((List<Contact>) newRecords());
+	}
 }

@@ -9,7 +9,13 @@ import getOverview from '@salesforce/apex/AccessExplorerController.getOverview';
 import listObjects from '@salesforce/apex/DataDictionaryController.listObjects';
 import describeObject from '@salesforce/apex/DataDictionaryController.describeObject';
 import { format, messageFrom, downloadCsv } from 'c/findCsv';
-import { withFlags as toFlagRow, withDetails } from 'c/accessExplorerRows';
+import {
+  withFlags as toFlagRow,
+  withDetails,
+  barnName,
+  shownColumns,
+  nameOptions
+} from 'c/accessExplorerRows';
 
 import TITLE from '@salesforce/label/c.Core_AccessExplorer_Title';
 import SHOW from '@salesforce/label/c.Core_DataJobs_Show';
@@ -23,8 +29,6 @@ import LOOK_UP from '@salesforce/label/c.Core_AccessExplorer_LookUp';
 import LOOK_UP_PERSON from '@salesforce/label/c.Core_Section_Person';
 import LOOK_UP_SET from '@salesforce/label/c.Core_AccessExplorer_KindSet';
 import SEARCH_PLACEHOLDER from '@salesforce/label/c.Core_AccessExplorer_SearchPlaceholder';
-import NO_MATCHES from '@salesforce/label/c.Core_AccessExplorer_NoMatches';
-import CHOOSE_SUBJECT from '@salesforce/label/c.Core_AccessExplorer_ChooseSubject';
 import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
 import KIND_PROFILE from '@salesforce/label/c.Core_AccessExplorer_KindProfile';
 import KIND_GROUP from '@salesforce/label/c.Core_AccessExplorer_KindGroup';
@@ -39,12 +43,7 @@ import FIELD_NONE from '@salesforce/label/c.Core_AccessExplorer_FieldNone';
 import GRANTS_HEADING from '@salesforce/label/c.Core_AccessExplorer_GrantsHeading';
 import PEOPLE_HEADING from '@salesforce/label/c.Core_AccessExplorer_PeopleHeading';
 import SHOW_MORE from '@salesforce/label/c.Core_AccessExplorer_ShowMore';
-import TRUNCATED from '@salesforce/label/c.Core_AccessExplorer_Truncated';
-import TAB_CHECK_SCHEDULED from '@salesforce/label/c.Core_AccessExplorer_TabCheckScheduled';
-import TAB_CHECK_NOT_SCHEDULED from '@salesforce/label/c.Core_AccessExplorer_TabCheckNotScheduled';
 import DOWNLOAD from '@salesforce/label/c.Core_AccessExplorer_Download';
-import DOWNLOADED from '@salesforce/label/c.Core_AccessExplorer_Downloaded';
-import NOTHING_TO_SHOW from '@salesforce/label/c.Core_AccessExplorer_NothingToShow';
 import YES from '@salesforce/label/c.Core_AccessExplorer_Yes';
 import ALWAYS from '@salesforce/label/c.Core_AccessExplorer_Always';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
@@ -61,6 +60,7 @@ import COL_MODIFY_ALL from '@salesforce/label/c.Core_AccessExplorer_ColModifyAll
 import COL_GRANTED_BY from '@salesforce/label/c.Core_AccessExplorer_ColGrantedBy';
 import COL_ACTIVE_PEOPLE from '@salesforce/label/c.Core_AccessExplorer_ColActivePeople';
 import COL_PERSON from '@salesforce/label/c.Core_Section_Person';
+import SHOW_TECHNICAL_NAMES from '@salesforce/label/c.Core_Shared_ShowTechnicalNames';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_BASE = 'Access_Explorer';
@@ -84,9 +84,17 @@ const READ_EDIT_COLUMNS = FLAG_COLUMNS.filter((column) =>
 const GRANTED_BY = text('grantedBy', COL_GRANTED_BY, { wrapText: true });
 const ACTIVE_PEOPLE = text('activePeople', COL_ACTIVE_PEOPLE, { type: 'number' });
 
-const WORDS = { yes: YES, always: ALWAYS, kinds: KINDS };
+/** An API name column: shown only while Show technical names is on (admin-24). */
+const API_NAME = text('name', COL_API_NAME, { technical: true });
+
+/** How a BarnCRM role or extra permission is named, as on the Access page (admin-9). */
+const barnNames = () => ({
+  role: helpText('Core', 'Core_AccessExplorer_RoleName'),
+  extraPermission: helpText('Core', 'Core_AccessExplorer_ExtraPermissionName')
+});
 /** A row as the table and CSV show it (c/accessExplorerRows, framework free). */
-const withFlags = (row) => toFlagRow(row, WORDS);
+const withFlags = (row) =>
+  toFlagRow(row, { yes: YES, always: ALWAYS, kinds: KINDS, barnNames: barnNames() });
 
 /**
  * The Access Explorer section of Org Optimizer (C-53, plan Section 6.1.1 item 7, D-154, admin
@@ -115,8 +123,12 @@ export default class AccessExplorer extends LightningElement {
     show: SHOW,
     lookUp: LOOK_UP,
     searchPlaceholder: SEARCH_PLACEHOLDER,
-    noMatches: NO_MATCHES,
-    chooseSubject: CHOOSE_SUBJECT,
+    get noMatches() {
+      return helpText('Core', 'Core_AccessExplorer_NoMatches');
+    },
+    get chooseSubject() {
+      return helpText('Core', 'Core_AccessExplorer_ChooseSubject');
+    },
     inactive: INACTIVE,
     sourcesHeading: SOURCES_HEADING,
     objectsHeading: OBJECTS_HEADING,
@@ -136,11 +148,18 @@ export default class AccessExplorer extends LightningElement {
     get alwaysField() {
       return helpText('Core', 'Core_AccessExplorer_AlwaysField');
     },
-    tabCheckScheduled: TAB_CHECK_SCHEDULED,
-    tabCheckNotScheduled: TAB_CHECK_NOT_SCHEDULED,
+    get tabCheckScheduled() {
+      return helpText('Core', 'Core_AccessExplorer_TabCheckScheduled');
+    },
+    get tabCheckNotScheduled() {
+      return helpText('Core', 'Core_AccessExplorer_TabCheckNotScheduled');
+    },
     download: DOWNLOAD,
-    nothingToShow: NOTHING_TO_SHOW,
-    loading: LOADING
+    get nothingToShow() {
+      return helpText('Core', 'Core_AccessExplorer_NothingToShow');
+    },
+    loading: LOADING,
+    showTechnicalNames: SHOW_TECHNICAL_NAMES
   };
 
   viewOptions = [
@@ -163,10 +182,11 @@ export default class AccessExplorer extends LightningElement {
   subject;
   fieldObject;
   fieldRows = [];
-  objectOptions = [];
+  objectChoices = [];
   objectName;
-  fieldOptions = [];
+  fieldChoices = [];
   fieldName = '';
+  showTechnicalNames = false;
   objectAccess;
   people = [];
   nextPage;
@@ -180,13 +200,22 @@ export default class AccessExplorer extends LightningElement {
   @wire(listObjects)
   wiredObjects({ data, error }) {
     if (data) {
-      this.objectOptions = data.map((option) => ({
-        value: option.value,
-        label: `${option.label} (${option.value})`
-      }));
+      this.objectChoices = data;
     } else if (error) {
       this.errorMessage = messageFrom(error);
     }
+  }
+
+  get objectOptions() {
+    return nameOptions(this.objectChoices, this.showTechnicalNames);
+  }
+
+  get fieldOptions() {
+    return nameOptions(this.fieldChoices, this.showTechnicalNames);
+  }
+
+  handleTechnicalNames(event) {
+    this.showTechnicalNames = event.target.checked;
   }
 
   get isSubjectView() {
@@ -218,9 +247,14 @@ export default class AccessExplorer extends LightningElement {
   }
 
   get resultItems() {
+    const patterns = barnNames();
     return (this.results || []).map((choice) => ({
       ...choice,
-      text: [choice.label, KINDS[choice.detail] || choice.detail, choice.isActive ? '' : INACTIVE]
+      text: [
+        barnName(choice.label, choice.barnKind, patterns),
+        KINDS[choice.detail] || choice.detail,
+        choice.isActive ? '' : INACTIVE
+      ]
         .filter(Boolean)
         .join(', ')
     }));
@@ -230,7 +264,7 @@ export default class AccessExplorer extends LightningElement {
     if (!this.subject) {
       return undefined;
     }
-    return withDetails(this.subject.label, [
+    return withDetails(barnName(this.subject.label, this.subject.barnKind, barnNames()), [
       KINDS[this.subject.detail] || this.subject.detail,
       this.subject.isActive ? '' : INACTIVE
     ]);
@@ -255,15 +289,18 @@ export default class AccessExplorer extends LightningElement {
   }
 
   get fieldObjectOptions() {
-    return (this.subject ? this.subject.objects : []).map((row) => ({
-      value: row.name,
-      label: `${row.label} (${row.name})`
-    }));
+    return nameOptions(
+      (this.subject ? this.subject.objects : []).map((row) => ({
+        value: row.name,
+        label: row.label
+      })),
+      this.showTechnicalNames
+    );
   }
 
   get truncatedMessage() {
     return this.objectAccess && this.objectAccess.truncated
-      ? format(TRUNCATED, MAX_GRANTS)
+      ? format(helpText('Core', 'Core_AccessExplorer_Truncated'), MAX_GRANTS)
       : undefined;
   }
 
@@ -281,6 +318,19 @@ export default class AccessExplorer extends LightningElement {
 
   /** Every table the section shows, by name: its columns and rows (the CSV uses the same). */
   get tables() {
+    const all = this.allTables;
+    const shown = {};
+    for (const name of Object.keys(all)) {
+      shown[name] = {
+        rows: all[name].rows,
+        columns: shownColumns(all[name].columns, this.showTechnicalNames)
+      };
+    }
+    return shown;
+  }
+
+  /** Every table with every column, API name columns marked technical. */
+  get allTables() {
     const fieldMode = Boolean(this.fieldName);
     return {
       sources: {
@@ -292,21 +342,11 @@ export default class AccessExplorer extends LightningElement {
         rows: (this.subject ? this.subject.sources : []).map(withFlags)
       },
       objects: {
-        columns: [
-          text('label', KIND_OF_RECORD),
-          text('name', COL_API_NAME),
-          ...FLAG_COLUMNS,
-          GRANTED_BY
-        ],
+        columns: [text('label', KIND_OF_RECORD), API_NAME, ...FLAG_COLUMNS, GRANTED_BY],
         rows: (this.subject ? this.subject.objects : []).map(withFlags)
       },
       fields: {
-        columns: [
-          text('label', FIELD),
-          text('name', COL_API_NAME),
-          ...READ_EDIT_COLUMNS,
-          GRANTED_BY
-        ],
+        columns: [text('label', FIELD), API_NAME, ...READ_EDIT_COLUMNS, GRANTED_BY],
         rows: this.fieldRows.map(withFlags)
       },
       grants: {
@@ -327,12 +367,7 @@ export default class AccessExplorer extends LightningElement {
         rows: this.people.map(withFlags)
       },
       barncrm: {
-        columns: [
-          text('label', COL_NAME),
-          text('name', COL_API_NAME),
-          text('kindLabel', COL_KIND),
-          ACTIVE_PEOPLE
-        ],
+        columns: [text('label', COL_NAME), API_NAME, text('kindLabel', COL_KIND), ACTIVE_PEOPLE],
         rows: (this.overview ? this.overview.sets : []).map(withFlags)
       }
     };
@@ -430,14 +465,14 @@ export default class AccessExplorer extends LightningElement {
   handleObject(event) {
     this.objectName = event.detail.value;
     this.fieldName = '';
-    this.fieldOptions = [];
+    this.fieldChoices = [];
     this.load(async () => {
       const described = await describeObject({ objectName: this.objectName });
-      this.fieldOptions = [
+      this.fieldChoices = [
         { value: '', label: FIELD_NONE },
         ...described.fields.map((field) => ({
           value: field.fieldName,
-          label: `${field.fieldLabel} (${field.fieldName})`
+          label: field.fieldLabel
         }))
       ];
       await this.loadObjectAccess();
@@ -496,6 +531,9 @@ export default class AccessExplorer extends LightningElement {
       path: column.fieldName
     }));
     downloadCsv(FILE_BASE, columns, table.rows);
-    this.noticeMessage = format(DOWNLOADED, String(table.rows.length));
+    this.noticeMessage = format(
+      helpText('Core', 'Core_AccessExplorer_Downloaded'),
+      String(table.rows.length)
+    );
   }
 }

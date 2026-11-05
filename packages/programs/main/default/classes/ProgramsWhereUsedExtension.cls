@@ -9,64 +9,64 @@
  */
 @NamespaceAccessible
 public with sharing class ProgramsWhereUsedExtension implements WhereUsedExtension {
-    private static final String KIND = 'eligibilityRules';
-    private static final String RULES_OBJECT = 'Enrollment__c';
+	private static final String KIND = 'eligibilityRules';
+	private static final String RULES_OBJECT = 'Enrollment__c';
 
-    @NamespaceAccessible
-    public ProgramsWhereUsedExtension() {
-        // Built by name from Core (WhereUsedExtensions), so it needs a public constructor.
-    }
+	@NamespaceAccessible
+	public ProgramsWhereUsedExtension() {
+		// Built by name from Core (WhereUsedExtensions), so it needs a public constructor.
+	}
 
-    public List<WhereUsedService.Reference> references(WhereUsedService.Target target) {
-        List<WhereUsedService.Reference> found = new List<WhereUsedService.Reference>();
-        if (target.isObject()) {
-            // Rules read only Programs' own Enrollment object, which only the module removes.
-            return found;
-        }
-        for (Program__c program : [
-            SELECT Id, Name, Eligibility_Rules__c
-            FROM Program__c
-            WITH SYSTEM_MODE
-            ORDER BY Name
-            LIMIT 2000
-        ]) {
-            if (rulesName(target, program.Eligibility_Rules__c)) {
-                found.add(
-                    new WhereUsedService.Reference(
-                            KIND,
-                            Schema.SObjectType.Program__c.getLabelPlural(),
-                            program.Name,
-                            program.Id
-                        )
-                        .addPart(
-                            Schema.SObjectType.Program__c.fields.Eligibility_Rules__c.getLabel()
-                        )
-                        .withBreaks(System.Label.Core_WhereUsed_BreaksModuleRecord)
-                        .withRecordEdit(program.Id)
-                );
-            }
-        }
-        return found;
-    }
+	public List<WhereUsedService.Reference> references(WhereUsedService.Target target) {
+		List<WhereUsedService.Reference> found = new List<WhereUsedService.Reference>();
+		if (target.isObject()) {
+			// Rules read only Programs' own Enrollment object, which only the module removes.
+			return found;
+		}
+		for (Program__c program : [
+			SELECT Id, Name, Eligibility_Rules__c
+			FROM Program__c
+			WITH SYSTEM_MODE
+			ORDER BY Name
+			LIMIT 2000
+		]) {
+			if (rulesName(target, program.Eligibility_Rules__c)) {
+				found.add(
+					new WhereUsedService.Reference(
+							KIND,
+							Schema.SObjectType.Program__c.getLabelPlural(),
+							program.Name,
+							program.Id
+						)
+						.addPart(
+							Schema.SObjectType.Program__c.fields.Eligibility_Rules__c.getLabel()
+						)
+						.withBreaks(System.Label.Core_WhereUsed_BreaksModuleRecord)
+						.withRecordEdit(program.Id)
+				);
+			}
+		}
+		return found;
+	}
 
-    /** True when any condition of any rule reads the target field. */
-    @TestVisible
-    private static Boolean rulesName(WhereUsedService.Target target, String rules) {
-        for (Object rule : WhereUsedService.listOf(WhereUsedService.parsed(rules).get('rules'))) {
-            if (!(rule instanceof Map<String, Object>)) {
-                continue;
-            }
-            for (
-                Object condition : WhereUsedService.listOf(((Map<String, Object>) rule).get('all'))
-            ) {
-                Object field = condition instanceof Map<String, Object>
-                    ? ((Map<String, Object>) condition).get('field')
-                    : null;
-                if (field instanceof String && target.matchesField(RULES_OBJECT, (String) field)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+	/** True when any condition of any rule reads the target field. */
+	@TestVisible
+	private static Boolean rulesName(WhereUsedService.Target target, String rules) {
+		for (Object rule : WhereUsedService.listOf(WhereUsedService.parsed(rules).get('rules'))) {
+			if (!(rule instanceof Map<String, Object>)) {
+				continue;
+			}
+			for (
+				Object condition : WhereUsedService.listOf(((Map<String, Object>) rule).get('all'))
+			) {
+				Object field = condition instanceof Map<String, Object>
+					? ((Map<String, Object>) condition).get('field')
+					: null;
+				if (field instanceof String && target.matchesField(RULES_OBJECT, (String) field)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }

@@ -5,7 +5,7 @@
 **Super Transformer** changes many records at once without a file and without building a Find
 query first. It is the top of the **Super Transformer** tab, and it walks you down one page in five numbered cards:
 
-1. **Object**: search for and choose the kind of record to change, for example Contact. Only
+1. **Kind of Record**: search for and choose the kind of record to change, for example Contact. Only
    objects you may edit are offered.
 2. **Which Records**: add conditions in plain words, the same condition rows Find uses (for
    example **Mailing City** **equals** `springfield`). The number of matching records
@@ -40,7 +40,7 @@ long as an import can be undone.
    in place of the cards, and no error.
 2. The **Data Manager** feature must be on (BarnCRM Settings, **General**), because the tab is
    one of its tools.
-3. Optional: **Super Transformer run limit** and **Bulk chunk size** (BarnCRM Settings, **Import**)
+3. Optional: **Super Transformer run limit** and **Records per batch in background jobs** (BarnCRM Settings, **Import**)
    apply to every Super Transformer run, whether it starts here or in Find. There is no setting of its own.
 
 ## 3. A Five-Minute Walkthrough (as Maria)
@@ -48,7 +48,7 @@ long as an import can be undone.
 Maria wants every volunteer in Springfield whose **Title** is empty to read `Volunteer`.
 
 1. Open the **Super Transformer** tab (from **Data Manager**, or the App Launcher).
-2. Under **1. Object**, type `con` in the search box and choose **Contact**.
+2. Under **1. Kind of Record**, type `con` in the search box and choose **Contact**.
 3. Under **2. Which Records**, add the condition **Mailing City** **equals** `Springfield`,
    then **Add Condition**, **Title** **is blank**. The count reads, for example, "37 contacts
    match."

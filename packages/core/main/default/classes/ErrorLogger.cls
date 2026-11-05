@@ -13,217 +13,217 @@
  */
 @NamespaceAccessible
 public with sharing class ErrorLogger {
-    @NamespaceAccessible
-    public static final String SEVERITY_INFO = 'Info';
-    @NamespaceAccessible
-    public static final String SEVERITY_WARNING = 'Warning';
-    @NamespaceAccessible
-    public static final String SEVERITY_ERROR = 'Error';
-    public static final String SEVERITY_CRITICAL = 'Critical';
-    public static final String STATUS_NEW = 'New';
-    public static final String STATUS_ACKNOWLEDGED = 'Acknowledged';
-    public static final String STATUS_RESOLVED = 'Resolved';
-    public static final String STATUS_IGNORED = 'Ignored';
+	@NamespaceAccessible
+	public static final String SEVERITY_INFO = 'Info';
+	@NamespaceAccessible
+	public static final String SEVERITY_WARNING = 'Warning';
+	@NamespaceAccessible
+	public static final String SEVERITY_ERROR = 'Error';
+	public static final String SEVERITY_CRITICAL = 'Critical';
+	public static final String STATUS_NEW = 'New';
+	public static final String STATUS_ACKNOWLEDGED = 'Acknowledged';
+	public static final String STATUS_RESOLVED = 'Resolved';
+	public static final String STATUS_IGNORED = 'Ignored';
 
-    private static final Integer MAX_LONG_TEXT = 32000;
-    private static final Integer MAX_CONTEXT = 255;
-    private static final Integer MAX_OBJECT_NAME = 80;
-    private static final Set<String> SEVERITIES = new Set<String>{
-        SEVERITY_INFO,
-        SEVERITY_WARNING,
-        SEVERITY_ERROR,
-        SEVERITY_CRITICAL
-    };
+	private static final Integer MAX_LONG_TEXT = 32000;
+	private static final Integer MAX_CONTEXT = 255;
+	private static final Integer MAX_OBJECT_NAME = 80;
+	private static final Set<String> SEVERITIES = new Set<String>{
+		SEVERITY_INFO,
+		SEVERITY_WARNING,
+		SEVERITY_ERROR,
+		SEVERITY_CRITICAL
+	};
 
-    @NamespaceAccessible
-    public static void log(Exception thrown, String context) {
-        log(thrown, context, null);
-    }
+	@NamespaceAccessible
+	public static void log(Exception thrown, String context) {
+		log(thrown, context, null);
+	}
 
-    @NamespaceAccessible
-    public static void log(Exception thrown, String context, Id recordId) {
-        if (thrown == null) {
-            return;
-        }
-        log(new List<Exception>{ thrown }, context, recordId);
-    }
+	@NamespaceAccessible
+	public static void log(Exception thrown, String context, Id recordId) {
+		if (thrown == null) {
+			return;
+		}
+		log(new List<Exception>{ thrown }, context, recordId);
+	}
 
-    @NamespaceAccessible
-    public static void log(List<Exception> thrown, String context) {
-        log(thrown, context, null);
-    }
+	@NamespaceAccessible
+	public static void log(List<Exception> thrown, String context) {
+		log(thrown, context, null);
+	}
 
-    @NamespaceAccessible
-    public static void log(List<Exception> thrown, String context, Id recordId) {
-        logAll(thrown, context, recordId, null);
-    }
+	@NamespaceAccessible
+	public static void log(List<Exception> thrown, String context, Id recordId) {
+		logAll(thrown, context, recordId, null);
+	}
 
-    /** Each failure as one entry, read under `message`, or the generic message when blank. */
-    private static void logAll(
-        List<Exception> thrown,
-        String context,
-        Id recordId,
-        String message
-    ) {
-        if (thrown == null || thrown.isEmpty()) {
-            return;
-        }
-        List<Error_Log__c> entries = new List<Error_Log__c>();
-        try {
-            for (Exception failure : thrown) {
-                if (failure == null) {
-                    continue;
-                }
-                entries.add(
-                    buildEntry(
-                        String.isBlank(message) ? friendlyMessage(context) : message,
-                        technicalDetail(failure),
-                        context,
-                        SEVERITY_ERROR,
-                        recordId
-                    )
-                );
-            }
-        } catch (Exception failedToBuild) {
-            // Deliberate last resort: this catch runs before any Error_Log__c row exists to
-            // write, so there is no queue-able entry left to hand to ErrorLogWriter. The debug
-            // log is the only place this failure can go. Kept intentionally (PMD
-            // AvoidDebugStatements finding accepted, not suppressed).
-            System.debug(
-                LoggingLevel.ERROR,
-                'BarnCRM could not build an Error Log record: ' + failedToBuild.getMessage()
-            );
-        }
-        ErrorLogWriter.write(entries);
-    }
+	/** Each failure as one entry, read under `message`, or the generic message when blank. */
+	private static void logAll(
+		List<Exception> thrown,
+		String context,
+		Id recordId,
+		String message
+	) {
+		if (thrown == null || thrown.isEmpty()) {
+			return;
+		}
+		List<Error_Log__c> entries = new List<Error_Log__c>();
+		try {
+			for (Exception failure : thrown) {
+				if (failure == null) {
+					continue;
+				}
+				entries.add(
+					buildEntry(
+						String.isBlank(message) ? friendlyMessage(context) : message,
+						technicalDetail(failure),
+						context,
+						SEVERITY_ERROR,
+						recordId
+					)
+				);
+			}
+		} catch (Exception failedToBuild) {
+			// Deliberate last resort: this catch runs before any Error_Log__c row exists to
+			// write, so there is no queue-able entry left to hand to ErrorLogWriter. The debug
+			// log is the only place this failure can go. Kept intentionally (PMD
+			// AvoidDebugStatements finding accepted, not suppressed).
+			System.debug(
+				LoggingLevel.ERROR,
+				'BarnCRM could not build an Error Log record: ' + failedToBuild.getMessage()
+			);
+		}
+		ErrorLogWriter.write(entries);
+	}
 
-    /**
-     * A caught failure with a message of the caller's own in place of the generic one, for a
-     * failure the caller can say more about; the technical detail is kept as `log` keeps it.
-     */
-    @NamespaceAccessible
-    public static void logWithMessage(Exception thrown, String context, String message) {
-        if (thrown == null) {
-            return;
-        }
-        logAll(new List<Exception>{ thrown }, context, null, message);
-    }
+	/**
+	 * A caught failure with a message of the caller's own in place of the generic one, for a
+	 * failure the caller can say more about; the technical detail is kept as `log` keeps it.
+	 */
+	@NamespaceAccessible
+	public static void logWithMessage(Exception thrown, String context, String message) {
+		if (thrown == null) {
+			return;
+		}
+		logAll(new List<Exception>{ thrown }, context, null, message);
+	}
 
-    @NamespaceAccessible
-    public static void logMessage(String message, String context, String severity) {
-        logMessage(message, context, severity, null);
-    }
+	@NamespaceAccessible
+	public static void logMessage(String message, String context, String severity) {
+		logMessage(message, context, severity, null);
+	}
 
-    @NamespaceAccessible
-    public static void logMessage(String message, String context, String severity, Id recordId) {
-        if (String.isBlank(message)) {
-            return;
-        }
-        ErrorLogWriter.write(
-            new List<Error_Log__c>{ buildEntry(message, null, context, severity, recordId) }
-        );
-    }
+	@NamespaceAccessible
+	public static void logMessage(String message, String context, String severity, Id recordId) {
+		if (String.isBlank(message)) {
+			return;
+		}
+		ErrorLogWriter.write(
+			new List<Error_Log__c>{ buildEntry(message, null, context, severity, recordId) }
+		);
+	}
 
-    @NamespaceAccessible
-    public static void logMessages(List<String> messages, String context, String severity) {
-        if (messages == null || messages.isEmpty()) {
-            return;
-        }
-        List<Error_Log__c> entries = new List<Error_Log__c>();
-        for (String message : messages) {
-            if (String.isNotBlank(message)) {
-                entries.add(buildEntry(message, null, context, severity, null));
-            }
-        }
-        ErrorLogWriter.write(entries);
-    }
+	@NamespaceAccessible
+	public static void logMessages(List<String> messages, String context, String severity) {
+		if (messages == null || messages.isEmpty()) {
+			return;
+		}
+		List<Error_Log__c> entries = new List<Error_Log__c>();
+		for (String message : messages) {
+			if (String.isNotBlank(message)) {
+				entries.add(buildEntry(message, null, context, severity, null));
+			}
+		}
+		ErrorLogWriter.write(entries);
+	}
 
-    /**
-     * Many messages, each about its own record, in one statement. `recordIds` runs alongside
-     * `messages`: entry i is about record i, and a null, or a list shorter than the messages,
-     * leaves that entry without a record.
-     */
-    @NamespaceAccessible
-    public static void logMessages(
-        List<String> messages,
-        List<Id> recordIds,
-        String context,
-        String severity
-    ) {
-        if (messages == null || messages.isEmpty()) {
-            return;
-        }
-        List<Error_Log__c> entries = new List<Error_Log__c>();
-        for (Integer i = 0; i < messages.size(); i++) {
-            if (String.isBlank(messages[i])) {
-                continue;
-            }
-            Id recordId = recordIds == null || i >= recordIds.size() ? null : recordIds[i];
-            entries.add(buildEntry(messages[i], null, context, severity, recordId));
-        }
-        ErrorLogWriter.write(entries);
-    }
+	/**
+	 * Many messages, each about its own record, in one statement. `recordIds` runs alongside
+	 * `messages`: entry i is about record i, and a null, or a list shorter than the messages,
+	 * leaves that entry without a record.
+	 */
+	@NamespaceAccessible
+	public static void logMessages(
+		List<String> messages,
+		List<Id> recordIds,
+		String context,
+		String severity
+	) {
+		if (messages == null || messages.isEmpty()) {
+			return;
+		}
+		List<Error_Log__c> entries = new List<Error_Log__c>();
+		for (Integer i = 0; i < messages.size(); i++) {
+			if (String.isBlank(messages[i])) {
+				continue;
+			}
+			Id recordId = recordIds == null || i >= recordIds.size() ? null : recordIds[i];
+			entries.add(buildEntry(messages[i], null, context, severity, recordId));
+		}
+		ErrorLogWriter.write(entries);
+	}
 
-    private static Error_Log__c buildEntry(
-        String message,
-        String detail,
-        String context,
-        String severity,
-        Id recordId
-    ) {
-        Error_Log__c entry = new Error_Log__c(
-            Timestamp__c = System.now(),
-            User__c = UserInfo.getUserId(),
-            Context__c = truncate(String.isBlank(context) ? 'BarnCRM' : context, MAX_CONTEXT),
-            Message__c = truncate(message, MAX_LONG_TEXT),
-            Technical_Detail__c = truncate(detail, MAX_LONG_TEXT),
-            Severity__c = SEVERITIES.contains(severity) ? severity : SEVERITY_ERROR,
-            Status__c = STATUS_NEW
-        );
-        if (recordId != null) {
-            entry.Record_Reference__c = String.valueOf(recordId);
-            entry.Object_Name__c = truncate(
-                String.valueOf(recordId.getSObjectType()),
-                MAX_OBJECT_NAME
-            );
-        }
-        return entry;
-    }
+	private static Error_Log__c buildEntry(
+		String message,
+		String detail,
+		String context,
+		String severity,
+		Id recordId
+	) {
+		Error_Log__c entry = new Error_Log__c(
+			Timestamp__c = System.now(),
+			User__c = UserInfo.getUserId(),
+			Context__c = truncate(String.isBlank(context) ? 'BarnCRM' : context, MAX_CONTEXT),
+			Message__c = truncate(message, MAX_LONG_TEXT),
+			Technical_Detail__c = truncate(detail, MAX_LONG_TEXT),
+			Severity__c = SEVERITIES.contains(severity) ? severity : SEVERITY_ERROR,
+			Status__c = STATUS_NEW
+		);
+		if (recordId != null) {
+			entry.Record_Reference__c = String.valueOf(recordId);
+			entry.Object_Name__c = truncate(
+				String.valueOf(recordId.getSObjectType()),
+				MAX_OBJECT_NAME
+			);
+		}
+		return entry;
+	}
 
-    /**
-     * What Maria reads: the label, naming where it happened so two entries from different
-     * places read differently in the list and the digest (ADMIN-23). Never the exception's own
-     * message, which is written for a developer ("Attempt to de-reference a null object") and
-     * belongs in the technical detail, the field the admin guide tells her to forward.
-     */
-    @TestVisible
-    private static String friendlyMessage(String context) {
-        return String.isBlank(context)
-            ? Label.Core_ErrorLog_UnexpectedFailure
-            : String.format(
-                  Label.Core_ErrorLog_UnexpectedFailureIn,
-                  new List<Object>{ context.trim() }
-              );
-    }
+	/**
+	 * What Maria reads: the label, naming where it happened so two entries from different
+	 * places read differently in the list and the digest (ADMIN-23). Never the exception's own
+	 * message, which is written for a developer ("Attempt to de-reference a null object") and
+	 * belongs in the technical detail, the field the admin guide tells her to forward.
+	 */
+	@TestVisible
+	private static String friendlyMessage(String context) {
+		return String.isBlank(context)
+			? BarnHelp.text('Core', 'Core_ErrorLog_UnexpectedFailure')
+			: String.format(
+					Label.Core_ErrorLog_UnexpectedFailureIn,
+					new List<Object>{ context.trim() }
+			  );
+	}
 
-    private static String technicalDetail(Exception thrown) {
-        String detail =
-            thrown.getTypeName() +
-            ': ' +
-            thrown.getMessage() +
-            '\n' +
-            thrown.getStackTraceString();
-        Exception cause = thrown.getCause();
-        if (cause != null) {
-            detail += '\nCaused by ' + cause.getTypeName() + ': ' + cause.getMessage();
-        }
-        return detail;
-    }
+	private static String technicalDetail(Exception thrown) {
+		String detail =
+			thrown.getTypeName() +
+			': ' +
+			thrown.getMessage() +
+			'\n' +
+			thrown.getStackTraceString();
+		Exception cause = thrown.getCause();
+		if (cause != null) {
+			detail += '\nCaused by ' + cause.getTypeName() + ': ' + cause.getMessage();
+		}
+		return detail;
+	}
 
-    private static String truncate(String value, Integer maxLength) {
-        if (String.isBlank(value)) {
-            return value;
-        }
-        return value.length() > maxLength ? value.substring(0, maxLength) : value;
-    }
+	private static String truncate(String value, Integer maxLength) {
+		if (String.isBlank(value)) {
+			return value;
+		}
+		return value.length() > maxLength ? value.substring(0, maxLength) : value;
+	}
 }

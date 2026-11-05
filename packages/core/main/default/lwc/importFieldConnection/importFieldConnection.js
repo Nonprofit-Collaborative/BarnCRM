@@ -6,7 +6,6 @@ import STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
 import CONNECTED from '@salesforce/label/c.Core_ImportNewField_PanelConnected';
 import NOT_CONNECTED from '@salesforce/label/c.Core_ImportNewField_PanelNotConnected';
 import SET_UP from '@salesforce/label/c.Core_ImportNewField_SetUpButton';
-import NEEDS_PERMISSION from '@salesforce/label/c.Core_ImportNewField_PanelNeedsPermission';
 import CALLOUTS_OFF from '@salesforce/label/c.Core_ImportNewField_PanelCalloutsOff';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import UNEXPECTED from '@salesforce/label/c.Core_UnexpectedError';
@@ -27,7 +26,9 @@ export default class ImportFieldConnection extends LightningElement {
     },
     status: STATUS,
     setUp: SET_UP,
-    needsPermission: NEEDS_PERMISSION,
+    get needsPermission() {
+      return helpText('Core', 'Core_ImportNewField_PanelNeedsPermission');
+    },
     get enableSteps() {
       return helpText('Core', 'Core_ImportNewField_PanelEnableSteps');
     },

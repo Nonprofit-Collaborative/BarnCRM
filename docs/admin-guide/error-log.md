@@ -22,7 +22,12 @@ You will find it in three places:
   The tile shows the count only, not the entries. When some of those errors came from the
   install or an upgrade (including a package's setup steps), a line under the count says how many ("Of the new errors above, 3
   came from the install and upgrades"); that number is part of the count, not added to it.
-- **The Org Optimizer tab, Errors section.** The **Error Log** card shows the count of new
+  Below it, the **Errors by Day** report chart shows the Error and Critical entries of each of
+  the last 30 days, from the **BarnCRM Admin** report folder (the **BarnCRM Error Logs** report
+  type). Both show only to people with Manage BarnCRM Settings.
+- **The Org Optimizer tab, Errors section**, the home for working through errors (a link can
+  open it directly with `c__section=errors`; see [Org Optimizer](org-optimizer.md)). The
+  **Error Log** card shows the count of new
   entries and the five most recent, each with its message and where it came from, an
   **Open This Entry** button and a **Mark Acknowledged** button. The Errors section needs
   the Manage BarnCRM Settings permission (the BarnCRM Admin role).
@@ -118,16 +123,16 @@ it.
 
 Each entry can hold a long technical detail, so an Error Log that is never emptied slowly
 fills your organization's data storage. BarnCRM deletes entries older than **180 days**, whatever
-their status, every morning when the daily Error Log run starts (the same 7:00 AM run that
-sends the digest).
+their status, every night in the Record Cleanup step of the nightly run (see
+[Nightly Jobs](nightly-jobs.md)).
 
 1. Open **BarnCRM Settings** and click **Error Log** in the left navigation.
 2. In **Days to keep Error Log entries**, type how many days to keep them, from 1 to
-   3,650, or 0 to keep every entry forever. Click **Save**. The next morning's run deletes
+   3,650, or 0 to keep every entry forever. Click **Save**. The next night's run deletes
    anything older; nothing is deleted when you save.
-3. Make sure the daily run is scheduled: the **Error Digest** panel says so, and Health
-   Check lists it under **Nightly Jobs Are Not Scheduled** when it is not. Old entries are
-   deleted only while it runs, whether or not anyone receives the digest.
+3. Make sure the nightly run is scheduled: Health Check lists it under **Nightly Jobs Are
+   Not Scheduled** when it is not. Old entries are deleted whenever the nightly run runs,
+   whether or not the daily digest is on.
 
 Deleted entries go to the Recycle Bin for 15 days, like any record you delete. If you need
 an entry for longer, export the Error Log list or build a report on it before it ages out.

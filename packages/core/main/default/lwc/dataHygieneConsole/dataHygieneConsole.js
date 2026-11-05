@@ -9,8 +9,6 @@ import RECOUNT from '@salesforce/label/c.Core_DataHygiene_Recount';
 import LOADING from '@salesforce/label/c.Core_DataHygiene_Loading';
 import OPEN_IN_FIND from '@salesforce/label/c.Core_DataHygiene_OpenInFind';
 import RECORDS_FOUND from '@salesforce/label/c.Core_DataHygiene_RecordsFound';
-import OPENED_NOTICE from '@salesforce/label/c.Core_DataHygiene_OpenedNotice';
-import CHECK_FAILED from '@salesforce/label/c.Core_DataHygiene_CheckFailed';
 import NEEDS_ATTENTION from '@salesforce/label/c.Core_DataHygiene_NeedsAttention';
 import ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
 import { bodyMessage } from 'c/findCsv';
@@ -62,7 +60,7 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
         headingId: `heading-${check.key}`,
         hasCount: check.count !== undefined && check.count !== null,
         badgeLabel: found ? NEEDS_ATTENTION : ALL_CLEAR,
-        badgeClass: found ? 'slds-theme_warning' : 'slds-theme_success'
+        badgeStatus: found ? 'warning' : 'success'
       };
     });
   }
@@ -79,7 +77,7 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
       const needsAttention = this.checks.filter((check) => check.count > 0).length;
       this.dispatchEvent(new CustomEvent('summary', { detail: { needsAttention } }));
     } catch (error) {
-      this.errorMessage = bodyMessage(error, CHECK_FAILED);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_DataHygiene_CheckFailed'));
     } finally {
       this.busy = false;
     }
@@ -95,8 +93,12 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
     this.errorMessage = undefined;
     try {
       const target = await openInFind({ checkKey: key });
+      // admin-5: Find opens the saved query by page state, so the toast says it is open.
       Toast.show(
-        { label: OPENED_NOTICE.replace('{0}', target.savedQueryName), variant: 'info' },
+        {
+          label: helpText('Core', 'Core_DataHygiene_OpenedInFind', target.savedQueryName),
+          variant: 'info'
+        },
         this
       );
       this[NavigationMixin.Navigate]({
@@ -105,7 +107,7 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
         state: { [target.stateKey]: target.savedQueryId }
       });
     } catch (error) {
-      this.errorMessage = bodyMessage(error, CHECK_FAILED);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_DataHygiene_CheckFailed'));
     } finally {
       this.busy = false;
     }

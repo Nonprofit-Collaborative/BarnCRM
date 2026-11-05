@@ -6,20 +6,22 @@ import describeObject from '@salesforce/apex/DataDictionaryController.describeOb
 import getAutomation from '@salesforce/apex/DataDictionaryController.getAutomation';
 import getPlan from '@salesforce/apex/FieldUtilizationController.getPlan';
 import countFields from '@salesforce/apex/FieldUtilizationController.countFields';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_DataDictionary_Progress: 'Described {0} of {1} kinds of record.',
+  Core_DataDictionary_NotCounted: 'Fill rates not counted for: {0}.',
+  Core_DataDictionary_Downloaded: 'Downloaded {0} fields.'
+});
+
+setHelpTextForTest({
+  Core_DataDictionary_AutomationNotRead: 'Could not read all automation for: {0}.',
+  Core_DataDictionary_DownloadedAutomation: 'Downloaded {0} automation rows.'
+});
 
 jest.mock(
   '@salesforce/apex/DataDictionaryController.getAutomation',
   () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataDictionary_AutomationNotRead',
-  () => ({ default: 'Could not read all automation for: {0}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataDictionary_DownloadedAutomation',
-  () => ({ default: 'Downloaded {0} automation rows.' }),
   { virtual: true }
 );
 
@@ -42,21 +44,6 @@ jest.mock('@salesforce/apex/FieldUtilizationController.getPlan', () => ({ defaul
 jest.mock(
   '@salesforce/apex/FieldUtilizationController.countFields',
   () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataDictionary_Progress',
-  () => ({ default: 'Described {0} of {1} kinds of record.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataDictionary_NotCounted',
-  () => ({ default: 'Fill rates not counted for: {0}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataDictionary_Downloaded',
-  () => ({ default: 'Downloaded {0} fields.' }),
   { virtual: true }
 );
 jest.mock('@salesforce/label/c.Core_AccessExplorer_Yes', () => ({ default: 'Yes' }), {
@@ -283,7 +270,7 @@ describe('c-data-dictionary', () => {
     expect(find(element, 'results').columns.map((column) => column.fieldName)).toContain(
       'fillRate'
     );
-    expect(find(element, 'not-counted').textContent).toBe('Fill rates not counted for: Contact.');
+    expect(find(element, 'not-counted').message).toBe('Fill rates not counted for: Contact.');
   });
 
   it('names an object whose fill rates failed and keeps its dictionary rows', async () => {
@@ -298,7 +285,7 @@ describe('c-data-dictionary', () => {
     await build(element);
 
     expect(find(element, 'results').data).toHaveLength(1);
-    expect(find(element, 'not-counted').textContent).toBe('Fill rates not counted for: Account.');
+    expect(find(element, 'not-counted').message).toBe('Fill rates not counted for: Account.');
     expect(find(element, 'error')).toBeNull();
   });
 
@@ -307,7 +294,7 @@ describe('c-data-dictionary', () => {
     const element = render();
     await build(element);
 
-    expect(find(element, 'error').textContent).toContain('You need the permission.');
+    expect(find(element, 'error').message).toContain('You need the permission.');
     expect(find(element, 'download').disabled).toBe(true);
   });
 
@@ -339,7 +326,7 @@ describe('c-data-dictionary', () => {
     expect(text).toContain('"Rating, ""Overall"""');
     expect(text).toContain('"Line one\nLine two"');
     expect(text).toContain('"\'=IF(A,""x"",""y"")"');
-    expect(find(element, 'notice').textContent).toBe('Downloaded 1 fields.');
+    expect(find(element, 'notice').message).toBe('Downloaded 1 fields.');
   });
 
   it('puts fill rates in the CSV as percentages, blank when not counted', async () => {
@@ -450,7 +437,7 @@ describe('c-data-dictionary', () => {
       await build(element);
 
       expect(find(element, 'automation-empty')).not.toBeNull();
-      expect(find(element, 'automation-not-read').textContent).toBe(
+      expect(find(element, 'automation-not-read').message).toBe(
         'Could not read all automation for: Account, Contact.'
       );
       expect(find(element, 'download-automation').disabled).toBe(true);
@@ -494,7 +481,7 @@ describe('c-data-dictionary', () => {
       expect(lines[0].split(',')[1]).toBe('Object API Name');
       expect(lines[1]).toContain('AccountTrigger');
       expect(lines[1]).toContain('Account,Account');
-      expect(find(element, 'notice').textContent).toBe('Downloaded 1 automation rows.');
+      expect(find(element, 'notice').message).toBe('Downloaded 1 automation rows.');
     });
   });
 });

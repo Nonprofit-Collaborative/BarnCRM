@@ -2,6 +2,11 @@ import { createElement } from 'lwc';
 import WhatsNew from 'c/whatsNew';
 import getWhatsNew from '@salesforce/apex/WhatsNewController.getWhatsNew';
 import dismiss from '@salesforce/apex/WhatsNewController.dismiss';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_WhatsNew_Failed: 'Could not update.'
+});
 
 jest.mock('@salesforce/apex/WhatsNewController.getWhatsNew', () => ({ default: jest.fn() }), {
   virtual: true
@@ -10,9 +15,6 @@ jest.mock('@salesforce/apex/WhatsNewController.dismiss', () => ({ default: jest.
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_WhatsNew_Version', () => ({ default: 'Version {0}' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Core_WhatsNew_Failed', () => ({ default: 'Could not update.' }), {
   virtual: true
 });
 
@@ -98,7 +100,7 @@ describe('c-whats-new', () => {
     await flush();
 
     expect(element.shadowRoot.querySelector('lightning-card')).not.toBeNull();
-    expect(element.shadowRoot.querySelector('[role="alert"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toContain(
       'Could not update.'
     );
     expect(element.shadowRoot.querySelector('[data-id="dismiss"]').disabled).toBe(false);

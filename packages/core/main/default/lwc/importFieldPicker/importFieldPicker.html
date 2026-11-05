@@ -1,0 +1,123 @@
+<template>
+    <template lwc:if={helpReady}>
+        <div class="slds-form-element">
+            <label class="slds-form-element__label slds-assistive-text" for="field-input">{label}</label>
+            <div class="slds-form-element__control">
+                <div class={comboClass} data-id="combobox" onfocusout={handleFocusOut}>
+                    <div
+                        class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right"
+                        role="none"
+                    >
+                        <input
+                            id="field-input"
+                            type="text"
+                            class="slds-input slds-combobox__input"
+                            role="combobox"
+                            aria-autocomplete="list"
+                            aria-haspopup="listbox"
+                            aria-expanded={ariaExpanded}
+                            aria-controls="field-list"
+                            autocomplete="off"
+                            value={inputValue}
+                            placeholder={placeholder}
+                            disabled={disabled}
+                            data-id="input"
+                            onfocus={handleFocus}
+                            onclick={handleOpen}
+                            oninput={handleInput}
+                            onkeydown={handleInputKey}
+                        />
+                        <lightning-icon
+                            class="slds-icon_container slds-input__icon slds-input__icon_right"
+                            icon-name="utility:search"
+                            size="x-small"
+                            alternative-text=""
+                            aria-hidden="true"
+                        ></lightning-icon>
+                    </div>
+                    <div
+                        id="field-list"
+                        class="slds-dropdown slds-dropdown_fluid slds-dropdown_length-10 barn-field-picker-list"
+                        role="listbox"
+                        aria-label={label}
+                        data-id="list"
+                        onkeydown={handleListKey}
+                    >
+                        <ul class="slds-listbox slds-listbox_vertical" role="presentation">
+                            <template lwc:if={model.pinned}>
+                                <li role="presentation" class="slds-listbox__item">
+                                    <div
+                                        class={model.pinned.optionClass}
+                                        role="option"
+                                        tabindex="-1"
+                                        aria-selected={model.pinned.selected}
+                                        data-index={model.pinned.index}
+                                        data-value={model.pinned.value}
+                                        data-id="option"
+                                        onclick={handleOptionClick}
+                                    >
+                                        <span class="slds-truncate">{model.pinned.label}</span>
+                                    </div>
+                                </li>
+                            </template>
+                            <template for:each={model.groups} for:item="group">
+                                <li key={group.key} role="presentation" class="slds-listbox__item">
+                                    <ul role="group" aria-label={group.label}>
+                                        <template lwc:if={group.label}>
+                                            <li role="presentation" class="slds-listbox__item">
+                                                <div class="slds-media slds-listbox__option slds-listbox__option_plain slds-media_small">
+                                                    <h3
+                                                        class="slds-listbox__option-header"
+                                                        role="presentation"
+                                                        data-id="group"
+                                                    >
+                                                        {group.label}
+                                                    </h3>
+                                                </div>
+                                            </li>
+                                        </template>
+                                        <template for:each={group.items} for:item="item">
+                                            <li key={item.value} role="presentation" class="slds-listbox__item">
+                                                <div
+                                                    class={item.optionClass}
+                                                    role="option"
+                                                    tabindex="-1"
+                                                    aria-selected={item.selected}
+                                                    data-index={item.index}
+                                                    data-value={item.value}
+                                                    data-id="option"
+                                                    onclick={handleOptionClick}
+                                                >
+                                                    <span class="slds-truncate">{item.label}</span>
+                                                    <template lwc:if={item.used}>
+                                                        <span class="slds-var-m-left_x-small">
+                                                            <c-barn-status-badge
+                                                                status="neutral"
+                                                                label={usedLabel}
+                                                                data-id="used"
+                                                            ></c-barn-status-badge>
+                                                        </span>
+                                                    </template>
+                                                </div>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </li>
+                            </template>
+                            <template lwc:if={noMatches}>
+                                <li role="presentation" class="slds-listbox__item">
+                                    <div class="slds-listbox__option slds-listbox__option_plain" data-id="none">
+                                        {noMatchText}
+                                    </div>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <p class="slds-assistive-text" role="status" aria-live="polite" data-id="count">
+                {countText}
+            </p>
+        </div>
+    </template>
+</template>

@@ -6,34 +6,58 @@
         </template>
 
         <template lwc:if={loadError}>
-            <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
-                <span data-id="load-error">{loadError}</span>
-            </div>
+            <c-barn-notice
+                class="slds-show slds-var-m-bottom_small"
+                variant="error"
+                message={loadError}
+                data-id="load-error"
+            ></c-barn-notice>
         </template>
 
         <template lwc:if={showErrorSummary}>
-            <div
-                class="slds-box slds-box_x-small slds-theme_warning slds-var-m-bottom_small"
-                role="alert"
+            <c-barn-notice
+                class="slds-show slds-var-m-bottom_small"
+                variant="warning"
+                message={labels.errorSummary}
                 data-id="error-summary"
-            >
-                {labels.errorSummary}
-            </div>
+            ></c-barn-notice>
         </template>
 
         <template lwc:if={showEmpty}>
             <p class="slds-var-m-bottom_small slds-text-color_weak" data-id="empty">{labels.empty}</p>
         </template>
 
+        <p class="slds-assistive-text" id="drag-help">{dragHelp}</p>
+        <p class="slds-assistive-text" role="status" aria-live="polite" data-id="drag-live">{announcement}</p>
+        <div data-drop-zone="conditions" data-drop-label={labels.conditionsZone} data-id="zone">
         <template for:each={rowViews} for:item="row">
             <fieldset
                 key={row.key}
-                class="slds-form-element slds-var-m-bottom_small slds-var-p-bottom_x-small slds-border_bottom"
+                class={row.rowClass}
                 data-id="condition"
                 data-key={row.key}
             >
                 <legend class="slds-form-element__legend slds-form-element__label">{row.legend}</legend>
                 <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                    <template lwc:if={canReorder}>
+                        <div class="slds-col slds-grow-none">
+                            <span
+                                class="drag-handle"
+                                role="button"
+                                tabindex="0"
+                                title={dragHelp}
+                                aria-label={row.legend}
+                                aria-describedby="drag-help"
+                                data-drag-id={row.key}
+                                data-drag-label={row.legend}
+                                data-id="drag"
+                                onpointerdown={handlePointerDown}
+                                onkeydown={handleDragKey}
+                            >
+                                <lightning-icon icon-name="utility:drag_and_drop" size="x-small"></lightning-icon>
+                            </span>
+                        </div>
+                    </template>
                     <template for:each={row.segments} for:item="segment">
                         <div key={segment.key} class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
                             <lightning-combobox
@@ -154,6 +178,30 @@
                             ></lightning-textarea>
                         </template>
                     </div>
+                    <template lwc:if={canReorder}>
+                        <div class="slds-col slds-shrink-none">
+                            <lightning-button-icon
+                                data-id="move-up"
+                                data-key={row.key}
+                                icon-name="utility:up"
+                                variant="border-filled"
+                                alternative-text={row.moveUpLabel}
+                                title={row.moveUpLabel}
+                                disabled={row.moveUpDisabled}
+                                onclick={handleMoveUp}
+                            ></lightning-button-icon>
+                            <lightning-button-icon
+                                data-id="move-down"
+                                data-key={row.key}
+                                icon-name="utility:down"
+                                variant="border-filled"
+                                alternative-text={row.moveDownLabel}
+                                title={row.moveDownLabel}
+                                disabled={row.moveDownDisabled}
+                                onclick={handleMoveDown}
+                            ></lightning-button-icon>
+                        </div>
+                    </template>
                     <div class="slds-col slds-shrink-none">
                         <lightning-button-icon
                             data-id="remove"
@@ -182,10 +230,16 @@
                     ></lightning-dual-listbox>
                 </template>
                 <template lwc:if={row.error}>
-                    <p class="slds-text-color_error slds-var-m-top_xx-small" data-id="row-error">{row.error}</p>
+                    <c-barn-notice
+                        class="slds-show slds-var-m-top_xx-small"
+                        variant="error"
+                        message={row.error}
+                        data-id="row-error"
+                    ></c-barn-notice>
                 </template>
             </fieldset>
         </template>
+        </div>
 
         <lightning-button
             data-id="add"
@@ -216,9 +270,12 @@
                         onchange={handleLogicChange}
                     ></lightning-input>
                     <template lwc:if={logicError}>
-                        <p class="slds-text-color_error slds-var-m-top_xx-small" data-id="logic-error" role="alert">
-                            {logicError}
-                        </p>
+                        <c-barn-notice
+                            class="slds-show slds-var-m-top_xx-small"
+                            variant="error"
+                            message={logicError}
+                            data-id="logic-error"
+                        ></c-barn-notice>
                     </template>
                 </template>
             </div>

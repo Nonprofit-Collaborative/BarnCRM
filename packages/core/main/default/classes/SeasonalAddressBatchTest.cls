@@ -4,240 +4,255 @@
  */
 @IsTest(testFor='ApexClass:SeasonalAddressBatch')
 private class SeasonalAddressBatchTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.admin();
+	}
 
-    private static final String HOME_STREET = '812 Willow Lane';
-    private static final String HOME_CITY = 'Springfield';
-    private static final String WINTER_CITY = 'Phoenix';
+	private static final String HOME_STREET = '812 Willow Lane';
+	private static final String HOME_CITY = 'Springfield';
+	private static final String WINTER_CITY = 'Phoenix';
 
-    @IsTest
-    static void aNightlyRunSwapsTheHouseholdAndRecordsWhatItDid() {
-        System.runAs(TestUsers.admin()) {
-            Account garcia = householdWithSeasonalAddress('The Garcia Family', 11, 1, 3, 31);
+	@IsTest
+	static void aNightlyRunSwapsTheHouseholdAndRecordsWhatItDid() {
+		System.runAs(TestUsers.admin()) {
+			Account garcia = householdWithSeasonalAddress('The Garcia Family', 11, 1, 3, 31);
 
-            Test.startTest();
-            Database.executeBatch(
-                new SeasonalAddressBatch(Date.newInstance(2027, 1, 15)),
-                SeasonalAddressBatch.CHUNK_SIZE
-            );
-            Test.stopTest();
+			Test.startTest();
+			Database.executeBatch(
+				new SeasonalAddressBatch(Date.newInstance(2027, 1, 15)),
+				SeasonalAddressBatch.CHUNK_SIZE
+			);
+			Test.stopTest();
 
-            List<Address__c> inUse = [
-                SELECT Id, Type__c, City__c
-                FROM Address__c
-                WHERE Account__c = :garcia.Id AND Is_Default__c = TRUE
-            ];
-            Assert.areEqual(1, inUse.size(), 'A household has one address in use at a time.');
-            Assert.areEqual(
-                WINTER_CITY,
-                inUse[0].City__c,
-                'In January the household should be at its winter address.'
-            );
-            Assert.isNotNull(
-                SeasonalAddressService.lastRun(),
-                'The run must record when it finished, or the Hub has nothing to show.'
-            );
-            Assert.isTrue(
-                SeasonalAddressService.lastRunSummary().contains('1'),
-                'The summary should say one household moved, and reads: ' +
-                SeasonalAddressService.lastRunSummary()
-            );
-        }
-    }
+			List<Address__c> inUse = [
+				SELECT Id, Type__c, City__c
+				FROM Address__c
+				WHERE Account__c = :garcia.Id AND Is_Default__c = TRUE
+			];
+			Assert.areEqual(1, inUse.size(), 'A household has one address in use at a time.');
+			Assert.areEqual(
+				WINTER_CITY,
+				inUse[0].City__c,
+				'In January the household should be at its winter address.'
+			);
+			Assert.isNotNull(
+				SeasonalAddressService.lastRun(),
+				'The run must record when it finished, or the Hub has nothing to show.'
+			);
+			Assert.isTrue(
+				SeasonalAddressService.lastRunSummary().contains('1'),
+				'The summary should say one household moved, and reads: ' +
+				SeasonalAddressService.lastRunSummary()
+			);
+		}
+	}
 
-    @IsTest
-    static void aRunDoesNothingWhileAddressesAreOff() {
-        System.runAs(TestUsers.admin()) {
-            Account garcia = householdWithSeasonalAddress('The Garcia Family', 11, 1, 3, 31);
-            TestSettings.newInstall();
+	@IsTest
+	static void aRunDoesNothingWhileAddressesAreOff() {
+		System.runAs(TestUsers.admin()) {
+			Account garcia = householdWithSeasonalAddress('The Garcia Family', 11, 1, 3, 31);
+			TestSettings.newInstall();
 
-            Test.startTest();
-            Database.executeBatch(
-                new SeasonalAddressBatch(Date.newInstance(2027, 1, 15)),
-                SeasonalAddressBatch.CHUNK_SIZE
-            );
-            Test.stopTest();
+			Test.startTest();
+			Database.executeBatch(
+				new SeasonalAddressBatch(Date.newInstance(2027, 1, 15)),
+				SeasonalAddressBatch.CHUNK_SIZE
+			);
+			Test.stopTest();
 
-            Assert.areEqual(
-                0,
-                [
-                    SELECT COUNT()
-                    FROM Address__c
-                    WHERE
-                        Account__c = :garcia.Id
-                        AND Is_Default__c = TRUE
-                        AND City__c = :WINTER_CITY
-                ],
-                'With Addresses off the household stays at its home address'
-            );
-        }
-    }
+			Assert.areEqual(
+				0,
+				[
+					SELECT COUNT()
+					FROM Address__c
+					WHERE
+						Account__c = :garcia.Id
+						AND Is_Default__c = TRUE
+						AND City__c = :WINTER_CITY
+				],
+				'With Addresses off the household stays at its home address'
+			);
+		}
+	}
 
-    @IsTest
-    static void aRunWithNothingToDoStillRecordsThatItRan() {
-        System.runAs(TestUsers.admin()) {
-            householdWithSeasonalAddress('The Garcia Family', 11, 1, 3, 31);
+	@IsTest
+	static void aRunWithNothingToDoStillRecordsThatItRan() {
+		System.runAs(TestUsers.admin()) {
+			householdWithSeasonalAddress('The Garcia Family', 11, 1, 3, 31);
 
-            Test.startTest();
-            Database.executeBatch(
-                new SeasonalAddressBatch(Date.newInstance(2027, 7, 4)),
-                SeasonalAddressBatch.CHUNK_SIZE
-            );
-            Test.stopTest();
+			Test.startTest();
+			Database.executeBatch(
+				new SeasonalAddressBatch(Date.newInstance(2027, 7, 4)),
+				SeasonalAddressBatch.CHUNK_SIZE
+			);
+			Test.stopTest();
 
-            Assert.isNotNull(
-                SeasonalAddressService.lastRun(),
-                'A job that ran and had nothing to do is not the same as a job that did not run.'
-            );
-        }
-    }
+			Assert.isNotNull(
+				SeasonalAddressService.lastRun(),
+				'A job that ran and had nothing to do is not the same as a job that did not run.'
+			);
+		}
+	}
 
-    @IsTest
-    static void anOrgWithNoSeasonalAddressesRunsCleanly() {
-        System.runAs(TestUsers.admin()) {
-            Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
-            garcia.BillingStreet = HOME_STREET;
-            garcia.BillingCity = HOME_CITY;
-            Database.insert(garcia, AccessLevel.SYSTEM_MODE);
+	@IsTest
+	static void anOrgWithNoSeasonalAddressesRunsCleanly() {
+		System.runAs(TestUsers.admin()) {
+			Account garcia = AddressTestDataFactory.newHousehold('The Garcia Family');
+			garcia.BillingStreet = HOME_STREET;
+			garcia.BillingCity = HOME_CITY;
+			Database.insert(garcia, AccessLevel.SYSTEM_MODE);
 
-            Test.startTest();
-            Database.executeBatch(new SeasonalAddressBatch(), SeasonalAddressBatch.CHUNK_SIZE);
-            Test.stopTest();
+			Test.startTest();
+			Database.executeBatch(new SeasonalAddressBatch(), SeasonalAddressBatch.CHUNK_SIZE);
+			Test.stopTest();
 
-            Assert.areEqual(
-                HOME_CITY,
-                [SELECT BillingCity FROM Account WHERE Id = :garcia.Id].BillingCity,
-                'A household with no seasonal address must be left exactly where it was.'
-            );
-            Assert.isNotNull(
-                SeasonalAddressService.lastRun(),
-                'The run is recorded even in an org that has no seasonal addresses at all.'
-            );
-        }
-    }
+			Assert.areEqual(
+				HOME_CITY,
+				[SELECT BillingCity FROM Account WHERE Id = :garcia.Id].BillingCity,
+				'A household with no seasonal address must be left exactly where it was.'
+			);
+			Assert.isNotNull(
+				SeasonalAddressService.lastRun(),
+				'The run is recorded even in an org that has no seasonal addresses at all.'
+			);
+		}
+	}
 
-    @IsTest
-    static void theRunUsesOneDayForEveryOwnerEvenAcrossMidnight() {
-        System.runAs(TestUsers.admin()) {
-            Account garcia = householdWithSeasonalAddress('The Garcia Family', 1, 1, 3, 31);
+	@IsTest
+	static void theRunUsesOneDayForEveryOwnerEvenAcrossMidnight() {
+		System.runAs(TestUsers.admin()) {
+			Account garcia = householdWithSeasonalAddress('The Garcia Family', 1, 1, 3, 31);
 
-            Test.startTest();
-            // December 31 is the day before the season. A run held to that date must not move the
-            // household, however long it takes to reach it.
-            Database.executeBatch(
-                new SeasonalAddressBatch(Date.newInstance(2026, 12, 31)),
-                SeasonalAddressBatch.CHUNK_SIZE
-            );
-            Test.stopTest();
+			Test.startTest();
+			// December 31 is the day before the season. A run held to that date must not move the
+			// household, however long it takes to reach it.
+			Database.executeBatch(
+				new SeasonalAddressBatch(Date.newInstance(2026, 12, 31)),
+				SeasonalAddressBatch.CHUNK_SIZE
+			);
+			Test.stopTest();
 
-            Assert.areEqual(
-                HOME_CITY,
-                [SELECT BillingCity FROM Account WHERE Id = :garcia.Id].BillingCity,
-                'A run held to December 31 must leave the household at its home address.'
-            );
-        }
-    }
+			Assert.areEqual(
+				HOME_CITY,
+				[SELECT BillingCity FROM Account WHERE Id = :garcia.Id].BillingCity,
+				'A run held to December 31 must leave the household at its home address.'
+			);
+		}
+	}
 
-    @IsTest
-    static void schedulingTheJobCreatesOneNightlyRunAndStoppingItRemovesIt() {
-        System.runAs(TestUsers.admin()) {
-            // The org's own swap, if an administrator switched it on, would be counted too.
-            TestDataFactory.clearScheduledJobs(
-                new List<String>{ SeasonalAddressScheduler.JOB_NAME }
-            );
-            ScheduledJobSelector.forget();
-            Test.startTest();
-            Id first = SeasonalAddressScheduler.start();
-            Id second = SeasonalAddressScheduler.start();
-            Boolean scheduled = SeasonalAddressScheduler.isScheduled();
-            Datetime nextRun = SeasonalAddressScheduler.nextRunAt();
-            Integer jobs = [
-                SELECT COUNT()
-                FROM CronJobDetail
-                WHERE Name = :SeasonalAddressScheduler.JOB_NAME
-            ];
-            SeasonalAddressScheduler.stop();
-            Boolean scheduledAfterStop = SeasonalAddressScheduler.isScheduled();
-            Test.stopTest();
+	/** The Seasonal Addresses switch, written below the console's save. */
+	private static void seasonalSwitch(Boolean enabled) {
+		OrgSettingsSystemWriter.save(
+			new Map<Schema.SObjectField, Object>{
+				BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c => enabled
+			}
+		);
+		SettingsService.clearCaches();
+		NightlyJobs.forget();
+	}
 
-            Assert.areEqual(
-                first,
-                second,
-                'Scheduling twice must not give the org two nightly swaps competing with each other.'
-            );
-            Assert.isTrue(scheduled, 'The console must be able to see that the job is scheduled.');
-            Assert.isNotNull(nextRun, 'A scheduled job has a next run to show the administrator.');
-            Assert.areEqual(1, jobs, 'One job, under the name the settings console looks for.');
-            Assert.isFalse(scheduledAfterStop, 'Stopping the schedule must actually stop it.');
-        }
-    }
+	@IsTest
+	static void schedulingTheJobCreatesOneNightlyRunAndSwitchingOffLeavesTheSwapOut() {
+		System.runAs(TestUsers.admin()) {
+			TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+			ScheduledJobSelector.forget();
+			seasonalSwitch(true);
+			Test.startTest();
+			Id first = SeasonalAddressScheduler.start();
+			Id second = SeasonalAddressScheduler.start();
+			Boolean scheduled = SeasonalAddressScheduler.isScheduled();
+			Datetime nextRun = SeasonalAddressScheduler.nextRunAt();
+			Integer jobs = [
+				SELECT COUNT()
+				FROM CronJobDetail
+				WHERE Name = :NightlyJobs.jobName()
+			];
+			seasonalSwitch(false);
+			Boolean scheduledAfterStop = SeasonalAddressScheduler.isScheduled();
+			Boolean inTonightsRun = NightlyJobs.isOn(
+				NightlyJobs.step(SeasonalAddressScheduler.JOB_NAME)
+			);
+			Test.stopTest();
+			Assert.isFalse(inTonightsRun, 'Switched off, the swap is left out of the nightly run.');
 
-    @IsTest
-    static void stoppingTheJobLeavesTheAddressesWhereTheLastRunPutThem() {
-        System.runAs(TestUsers.admin()) {
-            Account garcia = householdWithSeasonalAddress('The Garcia Family', 11, 1, 3, 31);
-            SeasonalAddressService.swapOwners(
-                new Set<Id>{ garcia.Id },
-                Date.newInstance(2027, 1, 15)
-            );
+			Assert.areEqual(
+				first,
+				second,
+				'Scheduling twice must not give the org two nightly swaps competing with each other.'
+			);
+			Assert.isTrue(scheduled, 'The console must be able to see that the job is scheduled.');
+			Assert.isNotNull(nextRun, 'A scheduled job has a next run to show the administrator.');
+			Assert.areEqual(1, jobs, 'One job: the nightly run, which does the swap.');
+			Assert.isFalse(scheduledAfterStop, 'Stopping the schedule must actually stop it.');
+		}
+	}
 
-            Test.startTest();
-            SeasonalAddressScheduler.start();
-            SeasonalAddressScheduler.stop();
-            Test.stopTest();
+	@IsTest
+	static void stoppingTheJobLeavesTheAddressesWhereTheLastRunPutThem() {
+		System.runAs(TestUsers.admin()) {
+			Account garcia = householdWithSeasonalAddress('The Garcia Family', 11, 1, 3, 31);
+			SeasonalAddressService.swapOwners(
+				new Set<Id>{ garcia.Id },
+				Date.newInstance(2027, 1, 15)
+			);
 
-            Assert.areEqual(
-                WINTER_CITY,
-                [SELECT BillingCity FROM Account WHERE Id = :garcia.Id].BillingCity,
-                'Stopping the nightly job must not undo the swap the last run made.'
-            );
-        }
-    }
+			seasonalSwitch(true);
+			Test.startTest();
+			SeasonalAddressScheduler.start();
+			seasonalSwitch(false);
+			Test.stopTest();
 
-    @IsTest
-    static void aScheduledJobThatHasNeverRunIsReportedAsStale() {
-        System.runAs(TestUsers.admin()) {
-            Test.startTest();
-            SeasonalAddressScheduler.start();
-            Boolean stale = SeasonalAddressService.isStale();
-            SeasonalAddressScheduler.stop();
-            Test.stopTest();
+			Assert.areEqual(
+				WINTER_CITY,
+				[SELECT BillingCity FROM Account WHERE Id = :garcia.Id].BillingCity,
+				'Stopping the nightly job must not undo the swap the last run made.'
+			);
+		}
+	}
 
-            Assert.isTrue(
-                stale,
-                'A job that is switched on and has never run is exactly what the Hub must warn about.'
-            );
-        }
-    }
+	@IsTest
+	static void aScheduledJobThatHasNeverRunIsReportedAsStale() {
+		System.runAs(TestUsers.admin()) {
+			seasonalSwitch(true);
+			Test.startTest();
+			SeasonalAddressScheduler.start();
+			Boolean stale = SeasonalAddressService.isStale();
+			seasonalSwitch(false);
+			Test.stopTest();
 
-    private static Account householdWithSeasonalAddress(
-        String name,
-        Integer startMonth,
-        Integer startDay,
-        Integer endMonth,
-        Integer endDay
-    ) {
-        Account household = AddressTestDataFactory.newHousehold(name);
-        household.BillingStreet = HOME_STREET;
-        household.BillingCity = HOME_CITY;
-        Database.insert(household, AccessLevel.SYSTEM_MODE);
-        insert new Address__c(
-            Account__c = household.Id,
-            Type__c = 'Seasonal',
-            Street__c = '4120 East Camelback Road',
-            City__c = WINTER_CITY,
-            State__c = 'AZ',
-            // A state code needs its country in an org with State and Country Picklists.
-            Country__c = 'US',
-            Postal_Code__c = '85018',
-            Seasonal_Start_Month__c = startMonth,
-            Seasonal_Start_Day__c = startDay,
-            Seasonal_End_Month__c = endMonth,
-            Seasonal_End_Day__c = endDay
-        );
-        return household;
-    }
+			Assert.isTrue(
+				stale,
+				'A job that is switched on and has never run is exactly what the Hub must warn about.'
+			);
+		}
+	}
+
+	private static Account householdWithSeasonalAddress(
+		String name,
+		Integer startMonth,
+		Integer startDay,
+		Integer endMonth,
+		Integer endDay
+	) {
+		Account household = AddressTestDataFactory.newHousehold(name);
+		household.BillingStreet = HOME_STREET;
+		household.BillingCity = HOME_CITY;
+		Database.insert(household, AccessLevel.SYSTEM_MODE);
+		insert new Address__c(
+			Account__c = household.Id,
+			Type__c = 'Seasonal',
+			Street__c = '4120 East Camelback Road',
+			City__c = WINTER_CITY,
+			State__c = 'AZ',
+			// A state code needs its country in an org with State and Country Picklists.
+			Country__c = 'US',
+			Postal_Code__c = '85018',
+			Seasonal_Start_Month__c = startMonth,
+			Seasonal_Start_Day__c = startDay,
+			Seasonal_End_Month__c = endMonth,
+			Seasonal_End_Day__c = endDay
+		);
+		return household;
+	}
 }

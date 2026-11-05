@@ -6,162 +6,258 @@
  * message that names the permission.
  */
 public with sharing class AutomationControlController {
-    /**
-     * One row in the list: what it does, and whether it is running.
-     */
-    public class AutomationView {
-        @AuraEnabled
-        public String recordId { get; set; }
-        @AuraEnabled
-        public String automationName { get; set; }
-        @AuraEnabled
-        public String label { get; set; }
-        @AuraEnabled
-        public String description { get; set; }
-        @AuraEnabled
-        public String objectName { get; set; }
-        @AuraEnabled
-        public Boolean enabled { get; set; }
-        /** True when this automation enforces a rule, so its switch is shown off and disabled. */
-        @AuraEnabled
-        public Boolean alwaysRuns { get; set; }
-    }
+	/**
+	 * One row in the list: what it does, and whether it is running.
+	 */
+	public class AutomationView {
+		@AuraEnabled
+		public String recordId { get; set; }
+		@AuraEnabled
+		public String automationName { get; set; }
+		@AuraEnabled
+		public String label { get; set; }
+		@AuraEnabled
+		public String description { get; set; }
+		@AuraEnabled
+		public String objectName { get; set; }
+		@AuraEnabled
+		public Boolean enabled { get; set; }
+		/** True when this automation enforces a rule, so its switch is shown off and disabled. */
+		@AuraEnabled
+		public Boolean alwaysRuns { get; set; }
+		/** True for an org's own listed flow (`Flow:` row), which the page can remove (R-A8). */
+		@AuraEnabled
+		public Boolean removable { get; set; }
+	}
 
-    /**
-     * The whole page: the pause, the permission, and the list.
-     */
-    public class AutomationPageView {
-        @AuraEnabled
-        public Boolean paused { get; set; }
-        @AuraEnabled
-        public Datetime pausedUntil { get; set; }
-        /** Who started the pause in effect, from the audit trail; null when not known. */
-        @AuraEnabled
-        public String pausedBy { get; set; }
-        @AuraEnabled
-        public Boolean canManage { get; set; }
-        @AuraEnabled
-        public List<Integer> pauseHourOptions { get; set; }
-        @AuraEnabled
-        public List<AutomationView> automations { get; set; }
-    }
+	/**
+	 * The whole page: the pause, the permission, and the list.
+	 */
+	public class AutomationPageView {
+		@AuraEnabled
+		public Boolean paused { get; set; }
+		@AuraEnabled
+		public Datetime pausedUntil { get; set; }
+		/** Who started the pause in effect, from the audit trail; null when not known. */
+		@AuraEnabled
+		public String pausedBy { get; set; }
+		@AuraEnabled
+		public Boolean canManage { get; set; }
+		@AuraEnabled
+		public List<Integer> pauseHourOptions { get; set; }
+		@AuraEnabled
+		public List<AutomationView> automations { get; set; }
+		/** The BarnCRM Automation Control rows: the org default first, then profiles and users. */
+		@AuraEnabled
+		public List<AutomationControlSettingService.ControlRow> controlRows { get; set; }
+		/** True while the org default has Pause All on: paused for everyone until turned off. */
+		@AuraEnabled
+		public Boolean pausedForEveryone { get; set; }
+		/** The setting's two field labels, as this org shows them. */
+		@AuraEnabled
+		public String pauseAllLabel { get; set; }
+		@AuraEnabled
+		public String bypassLabel { get; set; }
+		@AuraEnabled
+		public List<AutomationControlSettingService.Option> profileOptions { get; set; }
+		/** The org's own active flows not yet listed. */
+		@AuraEnabled
+		public List<AutomationControlSettingService.Option> flowOptions { get; set; }
+	}
 
-    @AuraEnabled(cacheable=true)
-    public static AutomationPageView getPage() {
-        try {
-            return currentPage();
-        } catch (Exception caught) {
-            throw asUserError(caught, 'Automation page');
-        }
-    }
+	@AuraEnabled(cacheable=true)
+	public static AutomationPageView getPage() {
+		try {
+			return currentPage();
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Automation page');
+		}
+	}
 
-    @AuraEnabled
-    public static AutomationPageView pauseAll(Integer hours) {
-        try {
-            requirePermission();
-            AutomationControl.pauseAll(hours);
-            return currentPage();
-        } catch (Exception caught) {
-            throw asUserError(caught, 'Pause all automation');
-        }
-    }
+	@AuraEnabled
+	public static AutomationPageView pauseAll(Integer hours) {
+		try {
+			requirePermission();
+			AutomationControl.pauseAll(hours);
+			return currentPage();
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Pause all automation');
+		}
+	}
 
-    @AuraEnabled
-    public static AutomationPageView resumeAll() {
-        try {
-            requirePermission();
-            AutomationControl.resumeAll();
-            return currentPage();
-        } catch (Exception caught) {
-            throw asUserError(caught, 'Resume automation');
-        }
-    }
+	@AuraEnabled
+	public static AutomationPageView resumeAll() {
+		try {
+			requirePermission();
+			AutomationControl.resumeAll();
+			return currentPage();
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Resume automation');
+		}
+	}
 
-    @AuraEnabled
-    public static AutomationPageView setEnabled(String automationName, Boolean enabled) {
-        try {
-            requirePermission();
-            if (String.isBlank(automationName)) {
-                throw new AutomationControl.AutomationControlException(
-                    Label.Core_Automation_NameRequired
-                );
-            }
-            AutomationControl.setEnabled(automationName, enabled == true);
-            return currentPage();
-        } catch (Exception caught) {
-            throw asUserError(caught, 'Switch an automation');
-        }
-    }
+	@AuraEnabled
+	public static AutomationPageView setEnabled(String automationName, Boolean enabled) {
+		try {
+			requirePermission();
+			if (String.isBlank(automationName)) {
+				throw new AutomationControl.AutomationControlException(
+					Label.Core_Automation_NameRequired
+				);
+			}
+			AutomationControl.setEnabled(automationName, enabled == true);
+			return currentPage();
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Switch an automation');
+		}
+	}
 
-    private static AutomationPageView currentPage() {
-        AutomationPageView page = new AutomationPageView();
-        page.pausedUntil = AutomationControl.pausedUntil();
-        page.paused = page.pausedUntil != null;
-        page.pausedBy = page.paused ? AutomationControl.pausedBy() : null;
-        page.canManage = canManage();
-        page.pauseHourOptions = new List<Integer>(AutomationControl.allowedPauseHours());
-        page.pauseHourOptions.sort();
-        page.automations = new List<AutomationView>();
-        for (Automation_Setting__c setting : AutomationSettingSelector.selectAllForConsole()) {
-            AutomationView view = new AutomationView();
-            view.recordId = setting.Id;
-            view.automationName = setting.Automation_Name__c;
-            view.label = setting.Name;
-            view.description = setting.Description__c;
-            view.objectName = objectLabel(setting.Object_Name__c);
-            view.alwaysRuns = setting.Always_Runs__c == true;
-            // A rule enforcing automation is never running "on" a switch: it is shown off, and
-            // disabled, so nobody reads the page as saying it can be turned on (ADR-0024).
-            view.enabled = view.alwaysRuns ? false : setting.Enabled__c;
-            page.automations.add(view);
-        }
-        return page;
-    }
+	/** Saves both boxes of the org default, a profile or a user (R-A8). */
+	@AuraEnabled
+	public static AutomationPageView saveControl(String ownerId, Boolean pauseAll, Boolean bypass) {
+		try {
+			AutomationControlSettingService.save(ownerId, pauseAll, bypass);
+			return currentPage();
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Save Automation Control');
+		}
+	}
 
-    /**
-     * The object's label in this org ("Household Member", not "Household_Member__c"). A name
-     * that is not an object here, or that cannot be described, is shown as stored.
-     */
-    @TestVisible
-    private static String objectLabel(String apiName) {
-        if (String.isBlank(apiName)) {
-            return apiName;
-        }
-        try {
-            Schema.DescribeSObjectResult described = Schema.describeSObjects(
-                new List<String>{ apiName.trim() },
-                SObjectDescribeOptions.DEFERRED
-            )[0];
-            return described.getLabel();
-        } catch (Exception notAnObject) {
-            return apiName;
-        }
-    }
+	/** Adds a profile or user row, with Bypass on. */
+	@AuraEnabled
+	public static AutomationPageView addControl(String ownerId) {
+		try {
+			AutomationControlSettingService.add(ownerId);
+			return currentPage();
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Add Automation Control');
+		}
+	}
 
-    private static Boolean canManage() {
-        // Bare, and correctly so: a custom permission defined in the same package resolves without
-        // a namespace prefix, so this is not the B5 problem that TriggerHandler.getName had.
-        return BarnCRMPermissions.canManageSettings();
-    }
+	/** Removes a profile or user row. */
+	@AuraEnabled
+	public static AutomationPageView removeControl(String ownerId) {
+		try {
+			AutomationControlSettingService.remove(ownerId);
+			return currentPage();
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Remove Automation Control');
+		}
+	}
 
-    private static void requirePermission() {
-        if (!canManage()) {
-            throw new AutomationControl.AutomationControlException(
-                Label.Core_Automation_NoPermission
-            );
-        }
-    }
+	/** Lists one of the org's own flows with a switch. */
+	@AuraEnabled
+	public static AutomationPageView addFlow(String apiName) {
+		try {
+			AutomationControlSettingService.addFlow(apiName);
+			return currentPage();
+		} catch (Exception caught) {
+			throw asUserError(caught, 'List a flow');
+		}
+	}
 
-    /**
-     * Turns anything that went wrong into a message the page can show, and records the ones the
-     * page cannot explain.
-     */
-    private static AuraHandledException asUserError(Exception caught, String context) {
-        return UserErrors.wrap(
-            caught,
-            caught instanceof AutomationControl.AutomationControlException,
-            context,
-            Label.Core_Automation_UnexpectedError
-        );
-    }
+	/** Takes one of the org's own flows off the list. */
+	@AuraEnabled
+	public static AutomationPageView removeFlow(String automationName) {
+		try {
+			AutomationControlSettingService.removeFlow(automationName);
+			return currentPage();
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Remove a listed flow');
+		}
+	}
+
+	/** Catch Up Now: households, household names and the waiting rollups, in the background. */
+	@AuraEnabled
+	public static AutomationPageView catchUpNow() {
+		try {
+			AutomationControlSettingService.catchUpNow();
+			return currentPage();
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Catch up now');
+		}
+	}
+
+	private static AutomationPageView currentPage() {
+		AutomationPageView page = new AutomationPageView();
+		page.pausedUntil = AutomationControl.pausedUntil();
+		page.paused = page.pausedUntil != null;
+		page.pausedBy = page.paused ? AutomationControl.pausedBy() : null;
+		page.canManage = canManage();
+		page.pauseHourOptions = new List<Integer>(AutomationControl.allowedPauseHours());
+		page.pauseHourOptions.sort();
+		page.automations = new List<AutomationView>();
+		page.controlRows = AutomationControlSettingService.rows();
+		page.pausedForEveryone = AutomationControlSettingService.pausedForEveryone();
+		page.pauseAllLabel = Schema.SObjectType.BarnCRM_Automation_Control__c.fields.Pause_All__c.getLabel();
+		page.bypassLabel = Schema.SObjectType.BarnCRM_Automation_Control__c.fields.Bypass__c.getLabel();
+		page.profileOptions = AutomationControlSettingService.profileOptions();
+		Set<String> listed = new Set<String>();
+		for (Automation_Setting__c setting : AutomationSettingSelector.selectAllForConsole()) {
+			if (setting.Automation_Name__c != null) {
+				listed.add(setting.Automation_Name__c.toLowerCase());
+			}
+			AutomationView view = new AutomationView();
+			view.recordId = setting.Id;
+			view.automationName = setting.Automation_Name__c;
+			view.label = setting.Name;
+			view.description = setting.Description__c;
+			view.objectName = objectLabel(setting.Object_Name__c);
+			view.alwaysRuns = setting.Always_Runs__c == true;
+			// A rule enforcing automation is never running "on" a switch: it is shown off, and
+			// disabled, so nobody reads the page as saying it can be turned on (ADR-0024).
+			view.enabled = view.alwaysRuns ? false : setting.Enabled__c;
+			view.removable = AutomationControlSettingService.isOwnFlow(setting);
+			page.automations.add(view);
+		}
+		page.flowOptions = AutomationControlSettingService.flowOptions(listed);
+		return page;
+	}
+
+	/**
+	 * The object's label in this org ("Household Member", not "Household_Member__c"). A name
+	 * that is not an object here, or that cannot be described, is shown as stored.
+	 */
+	@TestVisible
+	private static String objectLabel(String apiName) {
+		if (String.isBlank(apiName)) {
+			return apiName;
+		}
+		try {
+			Schema.DescribeSObjectResult described = Schema.describeSObjects(
+				new List<String>{ apiName.trim() },
+				SObjectDescribeOptions.DEFERRED
+			)[0];
+			return described.getLabel();
+		} catch (Exception notAnObject) {
+			return apiName;
+		}
+	}
+
+	private static Boolean canManage() {
+		// Bare, and correctly so: a custom permission defined in the same package resolves without
+		// a namespace prefix, so this is not the B5 problem that TriggerHandler.getName had.
+		return BarnCRMPermissions.canManageSettings();
+	}
+
+	private static void requirePermission() {
+		if (!canManage()) {
+			throw new AutomationControl.AutomationControlException(
+				Label.Core_Automation_NoPermission
+			);
+		}
+	}
+
+	/**
+	 * Turns anything that went wrong into a message the page can show, and records the ones the
+	 * page cannot explain.
+	 */
+	private static AuraHandledException asUserError(Exception caught, String context) {
+		return UserErrors.wrap(
+			caught,
+			caught instanceof AutomationControl.AutomationControlException,
+			context,
+			Label.Core_Automation_UnexpectedError
+		);
+	}
 }

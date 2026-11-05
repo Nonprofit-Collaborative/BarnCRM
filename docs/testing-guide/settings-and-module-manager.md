@@ -124,13 +124,58 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Automation**. | A card titled **Automation** lists each automation with a description, "Runs on" and its object, and a switch. **How long** shows **2 hours**. |
 | 2 | Open **How long**. | Options **1 hour**, **2 hours**, **4 hours**, **8 hours**, **24 hours**. |
-| 3 | Choose **1 hour** and click **Pause All Automation**. | A yellow box: "Automation is paused until" a date and time one hour from now, then "Paused by" your name and "It turns itself back on then." Every switch stays where it was. |
+| 3 | Choose **1 hour** and click **Pause All Automation**. | A yellow box: "Automation is paused until" a date and time one hour from now, then "Paused by" your name and "It turns itself back on then.", with a **Resume Automation** button inside it. **How long** and **Pause All Automation** are gone, and there is no other **Resume Automation** button. Every switch stays where it was. |
 | 4 | Open the **Home** tab. | Under **Welcome to BarnCRM**: "BarnCRM automation is paused. Households and greetings are not being updated until it resumes." in a yellow warning box with a **Resume Automation** link. Click the link: **BarnCRM Settings** opens on **Automation**. |
-| 5 | Back in **Automation**, click **Resume Automation**. | The yellow box disappears. On **Home** the banner is gone after a reload. |
-| 6 | Switch off **Keep Both Sides of Relationships in Step**. Reload the page. | The switch is still off. |
+| 5 | Back in **Automation**, click **Resume Automation** in the yellow box. | The yellow box disappears, and **How long** with **Pause All Automation** is back; no **Resume Automation** button shows. On **Home** the banner is gone after a reload. |
+| 6 | Switch off **Keep both sides of relationships in step**. | Next to the switch, for a few seconds: "Keep both sides of relationships in step is off. Turn it back on here." A screen reader announces it. Reload the page: the switch is still off. |
 | 7 | Switch it back on, open **General** and scroll to **Recent Changes**. | Rows for **Automation Paused Until** record the pause and the resume, and rows record both switch changes, each with your name. |
 
 **Cleanup:** leave every switch on and automation not paused.
+
+## T-SET-07A: One Failing Row Does Not Stop the Rest
+
+**Purpose:** confirm that when BarnCRM automation fails on one record of a bulk save, only that record is refused.
+**Prerequisites:** admin user, Household Upkeep on, **Create Households Automatically** on. In Setup, an Account validation rule `Test_No_Refuse` with the formula `CONTAINS(Name, "Refuseme")` and the message "Test rule". A CSV of five people, last names `Avery`, `Blake`, `Refuseme`, `Drew`, `Emery`, first name `Test`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Import the CSV with the **Generic contact list** template into People (see [Imports](imports.md)). | The run finishes. Four people are imported, each in a new household. One row is rejected: the `Refuseme` row, with a message saying the record was not saved. |
+| 2 | Open **BarnCRM Settings**, **Error Log**. | An entry from the household upkeep automation names the failure. If the failure reached the trigger dispatcher, a Warning entry also says "Row 3 of this save was not saved" (the row in that save). |
+| 3 | Search for `Avery` and `Emery`. | Both exist, each with a household. |
+
+**Cleanup:** delete the validation rule and the four test people and their households.
+
+## T-SET-07B: Bypass Automation for One User
+
+**Purpose:** confirm the BarnCRM Automation Control setting skips automation for one user only.
+**Prerequisites:** admin user, Household Upkeep on, **Create Households Automatically** on. A second user, Sam, with the BarnCRM Staff role.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Automation**. Under **Pause or Bypass for Some People**, choose **User**, pick Sam, and select **Add**. | Below **Whole Organization** (both boxes off), a row for Sam, type User, with **Bypass** ticked and **Pause All** off. |
+| 2 | As Sam, create a person `Test Bypassed`. | The person saves with no household (the household automation was skipped for Sam). |
+| 3 | As the admin, create a person `Test Normal`. | The person gets a household as usual. |
+| 4 | Select **Remove** on Sam's row, then **Catch Up Now**. Wait a minute and open `Test Bypassed`. | Sam's row is gone and the page says the catch-up has started. Selecting **Catch Up Now** again at once says "A catch-up is already running." `Test Bypassed` now has a household. |
+| 5 | Tick **Pause All** on **Whole Organization**. | A yellow bar at the top says automation is paused for everyone, with **Turn Off**. Create a person: no household. |
+| 6 | Add your own profile, untick its **Bypass**, and create a person. | The person gets a household: your profile's row (both off) replaces the organization's for you. |
+| 7 | Remove your profile's row and select **Turn Off** in the yellow bar. | The bar is gone and **Pause All** is off on **Whole Organization**. |
+| 8 | As a user without **Manage BarnCRM Settings**, open the page. | The rows show, but the boxes, **Add**, **Remove** and **Catch Up Now** are disabled. |
+
+**Cleanup:** delete the test people and their households.
+
+## T-SET-07C: List Your Own Flow on the Automation Page
+
+**Purpose:** confirm an org's own flow can be listed with a switch that Check BarnCRM Automation reads.
+**Prerequisites:** admin user; an active record-triggered flow of your own, `My_Test_Flow`, that starts with the **Check BarnCRM Automation** action (Automation Name `Flow:My_Test_Flow`) and ends when **Run** is false, and otherwise sets a field you can see.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Automation**. Under **Your Own Flows**, pick `My_Test_Flow` and select **Add**. | The flow joins the automation list, switched on, with a description naming `Flow:My_Test_Flow`, and a **Remove** button. It is no longer offered in the picker. |
+| 2 | Save a record the flow runs on. | The flow sets its field. |
+| 3 | Switch the flow's row **Off** and save another record. | The flow does not set its field. |
+| 4 | Select **Remove** on the row. | The row is gone and the flow is offered again. The flow itself is unchanged and still active. |
+
+**Cleanup:** deactivate or delete `My_Test_Flow`.
 
 ## T-SET-08: Turn on a Feature Left Off
 
@@ -223,7 +268,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 1 | As read-only, open **BarnCRM Settings**, **General**. | A notice: "You can read these settings but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." Every control is greyed out and no save bar appears. **Edition** shows with no **Change Edition** link. **Features** shows **On** and no **Turn On** buttons. |
 | 2 | Open **Access**. | "You can see this page but you cannot change roles. Ask someone with the BarnCRM Admin role to make the change, or to give you that role." No **Find a person**, **Role**, **Give Access** or **Remove**. Role cards list holders, or say "You can see this page but you cannot see who holds each role." |
 | 3 | Open **Modules**. | "You can see the modules but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." No **Turn Off**, **Turn On** or **What an Uninstall Deletes**. **Show Nonprofit Modules** is greyed out. |
-| 4 | Open **Automation**. | "You can read this page but not change it. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." **Pause All Automation**, **Resume Automation**, **How long** and every switch are disabled. |
+| 4 | Open **Automation**. | "You can read this page but not change it. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." **Pause All Automation**, **How long** and every switch are disabled (with automation running, **Resume Automation** is not shown). |
 | 5 | Open **General** and look for **Custom Metadata**. | It is not shown (it needs BarnCRM Metadata Admin). |
 | 6 | Repeat step 1 as staff. | The same read-only notice and greyed-out controls. |
 
@@ -272,7 +317,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Integrations**. | An introduction says the page is a roadmap, In Progress means planned and not built, and nothing listed is integrated with BarnCRM yet. |
+| 1 | Open **BarnCRM Settings**, **Integrations**. | The introduction reads "Other free apps that work alongside BarnCRM, and alternatives to BarnCRM modules already in your org. None is integrated with BarnCRM yet, and BarnCRM depends on none of them." Each product's status and installed state are badges with icons (In Progress amber with a clock, Installed in this org green, Not installed grey). |
 | 2 | Read the headings. | **Complementary Apps** and **In Development**. There is no **Alternatives to BarnCRM Modules** heading, and no empty group. |
 | 3 | Read one product's row. | Its name, **In Progress**, **Not installed**, a description, who maintains it, **Cost and license**, **Compatibility with BarnCRM** with a note, and **Learn More**. No row has an **Install** link. The Summit Events App note says it is not yet tested and mentions the Salesforce Site and guest user. |
 | 4 | Click **Learn More** on any row. | The product's page opens in a new tab. A screen reader reads "(Opens in a New Tab)" after the link name. |
@@ -289,20 +334,20 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-17: People and Households, and Boxes on Every Page
 
 **Purpose:** confirm Households and Relationships are one **People and Households** section, every section groups its settings into headed boxes, and links to the old sections land in the right box.
-**Prerequisites:** admin user. The **Household Upkeep** and **Relationships** features on, and **Send Long Job Notifications** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update All Household Names** in step 4.
+**Prerequisites:** admin user. The **Household Upkeep** and **Relationships** features on, and **Send long job notifications** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update All Household Names** in step 4.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings** and read the **Sections** list. | **People and Households** is the first item under **People**, right after **Organization**, then **Addresses**. There is no **Households** and no **Relationships** section. |
-| 2 | Click **People and Households**. | Four bordered boxes, in order, each with a Title Case heading: **People** (**How people belong to a household**, **Create Households Automatically**), **Households** (**Delete Empty Households**, **Keep Households of Deleted People**), **Household Names and Greetings** (the **Preview and Recompute** panel, **Include People Who Have Died in Names**) and **Relationships** (**Keep Both Sides of Relationships in Step**). Every setting shows its value; none is blank. There is no duplicates row and no note about duplicate rules: those are on **Duplicate Matching**. |
-| 3 | Tick **Keep Households of Deleted People**, click **Save**, then untick it and save again. | Both saves say the settings were saved. **General**, **Recent Changes** lists both changes. |
+| 2 | Click **People and Households**. | Four bordered boxes, in order, each with a Title Case heading: **People** (**How people belong to a household**, **Create households automatically**), **Households** (**Delete empty households**, **Keep households of deleted people**), **Household Names and Greetings** (the **Preview and Recompute** panel, **Include people who have died in names**) and **Relationships** (**Keep both sides of relationships in step**). Every setting shows its value; none is blank. There is no duplicates row and no note about duplicate rules: those are on **Duplicate Matching**. |
+| 3 | Tick **Keep households of deleted people**, click **Save**, then untick it and save again. | Both saves say the settings were saved. **General**, **Recent Changes** lists both changes. |
 | 4 | Back on **People and Households**, click **Update All Household Names** and confirm. Wait for the bell, then open its **Household name recompute finished** notification. | The console opens on **People and Households**, scrolled to the **Household Names and Greetings** box, with focus on its heading. |
 | 5 | Open each other section in turn: **General**, **Organization**, **Duplicate Matching**, **Addresses**, **Giving**, **Receipts**, **Rollups**, **Volunteers**, **Error Log**, **Import**, **Modules**, **Automation**, **Access**, **Org Optimizer**, **Integrations**, **Health**. | Every setting is inside a bordered box with a Title Case heading, as listed in the admin guide's "Sections and their boxes". A section with no list, such as **Access**, shows one box headed with its own name. No setting that showed before is missing. |
 | 6 | In the browser address bar, change the end of the console's address to `?c__section=Relationships` and press Enter. | **People and Households** opens, scrolled to the **Relationships** box. |
 | 7 | Do the same with `?c__section=Households`. | **People and Households** opens, scrolled to the **Households** box. |
 | 8 | Open **Setup Assistant** on the Home page, go to **Confirm how households are named** and click **Where This Lives in Settings**. | **People and Households** opens at the **Household Names and Greetings** box. |
 
-**Cleanup:** leave **Keep Households of Deleted People** unticked (the default).
+**Cleanup:** leave **Keep households of deleted people** unticked (the default).
 
 ## T-SET-18: Keep a Shown Default as a Saved Choice
 
@@ -385,7 +430,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | After the upgrade, open **BarnCRM Settings** and find **Send Weekly Admin Summary**. | It is on, and its description starts "On by default." |
+| 1 | After the upgrade, open **BarnCRM Settings** and find **Send weekly admin summary**. | It is on, and its description starts "On by default." |
 | 2 | Choose the **Giving** section and find **Ask Reminders**. | It is on. |
 | 3 | Switch both off and save. Run the upgrade or the source deploy again. | Both stay off. |
 
@@ -404,3 +449,56 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 4 | Open the **Programs Admin** permission set in Setup. | Its description names case notes and service deliveries. |
 
 **Cleanup:** leave the jobs scheduled as they were.
+
+## T-SET-23: Settings Save Cues, Setting Names, Health and Error Log Links, Narrow Screens
+
+**Purpose:** confirm a panel says it saves on its own, the save bar says what it covers, setting names read as form labels, Health and Error Log open Org Optimizer, and a narrow screen gets a Section box.
+**Prerequisites:** admin user; the Org Optimizer and Household Upkeep features on.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **People and Households**. | Setting names are in sentence case (**Create households automatically**, **Delete empty households**); box titles stay in Title Case. The household naming panel shows **Saves on its own** by its heading and its **Save** button at the top of the panel. |
+| 2 | Tick **Delete empty households** (do not save). | The save bar reads "1 unsaved change in this section". |
+| 3 | Open **General** without saving. | The save bar reads "0 unsaved changes in this section and 1 in other sections". Click **Discard**. |
+| 4 | Open **Import**. | **Records per batch in imports** (Importing) and **Records per batch in background jobs** (Find, Super Transformer and Bulk Delete) each read 200; each description says to lower it only after a limit error. The first row's button reads **Open Super Importer**. |
+| 5 | Open **Health** and click **Open Health Check**. | The Org Optimizer tab opens on its **Health Check** section, showing the last run (it does not start a new one). |
+| 6 | Open **BarnCRM Settings**, **Error Log**. | The first box has **Open the Error Log**; below it the digest and retention settings only. Click it: Org Optimizer opens on **Errors**. |
+| 7 | Narrow the browser window to phone width (or open on a phone) and reopen **BarnCRM Settings**. | The section list is replaced by a **Section** box under the search. Choose **Addresses**: the Addresses section shows and focus moves to its first box heading. |
+| 8 | Log in as a user who can open BarnCRM Settings but has neither Find and Export nor Manage BarnCRM Settings, and open **Health**, then **Error Log**. | Health shows the Health Check report itself, with no **Open Health Check** button; Error Log has no **Open the Error Log** button. |
+
+**Cleanup:** none.
+
+## T-SET-24: Module Turn Off Confirmation, First-Run Feature List and Household Name Parts
+
+**Purpose:** confirm Turn Off asks first, the first-run window names the default features, and the name pattern parts insert by click and by drag.
+**Prerequisites:** admin user; an installed module that is on (Giving); for step 3, a fresh org where first-run setup has not run (or read the window in a scratch org).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Modules**, on **BarnCRM Giving** click **Turn Off**, then **Cancel**. | A window titled "Turn Off BarnCRM Giving?" says its automation stops, its records stay, and its tabs stay visible (change a role on the Access page to hide them). After **Cancel** Giving is still on. |
+| 2 | Click **Turn Off** again and confirm with **Turn Off**. Then **Turn On**. | The row reads **Installed and off**, then back on. |
+| 3 | In the first-run window, leave **Turn on all the default core features** chosen. | Each default feature is listed by name with one plain line, and a warning reads "You can turn more features on later in BarnCRM Settings, General. A feature you turn on stays on, so if you are unsure, leave it off for now." |
+| 4 | **People and Households**, household naming panel: click in **Household name pattern** before `Family`, then click the `{FirstName}` part under it. | `{FirstName}` is added at the cursor with spaces around it, the preview updates, and a screen reader hears "Added {FirstName} to Household name pattern." |
+| 5 | Drag the `and` part (on a touch screen, press and hold, then drag) onto the formal greeting box and let go between two words. | `and` is added where you let go and the preview updates. Do not save. |
+| 6 | Reload the page. | The patterns are back to their saved values. |
+
+**Cleanup:** turn Giving back on if step 2 left it off.
+
+## T-SET-25: One Nightly Run
+
+**Purpose:** confirm every nightly job runs from the one schedule, in order, and the panel shows each job's result.
+**Prerequisites:** the admin user. For step 1, an org upgraded from a version whose nightly jobs were scheduled one by one.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | After the upgrade, open Setup, **Scheduled Jobs**. | One **BarnCRM Nightly Jobs** job at midnight, plus **BarnCRM Tab Access Check**; none of the old BarnCRM nightly jobs remain. |
+| 2 | Open **BarnCRM Settings**, **General**, **Nightly Jobs**. | Says the run is scheduled; lists each job in time order with its time and On or Off. A job that was scheduled before the upgrade reads On. |
+| 3 | Delete **BarnCRM Nightly Jobs** in Setup, then reload the panel. | Says it is not scheduled and shows **Schedule Nightly Jobs**. Health Check lists **Nightly Jobs Are Not Scheduled**. |
+| 4 | Press **Schedule Nightly Jobs**. | The panel says it is scheduled. |
+| 5 | On the **Error Log** section, press **Stop Daily Run**; back on **Nightly Jobs**. | The Error Log digest reads Off; the run stays scheduled. |
+| 6 | The next morning, read the panel. | Each job shows a last run and a result (Done, Done With Errors, Skipped for jobs that are off). |
+| 7 | Sign in as a user without Manage BarnCRM Settings and open the panel. | The list shows; there is no Schedule button. |
+| 8 | As the admin, open **General**, then **Duplicate Matching**, **Import** and **Org Optimizer**. | Each shows its "Days to keep" setting with its default (730, 365, 365, 730); the panel lists **Record Cleanup** at 1:20, On. |
+| 9 | Set **Days to keep merge history** to 5 and save. | A value below 30 is not accepted (the range is 30 to 3650). Set it back to 365. |
+
+**Cleanup:** press **Schedule Daily Run** on the Error Log section again.

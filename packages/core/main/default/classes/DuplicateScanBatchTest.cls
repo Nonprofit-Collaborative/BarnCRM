@@ -10,508 +10,508 @@
  */
 @IsTest(testFor='ApexClass:DuplicateScanBatch')
 private class DuplicateScanBatchTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.admin();
+	}
 
-    private static List<SObject> insertAllowingDuplicates(List<SObject> records) {
-        Database.DMLOptions options = new Database.DMLOptions();
-        options.DuplicateRuleHeader.allowSave = true;
-        // System mode: households are among these, and no user has their record type (ADR-0141).
-        Database.insert(records, options, AccessLevel.SYSTEM_MODE);
-        return records;
-    }
+	private static List<SObject> insertAllowingDuplicates(List<SObject> records) {
+		Database.DMLOptions options = new Database.DMLOptions();
+		options.DuplicateRuleHeader.allowSave = true;
+		// System mode: households are among these, and no user has their record type (ADR-0141).
+		Database.insert(records, options, AccessLevel.SYSTEM_MODE);
+		return records;
+	}
 
-    private static Boolean ruleActiveFor(String objectName) {
-        return DuplicateSelector.objectsWithActiveRules(new Set<String>{ objectName })
-            .contains(objectName);
-    }
+	private static Boolean ruleActiveFor(String objectName) {
+		return DuplicateSelector.objectsWithActiveRules(new Set<String>{ objectName })
+			.contains(objectName);
+	}
 
-    private static List<Contact> twins(String firstName) {
-        String email = firstName.toLowerCase() + '.dupscan@example.org';
-        return (List<Contact>) insertAllowingDuplicates(
-            new List<Contact>{
-                new Contact(FirstName = firstName, LastName = 'Dupscan', Email = email),
-                new Contact(FirstName = firstName, LastName = 'Dupscan', Email = email)
-            }
-        );
-    }
+	private static List<Contact> twins(String firstName) {
+		String email = firstName.toLowerCase() + '.dupscan@example.org';
+		return (List<Contact>) insertAllowingDuplicates(
+			new List<Contact>{
+				new Contact(FirstName = firstName, LastName = 'Dupscan', Email = email),
+				new Contact(FirstName = firstName, LastName = 'Dupscan', Email = email)
+			}
+		);
+	}
 
-    /** The matcher's answer for this pair, found from both sides as the platform reports it. */
-    private static void matcherAnswers(Id first, Id second) {
-        DuplicateService.stubMatches = new List<DuplicateService.Pair>{
-            new DuplicateService.Pair(first, second, null),
-            new DuplicateService.Pair(second, first, null)
-        };
-    }
+	/** The matcher's answer for this pair, found from both sides as the platform reports it. */
+	private static void matcherAnswers(Id first, Id second) {
+		DuplicateService.stubMatches = new List<DuplicateService.Pair>{
+			new DuplicateService.Pair(first, second, null),
+			new DuplicateService.Pair(second, first, null)
+		};
+	}
 
-    @IsTest
-    static void aChunkRecordsEachNewPairOnceAndASecondPassAddsNothing() {
-        System.runAs(TestUsers.admin()) {
-            List<Contact> people = twins('Rosa');
-            matcherAnswers(people[0].Id, people[1].Id);
-            Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(
-                new Set<String>{ 'Contact' }
-            );
+	@IsTest
+	static void aChunkRecordsEachNewPairOnceAndASecondPassAddsNothing() {
+		System.runAs(TestUsers.admin()) {
+			List<Contact> people = twins('Rosa');
+			matcherAnswers(people[0].Id, people[1].Id);
+			Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(
+				new Set<String>{ 'Contact' }
+			);
 
-            Test.startTest();
-            Integer first = DuplicateScanBatch.scanChunk(people, rules);
-            Integer second = DuplicateScanBatch.scanChunk(people, rules);
-            Test.stopTest();
+			Test.startTest();
+			Integer first = DuplicateScanBatch.scanChunk(people, rules);
+			Integer second = DuplicateScanBatch.scanChunk(people, rules);
+			Test.stopTest();
 
-            Assert.areEqual(
-                2,
-                [SELECT COUNT() FROM Contact WHERE Id IN :people],
-                'The scan changes no record.'
-            );
-            if (!ruleActiveFor('Contact')) {
-                // Skipped: no active rule for people in this org, so no suggestion can be written.
-                Assert.areEqual(0, first + second, 'With no active rule nothing is written.');
-                return;
-            }
-            Assert.areEqual(1, first, 'A pair found from both sides is one suggestion.');
-            Assert.areEqual(
-                0,
-                second,
-                'A pair already waiting for a reviewer is not written twice.'
-            );
-            Assert.areEqual(1, [SELECT COUNT() FROM DuplicateRecordSet], 'Exactly one suggestion.');
-            Assert.areEqual(
-                2,
-                [SELECT COUNT() FROM DuplicateRecordItem],
-                'Of exactly two records.'
-            );
-        }
-    }
+			Assert.areEqual(
+				2,
+				[SELECT COUNT() FROM Contact WHERE Id IN :people],
+				'The scan changes no record.'
+			);
+			if (!ruleActiveFor('Contact')) {
+				// Skipped: no active rule for people in this org, so no suggestion can be written.
+				Assert.areEqual(0, first + second, 'With no active rule nothing is written.');
+				return;
+			}
+			Assert.areEqual(1, first, 'A pair found from both sides is one suggestion.');
+			Assert.areEqual(
+				0,
+				second,
+				'A pair already waiting for a reviewer is not written twice.'
+			);
+			Assert.areEqual(1, [SELECT COUNT() FROM DuplicateRecordSet], 'Exactly one suggestion.');
+			Assert.areEqual(
+				2,
+				[SELECT COUNT() FROM DuplicateRecordItem],
+				'Of exactly two records.'
+			);
+		}
+	}
 
-    @IsTest
-    static void aDismissedPairIsNotWrittenAgain() {
-        System.runAs(TestUsers.admin()) {
-            List<Contact> people = twins('Iris');
-            matcherAnswers(people[0].Id, people[1].Id);
-            insert new Duplicate_Dismissal__c(
-                Pair_Key__c = DuplicateService.pairKey(people[0].Id, people[1].Id)
-            );
+	@IsTest
+	static void aDismissedPairIsNotWrittenAgain() {
+		System.runAs(TestUsers.admin()) {
+			List<Contact> people = twins('Iris');
+			matcherAnswers(people[0].Id, people[1].Id);
+			insert new Duplicate_Dismissal__c(
+				Pair_Key__c = DuplicateService.pairKey(people[0].Id, people[1].Id)
+			);
 
-            Test.startTest();
-            Integer written = DuplicateScanBatch.scanChunk(
-                people,
-                DuplicateSelector.activeRuleIdsByName(new Set<String>{ 'Contact' })
-            );
-            Test.stopTest();
+			Test.startTest();
+			Integer written = DuplicateScanBatch.scanChunk(
+				people,
+				DuplicateSelector.activeRuleIdsByName(new Set<String>{ 'Contact' })
+			);
+			Test.stopTest();
 
-            Assert.areEqual(0, written, 'A pair somebody dismissed is passed over (R-DP5).');
-            Assert.areEqual(0, [SELECT COUNT() FROM DuplicateRecordSet], 'Nothing is written.');
-        }
-    }
+			Assert.areEqual(0, written, 'A pair somebody dismissed is passed over (R-DP5).');
+			Assert.areEqual(0, [SELECT COUNT() FROM DuplicateRecordSet], 'Nothing is written.');
+		}
+	}
 
-    @IsTest
-    static void onlyAPairOfHouseholdsIsWritten() {
-        System.runAs(TestUsers.admin()) {
-            List<Account> accounts = (List<Account>) insertAllowingDuplicates(
-                new List<Account>{
-                    HouseholdTestDataFactory.newHousehold('The Dupscan Family'),
-                    HouseholdTestDataFactory.newHousehold('The Dupscan Family'),
-                    new Account(Name = 'The Dupscan Family')
-                }
-            );
-            DuplicateService.stubMatches = new List<DuplicateService.Pair>{
-                new DuplicateService.Pair(accounts[0].Id, accounts[1].Id, null),
-                new DuplicateService.Pair(accounts[0].Id, accounts[2].Id, null),
-                new DuplicateService.Pair(accounts[1].Id, accounts[2].Id, null)
-            };
+	@IsTest
+	static void onlyAPairOfHouseholdsIsWritten() {
+		System.runAs(TestUsers.admin()) {
+			List<Account> accounts = (List<Account>) insertAllowingDuplicates(
+				new List<Account>{
+					HouseholdTestDataFactory.newHousehold('The Dupscan Family'),
+					HouseholdTestDataFactory.newHousehold('The Dupscan Family'),
+					new Account(Name = 'The Dupscan Family')
+				}
+			);
+			DuplicateService.stubMatches = new List<DuplicateService.Pair>{
+				new DuplicateService.Pair(accounts[0].Id, accounts[1].Id, null),
+				new DuplicateService.Pair(accounts[0].Id, accounts[2].Id, null),
+				new DuplicateService.Pair(accounts[1].Id, accounts[2].Id, null)
+			};
 
-            Test.startTest();
-            Integer written = DuplicateScanBatch.scanChunk(accounts, null);
-            Test.stopTest();
+			Test.startTest();
+			Integer written = DuplicateScanBatch.scanChunk(accounts, null);
+			Test.stopTest();
 
-            if (!ruleActiveFor('Account')) {
-                // Skipped: no active rule for accounts in this org, so no suggestion can be written.
-                Assert.areEqual(0, written, 'With no active rule nothing is written.');
-                return;
-            }
-            Assert.areEqual(1, written, 'Only the two households are paired (R-DP2).');
-            Set<Id> named = new Set<Id>();
-            for (DuplicateRecordItem item : [SELECT RecordId FROM DuplicateRecordItem]) {
-                named.add(item.RecordId);
-            }
-            Assert.areEqual(
-                new Set<Id>{ accounts[0].Id, accounts[1].Id },
-                named,
-                'The organization is in no suggestion.'
-            );
-        }
-    }
+			if (!ruleActiveFor('Account')) {
+				// Skipped: no active rule for accounts in this org, so no suggestion can be written.
+				Assert.areEqual(0, written, 'With no active rule nothing is written.');
+				return;
+			}
+			Assert.areEqual(1, written, 'Only the two households are paired (R-DP2).');
+			Set<Id> named = new Set<Id>();
+			for (DuplicateRecordItem item : [SELECT RecordId FROM DuplicateRecordItem]) {
+				named.add(item.RecordId);
+			}
+			Assert.areEqual(
+				new Set<Id>{ accounts[0].Id, accounts[1].Id },
+				named,
+				'The organization is in no suggestion.'
+			);
+		}
+	}
 
-    @IsTest
-    static void theHouseholdPassReadsOnlyHouseholdsAndSaysWhatItFound() {
-        System.runAs(TestUsers.admin()) {
-            List<Account> accounts = (List<Account>) insertAllowingDuplicates(
-                new List<Account>{
-                    HouseholdTestDataFactory.newHousehold('The Dupscan Family'),
-                    HouseholdTestDataFactory.newHousehold('The Dupscan Family'),
-                    new Account(Name = 'Dupscan Hardware')
-                }
-            );
-            matcherAnswers(accounts[0].Id, accounts[1].Id);
-            DuplicateScanBatch batch = new DuplicateScanBatch('Account', null);
+	@IsTest
+	static void theHouseholdPassReadsOnlyHouseholdsAndSaysWhatItFound() {
+		System.runAs(TestUsers.admin()) {
+			List<Account> accounts = (List<Account>) insertAllowingDuplicates(
+				new List<Account>{
+					HouseholdTestDataFactory.newHousehold('The Dupscan Family'),
+					HouseholdTestDataFactory.newHousehold('The Dupscan Family'),
+					new Account(Name = 'Dupscan Hardware')
+				}
+			);
+			matcherAnswers(accounts[0].Id, accounts[1].Id);
+			DuplicateScanBatch batch = new DuplicateScanBatch('Account', null);
 
-            Test.startTest();
-            List<SObject> scope = new List<SObject>();
-            Database.QueryLocatorIterator rows = batch.start(null).iterator();
-            while (rows.hasNext()) {
-                scope.add(rows.next());
-            }
-            batch.execute(null, scope);
-            batch.finish(null);
-            Test.stopTest();
-            Test.getEventBus().deliver();
+			Test.startTest();
+			List<SObject> scope = new List<SObject>();
+			Database.QueryLocatorIterator rows = batch.start(null).iterator();
+			while (rows.hasNext()) {
+				scope.add(rows.next());
+			}
+			batch.execute(null, scope);
+			batch.finish(null);
+			Test.stopTest();
+			Test.getEventBus().deliver();
 
-            Set<Id> read = new Map<Id, SObject>(scope).keySet();
-            Assert.isTrue(read.contains(accounts[0].Id), 'A household is read.');
-            Assert.isFalse(read.contains(accounts[2].Id), 'An organization is never read (R-DP2).');
-            Assert.areEqual(0, batch.failedChunks, 'Nothing failed.');
-            Assert.areEqual(
-                ruleActiveFor('Account') ? 1 : 0,
-                batch.written,
-                'The one pair of households is written, where the org has a rule to name.'
-            );
-            List<Error_Log__c> summary = [
-                SELECT Severity__c
-                FROM Error_Log__c
-                WHERE Context__c = :DuplicateScanBatch.LOG_CONTEXT
-            ];
-            Assert.areEqual(1, summary.size(), 'A finished scan says so once.');
-            Assert.areEqual(
-                ErrorLogger.SEVERITY_INFO,
-                summary[0].Severity__c,
-                'A clean scan is Info.'
-            );
-        }
-    }
+			Set<Id> read = new Map<Id, SObject>(scope).keySet();
+			Assert.isTrue(read.contains(accounts[0].Id), 'A household is read.');
+			Assert.isFalse(read.contains(accounts[2].Id), 'An organization is never read (R-DP2).');
+			Assert.areEqual(0, batch.failedChunks, 'Nothing failed.');
+			Assert.areEqual(
+				ruleActiveFor('Account') ? 1 : 0,
+				batch.written,
+				'The one pair of households is written, where the org has a rule to name.'
+			);
+			List<Error_Log__c> summary = [
+				SELECT Severity__c
+				FROM Error_Log__c
+				WHERE Context__c = :DuplicateScanBatch.LOG_CONTEXT
+			];
+			Assert.areEqual(1, summary.size(), 'A finished scan says so once.');
+			Assert.areEqual(
+				ErrorLogger.SEVERITY_INFO,
+				summary[0].Severity__c,
+				'A clean scan is Info.'
+			);
+		}
+	}
 
-    @IsTest
-    static void aChunkThatCouldNotBeCheckedIsCountedAndTheSummaryWarns() {
-        System.runAs(TestUsers.admin()) {
-            // Same name, nothing else shared: only the (failing) rules could pair them, since
-            // similar names (R-DP7) pair only with a shared email, phone or postal code.
-            List<Contact> people = (List<Contact>) insertAllowingDuplicates(
-                new List<Contact>{
-                    new Contact(
-                        FirstName = 'Lena',
-                        LastName = 'Dupscan',
-                        Email = 'lena.one@example.org'
-                    ),
-                    new Contact(
-                        FirstName = 'Lena',
-                        LastName = 'Dupscan',
-                        Email = 'lena.two@example.org'
-                    )
-                }
-            );
-            DuplicateService.stubFails = true;
-            DuplicateScanBatch batch = new DuplicateScanBatch('Contact', null);
+	@IsTest
+	static void aChunkThatCouldNotBeCheckedIsCountedAndTheSummaryWarns() {
+		System.runAs(TestUsers.admin()) {
+			// Same name, nothing else shared: only the (failing) rules could pair them, since
+			// similar names (R-DP7) pair only with a shared email, phone or postal code.
+			List<Contact> people = (List<Contact>) insertAllowingDuplicates(
+				new List<Contact>{
+					new Contact(
+						FirstName = 'Lena',
+						LastName = 'Dupscan',
+						Email = 'lena.one@example.org'
+					),
+					new Contact(
+						FirstName = 'Lena',
+						LastName = 'Dupscan',
+						Email = 'lena.two@example.org'
+					)
+				}
+			);
+			DuplicateService.stubFails = true;
+			DuplicateScanBatch batch = new DuplicateScanBatch('Contact', null);
 
-            Test.startTest();
-            batch.execute(null, people);
-            batch.finish(null);
-            Test.stopTest();
-            Test.getEventBus().deliver();
+			Test.startTest();
+			batch.execute(null, people);
+			batch.finish(null);
+			Test.stopTest();
+			Test.getEventBus().deliver();
 
-            Assert.areEqual(1, batch.failedChunks, 'The chunk the matcher refused is counted.');
-            Assert.areEqual(0, batch.written, 'Nothing is written for it.');
-            List<Error_Log__c> summary = [
-                SELECT Severity__c
-                FROM Error_Log__c
-                WHERE Context__c = :DuplicateScanBatch.LOG_CONTEXT
-            ];
-            Assert.areEqual(1, summary.size(), 'One summary.');
-            Assert.areEqual(
-                ErrorLogger.SEVERITY_WARNING,
-                summary[0].Severity__c,
-                'A scan with a chunk it could not check never reads as a clean result.'
-            );
-        }
-    }
+			Assert.areEqual(1, batch.failedChunks, 'The chunk the matcher refused is counted.');
+			Assert.areEqual(0, batch.written, 'Nothing is written for it.');
+			List<Error_Log__c> summary = [
+				SELECT Severity__c
+				FROM Error_Log__c
+				WHERE Context__c = :DuplicateScanBatch.LOG_CONTEXT
+			];
+			Assert.areEqual(1, summary.size(), 'One summary.');
+			Assert.areEqual(
+				ErrorLogger.SEVERITY_WARNING,
+				summary[0].Severity__c,
+				'A scan with a chunk it could not check never reads as a clean result.'
+			);
+		}
+	}
 
-    @IsTest
-    static void peopleStoredAsAccountsAreLeftOutOnlyWhereTheyExist() {
-        System.runAs(TestUsers.admin()) {
-            Assert.areEqual(
-                HouseholdService.isPersonAccountOrg(),
-                DuplicateScanBatch.queryFor('Contact').contains('WHERE'),
-                'The people pass leaves out person accounts, and names the field only where it exists.'
-            );
-            Assert.isTrue(
-                DuplicateScanBatch.queryFor('Account').contains(':householdType'),
-                'The account pass reads households only.'
-            );
-        }
-    }
+	@IsTest
+	static void peopleStoredAsAccountsAreLeftOutOnlyWhereTheyExist() {
+		System.runAs(TestUsers.admin()) {
+			Assert.areEqual(
+				HouseholdService.isPersonAccountOrg(),
+				DuplicateScanBatch.queryFor('Contact').contains('WHERE'),
+				'The people pass leaves out person accounts, and names the field only where it exists.'
+			);
+			Assert.isTrue(
+				DuplicateScanBatch.queryFor('Account').contains(':householdType'),
+				'The account pass reads households only.'
+			);
+		}
+	}
 
-    @IsTest
-    static void aScanStartsOnlyWhenThereIsARuleToRun() {
-        System.runAs(TestUsers.admin()) {
-            Boolean anyActive = ruleActiveFor('Contact') || ruleActiveFor('Account');
-            Test.startTest();
-            Id jobId = DuplicateScanBatch.start();
-            // No stopTest: a scan chains its second object, which a test method cannot run.
-            Assert.areEqual(
-                anyActive,
-                jobId != null,
-                'A scan starts exactly when a rule is active (R-DP3).'
-            );
-        }
-    }
+	@IsTest
+	static void aScanStartsOnlyWhenThereIsARuleToRun() {
+		System.runAs(TestUsers.admin()) {
+			Boolean anyActive = ruleActiveFor('Contact') || ruleActiveFor('Account');
+			Test.startTest();
+			Id jobId = DuplicateScanBatch.start();
+			// No stopTest: a scan chains its second object, which a test method cannot run.
+			Assert.areEqual(
+				anyActive,
+				jobId != null,
+				'A scan starts exactly when a rule is active (R-DP3).'
+			);
+		}
+	}
 
-    /**
-     * The people pass hands what it found to the households pass, so the one summary at the
-     * end covers the whole scan, failures included.
-     */
-    @IsTest
-    static void theNextPassCarriesWhatTheFirstFoundIntoOneSummary() {
-        System.runAs(TestUsers.admin()) {
-            DuplicateScanBatch people = new DuplicateScanBatch(
-                'Contact',
-                new List<String>{ 'Account' }
-            );
-            people.written = 3;
-            people.failedChunks = 1;
+	/**
+	 * The people pass hands what it found to the households pass, so the one summary at the
+	 * end covers the whole scan, failures included.
+	 */
+	@IsTest
+	static void theNextPassCarriesWhatTheFirstFoundIntoOneSummary() {
+		System.runAs(TestUsers.admin()) {
+			DuplicateScanBatch people = new DuplicateScanBatch(
+				'Contact',
+				new List<String>{ 'Account' }
+			);
+			people.written = 3;
+			people.failedChunks = 1;
 
-            Test.startTest();
-            people.finish(null);
-            Test.stopTest();
+			Test.startTest();
+			people.finish(null);
+			Test.stopTest();
 
-            List<Error_Log__c> summaries = [
-                SELECT Message__c, Severity__c
-                FROM Error_Log__c
-                WHERE Context__c = :DuplicateScanBatch.LOG_CONTEXT
-            ];
-            Assert.areEqual(1, summaries.size(), 'One summary for the whole scan.');
-            Assert.areEqual(ErrorLogger.SEVERITY_WARNING, summaries[0].Severity__c);
-            Assert.areEqual(
-                String.format(
-                    Label.Core_Duplicates_ScanFinishedWithFailures,
-                    new List<Object>{ 'Contact, Account', '3', '1' }
-                ),
-                summaries[0].Message__c,
-                'Both passes, with the first pass counts.'
-            );
-        }
-    }
+			List<Error_Log__c> summaries = [
+				SELECT Message__c, Severity__c
+				FROM Error_Log__c
+				WHERE Context__c = :DuplicateScanBatch.LOG_CONTEXT
+			];
+			Assert.areEqual(1, summaries.size(), 'One summary for the whole scan.');
+			Assert.areEqual(ErrorLogger.SEVERITY_WARNING, summaries[0].Severity__c);
+			Assert.areEqual(
+				String.format(
+					BarnHelp.text('Core', 'Core_Duplicates_ScanFinishedWithFailures'),
+					new List<Object>{ 'Contact, Account', '3', '1' }
+				),
+				summaries[0].Message__c,
+				'Both passes, with the first pass counts.'
+			);
+		}
+	}
 
-    // ------------------------------------------------------------------ match sources (R-DP6)
+	// ------------------------------------------------------------------ match sources (R-DP6)
 
-    /** Two people at one address held only on Address records, the one source in use. */
-    private static List<Contact> neighboursOnlyBySource() {
-        MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
-            (Match_Source__mdt) JSON.deserialize(
-                JSON.serialize(
-                    new Map<String, Object>{
-                        'DeveloperName' => 'Address_Person',
-                        'MasterLabel' => 'Address (person)',
-                        NamespaceUtil.qualify('Object_Name__c') => 'Address__c',
-                        NamespaceUtil.qualify('Value_Field__c') => 'Street__c',
-                        NamespaceUtil.qualify('Postal_Code_Field__c') => 'Postal_Code__c',
-                        NamespaceUtil.qualify('Parent_Field__c') => 'Contact__c',
-                        NamespaceUtil.qualify('Normalization__c') => 'Address'
-                    }
-                ),
-                Match_Source__mdt.class
-            )
-        };
-        List<Contact> people = (List<Contact>) insertAllowingDuplicates(
-            new List<Contact>{
-                new Contact(FirstName = 'Wen', LastName = 'Sourcepair'),
-                new Contact(FirstName = 'Wendy', LastName = 'Source-Pair')
-            }
-        );
-        insert new List<Address__c>{
-            new Address__c(
-                Contact__c = people[0].Id,
-                Street__c = '4 Elm Avenue',
-                Postal_Code__c = '60601'
-            ),
-            new Address__c(
-                Contact__c = people[1].Id,
-                Street__c = '4 elm ave.',
-                Postal_Code__c = '60601'
-            )
-        };
-        return people;
-    }
+	/** Two people at one address held only on Address records, the one source in use. */
+	private static List<Contact> neighboursOnlyBySource() {
+		MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+			(Match_Source__mdt) JSON.deserialize(
+				JSON.serialize(
+					new Map<String, Object>{
+						'DeveloperName' => 'Address_Person',
+						'MasterLabel' => 'Address (person)',
+						NamespaceUtil.qualify('Object_Name__c') => 'Address__c',
+						NamespaceUtil.qualify('Value_Field__c') => 'Street__c',
+						NamespaceUtil.qualify('Postal_Code_Field__c') => 'Postal_Code__c',
+						NamespaceUtil.qualify('Parent_Field__c') => 'Contact__c',
+						NamespaceUtil.qualify('Normalization__c') => 'Address'
+					}
+				),
+				Match_Source__mdt.class
+			)
+		};
+		List<Contact> people = (List<Contact>) insertAllowingDuplicates(
+			new List<Contact>{
+				new Contact(FirstName = 'Wen', LastName = 'Sourcepair'),
+				new Contact(FirstName = 'Wendy', LastName = 'Source-Pair')
+			}
+		);
+		insert new List<Address__c>{
+			new Address__c(
+				Contact__c = people[0].Id,
+				Street__c = '4 Elm Avenue',
+				Postal_Code__c = '60601'
+			),
+			new Address__c(
+				Contact__c = people[1].Id,
+				Street__c = '4 elm ave.',
+				Postal_Code__c = '60601'
+			)
+		};
+		return people;
+	}
 
-    @IsTest
-    static void aPairOnlyASourceFindsIsWrittenWithItsReasonAndDismissedWithIt() {
-        System.runAs(TestUsers.admin()) {
-            List<Contact> people = neighboursOnlyBySource();
-            DuplicateService.stubMatches = new List<DuplicateService.Pair>();
-            Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(
-                new Set<String>{ 'Contact' }
-            );
+	@IsTest
+	static void aPairOnlyASourceFindsIsWrittenWithItsReasonAndDismissedWithIt() {
+		System.runAs(TestUsers.admin()) {
+			List<Contact> people = neighboursOnlyBySource();
+			DuplicateService.stubMatches = new List<DuplicateService.Pair>();
+			Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(
+				new Set<String>{ 'Contact' }
+			);
 
-            Test.startTest();
-            Integer written = DuplicateScanBatch.scanChunk(people, rules);
-            Test.stopTest();
+			Test.startTest();
+			Integer written = DuplicateScanBatch.scanChunk(people, rules);
+			Test.stopTest();
 
-            if (!ruleActiveFor('Contact')) {
-                // Skipped: the platform requires an active rule behind every suggestion.
-                Assert.areEqual(0, written, 'With no active rule nothing is written.');
-                return;
-            }
-            Assert.areEqual(1, written, 'The source pair is one suggestion.');
-            DuplicateRecordSet suggestion = [SELECT Id FROM DuplicateRecordSet LIMIT 1];
-            List<Duplicate_Reason__c> reasons = [
-                SELECT Set_Id__c, Reason__c
-                FROM Duplicate_Reason__c
-            ];
-            Assert.areEqual(1, reasons.size(), 'One reason for the suggestion.');
-            Assert.areEqual(String.valueOf(suggestion.Id), reasons[0].Set_Id__c);
-            Assert.areEqual('Same address on Address (person)', reasons[0].Reason__c);
+			if (!ruleActiveFor('Contact')) {
+				// Skipped: the platform requires an active rule behind every suggestion.
+				Assert.areEqual(0, written, 'With no active rule nothing is written.');
+				return;
+			}
+			Assert.areEqual(1, written, 'The source pair is one suggestion.');
+			DuplicateRecordSet suggestion = [SELECT Id FROM DuplicateRecordSet LIMIT 1];
+			List<Duplicate_Reason__c> reasons = [
+				SELECT Set_Id__c, Reason__c
+				FROM Duplicate_Reason__c
+			];
+			Assert.areEqual(1, reasons.size(), 'One reason for the suggestion.');
+			Assert.areEqual(String.valueOf(suggestion.Id), reasons[0].Set_Id__c);
+			Assert.areEqual('Same address on Address (person)', reasons[0].Reason__c);
 
-            DuplicateService.dismiss(suggestion.Id, 'Neighbours, not the same person');
-            Assert.areEqual(
-                0,
-                [SELECT COUNT() FROM Duplicate_Reason__c],
-                'The reason goes with its suggestion.'
-            );
-        }
-    }
+			DuplicateService.dismiss(suggestion.Id, 'Neighbours, not the same person');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Duplicate_Reason__c],
+				'The reason goes with its suggestion.'
+			);
+		}
+	}
 
-    @IsTest
-    static void aPairARuleAlsoFoundIsWrittenOnceAsTheRules() {
-        System.runAs(TestUsers.admin()) {
-            List<Contact> people = neighboursOnlyBySource();
-            matcherAnswers(people[0].Id, people[1].Id);
-            Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(
-                new Set<String>{ 'Contact' }
-            );
+	@IsTest
+	static void aPairARuleAlsoFoundIsWrittenOnceAsTheRules() {
+		System.runAs(TestUsers.admin()) {
+			List<Contact> people = neighboursOnlyBySource();
+			matcherAnswers(people[0].Id, people[1].Id);
+			Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(
+				new Set<String>{ 'Contact' }
+			);
 
-            Test.startTest();
-            Integer written = DuplicateScanBatch.scanChunk(people, rules);
-            Test.stopTest();
+			Test.startTest();
+			Integer written = DuplicateScanBatch.scanChunk(people, rules);
+			Test.stopTest();
 
-            if (!ruleActiveFor('Contact')) {
-                Assert.areEqual(0, written, 'With no active rule nothing is written.');
-                return;
-            }
-            Assert.areEqual(1, written, 'Found by both, proposed once.');
-            Assert.areEqual(
-                0,
-                [SELECT COUNT() FROM Duplicate_Reason__c],
-                'The rule found it, so no source reason is written.'
-            );
-        }
-    }
+			if (!ruleActiveFor('Contact')) {
+				Assert.areEqual(0, written, 'With no active rule nothing is written.');
+				return;
+			}
+			Assert.areEqual(1, written, 'Found by both, proposed once.');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Duplicate_Reason__c],
+				'The rule found it, so no source reason is written.'
+			);
+		}
+	}
 
-    @IsTest
-    static void aSourcePairsReasonGoesWhenItsSuggestionIsClosedByAMerge() {
-        System.runAs(TestUsers.admin()) {
-            List<Contact> people = neighboursOnlyBySource();
-            DuplicateService.stubMatches = new List<DuplicateService.Pair>();
-            Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(
-                new Set<String>{ 'Contact' }
-            );
-            Integer written = DuplicateScanBatch.scanChunk(people, rules);
-            if (!ruleActiveFor('Contact')) {
-                // Skipped: the platform requires an active rule behind every suggestion.
-                Assert.areEqual(0, written, 'With no active rule nothing is written.');
-                return;
-            }
-            DuplicateRecordSet suggestion = [SELECT Id FROM DuplicateRecordSet LIMIT 1];
-            Assert.areEqual(1, [SELECT COUNT() FROM Duplicate_Reason__c], 'Reason written.');
+	@IsTest
+	static void aSourcePairsReasonGoesWhenItsSuggestionIsClosedByAMerge() {
+		System.runAs(TestUsers.admin()) {
+			List<Contact> people = neighboursOnlyBySource();
+			DuplicateService.stubMatches = new List<DuplicateService.Pair>();
+			Map<String, Id> rules = DuplicateSelector.activeRuleIdsByName(
+				new Set<String>{ 'Contact' }
+			);
+			Integer written = DuplicateScanBatch.scanChunk(people, rules);
+			if (!ruleActiveFor('Contact')) {
+				// Skipped: the platform requires an active rule behind every suggestion.
+				Assert.areEqual(0, written, 'With no active rule nothing is written.');
+				return;
+			}
+			DuplicateRecordSet suggestion = [SELECT Id FROM DuplicateRecordSet LIMIT 1];
+			Assert.areEqual(1, [SELECT COUNT() FROM Duplicate_Reason__c], 'Reason written.');
 
-            Test.startTest();
-            DuplicateService.closeSet(suggestion.Id);
-            Test.stopTest();
+			Test.startTest();
+			DuplicateService.closeSet(suggestion.Id);
+			Test.stopTest();
 
-            Assert.areEqual(0, [SELECT COUNT() FROM DuplicateRecordSet], 'Suggestion closed.');
-            Assert.areEqual(
-                0,
-                [SELECT COUNT() FROM Duplicate_Reason__c],
-                'The reason goes with a suggestion a merge closed.'
-            );
-        }
-    }
+			Assert.areEqual(0, [SELECT COUNT() FROM DuplicateRecordSet], 'Suggestion closed.');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Duplicate_Reason__c],
+				'The reason goes with a suggestion a merge closed.'
+			);
+		}
+	}
 
-    @IsTest
-    static void peopleOfOneHouseholdArePairedByEmailButNotByAddress() {
-        System.runAs(TestUsers.admin()) {
-            Account home = AddressTestDataFactory.newHousehold('Sourcepair Household');
-            insertAllowingDuplicates(new List<Account>{ home });
-            List<Contact> people = new List<Contact>{
-                AddressTestDataFactory.newContact('Wen', 'Sourcepair', home.Id),
-                AddressTestDataFactory.newContact('Wendy', 'Sourcepair', home.Id)
-            };
-            insertAllowingDuplicates(people);
-            // Each address row also carries an email in City, read by a second source as an
-            // email held on a related record.
-            insert new List<Address__c>{
-                new Address__c(
-                    Contact__c = people[0].Id,
-                    Street__c = '4 Elm Avenue',
-                    Postal_Code__c = '60601',
-                    City__c = 'wen@sourcepair.example.org'
-                ),
-                new Address__c(
-                    Contact__c = people[1].Id,
-                    Street__c = '4 elm ave.',
-                    Postal_Code__c = '60601',
-                    City__c = 'WEN@sourcepair.example.org'
-                )
-            };
-            Assert.areEqual(
-                HouseholdService.getHouseholdIdsFor(new Set<Id>{ people[0].Id }).get(people[0].Id),
-                HouseholdService.getHouseholdIdsFor(new Set<Id>{ people[1].Id }).get(people[1].Id),
-                'Both in one household'
-            );
+	@IsTest
+	static void peopleOfOneHouseholdArePairedByEmailButNotByAddress() {
+		System.runAs(TestUsers.admin()) {
+			Account home = AddressTestDataFactory.newHousehold('Sourcepair Household');
+			insertAllowingDuplicates(new List<Account>{ home });
+			List<Contact> people = new List<Contact>{
+				AddressTestDataFactory.newContact('Wen', 'Sourcepair', home.Id),
+				AddressTestDataFactory.newContact('Wendy', 'Sourcepair', home.Id)
+			};
+			insertAllowingDuplicates(people);
+			// Each address row also carries an email in City, read by a second source as an
+			// email held on a related record.
+			insert new List<Address__c>{
+				new Address__c(
+					Contact__c = people[0].Id,
+					Street__c = '4 Elm Avenue',
+					Postal_Code__c = '60601',
+					City__c = 'wen@sourcepair.example.org'
+				),
+				new Address__c(
+					Contact__c = people[1].Id,
+					Street__c = '4 elm ave.',
+					Postal_Code__c = '60601',
+					City__c = 'WEN@sourcepair.example.org'
+				)
+			};
+			Assert.areEqual(
+				HouseholdService.getHouseholdIdsFor(new Set<Id>{ people[0].Id }).get(people[0].Id),
+				HouseholdService.getHouseholdIdsFor(new Set<Id>{ people[1].Id }).get(people[1].Id),
+				'Both in one household'
+			);
 
-            MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
-                (Match_Source__mdt) JSON.deserialize(
-                    JSON.serialize(
-                        new Map<String, Object>{
-                            'DeveloperName' => 'Address_Person',
-                            'MasterLabel' => 'Address (person)',
-                            NamespaceUtil.qualify('Object_Name__c') => 'Address__c',
-                            NamespaceUtil.qualify('Value_Field__c') => 'Street__c',
-                            NamespaceUtil.qualify('Postal_Code_Field__c') => 'Postal_Code__c',
-                            NamespaceUtil.qualify('Parent_Field__c') => 'Contact__c',
-                            NamespaceUtil.qualify('Normalization__c') => 'Address'
-                        }
-                    ),
-                    Match_Source__mdt.class
-                ),
-                (Match_Source__mdt) JSON.deserialize(
-                    JSON.serialize(
-                        new Map<String, Object>{
-                            'DeveloperName' => 'Address_Email',
-                            'MasterLabel' => 'Address email',
-                            NamespaceUtil.qualify('Object_Name__c') => 'Address__c',
-                            NamespaceUtil.qualify('Value_Field__c') => 'City__c',
-                            NamespaceUtil.qualify('Parent_Field__c') => 'Contact__c',
-                            NamespaceUtil.qualify('Normalization__c') => 'Email'
-                        }
-                    ),
-                    Match_Source__mdt.class
-                )
-            };
+			MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{
+				(Match_Source__mdt) JSON.deserialize(
+					JSON.serialize(
+						new Map<String, Object>{
+							'DeveloperName' => 'Address_Person',
+							'MasterLabel' => 'Address (person)',
+							NamespaceUtil.qualify('Object_Name__c') => 'Address__c',
+							NamespaceUtil.qualify('Value_Field__c') => 'Street__c',
+							NamespaceUtil.qualify('Postal_Code_Field__c') => 'Postal_Code__c',
+							NamespaceUtil.qualify('Parent_Field__c') => 'Contact__c',
+							NamespaceUtil.qualify('Normalization__c') => 'Address'
+						}
+					),
+					Match_Source__mdt.class
+				),
+				(Match_Source__mdt) JSON.deserialize(
+					JSON.serialize(
+						new Map<String, Object>{
+							'DeveloperName' => 'Address_Email',
+							'MasterLabel' => 'Address email',
+							NamespaceUtil.qualify('Object_Name__c') => 'Address__c',
+							NamespaceUtil.qualify('Value_Field__c') => 'City__c',
+							NamespaceUtil.qualify('Parent_Field__c') => 'Contact__c',
+							NamespaceUtil.qualify('Normalization__c') => 'Email'
+						}
+					),
+					Match_Source__mdt.class
+				)
+			};
 
-            Test.startTest();
-            List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
-                new List<Id>{ people[0].Id, people[1].Id }
-            );
-            Test.stopTest();
+			Test.startTest();
+			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
+				new List<Id>{ people[0].Id, people[1].Id }
+			);
+			Test.stopTest();
 
-            Set<String> reasons = new Set<String>();
-            for (DuplicateService.Pair pair : pairs) {
-                reasons.add(pair.reason);
-            }
-            Assert.areEqual(
-                new Set<String>{ 'Same email on Address email' },
-                reasons,
-                'One household: the shared email pairs them, the shared address does not'
-            );
-        }
-    }
+			Set<String> reasons = new Set<String>();
+			for (DuplicateService.Pair pair : pairs) {
+				reasons.add(pair.reason);
+			}
+			Assert.areEqual(
+				new Set<String>{ 'Same email on Address email' },
+				reasons,
+				'One household: the shared email pairs them, the shared address does not'
+			);
+		}
+	}
 }

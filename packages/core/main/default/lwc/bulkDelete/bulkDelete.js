@@ -8,15 +8,9 @@ import backupPage from '@salesforce/apex/BulkDeleteController.backupPage';
 import { messageFrom, format, downloadCsv } from 'c/findCsv';
 import { startPolling } from 'c/jobPoller';
 import BACKUP from '@salesforce/label/c.Core_BulkDelete_Backup';
-import BACKING_UP from '@salesforce/label/c.Core_BulkDelete_BackingUp';
-import BACKUP_DONE from '@salesforce/label/c.Core_BulkDelete_BackupDone';
 
 import TITLE from '@salesforce/label/c.Core_BulkDelete_Title';
-import PREVIEW_COUNT from '@salesforce/label/c.Core_BulkDelete_PreviewCount';
 import DELETE_BUTTON from '@salesforce/label/c.Core_BulkDelete_DeleteButton';
-import STARTED from '@salesforce/label/c.Core_BulkDelete_Started';
-import PROGRESS from '@salesforce/label/c.Core_BulkDelete_Progress';
-import SUMMARY from '@salesforce/label/c.Core_BulkDelete_Summary';
 import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
 import CONFIRM from '@salesforce/label/c.Core_BulkUpdate_Confirm';
 import UNDO_UNTIL from '@salesforce/label/c.Core_BulkUpdate_UndoUntil';
@@ -43,8 +37,8 @@ const STEPS = [
  * and the confirmed count; BulkDeleteController checks both as the person (canonical model R-BD1
  * to R-BD6). Undo is in Data jobs on the Data Manager tab (dataJobHistory).
  *
- * The import wizard opens it over a delete by file's completed dry run instead (`batchId`,
- * R-BD7): the records are the dry run's Matched rows, and the page sends the batch and the count.
+ * The import wizard opens it over a delete by file's completed preview instead (`batchId`,
+ * R-BD7): the records are the preview's Matched rows, and the page sends the batch and the count.
  *
  * Before the count is typed, "Download these records first" reads the records the delete would
  * delete, every field the person may read, page by page, and saves them as CSV (R-BD8, R-SQ3).
@@ -69,6 +63,12 @@ export default class BulkDelete extends LightningElement {
     get cascades() {
       return helpText('Core', 'Core_BulkDelete_Cascades');
     },
+    get noMatchesHeading() {
+      return helpText('Core', 'Core_BulkDelete_NoMatchesHeading');
+    },
+    get noMatches() {
+      return helpText('Core', 'Core_BulkDelete_ErrorNothingMatches');
+    },
     preview: PREVIEW,
     confirm: CONFIRM,
     undoUntil: UNDO_UNTIL,
@@ -77,6 +77,7 @@ export default class BulkDelete extends LightningElement {
       return helpText('Core', 'Core_BulkDelete_UndoFromTab');
     },
     close: CLOSE,
+    run: PATH_RUN,
     loading: LOADING,
     backup: BACKUP,
     get backupHelp() {
@@ -120,8 +121,32 @@ export default class BulkDelete extends LightningElement {
     return Boolean(this.noticeMessage);
   }
 
+  /** A preview that found nothing: an empty state, with no list, download or Delete button. */
+  get noMatches() {
+    return Boolean(this.preview) && !(this.preview.count > 0);
+  }
+
   get previewLine() {
-    return this.preview ? format(PREVIEW_COUNT, this.preview.count, this.preview.objectLabel) : '';
+    if (!this.preview) {
+      return '';
+    }
+    const one = this.preview.count === 1;
+    const template = one
+      ? helpText('Core', 'Core_BulkDelete_PreviewCountOne')
+      : helpText('Core', 'Core_BulkDelete_PreviewCount');
+    return format(
+      template,
+      this.preview.count,
+      one && this.preview.objectLabelSingular
+        ? this.preview.objectLabelSingular
+        : this.preview.objectLabel
+    );
+  }
+
+  get cascadesMoreLine() {
+    return this.preview && this.preview.cascadesMore > 0
+      ? format(helpText('Core', 'Core_BulkDelete_CascadesMore'), this.preview.cascadesMore)
+      : '';
   }
 
   get hasCascades() {
@@ -148,11 +173,17 @@ export default class BulkDelete extends LightningElement {
     }
     const job = this.job;
     const total = job.chunksTotal || 0;
+    const percent = total ? Math.round(((job.chunksDone || 0) * 100) / total) : 0;
     return {
       ...job,
-      summary: format(SUMMARY, job.matched, job.deleted, job.failed),
-      progressLine: job.running ? format(PROGRESS, job.chunksDone || 0, total) : '',
-      progressValue: total ? Math.round(((job.chunksDone || 0) * 100) / total) : 0,
+      summary: format(
+        helpText('Core', 'Core_BulkDelete_Summary'),
+        job.matched,
+        job.deleted,
+        job.failed
+      ),
+      progressLine: job.running ? helpText('Core', 'Core_BulkDelete_Progress', percent) : '',
+      progressValue: percent,
       hasFailures: Boolean(job.failures && job.failures.length),
       showUndo: Boolean(job.canUndo && !job.running)
     };
@@ -190,14 +221,20 @@ export default class BulkDelete extends LightningElement {
         });
         rows = rows.concat(page.rows || []);
         afterId = page.lastId;
-        this.noticeMessage = format(BACKING_UP, String(rows.length));
+        this.noticeMessage = format(
+          helpText('Core', 'Core_BulkDelete_BackingUp'),
+          String(rows.length)
+        );
       } while (!page.done);
       const columns = (page.columns || []).map((column) => ({
         label: column.label,
         path: column.fieldName
       }));
       downloadCsv(page.objectName, columns, rows);
-      this.noticeMessage = format(BACKUP_DONE, String(rows.length));
+      this.noticeMessage = format(
+        helpText('Core', 'Core_BulkDelete_BackupDone'),
+        String(rows.length)
+      );
     });
   }
 
@@ -207,7 +244,7 @@ export default class BulkDelete extends LightningElement {
       this.job = this.batchId
         ? await startFile({ batchId: this.batchId, confirmedCount })
         : await startDelete({ queryJson: this.queryJson, confirmedCount });
-      this.noticeMessage = STARTED;
+      this.noticeMessage = helpText('Core', 'Core_BulkDelete_Started');
       this.preview = undefined;
       this.confirmText = '';
       this.startPolling();

@@ -17,14 +17,6 @@
         <value>Include Data Quality Checks</value>
     </labels>
     <labels>
-        <fullName>Core_AiExport_NeedsFind</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: records need the Find permission</shortDescription>
-        <value>Include Records and Include Data Quality Checks need the Find and Export Records permission.</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_Review</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
@@ -39,14 +31,6 @@
         <protected>false</protected>
         <shortDescription>AI-Readiness Export: sensitive fields heading</shortDescription>
         <value>Sensitive Fields</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_NoSensitive</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: no sensitive fields found</shortDescription>
-        <value>No field of the kinds of record you chose was flagged as sensitive. Check the fields yourself before you share records.</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_ColWhy</fullName>
@@ -159,54 +143,6 @@
         <protected>false</protected>
         <shortDescription>AI-Readiness Export: download button</shortDescription>
         <value>Download Pack</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_RecordsProgress</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: reading records, {0} is the object, {1} the count</shortDescription>
-        <value>Reading records of {0}: {1} so far.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_Writing</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: writing the zip</shortDescription>
-        <value>Writing the pack.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_Done</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: done, {0} is objects, {1} is records</shortDescription>
-        <value>Downloaded the pack: {0} kinds of record and {1} records.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_Stopped</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: limit hit, {0} is the limit, {1} the objects</shortDescription>
-        <value>Records stopped at the Find export row limit ({0}) for: {1}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_RecordsFailed</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: records failed, {0} is the objects</shortDescription>
-        <value>Records could not be read for: {0}. The pack lists their fields without records.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ChecksFailed</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: checks could not be read</shortDescription>
-        <value>The Data Quality checks could not be read, so the pack leaves them out.</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_ReadmeIntro</fullName>

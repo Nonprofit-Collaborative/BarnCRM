@@ -22,7 +22,7 @@ the thank you is yours to write and rewrite, and the receipt is not.
 Everything is in the app, with one exception noted at step 3.
 
 1. Open **BarnCRM Settings**, then **Giving**, then **Acknowledgments**.
-2. Turn on **Send Gift Acknowledgments**. Nothing is queued until you do, because a thank you sent
+2. Turn on **Send gift acknowledgments**. Nothing is queued until you do, because a thank you sent
    with the wrong wording cannot be recalled.
 3. Decide what your emailed thank you says. The wording lives in a standard Salesforce email
    template, which means you get the normal editor, the preview, and the test send.
@@ -47,7 +47,8 @@ Everything is in the app, with one exception noted at step 3.
    `giving@yourorg.org` rather than from whoever pressed Send. The address has to be one
    your org has already verified as an organization wide address.
 6. If you want emailed thank yous to go out overnight without anybody pressing anything,
-   turn on **Send emails nightly** on the same page. It runs at 2:45 in the morning. Leave
+   turn on **Send emails nightly** on the same page. That switches on the acknowledgments step
+   of [BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run, at 2:45 in the morning. Leave
    it off if you would rather look at the queue first, which is what most organizations do
    for the first month.
 
@@ -56,7 +57,7 @@ Everything is in the app, with one exception noted at step 3.
 Start with the sample data loaded (see [sample-data.md](sample-data.md)).
 
 1. Open **BarnCRM Settings**, then **Giving**, then **Acknowledgments**. Turn on
-   **Send Gift Acknowledgments**.
+   **Send gift acknowledgments**.
 2. Choose **New Rule**. Name it `Everything else`, order `100`, channel `Email`, and choose
    **BarnCRM: thank you for your gift** as the email template. Save.
 3. Choose **New Rule** again. Name it `Major gifts`, order `10`, channel `Letter`, minimum

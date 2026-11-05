@@ -123,7 +123,7 @@ Salesforce org is needed for this job. Steps:
    description over 80 characters, a value over 1000, or any of them missing, each of
    which only an org would otherwise report.
    `scripts/ci/check-label-budget.py` fails when the label total across all packages
-   passes its budget (4,150; target 4,000), when a label is referenced nowhere in
+   passes its budget (3,215; target 3,000), when a label is referenced nowhere in
    `packages/`, or when a label reads as help prose (a sentence whose name ends in a help
    word such as `Intro`, `Help`, `Description`, `Note` or `Empty`; see the script's docstring). An org allows 5,000 custom labels; installed managed package labels do not
    count, but every source deploy does, beside the org's own labels, and a source deploy
@@ -132,7 +132,23 @@ Salesforce org is needed for this job. Steps:
    `Core_Shared_*` words and the `Core_Format_*` patterns such as `{0} ({1})`; modules may
    use a Core label once it is unprotected) before adding one. Help and guidance prose
    is never a label: it goes in the package's help catalog (`docs/contributor-guide/ux-kit.md`,
-   Help Text; ADR-NEXT `NEXT-help-text-json.md`).
+   Help Text; ADR-0164 `0164-help-text-json.md`).
+   `scripts/ci/check-apex-budget.py` fails when a package's non-test Apex, measured as the
+   org measures it (every character but comments; `@IsTest` classes excluded), passes its cap
+   (`CAPS` in the script, about 2 percent above each package's size on 2026-11-05), or when a
+   package has no cap. An org allows 6,000,000 characters for its own code and every unmanaged
+   BarnCRM package together, and scratch orgs allow 10,000,000, so only this sees growth.
+   Raise a cap only in the pull request that needs it, and say why. The trim pass targets
+   3,600,000 for the full suite and 2,000,000 for Core (the check reports the gap);
+   `--report` prints each package's size and the largest classes.
+   **Apex is indented with tabs** (`"useTabs": true` in the `*.{cls,trigger}` override of
+   `.prettierrc`, with `tabWidth` still 4 so lines wrap where they did). The org counts every
+   character but comments, leading whitespace included (about a quarter of the source was
+   indentation), and a tab is one character where four spaces are four: on `oi-test`, BarnHelp's
+   `ApexClass.LengthWithoutComments` fell from 4,380 to 3,672 (16 percent), and the whole suite
+   from 4,394,706 to 3,523,686 characters (Core from 2,421,585 to 1,942,950). Format with
+   Prettier and the repository's configuration, so a hand-indented file does not creep the
+   count back up.
    `scripts/ci/check-help-text.py` checks those catalogs (`BarnHelp_<Package>.json`): every
    key a `helpText`, `BarnHelp.text` or `help-key` names is in its package's catalog and
    written as a literal, every catalog key is used and is not also a label, translations are
@@ -277,6 +293,12 @@ Salesforce org is needed for this job. Steps:
    a user without that grant, and a Jest mock cannot see it (the Volunteers readiness card
    shipped broken this way). A deliberate exception goes in
    `scripts/ci/aura-class-access-allowlist.txt` as `Class  reason`.
+   `scripts/ci/check-trigger-handler-records.py` fails the build if a class that extends
+   `TriggerHandler` (directly or through another handler) reads `Trigger.new`, `Trigger.old`,
+   `Trigger.newMap` or `Trigger.oldMap`. A handler reads its records through `newRecords()`,
+   `oldRecords()`, `newRecordsById()` and `oldRecordsById()`, because the dispatcher narrows
+   them and reruns a handler on the rest after a failure (ADR-0165 rule 3); only
+   `TriggerHandler` reads the platform's own.
 17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
    (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
    mapping from the real package source, so a new object or field that breaks it fails here.
@@ -685,6 +707,112 @@ including the gate, fails at once with `UNKNOWN_EXCEPTION` before any test start
 While you iterate, use `sf apex run test --class-names <Class> --target-org <alias>` for one
 class, or the relevant-tests run above for a branch; the full run is the final run before
 merge, not the inner loop.
+
+**An org deployed by source is not an upgraded org until setup runs (QA-C-04).** A source
+deploy runs no install handler, and `run-org-tests.sh` passes `SOURCE_POST_INSTALL=0` on
+purpose: the Apex tests assume an org that has never saved BarnCRM Settings, and a test org
+marked as a new install has every feature off. So after a release gate, and before QA or UX
+testing on the same org, run Core's setup once, then each module's setup that the org has
+(`deploy-packages.sh` runs the same block when it is not told otherwise):
+
+```
+echo 'CorePostInstall.runAsSourceDeploy();' | sf apex run -o <alias>
+for m in Rollups Giving Volunteers Programs LogicModels Funders Mirror; do
+  echo "new ${m}PostInstall().runSetup(UserInfo.getUserId());" | sf apex run -o <alias>
+done
+```
+
+Until then shipped import template names keep their old casing, templates added by a later
+version (Relationships, Affiliations) are missing, shipped templates keep the people mode they
+were created with, and `Shipped_Defaults_Applied__c` is empty, so the upgrade scripts in the
+Testing Guide (T-SET-22, T-IMP-22, T-IMP-01) cannot pass. The nightly run is scheduled by setup
+only on a new install, or by adopting a schedule an earlier version had; an org with neither
+shows **Schedule Nightly Jobs** on the Nightly Jobs panel (T-SET-25 steps 3 and 4), so step 1
+of T-SET-25 needs an org that really was upgraded. The gate script does not run setup itself:
+it marks the org as set up and changes org state (it renames templates and realigns their
+people mode), which the next gate run's tests must not see. It is safe to run twice. Do the same
+after the `barn-npc` and `mwdbdevsb` deploys.
+
+### Release destructive manifest
+
+A source deploy adds and updates components but never deletes one. A class, label, field or
+tab a release removes stays in every org that had it, keeps counting toward the org's Apex,
+label and object limits, and can break a later compile (`barn-npc` kept 77 stale components
+in October 2026). So every release to a long-lived org (`barn-npc`, `mwdbdevsb`, and every
+organization's own org) carries a destructive manifest for what was removed since the version
+that org has:
+
+```
+python3 scripts/org/build-destructive-manifest.py <org's version> <release> \
+  --packages core,rollups --out release-<version>/destructive
+```
+
+- `<org's version>` and `<release>` are git refs (tags, branches or commits). `--packages` names
+  the packages the org has. A component that moved to another package is not removed.
+- Test orgs and long-lived orgs rarely sit on one version. Build the manifest from each version
+  in use and keep the union of the members (a member an org never had is only a warning, which
+  `--ignore-warnings` accepts). `release-0.17/destructive` is that union for releases 0.15 to
+  0.17: the removals since `19463c55` (before landing batch 8) and since `main` at `c06865c6`
+  (6 classes and the label and content asset removals of batch B; `Import_Row_Retention_Days`,
+  `ImportRowPurgeBatch`, `ErrorLogRetention`, `NightlyJob`, `NightlyJobProvider` and
+  `NamedNightlyJob` are in it).
+- Before QA on an org, compare its `Setting_Definition__mdt` names with the repo's: a definition
+  the repo lacks (QA-C-02: `Import_Row_Retention_Days`) shows a setting that nothing reads. The
+  Settings page already leaves out a definition whose field is missing.
+- It writes `package.xml` (empty) and `destructiveChangesPost.xml`, and prints the count per
+  type. A removed record type is printed instead (the Metadata API cannot delete one:
+  deactivate and delete it in Setup), as is any removed file whose type the script does not
+  map; either makes the exit status 1.
+- Deploy it with the release: add `--post-destructive-changes <dir>/destructiveChangesPost.xml
+  --ignore-warnings` to the release's `sf project deploy start` (the warnings are members an
+  org never had).
+- Deploy it first, on its own, when removed labels must free room before the release adds
+  labels (the label limit is checked before the deletions run) or when a stale component would
+  fail to compile against the release: `sf project deploy start --manifest <dir>/package.xml
+  --post-destructive-changes <dir>/destructiveChangesPost.xml --ignore-warnings`. A removed
+  class that an old class the release changes still calls cannot go first; it stays in the
+  release deploy.
+- Abort BarnCRM's scheduled jobs before a manifest deletes a schedulable class, and schedule
+  them again after (`deploy-packages.sh` does this for its own deploys).
+- Record the member count with the release in the org's row in the root `architecture.md`.
+
+**What a redeploy overwrites.** A source deploy replaces each shipped component whole, so an
+administrator's edit to one is lost at the next release: an object's sharing setting (a change
+to or from Private also starts a sharing recalculation), record pages, page layouts, list
+views, permission sets and groups (record type access a set no longer names is removed),
+picklist values on shipped fields, validation rules, labels, flow templates, and shipped
+custom metadata records such as `Automation_Registry__mdt` and `Setting_Definition__mdt`.
+Records, the settings saved in BarnCRM Settings, and components the organization made itself
+are kept. The Admin Guide (Installing BarnCRM, Upgrading) tells administrators to clone a
+shipped component rather than edit it.
+
+### Tests survive an org's own customizations
+
+BarnCRM installs as source with no namespace, so its tests are the org's local tests: they run
+in a production install and in every later production deploy the organization makes, beside
+the org's own validation rules, required fields, duplicate rules, flows and other packages'
+triggers on Account and Contact (architect review RT-02). The shared test data
+(`TestDataFactory` and the household, address and relationship factories built on it) handles
+what a test can:
+
+- **Duplicate rules:** `TestDataFactory.pastDuplicateRules(record)` saves past them.
+- **Required fields:** the same call fills every custom field the org requires (not nillable,
+  createable, no default) that the test left empty, with a plain sample value by type, through
+  `TestDataFactory.fillOrgRequiredFields`. A value the test set is kept; standard fields and
+  person account (`__pc`) fields are left to the test.
+- **Access:** tests run as a user they create (below), so the org's profiles and permission
+  sets do not decide the result.
+
+So build Account and Contact records through the factories (`HouseholdTestDataFactory.newContact`,
+`newHousehold`, `RelationshipTestDataFactory`, `AddressTestDataFactory`), or pass a record built
+by hand through `TestDataFactory.pastDuplicateRules` before inserting it.
+
+What no test can handle, so the install guide and pre-check report it instead: an active
+validation rule (Apex cannot skip one), a required lookup field (no sample record to point
+at), and an org's own record-triggered flow or trigger that fails. About 760 test sites
+(344 `new Account(`, 414 `new Contact(` in test classes on 2026-11-04) still build records by
+hand without the factory; they get the duplicate-rule and required-field help only once moved
+onto it.
 
 ### Tests run as a user they create
 

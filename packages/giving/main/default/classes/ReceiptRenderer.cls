@@ -14,18 +14,18 @@
  */
 @NamespaceAccessible
 public interface ReceiptRenderer {
-    /**
-     * The PDF bytes for one composed document.
-     *
-     * @param html a complete HTML document, already merged and already carrying the tax
-     *        sentences `ReceiptContentBuilder` is responsible for.
-     * @return the rendered PDF.
-     */
-    Blob render(String html);
+	/**
+	 * The PDF bytes for one composed document.
+	 *
+	 * @param html a complete HTML document, already merged and already carrying the tax
+	 *        sentences `ReceiptContentBuilder` is responsible for.
+	 * @return the rendered PDF.
+	 */
+	Blob render(String html);
 
-    /**
-     * What this renderer is, in a few words, for the Error Log and the run record. A failed
-     * year end run should say which renderer produced the failure without anyone reading code.
-     */
-    String describe();
+	/**
+	 * What this renderer is, in a few words, for the Error Log and the run record. A failed
+	 * year end run should say which renderer produced the failure without anyone reading code.
+	 */
+	String describe();
 }
