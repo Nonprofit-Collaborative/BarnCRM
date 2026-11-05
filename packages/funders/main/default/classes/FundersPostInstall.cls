@@ -63,6 +63,8 @@ public with sharing class FundersPostInstall implements InstallHandler, ModuleSe
      * @param installerId the person to give Funders Admin, or null for nobody
      */
     public void runSetup(Id installerId) {
+        // A job scheduled on its own before the nightly run becomes its step (R-NJ5).
+        NightlyJobs.adoptOldSchedules();
         // Each entry point records its own failures and returns, so nothing here throws.
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         FunderReportTemplates.installDefaultsDuringInstall();

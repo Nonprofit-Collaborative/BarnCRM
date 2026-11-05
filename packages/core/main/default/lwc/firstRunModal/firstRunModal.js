@@ -111,8 +111,9 @@ export default class FirstRunModal extends LightningModal {
   get features() {
     return ((this.state && this.state.features) || []).map((feature) => ({
       ...feature,
-      checked: feature.isOn || !this.unticked.has(feature.key),
-      disabled: feature.isOn || this.busy
+      // A feature that waits (its row says why, RT-04) cannot be ticked; one already on stays.
+      checked: feature.isOn || (!feature.blockedReason && !this.unticked.has(feature.key)),
+      disabled: feature.isOn || this.busy || Boolean(feature.blockedReason)
     }));
   }
 
@@ -145,7 +146,7 @@ export default class FirstRunModal extends LightningModal {
 
   async handleFinish() {
     const keys = this.features
-      .filter((feature) => !this.isChoosing || feature.checked)
+      .filter((feature) => (this.isChoosing ? feature.checked : !feature.blockedReason))
       .map((feature) => feature.key);
     this.busy = true;
     this.errorMessage = undefined;

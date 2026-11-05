@@ -299,17 +299,15 @@ private class GrantReminderTest {
             );
             report.Assigned_To__c = staffId;
             insert report;
-            List<NightlyJob> jobs = new FundersNightlyJobProvider().nightlyJobs();
-            Boolean before = jobs[0].isScheduled();
+            List<NightlyStep> steps = new FundersNightlyJobProvider().nightlySteps();
 
             Test.startTest();
-            jobs[0].schedule();
-            jobs[0].schedule();
-            new GrantReminderScheduler().execute(null);
+            steps[0].run();
             Test.stopTest();
 
-            Assert.isFalse(before, 'Not scheduled at first');
-            Assert.isTrue(jobs[0].isScheduled(), 'Scheduled, once however often asked');
+            Assert.areEqual(1, steps.size(), 'One step');
+            Assert.areEqual(360, steps[0].minute, 'At six in the morning');
+            Assert.isFalse(steps[0].hasSwitch(), 'No switch of its own');
             Assert.areEqual(
                 Date.today().addDays(3),
                 reread(report.Id).Reminder_Sent_For__c,

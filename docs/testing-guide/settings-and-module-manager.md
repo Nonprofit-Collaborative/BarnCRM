@@ -152,12 +152,30 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In Setup, open **Custom Settings**, **Manage** next to **BarnCRM Automation Control**, and add a value for the user Sam with **Bypass** ticked. | The row lists Sam with Bypass checked. |
+| 1 | Open **BarnCRM Settings**, **Automation**. Under **Pause or Bypass for Some People**, choose **User**, pick Sam, and select **Add**. | Below **Whole Organization** (both boxes off), a row for Sam, type User, with **Bypass** ticked and **Pause All** off. |
 | 2 | As Sam, create a person `Test Bypassed`. | The person saves with no household (the household automation was skipped for Sam). |
 | 3 | As the admin, create a person `Test Normal`. | The person gets a household as usual. |
-| 4 | Remove Sam's row. Open **BarnCRM Settings**, **Automation**, pause for **1 hour**, then click **Resume Automation**. Wait a minute and open `Test Bypassed`. | `Test Bypassed` now has a household: resuming caught up the people added without one. |
+| 4 | Select **Remove** on Sam's row, then **Catch Up Now**. Wait a minute and open `Test Bypassed`. | Sam's row is gone and the page says the catch-up has started. `Test Bypassed` now has a household. |
+| 5 | Tick **Pause All** on **Whole Organization**. | A yellow bar at the top says automation is paused for everyone, with **Turn Off**. Create a person: no household. |
+| 6 | Add your own profile, untick its **Bypass**, and create a person. | The person gets a household: your profile's row (both off) replaces the organization's for you. |
+| 7 | Remove your profile's row and select **Turn Off** in the yellow bar. | The bar is gone and **Pause All** is off on **Whole Organization**. |
+| 8 | As a user without **Manage BarnCRM Settings**, open the page. | The rows show, but the boxes, **Add**, **Remove** and **Catch Up Now** are disabled. |
 
-**Cleanup:** delete both test people and their households.
+**Cleanup:** delete the test people and their households.
+
+## T-SET-07C: List Your Own Flow on the Automation Page
+
+**Purpose:** confirm an org's own flow can be listed with a switch that Check BarnCRM Automation reads.
+**Prerequisites:** admin user; an active record-triggered flow of your own, `My_Test_Flow`, that starts with the **Check BarnCRM Automation** action (Automation Name `Flow:My_Test_Flow`) and ends when **Run** is false, and otherwise sets a field you can see.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Automation**. Under **Your Own Flows**, pick `My_Test_Flow` and select **Add**. | The flow joins the automation list, switched on, with a description naming `Flow:My_Test_Flow`, and a **Remove** button. It is no longer offered in the picker. |
+| 2 | Save a record the flow runs on. | The flow sets its field. |
+| 3 | Switch the flow's row **Off** and save another record. | The flow does not set its field. |
+| 4 | Select **Remove** on the row. | The row is gone and the flow is offered again. The flow itself is unchanged and still active. |
+
+**Cleanup:** deactivate or delete `My_Test_Flow`.
 
 ## T-SET-08: Turn on a Feature Left Off
 
@@ -465,3 +483,22 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 6 | Reload the page. | The patterns are back to their saved values. |
 
 **Cleanup:** turn Giving back on if step 2 left it off.
+
+## T-SET-25: One Nightly Run
+
+**Purpose:** confirm every nightly job runs from the one schedule, in order, and the panel shows each job's result.
+**Prerequisites:** the admin user. For step 1, an org upgraded from a version whose nightly jobs were scheduled one by one.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | After the upgrade, open Setup, **Scheduled Jobs**. | One **BarnCRM Nightly Jobs** job at midnight, plus **BarnCRM Tab Access Check**; none of the old BarnCRM nightly jobs remain. |
+| 2 | Open **BarnCRM Settings**, **General**, **Nightly Jobs**. | Says the run is scheduled; lists each job in time order with its time and On or Off. A job that was scheduled before the upgrade reads On. |
+| 3 | Delete **BarnCRM Nightly Jobs** in Setup, then reload the panel. | Says it is not scheduled and shows **Schedule Nightly Jobs**. Health Check lists **Nightly Jobs Are Not Scheduled**. |
+| 4 | Press **Schedule Nightly Jobs**. | The panel says it is scheduled. |
+| 5 | On the **Error Log** section, press **Stop Daily Run**; back on **Nightly Jobs**. | The Error Log digest reads Off; the run stays scheduled. |
+| 6 | The next morning, read the panel. | Each job shows a last run and a result (Done, Done With Errors, Skipped for jobs that are off). |
+| 7 | Sign in as a user without Manage BarnCRM Settings and open the panel. | The list shows; there is no Schedule button. |
+| 8 | As the admin, open **General**, then **Duplicate Matching**, **Import** and **Org Optimizer**. | Each shows its Days to Keep setting with its default (730, 365, 365, 730); the panel lists **Record Cleanup** at 1:20, On. |
+| 9 | Set **Days to Keep Merge History** to 5 and save. | A value below 30 is not accepted (the range is 30 to 3650). Set it back to 365. |
+
+**Cleanup:** press **Schedule Daily Run** on the Error Log section again.
