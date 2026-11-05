@@ -40,7 +40,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">See how many appeals have a matching Campaign, and give the rest theirs with Sync all appeals. Needs the Campaign Sync permission set.</value>
+        <value xsi:type="xsd:string">See how many appeals have a matching Campaign, and give the rest theirs with Sync All Appeals. Needs the Campaign Sync permission set.</value>
     </values>
     <values>
         <field>Help_Path__c</field>

@@ -105,7 +105,7 @@ One step is left for you, and nothing in the app does it on your behalf:
 1. From the App Launcher, open the **BarnCRM Admin** app and click the **Rollup
    Builder** tab. (In **BarnCRM Settings**, the **Rollups** section opens the same page.)
 2. You should see every total listed above, one row each.
-3. Click **Schedule nightly recalculation**. This switches the rollup recalculation step on
+3. Click **Schedule Nightly Recalculation**. This switches the rollup recalculation step on
    in [BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run, and makes sure that run
    is scheduled. The page then shows "Nightly recalculation is scheduled for 2:00 AM." (or
    the hour you chose in **Time of the nightly run**).
@@ -583,7 +583,9 @@ After changing exchange rates, recalculate your money totals to bring them up to
 
 ### Needs Attention
 
-Under the list, **Needs Attention** shows what the engine has not finished:
+**Needs Attention** is the first section of the page, above the templates and the list, and
+appears only while something needs attention, with a count badge beside its heading (a clean
+queue shows nothing). It shows what the engine has not finished:
 
 - **Records waiting**, for example "1,204 records waiting, oldest 3 minutes ago". These are
   totals from recent saves and bulk changes, queued and calculated within a minute or a few.
@@ -620,7 +622,7 @@ Build and check rollups in a sandbox, then move them to production with a file:
 1. In the sandbox, on the **Rollup Builder** tab, tick **Include in the export** on the rollups
    to move, or tick none to move every rollup you made. Click **Export to a File**. Your
    browser saves `barncrm-rollups.json`.
-2. In production, on the **Rollup Builder** tab, choose the file under **Import from a file**.
+2. In production, on the **Rollup Builder** tab, choose the file under **Import From a File**.
    A table says what would happen to each rollup: **New: will be created**, **Will replace the
    rollup here with the same Definition Key**, or **Not saved** with the reason. Nothing is
    saved yet.
@@ -720,7 +722,9 @@ offered too.
 
 ### With a Generated Trigger
 
-The **Instant Totals** section at the bottom of the Rollup Builder lists every object an
+The **Instant Totals** section sits in the **Advanced** section at the bottom of the Rollup
+Builder (click **Advanced** to open it). Its setup panel starts by pointing to the no-code
+option, the Flow template (see [With the Flow Template](#with-the-flow-template)). It lists every object an
 **Instantly** or **Both (recommended)** rollup counts, and every object that still has a
 BarnCRM trigger, with what each one does today:
 
@@ -752,7 +756,7 @@ test, named from the object (for opportunities, `BarnRollup_Opportunity` and
    your org that already fail do not block it.
 5. Back in the Rollup Builder, the object shows **On** as soon as the trigger is in the org.
 
-If you use the Salesforce CLI, **Download deploy package** saves a zip with the trigger and
+If you use the Salesforce CLI, **Download Deploy Package** saves a zip with the trigger and
 its test, and the Builder shows the command that deploys it, to a sandbox or straight to
 production, running only the generated test.
 
@@ -783,7 +787,7 @@ not uninstall BarnCRM while it is there). Click **Remove the Trigger**:
 
 1. In a sandbox, delete the trigger and its test class in Setup (**Apex Triggers**, **Apex
    Classes**).
-2. Production does not allow deleting Apex in Setup. **Download removal package** saves a zip
+2. Production does not allow deleting Apex in Setup. **Download Removal Package** saves a zip
    that deletes both, and the Builder shows the Salesforce CLI command that deploys it.
 
 ### With the Flow Template
@@ -825,8 +829,9 @@ put right anyway. To have one person's saves leave a rollup alone:
 1. In Setup, open **Custom Permissions** and create one, for example **Data Migration**
    (API name `Data_Migration`), or use one you already have.
 2. Give it to that person through a permission set.
-3. In the Rollup Builder, edit the rollup and, on the last step, enter the API name in **Skip
-   for people with this custom permission (optional)**. Save.
+3. In the Rollup Builder, edit the rollup and, on the last step, pick it in **Skip for people
+   with this custom permission (optional)**, a list of your org's custom permissions (**None**
+   by default). Save.
 
 What to know:
 
@@ -836,10 +841,11 @@ What to know:
   (recommended)**, and so do **Recalculate** and **Recalculate All**. A rollup set to
   **Instantly** is put right only when you click **Recalculate**, so prefer **Both** for a
   rollup you skip.
-- **A name that does not exist is refused** when you save, with the name in the message.
-  Enter it exactly as the API name in Setup. A custom permission from an installed package is
-  written with its prefix, for example `prefix__Name`.
-- Leave the field blank to have everyone's saves update the total.
+- **The list shows each permission by its label and API name.** A custom permission from an
+  installed package is listed with its prefix, for example `prefix__Name`. A name saved
+  earlier that the list no longer holds stays selected, and a name that does not exist is
+  still refused when you save.
+- Choose **None** to have everyone's saves update the total.
 
 ## Recalculating From a Flow or From Apex
 
@@ -914,7 +920,7 @@ BarnCRM reads DLRS's rollups (never changes them) to stop the two tools filling 
 - **Your answer is recorded.** **OK** writes a row to **Recent Changes** in BarnCRM Settings,
   named **Rollup Builder:** and the rollup's name, saying you confirmed the DLRS rollup will be
   switched off. Then switch it off in DLRS yourself; BarnCRM does not.
-- **A file import cannot ask**, so **Import from a file** does not save a rollup that is on in
+- **A file import cannot ask**, so **Import From a File** does not save a rollup that is on in
   the file when an active DLRS rollup fills its field, and says why. Import it switched off, or
   switch the DLRS rollup off first.
 - **Switching off and saving a rollup switched off** never ask: a rollup that is off fills

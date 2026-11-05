@@ -158,7 +158,7 @@ public without sharing class RollupFullRecalcBatch implements Database.Batchable
 		}
 		if (AutomationControl.isPaused()) {
 			ErrorLogger.logMessage(
-				System.Label.Core_Rollups_FullRunPaused,
+				BarnHelp.text('Rollups', 'Core_Rollups_FullRunPaused'),
 				LOG_CONTEXT,
 				ErrorLogger.SEVERITY_INFO
 			);

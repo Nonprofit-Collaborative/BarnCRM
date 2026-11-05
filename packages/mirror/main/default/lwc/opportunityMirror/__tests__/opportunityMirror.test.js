@@ -35,11 +35,6 @@ jest.mock(
   { virtual: true }
 );
 jest.mock(
-  '@salesforce/label/c.Mirror_OpportunityMirror_GiftSide',
-  () => ({ default: 'Gifts: {0}, total {1}' }),
-  { virtual: true }
-);
-jest.mock(
   '@salesforce/label/c.Mirror_OpportunityMirror_DifferenceCount',
   () => ({ default: 'Differences found: {0}. The first {1} are listed.' }),
   { virtual: true }
@@ -149,7 +144,7 @@ describe('c-opportunity-mirror', () => {
       direction: 'OpportunitiesToGifts',
       startDate: '2026-01-01'
     });
-    expect(find(element, 'direction').textContent).toBe(
+    expect(find(element, 'direction').message).toBe(
       'Won Opportunities closed on or after Jan 1, 2026 become gifts.'
     );
   });
@@ -182,7 +177,7 @@ describe('c-opportunity-mirror', () => {
     const element = await mount(READY);
     find(element, 'run-now').click();
     await flush();
-    expect(find(element, 'error').textContent).toBe('A run is already in progress.');
+    expect(find(element, 'error').message).toBe('A run is already in progress.');
   });
 
   it('compares a range, lists the differences and offers to copy them again', async () => {
@@ -194,10 +189,9 @@ describe('c-opportunity-mirror', () => {
     expect(compare).toHaveBeenCalledWith(
       expect.objectContaining({ fromDate: expect.any(String), toDate: expect.any(String) })
     );
-    expect(find(element, 'gift-side').textContent).toBe('Gifts: 4, total $175.00');
-    expect(find(element, 'difference-count').textContent).toBe(
-      'Differences found: 1. All are listed.'
-    );
+    expect(find(element, 'gift-count').value).toBe(4);
+    expect(find(element, 'gift-total').value).toBe(175);
+    expect(find(element, 'difference-count').message).toBe('Differences found: 1. All are listed.');
     expect(find(element, 'differences').data[0].giftUrl).toBe('/a01');
     const compared = compare.mock.calls[0][0];
     const from = find(element, 'from');
@@ -214,7 +208,7 @@ describe('c-opportunity-mirror', () => {
     const element = await mount(READY);
     find(element, 'compare').click();
     await flush();
-    expect(find(element, 'difference-count').textContent).toBe(
+    expect(find(element, 'difference-count').message).toBe(
       'Differences found: 3. The first 1 are listed.'
     );
   });
@@ -269,6 +263,6 @@ describe('c-opportunity-mirror', () => {
     const element = createElement('c-opportunity-mirror', { is: OpportunityMirror });
     document.body.appendChild(element);
     await flush();
-    expect(find(element, 'error').textContent).toBe('Something went wrong.');
+    expect(find(element, 'error').message).toBe('Something went wrong.');
   });
 });

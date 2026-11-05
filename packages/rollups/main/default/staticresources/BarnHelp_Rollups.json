@@ -1,11 +1,17 @@
 {
   "languages": ["en"],
   "texts": {
-    "Core_RollupBuilder_BypassPermissionHelp": "The API name of a custom permission, such as Data_Migration. Records saved by people who hold it do not update this total. Recalculate still does, and so does the nightly run when the rollup runs Every night or Both.",
+    "Core_HealthCheck_RollupQueueFailedDetail": "{0} queued total updates failed five times and are waiting. The Error Log says why, often a validation rule or a record being edited. Fix the cause, then click Retry in Needs Attention.",
+    "Core_HealthCheck_RollupQueueStuckDetail": "{0} queued total updates have waited more than {1} minutes. They normally finish within a minute. Click Start Now in Needs Attention to recalculate them, or wait for the nightly run.",
+    "Core_RollupBuilder_BypassPermissionHelp": "Pick a custom permission. Records saved by people who hold it do not update this total. Recalculate still does, and so does the nightly run when the rollup runs Every night or Both.",
+    "Core_RollupBuilder_DeleteShipped": "This rollup came with BarnCRM, so it cannot be deleted: Restore Shipped Rollups would bring it back. Switch it off instead.",
     "Core_RollupBuilder_DlrsImportFinishHint": "Finish is available once every copy is turned on. Close keeps the copies switched off; you can turn them on later in the rollup list.",
     "Core_RollupBuilder_DlrsImportIntro": "Copy DLRS rollups into BarnCRM. Each copy starts off: compare its values with DLRS, then turn it on and switch the DLRS rollup off in DLRS. BarnCRM never changes DLRS.",
     "Core_RollupBuilder_EstimateWorkingHours": "People are working now. A long run competes with them saving records, so consider running it tonight.",
+    "Core_RollupBuilder_ImportNotAFile": "This is not a BarnCRM rollups file. Choose a file made by Export to a File.",
+    "Core_RollupBuilder_ImportShipped": "This rollup comes with BarnCRM, so it is not imported. Use Restore Shipped Rollups here instead.",
     "Core_RollupBuilder_IncludeDeletedHelp": "Counts records in the Recycle Bin and archived tasks and events. Deleting a record does not lower the total; emptying the Recycle Bin does, at the next full recalculation.",
+    "Core_RollupBuilder_InstantFlowOption": "Prefer no code? In Setup, open Flows, find Recalculate Rollups (Template) and click Save As to make your own copy: it keeps these totals up to date without deploying anything, except for restored records. The steps below add a trigger instead.",
     "Core_RollupBuilder_InstantIntro": "The objects your instant rollups count, and whether saving one of their records updates the totals at once.",
     "Core_RollupBuilder_InstantRemoveStep1": "To stop instant totals now, use Turn off instant totals: nothing is deployed, it works in production at once, and you can turn it back on.",
     "Core_RollupBuilder_InstantRemoveStep3": "Production does not allow deleting Apex in Setup. Download the removal package and deploy it with the Salesforce CLI:",
@@ -16,6 +22,7 @@
     "Core_RollupBuilder_RowLimitHelp": "Optional. For the sum of the 5 largest gifts, enter 5 and order by Amount, Descending. Leave blank for every record.",
     "Core_RollupBuilder_TargetFieldHelp": "Only fields BarnCRM can write are listed. If the field you need does not exist, create a Number or Currency field in Setup, then come back.",
     "Core_RollupBuilder_TargetSearchHelp": "The list shows the objects most often used. Type part of a name to find any other object you can see, then pick it from the list.",
+    "Core_RollupBuilder_TonightAlreadyScheduled": "The nightly run already recalculates the rollups set to Every night or Both at {0}. Instant totals are kept up to date by each save; to rebuild them too, click Start Now.",
     "Core_RollupEase_CreateFieldWhy": "BarnCRM cannot add a field to your org itself: that takes a Metadata API deploy. It writes the field for you to create in Setup, or to download and deploy.",
     "Core_RollupEase_ExplainEmpty": "No BarnCRM rollup you can see fills a field on this record.",
     "Core_RollupEase_ExplainSeen": "The counts and the list include only records you can open; the total includes them all.",
@@ -27,6 +34,8 @@
     "Core_RollupEase_TplStarterHelp": "Giving totals BarnCRM does not ship, from received gifts: for each person, and for each appeal. Needs Giving.",
     "Core_RollupFilter_LogicHelp": "Leave empty to require every condition. Or type the condition numbers with AND, OR, NOT and brackets, for example 1 AND (2 OR 3).",
     "Core_Rollups_EmptyList": "No rollups are set up yet. Restore the shipped rollups to start with the ones BarnCRM provides.",
+    "Core_Rollups_FullRunPaused": "The rollup recalculation did not run because all automation is paused. It runs again tonight, or click Recalculate All once automation is back on.",
+    "Core_Rollups_ImportDropHint": "Drop a file here or choose one.",
     "Core_Rollups_PageIntro": "Every total BarnCRM keeps up to date for you, and when each one was last calculated."
   }
 }

@@ -368,7 +368,10 @@ private class AccountingExportServiceTest {
 		Assert.areEqual(410, view.total);
 		Assert.areEqual(64, view.digest.length(), 'A SHA-256 in hex');
 		Assert.areEqual(Label.Mirror_AccountingExport_ErrorDateOrder, refusal);
-		Assert.areEqual(Label.Mirror_AccountingExport_ChangedSinceDownload, markRefusal);
+		Assert.areEqual(
+			BarnHelp.text('Mirror', 'Mirror_AccountingExport_ChangedSinceDownload'),
+			markRefusal
+		);
 	}
 
 	// ------------------------------------------------------------------------------------
@@ -490,7 +493,7 @@ private class AccountingExportServiceTest {
 					Assert.fail('The full file no longer matches the first download');
 				} catch (AccountingExportService.ExportException refused) {
 					Assert.areEqual(
-						Label.Mirror_AccountingExport_ChangedSinceDownload,
+						BarnHelp.text('Mirror', 'Mirror_AccountingExport_ChangedSinceDownload'),
 						refused.getMessage()
 					);
 				}
@@ -553,7 +556,7 @@ private class AccountingExportServiceTest {
 					// package checks only that the refusal is Giving's, not one of its own.
 					Assert.isFalse(String.isBlank(refused.getMessage()), 'Refused with a reason');
 					Assert.areNotEqual(
-						Label.Mirror_AccountingExport_ChangedSinceDownload,
+						BarnHelp.text('Mirror', 'Mirror_AccountingExport_ChangedSinceDownload'),
 						refused.getMessage(),
 						'Refused for the missing permission, not for a changed file'
 					);
@@ -619,7 +622,7 @@ private class AccountingExportServiceTest {
 			}
 
 			Assert.areEqual(
-				Label.Mirror_AccountingExport_ChangedSinceDownload,
+				BarnHelp.text('Mirror', 'Mirror_AccountingExport_ChangedSinceDownload'),
 				markAfter(jen, digest)
 			);
 		}
@@ -639,7 +642,7 @@ private class AccountingExportServiceTest {
 			update new Gift_Allocation__c(Id = building.Id, Fund__c = general.Id);
 
 			Assert.areEqual(
-				Label.Mirror_AccountingExport_ChangedSinceDownload,
+				BarnHelp.text('Mirror', 'Mirror_AccountingExport_ChangedSinceDownload'),
 				markAfter(jen, digest)
 			);
 		}

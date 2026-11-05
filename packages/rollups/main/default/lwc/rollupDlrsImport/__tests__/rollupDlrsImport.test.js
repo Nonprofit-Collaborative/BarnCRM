@@ -248,7 +248,7 @@ describe('c-rollup-dlrs-import', () => {
 
     await click(element, 'turn-on');
 
-    expect($(element, 'error').textContent).toBe('The field is not writable.');
+    expect($(element, 'error').message).toBe('The field is not writable.');
     expect($(element, 'finish').disabled).toBe(true);
   });
 

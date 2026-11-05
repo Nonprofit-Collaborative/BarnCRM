@@ -86,7 +86,11 @@ function click(element) {
 
 function text(element, id) {
   const node = element.shadowRoot.querySelector(`[data-id="${id}"]`);
-  return node ? node.textContent.trim() : null;
+  if (!node) {
+    return null;
+  }
+  // A c-barn-notice carries its sentence in `message`; anything else is plain text.
+  return node.tagName === 'C-BARN-NOTICE' ? node.message : node.textContent.trim();
 }
 
 describe('c-accounting-export', () => {

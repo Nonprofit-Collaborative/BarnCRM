@@ -134,7 +134,7 @@ Nothing is broken today.
 | Settings | Whether any scheduled BarnCRM job belongs to a person who has been deactivated. A scheduled job runs as the person who scheduled it, and stops running the day that person is deactivated, while it still looks scheduled on its page. |
 | Settings | Whether Core or any installed module never ran the setup steps its package install runs, which happens when source is copied into an org by hand (**Setup never ran for** followed by the names). Its **Finish Setup** button runs those steps. |
 | Settings | With the Rollup Builder module: whether a total is set to be recalculated nightly while the nightly run is not scheduled. |
-| Settings | With the Rollup Builder module: whether totals waiting in the rollup queue failed five times (the Error Log says why), or have waited more than an hour. **Open Needs attention** takes you to the Rollup Builder, where **Retry** and **Start Now** put them through again. |
+| Settings | With the Rollup Builder module: whether totals waiting in the rollup queue failed five times (the Error Log says why), or have waited more than an hour. **Open Needs Attention** takes you to the Rollup Builder, where **Retry** and **Start Now** put them through again. |
 | Settings | With Giving: whether any gift dated in a closed accounting period has not been marked posted to accounting. |
 | Settings | With Mirror: whether the Opportunity mirror's nightly run is scheduled but has not completed a run for more than two days. |
 | Settings | With Mirror, in an org with Nonprofit Cloud fundraising: the same question for the Gift Transaction mirror. |

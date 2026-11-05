@@ -259,6 +259,21 @@ public with sharing class RollupSelector {
 		return found;
 	}
 
+	/**
+	 * The org's custom permissions by label, for the Rollup Builder's Bypass Permission list. Read
+	 * as the package, for the reason `customPermissionNames` is: the person saving a rollup need
+	 * not be able to see setup, and only the names are returned.
+	 */
+	public static List<CustomPermission> customPermissions() {
+		return [
+			SELECT DeveloperName, MasterLabel, NamespacePrefix
+			FROM CustomPermission
+			WITH SYSTEM_MODE
+			ORDER BY MasterLabel
+			LIMIT 500
+		];
+	}
+
 	/** Every shipped default, whichever package ships it. */
 	public static List<Rollup_Definition_Default__mdt> selectShippedDefaults() {
 		if (defaultsOverride != null) {

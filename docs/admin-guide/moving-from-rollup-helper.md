@@ -18,7 +18,7 @@ Helper until you switch its rollup off yourself.
 - Install BarnCRM Rollup Builder and give yourself the **Rollup Builder Admin** permission set
   and the Manage BarnCRM Settings permission.
 - Work in a sandbox first if you can, then move the finished rollups to production with
-  **Export to a File** and **Import from a file** (see
+  **Export to a File** and **Import From a File** (see
   [Moving Rollups to Another Org](rollups.md#moving-rollups-to-another-org)).
 - Make a list of your Rollup Helper rollups from Rollup Helper's own screens: for each one, the
   object and field that shows the total, the records counted and the lookup that links them,

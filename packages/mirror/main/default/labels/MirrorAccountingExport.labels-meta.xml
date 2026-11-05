@@ -30,7 +30,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Accounting export page: download button</shortDescription>
-    <value>Download file</value>
+    <value>Download File</value>
   </labels>
   <labels>
     <fullName>Mirror_AccountingExport_Summary</fullName>
@@ -110,7 +110,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Mark posted button</shortDescription>
-        <value>Mark these gifts posted</value>
+        <value>Mark These Gifts Posted</value>
     </labels>
     <labels>
         <fullName>Mirror_AccountingExport_Marked</fullName>
@@ -127,13 +127,5 @@
         <protected>false</protected>
         <shortDescription>Marking needs all funds</shortDescription>
         <value>To mark gifts posted, download the export for all funds: a gift split across funds would be locked when only part of it is in this file.</value>
-    </labels>
-    <labels>
-        <fullName>Mirror_AccountingExport_ChangedSinceDownload</fullName>
-        <categories>Mirror, Accounting Export</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Gifts changed since download</shortDescription>
-        <value>Gifts in this range changed since you downloaded the file, so nothing was marked. Download the file again, import it, and then mark.</value>
     </labels>
 </CustomLabels>

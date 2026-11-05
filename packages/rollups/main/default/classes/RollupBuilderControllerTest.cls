@@ -112,6 +112,15 @@ private class RollupBuilderControllerTest {
 			}
 			System.Assert.isFalse(model.aggregates.isEmpty(), 'Every calculation is offered');
 			System.Assert.areEqual(3, model.modes.size(), 'The three modes are offered');
+			Boolean listsOwnPermission = false;
+			for (RollupBuilderController.Option permission : model.customPermissions) {
+				listsOwnPermission =
+					listsOwnPermission || permission.value.endsWith('Manage_BarnCRM_Settings');
+			}
+			System.Assert.isTrue(
+				listsOwnPermission,
+				'The Bypass Permission list offers custom permissions'
+			);
 		}
 	}
 

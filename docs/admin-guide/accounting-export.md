@@ -32,7 +32,7 @@ Downloading changes nothing. Running it twice for the same dates gives the same 
 gift in those dates changed in between: a gift added or edited late, or a Pending gift that
 arrived and was set to Received.
 
-Once the file is in the accounting system, Jen clicks **Mark these gifts posted**, and those
+Once the file is in the accounting system, Jen clicks **Mark These Gifts Posted**, and those
 gifts are locked: their date, amount, donor, payment method, reference and funds can no longer
 change (see [Posting and Closed Periods](posting-and-closed-periods.md)). If any row of the file
 changed since she downloaded it, even a fund share moved with the total unchanged, nothing is
@@ -71,7 +71,7 @@ Do this as Jen, with the sample data loaded.
 1. Open the App Launcher, search for `Accounting Export` and open it.
 2. Set **From** to the first day of last month and **To** to the last day of last month.
    Leave **Fund** and **Payment Method** empty.
-3. Click **Download file**. A file named like
+3. Click **Download File**. A file named like
    `accounting-export-2026-08-01-to-2026-08-31.csv` downloads, and the page says how many
    rows and gifts it holds and the net total.
 4. Open the file in a spreadsheet. The first row is the column names above. Every row has a
@@ -81,7 +81,7 @@ Do this as Jen, with the sample data loaded.
    says Building Fund and accounting code 4100.
 6. Choose **Check** in **Payment Method** as well and download again. Only checks to the
    Building Fund remain.
-7. Set a range with no gifts, such as a week next year, and click **Download file**. No file
+7. Set a range with no gifts, such as a week next year, and click **Download File**. No file
    downloads and the page says `No gifts in this range.`
 8. Set last month again, empty **Fund** and **Payment Method**, and download. Click **Mark
    these gifts posted**. The page says how many gifts it marked.

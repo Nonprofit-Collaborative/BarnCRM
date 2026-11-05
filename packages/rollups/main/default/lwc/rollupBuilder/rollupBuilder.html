@@ -1,9 +1,13 @@
 <template>
-    <lightning-card title={labels.title} icon-name="custom:custom63">
+    <lightning-card title={labels.title} icon-name={icons.rollups}>
         <div class="slds-var-p-horizontal_medium">
             <template lwc:if={hasOtherTools}>
-                <div class="slds-box slds-box_x-small slds-theme_shade slds-var-m-bottom_small" role="status" data-id="other-rollup-tools">
-                    <h3 class="slds-text-heading_x-small">{labels.otherTools}</h3>
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    variant="info"
+                    title={labels.otherTools}
+                    data-id="other-rollup-tools"
+                >
                     <template for:each={otherToolNotices} for:item="otherTool">
                         <p key={otherTool} class="slds-text-body_small">{otherTool}</p>
                     </template>
@@ -15,17 +19,23 @@
                             onclick={handleImport}
                         ></lightning-button>
                     </template>
-                </div>
+                </c-barn-notice>
             </template>
             <template lwc:if={notice}>
-                <div class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small" role="status">
-                    <span data-id="notice">{notice}</span>
-                </div>
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    variant="success"
+                    message={notice}
+                    data-id="notice"
+                ></c-barn-notice>
             </template>
             <template lwc:if={error}>
-                <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
-                    <span data-id="error">{error}</span>
-                </div>
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    variant="error"
+                    message={error}
+                    data-id="error"
+                ></c-barn-notice>
             </template>
             <template lwc:if={editing}>
                 <c-rollup-wizard model={model} draft={draft} onsaved={handleSaved} oncancel={handleCancel}></c-rollup-wizard>
@@ -35,10 +45,14 @@
             </template>
         </div>
         <div class={listClass}>
+            <c-rollup-needs-attention></c-rollup-needs-attention>
             <c-rollup-templates can-manage={canManage} onopen={handleTemplateOpen} onadded={handleTemplatesAdded}></c-rollup-templates>
             <c-rollup-definitions builder onnew={handleNew} onedit={handleEdit} oncopy={handleCopy}></c-rollup-definitions>
-            <c-rollup-needs-attention></c-rollup-needs-attention>
-            <c-rollup-instant-totals can-manage={canManage}></c-rollup-instant-totals>
+            <lightning-accordion class="slds-var-m-horizontal_medium" data-id="advanced" allow-multiple-sections-open>
+                <lightning-accordion-section name="advanced" label={labels.advanced}>
+                    <c-rollup-instant-totals can-manage={canManage}></c-rollup-instant-totals>
+                </lightning-accordion-section>
+            </lightning-accordion>
         </div>
     </lightning-card>
 </template>

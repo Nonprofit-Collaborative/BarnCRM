@@ -392,9 +392,10 @@ private class RollupControllerTest {
 			Test.startTest();
 			System.runAs(maria()) {
 				notice = RollupController.runTonight();
-				expected = String.format(
-					Label.Core_RollupBuilder_TonightAlreadyScheduled,
-					new List<String>{ RollupScheduler.nightlyTime() }
+				expected = BarnHelp.text(
+					'Rollups',
+					'Core_RollupBuilder_TonightAlreadyScheduled',
+					new List<Object>{ RollupScheduler.nightlyTime() }
 				);
 			}
 			Test.stopTest();
@@ -434,7 +435,7 @@ private class RollupControllerTest {
 				System.Assert.fail('R-R6: a shipped rollup is refused');
 			} catch (AuraHandledException refused) {
 				System.Assert.areEqual(
-					Label.Core_RollupBuilder_DeleteShipped,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_DeleteShipped'),
 					refused.getMessage()
 				);
 			}

@@ -13,12 +13,14 @@
                 <lightning-spinner size="small" alternative-text={labels.title}></lightning-spinner>
             </template>
             <template lwc:if={error}>
-                <div class="slds-box slds-box_x-small slds-theme_error" role="alert">
-                    <span data-id="error">{error}</span>
-                </div>
+                <c-barn-notice variant="error" message={error} data-id="error"></c-barn-notice>
             </template>
             <template lwc:if={isEmpty}>
-                <p data-id="empty">{labels.empty}</p>
+                <c-barn-empty-state
+                    size="compact"
+                    heading={labels.empty}
+                    data-id="empty"
+                ></c-barn-empty-state>
             </template>
             <template lwc:if={hasExplanations}>
                 <template for:each={explanations} for:item="item">

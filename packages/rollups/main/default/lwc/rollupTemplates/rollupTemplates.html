@@ -8,9 +8,12 @@
                     <h3 class="slds-text-heading_small">{labels.button}</h3>
                     <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id="intro">{labels.intro}</p>
                     <template lwc:if={error}>
-                        <div class="slds-box slds-box_x-small slds-theme_error" role="alert">
-                            <span data-id="error">{error}</span>
-                        </div>
+                        <c-barn-notice
+                            class="slds-var-m-bottom_x-small"
+                            variant="error"
+                            message={error}
+                            data-id="error"
+                        ></c-barn-notice>
                     </template>
                     <template for:each={templateList} for:item="template">
                         <div key={template.key} class="slds-var-m-bottom_small" data-id="template">

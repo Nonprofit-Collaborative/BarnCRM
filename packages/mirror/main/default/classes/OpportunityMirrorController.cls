@@ -62,7 +62,9 @@ public with sharing class OpportunityMirrorController {
 	public static Status copyRangeAgain(Date fromDate, Date toDate) {
 		Status current = checked(false);
 		if (current.direction != OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES) {
-			throw UserErrors.message(Label.Mirror_OpportunityMirror_CopyAgainGiftsOnly);
+			throw UserErrors.message(
+				BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_CopyAgainGiftsOnly')
+			);
 		}
 		if (fromDate == null || toDate == null) {
 			throw UserErrors.message(Label.Mirror_OpportunityMirror_ErrorDatesRequired);

@@ -84,7 +84,41 @@ export default class RollupNeedsAttention extends LightningElement {
    * see the Builder without it: the queue is not read for them (RollupAttentionController).
    */
   get shown() {
-    return !!this.error || (!!this.attention && this.attention.canManage === true);
+    return !!this.error || !!this.notice || (this.canManageList && this.hasItems);
+  }
+
+  get canManageList() {
+    return !!this.attention && this.attention.canManage === true;
+  }
+
+  /** The list opens only when something needs attention (pg-21); a clean queue shows nothing. */
+  get hasItems() {
+    return (
+      this.hasFailed ||
+      this.showNightlyOff ||
+      (!!this.attention && this.attention.hasWaiting === true)
+    );
+  }
+
+  /** What the count badge counts: failed records, the waiting queue, and a missing nightly run. */
+  get itemCount() {
+    return (
+      this.rows.length +
+      (this.attention && this.attention.hasWaiting === true ? 1 : 0) +
+      (this.showNightlyOff ? 1 : 0)
+    );
+  }
+
+  get hasCount() {
+    return this.canManageList && this.itemCount > 0;
+  }
+
+  get itemCountText() {
+    return String(this.itemCount);
+  }
+
+  get failedCount() {
+    return this.rows.length;
   }
 
   get showNightlyOff() {

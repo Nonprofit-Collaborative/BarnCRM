@@ -1,6 +1,6 @@
 <template>
     <template lwc:if={helpReady}>
-    <lightning-card title={labels.title} icon-name="custom:custom31">
+    <lightning-card title={labels.title} icon-name={icons.giftTransactionMirror}>
         <div class="slds-var-p-horizontal_medium slds-is-relative">
             <template lwc:if={spinnerShown}>
                 <lightning-spinner alternative-text={labels.loading} size="small" data-id="spinner"></lightning-spinner>
@@ -8,37 +8,25 @@
             <p class="slds-var-m-bottom_medium" data-id="intro">{labels.intro}</p>
             <c-settings-setup-notes notes={setupNotes}></c-settings-setup-notes>
             <template lwc:if={view.unavailableShown}>
-                <p class="slds-var-m-bottom_medium" role="status" data-id="unavailable">
-                    {labels.unavailable}
-                </p>
+                <c-barn-notice class="slds-var-m-bottom_medium" variant="warning" message={labels.unavailable} data-id="unavailable"></c-barn-notice>
             </template>
             <template lwc:if={view.offShown}>
-                <p class="slds-var-m-bottom_medium" role="status" data-id="off">
-                    {labels.switchedOff}
-                </p>
+                <c-barn-notice class="slds-var-m-bottom_medium" variant="info" message={labels.switchedOff} data-id="off"></c-barn-notice>
             </template>
             <template lwc:if={view.onShown}>
                 <template lwc:if={view.notReadyShown}>
-                    <p class="slds-text-color_error slds-var-m-bottom_small" role="status" data-id="not-ready">
-                        {status.notReadyReason}
-                    </p>
+                    <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={status.notReadyReason} data-id="not-ready"></c-barn-notice>
                 </template>
                 <template lwc:else>
-                    <p class="slds-var-m-bottom_small" role="status" data-id="direction">
-                        {directionText}
-                    </p>
+                    <c-barn-notice class="slds-var-m-bottom_small" variant="info" message={directionText} data-id="direction"></c-barn-notice>
                 </template>
                 <p class="slds-var-m-bottom_small" data-id="schedule">{scheduleText}</p>
                 <p class="slds-var-m-bottom_small" data-id="last-run">{lastRunText}</p>
                 <template lwc:if={view.noManageShown}>
-                    <p class="slds-text-color_weak slds-var-m-bottom_small" data-id="no-manage">
-                        {labels.noManagePermission}
-                    </p>
+                    <c-barn-notice class="slds-var-m-bottom_small" variant="info" message={labels.noManagePermission} data-id="no-manage"></c-barn-notice>
                 </template>
                 <template lwc:if={view.noAccessShown}>
-                    <p class="slds-text-color_error slds-var-m-bottom_small" data-id="no-access">
-                        {labels.noAccess}
-                    </p>
+                    <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={labels.noAccess} data-id="no-access"></c-barn-notice>
                 </template>
                 <div class="slds-var-m-vertical_medium">
                     <lightning-button
@@ -68,15 +56,11 @@
                     </template>
                 </div>
                 <template lwc:if={view.runningShown}>
-                    <p class="slds-var-m-bottom_medium" role="status" data-id="running">
-                        {runningText}
-                    </p>
+                    <c-barn-notice class="slds-var-m-bottom_medium" variant="info" message={runningText} data-id="running"></c-barn-notice>
                 </template>
             </template>
             <template lwc:if={error}>
-                <p class="slds-text-color_error slds-var-m-bottom_medium" role="alert" data-id="error">
-                    {error}
-                </p>
+                <c-barn-notice class="slds-var-m-bottom_medium" variant="error" message={error} data-id="error"></c-barn-notice>
             </template>
             <template lwc:if={view.available}>
                 <h2 class="slds-text-heading_small slds-var-m-top_large slds-var-m-bottom_x-small">
@@ -112,11 +96,26 @@
                     </div>
                 </div>
                 <template lwc:if={comparison}>
-                    <p class="slds-var-m-top_medium" data-id="gift-side">{giftSideText}</p>
-                    <p data-id="gift-transaction-side">{giftTransactionSideText}</p>
-                    <p class="slds-var-m-vertical_small" role="status" data-id="difference-count">
-                        {differenceText}
-                    </p>
+                    <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-top_medium" data-id="sides">
+                        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+                            <c-barn-stat-tile label={labels.columnGift} value={comparison.giftCount} bordered align="start" data-id="gift-count"></c-barn-stat-tile>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+                            <c-barn-stat-tile label={labels.columnGiftAmount} value={comparison.giftTotal} format-style="currency" currency-code={currencyCode} bordered align="start" data-id="gift-total"></c-barn-stat-tile>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+                            <c-barn-stat-tile label={labels.columnGiftTransaction} value={comparison.giftTransactionCount} bordered align="start" data-id="gift-transaction-count"></c-barn-stat-tile>
+                        </div>
+                        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+                            <c-barn-stat-tile label={labels.columnGiftTransactionAmount} value={comparison.giftTransactionTotal} format-style="currency" currency-code={currencyCode} bordered align="start" data-id="gift-transaction-total"></c-barn-stat-tile>
+                        </div>
+                    </div>
+                    <c-barn-notice
+                        class="slds-var-m-vertical_small"
+                        variant={differenceVariant}
+                        message={differenceText}
+                        data-id="difference-count"
+                    ></c-barn-notice>
                     <template lwc:if={copyAgainShown}>
                         <lightning-button
                             class="slds-var-m-bottom_small"
