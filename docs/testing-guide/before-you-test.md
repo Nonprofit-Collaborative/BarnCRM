@@ -65,7 +65,7 @@ Do these in order.
    |---|---|---|
    | BarnCRM Duplicate Review | T-DUP scripts, smoke item 13 | When the duplicate scripts are done |
    | BarnCRM Erase People | T-ERASE-01 and T-ERASE-02, smoke item 15, on fixture records only | Straight after that script |
-   | BarnCRM Metadata Admin | The T-DUP and T-SET scripts that edit custom metadata | When those are done |
+   | BarnCRM Metadata Admin | Only for a test user who is not a BarnCRM Admin and must save custom metadata (BarnCRM Admin already includes it) | When those are done |
    | BarnCRM Bulk Delete | The delete scripts in [Super Transformer and bulk delete](bulk-update-and-delete.md), on `Bulkdeltest` contacts only | Straight after |
 
 4. **First-run setup and the household catch-up.** The setup window (T-SA-01) shows to every

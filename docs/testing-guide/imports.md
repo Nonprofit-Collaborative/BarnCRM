@@ -376,7 +376,7 @@ Zzsev Nowhere,Volunteer,<contact record ID>,Zzsev Title
 ## T-IMP-18: Create a New Field From a Column
 
 **Purpose:** confirm an admin can create a field for an unmapped column, with access, and that others cannot. Setup detail: [Creating a New Field From an Import](../admin-guide/import-new-fields.md).
-**Prerequisites:** a scratch org or sandbox, never production with real data; an admin with the System Administrator profile, BarnCRM Admin and **BarnCRM Metadata Admin**; a second user with BarnCRM Admin only. Save as `import-test-shirts.csv`:
+**Prerequisites:** a scratch org or sandbox, never production with real data; an admin with the System Administrator profile and BarnCRM Admin (which includes the metadata permission); a second user with BarnCRM Admin on a profile without **Customize Application** and **Modify Metadata**. Save as `import-test-shirts.csv`:
 
 ```
 First Name,Last Name,Email,T-Shirt Size,Joined On

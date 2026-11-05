@@ -30,15 +30,18 @@ added.
 The page is for administrators who can already change the org in Setup, because saving an
 entry changes the org's metadata.
 
-1. Give yourself the **BarnCRM Metadata Admin** permission set (BarnCRM Settings, Access,
-   Extra Permissions). It is in no role on purpose: give it only to people who
-   administer the org. Without it you do not see the page at all.
+1. **BarnCRM Admin** already includes the permission to save here. Someone who is not a
+   BarnCRM Admin needs the **BarnCRM Metadata Admin** permission set (BarnCRM Settings,
+   Access, Extra Permissions); it is in no role on purpose. Without either you do not see
+   the page at all.
 2. If BarnCRM was installed as a package, Salesforce asks once whether the app may change
    metadata. In Setup, open **Apex Settings** and turn on **Deploy Metadata from
    Non-Certified Package Versions via Apex**. This setting is in Setup only, and BarnCRM
-   cannot turn it on for you: it is Salesforce's own safeguard. If it is off, saving an
-   entry says so. BarnCRM cannot read this setting either, so the **Needs a Change in Setup**
-   note on **General** stays until your first save here works, then goes for good.
+   cannot turn it on for you or read it: it is Salesforce's own safeguard. If it is off, a
+   save fails with "Salesforce did not accept the change, so nothing was saved. If BarnCRM
+   was installed as a package, turn on Deploy Metadata from Non-Certified Package Versions
+   via Apex in Setup (Apex Settings), then save again. The Error Log has details." Where
+   BarnCRM was deployed as source, the setting is not needed.
 3. Open the **BarnCRM Admin** app, click **BarnCRM Settings**, choose **General**, and scroll to
    **Custom Metadata**.
 
@@ -108,8 +111,8 @@ them.
 
 Match sources are no longer on this page. They are listed, added, deactivated and tried out
 in the **Matching Logic** area of the **Duplicate Matching** tab; see
-[Duplicates](duplicates.md#matching-logic). The **BarnCRM Metadata Admin** permission set
-and the Setup step above apply there too.
+[Duplicates](duplicates.md#matching-logic). The permission to save
+(BarnCRM Admin, or **BarnCRM Metadata Admin**) and the Setup step above apply there too.
 
 ## Which Lists Can Be Extended
 

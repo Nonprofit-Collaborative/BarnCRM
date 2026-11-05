@@ -138,7 +138,7 @@ Except under **Keep master**, a blank never replaces a value. Add rules in **Bar
 `Email` or `Title`), or `MailingAddress` or `OtherAddress` to take a whole address from one
 person, so a street never lands with the other person's city. A field with no rule follows
 **Merge rule for other fields**. The household and the record owner always stay the kept
-person's. Saving a rule needs BarnCRM Metadata Admin.
+person's. Saving a rule needs BarnCRM Admin or BarnCRM Metadata Admin.
 
 ### Auto-Merge
 
@@ -182,15 +182,15 @@ only, in **Review**, with a link to change them in Setup.
 
 Who sees it: anyone with **Manage BarnCRM Settings** (BarnCRM Admin) or the **BarnCRM
 Metadata Admin** permission set. Adding, changing, deactivating and activating a source
-needs **BarnCRM Metadata Admin**, because saving one changes the org's metadata; without it
-the list is read only, and **Try a Value** still works. If BarnCRM was installed as a
+needs **BarnCRM Admin** (which includes the permission) or **BarnCRM Metadata Admin**, because
+saving one changes the org's metadata; without either the list is read only, and **Try a Value** still works. If BarnCRM was installed as a
 package, saving also needs **Deploy Metadata from Non-Certified Package Versions via Apex**
 turned on in Setup, **Apex Settings**; see [Custom metadata](custom-metadata.md#how-to-turn-it-on).
 
 The area opens with one line on what match sources are; the help icon beside it says how they
 work with your duplicate rules and how saving works. Each source is a card: its name, a
 **Shipped with BarnCRM** badge where it applies, and one line saying what it compares, for
-example "Email Address on Contact Point Email, compared as Email". With BarnCRM Metadata Admin
+example "Email Address on Contact Point Email, compared as Email". With permission to save
 the card has an **Active** switch; without it, an **Active** or **Inactive** badge. **Show
 Details** on a card lists, in words:
 

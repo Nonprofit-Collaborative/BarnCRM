@@ -59,7 +59,11 @@ private class ImportNewFieldControllerTest {
 
 	@IsTest
 	static void refusesEveryActionWithoutThePermissions() {
-		System.runAs(TestUsers.admin()) {
+		// BarnCRM Admin carries Manage BarnCRM Metadata, so this is an org's own permission set
+		// holding Manage BarnCRM Settings alone.
+		User settingsOnly = TestUsers.standardUser('SettingsOnly');
+		SettingsTestPermissions.grantTo('Settings_Only_Controller', settingsOnly.Id);
+		System.runAs(settingsOnly) {
 			connected('Enabled');
 			ImportNewFieldService.Connection status = ImportNewFieldController.getConnection();
 			Assert.isFalse(status.canCreate || status.connected, 'no Metadata Admin');

@@ -15,8 +15,8 @@ Record, or a person (Contact) or an organization (Account) for People and Organi
 
 ## 2. How to Turn It On
 
-1. Give yourself the **BarnCRM Metadata Admin** permission set (it is in no role on purpose).
-   You also need Import access and the Salesforce permissions **Customize Application** and
+1. **BarnCRM Admin** already includes the permissions for this (a person who is not a
+   BarnCRM Admin needs the **BarnCRM Metadata Admin** permission set). You also need Import access and the Salesforce permissions **Customize Application** and
    **Modify Metadata**, which the System Administrator profile has.
 2. Open **BarnCRM Settings**, **Import** page, **Create Fields From an Import**, and select
    **Set Up Connection**. This creates a Named Credential called `Barn_Org_Connection` that lets

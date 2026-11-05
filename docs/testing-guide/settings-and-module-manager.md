@@ -211,8 +211,8 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 ## T-SET-10: Custom Metadata: Relationship Types
 
-**Purpose:** confirm a Metadata Admin can add, archive and restore a relationship type, that a missing picklist value is refused, and that match sources are no longer on this page (they are tested in [T-DUP-06 and T-DUP-07](duplicates.md#t-dup-06-a-deactivated-match-source-finds-nothing)).
-**Prerequisites:** admin user holding **BarnCRM Metadata Admin** (the create script gives it; otherwise give it on the Access page, Extra Permissions). Scratch orgs need no Apex Settings change; in an org where BarnCRM is installed as a package, turn on **Deploy Metadata from Non-Certified Package Versions via Apex** first. In Setup, Object Manager, Relationship, Fields & Relationships, **Type**: add `Mentor` and `Mentee`. Do not add `Godparent`.
+**Purpose:** confirm a person who can save Custom Metadata (BarnCRM Admin or Metadata Admin) can add, archive and restore a relationship type, that a missing picklist value is refused, and that match sources are no longer on this page (they are tested in [T-DUP-06 and T-DUP-07](duplicates.md#t-dup-06-a-deactivated-match-source-finds-nothing)).
+**Prerequisites:** admin user holding **BarnCRM Admin**, which includes the permission to save Custom Metadata. Scratch orgs need no Apex Settings change; in an org where BarnCRM is installed as a package, turn on **Deploy Metadata from Non-Certified Package Versions via Apex** first. In Setup, Object Manager, Relationship, Fields & Relationships, **Type**: add `Mentor` and `Mentee`. Do not add `Godparent`.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -269,7 +269,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 2 | Open **Access**. | "You can see this page but you cannot change roles. Ask someone with the BarnCRM Admin role to make the change, or to give you that role." No **Find a person**, **Role**, **Give Access** or **Remove**. Role cards list holders, or say "You can see this page but you cannot see who holds each role." |
 | 3 | Open **Modules**. | "You can see the modules but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." No **Turn Off**, **Turn On** or **What an Uninstall Deletes**. **Show Nonprofit Modules** is greyed out. |
 | 4 | Open **Automation**. | "You can read this page but not change it. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." **Pause All Automation**, **How long** and every switch are disabled (with automation running, **Resume Automation** is not shown). |
-| 5 | Open **General** and look for **Custom Metadata**. | It is not shown (it needs BarnCRM Metadata Admin). |
+| 5 | Open **General** and look for **Custom Metadata**. | It is not shown (it needs BarnCRM Admin or BarnCRM Metadata Admin). |
 | 6 | Repeat step 1 as staff. | The same read-only notice and greyed-out controls. |
 
 **Cleanup:** None.
@@ -404,13 +404,13 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-20: Needs a Change in Setup Opens the Right Setup Page
 
 **Purpose:** confirm every **Needs a Change in Setup** note gives one sentence on why, numbered steps, and an **Open in Setup** button that opens the right Setup page in a new tab, and that **Check Again** re-reads a check.
-**Prerequisites:** admin user without **BarnCRM Metadata Admin** at the start, in an org where no Custom Metadata entry has been saved yet. Deliverability **Access level** is **All email**. Giving and Mirror installed for steps 7 to 10 (skip them on a Core-only org). A note whose change is already made is not shown at all.
+**Prerequisites:** an admin user with **BarnCRM Admin**, and a second user with settings access (Manage BarnCRM Settings) but neither BarnCRM Admin nor **BarnCRM Metadata Admin** (for step 1). Deliverability **Access level** is **All email**. Giving and Mirror installed for steps 7 to 10 (skip them on a Core-only org). A note whose change is already made is not shown at all.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **General**, and click **Open in Setup** on the note. | The note shows **Not done yet** with a warning icon and **Check Again**. A new browser tab opens **Apex Settings**. The BarnCRM tab is unchanged. Every note in this test shows one line under **Needs a Change in Setup**, the button, and **Show Steps**, closed; opening **Show Steps** shows one sentence on why and 2 to 4 numbered steps. |
-| 1a | On **Access**, **Extra Permissions**, give yourself **BarnCRM Metadata Admin**. Back on **General**, click **Check Again**. | **Not done yet** is gone; the note says "BarnCRM can't read this Setup switch, so this note stays until a Custom Metadata save works. Already turned it on? Save an entry on the Custom Metadata page, then select Check Again." |
-| 1b | Where BarnCRM is an installed package, turn on **Deploy Metadata from Non-Certified Package Versions via Apex** in the Apex Settings tab and save. Open **Custom Metadata**, add a relationship type and wait until it is saved. Back on **General**, click **Check Again**, then reload the page. | The note is gone, and stays gone after the reload (owner QA, 2026-10-31). |
+| 1 | As the user with settings access but neither BarnCRM Admin nor Metadata Admin, open **BarnCRM Settings**, **General**, and click **Open in Setup** on the **Custom Metadata** note. | The note shows **Not done yet** with a warning icon and **Check Again**. A new browser tab opens **Permission Sets**. The BarnCRM tab is unchanged. Every note in this test shows one line under **Needs a Change in Setup**, the button, and **Show Steps**, closed; opening **Show Steps** shows one sentence on why and 2 to 4 numbered steps (here: click BarnCRM Admin, or BarnCRM Metadata Admin; click Manage Assignments, then Add Assignment; tick the person, then click Next and Assign). |
+| 1a | As the admin with BarnCRM Admin, open **General**. | No **Custom Metadata** note is shown: BarnCRM Admin already holds the permission. The note does not mention the Apex Settings switch. |
+| 1b | Assign the first user **BarnCRM Metadata Admin** in Setup, then back on **General** click **Check Again**. | The note is gone, and stays gone after a reload. |
 | 2 | Click **Duplicate Matching**, then **Open in Setup**. | A new tab opens **Duplicate Rules**. |
 | 3 | Click **Rollups** (Rollup Builder installed), then **Open in Setup**. | A new tab opens **Object Manager**; the first step says to click the object the rollup totals onto. |
 | 4 | Click **Error Log**. | No email note: the org already sends all email. |
