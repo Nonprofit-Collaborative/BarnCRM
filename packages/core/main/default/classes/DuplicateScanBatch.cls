@@ -117,7 +117,11 @@ public with sharing class DuplicateScanBatch implements Database.Batchable<SObje
 		for (SObject record : scope) {
 			recordIds.add(record.Id);
 		}
-		List<DuplicateService.Pair> found = DuplicateService.matchesFor(recordIds);
+		// Checked before the pairs fold together, so a rule's city only household pair never
+		// stands in for the same pair a match source found with a real reason.
+		List<DuplicateService.Pair> found = DuplicateService.withHouseholdEvidence(
+			DuplicateService.matchesFor(recordIds)
+		);
 		found.addAll(MatchSourceService.pairsFor(recordIds));
 		found.addAll(FuzzyPairing.pairsFor(recordIds));
 		List<DuplicateService.Pair> candidates = DuplicateService.pairsToRecord(

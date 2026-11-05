@@ -392,6 +392,27 @@ public with sharing class DuplicateSelector {
 		Account.Phone
 	};
 
+	/**
+	 * The name, billing street, city, postal code and phone of these accounts, for deciding
+	 * whether a pair a duplicate rule reported shares real evidence
+	 * (`DuplicateService.householdsShareEvidence`). System mode on purpose: the values never
+	 * leave the server, only a yes or no per pair, and a reviewer who cannot read one of the
+	 * fields must still have city only pairs left out.
+	 */
+	public static Map<Id, Account> householdEvidence(Set<Id> accountIds) {
+		if (accountIds == null || accountIds.isEmpty()) {
+			return new Map<Id, Account>();
+		}
+		return new Map<Id, Account>(
+			[
+				SELECT Id, Name, BillingStreet, BillingCity, BillingPostalCode, Phone
+				FROM Account
+				WHERE Id IN :accountIds
+				WITH SYSTEM_MODE
+			]
+		);
+	}
+
 	/** The fields two people are compared on, side by side, in the order shown. */
 	public static final List<Schema.SObjectField> PERSON_COMPARED = new List<Schema.SObjectField>{
 		Contact.Email,

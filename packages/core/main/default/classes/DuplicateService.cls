@@ -223,6 +223,117 @@ public with sharing class DuplicateService {
 	}
 
 	/**
+	 * The pairs of households a duplicate rule reported, kept only when the two households
+	 * share real evidence (`householdsShareEvidence`); every other pair is kept as it is.
+	 *
+	 * The standard Account rule pairs two accounts whose names are alike and whose billing
+	 * cities are the same, and to its company name matching household names such as "The Hall
+	 * Family" and "The Shah-Duarte Family" are alike. Without this every two households in one
+	 * city would be suggested. A pair a match source found carries a reason and already shares
+	 * an address, email or phone, so it is not checked here.
+	 */
+	public static List<Pair> withHouseholdEvidence(List<Pair> pairs) {
+		List<Pair> result = new List<Pair>();
+		if (pairs == null || pairs.isEmpty()) {
+			return result;
+		}
+		Set<Id> accountIds = new Set<Id>();
+		for (Pair pair : pairs) {
+			if (isUnexplainedAccountPair(pair)) {
+				accountIds.add(pair.left);
+				accountIds.add(pair.right);
+			}
+		}
+		Map<Id, Account> households = DuplicateSelector.householdEvidence(accountIds);
+		for (Pair pair : pairs) {
+			if (
+				!isUnexplainedAccountPair(pair) ||
+				householdsShareEvidence(households.get(pair.left), households.get(pair.right))
+			) {
+				result.add(pair);
+			}
+		}
+		return result;
+	}
+
+	private static Boolean isUnexplainedAccountPair(Pair pair) {
+		return pair != null &&
+			pair.left != null &&
+			pair.right != null &&
+			String.isBlank(pair.reason) &&
+			pair.left.getSObjectType() == Account.SObjectType;
+	}
+
+	/**
+	 * Of the records in one suggestion a duplicate rule wrote, the ones to show: a household
+	 * only when it shares real evidence with another household in the suggestion, in the
+	 * suggestion's order. People and anything else are kept as they are.
+	 */
+	public static List<Id> householdsWithEvidence(List<Id> recordIds, Map<Id, Account> households) {
+		List<Id> result = new List<Id>();
+		if (recordIds == null) {
+			return result;
+		}
+		Map<Id, Account> known = households == null ? new Map<Id, Account>() : households;
+		for (Id recordId : recordIds) {
+			if (recordId == null) {
+				continue;
+			}
+			Boolean keep = recordId.getSObjectType() != Account.SObjectType;
+			for (Integer index = 0; !keep && index < recordIds.size(); index++) {
+				Id other = recordIds[index];
+				keep =
+					other != null &&
+					other != recordId &&
+					householdsShareEvidence(known.get(recordId), known.get(other));
+			}
+			if (keep) {
+				result.add(recordId);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Whether two households share something that says they may be one household: the same
+	 * street with the same city or postal code, the same phone, or the same name with the same
+	 * postal code. A blank value never matches, and the city, the state or both are never
+	 * evidence on their own: many households share a city.
+	 */
+	public static Boolean householdsShareEvidence(Account first, Account second) {
+		if (first == null || second == null) {
+			return false;
+		}
+		if (
+			sameValue(MatchSourceService.phone(first.Phone), MatchSourceService.phone(second.Phone))
+		) {
+			return true;
+		}
+		Boolean samePostal = sameValue(
+			MatchSourceService.postalCode(first.BillingPostalCode),
+			MatchSourceService.postalCode(second.BillingPostalCode)
+		);
+		Boolean sameStreet = sameValue(
+			MatchSourceService.street(first.BillingStreet),
+			MatchSourceService.street(second.BillingStreet)
+		);
+		Boolean sameCity = sameValue(
+			FuzzyMatch.normalize(first.BillingCity),
+			FuzzyMatch.normalize(second.BillingCity)
+		);
+		if (sameStreet && (samePostal || sameCity)) {
+			return true;
+		}
+		return samePostal &&
+			sameValue(FuzzyMatch.normalize(first.Name), FuzzyMatch.normalize(second.Name));
+	}
+
+	/** Both filled in and exactly equal; a blank never matches a blank. */
+	private static Boolean sameValue(String first, String second) {
+		return String.isNotBlank(first) && first.equals(second);
+	}
+
+	/**
 	 * Writes each pair as a duplicate record set of two, which is where the platform keeps the
 	 * duplicates its own rules report, so the standard Duplicate Record Sets tab and any report
 	 * on it show the scan's findings too. Answers how many were written; a failure is logged and

@@ -42,10 +42,107 @@ private class DuplicateControllerTest {
 	private static List<Account> twoHouseholds() {
 		return (List<Account>) insertAllowingDuplicates(
 			new List<Account>{
-				HouseholdTestDataFactory.newHousehold('The Dupview Family'),
-				HouseholdTestDataFactory.newHousehold('The Dupview Family')
+				atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupview Family')),
+				atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupview Family'))
 			}
 		);
+	}
+
+	/**
+	 * A household at the one address these tests share, so a pair of them shares real
+	 * evidence: a rule's suggestion of two households that share nothing but a city is not
+	 * shown.
+	 */
+	private static Account atOneAddress(Account household) {
+		return inCity(household, '12 Dupview Lane', '43622');
+	}
+
+	private static Account inCity(Account household, String street, String postalCode) {
+		household.BillingStreet = street;
+		household.BillingCity = 'Toledo';
+		household.BillingState = 'OH';
+		household.BillingPostalCode = postalCode;
+		return household;
+	}
+
+	/**
+	 * QA 2026-11-05: the standard Account rule paired households that shared only a city and
+	 * state. A rule's suggestion of such a pair is not shown; one of the same name at the same
+	 * address is.
+	 */
+	@IsTest
+	static void aRulePairOfHouseholdsSharingOnlyACityIsNotShown() {
+		System.runAs(TestUsers.admin()) {
+			List<Account> households = (List<Account>) insertAllowingDuplicates(
+				new List<Account>{
+					inCity(
+						HouseholdTestDataFactory.newHousehold('The Hall Family'),
+						'8848 Highland Ln',
+						'43622'
+					),
+					inCity(
+						HouseholdTestDataFactory.newHousehold('The Shah-Duarte Family'),
+						'9719 Harbor Dr',
+						'43621'
+					)
+				}
+			);
+			if (!suggest(households[0].Id, households[1].Id)) {
+				return;
+			}
+			List<Account> same = twoHouseholds();
+			suggest(same[0].Id, same[1].Id);
+
+			Test.startTest();
+			DuplicateController.DuplicateView view = DuplicateController.getView();
+			Test.stopTest();
+
+			Assert.areEqual(1, view.suggestions.size(), 'Only the pair at one address is shown.');
+			Assert.areEqual(1, view.totalSuggestions, 'And only it is counted.');
+			Set<Id> shown = new Set<Id>();
+			for (DuplicateController.RecordView record : view.suggestions[0].records) {
+				shown.add(record.recordId);
+			}
+			Assert.areEqual(new Map<Id, Account>(same).keySet(), shown, 'The same address pair.');
+		}
+	}
+
+	/** A suggestion a rule wrote on save keeps only the households with evidence in it. */
+	@IsTest
+	static void aRuleSuggestionOfSeveralShowsOnlyTheHouseholdsThatShareMoreThanACity() {
+		System.runAs(TestUsers.admin()) {
+			List<Account> households = (List<Account>) insertAllowingDuplicates(
+				new List<Account>{
+					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupview Family')),
+					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupview Family')),
+					inCity(
+						HouseholdTestDataFactory.newHousehold('The Dupview Household'),
+						'1 Other Road',
+						'43699'
+					)
+				}
+			);
+			if (!suggest(households[0].Id, households[1].Id)) {
+				return;
+			}
+			DuplicateRecordSet found = [SELECT Id FROM DuplicateRecordSet LIMIT 1];
+			insert new DuplicateRecordItem(
+				DuplicateRecordSetId = found.Id,
+				RecordId = households[2].Id
+			);
+
+			Test.startTest();
+			DuplicateController.DuplicateView view = DuplicateController.getView();
+			Test.stopTest();
+
+			Assert.areEqual(1, view.suggestions.size(), 'The suggestion is still shown.');
+			Assert.areEqual(
+				2,
+				view.suggestions[0].records.size(),
+				'Without the household that shares only the city.'
+			);
+			Assert.isTrue(view.suggestions[0].canMerge, 'The two left can be merged.');
+		}
 	}
 
 	@IsTest
@@ -469,8 +566,8 @@ private class DuplicateControllerTest {
 		System.runAs(TestUsers.admin()) {
 			List<Account> households = (List<Account>) insertAllowingDuplicates(
 				new List<Account>{
-					HouseholdTestDataFactory.newHousehold('The Dupview Family'),
-					HouseholdTestDataFactory.newHousehold('The Dupview Family'),
+					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupview Family')),
+					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupview Family')),
 					HouseholdTestDataFactory.newHousehold('The Dupview Household')
 				}
 			);
