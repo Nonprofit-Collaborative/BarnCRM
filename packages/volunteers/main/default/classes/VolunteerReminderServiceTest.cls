@@ -354,20 +354,16 @@ private class VolunteerReminderServiceTest {
             VolunteerReminderService.emailSender = stub;
             settings(true, 1);
             book(shiftIn(3, null).Id, person('Rivera', 'ana@example.org', false), 'Signed up');
-            List<NightlyJob> jobs = new VolunteersNightlyJobProvider().nightlyJobs();
-            Boolean before = jobs[1].isScheduled();
+            List<NightlyStep> steps = new VolunteersNightlyJobProvider().nightlySteps();
 
             Test.startTest();
-            jobs[1].schedule();
-            jobs[1].schedule();
-            new VolunteerReminderScheduler().execute(null);
+            steps[1].run();
             Test.stopTest();
 
-            Assert.isFalse(before, 'Not scheduled at first.');
-            Assert.isTrue(jobs[1].isScheduled(), 'Scheduled, once however often asked.');
+            Assert.areEqual(420, steps[1].minute, 'At seven in the morning.');
             Assert.areEqual(
                 Label.Volunteers_NightlyJobs_RemindersName,
-                jobs[1].label(),
+                steps[1].label,
                 'Its label.'
             );
             Assert.areEqual(1, stub.received.size(), 'The job ran the reminders.');

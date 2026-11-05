@@ -1,5 +1,5 @@
 /**
- * The dispatcher's error contract inside a real trigger (ADR-NEXT dispatcher error contract): a
+ * The dispatcher's error contract inside a real trigger (ADR-0165 dispatcher error contract): a
  * handler failure refuses only the records it belongs to, and the rest of the save goes ahead.
  *
  * Each test makes `TestFailingHandler` the whole Contact registry and saves five people, one or

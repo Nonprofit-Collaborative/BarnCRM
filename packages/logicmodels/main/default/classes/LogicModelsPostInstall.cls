@@ -51,6 +51,8 @@ public with sharing class LogicModelsPostInstall implements InstallHandler, Modu
      * @param installerId the person to give Logic Models Admin, or null for nobody
      */
     public void runSetup(Id installerId) {
+        // A job scheduled on its own before the nightly run becomes its step (R-NJ5).
+        NightlyJobs.adoptOldSchedules();
         // Each entry point records its own failures and returns, so nothing here throws.
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);

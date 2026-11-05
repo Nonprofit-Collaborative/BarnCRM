@@ -20,15 +20,12 @@ public with sharing class RollupsEngineExtension implements RollupEngineExtensio
         }
     }
 
-    /** A new nightly hour moves the scheduled nightly run (Section 14B). */
+    /**
+     * Nothing to do: the nightly rollup step reads its hour every night (ADR-0166
+     * nightly-job-dispatcher), so a new hour needs no schedule moved (Section 14B).
+     */
     public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
-        if (
-            RollupService.SETTINGS_OBJECT.equalsIgnoreCase(settingsObject) &&
-            changedKeys != null &&
-            changedKeys.contains(RollupScheduler.HOUR_SETTING)
-        ) {
-            RollupScheduler.reschedule();
-        }
+        return;
     }
 
     public void afterMerge(String targetObject, List<SObject> mergedRecords) {

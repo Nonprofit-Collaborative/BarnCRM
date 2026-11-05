@@ -326,9 +326,8 @@ private class HealthCheckFixesTest {
             Id gone = inactiveUserId();
             String otherJob = 'BarnCRM Fix test job';
             clearOrgBarnCrmJobs();
-            ErrorDigestScheduler.start();
+            NightlyJobs.start();
             ScheduledJobSelector.schedule(otherJob, '0 0 3 * * ?', new ErrorDigestScheduler());
-            NightlyJobs.jobsOverride = new List<NightlyJob>{ ErrorDigestScheduler.nightlyJob() };
             ScheduledJobSelector.ownerOverride = gone;
             ScheduledJobSelector.forget();
             String fixKey = HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS;
@@ -344,7 +343,7 @@ private class HealthCheckFixesTest {
                 HealthCheckService.Report report = HealthCheckController.applyFix(fixKey, scope);
 
                 Assert.isTrue(
-                    report.fixOutcome.contains(ErrorDigestScheduler.JOB_NAME),
+                    report.fixOutcome.contains(NightlyJobs.jobName()),
                     'A job Health Check schedules is said to be scheduled: ' + report.fixOutcome
                 );
                 Assert.isTrue(
@@ -375,7 +374,7 @@ private class HealthCheckFixesTest {
                 'The unknown job was stopped'
             );
             Assert.isNotNull(
-                ScheduledJobSelector.triggerIdByName(ErrorDigestScheduler.JOB_NAME),
+                ScheduledJobSelector.triggerIdByName(NightlyJobs.jobName()),
                 'The known job runs again'
             );
         }
@@ -392,7 +391,6 @@ private class HealthCheckFixesTest {
             // What an install leaves behind: the tab access check, owned by an active user.
             TabAccessScheduler.start();
             ScheduledJobSelector.schedule(otherJob, '0 0 3 * * ?', new ErrorDigestScheduler());
-            NightlyJobs.jobsOverride = new List<NightlyJob>{ TabAccessScheduler.nightlyJob() };
             String fixKey = HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS;
 
             System.runAs(maria) {

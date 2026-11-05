@@ -123,7 +123,7 @@ Salesforce org is needed for this job. Steps:
    description over 80 characters, a value over 1000, or any of them missing, each of
    which only an org would otherwise report.
    `scripts/ci/check-label-budget.py` fails when the label total across all packages
-   passes its budget (3,200; target 3,000), when a label is referenced nowhere in
+   passes its budget (3,215; target 3,000), when a label is referenced nowhere in
    `packages/`, or when a label reads as help prose (a sentence whose name ends in a help
    word such as `Intro`, `Help`, `Description`, `Note` or `Empty`; see the script's docstring). An org allows 5,000 custom labels; installed managed package labels do not
    count, but every source deploy does, beside the org's own labels, and a source deploy
@@ -132,7 +132,7 @@ Salesforce org is needed for this job. Steps:
    `Core_Shared_*` words and the `Core_Format_*` patterns such as `{0} ({1})`; modules may
    use a Core label once it is unprotected) before adding one. Help and guidance prose
    is never a label: it goes in the package's help catalog (`docs/contributor-guide/ux-kit.md`,
-   Help Text; ADR-NEXT `NEXT-help-text-json.md`).
+   Help Text; ADR-0164 `0164-help-text-json.md`).
    `scripts/ci/check-apex-budget.py` fails when a package's non-test Apex, measured as the
    org measures it (every character but comments; `@IsTest` classes excluded), passes its cap
    (`CAPS` in the script, a little above each package's size on 2026-11-04), or when a package

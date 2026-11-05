@@ -266,6 +266,48 @@ private class CorePostInstallTest {
         }
     }
 
+    @IsTest
+    static void aNewInstallSchedulesTheNightlyRunOnceAndAnUpgradeLeavesItAlone() {
+        System.runAs(TestUsers.admin()) {
+            CorePostInstall.scheduleNightlyInTests = true;
+            TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+            ScheduledJobSelector.forget();
+            Integer rowsBefore = [SELECT COUNT() FROM Nightly_Job__c];
+
+            new CorePostInstall().onInstall(new InstallBy(null, null, false));
+            Assert.isTrue(NightlyJobs.isScheduled(), 'A new install schedules the nightly run');
+            new CorePostInstall().onInstall(new InstallBy(null, null, false));
+            new CorePostInstall().onInstall(new InstallBy(null, new Version(1, 0), false));
+
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM CronTrigger
+                    WHERE CronJobDetail.Name = :NightlyJobs.jobName()
+                ],
+                'Installing again or upgrading never makes a second schedule'
+            );
+            Assert.areEqual(
+                rowsBefore,
+                [SELECT COUNT() FROM Nightly_Job__c],
+                'No step switch was written or changed'
+            );
+        }
+    }
+
+    @IsTest
+    static void aNewInstallDoesNotScheduleTheNightlyRunInTestsUnlessAsked() {
+        System.runAs(TestUsers.admin()) {
+            TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+            ScheduledJobSelector.forget();
+
+            new CorePostInstall().onInstall(new InstallBy(null, null, false));
+
+            Assert.isFalse(NightlyJobs.isScheduled(), 'The seam keeps other tests clean');
+        }
+    }
+
     /**
      * Removes the org's saved settings inside the test, so a test about an org that has never
      * saved them runs the same on an org that has (custom settings are visible to tests).
@@ -341,15 +383,17 @@ private class CorePostInstallTest {
     }
 
     /**
-     * An org already in use (its settings are saved) with the Seasonal Addresses switch and the
-     * nightly swap in the state the test names. The switch is written below the console's save,
-     * which would schedule the job itself.
+     * An org already in use (its settings are saved) with the Seasonal Addresses switch, and the
+     * swap's own schedule from before the nightly run, in the state the test names. The switch is
+     * written below the console's save, which would schedule the nightly run itself.
      */
-    private static void orgWithSeasonalState(Boolean switchedOn, Boolean jobScheduled) {
+    private static void orgWithSeasonalState(Boolean switchedOn, Boolean oldJobScheduled) {
         SettingsService.saveBookkeeping(
             new Map<String, Object>{ 'Seasonal_Addresses_Enabled__c' => false }
         );
-        TestDataFactory.clearScheduledJobs(new List<String>{ SeasonalAddressScheduler.JOB_NAME });
+        TestDataFactory.clearScheduledJobs(
+            new List<String>{ SeasonalAddressScheduler.JOB_NAME, NightlyJobs.jobName() }
+        );
         ScheduledJobSelector.forget();
         OrgSettingsSystemWriter.save(
             new Map<Schema.SObjectField, Object>{
@@ -357,12 +401,25 @@ private class CorePostInstallTest {
             }
         );
         SettingsService.clearCaches();
-        if (jobScheduled) {
-            SeasonalAddressScheduler.start();
+        if (oldJobScheduled) {
+            ScheduledJobSelector.schedule(
+                SeasonalAddressScheduler.JOB_NAME,
+                '0 30 0 * * ?',
+                new SeasonalAddressScheduler()
+            );
         }
     }
 
+    /** The nightly run's schedule, which does the swap (ADR-0166 nightly-job-dispatcher). */
     private static Integer swapJobs() {
+        return [
+            SELECT COUNT()
+            FROM CronTrigger
+            WHERE CronJobDetail.Name = :NightlyJobs.jobName()
+        ];
+    }
+
+    private static Integer oldSwapJobs() {
         return [
             SELECT COUNT()
             FROM CronTrigger
@@ -420,7 +477,7 @@ private class CorePostInstallTest {
         System.runAs(TestUsers.admin()) {
             forgetSavedSettings();
             TestDataFactory.clearScheduledJobs(
-                new List<String>{ SeasonalAddressScheduler.JOB_NAME }
+                new List<String>{ SeasonalAddressScheduler.JOB_NAME, NightlyJobs.jobName() }
             );
             ScheduledJobSelector.forget();
 
@@ -439,6 +496,7 @@ private class CorePostInstallTest {
         System.runAs(TestUsers.admin()) {
             orgWithSeasonalState(false, true);
             CorePostInstall.adoptSeasonalScheduleInTests = true;
+            NightlyJobs.adoptInTests = true;
 
             Test.startTest();
             CorePostInstall.runAsSourceDeploy();
@@ -449,7 +507,8 @@ private class CorePostInstallTest {
                 SeasonalAddressScheduler.isEnabled(),
                 'The page says on because the job is running'
             );
-            Assert.areEqual(1, swapJobs(), 'And the job that was running still is, once');
+            Assert.areEqual(0, oldSwapJobs(), 'The swap no longer has a schedule of its own');
+            Assert.areEqual(1, swapJobs(), 'The nightly run does the swap now, scheduled once');
         }
     }
 

@@ -1,6 +1,6 @@
 /**
  * A Contact handler that fails for some records, used only by the dispatcher's partial save
- * tests (ADR-NEXT dispatcher error contract).
+ * tests (ADR-0165 dispatcher error contract).
  *
  * It is a top-level public class with a no-argument constructor because the registry builds it by
  * name (ADR-0017). It fails whenever a record in front of it has a last name starting with

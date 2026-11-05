@@ -20,7 +20,7 @@
  *
  * A handler never reads `Trigger.new` and its companions directly: when a handler fails, the
  * dispatcher runs the handlers again over part of the records to find which record the failure
- * belongs to, and only these accessors see that part (ADR-NEXT dispatcher error contract).
+ * belongs to, and only these accessors see that part (ADR-0165 dispatcher error contract).
  *
  * Outside a trigger there is no `Trigger.new` to read, so a unit test that wants to drive a
  * handler without inserting records sets the `testNew`, `testNewMap`, `testOld`, and `testOldMap`
@@ -141,7 +141,7 @@ public virtual with sharing class TriggerHandler {
 
     /**
      * Part of a trigger's records, which the dispatcher hands its handlers while it finds out
-     * which record a failure belongs to (ADR-NEXT dispatcher error contract). The four
+     * which record a failure belongs to (ADR-0165 dispatcher error contract). The four
      * accessors above return it in place of the trigger collections. This is why a handler
      * reads its records through them and never through `Trigger.new` itself: a handler that
      * did would be handed all the records again, and the failure could never be pinned on one.

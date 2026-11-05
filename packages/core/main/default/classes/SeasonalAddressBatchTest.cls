@@ -141,14 +141,23 @@ private class SeasonalAddressBatchTest {
         }
     }
 
+    /** The Seasonal Addresses switch, written below the console's save. */
+    private static void seasonalSwitch(Boolean enabled) {
+        OrgSettingsSystemWriter.save(
+            new Map<Schema.SObjectField, Object>{
+                BarnCRM_Settings__c.Seasonal_Addresses_Enabled__c => enabled
+            }
+        );
+        SettingsService.clearCaches();
+        NightlyJobs.forget();
+    }
+
     @IsTest
-    static void schedulingTheJobCreatesOneNightlyRunAndStoppingItRemovesIt() {
+    static void schedulingTheJobCreatesOneNightlyRunAndSwitchingOffLeavesTheSwapOut() {
         System.runAs(TestUsers.admin()) {
-            // The org's own swap, if an administrator switched it on, would be counted too.
-            TestDataFactory.clearScheduledJobs(
-                new List<String>{ SeasonalAddressScheduler.JOB_NAME }
-            );
+            TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
             ScheduledJobSelector.forget();
+            seasonalSwitch(true);
             Test.startTest();
             Id first = SeasonalAddressScheduler.start();
             Id second = SeasonalAddressScheduler.start();
@@ -157,11 +166,15 @@ private class SeasonalAddressBatchTest {
             Integer jobs = [
                 SELECT COUNT()
                 FROM CronJobDetail
-                WHERE Name = :SeasonalAddressScheduler.JOB_NAME
+                WHERE Name = :NightlyJobs.jobName()
             ];
-            SeasonalAddressScheduler.stop();
+            seasonalSwitch(false);
             Boolean scheduledAfterStop = SeasonalAddressScheduler.isScheduled();
+            Boolean inTonightsRun = NightlyJobs.isOn(
+                NightlyJobs.step(SeasonalAddressScheduler.JOB_NAME)
+            );
             Test.stopTest();
+            Assert.isFalse(inTonightsRun, 'Switched off, the swap is left out of the nightly run.');
 
             Assert.areEqual(
                 first,
@@ -170,7 +183,7 @@ private class SeasonalAddressBatchTest {
             );
             Assert.isTrue(scheduled, 'The console must be able to see that the job is scheduled.');
             Assert.isNotNull(nextRun, 'A scheduled job has a next run to show the administrator.');
-            Assert.areEqual(1, jobs, 'One job, under the name the settings console looks for.');
+            Assert.areEqual(1, jobs, 'One job: the nightly run, which does the swap.');
             Assert.isFalse(scheduledAfterStop, 'Stopping the schedule must actually stop it.');
         }
     }
@@ -184,9 +197,10 @@ private class SeasonalAddressBatchTest {
                 Date.newInstance(2027, 1, 15)
             );
 
+            seasonalSwitch(true);
             Test.startTest();
             SeasonalAddressScheduler.start();
-            SeasonalAddressScheduler.stop();
+            seasonalSwitch(false);
             Test.stopTest();
 
             Assert.areEqual(
@@ -200,10 +214,11 @@ private class SeasonalAddressBatchTest {
     @IsTest
     static void aScheduledJobThatHasNeverRunIsReportedAsStale() {
         System.runAs(TestUsers.admin()) {
+            seasonalSwitch(true);
             Test.startTest();
             SeasonalAddressScheduler.start();
             Boolean stale = SeasonalAddressService.isStale();
-            SeasonalAddressScheduler.stop();
+            seasonalSwitch(false);
             Test.stopTest();
 
             Assert.isTrue(

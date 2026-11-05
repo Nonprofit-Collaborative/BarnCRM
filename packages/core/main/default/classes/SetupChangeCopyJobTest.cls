@@ -227,13 +227,13 @@ private class SetupChangeCopyJobTest {
             Id again = SetupChangeCopyJob.start();
             Test.stopTest();
 
-            Assert.areEqual(first, again, 'Never two jobs under the one name.');
+            Assert.areEqual(first, again, 'Never two nightly runs under the one name.');
             Assert.isTrue(SetupChangeCopyJob.isScheduled(), 'It is scheduled.');
-            NightlyJob listed = SetupChangeCopyJob.nightlyJob();
-            Assert.isTrue(listed.isScheduled(), 'Health Check sees it as scheduled.');
+            NightlyStep listed = SetupChangeCopyJob.step();
+            Assert.areEqual(90, listed.minute, 'Half past one in the nightly run.');
             Assert.areEqual(
                 Label.Core_HealthCheck_JobSetupChanges,
-                listed.label(),
+                listed.label,
                 'Named from a label.'
             );
         }
@@ -260,9 +260,9 @@ private class SetupChangeCopyJobTest {
                 ],
                 'A second scheduled start while one is waiting starts nothing.'
             );
-            SetupChangeCopyJob.nightlyJob().schedule();
+            SetupChangeCopyJob.start();
             Test.stopTest();
         }
-        Assert.isTrue(SetupChangeCopyJob.isScheduled(), 'Health Check schedules it.');
+        Assert.isTrue(SetupChangeCopyJob.isScheduled(), 'The nightly run does it.');
     }
 }

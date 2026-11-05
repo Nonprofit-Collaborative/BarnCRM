@@ -444,14 +444,12 @@ private class EmptyHouseholdTidyTest {
             Id second = EmptyHouseholdTidyScheduler.start();
             Test.stopTest();
 
-            Assert.areEqual(first, second, 'Starting again finds the job already there.');
-            Boolean listed = false;
-            for (NightlyJob job : NightlyJobs.all()) {
-                if (job.label() == System.Label.Core_HealthCheck_JobEmptyHouseholds) {
-                    listed = job.isScheduled();
-                }
-            }
-            Assert.isTrue(listed, 'Health Check sees it among the nightly jobs, scheduled.');
+            Assert.areEqual(first, second, 'Starting again finds the nightly run already there.');
+            NightlyStep step = NightlyJobs.step(EmptyHouseholdTidyScheduler.JOB_NAME);
+            Assert.isNotNull(step, 'The tidy-up is a step of the nightly run.');
+            Assert.areEqual(105, step.minute, 'At a quarter to two.');
+            Assert.isTrue(NightlyJobs.isOn(step), 'And it runs tonight.');
+            Assert.isTrue(EmptyHouseholdTidyScheduler.isScheduled(), 'Scheduled.');
         }
     }
 
