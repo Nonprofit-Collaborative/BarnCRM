@@ -13,92 +13,92 @@
  * it here: same keys, same severities, same categories, same labels, same fix targets.
  */
 public with sharing class HealthCheckAccessChecks {
-    /** Whether anybody at all can administer BarnCRM. */
-    public class NoAdminCheck implements HealthCheckService.Check {
-        private final HealthCheckService.AccessCounts counts;
+	/** Whether anybody at all can administer BarnCRM. */
+	public class NoAdminCheck implements HealthCheckService.Check {
+		private final HealthCheckService.AccessCounts counts;
 
-        public NoAdminCheck(HealthCheckService.AccessCounts counts) {
-            this.counts = counts;
-        }
+		public NoAdminCheck(HealthCheckService.AccessCounts counts) {
+			this.counts = counts;
+		}
 
-        public HealthCheckService.Finding run() {
-            return noAdminFinding(counts);
-        }
-    }
+		public HealthCheckService.Finding run() {
+			return noAdminFinding(counts);
+		}
+	}
 
-    /** How many active people hold no packaged role and so cannot see the app. */
-    public class UsersWithoutAccessCheck implements HealthCheckService.Check {
-        private final HealthCheckService.AccessCounts counts;
+	/** How many active people hold no packaged role and so cannot see the app. */
+	public class UsersWithoutAccessCheck implements HealthCheckService.Check {
+		private final HealthCheckService.AccessCounts counts;
 
-        public UsersWithoutAccessCheck(HealthCheckService.AccessCounts counts) {
-            this.counts = counts;
-        }
+		public UsersWithoutAccessCheck(HealthCheckService.AccessCounts counts) {
+			this.counts = counts;
+		}
 
-        public HealthCheckService.Finding run() {
-            return usersWithoutAccessFinding(counts);
-        }
-    }
+		public HealthCheckService.Finding run() {
+			return usersWithoutAccessFinding(counts);
+		}
+	}
 
-    /**
-     * What a viewer without the administrator permission is told in place of the three
-     * checks above, so that silence is never read as a pass.
-     */
-    public class NeedsAdminCheck implements HealthCheckService.Check {
-        public HealthCheckService.Finding run() {
-            return new HealthCheckService.Finding(
-                'access_checks_need_admin',
-                System.Label.Core_HealthCheck_AccessNeedsAdminTitle,
-                BarnHelp.text('Core', 'Core_HealthCheck_AccessNeedsAdminDetail'),
-                HealthCheckService.SEVERITY_INFO,
-                HealthCheckService.CATEGORY_ACCESS
-            );
-        }
-    }
+	/**
+	 * What a viewer without the administrator permission is told in place of the three
+	 * checks above, so that silence is never read as a pass.
+	 */
+	public class NeedsAdminCheck implements HealthCheckService.Check {
+		public HealthCheckService.Finding run() {
+			return new HealthCheckService.Finding(
+				'access_checks_need_admin',
+				System.Label.Core_HealthCheck_AccessNeedsAdminTitle,
+				BarnHelp.text('Core', 'Core_HealthCheck_AccessNeedsAdminDetail'),
+				HealthCheckService.SEVERITY_INFO,
+				HealthCheckService.CATEGORY_ACCESS
+			);
+		}
+	}
 
-    private static HealthCheckService.Finding noAdminFinding(
-        HealthCheckService.AccessCounts counts
-    ) {
-        Integer admins = counts.administrators();
-        if (admins > 0) {
-            return null;
-        }
+	private static HealthCheckService.Finding noAdminFinding(
+		HealthCheckService.AccessCounts counts
+	) {
+		Integer admins = counts.administrators();
+		if (admins > 0) {
+			return null;
+		}
 
-        return new HealthCheckService.Finding(
-                'no_admin',
-                System.Label.Core_HealthCheck_NoAdminTitle,
-                BarnHelp.text('Core', 'Core_HealthCheck_NoAdminDetail'),
-                HealthCheckService.SEVERITY_ERROR,
-                HealthCheckService.CATEGORY_ACCESS
-            )
-            .withFix(System.Label.Core_HealthCheck_AccessFix, HealthCheckService.SECTION_ACCESS);
-    }
+		return new HealthCheckService.Finding(
+				'no_admin',
+				System.Label.Core_HealthCheck_NoAdminTitle,
+				BarnHelp.text('Core', 'Core_HealthCheck_NoAdminDetail'),
+				HealthCheckService.SEVERITY_ERROR,
+				HealthCheckService.CATEGORY_ACCESS
+			)
+			.withFix(System.Label.Core_HealthCheck_AccessFix, HealthCheckService.SECTION_ACCESS);
+	}
 
-    private static HealthCheckService.Finding usersWithoutAccessFinding(
-        HealthCheckService.AccessCounts counts
-    ) {
-        Integer without = counts.usersWithoutAccess();
-        if (without <= 0) {
-            return null;
-        }
+	private static HealthCheckService.Finding usersWithoutAccessFinding(
+		HealthCheckService.AccessCounts counts
+	) {
+		Integer without = counts.usersWithoutAccess();
+		if (without <= 0) {
+			return null;
+		}
 
-        List<Object> count = new List<Object>{ String.valueOf(without) };
-        return new HealthCheckService.Finding(
-                'users_without_access',
-                HealthCheckService.forCount(
-                    without,
-                    System.Label.Core_HealthCheck_UsersWithoutAccessTitleOne,
-                    System.Label.Core_HealthCheck_UsersWithoutAccessTitle,
-                    count
-                ),
-                HealthCheckService.forCount(
-                    without,
-                    BarnHelp.text('Core', 'Core_HealthCheck_UsersWithoutAccessDetailOne'),
-                    BarnHelp.text('Core', 'Core_HealthCheck_UsersWithoutAccessDetail'),
-                    count
-                ),
-                HealthCheckService.SEVERITY_WARNING,
-                HealthCheckService.CATEGORY_ACCESS
-            )
-            .withFix(System.Label.Core_HealthCheck_AccessFix, HealthCheckService.SECTION_ACCESS);
-    }
+		List<Object> count = new List<Object>{ String.valueOf(without) };
+		return new HealthCheckService.Finding(
+				'users_without_access',
+				HealthCheckService.forCount(
+					without,
+					System.Label.Core_HealthCheck_UsersWithoutAccessTitleOne,
+					System.Label.Core_HealthCheck_UsersWithoutAccessTitle,
+					count
+				),
+				HealthCheckService.forCount(
+					without,
+					BarnHelp.text('Core', 'Core_HealthCheck_UsersWithoutAccessDetailOne'),
+					BarnHelp.text('Core', 'Core_HealthCheck_UsersWithoutAccessDetail'),
+					count
+				),
+				HealthCheckService.SEVERITY_WARNING,
+				HealthCheckService.CATEGORY_ACCESS
+			)
+			.withFix(System.Label.Core_HealthCheck_AccessFix, HealthCheckService.SECTION_ACCESS);
+	}
 }

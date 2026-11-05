@@ -4,16 +4,16 @@
  */
 @NamespaceAccessible
 public with sharing class AskTriggerHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public AskTriggerHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public AskTriggerHandler() {
+		return;
+	}
 
-    public override void beforeInsert() {
-        AskRules.beforeSave(newRecords(), null);
-    }
+	public override void beforeInsert() {
+		AskRules.beforeSave(newRecords(), null);
+	}
 
-    public override void beforeUpdate() {
-        AskRules.beforeSave(newRecords(), oldRecordsById());
-    }
+	public override void beforeUpdate() {
+		AskRules.beforeSave(newRecords(), oldRecordsById());
+	}
 }

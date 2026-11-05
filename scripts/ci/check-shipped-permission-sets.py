@@ -41,11 +41,11 @@ def render(names):
         " * also fails CI when this list and the package directories differ. Do not edit by hand.",
         " */",
         "public with sharing class BarnCRMShippedPermissionSets {",
-        "    public static final Set<String> NAMES = new Set<String>{",
+        "\tpublic static final Set<String> NAMES = new Set<String>{",
     ]
     for index, name in enumerate(names):
-        lines.append("        '" + name + "'" + ("," if index < len(names) - 1 else ""))
-    lines += ["    };", "}", ""]
+        lines.append("\t\t'" + name + "'" + ("," if index < len(names) - 1 else ""))
+    lines += ["\t};", "}", ""]
     return "\n".join(lines)
 
 

@@ -6,296 +6,296 @@
  */
 @IsTest(testFor='ApexClass:RollupScheduler, ApexClass:RollupsEngineExtension')
 private class RollupSchedulerTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.adminWith('Rollup_Builder_Admin');
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.adminWith('Rollup_Builder_Admin');
+	}
 
-    private static Rollup_Definition__c childCount(
-        String key,
-        String targetField,
-        String mode,
-        Boolean active
-    ) {
-        return new Rollup_Definition__c(
-            Name = key,
-            Definition_Key__c = key,
-            Source_Object__c = 'Account',
-            Target_Object__c = 'Account',
-            Relationship_Path__c = 'ParentId',
-            Aggregate__c = 'COUNT',
-            Target_Field__c = targetField,
-            Mode__c = mode,
-            Fiscal_Year_Aware__c = false,
-            Active__c = active
-        );
-    }
+	private static Rollup_Definition__c childCount(
+		String key,
+		String targetField,
+		String mode,
+		Boolean active
+	) {
+		return new Rollup_Definition__c(
+			Name = key,
+			Definition_Key__c = key,
+			Source_Object__c = 'Account',
+			Target_Object__c = 'Account',
+			Relationship_Path__c = 'ParentId',
+			Aggregate__c = 'COUNT',
+			Target_Field__c = targetField,
+			Mode__c = mode,
+			Fiscal_Year_Aware__c = false,
+			Active__c = active
+		);
+	}
 
-    private static Account organization(String name, Id parentId) {
-        return new Account(
-            Name = name,
-            ParentId = parentId,
-            RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
-        );
-    }
+	private static Account organization(String name, Id parentId) {
+		return new Account(
+			Name = name,
+			ParentId = parentId,
+			RecordTypeId = AccountKindsTestData.organizationRecordTypeId()
+		);
+	}
 
-    @IsTest
-    static void theNightlyRunCoversScheduledAndBothAndNothingElse() {
-        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            Account parent = organization('Parent', null);
-            insert parent;
-            insert organization('Child', parent.Id);
-            insert new List<Rollup_Definition__c>{
-                childCount(
-                    'Core_Scheduled',
-                    'NumberOfEmployees',
-                    RollupService.MODE_SCHEDULED,
-                    true
-                ),
-                childCount('Core_Both', 'Member_Count__c', RollupService.MODE_BOTH, true),
-                childCount('Core_Real_Time', 'AnnualRevenue', RollupService.MODE_REAL_TIME, true),
-                childCount(
-                    'Core_Inactive',
-                    'NumberOfEmployees',
-                    RollupService.MODE_SCHEDULED,
-                    false
-                )
-            };
+	@IsTest
+	static void theNightlyRunCoversScheduledAndBothAndNothingElse() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			Account parent = organization('Parent', null);
+			insert parent;
+			insert organization('Child', parent.Id);
+			insert new List<Rollup_Definition__c>{
+				childCount(
+					'Core_Scheduled',
+					'NumberOfEmployees',
+					RollupService.MODE_SCHEDULED,
+					true
+				),
+				childCount('Core_Both', 'Member_Count__c', RollupService.MODE_BOTH, true),
+				childCount('Core_Real_Time', 'AnnualRevenue', RollupService.MODE_REAL_TIME, true),
+				childCount(
+					'Core_Inactive',
+					'NumberOfEmployees',
+					RollupService.MODE_SCHEDULED,
+					false
+				)
+			};
 
-            Test.startTest();
-            Id jobId = RollupScheduler.runNow();
-            Test.stopTest();
+			Test.startTest();
+			Id jobId = RollupScheduler.runNow();
+			Test.stopTest();
 
-            Assert.isNotNull(jobId, 'The run started');
-            Set<String> keys = new Set<String>();
-            for (Rollup_Definition__c definition : [
-                SELECT Definition_Key__c
-                FROM Rollup_Definition__c
-                WHERE Last_Calculated__c != NULL
-            ]) {
-                keys.add(definition.Definition_Key__c);
-            }
-            Assert.areEqual(
-                new Set<String>{ 'Core_Scheduled', 'Core_Both' },
-                keys,
-                'R-R4: a real time rollup is already right, and an inactive one does not run'
-            );
-            Account counted = [
-                SELECT NumberOfEmployees, Member_Count__c
-                FROM Account
-                WHERE Id = :parent.Id
-            ];
-            Assert.areEqual(1, counted.NumberOfEmployees, 'The scheduled total is written');
-            Assert.areEqual(1, counted.Member_Count__c, 'And the Both one');
-        }
-    }
+			Assert.isNotNull(jobId, 'The run started');
+			Set<String> keys = new Set<String>();
+			for (Rollup_Definition__c definition : [
+				SELECT Definition_Key__c
+				FROM Rollup_Definition__c
+				WHERE Last_Calculated__c != NULL
+			]) {
+				keys.add(definition.Definition_Key__c);
+			}
+			Assert.areEqual(
+				new Set<String>{ 'Core_Scheduled', 'Core_Both' },
+				keys,
+				'R-R4: a real time rollup is already right, and an inactive one does not run'
+			);
+			Account counted = [
+				SELECT NumberOfEmployees, Member_Count__c
+				FROM Account
+				WHERE Id = :parent.Id
+			];
+			Assert.areEqual(1, counted.NumberOfEmployees, 'The scheduled total is written');
+			Assert.areEqual(1, counted.Member_Count__c, 'And the Both one');
+		}
+	}
 
-    @IsTest
-    static void theScheduledJobStartsTheFullRecalculation() {
-        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            insert childCount('Core_Both', 'NumberOfEmployees', RollupService.MODE_BOTH, true);
-            insert organization('Parent', null);
+	@IsTest
+	static void theScheduledJobStartsTheFullRecalculation() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			insert childCount('Core_Both', 'NumberOfEmployees', RollupService.MODE_BOTH, true);
+			insert organization('Parent', null);
 
-            Test.startTest();
-            new RollupScheduler().execute(null);
-            Test.stopTest();
+			Test.startTest();
+			new RollupScheduler().execute(null);
+			Test.stopTest();
 
-            Assert.areEqual(
-                1,
-                [
-                    SELECT COUNT()
-                    FROM AsyncApexJob
-                    WHERE JobType = 'BatchApex' AND ApexClass.Name = 'RollupFullRecalcBatch'
-                ],
-                'The nightly job runs the full recalculation of BarnCRM own engine'
-            );
-        }
-    }
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM AsyncApexJob
+					WHERE JobType = 'BatchApex' AND ApexClass.Name = 'RollupFullRecalcBatch'
+				],
+				'The nightly job runs the full recalculation of BarnCRM own engine'
+			);
+		}
+	}
 
-    /** 200 parents with one child each, saved before any rollup exists, so nothing is counted. */
-    private static List<Account> twoHundredParents() {
-        List<Account> parents = new List<Account>();
-        for (Integer i = 0; i < 200; i++) {
-            parents.add(organization('Parent ' + i, null));
-        }
-        insert parents;
-        List<Account> children = new List<Account>();
-        for (Account parent : parents) {
-            children.add(organization('Child', parent.Id));
-        }
-        insert children;
-        return parents;
-    }
+	/** 200 parents with one child each, saved before any rollup exists, so nothing is counted. */
+	private static List<Account> twoHundredParents() {
+		List<Account> parents = new List<Account>();
+		for (Integer i = 0; i < 200; i++) {
+			parents.add(organization('Parent ' + i, null));
+		}
+		insert parents;
+		List<Account> children = new List<Account>();
+		for (Account parent : parents) {
+			children.add(organization('Child', parent.Id));
+		}
+		insert children;
+		return parents;
+	}
 
-    /** Owner decision on ROLLUPS-8: Recalculate all rebuilds every active total, Instantly too. */
-    @IsTest
-    static void recalculateAllCoversEveryActiveRollupIncludingInstantly() {
-        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            List<Account> parents = twoHundredParents();
-            insert new List<Rollup_Definition__c>{
-                childCount('Core_Real_Time', 'AnnualRevenue', RollupService.MODE_REAL_TIME, true),
-                childCount('Core_Both', 'Member_Count__c', RollupService.MODE_BOTH, true),
-                childCount(
-                    'Core_Inactive',
-                    'NumberOfEmployees',
-                    RollupService.MODE_SCHEDULED,
-                    false
-                )
-            };
-            User maria = TestDataFactory.createUser(
-                'Maria',
-                new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
-            );
+	/** Owner decision on ROLLUPS-8: Recalculate all rebuilds every active total, Instantly too. */
+	@IsTest
+	static void recalculateAllCoversEveryActiveRollupIncludingInstantly() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			List<Account> parents = twoHundredParents();
+			insert new List<Rollup_Definition__c>{
+				childCount('Core_Real_Time', 'AnnualRevenue', RollupService.MODE_REAL_TIME, true),
+				childCount('Core_Both', 'Member_Count__c', RollupService.MODE_BOTH, true),
+				childCount(
+					'Core_Inactive',
+					'NumberOfEmployees',
+					RollupService.MODE_SCHEDULED,
+					false
+				)
+			};
+			User maria = TestDataFactory.createUser(
+				'Maria',
+				new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
+			);
 
-            Test.startTest();
-            System.runAs(maria) {
-                RollupController.recalculateAll();
-            }
-            Test.stopTest();
+			Test.startTest();
+			System.runAs(maria) {
+				RollupController.recalculateAll();
+			}
+			Test.stopTest();
 
-            Set<String> keys = new Set<String>();
-            for (Rollup_Definition__c definition : [
-                SELECT Definition_Key__c
-                FROM Rollup_Definition__c
-                WHERE Last_Calculated__c != NULL
-            ]) {
-                keys.add(definition.Definition_Key__c);
-            }
-            Assert.areEqual(
-                new Set<String>{ 'Core_Real_Time', 'Core_Both' },
-                keys,
-                'Every active rollup ran, and the inactive one did not'
-            );
-            for (Account parent : [
-                SELECT AnnualRevenue, Member_Count__c, NumberOfEmployees
-                FROM Account
-                WHERE Id IN :parents
-            ]) {
-                Assert.areEqual(1, parent.AnnualRevenue, 'The Instantly total is rebuilt');
-                Assert.areEqual(1, parent.Member_Count__c, 'And the Both one');
-                Assert.isNull(parent.NumberOfEmployees, 'An inactive rollup writes nothing');
-            }
-        }
-    }
+			Set<String> keys = new Set<String>();
+			for (Rollup_Definition__c definition : [
+				SELECT Definition_Key__c
+				FROM Rollup_Definition__c
+				WHERE Last_Calculated__c != NULL
+			]) {
+				keys.add(definition.Definition_Key__c);
+			}
+			Assert.areEqual(
+				new Set<String>{ 'Core_Real_Time', 'Core_Both' },
+				keys,
+				'Every active rollup ran, and the inactive one did not'
+			);
+			for (Account parent : [
+				SELECT AnnualRevenue, Member_Count__c, NumberOfEmployees
+				FROM Account
+				WHERE Id IN :parents
+			]) {
+				Assert.areEqual(1, parent.AnnualRevenue, 'The Instantly total is rebuilt');
+				Assert.areEqual(1, parent.Member_Count__c, 'And the Both one');
+				Assert.isNull(parent.NumberOfEmployees, 'An inactive rollup writes nothing');
+			}
+		}
+	}
 
-    /** The one run Recalculate all sets up for tonight covers every definition. */
-    @IsTest
-    static void theTonightRunCoversInstantlyRollups() {
-        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            insert organization('Parent', null);
-            insert new List<Rollup_Definition__c>{
-                childCount('Core_Real_Time', 'AnnualRevenue', RollupService.MODE_REAL_TIME, true),
-                childCount('Core_Both', 'Member_Count__c', RollupService.MODE_BOTH, true)
-            };
+	/** The one run Recalculate all sets up for tonight covers every definition. */
+	@IsTest
+	static void theTonightRunCoversInstantlyRollups() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			insert organization('Parent', null);
+			insert new List<Rollup_Definition__c>{
+				childCount('Core_Real_Time', 'AnnualRevenue', RollupService.MODE_REAL_TIME, true),
+				childCount('Core_Both', 'Member_Count__c', RollupService.MODE_BOTH, true)
+			};
 
-            Test.startTest();
-            new RollupScheduler(true).execute(null);
-            Test.stopTest();
+			Test.startTest();
+			new RollupScheduler(true).execute(null);
+			Test.stopTest();
 
-            Assert.areEqual(
-                2,
-                [SELECT COUNT() FROM Rollup_Definition__c WHERE Last_Calculated__c != NULL],
-                'The tonight run covers the Instantly rollup too'
-            );
-        }
-    }
+			Assert.areEqual(
+				2,
+				[SELECT COUNT() FROM Rollup_Definition__c WHERE Last_Calculated__c != NULL],
+				'The tonight run covers the Instantly rollup too'
+			);
+		}
+	}
 
-    @IsTest
-    static void theScheduleIsStartedAndStoppedFromTheConsole() {
-        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            Test.startTest();
-            RollupScheduler.start();
-            Boolean scheduledAfterStart = RollupScheduler.isScheduled();
-            RollupScheduler.stop();
-            Boolean scheduledAfterStop = RollupScheduler.isScheduled();
-            Test.stopTest();
+	@IsTest
+	static void theScheduleIsStartedAndStoppedFromTheConsole() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			Test.startTest();
+			RollupScheduler.start();
+			Boolean scheduledAfterStart = RollupScheduler.isScheduled();
+			RollupScheduler.stop();
+			Boolean scheduledAfterStop = RollupScheduler.isScheduled();
+			Test.stopTest();
 
-            System.Assert.isTrue(scheduledAfterStart, 'Starting the nightly run schedules it');
-            System.Assert.isFalse(scheduledAfterStop, 'And stopping it takes it away');
-        }
-    }
+			System.Assert.isTrue(scheduledAfterStart, 'Starting the nightly run schedules it');
+			System.Assert.isFalse(scheduledAfterStop, 'And stopping it takes it away');
+		}
+	}
 
-    @IsTest
-    static void startingTwiceDoesNotScheduleTwoJobs() {
-        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            Test.startTest();
-            Id first = RollupScheduler.start();
-            Id second = RollupScheduler.start();
-            Test.stopTest();
+	@IsTest
+	static void startingTwiceDoesNotScheduleTwoJobs() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			Test.startTest();
+			Id first = RollupScheduler.start();
+			Id second = RollupScheduler.start();
+			Test.stopTest();
 
-            System.Assert.areEqual(
-                first,
-                second,
-                'The same job, so a second click changes nothing'
-            );
-        }
-    }
+			System.Assert.areEqual(
+				first,
+				second,
+				'The same job, so a second click changes nothing'
+			);
+		}
+	}
 
-    private static void saveHour(Integer hour) {
-        SettingsService.saveValues(
-            RollupService.SETTINGS_OBJECT,
-            new Map<String, Object>{ RollupScheduler.HOUR_SETTING => hour }
-        );
-    }
+	private static void saveHour(Integer hour) {
+		SettingsService.saveValues(
+			RollupService.SETTINGS_OBJECT,
+			new Map<String, Object>{ RollupScheduler.HOUR_SETTING => hour }
+		);
+	}
 
-    private static void useJobNameOfItsOwn() {
-        RollupScheduler.jobNameInUse = 'BarnCRM Rollups test ' + Crypto.getRandomInteger();
-    }
+	private static void useJobNameOfItsOwn() {
+		RollupScheduler.jobNameInUse = 'BarnCRM Rollups test ' + Crypto.getRandomInteger();
+	}
 
-    @IsTest
-    static void theNightlyRunStartsAtTwoUntilTheSettingSaysOtherwise() {
-        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            useJobNameOfItsOwn();
-            Assert.areEqual(2, RollupScheduler.nightlyHour(), 'Blank means 2:00 AM');
-            Assert.isTrue(RollupScheduler.nightlyTime().contains('2:00'), 'Read as a time');
+	@IsTest
+	static void theNightlyRunStartsAtTwoUntilTheSettingSaysOtherwise() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			useJobNameOfItsOwn();
+			Assert.areEqual(2, RollupScheduler.nightlyHour(), 'Blank means 2:00 AM');
+			Assert.isTrue(RollupScheduler.nightlyTime().contains('2:00'), 'Read as a time');
 
-            Assert.areEqual(120, RollupScheduler.step().minute, 'The step is at 2:00 first');
+			Assert.areEqual(120, RollupScheduler.step().minute, 'The step is at 2:00 first');
 
-            Test.startTest();
-            saveHour(22);
-            Test.stopTest();
+			Test.startTest();
+			saveHour(22);
+			Test.stopTest();
 
-            Assert.areEqual(22, RollupScheduler.nightlyHour(), 'The saved hour');
-            Assert.areEqual(
-                22 * 60,
-                RollupScheduler.step().minute,
-                'The step moves with the hour, with no schedule to move'
-            );
-        }
-    }
+			Assert.areEqual(22, RollupScheduler.nightlyHour(), 'The saved hour');
+			Assert.areEqual(
+				22 * 60,
+				RollupScheduler.step().minute,
+				'The step moves with the hour, with no schedule to move'
+			);
+		}
+	}
 
-    @IsTest
-    static void savingANewHourSchedulesNothingWhenTheRunIsOff() {
-        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            useJobNameOfItsOwn();
+	@IsTest
+	static void savingANewHourSchedulesNothingWhenTheRunIsOff() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			useJobNameOfItsOwn();
 
-            Test.startTest();
-            saveHour(5);
-            Test.stopTest();
+			Test.startTest();
+			saveHour(5);
+			Test.stopTest();
 
-            Assert.isFalse(RollupScheduler.isScheduled(), 'The hour alone starts nothing');
-        }
-    }
+			Assert.isFalse(RollupScheduler.isScheduled(), 'The hour alone starts nothing');
+		}
+	}
 
-    @IsTest
-    static void theTonightRunIsSetForTheNightlyHour() {
-        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            useJobNameOfItsOwn();
-            saveHour(23);
+	@IsTest
+	static void theTonightRunIsSetForTheNightlyHour() {
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			useJobNameOfItsOwn();
+			saveHour(23);
 
-            Test.startTest();
-            RollupScheduler.scheduleTonight();
-            Test.stopTest();
+			Test.startTest();
+			RollupScheduler.scheduleTonight();
+			Test.stopTest();
 
-            String pattern = RollupScheduler.jobName() + ' %';
-            CronTrigger tonight = [
-                SELECT CronExpression
-                FROM CronTrigger
-                WHERE CronJobDetail.Name LIKE :pattern
-                WITH SYSTEM_MODE
-                LIMIT 1
-            ];
-            Assert.isTrue(tonight.CronExpression.startsWith('0 0 23 '), 'At 23 that night');
-        }
-    }
+			String pattern = RollupScheduler.jobName() + ' %';
+			CronTrigger tonight = [
+				SELECT CronExpression
+				FROM CronTrigger
+				WHERE CronJobDetail.Name LIKE :pattern
+				WITH SYSTEM_MODE
+				LIMIT 1
+			];
+			Assert.isTrue(tonight.CronExpression.startsWith('0 0 23 '), 'At 23 that night');
+		}
+	}
 }

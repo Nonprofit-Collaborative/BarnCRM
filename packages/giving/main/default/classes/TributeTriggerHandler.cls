@@ -11,51 +11,51 @@
  */
 @NamespaceAccessible
 public with sharing class TributeTriggerHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public TributeTriggerHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public TributeTriggerHandler() {
+		return;
+	}
 
-    public override void beforeInsert() {
-        List<Tribute__c> tributes = asTributes(newRecords());
-        TributeService.rejectSecondTribute(tributes);
-        TributeService.validate(tributes);
-        TributeService.stampSentDates(tributes, null);
-    }
+	public override void beforeInsert() {
+		List<Tribute__c> tributes = asTributes(newRecords());
+		TributeService.rejectSecondTribute(tributes);
+		TributeService.validate(tributes);
+		TributeService.stampSentDates(tributes, null);
+	}
 
-    public override void beforeUpdate() {
-        List<Tribute__c> tributes = asTributes(newRecords());
-        TributeService.validate(tributes);
-        TributeService.stampSentDates(tributes, priorById(oldRecordsById()));
-    }
+	public override void beforeUpdate() {
+		List<Tribute__c> tributes = asTributes(newRecords());
+		TributeService.validate(tributes);
+		TributeService.stampSentDates(tributes, priorById(oldRecordsById()));
+	}
 
-    public override void afterInsert() {
-        TributeService.mirrorOnGifts(asTributes(newRecords()), true);
-    }
+	public override void afterInsert() {
+		TributeService.mirrorOnGifts(asTributes(newRecords()), true);
+	}
 
-    public override void afterDelete() {
-        TributeService.mirrorOnGifts(asTributes(oldRecords()), false);
-    }
+	public override void afterDelete() {
+		TributeService.mirrorOnGifts(asTributes(oldRecords()), false);
+	}
 
-    private static Map<Id, Tribute__c> priorById(Map<Id, SObject> oldRecordsById) {
-        Map<Id, Tribute__c> prior = new Map<Id, Tribute__c>();
-        if (oldRecordsById == null) {
-            return prior;
-        }
-        for (Id recordId : oldRecordsById.keySet()) {
-            prior.put(recordId, (Tribute__c) oldRecordsById.get(recordId));
-        }
-        return prior;
-    }
+	private static Map<Id, Tribute__c> priorById(Map<Id, SObject> oldRecordsById) {
+		Map<Id, Tribute__c> prior = new Map<Id, Tribute__c>();
+		if (oldRecordsById == null) {
+			return prior;
+		}
+		for (Id recordId : oldRecordsById.keySet()) {
+			prior.put(recordId, (Tribute__c) oldRecordsById.get(recordId));
+		}
+		return prior;
+	}
 
-    private static List<Tribute__c> asTributes(List<SObject> records) {
-        List<Tribute__c> tributes = new List<Tribute__c>();
-        if (records == null) {
-            return tributes;
-        }
-        for (SObject record : records) {
-            tributes.add((Tribute__c) record);
-        }
-        return tributes;
-    }
+	private static List<Tribute__c> asTributes(List<SObject> records) {
+		List<Tribute__c> tributes = new List<Tribute__c>();
+		if (records == null) {
+			return tributes;
+		}
+		for (SObject record : records) {
+			tributes.add((Tribute__c) record);
+		}
+		return tributes;
+	}
 }

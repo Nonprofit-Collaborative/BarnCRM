@@ -20,36 +20,36 @@
  *   standard fields the package does not own.
  */
 public without sharing class SeasonalAddressWriter {
-    /**
-     * Saves one owner's swap, all of it or none of it.
-     *
-     * All of it or none of it, and therefore one DML statement per owner rather than one for
-     * the whole chunk: a swap is a pair of writes, one address giving up the default flag and
-     * another taking it, and a partial save would leave a household with no default address at
-     * all and so with no address in its standard address fields. The caller catches the
-     * exception, writes it to the Error Log against that owner, and carries on with the rest of
-     * the chunk (R-AD8).
-     */
-    public static void save(List<Address__c> updates) {
-        if (updates == null || updates.isEmpty()) {
-            return;
-        }
-        Database.update(updates, true, AccessLevel.SYSTEM_MODE);
-    }
+	/**
+	 * Saves one owner's swap, all of it or none of it.
+	 *
+	 * All of it or none of it, and therefore one DML statement per owner rather than one for
+	 * the whole chunk: a swap is a pair of writes, one address giving up the default flag and
+	 * another taking it, and a partial save would leave a household with no default address at
+	 * all and so with no address in its standard address fields. The caller catches the
+	 * exception, writes it to the Error Log against that owner, and carries on with the rest of
+	 * the chunk (R-AD8).
+	 */
+	public static void save(List<Address__c> updates) {
+		if (updates == null || updates.isEmpty()) {
+			return;
+		}
+		Database.update(updates, true, AccessLevel.SYSTEM_MODE);
+	}
 
-    /**
-     * Records when the run finished and what it did, on the org-level settings record.
-     *
-     * No permission is checked, unlike `SettingsWriter`: nobody asked for this write and no
-     * value in it came from a person. Both values are produced by the job about itself, and
-     * they are the whole of C-18's "visible last run" (R-AD8).
-     */
-    public static void recordRun(Datetime finishedAt, String summary) {
-        OrgSettingsSystemWriter.save(
-            new Map<Schema.SObjectField, Object>{
-                BarnCRM_Settings__c.Seasonal_Address_Last_Run__c => finishedAt,
-                BarnCRM_Settings__c.Seasonal_Address_Last_Run_Summary__c => summary
-            }
-        );
-    }
+	/**
+	 * Records when the run finished and what it did, on the org-level settings record.
+	 *
+	 * No permission is checked, unlike `SettingsWriter`: nobody asked for this write and no
+	 * value in it came from a person. Both values are produced by the job about itself, and
+	 * they are the whole of C-18's "visible last run" (R-AD8).
+	 */
+	public static void recordRun(Datetime finishedAt, String summary) {
+		OrgSettingsSystemWriter.save(
+			new Map<Schema.SObjectField, Object>{
+				BarnCRM_Settings__c.Seasonal_Address_Last_Run__c => finishedAt,
+				BarnCRM_Settings__c.Seasonal_Address_Last_Run_Summary__c => summary
+			}
+		);
+	}
 }

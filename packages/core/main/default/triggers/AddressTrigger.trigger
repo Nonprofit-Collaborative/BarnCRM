@@ -4,13 +4,13 @@
  * fails (plan Section 7.2, ADR-0017). No logic lives here.
  */
 trigger AddressTrigger on Address__c(
-    before insert,
-    before update,
-    before delete,
-    after insert,
-    after update,
-    after delete,
-    after undelete
+	before insert,
+	before update,
+	before delete,
+	after insert,
+	after update,
+	after delete,
+	after undelete
 ) {
-    TriggerDispatcher.run('Address__c');
+	TriggerDispatcher.run('Address__c');
 }

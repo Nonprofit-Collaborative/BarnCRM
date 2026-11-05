@@ -16,40 +16,40 @@
  * accessors on TriggerHandler.
  */
 public with sharing class AccountAddressHandler extends TriggerHandler {
-    public override void afterInsert() {
-        List<Account> accounts = (List<Account>) newRecords();
-        if (accounts == null || accounts.isEmpty()) {
-            return;
-        }
-        try {
-            AddressService.captureFromStandardFields(accounts, null);
-        } catch (Exception thrown) {
-            ErrorLogger.log(thrown, 'AccountAddressHandler.afterInsert');
-            for (Account account : accounts) {
-                account.addError(BarnHelp.text('Core', 'Core_Address_PropagationFailed'));
-            }
-        }
-    }
+	public override void afterInsert() {
+		List<Account> accounts = (List<Account>) newRecords();
+		if (accounts == null || accounts.isEmpty()) {
+			return;
+		}
+		try {
+			AddressService.captureFromStandardFields(accounts, null);
+		} catch (Exception thrown) {
+			ErrorLogger.log(thrown, 'AccountAddressHandler.afterInsert');
+			for (Account account : accounts) {
+				account.addError(BarnHelp.text('Core', 'Core_Address_PropagationFailed'));
+			}
+		}
+	}
 
-    /**
-     * A person account whose mailing address changed gets an address record of their own,
-     * and a household or organization whose billing address changed gets the new address as
-     * its default address record.
-     */
-    public override void afterUpdate() {
-        List<Account> accounts = (List<Account>) newRecords();
-        if (accounts == null || accounts.isEmpty()) {
-            return;
-        }
-        Map<Id, SObject> previousById = oldRecordsById();
-        try {
-            AddressService.capturePersonMailingChanges(accounts, previousById);
-            AddressService.captureBillingChanges(accounts, previousById);
-        } catch (Exception thrown) {
-            ErrorLogger.log(thrown, 'AccountAddressHandler.afterUpdate');
-            for (Account account : accounts) {
-                account.addError(BarnHelp.text('Core', 'Core_Address_PropagationFailed'));
-            }
-        }
-    }
+	/**
+	 * A person account whose mailing address changed gets an address record of their own,
+	 * and a household or organization whose billing address changed gets the new address as
+	 * its default address record.
+	 */
+	public override void afterUpdate() {
+		List<Account> accounts = (List<Account>) newRecords();
+		if (accounts == null || accounts.isEmpty()) {
+			return;
+		}
+		Map<Id, SObject> previousById = oldRecordsById();
+		try {
+			AddressService.capturePersonMailingChanges(accounts, previousById);
+			AddressService.captureBillingChanges(accounts, previousById);
+		} catch (Exception thrown) {
+			ErrorLogger.log(thrown, 'AccountAddressHandler.afterUpdate');
+			for (Account account : accounts) {
+				account.addError(BarnHelp.text('Core', 'Core_Address_PropagationFailed'));
+			}
+		}
+	}
 }

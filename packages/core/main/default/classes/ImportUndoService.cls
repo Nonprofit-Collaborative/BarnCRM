@@ -18,436 +18,436 @@
  */
 @NamespaceAccessible
 public with sharing class ImportUndoService {
-    /** Whether an undo job is queued or running, asked once per transaction. */
-    private static Boolean undoJobRunning;
+	/** Whether an undo job is queued or running, asked once per transaction. */
+	private static Boolean undoJobRunning;
 
-    /** What an undo would do, or why it cannot be done. */
-    @NamespaceAccessible
-    public class Preview {
-        @AuraEnabled
-        public Boolean allowed = false;
-        /** Why an undo is refused, in a sentence an administrator can act on. */
-        @AuraEnabled
-        public String reason;
-        @AuraEnabled
-        public Integer people = 0;
-        @AuraEnabled
-        public Integer households = 0;
-        @AuraEnabled
-        public Integer organizations = 0;
-        /** The records an undo would delete: the number the person confirms. */
-        @AuraEnabled
-        public Integer total = 0;
-        /** The updates the journal holds, which an undo puts back where nobody changed them. */
-        @AuraEnabled
-        public Integer updates = 0;
-        /**
-         * The records of an installed module's own objects the import created (for example
-         * gifts), one entry per object, in the order the undo deletes them (R-IB9).
-         */
-        @AuraEnabled
-        public List<TaggedCount> others = new List<TaggedCount>();
+	/** What an undo would do, or why it cannot be done. */
+	@NamespaceAccessible
+	public class Preview {
+		@AuraEnabled
+		public Boolean allowed = false;
+		/** Why an undo is refused, in a sentence an administrator can act on. */
+		@AuraEnabled
+		public String reason;
+		@AuraEnabled
+		public Integer people = 0;
+		@AuraEnabled
+		public Integer households = 0;
+		@AuraEnabled
+		public Integer organizations = 0;
+		/** The records an undo would delete: the number the person confirms. */
+		@AuraEnabled
+		public Integer total = 0;
+		/** The updates the journal holds, which an undo puts back where nobody changed them. */
+		@AuraEnabled
+		public Integer updates = 0;
+		/**
+		 * The records of an installed module's own objects the import created (for example
+		 * gifts), one entry per object, in the order the undo deletes them (R-IB9).
+		 */
+		@AuraEnabled
+		public List<TaggedCount> others = new List<TaggedCount>();
 
-        /** `total`, for another package: an @AuraEnabled field cannot be @NamespaceAccessible. */
-        @NamespaceAccessible
-        public Integer getTotal() {
-            return total;
-        }
-    }
+		/** `total`, for another package: an @AuraEnabled field cannot be @NamespaceAccessible. */
+		@NamespaceAccessible
+		public Integer getTotal() {
+			return total;
+		}
+	}
 
-    /** How many records of one module object carry the batch's tag. */
-    @NamespaceAccessible
-    public class TaggedCount {
-        /** The object's API name, stable for a key. */
-        @AuraEnabled
-        public String objectName;
-        /** The object's plural label, as the org shows it. */
-        @AuraEnabled
-        public String label;
-        @AuraEnabled
-        public Integer count = 0;
-    }
+	/** How many records of one module object carry the batch's tag. */
+	@NamespaceAccessible
+	public class TaggedCount {
+		/** The object's API name, stable for a key. */
+		@AuraEnabled
+		public String objectName;
+		/** The object's plural label, as the org shows it. */
+		@AuraEnabled
+		public String label;
+		@AuraEnabled
+		public Integer count = 0;
+	}
 
-    /**
-     * Counts what an undo of this batch would delete and put back, deleting nothing. The
-     * counts come from the tag on the records themselves, not from the batch's row counters,
-     * because this has to say what is there now rather than what the run did.
-     */
-    @NamespaceAccessible
-    public static Preview preview(Id batchId) {
-        Preview view = new Preview();
-        Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
-        view.reason = refusal(batch);
-        if (batch == null) {
-            return view;
-        }
-        // A bulk delete is undone by undeleting, from Data jobs; this undo would only
-        // mark it Undone and bring nothing back (R-BD5).
-        if (BulkDeleteService.OPERATION_DELETE.equals(batch.Operation__c)) {
-            view.reason = BarnHelp.text('Core', 'Core_Import_UndoErrorBulkDelete');
-            return view;
-        }
-        // A field access change puts permission rows back, on the Field Access Manager (R-FA1).
-        if (FieldAccessService.OPERATION_ACCESS.equals(batch.Operation__c)) {
-            view.reason = BarnHelp.text('Core', 'Core_Import_UndoErrorAccessChange');
-            return view;
-        }
-        countTagged(batch.Id, view);
-        // A bulk update journals a Failed entry for each record it could not save, which has
-        // nothing to put back, so its count is the records it saved (R-BU5). A job aborted or
-        // stopped before its finish counted them is counted from its Updated entries.
-        if (BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c)) {
-            view.updates = batch.Rows_Updated__c != null &&
-                batch.Rows_Updated__c > 0
-                ? batch.Rows_Updated__c.intValue()
-                : ImportJournalService.actionCount(
-                      batch.Id,
-                      ImportJournalService.PHASE_COMMIT,
-                      ImportJournalService.ACTION_UPDATED
-                  );
-        } else {
-            view.updates = ImportJournalService.entryCount(
-                batch.Id,
-                ImportJournalService.PHASE_COMMIT
-            );
-        }
-        if (String.isBlank(view.reason) && view.total == 0 && view.updates == 0) {
-            view.reason = BarnHelp.text('Core', 'Core_Import_UndoErrorNothingToUndo');
-        }
-        view.allowed = String.isBlank(view.reason);
-        return view;
-    }
+	/**
+	 * Counts what an undo of this batch would delete and put back, deleting nothing. The
+	 * counts come from the tag on the records themselves, not from the batch's row counters,
+	 * because this has to say what is there now rather than what the run did.
+	 */
+	@NamespaceAccessible
+	public static Preview preview(Id batchId) {
+		Preview view = new Preview();
+		Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
+		view.reason = refusal(batch);
+		if (batch == null) {
+			return view;
+		}
+		// A bulk delete is undone by undeleting, from Data jobs; this undo would only
+		// mark it Undone and bring nothing back (R-BD5).
+		if (BulkDeleteService.OPERATION_DELETE.equals(batch.Operation__c)) {
+			view.reason = BarnHelp.text('Core', 'Core_Import_UndoErrorBulkDelete');
+			return view;
+		}
+		// A field access change puts permission rows back, on the Field Access Manager (R-FA1).
+		if (FieldAccessService.OPERATION_ACCESS.equals(batch.Operation__c)) {
+			view.reason = BarnHelp.text('Core', 'Core_Import_UndoErrorAccessChange');
+			return view;
+		}
+		countTagged(batch.Id, view);
+		// A bulk update journals a Failed entry for each record it could not save, which has
+		// nothing to put back, so its count is the records it saved (R-BU5). A job aborted or
+		// stopped before its finish counted them is counted from its Updated entries.
+		if (BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c)) {
+			view.updates = batch.Rows_Updated__c != null &&
+				batch.Rows_Updated__c > 0
+				? batch.Rows_Updated__c.intValue()
+				: ImportJournalService.actionCount(
+						batch.Id,
+						ImportJournalService.PHASE_COMMIT,
+						ImportJournalService.ACTION_UPDATED
+				  );
+		} else {
+			view.updates = ImportJournalService.entryCount(
+				batch.Id,
+				ImportJournalService.PHASE_COMMIT
+			);
+		}
+		if (String.isBlank(view.reason) && view.total == 0 && view.updates == 0) {
+			view.reason = BarnHelp.text('Core', 'Core_Import_UndoErrorNothingToUndo');
+		}
+		view.allowed = String.isBlank(view.reason);
+		return view;
+	}
 
-    /**
-     * Starts the undo of one batch after checking every guard again. `confirmedTotal` is the
-     * total the person was shown: a set that has changed size since is refused, and counted
-     * again, rather than deleted (R-IB8).
-     *
-     * @return the identifier of the job doing the work
-     */
-    @NamespaceAccessible
-    public static Id start(Id batchId, Integer confirmedTotal) {
-        Preview view = preview(batchId);
-        if (!view.allowed) {
-            throw new ImportException(view.reason);
-        }
-        if (confirmedTotal != view.total) {
-            throw new ImportException(
-                String.format(
-                    BarnHelp.text('Core', 'Core_Import_UndoErrorCountChanged'),
-                    new List<String>{
-                        String.valueOf(confirmedTotal == null ? 0 : confirmedTotal),
-                        String.valueOf(view.total)
-                    }
-                )
-            );
-        }
-        latch(batchId);
-        return ImportUndoBatch.run(batchId, view.total);
-    }
+	/**
+	 * Starts the undo of one batch after checking every guard again. `confirmedTotal` is the
+	 * total the person was shown: a set that has changed size since is refused, and counted
+	 * again, rather than deleted (R-IB8).
+	 *
+	 * @return the identifier of the job doing the work
+	 */
+	@NamespaceAccessible
+	public static Id start(Id batchId, Integer confirmedTotal) {
+		Preview view = preview(batchId);
+		if (!view.allowed) {
+			throw new ImportException(view.reason);
+		}
+		if (confirmedTotal != view.total) {
+			throw new ImportException(
+				String.format(
+					BarnHelp.text('Core', 'Core_Import_UndoErrorCountChanged'),
+					new List<String>{
+						String.valueOf(confirmedTotal == null ? 0 : confirmedTotal),
+						String.valueOf(view.total)
+					}
+				)
+			);
+		}
+		latch(batchId);
+		return ImportUndoBatch.run(batchId, view.total);
+	}
 
-    /**
-     * Takes the once-only latch inside a locked read, so two people pressing Undo at the same
-     * moment produce one undo and one refusal. The status is the package's own bookkeeping,
-     * written in system mode (ADR-0021).
-     */
-    public static void latch(Id batchId) {
-        Import_Batch__c batch = [
-            SELECT Id, Status__c, Is_Dry_Run__c, Undo_Deadline__c, Completed_At__c, Job_Id__c
-            FROM Import_Batch__c
-            WHERE Id = :batchId
-            WITH SYSTEM_MODE
-            LIMIT 1
-            FOR UPDATE
-        ];
-        String refused = refusal(batch);
-        if (String.isNotBlank(refused)) {
-            throw new ImportException(refused);
-        }
-        batch.Status__c = ImportBatchService.STATUS_UNDOING;
-        Database.update(batch, AccessLevel.SYSTEM_MODE);
-        undoJobRunning = true;
-    }
+	/**
+	 * Takes the once-only latch inside a locked read, so two people pressing Undo at the same
+	 * moment produce one undo and one refusal. The status is the package's own bookkeeping,
+	 * written in system mode (ADR-0021).
+	 */
+	public static void latch(Id batchId) {
+		Import_Batch__c batch = [
+			SELECT Id, Status__c, Is_Dry_Run__c, Undo_Deadline__c, Completed_At__c, Job_Id__c
+			FROM Import_Batch__c
+			WHERE Id = :batchId
+			WITH SYSTEM_MODE
+			LIMIT 1
+			FOR UPDATE
+		];
+		String refused = refusal(batch);
+		if (String.isNotBlank(refused)) {
+			throw new ImportException(refused);
+		}
+		batch.Status__c = ImportBatchService.STATUS_UNDOING;
+		Database.update(batch, AccessLevel.SYSTEM_MODE);
+		undoJobRunning = true;
+	}
 
-    /**
-     * Closes an undo: its status, and one line added to the run log saying who ran it, when,
-     * and what it deleted, kept and put back. Called from the job's last finish, in system
-     * mode over fields the package owns (ADR-0021). `createdGone` is how many journaled
-     * creations the undo deleted (R-IJ3), so the ones left are the ones kept.
-     */
-    @NamespaceAccessible
-    public static void finish(
-        Id batchId,
-        Integer countedAtStart,
-        Integer restored,
-        Boolean failed,
-        Integer createdGone
-    ) {
-        try {
-            Preview left = new Preview();
-            countTagged(batchId, left);
-            left.total = Math.max(left.total - (createdGone == null ? 0 : createdGone), 0);
-            Integer counted = countedAtStart == null ? 0 : countedAtStart;
-            Import_Batch__c batch = [
-                SELECT Id, Run_Log__c, Operation__c
-                FROM Import_Batch__c
-                WHERE Id = :batchId
-                WITH SYSTEM_MODE
-                LIMIT 1
-            ];
-            String line = String.format(
-                BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c)
-                    ? BarnHelp.text('Core', 'Core_Import_LogUndoneBulkUpdate')
-                    : BarnHelp.text('Core', 'Core_Import_LogUndone'),
-                new List<String>{
-                    UserInfo.getName(),
-                    Datetime.now().format(),
-                    String.valueOf(Math.max(counted - left.total, 0)),
-                    String.valueOf(left.total),
-                    String.valueOf(restored == null ? 0 : restored)
-                }
-            );
-            batch.Run_Log__c = (String.isBlank(batch.Run_Log__c)
-                    ? line
-                    : batch.Run_Log__c + '\n' + line)
-                .right(32768);
-            batch.Status__c = failed == true
-                ? ImportBatchService.STATUS_UNDO_FAILED
-                : ImportBatchService.STATUS_UNDONE;
-            Database.update(batch, AccessLevel.SYSTEM_MODE);
-            JobNotifier.aboutRecord(
-                UserInfo.getUserId(),
-                BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c)
-                    ? Label.Core_JobNotice_BulkUpdateUndo
-                    : Label.Core_JobNotice_ImportUndo,
-                failed == true,
-                String.format(
-                    Label.Core_JobNotice_ImportUndoBody,
-                    new List<Object>{
-                        Math.max(counted - left.total, 0).format(),
-                        left.total.format(),
-                        (restored == null ? 0 : restored).format()
-                    }
-                ),
-                batchId
-            );
-        } catch (Exception e) {
-            ErrorLogger.log(e, 'ImportUndoService.finish', batchId);
-        }
-    }
+	/**
+	 * Closes an undo: its status, and one line added to the run log saying who ran it, when,
+	 * and what it deleted, kept and put back. Called from the job's last finish, in system
+	 * mode over fields the package owns (ADR-0021). `createdGone` is how many journaled
+	 * creations the undo deleted (R-IJ3), so the ones left are the ones kept.
+	 */
+	@NamespaceAccessible
+	public static void finish(
+		Id batchId,
+		Integer countedAtStart,
+		Integer restored,
+		Boolean failed,
+		Integer createdGone
+	) {
+		try {
+			Preview left = new Preview();
+			countTagged(batchId, left);
+			left.total = Math.max(left.total - (createdGone == null ? 0 : createdGone), 0);
+			Integer counted = countedAtStart == null ? 0 : countedAtStart;
+			Import_Batch__c batch = [
+				SELECT Id, Run_Log__c, Operation__c
+				FROM Import_Batch__c
+				WHERE Id = :batchId
+				WITH SYSTEM_MODE
+				LIMIT 1
+			];
+			String line = String.format(
+				BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c)
+					? BarnHelp.text('Core', 'Core_Import_LogUndoneBulkUpdate')
+					: BarnHelp.text('Core', 'Core_Import_LogUndone'),
+				new List<String>{
+					UserInfo.getName(),
+					Datetime.now().format(),
+					String.valueOf(Math.max(counted - left.total, 0)),
+					String.valueOf(left.total),
+					String.valueOf(restored == null ? 0 : restored)
+				}
+			);
+			batch.Run_Log__c = (String.isBlank(batch.Run_Log__c)
+					? line
+					: batch.Run_Log__c + '\n' + line)
+				.right(32768);
+			batch.Status__c = failed == true
+				? ImportBatchService.STATUS_UNDO_FAILED
+				: ImportBatchService.STATUS_UNDONE;
+			Database.update(batch, AccessLevel.SYSTEM_MODE);
+			JobNotifier.aboutRecord(
+				UserInfo.getUserId(),
+				BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c)
+					? Label.Core_JobNotice_BulkUpdateUndo
+					: Label.Core_JobNotice_ImportUndo,
+				failed == true,
+				String.format(
+					Label.Core_JobNotice_ImportUndoBody,
+					new List<Object>{
+						Math.max(counted - left.total, 0).format(),
+						left.total.format(),
+						(restored == null ? 0 : restored).format()
+					}
+				),
+				batchId
+			);
+		} catch (Exception e) {
+			ErrorLogger.log(e, 'ImportUndoService.finish', batchId);
+		}
+	}
 
-    /**
-     * Why this batch cannot be undone, or blank when it can. A commit that failed part way is
-     * undoable, because the chunks that ran did write (R-IB7), and so is an undo that stopped
-     * on an error, or whose job was aborted, because running it again only finishes it
-     * (R-IB8).
-     */
-    @NamespaceAccessible
-    public static String refusal(Import_Batch__c batch) {
-        return refusal(batch, null);
-    }
+	/**
+	 * Why this batch cannot be undone, or blank when it can. A commit that failed part way is
+	 * undoable, because the chunks that ran did write (R-IB7), and so is an undo that stopped
+	 * on an error, or whose job was aborted, because running it again only finishes it
+	 * (R-IB8).
+	 */
+	@NamespaceAccessible
+	public static String refusal(Import_Batch__c batch) {
+		return refusal(batch, null);
+	}
 
-    /**
-     * As above, for a batch whose effective status the caller has already worked out, so the
-     * job is not asked about twice; a null status is worked out here.
-     */
-    @NamespaceAccessible
-    public static String refusal(Import_Batch__c batch, String knownStatus) {
-        if (batch == null) {
-            return BarnHelp.text('Core', 'Core_Import_ErrorBatchGone');
-        }
-        if (batch.Is_Dry_Run__c == true) {
-            return BarnHelp.text('Core', 'Core_Import_UndoErrorDryRun');
-        }
-        String status = knownStatus == null ? effectiveStatus(batch) : knownStatus;
-        if (
-            ImportBatchService.STATUS_UNDOING.equals(status) ||
-            ImportBatchService.STATUS_UNDONE.equals(status)
-        ) {
-            return BarnHelp.text('Core', 'Core_Import_UndoErrorAlreadyUndone');
-        }
-        // A committed import keeps Is Dry Run cleared while it retries its rejected rows, so its
-        // retry's staging and finished preview can be undone like the commit (R-IB17).
-        if (
-            !(ImportBatchService.STATUS_COMPLETE.equals(status) ||
-            ImportBatchService.STATUS_TRIAL_COMPLETE.equals(status) ||
-            ImportBatchService.STATUS_FAILED.equals(status) ||
-            ImportBatchService.STATUS_UNDO_FAILED.equals(status) ||
-            ImportBatchService.STATUS_RETRYING.equals(status) ||
-            ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(status)) ||
-            batch.Undo_Deadline__c == null ||
-            (batch.Completed_At__c == null &&
-            !ImportBatchService.STATUS_COMMITTING.equals(batch.Status__c))
-        ) {
-            return BarnHelp.text('Core', 'Core_Import_UndoErrorNotCommitted');
-        }
-        if (batch.Undo_Deadline__c < Datetime.now()) {
-            return String.format(
-                BarnHelp.text('Core', 'Core_Import_UndoErrorWindowClosed'),
-                new List<String>{ batch.Undo_Deadline__c.format() }
-            );
-        }
-        return null;
-    }
+	/**
+	 * As above, for a batch whose effective status the caller has already worked out, so the
+	 * job is not asked about twice; a null status is worked out here.
+	 */
+	@NamespaceAccessible
+	public static String refusal(Import_Batch__c batch, String knownStatus) {
+		if (batch == null) {
+			return BarnHelp.text('Core', 'Core_Import_ErrorBatchGone');
+		}
+		if (batch.Is_Dry_Run__c == true) {
+			return BarnHelp.text('Core', 'Core_Import_UndoErrorDryRun');
+		}
+		String status = knownStatus == null ? effectiveStatus(batch) : knownStatus;
+		if (
+			ImportBatchService.STATUS_UNDOING.equals(status) ||
+			ImportBatchService.STATUS_UNDONE.equals(status)
+		) {
+			return BarnHelp.text('Core', 'Core_Import_UndoErrorAlreadyUndone');
+		}
+		// A committed import keeps Is Dry Run cleared while it retries its rejected rows, so its
+		// retry's staging and finished preview can be undone like the commit (R-IB17).
+		if (
+			!(ImportBatchService.STATUS_COMPLETE.equals(status) ||
+			ImportBatchService.STATUS_TRIAL_COMPLETE.equals(status) ||
+			ImportBatchService.STATUS_FAILED.equals(status) ||
+			ImportBatchService.STATUS_UNDO_FAILED.equals(status) ||
+			ImportBatchService.STATUS_RETRYING.equals(status) ||
+			ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(status)) ||
+			batch.Undo_Deadline__c == null ||
+			(batch.Completed_At__c == null &&
+			!ImportBatchService.STATUS_COMMITTING.equals(batch.Status__c))
+		) {
+			return BarnHelp.text('Core', 'Core_Import_UndoErrorNotCommitted');
+		}
+		if (batch.Undo_Deadline__c < Datetime.now()) {
+			return String.format(
+				BarnHelp.text('Core', 'Core_Import_UndoErrorWindowClosed'),
+				new List<String>{ batch.Undo_Deadline__c.format() }
+			);
+		}
+		return null;
+	}
 
-    /**
-     * The batch's status as it really stands: Undoing with no undo job queued or running
-     * means the job was aborted, which is Undo failed, so it can be run again rather than
-     * staying Undoing for ever (R-IB8).
-     */
-    @NamespaceAccessible
-    public static String effectiveStatus(Import_Batch__c batch) {
-        return effectiveStatus(batch, null);
-    }
+	/**
+	 * The batch's status as it really stands: Undoing with no undo job queued or running
+	 * means the job was aborted, which is Undo failed, so it can be run again rather than
+	 * staying Undoing for ever (R-IB8).
+	 */
+	@NamespaceAccessible
+	public static String effectiveStatus(Import_Batch__c batch) {
+		return effectiveStatus(batch, null);
+	}
 
-    /**
-     * As `effectiveStatus`, with whether the batch's own job is running when the caller has
-     * already read it (`ImportBatchService.isRunning(batch, job)`); null to read it here.
-     */
-    @NamespaceAccessible
-    public static String effectiveStatus(Import_Batch__c batch, Boolean jobRunning) {
-        if (batch == null) {
-            return null;
-        }
-        if (ImportBatchService.STATUS_UNDOING.equals(batch.Status__c) && !isUndoJobRunning()) {
-            return ImportBatchService.STATUS_UNDO_FAILED;
-        }
-        // A dry run or commit whose job the platform aborted, or whose finish failed, is
-        // Failed, and an aborted commit can be undone like any failed one (R-IB13).
-        if (
-            (ImportBatchService.STATUS_DRY_RUN.equals(batch.Status__c) ||
-            ImportBatchService.STATUS_COMMITTING.equals(batch.Status__c)) &&
-            !(jobRunning != null ? jobRunning : ImportBatchService.isRunning(batch))
-        ) {
-            return ImportBatchService.STATUS_FAILED;
-        }
-        return batch.Status__c;
-    }
+	/**
+	 * As `effectiveStatus`, with whether the batch's own job is running when the caller has
+	 * already read it (`ImportBatchService.isRunning(batch, job)`); null to read it here.
+	 */
+	@NamespaceAccessible
+	public static String effectiveStatus(Import_Batch__c batch, Boolean jobRunning) {
+		if (batch == null) {
+			return null;
+		}
+		if (ImportBatchService.STATUS_UNDOING.equals(batch.Status__c) && !isUndoJobRunning()) {
+			return ImportBatchService.STATUS_UNDO_FAILED;
+		}
+		// A dry run or commit whose job the platform aborted, or whose finish failed, is
+		// Failed, and an aborted commit can be undone like any failed one (R-IB13).
+		if (
+			(ImportBatchService.STATUS_DRY_RUN.equals(batch.Status__c) ||
+			ImportBatchService.STATUS_COMMITTING.equals(batch.Status__c)) &&
+			!(jobRunning != null ? jobRunning : ImportBatchService.isRunning(batch))
+		) {
+			return ImportBatchService.STATUS_FAILED;
+		}
+		return batch.Status__c;
+	}
 
-    /**
-     * Whether any undo job is queued or running. Batches carry no job reference, so this asks
-     * about the undo job classes (an import's, and a bulk delete's undelete); a second undo
-     * running for another batch only delays the moment an aborted one is seen as failed. Read
-     * in system mode: the job may be another user's.
-     */
-    private static Boolean isUndoJobRunning() {
-        if (undoJobRunning == null) {
-            Set<String> running = ImportBatchService.RUNNING_JOB_STATUSES;
-            Set<String> undoClasses = new Set<String>{ 'ImportUndoBatch', 'BulkDeleteUndoBatch' };
-            undoJobRunning = ![
-                    SELECT Id
-                    FROM AsyncApexJob
-                    WHERE ApexClass.Name IN :undoClasses AND Status IN :running
-                    WITH SYSTEM_MODE
-                    LIMIT 1
-                ]
-                .isEmpty();
-        }
-        return undoJobRunning;
-    }
+	/**
+	 * Whether any undo job is queued or running. Batches carry no job reference, so this asks
+	 * about the undo job classes (an import's, and a bulk delete's undelete); a second undo
+	 * running for another batch only delays the moment an aborted one is seen as failed. Read
+	 * in system mode: the job may be another user's.
+	 */
+	private static Boolean isUndoJobRunning() {
+		if (undoJobRunning == null) {
+			Set<String> running = ImportBatchService.RUNNING_JOB_STATUSES;
+			Set<String> undoClasses = new Set<String>{ 'ImportUndoBatch', 'BulkDeleteUndoBatch' };
+			undoJobRunning = ![
+					SELECT Id
+					FROM AsyncApexJob
+					WHERE ApexClass.Name IN :undoClasses AND Status IN :running
+					WITH SYSTEM_MODE
+					LIMIT 1
+				]
+				.isEmpty();
+		}
+		return undoJobRunning;
+	}
 
-    /**
-     * Counts the records carrying this batch's tag, by kind. People stored as accounts are
-     * counted as people, and an installed module's own objects each have their own count. Read in system mode (ADR-0021): the count has to include records the
-     * running user cannot see, because an undo that says "nothing to delete" about records it
-     * merely cannot see has told the administrator something false.
-     */
-    private static void countTagged(Id batchId, Preview view) {
-        if (batchId == null) {
-            return;
-        }
-        view.people = [
-            SELECT COUNT()
-            FROM Contact
-            WHERE Created_By_Import_Batch__c = :batchId
-            WITH SYSTEM_MODE
-        ];
-        Set<Id> personTypes = OrgShapeDetector.detect().personAccountRecordTypeIds;
-        Id householdType = HouseholdService.householdRecordTypeId();
-        for (AggregateResult counted : [
-            SELECT RecordTypeId recordType, COUNT(Id) total
-            FROM Account
-            WHERE Created_By_Import_Batch__c = :batchId
-            WITH SYSTEM_MODE
-            GROUP BY RecordTypeId
-        ]) {
-            Id recordType = (Id) counted.get('recordType');
-            Integer total = (Integer) counted.get('total');
-            if (recordType != null && personTypes.contains(recordType)) {
-                view.people += total;
-            } else if (recordType != null && recordType == householdType) {
-                view.households += total;
-            } else {
-                view.organizations += total;
-            }
-        }
-        view.others = new List<TaggedCount>();
-        Integer otherTotal = 0;
-        for (Schema.SObjectType type : ImportEntityProcessors.taggedTypes()) {
-            Schema.DescribeSObjectResult described = type.getDescribe(
-                SObjectDescribeOptions.DEFERRED
-            );
-            TaggedCount counted = new TaggedCount();
-            counted.objectName = described.getName();
-            counted.label = described.getLabelPlural();
-            counted.count = Database.countQueryWithBinds(
-                'SELECT COUNT() FROM ' +
-                    String.escapeSingleQuotes(described.getName()) +
-                    ' WHERE ' +
-                    ImportEntityProcessors.TAG_FIELD +
-                    ' = :batchId',
-                new Map<String, Object>{ 'batchId' => batchId },
-                AccessLevel.SYSTEM_MODE
-            );
-            otherTotal += counted.count;
-            view.others.add(counted);
-        }
-        for (TaggedCount created : createdCounts(batchId)) {
-            otherTotal += created.count;
-            view.others.add(created);
-        }
-        view.total = view.people + view.households + view.organizations + otherTotal;
-    }
+	/**
+	 * Counts the records carrying this batch's tag, by kind. People stored as accounts are
+	 * counted as people, and an installed module's own objects each have their own count. Read in system mode (ADR-0021): the count has to include records the
+	 * running user cannot see, because an undo that says "nothing to delete" about records it
+	 * merely cannot see has told the administrator something false.
+	 */
+	private static void countTagged(Id batchId, Preview view) {
+		if (batchId == null) {
+			return;
+		}
+		view.people = [
+			SELECT COUNT()
+			FROM Contact
+			WHERE Created_By_Import_Batch__c = :batchId
+			WITH SYSTEM_MODE
+		];
+		Set<Id> personTypes = OrgShapeDetector.detect().personAccountRecordTypeIds;
+		Id householdType = HouseholdService.householdRecordTypeId();
+		for (AggregateResult counted : [
+			SELECT RecordTypeId recordType, COUNT(Id) total
+			FROM Account
+			WHERE Created_By_Import_Batch__c = :batchId
+			WITH SYSTEM_MODE
+			GROUP BY RecordTypeId
+		]) {
+			Id recordType = (Id) counted.get('recordType');
+			Integer total = (Integer) counted.get('total');
+			if (recordType != null && personTypes.contains(recordType)) {
+				view.people += total;
+			} else if (recordType != null && recordType == householdType) {
+				view.households += total;
+			} else {
+				view.organizations += total;
+			}
+		}
+		view.others = new List<TaggedCount>();
+		Integer otherTotal = 0;
+		for (Schema.SObjectType type : ImportEntityProcessors.taggedTypes()) {
+			Schema.DescribeSObjectResult described = type.getDescribe(
+				SObjectDescribeOptions.DEFERRED
+			);
+			TaggedCount counted = new TaggedCount();
+			counted.objectName = described.getName();
+			counted.label = described.getLabelPlural();
+			counted.count = Database.countQueryWithBinds(
+				'SELECT COUNT() FROM ' +
+					String.escapeSingleQuotes(described.getName()) +
+					' WHERE ' +
+					ImportEntityProcessors.TAG_FIELD +
+					' = :batchId',
+				new Map<String, Object>{ 'batchId' => batchId },
+				AccessLevel.SYSTEM_MODE
+			);
+			otherTotal += counted.count;
+			view.others.add(counted);
+		}
+		for (TaggedCount created : createdCounts(batchId)) {
+			otherTotal += created.count;
+			view.others.add(created);
+		}
+		view.total = view.people + view.households + view.organizations + otherTotal;
+	}
 
-    /**
-     * The records an import journaled as created (R-IJ3), counted per object under its plural
-     * label; none when it created none. Read in system mode, as the tagged counts are. Should
-     * the journal be too long to read in full, the rest is counted with the first object so the
-     * total stays right.
-     */
-    private static List<TaggedCount> createdCounts(Id batchId) {
-        List<TaggedCount> result = new List<TaggedCount>();
-        Integer count = ImportJournalService.entryCount(
-            batchId,
-            ImportJournalService.PHASE_CREATED
-        );
-        if (count == 0) {
-            return result;
-        }
-        Map<String, Integer> byObject = ImportJournalService.countsByObject(
-            batchId,
-            ImportJournalService.PHASE_CREATED
-        );
-        Integer counted = 0;
-        for (String objectName : byObject.keySet()) {
-            Schema.SObjectType type = ImportObjectSchema.typeNamed(objectName);
-            TaggedCount each = new TaggedCount();
-            each.objectName = type == null
-                ? objectName
-                : type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
-            each.label = type == null
-                ? objectName
-                : type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
-            each.count = byObject.get(objectName);
-            counted += each.count;
-            result.add(each);
-        }
-        if (result.isEmpty()) {
-            result.add(new TaggedCount());
-            result[0].count = count;
-        } else if (counted < count) {
-            result[0].count += count - counted;
-        }
-        return result;
-    }
+	/**
+	 * The records an import journaled as created (R-IJ3), counted per object under its plural
+	 * label; none when it created none. Read in system mode, as the tagged counts are. Should
+	 * the journal be too long to read in full, the rest is counted with the first object so the
+	 * total stays right.
+	 */
+	private static List<TaggedCount> createdCounts(Id batchId) {
+		List<TaggedCount> result = new List<TaggedCount>();
+		Integer count = ImportJournalService.entryCount(
+			batchId,
+			ImportJournalService.PHASE_CREATED
+		);
+		if (count == 0) {
+			return result;
+		}
+		Map<String, Integer> byObject = ImportJournalService.countsByObject(
+			batchId,
+			ImportJournalService.PHASE_CREATED
+		);
+		Integer counted = 0;
+		for (String objectName : byObject.keySet()) {
+			Schema.SObjectType type = ImportObjectSchema.typeNamed(objectName);
+			TaggedCount each = new TaggedCount();
+			each.objectName = type == null
+				? objectName
+				: type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
+			each.label = type == null
+				? objectName
+				: type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabelPlural();
+			each.count = byObject.get(objectName);
+			counted += each.count;
+			result.add(each);
+		}
+		if (result.isEmpty()) {
+			result.add(new TaggedCount());
+			result[0].count = count;
+		} else if (counted < count) {
+			result[0].count += count - counted;
+		}
+		return result;
+	}
 }

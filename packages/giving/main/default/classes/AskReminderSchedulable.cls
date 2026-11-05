@@ -6,23 +6,23 @@
  * the same day: a donor already reminded for its date is skipped (R-AC3).
  */
 public with sharing class AskReminderSchedulable implements Schedulable {
-    /** Set by a test to prove a failed start is logged, not thrown. */
-    @TestVisible
-    private static Boolean failStartForTest = false;
+	/** Set by a test to prove a failed start is logged, not thrown. */
+	@TestVisible
+	private static Boolean failStartForTest = false;
 
-    public void execute(SchedulableContext context) {
-        try {
-            if (failStartForTest) {
-                throw new IllegalArgumentException('Start failed in a test.');
-            }
-            // Off, or a pass already waiting or running (Run now pressed twice, or pressed while
-            // the nightly pass runs): start nothing.
-            if (!AskReminderService.isEnabled() || AskReminderService.isRunning()) {
-                return;
-            }
-            Database.executeBatch(new AskReminderBatch(), AskReminderBatch.CHUNK_SIZE);
-        } catch (Exception jobFailure) {
-            ErrorLogger.log(jobFailure, 'AskReminderSchedulable');
-        }
-    }
+	public void execute(SchedulableContext context) {
+		try {
+			if (failStartForTest) {
+				throw new IllegalArgumentException('Start failed in a test.');
+			}
+			// Off, or a pass already waiting or running (Run now pressed twice, or pressed while
+			// the nightly pass runs): start nothing.
+			if (!AskReminderService.isEnabled() || AskReminderService.isRunning()) {
+				return;
+			}
+			Database.executeBatch(new AskReminderBatch(), AskReminderBatch.CHUNK_SIZE);
+		} catch (Exception jobFailure) {
+			ErrorLogger.log(jobFailure, 'AskReminderSchedulable');
+		}
+	}
 }

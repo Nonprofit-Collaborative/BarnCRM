@@ -26,39 +26,39 @@
  * saver cannot even see.
  */
 public without sharing class RelationshipUpkeepWriter {
-    /**
-     * Brings other sides back from the recycle bin when their partner has just been restored
-     * (PEOPLE-21), for the same reason a delete is covered: the restore follows one the
-     * platform has just allowed on the partner.
-     */
-    public static void restoreMirrors(List<Relationship__c> mirrors) {
-        if (mirrors == null || mirrors.isEmpty()) {
-            return;
-        }
-        Database.undelete(mirrors, true, AccessLevel.SYSTEM_MODE);
-    }
+	/**
+	 * Brings other sides back from the recycle bin when their partner has just been restored
+	 * (PEOPLE-21), for the same reason a delete is covered: the restore follows one the
+	 * platform has just allowed on the partner.
+	 */
+	public static void restoreMirrors(List<Relationship__c> mirrors) {
+		if (mirrors == null || mirrors.isEmpty()) {
+			return;
+		}
+		Database.undelete(mirrors, true, AccessLevel.SYSTEM_MODE);
+	}
 
-    /** Creates other sides. */
-    public static void insertMirrors(List<Relationship__c> mirrors) {
-        if (mirrors == null || mirrors.isEmpty()) {
-            return;
-        }
-        Database.insert(mirrors, true, AccessLevel.SYSTEM_MODE);
-    }
+	/** Creates other sides. */
+	public static void insertMirrors(List<Relationship__c> mirrors) {
+		if (mirrors == null || mirrors.isEmpty()) {
+			return;
+		}
+		Database.insert(mirrors, true, AccessLevel.SYSTEM_MODE);
+	}
 
-    /** Updates other sides, and the back pointer on the side that was saved. */
-    public static void updatePairs(List<Relationship__c> records) {
-        if (records == null || records.isEmpty()) {
-            return;
-        }
-        Database.update(records, true, AccessLevel.SYSTEM_MODE);
-    }
+	/** Updates other sides, and the back pointer on the side that was saved. */
+	public static void updatePairs(List<Relationship__c> records) {
+		if (records == null || records.isEmpty()) {
+			return;
+		}
+		Database.update(records, true, AccessLevel.SYSTEM_MODE);
+	}
 
-    /** Deletes the other sides of relationships the user has just deleted. */
-    public static void deleteMirrors(List<Relationship__c> mirrors) {
-        if (mirrors == null || mirrors.isEmpty()) {
-            return;
-        }
-        Database.delete(mirrors, true, AccessLevel.SYSTEM_MODE);
-    }
+	/** Deletes the other sides of relationships the user has just deleted. */
+	public static void deleteMirrors(List<Relationship__c> mirrors) {
+		if (mirrors == null || mirrors.isEmpty()) {
+			return;
+		}
+		Database.delete(mirrors, true, AccessLevel.SYSTEM_MODE);
+	}
 }

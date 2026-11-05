@@ -15,491 +15,491 @@
  */
 @NamespaceAccessible
 public with sharing class RollupFilterParser {
-    /** Raised when a filter document cannot be turned into a where clause. */
-    @NamespaceAccessible
-    public class RollupFilterException extends Exception {
-    }
+	/** Raised when a filter document cannot be turned into a where clause. */
+	@NamespaceAccessible
+	public class RollupFilterException extends Exception {
+	}
 
-    private static final Integer SUPPORTED_VERSION = 1;
+	private static final Integer SUPPORTED_VERSION = 1;
 
-    /** Operators the filter builder offers, mapped to the comparison the engine parses. */
-    private static final Map<String, String> COMPARISON_BY_OPERATOR = new Map<String, String>{
-        'equals' => '=',
-        'not equals' => '!=',
-        'less than' => '<',
-        'less or equal' => '<=',
-        'greater than' => '>',
-        'greater or equal' => '>=',
-        'contains' => 'like',
-        'does not contain' => 'not like',
-        'starts with' => 'like',
-        'is null' => '=',
-        'is not null' => '!=',
-        'in' => 'in',
-        'not in' => 'not in'
-    };
+	/** Operators the filter builder offers, mapped to the comparison the engine parses. */
+	private static final Map<String, String> COMPARISON_BY_OPERATOR = new Map<String, String>{
+		'equals' => '=',
+		'not equals' => '!=',
+		'less than' => '<',
+		'less or equal' => '<=',
+		'greater than' => '>',
+		'greater or equal' => '>=',
+		'contains' => 'like',
+		'does not contain' => 'not like',
+		'starts with' => 'like',
+		'is null' => '=',
+		'is not null' => '!=',
+		'in' => 'in',
+		'not in' => 'not in'
+	};
 
-    private static final Set<String> NO_VALUE_OPERATORS = new Set<String>{
-        'is null',
-        'is not null'
-    };
-    private static final Set<String> LIST_OPERATORS = new Set<String>{ 'in', 'not in' };
+	private static final Set<String> NO_VALUE_OPERATORS = new Set<String>{
+		'is null',
+		'is not null'
+	};
+	private static final Set<String> LIST_OPERATORS = new Set<String>{ 'in', 'not in' };
 
-    /**
-     * Relative date operators (R-R2 extensions). They render as the platform's date literals, and
-     * the only value any of them takes is a whole number of days, written back from an Integer.
-     */
-    private static final Map<String, String> DATE_LITERAL_BY_OPERATOR = new Map<String, String>{
-        'this year' => 'THIS_YEAR',
-        'last year' => 'LAST_YEAR'
-    };
-    private static final String LAST_N_DAYS = 'last n days';
-    private static final Integer MAX_DAYS = 3650;
-    private static final Pattern DATE_VALUE = Pattern.compile('^\\d{4}-\\d{2}-\\d{2}$');
-    private static final Pattern DATETIME_VALUE = Pattern.compile(
-        '^\\d{4}-\\d{2}-\\d{2}T[0-9:.]+Z$'
-    );
-    private static final Pattern FIELD_NAME = Pattern.compile(
-        '^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)*$'
-    );
-    private static final Pattern LOGIC_TOKEN = Pattern.compile('^(\\d+|AND|OR|NOT|\\(|\\))$');
+	/**
+	 * Relative date operators (R-R2 extensions). They render as the platform's date literals, and
+	 * the only value any of them takes is a whole number of days, written back from an Integer.
+	 */
+	private static final Map<String, String> DATE_LITERAL_BY_OPERATOR = new Map<String, String>{
+		'this year' => 'THIS_YEAR',
+		'last year' => 'LAST_YEAR'
+	};
+	private static final String LAST_N_DAYS = 'last n days';
+	private static final Integer MAX_DAYS = 3650;
+	private static final Pattern DATE_VALUE = Pattern.compile('^\\d{4}-\\d{2}-\\d{2}$');
+	private static final Pattern DATETIME_VALUE = Pattern.compile(
+		'^\\d{4}-\\d{2}-\\d{2}T[0-9:.]+Z$'
+	);
+	private static final Pattern FIELD_NAME = Pattern.compile(
+		'^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*)*$'
+	);
+	private static final Pattern LOGIC_TOKEN = Pattern.compile('^(\\d+|AND|OR|NOT|\\(|\\))$');
 
-    /**
-     * Renders a filter document as a where clause fragment, or an empty string when the document
-     * is empty. The caller joins the result with any other fragment it has.
-     */
-    @NamespaceAccessible
-    public static String toWhereClause(String filterDocument) {
-        return compile(filterDocument, null, null);
-    }
+	/**
+	 * Renders a filter document as a where clause fragment, or an empty string when the document
+	 * is empty. The caller joins the result with any other fragment it has.
+	 */
+	@NamespaceAccessible
+	public static String toWhereClause(String filterDocument) {
+		return compile(filterDocument, null, null);
+	}
 
-    /**
-     * The same, for conditions on this entity: a value shaped like a date is written as a date
-     * only when its attribute is a date or a date and time, and quoted as text otherwise, so
-     * `2026-01-01` in a text attribute is compared as text (ROLLUPS-15).
-     */
-    @NamespaceAccessible
-    public static String toWhereClause(String filterDocument, Schema.SObjectType entity) {
-        return compile(filterDocument, null, entity);
-    }
+	/**
+	 * The same, for conditions on this entity: a value shaped like a date is written as a date
+	 * only when its attribute is a date or a date and time, and quoted as text otherwise, so
+	 * `2026-01-01` in a text attribute is compared as text (ROLLUPS-15).
+	 */
+	@NamespaceAccessible
+	public static String toWhereClause(String filterDocument, Schema.SObjectType entity) {
+		return compile(filterDocument, null, entity);
+	}
 
-    /**
-     * Whether a filter document compares a date with today: is this year, is last year or is in
-     * the last N days. Such a total changes as the date moves on, with no record saved
-     * (ROLLUPS-8). A document that cannot be read compares nothing.
-     */
-    @NamespaceAccessible
-    public static Boolean usesRelativeDate(String filterDocument) {
-        if (String.isBlank(filterDocument)) {
-            return false;
-        }
-        try {
-            Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
-                filterDocument
-            );
-            for (Object rawCondition : (List<Object>) parsed.get('conditions')) {
-                String operator = ((String) ((Map<String, Object>) rawCondition).get('operator'))
-                    ?.toLowerCase()
-                    ?.trim();
-                if (DATE_LITERAL_BY_OPERATOR.containsKey(operator) || operator == LAST_N_DAYS) {
-                    return true;
-                }
-            }
-        } catch (Exception unreadable) {
-            return false;
-        }
-        return false;
-    }
+	/**
+	 * Whether a filter document compares a date with today: is this year, is last year or is in
+	 * the last N days. Such a total changes as the date moves on, with no record saved
+	 * (ROLLUPS-8). A document that cannot be read compares nothing.
+	 */
+	@NamespaceAccessible
+	public static Boolean usesRelativeDate(String filterDocument) {
+		if (String.isBlank(filterDocument)) {
+			return false;
+		}
+		try {
+			Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
+				filterDocument
+			);
+			for (Object rawCondition : (List<Object>) parsed.get('conditions')) {
+				String operator = ((String) ((Map<String, Object>) rawCondition).get('operator'))
+					?.toLowerCase()
+					?.trim();
+				if (DATE_LITERAL_BY_OPERATOR.containsKey(operator) || operator == LAST_N_DAYS) {
+					return true;
+				}
+			}
+		} catch (Exception unreadable) {
+			return false;
+		}
+		return false;
+	}
 
-    /** One `equals` or `not equals` test of a text attribute, for evaluation in Apex. */
-    @NamespaceAccessible
-    public class TextEquality {
-        @NamespaceAccessible
-        public String field;
-        @NamespaceAccessible
-        public Boolean negated;
-        @NamespaceAccessible
-        public String value;
-    }
+	/** One `equals` or `not equals` test of a text attribute, for evaluation in Apex. */
+	@NamespaceAccessible
+	public class TextEquality {
+		@NamespaceAccessible
+		public String field;
+		@NamespaceAccessible
+		public Boolean negated;
+		@NamespaceAccessible
+		public String value;
+	}
 
-    /**
-     * A document's conditions when every one is `equals` or `not equals` a text value on a text or
-     * picklist attribute of this entity and they are all joined by AND, or null for any other
-     * shape. The engine then tests target records it has already read instead of querying them
-     * again (ROLLUPS-12); anything else keeps its query.
-     */
-    @NamespaceAccessible
-    public static List<TextEquality> textEqualities(
-        String filterDocument,
-        Schema.SObjectType entity
-    ) {
-        if (String.isBlank(filterDocument) || entity == null) {
-            return null;
-        }
-        List<TextEquality> equalities = new List<TextEquality>();
-        try {
-            Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
-                filterDocument
-            );
-            if (String.isNotBlank((String) parsed.get('logic'))) {
-                return null;
-            }
-            for (Object rawCondition : (List<Object>) parsed.get('conditions')) {
-                Map<String, Object> condition = (Map<String, Object>) rawCondition;
-                String field = (String) condition.get('field');
-                String operator = ((String) condition.get('operator'))?.toLowerCase()?.trim();
-                Object value = condition.get('value');
-                Schema.DisplayType type = String.isBlank(field) ||
-                    !FIELD_NAME.matcher(field).matches()
-                    ? null
-                    : typeAt(entity, field);
-                if (
-                    (operator != 'equals' &&
-                    operator != 'not equals') ||
-                    !(value instanceof String) ||
-                    String.isBlank((String) value) ||
-                    (type != Schema.DisplayType.STRING &&
-                    type != Schema.DisplayType.PICKLIST)
-                ) {
-                    return null;
-                }
-                TextEquality equality = new TextEquality();
-                equality.field = field.trim();
-                equality.negated = operator == 'not equals';
-                equality.value = (String) value;
-                equalities.add(equality);
-            }
-        } catch (Exception unreadable) {
-            return null;
-        }
-        return equalities.isEmpty() ? null : equalities;
-    }
+	/**
+	 * A document's conditions when every one is `equals` or `not equals` a text value on a text or
+	 * picklist attribute of this entity and they are all joined by AND, or null for any other
+	 * shape. The engine then tests target records it has already read instead of querying them
+	 * again (ROLLUPS-12); anything else keeps its query.
+	 */
+	@NamespaceAccessible
+	public static List<TextEquality> textEqualities(
+		String filterDocument,
+		Schema.SObjectType entity
+	) {
+		if (String.isBlank(filterDocument) || entity == null) {
+			return null;
+		}
+		List<TextEquality> equalities = new List<TextEquality>();
+		try {
+			Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
+				filterDocument
+			);
+			if (String.isNotBlank((String) parsed.get('logic'))) {
+				return null;
+			}
+			for (Object rawCondition : (List<Object>) parsed.get('conditions')) {
+				Map<String, Object> condition = (Map<String, Object>) rawCondition;
+				String field = (String) condition.get('field');
+				String operator = ((String) condition.get('operator'))?.toLowerCase()?.trim();
+				Object value = condition.get('value');
+				Schema.DisplayType type = String.isBlank(field) ||
+					!FIELD_NAME.matcher(field).matches()
+					? null
+					: typeAt(entity, field);
+				if (
+					(operator != 'equals' &&
+					operator != 'not equals') ||
+					!(value instanceof String) ||
+					String.isBlank((String) value) ||
+					(type != Schema.DisplayType.STRING &&
+					type != Schema.DisplayType.PICKLIST)
+				) {
+					return null;
+				}
+				TextEquality equality = new TextEquality();
+				equality.field = field.trim();
+				equality.negated = operator == 'not equals';
+				equality.value = (String) value;
+				equalities.add(equality);
+			}
+		} catch (Exception unreadable) {
+			return null;
+		}
+		return equalities.isEmpty() ? null : equalities;
+	}
 
-    /**
-     * Renders a filter document over one object with every value in a bind variable. The clause
-     * is empty when the document is; the binder carries the values and the display rendering.
-     */
-    public static FilterValueBinder toBoundClause(String filterDocument, String objectApiName) {
-        return toBoundClause(filterDocument, new FilterValueBinder(objectApiName));
-    }
+	/**
+	 * Renders a filter document over one object with every value in a bind variable. The clause
+	 * is empty when the document is; the binder carries the values and the display rendering.
+	 */
+	public static FilterValueBinder toBoundClause(String filterDocument, String objectApiName) {
+		return toBoundClause(filterDocument, new FilterValueBinder(objectApiName));
+	}
 
-    /** The same, with bind names of the caller's own prefix (C-36, related records). */
-    public static FilterValueBinder toBoundClause(
-        String filterDocument,
-        String objectApiName,
-        String bindPrefix
-    ) {
-        return toBoundClause(filterDocument, new FilterValueBinder(objectApiName, bindPrefix));
-    }
+	/** The same, with bind names of the caller's own prefix (C-36, related records). */
+	public static FilterValueBinder toBoundClause(
+		String filterDocument,
+		String objectApiName,
+		String bindPrefix
+	) {
+		return toBoundClause(filterDocument, new FilterValueBinder(objectApiName, bindPrefix));
+	}
 
-    private static FilterValueBinder toBoundClause(
-        String filterDocument,
-        FilterValueBinder binder
-    ) {
-        binder.clause = compile(filterDocument, binder, null);
-        return binder;
-    }
+	private static FilterValueBinder toBoundClause(
+		String filterDocument,
+		FilterValueBinder binder
+	) {
+		binder.clause = compile(filterDocument, binder, null);
+		return binder;
+	}
 
-    private static String compile(
-        String filterDocument,
-        FilterValueBinder binder,
-        Schema.SObjectType entity
-    ) {
-        if (String.isBlank(filterDocument)) {
-            return '';
-        }
-        Map<String, Object> parsed;
-        try {
-            parsed = (Map<String, Object>) JSON.deserializeUntyped(filterDocument);
-        } catch (Exception parseFailure) {
-            throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
-        }
-        if (parsed == null) {
-            throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
-        }
-        try {
-            return compile(parsed, binder, entity);
-        } catch (TypeException wrongShape) {
-            // A part of the right name but the wrong shape, such as "conditions": ["Name"].
-            throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
-        }
-    }
+	private static String compile(
+		String filterDocument,
+		FilterValueBinder binder,
+		Schema.SObjectType entity
+	) {
+		if (String.isBlank(filterDocument)) {
+			return '';
+		}
+		Map<String, Object> parsed;
+		try {
+			parsed = (Map<String, Object>) JSON.deserializeUntyped(filterDocument);
+		} catch (Exception parseFailure) {
+			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+		}
+		if (parsed == null) {
+			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+		}
+		try {
+			return compile(parsed, binder, entity);
+		} catch (TypeException wrongShape) {
+			// A part of the right name but the wrong shape, such as "conditions": ["Name"].
+			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+		}
+	}
 
-    private static String compile(
-        Map<String, Object> parsed,
-        FilterValueBinder binder,
-        Schema.SObjectType entity
-    ) {
-        Integer version = parsed.get('version') == null
-            ? SUPPORTED_VERSION
-            : Integer.valueOf(parsed.get('version'));
-        if (version != SUPPORTED_VERSION) {
-            throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
-        }
-        List<Object> rawConditions = (List<Object>) parsed.get('conditions');
-        if (rawConditions == null || rawConditions.isEmpty()) {
-            return '';
-        }
+	private static String compile(
+		Map<String, Object> parsed,
+		FilterValueBinder binder,
+		Schema.SObjectType entity
+	) {
+		Integer version = parsed.get('version') == null
+			? SUPPORTED_VERSION
+			: Integer.valueOf(parsed.get('version'));
+		if (version != SUPPORTED_VERSION) {
+			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+		}
+		List<Object> rawConditions = (List<Object>) parsed.get('conditions');
+		if (rawConditions == null || rawConditions.isEmpty()) {
+			return '';
+		}
 
-        Map<String, String> clauseByConditionId = new Map<String, String>();
-        List<String> inOrder = new List<String>();
-        Integer fallbackId = 0;
-        for (Object rawCondition : rawConditions) {
-            fallbackId++;
-            Map<String, Object> condition = (Map<String, Object>) rawCondition;
-            String conditionId = condition.get('id') == null
-                ? String.valueOf(fallbackId)
-                : String.valueOf(condition.get('id'));
-            String clause = renderCondition(condition, binder, entity);
-            clauseByConditionId.put(conditionId, clause);
-            inOrder.add(clause);
-        }
+		Map<String, String> clauseByConditionId = new Map<String, String>();
+		List<String> inOrder = new List<String>();
+		Integer fallbackId = 0;
+		for (Object rawCondition : rawConditions) {
+			fallbackId++;
+			Map<String, Object> condition = (Map<String, Object>) rawCondition;
+			String conditionId = condition.get('id') == null
+				? String.valueOf(fallbackId)
+				: String.valueOf(condition.get('id'));
+			String clause = renderCondition(condition, binder, entity);
+			clauseByConditionId.put(conditionId, clause);
+			inOrder.add(clause);
+		}
 
-        String logic = (String) parsed.get('logic');
-        if (String.isBlank(logic)) {
-            return String.join(inOrder, ' AND ');
-        }
-        return renderLogic(logic, clauseByConditionId);
-    }
+		String logic = (String) parsed.get('logic');
+		if (String.isBlank(logic)) {
+			return String.join(inOrder, ' AND ');
+		}
+		return renderLogic(logic, clauseByConditionId);
+	}
 
-    /**
-     * The attribute names a filter document's conditions test, as written (`Status__c`,
-     * `Gift__r.Status__c`), so the engine can tell which changes move a total (R-R11). A document
-     * that cannot be read names nothing; `toWhereClause` is what refuses it.
-     */
-    @NamespaceAccessible
-    public static Set<String> fieldsOf(String filterDocument) {
-        Set<String> fields = new Set<String>();
-        if (String.isBlank(filterDocument)) {
-            return fields;
-        }
-        try {
-            Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
-                filterDocument
-            );
-            for (Object rawCondition : (List<Object>) parsed.get('conditions')) {
-                String fieldName = (String) ((Map<String, Object>) rawCondition).get('field');
-                if (String.isNotBlank(fieldName) && FIELD_NAME.matcher(fieldName).matches()) {
-                    fields.add(fieldName.trim());
-                }
-            }
-        } catch (Exception unreadable) {
-            return new Set<String>();
-        }
-        return fields;
-    }
+	/**
+	 * The attribute names a filter document's conditions test, as written (`Status__c`,
+	 * `Gift__r.Status__c`), so the engine can tell which changes move a total (R-R11). A document
+	 * that cannot be read names nothing; `toWhereClause` is what refuses it.
+	 */
+	@NamespaceAccessible
+	public static Set<String> fieldsOf(String filterDocument) {
+		Set<String> fields = new Set<String>();
+		if (String.isBlank(filterDocument)) {
+			return fields;
+		}
+		try {
+			Map<String, Object> parsed = (Map<String, Object>) JSON.deserializeUntyped(
+				filterDocument
+			);
+			for (Object rawCondition : (List<Object>) parsed.get('conditions')) {
+				String fieldName = (String) ((Map<String, Object>) rawCondition).get('field');
+				if (String.isNotBlank(fieldName) && FIELD_NAME.matcher(fieldName).matches()) {
+					fields.add(fieldName.trim());
+				}
+			}
+		} catch (Exception unreadable) {
+			return new Set<String>();
+		}
+		return fields;
+	}
 
-    /**
-     * One condition as `Field operator value`. With a binder, the field is checked against the
-     * running user's describe and every value becomes a bind variable; without one, values are
-     * escaped literals for the rollup engine.
-     */
-    private static String renderCondition(
-        Map<String, Object> condition,
-        FilterValueBinder binder,
-        Schema.SObjectType entity
-    ) {
-        String fieldName = (String) condition.get('field');
-        String operator = ((String) condition.get('operator'))?.toLowerCase()?.trim();
-        if (String.isBlank(fieldName) || FIELD_NAME.matcher(fieldName).matches() == false) {
-            throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
-        }
-        if (binder != null) {
-            fieldName = binder.useField(fieldName, operator);
-            return binder.render(fieldName, operator, condition.get('value'));
-        }
-        if (DATE_LITERAL_BY_OPERATOR.containsKey(operator)) {
-            return fieldName + ' = ' + DATE_LITERAL_BY_OPERATOR.get(operator);
-        }
-        if (operator == LAST_N_DAYS) {
-            return fieldName + ' = LAST_N_DAYS:' + dayCount(condition.get('value'));
-        }
-        if (COMPARISON_BY_OPERATOR.containsKey(operator) == false) {
-            throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidOperator);
-        }
-        String comparison = COMPARISON_BY_OPERATOR.get(operator);
-        if (NO_VALUE_OPERATORS.contains(operator)) {
-            return fieldName + ' ' + comparison + ' null';
-        }
-        Object rawValue = condition.get('value');
-        // Described only when a value could be read as a date, so a status filter costs nothing.
-        Boolean datesAsText = entity != null && looksLikeADate(rawValue)
-            ? isNotADate(entity, fieldName)
-            : false;
-        if (LIST_OPERATORS.contains(operator)) {
-            List<Object> values = rawValue instanceof List<Object>
-                ? (List<Object>) rawValue
-                : new List<Object>{ rawValue };
-            List<String> rendered = new List<String>();
-            for (Object value : values) {
-                rendered.add(renderValue(value, datesAsText));
-            }
-            return fieldName + ' ' + comparison + ' (' + String.join(rendered, ',') + ')';
-        }
-        // What the administrator typed is matched as typed: % and _ are not wildcards.
-        if (operator == 'contains' || operator == 'does not contain') {
-            return fieldName +
-                ' ' +
-                comparison +
-                ' ' +
-                likeValue('%' + SoqlText.escapeLike(String.valueOf(rawValue)) + '%');
-        }
-        if (operator == 'starts with') {
-            return fieldName +
-                ' ' +
-                comparison +
-                ' ' +
-                likeValue(SoqlText.escapeLike(String.valueOf(rawValue)) + '%');
-        }
-        return fieldName + ' ' + comparison + ' ' + renderValue(rawValue, datesAsText);
-    }
+	/**
+	 * One condition as `Field operator value`. With a binder, the field is checked against the
+	 * running user's describe and every value becomes a bind variable; without one, values are
+	 * escaped literals for the rollup engine.
+	 */
+	private static String renderCondition(
+		Map<String, Object> condition,
+		FilterValueBinder binder,
+		Schema.SObjectType entity
+	) {
+		String fieldName = (String) condition.get('field');
+		String operator = ((String) condition.get('operator'))?.toLowerCase()?.trim();
+		if (String.isBlank(fieldName) || FIELD_NAME.matcher(fieldName).matches() == false) {
+			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+		}
+		if (binder != null) {
+			fieldName = binder.useField(fieldName, operator);
+			return binder.render(fieldName, operator, condition.get('value'));
+		}
+		if (DATE_LITERAL_BY_OPERATOR.containsKey(operator)) {
+			return fieldName + ' = ' + DATE_LITERAL_BY_OPERATOR.get(operator);
+		}
+		if (operator == LAST_N_DAYS) {
+			return fieldName + ' = LAST_N_DAYS:' + dayCount(condition.get('value'));
+		}
+		if (COMPARISON_BY_OPERATOR.containsKey(operator) == false) {
+			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidOperator);
+		}
+		String comparison = COMPARISON_BY_OPERATOR.get(operator);
+		if (NO_VALUE_OPERATORS.contains(operator)) {
+			return fieldName + ' ' + comparison + ' null';
+		}
+		Object rawValue = condition.get('value');
+		// Described only when a value could be read as a date, so a status filter costs nothing.
+		Boolean datesAsText = entity != null && looksLikeADate(rawValue)
+			? isNotADate(entity, fieldName)
+			: false;
+		if (LIST_OPERATORS.contains(operator)) {
+			List<Object> values = rawValue instanceof List<Object>
+				? (List<Object>) rawValue
+				: new List<Object>{ rawValue };
+			List<String> rendered = new List<String>();
+			for (Object value : values) {
+				rendered.add(renderValue(value, datesAsText));
+			}
+			return fieldName + ' ' + comparison + ' (' + String.join(rendered, ',') + ')';
+		}
+		// What the administrator typed is matched as typed: % and _ are not wildcards.
+		if (operator == 'contains' || operator == 'does not contain') {
+			return fieldName +
+				' ' +
+				comparison +
+				' ' +
+				likeValue('%' + SoqlText.escapeLike(String.valueOf(rawValue)) + '%');
+		}
+		if (operator == 'starts with') {
+			return fieldName +
+				' ' +
+				comparison +
+				' ' +
+				likeValue(SoqlText.escapeLike(String.valueOf(rawValue)) + '%');
+		}
+		return fieldName + ' ' + comparison + ' ' + renderValue(rawValue, datesAsText);
+	}
 
-    /**
-     * A LIKE pattern, already escaped, quoted as text. Only quotes are escaped here:
-     * String.escapeSingleQuotes also doubles backslashes, which turns \% back into a wildcard.
-     */
-    private static String likeValue(String pattern) {
-        return '\'' + pattern.replace('\'', '\\\'') + '\'';
-    }
+	/**
+	 * A LIKE pattern, already escaped, quoted as text. Only quotes are escaped here:
+	 * String.escapeSingleQuotes also doubles backslashes, which turns \% back into a wildcard.
+	 */
+	private static String likeValue(String pattern) {
+		return '\'' + pattern.replace('\'', '\\\'') + '\'';
+	}
 
-    /**
-     * True when the attribute is known and is not a date or a date and time, so a value shaped
-     * like a date is text there. Unknown (no entity, or a path this cannot follow) keeps the
-     * rendering every filter had before.
-     */
-    private static Boolean looksLikeADate(Object rawValue) {
-        for (
-            Object value : rawValue instanceof List<Object>
-                ? (List<Object>) rawValue
-                : new List<Object>{ rawValue }
-        ) {
-            String text = value instanceof String ? (String) value : null;
-            if (
-                text != null &&
-                (DATE_VALUE.matcher(text).matches() || DATETIME_VALUE.matcher(text).matches())
-            ) {
-                return true;
-            }
-        }
-        return false;
-    }
+	/**
+	 * True when the attribute is known and is not a date or a date and time, so a value shaped
+	 * like a date is text there. Unknown (no entity, or a path this cannot follow) keeps the
+	 * rendering every filter had before.
+	 */
+	private static Boolean looksLikeADate(Object rawValue) {
+		for (
+			Object value : rawValue instanceof List<Object>
+				? (List<Object>) rawValue
+				: new List<Object>{ rawValue }
+		) {
+			String text = value instanceof String ? (String) value : null;
+			if (
+				text != null &&
+				(DATE_VALUE.matcher(text).matches() || DATETIME_VALUE.matcher(text).matches())
+			) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-    private static Boolean isNotADate(Schema.SObjectType entity, String fieldName) {
-        Schema.DisplayType type = typeAt(entity, fieldName);
-        return type != null &&
-            type != Schema.DisplayType.DATE &&
-            type != Schema.DisplayType.DATETIME;
-    }
+	private static Boolean isNotADate(Schema.SObjectType entity, String fieldName) {
+		Schema.DisplayType type = typeAt(entity, fieldName);
+		return type != null &&
+			type != Schema.DisplayType.DATE &&
+			type != Schema.DisplayType.DATETIME;
+	}
 
-    /** The type of an attribute or a path such as `Gift__r.Status__c`, or null when unknown. */
-    private static Schema.DisplayType typeAt(Schema.SObjectType entity, String path) {
-        if (entity == null) {
-            return null;
-        }
-        List<String> parts = path.split('\\.');
-        Schema.SObjectType current = entity;
-        for (Integer i = 0; i < parts.size() - 1 && current != null; i++) {
-            current = referencedThrough(current, parts[i]);
-        }
-        if (current == null) {
-            return null;
-        }
-        Schema.SObjectField field = current.getDescribe(SObjectDescribeOptions.DEFERRED)
-            .fields.getMap()
-            .get(parts[parts.size() - 1].toLowerCase());
-        return field == null ? null : field.getDescribe().getType();
-    }
+	/** The type of an attribute or a path such as `Gift__r.Status__c`, or null when unknown. */
+	private static Schema.DisplayType typeAt(Schema.SObjectType entity, String path) {
+		if (entity == null) {
+			return null;
+		}
+		List<String> parts = path.split('\\.');
+		Schema.SObjectType current = entity;
+		for (Integer i = 0; i < parts.size() - 1 && current != null; i++) {
+			current = referencedThrough(current, parts[i]);
+		}
+		if (current == null) {
+			return null;
+		}
+		Schema.SObjectField field = current.getDescribe(SObjectDescribeOptions.DEFERRED)
+			.fields.getMap()
+			.get(parts[parts.size() - 1].toLowerCase());
+		return field == null ? null : field.getDescribe().getType();
+	}
 
-    private static Schema.SObjectType referencedThrough(
-        Schema.SObjectType entity,
-        String relationshipName
-    ) {
-        for (
-            Schema.SObjectField field : entity.getDescribe(SObjectDescribeOptions.DEFERRED)
-                .fields.getMap()
-                .values()
-        ) {
-            Schema.DescribeFieldResult describe = field.getDescribe();
-            if (
-                describe.getType() == Schema.DisplayType.REFERENCE &&
-                relationshipName.equalsIgnoreCase(describe.getRelationshipName()) &&
-                !describe.getReferenceTo().isEmpty()
-            ) {
-                return describe.getReferenceTo()[0];
-            }
-        }
-        return null;
-    }
+	private static Schema.SObjectType referencedThrough(
+		Schema.SObjectType entity,
+		String relationshipName
+	) {
+		for (
+			Schema.SObjectField field : entity.getDescribe(SObjectDescribeOptions.DEFERRED)
+				.fields.getMap()
+				.values()
+		) {
+			Schema.DescribeFieldResult describe = field.getDescribe();
+			if (
+				describe.getType() == Schema.DisplayType.REFERENCE &&
+				relationshipName.equalsIgnoreCase(describe.getRelationshipName()) &&
+				!describe.getReferenceTo().isEmpty()
+			) {
+				return describe.getReferenceTo()[0];
+			}
+		}
+		return null;
+	}
 
-    /** The day count of `last n days`: a whole number from 1 to MAX_DAYS, or a refusal. */
-    public static Integer dayCount(Object rawValue) {
-        Decimal days;
-        try {
-            days = rawValue == null ? null : Decimal.valueOf(String.valueOf(rawValue).trim());
-        } catch (TypeException notANumber) {
-            days = null;
-        }
-        if (days == null || days.stripTrailingZeros().scale() > 0 || days < 1 || days > MAX_DAYS) {
-            throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
-        }
-        return days.intValue();
-    }
+	/** The day count of `last n days`: a whole number from 1 to MAX_DAYS, or a refusal. */
+	public static Integer dayCount(Object rawValue) {
+		Decimal days;
+		try {
+			days = rawValue == null ? null : Decimal.valueOf(String.valueOf(rawValue).trim());
+		} catch (TypeException notANumber) {
+			days = null;
+		}
+		if (days == null || days.stripTrailingZeros().scale() > 0 || days < 1 || days > MAX_DAYS) {
+			throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+		}
+		return days.intValue();
+	}
 
-    /**
-     * Numbers, booleans, dates and datetimes go in unquoted, because the engine's query reads them
-     * that way. Everything else is a string: it is quoted and escaped, which is the only place an
-     * administrator's typing reaches a query.
-     */
-    private static String renderValue(Object value, Boolean datesAsText) {
-        if (value == null) {
-            return 'null';
-        }
-        if (
-            value instanceof Boolean ||
-            value instanceof Decimal ||
-            value instanceof Integer ||
-            value instanceof Double ||
-            value instanceof Long
-        ) {
-            return String.valueOf(value);
-        }
-        String text = String.valueOf(value);
-        if (
-            datesAsText != true &&
-            (DATE_VALUE.matcher(text).matches() || DATETIME_VALUE.matcher(text).matches())
-        ) {
-            return text;
-        }
-        return '\'' + String.escapeSingleQuotes(text) + '\'';
-    }
+	/**
+	 * Numbers, booleans, dates and datetimes go in unquoted, because the engine's query reads them
+	 * that way. Everything else is a string: it is quoted and escaped, which is the only place an
+	 * administrator's typing reaches a query.
+	 */
+	private static String renderValue(Object value, Boolean datesAsText) {
+		if (value == null) {
+			return 'null';
+		}
+		if (
+			value instanceof Boolean ||
+			value instanceof Decimal ||
+			value instanceof Integer ||
+			value instanceof Double ||
+			value instanceof Long
+		) {
+			return String.valueOf(value);
+		}
+		String text = String.valueOf(value);
+		if (
+			datesAsText != true &&
+			(DATE_VALUE.matcher(text).matches() || DATETIME_VALUE.matcher(text).matches())
+		) {
+			return text;
+		}
+		return '\'' + String.escapeSingleQuotes(text) + '\'';
+	}
 
-    /**
-     * Substitutes each condition number in the logic string with its clause. Every token has to be
-     * a condition number, a bracket, or one of AND, OR and NOT, so nothing else can be smuggled in.
-     */
-    private static String renderLogic(String logic, Map<String, String> clauseByConditionId) {
-        String spaced = logic.replace('(', ' ( ').replace(')', ' ) ');
-        List<String> tokens = spaced.trim().split('\\s+');
-        List<String> rendered = new List<String>();
-        for (String token : tokens) {
-            String upper = token.toUpperCase();
-            if (LOGIC_TOKEN.matcher(upper).matches() == false) {
-                throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
-            }
-            if (clauseByConditionId.containsKey(token)) {
-                rendered.add('(' + clauseByConditionId.get(token) + ')');
-            } else if (
-                upper == 'AND' ||
-                upper == 'OR' ||
-                upper == 'NOT' ||
-                upper == '(' ||
-                upper == ')'
-            ) {
-                rendered.add(upper);
-            } else {
-                throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
-            }
-        }
-        return String.join(rendered, ' ');
-    }
+	/**
+	 * Substitutes each condition number in the logic string with its clause. Every token has to be
+	 * a condition number, a bracket, or one of AND, OR and NOT, so nothing else can be smuggled in.
+	 */
+	private static String renderLogic(String logic, Map<String, String> clauseByConditionId) {
+		String spaced = logic.replace('(', ' ( ').replace(')', ' ) ');
+		List<String> tokens = spaced.trim().split('\\s+');
+		List<String> rendered = new List<String>();
+		for (String token : tokens) {
+			String upper = token.toUpperCase();
+			if (LOGIC_TOKEN.matcher(upper).matches() == false) {
+				throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+			}
+			if (clauseByConditionId.containsKey(token)) {
+				rendered.add('(' + clauseByConditionId.get(token) + ')');
+			} else if (
+				upper == 'AND' ||
+				upper == 'OR' ||
+				upper == 'NOT' ||
+				upper == '(' ||
+				upper == ')'
+			) {
+				rendered.add(upper);
+			} else {
+				throw new RollupFilterException(System.Label.Core_Rollups_ErrorInvalidFilter);
+			}
+		}
+		return String.join(rendered, ' ');
+	}
 }

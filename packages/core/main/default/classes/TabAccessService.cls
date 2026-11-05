@@ -32,488 +32,488 @@
  */
 @NamespaceAccessible
 public with sharing class TabAccessService {
-    public static final String DATA_MANAGER_TAB = 'BarnCRM_Tab_Data_Manager';
-    public static final String IMPORT_TAB = 'BarnCRM_Tab_Import';
-    public static final String FIND_TAB = 'BarnCRM_Tab_Find';
-    public static final String BULK_UPDATE_TAB = 'BarnCRM_Tab_Bulk_Update';
-    public static final String DATA_HYGIENE_TAB = 'BarnCRM_Tab_Data_Hygiene';
-    public static final String DUPLICATE_MATCHING_TAB = 'BarnCRM_Tab_Duplicate_Matching';
+	public static final String DATA_MANAGER_TAB = 'BarnCRM_Tab_Data_Manager';
+	public static final String IMPORT_TAB = 'BarnCRM_Tab_Import';
+	public static final String FIND_TAB = 'BarnCRM_Tab_Find';
+	public static final String BULK_UPDATE_TAB = 'BarnCRM_Tab_Bulk_Update';
+	public static final String DATA_HYGIENE_TAB = 'BarnCRM_Tab_Data_Hygiene';
+	public static final String DUPLICATE_MATCHING_TAB = 'BarnCRM_Tab_Duplicate_Matching';
 
-    /** Shows the Households tab only, no record type; carried by Household Upkeep (ADR-0141). */
-    public static final String HOUSEHOLDS_SET = 'BarnCRM_Households';
+	/** Shows the Households tab only, no record type; carried by Household Upkeep (ADR-0141). */
+	public static final String HOUSEHOLDS_SET = 'BarnCRM_Households';
 
-    public static final String STANDARD_APP = 'BarnCRM_App_Standard';
-    public static final String CONSOLE_APP = 'BarnCRM_App_Console';
-    public static final String ADMIN_STANDARD_APP = 'BarnCRM_App_Admin_Standard';
-    public static final String ADMIN_CONSOLE_APP = 'BarnCRM_App_Admin_Console';
+	public static final String STANDARD_APP = 'BarnCRM_App_Standard';
+	public static final String CONSOLE_APP = 'BarnCRM_App_Console';
+	public static final String ADMIN_STANDARD_APP = 'BarnCRM_App_Admin_Standard';
+	public static final String ADMIN_CONSOLE_APP = 'BarnCRM_App_Admin_Console';
 
-    /** The stored values of App Navigation Style; anything else reads as Both. */
-    public static final String STYLE_STANDARD = 'Standard';
-    public static final String STYLE_CONSOLE = 'Console';
-    public static final String STYLE_BOTH = 'Both';
+	/** The stored values of App Navigation Style; anything else reads as Both. */
+	public static final String STYLE_STANDARD = 'Standard';
+	public static final String STYLE_CONSOLE = 'Console';
+	public static final String STYLE_BOTH = 'Both';
 
-    private static final String ADMIN = 'BarnCRM_Admin';
-    private static final String STAFF = 'BarnCRM_Staff';
-    private static final String READ_ONLY = 'BarnCRM_Read_Only';
-    private static final String FIND_AND_EXPORT = 'BarnCRM_Find_And_Export';
-    private static final String BULK_UPDATE = 'BarnCRM_Bulk_Update';
-    private static final String BULK_DELETE = 'BarnCRM_Bulk_Delete';
-    private static final String DUPLICATE_REVIEW = 'BarnCRM_Duplicate_Review';
-    private static final String METADATA_ADMIN = 'BarnCRM_Metadata_Admin';
+	private static final String ADMIN = 'BarnCRM_Admin';
+	private static final String STAFF = 'BarnCRM_Staff';
+	private static final String READ_ONLY = 'BarnCRM_Read_Only';
+	private static final String FIND_AND_EXPORT = 'BarnCRM_Find_And_Export';
+	private static final String BULK_UPDATE = 'BarnCRM_Bulk_Update';
+	private static final String BULK_DELETE = 'BarnCRM_Bulk_Delete';
+	private static final String DUPLICATE_REVIEW = 'BarnCRM_Duplicate_Review';
+	private static final String METADATA_ADMIN = 'BarnCRM_Metadata_Admin';
 
-    /**
-     * Each tab set, and the permission sets whose holders see that tab while it is on.
-     * Duplicate Review holders see Duplicate Matching, where the review list is (ADR-0139),
-     * and so do Metadata Admin holders, who change its matching logic.
-     */
-    @TestVisible
-    private static final Map<String, List<String>> AUDIENCE = new Map<String, List<String>>{
-        DATA_MANAGER_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE },
-        IMPORT_TAB => new List<String>{ ADMIN },
-        FIND_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT },
-        BULK_UPDATE_TAB => new List<String>{ ADMIN, BULK_UPDATE, BULK_DELETE },
-        DATA_HYGIENE_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT },
-        DUPLICATE_MATCHING_TAB => new List<String>{ ADMIN, DUPLICATE_REVIEW, METADATA_ADMIN },
-        HOUSEHOLDS_SET => new List<String>{ ADMIN, STAFF, READ_ONLY },
-        STANDARD_APP => new List<String>{ ADMIN, STAFF, READ_ONLY },
-        CONSOLE_APP => new List<String>{ ADMIN, STAFF, READ_ONLY },
-        ADMIN_STANDARD_APP => new List<String>{ ADMIN },
-        ADMIN_CONSOLE_APP => new List<String>{ ADMIN }
-    };
+	/**
+	 * Each tab set, and the permission sets whose holders see that tab while it is on.
+	 * Duplicate Review holders see Duplicate Matching, where the review list is (ADR-0139),
+	 * and so do Metadata Admin holders, who change its matching logic.
+	 */
+	@TestVisible
+	private static final Map<String, List<String>> AUDIENCE = new Map<String, List<String>>{
+		DATA_MANAGER_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE },
+		IMPORT_TAB => new List<String>{ ADMIN },
+		FIND_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT },
+		BULK_UPDATE_TAB => new List<String>{ ADMIN, BULK_UPDATE, BULK_DELETE },
+		DATA_HYGIENE_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT },
+		DUPLICATE_MATCHING_TAB => new List<String>{ ADMIN, DUPLICATE_REVIEW, METADATA_ADMIN },
+		HOUSEHOLDS_SET => new List<String>{ ADMIN, STAFF, READ_ONLY },
+		STANDARD_APP => new List<String>{ ADMIN, STAFF, READ_ONLY },
+		CONSOLE_APP => new List<String>{ ADMIN, STAFF, READ_ONLY },
+		ADMIN_STANDARD_APP => new List<String>{ ADMIN },
+		ADMIN_CONSOLE_APP => new List<String>{ ADMIN }
+	};
 
-    /**
-     * The app sets the App Navigation Style setting turns on: one style's two apps, or all four
-     * for Both, which is also what a blank or unknown value reads as.
-     */
-    public static Set<String> appSetsOn() {
-        String style = SettingsService.getSettings().App_Navigation_Style__c;
-        Set<String> names = new Set<String>();
-        if (style != STYLE_CONSOLE) {
-            names.addAll(new List<String>{ STANDARD_APP, ADMIN_STANDARD_APP });
-        }
-        if (style != STYLE_STANDARD) {
-            names.addAll(new List<String>{ CONSOLE_APP, ADMIN_CONSOLE_APP });
-        }
-        return names;
-    }
+	/**
+	 * The app sets the App Navigation Style setting turns on: one style's two apps, or all four
+	 * for Both, which is also what a blank or unknown value reads as.
+	 */
+	public static Set<String> appSetsOn() {
+		String style = SettingsService.getSettings().App_Navigation_Style__c;
+		Set<String> names = new Set<String>();
+		if (style != STYLE_CONSOLE) {
+			names.addAll(new List<String>{ STANDARD_APP, ADMIN_STANDARD_APP });
+		}
+		if (style != STYLE_STANDARD) {
+			names.addAll(new List<String>{ CONSOLE_APP, ADMIN_CONSOLE_APP });
+		}
+		return names;
+	}
 
-    /** How many assignments one run gives or takes, well inside the 10,000 DML rows. */
-    @TestVisible
-    private static Integer rowsPerRun = 5000;
+	/** How many assignments one run gives or takes, well inside the 10,000 DML rows. */
+	@TestVisible
+	private static Integer rowsPerRun = 5000;
 
-    private static final String CONTEXT = 'TabAccessService.sync';
+	private static final String CONTEXT = 'TabAccessService.sync';
 
-    /**
-     * Every permission set Core ships is named so; `giveToHolders` refuses them. Core's own
-     * tests, which can name no module set, change it to give a tab set instead.
-     */
-    @TestVisible
-    private static String coreSetPrefix = 'BarnCRM_';
+	/**
+	 * Every permission set Core ships is named so; `giveToHolders` refuses them. Core's own
+	 * tests, which can name no module set, change it to give a tab set instead.
+	 */
+	@TestVisible
+	private static String coreSetPrefix = 'BarnCRM_';
 
-    /** Whether this transaction has already queued a sync. */
-    private static Boolean requested = false;
+	/** Whether this transaction has already queued a sync. */
+	private static Boolean requested = false;
 
-    /**
-     * Queues one sync for this transaction; asking again changes nothing. Never throws: a
-     * switch that saved must not fail over its tabs, and the nightly run puts them right.
-     */
-    public static void requestSync() {
-        if (requested) {
-            return;
-        }
-        requested = true;
-        try {
-            System.enqueueJob(new Job());
-        } catch (Exception e) {
-            ErrorLogger.log(e, CONTEXT);
-        }
-    }
+	/**
+	 * Queues one sync for this transaction; asking again changes nothing. Never throws: a
+	 * switch that saved must not fail over its tabs, and the nightly run puts them right.
+	 */
+	public static void requestSync() {
+		if (requested) {
+			return;
+		}
+		requested = true;
+		try {
+			System.enqueueJob(new Job());
+		} catch (Exception e) {
+			ErrorLogger.log(e, CONTEXT);
+		}
+	}
 
-    /**
-     * One slice now, for a caller that already writes setup objects only, such as the install's
-     * access job. Returns true when more is left for the queued or nightly run.
-     */
-    public static Boolean syncNow() {
-        return syncOnce(rowsPerRun);
-    }
+	/**
+	 * One slice now, for a caller that already writes setup objects only, such as the install's
+	 * access job. Returns true when more is left for the queued or nightly run.
+	 */
+	public static Boolean syncNow() {
+		return syncOnce(rowsPerRun);
+	}
 
-    /**
-     * The queued sync: one slice, then itself again while more is left. Declares its sharing
-     * because an inner class does not take its outer class's, and a queued job with none runs
-     * without sharing; its reads and writes are system mode on setup objects either way.
-     */
-    public with sharing class Job implements Queueable {
-        public void execute(QueueableContext jobContext) {
-            try {
-                // A test cannot chain one queued job from another.
-                if (syncOnce(rowsPerRun) && !Test.isRunningTest()) {
-                    System.enqueueJob(new Job());
-                }
-            } catch (Exception e) {
-                ErrorLogger.log(e, CONTEXT);
-            }
-        }
-    }
+	/**
+	 * The queued sync: one slice, then itself again while more is left. Declares its sharing
+	 * because an inner class does not take its outer class's, and a queued job with none runs
+	 * without sharing; its reads and writes are system mode on setup objects either way.
+	 */
+	public with sharing class Job implements Queueable {
+		public void execute(QueueableContext jobContext) {
+			try {
+				// A test cannot chain one queued job from another.
+				if (syncOnce(rowsPerRun) && !Test.isRunningTest()) {
+					System.enqueueJob(new Job());
+				}
+			} catch (Exception e) {
+				ErrorLogger.log(e, CONTEXT);
+			}
+		}
+	}
 
-    /**
-     * Gives each tab set to its audience while its feature is on, and takes it from everyone
-     * while the feature is off, up to `budget` assignments. Returns true when more is left.
-     */
-    public static Boolean syncOnce(Integer budget) {
-        Map<String, Id> setIds = packagedSetIds();
-        Map<Id, Set<Id>> groupIdsBySet = groupsContaining(setIds.values());
-        Set<String> turnedOn = FeatureSwitchService.tabSetsOn();
-        turnedOn.addAll(appSetsOn());
-        List<PermissionSetAssignment> toInsert = new List<PermissionSetAssignment>();
-        List<PermissionSetAssignment> toDelete = new List<PermissionSetAssignment>();
-        Boolean more = false;
-        for (String tabSet : AUDIENCE.keySet()) {
-            Id tabSetId = setIds.get(tabSet);
-            if (tabSetId == null) {
-                continue;
-            }
-            Set<Id> wanted = turnedOn.contains(tabSet)
-                ? holdersOf(AUDIENCE.get(tabSet), setIds, groupIdsBySet)
-                : new Set<Id>();
-            Map<Id, PermissionSetAssignment> held = directHolders(tabSetId);
-            for (Id userId : wanted) {
-                if (held.containsKey(userId)) {
-                    continue;
-                }
-                if (toInsert.size() + toDelete.size() >= budget) {
-                    more = true;
-                    break;
-                }
-                toInsert.add(
-                    new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = tabSetId)
-                );
-            }
-            for (Id userId : held.keySet()) {
-                if (wanted.contains(userId)) {
-                    continue;
-                }
-                if (toInsert.size() + toDelete.size() >= budget) {
-                    more = true;
-                    break;
-                }
-                toDelete.add(held.get(userId));
-            }
-        }
-        write(toInsert, toDelete, CONTEXT);
-        return more;
-    }
+	/**
+	 * Gives each tab set to its audience while its feature is on, and takes it from everyone
+	 * while the feature is off, up to `budget` assignments. Returns true when more is left.
+	 */
+	public static Boolean syncOnce(Integer budget) {
+		Map<String, Id> setIds = packagedSetIds();
+		Map<Id, Set<Id>> groupIdsBySet = groupsContaining(setIds.values());
+		Set<String> turnedOn = FeatureSwitchService.tabSetsOn();
+		turnedOn.addAll(appSetsOn());
+		List<PermissionSetAssignment> toInsert = new List<PermissionSetAssignment>();
+		List<PermissionSetAssignment> toDelete = new List<PermissionSetAssignment>();
+		Boolean more = false;
+		for (String tabSet : AUDIENCE.keySet()) {
+			Id tabSetId = setIds.get(tabSet);
+			if (tabSetId == null) {
+				continue;
+			}
+			Set<Id> wanted = turnedOn.contains(tabSet)
+				? holdersOf(AUDIENCE.get(tabSet), setIds, groupIdsBySet)
+				: new Set<Id>();
+			Map<Id, PermissionSetAssignment> held = directHolders(tabSetId);
+			for (Id userId : wanted) {
+				if (held.containsKey(userId)) {
+					continue;
+				}
+				if (toInsert.size() + toDelete.size() >= budget) {
+					more = true;
+					break;
+				}
+				toInsert.add(
+					new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = tabSetId)
+				);
+			}
+			for (Id userId : held.keySet()) {
+				if (wanted.contains(userId)) {
+					continue;
+				}
+				if (toInsert.size() + toDelete.size() >= budget) {
+					more = true;
+					break;
+				}
+				toDelete.add(held.get(userId));
+			}
+		}
+		write(toInsert, toDelete, CONTEXT);
+		return more;
+	}
 
-    /**
-     * Gives the named permission set to every active person holding one of the audience sets,
-     * directly or through a permission set group such as a BarnCRM role, up to `budget`
-     * assignments. Never takes it away: a module's set may also be given by hand, to the person
-     * who installed the module or to an integration user. For a module keeping its own sets with
-     * BarnCRM's roles (ADR-0125 `0125-rollup-builder-module.md`, D2); it names its set and the
-     * audience, and Core names no module set. Written in system mode, as the tab sync is, and a
-     * refused assignment is logged as a Warning under `context`. Returns true when more is left,
-     * and false when every assignment of this slice was refused, so the caller does not queue
-     * itself again only to be refused again (the nightly run tries again). Does nothing when the
-     * set is not in this org or no audience is named, and refuses Core's own sets (every one is
-     * named `BarnCRM_`): those follow the roles through `sync` and the Access page.
-     *
-     * Each run reads every holder of the audience sets and of the set, unbounded, against the
-     * transaction's 50,000 query rows: see the ADR's note on the ceiling.
-     */
-    @NamespaceAccessible
-    public static Boolean giveToHolders(
-        String setName,
-        List<String> audience,
-        Integer budget,
-        String context
-    ) {
-        refuseCoreSet(setName);
-        if (audience == null || audience.isEmpty()) {
-            return false;
-        }
-        Set<String> names = new Set<String>(audience);
-        names.add(setName);
-        Map<String, Id> setIds = packagedSetIds(names);
-        if (!setIds.containsKey(setName)) {
-            return false;
-        }
-        Map<Id, Set<Id>> groupIdsBySet = groupsContaining(setIds.values());
-        Set<Id> wanted = holdersOf(audience, setIds, groupIdsBySet);
-        return give(setName, setIds, groupIdsBySet, wanted, budget, context);
-    }
+	/**
+	 * Gives the named permission set to every active person holding one of the audience sets,
+	 * directly or through a permission set group such as a BarnCRM role, up to `budget`
+	 * assignments. Never takes it away: a module's set may also be given by hand, to the person
+	 * who installed the module or to an integration user. For a module keeping its own sets with
+	 * BarnCRM's roles (ADR-0125 `0125-rollup-builder-module.md`, D2); it names its set and the
+	 * audience, and Core names no module set. Written in system mode, as the tab sync is, and a
+	 * refused assignment is logged as a Warning under `context`. Returns true when more is left,
+	 * and false when every assignment of this slice was refused, so the caller does not queue
+	 * itself again only to be refused again (the nightly run tries again). Does nothing when the
+	 * set is not in this org or no audience is named, and refuses Core's own sets (every one is
+	 * named `BarnCRM_`): those follow the roles through `sync` and the Access page.
+	 *
+	 * Each run reads every holder of the audience sets and of the set, unbounded, against the
+	 * transaction's 50,000 query rows: see the ADR's note on the ceiling.
+	 */
+	@NamespaceAccessible
+	public static Boolean giveToHolders(
+		String setName,
+		List<String> audience,
+		Integer budget,
+		String context
+	) {
+		refuseCoreSet(setName);
+		if (audience == null || audience.isEmpty()) {
+			return false;
+		}
+		Set<String> names = new Set<String>(audience);
+		names.add(setName);
+		Map<String, Id> setIds = packagedSetIds(names);
+		if (!setIds.containsKey(setName)) {
+			return false;
+		}
+		Map<Id, Set<Id>> groupIdsBySet = groupsContaining(setIds.values());
+		Set<Id> wanted = holdersOf(audience, setIds, groupIdsBySet);
+		return give(setName, setIds, groupIdsBySet, wanted, budget, context);
+	}
 
-    /**
-     * Gives the named permission set to every active person assigned one of the named permission
-     * set groups, such as a BarnCRM role, up to `budget` assignments, with the rules of
-     * `giveToHolders`. For a module whose sets follow roles that hold the same Core sets, such as
-     * the Coordinator and Team Member roles (ADR-0131 `0131-module-access-sync-by-role.md`).
-     * Only the groups this product ships count. Returns true when more is left.
-     */
-    @NamespaceAccessible
-    public static Boolean giveToGroupHolders(
-        String setName,
-        List<String> groupNames,
-        Integer budget,
-        String context
-    ) {
-        refuseCoreSet(setName);
-        if (groupNames == null || groupNames.isEmpty()) {
-            return false;
-        }
-        Map<String, Id> setIds = packagedSetIds(new Set<String>{ setName });
-        if (!setIds.containsKey(setName)) {
-            return false;
-        }
-        String namespace = namespace();
-        Set<Id> wanted = new Set<Id>();
-        for (PermissionSetAssignment row : [
-            SELECT AssigneeId
-            FROM PermissionSetAssignment
-            WHERE
-                PermissionSetGroup.DeveloperName IN :groupNames
-                AND PermissionSetGroup.NamespacePrefix = :namespace
-                AND Assignee.IsActive = TRUE
-            WITH SYSTEM_MODE
-        ]) {
-            wanted.add(row.AssigneeId);
-        }
-        Map<Id, Set<Id>> groupIdsBySet = groupsContaining(setIds.values());
-        return give(setName, setIds, groupIdsBySet, wanted, budget, context);
-    }
+	/**
+	 * Gives the named permission set to every active person assigned one of the named permission
+	 * set groups, such as a BarnCRM role, up to `budget` assignments, with the rules of
+	 * `giveToHolders`. For a module whose sets follow roles that hold the same Core sets, such as
+	 * the Coordinator and Team Member roles (ADR-0131 `0131-module-access-sync-by-role.md`).
+	 * Only the groups this product ships count. Returns true when more is left.
+	 */
+	@NamespaceAccessible
+	public static Boolean giveToGroupHolders(
+		String setName,
+		List<String> groupNames,
+		Integer budget,
+		String context
+	) {
+		refuseCoreSet(setName);
+		if (groupNames == null || groupNames.isEmpty()) {
+			return false;
+		}
+		Map<String, Id> setIds = packagedSetIds(new Set<String>{ setName });
+		if (!setIds.containsKey(setName)) {
+			return false;
+		}
+		String namespace = namespace();
+		Set<Id> wanted = new Set<Id>();
+		for (PermissionSetAssignment row : [
+			SELECT AssigneeId
+			FROM PermissionSetAssignment
+			WHERE
+				PermissionSetGroup.DeveloperName IN :groupNames
+				AND PermissionSetGroup.NamespacePrefix = :namespace
+				AND Assignee.IsActive = TRUE
+			WITH SYSTEM_MODE
+		]) {
+			wanted.add(row.AssigneeId);
+		}
+		Map<Id, Set<Id>> groupIdsBySet = groupsContaining(setIds.values());
+		return give(setName, setIds, groupIdsBySet, wanted, budget, context);
+	}
 
-    private static void refuseCoreSet(String setName) {
-        if (String.isBlank(setName) || setName.startsWithIgnoreCase(coreSetPrefix)) {
-            throw new IllegalArgumentException(
-                'A module sync gives a module\'s own set, never Core\'s: ' + setName
-            );
-        }
-    }
+	private static void refuseCoreSet(String setName) {
+		if (String.isBlank(setName) || setName.startsWithIgnoreCase(coreSetPrefix)) {
+			throw new IllegalArgumentException(
+				'A module sync gives a module\'s own set, never Core\'s: ' + setName
+			);
+		}
+	}
 
-    /** Gives the set to each wanted person who does not hold it yet, up to `budget`. */
-    private static Boolean give(
-        String setName,
-        Map<String, Id> setIds,
-        Map<Id, Set<Id>> groupIdsBySet,
-        Set<Id> wanted,
-        Integer budget,
-        String context
-    ) {
-        Id setId = setIds.get(setName);
-        // Held already, directly or through a group, such as a module role that includes it.
-        wanted.removeAll(holdersOf(new List<String>{ setName }, setIds, groupIdsBySet));
-        List<PermissionSetAssignment> toInsert = new List<PermissionSetAssignment>();
-        for (Id userId : wanted) {
-            if (toInsert.size() >= budget) {
-                break;
-            }
-            toInsert.add(new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = setId));
-        }
-        Integer refused = write(toInsert, new List<PermissionSetAssignment>(), context);
-        if (!toInsert.isEmpty() && refused == toInsert.size()) {
-            return false;
-        }
-        return wanted.size() > toInsert.size();
-    }
+	/** Gives the set to each wanted person who does not hold it yet, up to `budget`. */
+	private static Boolean give(
+		String setName,
+		Map<String, Id> setIds,
+		Map<Id, Set<Id>> groupIdsBySet,
+		Set<Id> wanted,
+		Integer budget,
+		String context
+	) {
+		Id setId = setIds.get(setName);
+		// Held already, directly or through a group, such as a module role that includes it.
+		wanted.removeAll(holdersOf(new List<String>{ setName }, setIds, groupIdsBySet));
+		List<PermissionSetAssignment> toInsert = new List<PermissionSetAssignment>();
+		for (Id userId : wanted) {
+			if (toInsert.size() >= budget) {
+				break;
+			}
+			toInsert.add(new PermissionSetAssignment(AssigneeId = userId, PermissionSetId = setId));
+		}
+		Integer refused = write(toInsert, new List<PermissionSetAssignment>(), context);
+		if (!toInsert.isEmpty() && refused == toInsert.size()) {
+			return false;
+		}
+		return wanted.size() > toInsert.size();
+	}
 
-    /**
-     * Writes the assignments in system mode and logs each one refused as a Warning. An insert
-     * refused as a duplicate is not logged: another job gave the same set a moment before, which
-     * is what was wanted. Returns how many inserts were refused for any other reason.
-     */
-    private static Integer write(
-        List<PermissionSetAssignment> toInsert,
-        List<PermissionSetAssignment> toDelete,
-        String context
-    ) {
-        List<PermissionSetAssignment> refused = new List<PermissionSetAssignment>();
-        List<List<String>> refusedErrors = new List<List<String>>();
-        Integer refusedInserts = 0;
-        if (!toInsert.isEmpty()) {
-            List<Database.SaveResult> saved = Database.insert(
-                toInsert,
-                false,
-                AccessLevel.SYSTEM_MODE
-            );
-            for (Integer i = 0; i < saved.size(); i++) {
-                Database.SaveResult result = saved[i];
-                if (result.isSuccess() || isDuplicate(result.getErrors())) {
-                    continue;
-                }
-                refusedInserts++;
-                refused.add(toInsert[i]);
-                refusedErrors.add(messagesOf(result.getErrors()));
-            }
-        }
-        if (!toDelete.isEmpty()) {
-            List<Database.DeleteResult> deleted = Database.delete(
-                toDelete,
-                false,
-                AccessLevel.SYSTEM_MODE
-            );
-            for (Integer i = 0; i < deleted.size(); i++) {
-                if (!deleted[i].isSuccess()) {
-                    refused.add(toDelete[i]);
-                    refusedErrors.add(messagesOf(deleted[i].getErrors()));
-                }
-            }
-        }
-        if (!refused.isEmpty()) {
-            ErrorLogger.logMessages(
-                refusalMessages(refused, refusedErrors),
-                context,
-                ErrorLogger.SEVERITY_WARNING
-            );
-        }
-        return refusedInserts;
-    }
+	/**
+	 * Writes the assignments in system mode and logs each one refused as a Warning. An insert
+	 * refused as a duplicate is not logged: another job gave the same set a moment before, which
+	 * is what was wanted. Returns how many inserts were refused for any other reason.
+	 */
+	private static Integer write(
+		List<PermissionSetAssignment> toInsert,
+		List<PermissionSetAssignment> toDelete,
+		String context
+	) {
+		List<PermissionSetAssignment> refused = new List<PermissionSetAssignment>();
+		List<List<String>> refusedErrors = new List<List<String>>();
+		Integer refusedInserts = 0;
+		if (!toInsert.isEmpty()) {
+			List<Database.SaveResult> saved = Database.insert(
+				toInsert,
+				false,
+				AccessLevel.SYSTEM_MODE
+			);
+			for (Integer i = 0; i < saved.size(); i++) {
+				Database.SaveResult result = saved[i];
+				if (result.isSuccess() || isDuplicate(result.getErrors())) {
+					continue;
+				}
+				refusedInserts++;
+				refused.add(toInsert[i]);
+				refusedErrors.add(messagesOf(result.getErrors()));
+			}
+		}
+		if (!toDelete.isEmpty()) {
+			List<Database.DeleteResult> deleted = Database.delete(
+				toDelete,
+				false,
+				AccessLevel.SYSTEM_MODE
+			);
+			for (Integer i = 0; i < deleted.size(); i++) {
+				if (!deleted[i].isSuccess()) {
+					refused.add(toDelete[i]);
+					refusedErrors.add(messagesOf(deleted[i].getErrors()));
+				}
+			}
+		}
+		if (!refused.isEmpty()) {
+			ErrorLogger.logMessages(
+				refusalMessages(refused, refusedErrors),
+				context,
+				ErrorLogger.SEVERITY_WARNING
+			);
+		}
+		return refusedInserts;
+	}
 
-    /**
-     * One line per error, naming the permission set and the user it was for, so the Warning
-     * says which assignment to look at rather than only what the platform answered.
-     */
-    @TestVisible
-    private static List<String> refusalMessages(
-        List<PermissionSetAssignment> refused,
-        List<List<String>> errors
-    ) {
-        Set<Id> setIds = new Set<Id>();
-        for (PermissionSetAssignment assignment : refused) {
-            setIds.add(assignment.PermissionSetId);
-        }
-        Map<Id, String> setNames = new Map<Id, String>();
-        for (PermissionSet row : [
-            SELECT Id, Name
-            FROM PermissionSet
-            WHERE Id IN :setIds
-            WITH SYSTEM_MODE
-        ]) {
-            setNames.put(row.Id, row.Name);
-        }
-        List<String> messages = new List<String>();
-        for (Integer i = 0; i < refused.size(); i++) {
-            PermissionSetAssignment assignment = refused[i];
-            String setName = setNames.get(assignment.PermissionSetId);
-            String detail = String.format(
-                BarnHelp.text('Core', 'Core_Access_TabRefusalDetail'),
-                new List<Object>{
-                    setName == null ? String.valueOf(assignment.PermissionSetId) : setName,
-                    assignment.AssigneeId
-                }
-            );
-            for (String error : errors[i]) {
-                messages.add(error + ' ' + detail);
-            }
-        }
-        return messages;
-    }
+	/**
+	 * One line per error, naming the permission set and the user it was for, so the Warning
+	 * says which assignment to look at rather than only what the platform answered.
+	 */
+	@TestVisible
+	private static List<String> refusalMessages(
+		List<PermissionSetAssignment> refused,
+		List<List<String>> errors
+	) {
+		Set<Id> setIds = new Set<Id>();
+		for (PermissionSetAssignment assignment : refused) {
+			setIds.add(assignment.PermissionSetId);
+		}
+		Map<Id, String> setNames = new Map<Id, String>();
+		for (PermissionSet row : [
+			SELECT Id, Name
+			FROM PermissionSet
+			WHERE Id IN :setIds
+			WITH SYSTEM_MODE
+		]) {
+			setNames.put(row.Id, row.Name);
+		}
+		List<String> messages = new List<String>();
+		for (Integer i = 0; i < refused.size(); i++) {
+			PermissionSetAssignment assignment = refused[i];
+			String setName = setNames.get(assignment.PermissionSetId);
+			String detail = String.format(
+				BarnHelp.text('Core', 'Core_Access_TabRefusalDetail'),
+				new List<Object>{
+					setName == null ? String.valueOf(assignment.PermissionSetId) : setName,
+					assignment.AssigneeId
+				}
+			);
+			for (String error : errors[i]) {
+				messages.add(error + ' ' + detail);
+			}
+		}
+		return messages;
+	}
 
-    private static List<String> messagesOf(List<Database.Error> errors) {
-        List<String> messages = new List<String>();
-        for (Database.Error error : errors) {
-            messages.add(error.getMessage());
-        }
-        return messages;
-    }
+	private static List<String> messagesOf(List<Database.Error> errors) {
+		List<String> messages = new List<String>();
+		for (Database.Error error : errors) {
+			messages.add(error.getMessage());
+		}
+		return messages;
+	}
 
-    private static Boolean isDuplicate(List<Database.Error> errors) {
-        for (Database.Error error : errors) {
-            if (error.getStatusCode() != StatusCode.DUPLICATE_VALUE) {
-                return false;
-            }
-        }
-        return !errors.isEmpty();
-    }
+	private static Boolean isDuplicate(List<Database.Error> errors) {
+		for (Database.Error error : errors) {
+			if (error.getStatusCode() != StatusCode.DUPLICATE_VALUE) {
+				return false;
+			}
+		}
+		return !errors.isEmpty();
+	}
 
-    /** This package's tab sets and audience sets, by name. */
-    private static Map<String, Id> packagedSetIds() {
-        Set<String> names = new Set<String>(AUDIENCE.keySet());
-        for (List<String> sources : AUDIENCE.values()) {
-            names.addAll(sources);
-        }
-        return packagedSetIds(names);
-    }
+	/** This package's tab sets and audience sets, by name. */
+	private static Map<String, Id> packagedSetIds() {
+		Set<String> names = new Set<String>(AUDIENCE.keySet());
+		for (List<String> sources : AUDIENCE.values()) {
+			names.addAll(sources);
+		}
+		return packagedSetIds(names);
+	}
 
-    /** The named permission sets this product ships, by name. */
-    private static Map<String, Id> packagedSetIds(Set<String> names) {
-        String namespace = namespace();
-        Map<String, Id> ids = new Map<String, Id>();
-        for (PermissionSet row : [
-            SELECT Id, Name
-            FROM PermissionSet
-            WHERE Name IN :names AND NamespacePrefix = :namespace AND IsOwnedByProfile = FALSE
-            WITH SYSTEM_MODE
-        ]) {
-            ids.put(row.Name, row.Id);
-        }
-        return ids;
-    }
+	/** The named permission sets this product ships, by name. */
+	private static Map<String, Id> packagedSetIds(Set<String> names) {
+		String namespace = namespace();
+		Map<String, Id> ids = new Map<String, Id>();
+		for (PermissionSet row : [
+			SELECT Id, Name
+			FROM PermissionSet
+			WHERE Name IN :names AND NamespacePrefix = :namespace AND IsOwnedByProfile = FALSE
+			WITH SYSTEM_MODE
+		]) {
+			ids.put(row.Name, row.Id);
+		}
+		return ids;
+	}
 
-    /** This product's namespace, or null while it has none. */
-    private static String namespace() {
-        String prefix = NamespaceUtil.prefix().removeEnd('__');
-        return String.isBlank(prefix) ? null : prefix;
-    }
+	/** This product's namespace, or null while it has none. */
+	private static String namespace() {
+		String prefix = NamespaceUtil.prefix().removeEnd('__');
+		return String.isBlank(prefix) ? null : prefix;
+	}
 
-    /** The permission set groups, BarnCRM roles or an org's own, holding each set. */
-    private static Map<Id, Set<Id>> groupsContaining(List<Id> setIds) {
-        Map<Id, Set<Id>> groups = new Map<Id, Set<Id>>();
-        for (PermissionSetGroupComponent component : [
-            SELECT PermissionSetGroupId, PermissionSetId
-            FROM PermissionSetGroupComponent
-            WHERE PermissionSetId IN :setIds
-            WITH SYSTEM_MODE
-        ]) {
-            if (!groups.containsKey(component.PermissionSetId)) {
-                groups.put(component.PermissionSetId, new Set<Id>());
-            }
-            groups.get(component.PermissionSetId).add(component.PermissionSetGroupId);
-        }
-        return groups;
-    }
+	/** The permission set groups, BarnCRM roles or an org's own, holding each set. */
+	private static Map<Id, Set<Id>> groupsContaining(List<Id> setIds) {
+		Map<Id, Set<Id>> groups = new Map<Id, Set<Id>>();
+		for (PermissionSetGroupComponent component : [
+			SELECT PermissionSetGroupId, PermissionSetId
+			FROM PermissionSetGroupComponent
+			WHERE PermissionSetId IN :setIds
+			WITH SYSTEM_MODE
+		]) {
+			if (!groups.containsKey(component.PermissionSetId)) {
+				groups.put(component.PermissionSetId, new Set<Id>());
+			}
+			groups.get(component.PermissionSetId).add(component.PermissionSetGroupId);
+		}
+		return groups;
+	}
 
-    /** The active people holding any of the sets, directly or through a group. */
-    private static Set<Id> holdersOf(
-        List<String> sourceNames,
-        Map<String, Id> setIds,
-        Map<Id, Set<Id>> groupIdsBySet
-    ) {
-        Set<Id> sourceIds = new Set<Id>();
-        Set<Id> groupIds = new Set<Id>();
-        for (String name : sourceNames) {
-            Id setId = setIds.get(name);
-            if (setId == null) {
-                continue;
-            }
-            sourceIds.add(setId);
-            if (groupIdsBySet.containsKey(setId)) {
-                groupIds.addAll(groupIdsBySet.get(setId));
-            }
-        }
-        Set<Id> people = new Set<Id>();
-        for (PermissionSetAssignment row : [
-            SELECT AssigneeId
-            FROM PermissionSetAssignment
-            WHERE
-                (PermissionSetId IN :sourceIds
-                OR PermissionSetGroupId IN :groupIds)
-                AND Assignee.IsActive = TRUE
-            WITH SYSTEM_MODE
-        ]) {
-            people.add(row.AssigneeId);
-        }
-        return people;
-    }
+	/** The active people holding any of the sets, directly or through a group. */
+	private static Set<Id> holdersOf(
+		List<String> sourceNames,
+		Map<String, Id> setIds,
+		Map<Id, Set<Id>> groupIdsBySet
+	) {
+		Set<Id> sourceIds = new Set<Id>();
+		Set<Id> groupIds = new Set<Id>();
+		for (String name : sourceNames) {
+			Id setId = setIds.get(name);
+			if (setId == null) {
+				continue;
+			}
+			sourceIds.add(setId);
+			if (groupIdsBySet.containsKey(setId)) {
+				groupIds.addAll(groupIdsBySet.get(setId));
+			}
+		}
+		Set<Id> people = new Set<Id>();
+		for (PermissionSetAssignment row : [
+			SELECT AssigneeId
+			FROM PermissionSetAssignment
+			WHERE
+				(PermissionSetId IN :sourceIds
+				OR PermissionSetGroupId IN :groupIds)
+				AND Assignee.IsActive = TRUE
+			WITH SYSTEM_MODE
+		]) {
+			people.add(row.AssigneeId);
+		}
+		return people;
+	}
 
-    /** The people holding the tab set itself, with the assignment to take away. */
-    private static Map<Id, PermissionSetAssignment> directHolders(Id tabSetId) {
-        Map<Id, PermissionSetAssignment> held = new Map<Id, PermissionSetAssignment>();
-        for (PermissionSetAssignment row : [
-            SELECT Id, AssigneeId, PermissionSetId
-            FROM PermissionSetAssignment
-            WHERE PermissionSetId = :tabSetId
-            WITH SYSTEM_MODE
-        ]) {
-            held.put(row.AssigneeId, row);
-        }
-        return held;
-    }
+	/** The people holding the tab set itself, with the assignment to take away. */
+	private static Map<Id, PermissionSetAssignment> directHolders(Id tabSetId) {
+		Map<Id, PermissionSetAssignment> held = new Map<Id, PermissionSetAssignment>();
+		for (PermissionSetAssignment row : [
+			SELECT Id, AssigneeId, PermissionSetId
+			FROM PermissionSetAssignment
+			WHERE PermissionSetId = :tabSetId
+			WITH SYSTEM_MODE
+		]) {
+			held.put(row.AssigneeId, row);
+		}
+		return held;
+	}
 }

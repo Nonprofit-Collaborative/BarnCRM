@@ -8,89 +8,89 @@
  * instead of starting one.
  */
 public with sharing class StewardshipStartController {
-    private static final String CONTEXT = 'Start stewardship plan';
+	private static final String CONTEXT = 'Start stewardship plan';
 
-    /** What the action shows: whether the person may start a plan, and the plans to choose from. */
-    public class StartModel {
-        @AuraEnabled
-        public Boolean canStart;
-        @AuraEnabled
-        public List<PlanOption> plans;
-    }
+	/** What the action shows: whether the person may start a plan, and the plans to choose from. */
+	public class StartModel {
+		@AuraEnabled
+		public Boolean canStart;
+		@AuraEnabled
+		public List<PlanOption> plans;
+	}
 
-    /** One plan in the list, with the description an administrator wrote for whoever picks it. */
-    public class PlanOption {
-        @AuraEnabled
-        public String label;
-        @AuraEnabled
-        public String value;
-        @AuraEnabled
-        public String description;
-    }
+	/** One plan in the list, with the description an administrator wrote for whoever picks it. */
+	public class PlanOption {
+		@AuraEnabled
+		public String label;
+		@AuraEnabled
+		public String value;
+		@AuraEnabled
+		public String description;
+	}
 
-    @AuraEnabled(cacheable=true)
-    public static StartModel getStartable() {
-        try {
-            StartModel model = new StartModel();
-            model.canStart = canStart();
-            model.plans = new List<PlanOption>();
-            for (
-                Stewardship_Plan_Template__c template : StewardshipSelector.selectManualTemplates()
-            ) {
-                PlanOption option = new PlanOption();
-                option.label = template.Name;
-                option.value = template.Id;
-                option.description = template.Description__c;
-                model.plans.add(option);
-            }
-            return model;
-        } catch (Exception failure) {
-            // Cacheable: no Error Log insert is allowed here, so the screen gets the sentence.
-            throw UserErrors.message(Label.Giving_Stewardship_StartLoadFailed);
-        }
-    }
+	@AuraEnabled(cacheable=true)
+	public static StartModel getStartable() {
+		try {
+			StartModel model = new StartModel();
+			model.canStart = canStart();
+			model.plans = new List<PlanOption>();
+			for (
+				Stewardship_Plan_Template__c template : StewardshipSelector.selectManualTemplates()
+			) {
+				PlanOption option = new PlanOption();
+				option.label = template.Name;
+				option.value = template.Id;
+				option.description = template.Description__c;
+				model.plans.add(option);
+			}
+			return model;
+		} catch (Exception failure) {
+			// Cacheable: no Error Log insert is allowed here, so the screen gets the sentence.
+			throw UserErrors.message(Label.Giving_Stewardship_StartLoadFailed);
+		}
+	}
 
-    /**
-     * Starts one plan on the donor whose page the action was opened from, and returns the plan.
-     * A person is the plan's Contact; a household or organization is its Account.
-     */
-    @AuraEnabled
-    public static Id startPlan(Id templateId, Id donorId) {
-        if (!canStart()) {
-            throw UserErrors.message(Label.Giving_Stewardship_StartNoPermission);
-        }
-        if (donorId == null) {
-            throw UserErrors.message(Label.Giving_Stewardship_ErrorOneDonor);
-        }
-        Boolean isPerson = donorId.getSObjectType() == Contact.SObjectType;
-        // The start runs in system mode, so the person must be able to see the donor first
-        // (2026-10-28 security review, G-L3). Anything but a person is read as an account.
-        if (!canSee(donorId, isPerson)) {
-            throw UserErrors.message(Label.Giving_Stewardship_ErrorDonorNotVisible);
-        }
-        try {
-            return StewardshipService.start(
-                    templateId,
-                    isPerson ? donorId : null,
-                    isPerson ? null : donorId
-                )
-                .Id;
-        } catch (StewardshipService.StewardshipException refused) {
-            throw UserErrors.message(refused.getMessage());
-        } catch (Exception failure) {
-            ErrorLogger.log(failure, CONTEXT, donorId);
-            throw UserErrors.message(Label.Giving_Stewardship_ErrorActionFailed);
-        }
-    }
+	/**
+	 * Starts one plan on the donor whose page the action was opened from, and returns the plan.
+	 * A person is the plan's Contact; a household or organization is its Account.
+	 */
+	@AuraEnabled
+	public static Id startPlan(Id templateId, Id donorId) {
+		if (!canStart()) {
+			throw UserErrors.message(Label.Giving_Stewardship_StartNoPermission);
+		}
+		if (donorId == null) {
+			throw UserErrors.message(Label.Giving_Stewardship_ErrorOneDonor);
+		}
+		Boolean isPerson = donorId.getSObjectType() == Contact.SObjectType;
+		// The start runs in system mode, so the person must be able to see the donor first
+		// (2026-10-28 security review, G-L3). Anything but a person is read as an account.
+		if (!canSee(donorId, isPerson)) {
+			throw UserErrors.message(Label.Giving_Stewardship_ErrorDonorNotVisible);
+		}
+		try {
+			return StewardshipService.start(
+					templateId,
+					isPerson ? donorId : null,
+					isPerson ? null : donorId
+				)
+				.Id;
+		} catch (StewardshipService.StewardshipException refused) {
+			throw UserErrors.message(refused.getMessage());
+		} catch (Exception failure) {
+			ErrorLogger.log(failure, CONTEXT, donorId);
+			throw UserErrors.message(Label.Giving_Stewardship_ErrorActionFailed);
+		}
+	}
 
-    /** Whether the running user can read the donor, in user mode. */
-    private static Boolean canSee(Id donorId, Boolean isPerson) {
-        return isPerson
-            ? [SELECT COUNT() FROM Contact WHERE Id = :donorId WITH USER_MODE] == 1
-            : [SELECT COUNT() FROM Account WHERE Id = :donorId WITH USER_MODE] == 1;
-    }
+	/** Whether the running user can read the donor, in user mode. */
+	private static Boolean canSee(Id donorId, Boolean isPerson) {
+		return isPerson
+			? [SELECT COUNT() FROM Contact WHERE Id = :donorId WITH USER_MODE] == 1
+			: [SELECT COUNT() FROM Account WHERE Id = :donorId WITH USER_MODE] == 1;
+	}
 
-    private static Boolean canStart() {
-        return Schema.SObjectType.Stewardship_Plan__c.isCreateable();
-    }
+	private static Boolean canStart() {
+		return Schema.SObjectType.Stewardship_Plan__c.isCreateable();
+	}
 }

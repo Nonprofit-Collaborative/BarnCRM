@@ -7,5 +7,5 @@
  * the merge's own bookkeeping, not an automation an administrator switches off.
  */
 trigger MergeSettlementReadyTrigger on Merge_Settlement_Ready__e(after insert) {
-    MergeSettlement.settlePublished(Trigger.new);
+	MergeSettlement.settlePublished(Trigger.new);
 }

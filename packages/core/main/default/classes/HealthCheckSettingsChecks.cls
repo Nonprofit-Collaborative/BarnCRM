@@ -16,329 +16,329 @@
  * it here: same keys, same severities, same categories, same labels, same fix targets.
  */
 public with sharing class HealthCheckSettingsChecks {
-    /** Whether automation is running or paused, said out loud either way. */
-    public class AutomationCheck implements HealthCheckService.Check {
-        public HealthCheckService.Finding run() {
-            return automationFinding();
-        }
-    }
+	/** Whether automation is running or paused, said out loud either way. */
+	public class AutomationCheck implements HealthCheckService.Check {
+		public HealthCheckService.Finding run() {
+			return automationFinding();
+		}
+	}
 
-    /** Whether the org's custom fiscal year can make reports and totals disagree. */
-    public class FiscalYearCheck implements HealthCheckService.Check {
-        public HealthCheckService.Finding run() {
-            return fiscalYearFinding();
-        }
-    }
+	/** Whether the org's custom fiscal year can make reports and totals disagree. */
+	public class FiscalYearCheck implements HealthCheckService.Check {
+		public HealthCheckService.Finding run() {
+			return fiscalYearFinding();
+		}
+	}
 
-    /**
-     * Whether the person running Health Check can use the record type for organizations
-     * (ADR-0141). Who else can is not readable from Apex, but the admin is the usual first to
-     * lose it: an org upgraded from a version whose permission sets gave Organization keeps
-     * the record type and loses the access, and the admin is who can give it back.
-     */
-    public class OrganizationRecordTypeCheck implements HealthCheckService.Check {
-        public HealthCheckService.Finding run() {
-            if (AccountKinds.organizationRecordTypeUsable()) {
-                return null;
-            }
-            return new HealthCheckService.Finding(
-                'organization_record_type_unavailable',
-                System.Label.Core_HealthCheck_OrganizationRecordTypeTitle,
-                String.format(
-                    BarnHelp.text('Core', 'Core_HealthCheck_OrganizationRecordTypeDetail'),
-                    new List<Object>{ AccountKinds.organizationRecordTypeLabel() }
-                ),
-                HealthCheckService.SEVERITY_WARNING,
-                HealthCheckService.CATEGORY_SETTINGS
-            );
-        }
-    }
+	/**
+	 * Whether the person running Health Check can use the record type for organizations
+	 * (ADR-0141). Who else can is not readable from Apex, but the admin is the usual first to
+	 * lose it: an org upgraded from a version whose permission sets gave Organization keeps
+	 * the record type and loses the access, and the admin is who can give it back.
+	 */
+	public class OrganizationRecordTypeCheck implements HealthCheckService.Check {
+		public HealthCheckService.Finding run() {
+			if (AccountKinds.organizationRecordTypeUsable()) {
+				return null;
+			}
+			return new HealthCheckService.Finding(
+				'organization_record_type_unavailable',
+				System.Label.Core_HealthCheck_OrganizationRecordTypeTitle,
+				String.format(
+					BarnHelp.text('Core', 'Core_HealthCheck_OrganizationRecordTypeDetail'),
+					new List<Object>{ AccountKinds.organizationRecordTypeLabel() }
+				),
+				HealthCheckService.SEVERITY_WARNING,
+				HealthCheckService.CATEGORY_SETTINGS
+			);
+		}
+	}
 
-    /** A scheduled error digest that has stopped running. */
-    public class ErrorDigestCheck implements HealthCheckService.Check {
-        public HealthCheckService.Finding run() {
-            return errorDigestFinding();
-        }
-    }
+	/** A scheduled error digest that has stopped running. */
+	public class ErrorDigestCheck implements HealthCheckService.Check {
+		public HealthCheckService.Finding run() {
+			return errorDigestFinding();
+		}
+	}
 
-    /** How many Error Log rows nobody has read yet. */
-    public class ErrorLogCheck implements HealthCheckService.Check {
-        public HealthCheckService.Finding run() {
-            return errorLogFinding();
-        }
-    }
+	/** How many Error Log rows nobody has read yet. */
+	public class ErrorLogCheck implements HealthCheckService.Check {
+		public HealthCheckService.Finding run() {
+			return errorLogFinding();
+		}
+	}
 
-    /** Shipped automations with no switch on the Automation page. */
-    public class AutomationSwitchesCheck implements HealthCheckService.Check {
-        public HealthCheckService.Finding run() {
-            return missingDefaultsFinding(
-                    'automation_switches_missing',
-                    HealthCheckService.FIX_KEY_RESTORE_AUTOMATION_SWITCHES,
-                    System.Label.Core_HealthCheck_SwitchesMissingTitleOne,
-                    System.Label.Core_HealthCheck_SwitchesMissingTitle,
-                    BarnHelp.text('Core', 'Core_HealthCheck_SwitchesMissingDetail'),
-                    HealthCheckService.SEVERITY_INFO
-                )
-                ?.withFix(
-                    System.Label.Core_HealthCheck_SwitchesMissingFix,
-                    HealthCheckService.FIX_ACTION_PREFIX +
-                    HealthCheckService.FIX_KEY_RESTORE_AUTOMATION_SWITCHES
-                );
-        }
-    }
+	/** Shipped automations with no switch on the Automation page. */
+	public class AutomationSwitchesCheck implements HealthCheckService.Check {
+		public HealthCheckService.Finding run() {
+			return missingDefaultsFinding(
+					'automation_switches_missing',
+					HealthCheckService.FIX_KEY_RESTORE_AUTOMATION_SWITCHES,
+					System.Label.Core_HealthCheck_SwitchesMissingTitleOne,
+					System.Label.Core_HealthCheck_SwitchesMissingTitle,
+					BarnHelp.text('Core', 'Core_HealthCheck_SwitchesMissingDetail'),
+					HealthCheckService.SEVERITY_INFO
+				)
+				?.withFix(
+					System.Label.Core_HealthCheck_SwitchesMissingFix,
+					HealthCheckService.FIX_ACTION_PREFIX +
+					HealthCheckService.FIX_KEY_RESTORE_AUTOMATION_SWITCHES
+				);
+		}
+	}
 
-    /** Shipped import templates this org does not have. */
-    public class ImportTemplatesCheck implements HealthCheckService.Check {
-        public HealthCheckService.Finding run() {
-            return missingDefaultsFinding(
-                    'import_templates_missing',
-                    HealthCheckService.FIX_KEY_RESTORE_IMPORT_TEMPLATES,
-                    System.Label.Core_HealthCheck_TemplatesMissingTitleOne,
-                    System.Label.Core_HealthCheck_TemplatesMissingTitle,
-                    BarnHelp.text('Core', 'Core_HealthCheck_TemplatesMissingDetail'),
-                    HealthCheckService.SEVERITY_INFO
-                )
-                ?.withFix(
-                    System.Label.Core_HealthCheck_TemplatesMissingFix,
-                    HealthCheckService.FIX_ACTION_PREFIX +
-                    HealthCheckService.FIX_KEY_RESTORE_IMPORT_TEMPLATES
-                );
-        }
-    }
+	/** Shipped import templates this org does not have. */
+	public class ImportTemplatesCheck implements HealthCheckService.Check {
+		public HealthCheckService.Finding run() {
+			return missingDefaultsFinding(
+					'import_templates_missing',
+					HealthCheckService.FIX_KEY_RESTORE_IMPORT_TEMPLATES,
+					System.Label.Core_HealthCheck_TemplatesMissingTitleOne,
+					System.Label.Core_HealthCheck_TemplatesMissingTitle,
+					BarnHelp.text('Core', 'Core_HealthCheck_TemplatesMissingDetail'),
+					HealthCheckService.SEVERITY_INFO
+				)
+				?.withFix(
+					System.Label.Core_HealthCheck_TemplatesMissingFix,
+					HealthCheckService.FIX_ACTION_PREFIX +
+					HealthCheckService.FIX_KEY_RESTORE_IMPORT_TEMPLATES
+				);
+		}
+	}
 
-    public class NightlyJobsCheck implements HealthCheckService.Check {
-        public HealthCheckService.Finding run() {
-            return nightlyJobsFinding();
-        }
-    }
+	public class NightlyJobsCheck implements HealthCheckService.Check {
+		public HealthCheckService.Finding run() {
+			return nightlyJobsFinding();
+		}
+	}
 
-    /**
-     * Scheduled BarnCRM jobs whose owner has been deactivated (ADMIN-12). Such a job stops
-     * running but keeps its trigger, so every other check and page reads it as scheduled.
-     */
-    public class InactiveOwnerJobsCheck implements HealthCheckService.Check {
-        public HealthCheckService.Finding run() {
-            List<String> stopped = HealthCheckService.fixScope(
-                HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS
-            );
-            if (stopped.isEmpty()) {
-                return null;
-            }
-            return new HealthCheckService.Finding(
-                    'jobs_inactive_owner',
-                    System.Label.Core_HealthCheck_InactiveOwnerJobsTitle,
-                    String.format(
-                        BarnHelp.text('Core', 'Core_HealthCheck_InactiveOwnerJobsDetail'),
-                        new List<Object>{ String.join(stopped, HealthCheckService.JOB_SEPARATOR) }
-                    ),
-                    HealthCheckService.SEVERITY_WARNING,
-                    HealthCheckService.CATEGORY_SETTINGS
-                )
-                .withFix(
-                    System.Label.Core_HealthCheck_InactiveOwnerJobsFix,
-                    HealthCheckService.FIX_ACTION_PREFIX +
-                    HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS
-                )
-                .withScope(stopped);
-        }
-    }
+	/**
+	 * Scheduled BarnCRM jobs whose owner has been deactivated (ADMIN-12). Such a job stops
+	 * running but keeps its trigger, so every other check and page reads it as scheduled.
+	 */
+	public class InactiveOwnerJobsCheck implements HealthCheckService.Check {
+		public HealthCheckService.Finding run() {
+			List<String> stopped = HealthCheckService.fixScope(
+				HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS
+			);
+			if (stopped.isEmpty()) {
+				return null;
+			}
+			return new HealthCheckService.Finding(
+					'jobs_inactive_owner',
+					System.Label.Core_HealthCheck_InactiveOwnerJobsTitle,
+					String.format(
+						BarnHelp.text('Core', 'Core_HealthCheck_InactiveOwnerJobsDetail'),
+						new List<Object>{ String.join(stopped, HealthCheckService.JOB_SEPARATOR) }
+					),
+					HealthCheckService.SEVERITY_WARNING,
+					HealthCheckService.CATEGORY_SETTINGS
+				)
+				.withFix(
+					System.Label.Core_HealthCheck_InactiveOwnerJobsFix,
+					HealthCheckService.FIX_ACTION_PREFIX +
+					HealthCheckService.FIX_KEY_RESCHEDULE_INACTIVE_OWNER_JOBS
+				)
+				.withScope(stopped);
+		}
+	}
 
-    /**
-     * Every BarnCRM nightly job that is not scheduled, Core's and those modules register, in
-     * one finding with one fix that schedules them all (ADR-0075,
-     * health-check-schedules-every-nightly-job). Nothing is scheduled on install, so this is
-     * the one place an administrator is told.
-     */
-    private static HealthCheckService.Finding nightlyJobsFinding() {
-        List<String> waiting = HealthCheckService.fixScope(
-            HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS
-        );
-        if (waiting.isEmpty()) {
-            return null;
-        }
-        return new HealthCheckService.Finding(
-                'nightly_jobs_not_scheduled',
-                System.Label.Core_HealthCheck_NightlyJobsTitle,
-                String.format(
-                    BarnHelp.text('Core', 'Core_HealthCheck_NightlyJobsDetail'),
-                    new List<Object>{ String.join(waiting, HealthCheckService.JOB_SEPARATOR) }
-                ),
-                HealthCheckService.SEVERITY_WARNING,
-                HealthCheckService.CATEGORY_SETTINGS
-            )
-            .withFix(
-                System.Label.Core_HealthCheck_NightlyJobsFix,
-                HealthCheckService.FIX_ACTION_PREFIX +
-                HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS
-            )
-            .withScope(waiting);
-    }
+	/**
+	 * Every BarnCRM nightly job that is not scheduled, Core's and those modules register, in
+	 * one finding with one fix that schedules them all (ADR-0075,
+	 * health-check-schedules-every-nightly-job). Nothing is scheduled on install, so this is
+	 * the one place an administrator is told.
+	 */
+	private static HealthCheckService.Finding nightlyJobsFinding() {
+		List<String> waiting = HealthCheckService.fixScope(
+			HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS
+		);
+		if (waiting.isEmpty()) {
+			return null;
+		}
+		return new HealthCheckService.Finding(
+				'nightly_jobs_not_scheduled',
+				System.Label.Core_HealthCheck_NightlyJobsTitle,
+				String.format(
+					BarnHelp.text('Core', 'Core_HealthCheck_NightlyJobsDetail'),
+					new List<Object>{ String.join(waiting, HealthCheckService.JOB_SEPARATOR) }
+				),
+				HealthCheckService.SEVERITY_WARNING,
+				HealthCheckService.CATEGORY_SETTINGS
+			)
+			.withFix(
+				System.Label.Core_HealthCheck_NightlyJobsFix,
+				HealthCheckService.FIX_ACTION_PREFIX +
+				HealthCheckService.FIX_KEY_SCHEDULE_NIGHTLY_JOBS
+			)
+			.withScope(waiting);
+	}
 
-    /**
-     * One finding naming the package defaults that are missing, or null when none is. The
-     * title and detail take the count as {0} and the names as {1}, so the finding says what
-     * its fix will create, counted from this org, and it carries the same names as its fix
-     * scope, so the fix creates exactly those (ADR-0048 condition 5). `titleOne` is the title
-     * when exactly one is missing.
-     */
-    private static HealthCheckService.Finding missingDefaultsFinding(
-        String key,
-        String fixKey,
-        String titleOne,
-        String title,
-        String detail,
-        String severity
-    ) {
-        List<String> missingNames = HealthCheckService.fixScope(fixKey);
-        if (missingNames == null || missingNames.isEmpty()) {
-            return null;
-        }
-        List<Object> values = new List<Object>{
-            String.valueOf(missingNames.size()),
-            String.join(missingNames, ', ')
-        };
-        return new HealthCheckService.Finding(
-                key,
-                HealthCheckService.forCount(missingNames.size(), titleOne, title, values),
-                String.format(detail, values),
-                severity,
-                HealthCheckService.CATEGORY_SETTINGS
-            )
-            .withScope(missingNames);
-    }
+	/**
+	 * One finding naming the package defaults that are missing, or null when none is. The
+	 * title and detail take the count as {0} and the names as {1}, so the finding says what
+	 * its fix will create, counted from this org, and it carries the same names as its fix
+	 * scope, so the fix creates exactly those (ADR-0048 condition 5). `titleOne` is the title
+	 * when exactly one is missing.
+	 */
+	private static HealthCheckService.Finding missingDefaultsFinding(
+		String key,
+		String fixKey,
+		String titleOne,
+		String title,
+		String detail,
+		String severity
+	) {
+		List<String> missingNames = HealthCheckService.fixScope(fixKey);
+		if (missingNames == null || missingNames.isEmpty()) {
+			return null;
+		}
+		List<Object> values = new List<Object>{
+			String.valueOf(missingNames.size()),
+			String.join(missingNames, ', ')
+		};
+		return new HealthCheckService.Finding(
+				key,
+				HealthCheckService.forCount(missingNames.size(), titleOne, title, values),
+				String.format(detail, values),
+				severity,
+				HealthCheckService.CATEGORY_SETTINGS
+			)
+			.withScope(missingNames);
+	}
 
-    private static HealthCheckService.Finding automationFinding() {
-        BarnCRM_Settings__c settings = SettingsService.getSettings();
-        Datetime pausedUntil = settings == null ? null : settings.Automation_Paused_Until__c;
-        if (pausedUntil == null || pausedUntil <= System.now()) {
-            return new HealthCheckService.Finding(
-                'automation_running',
-                System.Label.Core_HealthCheck_AutomationRunningTitle,
-                BarnHelp.text('Core', 'Core_HealthCheck_AutomationRunningDetail'),
-                HealthCheckService.SEVERITY_INFO,
-                HealthCheckService.CATEGORY_SETTINGS
-            );
-        }
+	private static HealthCheckService.Finding automationFinding() {
+		BarnCRM_Settings__c settings = SettingsService.getSettings();
+		Datetime pausedUntil = settings == null ? null : settings.Automation_Paused_Until__c;
+		if (pausedUntil == null || pausedUntil <= System.now()) {
+			return new HealthCheckService.Finding(
+				'automation_running',
+				System.Label.Core_HealthCheck_AutomationRunningTitle,
+				BarnHelp.text('Core', 'Core_HealthCheck_AutomationRunningDetail'),
+				HealthCheckService.SEVERITY_INFO,
+				HealthCheckService.CATEGORY_SETTINGS
+			);
+		}
 
-        // A pause nothing will end on time is a warning rather than information: it was set
-        // before automatic resume existed, or somewhere other than the Automation page (R-A5).
-        Boolean withoutResume = AutomationControl.isPauseWithoutResume();
-        String detail = String.format(
-            withoutResume
-                ? BarnHelp.text('Core', 'Core_HealthCheck_PausedNoResumeDetail')
-                : BarnHelp.text('Core', 'Core_HealthCheck_AutomationPausedDetail'),
-            new List<Object>{ pausedUntil.format() }
-        );
-        return new HealthCheckService.Finding(
-                withoutResume ? 'automation_paused_no_resume' : 'automation_paused',
-                withoutResume
-                    ? System.Label.Core_HealthCheck_PausedNoResumeTitle
-                    : System.Label.Core_HealthCheck_AutomationPausedTitle,
-                detail,
-                withoutResume
-                    ? HealthCheckService.SEVERITY_WARNING
-                    : HealthCheckService.SEVERITY_INFO,
-                HealthCheckService.CATEGORY_SETTINGS
-            )
-            .withFix(
-                System.Label.Core_HealthCheck_AutomationFix,
-                HealthCheckService.SECTION_AUTOMATION
-            );
-    }
+		// A pause nothing will end on time is a warning rather than information: it was set
+		// before automatic resume existed, or somewhere other than the Automation page (R-A5).
+		Boolean withoutResume = AutomationControl.isPauseWithoutResume();
+		String detail = String.format(
+			withoutResume
+				? BarnHelp.text('Core', 'Core_HealthCheck_PausedNoResumeDetail')
+				: BarnHelp.text('Core', 'Core_HealthCheck_AutomationPausedDetail'),
+			new List<Object>{ pausedUntil.format() }
+		);
+		return new HealthCheckService.Finding(
+				withoutResume ? 'automation_paused_no_resume' : 'automation_paused',
+				withoutResume
+					? System.Label.Core_HealthCheck_PausedNoResumeTitle
+					: System.Label.Core_HealthCheck_AutomationPausedTitle,
+				detail,
+				withoutResume
+					? HealthCheckService.SEVERITY_WARNING
+					: HealthCheckService.SEVERITY_INFO,
+				HealthCheckService.CATEGORY_SETTINGS
+			)
+			.withFix(
+				System.Label.Core_HealthCheck_AutomationFix,
+				HealthCheckService.SECTION_AUTOMATION
+			);
+	}
 
-    /**
-     * Whether the org uses a custom fiscal year (ADR-0135). BarnCRM windows are whole years
-     * from the org's fiscal year start month; report date literals follow custom periods, so
-     * with a custom year the two can disagree. Said as information, with no fix button: the
-     * only change is in Setup, and an org may keep its custom year on purpose.
-     */
-    private static HealthCheckService.Finding fiscalYearFinding() {
-        if (!FiscalYearSelector.usesCustomFiscalYears()) {
-            return null;
-        }
-        return new HealthCheckService.Finding(
-            'custom_fiscal_year',
-            System.Label.Core_HealthCheck_CustomFiscalYearTitle,
-            String.format(
-                BarnHelp.text('Core', 'Core_HealthCheck_CustomFiscalYearDetail'),
-                new List<Object>{
-                    FiscalYearSelector.monthName(FiscalYearSelector.fiscalYearStartMonth())
-                }
-            ),
-            HealthCheckService.SEVERITY_INFO,
-            HealthCheckService.CATEGORY_SETTINGS
-        );
-    }
+	/**
+	 * Whether the org uses a custom fiscal year (ADR-0135). BarnCRM windows are whole years
+	 * from the org's fiscal year start month; report date literals follow custom periods, so
+	 * with a custom year the two can disagree. Said as information, with no fix button: the
+	 * only change is in Setup, and an org may keep its custom year on purpose.
+	 */
+	private static HealthCheckService.Finding fiscalYearFinding() {
+		if (!FiscalYearSelector.usesCustomFiscalYears()) {
+			return null;
+		}
+		return new HealthCheckService.Finding(
+			'custom_fiscal_year',
+			System.Label.Core_HealthCheck_CustomFiscalYearTitle,
+			String.format(
+				BarnHelp.text('Core', 'Core_HealthCheck_CustomFiscalYearDetail'),
+				new List<Object>{
+					FiscalYearSelector.monthName(FiscalYearSelector.fiscalYearStartMonth())
+				}
+			),
+			HealthCheckService.SEVERITY_INFO,
+			HealthCheckService.CATEGORY_SETTINGS
+		);
+	}
 
-    /**
-     * How many new Error Log entries the finding counts before it says "N or more" instead. A
-     * flooded Error Log would otherwise spend a query row per entry, and past the transaction's
-     * row limit the whole Health Check page fails (dynamic-apex.md, "Cap every count and read").
-     */
-    @TestVisible
-    private static Integer errorLogCap = 1000;
+	/**
+	 * How many new Error Log entries the finding counts before it says "N or more" instead. A
+	 * flooded Error Log would otherwise spend a query row per entry, and past the transaction's
+	 * row limit the whole Health Check page fails (dynamic-apex.md, "Cap every count and read").
+	 */
+	@TestVisible
+	private static Integer errorLogCap = 1000;
 
-    private static HealthCheckService.Finding errorLogFinding() {
-        Integer newErrors = ErrorLogCountSelector.countNewUpTo(errorLogCap);
-        if (newErrors <= 0) {
-            return null;
-        }
+	private static HealthCheckService.Finding errorLogFinding() {
+		Integer newErrors = ErrorLogCountSelector.countNewUpTo(errorLogCap);
+		if (newErrors <= 0) {
+			return null;
+		}
 
-        String counted = newErrors > errorLogCap
-            ? String.format(
-                  System.Label.Core_HealthCheck_CountOrMore,
-                  new List<Object>{ errorLogCap.format() }
-              )
-            : newErrors.format();
-        List<Object> count = new List<Object>{ counted };
-        return new HealthCheckService.Finding(
-                'error_log_new',
-                HealthCheckService.forCount(
-                    newErrors,
-                    System.Label.Core_HealthCheck_ErrorLogTitleOne,
-                    System.Label.Core_HealthCheck_ErrorLogTitle,
-                    count
-                ),
-                HealthCheckService.forCount(
-                    newErrors,
-                    BarnHelp.text('Core', 'Core_HealthCheck_ErrorLogDetailOne'),
-                    BarnHelp.text('Core', 'Core_HealthCheck_ErrorLogDetail'),
-                    count
-                ),
-                HealthCheckService.SEVERITY_WARNING,
-                HealthCheckService.CATEGORY_SETTINGS
-            )
-            .withFix(System.Label.Core_ErrorLogTile_ViewAll, ErrorLogCountSelector.listViewUrl());
-    }
+		String counted = newErrors > errorLogCap
+			? String.format(
+					System.Label.Core_HealthCheck_CountOrMore,
+					new List<Object>{ errorLogCap.format() }
+			  )
+			: newErrors.format();
+		List<Object> count = new List<Object>{ counted };
+		return new HealthCheckService.Finding(
+				'error_log_new',
+				HealthCheckService.forCount(
+					newErrors,
+					System.Label.Core_HealthCheck_ErrorLogTitleOne,
+					System.Label.Core_HealthCheck_ErrorLogTitle,
+					count
+				),
+				HealthCheckService.forCount(
+					newErrors,
+					BarnHelp.text('Core', 'Core_HealthCheck_ErrorLogDetailOne'),
+					BarnHelp.text('Core', 'Core_HealthCheck_ErrorLogDetail'),
+					count
+				),
+				HealthCheckService.SEVERITY_WARNING,
+				HealthCheckService.CATEGORY_SETTINGS
+			)
+			.withFix(System.Label.Core_ErrorLogTile_ViewAll, ErrorLogCountSelector.listViewUrl());
+	}
 
-    /** How long a scheduled daily digest may go without a run before it is a finding. */
-    @TestVisible
-    private static final Integer DIGEST_STALE_DAYS = 2;
+	/** How long a scheduled daily digest may go without a run before it is a finding. */
+	@TestVisible
+	private static final Integer DIGEST_STALE_DAYS = 2;
 
-    /**
-     * Whether the error digest is scheduled but has not run for more than two days (ADR-0055).
-     * The job runs as the person who scheduled it, so it stops when that person is deactivated,
-     * and nothing else would say so: the panel still shows it as scheduled. A digest that has
-     * never run is not reported; its first run is at most a day away.
-     */
-    private static HealthCheckService.Finding errorDigestFinding() {
-        if (ErrorDigestScheduler.nextRunAt() == null) {
-            return null;
-        }
-        Datetime lastRun = SettingsService.getSettings().Error_Digest_Last_Run__c;
-        if (lastRun == null || lastRun > System.now().addDays(-DIGEST_STALE_DAYS)) {
-            return null;
-        }
-        return new HealthCheckService.Finding(
-                'error_digest_stale',
-                System.Label.Core_HealthCheck_DigestStaleTitle,
-                String.format(
-                    BarnHelp.text('Core', 'Core_HealthCheck_DigestStaleDetail'),
-                    new List<Object>{ lastRun.format() }
-                ),
-                HealthCheckService.SEVERITY_WARNING,
-                HealthCheckService.CATEGORY_SETTINGS
-            )
-            .withFix(System.Label.Core_HealthCheck_DigestStaleFix, SettingSections.ERROR_LOG);
-    }
+	/**
+	 * Whether the error digest is scheduled but has not run for more than two days (ADR-0055).
+	 * The job runs as the person who scheduled it, so it stops when that person is deactivated,
+	 * and nothing else would say so: the panel still shows it as scheduled. A digest that has
+	 * never run is not reported; its first run is at most a day away.
+	 */
+	private static HealthCheckService.Finding errorDigestFinding() {
+		if (ErrorDigestScheduler.nextRunAt() == null) {
+			return null;
+		}
+		Datetime lastRun = SettingsService.getSettings().Error_Digest_Last_Run__c;
+		if (lastRun == null || lastRun > System.now().addDays(-DIGEST_STALE_DAYS)) {
+			return null;
+		}
+		return new HealthCheckService.Finding(
+				'error_digest_stale',
+				System.Label.Core_HealthCheck_DigestStaleTitle,
+				String.format(
+					BarnHelp.text('Core', 'Core_HealthCheck_DigestStaleDetail'),
+					new List<Object>{ lastRun.format() }
+				),
+				HealthCheckService.SEVERITY_WARNING,
+				HealthCheckService.CATEGORY_SETTINGS
+			)
+			.withFix(System.Label.Core_HealthCheck_DigestStaleFix, SettingSections.ERROR_LOG);
+	}
 }

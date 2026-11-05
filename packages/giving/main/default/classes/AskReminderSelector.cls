@@ -10,27 +10,27 @@
  * SOQL cannot do, so the service makes that test on the rows this returns.
  */
 public with sharing class AskReminderSelector {
-    /** The people whose Next Ask Date has arrived and is not stale. */
-    public static Database.QueryLocator contactLocator(Date earliest, Date latest) {
-        return Database.getQueryLocator(
-            [
-                SELECT Id, Name, AccountId, OwnerId, Next_Ask_Date__c, Ask_Reminder_For_Date__c
-                FROM Contact
-                WHERE Next_Ask_Date__c >= :earliest AND Next_Ask_Date__c <= :latest
-                WITH SYSTEM_MODE
-            ]
-        );
-    }
+	/** The people whose Next Ask Date has arrived and is not stale. */
+	public static Database.QueryLocator contactLocator(Date earliest, Date latest) {
+		return Database.getQueryLocator(
+			[
+				SELECT Id, Name, AccountId, OwnerId, Next_Ask_Date__c, Ask_Reminder_For_Date__c
+				FROM Contact
+				WHERE Next_Ask_Date__c >= :earliest AND Next_Ask_Date__c <= :latest
+				WITH SYSTEM_MODE
+			]
+		);
+	}
 
-    /** The organizations and households, on the same terms as the people. */
-    public static Database.QueryLocator accountLocator(Date earliest, Date latest) {
-        return Database.getQueryLocator(
-            [
-                SELECT Id, Name, OwnerId, Next_Ask_Date__c, Ask_Reminder_For_Date__c
-                FROM Account
-                WHERE Next_Ask_Date__c >= :earliest AND Next_Ask_Date__c <= :latest
-                WITH SYSTEM_MODE
-            ]
-        );
-    }
+	/** The organizations and households, on the same terms as the people. */
+	public static Database.QueryLocator accountLocator(Date earliest, Date latest) {
+		return Database.getQueryLocator(
+			[
+				SELECT Id, Name, OwnerId, Next_Ask_Date__c, Ask_Reminder_For_Date__c
+				FROM Account
+				WHERE Next_Ask_Date__c >= :earliest AND Next_Ask_Date__c <= :latest
+				WITH SYSTEM_MODE
+			]
+		);
+	}
 }

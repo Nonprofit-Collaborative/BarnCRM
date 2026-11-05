@@ -12,84 +12,84 @@
  * written, so a normal night reads broadly and writes very little.
  */
 public with sharing class DonorLevelBatch implements Database.Batchable<SObject>, Database.Stateful {
-    @TestVisible
-    private static final String ACCOUNTS = 'Account';
-    @TestVisible
-    private static final String CONTACTS = 'Contact';
-    /** The settings console section the Donor Levels page is in. */
-    private static final String GIVING_SECTION = 'Giving';
+	@TestVisible
+	private static final String ACCOUNTS = 'Account';
+	@TestVisible
+	private static final String CONTACTS = 'Contact';
+	/** The settings console section the Donor Levels page is in. */
+	private static final String GIVING_SECTION = 'Giving';
 
-    private final String scopeObject;
-    private Integer moved = 0;
-    /** Who pressed Recalculate now, told when the run ends; null for the nightly run (Q-04). */
-    private Id notifyUserId;
+	private final String scopeObject;
+	private Integer moved = 0;
+	/** Who pressed Recalculate now, told when the run ends; null for the nightly run (Q-04). */
+	private Id notifyUserId;
 
-    /** A run that starts with accounts and chains to contacts. */
-    public DonorLevelBatch() {
-        this(ACCOUNTS, JobNotifier.starter(), 0);
-    }
+	/** A run that starts with accounts and chains to contacts. */
+	public DonorLevelBatch() {
+		this(ACCOUNTS, JobNotifier.starter(), 0);
+	}
 
-    @TestVisible
-    private DonorLevelBatch(String scopeObject) {
-        this(scopeObject, JobNotifier.starter(), 0);
-    }
+	@TestVisible
+	private DonorLevelBatch(String scopeObject) {
+		this(scopeObject, JobNotifier.starter(), 0);
+	}
 
-    /** A pass that carries who to tell and what the passes before it moved. */
-    private DonorLevelBatch(String scopeObject, Id notifyUserId, Integer moved) {
-        this.scopeObject = scopeObject;
-        this.notifyUserId = notifyUserId;
-        this.moved = moved;
-    }
+	/** A pass that carries who to tell and what the passes before it moved. */
+	private DonorLevelBatch(String scopeObject, Id notifyUserId, Integer moved) {
+		this.scopeObject = scopeObject;
+		this.notifyUserId = notifyUserId;
+		this.moved = moved;
+	}
 
-    public Database.QueryLocator start(Database.BatchableContext context) {
-        return ACCOUNTS.equals(scopeObject)
-            ? DonorLevelSelector.accountLocator()
-            : DonorLevelSelector.contactLocator();
-    }
+	public Database.QueryLocator start(Database.BatchableContext context) {
+		return ACCOUNTS.equals(scopeObject)
+			? DonorLevelSelector.accountLocator()
+			: DonorLevelSelector.contactLocator();
+	}
 
-    public void execute(Database.BatchableContext context, List<SObject> scope) {
-        try {
-            DonorLevelService.clearCache();
-            // The records as read, so only values the pass changed are written (RT-09).
-            Map<Id, SObject> before = new Map<Id, SObject>();
-            for (SObject record : scope) {
-                before.put(record.Id, record.clone(true, true, true, true));
-            }
-            List<SObject> changed = DonorLevelService.assignAll(scope);
-            // The same pass keeps donor scores right as the days go by (G-19, R-DT5).
-            List<SObject> rescored = DonorScoreService.scoreAll(scope);
-            Map<Id, SObject> toSave = new Map<Id, SObject>(changed);
-            toSave.putAll(rescored);
-            DonorLevelWriter.saveChanged(toSave.values(), before);
-            moved += changed.size();
-        } catch (Exception chunkFailure) {
-            // One bad chunk must not stop the rest of the org being re-placed.
-            ErrorLogger.log(chunkFailure, 'DonorLevelBatch.' + scopeObject);
-        }
-    }
+	public void execute(Database.BatchableContext context, List<SObject> scope) {
+		try {
+			DonorLevelService.clearCache();
+			// The records as read, so only values the pass changed are written (RT-09).
+			Map<Id, SObject> before = new Map<Id, SObject>();
+			for (SObject record : scope) {
+				before.put(record.Id, record.clone(true, true, true, true));
+			}
+			List<SObject> changed = DonorLevelService.assignAll(scope);
+			// The same pass keeps donor scores right as the days go by (G-19, R-DT5).
+			List<SObject> rescored = DonorScoreService.scoreAll(scope);
+			Map<Id, SObject> toSave = new Map<Id, SObject>(changed);
+			toSave.putAll(rescored);
+			DonorLevelWriter.saveChanged(toSave.values(), before);
+			moved += changed.size();
+		} catch (Exception chunkFailure) {
+			// One bad chunk must not stop the rest of the org being re-placed.
+			ErrorLogger.log(chunkFailure, 'DonorLevelBatch.' + scopeObject);
+		}
+	}
 
-    public void finish(Database.BatchableContext context) {
-        try {
-            if (ACCOUNTS.equals(scopeObject)) {
-                if (!Test.isRunningTest()) {
-                    Database.executeBatch(new DonorLevelBatch(CONTACTS, notifyUserId, moved), 200);
-                }
-                return;
-            }
-            DonorLevelService.recordRecalculation(System.now());
-        } catch (Exception finishFailure) {
-            ErrorLogger.log(finishFailure, 'DonorLevelBatch.finish');
-        }
-        // The contacts pass is the end of the run, so the one notification goes from there.
-        JobNotifier.aboutSettings(
-            notifyUserId,
-            Label.Giving_JobNotice_DonorLevels,
-            false,
-            String.format(
-                Label.Giving_JobNotice_DonorLevelsBody,
-                new List<Object>{ moved.format() }
-            ),
-            GIVING_SECTION
-        );
-    }
+	public void finish(Database.BatchableContext context) {
+		try {
+			if (ACCOUNTS.equals(scopeObject)) {
+				if (!Test.isRunningTest()) {
+					Database.executeBatch(new DonorLevelBatch(CONTACTS, notifyUserId, moved), 200);
+				}
+				return;
+			}
+			DonorLevelService.recordRecalculation(System.now());
+		} catch (Exception finishFailure) {
+			ErrorLogger.log(finishFailure, 'DonorLevelBatch.finish');
+		}
+		// The contacts pass is the end of the run, so the one notification goes from there.
+		JobNotifier.aboutSettings(
+			notifyUserId,
+			Label.Giving_JobNotice_DonorLevels,
+			false,
+			String.format(
+				Label.Giving_JobNotice_DonorLevelsBody,
+				new List<Object>{ moved.format() }
+			),
+			GIVING_SECTION
+		);
+	}
 }

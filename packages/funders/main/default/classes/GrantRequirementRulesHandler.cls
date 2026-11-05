@@ -5,27 +5,27 @@
  */
 @NamespaceAccessible
 public with sharing class GrantRequirementRulesHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public GrantRequirementRulesHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public GrantRequirementRulesHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'GrantRequirementRulesHandler';
-    }
+	public override String getName() {
+		return 'GrantRequirementRulesHandler';
+	}
 
-    public override void beforeInsert() {
-        GrantOutcomeService.checkOutcomes((List<Grant_Requirement__c>) newRecords());
-    }
+	public override void beforeInsert() {
+		GrantOutcomeService.checkOutcomes((List<Grant_Requirement__c>) newRecords());
+	}
 
-    public override void beforeUpdate() {
-        List<Grant_Requirement__c> changed = new List<Grant_Requirement__c>();
-        Map<Id, Grant_Requirement__c> oldById = (Map<Id, Grant_Requirement__c>) oldRecordsById();
-        for (Grant_Requirement__c requirement : (List<Grant_Requirement__c>) newRecords()) {
-            if (requirement.Outcome_Id__c != oldById.get(requirement.Id).Outcome_Id__c) {
-                changed.add(requirement);
-            }
-        }
-        GrantOutcomeService.checkOutcomes(changed);
-    }
+	public override void beforeUpdate() {
+		List<Grant_Requirement__c> changed = new List<Grant_Requirement__c>();
+		Map<Id, Grant_Requirement__c> oldById = (Map<Id, Grant_Requirement__c>) oldRecordsById();
+		for (Grant_Requirement__c requirement : (List<Grant_Requirement__c>) newRecords()) {
+			if (requirement.Outcome_Id__c != oldById.get(requirement.Id).Outcome_Id__c) {
+				changed.add(requirement);
+			}
+		}
+		GrantOutcomeService.checkOutcomes(changed);
+	}
 }

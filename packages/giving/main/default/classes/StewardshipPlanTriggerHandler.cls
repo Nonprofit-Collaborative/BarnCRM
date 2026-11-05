@@ -8,35 +8,35 @@
  */
 @NamespaceAccessible
 public with sharing class StewardshipPlanTriggerHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public StewardshipPlanTriggerHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public StewardshipPlanTriggerHandler() {
+		return;
+	}
 
-    public override void beforeInsert() {
-        syncCompletedDates(newRecords());
-    }
+	public override void beforeInsert() {
+		syncCompletedDates(newRecords());
+	}
 
-    public override void beforeUpdate() {
-        syncCompletedDates(newRecords());
-    }
+	public override void beforeUpdate() {
+		syncCompletedDates(newRecords());
+	}
 
-    /** Fills or clears Completed Date to match Status. */
-    @NamespaceAccessible
-    public static void syncCompletedDates(List<SObject> records) {
-        if (records == null) {
-            return;
-        }
-        for (SObject record : records) {
-            Stewardship_Plan__c plan = (Stewardship_Plan__c) record;
-            if (plan.Status__c == null) {
-                continue;
-            }
-            if (plan.Status__c == StewardshipService.STATUS_RUNNING) {
-                plan.Completed_Date__c = null;
-            } else if (plan.Completed_Date__c == null) {
-                plan.Completed_Date__c = System.today();
-            }
-        }
-    }
+	/** Fills or clears Completed Date to match Status. */
+	@NamespaceAccessible
+	public static void syncCompletedDates(List<SObject> records) {
+		if (records == null) {
+			return;
+		}
+		for (SObject record : records) {
+			Stewardship_Plan__c plan = (Stewardship_Plan__c) record;
+			if (plan.Status__c == null) {
+				continue;
+			}
+			if (plan.Status__c == StewardshipService.STATUS_RUNNING) {
+				plan.Completed_Date__c = null;
+			} else if (plan.Completed_Date__c == null) {
+				plan.Completed_Date__c = System.today();
+			}
+		}
+	}
 }

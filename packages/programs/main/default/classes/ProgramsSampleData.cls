@@ -10,101 +10,101 @@
  */
 @NamespaceAccessible
 public with sharing class ProgramsSampleData implements SampleDataModule {
-    @NamespaceAccessible
-    public ProgramsSampleData() {
-        // Built by name from Core (SampleDataModules), so it needs a public constructor.
-    }
+	@NamespaceAccessible
+	public ProgramsSampleData() {
+		// Built by name from Core (SampleDataModules), so it needs a public constructor.
+	}
 
-    public String moduleName() {
-        return ProgramsAccessSync.MODULE_NAME;
-    }
+	public String moduleName() {
+		return ProgramsAccessSync.MODULE_NAME;
+	}
 
-    public String countLabel() {
-        return System.Label.Programs_SampleData_CountLabel;
-    }
+	public String countLabel() {
+		return System.Label.Programs_SampleData_CountLabel;
+	}
 
-    /** The number the status card shows for Programs: sample people's enrollments. */
-    public Integer countLoaded() {
-        return canRead() ? ProgramSampleDataLoader.countSampleEnrollments() : 0;
-    }
+	/** The number the status card shows for Programs: sample people's enrollments. */
+	public Integer countLoaded() {
+		return canRead() ? ProgramSampleDataLoader.countSampleEnrollments() : 0;
+	}
 
-    /** Whether a sample program is still here, including one removal kept. */
-    public Boolean hasSampleRecords() {
-        return canRead() && ProgramSampleDataLoader.hasSamplePrograms();
-    }
+	/** Whether a sample program is still here, including one removal kept. */
+	public Boolean hasSampleRecords() {
+		return canRead() && ProgramSampleDataLoader.hasSamplePrograms();
+	}
 
-    /**
-     * Whether the user may read what the card asks about. An admin without a Programs set (one
-     * the access sync has not reached yet) sees 0 rather than an error on the card.
-     */
-    private static Boolean canRead() {
-        return Schema.SObjectType.Enrollment__c.isAccessible() &&
-            Schema.SObjectType.Program__c.fields.Sample_Data__c.isAccessible();
-    }
+	/**
+	 * Whether the user may read what the card asks about. An admin without a Programs set (one
+	 * the access sync has not reached yet) sees 0 rather than an error on the card.
+	 */
+	private static Boolean canRead() {
+		return Schema.SObjectType.Enrollment__c.isAccessible() &&
+			Schema.SObjectType.Program__c.fields.Sample_Data__c.isAccessible();
+	}
 
-    /** Starts the Programs load, after Core's people and the modules before it. */
-    public void enqueueLoad() {
-        SampleDataStageBatch.start(new LoadStages());
-    }
+	/** Starts the Programs load, after Core's people and the modules before it. */
+	public void enqueueLoad() {
+		SampleDataStageBatch.start(new LoadStages());
+	}
 
-    /** Starts the Programs removal, before the modules before it and Core's people. */
-    public void enqueueRemove() {
-        SampleDataRemoveBatch.startRemoval(new RemoveStages());
-    }
+	/** Starts the Programs removal, before the modules before it and Core's people. */
+	public void enqueueRemove() {
+		SampleDataRemoveBatch.startRemoval(new RemoveStages());
+	}
 
-    /**
-     * The load, one stage per transaction: the programs and services, the enrollments, then the
-     * service deliveries.
-     */
-    public class LoadStages implements SampleDataStages {
-        public String name() {
-            return 'ProgramsSampleData.LoadStages';
-        }
+	/**
+	 * The load, one stage per transaction: the programs and services, the enrollments, then the
+	 * service deliveries.
+	 */
+	public class LoadStages implements SampleDataStages {
+		public String name() {
+			return 'ProgramsSampleData.LoadStages';
+		}
 
-        public Integer stageCount() {
-            return 3;
-        }
+		public Integer stageCount() {
+			return 3;
+		}
 
-        public void runStage(Integer stage) {
-            if (stage == 0) {
-                ProgramSampleDataLoader.loadPrograms();
-            } else if (stage == 1) {
-                ProgramSampleDataLoader.loadEnrollments();
-            } else {
-                ProgramSampleDataLoader.loadDeliveries();
-            }
-        }
+		public void runStage(Integer stage) {
+			if (stage == 0) {
+				ProgramSampleDataLoader.loadPrograms();
+			} else if (stage == 1) {
+				ProgramSampleDataLoader.loadEnrollments();
+			} else {
+				ProgramSampleDataLoader.loadDeliveries();
+			}
+		}
 
-        public void finish() {
-            SampleDataModules.startAfter(ProgramsAccessSync.MODULE_NAME);
-        }
-    }
+		public void finish() {
+			SampleDataModules.startAfter(ProgramsAccessSync.MODULE_NAME);
+		}
+	}
 
-    /**
-     * The removal, one chunk per stage, then one Warning naming any sample program kept, and on
-     * to the module before this one, or to Core's own removal.
-     */
-    public class RemoveStages implements SampleDataStages {
-        public String name() {
-            return 'ProgramsSampleData.RemoveStages';
-        }
+	/**
+	 * The removal, one chunk per stage, then one Warning naming any sample program kept, and on
+	 * to the module before this one, or to Core's own removal.
+	 */
+	public class RemoveStages implements SampleDataStages {
+		public String name() {
+			return 'ProgramsSampleData.RemoveStages';
+		}
 
-        public Integer stageCount() {
-            return ProgramSampleDataLoader.removeStageCount();
-        }
+		public Integer stageCount() {
+			return ProgramSampleDataLoader.removeStageCount();
+		}
 
-        public void runStage(Integer stage) {
-            ProgramSampleDataLoader.removeNext();
-        }
+		public void runStage(Integer stage) {
+			ProgramSampleDataLoader.removeNext();
+		}
 
-        public void finish() {
-            try {
-                ProgramSampleDataLoader.logWhatWasKept();
-            } catch (Exception notNamed) {
-                // Naming what was kept is a courtesy; the rest of the removal still runs.
-                ErrorLogger.log(notNamed, name());
-            }
-            SampleDataModules.removeAfter(ProgramsAccessSync.MODULE_NAME);
-        }
-    }
+		public void finish() {
+			try {
+				ProgramSampleDataLoader.logWhatWasKept();
+			} catch (Exception notNamed) {
+				// Naming what was kept is a courtesy; the rest of the removal still runs.
+				ErrorLogger.log(notNamed, name());
+			}
+			SampleDataModules.removeAfter(ProgramsAccessSync.MODULE_NAME);
+		}
+	}
 }

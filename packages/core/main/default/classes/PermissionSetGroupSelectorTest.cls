@@ -4,80 +4,80 @@
  */
 @IsTest(testFor='ApexClass:PermissionSetGroupSelector')
 private class PermissionSetGroupSelectorTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.admin();
+	}
 
-    @IsTest
-    static void selectByDeveloperNamesFindsThePackagedRoles() {
-        System.runAs(TestUsers.admin()) {
-            PermissionSetGroupSelector selector = new PermissionSetGroupSelector();
+	@IsTest
+	static void selectByDeveloperNamesFindsThePackagedRoles() {
+		System.runAs(TestUsers.admin()) {
+			PermissionSetGroupSelector selector = new PermissionSetGroupSelector();
 
-            Test.startTest();
-            List<PermissionSetGroup> groups = selector.selectByDeveloperNames(
-                new Set<String>(AccessService.ROLE_DEVELOPER_NAMES)
-            );
-            Test.stopTest();
+			Test.startTest();
+			List<PermissionSetGroup> groups = selector.selectByDeveloperNames(
+				new Set<String>(AccessService.ROLE_DEVELOPER_NAMES)
+			);
+			Test.stopTest();
 
-            Set<String> names = new Set<String>();
-            for (PermissionSetGroup groupRecord : groups) {
-                names.add(groupRecord.DeveloperName);
-            }
-            Assert.isTrue(
-                names.contains(AccessService.ADMIN_ROLE),
-                'The BarnCRM Admin group ships with BarnCRM Core and should be found.'
-            );
-            Assert.isTrue(
-                names.contains('Read_Only'),
-                'The Read Only group ships with BarnCRM Core.'
-            );
-        }
-    }
+			Set<String> names = new Set<String>();
+			for (PermissionSetGroup groupRecord : groups) {
+				names.add(groupRecord.DeveloperName);
+			}
+			Assert.isTrue(
+				names.contains(AccessService.ADMIN_ROLE),
+				'The BarnCRM Admin group ships with BarnCRM Core and should be found.'
+			);
+			Assert.isTrue(
+				names.contains('Read_Only'),
+				'The Read Only group ships with BarnCRM Core.'
+			);
+		}
+	}
 
-    @IsTest
-    static void selectByDeveloperNamesReturnsNothingForAnEmptySet() {
-        System.runAs(TestUsers.admin()) {
-            PermissionSetGroupSelector selector = new PermissionSetGroupSelector();
+	@IsTest
+	static void selectByDeveloperNamesReturnsNothingForAnEmptySet() {
+		System.runAs(TestUsers.admin()) {
+			PermissionSetGroupSelector selector = new PermissionSetGroupSelector();
 
-            Test.startTest();
-            List<PermissionSetGroup> groups = selector.selectByDeveloperNames(new Set<String>());
-            Test.stopTest();
+			Test.startTest();
+			List<PermissionSetGroup> groups = selector.selectByDeveloperNames(new Set<String>());
+			Test.stopTest();
 
-            Assert.areEqual(0, groups.size(), 'Asking for no groups should not query the org.');
-        }
-    }
+			Assert.areEqual(0, groups.size(), 'Asking for no groups should not query the org.');
+		}
+	}
 
-    @IsTest
-    static void selectByDeveloperNameReturnsOneGroup() {
-        System.runAs(TestUsers.admin()) {
-            PermissionSetGroupSelector selector = new PermissionSetGroupSelector();
+	@IsTest
+	static void selectByDeveloperNameReturnsOneGroup() {
+		System.runAs(TestUsers.admin()) {
+			PermissionSetGroupSelector selector = new PermissionSetGroupSelector();
 
-            Test.startTest();
-            PermissionSetGroup groupRecord = selector.selectByDeveloperName('Program_Staff');
-            Test.stopTest();
+			Test.startTest();
+			PermissionSetGroup groupRecord = selector.selectByDeveloperName('Program_Staff');
+			Test.stopTest();
 
-            Assert.isNotNull(groupRecord, 'The Team Member group ships with BarnCRM Core.');
-            Assert.areEqual(
-                'Program_Staff',
-                groupRecord.DeveloperName,
-                'The wrong group came back.'
-            );
-        }
-    }
+			Assert.isNotNull(groupRecord, 'The Team Member group ships with BarnCRM Core.');
+			Assert.areEqual(
+				'Program_Staff',
+				groupRecord.DeveloperName,
+				'The wrong group came back.'
+			);
+		}
+	}
 
-    @IsTest
-    static void selectByDeveloperNameReturnsNullForAGroupThatIsNotThere() {
-        System.runAs(TestUsers.admin()) {
-            PermissionSetGroupSelector selector = new PermissionSetGroupSelector();
+	@IsTest
+	static void selectByDeveloperNameReturnsNullForAGroupThatIsNotThere() {
+		System.runAs(TestUsers.admin()) {
+			PermissionSetGroupSelector selector = new PermissionSetGroupSelector();
 
-            Test.startTest();
-            PermissionSetGroup missing = selector.selectByDeveloperName('No_Such_Group_Here');
-            PermissionSetGroup blank = selector.selectByDeveloperName('  ');
-            Test.stopTest();
+			Test.startTest();
+			PermissionSetGroup missing = selector.selectByDeveloperName('No_Such_Group_Here');
+			PermissionSetGroup blank = selector.selectByDeveloperName('  ');
+			Test.stopTest();
 
-            Assert.isNull(missing, 'A group that does not exist should come back as nothing.');
-            Assert.isNull(blank, 'A blank name should come back as nothing without querying.');
-        }
-    }
+			Assert.isNull(missing, 'A group that does not exist should come back as nothing.');
+			Assert.isNull(blank, 'A blank name should come back as nothing without querying.');
+		}
+	}
 }

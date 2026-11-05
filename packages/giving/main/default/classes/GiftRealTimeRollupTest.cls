@@ -15,280 +15,280 @@
  */
 @IsTest(critical=true)
 private class GiftRealTimeRollupTest {
-    private static final Set<String> GIVING_SOURCES = new Set<String>{
-        'Gift__c',
-        'Commitment__c',
-        'Gift_Allocation__c',
-        'Soft_Credit__c'
-    };
+	private static final Set<String> GIVING_SOURCES = new Set<String>{
+		'Gift__c',
+		'Commitment__c',
+		'Gift_Allocation__c',
+		'Soft_Credit__c'
+	};
 
-    @TestSetup
-    static void makeData() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            GivingTestDataFactory.insertDefaultFund();
-            GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
-            GivingRollupTestData.installShippedRollups();
-        }
-    }
+	@TestSetup
+	static void makeData() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			GivingTestDataFactory.insertDefaultFund();
+			GivingTestDataFactory.insertHouseholdContact('The Nolan Family', 'Ana', 'Nolan');
+			GivingRollupTestData.installShippedRollups();
+		}
+	}
 
-    @IsTest
-    static void everyGivingSourceIsRegisteredForRealTimeRollups() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Set<String> registered = new Set<String>();
-            for (Automation_Registry__mdt entry : [
-                SELECT Object_Name__c, Enabled_By_Default__c
-                FROM Automation_Registry__mdt
-                WHERE
-                    Handler_Class__c = 'RollupTriggerHandler'
-                    AND Object_Name__c IN :GIVING_SOURCES
-            ]) {
-                Assert.isTrue(
-                    entry.Enabled_By_Default__c,
-                    'A real-time total is on from install, like every shipped total.'
-                );
-                registered.add(entry.Object_Name__c);
-            }
-            Assert.areEqual(
-                GIVING_SOURCES,
-                registered,
-                'Gift, Commitment, Gift Allocation and Soft Credit run the real-time rollups.'
-            );
-        }
-    }
+	@IsTest
+	static void everyGivingSourceIsRegisteredForRealTimeRollups() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Set<String> registered = new Set<String>();
+			for (Automation_Registry__mdt entry : [
+				SELECT Object_Name__c, Enabled_By_Default__c
+				FROM Automation_Registry__mdt
+				WHERE
+					Handler_Class__c = 'RollupTriggerHandler'
+					AND Object_Name__c IN :GIVING_SOURCES
+			]) {
+				Assert.isTrue(
+					entry.Enabled_By_Default__c,
+					'A real-time total is on from install, like every shipped total.'
+				);
+				registered.add(entry.Object_Name__c);
+			}
+			Assert.areEqual(
+				GIVING_SOURCES,
+				registered,
+				'Gift, Commitment, Gift Allocation and Soft Credit run the real-time rollups.'
+			);
+		}
+	}
 
-    /**
-     * Ana gives 250. Her own totals and her household's move with the save, and nobody pressed
-     * Recalculate.
-     */
-    @IsTest
-    static void aSavedGiftUpdatesThePersonAndTheHousehold() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Contact ana = [SELECT Id, AccountId FROM Contact LIMIT 1];
+	/**
+	 * Ana gives 250. Her own totals and her household's move with the save, and nobody pressed
+	 * Recalculate.
+	 */
+	@IsTest
+	static void aSavedGiftUpdatesThePersonAndTheHousehold() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Contact ana = [SELECT Id, AccountId FROM Contact LIMIT 1];
 
-            Test.startTest();
-            insert GivingTestDataFactory.buildGift(ana.Id, 250);
-            Test.stopTest();
+			Test.startTest();
+			insert GivingTestDataFactory.buildGift(ana.Id, 250);
+			Test.stopTest();
 
-            Contact person = GivingRollupTestData.person(ana.Id);
-            GivingTestDataFactory.assertRollupWrote(person.Total_Giving__c);
-            Assert.areEqual(250, person.Total_Giving__c, 'Ana\'s total giving');
-            Assert.areEqual(1, person.Gift_Count__c, 'Ana\'s gift count');
-            Assert.areEqual(250, person.Largest_Gift__c, 'Ana\'s largest gift');
-            Assert.areEqual(Date.today(), person.Last_Gift_Date__c, 'Ana\'s last gift date');
+			Contact person = GivingRollupTestData.person(ana.Id);
+			GivingTestDataFactory.assertRollupWrote(person.Total_Giving__c);
+			Assert.areEqual(250, person.Total_Giving__c, 'Ana\'s total giving');
+			Assert.areEqual(1, person.Gift_Count__c, 'Ana\'s gift count');
+			Assert.areEqual(250, person.Largest_Gift__c, 'Ana\'s largest gift');
+			Assert.areEqual(Date.today(), person.Last_Gift_Date__c, 'Ana\'s last gift date');
 
-            Account household = GivingRollupTestData.account(ana.AccountId);
-            Assert.areEqual(250, household.Total_Giving__c, 'The Nolan household\'s total giving');
-            Assert.areEqual(1, household.Gift_Count__c, 'The Nolan household\'s gift count');
-        }
-    }
+			Account household = GivingRollupTestData.account(ana.AccountId);
+			Assert.areEqual(250, household.Total_Giving__c, 'The Nolan household\'s total giving');
+			Assert.areEqual(1, household.Gift_Count__c, 'The Nolan household\'s gift count');
+		}
+	}
 
-    /**
-     * The allocation a gift is given to the default fund moves that fund's total, including the
-     * shipped "Fund last gift date" rollup, whose source attribute is on the parent gift
-     * (`Gift__r.Gift_Date__c`). The vendored engine refused it (IllegalArgumentException "Child
-     * rollup field: null" in Rollup.getRollup); BarnCRM's own engine reads it.
-     */
-    @IsTest
-    static void aSavedGiftUpdatesTheFundItIsAllocatedTo() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Contact ana = [SELECT Id FROM Contact LIMIT 1];
-            Fund__c general = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
+	/**
+	 * The allocation a gift is given to the default fund moves that fund's total, including the
+	 * shipped "Fund last gift date" rollup, whose source attribute is on the parent gift
+	 * (`Gift__r.Gift_Date__c`). The vendored engine refused it (IllegalArgumentException "Child
+	 * rollup field: null" in Rollup.getRollup); BarnCRM's own engine reads it.
+	 */
+	@IsTest
+	static void aSavedGiftUpdatesTheFundItIsAllocatedTo() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Contact ana = [SELECT Id FROM Contact LIMIT 1];
+			Fund__c general = [SELECT Id FROM Fund__c WHERE Is_Default__c = TRUE LIMIT 1];
 
-            Test.startTest();
-            insert GivingTestDataFactory.buildGift(ana.Id, 250);
-            Test.stopTest();
+			Test.startTest();
+			insert GivingTestDataFactory.buildGift(ana.Id, 250);
+			Test.stopTest();
 
-            Fund__c fund = GivingRollupTestData.fund(general.Id);
-            GivingTestDataFactory.assertRollupWrote(fund.Total_Raised__c);
-            Assert.areEqual(250, fund.Total_Raised__c, 'General has raised the gift');
-            Assert.areEqual(1, fund.Gift_Count__c, 'One gift designated to General');
-        }
-    }
+			Fund__c fund = GivingRollupTestData.fund(general.Id);
+			GivingTestDataFactory.assertRollupWrote(fund.Total_Raised__c);
+			Assert.areEqual(250, fund.Total_Raised__c, 'General has raised the gift');
+			Assert.areEqual(1, fund.Gift_Count__c, 'One gift designated to General');
+		}
+	}
 
-    /**
-     * Bea solicited Ana's gift. Her soft credit total moves when the credit is saved. The vendored
-     * engine threw NullPointerException in
-     * Rollup.fillWrapper on the household soft credit rollups, whose `{Household}` path it cannot
-     * follow.
-     */
-    @IsTest
-    static void aSavedSoftCreditUpdatesThePersonCredited() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Contact ana = [SELECT Id FROM Contact LIMIT 1];
-            Contact bea = GivingTestDataFactory.insertHouseholdContact(
-                'The Lindqvist Family',
-                'Bea',
-                'Lindqvist'
-            );
-            Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 500);
-            insert gift;
-            GivingRollupTestData.nextSave();
+	/**
+	 * Bea solicited Ana's gift. Her soft credit total moves when the credit is saved. The vendored
+	 * engine threw NullPointerException in
+	 * Rollup.fillWrapper on the household soft credit rollups, whose `{Household}` path it cannot
+	 * follow.
+	 */
+	@IsTest
+	static void aSavedSoftCreditUpdatesThePersonCredited() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Contact ana = [SELECT Id FROM Contact LIMIT 1];
+			Contact bea = GivingTestDataFactory.insertHouseholdContact(
+				'The Lindqvist Family',
+				'Bea',
+				'Lindqvist'
+			);
+			Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 500);
+			insert gift;
+			GivingRollupTestData.nextSave();
 
-            Test.startTest();
-            insert new Soft_Credit__c(
-                Gift__c = gift.Id,
-                Contact__c = bea.Id,
-                Role__c = 'Solicitor',
-                Amount__c = 500
-            );
-            Test.stopTest();
+			Test.startTest();
+			insert new Soft_Credit__c(
+				Gift__c = gift.Id,
+				Contact__c = bea.Id,
+				Role__c = 'Solicitor',
+				Amount__c = 500
+			);
+			Test.stopTest();
 
-            Contact credited = GivingRollupTestData.person(bea.Id);
-            GivingTestDataFactory.assertRollupWrote(credited.Total_Soft_Credits__c);
-            Assert.areEqual(500, credited.Total_Soft_Credits__c, 'Bea is recognized for the gift');
-            Assert.areEqual(
-                0,
-                GivingRollupTestData.valueOf(credited.Total_Giving__c),
-                'Recognition is never giving'
-            );
-        }
-    }
+			Contact credited = GivingRollupTestData.person(bea.Id);
+			GivingTestDataFactory.assertRollupWrote(credited.Total_Soft_Credits__c);
+			Assert.areEqual(500, credited.Total_Soft_Credits__c, 'Bea is recognized for the gift');
+			Assert.areEqual(
+				0,
+				GivingRollupTestData.valueOf(credited.Total_Giving__c),
+				'Recognition is never giving'
+			);
+		}
+	}
 
-    /** Ana pledges 300. Her pledge balance shows it as soon as the pledge is saved. */
-    @IsTest
-    static void aSavedCommitmentUpdatesThePledgeBalance() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Contact ana = [SELECT Id FROM Contact LIMIT 1];
+	/** Ana pledges 300. Her pledge balance shows it as soon as the pledge is saved. */
+	@IsTest
+	static void aSavedCommitmentUpdatesThePledgeBalance() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Contact ana = [SELECT Id FROM Contact LIMIT 1];
 
-            Test.startTest();
-            insert new Commitment__c(
-                Type__c = 'Pledge',
-                Status__c = 'Active',
-                Donor_Contact__c = ana.Id,
-                Amount__c = 100,
-                Frequency__c = 'Monthly',
-                Start_Date__c = Date.today(),
-                Expected_Total__c = 300,
-                Installments_Planned__c = 3
-            );
-            Test.stopTest();
+			Test.startTest();
+			insert new Commitment__c(
+				Type__c = 'Pledge',
+				Status__c = 'Active',
+				Donor_Contact__c = ana.Id,
+				Amount__c = 100,
+				Frequency__c = 'Monthly',
+				Start_Date__c = Date.today(),
+				Expected_Total__c = 300,
+				Installments_Planned__c = 3
+			);
+			Test.stopTest();
 
-            Contact person = GivingRollupTestData.person(ana.Id);
-            GivingTestDataFactory.assertRollupWrote(person.Pledge_Balance__c);
-            Assert.areEqual(300, person.Pledge_Balance__c, 'Promised and not yet paid');
-        }
-    }
+			Contact person = GivingRollupTestData.person(ana.Id);
+			GivingTestDataFactory.assertRollupWrote(person.Pledge_Balance__c);
+			Assert.areEqual(300, person.Pledge_Balance__c, 'Promised and not yet paid');
+		}
+	}
 
-    /**
-     * Two hundred gifts in one save, ten each from twenty donors in twenty households, as a gift
-     * batch or an import posts them. Every donor and every household is right, and the save stays
-     * inside the platform's limits (plan Section 7.2).
-     */
-    @IsTest
-    static void twoHundredGiftsInOneSaveUpdateEveryDonor() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            List<String> names = new List<String>();
-            for (Integer i = 0; i < 20; i++) {
-                names.add('Donor' + i);
-            }
-            List<Contact> donors = GivingRollupTestData.peopleInOwnHouseholds(names);
-            List<Gift__c> gifts = new List<Gift__c>();
-            for (Contact donor : donors) {
-                gifts.addAll(GivingTestDataFactory.buildGifts(donor.Id, 10, 25));
-            }
-            Assert.areEqual(200, gifts.size(), 'The bulk case is two hundred records');
+	/**
+	 * Two hundred gifts in one save, ten each from twenty donors in twenty households, as a gift
+	 * batch or an import posts them. Every donor and every household is right, and the save stays
+	 * inside the platform's limits (plan Section 7.2).
+	 */
+	@IsTest
+	static void twoHundredGiftsInOneSaveUpdateEveryDonor() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			List<String> names = new List<String>();
+			for (Integer i = 0; i < 20; i++) {
+				names.add('Donor' + i);
+			}
+			List<Contact> donors = GivingRollupTestData.peopleInOwnHouseholds(names);
+			List<Gift__c> gifts = new List<Gift__c>();
+			for (Contact donor : donors) {
+				gifts.addAll(GivingTestDataFactory.buildGifts(donor.Id, 10, 25));
+			}
+			Assert.areEqual(200, gifts.size(), 'The bulk case is two hundred records');
 
-            Test.startTest();
-            insert gifts;
-            Test.stopTest();
+			Test.startTest();
+			insert gifts;
+			Test.stopTest();
 
-            Map<Id, Contact> people = new Map<Id, Contact>(
-                [
-                    SELECT Id, AccountId, Total_Giving__c, Gift_Count__c
-                    FROM Contact
-                    WHERE Id IN :donors
-                ]
-            );
-            Set<Id> householdIds = new Set<Id>();
-            for (Contact donor : people.values()) {
-                GivingTestDataFactory.assertRollupWrote(donor.Total_Giving__c);
-                Assert.areEqual(250, donor.Total_Giving__c, 'Ten gifts of 25 from each donor');
-                Assert.areEqual(10, donor.Gift_Count__c, 'Ten gifts from each donor');
-                householdIds.add(donor.AccountId);
-            }
-            for (Account household : [
-                SELECT Total_Giving__c, Gift_Count__c
-                FROM Account
-                WHERE Id IN :householdIds
-            ]) {
-                Assert.areEqual(250, household.Total_Giving__c, 'Each household\'s total');
-                Assert.areEqual(10, household.Gift_Count__c, 'Each household\'s gift count');
-            }
-            // The fund total is asserted in aSavedGiftUpdatesTheFundItIsAllocatedTo.
-        }
-    }
+			Map<Id, Contact> people = new Map<Id, Contact>(
+				[
+					SELECT Id, AccountId, Total_Giving__c, Gift_Count__c
+					FROM Contact
+					WHERE Id IN :donors
+				]
+			);
+			Set<Id> householdIds = new Set<Id>();
+			for (Contact donor : people.values()) {
+				GivingTestDataFactory.assertRollupWrote(donor.Total_Giving__c);
+				Assert.areEqual(250, donor.Total_Giving__c, 'Ten gifts of 25 from each donor');
+				Assert.areEqual(10, donor.Gift_Count__c, 'Ten gifts from each donor');
+				householdIds.add(donor.AccountId);
+			}
+			for (Account household : [
+				SELECT Total_Giving__c, Gift_Count__c
+				FROM Account
+				WHERE Id IN :householdIds
+			]) {
+				Assert.areEqual(250, household.Total_Giving__c, 'Each household\'s total');
+				Assert.areEqual(10, household.Gift_Count__c, 'Each household\'s gift count');
+			}
+			// The fund total is asserted in aSavedGiftUpdatesTheFundItIsAllocatedTo.
+		}
+	}
 
-    /**
-     * The instant path (slice S6). The promise rollup proposal D4
-     * makes for an ordinary save: the totals are right before the save returns, with no queued
-     * job in between.
-     */
-    @IsTest
-    static void theTotalsAreRightInTheSameTransaction() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Contact ana = [SELECT Id, AccountId FROM Contact LIMIT 1];
+	/**
+	 * The instant path (slice S6). The promise rollup proposal D4
+	 * makes for an ordinary save: the totals are right before the save returns, with no queued
+	 * job in between.
+	 */
+	@IsTest
+	static void theTotalsAreRightInTheSameTransaction() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Contact ana = [SELECT Id, AccountId FROM Contact LIMIT 1];
 
-            Test.startTest();
-            insert GivingTestDataFactory.buildGift(ana.Id, 250);
-            Contact person = GivingRollupTestData.person(ana.Id);
-            Account household = GivingRollupTestData.account(ana.AccountId);
-            Test.stopTest();
+			Test.startTest();
+			insert GivingTestDataFactory.buildGift(ana.Id, 250);
+			Contact person = GivingRollupTestData.person(ana.Id);
+			Account household = GivingRollupTestData.account(ana.AccountId);
+			Test.stopTest();
 
-            Assert.areEqual(250, person.Total_Giving__c, 'Right before the save returned');
-            Assert.areEqual(250, household.Total_Giving__c, 'And on the household too');
-        }
-    }
+			Assert.areEqual(250, person.Total_Giving__c, 'Right before the save returned');
+			Assert.areEqual(250, household.Total_Giving__c, 'And on the household too');
+		}
+	}
 
-    /**
-     * ROLLUPS-1: a gift paying a pledge. The save links the gift to the pledge's earliest open
-     * installment with a nested update of the same gift, which reached the rollup handler before
-     * the insert did. The rollup recursion guard was shared by every event, so the update used
-     * it up and the insert, the event that moves the donor, household and pledge totals, was
-     * skipped. No later save would have queued them either, so the totals stayed wrong until the
-     * nightly run. Read after `Test.stopTest`, so this holds on the instant and the queued path.
-     */
-    @IsTest
-    static void aGiftPayingAPledgeUpdatesTheDonorAndThePledge() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Contact ana = [SELECT Id, AccountId FROM Contact LIMIT 1];
-            Commitment__c pledge = new Commitment__c(
-                Type__c = 'Pledge',
-                Status__c = 'Active',
-                Donor_Contact__c = ana.Id,
-                Amount__c = 100,
-                Frequency__c = 'Monthly',
-                Start_Date__c = Date.today(),
-                Expected_Total__c = 300,
-                Installments_Planned__c = 3
-            );
-            insert pledge;
-            CommitmentService.generateInstallments(new Set<Id>{ pledge.Id });
-            GivingRollupTestData.nextSave();
+	/**
+	 * ROLLUPS-1: a gift paying a pledge. The save links the gift to the pledge's earliest open
+	 * installment with a nested update of the same gift, which reached the rollup handler before
+	 * the insert did. The rollup recursion guard was shared by every event, so the update used
+	 * it up and the insert, the event that moves the donor, household and pledge totals, was
+	 * skipped. No later save would have queued them either, so the totals stayed wrong until the
+	 * nightly run. Read after `Test.stopTest`, so this holds on the instant and the queued path.
+	 */
+	@IsTest
+	static void aGiftPayingAPledgeUpdatesTheDonorAndThePledge() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Contact ana = [SELECT Id, AccountId FROM Contact LIMIT 1];
+			Commitment__c pledge = new Commitment__c(
+				Type__c = 'Pledge',
+				Status__c = 'Active',
+				Donor_Contact__c = ana.Id,
+				Amount__c = 100,
+				Frequency__c = 'Monthly',
+				Start_Date__c = Date.today(),
+				Expected_Total__c = 300,
+				Installments_Planned__c = 3
+			);
+			insert pledge;
+			CommitmentService.generateInstallments(new Set<Id>{ pledge.Id });
+			GivingRollupTestData.nextSave();
 
-            Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 100);
-            gift.Commitment__c = pledge.Id;
+			Gift__c gift = GivingTestDataFactory.buildGift(ana.Id, 100);
+			gift.Commitment__c = pledge.Id;
 
-            Test.startTest();
-            insert gift;
-            Test.stopTest();
+			Test.startTest();
+			insert gift;
+			Test.stopTest();
 
-            Assert.isNotNull(
-                [SELECT Installment__c FROM Gift__c WHERE Id = :gift.Id].Installment__c,
-                'The save linked the gift to an installment, the nested update under test'
-            );
-            Contact person = GivingRollupTestData.person(ana.Id);
-            GivingTestDataFactory.assertRollupWrote(person.Total_Giving__c);
-            Assert.areEqual(100, person.Total_Giving__c, 'Ana\'s total giving');
-            Assert.areEqual(
-                100,
-                GivingRollupTestData.account(ana.AccountId).Total_Giving__c,
-                'The Nolan household\'s total giving'
-            );
-            Assert.areEqual(
-                100,
-                [SELECT Paid_To_Date__c FROM Commitment__c WHERE Id = :pledge.Id].Paid_To_Date__c,
-                'The pledge\'s paid to date'
-            );
-        }
-    }
+			Assert.isNotNull(
+				[SELECT Installment__c FROM Gift__c WHERE Id = :gift.Id].Installment__c,
+				'The save linked the gift to an installment, the nested update under test'
+			);
+			Contact person = GivingRollupTestData.person(ana.Id);
+			GivingTestDataFactory.assertRollupWrote(person.Total_Giving__c);
+			Assert.areEqual(100, person.Total_Giving__c, 'Ana\'s total giving');
+			Assert.areEqual(
+				100,
+				GivingRollupTestData.account(ana.AccountId).Total_Giving__c,
+				'The Nolan household\'s total giving'
+			);
+			Assert.areEqual(
+				100,
+				[SELECT Paid_To_Date__c FROM Commitment__c WHERE Id = :pledge.Id].Paid_To_Date__c,
+				'The pledge\'s paid to date'
+			);
+		}
+	}
 }

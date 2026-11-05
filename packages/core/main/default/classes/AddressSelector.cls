@@ -3,364 +3,364 @@
  * (plan Section 7.2: every query lives in a Selector).
  */
 public with sharing class AddressSelector {
-    /**
-     * Every address belonging to any of the given owners, whether the owner is a
-     * household or organization account, a contact, or a person account. Ordered so the
-     * address in use comes first and the newest address comes next, which is the order
-     * the address panel shows and the order the delete promotion relies on.
-     */
-    public static List<Address__c> selectByOwnerIds(Set<Id> ownerIds) {
-        if (ownerIds == null || ownerIds.isEmpty()) {
-            return new List<Address__c>();
-        }
-        return [
-            SELECT
-                Id,
-                Name,
-                Account__c,
-                Contact__c,
-                Person_Account__c,
-                Type__c,
-                Street__c,
-                City__c,
-                State__c,
-                Postal_Code__c,
-                Country__c,
-                Seasonal_Start_Month__c,
-                Seasonal_Start_Day__c,
-                Seasonal_End_Month__c,
-                Seasonal_End_Day__c,
-                Is_Default__c,
-                Verification_Status__c,
-                Latest_Verified_Date__c,
-                CreatedDate
-            FROM Address__c
-            WHERE
-                Account__c IN :ownerIds
-                OR Contact__c IN :ownerIds
-                OR Person_Account__c IN :ownerIds
-            WITH USER_MODE
-            ORDER BY Is_Default__c DESC, CreatedDate DESC
-            LIMIT 10000
-        ];
-    }
+	/**
+	 * Every address belonging to any of the given owners, whether the owner is a
+	 * household or organization account, a contact, or a person account. Ordered so the
+	 * address in use comes first and the newest address comes next, which is the order
+	 * the address panel shows and the order the delete promotion relies on.
+	 */
+	public static List<Address__c> selectByOwnerIds(Set<Id> ownerIds) {
+		if (ownerIds == null || ownerIds.isEmpty()) {
+			return new List<Address__c>();
+		}
+		return [
+			SELECT
+				Id,
+				Name,
+				Account__c,
+				Contact__c,
+				Person_Account__c,
+				Type__c,
+				Street__c,
+				City__c,
+				State__c,
+				Postal_Code__c,
+				Country__c,
+				Seasonal_Start_Month__c,
+				Seasonal_Start_Day__c,
+				Seasonal_End_Month__c,
+				Seasonal_End_Day__c,
+				Is_Default__c,
+				Verification_Status__c,
+				Latest_Verified_Date__c,
+				CreatedDate
+			FROM Address__c
+			WHERE
+				Account__c IN :ownerIds
+				OR Contact__c IN :ownerIds
+				OR Person_Account__c IN :ownerIds
+			WITH USER_MODE
+			ORDER BY Is_Default__c DESC, CreatedDate DESC
+			LIMIT 10000
+		];
+	}
 
-    /**
-     * The addresses currently marked default for the given owners, leaving out any
-     * address in excludeAddressIds. Used to keep one default per owner.
-     */
-    public static List<Address__c> selectDefaultsByOwnerIds(
-        Set<Id> ownerIds,
-        Set<Id> excludeAddressIds
-    ) {
-        if (ownerIds == null || ownerIds.isEmpty()) {
-            return new List<Address__c>();
-        }
-        Set<Id> skip = excludeAddressIds == null ? new Set<Id>() : excludeAddressIds;
-        return [
-            SELECT
-                Id,
-                Name,
-                Account__c,
-                Contact__c,
-                Person_Account__c,
-                Type__c,
-                Street__c,
-                City__c,
-                State__c,
-                Postal_Code__c,
-                Country__c,
-                Seasonal_Start_Month__c,
-                Seasonal_Start_Day__c,
-                Seasonal_End_Month__c,
-                Seasonal_End_Day__c,
-                Is_Default__c,
-                CreatedDate
-            FROM Address__c
-            WHERE
-                Is_Default__c = TRUE
-                AND Id NOT IN :skip
-                AND (Account__c IN :ownerIds
-                OR Contact__c IN :ownerIds
-                OR Person_Account__c IN :ownerIds)
-            WITH USER_MODE
-            ORDER BY CreatedDate DESC
-            LIMIT 10000
-        ];
-    }
+	/**
+	 * The addresses currently marked default for the given owners, leaving out any
+	 * address in excludeAddressIds. Used to keep one default per owner.
+	 */
+	public static List<Address__c> selectDefaultsByOwnerIds(
+		Set<Id> ownerIds,
+		Set<Id> excludeAddressIds
+	) {
+		if (ownerIds == null || ownerIds.isEmpty()) {
+			return new List<Address__c>();
+		}
+		Set<Id> skip = excludeAddressIds == null ? new Set<Id>() : excludeAddressIds;
+		return [
+			SELECT
+				Id,
+				Name,
+				Account__c,
+				Contact__c,
+				Person_Account__c,
+				Type__c,
+				Street__c,
+				City__c,
+				State__c,
+				Postal_Code__c,
+				Country__c,
+				Seasonal_Start_Month__c,
+				Seasonal_Start_Day__c,
+				Seasonal_End_Month__c,
+				Seasonal_End_Day__c,
+				Is_Default__c,
+				CreatedDate
+			FROM Address__c
+			WHERE
+				Is_Default__c = TRUE
+				AND Id NOT IN :skip
+				AND (Account__c IN :ownerIds
+				OR Contact__c IN :ownerIds
+				OR Person_Account__c IN :ownerIds)
+			WITH USER_MODE
+			ORDER BY CreatedDate DESC
+			LIMIT 10000
+		];
+	}
 
-    /**
-     * The ordinary addresses waiting for these owners' seasons to end (marked Replaced By
-     * Seasonal): the homes a move made while a seasonal address was primary leaves (R-AD10).
-     */
-    public static List<Address__c> selectWaitingForSeason(Set<Id> ownerIds) {
-        if (ownerIds == null || ownerIds.isEmpty()) {
-            return new List<Address__c>();
-        }
-        String seasonal = AddressService.TYPE_SEASONAL;
-        return [
-            SELECT
-                Id,
-                Account__c,
-                Contact__c,
-                Person_Account__c,
-                Type__c,
-                Street__c,
-                City__c,
-                State__c,
-                Postal_Code__c,
-                Country__c
-            FROM Address__c
-            WHERE
-                Replaced_By_Seasonal__c = TRUE
-                AND Type__c != :seasonal
-                AND (Account__c IN :ownerIds
-                OR Contact__c IN :ownerIds
-                OR Person_Account__c IN :ownerIds)
-            WITH USER_MODE
-            ORDER BY CreatedDate DESC
-            LIMIT 10000
-        ];
-    }
+	/**
+	 * The ordinary addresses waiting for these owners' seasons to end (marked Replaced By
+	 * Seasonal): the homes a move made while a seasonal address was primary leaves (R-AD10).
+	 */
+	public static List<Address__c> selectWaitingForSeason(Set<Id> ownerIds) {
+		if (ownerIds == null || ownerIds.isEmpty()) {
+			return new List<Address__c>();
+		}
+		String seasonal = AddressService.TYPE_SEASONAL;
+		return [
+			SELECT
+				Id,
+				Account__c,
+				Contact__c,
+				Person_Account__c,
+				Type__c,
+				Street__c,
+				City__c,
+				State__c,
+				Postal_Code__c,
+				Country__c
+			FROM Address__c
+			WHERE
+				Replaced_By_Seasonal__c = TRUE
+				AND Type__c != :seasonal
+				AND (Account__c IN :ownerIds
+				OR Contact__c IN :ownerIds
+				OR Person_Account__c IN :ownerIds)
+			WITH USER_MODE
+			ORDER BY CreatedDate DESC
+			LIMIT 10000
+		];
+	}
 
-    /**
-     * Copies the history fields (Status, Start Date, End Date, R-AD10) onto addresses the
-     * caller already read in user mode, and returns the same list.
-     *
-     * System mode on purpose, for this internal bookkeeping read only. The address trigger
-     * keeps these three fields on every save, so a person who may save addresses without
-     * access to them (a profile that grants Address__c, no BarnCRM permission set) must not
-     * have the save fail on them. Only these three fields of records the user could already
-     * read are read, and nothing read here is shown to the user: the address card and every
-     * other user-facing read stay in user mode.
-     */
-    public static List<Address__c> withHistory(List<Address__c> addresses) {
-        if (addresses == null || addresses.isEmpty()) {
-            return addresses;
-        }
-        Map<Id, Address__c> byId = new Map<Id, Address__c>(addresses);
-        for (Address__c history : [
-            SELECT Id, Status__c, Start_Date__c, End_Date__c
-            FROM Address__c
-            WHERE Id IN :byId.keySet()
-            WITH SYSTEM_MODE
-        ]) {
-            Address__c address = byId.get(history.Id);
-            address.Status__c = history.Status__c;
-            address.Start_Date__c = history.Start_Date__c;
-            address.End_Date__c = history.End_Date__c;
-        }
-        return addresses;
-    }
+	/**
+	 * Copies the history fields (Status, Start Date, End Date, R-AD10) onto addresses the
+	 * caller already read in user mode, and returns the same list.
+	 *
+	 * System mode on purpose, for this internal bookkeeping read only. The address trigger
+	 * keeps these three fields on every save, so a person who may save addresses without
+	 * access to them (a profile that grants Address__c, no BarnCRM permission set) must not
+	 * have the save fail on them. Only these three fields of records the user could already
+	 * read are read, and nothing read here is shown to the user: the address card and every
+	 * other user-facing read stay in user mode.
+	 */
+	public static List<Address__c> withHistory(List<Address__c> addresses) {
+		if (addresses == null || addresses.isEmpty()) {
+			return addresses;
+		}
+		Map<Id, Address__c> byId = new Map<Id, Address__c>(addresses);
+		for (Address__c history : [
+			SELECT Id, Status__c, Start_Date__c, End_Date__c
+			FROM Address__c
+			WHERE Id IN :byId.keySet()
+			WITH SYSTEM_MODE
+		]) {
+			Address__c address = byId.get(history.Id);
+			address.Status__c = history.Status__c;
+			address.Start_Date__c = history.Start_Date__c;
+			address.End_Date__c = history.End_Date__c;
+		}
+		return addresses;
+	}
 
-    /** The billing address in the standard fields of these accounts. */
-    public static List<Account> selectAccountBillingAddresses(Set<Id> accountIds) {
-        return selectAccountBillingAddresses(accountIds, null);
-    }
+	/** The billing address in the standard fields of these accounts. */
+	public static List<Account> selectAccountBillingAddresses(Set<Id> accountIds) {
+		return selectAccountBillingAddresses(accountIds, null);
+	}
 
-    /**
-     * The billing address in the standard fields of these accounts, and the named extra fields.
-     * The extra fields are a person account's mailing fields, named as strings by the caller and
-     * read with get, so this class compiles and runs in an org without person accounts; the
-     * caller names them only where the org has them.
-     *
-     * @param accountIds the accounts
-     * @param extraFields further Account fields to read; null or empty for none
-     */
-    public static List<Account> selectAccountBillingAddresses(
-        Set<Id> accountIds,
-        List<String> extraFields
-    ) {
-        if (accountIds == null || accountIds.isEmpty()) {
-            return new List<Account>();
-        }
-        List<String> fields = new List<String>{
-            'Id',
-            'BillingStreet',
-            'BillingCity',
-            'BillingPostalCode'
-        };
-        if (extraFields != null) {
-            fields.addAll(extraFields);
-        }
-        return Database.queryWithBinds(
-            'SELECT ' +
-                String.join(fields, ', ') +
-                ' FROM Account WHERE Id IN :accountIds LIMIT 10000',
-            new Map<String, Object>{ 'accountIds' => accountIds },
-            AccessLevel.USER_MODE
-        );
-    }
+	/**
+	 * The billing address in the standard fields of these accounts, and the named extra fields.
+	 * The extra fields are a person account's mailing fields, named as strings by the caller and
+	 * read with get, so this class compiles and runs in an org without person accounts; the
+	 * caller names them only where the org has them.
+	 *
+	 * @param accountIds the accounts
+	 * @param extraFields further Account fields to read; null or empty for none
+	 */
+	public static List<Account> selectAccountBillingAddresses(
+		Set<Id> accountIds,
+		List<String> extraFields
+	) {
+		if (accountIds == null || accountIds.isEmpty()) {
+			return new List<Account>();
+		}
+		List<String> fields = new List<String>{
+			'Id',
+			'BillingStreet',
+			'BillingCity',
+			'BillingPostalCode'
+		};
+		if (extraFields != null) {
+			fields.addAll(extraFields);
+		}
+		return Database.queryWithBinds(
+			'SELECT ' +
+				String.join(fields, ', ') +
+				' FROM Account WHERE Id IN :accountIds LIMIT 10000',
+			new Map<String, Object>{ 'accountIds' => accountIds },
+			AccessLevel.USER_MODE
+		);
+	}
 
-    /**
-     * The stored values of the named fields on these records, for deciding whether an address
-     * copied onto their standard fields would change anything. Only names the object really
-     * has are read. System mode (ADR-0021): the answer decides whether a write is sent and
-     * never reaches a screen; the write itself is made in user mode.
-     *
-     * @param objectType the object the records belong to
-     * @param fieldNames the fields to read, as written on the copies
-     * @param recordIds the records
-     */
-    public static List<SObject> selectStoredValues(
-        Schema.SObjectType objectType,
-        Set<String> fieldNames,
-        Set<Id> recordIds
-    ) {
-        if (objectType == null || recordIds == null || recordIds.isEmpty()) {
-            return new List<SObject>();
-        }
-        Map<String, Schema.SObjectField> known = objectType.getDescribe(
-                SObjectDescribeOptions.DEFERRED
-            )
-            .fields
-            .getMap();
-        List<String> fields = new List<String>{ 'Id' };
-        for (String fieldName : fieldNames == null ? new Set<String>() : fieldNames) {
-            Schema.SObjectField field = known.get(fieldName.toLowerCase());
-            if (field != null && !fieldName.equalsIgnoreCase('Id')) {
-                fields.add(field.getDescribe().getName());
-            }
-        }
-        return Database.queryWithBinds(
-            'SELECT ' +
-                String.join(fields, ', ') +
-                ' FROM ' +
-                objectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +
-                ' WHERE Id IN :recordIds',
-            new Map<String, Object>{ 'recordIds' => recordIds },
-            AccessLevel.SYSTEM_MODE
-        );
-    }
+	/**
+	 * The stored values of the named fields on these records, for deciding whether an address
+	 * copied onto their standard fields would change anything. Only names the object really
+	 * has are read. System mode (ADR-0021): the answer decides whether a write is sent and
+	 * never reaches a screen; the write itself is made in user mode.
+	 *
+	 * @param objectType the object the records belong to
+	 * @param fieldNames the fields to read, as written on the copies
+	 * @param recordIds the records
+	 */
+	public static List<SObject> selectStoredValues(
+		Schema.SObjectType objectType,
+		Set<String> fieldNames,
+		Set<Id> recordIds
+	) {
+		if (objectType == null || recordIds == null || recordIds.isEmpty()) {
+			return new List<SObject>();
+		}
+		Map<String, Schema.SObjectField> known = objectType.getDescribe(
+				SObjectDescribeOptions.DEFERRED
+			)
+			.fields
+			.getMap();
+		List<String> fields = new List<String>{ 'Id' };
+		for (String fieldName : fieldNames == null ? new Set<String>() : fieldNames) {
+			Schema.SObjectField field = known.get(fieldName.toLowerCase());
+			if (field != null && !fieldName.equalsIgnoreCase('Id')) {
+				fields.add(field.getDescribe().getName());
+			}
+		}
+		return Database.queryWithBinds(
+			'SELECT ' +
+				String.join(fields, ', ') +
+				' FROM ' +
+				objectType.getDescribe(SObjectDescribeOptions.DEFERRED).getName() +
+				' WHERE Id IN :recordIds',
+			new Map<String, Object>{ 'recordIds' => recordIds },
+			AccessLevel.SYSTEM_MODE
+		);
+	}
 
-    /** The mailing address in the standard fields of these contacts. */
-    public static List<Contact> selectContactMailingAddresses(Set<Id> contactIds) {
-        if (contactIds == null || contactIds.isEmpty()) {
-            return new List<Contact>();
-        }
-        return [
-            SELECT Id, MailingStreet, MailingCity, MailingPostalCode
-            FROM Contact
-            WHERE Id IN :contactIds
-            WITH USER_MODE
-            LIMIT 10000
-        ];
-    }
+	/** The mailing address in the standard fields of these contacts. */
+	public static List<Contact> selectContactMailingAddresses(Set<Id> contactIds) {
+		if (contactIds == null || contactIds.isEmpty()) {
+			return new List<Contact>();
+		}
+		return [
+			SELECT Id, MailingStreet, MailingCity, MailingPostalCode
+			FROM Contact
+			WHERE Id IN :contactIds
+			WITH USER_MODE
+			LIMIT 10000
+		];
+	}
 
-    /** These addresses, as the user may read them; one they cannot read is left out. */
-    public static List<Address__c> selectByIds(Set<Id> addressIds) {
-        if (addressIds == null || addressIds.isEmpty()) {
-            return new List<Address__c>();
-        }
-        return [
-            SELECT
-                Id,
-                Account__c,
-                Contact__c,
-                Person_Account__c,
-                Type__c,
-                Street__c,
-                City__c,
-                State__c,
-                Postal_Code__c,
-                Country__c,
-                Seasonal_Start_Month__c,
-                Seasonal_Start_Day__c,
-                Seasonal_End_Month__c,
-                Seasonal_End_Day__c,
-                Is_Default__c
-            FROM Address__c
-            WHERE Id IN :addressIds
-            WITH USER_MODE
-            LIMIT 10000
-        ];
-    }
+	/** These addresses, as the user may read them; one they cannot read is left out. */
+	public static List<Address__c> selectByIds(Set<Id> addressIds) {
+		if (addressIds == null || addressIds.isEmpty()) {
+			return new List<Address__c>();
+		}
+		return [
+			SELECT
+				Id,
+				Account__c,
+				Contact__c,
+				Person_Account__c,
+				Type__c,
+				Street__c,
+				City__c,
+				State__c,
+				Postal_Code__c,
+				Country__c,
+				Seasonal_Start_Month__c,
+				Seasonal_Start_Day__c,
+				Seasonal_End_Month__c,
+				Seasonal_End_Day__c,
+				Is_Default__c
+			FROM Address__c
+			WHERE Id IN :addressIds
+			WITH USER_MODE
+			LIMIT 10000
+		];
+	}
 
-    /**
-     * The name of each of these people and households, as the user may read them, for a
-     * screen that lists them (R-AD9). A record the user cannot read is left out.
-     */
-    public static Map<Id, String> selectNames(Set<Id> contactIds, Set<Id> accountIds) {
-        Map<Id, String> names = new Map<Id, String>();
-        if (contactIds != null && !contactIds.isEmpty()) {
-            for (Contact person : [
-                SELECT Id, Name
-                FROM Contact
-                WHERE Id IN :contactIds
-                WITH USER_MODE
-                ORDER BY Name
-                LIMIT 10000
-            ]) {
-                names.put(person.Id, person.Name);
-            }
-        }
-        if (accountIds != null && !accountIds.isEmpty()) {
-            for (Account record : [
-                SELECT Id, Name
-                FROM Account
-                WHERE Id IN :accountIds
-                WITH USER_MODE
-                ORDER BY Name
-                LIMIT 10000
-            ]) {
-                names.put(record.Id, record.Name);
-            }
-        }
-        return names;
-    }
+	/**
+	 * The name of each of these people and households, as the user may read them, for a
+	 * screen that lists them (R-AD9). A record the user cannot read is left out.
+	 */
+	public static Map<Id, String> selectNames(Set<Id> contactIds, Set<Id> accountIds) {
+		Map<Id, String> names = new Map<Id, String>();
+		if (contactIds != null && !contactIds.isEmpty()) {
+			for (Contact person : [
+				SELECT Id, Name
+				FROM Contact
+				WHERE Id IN :contactIds
+				WITH USER_MODE
+				ORDER BY Name
+				LIMIT 10000
+			]) {
+				names.put(person.Id, person.Name);
+			}
+		}
+		if (accountIds != null && !accountIds.isEmpty()) {
+			for (Account record : [
+				SELECT Id, Name
+				FROM Account
+				WHERE Id IN :accountIds
+				WITH USER_MODE
+				ORDER BY Name
+				LIMIT 10000
+			]) {
+				names.put(record.Id, record.Name);
+			}
+		}
+		return names;
+	}
 
-    /**
-     * Which of these people are marked deceased, so a move someone chooses leaves them out
-     * (R-AD9). System mode on purpose, for this one flag used only to leave records out: a
-     * person who may move addresses without field access to Deceased must not have the move
-     * fail on it, and nothing read here is shown.
-     */
-    public static Set<Id> selectDeceased(Set<Id> contactIds, Set<Id> accountIds) {
-        Set<Id> deceased = new Set<Id>();
-        if (contactIds != null && !contactIds.isEmpty()) {
-            for (Contact person : [
-                SELECT Id
-                FROM Contact
-                WHERE Id IN :contactIds AND Deceased__c = TRUE
-                WITH SYSTEM_MODE
-                LIMIT 10000
-            ]) {
-                deceased.add(person.Id);
-            }
-        }
-        if (accountIds != null && !accountIds.isEmpty()) {
-            for (Account record : [
-                SELECT Id
-                FROM Account
-                WHERE Id IN :accountIds AND Deceased__c = TRUE
-                WITH SYSTEM_MODE
-                LIMIT 10000
-            ]) {
-                deceased.add(record.Id);
-            }
-        }
-        return deceased;
-    }
+	/**
+	 * Which of these people are marked deceased, so a move someone chooses leaves them out
+	 * (R-AD9). System mode on purpose, for this one flag used only to leave records out: a
+	 * person who may move addresses without field access to Deceased must not have the move
+	 * fail on it, and nothing read here is shown.
+	 */
+	public static Set<Id> selectDeceased(Set<Id> contactIds, Set<Id> accountIds) {
+		Set<Id> deceased = new Set<Id>();
+		if (contactIds != null && !contactIds.isEmpty()) {
+			for (Contact person : [
+				SELECT Id
+				FROM Contact
+				WHERE Id IN :contactIds AND Deceased__c = TRUE
+				WITH SYSTEM_MODE
+				LIMIT 10000
+			]) {
+				deceased.add(person.Id);
+			}
+		}
+		if (accountIds != null && !accountIds.isEmpty()) {
+			for (Account record : [
+				SELECT Id
+				FROM Account
+				WHERE Id IN :accountIds AND Deceased__c = TRUE
+				WITH SYSTEM_MODE
+				LIMIT 10000
+			]) {
+				deceased.add(record.Id);
+			}
+		}
+		return deceased;
+	}
 
-    /**
-     * The birthdate and email of these contacts, for telling apart people listed with the same
-     * name (R-AD9). The ids are ones the user was just shown by name in user mode; fields the
-     * user may not read are stripped, so a hidden birthdate or email is never shown.
-     */
-    public static Map<Id, Contact> selectDistinguishingDetails(Set<Id> contactIds) {
-        if (contactIds == null || contactIds.isEmpty()) {
-            return new Map<Id, Contact>();
-        }
-        SObjectAccessDecision readable = Security.stripInaccessible(
-            AccessType.READABLE,
-            [
-                SELECT Id, Birthdate, Email
-                FROM Contact
-                WHERE Id IN :contactIds
-                WITH SYSTEM_MODE
-                LIMIT 10000
-            ]
-        );
-        return new Map<Id, Contact>((List<Contact>) readable.getRecords());
-    }
+	/**
+	 * The birthdate and email of these contacts, for telling apart people listed with the same
+	 * name (R-AD9). The ids are ones the user was just shown by name in user mode; fields the
+	 * user may not read are stripped, so a hidden birthdate or email is never shown.
+	 */
+	public static Map<Id, Contact> selectDistinguishingDetails(Set<Id> contactIds) {
+		if (contactIds == null || contactIds.isEmpty()) {
+			return new Map<Id, Contact>();
+		}
+		SObjectAccessDecision readable = Security.stripInaccessible(
+			AccessType.READABLE,
+			[
+				SELECT Id, Birthdate, Email
+				FROM Contact
+				WHERE Id IN :contactIds
+				WITH SYSTEM_MODE
+				LIMIT 10000
+			]
+		);
+		return new Map<Id, Contact>((List<Contact>) readable.getRecords());
+	}
 }

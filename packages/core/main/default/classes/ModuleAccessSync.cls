@@ -7,9 +7,9 @@
  */
 @NamespaceAccessible
 public interface ModuleAccessSync {
-    /**
-     * Queues the module's sync, which only gives and does nothing while the module is turned
-     * off. Never throws: a failure is logged and the next nightly check tries again.
-     */
-    void requestSync();
+	/**
+	 * Queues the module's sync, which only gives and does nothing while the module is turned
+	 * off. Never throws: a failure is logged and the next nightly check tries again.
+	 */
+	void requestSync();
 }

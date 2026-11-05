@@ -24,23 +24,23 @@
  * cannot edit the batch record still cannot post it.
  */
 public with sharing class GiftBatchWriter {
-    public static final String STATUS_POSTED = 'Posted';
+	public static final String STATUS_POSTED = 'Posted';
 
-    /** Points each line at the gift it produced. */
-    public static void linkGifts(Map<Id, Id> giftIdByRowId) {
-        List<Gift_Batch_Row__c> rows = new List<Gift_Batch_Row__c>();
-        for (Id rowId : giftIdByRowId.keySet()) {
-            rows.add(new Gift_Batch_Row__c(Id = rowId, Gift__c = giftIdByRowId.get(rowId)));
-        }
-        Database.update(rows, true, AccessLevel.SYSTEM_MODE);
-    }
+	/** Points each line at the gift it produced. */
+	public static void linkGifts(Map<Id, Id> giftIdByRowId) {
+		List<Gift_Batch_Row__c> rows = new List<Gift_Batch_Row__c>();
+		for (Id rowId : giftIdByRowId.keySet()) {
+			rows.add(new Gift_Batch_Row__c(Id = rowId, Gift__c = giftIdByRowId.get(rowId)));
+		}
+		Database.update(rows, true, AccessLevel.SYSTEM_MODE);
+	}
 
-    /** Closes the batch. The validation rule `Posted_Batch_Is_Final` keeps it closed. */
-    public static void markPosted(Id batchId) {
-        Database.update(
-            new Gift_Batch__c(Id = batchId, Status__c = STATUS_POSTED),
-            true,
-            AccessLevel.SYSTEM_MODE
-        );
-    }
+	/** Closes the batch. The validation rule `Posted_Batch_Is_Final` keeps it closed. */
+	public static void markPosted(Id batchId) {
+		Database.update(
+			new Gift_Batch__c(Id = batchId, Status__c = STATUS_POSTED),
+			true,
+			AccessLevel.SYSTEM_MODE
+		);
+	}
 }

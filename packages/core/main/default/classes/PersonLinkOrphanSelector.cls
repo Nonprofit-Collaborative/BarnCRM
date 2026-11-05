@@ -9,53 +9,53 @@
  * in user mode and stop at the cap they are given. Detection only; nothing here writes.
  */
 public with sharing class PersonLinkOrphanSelector {
-    public static Integer countRelationships(Integer cap) {
-        return [
-            SELECT COUNT()
-            FROM Relationship__c
-            WHERE
-                (Contact__c = NULL
-                AND Person_Account__c = NULL)
-                OR (Related_Contact__c = NULL
-                AND Related_Person_Account__c = NULL)
-            WITH USER_MODE
-            LIMIT :cap
-        ];
-    }
+	public static Integer countRelationships(Integer cap) {
+		return [
+			SELECT COUNT()
+			FROM Relationship__c
+			WHERE
+				(Contact__c = NULL
+				AND Person_Account__c = NULL)
+				OR (Related_Contact__c = NULL
+				AND Related_Person_Account__c = NULL)
+			WITH USER_MODE
+			LIMIT :cap
+		];
+	}
 
-    public static List<Relationship__c> relationships(Integer howMany) {
-        return [
-            SELECT Id, Name
-            FROM Relationship__c
-            WHERE
-                (Contact__c = NULL
-                AND Person_Account__c = NULL)
-                OR (Related_Contact__c = NULL
-                AND Related_Person_Account__c = NULL)
-            WITH USER_MODE
-            ORDER BY CreatedDate, Id
-            LIMIT :howMany
-        ];
-    }
+	public static List<Relationship__c> relationships(Integer howMany) {
+		return [
+			SELECT Id, Name
+			FROM Relationship__c
+			WHERE
+				(Contact__c = NULL
+				AND Person_Account__c = NULL)
+				OR (Related_Contact__c = NULL
+				AND Related_Person_Account__c = NULL)
+			WITH USER_MODE
+			ORDER BY CreatedDate, Id
+			LIMIT :howMany
+		];
+	}
 
-    public static Integer countAffiliations(Integer cap) {
-        return [
-            SELECT COUNT()
-            FROM Affiliation__c
-            WHERE Contact__c = NULL AND Person_Account__c = NULL
-            WITH USER_MODE
-            LIMIT :cap
-        ];
-    }
+	public static Integer countAffiliations(Integer cap) {
+		return [
+			SELECT COUNT()
+			FROM Affiliation__c
+			WHERE Contact__c = NULL AND Person_Account__c = NULL
+			WITH USER_MODE
+			LIMIT :cap
+		];
+	}
 
-    public static List<Affiliation__c> affiliations(Integer howMany) {
-        return [
-            SELECT Id, Name
-            FROM Affiliation__c
-            WHERE Contact__c = NULL AND Person_Account__c = NULL
-            WITH USER_MODE
-            ORDER BY CreatedDate, Id
-            LIMIT :howMany
-        ];
-    }
+	public static List<Affiliation__c> affiliations(Integer howMany) {
+		return [
+			SELECT Id, Name
+			FROM Affiliation__c
+			WHERE Contact__c = NULL AND Person_Account__c = NULL
+			WITH USER_MODE
+			ORDER BY CreatedDate, Id
+			LIMIT :howMany
+		];
+	}
 }

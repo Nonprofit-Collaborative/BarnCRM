@@ -11,22 +11,22 @@
  */
 @NamespaceAccessible
 public with sharing class GiftDonorDeleteGuardHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public GiftDonorDeleteGuardHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public GiftDonorDeleteGuardHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'GiftDonorDeleteGuardHandler';
-    }
+	public override String getName() {
+		return 'GiftDonorDeleteGuardHandler';
+	}
 
-    public override void beforeDelete() {
-        GiftPostingLock.noteDonorsNamed(oldRecords());
-        CommitmentService.noteDonorsWithOpenCommitments(oldRecords());
-    }
+	public override void beforeDelete() {
+		GiftPostingLock.noteDonorsNamed(oldRecords());
+		CommitmentService.noteDonorsWithOpenCommitments(oldRecords());
+	}
 
-    public override void afterDelete() {
-        GiftPostingLock.enforceOnDonorDelete(oldRecords());
-        CommitmentService.refuseDeletingOpenCommitmentDonors(oldRecords());
-    }
+	public override void afterDelete() {
+		GiftPostingLock.enforceOnDonorDelete(oldRecords());
+		CommitmentService.refuseDeletingOpenCommitmentDonors(oldRecords());
+	}
 }

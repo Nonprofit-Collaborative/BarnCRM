@@ -1,11 +1,11 @@
 trigger ContactTrigger on Contact(
-    before insert,
-    before update,
-    after insert,
-    after update,
-    before delete,
-    after delete,
-    after undelete
+	before insert,
+	before update,
+	after insert,
+	after update,
+	before delete,
+	after delete,
+	after undelete
 ) {
-    TriggerDispatcher.run('Contact');
+	TriggerDispatcher.run('Contact');
 }

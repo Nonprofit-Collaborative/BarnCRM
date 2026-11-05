@@ -9,15 +9,15 @@
  */
 @NamespaceAccessible
 public interface HealthCheckFixExtension {
-    /**
-     * What this fix would change if it ran now, as names the administrator reads in the confirm
-     * box. Empty when it would change nothing, null for a key this extension does not own.
-     */
-    List<String> fixScope(String fixKey);
+	/**
+	 * What this fix would change if it ran now, as names the administrator reads in the confirm
+	 * box. Empty when it would change nothing, null for a key this extension does not own.
+	 */
+	List<String> fixScope(String fixKey);
 
-    /** The button label of this fix, which also names it in the change history; null if unknown. */
-    String fixLabel(String fixKey);
+	/** The button label of this fix, which also names it in the change history; null if unknown. */
+	String fixLabel(String fixKey);
 
-    /** Runs the fix on exactly this scope and returns the sentence that says what it did. */
-    String runFix(String fixKey, List<String> scope);
+	/** Runs the fix on exactly this scope and returns the sentence that says what it did. */
+	String runFix(String fixKey, List<String> scope);
 }

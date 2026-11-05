@@ -4,5 +4,5 @@
  * from the settings console unless its row always runs (ADR-0017, ADR-0024).
  */
 trigger GoalTrigger on Goal__c(before insert, before update) {
-    TriggerDispatcher.run('Goal__c');
+	TriggerDispatcher.run('Goal__c');
 }

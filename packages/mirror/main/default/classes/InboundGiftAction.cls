@@ -13,12 +13,12 @@
  * `docs/admin-guide/using-barncrm-actions-with-ai.md`. BarnCRM ships no AI of its own.
  */
 global with sharing class InboundGiftAction {
-    @InvocableMethod(
-        label='Record Inbound Gift'
-        description='Records a gift that has already been received, for a donor who already exists. Never creates a donor, never changes or refunds a gift. Safe to repeat: the same External Id returns the gift already recorded instead of a second one.'
-        category='BarnCRM'
-    )
-    global static List<InboundGiftResult> record(List<InboundGift> gifts) {
-        return InboundGiftService.record(gifts);
-    }
+	@InvocableMethod(
+		label='Record Inbound Gift'
+		description='Records a gift that has already been received, for a donor who already exists. Never creates a donor, never changes or refunds a gift. Safe to repeat: the same External Id returns the gift already recorded instead of a second one.'
+		category='BarnCRM'
+	)
+	global static List<InboundGiftResult> record(List<InboundGift> gifts) {
+		return InboundGiftService.record(gifts);
+	}
 }

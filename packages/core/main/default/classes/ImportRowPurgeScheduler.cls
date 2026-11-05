@@ -8,12 +8,12 @@
  * nightly run does the work.
  */
 public with sharing class ImportRowPurgeScheduler implements Schedulable {
-    /** The name the job was scheduled under; the nightly run adopts it as a retired key. */
-    public static final String JOB_NAME = 'BarnCRM Import Row Cleanup';
+	/** The name the job was scheduled under; the nightly run adopts it as a retired key. */
+	public static final String JOB_NAME = 'BarnCRM Import Row Cleanup';
 
-    public void execute(SchedulableContext context) {
-        if (context != null) {
-            NightlyJobs.adoptOldSchedules();
-        }
-    }
+	public void execute(SchedulableContext context) {
+		if (context != null) {
+			NightlyJobs.adoptOldSchedules();
+		}
+	}
 }

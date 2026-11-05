@@ -10,27 +10,27 @@
  * a dynamic query.
  */
 public without sharing class EnrollmentIntegritySelector {
-    /**
-     * The open enrollments (Applied or Enrolled) in these programs that name one of these people.
-     */
-    public static List<Enrollment__c> selectOpenFor(
-        Set<Id> programIds,
-        Set<Id> contactIds,
-        Set<Id> accountIds
-    ) {
-        if (programIds == null || programIds.isEmpty()) {
-            return new List<Enrollment__c>();
-        }
-        Set<String> openStages = EnrollmentService.OPEN_STAGES;
-        return [
-            SELECT Id, Program__c, Contact__c, Account__c
-            FROM Enrollment__c
-            WHERE
-                Program__c IN :programIds
-                AND Stage__c IN :openStages
-                AND (Contact__c IN :contactIds
-                OR Account__c IN :accountIds)
-            WITH SYSTEM_MODE
-        ];
-    }
+	/**
+	 * The open enrollments (Applied or Enrolled) in these programs that name one of these people.
+	 */
+	public static List<Enrollment__c> selectOpenFor(
+		Set<Id> programIds,
+		Set<Id> contactIds,
+		Set<Id> accountIds
+	) {
+		if (programIds == null || programIds.isEmpty()) {
+			return new List<Enrollment__c>();
+		}
+		Set<String> openStages = EnrollmentService.OPEN_STAGES;
+		return [
+			SELECT Id, Program__c, Contact__c, Account__c
+			FROM Enrollment__c
+			WHERE
+				Program__c IN :programIds
+				AND Stage__c IN :openStages
+				AND (Contact__c IN :contactIds
+				OR Account__c IN :accountIds)
+			WITH SYSTEM_MODE
+		];
+	}
 }

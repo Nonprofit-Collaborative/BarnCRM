@@ -8,11 +8,11 @@
  * The batch records when it finished on Giving Settings, which is what the Hub shows.
  */
 public with sharing class InstallmentTopUpSchedulable implements Schedulable {
-    public void execute(SchedulableContext context) {
-        try {
-            Database.executeBatch(new InstallmentTopUpBatch(), InstallmentTopUpBatch.CHUNK_SIZE);
-        } catch (Exception jobFailure) {
-            ErrorLogger.log(jobFailure, 'InstallmentTopUpSchedulable');
-        }
-    }
+	public void execute(SchedulableContext context) {
+		try {
+			Database.executeBatch(new InstallmentTopUpBatch(), InstallmentTopUpBatch.CHUNK_SIZE);
+		} catch (Exception jobFailure) {
+			ErrorLogger.log(jobFailure, 'InstallmentTopUpSchedulable');
+		}
+	}
 }

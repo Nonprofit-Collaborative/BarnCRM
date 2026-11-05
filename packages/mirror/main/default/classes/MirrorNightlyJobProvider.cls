@@ -9,15 +9,15 @@
  */
 @NamespaceAccessible
 public with sharing class MirrorNightlyJobProvider implements NightlyStepProvider {
-    @NamespaceAccessible
-    public MirrorNightlyJobProvider() {
-        return;
-    }
+	@NamespaceAccessible
+	public MirrorNightlyJobProvider() {
+		return;
+	}
 
-    public List<NightlyStep> nightlySteps() {
-        return new List<NightlyStep>{
-            OpportunityMirrorSchedulable.step(),
-            GiftTransactionMirrorSchedulable.step()
-        };
-    }
+	public List<NightlyStep> nightlySteps() {
+		return new List<NightlyStep>{
+			OpportunityMirrorSchedulable.step(),
+			GiftTransactionMirrorSchedulable.step()
+		};
+	}
 }

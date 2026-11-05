@@ -77,6 +77,7 @@ CI enforces what it can; reviewers enforce the rest.
 
 - Objects and fields: `PascalCase__c`, module-neutral API names (the namespace disambiguates). Labels use the language a nonprofit uses: "Gift" not "Donation Transaction", "Fund" not "General Accounting Unit".
 - Apex: one class per responsibility, with role suffixes: `*Service`, `*Selector`, `*Domain` or `*TriggerHandler`, `*Controller`, `*Batch`, `*Queueable`, `*Schedulable`, `*Test`.
+- Apex formatting: Prettier indents `.cls` and `.trigger` files with tabs (`useTabs` in `.prettierrc`), because the org counts every leading space against its 6,000,000 character Apex limit and a tab is one character instead of four. Run `npx prettier --write` on the Apex you change; never indent by hand with spaces.
 - LWC: component names describe the screen, for example `settingsConsole`, `householdNamingPreview`, `importWizard`.
 - Custom labels: `Module_Screen_Purpose`, for example `Giving_ReceiptPage_IssuedStamp`.
 - Custom permissions: `Manage_BarnCRM_Settings`, `Enter_Gifts`, `Issue_Receipts`, `Manage_Volunteers`, `Manage_Programs`, `View_Funder_Pipeline`.

@@ -10,92 +10,92 @@
  */
 @NamespaceAccessible
 public with sharing class HealthCheckExtensions {
-    /**
-     * The class names dependent packages register to add findings, in the order they are asked:
-     * the Rollup Builder module's rollup checks (ADR-0125), Giving's (G-20 follow-up), then
-     * Mirror's, for its nightly mirror run (X-01), then Volunteers' (canonical model Part G), then Programs' (29ZA), then Funders' (29ZH).
-     */
-    @NamespaceAccessible
-    public static final List<String> EXTENSION_CLASSES = new List<String>{
-        'RollupsHealthCheckExtension',
-        'GivingHealthCheckExtension',
-        'MirrorHealthCheckExtension',
-        'VolunteersHealthCheckExtension',
-        'ProgramsHealthCheckExtension',
-        'FundersHealthCheckExtension'
-    };
+	/**
+	 * The class names dependent packages register to add findings, in the order they are asked:
+	 * the Rollup Builder module's rollup checks (ADR-0125), Giving's (G-20 follow-up), then
+	 * Mirror's, for its nightly mirror run (X-01), then Volunteers' (canonical model Part G), then Programs' (29ZA), then Funders' (29ZH).
+	 */
+	@NamespaceAccessible
+	public static final List<String> EXTENSION_CLASSES = new List<String>{
+		'RollupsHealthCheckExtension',
+		'GivingHealthCheckExtension',
+		'MirrorHealthCheckExtension',
+		'VolunteersHealthCheckExtension',
+		'ProgramsHealthCheckExtension',
+		'FundersHealthCheckExtension'
+	};
 
-    /** Injected by Core's tests by class name, since no other package is there to resolve. */
-    @TestVisible
-    private static Map<String, HealthCheckExtension> overrides = new Map<String, HealthCheckExtension>();
+	/** Injected by Core's tests by class name, since no other package is there to resolve. */
+	@TestVisible
+	private static Map<String, HealthCheckExtension> overrides = new Map<String, HealthCheckExtension>();
 
-    /** Set by Core's tests to see the org as having no extension beyond those injected. */
-    @TestVisible
-    private static Boolean noneForTest = false;
+	/** Set by Core's tests to see the org as having no extension beyond those injected. */
+	@TestVisible
+	private static Boolean noneForTest = false;
 
-    /** Each class looked up so far this transaction, null when it is not installed. */
-    private static Map<String, HealthCheckExtension> found = new Map<String, HealthCheckExtension>();
+	/** Each class looked up so far this transaction, null when it is not installed. */
+	private static Map<String, HealthCheckExtension> found = new Map<String, HealthCheckExtension>();
 
-    /**
-     * Every installed extension, keyed by the name a failure of it is reported under
-     * (`giving_extension`, `mirror_extension`), so one that throws never hides another's. Each
-     * is looked up once per transaction.
-     */
-    @NamespaceAccessible
-    public static Map<String, HealthCheckExtension> findAll() {
-        Map<String, HealthCheckExtension> byKey = new Map<String, HealthCheckExtension>();
-        for (String className : EXTENSION_CLASSES) {
-            HealthCheckExtension extension = overrides.get(className);
-            if (extension == null && noneForTest != true) {
-                if (!found.containsKey(className)) {
-                    found.put(className, resolve(className));
-                }
-                extension = found.get(className);
-            }
-            if (extension != null) {
-                byKey.put(
-                    className.removeEnd('HealthCheckExtension').toLowerCase() + '_extension',
-                    extension
-                );
-            }
-        }
-        return byKey;
-    }
+	/**
+	 * Every installed extension, keyed by the name a failure of it is reported under
+	 * (`giving_extension`, `mirror_extension`), so one that throws never hides another's. Each
+	 * is looked up once per transaction.
+	 */
+	@NamespaceAccessible
+	public static Map<String, HealthCheckExtension> findAll() {
+		Map<String, HealthCheckExtension> byKey = new Map<String, HealthCheckExtension>();
+		for (String className : EXTENSION_CLASSES) {
+			HealthCheckExtension extension = overrides.get(className);
+			if (extension == null && noneForTest != true) {
+				if (!found.containsKey(className)) {
+					found.put(className, resolve(className));
+				}
+				extension = found.get(className);
+			}
+			if (extension != null) {
+				byKey.put(
+					className.removeEnd('HealthCheckExtension').toLowerCase() + '_extension',
+					extension
+				);
+			}
+		}
+		return byKey;
+	}
 
-    /**
-     * The installed extensions that also offer fixes (`HealthCheckFixExtension`), in the order
-     * `findAll` lists them. Core asks these only for a fix key none of its own fixes has.
-     */
-    @NamespaceAccessible
-    public static List<HealthCheckFixExtension> fixExtensions() {
-        List<HealthCheckFixExtension> fixers = new List<HealthCheckFixExtension>();
-        for (HealthCheckExtension extension : findAll().values()) {
-            if (extension instanceof HealthCheckFixExtension) {
-                fixers.add((HealthCheckFixExtension) extension);
-            }
-        }
-        return fixers;
-    }
+	/**
+	 * The installed extensions that also offer fixes (`HealthCheckFixExtension`), in the order
+	 * `findAll` lists them. Core asks these only for a fix key none of its own fixes has.
+	 */
+	@NamespaceAccessible
+	public static List<HealthCheckFixExtension> fixExtensions() {
+		List<HealthCheckFixExtension> fixers = new List<HealthCheckFixExtension>();
+		for (HealthCheckExtension extension : findAll().values()) {
+			if (extension instanceof HealthCheckFixExtension) {
+				fixers.add((HealthCheckFixExtension) extension);
+			}
+		}
+		return fixers;
+	}
 
-    private static HealthCheckExtension resolve(String className) {
-        Type extensionType = NamespaceUtil.resolveType(className);
-        if (extensionType == null) {
-            return null;
-        }
-        Object candidate;
-        try {
-            candidate = extensionType.newInstance();
-        } catch (Exception cannotBuild) {
-            ErrorLogger.log(cannotBuild, 'HealthCheckExtensions.resolve');
-            return null;
-        }
-        if (candidate instanceof HealthCheckExtension) {
-            return (HealthCheckExtension) candidate;
-        }
-        ErrorLogger.log(
-            new System.TypeException(className + ' does not implement HealthCheckExtension'),
-            'HealthCheckExtensions.resolve'
-        );
-        return null;
-    }
+	private static HealthCheckExtension resolve(String className) {
+		Type extensionType = NamespaceUtil.resolveType(className);
+		if (extensionType == null) {
+			return null;
+		}
+		Object candidate;
+		try {
+			candidate = extensionType.newInstance();
+		} catch (Exception cannotBuild) {
+			ErrorLogger.log(cannotBuild, 'HealthCheckExtensions.resolve');
+			return null;
+		}
+		if (candidate instanceof HealthCheckExtension) {
+			return (HealthCheckExtension) candidate;
+		}
+		ErrorLogger.log(
+			new System.TypeException(className + ' does not implement HealthCheckExtension'),
+			'HealthCheckExtensions.resolve'
+		);
+		return null;
+	}
 }

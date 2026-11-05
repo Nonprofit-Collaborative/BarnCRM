@@ -7,36 +7,36 @@
  */
 @NamespaceAccessible
 public with sharing class AskNextAskDateHandler extends TriggerHandler {
-    private static final String CONTEXT = 'Ask: donor Next Ask Date';
+	private static final String CONTEXT = 'Ask: donor Next Ask Date';
 
-    @NamespaceAccessible
-    public AskNextAskDateHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public AskNextAskDateHandler() {
+		return;
+	}
 
-    public override void afterInsert() {
-        sync(newRecords(), null);
-    }
+	public override void afterInsert() {
+		sync(newRecords(), null);
+	}
 
-    public override void afterUpdate() {
-        sync(newRecords(), oldRecords());
-    }
+	public override void afterUpdate() {
+		sync(newRecords(), oldRecords());
+	}
 
-    public override void afterDelete() {
-        sync(null, oldRecords());
-    }
+	public override void afterDelete() {
+		sync(null, oldRecords());
+	}
 
-    /** An ask restored from the Recycle Bin is open again, so its date counts again. */
-    public override void afterUndelete() {
-        sync(newRecords(), null);
-    }
+	/** An ask restored from the Recycle Bin is open again, so its date counts again. */
+	public override void afterUndelete() {
+		sync(newRecords(), null);
+	}
 
-    private void sync(List<SObject> afterRows, List<SObject> beforeRows) {
-        try {
-            AskDonorDateSync.sync(afterRows, beforeRows);
-        } catch (Exception failure) {
-            // A donor date that could not be kept in step must not stop the ask being saved.
-            ErrorLogger.log(failure, CONTEXT);
-        }
-    }
+	private void sync(List<SObject> afterRows, List<SObject> beforeRows) {
+		try {
+			AskDonorDateSync.sync(afterRows, beforeRows);
+		} catch (Exception failure) {
+			// A donor date that could not be kept in step must not stop the ask being saved.
+			ErrorLogger.log(failure, CONTEXT);
+		}
+	}
 }

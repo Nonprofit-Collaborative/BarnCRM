@@ -8,33 +8,33 @@
  * erasure itself already stands.
  */
 public with sharing class PersonErasureHistoryCleanup implements Queueable {
-    /** Record Ids by history object and parent field, as "ContactHistory.ContactId". */
-    private final Map<String, Set<Id>> targets;
+	/** Record Ids by history object and parent field, as "ContactHistory.ContactId". */
+	private final Map<String, Set<Id>> targets;
 
-    public PersonErasureHistoryCleanup(Map<String, Set<Id>> targets) {
-        this.targets = targets;
-    }
+	public PersonErasureHistoryCleanup(Map<String, Set<Id>> targets) {
+		this.targets = targets;
+	}
 
-    public void execute(QueueableContext context) {
-        for (String key : targets.keySet()) {
-            String historyObject = key.substringBefore('.');
-            String parentField = key.substringAfter('.');
-            try {
-                List<SObject> rows = Database.queryWithBinds(
-                    'SELECT Id FROM ' +
-                        historyObject +
-                        ' WHERE ' +
-                        parentField +
-                        ' IN :ids LIMIT 10000',
-                    new Map<String, Object>{ 'ids' => targets.get(key) },
-                    AccessLevel.USER_MODE
-                );
-                if (!rows.isEmpty()) {
-                    Database.delete(rows, true, AccessLevel.USER_MODE);
-                }
-            } catch (Exception refused) {
-                ErrorLogger.log(refused, 'PersonErasureHistoryCleanup.' + historyObject);
-            }
-        }
-    }
+	public void execute(QueueableContext context) {
+		for (String key : targets.keySet()) {
+			String historyObject = key.substringBefore('.');
+			String parentField = key.substringAfter('.');
+			try {
+				List<SObject> rows = Database.queryWithBinds(
+					'SELECT Id FROM ' +
+						historyObject +
+						' WHERE ' +
+						parentField +
+						' IN :ids LIMIT 10000',
+					new Map<String, Object>{ 'ids' => targets.get(key) },
+					AccessLevel.USER_MODE
+				);
+				if (!rows.isEmpty()) {
+					Database.delete(rows, true, AccessLevel.USER_MODE);
+				}
+			} catch (Exception refused) {
+				ErrorLogger.log(refused, 'PersonErasureHistoryCleanup.' + historyObject);
+			}
+		}
+	}
 }

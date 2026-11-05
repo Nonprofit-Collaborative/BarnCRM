@@ -6,35 +6,35 @@
  */
 @NamespaceAccessible
 public with sharing class GiftPostingLockHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public GiftPostingLockHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public GiftPostingLockHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'GiftPostingLockHandler';
-    }
+	public override String getName() {
+		return 'GiftPostingLockHandler';
+	}
 
-    public override void beforeInsert() {
-        GiftPostingLock.enforceOnInsert((List<Gift__c>) newRecords());
-    }
+	public override void beforeInsert() {
+		GiftPostingLock.enforceOnInsert((List<Gift__c>) newRecords());
+	}
 
-    public override void afterInsert() {
-        GiftPostingLock.enforceOnRestore((List<Gift__c>) newRecords(), false);
-    }
+	public override void afterInsert() {
+		GiftPostingLock.enforceOnRestore((List<Gift__c>) newRecords(), false);
+	}
 
-    public override void beforeUpdate() {
-        GiftPostingLock.enforceOnUpdate(
-            (List<Gift__c>) newRecords(),
-            (Map<Id, Gift__c>) oldRecordsById()
-        );
-    }
+	public override void beforeUpdate() {
+		GiftPostingLock.enforceOnUpdate(
+			(List<Gift__c>) newRecords(),
+			(Map<Id, Gift__c>) oldRecordsById()
+		);
+	}
 
-    public override void beforeDelete() {
-        GiftPostingLock.enforceOnDelete((List<Gift__c>) oldRecords());
-    }
+	public override void beforeDelete() {
+		GiftPostingLock.enforceOnDelete((List<Gift__c>) oldRecords());
+	}
 
-    public override void afterUndelete() {
-        GiftPostingLock.enforceOnRestore((List<Gift__c>) newRecords(), true);
-    }
+	public override void afterUndelete() {
+		GiftPostingLock.enforceOnRestore((List<Gift__c>) newRecords(), true);
+	}
 }

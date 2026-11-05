@@ -25,28 +25,28 @@
  * accessors on TriggerHandler, which is the contract every packaged handler is written to.
  */
 public with sharing class RelationshipValidationHandler extends TriggerHandler {
-    public override void beforeInsert() {
-        applyAndValidate((List<Relationship__c>) newRecords(), null);
-    }
+	public override void beforeInsert() {
+		applyAndValidate((List<Relationship__c>) newRecords(), null);
+	}
 
-    public override void beforeUpdate() {
-        applyAndValidate((List<Relationship__c>) newRecords(), oldRecordsById());
-    }
+	public override void beforeUpdate() {
+		applyAndValidate((List<Relationship__c>) newRecords(), oldRecordsById());
+	}
 
-    private void applyAndValidate(List<Relationship__c> records, Map<Id, SObject> previousById) {
-        if (records == null || records.isEmpty()) {
-            return;
-        }
-        try {
-            RelationshipDomain.applyDefaults(records, previousById);
-            RelationshipDomain.validate(records, previousById);
-        } catch (Exception thrown) {
-            reportFailure(
-                thrown,
-                records,
-                'RelationshipValidationHandler.applyAndValidate',
-                BarnHelp.text('Core', 'Core_Relationship_SyncFailed')
-            );
-        }
-    }
+	private void applyAndValidate(List<Relationship__c> records, Map<Id, SObject> previousById) {
+		if (records == null || records.isEmpty()) {
+			return;
+		}
+		try {
+			RelationshipDomain.applyDefaults(records, previousById);
+			RelationshipDomain.validate(records, previousById);
+		} catch (Exception thrown) {
+			reportFailure(
+				thrown,
+				records,
+				'RelationshipValidationHandler.applyAndValidate',
+				BarnHelp.text('Core', 'Core_Relationship_SyncFailed')
+			);
+		}
+	}
 }

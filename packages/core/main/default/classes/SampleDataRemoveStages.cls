@@ -22,55 +22,55 @@
  * Nothing is kept between stages: each one reads what is left.
  */
 public with sharing class SampleDataRemoveStages implements SampleDataStages {
-    public String name() {
-        return 'SampleDataRemoveStages';
-    }
+	public String name() {
+		return 'SampleDataRemoveStages';
+	}
 
-    /** One stage per chunk of each kind of record, so the whole set is covered. */
-    public Integer stageCount() {
-        SampleDataSelector selector = new SampleDataSelector();
-        return chunksFor(selector.getSampleRelationshipIds().size()) +
-            chunksFor(selector.getSampleAffiliationIds().size()) +
-            chunksFor(selector.getSampleContactIds().size()) +
-            chunksFor(selector.getSampleAccountIds().size());
-    }
+	/** One stage per chunk of each kind of record, so the whole set is covered. */
+	public Integer stageCount() {
+		SampleDataSelector selector = new SampleDataSelector();
+		return chunksFor(selector.getSampleRelationshipIds().size()) +
+			chunksFor(selector.getSampleAffiliationIds().size()) +
+			chunksFor(selector.getSampleContactIds().size()) +
+			chunksFor(selector.getSampleAccountIds().size());
+	}
 
-    public void runStage(Integer stage) {
-        removeNextChunk();
-    }
+	public void runStage(Integer stage) {
+		removeNextChunk();
+	}
 
-    /** Nothing follows Core's records: the card sees the batch end and reports Not loaded. */
-    public void finish() {
-        return;
-    }
+	/** Nothing follows Core's records: the card sees the batch end and reports Not loaded. */
+	public void finish() {
+		return;
+	}
 
-    /**
-     * Deletes the next chunk of sample records and returns true when it deleted anything.
-     * Static and public so the tests drive a stage without a batch.
-     */
-    public static Boolean removeNextChunk() {
-        SampleDataSelector selector = new SampleDataSelector();
-        return deleteChunk(selector.getSampleRelationshipIds()) ||
-            deleteChunk(selector.getSampleAffiliationIds()) ||
-            deleteChunk(selector.getSampleContactIds()) ||
-            deleteChunk(selector.getSampleAccountIds());
-    }
+	/**
+	 * Deletes the next chunk of sample records and returns true when it deleted anything.
+	 * Static and public so the tests drive a stage without a batch.
+	 */
+	public static Boolean removeNextChunk() {
+		SampleDataSelector selector = new SampleDataSelector();
+		return deleteChunk(selector.getSampleRelationshipIds()) ||
+			deleteChunk(selector.getSampleAffiliationIds()) ||
+			deleteChunk(selector.getSampleContactIds()) ||
+			deleteChunk(selector.getSampleAccountIds());
+	}
 
-    private static Integer chunksFor(Integer recordCount) {
-        Integer size = SampleDataLoader.REMOVE_CHUNK_SIZE;
-        return (recordCount + size - 1) / size;
-    }
+	private static Integer chunksFor(Integer recordCount) {
+		Integer size = SampleDataLoader.REMOVE_CHUNK_SIZE;
+		return (recordCount + size - 1) / size;
+	}
 
-    /** Deletes up to one chunk of these ids; false when there were none. */
-    private static Boolean deleteChunk(List<Id> ids) {
-        if (ids.isEmpty()) {
-            return false;
-        }
-        List<Id> chunk = new List<Id>();
-        for (Integer i = 0; i < ids.size() && i < SampleDataLoader.REMOVE_CHUNK_SIZE; i++) {
-            chunk.add(ids[i]);
-        }
-        Database.delete(chunk, AccessLevel.USER_MODE);
-        return true;
-    }
+	/** Deletes up to one chunk of these ids; false when there were none. */
+	private static Boolean deleteChunk(List<Id> ids) {
+		if (ids.isEmpty()) {
+			return false;
+		}
+		List<Id> chunk = new List<Id>();
+		for (Integer i = 0; i < ids.size() && i < SampleDataLoader.REMOVE_CHUNK_SIZE; i++) {
+			chunk.add(ids[i]);
+		}
+		Database.delete(chunk, AccessLevel.USER_MODE);
+		return true;
+	}
 }

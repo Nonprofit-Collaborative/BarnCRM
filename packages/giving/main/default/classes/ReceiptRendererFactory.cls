@@ -24,90 +24,90 @@
  * an administrator who chose a renderer and got the default anyway would have no way to tell.
  */
 public with sharing class ReceiptRendererFactory {
-    /** The shipped renderer: the Visualforce PDF rendering service through `Blob.toPdf()`. */
-    public static final String KEY_BLOB_PDF = 'Blob PDF';
+	/** The shipped renderer: the Visualforce PDF rendering service through `Blob.toPdf()`. */
+	public static final String KEY_BLOB_PDF = 'Blob PDF';
 
-    /** The fallback ADR-0016 names: a Visualforce page rendered as PDF. */
-    public static final String KEY_VISUALFORCE = 'Visualforce';
+	/** The fallback ADR-0016 names: a Visualforce page rendered as PDF. */
+	public static final String KEY_VISUALFORCE = 'Visualforce';
 
-    /**
-     * Every renderer this package permits, key to class name. Closed, and checked **before** any
-     * class is resolved or constructed. ADR-0016 names two implementations and this is both of
-     * them; adding a third is a source change here plus a choice in the setting definition, which
-     * is exactly the review this gate exists for. The fallback class is not in the package yet, so
-     * choosing it in an org that does not have it is a readable error rather than a silent
-     * default.
-     */
-    private static final Map<String, String> PERMITTED_RENDERERS = new Map<String, String>{
-        KEY_BLOB_PDF => 'BlobToPdfReceiptRenderer',
-        KEY_VISUALFORCE => 'VisualforceReceiptRenderer'
-    };
+	/**
+	 * Every renderer this package permits, key to class name. Closed, and checked **before** any
+	 * class is resolved or constructed. ADR-0016 names two implementations and this is both of
+	 * them; adding a third is a source change here plus a choice in the setting definition, which
+	 * is exactly the review this gate exists for. The fallback class is not in the package yet, so
+	 * choosing it in an org that does not have it is a readable error rather than a silent
+	 * default.
+	 */
+	private static final Map<String, String> PERMITTED_RENDERERS = new Map<String, String>{
+		KEY_BLOB_PDF => 'BlobToPdfReceiptRenderer',
+		KEY_VISUALFORCE => 'VisualforceReceiptRenderer'
+	};
 
-    /**
-     * Set by a test to run the whole feature without producing PDF bytes. Production code never
-     * assigns it; ADR-0016 records that PDF bytes cannot be asserted in an Apex test, so the tests
-     * assert the composed HTML and the record and file graph instead.
-     */
-    @TestVisible
-    private static ReceiptRenderer overrideRenderer;
+	/**
+	 * Set by a test to run the whole feature without producing PDF bytes. Production code never
+	 * assigns it; ADR-0016 records that PDF bytes cannot be asserted in an Apex test, so the tests
+	 * assert the composed HTML and the record and file graph instead.
+	 */
+	@TestVisible
+	private static ReceiptRenderer overrideRenderer;
 
-    public static ReceiptRenderer get() {
-        if (overrideRenderer != null) {
-            return overrideRenderer;
-        }
-        String chosen = keyFrom(Giving_Settings__c.getOrgDefaults().Receipt_Renderer__c);
-        if (KEY_BLOB_PDF.equals(chosen)) {
-            // The shipped renderer is constructed directly, so the ordinary path never reaches
-            // reflection at all.
-            return new BlobToPdfReceiptRenderer();
-        }
-        if (!PERMITTED_RENDERERS.containsKey(chosen)) {
-            throw refusal(Label.Giving_Receipt_UnknownRenderer, chosen);
-        }
-        return resolve(chosen);
-    }
+	public static ReceiptRenderer get() {
+		if (overrideRenderer != null) {
+			return overrideRenderer;
+		}
+		String chosen = keyFrom(Giving_Settings__c.getOrgDefaults().Receipt_Renderer__c);
+		if (KEY_BLOB_PDF.equals(chosen)) {
+			// The shipped renderer is constructed directly, so the ordinary path never reaches
+			// reflection at all.
+			return new BlobToPdfReceiptRenderer();
+		}
+		if (!PERMITTED_RENDERERS.containsKey(chosen)) {
+			throw refusal(Label.Giving_Receipt_UnknownRenderer, chosen);
+		}
+		return resolve(chosen);
+	}
 
-    /**
-     * The key a configured value names: the shipped renderer when nothing is set, and otherwise
-     * the value without the whitespace around it, which is an administrator typing rather than a
-     * different choice.
-     */
-    @TestVisible
-    private static String keyFrom(String configured) {
-        return String.isBlank(configured) ? KEY_BLOB_PDF : configured.trim();
-    }
+	/**
+	 * The key a configured value names: the shipped renderer when nothing is set, and otherwise
+	 * the value without the whitespace around it, which is an administrator typing rather than a
+	 * different choice.
+	 */
+	@TestVisible
+	private static String keyFrom(String configured) {
+		return String.isBlank(configured) ? KEY_BLOB_PDF : configured.trim();
+	}
 
-    /**
-     * The class behind a key that has already been allowed. Only a class name this package owns
-     * reaches `Type.forName`, and nothing is constructed before the key was recognized.
-     */
-    private static ReceiptRenderer resolve(String chosen) {
-        Type rendererType = Type.forName(PERMITTED_RENDERERS.get(chosen));
-        if (rendererType == null) {
-            throw refusal(Label.Giving_Receipt_RendererUnavailable, chosen);
-        }
-        Object instance = rendererType.newInstance();
-        if (!(instance instanceof ReceiptRenderer)) {
-            // Unreachable while the map holds only renderers, and kept so that a future entry
-            // that is not one fails here rather than at the call site.
-            throw refusal(Label.Giving_Receipt_RendererUnavailable, chosen);
-        }
-        return (ReceiptRenderer) instance;
-    }
+	/**
+	 * The class behind a key that has already been allowed. Only a class name this package owns
+	 * reaches `Type.forName`, and nothing is constructed before the key was recognized.
+	 */
+	private static ReceiptRenderer resolve(String chosen) {
+		Type rendererType = Type.forName(PERMITTED_RENDERERS.get(chosen));
+		if (rendererType == null) {
+			throw refusal(Label.Giving_Receipt_RendererUnavailable, chosen);
+		}
+		Object instance = rendererType.newInstance();
+		if (!(instance instanceof ReceiptRenderer)) {
+			// Unreachable while the map holds only renderers, and kept so that a future entry
+			// that is not one fails here rather than at the call site.
+			throw refusal(Label.Giving_Receipt_RendererUnavailable, chosen);
+		}
+		return (ReceiptRenderer) instance;
+	}
 
-    /** A refusal that names the value, so an administrator can see what to clear. */
-    private static ReceiptRendererFactoryException refusal(String message, String chosen) {
-        return new ReceiptRendererFactoryException(
-            String.format(message, new List<String>{ chosen })
-        );
-    }
+	/** A refusal that names the value, so an administrator can see what to clear. */
+	private static ReceiptRendererFactoryException refusal(String message, String chosen) {
+		return new ReceiptRendererFactoryException(
+			String.format(message, new List<String>{ chosen })
+		);
+	}
 
-    /** The keys an administrator may choose, for the setting definition and for a test. */
-    @TestVisible
-    private static Set<String> permittedKeys() {
-        return PERMITTED_RENDERERS.keySet().clone();
-    }
+	/** The keys an administrator may choose, for the setting definition and for a test. */
+	@TestVisible
+	private static Set<String> permittedKeys() {
+		return PERMITTED_RENDERERS.keySet().clone();
+	}
 
-    public class ReceiptRendererFactoryException extends Exception {
-    }
+	public class ReceiptRendererFactoryException extends Exception {
+	}
 }

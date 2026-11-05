@@ -9,104 +9,104 @@
  * bell, as the duplicate scan's does.
  */
 public with sharing class AutoMergeJob implements Database.Batchable<String>, Database.Stateful {
-    public static final String LOG_CONTEXT = 'Auto-merge';
-    @TestVisible
-    private static final Integer MERGE_CHUNK = 10;
-    private static final Integer UNDO_CHUNK = 20;
+	public static final String LOG_CONTEXT = 'Auto-merge';
+	@TestVisible
+	private static final Integer MERGE_CHUNK = 10;
+	private static final Integer UNDO_CHUNK = 20;
 
-    private final Boolean undoing;
-    private final List<String> work;
-    private final String runId;
-    @TestVisible
-    private Integer done = 0;
-    @TestVisible
-    private Integer skipped = 0;
-    @TestVisible
-    private Integer failed = 0;
+	private final Boolean undoing;
+	private final List<String> work;
+	private final String runId;
+	@TestVisible
+	private Integer done = 0;
+	@TestVisible
+	private Integer skipped = 0;
+	@TestVisible
+	private Integer failed = 0;
 
-    private AutoMergeJob(Boolean undoing, List<String> work, String runId) {
-        this.undoing = undoing;
-        this.work = work;
-        this.runId = runId;
-    }
+	private AutoMergeJob(Boolean undoing, List<String> work, String runId) {
+		this.undoing = undoing;
+		this.work = work;
+		this.runId = runId;
+	}
 
-    /** Starts merging these pair references under a new run, and answers the run's id. */
-    public static String startMerge(List<String> refs) {
-        String runId = UUID.randomUUID().toString();
-        Database.executeBatch(new AutoMergeJob(false, refs, runId), MERGE_CHUNK);
-        return runId;
-    }
+	/** Starts merging these pair references under a new run, and answers the run's id. */
+	public static String startMerge(List<String> refs) {
+		String runId = UUID.randomUUID().toString();
+		Database.executeBatch(new AutoMergeJob(false, refs, runId), MERGE_CHUNK);
+		return runId;
+	}
 
-    /** Starts undoing these journal rows of one run. */
-    public static void startUndo(String runId, List<Id> journalIds) {
-        List<String> work = new List<String>();
-        for (Id journalId : journalIds) {
-            work.add(journalId);
-        }
-        Database.executeBatch(new AutoMergeJob(true, work, runId), UNDO_CHUNK);
-    }
+	/** Starts undoing these journal rows of one run. */
+	public static void startUndo(String runId, List<Id> journalIds) {
+		List<String> work = new List<String>();
+		for (Id journalId : journalIds) {
+			work.add(journalId);
+		}
+		Database.executeBatch(new AutoMergeJob(true, work, runId), UNDO_CHUNK);
+	}
 
-    public Iterable<String> start(Database.BatchableContext context) {
-        return work;
-    }
+	public Iterable<String> start(Database.BatchableContext context) {
+		return work;
+	}
 
-    public void execute(Database.BatchableContext context, List<String> scope) {
-        if (undoing) {
-            undoChunk(scope);
-            return;
-        }
-        Integer failuresBefore = AutoMergeService.failureCount;
-        List<AutoMergeService.Candidate> pairs = AutoMergeService.candidatesFor(scope);
-        Integer merged = AutoMergeService.mergeAll(pairs, runId);
-        done += merged;
-        failed += AutoMergeService.failureCount - failuresBefore;
-        skipped += scope.size() - pairs.size();
-    }
+	public void execute(Database.BatchableContext context, List<String> scope) {
+		if (undoing) {
+			undoChunk(scope);
+			return;
+		}
+		Integer failuresBefore = AutoMergeService.failureCount;
+		List<AutoMergeService.Candidate> pairs = AutoMergeService.candidatesFor(scope);
+		Integer merged = AutoMergeService.mergeAll(pairs, runId);
+		done += merged;
+		failed += AutoMergeService.failureCount - failuresBefore;
+		skipped += scope.size() - pairs.size();
+	}
 
-    private void undoChunk(List<String> scope) {
-        List<Merge_Journal__c> journals = [
-            SELECT
-                Id,
-                Survivor_Id__c,
-                Merged_Id__c,
-                Merged_Name__c,
-                Status__c,
-                Changed_Values__c,
-                Moved_Records__c,
-                Notes__c
-            FROM Merge_Journal__c
-            WHERE Id IN :scope AND Status__c = :AutoMergeService.MERGED
-            WITH USER_MODE
-        ];
-        AutoMergeService.undo(journals);
-        for (Merge_Journal__c journal : journals) {
-            if (journal.Status__c == AutoMergeService.UNDO_FAILED) {
-                failed++;
-            } else {
-                done++;
-            }
-        }
-        skipped += scope.size() - journals.size();
-    }
+	private void undoChunk(List<String> scope) {
+		List<Merge_Journal__c> journals = [
+			SELECT
+				Id,
+				Survivor_Id__c,
+				Merged_Id__c,
+				Merged_Name__c,
+				Status__c,
+				Changed_Values__c,
+				Moved_Records__c,
+				Notes__c
+			FROM Merge_Journal__c
+			WHERE Id IN :scope AND Status__c = :AutoMergeService.MERGED
+			WITH USER_MODE
+		];
+		AutoMergeService.undo(journals);
+		for (Merge_Journal__c journal : journals) {
+			if (journal.Status__c == AutoMergeService.UNDO_FAILED) {
+				failed++;
+			} else {
+				done++;
+			}
+		}
+		skipped += scope.size() - journals.size();
+	}
 
-    public void finish(Database.BatchableContext context) {
-        String summary = String.format(
-            undoing
-                ? BarnHelp.text('Core', 'Core_AutoMerge_UndoFinished')
-                : BarnHelp.text('Core', 'Core_AutoMerge_RunFinished'),
-            new List<Object>{ done, skipped, failed }
-        );
-        ErrorLogger.logMessage(
-            summary,
-            LOG_CONTEXT,
-            failed > 0 ? ErrorLogger.SEVERITY_WARNING : ErrorLogger.SEVERITY_INFO
-        );
-        JobNotifier.aboutSettings(
-            UserInfo.getUserId(),
-            undoing ? Label.Core_AutoMerge_UndoNotice : Label.Core_AutoMerge_RunNotice,
-            false,
-            summary,
-            JobNotifier.SECTION_DUPLICATE_MATCHING
-        );
-    }
+	public void finish(Database.BatchableContext context) {
+		String summary = String.format(
+			undoing
+				? BarnHelp.text('Core', 'Core_AutoMerge_UndoFinished')
+				: BarnHelp.text('Core', 'Core_AutoMerge_RunFinished'),
+			new List<Object>{ done, skipped, failed }
+		);
+		ErrorLogger.logMessage(
+			summary,
+			LOG_CONTEXT,
+			failed > 0 ? ErrorLogger.SEVERITY_WARNING : ErrorLogger.SEVERITY_INFO
+		);
+		JobNotifier.aboutSettings(
+			UserInfo.getUserId(),
+			undoing ? Label.Core_AutoMerge_UndoNotice : Label.Core_AutoMerge_RunNotice,
+			false,
+			summary,
+			JobNotifier.SECTION_DUPLICATE_MATCHING
+		);
+	}
 }

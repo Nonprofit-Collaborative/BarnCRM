@@ -8,101 +8,101 @@
  * console can read the panel.
  */
 public with sharing class ErrorDigestController {
-    /** Raised with a message the panel shows as it is. */
-    public class ErrorDigestException extends Exception {
-    }
+	/** Raised with a message the panel shows as it is. */
+	public class ErrorDigestException extends Exception {
+	}
 
-    /** The panel, in one round trip. */
-    public class DigestView {
-        @AuraEnabled
-        public Boolean canManage;
-        @AuraEnabled
-        public Boolean scheduled;
-        @AuraEnabled
-        public Datetime nextRunAt;
-        @AuraEnabled
-        public Datetime lastRun;
-        @AuraEnabled
-        public String lastRunSummary;
-        /** The names of the people the next digest goes to. */
-        @AuraEnabled
-        public List<String> recipients;
-        /** True when nobody is listed, so it goes to everyone who administers BarnCRM. */
-        @AuraEnabled
-        public Boolean toAdministrators;
-    }
+	/** The panel, in one round trip. */
+	public class DigestView {
+		@AuraEnabled
+		public Boolean canManage;
+		@AuraEnabled
+		public Boolean scheduled;
+		@AuraEnabled
+		public Datetime nextRunAt;
+		@AuraEnabled
+		public Datetime lastRun;
+		@AuraEnabled
+		public String lastRunSummary;
+		/** The names of the people the next digest goes to. */
+		@AuraEnabled
+		public List<String> recipients;
+		/** True when nobody is listed, so it goes to everyone who administers BarnCRM. */
+		@AuraEnabled
+		public Boolean toAdministrators;
+	}
 
-    @AuraEnabled(cacheable=true)
-    public static DigestView getDigest() {
-        try {
-            return currentView();
-        } catch (Exception caught) {
-            throw asUserError(caught, 'Error digest page');
-        }
-    }
+	@AuraEnabled(cacheable=true)
+	public static DigestView getDigest() {
+		try {
+			return currentView();
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Error digest page');
+		}
+	}
 
-    /** Starts or stops the daily digest job. */
-    @AuraEnabled
-    public static DigestView setSchedule(Boolean scheduled) {
-        try {
-            requirePermission();
-            if (scheduled == true) {
-                ErrorDigestScheduler.start();
-            } else {
-                ErrorDigestScheduler.stop();
-            }
-            return currentView();
-        } catch (Exception caught) {
-            throw asUserError(caught, 'Schedule the error digest');
-        }
-    }
+	/** Starts or stops the daily digest job. */
+	@AuraEnabled
+	public static DigestView setSchedule(Boolean scheduled) {
+		try {
+			requirePermission();
+			if (scheduled == true) {
+				ErrorDigestScheduler.start();
+			} else {
+				ErrorDigestScheduler.stop();
+			}
+			return currentView();
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Schedule the error digest');
+		}
+	}
 
-    /** Sends a digest now, whatever the frequency says; nothing is sent when nothing is new. */
-    @AuraEnabled
-    public static DigestView sendNow() {
-        try {
-            requirePermission();
-            ErrorDigestService.sendNow();
-            return currentView();
-        } catch (Exception caught) {
-            throw asUserError(caught, 'Send the error digest now');
-        }
-    }
+	/** Sends a digest now, whatever the frequency says; nothing is sent when nothing is new. */
+	@AuraEnabled
+	public static DigestView sendNow() {
+		try {
+			requirePermission();
+			ErrorDigestService.sendNow();
+			return currentView();
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Send the error digest now');
+		}
+	}
 
-    private static DigestView currentView() {
-        BarnCRM_Settings__c settings = SettingsService.getSettings();
-        DigestView view = new DigestView();
-        view.canManage = canManage();
-        view.nextRunAt = ErrorDigestScheduler.nextRunAt();
-        view.scheduled = view.nextRunAt != null;
-        view.lastRun = settings.Error_Digest_Last_Run__c;
-        view.lastRunSummary = settings.Error_Digest_Last_Run_Summary__c;
-        view.toAdministrators = String.isBlank(settings.Error_Digest_Recipients__c);
-        view.recipients = new List<String>();
-        for (User recipient : ErrorDigestRecipients.resolve(settings.Error_Digest_Recipients__c)) {
-            view.recipients.add(recipient.Name);
-        }
-        return view;
-    }
+	private static DigestView currentView() {
+		BarnCRM_Settings__c settings = SettingsService.getSettings();
+		DigestView view = new DigestView();
+		view.canManage = canManage();
+		view.nextRunAt = ErrorDigestScheduler.nextRunAt();
+		view.scheduled = view.nextRunAt != null;
+		view.lastRun = settings.Error_Digest_Last_Run__c;
+		view.lastRunSummary = settings.Error_Digest_Last_Run_Summary__c;
+		view.toAdministrators = String.isBlank(settings.Error_Digest_Recipients__c);
+		view.recipients = new List<String>();
+		for (User recipient : ErrorDigestRecipients.resolve(settings.Error_Digest_Recipients__c)) {
+			view.recipients.add(recipient.Name);
+		}
+		return view;
+	}
 
-    private static Boolean canManage() {
-        return BarnCRMPermissions.canManageSettings();
-    }
+	private static Boolean canManage() {
+		return BarnCRMPermissions.canManageSettings();
+	}
 
-    private static void requirePermission() {
-        if (!canManage()) {
-            throw new ErrorDigestException(
-                BarnHelp.text('Core', 'Core_ErrorDigest_PermissionRequired')
-            );
-        }
-    }
+	private static void requirePermission() {
+		if (!canManage()) {
+			throw new ErrorDigestException(
+				BarnHelp.text('Core', 'Core_ErrorDigest_PermissionRequired')
+			);
+		}
+	}
 
-    private static AuraHandledException asUserError(Exception caught, String context) {
-        return UserErrors.wrap(
-            caught,
-            caught instanceof ErrorDigestException,
-            context,
-            BarnHelp.text('Core', 'Core_ErrorDigest_UnexpectedError')
-        );
-    }
+	private static AuraHandledException asUserError(Exception caught, String context) {
+		return UserErrors.wrap(
+			caught,
+			caught instanceof ErrorDigestException,
+			context,
+			BarnHelp.text('Core', 'Core_ErrorDigest_UnexpectedError')
+		);
+	}
 }

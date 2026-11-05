@@ -5,56 +5,56 @@
  */
 @NamespaceAccessible
 public with sharing class VolunteerSignupTriggerHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public VolunteerSignupTriggerHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public VolunteerSignupTriggerHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'VolunteerSignupTriggerHandler';
-    }
+	public override String getName() {
+		return 'VolunteerSignupTriggerHandler';
+	}
 
-    public override void beforeInsert() {
-        VolunteerSignupService.refuseSecondSignups((List<Volunteer_Signup__c>) newRecords());
-    }
+	public override void beforeInsert() {
+		VolunteerSignupService.refuseSecondSignups((List<Volunteer_Signup__c>) newRecords());
+	}
 
-    public override void beforeUpdate() {
-        Map<Id, Volunteer_Signup__c> previousById = (Map<Id, Volunteer_Signup__c>) oldRecordsById();
-        List<Volunteer_Signup__c> moved = new List<Volunteer_Signup__c>();
-        for (Volunteer_Signup__c signup : (List<Volunteer_Signup__c>) newRecords()) {
-            Volunteer_Signup__c previous = previousById.get(signup.Id);
-            if (
-                signup.Volunteer_Shift__c != previous.Volunteer_Shift__c ||
-                signup.Contact__c != previous.Contact__c ||
-                signup.Account__c != previous.Account__c
-            ) {
-                moved.add(signup);
-            }
-        }
-        if (!moved.isEmpty()) {
-            VolunteerSignupService.refuseSecondSignups(moved);
-        }
-    }
+	public override void beforeUpdate() {
+		Map<Id, Volunteer_Signup__c> previousById = (Map<Id, Volunteer_Signup__c>) oldRecordsById();
+		List<Volunteer_Signup__c> moved = new List<Volunteer_Signup__c>();
+		for (Volunteer_Signup__c signup : (List<Volunteer_Signup__c>) newRecords()) {
+			Volunteer_Signup__c previous = previousById.get(signup.Id);
+			if (
+				signup.Volunteer_Shift__c != previous.Volunteer_Shift__c ||
+				signup.Contact__c != previous.Contact__c ||
+				signup.Account__c != previous.Account__c
+			) {
+				moved.add(signup);
+			}
+		}
+		if (!moved.isEmpty()) {
+			VolunteerSignupService.refuseSecondSignups(moved);
+		}
+	}
 
-    public override void afterInsert() {
-        VolunteerSignupService.createHoursForAttendance(
-            (List<Volunteer_Signup__c>) newRecords(),
-            null
-        );
-    }
+	public override void afterInsert() {
+		VolunteerSignupService.createHoursForAttendance(
+			(List<Volunteer_Signup__c>) newRecords(),
+			null
+		);
+	}
 
-    /**
-     * R-VU2 on undelete: restoring a sign-up for a person who has since been booked onto the
-     * same shift again is refused. Undeleting writes no attendance hours.
-     */
-    public override void afterUndelete() {
-        VolunteerSignupService.refuseSecondSignups((List<Volunteer_Signup__c>) newRecords());
-    }
+	/**
+	 * R-VU2 on undelete: restoring a sign-up for a person who has since been booked onto the
+	 * same shift again is refused. Undeleting writes no attendance hours.
+	 */
+	public override void afterUndelete() {
+		VolunteerSignupService.refuseSecondSignups((List<Volunteer_Signup__c>) newRecords());
+	}
 
-    public override void afterUpdate() {
-        VolunteerSignupService.createHoursForAttendance(
-            (List<Volunteer_Signup__c>) newRecords(),
-            (Map<Id, Volunteer_Signup__c>) oldRecordsById()
-        );
-    }
+	public override void afterUpdate() {
+		VolunteerSignupService.createHoursForAttendance(
+			(List<Volunteer_Signup__c>) newRecords(),
+			(Map<Id, Volunteer_Signup__c>) oldRecordsById()
+		);
+	}
 }

@@ -5,12 +5,12 @@
  */
 @NamespaceAccessible
 public with sharing class RollupsNightlyJobProvider implements NightlyStepProvider {
-    @NamespaceAccessible
-    public RollupsNightlyJobProvider() {
-        // Built by name from Core (NightlyJobs), so it needs a public constructor.
-    }
+	@NamespaceAccessible
+	public RollupsNightlyJobProvider() {
+		// Built by name from Core (NightlyJobs), so it needs a public constructor.
+	}
 
-    public List<NightlyStep> nightlySteps() {
-        return new List<NightlyStep>{ RollupScheduler.step() };
-    }
+	public List<NightlyStep> nightlySteps() {
+		return new List<NightlyStep>{ RollupScheduler.step() };
+	}
 }
