@@ -40,4 +40,12 @@
         <shortDescription>Record page section: Name and Greetings</shortDescription>
         <value>Name and Greetings</value>
     </labels>
+    <labels>
+        <fullName>Core_Section_Connections</fullName>
+        <categories>Core, Record pages</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record page tab: Connections</shortDescription>
+        <value>Connections</value>
+    </labels>
 </CustomLabels>
