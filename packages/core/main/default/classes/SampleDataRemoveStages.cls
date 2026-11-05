@@ -5,15 +5,19 @@
  *
  * Each stage deletes one chunk (SampleDataLoader.REMOVE_CHUNK_SIZE records) of the first kind
  * that still has sample records, in this order, so nothing is left pointing at a record that
- * has just gone: connections, affiliations, contacts, then the accounts. The number of stages
+ * has just gone: connections, affiliations, addresses, contacts, then the accounts. Addresses
+ * go before their people and households because the lookups on an address only clear when the
+ * owner is deleted, which would leave the address behind with no owner. The number of stages
  * is the number of chunks each kind needs, counted when the batch starts. Every stage reads
  * its list again, so a record an earlier stage's automation already removed (the other side
  * of a connection, a household that upkeep tidied away) is never asked for a second time, and
  * a stage that finds nothing left does nothing.
  *
- * Everything the loader creates is either flagged itself or a detail of something that is,
- * which is what keeps this to "delete only what the loader created". Records an administrator
- * entered have the box clear and are never in these lists.
+ * Everything the loader creates is either flagged itself, a detail of something that is, or an
+ * address the address automation made for a sample person or household (found through its
+ * owner, since an address has no flag of its own), which is what keeps this to "delete only
+ * what the loader created". Records an administrator entered, and the addresses of people
+ * they entered, have the box clear and are never in these lists.
  *
  * In junction mode the membership rows the load created go with the households: the Household
  * field on a household member record is a required lookup that cascades, so deleting a
@@ -31,6 +35,7 @@ public with sharing class SampleDataRemoveStages implements SampleDataStages {
 		SampleDataSelector selector = new SampleDataSelector();
 		return chunksFor(selector.getSampleRelationshipIds().size()) +
 			chunksFor(selector.getSampleAffiliationIds().size()) +
+			chunksFor(selector.getSampleAddressIds().size()) +
 			chunksFor(selector.getSampleContactIds().size()) +
 			chunksFor(selector.getSampleAccountIds().size());
 	}
@@ -52,6 +57,7 @@ public with sharing class SampleDataRemoveStages implements SampleDataStages {
 		SampleDataSelector selector = new SampleDataSelector();
 		return deleteChunk(selector.getSampleRelationshipIds()) ||
 			deleteChunk(selector.getSampleAffiliationIds()) ||
+			deleteChunk(selector.getSampleAddressIds()) ||
 			deleteChunk(selector.getSampleContactIds()) ||
 			deleteChunk(selector.getSampleAccountIds());
 	}

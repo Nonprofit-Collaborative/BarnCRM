@@ -188,7 +188,8 @@ household records, names, greetings, member counts, and Members panel.
 9. Return to **BarnCRM Settings**, **Sample Data**, and select **Remove Sample Data**.
    Confirm the dialog. The card shows **Removing** while it deletes the set in steps of
    about a hundred records, the same way it loaded, then returns to **Not loaded**. Every
-   record the loader created is gone: households, contacts, organizations, connections, affiliations, and the
+   record the loader created is gone: households, contacts, organizations, connections, affiliations, the
+   addresses BarnCRM kept for the sample people and households, and the
    gifts, allocations, soft credits, tributes, funds, appeals, commitments, installments and asks
    too, along with the household member records that joined people to households if your
    org uses the flexible way. With Volunteers installed, its jobs, skills, schedule, shifts,
@@ -270,6 +271,7 @@ household records, names, greetings, member counts, and Members panel.
 | Sample Data checkbox on gifts, funds, appeals, commitments and asks (with Giving) | `Sample_Data__c` on `Gift__c`, `Fund__c`, `Appeal__c`, `Commitment__c` and `Ask__c` |
 | Sample Data checkbox on volunteer jobs and skills (with Volunteers) | `Sample_Data__c` on `Volunteer_Job__c` and `Skill__c`; shifts, schedules, sign-ups and hours are found through their job |
 | The key that ties a sample gift to the person who gave it | `Sample_Data_Key__c` on Account and Contact |
+| Addresses BarnCRM made for sample people and households | `Address__c`, found through the sample owner (no checkbox of their own) and removed before it; addresses on records you entered stay |
 | The join between a sample person and their household, flexible mode only | `Household_Member__c`, removed with the household it belongs to |
 | Allocations, soft credits and tributes on a sample gift | Details of the gift, removed with it; they carry no checkbox of their own |
 | Installments on a sample commitment | Details of the commitment, removed with it |
