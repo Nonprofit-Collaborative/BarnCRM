@@ -260,8 +260,11 @@ private class NpspHouseholdAdoptionTest {
 			// where it has record types), so a probe account saved the same way says what to expect.
 			Id expectedType = was.RecordTypeId;
 			if (expectedType == null) {
-				Account probe = new Account(Name = PREFIX + 'Probe');
-				insert probe;
+				Account probe = new Account(
+					Name = PREFIX + 'Probe',
+					RecordTypeId = HouseholdService.householdRecordTypeId()
+				);
+				Database.insert(probe, true, AccessLevel.SYSTEM_MODE);
 				Database.update(
 					new Account(Id = probe.Id, RecordTypeId = null),
 					true,
@@ -277,8 +280,12 @@ private class NpspHouseholdAdoptionTest {
 			}
 			Assert.areEqual(expectedType, smith.RecordTypeId, 'record type put back');
 			Assert.areEqual(was.Custom_Name__c, smith.Custom_Name__c, 'custom name put back');
-			Assert.isNull(smith.Household_Formal_Greeting__c, 'greeting put back to blank');
-			Assert.isNull(smith.Primary_Contact__c, 'primary put back to blank');
+			// Where the org's default is the household type, the account stays a household and
+			// household naming fills these again, so they are blank only on another type.
+			if (expectedType != HouseholdService.householdRecordTypeId()) {
+				Assert.isNull(smith.Household_Formal_Greeting__c, 'greeting put back to blank');
+				Assert.isNull(smith.Primary_Contact__c, 'primary put back to blank');
+			}
 
 			Map<String, Household_Adoption__c> rows = new Map<String, Household_Adoption__c>();
 			for (Household_Adoption__c row : [
