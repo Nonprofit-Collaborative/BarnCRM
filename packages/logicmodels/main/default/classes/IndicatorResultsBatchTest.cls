@@ -314,21 +314,18 @@ private class IndicatorResultsBatchTest {
         IndicatorResultsScheduler.jobNameInUse = 'BarnCRM Indicator Results Test';
         Id indicatorId;
         Id jobId;
-        NightlyJob job = new LogicModelsNightlyJobProvider().nightlyJobs()[0];
+        NightlyStep step = new LogicModelsNightlyJobProvider().nightlySteps()[0];
         System.runAs(TestUsers.adminWith(ADMIN)) {
             Id elementId = newElement();
             sessions(elementId);
             indicatorId = computed(elementId, SESSIONS, definition('count', null));
-            Boolean before = job.isScheduled();
-            job.schedule();
-            Assert.isFalse(before, 'Not scheduled before');
-            Assert.isTrue(job.isScheduled(), 'Scheduled by the fix');
             Test.startTest();
             jobId = IndicatorResultsScheduler.refreshAll();
             Test.stopTest();
         }
 
-        Assert.areEqual(Label.LogicModels_NightlyJobs_ResultsName, job.label(), 'Its name');
+        Assert.areEqual(Label.LogicModels_NightlyJobs_ResultsName, step.label, 'Its name');
+        Assert.areEqual(210, step.minute, 'At half past three in the nightly run');
         Assert.isNotNull(jobId, 'A run started');
         Assert.areEqual(3, results(indicatorId).get('Month'), 'Worked out');
     }

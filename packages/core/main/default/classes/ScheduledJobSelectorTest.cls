@@ -2,7 +2,7 @@
  * The one lookup for BarnCRM's scheduled jobs (ADMIN-11), and the deactivated owner finding
  * and fix built on it (ADMIN-12).
  */
-@IsTest(testFor='ApexClass:ScheduledJobSelector, ApexClass:NightlyJobs, ApexClass:NamedNightlyJob')
+@IsTest(testFor='ApexClass:ScheduledJobSelector, ApexClass:NightlyJobs')
 private class ScheduledJobSelectorTest {
     @TestSetup
     static void createTestUser() {
@@ -34,16 +34,8 @@ private class ScheduledJobSelectorTest {
     @IsTest
     static void aNamedJobIsScheduledOnceAndStoppedByName() {
         System.runAs(TestUsers.admin()) {
-            NightlyJob job = new NamedNightlyJob(
-                'Selector test',
-                OTHER_JOB,
-                DAILY,
-                new ErrorDigestScheduler()
-            );
-
             Test.startTest();
-            Boolean before = job.isScheduled();
-            job.schedule();
+            Boolean before = ScheduledJobSelector.isScheduled(OTHER_JOB);
             Id first = ScheduledJobSelector.ensure(OTHER_JOB, DAILY, new ErrorDigestScheduler());
             Id again = ScheduledJobSelector.ensure(OTHER_JOB, DAILY, new ErrorDigestScheduler());
             Boolean during = ScheduledJobSelector.isScheduled(OTHER_JOB);
@@ -54,8 +46,10 @@ private class ScheduledJobSelectorTest {
             Assert.isFalse(before, 'Not scheduled at first');
             Assert.areEqual(first, again, 'Ensuring twice finds the job already there');
             Assert.isTrue(during, 'Scheduled once ensured');
-            Assert.isFalse(job.isScheduled(), 'Stopped by name, and stopping twice is harmless');
-            Assert.areEqual('Selector test', job.label(), 'The label it was given');
+            Assert.isFalse(
+                ScheduledJobSelector.isScheduled(OTHER_JOB),
+                'Stopped by name, and stopping twice is harmless'
+            );
         }
     }
 
@@ -94,7 +88,7 @@ private class ScheduledJobSelectorTest {
             Datetime next = ScheduledJobSelector.nextFireTime(OTHER_JOB);
             Boolean tidy = EmptyHouseholdTidyScheduler.isScheduled();
             Boolean addresses = SeasonalAddressScheduler.isScheduled();
-            Datetime digest = ErrorDigestScheduler.nextRunAt();
+            Boolean run = NightlyJobs.isScheduled();
             Integer used = Limits.getQueries() - before;
             Test.stopTest();
 
@@ -103,11 +97,7 @@ private class ScheduledJobSelectorTest {
             Assert.areEqual(1, used, 'Five questions about scheduled jobs cost one query');
             Assert.isNotNull(tidy, 'Each scheduler answers from the same read');
             Assert.isNotNull(addresses, 'So does this one');
-            Assert.areEqual(
-                ScheduledJobSelector.nextFireTime(ErrorDigestScheduler.JOB_NAME),
-                digest,
-                'And this one'
-            );
+            Assert.areEqual(tidy, run, 'And the nightly run, which does the tidy-up');
         }
     }
 
@@ -167,20 +157,19 @@ private class ScheduledJobSelectorTest {
     static void theFixSchedulesKnownJobsAgainAndNamesTheRest() {
         System.runAs(TestUsers.admin()) {
             Id gone = inactiveUserId();
-            ErrorDigestScheduler.start();
+            NightlyJobs.start();
             ScheduledJobSelector.schedule(OTHER_JOB, DAILY, new ErrorDigestScheduler());
-            NightlyJobs.jobsOverride = new List<NightlyJob>{ ErrorDigestScheduler.nightlyJob() };
-            Id oldDigest = ScheduledJobSelector.triggerIdByName(ErrorDigestScheduler.JOB_NAME);
+            Id oldDigest = ScheduledJobSelector.triggerIdByName(NightlyJobs.jobName());
 
             Test.startTest();
             List<String> stoppedOnly = NightlyJobs.rescheduleAsRunningUser(
-                new List<String>{ ErrorDigestScheduler.JOB_NAME, OTHER_JOB }
+                new List<String>{ NightlyJobs.jobName(), OTHER_JOB }
             );
-            Id newDigest = ScheduledJobSelector.triggerIdByName(ErrorDigestScheduler.JOB_NAME);
+            Id newDigest = ScheduledJobSelector.triggerIdByName(NightlyJobs.jobName());
             Test.stopTest();
 
             Assert.isNotNull(gone, 'A deactivated owner exists');
-            Assert.isNotNull(newDigest, 'The digest is scheduled again');
+            Assert.isNotNull(newDigest, 'The nightly run is scheduled again');
             Assert.areNotEqual(oldDigest, newDigest, 'as a new job, owned by the running user');
             Assert.areEqual(
                 new List<String>{ OTHER_JOB },

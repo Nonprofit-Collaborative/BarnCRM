@@ -18,6 +18,12 @@ public with sharing class FeatureController {
         /** Extra sentence for the turn-on confirmation, or null. */
         @AuraEnabled
         public String confirmNote;
+        /**
+         * Why the feature cannot be turned on now, or null (RT-04). Shown whether the feature
+         * is on or off: an upgraded org may already have Household Upkeep on.
+         */
+        @AuraEnabled
+        public String blockedReason;
     }
 
     /** The feature list and whether this person may turn features on. */
@@ -49,6 +55,9 @@ public with sharing class FeatureController {
         try {
             FeatureSwitchService.turnOn(key);
             return model();
+        } catch (FeatureSwitchService.FeatureBlockedException e) {
+            // Its message is written for the admin: why the feature cannot be turned on.
+            throw UserErrors.message(e.getMessage());
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
             throw UserErrors.message(BarnHelp.text('Core', 'Core_Feature_SaveError'));
@@ -68,6 +77,7 @@ public with sharing class FeatureController {
             row.confirmNote = item.key == FeatureSwitchService.HOUSEHOLD_UPKEEP
                 ? BarnHelp.text('Core', 'Core_Feature_HouseholdUpkeep_ConfirmNote')
                 : null;
+            row.blockedReason = FeatureSwitchService.blockedReason(item.key);
             rows.add(row);
         }
         return rows;

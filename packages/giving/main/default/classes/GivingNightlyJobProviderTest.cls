@@ -1,123 +1,110 @@
 /**
- * Giving's nightly jobs as Health Check sees them (ADR-0075,
- * health-check-schedules-every-nightly-job): the three jobs are listed, each is scheduled on its
- * own and only once, and the acknowledgment send, which emails donors, is never one of them.
+ * Giving's steps of the nightly run (ADR-0166 nightly-job-dispatcher): the four jobs switched
+ * together and shipped on, then the acknowledgment send and the pledge reminders, shipped off
+ * because they email donors. Switching is checked under the test name of the run, so nothing
+ * depends on what the org has scheduled.
  */
-@IsTest(testFor='ApexClass:GivingNightlyJobProvider')
+@IsTest(testFor='ApexClass:GivingNightlyJobProvider, ApexClass:GivingScheduler')
 private class GivingNightlyJobProviderTest {
     @TestSetup
     static void createTestUser() {
         TestUsers.adminWith('Giving_Admin');
     }
 
-    private static Integer givingTriggerCount() {
-        return [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE 'BarnCRM Giving%'];
+    private static void noRun() {
+        TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+        ScheduledJobSelector.forget();
+        NightlyJobs.forget();
     }
 
     @IsTest
-    static void listsTheThreeNightlyJobsAndNotTheAcknowledgmentSend() {
+    static void listsSixStepsWithTheEmailingOnesShippedOff() {
         System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            GivingTestDataFactory.clearOrgGivingJobs();
-            List<NightlyJob> jobs = new GivingNightlyJobProvider().nightlyJobs();
+            List<NightlyStep> steps = new GivingNightlyJobProvider().nightlySteps();
 
-            Assert.areEqual(
-                4,
-                jobs.size(),
-                'The top up, the overdue pass, the donor levels pass and the ask reminders.'
-            );
-            Set<String> labels = new Set<String>();
-            for (NightlyJob job : jobs) {
-                labels.add(job.label());
-                Assert.isFalse(job.isScheduled(), 'Nothing is scheduled on a fresh org.');
+            Assert.areEqual(6, steps.size(), 'Four jobs, the acknowledgments and the reminders.');
+            Map<String, NightlyStep> byKey = new Map<String, NightlyStep>();
+            for (NightlyStep step : steps) {
+                byKey.put(step.key, step);
+                Assert.isTrue(step.hasSwitch(), step.key + ' has a switch.');
             }
-            Assert.isTrue(labels.contains(System.Label.Giving_NightlyJobs_TopUpName));
-            Assert.isTrue(labels.contains(System.Label.Giving_NightlyJobs_OverdueName));
-            Assert.isTrue(labels.contains(System.Label.Giving_NightlyJobs_LevelsName));
-            Assert.isTrue(labels.contains(System.Label.Giving_NightlyJobs_AskRemindersName));
-            Assert.areEqual(
-                4,
-                labels.size(),
-                'Each job has its own name, so the finding can list them apart.'
-            );
-        }
-    }
-
-    @IsTest
-    static void schedulingEachJobTwiceSchedulesItOnce() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            GivingTestDataFactory.clearOrgGivingJobs();
-            List<NightlyJob> jobs = new GivingNightlyJobProvider().nightlyJobs();
-
-            Test.startTest();
-            for (NightlyJob job : jobs) {
-                job.schedule();
-                job.schedule();
-            }
-            Test.stopTest();
-
-            Assert.areEqual(4, givingTriggerCount(), 'A second press adds no second job.');
-            for (NightlyJob job : jobs) {
-                Assert.isTrue(job.isScheduled(), job.label() + ' is scheduled.');
-            }
-            Assert.areEqual(
-                0,
-                [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name LIKE '%cknowledg%'],
-                'The acknowledgment send is not scheduled, because it emails donors.'
-            );
-        }
-    }
-
-    @IsTest
-    static void schedulingOneJobLeavesTheOthersAlone() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            GivingTestDataFactory.clearOrgGivingJobs();
-            List<NightlyJob> jobs = new GivingNightlyJobProvider().nightlyJobs();
-
-            Test.startTest();
-            jobs[1].schedule();
-            Test.stopTest();
-
-            Assert.areEqual(1, givingTriggerCount());
-            Assert.isFalse(jobs[0].isScheduled());
-            Assert.isTrue(jobs[1].isScheduled());
-            Assert.isFalse(jobs[2].isScheduled());
-        }
-    }
-
-    @IsTest
-    static void anUnknownJobNameSchedulesNothing() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            GivingTestDataFactory.clearOrgGivingJobs();
-            Test.startTest();
-            GivingScheduler.scheduleJobNamed('BarnCRM Giving: not a job');
-            Test.stopTest();
-
-            Assert.areEqual(0, givingTriggerCount());
-            Assert.isFalse(GivingScheduler.isJobScheduled('BarnCRM Giving: not a job'));
-        }
-    }
-
-    @IsTest
-    static void healthCheckSeesTheJobsAsWaitingUntilTheyAreScheduled() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            GivingTestDataFactory.clearOrgGivingJobs();
-            // No override is set: Core resolves the installed provider by name.
-            List<String> before = NightlyJobs.unscheduledLabels();
-            Assert.isTrue(
-                before.contains(System.Label.Giving_NightlyJobs_LevelsName),
-                'Core finds this provider by name and counts its jobs.'
-            );
-
-            Test.startTest();
-            GivingScheduler.scheduleAll();
-            Test.stopTest();
-
-            Assert.areEqual(4, givingTriggerCount());
+            Assert.areEqual(75, byKey.get(GivingScheduler.TOP_UP_JOB_NAME).minute, '1:15');
+            Assert.areEqual(105, byKey.get(GivingScheduler.OVERDUE_JOB_NAME).minute, '1:45');
+            Assert.areEqual(180, byKey.get(GivingScheduler.LEVELS_JOB_NAME).minute, '3:00');
+            Assert.areEqual(210, byKey.get(GivingScheduler.ASK_JOB_NAME).minute, '3:30');
+            Assert.isTrue(byKey.get(GivingScheduler.LEVELS_JOB_NAME).switchDefault, 'On');
             Assert.isFalse(
-                NightlyJobs.unscheduledLabels()
-                    .contains(System.Label.Giving_NightlyJobs_LevelsName),
-                'Once scheduled the job is no longer waiting.'
+                byKey.get(AcknowledgmentScheduler.JOB_NAME).switchDefault,
+                'The acknowledgment send ships off, because it emails donors.'
             );
+            Assert.isFalse(byKey.get(PledgeReminderScheduler.JOB_NAME).switchDefault, 'Off');
+        }
+    }
+
+    @IsTest
+    static void scheduleAllSwitchesTheFourOnAndStopAllOff() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            noRun();
+            Boolean before = GivingScheduler.isScheduled();
+
+            GivingScheduler.scheduleAll();
+            NightlyJobs.forget();
+            ScheduledJobSelector.forget();
+            Boolean after = GivingScheduler.isScheduled();
+            Datetime next = GivingScheduler.nextRunAt();
+            GivingScheduler.stopAll();
+            NightlyJobs.forget();
+
+            Assert.isFalse(before, 'Nothing runs before the run is scheduled.');
+            Assert.isTrue(after, 'All four on, with the run scheduled.');
+            Assert.isNotNull(next, 'With the next of them.');
+            Assert.isFalse(GivingScheduler.isScheduled(), 'Stopped.');
+            Assert.isFalse(
+                GivingScheduler.isJobScheduled(GivingScheduler.LEVELS_JOB_NAME),
+                'Each one is off.'
+            );
+            Assert.isTrue(NightlyJobs.isScheduled(), 'The run stays for the other steps.');
+        }
+    }
+
+    @IsTest
+    static void schedulingOneJobLeavesTheOthersAsTheyWere() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            noRun();
+            GivingScheduler.stopAll();
+            GivingScheduler.scheduleJobNamed(GivingScheduler.OVERDUE_JOB_NAME);
+            GivingScheduler.scheduleJobNamed('BarnCRM Giving: not a job');
+            NightlyJobs.forget();
+            ScheduledJobSelector.forget();
+
+            Assert.isTrue(GivingScheduler.isJobScheduled(GivingScheduler.OVERDUE_JOB_NAME));
+            Assert.isFalse(GivingScheduler.isJobScheduled(GivingScheduler.TOP_UP_JOB_NAME));
+            Assert.isFalse(GivingScheduler.isJobScheduled('BarnCRM Giving: not a job'));
+            Assert.isFalse(GivingScheduler.isScheduled(), 'One of four is not on.');
+        }
+    }
+
+    @IsTest
+    static void theAcknowledgmentAndReminderSwitchesFollowTheirPages() {
+        System.runAs(TestUsers.adminWith('Giving_Admin')) {
+            noRun();
+            Boolean before = AcknowledgmentScheduler.isScheduled();
+            AcknowledgmentScheduler.start();
+            PledgeReminderScheduler.start();
+            NightlyJobs.forget();
+            ScheduledJobSelector.forget();
+            Boolean ackOn = AcknowledgmentScheduler.isScheduled();
+            Datetime ackNext = AcknowledgmentScheduler.nextRunAt();
+            Boolean remindersOn = PledgeReminderScheduler.isScheduled();
+            AcknowledgmentScheduler.stop();
+            NightlyJobs.forget();
+
+            Assert.isFalse(before, 'Shipped off.');
+            Assert.isTrue(ackOn, 'On once switched on.');
+            Assert.areEqual(45, ackNext.minute(), 'At quarter to three.');
+            Assert.isTrue(remindersOn, 'The reminders too.');
+            Assert.isFalse(AcknowledgmentScheduler.isScheduled(), 'Off again.');
+            Assert.isNull(AcknowledgmentScheduler.nextRunAt(), 'With no next run.');
         }
     }
 }

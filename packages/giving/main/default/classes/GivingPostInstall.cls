@@ -95,6 +95,8 @@ public with sharing class GivingPostInstall implements InstallHandler, ModuleSet
      * @param installerId unused: every step belongs to the org, not to a person
      */
     public void runSetup(Id installerId) {
+        // Giving's jobs scheduled one by one before the nightly run become its steps (R-NJ5).
+        NightlyJobs.adoptOldSchedules();
         // Nothing is caught here because nothing can be thrown: the entry point records its own
         // failure in the Error Log and returns, so an install is never aborted by this step, and
         // the Rollups page can still create the rows on demand.
