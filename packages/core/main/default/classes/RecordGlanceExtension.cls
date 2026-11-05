@@ -1,6 +1,6 @@
 /**
  * The seam a dependent package uses to add a small card to Core's Contact and Account record
- * pages without Core depending on it (people-14; ADR-NEXT `NEXT-record-glance-extension.md`).
+ * pages without Core depending on it (people-14; ADR-0167).
  * Found by `RecordGlanceExtensions` with `NamespaceUtil.resolveType`, the mechanism of
  * `HealthCheckExtensions` (ADR-0057) and `WhereUsedExtensions` (ADR-0159).
  *

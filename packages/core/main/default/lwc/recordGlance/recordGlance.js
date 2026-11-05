@@ -6,7 +6,7 @@ import { cardViews } from './recordGlanceModel';
 
 /**
  * A host for small summary cards that installed modules add to Core's Contact and Account
- * record pages (people-14, ADR-NEXT `NEXT-record-glance-extension.md`). Core has no content of
+ * record pages (people-14, ADR-0167). Core has no content of
  * its own here: with no module installed, or none with something to say, it draws nothing.
  */
 export default class RecordGlance extends NavigationMixin(LightningElement) {

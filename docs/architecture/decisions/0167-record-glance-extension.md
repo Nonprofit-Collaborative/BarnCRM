@@ -1,4 +1,4 @@
-# ADR-NEXT: Modules add a glance card to Core's record pages through an extension seam
+# ADR-0167: Modules add a glance card to Core's record pages through an extension seam
 
 **Status:** Proposed (owner approval of the card, Brandon, 2026-11-04)
 **Date:** 2026-11-04

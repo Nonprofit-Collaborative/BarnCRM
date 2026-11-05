@@ -1,6 +1,6 @@
 /**
- * What one module shows about a record in the glance card on Core's record pages (ADR-NEXT
- * `NEXT-record-glance-extension.md`): a title, a few figures and a few actions. Core draws it
+ * What one module shows about a record in the glance card on Core's record pages (ADR-0167):
+ * a title, a few figures and a few actions. Core draws it
  * and knows nothing of what it says, so a module returns finished label text and a page
  * reference, never keys Core would have to translate.
  *

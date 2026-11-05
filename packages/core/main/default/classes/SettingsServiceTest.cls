@@ -1011,6 +1011,47 @@ private class SettingsServiceTest {
 	}
 
 	@IsTest
+	static void aPicklistFromFieldSavesItsShownDefaultAndMatchesCaseExactly() {
+		System.runAs(TestUsers.admin()) {
+			SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+				new Setting_Definition__mdt(
+					DeveloperName = 'Error_Digest_Frequency',
+					MasterLabel = 'Error Digest Frequency',
+					Setting_Key__c = 'Error_Digest_Frequency__c',
+					Section__c = 'Errors',
+					Module__c = 'Core',
+					Data_Type__c = SettingsService.PICKLIST_FROM_FIELD,
+					Record_Object__c = 'Account.Industry',
+					Sort_Order__c = 1
+				)
+			};
+			// A saved row with this setting blank: the console shows the declared default.
+			insert new BarnCRM_Settings__c(
+				SetupOwnerId = UserInfo.getOrganizationId(),
+				Error_Digest_Frequency__c = null
+			);
+			String active;
+			for (Schema.PicklistEntry entry : Account.Industry.getDescribe().getPicklistValues()) {
+				if (entry.isActive()) {
+					active = entry.getValue();
+					break;
+				}
+			}
+
+			Test.startTest();
+			String keptDefault = refusalOf('Error_Digest_Frequency__c', 'Daily');
+			String otherCase = refusalOf('Error_Digest_Frequency__c', active.toLowerCase());
+			Test.stopTest();
+
+			Assert.isNull(
+				keptDefault,
+				'The shown default saves although the field does not list it'
+			);
+			Assert.isNotNull(otherCase, 'An active value in another case is refused');
+		}
+	}
+
+	@IsTest
 	static void aFieldListTakesOnlyFieldsTheObjectOffersAndSavesOrgWide() {
 		System.runAs(TestUsers.admin()) {
 			SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
