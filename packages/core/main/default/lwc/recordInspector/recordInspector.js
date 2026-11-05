@@ -19,10 +19,8 @@ import COLUMN_TYPE from '@salesforce/label/c.Core_DataDictionary_ColType';
 import COLUMN_VALUE from '@salesforce/label/c.Core_Filter_Value';
 import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
 import COPIED from '@salesforce/label/c.Core_RecordInspector_Copied';
-import COPY_FAILED from '@salesforce/label/c.Core_RecordInspector_CopyFailed';
 import COUNT from '@salesforce/label/c.Core_RecordInspector_Count';
 import COUNT_FILTERED from '@salesforce/label/c.Core_RecordInspector_CountFiltered';
-import NO_MATCH from '@salesforce/label/c.Core_RecordInspector_NoMatch';
 import EMPTY from '@salesforce/label/c.Core_RecordInspector_Empty';
 import SHORTENED from '@salesforce/label/c.Core_RecordInspector_Shortened';
 import OPEN_FIND from '@salesforce/label/c.Core_DataHygiene_OpenInFind';
@@ -84,7 +82,9 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
     columnValue: COLUMN_VALUE,
     copy: COPY,
     openFind: OPEN_FIND,
-    noMatch: NO_MATCH,
+    get noMatch() {
+      return helpText('Core', 'Core_RecordInspector_NoMatch');
+    },
     shortened: SHORTENED,
     get fieldsCut() {
       return helpText('Core', 'Core_RecordInspector_FieldsCut');
@@ -214,7 +214,7 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
     this.copiedMessage = undefined;
     const clipboard = typeof navigator !== 'undefined' ? navigator.clipboard : undefined;
     if (!clipboard || !clipboard.writeText) {
-      this.errorMessage = COPY_FAILED;
+      this.errorMessage = helpText('Core', 'Core_RecordInspector_CopyFailed');
       return Promise.resolve();
     }
     return clipboard
@@ -224,7 +224,7 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
         this.copiedMessage = COPIED.replace('{0}', apiName);
       })
       .catch(() => {
-        this.errorMessage = COPY_FAILED;
+        this.errorMessage = helpText('Core', 'Core_RecordInspector_CopyFailed');
       });
   }
 }

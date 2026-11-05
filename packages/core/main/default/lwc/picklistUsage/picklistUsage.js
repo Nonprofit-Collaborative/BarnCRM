@@ -7,12 +7,6 @@ import { groupsOf, mergeDates, applyDates, scanProgress } from 'c/picklistUsageD
 
 import TITLE from '@salesforce/label/c.Core_PicklistUsage_Title';
 import SHOW from '@salesforce/label/c.Core_PicklistUsage_Show';
-import PROGRESS from '@salesforce/label/c.Core_PicklistUsage_Progress';
-import DATES_PROGRESS from '@salesforce/label/c.Core_PicklistUsage_DatesProgress';
-import DATES_STOPPED from '@salesforce/label/c.Core_PicklistUsage_DatesStopped';
-import NO_FIELDS from '@salesforce/label/c.Core_PicklistUsage_NoFields';
-import NOT_CHECKED from '@salesforce/label/c.Core_PicklistUsage_NotChecked';
-import TRUNCATED from '@salesforce/label/c.Core_PicklistUsage_Truncated';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CONTINUE from '@salesforce/label/c.Core_DataManager_DeleteContinue';
 import COL_FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
@@ -74,7 +68,9 @@ export default class PicklistUsage extends LightningElement {
       return helpText('Core', 'Core_PicklistUsage_Intro');
     },
     show: SHOW,
-    noFields: NO_FIELDS,
+    get noFields() {
+      return helpText('Core', 'Core_PicklistUsage_NoFields');
+    },
     get note() {
       return helpText('Core', 'Core_PicklistUsage_LastUsedNote');
     },
@@ -144,7 +140,9 @@ export default class PicklistUsage extends LightningElement {
   }
 
   get progressText() {
-    return PROGRESS.replace('{0}', this.fieldsDone).replace('{1}', this.fieldTotal);
+    return helpText('Core', 'Core_PicklistUsage_Progress')
+      .replace('{0}', this.fieldsDone)
+      .replace('{1}', this.fieldTotal);
   }
 
   get scanState() {
@@ -156,10 +154,9 @@ export default class PicklistUsage extends LightningElement {
 
   get datesProgressText() {
     const state = this.scanState;
-    return DATES_PROGRESS.replace('{0}', state.read.toLocaleString()).replace(
-      '{1}',
-      state.of.toLocaleString()
-    );
+    return helpText('Core', 'Core_PicklistUsage_DatesProgress')
+      .replace('{0}', state.read.toLocaleString())
+      .replace('{1}', state.of.toLocaleString());
   }
 
   get showRetry() {
@@ -176,17 +173,22 @@ export default class PicklistUsage extends LightningElement {
       .slice(this.scan.group)
       .flat()
       .map((name) => labelOf.get(name) || name);
-    return DATES_STOPPED.replace('{0}', state.read.toLocaleString())
+    return helpText('Core', 'Core_PicklistUsage_DatesStopped')
+      .replace('{0}', state.read.toLocaleString())
       .replace('{1}', state.of.toLocaleString())
       .replace('{2}', waiting.join(', '));
   }
 
   get notCheckedMessage() {
-    return this.failed.length ? NOT_CHECKED.replace('{0}', this.failed.join(', ')) : undefined;
+    return this.failed.length
+      ? helpText('Core', 'Core_PicklistUsage_NotChecked').replace('{0}', this.failed.join(', '))
+      : undefined;
   }
 
   get truncatedMessage() {
-    return this.truncated.length ? TRUNCATED.replace('{0}', this.truncated.join(', ')) : undefined;
+    return this.truncated.length
+      ? helpText('Core', 'Core_PicklistUsage_Truncated').replace('{0}', this.truncated.join(', '))
+      : undefined;
   }
 
   get tableRows() {

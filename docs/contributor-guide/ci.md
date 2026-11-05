@@ -123,7 +123,7 @@ Salesforce org is needed for this job. Steps:
    description over 80 characters, a value over 1000, or any of them missing, each of
    which only an org would otherwise report.
    `scripts/ci/check-label-budget.py` fails when the label total across all packages
-   passes its budget (4,150; target 4,000), when a label is referenced nowhere in
+   passes its budget (3,200; target 3,000), when a label is referenced nowhere in
    `packages/`, or when a label reads as help prose (a sentence whose name ends in a help
    word such as `Intro`, `Help`, `Description`, `Note` or `Empty`; see the script's docstring). An org allows 5,000 custom labels; installed managed package labels do not
    count, but every source deploy does, beside the org's own labels, and a source deploy

@@ -1,30 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_DataDictionary_PermissionRequired</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: no permission</shortDescription>
-        <value>You need the Manage BarnCRM Settings permission to build the data dictionary.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_UnknownObject</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: unknown object, {0} is the name asked for</shortDescription>
-        <value>There is no kind of record you can document named "{0}".</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_UnexpectedError</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: unexpected error</shortDescription>
-        <value>The data dictionary could not be built. The problem was written to the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataDictionary_PageTitle</fullName>
         <categories>DataDictionary</categories>
         <language>en_US</language>
@@ -55,38 +31,6 @@
         <protected>false</protected>
         <shortDescription>Data dictionary: build button</shortDescription>
         <value>Build Dictionary</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_Downloaded</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: file saved, {0} is the row count</shortDescription>
-        <value>Downloaded {0} fields.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_Progress</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: progress, {0} is done, {1} is the total</shortDescription>
-        <value>Described {0} of {1} kinds of record.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_FillProgress</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: counting, {0} is the object label</shortDescription>
-        <value>Counting fill rates for {0}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_NotCounted</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data dictionary: fill rates skipped, {0} is a list of labels</shortDescription>
-        <value>Fill rates not counted for: {0}. Each is too large or could not be counted.</value>
     </labels>
     <labels>
         <fullName>Core_DataDictionary_No</fullName>

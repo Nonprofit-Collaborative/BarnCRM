@@ -214,7 +214,7 @@ private class SetupChangeControllerTest {
             } catch (AuraHandledException expected) {
                 refused++;
                 Assert.areEqual(
-                    Label.Core_OrgOptimizer_ErrorNoPermission,
+                    BarnHelp.text('Core', 'Core_OrgOptimizer_ErrorNoPermission'),
                     expected.getMessage(),
                     'The same message Org Optimizer gives.'
                 );

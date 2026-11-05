@@ -112,7 +112,8 @@ the only kind whose wording never needs to be a platform label: nothing in Setup
   Builder, installs beside an org's own 2,000 labels; the full suite still needs the org to use
   fewer than about 880. The remaining room is in messages (1,597); moving all sentences would
   leave 2,411 for the full suite.
-- The CI label cap drops from 4,500 to 4,150.
+- The CI label cap drops from 4,500 to 4,150, and to 3,200 once Core's messages move (D-172:
+  943 messages, 3,152 labels left).
 - A component with help renders once its package's catalog is in (one request per package per
   page, then the browser cache); with the catalog missing it renders without the help.
 - Translators get help prose as JSON beside labels as Translation Workbench strings, both keyed

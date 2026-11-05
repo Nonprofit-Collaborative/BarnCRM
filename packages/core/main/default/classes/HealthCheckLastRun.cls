@@ -76,7 +76,7 @@ public with sharing class HealthCheckLastRun {
             return new Summary();
         }
         summary.result = String.format(
-            System.Label.Core_HealthCheck_LastResult,
+            BarnHelp.text('Core', 'Core_HealthCheck_LastResult'),
             new List<Object>{ summary.errors, summary.warnings, summary.infos }
         );
         return summary;

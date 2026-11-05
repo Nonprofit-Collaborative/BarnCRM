@@ -7,9 +7,9 @@ Salesforce Help, Custom Labels), but every unpackaged source deploy does: barn-s
 barn-npc and mwdbdevsb all receive BarnCRM as source, beside each org's own labels. barn-sales
 reached 4,996 on 2026-11-02 and a deploy failed with "custom label limit exceeded".
 
-BUDGET is the total across every package directory: the count after help prose moved to the
-help catalogs (ADR-NEXT help-text-json, 4,120 on 2026-11-04) plus a small margin, so every
-label added is a choice. TARGET is where the total should settle; above it the check passes
+BUDGET is the total across every package directory: the count after help prose and then Core's
+messages moved to the help catalogs (ADR-NEXT help-text-json and D-172, 3,152 on 2026-11-04)
+plus a small margin, so every label added is a choice. TARGET is where the total should settle; above it the check passes
 and says by how much.
 
 Help prose: help and guidance sentences live in the package's help catalog
@@ -34,8 +34,8 @@ import re
 import subprocess
 import sys
 
-BUDGET = 4150
-TARGET = 4000
+BUDGET = 3200
+TARGET = 3000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 
 HELP_WORDS = {

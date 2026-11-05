@@ -121,14 +121,6 @@
         <value>Run Health Check</value>
     </labels>
     <labels>
-        <fullName>Core_OrgOptimizer_ErrorNoPermission</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: refusal without Manage BarnCRM Settings</shortDescription>
-        <value>This section needs the Manage BarnCRM Settings permission. Ask your BarnCRM admin.</value>
-    </labels>
-    <labels>
         <fullName>Core_OrgOptimizer_Errors</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
@@ -279,14 +271,6 @@
         <protected>false</protected>
         <shortDescription>Org Optimizer: check title, scheduled jobs owned by inactive users</shortDescription>
         <value>Scheduled Jobs Owned by Inactive Users</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_CouldNotCheck</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: shown when a check could not run</shortDescription>
-        <value>Could not check: your access or this org does not allow it.</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_CheckFieldLimit</fullName>

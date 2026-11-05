@@ -117,7 +117,7 @@ private class DataHygieneServiceTest {
             Assert.areEqual(4, result.count, 'Three loose and one whose membership has ended.');
             Assert.isTrue(result.canOpenInFind, 'Find can ask about a missing membership.');
             Assert.areEqual(
-                System.Label.Core_DataHygiene_PeopleAccountsNotListed,
+                BarnHelp.text('Core', 'Core_DataHygiene_PeopleAccountsNotListed'),
                 result.note,
                 'The check says where the count and the Find list can differ.'
             );
@@ -151,7 +151,7 @@ private class DataHygieneServiceTest {
             Assert.isNull(result.errorMessage, 'The check runs: ' + result.errorMessage);
             Assert.areEqual(203, result.count, 'Three contacts and 200 people kept as accounts.');
             Assert.areEqual(
-                System.Label.Core_DataHygiene_PeopleAccountsNotListed,
+                BarnHelp.text('Core', 'Core_DataHygiene_PeopleAccountsNotListed'),
                 result.note,
                 'The check says the person accounts are counted but not listed.'
             );
@@ -649,7 +649,7 @@ private class DataHygieneServiceTest {
                 Assert.fail('An unknown key is refused.');
             } catch (DataHygieneService.DataHygieneException refused) {
                 Assert.areEqual(
-                    System.Label.Core_DataHygiene_UnknownCheck,
+                    BarnHelp.text('Core', 'Core_DataHygiene_UnknownCheck'),
                     refused.getMessage(),
                     'With a message.'
                 );

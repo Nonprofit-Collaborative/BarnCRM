@@ -255,7 +255,7 @@ public with sharing class FieldUtilizationController {
             if (sent.size() > MAX_SAVE_ROWS) {
                 throw new FieldUtilizationException(
                     String.format(
-                        System.Label.Core_FieldUtilization_TooManyRows,
+                        BarnHelp.text('Core', 'Core_FieldUtilization_TooManyRows'),
                         new List<Object>{ sent.size(), MAX_SAVE_ROWS }
                     )
                 );
@@ -358,7 +358,7 @@ public with sharing class FieldUtilizationController {
             Schema.DescribeSObjectResult described = requireObject(objectName);
             if (!canDeleteSnapshots()) {
                 throw new FieldUtilizationException(
-                    System.Label.Core_FieldUtilization_DeleteNoAccess
+                    BarnHelp.text('Core', 'Core_FieldUtilization_DeleteNoAccess')
                 );
             }
             if (takenAt == null) {
@@ -372,7 +372,7 @@ public with sharing class FieldUtilizationController {
                 Database.delete(rows, AccessLevel.USER_MODE);
             } catch (DmlException notAllowed) {
                 throw new FieldUtilizationException(
-                    System.Label.Core_FieldUtilization_DeleteFailed
+                    BarnHelp.text('Core', 'Core_FieldUtilization_DeleteFailed')
                 );
             }
             return rows.size();
@@ -693,7 +693,7 @@ public with sharing class FieldUtilizationController {
         if (described == null) {
             throw new FieldUtilizationException(
                 String.format(
-                    System.Label.Core_FieldUtilization_UnknownObject,
+                    BarnHelp.text('Core', 'Core_FieldUtilization_UnknownObject'),
                     new List<Object>{ String.isBlank(objectName) ? '' : objectName }
                 )
             );
@@ -705,7 +705,7 @@ public with sharing class FieldUtilizationController {
         if (total > FieldUtilizationService.largeObjectLimit()) {
             throw new FieldUtilizationException(
                 String.format(
-                    System.Label.Core_FieldUtilization_TooLarge,
+                    BarnHelp.text('Core', 'Core_FieldUtilization_TooLarge'),
                     new List<Object>{ FieldUtilizationService.largeObjectLimit().format() }
                 )
             );
@@ -715,7 +715,7 @@ public with sharing class FieldUtilizationController {
     private static void requirePermission() {
         if (!FeatureManagement.checkPermission(PERMISSION)) {
             throw new FieldUtilizationException(
-                System.Label.Core_FieldUtilization_PermissionRequired
+                BarnHelp.text('Core', 'Core_FieldUtilization_PermissionRequired')
             );
         }
     }

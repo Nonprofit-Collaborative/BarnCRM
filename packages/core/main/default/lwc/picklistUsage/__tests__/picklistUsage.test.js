@@ -3,6 +3,15 @@ import PicklistUsage from 'c/picklistUsage';
 import getPicklistPlan from '@salesforce/apex/FieldUtilizationController.getPicklistPlan';
 import getPicklistUsage from '@salesforce/apex/FieldUtilizationController.getPicklistUsage';
 import getPicklistLastUsed from '@salesforce/apex/FieldUtilizationController.getPicklistLastUsed';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_PicklistUsage_Progress: '{0} of {1}',
+  Core_PicklistUsage_DatesProgress: 'Dates {0} of {1}',
+  Core_PicklistUsage_DatesStopped: 'Stopped {0} of {1}: {2}',
+  Core_PicklistUsage_Truncated: 'Cut: {0}',
+  Core_PicklistUsage_NotChecked: 'Failed: {0}'
+});
 
 jest.mock(
   '@salesforce/apex/FieldUtilizationController.getPicklistPlan',
@@ -19,25 +28,6 @@ jest.mock(
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
-jest.mock('@salesforce/label/c.Core_PicklistUsage_Progress', () => ({ default: '{0} of {1}' }), {
-  virtual: true
-});
-jest.mock(
-  '@salesforce/label/c.Core_PicklistUsage_DatesProgress',
-  () => ({ default: 'Dates {0} of {1}' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_PicklistUsage_DatesStopped',
-  () => ({ default: 'Stopped {0} of {1}: {2}' }),
-  { virtual: true }
-);
-jest.mock('@salesforce/label/c.Core_PicklistUsage_Truncated', () => ({ default: 'Cut: {0}' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Core_PicklistUsage_NotChecked', () => ({ default: 'Failed: {0}' }), {
-  virtual: true
-});
 
 // eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));

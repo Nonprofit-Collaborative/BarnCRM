@@ -81,7 +81,7 @@ public with sharing class DataHygieneController {
     private static void requirePermission() {
         if (!FeatureManagement.checkPermission(FindController.PERMISSION)) {
             throw new DataHygieneService.DataHygieneException(
-                System.Label.Core_DataHygiene_ErrorNoPermission
+                BarnHelp.text('Core', 'Core_DataHygiene_ErrorNoPermission')
             );
         }
     }
@@ -92,7 +92,7 @@ public with sharing class DataHygieneController {
             caught,
             caught instanceof DataHygieneService.DataHygieneException,
             context,
-            System.Label.Core_DataHygiene_CheckFailed
+            BarnHelp.text('Core', 'Core_DataHygiene_CheckFailed')
         );
     }
 }

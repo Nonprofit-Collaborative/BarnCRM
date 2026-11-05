@@ -22,11 +22,8 @@ import CONFIRM_HEADING from '@salesforce/label/c.Core_HealthCheck_ConfirmHeading
 import CURRENT_MODE from '@salesforce/label/c.Core_HealthCheck_CurrentModeLabel';
 import LAST_RUN from '@salesforce/label/c.Core_HealthCheck_LastRunLabel';
 import RUN_HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_RunHealthCheck';
-import LOAD_FAILED from '@salesforce/label/c.Core_HealthCheck_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_HealthCheck_Loading';
-import NO_FINDINGS from '@salesforce/label/c.Core_HealthCheck_NoFindings';
 import ORG_SHAPE_CARD from '@salesforce/label/c.Core_HealthCheck_OrgShapeCardTitle';
-import READ_ONLY from '@salesforce/label/c.Core_HealthCheck_ReadOnlyNotice';
 import RECOMMENDED_MODE from '@salesforce/label/c.Core_HealthCheck_RecommendedModeLabel';
 import RERUN from '@salesforce/label/c.Core_HealthCheck_RerunButton';
 import SEVERITY_ERROR from '@salesforce/label/c.Core_HealthCheck_SeverityError';
@@ -96,9 +93,13 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
     rerun: RERUN,
     useRecommended: USE_RECOMMENDED,
     orgShapeCard: ORG_SHAPE_CARD,
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Core', 'Core_HealthCheck_ReadOnlyNotice');
+    },
     loading: LOADING,
-    noFindings: NO_FINDINGS,
+    get noFindings() {
+      return helpText('Core', 'Core_HealthCheck_NoFindings');
+    },
     currentMode: CURRENT_MODE,
     recommendedMode: RECOMMENDED_MODE,
     lastRun: LAST_RUN,
@@ -128,7 +129,7 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
       this.lastRun = await getLastRun();
     } catch (error) {
       this.lastRun = undefined;
-      this.errorMessage = messageFrom(error, LOAD_FAILED);
+      this.errorMessage = messageFrom(error, helpText('Core', 'Core_HealthCheck_LoadFailed'));
     } finally {
       this.loading = false;
     }
@@ -176,7 +177,7 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
       this.report = await getReport();
     } catch (error) {
       this.report = undefined;
-      this.errorMessage = messageFrom(error, LOAD_FAILED);
+      this.errorMessage = messageFrom(error, helpText('Core', 'Core_HealthCheck_LoadFailed'));
     } finally {
       this.loading = false;
     }
@@ -440,7 +441,7 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
       this.report = await action();
       this.fixOutcome = this.report ? this.report.fixOutcome : undefined;
     } catch (error) {
-      const message = messageFrom(error, LOAD_FAILED);
+      const message = messageFrom(error, helpText('Core', 'Core_HealthCheck_LoadFailed'));
       // If the re-run fails too, the fix's own message is the one worth reading, so the
       // report already shown stays.
       const shown = this.report;

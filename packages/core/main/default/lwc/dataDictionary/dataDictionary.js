@@ -23,10 +23,6 @@ import SELECTED_LABEL from '@salesforce/label/c.Core_DataDictionary_SelectedLabe
 import INCLUDE_FILL_RATES from '@salesforce/label/c.Core_DataDictionary_IncludeFillRates';
 import BUILD from '@salesforce/label/c.Core_DataDictionary_Build';
 import DOWNLOAD from '@salesforce/label/c.Core_AccessExplorer_Download';
-import DOWNLOADED from '@salesforce/label/c.Core_DataDictionary_Downloaded';
-import PROGRESS from '@salesforce/label/c.Core_DataDictionary_Progress';
-import FILL_PROGRESS from '@salesforce/label/c.Core_DataDictionary_FillProgress';
-import NOT_COUNTED from '@salesforce/label/c.Core_DataDictionary_NotCounted';
 import INCLUDE_AUTOMATION from '@salesforce/label/c.Core_DataDictionary_IncludeAutomation';
 import AUTOMATION_TITLE from '@salesforce/label/c.Core_DataDictionary_AutomationTitle';
 import DOWNLOAD_AUTOMATION from '@salesforce/label/c.Core_DataDictionary_DownloadAutomation';
@@ -167,8 +163,12 @@ export default class DataDictionary extends LightningElement {
       return undefined;
     }
     return this.fillingLabel
-      ? format(FILL_PROGRESS, this.fillingLabel)
-      : format(PROGRESS, String(this.done), String(this.total));
+      ? format(helpText('Core', 'Core_DataDictionary_FillProgress'), this.fillingLabel)
+      : format(
+          helpText('Core', 'Core_DataDictionary_Progress'),
+          String(this.done),
+          String(this.total)
+        );
   }
 
   get progressValue() {
@@ -210,7 +210,9 @@ export default class DataDictionary extends LightningElement {
   }
 
   get notCountedMessage() {
-    return this.skipped.length ? format(NOT_COUNTED, this.skipped.join(', ')) : undefined;
+    return this.skipped.length
+      ? format(helpText('Core', 'Core_DataDictionary_NotCounted'), this.skipped.join(', '))
+      : undefined;
   }
 
   handleSelect(event) {
@@ -334,6 +336,9 @@ export default class DataDictionary extends LightningElement {
       }),
       fileName(FILE_BASE)
     );
-    this.noticeMessage = format(DOWNLOADED, String(this.rows.length));
+    this.noticeMessage = format(
+      helpText('Core', 'Core_DataDictionary_Downloaded'),
+      String(this.rows.length)
+    );
   }
 }

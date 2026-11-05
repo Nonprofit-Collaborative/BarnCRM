@@ -179,7 +179,10 @@ private class WhereUsedServiceTest {
                 columns.recordId,
                 columns.editState.get(NamespaceUtil.stateKey('savedQueryId'))
             );
-            Assert.areEqual(System.Label.Core_WhereUsed_BreaksSavedQuery, columns.breaks);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_WhereUsed_BreaksSavedQuery'),
+                columns.breaks
+            );
             Assert.areEqual(
                 '/lightning/n/' +
                     NamespaceUtil.qualify('Find') +
@@ -390,7 +393,10 @@ private class WhereUsedServiceTest {
                 'The formal greeting, and the informal one through its default.'
             );
             Assert.areEqual(0, salutation.size(), 'No pattern in use reads the salutation.');
-            Assert.areEqual(System.Label.Core_WhereUsed_BreaksPattern, lastName[0].breaks);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_WhereUsed_BreaksPattern'),
+                lastName[0].breaks
+            );
             Assert.areEqual(
                 'People and Households',
                 lastName[0].editState.get(NamespaceUtil.stateKey('section'))
@@ -478,7 +484,7 @@ private class WhereUsedServiceTest {
                 Assert.fail('A person without Manage BarnCRM Settings is refused.');
             } catch (AuraHandledException expected) {
                 Assert.areEqual(
-                    System.Label.Core_WhereUsed_ErrorNoPermission,
+                    BarnHelp.text('Core', 'Core_WhereUsed_ErrorNoPermission'),
                     expected.getMessage()
                 );
             }

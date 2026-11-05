@@ -44,7 +44,7 @@ private class DataHygieneControllerTest {
                         Assert.fail('The console needs the Find permission.');
                     } catch (AuraHandledException refused) {
                         Assert.areEqual(
-                            System.Label.Core_DataHygiene_ErrorNoPermission,
+                            BarnHelp.text('Core', 'Core_DataHygiene_ErrorNoPermission'),
                             refused.getMessage(),
                             'The message names the permission.'
                         );
@@ -186,7 +186,7 @@ private class DataHygieneControllerTest {
                     Assert.fail('An unknown check is refused.');
                 } catch (AuraHandledException refused) {
                     Assert.areEqual(
-                        System.Label.Core_DataHygiene_UnknownCheck,
+                        BarnHelp.text('Core', 'Core_DataHygiene_UnknownCheck'),
                         refused.getMessage(),
                         'With a message.'
                     );

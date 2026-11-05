@@ -20,7 +20,7 @@ public with sharing class HealthCheckController {
             return HealthCheckService.buildReport();
         } catch (Exception e) {
             ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
-            throw new AuraHandledException(System.Label.Core_HealthCheck_LoadFailed);
+            throw new AuraHandledException(BarnHelp.text('Core', 'Core_HealthCheck_LoadFailed'));
         }
     }
 
@@ -34,7 +34,7 @@ public with sharing class HealthCheckController {
             return HealthCheckLastRun.read();
         } catch (Exception e) {
             ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
-            throw new AuraHandledException(System.Label.Core_HealthCheck_LoadFailed);
+            throw new AuraHandledException(BarnHelp.text('Core', 'Core_HealthCheck_LoadFailed'));
         }
     }
 
@@ -52,7 +52,7 @@ public with sharing class HealthCheckController {
             throw new AuraHandledException(e.getMessage());
         } catch (Exception e) {
             ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
-            throw new AuraHandledException(System.Label.Core_HealthCheck_FixFailed);
+            throw new AuraHandledException(BarnHelp.text('Core', 'Core_HealthCheck_FixFailed'));
         }
     }
 
@@ -69,7 +69,7 @@ public with sharing class HealthCheckController {
             throw new AuraHandledException(e.getMessage());
         } catch (Exception e) {
             ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
-            throw new AuraHandledException(System.Label.Core_HealthCheck_FixFailed);
+            throw new AuraHandledException(BarnHelp.text('Core', 'Core_HealthCheck_FixFailed'));
         }
     }
 
@@ -85,7 +85,7 @@ public with sharing class HealthCheckController {
             return HealthCheckService.buildReport();
         } catch (Exception e) {
             ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
-            throw new AuraHandledException(System.Label.Core_HealthCheck_FixFailed);
+            throw new AuraHandledException(BarnHelp.text('Core', 'Core_HealthCheck_FixFailed'));
         }
     }
 
@@ -127,7 +127,7 @@ public with sharing class HealthCheckController {
         requireManageSettings();
         String fixLabel = fixLabel(fixKey);
         if (fixLabel == null) {
-            throw UserErrors.message(System.Label.Core_HealthCheck_FixUnknown);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_HealthCheck_FixUnknown'));
         }
         Savepoint beforeFix = Database.setSavepoint();
         try {
@@ -153,7 +153,7 @@ public with sharing class HealthCheckController {
         } catch (Exception e) {
             Database.rollback(beforeFix);
             ErrorLogger.log(e, System.Label.Core_HealthCheck_Title);
-            throw UserErrors.message(System.Label.Core_HealthCheck_FixFailed);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_HealthCheck_FixFailed'));
         }
     }
 
@@ -208,7 +208,7 @@ public with sharing class HealthCheckController {
                 outcome +=
                     (outcome == '' ? '' : ' ') +
                     String.format(
-                        System.Label.Core_HealthCheck_FixStoppedOnly,
+                        BarnHelp.text('Core', 'Core_HealthCheck_FixStoppedOnly'),
                         new List<Object>{
                             String.join(stoppedOnly, HealthCheckService.JOB_SEPARATOR)
                         }
@@ -253,7 +253,9 @@ public with sharing class HealthCheckController {
 
     private static void requireManageSettings() {
         if (!HealthCheckService.canManageSettings()) {
-            throw new AuraHandledException(System.Label.Core_HealthCheck_PermissionRequired);
+            throw new AuraHandledException(
+                BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired')
+            );
         }
     }
 }

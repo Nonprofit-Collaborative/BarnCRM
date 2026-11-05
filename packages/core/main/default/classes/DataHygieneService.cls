@@ -94,7 +94,7 @@ public with sharing class DataHygieneService {
             String document = queryDocument(key);
             if (key == PEOPLE_WITHOUT_HOUSEHOLD && HouseholdService.isJunctionMode()) {
                 result.count = countJunctionPeopleWithoutHousehold();
-                result.note = System.Label.Core_DataHygiene_PeopleAccountsNotListed;
+                result.note = BarnHelp.text('Core', 'Core_DataHygiene_PeopleAccountsNotListed');
             } else {
                 result.count = count(document);
             }
@@ -118,10 +118,10 @@ public with sharing class DataHygieneService {
             // Usually the user-mode refusal of a field or object, but a timeout on a large
             // count reads the same way, so it is logged for whoever looks into it.
             ErrorLogger.log(noAccess, 'Data Quality check ' + key);
-            result.errorMessage = System.Label.Core_DataHygiene_NoAccess;
+            result.errorMessage = BarnHelp.text('Core', 'Core_DataHygiene_NoAccess');
         } catch (Exception unexpected) {
             ErrorLogger.log(unexpected, 'Data Quality check ' + key);
-            result.errorMessage = System.Label.Core_DataHygiene_CheckFailed;
+            result.errorMessage = BarnHelp.text('Core', 'Core_DataHygiene_CheckFailed');
         }
         return result;
     }
@@ -154,7 +154,7 @@ public with sharing class DataHygieneService {
         } else if (key == PEOPLE_NOT_UPDATED) {
             document = peopleNotUpdated();
         } else {
-            throw new DataHygieneException(System.Label.Core_DataHygiene_UnknownCheck);
+            throw new DataHygieneException(BarnHelp.text('Core', 'Core_DataHygiene_UnknownCheck'));
         }
         return document == null ? null : JSON.serialize(document);
     }
@@ -596,7 +596,7 @@ public with sharing class DataHygieneService {
             )
         };
         if (!titles.containsKey(key)) {
-            throw new DataHygieneException(System.Label.Core_DataHygiene_UnknownCheck);
+            throw new DataHygieneException(BarnHelp.text('Core', 'Core_DataHygiene_UnknownCheck'));
         }
         return titles.get(key);
     }
@@ -604,19 +604,34 @@ public with sharing class DataHygieneService {
     private static String description(String key) {
         if (key == PEOPLE_WITHOUT_HOUSEHOLD) {
             return HouseholdService.isJunctionMode()
-                ? System.Label.Core_DataHygiene_PeopleJunctionDetail
-                : System.Label.Core_DataHygiene_PeopleContactDetail;
+                ? BarnHelp.text('Core', 'Core_DataHygiene_PeopleJunctionDetail')
+                : BarnHelp.text('Core', 'Core_DataHygiene_PeopleContactDetail');
         }
         return new Map<String, String>{
-                HOUSEHOLDS_WITHOUT_MEMBERS => System.Label.Core_DataHygiene_HouseholdsDetail,
-                MEMBERSHIPS_WITHOUT_PERSON => System.Label.Core_DataHygiene_MembershipsDetail,
-                ADDRESSES_WITHOUT_OWNER => System.Label.Core_DataHygiene_OwnerlessDetail,
-                DEFAULT_ADDRESSES_INCOMPLETE => System.Label.Core_DataHygiene_IncompleteDetail,
-                DEFAULT_ADDRESSES_FAILED => System.Label.Core_DataHygiene_FailedDetail,
-                DEFAULT_ADDRESSES_UNDELIVERABLE => System.Label.Core_DataHygiene_UndeliverableDetail,
-                PEOPLE_UNREACHABLE => System.Label.Core_DataHygiene_UnreachableDetail,
-                DECEASED_STILL_EMAILED => System.Label.Core_DataHygiene_DeceasedDetail,
-                PEOPLE_NOT_UPDATED => System.Label.Core_DataHygiene_NotUpdatedDetail
+                HOUSEHOLDS_WITHOUT_MEMBERS => BarnHelp.text(
+                    'Core',
+                    'Core_DataHygiene_HouseholdsDetail'
+                ),
+                MEMBERSHIPS_WITHOUT_PERSON => BarnHelp.text(
+                    'Core',
+                    'Core_DataHygiene_MembershipsDetail'
+                ),
+                ADDRESSES_WITHOUT_OWNER => BarnHelp.text(
+                    'Core',
+                    'Core_DataHygiene_OwnerlessDetail'
+                ),
+                DEFAULT_ADDRESSES_INCOMPLETE => BarnHelp.text(
+                    'Core',
+                    'Core_DataHygiene_IncompleteDetail'
+                ),
+                DEFAULT_ADDRESSES_FAILED => BarnHelp.text('Core', 'Core_DataHygiene_FailedDetail'),
+                DEFAULT_ADDRESSES_UNDELIVERABLE => BarnHelp.text(
+                    'Core',
+                    'Core_DataHygiene_UndeliverableDetail'
+                ),
+                PEOPLE_UNREACHABLE => BarnHelp.text('Core', 'Core_DataHygiene_UnreachableDetail'),
+                DECEASED_STILL_EMAILED => BarnHelp.text('Core', 'Core_DataHygiene_DeceasedDetail'),
+                PEOPLE_NOT_UPDATED => BarnHelp.text('Core', 'Core_DataHygiene_NotUpdatedDetail')
             }
             .get(key);
     }

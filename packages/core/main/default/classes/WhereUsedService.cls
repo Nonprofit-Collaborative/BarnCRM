@@ -411,7 +411,7 @@ public with sharing class WhereUsedService {
         if (type == null) {
             throw new WhereUsedException(
                 String.format(
-                    System.Label.Core_WhereUsed_ErrorNoObject,
+                    BarnHelp.text('Core', 'Core_WhereUsed_ErrorNoObject'),
                     new List<Object>{ objectName }
                 )
             );
@@ -424,7 +424,7 @@ public with sharing class WhereUsedService {
         if (token == null) {
             throw new WhereUsedException(
                 String.format(
-                    System.Label.Core_WhereUsed_ErrorNoField,
+                    BarnHelp.text('Core', 'Core_WhereUsed_ErrorNoField'),
                     new List<Object>{ fieldName, described.getLabel() }
                 )
             );
@@ -512,7 +512,7 @@ public with sharing class WhereUsedService {
             if (reference.parts.isEmpty()) {
                 continue;
             }
-            reference.withBreaks(System.Label.Core_WhereUsed_BreaksSavedQuery);
+            reference.withBreaks(BarnHelp.text('Core', 'Core_WhereUsed_BreaksSavedQuery'));
             if (query.Shared__c != true && query.OwnerId != me) {
                 // Private to someone else: say whose, not what it is called (R-SQ3).
                 reference.name = String.format(
@@ -629,7 +629,9 @@ public with sharing class WhereUsedService {
             }
             if (!reference.parts.isEmpty()) {
                 found.add(
-                    reference.withBreaks(System.Label.Core_WhereUsed_BreaksSavedTransform)
+                    reference.withBreaks(
+                            BarnHelp.text('Core', 'Core_WhereUsed_BreaksSavedTransform')
+                        )
                         .withEdit('Bulk_Update', null)
                 );
             }
@@ -778,7 +780,7 @@ public with sharing class WhereUsedService {
                 template.Name,
                 template.Id
             )
-            .withBreaks(System.Label.Core_WhereUsed_BreaksImportMapping)
+            .withBreaks(BarnHelp.text('Core', 'Core_WhereUsed_BreaksImportMapping'))
             .withEdit('Data_Manager', null);
     }
 
@@ -795,7 +797,7 @@ public with sharing class WhereUsedService {
                             null
                         )
                         .addPart(System.Label.Core_AccessExplorer_Field)
-                        .withBreaks(System.Label.Core_WhereUsed_BreaksMergeRule)
+                        .withBreaks(BarnHelp.text('Core', 'Core_WhereUsed_BreaksMergeRule'))
                         .withEdit('Duplicate_Matching', null)
                 );
             }
@@ -829,7 +831,7 @@ public with sharing class WhereUsedService {
             }
             if (!reference.parts.isEmpty()) {
                 found.add(
-                    reference.withBreaks(System.Label.Core_WhereUsed_BreaksMatchSource)
+                    reference.withBreaks(BarnHelp.text('Core', 'Core_WhereUsed_BreaksMatchSource'))
                         .withEdit('Duplicate_Matching', null)
                 );
             }
@@ -854,7 +856,7 @@ public with sharing class WhereUsedService {
             found.add(
                 settingReference(
                     Schema.BarnCRM_Settings__c.Address_Card_Fields__c.getDescribe().getLabel(),
-                    System.Label.Core_WhereUsed_BreaksSetting,
+                    BarnHelp.text('Core', 'Core_WhereUsed_BreaksSetting'),
                     'Addresses'
                 )
             );
@@ -870,7 +872,7 @@ public with sharing class WhereUsedService {
                 found.add(
                     settingReference(
                         field.getDescribe().getLabel(),
-                        System.Label.Core_WhereUsed_BreaksPattern,
+                        BarnHelp.text('Core', 'Core_WhereUsed_BreaksPattern'),
                         'People and Households'
                     )
                 );

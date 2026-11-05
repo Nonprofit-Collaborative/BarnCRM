@@ -1,54 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_FieldUtilization_PermissionRequired</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: no permission</shortDescription>
-        <value>You need the Manage BarnCRM Settings permission to count field use.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_UnknownObject</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: a chosen object cannot be counted; {0} is it</shortDescription>
-        <value>{0} cannot be counted. Choose from the list.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_TooLarge</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: object over the size limit; {0} is the limit</shortDescription>
-        <value>This kind of record has more than {0} records, so it is not counted.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_NoRecords</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: object with no records</shortDescription>
-        <value>There are no records of this kind to count.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_NoFields</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: object with no countable fields</shortDescription>
-        <value>This kind of record has no fields that can be counted.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_TooManyRows</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: save over the row limit; {0} counts, {1} the limit</shortDescription>
-        <value>There are too many counts to save at once ({0}). Save at most {1}.</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldUtilization_PageTitle</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>
@@ -73,14 +25,6 @@
         <value>Choose a kind of record</value>
     </labels>
     <labels>
-        <fullName>Core_FieldUtilization_Progress</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization progress; {0} fields counted, {1} fields in all</shortDescription>
-        <value>Counted {0} of {1} fields.</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldUtilization_CountAgain</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>
@@ -97,36 +41,12 @@
         <value>Save Snapshot</value>
     </labels>
     <labels>
-        <fullName>Core_FieldUtilization_Saved</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: after saving; {0} is the number of counts</shortDescription>
-        <value>Saved {0} counts.</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_NotCounted</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: fields that failed; {0} lists them</shortDescription>
-        <value>These fields could not be counted: {0}</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldUtilization_ComparedWith</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field utilization: previous saved count date</shortDescription>
         <value>Saved and Change compare with the counts saved</value>
-    </labels>
-    <labels>
-        <fullName>Core_FieldUtilization_NeverSaved</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: no saved count yet</shortDescription>
-        <value>No counts have been saved for this kind of record yet.</value>
     </labels>
     <labels>
         <fullName>Core_FieldUtilization_ColRecordType</fullName>

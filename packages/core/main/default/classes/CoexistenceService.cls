@@ -307,7 +307,9 @@ public with sharing class CoexistenceService {
     @NamespaceAccessible
     public static void applyMode(String mode) {
         if (!BarnCRMPermissions.canManageSettings()) {
-            throw new CoexistenceException(System.Label.Core_HealthCheck_PermissionRequired);
+            throw new CoexistenceException(
+                BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired')
+            );
         }
         setMode(mode);
     }

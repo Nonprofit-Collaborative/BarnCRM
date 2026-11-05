@@ -321,7 +321,7 @@ public with sharing class SetupChangeController {
             ? permissionOverride
             : FeatureManagement.checkPermission(PERMISSION);
         if (!allowed) {
-            throw UserErrors.message(Label.Core_OrgOptimizer_ErrorNoPermission);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_OrgOptimizer_ErrorNoPermission'));
         }
     }
 }

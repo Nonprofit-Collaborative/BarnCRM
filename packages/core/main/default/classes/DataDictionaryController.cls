@@ -320,7 +320,7 @@ public with sharing class DataDictionaryController {
         ) {
             throw new DataDictionaryException(
                 String.format(
-                    System.Label.Core_DataDictionary_UnknownObject,
+                    BarnHelp.text('Core', 'Core_DataDictionary_UnknownObject'),
                     new List<Object>{ String.isBlank(objectName) ? '' : objectName }
                 )
             );
@@ -330,7 +330,9 @@ public with sharing class DataDictionaryController {
 
     private static void requirePermission() {
         if (!FeatureManagement.checkPermission(PERMISSION)) {
-            throw new DataDictionaryException(System.Label.Core_DataDictionary_PermissionRequired);
+            throw new DataDictionaryException(
+                BarnHelp.text('Core', 'Core_DataDictionary_PermissionRequired')
+            );
         }
     }
 
@@ -339,7 +341,7 @@ public with sharing class DataDictionaryController {
             caught,
             caught instanceof DataDictionaryException,
             context,
-            System.Label.Core_DataDictionary_UnexpectedError
+            BarnHelp.text('Core', 'Core_DataDictionary_UnexpectedError')
         );
     }
 }
