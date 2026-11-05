@@ -1,4 +1,4 @@
-# ADR-NEXT: A household pair from the org's duplicate rules is shown only with household evidence
+# ADR-0168: A household pair from the org's duplicate rules is shown only with household evidence
 
 **Status:** Accepted (owner QA, Brandon, 2026-11-05)
 **Date:** 2026-11-05
