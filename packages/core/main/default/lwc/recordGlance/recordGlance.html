@@ -1,0 +1,35 @@
+<template>
+  <template lwc:if={hasCards}>
+    <template for:each={cards} for:item="card">
+      <lightning-card key={card.key} title={card.title} icon-name={card.iconName} class="glance-card">
+        <div class="slds-var-p-horizontal_medium">
+          <div class="slds-grid slds-wrap slds-gutters_x-small">
+            <template for:each={card.tiles} for:item="tile">
+              <div key={tile.key} class="slds-col slds-size_1-of-2 slds-var-m-bottom_x-small">
+                <c-barn-stat-tile
+                  label={tile.label}
+                  value={tile.value}
+                  format-style={tile.formatStyle}
+                  bordered
+                  align="start"
+                ></c-barn-stat-tile>
+              </div>
+            </template>
+          </div>
+        </div>
+        <div slot="actions">
+          <template for:each={card.actions} for:item="action">
+            <lightning-button
+              key={action.key}
+              label={action.label}
+              data-card={card.key}
+              data-action={action.key}
+              onclick={handleAction}
+              class="glance-action"
+            ></lightning-button>
+          </template>
+        </div>
+      </lightning-card>
+    </template>
+  </template>
+</template>
