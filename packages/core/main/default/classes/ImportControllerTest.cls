@@ -295,6 +295,8 @@ private class ImportControllerTest {
             );
 
             Test.startTest();
+            // The message catalog is read once per transaction; count only the batch's queries.
+            BarnHelp.text('Core', 'Core_Import_ErrorBatchGone');
             Integer queriesBefore = Limits.getQueries();
             ImportController.BatchView view = ImportController.getBatch(batch.Id);
             Integer queries = Limits.getQueries() - queriesBefore;
