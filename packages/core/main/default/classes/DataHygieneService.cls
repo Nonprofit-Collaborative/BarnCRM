@@ -105,7 +105,7 @@ public with sharing class DataHygieneService {
                 key == HOUSEHOLDS_WITHOUT_MEMBERS &&
                 OrgShapeDetector.detect().hasNativeHouseholdGroups == true
             ) {
-                result.note = System.Label.Core_DataHygiene_NativeHouseholdsListed;
+                result.note = BarnHelp.text('Core', 'Core_DataHygiene_NativeHouseholdsListed');
             }
             result.countLabel = countLabel(result.count);
         } catch (QueryCompiler.QueryCompilerException refused) {

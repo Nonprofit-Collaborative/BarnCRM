@@ -23,13 +23,8 @@ import ADD_FORM_TITLE from '@salesforce/label/c.Core_Relationship_AddFormTitle';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Relationship_EmptyHeading';
 import FORMER_BADGE from '@salesforce/label/c.Core_Affiliation_FormerBadge';
-import LOAD_FAILED from '@salesforce/label/c.Core_Relationship_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_Relationship_Loading';
 import REMOVE_BUTTON from '@salesforce/label/c.Core_Find_Remove';
-import REMOVE_FAILED from '@salesforce/label/c.Core_Relationship_RemoveFailed';
-import REMOVE_SUCCESS from '@salesforce/label/c.Core_Relationship_RemoveSuccess';
-import SAVE_FAILED from '@salesforce/label/c.Core_Relationship_SaveFailed';
-import SAVE_SUCCESS from '@salesforce/label/c.Core_Relationship_SaveSuccess';
 import UNNAMED_PERSON from '@salesforce/label/c.Core_Affiliation_UnnamedPerson';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -168,7 +163,7 @@ export default class RelationshipPanel extends NavigationMixin(LightningElement)
     this.refreshRelationships = result.refresh;
     if (result.errors && result.errors.length) {
       this.relationships = [];
-      this.errorMessage = LOAD_FAILED;
+      this.errorMessage = helpText('Core', 'Core_Relationship_LoadFailed');
       this.loaded = true;
     } else if (result.data) {
       const views = result.data.uiapi.query.Relationship__c.edges.map((edge) => toView(edge.node));
@@ -335,12 +330,12 @@ export default class RelationshipPanel extends NavigationMixin(LightningElement)
 
   handleFormSuccess() {
     this.showForm = false;
-    this.notify(SAVE_SUCCESS, 'success');
+    this.notify(helpText('Core', 'Core_Relationship_SaveSuccess'), 'success');
     this.refresh();
   }
 
   handleFormError() {
-    this.errorMessage = SAVE_FAILED;
+    this.errorMessage = helpText('Core', 'Core_Relationship_SaveFailed');
   }
 
   /** Removes both sides, after a confirm that points to End It for a relationship that ended. */
@@ -360,11 +355,11 @@ export default class RelationshipPanel extends NavigationMixin(LightningElement)
       // Deleting the other person's side is the trigger's work.
       await deleteRecord(relationshipId);
       this.errorMessage = undefined;
-      this.notify(REMOVE_SUCCESS, 'success');
+      this.notify(helpText('Core', 'Core_Relationship_RemoveSuccess'), 'success');
       this.refresh();
     } catch {
-      this.errorMessage = REMOVE_FAILED;
-      this.notify(REMOVE_FAILED, 'error');
+      this.errorMessage = helpText('Core', 'Core_Relationship_RemoveFailed');
+      this.notify(helpText('Core', 'Core_Relationship_RemoveFailed'), 'error');
     }
   }
 

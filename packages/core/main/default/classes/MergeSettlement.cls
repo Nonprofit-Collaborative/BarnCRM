@@ -240,7 +240,7 @@ public with sharing class MergeSettlement implements Queueable {
         }
         ErrorLogger.logMessage(
             String.format(
-                Label.Core_Households_MergeSettleRefused,
+                BarnHelp.text('Core', 'Core_Households_MergeSettleRefused'),
                 new List<String>{ String.join(named, ', '), String.valueOf(publisherId) }
             ),
             Label.Core_Households_ErrorContextMergeSettle,
@@ -298,7 +298,7 @@ public with sharing class MergeSettlement implements Queueable {
         }
         ErrorLogger.logMessage(
             String.format(
-                Label.Core_Households_MergeSettleNotQueued,
+                BarnHelp.text('Core', 'Core_Households_MergeSettleNotQueued'),
                 new List<String>{ String.join(named, ', '), failure }
             ),
             Label.Core_Households_ErrorContextMergeSettle,

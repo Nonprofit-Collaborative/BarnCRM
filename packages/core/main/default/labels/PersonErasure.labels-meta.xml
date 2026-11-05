@@ -1,70 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_Erase_NoPermission</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: the user lacks the permission</shortDescription>
-        <value>You need the Erase People permission to erase a person. Ask your Salesforce administrator.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_NotAPerson</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: the record is not a person</shortDescription>
-        <value>Only a person can be erased. This record is a household or an organization, or it is no longer there.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_AlreadyErased</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: already erased ({0} date)</shortDescription>
-        <value>This person was already erased on {0}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_NameMismatch</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: the typed name does not match</shortDescription>
-        <value>Type the person&apos;s name exactly as it is shown on the record to confirm. Nothing was erased.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_CannotEdit</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: records the user cannot change ({0} counts)</shortDescription>
-        <value>You can&apos;t change {0}, so nothing was erased. Ask your Salesforce administrator for access, or ask them to erase this person.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_CannotEditFields</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: fields the user cannot edit ({0} object, {1} fields)</shortDescription>
-        <value>You can&apos;t edit these fields of the {0}, and they hold values, so nothing was erased: {1}. Ask your Salesforce administrator for access.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_Refused</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: a change was refused ({0} reason)</shortDescription>
-        <value>Nothing was erased. Salesforce refused one of the changes: {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_ExtensionFailed</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: a module could not answer ({0} class)</shortDescription>
-        <value>Nothing was erased. An installed BarnCRM module ({0}) could not say what to do with its records about this person. Ask your Salesforce administrator to check the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Core_Erase_PersonName</fullName>
         <categories>Erase</categories>
         <language>en_US</language>
@@ -81,84 +17,12 @@
         <value>Erased household</value>
     </labels>
     <labels>
-        <fullName>Core_Erase_NoteRequired</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: why a field was kept</shortDescription>
-        <value>Salesforce requires these fields, so they are kept.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_NoteRenamed</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: a household with other members</shortDescription>
-        <value>Recounted without this person. Its name and greetings were made again from the remaining members.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_NoteCustomNameReleased</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: a custom-named household with other members</shortDescription>
-        <value>Its name was typed by hand and could name this person, so Custom Name was turned off and its name and greetings were made again from the remaining members. Type a new custom name afterwards if you want one.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_NoteNativeHousehold</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: a household Nonprofit Cloud names</shortDescription>
-        <value>Nonprofit Cloud names this household, so its name and greetings were not changed. If they name this person, change them by hand.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_NoteHouseholdKept</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: a household left empty and kept</shortDescription>
-        <value>Kept because records are credited to it. Renamed, and its greetings and addresses emptied.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_NoteHouseholdKeptSetting</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: a household left empty and kept, the delete setting off</shortDescription>
-        <value>Kept because Delete Empty Households is off (BarnCRM Settings, People and Households). Renamed, and its greetings and addresses emptied.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_NoteHistoryKept</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: field history the user cannot remove</shortDescription>
-        <value>Old values of tracked fields are kept. Erasing them needs the Salesforce permission to remove field history.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_NoteByHand</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: activities and files are not erased</shortDescription>
-        <value>Not erased. Open them from the person&apos;s record and delete or edit what is about this person by hand, before you erase.</value>
-    </labels>
-    <labels>
         <fullName>Core_Erase_Files</fullName>
         <categories>Erase</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Erase a person: the files row in the preview</shortDescription>
         <value>Files</value>
-    </labels>
-    <labels>
-        <fullName>Core_Erase_NoteHistoryDeleted</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase a person: field history removed after the erasure</shortDescription>
-        <value>Removed a moment after the erasure.</value>
     </labels>
     <labels>
         <fullName>Core_Erase_HistoryOf</fullName>
@@ -175,14 +39,6 @@
         <protected>false</protected>
         <shortDescription>Erase person action: title</shortDescription>
         <value>Erase Person</value>
-    </labels>
-    <labels>
-        <fullName>Core_EraseAction_Warning</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase person action: what it does and that it cannot be undone</shortDescription>
-        <value>Erasing removes what your organization holds about this person, and it cannot be undone. Press Preview first: it lists exactly what will change, and changes nothing.</value>
     </labels>
     <labels>
         <fullName>Core_EraseAction_Working</fullName>
@@ -287,14 +143,6 @@
         <protected>false</protected>
         <shortDescription>Erase person action: the erase button</shortDescription>
         <value>Erase</value>
-    </labels>
-    <labels>
-        <fullName>Core_EraseAction_Done</fullName>
-        <categories>Erase</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Erase person action: done</shortDescription>
-        <value>Erased. The list above is what changed, and the Erasure record keeps it.</value>
     </labels>
     <labels>
         <fullName>Core_EraseAction_OpenAudit</fullName>

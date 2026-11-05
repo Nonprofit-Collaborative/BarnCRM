@@ -68,10 +68,16 @@ private class GetDataJobStatusActionTest {
             );
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_AgentActions_DataJobNotFound, results[0].errorMessage);
-            Assert.areEqual(Label.Core_AgentActions_DataJobNotFound, results[1].errorMessage);
             Assert.areEqual(
-                Label.Core_AgentActions_NoDataJobs,
+                BarnHelp.text('Core', 'Core_AgentActions_DataJobNotFound'),
+                results[0].errorMessage
+            );
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_AgentActions_DataJobNotFound'),
+                results[1].errorMessage
+            );
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_AgentActions_NoDataJobs'),
                 results[2].errorMessage,
                 'With no import yet, the user is told so'
             );
@@ -101,7 +107,7 @@ private class GetDataJobStatusActionTest {
                     Assert.areEqual(job.Id, results[i].jobId, 'Request ' + i + ' found');
                 } else {
                     Assert.areEqual(
-                        Label.Core_AgentActions_DataJobNotFound,
+                        BarnHelp.text('Core', 'Core_AgentActions_DataJobNotFound'),
                         results[i].errorMessage,
                         'Request ' + i + ' answered in its own position'
                     );
@@ -128,7 +134,10 @@ private class GetDataJobStatusActionTest {
         }
         Test.stopTest();
 
-        Assert.areEqual(Label.Core_AgentActions_NoAccess, results[0].errorMessage);
+        Assert.areEqual(
+            BarnHelp.text('Core', 'Core_AgentActions_NoAccess'),
+            results[0].errorMessage
+        );
         Assert.isNull(results[0].status, 'Nothing of the job is shown');
     }
 

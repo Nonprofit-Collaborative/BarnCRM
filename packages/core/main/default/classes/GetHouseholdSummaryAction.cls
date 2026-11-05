@@ -134,10 +134,10 @@ global with sharing class GetHouseholdSummaryAction {
         try {
             answer(householdIds, personIds, results);
         } catch (QueryException denied) {
-            setErrorForAll(results, Label.Core_AgentActions_NoAccess);
+            setErrorForAll(results, BarnHelp.text('Core', 'Core_AgentActions_NoAccess'));
         } catch (Exception failed) {
             ErrorLogger.log(failed, Label.Core_AgentActions_ErrorContext);
-            setErrorForAll(results, Label.Core_AgentActions_Unexpected);
+            setErrorForAll(results, BarnHelp.text('Core', 'Core_AgentActions_Unexpected'));
         }
         return results;
     }
@@ -174,8 +174,8 @@ global with sharing class GetHouseholdSummaryAction {
                 // may be an organization as well as a person, so it is answered as not found.
                 results[i].errorMessage = recordId != null &&
                     recordId.getSObjectType() == Contact.SObjectType
-                    ? Label.Core_AgentActions_PersonHasNoHousehold
-                    : Label.Core_AgentActions_HouseholdNotFound;
+                    ? BarnHelp.text('Core', 'Core_AgentActions_PersonHasNoHousehold')
+                    : BarnHelp.text('Core', 'Core_AgentActions_HouseholdNotFound');
                 continue;
             }
             fill(results[i], household, membersByHousehold.get(household.Id));

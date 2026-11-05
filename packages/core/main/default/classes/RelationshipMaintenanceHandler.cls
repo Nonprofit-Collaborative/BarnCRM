@@ -50,7 +50,7 @@ public with sharing class RelationshipMaintenanceHandler extends TriggerHandler 
                 thrown,
                 records,
                 'RelationshipMaintenanceHandler.afterUpdate',
-                Label.Core_Relationship_SyncFailed
+                BarnHelp.text('Core', 'Core_Relationship_SyncFailed')
             );
         }
     }
@@ -68,7 +68,7 @@ public with sharing class RelationshipMaintenanceHandler extends TriggerHandler 
                 thrown,
                 deleted,
                 'RelationshipMaintenanceHandler.afterDelete',
-                Label.Core_Relationship_SyncFailed
+                BarnHelp.text('Core', 'Core_Relationship_SyncFailed')
             );
         }
     }
@@ -86,7 +86,7 @@ public with sharing class RelationshipMaintenanceHandler extends TriggerHandler 
                 thrown,
                 restored,
                 'RelationshipMaintenanceHandler.afterUndelete',
-                Label.Core_Relationship_SyncFailed
+                BarnHelp.text('Core', 'Core_Relationship_SyncFailed')
             );
         }
     }
@@ -99,7 +99,12 @@ public with sharing class RelationshipMaintenanceHandler extends TriggerHandler 
             failWhenAskedForTest();
             RelationshipService.ensureReciprocals(records);
         } catch (Exception thrown) {
-            reportFailure(thrown, records, context, Label.Core_Relationship_SyncFailed);
+            reportFailure(
+                thrown,
+                records,
+                context,
+                BarnHelp.text('Core', 'Core_Relationship_SyncFailed')
+            );
         }
     }
 }

@@ -38,7 +38,7 @@ private class DataProtectedFieldsTest {
 
             Assert.areEqual(
                 String.format(
-                    Label.Core_Data_ObjectBookkeeping,
+                    BarnHelp.text('Core', 'Core_Data_ObjectBookkeeping'),
                     new List<String>{ plural(Import_Batch__c.SObjectType) }
                 ),
                 batches,
@@ -99,7 +99,7 @@ private class DataProtectedFieldsTest {
 
             Assert.areEqual(
                 String.format(
-                    Label.Core_Data_ObjectSetup,
+                    BarnHelp.text('Core', 'Core_Data_ObjectSetup'),
                     new List<String>{ plural(User.SObjectType) }
                 ),
                 users,
@@ -108,7 +108,7 @@ private class DataProtectedFieldsTest {
             Assert.isNotNull(profiles, 'So are profiles.');
             Assert.areEqual(
                 String.format(
-                    Label.Core_Data_ObjectMembership,
+                    BarnHelp.text('Core', 'Core_Data_ObjectMembership'),
                     new List<String>{ plural(Household_Member__c.SObjectType) }
                 ),
                 members,
@@ -118,13 +118,17 @@ private class DataProtectedFieldsTest {
             Assert.isNotNull(event, 'Nor a platform event.');
             Assert.areEqual(
                 String.format(
-                    Label.Core_Data_ObjectNotLoadable,
+                    BarnHelp.text('Core', 'Core_Data_ObjectNotLoadable'),
                     new List<String>{ plural(AsyncApexJob.SObjectType) }
                 ),
                 jobs,
                 'A standard object that is not a business record is refused by the rule.'
             );
-            Assert.areEqual(Label.Core_Data_ObjectUnknown, missing, 'Nor an object the org lacks.');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Data_ObjectUnknown'),
+                missing,
+                'Nor an object the org lacks.'
+            );
         }
     }
 

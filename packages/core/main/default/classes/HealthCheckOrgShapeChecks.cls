@@ -244,8 +244,8 @@ public with sharing class HealthCheckOrgShapeChecks {
                 ),
                 HealthCheckService.forCount(
                     asAccounts,
-                    System.Label.Core_HealthCheck_PeopleAsAccountsDetailOne,
-                    System.Label.Core_HealthCheck_PeopleAsAccountsDetail,
+                    BarnHelp.text('Core', 'Core_HealthCheck_PeopleAsAccountsDetailOne'),
+                    BarnHelp.text('Core', 'Core_HealthCheck_PeopleAsAccountsDetail'),
                     count
                 ),
                 HealthCheckService.SEVERITY_WARNING,
@@ -280,14 +280,14 @@ public with sharing class HealthCheckOrgShapeChecks {
         String detail = junction
             ? HealthCheckService.forCount(
                   unseen,
-                  System.Label.Core_HealthCheck_MembershipHiddenByJunctionDetailOne,
-                  System.Label.Core_HealthCheck_MembershipHiddenByJunctionDetail,
+                  BarnHelp.text('Core', 'Core_HealthCheck_MembershipHiddenByJunctionDetailOne'),
+                  BarnHelp.text('Core', 'Core_HealthCheck_MembershipHiddenByJunctionDetail'),
                   count
               )
             : HealthCheckService.forCount(
                   unseen,
-                  System.Label.Core_HealthCheck_MembershipHiddenByContactDetailOne,
-                  System.Label.Core_HealthCheck_MembershipHiddenByContactDetail,
+                  BarnHelp.text('Core', 'Core_HealthCheck_MembershipHiddenByContactDetailOne'),
+                  BarnHelp.text('Core', 'Core_HealthCheck_MembershipHiddenByContactDetail'),
                   count
               );
         return new HealthCheckService.Finding(
@@ -353,11 +353,11 @@ public with sharing class HealthCheckOrgShapeChecks {
         String detail = shape.nativeHouseholdGroupCount != null
             ? HealthCheckService.forCount(
                   shape.nativeHouseholdGroupCount,
-                  System.Label.Core_HealthCheck_NativeHouseholdsDetailOne,
-                  System.Label.Core_HealthCheck_NativeHouseholdsDetail,
+                  BarnHelp.text('Core', 'Core_HealthCheck_NativeHouseholdsDetailOne'),
+                  BarnHelp.text('Core', 'Core_HealthCheck_NativeHouseholdsDetail'),
                   new List<Object>{ cappedCount(shape.nativeHouseholdGroupCount) }
               )
-            : System.Label.Core_HealthCheck_NativeHouseholdsUnknownDetail;
+            : BarnHelp.text('Core', 'Core_HealthCheck_NativeHouseholdsUnknownDetail');
         return new HealthCheckService.Finding(
             'native_households',
             System.Label.Core_HealthCheck_NativeHouseholdsTitle,
@@ -390,8 +390,8 @@ public with sharing class HealthCheckOrgShapeChecks {
             ),
             HealthCheckService.forCount(
                 collisions,
-                System.Label.Core_HealthCheck_NativeHouseholdCollisionDetailOne,
-                System.Label.Core_HealthCheck_NativeHouseholdCollisionDetail,
+                BarnHelp.text('Core', 'Core_HealthCheck_NativeHouseholdCollisionDetailOne'),
+                BarnHelp.text('Core', 'Core_HealthCheck_NativeHouseholdCollisionDetail'),
                 count
             ),
             HealthCheckService.SEVERITY_WARNING,

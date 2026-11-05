@@ -131,10 +131,22 @@ private class GetHouseholdSummaryActionTest {
             Test.stopTest();
 
             Assert.areEqual(4, results.size(), 'Every request is answered');
-            Assert.areEqual(Label.Core_AgentActions_HouseholdNotFound, results[0].errorMessage);
-            Assert.areEqual(Label.Core_AgentActions_PersonHasNoHousehold, results[1].errorMessage);
-            Assert.areEqual(Label.Core_AgentActions_HouseholdNotFound, results[2].errorMessage);
-            Assert.areEqual(Label.Core_AgentActions_HouseholdNotFound, results[3].errorMessage);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_AgentActions_HouseholdNotFound'),
+                results[0].errorMessage
+            );
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_AgentActions_PersonHasNoHousehold'),
+                results[1].errorMessage
+            );
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_AgentActions_HouseholdNotFound'),
+                results[2].errorMessage
+            );
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_AgentActions_HouseholdNotFound'),
+                results[3].errorMessage
+            );
         }
     }
 
@@ -189,7 +201,10 @@ private class GetHouseholdSummaryActionTest {
         }
         Test.stopTest();
 
-        Assert.areEqual(Label.Core_AgentActions_NoAccess, results[0].errorMessage);
+        Assert.areEqual(
+            BarnHelp.text('Core', 'Core_AgentActions_NoAccess'),
+            results[0].errorMessage
+        );
         Assert.isNull(results[0].householdId, 'Nothing of the household is shown');
         Assert.isTrue(results[0].members.isEmpty(), 'No member is shown');
     }

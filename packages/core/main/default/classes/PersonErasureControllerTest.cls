@@ -44,7 +44,7 @@ private class PersonErasureControllerTest {
                     Assert.fail('A broken extension stops the action');
                 } catch (AuraHandledException failed) {
                     Assert.areEqual(
-                        Label.Core_Households_ErrorUnexpected,
+                        BarnHelp.text('Core', 'Core_Households_ErrorUnexpected'),
                         failed.getMessage(),
                         'The screen is not given a stack trace'
                     );
@@ -77,7 +77,11 @@ private class PersonErasureControllerTest {
                 PersonErasureController.preview(UserInfo.getUserId());
                 Assert.fail('A user is not a person to erase');
             } catch (AuraHandledException refused) {
-                Assert.areEqual(Label.Core_Erase_NotAPerson, refused.getMessage(), 'Its own words');
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_Erase_NotAPerson'),
+                    refused.getMessage(),
+                    'Its own words'
+                );
             }
         }
     }
@@ -125,7 +129,7 @@ private class PersonErasureControllerTest {
                 Assert.fail('Refused without the permission');
             } catch (AuraHandledException refused) {
                 Assert.areEqual(
-                    Label.Core_Erase_NoPermission,
+                    BarnHelp.text('Core', 'Core_Erase_NoPermission'),
                     refused.getMessage(),
                     'Its own words'
                 );

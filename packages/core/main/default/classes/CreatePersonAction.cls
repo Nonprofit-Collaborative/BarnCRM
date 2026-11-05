@@ -84,13 +84,13 @@ global with sharing class CreatePersonAction {
         try {
             save(asked, results);
         } catch (QueryException denied) {
-            undo(beforeSave, results, Label.Core_AgentActions_NoAccess);
+            undo(beforeSave, results, BarnHelp.text('Core', 'Core_AgentActions_NoAccess'));
         } catch (SecurityException denied) {
-            undo(beforeSave, results, Label.Core_AgentActions_NoAccess);
+            undo(beforeSave, results, BarnHelp.text('Core', 'Core_AgentActions_NoAccess'));
         } catch (HouseholdException refused) {
             undo(beforeSave, results, refused.getMessage());
         } catch (Exception failed) {
-            undo(beforeSave, results, Label.Core_AgentActions_Unexpected);
+            undo(beforeSave, results, BarnHelp.text('Core', 'Core_AgentActions_Unexpected'));
             ErrorLogger.log(failed, Label.Core_AgentActions_ErrorContext);
         }
         return results;
@@ -168,7 +168,10 @@ global with sharing class CreatePersonAction {
         for (Integer i = 0; i < asked.size(); i++) {
             Request request = asked[i];
             if (request == null || String.isBlank(request.lastName)) {
-                results[i].errorMessage = Label.Core_HouseholdPanel_AddMemberMissingName;
+                results[i].errorMessage = BarnHelp.text(
+                    'Core',
+                    'Core_HouseholdPanel_AddMemberMissingName'
+                );
                 continue;
             }
             if (String.isBlank(request.householdId)) {
@@ -176,7 +179,10 @@ global with sharing class CreatePersonAction {
             }
             Id householdId = accountIdOf(request.householdId);
             if (householdId == null) {
-                results[i].errorMessage = Label.Core_Households_ErrorNotAHousehold;
+                results[i].errorMessage = BarnHelp.text(
+                    'Core',
+                    'Core_Households_ErrorNotAHousehold'
+                );
                 continue;
             }
             householdByPosition.put(i, householdId);
@@ -190,9 +196,15 @@ global with sharing class CreatePersonAction {
         for (Integer i : new List<Integer>(householdByPosition.keySet())) {
             Id householdId = householdByPosition.get(i);
             if (!households.contains(householdId)) {
-                results[i].errorMessage = Label.Core_Households_ErrorNotAHousehold;
+                results[i].errorMessage = BarnHelp.text(
+                    'Core',
+                    'Core_Households_ErrorNotAHousehold'
+                );
             } else if (!editable.contains(householdId)) {
-                results[i].errorMessage = Label.Core_AgentActions_HouseholdNoEditAccess;
+                results[i].errorMessage = BarnHelp.text(
+                    'Core',
+                    'Core_AgentActions_HouseholdNoEditAccess'
+                );
             } else {
                 continue;
             }
@@ -229,7 +241,9 @@ global with sharing class CreatePersonAction {
         for (Database.Error error : refused.getErrors()) {
             reasons.add(error.getMessage());
         }
-        return reasons.isEmpty() ? Label.Core_AgentActions_Unexpected : String.join(reasons, ' ');
+        return reasons.isEmpty()
+            ? BarnHelp.text('Core', 'Core_AgentActions_Unexpected')
+            : String.join(reasons, ' ');
     }
 
     private static Id accountIdOf(String value) {

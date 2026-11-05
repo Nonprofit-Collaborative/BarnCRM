@@ -106,9 +106,15 @@ private class FindPeopleActionTest {
             Test.stopTest();
 
             Assert.areEqual(3, results.size(), 'Every search is answered');
-            Assert.areEqual(Label.Core_AgentActions_SearchTooShort, results[0].errorMessage);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_AgentActions_SearchTooShort'),
+                results[0].errorMessage
+            );
             Assert.areEqual(1, results[1].matches.size(), 'The good search still ran');
-            Assert.areEqual(Label.Core_AgentActions_SearchTooShort, results[2].errorMessage);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_AgentActions_SearchTooShort'),
+                results[2].errorMessage
+            );
         }
     }
 
@@ -181,7 +187,10 @@ private class FindPeopleActionTest {
         }
         Test.stopTest();
 
-        Assert.areEqual(Label.Core_AgentActions_NoAccess, results[0].errorMessage);
+        Assert.areEqual(
+            BarnHelp.text('Core', 'Core_AgentActions_NoAccess'),
+            results[0].errorMessage
+        );
         Assert.isTrue(results[0].matches.isEmpty(), 'Nobody is returned');
     }
 

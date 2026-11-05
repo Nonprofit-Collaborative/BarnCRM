@@ -159,7 +159,7 @@ private class SampleDataControllerTest {
                 } catch (AuraHandledException e) {
                     loadThrew = true;
                     System.assertEquals(
-                        Label.Core_SampleData_NoPermission,
+                        BarnHelp.text('Core', 'Core_SampleData_NoPermission'),
                         e.getMessage(),
                         'the refusal should carry the no-permission label'
                     );
@@ -169,7 +169,7 @@ private class SampleDataControllerTest {
                 } catch (AuraHandledException e) {
                     removeThrew = true;
                     System.assertEquals(
-                        Label.Core_SampleData_NoPermission,
+                        BarnHelp.text('Core', 'Core_SampleData_NoPermission'),
                         e.getMessage(),
                         'the refusal should carry the no-permission label'
                     );
@@ -195,7 +195,7 @@ private class SampleDataControllerTest {
             } catch (AuraHandledException e) {
                 threw = true;
                 System.assertEquals(
-                    Label.Core_SampleData_AlreadyLoaded,
+                    BarnHelp.text('Core', 'Core_SampleData_AlreadyLoaded'),
                     e.getMessage(),
                     'the component should receive the already-loaded label text'
                 );

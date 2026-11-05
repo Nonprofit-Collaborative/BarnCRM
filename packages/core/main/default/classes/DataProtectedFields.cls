@@ -146,20 +146,20 @@ public with sharing class DataProtectedFields {
     @NamespaceAccessible
     public static String objectRefusal(Schema.SObjectType type) {
         if (type == null) {
-            return Label.Core_Data_ObjectUnknown;
+            return BarnHelp.text('Core', 'Core_Data_ObjectUnknown');
         }
         Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         String name = described.getName().toLowerCase();
         String own = described.isCustom() ? ownLocalName(name) : null;
         List<String> plural = new List<String>{ described.getLabelPlural() };
         if (!described.isCustom() && SETUP.contains(name)) {
-            return String.format(Label.Core_Data_ObjectSetup, plural);
+            return String.format(BarnHelp.text('Core', 'Core_Data_ObjectSetup'), plural);
         }
         if (isOwnBookkeeping(own) || DataProtectionExtensions.protectedObjects().contains(type)) {
-            return String.format(Label.Core_Data_ObjectBookkeeping, plural);
+            return String.format(BarnHelp.text('Core', 'Core_Data_ObjectBookkeeping'), plural);
         }
         if (own == MEMBERSHIP) {
-            return String.format(Label.Core_Data_ObjectMembership, plural);
+            return String.format(BarnHelp.text('Core', 'Core_Data_ObjectMembership'), plural);
         }
         if (
             described.isCustomSetting() ||
@@ -167,7 +167,7 @@ public with sharing class DataProtectedFields {
             !described.isQueryable() ||
             (!described.isCustom() && !described.isSearchable())
         ) {
-            return String.format(Label.Core_Data_ObjectNotLoadable, plural);
+            return String.format(BarnHelp.text('Core', 'Core_Data_ObjectNotLoadable'), plural);
         }
         return null;
     }

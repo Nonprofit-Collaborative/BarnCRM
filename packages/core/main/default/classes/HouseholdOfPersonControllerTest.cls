@@ -189,7 +189,7 @@ private class HouseholdOfPersonControllerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_HouseholdPanel_NotAMember,
+                BarnHelp.text('Core', 'Core_HouseholdPanel_NotAMember'),
                 message,
                 'The screen is told in plain words that the person is not a member'
             );
@@ -334,7 +334,7 @@ private class HouseholdOfPersonControllerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_Households_ErrorNotAHousehold,
+                BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'),
                 message,
                 'The screen is told in plain words that this is not a household'
             );
@@ -547,7 +547,7 @@ private class HouseholdOfPersonControllerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_HouseholdPanel_AddMemberMissingName,
+                BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingName'),
                 message,
                 'The screen is told in plain words that a last name is needed'
             );
@@ -579,7 +579,7 @@ private class HouseholdOfPersonControllerTest {
 
             Assert.isNotNull(message, 'A user without create access on Contact is refused');
             Assert.areEqual(
-                Label.Core_HouseholdPanel_AddMemberFailed,
+                BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberFailed'),
                 message,
                 'The refusal is worded for a person, not copied from the platform'
             );

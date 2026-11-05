@@ -137,13 +137,15 @@ public with sharing class NpspHouseholdAdoptionService {
         NpspHouseholdSource source = NpspHouseholdSource.get();
         Integer count = source.available() ? countCandidates(source) : 0;
         if (count == 0) {
-            throw UserErrors.message(Label.Core_NpspAdoption_ErrorNothingToAdopt);
+            throw UserErrors.message(
+                BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNothingToAdopt')
+            );
         }
         Integer runCount = Math.min(count, RUN_LIMIT);
         if (confirmedCount == null || runCount > confirmedCount) {
             throw UserErrors.message(
                 String.format(
-                    Label.Core_NpspAdoption_ErrorCountChanged,
+                    BarnHelp.text('Core', 'Core_NpspAdoption_ErrorCountChanged'),
                     new List<Object>{ runCount, confirmedCount == null ? 0 : confirmedCount }
                 )
             );
@@ -162,12 +164,12 @@ public with sharing class NpspHouseholdAdoptionService {
         requireNotRunning();
         Integer count = String.isBlank(runId) ? 0 : adoptedCount(runId);
         if (count == 0) {
-            throw UserErrors.message(Label.Core_NpspAdoption_ErrorNothingToUndo);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNothingToUndo'));
         }
         if (confirmedCount == null || count != confirmedCount) {
             throw UserErrors.message(
                 String.format(
-                    Label.Core_NpspAdoption_ErrorCountChanged,
+                    BarnHelp.text('Core', 'Core_NpspAdoption_ErrorCountChanged'),
                     new List<Object>{ count, confirmedCount == null ? 0 : confirmedCount }
                 )
             );
@@ -182,10 +184,10 @@ public with sharing class NpspHouseholdAdoptionService {
     @TestVisible
     private static String blockedReason() {
         if (HouseholdService.householdRecordTypeId() == null) {
-            return Label.Core_Households_ErrorRecordTypeMissing;
+            return BarnHelp.text('Core', 'Core_Households_ErrorRecordTypeMissing');
         }
         if (HouseholdService.isJunctionMode()) {
-            return Label.Core_NpspAdoption_ErrorJunctionMode;
+            return BarnHelp.text('Core', 'Core_NpspAdoption_ErrorJunctionMode');
         }
         return null;
     }
@@ -205,7 +207,7 @@ public with sharing class NpspHouseholdAdoptionService {
 
     private static void requireNotRunning() {
         if (isRunning()) {
-            throw UserErrors.message(Label.Core_NpspAdoption_ErrorRunning);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_NpspAdoption_ErrorRunning'));
         }
     }
 
@@ -313,7 +315,7 @@ public with sharing class NpspHouseholdAdoptionService {
             ? permissionOverride
             : BarnCRMPermissions.canManageSettings();
         if (!allowed) {
-            throw UserErrors.message(Label.Core_NpspAdoption_ErrorNoPermission);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNoPermission'));
         }
     }
 }

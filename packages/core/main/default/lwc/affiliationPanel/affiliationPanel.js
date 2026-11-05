@@ -26,14 +26,9 @@ import ADD_FORM_TITLE from '@salesforce/label/c.Core_Affiliation_AddFormTitle';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Affiliation_EmptyHeading';
 import FORMER_BADGE from '@salesforce/label/c.Core_Affiliation_FormerBadge';
-import LOAD_FAILED from '@salesforce/label/c.Core_Affiliation_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_Affiliation_Loading';
 import MAKE_PRIMARY_BUTTON from '@salesforce/label/c.Core_HouseholdPanel_MakePrimary';
-import MAKE_PRIMARY_FAILED from '@salesforce/label/c.Core_Affiliation_MakePrimaryFailed';
-import MAKE_PRIMARY_SUCCESS from '@salesforce/label/c.Core_Affiliation_MakePrimarySuccess';
 import PRIMARY_BADGE from '@salesforce/label/c.Core_HouseholdMembersPanel_Primary';
-import SAVE_FAILED from '@salesforce/label/c.Core_Affiliation_SaveFailed';
-import SAVE_SUCCESS from '@salesforce/label/c.Core_Affiliation_SaveSuccess';
 import UNNAMED_PERSON from '@salesforce/label/c.Core_Affiliation_UnnamedPerson';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -225,7 +220,7 @@ export default class AffiliationPanel extends NavigationMixin(LightningElement) 
     this.refreshAffiliations = result.refresh;
     if (result.errors && result.errors.length) {
       this.affiliations = [];
-      this.errorMessage = LOAD_FAILED;
+      this.errorMessage = helpText('Core', 'Core_Affiliation_LoadFailed');
       this.loaded = true;
     } else if (result.data) {
       const views = result.data.uiapi.query.Affiliation__c.edges.map((edge) =>
@@ -424,12 +419,12 @@ export default class AffiliationPanel extends NavigationMixin(LightningElement) 
 
   handleFormSuccess() {
     this.showForm = false;
-    this.notify(SAVE_SUCCESS, 'success');
+    this.notify(helpText('Core', 'Core_Affiliation_SaveSuccess'), 'success');
     this.refresh();
   }
 
   handleFormError() {
-    this.errorMessage = SAVE_FAILED;
+    this.errorMessage = helpText('Core', 'Core_Affiliation_SaveFailed');
   }
 
   async makePrimary(affiliationId) {
@@ -441,11 +436,11 @@ export default class AffiliationPanel extends NavigationMixin(LightningElement) 
         fields: { [ID_FIELD.fieldApiName]: affiliationId, [IS_PRIMARY_FIELD.fieldApiName]: true }
       });
       this.errorMessage = undefined;
-      this.notify(MAKE_PRIMARY_SUCCESS, 'success');
+      this.notify(helpText('Core', 'Core_Affiliation_MakePrimarySuccess'), 'success');
       this.refresh(affiliation ? [affiliation.personId] : []);
     } catch {
-      this.errorMessage = MAKE_PRIMARY_FAILED;
-      this.notify(MAKE_PRIMARY_FAILED, 'error');
+      this.errorMessage = helpText('Core', 'Core_Affiliation_MakePrimaryFailed');
+      this.notify(helpText('Core', 'Core_Affiliation_MakePrimaryFailed'), 'error');
     }
   }
 

@@ -9,10 +9,10 @@ import TITLE from '@salesforce/label/c.Core_Section_Household';
 import EMPTY from '@salesforce/label/c.Core_HouseholdPanel_OfPersonEmpty';
 import EMPTY_HEADING from '@salesforce/label/c.Core_HouseholdPanel_OfPersonEmptyHeading';
 import LOADING from '@salesforce/label/c.Core_HouseholdPanel_OfPersonLoading';
-import LOAD_FAILED from '@salesforce/label/c.Core_HouseholdPanel_OfPersonLoadFailed';
 import MEMBER_COUNT_ONE from '@salesforce/label/c.Core_HouseholdPanel_MemberCountOne';
 import MEMBER_COUNT_MANY from '@salesforce/label/c.Core_HouseholdPanel_MemberCountMany';
 import FORMAL_GREETING from '@salesforce/label/c.Core_HouseholdPanel_FormalGreeting';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The household a person belongs to, on the person's own record: its name as a link, how
@@ -21,6 +21,16 @@ import FORMAL_GREETING from '@salesforce/label/c.Core_HouseholdPanel_FormalGreet
  * and on a person account page where the org stores people as accounts.
  */
 export default class HouseholdOfPerson extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
 
   @wire(EnclosingTabId) enclosingTabId;
@@ -52,7 +62,7 @@ export default class HouseholdOfPerson extends NavigationMixin(LightningElement)
       this.generateUrls();
     } else if (error) {
       this.households = [];
-      this.errorMessage = LOAD_FAILED;
+      this.errorMessage = helpText('Core', 'Core_HouseholdPanel_OfPersonLoadFailed');
       this.loaded = true;
     }
   }

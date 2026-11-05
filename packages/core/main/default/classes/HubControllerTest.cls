@@ -76,7 +76,11 @@ private class HubControllerTest {
             Test.stopTest();
 
             Assert.isFalse(offered, 'No button');
-            Assert.areEqual(Label.Core_Households_ErrorCreateNoAccess, message, 'Refused');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess'),
+                message,
+                'Refused'
+            );
             Assert.areEqual(
                 before,
                 [SELECT COUNT() FROM Account WITH SYSTEM_MODE],

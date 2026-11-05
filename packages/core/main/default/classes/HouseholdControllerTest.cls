@@ -253,7 +253,7 @@ private class HouseholdControllerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_Households_ErrorMoveNoEditAccess,
+                BarnHelp.text('Core', 'Core_Households_ErrorMoveNoEditAccess'),
                 message,
                 'The refusal says what is missing, in plain words'
             );

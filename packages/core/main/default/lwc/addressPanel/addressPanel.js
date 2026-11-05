@@ -32,25 +32,15 @@ import ADD_FORM_TITLE from '@salesforce/label/c.Core_Address_AddFormTitle';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import DEFAULT_BADGE from '@salesforce/label/c.Core_HouseholdMembersPanel_Primary';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Address_EmptyHeading';
-import LOAD_FAILED from '@salesforce/label/c.Core_Address_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_Address_Loading';
-import MOVE_FAILED from '@salesforce/label/c.Core_Address_MoveFailed';
-import SAVE_FAILED from '@salesforce/label/c.Core_Address_SaveFailed';
-import SAVE_SUCCESS from '@salesforce/label/c.Core_Address_SaveSuccess';
 import SEASONAL_RANGE from '@salesforce/label/c.Core_Address_SeasonalRange';
 import SEASONAL_RANGE_TO from '@salesforce/label/c.Core_Address_SeasonalRangeTo';
 import SET_DEFAULT_BUTTON from '@salesforce/label/c.Core_Address_SetDefaultButton';
-import SET_DEFAULT_FAILED from '@salesforce/label/c.Core_Address_SetDefaultFailed';
-import SET_DEFAULT_SUCCESS from '@salesforce/label/c.Core_Address_SetDefaultSuccess';
 import UPDATE_EVERYONE_BUTTON from '@salesforce/label/c.Core_Address_UpdateEveryoneButton';
 import UPDATE_EVERYONE_MOVING from '@salesforce/label/c.Core_Address_UpdateEveryoneMoving';
-import UPDATE_EVERYONE_NOBODY from '@salesforce/label/c.Core_Address_UpdateEveryoneNobody';
-import UPDATE_EVERYONE_SUCCESS from '@salesforce/label/c.Core_Address_UpdateEveryoneSuccess';
 import UPDATE_EVERYONE_TITLE from '@salesforce/label/c.Core_Address_UpdateEveryoneTitle';
 import USE_FOR_HOUSEHOLD_BUTTON from '@salesforce/label/c.Core_Address_UseForHouseholdButton';
-import USE_FOR_HOUSEHOLD_DETAIL from '@salesforce/label/c.Core_Address_UseForHouseholdDetail';
 import USE_FOR_HOUSEHOLD_PICK from '@salesforce/label/c.Core_Address_UseForHouseholdPick';
-import USE_FOR_HOUSEHOLD_SUCCESS from '@salesforce/label/c.Core_Address_UseForHouseholdSuccess';
 import USE_FOR_HOUSEHOLD_TITLE from '@salesforce/label/c.Core_Address_UseForHouseholdTitle';
 import FORMER_HEADING from '@salesforce/label/c.Core_Address_FormerHeading';
 import DATE_RANGE from '@salesforce/label/c.Core_Address_DateRange';
@@ -62,8 +52,6 @@ import EDIT_ACTION from '@salesforce/label/c.Core_CmdtManager_EditAction';
 import MARK_CURRENT from '@salesforce/label/c.Core_Address_MarkCurrent';
 import MARK_FORMER from '@salesforce/label/c.Core_Address_MarkFormer';
 import MARK_UNDELIVERABLE from '@salesforce/label/c.Core_Address_MarkUndeliverable';
-import STATUS_SAVED from '@salesforce/label/c.Core_Address_StatusSaved';
-import STATUS_FAILED from '@salesforce/label/c.Core_Address_StatusFailed';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ADDRESS_OBJECT = 'Address__c';
@@ -261,7 +249,7 @@ function statusActions(address, isFormer) {
 
 /** The message an Apex refusal carries, or the card's own when it carries none. */
 function messageOf(error) {
-  return (error && error.body && error.body.message) || MOVE_FAILED;
+  return (error && error.body && error.body.message) || helpText('Core', 'Core_Address_MoveFailed');
 }
 
 /**
@@ -325,7 +313,7 @@ export default class AddressPanel extends NavigationMixin(LightningElement) {
     this.refreshAddresses = result.refresh;
     if (result.errors && result.errors.length) {
       this.addresses = [];
-      this.errorMessage = LOAD_FAILED;
+      this.errorMessage = helpText('Core', 'Core_Address_LoadFailed');
       this.loaded = true;
     } else if (result.data) {
       const views = result.data.uiapi.query.Address__c.edges.map((edge) => toView(edge.node));
@@ -566,12 +554,12 @@ export default class AddressPanel extends NavigationMixin(LightningElement) {
 
   handleFormSuccess() {
     this.showForm = false;
-    this.notify(SAVE_SUCCESS, 'success');
+    this.notify(helpText('Core', 'Core_Address_SaveSuccess'), 'success');
     this.refresh();
   }
 
   handleFormError() {
-    this.errorMessage = SAVE_FAILED;
+    this.errorMessage = helpText('Core', 'Core_Address_SaveFailed');
   }
 
   async handleSetDefault(event) {
@@ -583,11 +571,11 @@ export default class AddressPanel extends NavigationMixin(LightningElement) {
         fields: { [ID_FIELD.fieldApiName]: addressId, [IS_DEFAULT_FIELD.fieldApiName]: true }
       });
       this.errorMessage = undefined;
-      this.notify(SET_DEFAULT_SUCCESS, 'success');
+      this.notify(helpText('Core', 'Core_Address_SetDefaultSuccess'), 'success');
       this.refresh();
     } catch {
-      this.errorMessage = SET_DEFAULT_FAILED;
-      this.notify(SET_DEFAULT_FAILED, 'error');
+      this.errorMessage = helpText('Core', 'Core_Address_SetDefaultFailed');
+      this.notify(helpText('Core', 'Core_Address_SetDefaultFailed'), 'error');
     }
   }
 
@@ -606,11 +594,11 @@ export default class AddressPanel extends NavigationMixin(LightningElement) {
     try {
       await updateRecord({ fields });
       this.errorMessage = undefined;
-      this.notify(STATUS_SAVED, 'success');
+      this.notify(helpText('Core', 'Core_Address_StatusSaved'), 'success');
       this.refresh();
     } catch {
-      this.errorMessage = STATUS_FAILED;
-      this.notify(STATUS_FAILED, 'error');
+      this.errorMessage = helpText('Core', 'Core_Address_StatusFailed');
+      this.notify(helpText('Core', 'Core_Address_StatusFailed'), 'error');
     }
   }
 
@@ -633,7 +621,7 @@ export default class AddressPanel extends NavigationMixin(LightningElement) {
       size: 'small',
       label: USE_FOR_HOUSEHOLD_TITLE,
       message: helpText('Core', 'Core_Address_UseForHouseholdHelp'),
-      details: [USE_FOR_HOUSEHOLD_DETAIL],
+      details: [helpText('Core', 'Core_Address_UseForHouseholdDetail')],
       choices: several ? options : undefined,
       choicesLabel: USE_FOR_HOUSEHOLD_PICK,
       choice: options.length ? options[0].value : undefined,
@@ -661,7 +649,9 @@ export default class AddressPanel extends NavigationMixin(LightningElement) {
     const answer = await BarnConfirmModal.open({
       size: 'small',
       label: UPDATE_EVERYONE_TITLE,
-      message: moving.length ? UPDATE_EVERYONE_MOVING : UPDATE_EVERYONE_NOBODY,
+      message: moving.length
+        ? UPDATE_EVERYONE_MOVING
+        : helpText('Core', 'Core_Address_UpdateEveryoneNobody'),
       items: moving.map((person) => person.name),
       checks: withTheirOwn.map((person) => ({ label: person.name, value: person.id })),
       checksLabel: helpText('Core', 'Core_Address_UpdateEveryoneOwn'),
@@ -680,10 +670,10 @@ export default class AddressPanel extends NavigationMixin(LightningElement) {
     try {
       if (kind === MOVE_FOR_HOUSEHOLD) {
         await applyToWholeHousehold(params);
-        this.notify(USE_FOR_HOUSEHOLD_SUCCESS, 'success');
+        this.notify(helpText('Core', 'Core_Address_UseForHouseholdSuccess'), 'success');
       } else {
         await updateEveryonesAddress(params);
-        this.notify(UPDATE_EVERYONE_SUCCESS, 'success');
+        this.notify(helpText('Core', 'Core_Address_UpdateEveryoneSuccess'), 'success');
       }
       this.errorMessage = undefined;
       this.refresh();

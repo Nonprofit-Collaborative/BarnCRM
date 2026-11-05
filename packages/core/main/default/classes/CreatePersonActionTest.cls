@@ -122,15 +122,21 @@ private class CreatePersonActionTest {
 
             Assert.areEqual(5, results.size(), 'Every request is answered');
             Assert.areEqual(
-                Label.Core_HouseholdPanel_AddMemberMissingName,
+                BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingName'),
                 results[0].errorMessage
             );
-            Assert.areEqual(Label.Core_Households_ErrorNotAHousehold, results[1].errorMessage);
-            Assert.areEqual(Label.Core_Households_ErrorNotAHousehold, results[2].errorMessage);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'),
+                results[1].errorMessage
+            );
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'),
+                results[2].errorMessage
+            );
             Assert.isNull(results[3].errorMessage, 'The good request was saved');
             Assert.isNotNull(results[3].personId);
             Assert.areEqual(
-                Label.Core_HouseholdPanel_AddMemberMissingName,
+                BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingName'),
                 results[4].errorMessage
             );
             Assert.areEqual(1, [SELECT COUNT() FROM Contact], 'Only Ada was created, once');

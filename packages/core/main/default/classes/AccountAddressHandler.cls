@@ -26,7 +26,7 @@ public with sharing class AccountAddressHandler extends TriggerHandler {
         } catch (Exception thrown) {
             ErrorLogger.log(thrown, 'AccountAddressHandler.afterInsert');
             for (Account account : accounts) {
-                account.addError(Label.Core_Address_PropagationFailed);
+                account.addError(BarnHelp.text('Core', 'Core_Address_PropagationFailed'));
             }
         }
     }
@@ -48,7 +48,7 @@ public with sharing class AccountAddressHandler extends TriggerHandler {
         } catch (Exception thrown) {
             ErrorLogger.log(thrown, 'AccountAddressHandler.afterUpdate');
             for (Account account : accounts) {
-                account.addError(Label.Core_Address_PropagationFailed);
+                account.addError(BarnHelp.text('Core', 'Core_Address_PropagationFailed'));
             }
         }
     }

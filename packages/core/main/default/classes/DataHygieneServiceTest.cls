@@ -470,7 +470,7 @@ private class DataHygieneServiceTest {
 
             Assert.isNull(platformOnly.note, 'No note where there are no native households.');
             Assert.areEqual(
-                System.Label.Core_DataHygiene_NativeHouseholdsListed,
+                BarnHelp.text('Core', 'Core_DataHygiene_NativeHouseholdsListed'),
                 withNative.note,
                 'The empty households check warns not to delete a Nonprofit Cloud household.'
             );

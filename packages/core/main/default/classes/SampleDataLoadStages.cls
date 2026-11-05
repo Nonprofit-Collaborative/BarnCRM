@@ -282,7 +282,7 @@ public with sharing class SampleDataLoadStages implements SampleDataStages {
         if (info == null) {
             throw new SampleDataException(
                 String.format(
-                    Label.Core_SampleData_RecordTypeMissing,
+                    BarnHelp.text('Core', 'Core_SampleData_RecordTypeMissing'),
                     new List<Object>{ developerName }
                 )
             );

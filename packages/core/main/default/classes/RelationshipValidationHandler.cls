@@ -45,7 +45,7 @@ public with sharing class RelationshipValidationHandler extends TriggerHandler {
                 thrown,
                 records,
                 'RelationshipValidationHandler.applyAndValidate',
-                Label.Core_Relationship_SyncFailed
+                BarnHelp.text('Core', 'Core_Relationship_SyncFailed')
             );
         }
     }

@@ -5,8 +5,6 @@ import { iconFor } from 'c/barnIcons';
 import HEADING from '@salesforce/label/c.Core_HubHome_ErrorTileHeading';
 import ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
 import LINK from '@salesforce/label/c.Core_ErrorLogTile_ViewAll';
-import INSTALL_COMPLETED from '@salesforce/label/c.Core_HubHome_InstallCompleted';
-import INSTALL_PROBLEMS from '@salesforce/label/c.Core_HubHome_InstallProblems';
 import ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -76,8 +74,8 @@ export default class HubErrors extends NavigationMixin(LightningElement) {
 
   get installStatusText() {
     return this.installHadProblems
-      ? INSTALL_PROBLEMS.replace('{0}', this.installProblemCount)
-      : INSTALL_COMPLETED;
+      ? helpText('Core', 'Core_HubHome_InstallProblems').replace('{0}', this.installProblemCount)
+      : helpText('Core', 'Core_HubHome_InstallCompleted');
   }
 
   handleOpenErrorLog() {

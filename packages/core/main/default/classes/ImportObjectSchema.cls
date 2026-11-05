@@ -1415,7 +1415,7 @@ public with sharing class ImportObjectSchema {
         for (ImportMapping.ObjectStep each : mapping.objects) {
             Schema.SObjectType type = each == null ? null : typeNamed(each.entity);
             if (type == null) {
-                return Label.Core_Data_ObjectUnknown;
+                return BarnHelp.text('Core', 'Core_Data_ObjectUnknown');
             }
             Schema.DescribeSObjectResult described = type.getDescribe(
                 SObjectDescribeOptions.DEFERRED

@@ -126,10 +126,13 @@ global with sharing class GetDataJobStatusAction {
                 results.add(job == null ? notFound(latest) : toResult(job));
             }
         } catch (QueryException denied) {
-            results = allFailed(asked.size(), Label.Core_AgentActions_NoAccess);
+            results = allFailed(asked.size(), BarnHelp.text('Core', 'Core_AgentActions_NoAccess'));
         } catch (Exception failed) {
             ErrorLogger.log(failed, Label.Core_AgentActions_ErrorContext);
-            results = allFailed(asked.size(), Label.Core_AgentActions_Unexpected);
+            results = allFailed(
+                asked.size(),
+                BarnHelp.text('Core', 'Core_AgentActions_Unexpected')
+            );
         }
         return results;
     }
@@ -180,8 +183,8 @@ global with sharing class GetDataJobStatusAction {
     private static Result notFound(Boolean latest) {
         Result result = new Result();
         result.errorMessage = latest
-            ? Label.Core_AgentActions_NoDataJobs
-            : Label.Core_AgentActions_DataJobNotFound;
+            ? BarnHelp.text('Core', 'Core_AgentActions_NoDataJobs')
+            : BarnHelp.text('Core', 'Core_AgentActions_DataJobNotFound');
         return result;
     }
 

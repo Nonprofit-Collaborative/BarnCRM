@@ -211,7 +211,7 @@ public with sharing class CoexistenceService {
             return hidden == 0
                 ? null
                 : String.format(
-                      System.Label.Core_Coexistence_SwitchToContactRefused,
+                      BarnHelp.text('Core', 'Core_Coexistence_SwitchToContactRefused'),
                       new List<Object>{ String.valueOf(hidden) }
                   );
         }
@@ -219,7 +219,7 @@ public with sharing class CoexistenceService {
         return stranded == 0
             ? null
             : String.format(
-                  System.Label.Core_Coexistence_SwitchToJunctionRefused,
+                  BarnHelp.text('Core', 'Core_Coexistence_SwitchToJunctionRefused'),
                   new List<Object>{ String.valueOf(stranded) }
               );
     }

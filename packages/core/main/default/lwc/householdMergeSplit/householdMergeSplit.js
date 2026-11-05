@@ -39,20 +39,13 @@ import MEMBER_FROM_THIS from '@salesforce/label/c.Core_HouseholdMerge_MemberFrom
 import MEMBER_FROM_OTHER from '@salesforce/label/c.Core_HouseholdMerge_MemberFromOther';
 import MERGE_BUTTON from '@salesforce/label/c.Core_HouseholdMerge_MergeButton';
 import CONFIRM_HEADING from '@salesforce/label/c.Core_HouseholdMerge_ConfirmHeading';
-import CONFIRM_BODY from '@salesforce/label/c.Core_HouseholdMerge_ConfirmBody';
 import CONFIRM_BUTTON from '@salesforce/label/c.Core_Duplicates_MergeButton';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import MERGE_SUCCESS from '@salesforce/label/c.Core_HouseholdMerge_Success';
-import CUSTOM_NAME_KEPT from '@salesforce/label/c.Core_HouseholdMerge_CustomNameKept';
-import READ_ONLY from '@salesforce/label/c.Core_HouseholdMerge_ReadOnly';
-import NOT_A_HOUSEHOLD from '@salesforce/label/c.Core_HouseholdMerge_NotAHousehold';
 import SPLIT_HEADING from '@salesforce/label/c.Core_HouseholdMerge_SplitHeading';
 import SPLIT_NEW from '@salesforce/label/c.Core_HouseholdMerge_SplitNewHousehold';
 import SPLIT_EXISTING from '@salesforce/label/c.Core_HouseholdMerge_SplitExistingHousehold';
 import SPLIT_BUTTON from '@salesforce/label/c.Core_HouseholdMerge_SplitButton';
-import SPLIT_CONFIRM_BODY from '@salesforce/label/c.Core_HouseholdMerge_SplitConfirmBody';
 import SPLIT_CONFIRM_HEADING from '@salesforce/label/c.Core_HouseholdMerge_SplitConfirmHeading';
-import SPLIT_SUCCESS from '@salesforce/label/c.Core_HouseholdMerge_SplitSuccess';
 import MOVE_TO from '@salesforce/label/c.Core_Shared_MoveTo';
 import LOADING_COMPARISON from '@salesforce/label/c.Core_HouseholdScreens_LoadingComparison';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -96,8 +89,12 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
     columnOther: COLUMN_OTHER,
     membersHeading: MEMBERS_HEADING,
     mergeButton: MERGE_BUTTON,
-    readOnly: READ_ONLY,
-    notAHousehold: NOT_A_HOUSEHOLD,
+    get readOnly() {
+      return helpText('Core', 'Core_HouseholdMerge_ReadOnly');
+    },
+    get notAHousehold() {
+      return helpText('Core', 'Core_HouseholdMerge_NotAHousehold');
+    },
     splitHeading: SPLIT_HEADING,
     splitNew: SPLIT_NEW,
     splitExisting: SPLIT_EXISTING,
@@ -253,10 +250,9 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
   /** What is kept and what is folded in, for the confirm dialog: the preview names both. */
   get confirmBody() {
     const preview = this.preview || {};
-    return CONFIRM_BODY.replace('{0}', preview.victimName || '').replace(
-      '{1}',
-      preview.survivorName || ''
-    );
+    return helpText('Core', 'Core_HouseholdMerge_ConfirmBody')
+      .replace('{0}', preview.victimName || '')
+      .replace('{1}', preview.survivorName || '');
   }
 
   get selectedPersonIds() {
@@ -427,8 +423,8 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
         // The person is not told anywhere else that choosing a name during a merge locks
         // it against the naming automation, so the success message is where that is said.
         const message = result.customNameKept
-          ? `${MERGE_SUCCESS} ${CUSTOM_NAME_KEPT}`
-          : MERGE_SUCCESS;
+          ? `${helpText('Core', 'Core_HouseholdMerge_Success')} ${helpText('Core', 'Core_HouseholdMerge_CustomNameKept')}`
+          : helpText('Core', 'Core_HouseholdMerge_Success');
         this.toast(message, 'success');
         if (swapped) {
           // This household no longer exists: go straight to the one that was kept.
@@ -501,7 +497,7 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: SPLIT_CONFIRM_HEADING,
-      message: SPLIT_CONFIRM_BODY,
+      message: helpText('Core', 'Core_HouseholdMerge_SplitConfirmBody'),
       confirmLabel: SPLIT_BUTTON,
       cancelLabel: CANCEL
     });
@@ -517,7 +513,7 @@ export default class HouseholdMergeSplit extends NavigationMixin(LightningElemen
     })
       .then((destinationId) => {
         this.errorMessage = undefined;
-        this.toast(SPLIT_SUCCESS, 'success');
+        this.toast(helpText('Core', 'Core_HouseholdMerge_SplitSuccess'), 'success');
         return this.finish(destinationId);
       })
       .catch((error) => {

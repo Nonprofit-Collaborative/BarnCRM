@@ -228,7 +228,7 @@ private class DuplicateControllerTest {
 
             Assert.areEqual(0, view.suggestions.size(), 'The pair is not shown (ADR-0036).');
             Assert.areEqual(
-                Label.Core_HouseholdMerge_ErrorNativeHousehold,
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorNativeHousehold'),
                 refusal,
                 'And a merge of it is refused in words.'
             );

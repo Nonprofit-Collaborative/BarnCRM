@@ -36,7 +36,9 @@ public without sharing class HouseholdMergeWriter {
         HouseholdMergeService.MergeAuthorization authorization
     ) {
         if (authorization == null) {
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorMergeFailed);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorMergeFailed')
+            );
         }
         return Database.merge(
             new Account(Id = authorization.survivorId),

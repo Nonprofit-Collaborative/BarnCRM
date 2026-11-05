@@ -127,7 +127,9 @@ public with sharing class HouseholdController {
     public static String recomputeAll() {
         try {
             if (!canManageSettings()) {
-                throw new HouseholdException(Label.Core_Households_ErrorNoSettingsPermission);
+                throw new HouseholdException(
+                    BarnHelp.text('Core', 'Core_Households_ErrorNoSettingsPermission')
+                );
             }
             return String.valueOf(Database.executeBatch(new HouseholdNamingBatch(), 200));
         } catch (Exception e) {
@@ -150,7 +152,9 @@ public with sharing class HouseholdController {
     public static List<MemberView> getMembers(Id householdId) {
         try {
             if (householdId == null || householdId.getSObjectType() != Account.SObjectType) {
-                throw new HouseholdException(Label.Core_Households_ErrorNotAHousehold);
+                throw new HouseholdException(
+                    BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold')
+                );
             }
             List<MemberView> result = new List<MemberView>();
             // What a screen shows is read with the running user's own access (ADR-0021),

@@ -17,14 +17,6 @@
         <value>Add Member</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdMembersPanel_AddSuccess</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>A person was added to the household</shortDescription>
-        <value>Added. The household name and greetings have been brought up to date.</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdMembersPanel_Deceased</fullName>
         <categories>Households</categories>
         <language>en_US</language>
@@ -47,22 +39,6 @@
         <protected>true</protected>
         <shortDescription>Move a person button</shortDescription>
         <value>Move to Another Household</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMembersPanel_MoveSuccess</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>A person was moved</shortDescription>
-        <value>Moved. Both households have been brought up to date.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMembersPanel_NotAHousehold</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The record is not a household</shortDescription>
-        <value>This panel is for households. This record is an organization, so it has no members to show.</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMembersPanel_Primary</fullName>

@@ -136,7 +136,10 @@ private class PreferredPhoneServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                String.format(Label.Core_Phones_PreferredEmpty, new List<String>{ 'Other' }),
+                String.format(
+                    BarnHelp.text('Core', 'Core_Phones_PreferredEmpty'),
+                    new List<String>{ 'Other' }
+                ),
                 message,
                 'The save was refused with the message that names the empty number'
             );
@@ -187,7 +190,10 @@ private class PreferredPhoneServiceTest {
 
             Assert.areEqual(1, maria.getErrors().size(), 'Refused: ' + maria.getErrors());
             Assert.areEqual(
-                String.format(Label.Core_Phones_PreferredEmpty, new List<String>{ shown }),
+                String.format(
+                    BarnHelp.text('Core', 'Core_Phones_PreferredEmpty'),
+                    new List<String>{ shown }
+                ),
                 maria.getErrors()[0].getMessage(),
                 'Names the choice by its label'
             );

@@ -236,7 +236,11 @@ private class NpspHouseholdAdoptionTest {
             Assert.areEqual('Undone', rows.get(String.valueOf(f.smith.Id)).Status__c, 'undone');
             Household_Adoption__c gone = rows.get(String.valueOf(f.jones.Id));
             Assert.areEqual('Not Restored', gone.Status__c, 'deleted account not restored');
-            Assert.areEqual(Label.Core_NpspAdoption_NoteGone, gone.Note__c, 'says why');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_NpspAdoption_NoteGone'),
+                gone.Note__c,
+                'says why'
+            );
         }
     }
 
@@ -245,31 +249,53 @@ private class NpspHouseholdAdoptionTest {
         System.runAs(TestUsers.admin()) {
             fixture();
             assertRefused(
-                String.format(Label.Core_NpspAdoption_ErrorCountChanged, new List<Object>{ 2, 1 }),
+                String.format(
+                    BarnHelp.text('Core', 'Core_NpspAdoption_ErrorCountChanged'),
+                    new List<Object>{ 2, 1 }
+                ),
                 1,
                 'count grew'
             );
             assertRefused(
-                String.format(Label.Core_NpspAdoption_ErrorCountChanged, new List<Object>{ 2, 0 }),
+                String.format(
+                    BarnHelp.text('Core', 'Core_NpspAdoption_ErrorCountChanged'),
+                    new List<Object>{ 2, 0 }
+                ),
                 null,
                 'unconfirmed'
             );
 
             NpspHouseholdAdoptionService.runningOverride = true;
-            assertRefused(Label.Core_NpspAdoption_ErrorRunning, 2, 'a run is in progress');
+            assertRefused(
+                BarnHelp.text('Core', 'Core_NpspAdoption_ErrorRunning'),
+                2,
+                'a run is in progress'
+            );
             NpspHouseholdAdoptionService.runningOverride = null;
 
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-            assertRefused(Label.Core_NpspAdoption_ErrorJunctionMode, 2, 'junction mode');
+            assertRefused(
+                BarnHelp.text('Core', 'Core_NpspAdoption_ErrorJunctionMode'),
+                2,
+                'junction mode'
+            );
             HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
 
             NpspHouseholdAdoptionService.permissionOverride = false;
-            assertRefused(Label.Core_NpspAdoption_ErrorNoPermission, 2, 'no permission');
+            assertRefused(
+                BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNoPermission'),
+                2,
+                'no permission'
+            );
             try {
                 NpspHouseholdAdoptionController.getStatus();
                 Assert.fail('status needs the permission too');
             } catch (AuraHandledException e) {
-                Assert.areEqual(Label.Core_NpspAdoption_ErrorNoPermission, e.getMessage(), 'why');
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNoPermission'),
+                    e.getMessage(),
+                    'why'
+                );
             }
             NpspHouseholdAdoptionService.permissionOverride = null;
 
@@ -277,11 +303,19 @@ private class NpspHouseholdAdoptionTest {
                 NpspHouseholdAdoptionController.undo('no-such-run', 1);
                 Assert.fail('nothing to undo');
             } catch (AuraHandledException e) {
-                Assert.areEqual(Label.Core_NpspAdoption_ErrorNothingToUndo, e.getMessage(), 'why');
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNothingToUndo'),
+                    e.getMessage(),
+                    'why'
+                );
             }
 
             NpspHouseholdSource.instance = new FakeSource();
-            assertRefused(Label.Core_NpspAdoption_ErrorNothingToAdopt, 2, 'nothing to adopt');
+            assertRefused(
+                BarnHelp.text('Core', 'Core_NpspAdoption_ErrorNothingToAdopt'),
+                2,
+                'nothing to adopt'
+            );
         }
     }
 

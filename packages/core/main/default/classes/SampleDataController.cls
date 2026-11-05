@@ -51,7 +51,7 @@ public with sharing class SampleDataController {
 
     private static void enforcePermission() {
         if (!hasManagePermission()) {
-            throw new SampleDataException(Label.Core_SampleData_NoPermission);
+            throw new SampleDataException(BarnHelp.text('Core', 'Core_SampleData_NoPermission'));
         }
     }
 

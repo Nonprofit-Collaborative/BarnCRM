@@ -139,7 +139,7 @@ public with sharing class AffiliationDomain {
                 continue;
             }
             if (firstOverlap(inThisSave.get(key), record) != null) {
-                record.addError(Label.Core_Affiliation_OverlapInSave);
+                record.addError(BarnHelp.text('Core', 'Core_Affiliation_OverlapInSave'));
                 continue;
             }
             addTo(inThisSave, key, record);
@@ -223,7 +223,7 @@ public with sharing class AffiliationDomain {
         Affiliation__c existing = visibleById.get(clash.Id);
         if (existing == null) {
             // The clashing row is not visible to this user: say only that one exists.
-            return Label.Core_Affiliation_OverlapHidden;
+            return BarnHelp.text('Core', 'Core_Affiliation_OverlapHidden');
         }
         return String.format(
             Label.Core_Affiliation_Overlap,

@@ -81,7 +81,10 @@ public with sharing class PreferredEmailService {
         String chosen = (String) person.get(fieldName);
         if (String.isBlank(chosen)) {
             person.addError(
-                String.format(Label.Core_Emails_PreferredEmpty, new List<String>{ preference })
+                String.format(
+                    BarnHelp.text('Core', 'Core_Emails_PreferredEmpty'),
+                    new List<String>{ preference }
+                )
             );
             return null;
         }

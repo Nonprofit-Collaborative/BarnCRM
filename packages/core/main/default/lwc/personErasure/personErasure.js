@@ -7,7 +7,6 @@ import getPreview from '@salesforce/apex/PersonErasureController.preview';
 import erasePerson from '@salesforce/apex/PersonErasureController.erase';
 
 import TITLE from '@salesforce/label/c.Core_EraseAction_Title';
-import WARNING from '@salesforce/label/c.Core_EraseAction_Warning';
 import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
 import WORKING from '@salesforce/label/c.Core_EraseAction_Working';
 import COLUMN_ACTION from '@salesforce/label/c.Core_EraseAction_ColumnAction';
@@ -24,10 +23,8 @@ import ACTION_UPDATED from '@salesforce/label/c.Core_EraseAction_Updated';
 import REFERENCE from '@salesforce/label/c.Core_EraseAction_Reference';
 import CONFIRM from '@salesforce/label/c.Core_EraseAction_Confirm';
 import ERASE from '@salesforce/label/c.Core_EraseAction_Erase';
-import DONE from '@salesforce/label/c.Core_EraseAction_Done';
 import OPEN_AUDIT from '@salesforce/label/c.Core_EraseAction_OpenAudit';
 import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
-import NO_PERMISSION from '@salesforce/label/c.Core_Erase_NoPermission';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ACTION_LABELS = {
@@ -58,7 +55,9 @@ export default class PersonErasure extends NavigationMixin(LightningElement) {
 
   label = {
     title: TITLE,
-    warning: WARNING,
+    get warning() {
+      return helpText('Core', 'Core_EraseAction_Warning');
+    },
     preview: PREVIEW,
     working: WORKING,
     changesTable: CHANGES_TABLE,
@@ -67,10 +66,14 @@ export default class PersonErasure extends NavigationMixin(LightningElement) {
       return helpText('Core', 'Core_EraseAction_ReferenceHelp');
     },
     erase: ERASE,
-    done: DONE,
+    get done() {
+      return helpText('Core', 'Core_EraseAction_Done');
+    },
     openAudit: OPEN_AUDIT,
     close: CLOSE,
-    noPermission: NO_PERMISSION
+    get noPermission() {
+      return helpText('Core', 'Core_Erase_NoPermission');
+    }
   };
 
   columns = [

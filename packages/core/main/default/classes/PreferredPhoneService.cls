@@ -46,7 +46,7 @@ public with sharing class PreferredPhoneService {
                 // nobody would notice, so the save is refused instead.
                 person.addError(
                     String.format(
-                        Label.Core_Phones_PreferredEmpty,
+                        BarnHelp.text('Core', 'Core_Phones_PreferredEmpty'),
                         new List<String>{ labelOf(preference) }
                     )
                 );

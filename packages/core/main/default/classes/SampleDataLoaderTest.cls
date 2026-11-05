@@ -310,7 +310,7 @@ private class SampleDataLoaderTest {
             } catch (SampleDataException e) {
                 threw = true;
                 System.assertEquals(
-                    Label.Core_SampleData_AlreadyLoaded,
+                    BarnHelp.text('Core', 'Core_SampleData_AlreadyLoaded'),
                     e.getMessage(),
                     'the already-loaded error should use the packaged label'
                 );
@@ -333,7 +333,7 @@ private class SampleDataLoaderTest {
             }
             System.assertEquals(
                 String.format(
-                    Label.Core_SampleData_OrganizationRecordTypeUnavailable,
+                    BarnHelp.text('Core', 'Core_SampleData_OrganizationRecordTypeUnavailable'),
                     new List<String>{ AccountKinds.organizationRecordTypeLabel() }
                 ),
                 message,
@@ -567,7 +567,7 @@ private class SampleDataLoaderTest {
             } catch (SampleDataException e) {
                 threw = true;
                 System.assertEquals(
-                    Label.Core_SampleData_LoadInProgress,
+                    BarnHelp.text('Core', 'Core_SampleData_LoadInProgress'),
                     e.getMessage(),
                     'a second load should be refused with the load-in-progress label'
                 );
@@ -587,13 +587,19 @@ private class SampleDataLoaderTest {
                 SampleDataLoader.remove();
             } catch (SampleDataException e) {
                 refused++;
-                System.assertEquals(Label.Core_SampleData_RemoveInProgress, e.getMessage());
+                System.assertEquals(
+                    BarnHelp.text('Core', 'Core_SampleData_RemoveInProgress'),
+                    e.getMessage()
+                );
             }
             try {
                 SampleDataLoader.load();
             } catch (SampleDataException e) {
                 refused++;
-                System.assertEquals(Label.Core_SampleData_RemoveInProgress, e.getMessage());
+                System.assertEquals(
+                    BarnHelp.text('Core', 'Core_SampleData_RemoveInProgress'),
+                    e.getMessage()
+                );
             }
             System.assertEquals(2, refused, 'neither starts while a removal runs');
 
@@ -616,7 +622,7 @@ private class SampleDataLoaderTest {
             } catch (SampleDataException e) {
                 threw = true;
                 System.assertEquals(
-                    Label.Core_SampleData_LoadInProgress,
+                    BarnHelp.text('Core', 'Core_SampleData_LoadInProgress'),
                     e.getMessage(),
                     'removing during a load should be refused with the load-in-progress label'
                 );
@@ -923,7 +929,10 @@ private class SampleDataLoaderTest {
                 SampleDataLoader.load();
                 Assert.fail('A load is refused while a module still has sample records');
             } catch (SampleDataException refused) {
-                Assert.areEqual(Label.Core_SampleData_AlreadyLoaded, refused.getMessage());
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_SampleData_AlreadyLoaded'),
+                    refused.getMessage()
+                );
             }
 
             module.keptSome = false;

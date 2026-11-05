@@ -96,7 +96,9 @@ public with sharing class HouseholdMemberTriggerHandler extends TriggerHandler {
             )
         ) {
             if (existing.Is_Primary__c == true && existing.Id != record.Id) {
-                record.Is_Primary__c.addError(Label.Core_Households_ErrorSecondPrimary);
+                record.Is_Primary__c.addError(
+                    BarnHelp.text('Core', 'Core_Households_ErrorSecondPrimary')
+                );
                 return;
             }
         }
@@ -201,7 +203,7 @@ public with sharing class HouseholdMemberTriggerHandler extends TriggerHandler {
         for (Household_Member__c record : checked) {
             String key = record.Household__c + ':' + personOf(record);
             if (taken.contains(key)) {
-                record.addError(Label.Core_Households_ErrorAlreadyCurrentMember);
+                record.addError(BarnHelp.text('Core', 'Core_Households_ErrorAlreadyCurrentMember'));
             } else {
                 taken.add(key);
             }

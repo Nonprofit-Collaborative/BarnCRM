@@ -16,7 +16,7 @@ public with sharing class HouseholdException extends Exception {
             e instanceof HouseholdException,
             context,
             recordId,
-            Label.Core_Households_ErrorUnexpected
+            BarnHelp.text('Core', 'Core_Households_ErrorUnexpected')
         );
     }
 }
