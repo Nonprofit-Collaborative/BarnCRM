@@ -236,9 +236,11 @@ now) or tomorrow. The email names the job, the day and time, and the place when 
 one, and asks the person to tell you if they cannot come.
 
 **Turning it on.** The setting ships off, because turning it on emails real people. Switch it on
-in **BarnCRM Settings**, **Volunteers**. The 7:00 AM job is one of the nightly jobs on Health
-Check's list: if Health Check shows it as not scheduled, use its **Schedule all nightly jobs**
-fix once. Nothing else needs setting up.
+in **BarnCRM Settings**, **Volunteers**. The 7:00 AM job is a step of
+[BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run, and has no switch of its own:
+it runs whenever Volunteers is on and the setting is on. If Health Check shows the nightly
+run as not scheduled, use its **Schedule all nightly jobs** fix once. Nothing else needs
+setting up.
 
 **One reminder per booking.** Each due booking is stamped first: its **Reminder Sent On** field
 holds the time, and only bookings whose stamp saved are emailed. That booking is never emailed
@@ -324,9 +326,10 @@ does not.
 shifts a change removes are removed for them, although they cannot delete shifts themselves.
 Read Only users see schedules and change nothing.
 
-**The nightly run** is one of BarnCRM's nightly jobs, **Volunteer Schedules** (Setup's
-**Scheduled Jobs** page lists it as BarnCRM Volunteer Schedules). If **Health Check** says
-"Volunteer Schedules, 3:00 AM" is not scheduled, use its **Schedule All Nightly Jobs** fix. While Volunteers is turned
+**The nightly run** is a step of [BarnCRM Nightly Jobs](nightly-jobs.md), **Volunteer
+Schedules** at 3:00 AM (Setup's **Scheduled Jobs** page lists only the one run, BarnCRM
+Nightly Jobs). The step has no switch of its own. If **Health Check** says the nightly run is
+not scheduled, use its **Schedule All Nightly Jobs** fix. While Volunteers is turned
 off, no shifts are created; the first night after you turn it back on catches up.
 
 ## Hour Letters and Certificates

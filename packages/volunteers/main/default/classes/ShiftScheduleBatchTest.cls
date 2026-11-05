@@ -135,28 +135,18 @@ private class ShiftScheduleBatchTest {
     }
 
     @IsTest
-    static void healthCheckCanScheduleTheNightlyJob() {
+    static void theNightlyJobIsAStepOfTheNightlyRun() {
         System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
-            VolunteersScheduler.jobNameInUse = 'BarnCRM Volunteer Schedules test';
-            List<NightlyJob> jobs = new VolunteersNightlyJobProvider().nightlyJobs();
-            Boolean before = jobs[0].isScheduled();
+            List<NightlyStep> steps = new VolunteersNightlyJobProvider().nightlySteps();
 
-            Test.startTest();
-            jobs[0].schedule();
-            jobs[0].schedule();
-            Test.stopTest();
-
-            Assert.areEqual(2, jobs.size(), 'The schedule run and the reminder run.');
+            Assert.areEqual(2, steps.size(), 'The schedule run and the reminder run.');
             Assert.areEqual(
                 Label.Volunteers_NightlyJobs_SchedulesName,
-                jobs[0].label(),
+                steps[0].label,
                 'Its label.'
             );
-            Assert.isFalse(before, 'Not scheduled at first.');
-            Assert.isTrue(
-                jobs[0].isScheduled(),
-                'Scheduled by the fix, once however often it is asked.'
-            );
+            Assert.areEqual(180, steps[0].minute, 'At three in the morning.');
+            Assert.areEqual(VolunteersScheduler.JOB_NAME, steps[0].key, 'Keyed by its old name.');
         }
     }
 

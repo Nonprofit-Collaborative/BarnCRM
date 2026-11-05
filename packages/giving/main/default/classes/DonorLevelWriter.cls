@@ -21,6 +21,49 @@ public without sharing class DonorLevelWriter {
     }
 
     /**
+     * Saves only the values a recalculation changed (RT-09): each record goes out as its Id and
+     * the fields whose value differs from `before` (the record as read), and a record with no
+     * change is not written at all, so it costs no DML row and fires no trigger.
+     */
+    public static Integer saveChanged(List<SObject> recalculated, Map<Id, SObject> before) {
+        List<SObject> slim = changedOnly(recalculated, before);
+        save(slim);
+        return slim.size();
+    }
+
+    @TestVisible
+    private static List<SObject> changedOnly(List<SObject> recalculated, Map<Id, SObject> before) {
+        List<SObject> slim = new List<SObject>();
+        if (recalculated == null) {
+            return slim;
+        }
+        for (SObject record : recalculated) {
+            SObject original = before == null ? null : before.get(record.Id);
+            SObject changes = record.getSObjectType().newSObject(record.Id);
+            Boolean anyChange = false;
+            Map<String, Object> was = original == null
+                ? new Map<String, Object>()
+                : original.getPopulatedFieldsAsMap();
+            Map<String, Object> now = record.getPopulatedFieldsAsMap();
+            for (String field : now.keySet()) {
+                Object value = now.get(field);
+                if (field == 'Id' || value instanceof SObject || value instanceof List<SObject>) {
+                    continue;
+                }
+                if (original != null && was.get(field) == value) {
+                    continue;
+                }
+                changes.put(field, value);
+                anyChange = true;
+            }
+            if (anyChange) {
+                slim.add(changes);
+            }
+        }
+        return slim;
+    }
+
+    /**
      * Stamps when a recalculation finished, the freshness promise the rollups make (Principle 2).
      * Only this key is written, on the locked stored record, and a first save keeps the
      * checkboxes that ship on (OrgSettingsSystemWriter).

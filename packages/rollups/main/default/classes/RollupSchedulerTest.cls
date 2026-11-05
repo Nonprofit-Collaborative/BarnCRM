@@ -238,17 +238,6 @@ private class RollupSchedulerTest {
         );
     }
 
-    private static String cronOf(String jobName) {
-        return [
-            SELECT CronExpression
-            FROM CronTrigger
-            WHERE CronJobDetail.Name = :jobName
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ]
-        .CronExpression;
-    }
-
     private static void useJobNameOfItsOwn() {
         RollupScheduler.jobNameInUse = 'BarnCRM Rollups test ' + Crypto.getRandomInteger();
     }
@@ -260,37 +249,17 @@ private class RollupSchedulerTest {
             Assert.areEqual(2, RollupScheduler.nightlyHour(), 'Blank means 2:00 AM');
             Assert.isTrue(RollupScheduler.nightlyTime().contains('2:00'), 'Read as a time');
 
-            saveHour(22);
+            Assert.areEqual(120, RollupScheduler.step().minute, 'The step is at 2:00 first');
+
             Test.startTest();
-            RollupScheduler.start();
+            saveHour(22);
             Test.stopTest();
 
             Assert.areEqual(22, RollupScheduler.nightlyHour(), 'The saved hour');
-            Assert.areEqual('0 0 22 * * ?', cronOf(RollupScheduler.jobName()), 'Every day at 22');
-        }
-    }
-
-    @IsTest
-    static void savingANewHourMovesTheScheduledRun() {
-        System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
-            useJobNameOfItsOwn();
-            RollupScheduler.start();
-            Assert.areEqual('0 0 2 * * ?', cronOf(RollupScheduler.jobName()), 'At 2 first');
-
-            Test.startTest();
-            saveHour(5);
-            Test.stopTest();
-
             Assert.areEqual(
-                '0 0 5 * * ?',
-                cronOf(RollupScheduler.jobName()),
-                'Saving the hour moved it'
-            );
-            String name = RollupScheduler.jobName();
-            Assert.areEqual(
-                1,
-                [SELECT COUNT() FROM CronTrigger WHERE CronJobDetail.Name = :name WITH SYSTEM_MODE],
-                'Still one nightly run'
+                22 * 60,
+                RollupScheduler.step().minute,
+                'The step moves with the hour, with no schedule to move'
             );
         }
     }

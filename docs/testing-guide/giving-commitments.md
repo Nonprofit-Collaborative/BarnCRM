@@ -104,7 +104,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-COM-07: Nightly Jobs and Overdue Payments
 
-**Purpose:** confirm the nightly jobs schedule, run on demand, and fill the Overdue list view.
+**Purpose:** confirm the three Giving jobs switch on as steps of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md) (the one nightly run), run on demand, and fill the Overdue list view.
 **Prerequisites:** admin.
 
 | Step | Action | Expected result |

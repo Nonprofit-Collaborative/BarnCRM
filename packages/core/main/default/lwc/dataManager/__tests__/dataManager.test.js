@@ -353,7 +353,7 @@ describe('c-data-manager', () => {
 
   it('keeps each tile line to 12 words or fewer', () => {
     const fs = require('fs');
-    // The tile lines are help text: Core's help catalog holds them (ADR-NEXT help-text-json).
+    // The tile lines are help text: Core's help catalog holds them (ADR-0164 help-text-json).
     const { texts } = JSON.parse(
       fs.readFileSync('packages/core/main/default/staticresources/BarnHelp_Core.json', 'utf8')
     );

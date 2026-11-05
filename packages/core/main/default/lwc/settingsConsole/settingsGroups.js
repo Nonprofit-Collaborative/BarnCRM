@@ -29,6 +29,7 @@ import ERROR_LOG from '@salesforce/label/c.Core_ErrorLogTile_Title';
 import IMPORTING from '@salesforce/label/c.Core_SettingsGroup_Importing';
 import GIFT_MATCHING from '@salesforce/label/c.Core_SettingsGroup_GiftMatching';
 import FIND_AND_BULK from '@salesforce/label/c.Core_SettingsGroup_FindAndBulk';
+import NIGHTLY_JOBS from '@salesforce/label/c.Core_NightlyJobs_Title';
 
 /**
  * The boxes (sub-sections) each BarnCRM Settings page shows its rows in (P1), by page name in
@@ -61,6 +62,7 @@ const PAGE_GROUPS = {
         'FiscalYearStartMonth'
       ]
     },
+    { id: 'Nightly Jobs', label: NIGHTLY_JOBS, keys: ['Nightly_Jobs'] },
     { id: 'Tools', label: TOOLS, keys: ['Custom_Metadata_Manager', 'Sample_Data'] }
   ],
   organization: [

@@ -21,7 +21,7 @@
  * enforces a rule rather than providing a convenience, so there is nothing an administrator, a
  * pause or a bypass can say that should stop it (ADR-0024).
  *
- * FAILURES (ADR-NEXT dispatcher error contract). Whatever a handler throws is logged to the
+ * FAILURES (ADR-0165 dispatcher error contract). Whatever a handler throws is logged to the
  * Error Log first, so R-E1 holds even when the user never sees the failure. Then only the records
  * the failure belongs to are refused, and the rest of the save goes ahead:
  *

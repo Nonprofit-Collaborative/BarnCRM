@@ -47,7 +47,8 @@ Everything is in the app, with one exception noted at step 3.
    `giving@yourorg.org` rather than from whoever pressed Send. The address has to be one
    your org has already verified as an organization wide address.
 6. If you want emailed thank yous to go out overnight without anybody pressing anything,
-   turn on **Send emails nightly** on the same page. It runs at 2:45 in the morning. Leave
+   turn on **Send emails nightly** on the same page. That switches on the acknowledgments step
+   of [BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run, at 2:45 in the morning. Leave
    it off if you would rather look at the queue first, which is what most organizations do
    for the first month.
 

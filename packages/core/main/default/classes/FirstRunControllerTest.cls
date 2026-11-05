@@ -74,6 +74,36 @@ private class FirstRunControllerTest {
     }
 
     @IsTest
+    static void finishingSchedulesTheNightlyRunOnceAndKeepsAnExistingSchedule() {
+        System.runAs(TestUsers.admin()) {
+            TestSettings.neverSetUp();
+            FirstRunController.startTabCheckInTests = true;
+            TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+            ScheduledJobSelector.forget();
+
+            FirstRunController.finish(
+                ModuleDetectionService.SUITE_STANDARD,
+                new List<String>{ FeatureSwitchService.DATA_MANAGER }
+            );
+            Assert.isTrue(NightlyJobs.isScheduled(), 'Finishing setup schedules the nightly run');
+            FirstRunController.finish(
+                ModuleDetectionService.SUITE_STANDARD,
+                new List<String>{ FeatureSwitchService.DATA_MANAGER }
+            );
+
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM CronTrigger
+                    WHERE CronJobDetail.Name = :NightlyJobs.jobName()
+                ],
+                'Finishing twice leaves one schedule'
+            );
+        }
+    }
+
+    @IsTest
     static void mariaFinishesWithTheFeaturesSheTicked() {
         System.runAs(TestUsers.admin()) {
             TestSettings.newInstall();
