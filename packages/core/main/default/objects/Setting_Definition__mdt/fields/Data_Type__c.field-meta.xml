@@ -57,6 +57,11 @@
         <label>Field List</label>
       </value>
       <value>
+        <fullName>PicklistFromField</fullName>
+        <default>false</default>
+        <label>Picklist From Field</label>
+      </value>
+      <value>
         <fullName>Component</fullName>
         <default>false</default>
         <label>Component</label>

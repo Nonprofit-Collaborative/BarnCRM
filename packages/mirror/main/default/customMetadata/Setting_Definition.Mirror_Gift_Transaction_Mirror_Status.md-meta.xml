@@ -20,7 +20,11 @@
     </values>
     <values>
         <field>Data_Type__c</field>
-        <value xsi:type="xsd:string">Text</value>
+        <value xsi:type="xsd:string">PicklistFromField</value>
+    </values>
+    <values>
+        <field>Record_Object__c</field>
+        <value xsi:type="xsd:string">GiftTransaction.Status</value>
     </values>
     <values>
         <field>Sort_Order__c</field>
@@ -28,7 +32,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">The Status your paid Gift Transactions have in Nonprofit Cloud, exactly as its API name; it starts as Paid. Each Gift Transaction the mirror creates gets it. Nothing is copied while it is not one of your org's active Status values.</value>
+        <value xsi:type="xsd:string">The Status your paid Gift Transactions have in Nonprofit Cloud, chosen from your org's active Status values; it starts as Paid. Each Gift Transaction the mirror creates gets it. Nothing is copied while it is not one of your org's active Status values. Without Nonprofit Cloud, type the API name.</value>
     </values>
     <values>
         <field>Help_Path__c</field>
