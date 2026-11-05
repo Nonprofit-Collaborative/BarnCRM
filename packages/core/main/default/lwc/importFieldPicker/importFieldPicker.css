@@ -3,8 +3,8 @@
 }
 
 /* The list opens over the rows below it, inside a stacked table cell too. */
-.slds-dropdown {
-  min-width: 14rem;
+.barn-field-picker-list {
+  min-width: var(--barn-field-picker-min-width, 14rem);
 }
 
 [role='option']:focus {
