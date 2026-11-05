@@ -712,7 +712,7 @@ fi
 # undeployed this way until 2026-10-13.
 CORE_DIR="packages/core/main/default"
 CORE_STAGED=(objects customMetadata labels staticresources customPermissions notificationtypes
-  externalCredentials classes triggers contentassets permissionsets permissionsetgroups layouts flexipages applications
+  externalCredentials classes triggers contentassets permissionsets permissionsetgroups layouts reportTypes reports flexipages applications
   tabs quickActions lwc prompts flows PlatformEventSubscriberConfigs)
 unstaged=()
 for dir in "$CORE_DIR"/*/; do
@@ -867,6 +867,8 @@ if ! package_skipped core; then
     "${CORE_DIR}/permissionsets" \
     "${CORE_DIR}/permissionsetgroups" \
     "${CORE_DIR}/layouts" \
+    "${CORE_DIR}/reportTypes" \
+    "${CORE_DIR}/reports" \
     "${CORE_DIR}/flexipages" \
     "${CORE_DIR}/applications" \
     "${CORE_DIR}/tabs" \
@@ -929,6 +931,9 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(programs)
   # Logic Models depends on Core only (ADR-0154, logic models module).
   MODULES+=(logicmodels)
+  # Funders depends on Core only (ADR-0161, amended by ADR-0162 decision 1): its totals are
+  # platform roll-up summaries, not Rollup Builder definitions.
+  MODULES+=(funders)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
   RECORD_PACKAGES+=("${MODULES[@]}")
@@ -981,7 +986,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # BarnCRM_Module__mdt record (ADR-0137). The app
   # copies are written to a temporary metadata-format package; the repository's app files are
   # never changed. Nothing is deployed when no module names a tab.
-  deployed_modules=(rollups giving mirror programs logicmodels)
+  deployed_modules=(rollups giving mirror programs logicmodels funders)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"
   python3 scripts/org/module-app-tabs.py "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1
@@ -1008,7 +1013,8 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # The same gap for every module's own post-install steps (Giving's starting fund, receipt
   # letters and import templates, each module's automation switches, its admin permission set
   # for the person deploying): a deployment runs no post-install. Each module's runSetup is
-  # exactly what its install runs, safe on an org that already has them, and it records the
+  # exactly what its install runs (including turning on, once, a ship-on setting added in an
+  # upgrade: ShippedDefaultUpgrades, QA-F2), safe on an org that already has them, and it records the
   # module in the setup marker so Health Check does not offer Finish Setup here (FS1). Skipped
   # with SOURCE_POST_INSTALL=0, because the Apex tests assume an org with no funds and no saved
   # BarnCRM Settings.
@@ -1017,7 +1023,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     if volunteers_has_metadata; then
       SETUP_MODULES+=(Volunteers)
     fi
-    SETUP_MODULES+=(Programs LogicModels Mirror)
+    SETUP_MODULES+=(Programs LogicModels Funders Mirror)
     for module in "${SETUP_MODULES[@]}"; do
       echo ""
       echo "== Running the ${module} module's setup steps =="
@@ -1078,6 +1084,14 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   echo "== Queueing the Logic Models access sync =="
   if ! printf '%s\n' 'new LogicModelsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
     echo "The Logic Models access sync was not queued. Nothing else is affected: the hourly access"
+    echo "check syncs the access."
+  fi
+
+  # The same gap for the Funders permission sets (ADR-0161, funders module, decision 9).
+  echo ""
+  echo "== Queueing the Funders access sync =="
+  if ! printf '%s\n' 'new FundersAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Funders access sync was not queued. Nothing else is affected: the hourly access"
     echo "check syncs the access."
   fi
 fi

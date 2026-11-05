@@ -11,9 +11,14 @@ Withdrawn) and its start and end dates. Each time a service is given, or a perso
 **service delivery**: attendance and what was received, in one record.
 
 Each enrollment also carries the person's **intake and eligibility**: when they were first seen,
-who referred them, and whether they qualify, and staff keep private **case notes** on it. A
-**program dashboard** counts enrollments, people served and attendance for a period. A roster
-import comes in a later release (P-06). Who sees enrollments
+who referred them, and whether they qualify, and staff keep private **case notes** on it and a
+**service plan**: the person's goals, the steps toward each, and when each is next reviewed.
+A program can group its participants into **cohorts** (the spring class, the Tuesday group),
+add many people to a cohort at once, schedule **sessions** of a service, and take attendance
+per session. Staff can also count drop-in visitors without names, record **referrals** in and
+out, and screen enrollments against a program's **eligibility rules**. A **program dashboard**
+counts enrollments, people served and attendance for a period, and a roster import template
+loads enrollments from a spreadsheet. Who sees enrollments
 and service deliveries is the **Participant Privacy** preset on the Programs settings page:
 everyone with a Programs permission set (the default), or only the people who need to.
 
@@ -25,6 +30,13 @@ everyone with a Programs permission set (the default), or only the people who ne
   **Integrations** page as an alternative. Use one or the other for the same programs, not both.
   BarnCRM's programs, services and enrollments are laid out so a later PMM migration template
   can move PMM's records across without new fields.
+- **Nonprofit Cloud Program Management.** A Nonprofit Cloud org has its own standard **Program**
+  and **Program Enrollment** objects. BarnCRM Programs keeps its own programs, enrollments and
+  service deliveries and never reads or writes those objects, so the two share no records and can
+  sit in the same org without conflict. Choose one for each program, so nobody counts the same
+  people twice. Where those objects are present, the **Integrations** page lists Nonprofit Cloud
+  Program Management as an alternative and Health Check notes it as information (see Health
+  Check below).
 
 ## Installing
 
@@ -38,7 +50,9 @@ finishes, BarnCRM does four things on its own:
    enrollments and service deliveries already in the org (see Participant Privacy).
 
 Then open the **BarnCRM Programs** app from the App Launcher. Its tabs are **Programs
-Dashboard**, **Programs**, **Enrollments**, **Service Deliveries** and **Case Notes**. These tabs also join the BarnCRM apps.
+Dashboard**, **Programs**, **Cohorts**, **Sessions**, **Enrollments**, **Service Deliveries**,
+**Case Notes**, **Referrals**, **Service Counts**, **Goals** and **Reports**. These tabs also join
+the BarnCRM apps.
 
 ## Programs Settings
 
@@ -54,7 +68,7 @@ offers now and its default. They ship with:
 | Picklist | Choices it ships with | Default |
 |---|---|---|
 | Referral Source | Self, Family or Friend, Another Agency, School, Health Care Provider, Faith Community, Other | None |
-| Eligibility Status | Not Screened, Awaiting Documents, Eligible, Not Eligible | Not Screened |
+| Eligibility Status | Not Screened, Awaiting Documents, Eligible, Not Eligible, Review | Not Screened |
 | Eligibility Basis | Income, Age, Residence, Referral, Other | None |
 
 To make them your own, click **Change in Setup** beside a picklist: it opens the enrollment's
@@ -105,9 +119,9 @@ You never assign the Programs permission sets by hand. Give people their BarnCRM
 | BarnCRM role | Programs set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Programs Admin | Everything, including deleting a record entered by accident |
-| Coordinator | Programs Staff | Set up programs and services, enroll people and move them through the stages; never deletes |
+| Coordinator | Programs Staff | Set up programs, services, cohorts and sessions, enroll people and move them through the stages, take attendance, keep service plans; never deletes |
 | Team Member | Programs Staff | The same as Coordinator |
-| Read Only | Programs Read Only | Look at programs, services and enrollments |
+| Read Only | Programs Read Only | Look at programs, services, cohorts, sessions, enrollments and service plans |
 
 When it happens:
 
@@ -163,7 +177,7 @@ related list on the program. The list views are **Open Enrollments** and **All E
 ### Importing a Roster
 
 To enroll many people at once, use BarnCRM's import (see [Importing](importing.md)) with the
-shipped **Program roster** template, which Programs adds at install. It is an upload of several
+shipped **Program Roster** template, which Programs adds at install. It is an upload of several
 objects: each row finds its program by name and enrolls the person found by email. Columns:
 
 | Column | Loads | Notes |
@@ -200,9 +214,15 @@ panel under the roster:
    day already exists but you cannot see it (under Private, one another staff member logged),
    saving changes its Attendance and Quantity instead of adding a second row, and it is still
    not shown to you. This needs update access to Service Delivery Attendance and Quantity.
+   While marks are unsaved, a hint beside **Save** reads "1 unsaved change" or "N unsaved
+   changes". If staff change the **Service** or **Date** first, **Save Attendance First?**
+   asks them to **Save** (the default) or **Discard** the marks, then **Continue**; **Cancel**
+   keeps the marks and the old service and date.
 
-People left at **Not Recorded** get no delivery. The panel works the same in the Salesforce
-mobile app, one person per card, so attendance can be taken in the room. Read Only users see
+People left at **Not Recorded** get no delivery. The same panel sits on each **session** page,
+for attendance at one scheduled session (see [Cohorts and Sessions](#cohorts-and-sessions)). The
+panel works the same in the Salesforce mobile app, one person per card, so attendance can be
+taken in the room. Read Only users see
 what is recorded without the controls. The panel lists up to 200 people.
 
 You can also enter a delivery by hand on the **Service Deliveries** tab, for example for a person
@@ -219,6 +239,26 @@ Rules:
 
 Both run as the automation **Service Delivery: absences, enrollment** on the Automation
 page. It always runs (it keeps totals right), so it cannot be switched off.
+
+### Counting People Without Names
+
+A drop-in service, such as a walk-in meal or a pantry line, often serves people nobody records
+by name. For those, record a **service count**: how many people a service served on a day,
+with no person attached. Counts are kept apart from named deliveries, so the dashboard shows
+them in their own tile and column and never adds them to **People Served**.
+
+Under the log's rows, the **Service Delivery Log** panel shows **People counted without names
+for this service and day**. Type a number in **People Served, Not Named** and click **Add to
+the Count**. Each click adds a row, so two counts in one day add up. Counts can also be
+entered, corrected or deleted on the **Service Counts** tab (list views **All Service Counts**
+and **This Week**) and from the **Service Counts** list on a service. Each has a **Service**,
+a **Count Date** (today to start with), **People Served** (a whole number, never negative; 0
+is allowed) and a **Note**.
+
+Counts follow the same permission sets as deliveries: Programs Admin and Programs Staff add
+and change them, Read Only sees them (Staff cannot delete one). A count carries no person, so
+it is Public Read/Write inside the module and erasing a person never touches it. A service with
+counts cannot be deleted, as with deliveries: clear its **Active** box instead.
 
 ## Case Notes
 
@@ -244,7 +284,148 @@ The **Type** choices are yours to change on the field in Setup, as for the intak
 enrollment with case notes cannot be deleted: delete its notes first. The list views are **All
 Case Notes** (every note you can see) and **My Case Notes**.
 
-Case notes are light notes, not case management: service plans and goals come later (P-10).
+A note can be about one of the person's goals: pick it in the note's **Goal** field, or click
+**New Note** under the goal on the Service Plan panel, which fills in the enrollment and goal.
+Only a goal on the note's own enrollment can be picked. The note stays private to its author.
+
+## Service Plans and Goals
+
+A participant's **service plan** is the set of **goals** on their enrollment: find stable
+housing, pass the high school equivalency test, open a bank account. Each goal has **steps**, the
+actions that lead to it. Staff keep the plan on the **Service Plan** panel at the top of the
+enrollment page.
+
+A goal has:
+
+| Field | What it holds |
+|---|---|
+| **Goal** | The goal, in a line the participant would recognize |
+| **Description** | What success looks like and anything agreed about it |
+| **Status** | Not Started, In Progress, Achieved or Not Achieved. Achieved and Not Achieved close the goal |
+| **Target Date** | When it should be reached |
+| **Assigned To** | The staff member responsible for it |
+| **Last Reviewed**, **Next Review** | When it was last reviewed with the person, and when it is next due |
+| **Closed Date** | Filled in with today when the goal is Achieved or Not Achieved, emptied if it reopens |
+| **Outcome** | With Logic Models installed: the outcome the goal works toward (below) |
+
+A step has a name, a **Status** (Not Started, In Progress or Done), **Assigned To**, a **Target
+Date** and a **Completed Date**, filled in when it is Done.
+
+**On the panel**, staff can:
+
+- **Add Goal** and **Edit Goal**;
+- add a step under a goal, and tick a step to mark it Done (untick to reopen it);
+- **Mark Reviewed**: records today as Last Reviewed and asks for the next review date, offered
+  three months on (change it, or leave it blank for none);
+- **New Note**: a case note about the goal, with the enrollment and goal filled in. The goal lists
+  its three latest notes that you can see, and how many there are in all.
+
+A goal whose Next Review has passed shows **Review due**. The **Goals** tab lists every goal you
+can see; its **Reviews Due** list view is the week's review list, and **Open Goals** the open
+caseload. Add Assigned To as a filter to see one person's.
+
+**Who sees a plan.** Goals and steps belong to the enrollment: whoever can see the enrollment
+sees its goals, and whoever can edit it can change them, so **Participant Privacy** covers service
+plans too. Programs Staff add and change goals and steps but never delete them (set a goal to Not
+Achieved instead); Programs Admins also delete; Read Only users see plans and change nothing.
+Deleting an enrollment deletes its goals and steps.
+
+**Linking a goal to an outcome (Logic Models).** Where the [Logic Models](logic-models.md)
+module is installed, Edit Goal also offers **Outcome**: the outcomes of the logic model for the
+enrollment's program, then those of your organization's model. This says which change in your
+logic model the goal contributes to. Programs does not need Logic Models: without it the choice
+is not shown. If the outcome is later deleted from the logic model, the goal says so; edit it to
+choose another.
+
+**Turning off the dates.** The Closed Date and Completed Date are filled in by two automations,
+**Goal: fill in the closed date** and **Goal Step: fill in the completed date**, on the
+[Automation Control](automation-control.md) page. Switch them off while you load history whose dates you type
+yourself.
+
+## Cohorts and Sessions
+
+### Cohorts
+
+A **cohort** is a group of participants who go through a program together: the spring class of
+a job readiness course, the Tuesday group of a tutoring program. Create one from the **Cohorts**
+tab or the **Cohorts** related list on the program, with a **Cohort Name**, its **Program**, a
+**Status** (Planned, Active or Completed; Active to start with) and optional **Start Date** and
+**End Date** (the end cannot be before the start).
+
+A person is in a cohort when their enrollment in the program names it, in the enrollment's
+**Cohort** field. There is no separate membership record: the enrollment already carries the
+person, the stage and the privacy. Since a person has one open enrollment per program, they are in
+one cohort of a program at a time. Only a cohort of the enrollment's own program can be chosen.
+
+A cohort holds no participant details, so every user with a Programs permission set sees every
+cohort, as for programs. Who is in it is seen through the enrollments, so **Participant
+Privacy** still decides which members each user sees. Deleting a cohort (Programs Admin) keeps
+its enrollments and sessions and empties their Cohort.
+
+### Adding People: the Cohort Members Panel
+
+The cohort page opens on the **Cohort Members** panel. It lists the cohort's members, with
+their stage, and a **Remove** button on each (the enrollment is kept, out of the cohort). Under
+**Add People**:
+
+- **Enrolled in the program, not in a cohort:** the program's open enrollments that have no
+  cohort, each with a box. Tick the ones to add, or **Select All**.
+- **Someone else:** pick a person and click **Add to List**. Repeat for as many as you need.
+
+Click **Add to Cohort**. A ticked enrollment, or a picked person who already has an open
+enrollment in the program, is moved into the cohort. A picked person with no open enrollment is
+enrolled, at stage **Enrolled**, in the cohort, through the usual enrollment rules. Each person is
+added or refused on their own: the panel says how many were added and lists anyone refused, with
+the reason (for example an open enrollment in the program you cannot see under Private). At most
+200 people are added in one go.
+
+### Sessions
+
+A **session** is one scheduled occurrence of a service: the 6 pm class on 3 March. It has a
+**Session Name**, its **Service**, an optional **Cohort** (a cohort of the service's program;
+empty means everyone enrolled in the program), a **Session Date**, a **Start Time** and a
+**Status**: **Scheduled**, **Held** (set when attendance is saved) or **Cancelled**. The
+**Sessions** tab lists them (**All Sessions**, **Upcoming Sessions**); a service, a cohort and the
+program's services list their sessions too.
+
+Sessions, like cohorts, hold no participant details and are seen by every Programs user.
+Programs Staff create and edit them; Programs Admins also delete them. A session with attendance
+cannot be deleted: set it to **Cancelled** instead. A service with sessions cannot be deleted:
+clear its **Active** box.
+
+### Scheduling Sessions
+
+The **Schedule Sessions** panel, on the cohort page (sessions for that cohort) and the program
+page (sessions with no cohort), creates many sessions at once:
+
+1. Pick the **Service** (only Active ones are offered).
+2. Choose the **From** and **To** dates (a cohort's own dates to start with), the **Days of the
+   Week**, and a **Start Time** if you want one.
+3. The panel shows how many sessions that makes. Click **Schedule**. One Scheduled session is
+   created for each chosen weekday between the two dates, named after the service and the date.
+
+At most 200 sessions are created at a time. Nothing keeps the pattern: each session is then
+edited or cancelled on its own. Running it again does not duplicate: days that already have a
+session of the same service for the same cohort (on the program page, sessions with no cohort),
+other than Cancelled sessions, are skipped, and the preview and the result say how many ("Days
+that already have a session are skipped: 2."). **Schedule** is disabled when every chosen day
+already has one.
+
+### Taking Attendance on a Session
+
+Open the session. The **Service Delivery Log** panel shows its service and day, and lists the
+cohort's open enrollments (or the program's, when the session has no cohort), with what is
+recorded for each at that session. Set attendance and click **Save**, as on the program.
+
+- Each person gets one delivery for the session, naming it; saving again changes it.
+- A delivery already recorded for that person, service and day with no session (for example from
+  the program's log) is taken over by the session rather than doubled. This also applies to one
+  you cannot see under Private, as on the program.
+- Saving on a **Scheduled** session marks it **Held**.
+- A **Cancelled** session shows what was recorded and takes no attendance.
+
+Attendance taken on a session is an ordinary service delivery, so the program dashboard, a
+person's Programs card, the delivery rules and Participant Privacy all count it as before.
 
 ## Program Dashboard
 
@@ -258,10 +439,12 @@ default, **Last Month**, **This Year**, **Last Year** or **Last 12 Months**). Ti
 | Open Enrollments | Enrollments at Applied or Enrolled, now. |
 | New Enrollments | Enrollments whose Start Date falls in the period. |
 | People Served | Different people (contacts plus accounts) with a Present delivery in the period, counted as people rather than by scanning every delivery. |
+| Counted Without Names | People counted without names (service counts, above) in the period. Kept apart from People Served. |
 | Services Delivered | Service deliveries marked Present in the period. |
 | Attendance Rate | Present deliveries as a share of all deliveries in the period, absences included. |
 
-Below the tiles, a table gives the same figures for each program, plus **Completed** (enrollments
+Below the tiles, a table gives the same figures for each program (including **Counted Without
+Names**), plus **Completed** (enrollments
 completed in the period); click a program's name to open it. It lists every Active program and
 any other program with activity in the period.
 
@@ -291,7 +474,11 @@ other BarnCRM apps the person page stays as it was. To show the card there too, 
 ## Enrollment Rules
 
 - **One person per enrollment.** An enrollment names a contact or, where people are person
-  accounts, an account: never both and never neither.
+  accounts, an account: never both and never neither. The account has to be a person account:
+  an organization or household account is refused with "Choose a person. An organization or
+  household account cannot be enrolled or receive a service.", however the enrollment is saved
+  (the **New** button on the Enrollments tab, an import, the API), not only in the roster
+  panel's picker. The same rule holds for a service delivery.
 - **One open enrollment per person per program.** Enrolling someone who already has an Applied
   or Enrolled enrollment in the same program is refused, with a message naming the program:
   change the one that is there instead. Once their enrollment is Completed or Withdrawn, they can
@@ -315,6 +502,82 @@ only, never typed notes, so erasing a person leaves nothing on the enrollment to
 notes about a person in case notes. Add the fields to list views and reports as you need them,
 for example an **Awaiting Documents** list view to chase missing paperwork.
 
+## Eligibility Screening
+
+Instead of setting **Eligibility Status** by hand, give a program **eligibility rules** and let
+BarnCRM screen its enrollments. Screening reads the enrollment's intake fields and sets the
+**Eligibility Status** to **Eligible**, **Not Eligible** or **Review** (a person who needs a
+human look), with the **Reason**, and the **Eligibility Basis** when a rule names one. It also
+sets the **Eligibility Date** when the status becomes a decision (Eligible or Not Eligible), and
+clears it when the result is Review. Screening only suggests: staff can still change any
+enrollment by hand.
+
+Rules live in the **Eligibility Rules** panel on the program page (under the Service Delivery
+Log). Only Programs Admin can change them; Programs Staff see them and can screen.
+
+1. Click **Add a Rule**. A rule says: **when all** of its conditions are true, the **Result** is
+   Eligible, Not Eligible or Review, with a **Reason** (up to 255 characters, shown on the
+   enrollment) and optionally an **Eligibility Basis**.
+2. Each condition picks an **Enrollment Field**, a comparison (**equal to**, **not equal to**,
+   **one of**, **not one of**, **greater than**, **greater than or equal to**, **less than**,
+   **less than or equal to**, **blank**, **not blank**) and a **Value**. For **one of** and
+   **not one of**, separate the choices with commas.
+3. Rules are checked top to bottom and **the first rule whose conditions all hold decides**; use
+   **Move Up** and **Move Down** to order them. Put the narrowest rules first.
+4. Under **When No Rule Applies**, choose the **Default Result** (Review to start with) and an
+   optional **Default Reason**.
+5. Click **Save Rules**. The panel refuses rules it cannot use and says why (for example a
+   field that is not offered, or a rule with no reason). A program may have up to 50 rules of up
+   to 10 conditions each.
+
+The fields offered are the enrollment's own intake fields: the custom fields on an enrollment
+that hold text, a choice, a number, a date or a checkbox, such as **Referral Source**, **Intake
+Date** or any field you add to Enrollment in Setup (for example household size or income band).
+The Eligibility fields themselves and links to people are not offered. Comparisons ignore
+capitals; two numbers compare as numbers (4 equals 4.0); dates compare as dates; a blank value
+never satisfies greater or less than.
+
+**Preview, then screen.** Under **Preview and Screen**, choose an open enrollment to see what
+the rules, as you have them on screen (saved or not), would decide for it and why. Nothing
+changes until you screen:
+
+- **Screen This Enrollment** applies the saved rules to the enrollment chosen above.
+- **Screen Open Enrollments** applies them to the program's open enrollments (Applied or
+  Enrolled), up to 200 at a time. An enrollment already **Eligible** or **Not Eligible** is
+  left alone unless you tick **Also screen enrollments already Eligible or Not Eligible**, so a
+  decision a person made by hand is not overwritten.
+
+Save the rules before screening: screening uses the saved rules, and the panel says so if you
+have unsaved changes. The summary says how many came out Eligible, Not Eligible and Review and
+how many were left alone. Rules are stored as JSON in the program's **Eligibility Rules** field
+(`Eligibility_Rules__c`), a documented format any tool can read, so another interface can show
+the same rules; edit them in the panel rather than the field. **Review** is added to the
+Eligibility Status choices; if you removed it, screening that needs it fails with a clear
+message, so add it back in Setup.
+
+## Referrals
+
+A **referral** records a person sent to another organization (**Out**) or sent to yours (**In**),
+where it stands and how it turned out. Open the **Referrals** tab (list views **All Referrals**
+and **Open Referrals**) or the **Referrals** list on an enrollment, and click **New**. Fill in:
+
+| Field | Meaning |
+|---|---|
+| Direction | **Out** (you sent the person) or **In** (another organization sent them). |
+| Contact or Account | The person, one of the two, as for enrollments. |
+| Enrollment | The person's enrollment the referral belongs to, optional. |
+| Other Organization | Where the person was sent, or who sent them. |
+| Referral Date | The day it was made or received (today to start with). |
+| Status | **Open**, **Accepted** or **Closed**. |
+| Outcome | How it ended once closed: Service Received, Declined by Organization, Declined by Person, Unable to Reach, No Capacity or Other. |
+| Notes | What was agreed and what comes next. |
+
+The Status and Outcome choices are yours to change in Setup. The fields are generic, so a later
+partner portal (PB-05) can show the same records. A referral is **private**, as a case note is:
+its owner, people above the owner in the role hierarchy and Programs Admin see it, whatever the
+Participant Privacy preset says. Programs Staff create and edit their own and never delete;
+Read Only has no access. Erasing a person **deletes** their referrals (see below).
+
 ## People: Merging, Deleting and Erasing
 
 - **Merging two people** moves their enrollments to the person kept. If both had an open
@@ -327,19 +590,22 @@ for example an **Awaiting Documents** list view to chase missing paperwork.
   service deliveries, credited to the anonymous record. Neither holds typed notes, so there is
   nothing on them to empty. Their **case notes are deleted**, whoever wrote them. Only someone
   with Programs Admin can delete every note, so anyone else erasing a person who has case notes
-  is refused, with that reason, and nothing is erased. Erasing a person account also finds the
-  case notes, and counts the enrollments, recorded on that person account's own contact.
+  is refused, with that reason, and nothing is erased. Their **referrals are deleted** the same
+  way: a referral is typed text about the person, so Programs Admin is needed for it too. Their
+  **goals and steps are deleted** too, for the same reason and with the same rule. Service counts
+  name no one and are never touched. Erasing a person account also finds the case notes, and counts the enrollments, recorded on that person account's own contact.
 - **Deleting a person** keeps their case notes on the enrollment, which no longer names anyone.
   To remove what was written about someone, erase them rather than delete them.
 
 ## Health Check
 
-With Programs installed, [Health Check](health-check.md) asks one more question, shown only to
+With Programs installed, [Health Check](health-check.md) asks two more questions, shown only to
 people who can manage BarnCRM Settings and not while Programs is turned off:
 
 | Finding | Severity | What it means | What to do |
 |---|---|---|---|
 | **Enrollments are still open in programs that have ended** | Information | Enrollments at Applied or Enrolled in a program whose Status is Completed or whose End Date is past. They still count as open, so the person cannot be enrolled again, and they stay on the roster. | Open each linked enrollment and set its Stage to Completed or Withdrawn. If the program is still running, set its Status back to Active or move its End Date. |
+| **Nonprofit Cloud Program Management is also in this org** | Information | The org has the Nonprofit Cloud **Program** and **Program Enrollment** objects. BarnCRM Programs does not read or write them, so the two share no records. | Nothing needs fixing. Choose one for each program (see Before You Install). |
 
 ## Sample Data
 

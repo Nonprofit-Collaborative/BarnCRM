@@ -14,9 +14,13 @@ jest.mock(
     virtual: true
   }
 );
-jest.mock('@salesforce/label/c.Core_OrgOptimizer_MoreThan', () => ({ default: 'More than {0}' }), {
-  virtual: true
-});
+jest.mock(
+  '@salesforce/label/c.Core_HealthCheck_OrphansMoreThan',
+  () => ({ default: 'More than {0}' }),
+  {
+    virtual: true
+  }
+);
 
 const STORAGE = {
   countCap: 10000,
@@ -57,8 +61,9 @@ describe('c-optimizer-storage', () => {
     const element = await render();
 
     const limit = element.shadowRoot.querySelector('[data-id="DataStorageMB"]');
-    expect(limit.textContent).toContain('150 of 200 (75%)');
-    expect(limit.querySelector('lightning-progress-bar').value).toBe(75);
+    const meter = limit.querySelector('[data-id="meter"]');
+    expect(meter.valueText).toContain('150 of 200 (75%)');
+    expect(meter.value).toBe(75);
     const table = element.shadowRoot.querySelector('[data-id="own"]');
     expect(table.data[0].recordsText).toBe('More than 10000');
     expect(table.data[1].recordsText).toBe('12');
@@ -87,7 +92,7 @@ describe('c-optimizer-storage', () => {
     getStorage.mockRejectedValue('boom');
     const element = await render();
 
-    expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toBe(
       'c.Core_UnexpectedError'
     );
   });
@@ -96,7 +101,7 @@ describe('c-optimizer-storage', () => {
     getStorage.mockRejectedValue({ body: { message: 'Needs the permission.' } });
     const element = await render();
 
-    expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toBe(
       'Needs the permission.'
     );
 

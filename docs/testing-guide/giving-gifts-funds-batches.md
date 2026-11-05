@@ -74,6 +74,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 5 | Change the amount to `30`. | **Save** and **Save and New** are enabled again. Do not save. |
 | 6 | Click **Open This Gift**. | The gift shows **Donor Account** Founders Consulting Group, 25.00, Cash, appeal Annual Fund, one allocation to General Fund. |
 | 7 | Open the utility bar at the bottom of any BarnCRM Fundraising page. | **Quick Gift Entry** opens there over the page. |
+| 8 | Save another gift and look at the saved message. | A light notice with a green success icon, not a solid green box: "Gift G-... saved" and the **Open This Gift** link are dark text on a light background, easy to read, and the link opens the gift. |
 
 **Cleanup:** set **Default appeal** back to empty if later scripts expect none.
 
@@ -193,7 +194,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab from **Data Manager**, under **What Are You Importing?** choose **Gifts**, then **Generic gift list**, **Next**, upload the file. | **Check Columns** maps the first eight columns to person and gift targets (for example **Gift: amount**, **Gift: fund**). |
+| 1 | Open the Import tab from **Data Manager**, under **What Are You Importing?** choose **Gifts**, then **Generic Gift List**, **Next**, upload the file. | **Check Columns** maps the first eight columns to person and gift targets (for example **Gift: amount**, **Gift: fund**). |
 | 2 | Map **Transaction ID** to **Gift: external ID**. **Next**. | The matching step shows **Email exact** and **Matching gifts to scheduled payments** on **Match or create**. |
 | 3 | Under **Control Totals (Optional)** enter **Rows in the file** `3`, **Total of the gift amounts** `145`. Select **Preview**. | 2 rows would create a gift, 1 would be rejected: "No fund is named Genral Fund, or has it as its accounting code." Run log: "Control total: the file has 3 rows, as expected." |
 | 4 | Select **Import These Rows**. | Results: 2 gifts created, 1 rejected. |

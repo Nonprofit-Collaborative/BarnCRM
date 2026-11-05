@@ -75,9 +75,14 @@ Maria does this from the sample data, after an import left her with the Garcia f
    first: a household named Garcia with a member or two in it, standing in for the
    duplicate an import would have left.
 3. Click **Merge or Split**, then stay on the **Merge** tab.
-4. In the search box, type `Garcia`. Pick **Garcia Household**, the duplicate the import
-   created. Two columns appear side by side: the household you started from on the left, the
-   one you picked on the right.
+4. In **Find the Other Household** (a record picker that offers households only, never this
+   one, each with its billing city so two Garcia households can be told apart), type `Garcia`
+   and pick **Garcia Household**, the duplicate the import created. Two columns appear side
+   by side: the household you started from on the left, the one you picked on the right.
+   The household you started from is the one kept. If you opened the duplicate by mistake,
+   click **Keep the Other Household Instead**: the roles swap (the columns stay where they
+   are), and **Keep This Household Instead** swaps them back. After a merge that keeps the
+   other household, the page goes to it, since the one you started from no longer exists.
 5. Read the comparison. Where the two households disagree, you get a choice: the name, the
    "custom name" box, the formal and informal greetings, the primary contact, the
    anniversary, and each line of the billing address. In the flexible way of belonging the
@@ -103,7 +108,12 @@ Maria does this from the sample data, after an import left her with the Garcia f
 
 9. Still on the Garcia household, click **Merge or Split** again and choose the
    **Split** tab.
-10. Tick **Diego Garcia** in the member list.
+10. The members show as tiles in two columns, **Stays in The Garcia Family** and **Moves to
+    a New Household** (or the household you choose). Move **Diego Garcia** across in any of
+    three ways: tick his checkbox, choose **Move to a New Household** from his tile's menu,
+    or drag his tile (with a mouse, by press and hold on a touch screen, or with the keyboard:
+    Space picks the tile up, the arrow keys move it, Space drops it, Escape cancels). Each
+    move is announced to screen readers. A ticked person is in the Moves column.
 11. Leave **A new household** selected and click **Split**. A dialog headed **Split this
     household?** opens; click **Split**.
 12. The window closes and you land on Diego's new household, named **The Garcia Family** because that is what
@@ -111,7 +121,7 @@ Maria does this from the sample data, after an import left her with the Garcia f
     count is one lower. Both names were recalculated for you.
 
 To move someone into a household you already have instead, choose **An existing household**
-in step 11 and search for it by name.
+in step 11 and pick it in **Find the Other Household**.
 
 That is the whole job: two families become one, one person becomes their own household, and
 nobody typed a name.
@@ -125,7 +135,7 @@ Read that screen every time. If you are unsure, open both households in other ta
 compare them there.
 
 **"Merge will not let me pick the other record."**
-The search only offers households. Organizations, companies, foundations, and churches you
+The picker only offers households. Organizations, companies, foundations, and churches you
 raise money from are not households, and merging one into a household would destroy the
 distinction the whole product relies on. If two organizations are duplicates, merge them
 with the standard Salesforce account merge instead. The message you see is "Both records

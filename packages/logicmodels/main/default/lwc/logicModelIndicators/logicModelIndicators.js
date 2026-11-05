@@ -2,9 +2,26 @@ import { LightningElement, api } from 'lwc';
 import saveIndicator from '@salesforce/apex/LogicModelBuilderController.saveIndicator';
 import savePeriod from '@salesforce/apex/LogicModelBuilderController.savePeriod';
 import remove from '@salesforce/apex/LogicModelBuilderController.remove';
+import getSourceQueries from '@salesforce/apex/LogicModelBuilderController.getSourceQueries';
+import getSourceFields from '@salesforce/apex/LogicModelBuilderController.getSourceFields';
+import saveSource from '@salesforce/apex/LogicModelBuilderController.saveSource';
+import refreshResults from '@salesforce/apex/LogicModelBuilderController.refreshResults';
+import getModel from '@salesforce/apex/LogicModelBuilderController.getModel';
+import getSourceStarters from '@salesforce/apex/LogicModelBuilderController.getSourceStarters';
+import getStarterChoices from '@salesforce/apex/LogicModelBuilderController.getStarterChoices';
+import saveStarterSource from '@salesforce/apex/LogicModelBuilderController.saveStarterSource';
+import applyModelPeriods from '@salesforce/apex/LogicModelBuilderController.useModelPeriods';
 
-import { progress } from 'c/logicModelRules';
-import { LABELS, format, messageFrom } from 'c/logicModelText';
+import { FUNCTIONS, SOURCES, isComputed, progress, sourceReady } from 'c/logicModelRules';
+import { LABELS, format, messageFrom, starterLabel } from 'c/logicModelText';
+import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import BarnConfirmModal from 'c/barnConfirmModal';
+
+/** How often, and how many times, the panel looks for a refresh's results (modules-19). */
+const POLL_MS = 10000;
+const POLL_TRIES = 18;
+/** The Template choice for a saved query built in Find, beside the starters (R-IN8). */
+const SAVED_QUERY = 'savedQuery';
 
 const HIGHER = 'Higher';
 const EMPTY_INDICATOR = Object.freeze({
@@ -44,12 +61,69 @@ function summaryOf(indicator) {
   return parts.join(' ');
 }
 
+const SOURCE_LABELS = Object.freeze({
+  [SOURCES.MANUAL]: LABELS.sourceManual,
+  [SOURCES.IMPORT]: LABELS.sourceImport,
+  [SOURCES.COMPUTED]: LABELS.sourceComputed
+});
+
+/** Where the indicator's results come from, in one line (R-IN3). */
+function sourceLineOf(indicator) {
+  if (!isComputed(indicator)) {
+    return format(LABELS.resultsAre, SOURCE_LABELS[indicator.source] || LABELS.sourceManual);
+  }
+  const definition = indicator.definition || {};
+  const field = definition.fieldLabel || definition.field;
+  const workedOut =
+    definition.function === FUNCTIONS.SUM
+      ? format(LABELS.sumOf, field)
+      : definition.function === FUNCTIONS.UNIQUE
+        ? format(LABELS.uniqueOf, field)
+        : LABELS.countOf;
+  return format(
+    LABELS.computedFrom,
+    indicator.queryName || LABELS.someQuery,
+    workedOut,
+    definition.dateLabel || definition.dateField
+  );
+}
+
+/** When a computed indicator's results were last worked out. */
+function runLineOf(indicator) {
+  if (!indicator.computedAt) {
+    return LABELS.notRunYet;
+  }
+  return format(LABELS.lastRun, new Date(indicator.computedAt).toLocaleString());
+}
+
+const EMPTY_SOURCE = Object.freeze({
+  source: SOURCES.MANUAL,
+  queryId: null,
+  dateField: null,
+  function: FUNCTIONS.COUNT,
+  field: null
+});
+
 /**
  * The indicators of one output or outcome (L-02): unit, which way is better and a baseline, and
  * under each a target and a result per period with its progress. Saves hand the whole model back
  * in a `modelchange` event; a refusal goes up as `failure`.
  */
 export default class LogicModelIndicators extends LightningElement {
+  helpReady = isHelpLoaded('LogicModels');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('LogicModels').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
+  disconnectedCallback() {
+    this.stopWatching();
+  }
+
   @api model;
   @api elementId;
   @api canEdit = false;
@@ -64,7 +138,191 @@ export default class LogicModelIndicators extends LightningElement {
   periodFormId;
   periodIndicatorId;
   periodDraft = { ...EMPTY_PERIOD };
-  confirmingId;
+  /**
+   * A refresh being watched (modules-19): { id, computedAt, status, tries }, the indicator's
+   * stamp before the refresh. `stalled` once the panel has stopped looking.
+   */
+  watch;
+  stalled = false;
+  pollTimer;
+  /** The indicator whose source is being chosen (L-03), or undefined. */
+  sourceFormId;
+  sourceDraft = { ...EMPTY_SOURCE };
+  /** Saved queries the person can open, loaded when the source form first opens. */
+  queryOptions;
+  /** The chosen query's fields: dateFields, numberFields, uniqueFields. */
+  fieldChoices = { dateFields: [], numberFields: [], uniqueFields: [] };
+  /** The starters this org can use (R-IN8): value, choiceLabel, choiceRequired. */
+  starters;
+  /** The Template chosen: a starter's key or SAVED_QUERY. */
+  template = SAVED_QUERY;
+  /** The record the starter is about, and the records to choose from. */
+  starterChoiceId = '';
+  starterChoices = [];
+
+  get canSetSource() {
+    return !!(this.model && this.model.canSetSource);
+  }
+
+  get canRefresh() {
+    return !!(this.model && this.model.canRefresh);
+  }
+
+  get sourceOptions() {
+    return [
+      { value: SOURCES.MANUAL, label: LABELS.sourceManual },
+      { value: SOURCES.IMPORT, label: LABELS.sourceImport },
+      { value: SOURCES.COMPUTED, label: LABELS.sourceComputed }
+    ];
+  }
+
+  get functionOptions() {
+    return [
+      { value: FUNCTIONS.COUNT, label: LABELS.count },
+      { value: FUNCTIONS.SUM, label: LABELS.sum },
+      { value: FUNCTIONS.UNIQUE, label: LABELS.unique }
+    ];
+  }
+
+  get sourceDraftComputed() {
+    return this.sourceDraft.source === SOURCES.COMPUTED;
+  }
+
+  get hasQueryOptions() {
+    return !!(this.queryOptions && this.queryOptions.length);
+  }
+
+  get dateFieldOptions() {
+    return this.fieldChoices.dateFields;
+  }
+
+  get needsField() {
+    return this.sourceDraft.function !== FUNCTIONS.COUNT;
+  }
+
+  get measuredFieldOptions() {
+    return this.sourceDraft.function === FUNCTIONS.SUM
+      ? this.fieldChoices.numberFields
+      : this.fieldChoices.uniqueFields;
+  }
+
+  get noFieldChoices() {
+    return !this.sourceDraft.queryId;
+  }
+
+  get sourceSaveDisabled() {
+    if (this.busy) {
+      return true;
+    }
+    if (this.usingStarter) {
+      return this.starter.choiceRequired && !this.starterChoiceId;
+    }
+    return !sourceReady(this.sourceDraft);
+  }
+
+  // ------------------------------------------------------------ starters (R-IN8)
+
+  get hasStarters() {
+    return !!(this.starters && this.starters.length);
+  }
+
+  get templateOptions() {
+    return [
+      ...(this.starters || []).map((starter) => ({
+        value: starter.value,
+        label: starterLabel(starter.value)
+      })),
+      { value: SAVED_QUERY, label: LABELS.savedQuery }
+    ];
+  }
+
+  get starter() {
+    return (this.starters || []).find((item) => item.value === this.template);
+  }
+
+  /** A computed source built from a starter rather than a saved query. */
+  get usingStarter() {
+    return this.sourceDraftComputed && !!this.starter;
+  }
+
+  get usingSavedQuery() {
+    return this.sourceDraftComputed && !this.usingStarter;
+  }
+
+  get starterAsks() {
+    return !!(this.starter && this.starter.choiceLabel);
+  }
+
+  get starterChoiceLabel() {
+    return this.starter ? this.starter.choiceLabel : '';
+  }
+
+  get starterChoiceRequired() {
+    return !!(this.starter && this.starter.choiceRequired);
+  }
+
+  get starterChoiceOptions() {
+    const options = this.starterChoices || [];
+    return this.starterChoiceRequired ? options : [{ value: '', label: LABELS.all }, ...options];
+  }
+
+  loadStarters() {
+    if (this.starters) {
+      return Promise.resolve();
+    }
+    return getSourceStarters()
+      .then((starters) => {
+        this.starters = starters || [];
+      })
+      .catch((error) => {
+        this.starters = [];
+        this.fail(error);
+      });
+  }
+
+  /** Picks a Template; a starter that asks for a record loads the records to choose from. */
+  pickTemplate(value) {
+    this.template = value;
+    this.starterChoiceId = '';
+    this.starterChoices = [];
+    if (!this.starterAsks) {
+      return Promise.resolve();
+    }
+    return getStarterChoices({ starterKey: value })
+      .then((choices) => {
+        if (this.template === value) {
+          this.starterChoices = choices || [];
+        }
+      })
+      .catch((error) => this.fail(error));
+  }
+
+  handleTemplate(event) {
+    return this.pickTemplate(event.detail.value);
+  }
+
+  handleStarterChoice(event) {
+    this.starterChoiceId = event.detail.value;
+  }
+
+  /** The saved query's name: the starter and, when chosen, the record it is about. */
+  starterQueryName() {
+    const choice = (this.starterChoices || []).find((item) => item.value === this.starterChoiceId);
+    const name = starterLabel(this.template);
+    return choice ? `${name}: ${choice.label}` : name;
+  }
+
+  /** The period form's indicator is computed: its result is never typed (R-IN3). */
+  get periodResultLocked() {
+    const indicator = ((this.model && this.model.indicators) || []).find(
+      (item) => item.id === this.periodIndicatorId
+    );
+    return isComputed(indicator);
+  }
+
+  get periodResultHelp() {
+    return this.periodResultLocked ? LABELS.resultComputed : undefined;
+  }
 
   get betterWhenOptions() {
     return [
@@ -81,13 +339,22 @@ export default class LogicModelIndicators extends LightningElement {
         name: indicator.name,
         description: indicator.description,
         summary: summaryOf(indicator),
-        confirming: this.confirmingId === indicator.id,
+        sourceLine: sourceLineOf(indicator),
+        computed: isComputed(indicator),
+        runLine: isComputed(indicator) ? runLineOf(indicator) : '',
+        status: isComputed(indicator) ? indicator.status : null,
+        showRefresh: isComputed(indicator) && this.canRefresh,
+        sourceFormOpen: this.sourceFormId === indicator.id,
+        working: this.isWatching(indicator.id) && !this.stalled,
+        stalled: this.isWatching(indicator.id) && this.stalled,
         periodFormOpen: !!this.periodFormId && this.periodIndicatorId === indicator.id,
         hasPeriods: (indicator.periods || []).length > 0,
         periods: (indicator.periods || []).map((period) => {
           const state = progress(indicator, period);
           return {
             ...period,
+            hasProgress: state.state !== 'none',
+            progressValue: state.state === 'none' ? 0 : state.percent,
             progressText:
               state.state === 'met'
                 ? LABELS.met
@@ -164,22 +431,236 @@ export default class LogicModelIndicators extends LightningElement {
     });
   }
 
-  handleDeleteIndicator(event) {
-    this.confirmingId = event.currentTarget.dataset.recordId;
+  /** A delete asked in a platform modal with a red button, as in Core (vis-modules-12). */
+  confirmDelete(message) {
+    return BarnConfirmModal.open({
+      size: 'small',
+      label: LABELS.delete,
+      message,
+      confirmLabel: LABELS.delete,
+      cancelLabel: LABELS.cancel,
+      confirmVariant: 'destructive'
+    });
   }
 
-  handleDeleteCancel() {
-    this.confirmingId = undefined;
+  async handleDeleteIndicator(event) {
+    const id = event.currentTarget.dataset.recordId;
+    const confirmed = await this.confirmDelete(LABELS.deleteIndicatorConfirm);
+    if (!confirmed) {
+      return undefined;
+    }
+    return this.run(remove({ recordId: id }), null, LABELS.deleted);
   }
 
-  handleDeleteConfirm() {
+  // -------------------------------------------------------------------- sources (L-03)
+
+  handleSource(event) {
+    const id = event.currentTarget.dataset.recordId;
+    const indicator = this.model.indicators.find((item) => item.id === id);
+    const definition = indicator.definition || {};
+    this.sourceFormId = id;
+    this.sourceDraft = {
+      source: indicator.source || SOURCES.MANUAL,
+      queryId: indicator.queryId || null,
+      dateField: definition.dateField || null,
+      function: definition.function || FUNCTIONS.COUNT,
+      field: definition.field || null
+    };
+    this.fieldChoices = { dateFields: [], numberFields: [], uniqueFields: [] };
+    this.template = SAVED_QUERY;
+    this.starterChoiceId = '';
+    this.starterChoices = [];
+    const hasQuery = !!indicator.queryId;
+    return Promise.all([
+      this.loadQueries(),
+      this.loadFields(this.sourceDraft.queryId),
+      this.loadStarters().then(() => {
+        // A new computed source starts from the first starter; one already built keeps its query.
+        if (!hasQuery && this.hasStarters && this.sourceFormId === id) {
+          return this.pickTemplate(this.starters[0].value);
+        }
+        return undefined;
+      })
+    ]);
+  }
+
+  loadQueries() {
+    if (this.queryOptions) {
+      return Promise.resolve();
+    }
+    return getSourceQueries()
+      .then((options) => {
+        this.queryOptions = options || [];
+      })
+      .catch((error) => {
+        this.queryOptions = [];
+        this.fail(error);
+      });
+  }
+
+  loadFields(queryId) {
+    if (!queryId) {
+      return Promise.resolve();
+    }
+    return getSourceFields({ queryId })
+      .then((choices) => {
+        this.fieldChoices = {
+          dateFields: (choices && choices.dateFields) || [],
+          numberFields: (choices && choices.numberFields) || [],
+          uniqueFields: (choices && choices.uniqueFields) || []
+        };
+      })
+      .catch((error) => this.fail(error));
+  }
+
+  handleSourceField(event) {
+    const field = event.target.dataset.field;
+    const value = event.detail.value;
+    const draft = { ...this.sourceDraft, [field]: value };
+    if (field === 'queryId') {
+      draft.dateField = null;
+      draft.field = null;
+      this.fieldChoices = { dateFields: [], numberFields: [], uniqueFields: [] };
+      this.loadFields(value);
+    }
+    if (field === 'function') {
+      draft.field = null;
+    }
+    this.sourceDraft = draft;
+  }
+
+  handleSourceCancel() {
+    this.sourceFormId = undefined;
+  }
+
+  handleSourceSave() {
+    const source = { ...this.sourceDraft, id: this.sourceFormId };
+    const computed = source.source === SOURCES.COMPUTED;
+    const stamp = this.stampOf(source.id);
+    const call = this.usingStarter
+      ? saveStarterSource({
+          modelId: this.model.id,
+          starterJson: JSON.stringify({
+            id: source.id,
+            starter: this.template,
+            choiceId: this.starterChoiceId || null,
+            queryName: this.starterQueryName()
+          })
+        })
+      : saveSource({ modelId: this.model.id, sourceJson: JSON.stringify(source) });
     return this.run(
-      remove({ recordId: this.confirmingId }),
+      call,
       () => {
-        this.confirmingId = undefined;
+        this.sourceFormId = undefined;
+        if (computed) {
+          this.startWatching(source.id, stamp);
+        }
       },
-      LABELS.deleted
+      computed ? LABELS.refreshing : LABELS.saved
     );
+  }
+
+  handleRefresh(event) {
+    const indicatorId = event.currentTarget.dataset.recordId;
+    const stamp = this.stampOf(indicatorId);
+    return this.run(
+      refreshResults({ modelId: this.model.id, indicatorId }),
+      () => this.startWatching(indicatorId, stamp),
+      LABELS.refreshing
+    );
+  }
+
+  // ----------------------------------------------------- watching a refresh (modules-19)
+
+  /** What a refresh changes: when the results were worked out and what stopped them. */
+  stampOf(indicatorId) {
+    const indicator = ((this.model && this.model.indicators) || []).find(
+      (item) => item.id === indicatorId
+    );
+    return {
+      computedAt: indicator ? indicator.computedAt || null : null,
+      status: indicator ? indicator.status || null : null
+    };
+  }
+
+  isWatching(indicatorId) {
+    return !!this.watch && this.watch.id === indicatorId;
+  }
+
+  startWatching(indicatorId, stamp) {
+    this.stopWatching();
+    this.watch = { id: indicatorId, ...stamp, tries: 0 };
+    this.stalled = false;
+    this.schedulePoll();
+  }
+
+  stopWatching() {
+    if (this.pollTimer) {
+      clearTimeout(this.pollTimer);
+      this.pollTimer = undefined;
+    }
+  }
+
+  schedulePoll() {
+    // eslint-disable-next-line @lwc/lwc/no-async-operation
+    this.pollTimer = setTimeout(() => {
+      this.pollTimer = undefined;
+      this.poll();
+    }, POLL_MS);
+  }
+
+  /**
+   * Reads the model again: when the indicator's stamp has changed, the panel shows the new
+   * results and says so; otherwise it looks again, and after POLL_TRIES offers Check Again.
+   */
+  poll() {
+    const watch = this.watch;
+    if (!watch) {
+      return Promise.resolve();
+    }
+    return getModel({ modelId: this.model.id })
+      .then((model) => {
+        if (this.watch !== watch) {
+          return;
+        }
+        const indicator = ((model && model.indicators) || []).find((item) => item.id === watch.id);
+        const computedAt = indicator ? indicator.computedAt || null : null;
+        const status = indicator ? indicator.status || null : null;
+        if (!indicator || computedAt !== watch.computedAt || status !== watch.status) {
+          this.watch = undefined;
+          this.stalled = false;
+          this.dispatchEvent(
+            new CustomEvent('modelchange', {
+              detail: { model, message: status || LABELS.resultsWorkedOut }
+            })
+          );
+          return;
+        }
+        watch.tries += 1;
+        if (watch.tries >= POLL_TRIES) {
+          this.stalled = true;
+        } else {
+          this.schedulePoll();
+        }
+      })
+      .catch((error) => {
+        this.watch = undefined;
+        this.fail(error);
+      });
+  }
+
+  /** Check Again: one more look now, then the usual watching. */
+  handleCheckAgain() {
+    if (!this.watch) {
+      return Promise.resolve();
+    }
+    this.stalled = false;
+    this.watch = { ...this.watch, tries: 0 };
+    return this.poll();
+  }
+
+  fail(error) {
+    this.dispatchEvent(new CustomEvent('failure', { detail: { message: messageFrom(error) } }));
   }
 
   // --------------------------------------------------------------------------- periods
@@ -228,16 +709,35 @@ export default class LogicModelIndicators extends LightningElement {
     });
   }
 
-  handleDeletePeriod(event) {
-    return this.run(
-      remove({ recordId: event.currentTarget.dataset.recordId }),
-      null,
-      LABELS.deleted
+  /** Use the Model's Periods: every shared period the indicator lacks (R-LM4). */
+  handleUseModelPeriods(event) {
+    const indicatorId = event.currentTarget.dataset.recordId;
+    return this.run(applyModelPeriods({ modelId: this.model.id, indicatorId }), null, (model) =>
+      format(LABELS.periodsUsedAdded, (model && model.added) || 0)
     );
+  }
+
+  get hasModelPeriods() {
+    return !!(this.model && this.model.periods && this.model.periods.length);
+  }
+
+  async handleDeletePeriod(event) {
+    const id = event.currentTarget.dataset.recordId;
+    const period = ((this.model && this.model.indicators) || [])
+      .flatMap((item) => item.periods || [])
+      .find((item) => item.id === id);
+    const confirmed = await this.confirmDelete(
+      format(LABELS.deletePeriodConfirm, period ? period.name : '')
+    );
+    if (!confirmed) {
+      return undefined;
+    }
+    return this.run(remove({ recordId: id }), null, LABELS.deleted);
   }
 
   // ---------------------------------------------------------------------------- saving
 
+  /** Runs a save; `message` is a string or a function of the returned model. */
   run(call, after, message) {
     this.busy = true;
     return call
@@ -245,13 +745,12 @@ export default class LogicModelIndicators extends LightningElement {
         if (after) {
           after();
         }
+        const text = typeof message === 'function' ? message(model) : message;
         this.dispatchEvent(
-          new CustomEvent('modelchange', { detail: { model, message: message || LABELS.saved } })
+          new CustomEvent('modelchange', { detail: { model, message: text || LABELS.saved } })
         );
       })
-      .catch((error) => {
-        this.dispatchEvent(new CustomEvent('failure', { detail: { message: messageFrom(error) } }));
-      })
+      .catch((error) => this.fail(error))
       .finally(() => {
         this.busy = false;
       });

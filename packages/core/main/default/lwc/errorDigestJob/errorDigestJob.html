@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <div class="slds-var-p-around_medium">
         <h2 class="slds-text-heading_small" data-id="title">{labels.title}</h2>
         <p class="slds-text-body_small slds-var-m-bottom_small" data-id="intro">
@@ -6,9 +7,12 @@
         </p>
 
         <template lwc:if={errorMessage}>
-            <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">
-                {errorMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-bottom_small"
+                variant="error"
+                message={errorMessage}
+                data-id="error"
+            ></c-barn-notice>
         </template>
 
         <div class="slds-box slds-box_x-small slds-var-m-bottom_small">
@@ -84,4 +88,5 @@
             </template>
         </div>
     </div>
+    </template>
 </template>

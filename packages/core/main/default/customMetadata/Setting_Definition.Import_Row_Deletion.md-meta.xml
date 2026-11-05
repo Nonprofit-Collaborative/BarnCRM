@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-  <label>Delete Import Rows</label>
+  <label>Delete import rows</label>
   <protected>true</protected>
   <values>
     <field>Setting_Key__c</field>
@@ -26,7 +26,7 @@
     <field>Description__c</field>
     <value
       xsi:type="xsd:string"
-    >When the rows of a complete import are deleted, so you can see, correct and retry each row until then. The default is After 30 Days. Rejected rows waiting to be corrected follow the same choice. An import that was only previewed keeps its rows for at least 30 days. The nightly Import row cleanup deletes them; the import keeps its counts and run log, and can still be undone.</value>
+    >When the rows of a complete import are deleted, so you can see, correct and retry each row until then. The default is After 30 Days. Rejected rows waiting to be corrected follow the same choice. An import that was only previewed keeps its rows for at least 30 days. The nightly Record Cleanup deletes them; the import keeps its counts and run log, and can still be undone.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

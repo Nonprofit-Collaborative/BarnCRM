@@ -12,25 +12,18 @@ import applyJunctionMembership from '@salesforce/apex/HealthCheckController.appl
 import enableAutomaticHouseholds from '@salesforce/apex/HealthCheckController.enableAutomaticHouseholds';
 import applyFix from '@salesforce/apex/HealthCheckController.applyFix';
 
-import CATEGORY_ACCESS from '@salesforce/label/c.Core_HealthCheck_CategoryAccess';
+import CATEGORY_ACCESS from '@salesforce/label/c.Core_Access_PageTitle';
 import CATEGORY_LICENSES from '@salesforce/label/c.Core_HealthCheck_CategoryLicenses';
 import CATEGORY_ORG_SHAPE from '@salesforce/label/c.Core_HealthCheck_CategoryOrgShape';
 import CATEGORY_SETTINGS from '@salesforce/label/c.Core_HealthCheck_CategorySettings';
-import CANCEL from '@salesforce/label/c.Core_HealthCheck_CancelButton';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CONFIRM from '@salesforce/label/c.Core_HealthCheck_ConfirmButton';
 import CONFIRM_HEADING from '@salesforce/label/c.Core_HealthCheck_ConfirmHeading';
-import CONFIRM_INTRO from '@salesforce/label/c.Core_HealthCheck_ConfirmIntro';
-import CONFIRM_MODE_DETAIL from '@salesforce/label/c.Core_HealthCheck_ConfirmModeDetail';
 import CURRENT_MODE from '@salesforce/label/c.Core_HealthCheck_CurrentModeLabel';
-import INTRO from '@salesforce/label/c.Core_HealthCheck_Intro';
 import LAST_RUN from '@salesforce/label/c.Core_HealthCheck_LastRunLabel';
-import NEVER_RUN from '@salesforce/label/c.Core_HealthCheck_NeverRun';
-import RUN_NOW from '@salesforce/label/c.Core_HealthCheck_RunNowButton';
-import LOAD_FAILED from '@salesforce/label/c.Core_HealthCheck_LoadFailed';
+import RUN_HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_RunHealthCheck';
 import LOADING from '@salesforce/label/c.Core_HealthCheck_Loading';
-import NO_FINDINGS from '@salesforce/label/c.Core_HealthCheck_NoFindings';
 import ORG_SHAPE_CARD from '@salesforce/label/c.Core_HealthCheck_OrgShapeCardTitle';
-import READ_ONLY from '@salesforce/label/c.Core_HealthCheck_ReadOnlyNotice';
 import RECOMMENDED_MODE from '@salesforce/label/c.Core_HealthCheck_RecommendedModeLabel';
 import RERUN from '@salesforce/label/c.Core_HealthCheck_RerunButton';
 import SEVERITY_ERROR from '@salesforce/label/c.Core_HealthCheck_SeverityError';
@@ -39,6 +32,7 @@ import SEVERITY_WARNING from '@salesforce/label/c.Core_HealthCheck_SeverityWarni
 import TITLE from '@salesforce/label/c.Core_HealthCheck_Title';
 import USE_RECOMMENDED from '@salesforce/label/c.Core_HealthCheck_UseRecommendedButton';
 import { messageFrom } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ACTION_PREFIX = 'action:';
 const ACTION_RECOMMENDED_MODE = 'action:applyRecommendedMode';
@@ -52,12 +46,6 @@ const SEVERITY_DISPLAY = {
 };
 
 const CATEGORY_ORDER = ['OrgShape', 'Licenses', 'Access', 'Settings'];
-
-const BADGE_THEMES = {
-  success: 'slds-theme_success',
-  warning: 'slds-theme_warning',
-  error: 'slds-theme_error'
-};
 
 /**
  * Health Check: what BarnCRM found in this org and what to do about it (feature C-11).
@@ -78,10 +66,14 @@ const BADGE_THEMES = {
  * fix fails for any reason the panel runs Health Check again, so what it shows is current.
  *
  * With lastResultFirst set (BarnCRM Home sets it), the panel does not run Health Check when it
- * opens: it shows when Health Check last ran in full and how many findings it had, and its
- * button reads Run now (ADMIN-7). Any page that wants that behavior sets the same property.
+ * opens: it shows when Health Check last ran in full and how many findings it had (ADMIN-7).
+ * Any page that wants that behavior sets the same property. The button is Run Health Check
+ * before the first run and Run Again after it, and the badge uses the panel's own severity
+ * words (admin-6).
  */
 export default class HealthCheckPanel extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
   /** Show the last stored result and Run now, instead of running every check on open. */
   @api lastResultFirst = false;
 
@@ -95,20 +87,33 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
 
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_HealthCheck_Intro');
+    },
     rerun: RERUN,
     useRecommended: USE_RECOMMENDED,
     orgShapeCard: ORG_SHAPE_CARD,
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Core', 'Core_HealthCheck_ReadOnlyNotice');
+    },
     loading: LOADING,
-    noFindings: NO_FINDINGS,
+    get noFindings() {
+      return helpText('Core', 'Core_HealthCheck_NoFindings');
+    },
     currentMode: CURRENT_MODE,
     recommendedMode: RECOMMENDED_MODE,
     lastRun: LAST_RUN,
-    neverRun: NEVER_RUN
+    get neverRun() {
+      return helpText('Core', 'Core_HealthCheck_NeverRunText');
+    }
   };
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     if (this.lastResultFirst) {
       this.loadLastRun();
     } else {
@@ -124,7 +129,7 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
       this.lastRun = await getLastRun();
     } catch (error) {
       this.lastRun = undefined;
-      this.errorMessage = messageFrom(error, LOAD_FAILED);
+      this.errorMessage = messageFrom(error, helpText('Core', 'Core_HealthCheck_LoadFailed'));
     } finally {
       this.loading = false;
     }
@@ -152,13 +157,14 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
     return healthCheckBadge(this.lastRun);
   }
 
-  get lastRunBadgeClass() {
-    return BADGE_THEMES[this.lastRunBadge.badgeVariant] || '';
+  /** The badge's status word for c-barn-status-badge: Not Run Yet is neutral. */
+  get lastRunStatus() {
+    return this.lastRunBadge.badgeVariant || 'neutral';
   }
 
-  /** Run now before the first full run where the last result shows; Re-run after. */
+  /** Run Health Check until it has run once (no report here and no stored run); Run Again after. */
   get rerunLabel() {
-    return this.lastResultFirst && !this.hasReport ? RUN_NOW : RERUN;
+    return this.hasReport || this.hasLastRun ? RERUN : RUN_HEALTH_CHECK;
   }
 
   /** Run Health Check again. Also the Re-run button's handler. */
@@ -171,7 +177,7 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
       this.report = await getReport();
     } catch (error) {
       this.report = undefined;
-      this.errorMessage = messageFrom(error, LOAD_FAILED);
+      this.errorMessage = messageFrom(error, helpText('Core', 'Core_HealthCheck_LoadFailed'));
     } finally {
       this.loading = false;
     }
@@ -287,8 +293,11 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
     return this.confirmFix({
       target: ACTION_RECOMMENDED_MODE,
       title: USE_RECOMMENDED,
-      detail: CONFIRM_MODE_DETAIL.replace('{0}', this.currentModeLabel).replace(
-        '{1}',
+      // admin-6: the confirm box says in one line what coexistence mode means.
+      detail: helpText(
+        'Core',
+        'Core_HealthCheck_ConfirmModeChange',
+        this.currentModeLabel,
         this.recommendedModeLabel
       )
     });
@@ -303,7 +312,7 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: CONFIRM_HEADING,
-      message: CONFIRM_INTRO,
+      message: helpText('Core', 'Core_HealthCheck_ConfirmIntro'),
       details: [pending.title, pending.detail],
       confirmLabel: CONFIRM,
       cancelLabel: CANCEL
@@ -432,7 +441,7 @@ export default class HealthCheckPanel extends NavigationMixin(LightningElement) 
       this.report = await action();
       this.fixOutcome = this.report ? this.report.fixOutcome : undefined;
     } catch (error) {
-      const message = messageFrom(error, LOAD_FAILED);
+      const message = messageFrom(error, helpText('Core', 'Core_HealthCheck_LoadFailed'));
       // If the re-run fails too, the fix's own message is the one worth reading, so the
       // report already shown stays.
       const shown = this.report;

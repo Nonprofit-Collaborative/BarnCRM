@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Grant_Payment__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The received payment this entry records, set by BarnCRM. Empty on an entry typed by hand.</inlineHelpText>
+  <label>Payment</label>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+  <referenceTo>Grant_Payment__c</referenceTo>
+  <relationshipLabel>Restricted Fund Entries</relationshipLabel>
+  <relationshipName>Fund_Entries</relationshipName>
+  <required>false</required>
+</CustomField>

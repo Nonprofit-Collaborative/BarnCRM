@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Copies gifts to Nonprofit Cloud Gift Transactions: Run Now, the nightly schedule and the
+    reconciliation.
+  </description>
+  <flexiPage>Gift_Transaction_Mirror</flexiPage>
+  <label>Gift Transaction Mirror</label>
+  <motif>Custom31: Car</motif>
+</CustomTab>

@@ -3,8 +3,7 @@ import previewChanges from '@salesforce/apex/ImportController.previewChanges';
 
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import heading from '@salesforce/label/c.Core_Import_ChangesHeading';
-import help from '@salesforce/label/c.Core_Import_ChangesHelp';
-import addLabel from '@salesforce/label/c.Core_Import_ChangesAdd';
+import addLabel from '@salesforce/label/c.Core_BulkUpdate_AddChange';
 import kindLabel from '@salesforce/label/c.Core_Import_ChangesKind';
 import removeLabel from '@salesforce/label/c.Core_Import_ChangesRemove';
 import doneLabel from '@salesforce/label/c.Core_Import_ChangesDone';
@@ -20,7 +19,7 @@ import findLabel from '@salesforce/label/c.Core_Import_ChangesFind';
 import replaceWithLabel from '@salesforce/label/c.Core_Import_ChangesReplaceWith';
 import matchCaseLabel from '@salesforce/label/c.Core_Import_ChangesMatchCapitals';
 import wholeValueLabel from '@salesforce/label/c.Core_Import_ChangesWholeValue';
-import valueLabel from '@salesforce/label/c.Core_Import_ChangesValue';
+import valueLabel from '@salesforce/label/c.Core_Filter_Value';
 import columnsLabel from '@salesforce/label/c.Core_Import_ChangesColumns';
 import separatorLabel from '@salesforce/label/c.Core_Import_ChangesSeparator';
 import dateOrderLabel from '@salesforce/label/c.Core_Import_ChangesDateOrder';
@@ -30,7 +29,7 @@ import orderYmd from '@salesforce/label/c.Core_Import_ChangesOrderYMD';
 import previewHeading from '@salesforce/label/c.Core_Import_ChangesPreviewHeading';
 import beforeHeader from '@salesforce/label/c.Core_Import_ChangesBefore';
 import afterHeader from '@salesforce/label/c.Core_Import_ChangesAfter';
-import rowNumberHeader from '@salesforce/label/c.Core_Import_RowNumberHeader';
+import rowNumberHeader from '@salesforce/label/c.Core_Import_ResultsRow';
 import opAddFields from '@salesforce/label/c.Core_BulkUpdate_StepAddFields';
 import fieldsLabel from '@salesforce/label/c.Core_BulkUpdate_StepFields';
 import opMap from '@salesforce/label/c.Core_Import_StepsOpMap';
@@ -46,10 +45,10 @@ import mapAddRowLabel from '@salesforce/label/c.Core_Import_StepsMapAddRow';
 import mapRemoveRowLabel from '@salesforce/label/c.Core_Import_StepsMapRemoveRow';
 import mapOtherwiseLabel from '@salesforce/label/c.Core_Import_StepsMapOtherwise';
 import testLabel from '@salesforce/label/c.Core_Import_StepsTest';
-import testEquals from '@salesforce/label/c.Core_Import_StepsTestEquals';
-import testContains from '@salesforce/label/c.Core_Import_StepsTestContains';
-import testBlank from '@salesforce/label/c.Core_Import_StepsTestBlank';
-import testTextLabel from '@salesforce/label/c.Core_Import_StepsTestText';
+import testEquals from '@salesforce/label/c.Core_Filter_OpEquals';
+import testContains from '@salesforce/label/c.Core_Filter_OpContains';
+import testBlank from '@salesforce/label/c.Core_Import_RowRulesTestBlank';
+import testTextLabel from '@salesforce/label/c.Core_Import_RowRulesText';
 import thenValueLabel from '@salesforce/label/c.Core_Import_StepsThenValue';
 import otherwiseLabel from '@salesforce/label/c.Core_Import_StepsOtherwise';
 import splitAtLabel from '@salesforce/label/c.Core_Import_StepsSplitAt';
@@ -64,6 +63,11 @@ import whenBlankLabel from '@salesforce/label/c.Core_Import_StepsWhenBlank';
 import opDigits from '@salesforce/label/c.Core_Import_StepsOpDigits';
 import patternLabel from '@salesforce/label/c.Core_Import_StepsPattern';
 import countryLabel from '@salesforce/label/c.Core_Import_StepsCountry';
+import moveUpLabel from '@salesforce/label/c.Core_Shared_MoveUp';
+import moveDownLabel from '@salesforce/label/c.Core_Shared_MoveDown';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { createDragController, moveItem, targetIndex } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
 
 /** The most changes one column may have, as DataTransform.MAX_STEPS says. */
 const MAX_STEPS = 10;
@@ -84,6 +88,8 @@ const NUMBER_PARAMETERS = ['position', 'count', 'amount'];
  * because the bulk update preview shows each record before and after.
  */
 export default class ImportColumnTransforms extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   /** The column whose values are changed; another column is previewed afresh. */
   @api
   get source() {
@@ -112,9 +118,15 @@ export default class ImportColumnTransforms extends LightningElement {
   counter = 0;
   samples = [];
   problems = [];
+  /** The last move, read out by the aria-live region. */
+  announcement = '';
+  /** c/barnDrag's state while a step is dragged: which step, and where it would land. */
+  dragState;
 
   labels = {
-    help,
+    get help() {
+      return helpText('Core', 'Core_Import_ChangesHelp');
+    },
     addLabel,
     kindLabel,
     removeLabel,
@@ -148,7 +160,9 @@ export default class ImportColumnTransforms extends LightningElement {
     unitLabel,
     whenBlankLabel,
     patternLabel,
-    countryLabel
+    countryLabel,
+    moveUpLabel,
+    moveDownLabel
   };
 
   /** The column's steps, as the mapping document holds them. */
@@ -167,7 +181,44 @@ export default class ImportColumnTransforms extends LightningElement {
   }
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.refreshPreview();
+    // Drag a step by its handle (mouse, pen, or touch after a press and hold) or by keyboard
+    // (Space, the arrow keys, Space again); Move Up and Move Down stay as the plain path.
+    this.drag = createDragController({
+      root: this.template,
+      layout: 'list',
+      messages: dragMessages(),
+      announce: (text) => {
+        this.announcement = text;
+      },
+      onChange: (state) => {
+        this.dragState = state;
+      },
+      onDrop: ({ itemId, toIndex }) => {
+        const from = this.steps.findIndex((step) => step.key === itemId);
+        if (from < 0 || from === toIndex) {
+          return false;
+        }
+        this.steps = moveItem(this.steps, from, toIndex);
+        this.changed();
+        return true;
+      }
+    });
+  }
+
+  disconnectedCallback() {
+    if (this.drag) {
+      this.drag.destroy();
+    }
+  }
+
+  get dragHelp() {
+    return dragInstructions();
   }
 
   get heading() {
@@ -238,8 +289,31 @@ export default class ImportColumnTransforms extends LightningElement {
 
   /** The steps as the template shows them, each with the inputs its kind needs. */
   get rows() {
-    return this.steps.map((step) => ({
+    const last = this.steps.length - 1;
+    const drag = this.dragState && this.dragState.active ? this.dragState : null;
+    // While dragging, the step the dragged one would land before (or after, at the end).
+    const others = drag ? this.steps.filter((step) => step.key !== drag.itemId) : [];
+    const before = drag && drag.overIndex >= 0 ? others[drag.overIndex] : null;
+    const after =
+      drag && drag.overIndex >= 0 && drag.overIndex === others.length && others.length
+        ? others[others.length - 1]
+        : null;
+    return this.steps.map((step, position) => ({
       ...step,
+      index: position,
+      name: this.stepName(step),
+      rowClass: [
+        'step slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_x-small',
+        drag && drag.itemId === step.key ? 'step-dragging' : '',
+        before && before.key === step.key ? 'step-over-before' : '',
+        after && after.key === step.key ? 'step-over-after' : ''
+      ]
+        .filter(Boolean)
+        .join(' '),
+      isFirst: position === 0,
+      isLast: position === last,
+      moveUpText: `${moveUpLabel}: ${this.stepName(step)}`,
+      moveDownText: `${moveDownLabel}: ${this.stepName(step)}`,
       isReplace: step.op === 'replace',
       isIfBlank: step.op === 'ifBlank',
       isAppend: step.op === 'append',
@@ -281,6 +355,47 @@ export default class ImportColumnTransforms extends LightningElement {
   handleAdd() {
     this.steps = this.steps.concat(this.keyed({ op: 'trim' }));
     this.changed();
+  }
+
+  // Order changes the result (trim before fixing capitals), so steps move without retyping:
+  // Move Up and Move Down, or a drag (c/barnDrag) from the handle. Each move is announced.
+  handleMoveUp(event) {
+    this.moveBy(Number(event.currentTarget.dataset.index), -1);
+  }
+
+  handleMoveDown(event) {
+    this.moveBy(Number(event.currentTarget.dataset.index), 1);
+  }
+
+  handlePointerDown(event) {
+    this.drag.pointerDown(event);
+  }
+
+  handleDragKey(event) {
+    this.drag.keyDown(event);
+  }
+
+  moveBy(index, delta) {
+    const to = targetIndex(index, delta, this.steps.length);
+    if (to < 0) {
+      return;
+    }
+    const step = this.steps[index];
+    this.steps = moveItem(this.steps, index, to);
+    this.announcement = helpText(
+      'Core',
+      'Core_Drag_Position',
+      this.stepName(step),
+      to + 1,
+      this.steps.length
+    );
+    this.changed();
+  }
+
+  /** A step's kind as the list names it, for the move buttons and announcements. */
+  stepName(step) {
+    const option = this.operationOptions.find((candidate) => candidate.value === step.op);
+    return option ? option.label : step.op;
   }
 
   handleRemove(event) {

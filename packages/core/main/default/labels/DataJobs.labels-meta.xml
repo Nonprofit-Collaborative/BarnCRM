@@ -17,14 +17,6 @@
         <value>No Data Jobs Yet</value>
     </labels>
     <labels>
-        <fullName>Core_DataJobs_EmptyHint</fullName>
-        <categories>DataJobs</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data job history: empty state line under the heading</shortDescription>
-        <value>Each import, bulk update and bulk delete is listed here, with its undo.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataJobs_Show</fullName>
         <categories>DataJobs</categories>
         <language>en_US</language>
@@ -54,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data job history: filter option for bulk updates</shortDescription>
-        <value>Bulk updates</value>
+        <value>Super Transformer runs</value>
     </labels>
     <labels>
         <fullName>Core_DataJobs_ShowDeletes</fullName>
@@ -69,40 +61,8 @@
         <categories>DataJobs</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data job history: the kind of a job that imported a file</shortDescription>
-        <value>Import</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataJobs_KindUpdate</fullName>
-        <categories>DataJobs</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data job history: the kind of a bulk update job</shortDescription>
-        <value>Bulk update</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataJobs_KindDelete</fullName>
-        <categories>DataJobs</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data job history: the kind of a bulk delete job</shortDescription>
-        <value>Bulk delete</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataJobs_ImportSummary</fullName>
-        <categories>DataJobs</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import counts: {0} rows, {1} created, {2} updated, {3} matched, {4} rejected</shortDescription>
-        <value>{0} rows: {1} created, {2} updated, {3} matched, {4} rejected.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataJobs_ImportSummaryOne</fullName>
-        <categories>DataJobs</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>One-row import: {0} row, {1} created, {2} updated, {3} matched, {4} rejected</shortDescription>
-        <value>{0} row: {1} created, {2} updated, {3} matched, {4} rejected.</value>
+        <shortDescription>Data job history: kind of a job that imported a file (the import tool's name)</shortDescription>
+        <value>Super Importer</value>
     </labels>
     <labels>
         <fullName>Core_DataJobs_Started</fullName>

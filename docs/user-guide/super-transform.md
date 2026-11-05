@@ -1,15 +1,15 @@
 # Changing Many Records at Once
 
-**Super Transform** changes the same fields on many records in one go, for example every
+**Super Transformer** changes the same fields on many records in one go, for example every
 contact in one city, without a spreadsheet. You need the bulk update permissions; if the tab
-says Super Transform is not turned on for you, ask your BarnCRM administrator (setup detail:
-[Super Transform](../admin-guide/super-transform.md)).
+says Super Transformer is not turned on for you, ask your BarnCRM administrator (setup detail:
+[Super Transformer](../admin-guide/super-transform.md)).
 
 ## Making a Change
 
-Open the **Super Transform** tab and work down the five steps.
+Open the **Super Transformer** tab and work down the five steps.
 
-1. **Object**: type part of the name in **Search Objects**, then choose it in **Object**.
+1. **Kind of Record**: type part of the name in **Search Kinds of Record**, then choose it in **Kind of record**.
 2. **Which Records**: add conditions, for example **Mailing City** **equals** `Springfield`.
    **Matching Records** shows how many records match and updates as you type. A yellow
    warning means there is no condition, so every record would change; a red **Over the
@@ -31,7 +31,7 @@ Open the **Super Transform** tab and work down the five steps.
    old value, an arrow and the new value. Shaded cells will change; the rest already hold
    the new value. A red message in a cell means that record cannot take the value and will be
    left as it is.
-5. **Run**: press **Run Super Transform**, check the object, number and fields in the
+5. **Run**: press **Run Super Transformer**, check the object, number and fields in the
    confirmation, type the number if asked, and press **Run**. The bar shows the progress, and
    the result says how many records were updated, already held the values, or failed.
 
@@ -40,8 +40,8 @@ Open the **Super Transform** tab and work down the five steps.
 The **Saved Step Lists** card at the top keeps what you have set up. Type a **List Name** and
 press **Save as New List**. Later, choose it in **Saved List** and press **Load List**: the
 object, conditions and changes fill in again and nothing runs until you press **Preview** and
-**Run Super Transform**. **Rename List** and **Delete List** work on the list you chose. Lists
-are shared with everyone who uses Super Transform, and a saved list changes no records.
+**Run Super Transformer**. **Rename List** and **Delete List** work on the list you chose. Lists
+are shared with everyone who uses Super Transformer, and a saved list changes no records.
 
 ## Undoing a Change
 

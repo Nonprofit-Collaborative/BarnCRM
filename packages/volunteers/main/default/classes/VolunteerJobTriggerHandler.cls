@@ -9,23 +9,23 @@
  */
 @NamespaceAccessible
 public with sharing class VolunteerJobTriggerHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public VolunteerJobTriggerHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public VolunteerJobTriggerHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'VolunteerJobTriggerHandler';
-    }
+	public override String getName() {
+		return 'VolunteerJobTriggerHandler';
+	}
 
-    public override void beforeDelete() {
-        List<Volunteer_Job__c> jobs = (List<Volunteer_Job__c>) Trigger.old;
-        Set<Id> jobIds = new Map<Id, Volunteer_Job__c>(jobs).keySet();
-        Set<Id> inUse = VolunteerIntegritySelector.selectJobIdsInUse(jobIds);
-        for (Volunteer_Job__c job : jobs) {
-            if (inUse.contains(job.Id)) {
-                job.addError(Label.Volunteers_Job_InUseNotDeletable);
-            }
-        }
-    }
+	public override void beforeDelete() {
+		List<Volunteer_Job__c> jobs = (List<Volunteer_Job__c>) oldRecords();
+		Set<Id> jobIds = new Map<Id, Volunteer_Job__c>(jobs).keySet();
+		Set<Id> inUse = VolunteerIntegritySelector.selectJobIdsInUse(jobIds);
+		for (Volunteer_Job__c job : jobs) {
+			if (inUse.contains(job.Id)) {
+				job.addError(Label.Volunteers_Job_InUseNotDeletable);
+			}
+		}
+	}
 }

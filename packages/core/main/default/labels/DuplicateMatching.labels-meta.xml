@@ -9,14 +9,6 @@
         <value>Duplicate Matching</value>
     </labels>
     <labels>
-        <fullName>Core_DuplicateMatching_Intro</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicate Matching: one line under the title</shortDescription>
-        <value>Review possible duplicate people and households, and choose what pairs them.</value>
-    </labels>
-    <labels>
         <fullName>Core_DuplicateMatching_Review</fullName>
         <categories>DuplicateMatching</categories>
         <language>en_US</language>
@@ -33,14 +25,6 @@
         <value>Review ({0})</value>
     </labels>
     <labels>
-        <fullName>Core_DuplicateMatching_NoAccess</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Duplicate Matching: shown to someone who may open no area</shortDescription>
-        <value>You do not have access to duplicate matching. Ask your BarnCRM admin for the BarnCRM Duplicate Review permission set.</value>
-    </labels>
-    <labels>
         <fullName>Core_DuplicateMatching_MatchingLogic</fullName>
         <categories>DuplicateMatching</categories>
         <language>en_US</language>
@@ -55,22 +39,6 @@
         <protected>false</protected>
         <shortDescription>Matching Logic: heading of the window that adds a source</shortDescription>
         <value>New Match Source</value>
-    </labels>
-    <labels>
-        <fullName>Core_MatchLogic_Intro</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: what match sources are</shortDescription>
-        <value>Match sources pair people or households that share a value kept on a related record.</value>
-    </labels>
-    <labels>
-        <fullName>Core_MatchLogic_Help</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: help popover beside the intro line</shortDescription>
-        <value>Match sources see an email, phone or address on a related record, which duplicate rules cannot.</value>
     </labels>
     <labels>
         <fullName>Core_MatchLogic_HelpAlt</fullName>
@@ -113,30 +81,6 @@
         <value>Active: {0}</value>
     </labels>
     <labels>
-        <fullName>Core_MatchLogic_RulesNote</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: where the duplicate rules are</shortDescription>
-        <value>Match sources work alongside your Salesforce duplicate rules. The rules are listed, read only, in Review, with a link to change them in Setup.</value>
-    </labels>
-    <labels>
-        <fullName>Core_MatchLogic_ReadOnly</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: shown to someone who may read but not change</shortDescription>
-        <value>You can see the match sources. Adding or changing one needs the BarnCRM Metadata Admin permission set.</value>
-    </labels>
-    <labels>
-        <fullName>Core_MatchLogic_ShippedNote</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: what can be done to a shipped source</shortDescription>
-        <value>A source shipped with BarnCRM can be deactivated and activated again, but not changed. Saving takes about a minute, because Salesforce applies it in the background.</value>
-    </labels>
-    <labels>
         <fullName>Core_MatchLogic_Active</fullName>
         <categories>DuplicateMatching</categories>
         <language>en_US</language>
@@ -153,27 +97,11 @@
         <value>Inactive</value>
     </labels>
     <labels>
-        <fullName>Core_MatchLogic_Shipped</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: marks a source BarnCRM ships</shortDescription>
-        <value>Shipped with BarnCRM</value>
-    </labels>
-    <labels>
-        <fullName>Core_MatchLogic_NotUsable</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: a source the scan skips in this org</shortDescription>
-        <value>Not used in this org: its object or one of its fields is not here, or you cannot read it.</value>
-    </labels>
-    <labels>
         <fullName>Core_MatchLogic_Object</fullName>
         <categories>DuplicateMatching</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Matching Logic: the related object, by API name in the form</shortDescription>
+        <shortDescription>Shared: object picker or form label</shortDescription>
         <value>Object</value>
     </labels>
     <labels>
@@ -182,7 +110,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Matching Logic: the field whose value is compared</shortDescription>
-        <value>Field compared</value>
+        <value>Value compared</value>
     </labels>
     <labels>
         <fullName>Core_MatchLogic_PostalField</fullName>
@@ -206,7 +134,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Matching Logic: the lookup to the person or household</shortDescription>
-        <value>Through the lookup</value>
+        <value>Linked through the field</value>
     </labels>
     <labels>
         <fullName>Core_MatchLogic_Compare</fullName>
@@ -281,14 +209,6 @@
         <value>Try a Value</value>
     </labels>
     <labels>
-        <fullName>Core_MatchLogic_TryValue</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: the value to try</shortDescription>
-        <value>Value</value>
-    </labels>
-    <labels>
         <fullName>Core_MatchLogic_TryPostal</fullName>
         <categories>DuplicateMatching</categories>
         <language>en_US</language>
@@ -319,29 +239,5 @@
         <protected>false</protected>
         <shortDescription>Matching Logic: heading over the records found</shortDescription>
         <value>These records would match:</value>
-    </labels>
-    <labels>
-        <fullName>Core_MatchLogic_TryNone</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: nobody holds the value tried</shortDescription>
-        <value>No person or household you can see holds this value (a value held by more than ten is ignored).</value>
-    </labels>
-    <labels>
-        <fullName>Core_MatchLogic_TryTooLittle</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: the value tried says too little to compare</shortDescription>
-        <value>This value says too little to compare: an email needs an @, a phone at least seven digits, an address a street and a postal code.</value>
-    </labels>
-    <labels>
-        <fullName>Core_MatchLogic_PermissionRequired</fullName>
-        <categories>DuplicateMatching</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Matching Logic: refused without either permission</shortDescription>
-        <value>Matching logic needs the Manage BarnCRM Settings or Manage BarnCRM Metadata permission.</value>
     </labels>
 </CustomLabels>

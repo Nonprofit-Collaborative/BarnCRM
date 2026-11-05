@@ -9,14 +9,6 @@
         <value>Accounting Periods</value>
     </labels>
     <labels>
-        <fullName>Giving_Periods_Intro</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Accounting periods page intro</shortDescription>
-        <value>Close the books through a date when a month is finished. No gift dated on or before it can be added, or have its date, amount, donor, payment method, reference or funds changed, or be deleted. Refunds and write-offs are dated today, so they still work.</value>
-    </labels>
-    <labels>
         <fullName>Giving_Periods_ClosedThroughHeading</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
@@ -33,28 +25,12 @@
         <value>No period is closed.</value>
     </labels>
     <labels>
-        <fullName>Giving_Periods_SaveButton</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Save close date button</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
         <fullName>Giving_Periods_Saved</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Close date saved</shortDescription>
         <value>Saved. The books are closed through the date shown.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_Periods_ReopenNote</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Reopening note</shortDescription>
-        <value>Moving the date back reopens a closed period. It needs the Override Posting Lock permission, granted in Setup, and it is written to the Error Log.</value>
     </labels>
     <labels>
         <fullName>Giving_Periods_ReadOnly</fullName>

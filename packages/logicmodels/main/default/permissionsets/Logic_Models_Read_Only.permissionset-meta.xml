@@ -43,6 +43,31 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Indicator__c.Computed_At__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Indicator__c.Source_Definition__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Indicator__c.Source_Query__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Indicator__c.Source_Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Indicator__c.Source__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Indicator__c.Unit__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -89,6 +114,11 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Logic_Model__c.Description__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Logic_Model__c.Periods__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

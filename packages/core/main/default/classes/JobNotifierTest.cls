@@ -9,210 +9,210 @@
  */
 @IsTest(testFor='ApexClass:JobNotifier')
 private class JobNotifierTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.admin();
+	}
 
-    /** Saves the org's settings with notifications on or off. */
-    private static void notifications(Boolean turnedOn) {
-        insert new BarnCRM_Settings__c(
-            SetupOwnerId = UserInfo.getOrganizationId(),
-            Job_Notifications__c = turnedOn
-        );
-        SettingsService.clearCaches();
-    }
+	/** Saves the org's settings with notifications on or off. */
+	private static void notifications(Boolean turnedOn) {
+		insert new BarnCRM_Settings__c(
+			SetupOwnerId = UserInfo.getOrganizationId(),
+			Job_Notifications__c = turnedOn
+		);
+		SettingsService.clearCaches();
+	}
 
-    @IsTest
-    static void tellsTheRecipientAboutTheJobRecord() {
-        System.runAs(TestUsers.admin()) {
-            notifications(true);
-            Account record = new Account(Name = 'Job record');
-            insert record;
+	@IsTest
+	static void tellsTheRecipientAboutTheJobRecord() {
+		System.runAs(TestUsers.admin()) {
+			notifications(true);
+			Account record = new Account(Name = 'Job record');
+			insert record;
 
-            JobNotifier.aboutRecord(UserInfo.getUserId(), 'Bulk update', false, 'Body', record.Id);
+			JobNotifier.aboutRecord(UserInfo.getUserId(), 'Bulk update', false, 'Body', record.Id);
 
-            Assert.areEqual(1, JobNotifier.sent.size(), 'One notification');
-            JobNotifier.Notice notice = JobNotifier.sent[0];
-            Assert.areEqual(UserInfo.getUserId(), notice.recipientId, 'To the person given');
-            Assert.areEqual(record.Id, notice.targetId, 'Opening the record');
-            Assert.isNull(notice.section, 'And no settings page');
-            Assert.areEqual(
-                String.format(
-                    System.Label.Core_JobNotice_Finished,
-                    new List<Object>{ 'Bulk update' }
-                ),
-                notice.title,
-                'Saying what finished'
-            );
-            Assert.areEqual('Body', notice.body, 'With the outcome');
-        }
-    }
+			Assert.areEqual(1, JobNotifier.sent.size(), 'One notification');
+			JobNotifier.Notice notice = JobNotifier.sent[0];
+			Assert.areEqual(UserInfo.getUserId(), notice.recipientId, 'To the person given');
+			Assert.areEqual(record.Id, notice.targetId, 'Opening the record');
+			Assert.isNull(notice.section, 'And no settings page');
+			Assert.areEqual(
+				String.format(
+					System.Label.Core_JobNotice_Finished,
+					new List<Object>{ 'Bulk update' }
+				),
+				notice.title,
+				'Saying what finished'
+			);
+			Assert.areEqual('Body', notice.body, 'With the outcome');
+		}
+	}
 
-    @IsTest
-    static void aJobThatStoppedSaysSoAndCanOpenTheSettingsPage() {
-        System.runAs(TestUsers.admin()) {
-            notifications(true);
+	@IsTest
+	static void aJobThatStoppedSaysSoAndCanOpenTheSettingsPage() {
+		System.runAs(TestUsers.admin()) {
+			notifications(true);
 
-            JobNotifier.aboutSettings(
-                UserInfo.getUserId(),
-                'Rollup recalculation',
-                true,
-                '',
-                JobNotifier.SECTION_ROLLUPS
-            );
+			JobNotifier.aboutSettings(
+				UserInfo.getUserId(),
+				'Rollup recalculation',
+				true,
+				'',
+				JobNotifier.SECTION_ROLLUPS
+			);
 
-            Assert.areEqual(1, JobNotifier.sent.size(), 'One notification');
-            JobNotifier.Notice notice = JobNotifier.sent[0];
-            Assert.areEqual(
-                String.format(
-                    System.Label.Core_JobNotice_Stopped,
-                    new List<Object>{ 'Rollup recalculation' }
-                ),
-                notice.title,
-                'Saying it did not finish'
-            );
-            Assert.areEqual(notice.title, notice.body, 'A blank body falls back to the title');
-            Assert.areEqual(JobNotifier.SECTION_ROLLUPS, notice.section, 'Opening the section');
-            Map<String, Object> page = (Map<String, Object>) JSON.deserializeUntyped(
-                JobNotifier.pageReference(notice.section)
-            );
-            Assert.areEqual('standard__navItemPage', page.get('type'), 'A tab page');
-            Map<String, Object> attributes = (Map<String, Object>) page.get('attributes');
-            Assert.areEqual(
-                NamespaceUtil.qualify('BarnCRM_Settings'),
-                attributes.get('apiName'),
-                'The settings console'
-            );
-            Map<String, Object> state = (Map<String, Object>) page.get('state');
-            Assert.areEqual(
-                JobNotifier.SECTION_ROLLUPS,
-                state.get(NamespaceUtil.stateKey('section')),
-                'At the Rollups section'
-            );
-        }
-    }
+			Assert.areEqual(1, JobNotifier.sent.size(), 'One notification');
+			JobNotifier.Notice notice = JobNotifier.sent[0];
+			Assert.areEqual(
+				String.format(
+					System.Label.Core_JobNotice_Stopped,
+					new List<Object>{ 'Rollup recalculation' }
+				),
+				notice.title,
+				'Saying it did not finish'
+			);
+			Assert.areEqual(notice.title, notice.body, 'A blank body falls back to the title');
+			Assert.areEqual(JobNotifier.SECTION_ROLLUPS, notice.section, 'Opening the section');
+			Map<String, Object> page = (Map<String, Object>) JSON.deserializeUntyped(
+				JobNotifier.pageReference(notice.section)
+			);
+			Assert.areEqual('standard__navItemPage', page.get('type'), 'A tab page');
+			Map<String, Object> attributes = (Map<String, Object>) page.get('attributes');
+			Assert.areEqual(
+				NamespaceUtil.qualify('BarnCRM_Settings'),
+				attributes.get('apiName'),
+				'The settings console'
+			);
+			Map<String, Object> state = (Map<String, Object>) page.get('state');
+			Assert.areEqual(
+				JobNotifier.SECTION_ROLLUPS,
+				state.get(NamespaceUtil.stateKey('section')),
+				'At the Rollups section'
+			);
+		}
+	}
 
-    @IsTest
-    static void shipsSwitchedOnBeforeTheOrgHasSavedItsSettings() {
-        System.runAs(TestUsers.admin()) {
-            SettingsService.clearCaches();
+	@IsTest
+	static void shipsSwitchedOnBeforeTheOrgHasSavedItsSettings() {
+		System.runAs(TestUsers.admin()) {
+			SettingsService.clearCaches();
 
-            JobNotifier.aboutSettings(
-                UserInfo.getUserId(),
-                'Import',
-                false,
-                'Body',
-                JobNotifier.SECTION_GENERAL
-            );
+			JobNotifier.aboutSettings(
+				UserInfo.getUserId(),
+				'Import',
+				false,
+				'Body',
+				JobNotifier.SECTION_GENERAL
+			);
 
-            Assert.areEqual(1, JobNotifier.sent.size(), 'On by default (ADR-0035)');
-        }
-    }
+			Assert.areEqual(1, JobNotifier.sent.size(), 'On by default (ADR-0035)');
+		}
+	}
 
-    @IsTest
-    static void sendsNothingWhenTheSettingIsOff() {
-        System.runAs(TestUsers.admin()) {
-            notifications(false);
+	@IsTest
+	static void sendsNothingWhenTheSettingIsOff() {
+		System.runAs(TestUsers.admin()) {
+			notifications(false);
 
-            JobNotifier.aboutSettings(
-                UserInfo.getUserId(),
-                'Import',
-                false,
-                'Body',
-                JobNotifier.SECTION_GENERAL
-            );
+			JobNotifier.aboutSettings(
+				UserInfo.getUserId(),
+				'Import',
+				false,
+				'Body',
+				JobNotifier.SECTION_GENERAL
+			);
 
-            Assert.areEqual(0, JobNotifier.sent.size(), 'Turned off, nothing is sent');
-        }
-    }
+			Assert.areEqual(0, JobNotifier.sent.size(), 'Turned off, nothing is sent');
+		}
+	}
 
-    @IsTest
-    static void sendsNothingWhenNobodyIsToBeTold() {
-        System.runAs(TestUsers.admin()) {
-            notifications(true);
+	@IsTest
+	static void sendsNothingWhenNobodyIsToBeTold() {
+		System.runAs(TestUsers.admin()) {
+			notifications(true);
 
-            JobNotifier.aboutSettings(null, 'Import', false, 'Body', JobNotifier.SECTION_GENERAL);
+			JobNotifier.aboutSettings(null, 'Import', false, 'Body', JobNotifier.SECTION_GENERAL);
 
-            Assert.areEqual(0, JobNotifier.sent.size(), 'A scheduled run has no recipient');
-        }
-    }
+			Assert.areEqual(0, JobNotifier.sent.size(), 'A scheduled run has no recipient');
+		}
+	}
 
-    @IsTest
-    static void sendsNothingInAnOrgWithoutTheNotificationType() {
-        System.runAs(TestUsers.admin()) {
-            notifications(true);
-            JobNotifier.typeName = 'No_Such_Notification_Type';
+	@IsTest
+	static void sendsNothingInAnOrgWithoutTheNotificationType() {
+		System.runAs(TestUsers.admin()) {
+			notifications(true);
+			JobNotifier.typeName = 'No_Such_Notification_Type';
 
-            JobNotifier.aboutSettings(
-                UserInfo.getUserId(),
-                'Import',
-                false,
-                'Body',
-                JobNotifier.SECTION_GENERAL
-            );
+			JobNotifier.aboutSettings(
+				UserInfo.getUserId(),
+				'Import',
+				false,
+				'Body',
+				JobNotifier.SECTION_GENERAL
+			);
 
-            Assert.areEqual(0, JobNotifier.sent.size(), 'Nothing to send with');
-            Assert.areEqual(
-                0,
-                [SELECT COUNT() FROM Error_Log__c WHERE Context__c = :JobNotifier.LOG_CONTEXT],
-                'And nothing to report: the job is unaffected'
-            );
-        }
-    }
+			Assert.areEqual(0, JobNotifier.sent.size(), 'Nothing to send with');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = :JobNotifier.LOG_CONTEXT],
+				'And nothing to report: the job is unaffected'
+			);
+		}
+	}
 
-    @IsTest
-    static void aRefusedSendIsLoggedAndNeverThrown() {
-        System.runAs(TestUsers.admin()) {
-            notifications(true);
-            JobNotifier.refuseNextSend = true;
+	@IsTest
+	static void aRefusedSendIsLoggedAndNeverThrown() {
+		System.runAs(TestUsers.admin()) {
+			notifications(true);
+			JobNotifier.refuseNextSend = true;
 
-            Test.startTest();
-            JobNotifier.aboutSettings(
-                UserInfo.getUserId(),
-                'Import',
-                false,
-                'Body',
-                JobNotifier.SECTION_GENERAL
-            );
-            Test.stopTest();
+			Test.startTest();
+			JobNotifier.aboutSettings(
+				UserInfo.getUserId(),
+				'Import',
+				false,
+				'Body',
+				JobNotifier.SECTION_GENERAL
+			);
+			Test.stopTest();
 
-            Assert.areEqual(1, JobNotifier.sent.size(), 'The send was tried');
-            Assert.areEqual(
-                1,
-                [SELECT COUNT() FROM Error_Log__c WHERE Context__c = :JobNotifier.LOG_CONTEXT],
-                'The refusal is in the Error Log'
-            );
-        }
-    }
+			Assert.areEqual(1, JobNotifier.sent.size(), 'The send was tried');
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = :JobNotifier.LOG_CONTEXT],
+				'The refusal is in the Error Log'
+			);
+		}
+	}
 
-    @IsTest
-    static void theStarterIsTheRunningUserButNobodyInAScheduledRun() {
-        System.runAs(TestUsers.admin()) {
-            Assert.areEqual(UserInfo.getUserId(), JobNotifier.starter(), 'From a page');
+	@IsTest
+	static void theStarterIsTheRunningUserButNobodyInAScheduledRun() {
+		System.runAs(TestUsers.admin()) {
+			Assert.areEqual(UserInfo.getUserId(), JobNotifier.starter(), 'From a page');
 
-            Test.startTest();
-            System.schedule('Q-04 starter test', '0 0 3 * * ?', new JobNotifierProbe());
-            Test.stopTest();
+			Test.startTest();
+			System.schedule('Q-04 starter test', '0 0 3 * * ?', new JobNotifierProbe());
+			Test.stopTest();
 
-            Assert.areEqual(
-                1,
-                [SELECT COUNT() FROM Account WHERE Name = 'Starter: none'],
-                'A scheduled run tells nobody'
-            );
-        }
-    }
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Account WHERE Name = 'Starter: none'],
+				'A scheduled run tells nobody'
+			);
+		}
+	}
 
-    /** The duplicate scan's notice opens Duplicate Matching, where its panel is (batch 10, P1). */
-    @IsTest
-    static void theDuplicateScanNoticeOpensDuplicateMatching() {
-        System.runAs(TestUsers.admin()) {
-            Test.startTest();
-            String page = SettingSections.pageFor(JobNotifier.SECTION_DUPLICATE_MATCHING);
-            Test.stopTest();
+	/** The duplicate scan's notice opens Duplicate Matching, where its panel is (batch 10, P1). */
+	@IsTest
+	static void theDuplicateScanNoticeOpensDuplicateMatching() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			String page = SettingSections.pageFor(JobNotifier.SECTION_DUPLICATE_MATCHING);
+			Test.stopTest();
 
-            Assert.areEqual(SettingSections.DUPLICATE_MATCHING, page, 'Its own page');
-            Assert.isTrue(SettingSections.all().contains(page), 'A page the console lists');
-        }
-    }
+			Assert.areEqual(SettingSections.DUPLICATE_MATCHING, page, 'Its own page');
+			Assert.isTrue(SettingSections.all().contains(page), 'A page the console lists');
+		}
+	}
 }

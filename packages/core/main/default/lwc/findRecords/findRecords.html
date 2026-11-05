@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <c-barn-page-shell
         title={labels.title}
         title-hidden
@@ -27,24 +28,28 @@
             </template>
 
             <template lwc:if={hasStartNote}>
-                <div class="slds-box slds-box_x-small slds-theme_shade slds-var-m-bottom_small" data-id="start-note">
-                    <lightning-icon icon-name="utility:info" size="x-small" class="slds-var-m-right_x-small"></lightning-icon>
-                    <span>{startNote}</span>
-                </div>
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="info"
+                    message={startNote}
+                    data-id="start-note"
+                ></c-barn-notice>
             </template>
             <template lwc:if={hasError}>
-                <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
-                    <span data-id="error-message">{errorMessage}</span>
-                </div>
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="error"
+                    message={errorMessage}
+                    data-id="error-message"
+                ></c-barn-notice>
             </template>
             <template lwc:if={hasNotice}>
-                <div
-                    class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small"
-                    role="status"
-                    aria-live="polite"
-                >
-                    <span data-id="notice-message">{noticeMessage}</span>
-                </div>
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="success"
+                    message={noticeMessage}
+                    data-id="notice-message"
+                ></c-barn-notice>
             </template>
 
             <div class="slds-grid slds-wrap slds-gutters_x-small">
@@ -83,6 +88,59 @@
                         value={columns}
                         onchange={handleColumnsChange}
                     ></lightning-dual-listbox>
+                    <template lwc:if={canOrderColumns}>
+                        <p class="slds-assistive-text" id="column-drag-help">{dragHelp}</p>
+                        <p class="slds-assistive-text" role="status" aria-live="polite" data-id="column-live">{columnAnnouncement}</p>
+                        <div
+                            class="slds-var-m-top_small"
+                            data-drop-zone="columns"
+                            data-drop-label={labels.chosenFields}
+                            data-id="column-zone"
+                        >
+                            <h3 class="slds-form-element__label slds-var-m-bottom_xx-small">{labels.chosenFields}</h3>
+                            <template for:each={columnViews} for:item="column">
+                                <div key={column.key} class={column.itemClass} data-id="column">
+                                    <span
+                                        class="drag-handle"
+                                        role="button"
+                                        tabindex="0"
+                                        title={dragHelp}
+                                        aria-label={column.label}
+                                        aria-describedby="column-drag-help"
+                                        data-drag-id={column.key}
+                                        data-drag-label={column.label}
+                                        data-id="column-drag"
+                                        onpointerdown={handleColumnPointerDown}
+                                        onkeydown={handleColumnDragKey}
+                                    >
+                                        <lightning-icon icon-name="utility:drag_and_drop" size="x-small"></lightning-icon>
+                                    </span>
+                                    <span class="slds-col slds-var-p-horizontal_x-small">{column.label}</span>
+                                    <lightning-button-icon
+                                        data-id="column-up"
+                                        data-key={column.key}
+                                        icon-name="utility:up"
+                                        variant="border-filled"
+                                        alternative-text={column.moveUpLabel}
+                                        title={column.moveUpLabel}
+                                        disabled={column.moveUpDisabled}
+                                        onclick={handleColumnMoveUp}
+                                    ></lightning-button-icon>
+                                    <lightning-button-icon
+                                        class="slds-var-m-left_xx-small"
+                                        data-id="column-down"
+                                        data-key={column.key}
+                                        icon-name="utility:down"
+                                        variant="border-filled"
+                                        alternative-text={column.moveDownLabel}
+                                        title={column.moveDownLabel}
+                                        disabled={column.moveDownDisabled}
+                                        onclick={handleColumnMoveDown}
+                                    ></lightning-button-icon>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
                     <div class="slds-size_1-of-1 slds-medium-size_4-of-12 slds-var-m-top_x-small">
                         <lightning-combobox
                             data-id="related"
@@ -222,11 +280,6 @@
                 </div>
                 <c-find-export-files data-id="export-files-panel"></c-find-export-files>
 
-                <template lwc:if={showBulkUpdate}>
-                    <div class="slds-var-m-top_medium">
-                        <c-bulk-update query-json={bulkQueryJson} onclose={handleBulkClose}></c-bulk-update>
-                    </div>
-                </template>
                 <template lwc:if={showBulkDelete}>
                     <div class="slds-var-m-top_medium">
                         <c-bulk-delete query-json={deleteQueryJson} onclose={handleDeleteClose}></c-bulk-delete>
@@ -345,4 +398,5 @@
             </template>
         </div>
     </c-barn-page-shell>
+    </template>
 </template>

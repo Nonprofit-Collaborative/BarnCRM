@@ -5,45 +5,45 @@
  */
 @IsTest(testFor='ApexClass:ImportEntityProcessors')
 private class ImportEntityProcessorsTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.admin();
+	}
 
-    private static Integer logged() {
-        Test.getEventBus().deliver();
-        return [
-            SELECT COUNT()
-            FROM Error_Log__c
-            WHERE Context__c = 'ImportEntityProcessors.resolve'
-            WITH SYSTEM_MODE
-        ];
-    }
+	private static Integer logged() {
+		Test.getEventBus().deliver();
+		return [
+			SELECT COUNT()
+			FROM Error_Log__c
+			WHERE Context__c = 'ImportEntityProcessors.resolve'
+			WITH SYSTEM_MODE
+		];
+	}
 
-    @IsTest
-    static void aClassThatIsNotInTheOrgIsNoProcessorAndNoError() {
-        System.runAs(TestUsers.admin()) {
-            Test.startTest();
-            ImportEntityProcessor found = ImportEntityProcessors.resolve(
-                'NoSuchImportProcessorFu3'
-            );
-            Test.stopTest();
+	@IsTest
+	static void aClassThatIsNotInTheOrgIsNoProcessorAndNoError() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			ImportEntityProcessor found = ImportEntityProcessors.resolve(
+				'NoSuchImportProcessorFu3'
+			);
+			Test.stopTest();
 
-            Assert.isNull(found, 'A package that is not installed contributes nothing');
-            Assert.areEqual(0, logged(), 'An org without the package is not an error');
-        }
-    }
+			Assert.isNull(found, 'A package that is not installed contributes nothing');
+			Assert.areEqual(0, logged(), 'An org without the package is not an error');
+		}
+	}
 
-    @IsTest
-    static void aClassOfTheWrongShapeIsLeftOutAndLogged() {
-        System.runAs(TestUsers.admin()) {
-            Test.startTest();
-            // A real class with a no-argument constructor that does not implement the interface.
-            ImportEntityProcessor found = ImportEntityProcessors.resolve('ImportEntityProcessors');
-            Test.stopTest();
+	@IsTest
+	static void aClassOfTheWrongShapeIsLeftOutAndLogged() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			// A real class with a no-argument constructor that does not implement the interface.
+			ImportEntityProcessor found = ImportEntityProcessors.resolve('ImportEntityProcessors');
+			Test.stopTest();
 
-            Assert.isNull(found, 'Only a class that implements the interface is used');
-            Assert.areEqual(1, logged(), 'The wrong shape is written to the Error Log');
-        }
-    }
+			Assert.isNull(found, 'Only a class that implements the interface is used');
+			Assert.areEqual(1, logged(), 'The wrong shape is written to the Error Log');
+		}
+	}
 }

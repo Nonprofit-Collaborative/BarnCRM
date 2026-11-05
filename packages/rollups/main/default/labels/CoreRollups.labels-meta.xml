@@ -9,14 +9,6 @@
         <value>Rollups</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_PageIntro</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Intro line on the Rollups page.</shortDescription>
-        <value>Every total BarnCRM keeps up to date for you, and when each one was last calculated.</value>
-    </labels>
-    <labels>
         <fullName>Core_Rollups_ColumnRollup</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -47,14 +39,6 @@
         <protected>false</protected>
         <shortDescription>Column heading for when a rollup is recalculated.</shortDescription>
         <value>Mode</value>
-    </labels>
-    <labels>
-        <fullName>Core_Rollups_ColumnActive</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Column heading for the active toggle.</shortDescription>
-        <value>Active</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_ColumnLastCalculated</fullName>
@@ -319,22 +303,6 @@
         <protected>false</protected>
         <shortDescription>Restore the shipped rollups</shortDescription>
         <value>Restore Shipped Rollups</value>
-    </labels>
-    <labels>
-        <fullName>Core_Rollups_EmptyList</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>No rollups yet</shortDescription>
-        <value>No rollups are set up yet. Restore the shipped rollups to start with the ones BarnCRM provides.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Rollups_ColumnTarget</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Target column heading</shortDescription>
-        <value>Where It Shows</value>
     </labels>
     <labels>
         <fullName>Core_Rollups_NeverCalculated</fullName>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Adopt NPSP Households on the General page of the BarnCRM Settings console: what would be
+    adopted, the start and undo of a run with a typed count, and the newest run's counts.
+    Shown only where NPSP is detected.
+  </description>
+  <isExposed>false</isExposed>
+  <masterLabel>Adopt NPSP Households</masterLabel>
+</LightningComponentBundle>

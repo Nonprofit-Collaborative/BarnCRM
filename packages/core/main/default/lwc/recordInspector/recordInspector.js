@@ -9,27 +9,26 @@ import inspect from '@salesforce/apex/RecordInspectorController.inspect';
 import { filterRows } from './inspectorRows';
 
 import TITLE from '@salesforce/label/c.Core_RecordInspector_Title';
-import INTRO from '@salesforce/label/c.Core_RecordInspector_Intro';
 import INSPECT from '@salesforce/label/c.Core_RecordInspector_Inspect';
-import REFRESH from '@salesforce/label/c.Core_RecordInspector_Refresh';
+import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import LOADING from '@salesforce/label/c.Core_RecordInspector_Loading';
 import SEARCH from '@salesforce/label/c.Core_RecordInspector_Search';
-import COLUMN_FIELD from '@salesforce/label/c.Core_RecordInspector_ColumnField';
-import COLUMN_API_NAME from '@salesforce/label/c.Core_RecordInspector_ColumnApiName';
-import COLUMN_TYPE from '@salesforce/label/c.Core_RecordInspector_ColumnType';
-import COLUMN_VALUE from '@salesforce/label/c.Core_RecordInspector_ColumnValue';
+import COLUMN_FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
+import COLUMN_API_NAME from '@salesforce/label/c.Core_AccessExplorer_ColApiName';
+import COLUMN_TYPE from '@salesforce/label/c.Core_DataDictionary_ColType';
+import COLUMN_VALUE from '@salesforce/label/c.Core_Filter_Value';
 import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
 import COPIED from '@salesforce/label/c.Core_RecordInspector_Copied';
-import COPY_FAILED from '@salesforce/label/c.Core_RecordInspector_CopyFailed';
 import COUNT from '@salesforce/label/c.Core_RecordInspector_Count';
 import COUNT_FILTERED from '@salesforce/label/c.Core_RecordInspector_CountFiltered';
-import NO_MATCH from '@salesforce/label/c.Core_RecordInspector_NoMatch';
 import EMPTY from '@salesforce/label/c.Core_RecordInspector_Empty';
 import SHORTENED from '@salesforce/label/c.Core_RecordInspector_Shortened';
-import FIELDS_CUT from '@salesforce/label/c.Core_RecordInspector_FieldsCut';
-import OPEN_FIND from '@salesforce/label/c.Core_RecordInspector_OpenFind';
-import OPEN_SETUP from '@salesforce/label/c.Core_RecordInspector_OpenSetup';
-import { bodyMessage } from 'c/findCsv';
+import OPEN_FIND from '@salesforce/label/c.Core_DataHygiene_OpenInFind';
+import OPEN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
+import { bodyMessage, format } from 'c/findCsv';
+import WhereUsedModal from 'c/whereUsedModal';
+import WHERE_USED_ALT from '@salesforce/label/c.Core_WhereUsed_Title';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Record Inspector (C-55): a record page component that lists every field the viewer may
@@ -46,6 +45,16 @@ const FIND_TAB = 'Find';
 const TOOL_STATE_SUFFIX = 'tool';
 
 export default class RecordInspector extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
 
   /** The page state key Find reads its tool from, e.g. `c__tool`; the object key is its sibling. */
@@ -60,7 +69,9 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
 
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_RecordInspector_Intro');
+    },
     inspect: INSPECT,
     refresh: REFRESH,
     loading: LOADING,
@@ -71,9 +82,13 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
     columnValue: COLUMN_VALUE,
     copy: COPY,
     openFind: OPEN_FIND,
-    noMatch: NO_MATCH,
+    get noMatch() {
+      return helpText('Core', 'Core_RecordInspector_NoMatch');
+    },
     shortened: SHORTENED,
-    fieldsCut: FIELDS_CUT
+    get fieldsCut() {
+      return helpText('Core', 'Core_RecordInspector_FieldsCut');
+    }
   };
 
   inspection;
@@ -114,8 +129,22 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
       copyLabel: `${COPY}: ${field.apiName}`,
       setupUrl: fieldSetupPath(this.inspection.objectApiName, field.apiName),
       setupLabel: `${OPEN_SETUP}: ${field.label}`,
-      openSetup: OPEN_SETUP
+      openSetup: OPEN_SETUP,
+      whereUsedLabel: format(WHERE_USED_ALT, field.label)
     }));
+  }
+
+  /** A field row's Where Used button (C-59): which BarnCRM setup uses the field. */
+  handleWhereUsed(event) {
+    const apiName = event.currentTarget.dataset.apiName;
+    const field = (this.inspection.fields || []).find((one) => one.apiName === apiName);
+    WhereUsedModal.open({
+      size: 'medium',
+      objectName: this.inspection.objectApiName,
+      objectLabel: this.inspection.objectLabel,
+      fieldName: apiName,
+      fieldLabel: field ? field.label : apiName
+    });
   }
 
   /** Opens Find on this record's object, the same for every field. */
@@ -185,7 +214,7 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
     this.copiedMessage = undefined;
     const clipboard = typeof navigator !== 'undefined' ? navigator.clipboard : undefined;
     if (!clipboard || !clipboard.writeText) {
-      this.errorMessage = COPY_FAILED;
+      this.errorMessage = helpText('Core', 'Core_RecordInspector_CopyFailed');
       return Promise.resolve();
     }
     return clipboard
@@ -195,7 +224,7 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
         this.copiedMessage = COPIED.replace('{0}', apiName);
       })
       .catch(() => {
-        this.errorMessage = COPY_FAILED;
+        this.errorMessage = helpText('Core', 'Core_RecordInspector_CopyFailed');
       });
   }
 }

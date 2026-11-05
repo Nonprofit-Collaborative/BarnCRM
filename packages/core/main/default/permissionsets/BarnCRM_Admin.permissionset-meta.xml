@@ -64,6 +64,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>FieldAccessController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>FieldUtilizationController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -104,6 +108,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>PersonSameNameController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>HubController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -125,6 +133,14 @@
   </classAccesses>
   <classAccesses>
     <apexClass>ModuleManagerController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>NightlyJobsController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>NpspHouseholdAdoptionController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -165,6 +181,10 @@
   </classAccesses>
   <classAccesses>
     <apexClass>WhatsNewController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>WhereUsedController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <customPermissions>
@@ -656,6 +676,31 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Nightly_Job__c.Last_Finished__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Nightly_Job__c.Last_Message__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Nightly_Job__c.Last_Outcome__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Nightly_Job__c.Last_Started__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Nightly_Job__c.Switch__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Erasure__c.Contact__c</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -767,6 +812,36 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Field_Utilization_Snapshot__c.Taken_At__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Household_Adoption__c.Account_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Household_Adoption__c.Note__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Household_Adoption__c.Previous_Record_Type_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Household_Adoption__c.Previous_Values__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Household_Adoption__c.Run_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Household_Adoption__c.Status__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -1439,6 +1514,24 @@
     <allowRead>true</allowRead>
     <modifyAllRecords>true</modifyAllRecords>
     <object>Field_Utilization_Snapshot__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Household_Adoption__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Nightly_Job__c</object>
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
   <objectPermissions>

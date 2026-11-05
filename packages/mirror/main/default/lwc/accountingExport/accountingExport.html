@@ -1,5 +1,6 @@
 <template>
-    <lightning-card title={labels.title} icon-name="standard:file">
+    <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="custom:custom21">
         <div class="slds-var-p-horizontal_medium">
             <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
             <p class="slds-text-color_weak slds-var-m-bottom_medium" data-id="visibility">
@@ -90,4 +91,5 @@
             </template>
         </div>
     </lightning-card>
+    </template>
 </template>

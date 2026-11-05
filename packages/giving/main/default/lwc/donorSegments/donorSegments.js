@@ -26,19 +26,17 @@ import {
 } from 'c/donorSegmentExport';
 
 import TITLE from '@salesforce/label/c.Giving_Segments_Title';
-import INTRO from '@salesforce/label/c.Giving_Segments_Intro';
 import TEMPLATES_HEADING from '@salesforce/label/c.Giving_Segments_TemplatesHeading';
-import TEMPLATE_FIELD from '@salesforce/label/c.Giving_Segments_TemplateField';
-import RECORDS_FIELD from '@salesforce/label/c.Giving_Segments_RecordsField';
-import PEOPLE from '@salesforce/label/c.Giving_Segments_People';
-import ORGANIZATIONS from '@salesforce/label/c.Giving_Segments_Organizations';
+import TEMPLATE_FIELD from '@salesforce/label/c.Core_Import_StepTemplate';
+import RECORDS_FIELD from '@salesforce/label/c.Core_FieldUtilization_ColRecords';
+import PEOPLE from '@salesforce/label/c.Core_SettingsGroup_People';
+import ORGANIZATIONS from '@salesforce/label/c.Core_HubHome_QuickLinkOrganizations';
 import NAME_FIELD from '@salesforce/label/c.Giving_Segments_NameField';
 import SAVE_AS_SEGMENT from '@salesforce/label/c.Giving_Segments_SaveAsSegment';
 import SAVED from '@salesforce/label/c.Giving_Segments_Saved';
 import SEGMENTS_HEADING from '@salesforce/label/c.Giving_Segments_SegmentsHeading';
 import SEGMENT_FIELD from '@salesforce/label/c.Giving_Segments_SegmentField';
-import EMPTY from '@salesforce/label/c.Giving_Segments_Empty';
-import OPTION_MINE from '@salesforce/label/c.Giving_Segments_OptionMine';
+import OPTION_MINE from '@salesforce/label/c.Core_Format_Parenthetical';
 import OPTION_SHARED from '@salesforce/label/c.Giving_Segments_OptionShared';
 import COUNT from '@salesforce/label/c.Giving_Segments_Count';
 import COUNT_MORE from '@salesforce/label/c.Giving_Segments_CountMore';
@@ -48,21 +46,26 @@ import LAYOUT_FIELD from '@salesforce/label/c.Giving_Segments_LayoutField';
 import LAYOUT_MAILCHIMP from '@salesforce/label/c.Giving_Segments_LayoutMailchimp';
 import LAYOUT_CONSTANT_CONTACT from '@salesforce/label/c.Giving_Segments_LayoutConstantContact';
 import LAYOUT_ALL from '@salesforce/label/c.Giving_Segments_LayoutAll';
-import EXPORT from '@salesforce/label/c.Giving_Segments_Export';
+import EXPORT from '@salesforce/label/c.Core_Find_ExportMenu';
 import EXPORTING from '@salesforce/label/c.Giving_Segments_Exporting';
-import EXPORTED from '@salesforce/label/c.Giving_Segments_Exported';
+import EXPORTED from '@salesforce/label/c.Core_Find_ExportDone';
 import EXPORTED_DUPLICATES from '@salesforce/label/c.Giving_Segments_ExportedDuplicates';
 import LIMIT_REACHED from '@salesforce/label/c.Giving_Segments_LimitReached';
 import EDIT_IN_FIND from '@salesforce/label/c.Giving_Segments_EditInFind';
 import EMAIL_PEOPLE_ONLY from '@salesforce/label/c.Giving_Segments_EmailPeopleOnly';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const PEOPLE_OBJECT = 'Contact';
 const ORGANIZATIONS_OBJECT = 'Account';
 
 export default class DonorSegments extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Giving');
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Giving', 'Giving_Segments_Intro');
+    },
     templatesHeading: TEMPLATES_HEADING,
     templateField: TEMPLATE_FIELD,
     recordsField: RECORDS_FIELD,
@@ -70,7 +73,9 @@ export default class DonorSegments extends NavigationMixin(LightningElement) {
     saveAsSegment: SAVE_AS_SEGMENT,
     segmentsHeading: SEGMENTS_HEADING,
     segmentField: SEGMENT_FIELD,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Giving', 'Giving_Segments_Empty');
+    },
     showList: SHOW_LIST,
     layoutField: LAYOUT_FIELD,
     export: EXPORT,
@@ -101,6 +106,11 @@ export default class DonorSegments extends NavigationMixin(LightningElement) {
   layout = MAILCHIMP;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

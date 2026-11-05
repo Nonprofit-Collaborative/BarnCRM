@@ -1,39 +1,46 @@
 <template>
-    <lightning-card title={labels.title} icon-name="utility:warning">
+    <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="custom:custom53">
         <span slot="actions">
-            <lightning-badge data-id="new-count" label={newCountLabel}></lightning-badge>
+            <c-barn-status-badge
+                data-id="new-count"
+                status={newCountStatus}
+                label={newCountLabel}
+            ></c-barn-status-badge>
         </span>
 
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
             <template lwc:if={hasError}>
-                <div
-                    class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small"
-                    role="alert"
-                >
-                    <lightning-icon
-                        icon-name="utility:error"
-                        size="x-small"
-                        alternative-text={labels.title}
-                    ></lightning-icon>
-                    <span data-id="error-message">{errorMessage}</span>
-                </div>
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    variant="error"
+                    message={errorMessage}
+                    data-id="error-message"
+                ></c-barn-notice>
             </template>
 
             <template lwc:if={isReadOnly}>
-                <p class="slds-text-body_small slds-var-m-bottom_small" data-id="read-only-notice">
-                    {labels.readOnly}
-                </p>
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    message={labels.readOnly}
+                    data-id="read-only-notice"
+                ></c-barn-notice>
             </template>
 
             <template lwc:if={isEmpty}>
-                <p data-id="empty-state">{labels.empty}</p>
+                <c-barn-empty-state
+                    illustration="all-clear"
+                    size="compact"
+                    heading={labels.empty}
+                    data-id="empty-state"
+                ></c-barn-empty-state>
             </template>
 
             <ul class="slds-has-dividers_bottom-space" data-id="entry-list">
                 <template for:each={entries} for:item="entry">
                     <li key={entry.recordId} class="slds-item">
-                        <p class="slds-text-heading_small">{entry.message}</p>
-                        <p class="slds-text-body_small">
+                        <p class="slds-text-title_bold">{entry.message}</p>
+                        <p class="slds-text-body_small slds-text-color_weak">
                             {entry.context}
                             <lightning-formatted-date-time
                                 value={entry.occurredAt}
@@ -72,4 +79,5 @@
             ></lightning-button>
         </div>
     </lightning-card>
+    </template>
 </template>

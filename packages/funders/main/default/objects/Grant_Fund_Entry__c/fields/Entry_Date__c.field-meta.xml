@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Entry_Date__c</fullName>
+  <defaultValue>TODAY()</defaultValue>
+  <required>true</required>
+  <externalId>false</externalId>
+  <inlineHelpText>When it happened.</inlineHelpText>
+  <label>Entry Date</label>
+  <trackTrending>false</trackTrending>
+  <type>Date</type>
+</CustomField>

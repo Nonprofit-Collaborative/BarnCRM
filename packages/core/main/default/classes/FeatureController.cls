@@ -3,143 +3,155 @@
  * descriptions and state, and the one-way Turn on. First-run setup lists the same rows.
  */
 public with sharing class FeatureController {
-    private static final String ERROR_CONTEXT = 'FeatureController';
+	private static final String ERROR_CONTEXT = 'FeatureController';
 
-    /** One feature as the page shows it. */
-    public class FeatureRow {
-        @AuraEnabled
-        public String key;
-        @AuraEnabled
-        public String name;
-        @AuraEnabled
-        public String description;
-        @AuraEnabled
-        public Boolean isOn;
-        /** Extra sentence for the turn-on confirmation, or null. */
-        @AuraEnabled
-        public String confirmNote;
-    }
+	/** One feature as the page shows it. */
+	public class FeatureRow {
+		@AuraEnabled
+		public String key;
+		@AuraEnabled
+		public String name;
+		@AuraEnabled
+		public String description;
+		@AuraEnabled
+		public Boolean isOn;
+		/** Extra sentence for the turn-on confirmation, or null. */
+		@AuraEnabled
+		public String confirmNote;
+		/**
+		 * Why the feature cannot be turned on now, or null (RT-04). Shown whether the feature
+		 * is on or off: an upgraded org may already have Household Upkeep on.
+		 */
+		@AuraEnabled
+		public String blockedReason;
+	}
 
-    /** The feature list and whether this person may turn features on. */
-    public class FeaturesModel {
-        @AuraEnabled
-        public Boolean canEdit;
-        @AuraEnabled
-        public List<FeatureRow> features;
-    }
+	/** The feature list and whether this person may turn features on. */
+	public class FeaturesModel {
+		@AuraEnabled
+		public Boolean canEdit;
+		@AuraEnabled
+		public List<FeatureRow> features;
+	}
 
-    @AuraEnabled
-    public static FeaturesModel getFeatures() {
-        try {
-            return model();
-        } catch (Exception e) {
-            ErrorLogger.log(e, ERROR_CONTEXT);
-            throw UserErrors.message(System.Label.Core_Feature_LoadError);
-        }
-    }
+	@AuraEnabled
+	public static FeaturesModel getFeatures() {
+		try {
+			return model();
+		} catch (Exception e) {
+			ErrorLogger.log(e, ERROR_CONTEXT);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_Feature_LoadError'));
+		}
+	}
 
-    /** Turns one feature on, for good, after the page's confirmation. */
-    @AuraEnabled
-    public static FeaturesModel turnOn(String key) {
-        if (!BarnCRMPermissions.canManageSettings()) {
-            throw UserErrors.message(System.Label.Core_Settings_PermissionRequiredError);
-        }
-        try {
-            FeatureSwitchService.turnOn(key);
-            return model();
-        } catch (Exception e) {
-            ErrorLogger.log(e, ERROR_CONTEXT);
-            throw UserErrors.message(System.Label.Core_Feature_SaveError);
-        }
-    }
+	/** Turns one feature on, for good, after the page's confirmation. */
+	@AuraEnabled
+	public static FeaturesModel turnOn(String key) {
+		if (!BarnCRMPermissions.canManageSettings()) {
+			throw UserErrors.message(
+				BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
+			);
+		}
+		try {
+			FeatureSwitchService.turnOn(key);
+			return model();
+		} catch (FeatureSwitchService.FeatureBlockedException e) {
+			// Its message is written for the admin: why the feature cannot be turned on.
+			throw UserErrors.message(e.getMessage());
+		} catch (Exception e) {
+			ErrorLogger.log(e, ERROR_CONTEXT);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_Feature_SaveError'));
+		}
+	}
 
-    /** Every feature in the order General lists them, with its state. */
-    public static List<FeatureRow> rows() {
-        Set<String> turnedOn = FeatureSwitchService.featuresOn();
-        List<FeatureRow> rows = new List<FeatureRow>();
-        for (FeatureSwitchService.Item item : FeatureSwitchService.all()) {
-            FeatureRow row = new FeatureRow();
-            row.key = item.key;
-            row.name = nameOf(item.key);
-            row.description = descriptionOf(item.key);
-            row.isOn = turnedOn.contains(item.key.toLowerCase());
-            row.confirmNote = item.key == FeatureSwitchService.HOUSEHOLD_UPKEEP
-                ? System.Label.Core_Feature_HouseholdUpkeep_ConfirmNote
-                : null;
-            rows.add(row);
-        }
-        return rows;
-    }
+	/** Every feature in the order General lists them, with its state. */
+	public static List<FeatureRow> rows() {
+		Set<String> turnedOn = FeatureSwitchService.featuresOn();
+		List<FeatureRow> rows = new List<FeatureRow>();
+		for (FeatureSwitchService.Item item : FeatureSwitchService.all()) {
+			FeatureRow row = new FeatureRow();
+			row.key = item.key;
+			row.name = nameOf(item.key);
+			row.description = descriptionOf(item.key);
+			row.isOn = turnedOn.contains(item.key.toLowerCase());
+			row.confirmNote = item.key == FeatureSwitchService.HOUSEHOLD_UPKEEP
+				? BarnHelp.text('Core', 'Core_Feature_HouseholdUpkeep_ConfirmNote')
+				: null;
+			row.blockedReason = FeatureSwitchService.blockedReason(item.key);
+			rows.add(row);
+		}
+		return rows;
+	}
 
-    private static FeaturesModel model() {
-        FeaturesModel model = new FeaturesModel();
-        model.canEdit = BarnCRMPermissions.canManageSettings();
-        model.features = rows();
-        return model;
-    }
+	private static FeaturesModel model() {
+		FeaturesModel model = new FeaturesModel();
+		model.canEdit = BarnCRMPermissions.canManageSettings();
+		model.features = rows();
+		return model;
+	}
 
-    @TestVisible
-    public static String nameOf(String key) {
-        switch on key {
-            when 'DataManager' {
-                return System.Label.Core_Feature_DataManager_Name;
-            }
-            when 'DuplicateReview' {
-                return System.Label.Core_Feature_DuplicateReview_Name;
-            }
-            when 'OrgOptimizer' {
-                return System.Label.Core_Feature_OrgOptimizer_Name;
-            }
-            when 'HouseholdUpkeep' {
-                return System.Label.Core_Feature_HouseholdUpkeep_Name;
-            }
-            when 'Addresses' {
-                return System.Label.Core_Feature_Addresses_Name;
-            }
-            when 'Relationships' {
-                return System.Label.Core_Feature_Relationships_Name;
-            }
-            when 'Affiliations' {
-                return System.Label.Core_Feature_Affiliations_Name;
-            }
-            when 'PreferredEmail' {
-                return System.Label.Core_Feature_PreferredEmail_Name;
-            }
-            when else {
-                return key;
-            }
-        }
-    }
+	@TestVisible
+	public static String nameOf(String key) {
+		switch on key {
+			when 'DataManager' {
+				return System.Label.Core_DataManager_Title;
+			}
+			when 'DuplicateReview' {
+				return System.Label.Core_DuplicateMatching_Title;
+			}
+			when 'OrgOptimizer' {
+				return System.Label.Core_Feature_OrgOptimizer_Name;
+			}
+			when 'HouseholdUpkeep' {
+				return System.Label.Core_Feature_HouseholdUpkeep_Name;
+			}
+			when 'Addresses' {
+				return System.Label.Core_Feature_Addresses_Name;
+			}
+			when 'Relationships' {
+				return System.Label.Core_Feature_Relationships_Name;
+			}
+			when 'Affiliations' {
+				return System.Label.Core_Feature_Affiliations_Name;
+			}
+			when 'PreferredEmail' {
+				return System.Label.Core_Feature_PreferredEmail_Name;
+			}
+			when else {
+				return key;
+			}
+		}
+	}
 
-    private static String descriptionOf(String key) {
-        switch on key {
-            when 'DataManager' {
-                return System.Label.Core_Feature_DataManager_Description;
-            }
-            when 'DuplicateReview' {
-                return System.Label.Core_Feature_DuplicateReview_Description;
-            }
-            when 'OrgOptimizer' {
-                return System.Label.Core_Feature_OrgOptimizer_Description;
-            }
-            when 'HouseholdUpkeep' {
-                return System.Label.Core_Feature_HouseholdUpkeep_Description;
-            }
-            when 'Addresses' {
-                return System.Label.Core_Feature_Addresses_Description;
-            }
-            when 'Relationships' {
-                return System.Label.Core_Feature_Relationships_Description;
-            }
-            when 'Affiliations' {
-                return System.Label.Core_Feature_Affiliations_Description;
-            }
-            when 'PreferredEmail' {
-                return System.Label.Core_Feature_PreferredEmail_Description;
-            }
-            when else {
-                return null;
-            }
-        }
-    }
+	private static String descriptionOf(String key) {
+		switch on key {
+			when 'DataManager' {
+				return BarnHelp.text('Core', 'Core_Feature_DataManager_Description');
+			}
+			when 'DuplicateReview' {
+				return BarnHelp.text('Core', 'Core_Feature_DuplicateReview_Description');
+			}
+			when 'OrgOptimizer' {
+				return BarnHelp.text('Core', 'Core_Feature_OrgOptimizer_Description');
+			}
+			when 'HouseholdUpkeep' {
+				return BarnHelp.text('Core', 'Core_Feature_HouseholdUpkeep_Description');
+			}
+			when 'Addresses' {
+				return BarnHelp.text('Core', 'Core_Feature_Addresses_Description');
+			}
+			when 'Relationships' {
+				return BarnHelp.text('Core', 'Core_Feature_Relationships_Description');
+			}
+			when 'Affiliations' {
+				return BarnHelp.text('Core', 'Core_Feature_Affiliations_Description');
+			}
+			when 'PreferredEmail' {
+				return BarnHelp.text('Core', 'Core_Feature_PreferredEmail_Description');
+			}
+			when else {
+				return null;
+			}
+		}
+	}
 }

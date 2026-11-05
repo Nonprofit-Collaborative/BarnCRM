@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Nonprofit Cloud Program Management</label>
+  <protected>false</protected>
+  <values>
+    <field>Category__c</field>
+    <value xsi:type="xsd:string">Alternative</value>
+  </values>
+  <values>
+    <field>Status__c</field>
+    <value xsi:type="xsd:string">InProgress</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">The program and benefit management in Salesforce Nonprofit Cloud, with its own standard Program and Program Enrollment objects. It does the same work as BarnCRM Programs.</value>
+  </values>
+  <values>
+    <field>Maintainer__c</field>
+    <value xsi:type="xsd:string">Salesforce</value>
+  </values>
+  <values>
+    <field>License_Cost__c</field>
+    <value xsi:type="xsd:string">Part of a Nonprofit Cloud license</value>
+  </values>
+  <values>
+    <field>Link_Url__c</field>
+    <value xsi:type="xsd:string">https://www.salesforce.com/nonprofit/</value>
+  </values>
+  <values>
+    <field>Detection_Objects__c</field>
+    <value xsi:type="xsd:string">Program</value>
+  </values>
+  <values>
+    <field>Related_Module__c</field>
+    <value xsi:type="xsd:string">BarnCRM Programs</value>
+  </values>
+  <values>
+    <field>Compatibility__c</field>
+    <value xsi:type="xsd:string">Use one or the other for the same programs, not both. BarnCRM Programs keeps its own programs, enrollments and service deliveries and never reads or writes the Nonprofit Cloud objects, so the two share no records. Both can be in the same org without conflict; Health Check notes it as information.</value>
+  </values>
+  <values>
+    <field>Migration_Path__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Show_Only_When_Installed__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">25</value>
+  </values>
+</CustomMetadata>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Award Schedule card on a grant's page: the grant's payments with the amounts scheduled and
+    received, Build Schedule and Mark Received (F-05, canonical model 29ZM).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Grant Award Schedule</masterLabel>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordPage">
+      <objects>
+        <object>Grant__c</object>
+      </objects>
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

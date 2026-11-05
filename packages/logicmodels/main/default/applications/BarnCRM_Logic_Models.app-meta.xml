@@ -17,7 +17,9 @@
     <pageOrSobjectType>Logic_Model__c</pageOrSobjectType>
   </actionOverrides>
   <brand>
-    <headerColor>#0B5CAB</headerColor>
+    <headerColor>#007A9E</headerColor>
+    <logo>BarnCRM_Logic_Models_Logo</logo>
+    <logoVersion>1</logoVersion>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
   </brand>
   <description>

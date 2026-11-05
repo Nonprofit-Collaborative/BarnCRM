@@ -4,57 +4,51 @@ import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Setti
 import canFind from '@salesforce/customPermission/Find_And_Export_Records';
 import canBulkUpdate from '@salesforce/customPermission/Bulk_Update_Records';
 import canBulkDelete from '@salesforce/customPermission/Bulk_Delete_Records';
+import canReviewDuplicates from '@salesforce/customPermission/Review_Duplicate_Suggestions';
+import canManageMetadata from '@salesforce/customPermission/Manage_BarnCRM_Metadata';
 import getMappings from '@salesforce/apex/DataManagerController.getMappings';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 import BarnConfirmModal from 'c/barnConfirmModal';
 
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import TITLE from '@salesforce/label/c.Core_DataManager_Title';
-import INTRO from '@salesforce/label/c.Core_DataManager_Intro';
-import HELP_CHANGE from '@salesforce/label/c.Core_DataManager_HelpChange';
-import HELP_DELETE from '@salesforce/label/c.Core_DataManager_HelpDelete';
 import GROUP_BRING_IN from '@salesforce/label/c.Core_DataManager_GroupBringIn';
 import GROUP_FIND_CHANGE from '@salesforce/label/c.Core_DataManager_GroupFindChange';
 import GROUP_CHECK from '@salesforce/label/c.Core_DataManager_GroupCheck';
 import GROUP_CAREFUL from '@salesforce/label/c.Core_DataManager_GroupCareful';
 import IMPORT_TITLE from '@salesforce/label/c.Core_DataManager_ImportTitle';
-import IMPORT_TEXT from '@salesforce/label/c.Core_DataManager_ImportText';
-import FIND_TITLE from '@salesforce/label/c.Core_DataManager_FindTitle';
-import FIND_TEXT from '@salesforce/label/c.Core_DataManager_FindText';
-import UPDATE_TITLE from '@salesforce/label/c.Core_DataManager_UpdateTitle';
-import UPDATE_TEXT from '@salesforce/label/c.Core_DataManager_UpdateText';
+import FIND_TITLE from '@salesforce/label/c.Core_Find_Title';
+import DUPLICATES_TITLE from '@salesforce/label/c.Core_DuplicateMatching_Title';
+import TASK_SEARCH from '@salesforce/label/c.Core_DataManager_TaskSearch';
+import UPDATE_TITLE from '@salesforce/label/c.Core_SuperTransform_Title';
 import DELETE_TITLE from '@salesforce/label/c.Core_DataManager_DeleteTitle';
-import DELETE_TEXT from '@salesforce/label/c.Core_DataManager_DeleteText';
-import DELETE_WARNING from '@salesforce/label/c.Core_DataManager_DeleteWarning';
 import DELETE_CONTINUE from '@salesforce/label/c.Core_DataManager_DeleteContinue';
-import DELETE_CANCEL from '@salesforce/label/c.Core_DataManager_DeleteCancel';
-import OPTIMIZER_TITLE from '@salesforce/label/c.Core_DataManager_OptimizerTitle';
-import OPTIMIZER_TEXT from '@salesforce/label/c.Core_DataManager_OptimizerText';
+import DELETE_CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
+import OPTIMIZER_TITLE from '@salesforce/label/c.Core_OrgOptimizer_Title';
 import MAPPINGS_HEADING from '@salesforce/label/c.Core_DataManager_MappingsHeading';
-import MAPPINGS_INTRO from '@salesforce/label/c.Core_DataManager_MappingsIntro';
 import MAPPINGS_EMPTY from '@salesforce/label/c.Core_DataManager_MappingsEmpty';
-import MAPPINGS_EMPTY_HINT from '@salesforce/label/c.Core_DataManager_MappingsEmptyHint';
 import CREATE_TEMPLATE from '@salesforce/label/c.Core_DataManager_CreateTemplate';
-import COLUMN_NAME from '@salesforce/label/c.Core_DataManager_ColumnName';
+import COLUMN_NAME from '@salesforce/label/c.Core_Import_StepTemplate';
 import COLUMN_LOADS from '@salesforce/label/c.Core_DataManager_ColumnLoads';
 import COLUMN_SOURCE from '@salesforce/label/c.Core_DataManager_ColumnSource';
 import COLUMN_LAST_LOADED from '@salesforce/label/c.Core_DataManager_ColumnLastLoaded';
 import LOADS_PEOPLE from '@salesforce/label/c.Core_DataManager_LoadsPeople';
 import SALESFORCE_HEADING from '@salesforce/label/c.Core_DataManager_SalesforceHeading';
 import WEEKLY_EXPORT from '@salesforce/label/c.Core_DataManager_WeeklyExport';
-import WEEKLY_EXPORT_TEXT from '@salesforce/label/c.Core_DataManager_WeeklyExportText';
 import RECYCLE_BIN from '@salesforce/label/c.Core_DataManager_RecycleBin';
-import RECYCLE_BIN_TEXT from '@salesforce/label/c.Core_DataManager_RecycleBinText';
 import DATA_IMPORT_WIZARD from '@salesforce/label/c.Core_DataManager_DataImportWizard';
-import DATA_IMPORT_WIZARD_TEXT from '@salesforce/label/c.Core_DataManager_DataImportWizardText';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { iconFor } from 'c/barnIcons';
+import { matchTasks } from 'c/dataManagerTasks';
 
 /** The tabs the tiles open, by API name (ADR-0103 org-optimizer-and-data-manager-pages). */
 const TABS = {
   import: 'Import',
   find: 'Find',
-  // Super Transform (C-50) on the tab that kept the Bulk Update API name.
+  // Super Transformer (C-50) on the tab that kept the Bulk Update API name.
   update: 'Bulk_Update',
   optimizer: 'Data_Hygiene',
+  duplicates: 'Duplicate_Matching',
   delete: 'Find'
 };
 /** The tiles that open Find for a bulk tool, and the tool Find's note names. */
@@ -68,7 +62,9 @@ const SALESFORCE_TILES = [
   {
     name: 'export',
     label: WEEKLY_EXPORT,
-    description: WEEKLY_EXPORT_TEXT,
+    get description() {
+      return helpText('Core', 'Core_DataManager_WeeklyExportText');
+    },
     iconName: 'standard:dataset',
     href: '/lightning/setup/DataManagementExport/home',
     newTab: true
@@ -76,7 +72,9 @@ const SALESFORCE_TILES = [
   {
     name: 'recycle',
     label: RECYCLE_BIN,
-    description: RECYCLE_BIN_TEXT,
+    get description() {
+      return helpText('Core', 'Core_DataManager_RecycleBinText');
+    },
     iconName: 'standard:recycle_bin',
     href: '/lightning/o/DeleteEvent/home',
     newTab: true
@@ -84,7 +82,9 @@ const SALESFORCE_TILES = [
   {
     name: 'wizard',
     label: DATA_IMPORT_WIZARD,
-    description: DATA_IMPORT_WIZARD_TEXT,
+    get description() {
+      return helpText('Core', 'Core_DataManager_DataImportWizardText');
+    },
     iconName: 'standard:data_mapping',
     href: '/lightning/setup/DataManagementDataImporter/home',
     newTab: true
@@ -98,20 +98,52 @@ const SALESFORCE_TILES = [
  * permission check; the tiles only hide what the tool would refuse. Delete Many Records is last,
  * alone in the Careful group, and first shows in a confirmation box that the records go to the
  * Recycle Bin and can be undone; only Continue opens the tool (D-135). Find, Import and Bulk
- * Update are in no app's navigation, so these tiles are how they are reached.
+ * Update are in no app's navigation, so these tiles are how they are reached. Above the tiles,
+ * What Do You Want to Do? matches a typed task to the tile that does it (admin-23; the task
+ * table is the framework-free c/dataManagerTasks).
  */
 export default class DataManager extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
-    helpChange: HELP_CHANGE,
-    helpDelete: HELP_DELETE,
+    get intro() {
+      return helpText('Core', 'Core_DataManager_Intro');
+    },
+    get helpChange() {
+      return helpText('Core', 'Core_DataManager_HelpChange');
+    },
+    get helpDelete() {
+      return helpText('Core', 'Core_DataManager_HelpDelete');
+    },
     mappingsHeading: MAPPINGS_HEADING,
-    mappingsIntro: MAPPINGS_INTRO,
+    get mappingsIntro() {
+      return helpText('Core', 'Core_DataManager_MappingsIntro');
+    },
     mappingsEmpty: MAPPINGS_EMPTY,
-    mappingsEmptyHint: MAPPINGS_EMPTY_HINT,
-    createTemplate: CREATE_TEMPLATE
+    get mappingsEmptyHint() {
+      return helpText('Core', 'Core_DataManager_MappingsEmptyHint');
+    },
+    createTemplate: CREATE_TEMPLATE,
+    taskSearch: TASK_SEARCH,
+    get taskSearchPlaceholder() {
+      return helpText('Core', 'Core_DataManager_TaskSearchPlaceholder');
+    },
+    get taskSearchNone() {
+      return helpText('Core', 'Core_DataManager_TaskSearchNone');
+    }
   };
+
+  /** What was typed in What Do You Want to Do?. */
+  taskQuery = '';
 
   learnMoreUrl = LEARN_MORE_URL;
 
@@ -164,25 +196,64 @@ export default class DataManager extends NavigationMixin(LightningElement) {
   get toolGroups() {
     const bringIn = [];
     if (canManageSettings) {
-      bringIn.push(tile('import', IMPORT_TITLE, IMPORT_TEXT, 'standard:data_streams'));
+      bringIn.push(
+        tile(
+          'import',
+          IMPORT_TITLE,
+          helpText('Core', 'Core_DataManager_ImportText'),
+          iconFor('Import')
+        )
+      );
     }
     const findChange = [];
     if (canFind) {
-      findChange.push(tile('find', FIND_TITLE, FIND_TEXT, 'standard:search'));
+      findChange.push(
+        tile('find', FIND_TITLE, helpText('Core', 'Core_DataManager_FindText'), iconFor('Find'))
+      );
     }
     if (canBulkUpdate) {
-      findChange.push(tile('update', UPDATE_TITLE, UPDATE_TEXT, 'standard:record_update'));
+      findChange.push(
+        tile(
+          'update',
+          UPDATE_TITLE,
+          helpText('Core', 'Core_DataManager_UpdateText'),
+          iconFor('Bulk_Update')
+        )
+      );
     }
     const check = [];
     if (canFind || canManageSettings) {
       check.push(
-        tile('optimizer', OPTIMIZER_TITLE, OPTIMIZER_TEXT, 'standard:data_integration_hub')
+        tile(
+          'optimizer',
+          OPTIMIZER_TITLE,
+          helpText('Core', 'Core_DataManager_OptimizerText'),
+          iconFor('Data_Hygiene')
+        )
+      );
+    }
+    // The permissions the Duplicate Matching tab itself shows to.
+    if (canManageSettings || canReviewDuplicates || canManageMetadata) {
+      check.push(
+        tile(
+          'duplicates',
+          DUPLICATES_TITLE,
+          helpText('Core', 'Core_DataManager_DuplicatesText'),
+          iconFor('Duplicate_Matching')
+        )
       );
     }
     // Always last: the one destructive tool.
     const careful = [];
     if (canBulkDelete) {
-      careful.push(tile('delete', DELETE_TITLE, DELETE_TEXT, 'standard:record_delete'));
+      careful.push(
+        tile(
+          'delete',
+          DELETE_TITLE,
+          helpText('Core', 'Core_DataManager_DeleteText'),
+          'standard:record_delete'
+        )
+      );
     }
     return [
       { name: 'bringIn', label: GROUP_BRING_IN, tiles: bringIn },
@@ -190,6 +261,37 @@ export default class DataManager extends NavigationMixin(LightningElement) {
       { name: 'check', label: GROUP_CHECK, tiles: check },
       { name: 'careful', label: GROUP_CAREFUL, tiles: careful }
     ];
+  }
+
+  /** The tasks matching what was typed, each with the title of the tile it opens. */
+  get taskResults() {
+    const titles = {};
+    this.toolGroups.forEach((group) =>
+      group.tiles.forEach((item) => {
+        titles[item.name] = item.label;
+      })
+    );
+    return matchTasks(this.taskQuery, Object.keys(titles)).map((task) => ({
+      ...task,
+      toolLabel: titles[task.tool]
+    }));
+  }
+
+  get hasTaskResults() {
+    return this.taskResults.length > 0;
+  }
+
+  get showNoTasks() {
+    return this.taskQuery.trim().length > 0 && !this.hasTaskResults;
+  }
+
+  handleTaskInput(event) {
+    this.taskQuery = event.target.value || '';
+  }
+
+  /** A task opens its tool exactly as its tile does, the delete confirmation included. */
+  handleTaskSelect(event) {
+    this.handleSelect({ detail: { name: event.currentTarget.dataset.tool } });
   }
 
   get salesforceGroups() {
@@ -209,7 +311,7 @@ export default class DataManager extends NavigationMixin(LightningElement) {
       const confirmed = await BarnConfirmModal.open({
         size: 'small',
         label: DELETE_TITLE,
-        message: DELETE_WARNING,
+        message: helpText('Core', 'Core_DataManager_DeleteWarning'),
         confirmLabel: DELETE_CONTINUE,
         cancelLabel: DELETE_CANCEL,
         confirmVariant: 'destructive'

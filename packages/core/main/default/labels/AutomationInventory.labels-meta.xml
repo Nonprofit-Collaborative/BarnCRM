@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_DataDictionary_IncludeAutomation</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Dictionary: checkbox to include the automation inventory</shortDescription>
+        <value>Include Flows and Apex Triggers</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_AutomationTitle</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Dictionary: automation inventory heading</shortDescription>
+        <value>Automation Inventory</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_DownloadAutomation</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Dictionary: automation download button</shortDescription>
+        <value>Download Automation CSV</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColAutomationRuns</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Dictionary: automation column, when it runs</shortDescription>
+        <value>Runs</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_ColAutomationVersion</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Dictionary: automation column</shortDescription>
+        <value>API Version</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_TypeApexTrigger</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Dictionary: automation type</shortDescription>
+        <value>Apex Trigger</value>
+    </labels>
+    <labels>
+        <fullName>Core_DataDictionary_TypeFlow</fullName>
+        <categories>DataDictionary</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Data Dictionary: automation type</shortDescription>
+        <value>Flow</value>
+    </labels>
+</CustomLabels>

@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <template lwc:if={hasInputs}>
         <div class="slds-grid slds-wrap slds-gutters_x-small">
             <template for:each={inputs} for:item="field">
@@ -91,5 +92,6 @@
             data-target={field.navigationTarget}
             onclick={handleNavigate}
         ></lightning-button>
+    </template>
     </template>
 </template>

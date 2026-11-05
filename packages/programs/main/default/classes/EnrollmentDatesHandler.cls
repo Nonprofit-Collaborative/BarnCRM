@@ -7,28 +7,28 @@
  */
 @NamespaceAccessible
 public with sharing class EnrollmentDatesHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public EnrollmentDatesHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public EnrollmentDatesHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'EnrollmentDatesHandler';
-    }
+	public override String getName() {
+		return 'EnrollmentDatesHandler';
+	}
 
-    public override void beforeInsert() {
-        EnrollmentService.fillStageDates((List<Enrollment__c>) Trigger.new, null);
-        EnrollmentService.fillEligibilityDates((List<Enrollment__c>) Trigger.new, null);
-    }
+	public override void beforeInsert() {
+		EnrollmentService.fillStageDates((List<Enrollment__c>) newRecords(), null);
+		EnrollmentService.fillEligibilityDates((List<Enrollment__c>) newRecords(), null);
+	}
 
-    public override void beforeUpdate() {
-        EnrollmentService.fillStageDates(
-            (List<Enrollment__c>) Trigger.new,
-            (Map<Id, Enrollment__c>) Trigger.oldMap
-        );
-        EnrollmentService.fillEligibilityDates(
-            (List<Enrollment__c>) Trigger.new,
-            (Map<Id, Enrollment__c>) Trigger.oldMap
-        );
-    }
+	public override void beforeUpdate() {
+		EnrollmentService.fillStageDates(
+			(List<Enrollment__c>) newRecords(),
+			(Map<Id, Enrollment__c>) oldRecordsById()
+		);
+		EnrollmentService.fillEligibilityDates(
+			(List<Enrollment__c>) newRecords(),
+			(Map<Id, Enrollment__c>) oldRecordsById()
+		);
+	}
 }

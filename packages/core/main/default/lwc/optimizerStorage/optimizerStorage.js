@@ -11,14 +11,14 @@ import LIMIT_API from '@salesforce/label/c.Core_OrgOptimizer_LimitApiRequests';
 import LIMIT_ASYNC from '@salesforce/label/c.Core_OrgOptimizer_LimitAsyncApex';
 import LIMIT_EMAIL from '@salesforce/label/c.Core_OrgOptimizer_LimitSingleEmail';
 import OWN_HEADING from '@salesforce/label/c.Core_OrgOptimizer_OwnHeading';
-import OWN_INTRO from '@salesforce/label/c.Core_OrgOptimizer_OwnIntro';
-import COLUMN_OBJECT from '@salesforce/label/c.Core_OrgOptimizer_ColumnObject';
-import COLUMN_RECORDS from '@salesforce/label/c.Core_OrgOptimizer_ColumnRecords';
+import COLUMN_OBJECT from '@salesforce/label/c.Core_AccessExplorer_KindOfRecord';
+import COLUMN_RECORDS from '@salesforce/label/c.Core_FieldUtilization_ColRecords';
 import COLUMN_MB from '@salesforce/label/c.Core_OrgOptimizer_ColumnMB';
-import MORE_THAN from '@salesforce/label/c.Core_OrgOptimizer_MoreThan';
+import MORE_THAN from '@salesforce/label/c.Core_HealthCheck_OrphansMoreThan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import NEAR_LIMIT from '@salesforce/label/c.Core_OrgOptimizer_NearLimit';
 import { format } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** A limit used to this percentage or more carries a Near Limit badge. */
 const NEAR_LIMIT_PERCENT = 80;
@@ -38,11 +38,15 @@ const LIMIT_LABELS = {
  * `detail.dataStoragePercent` for the Overview tile.
  */
 export default class OptimizerStorage extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     title: STORAGE,
     limitsHeading: LIMITS_HEADING,
     ownHeading: OWN_HEADING,
-    ownIntro: OWN_INTRO,
+    get ownIntro() {
+      return helpText('Core', 'Core_OrgOptimizer_OwnIntro');
+    },
     refresh: REFRESH,
     nearLimit: NEAR_LIMIT
   };
@@ -58,6 +62,11 @@ export default class OptimizerStorage extends LightningElement {
   loading = false;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

@@ -9,30 +9,6 @@
         <value>Choose Your Edition</value>
     </labels>
     <labels>
-        <fullName>Core_SuiteChoice_ChooseInFirstRun</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: where the edition is asked, while none is saved</shortDescription>
-        <value>Choose the edition in the Set Up BarnCRM window, or in BarnCRM Settings, General.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuiteChoice_StepDescription</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: what the edition choice step asks</shortDescription>
-        <value>Nonprofit Edition adds Giving to the full core suite. You choose once; it decides which modules show.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuiteChoice_UnknownSuiteError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: refusal when no known edition was chosen</shortDescription>
-        <value>Choose the Standard Edition or the Nonprofit Edition, then click Confirm and continue.</value>
-    </labels>
-    <labels>
         <fullName>Core_SuiteChoice_EditionLabel</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -41,44 +17,12 @@
         <value>Edition</value>
     </labels>
     <labels>
-        <fullName>Core_SuiteChoice_GivingInstalled</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: Giving is already installed</shortDescription>
-        <value>Giving is installed. Its steps are part of this setup.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuiteChoice_GivingNeeded</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: the chosen edition needs Giving</shortDescription>
-        <value>The Nonprofit Edition needs the Giving module, which is not installed yet.</value>
-    </labels>
-    <labels>
         <fullName>Core_SuiteChoice_InstallButton</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the link to the Giving installer</shortDescription>
         <value>Open the Giving Installer</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuiteChoice_InstallHelp</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: how to finish installing Giving</shortDescription>
-        <value>Follow Salesforce's install screens in the new tab. When the install has finished, come back here and click Check Again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuiteChoice_NoInstallLink</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: no published Giving version to link to</shortDescription>
-        <value>The Giving install link is not published yet.</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_ReadAbout</fullName>
@@ -92,17 +36,9 @@
         <fullName>Core_SuiteChoice_CheckAgain</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: re-read what is installed</shortDescription>
+        <protected>false</protected>
+        <shortDescription>Shared: button that checks again</shortDescription>
         <value>Check Again</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuiteChoice_NewTab</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Assistive text: a link opens in a new tab</shortDescription>
-        <value>(opens in a new tab)</value>
     </labels>
     <labels>
         <fullName>Core_SuiteChoice_ModuleInstallLink</fullName>
@@ -129,14 +65,6 @@
         <value>Nonprofit Edition</value>
     </labels>
     <labels>
-        <fullName>Core_SuiteChoice_ChosenOnce</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: under the saved edition, which is not offered again</shortDescription>
-        <value>The edition is chosen once.</value>
-    </labels>
-    <labels>
         <fullName>Core_SuiteChoice_ChangeHelpLink</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -145,28 +73,12 @@
         <value>How to Change It Later</value>
     </labels>
     <labels>
-        <fullName>Core_Edition_NotChosen</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings Edition row: no edition has been chosen yet</shortDescription>
-        <value>Not chosen yet. Choose it in first-run setup, or with Change edition below.</value>
-    </labels>
-    <labels>
         <fullName>Core_Edition_ChangeToggle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings Edition row: the collapsed control that opens the change</shortDescription>
         <value>Change Edition</value>
-    </labels>
-    <labels>
-        <fullName>Core_Edition_ChangeIntro</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings Edition row: what changing the edition does</shortDescription>
-        <value>The edition decides which modules BarnCRM shows and offers to everyone. Changing it installs, removes and turns off nothing, and changes no records.</value>
     </labels>
     <labels>
         <fullName>Core_Edition_SwitchToStandard</fullName>
@@ -191,45 +103,5 @@
         <protected>true</protected>
         <shortDescription>Edition change confirmation: heading</shortDescription>
         <value>Change the Edition?</value>
-    </labels>
-    <labels>
-        <fullName>Core_Edition_ConfirmToNonprofit</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Edition change confirmation: what switching to Nonprofit does</shortDescription>
-        <value>BarnCRM will show and offer the nonprofit modules (Giving, Volunteers, Programs, Logic Models, Funders and Mirror) in the Setup Assistant, Module Manager and home page, to every admin and user. Nothing is installed: you install each module yourself.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Edition_ConfirmToStandard</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Edition change confirmation: what switching to Standard does</shortDescription>
-        <value>BarnCRM will stop showing and offering nonprofit modules that are not installed, to every admin and user. Modules already installed stay listed and keep working. Nothing is removed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Edition_ConfirmButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Edition change confirmation: the button that saves the change</shortDescription>
-        <value>Change Edition</value>
-    </labels>
-    <labels>
-        <fullName>Core_Edition_CancelButton</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Edition change confirmation: the button that leaves it as it is</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
-        <fullName>Core_Edition_Saved</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings Edition row: shown after the edition was changed</shortDescription>
-        <value>Edition changed. Reload open BarnCRM pages to see the new module lists.</value>
     </labels>
 </CustomLabels>

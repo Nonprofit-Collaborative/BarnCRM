@@ -9,6 +9,9 @@ module.exports = {
     '^lightning/actions$': '<rootDir>/packages/giving/test/jest-mocks/lightning/actions.js',
     // Nor for lightning/modal, the base of c/barnConfirmModal.
     '^lightning/modal$': '<rootDir>/packages/core/test/jest-mocks/lightning/modal.js',
+    // Help text from the BarnHelp_* static resources: always loaded, keys read as "c.<key>"
+    // like the custom label stub (ADR-0164 help-text-json).
+    '^c/barnHelpText$': '<rootDir>/packages/core/test/jest-mocks/c/barnHelpText.js',
     // One module id for lightning/toast, so a test's spy on Toast.show is the one the component
     // calls (the same per-directory caching problem as lightning/navigation below).
     '^lightning/toast$':

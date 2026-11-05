@@ -5,11 +5,11 @@
  */
 @IsTest
 public class ExtensionFakeWorks implements DataProtectionExtension, HouseholdDependentsExtension {
-    public Set<Schema.SObjectType> protectedObjects() {
-        return new Set<Schema.SObjectType>{ Relationship__c.SObjectType };
-    }
+	public Set<Schema.SObjectType> protectedObjects() {
+		return new Set<Schema.SObjectType>{ Relationship__c.SObjectType };
+	}
 
-    public Set<Id> householdsWithDependents(Set<Id> householdIds) {
-        return null;
-    }
+	public Set<Id> householdsWithDependents(Set<Id> householdIds) {
+		return null;
+	}
 }

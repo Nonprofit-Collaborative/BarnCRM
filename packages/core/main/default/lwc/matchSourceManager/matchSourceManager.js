@@ -5,16 +5,10 @@ import setArchived from '@salesforce/apex/CustomMetadataManagerController.setArc
 import getOutcome from '@salesforce/apex/CustomMetadataManagerController.getOutcome';
 import MatchSourceModal from 'c/matchSourceModal';
 
-import INTRO from '@salesforce/label/c.Core_MatchLogic_Intro';
-import HELP from '@salesforce/label/c.Core_MatchLogic_Help';
 import HELP_ALT from '@salesforce/label/c.Core_MatchLogic_HelpAlt';
-import RULES_NOTE from '@salesforce/label/c.Core_MatchLogic_RulesNote';
-import READ_ONLY from '@salesforce/label/c.Core_MatchLogic_ReadOnly';
-import SHIPPED_NOTE from '@salesforce/label/c.Core_MatchLogic_ShippedNote';
 import ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
 import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
-import SHIPPED from '@salesforce/label/c.Core_MatchLogic_Shipped';
-import NOT_USABLE from '@salesforce/label/c.Core_MatchLogic_NotUsable';
+import SHIPPED from '@salesforce/label/c.Core_CmdtManager_ShippedHeading';
 import OBJECT from '@salesforce/label/c.Core_MatchLogic_Object';
 import VALUE_FIELD from '@salesforce/label/c.Core_MatchLogic_ValueField';
 import POSTAL_FIELD from '@salesforce/label/c.Core_MatchLogic_PostalField';
@@ -27,23 +21,18 @@ import HIDE_DETAILS from '@salesforce/label/c.Core_MatchLogic_HideDetails';
 import ACTIVE_SWITCH from '@salesforce/label/c.Core_MatchLogic_ActiveSwitch';
 import NEW_TITLE from '@salesforce/label/c.Core_MatchLogic_NewTitle';
 import TRY from '@salesforce/label/c.Core_MatchLogic_Try';
-import TRY_VALUE from '@salesforce/label/c.Core_MatchLogic_TryValue';
+import TRY_VALUE from '@salesforce/label/c.Core_Filter_Value';
 import TRY_POSTAL from '@salesforce/label/c.Core_MatchLogic_TryPostal';
 import TRY_RUN from '@salesforce/label/c.Core_MatchLogic_TryRun';
 import TRY_COMPARED_AS from '@salesforce/label/c.Core_MatchLogic_TryComparedAs';
 import TRY_FOUND from '@salesforce/label/c.Core_MatchLogic_TryFound';
-import TRY_NONE from '@salesforce/label/c.Core_MatchLogic_TryNone';
-import TRY_TOO_LITTLE from '@salesforce/label/c.Core_MatchLogic_TryTooLittle';
 import ADD from '@salesforce/label/c.Core_CmdtManager_AddButton';
 import EDIT from '@salesforce/label/c.Core_CmdtManager_EditAction';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import EDIT_TITLE from '@salesforce/label/c.Core_CmdtManager_EditTitle';
-import SAVING from '@salesforce/label/c.Core_CmdtManager_Saving';
-import SAVED from '@salesforce/label/c.Core_CmdtManager_Saved';
-import STILL_SAVING from '@salesforce/label/c.Core_CmdtManager_StillSaving';
-import CHECK_AGAIN from '@salesforce/label/c.Core_CmdtManager_CheckAgain';
-import LOAD_ERROR from '@salesforce/label/c.Core_CmdtManager_LoadError';
+import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const TYPE_NAME = 'Match_Source__mdt';
 const ADDRESS = 'Address';
@@ -58,12 +47,20 @@ const POLL_ATTEMPTS = 20;
  * needs Manage BarnCRM Metadata, so the page waits on the deployment as that page does.
  */
 export default class MatchSourceManager extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_MatchLogic_Intro');
+    },
     helpAlt: HELP_ALT,
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Core', 'Core_MatchLogic_ReadOnly');
+    },
     shipped: SHIPPED,
-    notUsable: NOT_USABLE,
+    get notUsable() {
+      return helpText('Core', 'Core_MatchLogic_NotUsable');
+    },
     object: OBJECT,
     valueField: VALUE_FIELD,
     postalField: POSTAL_FIELD,
@@ -82,7 +79,9 @@ export default class MatchSourceManager extends LightningElement {
     checkAgain: CHECK_AGAIN
   };
 
-  helpText = `${HELP} ${RULES_NOTE} ${SHIPPED_NOTE}`;
+  get helpText() {
+    return `${helpText('Core', 'Core_MatchLogic_Help')} ${helpText('Core', 'Core_MatchLogic_RulesNote')} ${helpText('Core', 'Core_MatchLogic_ShippedNote')}`;
+  }
 
   view;
   /** The developer names of the cards whose details are shown. */
@@ -97,6 +96,11 @@ export default class MatchSourceManager extends LightningElement {
   pollTimer;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -109,7 +113,7 @@ export default class MatchSourceManager extends LightningElement {
       this.view = await getView();
       this.errorMessage = undefined;
     } catch (error) {
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_CmdtManager_LoadError'));
     }
   }
 
@@ -149,7 +153,7 @@ export default class MatchSourceManager extends LightningElement {
       return {
         ...source,
         statusText: source.active ? ACTIVE : INACTIVE,
-        statusClass: source.active ? 'slds-theme_success' : '',
+        statusTone: source.active ? 'active' : 'inactive',
         switchLabel: ACTIVE_SWITCH.replace('{0}', source.label),
         summary: SUMMARY.replace('{0}', valueText)
           .replace('{1}', objectText)
@@ -187,7 +191,7 @@ export default class MatchSourceManager extends LightningElement {
     }
     return this.tryResult.comparedAs
       ? TRY_COMPARED_AS.replace('{0}', this.tryResult.comparedAs)
-      : TRY_TOO_LITTLE;
+      : helpText('Core', 'Core_MatchLogic_TryTooLittle');
   }
 
   get tryRecords() {
@@ -203,7 +207,7 @@ export default class MatchSourceManager extends LightningElement {
   }
 
   get tryNoneText() {
-    return TRY_NONE;
+    return helpText('Core', 'Core_MatchLogic_TryNone');
   }
 
   // ------------------------------------------------------------------ add and edit
@@ -280,7 +284,7 @@ export default class MatchSourceManager extends LightningElement {
       this.errorMessage = undefined;
     } catch (error) {
       this.tryResult = undefined;
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_CmdtManager_LoadError'));
     }
   }
 
@@ -305,7 +309,7 @@ export default class MatchSourceManager extends LightningElement {
       this.track(await request, label);
     } catch (error) {
       this.busy = false;
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_CmdtManager_LoadError'));
     }
   }
 
@@ -313,7 +317,7 @@ export default class MatchSourceManager extends LightningElement {
   track(jobId, label) {
     this.busy = true;
     this.pending = { jobId, label };
-    this.statusMessage = SAVING;
+    this.statusMessage = helpText('Core', 'Core_CmdtManager_Saving');
     this.poll(jobId, label, POLL_ATTEMPTS);
   }
 
@@ -326,11 +330,11 @@ export default class MatchSourceManager extends LightningElement {
       try {
         outcome = await getOutcome({ deploymentId: jobId });
       } catch (error) {
-        this.finish(undefined, bodyMessage(error, LOAD_ERROR));
+        this.finish(undefined, bodyMessage(error, helpText('Core', 'Core_CmdtManager_LoadError')));
         return;
       }
       if (outcome.status === 'Succeeded') {
-        this.finish(SAVED.replace('{0}', label), undefined);
+        this.finish(helpText('Core', 'Core_CmdtManager_Saved').replace('{0}', label), undefined);
         this.load();
       } else if (outcome.status === 'Failed') {
         this.finish(undefined, outcome.message);
@@ -338,7 +342,7 @@ export default class MatchSourceManager extends LightningElement {
         this.poll(jobId, label, attemptsLeft - 1);
       } else {
         this.busy = false;
-        this.statusMessage = STILL_SAVING;
+        this.statusMessage = helpText('Core', 'Core_CmdtManager_StillSaving');
       }
     }, POLL_INTERVAL_MS);
   }

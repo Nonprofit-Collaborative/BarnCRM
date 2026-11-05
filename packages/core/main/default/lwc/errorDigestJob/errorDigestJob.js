@@ -8,20 +8,15 @@ import setSchedule from '@salesforce/apex/ErrorDigestController.setSchedule';
 import sendNow from '@salesforce/apex/ErrorDigestController.sendNow';
 
 import TITLE from '@salesforce/label/c.Core_ErrorDigest_PageTitle';
-import INTRO from '@salesforce/label/c.Core_ErrorDigest_PageIntro';
 import LAST_RUN_TITLE from '@salesforce/label/c.Core_ErrorDigest_LastRunTitle';
 import NEVER_RUN from '@salesforce/label/c.Core_ErrorDigest_NeverRun';
-import NOT_SCHEDULED from '@salesforce/label/c.Core_ErrorDigest_NotScheduled';
-import SCHEDULE_ACTIVE from '@salesforce/label/c.Core_ErrorDigest_ScheduleActive';
 import SCHEDULE_BUTTON from '@salesforce/label/c.Core_ErrorDigest_ScheduleButton';
 import STOP_BUTTON from '@salesforce/label/c.Core_ErrorDigest_StopButton';
 import SEND_NOW from '@salesforce/label/c.Core_ErrorDigest_SendNow';
 import RECIPIENTS_TITLE from '@salesforce/label/c.Core_ErrorDigest_RecipientsTitle';
 import TO_ADMINISTRATORS from '@salesforce/label/c.Core_ErrorDigest_ToAdministrators';
-import NO_RECIPIENTS from '@salesforce/label/c.Core_ErrorDigest_NoRecipients';
-import READ_ONLY from '@salesforce/label/c.Core_ErrorDigest_ReadOnly';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_ErrorDigest_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The error digest panel on the Error Log page of the BarnCRM Settings console (C-23).
@@ -32,14 +27,28 @@ import { bodyMessage } from 'c/findCsv';
  * same page, so they are saved and audited like every other setting.
  */
 export default class ErrorDigestJob extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_ErrorDigest_PageIntro');
+    },
     lastRunTitle: LAST_RUN_TITLE,
     neverRun: NEVER_RUN,
     sendNow: SEND_NOW,
     recipientsTitle: RECIPIENTS_TITLE,
-    readOnly: READ_ONLY
+    get readOnly() {
+      return helpText('Core', 'Core_ErrorDigest_ReadOnly');
+    }
   };
 
   digest;
@@ -54,7 +63,10 @@ export default class ErrorDigestJob extends LightningElement {
       this.digest = result.data;
       this.errorMessage = undefined;
     } else if (result.error) {
-      this.errorMessage = bodyMessage(result.error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(
+        result.error,
+        helpText('Core', 'Core_ErrorDigest_UnexpectedError')
+      );
     }
   }
 
@@ -75,7 +87,9 @@ export default class ErrorDigestJob extends LightningElement {
   }
 
   get scheduleMessage() {
-    return this.isScheduled ? SCHEDULE_ACTIVE : NOT_SCHEDULED;
+    return this.isScheduled
+      ? helpText('Core', 'Core_ErrorDigest_ScheduleActive')
+      : helpText('Core', 'Core_ErrorDigest_NotScheduled');
   }
 
   get scheduleButtonLabel() {
@@ -86,7 +100,7 @@ export default class ErrorDigestJob extends LightningElement {
   get recipientsText() {
     const names = this.digest && this.digest.recipients ? this.digest.recipients : [];
     if (names.length === 0) {
-      return NO_RECIPIENTS;
+      return helpText('Core', 'Core_ErrorDigest_NoRecipients');
     }
     const list = names.join(', ');
     return this.digest.toAdministrators ? `${TO_ADMINISTRATORS} ${list}` : list;
@@ -125,7 +139,7 @@ export default class ErrorDigestJob extends LightningElement {
         await refreshApex(this.wiredDigestResult);
       }
     } catch (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_ErrorDigest_UnexpectedError'));
     } finally {
       this.busy = false;
     }

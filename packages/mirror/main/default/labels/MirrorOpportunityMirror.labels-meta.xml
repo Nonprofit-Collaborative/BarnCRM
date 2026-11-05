@@ -6,7 +6,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Health Check: name of the Opportunity mirror nightly job</shortDescription>
-    <value>Opportunity Mirror, 1:30 AM</value>
+    <value>Opportunity Mirror</value>
   </labels>
   <labels>
     <fullName>Mirror_HealthCheck_MirrorNotRunTitle</fullName>
@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Health Check: mirror has not run, title</shortDescription>
-    <value>The Opportunity mirror has not run</value>
+    <value>The Opportunity Mirror Has Not Run</value>
   </labels>
   <labels>
     <fullName>Mirror_HealthCheck_MirrorNotRunDetail</fullName>
@@ -47,14 +47,6 @@
     <protected>false</protected>
     <shortDescription>Page: no completed run yet</shortDescription>
     <value>No run has completed yet.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_Loading</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Page: loading</shortDescription>
-    <value>Loading</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_NoOpportunityRead</fullName>
@@ -425,22 +417,6 @@
     <value>Opportunity Mirror</value>
   </labels>
   <labels>
-    <fullName>Mirror_OpportunityMirror_Intro</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Page introduction</shortDescription>
-    <value>Keeps gifts and Salesforce Opportunities in step, in the direction set in BarnCRM Settings. Run now copies what is waiting. The nightly run catches up at 1:30 AM, your organization's time zone.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_DirectionGifts</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Page: Gifts to Opportunities is on</shortDescription>
-    <value>Direction: Gifts to Opportunities. Every gift in the totals gets a matching Opportunity.</value>
-  </labels>
-  <labels>
     <fullName>Mirror_OpportunityMirror_DirectionOpportunities</fullName>
     <categories>Mirror, Opportunity Mirror</categories>
     <language>en_US</language>
@@ -455,30 +431,6 @@
     <protected>false</protected>
     <shortDescription>Page: no start date set</shortDescription>
     <value>Direction: Opportunities to Gifts, but no start date is set, so no Opportunity becomes a gift. Set Opportunity mirror start date in BarnCRM Settings.</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_RunNow</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Button: start a run</shortDescription>
-    <value>Run now</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_ScheduleNightly</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Button: schedule the nightly run</shortDescription>
-    <value>Schedule nightly run</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_StopSchedule</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Button: stop the nightly run</shortDescription>
-    <value>Stop nightly run</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_NextRun</fullName>
@@ -513,14 +465,6 @@
     <value>Reconciliation</value>
   </labels>
   <labels>
-    <fullName>Mirror_OpportunityMirror_ReconciliationIntro</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Section introduction: reconciliation</shortDescription>
-    <value>Compare the gifts in the totals dated in a range with the won Opportunities closed in it, as you can see them.</value>
-  </labels>
-  <labels>
     <fullName>Mirror_OpportunityMirror_FromDate</fullName>
     <categories>Mirror, Opportunity Mirror</categories>
     <language>en_US</language>
@@ -537,20 +481,12 @@
     <value>To</value>
   </labels>
   <labels>
-    <fullName>Mirror_OpportunityMirror_Compare</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Button: compare a range</shortDescription>
-    <value>Compare</value>
-  </labels>
-  <labels>
     <fullName>Mirror_OpportunityMirror_CopyAgain</fullName>
     <categories>Mirror, Opportunity Mirror</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Button: copy a range again</shortDescription>
-    <value>Copy these gifts again</value>
+    <value>Copy These Gifts Again</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_GiftSide</fullName>
@@ -569,14 +505,6 @@
     <value>Won Opportunities: {0}, total {1}</value>
   </labels>
   <labels>
-    <fullName>Mirror_OpportunityMirror_NoDifferences</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Reconciliation: nothing differs</shortDescription>
-    <value>No differences.</value>
-  </labels>
-  <labels>
     <fullName>Mirror_OpportunityMirror_DifferenceCount</fullName>
     <categories>Mirror, Opportunity Mirror</categories>
     <language>en_US</language>
@@ -585,28 +513,12 @@
     <value>Differences found: {0}. The first {1} are listed.</value>
   </labels>
   <labels>
-    <fullName>Mirror_OpportunityMirror_ColumnGift</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Column: gift</shortDescription>
-    <value>Gift</value>
-  </labels>
-  <labels>
     <fullName>Mirror_OpportunityMirror_ColumnGiftAmount</fullName>
     <categories>Mirror, Opportunity Mirror</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Column: gift amount</shortDescription>
     <value>Gift Amount</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_ColumnGiftDate</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Column: gift date</shortDescription>
-    <value>Gift Date</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_ColumnOpportunity</fullName>
@@ -631,13 +543,5 @@
     <protected>false</protected>
     <shortDescription>Column: close date</shortDescription>
     <value>Close Date</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_ColumnDifference</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Column: difference</shortDescription>
-    <value>Difference</value>
   </labels>
 </CustomLabels>

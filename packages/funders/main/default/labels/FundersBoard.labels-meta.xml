@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Funders_Board_Title</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Board Dashboard tab title</shortDescription>
+        <value>Board Dashboard</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Board_Mix</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Board Dashboard revenue mix section title</shortDescription>
+        <value>Revenue Mix</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Board_Gifts</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Board Dashboard revenue mix line for Giving gifts</shortDescription>
+        <value>Gifts to funds</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Board_Total</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Board Dashboard total line</shortDescription>
+        <value>Total</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Board_Concentration</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Board Dashboard concentration section title</shortDescription>
+        <value>Concentration</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Board_SingleRisk</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Board flag, one source over 25 percent: {0} organization, {1} share</shortDescription>
+        <value>{0} gives {1} of this year's revenue, more than the 25 percent a board usually wants from one source.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Board_TopFiveRisk</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Board flag, five largest over 50 percent: {0} their share</shortDescription>
+        <value>The five largest sources give {0} of this year's revenue, more than half.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Board_NoRisk</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Board, no concentration flag: {0} share of the five largest</shortDescription>
+        <value>No source gives more than 25 percent, and the five largest give {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Board_Restricted</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Board Dashboard restricted balances section title</shortDescription>
+        <value>Restricted Balances</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Board_Funds</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Board Dashboard restricted funds heading</shortDescription>
+        <value>Restricted Funds: Raised This Fiscal Year</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Board_Grants</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Board Dashboard restricted grants heading</shortDescription>
+        <value>Restricted Grants: Balance</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Board_ErrorLoad</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Board Dashboard load error</shortDescription>
+        <value>The Board Dashboard could not load. Try again, or ask your admin to look at the Error Log.</value>
+    </labels>
+</CustomLabels>

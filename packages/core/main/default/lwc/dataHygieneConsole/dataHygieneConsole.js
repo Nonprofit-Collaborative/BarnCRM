@@ -5,17 +5,14 @@ import getChecks from '@salesforce/apex/DataHygieneController.getChecks';
 import openInFind from '@salesforce/apex/DataHygieneController.openInFind';
 
 import PAGE_TITLE from '@salesforce/label/c.Core_DataHygiene_PageTitle';
-import INTRO from '@salesforce/label/c.Core_DataHygiene_Intro';
-import HEALTH_CHECK_NOTE from '@salesforce/label/c.Core_DataHygiene_HealthCheckNote';
 import RECOUNT from '@salesforce/label/c.Core_DataHygiene_Recount';
 import LOADING from '@salesforce/label/c.Core_DataHygiene_Loading';
 import OPEN_IN_FIND from '@salesforce/label/c.Core_DataHygiene_OpenInFind';
 import RECORDS_FOUND from '@salesforce/label/c.Core_DataHygiene_RecordsFound';
-import OPENED_NOTICE from '@salesforce/label/c.Core_DataHygiene_OpenedNotice';
-import CHECK_FAILED from '@salesforce/label/c.Core_DataHygiene_CheckFailed';
 import NEEDS_ATTENTION from '@salesforce/label/c.Core_DataHygiene_NeedsAttention';
 import ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * Org Optimizer's Data Quality section (C-28, admin guide data-hygiene.md): every check with
@@ -26,10 +23,16 @@ import { bodyMessage } from 'c/findCsv';
  * checks that found records, for the Overview tile. Nothing here changes a record.
  */
 export default class DataHygieneConsole extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     pageTitle: PAGE_TITLE,
-    intro: INTRO,
-    healthCheckNote: HEALTH_CHECK_NOTE,
+    get intro() {
+      return helpText('Core', 'Core_DataHygiene_Intro');
+    },
+    get healthCheckNote() {
+      return helpText('Core', 'Core_DataHygiene_HealthCheckNote');
+    },
     recount: RECOUNT,
     loading: LOADING,
     openInFind: OPEN_IN_FIND,
@@ -41,6 +44,11 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
   errorMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -52,7 +60,7 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
         headingId: `heading-${check.key}`,
         hasCount: check.count !== undefined && check.count !== null,
         badgeLabel: found ? NEEDS_ATTENTION : ALL_CLEAR,
-        badgeClass: found ? 'slds-theme_warning' : 'slds-theme_success'
+        badgeStatus: found ? 'warning' : 'success'
       };
     });
   }
@@ -69,7 +77,7 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
       const needsAttention = this.checks.filter((check) => check.count > 0).length;
       this.dispatchEvent(new CustomEvent('summary', { detail: { needsAttention } }));
     } catch (error) {
-      this.errorMessage = bodyMessage(error, CHECK_FAILED);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_DataHygiene_CheckFailed'));
     } finally {
       this.busy = false;
     }
@@ -85,8 +93,12 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
     this.errorMessage = undefined;
     try {
       const target = await openInFind({ checkKey: key });
+      // admin-5: Find opens the saved query by page state, so the toast says it is open.
       Toast.show(
-        { label: OPENED_NOTICE.replace('{0}', target.savedQueryName), variant: 'info' },
+        {
+          label: helpText('Core', 'Core_DataHygiene_OpenedInFind', target.savedQueryName),
+          variant: 'info'
+        },
         this
       );
       this[NavigationMixin.Navigate]({
@@ -95,7 +107,7 @@ export default class DataHygieneConsole extends NavigationMixin(LightningElement
         state: { [target.stateKey]: target.savedQueryId }
       });
     } catch (error) {
-      this.errorMessage = bodyMessage(error, CHECK_FAILED);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_DataHygiene_CheckFailed'));
     } finally {
       this.busy = false;
     }

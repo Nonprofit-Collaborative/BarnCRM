@@ -227,7 +227,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As the admin, open the **BarnCRM Programs** app. | **Programs Dashboard** is the first tab. |
-| 2 | Open **Programs Dashboard**. | Period **This Month**; six tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Services Delivered, Attendance Rate) and a **By Program** table listing every Active program by name. |
+| 2 | Open **Programs Dashboard**. | Period **This Month**; seven tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Counted Without Names, Services Delivered, Attendance Rate) and a **By Program** table listing every Active program by name. |
 | 3 | Compare the program's row with its **Program Roster** panel and today's log. | Open Enrollments matches the roster's Applied plus Enrolled; Services Delivered counts the Present delivery only; Attendance Rate is 50%; People Served is 1. |
 | 4 | Pick **Last Year**. | The figures reload for last year; a program with no activity then shows 0 and "None yet" for the rate. |
 | 5 | Click a program's name. | The program opens. |
@@ -244,7 +244,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open BarnCRM's import and upload the CSV. | **Program roster** is offered as a template. |
+| 1 | Open BarnCRM's import and upload the CSV. | **Program Roster** is offered as a template. |
 | 2 | Choose it and preview. | Columns map to Program and the enrollment's fields with no manual mapping. |
 | 3 | Load it. | 2 loaded, 3 not loaded: no program "No Such Program", no person with nobody@example.org, and the repeated first email refused as an open enrollment already in Test Pantry. |
 | 4 | Open Test Pantry's **Program Roster** panel. | The first person Enrolled with your start date and Referral Source School; the second Enrolled from today. |
@@ -252,3 +252,153 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 6 | Undo the import. | Both enrollments are removed; the program stays. |
 
 **Cleanup:** none after the undo.
+
+## T-PRG-16: Only a Person Is Enrolled or Served
+
+**Purpose:** confirm an organization or household account is refused on every path, and that Health Check reports Nonprofit Cloud Program Management when the org has it.
+**Prerequisites:** the admin user; an Active program with a service; an organization account and a household account; for step 4, a person account org; for step 5, an org with Nonprofit Cloud Program Management (optional).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Enrollments** tab, click **New**, choose the program and the organization account as **Account**, and save. | The save is refused: "Choose a person. An organization or household account cannot be enrolled or receive a service." |
+| 2 | Open the **Service Deliveries** tab, click **New**, choose the service, the household account, a Delivery Date and Attendance, and save. | The same message. |
+| 3 | Enroll a contact, then edit the enrollment: clear **Contact** and choose the organization account. | The same message. |
+| 4 | In a person account org, enroll a person account. | It saves. |
+| 5 | In an org with Nonprofit Cloud Program Management, run **Health Check**. | An information finding says the org also has Nonprofit Cloud Program Management, with no fix. BarnCRM Settings, **Integrations** lists it under **Alternatives to BarnCRM Modules**. In barn-sales neither appears. |
+
+**Cleanup:** delete the test enrollments.
+
+## T-PRG-17: Count People Without Names
+
+**Purpose:** confirm a drop-in count is added from the Service Delivery Log, totals for the day, and shows on the dashboard apart from named people.
+**Prerequisites:** the admin user and the staff user; an Active program with an Active service and one enrolled test person with a Present delivery today (T-PRG-09).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the staff user, open the program. Under the log's rows, find **People counted without names for this service and day**. | It reads 0, with **People Served, Not Named** and a disabled **Add to the Count**. |
+| 2 | Enter 12 and click **Add to the Count**. | "Added 12 to the count." and the total reads 12. |
+| 3 | Enter 8 and click **Add to the Count**. | The total reads 20 (each click adds a row). |
+| 4 | Change the **Date** to yesterday. | The total reads 0. Change it back to today. |
+| 5 | Open the **Service Counts** tab. | Two rows for today (12 and 8) in **All Service Counts**; **This Week** lists them too. |
+| 6 | Edit one row to -3 and save. | Refused: People Served cannot be negative. |
+| 7 | Open the **Programs Dashboard**, period **This Month**. | **Counted Without Names** shows 20 (more if earlier counts exist this month); **People Served** is unchanged and counts only named people. The program's row shows the same 20 in its own column. |
+| 8 | As a Read Only user, open the program and the dashboard. | The log shows the total without the input and button; the dashboard shows the figure. |
+| 9 | As the admin, try to delete the service. | Refused: a service with counts is kept. |
+
+**Cleanup:** delete the two counts and the test delivery.
+
+## T-PRG-18: Referrals In and Out
+
+**Purpose:** confirm referrals record direction, status and outcome, are private, and are deleted when their person is erased.
+**Prerequisites:** the admin user and a staff user with the Programs Staff set; a test person enrolled in a program.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the staff user, open the enrollment and, in **Referrals**, click **New**. | The form shows **Direction** (Out by default), **Referral Date** (today), **Status** (Open) and **Outcome**. |
+| 2 | Save with neither **Contact** nor **Account**. | Refused: a referral is one person. |
+| 3 | Pick the test person's contact, **Other Organization** "Legal Aid Clinic", and save. | The referral is listed on the enrollment. |
+| 4 | Edit it: **Status** Closed, **Outcome** Service Received. | Saved. |
+| 5 | Open the **Referrals** tab, **Open Referrals**. | The closed referral is not listed; **All Referrals** lists it. |
+| 6 | Make a second referral as the admin, **Direction** In. As the staff user open **All Referrals**. | Only the staff user's own referral is listed. |
+| 7 | As a Read Only user, look for the **Referrals** tab. | Not available. |
+| 8 | As a staff user, try to delete a referral. | No Delete is offered. |
+| 9 | As the admin, erase the test person (see [Erase a Person](../admin-guide/erase-a-person.md)). | The erasure result lists the person's **Referrals** as deleted; the enrollment is kept. |
+
+**Cleanup:** delete the remaining test referrals and enrollment.
+
+## T-PRG-19: Eligibility Screening Rules
+
+**Purpose:** confirm rules are built and checked, the preview matches what screening saves, and a decision made by hand is not overwritten.
+**Prerequisites:** the admin user and a staff user; a program with three open enrollments whose **Referral Source** is Self, School and Other.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open the program. Find the **Eligibility Rules** panel. | It says there are no rules yet; **Add a Rule** is offered. |
+| 2 | Click **Add a Rule**. Condition: **Referral Source** equal to Self. **Result** Not Eligible, **Reason** "Self referral is not accepted", **Eligibility Basis** Referral. Add a second rule: **Referral Source** one of "School, Another Agency", **Result** Eligible, **Reason** "Referred by a partner". Leave **Default Result** at Review. | **Unsaved changes** shows; **Save Rules** is enabled. |
+| 3 | Under **Preview and Screen**, pick each person in turn. | Self: "These rules would give Not Eligible: Self referral is not accepted"; School: Eligible with its reason; Other: Review with "No rule applied." |
+| 4 | Click **Screen Open Enrollments** before saving. | "Save the rules first". Nothing changes. |
+| 5 | Click **Save Rules**, then **Screen Open Enrollments**. | "Screened: 1 Eligible, 1 Not Eligible, 1 Review, 0 left alone." |
+| 6 | Open each enrollment. | Self: **Not Eligible**, Basis Referral, the reason, **Eligibility Date** today. School: **Eligible** with its date. Other: **Review**, reason "No rule applied.", no date. |
+| 7 | Set Other to **Eligible** by hand, then screen again. | "... 1 left alone." and Other is still Eligible. Tick **Also screen enrollments already Eligible or Not Eligible** and screen again: Other returns to Review. |
+| 8 | Add a rule whose condition field is blank, or clear a rule's **Reason**, and **Save Rules**. | Refused with a sentence naming the rule; the saved rules are unchanged. |
+| 9 | Move rule 2 above rule 1, save, and preview Self. | Unchanged result (the rules do not overlap); with a rule 1 of **Referral Source** not blank, moving it first decides every row. |
+| 10 | As the staff user, open the program. | The rules show but cannot be changed; **Screen Open Enrollments** works. |
+
+**Cleanup:** clear the rules (remove each rule and **Save Rules**) and reset the enrollments' eligibility.
+
+## T-PRG-20: Keep a Service Plan With Goals, Steps, Reviews and Notes
+
+**Purpose:** confirm staff keep a participant's goals and steps on the enrollment, that the dates fill in, that reviews and notes attach to a goal, that a plan is seen as its enrollment is, and that erasing the person deletes it.
+**Prerequisites:** the admin user; a staff user with a BarnCRM role of Team Member (Programs Staff); the Read Only user; a program with a test person enrolled ("Test Person"). For step 9, Logic Models installed with a logic model for that program holding an outcome.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the staff user, open Test Person's enrollment. | The **Service Plan** panel is at the top, saying there are no goals yet, with **Add Goal**. |
+| 2 | Click **Add Goal**, type "Find stable housing", Status In Progress, a Target Date next month, a Next Review date of yesterday. Save. | The goal is listed with "Target (the date)" and **Review due**. |
+| 3 | Under the goal add the steps "Apply" and "Visit". Tick "Apply". | "1 of 2 steps done"; opening the step record shows today as Completed Date. Untick it: the Completed Date empties. |
+| 4 | Click **Mark Reviewed**. | A date three months on is offered. Save Review: Last reviewed is today, Next review the date offered, **Review due** is gone. |
+| 5 | Click **New Note** under the goal, write a Subject, Save, and go back to the enrollment. | The new note opened with Enrollment and Goal filled in; the goal lists it under **Case Notes**. |
+| 6 | Create a case note on another of Test Person's enrollments and pick this goal. | Refused: choose a goal of this enrollment. |
+| 7 | **Edit Goal**, set Status to Achieved. Save. | The goal moves below open goals with "Closed (today)"; **Mark Reviewed** is no longer offered. |
+| 8 | As the staff user, try to delete the goal from its record page. | No Delete action. As the Read Only user, open the enrollment: the plan is shown with no Add Goal, Edit Goal, step boxes or New Note. |
+| 9 | With Logic Models: as the staff user, **Edit Goal** and open **Outcome**. | "No outcome", then the program's model's outcomes, then the organization model's. Pick one and save: "Works toward (the outcome)". Without Logic Models there is no Outcome field. |
+| 10 | Set Participant Privacy to **Private** and open the enrollment as a second staff user it is not shared with. | Neither the enrollment nor its goals are visible; the **Goals** tab does not list the goal. Set it back to Shared. |
+| 11 | As the admin, erase Test Person. | The summary lists Goals as deleted; the goal and its steps are gone, the enrollment stays. |
+
+**Cleanup:** delete the enrollments; remove the staff user's role.
+
+## T-PRG-21: Cohorts, Mass Enrollment, Scheduled Sessions and Session Attendance
+
+**Purpose:** confirm a cohort takes people already enrolled and enrolls new ones in one step, that sessions are scheduled over a date range, that attendance on a session is one service delivery per person and takes over a delivery already logged that day, and that a cancelled session takes no attendance.
+**Prerequisites:** the admin user; a staff user with a BarnCRM role of Team Member (Programs Staff); the Read Only user; a program with an active service "Tutoring", two people enrolled in it ("Ana" and "Ben") and a third person not enrolled ("Cara").
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the staff user, open the program and, in **Cohorts**, click **New**. Name it "Spring", Start Date the first of next month, End Date two weeks later. Save. | The cohort opens with the **Cohort Members** panel ("Members (0)") and the **Schedule Sessions** panel. An End Date before the Start Date is refused. |
+| 2 | Under **Add People**, tick Ana and Ben. Pick Cara under the person picker and click **Add to List**. Click **Add to Cohort**. | "3 people added." All three are members; Cara now has an Enrolled enrollment in the program, in the cohort. |
+| 3 | Pick Ana again, add her to the list and click **Add to Cohort**. | Ana is listed under **Not Added** with the reason; nobody is added twice. |
+| 4 | Click **Remove** by Ben. | Ben leaves the members and is offered again under the people to add; his enrollment stays, with no cohort. |
+| 5 | On an enrollment in another program, set **Cohort** to Spring. | Refused: the cohort must belong to the enrollment's program. |
+| 6 | In **Schedule Sessions**, pick Tutoring, keep the cohort's dates, tick Monday and Wednesday, set a Start Time. | The line under the form gives the number of sessions (4 for a range starting on a Monday). Click **Schedule**: "4 sessions scheduled.", listed under the cohort's **Sessions**, each named "Tutoring (date)". |
+| 7 | Set **To** before **From**, then untick every day. | The line asks for dates, then for days; **Schedule** is off. |
+| 8 | As the staff user, open the program's **Service Delivery Log**, pick Tutoring and the first session's date, mark Ana Present and save. Then open that session. | The session's log lists only the cohort members (Ana, Cara) with Ana already Present. |
+| 9 | Mark Cara Present and save. | "2 service deliveries saved."; the session's Status is Held. The session's **Service Deliveries** list shows two, and the program has no second delivery for Ana that day. |
+| 10 | Open another session and set its Status to Cancelled. | The log shows the session is cancelled with no controls; saving attendance on it is refused. |
+| 11 | Try to delete the held session. | Refused while it has service deliveries. |
+| 12 | As the Read Only user, open the cohort and a session. | Members, sessions and attendance are shown with no Add, Remove, Schedule or Save. |
+| 13 | On the program, schedule a session in **Schedule Sessions** (no cohort). Open it. | The log lists everyone with an open enrollment in the program. |
+
+**Cleanup:** delete the sessions without deliveries and the cohort; delete the enrollments; remove the staff user's role.
+
+## T-PRG-22: Schedule Sessions Twice Adds No Duplicates
+
+**Purpose:** confirm running **Schedule Sessions** again skips days that already have a session of the same service for the same cohort, and does not skip Cancelled ones.
+**Prerequisites:** T-PRG-21 step 6 done (the cohort "Spring" has 4 Tutoring sessions on its Mondays and Wednesdays); the staff user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the cohort, in **Schedule Sessions**, pick Tutoring, keep the same dates and days, and look at the line under the form. | "0 sessions will be scheduled. Days that already have a session are skipped: 4." **Schedule** is disabled. |
+| 2 | Add Friday to the days. | The line reads for example "2 sessions will be scheduled. Days that already have a session are skipped: 4." **Schedule** is enabled. |
+| 3 | Click **Schedule**. | "2 sessions scheduled. Days that already have a session are skipped: 4." |
+| 4 | Open the cohort's **Sessions** list. | 6 sessions in all, one per day; no day has two Tutoring sessions. |
+| 5 | Set one session's **Status** to **Cancelled**, then repeat the same schedule. | That day is scheduled again (a Cancelled session does not count); the other days are skipped. |
+| 6 | On the program (no cohort), schedule Tutoring over the same dates, then again. | The first run creates sessions with no cohort even though the cohort has sessions on those days; the second run skips them all and **Schedule** is disabled. |
+
+**Cleanup:** delete the sessions without deliveries and the cohort.
+
+## T-PRG-23: Unsaved Attendance Question
+
+**Purpose:** confirm changing the **Service** or **Date** with unsaved attendance asks first, and each choice does what it says.
+**Prerequisites:** the staff user; an Active program with two Active services ("Tutoring" and "Meals") and two enrolled test people ("Ana" and "Ben").
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the program. In **Service Delivery Log**, pick Tutoring and today's date. Look beside **Save**. | No unsaved hint. |
+| 2 | Mark Ana **Present**. | A small hint beside **Save** reads "1 unsaved change". Mark Ben Present too: "2 unsaved changes". |
+| 3 | Change **Service** to Meals. | A dialog **Save Attendance First?** opens: "You have unsaved attendance for Tutoring on (today's date). Changing the service or date reloads the list, so save it first or discard it." **Save** is chosen by default; the buttons are **Continue** and **Cancel**. |
+| 4 | Click **Cancel**. | The dialog closes, **Service** goes back to Tutoring and both marks are still there, with the hint. |
+| 5 | Change **Service** to Meals, keep **Save**, and click **Continue**. | The Tutoring attendance is saved ("2 service deliveries saved." or similar), then the Meals list loads with nobody marked and no hint. Changing back to Tutoring shows Ana and Ben Present. |
+| 6 | On Meals, mark Ana Present, then change **Date** to yesterday. Choose **Discard** and click **Continue**. | The mark is dropped and yesterday's Meals list loads with nobody marked and no hint. Today's Meals list has no delivery for Ana. |
+| 7 | Mark Ben Present on yesterday's list and click **Save**, then change **Date**. | No dialog (nothing is unsaved). |
+
+**Cleanup:** delete the test deliveries.

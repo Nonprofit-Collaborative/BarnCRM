@@ -16,9 +16,8 @@ import NO_GROUP from '@salesforce/label/c.Core_Find_NoGroup';
 import GROUP from '@salesforce/label/c.Core_Find_Group';
 import RESULT from '@salesforce/label/c.Core_Find_Result';
 import BLANK from '@salesforce/label/c.Core_Find_Blank';
-import CAPPED from '@salesforce/label/c.Core_Find_SummaryCapped';
-import LOADING from '@salesforce/label/c.Core_Find_Loading';
-import NOTHING_TO_SUMMARIZE from '@salesforce/label/c.Core_Find_SummaryNothing';
+import LOADING from '@salesforce/label/c.Core_EraseAction_Working';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const NUMBER_TYPES = new Set(['double', 'currency', 'percent', 'integer', 'long']);
 const DATE_TYPES = new Set(['date', 'datetime']);
@@ -31,6 +30,8 @@ const NOT_GROUPABLE = new Set(['textarea', 'datetime', 'multipicklist', 'address
  * The choice is reported in a `change` event so a saved query keeps it.
  */
 export default class FindSummaryPanel extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   @api objectApiName;
   /** The query document as Find has it now, without the summary. */
   @api queryJson;
@@ -41,7 +42,9 @@ export default class FindSummaryPanel extends LightningElement {
     summaryField: SUMMARY_FIELD,
     groupBy: GROUP_BY,
     loading: LOADING,
-    nothingToSummarize: NOTHING_TO_SUMMARIZE
+    get nothingToSummarize() {
+      return helpText('Core', 'Core_Find_SummaryNothing');
+    }
   };
 
   fn = 'count';
@@ -68,6 +71,11 @@ export default class FindSummaryPanel extends LightningElement {
   }
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.loadFields();
   }
 
@@ -142,7 +150,7 @@ export default class FindSummaryPanel extends LightningElement {
   }
 
   get cappedNote() {
-    return CAPPED.split('{0}').join('2,000');
+    return helpText('Core', 'Core_Find_SummaryCapped').split('{0}').join('2,000');
   }
 
   get summarizeDisabled() {

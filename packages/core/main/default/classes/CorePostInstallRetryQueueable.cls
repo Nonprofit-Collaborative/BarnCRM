@@ -19,109 +19,109 @@
  * throws: an install or an upgrade must not fail because of a background tidy-up.
  */
 public with sharing class CorePostInstallRetryQueueable implements Queueable {
-    /** How many times to look before giving up. */
-    @TestVisible
-    private static final Integer MAX_ATTEMPTS = 5;
+	/** How many times to look before giving up. */
+	@TestVisible
+	private static final Integer MAX_ATTEMPTS = 5;
 
-    /**
-     * How long to wait between attempts.
-     *
-     * A Queueable cannot sleep, so the wait is the job re-enqueueing itself with the
-     * delayed-execution overload of System.enqueueJob (available since API 60; this package
-     * is on 67). A minute is well under the few minutes the platform typically takes to
-     * finish calculating a packaged group, and MAX_ATTEMPTS gives five of them before the
-     * job gives up.
-     */
-    @TestVisible
-    private static final Integer RETRY_DELAY_MINUTES = 1;
+	/**
+	 * How long to wait between attempts.
+	 *
+	 * A Queueable cannot sleep, so the wait is the job re-enqueueing itself with the
+	 * delayed-execution overload of System.enqueueJob (available since API 60; this package
+	 * is on 67). A minute is well under the few minutes the platform typically takes to
+	 * finish calculating a packaged group, and MAX_ATTEMPTS gives five of them before the
+	 * job gives up.
+	 */
+	@TestVisible
+	private static final Integer RETRY_DELAY_MINUTES = 1;
 
-    private static final String CONTEXT = 'CorePostInstallRetryQueueable.execute';
+	private static final String CONTEXT = 'CorePostInstallRetryQueueable.execute';
 
-    private final Id installerId;
-    private final Integer attemptsLeft;
+	private final Id installerId;
+	private final Integer attemptsLeft;
 
-    /**
-     * Starts the wait with the full number of attempts.
-     *
-     * @param installerId the person who installed or upgraded the package
-     */
-    public CorePostInstallRetryQueueable(Id installerId) {
-        this(installerId, MAX_ATTEMPTS);
-    }
+	/**
+	 * Starts the wait with the full number of attempts.
+	 *
+	 * @param installerId the person who installed or upgraded the package
+	 */
+	public CorePostInstallRetryQueueable(Id installerId) {
+		this(installerId, MAX_ATTEMPTS);
+	}
 
-    /**
-     * Continues the wait with the attempts that are left.
-     *
-     * @param installerId the person who installed or upgraded the package
-     * @param attemptsLeft how many more times to look
-     */
-    public CorePostInstallRetryQueueable(Id installerId, Integer attemptsLeft) {
-        this.installerId = installerId;
-        this.attemptsLeft = attemptsLeft;
-    }
+	/**
+	 * Continues the wait with the attempts that are left.
+	 *
+	 * @param installerId the person who installed or upgraded the package
+	 * @param attemptsLeft how many more times to look
+	 */
+	public CorePostInstallRetryQueueable(Id installerId, Integer attemptsLeft) {
+		this.installerId = installerId;
+		this.attemptsLeft = attemptsLeft;
+	}
 
-    /**
-     * Looks once. Gives the permission set, assigns the role if the group is ready, queues
-     * another look if it is not, and writes a warning to the Error Log if the attempts run
-     * out.
-     *
-     * @param jobContext the platform's queueable context, not used
-     */
-    public void execute(QueueableContext jobContext) {
-        if (installerId == null) {
-            return;
-        }
-        assignPermissionSet();
-        try {
-            if (AccessService.tryAssignRoleDuringInstall(installerId, AccessService.ADMIN_ROLE)) {
-                return;
-            }
-            if (attemptsLeft > 1) {
-                System.enqueueJob(
-                    new CorePostInstallRetryQueueable(installerId, attemptsLeft - 1),
-                    RETRY_DELAY_MINUTES
-                );
-                return;
-            }
-            giveUp();
-        } catch (Exception e) {
-            ErrorLogger.log(e, CONTEXT);
-        }
-    }
+	/**
+	 * Looks once. Gives the permission set, assigns the role if the group is ready, queues
+	 * another look if it is not, and writes a warning to the Error Log if the attempts run
+	 * out.
+	 *
+	 * @param jobContext the platform's queueable context, not used
+	 */
+	public void execute(QueueableContext jobContext) {
+		if (installerId == null) {
+			return;
+		}
+		assignPermissionSet();
+		try {
+			if (AccessService.tryAssignRoleDuringInstall(installerId, AccessService.ADMIN_ROLE)) {
+				return;
+			}
+			if (attemptsLeft > 1) {
+				System.enqueueJob(
+					new CorePostInstallRetryQueueable(installerId, attemptsLeft - 1),
+					RETRY_DELAY_MINUTES
+				);
+				return;
+			}
+			giveUp();
+		} catch (Exception e) {
+			ErrorLogger.log(e, CONTEXT);
+		}
+	}
 
-    /**
-     * The permission set, on its own, so that a failure here still leaves the role to be
-     * tried: the role carries the same permission set, so either one gets the installer in.
-     */
-    private void assignPermissionSet() {
-        try {
-            AccessService.assignPermissionSetDuringInstall(
-                installerId,
-                AccessService.ADMIN_PERMISSION_SET
-            );
-            // The switchable tabs come from the BarnCRM Tab sets (ADR-0124): one pass here
-            // gives the installer theirs at once; the install's own queued sync does the rest.
-            TabAccessService.syncNow();
-        } catch (Exception e) {
-            ErrorLogger.log(e, CONTEXT);
-        }
-    }
+	/**
+	 * The permission set, on its own, so that a failure here still leaves the role to be
+	 * tried: the role carries the same permission set, so either one gets the installer in.
+	 */
+	private void assignPermissionSet() {
+		try {
+			AccessService.assignPermissionSetDuringInstall(
+				installerId,
+				AccessService.ADMIN_PERMISSION_SET
+			);
+			// The switchable tabs come from the BarnCRM Tab sets (ADR-0124): one pass here
+			// gives the installer theirs at once; the install's own queued sync does the rest.
+			TabAccessService.syncNow();
+		} catch (Exception e) {
+			ErrorLogger.log(e, CONTEXT);
+		}
+	}
 
-    /**
-     * Records that the role was never handed out, and what to do about it.
-     *
-     * The Error Log takes an exception, so the warning is carried as one. Nothing rethrows
-     * it: this is a note for the administrator, not a failure.
-     */
-    private void giveUp() {
-        ErrorLogger.log(
-            new AccessService.AccessException(
-                String.format(
-                    System.Label.Core_PostInstall_AdminRoleNotGiven,
-                    new List<Object>{ String.valueOf(MAX_ATTEMPTS) }
-                )
-            ),
-            CONTEXT
-        );
-    }
+	/**
+	 * Records that the role was never handed out, and what to do about it.
+	 *
+	 * The Error Log takes an exception, so the warning is carried as one. Nothing rethrows
+	 * it: this is a note for the administrator, not a failure.
+	 */
+	private void giveUp() {
+		ErrorLogger.log(
+			new AccessService.AccessException(
+				String.format(
+					BarnHelp.text('Core', 'Core_PostInstall_AdminRoleNotGiven'),
+					new List<Object>{ String.valueOf(MAX_ATTEMPTS) }
+				)
+			),
+			CONTEXT
+		);
+	}
 }

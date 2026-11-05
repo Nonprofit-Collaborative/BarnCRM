@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <template lwc:if={shown}>
         <section class="slds-var-m-top_medium">
             <template lwc:if={showIntro}>
@@ -92,5 +93,6 @@
                 </div>
             </template>
         </section>
+    </template>
     </template>
 </template>

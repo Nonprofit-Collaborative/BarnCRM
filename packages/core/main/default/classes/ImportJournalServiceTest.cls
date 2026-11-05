@@ -4,280 +4,280 @@
  */
 @IsTest(testFor='ApexClass:ImportJournalService')
 private class ImportJournalServiceTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.admin();
+	}
 
-    private static Import_Batch__c newBatch() {
-        TestDataFactory.defaultSettings();
-        return ImportTestDataFactory.batch(
-            ImportTestDataFactory.template(
-                ImportTestDataFactory.donorMapping(),
-                ImportTemplateService.RULE_EMAIL
-            )
-        );
-    }
+	private static Import_Batch__c newBatch() {
+		TestDataFactory.defaultSettings();
+		return ImportTestDataFactory.batch(
+			ImportTestDataFactory.template(
+				ImportTestDataFactory.donorMapping(),
+				ImportTemplateService.RULE_EMAIL
+			)
+		);
+	}
 
-    private static Map<String, Object> anUpdate(Integer row) {
-        return ImportJournalService.updated(
-            'Contact',
-            null,
-            row,
-            new Map<String, Object>{ 'Email' => 'old@example.org' },
-            new Map<String, Object>{ 'Email' => 'new@example.org' }
-        );
-    }
+	private static Map<String, Object> anUpdate(Integer row) {
+		return ImportJournalService.updated(
+			'Contact',
+			null,
+			row,
+			new Map<String, Object>{ 'Email' => 'old@example.org' },
+			new Map<String, Object>{ 'Email' => 'new@example.org' }
+		);
+	}
 
-    @IsTest
-    static void writesOnePageAndReadsItBackAsWritten() {
-        System.runAs(TestUsers.admin()) {
-            Import_Batch__c batch = newBatch();
-            Test.startTest();
-            Boolean written = ImportJournalService.write(
-                batch.Id,
-                ImportJournalService.PHASE_COMMIT,
-                new List<Map<String, Object>>{ anUpdate(2), anUpdate(3) }
-            );
-            Test.stopTest();
+	@IsTest
+	static void writesOnePageAndReadsItBackAsWritten() {
+		System.runAs(TestUsers.admin()) {
+			Import_Batch__c batch = newBatch();
+			Test.startTest();
+			Boolean written = ImportJournalService.write(
+				batch.Id,
+				ImportJournalService.PHASE_COMMIT,
+				new List<Map<String, Object>>{ anUpdate(2), anUpdate(3) }
+			);
+			Test.stopTest();
 
-            Assert.isTrue(written, 'The page was written.');
-            List<Import_Journal__c> pages = ImportJournalService.pages(
-                batch.Id,
-                ImportJournalService.PHASE_COMMIT,
-                10
-            );
-            Assert.areEqual(1, pages.size(), 'Two entries fit one page (R-IJ1).');
-            Assert.areEqual(2, pages[0].Entry_Count__c, 'The page counts its entries.');
-            Map<String, Object> entry = ImportJournalService.entries(pages[0])[0];
-            Map<String, Object> email = (Map<String, Object>) ((Map<String, Object>) entry.get(
-                    'fields'
-                ))
-                .get('Email');
-            Assert.areEqual('old@example.org', email.get('before'), 'The value before is kept.');
-            Assert.areEqual('new@example.org', email.get('after'), 'And the value written.');
-            Assert.areEqual(
-                2,
-                ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_COMMIT),
-                'The total is a sum of the pages.'
-            );
-        }
-    }
+			Assert.isTrue(written, 'The page was written.');
+			List<Import_Journal__c> pages = ImportJournalService.pages(
+				batch.Id,
+				ImportJournalService.PHASE_COMMIT,
+				10
+			);
+			Assert.areEqual(1, pages.size(), 'Two entries fit one page (R-IJ1).');
+			Assert.areEqual(2, pages[0].Entry_Count__c, 'The page counts its entries.');
+			Map<String, Object> entry = ImportJournalService.entries(pages[0])[0];
+			Map<String, Object> email = (Map<String, Object>) ((Map<String, Object>) entry.get(
+					'fields'
+				))
+				.get('Email');
+			Assert.areEqual('old@example.org', email.get('before'), 'The value before is kept.');
+			Assert.areEqual('new@example.org', email.get('after'), 'And the value written.');
+			Assert.areEqual(
+				2,
+				ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_COMMIT),
+				'The total is a sum of the pages.'
+			);
+		}
+	}
 
-    @IsTest
-    static void aPageTooLargeIsSplitNotShortened() {
-        System.runAs(TestUsers.admin()) {
-            Import_Batch__c batch = newBatch();
-            List<Map<String, Object>> entries = new List<Map<String, Object>>();
-            for (Integer i = 0; i < 4; i++) {
-                entries.add(anUpdate(i + 2));
-            }
-            Integer onePage = JSON.serialize(
-                    new Map<String, Object>{ 'version' => 1, 'entries' => entries }
-                )
-                .length();
-            ImportJournalService.maxDocumentLength = onePage / 2;
+	@IsTest
+	static void aPageTooLargeIsSplitNotShortened() {
+		System.runAs(TestUsers.admin()) {
+			Import_Batch__c batch = newBatch();
+			List<Map<String, Object>> entries = new List<Map<String, Object>>();
+			for (Integer i = 0; i < 4; i++) {
+				entries.add(anUpdate(i + 2));
+			}
+			Integer onePage = JSON.serialize(
+					new Map<String, Object>{ 'version' => 1, 'entries' => entries }
+				)
+				.length();
+			ImportJournalService.maxDocumentLength = onePage / 2;
 
-            Test.startTest();
-            ImportJournalService.write(batch.Id, ImportJournalService.PHASE_COMMIT, entries);
-            Test.stopTest();
+			Test.startTest();
+			ImportJournalService.write(batch.Id, ImportJournalService.PHASE_COMMIT, entries);
+			Test.stopTest();
 
-            List<Import_Journal__c> pages = ImportJournalService.pages(
-                batch.Id,
-                ImportJournalService.PHASE_COMMIT,
-                10
-            );
-            Assert.isTrue(pages.size() > 1, 'The entries were spread over more than one page.');
-            Assert.areEqual(
-                4,
-                ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_COMMIT),
-                'And none was lost, because a lost entry is a change nobody can put back.'
-            );
-        }
-    }
+			List<Import_Journal__c> pages = ImportJournalService.pages(
+				batch.Id,
+				ImportJournalService.PHASE_COMMIT,
+				10
+			);
+			Assert.isTrue(pages.size() > 1, 'The entries were spread over more than one page.');
+			Assert.areEqual(
+				4,
+				ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_COMMIT),
+				'And none was lost, because a lost entry is a change nobody can put back.'
+			);
+		}
+	}
 
-    @IsTest
-    static void anEntryTooLargeForAnyPageIsLoggedAndTheOthersAreWritten() {
-        System.runAs(TestUsers.admin()) {
-            Import_Batch__c batch = newBatch();
-            Map<String, Object> small = anUpdate(2);
-            Map<String, Object> large = anUpdate(3);
-            ((Map<String, Object>) large.get('fields'))
-                .put(
-                    'Description',
-                    new Map<String, Object>{
-                        'before' => 'x'.repeat(4000),
-                        'after' => 'y'.repeat(4000)
-                    }
-                );
-            ImportJournalService.maxDocumentLength = 2000;
-            Test.startTest();
-            Boolean written = ImportJournalService.write(
-                batch.Id,
-                ImportJournalService.PHASE_COMMIT,
-                new List<Map<String, Object>>{ small, large }
-            );
-            Test.stopTest();
-            Assert.isFalse(written, 'The caller is told, so the run log can say so (R-IJ4).');
-            Assert.areEqual(
-                1,
-                ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_COMMIT),
-                'The entry that fits is still written (R-IJ1).'
-            );
-            Assert.areEqual(
-                1,
-                [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'ImportJournalService.write'],
-                'And the one that does not is in the Error Log.'
-            );
-        }
-    }
+	@IsTest
+	static void anEntryTooLargeForAnyPageIsLoggedAndTheOthersAreWritten() {
+		System.runAs(TestUsers.admin()) {
+			Import_Batch__c batch = newBatch();
+			Map<String, Object> small = anUpdate(2);
+			Map<String, Object> large = anUpdate(3);
+			((Map<String, Object>) large.get('fields'))
+				.put(
+					'Description',
+					new Map<String, Object>{
+						'before' => 'x'.repeat(4000),
+						'after' => 'y'.repeat(4000)
+					}
+				);
+			ImportJournalService.maxDocumentLength = 2000;
+			Test.startTest();
+			Boolean written = ImportJournalService.write(
+				batch.Id,
+				ImportJournalService.PHASE_COMMIT,
+				new List<Map<String, Object>>{ small, large }
+			);
+			Test.stopTest();
+			Assert.isFalse(written, 'The caller is told, so the run log can say so (R-IJ4).');
+			Assert.areEqual(
+				1,
+				ImportJournalService.entryCount(batch.Id, ImportJournalService.PHASE_COMMIT),
+				'The entry that fits is still written (R-IJ1).'
+			);
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'ImportJournalService.write'],
+				'And the one that does not is in the Error Log.'
+			);
+		}
+	}
 
-    @IsTest
-    static void aPageHoldsAtMostTheEntryCap() {
-        System.runAs(TestUsers.admin()) {
-            Import_Batch__c batch = newBatch();
-            ImportJournalService.maxEntriesPerPage = 2;
-            ImportJournalService.write(
-                batch.Id,
-                ImportJournalService.PHASE_COMMIT,
-                new List<Map<String, Object>>{ anUpdate(2), anUpdate(3), anUpdate(4), anUpdate(5) }
-            );
-            Assert.areEqual(
-                2,
-                [SELECT COUNT() FROM Import_Journal__c WHERE Import_Batch__c = :batch.Id],
-                'Four entries at two a page are two pages.'
-            );
-        }
-    }
+	@IsTest
+	static void aPageHoldsAtMostTheEntryCap() {
+		System.runAs(TestUsers.admin()) {
+			Import_Batch__c batch = newBatch();
+			ImportJournalService.maxEntriesPerPage = 2;
+			ImportJournalService.write(
+				batch.Id,
+				ImportJournalService.PHASE_COMMIT,
+				new List<Map<String, Object>>{ anUpdate(2), anUpdate(3), anUpdate(4), anUpdate(5) }
+			);
+			Assert.areEqual(
+				2,
+				[SELECT COUNT() FROM Import_Journal__c WHERE Import_Batch__c = :batch.Id],
+				'Four entries at two a page are two pages.'
+			);
+		}
+	}
 
-    @IsTest
-    static void nothingToWriteWritesNothing() {
-        System.runAs(TestUsers.admin()) {
-            Import_Batch__c batch = newBatch();
-            Assert.isTrue(
-                ImportJournalService.write(
-                    batch.Id,
-                    ImportJournalService.PHASE_UNDO,
-                    new List<Map<String, Object>>()
-                ),
-                'An empty chunk is not a failure.'
-            );
-            Assert.areEqual(0, [SELECT COUNT() FROM Import_Journal__c], 'And writes no page.');
-        }
-    }
+	@IsTest
+	static void nothingToWriteWritesNothing() {
+		System.runAs(TestUsers.admin()) {
+			Import_Batch__c batch = newBatch();
+			Assert.isTrue(
+				ImportJournalService.write(
+					batch.Id,
+					ImportJournalService.PHASE_UNDO,
+					new List<Map<String, Object>>()
+				),
+				'An empty chunk is not a failure.'
+			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Import_Journal__c], 'And writes no page.');
+		}
+	}
 
-    @IsTest
-    static void keptAndNotRestoredEntriesCarryTheirReasons() {
-        System.runAs(TestUsers.admin()) {
-            Map<String, Object> kept = ImportJournalService.kept(
-                'Account',
-                null,
-                'The Smith Family',
-                'Somebody else lives here.'
-            );
-            Map<String, Object> notRestored = ImportJournalService.notRestored(
-                'Contact',
-                null,
-                'Email',
-                'Changed since the import.'
-            );
-            Assert.areEqual(ImportJournalService.ACTION_KEPT, kept.get('action'), 'A kept record.');
-            Assert.areEqual('Somebody else lives here.', kept.get('reason'), 'With its reason.');
-            Assert.areEqual(
-                'Email',
-                notRestored.get('field'),
-                'A value left alone names its field.'
-            );
-        }
-    }
+	@IsTest
+	static void keptAndNotRestoredEntriesCarryTheirReasons() {
+		System.runAs(TestUsers.admin()) {
+			Map<String, Object> kept = ImportJournalService.kept(
+				'Account',
+				null,
+				'The Smith Family',
+				'Somebody else lives here.'
+			);
+			Map<String, Object> notRestored = ImportJournalService.notRestored(
+				'Contact',
+				null,
+				'Email',
+				'Changed since the import.'
+			);
+			Assert.areEqual(ImportJournalService.ACTION_KEPT, kept.get('action'), 'A kept record.');
+			Assert.areEqual('Somebody else lives here.', kept.get('reason'), 'With its reason.');
+			Assert.areEqual(
+				'Email',
+				notRestored.get('field'),
+				'A value left alone names its field.'
+			);
+		}
+	}
 
-    /**
-     * Refusals journaled after many pages of saved records are still found, a few pages at a
-     * time, and counting reads the same way (FINDB-17).
-     */
-    @IsTest
-    static void theFirstRefusalsAreFoundPastTheFirstPagesAFewPagesAtATime() {
-        System.runAs(TestUsers.admin()) {
-            Import_Batch__c batch = newBatch();
-            ImportJournalService.maxEntriesPerPage = 10;
-            ImportJournalService.pagesPerRead = 4;
-            List<Map<String, Object>> entries = new List<Map<String, Object>>();
-            for (Integer row = 0; row < 250; row++) {
-                entries.add(anUpdate(row));
-            }
-            Id someone =
-                Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
-                '000000000001AAA';
-            for (Integer index = 0; index < 30; index++) {
-                entries.add(ImportJournalService.failed('Contact', someone, 'Refused ' + index));
-            }
-            Assert.isTrue(
-                ImportJournalService.write(batch.Id, ImportJournalService.PHASE_COMMIT, entries)
-            );
+	/**
+	 * Refusals journaled after many pages of saved records are still found, a few pages at a
+	 * time, and counting reads the same way (FINDB-17).
+	 */
+	@IsTest
+	static void theFirstRefusalsAreFoundPastTheFirstPagesAFewPagesAtATime() {
+		System.runAs(TestUsers.admin()) {
+			Import_Batch__c batch = newBatch();
+			ImportJournalService.maxEntriesPerPage = 10;
+			ImportJournalService.pagesPerRead = 4;
+			List<Map<String, Object>> entries = new List<Map<String, Object>>();
+			for (Integer row = 0; row < 250; row++) {
+				entries.add(anUpdate(row));
+			}
+			Id someone =
+				Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+				'000000000001AAA';
+			for (Integer index = 0; index < 30; index++) {
+				entries.add(ImportJournalService.failed('Contact', someone, 'Refused ' + index));
+			}
+			Assert.isTrue(
+				ImportJournalService.write(batch.Id, ImportJournalService.PHASE_COMMIT, entries)
+			);
 
-            Test.startTest();
-            List<Map<String, Object>> first = ImportJournalService.firstWithAction(
-                batch.Id,
-                ImportJournalService.PHASE_COMMIT,
-                ImportJournalService.ACTION_FAILED,
-                20
-            );
-            Integer failed = ImportJournalService.actionCount(
-                batch.Id,
-                ImportJournalService.PHASE_COMMIT,
-                ImportJournalService.ACTION_FAILED
-            );
-            Integer updated = ImportJournalService.actionCount(
-                batch.Id,
-                ImportJournalService.PHASE_COMMIT,
-                ImportJournalService.ACTION_UPDATED
-            );
-            Test.stopTest();
+			Test.startTest();
+			List<Map<String, Object>> first = ImportJournalService.firstWithAction(
+				batch.Id,
+				ImportJournalService.PHASE_COMMIT,
+				ImportJournalService.ACTION_FAILED,
+				20
+			);
+			Integer failed = ImportJournalService.actionCount(
+				batch.Id,
+				ImportJournalService.PHASE_COMMIT,
+				ImportJournalService.ACTION_FAILED
+			);
+			Integer updated = ImportJournalService.actionCount(
+				batch.Id,
+				ImportJournalService.PHASE_COMMIT,
+				ImportJournalService.ACTION_UPDATED
+			);
+			Test.stopTest();
 
-            Assert.areEqual(20, first.size(), 'Twenty shown, from page 26 on');
-            Assert.areEqual('Refused 0', first[0].get('reason'), 'In the order written');
-            Assert.areEqual(30, failed, 'Every refusal counted');
-            Assert.areEqual(250, updated, 'Every saved record counted');
-        }
-    }
+			Assert.areEqual(20, first.size(), 'Twenty shown, from page 26 on');
+			Assert.areEqual('Refused 0', first[0].get('reason'), 'In the order written');
+			Assert.areEqual(30, failed, 'Every refusal counted');
+			Assert.areEqual(250, updated, 'Every saved record counted');
+		}
+	}
 
-    /** Pages sharing one CreatedDate are still read in full, once each, in the order written. */
-    @IsTest
-    static void pagingHoldsAcrossPagesWithTheSameCreatedDate() {
-        System.runAs(TestUsers.admin()) {
-            Import_Batch__c batch = newBatch();
-            ImportJournalService.maxEntriesPerPage = 10;
-            ImportJournalService.pagesPerRead = 3;
-            List<Map<String, Object>> entries = new List<Map<String, Object>>();
-            for (Integer row = 0; row < 100; row++) {
-                entries.add(anUpdate(row));
-            }
-            Assert.isTrue(
-                ImportJournalService.write(batch.Id, ImportJournalService.PHASE_COMMIT, entries)
-            );
-            Datetime sameMoment = Datetime.now().addDays(-1);
-            for (Import_Journal__c page : [SELECT Id FROM Import_Journal__c]) {
-                Test.setCreatedDate(page.Id, sameMoment);
-            }
+	/** Pages sharing one CreatedDate are still read in full, once each, in the order written. */
+	@IsTest
+	static void pagingHoldsAcrossPagesWithTheSameCreatedDate() {
+		System.runAs(TestUsers.admin()) {
+			Import_Batch__c batch = newBatch();
+			ImportJournalService.maxEntriesPerPage = 10;
+			ImportJournalService.pagesPerRead = 3;
+			List<Map<String, Object>> entries = new List<Map<String, Object>>();
+			for (Integer row = 0; row < 100; row++) {
+				entries.add(anUpdate(row));
+			}
+			Assert.isTrue(
+				ImportJournalService.write(batch.Id, ImportJournalService.PHASE_COMMIT, entries)
+			);
+			Datetime sameMoment = Datetime.now().addDays(-1);
+			for (Import_Journal__c page : [SELECT Id FROM Import_Journal__c]) {
+				Test.setCreatedDate(page.Id, sameMoment);
+			}
 
-            Test.startTest();
-            Integer updated = ImportJournalService.actionCount(
-                batch.Id,
-                ImportJournalService.PHASE_COMMIT,
-                ImportJournalService.ACTION_UPDATED
-            );
-            List<Map<String, Object>> first = ImportJournalService.firstWithAction(
-                batch.Id,
-                ImportJournalService.PHASE_COMMIT,
-                ImportJournalService.ACTION_UPDATED,
-                100
-            );
-            Test.stopTest();
+			Test.startTest();
+			Integer updated = ImportJournalService.actionCount(
+				batch.Id,
+				ImportJournalService.PHASE_COMMIT,
+				ImportJournalService.ACTION_UPDATED
+			);
+			List<Map<String, Object>> first = ImportJournalService.firstWithAction(
+				batch.Id,
+				ImportJournalService.PHASE_COMMIT,
+				ImportJournalService.ACTION_UPDATED,
+				100
+			);
+			Test.stopTest();
 
-            Assert.areEqual(100, updated, 'Every entry counted across 10 pages of one moment');
-            Assert.areEqual(100, first.size(), 'None skipped or repeated');
-            Assert.areEqual(0, first[0].get('row'), 'In the order written');
-            Assert.areEqual(99, first[99].get('row'), 'To the last');
-        }
-    }
+			Assert.areEqual(100, updated, 'Every entry counted across 10 pages of one moment');
+			Assert.areEqual(100, first.size(), 'None skipped or repeated');
+			Assert.areEqual(0, first[0].get('row'), 'In the order written');
+			Assert.areEqual(99, first[99].get('row'), 'To the last');
+		}
+	}
 }

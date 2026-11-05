@@ -71,13 +71,16 @@ earlier release keeps every feature on and is not held.
      This is the only place the edition is asked; the Setup Assistant's first step shows the
      same answer and is marked **Done** as soon as you finish.
   2. **What to turn on**: **Turn on all the default core features** (every feature on, the
-     usual choice), or **Let me choose features**, which lists the features described below,
-     all ticked, each with a help icon. Untick what you do not want yet.
+     usual choice), with the features listed under it by name, one plain line each, or **Let
+     me choose features**, which lists the same features, all ticked, each with a help icon.
+     Untick what you do not want yet. Under the choice the window says: "You can turn more
+     features on later in BarnCRM Settings, General. A feature you turn on stays on, so if you
+     are unsure, leave it off for now."
 
   The window is a standard Salesforce dialog: focus stays inside it, and neither Escape nor
   its close button closes it (the close button is shown greyed out). Click **Finish Setup**. What you left ticked is turned on fully: its tabs, its settings and
   its automations. Finishing also gives the tool tabs (Data Manager, Import, Find, Org
-  Optimizer, Bulk Update) of every feature that is on to everyone holding a BarnCRM role, within
+  Optimizer, Super Transformer) of every feature that is on to everyone holding a BarnCRM role, within
   a few minutes, and starts the hourly tab access check if it is not already scheduled. What
   you unticked stays off, and you can turn it on later in **General**.
   You land on **General** in BarnCRM Settings, and the setup window never shows again on
@@ -118,7 +121,7 @@ to the people who should see them, shows its settings, and starts its automation
 
 | Feature | What it covers | Hidden or stopped while off |
 |---|---|---|
-| Data Manager | Data Manager, Import, Find and Bulk Update | Those four tabs and the Import section |
+| Data Manager | Data Manager, Import, Find and Super Transformer | Those four tabs and the Import section |
 | Duplicate Matching | Duplicate suggestions, review and matching logic | The Duplicate Matching tab and the Duplicate Matching section |
 | Org Optimizer and Health Check | The Org Optimizer tab and Health Check | The Org Optimizer tab, the Health section and the Org Optimizer section (its three thresholds) |
 | Household upkeep | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
@@ -136,7 +139,7 @@ grants it, and an app cannot hide a tab any other way. So each feature tab has i
 packaged permission set (for example **BarnCRM Tab: Find**) that grants only that tab, and
 BarnCRM gives it, once the feature is on, to the people who should see the tab: whoever holds
 a role or extra permission that used to include the tab (BarnCRM Admin for all five, Find and
-Export for Find, Data Manager and Org Optimizer, Bulk Update or Bulk Delete for Bulk Update and
+Export for Find, Data Manager and Org Optimizer, Bulk Update or Bulk Delete for Super Transformer and
 Data Manager). BarnCRM keeps these in step when a feature is turned on, when a role or extra
 permission is given or removed on the Access page, after every upgrade, and every hour (for
 roles given in Setup or by user access policies). A large org may take a few minutes to catch
@@ -177,13 +180,15 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
    left and the first section showing on the right. The page name shows once, in the page
    header. The sections are listed in groups: **Organization** (General, Organization),
    **People** (People and Households, Addresses), **Data** (Import, Duplicate Matching,
-   Rollups, Org Optimizer), **Fundraising** (Giving, Receipts), **Programs** (Volunteers) and
+   Rollups, Org Optimizer), **Fundraising** (Giving, Receipts, Funders), **Programs** (Volunteers) and
    **System** (Modules, Access, Automation, Integrations, Health, Error Log). A section a
    module adds that is not in these groups is listed under **More**, before System, so Error
-   Log is always last. Each section's settings sit in bordered boxes with a heading, such as **People** and
+   Log is always last. On a phone or other narrow screen the list is replaced by a
+   **Section** box at the top of the page: choose a section there, and the page moves to that
+   section's first heading. Each section's settings sit in bordered boxes with a heading, such as **People** and
    **Households** on People and Households. You only see
    the ones that have something in them, and a feature that is off hides its sections: Giving and
-   Receipts come with the Giving module, and Giving also adds the receipt details to the
+   Receipts come with the Giving module, Funders with the Funders module, and Giving also adds the receipt details to the
    Organization section, so BarnCRM Core on its own shows fewer. General starts with
    **Edition**, shown read-only: it is chosen once in first-run setup, and the
    **Change Edition** link under it is the way to change it later (see
@@ -227,14 +232,20 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 ## Saving Your Changes
 
 Changes are not saved as you make them. As soon as you change a setting, a bar docks to the
-bottom of the screen saying how many changes are not saved yet, with **Discard** and
-**Save**. **Save** saves every changed setting, including changes made in another section
-before you moved on; **Discard** puts them all back. The bar goes away once nothing is
+bottom of the screen saying how many changes in this section are not saved yet ("2 unsaved
+changes in this section"; "and 1 in other sections" is added when you changed something in
+another section first), with **Discard** and **Save**. **Save** saves every changed setting,
+including changes made in another section before you moved on; **Discard** puts them all
+back. The bar goes away once nothing is
 unsaved. While anything is unsaved, closing or reloading the browser tab asks you first;
 moving to another tab inside Salesforce does not ask, so save before you leave the page.
 
-Panels with their own **Save** button (such as household naming or the organization address)
-save on their own and do not count in the bar. The **Integrations** section has nothing to
+Every panel inside a section (Edition, Features, Module Manager, Error Digest, Adopt NPSP
+Households, household naming, the organization address, Sample Data, Custom Metadata,
+Automation, Access and the others) says **Saves on its own** beside its heading, except the
+read-only Integrations panel: what you do in it is saved by the panel itself, never
+by the bar, and does not count in the bar. A panel that has a **Save** button (household
+naming, the organization address) has it at the top of the panel, next to that cue. The **Integrations** section has nothing to
 save, so it has no save bar.
 
 ## Sections and Their Boxes
@@ -255,8 +266,29 @@ section's name.
 | Receipts | Receipt Details (the rest); Receipt Printing; Receipt Letters and Year End Statements |
 | Rollups | Rollup Processing (the rest); Rollup Builder |
 | Volunteers | Hours and Shifts |
-| Error Log | Error Digest (the rest); Error Log Retention |
-| Import | Importing (the rest); Gift Matching on Import; Find, Bulk Update and Bulk Delete |
+| Error Log | Error Log (the **Open the Error Log** link); Error Digest (the rest); Error Log Retention |
+| Import | Importing (the rest); Gift Matching on Import; Find, Super Transformer and Bulk Delete |
+
+### Health and Error Log
+
+Health Check and the Errors list each have one home, Org Optimizer. For someone who can open
+Org Optimizer (Find and Export, or Manage BarnCRM Settings), the **Health** section holds an
+**Open Health Check** button that opens Org Optimizer on its **Health Check** section, with
+the last run and a way to run it again, and the **Error Log** section starts with an **Open
+the Error Log** button that opens Org Optimizer on its **Errors** section; the rest of the
+Error Log section is the error settings (the digest and how long entries are kept). Someone
+who cannot open Org Optimizer still sees the Health Check report itself in the **Health**
+section, and no Error Log button.
+
+### Setting Names
+
+A setting's name is a form label, so it is written in sentence case ("Create households
+automatically", "Records per batch in background jobs"); the titles of sections, boxes and
+panels are in Title Case. Two settings decide how many records a background job handles at a
+time: **Records per batch in imports** (Import, Importing) and **Records per batch in
+background jobs** (Import, Find, Super Transformer and Bulk Delete). Leave both at 200, and
+lower one only when a job of that kind fails with a limit error, which happens in orgs with
+a lot of their own automation.
 
 ### People and Households
 
@@ -328,7 +360,7 @@ its next upgrade, so check this row after one.
 BarnCRM's permission sets give no Account record type, so the people who create organizations
 need the chosen one from their profile or a permission set of your own. Without it, import
 rejects the rows that would create an organization, sample data refuses to load, and Health
-Check warns **You cannot use the record type for organizations**, each naming the record type.
+Check warns **You Cannot Use the Record Type for Organizations**, each naming the record type.
 
 **Upgrading from a version that shipped the Organization record type.** The upgrade leaves the
 **Organization** record type and your accounts as they are, and this row keeps it, but

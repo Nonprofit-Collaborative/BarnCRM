@@ -66,6 +66,36 @@
     </customErrorMessages>
   </customErrors>
   <decisions>
+    <description>Ends the flow when the BarnCRM Automation Control setting has Pause All or Bypass on for the person saving, as BarnCRM's own automation does.</description>
+    <name>Automation_Control</name>
+    <label>Automation control</label>
+    <locationX>50</locationX>
+    <locationY>0</locationY>
+    <defaultConnector>
+      <targetReference>Get_Type_Mapping</targetReference>
+    </defaultConnector>
+    <defaultConnectorLabel>Runs</defaultConnectorLabel>
+    <rules>
+      <name>Paused_Or_Bypassed</name>
+      <conditionLogic>or</conditionLogic>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Pause_All__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <conditions>
+        <leftValueReference>$Setup.BarnCRM_Automation_Control__c.Bypass__c</leftValueReference>
+        <operator>EqualTo</operator>
+        <rightValue>
+          <booleanValue>true</booleanValue>
+        </rightValue>
+      </conditions>
+      <label>Paused or bypassed</label>
+    </rules>
+  </decisions>
+  <decisions>
     <description>Both sides name exactly one person (a contact or a person held as an account, not both), and the two people are different.</description>
     <name>Check_People</name>
     <label>Check people</label>
@@ -227,7 +257,7 @@
   <formulas>
     <name>fFromName</name>
     <dataType>String</dataType>
-    <expression>BLANKVALUE({!$Record.Contact__r.Name}, BLANKVALUE({!$Record.Person_Account__r.Name}, {!$Label.Core_Relationship_UnnamedPerson}))</expression>
+    <expression>BLANKVALUE({!$Record.Contact__r.Name}, BLANKVALUE({!$Record.Person_Account__r.Name}, {!$Label.Core_Affiliation_UnnamedPerson}))</expression>
   </formulas>
   <formulas>
     <description>True for a new relationship with a type, and for an edit that changed either person or the type.</description>
@@ -257,7 +287,7 @@
   <formulas>
     <name>fToName</name>
     <dataType>String</dataType>
-    <expression>BLANKVALUE({!$Record.Related_Contact__r.Name}, BLANKVALUE({!$Record.Related_Person_Account__r.Name}, {!$Label.Core_Relationship_UnnamedPerson}))</expression>
+    <expression>BLANKVALUE({!$Record.Related_Contact__r.Name}, BLANKVALUE({!$Record.Related_Person_Account__r.Name}, {!$Label.Core_Affiliation_UnnamedPerson}))</expression>
   </formulas>
   <interviewLabel>BarnCRM template: Check relationships before saving {!$Flow.CurrentDateTime}</interviewLabel>
   <isTemplate>true</isTemplate>
@@ -370,7 +400,7 @@
     <locationX>50</locationX>
     <locationY>0</locationY>
     <connector>
-      <targetReference>Get_Type_Mapping</targetReference>
+      <targetReference>Automation_Control</targetReference>
     </connector>
     <filterFormula>OR(ISNEW(), ISCHANGED({!$Record.Contact__c}), ISCHANGED({!$Record.Person_Account__c}), ISCHANGED({!$Record.Related_Contact__c}), ISCHANGED({!$Record.Related_Person_Account__c}), ISCHANGED({!$Record.Type__c}), ISCHANGED({!$Record.Status__c}), ISCHANGED({!$Record.End_Date__c}))</filterFormula>
     <object>Relationship__c</object>

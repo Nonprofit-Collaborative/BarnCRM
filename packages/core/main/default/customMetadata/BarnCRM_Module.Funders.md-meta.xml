@@ -19,7 +19,19 @@
     <value xsi:type="xsd:double">40</value>
   </values>
   <values>
-    <field>Requires__c</field>
-    <value xsi:type="xsd:string">Rollups;Giving</value>
+    <field>App_Name__c</field>
+    <value xsi:type="xsd:string">BarnCRM_Funders</value>
+  </values>
+  <values>
+    <field>Staff_Tabs__c</field>
+    <value xsi:type="xsd:string">Grant_Pipeline;Grant_Calendar;Grant__c</value>
+  </values>
+  <values>
+    <field>Admin_Tabs__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Probe_Object__c</field>
+    <value xsi:type="xsd:string">Grant__c</value>
   </values>
 </CustomMetadata>

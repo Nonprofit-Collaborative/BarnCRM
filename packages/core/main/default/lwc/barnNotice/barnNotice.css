@@ -1,0 +1,29 @@
+:host {
+  display: block;
+}
+
+.notice {
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+}
+
+/* The action takes the notice's own text color, which already passes contrast on its background. */
+.notice__action {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: var(--slds-g-font-weight-bold, 700);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.notice__action:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+.notice__action:focus-visible {
+  outline: none;
+  box-shadow: var(--slds-g-shadow-outline-focus-1, 0 0 0 2px #0b5cab);
+}

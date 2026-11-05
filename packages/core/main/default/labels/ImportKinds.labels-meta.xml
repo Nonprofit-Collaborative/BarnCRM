@@ -17,28 +17,12 @@
         <value>People and Organizations</value>
     </labels>
     <labels>
-        <fullName>Core_Import_KindPeopleText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the people and organizations card loads</shortDescription>
-        <value>People, a second person on the same row, households, organizations and the links between people and organizations, with their mailing addresses. A list of organizations only works too.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_KindGiftsTitle</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: title of the gifts card</shortDescription>
         <value>Gifts</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_KindGiftsText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the gifts card loads</shortDescription>
-        <value>Gifts, with the people and organizations who gave them.</value>
     </labels>
     <labels>
         <fullName>Core_Import_KindObjectTitle</fullName>
@@ -49,14 +33,6 @@
         <value>One Kind of Record</value>
     </labels>
     <labels>
-        <fullName>Core_Import_KindObjectText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the one kind of record card loads</shortDescription>
-        <value>Create, update or upsert the records of any one object, such as program sessions or one of your own objects.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_KindDeleteTitle</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -65,28 +41,12 @@
         <value>Delete the Records a File Lists</value>
     </labels>
     <labels>
-        <fullName>Core_Import_KindDeleteText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the delete by file card does, with its warning</shortDescription>
-        <value>Sends the records whose IDs a file lists to the Recycle Bin. You see a preview and confirm the count before anything is deleted.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_KindTemplatesTitle</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: title of the your templates card</shortDescription>
         <value>Your Templates</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_KindTemplatesText</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the your templates card lists</shortDescription>
-        <value>Every template in your org: the ones BarnCRM and your modules ship, and the ones you made.</value>
     </labels>
     <labels>
         <fullName>Core_Import_UseTemplate</fullName>
@@ -111,14 +71,6 @@
         <protected>false</protected>
         <shortDescription>Import wizard: a template that has never loaded a file</shortDescription>
         <value>Not loaded yet</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_CreatesSummary</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what a people template creates; {0} is the list of kinds</shortDescription>
-        <value>This file can create: {0}.</value>
     </labels>
     <labels>
         <fullName>Core_Import_LoadsSummary</fullName>
@@ -239,21 +191,5 @@
         <protected>false</protected>
         <shortDescription>Import wizard: starting name of a copied template; {0} is its source</shortDescription>
         <value>Copy of {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_ErrorCopyOneObject</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import: a one-object template cannot be copied</shortDescription>
-        <value>A template that loads one object cannot be copied. Choose One Kind of Record to make a new one.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_NoDeleteForObject</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: the chosen object cannot be deleted by file</shortDescription>
-        <value>This object's records cannot be deleted by file, so the template creates or updates them instead. To pick another object, choose another card, then this one again.</value>
     </labels>
 </CustomLabels>

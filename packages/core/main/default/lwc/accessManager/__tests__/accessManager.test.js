@@ -198,7 +198,7 @@ describe('c-access-manager', () => {
 
     expect(BarnConfirmModal.open).toHaveBeenCalledTimes(1);
     const dialog = BarnConfirmModal.open.mock.calls[0][0];
-    expect(dialog.label).toBe('c.Core_Access_ConfirmAddTitle');
+    expect(dialog.label).toBe('c.Core_Access_AddButton');
     expect(dialog.confirmLabel).toBe('c.Core_Access_AddButton');
     expect(dialog.details).toEqual([]);
     expect(assignRole).toHaveBeenCalledWith({
@@ -233,7 +233,7 @@ describe('c-access-manager', () => {
 
     const dialog = BarnConfirmModal.open.mock.calls[0][0];
     expect(dialog.label).toBe('c.Core_Access_ConfirmRemoveTitle');
-    expect(dialog.confirmLabel).toBe('c.Core_Access_RemoveButton');
+    expect(dialog.confirmLabel).toBe('c.Core_Find_Remove');
     expect(dialog.details).toEqual(['c.Core_Access_SelfRemovalWarning']);
     expect(removeRole).toHaveBeenCalledWith({
       userId: MARIA_ID,

@@ -4,13 +4,13 @@
  * bypassable from the settings console (ADR-0017).
  */
 trigger AppealTrigger on Appeal__c(
-    before insert,
-    before update,
-    before delete,
-    after insert,
-    after update,
-    after delete,
-    after undelete
+	before insert,
+	before update,
+	before delete,
+	after insert,
+	after update,
+	after delete,
+	after undelete
 ) {
-    TriggerDispatcher.run('Appeal__c');
+	TriggerDispatcher.run('Appeal__c');
 }

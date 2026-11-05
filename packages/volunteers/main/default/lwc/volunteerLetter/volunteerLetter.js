@@ -4,14 +4,15 @@ import { CloseActionScreenEvent } from 'lightning/actions';
 import getActionContext from '@salesforce/apex/VolunteerLetterController.getActionContext';
 import previewLetter from '@salesforce/apex/VolunteerLetterController.preview';
 import generateLetter from '@salesforce/apex/VolunteerLetterController.generate';
+import { localIsoDate } from 'c/findCsv';
 
 import HEADING from '@salesforce/label/c.Volunteers_LetterAction_Heading';
-import TEMPLATE from '@salesforce/label/c.Volunteers_LetterAction_Template';
-import FROM_DATE from '@salesforce/label/c.Volunteers_LetterAction_From';
-import TO_DATE from '@salesforce/label/c.Volunteers_LetterAction_To';
-import PREVIEW from '@salesforce/label/c.Volunteers_LetterAction_Preview';
-import GENERATE from '@salesforce/label/c.Volunteers_LetterAction_Generate';
-import CANCEL from '@salesforce/label/c.Volunteers_LetterAction_Cancel';
+import TEMPLATE from '@salesforce/label/c.Core_Import_StepTemplate';
+import FROM_DATE from '@salesforce/label/c.Core_SetupChanges_From';
+import TO_DATE from '@salesforce/label/c.Core_SetupChanges_To';
+import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
+import GENERATE from '@salesforce/label/c.Core_Shared_Generate';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import SAVED from '@salesforce/label/c.Volunteers_LetterAction_Saved';
 import NOT_A_PERSON from '@salesforce/label/c.Volunteers_Letter_NotAPerson';
 import NEED_PERMISSION from '@salesforce/label/c.Volunteers_Letter_NeedManagePermission';
@@ -19,14 +20,10 @@ import NO_TEMPLATE from '@salesforce/label/c.Volunteers_Letter_NoActiveTemplate'
 import BAD_PERIOD from '@salesforce/label/c.Volunteers_Letter_BadPeriod';
 import ACTION_FAILED from '@salesforce/label/c.Volunteers_Letter_ActionFailed';
 import NO_LEGAL_NAME from '@salesforce/label/c.Volunteers_LetterAction_NoLegalName';
-import LOADING from '@salesforce/label/c.Volunteers_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 /** A date as the lightning-input date value: yyyy-mm-dd, in the user's own day. */
-function isoDate(value) {
-  const month = String(value.getMonth() + 1).padStart(2, '0');
-  const day = String(value.getDate()).padStart(2, '0');
-  return `${value.getFullYear()}-${month}-${day}`;
-}
+const isoDate = localIsoDate;
 
 /**
  * The Volunteer letter action on a contact or person account (V-08): choose a template and a

@@ -93,10 +93,10 @@ describe('c-integrations-panel', () => {
 
     const here = row(element, 'here').querySelector('[data-id="badge"]');
     const gone = row(element, 'gone').querySelector('[data-id="badge"]');
-    expect(here.textContent).toBe('c.Core_Integrations_Installed');
-    expect(here.className).toContain('slds-theme_success');
-    expect(gone.textContent).toBe('c.Core_Integrations_NotInstalled');
-    expect(gone.className).not.toContain('slds-theme_success');
+    expect(here.label).toBe('c.Core_Integrations_Installed');
+    expect(here.status).toBe('success');
+    expect(gone.label).toBe('c.Core_Integrations_NotInstalled');
+    expect(gone.status).toBe('neutral');
   });
 
   it('shows the name, description, maintainer, cost and compatibility note', async () => {
@@ -121,9 +121,7 @@ describe('c-integrations-panel', () => {
     expect(learn.getAttribute('href')).toBe('https://example.invalid/one');
     expect(learn.target).toBe('_blank');
     expect(learn.rel).toContain('noopener');
-    expect(learn.querySelector('.slds-assistive-text').textContent).toContain(
-      'Core_SuiteChoice_NewTab'
-    );
+    expect(learn.querySelector('.slds-assistive-text').textContent).toContain('Core_Kit_NewTab');
     expect(learn.querySelector('.slds-assistive-text').textContent).toContain('Product one');
     expect(item.querySelector('[data-id="install"]')).toBeNull();
   });
@@ -152,12 +150,12 @@ describe('c-integrations-panel', () => {
     ]);
     const element = await build();
 
-    expect(row(element, 'plan').querySelector('[data-id="status"]').textContent).toBe(
-      'c.Core_Integrations_StatusInProgress'
-    );
-    expect(row(element, 'done').querySelector('[data-id="status"]').textContent).toBe(
-      'c.Core_Integrations_StatusAvailable'
-    );
+    const plan = row(element, 'plan').querySelector('[data-id="status"]');
+    const done = row(element, 'done').querySelector('[data-id="status"]');
+    expect(plan.label).toBe('c.Core_Integrations_StatusInProgress');
+    expect(plan.status).toBe('in-progress');
+    expect(done.label).toBe('c.Core_Integrations_StatusAvailable');
+    expect(done.status).toBe('success');
   });
 
   it('ends with a request section whose two forms open in a new tab', async () => {
@@ -166,15 +164,13 @@ describe('c-integrations-panel', () => {
 
     const request = element.shadowRoot.querySelector('[data-id="request"]');
     expect(request.querySelector('[data-id="request-heading"]').textContent).toBe(
-      'c.Core_Integrations_RequestHeading'
+      'c.Core_Integrations_RequestLink'
     );
     for (const id of ['request-link', 'partner-link', 'guide-link']) {
       const link = request.querySelector(`[data-id="${id}"]`);
       expect(link.target).toBe('_blank');
       expect(link.rel).toContain('noopener');
-      expect(link.querySelector('.slds-assistive-text').textContent).toContain(
-        'Core_SuiteChoice_NewTab'
-      );
+      expect(link.querySelector('.slds-assistive-text').textContent).toContain('Core_Kit_NewTab');
     }
     expect(request.querySelector('[data-id="request-link"]').getAttribute('href')).toBe(
       'c.Core_Integrations_RequestUrl'
@@ -196,9 +192,7 @@ describe('c-integrations-panel', () => {
     getApps.mockRejectedValue({ body: { message: 'Could not read' } });
     const element = await build();
 
-    expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toBe(
-      'Could not read'
-    );
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toBe('Could not read');
   });
 
   it('reads the org again on Check again', async () => {
@@ -210,7 +204,7 @@ describe('c-integrations-panel', () => {
     await settle();
 
     expect(getApps).toHaveBeenCalledTimes(2);
-    expect(row(element, 'one').querySelector('[data-id="badge"]').textContent).toBe(
+    expect(row(element, 'one').querySelector('[data-id="badge"]').label).toBe(
       'c.Core_Integrations_Installed'
     );
   });

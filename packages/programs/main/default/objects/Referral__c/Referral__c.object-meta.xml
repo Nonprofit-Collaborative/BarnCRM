@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <compactLayoutAssignment>Referral_Compact</compactLayoutAssignment>
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    A person sent to another organization, or sent to this one, with where it stands and how it turned out (P-13). Private to its owner, people above them in the role hierarchy and Programs Admin (canonical model Section 29ZA2).
+  </description>
+  <enableActivities>true</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>true</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <externalSharingModel>Private</externalSharingModel>
+  <label>Referral</label>
+  <nameField>
+    <displayFormat>RF-{000000}</displayFormat>
+    <label>Referral Number</label>
+    <trackHistory>false</trackHistory>
+    <type>AutoNumber</type>
+  </nameField>
+  <pluralLabel>Referrals</pluralLabel>
+  <sharingModel>Private</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

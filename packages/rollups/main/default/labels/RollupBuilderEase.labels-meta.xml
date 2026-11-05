@@ -241,36 +241,12 @@
         <value>Calculates the same total as {0}, into another field.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_ColumnStatus</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup list column: how each rollup's recalculation stands.</shortDescription>
-        <value>Status</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_Search</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Rollup list search box label.</shortDescription>
         <value>Search rollups</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_SearchHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup list search box help text.</shortDescription>
-        <value>Finds rollups by name, description, what they count, or the object and field that show the total.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_Group</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup list group heading: {0} is the object, {1} how many rollups.</shortDescription>
-        <value>{0} ({1})</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_NoMatches</fullName>
@@ -287,14 +263,6 @@
         <protected>false</protected>
         <shortDescription>Builder sentence: {0} calculation, {1} records, {2} which, {3} field, {4} mode</shortDescription>
         <value>Show {0} from {1}, counting {2}, in {3}. Updated: {4}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_SentenceHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder sentence help: its parts open the step that sets them.</shortDescription>
-        <value>Click a part of the sentence to change it.</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_NotChosen</fullName>
@@ -319,14 +287,6 @@
         <protected>false</protected>
         <shortDescription>Builder sentence: {0} is how many conditions the records must meet.</shortDescription>
         <value>only those that meet its conditions ({0})</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_TargetPart</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder sentence: {0} is the object, {1} the field showing the total.</shortDescription>
-        <value>{0}: {1}</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_NotForField</fullName>
@@ -423,14 +383,6 @@
         <protected>false</protected>
         <shortDescription>Builder preview: button that picks sample records.</shortDescription>
         <value>Pick Sample Records</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_PickSamplesHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder preview: what picking sample records does.</shortDescription>
-        <value>Calculates this rollup on up to five records it would fill, chosen for you. Nothing is saved.</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_SamplesHeading</fullName>
@@ -601,14 +553,6 @@
         <value>Create a Field</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_CreateFieldWhy</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder step 1: why the field is written, not created.</shortDescription>
-        <value>BarnCRM cannot add a field to your org itself: that takes a Metadata API deploy. It writes the field for you to create in Setup, or to download and deploy.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_NewFieldLabel</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -625,68 +569,12 @@
         <value>Field type</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_KindHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder step 1: which field type suits which calculation.</shortDescription>
-        <value>Number for counts and totals, Currency for amounts, Date or Date/Time for first and last dates, Text for a copied value, Text Area (Long) for a text list, Checkbox for Any and None.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_KindNumber</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field type, as Setup names it.</shortDescription>
-        <value>Number</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_KindCurrency</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field type, as Setup names it.</shortDescription>
-        <value>Currency</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_KindDate</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field type, as Setup names it.</shortDescription>
-        <value>Date</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_KindDateTime</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field type, as Setup names it.</shortDescription>
-        <value>Date/Time</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_KindText</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field type, as Setup names it.</shortDescription>
-        <value>Text</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_KindLongText</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Field type, as Setup names it.</shortDescription>
         <value>Text Area (Long)</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_KindCheckbox</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field type, as Setup names it.</shortDescription>
-        <value>Checkbox</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_WriteField</fullName>
@@ -777,28 +665,12 @@
         <value>Download Field Package</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_RefreshFields</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Builder step 1: button that reloads the fields.</shortDescription>
-        <value>Refresh Fields</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_ExplainTitle</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Record page card: title of Explain These Totals.</shortDescription>
         <value>Explain These Totals</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_ExplainEmpty</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Explain These Totals: no rollup fills this record.</shortDescription>
-        <value>No BarnCRM rollup you can see fills a field on this record.</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_ExplainCounts</fullName>
@@ -833,36 +705,12 @@
         <value>For admins, recalculated now without saving: {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_ExplainSeen</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Explain These Totals: counts cover only what the viewer can see.</shortDescription>
-        <value>The counts and the list include only records you can open; the total includes them all.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_ExplainRefresh</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Explain These Totals: button that reads the totals again.</shortDescription>
-        <value>Refresh</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_TplButton</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Rollup Builder: button and heading of the starter templates.</shortDescription>
         <value>Starter Templates</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_TplIntro</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Starter Templates: nothing is added until chosen.</shortDescription>
-        <value>Nothing is added until you tick rollups and click Add the Chosen Rollups. Each is added switched off: switch it on once its field shows what you expect.</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_TplAdd</fullName>
@@ -881,28 +729,12 @@
         <value>Open in Builder</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_TplClose</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Starter Templates: closes the panel.</shortDescription>
-        <value>Close</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_TplStarter</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Name of the nonprofit starter template.</shortDescription>
         <value>Nonprofit Starter</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupEase_TplStarterHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>What the nonprofit starter template holds.</shortDescription>
-        <value>Giving totals BarnCRM does not ship, from received gifts: for each person, and for each appeal. Needs Giving.</value>
     </labels>
     <labels>
         <fullName>Core_RollupEase_TplAverageGift</fullName>

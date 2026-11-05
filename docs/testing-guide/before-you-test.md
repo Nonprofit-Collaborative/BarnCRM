@@ -66,7 +66,7 @@ Do these in order.
    | BarnCRM Duplicate Review | T-DUP scripts, smoke item 13 | When the duplicate scripts are done |
    | BarnCRM Erase People | T-ERASE-01 and T-ERASE-02, smoke item 15, on fixture records only | Straight after that script |
    | BarnCRM Metadata Admin | The T-DUP and T-SET scripts that edit custom metadata | When those are done |
-   | BarnCRM Bulk Delete | The delete scripts in [Bulk update and delete](bulk-update-and-delete.md), on `Bulkdeltest` contacts only | Straight after |
+   | BarnCRM Bulk Delete | The delete scripts in [Super Transformer and bulk delete](bulk-update-and-delete.md), on `Bulkdeltest` contacts only | Straight after |
 
 4. **First-run setup and the household catch-up.** The setup window (T-SA-01) shows to every
    user until someone with **Manage BarnCRM Settings** finishes it, and only that person gets
@@ -90,13 +90,13 @@ Do these in order.
 
    The household then reads **3** members. **Wherever a
    script says Garcia, read Zztest**: The Garcia Family is The Zztest Family,
-   `harper.garcia1@example.org` is `harper.zztest1@example.org`, and a Find or bulk update
+   `harper.garcia1@example.org` is `harper.zztest1@example.org`, and a Find or Super Transformer
    condition **Last Name equals Garcia** is **Last Name equals Zztest**. With the fixture in
    place, T-IMP-01 gives the counts it states (3 created, 0 updated, 1 matched, 1 rejected);
    without Harper they would be 4, 0, 0, 1. Test emails use `example.org`, so none matches a
    real person.
-6. **Check the count before anything bulk.** Before a bulk update, a bulk delete, an import
-   or an erase, the preview must name only fixture records: a bulk update on `Zztest` shows 3
+6. **Check the count before anything bulk.** Before a Super Transformer run, a bulk delete, an import
+   or an erase, the preview must name only fixture records: a Super Transformer run on `Zztest` shows 3
    records, a bulk delete on `Bulkdeltest` shows 3, an import shows only the rows in the
    test file. If it shows more, cancel and fix the condition. Never use a condition that can
    match a real person, and never choose a real record in a merge, move, erase or relationship
@@ -125,7 +125,7 @@ scripts/org/deploy-packages.sh <alias>
 Then give your login user the module admin permission sets:
 
 ```bash
-sf org assign permset --target-org <alias> --name Rollup_Builder_Admin --name Giving_Admin --name Volunteers_Admin --name Opportunity_Mirror --name Campaign_Sync --name Accounting_Export --name Inbound_Gift_API --name Record_Inbound_Gift_Action
+sf org assign permset --target-org <alias> --name Rollup_Builder_Admin --name Giving_Admin --name Volunteers_Admin --name Opportunity_Mirror --name Gift_Transaction_Mirror --name Campaign_Sync --name Accounting_Export --name Inbound_Gift_API --name Record_Inbound_Gift_Action
 ```
 
 To test Core alone (the Standard Edition with nothing else installed), skip this step and use a

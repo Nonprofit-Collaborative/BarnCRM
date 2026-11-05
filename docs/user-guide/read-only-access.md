@@ -19,10 +19,10 @@ module, your admin gives **Giving Read Only** separately, if you should see gift
 | Addresses, relationships, affiliations | Read them on the cards and their tabs | Add, set as primary, make primary, remove (the cards do not show these buttons) |
 | Household members | See the **Members** card and the **Household Members** tab | Add, move or make primary (the card does not show these buttons) |
 | Household merge and split | Open **Merge or Split** and read it | Merge or split |
-| Home tab | **What's New in BarnCRM**, the welcome and **Quick Links** | Use **New Household** (it is hidden) |
+| Home tab | **What's New in BarnCRM**, the welcome and **Quick Links** | Use **New Person** or **New Household** (they are hidden) |
 | BarnCRM Settings | Read every setting and its **Learn More** link | Change anything |
 | Error Log | Read entries (open it from the navigation menu if it is not shown) | Change entries |
-| Find, Data Manager, Org Optimizer | Nothing, unless your admin also gives the **BarnCRM Find and Export** add-on | Bulk update or bulk delete |
+| Find, Data Manager, Org Optimizer | Nothing, unless your admin also gives the **BarnCRM Find and Export** add-on | Run Super Transformer or bulk delete |
 
 Tabs you see in the **BarnCRM** app: **Home**, **Households** and **Organizations**, plus
 **Contacts** if your Salesforce profile shows it. **BarnCRM Console** adds **Addresses**,
@@ -100,6 +100,10 @@ None of these change anything. Nothing is saved when an action is refused.
   who entered them and to coordinators. Totals on each person still show.
 - Problem: you need to change something. Ask your admin for a role that allows it, such as
   Team Member.
+- Problem: a field you need is missing from a record, or shows but cannot be changed. Your
+  permission sets do not give it. Tell your admin which field and on which kind of record:
+  they can give Read or Edit to a whole group at once with the Field Access Manager (see the
+  [Admin Guide](../admin-guide/field-access-manager.md)).
 
 ## Related
 

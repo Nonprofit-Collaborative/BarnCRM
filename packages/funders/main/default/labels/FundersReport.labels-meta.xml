@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Funders_Report_Title</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Funder Report card title</shortDescription>
+        <value>Funder Report</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Report_Download</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Funder Report card download button</shortDescription>
+        <value>Download Printable</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Report_NoTemplates</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Funder Report card with no active template</shortDescription>
+        <value>No active report template. A Funders admin adds one on the Funder Report Templates tab.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Report_ErrorLoad</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Funder Report card could not load</shortDescription>
+        <value>The report could not be prepared. Reload the page; if it happens again, tell your BarnCRM admin.</value>
+    </labels>
+</CustomLabels>

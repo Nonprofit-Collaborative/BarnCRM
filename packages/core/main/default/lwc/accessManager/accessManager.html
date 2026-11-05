@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <lightning-card title={labels.pageTitle} icon-name="standard:user_role">
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
             <p class="slds-var-m-bottom_small">{labels.pageDescription}</p>
@@ -15,15 +16,21 @@
             </template>
 
             <template if:true={loadError}>
-                <div class="slds-var-m-bottom_small" role="alert" data-id="load-error">
-                    <lightning-formatted-text value={loadError}></lightning-formatted-text>
-                </div>
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="error"
+                    message={loadError}
+                    data-id="load-error"
+                ></c-barn-notice>
             </template>
 
             <template if:true={isReadOnly}>
-                <div class="slds-var-m-bottom_small" role="status" data-id="read-only-notice">
-                    <lightning-formatted-text value={labels.readOnlyNotice}></lightning-formatted-text>
-                </div>
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="info"
+                    message={labels.readOnlyNotice}
+                    data-id="read-only-notice"
+                ></c-barn-notice>
             </template>
 
             <template lwc:if={showChangeReadOnly}>
@@ -229,9 +236,12 @@
                                         {addOn.description}
                                     </p>
                                     <template lwc:if={addOn.warning}>
-                                        <p class="slds-text-body_small slds-text-color_error slds-var-m-bottom_x-small" data-id="add-on-card-warning">
-                                            {addOn.warning}
-                                        </p>
+                                        <c-barn-notice
+                                            class="slds-show slds-var-m-bottom_x-small"
+                                            variant="warning"
+                                            message={addOn.warning}
+                                            data-id="add-on-card-warning"
+                                        ></c-barn-notice>
                                     </template>
                                     <template lwc:if={addOn.hasUsers}>
                                         <ul class="slds-has-dividers_bottom-space">
@@ -278,4 +288,5 @@
             </p>
         </div>
     </lightning-card>
+    </template>
 </template>

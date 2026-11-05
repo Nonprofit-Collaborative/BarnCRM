@@ -1,5 +1,6 @@
 <template>
-  <lightning-card title={labels.title} icon-name="custom:custom48">
+    <template lwc:if={helpReady}>
+  <lightning-card title={labels.title} icon-name="custom:custom54">
     <div slot="actions" class="slds-grid slds-grid_vertical-align-center slds-wrap">
       <lightning-radio-group
         data-id="view"
@@ -389,4 +390,5 @@
     </section>
     <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
   </template>
+    </template>
 </template>

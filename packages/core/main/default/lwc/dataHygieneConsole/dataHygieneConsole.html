@@ -1,7 +1,8 @@
 <template>
+    <template lwc:if={helpReady}>
   <div class="slds-is-relative">
-    <div class="slds-grid slds-grid_vertical-align-center slds-wrap slds-m-bottom_xx-small">
-      <h2 class="slds-text-heading_medium slds-m-right_x-small">{labels.pageTitle}</h2>
+    <div class="slds-grid slds-grid_vertical-align-center slds-wrap slds-var-m-bottom_xx-small">
+      <h2 class="slds-text-heading_medium slds-var-m-right_x-small">{labels.pageTitle}</h2>
       <c-barn-help content={labels.healthCheckNote} data-id="help"></c-barn-help>
       <lightning-button
         class="slds-col_bump-left"
@@ -12,11 +13,14 @@
       ></lightning-button>
     </div>
     <div>
-      <p class="slds-m-bottom_small">{labels.intro}</p>
+      <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small">{labels.intro}</p>
       <template lwc:if={errorMessage}>
-        <div class="slds-text-color_error slds-m-bottom_small" role="alert" data-id="error">
-          {errorMessage}
-        </div>
+        <c-barn-notice
+          class="slds-var-m-bottom_small"
+          variant="error"
+          message={errorMessage}
+          data-id="error"
+        ></c-barn-notice>
       </template>
       <template lwc:if={busy}>
         <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
@@ -30,25 +34,29 @@
                   <h3 class="slds-text-heading_small" id={check.headingId}>{check.title}</h3>
                   <p>{check.description}</p>
                   <template lwc:if={check.note}>
-                    <p class="slds-text-color_weak slds-m-top_xx-small" data-id="note">
+                    <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_xx-small" data-id="note">
                       {check.note}
                     </p>
                   </template>
                   <template lwc:if={check.errorMessage}>
-                    <p role="alert" class="slds-text-color_error slds-m-top_xx-small" data-id="check-error">
-                      {check.errorMessage}
-                    </p>
+                    <c-barn-notice
+                      class="slds-var-m-top_xx-small"
+                      variant="error"
+                      message={check.errorMessage}
+                      data-id="check-error"
+                    ></c-barn-notice>
                   </template>
                 </lightning-layout-item>
                 <lightning-layout-item size="6" medium-device-size="3" padding="around-small">
                   <template lwc:if={check.hasCount}>
-                    <p class="slds-text-heading_medium" data-id="count">{check.countLabel}</p>
-                    <p class="slds-text-body_small slds-text-color_weak">{labels.recordsFound}</p>
-                    <lightning-badge
-                      class={check.badgeClass}
-                      label={check.badgeLabel}
-                      data-id="badge"
-                    ></lightning-badge>
+                    <c-barn-stat-tile
+                      label={labels.recordsFound}
+                      value={check.countLabel}
+                      badge-label={check.badgeLabel}
+                      badge-variant={check.badgeStatus}
+                      align="start"
+                      data-id="count"
+                    ></c-barn-stat-tile>
                   </template>
                 </lightning-layout-item>
                 <lightning-layout-item size="6" medium-device-size="2" padding="around-small">
@@ -69,4 +77,5 @@
       </ul>
     </div>
   </div>
+    </template>
 </template>

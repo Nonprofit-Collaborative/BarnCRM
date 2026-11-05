@@ -1,10 +1,18 @@
 <template>
+    <template lwc:if={helpReady}>
     <lightning-card title={label.title} icon-name="standard:household">
+        <!-- The panel saves on its own, so its Save sits in its header (admin-18). -->
+        <lightning-button
+            slot="actions"
+            variant="brand"
+            label={label.save}
+            disabled={isSaveDisabled}
+            onclick={handleSave}
+            class="save-button"
+        ></lightning-button>
         <div class="slds-var-m-around_medium">
             <template if:true={isReadOnly}>
-                <div class="slds-box slds-box_x-small slds-text-color_weak slds-var-m-bottom_small">
-                    {label.readOnly}
-                </div>
+                <c-barn-notice class="slds-var-m-bottom_small" message={label.readOnly} data-id="read-only"></c-barn-notice>
             </template>
 
             <template if:true={isSaving}>
@@ -17,29 +25,60 @@
 
             <p class="slds-text-body_small slds-var-m-bottom_small">{label.tokenHelp}</p>
 
-            <lightning-input
-                label={label.nameLabel}
-                value={namePattern}
-                disabled={isReadOnly}
-                onchange={handleNameChange}
-            ></lightning-input>
-            <lightning-input
-                label={label.formalLabel}
-                value={formalPattern}
-                disabled={isReadOnly}
-                onchange={handleFormalChange}
-            ></lightning-input>
-            <lightning-input
-                label={label.informalLabel}
-                value={informalPattern}
-                disabled={isReadOnly}
-                onchange={handleInformalChange}
-            ></lightning-input>
+            <!-- Each part added by a click or a drop is announced here (drag and drop item 4). -->
+            <p class="slds-assistive-text" aria-live="polite" data-id="announcer">{announcement}</p>
+
+            <template for:each={patterns} for:item="pattern">
+                <div key={pattern.key} class="slds-form-element slds-var-m-bottom_small">
+                    <label class="slds-form-element__label" for={pattern.inputId}>{pattern.label}</label>
+                    <div
+                        class="slds-form-element__control"
+                        data-drop-zone={pattern.key}
+                        data-drop-label={pattern.label}
+                    >
+                        <input
+                            type="text"
+                            class={pattern.inputClass}
+                            id={pattern.inputId}
+                            value={pattern.value}
+                            disabled={isReadOnly}
+                            data-pattern={pattern.key}
+                            oninput={handlePatternInput}
+                        />
+                    </div>
+                    <template lwc:if={canEdit}>
+                        <div
+                            class="slds-var-m-top_xx-small"
+                            role="group"
+                            aria-label={pattern.partsLabel}
+                            data-parts={pattern.key}
+                            data-drop-zone={pattern.partsZone}
+                            data-drop-label={pattern.partsLabel}
+                        >
+                            <template for:each={pattern.parts} for:item="part">
+                                <button
+                                    key={part.id}
+                                    type="button"
+                                    class={part.className}
+                                    data-part={part.value}
+                                    data-pattern={pattern.key}
+                                    data-drag-id={part.id}
+                                    data-drag-label={part.value}
+                                    onclick={handlePartClick}
+                                    onpointerdown={handlePartPointerDown}
+                                >
+                                    {part.value}
+                                </button>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </template>
 
             <h2 class="slds-text-heading_small slds-var-m-top_medium">{label.previewHeading}</h2>
-            <template if:true={hasSamples}>
+            <template lwc:if={hasSamples}>
                 <table
-                    class="slds-table slds-table_bordered slds-table_fixed-layout slds-var-m-top_x-small"
+                    class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_fixed-layout slds-max-medium-table_stacked slds-var-m-top_x-small"
                     aria-label={label.previewHeading}
                 >
                     <thead>
@@ -53,10 +92,10 @@
                     <tbody>
                         <template for:each={samples} for:item="sample">
                             <tr key={sample.key} class="sample-row">
-                                <td class="slds-cell-wrap">{sample.members}</td>
-                                <td class="slds-cell-wrap">{sample.name}</td>
-                                <td class="slds-cell-wrap">{sample.formalGreeting}</td>
-                                <td class="slds-cell-wrap">{sample.informalGreeting}</td>
+                                <td class="slds-cell-wrap" data-label={label.columnMembers}>{sample.members}</td>
+                                <td class="slds-cell-wrap" data-label={label.columnName}>{sample.name}</td>
+                                <td class="slds-cell-wrap" data-label={label.columnFormal}>{sample.formalGreeting}</td>
+                                <td class="slds-cell-wrap" data-label={label.columnInformal}>{sample.informalGreeting}</td>
                             </tr>
                         </template>
                     </tbody>
@@ -64,17 +103,10 @@
             </template>
 
             <template if:true={errorMessage}>
-                <div class="slds-text-color_error slds-var-m-top_small" role="alert">{errorMessage}</div>
+                <c-barn-notice class="slds-var-m-top_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
             </template>
 
             <div class="slds-var-m-top_medium">
-                <lightning-button
-                    variant="brand"
-                    label={label.save}
-                    disabled={isSaveDisabled}
-                    onclick={handleSave}
-                    class="slds-var-m-right_x-small save-button"
-                ></lightning-button>
                 <lightning-button
                     label={label.recompute}
                     disabled={isReadOnly}
@@ -84,4 +116,5 @@
             </div>
         </div>
     </lightning-card>
+    </template>
 </template>

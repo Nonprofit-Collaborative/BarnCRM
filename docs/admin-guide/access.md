@@ -10,8 +10,9 @@ change our settings?" in a few seconds.
 
 To see why someone can (or cannot) open a kind of record or field, including access that
 comes from outside BarnCRM, use [Access Explorer](access-explorer.md) in Org Optimizer: the
-**Open Access Explorer** button on this page opens it. It only reads; changes are made here or
-in Setup.
+**Open Access Explorer** button on this page opens it. To give a permission set Read or Edit on
+fields and kinds of record, use its **Change Field Access** view, the
+[Field Access Manager](field-access-manager.md); everything else is changed here or in Setup.
 
 Roles ship with BarnCRM and are kept up to date for you.
 
@@ -59,7 +60,7 @@ own **Compare and merge**, which Salesforce allows only to people who can delete
 staff ask an admin for that.
 
 BarnCRM Admin also gives **View All** and **Modify All** on accounts and contacts, so the data
-tools an admin runs (Find and export, Bulk Update, Bulk Delete, Duplicate Matching, Erase a
+tools an admin runs (Find and export, Super Transformer, Bulk Delete, Duplicate Matching, Erase a
 Person, merges) see and change every person and household, not only the ones your sharing
 settings show them. That reaches every account and contact in the org, so give the role only to
 people you trust with all of them. To hold it back from someone, add a muting permission set to
@@ -235,7 +236,7 @@ Error Log when it works.
 ## Tabs That Follow a Feature
 
 Five tabs stay hidden for everyone until their feature is turned on in BarnCRM Settings,
-General, Features: Data Manager, Import, Find, Bulk Update and Org Optimizer. So no role or
+General, Features: Data Manager, Import, Find, Super Transformer and Org Optimizer. So no role or
 extra permission grants them any more. Each comes from its own permission set, **BarnCRM Tab:
 (tab name)**, which BarnCRM gives automatically to the people who should see it once its
 feature is on:
@@ -245,7 +246,7 @@ feature is on:
 | Data Manager | BarnCRM Admin, Find and Export, Bulk Update, Bulk Delete |
 | Import | BarnCRM Admin |
 | Find | BarnCRM Admin, Find and Export |
-| Bulk Update | BarnCRM Admin, Bulk Update, Bulk Delete |
+| Super Transformer | BarnCRM Admin, Bulk Update, Bulk Delete |
 | Org Optimizer | BarnCRM Admin, Find and Export |
 | Duplicate Matching | BarnCRM Admin, Duplicate Review, Metadata Admin |
 

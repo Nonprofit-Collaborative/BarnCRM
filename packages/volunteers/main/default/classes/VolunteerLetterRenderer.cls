@@ -8,7 +8,7 @@
  * batch, a Visualforce `renderAs="pdf"` page goes behind this class and nothing else changes.
  */
 public with sharing virtual class VolunteerLetterRenderer {
-    public virtual Blob render(String html) {
-        return Blob.toPdf(html);
-    }
+	public virtual Blob render(String html) {
+		return Blob.toPdf(html);
+	}
 }

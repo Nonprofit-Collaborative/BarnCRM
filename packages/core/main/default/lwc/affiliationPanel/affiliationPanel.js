@@ -1,30 +1,36 @@
 import { LightningElement, api, wire } from 'lwc';
 import Toast from 'lightning/toast';
+import { NavigationMixin } from 'lightning/navigation';
+import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { gql, graphql } from 'lightning/graphql';
 import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import BarnConfirmModal from 'c/barnConfirmModal';
+import { iconFor } from 'c/barnIcons';
+import { localIsoDate } from 'c/findCsv';
+import { initialsOf, opensElsewhere, recordHref } from 'c/recordRows';
+import { followLinkInWorkspace } from 'c/workspaceTabs';
 
 import AFFILIATION_SCHEMA from '@salesforce/schema/Affiliation__c';
 import ID_FIELD from '@salesforce/schema/Affiliation__c.Id';
 import IS_PRIMARY_FIELD from '@salesforce/schema/Affiliation__c.Is_Primary__c';
+import END_DATE_FIELD from '@salesforce/schema/Affiliation__c.End_Date__c';
 import getCardContext from '@salesforce/apex/AffiliationController.getCardContext';
 
-import PANEL_TITLE from '@salesforce/label/c.Core_Affiliation_PanelTitle';
+import ACTIONS_FOR from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
+import EDIT_ACTION from '@salesforce/label/c.Core_CmdtManager_EditAction';
+import END_ACTION from '@salesforce/label/c.Core_Relationship_EndAction';
+import PANEL_TITLE from '@salesforce/label/c.Core_Feature_Affiliations_Name';
 import ADD_BUTTON from '@salesforce/label/c.Core_Affiliation_AddButton';
 import ADD_FORM_TITLE from '@salesforce/label/c.Core_Affiliation_AddFormTitle';
-import CANCEL_BUTTON from '@salesforce/label/c.Core_Affiliation_CancelButton';
-import EMPTY_MESSAGE from '@salesforce/label/c.Core_Affiliation_Empty';
+import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Affiliation_EmptyHeading';
 import FORMER_BADGE from '@salesforce/label/c.Core_Affiliation_FormerBadge';
-import LOAD_FAILED from '@salesforce/label/c.Core_Affiliation_LoadFailed';
 import LOADING from '@salesforce/label/c.Core_Affiliation_Loading';
-import MAKE_PRIMARY_BUTTON from '@salesforce/label/c.Core_Affiliation_MakePrimaryButton';
-import MAKE_PRIMARY_FAILED from '@salesforce/label/c.Core_Affiliation_MakePrimaryFailed';
-import MAKE_PRIMARY_SUCCESS from '@salesforce/label/c.Core_Affiliation_MakePrimarySuccess';
-import PRIMARY_BADGE from '@salesforce/label/c.Core_Affiliation_PrimaryBadge';
-import SAVE_FAILED from '@salesforce/label/c.Core_Affiliation_SaveFailed';
-import SAVE_SUCCESS from '@salesforce/label/c.Core_Affiliation_SaveSuccess';
+import MAKE_PRIMARY_BUTTON from '@salesforce/label/c.Core_HouseholdPanel_MakePrimary';
+import PRIMARY_BADGE from '@salesforce/label/c.Core_HouseholdMembersPanel_Primary';
 import UNNAMED_PERSON from '@salesforce/label/c.Core_Affiliation_UnnamedPerson';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const AFFILIATION_OBJECT = 'Affiliation__c';
 const FORM_FIELDS = [
@@ -158,7 +164,24 @@ function byCardOrder(a, b) {
  * server decides which, because an account is an organization in one org and a person in
  * another.
  */
-export default class AffiliationPanel extends LightningElement {
+export default class AffiliationPanel extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  @wire(EnclosingTabId) enclosingTabId;
+
+  icons = { affiliation: iconFor('Affiliation__c') };
+
+  /** True while a row action is being saved, so its menu cannot start a second one. */
+  busy = false;
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
   @api objectApiName;
 
@@ -167,12 +190,16 @@ export default class AffiliationPanel extends LightningElement {
     addButton: ADD_BUTTON,
     addFormTitle: ADD_FORM_TITLE,
     cancelButton: CANCEL_BUTTON,
-    emptyMessage: EMPTY_MESSAGE,
+    get emptyMessage() {
+      return helpText('Core', 'Core_Affiliation_Empty');
+    },
     emptyHeading: EMPTY_HEADING,
     formerBadge: FORMER_BADGE,
     loading: LOADING,
     makePrimaryButton: MAKE_PRIMARY_BUTTON,
-    primaryBadge: PRIMARY_BADGE
+    primaryBadge: PRIMARY_BADGE,
+    editAction: EDIT_ACTION,
+    endAction: END_ACTION
   };
 
   affiliationObject = AFFILIATION_OBJECT;
@@ -193,7 +220,7 @@ export default class AffiliationPanel extends LightningElement {
     this.refreshAffiliations = result.refresh;
     if (result.errors && result.errors.length) {
       this.affiliations = [];
-      this.errorMessage = LOAD_FAILED;
+      this.errorMessage = helpText('Core', 'Core_Affiliation_LoadFailed');
       this.loaded = true;
     } else if (result.data) {
       const views = result.data.uiapi.query.Affiliation__c.edges.map((edge) =>
@@ -226,6 +253,38 @@ export default class AffiliationPanel extends LightningElement {
     const info = this.affiliationInfo;
     const field = info && info.fields && info.fields[IS_PRIMARY_FIELD.fieldApiName];
     return Boolean(info && info.updateable && field && field.updateable);
+  }
+
+  /** Edit, only for someone who can edit affiliations. */
+  get canEdit() {
+    return Boolean(this.affiliationInfo && this.affiliationInfo.updateable);
+  }
+
+  /** End It writes End Date, so it needs edit on affiliations and on that field. */
+  get canEndAffiliations() {
+    const info = this.affiliationInfo;
+    const field = info && info.fields && info.fields[END_DATE_FIELD.fieldApiName];
+    return Boolean(info && info.updateable && field && field.updateable);
+  }
+
+  /**
+   * The rows with the actions this user may take on each, worked out on the way to the
+   * screen because access arrives on its own wire, before or after the affiliations.
+   */
+  get rows() {
+    const canEdit = this.canEdit;
+    const canEnd = this.canEndAffiliations;
+    const canMakePrimary = this.canMakePrimary;
+    return this.affiliations.map((affiliation) => {
+      const rowCanEnd = canEnd && !affiliation.isFormer;
+      const rowCanMakePrimary = canMakePrimary && affiliation.showMakePrimary;
+      return {
+        ...affiliation,
+        canEnd: rowCanEnd,
+        canMakePrimary: rowCanMakePrimary,
+        hasActions: canEdit || rowCanEnd || rowCanMakePrimary
+      };
+    });
   }
 
   get isLoading() {
@@ -266,16 +325,88 @@ export default class AffiliationPanel extends LightningElement {
   }
 
   decorate(affiliation) {
+    const headline = affiliation.readFromOrganization
+      ? affiliation.personName
+      : affiliation.organizationName;
     return {
       ...affiliation,
-      headline: affiliation.readFromOrganization
-        ? affiliation.personName
-        : affiliation.organizationName,
+      headline,
+      // A person shows their initials, an organization the account icon.
+      initials: affiliation.readFromOrganization ? initialsOf(headline) : undefined,
+      avatarIcon: affiliation.readFromOrganization ? 'standard:avatar' : 'standard:account',
+      href: recordHref(affiliation.id),
+      actionsLabel: ACTIONS_FOR.replace('{0}', headline || ''),
       showMakePrimary: !affiliation.isPrimary && !affiliation.isFormer,
-      cardClass: affiliation.isFormer
-        ? 'slds-box slds-m-bottom_x-small slds-theme_shade'
-        : 'slds-box slds-m-bottom_x-small'
+      rowClass: affiliation.isFormer ? 'slds-item slds-theme_shade' : 'slds-item'
     };
+  }
+
+  /** A row's name opens the affiliation; in a console, as a subtab beside the record. */
+  handleOpenRecord(event) {
+    const recordId = event.currentTarget.dataset.recordId;
+    const pageReference = {
+      type: 'standard__recordPage',
+      attributes: { recordId, actionName: 'view' }
+    };
+    const navigate = () => this[NavigationMixin.Navigate](pageReference);
+    if (followLinkInWorkspace(this, event, { recordId }, navigate) || opensElsewhere(event)) {
+      return;
+    }
+    event.preventDefault();
+    navigate();
+  }
+
+  /** A choice from a row's menu: Edit, Make Primary or End It. */
+  handleRowAction(event) {
+    const affiliationId = event.target.dataset.recordId;
+    const action = event.detail.value;
+    if (action === 'edit') {
+      this[NavigationMixin.Navigate]({
+        type: 'standard__recordPage',
+        attributes: {
+          recordId: affiliationId,
+          objectApiName: AFFILIATION_OBJECT,
+          actionName: 'edit'
+        }
+      });
+      return undefined;
+    }
+    if (action === 'end') {
+      return this.endAffiliation(affiliationId);
+    }
+    return this.makePrimary(affiliationId);
+  }
+
+  /** Sets End Date to today after a confirm; the save makes it Former. */
+  async endAffiliation(affiliationId) {
+    const affiliation = this.affiliations.find((row) => row.id === affiliationId);
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: helpText('Core', 'Core_Affiliation_EndConfirmTitle'),
+      message: helpText('Core', 'Core_Affiliation_EndConfirm'),
+      confirmLabel: END_ACTION,
+      cancelLabel: CANCEL_BUTTON
+    });
+    if (!confirmed) {
+      return;
+    }
+    this.busy = true;
+    try {
+      await updateRecord({
+        fields: {
+          [ID_FIELD.fieldApiName]: affiliationId,
+          [END_DATE_FIELD.fieldApiName]: localIsoDate(new Date())
+        }
+      });
+      this.errorMessage = undefined;
+      this.notify(helpText('Core', 'Core_Affiliation_EndSuccess'), 'success');
+      // Ending a primary affiliation can change the person's Primary Affiliation field.
+      this.refresh(affiliation ? [affiliation.personId] : []);
+    } catch {
+      this.errorMessage = helpText('Core', 'Core_Affiliation_EndFailed');
+      this.notify(this.errorMessage, 'error');
+    }
+    this.busy = false;
   }
 
   handleAdd() {
@@ -288,16 +419,15 @@ export default class AffiliationPanel extends LightningElement {
 
   handleFormSuccess() {
     this.showForm = false;
-    this.notify(SAVE_SUCCESS, 'success');
+    this.notify(helpText('Core', 'Core_Affiliation_SaveSuccess'), 'success');
     this.refresh();
   }
 
   handleFormError() {
-    this.errorMessage = SAVE_FAILED;
+    this.errorMessage = helpText('Core', 'Core_Affiliation_SaveFailed');
   }
 
-  async handleMakePrimary(event) {
-    const affiliationId = event.target.dataset.id;
+  async makePrimary(affiliationId) {
     const affiliation = this.affiliations.find((row) => row.id === affiliationId);
     try {
       // Clearing the person's other primary and copying the organization to their Primary
@@ -306,11 +436,11 @@ export default class AffiliationPanel extends LightningElement {
         fields: { [ID_FIELD.fieldApiName]: affiliationId, [IS_PRIMARY_FIELD.fieldApiName]: true }
       });
       this.errorMessage = undefined;
-      this.notify(MAKE_PRIMARY_SUCCESS, 'success');
+      this.notify(helpText('Core', 'Core_Affiliation_MakePrimarySuccess'), 'success');
       this.refresh(affiliation ? [affiliation.personId] : []);
     } catch {
-      this.errorMessage = MAKE_PRIMARY_FAILED;
-      this.notify(MAKE_PRIMARY_FAILED, 'error');
+      this.errorMessage = helpText('Core', 'Core_Affiliation_MakePrimaryFailed');
+      this.notify(helpText('Core', 'Core_Affiliation_MakePrimaryFailed'), 'error');
     }
   }
 

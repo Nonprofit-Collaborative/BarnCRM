@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Notes__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>What was agreed, what was sent and what comes next.</inlineHelpText>
+  <label>Notes</label>
+  <length>32768</length>
+  <visibleLines>5</visibleLines>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+</CustomField>

@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <template lwc:if={visible}>
         <lightning-card title={heading} icon-name="standard:data_integration_hub">
             <lightning-button slot="actions" data-id="refresh" label={labels.refresh} onclick={handleRefresh}></lightning-button>
@@ -19,29 +20,39 @@
                 </template>
 
                 <template lwc:if={hasError}>
-                    <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
-                        <span data-id="error-message">{errorMessage}</span>
-                    </div>
+                    <c-barn-notice
+                        class="slds-show slds-var-m-bottom_small"
+                        variant="error"
+                        message={errorMessage}
+                        data-id="error-message"
+                    ></c-barn-notice>
                 </template>
                 <template lwc:if={hasNotice}>
-                    <div class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small" role="status" aria-live="polite">
-                        <span data-id="notice-message">{noticeMessage}</span>
-                    </div>
+                    <c-barn-notice
+                        class="slds-show slds-var-m-bottom_small"
+                        variant="success"
+                        message={noticeMessage}
+                        data-id="notice-message"
+                    ></c-barn-notice>
                 </template>
 
                 <template lwc:if={isImportUndo}>
                     <section class="slds-box slds-var-m-bottom_medium" data-id="import-undo-box">
                         <h3 class="slds-text-heading_small slds-var-m-bottom_small">{importConfirmTitle}</h3>
                         <template lwc:if={importPreview}>
-                            <div class="slds-grid slds-wrap slds-gutters slds-var-m-bottom_small">
+                            <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small">
                                 <template for:each={importCounts} for:item="count">
                                     <div
                                         key={count.key}
-                                        class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-text-align_center"
-                                        data-id={count.key}
+                                        class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small"
                                     >
-                                        <p class="slds-text-heading_medium">{count.value}</p>
-                                        <p class="slds-text-body_small">{count.label}</p>
+                                        <c-barn-stat-tile
+                                            data-id={count.key}
+                                            label={count.label}
+                                            value={count.value}
+                                            align="start"
+                                            bordered
+                                        ></c-barn-stat-tile>
                                     </div>
                                 </template>
                             </div>
@@ -117,11 +128,12 @@
                                     <div class="slds-col">
                                         <p class="slds-text-title_bold">
                                             {row.title}
-                                            <lightning-badge
-                                                class={row.badgeClass}
+                                            <c-barn-status-badge
+                                                class="slds-var-m-left_x-small"
                                                 data-id="status-badge"
+                                                status={row.tone}
                                                 label={row.status}
-                                            ></lightning-badge>
+                                            ></c-barn-status-badge>
                                         </p>
                                         <p class="slds-text-body_small">{row.summary}</p>
                                         <template lwc:if={row.startedAt}>
@@ -183,5 +195,6 @@
                 </template>
             </div>
         </lightning-card>
+    </template>
     </template>
 </template>

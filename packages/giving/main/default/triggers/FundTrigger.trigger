@@ -4,13 +4,13 @@
  * bypassable from the settings console (ADR-0017).
  */
 trigger FundTrigger on Fund__c(
-    before insert,
-    before update,
-    before delete,
-    after insert,
-    after update,
-    after delete,
-    after undelete
+	before insert,
+	before update,
+	before delete,
+	after insert,
+	after update,
+	after delete,
+	after undelete
 ) {
-    TriggerDispatcher.run('Fund__c');
+	TriggerDispatcher.run('Fund__c');
 }

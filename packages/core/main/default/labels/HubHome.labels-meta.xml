@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_HubHome_AutomationPausedBanner</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: banner shown while all packaged automation is paused</shortDescription>
-        <value>BarnCRM automation is paused. Households and greetings are not being updated until it resumes.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_ChecklistHeading</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: heading above the setup checklist</shortDescription>
-        <value>Setup Checklist</value>
-    </labels>
-    <labels>
         <fullName>Core_HubHome_ErrorTileHeading</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -25,44 +9,20 @@
         <value>Errors to Review</value>
     </labels>
     <labels>
-        <fullName>Core_HubHome_ErrorTileLinkLabel</fullName>
+        <fullName>Core_HubHome_QuickLinkGiftEntry</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: link from the error tile to the Error Log tab</shortDescription>
-        <value>Open the Error Log</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_LoadErrorMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: message shown when part of the home page could not load</shortDescription>
-        <value>The home page could not load everything. The error is recorded in the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_QuickLinkHouseholds</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: quick link to the Households tab</shortDescription>
-        <value>Households</value>
+        <protected>false</protected>
+        <shortDescription>Hub home: Quick Links tile for the Giving Quick Gift Entry tab</shortDescription>
+        <value>Quick Gift Entry</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_QuickLinkOrganizations</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: quick link to the Organizations tab</shortDescription>
+        <protected>false</protected>
+        <shortDescription>Shared: the word Organizations as a link or heading</shortDescription>
         <value>Organizations</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_QuickLinkSettings</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: quick link to the BarnCRM Settings tab</shortDescription>
-        <value>BarnCRM Settings</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_QuickLinksHeading</fullName>
@@ -79,14 +39,6 @@
         <protected>true</protected>
         <shortDescription>Hub home: the page heading</shortDescription>
         <value>Welcome to BarnCRM</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_WelcomeMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: the sentence under the page heading</shortDescription>
-        <value>Start with the setup checklist below. You can leave and come back: your progress is saved.</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_RecurringHeading</fullName>
@@ -109,63 +61,15 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Hub home: link to the Import tab</shortDescription>
-        <value>Go to Import</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_WelcomeMessageReady</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: welcome sentence once setup is done, or for staff who do not run setup</shortDescription>
-        <value>Your households, people and organizations are in the tabs above.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_WarningAltText</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: what a screen reader says for the warning icon on a tile</shortDescription>
-        <value>Warning</value>
+        <shortDescription>Hub home and setup checklist: button that opens Super Importer</shortDescription>
+        <value>Open Super Importer</value>
     </labels>
     <labels>
         <fullName>Core_HubHome_BadgeOverdue</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: badge on a nightly job tile that has run before and is now late</shortDescription>
+        <protected>false</protected>
+        <shortDescription>Overdue badge: a late nightly job tile; Funders Grant Calendar overdue mark</shortDescription>
         <value>Overdue</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_ResumeAutomationLink</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: link in the paused automation warning, for administrators</shortDescription>
-        <value>Resume Automation</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_QuickLinkHouseholdsLine</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: the line on the Households quick link tile</shortDescription>
-        <value>Every household and its members.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_QuickLinkOrganizationsLine</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: the line on the Organizations quick link tile</shortDescription>
-        <value>Every organization and its affiliations.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HubHome_QuickLinkSettingsLine</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Hub home: the line on the BarnCRM Settings quick link tile</shortDescription>
-        <value>Every BarnCRM setting in one place.</value>
     </labels>
 </CustomLabels>

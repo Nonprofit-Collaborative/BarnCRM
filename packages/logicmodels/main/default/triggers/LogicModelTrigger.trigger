@@ -4,13 +4,13 @@
  * bypassable from the settings console unless its row always runs (ADR-0017, ADR-0024).
  */
 trigger LogicModelTrigger on Logic_Model__c(
-    before insert,
-    before update,
-    before delete,
-    after insert,
-    after update,
-    after delete,
-    after undelete
+	before insert,
+	before update,
+	before delete,
+	after insert,
+	after update,
+	after delete,
+	after undelete
 ) {
-    TriggerDispatcher.run('Logic_Model__c');
+	TriggerDispatcher.run('Logic_Model__c');
 }

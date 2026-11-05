@@ -6,27 +6,27 @@
  * System mode, as `ProgramsSharing`.
  */
 public without sharing class ProgramsSharingBatch implements Database.Batchable<SObject> {
-    private final Schema.SObjectType type;
+	private final Schema.SObjectType type;
 
-    public ProgramsSharingBatch(Schema.SObjectType type) {
-        this.type = type;
-    }
+	public ProgramsSharingBatch(Schema.SObjectType type) {
+		this.type = type;
+	}
 
-    public Database.QueryLocator start(Database.BatchableContext context) {
-        return Database.getQueryLocator(
-            'SELECT Id FROM ' + type.getDescribe().getName(),
-            AccessLevel.SYSTEM_MODE
-        );
-    }
+	public Database.QueryLocator start(Database.BatchableContext context) {
+		return Database.getQueryLocator(
+			'SELECT Id FROM ' + type.getDescribe().getName(),
+			AccessLevel.SYSTEM_MODE
+		);
+	}
 
-    public void execute(Database.BatchableContext context, List<SObject> records) {
-        ProgramsSharing.share(records);
-    }
+	public void execute(Database.BatchableContext context, List<SObject> records) {
+		ProgramsSharing.share(records);
+	}
 
-    /** Enrollments first, then deliveries. A test cannot chain a batch from a batch. */
-    public void finish(Database.BatchableContext context) {
-        if (type == Enrollment__c.SObjectType && !Test.isRunningTest()) {
-            Database.executeBatch(new ProgramsSharingBatch(Service_Delivery__c.SObjectType), 2000);
-        }
-    }
+	/** Enrollments first, then deliveries. A test cannot chain a batch from a batch. */
+	public void finish(Database.BatchableContext context) {
+		if (type == Enrollment__c.SObjectType && !Test.isRunningTest()) {
+			Database.executeBatch(new ProgramsSharingBatch(Service_Delivery__c.SObjectType), 2000);
+		}
+	}
 }

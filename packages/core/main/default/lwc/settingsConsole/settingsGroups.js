@@ -2,12 +2,12 @@ import EDITION_AND_FEATURES from '@salesforce/label/c.Core_SettingsGroup_Edition
 import PREFERENCES from '@salesforce/label/c.Core_SettingsGroup_Preferences';
 import TOOLS from '@salesforce/label/c.Core_SettingsGroup_Tools';
 import ORGANIZATION_DETAILS from '@salesforce/label/c.Core_SettingsGroup_OrganizationDetails';
-import ORGANIZATION_ADDRESS from '@salesforce/label/c.Core_SettingsGroup_OrganizationAddress';
+import ORGANIZATION_ADDRESS from '@salesforce/label/c.Core_OrganizationAddress_Heading';
 import RECEIPT_SIGNATURE from '@salesforce/label/c.Core_SettingsGroup_ReceiptSignature';
 import PEOPLE from '@salesforce/label/c.Core_SettingsGroup_People';
 import HOUSEHOLDS from '@salesforce/label/c.Core_SettingsGroup_Households';
 import HOUSEHOLD_NAMES from '@salesforce/label/c.Core_SettingsGroup_HouseholdNames';
-import RELATIONSHIPS from '@salesforce/label/c.Core_SettingsGroup_Relationships';
+import RELATIONSHIPS from '@salesforce/label/c.Core_Feature_Relationships_Name';
 import ADDRESS_UPDATES from '@salesforce/label/c.Core_SettingsGroup_AddressUpdates';
 import ADDRESS_CARD from '@salesforce/label/c.Core_SettingsGroup_AddressCard';
 import SEASONAL_ADDRESSES from '@salesforce/label/c.Core_SettingsGroup_SeasonalAddresses';
@@ -23,11 +23,13 @@ import RECEIPT_RUNS from '@salesforce/label/c.Core_SettingsGroup_ReceiptRuns';
 import ROLLUP_PROCESSING from '@salesforce/label/c.Core_SettingsGroup_RollupProcessing';
 import ROLLUP_BUILDER from '@salesforce/label/c.Core_SettingsGroup_RollupBuilder';
 import HOURS_AND_SHIFTS from '@salesforce/label/c.Core_SettingsGroup_HoursAndShifts';
-import ERROR_DIGEST from '@salesforce/label/c.Core_SettingsGroup_ErrorDigest';
+import ERROR_DIGEST from '@salesforce/label/c.Core_ErrorDigest_PageTitle';
 import ERROR_LOG_RETENTION from '@salesforce/label/c.Core_SettingsGroup_ErrorLogRetention';
+import ERROR_LOG from '@salesforce/label/c.Core_ErrorLogTile_Title';
 import IMPORTING from '@salesforce/label/c.Core_SettingsGroup_Importing';
 import GIFT_MATCHING from '@salesforce/label/c.Core_SettingsGroup_GiftMatching';
 import FIND_AND_BULK from '@salesforce/label/c.Core_SettingsGroup_FindAndBulk';
+import NIGHTLY_JOBS from '@salesforce/label/c.Core_NightlyJobs_Title';
 
 /**
  * The boxes (sub-sections) each BarnCRM Settings page shows its rows in (P1), by page name in
@@ -60,6 +62,7 @@ const PAGE_GROUPS = {
         'FiscalYearStartMonth'
       ]
     },
+    { id: 'Nightly Jobs', label: NIGHTLY_JOBS, keys: ['Nightly_Jobs'] },
     { id: 'Tools', label: TOOLS, keys: ['Custom_Metadata_Manager', 'Sample_Data'] }
   ],
   organization: [
@@ -143,7 +146,14 @@ const PAGE_GROUPS = {
     {
       id: 'Donor Levels',
       label: DONOR_LEVELS,
-      keys: ['Donor_Levels_Enabled__c', 'Donor_Level_Source_Field__c', 'Donor_Levels_Page']
+      keys: [
+        'Donor_Levels_Enabled__c',
+        'Donor_Level_Source_Field__c',
+        'Donor_Levels_Page',
+        'Donor_Score_Recency_Days__c',
+        'Donor_Score_Frequency_Gifts__c',
+        'Donor_Score_Monetary_Amount__c'
+      ]
     },
     {
       id: 'Acknowledgments and Stewardship',
@@ -171,7 +181,11 @@ const PAGE_GROUPS = {
         'Opportunity_Mirror_Direction__c',
         'Opportunity_Mirror_Start__c',
         'Opportunity_Mirror_Record_Types__c',
-        'Mirror_Opportunity_Mirror'
+        'Mirror_Opportunity_Mirror',
+        'Gift_Transaction_Mirror_Direction__c',
+        'Gift_Transaction_Mirror_Status__c',
+        'Gift_Transaction_Mirror_Start__c',
+        'Mirror_Gift_Transaction_Mirror'
       ]
     }
   ],
@@ -227,6 +241,8 @@ const PAGE_GROUPS = {
     }
   ],
   'error log': [
+    // The list itself lives in Org Optimizer (admin-14); this box only links there.
+    { id: 'Error Log', label: ERROR_LOG, keys: ['Error_Log_Optimizer_Link'] },
     {
       id: 'Error Digest',
       label: ERROR_DIGEST,

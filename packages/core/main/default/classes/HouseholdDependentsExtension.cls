@@ -9,10 +9,10 @@
  */
 @NamespaceAccessible
 public interface HouseholdDependentsExtension {
-    /**
-     * Of these household identifiers, the ones this package still credits records to, read
-     * in system mode so that a record the running user cannot see still counts. Never null;
-     * an empty set means none.
-     */
-    Set<Id> householdsWithDependents(Set<Id> householdIds);
+	/**
+	 * Of these household identifiers, the ones this package still credits records to, read
+	 * in system mode so that a record the running user cannot see still counts. Never null;
+	 * an empty set means none.
+	 */
+	Set<Id> householdsWithDependents(Set<Id> householdIds);
 }

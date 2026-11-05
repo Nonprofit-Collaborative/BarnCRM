@@ -1,0 +1,118 @@
+<template>
+  <lightning-card title={labels.title} icon-name="custom:custom82">
+    <div slot="actions" class="slds-grid slds-grid_vertical-align-center slds-wrap">
+      <lightning-radio-group
+        data-id="scope"
+        name="scope"
+        label={labels.scope}
+        variant="label-hidden"
+        type="button"
+        options={scopeOptions}
+        value={scope}
+        onchange={handleScope}
+      ></lightning-radio-group>
+    </div>
+    <div class="slds-var-p-horizontal_medium">
+      <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
+        <lightning-button-icon
+          data-id="previous"
+          icon-name="utility:chevronleft"
+          alternative-text={labels.previous}
+          title={labels.previous}
+          onclick={handlePrevious}
+        ></lightning-button-icon>
+        <h2
+          data-id="month"
+          class="slds-text-heading_medium slds-var-m-horizontal_small"
+          aria-live="polite"
+        >
+          {monthTitle}
+        </h2>
+        <lightning-button-icon
+          data-id="next"
+          icon-name="utility:chevronright"
+          alternative-text={labels.next}
+          title={labels.next}
+          onclick={handleNext}
+        ></lightning-button-icon>
+      </div>
+
+      <ul class="barn-legend slds-var-m-bottom_small slds-text-body_small" data-id="legend">
+        <template for:each={legend} for:item="entry">
+          <li key={entry.key} class="barn-legend-entry" data-id="legend-entry">
+            <span class={entry.swatchClass}></span>{entry.text}
+          </li>
+        </template>
+        <li class="barn-legend-entry" data-id="legend-overdue">
+          <lightning-icon
+            icon-name="utility:warning"
+            size="xx-small"
+            variant="error"
+            class="slds-var-m-right_xx-small"
+          ></lightning-icon
+          >{labels.overdue}
+        </li>
+      </ul>
+
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
+      </template>
+
+      <table class="barn-calendar slds-size_full" data-id="calendar">
+        <caption class="slds-assistive-text">
+          {monthTitle}
+        </caption>
+        <thead>
+          <tr>
+            <template for:each={weekdays} for:item="weekday">
+              <th key={weekday.key} scope="col" class="slds-text-title_bold">{weekday.name}</th>
+            </template>
+          </tr>
+        </thead>
+        <tbody>
+          <template for:each={weeks} for:item="week">
+            <tr key={week.key} data-id="week">
+              <template for:each={week.days} for:item="day">
+                <td key={day.key} class={day.cellClass} data-id="day" data-date={day.date}>
+                  <span class="barn-day-number">{day.day}</span>
+                  <ul>
+                    <template for:each={day.items} for:item="item">
+                      <li key={item.id}>
+                        <button
+                          type="button"
+                          data-id="item"
+                          data-kind={item.kind}
+                          data-record-id={item.id}
+                          data-object={item.objectApiName}
+                          class={item.itemClass}
+                          title={item.title}
+                          onclick={handleOpen}
+                        >
+                          <template lwc:if={item.overdue}>
+                            <lightning-icon
+                              data-id="overdue"
+                              icon-name="utility:warning"
+                              size="xx-small"
+                              variant="error"
+                              alternative-text={labels.overdue}
+                              class="slds-var-m-right_xx-small"
+                            ></lightning-icon>
+                          </template>
+                          {item.text}
+                        </button>
+                      </li>
+                    </template>
+                  </ul>
+                </td>
+              </template>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+  </lightning-card>
+</template>

@@ -9,60 +9,20 @@
         <value>Data Manager</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_Intro</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: one line under the title</shortDescription>
-        <value>Start a data task, or see and undo what changed.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataManager_ImportTitle</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: card that opens the Import tab</shortDescription>
-        <value>Import a File</value>
+        <shortDescription>Data Manager: card that opens the Super Importer tab</shortDescription>
+        <value>Super Importer</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_ImportText</fullName>
+        <fullName>Core_DataManager_TaskSearch</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Data Manager: one line on the Import a File tile</shortDescription>
-        <value>Add or update records from a spreadsheet, with a dry run first.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_FindTitle</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: card that opens Find</shortDescription>
-        <value>Find and Export Records</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_FindText</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: one line on the Find tile</shortDescription>
-        <value>Find records, save the query, and export them to a file.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_UpdateTitle</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: card for bulk update</shortDescription>
-        <value>Update Many Records</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_UpdateText</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: one line on the bulk update tile</shortDescription>
-        <value>Super Transform: change fields on many records, no file needed.</value>
+        <shortDescription>Data Manager: label of the task search box above the tiles</shortDescription>
+        <value>What Do You Want to Do?</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_DeleteTitle</fullName>
@@ -73,52 +33,12 @@
         <value>Delete Many Records</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_DeleteText</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: one line on the bulk delete tile</shortDescription>
-        <value>Find records, then move them to the Recycle Bin.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_DeleteWarning</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: warning in the box shown when bulk delete is opened</shortDescription>
-        <value>Deleted records go to the Recycle Bin. You can undo a bulk delete from Data Jobs, on this page, for up to 15 days.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataManager_DeleteContinue</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: button in the delete warning box that opens Find</shortDescription>
         <value>Continue</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_DeleteCancel</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: button that closes the delete warning box</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_OptimizerTitle</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: card that opens Org Optimizer</shortDescription>
-        <value>Org Optimizer</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_OptimizerText</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: one line on the Org Optimizer tile</shortDescription>
-        <value>See which records and settings need attention.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_MappingsHeading</fullName>
@@ -129,28 +49,12 @@
         <value>Import Templates</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_MappingsIntro</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: one line under Import Templates</shortDescription>
-        <value>A template remembers how a file's columns match fields.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataManager_MappingsEmpty</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: empty state heading with no import templates</shortDescription>
         <value>No Import Templates Yet</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_ColumnName</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: templates column, the template name</shortDescription>
-        <value>Template</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_ColumnLoads</fullName>
@@ -185,14 +89,6 @@
         <value>People and organizations</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_LoadsGifts</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: what a gift template loads</shortDescription>
-        <value>Gifts</value>
-    </labels>
-    <labels>
         <fullName>Core_DataManager_SalesforceHeading</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
@@ -223,22 +119,6 @@
         <protected>false</protected>
         <shortDescription>Data Manager: tile that opens the Data Import Wizard in Setup</shortDescription>
         <value>Data Import Wizard</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_HelpChange</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: About This Tool, which tool changes many records</shortDescription>
-        <value>To change records from a spreadsheet, use Import a File. To change the same fields on many records, use Update Many Records.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_HelpDelete</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: About This Tool, deleting the records a file lists</shortDescription>
-        <value>To delete the records a spreadsheet lists by record ID, use Import a File.</value>
     </labels>
     <labels>
         <fullName>Core_DataManager_GroupBringIn</fullName>
@@ -273,43 +153,11 @@
         <value>Careful</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_MappingsEmptyHint</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: line under the no import templates heading</shortDescription>
-        <value>Make one in Import a File by choosing One Kind of Record.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataManager_CreateTemplate</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Manager: button that opens Import to create a template</shortDescription>
         <value>Create a Template</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_WeeklyExportText</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: one line on the Weekly Data Export tile</shortDescription>
-        <value>Your backup: a copy of all your data, each week.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_RecycleBinText</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: one line on the Recycle Bin tile</shortDescription>
-        <value>Restore records deleted in the last 15 days.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataManager_DataImportWizardText</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: one line on the Data Import Wizard tile</shortDescription>
-        <value>Load records that BarnCRM does not import.</value>
     </labels>
 </CustomLabels>

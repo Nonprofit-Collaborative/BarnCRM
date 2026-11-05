@@ -20,29 +20,18 @@ import {
   buildReadme
 } from 'c/aiReadinessPack';
 
-import CHOOSE_LABEL from '@salesforce/label/c.Core_DataDictionary_ChooseLabel';
-import SOURCE_LABEL from '@salesforce/label/c.Core_DataDictionary_SourceLabel';
+import CHOOSE_LABEL from '@salesforce/label/c.Core_AccessCompare_KindsHeading';
+import SOURCE_LABEL from '@salesforce/label/c.Core_Filter_AvailableValues';
 import SELECTED_LABEL from '@salesforce/label/c.Core_DataDictionary_SelectedLabel';
 import INCLUDE_FILL_RATES from '@salesforce/label/c.Core_DataDictionary_IncludeFillRates';
-import INCLUDE_FILL_RATES_HELP from '@salesforce/label/c.Core_DataDictionary_IncludeFillRatesHelp';
-import DESCRIBE_PROGRESS from '@salesforce/label/c.Core_DataDictionary_Progress';
-import FILL_PROGRESS from '@salesforce/label/c.Core_DataDictionary_FillProgress';
-import NOT_COUNTED from '@salesforce/label/c.Core_DataDictionary_NotCounted';
-import COL_OBJECT from '@salesforce/label/c.Core_DataDictionary_ColObject';
-import COL_FIELD from '@salesforce/label/c.Core_DataDictionary_ColField';
-import COL_API_NAME from '@salesforce/label/c.Core_DataDictionary_ColApiName';
-import TITLE from '@salesforce/label/c.Core_AiExport_Title';
-import INTRO from '@salesforce/label/c.Core_AiExport_Intro';
+import COL_OBJECT from '@salesforce/label/c.Core_MatchLogic_Object';
+import COL_FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
+import COL_API_NAME from '@salesforce/label/c.Core_AccessExplorer_ColApiName';
+import TITLE from '@salesforce/label/c.Core_OrgOptimizer_AiExport';
 import INCLUDE_RECORDS from '@salesforce/label/c.Core_AiExport_IncludeRecords';
-import INCLUDE_RECORDS_HELP from '@salesforce/label/c.Core_AiExport_IncludeRecordsHelp';
 import INCLUDE_CHECKS from '@salesforce/label/c.Core_AiExport_IncludeChecks';
-import INCLUDE_CHECKS_HELP from '@salesforce/label/c.Core_AiExport_IncludeChecksHelp';
-import NEEDS_FIND from '@salesforce/label/c.Core_AiExport_NeedsFind';
 import REVIEW from '@salesforce/label/c.Core_AiExport_Review';
-import REVIEW_FIRST from '@salesforce/label/c.Core_AiExport_ReviewFirst';
 import SENSITIVE_HEADING from '@salesforce/label/c.Core_AiExport_SensitiveHeading';
-import SENSITIVE_INTRO from '@salesforce/label/c.Core_AiExport_SensitiveIntro';
-import NO_SENSITIVE from '@salesforce/label/c.Core_AiExport_NoSensitive';
 import COL_WHY from '@salesforce/label/c.Core_AiExport_ColWhy';
 import COL_HANDLING from '@salesforce/label/c.Core_AiExport_ColHandling';
 import LEAVE_OUT from '@salesforce/label/c.Core_AiExport_LeaveOut';
@@ -51,26 +40,20 @@ import KEEP from '@salesforce/label/c.Core_AiExport_Keep';
 import REASON_EMAIL from '@salesforce/label/c.Core_AiExport_ReasonEmail';
 import REASON_PHONE from '@salesforce/label/c.Core_AiExport_ReasonPhone';
 import REASON_ENCRYPTED from '@salesforce/label/c.Core_AiExport_ReasonEncrypted';
-import REASON_NAME from '@salesforce/label/c.Core_AiExport_ReasonName';
+import REASON_NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
 import REASON_BIRTH_DATE from '@salesforce/label/c.Core_AiExport_ReasonBirthDate';
 import REASON_ADDRESS from '@salesforce/label/c.Core_AiExport_ReasonAddress';
 import REASON_IDENTITY from '@salesforce/label/c.Core_AiExport_ReasonIdentity';
 import REASON_PRIVATE from '@salesforce/label/c.Core_AiExport_ReasonPrivate';
 import REASON_FREE_TEXT from '@salesforce/label/c.Core_AiExport_ReasonFreeText';
 import DOWNLOAD from '@salesforce/label/c.Core_AiExport_Download';
-import RECORDS_PROGRESS from '@salesforce/label/c.Core_AiExport_RecordsProgress';
-import WRITING from '@salesforce/label/c.Core_AiExport_Writing';
-import DONE from '@salesforce/label/c.Core_AiExport_Done';
-import STOPPED from '@salesforce/label/c.Core_AiExport_Stopped';
-import RECORDS_FAILED from '@salesforce/label/c.Core_AiExport_RecordsFailed';
-import CHECKS_FAILED from '@salesforce/label/c.Core_AiExport_ChecksFailed';
-import README_TITLE from '@salesforce/label/c.Core_AiExport_ReadmeTitle';
+import README_TITLE from '@salesforce/label/c.Core_OrgOptimizer_AiExport';
 import README_INTRO from '@salesforce/label/c.Core_AiExport_ReadmeIntro';
 import README_FILES from '@salesforce/label/c.Core_AiExport_ReadmeFiles';
 import README_FILE_SCHEMA from '@salesforce/label/c.Core_AiExport_ReadmeFileSchema';
 import README_FILE_DICTIONARY from '@salesforce/label/c.Core_AiExport_ReadmeFileDictionary';
 import README_FILE_DATA from '@salesforce/label/c.Core_AiExport_ReadmeFileData';
-import README_OBJECTS from '@salesforce/label/c.Core_AiExport_ReadmeObjects';
+import README_OBJECTS from '@salesforce/label/c.Core_AccessCompare_KindsHeading';
 import README_OBJECT_LINE from '@salesforce/label/c.Core_AiExport_ReadmeObjectLine';
 import README_OBJECT_RECORDS from '@salesforce/label/c.Core_AiExport_ReadmeObjectRecords';
 import README_OBJECT_STOPPED from '@salesforce/label/c.Core_AiExport_ReadmeObjectStopped';
@@ -84,13 +67,14 @@ import README_PRIVACY_KEPT from '@salesforce/label/c.Core_AiExport_ReadmePrivacy
 import README_PRIVACY_ADVICE from '@salesforce/label/c.Core_AiExport_ReadmePrivacyAdvice';
 import README_QUALITY from '@salesforce/label/c.Core_AiExport_ReadmeQuality';
 import README_QUALITY_LOW_FILL from '@salesforce/label/c.Core_AiExport_ReadmeQualityLowFill';
-import README_QUALITY_CHECK from '@salesforce/label/c.Core_AiExport_ReadmeQualityCheck';
+import README_QUALITY_CHECK from '@salesforce/label/c.Core_Format_PairSentence';
 import README_QUALITY_NONE from '@salesforce/label/c.Core_AiExport_ReadmeQualityNone';
 import README_USE from '@salesforce/label/c.Core_AiExport_ReadmeUse';
 import README_USE_STEP_1 from '@salesforce/label/c.Core_AiExport_ReadmeUseStep1';
 import README_USE_STEP_2 from '@salesforce/label/c.Core_AiExport_ReadmeUseStep2';
 import README_USE_STEP_3 from '@salesforce/label/c.Core_AiExport_ReadmeUseStep3';
 import README_USE_STEP_4 from '@salesforce/label/c.Core_AiExport_ReadmeUseStep4';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_BASE = 'AI_Readiness_Export';
 /** Find's own export limit when its page cannot be read (FindController.DEFAULT_EXPORT_LIMIT). */
@@ -147,24 +131,50 @@ const README_TEXT = {
  * server check, and calls no outside service: the pack is built here and downloaded.
  */
 export default class AiReadinessExport extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_AiExport_Intro');
+    },
     chooseLabel: CHOOSE_LABEL,
     sourceLabel: SOURCE_LABEL,
     selectedLabel: SELECTED_LABEL,
     includeRecords: INCLUDE_RECORDS,
-    includeRecordsHelp: INCLUDE_RECORDS_HELP,
+    get includeRecordsHelp() {
+      return helpText('Core', 'Core_AiExport_IncludeRecordsHelp');
+    },
     includeFillRates: INCLUDE_FILL_RATES,
-    includeFillRatesHelp: INCLUDE_FILL_RATES_HELP,
+    get includeFillRatesHelp() {
+      return helpText('Core', 'Core_DataDictionary_IncludeFillRatesHelp');
+    },
     includeChecks: INCLUDE_CHECKS,
-    includeChecksHelp: INCLUDE_CHECKS_HELP,
-    needsFind: NEEDS_FIND,
+    get includeChecksHelp() {
+      return helpText('Core', 'Core_AiExport_IncludeChecksHelp');
+    },
+    get needsFind() {
+      return helpText('Core', 'Core_AiExport_NeedsFind');
+    },
     review: REVIEW,
-    reviewFirst: REVIEW_FIRST,
+    get reviewFirst() {
+      return helpText('Core', 'Core_AiExport_ReviewFirst');
+    },
     sensitiveHeading: SENSITIVE_HEADING,
-    sensitiveIntro: SENSITIVE_INTRO,
-    noSensitive: NO_SENSITIVE,
+    get sensitiveIntro() {
+      return helpText('Core', 'Core_AiExport_SensitiveIntro');
+    },
+    get noSensitive() {
+      return helpText('Core', 'Core_AiExport_NoSensitive');
+    },
     colObject: COL_OBJECT,
     colField: COL_FIELD,
     colApiName: COL_API_NAME,
@@ -278,7 +288,7 @@ export default class AiReadinessExport extends LightningElement {
       const described = [];
       for (const objectName of names) {
         this.progressText = format(
-          DESCRIBE_PROGRESS,
+          helpText('Core', 'Core_DataDictionary_Progress'),
           String(described.length),
           String(names.length)
         );
@@ -316,7 +326,7 @@ export default class AiReadinessExport extends LightningElement {
       if (run !== this.run) {
         return;
       }
-      this.progressText = WRITING;
+      this.progressText = helpText('Core', 'Core_AiExport_Writing');
       const schema = buildSchema(objects, { handlingByKey, fillRates, records, checks });
       const dictionaryRows = objects.flatMap((object) =>
         object.fields.map((field) => {
@@ -335,9 +345,10 @@ export default class AiReadinessExport extends LightningElement {
         fileName(FILE_BASE, new Date(), 'zip')
       );
       const total = Object.values(records).reduce((sum, info) => sum + info.count, 0);
-      this.noticeMessage = [format(DONE, String(objects.length), String(total)), ...notes].join(
-        ' '
-      );
+      this.noticeMessage = [
+        format(helpText('Core', 'Core_AiExport_Done'), String(objects.length), String(total)),
+        ...notes
+      ].join(' ');
     });
   }
 
@@ -346,7 +357,10 @@ export default class AiReadinessExport extends LightningElement {
     const fillRates = {};
     const skipped = [];
     for (const object of objects) {
-      this.progressText = format(FILL_PROGRESS, object.objectLabel);
+      this.progressText = format(
+        helpText('Core', 'Core_DataDictionary_FillProgress'),
+        object.objectLabel
+      );
       try {
         // eslint-disable-next-line no-await-in-loop
         const shares = await readFillRates(object.objectName, () => run === this.run);
@@ -361,7 +375,7 @@ export default class AiReadinessExport extends LightningElement {
       }
     }
     if (skipped.length) {
-      notes.push(format(NOT_COUNTED, skipped.join(', ')));
+      notes.push(format(helpText('Core', 'Core_DataDictionary_NotCounted'), skipped.join(', ')));
     }
     return fillRates;
   }
@@ -370,7 +384,7 @@ export default class AiReadinessExport extends LightningElement {
     try {
       return await getChecks();
     } catch {
-      notes.push(CHECKS_FAILED);
+      notes.push(helpText('Core', 'Core_AiExport_ChecksFailed'));
       return [];
     }
   }
@@ -426,10 +440,12 @@ export default class AiReadinessExport extends LightningElement {
       }
     }
     if (stopped.length) {
-      notes.push(format(STOPPED, String(limit), stopped.join(', ')));
+      notes.push(
+        format(helpText('Core', 'Core_AiExport_Stopped'), String(limit), stopped.join(', '))
+      );
     }
     if (failed.length) {
-      notes.push(format(RECORDS_FAILED, failed.join(', ')));
+      notes.push(format(helpText('Core', 'Core_AiExport_RecordsFailed'), failed.join(', ')));
     }
     return records;
   }
@@ -460,7 +476,11 @@ export default class AiReadinessExport extends LightningElement {
         }
         afterId = page.lastId;
         done = page.done;
-        this.progressText = format(RECORDS_PROGRESS, object.objectLabel, String(byId.size));
+        this.progressText = format(
+          helpText('Core', 'Core_AiExport_RecordsProgress'),
+          object.objectLabel,
+          String(byId.size)
+        );
       }
       if (index === 0) {
         stopped = !done || seen > limit;

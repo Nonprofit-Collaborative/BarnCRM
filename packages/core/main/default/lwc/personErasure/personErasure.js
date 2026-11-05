@@ -7,13 +7,12 @@ import getPreview from '@salesforce/apex/PersonErasureController.preview';
 import erasePerson from '@salesforce/apex/PersonErasureController.erase';
 
 import TITLE from '@salesforce/label/c.Core_EraseAction_Title';
-import WARNING from '@salesforce/label/c.Core_EraseAction_Warning';
-import PREVIEW from '@salesforce/label/c.Core_EraseAction_Preview';
+import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
 import WORKING from '@salesforce/label/c.Core_EraseAction_Working';
 import COLUMN_ACTION from '@salesforce/label/c.Core_EraseAction_ColumnAction';
-import COLUMN_OBJECT from '@salesforce/label/c.Core_EraseAction_ColumnObject';
+import COLUMN_OBJECT from '@salesforce/label/c.Core_BulkUpdate_Record';
 import COLUMN_COUNT from '@salesforce/label/c.Core_EraseAction_ColumnCount';
-import COLUMN_FIELDS from '@salesforce/label/c.Core_EraseAction_ColumnFields';
+import COLUMN_FIELDS from '@salesforce/label/c.Core_AccessCompare_FieldsHeading';
 import COLUMN_NOTE from '@salesforce/label/c.Core_EraseAction_ColumnNote';
 import CHANGES_TABLE from '@salesforce/label/c.Core_EraseAction_ChangesTable';
 import ACTION_CLEARED from '@salesforce/label/c.Core_EraseAction_Cleared';
@@ -22,13 +21,11 @@ import ACTION_DELETED from '@salesforce/label/c.Core_EraseAction_Deleted';
 import ACTION_KEPT from '@salesforce/label/c.Core_EraseAction_Kept';
 import ACTION_UPDATED from '@salesforce/label/c.Core_EraseAction_Updated';
 import REFERENCE from '@salesforce/label/c.Core_EraseAction_Reference';
-import REFERENCE_HELP from '@salesforce/label/c.Core_EraseAction_ReferenceHelp';
 import CONFIRM from '@salesforce/label/c.Core_EraseAction_Confirm';
 import ERASE from '@salesforce/label/c.Core_EraseAction_Erase';
-import DONE from '@salesforce/label/c.Core_EraseAction_Done';
 import OPEN_AUDIT from '@salesforce/label/c.Core_EraseAction_OpenAudit';
-import CLOSE from '@salesforce/label/c.Core_EraseAction_Close';
-import NO_PERMISSION from '@salesforce/label/c.Core_Erase_NoPermission';
+import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ACTION_LABELS = {
   Cleared: ACTION_CLEARED,
@@ -44,21 +41,39 @@ function normalized(value) {
 }
 
 export default class PersonErasure extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
 
   label = {
     title: TITLE,
-    warning: WARNING,
+    get warning() {
+      return helpText('Core', 'Core_EraseAction_Warning');
+    },
     preview: PREVIEW,
     working: WORKING,
     changesTable: CHANGES_TABLE,
     reference: REFERENCE,
-    referenceHelp: REFERENCE_HELP,
+    get referenceHelp() {
+      return helpText('Core', 'Core_EraseAction_ReferenceHelp');
+    },
     erase: ERASE,
-    done: DONE,
+    get done() {
+      return helpText('Core', 'Core_EraseAction_Done');
+    },
     openAudit: OPEN_AUDIT,
     close: CLOSE,
-    noPermission: NO_PERMISSION
+    get noPermission() {
+      return helpText('Core', 'Core_Erase_NoPermission');
+    }
   };
 
   columns = [

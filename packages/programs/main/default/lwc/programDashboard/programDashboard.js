@@ -3,8 +3,7 @@ import { NavigationMixin } from 'lightning/navigation';
 import getDashboard from '@salesforce/apex/ProgramDashboardController.getDashboard';
 
 import TITLE from '@salesforce/label/c.Programs_Dashboard_Title';
-import INTRO from '@salesforce/label/c.Programs_Dashboard_Intro';
-import PERIOD from '@salesforce/label/c.Programs_Dashboard_Period';
+import PERIOD from '@salesforce/label/c.Core_Shared_Period';
 import THIS_MONTH from '@salesforce/label/c.Programs_Dashboard_ThisMonth';
 import LAST_MONTH from '@salesforce/label/c.Programs_Dashboard_LastMonth';
 import THIS_YEAR from '@salesforce/label/c.Programs_Dashboard_ThisYear';
@@ -13,20 +12,22 @@ import LAST_12_MONTHS from '@salesforce/label/c.Programs_Dashboard_Last12Months'
 import ACTIVE_PROGRAMS from '@salesforce/label/c.Programs_Dashboard_ActivePrograms';
 import OPEN_ENROLLMENTS from '@salesforce/label/c.Programs_Dashboard_OpenEnrollments';
 import NEW_ENROLLMENTS from '@salesforce/label/c.Programs_Dashboard_NewEnrollments';
-import COMPLETED from '@salesforce/label/c.Programs_Dashboard_Completed';
+import COMPLETED from '@salesforce/label/c.Core_Shared_Completed';
 import PEOPLE_SERVED from '@salesforce/label/c.Programs_Dashboard_PeopleServed';
+import PEOPLE_COUNTED from '@salesforce/label/c.Programs_Dashboard_PeopleCounted';
 import DELIVERED from '@salesforce/label/c.Programs_Dashboard_Delivered';
 import ATTENDANCE_RATE from '@salesforce/label/c.Programs_Dashboard_AttendanceRate';
-import PROGRAM from '@salesforce/label/c.Programs_Dashboard_Program';
+import PROGRAM from '@salesforce/label/c.Core_Shared_Program';
 import BY_PROGRAM from '@salesforce/label/c.Programs_Dashboard_ByProgram';
 import NO_RATE from '@salesforce/label/c.Programs_Dashboard_NoRate';
 import NO_PROGRAMS from '@salesforce/label/c.Programs_Dashboard_NoPrograms';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Dashboard_MoreThanShown';
 import LOAD_FAILED from '@salesforce/label/c.Programs_Dashboard_LoadFailed';
 import NO_ACCESS from '@salesforce/label/c.Programs_Dashboard_NoAccess';
-import LOADING from '@salesforce/label/c.Programs_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import { DEFAULT_PERIOD, periodRange, programRows, tiles } from './dashboardRows';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Programs Dashboard (P-05): for the period picked, tiles for the whole organization and a
@@ -34,15 +35,20 @@ import { DEFAULT_PERIOD, periodRange, programRows, tiles } from './dashboardRows
  * are worked out in `dashboardRows`.
  */
 export default class ProgramDashboard extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Programs');
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Programs', 'Programs_Dashboard_Intro');
+    },
     period: PERIOD,
     program: PROGRAM,
     openEnrollments: OPEN_ENROLLMENTS,
     newEnrollments: NEW_ENROLLMENTS,
     completed: COMPLETED,
     peopleServed: PEOPLE_SERVED,
+    peopleCounted: PEOPLE_COUNTED,
     delivered: DELIVERED,
     attendanceRate: ATTENDANCE_RATE,
     byProgram: BY_PROGRAM,
@@ -66,6 +72,11 @@ export default class ProgramDashboard extends NavigationMixin(LightningElement) 
   errorMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Programs').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -100,6 +111,7 @@ export default class ProgramDashboard extends NavigationMixin(LightningElement) 
       openEnrollments: OPEN_ENROLLMENTS,
       newEnrollments: NEW_ENROLLMENTS,
       peopleServed: PEOPLE_SERVED,
+      peopleCounted: PEOPLE_COUNTED,
       delivered: DELIVERED,
       attendanceRate: ATTENDANCE_RATE,
       noRate: NO_RATE

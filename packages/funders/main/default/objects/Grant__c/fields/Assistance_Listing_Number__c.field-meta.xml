@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Assistance_Listing_Number__c</fullName>
+  <length>6</length>
+  <required>false</required>
+  <externalId>false</externalId>
+  <inlineHelpText>The federal Assistance Listing number (formerly CFDA), for example 84.287.</inlineHelpText>
+  <label>Assistance Listing Number</label>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+</CustomField>

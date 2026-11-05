@@ -129,14 +129,6 @@
         <value>{0} &gt; {1}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_ParentFieldNote</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Step 4 note shown when a filter reads a field of another record.</shortDescription>
-        <value>This filter reads a field of another record. When that record changes, totals update at once only if its object has rollup triggers. Otherwise the nightly run, or Recalculate on the Rollups page, puts them right.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_SourceBy</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -185,22 +177,6 @@
         <value>Rollup saved. BarnCRM Rollup Builder is turned off on Modules, so it is calculated once you turn it on.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_AddCondition</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter builder button that adds a condition row.</shortDescription>
-        <value>Add Condition</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_Field</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter builder label for the field of a condition.</shortDescription>
-        <value>Field</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupFilter_Operator</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -209,36 +185,12 @@
         <value>Comparison</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_Value</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter builder label for the value of a condition.</shortDescription>
-        <value>Value</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_Remove</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter builder remove button text. {0} is the condition number.</shortDescription>
-        <value>Remove condition {0}</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupFilter_Logic</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Filter builder label for the logic string.</shortDescription>
         <value>Combine conditions</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_LogicHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Help for the logic string.</shortDescription>
-        <value>Leave empty to require every condition. Or type the condition numbers with AND, OR, NOT and brackets, for example 1 AND (2 OR 3).</value>
     </labels>
     <labels>
         <fullName>Core_RollupFilter_ListHelp</fullName>
@@ -289,22 +241,6 @@
         <value>not</value>
     </labels>
     <labels>
-        <fullName>Core_RollupFilter_True</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Checked value of a checkbox in a filter condition.</shortDescription>
-        <value>True</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_False</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Unchecked value of a checkbox in a filter condition.</shortDescription>
-        <value>False</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupFilter_ErrorIncomplete</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -335,86 +271,6 @@
         <protected>false</protected>
         <shortDescription>Filter comparison: not equals.</shortDescription>
         <value>is not</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpLessThan</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: less than.</shortDescription>
-        <value>is less than</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpLessOrEqual</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: less than or equal.</shortDescription>
-        <value>is at most</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpGreaterThan</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: greater than.</shortDescription>
-        <value>is greater than</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpGreaterOrEqual</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: greater than or equal.</shortDescription>
-        <value>is at least</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpContains</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: contains.</shortDescription>
-        <value>contains</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpDoesNotContain</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: does not contain.</shortDescription>
-        <value>does not contain</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpStartsWith</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: starts with.</shortDescription>
-        <value>starts with</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpIsNull</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: is null.</shortDescription>
-        <value>is blank</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpIsNotNull</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: is not null.</shortDescription>
-        <value>is not blank</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupFilter_OpIn</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Filter comparison: in a list.</shortDescription>
-        <value>is one of</value>
     </labels>
     <labels>
         <fullName>Core_RollupFilter_OpNotIn</fullName>
@@ -481,28 +337,12 @@
         <value>Field that shows the total</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_TargetFieldHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Step 1 help for the field list.</shortDescription>
-        <value>Only fields BarnCRM can write are listed. If the field you need does not exist, create a Number or Currency field in Setup, then come back.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_TargetSearch</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Step 1 label: a search box that finds any object to show the total on.</shortDescription>
         <value>Find another object</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_TargetSearchHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Step 1 help for the object search box.</shortDescription>
-        <value>The list shows the objects most often used. Type part of a name to find any other object you can see, then pick it from the list.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_NoInstant</fullName>
@@ -577,14 +417,6 @@
         <value>Only the first N records</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_RowLimitHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Step 3 help for the row limit.</shortDescription>
-        <value>Optional. For the sum of the 5 largest gifts, enter 5 and order by Amount, Descending. Leave blank for every record.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_CustomDelimiter</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -599,14 +431,6 @@
         <protected>false</protected>
         <shortDescription>Step 4 label: count deleted and archived records too.</shortDescription>
         <value>Include deleted and archived records</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_IncludeDeletedHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Step 4 help for including deleted and archived records.</shortDescription>
-        <value>Counts records in the Recycle Bin and archived tasks and events. Deleting a record does not lower the total; emptying the Recycle Bin does, at the next full recalculation.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_Delimiter</fullName>
@@ -681,28 +505,12 @@
         <value>This field is a number, not a currency, so the total is shown in the corporate currency.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Filter</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Step 4 label: the conditions on the counted records.</shortDescription>
-        <value>Conditions</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_TargetFilter</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Step 4 label: the conditions on the records that show the total.</shortDescription>
         <value>Only for some records</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Name</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Step 5 label: the rollup's name.</shortDescription>
-        <value>Name</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_Description</fullName>
@@ -721,52 +529,12 @@
         <value>Skip for people with this custom permission (optional)</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_BypassPermissionHelp</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Step 5 help: what the bypass custom permission does</shortDescription>
-        <value>The API name of a custom permission, such as Data_Migration. Records saved by people who hold it do not update this total. Recalculate still does, and so does the nightly run when the rollup runs Every night or Both.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_Summary</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Step 5 sentence. {0} calculation, {1} records counted, {2} target.</shortDescription>
         <value>{0} of {1}, shown in {2}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Back</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup Builder button: previous step.</shortDescription>
-        <value>Back</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Next</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup Builder button: next step.</shortDescription>
-        <value>Next</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Cancel</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup Builder button: leave without saving.</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Save</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup Builder button: save.</shortDescription>
-        <value>Save</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_SaveAndCalculate</fullName>
@@ -777,52 +545,12 @@
         <value>Save and Calculate Now</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Title</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Title of the Rollup Builder page.</shortDescription>
-        <value>Rollup Builder</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_New</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Rollup Builder button: create a rollup.</shortDescription>
         <value>New Rollup</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Edit</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Row button: edit this rollup in the Builder.</shortDescription>
-        <value>Edit</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Copy</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Row button: copy this rollup in the Builder.</shortDescription>
-        <value>Copy</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_CopyOf</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Name of a copied rollup. {0} is the original name.</shortDescription>
-        <value>Copy of {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_Open</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Link from the Rollups settings page to the Builder.</shortDescription>
-        <value>Open the Rollup Builder</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_PreviewRecord</fullName>
@@ -881,14 +609,6 @@
         <value>About {0} records, roughly {1} minutes.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_EstimateWorkingHours</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Recalculate all: warning during working hours</shortDescription>
-        <value>People are working now. A long run competes with them saving records, so consider running it tonight.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_StartNow</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -919,14 +639,6 @@
         <protected>false</protected>
         <shortDescription>Run tonight: one run set; {0} is the nightly time</shortDescription>
         <value>One recalculation of every total is set for the next {0}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_AttentionTitle</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: section title</shortDescription>
-        <value>Needs Attention</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_Waiting</fullName>
@@ -961,28 +673,12 @@
         <value>Every total was saved.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_ColumnRecord</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: record column</shortDescription>
-        <value>Record</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_ColumnError</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Needs attention: what went wrong column</shortDescription>
         <value>What Went Wrong</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ColumnWhen</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Needs attention: when it failed column</shortDescription>
-        <value>When</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ColumnTries</fullName>
@@ -1057,30 +753,6 @@
         <value>Started. The waiting totals are recalculated in the background, usually within a minute. Refresh to see what is left.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_Delete</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Row button: delete this rollup</shortDescription>
-        <value>Delete</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DeleteTitle</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Delete confirmation: heading</shortDescription>
-        <value>Delete Rollup</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_DeleteConfirm</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Delete confirmation: what happens; {0} is the rollup name</shortDescription>
-        <value>Delete {0}? The values it already wrote stay on the records, but nothing updates them again. This cannot be undone.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_DeleteShipped</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -1129,14 +801,6 @@
         <value>Import from a file</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_ImportColumn</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import table column: what happens to each rollup</shortDescription>
-        <value>What Happens</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_ImportApply</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -1167,22 +831,6 @@
         <protected>false</protected>
         <shortDescription>Import preview: the rollup replaces the one with the same key</shortDescription>
         <value>Will replace the rollup here with the same Definition Key</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ImportCreated</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import result: created</shortDescription>
-        <value>Created</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ImportUpdated</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import result: updated</shortDescription>
-        <value>Updated</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ImportRefused</fullName>
@@ -1263,14 +911,6 @@
         <protected>false</protected>
         <shortDescription>Instant totals: Salesforce allows no trigger on this object</shortDescription>
         <value>Salesforce does not allow a trigger on this object, so its totals cannot be made instant. They are calculated every night and when you click Recalculate.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_InstantSwitchDescription</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Automation page: generated trigger switch. {0} is the trigger name.</shortDescription>
-        <value>The rollup trigger {0}, deployed from the Rollup Builder. Switch it off to stop instant totals on this object; rollups in Both still recalculate every night.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_InstantSwitchName</fullName>

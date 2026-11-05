@@ -1,5 +1,6 @@
 <template>
-    <lightning-card title={label.title} icon-name="standard:people">
+    <template lwc:if={helpReady}>
+    <lightning-card title={label.title} icon-name={icons.household}>
         <template lwc:if={canAddMember}>
             <lightning-button
                 slot="actions"
@@ -8,21 +9,21 @@
                 class="add-button"
             ></lightning-button>
         </template>
-        <div class="slds-var-m-around_medium slds-is-relative">
+        <div class="slds-var-p-horizontal_medium slds-is-relative">
             <template lwc:if={isHousehold}>
                 <template lwc:if={isLoading}>
                     <lightning-spinner alternative-text={label.loading} size="small"></lightning-spinner>
                 </template>
 
                 <template lwc:if={hasMembers}>
-                    <ul class="member-list">
+                    <ul class="slds-has-dividers_bottom-space member-list">
                         <template for:each={rows} for:item="member">
-                            <li key={member.personId} class="slds-box slds-box_x-small slds-var-m-bottom_x-small member-row">
+                            <li key={member.personId} class="slds-item member-row">
                                 <div class="slds-media slds-media_center slds-media_small">
                                     <div class="slds-media__figure" aria-hidden="true">
                                         <lightning-avatar
                                             variant="circle"
-                                            size="medium"
+                                            size="small"
                                             initials={member.initials}
                                             fallback-icon-name="standard:avatar"
                                             class="member-avatar"
@@ -30,15 +31,26 @@
                                     </div>
                                     <div class="slds-media__body">
                                         <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
-                                            <span class="slds-text-heading_small slds-var-m-right_x-small member-name">
-                                                {member.name}
-                                            </span>
+                                            <h3 class="slds-text-heading_small slds-var-m-right_x-small">
+                                                <a
+                                                    href={member.href}
+                                                    data-record-id={member.personId}
+                                                    onclick={handleOpenRecord}
+                                                    class="member-name"
+                                                >{member.name}</a>
+                                            </h3>
                                             <template for:each={member.badges} for:item="badge">
-                                                <lightning-badge key={badge.key} label={badge.text}></lightning-badge>
+                                                <c-barn-status-badge
+                                                    key={badge.key}
+                                                    class="slds-var-m-right_xx-small member-badge"
+                                                    status={badge.status}
+                                                    icon-name={badge.iconName}
+                                                    label={badge.text}
+                                                ></c-barn-status-badge>
                                             </template>
                                         </div>
                                         <template lwc:if={member.role}>
-                                            <p class="slds-text-body_small member-role">{member.role}</p>
+                                            <p class="slds-text-body_small slds-text-color_weak member-role">{member.role}</p>
                                         </template>
                                     </div>
                                     <template lwc:if={member.hasActions}>
@@ -95,6 +107,7 @@
                             variant="label-hidden"
                             placeholder={label.moveMember}
                             object-api-name="Account"
+                            display-info={householdDisplayInfo}
                             filter={householdFilter}
                             onchange={handleTargetChange}
                             class="move-target"
@@ -121,8 +134,13 @@
             </template>
 
             <template lwc:if={errorMessage}>
-                <div class="slds-text-color_error slds-var-m-top_small" role="alert">{errorMessage}</div>
+                <c-barn-notice
+                    class="slds-var-m-top_small error-message"
+                    variant="error"
+                    message={errorMessage}
+                ></c-barn-notice>
             </template>
         </div>
     </lightning-card>
+    </template>
 </template>

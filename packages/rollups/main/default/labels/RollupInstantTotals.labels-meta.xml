@@ -9,14 +9,6 @@
         <value>Instant Totals</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantIntro</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Instant totals: what the section lists</shortDescription>
-        <value>The objects your instant rollups count, and whether saving one of their records updates the totals at once.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_InstantStatusBuiltIn</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -113,22 +105,6 @@
         <value>Remove the Trigger</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantClose</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Instant totals: button that closes the steps</shortDescription>
-        <value>Close</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_InstantCopy</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Instant totals: button that copies the code</shortDescription>
-        <value>Copy</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_InstantCopied</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -201,22 +177,6 @@
         <value>In production's Setup, open Inbound Change Sets, click Deploy, choose Run specified tests and enter {0}. Only that test runs, so other tests in your org do not block it.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantSetupStep5</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Setup step 5: come back and see On</shortDescription>
-        <value>Back in the Rollup Builder, this object shows On as soon as the trigger is in the org.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_InstantSetupCli</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Instant totals: the Salesforce CLI alternative</shortDescription>
-        <value>With the Salesforce CLI instead, download the deploy package and run this command, to a sandbox or to production:</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_InstantRemoveTitle</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -225,28 +185,12 @@
         <value>Remove the Trigger for {0}</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_InstantRemoveStep1</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Removal step 1: turning off needs no deploy</shortDescription>
-        <value>To stop instant totals now, use Turn off instant totals: nothing is deployed, it works in production at once, and you can turn it back on.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_InstantRemoveStep2</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Removal step 2. {0} is the trigger name, {1} the test class name.</shortDescription>
         <value>To delete it, for example before uninstalling BarnCRM: in a sandbox, delete the trigger {0} and the class {1} in Setup (Apex Triggers, Apex Classes).</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_InstantRemoveStep3</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Removal step 3: production needs a deploy</shortDescription>
-        <value>Production does not allow deleting Apex in Setup. Download the removal package and deploy it with the Salesforce CLI:</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_InstantTriggerHeading</fullName>

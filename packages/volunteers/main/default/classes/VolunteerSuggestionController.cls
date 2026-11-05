@@ -6,174 +6,219 @@
  * (plan 9.9). Read only and in user mode; booking goes through the Sign-ups panel's own
  * `VolunteerShiftSignupsController.addSignup`, so every sign-up rule applies.
  *
- * People are Contacts: a person held only as a person account is not suggested.
+ * People are read as Contacts, which in an org that stores people as accounts includes the
+ * contact behind each person account; such a person is suggested by the account, as the
+ * Sign-ups panel books them (QA-F3).
  */
 public with sharing class VolunteerSuggestionController {
-    private static final String CONTEXT = 'Suggested volunteers';
-    /** The most active volunteers considered, most hours first: a bound on the read. */
-    public static final Integer MAX_CANDIDATES = 500;
+	private static final String CONTEXT = 'Suggested volunteers';
+	/** The most active volunteers considered, most hours first: a bound on the read. */
+	public static final Integer MAX_CANDIDATES = 500;
 
-    private static final List<String> WEEKDAYS = new List<String>{
-        'Monday',
-        'Tuesday',
-        'Wednesday',
-        'Thursday',
-        'Friday',
-        'Saturday',
-        'Sunday'
-    };
-    /** A Monday, from which the weekday of any later date is counted. */
-    private static final Date A_MONDAY = Date.newInstance(1900, 1, 1);
+	private static final List<String> WEEKDAYS = new List<String>{
+		'Monday',
+		'Tuesday',
+		'Wednesday',
+		'Thursday',
+		'Friday',
+		'Saturday',
+		'Sunday'
+	};
+	/** A Monday, from which the weekday of any later date is counted. */
+	private static final Date A_MONDAY = Date.newInstance(1900, 1, 1);
 
-    /** One person who could be booked, with the facts the ranking weighs. */
-    public class Candidate {
-        @AuraEnabled
-        public Id personId;
-        @AuraEnabled
-        public String name;
-        @AuraEnabled
-        public List<String> availableDays = new List<String>();
-        @AuraEnabled
-        public List<Id> skillIds = new List<Id>();
-        @AuraEnabled
-        public List<Id> interestIds = new List<Id>();
-        @AuraEnabled
-        public Decimal hoursOnJob = 0;
-        @AuraEnabled
-        public Decimal hoursTotal = 0;
-        /** `cleared` (every step current), `open` (a step not current) or `none` (no steps seen). */
-        @AuraEnabled
-        public String onboarding = 'none';
-    }
+	/** One person who could be booked, with the facts the ranking weighs. */
+	public class Candidate {
+		@AuraEnabled
+		public Id personId;
+		@AuraEnabled
+		public String name;
+		@AuraEnabled
+		public List<String> availableDays = new List<String>();
+		@AuraEnabled
+		public List<Id> skillIds = new List<Id>();
+		@AuraEnabled
+		public List<Id> interestIds = new List<Id>();
+		@AuraEnabled
+		public Decimal hoursOnJob = 0;
+		@AuraEnabled
+		public Decimal hoursTotal = 0;
+		/** `cleared` (every step current), `open` (a step not current) or `none` (no steps seen). */
+		@AuraEnabled
+		public String onboarding = 'none';
+	}
 
-    /** The shift's side of the ranking and the people to rank. */
-    public class Suggestions {
-        /** False when the user cannot book, or the shift is not Open: the card shows nothing. */
-        @AuraEnabled
-        public Boolean canBook = false;
-        @AuraEnabled
-        public String weekday;
-        @AuraEnabled
-        public List<Id> requiredSkillIds = new List<Id>();
-        @AuraEnabled
-        public List<Candidate> candidates = new List<Candidate>();
-        @AuraEnabled
-        public Boolean moreThanConsidered = false;
-    }
+	/** The shift's side of the ranking and the people to rank. */
+	public class Suggestions {
+		/** False when the user cannot book, or the shift is not Open: the card shows nothing. */
+		@AuraEnabled
+		public Boolean canBook = false;
+		@AuraEnabled
+		public String weekday;
+		@AuraEnabled
+		public List<Id> requiredSkillIds = new List<Id>();
+		@AuraEnabled
+		public List<Candidate> candidates = new List<Candidate>();
+		@AuraEnabled
+		public Boolean moreThanConsidered = false;
+	}
 
-    /** Not cacheable: it changes with every sign-up. */
-    @AuraEnabled
-    public static Suggestions getSuggestions(Id shiftId) {
-        Suggestions result = new Suggestions();
-        if (shiftId == null) {
-            return result;
-        }
-        try {
-            Volunteer_Shift__c shift = VolunteerSuggestionSelector.selectShift(shiftId);
-            if (
-                shift == null ||
-                shift.Status__c != 'Open' ||
-                shift.Start_Time__c == null ||
-                !Schema.SObjectType.Volunteer_Signup__c.isCreateable()
-            ) {
-                return result;
-            }
-            result.canBook = true;
-            result.weekday = weekdayOf(shift.Start_Time__c);
-            Set<Id> required = VolunteerSuggestionSelector.requiredSkillIds(shift.Volunteer_Job__c);
-            result.requiredSkillIds = new List<Id>(required);
+	/** Not cacheable: it changes with every sign-up. */
+	@AuraEnabled
+	public static Suggestions getSuggestions(Id shiftId) {
+		Suggestions result = new Suggestions();
+		if (shiftId == null) {
+			return result;
+		}
+		try {
+			Volunteer_Shift__c shift = VolunteerSuggestionSelector.selectShift(shiftId);
+			if (
+				shift == null ||
+				shift.Status__c != 'Open' ||
+				shift.Start_Time__c == null ||
+				!Schema.SObjectType.Volunteer_Signup__c.isCreateable()
+			) {
+				return result;
+			}
+			result.canBook = true;
+			result.weekday = weekdayOf(shift.Start_Time__c);
+			Set<Id> required = VolunteerSuggestionSelector.requiredSkillIds(shift.Volunteer_Job__c);
+			result.requiredSkillIds = new List<Id>(required);
 
-            List<Contact> people = VolunteerSuggestionSelector.selectCandidates(
-                shiftId,
-                MAX_CANDIDATES + 1
-            );
-            result.moreThanConsidered = people.size() > MAX_CANDIDATES;
-            while (people.size() > MAX_CANDIDATES) {
-                people.remove(people.size() - 1);
-            }
-            addFacts(result, people, shift, required);
-            return result;
-        } catch (Exception failure) {
-            ErrorLogger.log(failure, CONTEXT, shiftId);
-            AuraHandledException refused = new AuraHandledException(
-                Label.Volunteers_Suggestions_LoadFailed
-            );
-            refused.setMessage(Label.Volunteers_Suggestions_LoadFailed);
-            throw refused;
-        }
-    }
+			List<Contact> people = VolunteerSuggestionSelector.selectCandidates(
+				shiftId,
+				MAX_CANDIDATES + 1
+			);
+			result.moreThanConsidered = people.size() > MAX_CANDIDATES;
+			while (people.size() > MAX_CANDIDATES) {
+				people.remove(people.size() - 1);
+			}
+			addFacts(result, people, shift, required);
+			suggestPersonAccountsAsAccounts(result, shiftId);
+			return result;
+		} catch (Exception failure) {
+			ErrorLogger.log(failure, CONTEXT, shiftId);
+			AuraHandledException refused = new AuraHandledException(
+				Label.Volunteers_Suggestions_LoadFailed
+			);
+			refused.setMessage(Label.Volunteers_Suggestions_LoadFailed);
+			throw refused;
+		}
+	}
 
-    // ------------------------------------------------------------------------------ helpers
+	// ------------------------------------------------------------------------------ helpers
 
-    private static void addFacts(
-        Suggestions result,
-        List<Contact> people,
-        Volunteer_Shift__c shift,
-        Set<Id> required
-    ) {
-        if (people.isEmpty()) {
-            return;
-        }
-        Map<Id, Candidate> byId = new Map<Id, Candidate>();
-        for (Contact person : people) {
-            Candidate candidate = new Candidate();
-            candidate.personId = person.Id;
-            candidate.name = person.Name;
-            candidate.hoursTotal = person.Volunteer_Hours_Total__c == null
-                ? 0
-                : person.Volunteer_Hours_Total__c;
-            if (String.isNotBlank(person.Availability_Days__c)) {
-                candidate.availableDays = person.Availability_Days__c.split(';');
-            }
-            byId.put(person.Id, candidate);
-            result.candidates.add(candidate);
-        }
-        Set<Id> ids = byId.keySet();
+	/**
+	 * In an org that stores people as accounts, a person account volunteer is suggested by the
+	 * account, as the Sign-ups panel books one (QA-F3), and one already booked on the shift by
+	 * the account is left out. The facts stay keyed by the person's contact, where the skill,
+	 * hours and onboarding rows point.
+	 */
+	private static void suggestPersonAccountsAsAccounts(Suggestions result, Id shiftId) {
+		if (result.candidates.isEmpty()) {
+			return;
+		}
+		Set<Id> contactIds = new Set<Id>();
+		for (Candidate candidate : result.candidates) {
+			contactIds.add(candidate.personId);
+		}
+		Map<Id, Id> accountByContact = accountsBehindForTest != null
+			? accountsBehindForTest
+			: PersonRecordSelector.getAccountsBehindPersonContacts(contactIds);
+		if (accountByContact.isEmpty()) {
+			return;
+		}
+		Set<Id> booked = VolunteerSuggestionSelector.bookedAccountIds(
+			shiftId,
+			new Set<Id>(accountByContact.values())
+		);
+		List<Candidate> kept = new List<Candidate>();
+		for (Candidate candidate : result.candidates) {
+			Id accountId = accountByContact.get(candidate.personId);
+			if (accountId != null && booked.contains(accountId)) {
+				continue;
+			}
+			if (accountId != null) {
+				candidate.personId = accountId;
+			}
+			kept.add(candidate);
+		}
+		result.candidates = kept;
+	}
 
-        if (!required.isEmpty()) {
-            for (
-                Volunteer_Skill__c row : VolunteerSuggestionSelector.selectSkillRows(ids, required)
-            ) {
-                Candidate candidate = byId.get(row.Contact__c);
-                if (row.Type__c == 'Interest') {
-                    candidate.interestIds.add(row.Skill__c);
-                } else {
-                    candidate.skillIds.add(row.Skill__c);
-                }
-            }
-        }
-        Map<Id, Decimal> onJob = VolunteerSuggestionSelector.approvedHoursOnJob(
-            ids,
-            shift.Volunteer_Job__c
-        );
-        for (Id personId : onJob.keySet()) {
-            byId.get(personId).hoursOnJob = onJob.get(personId);
-        }
-        addOnboarding(byId, VolunteerSuggestionSelector.selectRequirements(ids));
-    }
+	/** Test seam: the person account behind each contact, for an org without person accounts. */
+	@TestVisible
+	private static Map<Id, Id> accountsBehindForTest;
 
-    /** A person with any latest-of-its-Type step not current is `open`; all current is `cleared`. */
-    private static void addOnboarding(
-        Map<Id, Candidate> byId,
-        List<Volunteer_Requirement__c> steps
-    ) {
-        Set<String> seen = new Set<String>();
-        for (Volunteer_Requirement__c step : steps) {
-            if (!seen.add(step.Contact__c + '|' + step.Type__c)) {
-                continue;
-            }
-            Candidate candidate = byId.get(step.Contact__c);
-            if (candidate == null || candidate.onboarding == 'open') {
-                continue;
-            }
-            candidate.onboarding = step.Is_Current__c == true ? 'cleared' : 'open';
-        }
-    }
+	private static void addFacts(
+		Suggestions result,
+		List<Contact> people,
+		Volunteer_Shift__c shift,
+		Set<Id> required
+	) {
+		if (people.isEmpty()) {
+			return;
+		}
+		Map<Id, Candidate> byId = new Map<Id, Candidate>();
+		for (Contact person : people) {
+			Candidate candidate = new Candidate();
+			candidate.personId = person.Id;
+			candidate.name = person.Name;
+			candidate.hoursTotal = person.Volunteer_Hours_Total__c == null
+				? 0
+				: person.Volunteer_Hours_Total__c;
+			if (String.isNotBlank(person.Availability_Days__c)) {
+				candidate.availableDays = person.Availability_Days__c.split(';');
+			}
+			byId.put(person.Id, candidate);
+			result.candidates.add(candidate);
+		}
+		Set<Id> ids = byId.keySet();
 
-    /** The shift's weekday in the org's time zone, named as the Availability Days picklist is. */
-    @TestVisible
-    private static String weekdayOf(Datetime start) {
-        Date day = ShiftScheduleService.orgDate(start);
-        return WEEKDAYS[Math.mod(A_MONDAY.daysBetween(day), 7)];
-    }
+		if (!required.isEmpty()) {
+			for (
+				Volunteer_Skill__c row : VolunteerSuggestionSelector.selectSkillRows(ids, required)
+			) {
+				Candidate candidate = byId.get(row.Contact__c);
+				if (row.Type__c == 'Interest') {
+					candidate.interestIds.add(row.Skill__c);
+				} else {
+					candidate.skillIds.add(row.Skill__c);
+				}
+			}
+		}
+		Map<Id, Decimal> onJob = VolunteerSuggestionSelector.approvedHoursOnJob(
+			ids,
+			shift.Volunteer_Job__c
+		);
+		for (Id personId : onJob.keySet()) {
+			byId.get(personId).hoursOnJob = onJob.get(personId);
+		}
+		addOnboarding(byId, VolunteerSuggestionSelector.selectRequirements(ids));
+	}
+
+	/** A person with any latest-of-its-Type step not current is `open`; all current is `cleared`. */
+	private static void addOnboarding(
+		Map<Id, Candidate> byId,
+		List<Volunteer_Requirement__c> steps
+	) {
+		Set<String> seen = new Set<String>();
+		for (Volunteer_Requirement__c step : steps) {
+			if (!seen.add(step.Contact__c + '|' + step.Type__c)) {
+				continue;
+			}
+			Candidate candidate = byId.get(step.Contact__c);
+			if (candidate == null || candidate.onboarding == 'open') {
+				continue;
+			}
+			candidate.onboarding = step.Is_Current__c == true ? 'cleared' : 'open';
+		}
+	}
+
+	/** The shift's weekday in the org's time zone, named as the Availability Days picklist is. */
+	@TestVisible
+	private static String weekdayOf(Datetime start) {
+		Date day = ShiftScheduleService.orgDate(start);
+		return WEEKDAYS[Math.mod(A_MONDAY.daysBetween(day), 7)];
+	}
 }

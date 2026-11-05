@@ -4,13 +4,13 @@
  * bypassable from the settings console (ADR-0017).
  */
 trigger GiftAllocationTrigger on Gift_Allocation__c(
-    before insert,
-    before update,
-    before delete,
-    after insert,
-    after update,
-    after delete,
-    after undelete
+	before insert,
+	before update,
+	before delete,
+	after insert,
+	after update,
+	after delete,
+	after undelete
 ) {
-    TriggerDispatcher.run('Gift_Allocation__c');
+	TriggerDispatcher.run('Gift_Allocation__c');
 }

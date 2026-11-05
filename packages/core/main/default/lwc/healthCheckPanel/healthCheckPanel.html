@@ -1,10 +1,11 @@
 <template>
+    <template lwc:if={helpReady}>
     <lightning-card title={labels.title} icon-name="standard:approval">
         <div slot="actions">
             <lightning-button
                 label={rerunLabel}
                 onclick={handleRerun}
-                class="slds-m-right_x-small"
+                class="slds-var-m-right_x-small"
                 data-id="rerun"
             ></lightning-button>
             <template if:true={showUseRecommended}>
@@ -17,27 +18,32 @@
             </template>
         </div>
 
-        <div class="slds-p-horizontal_medium">
-            <p class="slds-text-body_small slds-m-bottom_small">{labels.intro}</p>
+        <div class="slds-var-p-horizontal_medium">
+            <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small">{labels.intro}</p>
 
             <template if:true={loading}>
                 <p role="status" data-id="loading">{labels.loading}</p>
             </template>
 
             <template if:true={errorMessage}>
-                <p class="slds-text-color_error" data-id="error" role="alert">{errorMessage}</p>
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    variant="error"
+                    message={errorMessage}
+                    data-id="error"
+                ></c-barn-notice>
             </template>
 
             <template if:true={showLastRun}>
-                <div class="slds-m-bottom_small" data-id="last-run">
-                    <lightning-badge
-                        class={lastRunBadgeClass}
+                <div class="slds-var-m-bottom_small" data-id="last-run">
+                    <c-barn-status-badge
+                        status={lastRunStatus}
                         label={lastRunBadge.badgeLabel}
                         data-id="last-run-badge"
-                    ></lightning-badge>
+                    ></c-barn-status-badge>
                     <template if:true={hasLastRun}>
-                        <p>
-                            <span class="slds-text-title">{labels.lastRun}</span>&nbsp;
+                        <p class="slds-var-m-top_xx-small">
+                            <span class="slds-text-title_bold">{labels.lastRun}</span>&nbsp;
                             <lightning-formatted-date-time
                                 value={lastRunAt}
                                 year="numeric"
@@ -51,43 +57,53 @@
                         <p data-id="last-result">{lastRunResult}</p>
                     </template>
                     <template if:false={hasLastRun}>
-                        <p data-id="never-run">{labels.neverRun}</p>
+                        <p class="slds-var-m-top_xx-small" data-id="never-run">{labels.neverRun}</p>
                     </template>
                 </div>
             </template>
 
             <template if:true={fixOutcome}>
-                <p class="slds-text-color_success slds-m-bottom_small" data-id="fix-outcome" role="status">
-                    {fixOutcome}
-                </p>
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    variant="success"
+                    message={fixOutcome}
+                    data-id="fix-outcome"
+                ></c-barn-notice>
             </template>
 
             <template if:true={isReadOnly}>
-                <p class="slds-text-body_small slds-m-bottom_small" data-id="read-only">
-                    {labels.readOnly}
-                </p>
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    message={labels.readOnly}
+                    data-id="read-only"
+                ></c-barn-notice>
             </template>
 
             <template if:true={hasReport}>
-                <article class="slds-box slds-m-bottom_medium" data-id="org-shape-card">
-                    <h2 class="slds-text-heading_small">{labels.orgShapeCard}</h2>
-                    <p class="slds-m-top_x-small" data-id="org-shape-summary">{orgShapeSummary}</p>
-                    <dl class="slds-m-top_x-small slds-text-body_small">
-                        <dt class="slds-text-title">{labels.currentMode}</dt>
+                <section class="slds-var-m-bottom_medium" data-id="org-shape-card">
+                    <h3 class="slds-text-heading_small">{labels.orgShapeCard}</h3>
+                    <p class="slds-var-m-top_x-small" data-id="org-shape-summary">{orgShapeSummary}</p>
+                    <dl class="slds-var-m-top_x-small slds-text-body_small">
+                        <dt class="slds-text-title_bold">{labels.currentMode}</dt>
                         <dd data-id="current-mode">{currentModeLabel}</dd>
-                        <dt class="slds-text-title slds-m-top_xx-small">{labels.recommendedMode}</dt>
+                        <dt class="slds-text-title_bold slds-var-m-top_xx-small">{labels.recommendedMode}</dt>
                         <dd data-id="recommended-mode">{recommendedModeLabel}</dd>
                     </dl>
-                </article>
+                </section>
             </template>
 
             <template if:true={showNoFindings}>
-                <p data-id="no-findings">{labels.noFindings}</p>
+                <c-barn-empty-state
+                    illustration="all-clear"
+                    size="compact"
+                    heading={labels.noFindings}
+                    data-id="no-findings"
+                ></c-barn-empty-state>
             </template>
 
             <template for:each={groups} for:item="group">
-                <section key={group.key} class="slds-m-bottom_medium" data-id="group">
-                    <h2 class="slds-text-heading_small slds-m-bottom_x-small">{group.label}</h2>
+                <section key={group.key} class="slds-var-m-bottom_medium" data-id="group">
+                    <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{group.label}</h3>
                     <ul class="slds-has-dividers_bottom-space">
                         <template for:each={group.findings} for:item="finding">
                             <li key={finding.key} class="slds-item" data-id="finding">
@@ -102,12 +118,9 @@
                                         ></lightning-icon>
                                     </div>
                                     <div class="slds-media__body">
-                                        <h3
-                                            class="slds-text-heading_x-small"
-                                            data-id="finding-title"
-                                        >
+                                        <h4 class="slds-text-title_bold" data-id="finding-title">
                                             {finding.title}
-                                        </h3>
+                                        </h4>
                                         <p class="slds-text-body_small" data-id="finding-detail">
                                             {finding.detail}
                                         </p>
@@ -122,7 +135,7 @@
                                         </template>
                                         <template if:true={finding.showFix}>
                                             <lightning-button
-                                                class="slds-m-top_xx-small"
+                                                class="slds-var-m-top_xx-small"
                                                 label={finding.fixLabel}
                                                 data-target={finding.fixTarget}
                                                 data-key={finding.key}
@@ -139,4 +152,5 @@
             </template>
         </div>
     </lightning-card>
+    </template>
 </template>

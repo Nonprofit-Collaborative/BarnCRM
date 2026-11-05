@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>One payment a funder is expected to make under an award, on a date; a multi-year award's payments are its schedule (canonical model Section 29ZM).</description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>false</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Grant Payment</label>
+  <nameField>
+    <displayFormat>P-{000000}</displayFormat>
+    <label>Payment Number</label>
+    <trackHistory>false</trackHistory>
+    <type>AutoNumber</type>
+  </nameField>
+  <pluralLabel>Grant Payments</pluralLabel>
+  <sharingModel>ControlledByParent</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

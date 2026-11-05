@@ -16,76 +16,76 @@
  */
 @NamespaceAccessible
 public with sharing class PersonReference {
-    /**
-     * The id of whichever half of the pair is set, or null when neither is.
-     */
-    @NamespaceAccessible
-    public static Id idOf(Id contactId, Id accountId) {
-        if (contactId != null) {
-            return contactId;
-        }
-        return accountId;
-    }
+	/**
+	 * The id of whichever half of the pair is set, or null when neither is.
+	 */
+	@NamespaceAccessible
+	public static Id idOf(Id contactId, Id accountId) {
+		if (contactId != null) {
+			return contactId;
+		}
+		return accountId;
+	}
 
-    /**
-     * A reference is well formed when exactly one of the two lookups is set. Both set is as
-     * wrong as neither: it would say the same person is stored two ways at once, and every
-     * comparison after that would be guesswork.
-     */
-    @NamespaceAccessible
-    public static Boolean isComplete(Id contactId, Id accountId) {
-        return (contactId == null) != (accountId == null);
-    }
+	/**
+	 * A reference is well formed when exactly one of the two lookups is set. Both set is as
+	 * wrong as neither: it would say the same person is stored two ways at once, and every
+	 * comparison after that would be guesswork.
+	 */
+	@NamespaceAccessible
+	public static Boolean isComplete(Id contactId, Id accountId) {
+		return (contactId == null) != (accountId == null);
+	}
 
-    @NamespaceAccessible
-    public static Boolean isEmpty(Id contactId, Id accountId) {
-        return contactId == null && accountId == null;
-    }
+	@NamespaceAccessible
+	public static Boolean isEmpty(Id contactId, Id accountId) {
+		return contactId == null && accountId == null;
+	}
 
-    @NamespaceAccessible
-    public static Boolean isAmbiguous(Id contactId, Id accountId) {
-        return contactId != null && accountId != null;
-    }
+	@NamespaceAccessible
+	public static Boolean isAmbiguous(Id contactId, Id accountId) {
+		return contactId != null && accountId != null;
+	}
 
-    /**
-     * A stable key for one person, safe to use in a map and safe to compare across the two
-     * ways a person can be held. Two references produce the same key only when they are the
-     * same record, so a contact and an account never collide.
-     */
-    @NamespaceAccessible
-    public static String keyOf(Id contactId, Id accountId) {
-        Id personId = idOf(contactId, accountId);
-        if (personId == null) {
-            return null;
-        }
-        return (contactId != null ? 'c:' : 'a:') + String.valueOf(personId);
-    }
+	/**
+	 * A stable key for one person, safe to use in a map and safe to compare across the two
+	 * ways a person can be held. Two references produce the same key only when they are the
+	 * same record, so a contact and an account never collide.
+	 */
+	@NamespaceAccessible
+	public static String keyOf(Id contactId, Id accountId) {
+		Id personId = idOf(contactId, accountId);
+		if (personId == null) {
+			return null;
+		}
+		return (contactId != null ? 'c:' : 'a:') + String.valueOf(personId);
+	}
 
-    /** True when both references name the same person, whichever object holds them. */
-    @NamespaceAccessible
-    public static Boolean isSamePerson(
-        Id firstContactId,
-        Id firstAccountId,
-        Id secondContactId,
-        Id secondAccountId
-    ) {
-        String first = keyOf(firstContactId, firstAccountId);
-        String second = keyOf(secondContactId, secondAccountId);
-        return first != null && first == second;
-    }
+	/** True when both references name the same person, whichever object holds them. */
+	@NamespaceAccessible
+	public static Boolean isSamePerson(
+		Id firstContactId,
+		Id firstAccountId,
+		Id secondContactId,
+		Id secondAccountId
+	) {
+		String first = keyOf(firstContactId, firstAccountId);
+		String second = keyOf(secondContactId, secondAccountId);
+		return first != null && first == second;
+	}
 
-    /**
-     * The name to show for a person held as a contact or as a person account, whichever
-     * record is present with a name, or the given fallback (the caller's "unnamed" label).
-     */
-    @NamespaceAccessible
-    public static String nameOf(Contact asContact, Account asAccount, String fallback) {
-        if (asContact != null && String.isNotBlank(asContact.Name)) {
-            return asContact.Name;
-        }
-        if (asAccount != null && String.isNotBlank(asAccount.Name)) {
-            return asAccount.Name;
-        }
-        return fallback;
-    }
+	/**
+	 * The name to show for a person held as a contact or as a person account, whichever
+	 * record is present with a name, or the given fallback (the caller's "unnamed" label).
+	 */
+	@NamespaceAccessible
+	public static String nameOf(Contact asContact, Account asAccount, String fallback) {
+		if (asContact != null && String.isNotBlank(asContact.Name)) {
+			return asContact.Name;
+		}
+		if (asAccount != null && String.isNotBlank(asAccount.Name)) {
+			return asAccount.Name;
+		}
+		return fallback;
+	}
 }

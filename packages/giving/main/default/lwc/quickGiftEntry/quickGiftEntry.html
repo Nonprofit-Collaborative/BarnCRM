@@ -1,5 +1,6 @@
 <template>
-    <lightning-card icon-name="standard:sales_path" title={labels.heading}>
+    <template lwc:if={helpReady}>
+    <lightning-card icon-name="custom:custom40" title={labels.heading}>
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
             <template lwc:if={formError}>
                 <div
@@ -23,13 +24,20 @@
             </template>
 
             <template lwc:if={savedGift}>
+                <!-- A light notice with a success icon, not a solid green box: the link keeps
+                     its normal, readable colour (vis-core-2). -->
                 <div
-                    class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small"
+                    class="slds-scoped-notification slds-scoped-notification_light slds-media slds-media_center slds-var-m-bottom_small"
                     aria-live="polite"
                     data-id="saved"
                 >
-                    <p>{savedMessage}</p>
-                    <a href={savedGift.url} data-id="saved-link">{labels.openGiftLink}</a>
+                    <div class="slds-media__figure">
+                        <lightning-icon icon-name="utility:success" size="x-small" variant="success"></lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <p>{savedMessage}</p>
+                        <a href={savedGift.url} data-id="saved-link">{labels.openGiftLink}</a>
+                    </div>
                 </div>
             </template>
 
@@ -218,4 +226,5 @@
             </div>
         </div>
     </lightning-card>
+    </template>
 </template>

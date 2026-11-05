@@ -9,14 +9,6 @@
         <value>What's New in BarnCRM</value>
     </labels>
     <labels>
-        <fullName>Core_WhatsNew_Intro</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>What's new card: line under the heading.</shortDescription>
-        <value>Here is what changed since you last dismissed this card.</value>
-    </labels>
-    <labels>
         <fullName>Core_WhatsNew_Version</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -31,13 +23,5 @@
         <protected>false</protected>
         <shortDescription>What's new card: button that hides the card until the next release.</shortDescription>
         <value>Dismiss</value>
-    </labels>
-    <labels>
-        <fullName>Core_WhatsNew_Failed</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>What's new card: loading or dismissing failed.</shortDescription>
-        <value>What's new could not be updated. Refresh the page and try again. The problem is recorded in the Error Log.</value>
     </labels>
 </CustomLabels>

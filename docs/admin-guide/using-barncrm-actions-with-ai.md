@@ -14,7 +14,7 @@ BarnCRM has five such actions. Four are part of Core, so every BarnCRM org has t
 | **Find People** | Finds people by part of their name or their exact email address, and gives each one's household. | Create or change anything. |
 | **Get Household Summary** | Gives a household's name, greetings, primary contact, mailing address and members with their roles, from a household or a person. | Change anything. |
 | **Create Person** | Creates a new person, either in a household that already exists or with a household of their own. | Change, merge or delete a person who already exists. |
-| **Get Data Job Status** | Reports how an import, bulk update or bulk delete is going: its status and row counts. With no job named, the most recent import. | Start, commit or undo a job. |
+| **Get Data Job Status** | Reports how an import, Super Transformer run or bulk delete is going: its status and row counts. With no job named, the most recent import. | Start, commit or undo a job. |
 
 The fifth, **Record Inbound Gift**, is part of the Mirror module. It records a gift that has
 already arrived for a donor who is already in BarnCRM: "record a 25 dollar card gift from Luis

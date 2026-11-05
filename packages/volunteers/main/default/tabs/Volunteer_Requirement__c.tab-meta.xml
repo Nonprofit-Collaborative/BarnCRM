@@ -2,5 +2,5 @@
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
   <customObject>true</customObject>
   <description>Volunteers' onboarding steps, for coordinators and admins only.</description>
-  <motif>Custom54: Form</motif>
+  <motif>Custom86: RedCross</motif>
 </CustomTab>

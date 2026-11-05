@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <template lwc:if={canManage}>
         <div class="slds-var-p-horizontal_medium slds-var-m-bottom_small">
             <lightning-button data-id="toggle" label={labels.button} onclick={handleToggle}></lightning-button>
@@ -66,5 +67,6 @@
                 </div>
             </template>
         </div>
+    </template>
     </template>
 </template>

@@ -19,26 +19,26 @@
  */
 @NamespaceAccessible
 public without sharing class VolunteersHouseholdDependentsExtension implements HouseholdDependentsExtension {
-    @NamespaceAccessible
-    public VolunteersHouseholdDependentsExtension() {
-        return;
-    }
+	@NamespaceAccessible
+	public VolunteersHouseholdDependentsExtension() {
+		return;
+	}
 
-    public Set<Id> householdsWithDependents(Set<Id> householdIds) {
-        Set<Id> dependent = new Set<Id>();
-        if (householdIds == null || householdIds.isEmpty()) {
-            return dependent;
-        }
-        // A semi-join, so the query returns at most one row per household asked about, however
-        // many hours it has.
-        for (Account household : [
-            SELECT Id
-            FROM Account
-            WHERE Id IN :householdIds AND Id IN (SELECT Household__c FROM Volunteer_Hours__c)
-            WITH SYSTEM_MODE
-        ]) {
-            dependent.add(household.Id);
-        }
-        return dependent;
-    }
+	public Set<Id> householdsWithDependents(Set<Id> householdIds) {
+		Set<Id> dependent = new Set<Id>();
+		if (householdIds == null || householdIds.isEmpty()) {
+			return dependent;
+		}
+		// A semi-join, so the query returns at most one row per household asked about, however
+		// many hours it has.
+		for (Account household : [
+			SELECT Id
+			FROM Account
+			WHERE Id IN :householdIds AND Id IN (SELECT Household__c FROM Volunteer_Hours__c)
+			WITH SYSTEM_MODE
+		]) {
+			dependent.add(household.Id);
+		}
+		return dependent;
+	}
 }

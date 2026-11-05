@@ -1,0 +1,44 @@
+<template>
+  <lightning-card title={title} icon-name={iconName}>
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={title} size="small"></lightning-spinner>
+      </template>
+
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
+      </template>
+
+      <template lwc:if={notInstalled}>
+        <p data-id="not-installed" class="slds-text-body_small">{labels.notInstalled}</p>
+      </template>
+
+      <template lwc:if={isMissing}>
+        <p data-id="missing" class="slds-text-body_small slds-text-color_error">{labels.missing}</p>
+      </template>
+
+      <template lwc:if={showReadOnly}>
+        <p data-id="read-only" class="slds-text-body_regular">{readOnlyName}</p>
+      </template>
+
+      <template lwc:if={canEdit}>
+        <lightning-combobox
+          data-id={dataId}
+          label={title}
+          variant="label-hidden"
+          options={options}
+          value={value}
+          onchange={handleChange}
+        ></lightning-combobox>
+        <lightning-button
+          data-id="save"
+          class="slds-var-m-top_small"
+          variant="brand"
+          label={saveLabel}
+          disabled={saveDisabled}
+          onclick={handleSave}
+        ></lightning-button>
+      </template>
+    </div>
+  </lightning-card>
+</template>

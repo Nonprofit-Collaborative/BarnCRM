@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_Filter_ErrorUnknownObject</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal: object missing or not readable. {0} is its name.</shortDescription>
-        <value>This object is not available to you: {0}. Choose another, or ask your BarnCRM admin for access.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ErrorUnknownField</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal: field path missing or not readable. {0} is the path.</shortDescription>
-        <value>A filter names a field that is not available to you: {0}. Remove that condition, or ask your BarnCRM admin for access.</value>
-    </labels>
-    <labels>
         <fullName>Core_Filter_AddCondition</fullName>
         <categories>Filter</categories>
         <language>en_US</language>
@@ -41,14 +25,6 @@
         <value>Condition {0}</value>
     </labels>
     <labels>
-        <fullName>Core_Filter_Field</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Label of the field picker in a filter condition.</shortDescription>
-        <value>Field</value>
-    </labels>
-    <labels>
         <fullName>Core_Filter_FieldOn</fullName>
         <categories>Filter</categories>
         <language>en_US</language>
@@ -63,14 +39,6 @@
         <protected>false</protected>
         <shortDescription>Field picker option that opens a lookup's own fields. {0} is the lookup.</shortDescription>
         <value>{0}: more fields</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ChooseField</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Placeholder of the field picker in a filter condition.</shortDescription>
-        <value>Choose a field</value>
     </labels>
     <labels>
         <fullName>Core_Filter_Operator</fullName>
@@ -129,22 +97,6 @@
         <value>Chosen</value>
     </labels>
     <labels>
-        <fullName>Core_Filter_True</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Checkbox value True in a filter condition.</shortDescription>
-        <value>True</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_False</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Checkbox value False in a filter condition.</shortDescription>
-        <value>False</value>
-    </labels>
-    <labels>
         <fullName>Core_Filter_UseLogic</fullName>
         <categories>Filter</categories>
         <language>en_US</language>
@@ -161,116 +113,12 @@
         <value>Condition logic</value>
     </labels>
     <labels>
-        <fullName>Core_Filter_LogicHelp</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Help text of the condition logic input.</shortDescription>
-        <value>Use condition numbers with AND, OR, NOT and brackets, for example 1 AND (2 OR 3).</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_Empty</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when a filter has no conditions.</shortDescription>
-        <value>No conditions yet, so every record matches.</value>
-    </labels>
-    <labels>
         <fullName>Core_Filter_Loading</fullName>
         <categories>Filter</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Assistive text while the filter builder loads fields.</shortDescription>
         <value>Loading fields</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ErrorChooseField</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when a condition has no field.</shortDescription>
-        <value>Choose a field.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ErrorChooseOperator</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when a condition has no operator.</shortDescription>
-        <value>Choose an operator.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ErrorValueRequired</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when a condition needs a value and has none.</shortDescription>
-        <value>Enter a value.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ErrorNumber</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when a number condition has text that is not a number.</shortDescription>
-        <value>Enter a number.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ErrorDays</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when the last N days value is out of range.</shortDescription>
-        <value>Enter a whole number of days from 1 to 3650.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ErrorFieldUnavailable</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when a saved condition names a field the user cannot see. {0}: field.</shortDescription>
-        <value>This field is not available to you: {0}. Remove the condition, or ask your BarnCRM admin for access.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ErrorLogicSyntax</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when the condition logic is not well formed.</shortDescription>
-        <value>Check the condition logic: join condition numbers with AND or OR, and use NOT and brackets where needed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ErrorLogicUnknown</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when the logic names a condition that does not exist. {0}: number.</shortDescription>
-        <value>The condition logic names condition {0}, which does not exist.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ErrorLogicMissing</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when the logic leaves out a condition. {0}: its number.</shortDescription>
-        <value>The condition logic must use every condition. Add condition {0} to it, or remove the condition.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ErrorInvalidDocument</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when a saved filter cannot be read.</shortDescription>
-        <value>This filter could not be read. Remove its conditions and build it again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ErrorSummary</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Alert above the filter builder when conditions need fixing.</shortDescription>
-        <value>Some conditions need fixing before this filter can be used.</value>
     </labels>
     <labels>
         <fullName>Core_Filter_SummaryAll</fullName>
@@ -439,21 +287,5 @@
         <protected>false</protected>
         <shortDescription>Summary text for the last N days operator. {0}: the number of days.</shortDescription>
         <value>is in the last {0} days</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ErrorOperatorType</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal: operator does not suit the field. {0}: field, {1}: operator.</shortDescription>
-        <value>The operator {1} does not suit the field {0}. Choose another operator.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Filter_ErrorValueType</fullName>
-        <categories>Filter</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal: a value does not fit its field. {0}: the field.</shortDescription>
-        <value>The value for {0} does not fit that field. Check the condition and try again.</value>
     </labels>
 </CustomLabels>

@@ -8,23 +8,19 @@ import ADD from '@salesforce/label/c.Core_CmdtManager_AddButton';
 import EDIT from '@salesforce/label/c.Core_CmdtManager_EditAction';
 import ARCHIVE from '@salesforce/label/c.Core_CmdtManager_ArchiveAction';
 import RESTORE from '@salesforce/label/c.Core_CmdtManager_RestoreAction';
-import SAVE from '@salesforce/label/c.Core_CmdtManager_SaveButton';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
-import STATUS from '@salesforce/label/c.Core_CmdtManager_StatusColumn';
+import STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
 import IN_USE from '@salesforce/label/c.Core_CmdtManager_StatusInUse';
 import ARCHIVED from '@salesforce/label/c.Core_CmdtManager_StatusArchived';
 import OWN_HEADING from '@salesforce/label/c.Core_CmdtManager_OwnHeading';
-import OWN_EMPTY from '@salesforce/label/c.Core_CmdtManager_OwnEmpty';
 import SHIPPED_HEADING from '@salesforce/label/c.Core_CmdtManager_ShippedHeading';
 import NEW_TITLE from '@salesforce/label/c.Core_CmdtManager_NewTitle';
 import EDIT_TITLE from '@salesforce/label/c.Core_CmdtManager_EditTitle';
-import SAVING from '@salesforce/label/c.Core_CmdtManager_Saving';
-import SAVED from '@salesforce/label/c.Core_CmdtManager_Saved';
-import STILL_SAVING from '@salesforce/label/c.Core_CmdtManager_StillSaving';
-import CHECK_AGAIN from '@salesforce/label/c.Core_CmdtManager_CheckAgain';
-import LOAD_ERROR from '@salesforce/label/c.Core_CmdtManager_LoadError';
+import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const POLL_INTERVAL_MS = 3000;
 const POLL_ATTEMPTS = 20;
@@ -36,6 +32,8 @@ const POLL_ATTEMPTS = 20;
  * (0085-custom-metadata-manager-edits-only-types-read-directly.md).
  */
 export default class CustomMetadataManager extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   types = [];
   form;
   statusMessage;
@@ -50,12 +48,19 @@ export default class CustomMetadataManager extends LightningElement {
     cancel: CANCEL,
     name: NAME,
     ownHeading: OWN_HEADING,
-    ownEmpty: OWN_EMPTY,
+    get ownEmpty() {
+      return helpText('Core', 'Core_CmdtManager_OwnEmpty');
+    },
     shippedHeading: SHIPPED_HEADING,
     checkAgain: CHECK_AGAIN
   };
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -68,7 +73,7 @@ export default class CustomMetadataManager extends LightningElement {
       this.types = (await getTypes()) || [];
       this.errorMessage = undefined;
     } catch (error) {
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_CmdtManager_LoadError'));
     }
   }
 
@@ -223,12 +228,12 @@ export default class CustomMetadataManager extends LightningElement {
     try {
       const jobId = await request;
       this.pending = { jobId, label };
-      this.statusMessage = SAVING;
+      this.statusMessage = helpText('Core', 'Core_CmdtManager_Saving');
       this.poll(jobId, label, POLL_ATTEMPTS);
       return true;
     } catch (error) {
       this.busy = false;
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_CmdtManager_LoadError'));
       return false;
     }
   }
@@ -242,11 +247,11 @@ export default class CustomMetadataManager extends LightningElement {
       try {
         outcome = await getOutcome({ deploymentId: jobId });
       } catch (error) {
-        this.finish(undefined, bodyMessage(error, LOAD_ERROR));
+        this.finish(undefined, bodyMessage(error, helpText('Core', 'Core_CmdtManager_LoadError')));
         return;
       }
       if (outcome.status === 'Succeeded') {
-        this.finish(SAVED.replace('{0}', label), undefined);
+        this.finish(helpText('Core', 'Core_CmdtManager_Saved').replace('{0}', label), undefined);
         this.load();
       } else if (outcome.status === 'Failed') {
         this.finish(undefined, outcome.message);
@@ -254,7 +259,7 @@ export default class CustomMetadataManager extends LightningElement {
         this.poll(jobId, label, attemptsLeft - 1);
       } else {
         this.busy = false;
-        this.statusMessage = STILL_SAVING;
+        this.statusMessage = helpText('Core', 'Core_CmdtManager_StillSaving');
       }
     }, POLL_INTERVAL_MS);
   }

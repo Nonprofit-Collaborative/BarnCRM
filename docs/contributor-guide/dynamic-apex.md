@@ -13,7 +13,7 @@ at runtime.
 
 | Reached from | Target | Example | Decision |
 | --- | --- | --- | --- |
-| Mirror | Campaign (and later Opportunity, Gift Transaction) | `CampaignSyncService`, `CampaignSyncSelector` | ADR-0056 |
+| Mirror | Campaign, Opportunity, Gift Transaction and its designations | `CampaignSyncService`, `OpportunityMirrorContext`, `GiftTransactionMirrorSchema` (which also checks the field types it relies on, and which tests point at stand-in objects of the same shape) | ADR-0056, ADR-0058, ADR-0157 (Gift Transaction mirror) |
 | Core | Person Account fields (`PersonEmail`, `PersonMailingPostalCode`, `...__pc`) | `ImportMatcher`, `ImportRowProcessor.storedName` | ADR-0013 |
 | Core | Giving behaviour (classes) | `ImportEntityProcessors`, `SampleDataModules`, `HealthCheckExtensions`, `SetupAssistantExtensions` | ADR-0017, ADR-0057, ADR-0059 |
 | Core | Industries, NPSP, Sales Cloud detection | `OrgShapeDetector` | ADR-0013 |
@@ -255,8 +255,9 @@ alone turned missing field access into a failed Health Check.
   `String.escapeSingleQuotes` as defence in depth (`CampaignSyncSelector`, `ImportUndoBatch`).
 - **`String.escapeSingleQuotes` on a value only where a bind is impossible**, such as a filter
   string handed to the rollup engine (`RollupFilterParser`). On a bind it corrupts the value
-  (`HouseholdSelector.searchHouseholds`: it "would lose every O'Brien").
-- **Escape LIKE wildcards** in a bound search term (`\`, `%`, `_`), as `searchHouseholds` does.
+  (`UserSelector.searchActive`: it "would lose every O'Brien").
+- **Escape LIKE wildcards** in a bound search term (`\`, `%`, `_`) with `SoqlText.escapeLike`,
+  as `UserSelector.searchActive` does.
 - **Keep the query string testable.** Build it in a separate `@TestVisible` method, so a test
   in an org without the other package still asserts what Core would ask.
 

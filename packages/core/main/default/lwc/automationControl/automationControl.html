@@ -1,40 +1,34 @@
 <template>
-    <lightning-card title={labels.title} icon-name="utility:settings">
+    <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="custom:custom67">
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
             <p class="slds-var-m-bottom_small">{labels.intro}</p>
 
             <template lwc:if={isReadOnly}>
-                <div class="slds-box slds-box_x-small slds-theme_shade slds-var-m-bottom_small">
+                <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="info">
                     <p data-id="read-only-notice">{labels.readOnly}</p>
-                </div>
+                </c-barn-notice>
             </template>
 
             <template lwc:if={hasError}>
-                <div
-                    class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small"
-                    role="alert"
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="error"
+                    alternative-text={labels.errorPrefix}
+                    data-id="error-notice"
                 >
-                    <lightning-icon
-                        icon-name="utility:error"
-                        size="x-small"
-                        alternative-text={labels.errorPrefix}
-                    ></lightning-icon>
                     <span data-id="error-message">{errorMessage}</span>
-                </div>
+                </c-barn-notice>
             </template>
 
             <template lwc:if={isPaused}>
-                <div
-                    class="slds-box slds-box_x-small slds-theme_warning slds-var-m-bottom_small"
-                    role="status"
-                    aria-live="polite"
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="warning"
+                    alternative-text={labels.pausedPrefix}
+                    data-id="paused-notice"
                 >
                     <p data-id="paused-banner">
-                        <lightning-icon
-                            icon-name="utility:pause"
-                            size="x-small"
-                            alternative-text={labels.pausedPrefix}
-                        ></lightning-icon>
                         {labels.pausedBanner}
                         <lightning-formatted-date-time
                             value={pausedUntil}
@@ -51,40 +45,79 @@
                         </template>
                         {labels.resumesItself}
                     </p>
-                </div>
-            </template>
-
-            <div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-align-end slds-var-m-bottom_medium">
-                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
-                    <lightning-combobox
-                        data-id="pause-hours"
-                        label={labels.pauseLength}
-                        value={selectedHours}
-                        options={hourOptions}
-                        disabled={controlsDisabled}
-                        onchange={handleHoursChange}
-                    ></lightning-combobox>
-                </div>
-                <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3 slds-var-m-top_x-small">
-                    <lightning-button
-                        data-id="pause-button"
-                        label={labels.pauseButton}
-                        variant="brand"
-                        disabled={controlsDisabled}
-                        onclick={handlePause}
-                    ></lightning-button>
+                    <!-- admin-12: while paused, Resume is the only pause control, inside the banner. -->
                     <lightning-button
                         data-id="resume-button"
-                        class="slds-var-m-left_x-small"
+                        class="slds-var-m-top_x-small slds-show"
                         label={labels.resumeButton}
                         disabled={controlsDisabled}
                         onclick={handleResume}
                     ></lightning-button>
+                </c-barn-notice>
+            </template>
+            <template lwc:else>
+                <!-- While running, only Pause and How long are offered. -->
+                <div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-align-end slds-var-m-bottom_medium">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                        <lightning-combobox
+                            data-id="pause-hours"
+                            label={labels.pauseLength}
+                            value={selectedHours}
+                            options={hourOptions}
+                            disabled={controlsDisabled}
+                            onchange={handleHoursChange}
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3 slds-var-m-top_x-small">
+                        <lightning-button
+                            data-id="pause-button"
+                            label={labels.pauseButton}
+                            variant="brand"
+                            disabled={controlsDisabled}
+                            onclick={handlePause}
+                        ></lightning-button>
+                    </div>
                 </div>
+            </template>
+
+            <!-- R-A8: Pause All on the Whole Organization row, with its own Turn Off. -->
+            <template lwc:if={pausedForEveryone}>
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    variant="warning"
+                    message={labels.pausedForEveryone}
+                    action-label={turnOffLabel}
+                    onaction={handleTurnOffPauseAll}
+                    data-id="paused-for-everyone"
+                ></c-barn-notice>
+            </template>
+
+            <div class="slds-var-m-bottom_medium" data-id="catch-up">
+                <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.catchUpHelp}</p>
+                <lightning-button
+                    data-id="catch-up-button"
+                    label={labels.catchUpButton}
+                    disabled={controlsDisabled}
+                    onclick={handleCatchUp}
+                ></lightning-button>
+                <template lwc:if={catchUpMessage}>
+                    <c-barn-notice
+                        class="slds-var-m-top_x-small"
+                        variant="success"
+                        message={catchUpMessage}
+                        data-id="catch-up-started"
+                    ></c-barn-notice>
+                </template>
             </div>
 
             <template lwc:if={isEmpty}>
-                <p data-id="empty-state">{labels.empty}</p>
+                <c-barn-empty-state
+                    data-id="empty-state"
+                    size="compact"
+                    illustration="no-data"
+                    heading={labels.emptyHeading}
+                    message={labels.empty}
+                ></c-barn-empty-state>
             </template>
 
             <ul class="slds-has-dividers_bottom-space" data-id="automation-list">
@@ -94,9 +127,11 @@
                             <div class="slds-col slds-size_2-of-3">
                                 <p class="slds-text-heading_small">{automation.label}</p>
                                 <p class="slds-text-body_small">{automation.description}</p>
-                                <p class="slds-text-body_small">
-                                    {labels.runsOn} {automation.objectName}
-                                </p>
+                                <template lwc:if={automation.objectName}>
+                                    <p class="slds-text-body_small">
+                                        {labels.runsOn} {automation.objectName}
+                                    </p>
+                                </template>
                                 <template lwc:if={automation.alwaysRuns}>
                                     <p
                                         class="slds-text-body_small slds-text-color_weak"
@@ -117,11 +152,169 @@
                                     disabled={automation.toggleDisabled}
                                     onchange={handleToggle}
                                 ></lightning-input>
+                                <!-- admin-12: says a switch just turned off, for a few seconds. -->
+                                <p
+                                    class="slds-text-body_small slds-var-m-top_xx-small"
+                                    data-id="switch-status"
+                                    data-automation={automation.automationName}
+                                    aria-live="polite"
+                                >{automation.statusLine}</p>
+                                <template lwc:if={automation.removable}>
+                                    <lightning-button
+                                        variant="base"
+                                        label={labels.remove}
+                                        title={automation.removeTitle}
+                                        data-automation={automation.automationName}
+                                        data-id="remove-flow"
+                                        disabled={controlsDisabled}
+                                        onclick={handleRemoveFlow}
+                                    ></lightning-button>
+                                </template>
                             </div>
                         </div>
                     </li>
                 </template>
             </ul>
+
+            <!-- R-A8: the BarnCRM Automation Control rows, managed here, never only in Setup. -->
+            <h2 class="slds-text-heading_small slds-var-m-top_large slds-var-m-bottom_x-small">
+                {labels.peopleTitle}
+            </h2>
+            <p class="slds-text-body_small slds-var-m-bottom_small">{labels.peopleHelp}</p>
+            <div>
+                <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked" data-id="control-table">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th scope="col">{labels.name}</th>
+                            <th scope="col">{labels.type}</th>
+                            <th scope="col">{pauseAllLabel}</th>
+                            <th scope="col">{bypassLabel}</th>
+                            <th scope="col"><span class="slds-assistive-text">{labels.remove}</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={controlRows} for:item="row">
+                            <tr key={row.ownerId} data-id="control-row" data-owner={row.ownerId}>
+                                <th scope="row" data-label={labels.name}>{row.name}</th>
+                                <td data-label={labels.type}>{row.typeLabel}</td>
+                                <td data-label={pauseAllLabel}>
+                                    <lightning-input
+                                        type="checkbox"
+                                        variant="label-hidden"
+                                        label={row.pauseAllTitle}
+                                        checked={row.pauseAll}
+                                        disabled={controlsDisabled}
+                                        data-owner={row.ownerId}
+                                        data-field="pauseAll"
+                                        data-id="control-pause-all"
+                                        onchange={handleControlChange}
+                                    ></lightning-input>
+                                </td>
+                                <td data-label={bypassLabel}>
+                                    <lightning-input
+                                        type="checkbox"
+                                        variant="label-hidden"
+                                        label={row.bypassTitle}
+                                        checked={row.bypass}
+                                        disabled={controlsDisabled}
+                                        data-owner={row.ownerId}
+                                        data-field="bypass"
+                                        data-id="control-bypass"
+                                        onchange={handleControlChange}
+                                    ></lightning-input>
+                                </td>
+                                <td>
+                                    <template lwc:if={row.removable}>
+                                        <lightning-button
+                                            variant="base"
+                                            label={labels.remove}
+                                            title={row.removeTitle}
+                                            data-owner={row.ownerId}
+                                            data-id="remove-control"
+                                            disabled={controlsDisabled}
+                                            onclick={handleRemoveControl}
+                                        ></lightning-button>
+                                    </template>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+            <div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-align-end slds-var-m-top_small" data-id="add-control">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-radio-group
+                        type="button"
+                        label={labels.addFor}
+                        options={kindOptions}
+                        value={addKind}
+                        disabled={controlsDisabled}
+                        data-id="add-kind"
+                        onchange={handleAddKind}
+                    ></lightning-radio-group>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <template lwc:if={addingProfile}>
+                        <lightning-combobox
+                            label={labels.profile}
+                            options={profileOptions}
+                            value={addOwnerId}
+                            disabled={controlsDisabled}
+                            data-id="add-profile"
+                            onchange={handleAddOwner}
+                        ></lightning-combobox>
+                    </template>
+                    <template lwc:else>
+                        <lightning-record-picker
+                            label={labels.user}
+                            object-api-name="User"
+                            disabled={controlsDisabled}
+                            data-id="add-user"
+                            onchange={handleUserPicked}
+                        ></lightning-record-picker>
+                    </template>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-var-m-top_x-small">
+                    <lightning-button
+                        label={labels.add}
+                        disabled={addControlDisabled}
+                        data-id="add-control-button"
+                        onclick={handleAddControl}
+                    ></lightning-button>
+                </div>
+            </div>
+
+            <!-- R-A8: an org's own flows, listed with a switch named Flow: plus the API name. -->
+            <h2 class="slds-text-heading_small slds-var-m-top_large slds-var-m-bottom_x-small">
+                {labels.flowsTitle}
+            </h2>
+            <p class="slds-text-body_small slds-var-m-bottom_small">{labels.flowsHelp}</p>
+            <template lwc:if={hasFlowOptions}>
+                <div class="slds-grid slds-wrap slds-gutters slds-grid_vertical-align-end" data-id="add-flow">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3">
+                        <lightning-combobox
+                            label={labels.flow}
+                            options={flowOptions}
+                            value={flowToAdd}
+                            disabled={controlsDisabled}
+                            data-id="flow-choice"
+                            onchange={handleFlowChoice}
+                        ></lightning-combobox>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-var-m-top_x-small">
+                        <lightning-button
+                            label={labels.add}
+                            disabled={addFlowDisabled}
+                            data-id="add-flow-button"
+                            onclick={handleAddFlow}
+                        ></lightning-button>
+                    </div>
+                </div>
+            </template>
+            <template lwc:else>
+                <p class="slds-text-body_small slds-text-color_weak" data-id="no-flows">{labels.noFlowsToAdd}</p>
+            </template>
         </div>
     </lightning-card>
+    </template>
 </template>

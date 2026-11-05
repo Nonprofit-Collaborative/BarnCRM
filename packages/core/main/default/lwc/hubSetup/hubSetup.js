@@ -1,6 +1,6 @@
 import { LightningElement, api, wire } from 'lwc';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
-import CHECKLIST_HEADING from '@salesforce/label/c.Core_HubHome_ChecklistHeading';
+import CHECKLIST_HEADING from '@salesforce/label/c.Core_SetupAssistant_Heading';
 import SETUP_COMPLETE_HEADING from '@salesforce/label/c.Core_SetupAssistant_CompleteTileHeading';
 import REOPEN_SETUP from '@salesforce/label/c.Core_SetupAssistant_ReopenButton';
 import PROGRESS_FORMAT from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';

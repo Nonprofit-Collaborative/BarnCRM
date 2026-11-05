@@ -26,28 +26,28 @@
  * accessors on TriggerHandler, which is the contract every packaged handler is written to.
  */
 public with sharing class AffiliationValidationHandler extends TriggerHandler {
-    public override void beforeInsert() {
-        applyAndValidate((List<Affiliation__c>) newRecords(), null);
-    }
+	public override void beforeInsert() {
+		applyAndValidate((List<Affiliation__c>) newRecords(), null);
+	}
 
-    public override void beforeUpdate() {
-        applyAndValidate((List<Affiliation__c>) newRecords(), oldRecordsById());
-    }
+	public override void beforeUpdate() {
+		applyAndValidate((List<Affiliation__c>) newRecords(), oldRecordsById());
+	}
 
-    private void applyAndValidate(List<Affiliation__c> records, Map<Id, SObject> previousById) {
-        if (records == null || records.isEmpty()) {
-            return;
-        }
-        try {
-            AffiliationDomain.applyDefaults(records, previousById);
-            AffiliationDomain.validate(records, previousById);
-        } catch (Exception thrown) {
-            reportFailure(
-                thrown,
-                records,
-                'AffiliationValidationHandler.applyAndValidate',
-                Label.Core_Affiliation_PrimaryFailed
-            );
-        }
-    }
+	private void applyAndValidate(List<Affiliation__c> records, Map<Id, SObject> previousById) {
+		if (records == null || records.isEmpty()) {
+			return;
+		}
+		try {
+			AffiliationDomain.applyDefaults(records, previousById);
+			AffiliationDomain.validate(records, previousById);
+		} catch (Exception thrown) {
+			reportFailure(
+				thrown,
+				records,
+				'AffiliationValidationHandler.applyAndValidate',
+				BarnHelp.text('Core', 'Core_Affiliation_PrimaryFailed')
+			);
+		}
+	}
 }

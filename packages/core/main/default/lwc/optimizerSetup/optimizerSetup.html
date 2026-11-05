@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <div>
         <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
             <h2 class="slds-text-heading_medium">{labels.title}</h2>
@@ -14,39 +15,88 @@
                 <lightning-spinner alternative-text={labels.refresh} size="small"></lightning-spinner>
             </template>
             <template lwc:if={errorMessage}>
-                <p role="alert" class="slds-text-color_error" data-id="error">{errorMessage}</p>
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    variant="error"
+                    message={errorMessage}
+                    data-id="error"
+                ></c-barn-notice>
             </template>
-            <p class="slds-text-body_small slds-var-m-bottom_small">{labels.intro}</p>
-            <ul class="slds-has-dividers_bottom-space" data-id="findings">
-                <template for:each={findings} for:item="finding">
-                    <li key={finding.key} class="slds-item" data-id={finding.key}>
-                        <div class="slds-grid slds-grid_vertical-align-center">
-                            <div class="slds-col">
-                                <p>{finding.title}</p>
-                                <template lwc:if={finding.hasExamples}>
-                                    <p class="slds-text-body_small slds-text-color_weak" data-id="examples">{finding.examplesText}</p>
-                                </template>
-                            </div>
-                            <span class={finding.countClass} data-id="count">{finding.countText}</span>
-                            <a
-                                class="slds-var-m-left_medium"
-                                href={finding.setupUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                data-id="setup-link"
+            <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small">{labels.intro}</p>
+            <template for:each={sections} for:item="section">
+                <div key={section.kind} class={section.wrapperClass} data-id={section.sectionId}>
+                    <template lwc:if={section.collapsible}>
+                        <h3 class="slds-section__title">
+                            <button
+                                type="button"
+                                class="slds-button slds-section__title-action"
+                                aria-expanded={section.expandedText}
+                                aria-controls={section.contentId}
+                                onclick={handleToggleDebt}
+                                data-id="debt-toggle"
                             >
-                                <span>{labels.openInSetup}</span>
                                 <lightning-icon
-                                    class="slds-var-m-left_xx-small"
-                                    icon-name="utility:new_window"
-                                    size="xx-small"
+                                    class="slds-section__title-action-icon slds-button__icon_left"
+                                    icon-name="utility:switch"
+                                    size="x-small"
                                 ></lightning-icon>
-                                <span class="slds-assistive-text">{labels.newTab}</span>
-                            </a>
+                                <span class="slds-truncate" title={section.heading}>{section.heading}</span>
+                            </button>
+                        </h3>
+                    </template>
+                    <template lwc:elseif={section.showHeading}>
+                        <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{section.heading}</h3>
+                    </template>
+                    <template lwc:if={section.open}>
+                        <div class={section.contentClass} id={section.contentId} data-id="section-content">
+                            <template lwc:if={section.intro}>
+                                <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small" data-id="debt-intro">{section.intro}</p>
+                            </template>
+                            <ul class="slds-has-dividers_bottom-space" data-id={section.listId}>
+                                <template for:each={section.findings} for:item="finding">
+                                    <li key={finding.key} class="slds-item" data-id={finding.key}>
+                                        <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+                                            <div class="slds-col">
+                                                <p>{finding.title}</p>
+                                                <template lwc:if={finding.hasExamples}>
+                                                    <p class="slds-text-body_small slds-text-color_weak" data-id="examples">{finding.examplesText}</p>
+                                                </template>
+                                            </div>
+                                            <template lwc:if={finding.failed}>
+                                                <span class="slds-text-color_weak" data-id="count">{finding.countText}</span>
+                                            </template>
+                                            <template lwc:else>
+                                                <c-barn-status-badge
+                                                    status={finding.countStatus}
+                                                    label={finding.countText}
+                                                    hide-icon={finding.countHideIcon}
+                                                    data-id="count"
+                                                ></c-barn-status-badge>
+                                            </template>
+                                            <a
+                                                class="slds-var-m-left_medium"
+                                                href={finding.setupUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                data-id="setup-link"
+                                            >
+                                                <span>{labels.openInSetup}</span>
+                                                <lightning-icon
+                                                    class="slds-var-m-left_xx-small"
+                                                    icon-name="utility:new_window"
+                                                    size="xx-small"
+                                                ></lightning-icon>
+                                                <span class="slds-assistive-text">{labels.newTab}</span>
+                                            </a>
+                                        </div>
+                                    </li>
+                                </template>
+                            </ul>
                         </div>
-                    </li>
-                </template>
-            </ul>
+                    </template>
+                </div>
+            </template>
         </div>
     </div>
+    </template>
 </template>

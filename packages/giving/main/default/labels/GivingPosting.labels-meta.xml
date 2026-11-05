@@ -137,14 +137,6 @@
         <value>Not in the books: Pending and in-kind gifts are in no accounting export, so this gift stays editable.</value>
     </labels>
     <labels>
-        <fullName>Giving_PostingCard_ClosedPeriod</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Gift in a closed period</shortDescription>
-        <value>Dated in a closed period, so its date, amount, donor, payment method, reference and funds stay locked. The books are closed through</value>
-    </labels>
-    <labels>
         <fullName>Giving_PostingCard_ReasonLabel</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
@@ -191,14 +183,6 @@
         <protected>true</protected>
         <shortDescription>Posting lock override: gift entered a closed period</shortDescription>
         <value>the gift entered the books dated {0}</value>
-    </labels>
-    <labels>
-        <fullName>Giving_Posting_OverrideDeleted</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Posting lock override: gift deleted</shortDescription>
-        <value>the gift was deleted</value>
     </labels>
     <labels>
         <fullName>Giving_Posting_OverrideDonorDeleted</fullName>

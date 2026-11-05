@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_FieldAccess_RowRefused</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: refused row ({0} = set, {1} = target, {2} = reason)</shortDescription>
+        <value>{0}, {1}: {2}</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ViewChange</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Access explorer: view choice</shortDescription>
+        <value>Change Field Access</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_SetsPlaceholder</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: permission set search placeholder</shortDescription>
+        <value>Type two letters of a permission set's name</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ObjectAccess</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: object access choice</shortDescription>
+        <value>Access to the Kind of Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_NoChange</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: object access, no change</shortDescription>
+        <value>No Change</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ReadEdit</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: access level</shortDescription>
+        <value>Read and Edit</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_NoAccess</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: access level</shortDescription>
+        <value>No Access</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_FilterFields</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: field filter label</shortDescription>
+        <value>Filter Fields</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_FieldAccess</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: ticked fields access choice</shortDescription>
+        <value>Access for the Ticked Fields</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_AddToChanges</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: add button</shortDescription>
+        <value>Add to Changes</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ColNow</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: column</shortDescription>
+        <value>Now</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_NowText</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: now ({0} = read, {1} = edit, {2} = sets)</shortDescription>
+        <value>Read: {0} of {2}. Edit: {1} of {2}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ReadOnlyNote</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: note for a formula field</shortDescription>
+        <value>Read only</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_WholeRecord</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: the kind of record itself</shortDescription>
+        <value>(The kind of record)</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ColWhy</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: column</shortDescription>
+        <value>Why</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_WhyAsked</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: reason</shortDescription>
+        <value>Asked</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_WhyNeeded</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: reason</shortDescription>
+        <value>Needed for field access</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_WhyRemoved</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: reason</shortDescription>
+        <value>Removed with the kind of record</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_Apply</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: apply button</shortDescription>
+        <value>Apply Changes</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ConfirmTitle</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: confirm title</shortDescription>
+        <value>Apply Field Access Changes</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ConfirmButton</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: confirm button</shortDescription>
+        <value>Apply</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ColWhen</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: column</shortDescription>
+        <value>When</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ColBy</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: column</shortDescription>
+        <value>By</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ColChanged</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: column</shortDescription>
+        <value>Rows Changed</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ColRefused</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: column</shortDescription>
+        <value>Refused</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_ColUndoUntil</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: column</shortDescription>
+        <value>Undo Until</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldAccess_UndoConfirmTitle</fullName>
+        <categories>FieldAccess</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field access: undo confirm title</shortDescription>
+        <value>Undo Field Access Change</value>
+    </labels>
+</CustomLabels>

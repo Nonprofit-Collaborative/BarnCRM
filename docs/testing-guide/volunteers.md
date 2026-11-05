@@ -2,7 +2,7 @@
 
 Scripts for jobs, shifts, sign-ups, hours approval, skills and Volunteers access. Setup detail: [Volunteers](../admin-guide/volunteers.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Volunteers deployed and sample data loaded unless a script says otherwise. Volunteers is offered in the **Nonprofit Edition** only: run every script here in that edition (see [Edition modes](before-you-test.md#edition-modes)). Leave **Require Hours Approval** and **Create Hours From Attendance** on (the defaults) unless a script says otherwise.
+Before you start: an org from [Before you test](before-you-test.md), with Core, BarnCRM Rollup Builder and Volunteers deployed and sample data loaded unless a script says otherwise. Volunteers is offered in the **Nonprofit Edition** only: run every script here in that edition (see [Edition modes](before-you-test.md#edition-modes)). Leave **Require hours approval** and **Create hours from attendance** on (the defaults) unless a script says otherwise.
 
 ## T-VOL-01: Open the Volunteers App
 
@@ -121,17 +121,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 ## T-VOL-08: Hours Without Approval
 
-**Purpose:** confirm turning **Require Hours Approval** off makes new hours Approved at once, and back on restores Submitted.
+**Purpose:** confirm turning **Require hours approval** off makes new hours Approved at once, and back on restores Submitted.
 **Prerequisites:** admin user.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Volunteers**. | The section shows **Require Hours Approval**, **Create Hours From Attendance** and **Weeks Ahead to Create Shifts** (8 weeks). |
-| 2 | Turn **Require Hours Approval** off. | The change saves at once. |
+| 1 | Open **BarnCRM Settings**, **Volunteers**. | The section shows **Require hours approval**, **Create hours from attendance** and **Weeks ahead to create shifts** (8 weeks). |
+| 2 | Turn **Require hours approval** off. | The change saves at once. |
 | 3 | Create an hours entry for a sample person on job **Front desk**, 1 hour, yesterday. | It saves with **Status** Approved and **Reviewed By** you. |
-| 4 | Turn **Require Hours Approval** back on. Create a second entry the same way. | It saves with **Status** Submitted. |
+| 4 | Turn **Require hours approval** back on. Create a second entry the same way. | It saves with **Status** Submitted. |
 
-**Cleanup:** reopen the Approved entry on **Approve Hours**, then delete both entries. Confirm **Require Hours Approval** is on.
+**Cleanup:** reopen the Approved entry on **Approve Hours**, then delete both entries. Confirm **Require hours approval** is on.
 
 ## T-VOL-09: Skills, and Retiring a Skill
 
@@ -211,13 +211,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 ## T-VOL-14: Shift Reminders Go Out Once
 
 **Purpose:** confirm a signed-up volunteer gets one reminder email before their shift, and nobody is emailed twice or against their wishes.
-**Prerequisites:** admin user; a contact with your own email address; a second contact with **Email Opt Out** checked; Volunteers nightly jobs scheduled (Health Check, **Schedule all nightly jobs**).
+**Prerequisites:** admin user; a contact with your own email address; a second contact with **Email Opt Out** checked; the nightly run scheduled (Volunteers' jobs are steps of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md); Health Check, **Schedule all nightly jobs**).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Volunteers**. | **Send Shift Reminders** is off by default and **Days Before a Shift to Remind** reads 1. |
+| 1 | Open **BarnCRM Settings**, **Volunteers**. | **Send shift reminders** is off by default and **Days before a shift to remind** reads 1. |
 | 2 | Create a shift that starts tomorrow in 3 hours' time or later. Sign up both contacts. Open one sign-up. | **Reminder Sent On** is empty and read-only for a Team Member, editable for a Coordinator. |
-| 3 | Switch **Send Shift Reminders** on. In the Developer Console, run `VolunteerReminderBatch.startMorning();` as the admin. | The run starts. |
+| 3 | Switch **Send shift reminders** on. In the Developer Console, run `VolunteerReminderBatch.startMorning();` as the admin. | The run starts. |
 | 4 | Check the mailbox of the first contact and open each sign-up. | One email naming the job, day and time (and place, if the shift has one). The first sign-up now holds **Reminder Sent On**. The opted-out contact received nothing and has no stamp. |
 | 5 | Run `VolunteerReminderBatch.startMorning();` again. | No second email. |
 | 6 | Clear **Reminder Sent On** on the first sign-up and run it once more. | The email is sent again and the field is filled. |
@@ -225,7 +225,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 8 | Make a new sign-up for a shift that starts later today, after the run in step 6, and run it again with the lead time at 1. | The run stamps and emails only bookings whose shift starts after the run and before the end of the lead time; a booking made after a morning's run for a shift starting before the next morning's run gets no reminder from that run (tell such volunteers directly). |
 | 9 | Check the sender of the email from step 6. | It comes from the user who scheduled the morning reminder job, and replies go to that user. |
 
-**Cleanup:** switch **Send Shift Reminders** off; cancel the test shift.
+**Cleanup:** switch **Send shift reminders** off; cancel the test shift.
 
 ## T-VOL-15: Suggested Volunteers Rank and Sign Up
 
@@ -242,3 +242,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 6 | Open a shift as a Read Only user. | No Suggested Volunteers card. |
 
 **Cleanup:** delete the test sign-ups and restore the shift's status.
+
+## T-VOL-16: Person Accounts Are Reminded and Suggested as Accounts
+
+**Purpose:** confirm that in an org that stores people as person accounts, a booking on the account gets its reminder and a suggested volunteer is signed up on the account, not the contact behind it.
+**Prerequisites:** a person account org (not barn-sales); admin; **Send shift reminders** on; Volunteers nightly jobs scheduled; an open shift that starts tomorrow in 3 hours' time or later; a person account, Dana, with your own email address, **Volunteer Status** Active and Email Opt Out unchecked.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the shift. Read **Suggested Volunteers**. | Dana is listed. |
+| 2 | Click **Sign Up** on Dana's row, then open the new sign-up. | The sign-up names Dana's **Account**, and **Contact** is empty. Dana leaves the suggestions. |
+| 3 | In the Developer Console, run `VolunteerReminderBatch.startMorning();` as the admin. Reopen the sign-up. | **Reminder Sent On** has a date and time; the mailbox received one reminder greeting Dana by first name. |
+| 4 | Check Email Opt Out on Dana's account, clear **Reminder Sent On** and run it again. | No email, and **Reminder Sent On** stays empty. |
+
+**Cleanup:** cancel the sign-up, uncheck Email Opt Out, and switch **Send shift reminders** off if it was off before.

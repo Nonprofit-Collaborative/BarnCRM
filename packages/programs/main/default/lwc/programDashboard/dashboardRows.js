@@ -65,6 +65,7 @@ export function tiles(dashboard, labels) {
     { key: 'open', label: labels.openEnrollments, value: totals.openEnrollments || 0 },
     { key: 'new', label: labels.newEnrollments, value: totals.newEnrollments || 0 },
     { key: 'people', label: labels.peopleServed, value: totals.peopleServed || 0 },
+    { key: 'counted', label: labels.peopleCounted, value: totals.peopleCounted || 0 },
     { key: 'delivered', label: labels.delivered, value: totals.delivered || 0 },
     { key: 'rate', label: labels.attendanceRate, value: attendanceRate(totals, labels.noRate) }
   ].map((tile) => ({ ...tile, value: String(tile.value) }));
@@ -81,6 +82,7 @@ export function programRows(dashboard, noRateLabel) {
     newEnrollments: program.newEnrollments || 0,
     completedEnrollments: program.completedEnrollments || 0,
     peopleServed: program.peopleServed || 0,
+    peopleCounted: program.peopleCounted || 0,
     delivered: program.delivered || 0,
     rate: attendanceRate(program, noRateLabel)
   }));

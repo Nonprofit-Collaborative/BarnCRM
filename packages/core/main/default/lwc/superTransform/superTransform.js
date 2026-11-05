@@ -1,4 +1,5 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
+import { CurrentPageReference } from 'lightning/navigation';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import { startPolling } from 'c/jobPoller';
 import getPage from '@salesforce/apex/BulkUpdateController.getPage';
@@ -16,63 +17,41 @@ import renameSavedList from '@salesforce/apex/BulkUpdateController.renameSavedLi
 import deleteSavedList from '@salesforce/apex/BulkUpdateController.deleteSavedList';
 import { PHONE_PRESET_STEPS } from 'c/transformFormat';
 
-import NO_PERMISSION from '@salesforce/label/c.Core_BulkUpdate_ErrorNoPermission';
 import RECORD from '@salesforce/label/c.Core_BulkUpdate_Record';
 import REMOVE from '@salesforce/label/c.Core_BulkUpdate_Remove';
-import STARTED from '@salesforce/label/c.Core_BulkUpdate_Started';
-import PROGRESS from '@salesforce/label/c.Core_BulkUpdate_Progress';
-import SUMMARY from '@salesforce/label/c.Core_BulkUpdate_Summary';
 import FAILURES from '@salesforce/label/c.Core_BulkUpdate_Failures';
-import LOADING from '@salesforce/label/c.Core_BulkUpdate_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import TRUE_LABEL from '@salesforce/label/c.Core_BulkUpdate_True';
 import FALSE_LABEL from '@salesforce/label/c.Core_BulkUpdate_False';
 import TITLE from '@salesforce/label/c.Core_SuperTransform_Title';
-import INTRO from '@salesforce/label/c.Core_SuperTransform_Intro';
 import STEP_OBJECT from '@salesforce/label/c.Core_SuperTransform_StepObject';
 import STEP_RECORDS from '@salesforce/label/c.Core_SuperTransform_StepRecords';
 import STEP_CHANGES from '@salesforce/label/c.Core_SuperTransform_StepChanges';
 import STEP_PREVIEW from '@salesforce/label/c.Core_SuperTransform_StepPreview';
+import RUN_SHORT from '@salesforce/label/c.Core_BulkUpdate_PathRun';
 import STEP_RUN from '@salesforce/label/c.Core_SuperTransform_StepRun';
 import SEARCH_OBJECTS from '@salesforce/label/c.Core_SuperTransform_SearchObjects';
-import OBJECT from '@salesforce/label/c.Core_SuperTransform_Object';
-import CHOOSE_OBJECT from '@salesforce/label/c.Core_SuperTransform_ChooseObject';
-import NO_OBJECTS from '@salesforce/label/c.Core_SuperTransform_NoObjects';
-import OBJECT_FIRST from '@salesforce/label/c.Core_SuperTransform_ObjectFirst';
-import COUNTING from '@salesforce/label/c.Core_SuperTransform_Counting';
-import MATCH_COUNT from '@salesforce/label/c.Core_SuperTransform_MatchCount';
-import NONE_MATCH from '@salesforce/label/c.Core_SuperTransform_NoneMatch';
-import NO_FILTER from '@salesforce/label/c.Core_SuperTransform_NoFilter';
-import OVER_LIMIT from '@salesforce/label/c.Core_SuperTransform_OverLimit';
-import TOO_MANY from '@salesforce/label/c.Core_SuperTransform_TooManyToCount';
-import FIX_CONDITIONS from '@salesforce/label/c.Core_SuperTransform_FixConditions';
-import FIELD from '@salesforce/label/c.Core_SuperTransform_Field';
-import CHOOSE_FIELD from '@salesforce/label/c.Core_SuperTransform_ChooseField';
+import OBJECT from '@salesforce/label/c.Core_FieldUtilization_ChooseLabel';
+import CHOOSE_OBJECT from '@salesforce/label/c.Core_Find_ChooseObject';
+import FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
+import CHOOSE_FIELD from '@salesforce/label/c.Core_BulkUpdate_ChooseField';
 import ACTION from '@salesforce/label/c.Core_SuperTransform_Action';
 import ACTION_SET from '@salesforce/label/c.Core_SuperTransform_ActionSet';
-import ACTION_CLEAR from '@salesforce/label/c.Core_SuperTransform_ActionClear';
+import ACTION_CLEAR from '@salesforce/label/c.Core_BulkUpdate_ActionClear';
 import ACTION_COPY from '@salesforce/label/c.Core_SuperTransform_ActionCopy';
 import ACTION_TRANSFORM from '@salesforce/label/c.Core_SuperTransform_ActionTransform';
 import NEW_VALUE from '@salesforce/label/c.Core_SuperTransform_NewValue';
 import COPY_FROM from '@salesforce/label/c.Core_SuperTransform_CopyFrom';
 import ADD_FIELD from '@salesforce/label/c.Core_SuperTransform_AddField';
-import FIELD_LIMIT from '@salesforce/label/c.Core_SuperTransform_FieldLimit';
-import PREVIEW from '@salesforce/label/c.Core_SuperTransform_Preview';
-import PREVIEW_HINT from '@salesforce/label/c.Core_SuperTransform_PreviewHint';
-import PREVIEW_COUNT from '@salesforce/label/c.Core_SuperTransform_PreviewCount';
-import ALREADY_HELD from '@salesforce/label/c.Core_SuperTransform_AlreadyHeld';
+import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
 import CHANGES_TO from '@salesforce/label/c.Core_SuperTransform_ChangesTo';
 import NO_CHANGE from '@salesforce/label/c.Core_SuperTransform_NoChange';
-import BLANK from '@salesforce/label/c.Core_SuperTransform_Blank';
+import BLANK from '@salesforce/label/c.Core_Find_Blank';
 import RUN from '@salesforce/label/c.Core_SuperTransform_Run';
-import RUN_HINT from '@salesforce/label/c.Core_SuperTransform_RunHint';
-import CONFIRM_MESSAGE from '@salesforce/label/c.Core_SuperTransform_ConfirmMessage';
-import CONFIRM_DETAIL from '@salesforce/label/c.Core_SuperTransform_ConfirmDetail';
-import CONFIRM_BUTTON from '@salesforce/label/c.Core_SuperTransform_ConfirmButton';
-import CANCEL from '@salesforce/label/c.Core_SuperTransform_Cancel';
+import CONFIRM_BUTTON from '@salesforce/label/c.Core_Find_Run';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import TYPE_TO_CONFIRM from '@salesforce/label/c.Core_SuperTransform_TypeToConfirm';
-import UNDO_HINT from '@salesforce/label/c.Core_SuperTransform_UndoHint';
 import START_ANOTHER from '@salesforce/label/c.Core_SuperTransform_StartAnother';
-import HELP from '@salesforce/label/c.Core_SuperTransform_Help';
 import NO_PERMISSION_HEADING from '@salesforce/label/c.Core_SuperTransform_NoPermissionHeading';
 import NO_OBJECTS_HEADING from '@salesforce/label/c.Core_SuperTransform_NoObjectsHeading';
 import MATCHING from '@salesforce/label/c.Core_SuperTransform_Matching';
@@ -81,25 +60,16 @@ import BADGE_OVER from '@salesforce/label/c.Core_SuperTransform_BadgeOver';
 import ACTION_NAME_CASE from '@salesforce/label/c.Core_SuperTransform_ActionNameCase';
 import ACTION_PHONE_FORMAT from '@salesforce/label/c.Core_SuperTransform_ActionPhoneFormat';
 import SAVED_HEADING from '@salesforce/label/c.Core_SuperTransform_SavedHeading';
-import SAVED_HELP from '@salesforce/label/c.Core_SuperTransform_SavedHelp';
 import SAVED_CHOOSE from '@salesforce/label/c.Core_SuperTransform_SavedChoose';
 import SAVED_PLACEHOLDER from '@salesforce/label/c.Core_SuperTransform_SavedPlaceholder';
-import SAVED_NONE from '@salesforce/label/c.Core_SuperTransform_SavedNone';
-import SAVED_OPTION from '@salesforce/label/c.Core_SuperTransform_SavedOption';
+import SAVED_OPTION from '@salesforce/label/c.Core_Format_Parenthetical';
 import SAVED_LOAD from '@salesforce/label/c.Core_SuperTransform_SavedLoad';
 import SAVED_NAME from '@salesforce/label/c.Core_SuperTransform_SavedNameLabel';
 import SAVED_SAVE from '@salesforce/label/c.Core_SuperTransform_SavedSave';
 import SAVED_RENAME from '@salesforce/label/c.Core_SuperTransform_SavedRename';
 import SAVED_DELETE from '@salesforce/label/c.Core_SuperTransform_SavedDelete';
-import SAVED_DELETE_MESSAGE from '@salesforce/label/c.Core_SuperTransform_SavedDeleteMessage';
-import SAVED_DELETE_DETAIL from '@salesforce/label/c.Core_SuperTransform_SavedDeleteDetail';
-import SAVED_SAVED from '@salesforce/label/c.Core_SuperTransform_SavedSaved';
-import SAVED_LOADED from '@salesforce/label/c.Core_SuperTransform_SavedLoaded';
-import SAVED_RENAMED from '@salesforce/label/c.Core_SuperTransform_SavedRenamed';
-import SAVED_DELETED from '@salesforce/label/c.Core_SuperTransform_SavedDeleted';
-import SAVED_MISSING from '@salesforce/label/c.Core_SuperTransform_SavedMissingFields';
-import SAVED_SKIPPED from '@salesforce/label/c.Core_SuperTransform_SavedSkipped';
 import { messageFrom, format } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** A shipped step list: tidy spaces, then capitalize each word (for names). */
 const NAME_CASE_STEPS = [{ op: 'trim' }, { op: 'proper' }];
@@ -121,12 +91,32 @@ const INPUT_TYPES = {
   datetime: 'datetime'
 };
 
+/** The page state key Find's Change Records uses to open this tool: `c__start`, or the namespace's. */
+const START_STATE = '__start';
+
+/**
+ * What Find handed over, read from the page state: the kind of record, its conditions, and the
+ * conditions on related records. Anything else (a bad link) is ignored.
+ */
+function startFrom(state) {
+  const key = Object.keys(state || {}).find((name) => name.endsWith(START_STATE));
+  if (!key || !state[key]) {
+    return undefined;
+  }
+  try {
+    const start = JSON.parse(state[key]);
+    return start && typeof start.object === 'string' && start.object ? start : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function shown(value) {
   return value === null || value === undefined || value === '' ? BLANK : String(value);
 }
 
 /**
- * Super Transform (C-50, admin guide super-transform.md): a bulk update built on one page, in
+ * Super Transformer (C-50, admin guide super-transform.md): a bulk update built on one page, in
  * five numbered cards (object, which records, what to change, preview, run), without a file or
  * a Find query.
  *
@@ -135,11 +125,19 @@ function shown(value) {
  * own code and runs as a journaled, undoable job. Undo is on the Data Jobs list below it.
  */
 export default class SuperTransform extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     title: TITLE,
-    intro: INTRO,
-    help: HELP,
-    noPermission: NO_PERMISSION,
+    get intro() {
+      return helpText('Core', 'Core_SuperTransform_Intro');
+    },
+    get help() {
+      return helpText('Core', 'Core_SuperTransform_Help');
+    },
+    get noPermission() {
+      return helpText('Core', 'Core_BulkUpdate_ErrorNoPermission');
+    },
     noPermissionHeading: NO_PERMISSION_HEADING,
     noObjectsHeading: NO_OBJECTS_HEADING,
     matching: MATCHING,
@@ -148,12 +146,19 @@ export default class SuperTransform extends LightningElement {
     stepChanges: STEP_CHANGES,
     stepPreview: STEP_PREVIEW,
     stepRun: STEP_RUN,
+    runShort: RUN_SHORT,
     searchObjects: SEARCH_OBJECTS,
     object: OBJECT,
     chooseObject: CHOOSE_OBJECT,
-    noObjects: NO_OBJECTS,
-    objectFirst: OBJECT_FIRST,
-    counting: COUNTING,
+    get noObjects() {
+      return helpText('Core', 'Core_SuperTransform_NoObjects');
+    },
+    get objectFirst() {
+      return helpText('Core', 'Core_SuperTransform_ObjectFirst');
+    },
+    get counting() {
+      return helpText('Core', 'Core_SuperTransform_Counting');
+    },
     field: FIELD,
     chooseField: CHOOSE_FIELD,
     action: ACTION,
@@ -162,21 +167,31 @@ export default class SuperTransform extends LightningElement {
     remove: REMOVE,
     addField: ADD_FIELD,
     preview: PREVIEW,
-    previewHint: PREVIEW_HINT,
+    get previewHint() {
+      return helpText('Core', 'Core_SuperTransform_PreviewHint');
+    },
     record: RECORD,
     changesTo: CHANGES_TO,
     noChange: NO_CHANGE,
     run: RUN,
-    runHint: RUN_HINT,
+    get runHint() {
+      return helpText('Core', 'Core_SuperTransform_RunHint');
+    },
     failures: FAILURES,
-    undoHint: UNDO_HINT,
+    get undoHint() {
+      return helpText('Core', 'Core_SuperTransform_UndoHint');
+    },
     startAnother: START_ANOTHER,
     loading: LOADING,
     savedHeading: SAVED_HEADING,
-    savedHelp: SAVED_HELP,
+    get savedHelp() {
+      return helpText('Core', 'Core_SuperTransform_SavedHelp');
+    },
     savedChoose: SAVED_CHOOSE,
     savedPlaceholder: SAVED_PLACEHOLDER,
-    savedNone: SAVED_NONE,
+    get savedNone() {
+      return helpText('Core', 'Core_SuperTransform_SavedNone');
+    },
     savedLoad: SAVED_LOAD,
     savedName: SAVED_NAME,
     savedSave: SAVED_SAVE,
@@ -208,8 +223,65 @@ export default class SuperTransform extends LightningElement {
   savedLists = [];
   savedListId;
   savedNameText = '';
+  /** Find's conditions on related records, kept as the document's `related` (admin-14). */
+  relatedJson = '';
+  /** What Find handed over, waiting for the page to load; and the last one used. */
+  pendingStart;
+  usedStart;
+
+  /** Find's Change Records opens this page with its object and conditions (admin-14). */
+  @wire(CurrentPageReference)
+  handlePageReference(pageReference) {
+    const start = startFrom(pageReference && pageReference.state);
+    const text = start ? JSON.stringify(start) : undefined;
+    if (start && text !== this.usedStart) {
+      this.usedStart = text;
+      this.pendingStart = start;
+      this.applyStart();
+    }
+  }
+
+  /**
+   * Fills in the object and conditions Find handed over, once the page has loaded. Nothing runs:
+   * the person still chooses the changes, then Preview and Run. An object they may not change
+   * says so instead of leaving the page half filled.
+   */
+  async applyStart() {
+    const start = this.pendingStart;
+    if (!start || !this.loaded || !this.allowed) {
+      return;
+    }
+    this.pendingStart = undefined;
+    if (!this.objects.some((option) => option.value === start.object)) {
+      this.errorMessage = helpText('Core', 'Core_SuperTransform_StartNoObject');
+      return;
+    }
+    this.noticeMessage = undefined;
+    await this.work(async () => {
+      const targets = await getTargets({ objectName: start.object });
+      this.stopPolling();
+      this.job = undefined;
+      this.objectApiName = start.object;
+      this.targets = targets;
+      this.filterJson = start.filter ? JSON.stringify(start.filter) : '';
+      this.filterValid = true;
+      this.relatedJson =
+        Array.isArray(start.related) && start.related.length ? JSON.stringify(start.related) : '';
+      this.changes = [this.newChange()];
+      this.invalidate();
+      this.noticeMessage = this.relatedJson
+        ? helpText('Core', 'Core_SuperTransform_FromFindRelated')
+        : helpText('Core', 'Core_SuperTransform_FromFind');
+    });
+    this.scheduleCount(0);
+  }
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -229,6 +301,7 @@ export default class SuperTransform extends LightningElement {
       }
     });
     this.loaded = true;
+    this.applyStart();
   }
 
   /* ---------- what the template reads ---------- */
@@ -292,18 +365,25 @@ export default class SuperTransform extends LightningElement {
 
   get countMessage() {
     if (!this.filterValid) {
-      return FIX_CONDITIONS;
+      return helpText('Core', 'Core_SuperTransform_FixConditions');
     }
     if (this.counting || !this.counted) {
-      return COUNTING;
+      return helpText('Core', 'Core_SuperTransform_Counting');
     }
     const { count, runLimit, objectLabel } = this.counted;
     if (count === null || count === undefined) {
-      return format(TOO_MANY, runLimit.toLocaleString());
+      return format(
+        helpText('Core', 'Core_SuperTransform_TooManyToCount'),
+        runLimit.toLocaleString()
+      );
     }
     return count === 0
-      ? format(NONE_MATCH, objectLabel)
-      : format(MATCH_COUNT, count.toLocaleString(), objectLabel);
+      ? format(helpText('Core', 'Core_SuperTransform_NoneMatch'), objectLabel)
+      : format(
+          helpText('Core', 'Core_SuperTransform_MatchCount'),
+          count.toLocaleString(),
+          objectLabel
+        );
   }
 
   /** The page's one polite live region: progress, else the preview, else the count. */
@@ -350,13 +430,21 @@ export default class SuperTransform extends LightningElement {
     if (!this.filterJson && counted.count) {
       found.push({
         key: 'no-filter',
-        text: format(NO_FILTER, this.objectLabel, counted.count.toLocaleString())
+        text: format(
+          helpText('Core', 'Core_SuperTransform_NoFilter'),
+          this.objectLabel,
+          counted.count.toLocaleString()
+        )
       });
     }
     if (counted.overLimit && counted.count) {
       found.push({
         key: 'over-limit',
-        text: format(OVER_LIMIT, counted.count.toLocaleString(), counted.runLimit.toLocaleString())
+        text: format(
+          helpText('Core', 'Core_SuperTransform_OverLimit'),
+          counted.count.toLocaleString(),
+          counted.runLimit.toLocaleString()
+        )
       });
     }
     return found;
@@ -419,7 +507,7 @@ export default class SuperTransform extends LightningElement {
   }
 
   get fieldLimitLine() {
-    return format(FIELD_LIMIT, this.maxChanges);
+    return format(helpText('Core', 'Core_SuperTransform_FieldLimit'), this.maxChanges);
   }
 
   get hasChange() {
@@ -437,7 +525,11 @@ export default class SuperTransform extends LightningElement {
 
   get previewLine() {
     return this.preview
-      ? format(PREVIEW_COUNT, this.preview.count.toLocaleString(), this.preview.sample.length)
+      ? format(
+          helpText('Core', 'Core_SuperTransform_PreviewCount'),
+          this.preview.count.toLocaleString(),
+          this.preview.sample.length
+        )
       : '';
   }
 
@@ -481,7 +573,11 @@ export default class SuperTransform extends LightningElement {
     const held = this.preview.sample.filter((record) =>
       record.changes.every((change) => change.unchanged)
     ).length;
-    return format(ALREADY_HELD, held, this.preview.sample.length);
+    return format(
+      helpText('Core', 'Core_SuperTransform_AlreadyHeld'),
+      held,
+      this.preview.sample.length
+    );
   }
 
   get runDisabled() {
@@ -494,11 +590,18 @@ export default class SuperTransform extends LightningElement {
     }
     const job = this.job;
     const total = job.chunksTotal || 0;
+    const percent = total ? Math.round(((job.chunksDone || 0) * 100) / total) : 0;
     return {
       ...job,
-      summary: format(SUMMARY, job.matched, job.updated, job.unchanged, job.failed),
-      progressLine: job.running ? format(PROGRESS, job.chunksDone || 0, total) : '',
-      progressValue: total ? Math.round(((job.chunksDone || 0) * 100) / total) : 0,
+      summary: format(
+        helpText('Core', 'Core_BulkUpdate_Summary'),
+        job.matched,
+        job.updated,
+        job.unchanged,
+        job.failed
+      ),
+      progressLine: job.running ? helpText('Core', 'Core_SuperTransform_Progress', percent) : '',
+      progressValue: percent,
       hasFailures: Boolean(job.failures && job.failures.length),
       showUndo: Boolean(job.canUndo && !job.running)
     };
@@ -517,6 +620,7 @@ export default class SuperTransform extends LightningElement {
   async handleObjectChange(event) {
     this.objectApiName = event.detail.value;
     this.filterJson = '';
+    this.relatedJson = '';
     this.filterValid = true;
     this.targets = [];
     this.changes = [];
@@ -543,6 +647,9 @@ export default class SuperTransform extends LightningElement {
     const document = { version: 1, object: this.objectApiName, fields: ['Id'] };
     if (this.filterJson) {
       document.filter = JSON.parse(this.filterJson);
+    }
+    if (this.relatedJson) {
+      document.related = JSON.parse(this.relatedJson);
     }
     return JSON.stringify(document);
   }
@@ -700,12 +807,12 @@ export default class SuperTransform extends LightningElement {
       label: RUN,
       size: 'small',
       message: format(
-        CONFIRM_MESSAGE,
+        helpText('Core', 'Core_SuperTransform_ConfirmMessage'),
         fields.join(', '),
         count.toLocaleString(),
         this.preview.objectLabel
       ),
-      details: [CONFIRM_DETAIL],
+      details: [helpText('Core', 'Core_SuperTransform_ConfirmDetail')],
       confirmLabel: CONFIRM_BUTTON,
       cancelLabel: CANCEL,
       typeToConfirm: asksToType ? String(count) : undefined,
@@ -720,7 +827,7 @@ export default class SuperTransform extends LightningElement {
         changesJson: this.changesJson(),
         confirmedCount: count
       });
-      this.noticeMessage = STARTED;
+      this.noticeMessage = helpText('Core', 'Core_BulkUpdate_Started');
       this.startPolling();
     });
   }
@@ -803,7 +910,7 @@ export default class SuperTransform extends LightningElement {
         definitionJson: this.definitionJson()
       });
       await this.refreshSavedLists(saved.recordId);
-      this.noticeMessage = format(SAVED_SAVED, saved.name);
+      this.noticeMessage = format(helpText('Core', 'Core_SuperTransform_SavedSaved'), saved.name);
     });
   }
 
@@ -815,7 +922,7 @@ export default class SuperTransform extends LightningElement {
         name: this.savedNameText
       });
       await this.refreshSavedLists(saved.recordId);
-      this.noticeMessage = format(SAVED_RENAMED, saved.name);
+      this.noticeMessage = format(helpText('Core', 'Core_SuperTransform_SavedRenamed'), saved.name);
     });
   }
 
@@ -827,8 +934,8 @@ export default class SuperTransform extends LightningElement {
     const confirmed = await BarnConfirmModal.open({
       label: SAVED_DELETE,
       size: 'small',
-      message: format(SAVED_DELETE_MESSAGE, entry.name),
-      details: [SAVED_DELETE_DETAIL],
+      message: format(helpText('Core', 'Core_SuperTransform_SavedDeleteMessage'), entry.name),
+      details: [helpText('Core', 'Core_SuperTransform_SavedDeleteDetail')],
       confirmLabel: SAVED_DELETE,
       cancelLabel: CANCEL
     });
@@ -839,7 +946,7 @@ export default class SuperTransform extends LightningElement {
     await this.work(async () => {
       await deleteSavedList({ recordId: entry.recordId });
       await this.refreshSavedLists(undefined);
-      this.noticeMessage = format(SAVED_DELETED, entry.name);
+      this.noticeMessage = format(helpText('Core', 'Core_SuperTransform_SavedDeleted'), entry.name);
     });
   }
 
@@ -854,7 +961,13 @@ export default class SuperTransform extends LightningElement {
       const saved = await loadSavedList({ recordId: this.savedListId });
       if (saved.missingFields && saved.missingFields.length) {
         // Leaving a condition out would match more records, so the page is left as it was.
-        throw new Error(format(SAVED_MISSING, saved.name, saved.missingFields.join(', ')));
+        throw new Error(
+          format(
+            helpText('Core', 'Core_SuperTransform_SavedMissingFields'),
+            saved.name,
+            saved.missingFields.join(', ')
+          )
+        );
       }
       const definition = JSON.parse(saved.definitionJson);
       const targets = await getTargets({ objectName: definition.object });
@@ -863,6 +976,7 @@ export default class SuperTransform extends LightningElement {
       this.objectApiName = definition.object;
       this.targets = targets;
       this.filterJson = definition.filter ? JSON.stringify(definition.filter) : '';
+      this.relatedJson = '';
       this.filterValid = true;
       const wanted = definition.changes || [];
       const kept = wanted.filter((change) => this.targetOf(change.field));
@@ -891,8 +1005,8 @@ export default class SuperTransform extends LightningElement {
       // A change the person cannot change now is left out: that narrows what the run does.
       const skipped = wanted.length - kept.length;
       this.noticeMessage = skipped
-        ? format(SAVED_SKIPPED, saved.name, skipped)
-        : format(SAVED_LOADED, saved.name);
+        ? format(helpText('Core', 'Core_SuperTransform_SavedSkipped'), saved.name, skipped)
+        : format(helpText('Core', 'Core_SuperTransform_SavedLoaded'), saved.name);
       this.scheduleCount(0);
     });
   }

@@ -25,54 +25,6 @@
         <value>Enroll Someone</value>
     </labels>
     <labels>
-        <fullName>Programs_Roster_Person</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Person picker and column heading</shortDescription>
-        <value>Person</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Roster_Stage</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Stage picker and column heading</shortDescription>
-        <value>Stage</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Roster_StartDate</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Start date column heading</shortDescription>
-        <value>Start Date</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Roster_EndDate</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>End date column heading</shortDescription>
-        <value>End Date</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Roster_Save</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Save button of the enroll form</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Roster_Cancel</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Cancel button of the enroll form</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Programs_Roster_ShowEnded</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -95,14 +47,6 @@
         <protected>true</protected>
         <shortDescription>Hidden label of a row stage picker; {0} is the person name</shortDescription>
         <value>Stage for {0}</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Roster_Empty</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Roster has no enrollments to list</shortDescription>
-        <value>No one to list. Click Enroll Someone to add a person, or turn on Show Ended to see past enrollments.</value>
     </labels>
     <labels>
         <fullName>Programs_Roster_Added</fullName>
@@ -145,52 +89,12 @@
         <value>The roster could not be updated. The details are in the Error Log.</value>
     </labels>
     <labels>
-        <fullName>Programs_Loading</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Spinner text while loading</shortDescription>
-        <value>Loading</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Person_Title</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Title of the Programs card on a person</shortDescription>
-        <value>Programs</value>
-    </labels>
-    <labels>
         <fullName>Programs_Person_Empty</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Programs card when the person has no enrollment</shortDescription>
         <value>Not enrolled in any program.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Person_Started</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs card: before the start date</shortDescription>
-        <value>Started</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Person_Ended</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs card: before the end date</shortDescription>
-        <value>Ended</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Person_Refresh</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs card refresh button</shortDescription>
-        <value>Refresh</value>
     </labels>
     <labels>
         <fullName>Programs_Person_LoadFailed</fullName>
@@ -214,7 +118,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Health Check: one enrollment open in an ended program</shortDescription>
-        <value>1 enrollment is still open in a program that has ended</value>
+        <value>1 Enrollment Is Still Open in a Program That Has Ended</value>
     </labels>
     <labels>
         <fullName>Programs_HealthCheck_OpenAfterEndTitle</fullName>
@@ -222,7 +126,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Health Check: enrollments open in ended programs; {0} is how many</shortDescription>
-        <value>{0} enrollments are still open in programs that have ended</value>
+        <value>{0} Enrollments Are Still Open in Programs That Have Ended</value>
     </labels>
     <labels>
         <fullName>Programs_HealthCheck_OpenAfterEndDetail</fullName>
@@ -231,14 +135,6 @@
         <protected>true</protected>
         <shortDescription>Health Check: what open enrollments in ended programs mean</shortDescription>
         <value>These enrollments are Applied or Enrolled in a program that is Completed or past its End Date. They still count as open, so the person cannot enroll again. Set each to Completed or Withdrawn, or, if the program is still running, set it Active or move its End Date. The first ones are linked below.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_HealthCheck_MoreThan</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Health Check count that stopped at its cap; {0} is the cap</shortDescription>
-        <value>More than {0}</value>
     </labels>
     <labels>
         <fullName>Programs_SampleData_CountLabel</fullName>
@@ -265,28 +161,28 @@
         <value>Service Delivery Log</value>
     </labels>
     <labels>
+        <fullName>Programs_Log_UnsavedTitle</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service Delivery Log: heading of the unsaved attendance question</shortDescription>
+        <value>Save Attendance First?</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_UnsavedAsk</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Unsaved attendance question; {0} is the service, {1} the date</shortDescription>
+        <value>You have unsaved attendance for {0} on {1}. Changing the service or date reloads the list, so save it first or discard it.</value>
+    </labels>
+    <labels>
         <fullName>Programs_Log_Service</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Service Delivery Log: service picker</shortDescription>
         <value>Service</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Log_Date</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service Delivery Log: date picker</shortDescription>
-        <value>Date</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Log_Attendance</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service Delivery Log: attendance column</shortDescription>
-        <value>Attendance</value>
     </labels>
     <labels>
         <fullName>Programs_Log_Quantity</fullName>
@@ -311,14 +207,6 @@
         <protected>true</protected>
         <shortDescription>Service Delivery Log: mark everyone not recorded as present</shortDescription>
         <value>Mark All Present</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Log_Save</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service Delivery Log: save button</shortDescription>
-        <value>Save</value>
     </labels>
     <labels>
         <fullName>Programs_Log_Saved</fullName>
@@ -351,14 +239,6 @@
         <protected>true</protected>
         <shortDescription>Service Delivery Log: program has no active service</shortDescription>
         <value>This program has no active service. Add one in the Services list to record attendance.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Log_Empty</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service Delivery Log: nobody enrolled</shortDescription>
-        <value>Nobody has an open enrollment in this program yet.</value>
     </labels>
     <labels>
         <fullName>Programs_Log_AttendanceFor</fullName>
@@ -401,28 +281,12 @@
         <value>Programs Settings</value>
     </labels>
     <labels>
-        <fullName>Programs_Settings_Intro</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs settings page introduction</shortDescription>
-        <value>The choices your organization makes for the Programs module. Changes apply to everyone.</value>
-    </labels>
-    <labels>
         <fullName>Programs_Settings_PicklistsTitle</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Intake picklists card title</shortDescription>
         <value>Intake and Eligibility Picklists</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Settings_PicklistsIntro</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Intake picklists card introduction</shortDescription>
-        <value>The choices staff pick from on an enrollment. Add, rename or deactivate a choice on the field in Setup; a deactivated choice stays on the enrollments that have it.</value>
     </labels>
     <labels>
         <fullName>Programs_Settings_Default</fullName>
@@ -469,8 +333,8 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Erasure refused: case notes need Programs Admin</shortDescription>
-        <value>This person has case notes that only Programs Admin can delete. Ask someone with Programs Admin to erase them.</value>
+        <shortDescription>Erasure refused: case notes and referrals need Programs Admin</shortDescription>
+        <value>This person has case notes or referrals that only Programs Admin can delete. Ask someone with Programs Admin to erase them.</value>
     </labels>
     <labels>
         <fullName>Programs_Erase_EnrollmentsKept</fullName>
@@ -487,14 +351,6 @@
         <protected>true</protected>
         <shortDescription>Programs settings: privacy card title</shortDescription>
         <value>Participant Privacy</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Settings_PrivacyIntro</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs settings: privacy card introduction</shortDescription>
-        <value>Who can see enrollments and service deliveries. Every case note stays private whichever you choose.</value>
     </labels>
     <labels>
         <fullName>Programs_Settings_PrivacyLegend</fullName>
@@ -527,14 +383,6 @@
         <protected>true</protected>
         <shortDescription>Programs settings: the preset's default</shortDescription>
         <value>Default: Shared</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Settings_Save</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs settings: save button</shortDescription>
-        <value>Save</value>
     </labels>
     <labels>
         <fullName>Programs_Settings_Saved</fullName>
@@ -575,22 +423,6 @@
         <protected>true</protected>
         <shortDescription>Programs dashboard: page title</shortDescription>
         <value>Programs Dashboard</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Dashboard_Intro</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs dashboard: page introduction</shortDescription>
-        <value>How your programs are doing in the period you pick. Figures count only the records you can see.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Dashboard_Period</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs dashboard: period picker label</shortDescription>
-        <value>Period</value>
     </labels>
     <labels>
         <fullName>Programs_Dashboard_ThisMonth</fullName>
@@ -657,14 +489,6 @@
         <value>New Enrollments</value>
     </labels>
     <labels>
-        <fullName>Programs_Dashboard_Completed</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs dashboard: column</shortDescription>
-        <value>Completed</value>
-    </labels>
-    <labels>
         <fullName>Programs_Dashboard_PeopleServed</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -687,14 +511,6 @@
         <protected>true</protected>
         <shortDescription>Programs dashboard: tile and column</shortDescription>
         <value>Attendance Rate</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Dashboard_Program</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs dashboard: column</shortDescription>
-        <value>Program</value>
     </labels>
     <labels>
         <fullName>Programs_Dashboard_ByProgram</fullName>
@@ -751,5 +567,629 @@
         <protected>true</protected>
         <shortDescription>Programs dashboard: no access</shortDescription>
         <value>You need a Programs permission set to see the dashboard. Ask your BarnCRM admin.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Person_NotAPerson</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Enrollment or service delivery refused for an account that is not a person</shortDescription>
+        <value>Choose a person. An organization or household account cannot be enrolled or receive a service.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_HealthCheck_NpcProgramsTitle</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check title: Nonprofit Cloud Program Management is in the org</shortDescription>
+        <value>Nonprofit Cloud Program Management Is Also in This Org</value>
+    </labels>
+    <labels>
+        <fullName>Programs_HealthCheck_NpcProgramsDetail</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: Nonprofit Cloud Program Management alongside Programs</shortDescription>
+        <value>This org has the Nonprofit Cloud Program and Program Enrollment objects. BarnCRM Programs keeps its own programs, enrollments and service deliveries and does not read or write those objects, so the two do not share records. Choose one for each program; the Programs admin guide explains how they coexist. Nothing needs fixing.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NotFound</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: enrollment or goal not found</shortDescription>
+        <value>This enrollment or goal can't be found, or you don't have access to it.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NameRequired</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: a goal or step needs a name</shortDescription>
+        <value>Give the goal or step a name.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NextReviewPast</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: next review date before today</shortDescription>
+        <value>The next review can't be before today.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_BadOutcome</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: outcome not offered for this enrollment</shortDescription>
+        <value>Choose an outcome from the list.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_ActionFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: unexpected failure</shortDescription>
+        <value>Something went wrong with the service plan. Try again, or ask your BarnCRM admin to check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan panel title</shortDescription>
+        <value>Service Plan</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_AddGoal</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: add a goal button</shortDescription>
+        <value>Add Goal</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_EditGoal</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: edit a goal button</shortDescription>
+        <value>Edit Goal</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Goal</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: goal name field label</shortDescription>
+        <value>Goal</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NextReview</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: next review field label</shortDescription>
+        <value>Next Review</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Target</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Goal or step target; {0} is the date</shortDescription>
+        <value>Target {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Assigned</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Goal or step owner; {0} is the staff member's name</shortDescription>
+        <value>Assigned to {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NextReviewOn</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Goal next review; {0} is the date</shortDescription>
+        <value>Next review {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_LastReviewedOn</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Goal last review; {0} is the date</shortDescription>
+        <value>Last reviewed {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_ClosedOn</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Goal closed; {0} is the date</shortDescription>
+        <value>Closed {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_ReviewDue</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: badge on a goal past its review date</shortDescription>
+        <value>Review due</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_WorksToward</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Goal outcome; {0} is the outcome and its logic model</shortDescription>
+        <value>Works toward {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_OutcomeMissing</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: the goal's outcome was deleted</shortDescription>
+        <value>Its outcome is no longer in Logic Models. Edit the goal to choose another.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NewStep</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: new step input label</shortDescription>
+        <value>New step</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NewStepFor</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>New step input label; {0} is the goal</shortDescription>
+        <value>New step for {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_MarkReviewed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: mark a goal reviewed button</shortDescription>
+        <value>Mark Reviewed</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_SaveReview</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: save a review button</shortDescription>
+        <value>Save Review</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_Notes</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: case notes heading under a goal</shortDescription>
+        <value>Case Notes</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_MoreNotes</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>More notes than shown; {0} is how many notes in all</shortDescription>
+        <value>{0} notes in all. Open the goal to see every one.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Plan_NewNote</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service plan: new case note button</shortDescription>
+        <value>New Note</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_ActionFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: unexpected failure</shortDescription>
+        <value>Something went wrong with the cohort. Try again, or ask your BarnCRM admin to check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_AddPeople</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: add section heading</shortDescription>
+        <value>Add People</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_AddToCohort</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: add button</shortDescription>
+        <value>Add to Cohort</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_AddToList</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: add a picked person to the list</shortDescription>
+        <value>Add to List</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_AddedMany</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: many added; {0} is the count</shortDescription>
+        <value>{0} people added.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_AddedOne</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: one added</shortDescription>
+        <value>1 person added.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_Candidates</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: open enrollments in no cohort</shortDescription>
+        <value>Enrolled in the program, not in a cohort</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_Chosen</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: how many chosen; {0} is the count</shortDescription>
+        <value>Chosen: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_MemberCount</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: member count; {0} is the count</shortDescription>
+        <value>Members ({0})</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_MoreThanShown</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: more than 200 members</shortDescription>
+        <value>Only the first 200 members are listed. The Enrollments tab lists them all.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_NoCandidates</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: no open enrollments to add</shortDescription>
+        <value>Everyone enrolled in the program is already in a cohort.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_NobodyChosen</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: add with nobody chosen</shortDescription>
+        <value>Choose at least one person to add.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_NotAdded</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: heading over the refused people</shortDescription>
+        <value>Not Added</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_NotFound</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: cohort not found</shortDescription>
+        <value>This cohort can't be found, or you don't have access to it.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_NotFoundOne</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: enrollment not found</shortDescription>
+        <value>This enrollment can't be found, or you don't have access to it.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_NotOpen</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: enrollment not open in this program</shortDescription>
+        <value>Only an open enrollment in this cohort's program can be added.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_RemoveFor</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: remove button title; {0} is the person</shortDescription>
+        <value>Remove {0} from the cohort</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_Removed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: removed</shortDescription>
+        <value>Removed from the cohort. The enrollment is kept.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_SelectAll</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: tick every open enrollment</shortDescription>
+        <value>Select All</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_SomeFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: some refused; {0} is the count</shortDescription>
+        <value>{0} could not be added; see below.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_SomeoneElse</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: pick other people</shortDescription>
+        <value>Someone else</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_TakeOffList</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: take a picked person off the list; {0} is the person</shortDescription>
+        <value>Take {0} off the list</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_TickFor</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: tick box title; {0} is the person</shortDescription>
+        <value>Add {0} to the cohort</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: panel title</shortDescription>
+        <value>Cohort Members</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Cohort_TooMany</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Cohort members: more than the most per add; {0} is the most</shortDescription>
+        <value>Add at most {0} people at a time.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_SessionCancelled</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service delivery log: the session was cancelled</shortDescription>
+        <value>This session was cancelled, so it takes no attendance.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_SessionCohort</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service delivery log: whose session; {0} is the cohort</shortDescription>
+        <value>Cohort: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_SessionEveryone</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service delivery log: session with no cohort</shortDescription>
+        <value>Everyone enrolled in the program</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Log_SessionOf</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Service delivery log: session heading; {0} service, {1} date</shortDescription>
+        <value>{0} on {1}</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_ActionFailed</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: unexpected failure</shortDescription>
+        <value>Something went wrong scheduling sessions. Try again, or ask your BarnCRM admin to check the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_BadTime</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: start time not understood</shortDescription>
+        <value>Enter the start time as hours and minutes, for example 18:30.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_ChooseDates</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: dates missing or the wrong way round</shortDescription>
+        <value>Choose a From date and a To date on or after it.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_ChooseWeekdays</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: no weekday chosen</shortDescription>
+        <value>Choose at least one day of the week.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_CreatedMany</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: many created; {0} is the count</shortDescription>
+        <value>{0} sessions scheduled.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_Skipped</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: days skipped as they have a session; {0} is the count</shortDescription>
+        <value>Days that already have a session are skipped: {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_CreatedOne</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: one created</shortDescription>
+        <value>1 session scheduled.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_IntroCohort</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: on a cohort; {0} is the cohort</shortDescription>
+        <value>Sessions scheduled here are for {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_NoDates</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: no dates sent</shortDescription>
+        <value>Choose the dates and days of the week first.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_NoServices</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: the program has no active service</shortDescription>
+        <value>Add an active service to the program to schedule its sessions.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_PreviewMany</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: how many will be created; {0} is the count</shortDescription>
+        <value>{0} sessions will be scheduled.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_PreviewNone</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: no day matches</shortDescription>
+        <value>None of the chosen days falls between these dates.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_PreviewOne</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: one will be created</shortDescription>
+        <value>1 session will be scheduled.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_Schedule</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: schedule button</shortDescription>
+        <value>Schedule</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_ServiceRequired</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: no active service of the program chosen</shortDescription>
+        <value>Choose an active service of this program.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_StartTime</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: start time</shortDescription>
+        <value>Start Time</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: panel title</shortDescription>
+        <value>Schedule Sessions</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_TooMany</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: more than the most at once; {0} is the most</shortDescription>
+        <value>Schedule at most {0} sessions at a time: choose fewer days or a shorter span.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_Weekdays</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: weekday choices</shortDescription>
+        <value>Days of the Week</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Session_CancelledNoAttendance</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Session attendance: saving on a cancelled session</shortDescription>
+        <value>This session was cancelled, so it takes no attendance. Change its status first if it did take place.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Session_NotFound</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Session attendance: session not found</shortDescription>
+        <value>This session can't be found, or you don't have access to it.</value>
     </labels>
 </CustomLabels>

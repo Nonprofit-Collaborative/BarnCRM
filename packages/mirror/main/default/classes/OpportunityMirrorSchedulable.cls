@@ -1,85 +1,87 @@
 /**
- * The Opportunity mirror's nightly run (feature X-01, R-OM8), started and stopped from the
- * Opportunity mirror page in the shape ADR-0038 set for the Giving nightly jobs. It runs as the
- * administrator who scheduled it, whose access the run's user mode reads and writes use.
+ * The Opportunity mirror's nightly run (feature X-01, R-OM8), switched on and off from the
+ * Opportunity mirror page in the shape ADR-0038 set for the Giving nightly jobs. It is a step of
+ * Core's one nightly run (ADR-0166 nightly-job-dispatcher), which runs as the administrator who
+ * scheduled it, whose access the run's user mode reads and writes use.
  *
- * 01:30 keeps it clear of the seasonal address swap at 00:30, the Giving jobs at 01:15 and 01:45
- * and the rollups at 02:00, which then count the gifts it made.
+ * 01:30 keeps it after the seasonal address swap at 00:30 and the Giving top up at 01:15, and
+ * before the rollups at 02:00, which then count the gifts it made.
  */
 public with sharing class OpportunityMirrorSchedulable implements Schedulable {
-    public static final String JOB_NAME = 'BarnCRM Mirror: Opportunity mirror';
-    private static final String CRON = '0 30 1 * * ?';
-    /** The scheduled Apex job type, which is what CronJobDetail calls a scheduled class. */
-    private static final String SCHEDULED_APEX = '7';
-    private static final Set<String> RUNNING_JOB_STATUSES = new Set<String>{
-        'Queued',
-        'Preparing',
-        'Processing',
-        'Holding'
-    };
+	/** The name the run was scheduled under, now the step's key. */
+	public static final String JOB_NAME = 'BarnCRM Mirror Opportunity Mirror';
+	private static final Set<String> RUNNING_JOB_STATUSES = new Set<String>{
+		'Queued',
+		'Preparing',
+		'Processing',
+		'Holding'
+	};
 
-    /** Starts tonight's run, unless the mirror is off or a run is still going. */
-    public void execute(SchedulableContext context) {
-        if (!isRunning()) {
-            OpportunityMirrorBatch.run();
-        }
-    }
+	/** Starts tonight's run, unless the mirror is off or a run is still going. */
+	public void execute(SchedulableContext context) {
+		if (context != null) {
+			// Still scheduled on its own from before the nightly run (R-NJ5).
+			NightlyJobs.adoptOldSchedules();
+		}
+		if (!isRunning()) {
+			OpportunityMirrorBatch.run();
+		}
+	}
 
-    /** Schedules the nightly run; a second press returns the job already there. */
-    public static Id schedule() {
-        return ScheduledJobSelector.ensure(JOB_NAME, CRON, new OpportunityMirrorSchedulable());
-    }
+	/** Switches the nightly run on, scheduling Core's nightly run when it is not. */
+	public static Id schedule() {
+		return NightlyJobs.turnOn(JOB_NAME);
+	}
 
-    public static void stop() {
-        ScheduledJobSelector.stopNamed(JOB_NAME);
-    }
+	/** Switches the nightly run off. */
+	public static void stop() {
+		NightlyJobs.turnOff(JOB_NAME);
+	}
 
-    /** The nightly run as Health Check's nightly jobs list sees it (ADR-0075). */
-    public static NightlyJob nightlyJob() {
-        return new NamedNightlyJob(
-            System.Label.Mirror_NightlyJob_MirrorName,
-            JOB_NAME,
-            CRON,
-            new OpportunityMirrorSchedulable()
-        );
-    }
+	/** True when the step is switched on and the nightly run is scheduled. */
+	public static Boolean isScheduled() {
+		return NightlyJobs.isStepScheduled(JOB_NAME, true);
+	}
 
-    /** When the nightly run next starts, or null when it is not scheduled. */
-    public static Datetime nextRunAt() {
-        CronTrigger existing = job();
-        return existing == null ? null : existing.NextFireTime;
-    }
+	/** The run as a step of the nightly run: only while a mirror direction is chosen. */
+	public static NightlyStep step() {
+		return new NightlyStep(
+				JOB_NAME,
+				System.Label.Mirror_NightlyJob_MirrorName,
+				1,
+				30,
+				new OpportunityMirrorSchedulable()
+			)
+			.withSwitch(true)
+			.activeWhen(
+				OpportunityMirrorService.isAvailable() &&
+				OpportunityMirrorService.direction() != OpportunityMirrorService.OFF
+			);
+	}
 
-    /** When the nightly run was scheduled, or null when it is not, for Health Check. */
-    public static Datetime scheduledAt() {
-        CronTrigger existing = job();
-        return existing == null ? null : existing.StartTime;
-    }
+	/** When the nightly run next starts, or null when it is not scheduled. */
+	public static Datetime nextRunAt() {
+		return isScheduled() ? NightlyJobs.nextRunAt(step()) : null;
+	}
 
-    /** True while a run is queued or in progress, so only one runs at a time. */
-    public static Boolean isRunning() {
-        Set<String> statuses = RUNNING_JOB_STATUSES;
-        return ![
-                SELECT Id
-                FROM AsyncApexJob
-                WHERE
-                    ApexClass.Name = :OpportunityMirrorBatch.CLASS_NAME
-                    AND JobType = 'BatchApex'
-                    AND Status IN :statuses
-                WITH USER_MODE
-                LIMIT 1
-            ]
-            .isEmpty();
-    }
+	/** When the nightly run was scheduled, or null when it is not, for Health Check. */
+	public static Datetime scheduledAt() {
+		return isScheduled() ? ScheduledJobSelector.startTime(NightlyJobs.jobName()) : null;
+	}
 
-    private static CronTrigger job() {
-        List<CronTrigger> jobs = [
-            SELECT Id, NextFireTime, StartTime
-            FROM CronTrigger
-            WHERE CronJobDetail.Name = :JOB_NAME AND CronJobDetail.JobType = :SCHEDULED_APEX
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return jobs.isEmpty() ? null : jobs[0];
-    }
+	/** True while a run is queued or in progress, so only one runs at a time. */
+	public static Boolean isRunning() {
+		Set<String> statuses = RUNNING_JOB_STATUSES;
+		return ![
+				SELECT Id
+				FROM AsyncApexJob
+				WHERE
+					ApexClass.Name = :OpportunityMirrorBatch.CLASS_NAME
+					AND JobType = 'BatchApex'
+					AND Status IN :statuses
+				WITH USER_MODE
+				LIMIT 1
+			]
+			.isEmpty();
+	}
 }

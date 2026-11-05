@@ -37,6 +37,10 @@
         <behavior>Edit</behavior>
         <field>End_Date__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Cohort__c</field>
+      </layoutItems>
     </layoutColumns>
   </layoutSections>
   <layoutSections>
@@ -72,6 +76,14 @@
   </layoutSections>
   <relatedLists>
     <fields>NAME</fields>
+    <fields>Status__c</fields>
+    <fields>Target_Date__c</fields>
+    <fields>Assigned_To__c</fields>
+    <fields>Next_Review_Date__c</fields>
+    <relatedList>Goal__c.Enrollment__c</relatedList>
+  </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
     <fields>Service__c</fields>
     <fields>Delivery_Date__c</fields>
     <fields>Attendance__c</fields>
@@ -88,6 +100,17 @@
     <fields>OWNER.ALIAS</fields>
     <relatedList>Case_Note__c.Enrollment__c</relatedList>
     <sortField>Note_Date__c</sortField>
+    <sortOrder>Desc</sortOrder>
+  </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Direction__c</fields>
+    <fields>Other_Organization__c</fields>
+    <fields>Referral_Date__c</fields>
+    <fields>Status__c</fields>
+    <fields>Outcome__c</fields>
+    <relatedList>Referral__c.Enrollment__c</relatedList>
+    <sortField>Referral_Date__c</sortField>
     <sortOrder>Desc</sortOrder>
   </relatedLists>
   <showEmailCheckbox>false</showEmailCheckbox>

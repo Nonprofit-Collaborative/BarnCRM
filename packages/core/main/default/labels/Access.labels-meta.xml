@@ -25,92 +25,12 @@
         <value>Give Permission</value>
     </labels>
     <labels>
-        <fullName>Core_Access_AddOnAssignSuccess</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: extra permission given; {0} person, {1} permission</shortDescription>
-        <value>{0} now has the {1} permission.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnBulkDelete</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: what BarnCRM Bulk Delete grants</shortDescription>
-        <value>Delete many records at once from a Find query, with undo from the Recycle Bin. Give it together with Find and Export.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnBulkUpdate</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: what BarnCRM Bulk Update grants</shortDescription>
-        <value>Set, clear or copy fields on many records at once from a Find query, with undo. Give it together with Find and Export.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnConfirmAddMessage</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: confirm giving; {0} person, {1} permission</shortDescription>
-        <value>Give {0} the {1} permission?</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnConfirmRemoveMessage</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: confirm removing; {0} person, {1} permission</shortDescription>
-        <value>Remove the {1} permission from {0}? Their roles stay in place.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnDestructiveWarning</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: warning for an extra permission that removes data</shortDescription>
-        <value>This permission lets the person remove data. Give it only to someone you trust to do that.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnDuplicateReview</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: what BarnCRM Duplicate Review grants</shortDescription>
-        <value>Review suggested duplicate people and households. Works only for people with a Sales Cloud or Service Cloud license.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnErasePeople</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: what BarnCRM Erase People grants</shortDescription>
-        <value>Erase a person on their request (the right to be forgotten), which cannot be undone.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnFindAndExport</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: what BarnCRM Find and Export grants</shortDescription>
-        <value>Build, run, save and export Find queries and use Org Optimizer's Data Quality checks, seeing only the records the person can already see.</value>
-    </labels>
-    <labels>
         <fullName>Core_Access_AddOnLabel</fullName>
         <categories>Access</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: label of the extra permission picker</shortDescription>
         <value>Extra permission</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnMetadataAdmin</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: what BarnCRM Metadata Admin grants</shortDescription>
-        <value>Save changes on the Custom metadata page of BarnCRM Settings, which changes the org's configuration. For people who already administer the org.</value>
     </labels>
     <labels>
         <fullName>Core_Access_AddOnPickerPlaceholder</fullName>
@@ -121,84 +41,12 @@
         <value>Choose an extra permission</value>
     </labels>
     <labels>
-        <fullName>Core_Access_AddOnRemoveSuccess</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: extra permission removed; {0} person, {1} permission</shortDescription>
-        <value>{0} no longer has the {1} permission.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AddOnsDescription</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: text under the Extra permissions heading</shortDescription>
-        <value>Some features are in no role. Give them to a person here, alongside their role. Only permissions given here are listed: one that comes with a role is not.</value>
-    </labels>
-    <labels>
         <fullName>Core_Access_AddOnsHeading</fullName>
         <categories>Access</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: heading of the extra permissions section</shortDescription>
         <value>Extra Permissions</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_NoOneHasAddOn</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: an extra permission nobody has been given</shortDescription>
-        <value>No one has been given this permission here.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ErrorAddOnNotFound</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: the chosen permission is not one the page may give</shortDescription>
-        <value>That permission is not one this page can give. Reload the page and choose from the list.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ErrorAddOnRefused</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: one person refused; {0} person, {1} permission, {2} reason</shortDescription>
-        <value>{0} could not be given {1}. Their Salesforce license may not allow what it grants. Salesforce said: {2}</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ErrorAddOnRemoveRefused</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: removal refused; {0} person, {1} permission, {2} reason</shortDescription>
-        <value>{1} could not be removed from {0}. Salesforce said: {2}</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ErrorNeedsAccessManager</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: may manage settings but lacks Assign Permission Sets</shortDescription>
-        <value>You can see who has each role and extra permission but cannot change them. That needs the Assign Permission Sets permission: a system administrator has it, and a BarnCRM Admin on a Salesforce license gets it from the BarnCRM Access Manager permission set, assigned in Setup. A Salesforce Platform license cannot have it, so ask a colleague with a Salesforce license.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AssignSuccess</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: after a role is given; {0} person, {1} role</shortDescription>
-        <value>{0} now has the {1} role.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_AutomaticAccessHelp</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: text before the link to the automatic access guide</shortDescription>
-        <value>Add people often? A user access policy, created once in Setup, can give each new user a role for you.</value>
     </labels>
     <labels>
         <fullName>Core_Access_AutomaticAccessLink</fullName>
@@ -209,52 +57,12 @@
         <value>Set Up Automatic Access</value>
     </labels>
     <labels>
-        <fullName>Core_Access_CancelButton</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: button that closes a confirmation without changing anything</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ConfirmAddMessage</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: asked before a role is given; {0} person, {1} role</shortDescription>
-        <value>Give {0} the {1} role?</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ConfirmAddTitle</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: heading of the confirmation shown before a role is given</shortDescription>
-        <value>Give Access</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ConfirmRemoveMessage</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: asked before a role is removed; {0} person, {1} role</shortDescription>
-        <value>Remove the {1} role from {0}? Any other role they hold stays in place.</value>
-    </labels>
-    <labels>
         <fullName>Core_Access_ConfirmRemoveTitle</fullName>
         <categories>Access</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: heading of the confirmation shown before a role is removed</shortDescription>
         <value>Remove Access</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_CreateUserHelp</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: explains why creating a user happens in Setup</shortDescription>
-        <value>BarnCRM cannot create a person or hand out a Salesforce license. Create the user in Setup first, then come back here and give them a role.</value>
     </labels>
     <labels>
         <fullName>Core_Access_CreateUserLink</fullName>
@@ -265,70 +73,6 @@
         <value>Create a User in Setup</value>
     </labels>
     <labels>
-        <fullName>Core_Access_ErrorGroupNotReady</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: shown when the role is still being rebuilt by the platform</shortDescription>
-        <value>This role is still being prepared. Wait a moment, reload the page, and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ErrorInvalidInput</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: shown when a person or a role was not chosen</shortDescription>
-        <value>Choose a person and a role before you continue.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ErrorLastAdmin</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: shown when removing the only remaining BarnCRM Admin</shortDescription>
-        <value>You cannot remove the last person from the BarnCRM Admin role. Give the role to someone else first.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ErrorNoPermission</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: shown when the user may not change roles</shortDescription>
-        <value>You do not have permission to change roles. The Manage BarnCRM Settings permission is required, and it comes with the BarnCRM Admin role.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ErrorRoleNotFound</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: shown when the chosen role is missing from the org</shortDescription>
-        <value>That role was not found. Reload the page, and if it still does not appear, upgrade or reinstall BarnCRM Core.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ErrorRolesNotVisible</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: shown when the person is not allowed to read the roles at all</shortDescription>
-        <value>You can see this page but you cannot see who holds each role. Ask someone with the BarnCRM Admin role to tell you, or to give you that role.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ErrorUnexpected</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: shown when a role change fails for an unexpected reason</shortDescription>
-        <value>Something went wrong while changing this role. What happened is recorded in the Error Log (BarnCRM Settings, Error Log).</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ErrorUserNotFound</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: shown when the chosen person is missing or inactive</shortDescription>
-        <value>That person was not found, or their account is no longer active. Search for them again.</value>
-    </labels>
-    <labels>
         <fullName>Core_Access_LoadingRoles</fullName>
         <categories>Access</categories>
         <language>en_US</language>
@@ -337,52 +81,12 @@
         <value>Loading roles</value>
     </labels>
     <labels>
-        <fullName>Core_Access_NoOneInRole</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: shown on a role card that nobody holds</shortDescription>
-        <value>No one holds this role yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_PageDescription</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: one line explaining what the page is for</shortDescription>
-        <value>Give a colleague access by picking their name and a role, and see who holds each role today.</value>
-    </labels>
-    <labels>
         <fullName>Core_Access_PageTitle</fullName>
         <categories>Access</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: page heading</shortDescription>
         <value>Access</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_ReadOnlyNotice</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: notice shown to a user who may look but not change roles</shortDescription>
-        <value>You can see this page but you cannot change roles. Ask someone with the BarnCRM Admin role to make the change, or to give you that role.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_RemoveButton</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: button that takes a role away from a person</shortDescription>
-        <value>Remove</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_RemoveSuccess</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: after a role is removed; {0} person, {1} role</shortDescription>
-        <value>{0} no longer has the {1} role.</value>
     </labels>
     <labels>
         <fullName>Core_Access_RoleLabel</fullName>
@@ -409,36 +113,12 @@
         <value>Find a person</value>
     </labels>
     <labels>
-        <fullName>Core_Access_SearchNoResults</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: shown when a search matches nobody</shortDescription>
-        <value>No active users match that search. Check the spelling, or create the user in Setup first.</value>
-    </labels>
-    <labels>
         <fullName>Core_Access_SearchPlaceholder</fullName>
         <categories>Access</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: placeholder text of the person search box</shortDescription>
         <value>Type a name or an email address</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_SelfRemovalWarning</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: warning shown before someone removes their own admin role</shortDescription>
-        <value>You are about to remove your own BarnCRM Admin role. You will lose access to BarnCRM Settings.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Access_TabRefusalDetail</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Error Log: refused tab assignment. {0} permission set, {1} user Id</shortDescription>
-        <value>(permission set {0}, user {1})</value>
     </labels>
     <labels>
         <fullName>Core_Access_ToastErrorTitle</fullName>
@@ -449,27 +129,11 @@
         <value>That Did Not Work</value>
     </labels>
     <labels>
-        <fullName>Core_Access_ToastSuccessTitle</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Access page: heading of the message shown when a change succeeds</shortDescription>
-        <value>Done</value>
-    </labels>
-    <labels>
         <fullName>Core_Access_UsersInRole</fullName>
         <categories>Access</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Access page: heading above the list of people who hold a role</shortDescription>
         <value>People in This Role</value>
-    </labels>
-    <labels>
-        <fullName>Core_PostInstall_AdminRoleNotGiven</fullName>
-        <categories>Access</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Error Log: installer not given the admin role; {0} is the attempts</shortDescription>
-        <value>Warning: the BarnCRM Admin role was still being prepared after {0} attempts, so it was not given to the person who installed BarnCRM. They have the BarnCRM Admin permission set, so BarnCRM Settings works. To finish, open BarnCRM Settings, then Access, and give them the BarnCRM Admin role.</value>
     </labels>
 </CustomLabels>

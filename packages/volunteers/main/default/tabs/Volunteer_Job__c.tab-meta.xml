@@ -2,5 +2,5 @@
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
   <customObject>true</customObject>
   <description>The kinds of work volunteers do, each with its shifts.</description>
-  <motif>Custom19: Handshake</motif>
+  <motif>Custom44: Hammer</motif>
 </CustomTab>

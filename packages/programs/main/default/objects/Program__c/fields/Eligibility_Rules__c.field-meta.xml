@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Eligibility_Rules__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The program's eligibility rules, as JSON. Edit them in the Eligibility Rules panel on the program, not here.</inlineHelpText>
+  <label>Eligibility Rules</label>
+  <length>32768</length>
+  <visibleLines>6</visibleLines>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+</CustomField>

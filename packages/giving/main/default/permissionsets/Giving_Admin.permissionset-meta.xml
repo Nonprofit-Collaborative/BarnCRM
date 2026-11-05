@@ -35,6 +35,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>FundraisingHomeController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>GiftBatchController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -90,6 +94,86 @@
     <enabled>true</enabled>
     <name>Send_Acknowledgments</name>
   </customPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.Recent_Gift_Count__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.Recent_Giving__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.RFM_Recency_Score__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.RFM_Frequency_Score__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.RFM_Monetary_Score__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.RFM_Score__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.RFM_Segment__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Account.Days_Since_Last_Gift__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.Recent_Gift_Count__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.Recent_Giving__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.RFM_Recency_Score__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.RFM_Frequency_Score__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.RFM_Monetary_Score__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.RFM_Score__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.RFM_Segment__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Contact.Days_Since_Last_Gift__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
     <field>Account.Change_From_Last_Year__c</field>
@@ -1521,6 +1605,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Fund__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Fundraising_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>

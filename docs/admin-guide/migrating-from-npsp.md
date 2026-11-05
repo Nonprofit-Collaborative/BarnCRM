@@ -12,6 +12,12 @@ file, with a preview first and an undo afterwards.
 
 The templates only name columns. Nothing in BarnCRM depends on NPSP being installed.
 
+If BarnCRM is installed in the same org as NPSP, start by adopting NPSP's households in place
+([Adopting Your NPSP Households](npsp-households.md)) rather than loading the contacts file:
+your people are already there. Then set NPSP's Account Model to One-to-One or Individual and
+turn on Household Upkeep, in that order: BarnCRM does not let Household Upkeep on while NPSP
+households are in use.
+
 ## 2. How to Turn It On
 
 BarnCRM brings the contacts template, and the Giving module brings the two payment templates.
@@ -28,8 +34,8 @@ If one is missing (an install that logged a problem, for example), add it from H
    and names them.
 3. Select **Restore Import Templates**. Your own templates, and any shipped template you have
    edited, are not touched.
-4. Open the **Import** tab. The list now has **NPSP: contacts**, **NPSP: opportunities and
-   payments** and **NPSP: organization payments**.
+4. Open the **Import** tab. The list now has **NPSP: Contacts**, **NPSP: Opportunities and
+   Payments** and **NPSP: Organization Payments**.
 
 Before loading gifts, create in BarnCRM every appeal the gifts name, with the same names
 as your NPSP campaigns (see [Appeals](appeals.md)), and a default fund (see [Funds](funds.md)).
@@ -41,12 +47,12 @@ The three sample files in [samples](samples/) are small exports in exactly the s
 in section 4 produce. Create a default fund called **General Fund** and an appeal called
 **Year End 2024** first.
 
-1. Open the **Import** tab, select **NPSP: contacts**, then **Next**, and upload
+1. Open the **Import** tab, select **NPSP: Contacts**, then **Next**, and upload
    `npsp-contacts.csv`. Every column is already mapped: the home email to the personal email,
    the work email to the work email, the preferred email to the preferred email, and so on.
 2. Preview, then import. Ana Okafor and Robert Hale are created, each with a household of their
    own. Robert is marked deceased and do not call.
-3. Import `npsp-payments.csv` with **NPSP: opportunities and payments**. Leave donation matching
+3. Import `npsp-payments.csv` with **NPSP: Opportunities and Payments**. Leave donation matching
    at **Match or create**. The preview says 2 rows would create a gift and 1 would be rejected:
    "The tribute type Honor is not one BarnCRM knows. Use one of: In honor of, In memory
    of."
@@ -55,7 +61,7 @@ in section 4 produce. Create a default fund called **General Fund** and an appea
    email, not created again.
 5. In the file, replace `Honor` with `In honor of`, and load it again. The two gifts already
    loaded are matched, not duplicated, and the third is created with its tribute.
-6. Import `npsp-organization-payments.csv` with **NPSP: organization payments**. Hillside Rotary
+6. Import `npsp-organization-payments.csv` with **NPSP: Organization Payments**. Hillside Rotary
    Club is created as an organization and gives one gift of 500.00.
 
 ## 4. Moving Everything, Step by Step
@@ -68,7 +74,7 @@ to 500,000 rows can be previewed as one file; split anything larger.
 
 1. **Appeals and funds.** Create them in BarnCRM by hand, with the names your NPSP
    campaigns and general accounting units have. There is no import for them yet.
-2. **Contacts.** Export them with this query and load the file with **NPSP: contacts**.
+2. **Contacts.** Export them with this query and load the file with **NPSP: Contacts**.
 
    ```sql
    SELECT Salutation, FirstName, LastName, Title, Birthdate, Email, npe01__HomeEmail__c,
@@ -99,9 +105,9 @@ to 500,000 rows can be previewed as one file; split anything larger.
    ORDER BY npe01__Opportunity__c, npe01__Payment_Date__c
    ```
 
-   Load it with **NPSP: opportunities and payments**.
+   Load it with **NPSP: Opportunities and Payments**.
 4. **Payments from organizations.** The same query with the organization's name in place of
-   the four primary contact columns, loaded with **NPSP: organization payments**.
+   the four primary contact columns, loaded with **NPSP: Organization Payments**.
 
    ```sql
    SELECT Id, npe01__Payment_Amount__c, npe01__Payment_Date__c, npe01__Payment_Method__c,
@@ -137,7 +143,7 @@ and compare the rows with the records they came from.
 Check that every closed won gift has a payment:
 `SELECT COUNT() FROM Opportunity WHERE IsWon = true AND npe01__Number_of_Payments__c = 0`. If
 the count is not 0, those gifts were made while payments were switched off in NPSP and are not
-in the payment export. Load them with the **Generic gift list**.
+in the payment export. Load them with the **Generic Gift List**.
 
 Check that every paid payment has an account: the two payment queries select on the
 opportunity's account, so a payment whose opportunity has none is in neither file.
@@ -166,7 +172,7 @@ These are not loaded by the three templates. Each has what to do in the meantime
 
 | Not loaded | What to do meanwhile |
 |---|---|
-| Households and who is in them | Each contact gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). Household names are made by BarnCRM's naming. |
+| Households and who is in them | When BarnCRM is installed in the NPSP org itself, do not load contacts at all: adopt NPSP's households in place ([Adopting Your NPSP Households](npsp-households.md)), which keeps every family and its people as they are. When you load files into another org, each contact gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). Household names are made by BarnCRM's naming. |
 | Relationships and affiliations | No ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **One Kind of Record** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
 | Recurring donations and their schedules | No import yet. Create each active recurring gift by hand as a commitment ([Commitments](commitments.md)) before loading payments. With **Match or create**, a payment dated near one of its scheduled payments pays it; older payments load as gifts on their own. |
 | General accounting unit allocations | Every gift goes to the default fund. For opportunities with one allocation, export `SELECT npsp__Opportunity__c, npsp__General_Accounting_Unit__r.Name FROM npsp__Allocation__c`, add `npe01__Opportunity__c` to the payment query, and fill a new column headed `Fund` from the allocation file with a lookup on the opportunity. Delete the opportunity column before loading, and check on the column step that `Fund` reads **Gift: fund**. |
@@ -175,7 +181,7 @@ These are not loaded by the three templates. Each has what to do in the meantime
 | Additional and seasonal addresses | Only the mailing address loads. Add others by hand ([Addresses](addresses.md)). |
 | Written-off and unpaid payments | The exports take paid payments only. Refunds are recorded in BarnCRM after the gift is loaded ([Refunds](refunds.md)). |
 | An organization's details | A payment file creates an organization with its name only. Add its address and phone by hand. |
-| In-kind gifts | Their payments have no payment method, so the rows are rejected with "The gift has no payment method. Map a column to it, or give the template a default payment method." Load them with the **Generic gift list**, the value mapped to **Gift: fair market value** and no amount. |
+| In-kind gifts | Their payments have no payment method, so the rows are rejected with "The gift has no payment method. Map a column to it, or give the template a default payment method." Load them with the **Generic Gift List**, the value mapped to **Gift: fair market value** and no amount. |
 
 ## 7. Common Mistakes
 

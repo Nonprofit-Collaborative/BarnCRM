@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Field_Utilization_Retention_Days__c</fullName>
+  <defaultValue>730</defaultValue>
+  <description>Days a saved Field Utilization Snapshot row is kept before the nightly Record Cleanup step deletes it (architect review L-08, R-FU7, R-NJ8). Read as 730 when empty, held between 90 and 3650.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Days a saved field utilization count is kept before it is deleted.</inlineHelpText>
+  <label>Days to keep field use counts</label>
+  <precision>4</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

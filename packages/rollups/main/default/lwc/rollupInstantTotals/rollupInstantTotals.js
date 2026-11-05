@@ -5,7 +5,6 @@ import getCode from '@salesforce/apex/RollupInstantTotals.getCode';
 import setTurnedOn from '@salesforce/apex/RollupInstantTotals.setTurnedOn';
 
 import TITLE from '@salesforce/label/c.Core_RollupBuilder_InstantTitle';
-import INTRO from '@salesforce/label/c.Core_RollupBuilder_InstantIntro';
 import STATUS_BUILT_IN from '@salesforce/label/c.Core_RollupBuilder_InstantStatusBuiltIn';
 import STATUS_ON from '@salesforce/label/c.Core_RollupBuilder_InstantStatusOn';
 import STATUS_OFF from '@salesforce/label/c.Core_RollupBuilder_InstantStatusOff';
@@ -18,8 +17,8 @@ import COUNT_NONE from '@salesforce/label/c.Core_RollupBuilder_InstantCountNone'
 import TURN_ON from '@salesforce/label/c.Core_RollupBuilder_InstantTurnOn';
 import TURN_OFF from '@salesforce/label/c.Core_RollupBuilder_InstantTurnOff';
 import REMOVE from '@salesforce/label/c.Core_RollupBuilder_InstantRemove';
-import CLOSE from '@salesforce/label/c.Core_RollupBuilder_InstantClose';
-import COPY from '@salesforce/label/c.Core_RollupBuilder_InstantCopy';
+import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
+import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
 import COPIED from '@salesforce/label/c.Core_RollupBuilder_InstantCopied';
 import COPY_FAILED from '@salesforce/label/c.Core_RollupBuilder_InstantCopyFailed';
 import DOWNLOAD_DEPLOY from '@salesforce/label/c.Core_RollupBuilder_InstantDownloadDeploy';
@@ -29,18 +28,15 @@ import SETUP_STEP_1 from '@salesforce/label/c.Core_RollupBuilder_InstantSetupSte
 import SETUP_STEP_2 from '@salesforce/label/c.Core_RollupBuilder_InstantSetupStep2';
 import SETUP_STEP_3 from '@salesforce/label/c.Core_RollupBuilder_InstantSetupStep3';
 import SETUP_STEP_4 from '@salesforce/label/c.Core_RollupBuilder_InstantSetupStep4';
-import SETUP_STEP_5 from '@salesforce/label/c.Core_RollupBuilder_InstantSetupStep5';
-import SETUP_CLI from '@salesforce/label/c.Core_RollupBuilder_InstantSetupCli';
 import REMOVE_TITLE from '@salesforce/label/c.Core_RollupBuilder_InstantRemoveTitle';
-import REMOVE_STEP_1 from '@salesforce/label/c.Core_RollupBuilder_InstantRemoveStep1';
 import REMOVE_STEP_2 from '@salesforce/label/c.Core_RollupBuilder_InstantRemoveStep2';
-import REMOVE_STEP_3 from '@salesforce/label/c.Core_RollupBuilder_InstantRemoveStep3';
 import TRIGGER_HEADING from '@salesforce/label/c.Core_RollupBuilder_InstantTriggerHeading';
 import TEST_HEADING from '@salesforce/label/c.Core_RollupBuilder_InstantTestHeading';
 import TURNED_OFF from '@salesforce/label/c.Core_RollupBuilder_InstantTurnedOff';
 import TURNED_ON from '@salesforce/label/c.Core_RollupBuilder_InstantTurnedOn';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import { bodyMessage, format } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The states `RollupInstantTotals` reports (ADR-0138). */
 const STATUS_TEXT = {
@@ -67,12 +63,16 @@ const REMOVAL = 'removal';
  * gives the removal package and steps.
  */
 export default class RollupInstantTotals extends LightningElement {
+  helpReady = isHelpLoaded('Rollups');
+
   /** Whether the viewer may switch automation (Manage BarnCRM Settings). */
   @api canManage = false;
 
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Rollups', 'Core_RollupBuilder_InstantIntro');
+    },
     turnOn: TURN_ON,
     turnOff: TURN_OFF,
     remove: REMOVE,
@@ -82,7 +82,9 @@ export default class RollupInstantTotals extends LightningElement {
     downloadRemoval: DOWNLOAD_REMOVAL,
     triggerHeading: TRIGGER_HEADING,
     testHeading: TEST_HEADING,
-    setupCli: SETUP_CLI
+    get setupCli() {
+      return helpText('Rollups', 'Core_RollupBuilder_InstantSetupCli');
+    }
   };
 
   states = [];
@@ -113,6 +115,11 @@ export default class RollupInstantTotals extends LightningElement {
   }
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Rollups').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.connected = true;
     this.load();
   }
@@ -285,16 +292,16 @@ export default class RollupInstantTotals extends LightningElement {
       format(SETUP_STEP_2, code.testClassName),
       format(SETUP_STEP_3, code.triggerName, code.testClassName),
       format(SETUP_STEP_4, code.testClassName),
-      SETUP_STEP_5
+      helpText('Rollups', 'Core_RollupBuilder_InstantSetupStep5')
     ].map((text, index) => ({ key: `setup-${index}`, text }));
   }
 
   get removeSteps() {
     const code = this.code;
     return [
-      REMOVE_STEP_1,
+      helpText('Rollups', 'Core_RollupBuilder_InstantRemoveStep1'),
       format(REMOVE_STEP_2, code.triggerName, code.testClassName),
-      REMOVE_STEP_3
+      helpText('Rollups', 'Core_RollupBuilder_InstantRemoveStep3')
     ].map((text, index) => ({ key: `remove-${index}`, text }));
   }
 

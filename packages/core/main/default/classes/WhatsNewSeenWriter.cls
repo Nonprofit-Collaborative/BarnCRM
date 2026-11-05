@@ -15,13 +15,13 @@
  * - Only `Last_Seen_Version__c`, a package owned field, is written. Nothing else is elevated.
  */
 public without sharing class WhatsNewSeenWriter {
-    public static void markSeen(String version) {
-        Id userId = UserInfo.getUserId();
-        Whats_New_Seen__c row = Whats_New_Seen__c.getValues(userId);
-        if (row == null) {
-            row = new Whats_New_Seen__c(SetupOwnerId = userId);
-        }
-        row.Last_Seen_Version__c = version;
-        Database.upsert(row, AccessLevel.SYSTEM_MODE);
-    }
+	public static void markSeen(String version) {
+		Id userId = UserInfo.getUserId();
+		Whats_New_Seen__c row = Whats_New_Seen__c.getValues(userId);
+		if (row == null) {
+			row = new Whats_New_Seen__c(SetupOwnerId = userId);
+		}
+		row.Last_Seen_Version__c = version;
+		Database.upsert(row, AccessLevel.SYSTEM_MODE);
+	}
 }

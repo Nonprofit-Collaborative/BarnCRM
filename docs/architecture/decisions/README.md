@@ -163,6 +163,18 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0152](0152-ai-readiness-export.md) | AI-Readiness Export: a browser-built pack, no AI calls, sensitive fields left out by default | Proposed |
 | [0153](0153-solicitation-pipeline-ask-object.md) | The solicitation pipeline is a Giving Ask object, not Opportunity | Accepted (D-156) |
 | [0154](0154-logic-models-module.md) | The BarnCRM Logic Models module: its own package on Core, five objects, a program named by its record identifier | Proposed |
+| [0155](0155-npsp-household-adoption-in-core.md) | NPSP household adoption lives in Core, converts Accounts in place, and is undone from a journal | Proposed |
+| [0156](0156-field-access-manager.md) | Field Access Manager changes Read and Edit on permission sets the admin chooses, previewed, journaled and undoable (amends 0047) | Proposed |
+| [0157](0157-gift-transaction-mirror.md) | The Gift Transaction mirror copies gifts one way, in runs, with designations from each fund's link | Accepted (builder decision) |
+| [0158](0158-indicator-sources.md) | Indicator sources: hand entry, a Core Import template, or a Find saved query counted per period in system mode | Proposed |
+| [0159](0159-where-used-extension.md) | Where Used reads BarnCRM's own setup records, and modules add theirs through an extension seam | Proposed (builder decision) |
+| [0160](0160-programs-service-plans-cohorts-sessions.md) | Programs depth: goals on the enrollment, cohorts through the enrollment, sessions under a service with attendance on Service Delivery | Proposed |
+| [0161](0161-funders-module.md) | The BarnCRM Funders module: a Grant and its requirements, the funder an organization, a program named by its record identifier | Proposed |
+| [0162](0162-funders-restricted-funds-schedules-calendar.md) | Funders restricted funds, award schedules and the deadline calendar, with no Giving dependency | Proposed |
+| [0163](0163-funders-reporting-links.md) | Funders reporting: outcomes linked to requirements, a funder report template merged in the browser, a board dashboard that reads Giving when it can | Proposed |
+| [0164](0164-help-text-json.md) | Help and guidance prose in packaged JSON catalogs, not custom labels | Proposed |
+| [0165](0165-dispatcher-errors-and-automation-control.md) | A handler failure refuses only its own records, and one Automation Control setting pauses or bypasses automation per org, profile or user | Proposed |
+| [0166](0166-nightly-job-dispatcher.md) | One nightly job dispatcher runs every BarnCRM nightly job in sequence | Accepted |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

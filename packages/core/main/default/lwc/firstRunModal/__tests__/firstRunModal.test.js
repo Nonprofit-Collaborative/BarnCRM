@@ -70,7 +70,7 @@ describe('c-first-run-modal', () => {
       'c.Core_SuiteChoice_NonprofitName'
     ]);
     expect(picker.options.every((option) => option.iconName && option.description)).toBe(true);
-    expect(byId(element, 'finish').label).toBe('c.Core_FirstRun_Finish');
+    expect(byId(element, 'finish').label).toBe('c.Core_ModuleSetup_FinishButton');
   });
 
   it('tells someone who cannot finish that an administrator needs to', async () => {
@@ -88,7 +88,7 @@ describe('c-first-run-modal', () => {
 
     expect(element.disableClose).toBe(false);
     const close = byId(element, 'close');
-    expect(close.label).toBe('c.Core_FirstRun_Close');
+    expect(close.label).toBe('c.Core_BulkUpdate_Close');
     close.click();
     expect(closed).toHaveBeenCalled();
   });
@@ -125,6 +125,22 @@ describe('c-first-run-modal', () => {
     expect(element.disableClose).toBe(false);
   });
 
+  it('names the default features under the first choice, and says a feature stays on (admin-15)', async () => {
+    const element = await build(ADMIN_STATE);
+
+    const listed = all(element, 'all-feature');
+    expect(listed).toHaveLength(3);
+    expect(listed[0].textContent).toContain('Data Manager');
+    expect(listed[0].textContent).toContain('Bulk tools.');
+    expect(byId(element, 'stays-on').message).toBe('c.Core_FirstRun_StaysOnWarning');
+    expect(byId(element, 'stays-on').variant).toBe('warning');
+
+    choose(element, 'mode', 'choose');
+    await settle();
+    expect(all(element, 'all-feature')).toHaveLength(0);
+    expect(byId(element, 'stays-on')).not.toBeNull();
+  });
+
   it('lists every feature ticked when choosing, and leaves an unticked one off', async () => {
     const element = await build(ADMIN_STATE);
 
@@ -146,6 +162,36 @@ describe('c-first-run-modal', () => {
     });
   });
 
+  it('says why a feature waits, never ticks it, and leaves it out of the save (RT-04)', async () => {
+    const waiting = {
+      key: 'HouseholdUpkeep',
+      name: 'Household Upkeep',
+      description: 'Households.',
+      isOn: false,
+      blockedReason: 'NPSP households are still in use.'
+    };
+    const element = await build({ ...ADMIN_STATE, features: [FEATURES[0], waiting] });
+
+    expect(all(element, 'blocked').map((p) => p.textContent)).toEqual([
+      'NPSP households are still in use.'
+    ]);
+
+    choose(element, 'mode', 'choose');
+    await settle();
+    const boxes = all(element, 'feature');
+    expect(boxes.map((box) => [box.checked, box.disabled])).toEqual([
+      [true, false],
+      [false, true]
+    ]);
+    expect(all(element, 'blocked')).toHaveLength(1);
+
+    choose(element, 'mode', 'all');
+    await settle();
+    byId(element, 'finish').click();
+    await settle();
+    expect(finish).toHaveBeenCalledWith({ suite: 'Standard', featureKeys: ['DataManager'] });
+  });
+
   it('stays open and shows the message when finishing fails', async () => {
     finish.mockRejectedValue({ body: { message: 'Setup could not be finished.' } });
     const element = await build(ADMIN_STATE);
@@ -157,6 +203,6 @@ describe('c-first-run-modal', () => {
 
     expect(closed).not.toHaveBeenCalled();
     expect(element.disableClose).toBe(true);
-    expect(byId(element, 'error').textContent.trim()).toBe('Setup could not be finished.');
+    expect(byId(element, 'error').message).toBe('Setup could not be finished.');
   });
 });

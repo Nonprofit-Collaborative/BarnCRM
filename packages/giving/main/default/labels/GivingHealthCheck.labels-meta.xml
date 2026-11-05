@@ -6,7 +6,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: unposted gifts in a closed period. {0} count.</shortDescription>
-        <value>{0} gifts in a closed period are not posted to accounting</value>
+        <value>{0} Gifts in a Closed Period Are Not Posted to Accounting</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_UnpostedClosedPeriodDetail</fullName>
@@ -15,22 +15,6 @@
         <protected>false</protected>
         <shortDescription>Health Check detail: gifts in a closed period that are not posted.</shortDescription>
         <value>These gifts are locked because their date is on or before Books Closed Through, but none is marked posted to accounting. If they belong in an export you already sent, mark them posted on the Accounting Export page (Mirror). If not, move Books Closed Through back (needs the Override Posting Lock permission).</value>
-    </labels>
-    <labels>
-        <fullName>Giving_HealthCheck_UnpostedClosedPeriodMoreThan</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Stands in for the count at the cap. {0} the cap.</shortDescription>
-        <value>More than {0}</value>
-    </labels>
-    <labels>
-        <fullName>Giving_HealthCheck_UnpostedClosedPeriodFirstListed</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Says how many example gifts are linked. {0} number linked.</shortDescription>
-        <value>The first {0} are linked below.</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_UnpostedClosedPeriodFix</fullName>
@@ -46,7 +30,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: someone holds the Override Receipt Lock permission</shortDescription>
-        <value>Someone can override the receipt lock</value>
+        <value>Someone Can Override the Receipt Lock</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_OverrideLockDetail</fullName>
@@ -78,7 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the single receipt generation failure finding.</shortDescription>
-        <value>One receipt number was used by a run that failed</value>
+        <value>One Receipt Number Was Used by a Run That Failed</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_ReceiptFailedOneDetail</fullName>
@@ -89,20 +73,12 @@
         <value>One receipt is Void with the reason Generation failed. That is a number handed to a document that never generated. A single one is ordinary, not a problem. The Error Log says what went wrong, and the receipt can be run again once it is fixed.</value>
     </labels>
     <labels>
-        <fullName>Giving_HealthCheck_ReceiptFailedMoreThan</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>How many failed receipts, when there are more than the count cap.</shortDescription>
-        <value>More than {0}</value>
-    </labels>
-    <labels>
         <fullName>Giving_HealthCheck_ReceiptFailedManyTitle</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the repeated receipt generation failure finding.</shortDescription>
-        <value>{0} receipts failed to generate</value>
+        <value>{0} Receipts Failed to Generate</value>
     </labels>
     <labels>
         <fullName>Giving_HealthCheck_ReceiptFailedManyDetail</fullName>
@@ -111,13 +87,5 @@
         <protected>false</protected>
         <shortDescription>Explains that receipt generation has failed repeatedly.</shortDescription>
         <value>{0} receipts are Void with the reason Generation failed, so those donors are still waiting for their documents. Read the receipt entries in the Error Log, fix what they name, and run the receipts again. Leave the void records alone: they account for the numbers that were used.</value>
-    </labels>
-    <labels>
-        <fullName>Giving_HealthCheck_ErrorLogFix</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Fix button on the receipt generation findings: open the Error Log.</shortDescription>
-        <value>Open the Error Log</value>
     </labels>
 </CustomLabels>

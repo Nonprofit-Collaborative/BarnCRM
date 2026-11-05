@@ -66,6 +66,18 @@ jobs:
       - name: Check custom labels against the platform limits
         run: python3 scripts/ci/check-labels.py
 
+      - name: Check the custom label budget and that every label is used
+        run: python3 scripts/ci/check-label-budget.py
+
+      - name: Check each package's Apex code size against its budget
+        run: python3 scripts/ci/check-apex-budget.py
+
+      - name: Check every without sharing class is in the register
+        run: python3 scripts/ci/check-without-sharing-register.py
+
+      - name: Check trigger handlers read their records only through the accessors
+        run: python3 scripts/ci/check-trigger-handler-records.py
+
       - name: Check descriptions, field limits, layout actions and Apex type names
         run: python3 scripts/ci/check-metadata-lengths.py
 
@@ -86,6 +98,9 @@ jobs:
 
       - name: Check every exposed component is reachable from something
         run: python3 scripts/ci/check-components-reachable.py
+
+      - name: Check components add no look the visual standard replaced
+        run: python3 scripts/ci/check-visual-standard.py
 
       - name: Check every packaged record page is actually assigned
         run: python3 scripts/ci/check-record-pages-assigned.py

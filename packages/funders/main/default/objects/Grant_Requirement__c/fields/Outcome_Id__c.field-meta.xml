@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Outcome_Id__c</fullName>
+  <length>18</length>
+  <required>false</required>
+  <externalId>false</externalId>
+  <inlineHelpText>The Logic Models outcome or output this requirement reports on, stored by record ID. Choose it in the Logic Model Outcomes card on the grant's page.</inlineHelpText>
+  <label>Logic Model Outcome</label>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+</CustomField>

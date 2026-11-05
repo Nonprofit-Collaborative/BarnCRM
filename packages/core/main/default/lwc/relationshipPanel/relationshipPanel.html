@@ -1,5 +1,6 @@
 <template>
-  <lightning-card title={labels.panelTitle} icon-name="standard:people">
+    <template lwc:if={helpReady}>
+  <lightning-card title={labels.panelTitle} icon-name={icons.relationship}>
     <template lwc:if={canAdd}>
       <lightning-button
         slot="actions"
@@ -15,9 +16,12 @@
       </template>
 
       <template lwc:if={errorMessage}>
-        <div role="alert" class="slds-text-color_error slds-var-m-bottom_small" data-id="error">
-          {errorMessage}
-        </div>
+        <c-barn-notice
+          class="slds-var-m-bottom_small"
+          variant="error"
+          message={errorMessage}
+          data-id="error"
+        ></c-barn-notice>
       </template>
 
       <template lwc:if={isEmpty}>
@@ -28,40 +32,86 @@
         </c-barn-empty-state>
       </template>
 
-      <template for:each={relationships} for:item="relationship">
-        <div key={relationship.id} class={relationship.cardClass} data-id="relationship-card">
-          <div class="slds-grid slds-grid_align-spread">
-            <div>
-              <p class="slds-text-heading_small" data-id="related-person">
-                {relationship.relatedPersonName}
-              </p>
-              <p class="slds-text-title_caps" data-id="relationship-type">
-                {relationship.relationshipType}
-              </p>
-              <template lwc:if={relationship.description}>
-                <p class="slds-text-body_small" data-id="relationship-description">
-                  {relationship.description}
-                </p>
-              </template>
-            </div>
-            <div>
-              <template lwc:if={relationship.isFormer}>
-                <lightning-badge
-                  label={labels.formerBadge}
-                  data-id="former-badge"
-                ></lightning-badge>
-              </template>
-              <template lwc:if={canRemove}>
-                <lightning-button
-                  label={labels.removeButton}
-                  data-id={relationship.id}
-                  onclick={handleRemove}
-                  class="remove-relationship"
-                ></lightning-button>
-              </template>
-            </div>
-          </div>
-        </div>
+      <template lwc:if={hasRelationships}>
+        <ul class="slds-has-dividers_bottom-space" data-id="relationship-list">
+          <template for:each={rows} for:item="relationship">
+            <li key={relationship.id} class={relationship.rowClass} data-id="relationship-card">
+              <div class="slds-media slds-media_center slds-media_small">
+                <div class="slds-media__figure" aria-hidden="true">
+                  <lightning-avatar
+                    variant="circle"
+                    size="small"
+                    initials={relationship.initials}
+                    fallback-icon-name="standard:avatar"
+                  ></lightning-avatar>
+                </div>
+                <div class="slds-media__body">
+                  <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+                    <h3 class="slds-text-heading_small slds-var-m-right_x-small">
+                      <a
+                        href={relationship.href}
+                        data-record-id={relationship.id}
+                        onclick={handleOpenRecord}
+                        data-id="related-person"
+                      >{relationship.relatedPersonName}</a>
+                    </h3>
+                    <template lwc:if={relationship.isFormer}>
+                      <c-barn-status-badge
+                        status="former"
+                        label={labels.formerBadge}
+                        data-id="former-badge"
+                      ></c-barn-status-badge>
+                    </template>
+                  </div>
+                  <template lwc:if={relationship.relationshipType}>
+                    <p class="slds-text-body_small slds-text-color_weak" data-id="relationship-type">{relationship.relationshipType}</p>
+                  </template>
+                  <template lwc:if={relationship.description}>
+                    <p class="slds-text-body_small slds-text-color_weak" data-id="relationship-description">
+                      {relationship.description}
+                    </p>
+                  </template>
+                </div>
+                <template lwc:if={relationship.hasActions}>
+                  <div class="slds-media__figure slds-media__figure_reverse">
+                    <lightning-button-menu
+                      alternative-text={relationship.actionsLabel}
+                      title={relationship.actionsLabel}
+                      icon-size="small"
+                      menu-alignment="auto"
+                      data-record-id={relationship.id}
+                      disabled={busy}
+                      onselect={handleRowAction}
+                      class="row-menu"
+                    >
+                      <template lwc:if={canEdit}>
+                        <lightning-menu-item
+                          value="edit"
+                          label={labels.editAction}
+                          class="edit-relationship"
+                        ></lightning-menu-item>
+                      </template>
+                      <template lwc:if={relationship.canEnd}>
+                        <lightning-menu-item
+                          value="end"
+                          label={labels.endAction}
+                          class="end-relationship"
+                        ></lightning-menu-item>
+                      </template>
+                      <template lwc:if={canRemove}>
+                        <lightning-menu-item
+                          value="remove"
+                          label={labels.removeButton}
+                          class="remove-relationship"
+                        ></lightning-menu-item>
+                      </template>
+                    </lightning-button-menu>
+                  </div>
+                </template>
+              </div>
+            </li>
+          </template>
+        </ul>
       </template>
 
       <template lwc:if={showForm}>
@@ -102,4 +152,5 @@
       </template>
     </div>
   </lightning-card>
+    </template>
 </template>

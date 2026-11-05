@@ -4,13 +4,11 @@ import { refreshApex } from '@salesforce/apex';
 import getLadder from '@salesforce/apex/DonorLevelController.getLadder';
 import recalculate from '@salesforce/apex/DonorLevelController.recalculate';
 
-import TITLE from '@salesforce/label/c.Giving_DonorLevels_Title';
-import INTRO from '@salesforce/label/c.Giving_DonorLevels_Intro';
+import TITLE from '@salesforce/label/c.Core_SettingsGroup_DonorLevels';
 import MEASURED_ON from '@salesforce/label/c.Giving_DonorLevels_MeasuredOn';
 import LAST_RECALCULATED from '@salesforce/label/c.Giving_DonorLevels_LastRecalculated';
 import NEVER_RECALCULATED from '@salesforce/label/c.Giving_DonorLevels_NeverRecalculated';
 import OFF from '@salesforce/label/c.Giving_DonorLevels_Off';
-import EMPTY from '@salesforce/label/c.Giving_DonorLevels_Empty';
 import NEW_LEVEL from '@salesforce/label/c.Giving_DonorLevels_NewLevel';
 import RECALCULATE from '@salesforce/label/c.Giving_DonorLevels_Recalculate';
 import RECALCULATE_STARTED from '@salesforce/label/c.Giving_DonorLevels_RecalculateStarted';
@@ -18,11 +16,12 @@ import COLUMN_LEVEL from '@salesforce/label/c.Giving_DonorLevels_ColumnLevel';
 import COLUMN_FROM from '@salesforce/label/c.Giving_DonorLevels_ColumnFrom';
 import COLUMN_UP_TO from '@salesforce/label/c.Giving_DonorLevels_ColumnUpTo';
 import COLUMN_DONORS from '@salesforce/label/c.Giving_DonorLevels_ColumnDonors';
-import COLUMN_ACTIVE from '@salesforce/label/c.Giving_DonorLevels_ColumnActive';
+import COLUMN_ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
 import TOP_OF_LADDER from '@salesforce/label/c.Giving_DonorLevels_TopOfLadder';
-import INACTIVE from '@salesforce/label/c.Giving_DonorLevels_Inactive';
+import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
 import ACTION_FAILED from '@salesforce/label/c.Giving_DonorLevels_ActionFailed';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * The ladder, as Maria reads it: every rung lowest first, how many donors are on each, what the
@@ -32,14 +31,28 @@ import { bodyMessage } from 'c/findCsv';
  * a second editor (ADR-0028).
  */
 export default class DonorLevels extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Giving');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Giving', 'Giving_DonorLevels_Intro');
+    },
     measuredOn: MEASURED_ON,
     lastRecalculated: LAST_RECALCULATED,
     never: NEVER_RECALCULATED,
     off: OFF,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Giving', 'Giving_DonorLevels_Empty');
+    },
     newLevel: NEW_LEVEL,
     recalculate: RECALCULATE,
     columnLevel: COLUMN_LEVEL,

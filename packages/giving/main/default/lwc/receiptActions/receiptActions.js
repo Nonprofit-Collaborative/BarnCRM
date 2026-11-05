@@ -8,8 +8,8 @@ import voidAndReissue from '@salesforce/apex/ReceiptController.voidAndReissue';
 
 import TITLE from '@salesforce/label/c.Giving_Receipt_PanelTitle';
 import COLUMN_NUMBER from '@salesforce/label/c.Giving_Receipt_ColumnNumber';
-import COLUMN_STATUS from '@salesforce/label/c.Giving_Receipt_ColumnStatus';
-import COLUMN_AMOUNT from '@salesforce/label/c.Giving_Receipt_ColumnAmount';
+import COLUMN_STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
+import COLUMN_AMOUNT from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
 import COLUMN_ISSUED from '@salesforce/label/c.Giving_Receipt_ColumnIssued';
 import COLUMN_VOID_REASON from '@salesforce/label/c.Giving_Receipt_ColumnVoidReason';
 import COLUMN_FILE from '@salesforce/label/c.Giving_Receipt_ColumnFile';
@@ -17,7 +17,6 @@ import NONE_YET from '@salesforce/label/c.Giving_Receipt_NoneYet';
 import ISSUE from '@salesforce/label/c.Giving_Receipt_IssueButton';
 import VOID_REASON from '@salesforce/label/c.Giving_Receipt_VoidReasonField';
 import VOID_AND_REISSUE from '@salesforce/label/c.Giving_Receipt_VoidAndReissueButton';
-import VOID_NOTE from '@salesforce/label/c.Giving_Receipt_VoidNote';
 import VIEW_PDF from '@salesforce/label/c.Giving_Receipt_ViewPdf';
 import VIEW_PDF_OF from '@salesforce/label/c.Giving_Receipt_ViewPdfOf';
 import ISSUED_TITLE from '@salesforce/label/c.Giving_Receipt_IssuedTitle';
@@ -29,6 +28,7 @@ import REISSUED_TITLE from '@salesforce/label/c.Giving_Receipt_ReissuedTitle';
 import REISSUED_MESSAGE from '@salesforce/label/c.Giving_Receipt_ReissuedMessage';
 import NOT_REISSUED_TITLE from '@salesforce/label/c.Giving_Receipt_NotReissuedTitle';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Receipt_UnexpectedError';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * Issuing, voiding and reissuing a receipt from the gift's own page.
@@ -40,6 +40,16 @@ import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Receipt_UnexpectedError
  * box: a void with no reason is the record an auditor cannot use.
  */
 export default class ReceiptActions extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Giving');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
 
   labels = {
@@ -54,7 +64,9 @@ export default class ReceiptActions extends NavigationMixin(LightningElement) {
     issue: ISSUE,
     voidReason: VOID_REASON,
     voidAndReissue: VOID_AND_REISSUE,
-    voidNote: VOID_NOTE,
+    get voidNote() {
+      return helpText('Giving', 'Giving_Receipt_VoidNote');
+    },
     viewPdf: VIEW_PDF
   };
 

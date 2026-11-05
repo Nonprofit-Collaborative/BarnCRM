@@ -5,6 +5,7 @@ import {
   logicProblem,
   operatorsFor,
   parseDocument,
+  renumberLogic,
   serializeDocument,
   toDocumentValue,
   toInputValue,
@@ -15,6 +16,14 @@ import {
 const field = (dataType, extra = {}) => ({ apiName: 'X__c', dataType, filterable: true, ...extra });
 
 describe('c/filterDocument', () => {
+  it('renumbers the logic so every number follows its condition when one moves', () => {
+    expect(renumberLogic('1 AND (2 OR 3)', 2, 0, 3)).toBe('2 AND (3 OR 1)');
+    expect(renumberLogic('1 AND (2 OR 3)', 0, 1, 3)).toBe('2 AND (1 OR 3)');
+    expect(renumberLogic('1 AND 2', 1, 1, 2)).toBe('1 AND 2');
+    expect(renumberLogic('1 AND 9', 0, 1, 2)).toBe('2 AND 9');
+    expect(renumberLogic('', 0, 1, 2)).toBe('');
+  });
+
   it('offers only the operators that suit a field type', () => {
     expect(operatorsFor(field('boolean'))).toEqual([OPERATORS.EQUALS]);
     expect(operatorsFor(field('picklist'))).not.toContain(OPERATORS.CONTAINS);

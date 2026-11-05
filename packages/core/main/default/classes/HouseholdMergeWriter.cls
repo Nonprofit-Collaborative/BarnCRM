@@ -26,23 +26,25 @@
  *   screen shows) stays in user mode.
  */
 public without sharing class HouseholdMergeWriter {
-    /**
-     * Folds the second household into the first with the platform's own merge, so that
-     * activities, files, notes and every lookup any package points at it follow it. Answers
-     * with the platform's result rather than throwing, so the caller can roll back and say
-     * why. Throws when there is no authorization.
-     */
-    public static Database.MergeResult mergeInto(
-        HouseholdMergeService.MergeAuthorization authorization
-    ) {
-        if (authorization == null) {
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorMergeFailed);
-        }
-        return Database.merge(
-            new Account(Id = authorization.survivorId),
-            authorization.victimId,
-            false,
-            AccessLevel.SYSTEM_MODE
-        );
-    }
+	/**
+	 * Folds the second household into the first with the platform's own merge, so that
+	 * activities, files, notes and every lookup any package points at it follow it. Answers
+	 * with the platform's result rather than throwing, so the caller can roll back and say
+	 * why. Throws when there is no authorization.
+	 */
+	public static Database.MergeResult mergeInto(
+		HouseholdMergeService.MergeAuthorization authorization
+	) {
+		if (authorization == null) {
+			throw new HouseholdException(
+				BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorMergeFailed')
+			);
+		}
+		return Database.merge(
+			new Account(Id = authorization.survivorId),
+			authorization.victimId,
+			false,
+			AccessLevel.SYSTEM_MODE
+		);
+	}
 }

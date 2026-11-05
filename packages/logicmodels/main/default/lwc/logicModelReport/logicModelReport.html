@@ -1,0 +1,125 @@
+<template>
+    <template lwc:if={helpReady}>
+  <section data-id="report" class="slds-var-m-vertical_medium">
+    <h3 class="slds-text-heading_small slds-var-m-bottom_small">{labels.reportTitle}</h3>
+    <p role="status" tabindex="-1" data-id="report-result" class="slds-assistive-text">
+      {resultMessage}
+    </p>
+
+    <template lwc:if={hasIndicators}>
+      <template lwc:if={hasPeriods}>
+        <lightning-checkbox-group
+          data-id="report-periods"
+          label={labels.reportPeriods}
+          options={periodOptions}
+          value={chosenKeys}
+          onchange={handlePeriods}
+        ></lightning-checkbox-group>
+        <template lwc:if={nothingChosen}>
+          <p data-id="report-choose" class="slds-text-color_weak slds-var-m-vertical_small">
+            {labels.reportChooseOne}
+          </p>
+        </template>
+
+        <div class="slds-var-m-vertical_small">
+          <lightning-button
+            data-id="report-csv"
+            label={labels.reportDownloadCsv}
+            icon-name="utility:download"
+            disabled={cannotDownload}
+            onclick={handleCsv}
+            class="slds-var-m-right_small"
+          ></lightning-button>
+          <lightning-button
+            data-id="report-print"
+            label={labels.reportPrintable}
+            icon-name="utility:print"
+            disabled={cannotDownload}
+            onclick={handlePrintable}
+          ></lightning-button>
+          <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small">
+            {labels.reportPrintHelp}
+          </p>
+        </div>
+      </template>
+      <template lwc:else>
+        <c-barn-empty-state
+          data-id="report-no-periods"
+          size="compact"
+          heading={labels.reportNoPeriods}
+        ></c-barn-empty-state>
+      </template>
+
+      <div class="slds-scrollable_x">
+        <table
+          data-wide-table
+          data-id="report-table"
+          class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_col-bordered"
+          aria-label={labels.reportTitle}
+        >
+          <thead>
+            <tr>
+              <th scope="col" rowspan="2">{labels.column}</th>
+              <th scope="col" rowspan="2">{labels.reportPart}</th>
+              <th scope="col" rowspan="2">{labels.reportIndicator}</th>
+              <th scope="col" rowspan="2">{labels.baseline}</th>
+              <template for:each={headPeriods} for:item="period">
+                <th key={period.key} scope="colgroup" colspan="3" data-id="report-period">
+                  {period.name}
+                  <div class="slds-text-body_small slds-text-color_weak">{period.dates}</div>
+                </th>
+              </template>
+            </tr>
+            <tr>
+              <template for:each={subHeads} for:item="head">
+                <th key={head.key} scope="col">{head.label}</th>
+              </template>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={rows} for:item="row">
+              <tr key={row.id} data-id="report-row">
+                <td>{row.column}</td>
+                <td>{row.part}</td>
+                <th scope="row">
+                  {row.indicator}
+                  <template lwc:if={row.unit}>
+                    <span class="slds-text-color_weak"> ({row.unit})</span>
+                  </template>
+                </th>
+                <td class="slds-text-align_right">
+                  <lightning-formatted-number
+                    value={row.baseline}
+                    maximum-fraction-digits="2"
+                  ></lightning-formatted-number>
+                </td>
+                <template for:each={row.cells} for:item="cell">
+                  <template lwc:if={cell.number}>
+                    <td key={cell.key} class="slds-text-align_right">
+                      <lightning-formatted-number
+                        value={cell.value}
+                        maximum-fraction-digits="2"
+                      ></lightning-formatted-number>
+                    </td>
+                  </template>
+                  <template lwc:else>
+                    <td key={cell.key} data-id="report-progress">{cell.value}</td>
+                  </template>
+                </template>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </template>
+    <template lwc:else>
+      <c-barn-empty-state
+        data-id="report-no-indicators"
+        size="small"
+        illustration="no-data"
+        heading={labels.reportNoIndicators}
+      ></c-barn-empty-state>
+    </template>
+  </section>
+    </template>
+</template>

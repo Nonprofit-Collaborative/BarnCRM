@@ -4,13 +4,13 @@
  * (ADR-0017, plan Section 7.2).
  */
 trigger CommitmentTrigger on Commitment__c(
-    before insert,
-    before update,
-    before delete,
-    after insert,
-    after update,
-    after delete,
-    after undelete
+	before insert,
+	before update,
+	before delete,
+	after insert,
+	after update,
+	after delete,
+	after undelete
 ) {
-    TriggerDispatcher.run('Commitment__c');
+	TriggerDispatcher.run('Commitment__c');
 }

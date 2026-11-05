@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Setting_Change_Retention_Days__c</fullName>
+  <defaultValue>730</defaultValue>
+  <description>Days a Setting Change row is kept before the nightly Record Cleanup step deletes it (architect review L-08, R-S2, R-NJ8). Read as 730 when empty, held between 180 and 3650.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Days a recorded settings change is kept before it is deleted.</inlineHelpText>
+  <label>Days to keep settings changes</label>
+  <precision>4</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

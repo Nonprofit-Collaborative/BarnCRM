@@ -1,18 +1,25 @@
 <template>
+    <template lwc:if={helpReady}>
     <div>
         <div>
             <h2 class="slds-text-heading_medium slds-var-m-bottom_small">{labels.title}</h2>
             <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
 
             <template lwc:if={errorMessage}>
-                <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">
-                    {errorMessage}
-                </p>
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    data-id="error"
+                    variant="error"
+                    message={errorMessage}
+                ></c-barn-notice>
             </template>
             <template lwc:if={noticeMessage}>
-                <p class="slds-var-m-bottom_small" data-id="notice" role="status" aria-live="polite">
-                    {noticeMessage}
-                </p>
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    data-id="notice"
+                    variant="success"
+                    message={noticeMessage}
+                ></c-barn-notice>
             </template>
 
             <lightning-layout multiple-rows vertical-align="end">
@@ -57,13 +64,28 @@
             </template>
 
             <template lwc:if={tooLargeMessage}>
-                <p class="slds-var-m-vertical_small" data-id="too-large">{tooLargeMessage}</p>
+                <c-barn-notice
+                    class="slds-var-m-vertical_small"
+                    data-id="too-large"
+                    variant="warning"
+                    message={tooLargeMessage}
+                ></c-barn-notice>
             </template>
             <template lwc:if={hasNoRecords}>
-                <p class="slds-var-m-vertical_small" data-id="no-records">{labels.noRecords}</p>
+                <c-barn-empty-state
+                    class="slds-var-m-vertical_small"
+                    data-id="no-records"
+                    illustration="no-data"
+                    heading={labels.noRecords}
+                ></c-barn-empty-state>
             </template>
             <template lwc:if={hasNoFields}>
-                <p class="slds-var-m-vertical_small" data-id="no-fields">{labels.noFields}</p>
+                <c-barn-empty-state
+                    class="slds-var-m-vertical_small"
+                    data-id="no-fields"
+                    illustration="no-data"
+                    heading={labels.noFields}
+                ></c-barn-empty-state>
             </template>
 
             <template lwc:if={hasRows}>
@@ -85,6 +107,16 @@
                         {labels.neverSaved}
                     </p>
                 </template>
+                <lightning-input
+                    class="slds-var-m-bottom_x-small"
+                    data-id="technical-names"
+                    type="toggle"
+                    label={labels.showTechnicalNames}
+                    message-toggle-active=""
+                    message-toggle-inactive=""
+                    checked={showTechnicalNames}
+                    onchange={handleTechnicalNames}
+                ></lightning-input>
                 <lightning-datatable
                     data-id="results"
                     key-field="key"
@@ -94,11 +126,21 @@
                     sorted-by={sortedBy}
                     sorted-direction={sortedDirection}
                     onsort={handleSort}
+                    onrowaction={handleRowAction}
                 ></lightning-datatable>
             </template>
 
             <template lwc:if={notCountedMessage}>
-                <p class="slds-var-m-top_small" data-id="not-counted">{notCountedMessage}</p>
+                <c-barn-notice
+                    class="slds-var-m-top_small"
+                    data-id="not-counted"
+                    variant="warning"
+                    message={notCountedMessage}
+                ></c-barn-notice>
+            </template>
+
+            <template lwc:if={showPicklistUsage}>
+                <c-picklist-usage object-name={objectName} disabled={pickerDisabled}></c-picklist-usage>
             </template>
 
             <template lwc:if={showHistory}>
@@ -125,13 +167,17 @@
                         </template>
                     </template>
                     <template lwc:else>
-                        <p data-id="history-empty">{historyLabels.empty}</p>
+                        <c-barn-empty-state
+                            data-id="history-empty"
+                            size="compact"
+                            heading={historyLabels.empty}
+                        ></c-barn-empty-state>
                     </template>
 
                     <template lwc:if={viewTitle}>
                         <div class="slds-var-m-top_medium" data-id="snapshot-view">
                             <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_x-small">
-                                <h4 class="slds-text-heading_small slds-col">{viewTitle}</h4>
+                                <h4 class="slds-text-title_bold slds-col">{viewTitle}</h4>
                                 <lightning-button
                                     data-id="view-close"
                                     label={historyLabels.viewClose}
@@ -152,4 +198,5 @@
             </template>
         </div>
     </div>
+    </template>
 </template>

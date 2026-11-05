@@ -16,8 +16,10 @@ The everyday apps give you one home page that tells you what to do next, a setup
 that remembers how far you got, and the places you go most: your households, your people and
 your organizations. The admin apps hold every BarnCRM tool and setting in one place. Each
 tab shows only to the people whose access allows it, so a menu can be shorter than the list.
-**Import**, **Find** and **Bulk Update** are not in any app's navigation: open them from the
-tiles on the **Data Manager** tab. **Error Log** is always the last tab of an app that has it,
+**Super Importer**, **Find** and **Super Transformer** are not in any app's navigation: open them from the
+tiles on the **Data Manager** tab, which also has tiles for **Org Optimizer** and **Duplicate
+Matching**. The raw **Import Rows** tab is in no app's navigation either: open it from an
+import's results in Super Importer, or from the App Launcher. **Error Log** is always the last tab of an app that has it,
 after any pages a module adds. In the everyday apps, **Data Manager** is the last Core tab and
 a module's pages follow it.
 
@@ -28,6 +30,12 @@ one: a gear for **BarnCRM Settings**, building blocks for **Data Manager**, a st
 **Addresses** a map. On Data Manager, Org Optimizer, Duplicate Matching, Find and Import the
 page name appears once, in the page header, and the tool below it starts with what it is for.
 
+Module tabs follow the same rule: every Giving, Volunteers, Programs, Logic Models, Rollup
+Builder and Mirror tab has its own icon, never one shared with another BarnCRM tab (for
+example a stack of cash for **Gifts**, a trophy for **Donor Levels**, a chalkboard for **Logic
+Models**, a sailboat for **Programs**). The full list is in the contributor guide's
+[Tab Icons](../contributor-guide/tab-icons.md).
+
 If you have ever installed something in Salesforce and then wondered where to start, this
 is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**).
 
@@ -36,7 +44,7 @@ is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**
 | What you are looking for | Where it is |
 |---|---|
 | People, households, organizations | **BarnCRM** or **BarnCRM Console** |
-| Find, Import and Bulk Update | The **Data Manager** tab, in any BarnCRM app |
+| Find, Import and Super Transformer | The **Data Manager** tab, in any BarnCRM app |
 | Setup checklist, Health Check, What's new | The **Home** tab of **BarnCRM** or **BarnCRM Console** |
 | BarnCRM Settings, Access, Module Manager, Features | **BarnCRM Settings** tab in **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Org Optimizer, Duplicate Matching, Error Log | **BarnCRM Admin** or **BarnCRM Admin Console** |
@@ -105,7 +113,8 @@ person what they can act on:
 | Part of the home page | Who sees it |
 |---|---|
 | **What's New in BarnCRM**: what changed in the latest release, until you click **Dismiss** | Everyone, each person once per release |
-| **Welcome to BarnCRM** and the paused automation banner | Everyone |
+| **Welcome to BarnCRM** and the paused automation warning | Everyone |
+| **New Person** button (opens the standard new contact form; the household is made automatically) | People who can create contacts |
 | **New Household** button | People who can create and edit accounts (BarnCRM makes the household for them; nobody needs the Household record type) |
 | **Setup Checklist** (or the **Setup Complete** tile once it is finished) | Administrators |
 | **Health Check** (a summary of its last run; the full list of findings after **Run Now**) | Administrators |
@@ -114,11 +123,13 @@ person what they can act on:
 | **Seasonal Addresses Last Swapped** | Administrators |
 | **Modules** | Administrators |
 | **Files That Arrive Regularly** | Anyone who can read import templates, and only when a file is marked as arriving regularly |
-| **Quick Links** | Everyone |
+| **Quick Links**: People, Households, Organizations and Find | Everyone |
+| **Quick Gift Entry** quick link | Everyone, when Giving is installed and turned on in the Module Manager |
+| **BarnCRM Settings** quick link | Administrators |
 
 "Administrators" means anyone with the **Manage BarnCRM Settings** permission, which the
 **BarnCRM Admin** role carries. Staff without it see a shorter page: the welcome, the
-**New Household** button, and the quick links. They are not shown a checklist they cannot
+**New Person** and **New Household** buttons, and the quick links. They are not shown a checklist they cannot
 finish or an error count for a log they cannot open. The page does not work those numbers
 out for staff at all, so it loads faster for them; if you edit the page to show an
 administrator tile to staff, it shows nothing to count.
@@ -126,9 +137,12 @@ administrator tile to staff, it shows nothing to count.
 ## How Records Open: Tabs in a Console
 
 Every BarnCRM app shows a blue barn logo in the app launcher. The admin apps add a navy gear
-badge to it and have a navy header, so you can tell at a glance which app you are in; a module's
-app adds its own badge (a red heart for **BarnCRM Fundraising**, a green person for **BarnCRM
-Volunteers**).
+badge to it and have a navy header, so you can tell at a glance which app you are in; every other
+app, the module apps included, has the BarnCRM teal header (#007A9E). A module's
+app adds its own badge (a berry heart for **BarnCRM Fundraising**, a green person for **BarnCRM
+Volunteers**, a purple sprout for **BarnCRM Programs**, a bronze award ribbon for **BarnCRM
+Funders** and indigo flow arrows for **BarnCRM Logic Models**). No badge uses red, orange or
+yellow, because those colors mean an error or a warning elsewhere in BarnCRM.
 **BarnCRM Console** and
 **BarnCRM Admin Console** are console apps: instead of replacing the page each time you click,
 they keep the records you are working on open side by side in tabs across the top. In
@@ -197,10 +211,14 @@ Admin role.
    Automation** link to the Automation section of BarnCRM Settings. The warning disappears by
    itself when the pause expires.
 10. Look at **Modules**. It lists BarnCRM Core and each module installed in your org (with
-    Giving, that is Giving), and says for each whether it is on or installed and off. Click
+    Giving, that is Giving), each with its app's logo, and says for each whether it is on or
+    installed and off. Click
     **Open the Module Manager** to turn a module on or off.
-11. Use **Quick Links**, three icon tiles, to open Households, Organizations, or BarnCRM
-    Settings without going back to the app launcher.
+11. Use **Quick Links**, icon tiles, to open People, Households, Organizations, Find, Quick
+    Gift Entry (with Giving) or BarnCRM Settings without going back to the app launcher.
+12. Click **New Person** under the welcome to add someone; the household is made for them.
+    Once setup is finished, the welcome reads "Find someone, add someone new, or pick up
+    where you left off."
 
 That is the whole home page. Five minutes, and you know what is done, what is next, and
 whether anything went wrong.
@@ -260,9 +278,9 @@ compare it with the page that came with the package.
   **Data Manager** is in the BarnCRM apps too, for anyone with the Find and Export, Bulk Update
   or Bulk Delete permission. Someone without the admin role who has the Duplicate Review
   permission opens Org Optimizer or Duplicate Matching by typing its name in the app launcher.
-- **Looking for Find, Import or Super Transform in the navigation.** None is in any app's
+- **Looking for Find, Import or Super Transformer in the navigation.** None is in any app's
   navigation: open **Data Manager** and choose the **Find and Export Records**, **Import a
-  File** or **Update Many Records** (Super Transform) card. Recent bulk updates and their undo are under **Data
+  File** or **Super Transformer** card. Recent Super Transformer runs and their undo are under **Data
   Jobs** on the same page.
 - **Hiding a style and wondering why a person still has it as their default.** **App
   Navigation Style** takes the other style's apps away; the next time that person opens

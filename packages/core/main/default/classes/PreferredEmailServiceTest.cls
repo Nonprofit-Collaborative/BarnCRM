@@ -3,258 +3,261 @@
  */
 @IsTest(testFor='ApexClass:PreferredEmailService')
 private class PreferredEmailServiceTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.admin();
+	}
 
-    private static final String PERSONAL = 'maria.garcia@example.org';
-    private static final String WORK = 'mgarcia@springfieldfoodbank.example.org';
+	private static final String PERSONAL = 'maria.garcia@example.org';
+	private static final String WORK = 'mgarcia@springfieldfoodbank.example.org';
 
-    private static Contact mariaWithThreeAddresses() {
-        Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
-        maria.Personal_Email__c = PERSONAL;
-        maria.Work_Email__c = WORK;
-        return maria;
-    }
+	private static Contact mariaWithThreeAddresses() {
+		Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+		maria.Personal_Email__c = PERSONAL;
+		maria.Work_Email__c = WORK;
+		return maria;
+	}
 
-    @IsTest
-    static void choosingAnAddressFillsTheStandardEmailOnInsert() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            Contact maria = mariaWithThreeAddresses();
-            maria.Preferred_Email__c = 'Work';
+	@IsTest
+	static void choosingAnAddressFillsTheStandardEmailOnInsert() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+			Contact maria = mariaWithThreeAddresses();
+			maria.Preferred_Email__c = 'Work';
 
-            Test.startTest();
-            insert maria;
-            Test.stopTest();
+			Test.startTest();
+			insert maria;
+			Test.stopTest();
 
-            Assert.areEqual(
-                WORK,
-                [SELECT Email FROM Contact WHERE Id = :maria.Id].Email,
-                'The work address was copied into the standard email'
-            );
-        }
-    }
+			Assert.areEqual(
+				WORK,
+				[SELECT Email FROM Contact WHERE Id = :maria.Id].Email,
+				'The work address was copied into the standard email'
+			);
+		}
+	}
 
-    @IsTest
-    static void choosingAnAddressFillsTheStandardEmailOnUpdate() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            Contact maria = mariaWithThreeAddresses();
-            insert maria;
+	@IsTest
+	static void choosingAnAddressFillsTheStandardEmailOnUpdate() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+			Contact maria = mariaWithThreeAddresses();
+			insert maria;
 
-            Test.startTest();
-            update new Contact(Id = maria.Id, Preferred_Email__c = 'Personal');
-            Test.stopTest();
+			Test.startTest();
+			update new Contact(Id = maria.Id, Preferred_Email__c = 'Personal');
+			Test.stopTest();
 
-            Assert.areEqual(
-                PERSONAL,
-                [SELECT Email FROM Contact WHERE Id = :maria.Id].Email,
-                'The personal address was copied in on the save that made the choice'
-            );
-        }
-    }
+			Assert.areEqual(
+				PERSONAL,
+				[SELECT Email FROM Contact WHERE Id = :maria.Id].Email,
+				'The personal address was copied in on the save that made the choice'
+			);
+		}
+	}
 
-    @IsTest
-    static void changingTheChoiceCopiesTheOtherAddress() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            Contact maria = mariaWithThreeAddresses();
-            maria.Preferred_Email__c = 'Work';
-            insert maria;
+	@IsTest
+	static void changingTheChoiceCopiesTheOtherAddress() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+			Contact maria = mariaWithThreeAddresses();
+			maria.Preferred_Email__c = 'Work';
+			insert maria;
 
-            Test.startTest();
-            update new Contact(Id = maria.Id, Preferred_Email__c = 'Personal');
-            Test.stopTest();
+			Test.startTest();
+			update new Contact(Id = maria.Id, Preferred_Email__c = 'Personal');
+			Test.stopTest();
 
-            Assert.areEqual(
-                PERSONAL,
-                [SELECT Email FROM Contact WHERE Id = :maria.Id].Email,
-                'Maria changed jobs and only the choice moved'
-            );
-        }
-    }
+			Assert.areEqual(
+				PERSONAL,
+				[SELECT Email FROM Contact WHERE Id = :maria.Id].Email,
+				'Maria changed jobs and only the choice moved'
+			);
+		}
+	}
 
-    @IsTest
-    static void makingNoChoiceLeavesTheStandardEmailAlone() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            Contact maria = mariaWithThreeAddresses();
-            maria.Email = 'whatever.maria.typed@example.org';
+	@IsTest
+	static void makingNoChoiceLeavesTheStandardEmailAlone() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+			Contact maria = mariaWithThreeAddresses();
+			maria.Email = 'whatever.maria.typed@example.org';
 
-            Test.startTest();
-            insert maria;
-            update new Contact(Id = maria.Id, Work_Email__c = 'another@example.org');
-            Test.stopTest();
+			Test.startTest();
+			insert maria;
+			update new Contact(Id = maria.Id, Work_Email__c = 'another@example.org');
+			Test.stopTest();
 
-            Assert.areEqual(
-                'whatever.maria.typed@example.org',
-                [SELECT Email FROM Contact WHERE Id = :maria.Id].Email,
-                'An org that has not chosen an address sees no change at all'
-            );
-        }
-    }
+			Assert.areEqual(
+				'whatever.maria.typed@example.org',
+				[SELECT Email FROM Contact WHERE Id = :maria.Id].Email,
+				'An org that has not chosen an address sees no change at all'
+			);
+		}
+	}
 
-    @IsTest
-    static void choosingAnEmptyAddressRefusesTheSave() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            Contact maria = mariaWithThreeAddresses();
-            maria.Email = 'whatever.maria.typed@example.org';
-            insert maria;
-            String message;
+	@IsTest
+	static void choosingAnEmptyAddressRefusesTheSave() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+			Contact maria = mariaWithThreeAddresses();
+			maria.Email = 'whatever.maria.typed@example.org';
+			insert maria;
+			String message;
 
-            Test.startTest();
-            try {
-                update new Contact(Id = maria.Id, Preferred_Email__c = 'Alternate');
-            } catch (DmlException thrown) {
-                message = thrown.getDmlMessage(0);
-            }
-            Test.stopTest();
+			Test.startTest();
+			try {
+				update new Contact(Id = maria.Id, Preferred_Email__c = 'Alternate');
+			} catch (DmlException thrown) {
+				message = thrown.getDmlMessage(0);
+			}
+			Test.stopTest();
 
-            Assert.areEqual(
-                String.format(Label.Core_Emails_PreferredEmpty, new List<String>{ 'Alternate' }),
-                message,
-                'The save was refused with the message that names the empty address'
-            );
-            Assert.areEqual(
-                'whatever.maria.typed@example.org',
-                [SELECT Email FROM Contact WHERE Id = :maria.Id].Email,
-                'The standard email was not blanked'
-            );
-        }
-    }
+			Assert.areEqual(
+				String.format(
+					BarnHelp.text('Core', 'Core_Emails_PreferredEmpty'),
+					new List<String>{ 'Alternate' }
+				),
+				message,
+				'The save was refused with the message that names the empty address'
+			);
+			Assert.areEqual(
+				'whatever.maria.typed@example.org',
+				[SELECT Email FROM Contact WHERE Id = :maria.Id].Email,
+				'The standard email was not blanked'
+			);
+		}
+	}
 
-    @IsTest
-    static void twoHundredPeopleAreCopiedInOneSave() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Emailer');
-            for (Integer i = 0; i < people.size(); i++) {
-                people[i].Work_Email__c = 'person' + i + '@example.org';
-                people[i].Preferred_Email__c = 'Work';
-            }
+	@IsTest
+	static void twoHundredPeopleAreCopiedInOneSave() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+			List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Emailer');
+			for (Integer i = 0; i < people.size(); i++) {
+				people[i].Work_Email__c = 'person' + i + '@example.org';
+				people[i].Preferred_Email__c = 'Work';
+			}
 
-            Test.startTest();
-            insert people;
-            Test.stopTest();
+			Test.startTest();
+			insert people;
+			Test.stopTest();
 
-            Integer copied = 0;
-            for (Contact person : [
-                SELECT Email, Work_Email__c
-                FROM Contact
-                WHERE Id IN :people
-            ]) {
-                if (person.Email == person.Work_Email__c) {
-                    copied++;
-                }
-            }
-            Assert.areEqual(200, copied, 'Every person in the batch carries their work address');
-        }
-    }
+			Integer copied = 0;
+			for (Contact person : [
+				SELECT Email, Work_Email__c
+				FROM Contact
+				WHERE Id IN :people
+			]) {
+				if (person.Email == person.Work_Email__c) {
+					copied++;
+				}
+			}
+			Assert.areEqual(200, copied, 'Every person in the batch carries their work address');
+		}
+	}
 
-    @IsTest
-    static void anOrgWithoutThePersonEmailFieldSavesAnAccountUntouched() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-            // Both overrides on, so the account half runs as far as it can on an org shape that
-            // has no person email field to write: it must leave the save alone rather than fail.
-            // An org that has the field is an org with person accounts, where declaring the
-            // household a person would make the test write a person field onto a business
-            // account; there the household is left as what it is, and the account half must leave
-            // it alone for that reason instead (ADR-0013).
-            if (!Schema.SObjectType.Account.fields.getMap().containsKey('PersonEmail')) {
-                HouseholdService.personAccountOverride = true;
-                PersonRecordSelector.personRecordOverride = true;
-            }
-            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            household.Personal_Email__c = PERSONAL;
-            household.Preferred_Email__c = 'Personal';
+	@IsTest
+	static void anOrgWithoutThePersonEmailFieldSavesAnAccountUntouched() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+			// Both overrides on, so the account half runs as far as it can on an org shape that
+			// has no person email field to write: it must leave the save alone rather than fail.
+			// An org that has the field is an org with person accounts, where declaring the
+			// household a person would make the test write a person field onto a business
+			// account; there the household is left as what it is, and the account half must leave
+			// it alone for that reason instead (ADR-0013).
+			if (!Schema.SObjectType.Account.fields.getMap().containsKey('PersonEmail')) {
+				HouseholdService.personAccountOverride = true;
+				PersonRecordSelector.personRecordOverride = true;
+			}
+			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+			household.Personal_Email__c = PERSONAL;
+			household.Preferred_Email__c = 'Personal';
 
-            Test.startTest();
-            Database.insert(household, AccessLevel.SYSTEM_MODE);
-            Test.stopTest();
+			Test.startTest();
+			Database.insert(household, AccessLevel.SYSTEM_MODE);
+			Test.stopTest();
 
-            Assert.areEqual(
-                PERSONAL,
-                [SELECT Personal_Email__c FROM Account WHERE Id = :household.Id].Personal_Email__c,
-                'The account saved with its addresses and nothing was refused'
-            );
-        }
-    }
+			Assert.areEqual(
+				PERSONAL,
+				[SELECT Personal_Email__c FROM Account WHERE Id = :household.Id].Personal_Email__c,
+				'The account saved with its addresses and nothing was refused'
+			);
+		}
+	}
 
-    // ----------------------------------------------------------- its own automation row (PEOPLE-28)
+	// ----------------------------------------------------------- its own automation row (PEOPLE-28)
 
-    private static final String HOUSEHOLD_ROW = 'ContactTriggerHandler';
-    private static final String PREFERRED_EMAIL_ROW = 'Preferred_Email_Contact';
+	private static final String HOUSEHOLD_ROW = 'ContactTriggerHandler';
+	private static final String PREFERRED_EMAIL_ROW = 'Preferred_Email_Contact';
 
-    private static List<Contact> twoHundredWhoPreferWork() {
-        List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Emailer');
-        for (Integer i = 0; i < people.size(); i++) {
-            people[i].Work_Email__c = 'person' + i + '@example.org';
-            people[i].Preferred_Email__c = 'Work';
-        }
-        return people;
-    }
+	private static List<Contact> twoHundredWhoPreferWork() {
+		List<Contact> people = HouseholdTestDataFactory.manyContacts(200, 'Emailer');
+		for (Integer i = 0; i < people.size(); i++) {
+			people[i].Work_Email__c = 'person' + i + '@example.org';
+			people[i].Preferred_Email__c = 'Work';
+		}
+		return people;
+	}
 
-    private static Integer copied(List<Contact> people) {
-        Integer count = 0;
-        for (Contact person : [
-            SELECT Email, Work_Email__c
-            FROM Contact
-            WHERE Id IN :people
-            WITH SYSTEM_MODE
-        ]) {
-            if (person.Email == person.Work_Email__c) {
-                count++;
-            }
-        }
-        return count;
-    }
+	private static Integer copied(List<Contact> people) {
+		Integer count = 0;
+		for (Contact person : [
+			SELECT Email, Work_Email__c
+			FROM Contact
+			WHERE Id IN :people
+			WITH SYSTEM_MODE
+		]) {
+			if (person.Email == person.Work_Email__c) {
+				count++;
+			}
+		}
+		return count;
+	}
 
-    @IsTest
-    static void switchingHouseholdAutomationOffStillCopiesThePreferredEmail() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            TestDataFactory.insertAutomationSettings(
-                new Map<String, Boolean>{ HOUSEHOLD_ROW => false, PREFERRED_EMAIL_ROW => true }
-            );
-            List<Contact> people = twoHundredWhoPreferWork();
+	@IsTest
+	static void switchingHouseholdAutomationOffStillCopiesThePreferredEmail() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+			TestDataFactory.insertAutomationSettings(
+				new Map<String, Boolean>{ HOUSEHOLD_ROW => false, PREFERRED_EMAIL_ROW => true }
+			);
+			List<Contact> people = twoHundredWhoPreferWork();
 
-            Test.startTest();
-            insert people;
-            Test.stopTest();
+			Test.startTest();
+			insert people;
+			Test.stopTest();
 
-            Assert.areEqual(200, copied(people), 'The copy has its own switch, which is on.');
-            Assert.areEqual(
-                0,
-                [SELECT COUNT() FROM Contact WHERE Id IN :people AND AccountId != NULL],
-                'And household upkeep really was off: nobody was given a household.'
-            );
-        }
-    }
+			Assert.areEqual(200, copied(people), 'The copy has its own switch, which is on.');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Contact WHERE Id IN :people AND AccountId != NULL],
+				'And household upkeep really was off: nobody was given a household.'
+			);
+		}
+	}
 
-    @IsTest
-    static void switchingThePreferredEmailRowOffStopsTheCopy() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            TestDataFactory.insertAutomationSettings(
-                new Map<String, Boolean>{ HOUSEHOLD_ROW => true, PREFERRED_EMAIL_ROW => false }
-            );
-            List<Contact> people = twoHundredWhoPreferWork();
+	@IsTest
+	static void switchingThePreferredEmailRowOffStopsTheCopy() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+			TestDataFactory.insertAutomationSettings(
+				new Map<String, Boolean>{ HOUSEHOLD_ROW => true, PREFERRED_EMAIL_ROW => false }
+			);
+			List<Contact> people = twoHundredWhoPreferWork();
 
-            Test.startTest();
-            insert people;
-            update people;
-            Test.stopTest();
+			Test.startTest();
+			insert people;
+			update people;
+			Test.stopTest();
 
-            Assert.areEqual(0, copied(people), 'With its own row off nothing is copied.');
-            Assert.areEqual(
-                200,
-                [SELECT COUNT() FROM Contact WHERE Id IN :people AND AccountId != NULL],
-                'Household upkeep still ran: everybody has a household.'
-            );
-        }
-    }
+			Assert.areEqual(0, copied(people), 'With its own row off nothing is copied.');
+			Assert.areEqual(
+				200,
+				[SELECT COUNT() FROM Contact WHERE Id IN :people AND AccountId != NULL],
+				'Household upkeep still ran: everybody has a household.'
+			);
+		}
+	}
 }

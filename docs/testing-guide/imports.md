@@ -4,7 +4,7 @@ Scripts for the Import wizard: templates, preview, commit, rejected rows, row ru
 
 Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and, in `import-test-1.csv` row 4, use `Harper`, `Zztest`, `harper.zztest1@example.org` so the row matches Harper Zztest (without that match T-IMP-01 would show 4 created, 0 matched). Import only the test files here, never a real list. The **Data Manager** feature must be on (BarnCRM Settings, **General**, see [Data Manager](../admin-guide/data-manager.md)). These scripts assume people are stored as contacts.
 
-The Import tab opens from the **Data Manager** tab: select the **Import a File** tile. Save the test files below as UTF-8 CSV files with exactly these headings (the shipped **Generic contact list** template recognizes them; a new install calls it **People and Organizations List**, and an org installed before 2026-10-28 keeps **Generic contact list**, so read either name below as the one your org shows). For a migration-style file, the samples in [`docs/admin-guide/samples`](../admin-guide/samples) load through the Giving module's templates and are tested with Giving.
+The **Super Importer** tab opens from the **Data Manager** tab: select the **Super Importer** tile. Save the test files below as UTF-8 CSV files with exactly these headings (the shipped **Generic contact list** template recognizes them; a new install calls it **People and Organizations List**, and an org installed before 2026-10-28 keeps **Generic contact list**, so read either name below as the one your org shows). For a migration-style file, the samples in [`docs/admin-guide/samples`](../admin-guide/samples) load through the Giving module's templates and are tested with Giving.
 
 `import-test-1.csv` (5 rows: 3 new people, 1 existing sample person, 1 row with no last name):
 
@@ -35,17 +35,17 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Data Manager** tab and select the **Import a File** tile. | The **Import** tab opens on the card **Import a Spreadsheet**. A path across the top shows **Choose File Type**, **Upload File**, **Check Columns**, **Match Rows**, **Preview** and **Results**, with **Choose File Type** current. Below it, **What Are You Importing?** with the choice cards, each with an icon. **Next** and **Back** are not shown yet. A **Recent Imports** list shows below the wizard. |
+| 1 | Open the **Data Manager** tab and select the **Super Importer** tile. | The **Super Importer** tab opens on the card **Super Importer**. A path across the top shows **What You Are Importing**, **Upload File**, **Check Columns**, **Match Rows**, **Preview** and **Results**, with **What You Are Importing** current. Below it, **What Are You Importing?** with the choice cards, each with an icon. **Next** and **Back** are not shown yet. A **Recent Imports** list shows below the wizard. |
 | 2 | Under **What Are You Importing?**, choose **People and Organizations**, then in **Template** choose **Generic contact list**. | The cards stay, with **People and Organizations** marked as chosen and its name as a heading below them. The template's description appears under the picker ("A list of people with their contact details...") and the line "This file can create: people, households, organizations, links between people and organizations." **Next** is enabled, at the bottom right. |
-| 3 | Select **Next**. | **Upload File** is current on the path, with an **Upload file** control. **Back** shows at the bottom left. |
+| 3 | Select **Next**. | **Upload File** is current on the path, with a dashed drop area labeled **Upload or drop a file here** holding the file control. **Back** shows at the bottom left. |
 | 4 | Upload `import-test-1.csv`. | **Check Columns** is current on the path. **Columns are separated by** shows **Commas**. The table lists all 8 columns with **Column in Your File**, **What It Means** and **First Values**; First Name, Last Name and Email are mapped to person fields (for example "Person: first name"). |
 | 5 | Select **Next**. | **Match Rows** is current on the path. A collapsed **More Options** section sits below the matching choices. **Match a row to someone you already have by** shows **Email exact**, with its help text ("Matches only when the email in your file is exactly the email on the record..."). **When more than one record matches a row** shows **Reject the row**. |
 | 6 | Select **Preview**. | **Preview** is current on the path. Counts as big numbers: **Would create** 3, **Would update** 0, **Would match and change nothing** 1, **Would be rejected** 1. **Rows That Were Rejected** lists row 6 (Dee; the file's header line is row 1, so the fifth person is row 6) with a reason naming the missing last name ("Required value missing: last name..."). |
 | 7 | Search the org for "Testa Rivera". | No record found: the preview wrote nothing. |
-| 8 | Back on the Import tab, select **Import These Rows**. | "Working through the file. This page updates as it goes." shows, then **Results** is current on the path, with **Created** 3, **Updated** 0, **Matched, nothing changed** 1, **Rejected** 1, and the run log under **What Happened**. |
+| 8 | Back on the Super Importer tab, select **Import All {n} Rows**. | "Working through the file. This page updates as it goes." shows, then **Results** is current on the path, with **Created** 3, **Updated** 0, **Matched, nothing changed** 1, **Rejected** 1, and the run log under **What Happened**. |
 | 9 | Open the new contact Testa Rivera from global search, then open their household. | The household exists and its **Created By Import Batch** field links to this import. |
 | 10 | Open Harper Garcia. | Unchanged: the matched row created nothing and cleared nothing (empty cells never clear a person's fields). |
-| 11 | Back on the Import tab, open the **Download** menu (beside **Import Another File**, the main button) and select **Download Results**. | A CSV downloads with one line per file row and the columns **Row**, **Outcome**, **Reason**, **Person ID** (and the other ID columns) beside the file's own columns. Rows 2 to 4 read Created, row 5 Matched, row 6 Rejected with its reason (the header line is row 1). |
+| 11 | Back on the Super Importer tab, open the **Download** menu (beside **Import Another File**, the main button) and select **Download Results**. | A CSV downloads with one line per file row and the columns **Row**, **Outcome**, **Reason**, **Person ID** (and the other ID columns) beside the file's own columns. Rows 2 to 4 read Created, row 5 Matched, row 6 Rejected with its reason (the header line is row 1). |
 
 **Cleanup:** keep the import for T-IMP-02 and T-IMP-03; T-IMP-03 undoes it.
 
@@ -59,7 +59,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 | 1 | On the **Results** step, open the **Download** menu and select **Download Rejected Rows**. | A CSV downloads with one data row (Dee), with the file's columns plus Row and Reason. |
 | 2 | In the downloaded file, delete the **Email** column, save it as `retry-bad.csv`. Under **Retry Fixed Rows**, upload it as **File of fixed rows**. | Refused with "The fixed rows file is missing these columns of the original file: Email". Nothing is previewed. |
 | 3 | Open the downloaded file again, type `Nolast` into Dee's Last Name cell, save it as `retry-good.csv`, and upload it under **Retry Fixed Rows**. | A preview of that one row: **Would create** 1, **Would be rejected** 0. |
-| 4 | Select **Import These Rows**. | Results for the retry: **Created** 1. The import's rejected count is now 0. |
+| 4 | Select **Import All {n} Rows**. | Results for the retry: **Created** 1. The import's rejected count is now 0. |
 | 5 | Search the org for "Dee Nolast". | The contact exists, in a household of its own. |
 
 **Cleanup:** none; T-IMP-03 undoes both runs together.
@@ -72,7 +72,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab (Data Manager, **Import a File**, **Open**). | **Recent Imports** lists the import first, with **Started** and **Can be undone until** (30 days after it ran, unless the setting was changed) and a row menu holding **Undo**. |
+| 1 | Open the Super Importer tab (Data Manager, **Super Importer**, **Open**). | **Recent Imports** lists the import first, with **Started** and **Can be undone until** (30 days after it ran, unless the setting was changed) and a row menu holding **Undo**. |
 | 2 | Open the row menu beside it and select **Undo**. | A box headed "Undo" plus the import's name shows counts: **People to remove** 4, **Households to remove** 4, **Organizations to remove** 0, **Changed values to put back** 0, with **Cancel** and **Undo This Import**. Nothing has changed yet. The counts are the records the import created from your file; undo also removes the households and gift allocations BarnCRM created automatically for those rows, so on a large import the total removed can be higher. |
 | 3 | Select **Cancel**. | The box closes. The import is unchanged and **Undo** is still offered. |
 | 4 | Select **Undo** again, then **Undo This Import**. | "The undo has started. The import shows Undone when it has finished; refresh the page to check." |
@@ -92,7 +92,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 |---|---|---|
 | 1 | Import `import-test-1.csv` with **Generic contact list** as in T-IMP-01, steps 1 to 8. | **Created** 3, **Rejected** 1. |
 | 2 | Open the contact Ben Okoro, edit **Title** to `Edited after import`, and save. | Saved. |
-| 3 | Open the Import tab. Select **Undo** beside the import, then **Undo This Import**. | The undo starts. |
+| 3 | Open the Super Importer tab. Select **Undo** beside the import, then **Undo This Import**. | The undo starts. |
 | 4 | Select **Refresh** until the import reads **Undone**. | **Undone**. |
 | 5 | Search for Testa Rivera, Cara Lind and Ben Okoro. | Testa Rivera and Cara Lind are gone. Ben Okoro is still there, with his household. |
 | 6 | Read the Data Job's **Run Log**. | The undo line counts records kept (more than 0), and the import journal lists Ben Okoro as kept with "Kept: somebody changed this record, or logged an activity on it, after the import." |
@@ -106,22 +106,22 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab, choose **People and Organizations** and **Generic contact list**, select **Next**, and upload `broken.xlsx`. | "BarnCRM cannot read this Excel file. It may be an older .xls file or protected by a password. Save it as .xlsx or CSV and upload that." No columns step. |
+| 1 | Open the Super Importer tab, choose **People and Organizations** and **Generic contact list**, select **Next**, and upload `broken.xlsx`. | "BarnCRM cannot read this Excel file. It may be an older .xls file or protected by a password. Save it as .xlsx or CSV and upload that." No columns step. |
 | 2 | Upload `import-test-1.csv` instead and select **Next** on the columns step. | The matching step, with a collapsed **More Options** section. |
-| 3 | Open **More Options**, type `6` in **Rows in the file** under **Control Totals (Optional)**, and select **Preview**. | The run log says "Control total: the file has 5 rows, but 6 were expected. The import is refused until they agree." **Import These Rows** is disabled. |
-| 4 | Select **Back** to the matching step (**More Options** is already open, since a control total is set), change **Rows in the file** to `5`, and select **Preview**. | The run log says "Control total: the file has 5 rows, as expected." **Import These Rows** is enabled. |
+| 3 | Open **More Options**, type `6` in **Rows in the file** under **Control Totals (Optional)**, and select **Preview**. | The run log says "Control total: the file has 5 rows, but 6 were expected. The import is refused until they agree." **Import All {n} Rows** is disabled. |
+| 4 | Select **Back** to the matching step (**More Options** is already open, since a control total is set), change **Rows in the file** to `5`, and select **Preview**. | The run log says "Control total: the file has 5 rows, as expected." **Import All {n} Rows** is enabled. |
 
 **Cleanup:** none (nothing was imported). Select **Import Another File** or leave the page.
 
-## T-IMP-06: Try the First Rows, Then the Rest
+## T-IMP-06: Try a Few Rows First, Then the Rest
 
 **Purpose:** confirm a trial import saves only the first rows and the rest join the same import with one undo.
 **Prerequisites:** admin; `import-test-1.csv`.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Run `import-test-1.csv` through **Generic contact list** to the **Preview** step. | The four preview counts as in T-IMP-01, and a **Try the First Rows** section with **Rows to try** (25 by default). |
-| 2 | Set **Rows to try** to `2` and select **Import the First Rows**. | "The first 2 rows were imported. Check them above, then import the remaining 3 rows into the same import. If they are wrong, undo the import from Recent imports instead." |
+| 1 | Run `import-test-1.csv` through **Generic contact list** to the **Preview** step. | The four preview counts as in T-IMP-01, and a box headed **Not sure? Try a few rows first.** with **Rows to try** (25 by default) and a button **Import the First 25 Rows**. The footer button reads **Import All 5 Rows** (or **Import 4 of 5 Rows** when the preview rejects one). |
+| 2 | Set **Rows to try** to `2` and select **Import the First 2 Rows**. | "The first 2 rows were imported. Check them above, then import the remaining 3 rows into the same import. If they are wrong, undo the import from Recent imports instead." |
 | 3 | Search for Testa Rivera and Cara Lind. | Testa Rivera exists (first person in the file); Cara Lind (third) does not yet. |
 | 4 | Select **Import the Remaining Rows**. | Results for the whole file: **Created** 3, **Matched, nothing changed** 1, **Rejected** 1. |
 | 5 | Open **Recent Imports**. | One import for the file, not two. |
@@ -136,14 +136,14 @@ Cy,Dupe,cy.dupe@example.org,Active
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab, choose **People and Organizations** and **Generic contact list**, select **Next**, and upload `import-test-2.csv`. | The columns step. **Status** is set to **Do not load**. |
+| 1 | Open the Super Importer tab, choose **People and Organizations** and **Generic contact list**, select **Next**, and upload `import-test-2.csv`. | The columns step. **Status** is set to **Do not load**. |
 | 2 | Beside **Email**, select **Change Values**. Select **Add a Change** and choose **All lower case**. | A panel headed "Change values: Email" shows **The First Values, Before and After**: `ANA.RT@EXAMPLE.ORG` becomes `ana.rt@example.org`. |
 | 3 | Select **Done**. Beside **Last Name**, add **Capitalize each word** the same way and select **Done**. | The buttons now read **Change values (1)**. |
 | 4 | Under **Rows to Load**, **Skip Rows Where**, select **Add a Rule**: **Column** Status, **Test** **equals**, **Text** `cancelled`. | The rule is listed, with a **Remove Rule** button. |
 | 5 | Under **One Row Per**, choose **Email**. | Email is chosen. |
 | 6 | Select **Next**, then **Preview**. | **Would create** 2, **Would be rejected** 0. The run log says "2 rows were skipped by Skip Rows Where or One Row Per. They are listed with the file's rows, not as rejected." |
 | 7 | Read **Changed Values (First Rows)**. | Row 1 shows `ANA.RT@EXAMPLE.ORG` before and `ana.rt@example.org` after, and `RAMIREZ-TEST` before and `Ramirez-Test` after. |
-| 8 | Select **Import These Rows**, then undo the import from **Recent Imports**. | **Created** 2. After the undo, Ana Ramirez-Test and Cy Dupe are gone. |
+| 8 | Select **Import All {n} Rows**, then undo the import from **Recent Imports**. | **Created** 2. After the undo, Ana Ramirez-Test and Cy Dupe are gone. |
 
 **Cleanup:** the changes and rules are saved with the **Generic contact list** template. Upload `import-test-2.csv` with it again, remove both changes and the skip and one-row-per rules, and select **Preview**; then leave the page without importing.
 
@@ -178,10 +178,10 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab, choose **People and Organizations** and **Generic contact list**, select **Next**, upload `import-match.csv`, and select **Next**. | The matching step, with **Email exact** chosen. |
+| 1 | Open the Super Importer tab, choose **People and Organizations** and **Generic contact list**, select **Next**, upload `import-match.csv`, and select **Next**. | The matching step, with **Email exact** chosen. |
 | 2 | Leave **Also match with my duplicate rules** unticked and select **Preview**. | **Would create** 3: by email alone, nobody matches any row. |
 | 3 | Select **Back**, tick **Also match with my duplicate rules**, and select **Preview**. | **Would create** 2, **Would update** 1. Row 1 (Mara Stone) matches the existing Mara Stone through her address record, because the first and last names agree. Row 2 (Lee Brook, same address, different last name) and row 3 (Jana Stone, same address and last name, different first name) are not matched and would be created. |
-| 4 | Select **Import These Rows**. | **Created** 2, **Updated** 1. |
+| 4 | Select **Import All {n} Rows**. | **Created** 2, **Updated** 1. |
 | 5 | Open the existing Mara Stone. | **Email** is now `mara.stone.new@example.org`; **First Name** is still Mara. There is still only one Mara Stone. |
 | 6 | Open the import's Data Job record and its **Import Row** for row 1. | **Matched By Duplicate Rule** is ticked. On the rows for Lee Brook and Jana Stone it is not. |
 | 7 | Search for Lee Brook and Jana Stone. | Each is a new contact, not loaded into Mara Stone. |
@@ -197,12 +197,12 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Save a CSV `org-phone.csv` with the heading `Id,Phone` and one row: the record ID, then `555-0199`. | Saved. |
-| 2 | Open the Import tab. Under **What Are You Importing?**, choose **One Kind of Record**. | An **Object** picker, a **Template name** box and a **Create** button. **Create** is disabled until both are filled. |
-| 3 | Choose **Account** as **Object**, type `Test org phone update` as **Template name**, and select **Create**. | The new template is chosen in **Template**, and the line under it reads "Loads: Account". |
+| 2 | Open the Super Importer tab. Under **What Are You Importing?**, choose **One Kind of Record**. | A **Kind of record** picker, a **Template name** box and a **Create** button. **Create** is disabled until both are filled. |
+| 3 | Choose **Account** as **Kind of record**, type `Test org phone update` as **Template name**, and select **Create**. | The new template is chosen in **Template**, and the line under it reads "Loads: Account". |
 | 4 | Select **Next** and upload `org-phone.csv`. | The columns step. If **Id** is not already **Salesforce record ID**, choose it; **Phone** maps to the Phone field. Each column has an **Empty cells clear the field (update and upsert)** box. |
 | 5 | Select **Next**. | **What each row does** offers update choices only, for example **Update by record ID** and **Update by a field you choose**; **Create new records** is not offered for accounts. |
 | 6 | Choose **Update by record ID** and select **Preview**. | **Would update** 1, **Would be rejected** 0. |
-| 7 | Select **Import These Rows**. Open Bayview Hardware. | **Phone** reads `555-0199`. |
+| 7 | Select **Import All {n} Rows**. Open Bayview Hardware. | **Phone** reads `555-0199`. |
 | 8 | Open the **Data Manager** tab. | **Import Templates** lists **Test org phone update**. **Data Jobs** lists the import first. |
 | 9 | In **Data Jobs**, select **Undo** beside the import. | The box shows **Changed values to put back** 1 and 0 people, households and organizations to remove. |
 | 10 | Select **Undo This Import**, then **Refresh** until the job reads **Undone**. Open Bayview Hardware. | **Phone** is back to the value you noted. |
@@ -226,18 +226,18 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 ## T-IMP-12: What Are You Importing?
 
 **Purpose:** confirm each card on the first step opens what it should, the Gifts and Delete cards show only where they apply, and the line under a template says what it creates.
-**Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); a Core-only org for step 2 and an org with Giving installed for step 3; for step 5, a second admin without **Bulk Delete Records** and one with it (see [Bulk Update and Delete](bulk-update-and-delete.md)).
+**Prerequisites:** admin (see [Test users](before-you-test.md#test-users)); a Core-only org for step 2 and an org with Giving installed for step 3; for step 5, a second admin without **Bulk Delete Records** and one with it (see [Super Transformer and Bulk Delete](bulk-update-and-delete.md)).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab. | **What Are You Importing?** with an icon card for **People and Organizations**, **One Kind of Record**, **Several Objects in One File** and **Your Templates** (and **Gifts** and **Delete the Records a File Lists** where steps 3 and 5 say). Each card says what it creates. None is chosen and **Next** is not shown. |
+| 1 | Open the Super Importer tab. | **What Are You Importing?** with an icon card for **People and Organizations**, **One Kind of Record**, **Several Kinds of Record in One File** and **Your Templates** (and **Gifts** and **Delete the Records a File Lists** where steps 3 and 5 say). Each card says what it creates. None is chosen and **Next** is not shown. |
 | 2 | In a Core-only org, look at the cards. | There is no **Gifts** card. |
-| 3 | In an org with Giving installed, look at the cards, then choose **Gifts**. | A **Gifts** card shows. It is marked as chosen and the cards stay on screen. Its **Template** picker lists only gift templates (for example **Generic gift list**), the first is chosen, and **Next** is enabled. |
+| 3 | In an org with Giving installed, look at the cards, then choose **Gifts**. | A **Gifts** card shows. It is marked as chosen and the cards stay on screen. Its **Template** picker lists only gift templates (for example **Generic Gift List**), the first is chosen, and **Next** is enabled. |
 | 3a | Tab to the cards and press the arrow keys. | The choice moves from card to card like radio buttons, and what shows below follows the chosen card. |
 | 4 | Choose **People and Organizations**. | The **Template** picker lists only people templates and the first is chosen for you. The line under it says what it creates. **Next** is enabled. |
-| 5 | Log in as an admin without **Bulk Delete Records** and open the Import tab. Then log in as one with it. | The first sees no **Delete the Records a File Lists** card. The second sees it, with a warning icon. |
-| 6 | Choose **One Kind of Record**. | **Object**, **Template name** and **Create** show. **Next** is not shown until a template is created. Choose **Account**, name it `Test cards account`, select **Create**: the template is chosen and the line reads "Loads: Account". |
-| 7 | Choose **Several Objects in One File**. | **Objects to load** (a list to move objects across), **Template name** and **Create** show, with no **Object** picker. **Create** is disabled until an object is chosen and the template is named. T-IMP-17 covers the rest. |
+| 5 | Log in as an admin without **Bulk Delete Records** and open the Super Importer tab. Then log in as one with it. | The first sees no **Delete the Records a File Lists** card. The second sees it, with a warning icon. |
+| 6 | Choose **One Kind of Record**. | **Kind of record**, **Template name** and **Create** show. **Next** is not shown until a template is created. Choose **Account**, name it `Test cards account`, select **Create**: the template is chosen and the line reads "Loads: Account". |
+| 7 | Choose **Several Kinds of Record in One File**. | **Kinds of record to load** (a list to move kinds of record across), **Template name** and **Create** show, with no **Kind of record** picker. **Create** is disabled until a kind of record is chosen and the template is named. T-IMP-17 covers the rest. |
 | 8 | Select **Back** to the first step, then choose **Delete the Records a File Lists** (as the holder of **Bulk Delete Records**), choose **Contact**, name it `Test cards delete`, select **Create**. | The template is chosen and the line reads "Deletes: Contact". On the matching step **Delete by record ID** is chosen. |
 | 9 | Choose **One Kind of Record**, then **Delete the Records a File Lists** again, and choose an object whose records you may create or edit but not delete (for example a custom object your permission sets give Read, Create and Edit but not Delete). | "This object's records cannot be deleted by file, so the template creates or updates them instead. To pick another object, choose another card, then this one again." |
 | 10 | Choose **Your Templates**. | Every active template shows with its description, what it creates, and **Last loaded** with a date or **Not loaded yet**. Each has a **Use This Template** button. |
@@ -253,7 +253,7 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab and choose **People and Organizations**. | The first template is chosen and **Start a New Template From This One** shows under it. |
+| 1 | Open the Super Importer tab and choose **People and Organizations**. | The first template is chosen and **Start a New Template From This One** shows under it. |
 | 2 | Select **Start a New Template From This One**. | **New template name** shows prefilled "Copy of" plus the chosen template's name, with **Create**. |
 | 3 | Clear the name. | **Create** is disabled. |
 | 4 | Enter `Test event sign-ups` and select **Create**. | The new template is chosen under **Template**, **Next** is enabled and the line under it matches the source's ("This file can create: ..."). |
@@ -287,11 +287,11 @@ Nell,Ashby,nell.ashby@example.org,555-0303,Omar,Ashby,omar.ashby@example.org,555
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab and choose **People and Organizations**. | **People and Organizations List** is chosen first, with its creates line ("This file can create: people, households, organizations, links between people and organizations."). |
+| 1 | Open the Super Importer tab and choose **People and Organizations**. | **People and Organizations List** is chosen first, with its creates line ("This file can create: people, households, organizations, links between people and organizations."). |
 | 2 | Open the **Template** picker. | It also lists **Organization List** and **Couples and Households**. Choosing **Organization List** shows "This file can create: organizations."; choosing **Couples and Households** shows "This file can create: people, a second person per row, households." |
 | 3 | Choose **Organization List**, select **Next**, upload `import-test-orgs.csv`, select **Next** through the column check, then **Preview**. Import. | The preview shows **would create** 3 and **would be rejected** 0. After the import, the three organizations exist with the street, city, state, postal code and country in the billing address, plus phone and website, and no new people or households. |
 | 4 | Select **Import Another File**, choose **People and Organizations**, then **Couples and Households**, upload `import-test-couples.csv`, preview and import. | The preview shows **would create** 2 (one per row) and **would be rejected** 0. After the import, **Tolliver Household** holds Mira and Dean Tolliver and **Ashby Household** holds Nell and Omar Ashby: one household with two members per row. |
-| 5 | In an org installed before 2026-10-28 that has **Generic contact list**, open the Import tab after the upgrade and choose **People and Organizations**. | The first template is still named **Generic contact list** (never renamed), and **Organization List** and **Couples and Households** are listed as well. |
+| 5 | In an org installed before 2026-10-28 that has **Generic contact list**, open the Super Importer tab after the upgrade and choose **People and Organizations**. | The first template is still named **Generic contact list** (never renamed), and **Organization List** and **Couples and Households** are listed as well. |
 
 **Cleanup:** undo both imports from **Recent Imports** (see T-IMP-03).
 
@@ -306,7 +306,7 @@ Nell,Ashby,nell.ashby@example.org,555-0303,Omar,Ashby,omar.ashby@example.org,555
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab, choose **One Kind of Record**, choose **Contact**, name the template `Test sheets contact`, select **Create**, then **Next**, and upload `import-test-sheets.xlsx`. | **Sheets to load** lists **Read me (0 rows)**, **2025 (1 rows)** and **2026 (2 rows)**, with **2025** and **2026** chosen and **Read me** not chosen. |
+| 1 | Open the Super Importer tab, choose **One Kind of Record**, choose **Contact**, name the template `Test sheets contact`, select **Create**, then **Next**, and upload `import-test-sheets.xlsx`. | **Sheets to load** lists **Read me (0 rows)**, **2025 (1 rows)** and **2026 (2 rows)**, with **2025** and **2026** chosen and **Read me** not chosen. |
 | 2 | Look at the columns. | One row each for **First Name**, **Last Name**, **Email** and **Phone**: `Contact.First Name` on the 2026 sheet joined **First Name** (both map to First Name). |
 | 3 | Look at the **Examples** column. | **First Name** shows `Sheeta`, `Sheetb`, `Sheetc`, one per line; **Phone** shows `555-0601` and `(blank)`; **Email** shows `sheeta.zztest@example.org` only. |
 | 4 | Clear **2025**. | The columns are read again: **Email** is gone, and the **First Name** examples are `Sheetb` and `Sheetc`. |
@@ -329,17 +329,17 @@ Make `contacts_2026.xlsx` with two sheets: **Contacts** (headings `First Name` a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab, choose **One Kind of Record**, and under **Suggest the object from a file** choose `import-test-two-part.csv`. | **Object** is set to **Contact**, with "Suggested from your file: Contact. Change it if it is not right." |
-| 2 | Change **Object** to **Account**, then back to **Contact**. Name the template `Test two-part contact`, select **Create**, then **Next**. | The file is read without a second upload. **Contact.First Name** maps to First Name, **Last Name (Contact)** to Last Name, **Contact: Phone** to the Phone field (labelled Business Phone in most orgs), **Contact_Email** to Email. **Account.Name** and **Contact.Shoe Size** are **Do not load**. |
+| 1 | Open the Super Importer tab, choose **One Kind of Record**, and under **Suggest the kind of record from a file** choose `import-test-two-part.csv`. | **Kind of record** is set to **Contact**, with "Suggested from your file: Contact. Change it if it is not right." |
+| 2 | Change **Kind of record** to **Account**, then back to **Contact**. Name the template `Test two-part contact`, select **Create**, then **Next**. | The file is read without a second upload. **Contact.First Name** maps to First Name, **Last Name (Contact)** to Last Name, **Contact: Phone** to the Phone field (labelled Business Phone in most orgs), **Contact_Email** to Email. **Account.Name** and **Contact.Shoe Size** are **Do not load**. |
 | 3 | Change **Account.Name** to any Contact field, then back to **Do not load**. | Each mapping can be changed as before. |
-| 4 | Select **Back** to the first step, choose **One Kind of Record** again, and under **Suggest the object from a file** choose `contacts_2026.xlsx`. | **Object** is set to **Contact**. "The file's sheets point at different objects." with **Contacts: Contact** and **Accounts: Account** listed. |
+| 4 | Select **Back** to the first step, choose **One Kind of Record** again, and under **Suggest the kind of record from a file** choose `contacts_2026.xlsx`. | **Kind of record** is set to **Contact**. "The file's sheets point at different objects." with **Contacts: Contact** and **Accounts: Account** listed. |
 | 5 | Name the template `Test sheets suggest`, select **Create**, then **Next**. | Both sheets are chosen. The step says the sheets you chose point at different objects, lists **Contacts: Contact** and **Accounts: Account**, and **Next** is disabled. |
 | 6 | Clear **Accounts**. | The message is gone and **Next** is enabled. |
-| 7 | Choose **One Kind of Record**, and under **Suggest the object from a file** choose a file named `budget.csv` with the heading `Amount`. | "Nothing in the file names an object you can load. Choose one from the list." No object is chosen. |
+| 7 | Choose **One Kind of Record**, and under **Suggest the kind of record from a file** choose a file named `budget.csv` with the heading `Amount`. | "Nothing in the file names an object you can load. Choose one from the list." No object is chosen. |
 
 **Cleanup:** none; nothing was imported. Deactivate the `Test two-part contact` and `Test sheets suggest` templates if you do not keep them.
 
-## T-IMP-17: Several Objects in One File
+## T-IMP-17: Several Kinds of Record in One File
 
 **Purpose:** confirm one upload loads several objects: each sheet into its own object, several objects from one row through two-part headings, records on a row linked, records on another sheet linked by a lookup column, parents before children, a failed parent rejecting its row, and one undo for all (C-49c, D-154).
 **Prerequisites:** admin; no real data; a test contact whose record ID you have. Accounts are update-only in an import, so first create two accounts by hand: `Zzsev Org A` and `Zzsev Org B`. Make `import-test-several.xlsx` with two sheets, in this order:
@@ -357,18 +357,18 @@ Zzsev Nowhere,Volunteer,<contact record ID>,Zzsev Title
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab, choose **Several Objects in One File**, and under **Suggest the object from a file (optional)** choose `import-test-several.xlsx`. | **Objects to load** already holds **Affiliation** and **Account** (from the sheet names). |
+| 1 | Open the Super Importer tab, choose **Several Kinds of Record in One File**, and under **Suggest the kind of record from a file (optional)** choose `import-test-several.xlsx`. | **Kinds of record to load** already holds **Affiliation** and **Account** (from the sheet names). |
 | 2 | Name the template `Test several sheets` and select **Create**. | The template is chosen and the line reads "Loads: Account, Affiliation". |
 | 3 | Select **Next**. | The file is read without a second upload. **Object for Affiliations** is **Affiliation** and **Object for Accounts** is **Account**. The columns list **Account Name** and **Phone** first (the parents' sheet loads first, whatever the file's order), then **Organization** and **Role**. |
 | 4 | Map **Organization** to the affiliation's organization field and set **Find it by** to **Account Name**. Select **Next**. | One box per object, Account first, each with **What each row does**; Account offers only the updates. Below the boxes, one **When a lookup finds no record** choice. |
-| 5 | For **Account** choose **Update by a field you choose**, with **Match rows on** set to **Account Name**; leave **Affiliation** on **Create new records**. Select **Dry Run**. | 4 rows: the 2 Accounts rows would update their accounts, the 2 Affiliations rows would each create an affiliation. Nothing is written. |
+| 5 | For **Account** choose **Update by a field you choose**, with **Match rows on** set to **Account Name**; leave **Affiliation** on **Create new records**. Select **Preview**. | 4 rows: the 2 Accounts rows would update their accounts, the 2 Affiliations rows would each create an affiliation. Nothing is written. |
 | 6 | Select **Commit**, then open each new affiliation. | Each points at its organization. |
 | 7 | Run the template again and, on the column step, change **Object for Accounts** to **Affiliation**, then back to **Account**. | The sheet's columns are mapped again for the chosen object each time. Leave without loading. |
-| 8 | Create `Test several one row` from **Several Objects in One File** with **Account**, **Affiliation** and **Contact**, upload `import-test-one-row.csv`, and go to the matching step. | Under **Affiliation**, lines say each affiliation is linked to the Account record and to the Contact record on its row. |
-| 9 | Set **Account** to update by **Account Name** and **Contact** to **Update by record ID**, then dry run and commit. | Row 1 updates the account and the contact's Title and creates an affiliation linked to both, with no column for either link. Row 2 is rejected with a reason starting "Account:"; its contact is not updated again and its affiliation is not created, since both point at the account. A contact with an account keeps it; one with none gets `Zzsev Org A`. |
+| 8 | Create `Test several one row` from **Several Kinds of Record in One File** with **Account**, **Affiliation** and **Contact**, upload `import-test-one-row.csv`, and go to the matching step. | Under **Affiliation**, lines say each affiliation is linked to the Account record and to the Contact record on its row. |
+| 9 | Set **Account** to update by **Account Name** and **Contact** to **Update by record ID**, then preview and commit. | Row 1 updates the account and the contact's Title and creates an affiliation linked to both, with no column for either link. Row 2 is rejected with a reason starting "Account:"; its contact is not updated again and its affiliation is not created, since both point at the account. A contact with an account keeps it; one with none gets `Zzsev Org A`. |
 | 9a | Make `Test several retry` with **Relationship** (on **Create new records**) and **Affiliation**, and load a one-row file whose relationship is valid (two test contacts, a Type and a Status) and whose affiliation role is over 255 characters. Note the relationship count, then download the exceptions file, shorten the role, keep the **Row** column, and retry it. | The first commit creates the relationship and rejects the row with a reason starting "Affiliation:". The retry creates the affiliation only: the relationship count is unchanged. |
 | 10 | Undo all three imports from **Recent Imports**. | The affiliations and the relationship are deleted once each, and the phones and the contact's Title go back to what they were. |
-| 11 | Open a one-object template saved with **Related records** before this change, if the org has one, and dry run a file. | It still shows **Related records** under a parent key and loads both as before. |
+| 11 | Open a one-object template saved with **Related records** before this change, if the org has one, and preview a file. | It still shows **Related records** under a parent key and loads both as before. |
 
 **Cleanup:** deactivate the test templates and delete the test accounts.
 
@@ -402,34 +402,35 @@ Dot,Zzshirt,dot.zzshirt@example.org,M,2026-10-04
 ## T-IMP-19: Delete Import Rows, and Undo After the Rows Are Deleted
 
 **Purpose:** confirm the Delete Import Rows choice decides when the nightly cleanup deletes an import's rows, and that undo still works once they are gone.
-**Prerequisites:** admin; `import-test-1.csv`; Health Check shows **Import row cleanup** scheduled (or run its **Schedule All Nightly Jobs** fix). Step 4 is checked the morning after.
+**Prerequisites:** admin; `import-test-1.csv`; Health Check shows the nightly run scheduled (or run its **Schedule All Nightly Jobs** fix). Step 4 is checked the morning after, once Record Cleanup has run (twenty past one).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Import**. | **Delete Import Rows** shows **After 30 Days**, never a blank box, with the choices **Once Complete**, **After 30 Days**, **After 90 Days** and **Never**. |
+| 1 | Open **BarnCRM Settings**, **Import**. | **Delete import rows** shows **After 30 Days**, never a blank box, with the choices **Once Complete**, **After 30 Days**, **After 90 Days** and **Never**. |
 | 2 | Choose **Once Complete** and save. | Saved for the whole org. |
 | 3 | Import `import-test-1.csv` with **Generic contact list** as in T-IMP-01, steps 1 to 8. Open the import's **Data Job** record (from the **Data Jobs** list view). | **Created** 3, **Rejected** 1. Its **Import Rows** related list shows 4 rows. |
 | 4 | The next morning, open the same Data Job record. | **Import Rows** is empty; the counts and **Run Log** are unchanged. |
-| 5 | Open the Import tab and open the row menu beside the import and select **Undo**, then **Undo This Import**. Refresh until it reads **Undone**. | **Undone**. Testa Rivera, Ben Okoro and Cara Lind are gone: undo never needed the rows. |
-| 6 | Set **Delete Import Rows** back to **After 30 Days** and save. | Saved. |
+| 5 | Open the Super Importer tab and open the row menu beside the import and select **Undo**, then **Undo This Import**. Refresh until it reads **Undone**. | **Undone**. Testa Rivera, Ben Okoro and Cara Lind are gone: undo never needed the rows. |
+| 6 | Set **Delete import rows** back to **After 30 Days** and save. | Saved. |
+| 7 | Only in an org that has an import left in **Draft**, **Parsing** or **Dry run** (a wizard abandoned) that was started more than **Days to keep import history** ago (365 by default; the lowest setting is 30): check it in the **Data Jobs** list view the morning after Record Cleanup has run. | That import and its rows are gone. An abandoned import started more recently, and a finished import that can still be undone, are still there. |
 
 **Cleanup:** none.
 
 ## T-IMP-20: Browse Import Rows, Correct a Rejected Row and Retry It
 
 **Purpose:** confirm a rejected row can be found, corrected on screen beside its file values, and retried into the same import by anyone who runs imports, not only the person who committed it, and that one undo still covers it.
-**Prerequisites:** admin; a second user with BarnCRM Admin (the import permission); a third user with BarnCRM Staff only; **Delete Import Rows** is not **Once Complete**; `import-test-1.csv`.
+**Prerequisites:** admin; a second user with BarnCRM Admin (the import permission); a third user with BarnCRM Staff only; **Delete import rows** is not **Once Complete**; `import-test-1.csv`.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Import `import-test-1.csv` with **Generic contact list** as in T-IMP-01, steps 1 to 8. | **Created** 3, **Rejected** 1 (Dee, no last name). |
-| 2 | In the **BarnCRM Admin** app, open the **Import Rows** tab and choose each list view: **All Import Rows**, **Rejected Import Rows**, **Rejected Rows of Complete Imports**. | Each shows rows with **Import Batch**, **Row Number**, **Status** and **Data Job Status**; the rejected views show Dee's row with **Data Job Status** Complete. |
+| 2 | In the **BarnCRM Admin** app, open **Import Rows** from the App Launcher (it is not in the navigation bar) and choose each list view: **All Import Rows**, **Rejected Import Rows**, **Rejected Rows of Complete Imports**. | Each shows rows with **Import Batch**, **Row Number**, **Status** and **Data Job Status**; the rejected views show Dee's row with **Data Job Status** Complete. |
 | 3 | Log in as the Staff-only user and open Dee's row from the import's Data Job record (**Import Rows** list). | The card is read only and says you need the Manage BarnCRM Settings permission. |
 | 4 | Log in as the second user (not the one who committed the import) and open Dee's row. | A **Super Importer Row** card shows **Status** Rejected, a link to the import, **Why It Was Rejected**, and a table of **Column**, **File Value** and **Corrected Value** for every column of the file. |
 | 5 | Type `Nolast` in **Corrected Value** beside **Last Name** and select **Save Corrections**. | "Corrections saved. The file's values are kept beside them." **File Value** for Last Name is still empty; **Raw Values** in the details below is unchanged; "1 corrected rows in this import are ready to retry." |
 | 6 | Select **Retry This Row**, wait a moment, then **Refresh**. | "The retry has started." Then **Status** reads Created and the inputs are gone. Dee Nolast exists, and the import's **Rejected** count is 0; its **Run Log** ends with "Retried 1 rows corrected on screen." |
 | 7 | Open a **Created** row of the same import. | The card shows its values read only, with no buttons. |
-| 8 | Log back in as the admin who committed the import and undo it from the Import tab (see T-IMP-03). | Testa Rivera, Ben Okoro, Cara Lind and Dee Nolast are all removed: one undo covers the other user's retry. |
+| 8 | Log back in as the admin who committed the import and undo it from the Super Importer tab (see T-IMP-03). | Testa Rivera, Ben Okoro, Cara Lind and Dee Nolast are all removed: one undo covers the other user's retry. |
 
 **Cleanup:** none.
 
@@ -454,11 +455,11 @@ Guessb,Other,Zztest
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab, choose **One Kind of Record**, and under **Suggest the object from a file** choose `Contcts.csv`. | **Object** is set to **Contact**, and the suggestion line shows an amber **Best Guess, Check It** badge. |
+| 1 | Open the Super Importer tab, choose **One Kind of Record**, and under **Suggest the kind of record from a file** choose `Contcts.csv`. | **Kind of record** is set to **Contact**, and the suggestion line shows an amber **Best Guess, Check It** badge. |
 | 2 | Name the template `Test best guess`, select **Create**, then **Next**. | **Frist Name** is mapped to **First Name**, **Emial** to **Email** and **Mobil Phone** to **Mobile Phone**, each with the amber **Best Guess, Check It** badge and **Accept**. **Last Name** is mapped with no badge. **Shoe Size** is **Do not load**, with no badge. Above the columns: "Columns with a best guess: 3. Accept each guess, or choose another field, before you go on." with **Accept All Guesses**. **Next** is disabled. |
 | 3 | Select **Accept** beside **Frist Name**. Change **Mobil Phone** to **Do not load**. | Both badges are gone; the line now counts 1 and **Next** is still disabled. |
 | 4 | Select **Accept All Guesses**. | No badge is left, the line is gone and **Next** is enabled. |
-| 5 | Select **Next**, keep **Create new records**, then **Dry Run**. | **would create** 1, **would be rejected** 0. Nothing is written. |
+| 5 | Select **Next**, keep **Create new records**, then **Preview**. | **would create** 1, **would be rejected** 0. Nothing is written. |
 | 6 | Select **Back** twice to the columns, then use the template again with `import-test-exact-wins.csv`. | **First Name** is mapped to **First Name** with no badge; **Frist Name** is **Do not load** with no badge, because the exact heading took the field. **Next** is enabled. |
 
 **Cleanup:** none; nothing was imported. Deactivate `Test best guess` if you do not keep it.
@@ -487,12 +488,57 @@ ana.rowe@example.org,Rivergate Library,Volunteer,true,2026-03-01
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab and choose **Your Templates**. | **Relationships** and **Affiliations** are listed, each with its description. |
+| 1 | Open the Super Importer tab and choose **Your Templates**. | **Relationships** and **Affiliations** are listed, each with its description. |
 | 2 | Choose **Relationships**, upload `import-test-relationships.csv`, preview. | **would create** 2, **would be rejected** 0. |
 | 3 | Import. Open Ana Rowe. | Ana shows Ben as Child, Ben shows Ana as Parent: each other side exists once, so 4 relationship records in all. Cy and Ana each show the other as Friend. |
 | 4 | Import `import-test-relationships.csv` again. | **would be rejected** 2 with "already has this relationship"; no new records. |
 | 5 | Choose **Affiliations**, upload `import-test-affiliations.csv`, preview and import. | 3 created. Cy shows **Harbor Youth Club** as **Primary Affiliation**. Ana has two rows flagged primary and shows **Rivergate Library**, the last one in the file, as primary; her Harbor Youth Club affiliation is not primary. |
 | 6 | Import `import-test-affiliations.csv` again. | 3 rejected with "already has an affiliation ... covering those dates"; nothing changes. |
-| 7 | In an org installed before this release, open the Import tab after the upgrade. | **Relationships** and **Affiliations** are added; existing templates are unchanged. |
+| 7 | In an org installed before this release, open the Super Importer tab after the upgrade. | **Relationships** and **Affiliations** are added; existing templates are unchanged. |
 
 **Cleanup:** undo both imports from **Recent Imports** (see T-IMP-03); delete the test contacts and organization.
+
+## T-IMP-23: Reorder Value Changes
+
+**Purpose:** confirm the changes on a column can be reordered by button and by drag, on a desktop, a phone and with a screen reader.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Upload `import-test-2.csv` as in T-IMP-07. Beside **Last Name**, select **Change Values**, then add **Capitalize each word** and **Find and replace** (find `-TEST`, replace with nothing). | Two changes, in that order. The first one's **Move Up** arrow and the last one's **Move Down** arrow are greyed out. |
+| 2 | On the second change, select **Move Up** with the keyboard (Tab to it, press Enter). | **Find and replace** is now first; the before and after preview updates. A screen reader says "Find and replace, position 1 of 2." |
+| 3 | Drag the handle at the left of **Find and replace** below **Capitalize each word** with the mouse, then press Escape halfway through a second drag. | The first drag swaps them back; a blue line shows where the change lands. The cancelled drag changes nothing. |
+| 4 | Tab to a change's handle, press Space, press the down arrow, press Space. | A screen reader hears "Picked up", the new position, then "Moved". The change moves down one place. |
+| 5 | On a phone (or the browser's device view), press and hold a change's handle, then drag it. A quick swipe on the handle instead scrolls the page. | The change moves after the hold; the swipe only scrolls. |
+| 6 | Open **Super Transformer**, choose a text field and **Change With Steps**, add two steps and repeat step 2. | The steps move the same way. |
+
+**Cleanup:** leave the page without importing.
+
+## T-IMP-24: Drop Area, Row Counts on the Buttons and See Every Row
+
+**Purpose:** confirm the file drop area, the buttons that name their row counts, and the link from Results to every row of the import.
+**Prerequisites:** admin; `import-test-1.csv` (5 rows, one of which the preview rejects).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Super Importer**, choose **People and Organizations**, **Next**. | A dashed area labeled **Upload or drop a file here** holds the file control. |
+| 2 | Drag `import-test-1.csv` from your computer onto the area. | The file is read as if chosen with the control; the columns step opens on **Next**. On a phone the file picker does the same. |
+| 3 | Go on to **Preview**. | The footer button reads **Import 4 of 5 Rows**; with a file that rejects nothing it reads **Import All {n} Rows**. Above it, a box headed **Not sure? Try a few rows first.** has a button **Import the First 25 Rows** (it follows the number in **Rows to try**). |
+| 4 | Import the file. On **Results**, select **See Every Row**. | The data job's **Import Rows** list opens with one row per file row, including the rejected one. The **Import Rows** tab is not in the BarnCRM Admin app's navigation bar. |
+
+**Cleanup:** undo the import from **Recent Imports** (see T-IMP-03).
+
+## T-IMP-25: Search the Field Picker and Drag a Suggested Field
+
+**Purpose:** confirm the searchable field picker and the draggable suggestions, by mouse, keyboard and phone.
+**Prerequisites:** admin; a CSV with headings `Email`, `Nickname`, `Favorite Color` and one row.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Upload the file with **People and Organizations**. On **Check Columns**, select the picker beside **Email** and type `second`. | The list narrows to fields with **Second person**; **Do not load** stays at the top; a screen reader hears how many fields match. |
+| 2 | Clear the text, press the Down arrow, then Enter on a field. | The field is chosen and the list closes. The same field in another column's list is marked **In use**. |
+| 3 | Set **Nickname** to **Do not load**. Look beside the table. | **Suggested Fields** lists fields that look like the unmatched headings. **Favorite Color** adds none. |
+| 4 | Drag a suggested field onto the **Nickname** row. | The row shows a dashed outline while you drag; on drop the picker reads that field and the suggestion leaves the list. |
+| 5 | Press Space on another suggestion, press Right until a column is named, press Space. | A screen reader hears the pick up, each column, then the drop; the column is mapped. Escape instead cancels. |
+| 6 | On a phone, press and hold a suggestion, then drag it onto a column. | It maps after the hold; a quick swipe scrolls instead. |
+
+**Cleanup:** leave the page without importing.

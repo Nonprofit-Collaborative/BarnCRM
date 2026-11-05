@@ -9,14 +9,6 @@
         <value>Rollups Last Completed</value>
     </labels>
     <labels>
-        <fullName>Core_Rollups_FreshnessNever</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Freshness tile text when nothing has been calculated.</shortDescription>
-        <value>Rollups have not been calculated yet.</value>
-    </labels>
-    <labels>
         <fullName>Core_Rollups_FreshnessStale</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

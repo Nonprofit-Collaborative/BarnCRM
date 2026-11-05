@@ -6,667 +6,707 @@
  */
 @IsTest(testFor='ApexClass:HouseholdOfPersonController')
 private class HouseholdOfPersonControllerTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
-    }
-
-    @IsTest
-    static void aContactPointsAtItsHouseholdInTheSimpleWay() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
-            household.Household_Formal_Greeting__c = 'Mr. John Smith';
-            household.Member_Count__c = 1;
-            Database.insert(household, AccessLevel.SYSTEM_MODE);
-            Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
-            john.AccountId = household.Id;
-            insert john;
-
-            Test.startTest();
-            List<HouseholdOfPersonController.HouseholdView> households = HouseholdOfPersonController.getHouseholdsForPerson(
-                john.Id
-            );
-            Test.stopTest();
-
-            Assert.areEqual(1, households.size(), 'John is in one household');
-            Assert.areEqual(household.Id, households[0].householdId, 'It is the one he points at');
-            Assert.areEqual(1, households[0].memberCount, 'The member count is shown');
-            Assert.isTrue(
-                String.isNotBlank(households[0].formalGreeting),
-                'The formal greeting is shown'
-            );
-            Assert.isTrue(String.isNotBlank(households[0].name), 'The household is named');
-        }
-    }
-
-    @IsTest
-    static void aContactWhoPointsAtAnOrganizationIsInNoHousehold() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            HouseholdService.suspendAutomaticCreation();
-            Account organization = new Account(Name = 'The Union Foundation');
-            insert organization;
-            Contact harper = HouseholdTestDataFactory.newContact('Ms.', 'Harper', 'Garcia');
-            harper.AccountId = organization.Id;
-            insert harper;
-
-            Test.startTest();
-            List<HouseholdOfPersonController.HouseholdView> households = HouseholdOfPersonController.getHouseholdsForPerson(
-                harper.Id
-            );
-            Test.stopTest();
-
-            Assert.isTrue(households.isEmpty(), 'An organization is not a household');
-        }
-    }
-
-    @IsTest
-    static void aMembershipRecordPointsAtTheHouseholdInTheFlexibleWay() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            Database.insert(household, AccessLevel.SYSTEM_MODE);
-            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
-            insert maria;
-            insert new Household_Member__c(
-                Household__c = household.Id,
-                Contact__c = maria.Id,
-                Role__c = 'Head',
-                Is_Primary__c = true,
-                Start_Date__c = Date.today()
-            );
-
-            Test.startTest();
-            List<HouseholdOfPersonController.HouseholdView> households = HouseholdOfPersonController.getHouseholdsForPerson(
-                maria.Id
-            );
-            Test.stopTest();
-
-            Assert.areEqual(1, households.size(), 'Maria is in one household');
-            Assert.areEqual(
-                household.Id,
-                households[0].householdId,
-                'It is the one her membership names'
-            );
-        }
-    }
-
-    @IsTest
-    static void aPersonWithNoMembershipIsInNoHousehold() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
-            insert wei;
-
-            Test.startTest();
-            List<HouseholdOfPersonController.HouseholdView> households = HouseholdOfPersonController.getHouseholdsForPerson(
-                wei.Id
-            );
-            Test.stopTest();
-
-            Assert.isTrue(households.isEmpty(), 'Nobody has joined Wei to a household yet');
-        }
-    }
-
-    @IsTest
-    static void askingAboutNobodyIsAnsweredWithNothing() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-
-            Test.startTest();
-            List<HouseholdOfPersonController.HouseholdView> households = HouseholdOfPersonController.getHouseholdsForPerson(
-                null
-            );
-            Test.stopTest();
-
-            Assert.isTrue(households.isEmpty(), 'No person, no household');
-        }
-    }
-
-    @IsTest
-    static void makePrimaryMovesTheFlagToThePersonChosen() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            Database.insert(household, AccessLevel.SYSTEM_MODE);
-            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
-            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
-            insert new List<Contact>{ maria, wei };
-            Household_Member__c mariaRow = new Household_Member__c(
-                Household__c = household.Id,
-                Contact__c = maria.Id,
-                Is_Primary__c = true,
-                Start_Date__c = Date.today()
-            );
-            Household_Member__c weiRow = new Household_Member__c(
-                Household__c = household.Id,
-                Contact__c = wei.Id,
-                Is_Primary__c = false,
-                Start_Date__c = Date.today()
-            );
-            insert new List<Household_Member__c>{ mariaRow, weiRow };
-
-            Test.startTest();
-            HouseholdOfPersonController.makePrimary(household.Id, wei.Id);
-            Test.stopTest();
-
-            Map<Id, Household_Member__c> rows = new Map<Id, Household_Member__c>(
-                [
-                    SELECT Id, Is_Primary__c
-                    FROM Household_Member__c
-                    WHERE Household__c = :household.Id
-                ]
-            );
-            Assert.isTrue(rows.get(weiRow.Id).Is_Primary__c, 'Wei is now the primary contact');
-            Assert.isFalse(rows.get(mariaRow.Id).Is_Primary__c, 'Maria no longer is');
-        }
-    }
-
-    @IsTest
-    static void makePrimaryOnSomebodyOutsideTheHouseholdIsRefused() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            Database.insert(household, AccessLevel.SYSTEM_MODE);
-            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
-            Contact stranger = HouseholdTestDataFactory.newContact('Mr.', 'Sam', 'Stone');
-            insert new List<Contact>{ maria, stranger };
-            insert new Household_Member__c(
-                Household__c = household.Id,
-                Contact__c = maria.Id,
-                Is_Primary__c = true,
-                Start_Date__c = Date.today()
-            );
-            String message;
-
-            Test.startTest();
-            try {
-                HouseholdOfPersonController.makePrimary(household.Id, stranger.Id);
-            } catch (AuraHandledException e) {
-                message = e.getMessage();
-            }
-            Test.stopTest();
-
-            Assert.areEqual(
-                Label.Core_HouseholdPanel_NotAMember,
-                message,
-                'The screen is told in plain words that the person is not a member'
-            );
-            Assert.isTrue(
-                [
-                    SELECT Is_Primary__c
-                    FROM Household_Member__c
-                    WHERE Household__c = :household.Id
-                    LIMIT 1
-                ]
-                .Is_Primary__c,
-                'Maria is still the primary contact'
-            );
-        }
-    }
-
-    @IsTest
-    static void makePrimaryWithNothingChosenIsRefused() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-            Boolean refused = false;
-
-            Test.startTest();
-            try {
-                HouseholdOfPersonController.makePrimary(null, null);
-            } catch (AuraHandledException e) {
-                refused = true;
-            }
-            Test.stopTest();
-
-            Assert.isTrue(refused, 'Nothing chosen, nothing changed');
-        }
-    }
-
-    @IsTest
-    static void searchFindsAContactByName() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
-            insert wei;
-
-            Test.startTest();
-            List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
-                'Wei'
-            );
-            Test.stopTest();
-
-            Assert.areEqual(1, hits.size(), 'Wei is found by name');
-            Assert.areEqual(wei.Id, hits[0].id, 'It is Wei');
-        }
-    }
-
-    /**
-     * PEOPLE-7. A person stored as an account is offered once, as the account, and never a
-     * second time as the contact the platform keeps behind it. Needs real person accounts.
-     */
-    @IsTest
-    static void searchOffersAPersonStoredAsAnAccountOnce() {
-        System.runAs(TestUsers.admin()) {
-            if (PersonAccountTestShape.skipReason() != null) {
-                // The reason is checked and logged.
-                return;
-            }
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-            Account person = new Account(
-                RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId()
-            );
-            person.put('FirstName', 'Quillon');
-            person.put('LastName', 'Vantrees');
-            insert person;
-
-            Test.startTest();
-            List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
-                'Vantrees'
-            );
-            Test.stopTest();
-
-            Assert.areEqual(1, hits.size(), 'One person, offered once: ' + hits);
-            Assert.areEqual(person.Id, hits[0].id, 'Offered as the account');
-        }
-    }
-
-    @IsTest
-    static void searchWithFewerThanTwoCharactersFindsNothing() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
-            insert wei;
-
-            Test.startTest();
-            List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
-                'W'
-            );
-            Test.stopTest();
-
-            Assert.isTrue(hits.isEmpty(), 'One character is not enough to search on');
-        }
-    }
-
-    @IsTest
-    static void addingAnExistingContactJoinsTheHousehold() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            Database.insert(household, AccessLevel.SYSTEM_MODE);
-            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
-            insert maria;
-
-            Test.startTest();
-            HouseholdOfPersonController.addExistingPerson(household.Id, maria.Id);
-            Test.stopTest();
-
-            Assert.areEqual(
-                1,
-                [
-                    SELECT COUNT()
-                    FROM Household_Member__c
-                    WHERE Household__c = :household.Id AND Contact__c = :maria.Id
-                ],
-                'Maria is now a member of the household'
-            );
-        }
-    }
-
-    @IsTest
-    static void addingAnExistingPersonToSomethingThatIsNotAHouseholdIsRefused() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-            HouseholdService.suspendAutomaticCreation();
-            Account organization = new Account(Name = 'The Union Foundation');
-            insert organization;
-            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
-            insert maria;
-            String message;
-
-            Test.startTest();
-            try {
-                HouseholdOfPersonController.addExistingPerson(organization.Id, maria.Id);
-            } catch (AuraHandledException e) {
-                message = e.getMessage();
-            }
-            Test.stopTest();
-
-            Assert.areEqual(
-                Label.Core_Households_ErrorNotAHousehold,
-                message,
-                'The screen is told in plain words that this is not a household'
-            );
-        }
-    }
-
-    @IsTest
-    static void addingANewPersonCreatesTheContactAndJoinsTheHousehold() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-            Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            Database.insert(household, AccessLevel.SYSTEM_MODE);
-
-            Test.startTest();
-            HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
-            Test.stopTest();
-
-            Contact created = [
-                SELECT Id, FirstName, LastName, Salutation
-                FROM Contact
-                WHERE LastName = 'Lee'
-                LIMIT 1
-            ];
-            Assert.areEqual('Wei', created.FirstName, 'The new contact carries the name entered');
-            Id personId = personIdOf(created.Id);
-            Assert.areEqual(
-                1,
-                [
-                    SELECT COUNT()
-                    FROM Household_Member__c
-                    WHERE
-                        Household__c = :household.Id
-                        AND (Contact__c = :personId
-                        OR Account__c = :personId)
-                ],
-                'The new contact is now a member of the household'
-            );
-        }
-    }
-
-    /**
-     * Automatic creation is on (the shipped default). The new person joins the household
-     * the panel is on and is not given an empty household of their own first.
-     */
-    @IsTest
-    static void addingANewPersonInContactModeLeavesNoStrayHousehold() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            Database.insert(household, AccessLevel.SYSTEM_MODE);
-            Id recordTypeId = HouseholdService.householdRecordTypeId();
-            Integer householdsBefore = [
-                SELECT COUNT()
-                FROM Account
-                WHERE RecordTypeId = :recordTypeId
-            ];
-
-            Test.startTest();
-            HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
-            Test.stopTest();
-
-            Contact created = [SELECT AccountId FROM Contact WHERE LastName = 'Lee' LIMIT 1];
-            Assert.areEqual(
-                household.Id,
-                created.AccountId,
-                'Wei is in the household he was added to'
-            );
-            Assert.areEqual(
-                householdsBefore,
-                [SELECT COUNT() FROM Account WHERE RecordTypeId = :recordTypeId],
-                'No household of his own was made and left empty'
-            );
-            Assert.areEqual(
-                1,
-                [SELECT Member_Count__c FROM Account WHERE Id = :household.Id].Member_Count__c,
-                'The household counts him'
-            );
-        }
-    }
-
-    @IsTest
-    static void addingANewPersonInJunctionModeJoinsOnlyThatHousehold() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-            Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            Database.insert(household, AccessLevel.SYSTEM_MODE);
-
-            Test.startTest();
-            HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
-            Test.stopTest();
-
-            Contact created = [SELECT Id FROM Contact WHERE LastName = 'Lee' LIMIT 1];
-            Id personId = personIdOf(created.Id);
-            List<Household_Member__c> memberships = [
-                SELECT Household__c
-                FROM Household_Member__c
-                WHERE (Contact__c = :personId OR Account__c = :personId) AND End_Date__c = NULL
-            ];
-            Assert.areEqual(1, memberships.size(), 'Wei belongs to one household, not two');
-            Assert.areEqual(
-                household.Id,
-                memberships[0].Household__c,
-                'It is the one he was added to'
-            );
-        }
-    }
-
-    /**
-     * PEOPLE-4. Where the org gives this user a person record type, a new person in the
-     * flexible way of belonging is a person account; otherwise a contact.
-     */
-    @IsTest
-    static void aNewPersonIsAPersonAccountOnlyWhenOneCanBeCreated() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-            HouseholdService.personAccountOverride = true;
-            Id creatable = OrgShapeDetector.creatablePersonRecordTypeId();
-
-            SObject person = HouseholdOfPersonController.newPerson('Mr.', 'Wei', 'Lee');
-
-            if (creatable == null) {
-                Assert.areEqual(
-                    Contact.SObjectType,
-                    person.getSObjectType(),
-                    'With no person record type to create with, the new person is a contact'
-                );
-            } else {
-                Assert.areEqual(
-                    Account.SObjectType,
-                    person.getSObjectType(),
-                    'With a person record type to create with, the new person is an account'
-                );
-                Assert.areEqual(creatable, person.get('RecordTypeId'), 'It uses that type');
-            }
-            Assert.areEqual('Lee', person.get('LastName'), 'It carries the name entered');
-        }
-    }
-
-    /**
-     * PEOPLE-4. In contact mode a person account cannot belong to a household by reference,
-     * so a new person is a contact there whatever the org shape.
-     */
-    @IsTest
-    static void aNewPersonIsAContactInContactMode() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            HouseholdService.personAccountOverride = true;
-
-            SObject person = HouseholdOfPersonController.newPerson('Mr.', 'Wei', 'Lee');
-
-            Assert.areEqual(
-                Contact.SObjectType,
-                person.getSObjectType(),
-                'Contact mode always creates a contact'
-            );
-            Assert.areEqual('Wei', person.get('FirstName'), 'It carries the name entered');
-        }
-    }
-
-    /**
-     * PEOPLE-4, meaningful on a Person Account org only (oi-pa): the new person is a person
-     * account and joins the household through a membership on its account. Ends early where
-     * the org has no person record type this user can create with.
-     */
-    @IsTest
-    static void addingANewPersonInAPersonAccountOrgCreatesAPersonAccount() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-            Id creatable = HouseholdService.isPersonAccountOrg()
-                ? OrgShapeDetector.creatablePersonRecordTypeId()
-                : null;
-            if (creatable == null) {
-                return;
-            }
-            Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            Database.insert(household, AccessLevel.SYSTEM_MODE);
-
-            Test.startTest();
-            HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
-            Test.stopTest();
-
-            List<Household_Member__c> memberships = [
-                SELECT Account__c, Account__r.RecordTypeId
-                FROM Household_Member__c
-                WHERE Household__c = :household.Id AND End_Date__c = NULL
-            ];
-            Assert.areEqual(1, memberships.size(), 'The new person joined the household once');
-            Assert.areEqual(
-                creatable,
-                memberships[0].Account__r.RecordTypeId,
-                'The member is a person account of the type the user can create'
-            );
-        }
-    }
-
-    @IsTest
-    static void addingANewPersonWithNoLastNameIsRefused() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-            Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            Database.insert(household, AccessLevel.SYSTEM_MODE);
-            String message;
-
-            Test.startTest();
-            try {
-                HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', null);
-            } catch (AuraHandledException e) {
-                message = e.getMessage();
-            }
-            Test.stopTest();
-
-            Assert.areEqual(
-                Label.Core_HouseholdPanel_AddMemberMissingName,
-                message,
-                'The screen is told in plain words that a last name is needed'
-            );
-            Assert.isTrue(
-                [SELECT COUNT() FROM Contact WHERE LastName = 'Lee'] == 0,
-                'Nothing was created'
-            );
-        }
-    }
-
-    @IsTest
-    static void aUserWithNoCreateAccessOnContactGetsAFriendlyRefusal() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-            Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
-            Database.insert(household, AccessLevel.SYSTEM_MODE);
-            User reader = noCreateUser();
-            String message;
-
-            Test.startTest();
-            System.runAs(reader) {
-                try {
-                    HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
-                } catch (AuraHandledException e) {
-                    message = e.getMessage();
-                }
-            }
-            Test.stopTest();
-
-            Assert.isNotNull(message, 'A user without create access on Contact is refused');
-            Assert.areEqual(
-                Label.Core_HouseholdPanel_AddMemberFailed,
-                message,
-                'The refusal is worded for a person, not copied from the platform'
-            );
-        }
-    }
-
-    @IsTest
-    static void aUserWhoCannotEditMembershipsGetsAFriendlyRefusal() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            Database.insert(household, AccessLevel.SYSTEM_MODE);
-            Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
-            Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
-            insert new List<Contact>{ maria, wei };
-            insert new List<Household_Member__c>{
-                new Household_Member__c(
-                    Household__c = household.Id,
-                    Contact__c = maria.Id,
-                    Is_Primary__c = true,
-                    Start_Date__c = Date.today()
-                ),
-                new Household_Member__c(
-                    Household__c = household.Id,
-                    Contact__c = wei.Id,
-                    Is_Primary__c = false,
-                    Start_Date__c = Date.today()
-                )
-            };
-            User reader = HouseholdTestDataFactory.standardUser('reader');
-            HouseholdTestDataFactory.grantMembershipRead('Membership_Read_Only', reader.Id);
-            String message;
-
-            Test.startTest();
-            System.runAs(reader) {
-                try {
-                    HouseholdOfPersonController.makePrimary(household.Id, wei.Id);
-                } catch (AuraHandledException e) {
-                    message = e.getMessage();
-                }
-            }
-            Test.stopTest();
-
-            Assert.isNotNull(message, 'A user without edit access is refused');
-            Assert.isFalse(
-                message.containsIgnoreCase('INSUFFICIENT'),
-                'The refusal is worded for a person, not copied from the platform'
-            );
-        }
-    }
-
-    // ------------------------------------------------------------------ helpers
-
-    /**
-     * The id a membership names this new person by. Where the org stores people as accounts
-     * the panel creates a person account (PEOPLE-4), whose membership names the account, not
-     * the contact behind it.
-     */
-    private static Id personIdOf(Id contactId) {
-        Id account = PersonRecordSelector.getAccountsBehindPersonContacts(new Set<Id>{ contactId })
-            .get(contactId);
-        return account != null ? account : contactId;
-    }
-
-    /**
-     * A user on the most restricted standard profile, so that creating a contact without
-     * create access is refused by the same access check the screen asks about. The same
-     * pattern HouseholdMergeServiceTest.readOnlyUser uses, kept here rather than moved to the
-     * shared factory because only this class needs a user with no object access at all.
-     */
-    private static User noCreateUser() {
-        User reader = new User(
-            ProfileId = TestUsers.readOnlyProfileId(),
-            LastName = 'Reader',
-            Alias = 'reader',
-            Email = 'reader' + DateTime.now().getTime() + '@barncrm.test.invalid',
-            Username = 'reader' + DateTime.now().getTime() + '@barncrm.test.invalid',
-            EmailEncodingKey = 'UTF-8',
-            LanguageLocaleKey = 'en_US',
-            LocaleSidKey = 'en_US',
-            TimeZoneSidKey = 'America/New_York'
-        );
-        // A user is a setup record, so it is saved on its own: these tests have already
-        // saved households by the time they ask for a reader.
-        System.runAs(new User(Id = UserInfo.getUserId())) {
-            insert reader;
-        }
-        return reader;
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.admin();
+	}
+
+	@IsTest
+	static void aContactPointsAtItsHouseholdInTheSimpleWay() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+			Account household = HouseholdTestDataFactory.newHousehold('The Smith Family');
+			household.Household_Formal_Greeting__c = 'Mr. John Smith';
+			household.Member_Count__c = 1;
+			Database.insert(household, AccessLevel.SYSTEM_MODE);
+			Contact john = HouseholdTestDataFactory.newContact('Mr.', 'John', 'Smith');
+			john.AccountId = household.Id;
+			insert john;
+
+			Test.startTest();
+			List<HouseholdOfPersonController.HouseholdView> households = HouseholdOfPersonController.getHouseholdsForPerson(
+				john.Id
+			);
+			Test.stopTest();
+
+			Assert.areEqual(1, households.size(), 'John is in one household');
+			Assert.areEqual(household.Id, households[0].householdId, 'It is the one he points at');
+			Assert.areEqual(1, households[0].memberCount, 'The member count is shown');
+			Assert.isTrue(
+				String.isNotBlank(households[0].formalGreeting),
+				'The formal greeting is shown'
+			);
+			Assert.isTrue(String.isNotBlank(households[0].name), 'The household is named');
+		}
+	}
+
+	@IsTest
+	static void aContactWhoPointsAtAnOrganizationIsInNoHousehold() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+			HouseholdService.suspendAutomaticCreation();
+			Account organization = new Account(Name = 'The Union Foundation');
+			insert organization;
+			Contact harper = HouseholdTestDataFactory.newContact('Ms.', 'Harper', 'Garcia');
+			harper.AccountId = organization.Id;
+			insert harper;
+
+			Test.startTest();
+			List<HouseholdOfPersonController.HouseholdView> households = HouseholdOfPersonController.getHouseholdsForPerson(
+				harper.Id
+			);
+			Test.stopTest();
+
+			Assert.isTrue(households.isEmpty(), 'An organization is not a household');
+		}
+	}
+
+	@IsTest
+	static void aMembershipRecordPointsAtTheHouseholdInTheFlexibleWay() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+			Database.insert(household, AccessLevel.SYSTEM_MODE);
+			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+			insert maria;
+			insert new Household_Member__c(
+				Household__c = household.Id,
+				Contact__c = maria.Id,
+				Role__c = 'Head',
+				Is_Primary__c = true,
+				Start_Date__c = Date.today()
+			);
+
+			Test.startTest();
+			List<HouseholdOfPersonController.HouseholdView> households = HouseholdOfPersonController.getHouseholdsForPerson(
+				maria.Id
+			);
+			Test.stopTest();
+
+			Assert.areEqual(1, households.size(), 'Maria is in one household');
+			Assert.areEqual(
+				household.Id,
+				households[0].householdId,
+				'It is the one her membership names'
+			);
+		}
+	}
+
+	@IsTest
+	static void aPersonWithNoMembershipIsInNoHousehold() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+			insert wei;
+
+			Test.startTest();
+			List<HouseholdOfPersonController.HouseholdView> households = HouseholdOfPersonController.getHouseholdsForPerson(
+				wei.Id
+			);
+			Test.stopTest();
+
+			Assert.isTrue(households.isEmpty(), 'Nobody has joined Wei to a household yet');
+		}
+	}
+
+	@IsTest
+	static void askingAboutNobodyIsAnsweredWithNothing() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+
+			Test.startTest();
+			List<HouseholdOfPersonController.HouseholdView> households = HouseholdOfPersonController.getHouseholdsForPerson(
+				null
+			);
+			Test.stopTest();
+
+			Assert.isTrue(households.isEmpty(), 'No person, no household');
+		}
+	}
+
+	@IsTest
+	static void makePrimaryMovesTheFlagToThePersonChosen() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+			Database.insert(household, AccessLevel.SYSTEM_MODE);
+			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+			Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+			insert new List<Contact>{ maria, wei };
+			Household_Member__c mariaRow = new Household_Member__c(
+				Household__c = household.Id,
+				Contact__c = maria.Id,
+				Is_Primary__c = true,
+				Start_Date__c = Date.today()
+			);
+			Household_Member__c weiRow = new Household_Member__c(
+				Household__c = household.Id,
+				Contact__c = wei.Id,
+				Is_Primary__c = false,
+				Start_Date__c = Date.today()
+			);
+			insert new List<Household_Member__c>{ mariaRow, weiRow };
+
+			Test.startTest();
+			HouseholdOfPersonController.makePrimary(household.Id, wei.Id);
+			Test.stopTest();
+
+			Map<Id, Household_Member__c> rows = new Map<Id, Household_Member__c>(
+				[
+					SELECT Id, Is_Primary__c
+					FROM Household_Member__c
+					WHERE Household__c = :household.Id
+				]
+			);
+			Assert.isTrue(rows.get(weiRow.Id).Is_Primary__c, 'Wei is now the primary contact');
+			Assert.isFalse(rows.get(mariaRow.Id).Is_Primary__c, 'Maria no longer is');
+		}
+	}
+
+	@IsTest
+	static void makePrimaryOnSomebodyOutsideTheHouseholdIsRefused() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+			Database.insert(household, AccessLevel.SYSTEM_MODE);
+			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+			Contact stranger = HouseholdTestDataFactory.newContact('Mr.', 'Sam', 'Stone');
+			insert new List<Contact>{ maria, stranger };
+			insert new Household_Member__c(
+				Household__c = household.Id,
+				Contact__c = maria.Id,
+				Is_Primary__c = true,
+				Start_Date__c = Date.today()
+			);
+			String message;
+
+			Test.startTest();
+			try {
+				HouseholdOfPersonController.makePrimary(household.Id, stranger.Id);
+			} catch (AuraHandledException e) {
+				message = e.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.areEqual(
+				BarnHelp.text('Core', 'Core_HouseholdPanel_NotAMember'),
+				message,
+				'The screen is told in plain words that the person is not a member'
+			);
+			Assert.isTrue(
+				[
+					SELECT Is_Primary__c
+					FROM Household_Member__c
+					WHERE Household__c = :household.Id
+					LIMIT 1
+				]
+				.Is_Primary__c,
+				'Maria is still the primary contact'
+			);
+		}
+	}
+
+	@IsTest
+	static void makePrimaryWithNothingChosenIsRefused() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Boolean refused = false;
+
+			Test.startTest();
+			try {
+				HouseholdOfPersonController.makePrimary(null, null);
+			} catch (AuraHandledException e) {
+				refused = true;
+			}
+			Test.stopTest();
+
+			Assert.isTrue(refused, 'Nothing chosen, nothing changed');
+		}
+	}
+
+	@IsTest
+	static void searchFindsAContactByName() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+			insert wei;
+
+			Test.startTest();
+			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
+				'Wei'
+			);
+			Test.stopTest();
+
+			Assert.areEqual(1, hits.size(), 'Wei is found by name');
+			Assert.areEqual(wei.Id, hits[0].id, 'It is Wei');
+		}
+	}
+
+	/**
+	 * PEOPLE-7. A person stored as an account is offered once, as the account, and never a
+	 * second time as the contact the platform keeps behind it. Needs real person accounts.
+	 */
+	@IsTest
+	static void searchOffersAPersonStoredAsAnAccountOnce() {
+		System.runAs(TestUsers.admin()) {
+			if (PersonAccountTestShape.skipReason() != null) {
+				// The reason is checked and logged.
+				return;
+			}
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Account person = new Account(
+				RecordTypeId = OrgShapeDetector.creatablePersonRecordTypeId()
+			);
+			person.put('FirstName', 'Quillon');
+			person.put('LastName', 'Vantrees');
+			insert person;
+
+			Test.startTest();
+			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
+				'Vantrees'
+			);
+			Test.stopTest();
+
+			Assert.areEqual(1, hits.size(), 'One person, offered once: ' + hits);
+			Assert.areEqual(person.Id, hits[0].id, 'Offered as the account');
+		}
+	}
+
+	@IsTest
+	static void searchWithFewerThanTwoCharactersFindsNothing() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+			insert wei;
+
+			Test.startTest();
+			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
+				'W'
+			);
+			Test.stopTest();
+
+			Assert.isTrue(hits.isEmpty(), 'One character is not enough to search on');
+		}
+	}
+
+	@IsTest
+	static void addingAnExistingContactJoinsTheHousehold() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+			Database.insert(household, AccessLevel.SYSTEM_MODE);
+			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+			insert maria;
+
+			Test.startTest();
+			HouseholdOfPersonController.addExistingPerson(household.Id, maria.Id);
+			Test.stopTest();
+
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM Household_Member__c
+					WHERE Household__c = :household.Id AND Contact__c = :maria.Id
+				],
+				'Maria is now a member of the household'
+			);
+		}
+	}
+
+	@IsTest
+	static void addingAnExistingPersonToSomethingThatIsNotAHouseholdIsRefused() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			HouseholdService.suspendAutomaticCreation();
+			Account organization = new Account(Name = 'The Union Foundation');
+			insert organization;
+			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+			insert maria;
+			String message;
+
+			Test.startTest();
+			try {
+				HouseholdOfPersonController.addExistingPerson(organization.Id, maria.Id);
+			} catch (AuraHandledException e) {
+				message = e.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.areEqual(
+				BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'),
+				message,
+				'The screen is told in plain words that this is not a household'
+			);
+		}
+	}
+
+	@IsTest
+	static void addingANewPersonCreatesTheContactAndJoinsTheHousehold() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
+			Database.insert(household, AccessLevel.SYSTEM_MODE);
+
+			Test.startTest();
+			HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
+			Test.stopTest();
+
+			Contact created = [
+				SELECT Id, FirstName, LastName, Salutation
+				FROM Contact
+				WHERE LastName = 'Lee'
+				LIMIT 1
+			];
+			Assert.areEqual('Wei', created.FirstName, 'The new contact carries the name entered');
+			Id personId = personIdOf(created.Id);
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM Household_Member__c
+					WHERE
+						Household__c = :household.Id
+						AND (Contact__c = :personId
+						OR Account__c = :personId)
+				],
+				'The new contact is now a member of the household'
+			);
+		}
+	}
+
+	/**
+	 * Automatic creation is on (the shipped default). The new person joins the household
+	 * the panel is on and is not given an empty household of their own first.
+	 */
+	@IsTest
+	static void addingANewPersonInContactModeLeavesNoStrayHousehold() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+			Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
+			Database.insert(household, AccessLevel.SYSTEM_MODE);
+			Id recordTypeId = HouseholdService.householdRecordTypeId();
+			Integer householdsBefore = [
+				SELECT COUNT()
+				FROM Account
+				WHERE RecordTypeId = :recordTypeId
+			];
+
+			Test.startTest();
+			HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
+			Test.stopTest();
+
+			Contact created = [SELECT AccountId FROM Contact WHERE LastName = 'Lee' LIMIT 1];
+			Assert.areEqual(
+				household.Id,
+				created.AccountId,
+				'Wei is in the household he was added to'
+			);
+			Assert.areEqual(
+				householdsBefore,
+				[SELECT COUNT() FROM Account WHERE RecordTypeId = :recordTypeId],
+				'No household of his own was made and left empty'
+			);
+			Assert.areEqual(
+				1,
+				[SELECT Member_Count__c FROM Account WHERE Id = :household.Id].Member_Count__c,
+				'The household counts him'
+			);
+		}
+	}
+
+	@IsTest
+	static void addingANewPersonInJunctionModeJoinsOnlyThatHousehold() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+			Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
+			Database.insert(household, AccessLevel.SYSTEM_MODE);
+
+			Test.startTest();
+			HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
+			Test.stopTest();
+
+			Contact created = [SELECT Id FROM Contact WHERE LastName = 'Lee' LIMIT 1];
+			Id personId = personIdOf(created.Id);
+			List<Household_Member__c> memberships = [
+				SELECT Household__c
+				FROM Household_Member__c
+				WHERE (Contact__c = :personId OR Account__c = :personId) AND End_Date__c = NULL
+			];
+			Assert.areEqual(1, memberships.size(), 'Wei belongs to one household, not two');
+			Assert.areEqual(
+				household.Id,
+				memberships[0].Household__c,
+				'It is the one he was added to'
+			);
+		}
+	}
+
+	/** The Add member search in an org with no person accounts offers contacts by name. */
+	@IsTest
+	static void theSearchOffersContactsWhereThereAreNoPersonAccounts() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdService.personAccountOverride = false;
+			Contact found = new Contact(FirstName = 'Zelda', LastName = 'Searchable');
+			TestDataFactory.pastDuplicateRules(found);
+			insert found;
+
+			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
+				'Searchable'
+			);
+
+			Assert.areEqual(1, hits.size(), 'The one contact with that name');
+			Assert.areEqual(found.Id, hits[0].id, 'It is that contact');
+			Assert.isTrue(
+				HouseholdOfPersonController.searchPeople('Z').isEmpty(),
+				'One character never runs a query'
+			);
+		}
+	}
+
+	@IsTest
+	static void addingAPersonNeedsBothAHouseholdAndAPerson() {
+		System.runAs(TestUsers.admin()) {
+			String message;
+			try {
+				HouseholdOfPersonController.addExistingPerson(null, null);
+			} catch (AuraHandledException e) {
+				message = e.getMessage();
+			}
+
+			Assert.areEqual(
+				BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingPerson'),
+				message,
+				'The refusal says a person is missing'
+			);
+		}
+	}
+
+	/**
+	 * PEOPLE-4. Where the org gives this user a person record type, a new person in the
+	 * flexible way of belonging is a person account; otherwise a contact.
+	 */
+	@IsTest
+	static void aNewPersonIsAPersonAccountOnlyWhenOneCanBeCreated() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+			HouseholdService.personAccountOverride = true;
+			Id creatable = OrgShapeDetector.creatablePersonRecordTypeId();
+
+			SObject person = HouseholdOfPersonController.newPerson('Mr.', 'Wei', 'Lee');
+
+			if (creatable == null) {
+				Assert.areEqual(
+					Contact.SObjectType,
+					person.getSObjectType(),
+					'With no person record type to create with, the new person is a contact'
+				);
+			} else {
+				Assert.areEqual(
+					Account.SObjectType,
+					person.getSObjectType(),
+					'With a person record type to create with, the new person is an account'
+				);
+				Assert.areEqual(creatable, person.get('RecordTypeId'), 'It uses that type');
+			}
+			Assert.areEqual('Lee', person.get('LastName'), 'It carries the name entered');
+		}
+	}
+
+	/**
+	 * PEOPLE-4. In contact mode a person account cannot belong to a household by reference,
+	 * so a new person is a contact there whatever the org shape.
+	 */
+	@IsTest
+	static void aNewPersonIsAContactInContactMode() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
+			HouseholdService.personAccountOverride = true;
+
+			SObject person = HouseholdOfPersonController.newPerson('Mr.', 'Wei', 'Lee');
+
+			Assert.areEqual(
+				Contact.SObjectType,
+				person.getSObjectType(),
+				'Contact mode always creates a contact'
+			);
+			Assert.areEqual('Wei', person.get('FirstName'), 'It carries the name entered');
+		}
+	}
+
+	/**
+	 * PEOPLE-4, meaningful on a Person Account org only (oi-pa): the new person is a person
+	 * account and joins the household through a membership on its account. Ends early where
+	 * the org has no person record type this user can create with.
+	 */
+	@IsTest
+	static void addingANewPersonInAPersonAccountOrgCreatesAPersonAccount() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+			Id creatable = HouseholdService.isPersonAccountOrg()
+				? OrgShapeDetector.creatablePersonRecordTypeId()
+				: null;
+			if (creatable == null) {
+				return;
+			}
+			Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
+			Database.insert(household, AccessLevel.SYSTEM_MODE);
+
+			Test.startTest();
+			HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
+			Test.stopTest();
+
+			List<Household_Member__c> memberships = [
+				SELECT Account__c, Account__r.RecordTypeId
+				FROM Household_Member__c
+				WHERE Household__c = :household.Id AND End_Date__c = NULL
+			];
+			Assert.areEqual(1, memberships.size(), 'The new person joined the household once');
+			Assert.areEqual(
+				creatable,
+				memberships[0].Account__r.RecordTypeId,
+				'The member is a person account of the type the user can create'
+			);
+		}
+	}
+
+	@IsTest
+	static void addingANewPersonWithNoLastNameIsRefused() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
+			Database.insert(household, AccessLevel.SYSTEM_MODE);
+			String message;
+
+			Test.startTest();
+			try {
+				HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', null);
+			} catch (AuraHandledException e) {
+				message = e.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.areEqual(
+				BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingName'),
+				message,
+				'The screen is told in plain words that a last name is needed'
+			);
+			Assert.isTrue(
+				[SELECT COUNT() FROM Contact WHERE LastName = 'Lee'] == 0,
+				'Nothing was created'
+			);
+		}
+	}
+
+	@IsTest
+	static void aUserWithNoCreateAccessOnContactGetsAFriendlyRefusal() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Account household = HouseholdTestDataFactory.newHousehold('The Lee Family');
+			Database.insert(household, AccessLevel.SYSTEM_MODE);
+			User reader = noCreateUser();
+			String message;
+
+			Test.startTest();
+			System.runAs(reader) {
+				try {
+					HouseholdOfPersonController.addNewPerson(household.Id, 'Mr.', 'Wei', 'Lee');
+				} catch (AuraHandledException e) {
+					message = e.getMessage();
+				}
+			}
+			Test.stopTest();
+
+			Assert.isNotNull(message, 'A user without create access on Contact is refused');
+			Assert.areEqual(
+				BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberFailed'),
+				message,
+				'The refusal is worded for a person, not copied from the platform'
+			);
+		}
+	}
+
+	@IsTest
+	static void aUserWhoCannotEditMembershipsGetsAFriendlyRefusal() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
+			Database.insert(household, AccessLevel.SYSTEM_MODE);
+			Contact maria = HouseholdTestDataFactory.newContact('Ms.', 'Maria', 'Garcia');
+			Contact wei = HouseholdTestDataFactory.newContact('Mr.', 'Wei', 'Lee');
+			insert new List<Contact>{ maria, wei };
+			insert new List<Household_Member__c>{
+				new Household_Member__c(
+					Household__c = household.Id,
+					Contact__c = maria.Id,
+					Is_Primary__c = true,
+					Start_Date__c = Date.today()
+				),
+				new Household_Member__c(
+					Household__c = household.Id,
+					Contact__c = wei.Id,
+					Is_Primary__c = false,
+					Start_Date__c = Date.today()
+				)
+			};
+			User reader = HouseholdTestDataFactory.standardUser('reader');
+			HouseholdTestDataFactory.grantMembershipRead('Membership_Read_Only', reader.Id);
+			String message;
+
+			Test.startTest();
+			System.runAs(reader) {
+				try {
+					HouseholdOfPersonController.makePrimary(household.Id, wei.Id);
+				} catch (AuraHandledException e) {
+					message = e.getMessage();
+				}
+			}
+			Test.stopTest();
+
+			Assert.isNotNull(message, 'A user without edit access is refused');
+			Assert.isFalse(
+				message.containsIgnoreCase('INSUFFICIENT'),
+				'The refusal is worded for a person, not copied from the platform'
+			);
+		}
+	}
+
+	// ------------------------------------------------------------------ helpers
+
+	/**
+	 * The id a membership names this new person by. Where the org stores people as accounts
+	 * the panel creates a person account (PEOPLE-4), whose membership names the account, not
+	 * the contact behind it.
+	 */
+	private static Id personIdOf(Id contactId) {
+		Id account = PersonRecordSelector.getAccountsBehindPersonContacts(new Set<Id>{ contactId })
+			.get(contactId);
+		return account != null ? account : contactId;
+	}
+
+	/**
+	 * A user on the most restricted standard profile, so that creating a contact without
+	 * create access is refused by the same access check the screen asks about. The same
+	 * pattern HouseholdMergeServiceTest.readOnlyUser uses, kept here rather than moved to the
+	 * shared factory because only this class needs a user with no object access at all.
+	 */
+	private static User noCreateUser() {
+		User reader = new User(
+			ProfileId = TestUsers.readOnlyProfileId(),
+			LastName = 'Reader',
+			Alias = 'reader',
+			Email = 'reader' + DateTime.now().getTime() + '@barncrm.test.invalid',
+			Username = 'reader' + DateTime.now().getTime() + '@barncrm.test.invalid',
+			EmailEncodingKey = 'UTF-8',
+			LanguageLocaleKey = 'en_US',
+			LocaleSidKey = 'en_US',
+			TimeZoneSidKey = 'America/New_York'
+		);
+		// A user is a setup record, so it is saved on its own: these tests have already
+		// saved households by the time they ask for a reader.
+		System.runAs(new User(Id = UserInfo.getUserId())) {
+			insert reader;
+		}
+		return reader;
+	}
 }

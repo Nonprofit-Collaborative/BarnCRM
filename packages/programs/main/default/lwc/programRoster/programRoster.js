@@ -6,24 +6,24 @@ import setStage from '@salesforce/apex/ProgramRosterController.setStage';
 
 import TITLE from '@salesforce/label/c.Programs_Roster_Title';
 import ENROLL from '@salesforce/label/c.Programs_Roster_Enroll';
-import PERSON from '@salesforce/label/c.Programs_Roster_Person';
-import STAGE from '@salesforce/label/c.Programs_Roster_Stage';
-import START_DATE from '@salesforce/label/c.Programs_Roster_StartDate';
-import END_DATE from '@salesforce/label/c.Programs_Roster_EndDate';
-import SAVE from '@salesforce/label/c.Programs_Roster_Save';
-import CANCEL from '@salesforce/label/c.Programs_Roster_Cancel';
+import PERSON from '@salesforce/label/c.Core_Section_Person';
+import STAGE from '@salesforce/label/c.Core_Shared_Stage';
+import START_DATE from '@salesforce/label/c.Core_Shared_StartDate';
+import END_DATE from '@salesforce/label/c.Core_Shared_EndDate';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import SHOW_ENDED from '@salesforce/label/c.Programs_Roster_ShowEnded';
 import CAPTION from '@salesforce/label/c.Programs_Roster_Caption';
 import STAGE_FOR from '@salesforce/label/c.Programs_Roster_StageFor';
-import EMPTY from '@salesforce/label/c.Programs_Roster_Empty';
 import ADDED from '@salesforce/label/c.Programs_Roster_Added';
 import CHANGED from '@salesforce/label/c.Programs_Roster_Changed';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Roster_MoreThanShown';
 import ACTION_FAILED from '@salesforce/label/c.Programs_Roster_ActionFailed';
-import LOADING from '@salesforce/label/c.Programs_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import { format, rosterRows, stageFigures, stageLabel, stageOptions } from './roster';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const STAGE_ENROLLED = 'Enrolled';
 const MAX_SHOWN = 200;
@@ -34,6 +34,8 @@ const MAX_SHOWN = 200;
  * enrollment automation, so one open enrollment per person per program and the stage dates apply.
  */
 export default class ProgramRoster extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Programs');
+
   @api recordId;
 
   labels = {
@@ -46,7 +48,9 @@ export default class ProgramRoster extends NavigationMixin(LightningElement) {
     save: SAVE,
     cancel: CANCEL,
     showEnded: SHOW_ENDED,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Programs', 'Programs_Roster_Empty');
+    },
     loading: LOADING
   };
 
@@ -63,6 +67,11 @@ export default class ProgramRoster extends NavigationMixin(LightningElement) {
   loading = true;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Programs').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

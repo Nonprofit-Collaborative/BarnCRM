@@ -9,22 +9,6 @@
         <value>Org Optimizer</value>
     </labels>
     <labels>
-        <fullName>Core_OrgOptimizer_Intro</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: purpose line in the page header</shortDescription>
-        <value>What in your org needs attention, one section at a time.</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_HelpText</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: About This Tool text</shortDescription>
-        <value>Sections run when opened, so the page opens fast. Nothing changes unless a button says so.</value>
-    </labels>
-    <labels>
         <fullName>Core_OrgOptimizer_GroupData</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
@@ -70,7 +54,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: Health Check tile badge; {0} errors in the last run</shortDescription>
-        <value>Errors: {0}</value>
+        <value>Needs Fixing: {0}</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_BadgeWarnings</fullName>
@@ -78,15 +62,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: Health Check tile badge; {0} warnings in the last run</shortDescription>
-        <value>Warnings: {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_BadgePassed</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: Health Check tile badge when the last run found no problem</shortDescription>
-        <value>Passed</value>
+        <value>Worth Knowing: {0}</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_BadgeNotRun</fullName>
@@ -129,100 +105,12 @@
         <value>Overview</value>
     </labels>
     <labels>
-        <fullName>Core_OrgOptimizer_Quality</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: Data Quality section name</shortDescription>
-        <value>Data Quality</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_QualityText</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: what the Data quality section answers</shortDescription>
-        <value>Which records need tidying up, each check with Open in Find.</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_FieldUtilization</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: Field utilization section name</shortDescription>
-        <value>Field Utilization</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_FieldUtilizationText</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: what the Field utilization section answers</shortDescription>
-        <value>How often each field of a kind of record is filled in.</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_DataDictionary</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: Data dictionary section name</shortDescription>
-        <value>Data Dictionary</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_DataDictionaryText</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: what the Data dictionary section answers</shortDescription>
-        <value>Every field of the kinds of record you choose, with its rules, as a table and a CSV.</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_AccessExplorer</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: Access Explorer section name</shortDescription>
-        <value>Access Explorer</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_AccessExplorerText</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: what the Access Explorer section answers</shortDescription>
-        <value>Who can see or change what, and why. Read only.</value>
-    </labels>
-    <labels>
         <fullName>Core_OrgOptimizer_AiExport</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: AI-Readiness Export section name</shortDescription>
         <value>AI-Readiness Export</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_AiExportText</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: what the AI-Readiness Export section does</shortDescription>
-        <value>Your data model and records as files ready for an AI tool you choose, with sensitive fields left out or masked.</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_HealthCheck</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: Health Check section name</shortDescription>
-        <value>Health Check</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_HealthCheckText</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: what the Health Check section answers</shortDescription>
-        <value>Whether BarnCRM is set up the way it should be.</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_RunHealthCheck</fullName>
@@ -233,22 +121,6 @@
         <value>Run Health Check</value>
     </labels>
     <labels>
-        <fullName>Core_OrgOptimizer_HealthCheckIntro</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: why Health Check waits for the button</shortDescription>
-        <value>Health Check reads your org's setup, which can take a few seconds, so it runs only when you ask.</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_ErrorNoPermission</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: refusal without Manage BarnCRM Settings</shortDescription>
-        <value>This section needs the Manage BarnCRM Settings permission. Ask your BarnCRM admin.</value>
-    </labels>
-    <labels>
         <fullName>Core_OrgOptimizer_Errors</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
@@ -257,28 +129,12 @@
         <value>Errors</value>
     </labels>
     <labels>
-        <fullName>Core_OrgOptimizer_ErrorsText</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: what the Errors section answers</shortDescription>
-        <value>What went wrong recently, and which entries nobody has read.</value>
-    </labels>
-    <labels>
         <fullName>Core_OrgOptimizer_Storage</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Org Optimizer: Storage and limits section name</shortDescription>
         <value>Storage and Limits</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_StorageText</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: what the Storage and limits section answers</shortDescription>
-        <value>Storage and daily limits used, and what BarnCRM adds.</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_LimitsHeading</fullName>
@@ -345,30 +201,6 @@
         <value>What BarnCRM Stores</value>
     </labels>
     <labels>
-        <fullName>Core_OrgOptimizer_OwnIntro</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: explains the BarnCRM storage list</shortDescription>
-        <value>Records BarnCRM keeps for imports, undo and errors. Salesforce counts most records as 2 KB.</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_ColumnObject</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: storage column, the kind of record</shortDescription>
-        <value>Kind of Record</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_ColumnRecords</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: storage column, how many records</shortDescription>
-        <value>Records</value>
-    </labels>
-    <labels>
         <fullName>Core_OrgOptimizer_ColumnMB</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
@@ -377,19 +209,11 @@
         <value>About (MB)</value>
     </labels>
     <labels>
-        <fullName>Core_OrgOptimizer_MoreThan</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: a count that stopped at its cap; {0} is the cap</shortDescription>
-        <value>More than {0}</value>
-    </labels>
-    <labels>
         <fullName>Core_OrgOptimizer_Refresh</fullName>
         <categories>OrgOptimizer</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Org Optimizer: button that reads the section again</shortDescription>
+        <shortDescription>Shared: button that reads the data again</shortDescription>
         <value>Refresh</value>
     </labels>
     <labels>
@@ -399,38 +223,6 @@
         <protected>false</protected>
         <shortDescription>Org Optimizer: Unused setup section name</shortDescription>
         <value>Unused Setup</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_SetupText</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: Overview line for Unused setup</shortDescription>
-        <value>Users, permission sets, reports, flows and jobs nobody seems to use.</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_SetupChanges</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: Setup Changes section name</shortDescription>
-        <value>Setup Changes</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_SetupChangesText</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: Overview line for Setup Changes</shortDescription>
-        <value>Who changed what in Setup, and when, kept beyond Salesforce's 180 days.</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_SetupIntro</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: line at the top of the Unused setup section</shortDescription>
-        <value>Nothing here is changed for you. Open each item in Setup and decide whether to remove it.</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_CheckInactiveUsers</fullName>
@@ -479,22 +271,6 @@
         <protected>false</protected>
         <shortDescription>Org Optimizer: check title, scheduled jobs owned by inactive users</shortDescription>
         <value>Scheduled Jobs Owned by Inactive Users</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_CouldNotCheck</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: shown when a check could not run</shortDescription>
-        <value>Could not check: your access or this org does not allow it.</value>
-    </labels>
-    <labels>
-        <fullName>Core_OrgOptimizer_OpenInSetup</fullName>
-        <categories>OrgOptimizer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Org Optimizer: link to the Setup page for a check</shortDescription>
-        <value>Open in Setup</value>
     </labels>
     <labels>
         <fullName>Core_OrgOptimizer_CheckFieldLimit</fullName>

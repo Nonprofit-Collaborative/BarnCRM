@@ -1,5 +1,6 @@
 <template>
-    <lightning-card title={labels.title} icon-name="standard:opportunity">
+    <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="custom:custom30">
         <div class="slds-var-p-horizontal_medium slds-is-relative">
             <template lwc:if={spinnerShown}>
                 <lightning-spinner alternative-text={labels.loading} size="small" data-id="spinner"></lightning-spinner>
@@ -133,4 +134,5 @@
             </template>
         </div>
     </lightning-card>
+    </template>
 </template>

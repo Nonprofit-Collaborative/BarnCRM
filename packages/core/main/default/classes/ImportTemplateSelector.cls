@@ -6,143 +6,143 @@
  */
 @NamespaceAccessible
 public with sharing class ImportTemplateSelector {
-    /**
-     * Custom metadata cannot be inserted by a test, so tests put in-memory rows here and every
-     * read of the shipped defaults sees them instead of the packaged rows.
-     */
-    @TestVisible
-    private static List<Import_Template_Default__mdt> shippedOverride;
+	/**
+	 * Custom metadata cannot be inserted by a test, so tests put in-memory rows here and every
+	 * read of the shipped defaults sees them instead of the packaged rows.
+	 */
+	@TestVisible
+	private static List<Import_Template_Default__mdt> shippedOverride;
 
-    /** Active templates, in the order the wizard lists them. */
-    @NamespaceAccessible
-    public static List<Import_Template__c> selectActive() {
-        return [
-            SELECT
-                Id,
-                Name,
-                Description__c,
-                Template_Key__c,
-                Column_Mapping_JSON__c,
-                Default_Values_JSON__c,
-                Matching_Rule__c,
-                Person_Match_Field__c,
-                Organization_Matching_Rule__c,
-                Organization_Match_Field__c,
-                Several_Matches__c,
-                Use_Duplicate_Rules__c,
-                Person_Mode__c,
-                Is_Package_Default__c,
-                Is_Recurring__c,
-                Source_Name__c,
-                Last_Import_Date__c,
-                Active__c,
-                Payment_Matching__c,
-                Match_Date_Window_Days__c,
-                Match_Amount_Tolerance__c,
-                Target_Object__c,
-                Load_Operation__c,
-                Load_Match_Field__c,
-                Lookup_Not_Found__c,
-                Related_Object__c,
-                Related_Parent_Field__c
-            FROM Import_Template__c
-            WHERE Active__c = TRUE
-            WITH USER_MODE
-            ORDER BY Name ASC
-            LIMIT 500
-        ];
-    }
+	/** Active templates, in the order the wizard lists them. */
+	@NamespaceAccessible
+	public static List<Import_Template__c> selectActive() {
+		return [
+			SELECT
+				Id,
+				Name,
+				Description__c,
+				Template_Key__c,
+				Column_Mapping_JSON__c,
+				Default_Values_JSON__c,
+				Matching_Rule__c,
+				Person_Match_Field__c,
+				Organization_Matching_Rule__c,
+				Organization_Match_Field__c,
+				Several_Matches__c,
+				Use_Duplicate_Rules__c,
+				Person_Mode__c,
+				Is_Package_Default__c,
+				Is_Recurring__c,
+				Source_Name__c,
+				Last_Import_Date__c,
+				Active__c,
+				Payment_Matching__c,
+				Match_Date_Window_Days__c,
+				Match_Amount_Tolerance__c,
+				Target_Object__c,
+				Load_Operation__c,
+				Load_Match_Field__c,
+				Lookup_Not_Found__c,
+				Related_Object__c,
+				Related_Parent_Field__c
+			FROM Import_Template__c
+			WHERE Active__c = TRUE
+			WITH USER_MODE
+			ORDER BY Name ASC
+			LIMIT 500
+		];
+	}
 
-    /** One template, or null when it is gone or the user cannot see it. */
-    @NamespaceAccessible
-    public static Import_Template__c selectById(Id templateId) {
-        if (templateId == null) {
-            return null;
-        }
-        List<Import_Template__c> found = [
-            SELECT
-                Id,
-                Name,
-                Description__c,
-                Template_Key__c,
-                Column_Mapping_JSON__c,
-                Default_Values_JSON__c,
-                Matching_Rule__c,
-                Person_Match_Field__c,
-                Organization_Matching_Rule__c,
-                Organization_Match_Field__c,
-                Several_Matches__c,
-                Use_Duplicate_Rules__c,
-                Person_Mode__c,
-                Is_Package_Default__c,
-                Is_Recurring__c,
-                Source_Name__c,
-                Last_Import_Date__c,
-                Active__c,
-                Payment_Matching__c,
-                Match_Date_Window_Days__c,
-                Match_Amount_Tolerance__c,
-                Target_Object__c,
-                Load_Operation__c,
-                Load_Match_Field__c,
-                Lookup_Not_Found__c,
-                Related_Object__c,
-                Related_Parent_Field__c
-            FROM Import_Template__c
-            WHERE Id = :templateId
-            WITH USER_MODE
-            LIMIT 1
-        ];
-        return found.isEmpty() ? null : found[0];
-    }
+	/** One template, or null when it is gone or the user cannot see it. */
+	@NamespaceAccessible
+	public static Import_Template__c selectById(Id templateId) {
+		if (templateId == null) {
+			return null;
+		}
+		List<Import_Template__c> found = [
+			SELECT
+				Id,
+				Name,
+				Description__c,
+				Template_Key__c,
+				Column_Mapping_JSON__c,
+				Default_Values_JSON__c,
+				Matching_Rule__c,
+				Person_Match_Field__c,
+				Organization_Matching_Rule__c,
+				Organization_Match_Field__c,
+				Several_Matches__c,
+				Use_Duplicate_Rules__c,
+				Person_Mode__c,
+				Is_Package_Default__c,
+				Is_Recurring__c,
+				Source_Name__c,
+				Last_Import_Date__c,
+				Active__c,
+				Payment_Matching__c,
+				Match_Date_Window_Days__c,
+				Match_Amount_Tolerance__c,
+				Target_Object__c,
+				Load_Operation__c,
+				Load_Match_Field__c,
+				Lookup_Not_Found__c,
+				Related_Object__c,
+				Related_Parent_Field__c
+			FROM Import_Template__c
+			WHERE Id = :templateId
+			WITH USER_MODE
+			LIMIT 1
+		];
+		return found.isEmpty() ? null : found[0];
+	}
 
-    /**
-     * Existing templates keyed by their template key, for the materialization that must
-     * never overwrite an edited template (R-IT4). Runs in system mode because upgrade
-     * bookkeeping must see every row, including one a running user cannot.
-     */
-    @NamespaceAccessible
-    public static Map<String, Import_Template__c> selectByKeys(Set<String> keys) {
-        Map<String, Import_Template__c> result = new Map<String, Import_Template__c>();
-        if (keys == null || keys.isEmpty()) {
-            return result;
-        }
-        List<Import_Template__c> found = Database.queryWithBinds(
-            'SELECT Id, Template_Key__c, Is_Package_Default__c FROM Import_Template__c ' +
-            'WHERE Template_Key__c IN :keys',
-            new Map<String, Object>{ 'keys' => keys },
-            AccessLevel.SYSTEM_MODE
-        );
-        for (Import_Template__c template : found) {
-            result.put(template.Template_Key__c, template);
-        }
-        return result;
-    }
+	/**
+	 * Existing templates keyed by their template key, for the materialization that must
+	 * never overwrite an edited template (R-IT4). Runs in system mode because upgrade
+	 * bookkeeping must see every row, including one a running user cannot.
+	 */
+	@NamespaceAccessible
+	public static Map<String, Import_Template__c> selectByKeys(Set<String> keys) {
+		Map<String, Import_Template__c> result = new Map<String, Import_Template__c>();
+		if (keys == null || keys.isEmpty()) {
+			return result;
+		}
+		List<Import_Template__c> found = Database.queryWithBinds(
+			'SELECT Id, Name, Template_Key__c, Is_Package_Default__c, Person_Mode__c FROM Import_Template__c ' +
+			'WHERE Template_Key__c IN :keys',
+			new Map<String, Object>{ 'keys' => keys },
+			AccessLevel.SYSTEM_MODE
+		);
+		for (Import_Template__c template : found) {
+			result.put(template.Template_Key__c, template);
+		}
+		return result;
+	}
 
-    /** The templates the package ships (canonical model Section 13). */
-    @NamespaceAccessible
-    public static List<Import_Template_Default__mdt> selectShippedDefaults() {
-        if (shippedOverride != null) {
-            return shippedOverride;
-        }
-        return [
-            SELECT
-                DeveloperName,
-                MasterLabel,
-                Description__c,
-                Template_Key__c,
-                Column_Mapping_JSON__c,
-                Default_Values_JSON__c,
-                Matching_Rule__c,
-                Person_Mode__c,
-                Default_Active__c,
-                Target_Object__c,
-                Load_Operation__c,
-                Load_Match_Field__c
-            FROM Import_Template_Default__mdt
-            WITH SYSTEM_MODE
-            ORDER BY MasterLabel ASC
-            LIMIT 200
-        ];
-    }
+	/** The templates the package ships (canonical model Section 13). */
+	@NamespaceAccessible
+	public static List<Import_Template_Default__mdt> selectShippedDefaults() {
+		if (shippedOverride != null) {
+			return shippedOverride;
+		}
+		return [
+			SELECT
+				DeveloperName,
+				MasterLabel,
+				Description__c,
+				Template_Key__c,
+				Column_Mapping_JSON__c,
+				Default_Values_JSON__c,
+				Matching_Rule__c,
+				Person_Mode__c,
+				Default_Active__c,
+				Target_Object__c,
+				Load_Operation__c,
+				Load_Match_Field__c
+			FROM Import_Template_Default__mdt
+			WITH SYSTEM_MODE
+			ORDER BY MasterLabel ASC
+			LIMIT 200
+		];
+	}
 }

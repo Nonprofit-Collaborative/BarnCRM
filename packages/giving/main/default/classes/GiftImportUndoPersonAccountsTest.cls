@@ -6,47 +6,47 @@
  */
 @IsTest(testFor='ApexClass:GiftImportProcessor')
 private class GiftImportUndoPersonAccountsTest {
-    private static Boolean personAccountsOrg() {
-        return OrgShapeDetector.hasPersonAccounts() == true &&
-            OrgShapeDetector.creatablePersonRecordTypeId() != null;
-    }
+	private static Boolean personAccountsOrg() {
+		return OrgShapeDetector.hasPersonAccounts() == true &&
+			OrgShapeDetector.creatablePersonRecordTypeId() != null;
+	}
 
-    @TestSetup
-    static void importDonors() {
-        GiftImportUndoTest.createUsers();
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            if (personAccountsOrg()) {
-                HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
-                GiftImportUndoTest.imported(ImportTemplateService.PERSON_MODE_PERSON_ACCOUNTS);
-            }
-        }
-    }
+	@TestSetup
+	static void importDonors() {
+		GiftImportUndoTest.createUsers();
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			if (personAccountsOrg()) {
+				HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_JUNCTION);
+				GiftImportUndoTest.imported(ImportTemplateService.PERSON_MODE_PERSON_ACCOUNTS);
+			}
+		}
+	}
 
-    @IsTest
-    static void undoingRemovesPersonAccountsWhoseTotalsTheUndoRecalculated() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            if (!personAccountsOrg()) {
-                return;
-            }
-            Id batchId = GiftImportUndoTest.batch().Id;
-            Set<Id> personTypes = OrgShapeDetector.personAccountRecordTypeIds();
-            Assert.areEqual(
-                3,
-                [
-                    SELECT COUNT()
-                    FROM Account
-                    WHERE Created_By_Import_Batch__c = :batchId AND RecordTypeId IN :personTypes
-                ],
-                'Three person accounts were imported.'
-            );
+	@IsTest
+	static void undoingRemovesPersonAccountsWhoseTotalsTheUndoRecalculated() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			if (!personAccountsOrg()) {
+				return;
+			}
+			Id batchId = GiftImportUndoTest.batch().Id;
+			Set<Id> personTypes = OrgShapeDetector.personAccountRecordTypeIds();
+			Assert.areEqual(
+				3,
+				[
+					SELECT COUNT()
+					FROM Account
+					WHERE Created_By_Import_Batch__c = :batchId AND RecordTypeId IN :personTypes
+				],
+				'Three person accounts were imported.'
+			);
 
-            GiftImportUndoTest.undo(batchId);
+			GiftImportUndoTest.undo(batchId);
 
-            Assert.areEqual(
-                0,
-                GiftImportUndoTest.taggedLeft(batchId),
-                'Every person and household the import made goes.'
-            );
-        }
-    }
+			Assert.areEqual(
+				0,
+				GiftImportUndoTest.taggedLeft(batchId),
+				'Every person and household the import made goes.'
+			);
+		}
+	}
 }

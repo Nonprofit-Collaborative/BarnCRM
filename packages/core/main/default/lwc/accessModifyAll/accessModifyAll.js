@@ -1,33 +1,31 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import getModifyAllReport from '@salesforce/apex/AccessExplorerController.getModifyAllReport';
 import { format, messageFrom, downloadCsv } from 'c/findCsv';
+import { barnName, shownColumns } from 'c/accessExplorerRows';
 
-import INTRO from '@salesforce/label/c.Core_AccessModifyAll_Intro';
 import DATA_HEADING from '@salesforce/label/c.Core_AccessModifyAll_DataHeading';
-import OBJECTS_HEADING from '@salesforce/label/c.Core_AccessModifyAll_ObjectsHeading';
+import OBJECTS_HEADING from '@salesforce/label/c.Core_AccessCompare_KindsHeading';
 import COL_VIEW_ALL_DATA from '@salesforce/label/c.Core_AccessModifyAll_ColViewAllData';
 import COL_MODIFY_ALL_DATA from '@salesforce/label/c.Core_AccessModifyAll_ColModifyAllData';
 import COL_AUTHOR_APEX from '@salesforce/label/c.Core_AccessModifyAll_ColAuthorApex';
 import COL_IN_GROUPS from '@salesforce/label/c.Core_AccessModifyAll_ColInGroups';
 import COL_SCOPE from '@salesforce/label/c.Core_AccessModifyAll_ColScope';
 import SCOPE_STANDARD from '@salesforce/label/c.Core_AccessModifyAll_ScopeStandard';
-import SCOPE_CUSTOM from '@salesforce/label/c.Core_AccessModifyAll_ScopeCustom';
-import TRUNCATED from '@salesforce/label/c.Core_AccessModifyAll_Truncated';
+import SCOPE_CUSTOM from '@salesforce/label/c.Core_DataDictionary_ColCustom';
 import KIND_PROFILE from '@salesforce/label/c.Core_AccessExplorer_KindProfile';
 import KIND_GROUP from '@salesforce/label/c.Core_AccessExplorer_KindGroup';
 import KIND_SET from '@salesforce/label/c.Core_AccessExplorer_KindSet';
 import KIND_OF_RECORD from '@salesforce/label/c.Core_AccessExplorer_KindOfRecord';
-import COL_NAME from '@salesforce/label/c.Core_AccessExplorer_ColName';
+import COL_NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
 import COL_KIND from '@salesforce/label/c.Core_AccessExplorer_ColKind';
 import COL_API_NAME from '@salesforce/label/c.Core_AccessExplorer_ColApiName';
 import COL_VIEW_ALL from '@salesforce/label/c.Core_AccessExplorer_ColViewAll';
 import COL_MODIFY_ALL from '@salesforce/label/c.Core_AccessExplorer_ColModifyAll';
 import COL_ACTIVE_PEOPLE from '@salesforce/label/c.Core_AccessExplorer_ColActivePeople';
-import NOTHING_TO_SHOW from '@salesforce/label/c.Core_AccessExplorer_NothingToShow';
 import DOWNLOAD from '@salesforce/label/c.Core_AccessExplorer_Download';
-import DOWNLOADED from '@salesforce/label/c.Core_AccessExplorer_Downloaded';
 import YES from '@salesforce/label/c.Core_AccessExplorer_Yes';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_BASE = 'Access_Explorer_Modify_All';
 /** The most rows the server lists (AccessExplorerController). */
@@ -45,11 +43,20 @@ const yes = (value) => (value ? YES : '');
  * Read only; shown inside Access Explorer, which only administrators reach.
  */
 export default class AccessModifyAll extends LightningElement {
+  /** Show the API Name column (Access Explorer's toggle). */
+  @api showTechnicalNames = false;
+
+  helpReady = isHelpLoaded('Core');
+
   labels = {
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_AccessModifyAll_Intro');
+    },
     dataHeading: DATA_HEADING,
     objectsHeading: OBJECTS_HEADING,
-    nothingToShow: NOTHING_TO_SHOW,
+    get nothingToShow() {
+      return helpText('Core', 'Core_AccessExplorer_NothingToShow');
+    },
     download: DOWNLOAD,
     loading: LOADING
   };
@@ -60,6 +67,11 @@ export default class AccessModifyAll extends LightningElement {
   noticeMessage;
 
   async connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     try {
       this.report = await getModifyAllReport();
     } catch (error) {
@@ -70,13 +82,19 @@ export default class AccessModifyAll extends LightningElement {
   }
 
   get truncatedMessage() {
-    return this.report && this.report.truncated ? format(TRUNCATED, MAX_ROWS) : undefined;
+    return this.report && this.report.truncated
+      ? format(helpText('Core', 'Core_AccessModifyAll_Truncated'), MAX_ROWS)
+      : undefined;
   }
 
   /** Both tables, by name: columns and rows (the CSV uses the same). */
   get tables() {
     const grants = this.report ? this.report.dataGrants : [];
     const objects = this.report ? this.report.objects : [];
+    const patterns = {
+      role: helpText('Core', 'Core_AccessExplorer_RoleName'),
+      extraPermission: helpText('Core', 'Core_AccessExplorer_ExtraPermissionName')
+    };
     return {
       data: {
         columns: [
@@ -91,6 +109,7 @@ export default class AccessModifyAll extends LightningElement {
         rows: grants.map((grant) => ({
           ...grant,
           key: grant.id,
+          label: barnName(grant.label, grant.barnKind, patterns),
           kindLabel: KINDS[grant.kind] || '',
           modifyAllDataText: yes(grant.modifyAllData),
           viewAllDataText: yes(grant.viewAllData || grant.modifyAllData),
@@ -98,20 +117,24 @@ export default class AccessModifyAll extends LightningElement {
         }))
       },
       objects: {
-        columns: [
-          column('objectLabel', KIND_OF_RECORD),
-          column('objectName', COL_API_NAME),
-          column('scopeLabel', COL_SCOPE),
-          column('holder', COL_NAME),
-          column('kindLabel', COL_KIND),
-          column('modifyAllText', COL_MODIFY_ALL),
-          column('viewAllText', COL_VIEW_ALL),
-          column('inGroups', COL_IN_GROUPS, { wrapText: true }),
-          column('activePeople', COL_ACTIVE_PEOPLE, { type: 'number' })
-        ],
+        columns: shownColumns(
+          [
+            column('objectLabel', KIND_OF_RECORD),
+            column('objectName', COL_API_NAME, { technical: true }),
+            column('scopeLabel', COL_SCOPE),
+            column('holder', COL_NAME),
+            column('kindLabel', COL_KIND),
+            column('modifyAllText', COL_MODIFY_ALL),
+            column('viewAllText', COL_VIEW_ALL),
+            column('inGroups', COL_IN_GROUPS, { wrapText: true }),
+            column('activePeople', COL_ACTIVE_PEOPLE, { type: 'number' })
+          ],
+          this.showTechnicalNames
+        ),
         rows: objects.map((row) => ({
           ...row,
           key: `${row.objectName}:${row.holderId}`,
+          holder: barnName(row.holder, row.barnKind, patterns),
           scopeLabel: SCOPES[row.scope] || '',
           kindLabel: KINDS[row.kind] || '',
           modifyAllText: yes(row.modifyAll),
@@ -141,6 +164,9 @@ export default class AccessModifyAll extends LightningElement {
     const table = this.tables[event.currentTarget.dataset.table];
     const columns = table.columns.map((each) => ({ label: each.label, path: each.fieldName }));
     downloadCsv(FILE_BASE, columns, table.rows);
-    this.noticeMessage = format(DOWNLOADED, String(table.rows.length));
+    this.noticeMessage = format(
+      helpText('Core', 'Core_AccessExplorer_Downloaded'),
+      String(table.rows.length)
+    );
   }
 }

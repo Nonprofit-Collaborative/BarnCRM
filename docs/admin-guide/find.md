@@ -3,8 +3,8 @@
 ## 1. What It Does
 
 **Find** answers "show me exactly these records" without a report type, Setup or a query
-language. You pick one object (Households, Contacts, Gifts with the Giving module, or any
-other object you can see), choose the columns, add conditions such as "Status is one of
+language. You pick one kind of record (Households, Contacts, Gifts with the Giving module, or any
+other kind of record you can see), choose the columns, add conditions such as "Status is one of
 Received, Pledged" or "Gift Date is in the last 90 days", choose a sort order and how many
 rows to show, and press **Run**. The results appear in a table, 25 rows at a time: press
 **Show More** under the table for the next 25. You can then:
@@ -17,7 +17,7 @@ rows to show, and press **Run**. The results appear in a table, 25 rows at a tim
 - **Save** the query under a name, to run it again next month.
 - **Share** a saved query, so everyone else who uses Find can open it.
 - **Summarize**: count, total, lowest or highest value, grouped by a field.
-- **Edit in the table**, if you may also bulk update: change values in the results and save
+- **Edit in the table**, if you may also use Super Transformer: change values in the results and save
   them, with an undo (section 7.6).
 
 Find changes a record only when you edit it in the table and press **Save**. Everything it
@@ -52,15 +52,17 @@ builder and checks it exactly as if it had been built by hand.
 Maria wants every household in Springfield that has no email address on its primary contact,
 to send them a letter.
 
-1. Open **Find**. In **Object**, choose **Account**.
+1. Open **Find**. In **Kind of record**, choose **Account**.
 2. In **Columns**, move **Account Name**, **Billing City** and **Billing Postal Code** to the
    right. To add a field from a related record, choose the lookup in **Add fields from** (for
    example **Primary Contact**) and its fields appear in the list as "Primary Contact > Email".
-   Add **Primary Contact > Email**.
+   Add **Primary Contact > Email**. The chosen columns also appear in a list you can put in
+   order: drag by the handle (touch: press and hold) or use Move Up and Move Down; the preview
+   and results follow the order.
 3. Under **Conditions**, press **Add Condition**. Choose **Billing City**, **equals**, and type
    **Springfield**. Add a second condition: **Primary Contact: more fields**, then **Email**,
    **is blank**.
-4. In **Sort by**, choose **Account Name**, **Ascending**. Leave **Rows to show** at 200.
+4. In **Sort by**, choose **Account Name**, **A to Z or Oldest First**. Leave **Rows to show** at 200.
 5. Press **Run**. Find reads up to 200 households and the table shows the first 25; press
    **Show More** for the next 25. The line above the table says how many rows were found.
 6. Open the **Export** menu and choose **Export to CSV**. Find reads every matching household, in pages, and downloads one
@@ -97,6 +99,10 @@ a value; the operators offered depend on the field:
 - **Condition logic.** With two or more conditions, tick **Use custom condition logic** to
   combine them with AND, OR, NOT and brackets, for example `1 AND (2 OR 3)`. Every condition
   must appear in the logic.
+- **Condition order.** With two or more conditions, drag a condition by its handle (touch:
+  press and hold) or use its Move Up and Move Down buttons. Each move is announced to screen
+  readers. The condition logic is renumbered so every number still names the same condition:
+  moving condition 3 to the top turns `1 AND (2 OR 3)` into `2 AND (3 OR 1)`.
 - A condition that is incomplete, or a value that does not fit the field, is marked in place
   and the query does not run until it is fixed.
 
@@ -113,7 +119,7 @@ a value; the operators offered depend on the field:
   it for everyone who uses Find. A deleted query cannot be brought back.
 - The SOQL box below the conditions updates when you pause typing, not on every key, so typing
   a value costs one check.
-- The **Saved queries** list shows your own queries first, then the ones shared with you,
+- The **Saved searches** list shows your own queries first, then the ones shared with you,
   with the name of the person who shared each. The list holds up to 500 queries; your own
   are always counted first, so shared queries never push one of yours off it.
 - A shared query that names a field someone cannot see opens for them with that column left
@@ -248,13 +254,13 @@ If you hold the **Bulk Update Records** permission as well as Find's, the column
 show a pencil after a query runs. Double-click a cell (or press Enter on it), change the value,
 and press **Save** at the foot of the table. Find saves up to 200 changed records at a time.
 
-- Only the query object's own fields that a bulk update may change can be edited: not fields
+- Only the query object's own fields that Super Transformer may change can be edited: not fields
   of a related record, not formula or system fields, and not the fields BarnCRM keeps itself
-  ([Bulk update](bulk-update.md), section 4).
+  ([Super Transformer runs and undo](bulk-update.md), section 4).
 - Each save runs with your access, and your organization's validation rules and automation
   run, as on any save. A record that is refused is marked in the table with the reason; the
   rest still save.
-- Each save is recorded like a bulk update. It appears on the **Data Manager** tab under
+- Each save is recorded like a Super Transformer run. It appears on the **Data Manager** tab under
   **Data Jobs**, and can be undone there within the same window as an import. The
   undo puts back each value nobody has changed since.
 
@@ -262,9 +268,14 @@ and press **Save** at the foot of the table. Find saves up to 200 changed record
 
 An export to Files runs once, when you press it: scheduled or recurring exports and sending a
 file elsewhere are planned for a later release (C-38). Totals are a summary table, not a chart. To change many records to the same
-value at once, run a query, open the **Change Records** menu and choose **Bulk Update**,
-shown to people who also hold the Bulk Update Records permission. See
-[Bulk update](bulk-update.md). To delete every record a query returns, choose **Bulk Delete**
+value at once, run a search, open the **Change Records** menu and choose **Super Transformer**,
+shown to people who also hold the Bulk Update Records permission. Find does not build a second
+change screen: it opens the **Super Transformer** page already filled in with the search's kind
+of record and conditions (including its conditions on related records, which stay in the count
+but are not shown there), so you only choose what to change, then preview and run. Nothing runs
+until you do. The columns, sort order and **Rows to show** do not carry over: a change always
+covers every record the conditions match. See
+[Super Transformer runs and undo](bulk-update.md). To delete every record a query returns, choose **Bulk Delete**
 in the same menu, shown only to people who hold the Bulk Delete Records permission. See
 [Bulk delete](bulk-delete.md).
 
@@ -275,8 +286,9 @@ in the same menu, shown only to people who hold the Bulk Delete Records permissi
 - Until you choose an object or a saved query, the page shows only those two lists and a
   short prompt.
 - **Run** is the main button. **Export** holds the three exports, and **Change Records** holds
-  Bulk Update and Bulk Delete for people with those permissions. The bulk panel opens right
-  under these buttons, above the results.
+  Super Transformer and Bulk Delete for people with those permissions. Super Transformer opens as
+  its own page, pre-filled; the Bulk Delete panel opens right under these buttons, above the
+  results.
 - The table shows 25 rows at a time, with **Show More** for the next 25, so a long result does
   not run down the page. Every export still includes every matching record, up to the export
   row limit, not only the rows shown.

@@ -21,77 +21,77 @@
  * Process user.
  */
 public without sharing class RollupRecalcErrorHandler {
-    private static final String LOG_CONTEXT = 'RollupRecalcErrorHandler';
-    private static final String EXECUTE_PHASE = 'EXECUTE';
-    private static final String SEPARATOR = ',';
+	private static final String LOG_CONTEXT = 'RollupRecalcErrorHandler';
+	private static final String EXECUTE_PHASE = 'EXECUTE';
+	private static final String SEPARATOR = ',';
 
-    /**
-     * Queues the records of every stopped full recalculation chunk among these events.
-     *
-     * @param events the events the trigger received
-     */
-    public static void handle(List<BatchApexErrorEvent> events) {
-        Set<Id> jobIds = new Set<Id>();
-        for (BatchApexErrorEvent event : events) {
-            if (event.AsyncApexJobId != null && event.Phase == EXECUTE_PHASE) {
-                jobIds.add(event.AsyncApexJobId);
-            }
-        }
-        if (jobIds.isEmpty()) {
-            return;
-        }
-        Set<Id> ours = new Map<Id, AsyncApexJob>(
-                [
-                    SELECT Id
-                    FROM AsyncApexJob
-                    WHERE Id IN :jobIds AND ApexClass.Name = :RollupFullRecalcBatch.CLASS_NAME
-                    WITH SYSTEM_MODE
-                ]
-            )
-            .keySet();
-        Map<String, Set<Id>> idsByTarget = new Map<String, Set<Id>>();
-        Integer queued = 0;
-        for (BatchApexErrorEvent event : events) {
-            if (!ours.contains(event.AsyncApexJobId) || event.Phase != EXECUTE_PHASE) {
-                continue;
-            }
-            for (Id recordId : idsIn(event.JobScope)) {
-                String target = String.valueOf(recordId.getSObjectType());
-                if (!idsByTarget.containsKey(target)) {
-                    idsByTarget.put(target, new Set<Id>());
-                }
-                if (idsByTarget.get(target).add(recordId)) {
-                    queued++;
-                }
-            }
-        }
-        if (queued == 0) {
-            return;
-        }
-        RollupQueue.add(idsByTarget);
-        ErrorLogger.logMessage(
-            String.format(
-                System.Label.Core_Rollups_FullRunChunkQueued,
-                new List<String>{ String.valueOf(queued) }
-            ),
-            LOG_CONTEXT,
-            ErrorLogger.SEVERITY_WARNING
-        );
-    }
+	/**
+	 * Queues the records of every stopped full recalculation chunk among these events.
+	 *
+	 * @param events the events the trigger received
+	 */
+	public static void handle(List<BatchApexErrorEvent> events) {
+		Set<Id> jobIds = new Set<Id>();
+		for (BatchApexErrorEvent event : events) {
+			if (event.AsyncApexJobId != null && event.Phase == EXECUTE_PHASE) {
+				jobIds.add(event.AsyncApexJobId);
+			}
+		}
+		if (jobIds.isEmpty()) {
+			return;
+		}
+		Set<Id> ours = new Map<Id, AsyncApexJob>(
+				[
+					SELECT Id
+					FROM AsyncApexJob
+					WHERE Id IN :jobIds AND ApexClass.Name = :RollupFullRecalcBatch.CLASS_NAME
+					WITH SYSTEM_MODE
+				]
+			)
+			.keySet();
+		Map<String, Set<Id>> idsByTarget = new Map<String, Set<Id>>();
+		Integer queued = 0;
+		for (BatchApexErrorEvent event : events) {
+			if (!ours.contains(event.AsyncApexJobId) || event.Phase != EXECUTE_PHASE) {
+				continue;
+			}
+			for (Id recordId : idsIn(event.JobScope)) {
+				String target = String.valueOf(recordId.getSObjectType());
+				if (!idsByTarget.containsKey(target)) {
+					idsByTarget.put(target, new Set<Id>());
+				}
+				if (idsByTarget.get(target).add(recordId)) {
+					queued++;
+				}
+			}
+		}
+		if (queued == 0) {
+			return;
+		}
+		RollupQueue.add(idsByTarget);
+		ErrorLogger.logMessage(
+			String.format(
+				System.Label.Core_Rollups_FullRunChunkQueued,
+				new List<String>{ String.valueOf(queued) }
+			),
+			LOG_CONTEXT,
+			ErrorLogger.SEVERITY_WARNING
+		);
+	}
 
-    /** The record Ids in an event's job scope; anything that is not an Id is skipped. */
-    private static List<Id> idsIn(String jobScope) {
-        List<Id> ids = new List<Id>();
-        if (String.isBlank(jobScope)) {
-            return ids;
-        }
-        for (String part : jobScope.split(SEPARATOR)) {
-            try {
-                ids.add(Id.valueOf(part.trim()));
-            } catch (StringException notAnId) {
-                continue;
-            }
-        }
-        return ids;
-    }
+	/** The record Ids in an event's job scope; anything that is not an Id is skipped. */
+	private static List<Id> idsIn(String jobScope) {
+		List<Id> ids = new List<Id>();
+		if (String.isBlank(jobScope)) {
+			return ids;
+		}
+		for (String part : jobScope.split(SEPARATOR)) {
+			try {
+				ids.add(Id.valueOf(part.trim()));
+			} catch (StringException notAnId) {
+				continue;
+			}
+		}
+		return ids;
+	}
 }

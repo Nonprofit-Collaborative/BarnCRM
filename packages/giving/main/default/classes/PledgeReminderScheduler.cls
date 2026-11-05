@@ -8,47 +8,61 @@
  * setting off does nothing at all.
  */
 public with sharing class PledgeReminderScheduler implements Schedulable {
-    /** The name the scheduled job carries, so the page can find it again. */
-    public static final String JOB_NAME = 'BarnCRM Giving: pledge reminders';
+	/** The name the scheduled job carries, so the page can find it again. */
+	public static final String JOB_NAME = 'BarnCRM Giving Pledge Reminders';
 
-    /**
-     * Three fifteen in the morning: after the installment overdue pass, so an installment that
-     * went overdue overnight carries its status before the donor hears about it.
-     */
-    private static final String NIGHTLY_CRON = '0 15 3 * * ?';
+	private static final String LOG_CONTEXT = 'PledgeReminderScheduler.execute';
 
-    private static final String LOG_CONTEXT = 'PledgeReminderScheduler.execute';
+	public void execute(SchedulableContext context) {
+		if (context != null) {
+			// Still scheduled on its own from before the nightly run (R-NJ5).
+			NightlyJobs.adoptOldSchedules();
+		}
+		try {
+			if (!PledgeReminderService.isEnabled()) {
+				// Switched off since the schedule was started. Nothing to do, and nothing wrong.
+				return;
+			}
+			Database.executeBatch(new PledgeReminderBatch(), PledgeReminderBatch.SCOPE);
+		} catch (Exception nightlyFailure) {
+			// A scheduled job's exception goes nowhere a person will ever look, so it goes here.
+			ErrorLogger.log(nightlyFailure, LOG_CONTEXT);
+		}
+	}
 
-    public void execute(SchedulableContext context) {
-        try {
-            if (!PledgeReminderService.isEnabled()) {
-                // Switched off since the schedule was started. Nothing to do, and nothing wrong.
-                return;
-            }
-            Database.executeBatch(new PledgeReminderBatch(), PledgeReminderBatch.SCOPE);
-        } catch (Exception nightlyFailure) {
-            // A scheduled job's exception goes nowhere a person will ever look, so it goes here.
-            ErrorLogger.log(nightlyFailure, LOG_CONTEXT);
-        }
-    }
+	/** Switches the reminder run on, scheduling the nightly run when it is not (R-NJ4). */
+	public static Id start() {
+		return NightlyJobs.turnOn(JOB_NAME);
+	}
 
-    /** Starts the nightly run, or does nothing when it is already scheduled. */
-    public static Id start() {
-        return ScheduledJobSelector.ensure(JOB_NAME, NIGHTLY_CRON, new PledgeReminderScheduler());
-    }
+	/** Switches the reminder run off. The log stays exactly as it is. */
+	public static void stop() {
+		NightlyJobs.turnOff(JOB_NAME);
+	}
 
-    /** Stops the nightly run. The log stays exactly as it is. */
-    public static void stop() {
-        ScheduledJobSelector.stopNamed(JOB_NAME);
-    }
+	/** True when the reminder run is switched on and the nightly run is scheduled. */
+	public static Boolean isScheduled() {
+		return NightlyJobs.isStepScheduled(JOB_NAME, false);
+	}
 
-    /** True when the nightly run is scheduled. */
-    public static Boolean isScheduled() {
-        return ScheduledJobSelector.isScheduled(JOB_NAME);
-    }
+	/** When the reminder run is next due, or null when it is not scheduled. */
+	public static Datetime nextRunAt() {
+		return isScheduled() ? NightlyJobs.nextRunAt(step()) : null;
+	}
 
-    /** When the nightly run is next due, or null when it is not scheduled. */
-    public static Datetime nextRunAt() {
-        return ScheduledJobSelector.nextFireTime(JOB_NAME);
-    }
+	/**
+	 * The reminders as a step of the nightly run (ADR-0166 nightly-job-dispatcher): three
+	 * fifteen, after the installment overdue pass, so an installment that went overdue overnight
+	 * carries its status before the donor hears about it. Shipped off: it emails donors.
+	 */
+	public static NightlyStep step() {
+		return new NightlyStep(
+				JOB_NAME,
+				System.Label.Giving_PledgeReminders_Title,
+				3,
+				15,
+				new PledgeReminderScheduler()
+			)
+			.withSwitch(false);
+	}
 }

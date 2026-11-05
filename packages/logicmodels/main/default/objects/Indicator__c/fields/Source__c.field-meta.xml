@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Source__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Where the results come from: typed in, imported with the Indicator Results template, or computed every night from a Find saved query. Blank means typed in.</inlineHelpText>
+  <label>Source</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Manual</fullName>
+        <default>true</default>
+        <label>Typed In</label>
+      </value>
+      <value>
+        <fullName>Import</fullName>
+        <default>false</default>
+        <label>Imported</label>
+      </value>
+      <value>
+        <fullName>Computed</fullName>
+        <default>false</default>
+        <label>Computed</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

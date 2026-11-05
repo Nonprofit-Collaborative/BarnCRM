@@ -12,27 +12,27 @@
  */
 @NamespaceAccessible
 public with sharing class StewardshipTriggerHandler extends TriggerHandler {
-    private static final String CONTEXT = 'Stewardship plans';
+	private static final String CONTEXT = 'Stewardship plans';
 
-    @NamespaceAccessible
-    public StewardshipTriggerHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public StewardshipTriggerHandler() {
+		return;
+	}
 
-    public override void afterInsert() {
-        start();
-    }
+	public override void afterInsert() {
+		start();
+	}
 
-    private void start() {
-        List<SObject> records = newRecords();
-        if (records == null || records.isEmpty()) {
-            return;
-        }
-        try {
-            StewardshipService.startForGifts((List<Gift__c>) records);
-        } catch (Exception failure) {
-            // A plan that could not start must not stop somebody recording a gift (R-SP9).
-            ErrorLogger.log(failure, CONTEXT);
-        }
-    }
+	private void start() {
+		List<SObject> records = newRecords();
+		if (records == null || records.isEmpty()) {
+			return;
+		}
+		try {
+			StewardshipService.startForGifts((List<Gift__c>) records);
+		} catch (Exception failure) {
+			// A plan that could not start must not stop somebody recording a gift (R-SP9).
+			ErrorLogger.log(failure, CONTEXT);
+		}
+	}
 }

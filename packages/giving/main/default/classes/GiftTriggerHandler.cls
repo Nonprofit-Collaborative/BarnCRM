@@ -13,55 +13,55 @@
  */
 @NamespaceAccessible
 public with sharing class GiftTriggerHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public GiftTriggerHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public GiftTriggerHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'GiftTriggerHandler';
-    }
+	public override String getName() {
+		return 'GiftTriggerHandler';
+	}
 
-    public override void beforeInsert() {
-        List<Gift__c> gifts = (List<Gift__c>) Trigger.new;
-        GiftService.defaultGiftDates(gifts);
-        GiftService.deriveHouseholds(gifts);
-        GiftStatusRules.unlinkCancelledOnInsert(gifts);
-    }
+	public override void beforeInsert() {
+		List<Gift__c> gifts = (List<Gift__c>) newRecords();
+		GiftService.defaultGiftDates(gifts);
+		GiftService.deriveHouseholds(gifts);
+		GiftStatusRules.unlinkCancelledOnInsert(gifts);
+	}
 
-    public override void beforeUpdate() {
-        List<Gift__c> gifts = (List<Gift__c>) Trigger.new;
-        Map<Id, Gift__c> oldGifts = (Map<Id, Gift__c>) Trigger.oldMap;
-        GiftService.defaultGiftDates(gifts);
-        GiftStatusRules.enforceTransitions(gifts, oldGifts);
+	public override void beforeUpdate() {
+		List<Gift__c> gifts = (List<Gift__c>) newRecords();
+		Map<Id, Gift__c> oldGifts = (Map<Id, Gift__c>) oldRecordsById();
+		GiftService.defaultGiftDates(gifts);
+		GiftStatusRules.enforceTransitions(gifts, oldGifts);
 
-        List<Gift__c> donorChanged = new List<Gift__c>();
-        for (Gift__c gift : gifts) {
-            Gift__c previous = oldGifts.get(gift.Id);
-            if (
-                gift.Donor_Contact__c != previous.Donor_Contact__c ||
-                gift.Donor_Account__c != previous.Donor_Account__c
-            ) {
-                donorChanged.add(gift);
-            }
-        }
-        if (!donorChanged.isEmpty()) {
-            GiftService.deriveHouseholds(donorChanged);
-        }
-    }
+		List<Gift__c> donorChanged = new List<Gift__c>();
+		for (Gift__c gift : gifts) {
+			Gift__c previous = oldGifts.get(gift.Id);
+			if (
+				gift.Donor_Contact__c != previous.Donor_Contact__c ||
+				gift.Donor_Account__c != previous.Donor_Account__c
+			) {
+				donorChanged.add(gift);
+			}
+		}
+		if (!donorChanged.isEmpty()) {
+			GiftService.deriveHouseholds(donorChanged);
+		}
+	}
 
-    public override void afterInsert() {
-        GiftService.applyDefaultAllocations((List<Gift__c>) Trigger.new);
-    }
+	public override void afterInsert() {
+		GiftService.applyDefaultAllocations((List<Gift__c>) newRecords());
+	}
 
-    public override void afterUpdate() {
-        GiftService.synchronizeAllocationsToAmount(
-            (List<Gift__c>) Trigger.new,
-            (Map<Id, Gift__c>) Trigger.oldMap
-        );
-        GiftStatusRules.logCancellations(
-            (List<Gift__c>) Trigger.new,
-            (Map<Id, Gift__c>) Trigger.oldMap
-        );
-    }
+	public override void afterUpdate() {
+		GiftService.synchronizeAllocationsToAmount(
+			(List<Gift__c>) newRecords(),
+			(Map<Id, Gift__c>) oldRecordsById()
+		);
+		GiftStatusRules.logCancellations(
+			(List<Gift__c>) newRecords(),
+			(Map<Id, Gift__c>) oldRecordsById()
+		);
+	}
 }

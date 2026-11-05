@@ -14,17 +14,14 @@ import { startPolling } from 'c/jobPoller';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import HEADING from '@salesforce/label/c.Core_DataJobs_Heading';
 import EMPTY from '@salesforce/label/c.Core_DataJobs_Empty';
-import EMPTY_HINT from '@salesforce/label/c.Core_DataJobs_EmptyHint';
 import SHOW from '@salesforce/label/c.Core_DataJobs_Show';
 import SHOW_ALL from '@salesforce/label/c.Core_DataJobs_ShowAll';
 import SHOW_IMPORTS from '@salesforce/label/c.Core_DataJobs_ShowImports';
 import SHOW_UPDATES from '@salesforce/label/c.Core_DataJobs_ShowUpdates';
 import SHOW_DELETES from '@salesforce/label/c.Core_DataJobs_ShowDeletes';
 import KIND_IMPORT from '@salesforce/label/c.Core_DataJobs_KindImport';
-import KIND_UPDATE from '@salesforce/label/c.Core_DataJobs_KindUpdate';
-import KIND_DELETE from '@salesforce/label/c.Core_DataJobs_KindDelete';
-import IMPORT_SUMMARY from '@salesforce/label/c.Core_DataJobs_ImportSummary';
-import IMPORT_SUMMARY_ONE from '@salesforce/label/c.Core_DataJobs_ImportSummaryOne';
+import KIND_UPDATE from '@salesforce/label/c.Core_JobNotice_BulkUpdate';
+import KIND_DELETE from '@salesforce/label/c.Core_JobNotice_BulkDelete';
 import STARTED from '@salesforce/label/c.Core_DataJobs_Started';
 import ROW_ACTIONS from '@salesforce/label/c.Core_DataJobs_RowActions';
 import IMPORT_HEADING from '@salesforce/label/c.Core_Import_HistoryHeading';
@@ -34,26 +31,20 @@ import IMPORT_CONFIRM_HOUSEHOLDS from '@salesforce/label/c.Core_Import_UndoConfi
 import IMPORT_CONFIRM_ORGANIZATIONS from '@salesforce/label/c.Core_Import_UndoConfirmOrganizations';
 import IMPORT_CONFIRM_UPDATES from '@salesforce/label/c.Core_Import_UndoConfirmUpdates';
 import IMPORT_CONFIRM_BUTTON from '@salesforce/label/c.Core_Import_UndoConfirmButton';
-import IMPORT_UNDO_STARTED from '@salesforce/label/c.Core_Import_UndoStarted';
-import UPDATE_INTRO from '@salesforce/label/c.Core_BulkUpdate_TabIntro';
-import UPDATE_SUMMARY from '@salesforce/label/c.Core_BulkUpdate_Summary';
-import UPDATE_UNDO_CONFIRM from '@salesforce/label/c.Core_BulkUpdate_UndoConfirm';
 import UPDATE_UNDO_BUTTON from '@salesforce/label/c.Core_BulkUpdate_UndoButton';
-import DELETE_SUMMARY from '@salesforce/label/c.Core_BulkDelete_Summary';
-import DELETE_UNDO_CONFIRM from '@salesforce/label/c.Core_BulkDelete_UndoConfirm';
 import DELETE_UNDO_BUTTON from '@salesforce/label/c.Core_BulkDelete_UndoButton';
-import BULK_UNDO_STARTED from '@salesforce/label/c.Core_BulkUpdate_UndoStarted';
-import REFRESH from '@salesforce/label/c.Core_BulkUpdate_Refresh';
-import UNDO from '@salesforce/label/c.Core_BulkUpdate_Undo';
+import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
+import UNDO from '@salesforce/label/c.Core_AutoMerge_Undo';
 import UNDO_UNTIL from '@salesforce/label/c.Core_BulkUpdate_UndoUntil';
 import TYPE_TO_CONFIRM from '@salesforce/label/c.Core_BulkUpdate_Confirm';
-import CANCEL from '@salesforce/label/c.Core_BulkUpdate_Cancel';
-import LOADING from '@salesforce/label/c.Core_BulkUpdate_Loading';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import EVERYONE from '@salesforce/label/c.Core_BulkUpdate_EveryonesJobs';
 import OPEN_FIND from '@salesforce/label/c.Core_BulkUpdate_OpenFind';
 import { NavigationMixin } from 'lightning/navigation';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 import { format } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FIND_TAB = 'Find';
 
@@ -73,19 +64,22 @@ function errorText(error) {
 // ImportBatchService.STATUS_UNDOING
 const IMPORT_UNDOING = 'Undoing';
 
-/** The SLDS badge theme for a job status: green when done, red when it failed, amber while it runs. */
-function badgeTheme(status) {
+/**
+ * The status badge tone for a job status (the kit's vocabulary): success when done, error when
+ * it failed, running while it runs, neutral otherwise.
+ */
+function statusTone(status) {
   const text = String(status || '').toLowerCase();
   if (text.includes('fail') || text.includes('error')) {
-    return 'slds-theme_error';
+    return 'error';
   }
   if (text.includes('ing') || text.startsWith('queued') || text.startsWith('pending')) {
-    return 'slds-theme_warning';
+    return 'running';
   }
   if (text.startsWith('complete') || text.startsWith('done') || text === 'undone') {
-    return 'slds-theme_success';
+    return 'success';
   }
-  return '';
+  return 'neutral';
 }
 
 /** One import, in the shape every row of the list shares. */
@@ -99,7 +93,9 @@ function fromImport(batch) {
     detail: batch.fileName,
     status: batch.status,
     summary: format(
-      batch.rowCount === 1 ? IMPORT_SUMMARY_ONE : IMPORT_SUMMARY,
+      batch.rowCount === 1
+        ? helpText('Core', 'Core_DataJobs_ImportSummaryOne')
+        : helpText('Core', 'Core_DataJobs_ImportSummary'),
       batch.rowCount || 0,
       batch.created || 0,
       batch.updated || 0,
@@ -126,8 +122,14 @@ function fromBulkJob(job, kind) {
     detail: job.objectLabel,
     status: job.status,
     summary: isUpdate
-      ? format(UPDATE_SUMMARY, job.matched, job.updated, job.unchanged, job.failed)
-      : format(DELETE_SUMMARY, job.matched, job.deleted, job.failed),
+      ? format(
+          helpText('Core', 'Core_BulkUpdate_Summary'),
+          job.matched,
+          job.updated,
+          job.unchanged,
+          job.failed
+        )
+      : format(helpText('Core', 'Core_BulkDelete_Summary'), job.matched, job.deleted, job.failed),
     startedAt: job.startedAt,
     undoDeadline: job.undoDeadline,
     canUndo: Boolean(job.canUndo && !job.running),
@@ -158,13 +160,17 @@ function newestFirst(left, right) {
  * number it acts on (R-BU5, R-BD5).
  */
 export default class DataJobHistory extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
   /** Which kinds this placement lists, comma separated (Import, Update, Delete); blank is all. */
   @api kinds;
 
   labels = {
     show: SHOW,
     empty: EMPTY,
-    emptyHint: EMPTY_HINT,
+    get emptyHint() {
+      return helpText('Core', 'Core_DataJobs_EmptyHint');
+    },
     refresh: REFRESH,
     undo: UNDO,
     undoUntil: UNDO_UNTIL,
@@ -214,6 +220,11 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
   stopTimer;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -328,7 +339,7 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
   }
 
   get introText() {
-    return UPDATE_INTRO;
+    return helpText('Core', 'Core_BulkUpdate_TabIntro');
   }
 
   get showFilter() {
@@ -348,7 +359,7 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
       .map((job) => ({
         ...job,
         title: `${job.name}: ${[job.kindLabel, job.detail].filter(Boolean).join(', ')}`,
-        badgeClass: `slds-var-m-left_x-small ${badgeTheme(job.status)}`,
+        tone: statusTone(job.status),
         showDeadline: job.canUndo && Boolean(job.undoDeadline)
       }));
   }
@@ -401,7 +412,10 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
     if (!this.isBulkUndo) {
       return '';
     }
-    const template = this.undoTarget.kind === UPDATE ? UPDATE_UNDO_CONFIRM : DELETE_UNDO_CONFIRM;
+    const template =
+      this.undoTarget.kind === UPDATE
+        ? helpText('Core', 'Core_BulkUpdate_UndoConfirm')
+        : helpText('Core', 'Core_BulkDelete_UndoConfirm');
     return format(template, this.undoTarget.undoCount);
   }
 
@@ -467,7 +481,7 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
         batchId: this.undoTarget.id,
         confirmedTotal: this.importPreview.total
       });
-      this.finishUndo(IMPORT_UNDO_STARTED);
+      this.finishUndo(helpText('Core', 'Core_Import_UndoStarted'));
       await this.load();
     });
   }
@@ -483,7 +497,7 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
         const row = fromBulkJob(undone, target.kind);
         this.jobs = this.jobs.map((job) => (job.id === row.id ? row : job));
       }
-      this.finishUndo(BULK_UNDO_STARTED);
+      this.finishUndo(helpText('Core', 'Core_BulkUpdate_UndoStarted'));
       this.pollWhileRunning();
     });
   }

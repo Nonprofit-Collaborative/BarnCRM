@@ -1,13 +1,13 @@
 <template>
+    <template lwc:if={helpReady}>
     <p class="slds-text-body_regular slds-var-m-bottom_small" data-id="shape">{shapeText}</p>
 
     <template lwc:if={hasOtherRollupTools}>
-        <div class="slds-box slds-box_x-small slds-theme_shade slds-var-m-bottom_small" role="status" data-id="other-rollup-tools">
-            <h3 class="slds-text-heading_x-small">{labels.otherRollupTools}</h3>
+        <c-barn-notice class="slds-var-m-bottom_small" title={labels.otherRollupTools} data-id="other-rollup-tools">
             <template for:each={otherRollupTools} for:item="notice">
                 <p key={notice} class="slds-text-body_small">{notice}</p>
             </template>
-        </div>
+        </c-barn-notice>
     </template>
 
     <p class="slds-text-body_small slds-var-m-bottom_small">
@@ -31,5 +31,6 @@
             label={labels.confirm}
             onclick={handleConfirm}
         ></lightning-button>
+    </template>
     </template>
 </template>

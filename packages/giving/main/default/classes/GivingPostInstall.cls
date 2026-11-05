@@ -45,50 +45,71 @@
  * because of a bootstrap step, so a failure is written to the Error Log instead, and the
  * Rollups page still offers the same button.
  *
+ * Alongside these, a checkbox setting that ships on and was added in an upgrade is turned on once
+ * in an org that saved Giving Settings before it existed (QA-F2, `SHIPPED_ON_ADDED_IN_UPGRADES`).
+ *
  * The steps are `runSetup`, which also adds the module to Core's setup marker and is what
  * Finish Setup runs for a module copied into an org by hand (FS1, `ModuleSetups`).
  */
 @NamespaceAccessible
 public with sharing class GivingPostInstall implements InstallHandler, ModuleSetup {
-    /** The module's key in the module catalog and the setup marker. */
-    private static final String MODULE_KEY = 'Giving';
-    private static final String ROLLUP_CONTEXT = 'GivingPostInstall.ensureRollupDefaults';
-    private static final String TEMPLATE_CONTEXT = 'GivingPostInstall.installReceiptTemplates';
-    private static final String SWITCH_CONTEXT = 'GivingPostInstall.ensureAutomationSwitches';
-    private static final String IMPORT_CONTEXT = 'GivingPostInstall.ensureImportTemplates';
-    private static final String FUND_CONTEXT = 'GivingPostInstall.ensureDefaultFund';
+	/** The module's key in the module catalog and the setup marker. */
+	private static final String MODULE_KEY = 'Giving';
+	private static final String ROLLUP_CONTEXT = 'GivingPostInstall.ensureRollupDefaults';
+	private static final String TEMPLATE_CONTEXT = 'GivingPostInstall.installReceiptTemplates';
+	private static final String SWITCH_CONTEXT = 'GivingPostInstall.ensureAutomationSwitches';
+	private static final String IMPORT_CONTEXT = 'GivingPostInstall.ensureImportTemplates';
+	private static final String FUND_CONTEXT = 'GivingPostInstall.ensureDefaultFund';
 
-    /**
-     * Called by the platform after the package is installed or upgraded.
-     *
-     * @param context what the platform knows about this install, unused here because the
-     *        definitions belong to the org rather than to whoever pressed Install
-     */
-    public void onInstall(InstallContext context) {
-        runSetup(null);
-    }
+	/**
+	 * Giving checkboxes that ship on and were added in an upgrade, oldest first: each is turned
+	 * on once in an org that saved Giving Settings before it existed (Core's
+	 * `ShippedDefaultUpgrades`, QA-F2). Append only; `scripts/ci/check-setting-defaults.py`
+	 * fails the build when a new ship-on checkbox is missing here.
+	 */
+	@TestVisible
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
+		Giving_Settings__c.Ask_Reminders_Enabled__c
+	};
 
-    /** Built by name from Core (`ModuleSetups`) for Finish Setup, so it needs a public constructor. */
-    @NamespaceAccessible
-    public GivingPostInstall() {
-        // Nothing to set up: every step runs in runSetup.
-    }
+	/**
+	 * Called by the platform after the package is installed or upgraded.
+	 *
+	 * @param context what the platform knows about this install, unused here because the
+	 *        definitions belong to the org rather than to whoever pressed Install
+	 */
+	public void onInstall(InstallContext context) {
+		runSetup(null);
+	}
 
-    /**
-     * The install's steps (see the class comment), then the module's key added to the setup
-     * marker. Never throws.
-     *
-     * @param installerId unused: every step belongs to the org, not to a person
-     */
-    public void runSetup(Id installerId) {
-        // Nothing is caught here because nothing can be thrown: the entry point records its own
-        // failure in the Error Log and returns, so an install is never aborted by this step, and
-        // the Rollups page can still create the rows on demand.
-        RollupService.ensureDefaultsDuringInstall(ROLLUP_CONTEXT);
-        ReceiptTemplateService.installDefaultsDuringInstall(TEMPLATE_CONTEXT);
-        AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
-        ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);
-        FundDefaultsService.installDefaultFundDuringInstall(FUND_CONTEXT);
-        ModuleSetups.markRan(MODULE_KEY);
-    }
+	/** Built by name from Core (`ModuleSetups`) for Finish Setup, so it needs a public constructor. */
+	@NamespaceAccessible
+	public GivingPostInstall() {
+		// Nothing to set up: every step runs in runSetup.
+	}
+
+	/**
+	 * The install's steps (see the class comment), then the module's key added to the setup
+	 * marker. Never throws.
+	 *
+	 * @param installerId unused: every step belongs to the org, not to a person
+	 */
+	public void runSetup(Id installerId) {
+		// Giving's jobs scheduled one by one before the nightly run become its steps (R-NJ5).
+		NightlyJobs.adoptOldSchedules();
+		// Nothing is caught here because nothing can be thrown: the entry point records its own
+		// failure in the Error Log and returns, so an install is never aborted by this step, and
+		// the Rollups page can still create the rows on demand.
+		RollupService.ensureDefaultsDuringInstall(ROLLUP_CONTEXT);
+		ReceiptTemplateService.installDefaultsDuringInstall(TEMPLATE_CONTEXT);
+		AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
+		ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);
+		FundDefaultsService.installDefaultFundDuringInstall(FUND_CONTEXT);
+		ShippedDefaultUpgrades.apply(
+			MODULE_KEY,
+			Giving_Settings__c.SObjectType,
+			SHIPPED_ON_ADDED_IN_UPGRADES
+		);
+		ModuleSetups.markRan(MODULE_KEY);
+	}
 }

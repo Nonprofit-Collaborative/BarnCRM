@@ -26,136 +26,136 @@
  * the refusal is in the Error Log.
  */
 public with sharing class HouseholdCatchUpBatch implements Database.Batchable<SObject> {
-    /** People per chunk: one household insert, one contact or membership write and their upkeep. */
-    public static final Integer CHUNK_SIZE = 100;
+	/** People per chunk: one household insert, one contact or membership write and their upkeep. */
+	public static final Integer CHUNK_SIZE = 100;
 
-    private static final String LOG_CONTEXT = 'HouseholdCatchUpBatch';
+	private static final String LOG_CONTEXT = 'HouseholdCatchUpBatch';
 
-    /** Test seam: a chunk large enough for a bulk test to run in the one chunk tests allow. */
-    @TestVisible
-    private static Integer chunkSize = CHUNK_SIZE;
+	/** Test seam: a chunk large enough for a bulk test to run in the one chunk tests allow. */
+	@TestVisible
+	private static Integer chunkSize = CHUNK_SIZE;
 
-    /** True for the job over people stored as accounts, false for the job over contacts. */
-    private final Boolean personAccounts;
+	/** True for the job over people stored as accounts, false for the job over contacts. */
+	private final Boolean personAccounts;
 
-    public HouseholdCatchUpBatch() {
-        this(false);
-    }
+	public HouseholdCatchUpBatch() {
+		this(false);
+	}
 
-    @TestVisible
-    private HouseholdCatchUpBatch(Boolean personAccounts) {
-        this.personAccounts = personAccounts == true;
-    }
+	@TestVisible
+	private HouseholdCatchUpBatch(Boolean personAccounts) {
+		this.personAccounts = personAccounts == true;
+	}
 
-    /**
-     * Queues the catch-up: the contact job, and the person account job where the org stores
-     * people as accounts. Never throws: turning the feature on must not fail because of it.
-     * Answers the contact job's id.
-     */
-    public static Id enqueue() {
-        Id contactJob = enqueue(false);
-        try {
-            if (HouseholdService.isPersonAccountOrg()) {
-                enqueue(true);
-            }
-        } catch (Exception e) {
-            ErrorLogger.log(e, LOG_CONTEXT);
-        }
-        return contactJob;
-    }
+	/**
+	 * Queues the catch-up: the contact job, and the person account job where the org stores
+	 * people as accounts. Never throws: turning the feature on must not fail because of it.
+	 * Answers the contact job's id.
+	 */
+	public static Id enqueue() {
+		Id contactJob = enqueue(false);
+		try {
+			if (HouseholdService.isPersonAccountOrg()) {
+				enqueue(true);
+			}
+		} catch (Exception e) {
+			ErrorLogger.log(e, LOG_CONTEXT);
+		}
+		return contactJob;
+	}
 
-    private static Id enqueue(Boolean personAccounts) {
-        try {
-            return Database.executeBatch(new HouseholdCatchUpBatch(personAccounts), chunkSize);
-        } catch (Exception e) {
-            ErrorLogger.log(e, LOG_CONTEXT);
-            return null;
-        }
-    }
+	private static Id enqueue(Boolean personAccounts) {
+		try {
+			return Database.executeBatch(new HouseholdCatchUpBatch(personAccounts), chunkSize);
+		} catch (Exception e) {
+			ErrorLogger.log(e, LOG_CONTEXT);
+			return null;
+		}
+	}
 
-    public Database.QueryLocator start(Database.BatchableContext context) {
-        if (!runs()) {
-            return Database.getQueryLocator(
-                [SELECT Id FROM Contact WHERE Id = NULL WITH SYSTEM_MODE]
-            );
-        }
-        if (personAccounts) {
-            return HouseholdOrphanSelector.personAccountsWithoutMembershipLocator(
-                OrgShapeDetector.personRecordTypeIds()
-            );
-        }
-        if (HouseholdService.isJunctionMode()) {
-            // A contact linked straight to a household is in it by the simple link, and a
-            // person account's own contact is the account's to settle (R-M4).
-            Set<Id> excluded = new Set<Id>(OrgShapeDetector.personRecordTypeIds());
-            Id householdType = HouseholdService.householdRecordTypeId();
-            if (householdType != null) {
-                excluded.add(householdType);
-            }
-            return HouseholdOrphanSelector.contactsWithoutMembershipLocator(excluded);
-        }
-        return HouseholdOrphanSelector.contactsWithoutAccountLocator();
-    }
+	public Database.QueryLocator start(Database.BatchableContext context) {
+		if (!runs()) {
+			return Database.getQueryLocator(
+				[SELECT Id FROM Contact WHERE Id = NULL WITH SYSTEM_MODE]
+			);
+		}
+		if (personAccounts) {
+			return HouseholdOrphanSelector.personAccountsWithoutMembershipLocator(
+				OrgShapeDetector.personRecordTypeIds()
+			);
+		}
+		if (HouseholdService.isJunctionMode()) {
+			// A contact linked straight to a household is in it by the simple link, and a
+			// person account's own contact is the account's to settle (R-M4).
+			Set<Id> excluded = new Set<Id>(OrgShapeDetector.personRecordTypeIds());
+			Id householdType = HouseholdService.householdRecordTypeId();
+			if (householdType != null) {
+				excluded.add(householdType);
+			}
+			return HouseholdOrphanSelector.contactsWithoutMembershipLocator(excluded);
+		}
+		return HouseholdOrphanSelector.contactsWithoutAccountLocator();
+	}
 
-    public void execute(Database.BatchableContext context, List<SObject> scope) {
-        if (!runs()) {
-            return;
-        }
-        try {
-            if (personAccounts) {
-                HouseholdService.catchUpPersonAccounts(new Map<Id, SObject>(scope).keySet());
-            } else if (HouseholdService.isJunctionMode()) {
-                HouseholdService.createHouseholdsForNewContacts((List<Contact>) scope);
-            } else {
-                linkToNewHouseholds((List<Contact>) scope);
-            }
-        } catch (Exception e) {
-            ErrorLogger.log(e, LOG_CONTEXT);
-        }
-    }
+	public void execute(Database.BatchableContext context, List<SObject> scope) {
+		if (!runs()) {
+			return;
+		}
+		try {
+			if (personAccounts) {
+				HouseholdService.catchUpPersonAccounts(new Map<Id, SObject>(scope).keySet());
+			} else if (HouseholdService.isJunctionMode()) {
+				HouseholdService.createHouseholdsForNewContacts((List<Contact>) scope);
+			} else {
+				linkToNewHouseholds((List<Contact>) scope);
+			}
+		} catch (Exception e) {
+			ErrorLogger.log(e, LOG_CONTEXT);
+		}
+	}
 
-    public void finish(Database.BatchableContext context) {
-        // Nothing to record: each refusal was logged as it happened.
-        return;
-    }
+	public void finish(Database.BatchableContext context) {
+		// Nothing to record: each refusal was logged as it happened.
+		return;
+	}
 
-    /**
-     * Whether this job has anything to do now. The person account job also needs junction
-     * mode and an org that stores people as accounts, as the Account trigger does.
-     */
-    private Boolean runs() {
-        Boolean upkeepOn =
-            FeatureSwitchService.isOn(FeatureSwitchService.HOUSEHOLD_UPKEEP) &&
-            HouseholdService.automaticCreationEnabled();
-        if (!upkeepOn || !personAccounts) {
-            return upkeepOn;
-        }
-        return HouseholdService.isPersonAccountOrg() && HouseholdService.isJunctionMode();
-    }
+	/**
+	 * Whether this job has anything to do now. The person account job also needs junction
+	 * mode and an org that stores people as accounts, as the Account trigger does.
+	 */
+	private Boolean runs() {
+		Boolean upkeepOn =
+			FeatureSwitchService.isOn(FeatureSwitchService.HOUSEHOLD_UPKEEP) &&
+			HouseholdService.automaticCreationEnabled();
+		if (!upkeepOn || !personAccounts) {
+			return upkeepOn;
+		}
+		return HouseholdService.isPersonAccountOrg() && HouseholdService.isJunctionMode();
+	}
 
-    /**
-     * Contact mode: `ensureHouseholds` creates the households and sets each contact's
-     * `AccountId` in memory, as it does before insert; the contacts are then saved with it.
-     */
-    private static void linkToNewHouseholds(List<Contact> scope) {
-        HouseholdService.ensureHouseholds(scope);
-        List<Contact> links = new List<Contact>();
-        for (Contact person : scope) {
-            if (person.AccountId != null) {
-                links.add(new Contact(Id = person.Id, AccountId = person.AccountId));
-            }
-        }
-        List<Database.SaveResult> saves = HouseholdWriter.linkContactsToHouseholds(links);
-        List<Contact> linked = new List<Contact>();
-        List<Account> unused = new List<Account>();
-        for (Integer i = 0; i < saves.size(); i++) {
-            if (saves[i].isSuccess()) {
-                linked.add(links[i]);
-            } else {
-                unused.add(new Account(Id = links[i].AccountId));
-            }
-        }
-        HouseholdService.seedPrimaryContactsOfNewHouseholds(linked);
-        HouseholdWriter.deleteHouseholds(unused);
-    }
+	/**
+	 * Contact mode: `ensureHouseholds` creates the households and sets each contact's
+	 * `AccountId` in memory, as it does before insert; the contacts are then saved with it.
+	 */
+	private static void linkToNewHouseholds(List<Contact> scope) {
+		HouseholdService.ensureHouseholds(scope);
+		List<Contact> links = new List<Contact>();
+		for (Contact person : scope) {
+			if (person.AccountId != null) {
+				links.add(new Contact(Id = person.Id, AccountId = person.AccountId));
+			}
+		}
+		List<Database.SaveResult> saves = HouseholdWriter.linkContactsToHouseholds(links);
+		List<Contact> linked = new List<Contact>();
+		List<Account> unused = new List<Account>();
+		for (Integer i = 0; i < saves.size(); i++) {
+			if (saves[i].isSuccess()) {
+				linked.add(links[i]);
+			} else {
+				unused.add(new Account(Id = links[i].AccountId));
+			}
+		}
+		HouseholdService.seedPrimaryContactsOfNewHouseholds(linked);
+		HouseholdWriter.deleteHouseholds(unused);
+	}
 }

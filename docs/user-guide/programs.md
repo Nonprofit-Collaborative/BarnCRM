@@ -63,7 +63,7 @@ refused, with a message naming the program. Change the enrollment that is there 
 1. Make a spreadsheet with a row per person and the columns **Program** (the program's exact
    name) and **Email**, plus any of **Stage**, **Start Date**, **End Date**, **Intake Date**,
    **Referral Source**, **Eligibility Status**, **Eligibility Basis** and **Eligibility Date**.
-2. Open BarnCRM's import, upload the file and choose the **Program roster** template.
+2. Open BarnCRM's import, upload the file and choose the **Program Roster** template.
 3. Check the preview, then load it.
 
 You should see: one enrollment per row. Rows whose program or email finds nothing, or whose
@@ -105,7 +105,14 @@ click the person's name to open the enrollment and edit it there.
 3. Everyone with an open enrollment is listed. Set each person's **Attendance** (Present,
    Excused Absence or Unexcused Absence) and **Quantity**, or click **Mark All Present** to set
    everyone not yet recorded to Present with a quantity of 1.
-4. Click **Save**.
+4. Click **Save**. While marks are not saved, a hint beside **Save** says "1 unsaved change" (or
+   "N unsaved changes").
+
+If you change the **Service** or the **Date** with marks not saved, **Save Attendance First?**
+asks: "You have unsaved attendance for (service) on (date). Changing the service or date
+reloads the list, so save it first or discard it." Choose **Save** (the default) or **Discard**,
+then **Continue**, to save or drop the marks and load the new service and day. **Cancel** keeps
+the marks and puts the **Service** and **Date** back.
 
 You should see: "(number) service deliveries saved." Anyone left at **Not Recorded** gets
 nothing. An absence always counts a quantity of 0. To correct a day, pick the same service and
@@ -113,12 +120,55 @@ date again: what was saved shows, and saving changes it rather than adding a sec
 The panel works the same in the Salesforce mobile app, one person per card. Read Only users see
 what was recorded without the controls.
 
+## To Count People Without Naming Them
+
+For a drop-in service where nobody is recorded by name (a walk-in meal, a pantry line):
+
+1. On the program, in the **Service Delivery Log** panel, pick the **Service** and the **Date**.
+2. Under the rows, find **People counted without names for this service and day**. Type how many
+   people you served in **People Served, Not Named**.
+3. Click **Add to the Count**.
+
+You should see: "Added (number) to the count." and the day's total go up. Each click adds to
+the total, so you can add a second count later the same day. To correct one, open the
+**Service Counts** tab or the **Service Counts** list on the service and edit the row. These
+people show on the dashboard as **Counted Without Names**, apart from the people you named.
+
+## To Record a Referral
+
+1. Open the person's enrollment (click their name in the **Program Roster** panel) and, in the
+   **Referrals** list, click **New**. Or open the **Referrals** tab and click **New**.
+2. Pick the **Direction**: **Out** if you sent the person to another organization, **In** if
+   another organization sent them to you.
+3. Name the person (a **Contact** or an **Account**, not both) and fill in **Other
+   Organization**, the **Referral Date** and any **Notes**.
+4. Click **Save**. The **Status** starts as **Open**.
+
+As it moves on, change the **Status** (Open, Accepted or Closed) and, when it ends, pick an
+**Outcome** such as Service Received or Declined by Person. Only you, people above you in your
+organization's roles and Programs Admins can see a referral you make. The **Open Referrals** list
+on the **Referrals** tab shows everything not yet closed.
+
+## To Check Whether Someone Is Eligible
+
+If your admin has set up eligibility rules, the program page has an **Eligibility Rules** panel.
+Under **Preview and Screen**, choose a person from **Open Enrollment** to see what the rules
+would decide (Eligible, Not Eligible or Review) and why, then click **Screen This Enrollment** to
+save that result, or **Screen Open Enrollments** to do everyone. Screening sets the person's
+**Eligibility Status**, **Eligibility Basis** and **Eligibility Reason** on the enrollment.
+Someone already marked Eligible or Not Eligible is left alone unless you tick **Also screen
+enrollments already Eligible or Not Eligible**. **Review** means a person should look at the
+case. Only a Programs Admin changes the rules; you can still edit an enrollment's eligibility
+by hand.
+
 ## To Record a Service by Hand
 
 For someone who is not enrolled, or a one-off:
 
 1. Open the **Service Deliveries** tab and click **New**.
-2. Pick the **Service**, then a **Contact** or an **Account** (not both), the **Delivery Date**,
+2. Pick the **Service**, then a **Contact** or an **Account** (not both; an Account must be a
+   person, or you see "Choose a person. An organization or household account cannot be enrolled
+   or receive a service."), the **Delivery Date**,
    the **Attendance** and the **Quantity**.
 3. Click **Save**.
 
@@ -139,6 +189,90 @@ share it with **Sharing** on the note. You can edit your own notes but not delet
 Programs Admin to remove one written by mistake. The **My Case Notes** list on the **Case Notes**
 tab gathers everything you have written.
 
+A note can be about one of the person's goals: pick the goal in the note's **Goal** field, or
+start the note with **New Note** under the goal (see below).
+
+## To Keep Someone's Service Plan
+
+A person's service plan is their goals, each with the steps toward it, kept on their enrollment.
+
+1. Open the person's enrollment (click their name in the **Program Roster** panel).
+2. On the **Service Plan** panel, click **Add Goal**. Write the **Goal** (for example, "Find stable
+   housing"), and fill in what you know: a **Description**, the **Status**, who it is **Assigned
+   To**, a **Target Date** and the **Next Review** date. Where your organization uses Logic Models
+   you can also pick the **Outcome** the goal works toward.
+3. Click **Save**.
+4. Under the goal, type a step (for example, "Fill in the housing application") and click **Add
+   Step**. Add as many as you need.
+
+You should see the goal on the panel with its steps and "0 of 2 steps done" (or however many).
+Open goals come first, soonest target date first.
+
+**As the work goes on:**
+
+- **Tick a step** when it is done; it records today as its completed date. Untick it to reopen it.
+- **Edit Goal** to change the goal, or to set its Status to **Achieved** or **Not Achieved** when
+  it is finished. Its closed date is filled in for you.
+- **Mark Reviewed** after you go over the goal with the person: it records today and offers the
+  next review three months on. Change the date, or clear it for no further review, and click
+  **Save Review**. A goal past its next review shows **Review due**.
+- **New Note** opens a new case note about the goal with the enrollment and goal already filled
+  in. The goal lists its three latest notes you can see.
+
+The **Goals** tab lists every goal you can see; its **Reviews Due** list shows the goals waiting
+for a review. You can add and change goals and steps but not delete them: set a goal you are
+dropping to **Not Achieved**, or ask a Programs Admin to remove one entered by mistake. Read Only
+users see plans but change nothing.
+
+## To Put People in a Cohort
+
+A cohort is a group that goes through a program together, such as the spring class.
+
+1. Open the program and, in the **Cohorts** list, click **New**. Give the cohort a **Cohort
+   Name**, and a **Start Date** and **End Date** if it has them. Click **Save**.
+2. On the cohort, the **Cohort Members** panel lists who is in it. Under **Add People**:
+   - tick the people already enrolled in the program who are not in a cohort, or click **Select
+     All**;
+   - for anyone else, pick the person and click **Add to List**, as many times as you need.
+3. Click **Add to Cohort**.
+
+You should see: "(number) people added." Someone already enrolled in the program is moved into
+the cohort; someone who was not is enrolled, as Enrolled, in the cohort. Anyone who could not be
+added is listed under **Not Added**, with the reason. To take someone out, click **Remove** by
+their name: their enrollment stays, out of the cohort. You can also change a person's cohort in
+the **Cohort** field on their enrollment.
+
+## To Schedule Sessions
+
+1. Open the cohort (for its sessions) or the program (for sessions open to everyone enrolled).
+2. In the **Schedule Sessions** panel, pick the **Service**, the **From** and **To** dates and
+   the **Days of the Week**, and a **Start Time** if you like.
+3. Check the line under the form, for example "12 sessions will be scheduled", and click
+   **Schedule**.
+
+Running it twice does not duplicate: a day that already has a session of the same service for
+the same cohort (on a program, a session with no cohort), other than a **Cancelled** one, is
+skipped. The line says, for example, "2 sessions will be scheduled. Days that already have a
+session are skipped: 2." If every chosen day already has a session, **Schedule** is disabled.
+
+You should see: "12 sessions scheduled." (with the skipped count when there is one, for example
+"2 sessions scheduled. Days that already have a session are skipped: 2."). The sessions are in the cohort's **Sessions** list and
+on the **Sessions** tab. To move or call off one session, open it and edit its date or set its
+**Status** to **Cancelled**.
+
+## To Take Attendance at a Session
+
+1. Open the session (from the **Sessions** tab or the cohort's **Sessions** list).
+2. The **Service Delivery Log** panel shows the session's service and day and lists the
+   cohort's members (everyone enrolled in the program for a session with no cohort). Set each
+   person's **Attendance** and **Quantity**, or click **Mark All Present**.
+3. Click **Save**.
+
+You should see: "(number) service deliveries saved." and the session's **Status** becomes
+**Held**. Saving again changes what you recorded. A delivery already recorded for that person and
+day on the program's log is taken over by the session, not counted twice. A **Cancelled**
+session takes no attendance.
+
 ## To See Which Programs Someone Is In
 
 1. In the **BarnCRM Programs** app, open the person.
@@ -156,8 +290,8 @@ there is no card.
 2. Pick a period at the top: **This Month** (the default), **Last Month**, **This Year**,
    **Last Year** or **Last 12 Months**.
 
-You should see: tiles for active programs, open and new enrollments, people served, services
-delivered and the attendance rate, then a table with the same figures for each program. Click a
+You should see: tiles for active programs, open and new enrollments, people served, people
+counted without names, services delivered and the attendance rate, then a table with the same figures for each program. Click a
 program's name to open it. The figures count only the records you can see.
 
 ## To Enroll Someone Again

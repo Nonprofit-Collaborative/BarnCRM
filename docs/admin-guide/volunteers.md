@@ -22,9 +22,9 @@ Coordinator sets a new person's first status. On an account, the person details 
 account; a household or organization shows its hour totals once it has some. Other apps keep
 their own person page (see Readiness at a glance, under Onboarding requirements).
 
-Hours are entered by staff. When **Require Hours Approval** is on, a new entry waits as
+Hours are entered by staff. When **Require hours approval** is on, a new entry waits as
 **Submitted** until a coordinator approves or rejects it, and only approved hours count in any
-total. Marking a sign-up **Attended** creates its hours for you (the **Create Hours From Attendance**
+total. Marking a sign-up **Attended** creates its hours for you (the **Create hours from attendance**
 setting, on by default), so nobody types them twice. While automation is paused, attendance
 creates no hours and nothing catches up later: enter those hours by hand. There is no volunteer
 portal: volunteers do not log in.
@@ -220,25 +220,27 @@ settings, and each saves as you change it.
 
 | Setting | Default | What it does | Takes effect |
 |---|---|---|---|
-| Require Hours Approval | On | New hours wait as Submitted for a coordinator. Off means an entry counts as soon as it is saved. | Now |
-| Create Hours From Attendance | On | Marking a sign-up **Attended** writes the hours for that shift, so nobody types them twice. | Now |
-| Weeks Ahead to Create Shifts | 8 | How many weeks ahead recurring schedules keep their shifts created, from 1 to 26. Default: 8. | A longer horizon at the next nightly run or schedule save; a shorter one removes no shift already created |
-| Send Shift Reminders | Off | Volunteers signed up for a shift get one reminder email before it. See Shift Reminders below. | At the next 7:00 AM run |
-| Days Before a Shift to Remind | 1 | How many days before a shift its reminder goes out, from 1 to 14. Default: 1. | At the next 7:00 AM run |
+| Require hours approval | On | New hours wait as Submitted for a coordinator. Off means an entry counts as soon as it is saved. | Now |
+| Create hours from attendance | On | Marking a sign-up **Attended** writes the hours for that shift, so nobody types them twice. | Now |
+| Weeks ahead to create shifts | 8 | How many weeks ahead recurring schedules keep their shifts created, from 1 to 26. Default: 8. | A longer horizon at the next nightly run or schedule save; a shorter one removes no shift already created |
+| Send shift reminders | Off | Volunteers signed up for a shift get one reminder email before it. See Shift Reminders below. | At the next 7:00 AM run |
+| Days before a shift to remind | 1 | How many days before a shift its reminder goes out, from 1 to 14. Default: 1. | At the next 7:00 AM run |
 
 ## Shift Reminders
 
-When **Send Shift Reminders** is on, every volunteer signed up for a shift gets one email
-before it. A job named **Volunteer Shift Reminders, 7:00 AM** runs each morning and emails
+When **Send shift reminders** is on, every volunteer signed up for a shift gets one email
+before it. A job named **Volunteer Shift Reminders** runs each morning and emails
 everyone **Signed up** or **Confirmed** on an open shift that starts within **Days before a
 shift to remind** days. With the default of 1 that is every shift starting today (later than
 now) or tomorrow. The email names the job, the day and time, and the place when the shift has
 one, and asks the person to tell you if they cannot come.
 
 **Turning it on.** The setting ships off, because turning it on emails real people. Switch it on
-in **BarnCRM Settings**, **Volunteers**. The 7:00 AM job is one of the nightly jobs on Health
-Check's list: if Health Check shows it as not scheduled, use its **Schedule all nightly jobs**
-fix once. Nothing else needs setting up.
+in **BarnCRM Settings**, **Volunteers**. The 7:00 AM job is a step of
+[BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run, and has no switch of its own:
+it runs whenever Volunteers is on and the setting is on. If Health Check shows the nightly
+run as not scheduled, use its **Schedule all nightly jobs** fix once. Nothing else needs
+setting up.
 
 **One reminder per booking.** Each due booking is stamped first: its **Reminder Sent On** field
 holds the time, and only bookings whose stamp saved are emailed. That booking is never emailed
@@ -257,10 +259,11 @@ books at noon for a shift that evening. Tell such volunteers directly.
 person who turned reminders on or saved the schedule), and replies go to that user. BarnCRM has
 no separate from address setting for volunteer reminders.
 
-**Who is never emailed.** A person with **Email Opt Out** checked on their contact, a person
-with no email address, a sign-up that is Cancelled or marked No show or Attended, and any
-shift that is Cancelled or has already started. Sign-ups that name a person account instead of
-a contact are not reminded.
+**Who is never emailed.** A person with **Email Opt Out** checked on their contact (or person
+account), a person with no email address, a sign-up that is Cancelled or marked No show or
+Attended, and any shift that is Cancelled or has already started. Where your people are person
+accounts, a sign-up that names the person account (as the Sign-Ups panel books one) is reminded
+at the person account's own **Email**, greeted by its first name.
 
 **Email limits.** Reminders go out through your Salesforce org's own email, so your org's daily
 limit on emails sent by Apex applies, and the same limit is shared with every other BarnCRM email
@@ -287,7 +290,7 @@ schedule** to the job: on the job, in the **Shift Schedules** list, click **New*
 | Location | Copied to each shift. Leave it empty to use the job's location. |
 | Active | Untick to end the schedule. |
 
-When you save, BarnCRM creates the schedule's shifts from today up to the **Weeks Ahead to Create Shifts**
+When you save, BarnCRM creates the schedule's shifts from today up to the **Weeks ahead to create shifts**
 setting (8 by default), usually within a minute. Each is an ordinary shift: people sign up,
 attend and log hours on it as on any other. It appears in the job's **Shifts** list and shows the
 schedule it came from. Every night
@@ -323,9 +326,10 @@ does not.
 shifts a change removes are removed for them, although they cannot delete shifts themselves.
 Read Only users see schedules and change nothing.
 
-**The nightly run** is one of BarnCRM's nightly jobs, **Volunteer Schedules** (Setup's
-**Scheduled Jobs** page lists it as BarnCRM Volunteer Schedules). If **Health Check** says
-"Volunteer Schedules, 3:00 AM" is not scheduled, use its **Schedule All Nightly Jobs** fix. While Volunteers is turned
+**The nightly run** is a step of [BarnCRM Nightly Jobs](nightly-jobs.md), **Volunteer
+Schedules** at 3:00 AM (Setup's **Scheduled Jobs** page lists only the one run, BarnCRM
+Nightly Jobs). The step has no switch of its own. If **Health Check** says the nightly run is
+not scheduled, use its **Schedule All Nightly Jobs** fix. While Volunteers is turned
 off, no shifts are created; the first night after you turn it back on catches up.
 
 ## Hour Letters and Certificates
@@ -395,7 +399,7 @@ run as one job.
 **When it ends.** The person who started the job gets one notification (the bell, and the mobile
 app) with how many letters were made, how many people were skipped and why (for example no
 approved hours in the period), and how many failed; for failures it points to the
-[Error Log](error-log.md). It is the BarnCRM job notification, so the **Send Long Job Notifications**
+[Error Log](error-log.md). It is the BarnCRM job notification, so the **Send long job notifications**
 option in BarnCRM Settings turns it off.
 
 ## Signing People Up for a Shift
@@ -436,7 +440,8 @@ Completed. There is nothing to switch on.
 **Who is offered.** People whose **Volunteer Status** is **Active** and who have no sign-up on
 that shift (a cancelled one counts: change it instead of adding another). Of an org with more
 than 500 active volunteers, the 500 with the most hours are ranked, and the card says so.
-People held only as person accounts are not offered.
+Where your people are person accounts, they are offered too, and **Sign Up** books the person
+account, as **Add Sign-Up** does; one already booked on the shift by the account is not offered.
 
 **How they are ranked.** Each person scores points for what the data already says. Nothing
 here is a setting: the weights are fixed and listed so you can predict the order.
@@ -573,7 +578,7 @@ is turned off. Counts stop at 1,000, and each finding about records links the fi
 |---|---|---|
 | **Volunteer hours entries have waited more than 14 days for approval** (amber) | Hours count in no total and no letter until a coordinator approves them, so the volunteer looks as if they gave less time than they did. | **Open Approve Hours**, choose Submitted, and approve each entry, or reject it with a reason when it is wrong. |
 | **Past shifts are still Open** (blue) | Nothing closes a shift by itself. A shift that ended more than 7 days ago and is still Open usually means attendance was never marked, so the people who came have no hours. | **Open the shift list** opens the **Past Shifts Still Open** list view, which shows the same shifts the finding counts. Open each shift, mark who came on its Sign-ups panel, then set Status to Completed (or Cancelled if it did not happen). |
-| **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Weeks Ahead to Create Shifts** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and save it. |
+| **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Weeks ahead to create shifts** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and save it. |
 | **Volunteer coordinators do not have the Volunteers Coordinator permission set** (amber) | Someone with the Coordinator role cannot approve hours or work with shifts without it, or without Volunteers Admin, so people who hold Volunteers Admin are not listed. BarnCRM gives it every night, so this happens when the role was given in Setup today or the nightly access check failed. | **Give Volunteers Coordinator now** gives it within about a minute, after you confirm the names. Or assign the set in Setup. |
 | **Shipped volunteer totals are turned off** (blue) | The fields those totals fill stop updating, and the reports, list views and dashboard that use them go stale. | If you turned them off on purpose, nothing is wrong. Otherwise **Open Rollup Builder**, set each one Active, then choose **Recalculate**. A shipped total that is missing altogether is the Rollup Builder's own **Shipped totals are missing** finding, which can restore it. |
 
@@ -645,7 +650,7 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
 
 ## Importing Volunteer Hours
 
-To bring in hours kept in a spreadsheet, use the **Volunteer hours** template on the Import tab.
+To bring in hours kept in a spreadsheet, use the **Volunteer Hours** template on the Import tab.
 It is added when Volunteers is installed and appears only where Volunteers is. It loads one
 Volunteer Hours record per row, using the Core import's **One Kind of Record** (see
 [Importing](importing.md), section 9), so the preview, results, rejected rows download and undo
@@ -675,7 +680,7 @@ repeat; the hours still count toward the job.
 1. Make a file with the columns above, for example `volunteer@example.org, Food pantry,
    2026-03-14, 3, Sorted donations`. Every job named must already exist under **Volunteer
    Jobs**, and every email must belong to someone already in BarnCRM.
-2. Open the **Import** tab, select **Volunteer hours**, then **Next**, and upload the file.
+2. Open the **Import** tab, select **Volunteer Hours**, then **Next**, and upload the file.
 3. Check that each column is matched to its field, then select **Preview**. Nothing is written.
 4. Read the counts. A row whose email matches nobody, or whose job matches no job, is
    **rejected** and named in the table with the reason; select **Download Rejected Rows**, correct
@@ -688,7 +693,7 @@ so it cannot alter hours a coordinator has approved. Importing a file twice adds
 twice. To take back a wrong import, use **Undo** on its results (see [Importing](importing.md),
 section 5). Undo removes only entries that are still **Submitted**, and only when the person
 undoing holds the Volunteers Coordinator or Admin role; approved hours are never deleted, so
-they are kept and listed in the import's journal. With **Require Hours Approval** off every
+they are kept and listed in the import's journal. With **Require hours approval** off every
 imported entry is Approved at once, so check the file before you import: taking one back means
 a coordinator reopens it (back to Submitted) and then deletes it.
 

@@ -12,18 +12,18 @@
  */
 @NamespaceAccessible
 public interface SampleDataStages {
-    /** Names this load in the error log, for example 'Core sample data'. */
-    String name();
+	/** Names this load in the error log, for example 'Core sample data'. */
+	String name();
 
-    /** How many stages this load has. Stage numbers run from zero to this less one. */
-    Integer stageCount();
+	/** How many stages this load has. Stage numbers run from zero to this less one. */
+	Integer stageCount();
 
-    /**
-     * Runs one stage. A stage that throws is rolled back, logged, and ends the load: no later
-     * stage runs and finish() is not called.
-     */
-    void runStage(Integer stage);
+	/**
+	 * Runs one stage. A stage that throws is rolled back, logged, and ends the load: no later
+	 * stage runs and finish() is not called.
+	 */
+	void runStage(Integer stage);
 
-    /** Runs once after every stage succeeded, and starts whatever loads next. */
-    void finish();
+	/** Runs once after every stage succeeded, and starts whatever loads next. */
+	void finish();
 }

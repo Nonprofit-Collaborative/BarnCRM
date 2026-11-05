@@ -14,34 +14,28 @@ import HEADING from '@salesforce/label/c.Core_SetupAssistant_Heading';
 import DONE_BADGE from '@salesforce/label/c.Core_SetupAssistant_DoneBadge';
 import TODO_BADGE from '@salesforce/label/c.Core_SetupAssistant_ToDoBadge';
 import SKIPPED_BADGE from '@salesforce/label/c.Core_SetupAssistant_SkippedBadge';
-import NEXT from '@salesforce/label/c.Core_SetupAssistant_NextButton';
+import NEXT from '@salesforce/label/c.Core_Import_NextButton';
 import SKIP from '@salesforce/label/c.Core_SetupAssistant_SkipButton';
 import FINISH from '@salesforce/label/c.Core_SetupAssistant_FinishButton';
-import SAVE from '@salesforce/label/c.Core_SetupAssistant_SaveButton';
-import READ_ONLY from '@salesforce/label/c.Core_SetupAssistant_ReadOnlyNotice';
-import RULE_SETTING from '@salesforce/label/c.Core_SetupAssistant_RuleSetting';
-import RULE_ACTION from '@salesforce/label/c.Core_SetupAssistant_RuleAction';
-import LOAD_ERROR from '@salesforce/label/c.Core_SetupAssistant_LoadErrorMessage';
 import COMPLETE_HEADING from '@salesforce/label/c.Core_SetupAssistant_CompleteHeading';
 import ELAPSED from '@salesforce/label/c.Core_SetupAssistant_ElapsedLabel';
 import REOPEN from '@salesforce/label/c.Core_SetupAssistant_ReopenButton';
-import USER_LABEL from '@salesforce/label/c.Core_SetupAssistant_UserLabel';
-import ROLE_LABEL from '@salesforce/label/c.Core_SetupAssistant_RoleLabel';
-import GIVE_ACCESS from '@salesforce/label/c.Core_SetupAssistant_GiveAccessButton';
-import ACCESS_GRANTED from '@salesforce/label/c.Core_SetupAssistant_AccessGrantedMessage';
-import CREATE_USER from '@salesforce/label/c.Core_SetupAssistant_CreateUserLink';
-import AUTOMATIC_ACCESS from '@salesforce/label/c.Core_SetupAssistant_AutomaticAccessLink';
+import USER_LABEL from '@salesforce/label/c.Core_Section_Person';
+import ROLE_LABEL from '@salesforce/label/c.Core_Access_RoleLabel';
+import GIVE_ACCESS from '@salesforce/label/c.Core_Access_AddButton';
+import CREATE_USER from '@salesforce/label/c.Core_Access_CreateUserLink';
+import AUTOMATIC_ACCESS from '@salesforce/label/c.Core_Access_AutomaticAccessLink';
 import LOAD_SAMPLE from '@salesforce/label/c.Core_SetupAssistant_LoadSampleButton';
-import IMPORT_BUTTON from '@salesforce/label/c.Core_SetupAssistant_ImportButton';
-import IMPORT_MISSING from '@salesforce/label/c.Core_SetupAssistant_ImportMissingNotice';
-import NAMING_UNAVAILABLE from '@salesforce/label/c.Core_SetupAssistant_NamingUnavailableNotice';
-import SAMPLE_UNAVAILABLE from '@salesforce/label/c.Core_SetupAssistant_SampleDataUnavailableNotice';
+import IMPORT_BUTTON from '@salesforce/label/c.Core_HubHome_RecurringLink';
+import BarnConfirmModal from 'c/barnConfirmModal';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import START_AGAIN from '@salesforce/label/c.Core_SetupAssistant_StartAgainButton';
 import OPEN_SECTION from '@salesforce/label/c.Core_SetupAssistant_OpenSectionButton';
 import PROGRESS_FORMAT from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupPath } from 'c/setupLinks';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const CREATE_USER_URL = setupPath('users');
 // User access policies are created in Setup, not by a package (ADR-0095), so the step links to the guide.
@@ -61,6 +55,8 @@ const IMPORT_TAB = 'Import';
  * Apex and are shown by one field panel (ADR-0059, C-29).
  */
 export default class SetupAssistant extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
   /** Set by the Hub home page when Maria asked to reopen a finished setup. */
   @api reopened = false;
 
@@ -87,22 +83,28 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     next: NEXT,
     skip: SKIP,
     finish: FINISH,
-    save: SAVE,
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Core', 'Core_SetupAssistant_ReadOnlyNotice');
+    },
     completeHeading: COMPLETE_HEADING,
     elapsed: ELAPSED,
     reopen: REOPEN,
     user: USER_LABEL,
     role: ROLE_LABEL,
     giveAccess: GIVE_ACCESS,
-    accessGranted: ACCESS_GRANTED,
+    get accessGranted() {
+      return helpText('Core', 'Core_SetupAssistant_AccessGrantedMessage');
+    },
     createUser: CREATE_USER,
     automaticAccess: AUTOMATIC_ACCESS,
     loadSample: LOAD_SAMPLE,
     importButton: IMPORT_BUTTON,
-    importMissing: IMPORT_MISSING,
-    namingUnavailable: NAMING_UNAVAILABLE,
-    sampleUnavailable: SAMPLE_UNAVAILABLE,
+    get namingUnavailable() {
+      return helpText('Core', 'Core_SetupAssistant_NamingUnavailableNotice');
+    },
+    get sampleUnavailable() {
+      return helpText('Core', 'Core_SetupAssistant_SampleDataUnavailableNotice');
+    },
     startAgain: START_AGAIN,
     openSection: OPEN_SECTION
   };
@@ -111,6 +113,11 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
   automaticAccessUrl = AUTOMATIC_ACCESS_GUIDE;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.refreshHandlerId = registerRefreshHandler(this, this.refreshHandler);
     this.load();
   }
@@ -129,7 +136,10 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
       this.applyState(await getState(), true);
       this.errorMessage = undefined;
     } catch (error) {
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(
+        error,
+        helpText('Core', 'Core_SetupAssistant_LoadErrorMessage')
+      );
     }
   }
 
@@ -210,7 +220,9 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     if (!this.activeStep) {
       return '';
     }
-    return this.activeStep.completionRule === 'Setting' ? RULE_SETTING : RULE_ACTION;
+    return this.activeStep.completionRule === 'Setting'
+      ? helpText('Core', 'Core_SetupAssistant_RuleSetting')
+      : helpText('Core', 'Core_SetupAssistant_RuleAction');
   }
 
   // "{0} of {1}" is a translatable sentence, not punctuation, so the wording is a label.
@@ -247,15 +259,15 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     return this.steps.map((step, index) => {
       const isActive = index === this.activeIndex;
       let badge = TODO_BADGE;
-      let badgeClass = '';
+      let badgeStatus = 'neutral';
       let ringVariant = 'base';
       if (step.completed) {
         badge = DONE_BADGE;
-        badgeClass = 'slds-theme_success';
+        badgeStatus = 'done';
         ringVariant = 'base-autocomplete';
       } else if (step.skipped) {
         badge = SKIPPED_BADGE;
-        badgeClass = 'slds-theme_warning';
+        badgeStatus = 'skipped';
         ringVariant = 'warning';
       }
       return {
@@ -264,7 +276,7 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
         isActive,
         expanded: isActive ? 'true' : 'false',
         badge,
-        badgeClass,
+        badgeStatus,
         ringVariant,
         ringValue: step.completed ? 100 : 0
       };
@@ -311,6 +323,15 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     return Boolean(this.state && this.state.importAvailable);
   }
 
+  get importMissing() {
+    return helpText('Core', 'Core_SetupAssistant_ImportMissing');
+  }
+
+  /** Start Setup Again sits in a reopened, finished checklist, for editors only (admin-16). */
+  get canStartAgain() {
+    return this.canEdit && Boolean(this.state && this.state.isComplete);
+  }
+
   get roleOptions() {
     return ((this.state && this.state.roles) || []).map((role) => ({
       label: role.label || role.developerName || role,
@@ -347,7 +368,10 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
         state: { [link.sectionKey]: section }
       });
     } catch (error) {
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(
+        error,
+        helpText('Core', 'Core_SetupAssistant_LoadErrorMessage')
+      );
     }
   }
 
@@ -411,10 +435,23 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     this.finishedHere = false;
   }
 
-  /** Start setup again: the recorded progress is forgotten, the settings are not. */
-  handleReset() {
+  /**
+   * Start setup again: the recorded progress is forgotten, the settings are not. It asks first
+   * (admin-16), since every Done and Skipped mark goes.
+   */
+  async handleReset() {
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: START_AGAIN,
+      message: helpText('Core', 'Core_SetupAssistant_StartAgainConfirm'),
+      confirmLabel: START_AGAIN,
+      cancelLabel: CANCEL
+    });
+    if (!confirmed) {
+      return;
+    }
     this.reopenedHere = true;
-    this.call(resetSetup, {}, true);
+    await this.call(resetSetup, {}, true);
   }
 
   handleReopen() {
@@ -504,7 +541,10 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
         afterwards();
       }
     } catch (error) {
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(
+        error,
+        helpText('Core', 'Core_SetupAssistant_LoadErrorMessage')
+      );
     }
   }
 }

@@ -121,30 +121,6 @@
         <value>Paid</value>
     </labels>
     <labels>
-        <fullName>Giving_SchedulePreview_ColumnSequence</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Schedule preview column heading.</shortDescription>
-        <value>Number</value>
-    </labels>
-    <labels>
-        <fullName>Giving_SchedulePreview_ColumnStatus</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Schedule preview column heading.</shortDescription>
-        <value>Status</value>
-    </labels>
-    <labels>
-        <fullName>Giving_SchedulePreview_Empty</fullName>
-        <categories>Giving</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown on the schedule preview when no payments exist yet.</shortDescription>
-        <value>No payments have been generated for this commitment yet.</value>
-    </labels>
-    <labels>
         <fullName>Giving_SchedulePreview_GenerateError</fullName>
         <categories>Giving</categories>
         <language>en_US</language>

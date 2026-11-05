@@ -9,22 +9,22 @@
  */
 @NamespaceAccessible
 public with sharing class SampleDataRemoveBatch extends SampleDataStageBatch {
-    @NamespaceAccessible
-    public SampleDataRemoveBatch(SampleDataStages stages) {
-        super(stages);
-    }
+	@NamespaceAccessible
+	public SampleDataRemoveBatch(SampleDataStages stages) {
+		super(stages);
+	}
 
-    /** Starts a batch that runs the given removal's stages, and returns its job Id. */
-    @NamespaceAccessible
-    public static Id startRemoval(SampleDataStages stages) {
-        SampleDataStageBatch.noteStarted(stages);
-        return Database.executeBatch(
-            new SampleDataRemoveBatch(stages),
-            SampleDataStageBatch.SCOPE_SIZE
-        );
-    }
+	/** Starts a batch that runs the given removal's stages, and returns its job Id. */
+	@NamespaceAccessible
+	public static Id startRemoval(SampleDataStages stages) {
+		SampleDataStageBatch.noteStarted(stages);
+		return Database.executeBatch(
+			new SampleDataRemoveBatch(stages),
+			SampleDataStageBatch.SCOPE_SIZE
+		);
+	}
 
-    protected override void notifyStopped() {
-        SampleDataLoader.notifyRemoveStopped();
-    }
+	protected override void notifyStopped() {
+		SampleDataLoader.notifyRemoveStopped();
+	}
 }

@@ -51,9 +51,14 @@ export function toCsv(columns, rows) {
  * person's local one (the UTC date names an evening export in a US time zone for tomorrow).
  */
 export function fileName(objectApiName, today = new Date(), extension = 'csv') {
-  const two = (number) => String(number).padStart(2, '0');
-  const day = `${today.getFullYear()}-${two(today.getMonth() + 1)}-${two(today.getDate())}`;
+  const day = localIsoDate(today);
   return `${String(objectApiName || 'export').replace(/[^A-Za-z0-9_]/g, '_')}-${day}.${extension}`;
+}
+
+/** A date as YYYY-MM-DD in the browser's own day (the form a date input and Apex take). */
+export function localIsoDate(date = new Date()) {
+  const two = (number) => String(number).padStart(2, '0');
+  return `${date.getFullYear()}-${two(date.getMonth() + 1)}-${two(date.getDate())}`;
 }
 
 // -----------------------------------------------------------------------------------------

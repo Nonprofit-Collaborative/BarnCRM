@@ -24,531 +24,531 @@
  * reference is read in system mode and without sharing, for the reason `RollupAggregator` gives.
  */
 public without sharing class RollupChanges {
-    private static final String LOG_CONTEXT = 'RollupChanges';
+	private static final String LOG_CONTEXT = 'RollupChanges';
 
-    /**
-     * Paths already read in this transaction, by their text. Keyed by what was parsed, never by
-     * definition id, so a definition edited in the same transaction is read afresh. Callers only
-     * read a parsed path, so definitions with the same path share one.
-     */
-    private static final Map<String, RollupPath.Parsed> PARSED_BY_TEXT = new Map<String, RollupPath.Parsed>();
+	/**
+	 * Paths already read in this transaction, by their text. Keyed by what was parsed, never by
+	 * definition id, so a definition edited in the same transaction is read afresh. Callers only
+	 * read a parsed path, so definitions with the same path share one.
+	 */
+	private static final Map<String, RollupPath.Parsed> PARSED_BY_TEXT = new Map<String, RollupPath.Parsed>();
 
-    /** What each definition reads, by the definition attributes it is worked out from. */
-    private static final Map<String, Set<String>> READS_BY_KEY = new Map<String, Set<String>>();
+	/** What each definition reads, by the definition attributes it is worked out from. */
+	private static final Map<String, Set<String>> READS_BY_KEY = new Map<String, Set<String>>();
 
-    /** The reads that start on one entity, by entity and definition attributes. */
-    private static final Map<String, Set<String>> LOCAL_BY_KEY = new Map<String, Set<String>>();
+	/** The reads that start on one entity, by entity and definition attributes. */
+	private static final Map<String, Set<String>> LOCAL_BY_KEY = new Map<String, Set<String>>();
 
-    /**
-     * Target records marked for recalculation, by target entity, and the definitions that marked
-     * them: a save recalculates only those (ADR-0099
-     * `0099-rollups-recalculate-only-what-a-save-changed.md`).
-     */
-    public class Marked {
-        public Map<String, Set<Id>> idsByTarget = new Map<String, Set<Id>>();
-        public Map<String, Map<Id, Rollup_Definition__c>> definitionsByTarget = new Map<String, Map<Id, Rollup_Definition__c>>();
+	/**
+	 * Target records marked for recalculation, by target entity, and the definitions that marked
+	 * them: a save recalculates only those (ADR-0099
+	 * `0099-rollups-recalculate-only-what-a-save-changed.md`).
+	 */
+	public class Marked {
+		public Map<String, Set<Id>> idsByTarget = new Map<String, Set<Id>>();
+		public Map<String, Map<Id, Rollup_Definition__c>> definitionsByTarget = new Map<String, Map<Id, Rollup_Definition__c>>();
 
-        /** Marks these records of the definition's target entity, for that definition. */
-        public void add(Rollup_Definition__c definition, Set<Id> ids) {
-            if (definition == null || String.isBlank(definition.Target_Object__c) || ids == null) {
-                return;
-            }
-            String key = definition.Target_Object__c.toLowerCase();
-            Boolean added = false;
-            for (Id recordId : ids) {
-                if (recordId == null) {
-                    continue;
-                }
-                if (!this.idsByTarget.containsKey(key)) {
-                    this.idsByTarget.put(key, new Set<Id>());
-                }
-                this.idsByTarget.get(key).add(recordId);
-                added = true;
-            }
-            if (added) {
-                if (!this.definitionsByTarget.containsKey(key)) {
-                    this.definitionsByTarget.put(key, new Map<Id, Rollup_Definition__c>());
-                }
-                this.definitionsByTarget.get(key).put(definition.Id, definition);
-            }
-        }
+		/** Marks these records of the definition's target entity, for that definition. */
+		public void add(Rollup_Definition__c definition, Set<Id> ids) {
+			if (definition == null || String.isBlank(definition.Target_Object__c) || ids == null) {
+				return;
+			}
+			String key = definition.Target_Object__c.toLowerCase();
+			Boolean added = false;
+			for (Id recordId : ids) {
+				if (recordId == null) {
+					continue;
+				}
+				if (!this.idsByTarget.containsKey(key)) {
+					this.idsByTarget.put(key, new Set<Id>());
+				}
+				this.idsByTarget.get(key).add(recordId);
+				added = true;
+			}
+			if (added) {
+				if (!this.definitionsByTarget.containsKey(key)) {
+					this.definitionsByTarget.put(key, new Map<Id, Rollup_Definition__c>());
+				}
+				this.definitionsByTarget.get(key).put(definition.Id, definition);
+			}
+		}
 
-        public void addAll(Marked other) {
-            for (String targetObject : other.idsByTarget.keySet()) {
-                Map<Id, Rollup_Definition__c> definitions = other.definitionsByTarget.get(
-                    targetObject
-                );
-                for (
-                    Rollup_Definition__c definition : definitions == null
-                        ? new List<Rollup_Definition__c>()
-                        : definitions.values()
-                ) {
-                    this.add(definition, other.idsByTarget.get(targetObject));
-                }
-            }
-        }
+		public void addAll(Marked other) {
+			for (String targetObject : other.idsByTarget.keySet()) {
+				Map<Id, Rollup_Definition__c> definitions = other.definitionsByTarget.get(
+					targetObject
+				);
+				for (
+					Rollup_Definition__c definition : definitions == null
+						? new List<Rollup_Definition__c>()
+						: definitions.values()
+				) {
+					this.add(definition, other.idsByTarget.get(targetObject));
+				}
+			}
+		}
 
-        /**
-         * The definitions that marked records of this target entity, or null when one of them
-         * has no record id and so cannot be named: then every definition on the entity runs.
-         */
-        public List<Rollup_Definition__c> definitionsFor(String targetObject) {
-            Map<Id, Rollup_Definition__c> definitions = String.isBlank(targetObject)
-                ? null
-                : this.definitionsByTarget.get(targetObject.toLowerCase());
-            if (definitions == null || definitions.isEmpty() || definitions.containsKey(null)) {
-                return null;
-            }
-            return definitions.values();
-        }
+		/**
+		 * The definitions that marked records of this target entity, or null when one of them
+		 * has no record id and so cannot be named: then every definition on the entity runs.
+		 */
+		public List<Rollup_Definition__c> definitionsFor(String targetObject) {
+			Map<Id, Rollup_Definition__c> definitions = String.isBlank(targetObject)
+				? null
+				: this.definitionsByTarget.get(targetObject.toLowerCase());
+			if (definitions == null || definitions.isEmpty() || definitions.containsKey(null)) {
+				return null;
+			}
+			return definitions.values();
+		}
 
-        public Integer size() {
-            Integer total = 0;
-            for (Set<Id> ids : this.idsByTarget.values()) {
-                total += ids.size();
-            }
-            return total;
-        }
+		public Integer size() {
+			Integer total = 0;
+			for (Set<Id> ids : this.idsByTarget.values()) {
+				total += ids.size();
+			}
+			return total;
+		}
 
-        public Boolean isEmpty() {
-            return this.idsByTarget.isEmpty();
-        }
-    }
+		public Boolean isEmpty() {
+			return this.idsByTarget.isEmpty();
+		}
+	}
 
-    /**
-     * An insert, an update or an undelete.
-     *
-     * @param changedObject the entity saved
-     * @param records the records saved
-     * @param oldRecords the records before an update, or null
-     * @param restored true for an undelete
-     * @param definitions the active real-time definitions, of every source entity
-     */
-    public static Marked forSave(
-        String changedObject,
-        List<SObject> records,
-        Map<Id, SObject> oldRecords,
-        Boolean restored,
-        List<Rollup_Definition__c> definitions
-    ) {
-        Marked marked = new Marked();
-        Schema.SObjectType changedType = SettingsService.typeByName(changedObject);
-        if (changedType == null || records == null || records.isEmpty()) {
-            return marked;
-        }
-        Map<String, Schema.SObjectField> changedFields = fieldMap(changedType);
-        List<Rollup_Definition__c> sourced = new List<Rollup_Definition__c>();
-        List<RollupPath.Parsed> paths = new List<RollupPath.Parsed>();
-        List<Set<String>> readSets = new List<Set<String>>();
-        Set<String> readByAny = new Set<String>();
-        for (Rollup_Definition__c definition : definitions) {
-            RollupPath.Parsed path = pathOf(definition);
-            if (path == null || !changedObject.equalsIgnoreCase(definition.Source_Object__c)) {
-                continue;
-            }
-            Set<String> read = localReadsOf(definition, changedType, changedFields);
-            sourced.add(definition);
-            paths.add(path);
-            readSets.add(read);
-            readByAny.addAll(read);
-        }
-        List<SObject> candidates = sourced.isEmpty()
-            ? new List<SObject>()
-            : candidatesOf(readByAny, records, oldRecords);
-        for (Integer i = 0; i < sourced.size() && !candidates.isEmpty(); i++) {
-            List<SObject> touched = new List<SObject>();
-            List<SObject> before = new List<SObject>();
-            for (SObject record : candidates) {
-                SObject previous = oldRecords == null ? null : oldRecords.get(record.Id);
-                if (previous == null || changed(readSets[i], record, previous)) {
-                    touched.add(record);
-                    if (previous != null) {
-                        before.add(previous);
-                    }
-                }
-            }
-            marked.add(sourced[i], targetsOf(paths[i], changedType, touched));
-            marked.add(sourced[i], targetsOf(paths[i], changedType, before));
-        }
-        if (oldRecords != null || restored == true) {
-            RollupDependents.forSave(changedType, records, oldRecords, definitions, marked);
-        }
-        markMembership(
-            definitions,
-            HouseholdService.membershipChangeOf(records, oldRecords),
-            marked
-        );
-        return marked;
-    }
+	/**
+	 * An insert, an update or an undelete.
+	 *
+	 * @param changedObject the entity saved
+	 * @param records the records saved
+	 * @param oldRecords the records before an update, or null
+	 * @param restored true for an undelete
+	 * @param definitions the active real-time definitions, of every source entity
+	 */
+	public static Marked forSave(
+		String changedObject,
+		List<SObject> records,
+		Map<Id, SObject> oldRecords,
+		Boolean restored,
+		List<Rollup_Definition__c> definitions
+	) {
+		Marked marked = new Marked();
+		Schema.SObjectType changedType = SettingsService.typeByName(changedObject);
+		if (changedType == null || records == null || records.isEmpty()) {
+			return marked;
+		}
+		Map<String, Schema.SObjectField> changedFields = fieldMap(changedType);
+		List<Rollup_Definition__c> sourced = new List<Rollup_Definition__c>();
+		List<RollupPath.Parsed> paths = new List<RollupPath.Parsed>();
+		List<Set<String>> readSets = new List<Set<String>>();
+		Set<String> readByAny = new Set<String>();
+		for (Rollup_Definition__c definition : definitions) {
+			RollupPath.Parsed path = pathOf(definition);
+			if (path == null || !changedObject.equalsIgnoreCase(definition.Source_Object__c)) {
+				continue;
+			}
+			Set<String> read = localReadsOf(definition, changedType, changedFields);
+			sourced.add(definition);
+			paths.add(path);
+			readSets.add(read);
+			readByAny.addAll(read);
+		}
+		List<SObject> candidates = sourced.isEmpty()
+			? new List<SObject>()
+			: candidatesOf(readByAny, records, oldRecords);
+		for (Integer i = 0; i < sourced.size() && !candidates.isEmpty(); i++) {
+			List<SObject> touched = new List<SObject>();
+			List<SObject> before = new List<SObject>();
+			for (SObject record : candidates) {
+				SObject previous = oldRecords == null ? null : oldRecords.get(record.Id);
+				if (previous == null || changed(readSets[i], record, previous)) {
+					touched.add(record);
+					if (previous != null) {
+						before.add(previous);
+					}
+				}
+			}
+			marked.add(sourced[i], targetsOf(paths[i], changedType, touched));
+			marked.add(sourced[i], targetsOf(paths[i], changedType, before));
+		}
+		if (oldRecords != null || restored == true) {
+			RollupDependents.forSave(changedType, records, oldRecords, definitions, marked);
+		}
+		markMembership(
+			definitions,
+			HouseholdService.membershipChangeOf(records, oldRecords),
+			marked
+		);
+		return marked;
+	}
 
-    /**
-     * After a delete: the old targets of the deleted records, the households their people left,
-     * the households of merge survivors, and what `RollupDependents.beforeDelete` held.
-     */
-    public static Marked afterDelete(
-        String changedObject,
-        List<SObject> records,
-        List<Rollup_Definition__c> definitions
-    ) {
-        Marked marked = new Marked();
-        marked.addAll(RollupDependents.takeReadBeforeDelete());
-        Schema.SObjectType changedType = SettingsService.typeByName(changedObject);
-        if (changedType == null || records == null || records.isEmpty()) {
-            return marked;
-        }
-        for (Rollup_Definition__c definition : definitions) {
-            RollupPath.Parsed path = pathOf(definition);
-            if (path != null && changedObject.equalsIgnoreCase(definition.Source_Object__c)) {
-                marked.add(definition, targetsOf(path, changedType, records));
-            }
-        }
-        HouseholdService.MembershipChange change = HouseholdService.membershipChangeOf(
-            records,
-            null
-        );
-        for (SObject record : records) {
-            Object survivor = record.getPopulatedFieldsAsMap().get('MasterRecordId');
-            if (survivor != null) {
-                change.personIds.add((Id) survivor);
-            }
-        }
-        change.householdIds.addAll(HouseholdService.getHouseholdIdsFor(change.personIds).values());
-        change.householdIds.remove(null);
-        markMembership(definitions, change, marked);
-        return marked;
-    }
+	/**
+	 * After a delete: the old targets of the deleted records, the households their people left,
+	 * the households of merge survivors, and what `RollupDependents.beforeDelete` held.
+	 */
+	public static Marked afterDelete(
+		String changedObject,
+		List<SObject> records,
+		List<Rollup_Definition__c> definitions
+	) {
+		Marked marked = new Marked();
+		marked.addAll(RollupDependents.takeReadBeforeDelete());
+		Schema.SObjectType changedType = SettingsService.typeByName(changedObject);
+		if (changedType == null || records == null || records.isEmpty()) {
+			return marked;
+		}
+		for (Rollup_Definition__c definition : definitions) {
+			RollupPath.Parsed path = pathOf(definition);
+			if (path != null && changedObject.equalsIgnoreCase(definition.Source_Object__c)) {
+				marked.add(definition, targetsOf(path, changedType, records));
+			}
+		}
+		HouseholdService.MembershipChange change = HouseholdService.membershipChangeOf(
+			records,
+			null
+		);
+		for (SObject record : records) {
+			Object survivor = record.getPopulatedFieldsAsMap().get('MasterRecordId');
+			if (survivor != null) {
+				change.personIds.add((Id) survivor);
+			}
+		}
+		change.householdIds.addAll(HouseholdService.getHouseholdIdsFor(change.personIds).values());
+		change.householdIds.remove(null);
+		markMembership(definitions, change, marked);
+		return marked;
+	}
 
-    // ------------------------------------------------------------------------------- households
+	// ------------------------------------------------------------------------------- households
 
-    /** Marks the households on both sides of a membership change, for token definitions. */
-    private static void markMembership(
-        List<Rollup_Definition__c> definitions,
-        HouseholdService.MembershipChange change,
-        Marked marked
-    ) {
-        if (change == null || change.householdIds.isEmpty()) {
-            return;
-        }
-        Set<Id> people;
-        for (Rollup_Definition__c definition : definitions) {
-            RollupPath.Parsed path = pathOf(definition);
-            if (path == null) {
-                continue;
-            }
-            for (RollupPath.Branch branch : path.branches) {
-                String token = tokenOf(branch);
-                if (token == RollupPath.TOKEN_HOUSEHOLD) {
-                    marked.add(definition, change.householdIds);
-                } else if (token == RollupPath.TOKEN_HOUSEHOLD_MEMBERS) {
-                    if (people == null) {
-                        people = new Set<Id>(change.personIds);
-                        for (
-                            Set<Id> members : HouseholdService.getMemberPersonIds(
-                                    change.householdIds
-                                )
-                                .values()
-                        ) {
-                            people.addAll(members);
-                        }
-                    }
-                    marked.add(definition, people);
-                }
-            }
-        }
-    }
+	/** Marks the households on both sides of a membership change, for token definitions. */
+	private static void markMembership(
+		List<Rollup_Definition__c> definitions,
+		HouseholdService.MembershipChange change,
+		Marked marked
+	) {
+		if (change == null || change.householdIds.isEmpty()) {
+			return;
+		}
+		Set<Id> people;
+		for (Rollup_Definition__c definition : definitions) {
+			RollupPath.Parsed path = pathOf(definition);
+			if (path == null) {
+				continue;
+			}
+			for (RollupPath.Branch branch : path.branches) {
+				String token = tokenOf(branch);
+				if (token == RollupPath.TOKEN_HOUSEHOLD) {
+					marked.add(definition, change.householdIds);
+				} else if (token == RollupPath.TOKEN_HOUSEHOLD_MEMBERS) {
+					if (people == null) {
+						people = new Set<Id>(change.personIds);
+						for (
+							Set<Id> members : HouseholdService.getMemberPersonIds(
+									change.householdIds
+								)
+								.values()
+						) {
+							people.addAll(members);
+						}
+					}
+					marked.add(definition, people);
+				}
+			}
+		}
+	}
 
-    // ------------------------------------------------------------------------------------ paths
+	// ------------------------------------------------------------------------------------ paths
 
-    /**
-     * The definition's path, or null when it cannot be read (logged; R-R10 refuses it on save).
-     * A path is parsed once per transaction; one that cannot be read is tried, and logged, on
-     * every call, as before.
-     */
-    public static RollupPath.Parsed pathOf(Rollup_Definition__c definition) {
-        String text = definition.Relationship_Path__c;
-        RollupPath.Parsed parsed = text == null ? null : PARSED_BY_TEXT.get(text);
-        if (parsed != null) {
-            return parsed;
-        }
-        try {
-            parsed = RollupPath.parse(text);
-        } catch (Exception unreadable) {
-            ErrorLogger.log(unreadable, LOG_CONTEXT, definition.Id);
-            return null;
-        }
-        PARSED_BY_TEXT.put(text, parsed);
-        return parsed;
-    }
+	/**
+	 * The definition's path, or null when it cannot be read (logged; R-R10 refuses it on save).
+	 * A path is parsed once per transaction; one that cannot be read is tried, and logged, on
+	 * every call, as before.
+	 */
+	public static RollupPath.Parsed pathOf(Rollup_Definition__c definition) {
+		String text = definition.Relationship_Path__c;
+		RollupPath.Parsed parsed = text == null ? null : PARSED_BY_TEXT.get(text);
+		if (parsed != null) {
+			return parsed;
+		}
+		try {
+			parsed = RollupPath.parse(text);
+		} catch (Exception unreadable) {
+			ErrorLogger.log(unreadable, LOG_CONTEXT, definition.Id);
+			return null;
+		}
+		PARSED_BY_TEXT.put(text, parsed);
+		return parsed;
+	}
 
-    private static String tokenOf(RollupPath.Branch branch) {
-        for (String segment : branch.segments) {
-            if (RollupPath.TOKEN_HOUSEHOLD.equalsIgnoreCase(segment)) {
-                return RollupPath.TOKEN_HOUSEHOLD;
-            }
-            if (RollupPath.TOKEN_HOUSEHOLD_MEMBERS.equalsIgnoreCase(segment)) {
-                return RollupPath.TOKEN_HOUSEHOLD_MEMBERS;
-            }
-        }
-        return null;
-    }
+	private static String tokenOf(RollupPath.Branch branch) {
+		for (String segment : branch.segments) {
+			if (RollupPath.TOKEN_HOUSEHOLD.equalsIgnoreCase(segment)) {
+				return RollupPath.TOKEN_HOUSEHOLD;
+			}
+			if (RollupPath.TOKEN_HOUSEHOLD_MEMBERS.equalsIgnoreCase(segment)) {
+				return RollupPath.TOKEN_HOUSEHOLD_MEMBERS;
+			}
+		}
+		return null;
+	}
 
-    /** The targets these rows reach, through every alternative of the path. */
-    public static Set<Id> targetsOf(
-        RollupPath.Parsed path,
-        Schema.SObjectType sourceType,
-        List<SObject> rows
-    ) {
-        Set<Id> targets = new Set<Id>();
-        if (path == null || rows == null || rows.isEmpty()) {
-            return targets;
-        }
-        for (RollupPath.Branch branch : path.branches) {
-            Set<Id> reached = reachedBy(branch.referencePrefix(), sourceType, rows);
-            String token = tokenOf(branch);
-            if (token == null) {
-                targets.addAll(reached);
-                continue;
-            }
-            Set<Id> households = new Set<Id>(HouseholdService.getHouseholdIdsFor(reached).values());
-            households.remove(null);
-            if (token == RollupPath.TOKEN_HOUSEHOLD) {
-                targets.addAll(households);
-            } else {
-                for (Set<Id> members : HouseholdService.getMemberPersonIds(households).values()) {
-                    targets.addAll(members);
-                }
-            }
-        }
-        targets.remove(null);
-        return targets;
-    }
+	/** The targets these rows reach, through every alternative of the path. */
+	public static Set<Id> targetsOf(
+		RollupPath.Parsed path,
+		Schema.SObjectType sourceType,
+		List<SObject> rows
+	) {
+		Set<Id> targets = new Set<Id>();
+		if (path == null || rows == null || rows.isEmpty()) {
+			return targets;
+		}
+		for (RollupPath.Branch branch : path.branches) {
+			Set<Id> reached = reachedBy(branch.referencePrefix(), sourceType, rows);
+			String token = tokenOf(branch);
+			if (token == null) {
+				targets.addAll(reached);
+				continue;
+			}
+			Set<Id> households = new Set<Id>(HouseholdService.getHouseholdIdsFor(reached).values());
+			households.remove(null);
+			if (token == RollupPath.TOKEN_HOUSEHOLD) {
+				targets.addAll(households);
+			} else {
+				for (Set<Id> members : HouseholdService.getMemberPersonIds(households).values()) {
+					targets.addAll(members);
+				}
+			}
+		}
+		targets.remove(null);
+		return targets;
+	}
 
-    /**
-     * The records the reference attributes before a token reach: the rows themselves when there
-     * are none, the first reference read off each row, and further references walked by a query
-     * of the record the first one names.
-     */
-    private static Set<Id> reachedBy(
-        List<String> prefix,
-        Schema.SObjectType sourceType,
-        List<SObject> rows
-    ) {
-        Set<Id> reached = new Set<Id>();
-        if (prefix.isEmpty()) {
-            for (SObject row : rows) {
-                reached.add(row.Id);
-            }
-            return reached;
-        }
-        Schema.SObjectField first = fieldMap(sourceType).get(prefix[0].toLowerCase());
-        if (first == null) {
-            return reached;
-        }
-        for (SObject row : rows) {
-            Object value = row.get(first);
-            if (value != null) {
-                reached.add((Id) value);
-            }
-        }
-        if (prefix.size() == 1 || reached.isEmpty()) {
-            return reached;
-        }
-        List<Schema.SObjectType> referenced = first.getDescribe().getReferenceTo();
-        if (referenced.isEmpty()) {
-            return new Set<Id>();
-        }
-        List<String> rest = new List<String>();
-        for (Integer i = 1; i < prefix.size(); i++) {
-            rest.add(
-                i == prefix.size() - 1 ? prefix[i] : RollupPath.relationshipNameFor(prefix[i])
-            );
-        }
-        String expression = String.join(rest, '.');
-        Set<Id> further = new Set<Id>();
-        List<SObject> intermediates;
-        try {
-            // Segments are reference names RollupPath has already checked; ids are bound.
-            intermediates = Database.queryWithBinds(
-                'SELECT Id, ' +
-                    expression +
-                    ' FROM ' +
-                    String.valueOf(referenced[0]) +
-                    ' WHERE Id IN :reached',
-                new Map<String, Object>{ 'reached' => reached },
-                AccessLevel.SYSTEM_MODE
-            );
-        } catch (Exception unreadable) {
-            ErrorLogger.log(unreadable, LOG_CONTEXT);
-            return further;
-        }
-        for (SObject intermediate : intermediates) {
-            Object value = valueAt(intermediate, expression);
-            if (value != null) {
-                further.add((Id) value);
-            }
-        }
-        return further;
-    }
+	/**
+	 * The records the reference attributes before a token reach: the rows themselves when there
+	 * are none, the first reference read off each row, and further references walked by a query
+	 * of the record the first one names.
+	 */
+	private static Set<Id> reachedBy(
+		List<String> prefix,
+		Schema.SObjectType sourceType,
+		List<SObject> rows
+	) {
+		Set<Id> reached = new Set<Id>();
+		if (prefix.isEmpty()) {
+			for (SObject row : rows) {
+				reached.add(row.Id);
+			}
+			return reached;
+		}
+		Schema.SObjectField first = fieldMap(sourceType).get(prefix[0].toLowerCase());
+		if (first == null) {
+			return reached;
+		}
+		for (SObject row : rows) {
+			Object value = row.get(first);
+			if (value != null) {
+				reached.add((Id) value);
+			}
+		}
+		if (prefix.size() == 1 || reached.isEmpty()) {
+			return reached;
+		}
+		List<Schema.SObjectType> referenced = first.getDescribe().getReferenceTo();
+		if (referenced.isEmpty()) {
+			return new Set<Id>();
+		}
+		List<String> rest = new List<String>();
+		for (Integer i = 1; i < prefix.size(); i++) {
+			rest.add(
+				i == prefix.size() - 1 ? prefix[i] : RollupPath.relationshipNameFor(prefix[i])
+			);
+		}
+		String expression = String.join(rest, '.');
+		Set<Id> further = new Set<Id>();
+		List<SObject> intermediates;
+		try {
+			// Segments are reference names RollupPath has already checked; ids are bound.
+			intermediates = Database.queryWithBinds(
+				'SELECT Id, ' +
+					expression +
+					' FROM ' +
+					String.valueOf(referenced[0]) +
+					' WHERE Id IN :reached',
+				new Map<String, Object>{ 'reached' => reached },
+				AccessLevel.SYSTEM_MODE
+			);
+		} catch (Exception unreadable) {
+			ErrorLogger.log(unreadable, LOG_CONTEXT);
+			return further;
+		}
+		for (SObject intermediate : intermediates) {
+			Object value = valueAt(intermediate, expression);
+			if (value != null) {
+				further.add((Id) value);
+			}
+		}
+		return further;
+	}
 
-    private static Object valueAt(SObject row, String path) {
-        List<String> parts = path.split('\\.');
-        SObject current = row;
-        for (Integer i = 0; i < parts.size() - 1 && current != null; i++) {
-            current = current.getSObject(parts[i]);
-        }
-        return current == null ? null : current.get(parts[parts.size() - 1]);
-    }
+	private static Object valueAt(SObject row, String path) {
+		List<String> parts = path.split('\\.');
+		SObject current = row;
+		for (Integer i = 0; i < parts.size() - 1 && current != null; i++) {
+			current = current.getSObject(parts[i]);
+		}
+		return current == null ? null : current.get(parts[parts.size() - 1]);
+	}
 
-    // ------------------------------------------------------------------------------- attributes
+	// ------------------------------------------------------------------------------- attributes
 
-    /**
-     * What a definition reads, as written on its source entity: plain attributes, and paths
-     * through a relationship such as `Gift__r.Status__c`. A path attribute of more than one hop
-     * is written as the path the engine queries, `Donor_Contact__r.AccountId`.
-     */
-    public static Set<String> readsOf(Rollup_Definition__c definition, RollupPath.Parsed path) {
-        Set<String> reads = new Set<String>();
-        for (
-            String field : new List<String>{
-                definition.Source_Field__c,
-                definition.Order_By_Field__c,
-                definition.Fiscal_Date_Field__c
-            }
-        ) {
-            if (String.isNotBlank(field)) {
-                reads.add(field.trim());
-            }
-        }
-        reads.addAll(RollupFilterParser.fieldsOf(definition.Filter_JSON__c));
-        for (RollupPath.Branch branch : path.branches) {
-            List<String> prefix = branch.referencePrefix();
-            List<String> parts = new List<String>();
-            for (Integer i = 0; i < prefix.size(); i++) {
-                parts.add(
-                    i == prefix.size() - 1 ? prefix[i] : RollupPath.relationshipNameFor(prefix[i])
-                );
-            }
-            if (!parts.isEmpty()) {
-                reads.add(String.join(parts, '.'));
-            }
-        }
-        return reads;
-    }
+	/**
+	 * What a definition reads, as written on its source entity: plain attributes, and paths
+	 * through a relationship such as `Gift__r.Status__c`. A path attribute of more than one hop
+	 * is written as the path the engine queries, `Donor_Contact__r.AccountId`.
+	 */
+	public static Set<String> readsOf(Rollup_Definition__c definition, RollupPath.Parsed path) {
+		Set<String> reads = new Set<String>();
+		for (
+			String field : new List<String>{
+				definition.Source_Field__c,
+				definition.Order_By_Field__c,
+				definition.Fiscal_Date_Field__c
+			}
+		) {
+			if (String.isNotBlank(field)) {
+				reads.add(field.trim());
+			}
+		}
+		reads.addAll(RollupFilterParser.fieldsOf(definition.Filter_JSON__c));
+		for (RollupPath.Branch branch : path.branches) {
+			List<String> prefix = branch.referencePrefix();
+			List<String> parts = new List<String>();
+			for (Integer i = 0; i < prefix.size(); i++) {
+				parts.add(
+					i == prefix.size() - 1 ? prefix[i] : RollupPath.relationshipNameFor(prefix[i])
+				);
+			}
+			if (!parts.isEmpty()) {
+				reads.add(String.join(parts, '.'));
+			}
+		}
+		return reads;
+	}
 
-    /**
-     * The definition attributes its reads are worked out from, as one key: each part carries its
-     * length, so no two different definitions share a key. Two definitions that read the same way
-     * do, and share one read set.
-     */
-    public static String readKeyOf(Rollup_Definition__c definition) {
-        List<String> parts = new List<String>();
-        for (
-            String part : new List<String>{
-                definition.Source_Field__c,
-                definition.Order_By_Field__c,
-                definition.Fiscal_Date_Field__c,
-                definition.Filter_JSON__c,
-                definition.Relationship_Path__c
-            }
-        ) {
-            parts.add(part == null ? '-' : part.length() + ':' + part);
-        }
-        return String.join(parts, '|');
-    }
+	/**
+	 * The definition attributes its reads are worked out from, as one key: each part carries its
+	 * length, so no two different definitions share a key. Two definitions that read the same way
+	 * do, and share one read set.
+	 */
+	public static String readKeyOf(Rollup_Definition__c definition) {
+		List<String> parts = new List<String>();
+		for (
+			String part : new List<String>{
+				definition.Source_Field__c,
+				definition.Order_By_Field__c,
+				definition.Fiscal_Date_Field__c,
+				definition.Filter_JSON__c,
+				definition.Relationship_Path__c
+			}
+		) {
+			parts.add(part == null ? '-' : part.length() + ':' + part);
+		}
+		return String.join(parts, '|');
+	}
 
-    /**
-     * `readsOf` for a definition whose path `pathOf` read, worked out once per transaction.
-     * The set is shared: callers read it and never change it.
-     */
-    public static Set<String> readsFor(Rollup_Definition__c definition) {
-        String key = readKeyOf(definition);
-        Set<String> reads = READS_BY_KEY.get(key);
-        if (reads == null) {
-            reads = readsOf(definition, pathOf(definition));
-            READS_BY_KEY.put(key, reads);
-        }
-        return reads;
-    }
+	/**
+	 * `readsOf` for a definition whose path `pathOf` read, worked out once per transaction.
+	 * The set is shared: callers read it and never change it.
+	 */
+	public static Set<String> readsFor(Rollup_Definition__c definition) {
+		String key = readKeyOf(definition);
+		Set<String> reads = READS_BY_KEY.get(key);
+		if (reads == null) {
+			reads = readsOf(definition, pathOf(definition));
+			READS_BY_KEY.put(key, reads);
+		}
+		return reads;
+	}
 
-    /** `localFields` of `readsFor` on this entity, worked out once per transaction; shared. */
-    private static Set<String> localReadsOf(
-        Rollup_Definition__c definition,
-        Schema.SObjectType entity,
-        Map<String, Schema.SObjectField> fields
-    ) {
-        String key = String.valueOf(entity) + '|' + readKeyOf(definition);
-        Set<String> local = LOCAL_BY_KEY.get(key);
-        if (local == null) {
-            local = localFields(readsFor(definition), fields);
-            LOCAL_BY_KEY.put(key, local);
-        }
-        return local;
-    }
+	/** `localFields` of `readsFor` on this entity, worked out once per transaction; shared. */
+	private static Set<String> localReadsOf(
+		Rollup_Definition__c definition,
+		Schema.SObjectType entity,
+		Map<String, Schema.SObjectField> fields
+	) {
+		String key = String.valueOf(entity) + '|' + readKeyOf(definition);
+		Set<String> local = LOCAL_BY_KEY.get(key);
+		if (local == null) {
+			local = localFields(readsFor(definition), fields);
+			LOCAL_BY_KEY.put(key, local);
+		}
+		return local;
+	}
 
-    /**
-     * The records a definition of this entity can have to mark, in their order: every record with
-     * no prior version, and every one that changed an attribute some definition reads. A record
-     * that changed none of them is left out, which is what each definition would decide for it.
-     * A record whose versions cannot be compared here (an attribute missing from a queried row)
-     * is kept, so each definition compares it as it always did.
-     */
-    private static List<SObject> candidatesOf(
-        Set<String> readByAny,
-        List<SObject> records,
-        Map<Id, SObject> oldRecords
-    ) {
-        if (oldRecords == null) {
-            return records;
-        }
-        List<SObject> candidates = new List<SObject>();
-        for (SObject record : records) {
-            SObject previous = oldRecords.get(record.Id);
-            Boolean keep;
-            try {
-                keep = previous == null || changed(readByAny, record, previous);
-            } catch (Exception notCompared) {
-                keep = true;
-            }
-            if (keep) {
-                candidates.add(record);
-            }
-        }
-        return candidates;
-    }
+	/**
+	 * The records a definition of this entity can have to mark, in their order: every record with
+	 * no prior version, and every one that changed an attribute some definition reads. A record
+	 * that changed none of them is left out, which is what each definition would decide for it.
+	 * A record whose versions cannot be compared here (an attribute missing from a queried row)
+	 * is kept, so each definition compares it as it always did.
+	 */
+	private static List<SObject> candidatesOf(
+		Set<String> readByAny,
+		List<SObject> records,
+		Map<Id, SObject> oldRecords
+	) {
+		if (oldRecords == null) {
+			return records;
+		}
+		List<SObject> candidates = new List<SObject>();
+		for (SObject record : records) {
+			SObject previous = oldRecords.get(record.Id);
+			Boolean keep;
+			try {
+				keep = previous == null || changed(readByAny, record, previous);
+			} catch (Exception notCompared) {
+				keep = true;
+			}
+			if (keep) {
+				candidates.add(record);
+			}
+		}
+		return candidates;
+	}
 
-    /** The attributes on the entity itself that these reads start from, in lower case. */
-    public static Set<String> localFields(
-        Set<String> reads,
-        Map<String, Schema.SObjectField> fields
-    ) {
-        Set<String> local = new Set<String>();
-        for (String read : reads) {
-            String name = read.contains('.') ? referenceFieldFor(read.substringBefore('.')) : read;
-            if (fields.containsKey(name.toLowerCase())) {
-                local.add(name.toLowerCase());
-            }
-        }
-        return local;
-    }
+	/** The attributes on the entity itself that these reads start from, in lower case. */
+	public static Set<String> localFields(
+		Set<String> reads,
+		Map<String, Schema.SObjectField> fields
+	) {
+		Set<String> local = new Set<String>();
+		for (String read : reads) {
+			String name = read.contains('.') ? referenceFieldFor(read.substringBefore('.')) : read;
+			if (fields.containsKey(name.toLowerCase())) {
+				local.add(name.toLowerCase());
+			}
+		}
+		return local;
+	}
 
-    /** `Gift__r` is read through `Gift__c`, and `Account` through `AccountId`. */
-    private static String referenceFieldFor(String relationshipName) {
-        return relationshipName.endsWithIgnoreCase('__r')
-            ? relationshipName.left(relationshipName.length() - 3) + '__c'
-            : relationshipName + 'Id';
-    }
+	/** `Gift__r` is read through `Gift__c`, and `Account` through `AccountId`. */
+	private static String referenceFieldFor(String relationshipName) {
+		return relationshipName.endsWithIgnoreCase('__r')
+			? relationshipName.left(relationshipName.length() - 3) + '__c'
+			: relationshipName + 'Id';
+	}
 
-    /** Whether any of these attributes differs between the two versions of a record. */
-    public static Boolean changed(Set<String> fields, SObject record, SObject previous) {
-        for (String field : fields) {
-            if (record.get(field) != previous.get(field)) {
-                return true;
-            }
-        }
-        return false;
-    }
+	/** Whether any of these attributes differs between the two versions of a record. */
+	public static Boolean changed(Set<String> fields, SObject record, SObject previous) {
+		for (String field : fields) {
+			if (record.get(field) != previous.get(field)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-    public static Map<String, Schema.SObjectField> fieldMap(Schema.SObjectType entity) {
-        return entity.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
-    }
+	public static Map<String, Schema.SObjectField> fieldMap(Schema.SObjectType entity) {
+		return entity.getDescribe(SObjectDescribeOptions.DEFERRED).fields.getMap();
+	}
 }

@@ -28,9 +28,9 @@
         <fullName>Core_SettingsGroup_DonorLevels</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Settings console, Giving page: box heading for donor levels</shortDescription>
-        <value>Donor Levels</value>
+        <value>Donor Levels and Scores</value>
     </labels>
     <labels>
         <fullName>Core_SettingsGroup_EditionAndFeatures</fullName>
@@ -39,14 +39,6 @@
         <protected>true</protected>
         <shortDescription>Settings console, General page: box heading for edition and features</shortDescription>
         <value>Edition and Features</value>
-    </labels>
-    <labels>
-        <fullName>Core_SettingsGroup_ErrorDigest</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console, Error Log page: box heading for the digest email</shortDescription>
-        <value>Error Digest</value>
     </labels>
     <labels>
         <fullName>Core_SettingsGroup_ErrorLogRetention</fullName>
@@ -62,7 +54,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Settings console, Import page: box heading for Find and bulk job limits</shortDescription>
-        <value>Find, Bulk Update and Bulk Delete</value>
+        <value>Find, Super Transformer and Bulk Delete</value>
     </labels>
     <labels>
         <fullName>Core_SettingsGroup_GiftDefaults</fullName>
@@ -137,14 +129,6 @@
         <value>BarnCRM Mirror</value>
     </labels>
     <labels>
-        <fullName>Core_SettingsGroup_OrganizationAddress</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console, Organization page: box heading for the address</shortDescription>
-        <value>Organization Address</value>
-    </labels>
-    <labels>
         <fullName>Core_SettingsGroup_OrganizationDetails</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -156,7 +140,7 @@
         <fullName>Core_SettingsGroup_People</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Settings console, People and Households page: box heading for people</shortDescription>
         <value>People</value>
     </labels>
@@ -201,18 +185,10 @@
         <value>Receipt Logo and Signature</value>
     </labels>
     <labels>
-        <fullName>Core_SettingsGroup_Relationships</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings console, People and Households page: box heading, relationships</shortDescription>
-        <value>Relationships</value>
-    </labels>
-    <labels>
         <fullName>Core_SettingsGroup_RollupBuilder</fullName>
         <categories>Core</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Settings console, Rollups page: box heading for the Rollup Builder</shortDescription>
         <value>Rollup Builder</value>
     </labels>

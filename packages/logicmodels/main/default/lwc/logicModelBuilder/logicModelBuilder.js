@@ -4,17 +4,32 @@ import getPrograms from '@salesforce/apex/LogicModelBuilderController.getProgram
 import setProgram from '@salesforce/apex/LogicModelBuilderController.setProgram';
 import saveElement from '@salesforce/apex/LogicModelBuilderController.saveElement';
 
-import { columns, findings, nextOrder, stageByKey } from 'c/logicModelRules';
+import { downloadCsv } from 'c/findCsv';
+import {
+  RESULTS_SHEET_COLUMNS,
+  columns,
+  findings,
+  liveLinks,
+  nextOrder,
+  resultsSheetRows,
+  stageByKey
+} from 'c/logicModelRules';
 import { LABELS, format, messageFrom, stageLabel } from 'c/logicModelText';
+import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ORGANIZATION = '';
+const SELECTED_PART = 'selected-part';
+const PART_TILE = 'part-tile';
 
 /**
- * The Logic Model Builder panel on a logic model (L-01, L-02): whose model it is, the seven
- * columns of parts, the selected part with its arrows and indicators, and what needs attention.
+ * The Logic Model Builder panel on a logic model (L-01 to L-04): whose model it is, the seven
+ * columns of parts drawn left to right, the selected part with its arrows and indicators, what
+ * needs attention, and the Logic Model Report.
  * Every save returns the whole model, which the panel redraws.
  */
 export default class LogicModelBuilder extends LightningElement {
+  helpReady = isHelpLoaded('LogicModels');
+
   @api recordId;
 
   labels = LABELS;
@@ -32,16 +47,49 @@ export default class LogicModelBuilder extends LightningElement {
   focusTarget;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('LogicModels').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
   renderedCallback() {
-    if (this.focusTarget) {
-      const target = this.template.querySelector(`[data-id="${this.focusTarget}"]`);
-      if (target) {
+    this.applyFocus();
+  }
+
+  /** Moves focus to what the last action asked for, once it is on screen. */
+  applyFocus() {
+    if (!this.focusTarget) {
+      return;
+    }
+    if (this.focusTarget === SELECTED_PART) {
+      // The details sit below the columns, a screen away on a phone: take the person there.
+      const part = this.template.querySelector('[data-id="selected-part"]');
+      if (part) {
         this.focusTarget = undefined;
-        target.focus();
+        part.focusHeading();
       }
+      return;
+    }
+    if (this.focusTarget === PART_TILE) {
+      const tile = this.template.querySelector(
+        `[data-id="part"][data-record-id="${this.selectedId}"]`
+      );
+      if (tile) {
+        this.focusTarget = undefined;
+        if (tile.scrollIntoView) {
+          tile.scrollIntoView({ block: 'center' });
+        }
+        tile.focus();
+      }
+      return;
+    }
+    const target = this.template.querySelector(`[data-id="${this.focusTarget}"]`);
+    if (target) {
+      this.focusTarget = undefined;
+      target.focus();
     }
   }
 
@@ -95,6 +143,20 @@ export default class LogicModelBuilder extends LightningElement {
     return [{ value: ORGANIZATION, label: LABELS.wholeOrganization }, ...this.programOptions];
   }
 
+  /**
+   * Saves the results sheet (L-03, R-IN3): one row per period of every indicator that is not
+   * computed, with the columns the Indicator Results import template reads.
+   */
+  handleDownloadResults() {
+    const rows = resultsSheetRows(this.model);
+    if (!rows.length) {
+      this.errorMessage = LABELS.noResultRows;
+      return;
+    }
+    this.errorMessage = undefined;
+    downloadCsv('Indicator_Results', RESULTS_SHEET_COLUMNS, rows);
+  }
+
   handleChangeScope() {
     this.busy = true;
     this.errorMessage = undefined;
@@ -132,12 +194,41 @@ export default class LogicModelBuilder extends LightningElement {
 
   // ---------------------------------------------------------------------------- columns
 
+  /** The parts an arrow joins to the selected one, either way: drawn with a brand border. */
+  get linkedIds() {
+    const linked = new Set();
+    if (!this.selectedId) {
+      return linked;
+    }
+    for (const link of liveLinks(this.model)) {
+      if (link.fromId === this.selectedId) {
+        linked.add(link.toId);
+      } else if (link.toId === this.selectedId) {
+        linked.add(link.fromId);
+      }
+    }
+    return linked;
+  }
+
+  partClass(id, linked) {
+    if (id === this.selectedId) {
+      return 'part part_selected';
+    }
+    if (!this.selectedId) {
+      return 'part';
+    }
+    return linked.has(id) ? 'part part_linked' : 'part part_dimmed';
+  }
+
   get columns() {
-    return columns(this.model).map((column) => {
+    const linked = this.linkedIds;
+    return columns(this.model).map((column, index) => {
       const name = stageLabel(column.key);
       return {
         key: column.key,
         name,
+        count: String(column.elements.length),
+        showSeparator: index > 0,
         addLabel: format(LABELS.addTo, name),
         adding: this.addingStage === column.key,
         empty: column.elements.length === 0,
@@ -145,9 +236,7 @@ export default class LogicModelBuilder extends LightningElement {
           id: element.id,
           name: element.name,
           pressed: element.id === this.selectedId ? 'true' : 'false',
-          className:
-            'slds-button slds-button_stretch slds-var-m-bottom_xx-small ' +
-            (element.id === this.selectedId ? 'slds-button_brand' : 'slds-button_neutral')
+          className: this.partClass(element.id, linked)
         }))
       };
     });
@@ -156,6 +245,16 @@ export default class LogicModelBuilder extends LightningElement {
   handleSelect(event) {
     const id = event.currentTarget.dataset.recordId;
     this.selectedId = this.selectedId === id ? undefined : id;
+    if (this.selectedId) {
+      this.focusTarget = SELECTED_PART;
+    }
+  }
+
+  /** Back to the Model: from the part's details to its tile in the columns. */
+  handleBack() {
+    // Nothing on screen changes, so the tile is focused now rather than after a render.
+    this.focusTarget = PART_TILE;
+    this.applyFocus();
   }
 
   handleAdd(event) {

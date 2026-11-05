@@ -7,5 +7,5 @@
  * and the global pause are already checked where the processor starts.
  */
 trigger RollupQueueReadyTrigger on Rollup_Queue_Ready__e(after insert) {
-    RollupService.startQueuedRecalculation();
+	RollupService.startQueuedRecalculation();
 }

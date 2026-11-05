@@ -7,25 +7,24 @@ import getNamingSettings from '@salesforce/apex/HouseholdController.getNamingSet
 import recomputeAll from '@salesforce/apex/HouseholdController.recomputeAll';
 import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
 
-import TITLE from '@salesforce/label/c.Core_HouseholdNamingSettings_Title';
+import TITLE from '@salesforce/label/c.Core_SettingsGroup_HouseholdNames';
 import NAME_LABEL from '@salesforce/label/c.Core_HouseholdNamingSettings_NameLabel';
 import FORMAL_LABEL from '@salesforce/label/c.Core_HouseholdNamingSettings_FormalLabel';
 import INFORMAL_LABEL from '@salesforce/label/c.Core_HouseholdNamingSettings_InformalLabel';
-import TOKEN_HELP from '@salesforce/label/c.Core_HouseholdNamingSettings_TokenHelp';
 import PREVIEW_HEADING from '@salesforce/label/c.Core_HouseholdNamingSettings_PreviewHeading';
-import COLUMN_MEMBERS from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnMembers';
+import COLUMN_MEMBERS from '@salesforce/label/c.Core_SettingsGroup_People';
 import COLUMN_NAME from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnName';
 import COLUMN_FORMAL from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnFormal';
 import COLUMN_INFORMAL from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnInformal';
-import SAVE from '@salesforce/label/c.Core_HouseholdNamingSettings_Save';
-import SAVED from '@salesforce/label/c.Core_HouseholdNamingSettings_Saved';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import RECOMPUTE from '@salesforce/label/c.Core_HouseholdNamingSettings_Recompute';
-import RECOMPUTE_CONFIRM from '@salesforce/label/c.Core_HouseholdNamingSettings_RecomputeConfirm';
-import RECOMPUTE_STARTED from '@salesforce/label/c.Core_HouseholdNamingSettings_RecomputeStarted';
-import READ_ONLY from '@salesforce/label/c.Core_HouseholdNamingSettings_ReadOnly';
-import CANCEL from '@salesforce/label/c.Core_HouseholdNamingSettings_Cancel';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CONFIRM from '@salesforce/label/c.Core_HouseholdNamingSettings_Confirm';
 import SAVING from '@salesforce/label/c.Core_HouseholdScreens_Saving';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { createDragController } from 'c/barnDrag';
+import { dragMessages } from 'c/barnDragText';
+import { PARTS, insertPart, positionAtOffset } from './patternParts';
 
 const DEBOUNCE_MILLISECONDS = 300;
 // What the package ships. Used only until this org's own saved patterns arrive, and where
@@ -36,14 +35,44 @@ const SHIPPED_INFORMAL_PATTERN = '{FirstName}';
 const NAME_KEY = 'Household_Name_Pattern__c';
 const FORMAL_KEY = 'Formal_Greeting_Pattern__c';
 const INFORMAL_KEY = 'Informal_Greeting_Pattern__c';
+const INPUT_CLASS = 'slds-input';
+const DROP_TARGET_CLASS = 'slds-input pattern_drop-target';
+const PART_CLASS =
+  'slds-button slds-button_neutral part slds-var-m-right_xx-small slds-var-m-bottom_xx-small';
+/** The parts row of each pattern is a drop zone too (where a drag starts), never a target. */
+const PARTS_ZONE = 'parts-';
+
+/** The three patterns, in the order they show, by the property that holds each. */
+const PATTERN_FIELDS = [
+  { key: 'name', property: 'namePattern', label: NAME_LABEL },
+  { key: 'formal', property: 'formalPattern', label: FORMAL_LABEL },
+  { key: 'informal', property: 'informalPattern', label: INFORMAL_LABEL }
+];
+
+/** A context that measures text in the font a pattern box uses, or undefined. */
+function textMeasure(input) {
+  try {
+    const canvas = document.createElement('canvas');
+    const context = typeof canvas.getContext === 'function' ? canvas.getContext('2d') : null;
+    if (!context || typeof context.measureText !== 'function') {
+      return undefined;
+    }
+    const style = window.getComputedStyle(input);
+    context.font = style.font || `${style.fontSize} ${style.fontFamily}`;
+    return (text) => context.measureText(text).width;
+  } catch {
+    return undefined;
+  }
+}
 
 export default class HouseholdNamingSettings extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   label = {
     title: TITLE,
-    nameLabel: NAME_LABEL,
-    formalLabel: FORMAL_LABEL,
-    informalLabel: INFORMAL_LABEL,
-    tokenHelp: TOKEN_HELP,
+    get tokenHelp() {
+      return helpText('Core', 'Core_HouseholdNamingSettings_TokenHelp');
+    },
     previewHeading: PREVIEW_HEADING,
     columnMembers: COLUMN_MEMBERS,
     columnName: COLUMN_NAME,
@@ -51,7 +80,9 @@ export default class HouseholdNamingSettings extends LightningElement {
     columnInformal: COLUMN_INFORMAL,
     save: SAVE,
     recompute: RECOMPUTE,
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Core', 'Core_HouseholdNamingSettings_ReadOnly');
+    },
     saving: SAVING
   };
 
@@ -62,10 +93,16 @@ export default class HouseholdNamingSettings extends LightningElement {
   @track samples = [];
   errorMessage;
   isSaving = false;
+  /** The last part added, said by the aria-live region. */
+  announcement = '';
+  /** The drag the kit's controller reports (c/barnDrag): which part, and the box it is over. */
+  dragState = {};
 
   debounceTimer;
   /** Counts previews, so a slow answer for earlier patterns cannot replace a newer one. */
   previewSequence = 0;
+  /** The kit's drag controller, made on the first press on a part. */
+  drag;
 
   get canEdit() {
     return hasManageSettings === true;
@@ -83,7 +120,34 @@ export default class HouseholdNamingSettings extends LightningElement {
     return this.isReadOnly || this.isSaving;
   }
 
+  /** The three pattern boxes, each with its parts row. */
+  get patterns() {
+    const drag = this.dragState || {};
+    return PATTERN_FIELDS.map((field) => ({
+      key: field.key,
+      label: field.label,
+      value: this[field.property],
+      inputId: `pattern-${field.key}`,
+      inputClass: drag.active && drag.overZone === field.key ? DROP_TARGET_CLASS : INPUT_CLASS,
+      partsZone: `${PARTS_ZONE}${field.key}`,
+      partsLabel: helpText('Core', 'Core_HouseholdNamingSettings_PartsHelp'),
+      parts: PARTS.map((part) => {
+        const id = `${field.key}:${part}`;
+        return {
+          id,
+          value: part,
+          className: drag.active && drag.itemId === id ? `${PART_CLASS} part_dragging` : PART_CLASS
+        };
+      })
+    }));
+  }
+
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     // The page opens on this org's own wording, not on what the package ships, so that
     // saving again never writes the shipped patterns over what an admin chose before.
     return getNamingSettings()
@@ -103,21 +167,120 @@ export default class HouseholdNamingSettings extends LightningElement {
 
   disconnectedCallback() {
     clearTimeout(this.debounceTimer);
+    if (this.drag) {
+      this.drag.destroy();
+      this.drag = undefined;
+    }
   }
 
-  handleNameChange(event) {
-    this.namePattern = event.detail.value;
+  fieldFor(key) {
+    return PATTERN_FIELDS.find((field) => field.key === key);
+  }
+
+  inputFor(key) {
+    return Array.from(this.template.querySelectorAll('input[data-pattern]')).find(
+      (input) => input.dataset.pattern === key
+    );
+  }
+
+  handlePatternInput(event) {
+    const field = this.fieldFor(event.target.dataset.pattern);
+    if (field) {
+      this[field.property] = event.target.value;
+      this.schedulePreview();
+    }
+  }
+
+  /** A part clicked, or chosen with Enter or Space: it goes where the cursor is in that box. */
+  handlePartClick(event) {
+    const { part, pattern } = event.currentTarget.dataset;
+    const input = this.inputFor(pattern);
+    const start = input ? input.selectionStart : undefined;
+    const end = input ? input.selectionEnd : undefined;
+    this.addPart(pattern, part, start, end);
+  }
+
+  /** Puts a part into a pattern, moves the cursor after it, and says so. */
+  addPart(patternKey, part, start, end) {
+    const field = this.fieldFor(patternKey);
+    if (!field || this.isReadOnly) {
+      return;
+    }
+    const result = insertPart(this[field.property], part, start, end);
+    this[field.property] = result.value;
+    const input = this.inputFor(patternKey);
+    if (input) {
+      input.value = result.value;
+      if (typeof input.focus === 'function') {
+        input.focus();
+      }
+      if (typeof input.setSelectionRange === 'function') {
+        input.setSelectionRange(result.caret, result.caret);
+      }
+    }
+    this.announcement = helpText(
+      'Core',
+      'Core_HouseholdNamingSettings_PartAdded',
+      part,
+      field.label
+    );
     this.schedulePreview();
   }
 
-  handleFormalChange(event) {
-    this.formalPattern = event.detail.value;
-    this.schedulePreview();
+  // Dragging uses pointer events, so a mouse, a pen and a finger all work. Clicking stays the
+  // keyboard and phone path; a press that moves less than a few pixels is a click.
+  // The press goes to the kit's drag controller (c/barnDrag): a mouse or pen drags after a few
+  // pixels, a finger after a short press and hold, and the click that ends a drag is swallowed.
+  handlePartPointerDown(event) {
+    if (this.isReadOnly) {
+      return;
+    }
+    this.dragController().pointerDown(event);
   }
 
-  handleInformalChange(event) {
-    this.informalPattern = event.detail.value;
-    this.schedulePreview();
+  dragController() {
+    if (!this.drag) {
+      this.drag = createDragController({
+        root: this.template,
+        layout: 'list',
+        messages: dragMessages(),
+        announce: (text) => {
+          this.announcement = text;
+        },
+        onChange: (state) => {
+          this.dragState = state;
+        },
+        canDrop: (itemId, fromZone, toZone) => !String(toZone).startsWith(PARTS_ZONE),
+        onDrop: (drop) => this.handlePartDrop(drop)
+      });
+    }
+    return this.drag;
+  }
+
+  /** A part dropped on a pattern box: it goes into the text where the pointer let go. */
+  handlePartDrop({ itemId, toZone }) {
+    const input = this.inputFor(toZone);
+    if (!input || String(toZone).startsWith(PARTS_ZONE)) {
+      return false;
+    }
+    const part = String(itemId).slice(String(itemId).indexOf(':') + 1);
+    const x = this.dragState && this.dragState.x;
+    const position = x ? this.positionIn(input, x) : input.value.length;
+    this.addPart(toZone, part, position, position);
+    return true;
+  }
+
+  /** Where in a box's text a drop at this point lands: the nearest gap between characters. */
+  positionIn(input, x) {
+    const box = input.getBoundingClientRect();
+    const style = window.getComputedStyle(input);
+    const offset =
+      x -
+      box.left -
+      (parseFloat(style.paddingLeft) || 0) -
+      (parseFloat(style.borderLeftWidth) || 0) +
+      (input.scrollLeft || 0);
+    return positionAtOffset(input.value, offset, textMeasure(input));
   }
 
   schedulePreview() {
@@ -160,7 +323,7 @@ export default class HouseholdNamingSettings extends LightningElement {
     return saveSettings({ values })
       .then(() => {
         this.errorMessage = undefined;
-        this.toast(SAVED, 'success');
+        this.toast(helpText('Core', 'Core_HouseholdNamingSettings_Saved'), 'success');
         // The Setup Assistant embeds this panel and listens for "save" to tick its naming
         // step, the same event name setupStepFields dispatches for the same purpose.
         this.dispatchEvent(new CustomEvent('save', { detail: { values } }));
@@ -177,7 +340,7 @@ export default class HouseholdNamingSettings extends LightningElement {
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: RECOMPUTE,
-      message: RECOMPUTE_CONFIRM,
+      message: helpText('Core', 'Core_HouseholdNamingSettings_RecomputeConfirm'),
       confirmLabel: CONFIRM,
       cancelLabel: CANCEL
     });
@@ -187,7 +350,7 @@ export default class HouseholdNamingSettings extends LightningElement {
     return recomputeAll()
       .then(() => {
         this.errorMessage = undefined;
-        this.toast(RECOMPUTE_STARTED, 'success');
+        this.toast(helpText('Core', 'Core_HouseholdNamingSettings_RecomputeStarted'), 'success');
       })
       .catch((error) => {
         this.errorMessage = this.readError(error);

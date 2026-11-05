@@ -9,6 +9,17 @@ import getDeletePage from '@salesforce/apex/BulkDeleteController.getPage';
 import undoDelete from '@salesforce/apex/BulkDeleteController.undo';
 
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_BulkUpdate_UndoConfirm: 'Puts back {0}.',
+  Core_BulkDelete_UndoConfirm: 'Brings back {0}.'
+});
+
+setHelpTextForTest({
+  Core_DataJobs_ImportSummaryOne: '{0} row: {1} created, {2} updated, {3} matched, {4} rejected.',
+  Core_DataJobs_ImportSummary: '{0} rows: {1} created, {2} updated, {3} matched, {4} rejected.'
+});
 
 jest.mock(
   '@salesforce/apex/DataManagerController.findToolStateKey',
@@ -65,30 +76,6 @@ jest.mock('@salesforce/apex/BulkDeleteController.getPage', () => ({ default: jes
 jest.mock('@salesforce/apex/BulkDeleteController.undo', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_BulkUpdate_UndoConfirm',
-  () => ({ default: 'Puts back {0}.' }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
-  '@salesforce/label/c.Core_BulkDelete_UndoConfirm',
-  () => ({ default: 'Brings back {0}.' }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataJobs_ImportSummaryOne',
-  () => ({ default: '{0} row: {1} created, {2} updated, {3} matched, {4} rejected.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataJobs_ImportSummary',
-  () => ({ default: '{0} rows: {1} created, {2} updated, {3} matched, {4} rejected.' }),
-  { virtual: true }
-);
 
 const IMPORT_JOB = {
   id: 'a0B000000000001',
@@ -268,7 +255,8 @@ describe('c-data-job-history', () => {
     getUpdatePage.mockRejectedValue({ body: { message: 'No access' } });
     const element = await render();
 
-    expect(one(element, 'error-message').textContent).toBe('No access');
+    expect(one(element, 'error-message').message).toBe('No access');
+    expect(one(element, 'error-message').variant).toBe('error');
   });
 
   it('shows each status as a badge and keeps Undo in a row menu', async () => {
@@ -279,7 +267,8 @@ describe('c-data-job-history', () => {
     const badges = element.shadowRoot.querySelectorAll('[data-id="status-badge"]');
     expect(badges.length).toBeGreaterThan(0);
     const failed = Array.from(badges).find((badge) => badge.label === 'Failed');
-    expect(failed.className).toContain('slds-theme_error');
+    expect(failed.tagName.toLowerCase()).toBe('c-barn-status-badge');
+    expect(failed.status).toBe('error');
     expect(one(element, UPDATE_JOB.recordId).tagName.toLowerCase()).toBe('lightning-button-menu');
     expect(element.shadowRoot.querySelector('lightning-menu-item').value).toBe('undo');
   });
@@ -347,7 +336,7 @@ describe('c-data-job-history', () => {
       (candidate) => candidate.label === 'Undone'
     );
     expect(badge).toBeDefined();
-    expect(badge.className).toContain('slds-theme_success');
+    expect(badge.status).toBe('success');
     jest.restoreAllMocks();
   });
 
@@ -383,8 +372,8 @@ describe('c-data-job-history', () => {
     await flush();
 
     expect(previewUndo).toHaveBeenCalledWith({ batchId: IMPORT_JOB.id });
-    expect(one(element, 'people').textContent).toContain('5');
-    expect(one(element, 'other-Gift__c').textContent).toContain('Gifts');
+    expect(one(element, 'people').value).toBe(5);
+    expect(one(element, 'other-Gift__c').label).toContain('Gifts');
     expect(one(element, 'import-undo-start').disabled).toBe(false);
 
     one(element, 'import-undo-start').click();
@@ -404,7 +393,7 @@ describe('c-data-job-history', () => {
     await flush();
     await flush();
 
-    expect(one(element, 'error-message').textContent).toBe('The time to undo ended.');
+    expect(one(element, 'error-message').message).toBe('The time to undo ended.');
     expect(one(element, 'import-undo-start').disabled).toBe(true);
 
     one(element, 'undo-cancel').click();

@@ -1,7 +1,9 @@
 /**
  * The system mode writes behind the Automation page: the org default `BarnCRM_Settings__c`
- * record for the automation pause, and the Automation Setting rows materialized from the
- * shipped registry.
+ * record for the automation pause, the Automation Setting rows materialized from the shipped
+ * registry (and an org's own listed flow's row, removed again), and the BarnCRM Automation
+ * Control rows (canonical model R-A8: a custom setting takes no permission a BarnCRM Admin
+ * could hold; `AutomationControlSettingService` checks the permission and the owner first).
  *
  * ADR-0021 (system mode writes for package owned data) is the authority for this class and
  * names it as one of its writers. Two writes, each for its own reason:
@@ -29,28 +31,50 @@
  * itself authorizes.
  */
 public without sharing class AutomationSettingsWriter {
-    /**
-     * Saves the pause end over `stored`, the record the caller already read and locked with
-     * `OrgSettingsSystemWriter.lockStored()` to decide what to save (null when the org has none),
-     * so the row is read under lock once, not twice.
-     */
-    public static void savePausedUntil(BarnCRM_Settings__c stored, Datetime pausedUntil) {
-        // Through the shared writer: a pause is often the first thing saved after install, and
-        // that first save must keep the shipped defaults (OrgSettingsSystemWriter).
-        OrgSettingsSystemWriter.saveOver(
-            BarnCRM_Settings__c.SObjectType,
-            stored,
-            new Map<Schema.SObjectField, Object>{
-                BarnCRM_Settings__c.Automation_Paused_Until__c => pausedUntil
-            }
-        );
-    }
+	/**
+	 * Saves the pause end over `stored`, the record the caller already read and locked with
+	 * `OrgSettingsSystemWriter.lockStored()` to decide what to save (null when the org has none),
+	 * so the row is read under lock once, not twice.
+	 */
+	public static void savePausedUntil(BarnCRM_Settings__c stored, Datetime pausedUntil) {
+		// Through the shared writer: a pause is often the first thing saved after install, and
+		// that first save must keep the shipped defaults (OrgSettingsSystemWriter).
+		OrgSettingsSystemWriter.saveOver(
+			BarnCRM_Settings__c.SObjectType,
+			stored,
+			new Map<Schema.SObjectField, Object>{
+				BarnCRM_Settings__c.Automation_Paused_Until__c => pausedUntil
+			}
+		);
+	}
 
-    /** Inserts switch rows materialized from the shipped registry, or a generated trigger's. */
-    public static void insertSwitches(List<Automation_Setting__c> switches) {
-        if (switches == null || switches.isEmpty()) {
-            return;
-        }
-        Database.insert(switches, AccessLevel.SYSTEM_MODE);
-    }
+	/** Inserts switch rows materialized from the shipped registry, or a generated trigger's. */
+	public static void insertSwitches(List<Automation_Setting__c> switches) {
+		if (switches == null || switches.isEmpty()) {
+			return;
+		}
+		Database.insert(switches, AccessLevel.SYSTEM_MODE);
+	}
+
+	/**
+	 * Deletes the switch row of an org's own listed flow (R-A8). The caller has checked the
+	 * permission and that the row is a `Flow:` row that is not a package default.
+	 */
+	public static void deleteSwitch(Id switchId) {
+		Database.delete(switchId, true, AccessLevel.SYSTEM_MODE);
+	}
+
+	/**
+	 * Saves one BarnCRM Automation Control row (R-A8): a custom setting takes no object or field
+	 * permission a BarnCRM Admin could hold. The caller has checked the permission and that the
+	 * owner is this org, a Profile or a User; only the two checkboxes are set.
+	 */
+	public static void saveControl(BarnCRM_Automation_Control__c row) {
+		Database.upsert(row, true, AccessLevel.SYSTEM_MODE);
+	}
+
+	/** Deletes one profile or user BarnCRM Automation Control row, after the same checks. */
+	public static void deleteControl(Id rowId) {
+		Database.delete(rowId, true, AccessLevel.SYSTEM_MODE);
+	}
 }

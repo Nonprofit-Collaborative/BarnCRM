@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Answer Library's logic in plain JavaScript: topics split from free text, the topic list,
+    word counts and the search (canonical model 29ZN). Imported by grantAnswerLibrary.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

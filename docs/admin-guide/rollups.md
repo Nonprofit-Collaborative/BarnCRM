@@ -105,11 +105,13 @@ One step is left for you, and nothing in the app does it on your behalf:
 1. From the App Launcher, open the **BarnCRM Admin** app and click the **Rollup
    Builder** tab. (In **BarnCRM Settings**, the **Rollups** section opens the same page.)
 2. You should see every total listed above, one row each.
-3. Click **Schedule nightly recalculation**. The page then shows "Nightly recalculation
-   is scheduled for 2:00 AM." (or the hour you chose in **Time of the nightly run**).
+3. Click **Schedule nightly recalculation**. This switches the rollup recalculation step on
+   in [BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run, and makes sure that run
+   is scheduled. The page then shows "Nightly recalculation is scheduled for 2:00 AM." (or
+   the hour you chose in **Time of the nightly run**).
 
 Do that on the day you install. The Setup Assistant has no rollup step, so until you click
-it nothing recalculates overnight and the home page tile stays in warning.
+it the step stays off, nothing recalculates overnight and the home page tile stays in warning.
 
 ### If a Rollup Is Missing
 
@@ -194,8 +196,10 @@ the moment a gift is saved and your org has little automation of its own on gift
 
 ### How the Nightly Run Works
 
-The nightly run starts at 2:00 AM by default, in the time zone of the person who scheduled
-it. To run it at another hour, open **BarnCRM Settings**, **Rollups** section, and choose
+The nightly recalculation is a step of [BarnCRM Nightly Jobs](nightly-jobs.md), the one
+nightly run all of BarnCRM's overnight work shares. The step starts at 2:00 AM by default (or
+as soon as the step before it has finished), in the time zone of the person who scheduled the
+run, and is switched on and off here, on the Rollups page. To run it at another hour, open **BarnCRM Settings**, **Rollups** section, and choose
 **Time of the nightly run** (any hour from 12:00 AM (midnight) to 11:00 PM). Saving a new
 hour moves the scheduled run straight away; if the nightly run is not scheduled, the new hour
 is used when you schedule it. Pick a quiet hour after the day's data entry and before the
@@ -915,7 +919,7 @@ BarnCRM reads DLRS's rollups (never changes them) to stop the two tools filling 
   switch the DLRS rollup off first.
 - **Switching off and saving a rollup switched off** never ask: a rollup that is off fills
   nothing.
-- **Health Check** warns **BarnCRM and DLRS fill the same field** when such a pair appears
+- **Health Check** warns **BarnCRM and DLRS Fill the Same Field** when such a pair appears
   later, for example when a DLRS rollup is switched back on, and names each field and both
   rollups.
 

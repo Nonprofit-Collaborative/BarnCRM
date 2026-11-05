@@ -7,33 +7,27 @@ import grantAdminAccess from '@salesforce/apex/ModuleManagerController.grantAdmi
 import uninstallReport from '@salesforce/apex/ModuleManagerController.uninstallReport';
 import finishSetup from '@salesforce/apex/ModuleManagerController.finishSetup';
 import FINISH_SETUP from '@salesforce/label/c.Core_ModuleSetup_FinishButton';
-import SETUP_NOT_RUN from '@salesforce/label/c.Core_ModuleSetup_NotRunNotice';
 
 import STATUS_ON from '@salesforce/label/c.Core_ModuleManager_StatusOn';
 import STATUS_OFF from '@salesforce/label/c.Core_ModuleManager_StatusOff';
-import STATUS_NOT_INSTALLED from '@salesforce/label/c.Core_ModuleManager_StatusNotInstalled';
+import STATUS_NOT_INSTALLED from '@salesforce/label/c.Core_Integrations_NotInstalled';
 import LEARN_MORE from '@salesforce/label/c.Core_SetupAssistant_ModuleLearnMore';
-import NEW_TAB from '@salesforce/label/c.Core_SuiteChoice_NewTab';
+import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import INSTALL from '@salesforce/label/c.Core_SuiteChoice_ModuleInstallLink';
-import NO_INSTALL_LINK from '@salesforce/label/c.Core_ModuleManager_NoInstallLink';
 import TURN_OFF from '@salesforce/label/c.Core_ModuleManager_TurnOffButton';
 import TURN_ON from '@salesforce/label/c.Core_ModuleManager_TurnOnButton';
 import REPORT from '@salesforce/label/c.Core_ModuleManager_ReportButton';
-import REPORT_INTRO from '@salesforce/label/c.Core_ModuleManager_ReportIntro';
-import REPORT_EMPTY from '@salesforce/label/c.Core_ModuleManager_ReportEmpty';
 import INSTALLED_PACKAGES from '@salesforce/label/c.Core_ModuleManager_InstalledPackagesLink';
-import TABS_NOTICE from '@salesforce/label/c.Core_ModuleManager_TabsNotice';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
-import READ_ONLY from '@salesforce/label/c.Core_ModuleManager_ReadOnlyNotice';
-import LOAD_ERROR from '@salesforce/label/c.Core_ModuleManager_LoadErrorMessage';
 import OPEN_APP from '@salesforce/label/c.Core_ModuleManager_OpenApp';
-import INSTALL_FIRST from '@salesforce/label/c.Core_ModuleManager_InstallFirst';
 import NONPROFIT_TITLE from '@salesforce/label/c.Core_ModuleManager_NonprofitTitle';
 import SHOW_NONPROFIT from '@salesforce/label/c.Core_ModuleManager_ShowNonprofit';
-import NONPROFIT_HIDDEN from '@salesforce/label/c.Core_ModuleManager_NonprofitHidden';
 import OTHER_ROLLUP_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import { setupPath } from 'c/setupLinks';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const STATUS_TEXT = { On: STATUS_ON, Off: STATUS_OFF, NotInstalled: STATUS_NOT_INSTALLED };
 const INSTALLED_PACKAGES_URL = setupPath('installedPackages');
@@ -51,6 +45,8 @@ const INSTALLED_PACKAGES_URL = setupPath('installedPackages');
  * ones it hides so none disappears without a cue.
  */
 export default class ModuleManager extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   state;
   showNonprofit = true;
   reports = {};
@@ -61,25 +57,42 @@ export default class ModuleManager extends LightningElement {
     learnMore: LEARN_MORE,
     newTab: NEW_TAB,
     install: INSTALL,
-    noInstallLink: NO_INSTALL_LINK,
+    get noInstallLink() {
+      return helpText('Core', 'Core_ModuleManager_NoInstallLink');
+    },
     turnOff: TURN_OFF,
     turnOn: TURN_ON,
     report: REPORT,
-    reportIntro: REPORT_INTRO,
-    reportEmpty: REPORT_EMPTY,
+    get reportIntro() {
+      return helpText('Core', 'Core_ModuleManager_ReportIntro');
+    },
+    get reportEmpty() {
+      return helpText('Core', 'Core_ModuleManager_ReportEmpty');
+    },
     installedPackages: INSTALLED_PACKAGES,
-    tabsNotice: TABS_NOTICE,
+    get tabsNotice() {
+      return helpText('Core', 'Core_ModuleManager_TabsNotice');
+    },
     checkAgain: CHECK_AGAIN,
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Core', 'Core_ModuleManager_ReadOnlyNotice');
+    },
     openApp: OPEN_APP,
     nonprofitTitle: NONPROFIT_TITLE,
     showNonprofit: SHOW_NONPROFIT,
     finishSetup: FINISH_SETUP,
-    setupNotRun: SETUP_NOT_RUN,
+    get setupNotRun() {
+      return helpText('Core', 'Core_ModuleSetup_NotRunNotice');
+    },
     otherRollupTools: OTHER_ROLLUP_TOOLS
   };
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -118,10 +131,7 @@ export default class ModuleManager extends LightningElement {
         ...module,
         displayName: module.label || module.name,
         statusText: STATUS_TEXT[module.status] || module.status,
-        badgeClass:
-          module.status === 'On'
-            ? 'slds-badge slds-theme_success slds-var-m-left_x-small'
-            : 'slds-badge slds-var-m-left_x-small',
+        badgeStatus: module.status === 'On' ? 'on' : 'off',
         isOn: module.canSwitch && module.status === 'On',
         isOff: module.canSwitch && module.status === 'Off',
         setupPending: module.status !== 'NotInstalled' && module.setupPending === true,
@@ -129,7 +139,10 @@ export default class ModuleManager extends LightningElement {
         noInstallLink: module.status === 'NotInstalled' && !module.installUrl,
         installFirstText:
           module.status === 'NotInstalled' && module.installFirst
-            ? INSTALL_FIRST.replace('{0}', module.installFirst)
+            ? helpText('Core', 'Core_ModuleManager_InstallFirst').replace(
+                '{0}',
+                module.installFirst
+              )
             : null,
         hasReport: Boolean(report),
         reportEmpty: Boolean(report) && report.length === 0,
@@ -165,7 +178,9 @@ export default class ModuleManager extends LightningElement {
         isNonprofit: true,
         showRows: this.showNonprofit,
         rows: nonprofit,
-        hiddenText: hidden ? NONPROFIT_HIDDEN.replace('{0}', String(hidden)) : null
+        hiddenText: hidden
+          ? helpText('Core', 'Core_ModuleManager_NonprofitHidden').replace('{0}', String(hidden))
+          : null
       });
     }
     return groups;
@@ -190,8 +205,25 @@ export default class ModuleManager extends LightningElement {
     this.run(finishSetup, { moduleName: event.target.dataset.name });
   }
 
-  handleTurnOff(event) {
-    this.run(turnOff, { moduleName: event.target.dataset.name });
+  /** Turning a module off asks first (admin-11): what stops, what stays, and the tabs. */
+  async handleTurnOff(event) {
+    const moduleName = event.target.dataset.name;
+    const row = this.rows.find((candidate) => candidate.name === moduleName);
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: helpText(
+        'Core',
+        'Core_ModuleManager_TurnOffTitle',
+        row ? row.displayName : moduleName
+      ),
+      message: helpText('Core', 'Core_ModuleManager_TurnOffMessage'),
+      confirmLabel: TURN_OFF,
+      cancelLabel: CANCEL
+    });
+    if (!confirmed) {
+      return;
+    }
+    await this.run(turnOff, { moduleName });
   }
 
   // Turning on and giving the admin set are two calls: a permission set assignment cannot
@@ -202,7 +234,10 @@ export default class ModuleManager extends LightningElement {
       try {
         await grantAdminAccess({ moduleName });
       } catch (error) {
-        this.errorMessage = bodyMessage(error, LOAD_ERROR);
+        this.errorMessage = bodyMessage(
+          error,
+          helpText('Core', 'Core_ModuleManager_LoadErrorMessage')
+        );
       }
     }
   }
@@ -214,7 +249,10 @@ export default class ModuleManager extends LightningElement {
       this.reports = { ...this.reports, [moduleName]: lines || [] };
       this.errorMessage = undefined;
     } catch (error) {
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(
+        error,
+        helpText('Core', 'Core_ModuleManager_LoadErrorMessage')
+      );
     }
   }
 
@@ -226,7 +264,10 @@ export default class ModuleManager extends LightningElement {
       this.errorMessage = undefined;
       return true;
     } catch (error) {
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(
+        error,
+        helpText('Core', 'Core_ModuleManager_LoadErrorMessage')
+      );
       return false;
     }
   }

@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_HouseholdNamingSettings_Cancel</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Cancel button</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdNamingSettings_ColumnFormal</fullName>
         <categories>Households</categories>
         <language>en_US</language>
@@ -23,14 +15,6 @@
         <protected>true</protected>
         <shortDescription>Preview column heading</shortDescription>
         <value>Informal Greeting</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdNamingSettings_ColumnMembers</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Preview column heading</shortDescription>
-        <value>People</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdNamingSettings_ColumnName</fullName>
@@ -81,67 +65,11 @@
         <value>How Five Sample Households Would Read</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdNamingSettings_ReadOnly</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown to a user who cannot change settings</shortDescription>
-        <value>You can see these settings but not change them. Changing them needs the Manage BarnCRM Settings permission.</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdNamingSettings_Recompute</fullName>
         <categories>Households</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Recompute button</shortDescription>
         <value>Update All Household Names</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdNamingSettings_RecomputeConfirm</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Confirmation before recomputing every household</shortDescription>
-        <value>This rewrites the name and both greetings on every household except the ones marked as a custom name. It runs in the background. Do you want to continue?</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdNamingSettings_RecomputeStarted</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The recompute has started</shortDescription>
-        <value>Updating household names in the background.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdNamingSettings_Save</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Save button</shortDescription>
-        <value>Save</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdNamingSettings_Saved</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The patterns were saved</shortDescription>
-        <value>Saved. New households use these patterns straight away.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdNamingSettings_Title</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Naming settings heading</shortDescription>
-        <value>Household Names and Greetings</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdNamingSettings_TokenHelp</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>How to write a pattern</shortDescription>
-        <value>Use {FirstName}, {LastName} and {Salutation} where you want a person's details to appear.</value>
     </labels>
 </CustomLabels>

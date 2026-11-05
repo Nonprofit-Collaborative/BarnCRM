@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Source_Query__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>For a computed indicator: the Find saved query whose records are counted. Choose it with Source in the Logic Model Builder.</inlineHelpText>
+  <label>Source Query</label>
+  <referenceTo>Saved_Query__c</referenceTo>
+  <relationshipLabel>Logic Model Indicators</relationshipLabel>
+  <relationshipName>Logic_Model_Indicators</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <h3 class="slds-text-heading_small slds-var-m-bottom_x-small" data-id="title">{labels.title}</h3>
     <p class="slds-text-body_small slds-var-m-bottom_small">{labels.intro}</p>
     <lightning-progress-indicator current-step={step} type="path" variant="base">
@@ -182,4 +183,5 @@
             </template>
         </div>
     </div>
+    </template>
 </template>

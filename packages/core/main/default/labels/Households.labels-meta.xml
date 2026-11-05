@@ -1,36 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_Households_TidyNotRemoved</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error Log: tidy-up could not delete; {0} is the count, {1} first reason</shortDescription>
-        <value>The empty household tidy-up could not move {0} households to the Recycle Bin. The first: {1}</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_TidyProbeFailed</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error Log: tidy-up could not read a relationship; {0} its name, {1} reason</shortDescription>
-        <value>The empty household tidy-up could not check {0} for records linked to a household, so it kept every household it was checking. Reason: {1}</value>
-    </labels>
-    <labels>
         <fullName>Core_Households_Conjunction</fullName>
         <categories>Households</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Word joining the last two names in a household name or greeting</shortDescription>
         <value>and</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorAlreadyCurrentMember</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>A second current membership of one person in one household</shortDescription>
-        <value>This person is already a current member of this household. Edit their existing membership instead of adding another.</value>
     </labels>
     <labels>
         <fullName>Core_Households_ErrorContextMembership</fullName>
@@ -47,134 +23,6 @@
         <protected>true</protected>
         <shortDescription>Error log context for household naming work</shortDescription>
         <value>Household names and greetings</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorCreateFailed</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when a household the package was creating could not be saved</shortDescription>
-        <value>The new household could not be created, so nobody was moved. The Error Log has the details.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorCreateNoAccess</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Creating a household: the user cannot create or edit accounts or a field</shortDescription>
-        <value>You need permission to create and edit accounts, and their fields, to create a household. Nothing was created. Ask your BarnCRM admin.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorCreateNoHouseholdAccess</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Creating a household: no edit access to a household the change touches</shortDescription>
-        <value>You need edit access to every household this change touches. Nothing was created.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorPersonToOrganization</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Save refused: a household member pointed at an organization (simple mode)</shortDescription>
-        <value>This person is in a household, so Account Name must stay a household. To connect them to an organization, add an affiliation. To move them, use Move to another household.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorCreateFailedForPerson</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>On a person's save when their new household was refused; {0} is why</shortDescription>
-        <value>This person could not be saved because a household could not be created for them: {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorMoveMissingInput</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Move a person: nothing was chosen</shortDescription>
-        <value>Choose both a person and a household before moving someone. Nothing was changed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorMoveNeedsJunction</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Move a person: the org stores this person as an account</shortDescription>
-        <value>This person is stored as an account, so they can only be moved when your org uses the flexible way of belonging to a household. Change that in BarnCRM Settings first.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorMoveNoEditAccess</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Move a person: the user cannot edit the household they chose</shortDescription>
-        <value>You need edit access to the household you are moving this person into. Nothing was changed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorMoveNotFound</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Move a person: record not found</shortDescription>
-        <value>That person or that household could not be found. Refresh the page and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorNoSettingsPermission</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The user may not change settings</shortDescription>
-        <value>You do not have permission to do this. Recomputing every household needs the Manage BarnCRM Settings permission: ask your BarnCRM admin.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorNotAHousehold</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Move a person: the target is not a household</shortDescription>
-        <value>The record you chose is not a household. Choose a household and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorRecordTypeMissing</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The Household record type is missing or not visible</shortDescription>
-        <value>The Household record type is missing or hidden from you, so no household could be created. Ask your BarnCRM admin to check your access to household records.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorSaveFailed</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>A household could not be saved</shortDescription>
-        <value>A household could not be saved, so its name or its member count may be out of date.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorSecondPrimary</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Refuses a membership that would give a household a second current primary</shortDescription>
-        <value>This household already has a primary member. To change who it is, click Make primary on the right person in the household's Members panel.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_ErrorUnexpected</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Household screen: unexpected failure; the detail goes to the Error Log</shortDescription>
-        <value>Something went wrong and nothing was changed. What happened is recorded in the Error Log (BarnCRM Settings, Error Log).</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_SkippedNativeDependents</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Empty household kept, outside records use it; {0} name, {1} record Id</shortDescription>
-        <value>BarnCRM left the empty household {0} ({1}) in place. Nobody belongs to it in BarnCRM, but records outside BarnCRM still point at it, and deleting it would delete those records too. Open the household, check what else uses it, and delete it by hand if you are sure.</value>
     </labels>
     <labels>
         <fullName>Core_Households_ListSeparator</fullName>
@@ -217,43 +65,11 @@
         <value>Household</value>
     </labels>
     <labels>
-        <fullName>Core_Households_PrimaryContactFollowsMembers</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Refuses a hand edit of a household Primary Contact in junction mode</shortDescription>
-        <value>In this org a household's Primary Contact follows the member marked primary. To change it, click Make primary on the right person in the household's Members panel.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_PrimaryContactMustBeMember</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Refuses a Primary Contact who is not a member of the household</shortDescription>
-        <value>The Primary Contact has to be somebody in this household. Choose one of its members, or move the person into the household first.</value>
-    </labels>
-    <labels>
         <fullName>Core_Households_ErrorContextMergeSettle</fullName>
         <categories>Households</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Error log context for the tidy-up after a Salesforce merge</shortDescription>
         <value>Tidy-up after a merge</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_MergeSettleNotQueued</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Merge tidy-up could not start; {0} kept records, {1} platform message</shortDescription>
-        <value>A merge finished, but BarnCRM could not start its tidy-up because Salesforce refused the request ({1}). These kept records may have a stale member count or name, two primary addresses, or a duplicate relationship: {0}. Open each one and correct it by hand.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Households_MergeSettleRefused</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Merge tidy-up refused for records the sender cannot edit; {0} ids, {1} user</shortDescription>
-        <value>A tidy-up request after a merge named records that the person who sent it (user {1}) cannot edit, so BarnCRM left them alone: {0}. A merge only names records the person merging can edit, so check who sent it.</value>
     </labels>
 </CustomLabels>

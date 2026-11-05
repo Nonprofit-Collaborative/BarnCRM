@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Donor score recency days</label>
+  <protected>true</protected>
+  <values>
+    <field>Setting_Key__c</field>
+    <value xsi:type="xsd:string">Donor_Score_Recency_Days__c</value>
+  </values>
+  <values>
+    <field>Settings_Object__c</field>
+    <value xsi:type="xsd:string">Giving_Settings__c</value>
+  </values>
+  <values>
+    <field>Section__c</field>
+    <value xsi:type="xsd:string">Giving</value>
+  </values>
+  <values>
+    <field>Module__c</field>
+    <value xsi:type="xsd:string">Giving</value>
+  </values>
+  <values>
+    <field>Data_Type__c</field>
+    <value xsi:type="xsd:string">Text</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">53</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Four day counts, rising. A donor who gave within the first earns a recency score of 5, the second 4, the third 3, the fourth 2, and 1 beyond. Default 90,180,365,730.</value>
+  </values>
+  <values>
+    <field>Help_Path__c</field>
+    <value xsi:type="xsd:string">donor-scoring.md</value>
+  </values>
+</CustomMetadata>

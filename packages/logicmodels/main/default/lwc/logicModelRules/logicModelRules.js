@@ -236,3 +236,306 @@ export function nextOrder(model, stageKey) {
   const orders = (column ? column.elements : []).map((item) => item.sortOrder || 0);
   return (orders.length ? Math.max(...orders) : 0) + 10;
 }
+
+// ------------------------------------------------------------------- sources (L-03, R-IN3)
+
+/** Where an indicator's results come from, as Indicator__c.Source__c holds it. */
+export const SOURCES = Object.freeze({ MANUAL: 'Manual', IMPORT: 'Import', COMPUTED: 'Computed' });
+
+/** What a computed source works out, as its definition holds it (R-IN4). */
+export const FUNCTIONS = Object.freeze({ COUNT: 'count', SUM: 'sum', UNIQUE: 'unique' });
+
+/** True when the indicator's results are worked out by the refresh, never typed. */
+export function isComputed(indicator) {
+  return Boolean(indicator) && indicator.source === SOURCES.COMPUTED;
+}
+
+/**
+ * True when a source draft can be saved: any source but Computed as it is; Computed with a saved
+ * query, a date field and what to work out, plus a field for a sum or a unique count.
+ */
+export function sourceReady(draft) {
+  if (!draft || !Object.values(SOURCES).includes(draft.source)) {
+    return false;
+  }
+  if (draft.source !== SOURCES.COMPUTED) {
+    return true;
+  }
+  if (!draft.queryId || !draft.dateField || !Object.values(FUNCTIONS).includes(draft.function)) {
+    return false;
+  }
+  return draft.function === FUNCTIONS.COUNT || Boolean(draft.field);
+}
+
+/**
+ * The results sheet's columns, in order. Period Id, Target, Result and Notes are the columns the
+ * shipped Import template Indicator Results reads (R-IN3), so their headers never change; the
+ * others are there for the person filling it in and are ignored by the import.
+ */
+export const RESULTS_SHEET_COLUMNS = Object.freeze([
+  { label: 'Period Id', path: 'periodId' },
+  { label: 'Logic Model', path: 'model' },
+  { label: 'Part', path: 'part' },
+  { label: 'Indicator', path: 'indicator' },
+  { label: 'Unit', path: 'unit' },
+  { label: 'Period', path: 'period' },
+  { label: 'Start Date', path: 'startDate' },
+  { label: 'End Date', path: 'endDate' },
+  { label: 'Target', path: 'target' },
+  { label: 'Result', path: 'result' },
+  { label: 'Notes', path: 'notes' }
+]);
+
+/**
+ * The results sheet's rows: one per period of every indicator that is not computed, in column
+ * order, then the parts' order, the indicators' order and the periods' order.
+ */
+export function resultsSheetRows(model) {
+  const indicators = (model && model.indicators) || [];
+  const rows = [];
+  for (const column of columns(model)) {
+    for (const element of column.elements) {
+      for (const indicator of indicators) {
+        if (indicator.elementId !== element.id || isComputed(indicator)) {
+          continue;
+        }
+        for (const period of indicator.periods || []) {
+          rows.push({
+            periodId: period.id,
+            model: model.name,
+            part: element.name,
+            indicator: indicator.name,
+            unit: indicator.unit,
+            period: period.name,
+            startDate: period.startDate,
+            endDate: period.endDate,
+            target: period.targetValue,
+            result: period.resultValue,
+            notes: period.notes
+          });
+        }
+      }
+    }
+  }
+  return rows;
+}
+
+// ------------------------------------------------------------------- report (L-04, R-IN7)
+
+/** A period's place across indicators: periods with the same start and end dates are one period. */
+export function periodKey(period) {
+  return `${(period && period.startDate) || ''}|${(period && period.endDate) || ''}`;
+}
+
+/**
+ * Every period of the model's indicators, once per pair of dates, oldest first. Each takes the
+ * name of the first period found with those dates.
+ */
+export function reportPeriods(model) {
+  const byKey = new Map();
+  for (const indicator of (model && model.indicators) || []) {
+    for (const period of indicator.periods || []) {
+      const key = periodKey(period);
+      if (!byKey.has(key)) {
+        byKey.set(key, {
+          key,
+          name: period.name,
+          startDate: period.startDate,
+          endDate: period.endDate
+        });
+      }
+    }
+  }
+  return [...byKey.values()].sort((a, b) => a.key.localeCompare(b.key));
+}
+
+/** The periods a report opens with: the latest four, or fewer when there are fewer. */
+export function defaultReportKeys(model, count = 4) {
+  return reportPeriods(model)
+    .slice(-count)
+    .map((period) => period.key);
+}
+
+/**
+ * The report (R-IN7): the chosen periods oldest first, and one row per indicator in column, then
+ * part, then indicator order, with its baseline and, per chosen period, the target, result and
+ * progress. An indicator without that period has an empty cell.
+ */
+export function report(model, keys) {
+  const chosen = new Set(keys || []);
+  const periods = reportPeriods(model).filter((period) => chosen.has(period.key));
+  const indicators = (model && model.indicators) || [];
+  const rows = [];
+  for (const column of columns(model)) {
+    for (const element of column.elements) {
+      for (const indicator of indicators) {
+        if (indicator.elementId !== element.id) {
+          continue;
+        }
+        rows.push({
+          id: indicator.id,
+          stage: column.key,
+          part: element.name,
+          indicator: indicator.name,
+          unit: indicator.unit,
+          betterWhen: indicator.betterWhen,
+          baseline: indicator.baselineValue,
+          baselineDate: indicator.baselineDate,
+          cells: periods.map((wanted) => {
+            const period = (indicator.periods || []).find((item) => periodKey(item) === wanted.key);
+            return {
+              key: wanted.key,
+              found: Boolean(period),
+              target: period ? period.targetValue : null,
+              result: period ? period.resultValue : null,
+              progress: period ? progress(indicator, period) : { state: 'none', percent: null }
+            };
+          })
+        });
+      }
+    }
+  }
+  return { periods, rows };
+}
+
+/** A progress as words: the Met word, the percent, or nothing. */
+export function progressWords(value, words) {
+  if (!value || value.state === 'none') {
+    return '';
+  }
+  return value.state === 'met' ? words.met : `${value.percent}%`;
+}
+
+/**
+ * The report as CSV columns and flat rows for c/findCsv: Column, Part, Indicator, Unit, Better
+ * When, Baseline and Baseline Date, then a Target, Result and Progress column per period, each
+ * headed with the period's name.
+ */
+export function reportCsv(built, words) {
+  const csvColumns = [
+    { label: words.column, path: 'column' },
+    { label: words.part, path: 'part' },
+    { label: words.indicator, path: 'indicator' },
+    { label: words.unit, path: 'unit' },
+    { label: words.betterWhen, path: 'betterWhen' },
+    { label: words.baseline, path: 'baseline' },
+    { label: words.baselineDate, path: 'baselineDate' }
+  ];
+  built.periods.forEach((period, index) => {
+    csvColumns.push(
+      { label: `${period.name} ${words.target}`, path: `target${index}` },
+      { label: `${period.name} ${words.result}`, path: `result${index}` },
+      { label: `${period.name} ${words.progress}`, path: `progress${index}` }
+    );
+  });
+  const rows = built.rows.map((row) => {
+    const flat = {
+      column: words.stage(row.stage),
+      part: row.part,
+      indicator: row.indicator,
+      unit: row.unit,
+      betterWhen: row.betterWhen === 'Lower' ? words.lower : words.higher,
+      baseline: row.baseline,
+      baselineDate: row.baselineDate
+    };
+    row.cells.forEach((cell, index) => {
+      flat[`target${index}`] = cell.target;
+      flat[`result${index}`] = cell.result;
+      flat[`progress${index}`] = progressWords(cell.progress, words);
+    });
+    return flat;
+  });
+  return { columns: csvColumns, rows };
+}
+
+const HTML_ESCAPES = Object.freeze({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;'
+});
+
+/** Text made safe to place in HTML. */
+export function escapeHtml(value) {
+  return value === undefined || value === null
+    ? ''
+    : String(value).replace(/[&<>"']/g, (character) => HTML_ESCAPES[character]);
+}
+
+/**
+ * The report as one printable HTML page, with its own styles and no scripts, to open in a
+ * browser and print or save as PDF. Every value is escaped.
+ */
+export function reportHtml(built, words) {
+  const e = escapeHtml;
+  const periodHeads = built.periods
+    .map(
+      (period) =>
+        `<th colspan="3" scope="colgroup">${e(period.name)}<br><span class="dates">${e(
+          period.startDate
+        )} to ${e(period.endDate)}</span></th>`
+    )
+    .join('');
+  const subHeads = built.periods
+    .map(
+      () =>
+        `<th scope="col">${e(words.target)}</th><th scope="col">${e(words.result)}</th><th scope="col">${e(
+          words.progress
+        )}</th>`
+    )
+    .join('');
+  const body = built.rows
+    .map((row) => {
+      const cells = row.cells
+        .map(
+          (cell) =>
+            `<td class="num">${e(cell.target)}</td><td class="num">${e(cell.result)}</td><td>${e(
+              progressWords(cell.progress, words)
+            )}</td>`
+        )
+        .join('');
+      return `<tr><td>${e(words.stage(row.stage))}</td><td>${e(row.part)}</td><th scope="row">${e(
+        row.indicator
+      )}${row.unit ? ` <span class="unit">(${e(row.unit)})</span>` : ''}</th><td class="num">${e(
+        row.baseline
+      )}</td>${cells}</tr>`;
+    })
+    .join('\n');
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>${e(words.title)}</title>
+<style>
+body { font-family: Arial, Helvetica, sans-serif; color: #181818; margin: 24px; }
+h1 { font-size: 20px; margin: 0 0 4px; }
+p.meta { color: #444; margin: 0 0 16px; font-size: 13px; }
+table { border-collapse: collapse; width: 100%; font-size: 12px; }
+th, td { border: 1px solid #999; padding: 4px 6px; text-align: left; vertical-align: top; }
+thead th { background: #eee; }
+td.num { text-align: right; }
+.dates, .unit { font-weight: normal; color: #444; }
+@media print { body { margin: 0; } thead { display: table-header-group; } tr { page-break-inside: avoid; } }
+</style>
+</head>
+<body>
+<h1>${e(words.title)}</h1>
+<p class="meta">${e(words.meta)}</p>
+<table>
+<thead>
+<tr><th rowspan="2" scope="col">${e(words.column)}</th><th rowspan="2" scope="col">${e(
+    words.part
+  )}</th><th rowspan="2" scope="col">${e(words.indicator)}</th><th rowspan="2" scope="col">${e(
+    words.baseline
+  )}</th>${periodHeads}</tr>
+<tr>${subHeads}</tr>
+</thead>
+<tbody>
+${body}
+</tbody>
+</table>
+</body>
+</html>
+`;
+}

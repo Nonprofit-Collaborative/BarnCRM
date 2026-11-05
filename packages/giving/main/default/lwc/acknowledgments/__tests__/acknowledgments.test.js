@@ -46,7 +46,7 @@ jest.mock(
   { virtual: true }
 );
 
-jest.mock('@salesforce/label/c.Giving_Acknowledgments_Inactive', () => ({ default: 'Inactive' }), {
+jest.mock('@salesforce/label/c.Core_MatchLogic_Inactive', () => ({ default: 'Inactive' }), {
   virtual: true
 });
 

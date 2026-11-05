@@ -30,14 +30,6 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: the ask reminders job and when it runs</shortDescription>
-    <value>Ask Reminders, 3:30 AM</value>
-  </labels>
-  <labels>
-    <fullName>Giving_NightlyJobs_AskRemindersDescription</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: what the ask reminders job does</shortDescription>
-    <value>Creates a task for the donor's owner when the donor's Next Ask Date arrives. Does nothing while Ask Reminders is off in Settings.</value>
+    <value>Ask Reminders</value>
   </labels>
 </CustomLabels>

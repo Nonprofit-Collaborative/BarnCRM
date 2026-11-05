@@ -27,42 +27,42 @@
  * by the caller, so a future caller cannot reach this org-wide read by skipping the check.
  */
 public without sharing class HealthCheckGivingSelector {
-    /** How many gifts are in the books, dated in a closed period, and not yet posted. Capped. */
-    public static Integer countUnpostedInClosedPeriod(Date closed, Integer cap) {
-        if (closed == null || !HealthCheckService.canManageSettings()) {
-            return 0;
-        }
-        return [
-            SELECT COUNT()
-            FROM Gift__c
-            WHERE
-                (Status__c IN :GiftPostingLock.BOOK_STATUSES
-                OR Status__c = NULL)
-                AND Type__c != :GiftPostingLock.TYPE_IN_KIND
-                AND Gift_Date__c <= :closed
-                AND Accounting_Posted_At__c = NULL
-            WITH SYSTEM_MODE
-            LIMIT :cap
-        ];
-    }
+	/** How many gifts are in the books, dated in a closed period, and not yet posted. Capped. */
+	public static Integer countUnpostedInClosedPeriod(Date closed, Integer cap) {
+		if (closed == null || !HealthCheckService.canManageSettings()) {
+			return 0;
+		}
+		return [
+			SELECT COUNT()
+			FROM Gift__c
+			WHERE
+				(Status__c IN :GiftPostingLock.BOOK_STATUSES
+				OR Status__c = NULL)
+				AND Type__c != :GiftPostingLock.TYPE_IN_KIND
+				AND Gift_Date__c <= :closed
+				AND Accounting_Posted_At__c = NULL
+			WITH SYSTEM_MODE
+			LIMIT :cap
+		];
+	}
 
-    /** The earliest-dated of those gifts, to link a few examples. */
-    public static List<Gift__c> unpostedInClosedPeriod(Date closed, Integer howMany) {
-        if (closed == null || !HealthCheckService.canManageSettings()) {
-            return new List<Gift__c>();
-        }
-        return [
-            SELECT Id, Name, Gift_Date__c
-            FROM Gift__c
-            WHERE
-                (Status__c IN :GiftPostingLock.BOOK_STATUSES
-                OR Status__c = NULL)
-                AND Type__c != :GiftPostingLock.TYPE_IN_KIND
-                AND Gift_Date__c <= :closed
-                AND Accounting_Posted_At__c = NULL
-            WITH SYSTEM_MODE
-            ORDER BY Gift_Date__c ASC, Id ASC
-            LIMIT :howMany
-        ];
-    }
+	/** The earliest-dated of those gifts, to link a few examples. */
+	public static List<Gift__c> unpostedInClosedPeriod(Date closed, Integer howMany) {
+		if (closed == null || !HealthCheckService.canManageSettings()) {
+			return new List<Gift__c>();
+		}
+		return [
+			SELECT Id, Name, Gift_Date__c
+			FROM Gift__c
+			WHERE
+				(Status__c IN :GiftPostingLock.BOOK_STATUSES
+				OR Status__c = NULL)
+				AND Type__c != :GiftPostingLock.TYPE_IN_KIND
+				AND Gift_Date__c <= :closed
+				AND Accounting_Posted_At__c = NULL
+			WITH SYSTEM_MODE
+			ORDER BY Gift_Date__c ASC, Id ASC
+			LIMIT :howMany
+		];
+	}
 }

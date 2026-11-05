@@ -8,12 +8,13 @@ import getPlan from '@salesforce/apex/FieldUtilizationController.getPlan';
 import countFields from '@salesforce/apex/FieldUtilizationController.countFields';
 import { toCsv } from 'c/findCsv';
 
-import YES from '@salesforce/label/c.Core_DataDictionary_Yes';
+import YES from '@salesforce/label/c.Core_AccessExplorer_Yes';
 import NO from '@salesforce/label/c.Core_DataDictionary_No';
-import COL_OBJECT from '@salesforce/label/c.Core_DataDictionary_ColObject';
+import COL_OBJECT from '@salesforce/label/c.Core_MatchLogic_Object';
+import COL_KIND_OF_RECORD from '@salesforce/label/c.Core_AccessExplorer_KindOfRecord';
 import COL_OBJECT_API_NAME from '@salesforce/label/c.Core_DataDictionary_ColObjectApiName';
-import COL_FIELD from '@salesforce/label/c.Core_DataDictionary_ColField';
-import COL_API_NAME from '@salesforce/label/c.Core_DataDictionary_ColApiName';
+import COL_FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
+import COL_API_NAME from '@salesforce/label/c.Core_AccessExplorer_ColApiName';
 import COL_TYPE from '@salesforce/label/c.Core_DataDictionary_ColType';
 import COL_LENGTH from '@salesforce/label/c.Core_DataDictionary_ColLength';
 import COL_PRECISION from '@salesforce/label/c.Core_DataDictionary_ColPrecision';
@@ -26,6 +27,13 @@ import COL_HELP_TEXT from '@salesforce/label/c.Core_DataDictionary_ColHelpText';
 import COL_FORMULA from '@salesforce/label/c.Core_DataDictionary_ColFormula';
 import COL_RELATED_TO from '@salesforce/label/c.Core_DataDictionary_ColRelatedTo';
 import COL_FILL_RATE from '@salesforce/label/c.Core_DataDictionary_ColFillRate';
+import COL_AUTOMATION_TYPE from '@salesforce/label/c.Core_DataDictionary_ColType';
+import COL_AUTOMATION_NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
+import COL_AUTOMATION_STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
+import COL_AUTOMATION_RUNS from '@salesforce/label/c.Core_DataDictionary_ColAutomationRuns';
+import COL_AUTOMATION_VERSION from '@salesforce/label/c.Core_DataDictionary_ColAutomationVersion';
+import TYPE_APEX_TRIGGER from '@salesforce/label/c.Core_DataDictionary_TypeApexTrigger';
+import TYPE_FLOW from '@salesforce/label/c.Core_DataDictionary_TypeFlow';
 
 const PERCENT = { maximumFractionDigits: 1 };
 
@@ -60,8 +68,9 @@ export function toRow(objectDictionary, field, share) {
   };
 }
 
+/** The on-screen tables say "Kind of Record"; the CSV files keep "Object" beside "Object API Name". */
 export const TABLE_COLUMNS = [
-  { label: COL_OBJECT, fieldName: 'objectLabel', initialWidth: 160 },
+  { label: COL_KIND_OF_RECORD, fieldName: 'objectLabel', initialWidth: 160 },
   { label: COL_FIELD, fieldName: 'fieldLabel', initialWidth: 200 },
   { label: COL_API_NAME, fieldName: 'fieldName', initialWidth: 200 },
   { label: COL_TYPE, fieldName: 'dataType', initialWidth: 120 },
@@ -103,6 +112,41 @@ export function dictionaryCsv(rows, withFillRates) {
   return toCsv(
     csvColumns(withFillRates),
     rows.map((row) => ({ ...row, fillRateText: fillRateText(row.fillRate) }))
+  );
+}
+
+/** The automation inventory's table row for one trigger or flow (C-60). */
+export function toAutomationRow(row) {
+  return {
+    ...row,
+    typeLabel: row.automationType === 'ApexTrigger' ? TYPE_APEX_TRIGGER : TYPE_FLOW,
+    detail: row.detail || '',
+    apiVersion: isBlank(row.apiVersion) ? null : row.apiVersion
+  };
+}
+
+export const AUTOMATION_COLUMNS = [
+  { label: COL_KIND_OF_RECORD, fieldName: 'objectLabel', initialWidth: 160 },
+  { label: COL_AUTOMATION_TYPE, fieldName: 'typeLabel', initialWidth: 120 },
+  { label: COL_AUTOMATION_NAME, fieldName: 'name', initialWidth: 260 },
+  { label: COL_API_NAME, fieldName: 'apiName', initialWidth: 240 },
+  { label: COL_AUTOMATION_STATUS, fieldName: 'status', initialWidth: 100 },
+  { label: COL_AUTOMATION_RUNS, fieldName: 'detail', wrapText: true, initialWidth: 260 },
+  { label: COL_AUTOMATION_VERSION, fieldName: 'apiVersion', type: 'number', initialWidth: 110 }
+];
+
+/** The automation inventory's CSV text: the table's columns, with the object's API name added. */
+export function automationCsv(rows) {
+  return toCsv(
+    [
+      { label: COL_OBJECT, path: 'objectLabel' },
+      { label: COL_OBJECT_API_NAME, path: 'objectName' },
+      ...AUTOMATION_COLUMNS.slice(1).map((column) => ({
+        label: column.label,
+        path: column.fieldName
+      }))
+    ],
+    rows
   );
 }
 

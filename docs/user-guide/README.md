@@ -1,10 +1,10 @@
 # User Guide
 
-Applies to: BarnCRM main as of 2026-10-31 (commit 78e64110, landing batch A). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM landing/batch-b (v1.0 scope, releases 0.15 to 0.17), to be set to the final main merge commit at landing. Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 
-This guide is for staff who use BarnCRM every day: you look people up, keep households and addresses current, enter gifts, sign volunteers up for shifts and log their hours. You are not the person who installs or configures BarnCRM.
+This guide is for staff who use BarnCRM every day: you look people up, keep households and addresses current, enter gifts, sign volunteers up for shifts and log their hours. You are not the person who installs or configures BarnCRM (installing is on [Installing BarnCRM](../admin-guide/installing.md) in the Admin Guide).
 
 Each page is a set of short recipes ("To do X: 1. 2. 3.") using the names you see on screen. Where a task needs an admin (a setting, a permission, a template), the page says so and links to the [Admin Guide](../admin-guide/README.md) instead of explaining it.
 
@@ -20,7 +20,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 ### People and Households
 
 - [Finding people and records](find.md): search, list views and the Find tab.
-- [Changing many records at once](super-transform.md): Super Transform, with a preview and an undo, saved lists and a phone format.
+- [Changing many records at once](super-transform.md): Super Transformer, with a preview and an undo, saved lists and a phone format.
 - [People and households](people-and-households.md): adding people, household members, names and greetings, merge and split, interaction notes.
 - [Addresses, email and phone](addresses-email-phone.md): several addresses, seasonal addresses, the preferred email and phone.
 - [Relationships and affiliations](relationships-affiliations.md): how people are connected to each other and to organizations.
@@ -43,16 +43,21 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ### Programs (Nonprofit Edition)
 
-- [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages.
+- [Programs, services and enrollments](programs.md): creating programs and services, enrolling people and moving them through the stages, taking attendance, counting drop-in visitors without names, recording referrals, screening for eligibility, keeping a participant's service plan, and putting people in cohorts with scheduled sessions and attendance.
 
 ### Logic Models (Nonprofit Edition)
 
-- [Logic models](logic-models.md): building a logic model with arrows and assumptions, and measuring outputs and outcomes with indicators, targets and results.
+- [Logic models](logic-models.md): building a logic model with arrows and assumptions, and measuring outputs and outcomes with indicators, targets and results, filled in by hand, from a spreadsheet or worked out from your records, and comparing periods in a report for funders.
+
+### Funders (Nonprofit Edition)
+
+- [Grants and funders](funders.md): adding grants, moving them through the stages on the Grant Pipeline, the deadlines coming up and the Grant Calendar, the program a grant pays for, an award's payments, a restricted grant's ledger and Giving fund, government award fields, the answer library, linking a requirement to the outcome it reports on, funder reports and the Board Dashboard.
 
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.
 - [Donor segments](donor-segments.md): lists of donors by their giving, exported for Mailchimp or Constant Contact.
+- [Donor scores](donor-scores.md): how recently, how often and how much each donor gives, as a score and a segment on their record.
 
 ## Report a Bug or Give Feedback
 

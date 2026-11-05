@@ -4,10 +4,35 @@
 import { createElement } from 'lwc';
 import RelationshipPanel from 'c/relationshipPanel';
 import { graphql } from 'lightning/graphql';
-import { deleteRecord } from 'lightning/uiRecordApi';
+import { deleteRecord, updateRecord } from 'lightning/uiRecordApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import BarnConfirmModal from 'c/barnConfirmModal';
+
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+  },
+  { virtual: true }
+);
 
 const HARPER = '0031000000000001AA';
+
+/** Picks an action from the first row's menu (Edit, End It or Remove). */
+function choose(element, value) {
+  element.shadowRoot
+    .querySelector('.row-menu')
+    .dispatchEvent(new CustomEvent('select', { detail: { value } }));
+}
 
 /** One relationship as the GraphQL query returns it. */
 function node({ id, relatedName, type, status, description = null, asAccount = false }) {
@@ -134,7 +159,7 @@ describe('c-relationship-panel', () => {
     );
     await flush();
 
-    expect(names(element)).toEqual(['Luis Garcia', 'c.Core_Relationship_UnnamedPerson']);
+    expect(names(element)).toEqual(['Luis Garcia', 'c.Core_Affiliation_UnnamedPerson']);
   });
 
   it('names the type from this side and badges the ones that have ended', async () => {
@@ -172,13 +197,30 @@ describe('c-relationship-panel', () => {
     expect(element.shadowRoot.querySelector('[data-id="empty"]')).toBeNull();
   });
 
+  it('asks before removing, and removes nothing when the person keeps it', async () => {
+    BarnConfirmModal.open.mockResolvedValueOnce(false);
+    const element = build();
+    graphql.emit(response([SPOUSE]));
+    await flush();
+
+    choose(element, 'remove');
+    await flush();
+
+    const asked = BarnConfirmModal.open.mock.calls[0][0];
+    expect(asked.label).toBe('c.Core_Relationship_RemoveConfirmTitle');
+    expect(asked.message).toBe('c.Core_Relationship_RemoveConfirm');
+    expect(asked.confirmVariant).toBe('destructive');
+    expect(deleteRecord).not.toHaveBeenCalled();
+  });
+
   it('removes a relationship as the user and reads the card again', async () => {
+    BarnConfirmModal.open.mockResolvedValueOnce(true);
     const refresh = jest.fn().mockResolvedValue();
     const element = build();
     graphql.emit(response([SPOUSE, FORMER_COLLEAGUE]), undefined, refresh);
     await flush();
 
-    element.shadowRoot.querySelector('.remove-relationship').click();
+    choose(element, 'remove');
     await flush();
 
     expect(deleteRecord).toHaveBeenCalledWith(SPOUSE.Id);
@@ -190,15 +232,64 @@ describe('c-relationship-panel', () => {
   });
 
   it('shows a message when a relationship cannot be removed', async () => {
+    BarnConfirmModal.open.mockResolvedValueOnce(true);
     deleteRecord.mockRejectedValueOnce(new Error('no'));
     const element = build();
     graphql.emit(response([SPOUSE]));
     await flush();
 
-    element.shadowRoot.querySelector('.remove-relationship').click();
+    choose(element, 'remove');
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="error"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toBe(
+      'c.Core_Relationship_RemoveFailed'
+    );
+  });
+
+  it('links each row to its relationship and opens the edit form from the row menu', async () => {
+    const element = build();
+    graphql.emit(response([SPOUSE]));
+    await flush();
+
+    const link = element.shadowRoot.querySelector('[data-id="related-person"]');
+    expect(link.getAttribute('href')).toBe(`/${SPOUSE.Id}`);
+
+    choose(element, 'edit');
+    await flush();
+    expect(mockNavigate.mock.calls[0][0]).toEqual({
+      type: 'standard__recordPage',
+      attributes: { recordId: SPOUSE.Id, objectApiName: 'Relationship__c', actionName: 'edit' }
+    });
+  });
+
+  it('ends a current relationship today after a confirm, offering End It only on current ones', async () => {
+    BarnConfirmModal.open.mockResolvedValueOnce(true);
+    const refresh = jest.fn().mockResolvedValue();
+    const element = build('Contact', {
+      ...STAFF_ACCESS,
+      fields: { End_Date__c: { updateable: true } }
+    });
+    graphql.emit(response([SPOUSE, FORMER_COLLEAGUE]), undefined, refresh);
+    await flush();
+
+    expect(element.shadowRoot.querySelectorAll('.end-relationship').length).toBe(1);
+    choose(element, 'end');
+    await flush();
+
+    expect(BarnConfirmModal.open.mock.calls[0][0].label).toBe(
+      'c.Core_Relationship_EndConfirmTitle'
+    );
+    const fields = updateRecord.mock.calls[0][0].fields;
+    expect(fields.Id).toBe(SPOUSE.Id);
+    expect(fields.End_Date__c).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(refresh).toHaveBeenCalledTimes(1);
+  });
+
+  it('offers no End It without edit access to End Date', async () => {
+    const element = build();
+    graphql.emit(response([SPOUSE]));
+    await flush();
+    expect(element.shadowRoot.querySelectorAll('.end-relationship').length).toBe(0);
   });
 
   it('reads the card again after a new relationship is saved', async () => {

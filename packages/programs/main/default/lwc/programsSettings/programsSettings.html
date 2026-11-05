@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
   <div class="slds-var-p-around_medium slds-is-relative">
     <h1 class="slds-text-heading_medium" data-id="title">{labels.title}</h1>
     <p class="slds-text-body_regular slds-var-m-bottom_medium" data-id="intro">{labels.intro}</p>
@@ -20,7 +21,7 @@
     </template>
 
     <template lwc:if={canManage}>
-      <lightning-card title={labels.privacyTitle} icon-name="utility:lock" class="slds-show slds-var-m-bottom_medium" data-id="privacy">
+      <lightning-card title={labels.privacyTitle} icon-name="custom:custom73" class="slds-show slds-var-m-bottom_medium" data-id="privacy">
         <div class="slds-var-p-horizontal_medium">
           <p class="slds-text-body_small slds-var-m-bottom_small">{labels.privacyIntro}</p>
           <lightning-radio-group
@@ -45,7 +46,7 @@
         </div>
       </lightning-card>
 
-      <lightning-card title={labels.picklistsTitle} icon-name="utility:picklist_type" data-id="picklists">
+      <lightning-card title={labels.picklistsTitle} icon-name="custom:custom73" data-id="picklists">
         <div class="slds-var-p-horizontal_medium">
           <p class="slds-text-body_small slds-var-m-bottom_small">{labels.picklistsIntro}</p>
           <ul class="slds-has-dividers_bottom-space">
@@ -70,4 +71,5 @@
       </lightning-card>
     </template>
   </div>
+    </template>
 </template>

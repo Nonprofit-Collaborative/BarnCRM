@@ -3,12 +3,12 @@ import getAttention from '@salesforce/apex/RollupAttentionController.getAttentio
 import retry from '@salesforce/apex/RollupAttentionController.retry';
 import processNow from '@salesforce/apex/RollupAttentionController.processNow';
 
-import TITLE from '@salesforce/label/c.Core_RollupBuilder_AttentionTitle';
+import TITLE from '@salesforce/label/c.Core_DataHygiene_NeedsAttention';
 import FAILED_TITLE from '@salesforce/label/c.Core_RollupBuilder_FailedTitle';
 import NOTHING_FAILED from '@salesforce/label/c.Core_RollupBuilder_NothingFailed';
-import COLUMN_RECORD from '@salesforce/label/c.Core_RollupBuilder_ColumnRecord';
+import COLUMN_RECORD from '@salesforce/label/c.Core_BulkUpdate_Record';
 import COLUMN_ERROR from '@salesforce/label/c.Core_RollupBuilder_ColumnError';
-import COLUMN_WHEN from '@salesforce/label/c.Core_RollupBuilder_ColumnWhen';
+import COLUMN_WHEN from '@salesforce/label/c.Core_FieldAccess_ColWhen';
 import COLUMN_TRIES from '@salesforce/label/c.Core_RollupBuilder_ColumnTries';
 import RETRY from '@salesforce/label/c.Core_RollupBuilder_Retry';
 import RETRY_ALL from '@salesforce/label/c.Core_RollupBuilder_RetryAll';

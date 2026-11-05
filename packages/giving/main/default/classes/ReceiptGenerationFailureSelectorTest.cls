@@ -4,72 +4,72 @@
  */
 @IsTest(testFor='ApexClass:ReceiptGenerationFailureSelector')
 private class ReceiptGenerationFailureSelectorTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.adminWith('Giving_Admin');
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.adminWith('Giving_Admin');
+	}
 
-    @IsTest
-    static void anOrgWithNoFailedRunsCountsZero() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Test.startTest();
-            ReceiptGenerationFailureSelector.Result result = ReceiptGenerationFailureSelector.generationFailures();
-            Test.stopTest();
+	@IsTest
+	static void anOrgWithNoFailedRunsCountsZero() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Test.startTest();
+			ReceiptGenerationFailureSelector.Result result = ReceiptGenerationFailureSelector.generationFailures();
+			Test.stopTest();
 
-            System.assertEquals(true, result.available, 'An administrator can read receipts');
-            System.assertEquals(0, result.count, 'Nothing has failed in a fresh org');
-        }
-    }
+			System.assertEquals(true, result.available, 'An administrator can read receipts');
+			System.assertEquals(0, result.count, 'Nothing has failed in a fresh org');
+		}
+	}
 
-    @IsTest
-    static void aLongFailureHistoryIsCountedOnlyUpToTheCap() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            ReceiptTestDataFactory.setUpReceipting();
-            List<String> consumed = ReceiptNumberSequence.allocate(
-                ReceiptNumberSequence.TYPE_STATEMENT,
-                2026,
-                3
-            );
-            ReceiptNumberSequence.reconcile(ReceiptNumberSequence.TYPE_STATEMENT, 2026, null);
+	@IsTest
+	static void aLongFailureHistoryIsCountedOnlyUpToTheCap() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			ReceiptTestDataFactory.setUpReceipting();
+			List<String> consumed = ReceiptNumberSequence.allocate(
+				ReceiptNumberSequence.TYPE_STATEMENT,
+				2026,
+				3
+			);
+			ReceiptNumberSequence.reconcile(ReceiptNumberSequence.TYPE_STATEMENT, 2026, null);
 
-            Test.startTest();
-            ReceiptGenerationFailureSelector.Result uncapped = ReceiptGenerationFailureSelector.generationFailures();
-            ReceiptGenerationFailureSelector.countCap = 1;
-            Integer rowsBefore = Limits.getQueryRows();
-            ReceiptGenerationFailureSelector.Result capped = ReceiptGenerationFailureSelector.generationFailures();
-            Integer rowsRead = Limits.getQueryRows() - rowsBefore;
-            Test.stopTest();
+			Test.startTest();
+			ReceiptGenerationFailureSelector.Result uncapped = ReceiptGenerationFailureSelector.generationFailures();
+			ReceiptGenerationFailureSelector.countCap = 1;
+			Integer rowsBefore = Limits.getQueryRows();
+			ReceiptGenerationFailureSelector.Result capped = ReceiptGenerationFailureSelector.generationFailures();
+			Integer rowsRead = Limits.getQueryRows() - rowsBefore;
+			Test.stopTest();
 
-            System.assertEquals(3, consumed.size(), 'Three numbers were handed out and never used');
-            System.assertEquals(3, uncapped.count, 'Under the cap, the count is exact');
-            System.assertEquals(false, uncapped.capped, 'Under the cap, nothing was cut off');
-            System.assertEquals(true, capped.capped, 'Past the cap, counting stops');
-            System.assertEquals(1, capped.count, 'Past the cap, the count is the cap');
-            // The cap protects the 50,000-row limit only if the query stops reading rows there too.
-            System.assert(
-                rowsRead <= ReceiptGenerationFailureSelector.countCap + 1,
-                'The capped count read at most one row past the cap, not all three: ' + rowsRead
-            );
-        }
-    }
+			System.assertEquals(3, consumed.size(), 'Three numbers were handed out and never used');
+			System.assertEquals(3, uncapped.count, 'Under the cap, the count is exact');
+			System.assertEquals(false, uncapped.capped, 'Under the cap, nothing was cut off');
+			System.assertEquals(true, capped.capped, 'Past the cap, counting stops');
+			System.assertEquals(1, capped.count, 'Past the cap, the count is the cap');
+			// The cap protects the 50,000-row limit only if the query stops reading rows there too.
+			System.assert(
+				rowsRead <= ReceiptGenerationFailureSelector.countCap + 1,
+				'The capped count read at most one row past the cap, not all three: ' + rowsRead
+			);
+		}
+	}
 
-    @IsTest
-    static void aPersonWhoCannotReadReceiptsIsNotToldZero() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            User nobody = TestDataFactory.createUser('Nobody', new List<String>());
+	@IsTest
+	static void aPersonWhoCannotReadReceiptsIsNotToldZero() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			User nobody = TestDataFactory.createUser('Nobody', new List<String>());
 
-            ReceiptGenerationFailureSelector.Result result;
-            Test.startTest();
-            System.runAs(nobody) {
-                result = ReceiptGenerationFailureSelector.generationFailures();
-            }
-            Test.stopTest();
+			ReceiptGenerationFailureSelector.Result result;
+			Test.startTest();
+			System.runAs(nobody) {
+				result = ReceiptGenerationFailureSelector.generationFailures();
+			}
+			Test.stopTest();
 
-            System.assertEquals(
-                false,
-                result.available,
-                'Without read access the question was not answered, which is not the same as zero'
-            );
-        }
-    }
+			System.assertEquals(
+				false,
+				result.available,
+				'Without read access the question was not answered, which is not the same as zero'
+			);
+		}
+	}
 }

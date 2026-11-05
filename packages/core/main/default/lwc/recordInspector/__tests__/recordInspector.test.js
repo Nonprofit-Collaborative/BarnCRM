@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import RecordInspector from 'c/recordInspector';
+import WhereUsedModal from 'c/whereUsedModal';
 import inspect from '@salesforce/apex/RecordInspectorController.inspect';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
 import { filterRows, normalize } from '../inspectorRows';
@@ -122,7 +123,7 @@ describe('c-record-inspector', () => {
     const fax = q(element, 'tr[data-row="Fax"]');
     expect(fax.querySelector('[data-id="value"]')).toBeNull();
     const notes = q(element, 'tr[data-row="Notes__c"]');
-    expect(notes.querySelector('lightning-badge')).not.toBeNull();
+    expect(notes.querySelector('c-barn-status-badge')).not.toBeNull();
   });
 
   it('narrows the list by label, API name, type or value', async () => {
@@ -204,6 +205,11 @@ describe('c-record-inspector', () => {
       '/lightning/setup/ObjectManager/Contact/FieldsAndRelationships/Notes__c/view'
     );
     expect(link.getAttribute('target')).toBe('_blank');
+
+    q(element, 'tr[data-row="Notes__c"] .where-used-button').click();
+    expect(WhereUsedModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ objectName: 'Contact', fieldName: 'Notes__c', fieldLabel: 'Notes' })
+    );
   });
 
   it('shows the refusal Apex gives', async () => {
@@ -211,7 +217,7 @@ describe('c-record-inspector', () => {
     const element = mount();
     await open(element);
 
-    expect(q(element, '[data-id="error-message"]').textContent).toBe('Not for you.');
+    expect(q(element, '[data-id="error-message"]').message).toBe('Not for you.');
     expect(q(element, '[data-id="field-table"]')).toBeNull();
   });
 });

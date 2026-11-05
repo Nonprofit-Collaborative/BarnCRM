@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Outcome__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>How the referral turned out, once it is closed. Your admin can change the choices.</inlineHelpText>
+  <label>Outcome</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Service Received</fullName>
+        <default>false</default>
+        <label>Service Received</label>
+      </value>
+      <value>
+        <fullName>Declined by Organization</fullName>
+        <default>false</default>
+        <label>Declined by Organization</label>
+      </value>
+      <value>
+        <fullName>Declined by Person</fullName>
+        <default>false</default>
+        <label>Declined by Person</label>
+      </value>
+      <value>
+        <fullName>Unable to Reach</fullName>
+        <default>false</default>
+        <label>Unable to Reach</label>
+      </value>
+      <value>
+        <fullName>No Capacity</fullName>
+        <default>false</default>
+        <label>No Capacity</label>
+      </value>
+      <value>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

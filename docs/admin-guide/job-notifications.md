@@ -2,7 +2,7 @@
 
 ## What It Does
 
-Some BarnCRM work takes longer than a page can wait for: an import, a bulk update or bulk
+Some BarnCRM work takes longer than a page can wait for: an import, a Super Transformer run or bulk
 delete, undoing one of those, loading the sample data, recalculating every rollup, the field
 utilization count, the seasonal address swap, a duplicate scan, or recomputing every household
 name. With Giving installed, the year end statement run, sending acknowledgment emails and
@@ -18,7 +18,7 @@ Notifications are on from the day BarnCRM is installed. There is nothing to set 
 To turn them off for everyone:
 
 1. Open the **BarnCRM Settings** tab and choose the **General** section.
-2. Clear **Send Long Job Notifications**.
+2. Clear **Send long job notifications**.
 3. Click **Save**.
 
 Jobs still run and still record what they did on their own page or record; only the
@@ -36,11 +36,11 @@ Start with no sample data loaded.
    **Sample data load finished**, with the number of households, people and organizations.
 4. Click the notification. The BarnCRM Settings console opens at the General section, where the
    sample data card shows the same counts.
-5. Open the **Find** tab, run a query that returns a few sample records, press **Bulk Update**
-   and set a field on them (the [bulk update](bulk-update.md) page has the steps). When it
-   finishes, the bell shows **Bulk update finished** with how many
-   records were updated, left as they were, and could not be saved. Click it to open the bulk
-   update's record, with the full run log.
+5. Open the **Find** tab, run a query that returns a few sample records, choose **Change Records**,
+   **Super Transformer** and set a field on them (the [Super Transformer runs and undo](bulk-update.md)
+   page has the steps). When it finishes, the bell shows **Super Transformer run finished** with how many
+   records were updated, left as they were, and could not be saved. Click it to open the
+   run's record, with the full run log.
 
 ## Who Gets a Notification
 
@@ -49,7 +49,7 @@ Start with no sample data loaded.
   swap run on a schedule and send nothing; their results
   are on the Hub and the settings pages as before. With Giving, the nightly acknowledgment
   send and the nightly donor level pass are quiet in the same way. Clicking **Run Now** or **Recalculate** on
-  those pages does send one, because you are waiting for it. A field utilization count runs on
+  those pages does send one, because you are waiting for it. A Field Use count runs on
   its own tab while you watch it, so it sends none.
 - **One notification per job**, when the whole job is over: an import undo that runs in several
   passes, or a rollup recalculation across several kinds of record, sends one at the end.
@@ -59,7 +59,7 @@ Start with no sample data loaded.
 | Job | Notification opens |
 |---|---|
 | Import, check before importing (dry run), import undo | The import's record |
-| Bulk update and its undo | The bulk update's record |
+| Super Transformer run and Super Transformer undo | The Super Transformer run's record |
 | Bulk delete and its undo | The bulk delete's record |
 | Sample data load, and removal if it stops part way | BarnCRM Settings, General |
 | Rollup recalculation (Recalculate, Recalculate all) | BarnCRM Settings, Rollups |

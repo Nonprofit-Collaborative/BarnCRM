@@ -29,6 +29,11 @@ Households belong to the **Household Upkeep** feature. Turn it on in first-run s
 with **Turn On** in its row on **General** in BarnCRM Settings. Everything you can change is on
 the BarnCRM Settings page, so nobody needs to open Salesforce Setup.
 
+In an org with NPSP, Household Upkeep cannot be turned on while NPSP households are in use (NPSP
+still creates household accounts, or some are not yet adopted). The row says why;
+[Adopting Your NPSP Households](npsp-households.md#then-turn-on-household-upkeep) gives the
+steps.
+
 **The Household record type and the Households tab.** BarnCRM installs one Account record
 type, **Household**. Setup lists it on every install, because a package cannot leave out a
 record type it ships, but BarnCRM never gives it to anyone, so nobody is ever offered it when
@@ -203,7 +208,7 @@ past membership of someone who moved out (or was erased), or any other record, w
 product made it. Those households stay on the "households with nobody in them" lists in
 Health Check and Org Optimizer's Data Quality for you to review. Households emptied before this
 tidy-up was added, and households a merge or a move emptied, are never part of it. Schedule
-it with Health Check's **Nightly jobs are not scheduled** fix.
+it with Health Check's **Nightly Jobs Are Not Scheduled** fix.
 
 If the setting is off, that is a reasonable choice if you want to keep an empty household
 and its giving history. Delete the household by hand, and turn the setting on if you want

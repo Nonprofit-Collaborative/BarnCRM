@@ -5,10 +5,10 @@ import getStartable from '@salesforce/apex/StewardshipStartController.getStartab
 import startPlan from '@salesforce/apex/StewardshipStartController.startPlan';
 
 import HEADING from '@salesforce/label/c.Giving_Stewardship_StartHeading';
-import PLAN from '@salesforce/label/c.Giving_Stewardship_StartPlanLabel';
+import PLAN from '@salesforce/label/c.Giving_Stewardship_ColumnPlan';
 import CHOOSE from '@salesforce/label/c.Giving_Stewardship_StartChoose';
 import START from '@salesforce/label/c.Giving_Stewardship_StartButton';
-import CANCEL from '@salesforce/label/c.Giving_Stewardship_Cancel';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import NONE from '@salesforce/label/c.Giving_Stewardship_StartNone';
 import SUCCESS from '@salesforce/label/c.Giving_Stewardship_StartSuccess';
 import NO_ACCESS from '@salesforce/label/c.Giving_Stewardship_StartNoPermission';

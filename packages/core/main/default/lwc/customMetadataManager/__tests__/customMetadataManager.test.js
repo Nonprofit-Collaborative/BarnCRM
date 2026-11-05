@@ -173,7 +173,7 @@ describe('c-custom-metadata-manager', () => {
     jest.advanceTimersByTime(3000);
     await flush();
 
-    expect(find(element, 'error').textContent).toBe('The change to Mentee was not saved.');
+    expect(find(element, 'error').message).toBe('The change to Mentee was not saved.');
   });
 
   it('keeps the form open and shows a refusal from Apex', async () => {
@@ -182,7 +182,7 @@ describe('c-custom-metadata-manager', () => {
 
     await fillAndSave(element);
 
-    expect(find(element, 'error').textContent).toBe('Mentee is not a choice.');
+    expect(find(element, 'error').message).toBe('Mentee is not a choice.');
     expect(find(element, 'form')).not.toBeNull();
     expect(getOutcome).not.toHaveBeenCalled();
   });
@@ -281,6 +281,6 @@ describe('c-custom-metadata-manager', () => {
     getTypes.mockRejectedValue({});
     const element = await build();
 
-    expect(find(element, 'error').textContent).toBe('c.Core_CmdtManager_LoadError');
+    expect(find(element, 'error').message).toBe('c.Core_CmdtManager_LoadError');
   });
 });

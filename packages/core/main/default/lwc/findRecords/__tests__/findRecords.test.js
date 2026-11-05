@@ -15,21 +15,45 @@ import BarnConfirmModal from 'c/barnConfirmModal';
 import listChildRelationships from '@salesforce/apex/FindController.listChildRelationships';
 import { EnclosingTabId, setTabIcon, setTabLabel } from 'lightning/platformWorkspaceApi';
 
-jest.mock('@salesforce/label/c.Core_Console_TabLabel', () => ({ default: '{0}: {1}' }), {
+jest.mock('@salesforce/label/c.Core_Format_Pair', () => ({ default: '{0}: {1}' }), {
   virtual: true
 });
 import saveEdits from '@salesforce/apex/FindController.saveEdits';
 import * as navigation from 'lightning/navigation';
 import { TextEncoder as NodeTextEncoder } from 'util';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_Find_HiddenColumns: 'Left out columns you do not have access to: {0}.',
+  Core_Find_EditSaved: 'Saved {0}. {1} unchanged.',
+  Core_Find_DeleteConfirmBody: '{0} will be deleted.',
+  Core_Find_ExportStopped: 'Stopped at {0} rows.',
+  Core_Find_ResultCount: '{0} rows shown.'
+});
+
+// Find opens Super Transformer through the navigation mixin; the page reference stays a test
+// wire adapter so a test can emit state.
+const mockNavigate = jest.fn();
+jest.mock('lightning/navigation', () => {
+  const { createTestWireAdapter } = require('@salesforce/wire-service-jest-util');
+  const Navigate = Symbol('Navigate');
+  const NavigationMixin = (Base) =>
+    class extends Base {
+      [Navigate](...args) {
+        mockNavigate(...args);
+      }
+    };
+  NavigationMixin.Navigate = Navigate;
+  return {
+    NavigationMixin,
+    CurrentPageReference: createTestWireAdapter(jest.fn()),
+    __esModule: true
+  };
+});
 
 // jsdom has no TextEncoder; the Excel writer needs one, as browsers have.
 global.TextEncoder = global.TextEncoder || NodeTextEncoder;
 
-jest.mock(
-  '@salesforce/label/c.Core_Find_HiddenColumns',
-  () => ({ default: 'Left out columns you do not have access to: {0}.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/i18n/timeZone', () => ({ default: 'America/New_York' }), {
   virtual: true
 });
@@ -48,11 +72,6 @@ jest.mock('@salesforce/apex/FindController.startServerExport', () => ({ default:
 jest.mock('@salesforce/apex/FindController.summarize', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_Find_EditSaved',
-  () => ({ default: 'Saved {0}. {1} unchanged.' }),
-  { virtual: true }
-);
 
 jest.mock(
   '@salesforce/apex/FindController.listObjects',
@@ -80,11 +99,6 @@ jest.mock('@salesforce/apex/FindController.saveQuery', () => ({ default: jest.fn
 jest.mock('@salesforce/apex/FindController.deleteQuery', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_Find_DeleteConfirmBody',
-  () => ({ default: '{0} will be deleted.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/apex/BulkUpdateController.getPage', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -95,14 +109,6 @@ jest.mock('@salesforce/apex/QueryFieldCatalog.getObjectInfo', () => ({ default: 
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_Find_ExportDone', () => ({ default: 'Exported {0} rows.' }), {
-  virtual: true
-});
-jest.mock(
-  '@salesforce/label/c.Core_Find_ExportStopped',
-  () => ({ default: 'Stopped at {0} rows.' }),
-  { virtual: true }
-);
-jest.mock('@salesforce/label/c.Core_Find_ResultCount', () => ({ default: '{0} rows shown.' }), {
   virtual: true
 });
 
@@ -180,6 +186,18 @@ async function render() {
   ]);
   await flush();
   return element;
+}
+
+/** What getPage says about Super Transformer's tab and the state key that carries conditions. */
+const SUPER_TRANSFORMER = {
+  superTransformerTab: 'Bulk_Update',
+  superTransformerStateKey: 'c__start'
+};
+
+/** Where Find navigated (the mixin's Navigate is recorded by the mock at the top). */
+function spyOnNavigate() {
+  mockNavigate.mockClear();
+  return mockNavigate;
 }
 
 async function choose(target, value) {
@@ -275,6 +293,58 @@ describe('c-find-records', () => {
     expect(one(element, 'result-line').textContent.trim()).toBe('1 rows shown.');
   });
 
+  describe('putting the columns in order (drag and drop item 2)', () => {
+    async function withTwoColumns() {
+      const element = await render();
+      await choose(one(element, 'object'), 'Gift__c');
+      await choose(one(element, 'related'), 'Donor_Contact__r');
+      await choose(one(element, 'columns'), ['Name', 'Donor_Contact__r.LastName']);
+      return element;
+    }
+
+    const orderOf = (element) =>
+      Array.from(element.shadowRoot.querySelectorAll('[data-id="column-drag"]')).map(
+        (handle) => handle.dataset.dragId
+      );
+
+    it('lists the chosen columns for ordering only when there are two or more', async () => {
+      const element = await render();
+      await choose(one(element, 'object'), 'Gift__c');
+      await choose(one(element, 'columns'), ['Name']);
+      expect(element.shadowRoot.querySelector('[data-id="column-zone"]')).toBeNull();
+
+      const two = await withTwoColumns();
+      expect(orderOf(two)).toEqual(['Name', 'Donor_Contact__r.LastName']);
+      const handle = two.shadowRoot.querySelector('[data-id="column-drag"]');
+      expect(handle.getAttribute('role')).toBe('button');
+      expect(handle.getAttribute('tabindex')).toBe('0');
+      expect(handle.dataset.dragLabel).toBe('Gift Name');
+    });
+
+    it('moves a column down, announces it and keeps the new order', async () => {
+      const element = await withTwoColumns();
+      const down = element.shadowRoot.querySelectorAll('[data-id="column-down"]');
+      expect(down[1].disabled).toBe(true);
+      expect(down[0].alternativeText).toBe('c.Core_Shared_MoveDown: Gift Name');
+
+      down[0].click();
+      await flush();
+
+      expect(orderOf(element)).toEqual(['Donor_Contact__r.LastName', 'Name']);
+      expect(one(element, 'columns').value).toEqual(['Donor_Contact__r.LastName', 'Name']);
+      expect(one(element, 'column-live').textContent).toBe('c.Core_Drag_Position');
+    });
+
+    it('moves a column up and disables the first one', async () => {
+      const element = await withTwoColumns();
+      const up = element.shadowRoot.querySelectorAll('[data-id="column-up"]');
+      expect(up[0].disabled).toBe(true);
+      up[1].click();
+      await flush();
+      expect(orderOf(element)).toEqual(['Donor_Contact__r.LastName', 'Name']);
+    });
+  });
+
   it('refuses to run with no columns and says why', async () => {
     const element = await render();
     await choose(one(element, 'object'), 'Gift__c');
@@ -282,7 +352,7 @@ describe('c-find-records', () => {
     one(element, 'run').click();
     await flush();
     expect(runQuery).not.toHaveBeenCalled();
-    expect(one(element, 'error-message').textContent).toBe('c.Core_Find_ChooseColumns');
+    expect(one(element, 'error-message').message).toBe('c.Core_Find_ChooseColumns');
   });
 
   it('exports page by page and stops at the export limit', async () => {
@@ -312,7 +382,7 @@ describe('c-find-records', () => {
     expect(exportPage).toHaveBeenCalledTimes(2);
     expect(exportPage.mock.calls[1][0].afterId).toBe('2');
     expect(global.URL.createObjectURL).toHaveBeenCalled();
-    expect(one(element, 'notice-message').textContent).toBe('Stopped at 3 rows.');
+    expect(one(element, 'notice-message').message).toBe('Stopped at 3 rows.');
   });
 
   it('saves a new query with its name and sharing', async () => {
@@ -337,7 +407,7 @@ describe('c-find-records', () => {
     expect(saveQuery).toHaveBeenCalledWith(
       expect.objectContaining({ recordId: null, name: 'Mine', shared: true })
     );
-    expect(one(element, 'notice-message').textContent).toBe('c.Core_Find_SavedNotice');
+    expect(one(element, 'notice-message').message).toBe('c.Core_Find_SavedNotice');
   });
 
   it('keeps open the query a Save as wrote, even when another has the same name', async () => {
@@ -497,14 +567,14 @@ describe('c-find-records', () => {
       one(element, 'run').click();
       await flush();
       await flush();
-      expect(element.shadowRoot.textContent).toContain('The run failed.');
+      expect(one(element, 'error-message').message).toBe('The run failed.');
       const pending = holdPreviewTimers();
 
       change(element, '5');
       pending.forEach((run) => run());
       await flush();
 
-      expect(element.shadowRoot.textContent).toContain('The run failed.');
+      expect(one(element, 'error-message').message).toBe('The run failed.');
     });
   });
 
@@ -514,7 +584,7 @@ describe('c-find-records', () => {
     });
     const element = await render();
     await flush();
-    expect(one(element, 'error-message').textContent).toBe(
+    expect(one(element, 'error-message').message).toBe(
       'Find needs the Find and Export Records permission.'
     );
   });
@@ -527,34 +597,63 @@ describe('c-find-records', () => {
     expect(one(element, 'bulk-update')).toBeNull();
     element.remove();
 
-    getPage.mockResolvedValue({ ...PAGE, canBulkUpdate: true });
+    getPage.mockResolvedValue({ ...PAGE, canBulkUpdate: true, ...SUPER_TRANSFORMER });
+    const navigate = spyOnNavigate();
     const allowed = await render();
     await choose(one(allowed, 'object'), 'Gift__c');
     press(allowed, 'bulk-update');
     await flush();
 
-    const panel = allowed.shadowRoot.querySelector('c-bulk-update');
-    expect(panel.queryJson).toBe(
-      JSON.stringify({ version: 1, object: 'Gift__c', fields: ['Name'], limit: 200 })
-    );
-    panel.dispatchEvent(new CustomEvent('close'));
-    await flush();
-    expect(allowed.shadowRoot.querySelector('c-bulk-update')).toBeNull();
+    // Super Transformer is the one place a bulk change is built: Find opens it, pre-filled.
+    expect(navigate).toHaveBeenCalledTimes(1);
+    const reference = navigate.mock.calls[0][0];
+    expect(reference.type).toBe('standard__navItemPage');
+    expect(reference.attributes.apiName).toBe('Bulk_Update');
+    expect(JSON.parse(reference.state.c__start)).toEqual({
+      object: 'Gift__c',
+      at: expect.any(Number)
+    });
   });
 
-  it('closes the bulk update panel when the query changes', async () => {
-    getBulkPage.mockResolvedValue({ runLimit: 48000, maxChanges: 5 });
-    getTargets.mockResolvedValue([]);
-    getPage.mockResolvedValue({ ...PAGE, canBulkUpdate: true });
+  it('hands Super Transformer the conditions, including those on related records', async () => {
+    getPage.mockResolvedValue({ ...PAGE, canBulkUpdate: true, ...SUPER_TRANSFORMER });
+    const navigate = spyOnNavigate();
     const element = await render();
     await choose(one(element, 'object'), 'Gift__c');
+    const filter = { op: 'AND', conditions: [{ field: 'Name', operator: 'equals', value: 'A' }] };
+    const builder = element.shadowRoot.querySelector('c-filter-builder');
+    builder.dispatchEvent(
+      new CustomEvent('change', { detail: { value: JSON.stringify(filter), valid: true } })
+    );
+    const related = [{ relationship: 'Contacts', mode: 'has', filter: null }];
+    element.shadowRoot
+      .querySelector('c-find-related-panel')
+      .dispatchEvent(new CustomEvent('change', { detail: { related, children: [], valid: true } }));
+    await flush();
+
     press(element, 'bulk-update');
     await flush();
-    expect(element.shadowRoot.querySelector('c-bulk-update')).not.toBeNull();
 
-    await choose(one(element, 'columns'), ['Name', 'Amount__c']);
+    expect(JSON.parse(navigate.mock.calls[0][0].state.c__start)).toEqual({
+      object: 'Gift__c',
+      at: expect.any(Number),
+      filter,
+      related
+    });
+  });
 
-    expect(element.shadowRoot.querySelector('c-bulk-update')).toBeNull();
+  it('stays on Find with a message when the query is not ready to hand over', async () => {
+    getPage.mockResolvedValue({ ...PAGE, canBulkUpdate: true, ...SUPER_TRANSFORMER });
+    const navigate = spyOnNavigate();
+    const element = await render();
+    await choose(one(element, 'object'), 'Gift__c');
+    await choose(one(element, 'columns'), []);
+
+    press(element, 'bulk-update');
+    await flush();
+
+    expect(navigate).not.toHaveBeenCalled();
+    expect(one(element, 'error-message').message).toBe('c.Core_Find_ChooseColumns');
   });
 
   it('offers bulk delete only with its permission, one bulk panel at a time', async () => {
@@ -569,12 +668,9 @@ describe('c-find-records', () => {
     getPage.mockResolvedValue({ ...PAGE, canBulkUpdate: true, canBulkDelete: true });
     const allowed = await render();
     await choose(one(allowed, 'object'), 'Gift__c');
-    press(allowed, 'bulk-update');
-    await flush();
     press(allowed, 'bulk-delete');
     await flush();
 
-    expect(allowed.shadowRoot.querySelector('c-bulk-update')).toBeNull();
     const panel = allowed.shadowRoot.querySelector('c-bulk-delete');
     expect(panel.queryJson).toBe(
       JSON.stringify({ version: 1, object: 'Gift__c', fields: ['Name'], limit: 200 })
@@ -635,7 +731,7 @@ describe('c-find-records', () => {
     await flush();
 
     expect(one(element, 'columns').value).toEqual(['Name', 'Amount__c']);
-    expect(one(element, 'notice-message').textContent).toBe(
+    expect(one(element, 'notice-message').message).toBe(
       'Left out columns you do not have access to: Secret__c.'
     );
   });
@@ -733,7 +829,7 @@ describe('c-find-records', () => {
     const blob = global.URL.createObjectURL.mock.calls[0][0];
     expect(blob.type).toBe('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     expect(blob.size).toBeGreaterThan(0);
-    expect(one(element, 'notice-message').textContent).toBe('Exported 1 rows.');
+    expect(one(element, 'notice-message').message).toBe('Exported 1 rows.');
   });
 
   it('hands the query and the column labels to the export to Files', async () => {
@@ -794,7 +890,7 @@ describe('c-find-records', () => {
     });
     expect(one(element, 'results').draftValues).toEqual([drafts[1]]);
     expect(one(element, 'results').errors.rows.a02.messages).toEqual(['Amount is too large.']);
-    expect(one(element, 'notice-message').textContent).toBe('Saved 1. 0 unchanged.');
+    expect(one(element, 'notice-message').message).toBe('Saved 1. 0 unchanged.');
   });
 
   it('shows a related record column as text and asks for the related records', async () => {
@@ -890,10 +986,10 @@ describe('c-find-records', () => {
       expect(one(element, 'start-note')).toBeNull();
       navigation.CurrentPageReference.emit({ state: { c__tool: 'update' } });
       await flush();
-      expect(one(element, 'start-note').textContent).toContain('c.Core_Find_StartUpdate');
+      expect(one(element, 'start-note').message).toContain('c.Core_Find_StartUpdate');
       navigation.CurrentPageReference.emit({ state: { c__tool: 'delete' } });
       await flush();
-      expect(one(element, 'start-note').textContent).toContain('c.Core_Find_StartDelete');
+      expect(one(element, 'start-note').message).toContain('c.Core_Find_StartDelete');
     });
 
     it('keeps the SOQL in a closed Show Query section', async () => {

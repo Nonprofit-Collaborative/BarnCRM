@@ -5,7 +5,9 @@
 The Integrations page in BarnCRM Settings is a roadmap of other products BarnCRM plans to work
 with. It lists each one with what it does, who maintains it, what it costs, a link to it, and a
 note on what BarnCRM knows about using the two together. It also tells you whether a product is
-installed in your org.
+installed in your org. The page opens with: "Other free apps that work alongside BarnCRM, and
+alternatives to BarnCRM modules already in your org. None is integrated with BarnCRM yet, and
+BarnCRM depends on none of them."
 
 Every integration is **In Progress**. That means planned and not built: nothing on the page is
 integrated with BarnCRM yet, and BarnCRM has not tested these products with itself unless a
@@ -32,11 +34,14 @@ Products are grouped:
 - **Alternatives to BarnCRM Modules**: apps that overlap a BarnCRM module. They appear here only
   when installed in your org. If you have none, the heading does not appear at all. For each,
   use one or the other for the same records, not both. BarnCRM may offer a migration path to the
-  matching module in a future release, with no date promised.
+  matching module in a future release, with no date promised. In a Nonprofit Cloud org this
+  includes **Nonprofit Cloud Program Management**, found by its standard **Program** object,
+  beside BarnCRM Programs (see [Programs](programs.md)).
 
 Each product shows:
 
-- Its name, an **In Progress** status, and **Installed in this org** or **Not installed**. The
+- Its name, an **In Progress** status badge (amber, with a clock), and **Installed in this org**
+  (green, with a tick) or **Not installed** (grey). The
   installed check looks for one of the product's own objects in your org, so it also works for a
   product installed any way. **Check again** reads your org again.
 - A one-line description, who maintains it, and its cost and license.

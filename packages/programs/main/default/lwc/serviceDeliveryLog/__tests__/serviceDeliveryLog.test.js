@@ -2,12 +2,19 @@ import { createElement } from 'lwc';
 import ServiceDeliveryLog from 'c/serviceDeliveryLog';
 import getLog from '@salesforce/apex/ServiceDeliveryLogController.getLog';
 import save from '@salesforce/apex/ServiceDeliveryLogController.save';
+import addCount from '@salesforce/apex/ServiceDeliveryLogController.addCount';
+import getSessionLog from '@salesforce/apex/ServiceDeliveryLogController.getSessionLog';
+import saveSession from '@salesforce/apex/ServiceDeliveryLogController.saveSession';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import {
   entriesToSave,
   format,
+  formatIsoDate,
   isAbsence,
+  isSessionObject,
   logRows,
   markAllPresent,
+  sessionSummary,
   withAttendance,
   withQuantity
 } from '../logRows';
@@ -16,6 +23,36 @@ jest.mock('@salesforce/apex/ServiceDeliveryLogController.getLog', () => ({ defau
   virtual: true
 });
 jest.mock('@salesforce/apex/ServiceDeliveryLogController.save', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/apex/ServiceDeliveryLogController.addCount',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock('@salesforce/label/c.Programs_Log_Counted', () => ({ default: 'Counted: {0}' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Programs_Log_CountAdded', () => ({ default: 'Added {0}.' }), {
+  virtual: true
+});
+jest.mock(
+  '@salesforce/apex/ServiceDeliveryLogController.getSessionLog',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/ServiceDeliveryLogController.saveSession',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock('@salesforce/label/c.Programs_Log_SessionOf', () => ({ default: '{0} on {1}' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Programs_Log_SessionCohort', () => ({ default: 'Cohort: {0}' }), {
+  virtual: true
+});
+jest.mock('@salesforce/label/c.Programs_Log_SessionEveryone', () => ({ default: 'Everyone' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Programs_Log_Saved', () => ({ default: '{0} saved.' }), {
@@ -233,6 +270,61 @@ describe('c-service-delivery-log', () => {
     expect(getLog.mock.calls).toHaveLength(calls);
   });
 
+  it('asks before a change of service or day throws away unsaved attendance', async () => {
+    getLog.mockResolvedValue(logOf([ANA, BEN]));
+    save.mockResolvedValue(logOf([ANA, BEN], { saved: 1 }));
+    const element = await render();
+    expect(find(element, 'unsaved')).toBeNull();
+    find(element, 'mark-all-present').click();
+    await flush();
+    expect(find(element, 'unsaved').textContent).toContain('Core_Kit_UnsavedOne');
+
+    // Cancel: nothing reloads and the service stays.
+    BarnConfirmModal.open.mockResolvedValueOnce(undefined);
+    const service = find(element, 'service');
+    service.dispatchEvent(new CustomEvent('change', { detail: { value: 'a0A000000000002AAA' } }));
+    await flush();
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({
+        label: expect.stringContaining('Programs_Log_UnsavedTitle'),
+        choice: 'save',
+        choices: [
+          expect.objectContaining({ value: 'save' }),
+          expect.objectContaining({ value: 'discard' })
+        ]
+      })
+    );
+    expect(getLog).toHaveBeenCalledTimes(1);
+    expect(service.value).toBe(SERVICE_ID);
+
+    // Save first: the marks are saved, then the other day loads.
+    BarnConfirmModal.open.mockResolvedValueOnce({ choice: 'save', checked: [] });
+    const date = find(element, 'date');
+    date.value = '2026-10-30';
+    date.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(save).toHaveBeenCalledTimes(1);
+    expect(getLog).toHaveBeenLastCalledWith({
+      programId: PROGRAM_ID,
+      serviceId: SERVICE_ID,
+      deliveryDate: '2026-10-30'
+    });
+    expect(find(element, 'result').textContent).toBe('One saved.');
+
+    // Discard: the marks are dropped and the other service loads without saving.
+    find(element, 'mark-all-present').click();
+    await flush();
+    BarnConfirmModal.open.mockResolvedValueOnce({ choice: 'discard', checked: [] });
+    find(element, 'service').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'a0A000000000002AAA' } })
+    );
+    await flush();
+    expect(save).toHaveBeenCalledTimes(1);
+    expect(getLog).toHaveBeenLastCalledWith(
+      expect.objectContaining({ serviceId: 'a0A000000000002AAA' })
+    );
+  });
+
   it('marks everyone present and saves', async () => {
     getLog.mockResolvedValue(logOf([ANA, BEN]));
     save.mockResolvedValue(
@@ -275,6 +367,47 @@ describe('c-service-delivery-log', () => {
     expect(find(element, 'result').textContent).toBe('2 saved.');
   });
 
+  it('adds a count of people without names (P-12), apart from the named rows', async () => {
+    getLog.mockResolvedValue(
+      logOf([ANA], { canSeeCounts: true, canCount: true, peopleCounted: 12 })
+    );
+    addCount.mockResolvedValue(
+      logOf([ANA], { canSeeCounts: true, canCount: true, peopleCounted: 20 })
+    );
+    const element = await render();
+    expect(find(element, 'counted').textContent).toContain('12');
+    expect(find(element, 'add-count').disabled).toBe(true);
+
+    const input = find(element, 'count-input');
+    input.value = '8';
+    input.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    find(element, 'add-count').click();
+    await flush();
+
+    expect(addCount).toHaveBeenCalledWith({
+      programId: PROGRAM_ID,
+      serviceId: SERVICE_ID,
+      deliveryDate: '2026-10-31',
+      people: 8
+    });
+    expect(find(element, 'counted').textContent).toContain('20');
+    expect(find(element, 'result').textContent).toContain('8');
+  });
+
+  it('shows the count but no way to add one without permission, and nothing without access', async () => {
+    getLog.mockResolvedValue(
+      logOf([ANA], { canSeeCounts: true, canCount: false, peopleCounted: 5 })
+    );
+    const element = await render();
+    expect(find(element, 'counted').textContent).toContain('5');
+    expect(find(element, 'add-count')).toBeNull();
+
+    getLog.mockResolvedValue(logOf([ANA], { canSeeCounts: false }));
+    const second = await render();
+    expect(find(second, 'counts')).toBeNull();
+  });
+
   it('says when there is nothing to save', async () => {
     getLog.mockResolvedValue(logOf([ANA]));
     const element = await render();
@@ -298,5 +431,109 @@ describe('c-service-delivery-log', () => {
     expect(second.shadowRoot.querySelector('[data-id="error-message"]').textContent).toContain(
       'Programs_Log_ActionFailed'
     );
+  });
+});
+
+const SESSION_ID = 'a0S000000000001AAA';
+
+function sessionLog(rows, extra) {
+  return logOf(rows, {
+    sessionId: SESSION_ID,
+    sessionName: 'Tutoring hour 2026-10-31',
+    cohortName: 'Spring',
+    sessionStatus: 'Scheduled',
+    cancelled: false,
+    ...extra
+  });
+}
+
+async function renderSession(objectApiName = 'Session__c') {
+  const element = createElement('c-service-delivery-log', { is: ServiceDeliveryLog });
+  element.recordId = SESSION_ID;
+  element.objectApiName = objectApiName;
+  document.body.appendChild(element);
+  await flush();
+  return element;
+}
+
+// Built from parts so the namespace check does not read it as a hard-coded prefix.
+const PREFIXED_SESSION = ['ns', 'Session__c'].join('__');
+
+describe('sessions in logRows (framework free)', () => {
+  it('knows a session page whatever the namespace', () => {
+    expect(isSessionObject('Session__c')).toBe(true);
+    expect(isSessionObject(PREFIXED_SESSION)).toBe(true);
+    expect(isSessionObject('Program__c')).toBe(false);
+    expect(isSessionObject('Other_Session__c')).toBe(false);
+    expect(isSessionObject(undefined)).toBe(false);
+  });
+
+  it('writes the day out without moving it and sums the session up', () => {
+    expect(formatIsoDate('2026-10-31', 'en-US')).toBe('Oct 31, 2026');
+    expect(formatIsoDate('', 'en-US')).toBe('');
+    expect(formatIsoDate('2026-10-31', 'not a locale !')).toBe('2026-10-31');
+    const labels = { sessionOf: '{0} on {1}', cohort: 'Cohort: {0}', everyone: 'Everyone' };
+    expect(sessionSummary(sessionLog([]), labels, 'en-US')).toEqual({
+      heading: 'Tutoring hour on Oct 31, 2026',
+      roster: 'Cohort: Spring',
+      cancelled: false
+    });
+    expect(sessionSummary(sessionLog([], { cohortName: null }), labels, 'en-US').roster).toBe(
+      'Everyone'
+    );
+    expect(sessionSummary(logOf([]), labels, 'en-US')).toBeNull();
+  });
+});
+
+describe('c-service-delivery-log on a session', () => {
+  afterEach(() => {
+    while (document.body.firstChild) {
+      document.body.removeChild(document.body.firstChild);
+    }
+    jest.clearAllMocks();
+  });
+
+  it('shows the session and its cohort with no service or date to pick', async () => {
+    getSessionLog.mockResolvedValue(sessionLog([ANA, BEN]));
+    const element = await renderSession();
+    expect(getSessionLog).toHaveBeenCalledWith({ sessionId: SESSION_ID });
+    expect(getLog).not.toHaveBeenCalled();
+    expect(find(element, 'service')).toBeNull();
+    expect(find(element, 'date')).toBeNull();
+    expect(find(element, 'session-heading').textContent).toContain('Tutoring hour on');
+    expect(find(element, 'session-roster').textContent).toBe('Cohort: Spring');
+    expect(findAll(element, 'row')).toHaveLength(2);
+  });
+
+  it('saves the session and asks the page to refresh', async () => {
+    getSessionLog.mockResolvedValue(sessionLog([ANA]));
+    saveSession.mockResolvedValue(
+      sessionLog([{ ...ANA, deliveryId: 'a0B9', attendance: 'Present', quantity: 1 }], {
+        saved: 1,
+        sessionStatus: 'Held'
+      })
+    );
+    const element = await renderSession();
+    const refreshed = jest.fn();
+    element.addEventListener('lightning__refresh', refreshed);
+    find(element, 'mark-all-present').click();
+    await flush();
+    find(element, 'save').click();
+    await flush();
+    expect(saveSession).toHaveBeenCalledWith({
+      sessionId: SESSION_ID,
+      entries: [expect.objectContaining({ contactId: ANA.contactId, attendance: 'Present' })]
+    });
+    expect(save).not.toHaveBeenCalled();
+    expect(refreshed).toHaveBeenCalled();
+    expect(find(element, 'result').textContent).toBe('One saved.');
+  });
+
+  it('shows a cancelled session without the controls', async () => {
+    getSessionLog.mockResolvedValue(sessionLog([BEN], { cancelled: true, canEdit: false }));
+    const element = await renderSession(PREFIXED_SESSION);
+    expect(find(element, 'session-cancelled')).not.toBeNull();
+    expect(find(element, 'save')).toBeNull();
+    expect(find(element, 'recorded').textContent).toContain('Present');
   });
 });

@@ -15,110 +15,110 @@
  * Every change is recorded as a Setting Change, as the console records its own.
  */
 public with sharing class AccountingPeriodController {
-    private static final String CONTEXT = 'Accounting periods page';
-    private static final String REOPEN_CONTEXT = 'Posting lock override';
-    private static final String SETTING_NAME = 'Giving_Settings__c.Books_Closed_Through__c';
+	private static final String CONTEXT = 'Accounting periods page';
+	private static final String REOPEN_CONTEXT = 'Posting lock override';
+	private static final String SETTING_NAME = 'Giving_Settings__c.Books_Closed_Through__c';
 
-    /** Raised with a message the page shows as it is. */
-    public class AccountingPeriodException extends Exception {
-    }
+	/** Raised with a message the page shows as it is. */
+	public class AccountingPeriodException extends Exception {
+	}
 
-    /** The page, in one round trip. */
-    public class PeriodView {
-        @AuraEnabled
-        public Date closedThrough;
-        @AuraEnabled
-        public Date latestAllowed;
-        @AuraEnabled
-        public Boolean canManage;
-        @AuraEnabled
-        public Boolean canReopen;
-    }
+	/** The page, in one round trip. */
+	public class PeriodView {
+		@AuraEnabled
+		public Date closedThrough;
+		@AuraEnabled
+		public Date latestAllowed;
+		@AuraEnabled
+		public Boolean canManage;
+		@AuraEnabled
+		public Boolean canReopen;
+	}
 
-    @AuraEnabled
-    public static PeriodView getPeriod() {
-        try {
-            return currentView();
-        } catch (Exception caught) {
-            throw asUserError(caught, CONTEXT);
-        }
-    }
+	@AuraEnabled
+	public static PeriodView getPeriod() {
+		try {
+			return currentView();
+		} catch (Exception caught) {
+			throw asUserError(caught, CONTEXT);
+		}
+	}
 
-    /**
-     * Closes the books through `closeDate`, or reopens every period when it is null. Returns the
-     * page as it now stands.
-     */
-    @AuraEnabled
-    public static PeriodView closeThrough(Date closeDate) {
-        try {
-            if (!canManage()) {
-                throw new AccountingPeriodException(Label.Giving_Periods_PermissionRequired);
-            }
-            // Locked, so whether this save reopens a period, and the audit row's old value, are
-            // decided from what is stored, not from a value another person replaced a moment ago.
-            Date current = AccountingPeriodWriter.lockedClosedThrough();
-            if (closeDate == current) {
-                return currentView();
-            }
-            if (closeDate != null && closeDate > latestAllowed()) {
-                throw new AccountingPeriodException(Label.Giving_Periods_NotBeforeToday);
-            }
-            Boolean reopens = current != null && (closeDate == null || closeDate < current);
-            if (reopens && !GiftPostingLock.canOverride()) {
-                throw new AccountingPeriodException(Label.Giving_Periods_ReopenNeedsOverride);
-            }
-            AccountingPeriodWriter.saveClosedThrough(closeDate);
-            SettingsService.logChange(SETTING_NAME, asText(current), asText(closeDate));
-            if (reopens) {
-                ErrorLogger.logMessages(
-                    new List<String>{
-                        String.format(
-                            Label.Giving_Periods_ReopenLogged,
-                            new List<String>{
-                                asText(current),
-                                closeDate == null ? Label.Giving_Periods_NoDate : asText(closeDate)
-                            }
-                        )
-                    },
-                    REOPEN_CONTEXT,
-                    ErrorLogger.SEVERITY_WARNING
-                );
-            }
-            return currentView();
-        } catch (Exception caught) {
-            throw asUserError(caught, 'Close an accounting period');
-        }
-    }
+	/**
+	 * Closes the books through `closeDate`, or reopens every period when it is null. Returns the
+	 * page as it now stands.
+	 */
+	@AuraEnabled
+	public static PeriodView closeThrough(Date closeDate) {
+		try {
+			if (!canManage()) {
+				throw new AccountingPeriodException(Label.Giving_Periods_PermissionRequired);
+			}
+			// Locked, so whether this save reopens a period, and the audit row's old value, are
+			// decided from what is stored, not from a value another person replaced a moment ago.
+			Date current = AccountingPeriodWriter.lockedClosedThrough();
+			if (closeDate == current) {
+				return currentView();
+			}
+			if (closeDate != null && closeDate > latestAllowed()) {
+				throw new AccountingPeriodException(Label.Giving_Periods_NotBeforeToday);
+			}
+			Boolean reopens = current != null && (closeDate == null || closeDate < current);
+			if (reopens && !GiftPostingLock.canOverride()) {
+				throw new AccountingPeriodException(Label.Giving_Periods_ReopenNeedsOverride);
+			}
+			AccountingPeriodWriter.saveClosedThrough(closeDate);
+			SettingsService.logChange(SETTING_NAME, asText(current), asText(closeDate));
+			if (reopens) {
+				ErrorLogger.logMessages(
+					new List<String>{
+						String.format(
+							Label.Giving_Periods_ReopenLogged,
+							new List<String>{
+								asText(current),
+								closeDate == null ? Label.Giving_Periods_NoDate : asText(closeDate)
+							}
+						)
+					},
+					REOPEN_CONTEXT,
+					ErrorLogger.SEVERITY_WARNING
+				);
+			}
+			return currentView();
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Close an accounting period');
+		}
+	}
 
-    /** The day before yesterday in the user's time zone, which no time zone has as its today. */
-    private static Date latestAllowed() {
-        return Date.today().addDays(-2);
-    }
+	/** The day before yesterday in the user's time zone, which no time zone has as its today. */
+	private static Date latestAllowed() {
+		return Date.today().addDays(-2);
+	}
 
-    private static PeriodView currentView() {
-        PeriodView view = new PeriodView();
-        view.closedThrough = GiftPostingLock.closedThrough();
-        view.latestAllowed = latestAllowed();
-        view.canManage = canManage();
-        view.canReopen = view.canManage && GiftPostingLock.canOverride();
-        return view;
-    }
+	private static PeriodView currentView() {
+		PeriodView view = new PeriodView();
+		view.closedThrough = GiftPostingLock.closedThrough();
+		view.latestAllowed = latestAllowed();
+		view.canManage = canManage();
+		view.canReopen = view.canManage && GiftPostingLock.canOverride();
+		return view;
+	}
 
-    private static Boolean canManage() {
-        return BarnCRMPermissions.canManageSettings();
-    }
+	private static Boolean canManage() {
+		return BarnCRMPermissions.canManageSettings();
+	}
 
-    /** ISO dates, as the console records every date setting. */
-    private static String asText(Date value) {
-        return value == null ? '' : String.valueOf(value);
-    }
+	/** ISO dates, as the console records every date setting. */
+	private static String asText(Date value) {
+		return value == null ? '' : String.valueOf(value);
+	}
 
-    private static AuraHandledException asUserError(Exception caught, String context) {
-        return UserErrors.wrap(
-            caught,
-            caught instanceof AccountingPeriodException,
-            context,
-            Label.Giving_Periods_UnexpectedError
-        );
-    }
+	private static AuraHandledException asUserError(Exception caught, String context) {
+		return UserErrors.wrap(
+			caught,
+			caught instanceof AccountingPeriodException,
+			context,
+			Label.Giving_Periods_UnexpectedError
+		);
+	}
 }

@@ -131,7 +131,7 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Giving**, turn on **Send Gift Acknowledgments** and select **Save**. On the **Acknowledgments** row select **Open Acknowledgment Queue**. | The **Acknowledgments** page opens, with **Waiting to Go** and **Your Rules, in the Order They Are Considered**. |
+| 1 | In **BarnCRM Settings**, **Giving**, turn on **Send gift acknowledgments** and select **Save**. On the **Acknowledgments** row select **Open Acknowledgment Queue**. | The **Acknowledgments** page opens, with **Waiting to Go** and **Your Rules, in the Order They Are Considered**. |
 | 2 | Select **New Rule**. **Rule Name**: `Test email`, **Order** 10, **Active** on, **Channel** Email, **Email template** **BarnCRM: thank you for your gift**, **Minimum Amount** 7777, **Maximum Amount** 7777. Select **Save**. | Toast "The rule has been saved." The rule is listed with **Matches** "7777 and up, up to 7777". |
 | 3 | Select **New Rule**, **Channel** Email, leave **Email template** at **Choose a template**, select **Save**. | Refused: "An email rule needs an email template. Choose one from the list." Select **Cancel**. |
 | 4 | Open **Susan Ortiz**. Set **Work Email** to `susan.work@example.org`, **Preferred Email** to **Work**, select **Save**. | The ordinary **Email** now reads `susan.work@example.org` ([Email addresses](../admin-guide/emails.md)). |
@@ -170,13 +170,13 @@ For every script on this page:
 | 1 | In **BarnCRM Settings**, **Giving**, on the **Donor Levels** row select **Open Donor Level Ladder**. | The **Donor Levels** page. With no rungs: "You have not created any levels yet. Choose New level to add the first rung of your ladder." |
 | 2 | Select **New Level**: **Level Name** `Friend`, **Minimum Amount** 100, **Maximum Amount** 1000, **Active** on. Save. Repeat for `Sustainer` 1000 to 5000 and `Leadership Circle` 5000 with no maximum. | The page lists three rungs, lowest first; the top one reads "and above". |
 | 3 | Try a fourth level with **Minimum Amount** 500 and **Maximum Amount** 200. | Refused: "The maximum amount has to be greater than the minimum amount. Leave the maximum empty for the top level of your ladder." Cancel. |
-| 4 | In **BarnCRM Settings**, **Giving**, turn on **Turn On Donor Levels**, leave **Donor level source** at total giving, **Save**. Back on the page select **Recalculate Now**. | "Placing every donor on the ladder. This runs in the background and the counts below update when it finishes." After a refresh, **Donors** counts appear and **Donors last placed** shows a time. |
+| 4 | In **BarnCRM Settings**, **Giving**, turn on **Turn on donor levels**, leave **Donor level source** at total giving, **Save**. Back on the page select **Recalculate Now**. | "Placing every donor on the ladder. This runs in the background and the counts below update when it finishes." After a refresh, **Donors** counts appear and **Donors last placed** shows a time. |
 | 5 | Open Susan Ortiz's household. | **Donor Level** reads `Leadership Circle` (total giving 7777). |
 | 6 | Open the 7777 gift and select **Refund or Write Off**. Refund 5000 with reason `Level test`. Open the household again after a few seconds. | **Total Giving** 2777, **Donor Level** `Sustainer`. |
 | 7 | On the **Households** tab choose the list view **Donor Level Changed This Month** and find the household. | **Donor Level** `Sustainer`, **Previous Donor Level** `Leadership Circle`, **Donor Level Changed** today. The **Contacts** tab has a list view of the same name for people. |
 | 8 | As read-only, open the Donor Levels page. | The ladder shows; **Recalculate Now** is disabled. |
 
-**Cleanup:** In **BarnCRM Settings**, **Giving**, turn **Turn On Donor Levels** off. Clear **Active** on the three test levels.
+**Cleanup:** In **BarnCRM Settings**, **Giving**, turn **Turn on donor levels** off. Clear **Active** on the three test levels.
 
 ## T-RCPT-11: A Stewardship Plan Lays Out Tasks on a First Gift
 

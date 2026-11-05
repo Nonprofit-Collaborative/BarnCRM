@@ -7,19 +7,32 @@
 
 The **Access Explorer** section of **Org Optimizer** answers "who can see or change what, and
 why". It reads your org's profiles, permission sets and permission set groups and shows the
-answer five ways:
+answer five ways, and a sixth view changes field access:
 
 | View | What it shows |
 |---|---|
 | **By Person or Permission Set** | Everything one person can read, create, edit or delete, kind of record by kind of record, and the profile, permission sets and permission set groups that give it. Choose **Permission Set** instead to see what one profile, permission set or group gives. Choose a kind of record to see field access too. |
 | **By Kind of Record** | For one kind of record (or one of its fields), every profile, permission set and permission set group that gives access, how many active people hold each, and a list of the people who have access, 50 at a time. |
-| **BarnCRM Permission Sets** | Every permission set and role BarnCRM ships, how many active people hold each, and whether the hourly Tab Access Check is scheduled. |
+| **BarnCRM Roles and Extra Permissions** | Every role, extra permission and other permission set BarnCRM ships, how many active people hold each, and whether the hourly Tab Access Check is scheduled. |
 | **Compare Two** | Two people, or two profiles, permission sets or groups, side by side: what each can do on every kind of record (and on the fields of one), showing only the differences unless you ask for everything, with a similarity score. |
 | **Modify All Report** | Every profile, permission set and group that holds **Modify All Data**, **View All Data** or **Author Apex**, and every one that holds **Modify All** or **View All** on a kind of record, with how many active people hold each and the groups it sits inside. |
+| **Change Field Access** | The [Field Access Manager](field-access-manager.md): give or remove Read and Edit on fields and kinds of record across up to 10 of your own permission sets, with a preview and undo. |
 
 Each table has **Download CSV**, which saves what it shows.
 
-Access Explorer is **read only**. It never gives or takes access. To change who holds a BarnCRM
+Access Explorer uses the [Access page](access.md)'s words. Wherever a row is a BarnCRM role or
+an extra permission, its name says so, for example **Team Member (BarnCRM role)** or **BarnCRM
+Bulk Update (extra permission)**, so a role you gave on the Access page is easy to find. The **Kind**
+column still shows the Salesforce kind (**Permission Set Group** for a role, **Permission Set**
+for an extra permission).
+
+API names are hidden to start with. Turn on **Show technical names** at the top of the section
+to add the **API Name** columns to every view and the API names to the kind of record and field
+lists.
+
+The first five views are **read only**: they never give or take access. **Change Field Access**
+changes only Read and Edit, only on permission sets your organization made, and only after a
+preview (see [Field Access Manager](field-access-manager.md)). To change who holds a BarnCRM
 role or add-on, use the [Access page](access.md); for anything else, use Setup.
 
 ## How to Turn It On
@@ -58,7 +71,8 @@ Start from the sample data (see [Sample data](sample-data.md)).
    More** for the next 50. Choose a field in **Field** to see the same for one field.
 6. Back on **By Person or Permission Set**, choose **Permission Set** in **Look Up** and type
    `Staff`. Choose **BarnCRM Staff**: the table shows only what that permission set gives.
-7. Choose **BarnCRM Permission Sets**. Each BarnCRM role and permission set shows how many
+7. Choose **BarnCRM Roles and Extra Permissions**. Each BarnCRM role, extra permission and
+   other permission set shows how many
    active people hold it directly, and the **Tab Access Check** line says when it runs next.
 8. Choose **Compare Two**. Leave **Compare** on **People**, type part of one colleague's name
    under **First** and choose them, then do the same under **Second**. The page shows a
@@ -161,7 +175,7 @@ they can open that kind of record at all.
 yourself the BarnCRM Access Manager permission set (Salesforce licenses only) to see everyone.
 
 **Forgetting the Tab Access Check.** Someone given a BarnCRM role in Setup gets the matching tabs
-at the next hourly Tab Access Check. If **BarnCRM Permission Sets** says the check is not
+at the next hourly Tab Access Check. If **BarnCRM Roles and Extra Permissions** says the check is not
 scheduled, run **Health Check** and use its **Schedule All Nightly Jobs** fix.
 
 ## Related

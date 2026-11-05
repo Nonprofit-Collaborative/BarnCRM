@@ -2,6 +2,12 @@ import { createElement } from 'lwc';
 import DonorLevels from 'c/donorLevels';
 import getLadder from '@salesforce/apex/DonorLevelController.getLadder';
 import recalculate from '@salesforce/apex/DonorLevelController.recalculate';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Giving_DonorLevels_Empty:
+    'You have not created any levels yet. Choose New level to add the first rung.'
+});
 
 jest.mock(
   '@salesforce/apex/DonorLevelController.getLadder',
@@ -24,7 +30,7 @@ jest.mock('@salesforce/label/c.Giving_DonorLevels_TopOfLadder', () => ({ default
   virtual: true
 });
 
-jest.mock('@salesforce/label/c.Giving_DonorLevels_Inactive', () => ({ default: 'Inactive' }), {
+jest.mock('@salesforce/label/c.Core_MatchLogic_Inactive', () => ({ default: 'Inactive' }), {
   virtual: true
 });
 
@@ -33,14 +39,6 @@ jest.mock(
   () => ({
     default:
       'Donor levels are off. Build your ladder here, then turn Donor levels on in BarnCRM Settings under Giving.'
-  }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Giving_DonorLevels_Empty',
-  () => ({
-    default: 'You have not created any levels yet. Choose New level to add the first rung.'
   }),
   { virtual: true }
 );
@@ -152,7 +150,7 @@ describe('c-donor-levels', () => {
       'c.Giving_DonorLevels_ColumnFrom',
       'c.Giving_DonorLevels_ColumnUpTo',
       'c.Giving_DonorLevels_ColumnDonors',
-      'c.Giving_DonorLevels_ColumnActive'
+      'c.Core_MatchLogic_Active'
     ]);
   });
 

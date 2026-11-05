@@ -1,5 +1,6 @@
 <template>
-  <lightning-card title={labels.title} icon-name="custom:custom14">
+    <template lwc:if={helpReady}>
+  <lightning-card title={labels.title} icon-name="custom:custom16">
     <div class="slds-var-p-horizontal_medium slds-is-relative">
       <template lwc:if={showSpinner}>
         <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
@@ -15,8 +16,20 @@
         <p data-id="no-services" class="slds-text-body_regular">{labels.noServices}</p>
       </template>
 
+      <template lwc:if={session}>
+        <div data-id="session" class="slds-var-m-bottom_small">
+          <p class="slds-text-heading_small" data-id="session-heading">{session.heading}</p>
+          <p class="slds-text-body_small slds-text-color_weak" data-id="session-roster">{session.roster}</p>
+          <template lwc:if={session.cancelled}>
+            <p class="slds-text-body_regular slds-var-m-top_x-small" data-id="session-cancelled">
+              {labels.sessionCancelled}
+            </p>
+          </template>
+        </div>
+      </template>
+
       <template lwc:if={hasServices}>
-        <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small">
+        <div lwc:if={showPickers} class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small">
           <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
             <lightning-combobox
               data-id="service"
@@ -44,7 +57,7 @@
         </template>
 
         <template lwc:if={showHeader}>
-          <div class="slds-grid slds-gutters_x-small slds-show_medium slds-text-title_caps" data-id="header">
+          <div class="slds-grid slds-gutters_x-small slds-show_medium slds-text-title_bold" data-id="header">
             <div class="slds-col slds-size_1-of-2"></div>
             <div class="slds-col slds-size_1-of-4">{labels.attendance}</div>
             <div class="slds-col slds-size_1-of-4">{quantityLabel}</div>
@@ -103,7 +116,12 @@
         <div role="status" data-id="result" class="slds-var-m-vertical_small">{resultMessage}</div>
 
         <template lwc:if={canEdit}>
-          <div class="slds-grid slds-wrap slds-grid_align-end slds-var-m-bottom_small">
+          <div class="slds-grid slds-wrap slds-grid_align-end slds-grid_vertical-align-center slds-var-m-bottom_small">
+            <template lwc:if={unsavedText}>
+              <p data-id="unsaved" class="slds-text-body_small slds-text-color_weak slds-var-m-right_small">
+                {unsavedText}
+              </p>
+            </template>
             <lightning-button
               data-id="mark-all-present"
               label={labels.markAllPresent}
@@ -120,7 +138,38 @@
             ></lightning-button>
           </div>
         </template>
+
+        <template lwc:if={showCounts}>
+          <div class="slds-box slds-var-m-bottom_small" data-id="counts">
+            <p class="slds-text-body_regular" data-id="counted">{countedText}</p>
+            <template lwc:if={canCount}>
+              <div class="slds-grid slds-grid_vertical-align-end slds-gutters_x-small">
+                <div class="slds-col slds-size_2-of-3">
+                  <lightning-input
+                    data-id="count-input"
+                    type="number"
+                    min="0"
+                    step="1"
+                    label={labels.countInput}
+                    value={countDraft}
+                    disabled={controlsDisabled}
+                    onchange={handleCountChange}
+                  ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-3">
+                  <lightning-button
+                    data-id="add-count"
+                    label={labels.addCount}
+                    disabled={addCountDisabled}
+                    onclick={handleAddCount}
+                  ></lightning-button>
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
       </template>
     </div>
   </lightning-card>
+    </template>
 </template>

@@ -1,43 +1,76 @@
 import { LightningElement, api } from 'lwc';
+import { RefreshEvent } from 'lightning/refresh';
+import LOCALE from '@salesforce/i18n/locale';
 import getLog from '@salesforce/apex/ServiceDeliveryLogController.getLog';
 import save from '@salesforce/apex/ServiceDeliveryLogController.save';
+import addCount from '@salesforce/apex/ServiceDeliveryLogController.addCount';
+import COUNTED from '@salesforce/label/c.Programs_Log_Counted';
+import COUNT_INPUT from '@salesforce/label/c.Programs_Log_CountInput';
+import ADD_COUNT from '@salesforce/label/c.Programs_Log_AddCount';
+import COUNT_ADDED from '@salesforce/label/c.Programs_Log_CountAdded';
+import getSessionLog from '@salesforce/apex/ServiceDeliveryLogController.getSessionLog';
+import saveSession from '@salesforce/apex/ServiceDeliveryLogController.saveSession';
+import SESSION_OF from '@salesforce/label/c.Programs_Log_SessionOf';
+import SESSION_COHORT from '@salesforce/label/c.Programs_Log_SessionCohort';
+import SESSION_EVERYONE from '@salesforce/label/c.Programs_Log_SessionEveryone';
+import SESSION_CANCELLED from '@salesforce/label/c.Programs_Log_SessionCancelled';
 
 import TITLE from '@salesforce/label/c.Programs_Log_Title';
 import SERVICE from '@salesforce/label/c.Programs_Log_Service';
-import DATE from '@salesforce/label/c.Programs_Log_Date';
-import ATTENDANCE from '@salesforce/label/c.Programs_Log_Attendance';
+import DATE from '@salesforce/label/c.Core_ImportNewField_TypeDate';
+import ATTENDANCE from '@salesforce/label/c.Core_Shared_Attendance';
 import QUANTITY from '@salesforce/label/c.Programs_Log_Quantity';
 import NOT_RECORDED from '@salesforce/label/c.Programs_Log_NotRecorded';
 import MARK_ALL_PRESENT from '@salesforce/label/c.Programs_Log_MarkAllPresent';
-import SAVE from '@salesforce/label/c.Programs_Log_Save';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import SAVED from '@salesforce/label/c.Programs_Log_Saved';
 import SAVED_ONE from '@salesforce/label/c.Programs_Log_SavedOne';
 import NOTHING_TO_SAVE from '@salesforce/label/c.Programs_Log_NothingToSave';
 import NO_SERVICES from '@salesforce/label/c.Programs_Log_NoServices';
-import EMPTY from '@salesforce/label/c.Programs_Log_Empty';
 import ATTENDANCE_FOR from '@salesforce/label/c.Programs_Log_AttendanceFor';
 import QUANTITY_FOR from '@salesforce/label/c.Programs_Log_QuantityFor';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Log_MoreThanShown';
 import ACTION_FAILED from '@salesforce/label/c.Programs_Log_ActionFailed';
-import LOADING from '@salesforce/label/c.Programs_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import UNSAVED_TITLE from '@salesforce/label/c.Programs_Log_UnsavedTitle';
+import UNSAVED_ASK from '@salesforce/label/c.Programs_Log_UnsavedAsk';
+import UNSAVED_CHANGES from '@salesforce/label/c.Core_Shared_UnsavedChanges';
+import UNSAVED_ONE from '@salesforce/label/c.Core_Kit_UnsavedOne';
+import UNSAVED_MANY from '@salesforce/label/c.Core_Kit_UnsavedMany';
+import DISCARD from '@salesforce/label/c.Core_Kit_Discard';
+import CONTINUE from '@salesforce/label/c.Core_DataManager_DeleteContinue';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 
 import {
   entriesToSave,
   format,
+  formatIsoDate,
+  isSessionObject,
   logRows,
   markAllPresent,
+  sessionSummary,
   withAttendance,
   withQuantity
 } from './logRows';
 import { bodyMessage } from 'c/findCsv';
+import BarnConfirmModal from 'c/barnConfirmModal';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+
+const SAVE_FIRST = 'save';
+const DISCARD_CHANGES = 'discard';
 
 /**
  * The Service Delivery Log panel on a program (P-02): for one active service and one day, the
  * attendance and quantity of everyone with an open enrollment, saved in one go. One person per
  * row on a desktop, one per card on a phone. Saves go through the delivery rules (R-SD2, R-SD3).
+ * On a session page (P-11, R-SE2) the service and day are the session's, the cohort is listed,
+ * and a Cancelled session shows what was recorded without the controls (R-SE3).
  */
 export default class ServiceDeliveryLog extends LightningElement {
+  helpReady = isHelpLoaded('Programs');
+
   @api recordId;
+  @api objectApiName;
 
   labels = {
     title: TITLE,
@@ -47,11 +80,17 @@ export default class ServiceDeliveryLog extends LightningElement {
     markAllPresent: MARK_ALL_PRESENT,
     save: SAVE,
     noServices: NO_SERVICES,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Programs', 'Programs_Log_Empty');
+    },
     moreThanShown: MORE_THAN_SHOWN,
+    countInput: COUNT_INPUT,
+    addCount: ADD_COUNT,
+    sessionCancelled: SESSION_CANCELLED,
     loading: LOADING
   };
 
+  countDraft = '';
   log;
   drafts = {};
   busy = false;
@@ -60,12 +99,24 @@ export default class ServiceDeliveryLog extends LightningElement {
   resultMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Programs').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
+  }
+
+  get isSession() {
+    return isSessionObject(this.objectApiName);
   }
 
   load(serviceId, deliveryDate) {
     this.loading = true;
-    return getLog({ programId: this.recordId, serviceId, deliveryDate })
+    const read = this.isSession
+      ? getSessionLog({ sessionId: this.recordId })
+      : getLog({ programId: this.recordId, serviceId, deliveryDate });
+    return read
       .then((log) => {
         this.log = log;
         this.drafts = {};
@@ -130,24 +181,143 @@ export default class ServiceDeliveryLog extends LightningElement {
     return this.busy || this.loading;
   }
 
+  get showCounts() {
+    return !!(this.log && this.log.canSeeCounts);
+  }
+
+  get canCount() {
+    return !!(this.log && this.log.canCount);
+  }
+
+  get countedText() {
+    return format(COUNTED, this.log ? this.log.peopleCounted || 0 : 0);
+  }
+
+  get addCountDisabled() {
+    return this.controlsDisabled || this.countDraft === '' || Number(this.countDraft) < 0;
+  }
+
+  handleCountChange(event) {
+    this.resultMessage = undefined;
+    this.countDraft = event.target.value;
+  }
+
+  handleAddCount() {
+    const people = Math.floor(Number(this.countDraft));
+    this.errorMessage = undefined;
+    this.busy = true;
+    return addCount({
+      programId: this.recordId,
+      serviceId: this.log.serviceId,
+      deliveryDate: this.log.deliveryDate,
+      people
+    })
+      .then((log) => {
+        this.log = log;
+        this.countDraft = '';
+        this.resultMessage = format(COUNT_ADDED, people);
+      })
+      .catch((error) => {
+        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+      })
+      .finally(() => {
+        this.busy = false;
+      });
+  }
+
   get moreThanShown() {
     return !!(this.log && this.log.moreThanShown);
   }
 
-  // ------------------------------------------------------------------------- choosing
-
-  handleServiceChange(event) {
-    this.resultMessage = undefined;
-    this.errorMessage = undefined;
-    return this.load(event.detail.value, this.log.deliveryDate);
+  /** On a program, the service and date to choose; on a session they are the session's. */
+  get showPickers() {
+    return this.hasServices && !this.isSession;
   }
 
-  handleDateChange(event) {
-    const value = event.target.value;
+  get session() {
+    return sessionSummary(
+      this.log,
+      { sessionOf: SESSION_OF, cohort: SESSION_COHORT, everyone: SESSION_EVERYONE },
+      LOCALE
+    );
+  }
+
+  // ------------------------------------------------------------------------- choosing
+
+  /** How many people have attendance marked but not saved. */
+  get unsavedCount() {
+    return entriesToSave(this.log, this.drafts).length;
+  }
+
+  /** "1 unsaved change" or "N unsaved changes" by the Save button, empty when all is saved. */
+  get unsavedText() {
+    const count = this.unsavedCount;
+    if (count === 0) {
+      return '';
+    }
+    return count === 1 ? UNSAVED_ONE : format(UNSAVED_MANY, count);
+  }
+
+  /**
+   * Changing the service or date reloads the list, so unsaved attendance would be lost: ask
+   * first (Save, Discard, or Cancel to stay). Resolves true when the change may go ahead.
+   */
+  async readyToReload() {
+    if (this.unsavedCount === 0) {
+      return true;
+    }
+    const service = (this.log.services || []).find((option) => option.value === this.log.serviceId);
+    const answer = await BarnConfirmModal.open({
+      size: 'small',
+      label: UNSAVED_TITLE,
+      message: format(
+        UNSAVED_ASK,
+        service ? service.label : '',
+        formatIsoDate(this.log.deliveryDate, LOCALE)
+      ),
+      choices: [
+        { label: SAVE, value: SAVE_FIRST },
+        { label: DISCARD, value: DISCARD_CHANGES }
+      ],
+      choicesLabel: UNSAVED_CHANGES,
+      choice: SAVE_FIRST,
+      confirmLabel: CONTINUE,
+      cancelLabel: CANCEL
+    });
+    if (!answer) {
+      return false;
+    }
+    if (answer.choice === SAVE_FIRST) {
+      await this.handleSave();
+      return !this.errorMessage;
+    }
+    return true;
+  }
+
+  async handleServiceChange(event) {
+    const picker = event.target;
+    const serviceId = event.detail.value;
+    this.resultMessage = undefined;
+    if (!(await this.readyToReload())) {
+      // Stay on the service whose attendance is still unsaved.
+      picker.value = this.log.serviceId;
+      return undefined;
+    }
+    this.errorMessage = undefined;
+    return this.load(serviceId, this.log.deliveryDate);
+  }
+
+  async handleDateChange(event) {
+    const picker = event.target;
+    const value = picker.value;
     if (!value) {
       return undefined;
     }
     this.resultMessage = undefined;
+    if (!(await this.readyToReload())) {
+      picker.value = this.log.deliveryDate;
+      return undefined;
+    }
     this.errorMessage = undefined;
     return this.load(this.log.serviceId, value);
   }
@@ -182,16 +352,23 @@ export default class ServiceDeliveryLog extends LightningElement {
       return Promise.resolve();
     }
     this.busy = true;
-    return save({
-      programId: this.recordId,
-      serviceId: this.log.serviceId,
-      deliveryDate: this.log.deliveryDate,
-      entries
-    })
+    const write = this.isSession
+      ? saveSession({ sessionId: this.recordId, entries })
+      : save({
+          programId: this.recordId,
+          serviceId: this.log.serviceId,
+          deliveryDate: this.log.deliveryDate,
+          entries
+        });
+    return write
       .then((log) => {
         this.log = log;
         this.drafts = {};
         this.resultMessage = log.saved === 1 ? SAVED_ONE : format(SAVED, log.saved);
+        if (this.isSession) {
+          // The session is now Held: the page's details show it.
+          this.dispatchEvent(new RefreshEvent());
+        }
       })
       .catch((error) => {
         this.errorMessage = bodyMessage(error, ACTION_FAILED);

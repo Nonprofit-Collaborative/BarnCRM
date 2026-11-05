@@ -4,6 +4,11 @@ import getPage from '@salesforce/apex/AutomationControlController.getPage';
 import pauseAll from '@salesforce/apex/AutomationControlController.pauseAll';
 import resumeAll from '@salesforce/apex/AutomationControlController.resumeAll';
 import setEnabled from '@salesforce/apex/AutomationControlController.setEnabled';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_AutomationControl_ResumesItself: 'It turns itself back on then.'
+});
 
 jest.mock(
   '@salesforce/apex/AutomationControlController.getPage',
@@ -43,12 +48,6 @@ jest.mock(
 jest.mock(
   '@salesforce/label/c.Core_AutomationControl_PausedBy',
   () => ({ default: 'Paused by {0}.' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Core_AutomationControl_ResumesItself',
-  () => ({ default: 'It turns itself back on then.' }),
   { virtual: true }
 );
 
@@ -162,10 +161,10 @@ describe('c-automation-control', () => {
     expect(banner).not.toBeNull();
     expect(banner.textContent).toContain('Automation is paused until');
     // The state must not be carried by color alone (plan Section 4.14).
-    const region = element.shadowRoot.querySelector('[role="status"]');
-    expect(region).not.toBeNull();
-    expect(region.getAttribute('aria-live')).toBe('polite');
-    expect(banner.querySelector('lightning-icon')).not.toBeNull();
+    // The kit notice draws the icon and announces the state politely.
+    const notice = element.shadowRoot.querySelector('[data-id="paused-notice"]');
+    expect(notice).not.toBeNull();
+    expect(notice.variant).toBe('warning');
   });
 
   it('names who paused and says the pause ends by itself', async () => {
@@ -221,6 +220,49 @@ describe('c-automation-control', () => {
     expect(element.shadowRoot.querySelector('[data-id="paused-banner"]')).toBeNull();
   });
 
+  it('offers only Pause while running and only Resume, in the banner, while paused', async () => {
+    const element = createComponent();
+    getPage.emit(RUNNING_PAGE);
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="pause-button"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="pause-hours"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="resume-button"]')).toBeNull();
+
+    getPage.emit(PAUSED_PAGE);
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="pause-button"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="pause-hours"]')).toBeNull();
+    const banner = element.shadowRoot.querySelector('[data-id="paused-banner"]').parentElement;
+    expect(banner.querySelector('[data-id="resume-button"]')).not.toBeNull();
+  });
+
+  it('says beside a switch just turned off that it is off, then clears the line', async () => {
+    jest.useFakeTimers();
+    setHelpTextForTest({ Core_AutomationControl_SwitchedOff: '{0} is off. Turn it back on here.' });
+    setEnabled.mockResolvedValue({
+      ...RUNNING_PAGE,
+      automations: [{ ...RUNNING_PAGE.automations[0], enabled: false }]
+    });
+    const element = createComponent();
+    getPage.emit(RUNNING_PAGE);
+    await flush();
+
+    const toggle = element.shadowRoot.querySelector('.automation-toggle');
+    toggle.checked = false;
+    toggle.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    await flush();
+
+    const line = element.shadowRoot.querySelector('[data-id="switch-status"]');
+    expect(line.getAttribute('aria-live')).toBe('polite');
+    expect(line.textContent).toBe('Household naming is off. Turn it back on here.');
+
+    jest.advanceTimersByTime(7000);
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="switch-status"]').textContent).toBe('');
+    jest.useRealTimers();
+  });
+
   it('switches one automation off', async () => {
     setEnabled.mockResolvedValue({
       ...RUNNING_PAGE,
@@ -272,7 +314,7 @@ describe('c-automation-control', () => {
 
     const error = element.shadowRoot.querySelector('[data-id="error-message"]');
     expect(error.textContent).toBe('Choose how long to pause automation.');
-    expect(element.shadowRoot.querySelector('[role="alert"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="error-notice"]').variant).toBe('error');
   });
 
   it('says so when the page has nothing to list', async () => {

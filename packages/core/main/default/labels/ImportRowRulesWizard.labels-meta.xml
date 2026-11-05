@@ -9,14 +9,6 @@
         <value>Rows to Load</value>
     </labels>
     <labels>
-        <fullName>Core_Import_RowRulesHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what the row rules do</shortDescription>
-        <value>Skip unwanted rows, or load only the first row per key. Skipped rows are listed with a reason.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_RowRulesSkipHeading</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -41,14 +33,6 @@
         <value>Remove Rule</value>
     </labels>
     <labels>
-        <fullName>Core_Import_RowRulesColumn</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: the column a rule reads</shortDescription>
-        <value>Column</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_RowRulesTest</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -63,22 +47,6 @@
         <protected>false</protected>
         <shortDescription>Import wizard: the text a skip rule compares</shortDescription>
         <value>Text</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_RowRulesTestEquals</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: skip when the cell equals the text</shortDescription>
-        <value>equals</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_RowRulesTestContains</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: skip when the cell contains the text</shortDescription>
-        <value>contains</value>
     </labels>
     <labels>
         <fullName>Core_Import_RowRulesTestBlank</fullName>
@@ -97,19 +65,11 @@
         <value>One Row Per</value>
     </labels>
     <labels>
-        <fullName>Core_Import_RowRulesUniqueHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what one row per does</shortDescription>
-        <value>Only the first row with each combination of these columns&apos; values loads. Later rows with the same values are skipped. Up to five columns.</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_BlankClearsLabel</fullName>
         <categories>Import</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: empty cells clear the field, per column</shortDescription>
-        <value>Empty cells clear the field (update and upsert)</value>
+        <value>Empty cells clear the field (updates)</value>
     </labels>
 </CustomLabels>

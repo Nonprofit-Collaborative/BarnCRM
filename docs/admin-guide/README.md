@@ -1,6 +1,6 @@
 # Admin Guide
 
-Applies to: BarnCRM main as of 2026-10-31 (commit 78e64110, landing batch A). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
+Applies to: BarnCRM landing/batch-b (v1.0 scope, releases 0.15 to 0.17), to be set to the final main merge commit at landing. Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
 
 > **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org.
 
@@ -94,7 +94,7 @@ these pages, so that everyone is talking about the same person.
 
 ## Index
 
-Applies to: BarnCRM main as of 2026-10-31 (commit 78e64110, landing batch A). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM landing/batch-b (v1.0 scope, releases 0.15 to 0.17), to be set to the final main merge commit at landing. Pre-release: no package version exists yet; this tracks the newest code on main.
 
 Every page in this folder is listed once, below, grouped by what you are trying to do. A feature that adds a page adds its row here in the same pull request, and the version line is refreshed with it. For a short description of what BarnCRM is and which modules exist, read the [Overview](../overview.md). Staff who use BarnCRM daily (and are not administrators) have the [User Guide](../user-guide/README.md); someone checking a build step by step has the [Testing Guide](../testing-guide/README.md).
 
@@ -104,6 +104,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 
 | Feature | Page | Package |
 |---|---|---|
+| Installing BarnCRM: supported editions, room needed, install pre-check, production install, upgrades | [installing.md](installing.md) | Every package |
 | C-03 BarnCRM Apps, Navigation and Setup Checklist | [barncrm-app.md](barncrm-app.md) | Core |
 | C-12 Setup Assistant | [setup-assistant.md](setup-assistant.md) | Core, with steps from Giving |
 | C-30 Editions | [editions.md](editions.md) | Core |
@@ -128,6 +129,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-09 Household merge and split | [household-merge-split.md](household-merge-split.md) | Core |
 | C-07 Coexistence mode | [coexistence-mode.md](coexistence-mode.md) | Core |
 | X-09 Nonprofit Cloud households | [nonprofit-cloud-households.md](nonprofit-cloud-households.md) | Core, only in an org with Nonprofit Cloud |
+| X-05 Adopt NPSP households | [npsp-households.md](npsp-households.md) | Core, only in an org with NPSP |
 | C-15 Relationships | [relationships.md](relationships.md) | Core |
 | C-16 Affiliations | [affiliations.md](affiliations.md) | Core |
 | C-17, C-18 Addresses and seasonal addresses | [addresses.md](addresses.md) | Core |
@@ -145,17 +147,19 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-49d Creating a new field from an import | [import-new-fields.md](import-new-fields.md) | Core |
 | C-49b Super Importer rows: browse, correct and retry import rows | [import-rows.md](import-rows.md) | Core |
 | C-34, C-36 Find and export | [find.md](find.md) | Core |
-| C-35 Bulk update | [bulk-update.md](bulk-update.md) | Core |
-| C-50 Super Transform (bulk change without a file or a Find query) | [super-transform.md](super-transform.md) | Core |
+| C-35 Super Transformer runs and undo | [bulk-update.md](bulk-update.md) | Core |
+| C-50 Super Transformer (bulk change without a file or a Find query) | [super-transform.md](super-transform.md) | Core |
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core |
-| Org Optimizer (Data Quality, Field Utilization, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | Core |
+| Org Optimizer (Data Quality, Field Use, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | Core |
 | C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | Core |
 | C-20 Duplicates (the Duplicate Matching tab: review and matching logic) | [duplicates.md](duplicates.md) | Core |
-| Field utilization | [field-utilization.md](field-utilization.md) | Core |
+| Field Use (formerly Field Utilization) | [field-utilization.md](field-utilization.md) | Core |
 | C-52 Data Dictionary (the Data Dictionary section of Org Optimizer) | [data-dictionary.md](data-dictionary.md) | Core |
 | C-53 and C-53b Access Explorer, with Compare Two and the Modify All Report (a section of Org Optimizer) | [access-explorer.md](access-explorer.md) | Core |
+| C-65 Field Access Manager (give or remove Read and Edit across permission sets, with a preview and undo; Access Explorer's Change Field Access view) | [field-access-manager.md](field-access-manager.md) | Core |
 | C-56 Setup Changes (who changed what in Setup, kept beyond 180 days; the Setup Changes section of Org Optimizer) | [setup-changes.md](setup-changes.md) | Core |
 | C-55 Record Inspector (every readable field of one record, on record pages) | [record-inspector.md](record-inspector.md) | Core |
+| C-59 Where Used and Retire a Field (which BarnCRM setup uses a field or object; from the Data Dictionary, Field Use and the Record Inspector) | [where-used.md](where-used.md) | Core |
 | AIR-01 AI-Readiness Export (the AI-Readiness Export section of Org Optimizer) | [ai-readiness-export.md](ai-readiness-export.md) | Core |
 
 ### Automation, Totals and Health
@@ -168,6 +172,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-05, C-23 Error Log and error digest | [error-log.md](error-log.md) | Core |
 | C-11, C-21 Health Check | [health-check.md](health-check.md) | Core, with findings from Giving, Mirror, Rollup Builder and Volunteers |
 | Q-04 Job notifications | [job-notifications.md](job-notifications.md) | Core |
+| RT-10 Nightly jobs | [nightly-jobs.md](nightly-jobs.md) | Core, with jobs from every module |
 | X-03, Q-14 Using BarnCRM actions with your own AI assistant | [using-barncrm-actions-with-ai.md](using-barncrm-actions-with-ai.md) | Core, Mirror |
 
 ### Giving
@@ -194,9 +199,11 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | G-29 Ask cadence reminders | [ask-cadence.md](ask-cadence.md) | Giving |
 | G-16 Retention reports | [retention-reports.md](retention-reports.md) | Giving |
 | G-28 Donor segments | [donor-segments.md](donor-segments.md) | Giving |
+| G-19 Donor scoring | [donor-scoring.md](donor-scoring.md) | Giving |
 | G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving |
 | G-02, ADR-0064 A donor's giving on their record | [donor-records.md](donor-records.md) | Giving |
 | G-06 Giving dashboard | [giving-dashboard.md](giving-dashboard.md) | Giving |
+| pg-22, vis-core-18 Fundraising Home and report charts | [fundraising-home.md](fundraising-home.md) | Giving |
 | G-23, G-24 Importing gifts and donation matching | [gift-import.md](gift-import.md) | Giving |
 
 ### Mirror (Connections to Other Systems)
@@ -204,6 +211,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | Feature | Page | Package |
 |---|---|---|
 | X-01 Opportunity mirror | [opportunity-mirror.md](opportunity-mirror.md) | Mirror |
+| X-07 Gift Transaction mirror | [gift-transaction-mirror.md](gift-transaction-mirror.md) | Mirror |
 | X-02 Campaign sync | [campaign-sync.md](campaign-sync.md) | Mirror |
 | X-03, X-06 Inbound gift API | [inbound-gift-api.md](inbound-gift-api.md) | Mirror |
 | X-04 Accounting export | [accounting-export.md](accounting-export.md) | Mirror |
@@ -218,13 +226,28 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 
 | Feature | Page | Package |
 |---|---|---|
-| P-01 Programs: install, roles, programs, services, enrollments, the Program Roster panel | [programs.md](programs.md) | BarnCRM Programs |
+| P-01 Programs: install, roles, programs, services, enrollments, the Program Roster panel; P-10 service plans and goals, P-11 cohorts, sessions and mass enrollment, P-12 service counts without names, P-13 referrals, P-14 eligibility screening rules | [programs.md](programs.md) | BarnCRM Programs |
 
 ### Logic Models
 
 | Feature | Page | Package |
 |---|---|---|
-| L-01 and L-02 Logic Models: install, roles, the Logic Model Builder, arrows and assumptions, indicators with baselines, targets and results by period | [logic-models.md](logic-models.md) | BarnCRM Logic Models |
+| L-01 to L-04 Logic Models: install, roles, the Logic Model Builder, arrows and assumptions, indicators with baselines, targets and results by period, results typed in, imported or computed from a saved query, the Logic Model Report | [logic-models.md](logic-models.md) | BarnCRM Logic Models |
+
+### Funders
+
+| Feature | Page | Package |
+|---|---|---|
+| F-01 Funders: install, roles, grants and their stages, the program a grant pays for, the Grant Pipeline tab | [funders.md](funders.md) | BarnCRM Funders |
+| F-02 Reporting requirements and deadlines: grant requirements, morning reminder tasks and emails, the Funders settings, overdue requirements in Health Check | [funders.md](funders.md#grant-requirements) | BarnCRM Funders |
+| F-05 Multi-year award schedules: payments, Build Schedule, Mark Received | [funders.md](funders.md#award-schedules) | BarnCRM Funders |
+| F-03 Restricted fund tracking: the restricted ledger, its balance, received payments entered for you, the Giving fund a grant is booked to | [funders.md](funders.md#restricted-funds) | BarnCRM Funders |
+| F-08 Deadline calendar: the Grant Calendar tab | [funders.md](funders.md#the-grant-calendar-tab) | BarnCRM Funders |
+| F-04 Government award fields: funding source, federal agency, Assistance Listing number, award number, indirect cost rate, match | [funders.md](funders.md#government-awards) | BarnCRM Funders |
+| F-14 Answer and boilerplate library: Grant Answers | [funders.md](funders.md#answer-library) | BarnCRM Funders |
+| L-06 Link outcomes to grant deliverables: the Logic Model Outcomes card on a requirement | [funders.md](funders.md#outcomes-a-requirement-reports-on) | BarnCRM Funders |
+| F-06 Funder report merge template: Funder Report Templates | [funders.md](funders.md#funder-report-templates) | BarnCRM Funders |
+| F-07 Board dashboard: the Board Dashboard tab | [funders.md](funders.md#the-board-dashboard-tab) | BarnCRM Funders |
 
 ### Moving From Another System
 

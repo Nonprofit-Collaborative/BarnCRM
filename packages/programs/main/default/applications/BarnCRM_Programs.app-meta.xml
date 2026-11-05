@@ -48,8 +48,58 @@
     <type>Flexipage</type>
     <pageOrSobjectType>Contact</pageOrSobjectType>
   </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Enrollment, with the participant's service plan</comment>
+    <content>Enrollment_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Enrollment__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Enrollment, with the participant's service plan</comment>
+    <content>Enrollment_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Enrollment__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Cohort, with its members and the sessions to schedule</comment>
+    <content>Cohort_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Cohort__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Cohort, with its members and the sessions to schedule</comment>
+    <content>Cohort_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Cohort__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Session, where attendance is taken</comment>
+    <content>Session_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Session__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Session, where attendance is taken</comment>
+    <content>Session_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Session__c</pageOrSobjectType>
+  </actionOverrides>
   <brand>
-    <headerColor>#0B5CAB</headerColor>
+    <headerColor>#007A9E</headerColor>
+    <logo>BarnCRM_Programs_Logo</logo>
+    <logoVersion>1</logoVersion>
     <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
   </brand>
   <description>
@@ -64,9 +114,14 @@
   <navType>Console</navType>
   <tabs>Programs_Dashboard</tabs>
   <tabs>Program__c</tabs>
+  <tabs>Cohort__c</tabs>
+  <tabs>Session__c</tabs>
   <tabs>Enrollment__c</tabs>
   <tabs>Service_Delivery__c</tabs>
   <tabs>Case_Note__c</tabs>
+  <tabs>Referral__c</tabs>
+  <tabs>Service_Count__c</tabs>
+  <tabs>Goal__c</tabs>
   <tabs>standard-report</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
@@ -74,7 +129,13 @@
       <tab>Case_Note__c</tab>
     </mappings>
     <mappings>
+      <tab>Cohort__c</tab>
+    </mappings>
+    <mappings>
       <tab>Enrollment__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Goal__c</tab>
     </mappings>
     <mappings>
       <tab>Program__c</tab>
@@ -83,7 +144,16 @@
       <tab>Programs_Dashboard</tab>
     </mappings>
     <mappings>
+      <tab>Referral__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Service_Count__c</tab>
+    </mappings>
+    <mappings>
       <tab>Service_Delivery__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Session__c</tab>
     </mappings>
     <mappings>
       <tab>standard-report</tab>

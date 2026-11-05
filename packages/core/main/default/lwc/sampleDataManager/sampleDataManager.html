@@ -1,59 +1,61 @@
 <template>
+    <template lwc:if={helpReady}>
     <lightning-card title={labels.cardTitle} icon-name="standard:dataset">
         <span slot="actions">
-            <span class={statusBadgeClass}>{statusLabel}</span>
+            <c-barn-status-badge status={statusTone} label={statusLabel} data-id="status"></c-barn-status-badge>
         </span>
 
-        <div class="slds-p-horizontal_medium slds-p-bottom_medium">
-            <div class="slds-box slds-theme_warning slds-m-bottom_small" role="alert">
-                <p>{labels.productionWarning}</p>
-            </div>
+        <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
+            <c-barn-notice
+                class="slds-var-m-bottom_small"
+                variant="warning"
+                message={labels.productionWarning}
+                data-id="production-warning"
+            ></c-barn-notice>
 
-            <template if:true={isLoadingStatus}>
+            <template lwc:if={isLoadingStatus}>
                 <lightning-spinner
                     alternative-text={labels.loadingAltText}
                     size="small"
                 ></lightning-spinner>
             </template>
 
-            <template if:false={isLoadingStatus}>
-                <template if:true={statusFailed}>
-                    <p class="slds-text-color_weak slds-m-bottom_small" data-id="status-error" role="status">
+            <template lwc:else>
+                <template lwc:if={statusFailed}>
+                    <p class="slds-text-color_weak slds-var-m-bottom_small" data-id="status-error" role="status">
                         {labels.statusError}
                     </p>
                 </template>
-                <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_medium">
+                <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_medium">
                     <template for:each={tiles} for:item="tile">
-                        <div
-                            key={tile.key}
-                            class="slds-col slds-size_1-of-3 slds-text-align_center slds-m-bottom_x-small"
-                        >
-                            <p class="slds-text-heading_medium">{tile.value}</p>
-                            <p class="slds-text-body_small">{tile.label}</p>
+                        <div key={tile.key} class="slds-col slds-size_1-of-3 slds-var-m-bottom_x-small">
+                            <c-barn-stat-tile
+                                label={tile.label}
+                                value={tile.value}
+                                bordered
+                                align="start"
+                                data-id="tile"
+                            ></c-barn-stat-tile>
                         </div>
                     </template>
                 </div>
 
-                <template if:true={junctionMembership}>
+                <template lwc:if={junctionMembership}>
                     <p
-                        class="slds-text-color_weak slds-m-bottom_small"
+                        class="slds-text-color_weak slds-var-m-bottom_small"
                         data-id="junction-mode-note"
                     >
                         {labels.junctionModeNote}
                     </p>
                 </template>
 
-                <template if:false={canManage}>
-                    <p class="slds-text-color_weak">{labels.readOnlyMessage}</p>
-                </template>
-
-                <template if:true={canManage}>
+                <template lwc:if={canManage}>
                     <lightning-button
                         variant="brand"
                         label={labels.loadButtonLabel}
                         onclick={handleLoadClick}
                         disabled={loadDisabled}
-                        class="slds-m-right_small"
+                        class="slds-var-m-right_small"
                     ></lightning-button>
                     <lightning-button
                         variant="destructive"
@@ -62,7 +64,11 @@
                         disabled={removeDisabled}
                     ></lightning-button>
                 </template>
+                <template lwc:else>
+                    <p class="slds-text-color_weak" data-id="read-only">{labels.readOnlyMessage}</p>
+                </template>
             </template>
         </div>
     </lightning-card>
+    </template>
 </template>

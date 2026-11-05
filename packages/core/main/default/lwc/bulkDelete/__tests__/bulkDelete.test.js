@@ -6,6 +6,15 @@ import getJob from '@salesforce/apex/BulkDeleteController.getJob';
 import previewFile from '@salesforce/apex/BulkDeleteController.previewFile';
 import startFile from '@salesforce/apex/BulkDeleteController.startFile';
 import backupPage from '@salesforce/apex/BulkDeleteController.backupPage';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_BulkDelete_BackupDone: 'Downloaded {0} records.',
+  Core_BulkDelete_CascadesMore: 'and {0} more kinds',
+  Core_BulkDelete_PreviewCount: '{0} {1} match. The first ones:',
+  Core_BulkDelete_PreviewCountOne: '{0} {1} matches. It is:',
+  Core_BulkDelete_Summary: '{0} matched: {1} deleted, {2} refused.'
+});
 
 jest.mock('@salesforce/apex/BulkDeleteController.preview', () => ({ default: jest.fn() }), {
   virtual: true
@@ -26,23 +35,8 @@ jest.mock('@salesforce/apex/BulkDeleteController.backupPage', () => ({ default: 
   virtual: true
 });
 jest.mock(
-  '@salesforce/label/c.Core_BulkDelete_BackupDone',
-  () => ({ default: 'Downloaded {0} records.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_BulkDelete_PreviewCount',
-  () => ({ default: '{0} {1} match. The first ones:' }),
-  { virtual: true }
-);
-jest.mock(
   '@salesforce/label/c.Core_BulkDelete_DeleteButton',
   () => ({ default: 'Delete {0} records' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_BulkDelete_Summary',
-  () => ({ default: '{0} matched: {1} deleted, {2} refused.' }),
   { virtual: true }
 );
 
@@ -150,6 +144,34 @@ describe('c-bulk-delete', () => {
     expect(one(element, 'start').label).toBe('Delete 200 records');
   });
 
+  it('says "matches" for one record, with the singular label', async () => {
+    previewDelete.mockResolvedValue({
+      ...PREVIEW,
+      count: 1,
+      objectLabelSingular: 'Contact',
+      cascadesMore: 3
+    });
+    const element = await render();
+    one(element, 'preview').click();
+    await flush();
+
+    expect(one(element, 'preview-line').textContent).toBe('1 Contact matches. It is:');
+    expect(one(element, 'cascades-more').textContent).toBe('and 3 more kinds');
+  });
+
+  it('shows an empty state with no download, confirm box or Delete button for 0 matches', async () => {
+    previewDelete.mockResolvedValue({ ...PREVIEW, count: 0, sample: [], cascades: [] });
+    const element = await render();
+    one(element, 'preview').click();
+    await flush();
+
+    expect(one(element, 'no-matches')).not.toBeNull();
+    expect(one(element, 'preview-box')).toBeNull();
+    expect(one(element, 'backup')).toBeNull();
+    expect(one(element, 'confirm')).toBeNull();
+    expect(one(element, 'start')).toBeNull();
+  });
+
   it('starts only once the count is typed, then shows progress and the result', async () => {
     previewDelete.mockResolvedValue({ ...PREVIEW, cascades: [] });
     startDelete.mockResolvedValue(RUNNING);
@@ -171,6 +193,9 @@ describe('c-bulk-delete', () => {
     expect(startDelete).toHaveBeenCalledWith({ queryJson: QUERY, confirmedCount: 200 });
     expect(one(element, 'preview-box')).toBeNull();
     expect(one(element, 'notice-message')).not.toBeNull();
+    // While it runs the bar says a percent, never parts of an internal batch.
+    expect(one(element, 'progress').value).toBe(0);
+    expect(one(element, 'progress').valueText).toBe('c.Core_BulkDelete_Progress');
 
     polls.next()();
     await flush();
@@ -201,7 +226,7 @@ describe('c-bulk-delete', () => {
     polls.next()();
     await flush();
     expect(getJob).toHaveBeenCalledTimes(2);
-    expect(one(element, 'error-message').textContent).toBe('Connection lost');
+    expect(one(element, 'error-message').message).toBe('Connection lost');
   });
 
   it('deletes what a delete by file dry run found, sending the batch and the count', async () => {
@@ -280,7 +305,7 @@ describe('c-bulk-delete', () => {
     });
     expect(text).toContain('Contact ID,Last Name\r\n003000000000001,Person 0\r\n');
     expect(text).toContain("003000000000002,'=Person 1");
-    expect(one(element, 'notice-message').textContent).toBe('Downloaded 2 records.');
+    expect(one(element, 'notice-message').message).toBe('Downloaded 2 records.');
     expect(startDelete).not.toHaveBeenCalled();
   });
 
@@ -290,7 +315,7 @@ describe('c-bulk-delete', () => {
     one(element, 'preview').click();
     await flush();
 
-    expect(one(element, 'error-message').textContent).toBe('More than 10000 records match.');
+    expect(one(element, 'error-message').message).toBe('More than 10000 records match.');
     expect(one(element, 'start')).toBeNull();
   });
 

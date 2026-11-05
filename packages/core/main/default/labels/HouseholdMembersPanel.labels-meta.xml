@@ -4,7 +4,7 @@
         <fullName>Core_HouseholdMembersPanel_ActionsFor</fullName>
         <categories>Households</categories>
         <language>en_US</language>
-        <protected>true</protected>
+        <protected>false</protected>
         <shortDescription>Member actions menu for a screen reader; {0} is the member name</shortDescription>
         <value>Actions for {0}</value>
     </labels>
@@ -17,36 +17,12 @@
         <value>Add Member</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdMembersPanel_AddSuccess</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>A person was added to the household</shortDescription>
-        <value>Added. The household name and greetings have been brought up to date.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMembersPanel_Cancel</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Cancel button</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdMembersPanel_Deceased</fullName>
         <categories>Households</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Badge for a person who has died</shortDescription>
         <value>Deceased</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMembersPanel_Empty</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The household has no members yet</shortDescription>
-        <value>Add the people who belong to this household.</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMembersPanel_EmptyHeading</fullName>
@@ -57,14 +33,6 @@
         <value>No Members Yet</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdMembersPanel_MoveHelp</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>How to move a person to another household</shortDescription>
-        <value>Choose the household to move this person to.</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdMembersPanel_MoveMember</fullName>
         <categories>Households</categories>
         <language>en_US</language>
@@ -73,36 +41,12 @@
         <value>Move to Another Household</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdMembersPanel_MoveSuccess</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>A person was moved</shortDescription>
-        <value>Moved. Both households have been brought up to date.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMembersPanel_NotAHousehold</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The record is not a household</shortDescription>
-        <value>This panel is for households. This record is an organization, so it has no members to show.</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdMembersPanel_Primary</fullName>
         <categories>Households</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Badge for the primary member</shortDescription>
         <value>Primary</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMembersPanel_Save</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Save button</shortDescription>
-        <value>Save</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMembersPanel_Title</fullName>

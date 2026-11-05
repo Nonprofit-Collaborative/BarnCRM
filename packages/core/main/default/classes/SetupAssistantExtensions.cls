@@ -9,57 +9,57 @@
  */
 @NamespaceAccessible
 public with sharing class SetupAssistantExtensions {
-    /** The class names dependent packages register, in the order they are asked. */
-    @NamespaceAccessible
-    public static final List<String> EXTENSION_CLASSES = new List<String>{
-        'GivingSetupAssistantExtension'
-    };
+	/** The class names dependent packages register, in the order they are asked. */
+	@NamespaceAccessible
+	public static final List<String> EXTENSION_CLASSES = new List<String>{
+		'GivingSetupAssistantExtension'
+	};
 
-    /** Injected by Core's tests, since no other package is there to resolve. */
-    @TestVisible
-    private static List<SetupAssistantExtension> overrides;
+	/** Injected by Core's tests, since no other package is there to resolve. */
+	@TestVisible
+	private static List<SetupAssistantExtension> overrides;
 
-    /** Each class looked up so far this transaction, null when it is not installed. */
-    private static Map<String, SetupAssistantExtension> found = new Map<String, SetupAssistantExtension>();
+	/** Each class looked up so far this transaction, null when it is not installed. */
+	private static Map<String, SetupAssistantExtension> found = new Map<String, SetupAssistantExtension>();
 
-    /** Every installed extension, in the order of `EXTENSION_CLASSES`. */
-    @NamespaceAccessible
-    public static List<SetupAssistantExtension> findAll() {
-        if (overrides != null) {
-            return overrides;
-        }
-        List<SetupAssistantExtension> extensions = new List<SetupAssistantExtension>();
-        for (String className : EXTENSION_CLASSES) {
-            if (!found.containsKey(className)) {
-                found.put(className, resolve(className));
-            }
-            if (found.get(className) != null) {
-                extensions.add(found.get(className));
-            }
-        }
-        return extensions;
-    }
+	/** Every installed extension, in the order of `EXTENSION_CLASSES`. */
+	@NamespaceAccessible
+	public static List<SetupAssistantExtension> findAll() {
+		if (overrides != null) {
+			return overrides;
+		}
+		List<SetupAssistantExtension> extensions = new List<SetupAssistantExtension>();
+		for (String className : EXTENSION_CLASSES) {
+			if (!found.containsKey(className)) {
+				found.put(className, resolve(className));
+			}
+			if (found.get(className) != null) {
+				extensions.add(found.get(className));
+			}
+		}
+		return extensions;
+	}
 
-    @TestVisible
-    private static SetupAssistantExtension resolve(String className) {
-        Type extensionType = NamespaceUtil.resolveType(className);
-        if (extensionType == null) {
-            return null;
-        }
-        Object candidate;
-        try {
-            candidate = extensionType.newInstance();
-        } catch (Exception cannotBuild) {
-            ErrorLogger.log(cannotBuild, 'SetupAssistantExtensions.resolve');
-            return null;
-        }
-        if (candidate instanceof SetupAssistantExtension) {
-            return (SetupAssistantExtension) candidate;
-        }
-        ErrorLogger.log(
-            new System.TypeException(className + ' does not implement SetupAssistantExtension'),
-            'SetupAssistantExtensions.resolve'
-        );
-        return null;
-    }
+	@TestVisible
+	private static SetupAssistantExtension resolve(String className) {
+		Type extensionType = NamespaceUtil.resolveType(className);
+		if (extensionType == null) {
+			return null;
+		}
+		Object candidate;
+		try {
+			candidate = extensionType.newInstance();
+		} catch (Exception cannotBuild) {
+			ErrorLogger.log(cannotBuild, 'SetupAssistantExtensions.resolve');
+			return null;
+		}
+		if (candidate instanceof SetupAssistantExtension) {
+			return (SetupAssistantExtension) candidate;
+		}
+		ErrorLogger.log(
+			new System.TypeException(className + ' does not implement SetupAssistantExtension'),
+			'SetupAssistantExtensions.resolve'
+		);
+		return null;
+	}
 }

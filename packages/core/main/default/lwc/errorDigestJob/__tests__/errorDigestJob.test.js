@@ -3,6 +3,14 @@ import ErrorDigestJob from 'c/errorDigestJob';
 import getDigest from '@salesforce/apex/ErrorDigestController.getDigest';
 import setSchedule from '@salesforce/apex/ErrorDigestController.setSchedule';
 import sendNow from '@salesforce/apex/ErrorDigestController.sendNow';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_ErrorDigest_NotScheduled: 'Not scheduled: no digest is sent.',
+  Core_ErrorDigest_ScheduleActive: 'Scheduled every morning at 7:00. Next run:',
+  Core_ErrorDigest_NoRecipients: 'nobody yet.',
+  Core_ErrorDigest_UnexpectedError: 'Something went wrong with the error digest.'
+});
 
 jest.mock(
   '@salesforce/apex/ErrorDigestController.getDigest',
@@ -25,16 +33,6 @@ jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ defau
   virtual: true
 });
 
-jest.mock(
-  '@salesforce/label/c.Core_ErrorDigest_NotScheduled',
-  () => ({ default: 'Not scheduled: no digest is sent.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_ErrorDigest_ScheduleActive',
-  () => ({ default: 'Scheduled every morning at 7:00. Next run:' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/label/c.Core_ErrorDigest_ScheduleButton', () => ({ default: 'Schedule' }), {
   virtual: true
 });
@@ -44,14 +42,6 @@ jest.mock('@salesforce/label/c.Core_ErrorDigest_StopButton', () => ({ default: '
 jest.mock(
   '@salesforce/label/c.Core_ErrorDigest_ToAdministrators',
   () => ({ default: 'everyone with the Manage BarnCRM Settings permission:' }),
-  { virtual: true }
-);
-jest.mock('@salesforce/label/c.Core_ErrorDigest_NoRecipients', () => ({ default: 'nobody yet.' }), {
-  virtual: true
-});
-jest.mock(
-  '@salesforce/label/c.Core_ErrorDigest_UnexpectedError',
-  () => ({ default: 'Something went wrong with the error digest.' }),
   { virtual: true }
 );
 
@@ -192,7 +182,7 @@ describe('c-error-digest-job', () => {
     byId(element, 'send-now').click();
     await flush();
 
-    expect(byId(element, 'error').textContent).toContain('Manage BarnCRM Settings');
+    expect(byId(element, 'error').message).toContain('Manage BarnCRM Settings');
   });
 
   it('shows the message the page could not load with', async () => {
@@ -200,6 +190,6 @@ describe('c-error-digest-job', () => {
     getDigest.error({ message: 'Something went wrong with the error digest.' });
     await flush();
 
-    expect(byId(element, 'error').textContent).toContain('Something went wrong');
+    expect(byId(element, 'error').message).toContain('Something went wrong');
   });
 });

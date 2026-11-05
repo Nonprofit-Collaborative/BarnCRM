@@ -1,16 +1,14 @@
 import { createElement } from 'lwc';
 import OrganizationAddress from 'c/organizationAddress';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_OrganizationAddress_Hint: 'Leave it blank, or fill in the required parts.'
+});
 
 jest.mock(
   '@salesforce/label/c.Core_OrganizationAddress_Heading',
   () => ({ default: 'Organization address' }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
-  '@salesforce/label/c.Core_OrganizationAddress_Hint',
-  () => ({ default: 'Leave it blank, or fill in the required parts.' }),
   {
     virtual: true
   }

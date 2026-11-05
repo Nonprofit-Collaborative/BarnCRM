@@ -9,26 +9,26 @@ import NEEDED from '@salesforce/label/c.Volunteers_Signups_Needed';
 import FILLED from '@salesforce/label/c.Volunteers_Signups_Filled';
 import REMAINING from '@salesforce/label/c.Volunteers_Signups_Remaining';
 import ADD from '@salesforce/label/c.Volunteers_Signups_Add';
-import PERSON from '@salesforce/label/c.Volunteers_Signups_Person';
-import STATUS from '@salesforce/label/c.Volunteers_Signups_Status';
-import ACTIONS from '@salesforce/label/c.Volunteers_Signups_Actions';
-import SAVE from '@salesforce/label/c.Volunteers_Signups_Save';
-import CANCEL from '@salesforce/label/c.Volunteers_Signups_Cancel';
+import PERSON from '@salesforce/label/c.Core_Section_Person';
+import STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
+import ACTIONS from '@salesforce/label/c.Core_Shared_Attendance';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CAPTION from '@salesforce/label/c.Volunteers_Signups_Caption';
 import STATUS_FOR from '@salesforce/label/c.Volunteers_Signups_StatusFor';
 import ATTENDED from '@salesforce/label/c.Volunteers_Signups_Attended';
 import MARK_ATTENDED from '@salesforce/label/c.Volunteers_Signups_MarkAttended';
 import NO_SHOW from '@salesforce/label/c.Volunteers_Signups_NoShow';
 import MARK_NO_SHOW from '@salesforce/label/c.Volunteers_Signups_MarkNoShow';
-import EMPTY from '@salesforce/label/c.Volunteers_Signups_Empty';
 import ADDED from '@salesforce/label/c.Volunteers_Signups_Added';
-import CHANGED from '@salesforce/label/c.Volunteers_Signups_Changed';
+import CHANGED from '@salesforce/label/c.Core_Format_PairSentence';
 import HOURS_WRITTEN from '@salesforce/label/c.Volunteers_Signups_HoursWritten';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Volunteers_Signups_MoreThanShown';
 import ACTION_FAILED from '@salesforce/label/c.Volunteers_Signups_ActionFailed';
 import NO_HOURS_WARNING from '@salesforce/label/c.Volunteers_Signups_NoHoursWarning';
-import LOADING from '@salesforce/label/c.Volunteers_Loading';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { bodyMessage, format } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const STATUS_SIGNED_UP = 'Signed up';
 const STATUS_ATTENDED = 'Attended';
@@ -41,6 +41,8 @@ const MAX_SHOWN = 200;
  * so attendance writes the hours when the Attendance Creates Hours setting is on.
  */
 export default class ShiftSignups extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Volunteers');
+
   @api recordId;
 
   labels = {
@@ -56,7 +58,9 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
     cancel: CANCEL,
     attended: ATTENDED,
     noShow: NO_SHOW,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Volunteers', 'Volunteers_Signups_Empty');
+    },
     loading: LOADING
   };
 
@@ -73,6 +77,11 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
   loading = true;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Volunteers').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
     // Suggested Volunteers on the same page tells this panel when it signs someone up (V-11).
     window.addEventListener('barnshiftsignupschanged', this.handleSignupsChanged);

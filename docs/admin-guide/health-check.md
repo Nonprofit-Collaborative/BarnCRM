@@ -23,26 +23,33 @@ install is off until you turn it on: choose **Turn On** in that row in **BarnCRM
 [BarnCRM Settings](barncrm-settings.md). Once it is on there is nothing else to enable and
 nothing to configure.
 
+Health Check's one home is **Org Optimizer**:
+
 1. Open the **BarnCRM Admin** app.
-2. Click the **BarnCRM Settings** tab.
-3. Choose **Health** in the left navigation. The report is there.
-4. Click **Re-Run** whenever you want a fresh look. On this page Health Check reads your
-   org each time it opens.
+2. Click the **Org Optimizer** tab and choose **Health Check** (in the list on the left, or
+   in the **Show** box on a phone).
+3. The section shows the last full run. Click **Run Health Check** the first time, and
+   **Run Again** whenever you want a fresh look.
+
+**BarnCRM Settings**, **Health** keeps Health Check's settings and an **Open Health Check**
+link that opens this section.
 
 An administrator also finds Health Check on the BarnCRM home page, under the setup
 checklist. Home does not run every check each time it opens, because a full run reads a lot
 of your org and Home is the page everyone opens first. Instead it shows a summary of the last
-result: a badge (**Errors: 2**, **Warnings: 3**, **Passed**, or **Not Run Yet**, the same
-badge as the Health Check tile in Org Optimizer), when Health Check last ran in full for an
+result: a badge (**Needs Fixing: 2**, **Worth Knowing: 3**, **All Clear**, or **Not Run
+Yet**, the same badge as the Health Check tile in Org Optimizer, in the same words as the
+report's findings), when Health Check last ran in full for an
 administrator, and how many findings it had to fix, to be aware of and for your information.
-Click **Run Now** to run it in full there and see the whole report, with each finding as a
-row (the same component, and the same rows, as Org Optimizer's Health Check tab). Until
-Health Check has run once, Home says so and offers **Run Now**. A run by
+Click **Run Health Check** to run it in full there and see the whole report, with each finding as a
+row (the same component, and the same rows, as Org Optimizer's Health Check section); after
+that the button reads **Run Again**. Until
+Health Check has run once, Home says so and offers **Run Health Check**. A run by
 someone without the **Manage BarnCRM Settings** permission is not kept as the last result,
 because it skips the access checks.
 
-The settings console is the way in that always works, including for staff who do not see
-the home page copy and for an org where someone removed it from the page.
+Org Optimizer is the way in that always works, including for an org where someone removed
+the home page copy from the page.
 
 To act on a finding you need the **Manage BarnCRM Settings** permission, which the
 BarnCRM Admin role includes. Without it you can still read most of the report: the page says
@@ -58,8 +65,8 @@ Maria has just installed BarnCRM into her organization's Salesforce org. Person 
 are on, and nothing else that keeps households is installed. She has not set anything up
 yet.
 
-1. Maria opens the **BarnCRM Admin** app, clicks **BarnCRM Settings**, and chooses
-   **Health**.
+1. Maria opens the **BarnCRM Admin** app, clicks **Org Optimizer**, chooses **Health
+   Check**, and clicks **Run Health Check**.
 2. The first card is **What We Found in Your Org**. It says Person Accounts are enabled.
    Under it, the card shows the mode this org is in now and the mode BarnCRM recommends:
    **Standalone**.
@@ -70,20 +77,22 @@ yet.
    sentence, adds that BarnCRM supports this org shape directly, and says that Shield
    Platform Encryption cannot be detected from inside the app. If her org uses it, she should
    say so before she loads data.
-5. The next finding is amber: **Coexistence mode is not confirmed yet**. It explains which
+5. The next finding is amber: **Coexistence Mode Is Not Confirmed Yet**. It explains which
    mode BarnCRM recommends for what it found. There is a button, **Use Recommended Mode**.
-6. Maria clicks **Use Recommended Mode**. The page saves Standalone and re-runs. The amber
-   finding is replaced by a blue one: **Coexistence mode matches your org**. If household
+6. Maria clicks **Use Recommended Mode**. The confirm box says what changes, starting
+   **Coexistence mode (how BarnCRM shares people and households with NPSP or Nonprofit Cloud)
+   changes from**, and she clicks **Confirm**. The page saves Standalone and re-runs. The amber
+   finding is replaced by a blue one: **Coexistence Mode Matches Your Org**. If household
    membership were still set to the person's account, the red finding **Household
    membership does not fit Person Accounts** would offer its own one-click fix.
-7. Under **Access** there is a red finding: **No one is assigned the BarnCRM Admin role**.
+7. Under **Access** there is a red finding: **No One Is Assigned the BarnCRM Admin Role**.
    She clicks **Open the Access Page**, which takes her to the Access section of BarnCRM
-   Settings, adds herself, and comes back to Health.
-8. Another finding is amber: **4 users cannot see the app**. Four active users have a
+   Settings, adds herself, and comes back to Org Optimizer's Health Check.
+8. Another finding is amber: **4 Users Cannot See the App**. Four active users have a
    Salesforce license but none of the BarnCRM roles, so the BarnCRM app is invisible to
    them. She clicks **Open the Access Page** again and assigns roles.
-9. She clicks **Re-Run**. The red finding is gone, the amber ones are gone, and what is left
-   is blue: her org shape, the mode, and **Automation is running normally**.
+9. She clicks **Run Again**. The red finding is gone, the amber ones are gone, and what is left
+   is blue: her org shape, the mode, and **Automation Is Running Normally**.
 
 Total time: about five minutes, most of it assigning roles.
 
@@ -115,36 +124,39 @@ Nothing is broken today.
 | Settings | Whether anybody is in no household while every new person is meant to get one. |
 | Settings | Whether any household has nobody in it. |
 | Settings | Whether any relationship has no person on one side, or any affiliation has no person, because the person was deleted. |
-| Settings | Whether your org uses a custom fiscal year (**Your org uses a custom fiscal year**, information only). BarnCRM totals for this year, last year and two years ago run in whole years from the month your fiscal year starts in Setup; reports filtered or grouped by fiscal year follow your custom periods, so where a custom year starts on another day or is not twelve months long, the two can disagree. Only Setup can change it, so there is no fix button. With a standard fiscal year there is nothing to report: BarnCRM uses the same fiscal year as your reports. |
-| Settings | Whether you can use the record type chosen in **Record type for organizations** (**You cannot use the record type for organizations**, a warning). BarnCRM's permission sets give no Account record type, so after an upgrade from a version that shipped Organization the record type stays but the access goes. Give it on the profiles or permission sets of everyone who creates organizations, or choose one they have; see [BarnCRM Settings](barncrm-settings.md#record-type-for-organizations). Health Check can only read your own access, so check the others' profiles too. |
+| Settings | Whether your org uses a custom fiscal year (**Your Org Uses a Custom Fiscal Year**, information only). BarnCRM totals for this year, last year and two years ago run in whole years from the month your fiscal year starts in Setup; reports filtered or grouped by fiscal year follow your custom periods, so where a custom year starts on another day or is not twelve months long, the two can disagree. Only Setup can change it, so there is no fix button. With a standard fiscal year there is nothing to report: BarnCRM uses the same fiscal year as your reports. |
+| Settings | Whether you can use the record type chosen in **Record type for organizations** (**You Cannot Use the Record Type for Organizations**, a warning). BarnCRM's permission sets give no Account record type, so after an upgrade from a version that shipped Organization the record type stays but the access goes. Give it on the profiles or permission sets of everyone who creates organizations, or choose one they have; see [BarnCRM Settings](barncrm-settings.md#record-type-for-organizations). Health Check can only read your own access, so check the others' profiles too. |
 | Settings | With Giving: whether receipts have been voided with the reason "Generation failed", which is a receipt run that did not finish. |
 | Settings | With the Rollup Builder module: whether any of the totals BarnCRM ships are missing from the Rollup Builder. |
 | Settings | Whether any BarnCRM automation is missing its on and off switch on the Automation page. |
 | Settings | Whether any import template BarnCRM ships is missing from the Import page. |
-| Settings | Whether any BarnCRM nightly job is not scheduled: the seasonal address swap (only while **Turn On Seasonal Addresses** is on), the error digest, the empty household tidy-up and the Setup changes copy (see [Setup Changes](setup-changes.md)), plus the nightly jobs of any module that registers them. With the Rollup Builder module that is the rollup recalculation. With Giving that is the installment top up, the installments overdue pass and the donor levels pass. With Mirror it is the Opportunity mirror's nightly run, and only once a mirror direction is chosen. The acknowledgment send is never listed, because it emails donors: schedule it yourself on its own page when you want it. |
+| Settings | Whether the one nightly run, **BarnCRM Nightly Jobs**, or the hourly tab access check is not scheduled. The nightly run takes every BarnCRM nightly job in turn, Core's and each installed module's (see [Nightly Jobs](nightly-jobs.md)); each job is switched on and off on its own page. |
 | Settings | Whether any scheduled BarnCRM job belongs to a person who has been deactivated. A scheduled job runs as the person who scheduled it, and stops running the day that person is deactivated, while it still looks scheduled on its page. |
 | Settings | Whether Core or any installed module never ran the setup steps its package install runs, which happens when source is copied into an org by hand (**Setup never ran for** followed by the names). Its **Finish Setup** button runs those steps. |
 | Settings | With the Rollup Builder module: whether a total is set to be recalculated nightly while the nightly run is not scheduled. |
 | Settings | With the Rollup Builder module: whether totals waiting in the rollup queue failed five times (the Error Log says why), or have waited more than an hour. **Open Needs attention** takes you to the Rollup Builder, where **Retry** and **Start Now** put them through again. |
 | Settings | With Giving: whether any gift dated in a closed accounting period has not been marked posted to accounting. |
 | Settings | With Mirror: whether the Opportunity mirror's nightly run is scheduled but has not completed a run for more than two days. |
+| Settings | With Mirror, in an org with Nonprofit Cloud fundraising: the same question for the Gift Transaction mirror. |
 | Settings | With Volunteers: hours waiting more than 14 days for approval, past shifts nobody closed, shift schedules that have not created shifts far enough ahead, and shipped volunteer totals turned off. See [Volunteers, Health Check findings](volunteers.md#health-check-findings). |
 | Access | With Volunteers: whether anyone holding the Coordinator role is missing the Volunteers Coordinator permission set. |
 | Settings | With Programs: enrollments still open in a program that has ended. See [Programs, Health Check](programs.md#health-check). |
+| Your Org | With Programs: whether your org also has Nonprofit Cloud Program Management. Information only: choose one for each program. See [Programs, Health Check](programs.md#health-check). |
 
-Four of those need a module: the Override Receipt Lock permission, the failed receipts, the
-unposted gifts in a closed period (all with Giving), and the stalled Opportunity mirror (with
-Mirror). Each one is a quiet problem, where nothing looks broken and the cost arrives months
-later, so each is explained in full below.
+Five of those need a module: the Override Receipt Lock permission, the failed receipts, the
+unposted gifts in a closed period (all with Giving), and the stalled Opportunity and Gift
+Transaction mirrors (with Mirror). Each one is a quiet problem, where nothing looks broken and
+the cost arrives months later, so each is explained in full below.
 
-## The Four Quiet Findings
+## The Five Quiet Findings
 
 | Finding | What it means | Why it matters | What to do |
 |---|---|---|---|
-| **Someone can override the receipt lock** (with Giving) | One or more active people hold the **Override Receipt Lock** permission. BarnCRM ships it assigned to nobody. | That permission is the only way to change or delete a gift that carries a receipt number. It is meant to be granted in Setup for one correction and removed the same day. Left assigned, the guarantee that a receipted gift cannot change quietly stops being a guarantee, and nothing in the app will tell you again. | Read the names in the finding. If nobody is in the middle of a correction right now, open **Setup, Custom Permissions, Override Receipt Lock** and take it off the permission set or profile that grants it. Every change made with it is already in the Error Log at Warning severity, so you can see what it was used for. |
-| **Receipts failed to generate** (with Giving) | There are receipts with status **Void** and the reason **Generation failed**. | Every receipt number is used once. When a document fails to generate after its number was handed out, BarnCRM records the number as a void receipt so an auditor asking what happened to number 47 gets an answer. One of those is ordinary. A number of them means receipt generation is failing over and over, donors are not getting the documents they are waiting for, and nobody has looked. | Open the Error Log from the finding and read the receipt entries: they say what failed. Fix the cause (most often a missing letter template or a donor with no address), then re-run the receipt or the statement run. The void records stay: they are the audit trail for the numbers that were consumed, and deleting them is not a fix. |
-| **Gifts in a closed period are not posted** (with Giving) | One or more gifts are dated on or before **Books Closed Through**, so they are already locked from editing, but nothing has marked them **Posted to Accounting**. | A gift in this state fell into a closed period without the ordinary export-and-mark step ever reaching it: the period was closed before it was exported, or it was entered after the close. Either way, your books and BarnCRM can quietly disagree about what has actually been recorded, and the gift is now locked, so nobody can fix it by editing the gift itself. | Read the linked gifts. If they genuinely belong in the export you already sent your accounting system, mark them posted from the **Accounting Export** page in Mirror. Without Mirror, or if they should not have been closed yet, move **Books Closed Through** back on the Accounting Periods page, which needs the **Override Posting Lock** permission and is written to the Error Log. The **Open Giving settings** button on the finding opens the Giving section, which the Accounting Periods page lives in. |
-| **The Opportunity mirror has not run** (with Mirror) | The Opportunity mirror's nightly run is scheduled and a direction is chosen, but no run has completed for more than two days. | The scheduled run executes as the person who scheduled it. When that person is deactivated, or loses the Opportunity Mirror permission set or Opportunity access, every run fails before it starts, and gifts and Opportunities quietly drift apart. | Open **Opportunity mirror** from the Giving section of BarnCRM Settings, read **Last completed run**, then **Stop Nightly Run** and **Schedule nightly** again as someone who can still run it. The Error Log says why the runs failed. |
+| **Someone Can Override the Receipt Lock** (with Giving) | One or more active people hold the **Override Receipt Lock** permission. BarnCRM ships it assigned to nobody. | That permission is the only way to change or delete a gift that carries a receipt number. It is meant to be granted in Setup for one correction and removed the same day. Left assigned, the guarantee that a receipted gift cannot change quietly stops being a guarantee, and nothing in the app will tell you again. | Read the names in the finding. If nobody is in the middle of a correction right now, open **Setup, Custom Permissions, Override Receipt Lock** and take it off the permission set or profile that grants it. Every change made with it is already in the Error Log at Warning severity, so you can see what it was used for. |
+| **Receipts Failed to Generate** (with Giving) | There are receipts with status **Void** and the reason **Generation failed**. | Every receipt number is used once. When a document fails to generate after its number was handed out, BarnCRM records the number as a void receipt so an auditor asking what happened to number 47 gets an answer. One of those is ordinary. A number of them means receipt generation is failing over and over, donors are not getting the documents they are waiting for, and nobody has looked. | Open the Error Log from the finding and read the receipt entries: they say what failed. Fix the cause (most often a missing letter template or a donor with no address), then re-run the receipt or the statement run. The void records stay: they are the audit trail for the numbers that were consumed, and deleting them is not a fix. |
+| **Gifts in a Closed Period Are Not Posted** (with Giving) | One or more gifts are dated on or before **Books Closed Through**, so they are already locked from editing, but nothing has marked them **Posted to Accounting**. | A gift in this state fell into a closed period without the ordinary export-and-mark step ever reaching it: the period was closed before it was exported, or it was entered after the close. Either way, your books and BarnCRM can quietly disagree about what has actually been recorded, and the gift is now locked, so nobody can fix it by editing the gift itself. | Read the linked gifts. If they genuinely belong in the export you already sent your accounting system, mark them posted from the **Accounting Export** page in Mirror. Without Mirror, or if they should not have been closed yet, move **Books Closed Through** back on the Accounting Periods page, which needs the **Override Posting Lock** permission and is written to the Error Log. The **Open Giving settings** button on the finding opens the Giving section, which the Accounting Periods page lives in. |
+| **The Opportunity Mirror Has Not Run** (with Mirror) | The Opportunity mirror's nightly run is scheduled and a direction is chosen, but no run has completed for more than two days. | The scheduled run executes as the person who scheduled it. When that person is deactivated, or loses the Opportunity Mirror permission set or Opportunity access, every run fails before it starts, and gifts and Opportunities quietly drift apart. | Open **Opportunity mirror** from the Giving section of BarnCRM Settings, read **Last completed run**, then **Stop Nightly Run** and **Schedule nightly** again as someone who can still run it. The Error Log says why the runs failed. |
+| **The Gift Transaction Mirror Has Not Run** (with Mirror) | The Gift Transaction mirror's nightly run is scheduled and its direction is chosen, but no run has completed for more than two days. | The same as for the Opportunity mirror: the run executes as the person who scheduled it, and without their access, or the Fundraising User permission in Nonprofit Cloud, gifts and Nonprofit Cloud's donor summaries quietly drift apart. A run that had to leave some gifts for want of room is not counted as completed either. | Open **Gift Transaction Mirror** from the Giving section of BarnCRM Settings, read **Last completed run** and the Error Log, then **Stop Nightly Run** and **Schedule Nightly Run** again as someone who can still run it ([Gift Transaction Mirror](gift-transaction-mirror.md)). |
 
 With Rollup Builder in an org that also runs DLRS, Health Check warns **BarnCRM and DLRS fill
 the same field** when an active BarnCRM rollup and an active DLRS rollup write the same field,
@@ -157,7 +169,7 @@ off. See
 Most buttons open a page. A button that changes something in your org works like this:
 
 1. The finding says exactly what the fix will do, counted from your org: for example, with
-   Giving, **3 shipped totals are missing**, followed by their names (Total Gifts, Largest
+   Giving, **3 Shipped Totals Are Missing**, followed by their names (Total Gifts, Largest
    Gift, Last Gift Date) and what the fix will create.
 2. Click the button. A dialog headed **Before This Fix Runs** opens over the page and shows
    that sentence again with **Confirm** and **Cancel**. Nothing has changed yet. **Cancel**,
@@ -185,10 +197,10 @@ undone on their own page:
 | **Shipped totals are missing** | Creates the missing totals exactly as shipped. Each one starts calculating straight away, as it would have from install. Your own totals are not touched, and a shipped total whose field one of your own active totals already writes is skipped and named, so the two never overwrite each other. | Switch a total off in the Rollup Builder. Do not delete it: a deleted shipped total comes back the next time totals are restored or the package is upgraded (see Rollups). |
 | **Automation switches are missing** | Creates the missing switches, each set to its shipped default, so nothing that runs now stops. An automation that always runs (with Giving, such as the receipt lock) is listed with its switch locked. | Switch any automation off on the Automation page. |
 | **Shipped import templates are missing** | Creates the missing templates. | There is no undo in the app: the Import page cannot delete or switch off a template. A template does nothing until somebody picks it for an import. |
-| **Nightly jobs are not scheduled** | Schedules every job the finding lists, each at its usual time, to run as you. A job that is already scheduled is left alone. | Stop any one of them on its own page: the Rollup Builder, the Addresses section and the Error Log section of BarnCRM Settings, the Nightly jobs page for Giving, and the Opportunity mirror page for Mirror. |
-| **Scheduled jobs belong to a deactivated person** | Stops each job the finding lists and schedules it again at its usual time, to run as you. The end of a running automation pause is scheduled again too. A job Health Check never schedules for you, such as the acknowledgment send (it emails donors), is stopped and named, so you can schedule it again on its own page. | Stop any one of them on its own page, as for the finding above. |
+| **Nightly Jobs Are Not Scheduled** | Replaces any job still scheduled on its own from an earlier version, then schedules the nightly run and the hourly check, to run as you. One already scheduled is left alone. | Switch any one job off on its own page: the Rollup Builder, the Addresses section and the Error Log section of BarnCRM Settings, the Nightly jobs page for Giving, and the Opportunity mirror page for Mirror. The **Nightly Jobs** panel on the General section lists them all. |
+| **Scheduled Jobs Belong to a Deactivated Person** | Stops each job the finding lists and schedules it again at its usual time, to run as you. The end of a running automation pause is scheduled again too. A job Health Check never schedules for you, such as the acknowledgment send (it emails donors), is stopped and named, so you can schedule it again on its own page. | Stop any one of them on its own page, as for the finding above. |
 | **Setup never ran for** a package (Core or a module) | Runs the setup steps the package's install runs, for every package the finding names, with you standing in for the installer, then records that they ran: for Core, its automation switches, import templates, coexistence mode, hourly tab access check and your BarnCRM Admin access; for a module, its own switches, templates, shipped totals and records, and its administrator access. The panel says **Done. Setup steps ran for:** and the names. This is a recovery step for source copied into an org by hand: install BarnCRM as packages, which run these steps themselves. The same button is on the module's row on the Modules page. | Each step only adds what is missing, so there is nothing to undo; switch off anything you do not want on its own page. |
-| **Coexistence mode is not confirmed**, **Household membership does not fit Person Accounts**, **No new person is getting a household** | As described in the walkthrough and Common mistakes. | Change the setting back in BarnCRM Settings. |
+| **Coexistence Mode Is Not Confirmed**, **Household Membership Does Not Fit Person Accounts**, **No New Person Is Getting a Household** | As described in the walkthrough and Common mistakes. | Change the setting back in BarnCRM Settings. |
 | **Volunteer coordinators do not have the Volunteers Coordinator permission set** (with Volunteers) | Gives each person the finding names the Volunteers set their role calls for, in the background, within about a minute. | Remove the permission set assignment in Setup. The hourly access check gives it back while the person holds the role, so take the role away on the Access page instead. |
 
 Some findings deliberately have no fix button, because the answer is yours to choose: who
@@ -207,7 +219,7 @@ the records themselves.
 | Finding | Who is counted | Who is not counted | What to do |
 |---|---|---|---|
 | **People are not in a household** (amber) | With household membership on the person's account: every contact with no account. With membership records: every person, contact or person account, with no current membership (no end date, or one still to come). | A contact whose account is an organization: that person belongs to the organization. With membership records, a contact linked straight to a household: the separate membership finding covers it. Nobody at all while automatic household creation is off, because then a person without a household is your choice. | Open each linked person. With membership on the account, set the account to a household. With membership records, add them from the household's members panel. |
-| **Households have nobody in them** (blue) | Households with no contact on them, or with membership records, no current member. | Organizations. | Open each linked household and add a member, merge it into another household, or delete it. Some are kept on purpose, for example when **Delete Empty Households** is off (BarnCRM Settings, People and Households), or when merging two people emptied it: a merge never deletes a household, because records can still point at it, so merge it into the kept person's household (see Duplicates). A household kept because gifts or other records are credited to it, such as volunteer hours, is kept on purpose too: deleting it removes that link from those records. |
+| **Households have nobody in them** (blue) | Households with no contact on them, or with membership records, no current member. | Organizations. | Open each linked household and add a member, merge it into another household, or delete it. Some are kept on purpose, for example when **Delete empty households** is off (BarnCRM Settings, People and Households), or when merging two people emptied it: a merge never deletes a household, because records can still point at it, so merge it into the kept person's household (see Duplicates). A household kept because gifts or other records are credited to it, such as volunteer hours, is kept on purpose too: deleting it removes that link from those records. |
 
 Each finding counts up to 1,000 and then says **More than 1,000**, so a large org gets its
 answer quickly, and links the first five records, oldest first. The counts use your own
@@ -260,7 +272,7 @@ list them, because the packaged roles are what the app relies on.
 **Reading the access findings from someone else's screen.** Salesforce only lets a person see
 their own access, so for anyone without the Manage BarnCRM Settings permission Health Check
 skips the two access counts rather than printing a number it cannot stand behind. If the report
-you are looking at says **Only a BarnCRM Admin can see the access checks**, that is why:
+you are looking at says **Only a BarnCRM Admin Can See the Access Checks**, that is why:
 run it again as an administrator.
 
 **Treating the Override Receipt Lock finding as a formality (with Giving).** It is amber rather than red
@@ -286,7 +298,7 @@ installed, because a scheduled job runs as the person who scheduled it. Press **
 nightly jobs** once, as the administrator the jobs should run as. If that person later leaves
 and is deactivated, Health Check says so: press **Schedule Them Again as Me** on that finding.
 
-**Wondering why "Nightly totals are not scheduled" has no button.** It explains what an
+**Wondering why "Nightly Totals Are Not Scheduled" has no button.** It explains what an
 unscheduled rollup run costs you. The button that fixes it is **Schedule All Nightly Jobs**, on
 the nightly jobs finding. The totals finding only appears while at least one total is set to
 Scheduled or Both.

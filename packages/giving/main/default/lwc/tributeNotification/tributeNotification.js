@@ -9,7 +9,7 @@ import MARK_SENT from '@salesforce/label/c.Giving_TributeNotification_MarkSent';
 import SENT from '@salesforce/label/c.Giving_TributeNotification_Sent';
 import NOT_SENT from '@salesforce/label/c.Giving_TributeNotification_NotSent';
 import NOTIFY_PREFIX from '@salesforce/label/c.Giving_TributeNotification_NotifyPrefix';
-import ACTION_FAILED from '@salesforce/label/c.Giving_TributeNotification_ActionFailed';
+import ACTION_FAILED from '@salesforce/label/c.Giving_SoftCredits_ActionFailed';
 import { bodyMessage } from 'c/findCsv';
 
 export default class TributeNotification extends LightningElement {

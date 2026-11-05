@@ -28,7 +28,8 @@ ever missing, the automation still runs, and Health Check names it and offers to
 You will find it in two places:
 
 - **BarnCRM Settings, then Automation.** This is the full page: the list of every
-  automation with its on and off switch, and the pause button.
+  automation with its on and off switch, the pause button, **Catch Up Now**, the people and
+  profiles that pause or bypass automation, and your own flows.
 - **The BarnCRM home page.** While automation is paused, a banner appears at the top
   of the home page telling you what is paused and when it will come back on.
 
@@ -48,18 +49,23 @@ the records in first and the automatic housekeeping to happen afterwards, so not
    automation BarnCRM ships, each with a plain-language description and a switch.
 3. At the top of the page, choose **2 hours** in the **How long** list, then click
    **Pause All Automation**. The page now shows a yellow bar: "Automation is paused until
-   3:40 PM. Paused by Maria Lopez. It turns itself back on then." Every switch in the list
-   is still where you left it: pausing does not change anything you have chosen.
+   3:40 PM. Paused by Maria Lopez. It turns itself back on then." with a **Resume
+   Automation** button inside it. **How long** and **Pause All Automation** are hidden while
+   automation is paused, and **Resume Automation** shows only in that bar, so only the button
+   that does something is ever offered. Every switch in the list is still where you left it:
+   pausing does not change anything you have chosen.
 4. Click **Home**. The same banner appears at the top of the Hub, so anyone else working
    today can see why records are not updating themselves.
 5. Load your spreadsheet. Nothing runs automatically while you do.
 6. Come back to **BarnCRM Settings**, then **Automation**, and click **Resume
-   automation**. The banner disappears and the automation starts running again on the next
+   Automation** in the yellow bar. The banner disappears, **Pause All Automation** is back, and the automation starts running again on the next
    record anyone saves. If you forget this step, nothing breaks: automation turns itself
    back on at the two hour mark, and the change is recorded like any other (see "How long
    a pause lasts" below).
 7. Now switch off a single automation instead. Find **Household upkeep when a person
-   changes** in the list and click its switch to **Off**. Only that one stops running.
+   changes** in the list and click its switch to **Off**. Only that one stops running. For a
+   few seconds a line next to the switch says "Household upkeep when a person changes is
+   off. Turn it back on here." (a screen reader announces it).
    Everything else carries on.
 8. Switch it back **On**. Every change you make here is recorded with your name, the time,
    and what the value was before, so you can always see who changed what.
@@ -82,7 +88,7 @@ with its start and its end.
 Clicking **Resume Automation** early, or pausing again to get more time, replaces the
 scheduled end: the new length counts from the moment you click.
 
-If Health Check says **Automation is paused with no automatic resume**, a pause is in effect
+If Health Check says **Automation Is Paused with No Automatic Resume**, a pause is in effect
 that nothing is set to end: usually one started before this version of BarnCRM, or one
 set somewhere other than this page. Open this page, click **Resume Automation**, and pause
 again for a set time if you still need to.
@@ -113,6 +119,106 @@ With Giving, if you genuinely have to change a receipted gift, there is a way, a
 not on this page. It is the Override Receipt Lock permission, described under "Lifting the
 receipt lock" on the [Gifts page](gifts.md). Every change made with it is written to the
 [Error Log](error-log.md).
+
+## When Automation Fails on One Record
+
+If BarnCRM's automation fails on one record of a larger save, only that record is refused. The
+rest of the save goes ahead. This matters most for the Data Loader, the BarnCRM importer and
+integrations, which save 200 records at a time: one record BarnCRM cannot handle no longer costs
+the other 199 their save.
+
+- The refused record carries the message "Something went wrong while BarnCRM was updating this
+  record, so it was not saved." In the Data Loader it is in the error file; in the importer it
+  is on the row.
+- The [Error Log](error-log.md) has one entry for the failure itself, with the technical
+  detail, and one entry per refused record naming its row in the save. Fix the value it names
+  and save that record again.
+- To find the record, BarnCRM undoes the failed attempt and runs its automation again over
+  smaller and smaller parts of the save. That takes a little longer than a clean save. If the
+  save has too little room left in Salesforce's limits to do it, the records not yet cleared are
+  refused together, still with the message and the log entries.
+- A rule that always runs (see above) is the exception: if it fails, every record in front of
+  it is refused, because a rule that could not be checked lets nothing through.
+
+## Pausing or Bypassing for Some People
+
+The timed pause stops automation for everyone. When only some people's saves should skip it,
+use the **BarnCRM Automation Control** setting. It has two boxes, and each can be set for the
+whole organization, for a profile, or for one user. The value that applies to a save is the
+saving person's own, else their profile's, else the organization's.
+
+- **Bypass**: for an integration user (or its profile) and a migration consultant. Their saves
+  skip BarnCRM automation, while everyone else's run as normal.
+- **Pause All**: the long pause. Set for the whole organization, it stops automation for
+  everyone until you turn it off, for a migration that takes longer than the 24-hour pause.
+  Set for a profile or a user, BarnCRM treats it like Bypass.
+
+Rules that always run (see above) still run, whatever the setting says. The timed pause, the
+switches on this page and this setting all apply together: automation runs only when none of
+them stops it.
+
+You set it on this page, in **Pause or Bypass for Some People**; there is nothing to do in
+Setup. The section lists:
+
+- **Whole Organization** first, always, with both boxes off until you change them. Ticking
+  **Pause All** here pauses automation for everyone until you untick it. While it is on, a
+  yellow bar at the top of the page says so, with a **Turn Off** button.
+- then each profile and each user that has its own row, with their **Pause All** and
+  **Bypass** boxes and a **Remove** button.
+
+To add one, choose **Profile** or **User** under **Add a Profile or User**, pick the profile or
+the person, and select **Add**. The new row starts with **Bypass** ticked, the usual reason to
+add one; change either box at any time. Each box saves as soon as you click it, and every
+change is recorded with your name and the value before, like the switches below. **Remove**
+deletes the row, so that profile or person follows the organization's row again.
+
+A profile or user row replaces the organization's row for those people, both boxes together.
+So a row with both boxes off keeps automation running for them even while **Pause All** is on
+for the whole organization: use that to keep, say, your own admin profile running during a
+long pause.
+
+### Using It in Your Own Flows, Triggers and Validation Rules
+
+Your own automation can follow the same setting, so one place pauses or bypasses everything
+your organization has:
+
+- **A validation rule or formula:** add `NOT($Setup.BarnCRM_Automation_Control__c.Bypass__c) &&`
+  in front of the condition, or check `Pause_All__c` the same way.
+- **A flow:** start it with a **Decision** on
+  `{!$Setup.BarnCRM_Automation_Control__c.Pause_All__c}` or `Bypass__c` equals true, ending the
+  flow on that outcome, as every BarnCRM flow template does. To follow the timed pause and a
+  switch on this page as well, start it with the **Check BarnCRM Automation** action instead
+  and end the flow when **Run** is false.
+- **An Apex trigger:** read `BarnCRM_Automation_Control__c.getInstance()` and return early when
+  `Pause_All__c` or `Bypass__c` is true.
+
+### Listing Your Own Flows on This Page
+
+In **Your Own Flows**, pick one of your organization's active flows and select **Add**. It joins
+the list of automations with its own switch, named `Flow:` and the flow's API name (for example
+`Flow:My_Gift_Flow`), and its description says the same. **Remove** takes it off the list
+again. Listing or removing a flow never activates, deactivates or changes the flow itself.
+
+The switch works when your flow starts with the **Check BarnCRM Automation** action, with
+**Automation Name** set to that same name, and ends when **Run** is false. Then switching it
+off here stops the flow, and so do the timed pause and the BarnCRM Automation Control setting.
+A listed flow that does not call the action is on the list for the record only: its switch
+does nothing.
+
+### Catching Up After a Pause or a Bypassed Load
+
+BarnCRM does not record each save it skipped, so nothing is replayed record by record. When
+the timed pause ends, by itself or with **Resume Automation**, BarnCRM gives a household to
+every person added without one and works the rollup totals that waited. After a long Pause All
+or a bypassed load, select **Catch Up Now** on this page once automation runs again: it does
+the same, and also recomputes every household's name and greetings (a household marked as a
+custom name keeps its wording). It runs in the background, and the page says it has started.
+Selecting it again while a catch-up is still waiting or running does nothing but say "A
+catch-up is already running", so two runs never overlap.
+Anything else that was skipped (a preferred email or phone copied to the
+standard field, an address copied to its household, the other side of a relationship) is caught
+up by saving those records again, for example with **Bulk Update** changing nothing but a
+harmless field.
 
 ## Running Your Own Version Instead
 

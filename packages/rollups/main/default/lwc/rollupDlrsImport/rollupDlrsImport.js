@@ -6,9 +6,8 @@ import compare from '@salesforce/apex/RollupDlrsImport.compare';
 import turnOn from '@salesforce/apex/RollupDlrsImport.turnOn';
 
 import TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportTitle';
-import INTRO from '@salesforce/label/c.Core_RollupBuilder_DlrsImportIntro';
 import STEP_CHOOSE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStepChoose';
-import STEP_REVIEW from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStepReview';
+import STEP_REVIEW from '@salesforce/label/c.Core_DuplicateMatching_Review';
 import STEP_COMPARE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStepCompare';
 import STEP_TURN_ON from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStepTurnOn';
 import CAN_COPY from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCanCopy';
@@ -18,29 +17,29 @@ import FILLS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportFills';
 import BECOMES from '@salesforce/label/c.Core_RollupBuilder_DlrsImportBecomes';
 import NO_CHANGES from '@salesforce/label/c.Core_RollupBuilder_DlrsImportNoChanges';
 import COPY from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCopy';
-import NEXT from '@salesforce/label/c.Core_RollupBuilder_DlrsImportNext';
-import BACK from '@salesforce/label/c.Core_RollupBuilder_DlrsImportBack';
-import CLOSE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportClose';
-import FINISH from '@salesforce/label/c.Core_RollupBuilder_DlrsImportFinish';
+import NEXT from '@salesforce/label/c.Core_Import_NextButton';
+import BACK from '@salesforce/label/c.Core_Kit_Back';
+import CLOSE from '@salesforce/label/c.Core_BulkUpdate_Close';
+import FINISH from '@salesforce/label/c.Core_SetupAssistant_FinishButton';
 import COMPARE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCompare';
-import TURN_ON from '@salesforce/label/c.Core_RollupBuilder_DlrsImportTurnOn';
+import TURN_ON from '@salesforce/label/c.Core_ModuleManager_TurnOnButton';
 import CREATED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCreated';
 import UPDATED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportUpdated';
 import REFUSED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportRefused';
 import NOT_REACHED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportNotReached';
 import ACTIVE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportActive';
 import NOTHING_COPIED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportNothingCopied';
-import RECORD from '@salesforce/label/c.Core_RollupBuilder_DlrsImportRecord';
+import RECORD from '@salesforce/label/c.Core_BulkUpdate_Record';
 import VALUE_NOW from '@salesforce/label/c.Core_RollupBuilder_DlrsImportValueNow';
 import VALUE_BARN from '@salesforce/label/c.Core_RollupBuilder_DlrsImportValueBarn';
-import RESULT from '@salesforce/label/c.Core_RollupBuilder_DlrsImportResult';
+import RESULT from '@salesforce/label/c.Core_Find_Result';
 import SAME from '@salesforce/label/c.Core_RollupBuilder_DlrsImportSame';
 import NO_RECORDS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportNoRecords';
-import FINISH_HINT from '@salesforce/label/c.Core_RollupBuilder_DlrsImportFinishHint';
 import FINISHED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportFinished';
 import CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
 import CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const CHOOSE_STEP = 'choose';
 const REVIEW_STEP = 'review';
@@ -65,12 +64,16 @@ const format = (template, ...values) =>
  * every copy is on; Close leaves the copies switched off. DLRS itself is never changed.
  */
 export default class RollupDlrsImport extends LightningElement {
+  helpReady = isHelpLoaded('Rollups');
+
   /** The Builder's model, for the names of the totals. */
   @api model;
 
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Rollups', 'Core_RollupBuilder_DlrsImportIntro');
+    },
     canCopy: CAN_COPY,
     stays: STAYS,
     noneActive: NONE_ACTIVE,
@@ -88,7 +91,9 @@ export default class RollupDlrsImport extends LightningElement {
     valueBarn: VALUE_BARN,
     result: RESULT,
     noRecords: NO_RECORDS,
-    finishHint: FINISH_HINT
+    get finishHint() {
+      return helpText('Rollups', 'Core_RollupBuilder_DlrsImportFinishHint');
+    }
   };
 
   steps = [
@@ -108,6 +113,11 @@ export default class RollupDlrsImport extends LightningElement {
   error;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Rollups').then(() => {
+        this.helpReady = true;
+      });
+    }
     getCandidates()
       .then((candidates) => {
         this.candidates = candidates || [];

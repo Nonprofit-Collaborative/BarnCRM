@@ -4,6 +4,9 @@ import getModel from '@salesforce/apex/LogicModelBuilderController.getModel';
 import getPrograms from '@salesforce/apex/LogicModelBuilderController.getPrograms';
 import setProgram from '@salesforce/apex/LogicModelBuilderController.setProgram';
 import saveElement from '@salesforce/apex/LogicModelBuilderController.saveElement';
+import { downloadCsv } from 'c/findCsv';
+
+jest.mock('c/findCsv', () => ({ ...jest.requireActual('c/findCsv'), downloadCsv: jest.fn() }));
 
 jest.mock('@salesforce/apex/LogicModelBuilderController.getModel', () => ({ default: jest.fn() }), {
   virtual: true
@@ -72,6 +75,7 @@ async function render(value = model()) {
 
 const q = (element, id) => element.shadowRoot.querySelector(`[data-id="${id}"]`);
 const qa = (element, id) => element.shadowRoot.querySelectorAll(`[data-id="${id}"]`);
+const errorText = (element) => q(element, 'error-message').querySelector('c-barn-notice').message;
 
 describe('c-logic-model-builder', () => {
   afterEach(() => {
@@ -147,7 +151,7 @@ describe('c-logic-model-builder', () => {
     await flush();
     q(element, 'add-save').click();
     await flush();
-    expect(q(element, 'error-message').textContent.trim()).toBe('Name is required.');
+    expect(errorText(element)).toBe('Name is required.');
     q(element, 'add-cancel').click();
     await flush();
     expect(q(element, 'add-form')).toBeNull();
@@ -176,15 +180,81 @@ describe('c-logic-model-builder', () => {
     expect(qa(element, 'add')).toHaveLength(0);
   });
 
+  it('downloads the results sheet, or says there is nothing to fill in', async () => {
+    const empty = await render();
+    q(empty, 'download-results').click();
+    await flush();
+    expect(downloadCsv).not.toHaveBeenCalled();
+    expect(errorText(empty)).toBe('c.LogicModels_Results_None');
+    document.body.removeChild(empty);
+
+    const element = await render(
+      model({
+        elements: [{ id: 'o1', name: 'Sessions held', type: 'Output', sortOrder: 10 }],
+        indicators: [
+          {
+            id: 'i1',
+            elementId: 'o1',
+            name: 'Sessions',
+            source: 'Import',
+            periods: [{ id: 'p1', name: 'Q1', startDate: '2026-01-01', endDate: '2026-03-31' }]
+          }
+        ]
+      })
+    );
+    q(element, 'download-results').click();
+    expect(downloadCsv).toHaveBeenCalledTimes(1);
+    const [fileBase, columns, rows] = downloadCsv.mock.calls[0];
+    expect(fileBase).toBe('Indicator_Results');
+    expect(columns[0].label).toBe('Period Id');
+    expect(rows).toEqual([expect.objectContaining({ periodId: 'p1', model: 'Reading' })]);
+  });
+
+  it('offers no results sheet to a reader', async () => {
+    const element = await render(model({ canEdit: false }));
+    expect(q(element, 'download-results')).toBeNull();
+  });
+
   it('shows a failed load', async () => {
     getModel.mockRejectedValue(new Error('down'));
     const element = createElement('c-logic-model-builder', { is: LogicModelBuilder });
     element.recordId = MODEL_ID;
     document.body.appendChild(element);
     await flush();
-    expect(q(element, 'error-message').textContent.trim()).toBe(
-      'c.LogicModels_Builder_ActionFailed'
-    );
+    expect(errorText(element)).toBe('c.LogicModels_Builder_ActionFailed');
     expect(q(element, 'columns')).toBeNull();
+  });
+
+  it('draws the chain of the selected part and dims the rest', async () => {
+    const element = await render(
+      model({
+        elements: [
+          { id: 'e1', name: 'Tutors', type: 'Input', sortOrder: 10 },
+          { id: 'a1', name: 'Sessions', type: 'Activity', sortOrder: 10 },
+          { id: 'a2', name: 'Calls', type: 'Activity', sortOrder: 20 }
+        ],
+        links: [{ id: 'l1', fromId: 'e1', toId: 'a1' }]
+      })
+    );
+    const counts = Array.from(qa(element, 'column-count')).map((badge) => badge.label);
+    expect(counts).toEqual(['1', '2', '0', '0', '0', '0', '0']);
+    q(element, 'part').click();
+    await flush();
+    const classes = Array.from(qa(element, 'part')).map((part) => part.className);
+    expect(classes).toEqual(['part part_selected', 'part part_linked', 'part part_dimmed']);
+  });
+
+  it('takes focus to the details on select and back to the part with Back to the Model', async () => {
+    const element = await render();
+    const part = q(element, 'part');
+    part.click();
+    await flush();
+    const panel = q(element, 'selected-part');
+    expect(panel.shadowRoot.activeElement).toBe(
+      panel.shadowRoot.querySelector('[data-id="part-heading"]')
+    );
+    panel.dispatchEvent(new CustomEvent('back'));
+    await flush();
+    expect(element.shadowRoot.activeElement).toBe(part);
   });
 });

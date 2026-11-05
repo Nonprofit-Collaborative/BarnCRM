@@ -1,0 +1,151 @@
+<template>
+  <lightning-card title={labels.title} icon-name="standard:currency">
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
+      </template>
+
+      <template lwc:if={hasSchedule}>
+        <dl
+          class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small"
+          data-id="totals"
+        >
+          <div class="slds-col slds-size_1-of-3">
+            <dt class="slds-text-title">{heading.awarded}</dt>
+            <dd>
+              <lightning-formatted-number
+                data-id="awarded"
+                value={schedule.amountAwarded}
+                format-style="currency"
+              ></lightning-formatted-number>
+            </dd>
+          </div>
+          <div class="slds-col slds-size_1-of-3">
+            <dt class="slds-text-title">{heading.scheduled}</dt>
+            <dd>
+              <lightning-formatted-number
+                data-id="scheduled"
+                value={schedule.amountScheduled}
+                format-style="currency"
+              ></lightning-formatted-number>
+            </dd>
+          </div>
+          <div class="slds-col slds-size_1-of-3">
+            <dt class="slds-text-title">{heading.received}</dt>
+            <dd>
+              <lightning-formatted-number
+                data-id="received"
+                value={schedule.amountReceived}
+                format-style="currency"
+              ></lightning-formatted-number>
+            </dd>
+          </div>
+        </dl>
+
+        <template lwc:if={hasPayments}>
+          <div class="slds-scrollable_x">
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered" data-id="payments">
+              <thead>
+                <tr class="slds-line-height_reset">
+                  <th scope="col">{heading.dueDate}</th>
+                  <th scope="col">{heading.amount}</th>
+                  <th scope="col">{heading.status}</th>
+                  <th scope="col"><span class="slds-assistive-text">{labels.markReceived}</span></th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={payments} for:item="payment">
+                  <tr key={payment.id} data-id="payment">
+                    <td>
+                      <lightning-formatted-date-time
+                        value={payment.dueDate}
+                        time-zone="UTC"
+                      ></lightning-formatted-date-time>
+                    </td>
+                    <td>
+                      <lightning-formatted-number
+                        value={payment.amount}
+                        format-style="currency"
+                      ></lightning-formatted-number>
+                    </td>
+                    <td>{payment.status}</td>
+                    <td>
+                      <template lwc:if={payment.canMarkReceived}>
+                        <lightning-button
+                          data-id="mark-received"
+                          data-payment-id={payment.id}
+                          label={labels.markReceived}
+                          disabled={isSaving}
+                          onclick={handleMarkReceived}
+                        ></lightning-button>
+                      </template>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </template>
+
+        <template lwc:if={showCannotBuild}>
+          <p data-id="cannot-build" class="slds-text-body_small">{labels.cannotBuild}</p>
+        </template>
+
+        <template lwc:if={canBuild}>
+          <div data-id="build">
+            <lightning-combobox
+              data-id="frequency"
+              label={heading.frequency}
+              options={frequencyOptions}
+              value={frequency}
+              onchange={handleFrequency}
+            ></lightning-combobox>
+            <template lwc:if={hasPreview}>
+              <table
+                class="slds-table slds-table_cell-buffer slds-var-m-top_x-small"
+                data-id="preview"
+              >
+                <thead>
+                  <tr class="slds-line-height_reset">
+                    <th scope="col">{heading.dueDate}</th>
+                    <th scope="col">{heading.amount}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={preview} for:item="row">
+                    <tr key={row.key} data-id="preview-row">
+                      <td>
+                        <lightning-formatted-date-time
+                          value={row.dueDate}
+                          time-zone="UTC"
+                        ></lightning-formatted-date-time>
+                      </td>
+                      <td>
+                        <lightning-formatted-number
+                          value={row.amount}
+                          format-style="currency"
+                        ></lightning-formatted-number>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </template>
+            <lightning-button
+              data-id="build-schedule"
+              class="slds-var-m-top_small"
+              variant="brand"
+              label={labels.build}
+              disabled={buildDisabled}
+              onclick={handleBuild}
+            ></lightning-button>
+          </div>
+        </template>
+      </template>
+    </div>
+  </lightning-card>
+</template>

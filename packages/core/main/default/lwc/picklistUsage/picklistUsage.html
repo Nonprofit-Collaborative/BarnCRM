@@ -1,0 +1,98 @@
+<template>
+    <template lwc:if={helpReady}>
+    <div class="slds-var-m-top_large" data-id="picklist-usage">
+        <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.title}</h3>
+        <p class="slds-var-m-bottom_x-small" data-id="intro">{labels.intro}</p>
+        <lightning-button
+            data-id="show"
+            label={labels.show}
+            disabled={showDisabled}
+            onclick={handleShow}
+        ></lightning-button>
+
+        <template lwc:if={errorMessage}>
+            <c-barn-notice
+                class="slds-var-m-top_small"
+                data-id="error"
+                variant="error"
+                message={errorMessage}
+            ></c-barn-notice>
+        </template>
+        <template lwc:if={showProgress}>
+            <div class="slds-var-m-vertical_small" data-id="progress">
+                <lightning-progress-bar value={progressValue} size="medium"></lightning-progress-bar>
+                <p class="slds-text-body_small slds-var-m-top_xx-small" role="status" aria-live="polite">
+                    {progressText}
+                </p>
+            </div>
+        </template>
+        <template lwc:if={scanning}>
+            <div class="slds-var-m-vertical_small" data-id="dates-progress">
+                <lightning-progress-bar value={scanState.percent} size="medium"></lightning-progress-bar>
+                <p class="slds-text-body_small slds-var-m-vertical_xx-small" role="status" aria-live="polite">
+                    {datesProgressText}
+                </p>
+                <lightning-button
+                    data-id="cancel"
+                    label={labels.cancel}
+                    disabled={cancelRequested}
+                    onclick={handleCancel}
+                ></lightning-button>
+            </div>
+        </template>
+        <template lwc:if={datesStoppedMessage}>
+            <c-barn-notice
+                class="slds-var-m-vertical_small"
+                data-id="dates-stopped"
+                variant="warning"
+                message={datesStoppedMessage}
+            >
+                <template lwc:if={showRetry}>
+                    <lightning-button
+                        class="slds-var-m-top_x-small"
+                        data-id="retry"
+                        label={labels.retry}
+                        onclick={handleRetry}
+                    ></lightning-button>
+                </template>
+            </c-barn-notice>
+        </template>
+        <template lwc:if={showEmpty}>
+            <c-barn-empty-state
+                class="slds-var-m-top_small"
+                data-id="no-fields"
+                size="compact"
+                heading={labels.noFields}
+            ></c-barn-empty-state>
+        </template>
+        <template lwc:if={hasRows}>
+            <p class="slds-text-body_small slds-var-m-vertical_x-small" data-id="note">{labels.note}</p>
+            <lightning-datatable
+                data-id="results"
+                key-field="key"
+                data={tableRows}
+                columns={columns}
+                hide-checkbox-column
+                sorted-by={sortedBy}
+                sorted-direction={sortedDirection}
+                onsort={handleSort}
+            ></lightning-datatable>
+        </template>
+        <template lwc:if={truncatedMessage}>
+            <c-barn-notice
+                class="slds-var-m-top_x-small"
+                data-id="truncated"
+                message={truncatedMessage}
+            ></c-barn-notice>
+        </template>
+        <template lwc:if={notCheckedMessage}>
+            <c-barn-notice
+                class="slds-var-m-top_x-small"
+                data-id="not-checked"
+                variant="warning"
+                message={notCheckedMessage}
+            ></c-barn-notice>
+        </template>
+    </div>
+    </template>
+</template>

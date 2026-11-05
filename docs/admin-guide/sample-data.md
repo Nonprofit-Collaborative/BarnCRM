@@ -61,7 +61,7 @@ there:
 |---|---|---|
 | Skills | 4 | First aid, Spanish, Forklift and Gardening, with the jobs that ask for them |
 | Jobs | 3 | Food pantry sort, Front desk and Community garden, each with a description and a location |
-| Shift schedule | 1 | **Saturday sorting**, every Saturday morning for the pantry. Like any schedule, it creates its shifts as far ahead as the **Weeks Ahead to Create Shifts** setting says |
+| Shift schedule | 1 | **Saturday sorting**, every Saturday morning for the pantry. Like any schedule, it creates its shifts as far ahead as the **Weeks ahead to create shifts** setting says |
 | Shifts | 16, plus the schedule's | A morning shift for each job in each of the last four weeks, marked Completed, and four upcoming shifts on the front desk and in the garden |
 | Sign-Ups | 44 | Three people attended each past shift; two are booked on each upcoming shift, one Confirmed and one Signed up |
 | Hours | 60 | One entry for each attendance and one garden entry for each of 24 sample people. The newest four wait for approval, the next two are Rejected with a reason, and the rest are Approved |
@@ -70,7 +70,7 @@ there:
 
 The hours get their statuses the way a coordinator gives them, so loading needs the **Manage
 Volunteers** permission (Volunteers Admin includes it). Without it the hours keep the status
-they were saved with: Submitted, or Approved when **Require Hours Approval** is off.
+they were saved with: Submitted, or Approved when **Require hours approval** is off.
 
 The set does not generate a letter, because a letter is a file. To see one, open any sample
 volunteer with Approved hours and use the **Volunteer Letter** action with the shipped Hours
@@ -97,6 +97,21 @@ Warning in the [Error Log](error-log.md) names it: "Sample data removal kept the
 programs {names}, because people of your own are enrolled in them or have services recorded in
 them, or a sample enrollment in them has case notes. Move or delete those enrollments, service
 deliveries and case notes, then select Remove Sample Data again."
+
+### With Funders Installed
+
+With the **Funders** package installed, the same action also loads, after Programs if it is
+there:
+
+| Records | How many | What is in them |
+|---|---|---|
+| Grants | 3 | **Capacity Building Grant** (Prospect, deadline in 30 days), **Community Literacy Grant** (Applied) and **Youth Programs Award** (Awarded 35,000, with a one-year award period), to three of the sample organizations, owned by you |
+| Grant requirements | 3 | On the Youth Programs Award: **Site visit** (Accepted, 10 days ago), **Quarter 1 financial report** (In Progress, due in 10 days) and **Interim narrative report** (Not Started, due in 75 days). With reminders on, the next morning's run reminds you about the financial report. |
+| Grant payments | 2 | On the Youth Programs Award, which is **Restricted**: 17,500 at the award start (Received) and 17,500 six months later (Expected). |
+| Restricted fund entries | 2 | On the same award: the first payment's **Received** entry (17,500) and **Spent** 6,000 on tutor stipends, so the **Restricted Balance** is 11,500. |
+
+Removal deletes the sample grants with their requirements, payments and entries; your own grants are never touched. Nothing is loaded for
+Funders when the core sample organizations are not there.
 
 ## 2. How to Turn It On
 

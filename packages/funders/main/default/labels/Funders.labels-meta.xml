@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Funders_Grant_BadProgram</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant Program field holds something that is not a program</shortDescription>
+        <value>Choose the program in the Program card on the grant's page. This is not a program.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_HealthCheck_PastDeadlineTitleOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: one open application past its deadline</shortDescription>
+        <value>1 Grant Application Is Past Its Deadline</value>
+    </labels>
+    <labels>
+        <fullName>Funders_HealthCheck_PastDeadlineTitle</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: open applications past deadline; {0} is how many</shortDescription>
+        <value>{0} Grant Applications Are Past Their Deadline</value>
+    </labels>
+    <labels>
+        <fullName>Funders_HealthCheck_PastDeadlineDetail</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: what open applications past deadline mean</shortDescription>
+        <value>These grants are still at Prospect, Letter of Inquiry or Invited to Apply, but their Application Deadline has passed. Move each to Applied if it went in, set it to Withdrawn if you did not apply, or change the deadline if the funder extended it. The first ones are linked below.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_SampleData_CountLabel</fullName>
+        <categories>SampleData</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sample data card: what the Funders number counts</shortDescription>
+        <value>Grants</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_Title</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant Pipeline tab title</shortDescription>
+        <value>Grant Pipeline</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ScopeEveryone</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Scope choice: all open grants</shortDescription>
+        <value>Everyone</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ScopeMine</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Scope choice: grants the person owns</shortDescription>
+        <value>Mine</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_NewGrant</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button: create a grant</shortDescription>
+        <value>New Grant</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_TileOpen</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Total: number of open grants</shortDescription>
+        <value>Open Requests</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_TileRequested</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Total: amount requested on open grants</shortDescription>
+        <value>Amount Requested</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_TileAwarded</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Total: amount awarded this fiscal year</shortDescription>
+        <value>Awarded This Fiscal Year</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_AwardedDetail</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Under the awarded total; {0} is how many grants</shortDescription>
+        <value>{0} grants awarded</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ColumnEmpty</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A stage column with no grants</shortDescription>
+        <value>No grants at this stage.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_Truncated</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Board shows only some cards; {0} is how many</shortDescription>
+        <value>Showing the first {0} grants. The totals count every open grant.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ReadOnly</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shown to someone who cannot edit grants</shortDescription>
+        <value>You can look at the pipeline but not change it.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_NoFunder</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Card whose funder cannot be shown</shortDescription>
+        <value>Funder not shown</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_Deadlines</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Upcoming deadlines heading</shortDescription>
+        <value>Upcoming Deadlines</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_DaysLeft</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Deadline still ahead; {0} is days</shortDescription>
+        <value>{0} days left</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_DueToday</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Deadline is today</shortDescription>
+        <value>Due today</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_Overdue</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Deadline has passed; {0} is days</shortDescription>
+        <value>{0} days overdue</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_AwardTitle</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Award dialog title</shortDescription>
+        <value>Record the Award</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_AwardAmount</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Award dialog field</shortDescription>
+        <value>Amount Awarded</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ErrorLoad</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The pipeline could not load</shortDescription>
+        <value>The Grant Pipeline could not load. Try again, or ask your admin to look at the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ErrorNoPermission</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The person cannot edit grants</shortDescription>
+        <value>You do not have permission to change grants. Ask your admin for a Funders role.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ErrorStage</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>A move named an unknown stage</shortDescription>
+        <value>Choose one of the grant stages.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_ErrorUnexpected</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Something unexpected went wrong</shortDescription>
+        <value>Something went wrong and the change was not saved. Try again, or ask your admin to look at the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Program_None</fullName>
+        <categories>GrantProgram</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Choice: no program</shortDescription>
+        <value>No program</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Program_NotInstalled</fullName>
+        <categories>GrantProgram</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Shown without the Programs module</shortDescription>
+        <value>Install the Programs module to name the program this grant pays for.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Program_Missing</fullName>
+        <categories>GrantProgram</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The named program cannot be found</shortDescription>
+        <value>The program this grant named has been deleted or you cannot see it. Choose another, or No program.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Program_Saved</fullName>
+        <categories>GrantProgram</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Toast after saving the program</shortDescription>
+        <value>Program saved.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Program_ErrorLoad</fullName>
+        <categories>GrantProgram</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>The Program card could not load</shortDescription>
+        <value>The program could not load. Try again, or ask your admin to look at the Error Log.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_NightlyJobs_RemindersName</fullName>
+        <categories>NightlyJobs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check nightly jobs list: the grant reminder run</shortDescription>
+        <value>Grant Requirement Reminders</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Reminder_TaskSubject</fullName>
+        <categories>Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reminder task subject; {0} requirement, {1} grant</shortDescription>
+        <value>{0} due for {1}</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Reminder_EmailSubject</fullName>
+        <categories>Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reminder email subject; {0} requirement, {1} grant</shortDescription>
+        <value>Coming due: {0} for {1}</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Reminder_Body</fullName>
+        <categories>Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Reminder text; {0} requirement, {1} grant, {2} funder, {3} due date</shortDescription>
+        <value>{0} for the grant {1} from {2} is due on {3}. Open the grant for the instructions, and mark the requirement Submitted when it goes in.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Reminder_TaskFailed</fullName>
+        <categories>Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error Log: tasks not saved; {0} failed, {1} total, {2} reason</shortDescription>
+        <value>{0} of {1} grant requirement reminder tasks could not be saved and will be tried again tomorrow: {2}</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Reminder_StampFailed</fullName>
+        <categories>Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error Log: reminders not stamped; {0} failed, {1} total, {2} reason</shortDescription>
+        <value>{0} of {1} grant requirements could not be marked as reminded and may be reminded again: {2}</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Reminder_SendFailed</fullName>
+        <categories>Reminders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Error Log: emails not sent; {0} failed, {1} total, {2} reason</shortDescription>
+        <value>{0} of {1} grant requirement reminder emails could not be sent: {2}</value>
+    </labels>
+    <labels>
+        <fullName>Funders_HealthCheck_OverdueTitleOne</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: one overdue grant requirement</shortDescription>
+        <value>1 Grant Requirement Is Overdue</value>
+    </labels>
+    <labels>
+        <fullName>Funders_HealthCheck_OverdueTitle</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: overdue grant requirements; {0} is how many</shortDescription>
+        <value>{0} Grant Requirements Are Overdue</value>
+    </labels>
+    <labels>
+        <fullName>Funders_HealthCheck_OverdueDetail</fullName>
+        <categories>HealthCheck</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Health Check: what overdue grant requirements mean</shortDescription>
+        <value>These reports or deliverables are Not Started or In Progress and their due date has passed. Open each: mark it Submitted if it went in, Waived if the funder excused it, or move the due date if the funder agreed a new one.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_MarkSubmitted</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Deadline row button: mark a requirement submitted</shortDescription>
+        <value>Mark Submitted</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_MarkedSubmitted</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Toast after marking a requirement submitted</shortDescription>
+        <value>Marked submitted.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_KindApplication</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Deadline row: an application deadline</shortDescription>
+        <value>Application</value>
+    </labels>
+</CustomLabels>

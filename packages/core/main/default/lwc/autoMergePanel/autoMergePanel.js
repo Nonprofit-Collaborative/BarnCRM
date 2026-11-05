@@ -5,34 +5,21 @@ import preview from '@salesforce/apex/AutoMergeController.preview';
 import startRun from '@salesforce/apex/AutoMergeController.startRun';
 import undoRun from '@salesforce/apex/AutoMergeController.undoRun';
 
-import INTRO from '@salesforce/label/c.Core_AutoMerge_Intro';
-import RULE from '@salesforce/label/c.Core_AutoMerge_Rule';
 import PREVIEW from '@salesforce/label/c.Core_AutoMerge_Preview';
-import REFRESH from '@salesforce/label/c.Core_AutoMerge_Refresh';
-import LOADING from '@salesforce/label/c.Core_AutoMerge_Loading';
-import RUNNING from '@salesforce/label/c.Core_AutoMerge_Running';
+import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import PREVIEW_HEADING from '@salesforce/label/c.Core_AutoMerge_PreviewHeading';
-import NONE from '@salesforce/label/c.Core_AutoMerge_None';
 import KEEP from '@salesforce/label/c.Core_AutoMerge_Keep';
 import MERGE_AWAY from '@salesforce/label/c.Core_AutoMerge_MergeAway';
-import NO_CHANGES from '@salesforce/label/c.Core_AutoMerge_NoChanges';
 import CHANGE from '@salesforce/label/c.Core_AutoMerge_Change';
-import BLANK from '@salesforce/label/c.Core_AutoMerge_Blank';
-import MORE from '@salesforce/label/c.Core_AutoMerge_More';
+import BLANK from '@salesforce/label/c.Core_Find_Blank';
 import MERGE_BUTTON from '@salesforce/label/c.Core_AutoMerge_MergeButton';
 import CONFIRM_HEADING from '@salesforce/label/c.Core_AutoMerge_ConfirmHeading';
-import CONFIRM_BODY from '@salesforce/label/c.Core_AutoMerge_ConfirmBody';
-import CANCEL from '@salesforce/label/c.Core_AutoMerge_Cancel';
-import STARTED from '@salesforce/label/c.Core_AutoMerge_Started';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import RECENT_RUNS from '@salesforce/label/c.Core_AutoMerge_RecentRuns';
-import NO_RUNS from '@salesforce/label/c.Core_AutoMerge_NoRuns';
-import RUN_SUMMARY from '@salesforce/label/c.Core_AutoMerge_RunSummary';
 import UNDO from '@salesforce/label/c.Core_AutoMerge_Undo';
 import UNDO_HEADING from '@salesforce/label/c.Core_AutoMerge_UndoHeading';
-import UNDO_BODY from '@salesforce/label/c.Core_AutoMerge_UndoBody';
-import UNDO_STARTED from '@salesforce/label/c.Core_AutoMerge_UndoStarted';
-import NO_ACCESS from '@salesforce/label/c.Core_AutoMerge_NoAccess';
-import UNEXPECTED from '@salesforce/label/c.Core_Duplicates_ErrorUnexpected';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 function format(label, ...values) {
   return values.reduce((text, value, index) => text.replace(`{${index}}`, value), label);
@@ -44,20 +31,34 @@ function format(label, ...values) {
  * background run after a confirm, and undo a recent run. The server checks every permission.
  */
 export default class AutoMergePanel extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
-    intro: INTRO,
+    get intro() {
+      return helpText('Core', 'Core_AutoMerge_Intro');
+    },
     preview: PREVIEW,
     refresh: REFRESH,
     loading: LOADING,
-    running: RUNNING,
-    none: NONE,
+    get running() {
+      return helpText('Core', 'Core_AutoMerge_Running');
+    },
+    get none() {
+      return helpText('Core', 'Core_AutoMerge_None');
+    },
     keep: KEEP,
     mergeAway: MERGE_AWAY,
-    noChanges: NO_CHANGES,
+    get noChanges() {
+      return helpText('Core', 'Core_AutoMerge_NoChanges');
+    },
     recentRuns: RECENT_RUNS,
-    noRuns: NO_RUNS,
+    get noRuns() {
+      return helpText('Core', 'Core_AutoMerge_NoRuns');
+    },
     undo: UNDO,
-    noAccess: NO_ACCESS
+    get noAccess() {
+      return helpText('Core', 'Core_AutoMerge_NoAccess');
+    }
   };
 
   view;
@@ -67,6 +68,11 @@ export default class AutoMergePanel extends LightningElement {
   message;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -83,14 +89,16 @@ export default class AutoMergePanel extends LightningElement {
     try {
       await work();
     } catch (caught) {
-      this.error = (caught && caught.body && caught.body.message) || UNEXPECTED;
+      this.error =
+        (caught && caught.body && caught.body.message) ||
+        helpText('Core', 'Core_Duplicates_ErrorUnexpected');
     } finally {
       this.loading = false;
     }
   }
 
   get ruleText() {
-    return this.view ? format(RULE, this.view.exactRule) : '';
+    return this.view ? format(helpText('Core', 'Core_AutoMerge_Rule'), this.view.exactRule) : '';
   }
 
   get running() {
@@ -137,7 +145,13 @@ export default class AutoMergePanel extends LightningElement {
   }
 
   get moreText() {
-    return this.previewed ? format(MORE, this.previewed.pairs.length, this.previewed.total) : '';
+    return this.previewed
+      ? format(
+          helpText('Core', 'Core_AutoMerge_More'),
+          this.previewed.pairs.length,
+          this.previewed.total
+        )
+      : '';
   }
 
   get mergeLabel() {
@@ -149,7 +163,12 @@ export default class AutoMergePanel extends LightningElement {
       runId: run.runId,
       startedAt: run.startedAt,
       canUndo: run.canUndo,
-      summary: format(RUN_SUMMARY, run.merged, run.undone, run.notUndone),
+      summary: format(
+        helpText('Core', 'Core_AutoMerge_RunSummary'),
+        run.merged,
+        run.undone,
+        run.notUndone
+      ),
       noteLines: (run.notes || []).map((text, index) => ({ key: `${run.runId}-${index}`, text }))
     }));
   }
@@ -174,7 +193,7 @@ export default class AutoMergePanel extends LightningElement {
     const total = this.previewed ? this.previewed.total : 0;
     const confirmed = await BarnConfirmModal.open({
       label: CONFIRM_HEADING,
-      message: format(CONFIRM_BODY, total),
+      message: format(helpText('Core', 'Core_AutoMerge_ConfirmBody'), total),
       confirmLabel: this.mergeLabel,
       cancelLabel: CANCEL,
       size: 'small'
@@ -185,7 +204,7 @@ export default class AutoMergePanel extends LightningElement {
     await this.call(async () => {
       this.view = await startRun();
       this.previewed = undefined;
-      this.message = STARTED;
+      this.message = helpText('Core', 'Core_AutoMerge_Started');
     });
   }
 
@@ -193,7 +212,7 @@ export default class AutoMergePanel extends LightningElement {
     const runId = event.target.dataset.run;
     const confirmed = await BarnConfirmModal.open({
       label: UNDO_HEADING,
-      message: UNDO_BODY,
+      message: helpText('Core', 'Core_AutoMerge_UndoBody'),
       confirmLabel: UNDO,
       cancelLabel: CANCEL,
       confirmVariant: 'destructive',
@@ -204,7 +223,7 @@ export default class AutoMergePanel extends LightningElement {
     }
     await this.call(async () => {
       this.view = await undoRun({ runId });
-      this.message = UNDO_STARTED;
+      this.message = helpText('Core', 'Core_AutoMerge_UndoStarted');
     });
   }
 }

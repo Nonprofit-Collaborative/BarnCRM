@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Topics__c</fullName>
+  <length>255</length>
+  <required>false</required>
+  <externalId>false</externalId>
+  <inlineHelpText>The topics this answers, separated by commas, for example: Mission, Need. Capital letters do not matter.</inlineHelpText>
+  <label>Topics</label>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+</CustomField>

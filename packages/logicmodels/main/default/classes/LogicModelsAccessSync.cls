@@ -13,54 +13,54 @@
  */
 @NamespaceAccessible
 public with sharing class LogicModelsAccessSync extends ModuleAccessSyncBase {
-    /** The module key in the Module Manager. */
-    public static final String MODULE_NAME = 'LogicModels';
-    /** The set the installer and BarnCRM Admin holders get. */
-    public static final String ADMIN_SET = 'Logic_Models_Admin';
+	/** The module key in the Module Manager. */
+	public static final String MODULE_NAME = 'LogicModels';
+	/** The set the installer and BarnCRM Admin holders get. */
+	public static final String ADMIN_SET = 'Logic_Models_Admin';
 
-    /** The Admin set, and the Core permission set whose holders get it. */
-    @TestVisible
-    private static final Map<String, List<String>> BY_SET = new Map<String, List<String>>{
-        ADMIN_SET => new List<String>{ 'BarnCRM_Admin' }
-    };
+	/** The Admin set, and the Core permission set whose holders get it. */
+	@TestVisible
+	private static final Map<String, List<String>> BY_SET = new Map<String, List<String>>{
+		ADMIN_SET => new List<String>{ 'BarnCRM_Admin' }
+	};
 
-    /** Each other set, and the BarnCRM roles (permission set groups) whose holders get it. */
-    @TestVisible
-    private static final Map<String, List<String>> BY_ROLE = new Map<String, List<String>>{
-        'Logic_Models_Staff' => new List<String>{ 'Program_Staff', 'Volunteer_Coordinator' },
-        'Logic_Models_Read_Only' => new List<String>{ 'Read_Only' }
-    };
+	/** Each other set, and the BarnCRM roles (permission set groups) whose holders get it. */
+	@TestVisible
+	private static final Map<String, List<String>> BY_ROLE = new Map<String, List<String>>{
+		'Logic_Models_Staff' => new List<String>{ 'Program_Staff', 'Volunteer_Coordinator' },
+		'Logic_Models_Read_Only' => new List<String>{ 'Read_Only' }
+	};
 
-    /** Assignments one run gives per set: all three together stay inside the 10,000 DML rows. */
-    private static final Integer ROWS_PER_SET = 3000;
+	/** Assignments one run gives per set: all three together stay inside the 10,000 DML rows. */
+	private static final Integer ROWS_PER_SET = 3000;
 
-    @NamespaceAccessible
-    public LogicModelsAccessSync() {
-        // Built by name from Core (ModuleAccessSyncs), so it needs a public constructor.
-    }
+	@NamespaceAccessible
+	public LogicModelsAccessSync() {
+		// Built by name from Core (ModuleAccessSyncs), so it needs a public constructor.
+	}
 
-    /** One slice of each set now. Returns true when more is left. */
-    public static Boolean syncOnce() {
-        return new LogicModelsAccessSync().sync();
-    }
+	/** One slice of each set now. Returns true when more is left. */
+	public static Boolean syncOnce() {
+		return new LogicModelsAccessSync().sync();
+	}
 
-    public override String moduleName() {
-        return MODULE_NAME;
-    }
+	public override String moduleName() {
+		return MODULE_NAME;
+	}
 
-    public override String logContext() {
-        return 'LogicModelsAccessSync';
-    }
+	public override String logContext() {
+		return 'LogicModelsAccessSync';
+	}
 
-    public override Map<String, List<String>> setsByPermissionSet() {
-        return BY_SET;
-    }
+	public override Map<String, List<String>> setsByPermissionSet() {
+		return BY_SET;
+	}
 
-    public override Map<String, List<String>> setsByRole() {
-        return BY_ROLE;
-    }
+	public override Map<String, List<String>> setsByRole() {
+		return BY_ROLE;
+	}
 
-    public override Integer sliceSize() {
-        return ROWS_PER_SET;
-    }
+	public override Integer sliceSize() {
+		return ROWS_PER_SET;
+	}
 }

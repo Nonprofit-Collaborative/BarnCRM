@@ -1,36 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_AiExport_Title</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: section heading</shortDescription>
-        <value>AI-Readiness Export</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_Intro</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: what the section does</shortDescription>
-        <value>Download your data model, and optionally your records, as files an AI tool of your choice can read. BarnCRM never sends anything to an AI service: you choose the tool and upload the files yourself.</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_IncludeRecords</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>AI-Readiness Export: include records checkbox</shortDescription>
         <value>Include Records</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_IncludeRecordsHelp</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: include records help text</shortDescription>
-        <value>Adds one CSV file of records for each kind of record through Find's export, up to the Find export row limit each, with the fields below left out or masked as you choose.</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_IncludeChecks</fullName>
@@ -41,22 +17,6 @@
         <value>Include Data Quality Checks</value>
     </labels>
     <labels>
-        <fullName>Core_AiExport_IncludeChecksHelp</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: include checks help text</shortDescription>
-        <value>Adds each Data Quality check and its count, such as people without an email address.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_NeedsFind</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: records need the Find permission</shortDescription>
-        <value>Include Records and Include Data Quality Checks need the Find and Export Records permission.</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_Review</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
@@ -65,36 +25,12 @@
         <value>Review Sensitive Fields</value>
     </labels>
     <labels>
-        <fullName>Core_AiExport_ReviewFirst</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: hint before review</shortDescription>
-        <value>Press Review Sensitive Fields to read the fields and choose what the pack does with sensitive ones. Download Pack is ready after that.</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_SensitiveHeading</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>AI-Readiness Export: sensitive fields heading</shortDescription>
         <value>Sensitive Fields</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_SensitiveIntro</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: sensitive fields explanation</shortDescription>
-        <value>These fields may identify a person or hold private details. Leave Out drops the field from the record files. Mask replaces each value with a code (the same value gets the same code in this pack). Keep exports it as it is.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_NoSensitive</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: no sensitive fields found</shortDescription>
-        <value>No field of the kinds of record you chose was flagged as sensitive. Check the fields yourself before you share records.</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_ColWhy</fullName>
@@ -161,14 +97,6 @@
         <value>Encrypted</value>
     </labels>
     <labels>
-        <fullName>Core_AiExport_ReasonName</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: flag reason, a person's name</shortDescription>
-        <value>Name</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_ReasonBirthDate</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
@@ -217,62 +145,6 @@
         <value>Download Pack</value>
     </labels>
     <labels>
-        <fullName>Core_AiExport_RecordsProgress</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: reading records, {0} is the object, {1} the count</shortDescription>
-        <value>Reading records of {0}: {1} so far.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_Writing</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: writing the zip</shortDescription>
-        <value>Writing the pack.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_Done</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: done, {0} is objects, {1} is records</shortDescription>
-        <value>Downloaded the pack: {0} kinds of record and {1} records.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_Stopped</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: limit hit, {0} is the limit, {1} the objects</shortDescription>
-        <value>Records stopped at the Find export row limit ({0}) for: {1}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_RecordsFailed</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: records failed, {0} is the objects</shortDescription>
-        <value>Records could not be read for: {0}. The pack lists their fields without records.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ChecksFailed</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export: checks could not be read</shortDescription>
-        <value>The Data Quality checks could not be read, so the pack leaves them out.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeTitle</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: title</shortDescription>
-        <value>AI-Readiness Export</value>
-    </labels>
-    <labels>
         <fullName>Core_AiExport_ReadmeIntro</fullName>
         <categories>AiReadinessExport</categories>
         <language>en_US</language>
@@ -311,14 +183,6 @@
         <protected>false</protected>
         <shortDescription>AI-Readiness Export README: data folder line</shortDescription>
         <value>data/: one CSV file of records for each kind of record. The first row holds field API names, explained in schema.json. Id and lookup columns hold record Ids, so files can be joined.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeObjects</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>AI-Readiness Export README: objects heading</shortDescription>
-        <value>Kinds of Record</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_ReadmeObjectLine</fullName>
@@ -423,14 +287,6 @@
         <protected>false</protected>
         <shortDescription>README low fill: {0} is the percent, {1} is a list of fields</shortDescription>
         <value>Filled on fewer than {0}% of records: {1}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AiExport_ReadmeQualityCheck</fullName>
-        <categories>AiReadinessExport</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>README check line: {0} is the check title, {1} is its count</shortDescription>
-        <value>{0}: {1}.</value>
     </labels>
     <labels>
         <fullName>Core_AiExport_ReadmeQualityNone</fullName>

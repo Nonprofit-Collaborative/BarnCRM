@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <div class="slds-form-element">
         <lightning-input
             type="search"
@@ -9,7 +10,7 @@
     </div>
 
     <template lwc:if={hasResults}>
-        <h3 class="slds-text-title_caps slds-p-top_small" id="settings-search-results">
+        <h3 class="slds-text-title_bold slds-var-p-top_small" id="settings-search-results">
             {labels.resultsHeading}
         </h3>
         <ul class="slds-has-dividers_bottom-space" aria-labelledby="settings-search-results">
@@ -33,10 +34,11 @@
     </template>
 
     <template lwc:if={failed}>
-        <p class="slds-p-top_small slds-text-color_error" role="alert">{labels.searchError}</p>
+        <c-barn-notice class="slds-var-m-top_small" variant="error" message={labels.searchError} data-id="error"></c-barn-notice>
     </template>
 
     <template lwc:if={showNoResults}>
-        <p class="slds-p-top_small slds-text-color_weak" role="status">{labels.noResults}</p>
+        <p class="slds-var-p-top_small slds-text-color_weak" role="status">{labels.noResults}</p>
+    </template>
     </template>
 </template>

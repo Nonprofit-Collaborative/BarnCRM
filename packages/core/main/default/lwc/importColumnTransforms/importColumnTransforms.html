@@ -1,11 +1,31 @@
 <template>
+    <template lwc:if={helpReady}>
     <div class="slds-box slds-var-m-top_small" data-id="changes">
         <template lwc:if={standalone}>
-            <h3 class="slds-text-heading_x-small">{heading}</h3>
-            <p class="slds-text-body_small slds-var-m-bottom_x-small">{labels.help}</p>
+            <h3 class="slds-text-heading_small">{heading}</h3>
+            <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_x-small">{labels.help}</p>
         </template>
+        <p class="slds-assistive-text" id="drag-help">{dragHelp}</p>
+        <div data-drop-zone="steps" data-drop-label={heading} data-id="zone">
         <template for:each={rows} for:item="step">
-            <div key={step.key} class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_x-small" data-id="step">
+            <div key={step.key} class={step.rowClass} data-id="step">
+                <div class="slds-col slds-grow-none slds-align-bottom">
+                    <span
+                        class="drag-handle"
+                        role="button"
+                        tabindex="0"
+                        title={dragHelp}
+                        aria-label={step.name}
+                        aria-describedby="drag-help"
+                        data-drag-id={step.key}
+                        data-drag-label={step.name}
+                        data-id="drag"
+                        onpointerdown={handlePointerDown}
+                        onkeydown={handleDragKey}
+                    >
+                        <lightning-icon icon-name="utility:drag_and_drop" size="x-small"></lightning-icon>
+                    </span>
+                </div>
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
                     <lightning-combobox
                         label={labels.kindLabel}
@@ -80,26 +100,51 @@
                         <lightning-input type="text" label={labels.countryLabel} data-key={step.key} data-name="country" data-id="country" value={step.country} maxlength="3" onchange={handleInput}></lightning-input>
                     </template>
                 </div>
-                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-12 slds-align-bottom">
-                    <lightning-button-icon
-                        icon-name="utility:delete"
-                        alternative-text={labels.removeLabel}
-                        title={labels.removeLabel}
-                        data-key={step.key}
-                        data-id="remove"
-                        onclick={handleRemove}
-                    ></lightning-button-icon>
+                <div class="slds-col slds-grow-none slds-align-bottom">
+                    <lightning-button-group>
+                        <lightning-button-icon
+                            icon-name="utility:arrowup"
+                            alternative-text={step.moveUpText}
+                            title={labels.moveUpLabel}
+                            data-index={step.index}
+                            data-id="move-up"
+                            disabled={step.isFirst}
+                            onclick={handleMoveUp}
+                        ></lightning-button-icon>
+                        <lightning-button-icon
+                            icon-name="utility:arrowdown"
+                            alternative-text={step.moveDownText}
+                            title={labels.moveDownLabel}
+                            data-index={step.index}
+                            data-id="move-down"
+                            disabled={step.isLast}
+                            onclick={handleMoveDown}
+                        ></lightning-button-icon>
+                        <lightning-button-icon
+                            icon-name="utility:delete"
+                            alternative-text={labels.removeLabel}
+                            title={labels.removeLabel}
+                            data-key={step.key}
+                            data-id="remove"
+                            onclick={handleRemove}
+                        ></lightning-button-icon>
+                    </lightning-button-group>
                 </div>
             </div>
         </template>
+        </div>
         <lightning-button label={labels.addLabel} data-id="add" disabled={cannotAdd} onclick={handleAdd}></lightning-button>
+        <div class="slds-assistive-text" aria-live="polite" data-id="announce">{announcement}</div>
         <template lwc:if={hasProblems}>
-            <p class="slds-text-color_error slds-text-body_small slds-var-m-top_x-small" data-id="problems" role="alert">
-                {problemText}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-top_x-small"
+                variant="error"
+                message={problemText}
+                data-id="problems"
+            ></c-barn-notice>
         </template>
         <template lwc:if={hasSamples}>
-            <h4 class="slds-text-title slds-var-m-top_small">{labels.previewHeading}</h4>
+            <h4 class="slds-text-title_bold slds-var-m-top_small">{labels.previewHeading}</h4>
             <table
                 class="slds-table slds-table_bordered slds-table_fixed-layout slds-table_cell-buffer slds-max-medium-table_stacked slds-var-m-top_xx-small"
                 aria-label={labels.previewHeading}
@@ -132,4 +177,5 @@
             ></lightning-button>
         </template>
     </div>
+    </template>
 </template>

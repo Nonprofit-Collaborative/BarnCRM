@@ -14,7 +14,6 @@ import STEP_4 from '@salesforce/label/c.Core_RollupBuilder_Step4';
 import STEP_5 from '@salesforce/label/c.Core_RollupBuilder_Step5';
 import TARGET_OBJECT from '@salesforce/label/c.Core_RollupBuilder_TargetObject';
 import TARGET_FIELD from '@salesforce/label/c.Core_RollupBuilder_TargetField';
-import TARGET_FIELD_HELP from '@salesforce/label/c.Core_RollupBuilder_TargetFieldHelp';
 import FILLED_BY from '@salesforce/label/c.Core_RollupBuilder_FilledBy';
 import SOURCE from '@salesforce/label/c.Core_RollupBuilder_Source';
 import AGGREGATE from '@salesforce/label/c.Core_RollupBuilder_Aggregate';
@@ -22,13 +21,11 @@ import SOURCE_FIELD from '@salesforce/label/c.Core_RollupBuilder_SourceField';
 import ORDER_BY from '@salesforce/label/c.Core_RollupBuilder_OrderBy';
 import ORDER_DIRECTION from '@salesforce/label/c.Core_RollupBuilder_OrderDirection';
 import ROW_LIMIT from '@salesforce/label/c.Core_RollupBuilder_RowLimit';
-import ROW_LIMIT_HELP from '@salesforce/label/c.Core_RollupBuilder_RowLimitHelp';
 import ERROR_ROW_LIMIT_ORDER from '@salesforce/label/c.Core_Rollups_ErrorRowLimitNeedsOrder';
 import DELIMITER from '@salesforce/label/c.Core_RollupBuilder_Delimiter';
 import CUSTOM_DELIMITER from '@salesforce/label/c.Core_RollupBuilder_CustomDelimiter';
 import ERROR_CUSTOM_DELIMITER from '@salesforce/label/c.Core_Rollups_ErrorCustomDelimiterNeeded';
 import INCLUDE_DELETED from '@salesforce/label/c.Core_RollupBuilder_IncludeDeleted';
-import INCLUDE_DELETED_HELP from '@salesforce/label/c.Core_RollupBuilder_IncludeDeletedHelp';
 import WINDOW from '@salesforce/label/c.Core_RollupBuilder_Window';
 import WINDOW_ALL from '@salesforce/label/c.Core_RollupBuilder_WindowAll';
 import WINDOW_THIS from '@salesforce/label/c.Core_RollupBuilder_WindowThisYear';
@@ -37,20 +34,18 @@ import WINDOW_TWO from '@salesforce/label/c.Core_RollupBuilder_WindowTwoYears';
 import WINDOW_DATE from '@salesforce/label/c.Core_RollupBuilder_WindowDate';
 import CURRENCY_WARNING from '@salesforce/label/c.Core_RollupBuilder_CurrencyWarning';
 import NUMBER_WARNING from '@salesforce/label/c.Core_RollupBuilder_NumberWarning';
-import FILTER from '@salesforce/label/c.Core_RollupBuilder_Filter';
+import FILTER from '@salesforce/label/c.Core_Find_Conditions';
 import TARGET_FILTER from '@salesforce/label/c.Core_RollupBuilder_TargetFilter';
-import PARENT_FIELD_NOTE from '@salesforce/label/c.Core_RollupBuilder_ParentFieldNote';
-import NAME from '@salesforce/label/c.Core_RollupBuilder_Name';
+import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
 import DESCRIPTION from '@salesforce/label/c.Core_RollupBuilder_Description';
 import BYPASS_PERMISSION from '@salesforce/label/c.Core_RollupBuilder_BypassPermission';
-import BYPASS_PERMISSION_HELP from '@salesforce/label/c.Core_RollupBuilder_BypassPermissionHelp';
 import MODE from '@salesforce/label/c.Core_Rollups_ColumnMode';
-import ACTIVE from '@salesforce/label/c.Core_Rollups_ColumnActive';
+import ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
 import SUMMARY from '@salesforce/label/c.Core_RollupBuilder_Summary';
-import BACK from '@salesforce/label/c.Core_RollupBuilder_Back';
-import NEXT from '@salesforce/label/c.Core_RollupBuilder_Next';
-import CANCEL from '@salesforce/label/c.Core_RollupBuilder_Cancel';
-import SAVE from '@salesforce/label/c.Core_RollupBuilder_Save';
+import BACK from '@salesforce/label/c.Core_Kit_Back';
+import NEXT from '@salesforce/label/c.Core_Import_NextButton';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
+import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import SAVE_AND_CALCULATE from '@salesforce/label/c.Core_RollupBuilder_SaveAndCalculate';
 import ERROR_NAME from '@salesforce/label/c.Core_RollupBuilder_ErrorNameNeeded';
 import ERROR_TARGET from '@salesforce/label/c.Core_RollupBuilder_ErrorTargetNeeded';
@@ -61,18 +56,16 @@ import ERROR_WINDOW_DATE from '@salesforce/label/c.Core_RollupBuilder_ErrorWindo
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import PREVIEW_RECORD from '@salesforce/label/c.Core_RollupBuilder_PreviewRecord';
 import TARGET_SEARCH from '@salesforce/label/c.Core_RollupBuilder_TargetSearch';
-import TARGET_SEARCH_HELP from '@salesforce/label/c.Core_RollupBuilder_TargetSearchHelp';
 import NO_INSTANT from '@salesforce/label/c.Core_RollupBuilder_NoInstant';
 import DLRS_CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
 import DLRS_CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
 import saveSwitchingOffDlrs from '@salesforce/apex/RollupBuilderController.saveSwitchingOffDlrs';
 import LightningConfirm from 'lightning/confirm';
 import BUILDER_SENTENCE from '@salesforce/label/c.Core_RollupEase_BuilderSentence';
-import SENTENCE_HELP from '@salesforce/label/c.Core_RollupEase_SentenceHelp';
 import NOT_CHOSEN from '@salesforce/label/c.Core_RollupEase_NotChosen';
 import EVERY_RECORD from '@salesforce/label/c.Core_RollupEase_EveryRecord';
 import SOME_RECORDS from '@salesforce/label/c.Core_RollupEase_SomeRecords';
-import TARGET_PART from '@salesforce/label/c.Core_RollupEase_TargetPart';
+import TARGET_PART from '@salesforce/label/c.Core_Format_Pair';
 import NOT_FOR_FIELD from '@salesforce/label/c.Core_RollupEase_NotForField';
 import FIELDS_NUMBERS from '@salesforce/label/c.Core_RollupEase_FieldsNumbers';
 import FIELDS_NUMBERS_DATES from '@salesforce/label/c.Core_RollupEase_FieldsNumbersDates';
@@ -85,31 +78,29 @@ import MODE_NIGHTLY from '@salesforce/label/c.Core_RollupEase_ModeNightly';
 import MODE_BOTH_TEXT from '@salesforce/label/c.Core_RollupEase_ModeBoth';
 import MODE_BOTH_NO_INSTANT from '@salesforce/label/c.Core_RollupEase_ModeBothNoInstant';
 import PICK_SAMPLES from '@salesforce/label/c.Core_RollupEase_PickSamples';
-import PICK_SAMPLES_HELP from '@salesforce/label/c.Core_RollupEase_PickSamplesHelp';
 import SAMPLES_HEADING from '@salesforce/label/c.Core_RollupEase_SamplesHeading';
 import SAMPLES_NONE from '@salesforce/label/c.Core_RollupEase_SamplesNone';
 import SHOW_ROWS from '@salesforce/label/c.Core_RollupEase_ShowRows';
 import ROWS_HEADING from '@salesforce/label/c.Core_RollupEase_RowsHeading';
 import generateField from '@salesforce/apex/RollupFieldGenerator.generate';
 import CREATE_FIELD from '@salesforce/label/c.Core_RollupEase_CreateField';
-import CREATE_FIELD_WHY from '@salesforce/label/c.Core_RollupEase_CreateFieldWhy';
 import NEW_FIELD_LABEL from '@salesforce/label/c.Core_RollupEase_NewFieldLabel';
 import NEW_FIELD_KIND from '@salesforce/label/c.Core_RollupEase_NewFieldKind';
-import KIND_HELP from '@salesforce/label/c.Core_RollupEase_KindHelp';
-import KIND_NUMBER from '@salesforce/label/c.Core_RollupEase_KindNumber';
-import KIND_CURRENCY from '@salesforce/label/c.Core_RollupEase_KindCurrency';
-import KIND_DATE from '@salesforce/label/c.Core_RollupEase_KindDate';
-import KIND_DATETIME from '@salesforce/label/c.Core_RollupEase_KindDateTime';
-import KIND_TEXT from '@salesforce/label/c.Core_RollupEase_KindText';
+import KIND_NUMBER from '@salesforce/label/c.Core_ImportNewField_TypeNumber';
+import KIND_CURRENCY from '@salesforce/label/c.Core_ImportNewField_TypeCurrency';
+import KIND_DATE from '@salesforce/label/c.Core_ImportNewField_TypeDate';
+import KIND_DATETIME from '@salesforce/label/c.Core_ImportNewField_TypeDateTime';
+import KIND_TEXT from '@salesforce/label/c.Core_ImportNewField_TypeText';
 import KIND_LONGTEXT from '@salesforce/label/c.Core_RollupEase_KindLongText';
-import KIND_CHECKBOX from '@salesforce/label/c.Core_RollupEase_KindCheckbox';
+import KIND_CHECKBOX from '@salesforce/label/c.Core_ImportNewField_TypeCheckbox';
 import WRITE_FIELD from '@salesforce/label/c.Core_RollupEase_WriteField';
 import FIELD_DEPLOY from '@salesforce/label/c.Core_RollupEase_FieldDeploy';
 import DOWNLOAD_FIELD from '@salesforce/label/c.Core_RollupEase_DownloadField';
-import REFRESH_FIELDS from '@salesforce/label/c.Core_RollupEase_RefreshFields';
-import COPY from '@salesforce/label/c.Core_RollupBuilder_InstantCopy';
+import REFRESH_FIELDS from '@salesforce/label/c.Core_ImportNewField_RefreshButton';
+import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
 import COPIED from '@salesforce/label/c.Core_RollupBuilder_InstantCopied';
 import COPY_FAILED from '@salesforce/label/c.Core_RollupBuilder_InstantCopyFailed';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The stored modes (canonical model R-R4): Instantly alone, and Both. */
 const MODE_REAL_TIME = 'Real-time';
@@ -174,33 +165,45 @@ function format(label, ...values) {
  * Fires `saved` with `detail.notice` after a save, and `cancel`.
  */
 export default class RollupWizard extends LightningElement {
+  helpReady = isHelpLoaded('Rollups');
+
   /** What `RollupBuilderController.getModel` answered. */
   @api model;
 
   labels = {
     targetObject: TARGET_OBJECT,
     targetField: TARGET_FIELD,
-    targetFieldHelp: TARGET_FIELD_HELP,
+    get targetFieldHelp() {
+      return helpText('Rollups', 'Core_RollupBuilder_TargetFieldHelp');
+    },
     source: SOURCE,
     aggregate: AGGREGATE,
     sourceField: SOURCE_FIELD,
     orderBy: ORDER_BY,
     orderDirection: ORDER_DIRECTION,
     rowLimit: ROW_LIMIT,
-    rowLimitHelp: ROW_LIMIT_HELP,
+    get rowLimitHelp() {
+      return helpText('Rollups', 'Core_RollupBuilder_RowLimitHelp');
+    },
     delimiter: DELIMITER,
     customDelimiter: CUSTOM_DELIMITER,
     includeDeleted: INCLUDE_DELETED,
-    includeDeletedHelp: INCLUDE_DELETED_HELP,
+    get includeDeletedHelp() {
+      return helpText('Rollups', 'Core_RollupBuilder_IncludeDeletedHelp');
+    },
     window: WINDOW,
     windowDate: WINDOW_DATE,
     filter: FILTER,
     targetFilter: TARGET_FILTER,
-    parentFieldNote: PARENT_FIELD_NOTE,
+    get parentFieldNote() {
+      return helpText('Rollups', 'Core_RollupBuilder_ParentFieldNote');
+    },
     name: NAME,
     description: DESCRIPTION,
     bypassPermission: BYPASS_PERMISSION,
-    bypassPermissionHelp: BYPASS_PERMISSION_HELP,
+    get bypassPermissionHelp() {
+      return helpText('Rollups', 'Core_RollupBuilder_BypassPermissionHelp');
+    },
     mode: MODE,
     active: ACTIVE,
     back: BACK,
@@ -210,20 +213,30 @@ export default class RollupWizard extends LightningElement {
     saveAndCalculate: SAVE_AND_CALCULATE,
     previewRecord: PREVIEW_RECORD,
     targetSearch: TARGET_SEARCH,
-    targetSearchHelp: TARGET_SEARCH_HELP,
-    sentenceHelp: SENTENCE_HELP,
+    get targetSearchHelp() {
+      return helpText('Rollups', 'Core_RollupBuilder_TargetSearchHelp');
+    },
+    get sentenceHelp() {
+      return helpText('Rollups', 'Core_RollupEase_SentenceHelp');
+    },
     modeHeading: MODE_HEADING,
     pickSamples: PICK_SAMPLES,
-    pickSamplesHelp: PICK_SAMPLES_HELP,
+    get pickSamplesHelp() {
+      return helpText('Rollups', 'Core_RollupEase_PickSamplesHelp');
+    },
     samplesHeading: SAMPLES_HEADING,
     samplesNone: SAMPLES_NONE,
     showRows: SHOW_ROWS,
     rowsHeading: ROWS_HEADING,
     createField: CREATE_FIELD,
-    createFieldWhy: CREATE_FIELD_WHY,
+    get createFieldWhy() {
+      return helpText('Rollups', 'Core_RollupEase_CreateFieldWhy');
+    },
     newFieldLabel: NEW_FIELD_LABEL,
     newFieldKind: NEW_FIELD_KIND,
-    kindHelp: KIND_HELP,
+    get kindHelp() {
+      return helpText('Rollups', 'Core_RollupEase_KindHelp');
+    },
     writeField: WRITE_FIELD,
     downloadField: DOWNLOAD_FIELD,
     refreshFields: REFRESH_FIELDS,
@@ -284,6 +297,11 @@ export default class RollupWizard extends LightningElement {
   }
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Rollups').then(() => {
+        this.helpReady = true;
+      });
+    }
     if (!this.current.mode && this.model) {
       this.current = { ...this.current, mode: this.model.defaultMode };
     }

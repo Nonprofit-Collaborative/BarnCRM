@@ -1,78 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_Find_ErrorInvalidQuery</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal: a Find query document cannot be read.</shortDescription>
-        <value>This query could not be read. Open it again from Find, or build it again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_ErrorFieldCount</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal: a Find query has no columns or more than 20.</shortDescription>
-        <value>Choose from 1 to 20 columns.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_ErrorRowLimit</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal: rows to show is out of range.</shortDescription>
-        <value>Rows to show must be a whole number from 1 to 2000.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_ErrorSortField</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal: a field cannot be sorted on. {0}: the field.</shortDescription>
-        <value>This field cannot be used to sort: {0}. Choose another.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_ErrorNoPermission</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal when the user lacks the Find and Export Records permission.</shortDescription>
-        <value>Find needs the Find and Export Records permission. Ask your BarnCRM admin to assign you the BarnCRM Find and Export permission set.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_ErrorNotYours</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal when someone changes a saved query they do not own.</shortDescription>
-        <value>Only the person who saved this query can change, share or delete it. Use Save as to keep your own copy.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_ErrorNotFound</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal when a saved query is gone or no longer shared.</shortDescription>
-        <value>This saved query no longer exists, or is no longer shared with you.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_ErrorName</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal when a saved query has no name or a name over 80 characters.</shortDescription>
-        <value>Give the query a name of up to 80 characters.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_UnexpectedError</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when Find fails for a reason it cannot explain.</shortDescription>
-        <value>Something went wrong in Find. It has been recorded in the Error Log. Try again, and tell your administrator if it happens again.</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_Title</fullName>
         <categories>Find</categories>
         <language>en_US</language>
@@ -81,28 +9,12 @@
         <value>Find</value>
     </labels>
     <labels>
-        <fullName>Core_Find_Intro</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Intro line on the Find page.</shortDescription>
-        <value>Choose an object, the columns and conditions, then run, save or export. Find shows only what your own access allows.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_Object</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Label of the object picker on the Find page.</shortDescription>
-        <value>Object</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_ChooseObject</fullName>
         <categories>Find</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Placeholder of the object picker on the Find page.</shortDescription>
-        <value>Choose an object</value>
+        <value>Choose a kind of record</value>
     </labels>
     <labels>
         <fullName>Core_Find_Columns</fullName>
@@ -182,7 +94,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Sort direction option: ascending.</shortDescription>
-        <value>Ascending</value>
+        <value>A to Z or Oldest First</value>
     </labels>
     <labels>
         <fullName>Core_Find_Descending</fullName>
@@ -190,7 +102,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Sort direction option: descending.</shortDescription>
-        <value>Descending</value>
+        <value>Z to A or Newest First</value>
     </labels>
     <labels>
         <fullName>Core_Find_RowsToShow</fullName>
@@ -206,15 +118,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Label of the read only SOQL box on the Find page.</shortDescription>
-        <value>Query (read only)</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_SoqlHelp</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Help text of the read only SOQL box.</shortDescription>
-        <value>The query Find runs, in SOQL, for anyone who wants to check it or copy it. To type or paste a query instead, use Type a query.</value>
+        <value>Technical query (SOQL), read only</value>
     </labels>
     <labels>
         <fullName>Core_Find_Run</fullName>
@@ -233,14 +137,6 @@
         <value>Export to CSV</value>
     </labels>
     <labels>
-        <fullName>Core_Find_Exporting</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Progress while exporting. {0}: rows read so far.</shortDescription>
-        <value>Exporting: {0} rows so far.</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_ExportDone</fullName>
         <categories>Find</categories>
         <language>en_US</language>
@@ -249,52 +145,12 @@
         <value>Exported {0} rows.</value>
     </labels>
     <labels>
-        <fullName>Core_Find_HiddenColumns</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Notice: an opened query had columns left out. {0}: their paths.</shortDescription>
-        <value>Left out columns you do not have access to: {0}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_ExportStopped</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Notice when an export stopped at the limit. {0}: the limit.</shortDescription>
-        <value>Exported {0} rows, the export row limit. Narrow the conditions, or ask your BarnCRM admin to raise the limit.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_ResultCount</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Line above the results. {0}: rows found.</shortDescription>
-        <value>{0} rows found.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_ResultsCapped</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Line when results reached rows to show. {0}: rows read.</shortDescription>
-        <value>Found the first {0} matching rows. Export to get every matching record.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_NoResults</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when a query matched nothing.</shortDescription>
-        <value>No records match these conditions.</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_SavedQueries</fullName>
         <categories>Find</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Label of the saved query picker.</shortDescription>
-        <value>Saved queries</value>
+        <value>Saved searches</value>
     </labels>
     <labels>
         <fullName>Core_Find_ChooseSaved</fullName>
@@ -302,7 +158,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Placeholder of the saved query picker.</shortDescription>
-        <value>Open a saved query</value>
+        <value>Open a saved search</value>
     </labels>
     <labels>
         <fullName>Core_Find_SharedBy</fullName>
@@ -318,7 +174,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Label of the saved query name input.</shortDescription>
-        <value>Query name</value>
+        <value>Search name</value>
     </labels>
     <labels>
         <fullName>Core_Find_Share</fullName>
@@ -327,14 +183,6 @@
         <protected>false</protected>
         <shortDescription>Checkbox that shares a saved query.</shortDescription>
         <value>Show to everyone who uses Find</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_Save</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button that saves the query.</shortDescription>
-        <value>Save</value>
     </labels>
     <labels>
         <fullName>Core_Find_SaveAs</fullName>
@@ -357,16 +205,8 @@
         <categories>Find</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Button that clears Find to start a new query.</shortDescription>
-        <value>New Query</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_SavedNotice</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Notice after a query is saved. {0}: its name.</shortDescription>
-        <value>Saved {0}.</value>
+        <shortDescription>Button that clears Find to start a new search.</shortDescription>
+        <value>New Search</value>
     </labels>
     <labels>
         <fullName>Core_Find_DeleteConfirmHeading</fullName>
@@ -374,23 +214,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading of the dialog that confirms deleting a saved query.</shortDescription>
-        <value>Delete This Saved Query?</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_DeleteConfirmBody</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Body of the delete confirmation. {0}: the query name.</shortDescription>
-        <value>{0} will be deleted. This cannot be undone.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_DeleteConfirmShared</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Extra line in the delete confirmation when the query is shared.</shortDescription>
-        <value>This query is shared with everyone who uses Find. Deleting it removes it for all of them.</value>
+        <value>Delete This Saved Search?</value>
     </labels>
     <labels>
         <fullName>Core_Find_DeleteConfirmCancel</fullName>
@@ -399,46 +223,6 @@
         <protected>false</protected>
         <shortDescription>Button that keeps the saved query instead of deleting it.</shortDescription>
         <value>Keep It</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_DeletedNotice</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Notice after a query is deleted. {0}: its name.</shortDescription>
-        <value>Deleted {0}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_FixConditions</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when Run or Save is pressed with conditions to fix.</shortDescription>
-        <value>Fix the conditions marked below, then try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_ChooseColumns</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when Run or Save is pressed with no columns.</shortDescription>
-        <value>Choose at least one column.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_Loading</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Assistive text while Find works.</shortDescription>
-        <value>Working</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_Purpose</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>One-line purpose under the Find page header.</shortDescription>
-        <value>Find records, then export them, save the query, or change them all at once.</value>
     </labels>
     <labels>
         <fullName>Core_Find_GuideUrl</fullName>
@@ -455,14 +239,6 @@
         <protected>false</protected>
         <shortDescription>Empty state heading before an object is chosen.</shortDescription>
         <value>Choose What to Find</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_EmptyMessage</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Empty state line before an object is chosen.</shortDescription>
-        <value>Pick an object, or open a saved query, to start.</value>
     </labels>
     <labels>
         <fullName>Core_Find_NoResultsHeading</fullName>
@@ -489,22 +265,6 @@
         <value>Results</value>
     </labels>
     <labels>
-        <fullName>Core_Find_ShowMore</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Button under the results that shows the next rows.</shortDescription>
-        <value>Show More</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_ShowingOf</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Line beside Show More. {0}: rows on screen, {1}: rows found.</shortDescription>
-        <value>Showing {0} of {1} rows.</value>
-    </labels>
-    <labels>
         <fullName>Core_Find_ExportMenu</fullName>
         <categories>Find</categories>
         <language>en_US</language>
@@ -526,7 +286,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Heading over the save query fields.</shortDescription>
-        <value>Save This Query</value>
+        <value>Save This Search</value>
     </labels>
     <labels>
         <fullName>Core_Find_MoreQueryActions</fullName>
@@ -534,22 +294,6 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Screen reader name of the menu next to Save (Save As, Delete).</shortDescription>
-        <value>More Query Actions</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_StartUpdate</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Note when Find opens from the Update Many Records card.</shortDescription>
-        <value>Bulk Update starts here: find the records, press Run, then choose Change Records, Bulk Update.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Find_StartDelete</fullName>
-        <categories>Find</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Note when Find opens from the Delete Many Records card.</shortDescription>
-        <value>Bulk Delete starts here: find the records, press Run, then choose Change Records, Bulk Delete.</value>
+        <value>More Search Actions</value>
     </labels>
 </CustomLabels>

@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <lightning-modal-header label={labels.title}></lightning-modal-header>
     <lightning-modal-body>
         <template lwc:if={canFinish}>
@@ -19,13 +20,34 @@
                 data-id="mode"
                 onchange={handleMode}
             ></lightning-radio-group>
+            <!-- The default features by name, one plain line each (admin-15), so the first
+                 choice says what it turns on. -->
+            <template lwc:if={isAll}>
+                <ul class="slds-has-dividers_bottom-space slds-var-m-top_small" data-id="all-features">
+                    <template for:each={features} for:item="feature">
+                        <li key={feature.key} class="slds-item" data-id="all-feature">
+                            <p class="slds-text-title_bold">{feature.name}</p>
+                            <p class="slds-text-body_small slds-text-color_weak">{feature.description}</p>
+                            <template lwc:if={feature.blockedReason}>
+                                <p class="slds-text-body_small slds-text-color_error" data-id="blocked">{feature.blockedReason}</p>
+                            </template>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+            <c-barn-notice
+                class="slds-var-m-top_small"
+                variant="warning"
+                message={labels.staysOn}
+                data-id="stays-on"
+            ></c-barn-notice>
             <template lwc:if={isChoosing}>
                 <p class="slds-text-body_small slds-var-m-vertical_small" data-id="choose-help">
                     {labels.chooseHelp}
                 </p>
                 <template for:each={features} for:item="feature">
+                    <div key={feature.key}>
                     <lightning-input
-                        key={feature.key}
                         type="checkbox"
                         label={feature.name}
                         field-level-help={feature.description}
@@ -35,6 +57,10 @@
                         data-key={feature.key}
                         onchange={handleFeature}
                     ></lightning-input>
+                    <template lwc:if={feature.blockedReason}>
+                        <p class="slds-text-body_small slds-text-color_error slds-var-m-left_large" data-id="blocked">{feature.blockedReason}</p>
+                    </template>
+                    </div>
                 </template>
             </template>
             <p class="slds-text-body_small slds-var-m-top_medium">{labels.modulesNote}</p>
@@ -43,9 +69,12 @@
             <p role="status" data-id="admin-needed">{labels.adminNeeded}</p>
         </template>
         <template lwc:if={errorMessage}>
-            <p class="slds-text-color_error slds-var-m-top_small" role="alert" data-id="error">
-                {errorMessage}
-            </p>
+            <c-barn-notice
+                class="slds-var-m-top_small"
+                variant="error"
+                message={errorMessage}
+                data-id="error"
+            ></c-barn-notice>
         </template>
     </lightning-modal-body>
     <template lwc:if={canFinish}>
@@ -68,5 +97,6 @@
                 onclick={handleClose}
             ></lightning-button>
         </lightning-modal-footer>
+    </template>
     </template>
 </template>

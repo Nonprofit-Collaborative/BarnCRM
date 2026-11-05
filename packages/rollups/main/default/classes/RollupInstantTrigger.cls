@@ -20,88 +20,88 @@
  * signature. The name methods are public, for the Builder only.
  */
 global with sharing class RollupInstantTrigger {
-    private static final String NAME_PREFIX = 'BarnRollup_';
-    private static final String TEST_SUFFIX = '_Test';
-    /** Apex class and trigger names are at most 40 characters. */
-    private static final Integer NAME_LIMIT = 40;
+	private static final String NAME_PREFIX = 'BarnRollup_';
+	private static final String TEST_SUFFIX = '_Test';
+	/** Apex class and trigger names are at most 40 characters. */
+	private static final Integer NAME_LIMIT = 40;
 
-    private static Boolean reached = false;
+	private static Boolean reached = false;
 
-    /** The line every generated trigger runs. Reads the trigger context itself. */
-    global static void run() {
-        reached = true;
-        if (Trigger.isExecuting) {
-            handle(Trigger.operationType, Trigger.new, Trigger.newMap, Trigger.old, Trigger.oldMap);
-        }
-    }
+	/** The line every generated trigger runs. Reads the trigger context itself. */
+	global static void run() {
+		reached = true;
+		if (Trigger.isExecuting) {
+			handle(Trigger.operationType, Trigger.new, Trigger.newMap, Trigger.old, Trigger.oldMap);
+		}
+	}
 
-    /**
-     * True once a generated trigger has called `run` in this transaction, switched off or not.
-     * The generated test asserts it after its insert, which the org's own required fields or
-     * validation rules may refuse after the before insert trigger has run.
-     */
-    global static Boolean hasRun() {
-        return reached;
-    }
+	/**
+	 * True once a generated trigger has called `run` in this transaction, switched off or not.
+	 * The generated test asserts it after its insert, which the org's own required fields or
+	 * validation rules may refuse after the before insert trigger has run.
+	 */
+	global static Boolean hasRun() {
+		return reached;
+	}
 
-    /**
-     * `BarnRollup_` and the object's API name, every run of other characters one underscore:
-     * `Shift__c` gives `BarnRollup_Shift_c`. A name that would leave its test class over 40
-     * characters is cut and ends in six characters of the API name's MD5 hash, so two long
-     * names that start alike still differ. It is also the name of the object's switch.
-     */
-    public static String triggerNameFor(String objectApiName) {
-        String base = objectApiName.replaceAll('[^A-Za-z0-9]+', '_').removeEnd('_');
-        String name = NAME_PREFIX + base;
-        if (name.length() + TEST_SUFFIX.length() > NAME_LIMIT) {
-            String hash = EncodingUtil.convertToHex(
-                    Crypto.generateDigest('MD5', Blob.valueOf(objectApiName))
-                )
-                .left(6);
-            name = name.left(NAME_LIMIT - TEST_SUFFIX.length() - 7).removeEnd('_') + '_' + hash;
-        }
-        return name;
-    }
+	/**
+	 * `BarnRollup_` and the object's API name, every run of other characters one underscore:
+	 * `Shift__c` gives `BarnRollup_Shift_c`. A name that would leave its test class over 40
+	 * characters is cut and ends in six characters of the API name's MD5 hash, so two long
+	 * names that start alike still differ. It is also the name of the object's switch.
+	 */
+	public static String triggerNameFor(String objectApiName) {
+		String base = objectApiName.replaceAll('[^A-Za-z0-9]+', '_').removeEnd('_');
+		String name = NAME_PREFIX + base;
+		if (name.length() + TEST_SUFFIX.length() > NAME_LIMIT) {
+			String hash = EncodingUtil.convertToHex(
+					Crypto.generateDigest('MD5', Blob.valueOf(objectApiName))
+				)
+				.left(6);
+			name = name.left(NAME_LIMIT - TEST_SUFFIX.length() - 7).removeEnd('_') + '_' + hash;
+		}
+		return name;
+	}
 
-    public static String testClassNameFor(String objectApiName) {
-        return triggerNameFor(objectApiName) + TEST_SUFFIX;
-    }
+	public static String testClassNameFor(String objectApiName) {
+		return triggerNameFor(objectApiName) + TEST_SUFFIX;
+	}
 
-    /** The prefix every generated trigger's name starts with. */
-    public static String namePrefix() {
-        return NAME_PREFIX;
-    }
+	/** The prefix every generated trigger's name starts with. */
+	public static String namePrefix() {
+		return NAME_PREFIX;
+	}
 
-    /** The trigger context, handed to the rollup handler when the object's switch is on. */
-    @TestVisible
-    private static void handle(
-        System.TriggerOperation operation,
-        List<SObject> newRecords,
-        Map<Id, SObject> newRecordsById,
-        List<SObject> oldRecords,
-        Map<Id, SObject> oldRecordsById
-    ) {
-        List<SObject> records = newRecords != null ? newRecords : oldRecords;
-        if (records == null || records.isEmpty()) {
-            return;
-        }
-        String objectName = String.valueOf(records[0].getSObjectType());
-        if (!AutomationControl.isEnabled(triggerNameFor(objectName))) {
-            return;
-        }
-        // As TriggerDispatcher.run does for a registered trigger: a partial save's retry is told
-        // apart from the attempt it repeats, so its records are not skipped as already done.
-        TriggerHandler.noteTriggerProgress();
-        TriggerDispatcher.run(
-            new RollupTriggerHandler(),
-            new TriggerDispatcher.Context(
-                operation,
-                newRecords,
-                newRecordsById,
-                oldRecords,
-                oldRecordsById
-            )
-        );
-        TriggerHandler.noteTriggerProgress();
-    }
+	/** The trigger context, handed to the rollup handler when the object's switch is on. */
+	@TestVisible
+	private static void handle(
+		System.TriggerOperation operation,
+		List<SObject> newRecords,
+		Map<Id, SObject> newRecordsById,
+		List<SObject> oldRecords,
+		Map<Id, SObject> oldRecordsById
+	) {
+		List<SObject> records = newRecords != null ? newRecords : oldRecords;
+		if (records == null || records.isEmpty()) {
+			return;
+		}
+		String objectName = String.valueOf(records[0].getSObjectType());
+		if (!AutomationControl.isEnabled(triggerNameFor(objectName))) {
+			return;
+		}
+		// As TriggerDispatcher.run does for a registered trigger: a partial save's retry is told
+		// apart from the attempt it repeats, so its records are not skipped as already done.
+		TriggerHandler.noteTriggerProgress();
+		TriggerDispatcher.run(
+			new RollupTriggerHandler(),
+			new TriggerDispatcher.Context(
+				operation,
+				newRecords,
+				newRecordsById,
+				oldRecords,
+				oldRecordsById
+			)
+		);
+		TriggerHandler.noteTriggerProgress();
+	}
 }

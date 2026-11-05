@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Funders_Answers_Title</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library card title</shortDescription>
+        <value>Answer Library</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Answers_Search</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library search box label</shortDescription>
+        <value>Search Answers</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Answers_Topic</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library topic filter label</shortDescription>
+        <value>Topic</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Answers_AllTopics</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library topic filter: no filter</shortDescription>
+        <value>All topics</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Answers_Copied</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library: answer copied to the clipboard</shortDescription>
+        <value>Copied. Paste it into the application.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Answers_CopyFailed</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library: the browser refused the clipboard</shortDescription>
+        <value>Your browser did not allow copying. Click Show All, select the text and copy it.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Answers_ShowAll</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library: show the whole answer</shortDescription>
+        <value>Show All</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Answers_ShowLess</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library: show the start of the answer only</shortDescription>
+        <value>Show Less</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Answers_Words</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library word count; {0} is the count</shortDescription>
+        <value>{0} words</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Answers_LastUsed</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library last used date; {0} is the date</shortDescription>
+        <value>Last used {0}</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Answers_NeverUsed</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library: an answer never copied</shortDescription>
+        <value>Never used</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Answers_NoMatch</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library: search and topic match nothing</shortDescription>
+        <value>No answer matches. Try other words or another topic.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Answers_New</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library: add an answer</shortDescription>
+        <value>New Answer</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Answers_ErrorLoad</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library could not load</shortDescription>
+        <value>The answer library could not be loaded. Reload the page; if it happens again, tell your BarnCRM admin.</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Answers_ErrorStamp</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer copied but its last used date not saved</shortDescription>
+        <value>The answer was copied, but its last used date could not be saved.</value>
+    </labels>
+</CustomLabels>

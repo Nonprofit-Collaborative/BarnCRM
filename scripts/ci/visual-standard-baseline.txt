@@ -1,0 +1,17 @@
+# Screens built before the visual standard: path rule count (scripts/ci/check-visual-standard.py).
+# Lower a count, or delete a line, when a screen adopts the kit. Never raise one.
+packages/funders/main/default/lwc/fundersBoard/fundersBoard.html table-stacked 4
+packages/funders/main/default/lwc/grantSchedule/grantSchedule.html table-stacked 2
+packages/giving/main/default/lwc/commitmentSchedulePreview/commitmentSchedulePreview.html table-stacked 1
+packages/giving/main/default/lwc/giftBatchEntry/giftBatchEntry.html table-stacked 1
+packages/giving/main/default/lwc/quickGiftEntry/quickGiftEntry.html solid-box 2
+packages/giving/main/default/lwc/receiptActions/receiptActions.html table-stacked 1
+packages/giving/main/default/lwc/receiptSettings/receiptSettings.html table-stacked 1
+packages/rollups/main/default/lwc/rollupBuilder/rollupBuilder.html solid-box 2
+packages/rollups/main/default/lwc/rollupDefinitions/rollupDefinitions.html solid-box 3
+packages/rollups/main/default/lwc/rollupDefinitions/rollupDefinitions.html table-stacked 2
+packages/rollups/main/default/lwc/rollupDlrsImport/rollupDlrsImport.html solid-box 1
+packages/rollups/main/default/lwc/rollupDlrsImport/rollupDlrsImport.html table-stacked 1
+packages/rollups/main/default/lwc/rollupExplain/rollupExplain.html solid-box 1
+packages/rollups/main/default/lwc/rollupTemplates/rollupTemplates.html solid-box 1
+packages/rollups/main/default/lwc/rollupWizard/rollupWizard.html solid-box 2

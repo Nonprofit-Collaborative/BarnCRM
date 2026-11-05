@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_NpspAdoption_ErrorContext</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Error Log context for NPSP household adoption.</shortDescription>
+        <value>NPSP household adoption</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_Title</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Heading of the NPSP household adoption panel.</shortDescription>
+        <value>Adopt NPSP Households</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_SampleCaption</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Caption of the sample table.</shortDescription>
+        <value>The first households, as NPSP has them</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_ColumnPrimary</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Sample table column: primary contact.</shortDescription>
+        <value>Primary Contact</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_KeepNames</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Checkbox: keep NPSP names and greetings.</shortDescription>
+        <value>Keep NPSP&apos;s names and greetings</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_AdoptButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that starts an adoption.</shortDescription>
+        <value>Adopt Households</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_TypeToAdopt</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label of the typed count before adopting. {0} is the number.</shortDescription>
+        <value>Type {0} to adopt these households</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_ConfirmAdopt</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Confirm button in the adopt window.</shortDescription>
+        <value>Adopt</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_LastRun</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Heading for the newest run.</shortDescription>
+        <value>Last adoption</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_UndoButton</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button and window title that undo the newest run.</shortDescription>
+        <value>Undo This Adoption</value>
+    </labels>
+    <labels>
+        <fullName>Core_NpspAdoption_TypeToUndo</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Label of the typed count before undoing. {0} is the number.</shortDescription>
+        <value>Type {0} to undo</value>
+    </labels>
+</CustomLabels>

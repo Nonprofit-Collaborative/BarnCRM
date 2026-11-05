@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <section class="slds-box slds-is-relative" aria-labelledby="bulk-delete-title" data-id="panel">
         <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
             <lightning-icon icon-name="utility:delete" size="small" class="slds-var-m-right_x-small"></lightning-icon>
@@ -22,18 +23,20 @@
             </template>
 
             <template lwc:if={hasError}>
-                <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
-                    <span data-id="error-message">{errorMessage}</span>
-                </div>
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="error"
+                    message={errorMessage}
+                    data-id="error-message"
+                ></c-barn-notice>
             </template>
             <template lwc:if={hasNotice}>
-                <div
-                    class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small"
-                    role="status"
-                    aria-live="polite"
-                >
-                    <span data-id="notice-message">{noticeMessage}</span>
-                </div>
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="success"
+                    message={noticeMessage}
+                    data-id="notice-message"
+                ></c-barn-notice>
             </template>
 
             <p class="slds-var-m-bottom_small" data-id="intro">{intro}</p>
@@ -46,7 +49,16 @@
                 onclick={handlePreview}
             ></lightning-button>
 
-            <template lwc:if={preview}>
+            <template lwc:if={noMatches}>
+                <c-barn-empty-state
+                    data-id="no-matches"
+                    size="compact"
+                    illustration="all-clear"
+                    heading={labels.noMatchesHeading}
+                    message={labels.noMatches}
+                ></c-barn-empty-state>
+            </template>
+            <template lwc:elseif={preview}>
                 <section class="slds-box slds-var-m-vertical_medium" data-id="preview-box">
                     <p class="slds-text-title_bold" data-id="preview-line" role="status">{previewLine}</p>
                     <ul class="slds-list_dotted slds-var-m-vertical_x-small">
@@ -55,16 +67,23 @@
                         </template>
                     </ul>
                     <template lwc:if={hasCascades}>
-                        <div class="slds-box slds-box_x-small slds-theme_warning slds-var-m-bottom_small" data-id="cascades">
-                            <p class="slds-var-m-bottom_x-small">{labels.cascades}</p>
-                            <ul class="slds-list_horizontal slds-wrap">
+                        <c-barn-notice
+                            class="slds-show slds-var-m-bottom_small"
+                            variant="warning"
+                            message={labels.cascades}
+                            data-id="cascades"
+                        >
+                            <ul class="slds-list_horizontal slds-wrap slds-var-m-top_xx-small">
                                 <template for:each={preview.cascades} for:item="cascade">
                                     <li key={cascade} class="slds-var-m-right_xx-small slds-var-m-bottom_xx-small">
                                         <lightning-badge label={cascade} data-id="cascade"></lightning-badge>
                                     </li>
                                 </template>
+                                <template lwc:if={cascadesMoreLine}>
+                                    <li class="slds-var-m-bottom_xx-small" data-id="cascades-more">{cascadesMoreLine}</li>
+                                </template>
                             </ul>
-                        </div>
+                        </c-barn-notice>
                     </template>
                     <p class="slds-text-body_small slds-var-m-bottom_small">
                         {labels.undoUntil}
@@ -117,8 +136,14 @@
                 <section class="slds-box slds-var-m-vertical_medium" data-id="job">
                     <p class="slds-text-title_bold">{jobView.name}: {jobView.status}</p>
                     <template lwc:if={jobView.running}>
-                        <p class="slds-var-m-vertical_x-small" role="status" aria-live="polite">{jobView.progressLine}</p>
-                        <lightning-progress-bar value={jobView.progressValue} size="large"></lightning-progress-bar>
+                        <p class="slds-assistive-text" role="status" aria-live="polite">{jobView.progressLine}</p>
+                        <c-barn-meter
+                            data-id="progress"
+                            label={labels.run}
+                            value={jobView.progressValue}
+                            value-text={jobView.progressLine}
+                            size="large"
+                        ></c-barn-meter>
                     </template>
                     <template lwc:else>
                         <p data-id="job-summary">{jobView.summary}</p>
@@ -138,4 +163,5 @@
             </template>
         </div>
     </section>
+    </template>
 </template>

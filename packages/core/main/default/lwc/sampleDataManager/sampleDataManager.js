@@ -10,29 +10,20 @@ import cardTitle from '@salesforce/label/c.Core_SampleData_CardTitle';
 import loadButtonLabel from '@salesforce/label/c.Core_SampleData_LoadButton';
 import removeButtonLabel from '@salesforce/label/c.Core_SampleData_RemoveButton';
 import loadConfirmTitle from '@salesforce/label/c.Core_SampleData_LoadConfirmTitle';
-import loadConfirmBody from '@salesforce/label/c.Core_SampleData_LoadConfirmBody';
 import removeConfirmTitle from '@salesforce/label/c.Core_SampleData_RemoveConfirmTitle';
-import removeConfirmBody from '@salesforce/label/c.Core_SampleData_RemoveConfirmBody';
-import productionWarning from '@salesforce/label/c.Core_SampleData_ProductionWarning';
 import statusLoaded from '@salesforce/label/c.Core_SampleData_StatusLoaded';
 import statusNotLoaded from '@salesforce/label/c.Core_SampleData_StatusNotLoaded';
 import statusRemoving from '@salesforce/label/c.Core_SampleData_StatusRemoving';
-import statusLoading from '@salesforce/label/c.Core_SampleData_StatusLoading';
-import loadingAltText from '@salesforce/label/c.Core_SampleData_LoadingAltText';
-import householdsLabel from '@salesforce/label/c.Core_SampleData_HouseholdsLabel';
+import statusLoading from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import loadingAltText from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import householdsLabel from '@salesforce/label/c.Core_SettingsGroup_Households';
 import contactsLabel from '@salesforce/label/c.Core_SampleData_ContactsLabel';
-import organizationsLabel from '@salesforce/label/c.Core_SampleData_OrganizationsLabel';
-import relationshipsLabel from '@salesforce/label/c.Core_SampleData_RelationshipsLabel';
-import affiliationsLabel from '@salesforce/label/c.Core_SampleData_AffiliationsLabel';
-import readOnlyMessage from '@salesforce/label/c.Core_SampleData_ReadOnlyMessage';
-import loadSuccess from '@salesforce/label/c.Core_SampleData_LoadSuccess';
-import removeSuccess from '@salesforce/label/c.Core_SampleData_RemoveSuccess';
-import loadError from '@salesforce/label/c.Core_SampleData_LoadError';
-import removeError from '@salesforce/label/c.Core_SampleData_RemoveError';
-import statusError from '@salesforce/label/c.Core_SampleData_StatusError';
-import cancelButtonLabel from '@salesforce/label/c.Core_SampleData_CancelButton';
-import confirmButtonLabel from '@salesforce/label/c.Core_SampleData_ConfirmButton';
-import junctionModeNote from '@salesforce/label/c.Core_SampleData_JunctionModeNote';
+import organizationsLabel from '@salesforce/label/c.Core_HubHome_QuickLinkOrganizations';
+import relationshipsLabel from '@salesforce/label/c.Core_Feature_Relationships_Name';
+import affiliationsLabel from '@salesforce/label/c.Core_Feature_Affiliations_Name';
+import cancelButtonLabel from '@salesforce/label/c.Core_CmdtManager_CancelButton';
+import confirmButtonLabel from '@salesforce/label/c.Core_HealthCheck_ConfirmButton';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** How often the status card polls while a load is running (C-10). */
 const POLL_INTERVAL_MS = 3000;
@@ -44,15 +35,23 @@ const POLL_INTERVAL_MS = 3000;
  * See docs/admin-guide/sample-data.md.
  */
 export default class SampleDataManager extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   labels = {
     cardTitle,
     loadButtonLabel,
     removeButtonLabel,
     loadConfirmTitle,
-    loadConfirmBody,
+    get loadConfirmBody() {
+      return helpText('Core', 'Core_SampleData_LoadConfirmBody');
+    },
     removeConfirmTitle,
-    removeConfirmBody,
-    productionWarning,
+    get removeConfirmBody() {
+      return helpText('Core', 'Core_SampleData_RemoveConfirmBody');
+    },
+    get productionWarning() {
+      return helpText('Core', 'Core_SampleData_ProductionWarning');
+    },
     statusLoaded,
     statusNotLoaded,
     statusLoading,
@@ -63,15 +62,29 @@ export default class SampleDataManager extends LightningElement {
     organizationsLabel,
     relationshipsLabel,
     affiliationsLabel,
-    readOnlyMessage,
+    get readOnlyMessage() {
+      return helpText('Core', 'Core_SampleData_ReadOnlyMessage');
+    },
     cancelButtonLabel,
     confirmButtonLabel,
-    junctionModeNote,
-    loadSuccess,
-    removeSuccess,
-    loadError,
-    removeError,
-    statusError
+    get junctionModeNote() {
+      return helpText('Core', 'Core_SampleData_JunctionModeNote');
+    },
+    get loadSuccess() {
+      return helpText('Core', 'Core_SampleData_LoadSuccess');
+    },
+    get removeSuccess() {
+      return helpText('Core', 'Core_SampleData_RemoveSuccess');
+    },
+    get loadError() {
+      return helpText('Core', 'Core_SampleData_LoadError');
+    },
+    get removeError() {
+      return helpText('Core', 'Core_SampleData_RemoveError');
+    },
+    get statusError() {
+      return helpText('Core', 'Core_SampleData_StatusError');
+    }
   };
 
   householdCount = 0;
@@ -97,6 +110,11 @@ export default class SampleDataManager extends LightningElement {
   pollTimer;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.checkPermission();
     this.refreshStatus();
   }
@@ -212,11 +230,12 @@ export default class SampleDataManager extends LightningElement {
     return this.loaded ? this.labels.statusLoaded : this.labels.statusNotLoaded;
   }
 
-  get statusBadgeClass() {
+  /** The status badge's tone (c/barnStatus): running, success or neutral. */
+  get statusTone() {
     if (this.loading || this.removing) {
-      return 'slds-theme_warning';
+      return 'running';
     }
-    return this.loaded ? 'slds-theme_success' : '';
+    return this.loaded ? 'success' : 'neutral';
   }
 
   get loadDisabled() {

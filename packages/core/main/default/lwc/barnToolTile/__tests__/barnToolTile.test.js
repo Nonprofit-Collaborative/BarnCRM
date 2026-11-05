@@ -71,19 +71,16 @@ describe('c-barn-tool-tile', () => {
     expect(one(element, 'new-tab').className).toBe('slds-assistive-text');
   });
 
-  it.each([
-    ['success', 'slds-theme_success'],
-    ['warning', 'slds-theme_warning'],
-    ['error', 'slds-theme_error'],
-    ['inverse', 'slds-badge_inverse'],
-    [undefined, '']
-  ])('story: badge variant %s', async (variant, expected) => {
-    const element = render({ ...IMPORT, badgeLabel: '3 Need Attention', badgeVariant: variant });
-    await Promise.resolve();
-    const badge = one(element, 'badge');
-    expect(badge.label).toBe('3 Need Attention');
-    expect(badge.className).toBe(expected);
-  });
+  it.each([['success'], ['warning'], ['error'], [undefined]])(
+    'story: badge variant %s goes to the status badge',
+    async (variant) => {
+      const element = render({ ...IMPORT, badgeLabel: '3 Need Attention', badgeVariant: variant });
+      await Promise.resolve();
+      const badge = one(element, 'badge');
+      expect(badge.label).toBe('3 Need Attention');
+      expect(badge.status).toBe(variant);
+    }
+  );
 
   it('story: disabled shows its reason, stays focusable and fires nothing', () => {
     const element = render({

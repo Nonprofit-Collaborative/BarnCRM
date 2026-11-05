@@ -1,5 +1,6 @@
 <template>
-  <lightning-card title={labels.panelTitle} icon-name="standard:account">
+    <template lwc:if={helpReady}>
+  <lightning-card title={labels.panelTitle} icon-name={icons.affiliation}>
     <template lwc:if={canAdd}>
       <lightning-button
         slot="actions"
@@ -15,9 +16,12 @@
       </template>
 
       <template lwc:if={errorMessage}>
-        <div role="alert" class="slds-text-color_error slds-var-m-bottom_small" data-id="error">
-          {errorMessage}
-        </div>
+        <c-barn-notice
+          class="slds-var-m-bottom_small"
+          variant="error"
+          message={errorMessage}
+          data-id="error"
+        ></c-barn-notice>
       </template>
 
       <template lwc:if={isEmpty}>
@@ -28,48 +32,95 @@
         </c-barn-empty-state>
       </template>
 
-      <template for:each={affiliations} for:item="affiliation">
-        <div key={affiliation.id} class={affiliation.cardClass} data-id="affiliation-card">
-          <div class="slds-grid slds-grid_align-spread">
-            <div>
-              <p class="slds-text-heading_small" data-id="affiliation-headline">
-                {affiliation.headline}
-              </p>
-              <template lwc:if={affiliation.role}>
-                <p class="slds-text-title_caps" data-id="affiliation-role">{affiliation.role}</p>
-              </template>
-              <template lwc:if={affiliation.description}>
-                <p class="slds-text-body_small" data-id="affiliation-description">
-                  {affiliation.description}
-                </p>
-              </template>
-            </div>
-            <div>
-              <template lwc:if={affiliation.isPrimary}>
-                <lightning-badge
-                  label={labels.primaryBadge}
-                  data-id="primary-badge"
-                ></lightning-badge>
-              </template>
-              <template lwc:if={affiliation.isFormer}>
-                <lightning-badge
-                  label={labels.formerBadge}
-                  data-id="former-badge"
-                ></lightning-badge>
-              </template>
-              <template lwc:if={canMakePrimary}>
-                <template lwc:if={affiliation.showMakePrimary}>
-                  <lightning-button
-                    label={labels.makePrimaryButton}
-                    data-id={affiliation.id}
-                    onclick={handleMakePrimary}
-                    class="make-primary"
-                  ></lightning-button>
+      <template lwc:if={hasAffiliations}>
+        <ul class="slds-has-dividers_bottom-space" data-id="affiliation-list">
+          <template for:each={rows} for:item="affiliation">
+            <li key={affiliation.id} class={affiliation.rowClass} data-id="affiliation-card">
+              <div class="slds-media slds-media_center slds-media_small">
+                <div class="slds-media__figure" aria-hidden="true">
+                  <lightning-avatar
+                    variant="circle"
+                    size="small"
+                    initials={affiliation.initials}
+                    fallback-icon-name={affiliation.avatarIcon}
+                  ></lightning-avatar>
+                </div>
+                <div class="slds-media__body">
+                  <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+                    <h3 class="slds-text-heading_small slds-var-m-right_x-small">
+                      <a
+                        href={affiliation.href}
+                        data-record-id={affiliation.id}
+                        onclick={handleOpenRecord}
+                        data-id="affiliation-headline"
+                      >{affiliation.headline}</a>
+                    </h3>
+                    <template lwc:if={affiliation.isPrimary}>
+                      <c-barn-status-badge
+                        class="slds-var-m-right_xx-small"
+                        status="success"
+                        icon-name="utility:favorite"
+                        label={labels.primaryBadge}
+                        data-id="primary-badge"
+                      ></c-barn-status-badge>
+                    </template>
+                    <template lwc:if={affiliation.isFormer}>
+                      <c-barn-status-badge
+                        status="former"
+                        label={labels.formerBadge}
+                        data-id="former-badge"
+                      ></c-barn-status-badge>
+                    </template>
+                  </div>
+                  <template lwc:if={affiliation.role}>
+                    <p class="slds-text-body_small slds-text-color_weak" data-id="affiliation-role">{affiliation.role}</p>
+                  </template>
+                  <template lwc:if={affiliation.description}>
+                    <p class="slds-text-body_small slds-text-color_weak" data-id="affiliation-description">
+                      {affiliation.description}
+                    </p>
+                  </template>
+                </div>
+                <template lwc:if={affiliation.hasActions}>
+                  <div class="slds-media__figure slds-media__figure_reverse">
+                    <lightning-button-menu
+                      alternative-text={affiliation.actionsLabel}
+                      title={affiliation.actionsLabel}
+                      icon-size="small"
+                      menu-alignment="auto"
+                      data-record-id={affiliation.id}
+                      disabled={busy}
+                      onselect={handleRowAction}
+                      class="row-menu"
+                    >
+                      <template lwc:if={canEdit}>
+                        <lightning-menu-item
+                          value="edit"
+                          label={labels.editAction}
+                          class="edit-affiliation"
+                        ></lightning-menu-item>
+                      </template>
+                      <template lwc:if={affiliation.canMakePrimary}>
+                        <lightning-menu-item
+                          value="makePrimary"
+                          label={labels.makePrimaryButton}
+                          class="make-primary"
+                        ></lightning-menu-item>
+                      </template>
+                      <template lwc:if={affiliation.canEnd}>
+                        <lightning-menu-item
+                          value="end"
+                          label={labels.endAction}
+                          class="end-affiliation"
+                        ></lightning-menu-item>
+                      </template>
+                    </lightning-button-menu>
+                  </div>
                 </template>
-              </template>
-            </div>
-          </div>
-        </div>
+              </div>
+            </li>
+          </template>
+        </ul>
       </template>
 
       <template lwc:if={showForm}>
@@ -110,4 +161,5 @@
       </template>
     </div>
   </lightning-card>
+    </template>
 </template>

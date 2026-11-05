@@ -1,7 +1,5 @@
 <template>
     <template lwc:if={loadError}>
-        <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert" data-id="load-error">
-            <p>{loadError}</p>
-        </div>
+        <c-barn-notice variant="warning" message={loadError} data-id="load-error"></c-barn-notice>
     </template>
 </template>

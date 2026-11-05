@@ -1,8 +1,9 @@
 <template>
+    <template lwc:if={helpReady}>
     <ul class="slds-has-dividers_bottom-space">
         <template for:each={rows} for:item="module">
             <li key={module.name} class="slds-item slds-var-p-vertical_xx-small">
-                <span class={module.statusClass}>{module.status}</span>
+                <c-barn-status-badge status={module.statusTone} label={module.status} data-id="status"></c-barn-status-badge>
                 <span class="slds-text-heading_x-small slds-var-m-left_x-small" data-id="module-name"
                     >{module.displayName}</span
                 >
@@ -49,4 +50,5 @@
     <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small">
         {labels.managerNotice}
     </p>
+    </template>
 </template>

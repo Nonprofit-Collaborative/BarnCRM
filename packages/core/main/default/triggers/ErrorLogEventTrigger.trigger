@@ -6,5 +6,5 @@
  * is exactly when the entries matter most. `ErrorLogEventHandler` explains the rest.
  */
 trigger ErrorLogEventTrigger on Error_Log_Event__e(after insert) {
-    ErrorLogEventHandler.handle(Trigger.new);
+	ErrorLogEventHandler.handle(Trigger.new);
 }

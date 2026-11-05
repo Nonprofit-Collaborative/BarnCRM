@@ -20,30 +20,30 @@
  * sent on behalf of somebody who cannot open the pledge.
  */
 public without sharing class PledgeReminderWriter {
-    /**
-     * Inserts rows one at a time, keeping the ones that went in and reporting the ones that did
-     * not. The unique key on each row is the claim: a row whose installment and step already have
-     * a standing reminder fails, and that failure is the answer "already reminded".
-     */
-    public static List<Database.SaveResult> claim(List<Pledge_Reminder__c> rows) {
-        if (rows == null || rows.isEmpty()) {
-            return new List<Database.SaveResult>();
-        }
-        return Database.insert(rows, false, AccessLevel.SYSTEM_MODE);
-    }
+	/**
+	 * Inserts rows one at a time, keeping the ones that went in and reporting the ones that did
+	 * not. The unique key on each row is the claim: a row whose installment and step already have
+	 * a standing reminder fails, and that failure is the answer "already reminded".
+	 */
+	public static List<Database.SaveResult> claim(List<Pledge_Reminder__c> rows) {
+		if (rows == null || rows.isEmpty()) {
+			return new List<Database.SaveResult>();
+		}
+		return Database.insert(rows, false, AccessLevel.SYSTEM_MODE);
+	}
 
-    public static void updateReminders(List<Pledge_Reminder__c> rows) {
-        if (rows == null || rows.isEmpty()) {
-            return;
-        }
-        Database.update(rows, true, AccessLevel.SYSTEM_MODE);
-    }
+	public static void updateReminders(List<Pledge_Reminder__c> rows) {
+		if (rows == null || rows.isEmpty()) {
+			return;
+		}
+		Database.update(rows, true, AccessLevel.SYSTEM_MODE);
+	}
 
-    /** Updates rows one by one, reporting each, for settling after an all-or-none update failed. */
-    public static List<Database.SaveResult> settleEach(List<Pledge_Reminder__c> rows) {
-        if (rows == null || rows.isEmpty()) {
-            return new List<Database.SaveResult>();
-        }
-        return Database.update(rows, false, AccessLevel.SYSTEM_MODE);
-    }
+	/** Updates rows one by one, reporting each, for settling after an all-or-none update failed. */
+	public static List<Database.SaveResult> settleEach(List<Pledge_Reminder__c> rows) {
+		if (rows == null || rows.isEmpty()) {
+			return new List<Database.SaveResult>();
+		}
+		return Database.update(rows, false, AccessLevel.SYSTEM_MODE);
+	}
 }

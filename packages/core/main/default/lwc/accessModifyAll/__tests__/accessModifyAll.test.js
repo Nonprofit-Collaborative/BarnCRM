@@ -1,6 +1,12 @@
 import { createElement } from 'lwc';
 import AccessModifyAll from 'c/accessModifyAll';
 import getModifyAllReport from '@salesforce/apex/AccessExplorerController.getModifyAllReport';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_AccessModifyAll_Truncated: 'The list is cut at {0} rows.',
+  Core_AccessExplorer_Downloaded: 'Downloaded {0} rows.'
+});
 
 jest.mock(
   '@salesforce/apex/AccessExplorerController.getModifyAllReport',
@@ -20,19 +26,9 @@ jest.mock(
     virtual: true
   }
 );
-jest.mock('@salesforce/label/c.Core_AccessModifyAll_ScopeCustom', () => ({ default: 'Custom' }), {
+jest.mock('@salesforce/label/c.Core_DataDictionary_ColCustom', () => ({ default: 'Custom' }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_AccessModifyAll_Truncated',
-  () => ({ default: 'The list is cut at {0} rows.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_AccessExplorer_Downloaded',
-  () => ({ default: 'Downloaded {0} rows.' }),
-  { virtual: true }
-);
 
 const REPORT = {
   truncated: false,
@@ -134,7 +130,7 @@ describe('c-access-modify-all', () => {
     getModifyAllReport.mockResolvedValue({ truncated: true, dataGrants: [], objects: [] });
     const element = await render();
 
-    expect(byId(element, 'truncated').textContent).toBe('The list is cut at 2,000 rows.');
+    expect(byId(element, 'truncated').message).toBe('The list is cut at 2,000 rows.');
     expect(byId(element, 'data-empty')).not.toBeNull();
     expect(byId(element, 'objects-empty')).not.toBeNull();
   });
@@ -143,7 +139,7 @@ describe('c-access-modify-all', () => {
     getModifyAllReport.mockRejectedValue({ body: { message: 'No permission.' } });
     const element = await render();
 
-    expect(byId(element, 'error').textContent).toContain('No permission.');
+    expect(byId(element, 'error').message).toContain('No permission.');
     expect(byId(element, 'data')).toBeNull();
   });
 
@@ -161,6 +157,6 @@ describe('c-access-modify-all', () => {
     });
     expect(text).toContain('Gift Admin');
     expect(text).not.toContain('System Administrator');
-    expect(byId(element, 'notice').textContent).toBe('Downloaded 1 rows.');
+    expect(byId(element, 'notice').message).toBe('Downloaded 1 rows.');
   });
 });

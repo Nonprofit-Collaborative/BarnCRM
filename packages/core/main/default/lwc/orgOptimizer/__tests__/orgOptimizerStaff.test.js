@@ -30,10 +30,12 @@ describe('c-org-optimizer for staff with Find and Export only', () => {
     document.body.appendChild(element);
     await flush();
 
-    const tabs = Array.from(element.shadowRoot.querySelectorAll('lightning-tab')).map(
-      (tab) => tab.value
-    );
-    expect(tabs).toEqual(['overview', 'quality']);
+    const sections = Array.from(
+      element.shadowRoot.querySelectorAll('lightning-vertical-navigation-item-icon')
+    ).map((item) => item.name);
+    expect(sections).toEqual(['overview', 'quality']);
+    const show = element.shadowRoot.querySelector('lightning-combobox[data-id="show"]');
+    expect(show.options.map((option) => option.value)).toEqual(['overview', 'quality']);
     const groups = element.shadowRoot.querySelector('c-barn-tool-grid').groups;
     expect(groups.flatMap((group) => group.tiles).map((tile) => tile.name)).toEqual(['quality']);
     expect(getLastRun).not.toHaveBeenCalled();

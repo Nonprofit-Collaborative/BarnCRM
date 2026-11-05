@@ -7,20 +7,26 @@ import {
   logicProblem,
   operatorsFor,
   parseDocument,
+  renumberLogic,
   serializeDocument,
   toDocumentValue,
   toInputValue,
   valueKindFor,
   valueProblem
 } from 'c/filterDocument';
+import { createDragController, moveItem, targetIndex } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
 
+import MOVE_UP from '@salesforce/label/c.Core_Shared_MoveUp';
+import MOVE_DOWN from '@salesforce/label/c.Core_Shared_MoveDown';
+import CONDITIONS from '@salesforce/label/c.Core_Find_Conditions';
 import ADD_CONDITION from '@salesforce/label/c.Core_Filter_AddCondition';
 import REMOVE_CONDITION from '@salesforce/label/c.Core_Filter_RemoveCondition';
 import CONDITION_LEGEND from '@salesforce/label/c.Core_Filter_ConditionLegend';
-import FIELD from '@salesforce/label/c.Core_Filter_Field';
+import FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import FIELD_ON from '@salesforce/label/c.Core_Filter_FieldOn';
 import PARENT_FIELDS from '@salesforce/label/c.Core_Filter_ParentFields';
-import CHOOSE_FIELD from '@salesforce/label/c.Core_Filter_ChooseField';
+import CHOOSE_FIELD from '@salesforce/label/c.Core_BulkUpdate_ChooseField';
 import OPERATOR from '@salesforce/label/c.Core_Filter_Operator';
 import CHOOSE_OPERATOR from '@salesforce/label/c.Core_Filter_ChooseOperator';
 import VALUE from '@salesforce/label/c.Core_Filter_Value';
@@ -28,24 +34,11 @@ import VALUES_ONE_PER_LINE from '@salesforce/label/c.Core_Filter_ValuesOnePerLin
 import DAYS from '@salesforce/label/c.Core_Filter_Days';
 import AVAILABLE_VALUES from '@salesforce/label/c.Core_Filter_AvailableValues';
 import CHOSEN_VALUES from '@salesforce/label/c.Core_Filter_ChosenValues';
-import TRUE_LABEL from '@salesforce/label/c.Core_Filter_True';
-import FALSE_LABEL from '@salesforce/label/c.Core_Filter_False';
+import TRUE_LABEL from '@salesforce/label/c.Core_BulkUpdate_True';
+import FALSE_LABEL from '@salesforce/label/c.Core_BulkUpdate_False';
 import USE_LOGIC from '@salesforce/label/c.Core_Filter_UseLogic';
 import LOGIC from '@salesforce/label/c.Core_Filter_Logic';
-import LOGIC_HELP from '@salesforce/label/c.Core_Filter_LogicHelp';
-import EMPTY from '@salesforce/label/c.Core_Filter_Empty';
 import LOADING from '@salesforce/label/c.Core_Filter_Loading';
-import ERROR_CHOOSE_FIELD from '@salesforce/label/c.Core_Filter_ErrorChooseField';
-import ERROR_CHOOSE_OPERATOR from '@salesforce/label/c.Core_Filter_ErrorChooseOperator';
-import ERROR_VALUE_REQUIRED from '@salesforce/label/c.Core_Filter_ErrorValueRequired';
-import ERROR_NUMBER from '@salesforce/label/c.Core_Filter_ErrorNumber';
-import ERROR_DAYS from '@salesforce/label/c.Core_Filter_ErrorDays';
-import ERROR_FIELD_UNAVAILABLE from '@salesforce/label/c.Core_Filter_ErrorFieldUnavailable';
-import ERROR_LOGIC_SYNTAX from '@salesforce/label/c.Core_Filter_ErrorLogicSyntax';
-import ERROR_LOGIC_UNKNOWN from '@salesforce/label/c.Core_Filter_ErrorLogicUnknown';
-import ERROR_LOGIC_MISSING from '@salesforce/label/c.Core_Filter_ErrorLogicMissing';
-import ERROR_INVALID_DOCUMENT from '@salesforce/label/c.Core_Filter_ErrorInvalidDocument';
-import ERROR_SUMMARY from '@salesforce/label/c.Core_Filter_ErrorSummary';
 import SUMMARY_ALL from '@salesforce/label/c.Core_Filter_SummaryAll';
 import SUMMARY_LOGIC from '@salesforce/label/c.Core_Filter_SummaryLogic';
 import OP_EQUALS from '@salesforce/label/c.Core_Filter_OpEquals';
@@ -68,6 +61,7 @@ import OP_LAST_YEAR from '@salesforce/label/c.Core_Filter_OpLastYear';
 import OP_LAST_N_DAYS from '@salesforce/label/c.Core_Filter_OpLastNDays';
 import LAST_N_DAYS_VALUE from '@salesforce/label/c.Core_Filter_LastNDaysValue';
 import { messageFrom, format } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const OPERATOR_LABELS = {
   [OPERATORS.EQUALS]: OP_EQUALS,
@@ -102,11 +96,11 @@ function operatorLabel(field, operator) {
   return special || OPERATOR_LABELS[operator] || '';
 }
 
-const VALUE_PROBLEM_LABELS = {
-  valueRequired: ERROR_VALUE_REQUIRED,
-  number: ERROR_NUMBER,
-  days: ERROR_DAYS
-};
+const VALUE_PROBLEM_LABELS = () => ({
+  valueRequired: helpText('Core', 'Core_Filter_ErrorValueRequired'),
+  number: helpText('Core', 'Core_Filter_ErrorNumber'),
+  days: helpText('Core', 'Core_Filter_ErrorDays')
+});
 
 const FIELD_PREFIX = 'f:';
 const PARENT_PREFIX = 'r:';
@@ -122,6 +116,8 @@ const PARENT_PREFIX = 'r:';
  * whether it is valid, and a plain sentence describing it.
  */
 export default class FilterBuilder extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
   /** API name of the object the conditions test. */
   @api
   get objectApiName() {
@@ -161,13 +157,20 @@ export default class FilterBuilder extends LightningElement {
   @api disabled = false;
 
   labels = {
+    conditionsZone: CONDITIONS,
     addCondition: ADD_CONDITION,
     useLogic: USE_LOGIC,
     logic: LOGIC,
-    logicHelp: LOGIC_HELP,
-    empty: EMPTY,
+    get logicHelp() {
+      return helpText('Core', 'Core_Filter_LogicHelp');
+    },
+    get empty() {
+      return helpText('Core', 'Core_Filter_Empty');
+    },
     loading: LOADING,
-    errorSummary: ERROR_SUMMARY,
+    get errorSummary() {
+      return helpText('Core', 'Core_Filter_ErrorSummary');
+    },
     operator: OPERATOR,
     chooseOperator: CHOOSE_OPERATOR,
     value: VALUE,
@@ -192,12 +195,98 @@ export default class FilterBuilder extends LightningElement {
   infoByObject = new Map();
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.connected = true;
     this.rebuild();
+    // Drag a condition by its handle (mouse, pen, or touch after a press and hold) or by
+    // keyboard (Space, the arrow keys, Space again); Move Up and Move Down stay as the plain
+    // path. The condition logic's numbers follow their conditions.
+    this.drag = createDragController({
+      root: this.template,
+      layout: 'list',
+      messages: dragMessages(),
+      announce: (text) => {
+        this.announcement = text;
+      },
+      onChange: (state) => {
+        this.dragState = state;
+      },
+      onDrop: ({ itemId, toIndex }) => {
+        const from = this.rows.findIndex((row) => row.key === itemId);
+        if (from < 0 || from === toIndex) {
+          return false;
+        }
+        this.moveCondition(from, toIndex);
+        return true;
+      }
+    });
   }
 
   disconnectedCallback() {
     this.connected = false;
+    if (this.drag) {
+      this.drag.destroy();
+    }
+  }
+
+  /** The last move, read out by the aria-live region. */
+  announcement = '';
+  /** c/barnDrag's state while a condition is dragged: which one, and where it would land. */
+  dragState;
+
+  get dragHelp() {
+    return dragInstructions();
+  }
+
+  /** Two or more conditions can be put in order; a read only builder cannot. */
+  get canReorder() {
+    return this.rows.length > 1 && !this.disabled;
+  }
+
+  /** Moves a condition and renumbers the logic so each number still names the same condition. */
+  moveCondition(from, to) {
+    const logic = this.logicText;
+    this.rows = moveItem(this.rows, from, to);
+    if (logic) {
+      this.logicText = renumberLogic(logic, from, to, this.rows.length);
+    }
+    this.emitChange();
+  }
+
+  handlePointerDown(event) {
+    this.drag.pointerDown(event);
+  }
+
+  handleDragKey(event) {
+    this.drag.keyDown(event);
+  }
+
+  handleMoveUp(event) {
+    this.moveBy(event.currentTarget.dataset.key, -1);
+  }
+
+  handleMoveDown(event) {
+    this.moveBy(event.currentTarget.dataset.key, 1);
+  }
+
+  moveBy(key, delta) {
+    const from = this.rows.findIndex((row) => row.key === key);
+    const to = targetIndex(from, delta, this.rows.length);
+    if (to < 0) {
+      return;
+    }
+    this.moveCondition(from, to);
+    this.announcement = helpText(
+      'Core',
+      'Core_Drag_Position',
+      format(CONDITION_LEGEND, String(to + 1)),
+      to + 1,
+      this.rows.length
+    );
   }
 
   /** Checks every condition and the logic; returns { valid, message }. Shows nothing. */
@@ -254,6 +343,15 @@ export default class FilterBuilder extends LightningElement {
 
   /** One view per condition, with everything the markup needs worked out here. */
   get rowViews() {
+    const drag = this.dragState && this.dragState.active ? this.dragState : null;
+    // While dragging, the condition the dragged one would land before (or after, at the end).
+    const others = drag ? this.rows.filter((row) => row.key !== drag.itemId) : [];
+    const before = drag && drag.overIndex >= 0 ? others[drag.overIndex] : null;
+    const after =
+      drag && drag.overIndex >= 0 && drag.overIndex === others.length && others.length
+        ? others[others.length - 1]
+        : null;
+    const last = this.rows.length - 1;
     return this.rows.map((row, index) => {
       const number = String(index + 1);
       const field = this.leafField(row);
@@ -264,6 +362,18 @@ export default class FilterBuilder extends LightningElement {
         number,
         legend: format(CONDITION_LEGEND, number),
         removeLabel: format(REMOVE_CONDITION, number),
+        rowClass: [
+          'slds-form-element slds-var-m-bottom_small slds-var-p-bottom_x-small slds-border_bottom',
+          drag && drag.itemId === row.key ? 'condition-dragging' : '',
+          before && before.key === row.key ? 'condition-over-before' : '',
+          after && after.key === row.key ? 'condition-over-after' : ''
+        ]
+          .filter(Boolean)
+          .join(' '),
+        moveUpLabel: `${MOVE_UP}: ${format(CONDITION_LEGEND, number)}`,
+        moveDownLabel: `${MOVE_DOWN}: ${format(CONDITION_LEGEND, number)}`,
+        moveUpDisabled: index === 0,
+        moveDownDisabled: index === last,
         segments: this.segmentViews(row),
         operatorOptions: operatorsFor(field, !this.hideRelativeDates).map((operator) => ({
           label: operatorLabel(field, operator),
@@ -485,17 +595,17 @@ export default class FilterBuilder extends LightningElement {
 
   rowProblem(row) {
     if (row.unavailable) {
-      return format(ERROR_FIELD_UNAVAILABLE, row.rawField);
+      return format(helpText('Core', 'Core_Filter_ErrorFieldUnavailable'), row.rawField);
     }
     const field = this.leafField(row);
     if (!field) {
-      return ERROR_CHOOSE_FIELD;
+      return helpText('Core', 'Core_Filter_ErrorChooseField');
     }
     if (!row.operator || !operatorsFor(field, !this.hideRelativeDates).includes(row.operator)) {
-      return ERROR_CHOOSE_OPERATOR;
+      return helpText('Core', 'Core_Filter_ErrorChooseOperator');
     }
     const problem = valueProblem(valueKindFor(field, row.operator), row.inputValue);
-    return problem ? VALUE_PROBLEM_LABELS[problem] : undefined;
+    return problem ? VALUE_PROBLEM_LABELS()[problem] : undefined;
   }
 
   logicMessage() {
@@ -504,12 +614,12 @@ export default class FilterBuilder extends LightningElement {
       return undefined;
     }
     if (found.problem === 'unknown') {
-      return format(ERROR_LOGIC_UNKNOWN, found.condition);
+      return format(helpText('Core', 'Core_Filter_ErrorLogicUnknown'), found.condition);
     }
     if (found.problem === 'missing') {
-      return format(ERROR_LOGIC_MISSING, found.condition);
+      return format(helpText('Core', 'Core_Filter_ErrorLogicMissing'), found.condition);
     }
-    return ERROR_LOGIC_SYNTAX;
+    return helpText('Core', 'Core_Filter_ErrorLogicSyntax');
   }
 
   firstProblem() {
@@ -559,7 +669,7 @@ export default class FilterBuilder extends LightningElement {
       return this.logicEnabled ? `${index + 1}. ${condition}` : condition;
     });
     if (parts.length === 0) {
-      return EMPTY;
+      return helpText('Core', 'Core_Filter_Empty');
     }
     return this.logicEnabled
       ? format(SUMMARY_LOGIC, parts.join('; '), this.logicText)
@@ -622,7 +732,7 @@ export default class FilterBuilder extends LightningElement {
       try {
         parsed = parseDocument(this._value);
       } catch {
-        this.loadError = ERROR_INVALID_DOCUMENT;
+        this.loadError = helpText('Core', 'Core_Filter_ErrorInvalidDocument');
         return;
       }
       const rows = [];

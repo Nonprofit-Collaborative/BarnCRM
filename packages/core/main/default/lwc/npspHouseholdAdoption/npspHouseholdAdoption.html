@@ -1,0 +1,129 @@
+<template>
+    <template lwc:if={helpReady}>
+  <div class="slds-var-p-around_medium">
+    <h2 class="slds-text-heading_small" data-id="title">{labels.title}</h2>
+    <p class="slds-text-body_small slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+
+    <template lwc:if={errorMessage}>
+      <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+    </template>
+    <template lwc:if={noticeMessage}>
+      <p class="slds-var-m-bottom_small" data-id="notice" role="status" aria-live="polite">
+        {noticeMessage}
+      </p>
+    </template>
+
+    <template lwc:if={status}>
+      <template lwc:if={running}>
+        <p class="slds-var-m-bottom_small" data-id="running" role="status">{labels.running}</p>
+      </template>
+
+      <template lwc:if={available}>
+        <template lwc:if={hasCandidates}>
+          <p class="slds-var-m-bottom_x-small" data-id="candidates">
+            <strong>{candidateMessage}</strong>
+          </p>
+          <template lwc:if={moreThanLimitMessage}>
+            <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id="more">
+              {moreThanLimitMessage}
+            </p>
+          </template>
+          <template lwc:if={hasSample}>
+            <div class="slds-scrollable_x slds-var-m-bottom_small">
+              <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked" data-id="sample">
+                <caption class="slds-assistive-text">
+                  {labels.sampleCaption}
+                </caption>
+                <thead>
+                  <tr class="slds-line-height_reset">
+                    <th scope="col">{labels.columnName}</th>
+                    <th scope="col">{labels.columnFormal}</th>
+                    <th scope="col">{labels.columnInformal}</th>
+                    <th scope="col">{labels.columnPrimary}</th>
+                    <th scope="col">{labels.columnContacts}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template for:each={sample} for:item="row">
+                    <tr key={row.accountId}>
+                      <th scope="row" data-label={labels.columnName}>{row.name}</th>
+                      <td data-label={labels.columnFormal}>{row.formalGreeting}</td>
+                      <td data-label={labels.columnInformal}>{row.informalGreeting}</td>
+                      <td data-label={labels.columnPrimary}>{row.primaryContactName}</td>
+                      <td data-label={labels.columnContacts}>{row.contactCount}</td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+          </template>
+          <lightning-input
+            type="checkbox"
+            data-id="keep-names"
+            label={labels.keepNames}
+            checked={keepNames}
+            field-level-help={labels.keepNamesHelp}
+            onchange={handleKeepNames}
+          ></lightning-input>
+        </template>
+        <template lwc:else>
+          <p class="slds-var-m-bottom_small" data-id="none-left">{labels.noneLeft}</p>
+        </template>
+
+        <template lwc:if={blockedReason}>
+          <c-barn-notice class="slds-var-m-vertical_small" variant="warning" message={blockedReason} data-id="blocked"></c-barn-notice>
+        </template>
+      </template>
+      <template lwc:else>
+        <p class="slds-var-m-bottom_small" data-id="not-available">{labels.notAvailable}</p>
+      </template>
+
+      <div class="slds-var-m-top_small">
+        <template lwc:if={available}>
+          <lightning-button
+            data-id="adopt"
+            variant="brand"
+            label={labels.adoptButton}
+            disabled={adoptDisabled}
+            onclick={handleAdopt}
+            class="slds-var-m-right_x-small"
+          ></lightning-button>
+        </template>
+        <lightning-button
+          data-id="refresh"
+          label={labels.refresh}
+          disabled={busy}
+          onclick={handleRefresh}
+        ></lightning-button>
+      </div>
+
+      <template lwc:if={lastRun}>
+        <div class="slds-box slds-box_x-small slds-var-m-top_medium" data-id="last-run">
+          <p>
+            <strong>{labels.lastRun}:</strong>
+            <lightning-formatted-date-time
+              class="slds-var-m-left_xx-small"
+              value={lastRun.adoptedAt}
+              year="numeric"
+              month="short"
+              day="2-digit"
+              hour="2-digit"
+              minute="2-digit"
+            ></lightning-formatted-date-time>
+          </p>
+          <p data-id="last-run-counts">{lastRunCounts}</p>
+          <template lwc:if={canUndo}>
+            <lightning-button
+              class="slds-var-m-top_x-small"
+              data-id="undo"
+              label={labels.undoButton}
+              disabled={undoDisabled}
+              onclick={handleUndo}
+            ></lightning-button>
+          </template>
+        </div>
+      </template>
+    </template>
+  </div>
+    </template>
+</template>

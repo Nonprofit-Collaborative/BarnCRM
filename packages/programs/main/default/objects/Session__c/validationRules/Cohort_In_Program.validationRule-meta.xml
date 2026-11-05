@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Cohort_In_Program</fullName>
+  <active>true</active>
+  <description>
+    R-SE1: a session's cohort is a cohort of its service's program.
+  </description>
+  <errorConditionFormula>
+AND(
+  NOT(ISBLANK(Cohort__c)),
+  Cohort__r.Program__c &lt;&gt; Service__r.Program__c
+)
+  </errorConditionFormula>
+  <errorDisplayField>Cohort__c</errorDisplayField>
+  <errorMessage>
+    Choose a cohort of this service's program.
+  </errorMessage>
+</ValidationRule>

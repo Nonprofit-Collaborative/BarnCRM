@@ -17,14 +17,6 @@
         <value>{0} did not finish</value>
     </labels>
     <labels>
-        <fullName>Core_JobNotice_Import</fullName>
-        <categories>Job Notifications</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Job notification: name of an import</shortDescription>
-        <value>Import</value>
-    </labels>
-    <labels>
         <fullName>Core_JobNotice_ImportPreview</fullName>
         <categories>Job Notifications</categories>
         <language>en_US</language>
@@ -46,7 +38,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Job notification: name of a bulk update</shortDescription>
-        <value>Bulk update</value>
+        <value>Super Transformer run</value>
     </labels>
     <labels>
         <fullName>Core_JobNotice_BulkUpdateUndo</fullName>
@@ -54,7 +46,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Job notification: name of a bulk update undo</shortDescription>
-        <value>Bulk update undo</value>
+        <value>Super Transformer undo</value>
     </labels>
     <labels>
         <fullName>Core_JobNotice_BulkDelete</fullName>
@@ -87,14 +79,6 @@
         <protected>false</protected>
         <shortDescription>Job notification: name of a rollup recalculation</shortDescription>
         <value>Rollup recalculation</value>
-    </labels>
-    <labels>
-        <fullName>Core_JobNotice_SeasonalAddress</fullName>
-        <categories>Job Notifications</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Job notification: name of the seasonal address swap</shortDescription>
-        <value>Seasonal address swap</value>
     </labels>
     <labels>
         <fullName>Core_JobNotice_DuplicateScan</fullName>
@@ -134,7 +118,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Bulk update notice; {0} updated, {1} right, {2} unmatched, {3} failed</shortDescription>
-        <value>{0} updated, {1} already right, {2} no longer matched, {3} could not be saved. Open the bulk update for the run log.</value>
+        <value>{0} updated, {1} already right, {2} no longer matched, {3} could not be saved. Open the Super Transformer run for its log.</value>
     </labels>
     <labels>
         <fullName>Core_JobNotice_BulkDeleteBody</fullName>

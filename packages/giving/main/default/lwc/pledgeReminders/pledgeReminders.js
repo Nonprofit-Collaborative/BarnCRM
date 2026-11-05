@@ -8,9 +8,7 @@ import markLettersSent from '@salesforce/apex/PledgeReminderController.markLette
 import setSchedule from '@salesforce/apex/PledgeReminderController.setSchedule';
 
 import TITLE from '@salesforce/label/c.Giving_PledgeReminders_Title';
-import INTRO from '@salesforce/label/c.Giving_PledgeReminders_Intro';
 import OFF from '@salesforce/label/c.Giving_PledgeReminders_Off';
-import NO_STEPS from '@salesforce/label/c.Giving_PledgeReminders_NoSteps';
 import QUEUE_HEADING from '@salesforce/label/c.Giving_PledgeReminders_QueueHeading';
 import EMAILS_DUE from '@salesforce/label/c.Giving_PledgeReminders_EmailsDue';
 import LETTERS_DUE from '@salesforce/label/c.Giving_PledgeReminders_LettersDue';
@@ -26,39 +24,39 @@ import LETTERS_MARKED_SENT from '@salesforce/label/c.Giving_PledgeReminders_Lett
 import NIGHTLY from '@salesforce/label/c.Giving_PledgeReminders_Nightly';
 import NEXT_RUN from '@salesforce/label/c.Giving_PledgeReminders_NextRun';
 import NOT_SCHEDULED from '@salesforce/label/c.Giving_PledgeReminders_NotScheduled';
-import LAST_RUN from '@salesforce/label/c.Giving_PledgeReminders_LastRun';
+import LAST_RUN from '@salesforce/label/c.Core_HealthCheck_LastRunLabel';
 import NEVER_RUN from '@salesforce/label/c.Giving_PledgeReminders_NeverRun';
-import STEPS_HEADING from '@salesforce/label/c.Giving_PledgeReminders_StepsHeading';
+import STEPS_HEADING from '@salesforce/label/c.Giving_Stewardship_StepsHeading';
 import NEW_STEP from '@salesforce/label/c.Giving_PledgeReminders_NewStep';
-import EDIT_STEP from '@salesforce/label/c.Giving_PledgeReminders_EditStep';
+import EDIT_STEP from '@salesforce/label/c.Core_CmdtManager_EditAction';
 import EDIT_STEP_OF from '@salesforce/label/c.Giving_PledgeReminders_EditStepOf';
-import NEW_STEP_HEADING from '@salesforce/label/c.Giving_PledgeReminders_NewStepHeading';
+import NEW_STEP_HEADING from '@salesforce/label/c.Giving_PledgeReminders_NewStep';
 import EDIT_STEP_HEADING from '@salesforce/label/c.Giving_PledgeReminders_EditStepHeading';
 import TEMPLATE_FIELD from '@salesforce/label/c.Giving_PledgeReminders_TemplateField';
-import TEMPLATE_FIELD_HELP from '@salesforce/label/c.Giving_PledgeReminders_TemplateFieldHelp';
 import TEMPLATE_PLACEHOLDER from '@salesforce/label/c.Giving_PledgeReminders_TemplatePlaceholder';
 import TEMPLATE_REQUIRED from '@salesforce/label/c.Giving_PledgeReminders_TemplateRequired';
 import SAVE_STEP from '@salesforce/label/c.Giving_PledgeReminders_SaveStep';
-import CANCEL_STEP from '@salesforce/label/c.Giving_PledgeReminders_CancelStep';
+import CANCEL_STEP from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import STEP_SAVED from '@salesforce/label/c.Giving_PledgeReminders_StepSaved';
 import LOG_HEADING from '@salesforce/label/c.Giving_PledgeReminders_LogHeading';
 import NO_LOG from '@salesforce/label/c.Giving_PledgeReminders_NoLog';
-import TEMPLATE_MISSING from '@salesforce/label/c.Giving_PledgeReminders_TemplateMissing';
-import INACTIVE from '@salesforce/label/c.Giving_PledgeReminders_Inactive';
+import TEMPLATE_MISSING from '@salesforce/label/c.Giving_Acknowledgments_TemplateNotFound';
+import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
 import ACTION_FAILED from '@salesforce/label/c.Giving_PledgeReminders_ActionFailed';
 import COLUMN_STEP from '@salesforce/label/c.Giving_PledgeReminders_ColumnStep';
-import COLUMN_TIMING from '@salesforce/label/c.Giving_PledgeReminders_ColumnTiming';
-import COLUMN_CHANNEL from '@salesforce/label/c.Giving_PledgeReminders_ColumnChannel';
-import COLUMN_TEMPLATE from '@salesforce/label/c.Giving_PledgeReminders_ColumnTemplate';
+import COLUMN_TIMING from '@salesforce/label/c.Core_FieldAccess_ColWhen';
+import COLUMN_CHANNEL from '@salesforce/label/c.Giving_Acknowledgments_ColumnChannel';
+import COLUMN_TEMPLATE from '@salesforce/label/c.Core_Import_StepTemplate';
 import COLUMN_PLEDGE from '@salesforce/label/c.Giving_PledgeReminders_ColumnPledge';
 import COLUMN_INSTALLMENT from '@salesforce/label/c.Giving_PledgeReminders_ColumnInstallment';
-import COLUMN_STATUS from '@salesforce/label/c.Giving_PledgeReminders_ColumnStatus';
+import COLUMN_STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
 import COLUMN_SENT_ON from '@salesforce/label/c.Giving_PledgeReminders_ColumnSentOn';
 import DOWNLOAD_FILE from '@salesforce/label/c.Giving_PledgeReminders_DownloadFile';
 import DAYS_BEFORE from '@salesforce/label/c.Giving_PledgeReminders_DaysBefore';
 import ON_DUE_DATE from '@salesforce/label/c.Giving_PledgeReminders_OnDueDate';
 import DAYS_AFTER from '@salesforce/label/c.Giving_PledgeReminders_DaysAfter';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_DOWNLOAD_PATH = '/sfc/servlet.shepherd/document/download/';
 const CHANNEL_EMAIL = 'Email';
@@ -75,11 +73,25 @@ const CHANNEL_EMAIL = 'Email';
  * says so when it is off rather than offering a second switch.
  */
 export default class PledgeReminders extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Giving');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     title: TITLE,
-    intro: INTRO,
+    get intro() {
+      return helpText('Giving', 'Giving_PledgeReminders_Intro');
+    },
     off: OFF,
-    noSteps: NO_STEPS,
+    get noSteps() {
+      return helpText('Giving', 'Giving_PledgeReminders_NoSteps');
+    },
     queueHeading: QUEUE_HEADING,
     emailsDue: EMAILS_DUE,
     lettersDue: LETTERS_DUE,
@@ -96,7 +108,9 @@ export default class PledgeReminders extends NavigationMixin(LightningElement) {
     newStep: NEW_STEP,
     editStep: EDIT_STEP,
     templateField: TEMPLATE_FIELD,
-    templateFieldHelp: TEMPLATE_FIELD_HELP,
+    get templateFieldHelp() {
+      return helpText('Giving', 'Giving_PledgeReminders_TemplateFieldHelp');
+    },
     templatePlaceholder: TEMPLATE_PLACEHOLDER,
     templateRequired: TEMPLATE_REQUIRED,
     saveStep: SAVE_STEP,

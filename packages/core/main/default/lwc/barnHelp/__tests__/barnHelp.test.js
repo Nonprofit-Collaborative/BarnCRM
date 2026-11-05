@@ -53,6 +53,12 @@ describe('c-barn-help', () => {
     expect(one(element, 'learn-more').textContent).toContain('Read the Import Guide');
   });
 
+  it('story: popover text from the help catalog by key', () => {
+    const element = render({ helpPackage: 'Giving', helpKey: 'Giving_Example_Help' });
+    // The Jest stand-in for c/barnHelpText reads a key as "c.<key>", like a label stub.
+    expect(one(element, 'helptext').content).toBe('c.Giving_Example_Help');
+  });
+
   it('renders nothing visible when given nothing', () => {
     const element = render({});
     expect(one(element, 'helptext')).toBeNull();

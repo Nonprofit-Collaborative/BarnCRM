@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
   <div class="slds-var-p-around_medium">
     <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
       <p data-id="intro">{labels.intro}</p>
@@ -11,9 +12,12 @@
     </div>
 
     <template lwc:if={errorMessage}>
-      <p class="slds-text-color_error slds-var-m-vertical_small" data-id="error" role="alert">
-        {errorMessage}
-      </p>
+      <c-barn-notice
+        class="slds-show slds-var-m-vertical_small"
+        variant="error"
+        message={errorMessage}
+        data-id="error"
+      ></c-barn-notice>
     </template>
     <template lwc:if={statusMessage}>
       <p class="slds-var-m-vertical_small" data-id="status" role="status" aria-live="polite">
@@ -50,14 +54,14 @@
               <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
                 <h2 class="slds-text-heading_small slds-var-m-right_x-small">{source.label}</h2>
                 <template lwc:if={source.shipped}>
-                  <lightning-badge label={labels.shipped} data-id="shipped"></lightning-badge>
+                  <c-barn-status-badge status="info" label={labels.shipped} data-id="shipped"></c-barn-status-badge>
                 </template>
                 <template lwc:if={showReadOnly}>
-                  <lightning-badge
-                    class={source.statusClass}
+                  <c-barn-status-badge
+                    status={source.statusTone}
                     label={source.statusText}
                     data-id="status-badge"
-                  ></lightning-badge>
+                  ></c-barn-status-badge>
                 </template>
               </div>
               <p class="slds-text-body_small" data-id="summary">{source.summary}</p>
@@ -181,4 +185,5 @@
       </template>
     </ul>
   </div>
+    </template>
 </template>

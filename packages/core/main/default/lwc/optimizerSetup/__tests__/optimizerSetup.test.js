@@ -1,6 +1,11 @@
 import { createElement } from 'lwc';
 import OptimizerSetup from 'c/optimizerSetup';
 import getFindings from '@salesforce/apex/OrgOptimizerSetupController.getFindings';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_OrgOptimizer_CouldNotCheck: 'Could not check'
+});
 
 jest.mock(
   '@salesforce/apex/OrgOptimizerSetupController.getFindings',
@@ -12,13 +17,12 @@ jest.mock(
   () => ({ default: 'Active users who have not logged in for {0} days' }),
   { virtual: true }
 );
-jest.mock('@salesforce/label/c.Core_OrgOptimizer_MoreThan', () => ({ default: 'More than {0}' }), {
-  virtual: true
-});
 jest.mock(
-  '@salesforce/label/c.Core_OrgOptimizer_CouldNotCheck',
-  () => ({ default: 'Could not check' }),
-  { virtual: true }
+  '@salesforce/label/c.Core_HealthCheck_OrphansMoreThan',
+  () => ({ default: 'More than {0}' }),
+  {
+    virtual: true
+  }
 );
 
 const RESULT = {
@@ -78,19 +82,19 @@ describe('c-optimizer-setup', () => {
 
     const users = element.shadowRoot.querySelector('[data-id="inactiveUsers"]');
     expect(users.textContent).toContain('Active users who have not logged in for 90 days');
-    expect(users.querySelector('[data-id="count"]').textContent).toBe('2');
+    const count = users.querySelector('c-barn-status-badge[data-id="count"]');
+    expect(count.label).toBe('2');
+    // A check that found something is a warning badge (the visual standard's vocabulary).
+    expect(count.status).toBe('warning');
     expect(users.querySelector('[data-id="examples"]').textContent).toBe('Ana Lopez, Sam Reed');
     const link = users.querySelector('[data-id="setup-link"]');
     expect(link.getAttribute('href')).toBe('/lightning/setup/ManageUsers/home');
     // The new-tab cue: an icon, and words for screen readers.
     expect(link.querySelector('lightning-icon').iconName).toBe('utility:new_window');
     expect(link.querySelector('.slds-assistive-text')).not.toBeNull();
-    expect(users.querySelector('[data-id="count"]').classList.contains('slds-theme_warning')).toBe(
-      true
-    );
 
     const reports = element.shadowRoot.querySelector('[data-id="staleReports"]');
-    expect(reports.querySelector('[data-id="count"]').textContent).toBe('More than 1000');
+    expect(reports.querySelector('[data-id="count"]').label).toBe('More than 1000');
   });
 
   it('says a check could not run, without examples', async () => {
@@ -102,10 +106,63 @@ describe('c-optimizer-setup', () => {
     expect(flows.querySelector('[data-id="examples"]')).toBeNull();
   });
 
+  it('keeps the technical debt checks in a collapsed For Developers part, closed by default (admin-21)', async () => {
+    getFindings.mockResolvedValue({
+      ...RESULT,
+      apiVersion: 50,
+      findings: [
+        { ...RESULT.findings[0] },
+        {
+          key: 'apexOldApi',
+          kind: 'debt',
+          count: 3,
+          moreThan: false,
+          failed: false,
+          examples: ['OldClass'],
+          setupUrl: '/lightning/setup/ApexClasses/home'
+        }
+      ]
+    });
+    const element = await render();
+
+    const debt = element.shadowRoot.querySelector('[data-id="debt-section"]');
+    expect(debt.querySelector('h3').textContent).toBe('c.Core_TechDebt_DebtHeading');
+    const toggle = debt.querySelector('[data-id="debt-toggle"]');
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+    expect(debt.classList.contains('slds-is-open')).toBe(false);
+    expect(debt.querySelector('[data-id="apexOldApi"]')).toBeNull();
+
+    toggle.click();
+    await flush();
+
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(debt.classList.contains('slds-is-open')).toBe(true);
+    expect(debt.querySelector('[data-id="debt-intro"]')).not.toBeNull();
+    const apex = debt.querySelector('[data-id="apexOldApi"]');
+    expect(apex).not.toBeNull();
+    expect(apex.querySelector('[data-id="count"]').label).toBe('3');
+    // The unused list keeps its checks, always open, under the section's own heading.
+    const unused = element.shadowRoot.querySelector('[data-id="unused-section"]');
+    expect(unused.querySelector('[data-id="inactiveUsers"]')).not.toBeNull();
+    expect(unused.querySelector('[data-id="apexOldApi"]')).toBeNull();
+    expect(unused.querySelector('h3')).toBeNull();
+
+    toggle.click();
+    await flush();
+    expect(debt.querySelector('[data-id="apexOldApi"]')).toBeNull();
+  });
+
+  it('shows no heading when there are no technical debt checks', async () => {
+    getFindings.mockResolvedValue(RESULT);
+    const element = await render();
+    expect(element.shadowRoot.querySelector('[data-id="debt-section"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('h3')).toBeNull();
+  });
+
   it('shows the server refusal and reads again on Refresh', async () => {
     getFindings.mockRejectedValueOnce({ body: { message: 'Needs Manage BarnCRM Settings' } });
     const element = await render();
-    expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toBe(
       'Needs Manage BarnCRM Settings'
     );
 

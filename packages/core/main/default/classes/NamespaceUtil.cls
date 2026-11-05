@@ -15,130 +15,130 @@
  */
 @NamespaceAccessible
 public with sharing class NamespaceUtil {
-    @TestVisible
-    private static String cachedPrefix;
+	@TestVisible
+	private static String cachedPrefix;
 
-    /**
-     * The package prefix, `mynamespace__` in a managed package and empty everywhere else.
-     */
-    @NamespaceAccessible
-    public static String prefix() {
-        if (cachedPrefix == null) {
-            String className = NamespaceUtil.class.getName();
-            cachedPrefix = className.contains('.') ? className.substringBefore('.') + '__' : '';
-        }
-        return cachedPrefix;
-    }
+	/**
+	 * The package prefix, `mynamespace__` in a managed package and empty everywhere else.
+	 */
+	@NamespaceAccessible
+	public static String prefix() {
+		if (cachedPrefix == null) {
+			String className = NamespaceUtil.class.getName();
+			cachedPrefix = className.contains('.') ? className.substringBefore('.') + '__' : '';
+		}
+		return cachedPrefix;
+	}
 
-    /**
-     * A packaged API name with whatever prefix this org needs, for example a tab or page name.
-     */
-    @NamespaceAccessible
-    public static String qualify(String apiName) {
-        return String.isBlank(apiName) ? apiName : prefix() + apiName;
-    }
+	/**
+	 * A packaged API name with whatever prefix this org needs, for example a tab or page name.
+	 */
+	@NamespaceAccessible
+	public static String qualify(String apiName) {
+		return String.isBlank(apiName) ? apiName : prefix() + apiName;
+	}
 
-    /** Stands in for the org's global describe in tests, keyed by lower-case API name. */
-    @TestVisible
-    private static Map<String, Schema.SObjectType> describeOverride;
+	/** Stands in for the org's global describe in tests, keyed by lower-case API name. */
+	@TestVisible
+	private static Map<String, Schema.SObjectType> describeOverride;
 
-    /** Objects by trimmed lower-case name, null when absent, looked up once per transaction. */
-    @TestVisible
-    private static Map<String, Schema.SObjectType> typesByName = new Map<String, Schema.SObjectType>();
+	/** Objects by trimmed lower-case name, null when absent, looked up once per transaction. */
+	@TestVisible
+	private static Map<String, Schema.SObjectType> typesByName = new Map<String, Schema.SObjectType>();
 
-    /**
-     * The object a metadata row or setting names. Rows name objects without a prefix, so this
-     * package's own object (`prefix() + name`) is tried first, then the name exactly as written:
-     * a standard object, the subscriber's own object, or a name that already carries a prefix.
-     * There is no match on the part after some other prefix, which could pick another package's
-     * object (NPSP's `Address__c`). Null when nothing matches.
-     */
-    @NamespaceAccessible
-    public static Schema.SObjectType objectType(String apiName) {
-        if (String.isBlank(apiName)) {
-            return null;
-        }
-        String name = apiName.trim().toLowerCase();
-        if (!typesByName.containsKey(name)) {
-            Schema.SObjectType type = packagedObjectType(name);
-            typesByName.put(name, type != null ? type : globalDescribe().get(name));
-        }
-        return typesByName.get(name);
-    }
+	/**
+	 * The object a metadata row or setting names. Rows name objects without a prefix, so this
+	 * package's own object (`prefix() + name`) is tried first, then the name exactly as written:
+	 * a standard object, the subscriber's own object, or a name that already carries a prefix.
+	 * There is no match on the part after some other prefix, which could pick another package's
+	 * object (NPSP's `Address__c`). Null when nothing matches.
+	 */
+	@NamespaceAccessible
+	public static Schema.SObjectType objectType(String apiName) {
+		if (String.isBlank(apiName)) {
+			return null;
+		}
+		String name = apiName.trim().toLowerCase();
+		if (!typesByName.containsKey(name)) {
+			Schema.SObjectType type = packagedObjectType(name);
+			typesByName.put(name, type != null ? type : globalDescribe().get(name));
+		}
+		return typesByName.get(name);
+	}
 
-    /**
-     * This package's own object of that name, or null. Never the subscriber's object or another
-     * package's, even when its name ends the same way, so it is safe for asking whether a
-     * BarnCRM object is in the org.
-     */
-    @NamespaceAccessible
-    public static Schema.SObjectType packagedObjectType(String apiName) {
-        if (String.isBlank(apiName)) {
-            return null;
-        }
-        return globalDescribe().get(qualify(apiName.trim()).toLowerCase());
-    }
+	/**
+	 * This package's own object of that name, or null. Never the subscriber's object or another
+	 * package's, even when its name ends the same way, so it is safe for asking whether a
+	 * BarnCRM object is in the org.
+	 */
+	@NamespaceAccessible
+	public static Schema.SObjectType packagedObjectType(String apiName) {
+		if (String.isBlank(apiName)) {
+			return null;
+		}
+		return globalDescribe().get(qualify(apiName.trim()).toLowerCase());
+	}
 
-    /**
-     * The org's global describe, read once per transaction. Building it costs about 12 ms of
-     * CPU in an org with a thousand objects and one save used to ask for it ten times or more,
-     * while the objects an org has cannot change within a transaction. A stub always wins.
-     */
-    @TestVisible
-    private static Map<String, Schema.SObjectType> orgDescribe;
+	/**
+	 * The org's global describe, read once per transaction. Building it costs about 12 ms of
+	 * CPU in an org with a thousand objects and one save used to ask for it ten times or more,
+	 * while the objects an org has cannot change within a transaction. A stub always wins.
+	 */
+	@TestVisible
+	private static Map<String, Schema.SObjectType> orgDescribe;
 
-    /** The user `orgDescribe` was read as (a test's `System.runAs` changes it). */
-    private static Id orgDescribeUserId;
+	/** The user `orgDescribe` was read as (a test's `System.runAs` changes it). */
+	private static Id orgDescribeUserId;
 
-    /**
-     * The org's global describe, the same map `Schema.getGlobalDescribe()` returns, read once per
-     * transaction and running user: the describe is filtered by the running user's licences
-     * (ADR-0130), so a test's `System.runAs` reads it afresh. Every class asks here rather than
-     * calling `Schema.getGlobalDescribe()` itself. Callers read the map and never change it.
-     */
-    @NamespaceAccessible
-    public static Map<String, Schema.SObjectType> globalDescribe() {
-        if (describeOverride != null) {
-            return describeOverride;
-        }
-        Id runningUserId = UserInfo.getUserId();
-        if (orgDescribe == null || orgDescribeUserId != runningUserId) {
-            orgDescribe = Schema.getGlobalDescribe();
-            orgDescribeUserId = runningUserId;
-        }
-        return orgDescribe;
-    }
+	/**
+	 * The org's global describe, the same map `Schema.getGlobalDescribe()` returns, read once per
+	 * transaction and running user: the describe is filtered by the running user's licences
+	 * (ADR-0130), so a test's `System.runAs` reads it afresh. Every class asks here rather than
+	 * calling `Schema.getGlobalDescribe()` itself. Callers read the map and never change it.
+	 */
+	@NamespaceAccessible
+	public static Map<String, Schema.SObjectType> globalDescribe() {
+		if (describeOverride != null) {
+			return describeOverride;
+		}
+		Id runningUserId = UserInfo.getUserId();
+		if (orgDescribe == null || orgDescribeUserId != runningUserId) {
+			orgDescribe = Schema.getGlobalDescribe();
+			orgDescribeUserId = runningUserId;
+		}
+		return orgDescribe;
+	}
 
-    /**
-     * An Apex class by name: in this package's namespace first, then with none (today, and
-     * unmanaged deploys), or null when neither is visible. A class name is not an API name, so
-     * the prefix goes in without its `__` (dynamic-apex.md section 3). Every "find the module's
-     * class by name" seam resolves through this one place.
-     */
-    @NamespaceAccessible
-    public static Type resolveType(String className) {
-        if (String.isBlank(className)) {
-            return null;
-        }
-        String packagePrefix = prefix();
-        Type found = String.isBlank(packagePrefix)
-            ? null
-            : Type.forName(packagePrefix.removeEnd('__'), className);
-        return found == null ? Type.forName(className) : found;
-    }
+	/**
+	 * An Apex class by name: in this package's namespace first, then with none (today, and
+	 * unmanaged deploys), or null when neither is visible. A class name is not an API name, so
+	 * the prefix goes in without its `__` (dynamic-apex.md section 3). Every "find the module's
+	 * class by name" seam resolves through this one place.
+	 */
+	@NamespaceAccessible
+	public static Type resolveType(String className) {
+		if (String.isBlank(className)) {
+			return null;
+		}
+		String packagePrefix = prefix();
+		Type found = String.isBlank(packagePrefix)
+			? null
+			: Type.forName(packagePrefix.removeEnd('__'), className);
+		return found == null ? Type.forName(className) : found;
+	}
 
-    /**
-     * The key a page state parameter has to use. Lightning namespaces these too: a package
-     * with no namespace uses the `c__` prefix, and a managed package uses its own.
-     */
-    @NamespaceAccessible
-    public static String stateKey(String parameterName) {
-        if (String.isBlank(parameterName)) {
-            return parameterName;
-        }
-        String packagePrefix = prefix();
-        return String.isBlank(packagePrefix)
-            ? 'c__' + parameterName
-            : packagePrefix + parameterName;
-    }
+	/**
+	 * The key a page state parameter has to use. Lightning namespaces these too: a package
+	 * with no namespace uses the `c__` prefix, and a managed package uses its own.
+	 */
+	@NamespaceAccessible
+	public static String stateKey(String parameterName) {
+		if (String.isBlank(parameterName)) {
+			return parameterName;
+		}
+		String packagePrefix = prefix();
+		return String.isBlank(packagePrefix)
+			? 'c__' + parameterName
+			: packagePrefix + parameterName;
+	}
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Gift: Gift Transaction mirror</label>
+    <protected>true</protected>
+    <values>
+        <field>Object_Name__c</field>
+        <value xsi:type="xsd:string">Gift__c</value>
+    </values>
+    <values>
+        <field>Handler_Class__c</field>
+        <value xsi:type="xsd:string">GiftTransactionMirrorTriggerHandler</value>
+    </values>
+    <values>
+        <field>Execution_Order__c</field>
+        <value xsi:type="xsd:double">51</value>
+    </values>
+    <values>
+        <field>Enabled_By_Default__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Checks a Gift Transaction ID typed on a gift and reports the Gift Transaction a deleted gift leaves behind. Copies nothing itself: the Gift Transaction mirror copies gifts in its runs. Switched off, those runs stop too.</value>
+    </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Mirror</value>
+    </values>
+</CustomMetadata>

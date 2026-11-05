@@ -1,6 +1,7 @@
 <template>
+    <template lwc:if={helpReady}>
     <template lwc:if={hasReleases}>
-        <lightning-card title={labels.title} icon-name="utility:announcement">
+        <lightning-card title={labels.title} icon-name="standard:announcement">
             <lightning-button
                 slot="actions"
                 data-id="dismiss"
@@ -10,9 +11,12 @@
             ></lightning-button>
             <div class="slds-var-p-horizontal_medium">
                 <template lwc:if={errorMessage}>
-                    <p class="slds-text-color_error slds-var-m-bottom_small" role="alert">
-                        {errorMessage}
-                    </p>
+                    <c-barn-notice
+                        class="slds-var-m-bottom_small"
+                        variant="error"
+                        message={errorMessage}
+                        data-id="error"
+                    ></c-barn-notice>
                 </template>
                 <p class="slds-var-m-bottom_small">{labels.intro}</p>
                 <template for:each={releases} for:item="release">
@@ -42,5 +46,6 @@
                 </template>
             </div>
         </lightning-card>
+    </template>
     </template>
 </template>

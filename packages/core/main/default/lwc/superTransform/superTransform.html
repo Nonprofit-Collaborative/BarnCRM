@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <c-barn-page-shell
         title={labels.title}
         purpose={labels.intro}
@@ -12,14 +13,20 @@
         </div>
 
         <template lwc:if={errorMessage}>
-            <div class="slds-notify slds-notify_alert slds-alert_error slds-var-m-bottom_small" role="alert">
-                <span data-id="error-message">{errorMessage}</span>
-            </div>
+            <c-barn-notice
+                class="slds-show slds-var-m-bottom_small"
+                variant="error"
+                message={errorMessage}
+                data-id="error-message"
+            ></c-barn-notice>
         </template>
         <template lwc:if={noticeMessage}>
-            <div class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small">
-                <span data-id="notice-message">{noticeMessage}</span>
-            </div>
+            <c-barn-notice
+                class="slds-show slds-var-m-bottom_small"
+                variant="success"
+                message={noticeMessage}
+                data-id="notice-message"
+            ></c-barn-notice>
         </template>
         <template lwc:if={busy}>
             <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
@@ -156,13 +163,13 @@
                         <p class="slds-col" data-id="count">{countMessage}</p>
                     </div>
                     <template for:each={warnings} for:item="warning">
-                        <div
+                        <c-barn-notice
                             key={warning.key}
-                            class="slds-notify slds-notify_alert slds-alert_warning slds-var-m-top_x-small"
+                            class="slds-show slds-var-m-top_x-small"
+                            variant="warning"
+                            message={warning.text}
                             data-id="warning"
-                        >
-                            {warning.text}
-                        </div>
+                        ></c-barn-notice>
                     </template>
                 </template>
                 <template lwc:else>
@@ -327,7 +334,7 @@
                 <template lwc:if={preview}>
                     <p class="slds-var-m-bottom_x-small" data-id="preview-count">{previewLine}</p>
                     <div class="slds-scrollable_x">
-                        <table class="slds-table slds-table_bordered slds-table_cell-buffer" data-id="preview-table">
+                        <table class="slds-table slds-table_bordered slds-table_cell-buffer" data-id="preview-table" data-wide-table>
                             <thead>
                                 <tr class="slds-line-height_reset">
                                     <th scope="col">{labels.record}</th>
@@ -386,8 +393,13 @@
                 </div>
                 <template lwc:if={jobView}>
                     <template lwc:if={jobView.running}>
-                        <p data-id="progress">{jobView.progressLine}</p>
-                        <lightning-progress-bar value={jobView.progressValue} size="large"></lightning-progress-bar>
+                        <c-barn-meter
+                            data-id="progress"
+                            label={labels.runShort}
+                            value={jobView.progressValue}
+                            value-text={jobView.progressLine}
+                            size="large"
+                        ></c-barn-meter>
                     </template>
                     <template lwc:else>
                         <p data-id="summary">{jobView.summary}</p>
@@ -416,4 +428,5 @@
             </section>
         </template>
     </c-barn-page-shell>
+    </template>
 </template>

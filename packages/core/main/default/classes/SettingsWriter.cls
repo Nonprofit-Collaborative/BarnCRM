@@ -25,27 +25,29 @@
  * Reads are unaffected and stay as they were.
  */
 public with sharing class SettingsWriter {
-    /** Raised when a caller reaches the write without the Manage BarnCRM Settings permission. */
-    public class PermissionException extends Exception {
-    }
+	/** Raised when a caller reaches the write without the Manage BarnCRM Settings permission. */
+	public class PermissionException extends Exception {
+	}
 
-    /**
-     * Saves the changed keys on the org-level record of a settings object. The caller has
-     * already validated every value, and read `stored` through
-     * `OrgSettingsSystemWriter.lockStored(type)` in this transaction (null when the org has no
-     * record yet).
-     */
-    public static void saveOrgDefault(
-        Schema.SObjectType type,
-        SObject stored,
-        Map<Schema.SObjectField, Object> changed
-    ) {
-        if (changed == null || changed.isEmpty()) {
-            return;
-        }
-        if (!BarnCRMPermissions.canManageSettings()) {
-            throw new PermissionException(System.Label.Core_Settings_PermissionRequiredError);
-        }
-        OrgSettingsSystemWriter.saveOver(type, stored, changed);
-    }
+	/**
+	 * Saves the changed keys on the org-level record of a settings object. The caller has
+	 * already validated every value, and read `stored` through
+	 * `OrgSettingsSystemWriter.lockStored(type)` in this transaction (null when the org has no
+	 * record yet).
+	 */
+	public static void saveOrgDefault(
+		Schema.SObjectType type,
+		SObject stored,
+		Map<Schema.SObjectField, Object> changed
+	) {
+		if (changed == null || changed.isEmpty()) {
+			return;
+		}
+		if (!BarnCRMPermissions.canManageSettings()) {
+			throw new PermissionException(
+				BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
+			);
+		}
+		OrgSettingsSystemWriter.saveOver(type, stored, changed);
+	}
 }

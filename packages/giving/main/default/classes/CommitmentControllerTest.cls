@@ -3,252 +3,252 @@
  */
 @IsTest(testFor='ApexClass:CommitmentController')
 private class CommitmentControllerTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.adminWith('Giving_Admin');
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.adminWith('Giving_Admin');
+	}
 
-    private static Contact donor() {
-        Contact person = new Contact(FirstName = 'Sarah', LastName = 'Nguyen');
-        insert person;
-        return person;
-    }
+	private static Contact donor() {
+		Contact person = new Contact(FirstName = 'Sarah', LastName = 'Nguyen');
+		insert person;
+		return person;
+	}
 
-    private static Commitment__c pledge(Id donorId) {
-        Commitment__c commitment = new Commitment__c(
-            Type__c = 'Pledge',
-            Status__c = 'Active',
-            Donor_Contact__c = donorId,
-            Amount__c = 100,
-            Frequency__c = 'Monthly',
-            Start_Date__c = Date.today(),
-            Expected_Total__c = 300,
-            Installments_Planned__c = 3
-        );
-        insert commitment;
-        return commitment;
-    }
+	private static Commitment__c pledge(Id donorId) {
+		Commitment__c commitment = new Commitment__c(
+			Type__c = 'Pledge',
+			Status__c = 'Active',
+			Donor_Contact__c = donorId,
+			Amount__c = 100,
+			Frequency__c = 'Monthly',
+			Start_Date__c = Date.today(),
+			Expected_Total__c = 300,
+			Installments_Planned__c = 3
+		);
+		insert commitment;
+		return commitment;
+	}
 
-    @IsTest
-    static void previewsAScheduleBeforeAnythingIsSaved() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            CommitmentController.ScheduleInput input = new CommitmentController.ScheduleInput();
-            input.commitmentType = 'Pledge';
-            input.amount = 100;
-            input.frequency = 'Monthly';
-            input.startDate = Date.today();
-            input.expectedTotal = 1200;
-            input.installmentsPlanned = 12;
+	@IsTest
+	static void previewsAScheduleBeforeAnythingIsSaved() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			CommitmentController.ScheduleInput input = new CommitmentController.ScheduleInput();
+			input.commitmentType = 'Pledge';
+			input.amount = 100;
+			input.frequency = 'Monthly';
+			input.startDate = Date.today();
+			input.expectedTotal = 1200;
+			input.installmentsPlanned = 12;
 
-            Test.startTest();
-            CommitmentController.SchedulePreview preview = CommitmentController.getSchedulePreview(
-                input
-            );
-            Test.stopTest();
+			Test.startTest();
+			CommitmentController.SchedulePreview preview = CommitmentController.getSchedulePreview(
+				input
+			);
+			Test.stopTest();
 
-            Assert.areEqual(
-                12,
-                preview.count,
-                'The preview shows the twelve payments the pledge implies.'
-            );
-            Assert.areEqual(1200, preview.expectedTotal, 'The preview totals what is expected.');
-            Assert.isFalse(preview.saved, 'Nothing was saved to produce the preview.');
-            Assert.areEqual(0, [SELECT COUNT() FROM Installment__c], 'A preview writes nothing.');
-        }
-    }
+			Assert.areEqual(
+				12,
+				preview.count,
+				'The preview shows the twelve payments the pledge implies.'
+			);
+			Assert.areEqual(1200, preview.expectedTotal, 'The preview totals what is expected.');
+			Assert.isFalse(preview.saved, 'Nothing was saved to produce the preview.');
+			Assert.areEqual(0, [SELECT COUNT() FROM Installment__c], 'A preview writes nothing.');
+		}
+	}
 
-    @IsTest
-    static void refusesAPreviewWithoutEnoughToWorkWith() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            CommitmentController.ScheduleInput input = new CommitmentController.ScheduleInput();
-            input.amount = null;
+	@IsTest
+	static void refusesAPreviewWithoutEnoughToWorkWith() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			CommitmentController.ScheduleInput input = new CommitmentController.ScheduleInput();
+			input.amount = null;
 
-            Boolean refused = false;
-            Test.startTest();
-            try {
-                CommitmentController.getSchedulePreview(input);
-            } catch (AuraHandledException expected) {
-                refused = true;
-            }
-            Test.stopTest();
+			Boolean refused = false;
+			Test.startTest();
+			try {
+				CommitmentController.getSchedulePreview(input);
+			} catch (AuraHandledException expected) {
+				refused = true;
+			}
+			Test.stopTest();
 
-            Assert.isTrue(
-                refused,
-                'A preview without an amount asks for one rather than failing silently.'
-            );
-        }
-    }
+			Assert.isTrue(
+				refused,
+				'A preview without an amount asks for one rather than failing silently.'
+			);
+		}
+	}
 
-    @IsTest
-    static void generatesTheScheduleOnDemand() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Contact person = donor();
-            Commitment__c commitment = pledge(person.Id);
+	@IsTest
+	static void generatesTheScheduleOnDemand() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Contact person = donor();
+			Commitment__c commitment = pledge(person.Id);
 
-            Test.startTest();
-            CommitmentController.SchedulePreview preview = CommitmentController.generateNow(
-                commitment.Id
-            );
-            Test.stopTest();
+			Test.startTest();
+			CommitmentController.SchedulePreview preview = CommitmentController.generateNow(
+				commitment.Id
+			);
+			Test.stopTest();
 
-            Assert.areEqual(
-                3,
-                preview.count,
-                'Generate now creates the payments the commitment implies.'
-            );
-            Assert.isTrue(preview.saved, 'What comes back is the saved schedule.');
-            Assert.areEqual(
-                1,
-                preview.installments[0].sequence,
-                'The rows come back in schedule order.'
-            );
-        }
-    }
+			Assert.areEqual(
+				3,
+				preview.count,
+				'Generate now creates the payments the commitment implies.'
+			);
+			Assert.isTrue(preview.saved, 'What comes back is the saved schedule.');
+			Assert.areEqual(
+				1,
+				preview.installments[0].sequence,
+				'The rows come back in schedule order.'
+			);
+		}
+	}
 
-    @IsTest
-    static void readsAScheduleThatAlreadyExists() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Contact person = donor();
-            Commitment__c commitment = pledge(person.Id);
-            CommitmentService.generateInstallments(new Set<Id>{ commitment.Id });
+	@IsTest
+	static void readsAScheduleThatAlreadyExists() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Contact person = donor();
+			Commitment__c commitment = pledge(person.Id);
+			CommitmentService.generateInstallments(new Set<Id>{ commitment.Id });
 
-            Test.startTest();
-            CommitmentController.SchedulePreview preview = CommitmentController.getSchedule(
-                commitment.Id
-            );
-            Test.stopTest();
+			Test.startTest();
+			CommitmentController.SchedulePreview preview = CommitmentController.getSchedule(
+				commitment.Id
+			);
+			Test.stopTest();
 
-            Assert.areEqual(
-                3,
-                preview.count,
-                'The component reads the schedule the commitment has.'
-            );
-            Assert.areEqual(
-                300,
-                preview.expectedTotal,
-                'The total is what the three payments expect.'
-            );
-            Assert.areEqual(
-                'Active',
-                preview.commitmentStatus,
-                'The status comes back too, so the component offers only the changes it allows.'
-            );
-        }
-    }
+			Assert.areEqual(
+				3,
+				preview.count,
+				'The component reads the schedule the commitment has.'
+			);
+			Assert.areEqual(
+				300,
+				preview.expectedTotal,
+				'The total is what the three payments expect.'
+			);
+			Assert.areEqual(
+				'Active',
+				preview.commitmentStatus,
+				'The status comes back too, so the component offers only the changes it allows.'
+			);
+		}
+	}
 
-    @IsTest
-    static void pausesAndResumesFromTheComponent() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Contact person = donor();
-            Commitment__c commitment = pledge(person.Id);
-            CommitmentService.generateInstallments(new Set<Id>{ commitment.Id });
+	@IsTest
+	static void pausesAndResumesFromTheComponent() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Contact person = donor();
+			Commitment__c commitment = pledge(person.Id);
+			CommitmentService.generateInstallments(new Set<Id>{ commitment.Id });
 
-            Test.startTest();
-            CommitmentController.changeStatus(commitment.Id, 'pause');
-            Assert.areEqual(
-                'Paused',
-                [SELECT Status__c FROM Commitment__c WHERE Id = :commitment.Id].Status__c,
-                'Pause is a status change, not a deletion.'
-            );
-            CommitmentController.changeStatus(commitment.Id, 'resume');
-            Test.stopTest();
+			Test.startTest();
+			CommitmentController.changeStatus(commitment.Id, 'pause');
+			Assert.areEqual(
+				'Paused',
+				[SELECT Status__c FROM Commitment__c WHERE Id = :commitment.Id].Status__c,
+				'Pause is a status change, not a deletion.'
+			);
+			CommitmentController.changeStatus(commitment.Id, 'resume');
+			Test.stopTest();
 
-            Assert.areEqual(
-                'Active',
-                [SELECT Status__c FROM Commitment__c WHERE Id = :commitment.Id].Status__c,
-                'Resume puts the commitment back to work.'
-            );
-        }
-    }
+			Assert.areEqual(
+				'Active',
+				[SELECT Status__c FROM Commitment__c WHERE Id = :commitment.Id].Status__c,
+				'Resume puts the commitment back to work.'
+			);
+		}
+	}
 
-    /**
-     * A reader is offered no status change, and one forced through anyway is refused with a
-     * sentence about access rather than about the commitment's status (testing guide C7).
-     */
-    @IsTest
-    static void aReaderIsOfferedNoChangeAndIsToldWhy() {
-        User reader = TestDataFactory.createUser(
-            'Jen',
-            new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
-        );
-        Commitment__c commitment;
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            commitment = pledge(donor().Id);
-            CommitmentService.generateInstallments(new Set<Id>{ commitment.Id });
-            CommitmentController.SchedulePreview own = CommitmentController.getSchedule(
-                commitment.Id
-            );
-            Assert.isTrue(own.canChange, 'An administrator may change the commitment.');
-            Assert.isTrue(own.canGenerate, 'An administrator may generate a schedule.');
-            // Commitments are private: the reader sees this one through a read share.
-            insert new Commitment__Share(
-                ParentId = commitment.Id,
-                UserOrGroupId = reader.Id,
-                AccessLevel = 'Read',
-                RowCause = Schema.Commitment__Share.RowCause.Manual
-            );
-        }
+	/**
+	 * A reader is offered no status change, and one forced through anyway is refused with a
+	 * sentence about access rather than about the commitment's status (testing guide C7).
+	 */
+	@IsTest
+	static void aReaderIsOfferedNoChangeAndIsToldWhy() {
+		User reader = TestDataFactory.createUser(
+			'Jen',
+			new List<String>{ 'BarnCRM_Read_Only', 'Giving_Read_Only' }
+		);
+		Commitment__c commitment;
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			commitment = pledge(donor().Id);
+			CommitmentService.generateInstallments(new Set<Id>{ commitment.Id });
+			CommitmentController.SchedulePreview own = CommitmentController.getSchedule(
+				commitment.Id
+			);
+			Assert.isTrue(own.canChange, 'An administrator may change the commitment.');
+			Assert.isTrue(own.canGenerate, 'An administrator may generate a schedule.');
+			// Commitments are private: the reader sees this one through a read share.
+			insert new Commitment__Share(
+				ParentId = commitment.Id,
+				UserOrGroupId = reader.Id,
+				AccessLevel = 'Read',
+				RowCause = Schema.Commitment__Share.RowCause.Manual
+			);
+		}
 
-        CommitmentController.SchedulePreview seen;
-        String message;
-        Test.startTest();
-        System.runAs(reader) {
-            seen = CommitmentController.getSchedule(commitment.Id);
-            try {
-                CommitmentController.changeStatus(commitment.Id, 'pause');
-            } catch (AuraHandledException refused) {
-                message = refused.getMessage();
-            }
-        }
-        Test.stopTest();
+		CommitmentController.SchedulePreview seen;
+		String message;
+		Test.startTest();
+		System.runAs(reader) {
+			seen = CommitmentController.getSchedule(commitment.Id);
+			try {
+				CommitmentController.changeStatus(commitment.Id, 'pause');
+			} catch (AuraHandledException refused) {
+				message = refused.getMessage();
+			}
+		}
+		Test.stopTest();
 
-        Assert.isFalse(seen.canChange, 'A reader is offered no status change.');
-        Assert.isFalse(seen.canGenerate, 'A reader is offered no schedule to generate.');
-        Assert.areEqual(Label.Giving_Commitment_NoPermission, message, 'Told why.');
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Assert.areEqual(
-                'Active',
-                [SELECT Status__c FROM Commitment__c WHERE Id = :commitment.Id].Status__c,
-                'Nothing changed.'
-            );
-        }
-    }
+		Assert.isFalse(seen.canChange, 'A reader is offered no status change.');
+		Assert.isFalse(seen.canGenerate, 'A reader is offered no schedule to generate.');
+		Assert.areEqual(Label.Giving_Commitment_NoPermission, message, 'Told why.');
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Assert.areEqual(
+				'Active',
+				[SELECT Status__c FROM Commitment__c WHERE Id = :commitment.Id].Status__c,
+				'Nothing changed.'
+			);
+		}
+	}
 
-    @IsTest
-    static void refusesAnActionItDoesNotKnow() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Contact person = donor();
-            Commitment__c commitment = pledge(person.Id);
+	@IsTest
+	static void refusesAnActionItDoesNotKnow() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Contact person = donor();
+			Commitment__c commitment = pledge(person.Id);
 
-            Boolean refused = false;
-            Test.startTest();
-            try {
-                CommitmentController.changeStatus(commitment.Id, 'archive');
-            } catch (AuraHandledException expected) {
-                refused = true;
-            }
-            Test.stopTest();
+			Boolean refused = false;
+			Test.startTest();
+			try {
+				CommitmentController.changeStatus(commitment.Id, 'archive');
+			} catch (AuraHandledException expected) {
+				refused = true;
+			}
+			Test.stopTest();
 
-            Assert.isTrue(
-                refused,
-                'An action the service does not offer is refused in plain language.'
-            );
-        }
-    }
+			Assert.isTrue(
+				refused,
+				'An action the service does not offer is refused in plain language.'
+			);
+		}
+	}
 
-    @IsTest
-    static void refusesAMissingRecord() {
-        System.runAs(TestUsers.adminWith('Giving_Admin')) {
-            Boolean refused = false;
-            Test.startTest();
-            try {
-                CommitmentController.getSchedule(null);
-            } catch (AuraHandledException expected) {
-                refused = true;
-            }
-            Test.stopTest();
+	@IsTest
+	static void refusesAMissingRecord() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Boolean refused = false;
+			Test.startTest();
+			try {
+				CommitmentController.getSchedule(null);
+			} catch (AuraHandledException expected) {
+				refused = true;
+			}
+			Test.stopTest();
 
-            Assert.isTrue(refused, 'A missing commitment is reported, not guessed at.');
-        }
-    }
+			Assert.isTrue(refused, 'A missing commitment is reported, not guessed at.');
+		}
+	}
 }

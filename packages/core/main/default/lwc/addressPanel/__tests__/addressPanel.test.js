@@ -15,6 +15,23 @@ import updateEveryonesAddress from '@salesforce/apex/AddressMoveController.updat
 import getCardFields from '@salesforce/apex/AddressMoveController.getCardFields';
 import BarnConfirmModal from 'c/barnConfirmModal';
 
+const mockNavigate = jest.fn();
+jest.mock(
+  'lightning/navigation',
+  () => {
+    const Navigate = Symbol('Navigate');
+    const NavigationMixin = (Base) =>
+      class extends Base {
+        [Navigate](...args) {
+          mockNavigate(...args);
+        }
+      };
+    NavigationMixin.Navigate = Navigate;
+    return { NavigationMixin, CurrentPageReference: null, __esModule: true };
+  },
+  { virtual: true }
+);
+
 jest.mock(
   '@salesforce/apex/AddressMoveController.getCardFields',
   () => {
@@ -253,12 +270,17 @@ describe('c-address-panel', () => {
     expect(element.shadowRoot.querySelector('[data-id="add-form"]')).not.toBeNull();
   });
 
-  it('draws each address as a card with a map pin, and offers no add to a reader', async () => {
+  it('draws each address as a list row with the address icon, and offers no add to a reader', async () => {
     const element = build();
     graphql.emit(response([HOME]));
     await flush();
     const card = element.shadowRoot.querySelector('[data-id="address-card"]');
-    expect(card.querySelector('[data-id="address-icon"]').iconName).toBe('utility:location');
+    expect(card.querySelector('[data-id="address-icon"]').fallbackIconName).toBe(
+      'standard:address'
+    );
+    expect(card.querySelector('[data-id="address-type"]').getAttribute('href')).toBe(`/${HOME.Id}`);
+    const badge = card.querySelector('[data-id="default-badge"]');
+    expect(badge.iconName).toBe('utility:favorite');
 
     const reader = build('Account', READ_ONLY_ACCESS);
     graphql.emit(response([]));
@@ -442,30 +464,51 @@ describe('c-address-panel', () => {
       return element;
     }
 
-    function click(element, selector) {
-      element.shadowRoot.querySelector(selector).click();
+    /** The address ids whose More menu offers a value ('household' or 'everyone'). */
+    function offering(element, value) {
+      return Array.from(element.shadowRoot.querySelectorAll('.status-menu'))
+        .filter((menu) =>
+          Array.from(menu.querySelectorAll('lightning-menu-item')).some(
+            (item) => item.value === value
+          )
+        )
+        .map((menu) => menu.dataset.id);
     }
 
-    it('offers Use for Whole Household on an address of the person, not a seasonal one', async () => {
+    /** Chooses Move the Household Here or Give This Address to Members from the More menu. */
+    function click(element, selector) {
+      const value = selector === '.use-for-household' ? 'household' : 'everyone';
+      const menu = element.shadowRoot.querySelector(
+        `.status-menu[data-id="${offering(element, value)[0]}"]`
+      );
+      menu.dispatchEvent(new CustomEvent('select', { detail: { value } }));
+    }
+
+    it('offers Move the Household Here on an address of the person, not a seasonal one', async () => {
       const element = personWith([GARCIA]);
       await flush();
 
-      const buttons = element.shadowRoot.querySelectorAll('.use-for-household');
-      expect(buttons.length).toBe(1);
-      expect(buttons[0].dataset.id).toBe(OWN.Id);
-      expect(element.shadowRoot.querySelector('.update-everyone')).toBeNull();
+      expect(offering(element, 'household')).toEqual([OWN.Id]);
+      expect(offering(element, 'everyone')).toEqual([]);
+      const item = Array.from(
+        element.shadowRoot.querySelectorAll('.status-menu lightning-menu-item')
+      ).find((menuItem) => menuItem.value === 'household');
+      expect(item.label).toBe('c.Core_Address_UseForHouseholdButton');
+      // Set as Primary stays a button of its own.
+      expect(element.shadowRoot.querySelectorAll('.set-default').length).toBe(1);
     });
 
     it('offers no move to a person with no household, or to someone who only reads', async () => {
       const lonely = personWith([]);
       await flush();
-      expect(lonely.shadowRoot.querySelector('.use-for-household')).toBeNull();
+      expect(offering(lonely, 'household')).toEqual([]);
 
       const reader = build('Account', READ_ONLY_ACCESS);
       graphql.emit(response([HOME]));
       getCardContext.emit({ isHousehold: true, households: [] });
       await flush();
-      expect(reader.shadowRoot.querySelector('.update-everyone')).toBeNull();
+      expect(offering(reader, 'everyone')).toEqual([]);
+      expect(reader.shadowRoot.querySelector('.status-menu')).toBeNull();
     });
 
     it('moves the household to the address, without asking which, when there is one', async () => {
@@ -526,14 +569,12 @@ describe('c-address-panel', () => {
       });
     });
 
-    it('offers Update Everyone on the primary address of the household only', async () => {
+    it('offers Give This Address to Members on the primary address of the household only', async () => {
       const element = household();
       await flush();
 
-      const buttons = element.shadowRoot.querySelectorAll('.update-everyone');
-      expect(buttons.length).toBe(1);
-      expect(buttons[0].dataset.id).toBe(HOME.Id);
-      expect(element.shadowRoot.querySelector('.use-for-household')).toBeNull();
+      expect(offering(element, 'everyone')).toEqual([HOME.Id]);
+      expect(offering(element, 'household')).toEqual([]);
     });
 
     it('lists who moves and who has their own, and moves only those ticked', async () => {
@@ -595,9 +636,7 @@ describe('c-address-panel', () => {
       await flush();
       expect(updateEveryonesAddress).toHaveBeenCalledWith({ householdId: RECORD_ID, alsoMove: [] });
 
-      expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
-        'Not allowed.'
-      );
+      expect(element.shadowRoot.querySelector('[data-id="error"]').message).toBe('Not allowed.');
       expect(notifyRecordUpdateAvailable).not.toHaveBeenCalled();
     });
 
@@ -609,7 +648,7 @@ describe('c-address-panel', () => {
       click(element, '.update-everyone');
       await flush();
 
-      expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
+      expect(element.shadowRoot.querySelector('[data-id="error"]').message).toBe(
         'c.Core_Address_MoveFailed'
       );
     });
@@ -735,9 +774,12 @@ describe('c-address-panel', () => {
       await flush();
 
       expect(element.shadowRoot.querySelector('[data-id="undeliverable-badge"]')).not.toBeNull();
-      expect(
-        element.shadowRoot.querySelector('[data-id="undeliverable-primary"]').textContent
-      ).toContain('c.Core_Address_UndeliverablePrimary');
+      const notice = element.shadowRoot.querySelector('[data-id="undeliverable-primary"]');
+      expect(notice.variant).toBe('warning');
+      expect(notice.message).toBe('c.Core_Address_UndeliverablePrimary');
+      expect(element.shadowRoot.querySelector('[data-id="undeliverable-badge"]').status).toBe(
+        'error'
+      );
     });
 
     it('badges an undeliverable address that is not the primary without the warning', async () => {
@@ -777,12 +819,33 @@ describe('c-address-panel', () => {
       expect(element.shadowRoot.querySelector('[data-id="card-fields"]')).toBeNull();
     });
 
-    it('offers no status menu to someone who cannot change the status', async () => {
+    it('offers no status to someone who cannot change the status, only Edit', async () => {
       const element = build();
       graphql.emit(response([CURRENT_HOME, WINTER]));
       await flush();
 
-      expect(element.shadowRoot.querySelector('.status-menu')).toBeNull();
+      const values = Array.from(
+        element.shadowRoot.querySelectorAll('.status-menu lightning-menu-item')
+      ).map((item) => item.value);
+      expect(values).toEqual(['edit', 'edit']);
+      expect(element.shadowRoot.querySelector('.status-menu').alternativeText).toBe(
+        'c.Core_Settings_NavGroup_More'
+      );
+    });
+
+    it('opens the standard edit form from the More menu', async () => {
+      const element = build();
+      graphql.emit(response([CURRENT_HOME]));
+      await flush();
+
+      element.shadowRoot
+        .querySelector('.status-menu')
+        .dispatchEvent(new CustomEvent('select', { detail: { value: 'edit' } }));
+      await flush();
+      expect(mockNavigate.mock.calls[0][0]).toEqual({
+        type: 'standard__recordPage',
+        attributes: { recordId: HOME.Id, objectApiName: 'Address__c', actionName: 'edit' }
+      });
     });
 
     it('never offers Former on the primary address', async () => {
@@ -793,7 +856,7 @@ describe('c-address-panel', () => {
       const values = Array.from(
         element.shadowRoot.querySelectorAll('.status-menu lightning-menu-item')
       ).map((item) => item.value);
-      expect(values).toEqual(['Undeliverable']);
+      expect(values).toEqual(['edit', 'Undeliverable']);
     });
 
     it('marks an address Former with today as its end date', async () => {

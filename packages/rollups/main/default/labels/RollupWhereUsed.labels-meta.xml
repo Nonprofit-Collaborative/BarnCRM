@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_RollupBuilder_WhereUsedCounts</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: the rollup counts records of this object.</shortDescription>
+        <value>Counts this object</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_WhereUsedWrites</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: the rollup writes its number to this object.</shortDescription>
+        <value>Writes to this object</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_WhereUsedSourceField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: the rollup aggregates, sorts or dates by the field.</shortDescription>
+        <value>Counted field, sort or fiscal date</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_WhereUsedSourceFilter</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: the rollup's filter on counted records names the field.</shortDescription>
+        <value>Filter on counted records</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_WhereUsedPath</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: the rollup reaches its target record through the field.</shortDescription>
+        <value>Relationship path</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_WhereUsedTargetField</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: the rollup writes its result to the field.</shortDescription>
+        <value>Result field</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_WhereUsedTargetFilter</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: the rollup's filter on target records names the field.</shortDescription>
+        <value>Filter on target records</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_WhereUsedBreaks</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What breaks for a rollup when the field is deleted.</shortDescription>
+        <value>The rollup stops calculating and appears in Needs Attention until it is edited or turned off.</value>
+    </labels>
+</CustomLabels>

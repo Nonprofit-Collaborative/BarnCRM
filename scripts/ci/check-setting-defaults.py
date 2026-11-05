@@ -27,6 +27,13 @@ module class saving the record `getOrgDefaults()` returned, with its checkboxes 
 is how Giving switched three shipped features off. So the gate also fails on a class outside
 the tests that takes a settings record from `getOrgDefaults()` and hands it to DML: such a
 save goes through `OrgSettingsSystemWriter` instead.
+
+The third trap (QA-F2): an org that saved its settings before a ship-on checkbox existed gets
+the new field as false on its stored record, so neither default reaches it. Every ship-on
+checkbox has to be either listed in SHIPPED_BEFORE_UPGRADE_STEP below (the ones that predate
+the upgrade step; the list is closed) or registered in a `SHIPPED_ON_ADDED_IN_UPGRADES` list in
+the package's post-install class, which passes it to `ShippedDefaultUpgrades.apply` to turn it
+on once in such an org.
 """
 
 import glob
@@ -43,6 +50,21 @@ CORE_SETTINGS = "BarnCRM_Settings__c"
 # says the shipped default is not applied for that field today: it is a known gap, recorded
 # rather than hidden, and it is checked, so it cannot name a field that no longer qualifies.
 KNOWN_UNREGISTERED = {}
+
+# Ship-on checkboxes that existed before the upgrade step (QA-F2, 2026-11-02). Closed: a new
+# ship-on checkbox goes in its package's SHIPPED_ON_ADDED_IN_UPGRADES list instead.
+SHIPPED_BEFORE_UPGRADE_STEP = {
+    ("BarnCRM_Settings__c", "Auto_Create_Households__c"),
+    ("BarnCRM_Settings__c", "Job_Notifications__c"),
+    ("BarnCRM_Settings__c", "Relationship_Auto_Reciprocal__c"),
+    ("Giving_Settings__c", "Auto_Apply_Gifts_To_Installments__c"),
+    ("Giving_Settings__c", "Automatic_Household_Soft_Credits__c"),
+    ("Giving_Settings__c", "Receipt_Print_Logo__c"),
+    ("Volunteer_Settings__c", "Attendance_Creates_Hours__c"),
+    ("Volunteer_Settings__c", "Hours_Require_Approval__c"),
+}
+UPGRADE_LIST = "SHIPPED_ON_ADDED_IN_UPGRADES"
+UPGRADE_CALL = "ShippedDefaultUpgrades.apply("
 
 APEX_CLASSES = "packages/*/main/default/classes/*.cls"
 # The one class allowed to write a settings record it was handed.
@@ -148,6 +170,22 @@ def main():
             )
 
     problems.extend(raw_settings_saves(settings_objects))
+    upgrade_entries, upgrade_problems = upgrade_registries()
+    problems.extend(upgrade_problems)
+    for key in sorted(declared):
+        if key not in upgrade_entries and key not in SHIPPED_BEFORE_UPGRADE_STEP:
+            problems.append(
+                f"{key[0]}.{key[1]} ships on but is in no {UPGRADE_LIST} list. An org that "
+                f"saved these settings before the field existed gets it as false. Append it to "
+                f"{UPGRADE_LIST} in the package's post-install class (QA-F2)."
+            )
+    for key in sorted(SHIPPED_BEFORE_UPGRADE_STEP | set(upgrade_entries)):
+        if key not in declared:
+            problems.append(
+                f"{key[0]}.{key[1]} is listed as a ship-on checkbox "
+                f"({upgrade_entries.get(key, 'SHIPPED_BEFORE_UPGRADE_STEP')}) but its field "
+                f"metadata does not declare defaultValue true."
+            )
 
     for key in sorted(KNOWN_UNREGISTERED):
         if key not in declared:
@@ -182,6 +220,29 @@ def main():
         f"{len(KNOWN_UNREGISTERED)} recorded as known gaps; no raw settings saves."
     )
     return 0
+
+
+def upgrade_registries():
+    """Every SHIPPED_ON_ADDED_IN_UPGRADES entry as {(object, field): path}, and problems."""
+    entries = {}
+    problems = []
+    pattern = re.compile(
+        UPGRADE_LIST + r"\s*=\s*new\s+List<Schema\.SObjectField>\s*\{(.*?)\}", re.DOTALL
+    )
+    for path in sorted(glob.glob(APEX_CLASSES)):
+        with open(path, encoding="utf-8") as handle:
+            source = handle.read()
+        match = pattern.search(source)
+        if match is None:
+            continue
+        if UPGRADE_CALL not in source:
+            problems.append(
+                f"{path} declares {UPGRADE_LIST} but never passes it to {UPGRADE_CALL[:-1]}, "
+                f"so its entries are never turned on."
+            )
+        for object_name, field_name in re.findall(r"(\w+__c)\.(\w+__c)", match.group(1)):
+            entries[(object_name, field_name)] = path
+    return entries, problems
 
 
 def is_test_class(path, source):

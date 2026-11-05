@@ -65,14 +65,6 @@
         <value>Nonprofit Cloud coexistence</value>
     </labels>
     <labels>
-        <fullName>Core_CoexistenceMode_InvalidMode</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>A coexistence mode value is not one of the three; {0} is the value</shortDescription>
-        <value>{0} is not a coexistence mode. Choose one of the modes BarnCRM offers for this org.</value>
-    </labels>
-    <labels>
         <fullName>Core_CoexistenceMode_Npsp</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -97,38 +89,6 @@
         <value>not confirmed yet</value>
     </labels>
     <labels>
-        <fullName>Core_Console_TabLabel</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Console tab name; {0} the page, {1} what it shows</shortDescription>
-        <value>{0}: {1}</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorLog_ActionFailed</fullName>
-        <categories>Core, Error Log</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error log action failed</shortDescription>
-        <value>That did not work. Refresh the page and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorLog_EntryNotFound</fullName>
-        <categories>Core, Error Log</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error log entry not found</shortDescription>
-        <value>That entry is no longer in the Error Log. Refresh the page.</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorLog_UnexpectedFailure</fullName>
-        <categories>Core, Error Log</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error log default message</shortDescription>
-        <value>BarnCRM hit an unexpected problem. The technical detail on this entry says what failed and where. The admin guide page for the feature you were using says what to check.</value>
-    </labels>
-    <labels>
         <fullName>Core_ErrorLog_UnexpectedFailureIn</fullName>
         <categories>Core, Error Log</categories>
         <language>en_US</language>
@@ -145,14 +105,6 @@
         <value>Mark Acknowledged</value>
     </labels>
     <labels>
-        <fullName>Core_ErrorLogTile_Empty</fullName>
-        <categories>Core, Error Log</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error log tile empty state</shortDescription>
-        <value>Nothing has gone wrong. There is nothing to read here.</value>
-    </labels>
-    <labels>
         <fullName>Core_ErrorLogTile_NewCount</fullName>
         <categories>Core, Error Log</categories>
         <language>en_US</language>
@@ -167,14 +119,6 @@
         <protected>false</protected>
         <shortDescription>Open an error log entry</shortDescription>
         <value>Open This Entry</value>
-    </labels>
-    <labels>
-        <fullName>Core_ErrorLogTile_ReadOnly</fullName>
-        <categories>Core, Error Log</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error log tile read only notice</shortDescription>
-        <value>You can read these entries but not change them.</value>
     </labels>
     <labels>
         <fullName>Core_ErrorLogTile_Title</fullName>
@@ -215,30 +159,6 @@
         <value>Search settings</value>
     </labels>
     <labels>
-        <fullName>Core_SettingsSearch_ErrorMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings search: message shown when the search could not run</shortDescription>
-        <value>The search could not run. Try again in a moment.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SettingsSearch_NoResultsMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings search: message shown when nothing matches</shortDescription>
-        <value>No settings match that search. Try a shorter word, for example greeting.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SettingsSearch_Placeholder</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Settings search: the placeholder inside the search box</shortDescription>
-        <value>Search settings</value>
-    </labels>
-    <labels>
         <fullName>Core_UnexpectedError</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -253,5 +173,213 @@
         <protected>true</protected>
         <shortDescription>Settings search: heading above the result list</shortDescription>
         <value>Search Results</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Actions</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: column of buttons or actions</shortDescription>
+        <value>Actions</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Description</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: description field</shortDescription>
+        <value>Description</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_MoveDown</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: button that moves an item one place later</shortDescription>
+        <value>Move Down</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Saved</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: announced after a save</shortDescription>
+        <value>Saved.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_StartDate</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: start date field or column</shortDescription>
+        <value>Start Date</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_EndDate</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: end date field or column</shortDescription>
+        <value>End Date</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Period</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: a reporting period, picker or column</shortDescription>
+        <value>Period</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Stage</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: stage picker or column</shortDescription>
+        <value>Stage</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Generate</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: button that generates letters or statements</shortDescription>
+        <value>Generate</value>
+    </labels>
+    <labels>
+        <fullName>Core_Format_Parenthetical</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared format: {0} a value, {1} a detail shown in parentheses after it</shortDescription>
+        <value>{0} ({1})</value>
+    </labels>
+    <labels>
+        <fullName>Core_Format_Pair</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared format: {0} a name, {1} what belongs to it, after a colon</shortDescription>
+        <value>{0}: {1}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Format_PairSentence</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared format: {0} a name, {1} what belongs to it, as a sentence</shortDescription>
+        <value>{0}: {1}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_AddStep</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: button that adds a step</shortDescription>
+        <value>Add Step</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_AssignedTo</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: assigned to, as a field label or column</shortDescription>
+        <value>Assigned To</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_MoveTo</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: pipeline card menu item; {0} is the stage</shortDescription>
+        <value>Move to {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_MovedTo</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: message after a pipeline move; {0} is the stage</shortDescription>
+        <value>Moved to {0}.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Open</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: menu item that opens the record</shortDescription>
+        <value>Open</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_UnsavedChanges</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: notice that the panel has unsaved changes</shortDescription>
+        <value>Unsaved changes</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_TargetDate</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: target date, as a field label or column</shortDescription>
+        <value>Target Date</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_NoOutcome</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: the choice for no logic model outcome</shortDescription>
+        <value>No outcome</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_ReportDownloaded</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: message after a report file is downloaded</shortDescription>
+        <value>Report downloaded.</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_MoveUp</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: button that moves an item up</shortDescription>
+        <value>Move Up</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_ShowTechnicalNames</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: toggle that shows API name columns (Field Use, Access Explorer)</shortDescription>
+        <value>Show technical names</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Program</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: a program, as a card title or column</shortDescription>
+        <value>Program</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Attendance</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: attendance column heading</shortDescription>
+        <value>Attendance</value>
+    </labels>
+    <labels>
+        <fullName>Core_Shared_Completed</fullName>
+        <categories>Core, Shared</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Shared: completed, as a status or column</shortDescription>
+        <value>Completed</value>
     </labels>
 </CustomLabels>

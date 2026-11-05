@@ -3,26 +3,11 @@ import getSetupChecks from '@salesforce/apex/SettingsController.getSetupChecks';
 import { setupPath } from 'c/setupLinks';
 import HEADING from '@salesforce/label/c.Core_SetupNote_Heading';
 import OPEN_IN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
-import NEW_TAB from '@salesforce/label/c.Core_SetupNote_NewTab';
-import CHECK_AGAIN from '@salesforce/label/c.Core_SetupNote_CheckAgain';
+import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
+import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import SHOW_STEPS from '@salesforce/label/c.Core_SetupNote_ShowSteps';
 import NOT_DONE from '@salesforce/label/c.Core_SetupNote_NotDone';
-import METADATA_WHAT from '@salesforce/label/c.Core_SetupNote_Metadata_What';
-import METADATA_WHY from '@salesforce/label/c.Core_SetupNote_Metadata_Why';
-import METADATA_STEPS from '@salesforce/label/c.Core_SetupNote_Metadata_Steps';
-import METADATA_UNCONFIRMED from '@salesforce/label/c.Core_SetupNote_Metadata_Unconfirmed';
-import DUPLICATES_WHAT from '@salesforce/label/c.Core_SetupNote_Duplicates_What';
-import DUPLICATES_WHY from '@salesforce/label/c.Core_SetupNote_Duplicates_Why';
-import DUPLICATES_STEPS from '@salesforce/label/c.Core_SetupNote_Duplicates_Steps';
-import ROLLUP_WHAT from '@salesforce/label/c.Core_SetupNote_RollupField_What';
-import ROLLUP_WHY from '@salesforce/label/c.Core_SetupNote_RollupField_Why';
-import ROLLUP_STEPS from '@salesforce/label/c.Core_SetupNote_RollupField_Steps';
-import EMAIL_WHAT from '@salesforce/label/c.Core_SetupNote_Email_What';
-import EMAIL_WHY from '@salesforce/label/c.Core_SetupNote_Email_Why';
-import EMAIL_STEPS from '@salesforce/label/c.Core_SetupNote_Email_Steps';
-import USERS_WHAT from '@salesforce/label/c.Core_SetupNote_Users_What';
-import USERS_WHY from '@salesforce/label/c.Core_SetupNote_Users_Why';
-import USERS_STEPS from '@salesforce/label/c.Core_SetupNote_Users_Steps';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * What each Core section needs from Setup, by the section name the console shows. `link` names
@@ -30,50 +15,86 @@ import USERS_STEPS from '@salesforce/label/c.Core_SetupNote_Users_Steps';
  * SettingsController.getSetupChecks when BarnCRM can read the answer. Core sections only: a
  * module's notes go on the module's own settings page (ADR-0020).
  */
-const NOTES = {
+const NOTES = () => ({
   general: [
     {
       key: 'metadata',
-      what: METADATA_WHAT,
-      why: METADATA_WHY,
-      steps: METADATA_STEPS,
+      get what() {
+        return helpText('Core', 'Core_SetupNote_Metadata_What');
+      },
+      get why() {
+        return helpText('Core', 'Core_SetupNote_Metadata_Why');
+      },
+      get steps() {
+        return helpText('Core', 'Core_SetupNote_Metadata_Steps');
+      },
       link: 'apexSettings',
       check: 'metadata',
-      unconfirmed: METADATA_UNCONFIRMED
+      unconfirmed: helpText('Core', 'Core_SetupNote_Metadata_Unconfirmed')
     }
   ],
   'duplicate matching': [
     {
       key: 'duplicates',
-      what: DUPLICATES_WHAT,
-      why: DUPLICATES_WHY,
-      steps: DUPLICATES_STEPS,
+      get what() {
+        return helpText('Core', 'Core_SetupNote_Duplicates_What');
+      },
+      get why() {
+        return helpText('Core', 'Core_SetupNote_Duplicates_Why');
+      },
+      get steps() {
+        return helpText('Core', 'Core_SetupNote_Duplicates_Steps');
+      },
       link: 'duplicateRules'
     }
   ],
   rollups: [
     {
       key: 'rollupField',
-      what: ROLLUP_WHAT,
-      why: ROLLUP_WHY,
-      steps: ROLLUP_STEPS,
+      get what() {
+        return helpText('Core', 'Core_SetupNote_RollupField_What');
+      },
+      get why() {
+        return helpText('Core', 'Core_SetupNote_RollupField_Why');
+      },
+      get steps() {
+        return helpText('Core', 'Core_SetupNote_RollupField_Steps');
+      },
       link: 'objectManager'
     }
   ],
   'error log': [
     {
       key: 'emailDeliverability',
-      what: EMAIL_WHAT,
-      why: EMAIL_WHY,
-      steps: EMAIL_STEPS,
+      get what() {
+        return helpText('Core', 'Core_SetupNote_Email_What');
+      },
+      get why() {
+        return helpText('Core', 'Core_SetupNote_Email_Why');
+      },
+      get steps() {
+        return helpText('Core', 'Core_SetupNote_Email_Steps');
+      },
       link: 'deliverability',
       check: 'emailDeliverability'
     }
   ],
   access: [
-    { key: 'users', what: USERS_WHAT, why: USERS_WHY, steps: USERS_STEPS, link: 'permissionSets' }
+    {
+      key: 'users',
+      get what() {
+        return helpText('Core', 'Core_SetupNote_Users_What');
+      },
+      get why() {
+        return helpText('Core', 'Core_SetupNote_Users_Why');
+      },
+      get steps() {
+        return helpText('Core', 'Core_SetupNote_Users_Steps');
+      },
+      link: 'permissionSets'
+    }
   ]
-};
+});
 
 /** A steps label holds the clicks separated by `|`; each becomes one numbered step. */
 function splitSteps(steps) {
@@ -96,6 +117,16 @@ function splitSteps(steps) {
  * instruction, plus the note's `unconfirmed` text when it has one.
  */
 export default class SettingsSetupNotes extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     heading: HEADING,
     openInSetup: OPEN_IN_SETUP,
@@ -134,7 +165,7 @@ export default class SettingsSetupNotes extends LightningElement {
     if (Array.isArray(this._notes)) {
       return this._notes;
     }
-    return NOTES[String(this._section || '').toLowerCase()] || [];
+    return NOTES()[String(this._section || '').toLowerCase()] || [];
   }
 
   get shownNotes() {

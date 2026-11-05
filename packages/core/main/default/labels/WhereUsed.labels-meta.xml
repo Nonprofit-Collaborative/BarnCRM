@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_WhereUsed_KindSavedQuery</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used group heading for saved Find queries.</shortDescription>
+        <value>Saved Find Queries</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_KindSavedTransform</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used group heading for saved Super Transformer step lists.</shortDescription>
+        <value>Super Transformer Step Lists</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_KindImportMapping</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used group heading for import mappings (templates).</shortDescription>
+        <value>Import Mappings</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_KindMatchSource</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used group heading for duplicate matching sources.</shortDescription>
+        <value>Matching Sources</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartObject</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: the setup record works on this whole object.</shortDescription>
+        <value>Works on this kind of record</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartFilter</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: a filter condition names the field.</shortDescription>
+        <value>Filter</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartSort</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: a saved query sorts by the field.</shortDescription>
+        <value>Sort</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartRelated</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: a related-records condition of a saved query names it.</shortDescription>
+        <value>Related records condition</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartChildren</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: a related record column of a saved query names it.</shortDescription>
+        <value>Related record columns</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartMatchingField</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: an import mapping matches records on the field.</shortDescription>
+        <value>Matching field</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartRelatedParent</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: an import mapping links related records through the field.</shortDescription>
+        <value>Related records link</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartColumn</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: an import column loads the field. {0} is the file column heading.</shortDescription>
+        <value>Column "{0}"</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PartDefault</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used: an import mapping sets a default value for the field.</shortDescription>
+        <value>Default value</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_PrivateQuery</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Name shown for a private saved query. {0} is the owner's name.</shortDescription>
+        <value>A private saved query owned by {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_BreaksSettingValue</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What breaks for a setting whose chosen value is the field.</shortDescription>
+        <value>The setting falls back to its default; choose another value before you delete the field.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_BreaksModuleRecord</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What breaks for a module record that names the field.</shortDescription>
+        <value>This record stops working as set up (screening reads the field as blank, a computed indicator stops updating) until the part that names the field is changed.</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_Action</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Row action and button that opens Where Used for a field.</shortDescription>
+        <value>Where Used</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_Title</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used window title. {0} is the field and object, or the object.</shortDescription>
+        <value>Where Used: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_Loading</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where Used spinner text while it checks.</shortDescription>
+        <value>Checking BarnCRM setup</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_NamedIn</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Where in a setup record the field is named. {0} is a list of parts.</shortDescription>
+        <value>Named in: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_Breaks</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>What stops working if the field is deleted. {0} is the explanation.</shortDescription>
+        <value>If deleted: {0}</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_ShowObject</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that switches Where Used to the whole object.</shortDescription>
+        <value>Show Uses of the Whole Kind of Record</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_ShowField</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that switches Where Used back to the one field.</shortDescription>
+        <value>Show Uses of This Field</value>
+    </labels>
+    <labels>
+        <fullName>Core_WhereUsed_RetireTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Heading of the Retire a Field checklist.</shortDescription>
+        <value>Retire a Field</value>
+    </labels>
+</CustomLabels>

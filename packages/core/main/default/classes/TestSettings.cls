@@ -7,18 +7,18 @@
  */
 @IsTest
 public class TestSettings {
-    /** An org that never saved an edition, a feature list or checklist progress. */
-    public static void neverSetUp() {
-        SettingsService.saveSystemValue('Features_Turned_On__c', null);
-        SettingsService.saveSystemValue('Suite__c', null);
-        SettingsService.saveBookkeeping(
-            new Map<String, Object>{ 'Setup_Steps_Completed__c' => '' }
-        );
-    }
+	/** An org that never saved an edition, a feature list or checklist progress. */
+	public static void neverSetUp() {
+		SettingsService.saveSystemValue('Features_Turned_On__c', null);
+		SettingsService.saveSystemValue('Suite__c', null);
+		SettingsService.saveBookkeeping(
+			new Map<String, Object>{ 'Setup_Steps_Completed__c' => '' }
+		);
+	}
 
-    /** A new install: never set up, with the feature list marked as awaiting first-run setup. */
-    public static void newInstall() {
-        neverSetUp();
-        FeatureSwitchService.markNewInstall();
-    }
+	/** A new install: never set up, with the feature list marked as awaiting first-run setup. */
+	public static void newInstall() {
+		neverSetUp();
+		FeatureSwitchService.markNewInstall();
+	}
 }

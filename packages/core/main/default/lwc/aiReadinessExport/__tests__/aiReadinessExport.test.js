@@ -8,6 +8,14 @@ import getChecks from '@salesforce/apex/DataHygieneController.getChecks';
 import getPlan from '@salesforce/apex/FieldUtilizationController.getPlan';
 import countFields from '@salesforce/apex/FieldUtilizationController.countFields';
 import { writeZip } from 'c/xlsxWriter';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_AiExport_Done: 'Downloaded the pack: {0} kinds of record and {1} records.',
+  Core_AiExport_Stopped: 'Records stopped at the limit ({0}) for: {1}.',
+  Core_AiExport_RecordsFailed: 'Records could not be read for: {0}.',
+  Core_AiExport_ChecksFailed: 'Checks could not be read.'
+});
 
 jest.mock(
   '@salesforce/apex/DataDictionaryController.listObjects',
@@ -43,26 +51,6 @@ jest.mock('@salesforce/customPermission/Find_And_Export_Records', () => ({ defau
   virtual: true
 });
 jest.mock('c/xlsxWriter', () => ({ writeZip: jest.fn(async () => new Uint8Array([1])) }));
-jest.mock(
-  '@salesforce/label/c.Core_AiExport_Done',
-  () => ({ default: 'Downloaded the pack: {0} kinds of record and {1} records.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_AiExport_Stopped',
-  () => ({ default: 'Records stopped at the limit ({0}) for: {1}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_AiExport_RecordsFailed',
-  () => ({ default: 'Records could not be read for: {0}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_AiExport_ChecksFailed',
-  () => ({ default: 'Checks could not be read.' }),
-  { virtual: true }
-);
 
 const OPTIONS = [
   { value: 'Account', label: 'Account', isDefault: false },
@@ -216,7 +204,7 @@ describe('c-ai-readiness-export', () => {
     expect(schema.objects[0]).toMatchObject({ recordFile: 'data/Contact.csv', recordCount: 2 });
     expect(schema.dataQuality.checks).toHaveLength(1);
     expect(files['data-dictionary.csv']).toContain('50%');
-    expect(one(element, 'notice').textContent).toBe(
+    expect(one(element, 'notice').message).toBe(
       'Downloaded the pack: 1 kinds of record and 2 records.'
     );
     expect(URL.createObjectURL).toHaveBeenCalled();
@@ -235,7 +223,7 @@ describe('c-ai-readiness-export', () => {
     const schema = JSON.parse(filesOf()['schema.json']);
     expect(schema.objects[0]).toMatchObject({ recordCount: 1, recordsStoppedAtLimit: true });
     expect(schema.dataQuality.checks).toEqual([]);
-    const notice = one(element, 'notice').textContent;
+    const notice = one(element, 'notice').message;
     expect(notice).toContain('Records stopped at the limit (1) for: Contact.');
     expect(notice).toContain('Checks could not be read.');
 
@@ -244,7 +232,7 @@ describe('c-ai-readiness-export', () => {
 
     expect(Object.keys(filesOf(1))).not.toContain('data/Contact.csv');
     expect(JSON.parse(filesOf(1)['schema.json']).objects[0].recordFile).toBeNull();
-    expect(one(element, 'notice').textContent).toContain('Records could not be read for: Contact.');
+    expect(one(element, 'notice').message).toContain('Records could not be read for: Contact.');
   });
 
   it('asks for a new review when the choice of objects changes', async () => {

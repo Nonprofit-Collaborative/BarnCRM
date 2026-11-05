@@ -9,6 +9,16 @@ import getPeopleWithAccess from '@salesforce/apex/AccessExplorerController.getPe
 import getOverview from '@salesforce/apex/AccessExplorerController.getOverview';
 import listObjects from '@salesforce/apex/DataDictionaryController.listObjects';
 import describeObject from '@salesforce/apex/DataDictionaryController.describeObject';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_AccessExplorer_Downloaded: 'Downloaded {0} rows.',
+  Core_AccessExplorer_Truncated: 'More than {0} give access.'
+});
+
+setHelpTextForTest({
+  Core_AccessExplorer_ModifyAllDataNote: '{0} gives Modify All Data.'
+});
 
 jest.mock(
   '@salesforce/apex/AccessExplorerController.searchPeople',
@@ -62,21 +72,6 @@ jest.mock('@salesforce/label/c.Core_AccessExplorer_Yes', () => ({ default: 'Yes'
 jest.mock('@salesforce/label/c.Core_AccessExplorer_Always', () => ({ default: 'Always' }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_AccessExplorer_Downloaded',
-  () => ({ default: 'Downloaded {0} rows.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_AccessExplorer_ModifyAllDataNote',
-  () => ({ default: '{0} gives Modify All Data.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_AccessExplorer_Truncated',
-  () => ({ default: 'More than {0} give access.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/label/c.Core_AccessExplorer_KindGroup', () => ({ default: 'Group' }), {
   virtual: true
 });
@@ -199,16 +194,16 @@ describe('c-access-explorer', () => {
     await type(element, 'Pat');
 
     const result = all(element, '[data-id="results"] lightning-button')[0];
-    expect(result.label).toBe('Pat Doe, Standard User, c.Core_AccessExplorer_Inactive');
+    expect(result.label).toBe('Pat Doe, Standard User, c.Core_MatchLogic_Inactive');
     result.click();
     await flush();
     await flush();
 
     expect(getAccess).toHaveBeenCalledWith({ subjectId: '005A' });
     expect(byId(element, 'subject').textContent).toBe(
-      'Pat Doe (Standard User, c.Core_AccessExplorer_Inactive)'
+      'Pat Doe (Standard User, c.Core_MatchLogic_Inactive)'
     );
-    expect(all(element, '[data-id="all-data"]').map((note) => note.textContent)).toEqual([
+    expect(all(element, '[data-id="all-data"]').map((note) => note.message)).toEqual([
       'System Administrator gives Modify All Data.'
     ]);
     const sources = byId(element, 'sources').data;
@@ -277,12 +272,10 @@ describe('c-access-explorer', () => {
       '',
       'Description__c'
     ]);
-    expect(byId(element, 'truncated').textContent).toBe('More than 2,000 give access.');
+    expect(byId(element, 'truncated').message).toBe('More than 2,000 give access.');
     expect(byId(element, 'grants').data[0]).toMatchObject({ kindLabel: 'Group', activePeople: 3 });
     expect(byId(element, 'grants').columns).toHaveLength(9);
-    expect(byId(element, 'may-miss-people').textContent).toBe(
-      'c.Core_AccessExplorer_MayMissPeople'
-    );
+    expect(byId(element, 'may-miss-people').message).toBe('c.Core_AccessExplorer_MayMissPeople');
 
     byId(element, 'show-more').click();
     await flush();
@@ -347,19 +340,59 @@ describe('c-access-explorer', () => {
       label: 'BarnCRM Admin',
       activePeople: 2
     });
-    expect(byId(element, 'tab-check').textContent).toBe(
-      'c.Core_AccessExplorer_TabCheckNotScheduled'
-    );
+    expect(byId(element, 'tab-check').message).toBe('c.Core_AccessExplorer_TabCheckNotScheduled');
 
     one(element, 'lightning-button[data-table="barncrm"]').click();
     await flush();
     const text = await readCsv(csv);
     expect(text).toContain('BarnCRM Admin');
-    expect(byId(element, 'notice').textContent).toBe('Downloaded 1 rows.');
+    expect(byId(element, 'notice').message).toBe('Downloaded 1 rows.');
 
     await choose(element, 'view', 'subject');
     await choose(element, 'view', 'barncrm');
     expect(getOverview).toHaveBeenCalledTimes(1);
+  });
+
+  it('names roles and extra permissions as the Access page does, and hides API names until asked', async () => {
+    setHelpTextForTest({
+      Core_AccessExplorer_RoleName: '{0} (BarnCRM role)',
+      Core_AccessExplorer_ExtraPermissionName: '{0} (extra permission)'
+    });
+    getOverview.mockResolvedValue({
+      sets: [
+        { id: '0PS1', label: 'Team Member', name: 'Team', kind: 'group', barnKind: 'role' },
+        {
+          id: '0PS2',
+          label: 'BarnCRM Bulk Update',
+          name: 'BarnCRM_Bulk_Update',
+          kind: 'permissionSet',
+          barnKind: 'extraPermission'
+        },
+        { id: '0PS3', label: 'BarnCRM Staff', name: 'BarnCRM_Staff', kind: 'permissionSet' }
+      ],
+      tabAccessCheckScheduled: false
+    });
+    const element = await render();
+    await choose(element, 'view', 'barncrm');
+
+    const table = byId(element, 'barncrm');
+    expect(table.data.map((row) => row.label)).toEqual([
+      'Team Member (BarnCRM role)',
+      'BarnCRM Bulk Update (extra permission)',
+      'BarnCRM Staff'
+    ]);
+    expect(table.data[0].kindLabel).toBe('Group');
+    expect(table.columns.map((column) => column.fieldName)).not.toContain('name');
+    expect(table.columns.some((column) => 'technical' in column)).toBe(false);
+
+    const toggle = byId(element, 'technical-names');
+    toggle.checked = true;
+    toggle.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(byId(element, 'barncrm').columns.map((column) => column.fieldName)).toContain('name');
+
+    await choose(element, 'view', 'change');
+    expect(byId(element, 'change').showTechnicalNames).toBe(true);
   });
 
   it('offers Compare Two and the Modify All Report as views', async () => {
@@ -370,9 +403,11 @@ describe('c-access-explorer', () => {
       'object',
       'barncrm',
       'compare',
-      'modifyAll'
+      'modifyAll',
+      'change'
     ]);
     expect(byId(element, 'compare')).toBeNull();
+    expect(byId(element, 'change')).toBeNull();
 
     await choose(element, 'view', 'compare');
     expect(byId(element, 'compare')).not.toBeNull();
@@ -388,6 +423,6 @@ describe('c-access-explorer', () => {
     const element = await render();
     await choose(element, 'view', 'barncrm');
 
-    expect(byId(element, 'error').textContent).toBe('You need the permission.');
+    expect(byId(element, 'error').message).toBe('You need the permission.');
   });
 });

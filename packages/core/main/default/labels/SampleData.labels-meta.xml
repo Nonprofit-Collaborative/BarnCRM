@@ -1,44 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_SampleData_AlreadyLoaded</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Sample data already loaded error</shortDescription>
-        <value>Sample data is already loaded. Remove it before loading again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_OrganizationRecordTypeUnavailable</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Load refused: user lacks the organization record type; {0} is its label</shortDescription>
-        <value>Sample data was not loaded, because you cannot use the {0} record type that BarnCRM Settings uses for organizations (Record type for organizations, on General). Give yourself that record type on your profile or a permission set, or choose another in that setting, then load again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_CancelButton</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Cancel button</shortDescription>
-        <value>Cancel</value>
-    </labels>
-    <labels>
         <fullName>Core_SampleData_CardTitle</fullName>
         <categories>Sample Data</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Sample Data card title</shortDescription>
         <value>Sample Data</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_ConfirmButton</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Confirm button</shortDescription>
-        <value>Confirm</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_ContactsLabel</fullName>
@@ -49,44 +17,12 @@
         <value>Contacts</value>
     </labels>
     <labels>
-        <fullName>Core_SampleData_ErrorInvalidData</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Sample data file is not valid error</shortDescription>
-        <value>The sample data file is missing information the loader needs, so nothing was loaded. Reinstall the package or restore the Sample Data resource, then try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_JunctionModeNote</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>How sample data arrives in the flexible membership mode</shortDescription>
-        <value>This org uses the flexible way of belonging to a household, so each sample person is joined to a household by a household member record, like your own people. Sample people are loaded as contacts: BarnCRM never creates person accounts, so an org that stores people as accounts sees households of contacts.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_HouseholdsLabel</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Households count label</shortDescription>
-        <value>Households</value>
-    </labels>
-    <labels>
         <fullName>Core_SampleData_LoadButton</fullName>
         <categories>Sample Data</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Load Sample Data button</shortDescription>
         <value>Load Sample Data</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_LoadConfirmBody</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Load confirmation dialog body</shortDescription>
-        <value>This adds 200 households, 440 contacts, 25 organizations, their relationships and affiliations, and sample records for each installed module. Only load sample data into a scratch org, sandbox, or demo org, never production.</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_LoadConfirmTitle</fullName>
@@ -97,108 +33,12 @@
         <value>Load Sample Data?</value>
     </labels>
     <labels>
-        <fullName>Core_SampleData_LoadError</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Load failure toast</shortDescription>
-        <value>Sample data could not be loaded.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_LoadInProgress</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Load already running error</shortDescription>
-        <value>A sample data load is already running. Wait for it to finish before loading or removing sample data.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_LoadSuccess</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Load success toast</shortDescription>
-        <value>Sample data loaded.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_LoadingAltText</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Spinner alternative text</shortDescription>
-        <value>Loading</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_NoPermission</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Missing permission error</shortDescription>
-        <value>You need the Manage BarnCRM Settings permission to do this.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_OrganizationsLabel</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Organizations count label</shortDescription>
-        <value>Organizations</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_RelationshipsLabel</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Relationships count label</shortDescription>
-        <value>Relationships</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_AffiliationsLabel</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Affiliations count label</shortDescription>
-        <value>Affiliations</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_ProductionWarning</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Production org warning banner</shortDescription>
-        <value>Sample data is for scratch orgs, sandboxes, and demos. Never load it into a production org.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_ReadOnlyMessage</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Read-only message for users without the permission</shortDescription>
-        <value>You need the Manage BarnCRM Settings permission to load or remove sample data.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_RecordTypeMissing</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Missing record type error, {0} is the record type name</shortDescription>
-        <value>The {0} record type could not be found. Contact your administrator.</value>
-    </labels>
-    <labels>
         <fullName>Core_SampleData_RemoveButton</fullName>
         <categories>Sample Data</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Remove Sample Data button</shortDescription>
         <value>Remove Sample Data</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_RemoveConfirmBody</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Remove confirmation dialog body</shortDescription>
-        <value>This permanently deletes every household, contact, and organization created by the sample data loader. Records you entered yourself are not affected.</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_RemoveConfirmTitle</fullName>
@@ -209,52 +49,12 @@
         <value>Remove Sample Data?</value>
     </labels>
     <labels>
-        <fullName>Core_SampleData_RemoveError</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Remove failure toast</shortDescription>
-        <value>Sample data could not be removed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_RemoveSuccess</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Remove success toast</shortDescription>
-        <value>Sample data removed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_ResourceMissing</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Missing static resource error</shortDescription>
-        <value>The sample data file could not be found. Contact your administrator.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_StatusError</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Inline note when the sample data status could not be read</shortDescription>
-        <value>The sample data status could not be read, so the counts below may be out of date. The Error Log has the detail.</value>
-    </labels>
-    <labels>
         <fullName>Core_SampleData_StatusLoaded</fullName>
         <categories>Sample Data</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Loaded status badge</shortDescription>
         <value>Loaded</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_StatusLoading</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Loading status badge</shortDescription>
-        <value>Loading</value>
     </labels>
     <labels>
         <fullName>Core_SampleData_StatusNotLoaded</fullName>
@@ -271,21 +71,5 @@
         <protected>false</protected>
         <shortDescription>Removing status badge</shortDescription>
         <value>Removing</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_RemoveInProgress</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Remove already running error</shortDescription>
-        <value>Sample data is still being removed. Wait for it to finish before loading or removing sample data.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SampleData_StoppedLogMessage</fullName>
-        <categories>Sample Data</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error Log message: a sample data load or removal stopped part way</shortDescription>
-        <value>The sample data load or removal stopped part way, at the step this entry names. Its technical detail says what failed. The Sample data admin guide page, under Common mistakes, says what to check and how to finish.</value>
     </labels>
 </CustomLabels>

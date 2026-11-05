@@ -4,10 +4,11 @@
 
 BarnCRM can be the only system in your Salesforce org that keeps households, or it can sit
 alongside one that is already there. Coexistence mode is the one setting that records
-which situation you are in. In this version it is a record of what is installed: it does not
-read, adopt, or change any household data, and the only behaviour attached to it is that
-choosing Nonprofit Cloud coexistence also switches household membership to the junction,
-because Person Accounts require that.
+which situation you are in. It is a record of what is installed: it does not read, adopt, or
+change any household data, and the only behaviour attached to it is that choosing Nonprofit
+Cloud coexistence also switches household membership to the junction, because Person Accounts
+require that. In an org with NPSP, adopting NPSP's households is a separate step you start
+yourself ([Adopting Your NPSP Households](npsp-households.md)).
 
 Most organizations have nothing else in the org, and BarnCRM runs on its own: that is
 **Standalone**, and it is the only mode most orgs ever see. BarnCRM reads your org the first
@@ -31,8 +32,8 @@ The Setup Assistant's second step and BarnCRM Settings offer the same list.
 | Mode | Choose it when | What it changes |
 |---|---|---|
 | **Standalone** | Your org has no other household model. This is the default, and the recommendation in any org without NPSP or Nonprofit Cloud, including one with Person Accounts. | Nothing, in this version. How households group people is the separate **household membership** setting, which Standalone leaves as it is. In an org with Person Accounts, BarnCRM proposes junction membership (one membership record per person) because Person Accounts need it, but never overwrites a membership choice an administrator already made. |
-| **NPSP coexistence** (only with NPSP) | NPSP is installed and you still want it working while you move. | Nothing, in this version. It records that NPSP is here. BarnCRM builds its own households and leaves NPSP's records alone. Feeding NPSP's own totals arrives with the Mirror module (v0.6). |
-| **Nonprofit Cloud coexistence** (only with Nonprofit Cloud) | Your org has Salesforce Nonprofit Cloud objects. | Household membership uses membership records rather than the person's account, so Person Accounts work properly and one person can belong to more than one household. Your Nonprofit Cloud objects are left alone. |
+| **NPSP coexistence** (only with NPSP) | NPSP is installed and you still want it working while you move. | Nothing by itself. It records that NPSP is here, and BarnCRM leaves NPSP's records alone. To make NPSP's household accounts BarnCRM households, use **Adopt NPSP Households** on the same page ([Adopting Your NPSP Households](npsp-households.md)). Feeding NPSP's own totals comes with the Mirror module's Opportunity mirror. |
+| **Nonprofit Cloud coexistence** (only with Nonprofit Cloud) | Your org has Salesforce Nonprofit Cloud objects. | Household membership uses membership records rather than the person's account, so Person Accounts work properly and one person can belong to more than one household. Your Nonprofit Cloud objects are left alone. Copying BarnCRM's gifts to Nonprofit Cloud's Gift Transactions is a separate choice, the [Gift Transaction Mirror](gift-transaction-mirror.md), off until you turn it on. |
 
 BarnCRM recommends Nonprofit Cloud coexistence when it finds Nonprofit Cloud objects,
 otherwise NPSP coexistence when it finds NPSP, otherwise Standalone. If you are not sure,
@@ -66,10 +67,10 @@ keeps households is installed.
    **Health** in the left navigation.
 2. Health Check runs. The first card is **What We Found in Your Org**.
 3. It says Person Accounts are enabled, and the recommended mode is **Standalone**.
-4. Below the card there is a finding titled **Coexistence mode is not confirmed yet**, with
+4. Below the card there is a finding titled **Coexistence Mode Is Not Confirmed Yet**, with
    the button **Use Recommended Mode**.
 5. Maria clicks **Use Recommended Mode**. The page saves Standalone, re-runs itself, and the
-   finding is replaced by **Coexistence mode matches your org**. Household membership is a
+   finding is replaced by **Coexistence Mode Matches Your Org**. Household membership is a
    separate setting: because her org has Person Accounts, BarnCRM proposes a membership
    record for each person, and never overwrites a membership choice already made.
 6. She chooses **General** in the left navigation and sees Coexistence mode set to
@@ -103,10 +104,15 @@ your org, not about how you want households named or how records are entered. Th
 their own settings. If a household is named wrongly, change the naming settings, not the
 mode.
 
-**Expecting NPSP coexistence to take over your NPSP households.** It does not. BarnCRM
-builds its own households in every mode, so an org with NPSP has NPSP's households and
-BarnCRM's, and reconciling them is manual work in this version. Switching between NPSP
-coexistence and Standalone changes nothing about that either way.
+**Expecting NPSP coexistence to take over your NPSP households.** Choosing the mode does not.
+Adopting them is its own step, with a preview and an undo: **Adopt NPSP Households** on the
+**General** page ([Adopting Your NPSP Households](npsp-households.md)). Switching between NPSP
+coexistence and Standalone changes nothing about households either way.
+
+**Turning on Household Upkeep while NPSP still makes households.** BarnCRM does not allow it,
+in any mode: while NPSP's Account Model is Household Account, or NPSP households are not yet
+adopted, the Household Upkeep row says why and offers no **Turn On**
+([Then Turn On Household Upkeep](npsp-households.md#then-turn-on-household-upkeep)).
 
 **Expecting the mode to move data.** Confirming a mode records what is in your org and, for
 Nonprofit Cloud coexistence, sets household membership. It does not migrate anything, and

@@ -4,6 +4,13 @@ import searchPeople from '@salesforce/apex/AccessExplorerController.searchPeople
 import searchPermissionSets from '@salesforce/apex/AccessExplorerController.searchPermissionSets';
 import getAccess from '@salesforce/apex/AccessExplorerController.getAccess';
 import getFieldAccess from '@salesforce/apex/AccessExplorerController.getFieldAccess';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_AccessCompare_OnlyIn: 'Only {0}: {1}.',
+  Core_AccessCompare_Counts: '{0} of {1} rows differ.',
+  Core_AccessExplorer_Downloaded: 'Downloaded {0} rows.'
+});
 
 jest.mock(
   '@salesforce/apex/AccessExplorerController.searchPeople',
@@ -23,9 +30,6 @@ jest.mock(
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
-jest.mock('@salesforce/label/c.Core_AccessCompare_OnlyIn', () => ({ default: 'Only {0}: {1}.' }), {
-  virtual: true
-});
 jest.mock('@salesforce/label/c.Core_AccessCompare_None', () => ({ default: 'None' }), {
   virtual: true
 });
@@ -34,22 +38,12 @@ jest.mock(
   () => ({ default: 'Similarity: {0}%' }),
   { virtual: true }
 );
-jest.mock(
-  '@salesforce/label/c.Core_AccessCompare_Counts',
-  () => ({ default: '{0} of {1} rows differ.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/label/c.Core_AccessExplorer_ColRead', () => ({ default: 'Read' }), {
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_AccessExplorer_ColEdit', () => ({ default: 'Edit' }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_AccessExplorer_Downloaded',
-  () => ({ default: 'Downloaded {0} rows.' }),
-  { virtual: true }
-);
 
 const PAT = {
   id: '005A',
@@ -247,7 +241,7 @@ describe('c-access-compare', () => {
     await flush();
     await flush();
 
-    expect(byId(element, 'error').textContent).toContain('No access.');
+    expect(byId(element, 'error').message).toContain('No access.');
   });
 
   it('downloads the table shown', async () => {
@@ -266,6 +260,6 @@ describe('c-access-compare', () => {
     });
     expect(text).toContain('Only Pat Doe: Edit.');
     expect(text).not.toContain('Fund__c');
-    expect(byId(element, 'notice').textContent).toBe('Downloaded 2 rows.');
+    expect(byId(element, 'notice').message).toBe('Downloaded 2 rows.');
   });
 });

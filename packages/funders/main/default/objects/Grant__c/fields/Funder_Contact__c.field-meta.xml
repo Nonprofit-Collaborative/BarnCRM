@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Funder_Contact__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <referenceTo>Contact</referenceTo>
+  <relationshipLabel>Funder Grants</relationshipLabel>
+  <relationshipName>Funder_Grants</relationshipName>
+  <required>false</required>
+  <externalId>false</externalId>
+  <inlineHelpText>The program officer or other contact at the funder.</inlineHelpText>
+  <label>Funder Contact</label>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

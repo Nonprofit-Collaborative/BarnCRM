@@ -10,16 +10,16 @@
  */
 @NamespaceAccessible
 public with sharing class VolunteerHoursDeleteGuardHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public VolunteerHoursDeleteGuardHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public VolunteerHoursDeleteGuardHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'VolunteerHoursDeleteGuardHandler';
-    }
+	public override String getName() {
+		return 'VolunteerHoursDeleteGuardHandler';
+	}
 
-    public override void beforeDelete() {
-        VolunteerHoursService.refuseDeletingApproved((List<Volunteer_Hours__c>) Trigger.old);
-    }
+	public override void beforeDelete() {
+		VolunteerHoursService.refuseDeletingApproved((List<Volunteer_Hours__c>) oldRecords());
+	}
 }

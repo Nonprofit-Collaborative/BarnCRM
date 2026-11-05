@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import ModuleManager from 'c/moduleManager';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import getState from '@salesforce/apex/ModuleManagerController.getState';
 import turnOff from '@salesforce/apex/ModuleManagerController.turnOff';
 import turnOn from '@salesforce/apex/ModuleManagerController.turnOn';
@@ -7,6 +8,11 @@ import grantAdminAccess from '@salesforce/apex/ModuleManagerController.grantAdmi
 import uninstallReport from '@salesforce/apex/ModuleManagerController.uninstallReport';
 import saveShowNonprofitModules from '@salesforce/apex/ModuleManagerController.saveShowNonprofitModules';
 import finishSetup from '@salesforce/apex/ModuleManagerController.finishSetup';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_ModuleManager_NonprofitHidden: 'Installed nonprofit modules hidden: {0}'
+});
 
 jest.mock('@salesforce/apex/ModuleManagerController.finishSetup', () => ({ default: jest.fn() }), {
   virtual: true
@@ -21,11 +27,6 @@ jest.mock(
   { virtual: true }
 );
 // The hidden-count line carries a placeholder, so this label needs its text to assert the count.
-jest.mock(
-  '@salesforce/label/c.Core_ModuleManager_NonprofitHidden',
-  () => ({ default: 'Installed nonprofit modules hidden: {0}' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/apex/ModuleManagerController.turnOff', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -105,8 +106,13 @@ function row(element, name) {
   return element.shadowRoot.querySelector(`li[data-module="${name}"]`);
 }
 
+function status(element, name) {
+  return row(element, name).querySelector('[data-id="status"]').label;
+}
+
 describe('c-module-manager', () => {
   beforeEach(() => {
+    BarnConfirmModal.open.mockResolvedValue(true);
     getState.mockResolvedValue(state());
     turnOff.mockResolvedValue(state('Off'));
     turnOn.mockResolvedValue(state('On'));
@@ -135,17 +141,15 @@ describe('c-module-manager', () => {
     const element = await build();
 
     const notice = element.shadowRoot.querySelector('[data-id="other-rollup-tools"]');
-    expect(notice.textContent).toContain('Core_OtherRollupTools_Title');
+    expect(notice.title).toContain('Core_OtherRollupTools_Title');
     expect(notice.textContent).toContain('This org also runs DLRS.');
   });
 
   it('says what each module is doing', async () => {
     const element = await build();
 
-    expect(row(element, 'Core').textContent).toContain('Core_ModuleManager_StatusOn');
-    expect(row(element, 'Volunteers').textContent).toContain(
-      'Core_ModuleManager_StatusNotInstalled'
-    );
+    expect(status(element, 'Core')).toContain('Core_ModuleManager_StatusOn');
+    expect(status(element, 'Volunteers')).toContain('Core_Integrations_NotInstalled');
     expect(row(element, 'Core').querySelector('[data-id="turn-off"]')).toBeNull();
   });
 
@@ -194,8 +198,27 @@ describe('c-module-manager', () => {
     await settle();
 
     expect(turnOff).toHaveBeenCalledWith({ moduleName: 'Giving' });
-    expect(row(element, 'Giving').textContent).toContain('Core_ModuleManager_StatusOff');
+    expect(status(element, 'Giving')).toContain('Core_ModuleManager_StatusOff');
     expect(row(element, 'Giving').querySelector('[data-id="turn-on"]')).not.toBeNull();
+  });
+
+  it('asks before turning a module off, and leaves it on when Maria cancels (admin-11)', async () => {
+    BarnConfirmModal.open.mockResolvedValue(false);
+    const element = await build();
+
+    row(element, 'Giving').querySelector('[data-id="turn-off"]').click();
+    await settle();
+
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'c.Core_ModuleManager_TurnOffMessage',
+        confirmLabel: 'c.Core_ModuleManager_TurnOffButton'
+      })
+    );
+    expect(BarnConfirmModal.open.mock.calls[0][0].label).toContain(
+      'Core_ModuleManager_TurnOffTitle'
+    );
+    expect(turnOff).not.toHaveBeenCalled();
   });
 
   it('turns a module on, then gives its admin access in a second call', async () => {
@@ -207,7 +230,7 @@ describe('c-module-manager', () => {
 
     expect(turnOn).toHaveBeenCalledWith({ moduleName: 'Giving' });
     expect(grantAdminAccess).toHaveBeenCalledWith({ moduleName: 'Giving' });
-    expect(row(element, 'Giving').textContent).toContain('Core_ModuleManager_StatusOn');
+    expect(status(element, 'Giving')).toContain('Core_ModuleManager_StatusOn');
   });
 
   it('says so when the module is on but its access could not be given', async () => {
@@ -218,7 +241,7 @@ describe('c-module-manager', () => {
     row(element, 'Giving').querySelector('[data-id="turn-on"]').click();
     await settle();
 
-    expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toContain(
       'Access could not be given.'
     );
   });
@@ -356,7 +379,7 @@ describe('c-module-manager', () => {
       box.dispatchEvent(new CustomEvent('change'));
       await settle();
 
-      expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
+      expect(element.shadowRoot.querySelector('[data-id="error"]').message).toContain(
         'Not allowed.'
       );
       expect(element.shadowRoot.querySelector('[data-id="show-nonprofit"]').checked).toBe(true);
@@ -385,7 +408,7 @@ describe('c-module-manager', () => {
     row(element, 'Giving').querySelector('[data-id="turn-off"]').click();
     await settle();
 
-    expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toContain(
       'The module could not be switched.'
     );
   });
@@ -407,7 +430,7 @@ describe('c-module-manager', () => {
       const element = await build();
 
       const giving = row(element, 'Giving');
-      expect(giving.querySelector('[data-id="setup-not-run"]').textContent).toContain(
+      expect(giving.querySelector('[data-id="setup-not-run"]').message).toContain(
         'Core_ModuleSetup_NotRunNotice'
       );
       const button = giving.querySelector('[data-id="finish-setup"]');
@@ -445,7 +468,7 @@ describe('c-module-manager', () => {
       row(element, 'Giving').querySelector('[data-id="finish-setup"]').click();
       await settle();
 
-      expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain(
+      expect(element.shadowRoot.querySelector('[data-id="error"]').message).toContain(
         'The module could not be set up.'
       );
     });

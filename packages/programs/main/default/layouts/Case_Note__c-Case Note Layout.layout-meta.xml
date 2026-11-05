@@ -19,6 +19,10 @@
         <behavior>Edit</behavior>
         <field>Subject__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Goal__c</field>
+      </layoutItems>
     </layoutColumns>
     <layoutColumns>
       <layoutItems>

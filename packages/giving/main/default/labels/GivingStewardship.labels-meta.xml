@@ -49,14 +49,6 @@
     <value>Stewardship Plans</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_Intro</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: what the page is for</shortDescription>
-    <value>The follow-up your organization repeats. Write a plan down once here, and BarnCRM lays its tasks out every time the plan applies.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_RunningNotice</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
@@ -73,36 +65,12 @@
     <value>You can read the plans here. Changing them needs the Manage BarnCRM Settings permission.</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_Empty</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: no templates exist yet</shortDescription>
-    <value>You have not written a plan down yet. Choose New plan to write the first one.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_NewPlan</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: button, create a template</shortDescription>
     <value>New Plan</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_EditPlan</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, edit a template</shortDescription>
-    <value>Edit</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_TurnOn</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, make a template active</shortDescription>
-    <value>Turn on</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_TurnOff</fullName>
@@ -129,44 +97,12 @@
     <value>What Starts It</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_ColumnSteps</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: column, how many steps</shortDescription>
-    <value>Steps</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_ColumnRunning</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: column, how many plans are running</shortDescription>
     <value>Running Now</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_ColumnActive</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: column, whether the plan is on</shortDescription>
-    <value>On</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_Active</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: the plan is active</shortDescription>
-    <value>On</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_Inactive</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: the plan is not active</shortDescription>
-    <value>Off</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_FieldName</fullName>
@@ -193,52 +129,12 @@
     <value>Smallest gift that starts it</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_FieldMinimumHelp</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: help, the minimum is for gift events only</shortDescription>
-    <value>Only for the two gift events. Leave it empty to start on any gift.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_FieldDescription</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: field, the plan description</shortDescription>
-    <value>Description</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_StepsHeading</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: heading above the steps of a plan</shortDescription>
     <value>Steps</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_NoSteps</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: the template has no steps</shortDescription>
-    <value>This plan has no steps yet, so it would start and lay nothing out. Add the first step.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_SelectPlan</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: nothing is selected</shortDescription>
-    <value>Choose a plan to see and edit its steps.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_AddStep</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, add a step</shortDescription>
-    <value>Add Step</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_MoveUp</fullName>
@@ -249,36 +145,12 @@
     <value>Move up</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_MoveDown</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, move a step later</shortDescription>
-    <value>Move Down</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_RemoveStep</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, remove a step</shortDescription>
-    <value>Remove</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_StepSubject</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: field, the task subject</shortDescription>
     <value>Subject</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_StepSubjectHelp</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: help, write the subject as an instruction</shortDescription>
-    <value>What the assignee reads in their task list. Write it as an instruction: Call to say thank you, not Thank you.</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_StepDays</fullName>
@@ -321,30 +193,6 @@
     <value>Comments</value>
   </labels>
   <labels>
-    <fullName>Giving_Stewardship_Save</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, save</shortDescription>
-    <value>Save</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_Cancel</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, cancel</shortDescription>
-    <value>Cancel</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_Saved</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: the change was saved</shortDescription>
-    <value>Saved.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Stewardship_ErrorNotPermitted</fullName>
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
@@ -373,24 +221,8 @@
     <categories>Giving, Stewardship</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Stewardship: the page could not do what was asked</shortDescription>
+    <shortDescription>Giving: the page could not do what was asked</shortDescription>
     <value>That did not work. The details are in the Error Log. Try again, and if it keeps happening, ask your BarnCRM admin to check it.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_Selected</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: screen reader text on the plan being edited</shortDescription>
-    <value>Selected</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_ColumnActions</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: screen reader name of the buttons column</shortDescription>
-    <value>Actions</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_StartHeading</fullName>
@@ -399,14 +231,6 @@
     <protected>false</protected>
     <shortDescription>Start plan action: heading</shortDescription>
     <value>Start a Stewardship Plan</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_StartPlanLabel</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Start plan action: label of the plan picker</shortDescription>
-    <value>Plan</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_StartChoose</fullName>

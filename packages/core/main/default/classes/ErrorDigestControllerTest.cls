@@ -1,131 +1,122 @@
 /**
- * The error digest panel (C-23): the scheduling entry point, sending now, and that only an
- * administrator can do either.
+ * The error digest panel (C-23): switching the digest on and off as a step of the nightly run
+ * (ADR-0166 nightly-job-dispatcher), sending now, and that only an administrator can do either.
  */
-@IsTest(testFor='ApexClass:ErrorDigestController')
+@IsTest(testFor='ApexClass:ErrorDigestController, ApexClass:ErrorDigestScheduler')
 private class ErrorDigestControllerTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.admin();
+	}
 
-    private static List<CronTrigger> digestJobs() {
-        return [
-            SELECT Id, CronExpression, NextFireTime
-            FROM CronTrigger
-            WHERE CronJobDetail.Name = :ErrorDigestScheduler.JOB_NAME
-        ];
-    }
+	/** The nightly run's schedule, which sends the digest. */
+	private static List<CronTrigger> runJobs() {
+		return [
+			SELECT Id, CronExpression, NextFireTime
+			FROM CronTrigger
+			WHERE CronJobDetail.Name = :NightlyJobs.jobName()
+		];
+	}
 
-    @IsTest
-    static void mariaSchedulesSendsNowAndStops() {
-        System.runAs(TestUsers.admin()) {
-            TestDataFactory.clearScheduledJobs(new List<String>{ ErrorDigestScheduler.JOB_NAME });
-            TestDataFactory.defaultSettings();
-            User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+	@IsTest
+	static void mariaSchedulesSendsNowAndStops() {
+		System.runAs(TestUsers.admin()) {
+			TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+			TestDataFactory.defaultSettings();
+			User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 
-            System.runAs(maria) {
-                Test.startTest();
-                ErrorDigestController.DigestView scheduled = ErrorDigestController.setSchedule(
-                    true
-                );
-                Assert.isTrue(scheduled.scheduled, 'Scheduling switches the digest on.');
-                Assert.isNotNull(scheduled.nextRunAt, 'And says when it runs next.');
-                Assert.isTrue(scheduled.canManage, 'Maria may change it.');
-                Assert.isTrue(
-                    scheduled.toAdministrators,
-                    'Nobody is listed, so it goes to admins.'
-                );
+			System.runAs(maria) {
+				Test.startTest();
+				ErrorDigestController.DigestView scheduled = ErrorDigestController.setSchedule(
+					true
+				);
+				Assert.isTrue(scheduled.scheduled, 'Scheduling switches the digest on.');
+				Assert.isNotNull(scheduled.nextRunAt, 'And says when it runs next.');
+				Assert.areEqual(7, scheduled.nextRunAt.hour(), 'Every morning at 7:00.');
+				Assert.isTrue(scheduled.canManage, 'Maria may change it.');
+				Assert.isTrue(
+					scheduled.toAdministrators,
+					'Nobody is listed, so it goes to admins.'
+				);
 
-                ErrorDigestController.setSchedule(true);
-                List<CronTrigger> jobs = digestJobs();
-                Assert.areEqual(1, jobs.size(), 'Pressing Schedule twice keeps one job.');
-                Assert.areEqual('0 0 7 * * ?', jobs[0].CronExpression, 'Every morning at 7:00.');
+				ErrorDigestController.setSchedule(true);
+				Assert.areEqual(1, runJobs().size(), 'Pressing Schedule twice keeps one run.');
 
-                ErrorDigestController.DigestView afterSend = ErrorDigestController.sendNow();
-                Assert.isNotNull(afterSend.lastRun, 'Send now runs the digest.');
-                Assert.isNotNull(afterSend.lastRunSummary, 'And the panel says what it did.');
+				ErrorDigestController.DigestView afterSend = ErrorDigestController.sendNow();
+				Assert.isNotNull(afterSend.lastRun, 'Send now runs the digest.');
+				Assert.isNotNull(afterSend.lastRunSummary, 'And the panel says what it did.');
 
-                ErrorDigestController.DigestView stopped = ErrorDigestController.setSchedule(false);
-                Assert.isFalse(stopped.scheduled, 'Stop switches it off.');
-                Test.stopTest();
-            }
-            Assert.isTrue(digestJobs().isEmpty(), 'No job is left behind.');
-        }
-    }
+				ErrorDigestController.DigestView stopped = ErrorDigestController.setSchedule(false);
+				Assert.isFalse(stopped.scheduled, 'Stop switches it off.');
+				Test.stopTest();
+			}
+			NightlyJobs.forget();
+			Assert.isFalse(
+				NightlyJobs.isSwitchedOn(ErrorDigestScheduler.JOB_NAME, true),
+				'The step stays off in tonight\'s run.'
+			);
+		}
+	}
 
-    @IsTest
-    static void theScheduledJobRunsTheDigest() {
-        System.runAs(TestUsers.admin()) {
-            TestDataFactory.defaultSettings();
-            User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+	@IsTest
+	static void theNightlyStepRunsTheDigest() {
+		System.runAs(TestUsers.admin()) {
+			TestDataFactory.defaultSettings();
+			User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 
-            System.runAs(maria) {
-                Test.startTest();
-                ErrorDigestScheduler.start();
-                // The scheduled run happens here.
-                Test.stopTest();
-            }
+			System.runAs(maria) {
+				Test.startTest();
+				ErrorDigestScheduler.step().run();
+				Test.stopTest();
+			}
 
-            BarnCRM_Settings__c after = BarnCRM_Settings__c.getOrgDefaults();
-            Assert.isNotNull(after.Error_Digest_Last_Run__c, 'The job ran the digest.');
-            Assert.isTrue(
-                after.Error_Digest_Last_Run_Summary__c.startsWith(
-                    Label.Core_ErrorDigest_SummaryNothingNew.substringBefore('{0}')
-                ),
-                'With nothing new, it sent nothing and said so.'
-            );
-        }
-    }
+			BarnCRM_Settings__c after = BarnCRM_Settings__c.getOrgDefaults();
+			Assert.isNotNull(after.Error_Digest_Last_Run__c, 'The step ran the digest.');
+			Assert.isTrue(
+				after.Error_Digest_Last_Run_Summary__c.startsWith(
+					Label.Core_ErrorDigest_SummaryNothingNew.substringBefore('{0}')
+				),
+				'With nothing new, it sent nothing and said so.'
+			);
+		}
+	}
 
-    @IsTest
-    static void davidCanReadThePanelButNotScheduleOrSend() {
-        System.runAs(TestUsers.admin()) {
-            TestDataFactory.clearScheduledJobs(new List<String>{ ErrorDigestScheduler.JOB_NAME });
-            TestDataFactory.defaultSettings();
-            User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
+	@IsTest
+	static void davidCanReadThePanelButNotScheduleOrSend() {
+		System.runAs(TestUsers.admin()) {
+			TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+			TestDataFactory.defaultSettings();
+			User david = TestDataFactory.createUser('David', new List<String>{ 'BarnCRM_Staff' });
 
-            System.runAs(david) {
-                Test.startTest();
-                ErrorDigestController.DigestView view = ErrorDigestController.getDigest();
-                Assert.isFalse(view.canManage, 'David may read the panel only.');
-                Assert.isFalse(view.scheduled, 'And sees it is off.');
-                for (String action : new List<String>{ 'schedule', 'send' }) {
-                    try {
-                        if (action == 'schedule') {
-                            ErrorDigestController.setSchedule(true);
-                        } else {
-                            ErrorDigestController.sendNow();
-                        }
-                        Assert.fail('David should not be able to ' + action + '.');
-                    } catch (AuraHandledException expected) {
-                        Assert.areEqual(
-                            Label.Core_ErrorDigest_PermissionRequired,
-                            expected.getMessage(),
-                            'The message names the permission David needs.'
-                        );
-                    }
-                }
-                Test.stopTest();
-            }
+			System.runAs(david) {
+				Test.startTest();
+				ErrorDigestController.DigestView view = ErrorDigestController.getDigest();
+				Assert.isFalse(view.canManage, 'David may read the panel only.');
+				Assert.isFalse(view.scheduled, 'And sees it is off.');
+				for (String action : new List<String>{ 'schedule', 'send' }) {
+					try {
+						if (action == 'schedule') {
+							ErrorDigestController.setSchedule(true);
+						} else {
+							ErrorDigestController.sendNow();
+						}
+						Assert.fail('David should not be able to ' + action + '.');
+					} catch (AuraHandledException expected) {
+						Assert.areEqual(
+							BarnHelp.text('Core', 'Core_ErrorDigest_PermissionRequired'),
+							expected.getMessage(),
+							'The message names the permission David needs.'
+						);
+					}
+				}
+				Test.stopTest();
+			}
 
-            Assert.isTrue(digestJobs().isEmpty(), 'Nothing was scheduled.');
-            Assert.isNull(
-                BarnCRM_Settings__c.getOrgDefaults().Error_Digest_Last_Run__c,
-                'And nothing was sent.'
-            );
-        }
-    }
-
-    @IsTest
-    static void aDigestTheOrgAlreadyRunsIsSetAsideForTheTest() {
-        System.runAs(TestUsers.admin()) {
-            // Stands in for the job an org running BarnCRM already has.
-            ErrorDigestScheduler.start();
-
-            TestDataFactory.clearScheduledJobs(new List<String>{ ErrorDigestScheduler.JOB_NAME });
-
-            Assert.isTrue(digestJobs().isEmpty(), 'A test about scheduling starts from none');
-        }
-    }
+			Assert.isTrue(runJobs().isEmpty(), 'Nothing was scheduled.');
+			Assert.isNull(
+				BarnCRM_Settings__c.getOrgDefaults().Error_Digest_Last_Run__c,
+				'And nothing was sent.'
+			);
+		}
+	}
 }

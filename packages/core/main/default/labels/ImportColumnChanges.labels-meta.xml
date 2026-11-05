@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: the changes button; {0} is how many changes</shortDescription>
-        <value>Change values ({0})</value>
+        <value>Change Values ({0})</value>
     </labels>
     <labels>
         <fullName>Core_Import_ChangesHeading</fullName>
@@ -22,23 +22,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import wizard: heading of a column's changes; {0} is the column</shortDescription>
-        <value>Change values: {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_ChangesHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what a column&apos;s changes do</shortDescription>
-        <value>Changes run in order, before the values are matched or saved, and are saved with the template.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_ChangesAdd</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: adds a change to a column</shortDescription>
-        <value>Add a Change</value>
+        <value>Change Values: {0}</value>
     </labels>
     <labels>
         <fullName>Core_Import_ChangesKind</fullName>
@@ -161,14 +145,6 @@
         <value>Whole value only</value>
     </labels>
     <labels>
-        <fullName>Core_Import_ChangesValue</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Column change: the value an empty cell takes</shortDescription>
-        <value>Value</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_ChangesColumns</fullName>
         <categories>Import</categories>
         <language>en_US</language>
@@ -255,21 +231,5 @@
         <protected>false</protected>
         <shortDescription>Import wizard: also match with the org&apos;s duplicate rules</shortDescription>
         <value>Also match with my duplicate rules</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_DuplicateRulesHelp</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: what matching with duplicate rules risks</shortDescription>
-        <value>Your org&apos;s looser duplicate rules check rows the rule above misses. Check ticked rows in the dry run.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Import_DuplicateRulesNone</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: no duplicate rule is switched on</shortDescription>
-        <value>No duplicate rule is switched on for these records, so this changes nothing for them. The Duplicates page of the admin guide says how to switch one on.</value>
     </labels>
 </CustomLabels>

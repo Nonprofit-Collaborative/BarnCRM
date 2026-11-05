@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import SetupAssistant from 'c/setupAssistant';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import getState from '@salesforce/apex/SetupAssistantController.getState';
 import completeStep from '@salesforce/apex/SetupAssistantController.completeStep';
 import skipStep from '@salesforce/apex/SetupAssistantController.skipStep';
@@ -376,7 +377,7 @@ describe('c-setup-assistant', () => {
     const link = element.shadowRoot.querySelector('[data-id="automatic-access-link"]');
     expect(link.href).toContain('docs/admin-guide/automatic-access.md');
     expect(link.target).toBe('_blank');
-    expect(link.textContent).toContain('c.Core_SetupAssistant_AutomaticAccessLink');
+    expect(link.textContent).toContain('c.Core_Access_AutomaticAccessLink');
     expect(link.textContent).toContain('c.Core_Kit_NewTab');
   });
 
@@ -455,7 +456,9 @@ describe('c-setup-assistant', () => {
       .dispatchEvent(new CustomEvent('save', { detail: { values: { Default_Contact__c: 'x' } } }));
     await settle();
 
-    expect(element.shadowRoot.textContent).toContain('That record is not a contact.');
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toContain(
+      'That record is not a contact.'
+    );
     expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       'Choose a default contact'
     );
@@ -571,13 +574,23 @@ describe('c-setup-assistant', () => {
   });
 
   it('starts setup again when Maria asks, and forgets the progress it recorded', async () => {
+    BarnConfirmModal.open.mockResolvedValue(true);
     getState.mockResolvedValue(state({ completedKeys: STEP_DEFINITIONS.map(([key]) => key) }));
     const element = build();
     await settle();
 
+    // Reopen Setup is the completion screen's only button (admin-16).
+    expect(element.shadowRoot.querySelector('[data-id="start-again"]')).toBeNull();
+    click(element, 'reopen');
+    await settle();
+    expect(element.shadowRoot.querySelector('[data-id="start-again"]').variant).toBe('base');
+
     click(element, 'start-again');
     await settle();
 
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'c.Core_SetupAssistant_StartAgainConfirm' })
+    );
     expect(resetSetup).toHaveBeenCalled();
     expect(element.shadowRoot.querySelector(OPEN_STEP).textContent).toContain(
       'Confirm how BarnCRM fits your existing org'
@@ -607,7 +620,9 @@ describe('c-setup-assistant', () => {
     const element = build();
     await settle();
 
-    expect(element.shadowRoot.textContent).toContain('No luck today.');
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toContain(
+      'No luck today.'
+    );
   });
 
   it('reloads when the page refreshes, so the first-run edition shows as done', async () => {

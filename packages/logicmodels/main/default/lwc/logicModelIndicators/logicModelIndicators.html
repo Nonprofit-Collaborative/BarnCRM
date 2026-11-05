@@ -1,6 +1,7 @@
 <template>
+    <template lwc:if={helpReady}>
   <div data-id="indicators" class="slds-var-m-top_medium">
-    <h4 class="slds-text-title_caps slds-var-m-bottom_x-small">{labels.indicators}</h4>
+    <h4 class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.indicators}</h4>
 
     <template lwc:if={showAddIndicator}>
       <lightning-button
@@ -105,6 +106,61 @@
           <template lwc:if={indicator.description}>
             <p class="slds-text-body_small slds-text-color_weak">{indicator.description}</p>
           </template>
+          <p class="slds-text-body_small" data-id="source-line">{indicator.sourceLine}</p>
+          <template lwc:if={indicator.computed}>
+            <template lwc:if={indicator.status}>
+              <c-barn-notice
+                class="slds-var-m-vertical_x-small"
+                data-id="source-status"
+                variant="error"
+                message={indicator.status}
+              ></c-barn-notice>
+            </template>
+            <template lwc:else>
+              <p class="slds-text-body_small slds-text-color_weak" data-id="source-run">
+                {indicator.runLine}
+              </p>
+            </template>
+          </template>
+          <template lwc:if={indicator.working}>
+            <c-barn-notice
+              class="slds-var-m-vertical_x-small"
+              data-id="source-working"
+              message={labels.refreshing}
+            ></c-barn-notice>
+          </template>
+          <template lwc:if={indicator.stalled}>
+            <c-barn-notice
+              class="slds-var-m-vertical_x-small"
+              data-id="source-stalled"
+              variant="warning"
+              message={labels.stillWorking}
+              action-label={labels.checkAgain}
+              onaction={handleCheckAgain}
+            ></c-barn-notice>
+          </template>
+          <template lwc:if={canSetSource}>
+            <lightning-button
+              data-id="indicator-source"
+              data-record-id={indicator.id}
+              variant="base"
+              label={labels.source}
+              disabled={busy}
+              onclick={handleSource}
+              class="slds-var-m-right_small"
+            ></lightning-button>
+          </template>
+          <template lwc:if={indicator.showRefresh}>
+            <lightning-button
+              data-id="indicator-refresh"
+              data-record-id={indicator.id}
+              variant="base"
+              label={labels.refresh}
+              disabled={busy}
+              onclick={handleRefresh}
+              class="slds-var-m-right_small"
+            ></lightning-button>
+          </template>
           <template lwc:if={canEdit}>
             <lightning-button
               data-id="indicator-edit"
@@ -124,6 +180,17 @@
               onclick={handleAddPeriod}
               class="slds-var-m-right_small"
             ></lightning-button>
+            <template lwc:if={hasModelPeriods}>
+              <lightning-button
+                data-id="use-model-periods"
+                data-record-id={indicator.id}
+                variant="base"
+                label={labels.useModelPeriods}
+                disabled={busy}
+                onclick={handleUseModelPeriods}
+                class="slds-var-m-right_small"
+              ></lightning-button>
+            </template>
           </template>
           <template lwc:if={canDelete}>
             <lightning-button
@@ -135,62 +202,169 @@
               onclick={handleDeleteIndicator}
             ></lightning-button>
           </template>
-          <template lwc:if={indicator.confirming}>
-            <div class="slds-var-m-vertical_x-small" data-id="indicator-delete-confirm">
-              <p class="slds-var-m-bottom_x-small">{labels.deleteIndicatorConfirm}</p>
-              <lightning-button
-                data-id="indicator-delete-confirm-button"
-                variant="destructive"
-                label={labels.delete}
-                disabled={busy}
-                onclick={handleDeleteConfirm}
-                class="slds-var-m-right_x-small"
-              ></lightning-button>
-              <lightning-button
-                data-id="indicator-delete-cancel"
-                label={labels.cancel}
-                onclick={handleDeleteCancel}
-              ></lightning-button>
+          <template lwc:if={indicator.sourceFormOpen}>
+            <div class="slds-box slds-var-m-vertical_x-small" data-id="source-form">
+              <lightning-combobox
+                data-id="source-kind"
+                data-field="source"
+                label={labels.source}
+                value={sourceDraft.source}
+                options={sourceOptions}
+                onchange={handleSourceField}
+              ></lightning-combobox>
+              <template lwc:if={sourceDraftComputed}>
+                <template lwc:if={hasStarters}>
+                  <lightning-combobox
+                    data-id="source-template"
+                    label={labels.template}
+                    field-level-help={labels.starterHelp}
+                    value={template}
+                    options={templateOptions}
+                    onchange={handleTemplate}
+                  ></lightning-combobox>
+                </template>
+              </template>
+              <template lwc:if={usingStarter}>
+                <template lwc:if={starterAsks}>
+                  <lightning-combobox
+                    data-id="starter-choice"
+                    label={starterChoiceLabel}
+                    value={starterChoiceId}
+                    options={starterChoiceOptions}
+                    required={starterChoiceRequired}
+                    onchange={handleStarterChoice}
+                  ></lightning-combobox>
+                </template>
+              </template>
+              <template lwc:if={usingSavedQuery}>
+                <template lwc:if={hasQueryOptions}>
+                  <lightning-combobox
+                    data-id="source-query"
+                    data-field="queryId"
+                    label={labels.savedQuery}
+                    field-level-help={labels.savedQueryHelp}
+                    value={sourceDraft.queryId}
+                    options={queryOptions}
+                    required
+                    onchange={handleSourceField}
+                  ></lightning-combobox>
+                </template>
+                <template lwc:else>
+                  <p class="slds-text-color_weak slds-var-m-vertical_x-small" data-id="no-queries">
+                    {labels.noQueries}
+                  </p>
+                </template>
+                <div class="slds-grid slds-wrap slds-gutters_x-small">
+                  <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-combobox
+                      data-id="source-date"
+                      data-field="dateField"
+                      label={labels.dateField}
+                      value={sourceDraft.dateField}
+                      options={dateFieldOptions}
+                      disabled={noFieldChoices}
+                      required
+                      onchange={handleSourceField}
+                    ></lightning-combobox>
+                  </div>
+                  <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-combobox
+                      data-id="source-function"
+                      data-field="function"
+                      label={labels.workOut}
+                      value={sourceDraft.function}
+                      options={functionOptions}
+                      onchange={handleSourceField}
+                    ></lightning-combobox>
+                  </div>
+                  <template lwc:if={needsField}>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                      <lightning-combobox
+                        data-id="source-field"
+                        data-field="field"
+                        label={labels.field}
+                        value={sourceDraft.field}
+                        options={measuredFieldOptions}
+                        disabled={noFieldChoices}
+                        required
+                        onchange={handleSourceField}
+                      ></lightning-combobox>
+                    </div>
+                  </template>
+                </div>
+              </template>
+              <div class="slds-var-m-top_small">
+                <lightning-button
+                  data-id="source-save"
+                  variant="brand"
+                  label={labels.save}
+                  disabled={sourceSaveDisabled}
+                  onclick={handleSourceSave}
+                  class="slds-var-m-right_x-small"
+                ></lightning-button>
+                <lightning-button
+                  data-id="source-cancel"
+                  label={labels.cancel}
+                  onclick={handleSourceCancel}
+                ></lightning-button>
+              </div>
             </div>
           </template>
-
           <template lwc:if={indicator.hasPeriods}>
-            <div class="slds-scrollable_x">
-              <table
-                class="slds-table slds-table_bordered slds-table_cell-buffer slds-var-m-top_x-small"
-                data-id="periods"
-              >
-                <thead>
-                  <tr class="slds-line-height_reset">
-                    <th scope="col">{labels.period}</th>
-                    <th scope="col">{labels.startDate}</th>
-                    <th scope="col">{labels.endDate}</th>
-                    <th scope="col">{labels.target}</th>
-                    <th scope="col">{labels.result}</th>
-                    <th scope="col">{labels.progress}</th>
-                    <th scope="col">{labels.actions}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <template for:each={indicator.periods} for:item="period">
-                    <tr key={period.id} data-id="period">
-                      <th scope="row">{period.name}</th>
-                      <td>
-                        <lightning-formatted-date-time
-                          value={period.startDate}
-                          time-zone="UTC"
-                        ></lightning-formatted-date-time>
-                      </td>
-                      <td>
-                        <lightning-formatted-date-time
-                          value={period.endDate}
-                          time-zone="UTC"
-                        ></lightning-formatted-date-time>
-                      </td>
-                      <td>{period.targetValue}</td>
-                      <td>{period.resultValue}</td>
-                      <td data-id="progress">{period.progressText}</td>
-                      <td>
+            <table
+              class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked slds-var-m-top_x-small"
+              data-id="periods"
+            >
+              <thead>
+                <tr class="slds-line-height_reset">
+                  <th scope="col">{labels.period}</th>
+                  <th scope="col">{labels.startDate}</th>
+                  <th scope="col">{labels.endDate}</th>
+                  <th scope="col" class="slds-text-align_right">{labels.target}</th>
+                  <th scope="col" class="slds-text-align_right">{labels.result}</th>
+                  <th scope="col">{labels.progress}</th>
+                  <th scope="col">{labels.actions}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={indicator.periods} for:item="period">
+                  <tr key={period.id} data-id="period">
+                    <th scope="row" data-label={labels.period}>{period.name}</th>
+                    <td data-label={labels.startDate}>
+                      <lightning-formatted-date-time
+                        value={period.startDate}
+                        time-zone="UTC"
+                      ></lightning-formatted-date-time>
+                    </td>
+                    <td data-label={labels.endDate}>
+                      <lightning-formatted-date-time
+                        value={period.endDate}
+                        time-zone="UTC"
+                      ></lightning-formatted-date-time>
+                    </td>
+                    <td data-label={labels.target} class="slds-text-align_right">
+                      <lightning-formatted-number
+                        value={period.targetValue}
+                        maximum-fraction-digits="2"
+                      ></lightning-formatted-number>
+                    </td>
+                    <td data-label={labels.result} class="slds-text-align_right">
+                      <lightning-formatted-number
+                        value={period.resultValue}
+                        maximum-fraction-digits="2"
+                      ></lightning-formatted-number>
+                    </td>
+                    <td data-label={labels.progress} data-id="progress">
+                      <template lwc:if={period.hasProgress}>
+                        <c-barn-meter
+                          label={period.name}
+                          value={period.progressValue}
+                          value-text={period.progressText}
+                          size="small"
+                        ></c-barn-meter>
+                      </template>
+                    </td>
+                    <td data-label={labels.actions}>
                         <template lwc:if={canEdit}>
                           <lightning-button
                             data-id="period-edit"
@@ -217,10 +391,13 @@
                   </template>
                 </tbody>
               </table>
-            </div>
           </template>
           <template lwc:else>
-            <p class="slds-text-color_weak slds-text-body_small">{labels.noPeriods}</p>
+            <c-barn-empty-state
+              data-id="no-periods"
+              size="compact"
+              heading={labels.noPeriods}
+            ></c-barn-empty-state>
           </template>
 
           <template lwc:if={indicator.periodFormOpen}>
@@ -278,6 +455,8 @@
                     step="0.01"
                     label={labels.result}
                     value={periodDraft.resultValue}
+                    disabled={periodResultLocked}
+                    field-level-help={periodResultHelp}
                     onchange={handlePeriodField}
                   ></lightning-input>
                 </div>
@@ -310,7 +489,12 @@
       </template>
     </template>
     <template lwc:else>
-      <p class="slds-text-color_weak" data-id="no-indicators">{labels.noIndicators}</p>
+      <c-barn-empty-state
+        data-id="no-indicators"
+        size="compact"
+        heading={labels.noIndicators}
+      ></c-barn-empty-state>
     </template>
   </div>
+    </template>
 </template>

@@ -17,14 +17,6 @@
         <value>Name plus postal code</value>
     </labels>
     <labels>
-        <fullName>Core_Import_RuleExternalId</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import wizard: matching rule option, a field marked External ID</shortDescription>
-        <value>External ID</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_RuleNameExact</fullName>
         <categories>Import</categories>
         <language>en_US</language>
