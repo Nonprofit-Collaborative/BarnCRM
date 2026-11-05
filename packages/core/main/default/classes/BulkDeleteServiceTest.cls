@@ -100,7 +100,7 @@ private class BulkDeleteServiceTest {
 			System.Assert.isTrue(BulkDeleteService.isSystemChild('Thing__Share'), 'Custom sharing');
 			System.Assert.isFalse(BulkDeleteService.isSystemChild('Household_Member__c'), 'Data');
 			List<String> kinds = BulkDeleteService.cascades(
-				Schema.Contact.SObjectType.getDescribe()
+				Schema.Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
 			);
 			System.Assert.isFalse(kinds.contains('Contact Share'), 'No sharing rows');
 			System.Assert.isFalse(kinds.contains('Contact History'), 'No history rows');
