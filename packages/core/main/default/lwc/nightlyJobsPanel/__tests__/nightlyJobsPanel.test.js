@@ -26,6 +26,7 @@ const PANEL = {
       isOn: true,
       lastStarted: '2026-11-04T06:15:00.000Z',
       outcome: 'Done',
+      outcomeStatus: 'done',
       message: null
     }
   ]
@@ -55,9 +56,16 @@ describe('c-nightly-jobs-panel', () => {
     const rows = element.shadowRoot.querySelectorAll('tbody tr');
     expect(rows.length).toBe(2);
     expect(rows[0].dataset.key).toBe('BarnCRM Seasonal Addresses');
-    expect(rows[0].querySelector('[data-id="state"]').textContent).toBe('c.Core_Feature_Off');
-    expect(rows[1].querySelector('[data-id="state"]').textContent).toBe('c.Core_Feature_On');
-    expect(rows[1].querySelector('[data-id="outcome"]').textContent).toContain('Done');
+    const off = rows[0].querySelector('[data-id="state"] c-barn-status-badge');
+    const on = rows[1].querySelector('[data-id="state"] c-barn-status-badge');
+    expect(off.label).toBe('c.Core_Feature_Off');
+    expect(off.status).toBe('off');
+    expect(on.label).toBe('c.Core_Feature_On');
+    expect(on.status).toBe('on');
+    const outcome = rows[1].querySelector('[data-id="outcome"] c-barn-status-badge');
+    expect(outcome.label).toBe('Done');
+    expect(outcome.status).toBe('done');
+    expect(rows[0].querySelector('[data-id="outcome"] c-barn-status-badge')).toBeNull();
   });
 
   it('says the run is not scheduled and offers to schedule it', async () => {
@@ -69,7 +77,7 @@ describe('c-nightly-jobs-panel', () => {
     element.shadowRoot.querySelector('[data-id="schedule"]').click();
     await flush();
     expect(schedule).toHaveBeenCalled();
-    expect(element.shadowRoot.querySelector('[data-id="notice"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="notice"]').message).toContain(
       'c.Core_NightlyJobs_ScheduledNotice'
     );
     expect(element.shadowRoot.querySelector('[data-id="schedule"]')).toBeNull();
@@ -80,7 +88,9 @@ describe('c-nightly-jobs-panel', () => {
     const element = createElement('c-nightly-jobs-panel', { is: NightlyJobsPanel });
     document.body.appendChild(element);
     await flush();
-    expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toContain('Nope');
+    const notice = element.shadowRoot.querySelector('[data-id="error"]');
+    expect(notice.variant).toBe('error');
+    expect(notice.message).toContain('Nope');
   });
 
   it('writes minutes after midnight as a time of day', () => {

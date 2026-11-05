@@ -116,7 +116,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | **BarnCRM Settings**, **Funders** (under Fundraising). | **Create reminder tasks** on, **Email reminders** off, **Days before a deadline to remind** 14. Turn **Email reminders** on and save. |
-| 2 | BarnCRM Settings, General, Nightly Jobs panel. | **Grant Requirement Reminders, 6:00 AM** is listed as a step of the scheduled nightly run. |
+| 2 | BarnCRM Settings, General, Nightly Jobs panel. | **Grant Requirement Reminders** is listed as a step of the scheduled nightly run. |
 | 3 | In the Developer Console run `GrantReminderBatch.startMorning();`, or wait until the next morning. | The staff user has a task `Year 1 report due for Youth Grant` on the grant, due on the due date, and an email with a link to the grant. **Reminder Sent For** on the requirement shows the due date. |
 | 4 | Run it again. | No second task or email. |
 | 5 | Change the requirement's **Due Date** to 7 days from today and run it again. | A new task and email for the new date. |

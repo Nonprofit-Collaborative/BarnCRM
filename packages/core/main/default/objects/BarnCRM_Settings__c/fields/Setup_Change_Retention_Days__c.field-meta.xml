@@ -5,7 +5,7 @@
   <description>Days a copied Setup Audit Trail row (Setup_Change__c) is kept before the nightly Setup Changes copy deletes it (C-56, R-SU4). Read as 730 when empty, held between 180 and 3650 (D-40).</description>
   <externalId>false</externalId>
   <inlineHelpText>Days a copied Setup change is kept before it is deleted.</inlineHelpText>
-  <label>Days to Keep Setup Changes</label>
+  <label>Days to keep setup changes</label>
   <precision>4</precision>
   <required>false</required>
   <scale>0</scale>

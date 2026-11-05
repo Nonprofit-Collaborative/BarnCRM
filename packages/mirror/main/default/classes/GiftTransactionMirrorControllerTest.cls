@@ -111,6 +111,30 @@ private class GiftTransactionMirrorControllerTest {
 	}
 
 	@IsTest
+	static void copyingARangeAgainChecksTheDatesThenStartsARun() {
+		System.runAs(maria()) {
+			TestDataFactory.clearScheduledJobs(
+				new List<String>{ GiftTransactionMirrorSchedulable.JOB_NAME }
+			);
+			ScheduledJobSelector.forget();
+			GiftTransactionMirrorSchema.useStandIns();
+			Date day = Date.newInstance(2026, 9, 20);
+
+			Test.startTest();
+			Assert.areEqual(
+				Label.Mirror_OpportunityMirror_ErrorDateOrder,
+				refusalOf(new Action('copyBackwards')),
+				'An end date before the start is refused before anything starts.'
+			);
+			Assert.isTrue(
+				GiftTransactionMirrorController.copyRangeAgain(day, day).running,
+				'A valid range starts a run.'
+			);
+			Test.stopTest();
+		}
+	}
+
+	@IsTest
 	static void refusalsAreInWords() {
 		System.runAs(maria()) {
 			GiftTransactionMirrorSchema.absentForTest = true;

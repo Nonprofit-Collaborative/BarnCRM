@@ -246,6 +246,43 @@ private class AutomationControlSettingServiceTest {
 	}
 
 	@IsTest
+	static void catchUpNowIsRefusedWhileOneIsRunning() {
+		System.runAs(TestUsers.admin()) {
+			AutomationControlSettingService.catchUpRunningForTest = true;
+			String message;
+
+			Test.startTest();
+			try {
+				AutomationControlSettingService.catchUpNow();
+			} catch (AutomationControl.AutomationControlException e) {
+				message = e.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.areEqual(
+				BarnHelp.text('Core', 'Core_AutomationControl_CatchUpRunning'),
+				message,
+				'The admin is told a catch-up is already running'
+			);
+			Assert.areEqual(0, changesNamed('Automation: Catch Up Now'), 'Nothing was started');
+		}
+	}
+
+	@IsTest
+	static void catchUpNowChecksForRunningJobsAndStartsWhenNoneRuns() {
+		System.runAs(TestUsers.admin()) {
+			Assert.isFalse(
+				AutomationControlSettingService.catchUpRunning(),
+				'No catch-up job is queued in a fresh test'
+			);
+			Test.startTest();
+			AutomationControlSettingService.catchUpNow();
+			Test.stopTest();
+			Assert.areEqual(1, changesNamed('Automation: Catch Up Now'), 'Started and recorded');
+		}
+	}
+
+	@IsTest
 	static void catchUpNowStartsTheCatchUpAndIsRecorded() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();

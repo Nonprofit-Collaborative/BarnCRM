@@ -92,6 +92,33 @@ private class BulkDeleteServiceTest {
 	}
 
 	@IsTest
+	static void theDeletedWithThemListLeavesOutPlatformNoise() {
+		System.runAs(TestUsers.admin()) {
+			System.Assert.isTrue(BulkDeleteService.isSystemChild('ContactShare'), 'Sharing');
+			System.Assert.isTrue(BulkDeleteService.isSystemChild('ContactHistory'), 'History');
+			System.Assert.isTrue(BulkDeleteService.isSystemChild('ContactFeed'), 'Feed');
+			System.Assert.isTrue(BulkDeleteService.isSystemChild('Thing__Share'), 'Custom sharing');
+			System.Assert.isFalse(BulkDeleteService.isSystemChild('Household_Member__c'), 'Data');
+			List<String> kinds = BulkDeleteService.cascades(
+				Schema.Contact.SObjectType.getDescribe()
+			);
+			System.Assert.isFalse(kinds.contains('Contact Share'), 'No sharing rows');
+			System.Assert.isFalse(kinds.contains('Contact History'), 'No history rows');
+			Boolean seenStandard = false;
+			for (String kind : kinds) {
+				Boolean isCustomKind = kind.contains('Household Member');
+				if (!isCustomKind) {
+					seenStandard = true;
+				}
+				System.Assert.isFalse(
+					seenStandard && isCustomKind,
+					'BarnCRM kinds come before the standard ones'
+				);
+			}
+		}
+	}
+
+	@IsTest
 	static void refusesTheObjectsBarnCrmAndSetupKeep() {
 		System.runAs(TestUsers.admin()) {
 			DataProtectedFields.targetsOverride = new Map<String, Set<String>>();

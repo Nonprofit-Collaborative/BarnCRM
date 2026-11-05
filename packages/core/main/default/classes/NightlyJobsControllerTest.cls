@@ -71,6 +71,26 @@ private class NightlyJobsControllerTest {
 	}
 
 	@IsTest
+	static void anOutcomeMapsToAKitStatusWord() {
+		System.runAs(TestUsers.admin()) {
+			Assert.areEqual('done', NightlyJobsController.outcomeStatus('Done'), 'Done');
+			Assert.areEqual('failed', NightlyJobsController.outcomeStatus('Failed'), 'Failed');
+			Assert.areEqual('skipped', NightlyJobsController.outcomeStatus('Skipped'), 'Skipped');
+			Assert.areEqual(
+				'in-progress',
+				NightlyJobsController.outcomeStatus('Running'),
+				'Running'
+			);
+			Assert.areEqual(
+				'attention',
+				NightlyJobsController.outcomeStatus('Done With Errors'),
+				'Done with errors needs a look'
+			);
+			Assert.isNull(NightlyJobsController.outcomeStatus(null), 'No run yet shows no badge');
+		}
+	}
+
+	@IsTest
 	static void someoneWhoDoesNotManageSettingsCannotSchedule() {
 		System.runAs(TestUsers.admin()) {
 			User reader = TestUsers.standardUser('Reader');

@@ -76,7 +76,7 @@
             </template>
 
             <h2 class="slds-text-heading_small slds-var-m-top_medium">{label.previewHeading}</h2>
-            <template if:true={hasSamples}>
+            <template lwc:if={hasSamples}>
                 <table
                     class="slds-table slds-table_bordered slds-table_cell-buffer slds-table_fixed-layout slds-max-medium-table_stacked slds-var-m-top_x-small"
                     aria-label={label.previewHeading}

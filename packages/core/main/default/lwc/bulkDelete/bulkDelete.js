@@ -63,6 +63,12 @@ export default class BulkDelete extends LightningElement {
     get cascades() {
       return helpText('Core', 'Core_BulkDelete_Cascades');
     },
+    get noMatchesHeading() {
+      return helpText('Core', 'Core_BulkDelete_NoMatchesHeading');
+    },
+    get noMatches() {
+      return helpText('Core', 'Core_BulkDelete_ErrorNothingMatches');
+    },
     preview: PREVIEW,
     confirm: CONFIRM,
     undoUntil: UNDO_UNTIL,
@@ -115,13 +121,31 @@ export default class BulkDelete extends LightningElement {
     return Boolean(this.noticeMessage);
   }
 
+  /** A preview that found nothing: an empty state, with no list, download or Delete button. */
+  get noMatches() {
+    return Boolean(this.preview) && !(this.preview.count > 0);
+  }
+
   get previewLine() {
-    return this.preview
-      ? format(
-          helpText('Core', 'Core_BulkDelete_PreviewCount'),
-          this.preview.count,
-          this.preview.objectLabel
-        )
+    if (!this.preview) {
+      return '';
+    }
+    const one = this.preview.count === 1;
+    const template = one
+      ? helpText('Core', 'Core_BulkDelete_PreviewCountOne')
+      : helpText('Core', 'Core_BulkDelete_PreviewCount');
+    return format(
+      template,
+      this.preview.count,
+      one && this.preview.objectLabelSingular
+        ? this.preview.objectLabelSingular
+        : this.preview.objectLabel
+    );
+  }
+
+  get cascadesMoreLine() {
+    return this.preview && this.preview.cascadesMore > 0
+      ? format(helpText('Core', 'Core_BulkDelete_CascadesMore'), this.preview.cascadesMore)
       : '';
   }
 

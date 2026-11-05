@@ -137,7 +137,7 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 | 7 | Choose **Sum** with **Date Field** `Created Date`: open **Field**. | Only number fields are offered. Cancel. |
 | 8 | As staff (Program Staff role, no Find access), open the model. | The indicator line reads `computed from a saved query`; there is no **Source** button; **Refresh Results** is there and works. |
 | 9 | As admin, delete `All people` in **Find**, then click **Refresh Results** and wait. | The indicator shows a red notice that the saved query can't be found; the results are unchanged. |
-| 10 | In **Health Check**, look at nightly jobs. | `Indicator Results, 3:30 AM` is a step of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md) on the Nightly Jobs panel; **Schedule all nightly jobs** schedules the run. |
+| 10 | In **Health Check**, look at nightly jobs. | `Indicator Results` is a step of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md) on the Nightly Jobs panel; **Schedule all nightly jobs** schedules the run. |
 
 **Cleanup:** Delete `People in our records`.
 

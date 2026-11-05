@@ -309,6 +309,32 @@ private class ImportRowPurgeTest {
 	}
 
 	@IsTest
+	static void anOldScheduleThatFiresStartsNothingItself() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			// A real schedule hands execute a context, so the shell hands over to the nightly run.
+			Id triggerId = System.schedule(
+				'ImportRowPurgeTest old schedule',
+				'0 0 3 * * ?',
+				new ImportRowPurgeScheduler()
+			);
+			Test.stopTest();
+
+			Assert.isNotNull(triggerId, 'The old class can still be scheduled');
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'RecordRetentionBatch'],
+				'Firing it starts no cleanup of its own.'
+			);
+			Assert.areEqual(
+				'BarnCRM Import Row Cleanup',
+				ImportRowPurgeScheduler.JOB_NAME,
+				'The name the nightly run adopts'
+			);
+		}
+	}
+
+	@IsTest
 	static void theCleanupIsAPassOfRecordCleanupAndTheOldScheduleIsAShell() {
 		System.runAs(TestUsers.admin()) {
 			Assert.isNull(

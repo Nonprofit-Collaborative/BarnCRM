@@ -5,7 +5,7 @@
   <description>Days a finished import or bulk job (Import_Batch__c with its rows and journal) is kept once its undo window has closed (or, for an import left in Draft, Parsing or Dry run and never committed, once it is that old), before the nightly Record Cleanup step deletes it (architect review L-08, R-NJ8). Read as 365 when empty, held between 30 and 3650.</description>
   <externalId>false</externalId>
   <inlineHelpText>Days a finished import is kept, after it can no longer be undone, before it is deleted.</inlineHelpText>
-  <label>Days to Keep Import History</label>
+  <label>Days to keep import history</label>
   <precision>4</precision>
   <required>false</required>
   <scale>0</scale>

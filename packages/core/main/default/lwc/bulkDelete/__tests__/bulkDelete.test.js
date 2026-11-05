@@ -10,7 +10,9 @@ import { setHelpTextForTest } from 'c/barnHelpText';
 
 setHelpTextForTest({
   Core_BulkDelete_BackupDone: 'Downloaded {0} records.',
+  Core_BulkDelete_CascadesMore: 'and {0} more kinds',
   Core_BulkDelete_PreviewCount: '{0} {1} match. The first ones:',
+  Core_BulkDelete_PreviewCountOne: '{0} {1} matches. It is:',
   Core_BulkDelete_Summary: '{0} matched: {1} deleted, {2} refused.'
 });
 
@@ -140,6 +142,34 @@ describe('c-bulk-delete', () => {
     expect(one(element, 'cascade').label).toBe('Program Enrollments');
     expect(one(element, 'path').currentStep).toBe('confirm');
     expect(one(element, 'start').label).toBe('Delete 200 records');
+  });
+
+  it('says "matches" for one record, with the singular label', async () => {
+    previewDelete.mockResolvedValue({
+      ...PREVIEW,
+      count: 1,
+      objectLabelSingular: 'Contact',
+      cascadesMore: 3
+    });
+    const element = await render();
+    one(element, 'preview').click();
+    await flush();
+
+    expect(one(element, 'preview-line').textContent).toBe('1 Contact matches. It is:');
+    expect(one(element, 'cascades-more').textContent).toBe('and 3 more kinds');
+  });
+
+  it('shows an empty state with no download, confirm box or Delete button for 0 matches', async () => {
+    previewDelete.mockResolvedValue({ ...PREVIEW, count: 0, sample: [], cascades: [] });
+    const element = await render();
+    one(element, 'preview').click();
+    await flush();
+
+    expect(one(element, 'no-matches')).not.toBeNull();
+    expect(one(element, 'preview-box')).toBeNull();
+    expect(one(element, 'backup')).toBeNull();
+    expect(one(element, 'confirm')).toBeNull();
+    expect(one(element, 'start')).toBeNull();
   });
 
   it('starts only once the count is typed, then shows progress and the result', async () => {

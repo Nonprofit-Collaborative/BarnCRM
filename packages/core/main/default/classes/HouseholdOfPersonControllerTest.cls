@@ -442,6 +442,46 @@ private class HouseholdOfPersonControllerTest {
 		}
 	}
 
+	/** The Add member search in an org with no person accounts offers contacts by name. */
+	@IsTest
+	static void theSearchOffersContactsWhereThereAreNoPersonAccounts() {
+		System.runAs(TestUsers.admin()) {
+			HouseholdService.personAccountOverride = false;
+			Contact found = new Contact(FirstName = 'Zelda', LastName = 'Searchable');
+			TestDataFactory.pastDuplicateRules(found);
+			insert found;
+
+			List<HouseholdOfPersonController.PersonResult> hits = HouseholdOfPersonController.searchPeople(
+				'Searchable'
+			);
+
+			Assert.areEqual(1, hits.size(), 'The one contact with that name');
+			Assert.areEqual(found.Id, hits[0].id, 'It is that contact');
+			Assert.isTrue(
+				HouseholdOfPersonController.searchPeople('Z').isEmpty(),
+				'One character never runs a query'
+			);
+		}
+	}
+
+	@IsTest
+	static void addingAPersonNeedsBothAHouseholdAndAPerson() {
+		System.runAs(TestUsers.admin()) {
+			String message;
+			try {
+				HouseholdOfPersonController.addExistingPerson(null, null);
+			} catch (AuraHandledException e) {
+				message = e.getMessage();
+			}
+
+			Assert.areEqual(
+				BarnHelp.text('Core', 'Core_HouseholdPanel_AddMemberMissingPerson'),
+				message,
+				'The refusal says a person is missing'
+			);
+		}
+	}
+
 	/**
 	 * PEOPLE-4. Where the org gives this user a person record type, a new person in the
 	 * flexible way of belonging is a person account; otherwise a contact.

@@ -412,7 +412,7 @@ Dot,Zzshirt,dot.zzshirt@example.org,M,2026-10-04
 | 4 | The next morning, open the same Data Job record. | **Import Rows** is empty; the counts and **Run Log** are unchanged. |
 | 5 | Open the Super Importer tab and open the row menu beside the import and select **Undo**, then **Undo This Import**. Refresh until it reads **Undone**. | **Undone**. Testa Rivera, Ben Okoro and Cara Lind are gone: undo never needed the rows. |
 | 6 | Set **Delete import rows** back to **After 30 Days** and save. | Saved. |
-| 7 | Only in an org that has an import left in **Draft**, **Parsing** or **Dry run** (a wizard abandoned) that was started more than **Days to Keep Import History** ago (365 by default; the lowest setting is 30): check it in the **Data Jobs** list view the morning after Record Cleanup has run. | That import and its rows are gone. An abandoned import started more recently, and a finished import that can still be undone, are still there. |
+| 7 | Only in an org that has an import left in **Draft**, **Parsing** or **Dry run** (a wizard abandoned) that was started more than **Days to keep import history** ago (365 by default; the lowest setting is 30): check it in the **Data Jobs** list view the morning after Record Cleanup has run. | That import and its rows are gone. An abandoned import started more recently, and a finished import that can still be undone, are still there. |
 
 **Cleanup:** none.
 

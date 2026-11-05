@@ -6,7 +6,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Health Check: name of the Opportunity mirror nightly job</shortDescription>
-    <value>Opportunity Mirror, 1:30 AM</value>
+    <value>Opportunity Mirror</value>
   </labels>
   <labels>
     <fullName>Mirror_HealthCheck_MirrorNotRunTitle</fullName>

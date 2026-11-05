@@ -5,37 +5,30 @@
             <p class="slds-var-m-bottom_small">{labels.intro}</p>
 
             <template lwc:if={isReadOnly}>
-                <div class="slds-box slds-box_x-small slds-theme_shade slds-var-m-bottom_small">
+                <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="info">
                     <p data-id="read-only-notice">{labels.readOnly}</p>
-                </div>
+                </c-barn-notice>
             </template>
 
             <template lwc:if={hasError}>
-                <div
-                    class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small"
-                    role="alert"
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="error"
+                    alternative-text={labels.errorPrefix}
+                    data-id="error-notice"
                 >
-                    <lightning-icon
-                        icon-name="utility:error"
-                        size="x-small"
-                        alternative-text={labels.errorPrefix}
-                    ></lightning-icon>
                     <span data-id="error-message">{errorMessage}</span>
-                </div>
+                </c-barn-notice>
             </template>
 
             <template lwc:if={isPaused}>
-                <div
-                    class="slds-box slds-box_x-small slds-theme_warning slds-var-m-bottom_small"
-                    role="status"
-                    aria-live="polite"
+                <c-barn-notice
+                    class="slds-show slds-var-m-bottom_small"
+                    variant="warning"
+                    alternative-text={labels.pausedPrefix}
+                    data-id="paused-notice"
                 >
                     <p data-id="paused-banner">
-                        <lightning-icon
-                            icon-name="utility:pause"
-                            size="x-small"
-                            alternative-text={labels.pausedPrefix}
-                        ></lightning-icon>
                         {labels.pausedBanner}
                         <lightning-formatted-date-time
                             value={pausedUntil}
@@ -60,7 +53,7 @@
                         disabled={controlsDisabled}
                         onclick={handleResume}
                     ></lightning-button>
-                </div>
+                </c-barn-notice>
             </template>
             <template lwc:else>
                 <!-- While running, only Pause and How long are offered. -->
@@ -118,7 +111,13 @@
             </div>
 
             <template lwc:if={isEmpty}>
-                <p data-id="empty-state">{labels.empty}</p>
+                <c-barn-empty-state
+                    data-id="empty-state"
+                    size="compact"
+                    illustration="no-data"
+                    heading={labels.emptyHeading}
+                    message={labels.empty}
+                ></c-barn-empty-state>
             </template>
 
             <ul class="slds-has-dividers_bottom-space" data-id="automation-list">

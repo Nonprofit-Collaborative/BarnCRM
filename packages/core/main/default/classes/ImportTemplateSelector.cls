@@ -108,7 +108,7 @@ public with sharing class ImportTemplateSelector {
 			return result;
 		}
 		List<Import_Template__c> found = Database.queryWithBinds(
-			'SELECT Id, Name, Template_Key__c, Is_Package_Default__c FROM Import_Template__c ' +
+			'SELECT Id, Name, Template_Key__c, Is_Package_Default__c, Person_Mode__c FROM Import_Template__c ' +
 			'WHERE Template_Key__c IN :keys',
 			new Map<String, Object>{ 'keys' => keys },
 			AccessLevel.SYSTEM_MODE

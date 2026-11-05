@@ -93,6 +93,9 @@ export default class AutomationControl extends LightningElement {
     get empty() {
       return helpText('Core', 'Core_AutomationControl_Empty');
     },
+    get emptyHeading() {
+      return helpText('Core', 'Core_AutomationControl_EmptyHeading');
+    },
     runsOn: RUNS_ON,
     errorPrefix: ERROR_PREFIX,
     pausedPrefix: PAUSED_PREFIX,

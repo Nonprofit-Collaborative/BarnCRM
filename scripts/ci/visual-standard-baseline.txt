@@ -1,10 +1,5 @@
 # Screens built before the visual standard: path rule count (scripts/ci/check-visual-standard.py).
 # Lower a count, or delete a line, when a screen adopts the kit. Never raise one.
-packages/core/main/default/lwc/automationControl/automationControl.html solid-box 2
-packages/core/main/default/lwc/householdNamingSettings/householdNamingSettings.html table-stacked 1
-packages/core/main/default/lwc/npspHouseholdAdoption/npspHouseholdAdoption.html table-stacked 1
-packages/core/main/default/lwc/sampleDataManager/sampleDataManager.html solid-box 1
-packages/core/main/default/lwc/setupStepModules/setupStepModules.js badge-inverse 1
 packages/funders/main/default/lwc/fundersBoard/fundersBoard.html table-stacked 4
 packages/funders/main/default/lwc/grantSchedule/grantSchedule.html table-stacked 2
 packages/giving/main/default/lwc/commitmentSchedulePreview/commitmentSchedulePreview.html table-stacked 1

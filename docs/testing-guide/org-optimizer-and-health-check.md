@@ -66,7 +66,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Org Optimizer**, **Health Check**, click **Run Health Check** (or **Run Again**) and find **Nightly Jobs Are Not Scheduled**. | It names the jobs, for example **Error digest email**, **Empty household tidy-up**, and has **Schedule All Nightly Jobs**. |
+| 1 | On **Org Optimizer**, **Health Check**, click **Run Health Check** (or **Run Again**) and find **Nightly Jobs Are Not Scheduled**. | It names the jobs, for example **Error Digest Email**, **Empty Household Tidy-Up**, and has **Schedule All Nightly Jobs**. |
 | 2 | Click **Schedule All Nightly Jobs**. | A dialog **Before This Fix Runs**: **This is what the fix will do. Nothing changes until you confirm.**, the same list, **Confirm** and **Cancel**. |
 | 3 | Press Escape. | The dialog closes and focus returns to the button. Nothing is scheduled. |
 | 4 | Click **Schedule All Nightly Jobs**, then **Confirm**. | **Done. Scheduled: ...** naming each job, and the report re-runs. **Nightly Jobs Are Not Scheduled** is gone. |
@@ -270,7 +270,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 7 | Clear **Search**. Choose a **Section**, and set **From** to today. | Only today's changes in that section. Set **To** to yesterday and click **Search**: **From is after To.** and nothing is asked of the server. |
 | 8 | Clear the filters and click **Download CSV**. | A file named **Setup_Changes-** and today's date ending .csv downloads, and **Saved {n} changes as CSV.** shows. Its header row is **Changed At**, **Changed By**, **Logged In As**, **Section**, **Action**, **What Changed**. |
 | 9 | In **BarnCRM Settings**, **Org Optimizer**, find **Days to keep setup changes**. Set it to `100` and click **Save**. | Shows **730** before you change it. Nothing is saved; the value is marked as outside its range (180 to 3,650). |
-| 10 | Open **Org Optimizer**, **Health Check**, and run it. | If the nightly jobs finding lists jobs, **Setup changes copy** is one of them unless step 3 already scheduled it. |
+| 10 | Open **Org Optimizer**, **Health Check**, and run it. | If the nightly jobs finding lists jobs, **Setup Changes Copy** is one of them unless step 3 already scheduled it. |
 | 11 | As staff (no Manage BarnCRM Settings), open **Org Optimizer**. | There is no **Setup Changes** tile or tab. |
 
 **Cleanup:** Change the help text from step 5 back. The copied **Setup Change** records stay until the nightly copy deletes them after **Days to keep setup changes**; nobody edits or deletes them by hand.
