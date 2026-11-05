@@ -16,7 +16,7 @@ but not change; see [Read-only access](read-only-access.md).
 3. Click **Save**.
 
 You should see: the person's record, with a household already created for them, for example
-**The Garcia Family**. The **Household** card on the right of the person links to it, with
+**The Garcia Family**. The **Household** card on the person's **Connections** tab links to it, with
 the member count and the formal greeting. If your org turned off automatic households, or
 records membership the flexible way, the household field may stay blank: open the household
 from the **Household** card or the **Households** tab.
@@ -35,7 +35,7 @@ into a household.
 
 ## To Add a Member to a Household
 
-1. Open the household. Find the **Members** card.
+1. Open the household and click the **Connections** tab. Find the **Members** card.
 2. Click **Add Member**. The **Add Member** dialog opens.
 3. Either search under **Add Someone Already in Salesforce** (type in **Search by name** and
    choose the person), or fill in **Salutation**, **First Name** and **Last Name** under **Or

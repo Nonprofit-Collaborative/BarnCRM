@@ -31,6 +31,19 @@ What ships:
 | **Account Record Page** | Households and organizations | A **Details** section (name, phone, owner, address, parent, and for an organization the website), the actions bar, the activity panel, related lists, and the panels below |
 | **Contact Record Page** | People | **Person**, **Household** and **Reaching This Person** sections, the actions bar, the activity panel, a Potential Duplicates card, related lists, and the panels below |
 
+**Tabs.** The main column of each page has three tabs, so the fields, the people and places,
+and the lists do not stack into one long page:
+
+- **Details** (open first): the field sections.
+- **Connections**: the panels: **Household** or **Members**, **Relationships**,
+  **Affiliations** and **Addresses**.
+- **Related**: the related lists.
+
+The actions bar and the sidebar (activity, Potential Duplicates, Record Inspector) stay outside
+the tabs. The top of the sidebar holds the **Record Glance** host, where an installed module
+can add a small summary card, for example a giving summary. With no module that adds one, it
+shows nothing and takes no space.
+
 What changes with the record:
 
 - **A household** shows the **Members** panel and a **Name and Greetings** section
@@ -75,13 +88,14 @@ org's. Add the panel yourself. The steps are in
 Start with the sample data loaded ([Sample data](sample-data.md)).
 
 1. Open the **BarnCRM** app and choose the **Households** tab. Open **The Garcia Family**.
-   The page has the **Details** section, the **Members** panel, and **Name and
-   Greetings**, with the formal and informal greetings.
+   The **Details** tab has the **Details** section and **Name and Greetings**, with the
+   formal and informal greetings. Click the **Connections** tab: the **Members** panel is
+   there.
 2. Look at the action bar at the top. **Merge or Split** is there, because this is a
    household.
-3. Click a member's name to open the person. The page now has **Person**, **Household** and
-   **Reaching This Person** sections, and the **Household** panel names the household you
-   came from. **Merge or Split** is gone, because a person is not a household.
+3. Click a member's name to open the person. The **Details** tab now has **Person**,
+   **Household** and **Reaching This Person** sections, and on **Connections** the
+   **Household** panel names the household you came from. **Merge or Split** is gone, because a person is not a household.
 4. Go back and open an organization from the **Organizations** tab. There is no **Name and
    Greetings** section and no **Members** panel; the **Affiliations** panel and
    the website show instead. The page is the same one the household used: it chose what to
