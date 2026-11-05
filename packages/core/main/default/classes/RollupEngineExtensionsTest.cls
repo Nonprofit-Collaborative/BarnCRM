@@ -4,282 +4,282 @@
  */
 @IsTest(testFor='ApexClass:RollupEngineExtensions, ApexClass:SettingsService')
 private class RollupEngineExtensionsTest {
-    @TestSetup
-    static void createTheAdmin() {
-        TestUsers.admin();
-    }
+	@TestSetup
+	static void createTheAdmin() {
+		TestUsers.admin();
+	}
 
-    /** Records what Core asked of the engine. */
-    private virtual class RecordingEngine implements RollupEngineExtension {
-        public List<String> calls = new List<String>();
-        public void afterMerge(String targetObject, List<SObject> mergedRecords) {
-            calls.add('afterMerge ' + targetObject);
-        }
-        public void forSurvivors(String targetObject, Set<Id> survivorIds) {
-            calls.add('forSurvivors ' + targetObject);
-        }
-        public void startQueuedRecalculation() {
-            calls.add('startQueuedRecalculation');
-        }
-        public void processPending() {
-            calls.add('processPending');
-        }
-        public Datetime lastCalculated() {
-            return null;
-        }
-        public Boolean isStale() {
-            return false;
-        }
-        public Map<String, Set<String>> targetFieldsByObject() {
-            calls.add('targetFieldsByObject');
-            return new Map<String, Set<String>>{ 'Contact' => new Set<String>{ 'Description' } };
-        }
-    }
+	/** Records what Core asked of the engine. */
+	private virtual class RecordingEngine implements RollupEngineExtension {
+		public List<String> calls = new List<String>();
+		public void afterMerge(String targetObject, List<SObject> mergedRecords) {
+			calls.add('afterMerge ' + targetObject);
+		}
+		public void forSurvivors(String targetObject, Set<Id> survivorIds) {
+			calls.add('forSurvivors ' + targetObject);
+		}
+		public void startQueuedRecalculation() {
+			calls.add('startQueuedRecalculation');
+		}
+		public void processPending() {
+			calls.add('processPending');
+		}
+		public Datetime lastCalculated() {
+			return null;
+		}
+		public Boolean isStale() {
+			return false;
+		}
+		public Map<String, Set<String>> targetFieldsByObject() {
+			calls.add('targetFieldsByObject');
+			return new Map<String, Set<String>>{ 'Contact' => new Set<String>{ 'Description' } };
+		}
+	}
 
-    /** An engine with the settings seam (V3), which can be told to fail. */
-    private class SettingsListeningEngine extends RecordingEngine implements RollupEngineExtensionV3 {
-        public Boolean fail = false;
-        public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
-            calls.add('afterSettingsSaved ' + settingsObject + ' ' + changedKeys);
-            if (fail) {
-                throw new System.IllegalArgumentException('The engine failed');
-            }
-        }
-    }
+	/** An engine with the settings seam (V3), which can be told to fail. */
+	private class SettingsListeningEngine extends RecordingEngine implements RollupEngineExtensionV3 {
+		public Boolean fail = false;
+		public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
+			calls.add('afterSettingsSaved ' + settingsObject + ' ' + changedKeys);
+			if (fail) {
+				throw new System.IllegalArgumentException('The engine failed');
+			}
+		}
+	}
 
-    @IsTest
-    static void aSettingsSaveTellsTheEngineWhatChanged() {
-        System.runAs(TestUsers.admin()) {
-            SettingsListeningEngine engine = new SettingsListeningEngine();
-            RollupEngineExtensions.extensionOverride = engine;
+	@IsTest
+	static void aSettingsSaveTellsTheEngineWhatChanged() {
+		System.runAs(TestUsers.admin()) {
+			SettingsListeningEngine engine = new SettingsListeningEngine();
+			RollupEngineExtensions.extensionOverride = engine;
 
-            SettingsService.saveValues(
-                new Map<String, Object>{ 'Error_Log_Retention_Days__c' => 30 }
-            );
+			SettingsService.saveValues(
+				new Map<String, Object>{ 'Error_Log_Retention_Days__c' => 30 }
+			);
 
-            Assert.areEqual(
-                new List<String>{
-                    'afterSettingsSaved BarnCRM_Settings__c {Error_Log_Retention_Days__c}'
-                },
-                engine.calls,
-                'Told the settings object and the changed field, without a prefix'
-            );
-        }
-    }
+			Assert.areEqual(
+				new List<String>{
+					'afterSettingsSaved BarnCRM_Settings__c {Error_Log_Retention_Days__c}'
+				},
+				engine.calls,
+				'Told the settings object and the changed field, without a prefix'
+			);
+		}
+	}
 
-    @IsTest
-    static void aFailingEngineDoesNotUndoTheSettingsSave() {
-        System.runAs(TestUsers.admin()) {
-            SettingsListeningEngine engine = new SettingsListeningEngine();
-            engine.fail = true;
-            RollupEngineExtensions.extensionOverride = engine;
+	@IsTest
+	static void aFailingEngineDoesNotUndoTheSettingsSave() {
+		System.runAs(TestUsers.admin()) {
+			SettingsListeningEngine engine = new SettingsListeningEngine();
+			engine.fail = true;
+			RollupEngineExtensions.extensionOverride = engine;
 
-            SettingsService.saveValues(
-                new Map<String, Object>{ 'Error_Log_Retention_Days__c' => 45 }
-            );
+			SettingsService.saveValues(
+				new Map<String, Object>{ 'Error_Log_Retention_Days__c' => 45 }
+			);
 
-            Assert.areEqual(1, engine.calls.size(), 'The engine was asked');
-            Assert.areEqual(
-                45,
-                Integer.valueOf(
-                    String.valueOf(SettingsService.getValue('Error_Log_Retention_Days__c'))
-                ),
-                'The setting is saved all the same'
-            );
-        }
-    }
+			Assert.areEqual(1, engine.calls.size(), 'The engine was asked');
+			Assert.areEqual(
+				45,
+				Integer.valueOf(
+					String.valueOf(SettingsService.getValue('Error_Log_Retention_Days__c'))
+				),
+				'The setting is saved all the same'
+			);
+		}
+	}
 
-    @IsTest
-    static void anEngineWithoutTheSettingsSeamIsNotAsked() {
-        System.runAs(TestUsers.admin()) {
-            RecordingEngine engine = new RecordingEngine();
-            RollupEngineExtensions.extensionOverride = engine;
+	@IsTest
+	static void anEngineWithoutTheSettingsSeamIsNotAsked() {
+		System.runAs(TestUsers.admin()) {
+			RecordingEngine engine = new RecordingEngine();
+			RollupEngineExtensions.extensionOverride = engine;
 
-            SettingsService.saveValues(
-                new Map<String, Object>{ 'Error_Log_Retention_Days__c' => 30 }
-            );
+			SettingsService.saveValues(
+				new Map<String, Object>{ 'Error_Log_Retention_Days__c' => 30 }
+			);
 
-            Assert.isNull(RollupEngineExtensions.findV3(), 'No third seam');
-            Assert.isTrue(engine.calls.isEmpty(), 'Nothing asked');
-        }
-    }
+			Assert.isNull(RollupEngineExtensions.findV3(), 'No third seam');
+			Assert.isTrue(engine.calls.isEmpty(), 'Nothing asked');
+		}
+	}
 
-    @IsTest
-    static void anOverrideIsWhatCoreFinds() {
-        System.runAs(TestUsers.admin()) {
-            RecordingEngine engine = new RecordingEngine();
-            RollupEngineExtensions.extensionOverride = engine;
+	@IsTest
+	static void anOverrideIsWhatCoreFinds() {
+		System.runAs(TestUsers.admin()) {
+			RecordingEngine engine = new RecordingEngine();
+			RollupEngineExtensions.extensionOverride = engine;
 
-            Assert.areEqual(engine, RollupEngineExtensions.find(), 'The injected engine');
-        }
-    }
+			Assert.areEqual(engine, RollupEngineExtensions.find(), 'The injected engine');
+		}
+	}
 
-    @IsTest
-    static void anOrgWithoutTheModuleHasNoEngine() {
-        System.runAs(TestUsers.admin()) {
-            RollupEngineExtensions.noneForTest = true;
+	@IsTest
+	static void anOrgWithoutTheModuleHasNoEngine() {
+		System.runAs(TestUsers.admin()) {
+			RollupEngineExtensions.noneForTest = true;
 
-            Assert.isNull(RollupEngineExtensions.find(), 'No module, no engine');
-        }
-    }
+			Assert.isNull(RollupEngineExtensions.find(), 'No module, no engine');
+		}
+	}
 
-    @IsTest
-    static void aClassThatIsMissingOrTheWrongShapeIsAbsent() {
-        System.runAs(TestUsers.admin()) {
-            Test.startTest();
-            RollupEngineExtension missing = RollupEngineExtensions.resolve('NoSuchEngineClass');
-            RollupEngineExtension wrongShape = RollupEngineExtensions.resolve(
-                'RollupEngineExtensions'
-            );
-            Test.stopTest();
+	@IsTest
+	static void aClassThatIsMissingOrTheWrongShapeIsAbsent() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			RollupEngineExtension missing = RollupEngineExtensions.resolve('NoSuchEngineClass');
+			RollupEngineExtension wrongShape = RollupEngineExtensions.resolve(
+				'RollupEngineExtensions'
+			);
+			Test.stopTest();
 
-            Assert.isNull(missing, 'A class that is not there is absent');
-            Assert.isNull(wrongShape, 'A class that is not an engine is absent');
-        }
-    }
+			Assert.isNull(missing, 'A class that is not there is absent');
+			Assert.isNull(wrongShape, 'A class that is not an engine is absent');
+		}
+	}
 
-    @IsTest
-    static void resumingAutomationStartsTheWaitingTotalsOnlyWhenThereIsAnEngine() {
-        System.runAs(TestUsers.admin()) {
-            TestDataFactory.pausedSettings(-1);
-            RecordingEngine engine = new RecordingEngine();
-            RollupEngineExtensions.extensionOverride = engine;
+	@IsTest
+	static void resumingAutomationStartsTheWaitingTotalsOnlyWhenThereIsAnEngine() {
+		System.runAs(TestUsers.admin()) {
+			TestDataFactory.pausedSettings(-1);
+			RecordingEngine engine = new RecordingEngine();
+			RollupEngineExtensions.extensionOverride = engine;
 
-            Test.startTest();
-            Boolean resumed = AutomationControl.resumeExpiredPause();
-            Test.stopTest();
+			Test.startTest();
+			Boolean resumed = AutomationControl.resumeExpiredPause();
+			Test.stopTest();
 
-            Assert.isTrue(resumed, 'The expired pause is cleared');
+			Assert.isTrue(resumed, 'The expired pause is cleared');
 
-            Assert.areEqual(
-                new List<String>{ 'processPending' },
-                engine.calls,
-                'The resume asks the engine to start what waited'
-            );
-        }
-    }
+			Assert.areEqual(
+				new List<String>{ 'processPending' },
+				engine.calls,
+				'The resume asks the engine to start what waited'
+			);
+		}
+	}
 
-    @IsTest
-    static void resumingWithoutTheModuleStillResumes() {
-        System.runAs(TestUsers.admin()) {
-            TestDataFactory.pausedSettings(-1);
-            RollupEngineExtensions.noneForTest = true;
+	@IsTest
+	static void resumingWithoutTheModuleStillResumes() {
+		System.runAs(TestUsers.admin()) {
+			TestDataFactory.pausedSettings(-1);
+			RollupEngineExtensions.noneForTest = true;
 
-            Test.startTest();
-            Boolean resumed = AutomationControl.resumeExpiredPause();
-            Test.stopTest();
+			Test.startTest();
+			Boolean resumed = AutomationControl.resumeExpiredPause();
+			Test.stopTest();
 
-            Assert.isTrue(resumed, 'Nothing waits, and the resume holds');
-            Assert.isFalse(AutomationControl.isPaused(), 'Automation runs again');
-        }
-    }
+			Assert.isTrue(resumed, 'Nothing waits, and the resume holds');
+			Assert.isFalse(AutomationControl.isPaused(), 'Automation runs again');
+		}
+	}
 
-    @IsTest
-    static void rollupTargetsComeFromTheEngine() {
-        System.runAs(TestUsers.admin()) {
-            RecordingEngine engine = new RecordingEngine();
-            RollupEngineExtensions.extensionOverride = engine;
+	@IsTest
+	static void rollupTargetsComeFromTheEngine() {
+		System.runAs(TestUsers.admin()) {
+			RecordingEngine engine = new RecordingEngine();
+			RollupEngineExtensions.extensionOverride = engine;
 
-            Test.startTest();
-            Boolean description = DataProtectedFields.isProtected(
-                Contact.SObjectType,
-                'Description'
-            );
-            Test.stopTest();
+			Test.startTest();
+			Boolean description = DataProtectedFields.isProtected(
+				Contact.SObjectType,
+				'Description'
+			);
+			Test.stopTest();
 
-            Assert.isTrue(description, 'A field the engine reports as a rollup target is kept');
-            Assert.areEqual(new List<String>{ 'targetFieldsByObject' }, engine.calls, 'Asked once');
-        }
-    }
+			Assert.isTrue(description, 'A field the engine reports as a rollup target is kept');
+			Assert.areEqual(new List<String>{ 'targetFieldsByObject' }, engine.calls, 'Asked once');
+		}
+	}
 
-    @IsTest
-    static void withoutTheModuleNoFieldIsARollupTarget() {
-        System.runAs(TestUsers.admin()) {
-            RollupEngineExtensions.noneForTest = true;
+	@IsTest
+	static void withoutTheModuleNoFieldIsARollupTarget() {
+		System.runAs(TestUsers.admin()) {
+			RollupEngineExtensions.noneForTest = true;
 
-            Test.startTest();
-            Boolean description = DataProtectedFields.isProtected(
-                Contact.SObjectType,
-                'Description'
-            );
-            Test.stopTest();
+			Test.startTest();
+			Boolean description = DataProtectedFields.isProtected(
+				Contact.SObjectType,
+				'Description'
+			);
+			Test.stopTest();
 
-            Assert.isFalse(description, 'No module, no rollup targets');
-        }
-    }
+			Assert.isFalse(description, 'No module, no rollup targets');
+		}
+	}
 
-    /** A module whose engine fails whatever Core asks of it. */
-    private class FailingEngine implements RollupEngineExtension {
-        public void afterMerge(String targetObject, List<SObject> mergedRecords) {
-            throw new IllegalArgumentException('afterMerge failed');
-        }
-        public void forSurvivors(String targetObject, Set<Id> survivorIds) {
-            throw new IllegalArgumentException('forSurvivors failed');
-        }
-        public void startQueuedRecalculation() {
-            throw new IllegalArgumentException('startQueuedRecalculation failed');
-        }
-        public void processPending() {
-            throw new IllegalArgumentException('processPending failed');
-        }
-        public Datetime lastCalculated() {
-            throw new IllegalArgumentException('lastCalculated failed');
-        }
-        public Boolean isStale() {
-            throw new IllegalArgumentException('isStale failed');
-        }
-        public Map<String, Set<String>> targetFieldsByObject() {
-            throw new IllegalArgumentException('targetFieldsByObject failed');
-        }
-    }
+	/** A module whose engine fails whatever Core asks of it. */
+	private class FailingEngine implements RollupEngineExtension {
+		public void afterMerge(String targetObject, List<SObject> mergedRecords) {
+			throw new IllegalArgumentException('afterMerge failed');
+		}
+		public void forSurvivors(String targetObject, Set<Id> survivorIds) {
+			throw new IllegalArgumentException('forSurvivors failed');
+		}
+		public void startQueuedRecalculation() {
+			throw new IllegalArgumentException('startQueuedRecalculation failed');
+		}
+		public void processPending() {
+			throw new IllegalArgumentException('processPending failed');
+		}
+		public Datetime lastCalculated() {
+			throw new IllegalArgumentException('lastCalculated failed');
+		}
+		public Boolean isStale() {
+			throw new IllegalArgumentException('isStale failed');
+		}
+		public Map<String, Set<String>> targetFieldsByObject() {
+			throw new IllegalArgumentException('targetFieldsByObject failed');
+		}
+	}
 
-    @IsTest
-    static void aFailingEngineCostsOnlyItsRollupTargetsAndIsLogged() {
-        System.runAs(TestUsers.admin()) {
-            RollupEngineExtensions.extensionOverride = new FailingEngine();
+	@IsTest
+	static void aFailingEngineCostsOnlyItsRollupTargetsAndIsLogged() {
+		System.runAs(TestUsers.admin()) {
+			RollupEngineExtensions.extensionOverride = new FailingEngine();
 
-            Test.startTest();
-            Boolean description = DataProtectedFields.isProtected(
-                Contact.SObjectType,
-                'Description'
-            );
-            Test.stopTest();
+			Test.startTest();
+			Boolean description = DataProtectedFields.isProtected(
+				Contact.SObjectType,
+				'Description'
+			);
+			Test.stopTest();
 
-            Assert.isFalse(description, 'No targets were reported, so none are kept');
-            Assert.areEqual(
-                1,
-                [
-                    SELECT COUNT()
-                    FROM Error_Log__c
-                    WHERE Context__c = 'DataProtectedFields.rollupTargetsOf'
-                ],
-                'The failure is in the Error Log rather than thrown at the caller'
-            );
-        }
-    }
+			Assert.isFalse(description, 'No targets were reported, so none are kept');
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE Context__c = 'DataProtectedFields.rollupTargetsOf'
+				],
+				'The failure is in the Error Log rather than thrown at the caller'
+			);
+		}
+	}
 
-    @IsTest
-    static void mergingAccountsWithoutTheModuleStillMerges() {
-        System.runAs(TestUsers.admin()) {
-            RollupEngineExtensions.noneForTest = true;
-            Account kept = new Account(Name = 'Riverside Food Bank');
-            Account merged = new Account(Name = 'Riverside Food Bank (old)');
-            insert new List<Account>{ kept, merged };
+	@IsTest
+	static void mergingAccountsWithoutTheModuleStillMerges() {
+		System.runAs(TestUsers.admin()) {
+			RollupEngineExtensions.noneForTest = true;
+			Account kept = new Account(Name = 'Riverside Food Bank');
+			Account merged = new Account(Name = 'Riverside Food Bank (old)');
+			insert new List<Account>{ kept, merged };
 
-            Test.startTest();
-            Database.merge(kept, merged.Id);
-            Test.stopTest();
+			Test.startTest();
+			Database.merge(kept, merged.Id);
+			Test.stopTest();
 
-            Assert.areEqual(
-                1,
-                [SELECT COUNT() FROM Account WHERE Id IN (:kept.Id, :merged.Id)],
-                'The merge went through: only the survivor is left'
-            );
-            Assert.areEqual(
-                0,
-                [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'AccountTriggerHandler'],
-                'With no engine there is nothing to recalculate and nothing fails'
-            );
-        }
-    }
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Account WHERE Id IN (:kept.Id, :merged.Id)],
+				'The merge went through: only the survivor is left'
+			);
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'AccountTriggerHandler'],
+				'With no engine there is nothing to recalculate and nothing fails'
+			);
+		}
+	}
 }

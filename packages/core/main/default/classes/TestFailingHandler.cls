@@ -10,41 +10,41 @@
  */
 @IsTest
 public class TestFailingHandler extends TriggerHandler {
-    public static final String REFUSED_PREFIX = 'Refuse';
-    public static final String SEEN = 'Seen by the test handler';
+	public static final String REFUSED_PREFIX = 'Refuse';
+	public static final String SEEN = 'Seen by the test handler';
 
-    /** Which phase fails: 'before' or 'after'. */
-    public static String failIn = 'before';
-    /** How many times a context method ran, every attempt counted. */
-    public static Integer attempts = 0;
+	/** Which phase fails: 'before' or 'after'. */
+	public static String failIn = 'before';
+	/** How many times a context method ran, every attempt counted. */
+	public static Integer attempts = 0;
 
-    public override void beforeInsert() {
-        attempts++;
-        for (Contact person : (List<Contact>) newRecords()) {
-            person.Description = SEEN;
-        }
-        if (failIn == 'before') {
-            failForRefusedNames();
-        }
-    }
+	public override void beforeInsert() {
+		attempts++;
+		for (Contact person : (List<Contact>) newRecords()) {
+			person.Description = SEEN;
+		}
+		if (failIn == 'before') {
+			failForRefusedNames();
+		}
+	}
 
-    public override void afterInsert() {
-        attempts++;
-        List<Saved_Query__c> notes = new List<Saved_Query__c>();
-        for (Contact person : (List<Contact>) newRecords()) {
-            notes.add(new Saved_Query__c(Name = person.LastName, Object_Name__c = 'Contact'));
-        }
-        Database.insert(notes, AccessLevel.SYSTEM_MODE);
-        if (failIn == 'after') {
-            failForRefusedNames();
-        }
-    }
+	public override void afterInsert() {
+		attempts++;
+		List<Saved_Query__c> notes = new List<Saved_Query__c>();
+		for (Contact person : (List<Contact>) newRecords()) {
+			notes.add(new Saved_Query__c(Name = person.LastName, Object_Name__c = 'Contact'));
+		}
+		Database.insert(notes, AccessLevel.SYSTEM_MODE);
+		if (failIn == 'after') {
+			failForRefusedNames();
+		}
+	}
 
-    private void failForRefusedNames() {
-        for (Contact person : (List<Contact>) newRecords()) {
-            if (person.LastName != null && person.LastName.startsWith(REFUSED_PREFIX)) {
-                throw new IllegalArgumentException('A value this handler cannot use.');
-            }
-        }
-    }
+	private void failForRefusedNames() {
+		for (Contact person : (List<Contact>) newRecords()) {
+			if (person.LastName != null && person.LastName.startsWith(REFUSED_PREFIX)) {
+				throw new IllegalArgumentException('A value this handler cannot use.');
+			}
+		}
+	}
 }

@@ -18,56 +18,56 @@
  * finding says "more than" it, the way `HealthCheckGivingSelector` reports unposted gifts.
  */
 public with sharing class ReceiptGenerationFailureSelector {
-    /** Injected by the tests, which choose the count rather than creating failed runs. */
-    @TestVisible
-    private static Result resultOverride;
+	/** Injected by the tests, which choose the count rather than creating failed runs. */
+	@TestVisible
+	private static Result resultOverride;
 
-    /** Counts stop here. A test lowers it. */
-    @TestVisible
-    private static Integer countCap = 1000;
+	/** Counts stop here. A test lowers it. */
+	@TestVisible
+	private static Integer countCap = 1000;
 
-    /** The count, and whether the running person could take it at all. */
-    public class Result {
-        public Boolean available;
-        public Integer count;
-        /** True when more than `count` matched and counting stopped at the cap. */
-        public Boolean capped;
+	/** The count, and whether the running person could take it at all. */
+	public class Result {
+		public Boolean available;
+		public Integer count;
+		/** True when more than `count` matched and counting stopped at the cap. */
+		public Boolean capped;
 
-        public Result() {
-            this.available = false;
-            this.count = 0;
-            this.capped = false;
-        }
-    }
+		public Result() {
+			this.available = false;
+			this.count = 0;
+			this.capped = false;
+		}
+	}
 
-    /** How many receipts stand as the record of a number a failed run consumed. */
-    public static Result generationFailures() {
-        if (resultOverride != null) {
-            return resultOverride;
-        }
-        Result result = new Result();
-        Integer rowLimit = countCap + 1;
-        try {
-            Integer counted = [
-                SELECT COUNT()
-                FROM Receipt__c
-                WHERE
-                    Status__c = :ReceiptService.STATUS_VOID
-                    AND Void_Reason__c = :ReceiptNumberSequence.VOID_REASON_GENERATION_FAILED
-                WITH USER_MODE
-                LIMIT :rowLimit
-            ];
-            result.available = true;
-            result.capped = counted > countCap;
-            result.count = result.capped ? countCap : counted;
-        } catch (System.SecurityException cannotRead) {
-            // A user-mode static query without object access throws this, not a QueryException.
-            result.available = false;
-            result.count = 0;
-        } catch (QueryException cannotRead) {
-            result.available = false;
-            result.count = 0;
-        }
-        return result;
-    }
+	/** How many receipts stand as the record of a number a failed run consumed. */
+	public static Result generationFailures() {
+		if (resultOverride != null) {
+			return resultOverride;
+		}
+		Result result = new Result();
+		Integer rowLimit = countCap + 1;
+		try {
+			Integer counted = [
+				SELECT COUNT()
+				FROM Receipt__c
+				WHERE
+					Status__c = :ReceiptService.STATUS_VOID
+					AND Void_Reason__c = :ReceiptNumberSequence.VOID_REASON_GENERATION_FAILED
+				WITH USER_MODE
+				LIMIT :rowLimit
+			];
+			result.available = true;
+			result.capped = counted > countCap;
+			result.count = result.capped ? countCap : counted;
+		} catch (System.SecurityException cannotRead) {
+			// A user-mode static query without object access throws this, not a QueryException.
+			result.available = false;
+			result.count = 0;
+		} catch (QueryException cannotRead) {
+			result.available = false;
+			result.count = 0;
+		}
+		return result;
+	}
 }

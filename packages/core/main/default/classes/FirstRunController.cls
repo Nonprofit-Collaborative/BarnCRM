@@ -9,118 +9,118 @@
  * told an administrator needs to finish. It installs no module.
  */
 public with sharing class FirstRunController {
-    private static final String ERROR_CONTEXT = 'FirstRunController';
+	private static final String ERROR_CONTEXT = 'FirstRunController';
 
-    /** Whether the window shows, who may finish it, and what it offers. */
-    public class FirstRunState {
-        @AuraEnabled
-        public Boolean needsSetup;
-        @AuraEnabled
-        public Boolean canFinish;
-        @AuraEnabled
-        public String recommendedSuite;
-        @AuraEnabled
-        public List<FeatureController.FeatureRow> features;
-    }
+	/** Whether the window shows, who may finish it, and what it offers. */
+	public class FirstRunState {
+		@AuraEnabled
+		public Boolean needsSetup;
+		@AuraEnabled
+		public Boolean canFinish;
+		@AuraEnabled
+		public String recommendedSuite;
+		@AuraEnabled
+		public List<FeatureController.FeatureRow> features;
+	}
 
-    /** The window's state. Not cacheable: it changes the moment setup finishes. */
-    @AuraEnabled
-    public static FirstRunState getState() {
-        try {
-            return state();
-        } catch (Exception e) {
-            ErrorLogger.log(e, ERROR_CONTEXT);
-            throw UserErrors.message(BarnHelp.text('Core', 'Core_FirstRun_LoadError'));
-        }
-    }
+	/** The window's state. Not cacheable: it changes the moment setup finishes. */
+	@AuraEnabled
+	public static FirstRunState getState() {
+		try {
+			return state();
+		} catch (Exception e) {
+			ErrorLogger.log(e, ERROR_CONTEXT);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_FirstRun_LoadError'));
+		}
+	}
 
-    /**
-     * Saves the edition and turns on the ticked features, in one transaction: if either fails,
-     * the thrown error rolls both back and the window stays. A feature already on stays on.
-     */
-    @AuraEnabled
-    public static FirstRunState finish(String suite, List<String> featureKeys) {
-        if (!BarnCRMPermissions.canManageSettings()) {
-            throw UserErrors.message(
-                BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
-            );
-        }
-        String chosen = knownSuite(suite);
-        try {
-            SetupAssistantService.ensureStarted();
-            SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => chosen });
-            FeatureSwitchService.finishFirstRun(
-                featureKeys == null ? new Set<String>() : new Set<String>(featureKeys)
-            );
-            giveTabsToEveryRole();
-            return state();
-        } catch (Exception e) {
-            ErrorLogger.log(e, ERROR_CONTEXT);
-            throw UserErrors.message(BarnHelp.text('Core', 'Core_FirstRun_SaveError'));
-        }
-    }
+	/**
+	 * Saves the edition and turns on the ticked features, in one transaction: if either fails,
+	 * the thrown error rolls both back and the window stays. A feature already on stays on.
+	 */
+	@AuraEnabled
+	public static FirstRunState finish(String suite, List<String> featureKeys) {
+		if (!BarnCRMPermissions.canManageSettings()) {
+			throw UserErrors.message(
+				BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
+			);
+		}
+		String chosen = knownSuite(suite);
+		try {
+			SetupAssistantService.ensureStarted();
+			SettingsService.saveValues(new Map<String, Object>{ 'Suite__c' => chosen });
+			FeatureSwitchService.finishFirstRun(
+				featureKeys == null ? new Set<String>() : new Set<String>(featureKeys)
+			);
+			giveTabsToEveryRole();
+			return state();
+		} catch (Exception e) {
+			ErrorLogger.log(e, ERROR_CONTEXT);
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_FirstRun_SaveError'));
+		}
+	}
 
-    /**
-     * Gives the tool tabs of the features now on to everyone holding a BarnCRM role, and starts
-     * the hourly tab access check unless it is running. Turning features on queues the sync
-     * only when one is newly on, and on an org built from source every feature was already on,
-     * so finishing would otherwise leave the tool tabs hidden until somebody changed a role on
-     * the Access page. Neither step throws: the sync logs its own failure, and a check that
-     * cannot be scheduled is logged and listed by Health Check.
-     */
-    private static void giveTabsToEveryRole() {
-        TabAccessService.requestSync();
-        if (Test.isRunningTest() && !startTabCheckInTests) {
-            return;
-        }
-        try {
-            TabAccessScheduler.start();
-        } catch (Exception e) {
-            ErrorLogger.log(e, ERROR_CONTEXT);
-        }
-        startNightlyRun();
-    }
+	/**
+	 * Gives the tool tabs of the features now on to everyone holding a BarnCRM role, and starts
+	 * the hourly tab access check unless it is running. Turning features on queues the sync
+	 * only when one is newly on, and on an org built from source every feature was already on,
+	 * so finishing would otherwise leave the tool tabs hidden until somebody changed a role on
+	 * the Access page. Neither step throws: the sync logs its own failure, and a check that
+	 * cannot be scheduled is logged and listed by Health Check.
+	 */
+	private static void giveTabsToEveryRole() {
+		TabAccessService.requestSync();
+		if (Test.isRunningTest() && !startTabCheckInTests) {
+			return;
+		}
+		try {
+			TabAccessScheduler.start();
+		} catch (Exception e) {
+			ErrorLogger.log(e, ERROR_CONTEXT);
+		}
+		startNightlyRun();
+	}
 
-    /**
-     * Schedules the nightly run unless it is scheduled already, leaving every step switch as it
-     * is. A fresh install is scheduled by its install step; this covers an org built from source
-     * and one where that step failed. Never throws.
-     */
-    private static void startNightlyRun() {
-        try {
-            NightlyJobs.start();
-        } catch (Exception e) {
-            ErrorLogger.log(e, ERROR_CONTEXT);
-        }
-    }
+	/**
+	 * Schedules the nightly run unless it is scheduled already, leaving every step switch as it
+	 * is. A fresh install is scheduled by its install step; this covers an org built from source
+	 * and one where that step failed. Never throws.
+	 */
+	private static void startNightlyRun() {
+		try {
+			NightlyJobs.start();
+		} catch (Exception e) {
+			ErrorLogger.log(e, ERROR_CONTEXT);
+		}
+	}
 
-    /** Test seam: true lets a test see the hourly tab access check and nightly run started. */
-    @TestVisible
-    private static Boolean startTabCheckInTests = false;
+	/** Test seam: true lets a test see the hourly tab access check and nightly run started. */
+	@TestVisible
+	private static Boolean startTabCheckInTests = false;
 
-    private static FirstRunState state() {
-        FirstRunState model = new FirstRunState();
-        model.needsSetup =
-            ModuleDetectionService.chosenSuite() == null || FeatureSwitchService.awaitingFirstRun();
-        model.canFinish = BarnCRMPermissions.canManageSettings();
-        if (model.needsSetup && model.canFinish) {
-            // The saved edition when there is one (set in Setup), otherwise the suggestion.
-            model.recommendedSuite = SetupAssistantService.recommendedSuite();
-            model.features = FeatureController.rows();
-        } else {
-            model.features = new List<FeatureController.FeatureRow>();
-        }
-        return model;
-    }
+	private static FirstRunState state() {
+		FirstRunState model = new FirstRunState();
+		model.needsSetup =
+			ModuleDetectionService.chosenSuite() == null || FeatureSwitchService.awaitingFirstRun();
+		model.canFinish = BarnCRMPermissions.canManageSettings();
+		if (model.needsSetup && model.canFinish) {
+			// The saved edition when there is one (set in Setup), otherwise the suggestion.
+			model.recommendedSuite = SetupAssistantService.recommendedSuite();
+			model.features = FeatureController.rows();
+		} else {
+			model.features = new List<FeatureController.FeatureRow>();
+		}
+		return model;
+	}
 
-    private static String knownSuite(String suite) {
-        String chosen = suite == null ? '' : suite.trim();
-        if (
-            chosen != ModuleDetectionService.SUITE_STANDARD &&
-            chosen != ModuleDetectionService.SUITE_NONPROFIT
-        ) {
-            throw UserErrors.message(BarnHelp.text('Core', 'Core_SuiteChoice_UnknownSuiteError'));
-        }
-        return chosen;
-    }
+	private static String knownSuite(String suite) {
+		String chosen = suite == null ? '' : suite.trim();
+		if (
+			chosen != ModuleDetectionService.SUITE_STANDARD &&
+			chosen != ModuleDetectionService.SUITE_NONPROFIT
+		) {
+			throw UserErrors.message(BarnHelp.text('Core', 'Core_SuiteChoice_UnknownSuiteError'));
+		}
+		return chosen;
+	}
 }

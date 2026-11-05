@@ -15,82 +15,82 @@
  * Stateful because the counts are the point: they are the sentence the Hub shows afterwards.
  */
 public with sharing class SeasonalAddressBatch implements Database.Batchable<SObject>, Database.Stateful {
-    /** Owners per chunk. Each one costs a DML of its own plus the address automation's writes. */
-    public static final Integer CHUNK_SIZE = 15;
+	/** Owners per chunk. Each one costs a DML of its own plus the address automation's writes. */
+	public static final Integer CHUNK_SIZE = 15;
 
-    private static final String LOG_CONTEXT = 'Seasonal address swap';
+	private static final String LOG_CONTEXT = 'Seasonal address swap';
 
-    /** Carried across chunks so the finish method can record one run rather than many. */
-    @TestVisible
-    private SeasonalAddressService.RunSummary summary = new SeasonalAddressService.RunSummary();
+	/** Carried across chunks so the finish method can record one run rather than many. */
+	@TestVisible
+	private SeasonalAddressService.RunSummary summary = new SeasonalAddressService.RunSummary();
 
-    /**
-     * The day the run is for. Held rather than read per chunk so a run that starts before
-     * midnight and finishes after it swaps every owner onto the same day, instead of moving
-     * half the org on one date and half on the next.
-     */
-    private Date runDate;
+	/**
+	 * The day the run is for. Held rather than read per chunk so a run that starts before
+	 * midnight and finishes after it swaps every owner onto the same day, instead of moving
+	 * half the org on one date and half on the next.
+	 */
+	private Date runDate;
 
-    /** Who pressed Run now, told when the swap ends; null for the nightly run (Q-04). */
-    private Id notifyUserId = JobNotifier.starter();
+	/** Who pressed Run now, told when the swap ends; null for the nightly run (Q-04). */
+	private Id notifyUserId = JobNotifier.starter();
 
-    public SeasonalAddressBatch() {
-        this(Date.today());
-    }
+	public SeasonalAddressBatch() {
+		this(Date.today());
+	}
 
-    /** The same run against a named day, which is how the tests reach the boundary dates. */
-    public SeasonalAddressBatch(Date runDate) {
-        this.runDate = runDate == null ? Date.today() : runDate;
-    }
+	/** The same run against a named day, which is how the tests reach the boundary dates. */
+	public SeasonalAddressBatch(Date runDate) {
+		this.runDate = runDate == null ? Date.today() : runDate;
+	}
 
-    /** No work while the Addresses feature is off (ADR-0124): the locator then finds nothing. */
-    public Database.QueryLocator start(Database.BatchableContext context) {
-        if (!addressesOn()) {
-            return Database.getQueryLocator(
-                [SELECT Id FROM Address__c WHERE Id = NULL WITH SYSTEM_MODE]
-            );
-        }
-        return new SeasonalAddressSelector().seasonalLocator();
-    }
+	/** No work while the Addresses feature is off (ADR-0124): the locator then finds nothing. */
+	public Database.QueryLocator start(Database.BatchableContext context) {
+		if (!addressesOn()) {
+			return Database.getQueryLocator(
+				[SELECT Id FROM Address__c WHERE Id = NULL WITH SYSTEM_MODE]
+			);
+		}
+		return new SeasonalAddressSelector().seasonalLocator();
+	}
 
-    private static Boolean addressesOn() {
-        return FeatureSwitchService.isOn(FeatureSwitchService.ADDRESSES);
-    }
+	private static Boolean addressesOn() {
+		return FeatureSwitchService.isOn(FeatureSwitchService.ADDRESSES);
+	}
 
-    public void execute(Database.BatchableContext context, List<Address__c> scope) {
-        if (!addressesOn()) {
-            return;
-        }
-        try {
-            Set<Id> ownerIds = new Set<Id>();
-            for (Address__c address : scope) {
-                Id ownerId = AddressService.ownerIdOf(address);
-                if (ownerId != null) {
-                    ownerIds.add(ownerId);
-                }
-            }
-            this.summary.add(SeasonalAddressService.swapOwners(ownerIds, this.runDate));
-        } catch (Exception chunkFailure) {
-            // A chunk that cannot even be read must not stop the org's remaining chunks, and
-            // must not disappear either: the run's own summary counts owner-level failures, and
-            // this is the level above that.
-            ErrorLogger.log(chunkFailure, LOG_CONTEXT);
-        }
-    }
+	public void execute(Database.BatchableContext context, List<Address__c> scope) {
+		if (!addressesOn()) {
+			return;
+		}
+		try {
+			Set<Id> ownerIds = new Set<Id>();
+			for (Address__c address : scope) {
+				Id ownerId = AddressService.ownerIdOf(address);
+				if (ownerId != null) {
+					ownerIds.add(ownerId);
+				}
+			}
+			this.summary.add(SeasonalAddressService.swapOwners(ownerIds, this.runDate));
+		} catch (Exception chunkFailure) {
+			// A chunk that cannot even be read must not stop the org's remaining chunks, and
+			// must not disappear either: the run's own summary counts owner-level failures, and
+			// this is the level above that.
+			ErrorLogger.log(chunkFailure, LOG_CONTEXT);
+		}
+	}
 
-    /**
-     * Records the run whatever happened in it, including a run that swapped nothing. "The job
-     * ran and had nothing to do" and "the job did not run" are different facts and an
-     * administrator needs to be able to tell them apart (R-AD8).
-     */
-    public void finish(Database.BatchableContext context) {
-        SeasonalAddressService.recordRun(this.summary, System.now());
-        JobNotifier.aboutSettings(
-            this.notifyUserId,
-            System.Label.Core_HealthCheck_JobSeasonalAddresses,
-            false,
-            this.summary.text(),
-            JobNotifier.SECTION_ADDRESSES
-        );
-    }
+	/**
+	 * Records the run whatever happened in it, including a run that swapped nothing. "The job
+	 * ran and had nothing to do" and "the job did not run" are different facts and an
+	 * administrator needs to be able to tell them apart (R-AD8).
+	 */
+	public void finish(Database.BatchableContext context) {
+		SeasonalAddressService.recordRun(this.summary, System.now());
+		JobNotifier.aboutSettings(
+			this.notifyUserId,
+			System.Label.Core_HealthCheck_JobSeasonalAddresses,
+			false,
+			this.summary.text(),
+			JobNotifier.SECTION_ADDRESSES
+		);
+	}
 }

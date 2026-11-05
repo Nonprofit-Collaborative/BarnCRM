@@ -9,25 +9,25 @@
  * owns the account queries that everything else uses.
  */
 public with sharing class GivingAccountSelector {
-    /**
-     * The record type developer name of each of the given accounts. An account with no record
-     * type is absent from the map.
-     */
-    public static Map<Id, String> selectRecordTypeNamesById(Set<Id> accountIds) {
-        Map<Id, String> names = new Map<Id, String>();
-        if (accountIds == null || accountIds.isEmpty()) {
-            return names;
-        }
-        for (Account donorAccount : [
-            SELECT Id, RecordTypeId, RecordType.DeveloperName
-            FROM Account
-            WHERE Id IN :accountIds
-            WITH USER_MODE
-        ]) {
-            if (donorAccount.RecordTypeId != null) {
-                names.put(donorAccount.Id, donorAccount.RecordType.DeveloperName);
-            }
-        }
-        return names;
-    }
+	/**
+	 * The record type developer name of each of the given accounts. An account with no record
+	 * type is absent from the map.
+	 */
+	public static Map<Id, String> selectRecordTypeNamesById(Set<Id> accountIds) {
+		Map<Id, String> names = new Map<Id, String>();
+		if (accountIds == null || accountIds.isEmpty()) {
+			return names;
+		}
+		for (Account donorAccount : [
+			SELECT Id, RecordTypeId, RecordType.DeveloperName
+			FROM Account
+			WHERE Id IN :accountIds
+			WITH USER_MODE
+		]) {
+			if (donorAccount.RecordTypeId != null) {
+				names.put(donorAccount.Id, donorAccount.RecordType.DeveloperName);
+			}
+		}
+		return names;
+	}
 }

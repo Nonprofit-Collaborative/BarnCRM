@@ -5,5 +5,5 @@
  * explains why.
  */
 trigger RollupRecalcErrorTrigger on BatchApexErrorEvent(after insert) {
-    RollupRecalcErrorHandler.handle(Trigger.new);
+	RollupRecalcErrorHandler.handle(Trigger.new);
 }

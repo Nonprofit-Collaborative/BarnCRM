@@ -10,6 +10,6 @@
  */
 @NamespaceAccessible
 public interface WhereUsedExtension {
-    /** Every record of this package that names the target; never null. */
-    List<WhereUsedService.Reference> references(WhereUsedService.Target target);
+	/** Every record of this package that names the target; never null. */
+	List<WhereUsedService.Reference> references(WhereUsedService.Target target);
 }

@@ -17,168 +17,168 @@
 @IsTest
 @NamespaceAccessible
 public class RelationshipTestDataFactory {
-    private static final String CONTACT_HANDLER = 'ContactTriggerHandler';
-    private static final String ACCOUNT_HANDLER = 'AccountTriggerHandler';
-    private static final String CONTACT_ADDRESS_HANDLER = 'Contact_Address_Capture';
-    private static final String ACCOUNT_ADDRESS_HANDLER = 'Account_Address_Capture';
+	private static final String CONTACT_HANDLER = 'ContactTriggerHandler';
+	private static final String ACCOUNT_HANDLER = 'AccountTriggerHandler';
+	private static final String CONTACT_ADDRESS_HANDLER = 'Contact_Address_Capture';
+	private static final String ACCOUNT_ADDRESS_HANDLER = 'Account_Address_Capture';
 
-    /**
-     * Stands the household and address automations down for the whole test. These features
-     * never change a household or an address, so the tests are about relationships and
-     * affiliations only, and setup stays cheap.
-     */
-    @NamespaceAccessible
-    public static void quietOtherAutomations() {
-        AutomationControl.bypass(CONTACT_HANDLER);
-        AutomationControl.bypass(ACCOUNT_HANDLER);
-        AutomationControl.bypass(CONTACT_ADDRESS_HANDLER);
-        AutomationControl.bypass(ACCOUNT_ADDRESS_HANDLER);
-    }
+	/**
+	 * Stands the household and address automations down for the whole test. These features
+	 * never change a household or an address, so the tests are about relationships and
+	 * affiliations only, and setup stays cheap.
+	 */
+	@NamespaceAccessible
+	public static void quietOtherAutomations() {
+		AutomationControl.bypass(CONTACT_HANDLER);
+		AutomationControl.bypass(ACCOUNT_HANDLER);
+		AutomationControl.bypass(CONTACT_ADDRESS_HANDLER);
+		AutomationControl.bypass(ACCOUNT_ADDRESS_HANDLER);
+	}
 
-    /** People held as contacts, inserted. */
-    public static List<Contact> contacts(Integer howMany, String lastName) {
-        List<Contact> people = new List<Contact>();
-        for (Integer i = 0; i < howMany; i++) {
-            people.add(
-                (Contact) TestDataFactory.pastDuplicateRules(
-                    new Contact(FirstName = 'Person' + i, LastName = lastName)
-                )
-            );
-        }
-        insert people;
-        return people;
-    }
+	/** People held as contacts, inserted. */
+	public static List<Contact> contacts(Integer howMany, String lastName) {
+		List<Contact> people = new List<Contact>();
+		for (Integer i = 0; i < howMany; i++) {
+			people.add(
+				(Contact) TestDataFactory.pastDuplicateRules(
+					new Contact(FirstName = 'Person' + i, LastName = lastName)
+				)
+			);
+		}
+		insert people;
+		return people;
+	}
 
-    /**
-     * People held as accounts, inserted. Ordinary accounts: see the class comment for why that
-     * exercises the same code a person account would.
-     */
-    public static List<Account> peopleAsAccounts(Integer howMany, String lastName) {
-        List<Account> people = new List<Account>();
-        for (Integer i = 0; i < howMany; i++) {
-            people.add(
-                (Account) TestDataFactory.pastDuplicateRules(
-                    new Account(Name = 'Person' + i + ' ' + lastName)
-                )
-            );
-        }
-        insert people;
-        return people;
-    }
+	/**
+	 * People held as accounts, inserted. Ordinary accounts: see the class comment for why that
+	 * exercises the same code a person account would.
+	 */
+	public static List<Account> peopleAsAccounts(Integer howMany, String lastName) {
+		List<Account> people = new List<Account>();
+		for (Integer i = 0; i < howMany; i++) {
+			people.add(
+				(Account) TestDataFactory.pastDuplicateRules(
+					new Account(Name = 'Person' + i + ' ' + lastName)
+				)
+			);
+		}
+		insert people;
+		return people;
+	}
 
-    /** Organizations, inserted. */
-    public static List<Account> organizations(Integer howMany, String prefix) {
-        List<Account> orgs = new List<Account>();
-        for (Integer i = 0; i < howMany; i++) {
-            orgs.add(
-                (Account) TestDataFactory.pastDuplicateRules(
-                    AccountKindsTestData.organization(prefix + ' ' + i)
-                )
-            );
-        }
-        insert orgs;
-        return orgs;
-    }
+	/** Organizations, inserted. */
+	public static List<Account> organizations(Integer howMany, String prefix) {
+		List<Account> orgs = new List<Account>();
+		for (Integer i = 0; i < howMany; i++) {
+			orgs.add(
+				(Account) TestDataFactory.pastDuplicateRules(
+					AccountKindsTestData.organization(prefix + ' ' + i)
+				)
+			);
+		}
+		insert orgs;
+		return orgs;
+	}
 
-    /** A relationship between two people held as contacts, not yet inserted. */
-    public static Relationship__c between(Contact person, Contact other, String type) {
-        return new Relationship__c(
-            Contact__c = person.Id,
-            Related_Contact__c = other.Id,
-            Type__c = type,
-            Status__c = 'Current',
-            Is_Reciprocal_Managed__c = true
-        );
-    }
+	/** A relationship between two people held as contacts, not yet inserted. */
+	public static Relationship__c between(Contact person, Contact other, String type) {
+		return new Relationship__c(
+			Contact__c = person.Id,
+			Related_Contact__c = other.Id,
+			Type__c = type,
+			Status__c = 'Current',
+			Is_Reciprocal_Managed__c = true
+		);
+	}
 
-    /** A relationship between two people held as accounts, not yet inserted. */
-    public static Relationship__c between(Account person, Account other, String type) {
-        return new Relationship__c(
-            Person_Account__c = person.Id,
-            Related_Person_Account__c = other.Id,
-            Type__c = type,
-            Status__c = 'Current',
-            Is_Reciprocal_Managed__c = true
-        );
-    }
+	/** A relationship between two people held as accounts, not yet inserted. */
+	public static Relationship__c between(Account person, Account other, String type) {
+		return new Relationship__c(
+			Person_Account__c = person.Id,
+			Related_Person_Account__c = other.Id,
+			Type__c = type,
+			Status__c = 'Current',
+			Is_Reciprocal_Managed__c = true
+		);
+	}
 
-    /** A relationship from a person held as a contact to one held as an account. */
-    public static Relationship__c between(Contact person, Account other, String type) {
-        return new Relationship__c(
-            Contact__c = person.Id,
-            Related_Person_Account__c = other.Id,
-            Type__c = type,
-            Status__c = 'Current',
-            Is_Reciprocal_Managed__c = true
-        );
-    }
+	/** A relationship from a person held as a contact to one held as an account. */
+	public static Relationship__c between(Contact person, Account other, String type) {
+		return new Relationship__c(
+			Contact__c = person.Id,
+			Related_Person_Account__c = other.Id,
+			Type__c = type,
+			Status__c = 'Current',
+			Is_Reciprocal_Managed__c = true
+		);
+	}
 
-    /** An affiliation from a person held as a contact, not yet inserted. */
-    public static Affiliation__c affiliation(Contact person, Account organization, String role) {
-        return new Affiliation__c(
-            Contact__c = person.Id,
-            Organization__c = organization.Id,
-            Role__c = role,
-            Status__c = 'Current'
-        );
-    }
+	/** An affiliation from a person held as a contact, not yet inserted. */
+	public static Affiliation__c affiliation(Contact person, Account organization, String role) {
+		return new Affiliation__c(
+			Contact__c = person.Id,
+			Organization__c = organization.Id,
+			Role__c = role,
+			Status__c = 'Current'
+		);
+	}
 
-    /** An affiliation from a person held as an account, not yet inserted. */
-    public static Affiliation__c affiliation(Account person, Account organization, String role) {
-        return new Affiliation__c(
-            Person_Account__c = person.Id,
-            Organization__c = organization.Id,
-            Role__c = role,
-            Status__c = 'Current'
-        );
-    }
+	/** An affiliation from a person held as an account, not yet inserted. */
+	public static Affiliation__c affiliation(Account person, Account organization, String role) {
+		return new Affiliation__c(
+			Person_Account__c = person.Id,
+			Organization__c = organization.Id,
+			Role__c = role,
+			Status__c = 'Current'
+		);
+	}
 
-    /**
-     * Every relationship on file, read in system mode so a test sees the records the package
-     * wrote as well as the ones it wrote itself.
-     */
-    public static List<Relationship__c> allRelationships() {
-        return [
-            SELECT
-                Id,
-                Name,
-                Contact__c,
-                Person_Account__c,
-                Related_Contact__c,
-                Related_Person_Account__c,
-                Type__c,
-                Reciprocal_Type__c,
-                Status__c,
-                Start_Date__c,
-                End_Date__c,
-                Description__c,
-                Reciprocal_Relationship__c,
-                Is_Reciprocal_Managed__c
-            FROM Relationship__c
-            WITH SYSTEM_MODE
-            ORDER BY Name
-            LIMIT 5000
-        ];
-    }
+	/**
+	 * Every relationship on file, read in system mode so a test sees the records the package
+	 * wrote as well as the ones it wrote itself.
+	 */
+	public static List<Relationship__c> allRelationships() {
+		return [
+			SELECT
+				Id,
+				Name,
+				Contact__c,
+				Person_Account__c,
+				Related_Contact__c,
+				Related_Person_Account__c,
+				Type__c,
+				Reciprocal_Type__c,
+				Status__c,
+				Start_Date__c,
+				End_Date__c,
+				Description__c,
+				Reciprocal_Relationship__c,
+				Is_Reciprocal_Managed__c
+			FROM Relationship__c
+			WITH SYSTEM_MODE
+			ORDER BY Name
+			LIMIT 5000
+		];
+	}
 
-    /** Every affiliation on file, read the same way. */
-    public static List<Affiliation__c> allAffiliations() {
-        return [
-            SELECT
-                Id,
-                Name,
-                Contact__c,
-                Person_Account__c,
-                Organization__c,
-                Role__c,
-                Status__c,
-                Is_Primary__c,
-                Start_Date__c,
-                End_Date__c
-            FROM Affiliation__c
-            WITH SYSTEM_MODE
-            ORDER BY Name
-            LIMIT 5000
-        ];
-    }
+	/** Every affiliation on file, read the same way. */
+	public static List<Affiliation__c> allAffiliations() {
+		return [
+			SELECT
+				Id,
+				Name,
+				Contact__c,
+				Person_Account__c,
+				Organization__c,
+				Role__c,
+				Status__c,
+				Is_Primary__c,
+				Start_Date__c,
+				End_Date__c
+			FROM Affiliation__c
+			WITH SYSTEM_MODE
+			ORDER BY Name
+			LIMIT 5000
+		];
+	}
 }

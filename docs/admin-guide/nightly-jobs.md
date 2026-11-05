@@ -16,11 +16,10 @@ The jobs in the run, by time of night:
 | Time | Job | Package | Switched on and off |
 |---|---|---|---|
 | 0:30 | Seasonal address swap | Core | **Turn On Seasonal Addresses**, Addresses section |
-| 1:15 | Import row cleanup | Core | **Delete Import Rows**, Import section |
-| 1:20 | Record Cleanup | Core | Always on; how long each kind of history is kept is set as below |
+| 1:20 | Record Cleanup | Core | Always on; how long each kind of history is kept is set as below (the staged rows of finished imports follow **Delete Import Rows**, Import section) |
 | 1:30 | Setup changes copy | Core | Org Optimizer on or off |
 | 1:45 | Empty household tidy-up | Core | **Delete Empty Households**, People and Households section |
-| 7:00 | Error Log digest and cleanup | Core | **Schedule Daily Run** and **Stop Daily Run**, Error Log section |
+| 7:00 | Error Log digest | Core | **Schedule Daily Run** and **Stop Daily Run**, Error Log section |
 
 With modules installed, these join the run (Schedule and Stop on each job's page now switch it
 on and off; a job without a switch runs whenever its module is on):
@@ -87,11 +86,16 @@ and applies to the whole organization:
 |---|---|---|---|---|
 | **Days to Keep Merge History** | Duplicate Matching | 365 | 30 to 3650 | Merge Journal entries (undo is offered for 15 days, so this does not shorten it) |
 | **Days to Keep Settings Changes** | General | 730 | 180 to 3650 | The record of who changed which setting |
-| **Days to Keep Import History** | Import | 365 | 30 to 3650 | Finished imports and bulk jobs, with their rows and journal, once they can no longer be undone |
+| **Days to Keep Import History** | Import | 365 | 30 to 3650 | Finished imports and bulk jobs, with their rows and journal, once they can no longer be undone; and imports abandoned in Draft, Parsing or Preview (started and never committed), with their staged rows |
 | **Days to Keep Field Use Counts** | Org Optimizer | 730 | 90 to 3650 | Saved Field Utilization counts |
+| **Days to Keep Error Log Entries** | Error Log | 180 | 1 to 3650, or 0 to keep every entry | Error Log entries, whatever their status |
 
 A value outside the accepted range is read as the nearest end. An import that is still running,
-or that can still be undone, is never deleted.
+or that can still be undone, is never deleted. An import is counted from the day it was
+started, so a wizard left open and forgotten goes with the rest of the history after the same
+number of days. The staged rows of a finished import go sooner or later by the **Delete Import
+Rows** choice in the Import section (see [Importing](importing.md)); Record Cleanup applies it
+every night.
 
 ## How Long a Job May Take
 

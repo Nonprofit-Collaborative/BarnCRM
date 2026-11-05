@@ -810,8 +810,8 @@ found nothing moves the covered window on, and a run that could not send leaves 
 was, so no entry is counted twice or dropped. A run reads at most the newest 2,000 entries
 and says "more than 2,000" beyond that, so a flooded Error Log cannot stop the digest. A
 digest that is scheduled but has not run for two days is a Health Check warning (ADR-0055).
-**R-E6 Entries are kept for a set time.** Each run of the daily Error Log job (the digest's)
-first starts a batch that deletes every entry, whatever its Status, created more than
+**R-E6 Entries are kept for a set time.** The nightly Record Cleanup step (R-NJ8), as one of
+its passes, deletes every entry, whatever its Status, created more than
 `Error_Log_Retention_Days__c` days before (default 180, 0 keeps every entry). The delete is
 package upkeep in system mode (ADR-0021) and puts the entries in the Recycle Bin. Saving the
 setting deletes nothing (owner decision, 2026-10-13, ADMIN-26).
@@ -1120,7 +1120,7 @@ its job from the console, as the nightly jobs are (ADR-0038), so it has no on an
 | `Error_Digest_Covered_Until__c` | datetime | empty | The end of the window the last digest run covered; the next digest counts entries created after it. Written by the job. |
 | `Error_Digest_Last_Run__c` | datetime | empty | When the digest job last ran, whether or not it sent anything. Written by the job. |
 | `Error_Digest_Last_Run_Summary__c` | text (255) | empty | What the last digest run did, in one sentence. Written by the job. |
-| `Error_Log_Retention_Days__c` | number(4, 0) | 180 | How many days an Error Log entry is kept before the daily Error Log job deletes it (R-E6). 0 keeps every entry; otherwise 1 to 3,650. Added 2026-10-13 (owner decision, ADMIN-26). |
+| `Error_Log_Retention_Days__c` | number(4, 0) | 180 | How many days an Error Log entry is kept before the nightly Record Cleanup deletes it (R-E6). 0 keeps every entry; otherwise 1 to 3,650. Added 2026-10-13 (owner decision, ADMIN-26). |
 
 ### v0.7 keys
 
@@ -1132,7 +1132,7 @@ Section 29E, R-BD2). Shown in the console's Import section.
 | `Find_Export_Row_Limit__c` | integer | 50000 | The most rows one Find export writes (R-SQ3). From 1 to 500,000; empty reads as 50,000. |
 | `Bulk_Update_Run_Limit__c` | integer | 48000 | The most records one Super Transformer run may change (R-BU2); its label is **Super Transformer run limit**. From 1 to 48,000; empty or out of range reads as the nearest end. |
 | `Bulk_Delete_Run_Limit__c` | integer | 10000 | The most records one bulk delete may delete (R-BD2). From 1 to 48,000; empty reads as 10,000, out of range as the nearest end. |
-| `Import_Row_Deletion__c` | picklist(Once_Complete, After_30_Days, After_90_Days, Never) | After_30_Days | Delete Import Rows: when the nightly Import row cleanup deletes the staged rows of a complete import (R-IR5, ADR-0149). Stored as text (ADR-0019); a blank or unknown value reads as After_30_Days. Replaces `Import_Row_Retention_Days__c` (a number of days, D-40), which is removed. |
+| `Import_Row_Deletion__c` | picklist(Once_Complete, After_30_Days, After_90_Days, Never) | After_30_Days | Delete Import Rows: when the nightly Record Cleanup deletes the staged rows of a complete import (R-IR5, ADR-0149). Stored as text (ADR-0019); a blank or unknown value reads as After_30_Days. Replaces `Import_Row_Retention_Days__c` (a number of days, D-40), which is removed. |
 | `Bulk_Chunk_Size__c` | integer | 200 | Records each chunk of a bulk update or bulk delete handles (R-BU2, R-BD2). From 10 to 200; empty reads as 200, out of range as the nearest end. Stamped on the job when it starts. |
 
 ### v0.8 keys
@@ -1230,7 +1230,7 @@ Added by architect review L-08. Each is read by the nightly run's Record Cleanup
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Setting_Change_Retention_Days__c` | integer | 730 | Days a Setting Change row is kept (R-S2). From 180 to 3,650. General section. |
-| `Import_History_Retention_Days__c` | integer | 365 | Days a finished import or bulk job (`Import_Batch__c`, with its rows and journal) is kept once its undo window has closed. From 30 to 3,650. Import section. |
+| `Import_History_Retention_Days__c` | integer | 365 | Days a finished import or bulk job (`Import_Batch__c`, with its rows and journal) is kept once its undo window has closed. An import left in Draft, Parsing or Dry run and never committed (an abandoned wizard) is deleted, with its rows, once it is that many days old. From 30 to 3,650. Import section. |
 | `Field_Utilization_Retention_Days__c` | integer | 730 | Days a saved Field Utilization Snapshot row is kept (R-FU7). From 90 to 3,650. Org Optimizer section. |
 
 ### Health Check keys
@@ -3543,8 +3543,8 @@ place of its raw value (a corrected blank is a blank cell) and every other colum
 uploaded. Corrections are written in system mode under ADR-0021, after that check.
 
 **R-IR5 Retention.** The Import setting Delete Import Rows (`Import_Row_Deletion__c`)
-decides when the nightly Import row cleanup (`ImportRowPurgeScheduler`, listed in Health
-Check's nightly jobs) deletes a batch's rows: Once Complete (on the first nightly run after
+decides when the nightly Record Cleanup step (R-NJ8; a pass of `RecordRetentionBatch`, which
+replaced the separate Import row cleanup job) deletes a batch's rows: Once Complete (on the first nightly run after
 the batch is complete), After 30 Days (the default, and what a blank or unknown value reads
 as), After 90 Days, or Never (ADR-0149, Brandon 2026-10-30, superseding the number of days
 of D-40 and plan Section 4.9's purge on commit). A batch is complete when its last commit
@@ -12223,9 +12223,13 @@ next check, and the new run's first step waits for the work the old step started
 
 **R-NJ8 Record Cleanup.** A Core step at 1:20 deletes, oldest first and in system mode, the
 history rows past their retention (architect review L-08): Setting Change (R-S2), Merge Journal,
-finished imports and bulk jobs whose undo window has closed (journal and rows first, then the
-batch), and Field Utilization Snapshot (R-FU7), each by its key in Section 12 ("Record retention
-keys" and `Merge_Journal_Retention_Days__c`). A pass that fails is logged and the next pass runs.
+finished imports and bulk jobs whose undo window has closed, and imports abandoned in Draft,
+Parsing or Dry run (never committed) once as old (journal and rows first, then the batch),
+Field Utilization Snapshot (R-FU7), Error Log entries (R-E6) and the staged rows of complete
+imports by Delete Import Rows (R-IR5), each by its key in Section 12 ("Record retention keys",
+`Merge_Journal_Retention_Days__c`, `Error_Log_Retention_Days__c`, `Import_Row_Deletion__c`).
+The step runs without sharing, since a cleanup limited to what its scheduler can see would leave
+rows for ever. A pass that fails is logged and the next pass runs.
 **R-NJ7 Administrators only.** Only `BarnCRM_Admin` is granted the object, Read and View All.
 Rows are written only by BarnCRM code in system mode (ADR-0021); switches change through the
 pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
@@ -12594,6 +12598,7 @@ mirrors the primary member).
 | 0.16 | 2026-11-02 | Funders F-07 (ADR-0163 `0163-funders-reporting-links.md`). Grant (29ZH) gains rule R-GN9, the board dashboard (revenue mix, concentration, restricted balances), read from grants and, by describe, Giving and the F-03 ledger; no new object or field. |
 | v1.0 | 2026-11-04 | One nightly job dispatcher (architect review RT-10, L-10, ADR-0166 nightly-job-dispatcher). New Core object Nightly Job (`Nightly_Job__c`, 29ZR) with rules R-NJ1 to R-NJ7: one nightly schedule runs every step in sequence, each step keeping its switch and last result; about 19 separate scheduled jobs are replaced and adopted on upgrade. R-SU2 and R-IN5 read the nightly run instead of their own jobs. |
 | v1.0 | 2026-11-04 | Record retention (architect review L-08). `BarnCRM_Settings__c` gains `Merge_Journal_Retention_Days__c` (365), `Setting_Change_Retention_Days__c` (730), `Import_History_Retention_Days__c` (365) and `Field_Utilization_Retention_Days__c` (730). New rule R-NJ8 (the Record Cleanup step); R-S2 and R-FU7 amended. No object added. |
+| v1.0 | 2026-11-04 | Core pre-batch review (CPR-22, CPR-41). Rule R-NJ8 (Record Cleanup) gains passes for Error Log entries (R-E6) and the staged rows of complete imports (R-IR5), which replace the separate Import row cleanup step and the Error Log delete that rode on the daily digest; it also deletes imports abandoned in Draft, Parsing or Dry run after Days to Keep Import History. No object or field added. |
 | 0.17 | 2026-11-04 | Dispatcher error contract (RT-05, ADR-0165 dispatcher errors and Automation Control). Section 10 gains rule R-A6: a failure refuses only its own records, the rest of the save goes ahead. No object or field added. |
 | 0.17 | 2026-11-04 | BarnCRM Automation Control (RT-13, same ADR). New hierarchy custom setting `BarnCRM_Automation_Control__c` with `Pause_All__c` and `Bypass__c` (Section 10, rule R-A7), read by the dispatcher, every shipped flow template and the Check BarnCRM Automation action. |
 | 0.17 | 2026-11-04 | Automation page manages Automation Control (RT-13, same ADR, decisions 2.6 to 2.8). Section 10 gains rule R-A8: org, profile and user rows edited in the console, an org's own flows listed as `Flow:` switch rows, and Catch Up Now. No object or field added. |

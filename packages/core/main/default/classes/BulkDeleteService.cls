@@ -9,721 +9,721 @@
  * mode (ADR-0021); every record is deleted in the person's own mode, by `BulkDeleteBatch`.
  */
 public with sharing class BulkDeleteService {
-    public static final String OPERATION_DELETE = 'Delete';
-    /** How many records the preview names. */
-    public static final Integer SAMPLE_SIZE = 5;
-    /** The run limit's default (R-BD2). */
-    public static final Integer DEFAULT_RUN_LIMIT = 10000;
-    /** The run limit's highest value: what one request can count exactly (R-BD2). */
-    public static final Integer MAX_RUN_LIMIT = 48000;
-    /** How long the platform keeps a deleted record in the Recycle Bin. */
-    public static final Integer RECYCLE_BIN_DAYS = 15;
-    /** The most kinds of child record the preview names. */
-    private static final Integer MAX_CASCADES = 20;
-    /** Query rows left free for the reads around a count. */
-    private static final Integer COUNT_MARGIN = 100;
-    private static final Integer DEFINITION_VERSION = 1;
-    /** The definition's source for a delete by file (R-BD7); a query has none. */
-    public static final String SOURCE_FILE = 'file';
+	public static final String OPERATION_DELETE = 'Delete';
+	/** How many records the preview names. */
+	public static final Integer SAMPLE_SIZE = 5;
+	/** The run limit's default (R-BD2). */
+	public static final Integer DEFAULT_RUN_LIMIT = 10000;
+	/** The run limit's highest value: what one request can count exactly (R-BD2). */
+	public static final Integer MAX_RUN_LIMIT = 48000;
+	/** How long the platform keeps a deleted record in the Recycle Bin. */
+	public static final Integer RECYCLE_BIN_DAYS = 15;
+	/** The most kinds of child record the preview names. */
+	private static final Integer MAX_CASCADES = 20;
+	/** Query rows left free for the reads around a count. */
+	private static final Integer COUNT_MARGIN = 100;
+	private static final Integer DEFINITION_VERSION = 1;
+	/** The definition's source for a delete by file (R-BD7); a query has none. */
+	public static final String SOURCE_FILE = 'file';
 
-    /** Raised for anything the person can fix; the message is for them. */
-    public class BulkDeleteException extends Exception {
-    }
+	/** Raised for anything the person can fix; the message is for them. */
+	public class BulkDeleteException extends Exception {
+	}
 
-    /** A checked bulk delete: the query document, or a file's rows (R-BD7), and its object. */
-    public class Plan {
-        public String queryJson;
-        /** True when the records are the Matched rows of a delete by file (R-BD7). */
-        public Boolean fromFile = false;
-        public String objectName;
-        public Schema.SObjectType objectType;
-        /** The object's name field, when the person may read it; null otherwise. */
-        public String nameField;
+	/** A checked bulk delete: the query document, or a file's rows (R-BD7), and its object. */
+	public class Plan {
+		public String queryJson;
+		/** True when the records are the Matched rows of a delete by file (R-BD7). */
+		public Boolean fromFile = false;
+		public String objectName;
+		public Schema.SObjectType objectType;
+		/** The object's name field, when the person may read it; null otherwise. */
+		public String nameField;
 
-        /**
-         * What a job keeps (R-BD1, R-BD7): the query document, or the object a file names, and
-         * the confirmed count.
-         */
-        public String definition(Integer confirmedCount) {
-            Map<String, Object> kept = new Map<String, Object>{
-                'version' => DEFINITION_VERSION,
-                'confirmedCount' => confirmedCount
-            };
-            if (fromFile) {
-                kept.put('source', SOURCE_FILE);
-                kept.put('object', objectName);
-            } else {
-                kept.put('query', JSON.deserializeUntyped(queryJson));
-            }
-            return JSON.serialize(kept);
-        }
+		/**
+		 * What a job keeps (R-BD1, R-BD7): the query document, or the object a file names, and
+		 * the confirmed count.
+		 */
+		public String definition(Integer confirmedCount) {
+			Map<String, Object> kept = new Map<String, Object>{
+				'version' => DEFINITION_VERSION,
+				'confirmedCount' => confirmedCount
+			};
+			if (fromFile) {
+				kept.put('source', SOURCE_FILE);
+				kept.put('object', objectName);
+			} else {
+				kept.put('query', JSON.deserializeUntyped(queryJson));
+			}
+			return JSON.serialize(kept);
+		}
 
-        /** The fields each chunk reads: the Id and the name the journal keeps. */
-        public Set<String> readFields() {
-            Set<String> names = new Set<String>{ 'Id' };
-            if (nameField != null) {
-                names.add(nameField);
-            }
-            return names;
-        }
+		/** The fields each chunk reads: the Id and the name the journal keeps. */
+		public Set<String> readFields() {
+			Set<String> names = new Set<String>{ 'Id' };
+			if (nameField != null) {
+				names.add(nameField);
+			}
+			return names;
+		}
 
-        /** A record's name for the preview and the journal, or its Id. */
-        public String nameOf(SObject record) {
-            Object name = nameField == null ? null : record.get(nameField);
-            return name == null ? String.valueOf(record.Id) : String.valueOf(name);
-        }
-    }
+		/** A record's name for the preview and the journal, or its Id. */
+		public String nameOf(SObject record) {
+			Object name = nameField == null ? null : record.get(nameField);
+			return name == null ? String.valueOf(record.Id) : String.valueOf(name);
+		}
+	}
 
-    /** One record of the preview's sample. */
-    public class SampleRecord {
-        @AuraEnabled
-        public String recordId;
-        @AuraEnabled
-        public String name;
-    }
+	/** One record of the preview's sample. */
+	public class SampleRecord {
+		@AuraEnabled
+		public String recordId;
+		@AuraEnabled
+		public String name;
+	}
 
-    /** What a bulk delete would do. */
-    public class Preview {
-        /** How many records match now: the number the person confirms. */
-        @AuraEnabled
-        public Integer count;
-        @AuraEnabled
-        public String objectLabel;
-        @AuraEnabled
-        public List<SampleRecord> sample = new List<SampleRecord>();
-        /** The kinds of child record the platform deletes with each record (R-BD2). */
-        @AuraEnabled
-        public List<String> cascades = new List<String>();
-        /** The last moment an undo could run, if the job started now. */
-        @AuraEnabled
-        public Datetime undoDeadline;
-    }
+	/** What a bulk delete would do. */
+	public class Preview {
+		/** How many records match now: the number the person confirms. */
+		@AuraEnabled
+		public Integer count;
+		@AuraEnabled
+		public String objectLabel;
+		@AuraEnabled
+		public List<SampleRecord> sample = new List<SampleRecord>();
+		/** The kinds of child record the platform deletes with each record (R-BD2). */
+		@AuraEnabled
+		public List<String> cascades = new List<String>();
+		/** The last moment an undo could run, if the job started now. */
+		@AuraEnabled
+		public Datetime undoDeadline;
+	}
 
-    // -------------------------------------------------------------------------------------
-    // Checking
-    // -------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------------------
+	// Checking
+	// -------------------------------------------------------------------------------------
 
-    /** Checks a query document as the running user (R-BD4). */
-    public static Plan plan(String queryJson) {
-        Schema.DescribeSObjectResult described;
-        try {
-            described = QueryFieldCatalog.describeObject(QueryCompiler.parse(queryJson).objectName);
-        } catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
-            throw new BulkDeleteException(refused.getMessage());
-        }
-        Plan result = checked(described);
-        result.queryJson = queryJson;
-        return result;
-    }
+	/** Checks a query document as the running user (R-BD4). */
+	public static Plan plan(String queryJson) {
+		Schema.DescribeSObjectResult described;
+		try {
+			described = QueryFieldCatalog.describeObject(QueryCompiler.parse(queryJson).objectName);
+		} catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
+			throw new BulkDeleteException(refused.getMessage());
+		}
+		Plan result = checked(described);
+		result.queryJson = queryJson;
+		return result;
+	}
 
-    /** Checks a delete by file of this object as the running user (R-BD7). */
-    public static Plan planForFile(String objectName) {
-        Schema.DescribeSObjectResult described;
-        try {
-            described = QueryFieldCatalog.describeObject(objectName);
-        } catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
-            throw new BulkDeleteException(refused.getMessage());
-        }
-        if (!FeatureManagement.checkPermission(BulkDeleteController.PERMISSION)) {
-            throw new BulkDeleteException(
-                BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsPermission')
-            );
-        }
-        Plan result = checked(described);
-        result.fromFile = true;
-        return result;
-    }
+	/** Checks a delete by file of this object as the running user (R-BD7). */
+	public static Plan planForFile(String objectName) {
+		Schema.DescribeSObjectResult described;
+		try {
+			described = QueryFieldCatalog.describeObject(objectName);
+		} catch (QueryFieldCatalog.QueryFieldCatalogException refused) {
+			throw new BulkDeleteException(refused.getMessage());
+		}
+		if (!FeatureManagement.checkPermission(BulkDeleteController.PERMISSION)) {
+			throw new BulkDeleteException(
+				BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsPermission')
+			);
+		}
+		Plan result = checked(described);
+		result.fromFile = true;
+		return result;
+	}
 
-    /** A plan for an object the person may bulk delete from, or refused naming why (R-BD4). */
-    private static Plan checked(Schema.DescribeSObjectResult described) {
-        String reason = objectReason(described);
-        if (reason != null) {
-            throw new BulkDeleteException(
-                String.format(
-                    BarnHelp.text('Core', 'Core_BulkDelete_ErrorObject'),
-                    new List<Object>{ described.getLabelPlural(), reason }
-                )
-            );
-        }
-        Plan result = new Plan();
-        result.objectType = described.getSObjectType();
-        result.objectName = described.getName();
-        result.nameField = DataJobs.nameField(described);
-        return result;
-    }
+	/** A plan for an object the person may bulk delete from, or refused naming why (R-BD4). */
+	private static Plan checked(Schema.DescribeSObjectResult described) {
+		String reason = objectReason(described);
+		if (reason != null) {
+			throw new BulkDeleteException(
+				String.format(
+					BarnHelp.text('Core', 'Core_BulkDelete_ErrorObject'),
+					new List<Object>{ described.getLabelPlural(), reason }
+				)
+			);
+		}
+		Plan result = new Plan();
+		result.objectType = described.getSObjectType();
+		result.objectName = described.getName();
+		result.nameField = DataJobs.nameField(described);
+		return result;
+	}
 
-    /** Checks a job's stored definition again, as the person running the job. */
-    public static Plan planFromDefinition(String definitionJson) {
-        Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(
-            definitionJson
-        );
-        if (SOURCE_FILE.equals(definition.get('source'))) {
-            return planForFile((String) definition.get('object'));
-        }
-        return plan(JSON.serialize(definition.get('query')));
-    }
+	/** Checks a job's stored definition again, as the person running the job. */
+	public static Plan planFromDefinition(String definitionJson) {
+		Map<String, Object> definition = (Map<String, Object>) JSON.deserializeUntyped(
+			definitionJson
+		);
+		if (SOURCE_FILE.equals(definition.get('source'))) {
+			return planForFile((String) definition.get('object'));
+		}
+		return plan(JSON.serialize(definition.get('query')));
+	}
 
-    /** Why no record of this object may be bulk deleted, or null when its records may be. */
-    public static String objectReason(Schema.DescribeSObjectResult described) {
-        String refused = DataProtectedFields.objectRefusal(described.getSObjectType());
-        if (refused != null) {
-            return refused;
-        }
-        if (!described.isDeletable()) {
-            return BarnHelp.text('Core', 'Core_BulkDelete_ReasonNoDelete');
-        }
-        if (!described.isUndeletable()) {
-            return BarnHelp.text('Core', 'Core_BulkDelete_ReasonNoUndelete');
-        }
-        return null;
-    }
+	/** Why no record of this object may be bulk deleted, or null when its records may be. */
+	public static String objectReason(Schema.DescribeSObjectResult described) {
+		String refused = DataProtectedFields.objectRefusal(described.getSObjectType());
+		if (refused != null) {
+			return refused;
+		}
+		if (!described.isDeletable()) {
+			return BarnHelp.text('Core', 'Core_BulkDelete_ReasonNoDelete');
+		}
+		if (!described.isUndeletable()) {
+			return BarnHelp.text('Core', 'Core_BulkDelete_ReasonNoUndelete');
+		}
+		return null;
+	}
 
-    // -------------------------------------------------------------------------------------
-    // Preview
-    // -------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------------------
+	// Preview
+	// -------------------------------------------------------------------------------------
 
-    /**
-     * Counts the records the query matches now, names the first few, and lists what the
-     * platform deletes with them. The count is the number the person confirms; nothing is
-     * deleted.
-     */
-    public static Preview preview(String queryJson) {
-        Plan checked = plan(queryJson);
-        Integer ceiling = runLimit();
-        Preview result = new Preview();
-        result.count = countWithin(checked, ceiling);
-        if (result.count > ceiling) {
-            throw new BulkDeleteException(overLimit(ceiling));
-        }
-        Schema.DescribeSObjectResult described = checked.objectType.getDescribe(
-            SObjectDescribeOptions.DEFERRED
-        );
-        result.objectLabel = described.getLabelPlural();
-        result.cascades = cascades(described);
-        result.undoDeadline = undoDeadlineFrom(Datetime.now());
-        QueryCompiler.Compiled sample = QueryCompiler.compileSelection(
-            queryJson,
-            checked.readFields(),
-            null
-        );
-        sample.binds.put('sampleSize', SAMPLE_SIZE);
-        for (
-            SObject record : Database.queryWithBinds(
-                sample.soql + ' ORDER BY Id LIMIT :sampleSize',
-                sample.binds,
-                AccessLevel.USER_MODE
-            )
-        ) {
-            SampleRecord shown = new SampleRecord();
-            shown.recordId = record.Id;
-            shown.name = checked.nameOf(record);
-            result.sample.add(shown);
-        }
-        return result;
-    }
+	/**
+	 * Counts the records the query matches now, names the first few, and lists what the
+	 * platform deletes with them. The count is the number the person confirms; nothing is
+	 * deleted.
+	 */
+	public static Preview preview(String queryJson) {
+		Plan checked = plan(queryJson);
+		Integer ceiling = runLimit();
+		Preview result = new Preview();
+		result.count = countWithin(checked, ceiling);
+		if (result.count > ceiling) {
+			throw new BulkDeleteException(overLimit(ceiling));
+		}
+		Schema.DescribeSObjectResult described = checked.objectType.getDescribe(
+			SObjectDescribeOptions.DEFERRED
+		);
+		result.objectLabel = described.getLabelPlural();
+		result.cascades = cascades(described);
+		result.undoDeadline = undoDeadlineFrom(Datetime.now());
+		QueryCompiler.Compiled sample = QueryCompiler.compileSelection(
+			queryJson,
+			checked.readFields(),
+			null
+		);
+		sample.binds.put('sampleSize', SAMPLE_SIZE);
+		for (
+			SObject record : Database.queryWithBinds(
+				sample.soql + ' ORDER BY Id LIMIT :sampleSize',
+				sample.binds,
+				AccessLevel.USER_MODE
+			)
+		) {
+			SampleRecord shown = new SampleRecord();
+			shown.recordId = record.Id;
+			shown.name = checked.nameOf(record);
+			result.sample.add(shown);
+		}
+		return result;
+	}
 
-    /**
-     * The kinds of child record the platform deletes with a record of this object, by plural
-     * label, sorted: child relationships marked cascade delete whose object the person may read.
-     */
-    @TestVisible
-    private static List<String> cascades(Schema.DescribeSObjectResult described) {
-        Set<String> labels = new Set<String>();
-        for (Schema.ChildRelationship child : described.getChildRelationships()) {
-            if (!child.isCascadeDelete() || child.getChildSObject() == null) {
-                continue;
-            }
-            Schema.DescribeSObjectResult childObject = child.getChildSObject()
-                .getDescribe(SObjectDescribeOptions.DEFERRED);
-            if (childObject.isAccessible() && childObject.isQueryable()) {
-                labels.add(childObject.getLabelPlural());
-            }
-        }
-        List<String> sorted = new List<String>(labels);
-        sorted.sort();
-        while (sorted.size() > MAX_CASCADES) {
-            sorted.remove(sorted.size() - 1);
-        }
-        return sorted;
-    }
+	/**
+	 * The kinds of child record the platform deletes with a record of this object, by plural
+	 * label, sorted: child relationships marked cascade delete whose object the person may read.
+	 */
+	@TestVisible
+	private static List<String> cascades(Schema.DescribeSObjectResult described) {
+		Set<String> labels = new Set<String>();
+		for (Schema.ChildRelationship child : described.getChildRelationships()) {
+			if (!child.isCascadeDelete() || child.getChildSObject() == null) {
+				continue;
+			}
+			Schema.DescribeSObjectResult childObject = child.getChildSObject()
+				.getDescribe(SObjectDescribeOptions.DEFERRED);
+			if (childObject.isAccessible() && childObject.isQueryable()) {
+				labels.add(childObject.getLabelPlural());
+			}
+		}
+		List<String> sorted = new List<String>(labels);
+		sorted.sort();
+		while (sorted.size() > MAX_CASCADES) {
+			sorted.remove(sorted.size() - 1);
+		}
+		return sorted;
+	}
 
-    /**
-     * How many records match, counting at most one past `ceiling`. Refused when none match, or
-     * when the request cannot read enough rows to tell; a count past the ceiling is returned,
-     * so the caller can say which limit it passed.
-     */
-    public static Integer countWithin(Plan checked, Integer ceiling) {
-        Integer count = DataJobs.countWithin(checked.queryJson, ceiling, COUNT_MARGIN);
-        if (count == null) {
-            throw new BulkDeleteException(
-                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorTooManyToCount')
-            );
-        }
-        if (count == 0) {
-            throw new BulkDeleteException(
-                BarnHelp.text('Core', 'Core_BulkDelete_ErrorNothingMatches')
-            );
-        }
-        return count;
-    }
+	/**
+	 * How many records match, counting at most one past `ceiling`. Refused when none match, or
+	 * when the request cannot read enough rows to tell; a count past the ceiling is returned,
+	 * so the caller can say which limit it passed.
+	 */
+	public static Integer countWithin(Plan checked, Integer ceiling) {
+		Integer count = DataJobs.countWithin(checked.queryJson, ceiling, COUNT_MARGIN);
+		if (count == null) {
+			throw new BulkDeleteException(
+				BarnHelp.text('Core', 'Core_BulkUpdate_ErrorTooManyToCount')
+			);
+		}
+		if (count == 0) {
+			throw new BulkDeleteException(
+				BarnHelp.text('Core', 'Core_BulkDelete_ErrorNothingMatches')
+			);
+		}
+		return count;
+	}
 
-    // -------------------------------------------------------------------------------------
-    // Start
-    // -------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------------------
+	// Start
+	// -------------------------------------------------------------------------------------
 
-    /**
-     * Starts a bulk delete of at most `confirmedCount` records after counting again: refused
-     * when more records match now than were confirmed, or than the run limit allows (R-BD2).
-     */
-    public static Import_Batch__c start(String queryJson, Integer confirmedCount) {
-        Plan checked = plan(queryJson);
-        if (confirmedCount == null || confirmedCount < 1) {
-            throw new BulkDeleteException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorConfirm'));
-        }
-        Integer ceiling = runLimit();
-        if (confirmedCount > ceiling) {
-            throw new BulkDeleteException(overLimit(ceiling));
-        }
-        Integer count = countWithin(checked, confirmedCount);
-        if (count > confirmedCount) {
-            throw new BulkDeleteException(
-                String.format(
-                    BarnHelp.text('Core', 'Core_BulkDelete_ErrorMoreThanConfirmed'),
-                    new List<Object>{ confirmedCount.format() }
-                )
-            );
-        }
-        Import_Batch__c job = createJob(checked, count, confirmedCount);
-        return DataJobs.launch(new BulkDeleteBatch(job.Id), job);
-    }
+	/**
+	 * Starts a bulk delete of at most `confirmedCount` records after counting again: refused
+	 * when more records match now than were confirmed, or than the run limit allows (R-BD2).
+	 */
+	public static Import_Batch__c start(String queryJson, Integer confirmedCount) {
+		Plan checked = plan(queryJson);
+		if (confirmedCount == null || confirmedCount < 1) {
+			throw new BulkDeleteException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorConfirm'));
+		}
+		Integer ceiling = runLimit();
+		if (confirmedCount > ceiling) {
+			throw new BulkDeleteException(overLimit(ceiling));
+		}
+		Integer count = countWithin(checked, confirmedCount);
+		if (count > confirmedCount) {
+			throw new BulkDeleteException(
+				String.format(
+					BarnHelp.text('Core', 'Core_BulkDelete_ErrorMoreThanConfirmed'),
+					new List<Object>{ confirmedCount.format() }
+				)
+			);
+		}
+		Import_Batch__c job = createJob(checked, count, confirmedCount);
+		return DataJobs.launch(new BulkDeleteBatch(job.Id), job);
+	}
 
-    /**
-     * The job record, committed when it starts, with its undo deadline stamped then: the
-     * earlier of the import undo window and the Recycle Bin's 15 days (R-BD2).
-     */
-    @TestVisible
-    private static Import_Batch__c createJob(Plan checked, Integer count, Integer confirmedCount) {
-        Import_Batch__c job = jobFields(checked, count, confirmedCount);
-        Database.insert(job, AccessLevel.SYSTEM_MODE);
-        return job;
-    }
+	/**
+	 * The job record, committed when it starts, with its undo deadline stamped then: the
+	 * earlier of the import undo window and the Recycle Bin's 15 days (R-BD2).
+	 */
+	@TestVisible
+	private static Import_Batch__c createJob(Plan checked, Integer count, Integer confirmedCount) {
+		Import_Batch__c job = jobFields(checked, count, confirmedCount);
+		Database.insert(job, AccessLevel.SYSTEM_MODE);
+		return job;
+	}
 
-    /** A bulk delete job's fields as it starts, not yet saved. */
-    private static Import_Batch__c jobFields(Plan checked, Integer count, Integer confirmedCount) {
-        Datetime now = Datetime.now();
-        Import_Batch__c job = new Import_Batch__c(
-            Operation__c = OPERATION_DELETE,
-            Operation_JSON__c = checked.definition(confirmedCount),
-            Status__c = ImportBatchService.STATUS_COMMITTING,
-            Is_Dry_Run__c = false,
-            Row_Count__c = count,
-            Rows_Created__c = 0,
-            Rows_Updated__c = 0,
-            Rows_Matched__c = 0,
-            Rows_Rejected__c = 0,
-            Rows_Deleted__c = 0,
-            Chunk_Size__c = DataJobs.chunkSize(),
-            Started_At__c = now,
-            Committed_By__c = UserInfo.getUserId(),
-            Undo_Deadline__c = undoDeadlineFrom(now),
-            Run_Log__c = String.format(
-                BarnHelp.text('Core', 'Core_BulkDelete_LogStarted'),
-                new List<Object>{
-                    UserInfo.getName(),
-                    now.format(),
-                    count.format(),
-                    checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-                        .getLabelPlural(),
-                    confirmedCount.format()
-                }
-            )
-        );
-        return job;
-    }
+	/** A bulk delete job's fields as it starts, not yet saved. */
+	private static Import_Batch__c jobFields(Plan checked, Integer count, Integer confirmedCount) {
+		Datetime now = Datetime.now();
+		Import_Batch__c job = new Import_Batch__c(
+			Operation__c = OPERATION_DELETE,
+			Operation_JSON__c = checked.definition(confirmedCount),
+			Status__c = ImportBatchService.STATUS_COMMITTING,
+			Is_Dry_Run__c = false,
+			Row_Count__c = count,
+			Rows_Created__c = 0,
+			Rows_Updated__c = 0,
+			Rows_Matched__c = 0,
+			Rows_Rejected__c = 0,
+			Rows_Deleted__c = 0,
+			Chunk_Size__c = DataJobs.chunkSize(),
+			Started_At__c = now,
+			Committed_By__c = UserInfo.getUserId(),
+			Undo_Deadline__c = undoDeadlineFrom(now),
+			Run_Log__c = String.format(
+				BarnHelp.text('Core', 'Core_BulkDelete_LogStarted'),
+				new List<Object>{
+					UserInfo.getName(),
+					now.format(),
+					count.format(),
+					checked.objectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+						.getLabelPlural(),
+					confirmedCount.format()
+				}
+			)
+		);
+		return job;
+	}
 
-    // -------------------------------------------------------------------------------------
-    // Delete by file (R-BD7)
-    // -------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------------------
+	// Delete by file (R-BD7)
+	// -------------------------------------------------------------------------------------
 
-    /**
-     * What deleting the Matched rows of a dry run of a delete by file would do: their count
-     * (the number the person confirms), five of them by name, the cascade kinds and the undo
-     * deadline. Nothing is deleted; the run limit is checked when it starts.
-     */
-    public static Preview filePreview(Id batchId) {
-        Import_Batch__c batch = dryRunOfFile(batchId);
-        Plan checked = planForFile(objectOfFile(batch));
-        Preview result = new Preview();
-        result.count = matchedRows(batch.Id);
-        Schema.DescribeSObjectResult described = checked.objectType.getDescribe(
-            SObjectDescribeOptions.DEFERRED
-        );
-        result.objectLabel = described.getLabelPlural();
-        result.cascades = cascades(described);
-        result.undoDeadline = undoDeadlineFrom(Datetime.now());
-        Set<Id> firstIds = new Set<Id>();
-        for (Import_Row__c row : [
-            SELECT Gift_Id__c
-            FROM Import_Row__c
-            WHERE
-                Import_Batch__c = :batch.Id
-                AND Status__c = :ImportRowProcessor.STATUS_MATCHED
-                AND Gift_Id__c != NULL
-            WITH SYSTEM_MODE
-            ORDER BY Row_Number__c
-            LIMIT :SAMPLE_SIZE
-        ]) {
-            firstIds.add(row.Gift_Id__c);
-        }
-        for (SObject record : readAgain(checked, firstIds)) {
-            SampleRecord shown = new SampleRecord();
-            shown.recordId = record.Id;
-            shown.name = checked.nameOf(record);
-            result.sample.add(shown);
-        }
-        return result;
-    }
+	/**
+	 * What deleting the Matched rows of a dry run of a delete by file would do: their count
+	 * (the number the person confirms), five of them by name, the cascade kinds and the undo
+	 * deadline. Nothing is deleted; the run limit is checked when it starts.
+	 */
+	public static Preview filePreview(Id batchId) {
+		Import_Batch__c batch = dryRunOfFile(batchId);
+		Plan checked = planForFile(objectOfFile(batch));
+		Preview result = new Preview();
+		result.count = matchedRows(batch.Id);
+		Schema.DescribeSObjectResult described = checked.objectType.getDescribe(
+			SObjectDescribeOptions.DEFERRED
+		);
+		result.objectLabel = described.getLabelPlural();
+		result.cascades = cascades(described);
+		result.undoDeadline = undoDeadlineFrom(Datetime.now());
+		Set<Id> firstIds = new Set<Id>();
+		for (Import_Row__c row : [
+			SELECT Gift_Id__c
+			FROM Import_Row__c
+			WHERE
+				Import_Batch__c = :batch.Id
+				AND Status__c = :ImportRowProcessor.STATUS_MATCHED
+				AND Gift_Id__c != NULL
+			WITH SYSTEM_MODE
+			ORDER BY Row_Number__c
+			LIMIT :SAMPLE_SIZE
+		]) {
+			firstIds.add(row.Gift_Id__c);
+		}
+		for (SObject record : readAgain(checked, firstIds)) {
+			SampleRecord shown = new SampleRecord();
+			shown.recordId = record.Id;
+			shown.name = checked.nameOf(record);
+			result.sample.add(shown);
+		}
+		return result;
+	}
 
-    /**
-     * Starts the bulk delete of a delete by file's Matched rows (R-BD7): refused unless the
-     * count typed is the number of Matched rows and within the run limit. The import batch
-     * becomes the bulk delete job, so it leaves the import history.
-     */
-    public static Import_Batch__c startFromFile(Id batchId, Integer confirmedCount) {
-        Import_Batch__c batch = dryRunOfFile(batchId);
-        Plan checked = planForFile(objectOfFile(batch));
-        Integer count = matchedRows(batch.Id);
-        if (count == 0) {
-            throw new BulkDeleteException(
-                BarnHelp.text('Core', 'Core_BulkDelete_ErrorNothingMatches')
-            );
-        }
-        Integer ceiling = runLimit();
-        if (count > ceiling) {
-            throw new BulkDeleteException(overLimit(ceiling));
-        }
-        if (confirmedCount != count) {
-            throw new BulkDeleteException(
-                String.format(
-                    BarnHelp.text('Core', 'Core_Import_ErrorDeleteCountDiffers'),
-                    new List<Object>{ count.format() }
-                )
-            );
-        }
-        // Locked, so two starts at once cannot both find the dry run complete (R-IB13).
-        Import_Batch__c locked = [
-            SELECT Id, Status__c, Run_Log__c
-            FROM Import_Batch__c
-            WHERE Id = :batch.Id
-            WITH SYSTEM_MODE
-            LIMIT 1
-            FOR UPDATE
-        ];
-        if (!ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(locked.Status__c)) {
-            throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Import_ErrorDryRunFirst'));
-        }
-        Import_Batch__c job = jobFields(checked, count, count);
-        job.Id = batch.Id;
-        if (String.isNotBlank(locked.Run_Log__c)) {
-            job.Run_Log__c = (locked.Run_Log__c + '\n' + job.Run_Log__c).right(32768);
-        }
-        Database.update(job, AccessLevel.SYSTEM_MODE);
-        return DataJobs.launch(new BulkDeleteBatch(job.Id), job);
-    }
+	/**
+	 * Starts the bulk delete of a delete by file's Matched rows (R-BD7): refused unless the
+	 * count typed is the number of Matched rows and within the run limit. The import batch
+	 * becomes the bulk delete job, so it leaves the import history.
+	 */
+	public static Import_Batch__c startFromFile(Id batchId, Integer confirmedCount) {
+		Import_Batch__c batch = dryRunOfFile(batchId);
+		Plan checked = planForFile(objectOfFile(batch));
+		Integer count = matchedRows(batch.Id);
+		if (count == 0) {
+			throw new BulkDeleteException(
+				BarnHelp.text('Core', 'Core_BulkDelete_ErrorNothingMatches')
+			);
+		}
+		Integer ceiling = runLimit();
+		if (count > ceiling) {
+			throw new BulkDeleteException(overLimit(ceiling));
+		}
+		if (confirmedCount != count) {
+			throw new BulkDeleteException(
+				String.format(
+					BarnHelp.text('Core', 'Core_Import_ErrorDeleteCountDiffers'),
+					new List<Object>{ count.format() }
+				)
+			);
+		}
+		// Locked, so two starts at once cannot both find the dry run complete (R-IB13).
+		Import_Batch__c locked = [
+			SELECT Id, Status__c, Run_Log__c
+			FROM Import_Batch__c
+			WHERE Id = :batch.Id
+			WITH SYSTEM_MODE
+			LIMIT 1
+			FOR UPDATE
+		];
+		if (!ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(locked.Status__c)) {
+			throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Import_ErrorDryRunFirst'));
+		}
+		Import_Batch__c job = jobFields(checked, count, count);
+		job.Id = batch.Id;
+		if (String.isNotBlank(locked.Run_Log__c)) {
+			job.Run_Log__c = (locked.Run_Log__c + '\n' + job.Run_Log__c).right(32768);
+		}
+		Database.update(job, AccessLevel.SYSTEM_MODE);
+		return DataJobs.launch(new BulkDeleteBatch(job.Id), job);
+	}
 
-    /**
-     * The records a delete by file's chunk names, read again as the person: a record deleted or
-     * hidden since the dry run is not returned. Object and field names come from describe.
-     */
-    public static List<SObject> readAgain(Plan checked, Set<Id> ids) {
-        if (ids.isEmpty()) {
-            return new List<SObject>();
-        }
-        return Database.queryWithBinds(
-            'SELECT ' +
-                String.join(new List<String>(checked.readFields()), ', ') +
-                ' FROM ' +
-                checked.objectName +
-                ' WHERE Id IN :ids',
-            new Map<String, Object>{ 'ids' => ids },
-            AccessLevel.USER_MODE
-        );
-    }
+	/**
+	 * The records a delete by file's chunk names, read again as the person: a record deleted or
+	 * hidden since the dry run is not returned. Object and field names come from describe.
+	 */
+	public static List<SObject> readAgain(Plan checked, Set<Id> ids) {
+		if (ids.isEmpty()) {
+			return new List<SObject>();
+		}
+		return Database.queryWithBinds(
+			'SELECT ' +
+				String.join(new List<String>(checked.readFields()), ', ') +
+				' FROM ' +
+				checked.objectName +
+				' WHERE Id IN :ids',
+			new Map<String, Object>{ 'ids' => ids },
+			AccessLevel.USER_MODE
+		);
+	}
 
-    /** A completed dry run of a delete by file, read as the person, or refused. */
-    private static Import_Batch__c dryRunOfFile(Id batchId) {
-        Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
-        if (batch == null) {
-            throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'));
-        }
-        if (!ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(batch.Status__c)) {
-            throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Import_ErrorDryRunFirst'));
-        }
-        return batch;
-    }
+	/** A completed dry run of a delete by file, read as the person, or refused. */
+	private static Import_Batch__c dryRunOfFile(Id batchId) {
+		Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
+		if (batch == null) {
+			throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'));
+		}
+		if (!ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(batch.Status__c)) {
+			throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Import_ErrorDryRunFirst'));
+		}
+		return batch;
+	}
 
-    /** The object a delete by file's template names, or refused when it does not delete. */
-    private static String objectOfFile(Import_Batch__c batch) {
-        Import_Template__c template = ImportTemplateSelector.selectById(batch.Import_Template__c);
-        Schema.SObjectType type = ImportObjectSchema.typeOf(template);
-        if (
-            type == null ||
-            ImportObjectSchema.operationOf(template) != ImportObjectSchema.OPERATION_DELETE
-        ) {
-            throw new BulkDeleteException(
-                BarnHelp.text('Core', 'Core_Import_ErrorNotDeleteByFile')
-            );
-        }
-        return type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
-    }
+	/** The object a delete by file's template names, or refused when it does not delete. */
+	private static String objectOfFile(Import_Batch__c batch) {
+		Import_Template__c template = ImportTemplateSelector.selectById(batch.Import_Template__c);
+		Schema.SObjectType type = ImportObjectSchema.typeOf(template);
+		if (
+			type == null ||
+			ImportObjectSchema.operationOf(template) != ImportObjectSchema.OPERATION_DELETE
+		) {
+			throw new BulkDeleteException(
+				BarnHelp.text('Core', 'Core_Import_ErrorNotDeleteByFile')
+			);
+		}
+		return type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
+	}
 
-    /** How many rows the dry run Matched: the records a delete by file deletes. */
-    private static Integer matchedRows(Id batchId) {
-        Integer matched = ImportBatchSelector.countRowsByStatus(batchId)
-            .get(ImportRowProcessor.STATUS_MATCHED);
-        return matched == null ? 0 : matched;
-    }
+	/** How many rows the dry run Matched: the records a delete by file deletes. */
+	private static Integer matchedRows(Id batchId) {
+		Integer matched = ImportBatchSelector.countRowsByStatus(batchId)
+			.get(ImportRowProcessor.STATUS_MATCHED);
+		return matched == null ? 0 : matched;
+	}
 
-    // -------------------------------------------------------------------------------------
-    // Download these records first (R-BD8)
-    // -------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------------------
+	// Download these records first (R-BD8)
+	// -------------------------------------------------------------------------------------
 
-    /** Records read per page of a download: every readable field, so fewer than Find's. */
-    public static final Integer BACKUP_PAGE_SIZE = 200;
+	/** Records read per page of a download: every readable field, so fewer than Find's. */
+	public static final Integer BACKUP_PAGE_SIZE = 200;
 
-    /** One column of a download: a field the person may read. */
-    public class BackupColumn {
-        @AuraEnabled
-        public String fieldName;
-        @AuraEnabled
-        public String label;
-    }
+	/** One column of a download: a field the person may read. */
+	public class BackupColumn {
+		@AuraEnabled
+		public String fieldName;
+		@AuraEnabled
+		public String label;
+	}
 
-    /** One page of the records a delete would delete, with every field the person may read. */
-    public class BackupPage {
-        @AuraEnabled
-        public String objectName;
-        @AuraEnabled
-        public List<BackupColumn> columns = new List<BackupColumn>();
-        @AuraEnabled
-        public List<SObject> rows = new List<SObject>();
-        /** Where the next page starts; the browser sends it back. */
-        @AuraEnabled
-        public String lastId;
-        @AuraEnabled
-        public Boolean done = true;
-    }
+	/** One page of the records a delete would delete, with every field the person may read. */
+	public class BackupPage {
+		@AuraEnabled
+		public String objectName;
+		@AuraEnabled
+		public List<BackupColumn> columns = new List<BackupColumn>();
+		@AuraEnabled
+		public List<SObject> rows = new List<SObject>();
+		/** Where the next page starts; the browser sends it back. */
+		@AuraEnabled
+		public String lastId;
+		@AuraEnabled
+		public Boolean done = true;
+	}
 
-    /**
-     * One page of the records a bulk delete (a query document) or a delete by file (a batch's
-     * Matched rows) would delete, in Id order after `afterId`, read as the person with every
-     * field they may read. Nothing is written.
-     */
-    public static BackupPage backupPage(String queryJson, Id batchId, String afterId) {
-        Plan checked;
-        List<Id> ids = new List<Id>();
-        if (batchId != null) {
-            checked = planForFile(objectOfFile(dryRunOfFile(batchId)));
-            // The rows are the package's own bookkeeping (ADR-0021); the records are read below
-            // as the person.
-            for (
-                SObject row : Database.queryWithBinds(
-                    'SELECT Gift_Id__c FROM Import_Row__c WHERE Import_Batch__c = :batchId' +
-                        ' AND Status__c = :matched AND Gift_Id__c != NULL' +
-                        (String.isBlank(afterId) ? '' : ' AND Gift_Id__c > :after') +
-                        ' ORDER BY Gift_Id__c LIMIT :pageSize',
-                    new Map<String, Object>{
-                        'batchId' => batchId,
-                        'matched' => ImportRowProcessor.STATUS_MATCHED,
-                        'after' => afterId,
-                        'pageSize' => BACKUP_PAGE_SIZE
-                    },
-                    AccessLevel.SYSTEM_MODE
-                )
-            ) {
-                ids.add(Id.valueOf((String) row.get('Gift_Id__c')));
-            }
-        } else {
-            checked = plan(queryJson);
-            Id after = String.isBlank(afterId) ? null : Id.valueOf(afterId);
-            for (
-                SObject record : QueryCompiler.run(
-                    QueryCompiler.compileIdPage(queryJson, after, BACKUP_PAGE_SIZE)
-                )
-            ) {
-                ids.add(record.Id);
-            }
-        }
-        BackupPage page = new BackupPage();
-        page.objectName = checked.objectName;
-        List<String> fieldNames = new List<String>();
-        for (Schema.DescribeFieldResult field : backupFields(checked.objectType)) {
-            BackupColumn column = new BackupColumn();
-            column.fieldName = field.getName();
-            column.label = field.getLabel();
-            page.columns.add(column);
-            fieldNames.add(column.fieldName);
-        }
-        page.done = ids.size() < BACKUP_PAGE_SIZE;
-        page.lastId = ids.isEmpty() ? afterId : String.valueOf(ids[ids.size() - 1]);
-        if (!ids.isEmpty()) {
-            page.rows = Database.queryWithBinds(
-                'SELECT ' +
-                    String.join(fieldNames, ', ') +
-                    ' FROM ' +
-                    checked.objectName +
-                    ' WHERE Id IN :ids ORDER BY Id',
-                new Map<String, Object>{ 'ids' => ids },
-                AccessLevel.USER_MODE
-            );
-        }
-        return page;
-    }
+	/**
+	 * One page of the records a bulk delete (a query document) or a delete by file (a batch's
+	 * Matched rows) would delete, in Id order after `afterId`, read as the person with every
+	 * field they may read. Nothing is written.
+	 */
+	public static BackupPage backupPage(String queryJson, Id batchId, String afterId) {
+		Plan checked;
+		List<Id> ids = new List<Id>();
+		if (batchId != null) {
+			checked = planForFile(objectOfFile(dryRunOfFile(batchId)));
+			// The rows are the package's own bookkeeping (ADR-0021); the records are read below
+			// as the person.
+			for (
+				SObject row : Database.queryWithBinds(
+					'SELECT Gift_Id__c FROM Import_Row__c WHERE Import_Batch__c = :batchId' +
+						' AND Status__c = :matched AND Gift_Id__c != NULL' +
+						(String.isBlank(afterId) ? '' : ' AND Gift_Id__c > :after') +
+						' ORDER BY Gift_Id__c LIMIT :pageSize',
+					new Map<String, Object>{
+						'batchId' => batchId,
+						'matched' => ImportRowProcessor.STATUS_MATCHED,
+						'after' => afterId,
+						'pageSize' => BACKUP_PAGE_SIZE
+					},
+					AccessLevel.SYSTEM_MODE
+				)
+			) {
+				ids.add(Id.valueOf((String) row.get('Gift_Id__c')));
+			}
+		} else {
+			checked = plan(queryJson);
+			Id after = String.isBlank(afterId) ? null : Id.valueOf(afterId);
+			for (
+				SObject record : QueryCompiler.run(
+					QueryCompiler.compileIdPage(queryJson, after, BACKUP_PAGE_SIZE)
+				)
+			) {
+				ids.add(record.Id);
+			}
+		}
+		BackupPage page = new BackupPage();
+		page.objectName = checked.objectName;
+		List<String> fieldNames = new List<String>();
+		for (Schema.DescribeFieldResult field : backupFields(checked.objectType)) {
+			BackupColumn column = new BackupColumn();
+			column.fieldName = field.getName();
+			column.label = field.getLabel();
+			page.columns.add(column);
+			fieldNames.add(column.fieldName);
+		}
+		page.done = ids.size() < BACKUP_PAGE_SIZE;
+		page.lastId = ids.isEmpty() ? afterId : String.valueOf(ids[ids.size() - 1]);
+		if (!ids.isEmpty()) {
+			page.rows = Database.queryWithBinds(
+				'SELECT ' +
+					String.join(fieldNames, ', ') +
+					' FROM ' +
+					checked.objectName +
+					' WHERE Id IN :ids ORDER BY Id',
+				new Map<String, Object>{ 'ids' => ids },
+				AccessLevel.USER_MODE
+			);
+		}
+		return page;
+	}
 
-    /**
-     * The fields a download holds: every field the person may read, Id first, leaving out
-     * compound address and location fields (their parts are listed) and binary content.
-     */
-    @TestVisible
-    private static List<Schema.DescribeFieldResult> backupFields(Schema.SObjectType type) {
-        List<Schema.DescribeFieldResult> result = new List<Schema.DescribeFieldResult>();
-        List<Schema.DescribeFieldResult> others = new List<Schema.DescribeFieldResult>();
-        for (Schema.SObjectField token : type.getDescribe().fields.getMap().values()) {
-            Schema.DescribeFieldResult field = token.getDescribe();
-            Schema.DisplayType kind = field.getType();
-            if (
-                !field.isAccessible() ||
-                kind == Schema.DisplayType.ADDRESS ||
-                kind == Schema.DisplayType.LOCATION ||
-                kind == Schema.DisplayType.BASE64
-            ) {
-                continue;
-            }
-            if (field.getName() == 'Id') {
-                result.add(field);
-            } else {
-                others.add(field);
-            }
-        }
-        result.addAll(others);
-        return result;
-    }
+	/**
+	 * The fields a download holds: every field the person may read, Id first, leaving out
+	 * compound address and location fields (their parts are listed) and binary content.
+	 */
+	@TestVisible
+	private static List<Schema.DescribeFieldResult> backupFields(Schema.SObjectType type) {
+		List<Schema.DescribeFieldResult> result = new List<Schema.DescribeFieldResult>();
+		List<Schema.DescribeFieldResult> others = new List<Schema.DescribeFieldResult>();
+		for (Schema.SObjectField token : type.getDescribe().fields.getMap().values()) {
+			Schema.DescribeFieldResult field = token.getDescribe();
+			Schema.DisplayType kind = field.getType();
+			if (
+				!field.isAccessible() ||
+				kind == Schema.DisplayType.ADDRESS ||
+				kind == Schema.DisplayType.LOCATION ||
+				kind == Schema.DisplayType.BASE64
+			) {
+				continue;
+			}
+			if (field.getName() == 'Id') {
+				result.add(field);
+			} else {
+				others.add(field);
+			}
+		}
+		result.addAll(others);
+		return result;
+	}
 
-    // -------------------------------------------------------------------------------------
-    // Undo
-    // -------------------------------------------------------------------------------------
+	// -------------------------------------------------------------------------------------
+	// Undo
+	// -------------------------------------------------------------------------------------
 
-    /** What an undo of a bulk delete would bring back. */
-    public class UndoPreview {
-        @AuraEnabled
-        public Boolean allowed = false;
-        @AuraEnabled
-        public String reason;
-        /** The records the job deleted: the number the person confirms. */
-        @AuraEnabled
-        public Integer records = 0;
-    }
+	/** What an undo of a bulk delete would bring back. */
+	public class UndoPreview {
+		@AuraEnabled
+		public Boolean allowed = false;
+		@AuraEnabled
+		public String reason;
+		/** The records the job deleted: the number the person confirms. */
+		@AuraEnabled
+		public Integer records = 0;
+	}
 
-    /**
-     * Whether a bulk delete can be undone now and how many records it deleted (R-BD5), with the
-     * import undo's guards: once, within the Undo Deadline, not while it runs.
-     */
-    public static UndoPreview undoPreview(Id jobId) {
-        UndoPreview view = new UndoPreview();
-        Import_Batch__c job = jobById(jobId);
-        if (job != null && !OPERATION_DELETE.equals(job.Operation__c)) {
-            job = null;
-        }
-        view.reason = job == null
-            ? BarnHelp.text('Core', 'Core_BulkDelete_ErrorNotBulkDelete')
-            : ImportUndoService.refusal(job);
-        if (job == null) {
-            return view;
-        }
-        view.records = job.Rows_Deleted__c == null ? 0 : job.Rows_Deleted__c.intValue();
-        // A job the platform stopped before its finish counted keeps the journal's count.
-        if (view.records == 0) {
-            view.records = deletedEntries(job.Id);
-        }
-        if (String.isBlank(view.reason) && view.records == 0) {
-            view.reason = BarnHelp.text('Core', 'Core_BulkDelete_UndoNothing');
-        }
-        view.allowed = String.isBlank(view.reason);
-        return view;
-    }
+	/**
+	 * Whether a bulk delete can be undone now and how many records it deleted (R-BD5), with the
+	 * import undo's guards: once, within the Undo Deadline, not while it runs.
+	 */
+	public static UndoPreview undoPreview(Id jobId) {
+		UndoPreview view = new UndoPreview();
+		Import_Batch__c job = jobById(jobId);
+		if (job != null && !OPERATION_DELETE.equals(job.Operation__c)) {
+			job = null;
+		}
+		view.reason = job == null
+			? BarnHelp.text('Core', 'Core_BulkDelete_ErrorNotBulkDelete')
+			: ImportUndoService.refusal(job);
+		if (job == null) {
+			return view;
+		}
+		view.records = job.Rows_Deleted__c == null ? 0 : job.Rows_Deleted__c.intValue();
+		// A job the platform stopped before its finish counted keeps the journal's count.
+		if (view.records == 0) {
+			view.records = deletedEntries(job.Id);
+		}
+		if (String.isBlank(view.reason) && view.records == 0) {
+			view.reason = BarnHelp.text('Core', 'Core_BulkDelete_UndoNothing');
+		}
+		view.allowed = String.isBlank(view.reason);
+		return view;
+	}
 
-    /**
-     * Starts the undo after checking every guard again and that the number of records is the
-     * number the person was shown; takes the once-only latch first (R-BD5).
-     */
-    public static Id undo(Id jobId, Integer confirmedRecords) {
-        UndoPreview view = undoPreview(jobId);
-        if (!view.allowed) {
-            throw new BulkDeleteException(view.reason);
-        }
-        if (confirmedRecords != view.records) {
-            throw new BulkDeleteException(
-                String.format(
-                    BarnHelp.text('Core', 'Core_BulkDelete_UndoCountChanged'),
-                    new List<Object>{
-                        String.valueOf(confirmedRecords == null ? 0 : confirmedRecords),
-                        String.valueOf(view.records)
-                    }
-                )
-            );
-        }
-        ImportUndoService.latch(jobId);
-        return Database.executeBatch(new BulkDeleteUndoBatch(jobId, view.records), 1);
-    }
+	/**
+	 * Starts the undo after checking every guard again and that the number of records is the
+	 * number the person was shown; takes the once-only latch first (R-BD5).
+	 */
+	public static Id undo(Id jobId, Integer confirmedRecords) {
+		UndoPreview view = undoPreview(jobId);
+		if (!view.allowed) {
+			throw new BulkDeleteException(view.reason);
+		}
+		if (confirmedRecords != view.records) {
+			throw new BulkDeleteException(
+				String.format(
+					BarnHelp.text('Core', 'Core_BulkDelete_UndoCountChanged'),
+					new List<Object>{
+						String.valueOf(confirmedRecords == null ? 0 : confirmedRecords),
+						String.valueOf(view.records)
+					}
+				)
+			);
+		}
+		ImportUndoService.latch(jobId);
+		return Database.executeBatch(new BulkDeleteUndoBatch(jobId, view.records), 1);
+	}
 
-    /** A data job by Id, with the fields the undo guards read, in system mode (ADR-0021). */
-    private static Import_Batch__c jobById(Id jobId) {
-        List<Import_Batch__c> found = [
-            SELECT
-                Id,
-                Status__c,
-                Is_Dry_Run__c,
-                Undo_Deadline__c,
-                Completed_At__c,
-                Job_Id__c,
-                Operation__c,
-                Rows_Deleted__c
-            FROM Import_Batch__c
-            WHERE Id = :jobId
-            WITH SYSTEM_MODE
-            LIMIT 1
-        ];
-        return found.isEmpty() ? null : found[0];
-    }
+	/** A data job by Id, with the fields the undo guards read, in system mode (ADR-0021). */
+	private static Import_Batch__c jobById(Id jobId) {
+		List<Import_Batch__c> found = [
+			SELECT
+				Id,
+				Status__c,
+				Is_Dry_Run__c,
+				Undo_Deadline__c,
+				Completed_At__c,
+				Job_Id__c,
+				Operation__c,
+				Rows_Deleted__c
+			FROM Import_Batch__c
+			WHERE Id = :jobId
+			WITH SYSTEM_MODE
+			LIMIT 1
+		];
+		return found.isEmpty() ? null : found[0];
+	}
 
-    /** How many Deleted entries a job's commit journal holds. */
-    private static Integer deletedEntries(Id jobId) {
-        return ImportJournalService.actionCount(
-            jobId,
-            ImportJournalService.PHASE_COMMIT,
-            ImportJournalService.ACTION_DELETED
-        );
-    }
+	/** How many Deleted entries a job's commit journal holds. */
+	private static Integer deletedEntries(Id jobId) {
+		return ImportJournalService.actionCount(
+			jobId,
+			ImportJournalService.PHASE_COMMIT,
+			ImportJournalService.ACTION_DELETED
+		);
+	}
 
-    /** The undo deadline of a bulk delete started at `startedAt` (R-BD2). */
-    public static Datetime undoDeadlineFrom(Datetime startedAt) {
-        return startedAt.addDays(Math.min(ImportBatchService.undoWindowDays(), RECYCLE_BIN_DAYS));
-    }
+	/** The undo deadline of a bulk delete started at `startedAt` (R-BD2). */
+	public static Datetime undoDeadlineFrom(Datetime startedAt) {
+		return startedAt.addDays(Math.min(ImportBatchService.undoWindowDays(), RECYCLE_BIN_DAYS));
+	}
 
-    /** The run limit from BarnCRM Settings, held between 1 and MAX_RUN_LIMIT (R-BD2). */
-    public static Integer runLimit() {
-        return DataJobs.wholeNumberSetting(
-            'Bulk_Delete_Run_Limit__c',
-            DEFAULT_RUN_LIMIT,
-            1,
-            MAX_RUN_LIMIT
-        );
-    }
+	/** The run limit from BarnCRM Settings, held between 1 and MAX_RUN_LIMIT (R-BD2). */
+	public static Integer runLimit() {
+		return DataJobs.wholeNumberSetting(
+			'Bulk_Delete_Run_Limit__c',
+			DEFAULT_RUN_LIMIT,
+			1,
+			MAX_RUN_LIMIT
+		);
+	}
 
-    public static String overLimit(Integer ceiling) {
-        return String.format(
-            BarnHelp.text('Core', 'Core_BulkDelete_ErrorOverLimit'),
-            new List<Object>{ ceiling.format() }
-        );
-    }
+	public static String overLimit(Integer ceiling) {
+		return String.format(
+			BarnHelp.text('Core', 'Core_BulkDelete_ErrorOverLimit'),
+			new List<Object>{ ceiling.format() }
+		);
+	}
 }

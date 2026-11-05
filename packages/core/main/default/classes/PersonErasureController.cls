@@ -4,37 +4,37 @@
  * unexpected into the generic message, logged.
  */
 public with sharing class PersonErasureController {
-    /** What erasing this person would change, with nothing changed. */
-    @AuraEnabled
-    public static PersonErasure.Result preview(Id personId) {
-        try {
-            return PersonErasure.preview(personId);
-        } catch (Exception failed) {
-            throw asUserError(failed, personId);
-        }
-    }
+	/** What erasing this person would change, with nothing changed. */
+	@AuraEnabled
+	public static PersonErasure.Result preview(Id personId) {
+		try {
+			return PersonErasure.preview(personId);
+		} catch (Exception failed) {
+			throw asUserError(failed, personId);
+		}
+	}
 
-    /** Erases the person, once the typed name matches. */
-    @AuraEnabled
-    public static PersonErasure.Result erase(
-        Id personId,
-        String typedName,
-        String requestReference
-    ) {
-        try {
-            return PersonErasure.erase(personId, typedName, requestReference);
-        } catch (Exception failed) {
-            throw asUserError(failed, personId);
-        }
-    }
+	/** Erases the person, once the typed name matches. */
+	@AuraEnabled
+	public static PersonErasure.Result erase(
+		Id personId,
+		String typedName,
+		String requestReference
+	) {
+		try {
+			return PersonErasure.erase(personId, typedName, requestReference);
+		} catch (Exception failed) {
+			throw asUserError(failed, personId);
+		}
+	}
 
-    private static AuraHandledException asUserError(Exception failed, Id personId) {
-        return UserErrors.wrap(
-            failed,
-            failed instanceof PersonErasure.ErasureException,
-            'PersonErasureController',
-            personId,
-            BarnHelp.text('Core', 'Core_Households_ErrorUnexpected')
-        );
-    }
+	private static AuraHandledException asUserError(Exception failed, Id personId) {
+		return UserErrors.wrap(
+			failed,
+			failed instanceof PersonErasure.ErasureException,
+			'PersonErasureController',
+			personId,
+			BarnHelp.text('Core', 'Core_Households_ErrorUnexpected')
+		);
+	}
 }

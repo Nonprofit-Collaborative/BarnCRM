@@ -6,237 +6,237 @@
  */
 @IsTest(testFor='ApexClass:HealthCheckHouseholdChecks, ApexClass:PersonLinkOrphanSelector')
 private class HealthCheckPersonLinkChecksTest {
-    @TestSetup
-    static void createTestUser() {
-        TestUsers.admin();
-    }
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.admin();
+	}
 
-    private static final String RELATIONSHIP_KEY = 'relationships_without_person';
-    private static final String AFFILIATION_KEY = 'affiliations_without_person';
+	private static final String RELATIONSHIP_KEY = 'relationships_without_person';
+	private static final String AFFILIATION_KEY = 'affiliations_without_person';
 
-    /**
-     * Runs Health Check once as Maria and returns its findings by key. The run is the measured
-     * part, so it gets its own governor limits: the setup (hundreds of people, their links and
-     * the deletes, with every trigger, flow and module guard an org runs on them) is spent
-     * before Test.startTest, and an org with more automation than ours does not push one run
-     * over the query limit.
-     */
-    private static Map<String, HealthCheckService.Finding> runAsMaria() {
-        User maria = HealthCheckTestHelper.mariaWithManageSettings();
-        Map<String, HealthCheckService.Finding> byKey = new Map<String, HealthCheckService.Finding>();
-        Test.startTest();
-        System.runAs(maria) {
-            for (HealthCheckService.Finding finding : HealthCheckService.run()) {
-                byKey.put(finding.key, finding);
-            }
-        }
-        Test.stopTest();
-        return byKey;
-    }
+	/**
+	 * Runs Health Check once as Maria and returns its findings by key. The run is the measured
+	 * part, so it gets its own governor limits: the setup (hundreds of people, their links and
+	 * the deletes, with every trigger, flow and module guard an org runs on them) is spent
+	 * before Test.startTest, and an org with more automation than ours does not push one run
+	 * over the query limit.
+	 */
+	private static Map<String, HealthCheckService.Finding> runAsMaria() {
+		User maria = HealthCheckTestHelper.mariaWithManageSettings();
+		Map<String, HealthCheckService.Finding> byKey = new Map<String, HealthCheckService.Finding>();
+		Test.startTest();
+		System.runAs(maria) {
+			for (HealthCheckService.Finding finding : HealthCheckService.run()) {
+				byKey.put(finding.key, finding);
+			}
+		}
+		Test.stopTest();
+		return byKey;
+	}
 
-    private static List<Relationship__c> relationshipsBetween(
-        List<Contact> people,
-        List<Contact> others
-    ) {
-        List<Relationship__c> rows = new List<Relationship__c>();
-        for (Integer i = 0; i < people.size(); i++) {
-            Relationship__c row = RelationshipTestDataFactory.between(
-                people[i],
-                others[i],
-                'Sibling'
-            );
-            row.Is_Reciprocal_Managed__c = false;
-            rows.add(row);
-        }
-        insert rows;
-        return rows;
-    }
+	private static List<Relationship__c> relationshipsBetween(
+		List<Contact> people,
+		List<Contact> others
+	) {
+		List<Relationship__c> rows = new List<Relationship__c>();
+		for (Integer i = 0; i < people.size(); i++) {
+			Relationship__c row = RelationshipTestDataFactory.between(
+				people[i],
+				others[i],
+				'Sibling'
+			);
+			row.Is_Reciprocal_Managed__c = false;
+			rows.add(row);
+		}
+		insert rows;
+		return rows;
+	}
 
-    @IsTest
-    static void aRelationshipWhoseRelatedPersonWasDeletedIsReported() {
-        System.runAs(TestUsers.admin()) {
-            RelationshipTestDataFactory.quietOtherAutomations();
-            List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-            List<Contact> others = RelationshipTestDataFactory.contacts(2, 'Lee');
-            List<Relationship__c> rows = relationshipsBetween(people, others);
+	@IsTest
+	static void aRelationshipWhoseRelatedPersonWasDeletedIsReported() {
+		System.runAs(TestUsers.admin()) {
+			RelationshipTestDataFactory.quietOtherAutomations();
+			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
+			List<Contact> others = RelationshipTestDataFactory.contacts(2, 'Lee');
+			List<Relationship__c> rows = relationshipsBetween(people, others);
 
-            delete others[0];
+			delete others[0];
 
-            HealthCheckService.Finding finding = runAsMaria().get(RELATIONSHIP_KEY);
+			HealthCheckService.Finding finding = runAsMaria().get(RELATIONSHIP_KEY);
 
-            Assert.isNotNull(finding, 'A relationship with nobody on one side is reported.');
-            Assert.isTrue(finding.title.startsWith('1 '), 'One of the two: ' + finding.title);
-            Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.severity, 'A warning.');
-            Assert.isNull(finding.fixTarget, 'Detection only: there is no fix button.');
-            Assert.areEqual(1, finding.links.size(), 'It is linked.');
-            Assert.areEqual(
-                '/lightning/r/Relationship__c/' + rows[0].Id + '/view',
-                finding.links[0].url,
-                'To the relationship record page.'
-            );
-            Assert.isTrue(
-                finding.detail.contains(
-                    BarnHelp.text('Core', 'Core_HealthCheck_RelationshipsNoPersonDetailOne')
-                ),
-                'It says what to do next.'
-            );
-        }
-    }
+			Assert.isNotNull(finding, 'A relationship with nobody on one side is reported.');
+			Assert.isTrue(finding.title.startsWith('1 '), 'One of the two: ' + finding.title);
+			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.severity, 'A warning.');
+			Assert.isNull(finding.fixTarget, 'Detection only: there is no fix button.');
+			Assert.areEqual(1, finding.links.size(), 'It is linked.');
+			Assert.areEqual(
+				'/lightning/r/Relationship__c/' + rows[0].Id + '/view',
+				finding.links[0].url,
+				'To the relationship record page.'
+			);
+			Assert.isTrue(
+				finding.detail.contains(
+					BarnHelp.text('Core', 'Core_HealthCheck_RelationshipsNoPersonDetailOne')
+				),
+				'It says what to do next.'
+			);
+		}
+	}
 
-    @IsTest
-    static void aRelationshipWhoseOwnerPersonWasDeletedIsReported() {
-        System.runAs(TestUsers.admin()) {
-            RelationshipTestDataFactory.quietOtherAutomations();
-            List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
-            List<Contact> others = RelationshipTestDataFactory.contacts(1, 'Lee');
-            relationshipsBetween(people, others);
+	@IsTest
+	static void aRelationshipWhoseOwnerPersonWasDeletedIsReported() {
+		System.runAs(TestUsers.admin()) {
+			RelationshipTestDataFactory.quietOtherAutomations();
+			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
+			List<Contact> others = RelationshipTestDataFactory.contacts(1, 'Lee');
+			relationshipsBetween(people, others);
 
-            delete people;
+			delete people;
 
-            HealthCheckService.Finding finding = runAsMaria().get(RELATIONSHIP_KEY);
+			HealthCheckService.Finding finding = runAsMaria().get(RELATIONSHIP_KEY);
 
-            Assert.isNotNull(finding, 'A blank person on the owner side is reported too.');
-            Assert.isTrue(finding.title.startsWith('1 '), finding.title);
-        }
-    }
+			Assert.isNotNull(finding, 'A blank person on the owner side is reported too.');
+			Assert.isTrue(finding.title.startsWith('1 '), finding.title);
+		}
+	}
 
-    @IsTest
-    static void relationshipsBetweenPeopleWhoStillExistAreNotReported() {
-        System.runAs(TestUsers.admin()) {
-            RelationshipTestDataFactory.quietOtherAutomations();
-            List<Contact> people = RelationshipTestDataFactory.contacts(3, 'Garcia');
-            List<Contact> others = RelationshipTestDataFactory.contacts(3, 'Lee');
-            relationshipsBetween(people, others);
+	@IsTest
+	static void relationshipsBetweenPeopleWhoStillExistAreNotReported() {
+		System.runAs(TestUsers.admin()) {
+			RelationshipTestDataFactory.quietOtherAutomations();
+			List<Contact> people = RelationshipTestDataFactory.contacts(3, 'Garcia');
+			List<Contact> others = RelationshipTestDataFactory.contacts(3, 'Lee');
+			relationshipsBetween(people, others);
 
-            Map<String, HealthCheckService.Finding> findings = runAsMaria();
+			Map<String, HealthCheckService.Finding> findings = runAsMaria();
 
-            Assert.isNull(findings.get(RELATIONSHIP_KEY), 'Nothing is blank, so nothing is shown.');
-            Assert.isNull(findings.get(AFFILIATION_KEY), 'Nor for affiliations.');
-        }
-    }
+			Assert.isNull(findings.get(RELATIONSHIP_KEY), 'Nothing is blank, so nothing is shown.');
+			Assert.isNull(findings.get(AFFILIATION_KEY), 'Nor for affiliations.');
+		}
+	}
 
-    @IsTest
-    static void anAffiliationWhoseContactStillExistsIsNotReported() {
-        System.runAs(TestUsers.admin()) {
-            RelationshipTestDataFactory.quietOtherAutomations();
-            List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
-            List<Account> organizations = RelationshipTestDataFactory.organizations(1, 'Acme');
-            insert RelationshipTestDataFactory.affiliation(people[0], organizations[0], 'Officer');
+	@IsTest
+	static void anAffiliationWhoseContactStillExistsIsNotReported() {
+		System.runAs(TestUsers.admin()) {
+			RelationshipTestDataFactory.quietOtherAutomations();
+			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
+			List<Account> organizations = RelationshipTestDataFactory.organizations(1, 'Acme');
+			insert RelationshipTestDataFactory.affiliation(people[0], organizations[0], 'Officer');
 
-            Assert.isNull(runAsMaria().get(AFFILIATION_KEY), 'The person is still there.');
-        }
-    }
+			Assert.isNull(runAsMaria().get(AFFILIATION_KEY), 'The person is still there.');
+		}
+	}
 
-    @IsTest
-    static void anAffiliationWhoseContactWasDeletedIsReported() {
-        System.runAs(TestUsers.admin()) {
-            RelationshipTestDataFactory.quietOtherAutomations();
-            List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
-            List<Account> organizations = RelationshipTestDataFactory.organizations(1, 'Acme');
-            List<Affiliation__c> rows = new List<Affiliation__c>{
-                RelationshipTestDataFactory.affiliation(people[0], organizations[0], 'Officer'),
-                RelationshipTestDataFactory.affiliation(people[1], organizations[0], 'Member')
-            };
-            insert rows;
+	@IsTest
+	static void anAffiliationWhoseContactWasDeletedIsReported() {
+		System.runAs(TestUsers.admin()) {
+			RelationshipTestDataFactory.quietOtherAutomations();
+			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
+			List<Account> organizations = RelationshipTestDataFactory.organizations(1, 'Acme');
+			List<Affiliation__c> rows = new List<Affiliation__c>{
+				RelationshipTestDataFactory.affiliation(people[0], organizations[0], 'Officer'),
+				RelationshipTestDataFactory.affiliation(people[1], organizations[0], 'Member')
+			};
+			insert rows;
 
-            delete people[0];
+			delete people[0];
 
-            HealthCheckService.Finding finding = runAsMaria().get(AFFILIATION_KEY);
+			HealthCheckService.Finding finding = runAsMaria().get(AFFILIATION_KEY);
 
-            Assert.isNotNull(finding, 'An affiliation with no person is reported.');
-            Assert.isTrue(finding.title.startsWith('1 '), finding.title);
-            Assert.areEqual(
-                '/lightning/r/Affiliation__c/' + rows[0].Id + '/view',
-                finding.links[0].url,
-                'To the affiliation record page.'
-            );
-            Assert.isTrue(
-                finding.detail.contains(
-                    BarnHelp.text('Core', 'Core_HealthCheck_AffiliationsNoPersonDetailOne')
-                ),
-                'It says what to do next.'
-            );
-        }
-    }
+			Assert.isNotNull(finding, 'An affiliation with no person is reported.');
+			Assert.isTrue(finding.title.startsWith('1 '), finding.title);
+			Assert.areEqual(
+				'/lightning/r/Affiliation__c/' + rows[0].Id + '/view',
+				finding.links[0].url,
+				'To the affiliation record page.'
+			);
+			Assert.isTrue(
+				finding.detail.contains(
+					BarnHelp.text('Core', 'Core_HealthCheck_AffiliationsNoPersonDetailOne')
+				),
+				'It says what to do next.'
+			);
+		}
+	}
 
-    @IsTest
-    static void twoHundredRelationshipsAndAffiliationsLeftBlankAreCountedAndFiveLinked() {
-        System.runAs(TestUsers.admin()) {
-            RelationshipTestDataFactory.quietOtherAutomations();
-            List<Contact> people = RelationshipTestDataFactory.contacts(200, 'Garcia');
-            List<Contact> others = RelationshipTestDataFactory.contacts(200, 'Lee');
-            List<Account> organizations = RelationshipTestDataFactory.organizations(1, 'Acme');
-            relationshipsBetween(people, others);
-            List<Affiliation__c> affiliations = new List<Affiliation__c>();
-            for (Contact person : people) {
-                affiliations.add(
-                    RelationshipTestDataFactory.affiliation(person, organizations[0], 'Member')
-                );
-            }
-            insert affiliations;
+	@IsTest
+	static void twoHundredRelationshipsAndAffiliationsLeftBlankAreCountedAndFiveLinked() {
+		System.runAs(TestUsers.admin()) {
+			RelationshipTestDataFactory.quietOtherAutomations();
+			List<Contact> people = RelationshipTestDataFactory.contacts(200, 'Garcia');
+			List<Contact> others = RelationshipTestDataFactory.contacts(200, 'Lee');
+			List<Account> organizations = RelationshipTestDataFactory.organizations(1, 'Acme');
+			relationshipsBetween(people, others);
+			List<Affiliation__c> affiliations = new List<Affiliation__c>();
+			for (Contact person : people) {
+				affiliations.add(
+					RelationshipTestDataFactory.affiliation(person, organizations[0], 'Member')
+				);
+			}
+			insert affiliations;
 
-            delete others;
-            delete people;
+			delete others;
+			delete people;
 
-            Map<String, HealthCheckService.Finding> findings = runAsMaria();
-            HealthCheckService.Finding relationships = findings.get(RELATIONSHIP_KEY);
-            HealthCheckService.Finding affiliationFinding = findings.get(AFFILIATION_KEY);
+			Map<String, HealthCheckService.Finding> findings = runAsMaria();
+			HealthCheckService.Finding relationships = findings.get(RELATIONSHIP_KEY);
+			HealthCheckService.Finding affiliationFinding = findings.get(AFFILIATION_KEY);
 
-            Assert.isTrue(relationships.title.startsWith('200 '), relationships.title);
-            Assert.areEqual(5, relationships.links.size(), 'Five are linked.');
-            Assert.isTrue(affiliationFinding.title.startsWith('200 '), affiliationFinding.title);
-            Assert.areEqual(5, affiliationFinding.links.size(), 'Five are linked.');
-        }
-    }
+			Assert.isTrue(relationships.title.startsWith('200 '), relationships.title);
+			Assert.areEqual(5, relationships.links.size(), 'Five are linked.');
+			Assert.isTrue(affiliationFinding.title.startsWith('200 '), affiliationFinding.title);
+			Assert.areEqual(5, affiliationFinding.links.size(), 'Five are linked.');
+		}
+	}
 
-    @IsTest
-    static void theCountStopsAtTheCapAndSaysMoreThan() {
-        System.runAs(TestUsers.admin()) {
-            RelationshipTestDataFactory.quietOtherAutomations();
-            List<Contact> people = RelationshipTestDataFactory.contacts(3, 'Garcia');
-            List<Account> organizations = RelationshipTestDataFactory.organizations(1, 'Acme');
-            List<Affiliation__c> affiliations = new List<Affiliation__c>();
-            for (Contact person : people) {
-                affiliations.add(
-                    RelationshipTestDataFactory.affiliation(person, organizations[0], 'Member')
-                );
-            }
-            insert affiliations;
-            delete people;
-            HealthCheckHouseholdChecks.countCap = 2;
+	@IsTest
+	static void theCountStopsAtTheCapAndSaysMoreThan() {
+		System.runAs(TestUsers.admin()) {
+			RelationshipTestDataFactory.quietOtherAutomations();
+			List<Contact> people = RelationshipTestDataFactory.contacts(3, 'Garcia');
+			List<Account> organizations = RelationshipTestDataFactory.organizations(1, 'Acme');
+			List<Affiliation__c> affiliations = new List<Affiliation__c>();
+			for (Contact person : people) {
+				affiliations.add(
+					RelationshipTestDataFactory.affiliation(person, organizations[0], 'Member')
+				);
+			}
+			insert affiliations;
+			delete people;
+			HealthCheckHouseholdChecks.countCap = 2;
 
-            HealthCheckService.Finding finding = runAsMaria().get(AFFILIATION_KEY);
+			HealthCheckService.Finding finding = runAsMaria().get(AFFILIATION_KEY);
 
-            Assert.isTrue(
-                finding.title.startsWith(
-                    String.format(
-                        System.Label.Core_HealthCheck_OrphansMoreThan,
-                        new List<Object>{ '2' }
-                    )
-                ),
-                'Past the cap it says more than: ' + finding.title
-            );
-        }
-    }
+			Assert.isTrue(
+				finding.title.startsWith(
+					String.format(
+						System.Label.Core_HealthCheck_OrphansMoreThan,
+						new List<Object>{ '2' }
+					)
+				),
+				'Past the cap it says more than: ' + finding.title
+			);
+		}
+	}
 
-    @IsTest
-    static void theFindingsAreShownOnlyToSomebodyWhoManagesSettings() {
-        System.runAs(TestUsers.admin()) {
-            RelationshipTestDataFactory.quietOtherAutomations();
-            List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
-            List<Account> organizations = RelationshipTestDataFactory.organizations(1, 'Acme');
-            insert RelationshipTestDataFactory.affiliation(people[0], organizations[0], 'Officer');
-            delete people;
-            User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
+	@IsTest
+	static void theFindingsAreShownOnlyToSomebodyWhoManagesSettings() {
+		System.runAs(TestUsers.admin()) {
+			RelationshipTestDataFactory.quietOtherAutomations();
+			List<Contact> people = RelationshipTestDataFactory.contacts(1, 'Garcia');
+			List<Account> organizations = RelationshipTestDataFactory.organizations(1, 'Acme');
+			insert RelationshipTestDataFactory.affiliation(people[0], organizations[0], 'Officer');
+			delete people;
+			User priya = HealthCheckTestHelper.priyaWithoutManageSettings();
 
-            Test.startTest();
-            System.runAs(priya) {
-                for (HealthCheckService.Finding finding : HealthCheckService.run()) {
-                    Assert.areNotEqual(RELATIONSHIP_KEY, finding.key, 'Hidden from her.');
-                    Assert.areNotEqual(AFFILIATION_KEY, finding.key, 'Hidden from her.');
-                }
-            }
-            Test.stopTest();
-        }
-    }
+			Test.startTest();
+			System.runAs(priya) {
+				for (HealthCheckService.Finding finding : HealthCheckService.run()) {
+					Assert.areNotEqual(RELATIONSHIP_KEY, finding.key, 'Hidden from her.');
+					Assert.areNotEqual(AFFILIATION_KEY, finding.key, 'Hidden from her.');
+				}
+			}
+			Test.stopTest();
+		}
+	}
 }

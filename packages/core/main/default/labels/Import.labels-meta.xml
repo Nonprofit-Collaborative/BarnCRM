@@ -9,14 +9,6 @@
         <value>The rows of this import were removed because it finished longer ago than BarnCRM keeps them. Upload the file again to run it.</value>
     </labels>
     <labels>
-        <fullName>Core_Import_LogRowsNotRemoved</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error Log: rows cleanup could not delete; {0} is the count, {1} first reason</shortDescription>
-        <value>The import row cleanup could not remove {0} rows. The first: {1}</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_TargetHouseholdField</fullName>
         <categories>Import</categories>
         <language>en_US</language>

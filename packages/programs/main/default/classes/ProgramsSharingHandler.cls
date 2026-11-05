@@ -7,20 +7,20 @@
  */
 @NamespaceAccessible
 public with sharing class ProgramsSharingHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public ProgramsSharingHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public ProgramsSharingHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'ProgramsSharingHandler';
-    }
+	public override String getName() {
+		return 'ProgramsSharingHandler';
+	}
 
-    public override void afterInsert() {
-        ProgramsSharing.share(newRecords());
-    }
+	public override void afterInsert() {
+		ProgramsSharing.share(newRecords());
+	}
 
-    public override void afterUndelete() {
-        ProgramsSharing.share(newRecords());
-    }
+	public override void afterUndelete() {
+		ProgramsSharing.share(newRecords());
+	}
 }

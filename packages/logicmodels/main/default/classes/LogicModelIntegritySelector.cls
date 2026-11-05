@@ -9,23 +9,23 @@
  * dynamic query.
  */
 public without sharing class LogicModelIntegritySelector {
-    /**
-     * The models holding one of these scope keys, other than the ones being saved.
-     *
-     * @param scopeKeys the scope keys being claimed
-     * @param excluded the models being saved, which may keep their own key
-     * @return the models already holding a key
-     */
-    public static List<Logic_Model__c> selectByScopeKeys(Set<String> scopeKeys, Set<Id> excluded) {
-        if (scopeKeys == null || scopeKeys.isEmpty()) {
-            return new List<Logic_Model__c>();
-        }
-        Set<Id> skip = excluded == null ? new Set<Id>() : excluded;
-        return [
-            SELECT Id, Scope_Key__c
-            FROM Logic_Model__c
-            WHERE Scope_Key__c IN :scopeKeys AND Id NOT IN :skip
-            WITH SYSTEM_MODE
-        ];
-    }
+	/**
+	 * The models holding one of these scope keys, other than the ones being saved.
+	 *
+	 * @param scopeKeys the scope keys being claimed
+	 * @param excluded the models being saved, which may keep their own key
+	 * @return the models already holding a key
+	 */
+	public static List<Logic_Model__c> selectByScopeKeys(Set<String> scopeKeys, Set<Id> excluded) {
+		if (scopeKeys == null || scopeKeys.isEmpty()) {
+			return new List<Logic_Model__c>();
+		}
+		Set<Id> skip = excluded == null ? new Set<Id>() : excluded;
+		return [
+			SELECT Id, Scope_Key__c
+			FROM Logic_Model__c
+			WHERE Scope_Key__c IN :scopeKeys AND Id NOT IN :skip
+			WITH SYSTEM_MODE
+		];
+	}
 }

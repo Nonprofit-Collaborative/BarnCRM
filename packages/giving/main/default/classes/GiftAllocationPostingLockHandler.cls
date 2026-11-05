@@ -4,45 +4,45 @@
  */
 @NamespaceAccessible
 public with sharing class GiftAllocationPostingLockHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public GiftAllocationPostingLockHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public GiftAllocationPostingLockHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'GiftAllocationPostingLockHandler';
-    }
+	public override String getName() {
+		return 'GiftAllocationPostingLockHandler';
+	}
 
-    public override void beforeInsert() {
-        GiftPostingLock.enforceOnAllocations(
-            (List<Gift_Allocation__c>) newRecords(),
-            null,
-            Label.Giving_Posting_OverrideAllocationAdded
-        );
-    }
+	public override void beforeInsert() {
+		GiftPostingLock.enforceOnAllocations(
+			(List<Gift_Allocation__c>) newRecords(),
+			null,
+			Label.Giving_Posting_OverrideAllocationAdded
+		);
+	}
 
-    public override void beforeUpdate() {
-        GiftPostingLock.enforceOnAllocations(
-            (List<Gift_Allocation__c>) newRecords(),
-            (Map<Id, Gift_Allocation__c>) oldRecordsById(),
-            Label.Giving_Posting_OverrideAllocationChanged
-        );
-    }
+	public override void beforeUpdate() {
+		GiftPostingLock.enforceOnAllocations(
+			(List<Gift_Allocation__c>) newRecords(),
+			(Map<Id, Gift_Allocation__c>) oldRecordsById(),
+			Label.Giving_Posting_OverrideAllocationChanged
+		);
+	}
 
-    public override void beforeDelete() {
-        GiftPostingLock.enforceOnAllocations(
-            (List<Gift_Allocation__c>) oldRecords(),
-            null,
-            Label.Giving_Posting_OverrideAllocationDeleted
-        );
-    }
+	public override void beforeDelete() {
+		GiftPostingLock.enforceOnAllocations(
+			(List<Gift_Allocation__c>) oldRecords(),
+			null,
+			Label.Giving_Posting_OverrideAllocationDeleted
+		);
+	}
 
-    /** A restored allocation is an allocation added to its gift. */
-    public override void afterUndelete() {
-        GiftPostingLock.enforceOnAllocations(
-            (List<Gift_Allocation__c>) newRecords(),
-            null,
-            Label.Giving_Posting_OverrideAllocationRestored
-        );
-    }
+	/** A restored allocation is an allocation added to its gift. */
+	public override void afterUndelete() {
+		GiftPostingLock.enforceOnAllocations(
+			(List<Gift_Allocation__c>) newRecords(),
+			null,
+			Label.Giving_Posting_OverrideAllocationRestored
+		);
+	}
 }

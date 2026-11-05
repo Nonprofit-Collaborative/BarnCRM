@@ -34,17 +34,16 @@ from apex_source import is_test_class, without_comments  # noqa: E402
 
 ORG_LIMIT = 6_000_000
 CAPS = {
-    # raised for the nightly dispatcher and Automation Control, then by about 11,000 for D-172
-    # (each moved message reads BarnHelp.text('Core', ...) instead of Label.<name>, which frees
-    # 943 of the org's 5,000 labels); the Core trim pass lowers it
-    "core": 2_431_000,
-    "rollups": 470_000,
-    "giving": 730_000,
-    "volunteers": 210_000,
-    "programs": 190_000,
-    "logicmodels": 83_000,
-    "funders": 122_000,
-    "mirror": 230_000,
+    # Set 2026-11-05 to each package's size with Apex indented by tabs (the org counts every
+    # leading space, so tabs cut about 19 percent) plus about 2 percent.
+    "core": 1_982_000,
+    "rollups": 374_000,
+    "giving": 587_000,
+    "volunteers": 166_000,
+    "programs": 148_000,
+    "logicmodels": 65_000,
+    "funders": 95_000,
+    "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

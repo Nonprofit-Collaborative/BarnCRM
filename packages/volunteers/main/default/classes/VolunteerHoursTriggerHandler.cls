@@ -8,53 +8,53 @@
  */
 @NamespaceAccessible
 public with sharing class VolunteerHoursTriggerHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public VolunteerHoursTriggerHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public VolunteerHoursTriggerHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'VolunteerHoursTriggerHandler';
-    }
+	public override String getName() {
+		return 'VolunteerHoursTriggerHandler';
+	}
 
-    public override void beforeInsert() {
-        List<Volunteer_Hours__c> entries = (List<Volunteer_Hours__c>) newRecords();
-        VolunteerHoursService.applyStartingStatus(entries);
-        VolunteerHoursService.fillJobsFromShifts(entries);
-        VolunteerHoursService.deriveHouseholds(entries);
-    }
+	public override void beforeInsert() {
+		List<Volunteer_Hours__c> entries = (List<Volunteer_Hours__c>) newRecords();
+		VolunteerHoursService.applyStartingStatus(entries);
+		VolunteerHoursService.fillJobsFromShifts(entries);
+		VolunteerHoursService.deriveHouseholds(entries);
+	}
 
-    public override void beforeUpdate() {
-        List<Volunteer_Hours__c> entries = (List<Volunteer_Hours__c>) newRecords();
-        Map<Id, Volunteer_Hours__c> previousById = (Map<Id, Volunteer_Hours__c>) oldRecordsById();
-        VolunteerHoursService.refuseStatusChangesOutsideTheService(entries, previousById);
+	public override void beforeUpdate() {
+		List<Volunteer_Hours__c> entries = (List<Volunteer_Hours__c>) newRecords();
+		Map<Id, Volunteer_Hours__c> previousById = (Map<Id, Volunteer_Hours__c>) oldRecordsById();
+		VolunteerHoursService.refuseStatusChangesOutsideTheService(entries, previousById);
 
-        List<Volunteer_Hours__c> shiftChanged = new List<Volunteer_Hours__c>();
-        List<Volunteer_Hours__c> personChanged = new List<Volunteer_Hours__c>();
-        for (Volunteer_Hours__c entry : entries) {
-            Volunteer_Hours__c previous = previousById.get(entry.Id);
-            if (entry.Volunteer_Shift__c != previous.Volunteer_Shift__c) {
-                shiftChanged.add(entry);
-            }
-            // R-VG2: recomputed only when the person changes, so hours stay with the household
-            // they were given in when the person later moves (ADR-0071).
-            if (
-                entry.Contact__c != previous.Contact__c ||
-                entry.Account__c != previous.Account__c
-            ) {
-                personChanged.add(entry);
-            }
-        }
-        if (!shiftChanged.isEmpty()) {
-            VolunteerHoursService.fillJobsFromShifts(shiftChanged);
-        }
-        if (!personChanged.isEmpty()) {
-            VolunteerHoursService.deriveHouseholds(personChanged);
-        }
-    }
+		List<Volunteer_Hours__c> shiftChanged = new List<Volunteer_Hours__c>();
+		List<Volunteer_Hours__c> personChanged = new List<Volunteer_Hours__c>();
+		for (Volunteer_Hours__c entry : entries) {
+			Volunteer_Hours__c previous = previousById.get(entry.Id);
+			if (entry.Volunteer_Shift__c != previous.Volunteer_Shift__c) {
+				shiftChanged.add(entry);
+			}
+			// R-VG2: recomputed only when the person changes, so hours stay with the household
+			// they were given in when the person later moves (ADR-0071).
+			if (
+				entry.Contact__c != previous.Contact__c ||
+				entry.Account__c != previous.Account__c
+			) {
+				personChanged.add(entry);
+			}
+		}
+		if (!shiftChanged.isEmpty()) {
+			VolunteerHoursService.fillJobsFromShifts(shiftChanged);
+		}
+		if (!personChanged.isEmpty()) {
+			VolunteerHoursService.deriveHouseholds(personChanged);
+		}
+	}
 
-    /** R-VU3: one attendance, one entry, also when an old entry is restored. */
-    public override void afterUndelete() {
-        VolunteerSignupService.refuseRestoringASecondEntry((List<Volunteer_Hours__c>) newRecords());
-    }
+	/** R-VU3: one attendance, one entry, also when an old entry is restored. */
+	public override void afterUndelete() {
+		VolunteerSignupService.refuseRestoringASecondEntry((List<Volunteer_Hours__c>) newRecords());
+	}
 }

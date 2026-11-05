@@ -13,31 +13,31 @@
  */
 @NamespaceAccessible
 public with sharing class DonorLevelTriggerHandler extends TriggerHandler {
-    private static final String CONTEXT = 'Donor level assignment';
+	private static final String CONTEXT = 'Donor level assignment';
 
-    @NamespaceAccessible
-    public DonorLevelTriggerHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public DonorLevelTriggerHandler() {
+		return;
+	}
 
-    public override void beforeInsert() {
-        place();
-    }
+	public override void beforeInsert() {
+		place();
+	}
 
-    public override void beforeUpdate() {
-        place();
-    }
+	public override void beforeUpdate() {
+		place();
+	}
 
-    private void place() {
-        List<SObject> records = newRecords();
-        if (records == null || records.isEmpty()) {
-            return;
-        }
-        try {
-            DonorLevelService.assignAll(records);
-        } catch (Exception failure) {
-            // A ladder that cannot be read must not stop somebody saving a household or a person.
-            ErrorLogger.log(failure, CONTEXT);
-        }
-    }
+	private void place() {
+		List<SObject> records = newRecords();
+		if (records == null || records.isEmpty()) {
+			return;
+		}
+		try {
+			DonorLevelService.assignAll(records);
+		} catch (Exception failure) {
+			// A ladder that cannot be read must not stop somebody saving a household or a person.
+			ErrorLogger.log(failure, CONTEXT);
+		}
+	}
 }

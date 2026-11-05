@@ -9,42 +9,42 @@
  * those of a schedule the save marked Rebuild Pending (R-SSC6).
  */
 public with sharing class ShiftScheduleGenerator implements Queueable {
-    private static final String LOG_CONTEXT = 'ShiftScheduleGenerator';
+	private static final String LOG_CONTEXT = 'ShiftScheduleGenerator';
 
-    private final Set<Id> scheduleIds;
+	private final Set<Id> scheduleIds;
 
-    public ShiftScheduleGenerator(Set<Id> scheduleIds) {
-        this.scheduleIds = scheduleIds;
-    }
+	public ShiftScheduleGenerator(Set<Id> scheduleIds) {
+		this.scheduleIds = scheduleIds;
+	}
 
-    /** Queues one run for these schedules, when there are any and a job can still be queued. */
-    public static void queue(Set<Id> scheduleIds) {
-        if (scheduleIds == null || scheduleIds.isEmpty() || ShiftScheduleService.isTurnedOff()) {
-            return;
-        }
-        if (Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
-            return;
-        }
-        try {
-            System.enqueueJob(new ShiftScheduleGenerator(new Set<Id>(scheduleIds)));
-        } catch (Exception notQueued) {
-            ErrorLogger.log(notQueued, LOG_CONTEXT);
-        }
-    }
+	/** Queues one run for these schedules, when there are any and a job can still be queued. */
+	public static void queue(Set<Id> scheduleIds) {
+		if (scheduleIds == null || scheduleIds.isEmpty() || ShiftScheduleService.isTurnedOff()) {
+			return;
+		}
+		if (Limits.getQueueableJobs() >= Limits.getLimitQueueableJobs()) {
+			return;
+		}
+		try {
+			System.enqueueJob(new ShiftScheduleGenerator(new Set<Id>(scheduleIds)));
+		} catch (Exception notQueued) {
+			ErrorLogger.log(notQueued, LOG_CONTEXT);
+		}
+	}
 
-    public void execute(QueueableContext context) {
-        try {
-            if (scheduleIds.size() <= ShiftScheduleBatch.chunkSize()) {
-                ShiftScheduleService.run(scheduleIds);
-            } else {
-                Database.executeBatch(
-                    new ShiftScheduleBatch(scheduleIds),
-                    ShiftScheduleBatch.chunkSize()
-                );
-            }
-        } catch (Exception runFailure) {
-            // The nightly run tries these schedules again.
-            ErrorLogger.log(runFailure, LOG_CONTEXT);
-        }
-    }
+	public void execute(QueueableContext context) {
+		try {
+			if (scheduleIds.size() <= ShiftScheduleBatch.chunkSize()) {
+				ShiftScheduleService.run(scheduleIds);
+			} else {
+				Database.executeBatch(
+					new ShiftScheduleBatch(scheduleIds),
+					ShiftScheduleBatch.chunkSize()
+				);
+			}
+		} catch (Exception runFailure) {
+			// The nightly run tries these schedules again.
+			ErrorLogger.log(runFailure, LOG_CONTEXT);
+		}
+	}
 }

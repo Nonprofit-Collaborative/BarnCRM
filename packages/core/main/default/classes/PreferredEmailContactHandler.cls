@@ -8,11 +8,11 @@
  * trigger collections through the accessors on TriggerHandler.
  */
 public with sharing class PreferredEmailContactHandler extends TriggerHandler {
-    public override void beforeInsert() {
-        PreferredEmailService.apply((List<Contact>) newRecords());
-    }
+	public override void beforeInsert() {
+		PreferredEmailService.apply((List<Contact>) newRecords());
+	}
 
-    public override void beforeUpdate() {
-        PreferredEmailService.apply((List<Contact>) newRecords());
-    }
+	public override void beforeUpdate() {
+		PreferredEmailService.apply((List<Contact>) newRecords());
+	}
 }

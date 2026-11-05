@@ -4,292 +4,292 @@
  */
 @IsTest(testFor='ApexClass:FirstRunController')
 private class FirstRunControllerTest {
-    @TestSetup
-    static void createTestUsers() {
-        System.runAs(TestUsers.admin()) {
-            TestUsers.standardUserWith('Adeyemi', new List<String>{ 'BarnCRM_Read_Only' });
-        }
-    }
+	@TestSetup
+	static void createTestUsers() {
+		System.runAs(TestUsers.admin()) {
+			TestUsers.standardUserWith('Adeyemi', new List<String>{ 'BarnCRM_Read_Only' });
+		}
+	}
 
-    private static User david() {
-        return [
-            SELECT Id
-            FROM User
-            WHERE LastName = 'Adeyemi'
-            WITH SYSTEM_MODE
-            ORDER BY CreatedDate DESC
-            LIMIT 1
-        ];
-    }
+	private static User david() {
+		return [
+			SELECT Id
+			FROM User
+			WHERE LastName = 'Adeyemi'
+			WITH SYSTEM_MODE
+			ORDER BY CreatedDate DESC
+			LIMIT 1
+		];
+	}
 
-    @IsTest
-    static void aNewInstallNeedsSetupAndOffersEveryFeature() {
-        System.runAs(TestUsers.admin()) {
-            TestSettings.newInstall();
+	@IsTest
+	static void aNewInstallNeedsSetupAndOffersEveryFeature() {
+		System.runAs(TestUsers.admin()) {
+			TestSettings.newInstall();
 
-            Test.startTest();
-            FirstRunController.FirstRunState state = FirstRunController.getState();
-            Test.stopTest();
+			Test.startTest();
+			FirstRunController.FirstRunState state = FirstRunController.getState();
+			Test.stopTest();
 
-            Assert.isTrue(state.needsSetup, 'No edition is saved yet');
-            Assert.isTrue(state.canFinish, 'Maria may finish it');
-            // Suggested only when Giving, NPSP or Nonprofit Cloud is there; otherwise null by
-            // design, so the administrator picks (ADR-0072). The test holds in either org.
-            if (ModuleDetectionService.isGivingPresent()) {
-                Assert.areEqual(
-                    ModuleDetectionService.SUITE_NONPROFIT,
-                    state.recommendedSuite,
-                    'The Nonprofit Edition is suggested when Giving is installed'
-                );
-            } else {
-                Assert.isTrue(
-                    state.recommendedSuite == null ||
-                        state.recommendedSuite == ModuleDetectionService.SUITE_NONPROFIT,
-                    'Without Giving an edition is suggested only for NPSP or Nonprofit Cloud: ' +
-                    state.recommendedSuite
-                );
-            }
-            Assert.areEqual(8, state.features.size(), 'Every feature is offered');
-        }
-    }
+			Assert.isTrue(state.needsSetup, 'No edition is saved yet');
+			Assert.isTrue(state.canFinish, 'Maria may finish it');
+			// Suggested only when Giving, NPSP or Nonprofit Cloud is there; otherwise null by
+			// design, so the administrator picks (ADR-0072). The test holds in either org.
+			if (ModuleDetectionService.isGivingPresent()) {
+				Assert.areEqual(
+					ModuleDetectionService.SUITE_NONPROFIT,
+					state.recommendedSuite,
+					'The Nonprofit Edition is suggested when Giving is installed'
+				);
+			} else {
+				Assert.isTrue(
+					state.recommendedSuite == null ||
+						state.recommendedSuite == ModuleDetectionService.SUITE_NONPROFIT,
+					'Without Giving an edition is suggested only for NPSP or Nonprofit Cloud: ' +
+					state.recommendedSuite
+				);
+			}
+			Assert.areEqual(8, state.features.size(), 'Every feature is offered');
+		}
+	}
 
-    @IsTest
-    static void finishingWithEveryFeatureAlreadyOnStillGivesTheToolTabs() {
-        System.runAs(TestUsers.admin()) {
-            // An org built from source: no feature list saved, so every feature is on already.
-            TestSettings.neverSetUp();
-            FirstRunController.startTabCheckInTests = true;
+	@IsTest
+	static void finishingWithEveryFeatureAlreadyOnStillGivesTheToolTabs() {
+		System.runAs(TestUsers.admin()) {
+			// An org built from source: no feature list saved, so every feature is on already.
+			TestSettings.neverSetUp();
+			FirstRunController.startTabCheckInTests = true;
 
-            Test.startTest();
-            FirstRunController.finish(
-                ModuleDetectionService.SUITE_STANDARD,
-                new List<String>{ FeatureSwitchService.DATA_MANAGER }
-            );
-            Integer queued = Limits.getQueueableJobs();
-            Test.stopTest();
+			Test.startTest();
+			FirstRunController.finish(
+				ModuleDetectionService.SUITE_STANDARD,
+				new List<String>{ FeatureSwitchService.DATA_MANAGER }
+			);
+			Integer queued = Limits.getQueueableJobs();
+			Test.stopTest();
 
-            Assert.isTrue(queued > 0, 'The tab access sync is queued though nothing was newly on');
-            Assert.isTrue(TabAccessScheduler.isScheduled(), 'And the hourly check is running');
-        }
-    }
+			Assert.isTrue(queued > 0, 'The tab access sync is queued though nothing was newly on');
+			Assert.isTrue(TabAccessScheduler.isScheduled(), 'And the hourly check is running');
+		}
+	}
 
-    @IsTest
-    static void finishingSchedulesTheNightlyRunOnceAndKeepsAnExistingSchedule() {
-        System.runAs(TestUsers.admin()) {
-            TestSettings.neverSetUp();
-            FirstRunController.startTabCheckInTests = true;
-            TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
-            ScheduledJobSelector.forget();
+	@IsTest
+	static void finishingSchedulesTheNightlyRunOnceAndKeepsAnExistingSchedule() {
+		System.runAs(TestUsers.admin()) {
+			TestSettings.neverSetUp();
+			FirstRunController.startTabCheckInTests = true;
+			TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
+			ScheduledJobSelector.forget();
 
-            FirstRunController.finish(
-                ModuleDetectionService.SUITE_STANDARD,
-                new List<String>{ FeatureSwitchService.DATA_MANAGER }
-            );
-            Assert.isTrue(NightlyJobs.isScheduled(), 'Finishing setup schedules the nightly run');
-            FirstRunController.finish(
-                ModuleDetectionService.SUITE_STANDARD,
-                new List<String>{ FeatureSwitchService.DATA_MANAGER }
-            );
+			FirstRunController.finish(
+				ModuleDetectionService.SUITE_STANDARD,
+				new List<String>{ FeatureSwitchService.DATA_MANAGER }
+			);
+			Assert.isTrue(NightlyJobs.isScheduled(), 'Finishing setup schedules the nightly run');
+			FirstRunController.finish(
+				ModuleDetectionService.SUITE_STANDARD,
+				new List<String>{ FeatureSwitchService.DATA_MANAGER }
+			);
 
-            Assert.areEqual(
-                1,
-                [
-                    SELECT COUNT()
-                    FROM CronTrigger
-                    WHERE CronJobDetail.Name = :NightlyJobs.jobName()
-                ],
-                'Finishing twice leaves one schedule'
-            );
-        }
-    }
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM CronTrigger
+					WHERE CronJobDetail.Name = :NightlyJobs.jobName()
+				],
+				'Finishing twice leaves one schedule'
+			);
+		}
+	}
 
-    @IsTest
-    static void mariaFinishesWithTheFeaturesSheTicked() {
-        System.runAs(TestUsers.admin()) {
-            TestSettings.newInstall();
+	@IsTest
+	static void mariaFinishesWithTheFeaturesSheTicked() {
+		System.runAs(TestUsers.admin()) {
+			TestSettings.newInstall();
 
-            Test.startTest();
-            FirstRunController.FirstRunState state = FirstRunController.finish(
-                ModuleDetectionService.SUITE_STANDARD,
-                new List<String>{
-                    FeatureSwitchService.DATA_MANAGER,
-                    FeatureSwitchService.RELATIONSHIPS
-                }
-            );
-            Test.stopTest();
+			Test.startTest();
+			FirstRunController.FirstRunState state = FirstRunController.finish(
+				ModuleDetectionService.SUITE_STANDARD,
+				new List<String>{
+					FeatureSwitchService.DATA_MANAGER,
+					FeatureSwitchService.RELATIONSHIPS
+				}
+			);
+			Test.stopTest();
 
-            Assert.isFalse(state.needsSetup, 'The window does not show again');
-            Assert.areEqual(
-                ModuleDetectionService.SUITE_STANDARD,
-                ModuleDetectionService.chosenSuite(),
-                'The edition is saved'
-            );
-            Assert.isTrue(
-                FeatureSwitchService.isOn(FeatureSwitchService.DATA_MANAGER),
-                'A ticked feature is on'
-            );
-            Assert.isTrue(
-                FeatureSwitchService.isOn(FeatureSwitchService.RELATIONSHIPS),
-                'So is the other'
-            );
-            Assert.isFalse(
-                FeatureSwitchService.isOn(FeatureSwitchService.AFFILIATIONS),
-                'An unticked feature stays off'
-            );
-        }
-    }
+			Assert.isFalse(state.needsSetup, 'The window does not show again');
+			Assert.areEqual(
+				ModuleDetectionService.SUITE_STANDARD,
+				ModuleDetectionService.chosenSuite(),
+				'The edition is saved'
+			);
+			Assert.isTrue(
+				FeatureSwitchService.isOn(FeatureSwitchService.DATA_MANAGER),
+				'A ticked feature is on'
+			);
+			Assert.isTrue(
+				FeatureSwitchService.isOn(FeatureSwitchService.RELATIONSHIPS),
+				'So is the other'
+			);
+			Assert.isFalse(
+				FeatureSwitchService.isOn(FeatureSwitchService.AFFILIATIONS),
+				'An unticked feature stays off'
+			);
+		}
+	}
 
-    @IsTest
-    static void anEditionSavedInSetupStillAsksForFeaturesAndIsPreselected() {
-        System.runAs(TestUsers.admin()) {
-            TestSettings.newInstall();
-            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_NONPROFIT);
+	@IsTest
+	static void anEditionSavedInSetupStillAsksForFeaturesAndIsPreselected() {
+		System.runAs(TestUsers.admin()) {
+			TestSettings.newInstall();
+			SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_NONPROFIT);
 
-            Test.startTest();
-            FirstRunController.FirstRunState state = FirstRunController.getState();
-            Test.stopTest();
+			Test.startTest();
+			FirstRunController.FirstRunState state = FirstRunController.getState();
+			Test.stopTest();
 
-            Assert.isTrue(state.needsSetup, 'The features are still to be chosen');
-            Assert.areEqual(
-                ModuleDetectionService.SUITE_NONPROFIT,
-                state.recommendedSuite,
-                'The saved edition is pre-selected'
-            );
-        }
-    }
+			Assert.isTrue(state.needsSetup, 'The features are still to be chosen');
+			Assert.areEqual(
+				ModuleDetectionService.SUITE_NONPROFIT,
+				state.recommendedSuite,
+				'The saved edition is pre-selected'
+			);
+		}
+	}
 
-    @IsTest
-    static void finishingWithEveryFeatureUntickedDoesNotLoop() {
-        System.runAs(TestUsers.admin()) {
-            TestSettings.newInstall();
+	@IsTest
+	static void finishingWithEveryFeatureUntickedDoesNotLoop() {
+		System.runAs(TestUsers.admin()) {
+			TestSettings.newInstall();
 
-            Test.startTest();
-            FirstRunController.FirstRunState state = FirstRunController.finish(
-                ModuleDetectionService.SUITE_STANDARD,
-                new List<String>()
-            );
-            Test.stopTest();
+			Test.startTest();
+			FirstRunController.FirstRunState state = FirstRunController.finish(
+				ModuleDetectionService.SUITE_STANDARD,
+				new List<String>()
+			);
+			Test.stopTest();
 
-            Assert.isFalse(state.needsSetup, 'The window does not come back');
-            Assert.areEqual(
-                FeatureSwitchService.NONE_CHOSEN,
-                SettingsService.getSettings().Features_Turned_On__c,
-                'Setup is marked done with nothing on'
-            );
-            Assert.isTrue(FeatureSwitchService.featuresOn().isEmpty(), 'No feature is on');
-            FeatureSwitchService.turnOn(FeatureSwitchService.RELATIONSHIPS);
-            Assert.areEqual(
-                FeatureSwitchService.RELATIONSHIPS,
-                SettingsService.getSettings().Features_Turned_On__c,
-                'A feature turned on later replaces the marker'
-            );
-        }
-    }
+			Assert.isFalse(state.needsSetup, 'The window does not come back');
+			Assert.areEqual(
+				FeatureSwitchService.NONE_CHOSEN,
+				SettingsService.getSettings().Features_Turned_On__c,
+				'Setup is marked done with nothing on'
+			);
+			Assert.isTrue(FeatureSwitchService.featuresOn().isEmpty(), 'No feature is on');
+			FeatureSwitchService.turnOn(FeatureSwitchService.RELATIONSHIPS);
+			Assert.areEqual(
+				FeatureSwitchService.RELATIONSHIPS,
+				SettingsService.getSettings().Features_Turned_On__c,
+				'A feature turned on later replaces the marker'
+			);
+		}
+	}
 
-    @IsTest
-    static void anUpgradedOrgWithAnEditionNeverSeesTheWindow() {
-        System.runAs(TestUsers.admin()) {
-            TestSettings.neverSetUp();
-            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_STANDARD);
+	@IsTest
+	static void anUpgradedOrgWithAnEditionNeverSeesTheWindow() {
+		System.runAs(TestUsers.admin()) {
+			TestSettings.neverSetUp();
+			SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_STANDARD);
 
-            Test.startTest();
-            FirstRunController.FirstRunState state = FirstRunController.getState();
-            Test.stopTest();
+			Test.startTest();
+			FirstRunController.FirstRunState state = FirstRunController.getState();
+			Test.stopTest();
 
-            Assert.isFalse(state.needsSetup, 'Every feature is on and the edition is saved');
-        }
-    }
+			Assert.isFalse(state.needsSetup, 'Every feature is on and the edition is saved');
+		}
+	}
 
-    @IsTest
-    static void anUnknownFeatureKeepsNothing() {
-        System.runAs(TestUsers.admin()) {
-            TestSettings.newInstall();
-            Exception refused;
+	@IsTest
+	static void anUnknownFeatureKeepsNothing() {
+		System.runAs(TestUsers.admin()) {
+			TestSettings.newInstall();
+			Exception refused;
 
-            Test.startTest();
-            try {
-                FirstRunController.finish(
-                    ModuleDetectionService.SUITE_NONPROFIT,
-                    new List<String>{ 'Rollups' }
-                );
-            } catch (AuraHandledException e) {
-                refused = e;
-            }
-            Test.stopTest();
+			Test.startTest();
+			try {
+				FirstRunController.finish(
+					ModuleDetectionService.SUITE_NONPROFIT,
+					new List<String>{ 'Rollups' }
+				);
+			} catch (AuraHandledException e) {
+				refused = e;
+			}
+			Test.stopTest();
 
-            Assert.areEqual(
-                BarnHelp.text('Core', 'Core_FirstRun_SaveError'),
-                refused.getMessage(),
-                'Maria sees a message she can act on'
-            );
-        }
-    }
+			Assert.areEqual(
+				BarnHelp.text('Core', 'Core_FirstRun_SaveError'),
+				refused.getMessage(),
+				'Maria sees a message she can act on'
+			);
+		}
+	}
 
-    @IsTest
-    static void anUnknownEditionIsRefused() {
-        System.runAs(TestUsers.admin()) {
-            Exception refused;
+	@IsTest
+	static void anUnknownEditionIsRefused() {
+		System.runAs(TestUsers.admin()) {
+			Exception refused;
 
-            Test.startTest();
-            try {
-                FirstRunController.finish('Enterprise', new List<String>());
-            } catch (AuraHandledException e) {
-                refused = e;
-            }
-            Test.stopTest();
+			Test.startTest();
+			try {
+				FirstRunController.finish('Enterprise', new List<String>());
+			} catch (AuraHandledException e) {
+				refused = e;
+			}
+			Test.stopTest();
 
-            Assert.areEqual(
-                BarnHelp.text('Core', 'Core_SuiteChoice_UnknownSuiteError'),
-                refused.getMessage(),
-                'Only the two editions are accepted'
-            );
-        }
-    }
+			Assert.areEqual(
+				BarnHelp.text('Core', 'Core_SuiteChoice_UnknownSuiteError'),
+				refused.getMessage(),
+				'Only the two editions are accepted'
+			);
+		}
+	}
 
-    @IsTest
-    static void aNewInstallStillNeedsSetupInAnOrgThatSavedItsSettings() {
-        System.runAs(TestUsers.admin()) {
-            // The org already finished first-run setup and saved its settings.
-            SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_STANDARD);
-            SettingsService.saveSystemValue(
-                'Features_Turned_On__c',
-                FeatureSwitchService.DATA_MANAGER
-            );
-            SettingsService.saveBookkeeping(
-                new Map<String, Object>{ 'Setup_Steps_Completed__c' => 'one' }
-            );
-            TestSettings.newInstall();
+	@IsTest
+	static void aNewInstallStillNeedsSetupInAnOrgThatSavedItsSettings() {
+		System.runAs(TestUsers.admin()) {
+			// The org already finished first-run setup and saved its settings.
+			SettingsService.saveSystemValue('Suite__c', ModuleDetectionService.SUITE_STANDARD);
+			SettingsService.saveSystemValue(
+				'Features_Turned_On__c',
+				FeatureSwitchService.DATA_MANAGER
+			);
+			SettingsService.saveBookkeeping(
+				new Map<String, Object>{ 'Setup_Steps_Completed__c' => 'one' }
+			);
+			TestSettings.newInstall();
 
-            Test.startTest();
-            FirstRunController.FirstRunState state = FirstRunController.getState();
-            Test.stopTest();
+			Test.startTest();
+			FirstRunController.FirstRunState state = FirstRunController.getState();
+			Test.stopTest();
 
-            Assert.isTrue(state.needsSetup, 'A reset org needs setup however the org was saved');
-            Assert.areEqual(8, state.features.size(), 'Every feature is offered');
-        }
-    }
+			Assert.isTrue(state.needsSetup, 'A reset org needs setup however the org was saved');
+			Assert.areEqual(8, state.features.size(), 'Every feature is offered');
+		}
+	}
 
-    @IsTest
-    static void davidSeesTheWindowButCannotFinish() {
-        System.runAs(david()) {
-            Exception refused;
+	@IsTest
+	static void davidSeesTheWindowButCannotFinish() {
+		System.runAs(david()) {
+			Exception refused;
 
-            Test.startTest();
-            FirstRunController.FirstRunState state = FirstRunController.getState();
-            try {
-                FirstRunController.finish(
-                    ModuleDetectionService.SUITE_STANDARD,
-                    new List<String>()
-                );
-            } catch (AuraHandledException e) {
-                refused = e;
-            }
-            Test.stopTest();
+			Test.startTest();
+			FirstRunController.FirstRunState state = FirstRunController.getState();
+			try {
+				FirstRunController.finish(
+					ModuleDetectionService.SUITE_STANDARD,
+					new List<String>()
+				);
+			} catch (AuraHandledException e) {
+				refused = e;
+			}
+			Test.stopTest();
 
-            Assert.isTrue(state.needsSetup, 'The window shows for David too');
-            Assert.isFalse(state.canFinish, 'He is told an administrator needs to finish');
-            Assert.isTrue(state.features.isEmpty(), 'And is shown no choices');
-            Assert.isNotNull(refused, 'Finishing needs Manage BarnCRM Settings');
-        }
-    }
+			Assert.isTrue(state.needsSetup, 'The window shows for David too');
+			Assert.isFalse(state.canFinish, 'He is told an administrator needs to finish');
+			Assert.isTrue(state.features.isEmpty(), 'And is shown no choices');
+			Assert.isNotNull(refused, 'Finishing needs Manage BarnCRM Settings');
+		}
+	}
 }

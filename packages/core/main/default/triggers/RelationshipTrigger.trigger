@@ -4,12 +4,12 @@
  * fails (plan Section 7.2, ADR-0017). No logic lives here.
  */
 trigger RelationshipTrigger on Relationship__c(
-    before insert,
-    before update,
-    after insert,
-    after update,
-    after delete,
-    after undelete
+	before insert,
+	before update,
+	after insert,
+	after update,
+	after delete,
+	after undelete
 ) {
-    TriggerDispatcher.run('Relationship__c');
+	TriggerDispatcher.run('Relationship__c');
 }

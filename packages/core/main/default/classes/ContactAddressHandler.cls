@@ -11,45 +11,45 @@
  * accessors on TriggerHandler.
  */
 public with sharing class ContactAddressHandler extends TriggerHandler {
-    public override void afterInsert() {
-        capture((List<Contact>) newRecords());
-    }
+	public override void afterInsert() {
+		capture((List<Contact>) newRecords());
+	}
 
-    public override void afterUpdate() {
-        List<Contact> records = (List<Contact>) newRecords();
-        Map<Id, SObject> previousById = oldRecordsById();
-        List<Contact> moved = new List<Contact>();
-        if (records == null) {
-            return;
-        }
-        for (Contact person : records) {
-            Contact old = previousById == null ? null : (Contact) previousById.get(person.Id);
-            if (old == null || mailingAddressChanged(person, old)) {
-                moved.add(person);
-            }
-        }
-        capture(moved);
-    }
+	public override void afterUpdate() {
+		List<Contact> records = (List<Contact>) newRecords();
+		Map<Id, SObject> previousById = oldRecordsById();
+		List<Contact> moved = new List<Contact>();
+		if (records == null) {
+			return;
+		}
+		for (Contact person : records) {
+			Contact old = previousById == null ? null : (Contact) previousById.get(person.Id);
+			if (old == null || mailingAddressChanged(person, old)) {
+				moved.add(person);
+			}
+		}
+		capture(moved);
+	}
 
-    private void capture(List<Contact> contacts) {
-        if (contacts == null || contacts.isEmpty()) {
-            return;
-        }
-        try {
-            AddressService.captureFromStandardFields(null, contacts);
-        } catch (Exception thrown) {
-            ErrorLogger.log(thrown, 'ContactAddressHandler.capture');
-            for (Contact person : contacts) {
-                person.addError(BarnHelp.text('Core', 'Core_Address_PropagationFailed'));
-            }
-        }
-    }
+	private void capture(List<Contact> contacts) {
+		if (contacts == null || contacts.isEmpty()) {
+			return;
+		}
+		try {
+			AddressService.captureFromStandardFields(null, contacts);
+		} catch (Exception thrown) {
+			ErrorLogger.log(thrown, 'ContactAddressHandler.capture');
+			for (Contact person : contacts) {
+				person.addError(BarnHelp.text('Core', 'Core_Address_PropagationFailed'));
+			}
+		}
+	}
 
-    private Boolean mailingAddressChanged(Contact person, Contact old) {
-        return person.MailingStreet != old.MailingStreet ||
-            person.MailingCity != old.MailingCity ||
-            person.MailingState != old.MailingState ||
-            person.MailingPostalCode != old.MailingPostalCode ||
-            person.MailingCountry != old.MailingCountry;
-    }
+	private Boolean mailingAddressChanged(Contact person, Contact old) {
+		return person.MailingStreet != old.MailingStreet ||
+			person.MailingCity != old.MailingCity ||
+			person.MailingState != old.MailingState ||
+			person.MailingPostalCode != old.MailingPostalCode ||
+			person.MailingCountry != old.MailingCountry;
+	}
 }

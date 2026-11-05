@@ -8,31 +8,31 @@
  */
 @NamespaceAccessible
 public with sharing class ServicePlanDatesHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public ServicePlanDatesHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public ServicePlanDatesHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'ServicePlanDatesHandler';
-    }
+	public override String getName() {
+		return 'ServicePlanDatesHandler';
+	}
 
-    public override void beforeInsert() {
-        fill(newRecords(), null);
-    }
+	public override void beforeInsert() {
+		fill(newRecords(), null);
+	}
 
-    public override void beforeUpdate() {
-        fill(newRecords(), oldRecordsById());
-    }
+	public override void beforeUpdate() {
+		fill(newRecords(), oldRecordsById());
+	}
 
-    private static void fill(List<SObject> records, Map<Id, SObject> oldById) {
-        if (records == null || records.isEmpty()) {
-            return;
-        }
-        if (records[0].getSObjectType() == Goal__c.SObjectType) {
-            ServicePlanService.fillClosedDates((List<Goal__c>) records, oldById);
-        } else if (records[0].getSObjectType() == Goal_Step__c.SObjectType) {
-            ServicePlanService.fillCompletedDates((List<Goal_Step__c>) records, oldById);
-        }
-    }
+	private static void fill(List<SObject> records, Map<Id, SObject> oldById) {
+		if (records == null || records.isEmpty()) {
+			return;
+		}
+		if (records[0].getSObjectType() == Goal__c.SObjectType) {
+			ServicePlanService.fillClosedDates((List<Goal__c>) records, oldById);
+		} else if (records[0].getSObjectType() == Goal_Step__c.SObjectType) {
+			ServicePlanService.fillCompletedDates((List<Goal_Step__c>) records, oldById);
+		}
+	}
 }

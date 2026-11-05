@@ -364,9 +364,10 @@ progress) keeps them. The import itself stays: its counts, run log and file name
 undo, which never reads the rows. A preview whose rows were deleted cannot be committed, and a
 row that was deleted cannot be retried: upload the file again.
 
-The job is called **Import row cleanup**. Health Check reports it when it is not scheduled, and
-its **Schedule All Nightly Jobs** fix schedules it. It runs at a quarter past one in the
-morning.
+The nightly **Record Cleanup** job applies this choice (it runs at twenty past one in the
+morning, as part of the nightly run Health Check reports on). Record Cleanup also deletes an
+import you started and abandoned in Draft, Parsing or Preview, with its rows, once it is
+older than **Days to Keep Import History** (365 days by default; see [Nightly Jobs](nightly-jobs.md)).
 
 ## 6. Files That Arrive Every Month
 

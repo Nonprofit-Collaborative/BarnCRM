@@ -6,9 +6,9 @@
  */
 @NamespaceAccessible
 public interface NightlyStepProvider {
-    /**
-     * Every nightly step this package has, on or off, built now so each reads its settings as
-     * they are. Never null.
-     */
-    List<NightlyStep> nightlySteps();
+	/**
+	 * Every nightly step this package has, on or off, built now so each reads its settings as
+	 * they are. Never null.
+	 */
+	List<NightlyStep> nightlySteps();
 }

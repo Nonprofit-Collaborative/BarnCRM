@@ -4,43 +4,43 @@
  */
 @IsTest
 public class AddressTestDataFactory {
-    /** A household account, not yet inserted, named the way the naming service expects. */
-    public static Account newHousehold(String name) {
-        return HouseholdTestDataFactory.newHousehold(name);
-    }
+	/** A household account, not yet inserted, named the way the naming service expects. */
+	public static Account newHousehold(String name) {
+		return HouseholdTestDataFactory.newHousehold(name);
+	}
 
-    /**
-     * Puts a state and country on a standard address the way the org takes them: the codes
-     * where State and Country Picklists are on (the text fields there take full names only),
-     * the same codes as text otherwise.
-     *
-     * @param record the account or contact
-     * @param prefix the address, such as `Billing` or `Mailing`
-     * @param stateCode a state code, such as `IL`
-     * @param countryCode a country code, such as `US`
-     */
-    public static void putStateAndCountry(
-        SObject record,
-        String prefix,
-        String stateCode,
-        String countryCode
-    ) {
-        String suffix = AddressService.usesStateAndCountryPicklists() ? 'Code' : '';
-        record.put(prefix + 'Country' + suffix, countryCode);
-        record.put(prefix + 'State' + suffix, stateCode);
-    }
+	/**
+	 * Puts a state and country on a standard address the way the org takes them: the codes
+	 * where State and Country Picklists are on (the text fields there take full names only),
+	 * the same codes as text otherwise.
+	 *
+	 * @param record the account or contact
+	 * @param prefix the address, such as `Billing` or `Mailing`
+	 * @param stateCode a state code, such as `IL`
+	 * @param countryCode a country code, such as `US`
+	 */
+	public static void putStateAndCountry(
+		SObject record,
+		String prefix,
+		String stateCode,
+		String countryCode
+	) {
+		String suffix = AddressService.usesStateAndCountryPicklists() ? 'Code' : '';
+		record.put(prefix + 'Country' + suffix, countryCode);
+		record.put(prefix + 'State' + suffix, stateCode);
+	}
 
-    /** An organization account, not yet inserted. */
-    public static Account newOrganization(String name) {
-        return (Account) TestDataFactory.pastDuplicateRules(
-            AccountKindsTestData.organization(name)
-        );
-    }
+	/** An organization account, not yet inserted. */
+	public static Account newOrganization(String name) {
+		return (Account) TestDataFactory.pastDuplicateRules(
+			AccountKindsTestData.organization(name)
+		);
+	}
 
-    /** A person in the given household, not yet inserted. */
-    public static Contact newContact(String firstName, String lastName, Id accountId) {
-        Contact person = HouseholdTestDataFactory.newContact('Ms.', firstName, lastName);
-        person.AccountId = accountId;
-        return person;
-    }
+	/** A person in the given household, not yet inserted. */
+	public static Contact newContact(String firstName, String lastName, Id accountId) {
+		Contact person = HouseholdTestDataFactory.newContact('Ms.', firstName, lastName);
+		person.AccountId = accountId;
+		return person;
+	}
 }

@@ -20,342 +20,342 @@
  * them out of it on purpose (canonical model R-ER9).
  */
 public with sharing class HouseholdOrphanSelector {
-    /** The most erased people left out; erasures are rare, and the ids are never shown. */
-    private static final Integer ERASED_READ_CAP = 10000;
+	/** The most erased people left out; erasures are rare, and the ids are never shown. */
+	private static final Integer ERASED_READ_CAP = 10000;
 
-    private static Set<Id> erased;
+	private static Set<Id> erased;
 
-    /**
-     * Every person an Erasure record names, read once per transaction. System mode, because
-     * the ids only leave people out of a count the user is shown in user mode, and the person
-     * running Health Check need not be able to read the erasure audit (ADR-0021).
-     */
-    private static Set<Id> erasedPeople() {
-        if (erased == null) {
-            erased = new Set<Id>();
-            for (Erasure__c erasure : [
-                SELECT Contact__c, Person_Account__c
-                FROM Erasure__c
-                WHERE Contact__c != NULL OR Person_Account__c != NULL
-                WITH SYSTEM_MODE
-                ORDER BY CreatedDate DESC
-                LIMIT :ERASED_READ_CAP
-            ]) {
-                erased.add(
-                    erasure.Contact__c != null ? erasure.Contact__c : erasure.Person_Account__c
-                );
-            }
-        }
-        return erased;
-    }
+	/**
+	 * Every person an Erasure record names, read once per transaction. System mode, because
+	 * the ids only leave people out of a count the user is shown in user mode, and the person
+	 * running Health Check need not be able to read the erasure audit (ADR-0021).
+	 */
+	private static Set<Id> erasedPeople() {
+		if (erased == null) {
+			erased = new Set<Id>();
+			for (Erasure__c erasure : [
+				SELECT Contact__c, Person_Account__c
+				FROM Erasure__c
+				WHERE Contact__c != NULL OR Person_Account__c != NULL
+				WITH SYSTEM_MODE
+				ORDER BY CreatedDate DESC
+				LIMIT :ERASED_READ_CAP
+			]) {
+				erased.add(
+					erasure.Contact__c != null ? erasure.Contact__c : erasure.Person_Account__c
+				);
+			}
+		}
+		return erased;
+	}
 
-    /**
-     * Junction mode: the people in no household, contacts and person accounts together, as
-     * Health Check and Data Quality both count them. Stops at `cap`: the person
-     * accounts are not counted once the contacts alone reach it.
-     */
-    public static Integer countPeopleWithoutMembership(Id householdRecordTypeId, Integer cap) {
-        Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
-        Set<Id> excluded = new Set<Id>(personTypes);
-        if (householdRecordTypeId != null) {
-            excluded.add(householdRecordTypeId);
-        }
-        Integer found = countContactsWithoutMembership(excluded, cap);
-        if (!personTypes.isEmpty() && found < cap) {
-            found += countPersonAccountsWithoutMembership(personTypes, cap);
-        }
-        return found;
-    }
+	/**
+	 * Junction mode: the people in no household, contacts and person accounts together, as
+	 * Health Check and Data Quality both count them. Stops at `cap`: the person
+	 * accounts are not counted once the contacts alone reach it.
+	 */
+	public static Integer countPeopleWithoutMembership(Id householdRecordTypeId, Integer cap) {
+		Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
+		Set<Id> excluded = new Set<Id>(personTypes);
+		if (householdRecordTypeId != null) {
+			excluded.add(householdRecordTypeId);
+		}
+		Integer found = countContactsWithoutMembership(excluded, cap);
+		if (!personTypes.isEmpty() && found < cap) {
+			found += countPersonAccountsWithoutMembership(personTypes, cap);
+		}
+		return found;
+	}
 
-    /** Contact mode: contacts with no account at all. */
-    public static Integer countContactsWithoutAccount(Integer cap) {
-        return [
-            SELECT COUNT()
-            FROM Contact
-            WHERE AccountId = NULL AND Id NOT IN :erasedPeople()
-            WITH USER_MODE
-            LIMIT :cap
-        ];
-    }
+	/** Contact mode: contacts with no account at all. */
+	public static Integer countContactsWithoutAccount(Integer cap) {
+		return [
+			SELECT COUNT()
+			FROM Contact
+			WHERE AccountId = NULL AND Id NOT IN :erasedPeople()
+			WITH USER_MODE
+			LIMIT :cap
+		];
+	}
 
-    public static List<Contact> contactsWithoutAccount(Integer howMany) {
-        return [
-            SELECT Id, Name
-            FROM Contact
-            WHERE AccountId = NULL AND Id NOT IN :erasedPeople()
-            WITH USER_MODE
-            ORDER BY CreatedDate, Id
-            LIMIT :howMany
-        ];
-    }
+	public static List<Contact> contactsWithoutAccount(Integer howMany) {
+		return [
+			SELECT Id, Name
+			FROM Contact
+			WHERE AccountId = NULL AND Id NOT IN :erasedPeople()
+			WITH USER_MODE
+			ORDER BY CreatedDate, Id
+			LIMIT :howMany
+		];
+	}
 
-    /**
-     * Junction mode: contacts with no current membership row, leaving out a contact whose
-     * account is of one of the excluded record types. The caller excludes the household type,
-     * because a contact linked straight to a household is in it by the simple link (and the
-     * membership check reports that already), and the person types, because the person contact
-     * of a person account is counted as the account below. Never empty: it always holds the
-     * household type.
-     */
-    public static Integer countContactsWithoutMembership(
-        Set<Id> excludedAccountTypes,
-        Integer cap
-    ) {
-        Date today = Date.today();
-        return [
-            SELECT COUNT()
-            FROM Contact
-            WHERE
-                Id NOT IN (
-                    SELECT Contact__c
-                    FROM Household_Member__c
-                    WHERE Contact__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
-                )
-                AND Id NOT IN :erasedPeople()
-                AND (AccountId = NULL
-                OR Account.RecordTypeId NOT IN :excludedAccountTypes)
-            WITH USER_MODE
-            LIMIT :cap
-        ];
-    }
+	/**
+	 * Junction mode: contacts with no current membership row, leaving out a contact whose
+	 * account is of one of the excluded record types. The caller excludes the household type,
+	 * because a contact linked straight to a household is in it by the simple link (and the
+	 * membership check reports that already), and the person types, because the person contact
+	 * of a person account is counted as the account below. Never empty: it always holds the
+	 * household type.
+	 */
+	public static Integer countContactsWithoutMembership(
+		Set<Id> excludedAccountTypes,
+		Integer cap
+	) {
+		Date today = Date.today();
+		return [
+			SELECT COUNT()
+			FROM Contact
+			WHERE
+				Id NOT IN (
+					SELECT Contact__c
+					FROM Household_Member__c
+					WHERE Contact__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
+				)
+				AND Id NOT IN :erasedPeople()
+				AND (AccountId = NULL
+				OR Account.RecordTypeId NOT IN :excludedAccountTypes)
+			WITH USER_MODE
+			LIMIT :cap
+		];
+	}
 
-    public static List<Contact> contactsWithoutMembership(
-        Set<Id> excludedAccountTypes,
-        Integer howMany
-    ) {
-        Date today = Date.today();
-        return [
-            SELECT Id, Name
-            FROM Contact
-            WHERE
-                Id NOT IN (
-                    SELECT Contact__c
-                    FROM Household_Member__c
-                    WHERE Contact__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
-                )
-                AND Id NOT IN :erasedPeople()
-                AND (AccountId = NULL
-                OR Account.RecordTypeId NOT IN :excludedAccountTypes)
-            WITH USER_MODE
-            ORDER BY CreatedDate, Id
-            LIMIT :howMany
-        ];
-    }
+	public static List<Contact> contactsWithoutMembership(
+		Set<Id> excludedAccountTypes,
+		Integer howMany
+	) {
+		Date today = Date.today();
+		return [
+			SELECT Id, Name
+			FROM Contact
+			WHERE
+				Id NOT IN (
+					SELECT Contact__c
+					FROM Household_Member__c
+					WHERE Contact__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
+				)
+				AND Id NOT IN :erasedPeople()
+				AND (AccountId = NULL
+				OR Account.RecordTypeId NOT IN :excludedAccountTypes)
+			WITH USER_MODE
+			ORDER BY CreatedDate, Id
+			LIMIT :howMany
+		];
+	}
 
-    /**
-     * Contact mode, for the household catch-up batch: every contact with no account, with the
-     * fields a household name is built from. Unlike the reads above this is household upkeep,
-     * not a screen, so it runs in system mode like the trigger it stands in for (ADR-0021);
-     * the class is `with sharing`, so it still sees only records the person who turned
-     * household upkeep on can see.
-     */
-    public static Database.QueryLocator contactsWithoutAccountLocator() {
-        Set<Id> erasedIds = erasedPeople();
-        return Database.getQueryLocator(
-            [
-                SELECT
-                    Id,
-                    AccountId,
-                    FirstName,
-                    LastName,
-                    Salutation,
-                    Preferred_Name__c,
-                    Household_Role__c,
-                    Deceased__c,
-                    Exclude_From_Household_Name__c,
-                    Exclude_From_Greetings__c,
-                    CreatedDate
-                FROM Contact
-                WHERE AccountId = NULL AND Id NOT IN :erasedIds
-                WITH SYSTEM_MODE
-            ]
-        );
-    }
+	/**
+	 * Contact mode, for the household catch-up batch: every contact with no account, with the
+	 * fields a household name is built from. Unlike the reads above this is household upkeep,
+	 * not a screen, so it runs in system mode like the trigger it stands in for (ADR-0021);
+	 * the class is `with sharing`, so it still sees only records the person who turned
+	 * household upkeep on can see.
+	 */
+	public static Database.QueryLocator contactsWithoutAccountLocator() {
+		Set<Id> erasedIds = erasedPeople();
+		return Database.getQueryLocator(
+			[
+				SELECT
+					Id,
+					AccountId,
+					FirstName,
+					LastName,
+					Salutation,
+					Preferred_Name__c,
+					Household_Role__c,
+					Deceased__c,
+					Exclude_From_Household_Name__c,
+					Exclude_From_Greetings__c,
+					CreatedDate
+				FROM Contact
+				WHERE AccountId = NULL AND Id NOT IN :erasedIds
+				WITH SYSTEM_MODE
+			]
+		);
+	}
 
-    /**
-     * Junction mode, for the household catch-up batch: every contact with no current
-     * membership row, leaving out those whose account is of an excluded type, as
-     * `contactsWithoutMembership` does. System mode for the reason above.
-     */
-    public static Database.QueryLocator contactsWithoutMembershipLocator(
-        Set<Id> excludedAccountTypes
-    ) {
-        Date today = Date.today();
-        Set<Id> erasedIds = erasedPeople();
-        return Database.getQueryLocator(
-            [
-                SELECT
-                    Id,
-                    AccountId,
-                    FirstName,
-                    LastName,
-                    Salutation,
-                    Preferred_Name__c,
-                    Household_Role__c,
-                    Deceased__c,
-                    Exclude_From_Household_Name__c,
-                    Exclude_From_Greetings__c,
-                    CreatedDate
-                FROM Contact
-                WHERE
-                    Id NOT IN (
-                        SELECT Contact__c
-                        FROM Household_Member__c
-                        WHERE Contact__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
-                    )
-                    AND Id NOT IN :erasedIds
-                    AND (AccountId = NULL
-                    OR Account.RecordTypeId NOT IN :excludedAccountTypes)
-                WITH SYSTEM_MODE
-            ]
-        );
-    }
+	/**
+	 * Junction mode, for the household catch-up batch: every contact with no current
+	 * membership row, leaving out those whose account is of an excluded type, as
+	 * `contactsWithoutMembership` does. System mode for the reason above.
+	 */
+	public static Database.QueryLocator contactsWithoutMembershipLocator(
+		Set<Id> excludedAccountTypes
+	) {
+		Date today = Date.today();
+		Set<Id> erasedIds = erasedPeople();
+		return Database.getQueryLocator(
+			[
+				SELECT
+					Id,
+					AccountId,
+					FirstName,
+					LastName,
+					Salutation,
+					Preferred_Name__c,
+					Household_Role__c,
+					Deceased__c,
+					Exclude_From_Household_Name__c,
+					Exclude_From_Greetings__c,
+					CreatedDate
+				FROM Contact
+				WHERE
+					Id NOT IN (
+						SELECT Contact__c
+						FROM Household_Member__c
+						WHERE Contact__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
+					)
+					AND Id NOT IN :erasedIds
+					AND (AccountId = NULL
+					OR Account.RecordTypeId NOT IN :excludedAccountTypes)
+				WITH SYSTEM_MODE
+			]
+		);
+	}
 
-    /**
-     * Junction mode, for the household catch-up batch: every person stored as an account that
-     * no current membership row names, as `personAccountsWithoutMembership` reads them. Only
-     * the id is selected, so no person account field is named here (ADR-0013); the batch reads
-     * the naming fields through `PersonRecordSelector`. System mode for the reason above.
-     */
-    public static Database.QueryLocator personAccountsWithoutMembershipLocator(
-        Set<Id> personRecordTypeIds
-    ) {
-        Date today = Date.today();
-        Set<Id> erasedIds = erasedPeople();
-        return Database.getQueryLocator(
-            [
-                SELECT Id
-                FROM Account
-                WHERE
-                    RecordTypeId IN :personRecordTypeIds
-                    AND Id NOT IN :erasedIds
-                    AND Id NOT IN (
-                        SELECT Account__c
-                        FROM Household_Member__c
-                        WHERE Account__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
-                    )
-                WITH SYSTEM_MODE
-            ]
-        );
-    }
+	/**
+	 * Junction mode, for the household catch-up batch: every person stored as an account that
+	 * no current membership row names, as `personAccountsWithoutMembership` reads them. Only
+	 * the id is selected, so no person account field is named here (ADR-0013); the batch reads
+	 * the naming fields through `PersonRecordSelector`. System mode for the reason above.
+	 */
+	public static Database.QueryLocator personAccountsWithoutMembershipLocator(
+		Set<Id> personRecordTypeIds
+	) {
+		Date today = Date.today();
+		Set<Id> erasedIds = erasedPeople();
+		return Database.getQueryLocator(
+			[
+				SELECT Id
+				FROM Account
+				WHERE
+					RecordTypeId IN :personRecordTypeIds
+					AND Id NOT IN :erasedIds
+					AND Id NOT IN (
+						SELECT Account__c
+						FROM Household_Member__c
+						WHERE Account__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
+					)
+				WITH SYSTEM_MODE
+			]
+		);
+	}
 
-    /** Junction mode, people stored as accounts: no current membership row names them. */
-    public static Integer countPersonAccountsWithoutMembership(
-        Set<Id> personRecordTypeIds,
-        Integer cap
-    ) {
-        Date today = Date.today();
-        return [
-            SELECT COUNT()
-            FROM Account
-            WHERE
-                RecordTypeId IN :personRecordTypeIds
-                AND Id NOT IN :erasedPeople()
-                AND Id NOT IN (
-                    SELECT Account__c
-                    FROM Household_Member__c
-                    WHERE Account__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
-                )
-            WITH USER_MODE
-            LIMIT :cap
-        ];
-    }
+	/** Junction mode, people stored as accounts: no current membership row names them. */
+	public static Integer countPersonAccountsWithoutMembership(
+		Set<Id> personRecordTypeIds,
+		Integer cap
+	) {
+		Date today = Date.today();
+		return [
+			SELECT COUNT()
+			FROM Account
+			WHERE
+				RecordTypeId IN :personRecordTypeIds
+				AND Id NOT IN :erasedPeople()
+				AND Id NOT IN (
+					SELECT Account__c
+					FROM Household_Member__c
+					WHERE Account__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
+				)
+			WITH USER_MODE
+			LIMIT :cap
+		];
+	}
 
-    public static List<Account> personAccountsWithoutMembership(
-        Set<Id> personRecordTypeIds,
-        Integer howMany
-    ) {
-        Date today = Date.today();
-        return [
-            SELECT Id, Name
-            FROM Account
-            WHERE
-                RecordTypeId IN :personRecordTypeIds
-                AND Id NOT IN :erasedPeople()
-                AND Id NOT IN (
-                    SELECT Account__c
-                    FROM Household_Member__c
-                    WHERE Account__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
-                )
-            WITH USER_MODE
-            ORDER BY CreatedDate, Id
-            LIMIT :howMany
-        ];
-    }
+	public static List<Account> personAccountsWithoutMembership(
+		Set<Id> personRecordTypeIds,
+		Integer howMany
+	) {
+		Date today = Date.today();
+		return [
+			SELECT Id, Name
+			FROM Account
+			WHERE
+				RecordTypeId IN :personRecordTypeIds
+				AND Id NOT IN :erasedPeople()
+				AND Id NOT IN (
+					SELECT Account__c
+					FROM Household_Member__c
+					WHERE Account__c != NULL AND (End_Date__c = NULL OR End_Date__c > :today)
+				)
+			WITH USER_MODE
+			ORDER BY CreatedDate, Id
+			LIMIT :howMany
+		];
+	}
 
-    /** Contact mode: households no contact's account points at. */
-    public static Integer countHouseholdsWithoutContacts(Id householdRecordTypeId, Integer cap) {
-        return [
-            SELECT COUNT()
-            FROM Account
-            WHERE
-                RecordTypeId = :householdRecordTypeId
-                AND Id NOT IN (SELECT AccountId FROM Contact WHERE AccountId != NULL)
-            WITH USER_MODE
-            LIMIT :cap
-        ];
-    }
+	/** Contact mode: households no contact's account points at. */
+	public static Integer countHouseholdsWithoutContacts(Id householdRecordTypeId, Integer cap) {
+		return [
+			SELECT COUNT()
+			FROM Account
+			WHERE
+				RecordTypeId = :householdRecordTypeId
+				AND Id NOT IN (SELECT AccountId FROM Contact WHERE AccountId != NULL)
+			WITH USER_MODE
+			LIMIT :cap
+		];
+	}
 
-    public static List<Account> householdsWithoutContacts(
-        Id householdRecordTypeId,
-        Integer howMany
-    ) {
-        return [
-            SELECT Id, Name
-            FROM Account
-            WHERE
-                RecordTypeId = :householdRecordTypeId
-                AND Id NOT IN (SELECT AccountId FROM Contact WHERE AccountId != NULL)
-            WITH USER_MODE
-            ORDER BY CreatedDate, Id
-            LIMIT :howMany
-        ];
-    }
+	public static List<Account> householdsWithoutContacts(
+		Id householdRecordTypeId,
+		Integer howMany
+	) {
+		return [
+			SELECT Id, Name
+			FROM Account
+			WHERE
+				RecordTypeId = :householdRecordTypeId
+				AND Id NOT IN (SELECT AccountId FROM Contact WHERE AccountId != NULL)
+			WITH USER_MODE
+			ORDER BY CreatedDate, Id
+			LIMIT :howMany
+		];
+	}
 
-    /** Junction mode: households no current membership row that names somebody points at. */
-    public static Integer countHouseholdsWithoutMembers(Id householdRecordTypeId, Integer cap) {
-        Date today = Date.today();
-        return [
-            SELECT COUNT()
-            FROM Account
-            WHERE
-                RecordTypeId = :householdRecordTypeId
-                AND Id NOT IN (
-                    SELECT Household__c
-                    FROM Household_Member__c
-                    WHERE
-                        (Contact__c != NULL
-                        OR Account__c != NULL)
-                        AND (End_Date__c = NULL
-                        OR End_Date__c > :today)
-                )
-            WITH USER_MODE
-            LIMIT :cap
-        ];
-    }
+	/** Junction mode: households no current membership row that names somebody points at. */
+	public static Integer countHouseholdsWithoutMembers(Id householdRecordTypeId, Integer cap) {
+		Date today = Date.today();
+		return [
+			SELECT COUNT()
+			FROM Account
+			WHERE
+				RecordTypeId = :householdRecordTypeId
+				AND Id NOT IN (
+					SELECT Household__c
+					FROM Household_Member__c
+					WHERE
+						(Contact__c != NULL
+						OR Account__c != NULL)
+						AND (End_Date__c = NULL
+						OR End_Date__c > :today)
+				)
+			WITH USER_MODE
+			LIMIT :cap
+		];
+	}
 
-    public static List<Account> householdsWithoutMembers(
-        Id householdRecordTypeId,
-        Integer howMany
-    ) {
-        Date today = Date.today();
-        return [
-            SELECT Id, Name
-            FROM Account
-            WHERE
-                RecordTypeId = :householdRecordTypeId
-                AND Id NOT IN (
-                    SELECT Household__c
-                    FROM Household_Member__c
-                    WHERE
-                        (Contact__c != NULL
-                        OR Account__c != NULL)
-                        AND (End_Date__c = NULL
-                        OR End_Date__c > :today)
-                )
-            WITH USER_MODE
-            ORDER BY CreatedDate, Id
-            LIMIT :howMany
-        ];
-    }
+	public static List<Account> householdsWithoutMembers(
+		Id householdRecordTypeId,
+		Integer howMany
+	) {
+		Date today = Date.today();
+		return [
+			SELECT Id, Name
+			FROM Account
+			WHERE
+				RecordTypeId = :householdRecordTypeId
+				AND Id NOT IN (
+					SELECT Household__c
+					FROM Household_Member__c
+					WHERE
+						(Contact__c != NULL
+						OR Account__c != NULL)
+						AND (End_Date__c = NULL
+						OR End_Date__c > :today)
+				)
+			WITH USER_MODE
+			ORDER BY CreatedDate, Id
+			LIMIT :howMany
+		];
+	}
 }

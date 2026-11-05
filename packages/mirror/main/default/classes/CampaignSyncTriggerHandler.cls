@@ -6,23 +6,23 @@
  */
 @NamespaceAccessible
 public with sharing class CampaignSyncTriggerHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public CampaignSyncTriggerHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public CampaignSyncTriggerHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return CampaignSyncService.AUTOMATION_NAME;
-    }
+	public override String getName() {
+		return CampaignSyncService.AUTOMATION_NAME;
+	}
 
-    public override void beforeInsert() {
-        CampaignSyncService.syncBeforeSave((List<Appeal__c>) newRecords(), null);
-    }
+	public override void beforeInsert() {
+		CampaignSyncService.syncBeforeSave((List<Appeal__c>) newRecords(), null);
+	}
 
-    public override void beforeUpdate() {
-        CampaignSyncService.syncBeforeSave(
-            (List<Appeal__c>) newRecords(),
-            (Map<Id, Appeal__c>) oldRecordsById()
-        );
-    }
+	public override void beforeUpdate() {
+		CampaignSyncService.syncBeforeSave(
+			(List<Appeal__c>) newRecords(),
+			(Map<Id, Appeal__c>) oldRecordsById()
+		);
+	}
 }

@@ -24,7 +24,9 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">How many days a finished import, Super Transformer run or bulk delete is kept on the Imports list, with its rows and journal, once it can no longer be undone. The nightly run deletes older ones. The default is 365, and anything from 30 to 3650 is accepted; a value outside that range is read as the nearest end.</value>
+    <value
+      xsi:type="xsd:string"
+    >How many days a finished import, Super Transformer run or bulk delete is kept on the Imports list, with its rows and journal, once it can no longer be undone. An import left in Draft, Parsing or Preview and never committed goes after the same number of days. The nightly run deletes older ones. The default is 365, and anything from 30 to 3650 is accepted; a value outside that range is read as the nearest end.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

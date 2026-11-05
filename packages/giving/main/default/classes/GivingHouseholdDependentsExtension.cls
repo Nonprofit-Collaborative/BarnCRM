@@ -16,39 +16,39 @@
  */
 @NamespaceAccessible
 public without sharing class GivingHouseholdDependentsExtension implements HouseholdDependentsExtension {
-    @NamespaceAccessible
-    public GivingHouseholdDependentsExtension() {
-        return;
-    }
+	@NamespaceAccessible
+	public GivingHouseholdDependentsExtension() {
+		return;
+	}
 
-    public Set<Id> householdsWithDependents(Set<Id> householdIds) {
-        Set<Id> dependent = new Set<Id>();
-        if (householdIds == null || householdIds.isEmpty()) {
-            return dependent;
-        }
-        // Semi-joins, so each query returns at most one row per household asked about, however
-        // many gifts it has.
-        for (Account household : [
-            SELECT Id
-            FROM Account
-            WHERE Id IN :householdIds AND Id IN (SELECT Household__c FROM Gift__c)
-            WITH SYSTEM_MODE
-        ]) {
-            dependent.add(household.Id);
-        }
-        Set<Id> notYetDependent = new Set<Id>(householdIds);
-        notYetDependent.removeAll(dependent);
-        if (notYetDependent.isEmpty()) {
-            return dependent;
-        }
-        for (Account household : [
-            SELECT Id
-            FROM Account
-            WHERE Id IN :notYetDependent AND Id IN (SELECT Household__c FROM Commitment__c)
-            WITH SYSTEM_MODE
-        ]) {
-            dependent.add(household.Id);
-        }
-        return dependent;
-    }
+	public Set<Id> householdsWithDependents(Set<Id> householdIds) {
+		Set<Id> dependent = new Set<Id>();
+		if (householdIds == null || householdIds.isEmpty()) {
+			return dependent;
+		}
+		// Semi-joins, so each query returns at most one row per household asked about, however
+		// many gifts it has.
+		for (Account household : [
+			SELECT Id
+			FROM Account
+			WHERE Id IN :householdIds AND Id IN (SELECT Household__c FROM Gift__c)
+			WITH SYSTEM_MODE
+		]) {
+			dependent.add(household.Id);
+		}
+		Set<Id> notYetDependent = new Set<Id>(householdIds);
+		notYetDependent.removeAll(dependent);
+		if (notYetDependent.isEmpty()) {
+			return dependent;
+		}
+		for (Account household : [
+			SELECT Id
+			FROM Account
+			WHERE Id IN :notYetDependent AND Id IN (SELECT Household__c FROM Commitment__c)
+			WITH SYSTEM_MODE
+		]) {
+			dependent.add(household.Id);
+		}
+		return dependent;
+	}
 }

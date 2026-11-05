@@ -7,27 +7,27 @@
  */
 @NamespaceAccessible
 public with sharing class OpportunityMirrorTriggerHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public OpportunityMirrorTriggerHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public OpportunityMirrorTriggerHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return OpportunityMirrorService.AUTOMATION_NAME;
-    }
+	public override String getName() {
+		return OpportunityMirrorService.AUTOMATION_NAME;
+	}
 
-    public override void beforeInsert() {
-        OpportunityMirrorService.syncBeforeSave((List<Gift__c>) newRecords(), null);
-    }
+	public override void beforeInsert() {
+		OpportunityMirrorService.syncBeforeSave((List<Gift__c>) newRecords(), null);
+	}
 
-    public override void beforeUpdate() {
-        OpportunityMirrorService.syncBeforeSave(
-            (List<Gift__c>) newRecords(),
-            (Map<Id, Gift__c>) oldRecordsById()
-        );
-    }
+	public override void beforeUpdate() {
+		OpportunityMirrorService.syncBeforeSave(
+			(List<Gift__c>) newRecords(),
+			(Map<Id, Gift__c>) oldRecordsById()
+		);
+	}
 
-    public override void afterDelete() {
-        OpportunityMirrorService.warnDeleted((List<Gift__c>) oldRecords());
-    }
+	public override void afterDelete() {
+		OpportunityMirrorService.warnDeleted((List<Gift__c>) oldRecords());
+	}
 }

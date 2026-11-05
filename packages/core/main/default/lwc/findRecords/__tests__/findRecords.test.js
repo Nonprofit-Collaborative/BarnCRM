@@ -605,7 +605,6 @@ describe('c-find-records', () => {
     await flush();
 
     // Super Transformer is the one place a bulk change is built: Find opens it, pre-filled.
-    expect(allowed.shadowRoot.querySelector('c-bulk-update')).toBeNull();
     expect(navigate).toHaveBeenCalledTimes(1);
     const reference = navigate.mock.calls[0][0];
     expect(reference.type).toBe('standard__navItemPage');

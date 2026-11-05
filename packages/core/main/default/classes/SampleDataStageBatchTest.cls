@@ -7,272 +7,272 @@
  */
 @IsTest(testFor='ApexClass:SampleDataStageBatch, ApexClass:SampleDataLoadStages')
 private class SampleDataStageBatchTest {
-    @TestSetup
-    static void createTestUser() {
-        System.runAs(TestUsers.adminWithInstalledModules()) {
-            AccountKindsTestData.useRecordTypeTheUserCanUse();
-        }
-    }
+	@TestSetup
+	static void createTestUser() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			AccountKindsTestData.useRecordTypeTheUserCanUse();
+		}
+	}
 
-    /** A module that records that Core started it, standing in for Giving. */
-    private class StubModule implements SampleDataModule {
-        private Boolean loadStarted = false;
+	/** A module that records that Core started it, standing in for Giving. */
+	private class StubModule implements SampleDataModule {
+		private Boolean loadStarted = false;
 
-        public String moduleName() {
-            return 'Stub';
-        }
+		public String moduleName() {
+			return 'Stub';
+		}
 
-        public String countLabel() {
-            return 'Stub records';
-        }
+		public String countLabel() {
+			return 'Stub records';
+		}
 
-        public Integer countLoaded() {
-            return 0;
-        }
+		public Integer countLoaded() {
+			return 0;
+		}
 
-        public Boolean hasSampleRecords() {
-            return false;
-        }
+		public Boolean hasSampleRecords() {
+			return false;
+		}
 
-        public void enqueueLoad() {
-            loadStarted = true;
-        }
+		public void enqueueLoad() {
+			loadStarted = true;
+		}
 
-        public void enqueueRemove() {
-            return;
-        }
-    }
+		public void enqueueRemove() {
+			return;
+		}
+	}
 
-    /** A load that records each stage it runs, and fails at the stage it is told to. */
-    private class RecordingStages implements SampleDataStages {
-        private final Integer failAt;
-        private List<Integer> ran = new List<Integer>();
-        private Boolean finished = false;
+	/** A load that records each stage it runs, and fails at the stage it is told to. */
+	private class RecordingStages implements SampleDataStages {
+		private final Integer failAt;
+		private List<Integer> ran = new List<Integer>();
+		private Boolean finished = false;
 
-        private RecordingStages(Integer failAt) {
-            this.failAt = failAt;
-        }
+		private RecordingStages(Integer failAt) {
+			this.failAt = failAt;
+		}
 
-        public String name() {
-            return 'RecordingStages';
-        }
+		public String name() {
+			return 'RecordingStages';
+		}
 
-        public Integer stageCount() {
-            return 3;
-        }
+		public Integer stageCount() {
+			return 3;
+		}
 
-        public void runStage(Integer stage) {
-            Database.insert(new Account(Name = 'Stage ' + stage), AccessLevel.USER_MODE);
-            if (stage == failAt) {
-                throw new SampleDataException('stage ' + stage + ' failed');
-            }
-            ran.add(stage);
-        }
+		public void runStage(Integer stage) {
+			Database.insert(new Account(Name = 'Stage ' + stage), AccessLevel.USER_MODE);
+			if (stage == failAt) {
+				throw new SampleDataException('stage ' + stage + ' failed');
+			}
+			ran.add(stage);
+		}
 
-        public void finish() {
-            finished = true;
-        }
-    }
+		public void finish() {
+			finished = true;
+		}
+	}
 
-    /** One hundred households of two people each, one organization and one connection. */
-    private static String buildJson() {
-        List<Object> households = new List<Object>();
-        for (Integer h = 0; h < 100; h++) {
-            List<Object> members = new List<Object>();
-            for (Integer m = 1; m <= 2; m++) {
-                members.add(
-                    new Map<String, Object>{
-                        'key' => 'H' +
-                        h +
-                        '-' +
-                        m,
-                        'firstName' => 'Person' + m,
-                        'lastName' => 'Stage' + h,
-                        'householdRole' => m == 1 ? 'Head' : 'Other'
-                    }
-                );
-            }
-            households.add(
-                new Map<String, Object>{
-                    'key' => 'H' + h,
-                    'customName' => false,
-                    'members' => members
-                }
-            );
-        }
-        Map<String, Object> root = new Map<String, Object>{
-            'households' => households,
-            'organizations' => new List<Object>{
-                new Map<String, Object>{ 'key' => 'O1', 'name' => 'Stage Foundation' }
-            },
-            'relationships' => new List<Object>{
-                new Map<String, Object>{
-                    'person' => 'H0-1',
-                    'relatedPerson' => 'H1-1',
-                    'type' => 'Friend',
-                    'status' => 'Current'
-                }
-            }
-        };
-        return JSON.serialize(root);
-    }
+	/** One hundred households of two people each, one organization and one connection. */
+	private static String buildJson() {
+		List<Object> households = new List<Object>();
+		for (Integer h = 0; h < 100; h++) {
+			List<Object> members = new List<Object>();
+			for (Integer m = 1; m <= 2; m++) {
+				members.add(
+					new Map<String, Object>{
+						'key' => 'H' +
+						h +
+						'-' +
+						m,
+						'firstName' => 'Person' + m,
+						'lastName' => 'Stage' + h,
+						'householdRole' => m == 1 ? 'Head' : 'Other'
+					}
+				);
+			}
+			households.add(
+				new Map<String, Object>{
+					'key' => 'H' + h,
+					'customName' => false,
+					'members' => members
+				}
+			);
+		}
+		Map<String, Object> root = new Map<String, Object>{
+			'households' => households,
+			'organizations' => new List<Object>{
+				new Map<String, Object>{ 'key' => 'O1', 'name' => 'Stage Foundation' }
+			},
+			'relationships' => new List<Object>{
+				new Map<String, Object>{
+					'person' => 'H0-1',
+					'relatedPerson' => 'H1-1',
+					'type' => 'Friend',
+					'status' => 'Current'
+				}
+			}
+		};
+		return JSON.serialize(root);
+	}
 
-    @IsTest
-    static void testCoreStagesRunInOrderToTheModuleHandOff() {
-        System.runAs(TestUsers.adminWithInstalledModules()) {
-            SampleDataLoader.jsonOverride = buildJson();
-            StubModule module = new StubModule();
-            SampleDataModules.moduleOverride = new List<SampleDataModule>{ module };
-            SampleDataStageBatch.everyStageInTest = true;
-            SampleDataStageBatch batch = new SampleDataStageBatch(new SampleDataLoadStages());
+	@IsTest
+	static void testCoreStagesRunInOrderToTheModuleHandOff() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			SampleDataLoader.jsonOverride = buildJson();
+			StubModule module = new StubModule();
+			SampleDataModules.moduleOverride = new List<SampleDataModule>{ module };
+			SampleDataStageBatch.everyStageInTest = true;
+			SampleDataStageBatch batch = new SampleDataStageBatch(new SampleDataLoadStages());
 
-            Test.startTest();
-            List<Integer> order = (List<Integer>) batch.start(null);
-            System.assertEquals(
-                new List<Integer>{ 0, 1, 2, 3 },
-                order,
-                'accounts, two contact chunks of one hundred, then connections'
-            );
+			Test.startTest();
+			List<Integer> order = (List<Integer>) batch.start(null);
+			System.assertEquals(
+				new List<Integer>{ 0, 1, 2, 3 },
+				order,
+				'accounts, two contact chunks of one hundred, then connections'
+			);
 
-            batch.execute(null, new List<Integer>{ 0 });
-            System.assertEquals(
-                100,
-                SampleDataLoader.status().householdCount,
-                'stage 0: households'
-            );
-            System.assertEquals(0, SampleDataLoader.status().contactCount, 'no people yet');
+			batch.execute(null, new List<Integer>{ 0 });
+			System.assertEquals(
+				100,
+				SampleDataLoader.status().householdCount,
+				'stage 0: households'
+			);
+			System.assertEquals(0, SampleDataLoader.status().contactCount, 'no people yet');
 
-            batch.execute(null, new List<Integer>{ 1 });
-            System.assertEquals(
-                100,
-                SampleDataLoader.status().contactCount,
-                'stage 1: first chunk'
-            );
+			batch.execute(null, new List<Integer>{ 1 });
+			System.assertEquals(
+				100,
+				SampleDataLoader.status().contactCount,
+				'stage 1: first chunk'
+			);
 
-            batch.execute(null, new List<Integer>{ 2 });
-            System.assertEquals(
-                200,
-                SampleDataLoader.status().contactCount,
-                'stage 2: second chunk'
-            );
-            System.assertEquals(false, module.loadStarted, 'modules wait for the last stage');
+			batch.execute(null, new List<Integer>{ 2 });
+			System.assertEquals(
+				200,
+				SampleDataLoader.status().contactCount,
+				'stage 2: second chunk'
+			);
+			System.assertEquals(false, module.loadStarted, 'modules wait for the last stage');
 
-            batch.execute(null, new List<Integer>{ 3 });
-            batch.finish(null);
-            Test.stopTest();
+			batch.execute(null, new List<Integer>{ 3 });
+			batch.finish(null);
+			Test.stopTest();
 
-            SampleDataLoader.Counts status = SampleDataLoader.status();
-            System.assertEquals(
-                1,
-                status.relationshipCount,
-                'one connection, using the household map kept between stages'
-            );
-            System.assertEquals(
-                2,
-                [SELECT COUNT() FROM Relationship__c WHERE Sample_Data__c = TRUE],
-                'the connection and its mirror'
-            );
-            System.assertEquals(false, batch.stopped, 'no stage failed');
-            System.assertEquals(true, module.loadStarted, 'finish starts the first module');
-        }
-    }
+			SampleDataLoader.Counts status = SampleDataLoader.status();
+			System.assertEquals(
+				1,
+				status.relationshipCount,
+				'one connection, using the household map kept between stages'
+			);
+			System.assertEquals(
+				2,
+				[SELECT COUNT() FROM Relationship__c WHERE Sample_Data__c = TRUE],
+				'the connection and its mirror'
+			);
+			System.assertEquals(false, batch.stopped, 'no stage failed');
+			System.assertEquals(true, module.loadStarted, 'finish starts the first module');
+		}
+	}
 
-    @IsTest
-    static void testATestContextRunsTheFirstStageOnly() {
-        System.runAs(TestUsers.adminWithInstalledModules()) {
-            SampleDataLoader.jsonOverride = buildJson();
-            SampleDataStageBatch batch = new SampleDataStageBatch(new SampleDataLoadStages());
+	@IsTest
+	static void testATestContextRunsTheFirstStageOnly() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			SampleDataLoader.jsonOverride = buildJson();
+			SampleDataStageBatch batch = new SampleDataStageBatch(new SampleDataLoadStages());
 
-            List<Integer> order = (List<Integer>) batch.start(null);
+			List<Integer> order = (List<Integer>) batch.start(null);
 
-            System.assertEquals(
-                new List<Integer>{ 0 },
-                order,
-                'the platform allows one execute of a batch in a test'
-            );
-        }
-    }
+			System.assertEquals(
+				new List<Integer>{ 0 },
+				order,
+				'the platform allows one execute of a batch in a test'
+			);
+		}
+	}
 
-    @IsTest
-    static void testAFailedStageIsRolledBackAndStopsTheLoad() {
-        System.runAs(TestUsers.adminWithInstalledModules()) {
-            RecordingStages stages = new RecordingStages(1);
-            SampleDataStageBatch.everyStageInTest = true;
-            SampleDataStageBatch batch = new SampleDataStageBatch(stages);
+	@IsTest
+	static void testAFailedStageIsRolledBackAndStopsTheLoad() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			RecordingStages stages = new RecordingStages(1);
+			SampleDataStageBatch.everyStageInTest = true;
+			SampleDataStageBatch batch = new SampleDataStageBatch(stages);
 
-            Test.startTest();
-            for (Integer stage : (List<Integer>) batch.start(null)) {
-                batch.execute(null, new List<Integer>{ stage });
-            }
-            batch.finish(null);
-            Test.stopTest();
+			Test.startTest();
+			for (Integer stage : (List<Integer>) batch.start(null)) {
+				batch.execute(null, new List<Integer>{ stage });
+			}
+			batch.finish(null);
+			Test.stopTest();
 
-            System.assertEquals(new List<Integer>{ 0 }, stages.ran, 'stage 2 never runs');
-            System.assertEquals(true, batch.stopped, 'the load is marked stopped');
-            System.assertEquals(false, stages.finished, 'a stopped load hands over to nothing');
-            System.assertEquals(
-                1,
-                [SELECT COUNT() FROM Account WHERE Name LIKE 'Stage %'],
-                'the failed stage is rolled back and the stage before it is kept'
-            );
-            Boolean pointed = false;
-            for (Error_Log__c entry : [
-                SELECT Message__c, Technical_Detail__c
-                FROM Error_Log__c
-                WITH SYSTEM_MODE
-            ]) {
-                if (
-                    entry.Message__c == BarnHelp.text('Core', 'Core_SampleData_StoppedLogMessage')
-                ) {
-                    pointed = entry.Technical_Detail__c != null;
-                }
-            }
-            System.assert(
-                pointed,
-                'the Error Log entry points to the admin guide and keeps the technical detail'
-            );
-        }
-    }
+			System.assertEquals(new List<Integer>{ 0 }, stages.ran, 'stage 2 never runs');
+			System.assertEquals(true, batch.stopped, 'the load is marked stopped');
+			System.assertEquals(false, stages.finished, 'a stopped load hands over to nothing');
+			System.assertEquals(
+				1,
+				[SELECT COUNT() FROM Account WHERE Name LIKE 'Stage %'],
+				'the failed stage is rolled back and the stage before it is kept'
+			);
+			Boolean pointed = false;
+			for (Error_Log__c entry : [
+				SELECT Message__c, Technical_Detail__c
+				FROM Error_Log__c
+				WITH SYSTEM_MODE
+			]) {
+				if (
+					entry.Message__c == BarnHelp.text('Core', 'Core_SampleData_StoppedLogMessage')
+				) {
+					pointed = entry.Technical_Detail__c != null;
+				}
+			}
+			System.assert(
+				pointed,
+				'the Error Log entry points to the admin guide and keeps the technical detail'
+			);
+		}
+	}
 
-    @IsTest
-    static void testFinishWaitsForEveryStage() {
-        System.runAs(TestUsers.adminWithInstalledModules()) {
-            RecordingStages stages = new RecordingStages(null);
-            SampleDataStageBatch batch = new SampleDataStageBatch(stages);
+	@IsTest
+	static void testFinishWaitsForEveryStage() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			RecordingStages stages = new RecordingStages(null);
+			SampleDataStageBatch batch = new SampleDataStageBatch(stages);
 
-            Test.startTest();
-            batch.start(null);
-            batch.execute(null, new List<Integer>{ 0 });
-            batch.finish(null);
-            Test.stopTest();
+			Test.startTest();
+			batch.start(null);
+			batch.execute(null, new List<Integer>{ 0 });
+			batch.finish(null);
+			Test.stopTest();
 
-            System.assertEquals(
-                false,
-                stages.finished,
-                'a batch that ran one of three stages does not hand over'
-            );
-        }
-    }
+			System.assertEquals(
+				false,
+				stages.finished,
+				'a batch that ran one of three stages does not hand over'
+			);
+		}
+	}
 
-    @IsTest
-    static void testLoadStartsTheStageBatch() {
-        System.runAs(TestUsers.adminWithInstalledModules()) {
-            SampleDataLoader.jsonOverride = buildJson();
+	@IsTest
+	static void testLoadStartsTheStageBatch() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			SampleDataLoader.jsonOverride = buildJson();
 
-            Test.startTest();
-            SampleDataLoader.load();
-            Test.stopTest();
+			Test.startTest();
+			SampleDataLoader.load();
+			Test.stopTest();
 
-            System.assertEquals(1, SampleDataStageBatch.started.size(), 'one batch is started');
-            System.assert(
-                SampleDataStageBatch.started[0] instanceof SampleDataLoadStages,
-                'the batch runs Core\'s own stages first'
-            );
-            System.assertEquals(
-                100,
-                SampleDataLoader.status().householdCount,
-                'the batch ran the accounts stage'
-            );
-        }
-    }
+			System.assertEquals(1, SampleDataStageBatch.started.size(), 'one batch is started');
+			System.assert(
+				SampleDataStageBatch.started[0] instanceof SampleDataLoadStages,
+				'the batch runs Core\'s own stages first'
+			);
+			System.assertEquals(
+				100,
+				SampleDataLoader.status().householdCount,
+				'the batch ran the accounts stage'
+			);
+		}
+	}
 }

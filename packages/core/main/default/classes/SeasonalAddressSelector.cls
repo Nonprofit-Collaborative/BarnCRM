@@ -13,71 +13,71 @@
  * hands it identifiers that came from its own query locator.
  */
 public without sharing class SeasonalAddressSelector {
-    /**
-     * Every seasonal address in the org, grouped by owner.
-     *
-     * Seasonal addresses are the whole working set. An owner whose season is starting has one,
-     * and so does an owner whose season has just ended and whose ordinary address has to be put
-     * back, because the address the default flag is being moved away from is the seasonal one.
-     *
-     * The order keeps an owner's seasonal addresses together, so an owner with two of them is
-     * usually handled in one chunk rather than two. Handling them in two would be correct
-     * anyway: the swap is idempotent and the second pass finds nothing to do.
-     */
-    public Database.QueryLocator seasonalLocator() {
-        String seasonal = AddressService.TYPE_SEASONAL;
-        return Database.getQueryLocator(
-            [
-                SELECT Id, Account__c, Contact__c, Person_Account__c
-                FROM Address__c
-                WHERE Type__c = :seasonal
-                WITH SYSTEM_MODE
-                ORDER BY
-                    Account__c NULLS LAST,
-                    Contact__c NULLS LAST,
-                    Person_Account__c NULLS LAST,
-                    CreatedDate
-            ]
-        );
-    }
+	/**
+	 * Every seasonal address in the org, grouped by owner.
+	 *
+	 * Seasonal addresses are the whole working set. An owner whose season is starting has one,
+	 * and so does an owner whose season has just ended and whose ordinary address has to be put
+	 * back, because the address the default flag is being moved away from is the seasonal one.
+	 *
+	 * The order keeps an owner's seasonal addresses together, so an owner with two of them is
+	 * usually handled in one chunk rather than two. Handling them in two would be correct
+	 * anyway: the swap is idempotent and the second pass finds nothing to do.
+	 */
+	public Database.QueryLocator seasonalLocator() {
+		String seasonal = AddressService.TYPE_SEASONAL;
+		return Database.getQueryLocator(
+			[
+				SELECT Id, Account__c, Contact__c, Person_Account__c
+				FROM Address__c
+				WHERE Type__c = :seasonal
+				WITH SYSTEM_MODE
+				ORDER BY
+					Account__c NULLS LAST,
+					Contact__c NULLS LAST,
+					Person_Account__c NULLS LAST,
+					CreatedDate
+			]
+		);
+	}
 
-    /**
-     * Every address belonging to the given owners, not only the seasonal ones: the swap has to
-     * see the address it is moving the default away from and the address it is putting back.
-     */
-    public static List<Address__c> selectAllForOwners(Set<Id> ownerIds) {
-        if (ownerIds == null || ownerIds.isEmpty()) {
-            return new List<Address__c>();
-        }
-        return [
-            SELECT
-                Id,
-                Name,
-                Account__c,
-                Contact__c,
-                Person_Account__c,
-                Type__c,
-                Street__c,
-                City__c,
-                State__c,
-                Postal_Code__c,
-                Country__c,
-                Seasonal_Start_Month__c,
-                Seasonal_Start_Day__c,
-                Seasonal_End_Month__c,
-                Seasonal_End_Day__c,
-                Is_Default__c,
-                Replaced_By_Seasonal__c,
-                Status__c,
-                CreatedDate
-            FROM Address__c
-            WHERE
-                Account__c IN :ownerIds
-                OR Contact__c IN :ownerIds
-                OR Person_Account__c IN :ownerIds
-            WITH SYSTEM_MODE
-            ORDER BY CreatedDate
-            LIMIT 10000
-        ];
-    }
+	/**
+	 * Every address belonging to the given owners, not only the seasonal ones: the swap has to
+	 * see the address it is moving the default away from and the address it is putting back.
+	 */
+	public static List<Address__c> selectAllForOwners(Set<Id> ownerIds) {
+		if (ownerIds == null || ownerIds.isEmpty()) {
+			return new List<Address__c>();
+		}
+		return [
+			SELECT
+				Id,
+				Name,
+				Account__c,
+				Contact__c,
+				Person_Account__c,
+				Type__c,
+				Street__c,
+				City__c,
+				State__c,
+				Postal_Code__c,
+				Country__c,
+				Seasonal_Start_Month__c,
+				Seasonal_Start_Day__c,
+				Seasonal_End_Month__c,
+				Seasonal_End_Day__c,
+				Is_Default__c,
+				Replaced_By_Seasonal__c,
+				Status__c,
+				CreatedDate
+			FROM Address__c
+			WHERE
+				Account__c IN :ownerIds
+				OR Contact__c IN :ownerIds
+				OR Person_Account__c IN :ownerIds
+			WITH SYSTEM_MODE
+			ORDER BY CreatedDate
+			LIMIT 10000
+		];
+	}
 }

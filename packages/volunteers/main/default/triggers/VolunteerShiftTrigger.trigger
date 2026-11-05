@@ -4,13 +4,13 @@
  * bypassable from the settings console unless its row always runs (ADR-0017, ADR-0024).
  */
 trigger VolunteerShiftTrigger on Volunteer_Shift__c(
-    before insert,
-    before update,
-    before delete,
-    after insert,
-    after update,
-    after delete,
-    after undelete
+	before insert,
+	before update,
+	before delete,
+	after insert,
+	after update,
+	after delete,
+	after undelete
 ) {
-    TriggerDispatcher.run('Volunteer_Shift__c');
+	TriggerDispatcher.run('Volunteer_Shift__c');
 }

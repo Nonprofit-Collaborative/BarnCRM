@@ -9,15 +9,15 @@
  */
 @NamespaceAccessible
 public with sharing class GivingNightlyJobProvider implements NightlyStepProvider {
-    @NamespaceAccessible
-    public GivingNightlyJobProvider() {
-        return;
-    }
+	@NamespaceAccessible
+	public GivingNightlyJobProvider() {
+		return;
+	}
 
-    public List<NightlyStep> nightlySteps() {
-        List<NightlyStep> steps = GivingScheduler.steps();
-        steps.add(AcknowledgmentScheduler.step());
-        steps.add(PledgeReminderScheduler.step());
-        return steps;
-    }
+	public List<NightlyStep> nightlySteps() {
+		List<NightlyStep> steps = GivingScheduler.steps();
+		steps.add(AcknowledgmentScheduler.step());
+		steps.add(PledgeReminderScheduler.step());
+		return steps;
+	}
 }

@@ -135,12 +135,20 @@ Salesforce org is needed for this job. Steps:
    Help Text; ADR-0164 `0164-help-text-json.md`).
    `scripts/ci/check-apex-budget.py` fails when a package's non-test Apex, measured as the
    org measures it (every character but comments; `@IsTest` classes excluded), passes its cap
-   (`CAPS` in the script, a little above each package's size on 2026-11-04), or when a package
-   has no cap. An org allows 6,000,000 characters for its own code and every unmanaged
+   (`CAPS` in the script, about 2 percent above each package's size on 2026-11-05), or when a
+   package has no cap. An org allows 6,000,000 characters for its own code and every unmanaged
    BarnCRM package together, and scratch orgs allow 10,000,000, so only this sees growth.
    Raise a cap only in the pull request that needs it, and say why. The trim pass targets
    3,600,000 for the full suite and 2,000,000 for Core (the check reports the gap);
    `--report` prints each package's size and the largest classes.
+   **Apex is indented with tabs** (`"useTabs": true` in the `*.{cls,trigger}` override of
+   `.prettierrc`, with `tabWidth` still 4 so lines wrap where they did). The org counts every
+   character but comments, leading whitespace included (about a quarter of the source was
+   indentation), and a tab is one character where four spaces are four: on `oi-test`, BarnHelp's
+   `ApexClass.LengthWithoutComments` fell from 4,380 to 3,672 (16 percent), and the whole suite
+   from 4,394,706 to 3,523,686 characters (Core from 2,421,585 to 1,942,950). Format with
+   Prettier and the repository's configuration, so a hand-indented file does not creep the
+   count back up.
    `scripts/ci/check-help-text.py` checks those catalogs (`BarnHelp_<Package>.json`): every
    key a `helpText`, `BarnHelp.text` or `help-key` names is in its package's catalog and
    written as a literal, every catalog key is used and is not also a label, translations are
@@ -285,6 +293,12 @@ Salesforce org is needed for this job. Steps:
    a user without that grant, and a Jest mock cannot see it (the Volunteers readiness card
    shipped broken this way). A deliberate exception goes in
    `scripts/ci/aura-class-access-allowlist.txt` as `Class  reason`.
+   `scripts/ci/check-trigger-handler-records.py` fails the build if a class that extends
+   `TriggerHandler` (directly or through another handler) reads `Trigger.new`, `Trigger.old`,
+   `Trigger.newMap` or `Trigger.oldMap`. A handler reads its records through `newRecords()`,
+   `oldRecords()`, `newRecordsById()` and `oldRecordsById()`, because the dispatcher narrows
+   them and reruns a handler on the rest after a failure (ADR-0165 rule 3); only
+   `TriggerHandler` reads the platform's own.
 17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
    (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
    mapping from the real package source, so a new object or field that breaks it fails here.

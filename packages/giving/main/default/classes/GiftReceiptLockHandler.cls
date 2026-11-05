@@ -11,31 +11,31 @@
  */
 @NamespaceAccessible
 public with sharing class GiftReceiptLockHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public GiftReceiptLockHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public GiftReceiptLockHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'GiftReceiptLockHandler';
-    }
+	public override String getName() {
+		return 'GiftReceiptLockHandler';
+	}
 
-    public override void beforeInsert() {
-        GiftService.enforceReceiptNumberOnInsert((List<Gift__c>) newRecords());
-    }
+	public override void beforeInsert() {
+		GiftService.enforceReceiptNumberOnInsert((List<Gift__c>) newRecords());
+	}
 
-    public override void afterInsert() {
-        GiftService.recordReceiptNumberOverridesOnInsert((List<Gift__c>) newRecords());
-    }
+	public override void afterInsert() {
+		GiftService.recordReceiptNumberOverridesOnInsert((List<Gift__c>) newRecords());
+	}
 
-    public override void beforeUpdate() {
-        GiftService.enforceReceiptLock(
-            (List<Gift__c>) newRecords(),
-            (Map<Id, Gift__c>) oldRecordsById()
-        );
-    }
+	public override void beforeUpdate() {
+		GiftService.enforceReceiptLock(
+			(List<Gift__c>) newRecords(),
+			(Map<Id, Gift__c>) oldRecordsById()
+		);
+	}
 
-    public override void beforeDelete() {
-        GiftService.preventLossOfHistory((List<Gift__c>) oldRecords());
-    }
+	public override void beforeDelete() {
+		GiftService.preventLossOfHistory((List<Gift__c>) oldRecords());
+	}
 }

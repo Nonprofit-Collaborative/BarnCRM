@@ -12,11 +12,11 @@
  */
 @NamespaceAccessible
 public interface HealthCheckExtension {
-    /**
-     * Every finding this package adds to the report, already limited to what the running
-     * viewer may see (Health Check's own rule: only a viewer who may manage settings is asked
-     * a question that only they can be trusted to answer correctly). Never null; an empty
-     * list means nothing to report.
-     */
-    List<HealthCheckService.Finding> findings();
+	/**
+	 * Every finding this package adds to the report, already limited to what the running
+	 * viewer may see (Health Check's own rule: only a viewer who may manage settings is asked
+	 * a question that only they can be trusted to answer correctly). Never null; an empty
+	 * list means nothing to report.
+	 */
+	List<HealthCheckService.Finding> findings();
 }

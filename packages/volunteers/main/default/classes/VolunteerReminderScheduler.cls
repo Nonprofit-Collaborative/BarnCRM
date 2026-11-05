@@ -9,32 +9,32 @@
  * A separate class from the batch, so a change to the batch deploys while the job is scheduled.
  */
 public with sharing class VolunteerReminderScheduler implements Schedulable {
-    /** The name the scheduled job carries, so it can be found again. */
-    public static final String JOB_NAME = 'BarnCRM Volunteer Reminders';
+	/** The name the scheduled job carries, so it can be found again. */
+	public static final String JOB_NAME = 'BarnCRM Volunteer Reminders';
 
-    /** A test gives it a name of its own, because the org a test runs in may already have it. */
-    @TestVisible
-    private static String jobNameInUse = JOB_NAME;
+	/** A test gives it a name of its own, because the org a test runs in may already have it. */
+	@TestVisible
+	private static String jobNameInUse = JOB_NAME;
 
-    public void execute(SchedulableContext context) {
-        if (context != null) {
-            // Still scheduled on its own from before the nightly run (R-NJ5).
-            NightlyJobs.adoptOldSchedules();
-        }
-        VolunteerReminderBatch.startMorning();
-    }
+	public void execute(SchedulableContext context) {
+		if (context != null) {
+			// Still scheduled on its own from before the nightly run (R-NJ5).
+			NightlyJobs.adoptOldSchedules();
+		}
+		VolunteerReminderBatch.startMorning();
+	}
 
-    /**
-     * The job as a step of the nightly run (ADR-0166 nightly-job-dispatcher): seven in the
-     * morning, after the 3:00 AM shift run has created the day's shifts.
-     */
-    public static NightlyStep step() {
-        return new NightlyStep(
-            jobNameInUse,
-            System.Label.Volunteers_NightlyJobs_RemindersName,
-            7,
-            0,
-            new VolunteerReminderScheduler()
-        );
-    }
+	/**
+	 * The job as a step of the nightly run (ADR-0166 nightly-job-dispatcher): seven in the
+	 * morning, after the 3:00 AM shift run has created the day's shifts.
+	 */
+	public static NightlyStep step() {
+		return new NightlyStep(
+			jobNameInUse,
+			System.Label.Volunteers_NightlyJobs_RemindersName,
+			7,
+			0,
+			new VolunteerReminderScheduler()
+		);
+	}
 }

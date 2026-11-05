@@ -8,257 +8,257 @@
 // runs-as: deploying user (pure logic: reads a class name, no DML or SOQL)
 @IsTest(testFor='ApexClass:NamespaceUtil')
 private class NamespaceUtilTest {
-    @IsTest
-    static void prefixIsEmptyOrEndsInADoubleUnderscore() {
-        NamespaceUtil.cachedPrefix = null;
+	@IsTest
+	static void prefixIsEmptyOrEndsInADoubleUnderscore() {
+		NamespaceUtil.cachedPrefix = null;
 
-        String prefix = NamespaceUtil.prefix();
+		String prefix = NamespaceUtil.prefix();
 
-        System.assertNotEquals(null, prefix, 'There is always an answer, even if it is empty.');
-        System.assert(
-            String.isBlank(prefix) || prefix.endsWith('__'),
-            'A prefix is either absent or ready to be put in front of a name: ' + prefix
-        );
-    }
+		System.assertNotEquals(null, prefix, 'There is always an answer, even if it is empty.');
+		System.assert(
+			String.isBlank(prefix) || prefix.endsWith('__'),
+			'A prefix is either absent or ready to be put in front of a name: ' + prefix
+		);
+	}
 
-    @IsTest
-    static void qualifyPutsThePrefixInFront() {
-        NamespaceUtil.cachedPrefix = 'example__';
+	@IsTest
+	static void qualifyPutsThePrefixInFront() {
+		NamespaceUtil.cachedPrefix = 'example__';
 
-        System.assertEquals(
-            'example__BarnCRM_Settings',
-            NamespaceUtil.qualify('BarnCRM_Settings'),
-            'A packaged tab carries the package prefix.'
-        );
-    }
+		System.assertEquals(
+			'example__BarnCRM_Settings',
+			NamespaceUtil.qualify('BarnCRM_Settings'),
+			'A packaged tab carries the package prefix.'
+		);
+	}
 
-    @IsTest
-    static void qualifyLeavesNamesAloneWithoutANamespace() {
-        NamespaceUtil.cachedPrefix = '';
+	@IsTest
+	static void qualifyLeavesNamesAloneWithoutANamespace() {
+		NamespaceUtil.cachedPrefix = '';
 
-        System.assertEquals(
-            'BarnCRM_Settings',
-            NamespaceUtil.qualify('BarnCRM_Settings'),
-            'With no namespace registered the name stands on its own.'
-        );
-        System.assertEquals(null, NamespaceUtil.qualify(null), 'Nothing qualifies to nothing.');
-    }
+		System.assertEquals(
+			'BarnCRM_Settings',
+			NamespaceUtil.qualify('BarnCRM_Settings'),
+			'With no namespace registered the name stands on its own.'
+		);
+		System.assertEquals(null, NamespaceUtil.qualify(null), 'Nothing qualifies to nothing.');
+	}
 
-    @IsTest
-    static void stateKeysUseTheDefaultPrefixWhenThereIsNoNamespace() {
-        NamespaceUtil.cachedPrefix = '';
+	@IsTest
+	static void stateKeysUseTheDefaultPrefixWhenThereIsNoNamespace() {
+		NamespaceUtil.cachedPrefix = '';
 
-        System.assertEquals(
-            'c__section',
-            NamespaceUtil.stateKey('section'),
-            'Lightning namespaces page state, and an unmanaged package uses c__.'
-        );
-    }
+		System.assertEquals(
+			'c__section',
+			NamespaceUtil.stateKey('section'),
+			'Lightning namespaces page state, and an unmanaged package uses c__.'
+		);
+	}
 
-    @IsTest
-    static void stateKeysUseThePackagePrefixWhenThereIsOne() {
-        NamespaceUtil.cachedPrefix = 'example__';
+	@IsTest
+	static void stateKeysUseThePackagePrefixWhenThereIsOne() {
+		NamespaceUtil.cachedPrefix = 'example__';
 
-        System.assertEquals(
-            'example__section',
-            NamespaceUtil.stateKey('section'),
-            'A managed package uses its own prefix on page state.'
-        );
-        System.assertEquals(null, NamespaceUtil.stateKey(null), 'Nothing keys to nothing.');
-    }
+		System.assertEquals(
+			'example__section',
+			NamespaceUtil.stateKey('section'),
+			'A managed package uses its own prefix on page state.'
+		);
+		System.assertEquals(null, NamespaceUtil.stateKey(null), 'Nothing keys to nothing.');
+	}
 
-    /** This package's prefix and another package's, kept apart from the names they go on. */
-    private static final String OWN = 'barn__';
-    private static final String OTHER = 'npsp__';
+	/** This package's prefix and another package's, kept apart from the names they go on. */
+	private static final String OWN = 'barn__';
+	private static final String OTHER = 'npsp__';
 
-    /** A describe map standing in for an org, keyed the way the resolver looks names up. */
-    private static void stubDescribe(String prefix, Map<String, Schema.SObjectType> objects) {
-        NamespaceUtil.cachedPrefix = prefix;
-        NamespaceUtil.describeOverride = objects;
-        NamespaceUtil.typesByName.clear();
-    }
+	/** A describe map standing in for an org, keyed the way the resolver looks names up. */
+	private static void stubDescribe(String prefix, Map<String, Schema.SObjectType> objects) {
+		NamespaceUtil.cachedPrefix = prefix;
+		NamespaceUtil.describeOverride = objects;
+		NamespaceUtil.typesByName.clear();
+	}
 
-    @IsTest
-    static void objectTypePrefersThisPackagesObjectOverEveryOther() {
-        stubDescribe(
-            OWN,
-            new Map<String, Schema.SObjectType>{
-                OTHER + 'address__c' => Contact.SObjectType,
-                'address__c' => User.SObjectType,
-                OWN + 'address__c' => Account.SObjectType
-            }
-        );
+	@IsTest
+	static void objectTypePrefersThisPackagesObjectOverEveryOther() {
+		stubDescribe(
+			OWN,
+			new Map<String, Schema.SObjectType>{
+				OTHER + 'address__c' => Contact.SObjectType,
+				'address__c' => User.SObjectType,
+				OWN + 'address__c' => Account.SObjectType
+			}
+		);
 
-        Assert.areEqual(
-            Account.SObjectType,
-            NamespaceUtil.objectType('Address__c'),
-            'The package\'s own object wins over the subscriber\'s and NPSP\'s'
-        );
-        Assert.areEqual(
-            Account.SObjectType,
-            NamespaceUtil.objectType(' ADDRESS__C '),
-            'Capitals and spacing do not matter'
-        );
-    }
+		Assert.areEqual(
+			Account.SObjectType,
+			NamespaceUtil.objectType('Address__c'),
+			'The package\'s own object wins over the subscriber\'s and NPSP\'s'
+		);
+		Assert.areEqual(
+			Account.SObjectType,
+			NamespaceUtil.objectType(' ADDRESS__C '),
+			'Capitals and spacing do not matter'
+		);
+	}
 
-    @IsTest
-    static void objectTypeNeverPicksAnotherPackagesObject() {
-        stubDescribe(
-            OWN,
-            new Map<String, Schema.SObjectType>{ OTHER + 'address__c' => Contact.SObjectType }
-        );
-        Assert.isNull(
-            NamespaceUtil.objectType('Address__c'),
-            'Under a namespace, NPSP\'s Address__c is not BarnCRM\'s'
-        );
+	@IsTest
+	static void objectTypeNeverPicksAnotherPackagesObject() {
+		stubDescribe(
+			OWN,
+			new Map<String, Schema.SObjectType>{ OTHER + 'address__c' => Contact.SObjectType }
+		);
+		Assert.isNull(
+			NamespaceUtil.objectType('Address__c'),
+			'Under a namespace, NPSP\'s Address__c is not BarnCRM\'s'
+		);
 
-        stubDescribe(
-            '',
-            new Map<String, Schema.SObjectType>{ OTHER + 'address__c' => Contact.SObjectType }
-        );
-        Assert.isNull(
-            NamespaceUtil.objectType('Address__c'),
-            'Without a namespace, NPSP\'s Address__c is not BarnCRM\'s either'
-        );
-    }
+		stubDescribe(
+			'',
+			new Map<String, Schema.SObjectType>{ OTHER + 'address__c' => Contact.SObjectType }
+		);
+		Assert.isNull(
+			NamespaceUtil.objectType('Address__c'),
+			'Without a namespace, NPSP\'s Address__c is not BarnCRM\'s either'
+		);
+	}
 
-    @IsTest
-    static void objectTypeFallsBackToTheNameAsWritten() {
-        stubDescribe(
-            OWN,
-            new Map<String, Schema.SObjectType>{
-                'account' => Account.SObjectType,
-                OTHER + 'thing__c' => Contact.SObjectType
-            }
-        );
+	@IsTest
+	static void objectTypeFallsBackToTheNameAsWritten() {
+		stubDescribe(
+			OWN,
+			new Map<String, Schema.SObjectType>{
+				'account' => Account.SObjectType,
+				OTHER + 'thing__c' => Contact.SObjectType
+			}
+		);
 
-        Assert.areEqual(
-            Account.SObjectType,
-            NamespaceUtil.objectType('Account'),
-            'A standard object resolves by its own name'
-        );
-        Assert.areEqual(
-            Contact.SObjectType,
-            NamespaceUtil.objectType(OTHER + 'Thing__c'),
-            'A name that already carries a prefix resolves as written'
-        );
-        Assert.isNull(NamespaceUtil.objectType(' '), 'A blank name resolves to nothing');
-        Assert.isNull(NamespaceUtil.objectType('Missing__c'), 'An absent object stays null');
-    }
+		Assert.areEqual(
+			Account.SObjectType,
+			NamespaceUtil.objectType('Account'),
+			'A standard object resolves by its own name'
+		);
+		Assert.areEqual(
+			Contact.SObjectType,
+			NamespaceUtil.objectType(OTHER + 'Thing__c'),
+			'A name that already carries a prefix resolves as written'
+		);
+		Assert.isNull(NamespaceUtil.objectType(' '), 'A blank name resolves to nothing');
+		Assert.isNull(NamespaceUtil.objectType('Missing__c'), 'An absent object stays null');
+	}
 
-    @IsTest
-    static void packagedObjectTypeIgnoresTheSubscribersAndOtherPackagesObjects() {
-        stubDescribe(
-            OWN,
-            new Map<String, Schema.SObjectType>{
-                'fund__c' => Account.SObjectType,
-                OTHER + 'fund__c' => Contact.SObjectType
-            }
-        );
-        Assert.isNull(
-            NamespaceUtil.packagedObjectType('Fund__c'),
-            'Neither the subscriber\'s Fund__c nor another package\'s is BarnCRM\'s'
-        );
+	@IsTest
+	static void packagedObjectTypeIgnoresTheSubscribersAndOtherPackagesObjects() {
+		stubDescribe(
+			OWN,
+			new Map<String, Schema.SObjectType>{
+				'fund__c' => Account.SObjectType,
+				OTHER + 'fund__c' => Contact.SObjectType
+			}
+		);
+		Assert.isNull(
+			NamespaceUtil.packagedObjectType('Fund__c'),
+			'Neither the subscriber\'s Fund__c nor another package\'s is BarnCRM\'s'
+		);
 
-        NamespaceUtil.describeOverride.put(OWN + 'fund__c', User.SObjectType);
-        Assert.areEqual(
-            User.SObjectType,
-            NamespaceUtil.packagedObjectType('Fund__c'),
-            'The package\'s own object is found by its prefixed name'
-        );
-        Assert.isNull(NamespaceUtil.packagedObjectType(null), 'Nothing resolves to nothing');
-    }
+		NamespaceUtil.describeOverride.put(OWN + 'fund__c', User.SObjectType);
+		Assert.areEqual(
+			User.SObjectType,
+			NamespaceUtil.packagedObjectType('Fund__c'),
+			'The package\'s own object is found by its prefixed name'
+		);
+		Assert.isNull(NamespaceUtil.packagedObjectType(null), 'Nothing resolves to nothing');
+	}
 
-    @IsTest
-    static void objectTypeFindsARealObjectWithoutAStub() {
-        NamespaceUtil.cachedPrefix = null;
-        NamespaceUtil.typesByName.clear();
+	@IsTest
+	static void objectTypeFindsARealObjectWithoutAStub() {
+		NamespaceUtil.cachedPrefix = null;
+		NamespaceUtil.typesByName.clear();
 
-        Assert.areEqual(
-            Account.SObjectType,
-            NamespaceUtil.objectType('Account'),
-            'The org\'s own describe answers when no stub is set'
-        );
-    }
+		Assert.areEqual(
+			Account.SObjectType,
+			NamespaceUtil.objectType('Account'),
+			'The org\'s own describe answers when no stub is set'
+		);
+	}
 
-    @IsTest
-    static void theOrgDescribeIsReadOnceAndAStubStillWins() {
-        NamespaceUtil.cachedPrefix = null;
-        NamespaceUtil.typesByName.clear();
-        NamespaceUtil.orgDescribe = null;
+	@IsTest
+	static void theOrgDescribeIsReadOnceAndAStubStillWins() {
+		NamespaceUtil.cachedPrefix = null;
+		NamespaceUtil.typesByName.clear();
+		NamespaceUtil.orgDescribe = null;
 
-        Assert.areEqual(
-            Contact.SObjectType,
-            NamespaceUtil.objectType('Contact'),
-            'Read from the org'
-        );
-        Assert.isNotNull(NamespaceUtil.orgDescribe, 'The describe is kept for the transaction');
-        Map<String, Schema.SObjectType> kept = NamespaceUtil.orgDescribe;
-        Assert.areEqual(Account.SObjectType, NamespaceUtil.objectType('Account'), 'A new name');
-        Assert.isTrue(
-            kept === NamespaceUtil.orgDescribe,
-            'The second name reuses the same describe'
-        );
+		Assert.areEqual(
+			Contact.SObjectType,
+			NamespaceUtil.objectType('Contact'),
+			'Read from the org'
+		);
+		Assert.isNotNull(NamespaceUtil.orgDescribe, 'The describe is kept for the transaction');
+		Map<String, Schema.SObjectType> kept = NamespaceUtil.orgDescribe;
+		Assert.areEqual(Account.SObjectType, NamespaceUtil.objectType('Account'), 'A new name');
+		Assert.isTrue(
+			kept === NamespaceUtil.orgDescribe,
+			'The second name reuses the same describe'
+		);
 
-        stubDescribe(OWN, new Map<String, Schema.SObjectType>{ 'account' => User.SObjectType });
-        Assert.areEqual(
-            User.SObjectType,
-            NamespaceUtil.objectType('Account'),
-            'A stub set after the org was read still answers first'
-        );
-    }
+		stubDescribe(OWN, new Map<String, Schema.SObjectType>{ 'account' => User.SObjectType });
+		Assert.areEqual(
+			User.SObjectType,
+			NamespaceUtil.objectType('Account'),
+			'A stub set after the org was read still answers first'
+		);
+	}
 
-    /**
-     * The describe is filtered by the running user's licences (ADR-0130), so a test that runs as
-     * someone else reads it afresh, and every class that asks gets the same map.
-     */
-    @IsTest
-    static void anotherRunningUserReadsTheDescribeAfresh() {
-        User someoneElse = TestUsers.standardUser('Describe');
-        NamespaceUtil.orgDescribe = null;
+	/**
+	 * The describe is filtered by the running user's licences (ADR-0130), so a test that runs as
+	 * someone else reads it afresh, and every class that asks gets the same map.
+	 */
+	@IsTest
+	static void anotherRunningUserReadsTheDescribeAfresh() {
+		User someoneElse = TestUsers.standardUser('Describe');
+		NamespaceUtil.orgDescribe = null;
 
-        Map<String, Schema.SObjectType> mine = NamespaceUtil.globalDescribe();
-        Assert.isTrue(mine === NamespaceUtil.globalDescribe(), 'Kept for the transaction');
-        Map<String, Schema.SObjectType> theirs;
-        System.runAs(someoneElse) {
-            theirs = NamespaceUtil.globalDescribe();
-        }
-        Map<String, Schema.SObjectType> mineAgain = NamespaceUtil.globalDescribe();
+		Map<String, Schema.SObjectType> mine = NamespaceUtil.globalDescribe();
+		Assert.isTrue(mine === NamespaceUtil.globalDescribe(), 'Kept for the transaction');
+		Map<String, Schema.SObjectType> theirs;
+		System.runAs(someoneElse) {
+			theirs = NamespaceUtil.globalDescribe();
+		}
+		Map<String, Schema.SObjectType> mineAgain = NamespaceUtil.globalDescribe();
 
-        Assert.isTrue(mine.containsKey('contact'), 'The org describe');
-        Assert.isFalse(theirs === mine, 'Another running user reads it afresh');
-        Assert.isTrue(theirs.containsKey('contact'), 'Their describe');
-        Assert.isFalse(mineAgain === theirs, 'Back as the first user, read afresh again');
-        Assert.isTrue(
-            mineAgain === NamespaceUtil.globalDescribe(),
-            'And kept again while the user stays the same'
-        );
-    }
+		Assert.isTrue(mine.containsKey('contact'), 'The org describe');
+		Assert.isFalse(theirs === mine, 'Another running user reads it afresh');
+		Assert.isTrue(theirs.containsKey('contact'), 'Their describe');
+		Assert.isFalse(mineAgain === theirs, 'Back as the first user, read afresh again');
+		Assert.isTrue(
+			mineAgain === NamespaceUtil.globalDescribe(),
+			'And kept again while the user stays the same'
+		);
+	}
 
-    @IsTest
-    static void aClassIsFoundByNameAndAMissingOneIsNull() {
-        NamespaceUtil.cachedPrefix = null;
+	@IsTest
+	static void aClassIsFoundByNameAndAMissingOneIsNull() {
+		NamespaceUtil.cachedPrefix = null;
 
-        Assert.areEqual(
-            NamespaceUtil.class,
-            NamespaceUtil.resolveType('NamespaceUtil'),
-            'A packaged class is found by its bare name, whatever the namespace.'
-        );
-        Assert.isNull(
-            NamespaceUtil.resolveType('NoSuchClassAnywhere'),
-            'A module that is not installed resolves to nothing, not an error.'
-        );
-        Assert.isNull(NamespaceUtil.resolveType(''), 'A blank name resolves to nothing.');
-    }
+		Assert.areEqual(
+			NamespaceUtil.class,
+			NamespaceUtil.resolveType('NamespaceUtil'),
+			'A packaged class is found by its bare name, whatever the namespace.'
+		);
+		Assert.isNull(
+			NamespaceUtil.resolveType('NoSuchClassAnywhere'),
+			'A module that is not installed resolves to nothing, not an error.'
+		);
+		Assert.isNull(NamespaceUtil.resolveType(''), 'A blank name resolves to nothing.');
+	}
 
-    @IsTest
-    static void aClassIsStillFoundWhenThePrefixNamesNoInstalledNamespace() {
-        NamespaceUtil.cachedPrefix = 'example__';
+	@IsTest
+	static void aClassIsStillFoundWhenThePrefixNamesNoInstalledNamespace() {
+		NamespaceUtil.cachedPrefix = 'example__';
 
-        Assert.areEqual(
-            NamespaceUtil.class,
-            NamespaceUtil.resolveType('NamespaceUtil'),
-            'With no class under the prefix, the bare name is tried next.'
-        );
-    }
+		Assert.areEqual(
+			NamespaceUtil.class,
+			NamespaceUtil.resolveType('NamespaceUtil'),
+			'With no class under the prefix, the bare name is tried next.'
+		);
+	}
 }

@@ -11,60 +11,60 @@
  */
 @NamespaceAccessible
 public with sharing class ModuleAccessSyncs {
-    /** The suffix after the module key that names a module's sync class. */
-    @NamespaceAccessible
-    public static final String CLASS_SUFFIX = 'AccessSync';
+	/** The suffix after the module key that names a module's sync class. */
+	@NamespaceAccessible
+	public static final String CLASS_SUFFIX = 'AccessSync';
 
-    /** Injected by Core's tests by module key, since no module is there to resolve. */
-    @TestVisible
-    private static Map<String, ModuleAccessSync> overrides = new Map<String, ModuleAccessSync>();
+	/** Injected by Core's tests by module key, since no module is there to resolve. */
+	@TestVisible
+	private static Map<String, ModuleAccessSync> overrides = new Map<String, ModuleAccessSync>();
 
-    private static final String CONTEXT = 'ModuleAccessSyncs';
+	private static final String CONTEXT = 'ModuleAccessSyncs';
 
-    /** Asks the named module's sync to run, when the module has one. Never throws. */
-    @NamespaceAccessible
-    public static void requestFor(String moduleName) {
-        if (String.isNotBlank(moduleName)) {
-            request(moduleName);
-        }
-    }
+	/** Asks the named module's sync to run, when the module has one. Never throws. */
+	@NamespaceAccessible
+	public static void requestFor(String moduleName) {
+		if (String.isNotBlank(moduleName)) {
+			request(moduleName);
+		}
+	}
 
-    /** Asks every catalog module's sync to run, where it has one. Never throws. */
-    @NamespaceAccessible
-    public static void requestAll() {
-        Set<String> keys = new Set<String>(overrides.keySet());
-        try {
-            keys.addAll(BarnCRM_Module__mdt.getAll().keySet());
-        } catch (Exception failed) {
-            ErrorLogger.log(failed, CONTEXT);
-        }
-        for (String key : keys) {
-            request(key);
-        }
-    }
+	/** Asks every catalog module's sync to run, where it has one. Never throws. */
+	@NamespaceAccessible
+	public static void requestAll() {
+		Set<String> keys = new Set<String>(overrides.keySet());
+		try {
+			keys.addAll(BarnCRM_Module__mdt.getAll().keySet());
+		} catch (Exception failed) {
+			ErrorLogger.log(failed, CONTEXT);
+		}
+		for (String key : keys) {
+			request(key);
+		}
+	}
 
-    private static void request(String moduleKey) {
-        try {
-            ModuleAccessSync sync = overrides.containsKey(moduleKey)
-                ? overrides.get(moduleKey)
-                : resolve(moduleKey + CLASS_SUFFIX);
-            if (sync != null) {
-                sync.requestSync();
-            }
-        } catch (Exception failed) {
-            ErrorLogger.log(failed, CONTEXT);
-        }
-    }
+	private static void request(String moduleKey) {
+		try {
+			ModuleAccessSync sync = overrides.containsKey(moduleKey)
+				? overrides.get(moduleKey)
+				: resolve(moduleKey + CLASS_SUFFIX);
+			if (sync != null) {
+				sync.requestSync();
+			}
+		} catch (Exception failed) {
+			ErrorLogger.log(failed, CONTEXT);
+		}
+	}
 
-    private static ModuleAccessSync resolve(String className) {
-        Type syncType = NamespaceUtil.resolveType(className);
-        if (syncType == null) {
-            return null;
-        }
-        Object candidate = syncType.newInstance();
-        if (candidate instanceof ModuleAccessSync) {
-            return (ModuleAccessSync) candidate;
-        }
-        throw new System.TypeException(className + ' does not implement ModuleAccessSync');
-    }
+	private static ModuleAccessSync resolve(String className) {
+		Type syncType = NamespaceUtil.resolveType(className);
+		if (syncType == null) {
+			return null;
+		}
+		Object candidate = syncType.newInstance();
+		if (candidate instanceof ModuleAccessSync) {
+			return (ModuleAccessSync) candidate;
+		}
+		throw new System.TypeException(className + ' does not implement ModuleAccessSync');
+	}
 }

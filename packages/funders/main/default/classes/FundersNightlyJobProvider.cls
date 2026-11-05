@@ -4,12 +4,12 @@
  */
 @NamespaceAccessible
 public with sharing class FundersNightlyJobProvider implements NightlyStepProvider {
-    @NamespaceAccessible
-    public FundersNightlyJobProvider() {
-        // Built by name from Core (NightlyJobs), so it needs a public constructor.
-    }
+	@NamespaceAccessible
+	public FundersNightlyJobProvider() {
+		// Built by name from Core (NightlyJobs), so it needs a public constructor.
+	}
 
-    public List<NightlyStep> nightlySteps() {
-        return new List<NightlyStep>{ GrantReminderScheduler.step() };
-    }
+	public List<NightlyStep> nightlySteps() {
+		return new List<NightlyStep>{ GrantReminderScheduler.step() };
+	}
 }

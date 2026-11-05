@@ -7,9 +7,9 @@
  */
 @NamespaceAccessible
 public interface DataProtectionExtension {
-    /**
-     * The package's own bookkeeping objects, whose records no import or one-object load may
-     * create or change, for example records that are an audit trail. Never null.
-     */
-    Set<Schema.SObjectType> protectedObjects();
+	/**
+	 * The package's own bookkeeping objects, whose records no import or one-object load may
+	 * create or change, for example records that are an audit trail. Never null.
+	 */
+	Set<Schema.SObjectType> protectedObjects();
 }

@@ -13,58 +13,58 @@
  */
 @NamespaceAccessible
 public with sharing class FundersAccessSync extends ModuleAccessSyncBase {
-    /** The module key in the Module Manager. */
-    public static final String MODULE_NAME = 'Funders';
-    /** The set the installer and BarnCRM Admin holders get. */
-    public static final String ADMIN_SET = 'Funders_Admin';
+	/** The module key in the Module Manager. */
+	public static final String MODULE_NAME = 'Funders';
+	/** The set the installer and BarnCRM Admin holders get. */
+	public static final String ADMIN_SET = 'Funders_Admin';
 
-    /** The Admin set, and the Core permission set whose holders get it. */
-    @TestVisible
-    private static final Map<String, List<String>> BY_SET = new Map<String, List<String>>{
-        ADMIN_SET => new List<String>{ 'BarnCRM_Admin' }
-    };
+	/** The Admin set, and the Core permission set whose holders get it. */
+	@TestVisible
+	private static final Map<String, List<String>> BY_SET = new Map<String, List<String>>{
+		ADMIN_SET => new List<String>{ 'BarnCRM_Admin' }
+	};
 
-    /** Each other set, and the BarnCRM roles (permission set groups) whose holders get it. */
-    @TestVisible
-    private static final Map<String, List<String>> BY_ROLE = new Map<String, List<String>>{
-        'Funders_Staff' => new List<String>{
-            'Program_Staff',
-            'Volunteer_Coordinator',
-            'Fundraising_Staff'
-        },
-        'Funders_Read_Only' => new List<String>{ 'Read_Only' }
-    };
+	/** Each other set, and the BarnCRM roles (permission set groups) whose holders get it. */
+	@TestVisible
+	private static final Map<String, List<String>> BY_ROLE = new Map<String, List<String>>{
+		'Funders_Staff' => new List<String>{
+			'Program_Staff',
+			'Volunteer_Coordinator',
+			'Fundraising_Staff'
+		},
+		'Funders_Read_Only' => new List<String>{ 'Read_Only' }
+	};
 
-    /** Assignments one run gives per set: all three together stay inside the 10,000 DML rows. */
-    private static final Integer ROWS_PER_SET = 3000;
+	/** Assignments one run gives per set: all three together stay inside the 10,000 DML rows. */
+	private static final Integer ROWS_PER_SET = 3000;
 
-    @NamespaceAccessible
-    public FundersAccessSync() {
-        // Built by name from Core (ModuleAccessSyncs), so it needs a public constructor.
-    }
+	@NamespaceAccessible
+	public FundersAccessSync() {
+		// Built by name from Core (ModuleAccessSyncs), so it needs a public constructor.
+	}
 
-    /** One slice of each set now. Returns true when more is left. */
-    public static Boolean syncOnce() {
-        return new FundersAccessSync().sync();
-    }
+	/** One slice of each set now. Returns true when more is left. */
+	public static Boolean syncOnce() {
+		return new FundersAccessSync().sync();
+	}
 
-    public override String moduleName() {
-        return MODULE_NAME;
-    }
+	public override String moduleName() {
+		return MODULE_NAME;
+	}
 
-    public override String logContext() {
-        return 'FundersAccessSync';
-    }
+	public override String logContext() {
+		return 'FundersAccessSync';
+	}
 
-    public override Map<String, List<String>> setsByPermissionSet() {
-        return BY_SET;
-    }
+	public override Map<String, List<String>> setsByPermissionSet() {
+		return BY_SET;
+	}
 
-    public override Map<String, List<String>> setsByRole() {
-        return BY_ROLE;
-    }
+	public override Map<String, List<String>> setsByRole() {
+		return BY_ROLE;
+	}
 
-    public override Integer sliceSize() {
-        return ROWS_PER_SET;
-    }
+	public override Integer sliceSize() {
+		return ROWS_PER_SET;
+	}
 }

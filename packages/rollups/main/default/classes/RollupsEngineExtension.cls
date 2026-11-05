@@ -7,66 +7,66 @@
  */
 @NamespaceAccessible
 public with sharing class RollupsEngineExtension implements RollupEngineExtension, RollupEngineExtensionV2, RollupEngineExtensionV3 {
-    @NamespaceAccessible
-    public RollupsEngineExtension() {
-        // Built by name from Core (RollupEngineExtensions), so it needs a public constructor.
-    }
+	@NamespaceAccessible
+	public RollupsEngineExtension() {
+		// Built by name from Core (RollupEngineExtensions), so it needs a public constructor.
+	}
 
-    public void afterModuleTurnedOn(String moduleName) {
-        if (RollupService.MODULE_NAME.equalsIgnoreCase(moduleName)) {
-            RollupService.catchUpAfterTurnedOn();
-            // People given a BarnCRM role while it was off get their sets now (D2).
-            RollupAccessSync.requestSync();
-        }
-    }
+	public void afterModuleTurnedOn(String moduleName) {
+		if (RollupService.MODULE_NAME.equalsIgnoreCase(moduleName)) {
+			RollupService.catchUpAfterTurnedOn();
+			// People given a BarnCRM role while it was off get their sets now (D2).
+			RollupAccessSync.requestSync();
+		}
+	}
 
-    /**
-     * Nothing to do: the nightly rollup step reads its hour every night (ADR-0166
-     * nightly-job-dispatcher), so a new hour needs no schedule moved (Section 14B).
-     */
-    public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
-        return;
-    }
+	/**
+	 * Nothing to do: the nightly rollup step reads its hour every night (ADR-0166
+	 * nightly-job-dispatcher), so a new hour needs no schedule moved (Section 14B).
+	 */
+	public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {
+		return;
+	}
 
-    public void afterMerge(String targetObject, List<SObject> mergedRecords) {
-        RollupService.runAfterMerge(targetObject, mergedRecords);
-    }
+	public void afterMerge(String targetObject, List<SObject> mergedRecords) {
+		RollupService.runAfterMerge(targetObject, mergedRecords);
+	}
 
-    public void forSurvivors(String targetObject, Set<Id> survivorIds) {
-        RollupService.runForSurvivors(targetObject, survivorIds);
-    }
+	public void forSurvivors(String targetObject, Set<Id> survivorIds) {
+		RollupService.runForSurvivors(targetObject, survivorIds);
+	}
 
-    public void startQueuedRecalculation() {
-        RollupService.startQueuedRecalculation();
-    }
+	public void startQueuedRecalculation() {
+		RollupService.startQueuedRecalculation();
+	}
 
-    public void processPending() {
-        RollupQueue.processPending();
-    }
+	public void processPending() {
+		RollupQueue.processPending();
+	}
 
-    public Datetime lastCalculated() {
-        return RollupService.lastCalculated();
-    }
+	public Datetime lastCalculated() {
+		return RollupService.lastCalculated();
+	}
 
-    public Boolean isStale() {
-        return RollupService.isStale();
-    }
+	public Boolean isStale() {
+		return RollupService.isStale();
+	}
 
-    public Map<String, Set<String>> targetFieldsByObject() {
-        Map<String, Set<String>> targets = new Map<String, Set<String>>();
-        for (Rollup_Definition__c definition : RollupSelector.selectAll()) {
-            if (
-                String.isBlank(definition.Target_Object__c) ||
-                String.isBlank(definition.Target_Field__c)
-            ) {
-                continue;
-            }
-            String target = definition.Target_Object__c.trim();
-            if (!targets.containsKey(target)) {
-                targets.put(target, new Set<String>());
-            }
-            targets.get(target).add(definition.Target_Field__c.trim());
-        }
-        return targets;
-    }
+	public Map<String, Set<String>> targetFieldsByObject() {
+		Map<String, Set<String>> targets = new Map<String, Set<String>>();
+		for (Rollup_Definition__c definition : RollupSelector.selectAll()) {
+			if (
+				String.isBlank(definition.Target_Object__c) ||
+				String.isBlank(definition.Target_Field__c)
+			) {
+				continue;
+			}
+			String target = definition.Target_Object__c.trim();
+			if (!targets.containsKey(target)) {
+				targets.put(target, new Set<String>());
+			}
+			targets.get(target).add(definition.Target_Field__c.trim());
+		}
+		return targets;
+	}
 }

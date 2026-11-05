@@ -6,23 +6,23 @@
  */
 @NamespaceAccessible
 public with sharing class LogicModelScopeHandler extends TriggerHandler {
-    @NamespaceAccessible
-    public LogicModelScopeHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public LogicModelScopeHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'LogicModelScopeHandler';
-    }
+	public override String getName() {
+		return 'LogicModelScopeHandler';
+	}
 
-    public override void beforeInsert() {
-        LogicModelScope.apply((List<Logic_Model__c>) newRecords(), null);
-    }
+	public override void beforeInsert() {
+		LogicModelScope.apply((List<Logic_Model__c>) newRecords(), null);
+	}
 
-    public override void beforeUpdate() {
-        LogicModelScope.apply(
-            (List<Logic_Model__c>) newRecords(),
-            (Map<Id, Logic_Model__c>) oldRecordsById()
-        );
-    }
+	public override void beforeUpdate() {
+		LogicModelScope.apply(
+			(List<Logic_Model__c>) newRecords(),
+			(Map<Id, Logic_Model__c>) oldRecordsById()
+		);
+	}
 }

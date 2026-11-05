@@ -19,159 +19,159 @@
  */
 @NamespaceAccessible
 public with sharing class ScheduledJobSelector {
-    private static final String NAME_PATTERN = 'BarnCRM%';
+	private static final String NAME_PATTERN = 'BarnCRM%';
 
-    /** The package's scheduled jobs by `nameKey`, read once per transaction; null until asked. */
-    private static Map<String, CronTrigger> byName;
+	/** The package's scheduled jobs by `nameKey`, read once per transaction; null until asked. */
+	private static Map<String, CronTrigger> byName;
 
-    /**
-     * What a job name is matched by: lower case, colons read as spaces, spaces collapsed. So
-     * "BarnCRM Giving: ask reminders" and "BarnCRM Giving Ask Reminders" are the same job.
-     */
-    @NamespaceAccessible
-    public static String nameKey(String jobName) {
-        return jobName == null ? null : jobName.replace(':', ' ').normalizeSpace().toLowerCase();
-    }
+	/**
+	 * What a job name is matched by: lower case, colons read as spaces, spaces collapsed. So
+	 * "BarnCRM Giving: ask reminders" and "BarnCRM Giving Ask Reminders" are the same job.
+	 */
+	@NamespaceAccessible
+	public static String nameKey(String jobName) {
+		return jobName == null ? null : jobName.replace(':', ' ').normalizeSpace().toLowerCase();
+	}
 
-    /** The Id of the trigger behind the named scheduled Apex job, or null when there is none. */
-    @NamespaceAccessible
-    public static Id triggerIdByName(String jobName) {
-        CronTrigger found = triggerByName(jobName);
-        return found == null ? null : found.Id;
-    }
+	/** The Id of the trigger behind the named scheduled Apex job, or null when there is none. */
+	@NamespaceAccessible
+	public static Id triggerIdByName(String jobName) {
+		CronTrigger found = triggerByName(jobName);
+		return found == null ? null : found.Id;
+	}
 
-    /** The cron expression the named job was scheduled with, or null when it is not scheduled. */
-    @NamespaceAccessible
-    public static String cronExpressionByName(String jobName) {
-        CronTrigger found = triggerByName(jobName);
-        return found == null ? null : found.CronExpression;
-    }
+	/** The cron expression the named job was scheduled with, or null when it is not scheduled. */
+	@NamespaceAccessible
+	public static String cronExpressionByName(String jobName) {
+		CronTrigger found = triggerByName(jobName);
+		return found == null ? null : found.CronExpression;
+	}
 
-    /**
-     * When the named job runs next, or null when it is not scheduled. A one-time job that has
-     * already fired keeps its trigger with no next run, and counts as not scheduled.
-     */
-    @NamespaceAccessible
-    public static Datetime nextFireTime(String jobName) {
-        CronTrigger found = triggerByName(jobName);
-        return found == null ? null : found.NextFireTime;
-    }
+	/**
+	 * When the named job runs next, or null when it is not scheduled. A one-time job that has
+	 * already fired keeps its trigger with no next run, and counts as not scheduled.
+	 */
+	@NamespaceAccessible
+	public static Datetime nextFireTime(String jobName) {
+		CronTrigger found = triggerByName(jobName);
+		return found == null ? null : found.NextFireTime;
+	}
 
-    /** When the named job was scheduled, or null when it is not. */
-    @NamespaceAccessible
-    public static Datetime startTime(String jobName) {
-        CronTrigger found = triggerByName(jobName);
-        return found == null ? null : found.StartTime;
-    }
+	/** When the named job was scheduled, or null when it is not. */
+	@NamespaceAccessible
+	public static Datetime startTime(String jobName) {
+		CronTrigger found = triggerByName(jobName);
+		return found == null ? null : found.StartTime;
+	}
 
-    /**
-     * The names of the package's scheduled jobs whose owner is no longer active. A scheduled
-     * job runs as the person who scheduled it and stops when that user is deactivated, while
-     * its trigger stays, so it still reads as scheduled (ADMIN-12).
-     */
-    @NamespaceAccessible
-    public static List<String> namesOwnedByInactiveUsers() {
-        Map<String, Id> ownerByName = new Map<String, Id>();
-        for (CronTrigger job : all().values()) {
-            ownerByName.put(
-                job.CronJobDetail.Name,
-                ownerOverride != null ? ownerOverride : job.OwnerId
-            );
-        }
-        Set<Id> ownerIds = new Set<Id>(ownerByName.values());
-        Set<Id> inactive = new Set<Id>();
-        if (!ownerIds.isEmpty()) {
-            for (User owner : [
-                SELECT Id
-                FROM User
-                WHERE Id IN :ownerIds AND IsActive = FALSE
-                WITH SYSTEM_MODE
-            ]) {
-                inactive.add(owner.Id);
-            }
-        }
-        List<String> names = new List<String>();
-        for (String name : ownerByName.keySet()) {
-            if (inactive.contains(ownerByName.get(name))) {
-                names.add(name);
-            }
-        }
-        names.sort();
-        return names;
-    }
+	/**
+	 * The names of the package's scheduled jobs whose owner is no longer active. A scheduled
+	 * job runs as the person who scheduled it and stops when that user is deactivated, while
+	 * its trigger stays, so it still reads as scheduled (ADMIN-12).
+	 */
+	@NamespaceAccessible
+	public static List<String> namesOwnedByInactiveUsers() {
+		Map<String, Id> ownerByName = new Map<String, Id>();
+		for (CronTrigger job : all().values()) {
+			ownerByName.put(
+				job.CronJobDetail.Name,
+				ownerOverride != null ? ownerOverride : job.OwnerId
+			);
+		}
+		Set<Id> ownerIds = new Set<Id>(ownerByName.values());
+		Set<Id> inactive = new Set<Id>();
+		if (!ownerIds.isEmpty()) {
+			for (User owner : [
+				SELECT Id
+				FROM User
+				WHERE Id IN :ownerIds AND IsActive = FALSE
+				WITH SYSTEM_MODE
+			]) {
+				inactive.add(owner.Id);
+			}
+		}
+		List<String> names = new List<String>();
+		for (String name : ownerByName.keySet()) {
+			if (inactive.contains(ownerByName.get(name))) {
+				names.add(name);
+			}
+		}
+		names.sort();
+		return names;
+	}
 
-    /** Schedules a named job and forgets what was read, so the next question sees it. */
-    @NamespaceAccessible
-    public static Id schedule(String jobName, String cron, Schedulable job) {
-        byName = null;
-        return System.schedule(jobName, cron, job);
-    }
+	/** Schedules a named job and forgets what was read, so the next question sees it. */
+	@NamespaceAccessible
+	public static Id schedule(String jobName, String cron, Schedulable job) {
+		byName = null;
+		return System.schedule(jobName, cron, job);
+	}
 
-    /**
-     * Schedules a named job unless a job by that name is already scheduled. Returns the trigger
-     * Id of the job that is there, or of the one just scheduled.
-     */
-    @NamespaceAccessible
-    public static Id ensure(String jobName, String cron, Schedulable job) {
-        Id existing = triggerIdByName(jobName);
-        return existing != null ? existing : schedule(jobName, cron, job);
-    }
+	/**
+	 * Schedules a named job unless a job by that name is already scheduled. Returns the trigger
+	 * Id of the job that is there, or of the one just scheduled.
+	 */
+	@NamespaceAccessible
+	public static Id ensure(String jobName, String cron, Schedulable job) {
+		Id existing = triggerIdByName(jobName);
+		return existing != null ? existing : schedule(jobName, cron, job);
+	}
 
-    /** Aborts the named job when it is scheduled; does nothing when it is not. */
-    @NamespaceAccessible
-    public static void stopNamed(String jobName) {
-        Id existing = triggerIdByName(jobName);
-        if (existing != null) {
-            abort(existing);
-        }
-    }
+	/** Aborts the named job when it is scheduled; does nothing when it is not. */
+	@NamespaceAccessible
+	public static void stopNamed(String jobName) {
+		Id existing = triggerIdByName(jobName);
+		if (existing != null) {
+			abort(existing);
+		}
+	}
 
-    /** True when a job by that name is scheduled. */
-    @NamespaceAccessible
-    public static Boolean isScheduled(String jobName) {
-        return triggerIdByName(jobName) != null;
-    }
+	/** True when a job by that name is scheduled. */
+	@NamespaceAccessible
+	public static Boolean isScheduled(String jobName) {
+		return triggerIdByName(jobName) != null;
+	}
 
-    /** Aborts a scheduled job and forgets what was read. */
-    @NamespaceAccessible
-    public static void abort(Id triggerId) {
-        byName = null;
-        System.abortJob(triggerId);
-    }
+	/** Aborts a scheduled job and forgets what was read. */
+	@NamespaceAccessible
+	public static void abort(Id triggerId) {
+		byName = null;
+		System.abortJob(triggerId);
+	}
 
-    /** Forgets what was read, for a caller that scheduled or aborted some other way. */
-    @NamespaceAccessible
-    public static void forget() {
-        byName = null;
-    }
+	/** Forgets what was read, for a caller that scheduled or aborted some other way. */
+	@NamespaceAccessible
+	public static void forget() {
+		byName = null;
+	}
 
-    /**
-     * Test seam: the owner a job is read with, so a test can see a job as owned by an inactive
-     * user without deactivating anyone. Null in production.
-     */
-    @TestVisible
-    private static Id ownerOverride;
+	/**
+	 * Test seam: the owner a job is read with, so a test can see a job as owned by an inactive
+	 * user without deactivating anyone. Null in production.
+	 */
+	@TestVisible
+	private static Id ownerOverride;
 
-    private static CronTrigger triggerByName(String jobName) {
-        if (String.isBlank(jobName)) {
-            return null;
-        }
-        return all().get(nameKey(jobName));
-    }
+	private static CronTrigger triggerByName(String jobName) {
+		if (String.isBlank(jobName)) {
+			return null;
+		}
+		return all().get(nameKey(jobName));
+	}
 
-    private static Map<String, CronTrigger> all() {
-        if (byName == null) {
-            byName = new Map<String, CronTrigger>();
-            // At most 100 rows: an org may hold only 100 scheduled Apex jobs.
-            for (CronTrigger job : [
-                SELECT Id, NextFireTime, StartTime, OwnerId, CronExpression, CronJobDetail.Name
-                FROM CronTrigger
-                WHERE CronJobDetail.JobType = '7' AND CronJobDetail.Name LIKE :NAME_PATTERN
-                WITH SYSTEM_MODE
-            ]) {
-                byName.put(nameKey(job.CronJobDetail.Name), job);
-            }
-        }
-        return byName;
-    }
+	private static Map<String, CronTrigger> all() {
+		if (byName == null) {
+			byName = new Map<String, CronTrigger>();
+			// At most 100 rows: an org may hold only 100 scheduled Apex jobs.
+			for (CronTrigger job : [
+				SELECT Id, NextFireTime, StartTime, OwnerId, CronExpression, CronJobDetail.Name
+				FROM CronTrigger
+				WHERE CronJobDetail.JobType = '7' AND CronJobDetail.Name LIKE :NAME_PATTERN
+				WITH SYSTEM_MODE
+			]) {
+				byName.put(nameKey(job.CronJobDetail.Name), job);
+			}
+		}
+		return byName;
+	}
 }

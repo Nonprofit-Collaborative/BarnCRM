@@ -21,304 +21,285 @@
  * written, so that it holds whichever of their three addresses they chose (R-C6).
  */
 public with sharing class AccountTriggerHandler extends TriggerHandler {
-    /**
-     * The households the people currently being deleted are leaving. Filled in
-     * `beforeDelete` and consumed in `afterDelete`, which is also where it is emptied
-     * again: one DML of 400 records runs the pair twice, so each half has to hand over
-     * only its own chunk.
-     */
-    private static Set<Id> departingHouseholdIds = new Set<Id>();
+	/**
+	 * The households the people currently being deleted are leaving. Filled in
+	 * `beforeDelete` and consumed in `afterDelete`, which is also where it is emptied
+	 * again: one DML of 400 records runs the pair twice, so each half has to hand over
+	 * only its own chunk.
+	 */
+	private static Set<Id> departingHouseholdIds = new Set<Id>();
 
-    /**
-     * The membership rows the people being deleted had, read before they were removed. Only
-     * a merge uses them: the platform says a delete was a merge (by filling `MasterRecordId`)
-     * only after the delete, and by then the rows are gone (C-20, see `afterDelete`).
-     */
-    private static List<Household_Member__c> departingMemberships = new List<Household_Member__c>();
+	/**
+	 * The membership rows the people being deleted had, read before they were removed. Only
+	 * a merge uses them: the platform says a delete was a merge (by filling `MasterRecordId`)
+	 * only after the delete, and by then the rows are gone (C-20, see `afterDelete`).
+	 */
+	private static List<Household_Member__c> departingMemberships = new List<Household_Member__c>();
 
-    /**
-     * The membership handler, stood down while this handler removes and moves membership rows
-     * itself, so that a household is recounted and renamed once, after the delete,
-     * rather than in the middle of it.
-     */
-    private static final String MEMBER_HANDLER = 'HouseholdMemberTriggerHandler';
+	private static final String CONTEXT = 'AccountTriggerHandler';
 
-    private static final String CONTEXT = 'AccountTriggerHandler';
+	public override void beforeInsert() {
+		HouseholdService.refuseHandSetPrimaryContacts((List<Account>) newRecords(), null);
+		nameNewHouseholds((List<Account>) newRecords());
+	}
 
-    public override void beforeInsert() {
-        HouseholdService.refuseHandSetPrimaryContacts((List<Account>) newRecords(), null);
-        nameNewHouseholds((List<Account>) newRecords());
-    }
+	public override void beforeUpdate() {
+		HouseholdService.refuseHandSetPrimaryContacts(
+			(List<Account>) newRecords(),
+			(Map<Id, Account>) oldRecordsById()
+		);
+		nameNewHouseholds((List<Account>) newRecords());
+	}
 
-    public override void beforeUpdate() {
-        HouseholdService.refuseHandSetPrimaryContacts(
-            (List<Account>) newRecords(),
-            (Map<Id, Account>) oldRecordsById()
-        );
-        nameNewHouseholds((List<Account>) newRecords());
-    }
+	public override void afterInsert() {
+		createHouseholdsForNewPeople((List<Account>) newRecords());
+	}
 
-    public override void afterInsert() {
-        createHouseholdsForNewPeople((List<Account>) newRecords());
-    }
+	public override void afterUpdate() {
+		Map<Id, Account> previousById = (Map<Id, Account>) oldRecordsById();
+		Boolean watchPeople = handlesPeople();
+		Set<Id> released = new Set<Id>();
+		List<Account> renamedPeople = new List<Account>();
+		for (Account record : (List<Account>) newRecords()) {
+			Account previous = previousById.get(record.Id);
+			Boolean wasCustom = previous != null && previous.Custom_Name__c == true;
+			if (wasCustom && record.Custom_Name__c != true) {
+				released.add(record.Id);
+			}
+			if (watchPeople && PersonRecordSelector.namingChanged(record, previous)) {
+				renamedPeople.add(record);
+			}
+		}
+		// A household that Nonprofit Cloud manages natively keeps its name: applyNaming
+		// leaves it alone (mutual exclusion, product-plan Section 11.2 item 9).
+		HouseholdNamingService.applyNaming(released);
+		// R-H4 and R-H11. A person renamed, marked deceased, given a preferred name, moved
+		// to another household role or excluded from the wording changes what every
+		// household they belong to is called.
+		HouseholdService.afterMembershipChange(householdIdsOf(renamedPeople), true);
+	}
 
-    public override void afterUpdate() {
-        Map<Id, Account> previousById = (Map<Id, Account>) oldRecordsById();
-        Boolean watchPeople = handlesPeople();
-        Set<Id> released = new Set<Id>();
-        List<Account> renamedPeople = new List<Account>();
-        for (Account record : (List<Account>) newRecords()) {
-            Account previous = previousById.get(record.Id);
-            Boolean wasCustom = previous != null && previous.Custom_Name__c == true;
-            if (wasCustom && record.Custom_Name__c != true) {
-                released.add(record.Id);
-            }
-            if (watchPeople && PersonRecordSelector.namingChanged(record, previous)) {
-                renamedPeople.add(record);
-            }
-        }
-        // A household that Nonprofit Cloud manages natively keeps its name: applyNaming
-        // leaves it alone (mutual exclusion, product-plan Section 11.2 item 9).
-        HouseholdNamingService.applyNaming(released);
-        // R-H4 and R-H11. A person renamed, marked deceased, given a preferred name, moved
-        // to another household role or excluded from the wording changes what every
-        // household they belong to is called.
-        HouseholdService.afterMembershipChange(householdIdsOf(renamedPeople), true);
-    }
+	/**
+	 * Takes the memberships of the people being deleted with them, while the rows still
+	 * say whose memberships they are, and remembers the households that affects.
+	 *
+	 * `Household_Member__c.Account__c` empties itself when the account it points at is
+	 * deleted, so by `afterDelete` the row no longer names anybody: the household it
+	 * belongs to cannot be worked out from it, and it cannot be put back either, because
+	 * the platform does not restore a lookup it emptied that way when the record comes
+	 * back out of the recycle bin. Removing the rows here, first, is what makes both the
+	 * delete and the undelete paths work.
+	 */
+	public override void beforeDelete() {
+		Set<Id> personIds = personIdsOf((List<Account>) oldRecords());
+		departingMemberships = HouseholdService.membershipsFor(personIds);
+		departingHouseholdIds = HouseholdService.removeMembershipsWithoutUpkeep(personIds);
+	}
 
-    /**
-     * Takes the memberships of the people being deleted with them, while the rows still
-     * say whose memberships they are, and remembers the households that affects.
-     *
-     * `Household_Member__c.Account__c` empties itself when the account it points at is
-     * deleted, so by `afterDelete` the row no longer names anybody: the household it
-     * belongs to cannot be worked out from it, and it cannot be put back either, because
-     * the platform does not restore a lookup it emptied that way when the record comes
-     * back out of the recycle bin. Removing the rows here, first, is what makes both the
-     * delete and the undelete paths work.
-     */
-    public override void beforeDelete() {
-        Set<Id> personIds = personIdsOf((List<Account>) oldRecords());
-        departingMemberships = HouseholdService.membershipsFor(personIds);
-        AutomationControl.bypass(MEMBER_HANDLER);
-        try {
-            departingHouseholdIds = HouseholdService.removeMembershipsFor(personIds);
-        } finally {
-            AutomationControl.clearBypass(MEMBER_HANDLER);
-        }
-    }
+	/**
+	 * A delete recounts and renames the households the people left, and never tidies one away,
+	 * even left empty (R-H12): deleting the household would purge the people's membership rows
+	 * from the Recycle Bin, so an undelete could not put them back in it.
+	 *
+	 * A merge is a delete the platform has filled `MasterRecordId` on, and it is handled as
+	 * it is for a person stored as a contact (C-20). The merged-away person's memberships go
+	 * to the survivor and a household keeps its primary member. The survivors' real-time
+	 * totals are then recalculated, for the survivors only.
+	 */
+	public override void afterDelete() {
+		List<Account> gone = (List<Account>) oldRecords();
+		Set<Id> affected = departingHouseholdIds;
+		departingHouseholdIds = new Set<Id>();
+		List<Household_Member__c> removed = departingMemberships;
+		departingMemberships = new List<Household_Member__c>();
 
-    /**
-     * A delete recounts and renames the households the people left, and never tidies one away,
-     * even left empty (R-H12): deleting the household would purge the people's membership rows
-     * from the Recycle Bin, so an undelete could not put them back in it.
-     *
-     * A merge is a delete the platform has filled `MasterRecordId` on, and it is handled as
-     * it is for a person stored as a contact (C-20). The merged-away person's memberships go
-     * to the survivor and a household keeps its primary member. The survivors' real-time
-     * totals are then recalculated, for the survivors only.
-     */
-    public override void afterDelete() {
-        List<Account> gone = (List<Account>) oldRecords();
-        Set<Id> affected = departingHouseholdIds;
-        departingHouseholdIds = new Set<Id>();
-        List<Household_Member__c> removed = departingMemberships;
-        departingMemberships = new List<Household_Member__c>();
+		Map<Id, Id> survivorByMerged = survivorsOf(gone);
+		affected.addAll(
+			HouseholdService.moveMembershipsToSurvivorsWithoutUpkeep(removed, survivorByMerged)
+		);
+		if (survivorByMerged.isEmpty()) {
+			// A household this delete empties is stamped for the nightly tidy-up (R-H12a).
+			HouseholdService.afterPeopleDeleted(affected);
+		} else {
+			HouseholdService.afterMembershipChange(affected, false);
+		}
+		recalculateSurvivors(gone, survivorByMerged);
+		settleSurvivors(gone, survivorByMerged);
+	}
 
-        Map<Id, Id> survivorByMerged = survivorsOf(gone);
-        if (!survivorByMerged.isEmpty()) {
-            AutomationControl.bypass(MEMBER_HANDLER);
-            try {
-                affected.addAll(
-                    HouseholdService.moveMembershipsToSurvivors(removed, survivorByMerged)
-                );
-            } finally {
-                AutomationControl.clearBypass(MEMBER_HANDLER);
-            }
-        }
-        if (survivorByMerged.isEmpty()) {
-            // A household this delete empties is stamped for the nightly tidy-up (R-H12a).
-            HouseholdService.afterPeopleDeleted(affected);
-        } else {
-            HouseholdService.afterMembershipChange(affected, false);
-        }
-        recalculateSurvivors(gone, survivorByMerged);
-        settleSurvivors(gone, survivorByMerged);
-    }
+	/**
+	 * What the merge moved onto the survivors without running their children's triggers,
+	 * settled once the merge is saved (PEOPLE-15, MergeSettlement): a household that took in
+	 * another household's members is recounted and renamed, every survivor keeps one default
+	 * address, and a surviving person's relationships and primary affiliation are settled.
+	 */
+	private static void settleSurvivors(List<Account> gone, Map<Id, Id> survivorByMerged) {
+		if (survivorByMerged.isEmpty()) {
+			return;
+		}
+		// People in either membership mode: relationships and affiliations do not depend on it.
+		Set<Id> mergedPeople = new Set<Id>();
+		if (HouseholdService.isPersonAccountOrg()) {
+			mergedPeople = new Map<Id, SObject>(PersonRecordSelector.filterPeople(gone)).keySet();
+		}
+		Id householdType = HouseholdService.householdRecordTypeId();
+		Set<Id> households = new Set<Id>();
+		Set<Id> people = new Set<Id>();
+		for (Account record : gone) {
+			Id survivorId = survivorByMerged.get(record.Id);
+			if (survivorId == null) {
+				continue;
+			}
+			if (mergedPeople.contains(record.Id)) {
+				people.add(survivorId);
+			} else if (householdType != null && record.RecordTypeId == householdType) {
+				households.add(survivorId);
+			}
+		}
+		MergeSettlement.afterMerge(households, new Set<Id>(survivorByMerged.values()), people);
+	}
 
-    /**
-     * What the merge moved onto the survivors without running their children's triggers,
-     * settled once the merge is saved (PEOPLE-15, MergeSettlement): a household that took in
-     * another household's members is recounted and renamed, every survivor keeps one default
-     * address, and a surviving person's relationships and primary affiliation are settled.
-     */
-    private static void settleSurvivors(List<Account> gone, Map<Id, Id> survivorByMerged) {
-        if (survivorByMerged.isEmpty()) {
-            return;
-        }
-        // People in either membership mode: relationships and affiliations do not depend on it.
-        Set<Id> mergedPeople = new Set<Id>();
-        if (HouseholdService.isPersonAccountOrg()) {
-            mergedPeople = new Map<Id, SObject>(PersonRecordSelector.filterPeople(gone)).keySet();
-        }
-        Id householdType = HouseholdService.householdRecordTypeId();
-        Set<Id> households = new Set<Id>();
-        Set<Id> people = new Set<Id>();
-        for (Account record : gone) {
-            Id survivorId = survivorByMerged.get(record.Id);
-            if (survivorId == null) {
-                continue;
-            }
-            if (mergedPeople.contains(record.Id)) {
-                people.add(survivorId);
-            } else if (householdType != null && record.RecordTypeId == householdType) {
-                households.add(survivorId);
-            }
-        }
-        MergeSettlement.afterMerge(households, new Set<Id>(survivorByMerged.values()), people);
-    }
+	/**
+	 * A person restored from the recycle bin gets their memberships back, and the
+	 * households they have rejoined are recounted and renamed. Never tidied away here:
+	 * nobody has left.
+	 */
+	public override void afterUndelete() {
+		Set<Id> personIds = personIdsOf((List<Account>) newRecords());
+		Set<Id> affected = HouseholdService.restoreMembershipsFor(personIds);
+		affected.addAll(HouseholdService.householdIdsForPeople(personIds));
+		HouseholdService.afterMembershipChange(affected, false);
+	}
 
-    /**
-     * A person restored from the recycle bin gets their memberships back, and the
-     * households they have rejoined are recounted and renamed. Never tidied away here:
-     * nobody has left.
-     */
-    public override void afterUndelete() {
-        Set<Id> personIds = personIdsOf((List<Account>) newRecords());
-        Set<Id> affected = HouseholdService.restoreMembershipsFor(personIds);
-        affected.addAll(HouseholdService.householdIdsForPeople(personIds));
-        HouseholdService.afterMembershipChange(affected, false);
-    }
+	/** The survivor of each of these records that was deleted by a merge. */
+	private static Map<Id, Id> survivorsOf(List<Account> records) {
+		Map<Id, Id> result = new Map<Id, Id>();
+		for (Account record : records) {
+			if (record.MasterRecordId != null) {
+				result.put(record.Id, record.MasterRecordId);
+			}
+		}
+		return result;
+	}
 
-    /** The survivor of each of these records that was deleted by a merge. */
-    private static Map<Id, Id> survivorsOf(List<Account> records) {
-        Map<Id, Id> result = new Map<Id, Id>();
-        for (Account record : records) {
-            if (record.MasterRecordId != null) {
-                result.put(record.Id, record.MasterRecordId);
-            }
-        }
-        return result;
-    }
+	/**
+	 * The real-time totals on the survivors of an account merge, recalculated for the
+	 * survivors only (C-20). A merged household or organization has its own totals; a
+	 * merged person stored as an account also has the totals on the contact the platform
+	 * keeps behind it, which the merge changes too, so the survivors' person contacts are
+	 * recalculated as well. A failure is logged and never fails the merge: the nightly run
+	 * puts a total right, as for every rollup. Without the Rollup Builder module there are no
+	 * totals, and the merge has nothing to recalculate (ADR-0125).
+	 */
+	private static void recalculateSurvivors(List<Account> gone, Map<Id, Id> survivorByMerged) {
+		if (survivorByMerged.isEmpty()) {
+			return;
+		}
+		try {
+			RollupEngineExtension engine = RollupEngineExtensions.find();
+			if (engine == null) {
+				return;
+			}
+			engine.afterMerge(String.valueOf(Account.SObjectType), gone);
+			Set<Id> survivingPeople = new Set<Id>();
+			if (handlesPeople()) {
+				Set<Id> mergedPeople = personIdsOf(gone);
+				for (Id mergedId : survivorByMerged.keySet()) {
+					if (mergedPeople.contains(mergedId)) {
+						survivingPeople.add(survivorByMerged.get(mergedId));
+					}
+				}
+			}
+			if (!survivingPeople.isEmpty()) {
+				engine.forSurvivors(
+					String.valueOf(Contact.SObjectType),
+					new Set<Id>(PersonRecordSelector.getPersonContactIds(survivingPeople).values())
+				);
+			}
+		} catch (Exception failed) {
+			ErrorLogger.log(failed, CONTEXT);
+		}
+	}
 
-    /**
-     * The real-time totals on the survivors of an account merge, recalculated for the
-     * survivors only (C-20). A merged household or organization has its own totals; a
-     * merged person stored as an account also has the totals on the contact the platform
-     * keeps behind it, which the merge changes too, so the survivors' person contacts are
-     * recalculated as well. A failure is logged and never fails the merge: the nightly run
-     * puts a total right, as for every rollup. Without the Rollup Builder module there are no
-     * totals, and the merge has nothing to recalculate (ADR-0125).
-     */
-    private static void recalculateSurvivors(List<Account> gone, Map<Id, Id> survivorByMerged) {
-        if (survivorByMerged.isEmpty()) {
-            return;
-        }
-        try {
-            RollupEngineExtension engine = RollupEngineExtensions.find();
-            if (engine == null) {
-                return;
-            }
-            engine.afterMerge(String.valueOf(Account.SObjectType), gone);
-            Set<Id> survivingPeople = new Set<Id>();
-            if (handlesPeople()) {
-                Set<Id> mergedPeople = personIdsOf(gone);
-                for (Id mergedId : survivorByMerged.keySet()) {
-                    if (mergedPeople.contains(mergedId)) {
-                        survivingPeople.add(survivorByMerged.get(mergedId));
-                    }
-                }
-            }
-            if (!survivingPeople.isEmpty()) {
-                engine.forSurvivors(
-                    String.valueOf(Contact.SObjectType),
-                    new Set<Id>(PersonRecordSelector.getPersonContactIds(survivingPeople).values())
-                );
-            }
-        } catch (Exception failed) {
-            ErrorLogger.log(failed, CONTEXT);
-        }
-    }
+	/**
+	 * True when this org keeps people on the account object and joins them to households
+	 * with membership rows. Asked once per context rather than once per record.
+	 */
+	private static Boolean handlesPeople() {
+		return HouseholdService.isPersonAccountOrg() && HouseholdService.isJunctionMode();
+	}
 
-    /**
-     * True when this org keeps people on the account object and joins them to households
-     * with membership rows. Asked once per context rather than once per record.
-     */
-    private static Boolean handlesPeople() {
-        return HouseholdService.isPersonAccountOrg() && HouseholdService.isJunctionMode();
-    }
+	/**
+	 * The people among these records. A record that holds an organization or a household
+	 * rather than a person is left out, and on an org that does not keep people as
+	 * accounts the answer is empty without anything being read.
+	 */
+	private static Set<Id> personIdsOf(List<Account> records) {
+		Set<Id> result = new Set<Id>();
+		if (records == null || records.isEmpty() || !handlesPeople()) {
+			return result;
+		}
+		for (SObject person : PersonRecordSelector.filterPeople(records)) {
+			if (person.Id != null) {
+				result.add(person.Id);
+			}
+		}
+		return result;
+	}
 
-    /**
-     * The people among these records. A record that holds an organization or a household
-     * rather than a person is left out, and on an org that does not keep people as
-     * accounts the answer is empty without anything being read.
-     */
-    private static Set<Id> personIdsOf(List<Account> records) {
-        Set<Id> result = new Set<Id>();
-        if (records == null || records.isEmpty() || !handlesPeople()) {
-            return result;
-        }
-        for (SObject person : PersonRecordSelector.filterPeople(records)) {
-            if (person.Id != null) {
-                result.add(person.Id);
-            }
-        }
-        return result;
-    }
+	/**
+	 * The households every person among these records belongs to.
+	 */
+	private static Set<Id> householdIdsOf(List<Account> records) {
+		return HouseholdService.householdIdsForPeople(personIdsOf(records));
+	}
 
-    /**
-     * The households every person among these records belongs to.
-     */
-    private static Set<Id> householdIdsOf(List<Account> records) {
-        return HouseholdService.householdIdsForPeople(personIdsOf(records));
-    }
+	/**
+	 * A household saved with no name gets a placeholder rather than a save error. The
+	 * naming service replaces it as soon as the household has a member.
+	 */
+	private static void nameNewHouseholds(List<Account> records) {
+		Id recordTypeId = HouseholdService.householdRecordTypeId();
+		if (recordTypeId == null) {
+			return;
+		}
+		for (Account record : records) {
+			Boolean isHousehold = record.RecordTypeId == recordTypeId;
+			if (isHousehold && record.Custom_Name__c != true && String.isBlank(record.Name)) {
+				record.Name = HouseholdNamingService.storedLabel(
+					'Core_Households_NamePlaceholder',
+					Label.Core_Households_NamePlaceholder
+				);
+			}
+		}
+	}
 
-    /**
-     * A household saved with no name gets a placeholder rather than a save error. The
-     * naming service replaces it as soon as the household has a member.
-     */
-    private static void nameNewHouseholds(List<Account> records) {
-        Id recordTypeId = HouseholdService.householdRecordTypeId();
-        if (recordTypeId == null) {
-            return;
-        }
-        for (Account record : records) {
-            Boolean isHousehold = record.RecordTypeId == recordTypeId;
-            if (isHousehold && record.Custom_Name__c != true && String.isBlank(record.Name)) {
-                record.Name = HouseholdNamingService.storedLabel(
-                    'Core_Households_NamePlaceholder',
-                    Label.Core_Households_NamePlaceholder
-                );
-            }
-        }
-    }
-
-    /**
-     * R-H2. Only in an org that stores people as accounts, only in junction mode, and only
-     * when automatic household creation is on.
-     *
-     * That is the same setting a person stored as a contact is given a household by
-     * (ADR-0037). The separate person account setting this used to read is retired: it
-     * shipped off, so an org that took the recommended setup got no households at all and
-     * was told nothing about it.
-     */
-    private static void createHouseholdsForNewPeople(List<Account> records) {
-        if (records == null || records.isEmpty()) {
-            return;
-        }
-        if (!handlesPeople()) {
-            return;
-        }
-        BarnCRM_Settings__c settings = SettingsService.getSettings();
-        if (settings == null || settings.Auto_Create_Households__c != true) {
-            return;
-        }
-        List<SObject> people = PersonRecordSelector.filterPeople(records);
-        if (people.isEmpty()) {
-            return;
-        }
-        // HouseholdService guards its own creation pass against the saves it makes coming
-        // back round through this trigger (ADR-0037).
-        HouseholdService.createHouseholdsForPersonAccounts(people);
-    }
+	/**
+	 * R-H2. Only in an org that stores people as accounts, only in junction mode, and only
+	 * when automatic household creation is on.
+	 *
+	 * That is the same setting a person stored as a contact is given a household by
+	 * (ADR-0037). The separate person account setting this used to read is retired: it
+	 * shipped off, so an org that took the recommended setup got no households at all and
+	 * was told nothing about it.
+	 */
+	private static void createHouseholdsForNewPeople(List<Account> records) {
+		if (records == null || records.isEmpty()) {
+			return;
+		}
+		if (!handlesPeople()) {
+			return;
+		}
+		BarnCRM_Settings__c settings = SettingsService.getSettings();
+		if (settings == null || settings.Auto_Create_Households__c != true) {
+			return;
+		}
+		List<SObject> people = PersonRecordSelector.filterPeople(records);
+		if (people.isEmpty()) {
+			return;
+		}
+		// HouseholdService guards its own creation pass against the saves it makes coming
+		// back round through this trigger (ADR-0037).
+		HouseholdService.createHouseholdsForPersonAccounts(people);
+	}
 }

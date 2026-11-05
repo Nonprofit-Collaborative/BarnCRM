@@ -4,23 +4,23 @@
  */
 @IsTest
 private class FundraisingStaffGroupTest {
-    @IsTest
-    static void theRoleIncludesGivingStaff() {
-        System.runAs(TestUsers.admin()) {
-            Test.startTest();
-            Set<String> included = new Set<String>();
-            for (PermissionSetGroupComponent component : [
-                SELECT PermissionSet.Name
-                FROM PermissionSetGroupComponent
-                WHERE PermissionSetGroup.DeveloperName = 'Fundraising_Staff'
-                WITH SYSTEM_MODE
-            ]) {
-                included.add(component.PermissionSet.Name);
-            }
-            Test.stopTest();
+	@IsTest
+	static void theRoleIncludesGivingStaff() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			Set<String> included = new Set<String>();
+			for (PermissionSetGroupComponent component : [
+				SELECT PermissionSet.Name
+				FROM PermissionSetGroupComponent
+				WHERE PermissionSetGroup.DeveloperName = 'Fundraising_Staff'
+				WITH SYSTEM_MODE
+			]) {
+				included.add(component.PermissionSet.Name);
+			}
+			Test.stopTest();
 
-            Assert.isTrue(included.contains('BarnCRM_Staff'), 'Core staff access, as before');
-            Assert.isTrue(included.contains('Giving_Staff'), 'and the Giving records');
-        }
-    }
+			Assert.isTrue(included.contains('BarnCRM_Staff'), 'Core staff access, as before');
+			Assert.isTrue(included.contains('Giving_Staff'), 'and the Giving records');
+		}
+	}
 }

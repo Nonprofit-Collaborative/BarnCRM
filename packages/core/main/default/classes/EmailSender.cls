@@ -8,10 +8,10 @@
  */
 @NamespaceAccessible
 public interface EmailSender {
-    /**
-     * Sends the messages and reports one outcome per message, in the same order. One address
-     * that bounces must not stop the others going out, so the send is partial success, not all
-     * or nothing. A call the platform refuses as a whole throws.
-     */
-    List<EmailSendOutcome> send(List<Messaging.SingleEmailMessage> messages);
+	/**
+	 * Sends the messages and reports one outcome per message, in the same order. One address
+	 * that bounces must not stop the others going out, so the send is partial success, not all
+	 * or nothing. A call the platform refuses as a whole throws.
+	 */
+	List<EmailSendOutcome> send(List<Messaging.SingleEmailMessage> messages);
 }

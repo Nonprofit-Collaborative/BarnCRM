@@ -19,28 +19,28 @@
  *    reads the date through `GiftPostingLock`, as before.
  */
 public with sharing class AccountingPeriodWriter {
-    /**
-     * The stored close date, read under a lock that holds until the transaction ends, so two
-     * people closing or reopening at once take turns instead of both deciding from the same
-     * value. Null when no period is closed.
-     */
-    public static Date lockedClosedThrough() {
-        Giving_Settings__c stored = (Giving_Settings__c) OrgSettingsSystemWriter.lockStored(
-            Giving_Settings__c.SObjectType
-        );
-        return stored?.Books_Closed_Through__c;
-    }
+	/**
+	 * The stored close date, read under a lock that holds until the transaction ends, so two
+	 * people closing or reopening at once take turns instead of both deciding from the same
+	 * value. Null when no period is closed.
+	 */
+	public static Date lockedClosedThrough() {
+		Giving_Settings__c stored = (Giving_Settings__c) OrgSettingsSystemWriter.lockStored(
+			Giving_Settings__c.SObjectType
+		);
+		return stored?.Books_Closed_Through__c;
+	}
 
-    /**
-     * Saves the close date and nothing else. A first save keeps the checkboxes that ship on
-     * (OrgSettingsSystemWriter).
-     */
-    public static void saveClosedThrough(Date closeDate) {
-        OrgSettingsSystemWriter.save(
-            Giving_Settings__c.SObjectType,
-            new Map<Schema.SObjectField, Object>{
-                Giving_Settings__c.Books_Closed_Through__c => closeDate
-            }
-        );
-    }
+	/**
+	 * Saves the close date and nothing else. A first save keeps the checkboxes that ship on
+	 * (OrgSettingsSystemWriter).
+	 */
+	public static void saveClosedThrough(Date closeDate) {
+		OrgSettingsSystemWriter.save(
+			Giving_Settings__c.SObjectType,
+			new Map<Schema.SObjectField, Object>{
+				Giving_Settings__c.Books_Closed_Through__c => closeDate
+			}
+		);
+	}
 }

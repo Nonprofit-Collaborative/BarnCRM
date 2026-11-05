@@ -14,86 +14,86 @@
  */
 @NamespaceAccessible
 public with sharing class VolunteerPersonDeleteHandler extends TriggerHandler {
-    /** The rows noted before delete, by the record being deleted, until after delete. */
-    private static Map<Id, Set<Id>> notedByPerson = new Map<Id, Set<Id>>();
-    /**
-     * Rows already deleted in this pass of the delete: an account's contacts are deleted with it,
-     * and should their triggers run too, a row is not deleted twice. Cleared at the start of
-     * every before delete, because the platform retries a batch whose other rows failed (partial
-     * success): the first pass is rolled back, its rows are back, and a retained set would make
-     * the retry skip them.
-     */
-    private static Set<Id> deleted = new Set<Id>();
+	/** The rows noted before delete, by the record being deleted, until after delete. */
+	private static Map<Id, Set<Id>> notedByPerson = new Map<Id, Set<Id>>();
+	/**
+	 * Rows already deleted in this pass of the delete: an account's contacts are deleted with it,
+	 * and should their triggers run too, a row is not deleted twice. Cleared at the start of
+	 * every before delete, because the platform retries a batch whose other rows failed (partial
+	 * success): the first pass is rolled back, its rows are back, and a retained set would make
+	 * the retry skip them.
+	 */
+	private static Set<Id> deleted = new Set<Id>();
 
-    @NamespaceAccessible
-    public VolunteerPersonDeleteHandler() {
-        return;
-    }
+	@NamespaceAccessible
+	public VolunteerPersonDeleteHandler() {
+		return;
+	}
 
-    public override String getName() {
-        return 'VolunteerPersonDeleteHandler';
-    }
+	public override String getName() {
+		return 'VolunteerPersonDeleteHandler';
+	}
 
-    public override void beforeDelete() {
-        deleted = new Set<Id>();
-        Set<Id> contactIds = new Set<Id>();
-        Set<Id> accountIds = new Set<Id>();
-        for (SObject person : oldRecordsById().values()) {
-            if (person.getSObjectType() == Contact.SObjectType) {
-                contactIds.add(person.Id);
-            } else {
-                accountIds.add(person.Id);
-            }
-        }
-        notedByPerson.putAll(
-            VolunteerIntegritySelector.selectRowsNamingPeople(contactIds, accountIds)
-        );
-    }
+	public override void beforeDelete() {
+		deleted = new Set<Id>();
+		Set<Id> contactIds = new Set<Id>();
+		Set<Id> accountIds = new Set<Id>();
+		for (SObject person : oldRecordsById().values()) {
+			if (person.getSObjectType() == Contact.SObjectType) {
+				contactIds.add(person.Id);
+			} else {
+				accountIds.add(person.Id);
+			}
+		}
+		notedByPerson.putAll(
+			VolunteerIntegritySelector.selectRowsNamingPeople(contactIds, accountIds)
+		);
+	}
 
-    public override void afterDelete() {
-        Set<Id> toDelete = new Set<Id>();
-        for (SObject person : oldRecordsById().values()) {
-            Set<Id> noted = notedByPerson.remove(person.Id);
-            if (noted != null && person.get('MasterRecordId') == null) {
-                toDelete.addAll(noted);
-            }
-        }
-        toDelete.removeAll(deleted);
-        if (toDelete.isEmpty()) {
-            return;
-        }
-        new Purge().run(new List<Id>(toDelete));
-        deleted.addAll(toDelete);
-    }
+	public override void afterDelete() {
+		Set<Id> toDelete = new Set<Id>();
+		for (SObject person : oldRecordsById().values()) {
+			Set<Id> noted = notedByPerson.remove(person.Id);
+			if (noted != null && person.get('MasterRecordId') == null) {
+				toDelete.addAll(noted);
+			}
+		}
+		toDelete.removeAll(deleted);
+		if (toDelete.isEmpty()) {
+			return;
+		}
+		new Purge().run(new List<Id>(toDelete));
+		deleted.addAll(toDelete);
+	}
 
-    /**
-     * DOCUMENTED EXCEPTION to the "user mode DML" rule (plan Section 4.13), under ADR-0021.
-     *
-     * 1. **Permission enforced before this class is reached.** The platform has already deleted
-     *    the person as the user, so the user was allowed to delete them.
-     * 2. **Inputs validated by the caller.** The Ids are the rows the selector found naming the
-     *    deleted records, nothing the user typed.
-     * 3. **Only package owned records.** Requirement rows and volunteer skills, both Volunteers
-     *    objects.
-     * 4. **Reads that reach a user stay in user mode.** Nothing read here reaches the user.
-     *
-     * `without sharing` and system mode: requirements are private and a Team Member holds no
-     * permission on them at all, yet must not leave a background check behind.
-     */
-    private without sharing class Purge {
-        /** One delete per object: a list that alternates objects splits into too many chunks. */
-        void run(List<Id> rowIds) {
-            Map<Schema.SObjectType, List<Id>> byObject = new Map<Schema.SObjectType, List<Id>>();
-            for (Id rowId : rowIds) {
-                Schema.SObjectType rowType = rowId.getSObjectType();
-                if (!byObject.containsKey(rowType)) {
-                    byObject.put(rowType, new List<Id>());
-                }
-                byObject.get(rowType).add(rowId);
-            }
-            for (List<Id> sameObject : byObject.values()) {
-                Database.delete(sameObject, true, AccessLevel.SYSTEM_MODE);
-            }
-        }
-    }
+	/**
+	 * DOCUMENTED EXCEPTION to the "user mode DML" rule (plan Section 4.13), under ADR-0021.
+	 *
+	 * 1. **Permission enforced before this class is reached.** The platform has already deleted
+	 *    the person as the user, so the user was allowed to delete them.
+	 * 2. **Inputs validated by the caller.** The Ids are the rows the selector found naming the
+	 *    deleted records, nothing the user typed.
+	 * 3. **Only package owned records.** Requirement rows and volunteer skills, both Volunteers
+	 *    objects.
+	 * 4. **Reads that reach a user stay in user mode.** Nothing read here reaches the user.
+	 *
+	 * `without sharing` and system mode: requirements are private and a Team Member holds no
+	 * permission on them at all, yet must not leave a background check behind.
+	 */
+	private without sharing class Purge {
+		/** One delete per object: a list that alternates objects splits into too many chunks. */
+		void run(List<Id> rowIds) {
+			Map<Schema.SObjectType, List<Id>> byObject = new Map<Schema.SObjectType, List<Id>>();
+			for (Id rowId : rowIds) {
+				Schema.SObjectType rowType = rowId.getSObjectType();
+				if (!byObject.containsKey(rowType)) {
+					byObject.put(rowType, new List<Id>());
+				}
+				byObject.get(rowType).add(rowId);
+			}
+			for (List<Id> sameObject : byObject.values()) {
+				Database.delete(sameObject, true, AccessLevel.SYSTEM_MODE);
+			}
+		}
+	}
 }
