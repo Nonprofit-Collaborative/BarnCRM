@@ -190,7 +190,7 @@ public with sharing class FindController {
         try {
             requirePermission();
             if (!BulkUpdateController.hasPermission()) {
-                throw new FindException(System.Label.Core_BulkUpdate_ErrorNoPermission);
+                throw new FindException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoPermission'));
             }
             return FindInlineEditService.save(objectApiName, editsJson);
         } catch (Exception caught) {

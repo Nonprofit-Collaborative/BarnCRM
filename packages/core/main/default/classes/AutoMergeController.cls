@@ -93,7 +93,9 @@ public with sharing class AutoMergeController {
                 refs.add(pair.ref);
             }
             if (refs.isEmpty()) {
-                throw new DuplicateService.DuplicateException(Label.Core_AutoMerge_ErrorNothing);
+                throw new DuplicateService.DuplicateException(
+                    BarnHelp.text('Core', 'Core_AutoMerge_ErrorNothing')
+                );
             }
             AutoMergeJob.startMerge(refs);
             return currentView();
@@ -124,7 +126,9 @@ public with sharing class AutoMergeController {
                     .keySet()
             );
             if (journalIds.isEmpty()) {
-                throw new DuplicateService.DuplicateException(Label.Core_AutoMerge_ErrorNoUndo);
+                throw new DuplicateService.DuplicateException(
+                    BarnHelp.text('Core', 'Core_AutoMerge_ErrorNoUndo')
+                );
             }
             AutoMergeJob.startUndo(runId, journalIds);
             return currentView();
@@ -187,7 +191,7 @@ public with sharing class AutoMergeController {
     private static void requirePermission() {
         if (!FeatureManagement.checkPermission(EDIT_PERMISSION)) {
             throw new DuplicateService.DuplicateException(
-                Label.Core_Duplicates_ErrorPermissionRequired
+                BarnHelp.text('Core', 'Core_Duplicates_ErrorPermissionRequired')
             );
         }
     }
@@ -196,7 +200,7 @@ public with sharing class AutoMergeController {
         requirePermission();
         if (!canReviewSuggestions()) {
             throw new DuplicateService.DuplicateException(
-                Label.Core_Duplicates_ErrorNoSuggestionAccess
+                BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestionAccess')
             );
         }
     }
@@ -204,7 +208,9 @@ public with sharing class AutoMergeController {
     /** One run or undo at a time, and none while a scan is still writing the pairs. */
     private static void requireNothingRunning() {
         if (DuplicateSelector.scanRunning(JOB_CLASS) || DuplicateSelector.scanRunning(SCAN_CLASS)) {
-            throw new DuplicateService.DuplicateException(Label.Core_AutoMerge_ErrorRunning);
+            throw new DuplicateService.DuplicateException(
+                BarnHelp.text('Core', 'Core_AutoMerge_ErrorRunning')
+            );
         }
     }
 
@@ -213,7 +219,7 @@ public with sharing class AutoMergeController {
             caught,
             caught instanceof DuplicateService.DuplicateException,
             context,
-            Label.Core_Duplicates_ErrorUnexpected
+            BarnHelp.text('Core', 'Core_Duplicates_ErrorUnexpected')
         );
     }
 }

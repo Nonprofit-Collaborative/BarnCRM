@@ -358,7 +358,10 @@ private class SavedTransformServiceTest {
                 SavedTransformService.load(null);
                 System.assert(false, 'No list.');
             } catch (BulkUpdateFields.BulkUpdateException gone) {
-                System.assertEquals(Label.Core_SavedTransform_ErrorNotFound, gone.getMessage());
+                System.assertEquals(
+                    BarnHelp.text('Core', 'Core_SavedTransform_ErrorNotFound'),
+                    gone.getMessage()
+                );
             }
             try {
                 SavedTransformService.remove(
@@ -367,7 +370,10 @@ private class SavedTransformServiceTest {
                 );
                 System.assert(false, 'No list.');
             } catch (BulkUpdateFields.BulkUpdateException gone) {
-                System.assertEquals(Label.Core_SavedTransform_ErrorNotFound, gone.getMessage());
+                System.assertEquals(
+                    BarnHelp.text('Core', 'Core_SavedTransform_ErrorNotFound'),
+                    gone.getMessage()
+                );
             }
         }
     }

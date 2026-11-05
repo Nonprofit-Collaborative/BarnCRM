@@ -212,7 +212,7 @@ private class BulkDeleteBatchTest {
             System.Assert.areEqual(100, [SELECT COUNT() FROM Contact], 'The rest stay');
             System.Assert.isTrue(
                 done.Run_Log__c.contains(
-                    System.Label.Core_BulkDelete_LogStopped.substringBefore('{0}')
+                    BarnHelp.text('Core', 'Core_BulkDelete_LogStopped').substringBefore('{0}')
                 ),
                 done.Run_Log__c
             );

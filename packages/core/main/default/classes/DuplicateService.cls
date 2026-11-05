@@ -457,21 +457,29 @@ public with sharing class DuplicateService {
      */
     public static DuplicateRecordSet requireSet(Id duplicateRecordSetId) {
         if (duplicateRecordSetId == null) {
-            throw new DuplicateException(Label.Core_Duplicates_ErrorNoSuggestion);
+            throw new DuplicateException(
+                BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestion')
+            );
         }
         List<DuplicateRecordSet> sets = DuplicateSelector.setsByIds(
             new Set<Id>{ duplicateRecordSetId }
         );
         if (sets.isEmpty()) {
-            throw new DuplicateException(Label.Core_Duplicates_ErrorNoSuggestion);
+            throw new DuplicateException(
+                BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestion')
+            );
         }
         if (sets[0].DuplicateRecordItems.size() < 2) {
-            throw new DuplicateException(Label.Core_Duplicates_ErrorNotReviewable);
+            throw new DuplicateException(
+                BarnHelp.text('Core', 'Core_Duplicates_ErrorNotReviewable')
+            );
         }
         for (DuplicateRecordItem item : sets[0].DuplicateRecordItems) {
             Schema.SObjectType itemType = item.RecordId.getSObjectType();
             if (itemType != Contact.SObjectType && itemType != Account.SObjectType) {
-                throw new DuplicateException(Label.Core_Duplicates_ErrorNotReviewable);
+                throw new DuplicateException(
+                    BarnHelp.text('Core', 'Core_Duplicates_ErrorNotReviewable')
+                );
             }
         }
         return sets[0];
@@ -488,7 +496,7 @@ public with sharing class DuplicateService {
             named.add(item.RecordId);
         }
         if (recordIds == null || !named.equals(recordIds)) {
-            throw new DuplicateException(Label.Core_Duplicates_ErrorNotThisPair);
+            throw new DuplicateException(BarnHelp.text('Core', 'Core_Duplicates_ErrorNotThisPair'));
         }
         return found;
     }

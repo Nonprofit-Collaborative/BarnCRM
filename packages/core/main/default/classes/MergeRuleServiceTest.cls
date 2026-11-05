@@ -245,7 +245,10 @@ private class MergeRuleServiceTest {
                     );
                 Assert.fail('An unknown rule is refused.');
             } catch (CustomMetadataManagerService.CustomMetadataManagerException expected) {
-                Assert.areEqual(Label.Core_DuplicateManagement_RuleUnknown, expected.getMessage());
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_DuplicateManagement_RuleUnknown'),
+                    expected.getMessage()
+                );
             }
         }
     }

@@ -137,7 +137,7 @@ private class FindInlineEditServiceTest {
                             new Map<String, Object>{ 'Id' => organization.Id, 'Title' => 'X' }
                         }
                     ) => System.Label.Core_Find_ErrorEditRecord,
-                    '[]' => System.Label.Core_BulkUpdate_ErrorNoChanges
+                    '[]' => BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
                 };
                 for (String sent : expected.keySet()) {
                     try {
@@ -183,7 +183,7 @@ private class FindInlineEditServiceTest {
                     System.Assert.fail('Editing needs the bulk update permission');
                 } catch (AuraHandledException refused) {
                     System.Assert.areEqual(
-                        System.Label.Core_BulkUpdate_ErrorNoPermission,
+                        BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoPermission'),
                         refused.getMessage(),
                         'It names the permission'
                     );

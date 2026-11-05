@@ -292,7 +292,7 @@ private class DuplicateScanBatchTest {
             Assert.areEqual(ErrorLogger.SEVERITY_WARNING, summaries[0].Severity__c);
             Assert.areEqual(
                 String.format(
-                    Label.Core_Duplicates_ScanFinishedWithFailures,
+                    BarnHelp.text('Core', 'Core_Duplicates_ScanFinishedWithFailures'),
                     new List<Object>{ 'Contact, Account', '3', '1' }
                 ),
                 summaries[0].Message__c,

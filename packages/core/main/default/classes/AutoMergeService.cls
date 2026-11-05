@@ -541,7 +541,7 @@ public with sharing class AutoMergeService {
                 for (Moved records : result.values()) {
                     records.notes.add(
                         String.format(
-                            Label.Core_AutoMerge_NoteNotRecorded,
+                            BarnHelp.text('Core', 'Core_AutoMerge_NoteNotRecorded'),
                             new List<Object>{ missed }
                         )
                     );
@@ -608,7 +608,7 @@ public with sharing class AutoMergeService {
             notesById.get(journals[i].Id)
                 .add(
                     String.format(
-                        Label.Core_AutoMerge_NoteNotUndeleted,
+                        BarnHelp.text('Core', 'Core_AutoMerge_NoteNotUndeleted'),
                         new List<Object>{
                             journals[i].Merged_Name__c,
                             results[i].getErrors()[0].getMessage()
@@ -665,7 +665,8 @@ public with sharing class AutoMergeService {
                 continue;
             }
             if (survivor == null) {
-                notesById.get(journal.Id).add(Label.Core_AutoMerge_NoteSurvivorGone);
+                notesById.get(journal.Id)
+                    .add(BarnHelp.text('Core', 'Core_AutoMerge_NoteSurvivorGone'));
                 continue;
             }
             Map<String, Object> putBack = new Map<String, Object>{
@@ -683,7 +684,7 @@ public with sharing class AutoMergeService {
                     notesById.get(journal.Id)
                         .add(
                             String.format(
-                                Label.Core_AutoMerge_NoteValueChanged,
+                                BarnHelp.text('Core', 'Core_AutoMerge_NoteValueChanged'),
                                 new List<Object>{ field }
                             )
                         );
@@ -700,7 +701,7 @@ public with sharing class AutoMergeService {
                 notesById.get(updated[i].Id)
                     .add(
                         String.format(
-                            Label.Core_AutoMerge_NoteValuesRefused,
+                            BarnHelp.text('Core', 'Core_AutoMerge_NoteValuesRefused'),
                             new List<Object>{ saves[i].getErrors()[0].getMessage() }
                         )
                     );
@@ -770,7 +771,12 @@ public with sharing class AutoMergeService {
                         // that automation keeps (a household's Primary Contact, recomputed when
                         // the memberships come back with the undelete) is back before this runs.
                         // Anything else was moved since.
-                        addOnce(notesById, owner, Label.Core_AutoMerge_NoteRecordMovedSince, key);
+                        addOnce(
+                            notesById,
+                            owner,
+                            BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordMovedSince'),
+                            key
+                        );
                     }
                 }
                 List<Database.SaveResult> saves = Database.update(
@@ -783,14 +789,19 @@ public with sharing class AutoMergeService {
                         addOnce(
                             notesById,
                             moveOwners[i],
-                            Label.Core_AutoMerge_NoteRecordRefused,
+                            BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordRefused'),
                             key
                         );
                     }
                 }
             } catch (Exception unreadable) {
                 for (Merge_Journal__c owner : new Set<Merge_Journal__c>(owners.values())) {
-                    addOnce(notesById, owner, Label.Core_AutoMerge_NoteRecordRefused, key);
+                    addOnce(
+                        notesById,
+                        owner,
+                        BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordRefused'),
+                        key
+                    );
                 }
                 continue;
             }
@@ -799,7 +810,7 @@ public with sharing class AutoMergeService {
                     addOnce(
                         notesById,
                         owners.get(recordId),
-                        Label.Core_AutoMerge_NoteRecordGone,
+                        BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordGone'),
                         key
                     );
                 }
@@ -848,7 +859,12 @@ public with sharing class AutoMergeService {
                     removing.add(row);
                     removingOwners.add(owner);
                 } else {
-                    addOnce(notesById, owner, Label.Core_AutoMerge_NoteRecordMovedSince, key);
+                    addOnce(
+                        notesById,
+                        owner,
+                        BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordMovedSince'),
+                        key
+                    );
                 }
             }
             List<Database.DeleteResult> results = Database.delete(
@@ -861,14 +877,19 @@ public with sharing class AutoMergeService {
                     addOnce(
                         notesById,
                         removingOwners[i],
-                        Label.Core_AutoMerge_NoteRecordRefused,
+                        BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordRefused'),
                         key
                     );
                 }
             }
         } catch (Exception unreadable) {
             for (Merge_Journal__c owner : new Set<Merge_Journal__c>(ownerByRow.values())) {
-                addOnce(notesById, owner, Label.Core_AutoMerge_NoteRecordRefused, key);
+                addOnce(
+                    notesById,
+                    owner,
+                    BarnHelp.text('Core', 'Core_AutoMerge_NoteRecordRefused'),
+                    key
+                );
             }
         }
     }

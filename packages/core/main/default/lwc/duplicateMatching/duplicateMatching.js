@@ -7,7 +7,6 @@ import TITLE from '@salesforce/label/c.Core_DuplicateMatching_Title';
 import REVIEW from '@salesforce/label/c.Core_DuplicateMatching_Review';
 import REVIEW_COUNT from '@salesforce/label/c.Core_DuplicateMatching_ReviewCount';
 import MATCHING_LOGIC from '@salesforce/label/c.Core_DuplicateMatching_MatchingLogic';
-import NO_ACCESS from '@salesforce/label/c.Core_DuplicateMatching_NoAccess';
 import AUTO_MERGE from '@salesforce/label/c.Core_AutoMerge_Tab';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -33,7 +32,9 @@ export default class DuplicateMatching extends LightningElement {
     review: REVIEW,
     matchingLogic: MATCHING_LOGIC,
     autoMerge: AUTO_MERGE,
-    noAccess: NO_ACCESS
+    get noAccess() {
+      return helpText('Core', 'Core_DuplicateMatching_NoAccess');
+    }
   };
 
   activeArea;

@@ -64,7 +64,8 @@ private class BulkUpdateFieldsTest {
                     System.Assert.fail('A rollup target is refused');
                 } catch (BulkUpdateFields.BulkUpdateException refused) {
                     System.Assert.isTrue(
-                        refused.getMessage().contains(System.Label.Core_BulkUpdate_ReasonKept),
+                        refused.getMessage()
+                            .contains(BarnHelp.text('Core', 'Core_BulkUpdate_ReasonKept')),
                         'The refusal says BarnCRM calculates it: ' + refused.getMessage()
                     );
                 }
@@ -84,7 +85,9 @@ private class BulkUpdateFieldsTest {
                     } catch (BulkUpdateFields.BulkUpdateException refused) {
                         System.Assert.isTrue(
                             refused.getMessage()
-                                .contains(System.Label.Core_BulkUpdate_ReasonBookkeeping),
+                                .contains(
+                                    BarnHelp.text('Core', 'Core_BulkUpdate_ReasonBookkeeping')
+                                ),
                             refused.getMessage()
                         );
                     }
@@ -94,7 +97,8 @@ private class BulkUpdateFieldsTest {
                     System.Assert.fail('Users are changed in Setup');
                 } catch (BulkUpdateFields.BulkUpdateException refused) {
                     System.Assert.isTrue(
-                        refused.getMessage().contains(System.Label.Core_BulkUpdate_ReasonSetup),
+                        refused.getMessage()
+                            .contains(BarnHelp.text('Core', 'Core_BulkUpdate_ReasonSetup')),
                         refused.getMessage()
                     );
                 }

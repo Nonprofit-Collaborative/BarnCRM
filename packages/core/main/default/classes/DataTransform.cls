@@ -375,7 +375,9 @@ public with sharing class DataTransform {
                     : BarnHelp.text('Core', 'Core_Transform_ErrorShift');
             }
             when 'digits' {
-                return digitsPatternOk(step) ? null : Label.Core_Transform_ErrorDigits;
+                return digitsPatternOk(step)
+                    ? null
+                    : BarnHelp.text('Core', 'Core_Transform_ErrorDigits');
             }
             when else {
                 return null;

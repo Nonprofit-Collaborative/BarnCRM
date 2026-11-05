@@ -31,13 +31,8 @@ import IMPORT_CONFIRM_HOUSEHOLDS from '@salesforce/label/c.Core_Import_UndoConfi
 import IMPORT_CONFIRM_ORGANIZATIONS from '@salesforce/label/c.Core_Import_UndoConfirmOrganizations';
 import IMPORT_CONFIRM_UPDATES from '@salesforce/label/c.Core_Import_UndoConfirmUpdates';
 import IMPORT_CONFIRM_BUTTON from '@salesforce/label/c.Core_Import_UndoConfirmButton';
-import UPDATE_SUMMARY from '@salesforce/label/c.Core_BulkUpdate_Summary';
-import UPDATE_UNDO_CONFIRM from '@salesforce/label/c.Core_BulkUpdate_UndoConfirm';
 import UPDATE_UNDO_BUTTON from '@salesforce/label/c.Core_BulkUpdate_UndoButton';
-import DELETE_SUMMARY from '@salesforce/label/c.Core_BulkDelete_Summary';
-import DELETE_UNDO_CONFIRM from '@salesforce/label/c.Core_BulkDelete_UndoConfirm';
 import DELETE_UNDO_BUTTON from '@salesforce/label/c.Core_BulkDelete_UndoButton';
-import BULK_UNDO_STARTED from '@salesforce/label/c.Core_BulkUpdate_UndoStarted';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import UNDO from '@salesforce/label/c.Core_AutoMerge_Undo';
 import UNDO_UNTIL from '@salesforce/label/c.Core_BulkUpdate_UndoUntil';
@@ -127,8 +122,14 @@ function fromBulkJob(job, kind) {
     detail: job.objectLabel,
     status: job.status,
     summary: isUpdate
-      ? format(UPDATE_SUMMARY, job.matched, job.updated, job.unchanged, job.failed)
-      : format(DELETE_SUMMARY, job.matched, job.deleted, job.failed),
+      ? format(
+          helpText('Core', 'Core_BulkUpdate_Summary'),
+          job.matched,
+          job.updated,
+          job.unchanged,
+          job.failed
+        )
+      : format(helpText('Core', 'Core_BulkDelete_Summary'), job.matched, job.deleted, job.failed),
     startedAt: job.startedAt,
     undoDeadline: job.undoDeadline,
     canUndo: Boolean(job.canUndo && !job.running),
@@ -411,7 +412,10 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
     if (!this.isBulkUndo) {
       return '';
     }
-    const template = this.undoTarget.kind === UPDATE ? UPDATE_UNDO_CONFIRM : DELETE_UNDO_CONFIRM;
+    const template =
+      this.undoTarget.kind === UPDATE
+        ? helpText('Core', 'Core_BulkUpdate_UndoConfirm')
+        : helpText('Core', 'Core_BulkDelete_UndoConfirm');
     return format(template, this.undoTarget.undoCount);
   }
 
@@ -493,7 +497,7 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
         const row = fromBulkJob(undone, target.kind);
         this.jobs = this.jobs.map((job) => (job.id === row.id ? row : job));
       }
-      this.finishUndo(BULK_UNDO_STARTED);
+      this.finishUndo(helpText('Core', 'Core_BulkUpdate_UndoStarted'));
       this.pollWhileRunning();
     });
   }

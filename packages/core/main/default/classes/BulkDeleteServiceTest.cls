@@ -136,7 +136,7 @@ private class BulkDeleteServiceTest {
                     System.Assert.fail('Nothing matches');
                 } catch (BulkDeleteService.BulkDeleteException expected) {
                     System.Assert.areEqual(
-                        System.Label.Core_BulkDelete_ErrorNothingMatches,
+                        BarnHelp.text('Core', 'Core_BulkDelete_ErrorNothingMatches'),
                         expected.getMessage()
                     );
                 }
@@ -160,7 +160,7 @@ private class BulkDeleteServiceTest {
                     System.Assert.fail('Nothing confirmed');
                 } catch (BulkDeleteService.BulkDeleteException expected) {
                     System.Assert.areEqual(
-                        System.Label.Core_BulkUpdate_ErrorConfirm,
+                        BarnHelp.text('Core', 'Core_BulkUpdate_ErrorConfirm'),
                         expected.getMessage()
                     );
                 }

@@ -555,7 +555,7 @@ public with sharing class ImportObjectSchema {
         return reason == null
             ? null
             : String.format(
-                  Label.Core_BulkDelete_ErrorObject,
+                  BarnHelp.text('Core', 'Core_BulkDelete_ErrorObject'),
                   new List<String>{ described.getLabelPlural(), reason }
               );
     }

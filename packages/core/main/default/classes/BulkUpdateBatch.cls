@@ -147,7 +147,7 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
                     ImportJournalService.failed(
                         checked.objectName,
                         record.Id,
-                        System.Label.Core_BulkUpdate_ErrorTooLargeToUndo
+                        BarnHelp.text('Core', 'Core_BulkUpdate_ErrorTooLargeToUndo')
                     )
                 );
                 continue;
@@ -198,11 +198,11 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
                 String.isBlank(stoppedBecause)
                     ? null
                     : String.format(
-                          System.Label.Core_BulkDelete_LogStopped,
+                          BarnHelp.text('Core', 'Core_BulkDelete_LogStopped'),
                           new List<Object>{ stoppedBecause }
                       ),
                 String.format(
-                    System.Label.Core_BulkUpdate_LogFinished,
+                    BarnHelp.text('Core', 'Core_BulkUpdate_LogFinished'),
                     new List<Object>{
                         updated.format(),
                         unchanged.format(),

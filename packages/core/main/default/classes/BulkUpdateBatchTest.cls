@@ -356,7 +356,8 @@ private class BulkUpdateBatchTest {
             for (Map<String, Object> entry : journal(job.Id, ImportJournalService.PHASE_COMMIT)) {
                 reasonGiven =
                     reasonGiven ||
-                    System.Label.Core_BulkUpdate_ErrorHouseholdName.equals(entry.get('reason'));
+                    BarnHelp.text('Core', 'Core_BulkUpdate_ErrorHouseholdName')
+                        .equals(entry.get('reason'));
             }
             System.Assert.isTrue(reasonGiven, 'The reason is journaled');
         }
@@ -390,7 +391,7 @@ private class BulkUpdateBatchTest {
             System.Assert.isTrue(
                 done.Run_Log__c.contains(
                     String.format(
-                        System.Label.Core_BulkUpdate_LogNotReached,
+                        BarnHelp.text('Core', 'Core_BulkUpdate_LogNotReached'),
                         new List<Object>{ (100).format() }
                     )
                 ),
@@ -430,7 +431,7 @@ private class BulkUpdateBatchTest {
             List<Map<String, Object>> entries = journal(job.Id, ImportJournalService.PHASE_COMMIT);
             System.Assert.areEqual(200, entries.size(), 'One refusal per record');
             System.Assert.areEqual(
-                System.Label.Core_BulkUpdate_ErrorTooLargeToUndo,
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorTooLargeToUndo'),
                 entries[0].get('reason')
             );
         }

@@ -6,6 +6,13 @@ import getJob from '@salesforce/apex/BulkDeleteController.getJob';
 import previewFile from '@salesforce/apex/BulkDeleteController.previewFile';
 import startFile from '@salesforce/apex/BulkDeleteController.startFile';
 import backupPage from '@salesforce/apex/BulkDeleteController.backupPage';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_BulkDelete_BackupDone: 'Downloaded {0} records.',
+  Core_BulkDelete_PreviewCount: '{0} {1} match. The first ones:',
+  Core_BulkDelete_Summary: '{0} matched: {1} deleted, {2} refused.'
+});
 
 jest.mock('@salesforce/apex/BulkDeleteController.preview', () => ({ default: jest.fn() }), {
   virtual: true
@@ -26,23 +33,8 @@ jest.mock('@salesforce/apex/BulkDeleteController.backupPage', () => ({ default: 
   virtual: true
 });
 jest.mock(
-  '@salesforce/label/c.Core_BulkDelete_BackupDone',
-  () => ({ default: 'Downloaded {0} records.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_BulkDelete_PreviewCount',
-  () => ({ default: '{0} {1} match. The first ones:' }),
-  { virtual: true }
-);
-jest.mock(
   '@salesforce/label/c.Core_BulkDelete_DeleteButton',
   () => ({ default: 'Delete {0} records' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_BulkDelete_Summary',
-  () => ({ default: '{0} matched: {1} deleted, {2} refused.' }),
   { virtual: true }
 );
 

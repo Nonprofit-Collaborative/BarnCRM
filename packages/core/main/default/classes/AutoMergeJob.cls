@@ -91,7 +91,9 @@ public with sharing class AutoMergeJob implements Database.Batchable<String>, Da
 
     public void finish(Database.BatchableContext context) {
         String summary = String.format(
-            undoing ? Label.Core_AutoMerge_UndoFinished : Label.Core_AutoMerge_RunFinished,
+            undoing
+                ? BarnHelp.text('Core', 'Core_AutoMerge_UndoFinished')
+                : BarnHelp.text('Core', 'Core_AutoMerge_RunFinished'),
             new List<Object>{ done, skipped, failed }
         );
         ErrorLogger.logMessage(

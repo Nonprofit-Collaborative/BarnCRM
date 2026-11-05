@@ -165,31 +165,34 @@ public with sharing class SavedTransformService {
      */
     public static String checkDefinition(String definitionJson) {
         if (String.isBlank(definitionJson) || definitionJson.length() > MAX_DOCUMENT) {
-            throw refused(Label.Core_SavedTransform_ErrorTooBig);
+            throw refused(BarnHelp.text('Core', 'Core_SavedTransform_ErrorTooBig'));
         }
         Map<String, Object> document;
         try {
             document = (Map<String, Object>) JSON.deserializeUntyped(definitionJson);
         } catch (Exception unreadable) {
-            throw refused(Label.Core_SavedTransform_ErrorUnreadable);
+            throw refused(BarnHelp.text('Core', 'Core_SavedTransform_ErrorUnreadable'));
         }
         if (
             document.get('version') != DOCUMENT_VERSION ||
             !(document.get('object') instanceof String)
         ) {
-            throw refused(Label.Core_SavedTransform_ErrorUnreadable);
+            throw refused(BarnHelp.text('Core', 'Core_SavedTransform_ErrorUnreadable'));
         }
         String objectName = (String) document.get('object');
         if (!BulkUpdateFields.isWritable(objectName)) {
             throw refused(
-                String.format(Label.Core_SavedTransform_ErrorObject, new List<Object>{ objectName })
+                String.format(
+                    BarnHelp.text('Core', 'Core_SavedTransform_ErrorObject'),
+                    new List<Object>{ objectName }
+                )
             );
         }
         if (
             document.get('filter') != null &&
             !(document.get('filter') instanceof Map<String, Object>)
         ) {
-            throw refused(Label.Core_SavedTransform_ErrorUnreadable);
+            throw refused(BarnHelp.text('Core', 'Core_SavedTransform_ErrorUnreadable'));
         }
         checkChanges(document.get('changes'));
         return objectName;
@@ -197,13 +200,13 @@ public with sharing class SavedTransformService {
 
     private static void checkChanges(Object rawChanges) {
         if (!(rawChanges instanceof List<Object>)) {
-            throw refused(Label.Core_SavedTransform_ErrorUnreadable);
+            throw refused(BarnHelp.text('Core', 'Core_SavedTransform_ErrorUnreadable'));
         }
         List<Object> changes = (List<Object>) rawChanges;
         if (changes.size() > BulkUpdateService.MAX_CHANGES) {
             throw refused(
                 String.format(
-                    Label.Core_SavedTransform_ErrorChanges,
+                    BarnHelp.text('Core', 'Core_SavedTransform_ErrorChanges'),
                     new List<Object>{ BulkUpdateService.MAX_CHANGES }
                 )
             );
@@ -220,7 +223,7 @@ public with sharing class SavedTransformService {
             ) {
                 throw refused(
                     String.format(
-                        Label.Core_SavedTransform_ErrorChanges,
+                        BarnHelp.text('Core', 'Core_SavedTransform_ErrorChanges'),
                         new List<Object>{ BulkUpdateService.MAX_CHANGES }
                     )
                 );
@@ -239,7 +242,7 @@ public with sharing class SavedTransformService {
         if (!problems.isEmpty()) {
             throw refused(
                 String.format(
-                    Label.Core_SavedTransform_ErrorSteps,
+                    BarnHelp.text('Core', 'Core_SavedTransform_ErrorSteps'),
                     new List<Object>{ field, String.join(problems, ' ') }
                 )
             );
@@ -250,7 +253,10 @@ public with sharing class SavedTransformService {
         String cleaned = name == null ? '' : name.normalizeSpace();
         if (cleaned.length() == 0 || cleaned.length() > MAX_NAME) {
             throw refused(
-                String.format(Label.Core_SavedTransform_ErrorName, new List<Object>{ MAX_NAME })
+                String.format(
+                    BarnHelp.text('Core', 'Core_SavedTransform_ErrorName'),
+                    new List<Object>{ MAX_NAME }
+                )
             );
         }
         return cleaned;
@@ -267,7 +273,10 @@ public with sharing class SavedTransformService {
         ];
         if (!same.isEmpty()) {
             throw refused(
-                String.format(Label.Core_SavedTransform_ErrorExists, new List<Object>{ name })
+                String.format(
+                    BarnHelp.text('Core', 'Core_SavedTransform_ErrorExists'),
+                    new List<Object>{ name }
+                )
             );
         }
     }
@@ -283,7 +292,7 @@ public with sharing class SavedTransformService {
                   LIMIT 1
               ];
         if (found.isEmpty()) {
-            throw refused(Label.Core_SavedTransform_ErrorNotFound);
+            throw refused(BarnHelp.text('Core', 'Core_SavedTransform_ErrorNotFound'));
         }
         return found[0];
     }

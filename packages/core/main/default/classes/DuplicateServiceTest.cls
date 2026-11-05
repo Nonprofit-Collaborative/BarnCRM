@@ -276,7 +276,7 @@ private class DuplicateServiceTest {
                 Assert.fail('A dismissal needs a suggestion.');
             } catch (DuplicateService.DuplicateException expected) {
                 Assert.areEqual(
-                    Label.Core_Duplicates_ErrorNoSuggestion,
+                    BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestion'),
                     expected.getMessage(),
                     'Said in words.'
                 );
@@ -516,7 +516,7 @@ private class DuplicateServiceTest {
                 Assert.fail('One record is nothing to dismiss.');
             } catch (DuplicateService.DuplicateException expected) {
                 Assert.areEqual(
-                    Label.Core_Duplicates_ErrorNotReviewable,
+                    BarnHelp.text('Core', 'Core_Duplicates_ErrorNotReviewable'),
                     expected.getMessage(),
                     'Said in words.'
                 );
@@ -554,7 +554,7 @@ private class DuplicateServiceTest {
                 Assert.fail('A different pair is refused.');
             } catch (DuplicateService.DuplicateException expected) {
                 Assert.areEqual(
-                    Label.Core_Duplicates_ErrorNotThisPair,
+                    BarnHelp.text('Core', 'Core_Duplicates_ErrorNotThisPair'),
                     expected.getMessage(),
                     'Said in words.'
                 );

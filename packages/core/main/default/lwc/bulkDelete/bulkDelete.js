@@ -8,14 +8,9 @@ import backupPage from '@salesforce/apex/BulkDeleteController.backupPage';
 import { messageFrom, format, downloadCsv } from 'c/findCsv';
 import { startPolling } from 'c/jobPoller';
 import BACKUP from '@salesforce/label/c.Core_BulkDelete_Backup';
-import BACKING_UP from '@salesforce/label/c.Core_BulkDelete_BackingUp';
-import BACKUP_DONE from '@salesforce/label/c.Core_BulkDelete_BackupDone';
 
 import TITLE from '@salesforce/label/c.Core_BulkDelete_Title';
-import PREVIEW_COUNT from '@salesforce/label/c.Core_BulkDelete_PreviewCount';
 import DELETE_BUTTON from '@salesforce/label/c.Core_BulkDelete_DeleteButton';
-import STARTED from '@salesforce/label/c.Core_BulkDelete_Started';
-import SUMMARY from '@salesforce/label/c.Core_BulkDelete_Summary';
 import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
 import CONFIRM from '@salesforce/label/c.Core_BulkUpdate_Confirm';
 import UNDO_UNTIL from '@salesforce/label/c.Core_BulkUpdate_UndoUntil';
@@ -121,7 +116,13 @@ export default class BulkDelete extends LightningElement {
   }
 
   get previewLine() {
-    return this.preview ? format(PREVIEW_COUNT, this.preview.count, this.preview.objectLabel) : '';
+    return this.preview
+      ? format(
+          helpText('Core', 'Core_BulkDelete_PreviewCount'),
+          this.preview.count,
+          this.preview.objectLabel
+        )
+      : '';
   }
 
   get hasCascades() {
@@ -151,7 +152,12 @@ export default class BulkDelete extends LightningElement {
     const percent = total ? Math.round(((job.chunksDone || 0) * 100) / total) : 0;
     return {
       ...job,
-      summary: format(SUMMARY, job.matched, job.deleted, job.failed),
+      summary: format(
+        helpText('Core', 'Core_BulkDelete_Summary'),
+        job.matched,
+        job.deleted,
+        job.failed
+      ),
       progressLine: job.running ? helpText('Core', 'Core_BulkDelete_Progress', percent) : '',
       progressValue: percent,
       hasFailures: Boolean(job.failures && job.failures.length),
@@ -191,14 +197,20 @@ export default class BulkDelete extends LightningElement {
         });
         rows = rows.concat(page.rows || []);
         afterId = page.lastId;
-        this.noticeMessage = format(BACKING_UP, String(rows.length));
+        this.noticeMessage = format(
+          helpText('Core', 'Core_BulkDelete_BackingUp'),
+          String(rows.length)
+        );
       } while (!page.done);
       const columns = (page.columns || []).map((column) => ({
         label: column.label,
         path: column.fieldName
       }));
       downloadCsv(page.objectName, columns, rows);
-      this.noticeMessage = format(BACKUP_DONE, String(rows.length));
+      this.noticeMessage = format(
+        helpText('Core', 'Core_BulkDelete_BackupDone'),
+        String(rows.length)
+      );
     });
   }
 
@@ -208,7 +220,7 @@ export default class BulkDelete extends LightningElement {
       this.job = this.batchId
         ? await startFile({ batchId: this.batchId, confirmedCount })
         : await startDelete({ queryJson: this.queryJson, confirmedCount });
-      this.noticeMessage = STARTED;
+      this.noticeMessage = helpText('Core', 'Core_BulkDelete_Started');
       this.preview = undefined;
       this.confirmText = '';
       this.startPolling();

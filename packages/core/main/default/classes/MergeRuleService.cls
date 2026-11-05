@@ -244,7 +244,7 @@ public with sharing class MergeRuleService {
         String rule = values == null ? null : (String) values.get('Rule__c');
         if (rule != null && !RULES.contains(rule)) {
             throw new CustomMetadataManagerService.CustomMetadataManagerException(
-                Label.Core_DuplicateManagement_RuleUnknown
+                BarnHelp.text('Core', 'Core_DuplicateManagement_RuleUnknown')
             );
         }
         String name = fieldName == null ? '' : fieldName.trim().toLowerCase();
@@ -261,7 +261,7 @@ public with sharing class MergeRuleService {
         ) {
             throw new CustomMetadataManagerService.CustomMetadataManagerException(
                 String.format(
-                    Label.Core_DuplicateManagement_RuleFieldInvalid,
+                    BarnHelp.text('Core', 'Core_DuplicateManagement_RuleFieldInvalid'),
                     new List<Object>{ fieldName }
                 )
             );

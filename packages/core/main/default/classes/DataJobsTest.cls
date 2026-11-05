@@ -136,10 +136,10 @@ private class DataJobsTest {
                         'Stopped.',
                         'Finished.',
                         String.format(
-                            System.Label.Core_BulkUpdate_LogNotReached,
+                            BarnHelp.text('Core', 'Core_BulkUpdate_LogNotReached'),
                             new List<Object>{ (50).format() }
                         ),
-                        System.Label.Core_BulkUpdate_LogJournalIncomplete
+                        BarnHelp.text('Core', 'Core_BulkUpdate_LogJournalIncomplete')
                     },
                     '\n'
                 ),

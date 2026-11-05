@@ -51,7 +51,7 @@ public with sharing class BulkUpdateService {
         public Object newValueFor(SObject record) {
             if (keptOnRecord(record)) {
                 throw new BulkUpdateFields.BulkUpdateException(
-                    System.Label.Core_BulkUpdate_ErrorHouseholdName
+                    BarnHelp.text('Core', 'Core_BulkUpdate_ErrorHouseholdName')
                 );
             }
             if (action == ACTION_COPY) {
@@ -204,7 +204,7 @@ public with sharing class BulkUpdateService {
                 : (List<Object>) JSON.deserializeUntyped(changesJson);
         } catch (Exception unreadable) {
             throw new BulkUpdateFields.BulkUpdateException(
-                System.Label.Core_BulkUpdate_ErrorNoChanges
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
             );
         }
         return plan(queryJson, rawChanges);
@@ -231,26 +231,26 @@ public with sharing class BulkUpdateService {
             .getName();
         if (rawChanges == null || rawChanges.isEmpty()) {
             throw new BulkUpdateFields.BulkUpdateException(
-                System.Label.Core_BulkUpdate_ErrorNoChanges
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
             );
         }
         if (rawChanges.size() > MAX_CHANGES) {
             throw new BulkUpdateFields.BulkUpdateException(
-                System.Label.Core_BulkUpdate_ErrorTooManyChanges
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorTooManyChanges')
             );
         }
         Set<String> targets = new Set<String>();
         for (Object entry : rawChanges) {
             if (!(entry instanceof Map<String, Object>)) {
                 throw new BulkUpdateFields.BulkUpdateException(
-                    System.Label.Core_BulkUpdate_ErrorNoChanges
+                    BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
                 );
             }
             Change change = change(result.objectType, (Map<String, Object>) entry);
             if (!targets.add(change.target.getName().toLowerCase())) {
                 throw new BulkUpdateFields.BulkUpdateException(
                     String.format(
-                        System.Label.Core_BulkUpdate_ErrorDuplicateField,
+                        BarnHelp.text('Core', 'Core_BulkUpdate_ErrorDuplicateField'),
                         new List<Object>{ change.target.getLabel() }
                     )
                 );
@@ -271,7 +271,7 @@ public with sharing class BulkUpdateService {
             if (!change.target.isNillable()) {
                 throw new BulkUpdateFields.BulkUpdateException(
                     String.format(
-                        System.Label.Core_BulkUpdate_ErrorRequired,
+                        BarnHelp.text('Core', 'Core_BulkUpdate_ErrorRequired'),
                         new List<Object>{ label }
                     )
                 );
@@ -286,7 +286,7 @@ public with sharing class BulkUpdateService {
             ) {
                 throw new BulkUpdateFields.BulkUpdateException(
                     String.format(
-                        System.Label.Core_BulkUpdate_ErrorIncompatibleCopy,
+                        BarnHelp.text('Core', 'Core_BulkUpdate_ErrorIncompatibleCopy'),
                         new List<Object>{ change.source.getLabel(), label }
                     )
                 );
@@ -301,7 +301,9 @@ public with sharing class BulkUpdateService {
         if (change.action == ACTION_TRANSFORM) {
             return withSteps(type, change, raw.get('transforms'));
         }
-        throw new BulkUpdateFields.BulkUpdateException(System.Label.Core_BulkUpdate_ErrorNoChanges);
+        throw new BulkUpdateFields.BulkUpdateException(
+            BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
+        );
     }
 
     /**
@@ -314,7 +316,7 @@ public with sharing class BulkUpdateService {
         if (!BulkUpdateFields.canTransform(change.target)) {
             throw new BulkUpdateFields.BulkUpdateException(
                 String.format(
-                    System.Label.Core_BulkUpdate_ErrorCannotTransform,
+                    BarnHelp.text('Core', 'Core_BulkUpdate_ErrorCannotTransform'),
                     new List<Object>{ label }
                 )
             );
@@ -324,14 +326,17 @@ public with sharing class BulkUpdateService {
             : new List<DataTransform.Step>();
         if (change.steps.isEmpty()) {
             throw new BulkUpdateFields.BulkUpdateException(
-                String.format(System.Label.Core_BulkUpdate_ErrorNoSteps, new List<Object>{ label })
+                String.format(
+                    BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoSteps'),
+                    new List<Object>{ label }
+                )
             );
         }
         List<String> problems = DataTransform.problems(change.steps);
         if (!problems.isEmpty()) {
             throw new BulkUpdateFields.BulkUpdateException(
                 String.format(
-                    System.Label.Core_BulkUpdate_ErrorSteps,
+                    BarnHelp.text('Core', 'Core_BulkUpdate_ErrorSteps'),
                     new List<Object>{ label, String.join(problems, ' ') }
                 )
             );
@@ -424,12 +429,12 @@ public with sharing class BulkUpdateService {
         Integer count = DataJobs.countWithin(checked.queryJson, ceiling, COUNT_MARGIN);
         if (count == null) {
             throw new BulkUpdateFields.BulkUpdateException(
-                System.Label.Core_BulkUpdate_ErrorTooManyToCount
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorTooManyToCount')
             );
         }
         if (count == 0) {
             throw new BulkUpdateFields.BulkUpdateException(
-                System.Label.Core_BulkUpdate_ErrorNothingMatches
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNothingMatches')
             );
         }
         return count;
@@ -453,7 +458,7 @@ public with sharing class BulkUpdateService {
         Plan checked = plan(queryJson, changesJson);
         if (confirmedCount == null || confirmedCount < 1) {
             throw new BulkUpdateFields.BulkUpdateException(
-                System.Label.Core_BulkUpdate_ErrorConfirm
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorConfirm')
             );
         }
         Integer ceiling = runLimit();
@@ -464,7 +469,7 @@ public with sharing class BulkUpdateService {
         if (count > confirmedCount) {
             throw new BulkUpdateFields.BulkUpdateException(
                 String.format(
-                    System.Label.Core_BulkUpdate_ErrorMoreThanConfirmed,
+                    BarnHelp.text('Core', 'Core_BulkUpdate_ErrorMoreThanConfirmed'),
                     new List<Object>{ confirmedCount.format() }
                 )
             );
@@ -495,7 +500,7 @@ public with sharing class BulkUpdateService {
             Committed_By__c = UserInfo.getUserId(),
             Undo_Deadline__c = now.addDays(ImportBatchService.undoWindowDays()),
             Run_Log__c = String.format(
-                System.Label.Core_BulkUpdate_LogStarted,
+                BarnHelp.text('Core', 'Core_BulkUpdate_LogStarted'),
                 new List<Object>{
                     UserInfo.getName(),
                     now.format(),
@@ -522,7 +527,7 @@ public with sharing class BulkUpdateService {
 
     public static String overLimit(Integer ceiling) {
         return String.format(
-            System.Label.Core_BulkUpdate_ErrorOverLimit,
+            BarnHelp.text('Core', 'Core_BulkUpdate_ErrorOverLimit'),
             new List<Object>{ ceiling.format() }
         );
     }

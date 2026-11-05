@@ -53,7 +53,7 @@ private class AutoMergeControllerTest {
                     Assert.fail('Action ' + action + ' is refused.');
                 } catch (AuraHandledException expected) {
                     Assert.areEqual(
-                        Label.Core_Duplicates_ErrorPermissionRequired,
+                        BarnHelp.text('Core', 'Core_Duplicates_ErrorPermissionRequired'),
                         expected.getMessage()
                     );
                 }
@@ -72,7 +72,7 @@ private class AutoMergeControllerTest {
                     Assert.fail('Without Duplicate Review access a preview is refused.');
                 } catch (AuraHandledException expected) {
                     Assert.areEqual(
-                        Label.Core_Duplicates_ErrorNoSuggestionAccess,
+                        BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestionAccess'),
                         expected.getMessage()
                     );
                 }
@@ -115,7 +115,10 @@ private class AutoMergeControllerTest {
                 AutoMergeController.undoRun('run-undo');
                 Assert.fail('A run undone already is refused.');
             } catch (AuraHandledException expected) {
-                Assert.areEqual(Label.Core_AutoMerge_ErrorNoUndo, expected.getMessage());
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_AutoMerge_ErrorNoUndo'),
+                    expected.getMessage()
+                );
             }
         }
     }
@@ -132,7 +135,10 @@ private class AutoMergeControllerTest {
                 AutoMergeController.startRun();
                 Assert.fail('Nothing to merge is refused.');
             } catch (AuraHandledException expected) {
-                Assert.areEqual(Label.Core_AutoMerge_ErrorNothing, expected.getMessage());
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_AutoMerge_ErrorNothing'),
+                    expected.getMessage()
+                );
             }
         }
     }

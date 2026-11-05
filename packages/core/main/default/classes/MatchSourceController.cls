@@ -169,7 +169,7 @@ public with sharing class MatchSourceController {
             MatchSourceService.Source source = MatchSourceService.sourceFrom(label, given);
             if (source == null) {
                 throw new CustomMetadataManagerService.CustomMetadataManagerException(
-                    System.Label.Core_MatchLogic_NotUsable
+                    BarnHelp.text('Core', 'Core_MatchLogic_NotUsable')
                 );
             }
             TryResult result = new TryResult();
@@ -285,7 +285,7 @@ public with sharing class MatchSourceController {
             !FeatureManagement.checkPermission(SETTINGS_PERMISSION) &&
             !FeatureManagement.checkPermission(METADATA_PERMISSION)
         ) {
-            throw UserErrors.message(Label.Core_MatchLogic_PermissionRequired);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_MatchLogic_PermissionRequired'));
         }
     }
 

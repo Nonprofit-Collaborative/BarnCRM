@@ -132,7 +132,7 @@ public with sharing class FindInlineEditService {
         }
         if (rows == null || rows.isEmpty()) {
             throw new BulkUpdateFields.BulkUpdateException(
-                System.Label.Core_BulkUpdate_ErrorNoChanges
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
             );
         }
         if (rows.size() > MAX_RECORDS) {
@@ -164,7 +164,7 @@ public with sharing class FindInlineEditService {
         }
         if (wantedById.isEmpty()) {
             throw new BulkUpdateFields.BulkUpdateException(
-                System.Label.Core_BulkUpdate_ErrorNoChanges
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
             );
         }
         return wantedById;
@@ -190,7 +190,7 @@ public with sharing class FindInlineEditService {
             if (!field.isNillable()) {
                 throw new BulkUpdateFields.BulkUpdateException(
                     String.format(
-                        System.Label.Core_BulkUpdate_ErrorRequired,
+                        BarnHelp.text('Core', 'Core_BulkUpdate_ErrorRequired'),
                         new List<Object>{ field.getLabel() }
                     )
                 );

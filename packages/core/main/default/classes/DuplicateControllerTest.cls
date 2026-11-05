@@ -256,7 +256,7 @@ private class DuplicateControllerTest {
 
             Assert.isTrue(view.scanRunning, 'The panel says a scan is running.');
             Assert.areEqual(
-                Label.Core_Duplicates_ErrorScanRunning,
+                BarnHelp.text('Core', 'Core_Duplicates_ErrorScanRunning'),
                 refusal,
                 'A second scan is refused in words.'
             );
@@ -337,7 +337,7 @@ private class DuplicateControllerTest {
             } catch (AuraHandledException refused) {
                 Assert.isFalse(anyActive, 'A scan with an active rule must start.');
                 Assert.areEqual(
-                    Label.Core_Duplicates_ErrorNoActiveRule,
+                    BarnHelp.text('Core', 'Core_Duplicates_ErrorNoActiveRule'),
                     refused.getMessage(),
                     'Said in words.'
                 );
@@ -359,7 +359,7 @@ private class DuplicateControllerTest {
                     Assert.fail('A scan needs Manage BarnCRM Settings.');
                 } catch (AuraHandledException refused) {
                     Assert.areEqual(
-                        Label.Core_Duplicates_ErrorPermissionRequired,
+                        BarnHelp.text('Core', 'Core_Duplicates_ErrorPermissionRequired'),
                         refused.getMessage(),
                         'Said in words.'
                     );
@@ -369,7 +369,7 @@ private class DuplicateControllerTest {
                     Assert.fail('A merge from the panel needs Manage BarnCRM Settings.');
                 } catch (AuraHandledException refused) {
                     Assert.areEqual(
-                        Label.Core_Duplicates_ErrorPermissionRequired,
+                        BarnHelp.text('Core', 'Core_Duplicates_ErrorPermissionRequired'),
                         refused.getMessage(),
                         'Said in words.'
                     );
@@ -388,7 +388,7 @@ private class DuplicateControllerTest {
                 Assert.fail('Nothing to dismiss.');
             } catch (AuraHandledException refused) {
                 Assert.areEqual(
-                    Label.Core_Duplicates_ErrorNoSuggestion,
+                    BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestion'),
                     refused.getMessage(),
                     'Said in words.'
                 );
@@ -454,7 +454,7 @@ private class DuplicateControllerTest {
                     Assert.fail('A scan needs access to the duplicate record sets.');
                 } catch (AuraHandledException refused) {
                     Assert.areEqual(
-                        Label.Core_Duplicates_ErrorNoSuggestionAccess,
+                        BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestionAccess'),
                         refused.getMessage(),
                         'Said in words.'
                     );
@@ -490,7 +490,7 @@ private class DuplicateControllerTest {
                 Assert.fail('A merge of a pair the suggestion does not name is refused.');
             } catch (AuraHandledException refused) {
                 Assert.areEqual(
-                    Label.Core_Duplicates_ErrorNotThisPair,
+                    BarnHelp.text('Core', 'Core_Duplicates_ErrorNotThisPair'),
                     refused.getMessage(),
                     'Said in words.'
                 );

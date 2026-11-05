@@ -12,6 +12,11 @@ import findToolStateKey from '@salesforce/apex/DataManagerController.findToolSta
 import { setHelpTextForTest } from 'c/barnHelpText';
 
 setHelpTextForTest({
+  Core_BulkUpdate_UndoConfirm: 'Puts back {0}.',
+  Core_BulkDelete_UndoConfirm: 'Brings back {0}.'
+});
+
+setHelpTextForTest({
   Core_DataJobs_ImportSummaryOne: '{0} row: {1} created, {2} updated, {3} matched, {4} rejected.',
   Core_DataJobs_ImportSummary: '{0} rows: {1} created, {2} updated, {3} matched, {4} rejected.'
 });
@@ -71,20 +76,6 @@ jest.mock('@salesforce/apex/BulkDeleteController.getPage', () => ({ default: jes
 jest.mock('@salesforce/apex/BulkDeleteController.undo', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_BulkUpdate_UndoConfirm',
-  () => ({ default: 'Puts back {0}.' }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
-  '@salesforce/label/c.Core_BulkDelete_UndoConfirm',
-  () => ({ default: 'Brings back {0}.' }),
-  {
-    virtual: true
-  }
-);
 
 const IMPORT_JOB = {
   id: 'a0B000000000001',

@@ -136,7 +136,7 @@ private class MatchSourceControllerTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_MatchLogic_PermissionRequired, refusal);
+            Assert.areEqual(BarnHelp.text('Core', 'Core_MatchLogic_PermissionRequired'), refusal);
         }
     }
 

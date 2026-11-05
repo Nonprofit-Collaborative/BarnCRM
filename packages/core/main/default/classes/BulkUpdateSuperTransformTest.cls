@@ -202,7 +202,7 @@ private class BulkUpdateSuperTransformTest {
                 System.Assert.fail('A preview needs a change');
             } catch (AuraHandledException refused) {
                 System.Assert.areEqual(
-                    System.Label.Core_BulkUpdate_ErrorNoChanges,
+                    BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges'),
                     refused.getMessage(),
                     'Says to choose a change'
                 );
@@ -233,7 +233,7 @@ private class BulkUpdateSuperTransformTest {
             System.Assert.areEqual(3, refusedCalls.size(), 'Every entry point refuses');
             for (String message : refusedCalls) {
                 System.Assert.areEqual(
-                    System.Label.Core_BulkUpdate_ErrorNoPermission,
+                    BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoPermission'),
                     message,
                     'Names the permissions'
                 );
