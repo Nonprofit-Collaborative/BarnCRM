@@ -1,5 +1,5 @@
 /**
- * The daily Error Log run (C-23, R-E5, R-E6): a step of the nightly run at 07:00 (ADR-NEXT
+ * The daily Error Log run (C-23, R-E5, R-E6): a step of the nightly run at 07:00 (ADR-0166
  * nightly-job-dispatcher), switched on and off from the Error Log page of the BarnCRM Settings
  * console. It deletes entries past their retention and sends the digest when one is due, so
  * changing the frequency from daily to weekly never needs the schedule changed.

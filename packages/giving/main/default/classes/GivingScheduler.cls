@@ -1,6 +1,6 @@
 /**
  * The Giving module's four nightly jobs, switched on and off together from the Nightly Jobs page
- * of the BarnCRM Settings console (ADR-0038). Each is a step of Core's one nightly run (ADR-NEXT
+ * of the BarnCRM Settings console (ADR-0038). Each is a step of Core's one nightly run (ADR-0166
  * nightly-job-dispatcher), keyed by the name it was once scheduled under, so an upgrade adopts
  * the old schedule (R-NJ5).
  *

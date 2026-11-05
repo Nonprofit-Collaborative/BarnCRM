@@ -175,7 +175,7 @@ public with sharing class AutomationControl {
      * True when the BarnCRM Automation Control setting that applies to the running user (theirs,
      * else their profile's, else the org default) has Pause All or Bypass on. The dispatcher
      * then skips every automation that does not always run, alongside the timed pause and the
-     * switches (ADR-NEXT dispatcher errors and Automation Control). Costs no query.
+     * switches (ADR-0165 dispatcher errors and Automation Control). Costs no query.
      */
     @NamespaceAccessible
     public static Boolean isOffForRunningUser() {

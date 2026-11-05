@@ -3,7 +3,7 @@ import LANGUAGE from '@salesforce/i18n/lang';
 import { createHelpStore } from 'c/barnHelpCatalog';
 
 /**
- * Help and guidance text from the packaged JSON catalogs (ADR-NEXT help-text-json). The
+ * Help and guidance text from the packaged JSON catalogs (ADR-0164 help-text-json). The
  * Salesforce half of c/barnHelpCatalog: it knows the static resource URLs, the user's language
  * and fetch, and keeps one store for the page.
  *

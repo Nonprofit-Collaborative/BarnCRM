@@ -1,5 +1,5 @@
 /**
- * Giving's steps of the nightly run (ADR-NEXT nightly-job-dispatcher): the four jobs switched
+ * Giving's steps of the nightly run (ADR-0166 nightly-job-dispatcher): the four jobs switched
  * together and shipped on, then the acknowledgment send and the pledge reminders, shipped off
  * because they email donors. Switching is checked under the test name of the run, so nothing
  * depends on what the org has scheduled.

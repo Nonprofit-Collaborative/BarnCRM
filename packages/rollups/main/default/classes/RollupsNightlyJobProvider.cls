@@ -1,6 +1,6 @@
 /**
  * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the nightly rollup
- * recalculation to the one nightly run (ADR-NEXT nightly-job-dispatcher, ADR-0125
+ * recalculation to the one nightly run (ADR-0166 nightly-job-dispatcher, ADR-0125
  * `0125-rollup-builder-module.md`). Without the Rollup Builder module there is no rollup step.
  */
 @NamespaceAccessible

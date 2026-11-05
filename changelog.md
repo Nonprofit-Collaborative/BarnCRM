@@ -31,7 +31,7 @@ Rule: Claude adds an entry in the same session as each change (merge, deploy, or
 - 2026-11-04: PRs #894, #895, #897, one nightly job dispatcher with module steps (RT-10, L-10), changed-only donor level writes (RT-09), record retention defaults and Record Cleanup step (L-08).
 - 2026-11-04: PR #888, Household Upkeep waits while NPSP households are in use (RT-04).
 - 2026-11-04: PR #898, a new install and first-run setup schedule BarnCRM Nightly Jobs; module guides describe each job as a nightly step.
-- 2026-11-04: ADR-NEXT files added on `landing/batch-b`: help-text-json, dispatcher-errors-and-automation-control, nightly-job-dispatcher (numbers assigned at landing). Nonprofit module rollouts (Giving WS3 to WS8, Programs, Volunteers, Funders, Logic Models part 3, PRs #879 and #880) are on hold behind Core.
+- 2026-11-04: ADR files added on `landing/batch-b` and numbered at landing: ADR-0164 help-text-json, ADR-0165 dispatcher-errors-and-automation-control, ADR-0166 nightly-job-dispatcher (every ADR-NEXT citation replaced). Nonprofit module rollouts (Giving WS3 to WS8, Programs, Volunteers, Funders, Logic Models part 3, PRs #879 and #880) are on hold behind Core.
 
 ## 2026-11-02
 

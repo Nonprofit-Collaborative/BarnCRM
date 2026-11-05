@@ -12,7 +12,7 @@ Rules for any screen:
 
 ## Help Text
 
-Help and guidance prose (an intro, a description, an explanation, an empty-state explanation, a setup note, a tooltip longer than a short phrase) lives in the package's JSON help catalog, not in custom labels (ADR-NEXT `NEXT-help-text-json.md`). Custom labels of an unmanaged or source install count toward the org's 5,000, and BarnCRM installs that way for a long time.
+Help and guidance prose (an intro, a description, an explanation, an empty-state explanation, a setup note, a tooltip longer than a short phrase) lives in the package's JSON help catalog, not in custom labels (ADR-0164 `0164-help-text-json.md`). Custom labels of an unmanaged or source install count toward the org's 5,000, and BarnCRM installs that way for a long time.
 
 - **Where:** `packages/<dir>/main/default/staticresources/BarnHelp_<Package>.json` (`BarnHelp_Core`, `BarnHelp_Rollups`, `BarnHelp_Giving`, `BarnHelp_Volunteers`, `BarnHelp_Programs`, `BarnHelp_LogicModels`, `BarnHelp_Funders`, `BarnHelp_Mirror`), shaped `{ "languages": ["en"], "texts": { "<key>": "<text>" } }`. A package's first help text adds its catalog and a `.resource-meta.xml` copied from Core's. English only for now.
 - **Keys:** named like labels, `<Package>_<Area>_<What>` (`Core_OrgOptimizer_Intro`). Keep the keys sorted.

@@ -1,7 +1,7 @@
 /**
  * The Opportunity mirror's nightly run (feature X-01, R-OM8), switched on and off from the
  * Opportunity mirror page in the shape ADR-0038 set for the Giving nightly jobs. It is a step of
- * Core's one nightly run (ADR-NEXT nightly-job-dispatcher), which runs as the administrator who
+ * Core's one nightly run (ADR-0166 nightly-job-dispatcher), which runs as the administrator who
  * scheduled it, whose access the run's user mode reads and writes use.
  *
  * 01:30 keeps it after the seasonal address swap at 00:30 and the Giving top up at 01:15, and

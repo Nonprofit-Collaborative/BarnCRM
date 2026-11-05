@@ -48,7 +48,7 @@ public with sharing class IndicatorResultsScheduler implements Schedulable {
     }
 
     /**
-     * The job as a step of the nightly run (ADR-NEXT nightly-job-dispatcher): half past three in
+     * The job as a step of the nightly run (ADR-0166 nightly-job-dispatcher): half past three in
      * the morning, after the rollups and the volunteer schedules.
      */
     public static NightlyStep step() {

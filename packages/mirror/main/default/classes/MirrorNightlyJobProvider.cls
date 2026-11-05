@@ -1,6 +1,6 @@
 /**
  * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add Mirror's steps to the
- * one nightly run (ADR-NEXT nightly-job-dispatcher): the nightly run of the Opportunity mirror
+ * one nightly run (ADR-0166 nightly-job-dispatcher): the nightly run of the Opportunity mirror
  * and of the Gift Transaction mirror (X-07). Each step is in tonight's run only while that
  * mirror's direction is chosen and its object exists, and its page switches it on and off.
  *

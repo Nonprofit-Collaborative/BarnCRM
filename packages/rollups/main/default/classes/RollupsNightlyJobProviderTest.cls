@@ -1,6 +1,6 @@
 /**
  * The Rollup Builder module adds its nightly recalculation to Core's nightly run through the
- * provider Core finds by name (ADR-NEXT nightly-job-dispatcher, ADR-0125): one switched step at
+ * provider Core finds by name (ADR-0166 nightly-job-dispatcher, ADR-0125): one switched step at
  * the hour the setting holds, which the Rollups page switches on and off.
  */
 @IsTest(testFor='ApexClass:RollupsNightlyJobProvider, ApexClass:RollupScheduler')

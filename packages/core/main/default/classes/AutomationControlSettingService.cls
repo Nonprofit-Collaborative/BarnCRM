@@ -1,5 +1,5 @@
 /**
- * What the Automation page manages beyond the switches and the timed pause (ADR-NEXT dispatcher
+ * What the Automation page manages beyond the switches and the timed pause (ADR-0165 dispatcher
  * errors and Automation Control, decisions 2.6 to 2.8; canonical model R-A8):
  *
  * - the BarnCRM Automation Control rows: the org default, always shown (both boxes off until

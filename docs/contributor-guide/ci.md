@@ -132,7 +132,7 @@ Salesforce org is needed for this job. Steps:
    `Core_Shared_*` words and the `Core_Format_*` patterns such as `{0} ({1})`; modules may
    use a Core label once it is unprotected) before adding one. Help and guidance prose
    is never a label: it goes in the package's help catalog (`docs/contributor-guide/ux-kit.md`,
-   Help Text; ADR-NEXT `NEXT-help-text-json.md`).
+   Help Text; ADR-0164 `0164-help-text-json.md`).
    `scripts/ci/check-apex-budget.py` fails when a package's non-test Apex, measured as the
    org measures it (every character but comments; `@IsTest` classes excluded), passes its cap
    (`CAPS` in the script, a little above each package's size on 2026-11-04), or when a package

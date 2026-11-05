@@ -8,7 +8,7 @@ barn-npc and mwdbdevsb all receive BarnCRM as source, beside each org's own labe
 reached 4,996 on 2026-11-02 and a deploy failed with "custom label limit exceeded".
 
 BUDGET is the total across every package directory: the count after help prose moved to the
-help catalogs (ADR-NEXT help-text-json, 4,120 on 2026-11-04) plus a small margin, so every
+help catalogs (ADR-0164 help-text-json, 4,120 on 2026-11-04) plus a small margin, so every
 label added is a choice. TARGET is where the total should settle; above it the check passes
 and says by how much.
 

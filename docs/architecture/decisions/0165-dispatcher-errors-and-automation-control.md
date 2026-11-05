@@ -1,4 +1,4 @@
-# ADR-NEXT: A handler failure refuses only its own records, and one Automation Control setting pauses or bypasses automation per org, profile or user
+# ADR-0165: A handler failure refuses only its own records, and one Automation Control setting pauses or bypasses automation per org, profile or user
 
 **Status:** Proposed (owner decisions, Brandon, 2026-11-04)
 **Date:** 2026-11-04

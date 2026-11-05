@@ -1,7 +1,7 @@
 /**
  * NightlyJobsController: the Nightly Jobs panel on the General page of BarnCRM Settings shows
  * the one schedule and every step with how it last ran, and only someone who manages settings
- * can schedule the run from it (ADR-NEXT nightly-job-dispatcher).
+ * can schedule the run from it (ADR-0166 nightly-job-dispatcher).
  */
 @IsTest(testFor='ApexClass:NightlyJobsController')
 private class NightlyJobsControllerTest {

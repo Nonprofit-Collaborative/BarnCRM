@@ -1,7 +1,7 @@
 /**
  * The Gift Transaction mirror's nightly run (feature X-07, R-GT6), switched on and off from the
  * Gift Transaction mirror page in the shape ADR-0038 set for the Giving nightly jobs. It is a
- * step of Core's one nightly run (ADR-NEXT nightly-job-dispatcher), which runs as the
+ * step of Core's one nightly run (ADR-0166 nightly-job-dispatcher), which runs as the
  * administrator who scheduled it, whose access the run's user mode reads and writes use.
  *
  * 01:35 keeps it after the Opportunity mirror at 01:30 and before the rollups at 02:00.

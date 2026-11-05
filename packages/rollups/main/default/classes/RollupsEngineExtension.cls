@@ -21,7 +21,7 @@ public with sharing class RollupsEngineExtension implements RollupEngineExtensio
     }
 
     /**
-     * Nothing to do: the nightly rollup step reads its hour every night (ADR-NEXT
+     * Nothing to do: the nightly rollup step reads its hour every night (ADR-0166
      * nightly-job-dispatcher), so a new hour needs no schedule moved (Section 14B).
      */
     public void afterSettingsSaved(String settingsObject, Set<String> changedKeys) {

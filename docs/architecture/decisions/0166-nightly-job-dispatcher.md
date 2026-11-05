@@ -1,4 +1,4 @@
-# ADR-NEXT: One nightly job dispatcher runs every BarnCRM nightly job in sequence
+# ADR-0166: One nightly job dispatcher runs every BarnCRM nightly job in sequence
 
 **Status:** Accepted (Brandon approved the architect review fixes, decision 4, 2026-11-04)
 **Date:** 2026-11-04
