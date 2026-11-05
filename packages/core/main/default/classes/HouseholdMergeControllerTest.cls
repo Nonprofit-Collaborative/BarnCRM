@@ -1,89 +1,11 @@
 /**
- * What the merge and split screen calls, including the picker and the read only check.
+ * What the merge and split screen calls, including the read only check.
  */
 @IsTest(testFor='ApexClass:HouseholdMergeController')
 private class HouseholdMergeControllerTest {
     @TestSetup
     static void createTestUser() {
         TestUsers.admin();
-    }
-
-    @IsTest
-    static void theSearchOffersHouseholdsAndNotOrganizations() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            Account household = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            Account duplicate = HouseholdTestDataFactory.newHousehold('Garcia Household');
-            Account organization = new Account(Name = 'Garcia Family Foundation');
-            Database.insert(
-                new List<Account>{ household, duplicate, organization },
-                AccessLevel.SYSTEM_MODE
-            );
-
-            Test.startTest();
-            List<HouseholdMergeController.HouseholdOption> options = HouseholdMergeController.searchHouseholds(
-                'Garcia',
-                household.Id
-            );
-            Test.stopTest();
-
-            Assert.areEqual(1, options.size(), 'Only the other household is offered');
-            Assert.areEqual(duplicate.Id, options[0].id, 'And it is the duplicate');
-        }
-    }
-
-    /**
-     * A typed % or _ is a letter to search for, not a wildcard: otherwise typing % would
-     * offer every household in the org.
-     */
-    @IsTest
-    static void theSearchTreatsWildcardsAsLetters() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-            Account plain = HouseholdTestDataFactory.newHousehold('The Garcia Family');
-            Account percent = HouseholdTestDataFactory.newHousehold('100% Garcia');
-            Account underscore = HouseholdTestDataFactory.newHousehold('Garcia_Lee');
-            Database.insert(
-                new List<Account>{ plain, percent, underscore },
-                AccessLevel.SYSTEM_MODE
-            );
-
-            Test.startTest();
-            List<HouseholdMergeController.HouseholdOption> byPercent = HouseholdMergeController.searchHouseholds(
-                '0% G',
-                null
-            );
-            List<HouseholdMergeController.HouseholdOption> byUnderscore = HouseholdMergeController.searchHouseholds(
-                'ia_L',
-                null
-            );
-            Test.stopTest();
-
-            Assert.areEqual(1, byPercent.size(), 'Only the household with a percent sign matches');
-            Assert.areEqual(percent.Id, byPercent[0].id, 'And it is that one');
-            Assert.areEqual(
-                1,
-                byUnderscore.size(),
-                'Only the household with an underscore matches'
-            );
-            Assert.areEqual(underscore.Id, byUnderscore[0].id, 'And it is that one');
-        }
-    }
-
-    @IsTest
-    static void aVeryShortSearchAsksForMore() {
-        System.runAs(TestUsers.admin()) {
-            HouseholdTestDataFactory.settings(HouseholdTestDataFactory.MODE_CONTACT);
-
-            Test.startTest();
-            List<HouseholdMergeController.HouseholdOption> options = HouseholdMergeController.searchHouseholds(
-                'G',
-                null
-            );
-            Test.stopTest();
-
-            Assert.isTrue(options.isEmpty(), 'One letter is not a search');
-        }
     }
 
     @IsTest

@@ -123,16 +123,16 @@ it.
 
 Each entry can hold a long technical detail, so an Error Log that is never emptied slowly
 fills your organization's data storage. BarnCRM deletes entries older than **180 days**, whatever
-their status, every morning when the daily Error Log run starts (the same 7:00 AM run that
-sends the digest).
+their status, every night in the Record Cleanup step of the nightly run (see
+[Nightly Jobs](nightly-jobs.md)).
 
 1. Open **BarnCRM Settings** and click **Error Log** in the left navigation.
 2. In **Days to keep Error Log entries**, type how many days to keep them, from 1 to
-   3,650, or 0 to keep every entry forever. Click **Save**. The next morning's run deletes
+   3,650, or 0 to keep every entry forever. Click **Save**. The next night's run deletes
    anything older; nothing is deleted when you save.
-3. Make sure the daily run is scheduled: the **Error Digest** panel says so, and Health
-   Check lists it under **Nightly Jobs Are Not Scheduled** when it is not. Old entries are
-   deleted only while it runs, whether or not anyone receives the digest.
+3. Make sure the nightly run is scheduled: Health Check lists it under **Nightly Jobs Are
+   Not Scheduled** when it is not. Old entries are deleted whenever the nightly run runs,
+   whether or not the daily digest is on.
 
 Deleted entries go to the Recycle Bin for 15 days, like any record you delete. If you need
 an entry for longer, export the Error Log list or build a report on it before it ages out.

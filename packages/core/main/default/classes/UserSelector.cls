@@ -15,7 +15,7 @@ public with sharing class UserSelector {
         if (String.isBlank(term) || maxResults == null || maxResults <= 0) {
             return new List<User>();
         }
-        String pattern = escapeForLike(term.trim()) + '%';
+        String pattern = SoqlText.escapeLike(term.trim()) + '%';
         Integer resultLimit = maxResults;
         return [
             SELECT Id, Name, Email, Username, IsActive
@@ -66,16 +66,5 @@ public with sharing class UserSelector {
             LIMIT 1
         ];
         return access.isEmpty() ? null : access[0];
-    }
-
-    /**
-     * Escapes the characters that carry meaning inside a SOQL LIKE pattern, so that a
-     * person searching for "a_b" is not offered every three letter name.
-     *
-     * @param term the raw search term
-     * @return the term with backslash, percent, and underscore escaped
-     */
-    private String escapeForLike(String term) {
-        return term.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_');
     }
 }

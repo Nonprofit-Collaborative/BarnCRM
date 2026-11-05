@@ -36,13 +36,6 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
      */
     private static List<Household_Member__c> departingMemberships = new List<Household_Member__c>();
 
-    /**
-     * The membership handler, stood down while this handler removes and moves membership rows
-     * itself, so that a household is recounted and renamed once, after the delete,
-     * rather than in the middle of it.
-     */
-    private static final String MEMBER_HANDLER = 'HouseholdMemberTriggerHandler';
-
     private static final String CONTEXT = 'AccountTriggerHandler';
 
     public override void beforeInsert() {
@@ -100,12 +93,7 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
     public override void beforeDelete() {
         Set<Id> personIds = personIdsOf((List<Account>) oldRecords());
         departingMemberships = HouseholdService.membershipsFor(personIds);
-        AutomationControl.bypass(MEMBER_HANDLER);
-        try {
-            departingHouseholdIds = HouseholdService.removeMembershipsFor(personIds);
-        } finally {
-            AutomationControl.clearBypass(MEMBER_HANDLER);
-        }
+        departingHouseholdIds = HouseholdService.removeMembershipsWithoutUpkeep(personIds);
     }
 
     /**
@@ -126,16 +114,9 @@ public with sharing class AccountTriggerHandler extends TriggerHandler {
         departingMemberships = new List<Household_Member__c>();
 
         Map<Id, Id> survivorByMerged = survivorsOf(gone);
-        if (!survivorByMerged.isEmpty()) {
-            AutomationControl.bypass(MEMBER_HANDLER);
-            try {
-                affected.addAll(
-                    HouseholdService.moveMembershipsToSurvivors(removed, survivorByMerged)
-                );
-            } finally {
-                AutomationControl.clearBypass(MEMBER_HANDLER);
-            }
-        }
+        affected.addAll(
+            HouseholdService.moveMembershipsToSurvivorsWithoutUpkeep(removed, survivorByMerged)
+        );
         if (survivorByMerged.isEmpty()) {
             // A household this delete empties is stamped for the nightly tidy-up (R-H12a).
             HouseholdService.afterPeopleDeleted(affected);

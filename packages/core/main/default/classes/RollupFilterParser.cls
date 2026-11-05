@@ -338,20 +338,20 @@ public with sharing class RollupFilterParser {
         }
         // What the administrator typed is matched as typed: % and _ are not wildcards.
         if (operator == 'contains' || operator == 'does not contain') {
-            return fieldName + ' ' + comparison + ' ' + likeValue('%' + escapeLike(rawValue) + '%');
+            return fieldName +
+                ' ' +
+                comparison +
+                ' ' +
+                likeValue('%' + SoqlText.escapeLike(String.valueOf(rawValue)) + '%');
         }
         if (operator == 'starts with') {
-            return fieldName + ' ' + comparison + ' ' + likeValue(escapeLike(rawValue) + '%');
+            return fieldName +
+                ' ' +
+                comparison +
+                ' ' +
+                likeValue(SoqlText.escapeLike(String.valueOf(rawValue)) + '%');
         }
         return fieldName + ' ' + comparison + ' ' + renderValue(rawValue, datesAsText);
-    }
-
-    /** A value for LIKE with its own backslashes, % and _ escaped, so they match themselves. */
-    private static String escapeLike(Object rawValue) {
-        return String.valueOf(rawValue)
-            .replace('\\', '\\\\')
-            .replace('%', '\\%')
-            .replace('_', '\\_');
     }
 
     /**

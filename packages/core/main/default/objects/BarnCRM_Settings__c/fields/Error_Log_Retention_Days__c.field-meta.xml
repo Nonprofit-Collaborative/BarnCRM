@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Error_Log_Retention_Days__c</fullName>
   <defaultValue>180</defaultValue>
-  <description>How many days an Error Log entry is kept before the daily Error Log run deletes it, whatever its status. 0 keeps every entry (R-E6).</description>
+  <description>How many days an Error Log entry is kept before the nightly Record Cleanup deletes it, whatever its status. 0 keeps every entry (R-E6).</description>
   <externalId>false</externalId>
   <inlineHelpText>How many days to keep Error Log entries. 0 keeps them all.</inlineHelpText>
   <label>Days To Keep Error Log Entries</label>

@@ -131,17 +131,19 @@ public with sharing class FilterValueBinder {
             return fieldPath + (operator == 'in' ? ' IN ' : ' NOT IN ') + bindList(rawValue);
         }
         if (operator == 'contains') {
-            return fieldPath + ' LIKE ' + bindPattern('%' + escapeLike(text(rawValue)) + '%');
+            return fieldPath +
+                ' LIKE ' +
+                bindPattern('%' + SoqlText.escapeLike(text(rawValue)) + '%');
         }
         if (operator == 'does not contain') {
             return '(NOT ' +
                 fieldPath +
                 ' LIKE ' +
-                bindPattern('%' + escapeLike(text(rawValue)) + '%') +
+                bindPattern('%' + SoqlText.escapeLike(text(rawValue)) + '%') +
                 ')';
         }
         if (operator == 'starts with') {
-            return fieldPath + ' LIKE ' + bindPattern(escapeLike(text(rawValue)) + '%');
+            return fieldPath + ' LIKE ' + bindPattern(SoqlText.escapeLike(text(rawValue)) + '%');
         }
         return fieldPath + ' ' + SOQL_BY_COMPARISON.get(operator) + ' ' + bind(coerce(rawValue));
     }
@@ -264,11 +266,6 @@ public with sharing class FilterValueBinder {
         // Only quotes are escaped here: escapeSingleQuotes would double the backslashes again.
         displayByName.put(name, '\'' + String.join(shown, '').replace('\'', '\\\'') + '\'');
         return ':' + name;
-    }
-
-    /** `%` and `_` in typed text are matched as themselves, not as wildcards. */
-    private static String escapeLike(String value) {
-        return value.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_');
     }
 
     private static String literal(Object value) {

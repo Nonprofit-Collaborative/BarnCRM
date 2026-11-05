@@ -409,7 +409,7 @@ public with sharing class BulkUpdateService {
                 field.before = record.get(change.target.getName());
                 try {
                     field.after = change.newValueFor(record);
-                    field.unchanged = BulkUpdateBatch.same(field.before, field.after);
+                    field.unchanged = BulkJobSupport.same(field.before, field.after);
                 } catch (BulkUpdateFields.BulkUpdateException refused) {
                     field.problem = refused.getMessage();
                 }

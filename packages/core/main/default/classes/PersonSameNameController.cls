@@ -42,23 +42,14 @@ public with sharing class PersonSameNameController {
             return result;
         }
         try {
-            List<Contact> people = String.isBlank(first)
-                ? [
-                      SELECT Id, Name, MailingCity, AccountId, Account.Name, Account.RecordTypeId
-                      FROM Contact
-                      WHERE LastName = :last
-                      WITH USER_MODE
-                      ORDER BY Name
-                      LIMIT 20
-                  ]
-                : [
-                      SELECT Id, Name, MailingCity, AccountId, Account.Name, Account.RecordTypeId
-                      FROM Contact
-                      WHERE LastName = :last AND FirstName = :first
-                      WITH USER_MODE
-                      ORDER BY Name
-                      LIMIT 20
-                  ];
+            List<Contact> people = (List<Contact>) Database.queryWithBinds(
+                'SELECT Id, Name, MailingCity, AccountId, Account.Name, Account.RecordTypeId ' +
+                    'FROM Contact WHERE LastName = :last' +
+                    (String.isBlank(first) ? '' : ' AND FirstName = :first') +
+                    ' ORDER BY Name LIMIT 20',
+                new Map<String, Object>{ 'last' => last, 'first' => first },
+                AccessLevel.USER_MODE
+            );
             if (people.isEmpty()) {
                 return result;
             }
@@ -85,7 +76,9 @@ public with sharing class PersonSameNameController {
             }
             return result;
         } catch (Exception e) {
-            // A hint that cannot be read is no hint: the person can still be saved.
+            // A hint that cannot be read is no hint: the person can still be saved. The failure
+            // is logged, so a sharing or access problem is not mistaken for "no matches".
+            ErrorLogger.log(e, 'PersonSameNameController');
             return new List<Match>();
         }
     }

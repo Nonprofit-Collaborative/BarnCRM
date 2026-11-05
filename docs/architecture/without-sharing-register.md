@@ -29,11 +29,10 @@ into five kinds:
 | EmptyHouseholdTidyBatch | Org job | Every empty household, read and deleted as the scheduler, with the dependents check reaching every child record | ADR-0021, ADR-0036 |
 | ErrorDigestWriter | Platform | The digest run record on the protected org settings | ADR-0021, ADR-0027 |
 | ErrorLogEventHandler | Upkeep | Writes the Error Log entry from the event, whoever raised it | ADR-0021 |
-| ErrorLogRetention | Org job | Deletes old Error Log entries the scheduler may not see | ADR-0021 |
 | ErrorLogWriter | Upkeep | Writes the Error Log entry even when the user cannot create one | ADR-0021 |
 | HouseholdMergeWriter | Upkeep | The platform account merge, which needs delete access to the household that goes away, once BarnCRM has authorized the merge | ADR-0021, ADR-0134 |
-| ImportRowPurgeBatch | Org job | Deletes old import staging rows of every import | ADR-0021 |
 | OrgSettingsSystemWriter | Platform | Saves keys on the protected org-level settings record for the named system writers | ADR-0021, ADR-0027 |
+| RecordRetentionBatch | Org job | Deletes the history rows past their retention (setting changes, merge journal, finished and abandoned imports and their staged rows, Error Log entries, field use counts) the scheduler may not see, so none is left for ever | ADR-0021, ADR-0027, ADR-0166 |
 | RelationshipUpkeepSelector | Integrity | The reciprocal and duplicate relationships owned by someone else | ADR-0021 category 2, ADR-0109 |
 | RelationshipUpkeepWriter | Upkeep | The other side of a relationship, usually owned by another user | ADR-0021 category 2, ADR-0109 |
 | SavedQuerySharingWriter | Platform | Shares on saved queries with an Apex sharing reason | ADR-0076, ADR-0021 |

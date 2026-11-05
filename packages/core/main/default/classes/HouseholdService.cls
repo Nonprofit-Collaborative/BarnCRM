@@ -2085,6 +2085,40 @@ public with sharing class HouseholdService {
     }
 
     /**
+     * `removeMembershipsFor` with the membership handler stood down, for the person trigger
+     * handlers' before delete: they recount and rename the households once, after the delete.
+     */
+    @NamespaceAccessible
+    public static Set<Id> removeMembershipsWithoutUpkeep(Set<Id> personIds) {
+        AutomationControl.bypass(MEMBER_HANDLER);
+        try {
+            return removeMembershipsFor(personIds);
+        } finally {
+            AutomationControl.clearBypass(MEMBER_HANDLER);
+        }
+    }
+
+    /**
+     * `moveMembershipsToSurvivors` with the membership handler stood down, for the person
+     * trigger handlers' after delete of merged-away people; nothing to move when none was merged.
+     */
+    @NamespaceAccessible
+    public static Set<Id> moveMembershipsToSurvivorsWithoutUpkeep(
+        List<Household_Member__c> removed,
+        Map<Id, Id> survivorByMerged
+    ) {
+        if (survivorByMerged == null || survivorByMerged.isEmpty()) {
+            return new Set<Id>();
+        }
+        AutomationControl.bypass(MEMBER_HANDLER);
+        try {
+            return moveMembershipsToSurvivors(removed, survivorByMerged);
+        } finally {
+            AutomationControl.clearBypass(MEMBER_HANDLER);
+        }
+    }
+
+    /**
      * Moves several people to one household in a single pass, whichever object holds each
      * of them and whichever membership mode the org uses, and answers with every household
      * the move touched: the target, and each household somebody left.

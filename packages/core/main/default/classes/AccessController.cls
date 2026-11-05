@@ -123,6 +123,27 @@ public with sharing class AccessController {
     }
 
     /**
+     * The refusal for a change that may not go ahead: the person lacks the permission to make
+     * it, or the user or the name asked for is missing. Null when it may go ahead.
+     */
+    private static AccessResult refuseChange(String userId, String name) {
+        String refusal = AccessService.changeRefusal();
+        String errorCode = ERROR_NO_PERMISSION;
+        if (refusal == null && (toUserId(userId) == null || String.isBlank(name))) {
+            refusal = BarnHelp.text('Core', 'Core_Access_ErrorInvalidInput');
+            errorCode = ERROR_INVALID_INPUT;
+        }
+        if (refusal == null) {
+            return null;
+        }
+        AccessResult result = new AccessResult();
+        result.success = false;
+        result.errorCode = errorCode;
+        result.message = refusal;
+        return result;
+    }
+
+    /**
      * Shared path for giving and taking away an add-on: the permission refusal the service
      * would give (so the page gets a code it can branch on), input validation, then the
      * service call, which enforces both permission checks itself.
@@ -137,21 +158,12 @@ public with sharing class AccessController {
         String permissionSetName,
         Boolean isAssign
     ) {
-        AccessResult result = new AccessResult();
-        String refusal = AccessService.changeRefusal();
-        if (refusal != null) {
-            result.success = false;
-            result.errorCode = ERROR_NO_PERMISSION;
-            result.message = refusal;
+        AccessResult result = refuseChange(userId, permissionSetName);
+        if (result != null) {
             return result;
         }
+        result = new AccessResult();
         Id assigneeId = toUserId(userId);
-        if (assigneeId == null || String.isBlank(permissionSetName)) {
-            result.success = false;
-            result.errorCode = ERROR_INVALID_INPUT;
-            result.message = BarnHelp.text('Core', 'Core_Access_ErrorInvalidInput');
-            return result;
-        }
         try {
             Set<Id> people = new Set<Id>{ assigneeId };
             List<String> refusals = isAssign
@@ -242,21 +254,12 @@ public with sharing class AccessController {
         String roleDeveloperName,
         Boolean isAssign
     ) {
-        AccessResult result = new AccessResult();
-        String refusal = AccessService.changeRefusal();
-        if (refusal != null) {
-            result.success = false;
-            result.errorCode = ERROR_NO_PERMISSION;
-            result.message = refusal;
+        AccessResult result = refuseChange(userId, roleDeveloperName);
+        if (result != null) {
             return result;
         }
+        result = new AccessResult();
         Id assigneeId = toUserId(userId);
-        if (assigneeId == null || String.isBlank(roleDeveloperName)) {
-            result.success = false;
-            result.errorCode = ERROR_INVALID_INPUT;
-            result.message = BarnHelp.text('Core', 'Core_Access_ErrorInvalidInput');
-            return result;
-        }
         try {
             if (isAssign) {
                 AccessService.assignRole(assigneeId, roleDeveloperName);

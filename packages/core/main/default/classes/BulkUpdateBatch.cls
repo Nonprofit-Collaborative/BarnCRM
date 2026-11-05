@@ -120,7 +120,7 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
                     refusal = cannotTake.getMessage();
                     break;
                 }
-                if (!same(was, becomes)) {
+                if (!BulkJobSupport.same(was, becomes)) {
                     before.put(field, was);
                     after.put(field, becomes);
                     change.put(field, becomes);
@@ -175,12 +175,11 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
                 );
             } else {
                 failedRecords++;
-                journal.add(
-                    ImportJournalService.failed(
-                        checked.objectName,
-                        recordId,
-                        message(results[i].getErrors())
-                    )
+                BulkJobSupport.journalFailure(
+                    journal,
+                    checked.objectName,
+                    recordId,
+                    results[i].getErrors()
                 );
             }
         }
@@ -240,36 +239,5 @@ public with sharing class BulkUpdateBatch implements Database.Batchable<SObject>
         } catch (Exception e) {
             ErrorLogger.log(e, 'BulkUpdateBatch.finish', jobId);
         }
-    }
-
-    /**
-     * Whether two values are the same for a bulk update: numbers as numbers, text exactly, so a
-     * value that differs only in capitals is still written. The preview marks a value it would
-     * leave alone by the same test (C-50), so the preview says what the run does.
-     */
-    public static Boolean same(Object stored, Object wanted) {
-        if (stored == null || wanted == null) {
-            return stored == null && wanted == null;
-        }
-        if (stored instanceof Decimal || stored instanceof Integer || stored instanceof Double) {
-            try {
-                return Decimal.valueOf(String.valueOf(stored)) ==
-                    Decimal.valueOf(String.valueOf(wanted));
-            } catch (Exception notANumber) {
-                return false;
-            }
-        }
-        if (stored instanceof String || wanted instanceof String) {
-            return String.valueOf(stored).equals(String.valueOf(wanted));
-        }
-        return stored == wanted;
-    }
-
-    private static String message(List<Database.Error> errors) {
-        List<String> parts = new List<String>();
-        for (Database.Error error : errors) {
-            parts.add(error.getMessage());
-        }
-        return String.join(parts, ' ');
     }
 }

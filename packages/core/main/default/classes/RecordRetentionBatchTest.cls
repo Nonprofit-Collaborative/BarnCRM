@@ -96,6 +96,10 @@ private class RecordRetentionBatchTest {
                     Id = undoOpen.Id,
                     Status__c = ImportBatchService.STATUS_COMPLETE,
                     Undo_Deadline__c = Datetime.now().addDays(5)
+                ),
+                new Import_Batch__c(
+                    Id = running.Id,
+                    Status__c = ImportBatchService.STATUS_COMMITTING
                 )
             };
             insert as system new Import_Journal__c(Import_Batch__c = closed.Id);
@@ -122,6 +126,147 @@ private class RecordRetentionBatchTest {
                 2,
                 [SELECT COUNT() FROM Import_Row__c WITH SYSTEM_MODE],
                 'Only the deleted import\'s rows go'
+            );
+        }
+    }
+
+    @IsTest
+    static void importsAbandonedInDraftParsingOrPreviewGoAfterTheSameDays() {
+        System.runAs(TestUsers.admin()) {
+            Import_Template__c template = ImportTestDataFactory.template(
+                ImportTestDataFactory.donorMapping(),
+                ImportTemplateService.RULE_EMAIL
+            );
+            List<Import_Batch__c> old = new List<Import_Batch__c>();
+            for (
+                String status : new List<String>{
+                    ImportBatchService.STATUS_DRAFT,
+                    ImportBatchService.STATUS_PARSING,
+                    ImportBatchService.STATUS_DRY_RUN
+                }
+            ) {
+                Import_Batch__c batch = ImportTestDataFactory.batch(template);
+                ImportTestDataFactory.rows(
+                    batch,
+                    new List<Map<String, String>>{
+                        ImportTestDataFactory.donorRow('Ana', 'Row', 'row@example.org', null)
+                    }
+                );
+                old.add(new Import_Batch__c(Id = batch.Id, Status__c = status));
+                Test.setCreatedDate(batch.Id, Datetime.now().addDays(-400));
+            }
+            Import_Batch__c recent = ImportTestDataFactory.batch(template);
+            Import_Batch__c committing = ImportTestDataFactory.batch(template);
+            Test.setCreatedDate(committing.Id, Datetime.now().addDays(-400));
+            old.add(
+                new Import_Batch__c(
+                    Id = committing.Id,
+                    Status__c = ImportBatchService.STATUS_COMMITTING
+                )
+            );
+            update as system old;
+
+            Test.startTest();
+            runPass(RecordRetentionBatch.IMPORT_JOURNAL);
+            runPass(RecordRetentionBatch.IMPORT_ROWS);
+            runPass(RecordRetentionBatch.IMPORT_BATCHES);
+            Test.stopTest();
+
+            Set<Id> left = new Map<Id, Import_Batch__c>(
+                    [SELECT Id FROM Import_Batch__c WITH SYSTEM_MODE]
+                )
+                .keySet();
+            Assert.isTrue(left.contains(recent.Id), 'A recent draft is kept');
+            Assert.isTrue(left.contains(committing.Id), 'An import that is running is kept');
+            Assert.isFalse(left.contains(old[0].Id), 'An old draft is deleted');
+            Assert.isFalse(left.contains(old[1].Id), 'An old parsing import is deleted');
+            Assert.isFalse(left.contains(old[2].Id), 'An old preview is deleted');
+            Assert.areEqual(
+                0,
+                [
+                    SELECT COUNT()
+                    FROM Import_Row__c
+                    WHERE Import_Batch__c = :old[0].Id
+                    WITH SYSTEM_MODE
+                ],
+                'Its staged rows go with it'
+            );
+        }
+    }
+
+    @IsTest
+    static void errorLogEntriesPastTheirDaysAreDeletedWhateverTheirStatus() {
+        System.runAs(TestUsers.admin()) {
+            List<Error_Log__c> logs = new List<Error_Log__c>();
+            for (
+                String status : new List<String>{
+                    ErrorLogger.STATUS_NEW,
+                    ErrorLogger.STATUS_RESOLVED,
+                    ErrorLogger.STATUS_NEW
+                }
+            ) {
+                logs.add(
+                    new Error_Log__c(
+                        Timestamp__c = System.now(),
+                        Context__c = 'Retention test',
+                        Message__c = 'The Garcia household could not be renamed.',
+                        Severity__c = ErrorLogger.SEVERITY_ERROR,
+                        Status__c = status
+                    )
+                );
+            }
+            insert logs;
+            Test.setCreatedDate(logs[0].Id, Datetime.now().addDays(-181));
+            Test.setCreatedDate(logs[1].Id, Datetime.now().addDays(-181));
+
+            Test.startTest();
+            runPass(RecordRetentionBatch.ERROR_LOG);
+            Test.stopTest();
+
+            Assert.areEqual(180, RecordRetentionBatch.errorLogDays(), 'The shipped default');
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'Retention test'
+                    WITH SYSTEM_MODE
+                ],
+                'The two older than 180 days are gone, New or not'
+            );
+        }
+    }
+
+    @IsTest
+    static void aSettingOfZeroKeepsEveryErrorLogEntry() {
+        System.runAs(TestUsers.admin()) {
+            BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+            settings.Error_Log_Retention_Days__c = 0;
+            TestDataFactory.saveSettings(settings);
+            Error_Log__c old = new Error_Log__c(
+                Timestamp__c = System.now(),
+                Context__c = 'Retention test',
+                Message__c = 'The Garcia household could not be renamed.',
+                Severity__c = ErrorLogger.SEVERITY_ERROR,
+                Status__c = ErrorLogger.STATUS_NEW
+            );
+            insert old;
+            Test.setCreatedDate(old.Id, Datetime.now().addDays(-4000));
+
+            Test.startTest();
+            runPass(RecordRetentionBatch.ERROR_LOG);
+            Test.stopTest();
+
+            Assert.isNull(RecordRetentionBatch.errorLogDays(), 'Zero keeps everything');
+            Assert.areEqual(
+                1,
+                [
+                    SELECT COUNT()
+                    FROM Error_Log__c
+                    WHERE Context__c = 'Retention test'
+                    WITH SYSTEM_MODE
+                ],
+                'Every entry is kept'
             );
         }
     }

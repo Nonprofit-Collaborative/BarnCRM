@@ -1816,7 +1816,8 @@ public with sharing class ImportObjectLoader {
     // Helpers
     // -------------------------------------------------------------------------------------
 
-    private static Boolean hasAnyValue(Map<String, String> held) {
+    /** Whether any held value is not blank. */
+    public static Boolean hasAnyValue(Map<String, String> held) {
         if (held == null) {
             return false;
         }

@@ -49,6 +49,11 @@ public with sharing class NightlyJobs {
         'FundersNightlyJobProvider'
     };
 
+    /** Separate schedules of steps that became part of another step: adopted, then aborted. */
+    private static final List<String> RETIRED_KEYS = new List<String>{
+        ImportRowPurgeScheduler.JOB_NAME
+    };
+
     private static final String ERROR_CONTEXT = 'NightlyJobs';
 
     /** Set by a test to the whole list, so no test depends on which modules are installed. */
@@ -131,7 +136,6 @@ public with sharing class NightlyJobs {
     private static List<NightlyStep> coreSteps() {
         return new List<NightlyStep>{
             SeasonalAddressScheduler.step(),
-            ImportRowPurgeScheduler.step(),
             RecordRetentionBatch.step(),
             SetupChangeCopyJob.step(),
             EmptyHouseholdTidyScheduler.step(),
@@ -297,6 +301,13 @@ public with sharing class NightlyJobs {
         try {
             List<Nightly_Job__c> switched = new List<Nightly_Job__c>();
             Boolean adopted = false;
+            for (String retired : RETIRED_KEYS) {
+                Id gone = ScheduledJobSelector.triggerIdByName(retired);
+                if (gone != null) {
+                    ScheduledJobSelector.abort(gone);
+                    adopted = true;
+                }
+            }
             for (NightlyStep candidate : steps()) {
                 Id old = ScheduledJobSelector.triggerIdByName(candidate.key);
                 if (old == null) {

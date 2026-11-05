@@ -12,45 +12,6 @@
  */
 public with sharing class HouseholdMergeController {
     /**
-     * One household as the picker offers it.
-     */
-    public class HouseholdOption {
-        @AuraEnabled
-        public Id id;
-        @AuraEnabled
-        public String name;
-        @AuraEnabled
-        public Decimal memberCount;
-        @AuraEnabled
-        public String location;
-    }
-
-    /**
-     * Households whose name contains what the person typed. Households only, never
-     * organizations, so a merge cannot be aimed at one by accident.
-     */
-    @AuraEnabled(cacheable=true)
-    public static List<HouseholdOption> searchHouseholds(String term, Id excludeId) {
-        try {
-            List<HouseholdOption> result = new List<HouseholdOption>();
-            if (String.isBlank(term) || term.trim().length() < 2) {
-                return result;
-            }
-            for (Account household : HouseholdSelector.searchHouseholds(term, excludeId, 20)) {
-                HouseholdOption option = new HouseholdOption();
-                option.id = household.Id;
-                option.name = household.Name;
-                option.memberCount = household.Member_Count__c;
-                option.location = place(household);
-                result.add(option);
-            }
-            return result;
-        } catch (Exception e) {
-            throw asUserError(e, excludeId);
-        }
-    }
-
-    /**
      * Whether this person may change this household at all, so that the screen can show a
      * read only notice rather than buttons that would fail.
      */
@@ -118,17 +79,6 @@ public with sharing class HouseholdMergeController {
     }
 
     // ------------------------------------------------------------------ helpers
-
-    private static String place(Account household) {
-        List<String> parts = new List<String>();
-        if (String.isNotBlank(household.BillingCity)) {
-            parts.add(household.BillingCity);
-        }
-        if (String.isNotBlank(household.BillingState)) {
-            parts.add(household.BillingState);
-        }
-        return String.join(parts, ', ');
-    }
 
     /** What the screen is told, logged under the merge's own context. */
     private static AuraHandledException asUserError(Exception e, Id recordId) {

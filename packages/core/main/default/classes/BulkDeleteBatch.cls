@@ -138,12 +138,11 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
                 );
             } else {
                 failedRecords++;
-                journal.add(
-                    ImportJournalService.failed(
-                        checked.objectName,
-                        record.Id,
-                        message(results[i].getErrors())
-                    )
+                BulkJobSupport.journalFailure(
+                    journal,
+                    checked.objectName,
+                    record.Id,
+                    results[i].getErrors()
                 );
             }
         }
@@ -209,13 +208,5 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
             ids.add(Id.valueOf((String) row.get('Gift_Id__c')));
         }
         return ids;
-    }
-
-    private static String message(List<Database.Error> errors) {
-        List<String> parts = new List<String>();
-        for (Database.Error error : errors) {
-            parts.add(error.getMessage());
-        }
-        return String.join(parts, ' ');
     }
 }

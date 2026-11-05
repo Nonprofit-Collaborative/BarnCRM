@@ -17,16 +17,6 @@ public with sharing class EmptyHouseholdTidyScheduler implements Schedulable {
         Database.executeBatch(new EmptyHouseholdTidyBatch(), EmptyHouseholdTidyBatch.CHUNK_SIZE);
     }
 
-    /** Makes sure the nightly run, which does the tidy-up, is scheduled. */
-    public static Id start() {
-        return NightlyJobs.start();
-    }
-
-    /** True when the nightly run, which does the tidy-up, is scheduled. */
-    public static Boolean isScheduled() {
-        return NightlyJobs.isScheduled();
-    }
-
     /** The tidy-up as a step of the nightly run: a quarter to two, after the import cleanup. */
     public static NightlyStep step() {
         return new NightlyStep(

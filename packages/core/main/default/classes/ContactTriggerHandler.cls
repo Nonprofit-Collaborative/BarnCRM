@@ -32,14 +32,6 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
      */
     private static List<Household_Member__c> departingMemberships = new List<Household_Member__c>();
 
-    /**
-     * The membership handler, stood down while this handler removes and moves membership rows
-     * itself, so that a household is recounted and renamed once, after the delete,
-     * rather than in the middle of it. Rollups on membership rows are a different handler and
-     * still run.
-     */
-    private static final String MEMBER_HANDLER = 'HouseholdMemberTriggerHandler';
-
     public override void beforeInsert() {
         HouseholdService.ensureHouseholds((List<Contact>) newRecords());
     }
@@ -99,12 +91,7 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
     public override void beforeDelete() {
         Set<Id> personIds = personIdsOf((List<Contact>) oldRecords());
         departingMemberships = HouseholdService.membershipsFor(personIds);
-        AutomationControl.bypass(MEMBER_HANDLER);
-        try {
-            departingHouseholdIds = HouseholdService.removeMembershipsFor(personIds);
-        } finally {
-            AutomationControl.clearBypass(MEMBER_HANDLER);
-        }
+        departingHouseholdIds = HouseholdService.removeMembershipsWithoutUpkeep(personIds);
     }
 
     /**
@@ -127,16 +114,9 @@ public with sharing class ContactTriggerHandler extends TriggerHandler {
         affected.addAll(householdIds(gone));
 
         Map<Id, Id> survivorByMerged = survivorsOf(gone);
-        if (!survivorByMerged.isEmpty()) {
-            AutomationControl.bypass(MEMBER_HANDLER);
-            try {
-                affected.addAll(
-                    HouseholdService.moveMembershipsToSurvivors(removed, survivorByMerged)
-                );
-            } finally {
-                AutomationControl.clearBypass(MEMBER_HANDLER);
-            }
-        }
+        affected.addAll(
+            HouseholdService.moveMembershipsToSurvivorsWithoutUpkeep(removed, survivorByMerged)
+        );
         if (survivorByMerged.isEmpty()) {
             // A household this delete empties is stamped for the nightly tidy-up (R-H12a).
             HouseholdService.afterPeopleDeleted(affected);

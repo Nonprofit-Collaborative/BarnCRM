@@ -1,8 +1,9 @@
 /**
  * The daily Error Log run (C-23, R-E5, R-E6): a step of the nightly run at 07:00 (ADR-0166
  * nightly-job-dispatcher), switched on and off from the Error Log page of the BarnCRM Settings
- * console. It deletes entries past their retention and sends the digest when one is due, so
- * changing the frequency from daily to weekly never needs the schedule changed.
+ * console. It sends the digest when one is due, so changing the frequency from daily to weekly
+ * never needs the schedule changed. Entries past their retention (R-E6) are deleted by the
+ * nightly Record Cleanup step (`RecordRetentionBatch`).
  *
  * Still schedulable: an org upgraded from before the nightly run may have this job scheduled on
  * its own, and when it fires it adopts the old schedules (R-NJ5) and does today's work.
@@ -14,13 +15,6 @@ public with sharing class ErrorDigestScheduler implements Schedulable {
     public void execute(SchedulableContext context) {
         if (context != null) {
             NightlyJobs.adoptOldSchedules();
-        }
-        // The daily Error Log run also deletes entries past their retention (R-E6). Its own
-        // try, so neither half stops the other.
-        try {
-            ErrorLogRetention.start();
-        } catch (Exception failed) {
-            ErrorLogger.log(failed, 'Error Log retention');
         }
         try {
             ErrorDigestService.runScheduled();

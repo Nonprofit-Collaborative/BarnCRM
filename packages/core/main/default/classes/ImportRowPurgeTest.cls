@@ -5,7 +5,7 @@
  * the import keeps its counts, a batch whose rows are gone is refused rather than run over
  * nothing, and undo still works once the rows are gone (R-IR8).
  */
-@IsTest(testFor='ApexClass:ImportRowPurgeBatch, ApexClass:ImportRowPurgeScheduler')
+@IsTest(testFor='ApexClass:RecordRetentionBatch, ApexClass:ImportRowPurgeScheduler')
 private class ImportRowPurgeTest {
     /** More rows than one chunk of 200, so the cleanup is bulk tested. */
     private static final Integer ROWS = 251;
@@ -62,7 +62,11 @@ private class ImportRowPurgeTest {
     }
 
     /** Runs the cleanup's start and execute in this transaction, as the job would. */
-    private static void runNow(ImportRowPurgeBatch purge) {
+    private static void runNow() {
+        RecordRetentionBatch.chain = false;
+        RecordRetentionBatch purge = new RecordRetentionBatch(
+            RecordRetentionBatch.IMPORT_ROW_CHOICE
+        );
         List<SObject> scope = new List<SObject>();
         Database.QueryLocatorIterator found = purge.start(null).iterator();
         while (found.hasNext()) {
@@ -84,7 +88,11 @@ private class ImportRowPurgeTest {
             Import_Batch__c draft = batchOf(template, ImportBatchService.STATUS_DRAFT, null);
 
             Test.startTest();
-            Database.executeBatch(new ImportRowPurgeBatch(), ImportRowPurgeBatch.CHUNK_SIZE);
+            RecordRetentionBatch.chain = false;
+            Database.executeBatch(
+                new RecordRetentionBatch(RecordRetentionBatch.IMPORT_ROW_CHOICE),
+                RecordRetentionBatch.CHUNK_SIZE
+            );
             Test.stopTest();
 
             Assert.areEqual(0, rowsOf(old.Id), 'Rows of an import 40 days complete are removed.');
@@ -122,7 +130,7 @@ private class ImportRowPurgeTest {
             deleteRows(ImportBatchService.ROWS_ONCE_COMPLETE);
 
             Test.startTest();
-            runNow(new ImportRowPurgeBatch());
+            runNow();
             Test.stopTest();
 
             Assert.areEqual(0, rowsOf(done.Id), 'Once complete, the rows go the same night.');
@@ -141,13 +149,12 @@ private class ImportRowPurgeTest {
             Import_Batch__c sixtyDays = batchOf(template, ImportBatchService.STATUS_COMPLETE, 60);
             Import_Batch__c yearsAgo = batchOf(template, ImportBatchService.STATUS_COMPLETE, 4000);
             deleteRows(ImportBatchService.ROWS_NEVER);
-            ImportRowPurgeBatch never = new ImportRowPurgeBatch();
-            runNow(never);
+            runNow();
             Assert.areEqual(ROWS, rowsOf(yearsAgo.Id), 'Never keeps every row, however old.');
 
             deleteRows(ImportBatchService.ROWS_AFTER_90_DAYS);
             Test.startTest();
-            runNow(new ImportRowPurgeBatch());
+            runNow();
             Test.stopTest();
 
             Assert.areEqual(ROWS, rowsOf(sixtyDays.Id), 'Kept for 90 days, 60 days stays.');
@@ -192,7 +199,7 @@ private class ImportRowPurgeTest {
                 Id = batch.Id,
                 Is_Dry_Run__c = false,
                 Started_At__c = Datetime.now().addMinutes(-5),
-                Completed_At__c = Datetime.now().addMinutes(1),
+                Completed_At__c = Datetime.now().addMinutes(-1),
                 Committed_By__c = UserInfo.getUserId(),
                 Undo_Deadline__c = Datetime.now().addDays(30)
             );
@@ -219,9 +226,7 @@ private class ImportRowPurgeTest {
                 }
             );
             deleteRows(ImportBatchService.ROWS_ONCE_COMPLETE);
-            ImportRowPurgeBatch purge = new ImportRowPurgeBatch();
-            purge.cutoff = Datetime.now().addMinutes(5);
-            runNow(purge);
+            runNow();
             Assert.areEqual(0, rowsOf(batch.Id), 'The cleanup removed every row first.');
 
             Integer total = ImportUndoService.preview(batch.Id).total;
@@ -281,7 +286,10 @@ private class ImportRowPurgeTest {
             delete rows;
 
             Test.startTest();
-            ImportRowPurgeBatch purge = new ImportRowPurgeBatch();
+            RecordRetentionBatch.chain = false;
+            RecordRetentionBatch purge = new RecordRetentionBatch(
+                RecordRetentionBatch.IMPORT_ROW_CHOICE
+            );
             purge.execute(null, rows);
             purge.finish(null);
             Test.stopTest();
@@ -289,31 +297,38 @@ private class ImportRowPurgeTest {
             List<Error_Log__c> entries = [
                 SELECT Message__c, Severity__c
                 FROM Error_Log__c
-                WHERE Context__c = 'ImportRowPurgeBatch'
+                WHERE Context__c = 'RecordRetentionBatch'
             ];
             Assert.areEqual(1, entries.size(), 'One entry for the chunk, not one per row');
             Assert.areEqual(ErrorLogger.SEVERITY_WARNING, entries[0].Severity__c);
             Assert.isTrue(
-                entries[0].Message__c.contains(String.valueOf(rows.size())),
-                'It says how many rows were not removed: ' + entries[0].Message__c
+                entries[0].Message__c.contains(String.valueOf(rows[0].Id)),
+                'It names the first row not removed: ' + entries[0].Message__c
             );
         }
     }
 
     @IsTest
-    static void theCleanupIsScheduledOnceAndListedAsANightlyJob() {
+    static void theCleanupIsAPassOfRecordCleanupAndTheOldScheduleIsAShell() {
         System.runAs(TestUsers.admin()) {
+            Assert.isNull(
+                NightlyJobs.step(ImportRowPurgeScheduler.JOB_NAME),
+                'The cleanup is no step of its own.'
+            );
+            Assert.isNotNull(
+                NightlyJobs.step(RecordRetentionBatch.JOB_NAME),
+                'It is a pass of the Record Cleanup step.'
+            );
+
             Test.startTest();
-            Id first = ImportRowPurgeScheduler.start();
-            Id second = ImportRowPurgeScheduler.start();
+            new ImportRowPurgeScheduler().execute(null);
             Test.stopTest();
 
-            Assert.areEqual(first, second, 'Starting again finds the nightly run already there.');
-            Assert.isTrue(ImportRowPurgeScheduler.isScheduled());
-            NightlyStep step = NightlyJobs.step(ImportRowPurgeScheduler.JOB_NAME);
-            Assert.isNotNull(step, 'The cleanup is a step of the nightly run.');
-            Assert.areEqual(75, step.minute, 'At a quarter past one.');
-            Assert.isTrue(NightlyJobs.isOn(step), 'And it runs tonight.');
+            Assert.areEqual(
+                0,
+                [SELECT COUNT() FROM AsyncApexJob WHERE ApexClass.Name = 'RecordRetentionBatch'],
+                'The shell starts nothing: the nightly run does the work.'
+            );
         }
     }
 }

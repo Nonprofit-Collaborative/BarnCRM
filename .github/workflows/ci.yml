@@ -75,6 +75,9 @@ jobs:
       - name: Check every without sharing class is in the register
         run: python3 scripts/ci/check-without-sharing-register.py
 
+      - name: Check trigger handlers read their records only through the accessors
+        run: python3 scripts/ci/check-trigger-handler-records.py
+
       - name: Check descriptions, field limits, layout actions and Apex type names
         run: python3 scripts/ci/check-metadata-lengths.py
 

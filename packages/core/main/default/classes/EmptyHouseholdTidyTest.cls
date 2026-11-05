@@ -440,8 +440,8 @@ private class EmptyHouseholdTidyTest {
     static void theTidyUpIsScheduledOnceAndListedAsANightlyJob() {
         System.runAs(TestUsers.admin()) {
             Test.startTest();
-            Id first = EmptyHouseholdTidyScheduler.start();
-            Id second = EmptyHouseholdTidyScheduler.start();
+            Id first = NightlyJobs.start();
+            Id second = NightlyJobs.start();
             Test.stopTest();
 
             Assert.areEqual(first, second, 'Starting again finds the nightly run already there.');
@@ -449,7 +449,7 @@ private class EmptyHouseholdTidyTest {
             Assert.isNotNull(step, 'The tidy-up is a step of the nightly run.');
             Assert.areEqual(105, step.minute, 'At a quarter to two.');
             Assert.isTrue(NightlyJobs.isOn(step), 'And it runs tonight.');
-            Assert.isTrue(EmptyHouseholdTidyScheduler.isScheduled(), 'Scheduled.');
+            Assert.isTrue(NightlyJobs.isScheduled(), 'Scheduled.');
         }
     }
 

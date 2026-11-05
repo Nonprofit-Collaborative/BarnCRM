@@ -1423,7 +1423,7 @@ public with sharing class ImportRowProcessor {
     }
 
     private static Boolean describesPerson(Working item, String entity) {
-        return hasAnyValue(item.byEntity.get(entity));
+        return ImportObjectLoader.hasAnyValue(item.byEntity.get(entity));
     }
 
     private static Boolean hasLastName(Working item, String entity) {
@@ -2574,7 +2574,7 @@ public with sharing class ImportRowProcessor {
             }
             List<String> carried = new List<String>();
             for (String entity : deferred) {
-                if (hasAnyValue(item.byEntity.get(entity))) {
+                if (ImportObjectLoader.hasAnyValue(item.byEntity.get(entity))) {
                     carried.add(entity);
                 }
             }
@@ -2591,18 +2591,6 @@ public with sharing class ImportRowProcessor {
             item.row.Gift_Id__c = null;
             item.row.Soft_Credit_Id__c = null;
         }
-    }
-
-    private static Boolean hasAnyValue(Map<String, String> held) {
-        if (held == null) {
-            return false;
-        }
-        for (String value : held.values()) {
-            if (String.isNotBlank(value)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

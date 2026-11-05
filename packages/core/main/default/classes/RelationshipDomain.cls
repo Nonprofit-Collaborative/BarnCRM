@@ -195,7 +195,8 @@ public with sharing class RelationshipDomain {
         return keyOf(record) == keyOf(previous);
     }
 
-    private static String keyOf(Relationship__c record) {
+    /** How a record identifies itself: this person, that person, this type; null when unknown. */
+    public static String keyOf(Relationship__c record) {
         String fromKey = PersonReference.keyOf(record.Contact__c, record.Person_Account__c);
         String toKey = PersonReference.keyOf(
             record.Related_Contact__c,

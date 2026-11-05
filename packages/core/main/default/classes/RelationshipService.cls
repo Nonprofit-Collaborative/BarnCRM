@@ -498,7 +498,7 @@ public with sharing class RelationshipService {
                 otherPeople
             )
         ) {
-            String candidateKey = ownSideKey(candidate);
+            String candidateKey = RelationshipDomain.keyOf(candidate);
             if (candidateKey != null && !eligibleIds.contains(candidate.Id)) {
                 takenKeys.add(candidateKey);
             }
@@ -508,7 +508,7 @@ public with sharing class RelationshipService {
             ) {
                 continue;
             }
-            String key = ownSideKey(candidate);
+            String key = RelationshipDomain.keyOf(candidate);
             if (key != null && !byKey.containsKey(key)) {
                 byKey.put(key, candidate);
             }
@@ -528,7 +528,7 @@ public with sharing class RelationshipService {
                 otherPeople
             )
         ) {
-            String key = ownSideKey(candidate);
+            String key = RelationshipDomain.keyOf(candidate);
             if (key == null) {
                 continue;
             }
@@ -604,19 +604,6 @@ public with sharing class RelationshipService {
             }
         }
         return pool.remove(chosen);
-    }
-
-    /** How this record identifies itself: this person, that person, this type. */
-    private static String ownSideKey(Relationship__c record) {
-        String fromKey = PersonReference.keyOf(record.Contact__c, record.Person_Account__c);
-        String toKey = PersonReference.keyOf(
-            record.Related_Contact__c,
-            record.Related_Person_Account__c
-        );
-        if (fromKey == null || toKey == null || String.isBlank(record.Type__c)) {
-            return null;
-        }
-        return fromKey + '>' + toKey + '>' + record.Type__c.toLowerCase();
     }
 
     /** What the other side of this record would call itself. */

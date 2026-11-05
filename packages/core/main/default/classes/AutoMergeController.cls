@@ -7,7 +7,6 @@
  * Review), since the pairs come from the review list; undo reads only the journal.
  */
 public with sharing class AutoMergeController {
-    private static final String EDIT_PERMISSION = 'Manage_BarnCRM_Settings';
     private static final String JOB_CLASS = 'AutoMergeJob';
     private static final String SCAN_CLASS = 'DuplicateScanBatch';
     /** The most pairs a preview lists; the count still covers them all. */
@@ -58,7 +57,7 @@ public with sharing class AutoMergeController {
     @AuraEnabled
     public static PanelView getView() {
         try {
-            requirePermission();
+            DuplicateController.requirePermission();
             return currentView();
         } catch (Exception caught) {
             throw asUserError(caught, 'Auto-merge panel');
@@ -108,7 +107,7 @@ public with sharing class AutoMergeController {
     @AuraEnabled
     public static PanelView undoRun(String runId) {
         try {
-            requirePermission();
+            DuplicateController.requirePermission();
             requireNothingRunning();
             Datetime since = Datetime.now().addDays(-AutoMergeService.UNDO_DAYS);
             List<Id> journalIds = new List<Id>(
@@ -188,16 +187,8 @@ public with sharing class AutoMergeController {
 
     // ------------------------------------------------------------------ helpers
 
-    private static void requirePermission() {
-        if (!FeatureManagement.checkPermission(EDIT_PERMISSION)) {
-            throw new DuplicateService.DuplicateException(
-                BarnHelp.text('Core', 'Core_Duplicates_ErrorPermissionRequired')
-            );
-        }
-    }
-
     private static void requireRunAccess() {
-        requirePermission();
+        DuplicateController.requirePermission();
         if (!canReviewSuggestions()) {
             throw new DuplicateService.DuplicateException(
                 BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestionAccess')

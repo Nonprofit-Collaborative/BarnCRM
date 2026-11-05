@@ -552,7 +552,12 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                 .getName();
             for (String field : changedFields.get(recordId)) {
                 journal.add(
-                    notRestored(objectName, recordId, field, message(results[i].getErrors()))
+                    notRestored(
+                        objectName,
+                        recordId,
+                        field,
+                        BulkJobSupport.message(results[i].getErrors())
+                    )
                 );
             }
         }
@@ -918,7 +923,7 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
                 return BarnHelp.text('Core', 'Core_Import_UndoKeptNoAccess');
             }
         }
-        return message(errors);
+        return BulkJobSupport.message(errors);
     }
 
     /**
@@ -1379,14 +1384,6 @@ public with sharing class ImportUndoBatch implements Database.Batchable<SObject>
         String reason
     ) {
         return ImportJournalService.notRestored(objectName, recordId, field, reason);
-    }
-
-    private static String message(List<Database.Error> errors) {
-        List<String> parts = new List<String>();
-        for (Database.Error error : errors) {
-            parts.add(error.getMessage());
-        }
-        return String.join(parts, ' ');
     }
 
     /** A time cut to the whole second, the precision the platform stamps records with. */

@@ -86,7 +86,7 @@ private class ScheduledJobSelectorTest {
             Integer before = Limits.getQueries();
             Id found = ScheduledJobSelector.triggerIdByName(OTHER_JOB);
             Datetime next = ScheduledJobSelector.nextFireTime(OTHER_JOB);
-            Boolean tidy = EmptyHouseholdTidyScheduler.isScheduled();
+            Boolean tidy = NightlyJobs.isScheduled();
             Boolean addresses = SeasonalAddressScheduler.isScheduled();
             Boolean run = NightlyJobs.isScheduled();
             Integer used = Limits.getQueries() - before;

@@ -285,6 +285,12 @@ Salesforce org is needed for this job. Steps:
    a user without that grant, and a Jest mock cannot see it (the Volunteers readiness card
    shipped broken this way). A deliberate exception goes in
    `scripts/ci/aura-class-access-allowlist.txt` as `Class  reason`.
+   `scripts/ci/check-trigger-handler-records.py` fails the build if a class that extends
+   `TriggerHandler` (directly or through another handler) reads `Trigger.new`, `Trigger.old`,
+   `Trigger.newMap` or `Trigger.oldMap`. A handler reads its records through `newRecords()`,
+   `oldRecords()`, `newRecordsById()` and `oldRecordsById()`, because the dispatcher narrows
+   them and reruns a handler on the rest after a failure (ADR-0165 rule 3); only
+   `TriggerHandler` reads the platform's own.
 17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
    (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
    mapping from the real package source, so a new object or field that breaks it fails here.

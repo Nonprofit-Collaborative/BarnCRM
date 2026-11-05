@@ -83,9 +83,7 @@ private class GiftTransactionMirrorRunTest {
     }
 
     private static void clearOrgJob() {
-        TestDataFactory.clearScheduledJobs(
-            new List<String>{ NightlyJobs.jobName() }
-        );
+        TestDataFactory.clearScheduledJobs(new List<String>{ NightlyJobs.jobName() });
         ScheduledJobSelector.forget();
     }
 

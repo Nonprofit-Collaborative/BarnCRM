@@ -444,7 +444,8 @@ public with sharing class DuplicateController {
 
     // ------------------------------------------------------------------ helpers
 
-    private static void requirePermission() {
+    /** Refuses anyone without Manage BarnCRM Settings; the Auto-Merge screen asks the same. */
+    public static void requirePermission() {
         if (!FeatureManagement.checkPermission(EDIT_PERMISSION)) {
             throw new DuplicateService.DuplicateException(
                 BarnHelp.text('Core', 'Core_Duplicates_ErrorPermissionRequired')

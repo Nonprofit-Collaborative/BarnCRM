@@ -613,35 +613,6 @@ public with sharing class HouseholdSelector {
     }
 
     /**
-     * Households whose name contains what the person typed, for the picker that chooses
-     * the other household in a merge or the destination of a split. Only households are
-     * offered, never organizations, and the household the person started from is left out.
-     */
-    @NamespaceAccessible
-    public static List<Account> searchHouseholds(String term, Id excludeId, Integer maxRows) {
-        Id recordTypeId = HouseholdService.householdRecordTypeId();
-        if (recordTypeId == null || String.isBlank(term)) {
-            return new List<Account>();
-        }
-        // The term is a bind variable, not string concatenation, so quotes need no escaping
-        // and escapeSingleQuotes would lose every O'Brien. The LIKE wildcards are another
-        // matter: a typed % or _ would match every household, so each is escaped with the
-        // backslash LIKE understands, after any backslash of the person's own.
-        String literal = term.trim().replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_');
-        String pattern = '%' + literal + '%';
-        Integer rows = maxRows == null || maxRows <= 0 ? 20 : maxRows;
-        Id skip = excludeId;
-        return [
-            SELECT Id, Name, Member_Count__c, BillingCity, BillingState
-            FROM Account
-            WHERE RecordTypeId = :recordTypeId AND Name LIKE :pattern AND Id != :skip
-            WITH USER_MODE
-            ORDER BY Name
-            LIMIT :rows
-        ];
-    }
-
-    /**
      * Of the records given, the ones this user may actually edit. Object level access is
      * not the whole answer on a record that sharing may withhold, so the platform's own
      * record access view is asked rather than inferred.

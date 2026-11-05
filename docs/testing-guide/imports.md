@@ -402,7 +402,7 @@ Dot,Zzshirt,dot.zzshirt@example.org,M,2026-10-04
 ## T-IMP-19: Delete Import Rows, and Undo After the Rows Are Deleted
 
 **Purpose:** confirm the Delete Import Rows choice decides when the nightly cleanup deletes an import's rows, and that undo still works once they are gone.
-**Prerequisites:** admin; `import-test-1.csv`; Health Check shows **Import row cleanup** scheduled (or run its **Schedule All Nightly Jobs** fix). Step 4 is checked the morning after.
+**Prerequisites:** admin; `import-test-1.csv`; Health Check shows the nightly run scheduled (or run its **Schedule All Nightly Jobs** fix). Step 4 is checked the morning after, once Record Cleanup has run (twenty past one).
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -412,6 +412,7 @@ Dot,Zzshirt,dot.zzshirt@example.org,M,2026-10-04
 | 4 | The next morning, open the same Data Job record. | **Import Rows** is empty; the counts and **Run Log** are unchanged. |
 | 5 | Open the Super Importer tab and open the row menu beside the import and select **Undo**, then **Undo This Import**. Refresh until it reads **Undone**. | **Undone**. Testa Rivera, Ben Okoro and Cara Lind are gone: undo never needed the rows. |
 | 6 | Set **Delete import rows** back to **After 30 Days** and save. | Saved. |
+| 7 | Only in an org that has an import left in **Draft**, **Parsing** or **Dry run** (a wizard abandoned) that was started more than **Days to Keep Import History** ago (365 by default; the lowest setting is 30): check it in the **Data Jobs** list view the morning after Record Cleanup has run. | That import and its rows are gone. An abandoned import started more recently, and a finished import that can still be undone, are still there. |
 
 **Cleanup:** none.
 

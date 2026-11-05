@@ -199,7 +199,10 @@ private class SettingsControllerTest {
 
             Assert.isTrue(withAccess.contains('Health_Check_Optimizer_Link'), 'Health links out');
             Assert.isTrue(withAccess.contains('Error_Log_Optimizer_Link'), 'Error Log links out');
-            Assert.isFalse(withAccess.contains('Health_Check'), 'The report itself is in Org Optimizer');
+            Assert.isFalse(
+                withAccess.contains('Health_Check'),
+                'The report itself is in Org Optimizer'
+            );
             Assert.isTrue(
                 withoutAccess.contains('Health_Check'),
                 'Someone who cannot open Org Optimizer keeps the report in Settings'

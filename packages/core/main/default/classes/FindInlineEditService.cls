@@ -75,7 +75,7 @@ public with sharing class FindInlineEditService {
             for (String field : wanted.keySet()) {
                 Object was = record.get(field);
                 Object becomes = wanted.get(field);
-                if (!same(was, becomes)) {
+                if (!BulkJobSupport.same(was, becomes)) {
                     before.put(field, was);
                     after.put(field, becomes);
                     change.put(field, becomes);
@@ -108,9 +108,15 @@ public with sharing class FindInlineEditService {
                     )
                 );
             } else {
-                String message = message(results[i].getErrors());
-                summary.errors.add(rowError(recordId, message));
-                journal.add(ImportJournalService.failed(objectName, recordId, message));
+                summary.errors.add(
+                    rowError(recordId, BulkJobSupport.message(results[i].getErrors()))
+                );
+                BulkJobSupport.journalFailure(
+                    journal,
+                    objectName,
+                    recordId,
+                    results[i].getErrors()
+                );
             }
         }
         if (!journal.isEmpty()) {
@@ -274,37 +280,10 @@ public with sharing class FindInlineEditService {
         return job;
     }
 
-    /** Numbers as numbers, text exactly, as a bulk update compares them. */
-    private static Boolean same(Object stored, Object wanted) {
-        if (stored == null || wanted == null) {
-            return stored == null && wanted == null;
-        }
-        if (stored instanceof Decimal || stored instanceof Integer || stored instanceof Double) {
-            try {
-                return Decimal.valueOf(String.valueOf(stored)) ==
-                    Decimal.valueOf(String.valueOf(wanted));
-            } catch (Exception notANumber) {
-                return false;
-            }
-        }
-        if (stored instanceof String || wanted instanceof String) {
-            return String.valueOf(stored).equals(String.valueOf(wanted));
-        }
-        return stored == wanted;
-    }
-
     private static RowError rowError(Id recordId, String message) {
         RowError error = new RowError();
         error.recordId = recordId;
         error.message = message;
         return error;
-    }
-
-    private static String message(List<Database.Error> errors) {
-        List<String> parts = new List<String>();
-        for (Database.Error error : errors) {
-            parts.add(error.getMessage());
-        }
-        return String.join(parts, ' ');
     }
 }

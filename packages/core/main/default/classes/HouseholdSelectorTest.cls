@@ -93,10 +93,6 @@ private class HouseholdSelectorTest {
                     .isEmpty(),
                 'An empty set of people is not a question about every person'
             );
-            Assert.isTrue(
-                HouseholdSelector.searchHouseholds('  ', null, 5).isEmpty(),
-                'A blank search term finds nothing'
-            );
             Test.stopTest();
         }
     }
@@ -219,24 +215,6 @@ private class HouseholdSelectorTest {
                 ),
                 'Only the accounts the stated rows name are dependent'
             );
-        }
-    }
-
-    @IsTest
-    static void aSearchTermIsMatchedLiterallyAndLimited() {
-        System.runAs(TestUsers.admin()) {
-            Account match = HouseholdTestDataFactory.newHousehold('Q_100% Match');
-            Account lookalike = HouseholdTestDataFactory.newHousehold('Qx1000 Match');
-            Database.insert(new List<Account>{ match, lookalike }, AccessLevel.SYSTEM_MODE);
-
-            Test.startTest();
-            List<Account> found = HouseholdSelector.searchHouseholds('q_100%', null, null);
-            List<Account> skipped = HouseholdSelector.searchHouseholds('q_100%', match.Id, 0);
-            Test.stopTest();
-
-            Assert.areEqual(1, found.size(), 'The wildcard characters are not wildcards');
-            Assert.areEqual(match.Id, found[0].Id, 'Only the literal match is found');
-            Assert.isTrue(skipped.isEmpty(), 'The household being merged is not offered');
         }
     }
 
