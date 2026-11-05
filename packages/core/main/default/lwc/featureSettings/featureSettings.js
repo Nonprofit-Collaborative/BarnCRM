@@ -62,6 +62,14 @@ export default class FeatureSettings extends LightningElement {
     return Boolean(this.busyKey);
   }
 
+  /** The rows as shown: Turn On is disabled while saving, or while the row says why it waits. */
+  get rows() {
+    return this.features.map((feature) => ({
+      ...feature,
+      turnOnDisabled: this.isBusy || Boolean(feature.blockedReason)
+    }));
+  }
+
   async handleTurnOn(event) {
     const key = event.target.dataset.key;
     const feature = this.features.find((row) => row.key === key);

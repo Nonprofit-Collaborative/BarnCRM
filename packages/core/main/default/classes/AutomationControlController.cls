@@ -25,6 +25,9 @@ public with sharing class AutomationControlController {
         /** True when this automation enforces a rule, so its switch is shown off and disabled. */
         @AuraEnabled
         public Boolean alwaysRuns { get; set; }
+        /** True for an org's own listed flow (`Flow:` row), which the page can remove (R-A8). */
+        @AuraEnabled
+        public Boolean removable { get; set; }
     }
 
     /**
@@ -44,6 +47,22 @@ public with sharing class AutomationControlController {
         public List<Integer> pauseHourOptions { get; set; }
         @AuraEnabled
         public List<AutomationView> automations { get; set; }
+        /** The BarnCRM Automation Control rows: the org default first, then profiles and users. */
+        @AuraEnabled
+        public List<AutomationControlSettingService.ControlRow> controlRows { get; set; }
+        /** True while the org default has Pause All on: paused for everyone until turned off. */
+        @AuraEnabled
+        public Boolean pausedForEveryone { get; set; }
+        /** The setting's two field labels, as this org shows them. */
+        @AuraEnabled
+        public String pauseAllLabel { get; set; }
+        @AuraEnabled
+        public String bypassLabel { get; set; }
+        @AuraEnabled
+        public List<AutomationControlSettingService.Option> profileOptions { get; set; }
+        /** The org's own active flows not yet listed. */
+        @AuraEnabled
+        public List<AutomationControlSettingService.Option> flowOptions { get; set; }
     }
 
     @AuraEnabled(cacheable=true)
@@ -93,6 +112,72 @@ public with sharing class AutomationControlController {
         }
     }
 
+    /** Saves both boxes of the org default, a profile or a user (R-A8). */
+    @AuraEnabled
+    public static AutomationPageView saveControl(String ownerId, Boolean pauseAll, Boolean bypass) {
+        try {
+            AutomationControlSettingService.save(ownerId, pauseAll, bypass);
+            return currentPage();
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Save Automation Control');
+        }
+    }
+
+    /** Adds a profile or user row, with Bypass on. */
+    @AuraEnabled
+    public static AutomationPageView addControl(String ownerId) {
+        try {
+            AutomationControlSettingService.add(ownerId);
+            return currentPage();
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Add Automation Control');
+        }
+    }
+
+    /** Removes a profile or user row. */
+    @AuraEnabled
+    public static AutomationPageView removeControl(String ownerId) {
+        try {
+            AutomationControlSettingService.remove(ownerId);
+            return currentPage();
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Remove Automation Control');
+        }
+    }
+
+    /** Lists one of the org's own flows with a switch. */
+    @AuraEnabled
+    public static AutomationPageView addFlow(String apiName) {
+        try {
+            AutomationControlSettingService.addFlow(apiName);
+            return currentPage();
+        } catch (Exception caught) {
+            throw asUserError(caught, 'List a flow');
+        }
+    }
+
+    /** Takes one of the org's own flows off the list. */
+    @AuraEnabled
+    public static AutomationPageView removeFlow(String automationName) {
+        try {
+            AutomationControlSettingService.removeFlow(automationName);
+            return currentPage();
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Remove a listed flow');
+        }
+    }
+
+    /** Catch Up Now: households, household names and the waiting rollups, in the background. */
+    @AuraEnabled
+    public static AutomationPageView catchUpNow() {
+        try {
+            AutomationControlSettingService.catchUpNow();
+            return currentPage();
+        } catch (Exception caught) {
+            throw asUserError(caught, 'Catch up now');
+        }
+    }
+
     private static AutomationPageView currentPage() {
         AutomationPageView page = new AutomationPageView();
         page.pausedUntil = AutomationControl.pausedUntil();
@@ -102,7 +187,16 @@ public with sharing class AutomationControlController {
         page.pauseHourOptions = new List<Integer>(AutomationControl.allowedPauseHours());
         page.pauseHourOptions.sort();
         page.automations = new List<AutomationView>();
+        page.controlRows = AutomationControlSettingService.rows();
+        page.pausedForEveryone = AutomationControlSettingService.pausedForEveryone();
+        page.pauseAllLabel = Schema.SObjectType.BarnCRM_Automation_Control__c.fields.Pause_All__c.getLabel();
+        page.bypassLabel = Schema.SObjectType.BarnCRM_Automation_Control__c.fields.Bypass__c.getLabel();
+        page.profileOptions = AutomationControlSettingService.profileOptions();
+        Set<String> listed = new Set<String>();
         for (Automation_Setting__c setting : AutomationSettingSelector.selectAllForConsole()) {
+            if (setting.Automation_Name__c != null) {
+                listed.add(setting.Automation_Name__c.toLowerCase());
+            }
             AutomationView view = new AutomationView();
             view.recordId = setting.Id;
             view.automationName = setting.Automation_Name__c;
@@ -113,8 +207,10 @@ public with sharing class AutomationControlController {
             // A rule enforcing automation is never running "on" a switch: it is shown off, and
             // disabled, so nobody reads the page as saying it can be turned on (ADR-0024).
             view.enabled = view.alwaysRuns ? false : setting.Enabled__c;
+            view.removable = AutomationControlSettingService.isOwnFlow(setting);
             page.automations.add(view);
         }
+        page.flowOptions = AutomationControlSettingService.flowOptions(listed);
         return page;
     }
 

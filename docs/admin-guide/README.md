@@ -172,6 +172,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-05, C-23 Error Log and error digest | [error-log.md](error-log.md) | Core |
 | C-11, C-21 Health Check | [health-check.md](health-check.md) | Core, with findings from Giving, Mirror, Rollup Builder and Volunteers |
 | Q-04 Job notifications | [job-notifications.md](job-notifications.md) | Core |
+| RT-10 Nightly jobs | [nightly-jobs.md](nightly-jobs.md) | Core, with jobs from every module |
 | X-03, Q-14 Using BarnCRM actions with your own AI assistant | [using-barncrm-actions-with-ai.md](using-barncrm-actions-with-ai.md) | Core, Mirror |
 
 ### Giving

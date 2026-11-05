@@ -28,6 +28,9 @@
                         <li key={feature.key} class="slds-item" data-id="all-feature">
                             <p class="slds-text-title_bold">{feature.name}</p>
                             <p class="slds-text-body_small slds-text-color_weak">{feature.description}</p>
+                            <template lwc:if={feature.blockedReason}>
+                                <p class="slds-text-body_small slds-text-color_error" data-id="blocked">{feature.blockedReason}</p>
+                            </template>
                         </li>
                     </template>
                 </ul>
@@ -43,8 +46,8 @@
                     {labels.chooseHelp}
                 </p>
                 <template for:each={features} for:item="feature">
+                    <div key={feature.key}>
                     <lightning-input
-                        key={feature.key}
                         type="checkbox"
                         label={feature.name}
                         field-level-help={feature.description}
@@ -54,6 +57,10 @@
                         data-key={feature.key}
                         onchange={handleFeature}
                     ></lightning-input>
+                    <template lwc:if={feature.blockedReason}>
+                        <p class="slds-text-body_small slds-text-color_error slds-var-m-left_large" data-id="blocked">{feature.blockedReason}</p>
+                    </template>
+                    </div>
                 </template>
             </template>
             <p class="slds-text-body_small slds-var-m-top_medium">{labels.modulesNote}</p>

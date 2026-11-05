@@ -154,6 +154,104 @@ public with sharing virtual class NpspHouseholdSource {
         return value == null ? null : String.valueOf(value);
     }
 
+    /** NPSP's Account Model setting, and its field, read by describe (RT-04, R-HA6). */
+    @TestVisible
+    private static final String ACCOUNT_MODEL_SETTING = npspField(
+        CONTACTS_AND_ORGS,
+        'Contacts_And_Orgs_Settings'
+    );
+    @TestVisible
+    private static final String ACCOUNT_MODEL_FIELD = npspField(
+        CONTACTS_AND_ORGS,
+        'Account_Processor'
+    );
+
+    private static Boolean householdsInUse;
+
+    /**
+     * Whether NPSP households are in use (RT-04, R-HA6): NPSP still creates household
+     * accounts, or NPSP household accounts not yet adopted exist. While true, Household Upkeep
+     * cannot be turned on, so the two packages never both make a household for the same
+     * person. Read once per transaction; never throws (a read failure answers false and is
+     * logged).
+     */
+    public static Boolean householdsInUse() {
+        if (householdsInUse == null) {
+            try {
+                NpspHouseholdSource source = get();
+                householdsInUse = source.createsHouseholds() || source.unadoptedHouseholdsExist();
+            } catch (Exception e) {
+                ErrorLogger.log(e, 'NpspHouseholdSource');
+                householdsInUse = false;
+            }
+        }
+        return householdsInUse;
+    }
+
+    /** Test seam: forgets the answer read in this transaction. */
+    @TestVisible
+    private static void clearCache() {
+        householdsInUse = null;
+    }
+
+    /**
+     * Whether NPSP's Account Model is Household Account: the org default of NPSP's Contacts
+     * and Organizations setting, found by describe. No setting object means no NPSP; no org
+     * default row means NPSP's own default, Household Account. Read in system mode: it is
+     * NPSP configuration, not people's data, and the answer must not depend on the viewer.
+     */
+    public virtual Boolean createsHouseholds() {
+        Schema.SObjectType settingType = sobjectType(ACCOUNT_MODEL_SETTING);
+        if (settingType == null) {
+            return false;
+        }
+        if (!settingType.getDescribe().fields.getMap().containsKey(ACCOUNT_MODEL_FIELD)) {
+            return false;
+        }
+        String query =
+            'SELECT ' +
+            ACCOUNT_MODEL_FIELD +
+            ' FROM ' +
+            ACCOUNT_MODEL_SETTING +
+            ' WHERE SetupOwnerId = :orgId LIMIT 1';
+        List<SObject> rows = Database.queryWithBinds(
+            query,
+            new Map<String, Object>{ 'orgId' => UserInfo.getOrganizationId() },
+            AccessLevel.SYSTEM_MODE
+        );
+        if (rows.isEmpty()) {
+            return true;
+        }
+        Object model = rows[0].get(ACCOUNT_MODEL_FIELD);
+        return model == null || String.valueOf(model) == HOUSEHOLD_ACCOUNT_TYPE;
+    }
+
+    /**
+     * Whether any NPSP household not yet a BarnCRM household exists. Read in system mode so
+     * the answer does not depend on which records the viewer can see; no row is returned.
+     */
+    public virtual Boolean unadoptedHouseholdsExist() {
+        String filter = available() ? condition() : '';
+        if (String.isBlank(filter)) {
+            return false;
+        }
+        String query = 'SELECT Id FROM Account WHERE ' + filter + ' LIMIT 1';
+        return !Database.queryWithBinds(query, binds(), AccessLevel.SYSTEM_MODE).isEmpty();
+    }
+
+    /** The object of that name when the org has it, or null. */
+    private static Schema.SObjectType sobjectType(String name) {
+        try {
+            List<Schema.DescribeSObjectResult> found = Schema.describeSObjects(
+                new List<String>{ name },
+                SObjectDescribeOptions.DEFERRED
+            );
+            return found.isEmpty() ? null : found[0].getSObjectType();
+        } catch (InvalidParameterValueException e) {
+            return null;
+        }
+    }
+
     /** NPSP's household record type, when the org has it. */
     private static Id npspRecordTypeId() {
         Schema.RecordTypeInfo info = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()

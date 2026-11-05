@@ -28,7 +28,8 @@ ever missing, the automation still runs, and Health Check names it and offers to
 You will find it in two places:
 
 - **BarnCRM Settings, then Automation.** This is the full page: the list of every
-  automation with its on and off switch, and the pause button.
+  automation with its on and off switch, the pause button, **Catch Up Now**, the people and
+  profiles that pause or bypass automation, and your own flows.
 - **The BarnCRM home page.** While automation is paused, a banner appears at the top
   of the home page telling you what is paused and when it will come back on.
 
@@ -156,9 +157,25 @@ Rules that always run (see above) still run, whatever the setting says. The time
 switches on this page and this setting all apply together: automation runs only when none of
 them stops it.
 
-Until the Automation page shows the setting, set it in Setup: search for **Custom Settings**,
-choose **Manage** next to **BarnCRM Automation Control**, then **New** for the organization
-default, or **New** under the list for a profile or a user.
+You set it on this page, in **Pause or Bypass for Some People**; there is nothing to do in
+Setup. The section lists:
+
+- **Whole Organization** first, always, with both boxes off until you change them. Ticking
+  **Pause All** here pauses automation for everyone until you untick it. While it is on, a
+  yellow bar at the top of the page says so, with a **Turn Off** button.
+- then each profile and each user that has its own row, with their **Pause All** and
+  **Bypass** boxes and a **Remove** button.
+
+To add one, choose **Profile** or **User** under **Add a Profile or User**, pick the profile or
+the person, and select **Add**. The new row starts with **Bypass** ticked, the usual reason to
+add one; change either box at any time. Each box saves as soon as you click it, and every
+change is recorded with your name and the value before, like the switches below. **Remove**
+deletes the row, so that profile or person follows the organization's row again.
+
+A profile or user row replaces the organization's row for those people, both boxes together.
+So a row with both boxes off keeps automation running for them even while **Pause All** is on
+for the whole organization: use that to keep, say, your own admin profile running during a
+long pause.
 
 ### Using It in Your Own Flows, Triggers and Validation Rules
 
@@ -175,13 +192,28 @@ your organization has:
 - **An Apex trigger:** read `BarnCRM_Automation_Control__c.getInstance()` and return early when
   `Pause_All__c` or `Bypass__c` is true.
 
+### Listing Your Own Flows on This Page
+
+In **Your Own Flows**, pick one of your organization's active flows and select **Add**. It joins
+the list of automations with its own switch, named `Flow:` and the flow's API name (for example
+`Flow:My_Gift_Flow`), and its description says the same. **Remove** takes it off the list
+again. Listing or removing a flow never activates, deactivates or changes the flow itself.
+
+The switch works when your flow starts with the **Check BarnCRM Automation** action, with
+**Automation Name** set to that same name, and ends when **Run** is false. Then switching it
+off here stops the flow, and so do the timed pause and the BarnCRM Automation Control setting.
+A listed flow that does not call the action is on the list for the record only: its switch
+does nothing.
+
 ### Catching Up After a Pause or a Bypassed Load
 
 BarnCRM does not record each save it skipped, so nothing is replayed record by record. When
 the timed pause ends, by itself or with **Resume Automation**, BarnCRM gives a household to
 every person added without one and works the rollup totals that waited. After a long Pause All
-or a bypassed load, do the same by resuming, then recompute household names on the **People
-and Households** page. Anything else that was skipped (a preferred email or phone copied to the
+or a bypassed load, select **Catch Up Now** on this page once automation runs again: it does
+the same, and also recomputes every household's name and greetings (a household marked as a
+custom name keeps its wording). It runs in the background, and the page says it has started.
+Anything else that was skipped (a preferred email or phone copied to the
 standard field, an address copied to its household, the other side of a relationship) is caught
 up by saving those records again, for example with **Bulk Update** changing nothing but a
 harmless field.

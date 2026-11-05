@@ -1,9 +1,9 @@
 /**
  * The nightly rollup run, and the two buttons on the Rollups page that turn it on and off.
  *
- * The schedule is an administrator's, not Setup's: it is started and stopped from the BarnCRM
- * Settings console, which is what "every admin setting lives in the in-app console" means for
- * something that is a scheduled job rather than a field.
+ * The run is a step of Core's one nightly run (ADR-0166 nightly-job-dispatcher) at the hour the
+ * Time of the Nightly Run setting holds; the buttons switch the step on and off. The switch is an
+ * administrator's, not Setup's: it lives in the BarnCRM Settings console.
  */
 public with sharing class RollupScheduler implements Schedulable {
     /** The name the scheduled job carries, so the console can find it again. */
@@ -43,11 +43,6 @@ public with sharing class RollupScheduler implements Schedulable {
             .format('h:mm a');
     }
 
-    /** Every day at the nightly hour. */
-    private static String nightlyCron() {
-        return '0 0 ' + nightlyHour() + ' * * ?';
-    }
-
     /**
      * True for the one run Recalculate all sets up for tonight, which covers every definition;
      * the nightly job covers Scheduled and Both only. Null on a job scheduled before this field.
@@ -73,6 +68,10 @@ public with sharing class RollupScheduler implements Schedulable {
      * (`RollupAccessSync`, D2).
      */
     public void execute(SchedulableContext context) {
+        if (context != null && this.everyDefinition != true) {
+            // Still scheduled on its own from before the nightly run (R-NJ5).
+            NightlyJobs.adoptOldSchedules();
+        }
         if (RollupService.isTurnedOff()) {
             ErrorLogger.logMessage(
                 System.Label.Core_Rollups_ScheduledRunTurnedOff,
@@ -90,27 +89,29 @@ public with sharing class RollupScheduler implements Schedulable {
         RollupQueue.processPending();
     }
 
-    /** Starts the nightly run, or does nothing when it is already scheduled. */
+    /** Switches the nightly step on, scheduling Core's nightly run when it is not. */
     public static Id start() {
-        return ScheduledJobSelector.ensure(jobNameInUse, nightlyCron(), new RollupScheduler());
+        return NightlyJobs.turnOn(jobNameInUse);
+    }
+
+    /** Switches the nightly step off. */
+    public static void stop() {
+        NightlyJobs.turnOff(jobNameInUse);
     }
 
     /**
-     * Moves the nightly run to the hour the setting now holds, when it is scheduled; does
-     * nothing when it is not, so changing the hour never starts a run nobody asked for. The
-     * settings service calls this through the engine seam when the hour is saved.
+     * The rollup run as a step of the nightly run, at the hour the setting holds. Read every
+     * night, so saving a new hour needs nothing moved.
      */
-    public static void reschedule() {
-        if (!isScheduled()) {
-            return;
-        }
-        ScheduledJobSelector.stopNamed(jobNameInUse);
-        ScheduledJobSelector.schedule(jobNameInUse, nightlyCron(), new RollupScheduler());
-    }
-
-    /** Stops the nightly run. */
-    public static void stop() {
-        ScheduledJobSelector.stopNamed(jobNameInUse);
+    public static NightlyStep step() {
+        return new NightlyStep(
+                jobNameInUse,
+                System.Label.Core_JobNotice_Rollups,
+                nightlyHour(),
+                0,
+                new RollupScheduler()
+            )
+            .withSwitch(true);
     }
 
     /** Runs the nightly work now, without waiting for tonight; null when nothing started. */
@@ -137,23 +138,13 @@ public with sharing class RollupScheduler implements Schedulable {
         return ScheduledJobSelector.ensure(name, cron, new RollupScheduler(true));
     }
 
-    /** True when the nightly run is scheduled. */
+    /** True when the step is switched on and the nightly run is scheduled. */
     public static Boolean isScheduled() {
-        return ScheduledJobSelector.isScheduled(jobNameInUse);
+        return NightlyJobs.isStepScheduled(jobNameInUse, true);
     }
 
-    /** When the nightly run is next due, or null when it is not scheduled. */
+    /** When the nightly rollup run is next due, or null when it is not scheduled. */
     public static Datetime nextRunAt() {
-        return ScheduledJobSelector.nextFireTime(jobNameInUse);
-    }
-
-    /** The nightly run as Health Check's nightly jobs list sees it (ADR-0075). */
-    public static NightlyJob nightlyJob() {
-        return new NamedNightlyJob(
-            System.Label.Core_JobNotice_Rollups,
-            jobNameInUse,
-            nightlyCron(),
-            new RollupScheduler()
-        );
+        return isScheduled() ? NightlyJobs.nextRunAt(step()) : null;
     }
 }

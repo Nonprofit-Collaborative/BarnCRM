@@ -19,10 +19,11 @@ public with sharing class VolunteersScheduler implements Schedulable {
     @TestVisible
     private static String jobNameInUse = JOB_NAME;
 
-    /** Three in the morning: after the 2:00 AM rollups, before the day's sign-ups. */
-    private static final String NIGHTLY_CRON = '0 0 3 * * ?';
-
     public void execute(SchedulableContext context) {
+        if (context != null) {
+            // Still scheduled on its own from before the nightly run (R-NJ5).
+            NightlyJobs.adoptOldSchedules();
+        }
         if (ShiftScheduleService.isTurnedOff()) {
             ErrorLogger.logMessage(
                 System.Label.Volunteers_Schedules_SkippedTurnedOff,
@@ -34,12 +35,16 @@ public with sharing class VolunteersScheduler implements Schedulable {
         ShiftScheduleBatch.startNightly();
     }
 
-    /** The nightly job as Health Check's nightly jobs list sees it (ADR-0075). */
-    public static NightlyJob nightlyJob() {
-        return new NamedNightlyJob(
-            System.Label.Volunteers_NightlyJobs_SchedulesName,
+    /**
+     * The job as a step of the nightly run (ADR-0166 nightly-job-dispatcher): three in the
+     * morning, after the 2:00 AM rollups, before the day's sign-ups.
+     */
+    public static NightlyStep step() {
+        return new NightlyStep(
             jobNameInUse,
-            NIGHTLY_CRON,
+            System.Label.Volunteers_NightlyJobs_SchedulesName,
+            3,
+            0,
             new VolunteersScheduler()
         );
     }

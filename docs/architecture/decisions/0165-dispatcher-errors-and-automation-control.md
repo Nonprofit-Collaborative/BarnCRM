@@ -1,4 +1,4 @@
-# ADR-NEXT: A handler failure refuses only its own records, and one Automation Control setting pauses or bypasses automation per org, profile or user
+# ADR-0165: A handler failure refuses only its own records, and one Automation Control setting pauses or bypasses automation per org, profile or user
 
 **Status:** Proposed (owner decisions, Brandon, 2026-11-04)
 **Date:** 2026-11-04
@@ -143,7 +143,8 @@ own bypass checkbox. Work skipped during a pause is not replayed.
 - Canonical model: Section 10 gains the setting and rules R-A6 (error contract) and R-A7
   (Automation Control); Section 12 is unchanged (the setting is its own object).
 - Built in order: the error contract, then the setting, the dispatcher read, the flow
-  templates, the Check BarnCRM Automation action and the catch-up on resume. Managing the
-  setting on the Automation page (2.6), listing an org's own flows there (2.7) and the **Catch
-  Up Now** action (2.8) follow in their own change; until then the admin guide says to set the
-  setting in Setup, Custom Settings.
+  templates, the Check BarnCRM Automation action and the catch-up on resume; then, in their
+  own change, managing the setting on the Automation page (2.6), listing an org's own flows
+  there (2.7) and the **Catch Up Now** action (2.8) (canonical model R-A8). The setting is
+  written in system mode by `AutomationSettingsWriter` after the Manage BarnCRM Settings check
+  (ADR-0021), because a custom setting takes no field permissions a BarnCRM Admin could hold.

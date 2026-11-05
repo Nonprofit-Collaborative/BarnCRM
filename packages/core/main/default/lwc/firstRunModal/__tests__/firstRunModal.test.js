@@ -162,6 +162,36 @@ describe('c-first-run-modal', () => {
     });
   });
 
+  it('says why a feature waits, never ticks it, and leaves it out of the save (RT-04)', async () => {
+    const waiting = {
+      key: 'HouseholdUpkeep',
+      name: 'Household Upkeep',
+      description: 'Households.',
+      isOn: false,
+      blockedReason: 'NPSP households are still in use.'
+    };
+    const element = await build({ ...ADMIN_STATE, features: [FEATURES[0], waiting] });
+
+    expect(all(element, 'blocked').map((p) => p.textContent)).toEqual([
+      'NPSP households are still in use.'
+    ]);
+
+    choose(element, 'mode', 'choose');
+    await settle();
+    const boxes = all(element, 'feature');
+    expect(boxes.map((box) => [box.checked, box.disabled])).toEqual([
+      [true, false],
+      [false, true]
+    ]);
+    expect(all(element, 'blocked')).toHaveLength(1);
+
+    choose(element, 'mode', 'all');
+    await settle();
+    byId(element, 'finish').click();
+    await settle();
+    expect(finish).toHaveBeenCalledWith({ suite: 'Standard', featureKeys: ['DataManager'] });
+  });
+
   it('stays open and shows the message when finishing fails', async () => {
     finish.mockRejectedValue({ body: { message: 'Setup could not be finished.' } });
     const element = await build(ADMIN_STATE);
