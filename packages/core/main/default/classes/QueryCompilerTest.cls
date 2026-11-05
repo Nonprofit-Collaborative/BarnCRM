@@ -195,7 +195,7 @@ private class QueryCompilerTest {
             } catch (QueryCompiler.QueryCompilerException refused) {
                 System.Assert.areEqual(
                     String.format(
-                        System.Label.Core_Filter_ErrorUnknownField,
+                        BarnHelp.text('Core', 'Core_Filter_ErrorUnknownField'),
                         new List<Object>{ path.abbreviate(80) }
                     ),
                     refused.getMessage(),

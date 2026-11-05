@@ -77,7 +77,7 @@ public with sharing class OrgOptimizerStorageController {
     @AuraEnabled
     public static Storage getStorage() {
         if (!hasPermission()) {
-            throw UserErrors.message(Label.Core_OrgOptimizer_ErrorNoPermission);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_OrgOptimizer_ErrorNoPermission'));
         }
         try {
             Storage result = new Storage();

@@ -11,6 +11,20 @@ import {
   sectionOptions,
   csvRows
 } from '../setupChangeModel';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_SetupChanges_Kept: 'Kept: {0} changes, from {1} to {2}.',
+  Core_SetupChanges_NothingKept: 'Nothing kept.',
+  Core_SetupChanges_Scheduled: 'Copied nightly, kept {0} days.',
+  Core_SetupChanges_NotScheduled: 'Not scheduled.',
+  Core_SetupChanges_CopyRunning: 'Running.',
+  Core_SetupChanges_CopyStarted: 'Started.',
+  Core_SetupChanges_More: 'Showing {0}; download up to {1}.',
+  Core_SetupChanges_ScanStopped: 'Stopped after {0}.',
+  Core_SetupChanges_Downloaded: 'Saved {0}.',
+  Core_SetupChanges_DatesReversed: 'Reversed.'
+});
 
 jest.mock('@salesforce/apex/SetupChangeController.getSummary', () => ({ default: jest.fn() }), {
   virtual: true
@@ -23,52 +37,6 @@ jest.mock('@salesforce/apex/SetupChangeController.copyNow', () => ({ default: je
 });
 jest.mock('@salesforce/i18n/locale', () => ({ default: 'en-US' }), { virtual: true });
 jest.mock('@salesforce/i18n/timeZone', () => ({ default: 'UTC' }), { virtual: true });
-jest.mock(
-  '@salesforce/label/c.Core_SetupChanges_Kept',
-  () => ({ default: 'Kept: {0} changes, from {1} to {2}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SetupChanges_NothingKept',
-  () => ({ default: 'Nothing kept.' }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SetupChanges_Scheduled',
-  () => ({ default: 'Copied nightly, kept {0} days.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SetupChanges_NotScheduled',
-  () => ({ default: 'Not scheduled.' }),
-  {
-    virtual: true
-  }
-);
-jest.mock('@salesforce/label/c.Core_SetupChanges_CopyRunning', () => ({ default: 'Running.' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Core_SetupChanges_CopyStarted', () => ({ default: 'Started.' }), {
-  virtual: true
-});
-jest.mock(
-  '@salesforce/label/c.Core_SetupChanges_More',
-  () => ({ default: 'Showing {0}; download up to {1}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SetupChanges_ScanStopped',
-  () => ({ default: 'Stopped after {0}.' }),
-  { virtual: true }
-);
-jest.mock('@salesforce/label/c.Core_SetupChanges_Downloaded', () => ({ default: 'Saved {0}.' }), {
-  virtual: true
-});
-jest.mock('@salesforce/label/c.Core_SetupChanges_DatesReversed', () => ({ default: 'Reversed.' }), {
-  virtual: true
-});
 jest.mock(
   '@salesforce/label/c.Core_SetupChanges_AllSections',
   () => ({ default: 'All Sections' }),

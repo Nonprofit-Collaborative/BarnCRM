@@ -295,6 +295,8 @@ private class ImportControllerTest {
             );
 
             Test.startTest();
+            // The message catalog is read once per transaction; count only the batch's queries.
+            BarnHelp.text('Core', 'Core_Import_ErrorBatchGone');
             Integer queriesBefore = Limits.getQueries();
             ImportController.BatchView view = ImportController.getBatch(batch.Id);
             Integer queries = Limits.getQueries() - queriesBefore;
@@ -373,7 +375,7 @@ private class ImportControllerTest {
                 }
             );
             rows[1].Status__c = ImportRowProcessor.STATUS_REJECTED;
-            rows[1].Error_Message__c = Label.Core_Import_ErrorLastNameMissing;
+            rows[1].Error_Message__c = BarnHelp.text('Core', 'Core_Import_ErrorLastNameMissing');
             update rows;
 
             Test.startTest();
@@ -393,7 +395,7 @@ private class ImportControllerTest {
             Assert.areEqual(1, rejected.size(), 'Only the rejected row comes back.');
             Assert.areEqual(3, rejected[0].rowNumber, 'Named by its row number in the file.');
             Assert.areEqual(
-                Label.Core_Import_ErrorLastNameMissing,
+                BarnHelp.text('Core', 'Core_Import_ErrorLastNameMissing'),
                 rejected[0].errorMessage,
                 'With the reason the administrator can act on.'
             );
@@ -427,7 +429,9 @@ private class ImportControllerTest {
                         Status__c = rejected
                             ? ImportRowProcessor.STATUS_REJECTED
                             : ImportRowProcessor.STATUS_PENDING,
-                        Error_Message__c = rejected ? Label.Core_Import_ErrorLastNameMissing : null
+                        Error_Message__c = rejected
+                            ? BarnHelp.text('Core', 'Core_Import_ErrorLastNameMissing')
+                            : null
                     )
                 );
             }
@@ -789,7 +793,7 @@ private class ImportControllerTest {
                 Assert.fail('Undoing an import needs the Manage BarnCRM Settings permission.');
             } catch (AuraHandledException expected) {
                 Assert.areEqual(
-                    Label.Core_Import_ErrorNoPermission,
+                    BarnHelp.text('Core', 'Core_Import_ErrorNoPermission'),
                     expected.getMessage(),
                     'Saying so.'
                 );
@@ -828,7 +832,7 @@ private class ImportControllerTest {
                 Assert.fail('Unreadable options are refused.');
             } catch (ImportException e) {
                 Assert.areEqual(
-                    Label.Core_Import_ErrorOptionsUnreadable,
+                    BarnHelp.text('Core', 'Core_Import_ErrorOptionsUnreadable'),
                     e.getMessage(),
                     'In words the administrator can act on.'
                 );

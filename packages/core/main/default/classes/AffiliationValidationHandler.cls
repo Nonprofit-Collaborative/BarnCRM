@@ -46,7 +46,7 @@ public with sharing class AffiliationValidationHandler extends TriggerHandler {
                 thrown,
                 records,
                 'AffiliationValidationHandler.applyAndValidate',
-                Label.Core_Affiliation_PrimaryFailed
+                BarnHelp.text('Core', 'Core_Affiliation_PrimaryFailed')
             );
         }
     }

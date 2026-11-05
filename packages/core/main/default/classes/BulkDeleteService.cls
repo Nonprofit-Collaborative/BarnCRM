@@ -125,7 +125,9 @@ public with sharing class BulkDeleteService {
             throw new BulkDeleteException(refused.getMessage());
         }
         if (!FeatureManagement.checkPermission(BulkDeleteController.PERMISSION)) {
-            throw new BulkDeleteException(System.Label.Core_Import_ErrorDeleteNeedsPermission);
+            throw new BulkDeleteException(
+                BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsPermission')
+            );
         }
         Plan result = checked(described);
         result.fromFile = true;
@@ -138,7 +140,7 @@ public with sharing class BulkDeleteService {
         if (reason != null) {
             throw new BulkDeleteException(
                 String.format(
-                    System.Label.Core_BulkDelete_ErrorObject,
+                    BarnHelp.text('Core', 'Core_BulkDelete_ErrorObject'),
                     new List<Object>{ described.getLabelPlural(), reason }
                 )
             );
@@ -168,10 +170,10 @@ public with sharing class BulkDeleteService {
             return refused;
         }
         if (!described.isDeletable()) {
-            return System.Label.Core_BulkDelete_ReasonNoDelete;
+            return BarnHelp.text('Core', 'Core_BulkDelete_ReasonNoDelete');
         }
         if (!described.isUndeletable()) {
-            return System.Label.Core_BulkDelete_ReasonNoUndelete;
+            return BarnHelp.text('Core', 'Core_BulkDelete_ReasonNoUndelete');
         }
         return null;
     }
@@ -253,10 +255,14 @@ public with sharing class BulkDeleteService {
     public static Integer countWithin(Plan checked, Integer ceiling) {
         Integer count = DataJobs.countWithin(checked.queryJson, ceiling, COUNT_MARGIN);
         if (count == null) {
-            throw new BulkDeleteException(System.Label.Core_BulkUpdate_ErrorTooManyToCount);
+            throw new BulkDeleteException(
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorTooManyToCount')
+            );
         }
         if (count == 0) {
-            throw new BulkDeleteException(System.Label.Core_BulkDelete_ErrorNothingMatches);
+            throw new BulkDeleteException(
+                BarnHelp.text('Core', 'Core_BulkDelete_ErrorNothingMatches')
+            );
         }
         return count;
     }
@@ -272,7 +278,7 @@ public with sharing class BulkDeleteService {
     public static Import_Batch__c start(String queryJson, Integer confirmedCount) {
         Plan checked = plan(queryJson);
         if (confirmedCount == null || confirmedCount < 1) {
-            throw new BulkDeleteException(System.Label.Core_BulkUpdate_ErrorConfirm);
+            throw new BulkDeleteException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorConfirm'));
         }
         Integer ceiling = runLimit();
         if (confirmedCount > ceiling) {
@@ -282,7 +288,7 @@ public with sharing class BulkDeleteService {
         if (count > confirmedCount) {
             throw new BulkDeleteException(
                 String.format(
-                    System.Label.Core_BulkDelete_ErrorMoreThanConfirmed,
+                    BarnHelp.text('Core', 'Core_BulkDelete_ErrorMoreThanConfirmed'),
                     new List<Object>{ confirmedCount.format() }
                 )
             );
@@ -321,7 +327,7 @@ public with sharing class BulkDeleteService {
             Committed_By__c = UserInfo.getUserId(),
             Undo_Deadline__c = undoDeadlineFrom(now),
             Run_Log__c = String.format(
-                System.Label.Core_BulkDelete_LogStarted,
+                BarnHelp.text('Core', 'Core_BulkDelete_LogStarted'),
                 new List<Object>{
                     UserInfo.getName(),
                     now.format(),
@@ -388,7 +394,9 @@ public with sharing class BulkDeleteService {
         Plan checked = planForFile(objectOfFile(batch));
         Integer count = matchedRows(batch.Id);
         if (count == 0) {
-            throw new BulkDeleteException(System.Label.Core_BulkDelete_ErrorNothingMatches);
+            throw new BulkDeleteException(
+                BarnHelp.text('Core', 'Core_BulkDelete_ErrorNothingMatches')
+            );
         }
         Integer ceiling = runLimit();
         if (count > ceiling) {
@@ -397,7 +405,7 @@ public with sharing class BulkDeleteService {
         if (confirmedCount != count) {
             throw new BulkDeleteException(
                 String.format(
-                    System.Label.Core_Import_ErrorDeleteCountDiffers,
+                    BarnHelp.text('Core', 'Core_Import_ErrorDeleteCountDiffers'),
                     new List<Object>{ count.format() }
                 )
             );
@@ -412,7 +420,7 @@ public with sharing class BulkDeleteService {
             FOR UPDATE
         ];
         if (!ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(locked.Status__c)) {
-            throw new BulkDeleteException(System.Label.Core_Import_ErrorDryRunFirst);
+            throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Import_ErrorDryRunFirst'));
         }
         Import_Batch__c job = jobFields(checked, count, count);
         job.Id = batch.Id;
@@ -446,10 +454,10 @@ public with sharing class BulkDeleteService {
     private static Import_Batch__c dryRunOfFile(Id batchId) {
         Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
         if (batch == null) {
-            throw new BulkDeleteException(System.Label.Core_Import_ErrorBatchGone);
+            throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'));
         }
         if (!ImportBatchService.STATUS_DRY_RUN_COMPLETE.equals(batch.Status__c)) {
-            throw new BulkDeleteException(System.Label.Core_Import_ErrorDryRunFirst);
+            throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Import_ErrorDryRunFirst'));
         }
         return batch;
     }
@@ -462,7 +470,9 @@ public with sharing class BulkDeleteService {
             type == null ||
             ImportObjectSchema.operationOf(template) != ImportObjectSchema.OPERATION_DELETE
         ) {
-            throw new BulkDeleteException(System.Label.Core_Import_ErrorNotDeleteByFile);
+            throw new BulkDeleteException(
+                BarnHelp.text('Core', 'Core_Import_ErrorNotDeleteByFile')
+            );
         }
         return type.getDescribe(SObjectDescribeOptions.DEFERRED).getName();
     }
@@ -625,7 +635,7 @@ public with sharing class BulkDeleteService {
             job = null;
         }
         view.reason = job == null
-            ? System.Label.Core_BulkDelete_ErrorNotBulkDelete
+            ? BarnHelp.text('Core', 'Core_BulkDelete_ErrorNotBulkDelete')
             : ImportUndoService.refusal(job);
         if (job == null) {
             return view;
@@ -636,7 +646,7 @@ public with sharing class BulkDeleteService {
             view.records = deletedEntries(job.Id);
         }
         if (String.isBlank(view.reason) && view.records == 0) {
-            view.reason = System.Label.Core_BulkDelete_UndoNothing;
+            view.reason = BarnHelp.text('Core', 'Core_BulkDelete_UndoNothing');
         }
         view.allowed = String.isBlank(view.reason);
         return view;
@@ -654,7 +664,7 @@ public with sharing class BulkDeleteService {
         if (confirmedRecords != view.records) {
             throw new BulkDeleteException(
                 String.format(
-                    System.Label.Core_BulkDelete_UndoCountChanged,
+                    BarnHelp.text('Core', 'Core_BulkDelete_UndoCountChanged'),
                     new List<Object>{
                         String.valueOf(confirmedRecords == null ? 0 : confirmedRecords),
                         String.valueOf(view.records)
@@ -712,7 +722,7 @@ public with sharing class BulkDeleteService {
 
     public static String overLimit(Integer ceiling) {
         return String.format(
-            System.Label.Core_BulkDelete_ErrorOverLimit,
+            BarnHelp.text('Core', 'Core_BulkDelete_ErrorOverLimit'),
             new List<Object>{ ceiling.format() }
         );
     }

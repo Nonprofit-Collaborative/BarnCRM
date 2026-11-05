@@ -196,7 +196,7 @@ private class PersonErasureTest {
             }
             Assert.isNotNull(householdRow, 'The kept household is reported');
             Assert.areEqual(
-                Label.Core_Erase_NoteHouseholdKept,
+                BarnHelp.text('Core', 'Core_Erase_NoteHouseholdKept'),
                 householdRow.note,
                 'Says it was kept for credited records'
             );
@@ -249,7 +249,7 @@ private class PersonErasureTest {
             }
             Assert.isNotNull(householdRow, 'Reported as a household, not as an account');
             Assert.areEqual(
-                Label.Core_Erase_NoteHouseholdKeptSetting,
+                BarnHelp.text('Core', 'Core_Erase_NoteHouseholdKeptSetting'),
                 householdRow.note,
                 'Says it was kept because the setting is off, not for credited records'
             );
@@ -359,7 +359,7 @@ private class PersonErasureTest {
                 Assert.isNotNull(row, 'The household is reported');
                 Assert.areEqual(PersonErasure.UPDATED, row.action, 'As updated');
                 Assert.areEqual(
-                    Label.Core_Erase_NoteCustomNameReleased,
+                    BarnHelp.text('Core', 'Core_Erase_NoteCustomNameReleased'),
                     row.note,
                     'Saying the typed name was replaced'
                 );
@@ -375,7 +375,7 @@ private class PersonErasureTest {
             String details = [SELECT Details__c FROM Erasure__c WHERE Id = :result.erasureId]
             .Details__c;
             Assert.isTrue(
-                details.contains(Label.Core_Erase_NoteCustomNameReleased),
+                details.contains(BarnHelp.text('Core', 'Core_Erase_NoteCustomNameReleased')),
                 'The Erasure record says the same: ' + details
             );
             Assert.isFalse(details.contains('Jordan'), 'And names nobody');
@@ -403,7 +403,11 @@ private class PersonErasureTest {
             );
             PersonErasure.Change row = sharedHouseholdRow(result, jordan.AccountId);
             Assert.areEqual(PersonErasure.UPDATED, row.action, 'Reported as updated');
-            Assert.areEqual(Label.Core_Erase_NoteRenamed, row.note, 'Named again by upkeep');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Erase_NoteRenamed'),
+                row.note,
+                'Named again by upkeep'
+            );
             Assert.isTrue(
                 row.fields.contains(Account.Member_Count__c.getDescribe().getLabel()),
                 'Lists the count: ' + row.fields
@@ -663,7 +667,7 @@ private class PersonErasureTest {
             Assert.areEqual(1, kept.get(events)?.count, 'The event counted');
             Assert.areEqual(1, kept.get(Label.Core_Erase_Files)?.count, 'The file counted');
             Assert.areEqual(
-                Label.Core_Erase_NoteByHand,
+                BarnHelp.text('Core', 'Core_Erase_NoteByHand'),
                 kept.get(tasks).note,
                 'Told to act by hand'
             );
@@ -693,7 +697,7 @@ private class PersonErasureTest {
                 Assert.fail('Refused without Erase People');
             } catch (PersonErasure.ErasureException refused) {
                 Assert.areEqual(
-                    Label.Core_Erase_NoPermission,
+                    BarnHelp.text('Core', 'Core_Erase_NoPermission'),
                     refused.getMessage(),
                     'Says which permission'
                 );
@@ -753,7 +757,7 @@ private class PersonErasureTest {
                 Assert.fail('Refused for a name that does not match');
             } catch (PersonErasure.ErasureException refused) {
                 Assert.areEqual(
-                    Label.Core_Erase_NameMismatch,
+                    BarnHelp.text('Core', 'Core_Erase_NameMismatch'),
                     refused.getMessage(),
                     'Asks for the name'
                 );
@@ -765,7 +769,9 @@ private class PersonErasureTest {
             } catch (PersonErasure.ErasureException refused) {
                 Assert.isTrue(
                     refused.getMessage()
-                        .startsWith(Label.Core_Erase_AlreadyErased.substringBefore('{0}')),
+                        .startsWith(
+                            BarnHelp.text('Core', 'Core_Erase_AlreadyErased').substringBefore('{0}')
+                        ),
                     'Already erased'
                 );
             }

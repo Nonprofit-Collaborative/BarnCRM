@@ -200,7 +200,7 @@ private class ImportRetryRejectsTest {
             );
             Assert.areEqual(started, after.Started_At__c, 'The import keeps its start.');
             Assert.isTrue(
-                after.Run_Log__c.contains(Label.Core_Import_LogCommitHeader),
+                after.Run_Log__c.contains(BarnHelp.text('Core', 'Core_Import_LogCommitHeader')),
                 'The log keeps both runs.'
             );
             Assert.isNull(ImportUndoService.refusal(after), 'And it is undone as one.');
@@ -221,7 +221,7 @@ private class ImportRetryRejectsTest {
             Id me = UserInfo.getUserId();
             otherUser.Committed_By__c = [SELECT Id FROM User WHERE Id != :me LIMIT 1].Id;
             Assert.areEqual(
-                Label.Core_Import_ErrorRetryOtherUser,
+                BarnHelp.text('Core', 'Core_Import_ErrorRetryOtherUser'),
                 ImportBatchService.retryRefusal(otherUser),
                 'Only the person who committed it.'
             );
@@ -229,7 +229,7 @@ private class ImportRetryRejectsTest {
             Import_Batch__c nothingRejected = batch.clone(true, true, true, true);
             nothingRejected.Rows_Rejected__c = 0;
             Assert.areEqual(
-                Label.Core_Import_ErrorRetryNotOpen,
+                BarnHelp.text('Core', 'Core_Import_ErrorRetryNotOpen'),
                 ImportBatchService.retryRefusal(nothingRejected),
                 'Nothing to retry.'
             );
@@ -237,7 +237,7 @@ private class ImportRetryRejectsTest {
             Import_Batch__c dataJob = batch.clone(true, true, true, true);
             dataJob.Operation__c = BulkUpdateService.OPERATION_UPDATE;
             Assert.areEqual(
-                Label.Core_Import_ErrorRetryNotOpen,
+                BarnHelp.text('Core', 'Core_Import_ErrorRetryNotOpen'),
                 ImportBatchService.retryRefusal(dataJob),
                 'A bulk update is not a file import.'
             );
@@ -245,7 +245,7 @@ private class ImportRetryRejectsTest {
             Import_Batch__c previewOnly = batch.clone(true, true, true, true);
             previewOnly.Status__c = ImportBatchService.STATUS_DRY_RUN_COMPLETE;
             Assert.areEqual(
-                Label.Core_Import_ErrorRetryNotOpen,
+                BarnHelp.text('Core', 'Core_Import_ErrorRetryNotOpen'),
                 ImportBatchService.retryRefusal(previewOnly),
                 'Nor an import that was only previewed.'
             );
@@ -254,7 +254,10 @@ private class ImportRetryRejectsTest {
                 ImportBatchService.stageRows(batch.Id, fixedRows(), 2);
                 Assert.fail('A finished import takes rows only through a retry.');
             } catch (ImportException e) {
-                Assert.areEqual(Label.Core_Import_ErrorStagingClosed, e.getMessage());
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_Import_ErrorStagingClosed'),
+                    e.getMessage()
+                );
             }
         }
     }

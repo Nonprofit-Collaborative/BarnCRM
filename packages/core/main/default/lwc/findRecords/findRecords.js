@@ -37,12 +37,7 @@ import ROWS_TO_SHOW from '@salesforce/label/c.Core_Find_RowsToShow';
 import SOQL from '@salesforce/label/c.Core_Find_Soql';
 import RUN from '@salesforce/label/c.Core_Find_Run';
 import EXPORT from '@salesforce/label/c.Core_Find_Export';
-import EXPORTING from '@salesforce/label/c.Core_Find_Exporting';
 import EXPORT_DONE from '@salesforce/label/c.Core_Find_ExportDone';
-import EXPORT_STOPPED from '@salesforce/label/c.Core_Find_ExportStopped';
-import RESULT_COUNT from '@salesforce/label/c.Core_Find_ResultCount';
-import RESULTS_CAPPED from '@salesforce/label/c.Core_Find_ResultsCapped';
-import NO_RESULTS from '@salesforce/label/c.Core_Find_NoResults';
 import SAVED_QUERIES from '@salesforce/label/c.Core_Find_SavedQueries';
 import CHOOSE_SAVED from '@salesforce/label/c.Core_Find_ChooseSaved';
 import SHARED_BY from '@salesforce/label/c.Core_Find_SharedBy';
@@ -52,30 +47,20 @@ import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import SAVE_AS from '@salesforce/label/c.Core_Find_SaveAs';
 import DELETE_LABEL from '@salesforce/label/c.Core_Find_Delete';
 import NEW_QUERY from '@salesforce/label/c.Core_Find_New';
-import SAVED_NOTICE from '@salesforce/label/c.Core_Find_SavedNotice';
 import DELETE_CONFIRM_HEADING from '@salesforce/label/c.Core_Find_DeleteConfirmHeading';
-import DELETE_CONFIRM_BODY from '@salesforce/label/c.Core_Find_DeleteConfirmBody';
-import DELETE_CONFIRM_SHARED from '@salesforce/label/c.Core_Find_DeleteConfirmShared';
 import DELETE_CONFIRM_CANCEL from '@salesforce/label/c.Core_Find_DeleteConfirmCancel';
-import DELETED_NOTICE from '@salesforce/label/c.Core_Find_DeletedNotice';
-import FIX_CONDITIONS from '@salesforce/label/c.Core_Find_FixConditions';
-import CHOOSE_COLUMNS from '@salesforce/label/c.Core_Find_ChooseColumns';
 import LOADING from '@salesforce/label/c.Core_EraseAction_Working';
 import BULK_UPDATE from '@salesforce/label/c.Core_SuperTransform_Title';
 import BULK_DELETE from '@salesforce/label/c.Core_BulkDelete_Title';
 import EXPORT_EXCEL from '@salesforce/label/c.Core_Find_ExportExcel';
 import EXPORT_FILES from '@salesforce/label/c.Core_Find_ExportFiles';
 import SUMMARIZE from '@salesforce/label/c.Core_Find_Summarize';
-import EDIT_SAVED from '@salesforce/label/c.Core_Find_EditSaved';
-import EDIT_FAILED from '@salesforce/label/c.Core_Find_EditFailed';
-import HIDDEN_COLUMNS from '@salesforce/label/c.Core_Find_HiddenColumns';
 import GUIDE_URL from '@salesforce/label/c.Core_Find_GuideUrl';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Find_EmptyHeading';
 import NO_RESULTS_HEADING from '@salesforce/label/c.Core_Find_NoResultsHeading';
 import SHOW_QUERY from '@salesforce/label/c.Core_Find_ShowQuery';
 import RESULTS from '@salesforce/label/c.Core_Find_Results';
 import SHOW_MORE from '@salesforce/label/c.Core_AccessExplorer_ShowMore';
-import SHOWING_OF from '@salesforce/label/c.Core_Find_ShowingOf';
 import EXPORT_MENU from '@salesforce/label/c.Core_Find_ExportMenu';
 import CHANGE_RECORDS from '@salesforce/label/c.Core_Find_ChangeRecords';
 import SAVE_HEADING from '@salesforce/label/c.Core_Find_SaveHeading';
@@ -193,7 +178,9 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
     summarize: SUMMARIZE,
     bulkUpdate: BULK_UPDATE,
     bulkDelete: BULK_DELETE,
-    noResults: NO_RESULTS,
+    get noResults() {
+      return helpText('Core', 'Core_Find_NoResults');
+    },
     savedQueries: SAVED_QUERIES,
     chooseSaved: CHOOSE_SAVED,
     queryName: QUERY_NAME,
@@ -612,7 +599,7 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
 
   get showingLine() {
     return format(
-      SHOWING_OF,
+      helpText('Core', 'Core_Find_ShowingOf'),
       String(Math.min(this.shownCount, this.rows.length)),
       String(this.rows.length)
     );
@@ -702,8 +689,8 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
     }
     const count = String(this.rows.length);
     return this.rows.length >= Number(this.rowLimit)
-      ? format(RESULTS_CAPPED, count)
-      : format(RESULT_COUNT, count);
+      ? format(helpText('Core', 'Core_Find_ResultsCapped'), count)
+      : format(helpText('Core', 'Core_Find_ResultCount'), count);
   }
 
   /* ---------- the query document ---------- */
@@ -736,12 +723,12 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
   /** Says what to fix before anything is sent, or returns true. */
   checkReady() {
     if (this.columns.length === 0) {
-      this.errorMessage = CHOOSE_COLUMNS;
+      this.errorMessage = helpText('Core', 'Core_Find_ChooseColumns');
       return false;
     }
     const builder = this.template.querySelector('c-filter-builder');
     if (!this.filterValid || !this.relatedValid || (builder && !builder.reportValidity())) {
-      this.errorMessage = FIX_CONDITIONS;
+      this.errorMessage = helpText('Core', 'Core_Find_FixConditions');
       return false;
     }
     return true;
@@ -852,7 +839,11 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
       const failed = new Set(summary.errors.map((error) => error.recordId));
       this.draftValues = drafts.filter((draft) => failed.has(draft.Id));
       this.tableErrors = failed.size === 0 ? undefined : this.errorsFor(summary.errors, drafts);
-      this.noticeMessage = format(EDIT_SAVED, String(summary.saved), String(summary.unchanged));
+      this.noticeMessage = format(
+        helpText('Core', 'Core_Find_EditSaved'),
+        String(summary.saved),
+        String(summary.unchanged)
+      );
     });
   }
 
@@ -861,14 +852,17 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
     for (const error of errors) {
       const draft = drafts.find((candidate) => candidate.Id === error.recordId) || {};
       rows[error.recordId] = {
-        title: EDIT_FAILED.split('{0}').join('1'),
+        title: helpText('Core', 'Core_Find_EditFailed').split('{0}').join('1'),
         messages: [error.message],
         fieldNames: Object.keys(draft).filter((name) => name !== 'Id')
       };
     }
     return {
       rows,
-      table: { title: EDIT_FAILED.split('{0}').join(String(errors.length)), messages: [] }
+      table: {
+        title: helpText('Core', 'Core_Find_EditFailed').split('{0}').join(String(errors.length)),
+        messages: []
+      }
     };
   }
 
@@ -1028,7 +1022,7 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
         }
         afterId = result.lastId;
         done = result.done;
-        this.noticeMessage = format(EXPORTING, String(rows.length));
+        this.noticeMessage = format(helpText('Core', 'Core_Find_Exporting'), String(rows.length));
       }
       const stopped = leftOver || (rows.length >= limit && !done);
       if (kind === 'xlsx') {
@@ -1062,7 +1056,7 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
         );
       }
       this.noticeMessage = stopped
-        ? format(EXPORT_STOPPED, String(limit))
+        ? format(helpText('Core', 'Core_Find_ExportStopped'), String(limit))
         : format(EXPORT_DONE, String(rows.length));
     });
   }
@@ -1096,7 +1090,7 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
       } else if (saved) {
         this.openQueryId = saved.recordId;
       }
-      this.noticeMessage = format(SAVED_NOTICE, this.queryName.trim());
+      this.noticeMessage = format(helpText('Core', 'Core_Find_SavedNotice'), this.queryName.trim());
     });
   }
 
@@ -1105,8 +1099,11 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: DELETE_CONFIRM_HEADING,
-      message: format(DELETE_CONFIRM_BODY, name),
-      details: this.openQuery && this.openQuery.shared ? [DELETE_CONFIRM_SHARED] : [],
+      message: format(helpText('Core', 'Core_Find_DeleteConfirmBody'), name),
+      details:
+        this.openQuery && this.openQuery.shared
+          ? [helpText('Core', 'Core_Find_DeleteConfirmShared')]
+          : [],
       confirmLabel: DELETE_LABEL,
       cancelLabel: DELETE_CONFIRM_CANCEL,
       confirmVariant: 'destructive'
@@ -1118,7 +1115,7 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
       this.page = await deleteQuery({ recordId: this.openQueryId });
       this.resetQuery();
       this.objectApiName = undefined;
-      this.noticeMessage = format(DELETED_NOTICE, name);
+      this.noticeMessage = format(helpText('Core', 'Core_Find_DeletedNotice'), name);
     });
   }
 
@@ -1210,7 +1207,7 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
     const hidden = fields.filter((path) => !this.fieldOf(path));
     this.columns = fields.filter((path) => this.fieldOf(path));
     if (hidden.length > 0) {
-      this.noticeMessage = format(HIDDEN_COLUMNS, hidden.join(', '));
+      this.noticeMessage = format(helpText('Core', 'Core_Find_HiddenColumns'), hidden.join(', '));
     }
     this.filterJson = document.filter ? JSON.stringify(document.filter) : '';
     const order = (document.orderBy || [])[0];

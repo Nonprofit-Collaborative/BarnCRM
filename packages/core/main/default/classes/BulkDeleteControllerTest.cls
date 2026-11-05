@@ -67,7 +67,7 @@ private class BulkDeleteControllerTest {
                 System.Assert.fail('Refused');
             } catch (AuraHandledException expected) {
                 System.Assert.areEqual(
-                    System.Label.Core_BulkDelete_ErrorNoPermission,
+                    BarnHelp.text('Core', 'Core_BulkDelete_ErrorNoPermission'),
                     expected.getMessage()
                 );
             }
@@ -194,7 +194,7 @@ private class BulkDeleteControllerTest {
                     System.Assert.fail('Another person job is not hers to open');
                 } catch (AuraHandledException refused) {
                     System.Assert.areEqual(
-                        System.Label.Core_BulkDelete_ErrorNotBulkDelete,
+                        BarnHelp.text('Core', 'Core_BulkDelete_ErrorNotBulkDelete'),
                         refused.getMessage()
                     );
                 }
@@ -221,7 +221,7 @@ private class BulkDeleteControllerTest {
                     System.Assert.fail('Refused');
                 } catch (AuraHandledException expected) {
                     System.Assert.areEqual(
-                        System.Label.Core_BulkDelete_ErrorNotBulkDelete,
+                        BarnHelp.text('Core', 'Core_BulkDelete_ErrorNotBulkDelete'),
                         expected.getMessage()
                     );
                 }

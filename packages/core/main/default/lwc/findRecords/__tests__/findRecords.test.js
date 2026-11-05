@@ -21,6 +21,15 @@ jest.mock('@salesforce/label/c.Core_Format_Pair', () => ({ default: '{0}: {1}' }
 import saveEdits from '@salesforce/apex/FindController.saveEdits';
 import * as navigation from 'lightning/navigation';
 import { TextEncoder as NodeTextEncoder } from 'util';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_Find_HiddenColumns: 'Left out columns you do not have access to: {0}.',
+  Core_Find_EditSaved: 'Saved {0}. {1} unchanged.',
+  Core_Find_DeleteConfirmBody: '{0} will be deleted.',
+  Core_Find_ExportStopped: 'Stopped at {0} rows.',
+  Core_Find_ResultCount: '{0} rows shown.'
+});
 
 // Find opens Super Transformer through the navigation mixin; the page reference stays a test
 // wire adapter so a test can emit state.
@@ -45,11 +54,6 @@ jest.mock('lightning/navigation', () => {
 // jsdom has no TextEncoder; the Excel writer needs one, as browsers have.
 global.TextEncoder = global.TextEncoder || NodeTextEncoder;
 
-jest.mock(
-  '@salesforce/label/c.Core_Find_HiddenColumns',
-  () => ({ default: 'Left out columns you do not have access to: {0}.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/i18n/timeZone', () => ({ default: 'America/New_York' }), {
   virtual: true
 });
@@ -68,11 +72,6 @@ jest.mock('@salesforce/apex/FindController.startServerExport', () => ({ default:
 jest.mock('@salesforce/apex/FindController.summarize', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_Find_EditSaved',
-  () => ({ default: 'Saved {0}. {1} unchanged.' }),
-  { virtual: true }
-);
 
 jest.mock(
   '@salesforce/apex/FindController.listObjects',
@@ -100,11 +99,6 @@ jest.mock('@salesforce/apex/FindController.saveQuery', () => ({ default: jest.fn
 jest.mock('@salesforce/apex/FindController.deleteQuery', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_Find_DeleteConfirmBody',
-  () => ({ default: '{0} will be deleted.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/apex/BulkUpdateController.getPage', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -115,14 +109,6 @@ jest.mock('@salesforce/apex/QueryFieldCatalog.getObjectInfo', () => ({ default: 
   virtual: true
 });
 jest.mock('@salesforce/label/c.Core_Find_ExportDone', () => ({ default: 'Exported {0} rows.' }), {
-  virtual: true
-});
-jest.mock(
-  '@salesforce/label/c.Core_Find_ExportStopped',
-  () => ({ default: 'Stopped at {0} rows.' }),
-  { virtual: true }
-);
-jest.mock('@salesforce/label/c.Core_Find_ResultCount', () => ({ default: '{0} rows shown.' }), {
   virtual: true
 });
 

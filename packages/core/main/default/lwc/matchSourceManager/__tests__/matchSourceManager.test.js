@@ -5,6 +5,11 @@ import getView from '@salesforce/apex/MatchSourceController.getView';
 import tryValue from '@salesforce/apex/MatchSourceController.tryValue';
 import setArchived from '@salesforce/apex/CustomMetadataManagerController.setArchived';
 import getOutcome from '@salesforce/apex/CustomMetadataManagerController.getOutcome';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_CmdtManager_Saved: 'Saved. {0} is in the list.'
+});
 
 jest.mock('@salesforce/apex/MatchSourceController.getView', () => ({ default: jest.fn() }), {
   virtual: true
@@ -32,13 +37,6 @@ jest.mock(
   '@salesforce/apex/CustomMetadataManagerController.getOutcome',
   () => ({ default: jest.fn() }),
   { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_CmdtManager_Saved',
-  () => ({ default: 'Saved. {0} is in the list.' }),
-  {
-    virtual: true
-  }
 );
 jest.mock(
   '@salesforce/label/c.Core_MatchLogic_TryComparedAs',

@@ -52,10 +52,10 @@ public with sharing class OtherRollupTools {
     public static List<String> notices() {
         List<String> notices = new List<String>();
         if (hasDlrs()) {
-            notices.add(System.Label.Core_OtherRollupTools_Dlrs);
+            notices.add(BarnHelp.text('Core', 'Core_OtherRollupTools_Dlrs'));
         }
         if (hasRollupHelper()) {
-            notices.add(System.Label.Core_OtherRollupTools_RollupHelper);
+            notices.add(BarnHelp.text('Core', 'Core_OtherRollupTools_RollupHelper'));
         }
         return notices;
     }

@@ -380,7 +380,9 @@ private class HealthCheckHouseholdChecksTest {
             HealthCheckService.Finding finding = runAsMaria(PEOPLE);
 
             Assert.isTrue(
-                finding.detail.contains(System.Label.Core_HealthCheck_OrphansNativeNote),
+                finding.detail.contains(
+                    BarnHelp.text('Core', 'Core_HealthCheck_OrphansNativeNote')
+                ),
                 'BarnCRM cannot see native membership, and says so (R-H12).'
             );
         }

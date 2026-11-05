@@ -137,7 +137,7 @@ private class BulkDeleteUndoTest {
             );
             System.Assert.areEqual(String.valueOf(binned[1].Id), undone[0].get('id'));
             System.Assert.areEqual(
-                System.Label.Core_BulkDelete_UndoPurged,
+                BarnHelp.text('Core', 'Core_BulkDelete_UndoPurged'),
                 undone[0].get('reason')
             );
         }
@@ -251,7 +251,10 @@ private class BulkDeleteUndoTest {
             insert updateJob;
             BulkDeleteService.UndoPreview preview = BulkDeleteService.undoPreview(updateJob.Id);
             System.Assert.isFalse(preview.allowed, 'Refused');
-            System.Assert.areEqual(System.Label.Core_BulkDelete_ErrorNotBulkDelete, preview.reason);
+            System.Assert.areEqual(
+                BarnHelp.text('Core', 'Core_BulkDelete_ErrorNotBulkDelete'),
+                preview.reason
+            );
         }
     }
 
@@ -265,13 +268,16 @@ private class BulkDeleteUndoTest {
             }
             ImportUndoService.Preview preview = ImportUndoService.preview(jobId);
             System.Assert.isFalse(preview.allowed, 'Refused');
-            System.Assert.areEqual(System.Label.Core_Import_UndoErrorBulkDelete, preview.reason);
+            System.Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Import_UndoErrorBulkDelete'),
+                preview.reason
+            );
             try {
                 ImportUndoService.start(jobId, 0);
                 System.Assert.fail('Refused');
             } catch (ImportException expected) {
                 System.Assert.areEqual(
-                    System.Label.Core_Import_UndoErrorBulkDelete,
+                    BarnHelp.text('Core', 'Core_Import_UndoErrorBulkDelete'),
                     expected.getMessage()
                 );
             }

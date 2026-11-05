@@ -665,7 +665,7 @@ public with sharing class HealthCheckService {
     public static Finding checkFailed(String checkKey, Exception e) {
         logQuietly(e);
         String detail = String.format(
-            System.Label.Core_HealthCheck_CheckFailedDetail,
+            BarnHelp.text('Core', 'Core_HealthCheck_CheckFailedDetail'),
             new List<Object>{ checkKey }
         );
         return new Finding(

@@ -137,12 +137,12 @@ public with sharing class DuplicateController {
             requireSuggestionAccess();
             if (DuplicateSelector.scanRunning(SCAN_CLASS)) {
                 throw new DuplicateService.DuplicateException(
-                    Label.Core_Duplicates_ErrorScanRunning
+                    BarnHelp.text('Core', 'Core_Duplicates_ErrorScanRunning')
                 );
             }
             if (DuplicateScanBatch.start() == null) {
                 throw new DuplicateService.DuplicateException(
-                    Label.Core_Duplicates_ErrorNoActiveRule
+                    BarnHelp.text('Core', 'Core_Duplicates_ErrorNoActiveRule')
                 );
             }
             return currentView();
@@ -275,7 +275,7 @@ public with sharing class DuplicateController {
     private static void requireSuggestionAccess() {
         if (!canReviewSuggestions()) {
             throw new DuplicateService.DuplicateException(
-                Label.Core_Duplicates_ErrorNoSuggestionAccess
+                BarnHelp.text('Core', 'Core_Duplicates_ErrorNoSuggestionAccess')
             );
         }
     }
@@ -447,7 +447,7 @@ public with sharing class DuplicateController {
     private static void requirePermission() {
         if (!FeatureManagement.checkPermission(EDIT_PERMISSION)) {
             throw new DuplicateService.DuplicateException(
-                Label.Core_Duplicates_ErrorPermissionRequired
+                BarnHelp.text('Core', 'Core_Duplicates_ErrorPermissionRequired')
             );
         }
     }
@@ -460,6 +460,11 @@ public with sharing class DuplicateController {
         Boolean expected =
             caught instanceof DuplicateService.DuplicateException ||
             caught instanceof HouseholdException;
-        return UserErrors.wrap(caught, expected, context, Label.Core_Duplicates_ErrorUnexpected);
+        return UserErrors.wrap(
+            caught,
+            expected,
+            context,
+            BarnHelp.text('Core', 'Core_Duplicates_ErrorUnexpected')
+        );
     }
 }

@@ -237,7 +237,7 @@ private class FieldUtilizationControllerTest {
             Assert.isTrue(planned.fields.isEmpty(), 'No field is offered for counting.');
             Assert.areEqual(
                 String.format(
-                    System.Label.Core_FieldUtilization_TooLarge,
+                    BarnHelp.text('Core', 'Core_FieldUtilization_TooLarge'),
                     new List<Object>{ Integer.valueOf(100).format() }
                 ),
                 refusal,
@@ -333,7 +333,7 @@ private class FieldUtilizationControllerTest {
 
             Assert.areEqual(
                 String.format(
-                    System.Label.Core_FieldUtilization_UnknownObject,
+                    BarnHelp.text('Core', 'Core_FieldUtilization_UnknownObject'),
                     new List<Object>{ 'Not_A_Real_Object__c' }
                 ),
                 unknown,
@@ -357,7 +357,7 @@ private class FieldUtilizationControllerTest {
             }
 
             Assert.areEqual(
-                System.Label.Core_FieldUtilization_PermissionRequired,
+                BarnHelp.text('Core', 'Core_FieldUtilization_PermissionRequired'),
                 refusal,
                 'Refused.'
             );
@@ -583,7 +583,7 @@ private class FieldUtilizationControllerTest {
             }
 
             Assert.areEqual(
-                System.Label.Core_FieldUtilization_DeleteNoAccess,
+                BarnHelp.text('Core', 'Core_FieldUtilization_DeleteNoAccess'),
                 refusal,
                 'Refused without delete access.'
             );
@@ -621,7 +621,7 @@ private class FieldUtilizationControllerTest {
             Assert.areEqual(3, refusals.size(), 'Each call is refused.');
             for (String refusal : refusals) {
                 Assert.areEqual(
-                    System.Label.Core_FieldUtilization_PermissionRequired,
+                    BarnHelp.text('Core', 'Core_FieldUtilization_PermissionRequired'),
                     refusal,
                     'The permission is required.'
                 );

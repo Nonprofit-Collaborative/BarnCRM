@@ -67,7 +67,7 @@ public with sharing class ErrorDigestRecipients {
             return null;
         }
         return String.format(
-            System.Label.Core_ErrorDigest_UnknownRecipients,
+            BarnHelp.text('Core', 'Core_ErrorDigest_UnknownRecipients'),
             new List<Object>{ String.join(unknown, ', ') }
         );
     }

@@ -302,7 +302,7 @@ public with sharing class AddressService {
                 continue;
             }
             for (Address__c address : untickedByOwner.get(ownerId)) {
-                address.addError(Label.Core_Address_CannotUntickOnlyDefault);
+                address.addError(BarnHelp.text('Core', 'Core_Address_CannotUntickOnlyDefault'));
             }
         }
     }
@@ -644,7 +644,7 @@ public with sharing class AddressService {
         }
         List<Address__c> sources = AddressSelector.selectByIds(householdByAddressId.keySet());
         if (sources.size() != householdByAddressId.size()) {
-            throw new AddressMoveException(System.Label.Core_Address_MoveNotFound);
+            throw new AddressMoveException(BarnHelp.text('Core', 'Core_Address_MoveNotFound'));
         }
         Set<Id> personIds = new Set<Id>();
         for (Address__c source : sources) {
@@ -677,7 +677,9 @@ public with sharing class AddressService {
             Id householdId = householdByAddressId.get(source.Id);
             Set<Id> theirs = householdsByPerson.get(personId);
             if (householdId == null || theirs == null || !theirs.contains(householdId)) {
-                throw new AddressMoveException(System.Label.Core_Address_MoveNotTheirHousehold);
+                throw new AddressMoveException(
+                    BarnHelp.text('Core', 'Core_Address_MoveNotTheirHousehold')
+                );
             }
             if (source.Contact__c != null && ownHouseholdByPerson.get(personId) == householdId) {
                 released.put(personId, householdId);
@@ -772,7 +774,7 @@ public with sharing class AddressService {
         for (Id householdId : tickedByHousehold.keySet()) {
             HouseholdMove move = moves.get(householdId);
             if (move.primary == null) {
-                throw new AddressMoveException(System.Label.Core_Address_MoveNoPrimary);
+                throw new AddressMoveException(BarnHelp.text('Core', 'Core_Address_MoveNoPrimary'));
             }
             primaries.add(move.primary);
             Set<Id> ticked = tickedByHousehold.get(householdId);

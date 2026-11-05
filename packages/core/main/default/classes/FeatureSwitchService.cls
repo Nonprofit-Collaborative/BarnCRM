@@ -295,7 +295,9 @@ public with sharing class FeatureSwitchService {
         for (String key : keys) {
             Item feature = item(key);
             if (feature == null) {
-                throw new FeatureSwitchException(System.Label.Core_Feature_UnknownKeyError);
+                throw new FeatureSwitchException(
+                    BarnHelp.text('Core', 'Core_Feature_UnknownKeyError')
+                );
             }
             String lower = feature.key.toLowerCase();
             if (!current.contains(lower) && !newKeys.contains(lower)) {

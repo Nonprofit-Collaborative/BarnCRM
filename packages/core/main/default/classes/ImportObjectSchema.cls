@@ -548,14 +548,14 @@ public with sharing class ImportObjectSchema {
     @NamespaceAccessible
     public static String deleteRefusal(Schema.SObjectType type) {
         if (!FeatureManagement.checkPermission(BulkDeleteController.PERMISSION)) {
-            return Label.Core_Import_ErrorDeleteNeedsPermission;
+            return BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsPermission');
         }
         Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         String reason = BulkDeleteService.objectReason(described);
         return reason == null
             ? null
             : String.format(
-                  Label.Core_BulkDelete_ErrorObject,
+                  BarnHelp.text('Core', 'Core_BulkDelete_ErrorObject'),
                   new List<String>{ described.getLabelPlural(), reason }
               );
     }
@@ -711,7 +711,7 @@ public with sharing class ImportObjectSchema {
             return null;
         }
         return String.format(
-            Label.Core_Import_ErrorFieldNotSelective,
+            BarnHelp.text('Core', 'Core_Import_ErrorFieldNotSelective'),
             new List<String>{
                 labelOf(type, fieldName),
                 described.getLabelPlural(),
@@ -958,49 +958,52 @@ public with sharing class ImportObjectSchema {
                 return cannotDelete;
             }
         } else if (updatesOnly(type) && !neverCreates(operation)) {
-            return String.format(Label.Core_Import_ErrorPeopleUpdateOnly, plural);
+            return String.format(
+                BarnHelp.text('Core', 'Core_Import_ErrorPeopleUpdateOnly'),
+                plural
+            );
         }
         if (!canRun(described, operation)) {
-            return String.format(Label.Core_Import_ErrorObjectNoAccess, plural);
+            return String.format(BarnHelp.text('Core', 'Core_Import_ErrorObjectNoAccess'), plural);
         }
         ImportMapping given = mapping == null ? new ImportMapping() : mapping;
         Set<String> attributes = given.recordAttributes();
         if (attributes.isEmpty()) {
-            return Label.Core_Import_ErrorNothingMapped;
+            return BarnHelp.text('Core', 'Core_Import_ErrorNothingMapped');
         }
         String key = byId ? ID_ATTRIBUTE : null;
         if (byId && !attributes.contains(ID_ATTRIBUTE.toLowerCase())) {
-            return Label.Core_Import_ErrorIdColumnMissing;
+            return BarnHelp.text('Core', 'Core_Import_ErrorIdColumnMissing');
         }
         if (operation == OPERATION_UPSERT || operation == OPERATION_UPDATE_BY_FIELD) {
             Boolean byKey = operation == OPERATION_UPSERT;
             String chosen = template.Load_Match_Field__c;
             if (String.isBlank(chosen)) {
                 return byKey
-                    ? Label.Core_Import_ErrorKeyFieldRequired
-                    : Label.Core_Import_ErrorMatchFieldRequired;
+                    ? BarnHelp.text('Core', 'Core_Import_ErrorKeyFieldRequired')
+                    : BarnHelp.text('Core', 'Core_Import_ErrorMatchFieldRequired');
             }
             key = byKey ? keyField(type, chosen) : matchField(type, chosen);
             if (key == null) {
                 return String.format(
                     byKey
-                        ? Label.Core_Import_ErrorKeyFieldUnusable
-                        : Label.Core_Import_ErrorMatchFieldUnusable,
+                        ? BarnHelp.text('Core', 'Core_Import_ErrorKeyFieldUnusable')
+                        : BarnHelp.text('Core', 'Core_Import_ErrorMatchFieldUnusable'),
                     new List<String>{ chosen.trim().abbreviate(80) }
                 );
             }
             if (!mapsField(attributes, key)) {
                 return String.format(
                     byKey
-                        ? Label.Core_Import_ErrorKeyColumnMissing
-                        : Label.Core_Import_ErrorMatchColumnMissing,
+                        ? BarnHelp.text('Core', 'Core_Import_ErrorKeyColumnMissing')
+                        : BarnHelp.text('Core', 'Core_Import_ErrorMatchColumnMissing'),
                     new List<String>{ labelOf(type, key) }
                 );
             }
         }
         if (key != null && givesEveryRow(given, key)) {
             return String.format(
-                Label.Core_Import_ErrorKeyForEveryRow,
+                BarnHelp.text('Core', 'Core_Import_ErrorKeyForEveryRow'),
                 new List<String>{
                     key == ID_ATTRIBUTE ? Label.Core_Import_RecordIdOption : labelOf(type, key)
                 }
@@ -1114,7 +1117,7 @@ public with sharing class ImportObjectSchema {
         Schema.DescribeSObjectResult described = type.getDescribe(SObjectDescribeOptions.DEFERRED);
         return updatesOnly(type) || !canRun(described, OPERATION_INSERT)
             ? String.format(
-                  Label.Core_Import_ErrorRelatedObjectUnusable,
+                  BarnHelp.text('Core', 'Core_Import_ErrorRelatedObjectUnusable'),
                   new List<String>{ described.getLabelPlural() }
               )
             : null;
@@ -1136,7 +1139,7 @@ public with sharing class ImportObjectSchema {
             return null;
         }
         if (operation == OPERATION_INSERT) {
-            return Label.Core_Import_ErrorRelatedNeedsKey;
+            return BarnHelp.text('Core', 'Core_Import_ErrorRelatedNeedsKey');
         }
         Schema.SObjectType related = relatedTypeOf(template);
         String refused = insertRefusal(related);
@@ -1145,7 +1148,7 @@ public with sharing class ImportObjectSchema {
         }
         if (relatedParentField(type, related, template.Related_Parent_Field__c) == null) {
             return String.format(
-                Label.Core_Import_ErrorRelatedFieldUnusable,
+                BarnHelp.text('Core', 'Core_Import_ErrorRelatedFieldUnusable'),
                 new List<String>{
                     related.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel(),
                     type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
@@ -1412,19 +1415,19 @@ public with sharing class ImportObjectSchema {
         for (ImportMapping.ObjectStep each : mapping.objects) {
             Schema.SObjectType type = each == null ? null : typeNamed(each.entity);
             if (type == null) {
-                return Label.Core_Data_ObjectUnknown;
+                return BarnHelp.text('Core', 'Core_Data_ObjectUnknown');
             }
             Schema.DescribeSObjectResult described = type.getDescribe(
                 SObjectDescribeOptions.DEFERRED
             );
             if (!listed.add(described.getName().toLowerCase())) {
                 return String.format(
-                    Label.Core_Import_ErrorSeveralObjectsRepeated,
+                    BarnHelp.text('Core', 'Core_Import_ErrorSeveralObjectsRepeated'),
                     new List<String>{ described.getLabel() }
                 );
             }
             if (OPERATION_DELETE.equalsIgnoreCase(each.operation)) {
-                return Label.Core_Import_ErrorSeveralObjectsDelete;
+                return BarnHelp.text('Core', 'Core_Import_ErrorSeveralObjectsDelete');
             }
         }
         for (ImportMapping.Column column : mapping.columns) {
@@ -1437,7 +1440,7 @@ public with sharing class ImportObjectSchema {
                 : type.getDescribe(SObjectDescribeOptions.DEFERRED).getName().toLowerCase();
             if (!listed.contains(name)) {
                 return String.format(
-                    Label.Core_Import_ErrorSeveralObjectsColumn,
+                    BarnHelp.text('Core', 'Core_Import_ErrorSeveralObjectsColumn'),
                     new List<String>{
                         column.source,
                         ImportMapping.entityOf(column.target).abbreviate(80)
@@ -1456,7 +1459,7 @@ public with sharing class ImportObjectSchema {
         }
         List<Step> steps = steps(template, mapping);
         if (steps.isEmpty()) {
-            return Label.Core_Import_ErrorNothingMapped;
+            return BarnHelp.text('Core', 'Core_Import_ErrorNothingMapped');
         }
         for (Step step : steps) {
             String refused = refusal(step.template, step.mapping);
@@ -1533,7 +1536,7 @@ public with sharing class ImportObjectSchema {
             value.length() > length
         ) {
             return String.format(
-                Label.Core_Import_ErrorValueTooLong,
+                BarnHelp.text('Core', 'Core_Import_ErrorValueTooLong'),
                 new List<String>{ field.getLabel(), String.valueOf(length) }
             );
         }
@@ -1545,7 +1548,7 @@ public with sharing class ImportObjectSchema {
         }
         if (converted == null) {
             return String.format(
-                Label.Core_Import_ErrorValueUnreadable,
+                BarnHelp.text('Core', 'Core_Import_ErrorValueUnreadable'),
                 new List<String>{ field.getLabel(), value.abbreviate(80) }
             );
         }

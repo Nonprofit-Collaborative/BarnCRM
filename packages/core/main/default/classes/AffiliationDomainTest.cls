@@ -270,7 +270,11 @@ private class AffiliationDomainTest {
 
             Assert.isFalse(result.isSuccess(), 'A hidden overlap is still refused');
             String message = result.getErrors()[0].getMessage();
-            Assert.areEqual(Label.Core_Affiliation_OverlapHidden, message, 'The generic message');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Affiliation_OverlapHidden'),
+                message,
+                'The generic message'
+            );
             Assert.isFalse(message.contains('AF-'), 'No record number');
             Assert.isFalse(message.contains('Garcia'), 'No name');
             Assert.isFalse(message.contains('Union Foundation'), 'No organization');
@@ -307,7 +311,7 @@ private class AffiliationDomainTest {
             for (Database.SaveResult result : results) {
                 Assert.isFalse(result.isSuccess(), 'Every hidden overlap is refused');
                 Assert.areEqual(
-                    Label.Core_Affiliation_OverlapHidden,
+                    BarnHelp.text('Core', 'Core_Affiliation_OverlapHidden'),
                     result.getErrors()[0].getMessage(),
                     'With the generic message'
                 );

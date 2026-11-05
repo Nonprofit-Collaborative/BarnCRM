@@ -344,7 +344,7 @@ private class PicklistUsageTest {
                 }
             }
             Assert.areEqual(
-                System.Label.Core_FieldUtilization_PermissionRequired,
+                BarnHelp.text('Core', 'Core_FieldUtilization_PermissionRequired'),
                 refusal,
                 'Manage BarnCRM Settings is required.'
             );

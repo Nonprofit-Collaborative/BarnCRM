@@ -11,7 +11,6 @@ import CHECK_FLOWS from '@salesforce/label/c.Core_OrgOptimizer_CheckInactiveFlow
 import CHECK_JOBS from '@salesforce/label/c.Core_OrgOptimizer_CheckJobsOfInactiveUsers';
 import CHECK_FIELD_LIMIT from '@salesforce/label/c.Core_OrgOptimizer_CheckFieldLimit';
 import CHECK_RECORD_TYPES from '@salesforce/label/c.Core_OrgOptimizer_CheckRecordTypes';
-import COULD_NOT_CHECK from '@salesforce/label/c.Core_OrgOptimizer_CouldNotCheck';
 import OPEN_IN_SETUP from '@salesforce/label/c.Core_SetupNote_OpenInSetup';
 import MORE_THAN from '@salesforce/label/c.Core_HealthCheck_OrphansMoreThan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
@@ -109,7 +108,7 @@ export default class OptimizerSetup extends LightningElement {
     return ((this.result && this.result.findings) || []).map((finding) => {
       let countText = String(finding.count);
       if (finding.failed) {
-        countText = COULD_NOT_CHECK;
+        countText = helpText('Core', 'Core_OrgOptimizer_CouldNotCheck');
       } else if (finding.moreThan) {
         countText = format(MORE_THAN, cap);
       }

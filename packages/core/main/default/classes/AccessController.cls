@@ -66,7 +66,7 @@ public with sharing class AccessController {
             result.canChangeAccess = false;
             result.success = false;
             result.errorCode = ERROR_NO_PERMISSION;
-            result.message = Label.Core_Access_ErrorRolesNotVisible;
+            result.message = BarnHelp.text('Core', 'Core_Access_ErrorRolesNotVisible');
             return result;
         }
         try {
@@ -82,7 +82,7 @@ public with sharing class AccessController {
             result.errorCode = ERROR_FAILED;
             result.message = result.canManage
                 ? e.getMessage()
-                : Label.Core_Access_ErrorRolesNotVisible;
+                : BarnHelp.text('Core', 'Core_Access_ErrorRolesNotVisible');
         }
         // Giving a role or an add-on needs both Manage BarnCRM Settings and what Setup itself
         // would need, so the page can disable both up front (ADR-0121).
@@ -149,7 +149,7 @@ public with sharing class AccessController {
         if (assigneeId == null || String.isBlank(permissionSetName)) {
             result.success = false;
             result.errorCode = ERROR_INVALID_INPUT;
-            result.message = Label.Core_Access_ErrorInvalidInput;
+            result.message = BarnHelp.text('Core', 'Core_Access_ErrorInvalidInput');
             return result;
         }
         try {
@@ -189,7 +189,7 @@ public with sharing class AccessController {
             // Only someone who may give roles needs to look people up by name and email.
             result.success = false;
             result.errorCode = ERROR_NO_PERMISSION;
-            result.message = Label.Core_Access_ErrorNoPermission;
+            result.message = BarnHelp.text('Core', 'Core_Access_ErrorNoPermission');
             return result;
         }
         try {
@@ -254,7 +254,7 @@ public with sharing class AccessController {
         if (assigneeId == null || String.isBlank(roleDeveloperName)) {
             result.success = false;
             result.errorCode = ERROR_INVALID_INPUT;
-            result.message = Label.Core_Access_ErrorInvalidInput;
+            result.message = BarnHelp.text('Core', 'Core_Access_ErrorInvalidInput');
             return result;
         }
         try {

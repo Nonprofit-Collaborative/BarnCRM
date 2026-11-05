@@ -113,10 +113,12 @@ public with sharing class SampleDataLoader {
      */
     public static void load() {
         if (hasRunningLoadJob()) {
-            throw new SampleDataException(Label.Core_SampleData_LoadInProgress);
+            throw new SampleDataException(BarnHelp.text('Core', 'Core_SampleData_LoadInProgress'));
         }
         if (hasRunningRemoveJob()) {
-            throw new SampleDataException(Label.Core_SampleData_RemoveInProgress);
+            throw new SampleDataException(
+                BarnHelp.text('Core', 'Core_SampleData_RemoveInProgress')
+            );
         }
         SampleDataSelector selector = new SampleDataSelector();
         if (
@@ -124,14 +126,14 @@ public with sharing class SampleDataLoader {
             selector.countSampleOrganizations() > 0 ||
             SampleDataModules.anyHasSampleRecords()
         ) {
-            throw new SampleDataException(Label.Core_SampleData_AlreadyLoaded);
+            throw new SampleDataException(BarnHelp.text('Core', 'Core_SampleData_AlreadyLoaded'));
         }
         // Checked here for the same reason: the platform would refuse the batch's organization
         // insert with a record type error the card cannot explain.
         if (!AccountKinds.organizationRecordTypeUsable()) {
             throw new SampleDataException(
                 String.format(
-                    Label.Core_SampleData_OrganizationRecordTypeUnavailable,
+                    BarnHelp.text('Core', 'Core_SampleData_OrganizationRecordTypeUnavailable'),
                     new List<String>{ AccountKinds.organizationRecordTypeLabel() }
                 )
             );
@@ -214,10 +216,12 @@ public with sharing class SampleDataLoader {
      */
     public static Counts remove() {
         if (hasRunningLoadJob()) {
-            throw new SampleDataException(Label.Core_SampleData_LoadInProgress);
+            throw new SampleDataException(BarnHelp.text('Core', 'Core_SampleData_LoadInProgress'));
         }
         if (hasRunningRemoveJob()) {
-            throw new SampleDataException(Label.Core_SampleData_RemoveInProgress);
+            throw new SampleDataException(
+                BarnHelp.text('Core', 'Core_SampleData_RemoveInProgress')
+            );
         }
         Counts result = status();
         SampleDataModules.startRemoval();
@@ -290,7 +294,7 @@ public with sharing class SampleDataLoader {
         }
         StaticResource resource = new SampleDataSelector().getSampleDataResource();
         if (resource == null) {
-            throw new SampleDataException(Label.Core_SampleData_ResourceMissing);
+            throw new SampleDataException(BarnHelp.text('Core', 'Core_SampleData_ResourceMissing'));
         }
         return resource.Body.toString();
     }

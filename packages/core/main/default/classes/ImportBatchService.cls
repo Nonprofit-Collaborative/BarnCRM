@@ -89,11 +89,13 @@ public with sharing class ImportBatchService {
         Boolean matchOnly
     ) {
         if (expectedCount != null && expectedCount < 0) {
-            throw new ImportException(Label.Core_Import_ErrorControlCountNegative);
+            throw new ImportException(
+                BarnHelp.text('Core', 'Core_Import_ErrorControlCountNegative')
+            );
         }
         Import_Template__c template = ImportTemplateSelector.selectById(templateId);
         if (template == null) {
-            throw new ImportException(Label.Core_Import_ErrorTemplateGone);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorTemplateGone'));
         }
         String fileValuesDocument = fileValuesDocument(template, fileValues);
         Import_Batch__c batch = new Import_Batch__c(
@@ -151,7 +153,7 @@ public with sharing class ImportBatchService {
             if (ImportMapping.namesAPerson(target, personField)) {
                 throw new ImportException(
                     String.format(
-                        Label.Core_Import_ErrorFileValueNotAllowed,
+                        BarnHelp.text('Core', 'Core_Import_ErrorFileValueNotAllowed'),
                         new List<String>{ target.left(80) }
                     )
                 );
@@ -179,14 +181,14 @@ public with sharing class ImportBatchService {
     ) {
         Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
         if (batch == null) {
-            throw new ImportException(Label.Core_Import_ErrorBatchGone);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'));
         }
         // Rows join a file only while it is being read in: staging into a batch that has run
         // would flip it back to Parsing, hiding a running job and an undoable commit. A retry
         // opened on purpose takes the fixed rows (R-IB17).
         Boolean retrying = STATUS_RETRYING.equals(batch.Status__c);
         if (batch.Status__c != STATUS_DRAFT && batch.Status__c != STATUS_PARSING && !retrying) {
-            throw new ImportException(Label.Core_Import_ErrorStagingClosed);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorStagingClosed'));
         }
         if (rows == null || rows.isEmpty()) {
             return batch.Row_Count__c == null ? 0 : batch.Row_Count__c.intValue();
@@ -201,7 +203,7 @@ public with sharing class ImportBatchService {
             if (Math.max(start - 2, 0) + rows.size() > MAX_RETRY_ROWS) {
                 throw new ImportException(
                     String.format(
-                        Label.Core_Import_ErrorRetryTooLarge,
+                        BarnHelp.text('Core', 'Core_Import_ErrorRetryTooLarge'),
                         new List<String>{ MAX_RETRY_ROWS.format() }
                     )
                 );
@@ -216,7 +218,7 @@ public with sharing class ImportBatchService {
             if (raw.length() > MAX_ROW_LENGTH) {
                 throw new ImportException(
                     String.format(
-                        Label.Core_Import_ErrorRowTooLong,
+                        BarnHelp.text('Core', 'Core_Import_ErrorRowTooLong'),
                         new List<String>{ String.valueOf(start + i) }
                     )
                 );
@@ -313,7 +315,7 @@ public with sharing class ImportBatchService {
      */
     private static String retryRefusal(Import_Batch__c batch, Boolean anyImporter) {
         if (batch == null) {
-            return Label.Core_Import_ErrorBatchGone;
+            return BarnHelp.text('Core', 'Core_Import_ErrorBatchGone');
         }
         Boolean open = batch.Retry_After_Row__c != null;
         Boolean complete =
@@ -325,10 +327,10 @@ public with sharing class ImportBatchService {
             BulkDeleteService.OPERATION_DELETE.equals(batch.Operation__c) ||
             FieldAccessService.OPERATION_ACCESS.equals(batch.Operation__c);
         if (dataJob || !(complete || open) || isRunning(batch)) {
-            return Label.Core_Import_ErrorRetryNotOpen;
+            return BarnHelp.text('Core', 'Core_Import_ErrorRetryNotOpen');
         }
         if (!anyImporter && batch.Committed_By__c != UserInfo.getUserId()) {
-            return Label.Core_Import_ErrorRetryOtherUser;
+            return BarnHelp.text('Core', 'Core_Import_ErrorRetryOtherUser');
         }
         String undo = ImportUndoService.refusal(batch);
         if (undo != null) {
@@ -375,18 +377,20 @@ public with sharing class ImportBatchService {
     public static Id startCommit(Id batchId) {
         Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
         if (batch == null) {
-            throw new ImportException(Label.Core_Import_ErrorBatchGone);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'));
         }
         if (STATUS_TRIAL_COMPLETE.equals(batch.Status__c)) {
             // The rest of a file whose first rows were tried (R-IB16).
             return startRemaining(batch);
         }
         if (!STATUS_DRY_RUN_COMPLETE.equals(batch.Status__c)) {
-            throw new ImportException(Label.Core_Import_ErrorDryRunFirst);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorDryRunFirst'));
         }
         // A retry's file is the fixed rows, not the file the totals describe (R-IB17).
         if (!isRetrying(batch) && !controlTotalsAgree(batch)) {
-            throw new ImportException(Label.Core_Import_ErrorControlTotalsDiffer);
+            throw new ImportException(
+                BarnHelp.text('Core', 'Core_Import_ErrorControlTotalsDiffer')
+            );
         }
         refuseDeleteByFile(batch);
         return start(batchId, false);
@@ -399,7 +403,7 @@ public with sharing class ImportBatchService {
                 ImportTemplateSelector.selectById(batch.Import_Template__c)
             ) == ImportObjectSchema.OPERATION_DELETE
         ) {
-            throw new ImportException(Label.Core_Import_ErrorDeleteNeedsConfirm);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsConfirm'));
         }
     }
 
@@ -413,10 +417,10 @@ public with sharing class ImportBatchService {
     public static Id startTrial(Id batchId, Integer rowCount) {
         Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
         if (batch == null) {
-            throw new ImportException(Label.Core_Import_ErrorBatchGone);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'));
         }
         if (!STATUS_DRY_RUN_COMPLETE.equals(batch.Status__c)) {
-            throw new ImportException(Label.Core_Import_ErrorDryRunFirst);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorDryRunFirst'));
         }
         refuseDeleteByFile(batch);
         if (isRetrying(batch)) {
@@ -425,7 +429,9 @@ public with sharing class ImportBatchService {
             return start(batchId, false);
         }
         if (!controlTotalsAgree(batch)) {
-            throw new ImportException(Label.Core_Import_ErrorControlTotalsDiffer);
+            throw new ImportException(
+                BarnHelp.text('Core', 'Core_Import_ErrorControlTotalsDiffer')
+            );
         }
         Integer size = rowCount == null ? trialRows() : clampTrial(rowCount);
         if (batch.Row_Count__c != null && size >= batch.Row_Count__c) {
@@ -439,7 +445,7 @@ public with sharing class ImportBatchService {
     private static Id startRemaining(Import_Batch__c batch) {
         if (batch.Committed_By__c != null && batch.Committed_By__c != UserInfo.getUserId()) {
             // One person's commit, so undo can tell the import's records from anyone else's.
-            throw new ImportException(Label.Core_Import_ErrorRemainingOtherUser);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorRemainingOtherUser'));
         }
         Decimal boundary = ImportBatchSelector.selectRowNumberAt(
             batch.Id,
@@ -501,11 +507,11 @@ public with sharing class ImportBatchService {
             lines.add(
                 countAgrees(batch)
                     ? String.format(
-                          Label.Core_Import_LogControlCountAgrees,
+                          BarnHelp.text('Core', 'Core_Import_LogControlCountAgrees'),
                           new List<String>{ found }
                       )
                     : String.format(
-                          Label.Core_Import_LogControlCountDiffers,
+                          BarnHelp.text('Core', 'Core_Import_LogControlCountDiffers'),
                           new List<String>{
                               found,
                               String.valueOf(batch.Expected_Count__c.intValue())
@@ -515,17 +521,17 @@ public with sharing class ImportBatchService {
         }
         if (batch.Expected_Amount__c != null) {
             if (batch.File_Amount__c == null) {
-                lines.add(Label.Core_Import_LogControlAmountUnread);
+                lines.add(BarnHelp.text('Core', 'Core_Import_LogControlAmountUnread'));
             } else {
                 String found = batch.File_Amount__c.setScale(2).format();
                 lines.add(
                     amountAgrees(batch)
                         ? String.format(
-                              Label.Core_Import_LogControlAmountAgrees,
+                              BarnHelp.text('Core', 'Core_Import_LogControlAmountAgrees'),
                               new List<String>{ found }
                           )
                         : String.format(
-                              Label.Core_Import_LogControlAmountDiffers,
+                              BarnHelp.text('Core', 'Core_Import_LogControlAmountDiffers'),
                               new List<String>{
                                   found,
                                   batch.Expected_Amount__c.setScale(2).format()
@@ -559,7 +565,7 @@ public with sharing class ImportBatchService {
         }
         Set<Id> fixed = fixedRowIds(batchId, rowIds);
         if (fixed.isEmpty()) {
-            throw new ImportException(Label.Core_Import_ErrorNoFixedRows);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorNoFixedRows'));
         }
         return start(batchId, false, null, null, fixed);
     }
@@ -569,7 +575,7 @@ public with sharing class ImportBatchService {
     public static String rowRetryRefusal(Import_Batch__c batch) {
         String refused = retryRefusal(batch, true);
         if (refused == null && isRetrying(batch)) {
-            refused = Label.Core_Import_ErrorRetryByFileOpen;
+            refused = BarnHelp.text('Core', 'Core_Import_ErrorRetryByFileOpen');
         }
         return refused;
     }
@@ -629,21 +635,21 @@ public with sharing class ImportBatchService {
         ];
         Import_Batch__c batch = locked.isEmpty() ? null : ImportBatchSelector.selectById(batchId);
         if (batch == null) {
-            throw new ImportException(Label.Core_Import_ErrorBatchGone);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'));
         }
         if (isRunning(batch)) {
             // Two passes of one batch at once would each overwrite the other's rows (R-IB13).
-            throw new ImportException(Label.Core_Import_ErrorRunInProgress);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorRunInProgress'));
         }
         // A retry of corrected rows runs as a retry's commit does (R-IB17a).
         Boolean retrying = isRetrying(batch) || rowIds != null;
         Id me = UserInfo.getUserId();
         // Corrected rows may be retried by anyone who runs imports, not only the committer.
         if (retrying && rowIds == null && batch.Committed_By__c != me) {
-            throw new ImportException(Label.Core_Import_ErrorRetryOtherUser);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorRetryOtherUser'));
         }
         if (dryRun && hasCommitted(batch) && !retrying) {
-            throw new ImportException(Label.Core_Import_ErrorDryRunAfterCommit);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorDryRunAfterCommit'));
         }
         // A dry run reads the template as it stands and records it; the commit runs under what
         // its dry run recorded, whatever has been edited since (R-IB1). A retry keeps to the
@@ -652,7 +658,7 @@ public with sharing class ImportBatchService {
             ? ImportTemplateSelector.selectById(batch.Import_Template__c)
             : templateFor(batch);
         if (template == null) {
-            throw new ImportException(Label.Core_Import_ErrorTemplateGone);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorTemplateGone'));
         }
         ImportMapping mapping = ImportMapping.parse(
                 template.Column_Mapping_JSON__c,
@@ -666,10 +672,12 @@ public with sharing class ImportBatchService {
             throw new ImportException(refused);
         }
         if (!oneObject && !mapping.identifiesSomebody()) {
-            throw new ImportException(Label.Core_Import_ErrorMappingIdentifiesNobody);
+            throw new ImportException(
+                BarnHelp.text('Core', 'Core_Import_ErrorMappingIdentifiesNobody')
+            );
         }
         if (batch.Row_Count__c == null || batch.Row_Count__c <= 0) {
-            throw new ImportException(Label.Core_Import_ErrorNoRows);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorNoRows'));
         }
         // A batch whose rows the nightly cleanup removed would run over nothing (R-IR5).
         if (!hasRows(batch.Id)) {
@@ -680,7 +688,9 @@ public with sharing class ImportBatchService {
             ImportTemplateService.isPersonAccountMode(template) &&
             OrgShapeDetector.detect().personAccountRecordTypeIds.isEmpty()
         ) {
-            throw new ImportException(Label.Core_Import_ErrorPersonModeUnavailable);
+            throw new ImportException(
+                BarnHelp.text('Core', 'Core_Import_ErrorPersonModeUnavailable')
+            );
         }
         // No reset of the staged rows: each chunk clears and stamps its own, so a pass costs the
         // same two writes here however long the file (R-IB13).
@@ -939,7 +949,7 @@ public with sharing class ImportBatchService {
     public static void beginPass(Id batchId) {
         Import_Batch__c batch = ImportBatchSelector.selectById(batchId);
         if (batch == null) {
-            throw new ImportException(Label.Core_Import_ErrorBatchGone);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorBatchGone'));
         }
         // Package bookkeeping (ADR-0021).
         Database.update(
@@ -1057,7 +1067,7 @@ public with sharing class ImportBatchService {
             // Skipped as staged (R-IT18): not rejected, and listed with the rows.
             lines.add(
                 String.format(
-                    Label.Core_Import_LogRowsSkipped,
+                    BarnHelp.text('Core', 'Core_Import_LogRowsSkipped'),
                     new List<String>{ String.valueOf(skipped) }
                 )
             );

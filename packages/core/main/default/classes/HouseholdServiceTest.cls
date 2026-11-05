@@ -353,7 +353,7 @@ private class HouseholdServiceTest {
 
             Assert.isFalse(result.isSuccess(), 'The save is refused');
             Assert.areEqual(
-                Label.Core_Households_PrimaryContactMustBeMember,
+                BarnHelp.text('Core', 'Core_Households_PrimaryContactMustBeMember'),
                 result.getErrors()[0].getMessage(),
                 'The refusal says the Primary Contact has to be a member'
             );
@@ -474,7 +474,8 @@ private class HouseholdServiceTest {
             );
             Assert.isTrue(
                 message.startsWith(
-                    Label.Core_Households_ErrorCreateFailedForPerson.substringBefore('{0}')
+                    BarnHelp.text('Core', 'Core_Households_ErrorCreateFailedForPerson')
+                        .substringBefore('{0}')
                 ),
                 'The failure says the household could not be created: ' + message
             );
@@ -521,7 +522,8 @@ private class HouseholdServiceTest {
             );
             Assert.isTrue(
                 message.startsWith(
-                    Label.Core_Households_ErrorCreateFailedForPerson.substringBefore('{0}')
+                    BarnHelp.text('Core', 'Core_Households_ErrorCreateFailedForPerson')
+                        .substringBefore('{0}')
                 ),
                 'The failure says the household could not be created: ' + message
             );
@@ -736,7 +738,7 @@ private class HouseholdServiceTest {
                 message = e.getMessage();
             }
             Assert.areEqual(
-                Label.Core_Households_ErrorMoveMissingInput,
+                BarnHelp.text('Core', 'Core_Households_ErrorMoveMissingInput'),
                 message,
                 'Maria is told what to do'
             );
@@ -762,7 +764,7 @@ private class HouseholdServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_Households_ErrorNotAHousehold,
+                BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'),
                 message,
                 'An organization is not a household'
             );
@@ -1458,7 +1460,7 @@ private class HouseholdServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_Households_ErrorMoveNotFound,
+                BarnHelp.text('Core', 'Core_Households_ErrorMoveNotFound'),
                 message,
                 'A stale id is refused rather than quietly dropped from the move'
             );
@@ -1920,7 +1922,7 @@ private class HouseholdServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_Households_ErrorNotAHousehold,
+                BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'),
                 message,
                 'An organization is never a household to join'
             );

@@ -56,14 +56,16 @@ public with sharing class RecordInspectorController {
         try {
             if (!BarnCRMPermissions.canManageSettings()) {
                 throw new RecordInspectorException(
-                    System.Label.Core_RecordInspector_ErrorNoPermission
+                    BarnHelp.text('Core', 'Core_RecordInspector_ErrorNoPermission')
                 );
             }
             Id parsed = parse(recordId);
             Schema.DescribeSObjectResult described = parsed.getSObjectType()
                 .getDescribe(SObjectDescribeOptions.DEFERRED);
             if (!described.isAccessible()) {
-                throw new RecordInspectorException(System.Label.Core_RecordInspector_ErrorNotFound);
+                throw new RecordInspectorException(
+                    BarnHelp.text('Core', 'Core_RecordInspector_ErrorNotFound')
+                );
             }
             Inspection result = new Inspection();
             result.recordId = parsed;
@@ -77,7 +79,9 @@ public with sharing class RecordInspectorController {
             }
             SObject record = read(described.getName(), parsed, readable);
             if (record == null) {
-                throw new RecordInspectorException(System.Label.Core_RecordInspector_ErrorNotFound);
+                throw new RecordInspectorException(
+                    BarnHelp.text('Core', 'Core_RecordInspector_ErrorNotFound')
+                );
             }
             for (Schema.DescribeFieldResult field : readable) {
                 result.fields.add(row(field, record));
@@ -93,7 +97,9 @@ public with sharing class RecordInspectorController {
         try {
             return Id.valueOf(recordId);
         } catch (Exception notAnId) {
-            throw new RecordInspectorException(System.Label.Core_RecordInspector_ErrorNotFound);
+            throw new RecordInspectorException(
+                BarnHelp.text('Core', 'Core_RecordInspector_ErrorNotFound')
+            );
         }
     }
 

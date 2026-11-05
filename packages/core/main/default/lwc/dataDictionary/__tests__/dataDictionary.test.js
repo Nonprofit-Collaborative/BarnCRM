@@ -6,20 +6,22 @@ import describeObject from '@salesforce/apex/DataDictionaryController.describeOb
 import getAutomation from '@salesforce/apex/DataDictionaryController.getAutomation';
 import getPlan from '@salesforce/apex/FieldUtilizationController.getPlan';
 import countFields from '@salesforce/apex/FieldUtilizationController.countFields';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_DataDictionary_Progress: 'Described {0} of {1} kinds of record.',
+  Core_DataDictionary_NotCounted: 'Fill rates not counted for: {0}.',
+  Core_DataDictionary_Downloaded: 'Downloaded {0} fields.'
+});
+
+setHelpTextForTest({
+  Core_DataDictionary_AutomationNotRead: 'Could not read all automation for: {0}.',
+  Core_DataDictionary_DownloadedAutomation: 'Downloaded {0} automation rows.'
+});
 
 jest.mock(
   '@salesforce/apex/DataDictionaryController.getAutomation',
   () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataDictionary_AutomationNotRead',
-  () => ({ default: 'Could not read all automation for: {0}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataDictionary_DownloadedAutomation',
-  () => ({ default: 'Downloaded {0} automation rows.' }),
   { virtual: true }
 );
 
@@ -42,21 +44,6 @@ jest.mock('@salesforce/apex/FieldUtilizationController.getPlan', () => ({ defaul
 jest.mock(
   '@salesforce/apex/FieldUtilizationController.countFields',
   () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataDictionary_Progress',
-  () => ({ default: 'Described {0} of {1} kinds of record.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataDictionary_NotCounted',
-  () => ({ default: 'Fill rates not counted for: {0}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_DataDictionary_Downloaded',
-  () => ({ default: 'Downloaded {0} fields.' }),
   { virtual: true }
 );
 jest.mock('@salesforce/label/c.Core_AccessExplorer_Yes', () => ({ default: 'Yes' }), {

@@ -22,7 +22,6 @@ import DUPLICATES_TITLE from '@salesforce/label/c.Core_DuplicateMatching_Title';
 import TASK_SEARCH from '@salesforce/label/c.Core_DataManager_TaskSearch';
 import UPDATE_TITLE from '@salesforce/label/c.Core_SuperTransform_Title';
 import DELETE_TITLE from '@salesforce/label/c.Core_DataManager_DeleteTitle';
-import DELETE_WARNING from '@salesforce/label/c.Core_DataManager_DeleteWarning';
 import DELETE_CONTINUE from '@salesforce/label/c.Core_DataManager_DeleteContinue';
 import DELETE_CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import OPTIMIZER_TITLE from '@salesforce/label/c.Core_OrgOptimizer_Title';
@@ -312,7 +311,7 @@ export default class DataManager extends NavigationMixin(LightningElement) {
       const confirmed = await BarnConfirmModal.open({
         size: 'small',
         label: DELETE_TITLE,
-        message: DELETE_WARNING,
+        message: helpText('Core', 'Core_DataManager_DeleteWarning'),
         confirmLabel: DELETE_CONTINUE,
         cancelLabel: DELETE_CANCEL,
         confirmVariant: 'destructive'

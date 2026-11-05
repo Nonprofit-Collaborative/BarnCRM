@@ -155,7 +155,7 @@ private class HouseholdMemberTriggerHandlerTest {
 
             Assert.isFalse(result.isSuccess(), 'John is already a current member');
             Assert.areEqual(
-                Label.Core_Households_ErrorAlreadyCurrentMember,
+                BarnHelp.text('Core', 'Core_Households_ErrorAlreadyCurrentMember'),
                 result.getErrors()[0].getMessage(),
                 'The person is told why'
             );

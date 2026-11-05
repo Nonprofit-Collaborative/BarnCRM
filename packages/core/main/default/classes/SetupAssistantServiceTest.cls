@@ -112,7 +112,7 @@ private class SetupAssistantServiceTest {
             } catch (SetupAssistantService.SetupStepException e) {
                 refused = true;
                 Assert.areEqual(
-                    System.Label.Core_SetupAssistant_UnknownStepError,
+                    BarnHelp.text('Core', 'Core_SetupAssistant_UnknownStepError'),
                     e.getMessage(),
                     'The message says what to do next'
                 );

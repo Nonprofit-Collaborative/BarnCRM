@@ -47,8 +47,8 @@ private class OtherRollupToolsTest {
 
             Assert.areEqual(
                 new List<String>{
-                    System.Label.Core_OtherRollupTools_Dlrs,
-                    System.Label.Core_OtherRollupTools_RollupHelper
+                    BarnHelp.text('Core', 'Core_OtherRollupTools_Dlrs'),
+                    BarnHelp.text('Core', 'Core_OtherRollupTools_RollupHelper')
                 },
                 notices,
                 'DLRS, then Rollup Helper.'

@@ -49,14 +49,6 @@
         <value>Preferred Email and Phone</value>
     </labels>
     <labels>
-        <fullName>Core_Feature_OneWayWarning</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Warning above the feature list that turning one on is permanent.</shortDescription>
-        <value>A feature can't be turned off once it is turned on. Turn on only what your organization will use.</value>
-    </labels>
-    <labels>
         <fullName>Core_Feature_TurnOn</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -87,45 +79,5 @@
         <protected>false</protected>
         <shortDescription>Title of the confirmation before a feature is turned on. {0} is its name.</shortDescription>
         <value>Turn on {0}?</value>
-    </labels>
-    <labels>
-        <fullName>Core_Feature_ConfirmMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Body of the confirmation before a feature is turned on. {0} is its name.</shortDescription>
-        <value>{0} will be turned on for everyone, with its pages, settings and automations. It can't be turned off again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Feature_TurnedOn</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Message after a feature is turned on. {0} is its name.</shortDescription>
-        <value>{0} is on. Its pages appear for the right people within a few minutes.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Feature_LoadError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when the feature list cannot be loaded.</shortDescription>
-        <value>The features could not be loaded. Reload the page to try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Feature_UnknownKeyError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when a feature key is not a feature in this org.</shortDescription>
-        <value>That feature does not exist in this org.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Feature_SaveError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Error when a feature cannot be turned on.</shortDescription>
-        <value>The feature could not be turned on. Try again, and check the Error Log if it keeps happening.</value>
     </labels>
 </CustomLabels>

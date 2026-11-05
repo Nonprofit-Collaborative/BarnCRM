@@ -193,7 +193,11 @@ private class AddressMoveControllerTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(System.Label.Core_Address_MoveNoPrimary, message, 'As it is.');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Address_MoveNoPrimary'),
+                message,
+                'As it is.'
+            );
         }
     }
 
@@ -235,8 +239,8 @@ private class AddressMoveControllerTest {
         System.runAs(TestUsers.admin()) {
             Assert.areEqual(
                 new List<String>{
-                    System.Label.Core_Address_MoveFailed,
-                    System.Label.Core_Address_MoveFailed
+                    BarnHelp.text('Core', 'Core_Address_MoveFailed'),
+                    BarnHelp.text('Core', 'Core_Address_MoveFailed')
                 },
                 messages,
                 'Both are refused in plain words.'

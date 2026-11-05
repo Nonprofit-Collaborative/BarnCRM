@@ -35,7 +35,7 @@ private class SetupAssistantControllerTest {
             SetupAssistantController.SetupState state = SetupAssistantController.getState();
 
             Assert.areEqual(
-                new List<String>{ System.Label.Core_OtherRollupTools_RollupHelper },
+                new List<String>{ BarnHelp.text('Core', 'Core_OtherRollupTools_RollupHelper') },
                 state.coexistence.otherRollupTools,
                 'Step two says Rollup Helper is a separate tool'
             );
@@ -377,7 +377,7 @@ private class SetupAssistantControllerTest {
 
             Assert.isTrue(refused, 'Only the keys the step declares are accepted');
             Assert.areEqual(
-                System.Label.Core_SetupAssistant_NothingToSaveError,
+                BarnHelp.text('Core', 'Core_SetupAssistant_NothingToSaveError'),
                 message,
                 'A setting on another step is not saved through this one'
             );
@@ -532,7 +532,7 @@ private class SetupAssistantControllerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                System.Label.Core_SetupAssistant_WrongRecordTypeError,
+                BarnHelp.text('Core', 'Core_SetupAssistant_WrongRecordTypeError'),
                 message,
                 'A user identifier is not a contact, so it never becomes the default'
             );
@@ -691,7 +691,7 @@ private class SetupAssistantControllerTest {
                 } catch (AuraHandledException e) {
                     refused = true;
                     Assert.areEqual(
-                        System.Label.Core_Settings_PermissionRequiredError,
+                        BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'),
                         e.getMessage(),
                         'The message names the permission he is missing'
                     );
@@ -766,13 +766,13 @@ private class SetupAssistantControllerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                System.Label.Core_SuiteChoice_UnknownSuiteError,
+                BarnHelp.text('Core', 'Core_SuiteChoice_UnknownSuiteError'),
                 unknownMessage,
                 'Only the two stored values are accepted'
             );
             Assert.isFalse(davidMayEdit, 'David is not offered the change');
             Assert.areEqual(
-                System.Label.Core_Settings_PermissionRequiredError,
+                BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'),
                 davidMessage,
                 'And it is refused if he tries'
             );

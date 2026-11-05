@@ -221,7 +221,9 @@ private class SampleDataStageBatchTest {
                 FROM Error_Log__c
                 WITH SYSTEM_MODE
             ]) {
-                if (entry.Message__c == Label.Core_SampleData_StoppedLogMessage) {
+                if (
+                    entry.Message__c == BarnHelp.text('Core', 'Core_SampleData_StoppedLogMessage')
+                ) {
                     pointed = entry.Technical_Detail__c != null;
                 }
             }

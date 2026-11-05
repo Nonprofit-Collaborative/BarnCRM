@@ -12,7 +12,6 @@ import COL_IN_GROUPS from '@salesforce/label/c.Core_AccessModifyAll_ColInGroups'
 import COL_SCOPE from '@salesforce/label/c.Core_AccessModifyAll_ColScope';
 import SCOPE_STANDARD from '@salesforce/label/c.Core_AccessModifyAll_ScopeStandard';
 import SCOPE_CUSTOM from '@salesforce/label/c.Core_DataDictionary_ColCustom';
-import TRUNCATED from '@salesforce/label/c.Core_AccessModifyAll_Truncated';
 import KIND_PROFILE from '@salesforce/label/c.Core_AccessExplorer_KindProfile';
 import KIND_GROUP from '@salesforce/label/c.Core_AccessExplorer_KindGroup';
 import KIND_SET from '@salesforce/label/c.Core_AccessExplorer_KindSet';
@@ -23,9 +22,7 @@ import COL_API_NAME from '@salesforce/label/c.Core_AccessExplorer_ColApiName';
 import COL_VIEW_ALL from '@salesforce/label/c.Core_AccessExplorer_ColViewAll';
 import COL_MODIFY_ALL from '@salesforce/label/c.Core_AccessExplorer_ColModifyAll';
 import COL_ACTIVE_PEOPLE from '@salesforce/label/c.Core_AccessExplorer_ColActivePeople';
-import NOTHING_TO_SHOW from '@salesforce/label/c.Core_AccessExplorer_NothingToShow';
 import DOWNLOAD from '@salesforce/label/c.Core_AccessExplorer_Download';
-import DOWNLOADED from '@salesforce/label/c.Core_AccessExplorer_Downloaded';
 import YES from '@salesforce/label/c.Core_AccessExplorer_Yes';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -57,7 +54,9 @@ export default class AccessModifyAll extends LightningElement {
     },
     dataHeading: DATA_HEADING,
     objectsHeading: OBJECTS_HEADING,
-    nothingToShow: NOTHING_TO_SHOW,
+    get nothingToShow() {
+      return helpText('Core', 'Core_AccessExplorer_NothingToShow');
+    },
     download: DOWNLOAD,
     loading: LOADING
   };
@@ -83,7 +82,9 @@ export default class AccessModifyAll extends LightningElement {
   }
 
   get truncatedMessage() {
-    return this.report && this.report.truncated ? format(TRUNCATED, MAX_ROWS) : undefined;
+    return this.report && this.report.truncated
+      ? format(helpText('Core', 'Core_AccessModifyAll_Truncated'), MAX_ROWS)
+      : undefined;
   }
 
   /** Both tables, by name: columns and rows (the CSV uses the same). */
@@ -163,6 +164,9 @@ export default class AccessModifyAll extends LightningElement {
     const table = this.tables[event.currentTarget.dataset.table];
     const columns = table.columns.map((each) => ({ label: each.label, path: each.fieldName }));
     downloadCsv(FILE_BASE, columns, table.rows);
-    this.noticeMessage = format(DOWNLOADED, String(table.rows.length));
+    this.noticeMessage = format(
+      helpText('Core', 'Core_AccessExplorer_Downloaded'),
+      String(table.rows.length)
+    );
   }
 }

@@ -270,7 +270,7 @@ public with sharing class AddressMoveController {
             caught,
             caught instanceof AddressService.AddressMoveException,
             context,
-            System.Label.Core_Address_MoveFailed
+            BarnHelp.text('Core', 'Core_Address_MoveFailed')
         );
     }
 }

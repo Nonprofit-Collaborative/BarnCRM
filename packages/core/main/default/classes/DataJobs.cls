@@ -301,13 +301,13 @@ public with sharing class DataJobs {
         if (missed > 0) {
             lines.add(
                 String.format(
-                    System.Label.Core_BulkUpdate_LogNotReached,
+                    BarnHelp.text('Core', 'Core_BulkUpdate_LogNotReached'),
                     new List<Object>{ missed.format() }
                 )
             );
         }
         if (journalIncomplete == true) {
-            lines.add(System.Label.Core_BulkUpdate_LogJournalIncomplete);
+            lines.add(BarnHelp.text('Core', 'Core_BulkUpdate_LogJournalIncomplete'));
         }
         return String.join(lines, '\n').right(32768);
     }

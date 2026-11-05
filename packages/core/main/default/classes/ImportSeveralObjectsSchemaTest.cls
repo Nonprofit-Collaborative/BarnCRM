@@ -186,20 +186,20 @@ private class ImportSeveralObjectsSchemaTest {
 
                 Assert.areEqual(
                     String.format(
-                        Label.Core_Import_ErrorSeveralObjectsRepeated,
+                        BarnHelp.text('Core', 'Core_Import_ErrorSeveralObjectsRepeated'),
                         new List<String>{ labelOf(Account.SObjectType) }
                     ),
                     ImportObjectSchema.severalObjectsProblem(twice),
                     'An object listed twice.'
                 );
                 Assert.areEqual(
-                    Label.Core_Import_ErrorSeveralObjectsDelete,
+                    BarnHelp.text('Core', 'Core_Import_ErrorSeveralObjectsDelete'),
                     ImportObjectSchema.severalObjectsProblem(deletes),
                     'No delete.'
                 );
                 Assert.areEqual(
                     String.format(
-                        Label.Core_Import_ErrorSeveralObjectsColumn,
+                        BarnHelp.text('Core', 'Core_Import_ErrorSeveralObjectsColumn'),
                         new List<String>{ 'Title', CONTACT_NAME }
                     ),
                     ImportObjectSchema.severalObjectsProblem(elsewhere),
@@ -210,14 +210,14 @@ private class ImportSeveralObjectsSchemaTest {
                         Label.Core_Format_Pair,
                         new List<String>{
                             labelOf(Account.SObjectType),
-                            Label.Core_Import_ErrorMatchFieldRequired
+                            BarnHelp.text('Core', 'Core_Import_ErrorMatchFieldRequired')
                         }
                     ),
                     refused(template(noKey)),
                     'A run names the object that cannot load.'
                 );
                 Assert.areEqual(
-                    Label.Core_Import_ErrorNothingMapped,
+                    BarnHelp.text('Core', 'Core_Import_ErrorNothingMapped'),
                     refused(template(unmapped)),
                     'Nothing mapped at all.'
                 );

@@ -106,7 +106,7 @@ public with sharing class AffiliationMaintenanceHandler extends TriggerHandler {
                 thrown,
                 records == null || records.isEmpty() ? previous : records,
                 context,
-                Label.Core_Affiliation_PrimaryFailed
+                BarnHelp.text('Core', 'Core_Affiliation_PrimaryFailed')
             );
         }
     }

@@ -380,7 +380,9 @@ public with sharing class ModuleManagerService {
                 return row;
             }
         }
-        throw new ModuleManagerException(System.Label.Core_ModuleManager_UnknownModuleError);
+        throw new ModuleManagerException(
+            BarnHelp.text('Core', 'Core_ModuleManager_UnknownModuleError')
+        );
     }
 
     private static void setTurnedOff(String moduleName, Boolean off) {
@@ -405,7 +407,9 @@ public with sharing class ModuleManagerService {
         }
         String joined = String.join(names, ',');
         if (joined.length() > TURNED_OFF_LENGTH) {
-            throw new ModuleManagerException(System.Label.Core_ModuleManager_SaveErrorMessage);
+            throw new ModuleManagerException(
+                BarnHelp.text('Core', 'Core_ModuleManager_SaveErrorMessage')
+            );
         }
         SettingsService.saveSystemValue(TURNED_OFF_KEY, joined);
         AutomationControl.clearCache();

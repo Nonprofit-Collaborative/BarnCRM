@@ -44,7 +44,9 @@ public with sharing class SettingsWriter {
             return;
         }
         if (!BarnCRMPermissions.canManageSettings()) {
-            throw new PermissionException(System.Label.Core_Settings_PermissionRequiredError);
+            throw new PermissionException(
+                BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
+            );
         }
         OrgSettingsSystemWriter.saveOver(type, stored, changed);
     }

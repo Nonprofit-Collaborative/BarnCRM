@@ -188,12 +188,12 @@ private class DataDictionaryControllerTest {
             }
 
             Assert.areEqual(
-                System.Label.Core_DataDictionary_PermissionRequired,
+                BarnHelp.text('Core', 'Core_DataDictionary_PermissionRequired'),
                 refusal,
                 'Refused.'
             );
             Assert.areEqual(
-                System.Label.Core_DataDictionary_PermissionRequired,
+                BarnHelp.text('Core', 'Core_DataDictionary_PermissionRequired'),
                 listRefusal,
                 'The list is refused too.'
             );
@@ -294,7 +294,7 @@ private class DataDictionaryControllerTest {
             }
             Assert.areEqual(
                 String.format(
-                    System.Label.Core_DataDictionary_UnknownObject,
+                    BarnHelp.text('Core', 'Core_DataDictionary_UnknownObject'),
                     new List<Object>{ 'Nothing_Here__c' }
                 ),
                 unknown,
@@ -311,7 +311,7 @@ private class DataDictionaryControllerTest {
                 }
             }
             Assert.areEqual(
-                System.Label.Core_DataDictionary_PermissionRequired,
+                BarnHelp.text('Core', 'Core_DataDictionary_PermissionRequired'),
                 refusal,
                 'Manage BarnCRM Settings is required.'
             );
@@ -330,7 +330,7 @@ private class DataDictionaryControllerTest {
 
             Assert.areEqual(
                 String.format(
-                    System.Label.Core_DataDictionary_UnknownObject,
+                    BarnHelp.text('Core', 'Core_DataDictionary_UnknownObject'),
                     new List<Object>{ 'Nothing_Here__c' }
                 ),
                 unknown,

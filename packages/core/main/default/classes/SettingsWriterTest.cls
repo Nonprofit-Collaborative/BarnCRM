@@ -69,7 +69,7 @@ private class SettingsWriterTest {
                 } catch (SettingsWriter.PermissionException e) {
                     refused = true;
                     Assert.areEqual(
-                        System.Label.Core_Settings_PermissionRequiredError,
+                        BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'),
                         e.getMessage(),
                         'The message names the permission to ask for'
                     );

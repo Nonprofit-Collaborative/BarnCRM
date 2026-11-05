@@ -136,7 +136,7 @@ private class MatchSourceControllerTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_MatchLogic_PermissionRequired, refusal);
+            Assert.areEqual(BarnHelp.text('Core', 'Core_MatchLogic_PermissionRequired'), refusal);
         }
     }
 
@@ -173,7 +173,7 @@ private class MatchSourceControllerTest {
             Assert.isFalse(parents.contains('Street__c'), 'Text is not a parent');
             Assert.areEqual(
                 String.format(
-                    Label.Core_MatchSource_NoSuchObject,
+                    BarnHelp.text('Core', 'Core_MatchSource_NoSuchObject'),
                     new List<Object>{ 'No_Such_Thing__c' }
                 ),
                 refusal
@@ -247,7 +247,7 @@ private class MatchSourceControllerTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_MatchSource_PostalRequired, refusal);
+            Assert.areEqual(BarnHelp.text('Core', 'Core_MatchSource_PostalRequired'), refusal);
         }
     }
 

@@ -33,14 +33,6 @@
         <value>Delete Many Records</value>
     </labels>
     <labels>
-        <fullName>Core_DataManager_DeleteWarning</fullName>
-        <categories>DataManager</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Manager: warning in the box shown when bulk delete is opened</shortDescription>
-        <value>Deleted records go to the Recycle Bin. You can undo a bulk delete from Data Jobs, on this page, for up to 15 days.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataManager_DeleteContinue</fullName>
         <categories>DataManager</categories>
         <language>en_US</language>

@@ -114,7 +114,10 @@ private class PreferredEmailServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                String.format(Label.Core_Emails_PreferredEmpty, new List<String>{ 'Alternate' }),
+                String.format(
+                    BarnHelp.text('Core', 'Core_Emails_PreferredEmpty'),
+                    new List<String>{ 'Alternate' }
+                ),
                 message,
                 'The save was refused with the message that names the empty address'
             );

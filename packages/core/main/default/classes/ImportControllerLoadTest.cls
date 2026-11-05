@@ -72,7 +72,7 @@ private class ImportControllerLoadTest {
                 Assert.areEqual(2, people.loadOperations.size(), 'And the two updates only.');
                 Assert.isNotNull(refused, 'The package bookkeeping is never a target.');
                 Assert.isTrue(
-                    unnamed.contains(Label.Core_Import_ErrorObjectTemplateName),
+                    unnamed.contains(BarnHelp.text('Core', 'Core_Import_ErrorObjectTemplateName')),
                     'Named.'
                 );
             }
@@ -354,12 +354,12 @@ private class ImportControllerLoadTest {
                 ];
                 Assert.isTrue(after.Is_Recurring__c, 'The source is unchanged.');
                 Assert.areEqual(
-                    Label.Core_Import_ErrorObjectTemplateName,
+                    BarnHelp.text('Core', 'Core_Import_ErrorObjectTemplateName'),
                     unnamed,
                     'A name is needed.'
                 );
                 Assert.areEqual(
-                    Label.Core_Import_ErrorCopyOneObject,
+                    BarnHelp.text('Core', 'Core_Import_ErrorCopyOneObject'),
                     objectRefused,
                     'A one-object template is not copied.'
                 );
@@ -380,7 +380,11 @@ private class ImportControllerLoadTest {
                 ImportController.copyTemplate(source.Id, 'Another');
                 Assert.fail('Copying a template needs Manage BarnCRM Settings.');
             } catch (Exception e) {
-                Assert.areEqual(Label.Core_Import_ErrorNoPermission, e.getMessage(), 'Refused.');
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_Import_ErrorNoPermission'),
+                    e.getMessage(),
+                    'Refused.'
+                );
             }
             Test.stopTest();
             Assert.areEqual(1, [SELECT COUNT() FROM Import_Template__c], 'Nothing was created.');

@@ -87,7 +87,7 @@ public with sharing class FuzzyPairing {
             if (candidates.size() >= maxCandidates) {
                 ErrorLogger.logMessage(
                     String.format(
-                        Label.Core_DuplicateManagement_CandidateCap,
+                        BarnHelp.text('Core', 'Core_DuplicateManagement_CandidateCap'),
                         new List<Object>{ maxCandidates }
                     ),
                     CONTEXT,

@@ -174,7 +174,7 @@ private class BulkUpdateServiceTest {
                     System.Assert.fail('Nothing matches');
                 } catch (BulkUpdateFields.BulkUpdateException refused) {
                     System.Assert.areEqual(
-                        System.Label.Core_BulkUpdate_ErrorNothingMatches,
+                        BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNothingMatches'),
                         refused.getMessage(),
                         'The refusal says nothing matches'
                     );

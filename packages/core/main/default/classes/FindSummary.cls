@@ -58,7 +58,9 @@ public with sharing class FindSummary {
             ? ''
             : String.valueOf(aggregate.get('function')).toLowerCase();
         if (!SOQL_BY_FUNCTION.containsKey(function)) {
-            throw new QueryCompiler.QueryCompilerException(System.Label.Core_Find_ErrorSummary);
+            throw new QueryCompiler.QueryCompilerException(
+                BarnHelp.text('Core', 'Core_Find_ErrorSummary')
+            );
         }
         QueryCompiler.Compiled records = QueryCompiler.compileSelection(
             queryJson,
@@ -79,7 +81,7 @@ public with sharing class FindSummary {
         if (QueryCompiler.count(records, MAX_RECORDS + 1) > MAX_RECORDS) {
             throw new QueryCompiler.QueryCompilerException(
                 String.format(
-                    System.Label.Core_Find_ErrorSummaryTooMany,
+                    BarnHelp.text('Core', 'Core_Find_ErrorSummaryTooMany'),
                     new List<Object>{ MAX_RECORDS.format() }
                 )
             );
@@ -159,7 +161,7 @@ public with sharing class FindSummary {
         if (!fits || !field.isAggregatable()) {
             throw new QueryCompiler.QueryCompilerException(
                 String.format(
-                    System.Label.Core_Find_ErrorSummaryField,
+                    BarnHelp.text('Core', 'Core_Find_ErrorSummaryField'),
                     new List<Object>{ field.getLabel() }
                 )
             );
@@ -172,7 +174,7 @@ public with sharing class FindSummary {
         if (!field.isGroupable()) {
             throw new QueryCompiler.QueryCompilerException(
                 String.format(
-                    System.Label.Core_Find_ErrorSummaryGroup,
+                    BarnHelp.text('Core', 'Core_Find_ErrorSummaryGroup'),
                     new List<Object>{ field.getLabel() }
                 )
             );

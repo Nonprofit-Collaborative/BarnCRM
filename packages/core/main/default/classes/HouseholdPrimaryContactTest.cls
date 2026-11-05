@@ -269,7 +269,7 @@ private class HouseholdPrimaryContactTest {
 
             Assert.isFalse(result.isSuccess(), 'A second primary is refused');
             Assert.areEqual(
-                Label.Core_Households_ErrorSecondPrimary,
+                BarnHelp.text('Core', 'Core_Households_ErrorSecondPrimary'),
                 result.getErrors()[0].getMessage(),
                 'The refusal says where to make the change instead'
             );
@@ -375,7 +375,7 @@ private class HouseholdPrimaryContactTest {
 
             Assert.isFalse(result.isSuccess(), 'Only HouseholdService writes the mirror');
             Assert.areEqual(
-                Label.Core_Households_PrimaryContactFollowsMembers,
+                BarnHelp.text('Core', 'Core_Households_PrimaryContactFollowsMembers'),
                 result.getErrors()[0].getMessage(),
                 'The refusal says where to make the change instead'
             );

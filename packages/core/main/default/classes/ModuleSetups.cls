@@ -145,7 +145,7 @@ public with sharing class ModuleSetups {
         }
         if (!wanted.isEmpty() || toRun.isEmpty()) {
             throw new ModuleManagerService.ModuleManagerException(
-                System.Label.Core_ModuleManager_UnknownModuleError
+                BarnHelp.text('Core', 'Core_ModuleManager_UnknownModuleError')
             );
         }
         List<String> done = new List<String>();
@@ -214,7 +214,7 @@ public with sharing class ModuleSetups {
                         System.Label.Core_ModuleSetup_FindingTitle,
                         values
                     ),
-                    String.format(System.Label.Core_ModuleSetup_FindingDetail, values),
+                    String.format(BarnHelp.text('Core', 'Core_ModuleSetup_FindingDetail'), values),
                     HealthCheckService.SEVERITY_WARNING,
                     HealthCheckService.CATEGORY_SETTINGS
                 )

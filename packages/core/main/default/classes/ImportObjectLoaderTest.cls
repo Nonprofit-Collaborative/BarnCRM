@@ -525,7 +525,7 @@ private class ImportObjectLoaderTest {
                 Assert.isTrue(loaded[0].Error_Message__c.contains('not an id'), 'Not an ID.');
                 Assert.isTrue(loaded[1].Error_Message__c.contains(ana.Id), 'Another object.');
                 Assert.areEqual(
-                    Label.Core_Import_ErrorRecordNotFound,
+                    BarnHelp.text('Core', 'Core_Import_ErrorRecordNotFound'),
                     loaded[2].Error_Message__c,
                     'A record that is gone.'
                 );
@@ -567,7 +567,7 @@ private class ImportObjectLoaderTest {
                     'The same key, ignoring case, in a later chunk.'
                 );
                 Assert.areEqual(
-                    Label.Core_Import_ErrorRecordRepeated,
+                    BarnHelp.text('Core', 'Core_Import_ErrorRecordRepeated'),
                     rows()[2].Error_Message__c,
                     'Said in words.'
                 );
@@ -640,7 +640,7 @@ private class ImportObjectLoaderTest {
                 Assert.isTrue(
                     committed.notes.contains(
                         String.format(
-                            Label.Core_Import_LogFieldProtected,
+                            BarnHelp.text('Core', 'Core_Import_LogFieldProtected'),
                             new List<String>{
                                 Affiliation__c.Sample_Data__c.getDescribe().getLabel()
                             }
@@ -710,7 +710,7 @@ private class ImportObjectLoaderTest {
 
                 Import_Batch__c finished = ImportBatchSelector.selectById(batch.Id);
                 Assert.areEqual(
-                    Label.Core_Import_ErrorIdColumnMissing,
+                    BarnHelp.text('Core', 'Core_Import_ErrorIdColumnMissing'),
                     refused,
                     'An update with no record ID column never starts.'
                 );

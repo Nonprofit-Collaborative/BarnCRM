@@ -17,23 +17,18 @@ import SKIPPED_BADGE from '@salesforce/label/c.Core_SetupAssistant_SkippedBadge'
 import NEXT from '@salesforce/label/c.Core_Import_NextButton';
 import SKIP from '@salesforce/label/c.Core_SetupAssistant_SkipButton';
 import FINISH from '@salesforce/label/c.Core_SetupAssistant_FinishButton';
-import READ_ONLY from '@salesforce/label/c.Core_SetupAssistant_ReadOnlyNotice';
-import LOAD_ERROR from '@salesforce/label/c.Core_SetupAssistant_LoadErrorMessage';
 import COMPLETE_HEADING from '@salesforce/label/c.Core_SetupAssistant_CompleteHeading';
 import ELAPSED from '@salesforce/label/c.Core_SetupAssistant_ElapsedLabel';
 import REOPEN from '@salesforce/label/c.Core_SetupAssistant_ReopenButton';
 import USER_LABEL from '@salesforce/label/c.Core_Section_Person';
 import ROLE_LABEL from '@salesforce/label/c.Core_Access_RoleLabel';
 import GIVE_ACCESS from '@salesforce/label/c.Core_Access_AddButton';
-import ACCESS_GRANTED from '@salesforce/label/c.Core_SetupAssistant_AccessGrantedMessage';
 import CREATE_USER from '@salesforce/label/c.Core_Access_CreateUserLink';
 import AUTOMATIC_ACCESS from '@salesforce/label/c.Core_Access_AutomaticAccessLink';
 import LOAD_SAMPLE from '@salesforce/label/c.Core_SetupAssistant_LoadSampleButton';
 import IMPORT_BUTTON from '@salesforce/label/c.Core_HubHome_RecurringLink';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import NAMING_UNAVAILABLE from '@salesforce/label/c.Core_SetupAssistant_NamingUnavailableNotice';
-import SAMPLE_UNAVAILABLE from '@salesforce/label/c.Core_SetupAssistant_SampleDataUnavailableNotice';
 import START_AGAIN from '@salesforce/label/c.Core_SetupAssistant_StartAgainButton';
 import OPEN_SECTION from '@salesforce/label/c.Core_SetupAssistant_OpenSectionButton';
 import PROGRESS_FORMAT from '@salesforce/label/c.Core_SetupAssistant_ProgressFormat';
@@ -88,20 +83,28 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
     next: NEXT,
     skip: SKIP,
     finish: FINISH,
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Core', 'Core_SetupAssistant_ReadOnlyNotice');
+    },
     completeHeading: COMPLETE_HEADING,
     elapsed: ELAPSED,
     reopen: REOPEN,
     user: USER_LABEL,
     role: ROLE_LABEL,
     giveAccess: GIVE_ACCESS,
-    accessGranted: ACCESS_GRANTED,
+    get accessGranted() {
+      return helpText('Core', 'Core_SetupAssistant_AccessGrantedMessage');
+    },
     createUser: CREATE_USER,
     automaticAccess: AUTOMATIC_ACCESS,
     loadSample: LOAD_SAMPLE,
     importButton: IMPORT_BUTTON,
-    namingUnavailable: NAMING_UNAVAILABLE,
-    sampleUnavailable: SAMPLE_UNAVAILABLE,
+    get namingUnavailable() {
+      return helpText('Core', 'Core_SetupAssistant_NamingUnavailableNotice');
+    },
+    get sampleUnavailable() {
+      return helpText('Core', 'Core_SetupAssistant_SampleDataUnavailableNotice');
+    },
     startAgain: START_AGAIN,
     openSection: OPEN_SECTION
   };
@@ -133,7 +136,10 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
       this.applyState(await getState(), true);
       this.errorMessage = undefined;
     } catch (error) {
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(
+        error,
+        helpText('Core', 'Core_SetupAssistant_LoadErrorMessage')
+      );
     }
   }
 
@@ -362,7 +368,10 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
         state: { [link.sectionKey]: section }
       });
     } catch (error) {
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(
+        error,
+        helpText('Core', 'Core_SetupAssistant_LoadErrorMessage')
+      );
     }
   }
 
@@ -532,7 +541,10 @@ export default class SetupAssistant extends NavigationMixin(LightningElement) {
         afterwards();
       }
     } catch (error) {
-      this.errorMessage = bodyMessage(error, LOAD_ERROR);
+      this.errorMessage = bodyMessage(
+        error,
+        helpText('Core', 'Core_SetupAssistant_LoadErrorMessage')
+      );
     }
   }
 }

@@ -3,6 +3,14 @@ import OrganizationAddressSettings from 'c/organizationAddressSettings';
 import getOrganizationAddress from '@salesforce/apex/SettingsController.getOrganizationAddress';
 import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
 import getCompanyAddress from '@salesforce/apex/SettingsController.getCompanyAddress';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_OrganizationAddress_Saved: 'Address saved.',
+  Core_OrganizationAddress_FillRequired: 'Fill in the required parts.',
+  Core_OrganizationAddress_LoadError: 'Could not load.',
+  Core_Settings_SaveErrorMessage: 'Could not save.'
+});
 
 jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: true }), {
   virtual: true
@@ -21,32 +29,6 @@ jest.mock('@salesforce/apex/SettingsController.getCompanyAddress', () => ({ defa
 jest.mock(
   '@salesforce/label/c.Core_OrganizationAddress_Save',
   () => ({ default: 'Save address' }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
-  '@salesforce/label/c.Core_OrganizationAddress_Saved',
-  () => ({ default: 'Address saved.' }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
-  '@salesforce/label/c.Core_OrganizationAddress_FillRequired',
-  () => ({ default: 'Fill in the required parts.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_OrganizationAddress_LoadError',
-  () => ({ default: 'Could not load.' }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
-  '@salesforce/label/c.Core_Settings_SaveErrorMessage',
-  () => ({ default: 'Could not save.' }),
   {
     virtual: true
   }

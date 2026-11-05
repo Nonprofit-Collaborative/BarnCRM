@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <!-- The panel saves on its own, so its Save sits at its top, by the panel heading the
          console shows with "Saves on its own" (admin-18), never at the bottom. -->
     <template lwc:if={canEdit}>
@@ -35,5 +36,6 @@
 
     <template lwc:if={message}>
         <p class={messageClass} role="status" aria-live="polite">{message}</p>
+    </template>
     </template>
 </template>

@@ -1,6 +1,12 @@
 import { createElement } from 'lwc';
 import AccessModifyAll from 'c/accessModifyAll';
 import getModifyAllReport from '@salesforce/apex/AccessExplorerController.getModifyAllReport';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_AccessModifyAll_Truncated: 'The list is cut at {0} rows.',
+  Core_AccessExplorer_Downloaded: 'Downloaded {0} rows.'
+});
 
 jest.mock(
   '@salesforce/apex/AccessExplorerController.getModifyAllReport',
@@ -23,16 +29,6 @@ jest.mock(
 jest.mock('@salesforce/label/c.Core_DataDictionary_ColCustom', () => ({ default: 'Custom' }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_AccessModifyAll_Truncated',
-  () => ({ default: 'The list is cut at {0} rows.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_AccessExplorer_Downloaded',
-  () => ({ default: 'Downloaded {0} rows.' }),
-  { virtual: true }
-);
 
 const REPORT = {
   truncated: false,

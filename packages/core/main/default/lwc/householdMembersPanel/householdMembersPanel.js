@@ -19,18 +19,13 @@ import makePrimaryMembership from '@salesforce/apex/HouseholdOfPersonController.
 import TITLE from '@salesforce/label/c.Core_HouseholdMembersPanel_Title';
 import EMPTY_HEADING from '@salesforce/label/c.Core_HouseholdMembersPanel_EmptyHeading';
 import ACTIONS_FOR from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
-import NOT_A_HOUSEHOLD from '@salesforce/label/c.Core_HouseholdMembersPanel_NotAHousehold';
 import PRIMARY from '@salesforce/label/c.Core_HouseholdMembersPanel_Primary';
 import DECEASED from '@salesforce/label/c.Core_HouseholdMembersPanel_Deceased';
 import ADD_MEMBER from '@salesforce/label/c.Core_HouseholdMembersPanel_AddMember';
 import MOVE_MEMBER from '@salesforce/label/c.Core_HouseholdMembersPanel_MoveMember';
-import MOVE_SUCCESS from '@salesforce/label/c.Core_HouseholdMembersPanel_MoveSuccess';
-import ADD_SUCCESS from '@salesforce/label/c.Core_HouseholdMembersPanel_AddSuccess';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import MAKE_PRIMARY from '@salesforce/label/c.Core_HouseholdPanel_MakePrimary';
-import MAKE_PRIMARY_SUCCESS from '@salesforce/label/c.Core_HouseholdPanel_MakePrimarySuccess';
-import MAKE_PRIMARY_FAILED from '@salesforce/label/c.Core_HouseholdPanel_MakePrimaryFailed';
 import LOADING from '@salesforce/label/c.Core_HouseholdPanel_Loading';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -72,7 +67,9 @@ export default class HouseholdMembersPanel extends NavigationMixin(LightningElem
       return helpText('Core', 'Core_HouseholdMembersPanel_Empty');
     },
     emptyHeading: EMPTY_HEADING,
-    notAHousehold: NOT_A_HOUSEHOLD,
+    get notAHousehold() {
+      return helpText('Core', 'Core_HouseholdMembersPanel_NotAHousehold');
+    },
     primary: PRIMARY,
     deceased: DECEASED,
     addMember: ADD_MEMBER,
@@ -313,7 +310,7 @@ export default class HouseholdMembersPanel extends NavigationMixin(LightningElem
       return undefined;
     }
     this.errorMessage = undefined;
-    this.toast(ADD_SUCCESS, 'success');
+    this.toast(helpText('Core', 'Core_HouseholdMembersPanel_AddSuccess'), 'success');
     return this.refresh();
   }
 
@@ -352,7 +349,7 @@ export default class HouseholdMembersPanel extends NavigationMixin(LightningElem
         this.movingPersonId = undefined;
         this.targetHouseholdId = undefined;
         this.errorMessage = undefined;
-        this.toast(MOVE_SUCCESS, 'success');
+        this.toast(helpText('Core', 'Core_HouseholdMembersPanel_MoveSuccess'), 'success');
         return this.refresh();
       })
       .catch((error) => {
@@ -378,11 +375,16 @@ export default class HouseholdMembersPanel extends NavigationMixin(LightningElem
     return write
       .then(() => {
         this.errorMessage = undefined;
-        this.toast(MAKE_PRIMARY_SUCCESS.replace('{0}', name), 'success');
+        this.toast(
+          helpText('Core', 'Core_HouseholdPanel_MakePrimarySuccess').replace('{0}', name),
+          'success'
+        );
         return this.refresh();
       })
       .catch((error) => {
-        this.errorMessage = this.isJunctionMode ? this.readError(error) : MAKE_PRIMARY_FAILED;
+        this.errorMessage = this.isJunctionMode
+          ? this.readError(error)
+          : helpText('Core', 'Core_HouseholdPanel_MakePrimaryFailed');
       })
       .finally(() => {
         this.busy = false;

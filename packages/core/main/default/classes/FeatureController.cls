@@ -40,7 +40,7 @@ public with sharing class FeatureController {
             return model();
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw UserErrors.message(System.Label.Core_Feature_LoadError);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_Feature_LoadError'));
         }
     }
 
@@ -48,7 +48,9 @@ public with sharing class FeatureController {
     @AuraEnabled
     public static FeaturesModel turnOn(String key) {
         if (!BarnCRMPermissions.canManageSettings()) {
-            throw UserErrors.message(System.Label.Core_Settings_PermissionRequiredError);
+            throw UserErrors.message(
+                BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError')
+            );
         }
         try {
             FeatureSwitchService.turnOn(key);
@@ -58,7 +60,7 @@ public with sharing class FeatureController {
             throw UserErrors.message(e.getMessage());
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw UserErrors.message(System.Label.Core_Feature_SaveError);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_Feature_SaveError'));
         }
     }
 

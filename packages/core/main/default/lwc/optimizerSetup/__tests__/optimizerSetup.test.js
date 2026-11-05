@@ -1,6 +1,11 @@
 import { createElement } from 'lwc';
 import OptimizerSetup from 'c/optimizerSetup';
 import getFindings from '@salesforce/apex/OrgOptimizerSetupController.getFindings';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_OrgOptimizer_CouldNotCheck: 'Could not check'
+});
 
 jest.mock(
   '@salesforce/apex/OrgOptimizerSetupController.getFindings',
@@ -18,11 +23,6 @@ jest.mock(
   {
     virtual: true
   }
-);
-jest.mock(
-  '@salesforce/label/c.Core_OrgOptimizer_CouldNotCheck',
-  () => ({ default: 'Could not check' }),
-  { virtual: true }
 );
 
 const RESULT = {

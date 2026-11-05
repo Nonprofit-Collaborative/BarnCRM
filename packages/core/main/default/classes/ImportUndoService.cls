@@ -84,12 +84,12 @@ public with sharing class ImportUndoService {
         // A bulk delete is undone by undeleting, from Data jobs; this undo would only
         // mark it Undone and bring nothing back (R-BD5).
         if (BulkDeleteService.OPERATION_DELETE.equals(batch.Operation__c)) {
-            view.reason = Label.Core_Import_UndoErrorBulkDelete;
+            view.reason = BarnHelp.text('Core', 'Core_Import_UndoErrorBulkDelete');
             return view;
         }
         // A field access change puts permission rows back, on the Field Access Manager (R-FA1).
         if (FieldAccessService.OPERATION_ACCESS.equals(batch.Operation__c)) {
-            view.reason = Label.Core_Import_UndoErrorAccessChange;
+            view.reason = BarnHelp.text('Core', 'Core_Import_UndoErrorAccessChange');
             return view;
         }
         countTagged(batch.Id, view);
@@ -112,7 +112,7 @@ public with sharing class ImportUndoService {
             );
         }
         if (String.isBlank(view.reason) && view.total == 0 && view.updates == 0) {
-            view.reason = Label.Core_Import_UndoErrorNothingToUndo;
+            view.reason = BarnHelp.text('Core', 'Core_Import_UndoErrorNothingToUndo');
         }
         view.allowed = String.isBlank(view.reason);
         return view;
@@ -134,7 +134,7 @@ public with sharing class ImportUndoService {
         if (confirmedTotal != view.total) {
             throw new ImportException(
                 String.format(
-                    Label.Core_Import_UndoErrorCountChanged,
+                    BarnHelp.text('Core', 'Core_Import_UndoErrorCountChanged'),
                     new List<String>{
                         String.valueOf(confirmedTotal == null ? 0 : confirmedTotal),
                         String.valueOf(view.total)
@@ -197,8 +197,8 @@ public with sharing class ImportUndoService {
             ];
             String line = String.format(
                 BulkUpdateService.OPERATION_UPDATE.equals(batch.Operation__c)
-                    ? Label.Core_Import_LogUndoneBulkUpdate
-                    : Label.Core_Import_LogUndone,
+                    ? BarnHelp.text('Core', 'Core_Import_LogUndoneBulkUpdate')
+                    : BarnHelp.text('Core', 'Core_Import_LogUndone'),
                 new List<String>{
                     UserInfo.getName(),
                     Datetime.now().format(),
@@ -254,17 +254,17 @@ public with sharing class ImportUndoService {
     @NamespaceAccessible
     public static String refusal(Import_Batch__c batch, String knownStatus) {
         if (batch == null) {
-            return Label.Core_Import_ErrorBatchGone;
+            return BarnHelp.text('Core', 'Core_Import_ErrorBatchGone');
         }
         if (batch.Is_Dry_Run__c == true) {
-            return Label.Core_Import_UndoErrorDryRun;
+            return BarnHelp.text('Core', 'Core_Import_UndoErrorDryRun');
         }
         String status = knownStatus == null ? effectiveStatus(batch) : knownStatus;
         if (
             ImportBatchService.STATUS_UNDOING.equals(status) ||
             ImportBatchService.STATUS_UNDONE.equals(status)
         ) {
-            return Label.Core_Import_UndoErrorAlreadyUndone;
+            return BarnHelp.text('Core', 'Core_Import_UndoErrorAlreadyUndone');
         }
         // A committed import keeps Is Dry Run cleared while it retries its rejected rows, so its
         // retry's staging and finished preview can be undone like the commit (R-IB17).
@@ -279,11 +279,11 @@ public with sharing class ImportUndoService {
             (batch.Completed_At__c == null &&
             !ImportBatchService.STATUS_COMMITTING.equals(batch.Status__c))
         ) {
-            return Label.Core_Import_UndoErrorNotCommitted;
+            return BarnHelp.text('Core', 'Core_Import_UndoErrorNotCommitted');
         }
         if (batch.Undo_Deadline__c < Datetime.now()) {
             return String.format(
-                Label.Core_Import_UndoErrorWindowClosed,
+                BarnHelp.text('Core', 'Core_Import_UndoErrorWindowClosed'),
                 new List<String>{ batch.Undo_Deadline__c.format() }
             );
         }

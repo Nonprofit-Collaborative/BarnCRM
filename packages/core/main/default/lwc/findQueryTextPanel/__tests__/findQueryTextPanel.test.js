@@ -1,16 +1,11 @@
 import { createElement } from 'lwc';
 import FindQueryTextPanel from 'c/findQueryTextPanel';
+import { setHelpTextForTest } from 'c/barnHelpText';
 
-jest.mock(
-  '@salesforce/label/c.Core_Find_TextMixed',
-  () => ({ default: 'Add brackets where AND and OR are mixed.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_Find_TextSyntax',
-  () => ({ default: 'Find could not read the query near: {0}' }),
-  { virtual: true }
-);
+setHelpTextForTest({
+  Core_Find_TextMixed: 'Add brackets where AND and OR are mixed.',
+  Core_Find_TextSyntax: 'Find could not read the query near: {0}'
+});
 
 function mount(soql) {
   const element = createElement('c-find-query-text-panel', { is: FindQueryTextPanel });

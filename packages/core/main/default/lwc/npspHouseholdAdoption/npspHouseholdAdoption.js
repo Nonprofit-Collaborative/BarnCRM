@@ -7,10 +7,6 @@ import adopt from '@salesforce/apex/NpspHouseholdAdoptionController.adopt';
 import undo from '@salesforce/apex/NpspHouseholdAdoptionController.undo';
 
 import TITLE from '@salesforce/label/c.Core_NpspAdoption_Title';
-import NOT_AVAILABLE from '@salesforce/label/c.Core_NpspAdoption_NotAvailable';
-import CANDIDATE_COUNT from '@salesforce/label/c.Core_NpspAdoption_CandidateCount';
-import MORE_THAN_LIMIT from '@salesforce/label/c.Core_NpspAdoption_MoreThanLimit';
-import NONE_LEFT from '@salesforce/label/c.Core_NpspAdoption_NoneLeft';
 import SAMPLE_CAPTION from '@salesforce/label/c.Core_NpspAdoption_SampleCaption';
 import COLUMN_NAME from '@salesforce/label/c.Core_Households_NameSuffix';
 import COLUMN_FORMAL from '@salesforce/label/c.Core_HouseholdNamingSettings_ColumnFormal';
@@ -19,18 +15,13 @@ import COLUMN_PRIMARY from '@salesforce/label/c.Core_NpspAdoption_ColumnPrimary'
 import COLUMN_CONTACTS from '@salesforce/label/c.Core_SampleData_ContactsLabel';
 import KEEP_NAMES from '@salesforce/label/c.Core_NpspAdoption_KeepNames';
 import ADOPT_BUTTON from '@salesforce/label/c.Core_NpspAdoption_AdoptButton';
-import CONFIRM_MESSAGE from '@salesforce/label/c.Core_NpspAdoption_ConfirmMessage';
 import TYPE_TO_ADOPT from '@salesforce/label/c.Core_NpspAdoption_TypeToAdopt';
 import CONFIRM_ADOPT from '@salesforce/label/c.Core_NpspAdoption_ConfirmAdopt';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import RUNNING from '@salesforce/label/c.Core_NpspAdoption_Running';
 import LAST_RUN from '@salesforce/label/c.Core_NpspAdoption_LastRun';
-import LAST_RUN_COUNTS from '@salesforce/label/c.Core_NpspAdoption_LastRunCounts';
 import UNDO_BUTTON from '@salesforce/label/c.Core_NpspAdoption_UndoButton';
-import UNDO_MESSAGE from '@salesforce/label/c.Core_NpspAdoption_UndoMessage';
 import TYPE_TO_UNDO from '@salesforce/label/c.Core_NpspAdoption_TypeToUndo';
 import CONFIRM_UNDO from '@salesforce/label/c.Core_AutoMerge_Undo';
-import STARTED from '@salesforce/label/c.Core_NpspAdoption_Started';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -50,8 +41,12 @@ export default class NpspHouseholdAdoption extends LightningElement {
     get intro() {
       return helpText('Core', 'Core_NpspAdoption_Intro');
     },
-    notAvailable: NOT_AVAILABLE,
-    noneLeft: NONE_LEFT,
+    get notAvailable() {
+      return helpText('Core', 'Core_NpspAdoption_NotAvailable');
+    },
+    get noneLeft() {
+      return helpText('Core', 'Core_NpspAdoption_NoneLeft');
+    },
     sampleCaption: SAMPLE_CAPTION,
     columnName: COLUMN_NAME,
     columnFormal: COLUMN_FORMAL,
@@ -63,7 +58,9 @@ export default class NpspHouseholdAdoption extends LightningElement {
       return helpText('Core', 'Core_NpspAdoption_KeepNamesHelp');
     },
     adoptButton: ADOPT_BUTTON,
-    running: RUNNING,
+    get running() {
+      return helpText('Core', 'Core_NpspAdoption_Running');
+    },
     lastRun: LAST_RUN,
     undoButton: UNDO_BUTTON,
     refresh: REFRESH
@@ -161,12 +158,18 @@ export default class NpspHouseholdAdoption extends LightningElement {
   }
 
   get candidateMessage() {
-    return format(CANDIDATE_COUNT, this.runCount.toLocaleString());
+    return format(
+      helpText('Core', 'Core_NpspAdoption_CandidateCount'),
+      this.runCount.toLocaleString()
+    );
   }
 
   get moreThanLimitMessage() {
     return this.status && this.status.moreThanLimit
-      ? format(MORE_THAN_LIMIT, this.status.runLimit.toLocaleString())
+      ? format(
+          helpText('Core', 'Core_NpspAdoption_MoreThanLimit'),
+          this.status.runLimit.toLocaleString()
+        )
       : undefined;
   }
 
@@ -184,7 +187,14 @@ export default class NpspHouseholdAdoption extends LightningElement {
 
   get lastRunCounts() {
     const run = this.lastRun;
-    return run ? format(LAST_RUN_COUNTS, run.adopted, run.undone, run.notRestored) : undefined;
+    return run
+      ? format(
+          helpText('Core', 'Core_NpspAdoption_LastRunCounts'),
+          run.adopted,
+          run.undone,
+          run.notRestored
+        )
+      : undefined;
   }
 
   get adoptDisabled() {
@@ -213,7 +223,7 @@ export default class NpspHouseholdAdoption extends LightningElement {
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: TITLE,
-      message: format(CONFIRM_MESSAGE, count.toLocaleString()),
+      message: format(helpText('Core', 'Core_NpspAdoption_ConfirmMessage'), count.toLocaleString()),
       typeToConfirm: String(count),
       typeToConfirmLabel: format(TYPE_TO_ADOPT, count),
       confirmLabel: CONFIRM_ADOPT,
@@ -230,7 +240,10 @@ export default class NpspHouseholdAdoption extends LightningElement {
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: UNDO_BUTTON,
-      message: format(UNDO_MESSAGE, run.adopted.toLocaleString()),
+      message: format(
+        helpText('Core', 'Core_NpspAdoption_UndoMessage'),
+        run.adopted.toLocaleString()
+      ),
       typeToConfirm: String(run.adopted),
       typeToConfirmLabel: format(TYPE_TO_UNDO, run.adopted),
       confirmLabel: CONFIRM_UNDO,
@@ -249,7 +262,7 @@ export default class NpspHouseholdAdoption extends LightningElement {
     this.noticeMessage = undefined;
     try {
       await call();
-      this.noticeMessage = STARTED;
+      this.noticeMessage = helpText('Core', 'Core_NpspAdoption_Started');
       await this.load();
       this.poll();
     } catch (error) {

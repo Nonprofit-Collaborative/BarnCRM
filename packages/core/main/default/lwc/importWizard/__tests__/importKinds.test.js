@@ -5,12 +5,12 @@ import {
   createsText,
   isGiftTemplate
 } from '../importKinds';
+import { setHelpTextForTest } from 'c/barnHelpText';
 
-jest.mock(
-  '@salesforce/label/c.Core_Import_CreatesSummary',
-  () => ({ default: 'This file can create: {0}.' }),
-  { virtual: true }
-);
+setHelpTextForTest({
+  Core_Import_CreatesSummary: 'This file can create: {0}.'
+});
+
 jest.mock('@salesforce/label/c.Core_Import_LoadsSummary', () => ({ default: 'Loads: {0}' }), {
   virtual: true
 });

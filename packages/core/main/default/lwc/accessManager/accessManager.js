@@ -12,40 +12,24 @@ import removeAddOnApex from '@salesforce/apex/AccessController.removeAddOn';
 
 import ADD_BUTTON from '@salesforce/label/c.Core_Access_AddButton';
 import ADD_ON_ADD_BUTTON from '@salesforce/label/c.Core_Access_AddOnAddButton';
-import ADD_ON_ASSIGN_SUCCESS from '@salesforce/label/c.Core_Access_AddOnAssignSuccess';
-import ADD_ON_CONFIRM_ADD from '@salesforce/label/c.Core_Access_AddOnConfirmAddMessage';
-import ADD_ON_CONFIRM_REMOVE from '@salesforce/label/c.Core_Access_AddOnConfirmRemoveMessage';
 import ADD_ON_LABEL from '@salesforce/label/c.Core_Access_AddOnLabel';
 import ADD_ON_PICKER_PLACEHOLDER from '@salesforce/label/c.Core_Access_AddOnPickerPlaceholder';
-import ADD_ON_REMOVE_SUCCESS from '@salesforce/label/c.Core_Access_AddOnRemoveSuccess';
 import ADD_ONS_HEADING from '@salesforce/label/c.Core_Access_AddOnsHeading';
-import CHANGE_READ_ONLY_NOTICE from '@salesforce/label/c.Core_Access_ErrorNeedsAccessManager';
-import NO_ONE_HAS_ADD_ON from '@salesforce/label/c.Core_Access_NoOneHasAddOn';
-import ASSIGN_SUCCESS from '@salesforce/label/c.Core_Access_AssignSuccess';
 import AUTOMATIC_ACCESS_LINK from '@salesforce/label/c.Core_Access_AutomaticAccessLink';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import CONFIRM_ADD_MESSAGE from '@salesforce/label/c.Core_Access_ConfirmAddMessage';
 import CONFIRM_ADD_TITLE from '@salesforce/label/c.Core_Access_AddButton';
-import CONFIRM_REMOVE_MESSAGE from '@salesforce/label/c.Core_Access_ConfirmRemoveMessage';
 import CONFIRM_REMOVE_TITLE from '@salesforce/label/c.Core_Access_ConfirmRemoveTitle';
 import CREATE_USER_LINK from '@salesforce/label/c.Core_Access_CreateUserLink';
-import ERROR_INVALID_INPUT from '@salesforce/label/c.Core_Access_ErrorInvalidInput';
-import ERROR_UNEXPECTED from '@salesforce/label/c.Core_Access_ErrorUnexpected';
 import LOADING_ROLES from '@salesforce/label/c.Core_Access_LoadingRoles';
-import NO_ONE_IN_ROLE from '@salesforce/label/c.Core_Access_NoOneInRole';
 import PAGE_TITLE from '@salesforce/label/c.Core_Access_PageTitle';
 import OPEN_ACCESS_EXPLORER from '@salesforce/label/c.Core_Access_OpenAccessExplorer';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import getOpenLink from '@salesforce/apex/AccessExplorerController.getOpenLink';
-import READ_ONLY_NOTICE from '@salesforce/label/c.Core_Access_ReadOnlyNotice';
 import REMOVE_BUTTON from '@salesforce/label/c.Core_Find_Remove';
-import REMOVE_SUCCESS from '@salesforce/label/c.Core_Access_RemoveSuccess';
 import ROLE_LABEL from '@salesforce/label/c.Core_Access_RoleLabel';
 import ROLE_PICKER_PLACEHOLDER from '@salesforce/label/c.Core_Access_RolePickerPlaceholder';
 import SEARCH_LABEL from '@salesforce/label/c.Core_Access_SearchLabel';
-import SEARCH_NO_RESULTS from '@salesforce/label/c.Core_Access_SearchNoResults';
 import SEARCH_PLACEHOLDER from '@salesforce/label/c.Core_Access_SearchPlaceholder';
-import SELF_REMOVAL_WARNING from '@salesforce/label/c.Core_Access_SelfRemovalWarning';
 import REMOVE_PERSON from '@salesforce/label/c.Core_Access_RemovePerson';
 import TOAST_ERROR_TITLE from '@salesforce/label/c.Core_Access_ToastErrorTitle';
 import TOAST_SUCCESS_TITLE from '@salesforce/label/c.Core_SetupAssistant_DoneBadge';
@@ -109,8 +93,12 @@ export default class AccessManager extends LightningElement {
       return helpText('Core', 'Core_Access_AddOnsDescription');
     },
     addOnsHeading: ADD_ONS_HEADING,
-    changeReadOnlyNotice: CHANGE_READ_ONLY_NOTICE,
-    noOneHasAddOn: NO_ONE_HAS_ADD_ON,
+    get changeReadOnlyNotice() {
+      return helpText('Core', 'Core_Access_ErrorNeedsAccessManager');
+    },
+    get noOneHasAddOn() {
+      return helpText('Core', 'Core_Access_NoOneHasAddOn');
+    },
     get automaticAccessHelp() {
       return helpText('Core', 'Core_Access_AutomaticAccessHelp');
     },
@@ -123,20 +111,28 @@ export default class AccessManager extends LightningElement {
     },
     createUserLink: CREATE_USER_LINK,
     loadingRoles: LOADING_ROLES,
-    noOneInRole: NO_ONE_IN_ROLE,
+    get noOneInRole() {
+      return helpText('Core', 'Core_Access_NoOneInRole');
+    },
     get pageDescription() {
       return helpText('Core', 'Core_Access_PageDescription');
     },
     pageTitle: PAGE_TITLE,
     openAccessExplorer: OPEN_ACCESS_EXPLORER,
-    readOnlyNotice: READ_ONLY_NOTICE,
+    get readOnlyNotice() {
+      return helpText('Core', 'Core_Access_ReadOnlyNotice');
+    },
     removeButton: REMOVE_BUTTON,
     roleLabel: ROLE_LABEL,
     rolePickerPlaceholder: ROLE_PICKER_PLACEHOLDER,
     searchLabel: SEARCH_LABEL,
-    searchNoResults: SEARCH_NO_RESULTS,
+    get searchNoResults() {
+      return helpText('Core', 'Core_Access_SearchNoResults');
+    },
     searchPlaceholder: SEARCH_PLACEHOLDER,
-    selfRemovalWarning: SELF_REMOVAL_WARNING,
+    get selfRemovalWarning() {
+      return helpText('Core', 'Core_Access_SelfRemovalWarning');
+    },
     usersInRole: USERS_IN_ROLE
   };
 
@@ -189,7 +185,7 @@ export default class AccessManager extends LightningElement {
       this.loadError = data.success ? undefined : data.message;
     } else if (error) {
       this.isLoading = false;
-      this.loadError = ERROR_UNEXPECTED;
+      this.loadError = helpText('Core', 'Core_Access_ErrorUnexpected');
     }
   }
 
@@ -397,7 +393,7 @@ export default class AccessManager extends LightningElement {
           return;
         }
         this.searchResults = [];
-        this.showError(ERROR_UNEXPECTED);
+        this.showError(helpText('Core', 'Core_Access_ErrorUnexpected'));
       });
   }
 
@@ -464,7 +460,7 @@ export default class AccessManager extends LightningElement {
   /** Asks the person to confirm giving the chosen role to the chosen person. */
   handleAddClick() {
     if (!this.selectedUser || !this.selectedRole) {
-      this.showError(ERROR_INVALID_INPUT);
+      this.showError(helpText('Core', 'Core_Access_ErrorInvalidInput'));
       return Promise.resolve();
     }
     return this.confirmAndRun({
@@ -504,7 +500,7 @@ export default class AccessManager extends LightningElement {
   /** Asks the person to confirm giving the chosen extra permission to the chosen person. */
   handleAddOnAddClick() {
     if (!this.selectedUser || !this.selectedAddOn) {
-      this.showError(ERROR_INVALID_INPUT);
+      this.showError(helpText('Core', 'Core_Access_ErrorInvalidInput'));
       return Promise.resolve();
     }
     return this.confirmAndRun(
@@ -554,14 +550,22 @@ export default class AccessManager extends LightningElement {
   wordingFor(action) {
     if (action.isAddOn) {
       return {
-        confirm: action.isAssign ? ADD_ON_CONFIRM_ADD : ADD_ON_CONFIRM_REMOVE,
-        success: action.isAssign ? ADD_ON_ASSIGN_SUCCESS : ADD_ON_REMOVE_SUCCESS,
+        confirm: action.isAssign
+          ? helpText('Core', 'Core_Access_AddOnConfirmAddMessage')
+          : helpText('Core', 'Core_Access_AddOnConfirmRemoveMessage'),
+        success: action.isAssign
+          ? helpText('Core', 'Core_Access_AddOnAssignSuccess')
+          : helpText('Core', 'Core_Access_AddOnRemoveSuccess'),
         button: action.isAssign ? this.labels.addOnAddButton : this.labels.removeButton
       };
     }
     return {
-      confirm: action.isAssign ? CONFIRM_ADD_MESSAGE : CONFIRM_REMOVE_MESSAGE,
-      success: action.isAssign ? ASSIGN_SUCCESS : REMOVE_SUCCESS,
+      confirm: action.isAssign
+        ? helpText('Core', 'Core_Access_ConfirmAddMessage')
+        : helpText('Core', 'Core_Access_ConfirmRemoveMessage'),
+      success: action.isAssign
+        ? helpText('Core', 'Core_Access_AssignSuccess')
+        : helpText('Core', 'Core_Access_RemoveSuccess'),
       button: action.isAssign ? this.labels.addButton : this.labels.removeButton
     };
   }
@@ -621,11 +625,11 @@ export default class AccessManager extends LightningElement {
           this.resetChooser();
           return refreshApex(this.overviewResult);
         }
-        this.showError(result ? result.message : ERROR_UNEXPECTED);
+        this.showError(result ? result.message : helpText('Core', 'Core_Access_ErrorUnexpected'));
         return null;
       })
       .catch(() => {
-        this.showError(ERROR_UNEXPECTED);
+        this.showError(helpText('Core', 'Core_Access_ErrorUnexpected'));
       })
       .finally(() => {
         this.working = false;
@@ -671,7 +675,7 @@ export default class AccessManager extends LightningElement {
     Toast.show(
       {
         label: TOAST_ERROR_TITLE,
-        message: message || ERROR_UNEXPECTED,
+        message: message || helpText('Core', 'Core_Access_ErrorUnexpected'),
         variant: 'error',
         mode: 'sticky'
       },

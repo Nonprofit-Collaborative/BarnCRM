@@ -77,7 +77,7 @@ private class OrgOptimizerStorageControllerTest {
                 Assert.fail('A person without the permission is refused.');
             } catch (AuraHandledException refused) {
                 Assert.areEqual(
-                    Label.Core_OrgOptimizer_ErrorNoPermission,
+                    BarnHelp.text('Core', 'Core_OrgOptimizer_ErrorNoPermission'),
                     refused.getMessage(),
                     'With the sentence that says which permission.'
                 );

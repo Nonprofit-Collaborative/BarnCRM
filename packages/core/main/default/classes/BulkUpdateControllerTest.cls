@@ -90,7 +90,7 @@ private class BulkUpdateControllerTest {
                     System.Assert.fail('Find alone does not open bulk update');
                 } catch (AuraHandledException refused) {
                     System.Assert.areEqual(
-                        System.Label.Core_BulkUpdate_ErrorNoPermission,
+                        BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoPermission'),
                         refused.getMessage(),
                         'The message names both permissions'
                     );

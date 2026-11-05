@@ -316,7 +316,7 @@ public with sharing class BulkUpdateController {
             if (confirmedUpdates != undoPreview.updates) {
                 throw new BulkUpdateFields.BulkUpdateException(
                     String.format(
-                        System.Label.Core_Import_UndoErrorCountChanged,
+                        BarnHelp.text('Core', 'Core_Import_UndoErrorCountChanged'),
                         new List<Object>{
                             String.valueOf(confirmedUpdates == null ? 0 : confirmedUpdates),
                             String.valueOf(undoPreview.updates)
@@ -340,7 +340,7 @@ public with sharing class BulkUpdateController {
     private static void requirePermission() {
         if (!hasPermission()) {
             throw new BulkUpdateFields.BulkUpdateException(
-                System.Label.Core_BulkUpdate_ErrorNoPermission
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoPermission')
             );
         }
     }
@@ -353,7 +353,7 @@ public with sharing class BulkUpdateController {
         );
         if (found == null) {
             throw new BulkUpdateFields.BulkUpdateException(
-                System.Label.Core_BulkUpdate_ErrorNotBulkUpdate
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNotBulkUpdate')
             );
         }
         return found;

@@ -93,7 +93,7 @@ private class DataTransformDigitsTest {
             };
             for (DataTransform.Step step : bad) {
                 System.assertEquals(
-                    Label.Core_Transform_ErrorDigits,
+                    BarnHelp.text('Core', 'Core_Transform_ErrorDigits'),
                     DataTransform.problemWith(step),
                     JSON.serialize(step)
                 );

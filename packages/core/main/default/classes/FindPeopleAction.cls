@@ -106,7 +106,7 @@ global with sharing class FindPeopleAction {
                 ? ''
                 : request.searchText.trim();
             if (term.length() < 2) {
-                result.errorMessage = Label.Core_AgentActions_SearchTooShort;
+                result.errorMessage = BarnHelp.text('Core', 'Core_AgentActions_SearchTooShort');
                 term = null;
             }
             terms.add(term);
@@ -115,10 +115,10 @@ global with sharing class FindPeopleAction {
         try {
             answer(requests, terms, results);
         } catch (QueryException denied) {
-            setErrorForAll(results, Label.Core_AgentActions_NoAccess);
+            setErrorForAll(results, BarnHelp.text('Core', 'Core_AgentActions_NoAccess'));
         } catch (Exception failed) {
             ErrorLogger.log(failed, Label.Core_AgentActions_ErrorContext);
-            setErrorForAll(results, Label.Core_AgentActions_Unexpected);
+            setErrorForAll(results, BarnHelp.text('Core', 'Core_AgentActions_Unexpected'));
         }
         return results;
     }

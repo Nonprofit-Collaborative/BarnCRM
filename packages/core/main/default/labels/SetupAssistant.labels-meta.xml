@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_SetupAssistant_AccessErrorMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: error when giving a colleague a role does not work</shortDescription>
-        <value>That role could not be given out just now, so nothing changed. Try again, and if it keeps happening look at the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_AccessGrantedMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: confirmation after a colleague is given a role</shortDescription>
-        <value>Access given. Add another person, or continue.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_CompleteHeading</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -73,28 +57,12 @@
         <value>Setup Checklist</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_InvalidValueError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: a typed value is not in the shape the field asks for</shortDescription>
-        <value>That value is not in the shape this field asks for, so nothing was saved.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_LegalNameLabel</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: the legal name field on the identity step</shortDescription>
         <value>Legal name, as registered</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_LoadErrorMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: error when the assistant cannot be loaded</shortDescription>
-        <value>The setup assistant could not be loaded just now. Refresh the page, and if it keeps happening look at the Error Log.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_LoadSampleButton</fullName>
@@ -121,52 +89,12 @@
         <value>What this module does</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_ModuleManagerNotice</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: notice that one click module control arrives later</shortDescription>
-        <value>To turn an installed module off or on, or to see what uninstalling one would delete, open the Modules section of BarnCRM Settings.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_ModuleStaffTabs</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: {0} is a module's everyday tab labels, comma separated</shortDescription>
-        <value>Add to BarnCRM and BarnCRM Console: {0}</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_ModuleAdminTabs</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: {0} is a module's admin tab labels, comma separated</shortDescription>
-        <value>Add to BarnCRM Admin and BarnCRM Admin Console: {0}</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_ModulePresent</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Setup assistant: status of a module that is in this org</shortDescription>
         <value>Present</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_NamingUnavailableNotice</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: notice when the household naming panel is not in this org</shortDescription>
-        <value>The household naming screen is not in this org yet, so there is nothing to confirm. Skip this step: BarnCRM names households with its shipped pattern until you change it.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_NothingToSaveError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: error when a panel is saved with nothing filled in</shortDescription>
-        <value>There was nothing to save. Fill something in first.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_OpenSectionButton</fullName>
@@ -185,14 +113,6 @@
         <value>{0} of {1} steps done</value>
     </labels>
     <labels>
-        <fullName>Core_SetupAssistant_ReadOnlyNotice</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: notice for someone who can read but not change it</shortDescription>
-        <value>You can read the setup steps but not change them. Ask whoever installed BarnCRM to add you to the BarnCRM Admin role on the Access page.</value>
-    </labels>
-    <labels>
         <fullName>Core_SetupAssistant_RecommendedLabel</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -207,22 +127,6 @@
         <protected>true</protected>
         <shortDescription>Setup assistant: button that opens the finished assistant again</shortDescription>
         <value>Reopen Setup</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_SampleDataUnavailableNotice</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: notice when the sample data panel is not in this org</shortDescription>
-        <value>The sample data loader is not in this org yet. Import your own spreadsheet instead, or skip this step and come back.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_SaveErrorMessage</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: error when a panel cannot be saved</shortDescription>
-        <value>That could not be saved just now, so nothing changed. Try again, and if it keeps happening look at the Error Log.</value>
     </labels>
     <labels>
         <fullName>Core_SetupAssistant_SkipButton</fullName>
@@ -311,37 +215,5 @@
         <protected>true</protected>
         <shortDescription>Setup assistant: badge on a step that is not finished</shortDescription>
         <value>To Do</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_TooLongError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: value too long. {0} field label, {1} character limit</shortDescription>
-        <value>{0} can be at most {1} characters, so nothing was saved.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_UnknownModeError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: coexistence mode from the page is not one of the three</shortDescription>
-        <value>That is not a way BarnCRM can fit an org, so nothing changed. Refresh the page and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_UnknownStepError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: step key from the page is not a shipped step</shortDescription>
-        <value>That setup step is not one BarnCRM knows about, so nothing was recorded. Refresh the page and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SetupAssistant_WrongRecordTypeError</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Setup assistant: chosen record is not the kind the step asks for</shortDescription>
-        <value>That is not the kind of record this step is choosing, so nothing was saved. Pick again from the list.</value>
     </labels>
 </CustomLabels>

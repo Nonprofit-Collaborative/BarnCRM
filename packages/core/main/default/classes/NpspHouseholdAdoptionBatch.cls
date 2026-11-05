@@ -206,11 +206,11 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
                 : current.get(Id.valueOf(row.Account_Id__c));
             String note;
             if (account == null) {
-                note = Label.Core_NpspAdoption_NoteGone;
+                note = BarnHelp.text('Core', 'Core_NpspAdoption_NoteGone');
             } else if (account.RecordTypeId != household) {
-                note = Label.Core_NpspAdoption_NoteNotHousehold;
+                note = BarnHelp.text('Core', 'Core_NpspAdoption_NoteNotHousehold');
             } else if (!editable.contains(account.Id)) {
-                note = Label.Core_NpspAdoption_NoteNoAccess;
+                note = BarnHelp.text('Core', 'Core_NpspAdoption_NoteNoAccess');
             }
             if (note != null) {
                 notRestored(row, note);
@@ -226,7 +226,7 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
                 notRestored(
                     row,
                     String.format(
-                        Label.Core_NpspAdoption_NoteRefused,
+                        BarnHelp.text('Core', 'Core_NpspAdoption_NoteRefused'),
                         new List<Object>{ refusals.get(accountId) }
                     )
                 );
@@ -275,9 +275,12 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 
     public void finish(Database.BatchableContext context) {
         String summary = undoing
-            ? String.format(Label.Core_NpspAdoption_UndoSummary, new List<Object>{ done, refused })
+            ? String.format(
+                  BarnHelp.text('Core', 'Core_NpspAdoption_UndoSummary'),
+                  new List<Object>{ done, refused }
+              )
             : String.format(
-                  Label.Core_NpspAdoption_RunSummary,
+                  BarnHelp.text('Core', 'Core_NpspAdoption_RunSummary'),
                   new List<Object>{ done, skipped, refused }
               );
         ErrorLogger.logMessage(

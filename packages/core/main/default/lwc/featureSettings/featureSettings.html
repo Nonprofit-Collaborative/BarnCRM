@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <c-barn-notice
         class="slds-var-m-bottom_small"
         variant="warning"
@@ -49,5 +50,6 @@
     </template>
     <template lwc:if={errorMessage}>
         <c-barn-notice class="slds-var-m-top_x-small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+    </template>
     </template>
 </template>

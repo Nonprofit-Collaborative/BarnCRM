@@ -222,7 +222,7 @@ private class HealthCheckServiceTest {
                 'People vanishing from their households is broken, not untidy.'
             );
             System.assertEquals(
-                System.Label.Core_HealthCheck_MembershipHiddenByContactDetailOne,
+                BarnHelp.text('Core', 'Core_HealthCheck_MembershipHiddenByContactDetailOne'),
                 finding.detail,
                 'The finding says how many people are affected, in the singular for one.'
             );
@@ -255,7 +255,7 @@ private class HealthCheckServiceTest {
 
             System.assertNotEquals(null, finding, 'A person the mode cannot see is reported.');
             System.assertEquals(
-                System.Label.Core_HealthCheck_MembershipHiddenByJunctionDetailOne,
+                BarnHelp.text('Core', 'Core_HealthCheck_MembershipHiddenByJunctionDetailOne'),
                 finding.detail,
                 'The finding says how many people are affected, in the singular for one.'
             );

@@ -121,7 +121,7 @@ public virtual with sharing class SampleDataStageBatch implements Database.Batch
         ErrorLogger.logWithMessage(
             failed,
             stages.name() + (stage == null ? '' : ', stage ' + stage),
-            Label.Core_SampleData_StoppedLogMessage
+            BarnHelp.text('Core', 'Core_SampleData_StoppedLogMessage')
         );
         // The stage is already rolled back to its savepoint, so this notice stays (Q-04).
         notifyStopped();

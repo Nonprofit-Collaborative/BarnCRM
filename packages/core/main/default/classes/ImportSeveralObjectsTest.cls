@@ -224,7 +224,7 @@ private class ImportSeveralObjectsTest {
                     'The reason names the object: ' + staged[0].Error_Message__c
                 );
                 Assert.areEqual(
-                    onObject(account, Label.Core_Import_ErrorKeyFirstRowFailed),
+                    onObject(account, BarnHelp.text('Core', 'Core_Import_ErrorKeyFirstRowFailed')),
                     staged[1].Error_Message__c,
                     'A later row of a failed key.'
                 );

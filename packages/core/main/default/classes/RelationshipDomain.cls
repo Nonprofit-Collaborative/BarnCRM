@@ -216,7 +216,7 @@ public with sharing class RelationshipDomain {
         Relationship__c existing = visibleById.get(clash.Id);
         if (existing == null) {
             // The row on file is not visible to this user: say only that it exists.
-            return Label.Core_Relationship_DuplicateHidden;
+            return BarnHelp.text('Core', 'Core_Relationship_DuplicateHidden');
         }
         return String.format(
             Label.Core_Relationship_Duplicate,
@@ -237,6 +237,6 @@ public with sharing class RelationshipDomain {
     }
 
     private static String duplicateMessageWithin() {
-        return Label.Core_Relationship_DuplicateInSave;
+        return BarnHelp.text('Core', 'Core_Relationship_DuplicateInSave');
     }
 }

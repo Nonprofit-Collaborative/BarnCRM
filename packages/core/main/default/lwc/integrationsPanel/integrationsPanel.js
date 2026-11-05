@@ -21,8 +21,6 @@ import RELATED_MODULE from '@salesforce/label/c.Core_Integrations_RelatedModule'
 import COMPATIBILITY_HEADING from '@salesforce/label/c.Core_Integrations_CompatibilityHeading';
 import MIGRATION_PATH from '@salesforce/label/c.Core_Integrations_MigrationPath';
 import LEARN_MORE from '@salesforce/label/c.Core_Kit_LearnMore';
-import EMPTY from '@salesforce/label/c.Core_Integrations_EmptyMessage';
-import LOAD_ERROR from '@salesforce/label/c.Core_Integrations_LoadErrorMessage';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -82,7 +80,9 @@ export default class IntegrationsPanel extends LightningElement {
       return helpText('Core', 'Core_Integrations_Intro');
     },
     compatibility: COMPATIBILITY_HEADING,
-    empty: EMPTY,
+    get empty() {
+      return helpText('Core', 'Core_Integrations_EmptyMessage');
+    },
     checkAgain: CHECK_AGAIN,
     newTab: NEW_TAB
   };
@@ -125,7 +125,9 @@ export default class IntegrationsPanel extends LightningElement {
       this.errorMessage = undefined;
     } catch (error) {
       this.errorMessage =
-        error && error.body && error.body.message ? error.body.message : LOAD_ERROR;
+        error && error.body && error.body.message
+          ? error.body.message
+          : helpText('Core', 'Core_Integrations_LoadErrorMessage');
     }
   }
 

@@ -170,7 +170,7 @@ private class ImportRelatedRecordsTest {
                 }
                 Assert.areEqual(
                     String.format(
-                        Label.Core_Import_LogRelatedCommit,
+                        BarnHelp.text('Core', 'Core_Import_LogRelatedCommit'),
                         new List<String>{ String.valueOf(MANY + 20), '0' }
                     ),
                     ImportObjectLoader.relatedLines(batch.Id, false)[0],
@@ -205,12 +205,12 @@ private class ImportRelatedRecordsTest {
                 List<Import_Row__c> staged = rows();
                 Assert.areEqual('Rejected', staged[0].Status__c, 'The parent found nothing.');
                 Assert.areEqual(
-                    Label.Core_Import_ErrorRelatedParentFailed,
+                    BarnHelp.text('Core', 'Core_Import_ErrorRelatedParentFailed'),
                     staged[1].Error_Message__c,
                     'A later row of its key in the same chunk.'
                 );
                 Assert.areEqual(
-                    Label.Core_Import_ErrorRelatedParentFailed,
+                    BarnHelp.text('Core', 'Core_Import_ErrorRelatedParentFailed'),
                     staged[4].Error_Message__c,
                     'And in a later chunk.'
                 );
@@ -219,7 +219,8 @@ private class ImportRelatedRecordsTest {
                 Assert.isTrue(
                     staged[3]
                         .Error_Message__c.startsWith(
-                            Label.Core_Import_ErrorRelatedRecord.substringBefore('{0}')
+                            BarnHelp.text('Core', 'Core_Import_ErrorRelatedRecord')
+                                .substringBefore('{0}')
                         ),
                     'Said to be the related record: ' + staged[3].Error_Message__c
                 );
@@ -305,7 +306,10 @@ private class ImportRelatedRecordsTest {
                     'Nothing is journaled.'
                 );
                 Assert.areEqual(
-                    String.format(Label.Core_Import_LogRelatedDryRun, new List<String>{ '2', '1' }),
+                    String.format(
+                        BarnHelp.text('Core', 'Core_Import_LogRelatedDryRun'),
+                        new List<String>{ '2', '1' }
+                    ),
                     ImportObjectLoader.relatedLines(batch.Id, true)[0],
                     'The run log says what would be created.'
                 );

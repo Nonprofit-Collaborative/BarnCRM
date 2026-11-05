@@ -3,12 +3,8 @@ import { NavigationMixin } from 'lightning/navigation';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
 import createHousehold from '@salesforce/apex/HubController.createHousehold';
 import WELCOME_HEADING from '@salesforce/label/c.Core_HubHome_WelcomeHeading';
-import WELCOME_MESSAGE from '@salesforce/label/c.Core_HubHome_WelcomeMessage';
-import PAUSED_BANNER from '@salesforce/label/c.Core_HubHome_AutomationPausedBanner';
-import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
 import NEW_HOUSEHOLD from '@salesforce/label/c.Core_HubHomeActions_NewHousehold';
 import NEW_PERSON from '@salesforce/label/c.Core_HubHomeActions_NewPerson';
-import NEW_HOUSEHOLD_FAILED from '@salesforce/label/c.Core_HubHomeActions_NewHouseholdFailed';
 import RESUME from '@salesforce/label/c.Core_AutomationControl_ResumeButton';
 import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import { iconFor } from 'c/barnIcons';
@@ -29,7 +25,9 @@ const AUTOMATION_SECTION = 'Automation';
 export default class HubWelcome extends NavigationMixin(LightningElement) {
   labels = {
     welcomeHeading: WELCOME_HEADING,
-    pausedBanner: PAUSED_BANNER,
+    get pausedBanner() {
+      return helpText('Core', 'Core_HubHome_AutomationPausedBanner');
+    },
     newHousehold: NEW_HOUSEHOLD,
     newPerson: NEW_PERSON
   };
@@ -57,7 +55,7 @@ export default class HubWelcome extends NavigationMixin(LightningElement) {
       this.errorMessage = undefined;
     } else if (error) {
       this.model = undefined;
-      this.errorMessage = LOAD_ERROR;
+      this.errorMessage = helpText('Core', 'Core_HubHome_LoadErrorMessage');
     }
   }
 
@@ -71,7 +69,9 @@ export default class HubWelcome extends NavigationMixin(LightningElement) {
       model &&
       model.canEdit &&
       !(model.stepsTotal > 0 && model.stepsCompleted === model.stepsTotal);
-    return setupPending ? WELCOME_MESSAGE : helpText('Core', 'Core_HubHome_WelcomeEveryday');
+    return setupPending
+      ? helpText('Core', 'Core_HubHome_WelcomeMessage')
+      : helpText('Core', 'Core_HubHome_WelcomeEveryday');
   }
 
   get automationPaused() {
@@ -97,7 +97,7 @@ export default class HubWelcome extends NavigationMixin(LightningElement) {
         state: { [link.sectionKey]: AUTOMATION_SECTION }
       });
     } catch {
-      this.errorMessage = LOAD_ERROR;
+      this.errorMessage = helpText('Core', 'Core_HubHome_LoadErrorMessage');
     }
   }
 
@@ -141,7 +141,9 @@ export default class HubWelcome extends NavigationMixin(LightningElement) {
       });
     } catch (error) {
       const message = error && error.body && error.body.message;
-      this.createError = message || NEW_HOUSEHOLD_FAILED.replace('{0}', '').trim();
+      this.createError =
+        message ||
+        helpText('Core', 'Core_HubHomeActions_NewHouseholdFailed').replace('{0}', '').trim();
     } finally {
       this.creating = false;
     }

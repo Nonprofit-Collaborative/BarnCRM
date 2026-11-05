@@ -258,7 +258,7 @@ private class ModuleSetupsTest {
                 Assert.fail('An unknown package is refused');
             } catch (ModuleManagerService.ModuleManagerException expected) {
                 Assert.areEqual(
-                    System.Label.Core_ModuleManager_UnknownModuleError,
+                    BarnHelp.text('Core', 'Core_ModuleManager_UnknownModuleError'),
                     expected.getMessage(),
                     'With the Module Manager sentence'
                 );

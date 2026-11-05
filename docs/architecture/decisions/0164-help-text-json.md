@@ -6,7 +6,8 @@
 labels and for the JSON to only be available in English for now ... the unmanaged package needs
 to work for orgs for quite a while"); plan Section 4.1 (unlocked now, managed at listing),
 Section 4.14 (labels, translation-ready), Section 9.9 (portability), D-168 (label budget).
-Amends Section 4.14 "All labels in Custom Labels from day one" for help prose only.
+Amends Section 4.14 "All labels in Custom Labels from day one" for help prose and, from D-172
+(Brandon, 2026-11-04: "also move messages"), for messages too.
 
 ## Context
 
@@ -71,11 +72,14 @@ the only kind whose wording never needs to be a platform label: nothing in Setup
    returns an empty string. `scripts/ci/check-help-text.py` makes a missing key a build failure
    instead of a blank.
 7. **What stays a custom label.** UI strings (every title, button, tab, column header, field
-   label, short status word), every message (errors, toasts, validation, confirmations, log
-   lines, run results, notices, and sentences with `{0}` placeholders about the current state),
-   content BarnCRM writes into records, emails, letters, receipts and files, and any text named
+   label, short status word), content BarnCRM writes into emails, letters, receipts,
+   notifications and files, and any text named
    where JSON cannot reach: FlexiPage and Flow metadata, custom metadata records that name a label
    (`Access_Add_On__mdt.Description_Label__c`, Setting Definitions), Aura and Visualforce.
+   Messages (errors, toasts, validation, confirmations, log and run log lines, run results,
+   notices, and sentences with `{0}` placeholders) go into the catalog too (D-172), read the same
+   way; one shown by a Flow or named by metadata stays a label, and so does one another package
+   reads until that package's references move with it.
 8. **CI keeps it that way.** `scripts/ci/check-help-text.py` fails when a key a call names
    (`helpText('<Package>', '<key>')`, `BarnHelp.text('<Package>', '<key>')`, `help-key`) is not
    in that package's catalog, when a call names its key with anything but a literal, when code
@@ -108,7 +112,8 @@ the only kind whose wording never needs to be a platform label: nothing in Setup
   Builder, installs beside an org's own 2,000 labels; the full suite still needs the org to use
   fewer than about 880. The remaining room is in messages (1,597); moving all sentences would
   leave 2,411 for the full suite.
-- The CI label cap drops from 4,500 to 4,150.
+- The CI label cap drops from 4,500 to 4,150, and to 3,215 once Core's messages move (D-172:
+  943 messages, 3,163 labels left).
 - A component with help renders once its package's catalog is in (one request per package per
   page, then the browser cache); with the catalog missing it renders without the help.
 - Translators get help prose as JSON beside labels as Translation Workbench strings, both keyed

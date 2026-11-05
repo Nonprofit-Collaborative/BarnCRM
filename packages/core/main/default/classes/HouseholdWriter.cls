@@ -126,11 +126,15 @@ public with sharing class HouseholdWriter {
     private static void checkCreateAccess(List<Account> households, Set<Id> touchedHouseholdIds) {
         Id recordTypeId = HouseholdService.householdRecordTypeId();
         if (recordTypeId == null) {
-            throw new HouseholdException(Label.Core_Households_ErrorRecordTypeMissing);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_Households_ErrorRecordTypeMissing')
+            );
         }
         Schema.DescribeSObjectResult account = Schema.SObjectType.Account;
         if (!account.isCreateable() || !account.isUpdateable()) {
-            throw new HouseholdException(Label.Core_Households_ErrorCreateNoAccess);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess')
+            );
         }
         Map<String, Schema.SObjectField> fields = account.fields.getMap();
         Set<String> checked = new Set<String>();
@@ -138,7 +142,9 @@ public with sharing class HouseholdWriter {
             if (household.RecordTypeId == null) {
                 household.RecordTypeId = recordTypeId;
             } else if (household.RecordTypeId != recordTypeId) {
-                throw new HouseholdException(Label.Core_Households_ErrorNotAHousehold);
+                throw new HouseholdException(
+                    BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold')
+                );
             }
             for (String name : household.getPopulatedFieldsAsMap().keySet()) {
                 if (!checked.add(name.toLowerCase())) {
@@ -150,7 +156,9 @@ public with sharing class HouseholdWriter {
                     !BOOKKEEPING_FIELDS.contains(field) &&
                     !field.getDescribe().isCreateable()
                 ) {
-                    throw new HouseholdException(Label.Core_Households_ErrorCreateNoAccess);
+                    throw new HouseholdException(
+                        BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess')
+                    );
                 }
             }
         }
@@ -159,7 +167,9 @@ public with sharing class HouseholdWriter {
             : new Set<Id>(touchedHouseholdIds);
         touched.remove(null);
         if (editableCount(touched) != touched.size()) {
-            throw new HouseholdException(Label.Core_Households_ErrorCreateNoHouseholdAccess);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_Households_ErrorCreateNoHouseholdAccess')
+            );
         }
     }
 
@@ -463,7 +473,9 @@ public with sharing class HouseholdWriter {
 
     private static void log(String message, String context) {
         ErrorLogger.log(
-            new HouseholdException(Label.Core_Households_ErrorSaveFailed + ' ' + message),
+            new HouseholdException(
+                BarnHelp.text('Core', 'Core_Households_ErrorSaveFailed') + ' ' + message
+            ),
             context
         );
     }

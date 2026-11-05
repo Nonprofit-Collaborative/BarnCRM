@@ -106,7 +106,7 @@ private class RecordInspectorControllerTest {
                     Assert.fail('Staff may not use the inspector.');
                 } catch (AuraHandledException refused) {
                     Assert.areEqual(
-                        Label.Core_RecordInspector_ErrorNoPermission,
+                        BarnHelp.text('Core', 'Core_RecordInspector_ErrorNoPermission'),
                         refused.getMessage()
                     );
                 }
@@ -126,7 +126,7 @@ private class RecordInspectorControllerTest {
                     Assert.fail('Expected a refusal for ' + bad);
                 } catch (AuraHandledException refused) {
                     Assert.areEqual(
-                        Label.Core_RecordInspector_ErrorNotFound,
+                        BarnHelp.text('Core', 'Core_RecordInspector_ErrorNotFound'),
                         refused.getMessage(),
                         'A reason written for a person.'
                     );

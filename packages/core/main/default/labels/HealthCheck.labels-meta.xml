@@ -9,14 +9,6 @@
         <value>Open the Access Page</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_AccessNeedsAdminDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown to a viewer who cannot see who else is in the org.</shortDescription>
-        <value>Who can get into the app, and how many errors nobody has read, can only be answered by an administrator. Everything else in this report is accurate for everyone.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_AccessNeedsAdminTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -33,28 +25,12 @@
         <value>Open Automation Settings</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_AutomationPausedDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check: packaged automation is paused; {0} is the end time</shortDescription>
-        <value>Automation is paused until {0}. While paused, households are not created and names are not recomputed. That suits a bulk load and nothing else.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_AutomationPausedTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the paused automation finding.</shortDescription>
         <value>BarnCRM Automation Is Paused</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_AutomationRunningDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when no automation is paused.</shortDescription>
-        <value>Nothing is paused. Households are created and names are recomputed as people work.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AutomationRunningTitle</fullName>
@@ -89,14 +65,6 @@
         <value>Settings</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_CheckFailedDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check: one check could not run; {0} is the check name</shortDescription>
-        <value>Health Check could not finish the check named {0}. The rest of this report is still accurate. The details are in the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_CheckFailedTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -119,14 +87,6 @@
         <protected>false</protected>
         <shortDescription>Heading of the box that asks before a fix runs.</shortDescription>
         <value>Before This Fix Runs</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_MirrorMissingDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Explains which module holds the mirror for the detected objects.</shortDescription>
-        <value>This org has Nonprofit Cloud Gift Transaction objects and the Mirror module is not installed. Nothing is broken. To keep Nonprofit Cloud's own summaries working alongside BarnCRM, install the Mirror module.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MirrorMissingTitle</fullName>
@@ -153,14 +113,6 @@
         <value>Coexistence mode</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_EmptyHouseholdsDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check detail: households with no current member.</shortDescription>
-        <value>Nobody is a current member of these households. Some may be kept on purpose, for example when empty households are not deleted automatically, or because records are credited to them (deleting one unlinks them). Open each to add a member, merge it into another household, or delete it. Health Check does not change them.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_EmptyHouseholdsTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -169,28 +121,12 @@
         <value>{0} Households Have Nobody in Them</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_ErrorLogDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check: unread Error Log entries; {0} is the count</shortDescription>
-        <value>The Error Log has {0} new entries. Each one says what went wrong and what to do about it. Work through them, then mark them resolved.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_ErrorLogTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: unread errors; {0} is the count</shortDescription>
         <value>{0} Errors Nobody Has Looked At</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_CustomFiscalYearDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check: custom fiscal year in Setup; {0} is the start month</shortDescription>
-        <value>Reports filtered or grouped by fiscal year follow your custom fiscal year periods. BarnCRM totals for this year, last year and two years ago use whole years from the start of {0}, so they can disagree where a custom year starts on another day or is not twelve months long.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_CustomFiscalYearTitle</fullName>
@@ -209,28 +145,12 @@
         <value>Done. Created: {0}.</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_FixFailed</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when a fix button could not do what it says.</shortDescription>
-        <value>That did not work, and nothing was changed. The details are in the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_FixScheduled</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>After the nightly jobs fix: what it did. {0} the job names.</shortDescription>
         <value>Done. Scheduled: {0}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_FixStoppedOnly</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>After the deactivated owner fix: jobs stopped, not rescheduled. {0} names.</shortDescription>
-        <value>Stopped, and not scheduled again because Health Check never schedules them for you: {0}. Schedule each again on its own page if you still want it.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_InactiveOwnerJobsTitle</fullName>
@@ -249,22 +169,6 @@
         <value>You Cannot Use the Record Type for Organizations</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_OrganizationRecordTypeDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Finding detail: user lacks the organization record type. {0} is its label.</shortDescription>
-        <value>{0} is the record type for organizations (BarnCRM Settings, General), but your profile and permission sets do not give it to you, so you cannot create organizations. In Setup, give {0} to everyone who creates organizations, or choose a record type they have in that setting.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_InactiveOwnerJobsDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Finding detail: deactivated owner jobs. {0} the job names.</shortDescription>
-        <value>These jobs run as a deactivated person, so they stopped although they still show as scheduled: {0}. The fix stops each one and schedules it again as you.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_InactiveOwnerJobsFix</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -279,14 +183,6 @@
         <protected>false</protected>
         <shortDescription>Fix refused: what it would change is not what the finding said.</shortDescription>
         <value>Something changed since Health Check last ran, so this fix would not do exactly what you confirmed. Nothing was changed. Health Check has run again: read the finding and press its button again if it is still there.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_FixUnknown</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when the panel asks for a fix Health Check does not have.</shortDescription>
-        <value>Health Check does not have that fix. Run Health Check again.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_IndustriesDetected</fullName>
@@ -345,28 +241,12 @@
         <value>Seasonal address swap</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_LoadFailed</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when the whole report could not be built.</shortDescription>
-        <value>Health Check could not read your org. The details are in the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_Loading</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown while the report is being built.</shortDescription>
         <value>Reading your org</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_MembershipDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Explains why contact membership does not work with Person Accounts.</shortDescription>
-        <value>Person Accounts are enabled, but household membership still uses the person's account. In a Person Accounts org the person is an account, so households built that way do not work. Switch to the flexible way of belonging, with one membership record per person. Existing households are not changed.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_MembershipFix</fullName>
@@ -385,28 +265,12 @@
         <value>Household Membership Does Not Fit Person Accounts</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_ModeMatchDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check: coexistence mode matches the org; {0} is the mode</shortDescription>
-        <value>This org is set to {0}, which is what BarnCRM recommends for what is installed here.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_ModeMatchTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the finding shown when the mode matches.</shortDescription>
         <value>Coexistence Mode Matches Your Org</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_ModeMismatchDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check: mode does not match; {0} mode set, {1} mode recommended</shortDescription>
-        <value>This org is set to {0}, but what is installed points to {1}. If that is deliberate, leave it. If not, switch: households and imports behave differently in each mode.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_ModeMismatchTitle</fullName>
@@ -417,14 +281,6 @@
         <value>Coexistence Mode Does Not Match Your Org</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_ModeUnsetDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check: no mode confirmed; {0} mode in use, {1} mode recommended</shortDescription>
-        <value>BarnCRM is running as {0} because nobody has confirmed a mode yet. This org looks like {1}. Confirm it before you create households or load data.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_ModeUnsetTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -433,28 +289,12 @@
         <value>Coexistence Mode Is Not Confirmed Yet</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_MultiCurrencyDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Explains that multiple currencies are not supported yet.</shortDescription>
-        <value>BarnCRM does not convert between currencies yet. Nothing will break, but totals add up amounts as they were entered. Keep amounts in one currency until currency support ships.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_MultiCurrencyTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the multi-currency finding.</shortDescription>
         <value>This Org Uses More Than One Currency</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_NightlyJobsDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check detail: nightly jobs not scheduled. {0} the job names.</shortDescription>
-        <value>Not scheduled: {0}. Each keeps something up to date overnight, and none runs until someone schedules it. The fix schedules each at its usual time, to run as you. Stop any of them on its own page.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NightlyJobsFix</fullName>
@@ -473,36 +313,12 @@
         <value>Nightly Jobs Are Not Scheduled</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_NoAdminDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Explains that nobody holds the BarnCRM Admin role.</shortDescription>
-        <value>Nobody in this org has the BarnCRM Admin role, so nobody can change settings and parts of BarnCRM will refuse to run. Assign it to yourself on the Access page.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_NoAdminTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title of the missing administrator finding.</shortDescription>
         <value>No One Is Assigned the BarnCRM Admin Role</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_NoFindings</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when there is nothing to report.</shortDescription>
-        <value>Nothing to report. BarnCRM is set up correctly.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_NoHouseholdCreationDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Explains that no new person is getting a household.</shortDescription>
-        <value>Household membership uses membership records and "create a household automatically" is off, so no person saved from now on gets a household. Nothing fails or is logged, but people saved meanwhile must be grouped by hand later. Turn automatic households on unless your org groups people another way.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_NoHouseholdCreationFix</fullName>
@@ -545,14 +361,6 @@
         <value>What We Found in Your Org</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_OrgShapeDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check org shape: {0} what was detected, {1} the recommended mode</shortDescription>
-        <value>{0} BarnCRM supports this org shape directly. The recommended coexistence mode is {1}. Shield Platform Encryption cannot be detected in the app: if your org uses it, say so before you load data.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_OrgShapeTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -577,30 +385,6 @@
         <value>More than {0}</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_OrphansNativeNote</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Orphan findings in an org that also has detected native households.</shortDescription>
-        <value>This org also has Nonprofit Cloud households, and BarnCRM cannot see who belongs to those, so some of these may be in one.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_PeopleWithoutHouseholdContactDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check detail: contacts with no account, in contact mode.</shortDescription>
-        <value>These contacts have no account, so they are in no household: they count toward no household total and no household name or greeting. A contact whose account is an organization is not counted. Open each one and set its account to a household. Health Check does not change them.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_PeopleWithoutHouseholdJunctionDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check detail: people with no current membership, junction mode.</shortDescription>
-        <value>No current household membership names these people, so they are in no household: they count toward no household total and no household name or greeting. Open each one and add them to a household from the members panel. Health Check does not change them.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_PeopleWithoutHouseholdTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -609,28 +393,12 @@
         <value>{0} People Are Not in a Household</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_PermissionRequired</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when someone without the permission tries to change a setting.</shortDescription>
-        <value>You need the Manage BarnCRM Settings permission to change this. Ask your BarnCRM admin for the BarnCRM Admin role.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_PersonAccountsDetected</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Shown when Person Accounts are enabled.</shortDescription>
         <value>Person Accounts enabled</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_ReadOnlyNotice</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown to someone who can read the report but not act on it.</shortDescription>
-        <value>You can read this report but not change anything. Ask your BarnCRM admin for the Manage BarnCRM Settings permission.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_RecommendedModeLabel</fullName>
@@ -681,14 +449,6 @@
         <value>Worth Knowing</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_SwitchesMissingDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check detail: automation switches missing. {0} count, {1} names.</shortDescription>
-        <value>These automations run but have no switch on the Automation page, so they cannot be turned off there: {1}. The fix creates each switch at its shipped default, so nothing stops. An automation that enforces a rule gets a locked switch because it always runs. Existing switches keep their setting.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_SwitchesMissingFix</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -703,14 +463,6 @@
         <protected>false</protected>
         <shortDescription>Health Check title: automation switches missing. {0} is the count.</shortDescription>
         <value>{0} Automation Switches Are Missing</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_TemplatesMissingDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check detail: import templates missing. {0} count, {1} names.</shortDescription>
-        <value>BarnCRM ships import templates this org does not have: {1}. The fix creates each one exactly as shipped. Your own templates are not touched.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_TemplatesMissingFix</fullName>
@@ -745,14 +497,6 @@
         <value>Use Recommended Mode</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_UsersWithoutAccessDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check: active users hold no BarnCRM role; {0} is the count</shortDescription>
-        <value>{0} active users have a Salesforce license but no BarnCRM role, so the BarnCRM app is invisible to them. Assign roles on the Access page, or ignore this if those people are not meant to use BarnCRM.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_UsersWithoutAccessTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -769,14 +513,6 @@
         <value>Automation Is Paused with No Automatic Resume</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_PausedNoResumeDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check: a pause nothing will end; {0} is the end time</shortDescription>
-        <value>Automation is paused until {0}, and nothing is set to switch it back on then. The pause started before automatic resume existed, or somewhere other than the Automation page. Open the Automation page and click Resume automation, then pause again for a set time if you still need to.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_DigestStaleTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
@@ -785,28 +521,12 @@
         <value>The Error Digest Has Stopped Running</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_DigestStaleDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Detail of the stopped digest finding; {0} is when it last ran.</shortDescription>
-        <value>The error digest is scheduled but last ran {0}. It runs as the person who scheduled it, so it stops when they are deactivated. Stop it and schedule it again as yourself.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_DigestStaleFix</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Fix button for the stopped digest finding.</shortDescription>
         <value>Open Error Log Settings</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_LastResult</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Last Health Check result. {0} to fix, {1} to be aware of, {2} information.</shortDescription>
-        <value>{0} to fix, {1} to be aware of, {2} for your information.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_LastRunLabel</fullName>
@@ -833,28 +553,12 @@
         <value>{0} Relationships Have No Person on One Side</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_RelationshipsNoPersonDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Detail: relationships left with no person after a delete.</shortDescription>
-        <value>One person in each of these relationships was deleted, so the relationship no longer connects two people and cannot be edited until a person is chosen. Open each one and choose the missing person, or delete the relationship. Health Check does not change them.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_AffiliationsNoPersonTitle</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Title: affiliations with no person. {0} count or more than.</shortDescription>
         <value>{0} Affiliations Have No Person</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_AffiliationsNoPersonDetail</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Detail: affiliations left with no person after a delete.</shortDescription>
-        <value>The person in these affiliations was deleted, so they show as an unnamed person. Open each one and choose the person, or delete the affiliation. Health Check does not change them.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_AffiliationsNoPersonTitleOne</fullName>
@@ -897,28 +601,12 @@
         <value>It is linked below.</value>
     </labels>
     <labels>
-        <fullName>Core_HealthCheck_OrphansFirstListedOne</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check: only the first of several records is linked below.</shortDescription>
-        <value>The first is linked below.</value>
-    </labels>
-    <labels>
         <fullName>Core_HealthCheck_ErrorLogTitleOne</fullName>
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Health Check title: one new Error Log entry.</shortDescription>
         <value>1 Error Nobody Has Looked At</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_ErrorLogDetailOne</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check detail: one new Error Log entry.</shortDescription>
-        <value>The Error Log has 1 new entry. It says what went wrong and what to do about it. Work through it, then mark it resolved.</value>
     </labels>
     <labels>
         <fullName>Core_HealthCheck_SwitchesMissingTitleOne</fullName>
@@ -943,53 +631,5 @@
         <protected>false</protected>
         <shortDescription>Health Check title: one licensed user has no BarnCRM role.</shortDescription>
         <value>1 User Cannot See the App</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_UsersWithoutAccessDetailOne</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check detail: one licensed user has no BarnCRM role.</shortDescription>
-        <value>1 active user has a Salesforce license but no BarnCRM role, so the BarnCRM app is invisible to them. Assign roles on the Access page, or ignore this if that person is not meant to use BarnCRM.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_EmptyHouseholdsDetailOne</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check detail: exactly one household with no current member.</shortDescription>
-        <value>Nobody is a current member of this household. It may be kept on purpose, for example when empty households are not deleted automatically, or because records are credited to it (deleting it unlinks them). Open it to add a member, merge it into another household, or delete it. Health Check does not change it.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_PeopleWithoutHouseholdContactDetailOne</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check detail: exactly one contact with no account, in contact mode.</shortDescription>
-        <value>This contact has no account, so they are in no household: they count toward no household total and no household name or greeting. A contact whose account is an organization is not counted. Open the contact and set its account to a household. Health Check does not change it.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_PeopleWithoutHouseholdJunctionDetailOne</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Health Check detail: one person with no current membership, junction mode.</shortDescription>
-        <value>No current household membership names this person, so they are in no household: they count toward no household total and no household name or greeting. Open the person and add them to a household from the members panel. Health Check does not change it.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_RelationshipsNoPersonDetailOne</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Detail: exactly one relationship left with no person after a delete.</shortDescription>
-        <value>One person in this relationship was deleted, so it no longer connects two people and cannot be edited until a person is chosen. Open it and choose the missing person, or delete the relationship. Health Check does not change it.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HealthCheck_AffiliationsNoPersonDetailOne</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Detail: exactly one affiliation left with no person after a delete.</shortDescription>
-        <value>The person in this affiliation was deleted, so it shows as an unnamed person. Open it and choose the person, or delete the affiliation. Health Check does not change it.</value>
     </labels>
 </CustomLabels>

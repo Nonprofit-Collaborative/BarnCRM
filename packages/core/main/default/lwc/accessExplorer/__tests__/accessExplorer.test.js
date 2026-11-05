@@ -12,6 +12,11 @@ import describeObject from '@salesforce/apex/DataDictionaryController.describeOb
 import { setHelpTextForTest } from 'c/barnHelpText';
 
 setHelpTextForTest({
+  Core_AccessExplorer_Downloaded: 'Downloaded {0} rows.',
+  Core_AccessExplorer_Truncated: 'More than {0} give access.'
+});
+
+setHelpTextForTest({
   Core_AccessExplorer_ModifyAllDataNote: '{0} gives Modify All Data.'
 });
 
@@ -67,16 +72,6 @@ jest.mock('@salesforce/label/c.Core_AccessExplorer_Yes', () => ({ default: 'Yes'
 jest.mock('@salesforce/label/c.Core_AccessExplorer_Always', () => ({ default: 'Always' }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_AccessExplorer_Downloaded',
-  () => ({ default: 'Downloaded {0} rows.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_AccessExplorer_Truncated',
-  () => ({ default: 'More than {0} give access.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/label/c.Core_AccessExplorer_KindGroup', () => ({ default: 'Group' }), {
   virtual: true
 });

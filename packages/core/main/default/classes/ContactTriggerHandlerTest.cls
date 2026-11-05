@@ -382,7 +382,10 @@ private class ContactTriggerHandlerTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_Households_ErrorPersonToOrganization, refused);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Households_ErrorPersonToOrganization'),
+                refused
+            );
             Assert.areEqual(
                 household,
                 [SELECT AccountId FROM Contact WHERE Id = :maria.Id].AccountId,

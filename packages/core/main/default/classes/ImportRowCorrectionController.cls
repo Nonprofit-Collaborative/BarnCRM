@@ -88,7 +88,9 @@ public with sharing class ImportRowCorrectionController {
             }
             String document = kept.isEmpty() ? null : JSON.serialize(kept);
             if (document != null && document.length() > MAX_CORRECTIONS) {
-                throw new ImportException(Label.Core_Import_ErrorCorrectionsTooLong);
+                throw new ImportException(
+                    BarnHelp.text('Core', 'Core_Import_ErrorCorrectionsTooLong')
+                );
             }
             Database.update(
                 new Import_Row__c(Id = row.Id, Corrected_Values_JSON__c = document),
@@ -118,7 +120,9 @@ public with sharing class ImportRowCorrectionController {
             enforcePermission();
             Import_Row__c row = readRow(rowId);
             if (!canEdit(row.Import_Batch__c)) {
-                throw new ImportException(Label.Core_Import_ErrorNoRowEditAccess);
+                throw new ImportException(
+                    BarnHelp.text('Core', 'Core_Import_ErrorNoRowEditAccess')
+                );
             }
             return ImportBatchService.startRowRetry(row.Import_Batch__c, null);
         } catch (Exception e) {
@@ -166,10 +170,10 @@ public with sharing class ImportRowCorrectionController {
     /** Why this rejected row cannot be corrected or retried now, or null. */
     private static String refusal(Import_Row__c row) {
         if (!hasManagePermission()) {
-            return Label.Core_Import_ErrorNoPermission;
+            return BarnHelp.text('Core', 'Core_Import_ErrorNoPermission');
         }
         if (!canEdit(row.Id)) {
-            return Label.Core_Import_ErrorNoRowEditAccess;
+            return BarnHelp.text('Core', 'Core_Import_ErrorNoRowEditAccess');
         }
         return ImportBatchService.rowRetryRefusal(
             ImportBatchSelector.selectById(row.Import_Batch__c)
@@ -181,7 +185,9 @@ public with sharing class ImportRowCorrectionController {
         enforcePermission();
         Import_Row__c row = readRow(rowId);
         if (!ImportRowProcessor.STATUS_REJECTED.equals(row.Status__c)) {
-            throw new ImportException(Label.Core_Import_ErrorCorrectOnlyRejected);
+            throw new ImportException(
+                BarnHelp.text('Core', 'Core_Import_ErrorCorrectOnlyRejected')
+            );
         }
         String refused = refusal(row);
         if (refused != null) {
@@ -229,7 +235,7 @@ public with sharing class ImportRowCorrectionController {
 
     private static void enforcePermission() {
         if (!hasManagePermission()) {
-            throw new ImportException(Label.Core_Import_ErrorNoPermission);
+            throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorNoPermission'));
         }
     }
 

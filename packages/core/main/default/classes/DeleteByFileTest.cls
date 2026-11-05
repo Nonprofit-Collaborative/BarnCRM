@@ -135,7 +135,7 @@ private class DeleteByFileTest {
                     Assert.fail('The import commit is refused.');
                 } catch (ImportException refused) {
                     Assert.areEqual(
-                        Label.Core_Import_ErrorDeleteNeedsConfirm,
+                        BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsConfirm'),
                         refused.getMessage()
                     );
                 }
@@ -268,7 +268,7 @@ private class DeleteByFileTest {
                 );
                 Import_Template__c template = deleteTemplate();
                 Assert.areEqual(
-                    Label.Core_Import_ErrorDeleteNeedsPermission,
+                    BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsPermission'),
                     ImportObjectSchema.refusal(
                         template,
                         ImportMapping.parse(template.Column_Mapping_JSON__c)
@@ -281,7 +281,7 @@ private class DeleteByFileTest {
                     Assert.fail('Saving a delete is refused.');
                 } catch (ImportException refused) {
                     Assert.areEqual(
-                        Label.Core_Import_ErrorDeleteNeedsPermission,
+                        BarnHelp.text('Core', 'Core_Import_ErrorDeleteNeedsPermission'),
                         refused.getMessage()
                     );
                 }

@@ -48,7 +48,7 @@ private class SampleDataSetTest {
         } catch (SampleDataException e) {
             threw = true;
             System.assertEquals(
-                Label.Core_SampleData_ErrorInvalidData,
+                BarnHelp.text('Core', 'Core_SampleData_ErrorInvalidData'),
                 e.getMessage(),
                 'invalid data should use the packaged label: ' + because
             );

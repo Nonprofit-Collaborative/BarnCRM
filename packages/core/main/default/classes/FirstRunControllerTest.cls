@@ -218,7 +218,7 @@ private class FirstRunControllerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                System.Label.Core_FirstRun_SaveError,
+                BarnHelp.text('Core', 'Core_FirstRun_SaveError'),
                 refused.getMessage(),
                 'Maria sees a message she can act on'
             );
@@ -239,7 +239,7 @@ private class FirstRunControllerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                System.Label.Core_SuiteChoice_UnknownSuiteError,
+                BarnHelp.text('Core', 'Core_SuiteChoice_UnknownSuiteError'),
                 refused.getMessage(),
                 'Only the two editions are accepted'
             );

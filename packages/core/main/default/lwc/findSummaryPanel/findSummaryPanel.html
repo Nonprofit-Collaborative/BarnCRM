@@ -1,4 +1,5 @@
 <template>
+    <template lwc:if={helpReady}>
     <div class="slds-is-relative">
         <template lwc:if={busy}>
             <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
@@ -67,4 +68,5 @@
             </div>
         </template>
     </div>
+    </template>
 </template>

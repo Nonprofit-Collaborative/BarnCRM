@@ -45,7 +45,7 @@ public with sharing class HealthCheckSettingsChecks {
                 'organization_record_type_unavailable',
                 System.Label.Core_HealthCheck_OrganizationRecordTypeTitle,
                 String.format(
-                    System.Label.Core_HealthCheck_OrganizationRecordTypeDetail,
+                    BarnHelp.text('Core', 'Core_HealthCheck_OrganizationRecordTypeDetail'),
                     new List<Object>{ AccountKinds.organizationRecordTypeLabel() }
                 ),
                 HealthCheckService.SEVERITY_WARNING,
@@ -76,7 +76,7 @@ public with sharing class HealthCheckSettingsChecks {
                     HealthCheckService.FIX_KEY_RESTORE_AUTOMATION_SWITCHES,
                     System.Label.Core_HealthCheck_SwitchesMissingTitleOne,
                     System.Label.Core_HealthCheck_SwitchesMissingTitle,
-                    System.Label.Core_HealthCheck_SwitchesMissingDetail,
+                    BarnHelp.text('Core', 'Core_HealthCheck_SwitchesMissingDetail'),
                     HealthCheckService.SEVERITY_INFO
                 )
                 ?.withFix(
@@ -95,7 +95,7 @@ public with sharing class HealthCheckSettingsChecks {
                     HealthCheckService.FIX_KEY_RESTORE_IMPORT_TEMPLATES,
                     System.Label.Core_HealthCheck_TemplatesMissingTitleOne,
                     System.Label.Core_HealthCheck_TemplatesMissingTitle,
-                    System.Label.Core_HealthCheck_TemplatesMissingDetail,
+                    BarnHelp.text('Core', 'Core_HealthCheck_TemplatesMissingDetail'),
                     HealthCheckService.SEVERITY_INFO
                 )
                 ?.withFix(
@@ -128,7 +128,7 @@ public with sharing class HealthCheckSettingsChecks {
                     'jobs_inactive_owner',
                     System.Label.Core_HealthCheck_InactiveOwnerJobsTitle,
                     String.format(
-                        System.Label.Core_HealthCheck_InactiveOwnerJobsDetail,
+                        BarnHelp.text('Core', 'Core_HealthCheck_InactiveOwnerJobsDetail'),
                         new List<Object>{ String.join(stopped, HealthCheckService.JOB_SEPARATOR) }
                     ),
                     HealthCheckService.SEVERITY_WARNING,
@@ -160,7 +160,7 @@ public with sharing class HealthCheckSettingsChecks {
                 'nightly_jobs_not_scheduled',
                 System.Label.Core_HealthCheck_NightlyJobsTitle,
                 String.format(
-                    System.Label.Core_HealthCheck_NightlyJobsDetail,
+                    BarnHelp.text('Core', 'Core_HealthCheck_NightlyJobsDetail'),
                     new List<Object>{ String.join(waiting, HealthCheckService.JOB_SEPARATOR) }
                 ),
                 HealthCheckService.SEVERITY_WARNING,
@@ -214,7 +214,7 @@ public with sharing class HealthCheckSettingsChecks {
             return new HealthCheckService.Finding(
                 'automation_running',
                 System.Label.Core_HealthCheck_AutomationRunningTitle,
-                System.Label.Core_HealthCheck_AutomationRunningDetail,
+                BarnHelp.text('Core', 'Core_HealthCheck_AutomationRunningDetail'),
                 HealthCheckService.SEVERITY_INFO,
                 HealthCheckService.CATEGORY_SETTINGS
             );
@@ -225,8 +225,8 @@ public with sharing class HealthCheckSettingsChecks {
         Boolean withoutResume = AutomationControl.isPauseWithoutResume();
         String detail = String.format(
             withoutResume
-                ? System.Label.Core_HealthCheck_PausedNoResumeDetail
-                : System.Label.Core_HealthCheck_AutomationPausedDetail,
+                ? BarnHelp.text('Core', 'Core_HealthCheck_PausedNoResumeDetail')
+                : BarnHelp.text('Core', 'Core_HealthCheck_AutomationPausedDetail'),
             new List<Object>{ pausedUntil.format() }
         );
         return new HealthCheckService.Finding(
@@ -260,7 +260,7 @@ public with sharing class HealthCheckSettingsChecks {
             'custom_fiscal_year',
             System.Label.Core_HealthCheck_CustomFiscalYearTitle,
             String.format(
-                System.Label.Core_HealthCheck_CustomFiscalYearDetail,
+                BarnHelp.text('Core', 'Core_HealthCheck_CustomFiscalYearDetail'),
                 new List<Object>{
                     FiscalYearSelector.monthName(FiscalYearSelector.fiscalYearStartMonth())
                 }
@@ -301,8 +301,8 @@ public with sharing class HealthCheckSettingsChecks {
                 ),
                 HealthCheckService.forCount(
                     newErrors,
-                    System.Label.Core_HealthCheck_ErrorLogDetailOne,
-                    System.Label.Core_HealthCheck_ErrorLogDetail,
+                    BarnHelp.text('Core', 'Core_HealthCheck_ErrorLogDetailOne'),
+                    BarnHelp.text('Core', 'Core_HealthCheck_ErrorLogDetail'),
                     count
                 ),
                 HealthCheckService.SEVERITY_WARNING,
@@ -333,7 +333,7 @@ public with sharing class HealthCheckSettingsChecks {
                 'error_digest_stale',
                 System.Label.Core_HealthCheck_DigestStaleTitle,
                 String.format(
-                    System.Label.Core_HealthCheck_DigestStaleDetail,
+                    BarnHelp.text('Core', 'Core_HealthCheck_DigestStaleDetail'),
                     new List<Object>{ lastRun.format() }
                 ),
                 HealthCheckService.SEVERITY_WARNING,

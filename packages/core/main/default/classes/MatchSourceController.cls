@@ -115,7 +115,10 @@ public with sharing class MatchSourceController {
         Schema.SObjectType type = NamespaceUtil.objectType(objectName);
         if (type == null) {
             throw UserErrors.message(
-                String.format(Label.Core_MatchSource_NoSuchObject, new List<Object>{ objectName })
+                String.format(
+                    BarnHelp.text('Core', 'Core_MatchSource_NoSuchObject'),
+                    new List<Object>{ objectName }
+                )
             );
         }
         try {
@@ -166,7 +169,7 @@ public with sharing class MatchSourceController {
             MatchSourceService.Source source = MatchSourceService.sourceFrom(label, given);
             if (source == null) {
                 throw new CustomMetadataManagerService.CustomMetadataManagerException(
-                    System.Label.Core_MatchLogic_NotUsable
+                    BarnHelp.text('Core', 'Core_MatchLogic_NotUsable')
                 );
             }
             TryResult result = new TryResult();
@@ -282,7 +285,7 @@ public with sharing class MatchSourceController {
             !FeatureManagement.checkPermission(SETTINGS_PERMISSION) &&
             !FeatureManagement.checkPermission(METADATA_PERMISSION)
         ) {
-            throw UserErrors.message(Label.Core_MatchLogic_PermissionRequired);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_MatchLogic_PermissionRequired'));
         }
     }
 
@@ -292,7 +295,7 @@ public with sharing class MatchSourceController {
             e,
             e instanceof CustomMetadataManagerService.CustomMetadataManagerException,
             'Duplicate Matching: matching logic',
-            Label.Core_CmdtManager_LoadError
+            BarnHelp.text('Core', 'Core_CmdtManager_LoadError')
         );
     }
 }

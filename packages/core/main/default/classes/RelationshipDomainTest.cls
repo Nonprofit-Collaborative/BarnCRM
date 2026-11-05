@@ -245,7 +245,11 @@ private class RelationshipDomainTest {
 
             Assert.isFalse(result.isSuccess(), 'A hidden duplicate is still refused');
             String message = result.getErrors()[0].getMessage();
-            Assert.areEqual(Label.Core_Relationship_DuplicateHidden, message, 'Generic message');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Relationship_DuplicateHidden'),
+                message,
+                'Generic message'
+            );
             Assert.isFalse(message.contains('RL-'), 'No record number');
             Assert.isFalse(message.contains('Garcia'), 'No name');
         }
@@ -276,7 +280,7 @@ private class RelationshipDomainTest {
             for (Database.SaveResult result : results) {
                 Assert.isFalse(result.isSuccess(), 'Every hidden duplicate is refused');
                 Assert.areEqual(
-                    Label.Core_Relationship_DuplicateHidden,
+                    BarnHelp.text('Core', 'Core_Relationship_DuplicateHidden'),
                     result.getErrors()[0].getMessage(),
                     'With the generic message'
                 );

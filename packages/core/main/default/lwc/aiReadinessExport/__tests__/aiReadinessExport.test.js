@@ -8,6 +8,14 @@ import getChecks from '@salesforce/apex/DataHygieneController.getChecks';
 import getPlan from '@salesforce/apex/FieldUtilizationController.getPlan';
 import countFields from '@salesforce/apex/FieldUtilizationController.countFields';
 import { writeZip } from 'c/xlsxWriter';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_AiExport_Done: 'Downloaded the pack: {0} kinds of record and {1} records.',
+  Core_AiExport_Stopped: 'Records stopped at the limit ({0}) for: {1}.',
+  Core_AiExport_RecordsFailed: 'Records could not be read for: {0}.',
+  Core_AiExport_ChecksFailed: 'Checks could not be read.'
+});
 
 jest.mock(
   '@salesforce/apex/DataDictionaryController.listObjects',
@@ -43,26 +51,6 @@ jest.mock('@salesforce/customPermission/Find_And_Export_Records', () => ({ defau
   virtual: true
 });
 jest.mock('c/xlsxWriter', () => ({ writeZip: jest.fn(async () => new Uint8Array([1])) }));
-jest.mock(
-  '@salesforce/label/c.Core_AiExport_Done',
-  () => ({ default: 'Downloaded the pack: {0} kinds of record and {1} records.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_AiExport_Stopped',
-  () => ({ default: 'Records stopped at the limit ({0}) for: {1}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_AiExport_RecordsFailed',
-  () => ({ default: 'Records could not be read for: {0}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_AiExport_ChecksFailed',
-  () => ({ default: 'Checks could not be read.' }),
-  { virtual: true }
-);
 
 const OPTIONS = [
   { value: 'Account', label: 'Account', isDefault: false },

@@ -28,7 +28,7 @@ public with sharing class ImportRowFilter {
         if (rules.size() > MAX_RULES || keys.size() > MAX_RULES) {
             result.add(
                 String.format(
-                    Label.Core_Import_ErrorRowRulesTooMany,
+                    BarnHelp.text('Core', 'Core_Import_ErrorRowRulesTooMany'),
                     new List<String>{ String.valueOf(MAX_RULES) }
                 )
             );
@@ -43,13 +43,13 @@ public with sharing class ImportRowFilter {
                 (rule.text == null ||
                 rule.text.length() <= DataTransform.MAX_TEXT);
             if (!usable) {
-                result.add(Label.Core_Import_ErrorSkipRule);
+                result.add(BarnHelp.text('Core', 'Core_Import_ErrorSkipRule'));
                 break;
             }
         }
         for (String key : keys) {
             if (String.isBlank(key)) {
-                result.add(Label.Core_Import_ErrorUniqueBy);
+                result.add(BarnHelp.text('Core', 'Core_Import_ErrorUniqueBy'));
                 break;
             }
         }
@@ -104,7 +104,7 @@ public with sharing class ImportRowFilter {
                 skip(
                     rows[i],
                     String.format(
-                        Label.Core_Import_SkippedRepeat,
+                        BarnHelp.text('Core', 'Core_Import_SkippedRepeat'),
                         new List<String>{ String.valueOf(earlier), String.join(keys, ', ') }
                     )
                 );
@@ -136,7 +136,7 @@ public with sharing class ImportRowFilter {
             }
             if (matches) {
                 return String.format(
-                    Label.Core_Import_SkippedByRule,
+                    BarnHelp.text('Core', 'Core_Import_SkippedByRule'),
                     new List<String>{ rule.column }
                 );
             }

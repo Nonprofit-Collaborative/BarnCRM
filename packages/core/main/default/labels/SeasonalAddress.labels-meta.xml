@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Core_SeasonalAddress_CollisionWarning</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Seasonal swap: two seasonal addresses cover the same day</shortDescription>
-        <value>Two seasonal addresses cover today, so BarnCRM used the first added. Change one&apos;s dates.</value>
-    </labels>
-    <labels>
         <fullName>Core_SeasonalAddress_HubLink</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
@@ -25,22 +17,6 @@
         <value>Seasonal Addresses Last Swapped</value>
     </labels>
     <labels>
-        <fullName>Core_SeasonalAddress_NeverRun</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown where the last run would be, before the job has ever run</shortDescription>
-        <value>The seasonal address swap has not run yet.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SeasonalAddress_NotScheduled</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Status shown when the nightly swap is not scheduled</shortDescription>
-        <value>The nightly swap is not scheduled, so seasonal addresses will not move on their own.</value>
-    </labels>
-    <labels>
         <fullName>Core_SeasonalAddress_PageTitle</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
@@ -49,75 +25,11 @@
         <value>Seasonal Address Swap</value>
     </labels>
     <labels>
-        <fullName>Core_SeasonalAddress_PermissionRequired</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Run now refused without Manage BarnCRM Settings</shortDescription>
-        <value>You need the Manage BarnCRM Settings permission to run the seasonal address swap. Ask your BarnCRM admin for the BarnCRM Admin role.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SeasonalAddress_ReadOnly</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Note shown to a user who can see the panel but not change it</shortDescription>
-        <value>You can see when the swap last ran. Running it needs the Manage BarnCRM Settings permission.</value>
-    </labels>
-    <labels>
         <fullName>Core_SeasonalAddress_RunNow</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Button that runs the swap immediately</shortDescription>
         <value>Run the Swap Now</value>
-    </labels>
-    <labels>
-        <fullName>Core_SeasonalAddress_RunNowStarted</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Confirmation after the swap is started by hand</shortDescription>
-        <value>The swap has started. Refresh this page in a minute to see what it did.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SeasonalAddress_RunSummaryFormat</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Seasonal run: {0} moved in, {1} moved back, {2} could not be changed</shortDescription>
-        <value>{0} moved to a seasonal address, {1} moved back, {2} could not be changed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SeasonalAddress_ScheduleActive</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Status shown when the nightly swap is scheduled</shortDescription>
-        <value>The swap runs every night at 12:30 AM, in your organization's time zone.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SeasonalAddress_Stale</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Warning when a scheduled swap has not run inside its window</shortDescription>
-        <value>The swap is scheduled but has not run in more than 36 hours. Choose Run the swap now, and check the Error Log if it does not finish.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SeasonalAddress_SwitchedOff</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Status shown when Seasonal Addresses is off</shortDescription>
-        <value>Seasonal Addresses is off, so seasonal addresses will not move on their own. Turn it on above and choose Save to schedule the nightly swap.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SeasonalAddress_UnexpectedError</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Message shown when the seasonal swap panel fails for a reason it cannot explain</shortDescription>
-        <value>Something went wrong with the seasonal address swap. Try again, and if it happens again ask your BarnCRM admin to check the Error Log.</value>
     </labels>
 </CustomLabels>

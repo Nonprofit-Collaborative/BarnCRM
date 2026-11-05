@@ -43,7 +43,7 @@ private class HubControllerFailureTest {
 
             Assert.isNull(model, 'No half built page is handed back');
             Assert.areEqual(
-                System.Label.Core_HubHome_LoadErrorMessage,
+                BarnHelp.text('Core', 'Core_HubHome_LoadErrorMessage'),
                 message,
                 'The page is told what happened in the words the label gives'
             );

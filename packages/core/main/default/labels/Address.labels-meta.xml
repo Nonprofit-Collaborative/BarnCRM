@@ -17,14 +17,6 @@
         <value>New Address</value>
     </labels>
     <labels>
-        <fullName>Core_Address_CannotUntickOnlyDefault</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address: refusal to untick the only address in use</shortDescription>
-        <value>This is the address in use. To change that, make another address the primary, or delete this one.</value>
-    </labels>
-    <labels>
         <fullName>Core_Address_EmptyHeading</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
@@ -33,76 +25,12 @@
         <value>No Addresses Yet</value>
     </labels>
     <labels>
-        <fullName>Core_Address_LoadFailed</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: message shown when the addresses cannot be read</shortDescription>
-        <value>We could not load these addresses. Refresh the page. If it happens again, ask your BarnCRM admin to check your access to addresses.</value>
-    </labels>
-    <labels>
         <fullName>Core_Address_Loading</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: what a screen reader hears while the card loads</shortDescription>
         <value>Loading addresses</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_MoveFailed</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: a household move could not be saved</shortDescription>
-        <value>Nothing was changed. Check you can edit addresses, the household and its people. If it happens again, an administrator can check the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_MoveNoPrimary</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: Update Everyone's Address on a household with no primary</shortDescription>
-        <value>This household has no primary address yet. Choose Set as Primary on one of its addresses first.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_MoveNotFound</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: the address to move was deleted or cannot be read</shortDescription>
-        <value>We could not find that address. Refresh the page and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_MoveNotTheirHousehold</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: the household chosen is not one the person belongs to</shortDescription>
-        <value>This person is not a current member of that household, so nothing was changed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_PropagationFailed</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address automation: primary address could not be copied to standard fields</shortDescription>
-        <value>We could not copy this address to the standard address fields, so nothing was saved. Check that you can edit the household and its people, then try again. If it happens again, ask your BarnCRM admin to check the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_SaveFailed</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: message shown when a new address could not be saved</shortDescription>
-        <value>The address could not be saved. Check the fields marked in the form and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_SaveSuccess</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: confirmation after a new address is saved</shortDescription>
-        <value>Address saved.</value>
     </labels>
     <labels>
         <fullName>Core_Address_SeasonalRange</fullName>
@@ -129,22 +57,6 @@
         <value>Set as Primary</value>
     </labels>
     <labels>
-        <fullName>Core_Address_SetDefaultFailed</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: message shown when the primary could not be changed</shortDescription>
-        <value>We could not make that the primary address. Check you can edit addresses. If it happens again, an administrator can check the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_SetDefaultSuccess</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: confirmation after the primary address changes</shortDescription>
-        <value>This is now the primary address, and it has been copied to the standard address fields.</value>
-    </labels>
-    <labels>
         <fullName>Core_Address_UpdateEveryoneButton</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
@@ -159,22 +71,6 @@
         <protected>false</protected>
         <shortDescription>Address panel: heads the list of people who will get the address</shortDescription>
         <value>These people will get this address:</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_UpdateEveryoneNobody</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: every member has an address of their own</shortDescription>
-        <value>Everyone in this household has an address of their own, so only the people you tick will get this address.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_UpdateEveryoneSuccess</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: confirmation after Update Everyone's Address</shortDescription>
-        <value>Everyone's address has been updated.</value>
     </labels>
     <labels>
         <fullName>Core_Address_UpdateEveryoneTitle</fullName>
@@ -193,28 +89,12 @@
         <value>Move the Household Here</value>
     </labels>
     <labels>
-        <fullName>Core_Address_UseForHouseholdDetail</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: second line of the Use for Whole Household confirmation</shortDescription>
-        <value>If this is the person's own household, they move with it from now on. Their own addresses stay on file.</value>
-    </labels>
-    <labels>
         <fullName>Core_Address_UseForHouseholdPick</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Address panel: label of the household picker</shortDescription>
         <value>Which household?</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_UseForHouseholdSuccess</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: confirmation after Use for Whole Household</shortDescription>
-        <value>The household now uses this address.</value>
     </labels>
     <labels>
         <fullName>Core_Address_UseForHouseholdTitle</fullName>
@@ -287,22 +167,6 @@
         <protected>false</protected>
         <shortDescription>Address panel: status menu item that marks an address Undeliverable</shortDescription>
         <value>Mark as Undeliverable</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_StatusSaved</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: confirmation after an address status change</shortDescription>
-        <value>The address status is saved.</value>
-    </labels>
-    <labels>
-        <fullName>Core_Address_StatusFailed</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Address panel: an address status change could not be saved</shortDescription>
-        <value>The address status could not be saved. You may not have access to change it.</value>
     </labels>
     <labels>
         <fullName>Core_Address_SameNameBorn</fullName>

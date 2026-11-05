@@ -101,13 +101,16 @@ private class FieldAccessServiceTest {
             FieldAccessService.manageProfilesOverride = false;
             FieldAccessController.Status status = FieldAccessController.getStatus();
             Assert.isFalse(status.canChange, 'Without the system permission nothing may change.');
-            Assert.areEqual(System.Label.Core_FieldAccess_NeedsManageProfiles, status.reason);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_FieldAccess_NeedsManageProfiles'),
+                status.reason
+            );
             try {
                 FieldAccessController.searchSets('Test');
                 Assert.fail('A search without the permission must be refused.');
             } catch (AuraHandledException expected) {
                 Assert.areEqual(
-                    System.Label.Core_FieldAccess_NeedsManageProfiles,
+                    BarnHelp.text('Core', 'Core_FieldAccess_NeedsManageProfiles'),
                     expected.getMessage()
                 );
             }
@@ -143,7 +146,10 @@ private class FieldAccessServiceTest {
                 FieldAccessService.requireSets(new List<Object>{ profileSet.Id });
                 Assert.fail('A profile must never be changed.');
             } catch (FieldAccessService.FieldAccessException expected) {
-                Assert.areEqual(System.Label.Core_FieldAccess_SetNotAllowed, expected.getMessage());
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_FieldAccess_SetNotAllowed'),
+                    expected.getMessage()
+                );
             }
         }
     }
@@ -178,7 +184,10 @@ private class FieldAccessServiceTest {
                 FieldAccessService.requireSets(new List<Object>{ shipped.Id });
                 Assert.fail('A set BarnCRM ships must never be changed.');
             } catch (FieldAccessService.FieldAccessException expected) {
-                Assert.areEqual(System.Label.Core_FieldAccess_SetNotAllowed, expected.getMessage());
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_FieldAccess_SetNotAllowed'),
+                    expected.getMessage()
+                );
             }
         }
     }
@@ -276,7 +285,7 @@ private class FieldAccessServiceTest {
             Assert.areEqual(String.valueOf(job.Id), listed[0].id);
             Assert.isTrue(listed[0].canUndo, 'A complete change inside its window can be undone.');
             Assert.areEqual(
-                System.Label.Core_Import_UndoErrorAccessChange,
+                BarnHelp.text('Core', 'Core_Import_UndoErrorAccessChange'),
                 ImportUndoService.preview(job.Id).reason,
                 'The import undo refuses an access change.'
             );
@@ -303,7 +312,7 @@ private class FieldAccessServiceTest {
             } catch (AuraHandledException expected) {
                 Assert.areEqual(
                     String.format(
-                        System.Label.Core_FieldAccess_CountChanged,
+                        BarnHelp.text('Core', 'Core_FieldAccess_CountChanged'),
                         new List<Object>{ 1, 5 }
                     ),
                     expected.getMessage()
@@ -428,7 +437,7 @@ private class FieldAccessServiceTest {
         Assert.isTrue(after.Run_Log__c.startsWith('Applied.\n'), 'The undo line is added.');
         System.runAs(TestUsers.admin()) {
             Assert.areEqual(
-                System.Label.Core_FieldAccess_UndoNotAllowed,
+                BarnHelp.text('Core', 'Core_FieldAccess_UndoNotAllowed'),
                 FieldAccessService.undoRefusal(
                     new Import_Batch__c(
                         Operation__c = FieldAccessService.OPERATION_ACCESS,
@@ -455,7 +464,7 @@ private class FieldAccessServiceTest {
                     }
                 ),
                 String.format(
-                    System.Label.Core_FieldAccess_ReadOnlyField,
+                    BarnHelp.text('Core', 'Core_FieldAccess_ReadOnlyField'),
                     new List<Object>{ Account.Is_Organization__c.getDescribe().getLabel() }
                 )
             );
@@ -468,7 +477,7 @@ private class FieldAccessServiceTest {
                     }
                 ),
                 String.format(
-                    System.Label.Core_FieldAccess_Conflict,
+                    BarnHelp.text('Core', 'Core_FieldAccess_Conflict'),
                     new List<Object>{
                         Relationship__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
                             .getLabel()
@@ -483,21 +492,21 @@ private class FieldAccessServiceTest {
                     }
                 ),
                 String.format(
-                    System.Label.Core_FieldAccess_FieldNotAllowed,
+                    BarnHelp.text('Core', 'Core_FieldAccess_FieldNotAllowed'),
                     new List<Object>{ 'Name' }
                 )
             );
             assertRefused(
                 change(setIds, new List<Map<String, Object>>()),
-                System.Label.Core_FieldAccess_NoItems
+                BarnHelp.text('Core', 'Core_FieldAccess_NoItems')
             );
-            assertRefused('{"version":2}', System.Label.Core_FieldAccess_BadDocument);
+            assertRefused('{"version":2}', BarnHelp.text('Core', 'Core_FieldAccess_BadDocument'));
             assertRefused(
                 change(
                     new List<Id>(),
                     new List<Map<String, Object>>{ item(RELATIONSHIP, null, 'read') }
                 ),
-                System.Label.Core_FieldAccess_NoSets
+                BarnHelp.text('Core', 'Core_FieldAccess_NoSets')
             );
         }
     }

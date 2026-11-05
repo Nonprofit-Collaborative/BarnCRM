@@ -204,7 +204,7 @@ public with sharing class BulkDeleteController {
     private static void requirePermission() {
         if (!hasPermission()) {
             throw new BulkDeleteService.BulkDeleteException(
-                System.Label.Core_BulkDelete_ErrorNoPermission
+                BarnHelp.text('Core', 'Core_BulkDelete_ErrorNoPermission')
             );
         }
     }
@@ -218,7 +218,7 @@ public with sharing class BulkDeleteController {
     private static void requireDeletePermission() {
         if (!mayDelete()) {
             throw new BulkDeleteService.BulkDeleteException(
-                System.Label.Core_BulkDelete_ErrorNoPermission
+                BarnHelp.text('Core', 'Core_BulkDelete_ErrorNoPermission')
             );
         }
     }
@@ -231,7 +231,7 @@ public with sharing class BulkDeleteController {
         );
         if (found == null) {
             throw new BulkDeleteService.BulkDeleteException(
-                System.Label.Core_BulkDelete_ErrorNotBulkDelete
+                BarnHelp.text('Core', 'Core_BulkDelete_ErrorNotBulkDelete')
             );
         }
         return found;

@@ -158,8 +158,8 @@ public with sharing class DuplicateScanBatch implements Database.Batchable<SObje
         };
         String summary = String.format(
             failedChunks > 0
-                ? Label.Core_Duplicates_ScanFinishedWithFailures
-                : Label.Core_Duplicates_ScanFinished,
+                ? BarnHelp.text('Core', 'Core_Duplicates_ScanFinishedWithFailures')
+                : BarnHelp.text('Core', 'Core_Duplicates_ScanFinished'),
             values
         );
         ErrorLogger.logMessage(

@@ -125,7 +125,11 @@ public with sharing class MatchSourceSelector {
         Integer cap = Math.min(maxRows, rowsLeft);
         if (cap <= 0 || queriesLeft <= 0) {
             cappedLookups++;
-            warnOnce(name, System.Label.Core_MatchSource_BudgetSpent, new List<Object>{ name });
+            warnOnce(
+                name,
+                BarnHelp.text('Core', 'Core_MatchSource_BudgetSpent'),
+                new List<Object>{ name }
+            );
             return new List<SObject>();
         }
         List<SObject> rows = Database.queryWithBinds(
@@ -137,7 +141,7 @@ public with sharing class MatchSourceSelector {
             cappedLookups++;
             warnOnce(
                 name,
-                System.Label.Core_MatchSource_RowCapReached,
+                BarnHelp.text('Core', 'Core_MatchSource_RowCapReached'),
                 new List<Object>{ name, String.valueOf(cap) }
             );
         }

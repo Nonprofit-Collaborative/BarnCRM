@@ -12,19 +12,18 @@ import BarnConfirmModal from 'c/barnConfirmModal';
 import { setHelpTextForTest } from 'c/barnHelpText';
 
 setHelpTextForTest({
+  Core_FieldUtilization_HistoryLimit: 'Showing the newest {0} snapshots.',
+  Core_FieldUtilization_DeleteConfirm: 'Deletes the {1} counts taken on {0}.',
+  Core_FieldUtilization_Progress: 'Counted {0} of {1} fields.',
+  Core_FieldUtilization_Saved: 'Saved {0} counts.',
+  Core_FieldUtilization_TooLarge: 'More than {0} records.',
+  Core_FieldUtilization_NotCounted: 'Not counted: {0}'
+});
+
+setHelpTextForTest({
   Core_FieldUtilization_SaveHelp: 'Keeps this count so your next count shows what changed.'
 });
 
-jest.mock(
-  '@salesforce/label/c.Core_FieldUtilization_HistoryLimit',
-  () => ({ default: 'Showing the newest {0} snapshots.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_FieldUtilization_DeleteConfirm',
-  () => ({ default: 'Deletes the {1} counts taken on {0}.' }),
-  { virtual: true }
-);
 jest.mock(
   '@salesforce/apex/FieldUtilizationController.getHistory',
   () => ({ default: jest.fn() }),
@@ -61,29 +60,9 @@ jest.mock(
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
-jest.mock(
-  '@salesforce/label/c.Core_FieldUtilization_Progress',
-  () => ({ default: 'Counted {0} of {1} fields.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/label/c.Core_FieldUtilization_Save', () => ({ default: 'Save Snapshot' }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_FieldUtilization_Saved',
-  () => ({ default: 'Saved {0} counts.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_FieldUtilization_TooLarge',
-  () => ({ default: 'More than {0} records.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_FieldUtilization_NotCounted',
-  () => ({ default: 'Not counted: {0}' }),
-  { virtual: true }
-);
 
 const OPTIONS = [
   { value: 'Account', label: 'Account' },

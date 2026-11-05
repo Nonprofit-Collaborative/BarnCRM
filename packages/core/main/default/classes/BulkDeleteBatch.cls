@@ -161,11 +161,11 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
                 String.isBlank(stoppedBecause)
                     ? null
                     : String.format(
-                          System.Label.Core_BulkDelete_LogStopped,
+                          BarnHelp.text('Core', 'Core_BulkDelete_LogStopped'),
                           new List<Object>{ stoppedBecause }
                       ),
                 String.format(
-                    System.Label.Core_BulkDelete_LogFinished,
+                    BarnHelp.text('Core', 'Core_BulkDelete_LogFinished'),
                     new List<Object>{
                         deletedRecords.format(),
                         noLongerMatching.format(),

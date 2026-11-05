@@ -49,46 +49,6 @@
         <value>records found</value>
     </labels>
     <labels>
-        <fullName>Core_DataHygiene_ErrorNoPermission</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal without the Find and Export Records permission.</shortDescription>
-        <value>Data Quality needs the Find and Export Records permission. Ask your BarnCRM admin to assign you the BarnCRM Find and Export permission set.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataHygiene_PeopleAccountsNotListed</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Note on the people check in membership record mode: count and Find list differ.</shortDescription>
-        <value>The count leaves out erased people and includes people kept as person accounts. Find lists contacts only, so it omits person accounts and may list an erased contact. Health Check links the first five.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataHygiene_NoAccess</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown on a check whose records the person cannot read.</shortDescription>
-        <value>You cannot see the records this check reads. Ask whoever manages access in your org.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataHygiene_CheckFailed</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Shown when a check fails unexpectedly.</shortDescription>
-        <value>This check could not run. The details are in the Error Log.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataHygiene_UnknownCheck</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Refusal for a check key the page does not know.</shortDescription>
-        <value>That check does not exist. Reload the Org Optimizer page and try again.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataHygiene_SavedQueryName</fullName>
         <categories>DataHygiene</categories>
         <language>en_US</language>
@@ -105,36 +65,12 @@
         <value>People with No Household</value>
     </labels>
     <labels>
-        <fullName>Core_DataHygiene_PeopleContactDetail</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Check detail, contact mode.</shortDescription>
-        <value>Contacts with no account. They are left out of household names, greetings, totals and mailings.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataHygiene_PeopleJunctionDetail</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Check detail, junction mode.</shortDescription>
-        <value>People, contacts or person accounts, with no current household membership. They are left out of household names, greetings, totals and mailings.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataHygiene_HouseholdsTitle</fullName>
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check title: households with nobody in them.</shortDescription>
         <value>Households with Nobody in Them</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataHygiene_HouseholdsDetail</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Check detail: empty households.</shortDescription>
-        <value>Households whose Member Count is zero or empty. Add a member, merge the household into another, or delete it.</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_MembershipsTitle</fullName>
@@ -145,28 +81,12 @@
         <value>Memberships That Name Nobody</value>
     </labels>
     <labels>
-        <fullName>Core_DataHygiene_MembershipsDetail</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Check detail: membership rows with no person.</shortDescription>
-        <value>Household membership records whose person was deleted while automation was off. They count for nobody and can be deleted.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataHygiene_OwnerlessTitle</fullName>
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check title: addresses that belong to nobody.</shortDescription>
         <value>Addresses That Belong to Nobody</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataHygiene_OwnerlessDetail</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Check detail: addresses with no owner.</shortDescription>
-        <value>Address records whose household, organization or person was deleted. Delete them, or give them an owner.</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_IncompleteTitle</fullName>
@@ -177,28 +97,12 @@
         <value>Primary Addresses with Parts Missing</value>
     </labels>
     <labels>
-        <fullName>Core_DataHygiene_IncompleteDetail</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Check detail: incomplete primary addresses.</shortDescription>
-        <value>The address each household, organization or person is mailed at, with no street, city or postal code. Mail sent there will not arrive.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataHygiene_FailedTitle</fullName>
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check title: primary addresses that failed verification.</shortDescription>
         <value>Primary Addresses That Failed Verification</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataHygiene_FailedDetail</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Check detail: failed verification.</shortDescription>
-        <value>Primary addresses an address verification app marked Failed. Without such an app this is always 0.</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_UndeliverableTitle</fullName>
@@ -209,28 +113,12 @@
         <value>Primary Addresses Marked Undeliverable</value>
     </labels>
     <labels>
-        <fullName>Core_DataHygiene_UndeliverableDetail</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Check detail: primary addresses marked Undeliverable.</shortDescription>
-        <value>Households, organizations and people whose primary address someone marked Undeliverable, so their mail comes back. Add the new address with Primary ticked, or set another address as primary.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataHygiene_UnreachableTitle</fullName>
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check title: people nobody can reach.</shortDescription>
         <value>People with No Way to Reach Them</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataHygiene_UnreachableDetail</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Check detail: people nobody can reach.</shortDescription>
-        <value>Living people with no email, no phone, no mobile and no mailing city or postal code. Nothing you send can reach them.</value>
     </labels>
     <labels>
         <fullName>Core_DataHygiene_DeceasedTitle</fullName>
@@ -241,27 +129,11 @@
         <value>Deceased People Who Can Still Be Emailed</value>
     </labels>
     <labels>
-        <fullName>Core_DataHygiene_DeceasedDetail</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Check detail: deceased people who can still be emailed.</shortDescription>
-        <value>People marked Deceased who have an email address and are not opted out of email. Tick Email Opt Out so no message goes to them.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataHygiene_NotUpdatedTitle</fullName>
         <categories>DataHygiene</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Check title: people not changed for years; {0} is the years.</shortDescription>
         <value>People Not Changed in {0} Years</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataHygiene_NotUpdatedDetail</fullName>
-        <categories>DataHygiene</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Check detail: people not changed for years.</shortDescription>
-        <value>People nobody has changed for the number of years set in BarnCRM Settings (General). Review them before you decide to archive or delete any.</value>
     </labels>
 </CustomLabels>

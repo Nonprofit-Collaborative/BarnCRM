@@ -25,14 +25,6 @@
         <value>This Household</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdMerge_ConfirmBody</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Warning before a merge; {0} household merged away, {1} the survivor</shortDescription>
-        <value>{0} will be combined into {1}. Everyone in it, and all its history, letters, files and notes, will move across. A merge cannot be undone. Check both households first.</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdMerge_ConfirmHeading</fullName>
         <categories>Households</categories>
         <language>en_US</language>
@@ -47,86 +39,6 @@
         <protected>true</protected>
         <shortDescription>Error log context for a merge or a split</shortDescription>
         <value>Household merge and split</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_ErrorMergeFailed</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when the platform refuses the account merge behind a household merge</shortDescription>
-        <value>The two households could not be combined, so nothing was changed.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_ErrorMissingInput</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Neither household was named</shortDescription>
-        <value>Choose two households to merge.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_CustomNameKept</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown after a merge when the survivor's name is now held as custom</shortDescription>
-        <value>The name you chose is kept as this household's own name, and the naming automation will not change it. Clear Custom Name on the household to follow the members again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_ErrorNoEditAccess</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The person cannot edit one of the two households</shortDescription>
-        <value>You need edit access to both households to merge them.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_ErrorNotFound</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>One of the two households no longer exists</shortDescription>
-        <value>One of these households could not be found. Refresh the page and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_ErrorNotHousehold</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>One of the two records is not a household</shortDescription>
-        <value>Both records must be households. Choose a household, not an organization.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_ErrorSameRecord</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The same household was chosen twice</shortDescription>
-        <value>Choose a different household. A household cannot be merged into itself.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_ErrorSplitNoMembers</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Nobody was ticked for the split</shortDescription>
-        <value>Choose at least one person to move.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_ErrorSplitNotMembers</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The people ticked are not in this household</shortDescription>
-        <value>Those people are not in this household. Refresh the page and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_ErrorSplitSameHousehold</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The household people were being split out of was also chosen as the destination</shortDescription>
-        <value>Choose a different household. These people are already in this one.</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_KeepSurvivor</fullName>
@@ -193,22 +105,6 @@
         <value>Merge</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdMerge_NotAHousehold</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when the record is not a household</shortDescription>
-        <value>Merging and splitting are for households. This record is an organization.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_ReadOnly</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown when the person cannot edit this household</shortDescription>
-        <value>You can see this household but not change it, so merging and splitting are switched off. Ask whoever manages access for edit access to both households.</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdMerge_SearchLabel</fullName>
         <categories>Households</categories>
         <language>en_US</language>
@@ -223,14 +119,6 @@
         <protected>true</protected>
         <shortDescription>Button that opens the split confirmation</shortDescription>
         <value>Split</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_SplitConfirmBody</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>What the person is told before a split runs</shortDescription>
-        <value>The people you ticked will move out of this household. Both household names and member counts are recalculated for you.</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_SplitConfirmHeading</fullName>
@@ -263,22 +151,6 @@
         <protected>true</protected>
         <shortDescription>Split destination choice: a household to be created</shortDescription>
         <value>A new household</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_SplitSuccess</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>A split finished</shortDescription>
-        <value>Moved. Both household names and member counts are up to date.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdMerge_Success</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>A merge finished</shortDescription>
-        <value>Merged. The household you kept now holds everyone from both.</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdMerge_Title</fullName>

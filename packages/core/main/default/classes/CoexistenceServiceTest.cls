@@ -256,7 +256,7 @@ private class CoexistenceServiceTest {
                 } catch (CoexistenceService.CoexistenceException e) {
                     refused = true;
                     System.assertEquals(
-                        System.Label.Core_HealthCheck_PermissionRequired,
+                        BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired'),
                         e.getMessage(),
                         'Priya is told what permission she needs and who to ask for it.'
                     );

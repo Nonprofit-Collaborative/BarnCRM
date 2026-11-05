@@ -420,7 +420,7 @@ public with sharing class ImportJournalService {
         }
         if (entries.size() == 1) {
             ErrorLogger.logMessage(
-                Label.Core_Import_JournalEntryTooLarge,
+                BarnHelp.text('Core', 'Core_Import_JournalEntryTooLarge'),
                 'ImportJournalService.write',
                 ErrorLogger.SEVERITY_ERROR,
                 batchId

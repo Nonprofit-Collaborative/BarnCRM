@@ -385,7 +385,9 @@ public with sharing class SetupAssistantService {
     private static List<Step> setMembership(String settingKey, String stepKey, Boolean member) {
         String key = stepKey == null ? '' : stepKey.trim();
         if (!keys().contains(key)) {
-            throw new SetupStepException(System.Label.Core_SetupAssistant_UnknownStepError);
+            throw new SetupStepException(
+                BarnHelp.text('Core', 'Core_SetupAssistant_UnknownStepError')
+            );
         }
         Set<String> current = keysIn(settingKey);
         if (member) {

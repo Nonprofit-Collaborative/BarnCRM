@@ -125,7 +125,7 @@ public with sharing class HealthCheckOrgShapeChecks {
     private static HealthCheckService.Finding orgShapeFinding(OrgShapeDetector.OrgShape shape) {
         String recommended = OrgShapeDetector.recommendedCoexistenceMode();
         String detail = String.format(
-            System.Label.Core_HealthCheck_OrgShapeDetail,
+            BarnHelp.text('Core', 'Core_HealthCheck_OrgShapeDetail'),
             new List<Object>{ detectedSummary(shape), HealthCheckService.modeLabel(recommended) }
         );
         return new HealthCheckService.Finding(
@@ -143,7 +143,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 
         if (String.isBlank(current)) {
             String detail = String.format(
-                System.Label.Core_HealthCheck_ModeUnsetDetail,
+                BarnHelp.text('Core', 'Core_HealthCheck_ModeUnsetDetail'),
                 new List<Object>{
                     HealthCheckService.modeLabel(CoexistenceService.MODE_STANDALONE),
                     HealthCheckService.modeLabel(recommended)
@@ -164,7 +164,7 @@ public with sharing class HealthCheckOrgShapeChecks {
 
         if (!current.equals(recommended)) {
             String detail = String.format(
-                System.Label.Core_HealthCheck_ModeMismatchDetail,
+                BarnHelp.text('Core', 'Core_HealthCheck_ModeMismatchDetail'),
                 new List<Object>{
                     HealthCheckService.modeLabel(current),
                     HealthCheckService.modeLabel(recommended)
@@ -184,7 +184,7 @@ public with sharing class HealthCheckOrgShapeChecks {
         }
 
         String matchDetail = String.format(
-            System.Label.Core_HealthCheck_ModeMatchDetail,
+            BarnHelp.text('Core', 'Core_HealthCheck_ModeMatchDetail'),
             new List<Object>{ HealthCheckService.modeLabel(current) }
         );
         return new HealthCheckService.Finding(
@@ -217,7 +217,7 @@ public with sharing class HealthCheckOrgShapeChecks {
             return new HealthCheckService.Finding(
                     'membership_mode_person_accounts',
                     System.Label.Core_HealthCheck_MembershipTitle,
-                    System.Label.Core_HealthCheck_MembershipDetail,
+                    BarnHelp.text('Core', 'Core_HealthCheck_MembershipDetail'),
                     HealthCheckService.SEVERITY_ERROR,
                     HealthCheckService.CATEGORY_ORG_SHAPE
                 )
@@ -244,8 +244,8 @@ public with sharing class HealthCheckOrgShapeChecks {
                 ),
                 HealthCheckService.forCount(
                     asAccounts,
-                    System.Label.Core_HealthCheck_PeopleAsAccountsDetailOne,
-                    System.Label.Core_HealthCheck_PeopleAsAccountsDetail,
+                    BarnHelp.text('Core', 'Core_HealthCheck_PeopleAsAccountsDetailOne'),
+                    BarnHelp.text('Core', 'Core_HealthCheck_PeopleAsAccountsDetail'),
                     count
                 ),
                 HealthCheckService.SEVERITY_WARNING,
@@ -280,14 +280,14 @@ public with sharing class HealthCheckOrgShapeChecks {
         String detail = junction
             ? HealthCheckService.forCount(
                   unseen,
-                  System.Label.Core_HealthCheck_MembershipHiddenByJunctionDetailOne,
-                  System.Label.Core_HealthCheck_MembershipHiddenByJunctionDetail,
+                  BarnHelp.text('Core', 'Core_HealthCheck_MembershipHiddenByJunctionDetailOne'),
+                  BarnHelp.text('Core', 'Core_HealthCheck_MembershipHiddenByJunctionDetail'),
                   count
               )
             : HealthCheckService.forCount(
                   unseen,
-                  System.Label.Core_HealthCheck_MembershipHiddenByContactDetailOne,
-                  System.Label.Core_HealthCheck_MembershipHiddenByContactDetail,
+                  BarnHelp.text('Core', 'Core_HealthCheck_MembershipHiddenByContactDetailOne'),
+                  BarnHelp.text('Core', 'Core_HealthCheck_MembershipHiddenByContactDetail'),
                   count
               );
         return new HealthCheckService.Finding(
@@ -328,7 +328,7 @@ public with sharing class HealthCheckOrgShapeChecks {
         return new HealthCheckService.Finding(
                 'household_creation_disabled',
                 System.Label.Core_HealthCheck_NoHouseholdCreationTitle,
-                System.Label.Core_HealthCheck_NoHouseholdCreationDetail,
+                BarnHelp.text('Core', 'Core_HealthCheck_NoHouseholdCreationDetail'),
                 HealthCheckService.SEVERITY_ERROR,
                 HealthCheckService.CATEGORY_SETTINGS
             )
@@ -353,11 +353,11 @@ public with sharing class HealthCheckOrgShapeChecks {
         String detail = shape.nativeHouseholdGroupCount != null
             ? HealthCheckService.forCount(
                   shape.nativeHouseholdGroupCount,
-                  System.Label.Core_HealthCheck_NativeHouseholdsDetailOne,
-                  System.Label.Core_HealthCheck_NativeHouseholdsDetail,
+                  BarnHelp.text('Core', 'Core_HealthCheck_NativeHouseholdsDetailOne'),
+                  BarnHelp.text('Core', 'Core_HealthCheck_NativeHouseholdsDetail'),
                   new List<Object>{ cappedCount(shape.nativeHouseholdGroupCount) }
               )
-            : System.Label.Core_HealthCheck_NativeHouseholdsUnknownDetail;
+            : BarnHelp.text('Core', 'Core_HealthCheck_NativeHouseholdsUnknownDetail');
         return new HealthCheckService.Finding(
             'native_households',
             System.Label.Core_HealthCheck_NativeHouseholdsTitle,
@@ -390,8 +390,8 @@ public with sharing class HealthCheckOrgShapeChecks {
             ),
             HealthCheckService.forCount(
                 collisions,
-                System.Label.Core_HealthCheck_NativeHouseholdCollisionDetailOne,
-                System.Label.Core_HealthCheck_NativeHouseholdCollisionDetail,
+                BarnHelp.text('Core', 'Core_HealthCheck_NativeHouseholdCollisionDetailOne'),
+                BarnHelp.text('Core', 'Core_HealthCheck_NativeHouseholdCollisionDetail'),
                 count
             ),
             HealthCheckService.SEVERITY_WARNING,
@@ -411,7 +411,7 @@ public with sharing class HealthCheckOrgShapeChecks {
         return new HealthCheckService.Finding(
             'mirror_module_absent',
             System.Label.Core_HealthCheck_MirrorMissingTitle,
-            System.Label.Core_HealthCheck_MirrorMissingDetail,
+            BarnHelp.text('Core', 'Core_HealthCheck_MirrorMissingDetail'),
             HealthCheckService.SEVERITY_INFO,
             HealthCheckService.CATEGORY_ORG_SHAPE
         );
@@ -443,7 +443,7 @@ public with sharing class HealthCheckOrgShapeChecks {
         return new HealthCheckService.Finding(
             'multi_currency',
             System.Label.Core_HealthCheck_MultiCurrencyTitle,
-            System.Label.Core_HealthCheck_MultiCurrencyDetail,
+            BarnHelp.text('Core', 'Core_HealthCheck_MultiCurrencyDetail'),
             HealthCheckService.SEVERITY_WARNING,
             HealthCheckService.CATEGORY_LICENSES
         );

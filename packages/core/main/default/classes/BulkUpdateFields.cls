@@ -90,7 +90,7 @@ public with sharing class BulkUpdateFields {
         if (reason != null) {
             throw new BulkUpdateException(
                 String.format(
-                    System.Label.Core_BulkUpdate_ErrorField,
+                    BarnHelp.text('Core', 'Core_BulkUpdate_ErrorField'),
                     new List<Object>{ described.getLabelPlural(), reason }
                 )
             );
@@ -185,7 +185,7 @@ public with sharing class BulkUpdateFields {
         if (token == null || !token.getDescribe().isAccessible()) {
             throw new BulkUpdateException(
                 String.format(
-                    System.Label.Core_BulkUpdate_ErrorUnknownField,
+                    BarnHelp.text('Core', 'Core_BulkUpdate_ErrorUnknownField'),
                     new List<Object>{ name.abbreviate(80) }
                 )
             );
@@ -203,7 +203,7 @@ public with sharing class BulkUpdateFields {
         if (reason != null) {
             throw new BulkUpdateException(
                 String.format(
-                    System.Label.Core_BulkUpdate_ErrorField,
+                    BarnHelp.text('Core', 'Core_BulkUpdate_ErrorField'),
                     new List<Object>{ field.getLabel(), reason }
                 )
             );
@@ -248,7 +248,7 @@ public with sharing class BulkUpdateFields {
     public static Object typed(Schema.DescribeFieldResult field, Object raw) {
         BulkUpdateException refused = new BulkUpdateException(
             String.format(
-                System.Label.Core_BulkUpdate_ErrorBadValue,
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorBadValue'),
                 new List<Object>{ field.getLabel() }
             )
         );
@@ -361,7 +361,7 @@ public with sharing class BulkUpdateFields {
             }
             throw new BulkUpdateException(
                 String.format(
-                    System.Label.Core_BulkUpdate_ErrorStepResult,
+                    BarnHelp.text('Core', 'Core_BulkUpdate_ErrorStepResult'),
                     new List<Object>{ field.getLabel(), text.abbreviate(80) }
                 )
             );
@@ -370,7 +370,7 @@ public with sharing class BulkUpdateFields {
             if (!field.isNillable()) {
                 throw new BulkUpdateException(
                     String.format(
-                        System.Label.Core_BulkUpdate_ErrorRequired,
+                        BarnHelp.text('Core', 'Core_BulkUpdate_ErrorRequired'),
                         new List<Object>{ field.getLabel() }
                     )
                 );
@@ -379,7 +379,7 @@ public with sharing class BulkUpdateFields {
         }
         BulkUpdateException refused = new BulkUpdateException(
             String.format(
-                System.Label.Core_BulkUpdate_ErrorStepResult,
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorStepResult'),
                 new List<Object>{ field.getLabel(), text.abbreviate(80) }
             )
         );
@@ -428,16 +428,16 @@ public with sharing class BulkUpdateFields {
     @TestVisible
     private static String objectReason(Schema.DescribeSObjectResult described) {
         if (DataProtectedFields.isBookkeeping(described.getSObjectType())) {
-            return System.Label.Core_BulkUpdate_ReasonBookkeeping;
+            return BarnHelp.text('Core', 'Core_BulkUpdate_ReasonBookkeeping');
         }
         if (described.isCustomSetting()) {
-            return System.Label.Core_BulkUpdate_ReasonBookkeeping;
+            return BarnHelp.text('Core', 'Core_BulkUpdate_ReasonBookkeeping');
         }
         if (DataProtectedFields.isSetup(described.getSObjectType())) {
-            return System.Label.Core_BulkUpdate_ReasonSetup;
+            return BarnHelp.text('Core', 'Core_BulkUpdate_ReasonSetup');
         }
         if (!described.isUpdateable()) {
-            return System.Label.Core_BulkUpdate_ReasonNoObjectAccess;
+            return BarnHelp.text('Core', 'Core_BulkUpdate_ReasonNoObjectAccess');
         }
         return null;
     }
@@ -446,13 +446,13 @@ public with sharing class BulkUpdateFields {
     @TestVisible
     private static String fieldReason(Schema.SObjectType type, Schema.DescribeFieldResult field) {
         if (DataProtectedFields.isKeptByThePackage(type, field)) {
-            return System.Label.Core_BulkUpdate_ReasonKept;
+            return BarnHelp.text('Core', 'Core_BulkUpdate_ReasonKept');
         }
         if (!field.isUpdateable() || !field.isAccessible()) {
-            return System.Label.Core_BulkUpdate_ReasonNoFieldAccess;
+            return BarnHelp.text('Core', 'Core_BulkUpdate_ReasonNoFieldAccess');
         }
         if (!WRITABLE.contains(field.getType())) {
-            return System.Label.Core_BulkUpdate_ReasonType;
+            return BarnHelp.text('Core', 'Core_BulkUpdate_ReasonType');
         }
         return null;
     }

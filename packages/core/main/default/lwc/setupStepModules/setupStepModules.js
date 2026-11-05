@@ -2,12 +2,8 @@ import { LightningElement, api } from 'lwc';
 import PRESENT from '@salesforce/label/c.Core_SetupAssistant_ModulePresent';
 import ABSENT from '@salesforce/label/c.Core_Integrations_NotInstalled';
 import LEARN_MORE from '@salesforce/label/c.Core_SetupAssistant_ModuleLearnMore';
-import MANAGER_NOTICE from '@salesforce/label/c.Core_SetupAssistant_ModuleManagerNotice';
 import INSTALL from '@salesforce/label/c.Core_SuiteChoice_ModuleInstallLink';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
-import INSTALL_FIRST from '@salesforce/label/c.Core_ModuleManager_InstallFirst';
-import STAFF_TABS from '@salesforce/label/c.Core_SetupAssistant_ModuleStaffTabs';
-import ADMIN_TABS from '@salesforce/label/c.Core_SetupAssistant_ModuleAdminTabs';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
@@ -34,7 +30,9 @@ export default class SetupStepModules extends LightningElement {
 
   labels = {
     learnMore: LEARN_MORE,
-    managerNotice: MANAGER_NOTICE,
+    get managerNotice() {
+      return helpText('Core', 'Core_SetupAssistant_ModuleManagerNotice');
+    },
     install: INSTALL,
     newTab: NEW_TAB,
     get tabsHow() {
@@ -55,12 +53,16 @@ export default class SetupStepModules extends LightningElement {
       status: module.present ? PRESENT : ABSENT,
       installFirstText:
         !module.present && module.installFirst
-          ? INSTALL_FIRST.replace('{0}', module.installFirst)
+          ? helpText('Core', 'Core_ModuleManager_InstallFirst').replace('{0}', module.installFirst)
           : null,
       staffTabsText:
-        module.present && module.staffTabs ? STAFF_TABS.replace('{0}', module.staffTabs) : null,
+        module.present && module.staffTabs
+          ? helpText('Core', 'Core_SetupAssistant_ModuleStaffTabs').replace('{0}', module.staffTabs)
+          : null,
       adminTabsText:
-        module.present && module.adminTabs ? ADMIN_TABS.replace('{0}', module.adminTabs) : null,
+        module.present && module.adminTabs
+          ? helpText('Core', 'Core_SetupAssistant_ModuleAdminTabs').replace('{0}', module.adminTabs)
+          : null,
       statusTone: module.present ? 'success' : 'neutral'
     }));
   }

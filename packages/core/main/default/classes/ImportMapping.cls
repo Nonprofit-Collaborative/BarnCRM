@@ -506,7 +506,7 @@ public with sharing class ImportMapping {
             if (!problems.isEmpty()) {
                 result.add(
                     String.format(
-                        Label.Core_Import_ErrorColumnChanges,
+                        BarnHelp.text('Core', 'Core_Import_ErrorColumnChanges'),
                         new List<String>{ column.source, String.join(problems, ' ') }
                     )
                 );

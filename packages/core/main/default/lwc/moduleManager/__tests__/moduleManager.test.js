@@ -8,6 +8,11 @@ import grantAdminAccess from '@salesforce/apex/ModuleManagerController.grantAdmi
 import uninstallReport from '@salesforce/apex/ModuleManagerController.uninstallReport';
 import saveShowNonprofitModules from '@salesforce/apex/ModuleManagerController.saveShowNonprofitModules';
 import finishSetup from '@salesforce/apex/ModuleManagerController.finishSetup';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_ModuleManager_NonprofitHidden: 'Installed nonprofit modules hidden: {0}'
+});
 
 jest.mock('@salesforce/apex/ModuleManagerController.finishSetup', () => ({ default: jest.fn() }), {
   virtual: true
@@ -22,11 +27,6 @@ jest.mock(
   { virtual: true }
 );
 // The hidden-count line carries a placeholder, so this label needs its text to assert the count.
-jest.mock(
-  '@salesforce/label/c.Core_ModuleManager_NonprofitHidden',
-  () => ({ default: 'Installed nonprofit modules hidden: {0}' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/apex/ModuleManagerController.turnOff', () => ({ default: jest.fn() }), {
   virtual: true
 });

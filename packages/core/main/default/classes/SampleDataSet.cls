@@ -211,6 +211,6 @@ public with sharing class SampleDataSet {
     }
 
     private static SampleDataException invalidData() {
-        return new SampleDataException(Label.Core_SampleData_ErrorInvalidData);
+        return new SampleDataException(BarnHelp.text('Core', 'Core_SampleData_ErrorInvalidData'));
     }
 }

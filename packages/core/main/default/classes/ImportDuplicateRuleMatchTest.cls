@@ -108,7 +108,11 @@ private class ImportDuplicateRuleMatchTest {
                 Assert.areEqual(0, preview.created, 'Nobody would be created.');
                 Assert.areEqual(0, committed.created, 'Nobody was: ' + committed.notes);
                 Assert.areEqual(MANY, [SELECT COUNT() FROM Contact], 'Still two hundred people.');
-                Assert.isTrue(committed.notes.contains(Label.Core_Import_LogDuplicateRuleMatches));
+                Assert.isTrue(
+                    committed.notes.contains(
+                        BarnHelp.text('Core', 'Core_Import_LogDuplicateRuleMatches')
+                    )
+                );
                 List<Import_Row__c> loaded = rows();
                 Assert.areEqual(existing[0].Id, loaded[0].Contact_1__c, 'Loaded into the match.');
                 for (Import_Row__c each : loaded) {
@@ -158,7 +162,10 @@ private class ImportDuplicateRuleMatchTest {
 
             Import_Row__c rejected = rows()[0];
             Assert.areEqual(1, preview.rejected);
-            Assert.areEqual(Label.Core_Import_ErrorSeveralPeopleMatch, rejected.Error_Message__c);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Import_ErrorSeveralPeopleMatch'),
+                rejected.Error_Message__c
+            );
             Assert.isTrue(rejected.Several_Matches__c, 'Listed as a several-matches row.');
             Assert.isFalse(rejected.Duplicate_Rule_Match__c, 'Not loaded into either.');
         }
@@ -203,7 +210,7 @@ private class ImportDuplicateRuleMatchTest {
             run(true);
 
             Assert.areEqual(
-                Label.Core_Import_ErrorDuplicateRuleOnePerson,
+                BarnHelp.text('Core', 'Core_Import_ErrorDuplicateRuleOnePerson'),
                 rows()[0].Error_Message__c
             );
         }
@@ -256,9 +263,15 @@ private class ImportDuplicateRuleMatchTest {
             ImportRowProcessor.Outcome committed = run(false);
 
             Assert.areEqual(1, committed.created, 'Nothing is rejected for want of a rule.');
-            Assert.isTrue(committed.notes.contains(Label.Core_Import_LogNoDuplicateRulePeople));
             Assert.isTrue(
-                committed.notes.contains(Label.Core_Import_LogNoDuplicateRuleOrganizations)
+                committed.notes.contains(
+                    BarnHelp.text('Core', 'Core_Import_LogNoDuplicateRulePeople')
+                )
+            );
+            Assert.isTrue(
+                committed.notes.contains(
+                    BarnHelp.text('Core', 'Core_Import_LogNoDuplicateRuleOrganizations')
+                )
             );
         }
     }

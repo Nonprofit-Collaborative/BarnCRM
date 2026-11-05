@@ -29,24 +29,17 @@ import MERGE_KEEP_LABEL from '@salesforce/label/c.Core_Duplicates_MergeKeepLabel
 import MERGE_KEEPING from '@salesforce/label/c.Core_Duplicates_MergeKeeping';
 import MERGE_DROPPING from '@salesforce/label/c.Core_Duplicates_MergeDropping';
 import MERGE_CONFIRM from '@salesforce/label/c.Core_Duplicates_MergeConfirm';
-import MERGE_SUCCESS from '@salesforce/label/c.Core_Duplicates_MergeSuccess';
 import DISMISS_BUTTON from '@salesforce/label/c.Core_Duplicates_DismissButton';
 import DISMISS_HEADING from '@salesforce/label/c.Core_Duplicates_DismissButton';
 import DISMISS_REASON_LABEL from '@salesforce/label/c.Core_Import_ResultsReason';
-import DISMISS_SUCCESS from '@salesforce/label/c.Core_Duplicates_DismissSuccess';
 import DISMISSED_COUNT from '@salesforce/label/c.Core_Duplicates_DismissedCount';
 import VIEW_DISMISSED from '@salesforce/label/c.Core_FieldUtilization_HistoryView';
-import READ_ONLY from '@salesforce/label/c.Core_Duplicates_ReadOnlyNotice';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Duplicates_ErrorUnexpected';
-import SHOWING_COUNT from '@salesforce/label/c.Core_Duplicates_ShowingCount';
-import SHOWING_COUNT_MORE from '@salesforce/label/c.Core_Duplicates_ShowingCountMore';
 import SHOW_MORE from '@salesforce/label/c.Core_AccessExplorer_ShowMore';
 import EMPTY_HEADING from '@salesforce/label/c.Core_Duplicates_EmptyHeading';
 import COUNT_ALT from '@salesforce/label/c.Core_Duplicates_CountAlt';
 import DIFFERENT from '@salesforce/label/c.Core_Duplicates_Different';
 import DIFFERENT_FROM from '@salesforce/label/c.Core_Duplicates_DifferentFrom';
-import COMPARED_WITH_FIRST from '@salesforce/label/c.Core_Duplicates_ComparedWithFirst';
 import BLANK from '@salesforce/label/c.Core_Duplicates_Blank';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { setupPath } from 'c/setupLinks';
@@ -105,7 +98,9 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     dismissReasonLabel: DISMISS_REASON_LABEL,
     dismissedCount: DISMISSED_COUNT,
     viewDismissed: VIEW_DISMISSED,
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Core', 'Core_Duplicates_ReadOnlyNotice');
+    },
     get noAccess() {
       return helpText('Core', 'Core_Duplicates_NoAccessNotice');
     },
@@ -188,7 +183,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
       this.errorMessage = undefined;
       this.announceCount();
     } catch (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_Duplicates_ErrorUnexpected'));
     } finally {
       this.busy = false;
     }
@@ -263,7 +258,9 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     if (!this.moreNotCounted && total <= shown) {
       return undefined;
     }
-    const template = this.moreNotCounted ? SHOWING_COUNT_MORE : SHOWING_COUNT;
+    const template = this.moreNotCounted
+      ? helpText('Core', 'Core_Duplicates_ShowingCountMore')
+      : helpText('Core', 'Core_Duplicates_ShowingCount');
     return template.replace('{0}', shown).replace('{1}', total);
   }
 
@@ -313,7 +310,10 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
         mergeOpen: !!this.merging && this.merging.setId === suggestion.setId,
         // A suggestion can hold three or more records: each is compared with the first.
         isGroup: records.length > 2,
-        comparedWithFirst: COMPARED_WITH_FIRST.replace('{0}', first),
+        comparedWithFirst: helpText('Core', 'Core_Duplicates_ComparedWithFirst').replace(
+          '{0}',
+          first
+        ),
         records: this.sideBySide(records)
       };
     });
@@ -468,7 +468,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     this.dismissing = undefined;
     this.runAction(
       dismissSuggestion({ duplicateRecordSetId: setId, reason: this.dismissReason }),
-      DISMISS_SUCCESS
+      helpText('Core', 'Core_Duplicates_DismissSuccess')
     );
   }
 
@@ -507,7 +507,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
       }
     } catch (error) {
       if (request === this.previewRequest) {
-        this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+        this.errorMessage = bodyMessage(error, helpText('Core', 'Core_Duplicates_ErrorUnexpected'));
         this.merging = undefined;
       }
     } finally {
@@ -562,7 +562,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
     this.mergePreview = undefined;
     this.runAction(
       mergeHouseholds({ duplicateRecordSetId: setId, survivorId, victimId, fieldChoices: {} }),
-      MERGE_SUCCESS
+      helpText('Core', 'Core_Duplicates_MergeSuccess')
     );
   }
 
@@ -591,7 +591,7 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
       this.noticeMessage = notice;
       this.announceCount();
     } catch (error) {
-      this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
+      this.errorMessage = bodyMessage(error, helpText('Core', 'Core_Duplicates_ErrorUnexpected'));
     } finally {
       this.busy = false;
     }

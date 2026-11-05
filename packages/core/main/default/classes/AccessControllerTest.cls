@@ -106,7 +106,7 @@ private class AccessControllerTest {
                     'A permission refusal, not a failure.'
                 );
                 Assert.areEqual(
-                    Label.Core_Access_ErrorNeedsAccessManager,
+                    BarnHelp.text('Core', 'Core_Access_ErrorNeedsAccessManager'),
                     refused.message,
                     'The reason names BarnCRM Access Manager and the license limit.'
                 );
@@ -145,7 +145,10 @@ private class AccessControllerTest {
             // never left empty and silent.
             Assert.isFalse(result.success, 'David may not read who holds each role.');
             Assert.areEqual(AccessController.ERROR_NO_PERMISSION, result.errorCode);
-            Assert.areEqual(Label.Core_Access_ErrorRolesNotVisible, result.message);
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Access_ErrorRolesNotVisible'),
+                result.message
+            );
             Assert.isNotNull(result.roles, 'The page always gets a list, even an empty one.');
             Assert.isTrue(result.assignments.isEmpty(), 'No role holders are returned to him.');
             Assert.isTrue(result.addOnAssignments.isEmpty(), 'Nor add-on holders.');
@@ -201,7 +204,7 @@ private class AccessControllerTest {
                 'The page needs a code it can branch on, not only a message.'
             );
             Assert.areEqual(
-                Label.Core_Access_ErrorNoPermission,
+                BarnHelp.text('Core', 'Core_Access_ErrorNoPermission'),
                 result.message,
                 'The message should name the permission that is missing.'
             );
@@ -304,7 +307,7 @@ private class AccessControllerTest {
                 'The page needs a code it can branch on.'
             );
             Assert.areEqual(
-                Label.Core_Access_ErrorRoleNotFound,
+                BarnHelp.text('Core', 'Core_Access_ErrorRoleNotFound'),
                 result.message,
                 'The message should match the one in the admin guide.'
             );
@@ -475,7 +478,7 @@ private class AccessControllerTest {
                 'The page needs a code it can branch on.'
             );
             Assert.areEqual(
-                Label.Core_Access_ErrorNeedsAccessManager,
+                BarnHelp.text('Core', 'Core_Access_ErrorNeedsAccessManager'),
                 result.message,
                 'The message should name the Setup permission that is missing.'
             );
@@ -524,7 +527,7 @@ private class AccessControllerTest {
 
             Assert.isFalse(result.success, 'Only the Core add-ons may be given here.');
             Assert.areEqual(
-                Label.Core_Access_ErrorAddOnNotFound,
+                BarnHelp.text('Core', 'Core_Access_ErrorAddOnNotFound'),
                 result.message,
                 'The refusal should say the permission is not one the page can give.'
             );

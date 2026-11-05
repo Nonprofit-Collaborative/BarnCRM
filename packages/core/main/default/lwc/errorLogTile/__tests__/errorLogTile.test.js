@@ -3,6 +3,11 @@ import ErrorLogTile from 'c/errorLogTile';
 import getTile from '@salesforce/apex/ErrorLogController.getTile';
 import acknowledge from '@salesforce/apex/ErrorLogController.acknowledge';
 import { EnclosingTabId, getTabInfo, openSubtab } from 'lightning/platformWorkspaceApi';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_ErrorLogTile_ReadOnly: 'You can read these entries but not change them.'
+});
 
 const mockNavigate = jest.fn();
 jest.mock(
@@ -37,12 +42,6 @@ jest.mock('@salesforce/apex/ErrorLogController.acknowledge', () => ({ default: j
 jest.mock('@salesforce/label/c.Core_ErrorLogTile_NewCount', () => ({ default: '{0} new' }), {
   virtual: true
 });
-
-jest.mock(
-  '@salesforce/label/c.Core_ErrorLogTile_ReadOnly',
-  () => ({ default: 'You can read these entries but not change them.' }),
-  { virtual: true }
-);
 
 const ENTRY = {
   recordId: 'a01000000000001AAA',

@@ -243,7 +243,9 @@ public with sharing class HouseholdMergeService {
             !Schema.SObjectType.Account.isUpdateable() ||
             HouseholdSelector.getEditableIds(new Set<Id>{ survivorId, victimId }).size() != 2
         ) {
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorNoEditAccess);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorNoEditAccess')
+            );
         }
 
         // Everything below is undone together if the merge cannot finish, so a refusal leaves
@@ -327,12 +329,14 @@ public with sharing class HouseholdMergeService {
     private static void failMerge(Savepoint beforeMerge, List<String> reasons, Id survivorId) {
         Database.rollback(beforeMerge);
         ErrorLogger.logMessage(
-            Label.Core_HouseholdMerge_ErrorMergeFailed + ' ' + String.join(reasons, ' '),
+            BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorMergeFailed') +
+                ' ' +
+                String.join(reasons, ' '),
             Label.Core_HouseholdMerge_ErrorContext,
             ErrorLogger.SEVERITY_ERROR,
             survivorId
         );
-        throw new HouseholdException(Label.Core_HouseholdMerge_ErrorMergeFailed);
+        throw new HouseholdException(BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorMergeFailed'));
     }
 
     /**
@@ -493,16 +497,22 @@ public with sharing class HouseholdMergeService {
     @NamespaceAccessible
     public static Id split(Id householdId, Set<Id> personIds, Id targetHouseholdId) {
         if (householdId == null || personIds == null || personIds.isEmpty()) {
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorSplitNoMembers);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorSplitNoMembers')
+            );
         }
         List<Account> sources = HouseholdSelector.getHouseholdsByIds(new Set<Id>{ householdId });
         if (
             sources.isEmpty() || sources[0].RecordTypeId != HouseholdService.householdRecordTypeId()
         ) {
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorNotHousehold);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorNotHousehold')
+            );
         }
         if (targetHouseholdId == householdId) {
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorSplitSameHousehold);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorSplitSameHousehold')
+            );
         }
         // Both ends of the move are edited, so edit access is needed on both. Checking only
         // the household people leave would let somebody push people into a household they
@@ -512,7 +522,9 @@ public with sharing class HouseholdMergeService {
             bothEnds.add(targetHouseholdId);
         }
         if (HouseholdSelector.getEditableIds(bothEnds).size() != bothEnds.size()) {
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorNoEditAccess);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorNoEditAccess')
+            );
         }
 
         List<HouseholdService.Person> moving = new List<HouseholdService.Person>();
@@ -528,7 +540,9 @@ public with sharing class HouseholdMergeService {
             }
         }
         if (moving.isEmpty()) {
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorSplitNotMembers);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorSplitNotMembers')
+            );
         }
 
         Id destination = targetHouseholdId;
@@ -571,10 +585,14 @@ public with sharing class HouseholdMergeService {
      */
     private static Map<Id, Account> loadPair(Id survivorId, Id victimId) {
         if (survivorId == null || victimId == null) {
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorMissingInput);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorMissingInput')
+            );
         }
         if (survivorId == victimId) {
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorSameRecord);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorSameRecord')
+            );
         }
         Map<Id, Account> result = new Map<Id, Account>();
         for (
@@ -585,18 +603,24 @@ public with sharing class HouseholdMergeService {
             result.put(household.Id, household);
         }
         if (result.size() != 2) {
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorNotFound);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorNotFound')
+            );
         }
         Id recordTypeId = HouseholdService.householdRecordTypeId();
         for (Account household : result.values()) {
             if (recordTypeId == null || household.RecordTypeId != recordTypeId) {
-                throw new HouseholdException(Label.Core_HouseholdMerge_ErrorNotHousehold);
+                throw new HouseholdException(
+                    BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorNotHousehold')
+                );
             }
         }
         // A household that is also a Nonprofit Cloud household is not BarnCRM's to merge: the
         // merge deletes one Account, and its native household group would go with it (ADR-0036).
         if (!HouseholdSelector.accountsWithNativeHouseholdGroups(result.keySet()).isEmpty()) {
-            throw new HouseholdException(Label.Core_HouseholdMerge_ErrorNativeHousehold);
+            throw new HouseholdException(
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorNativeHousehold')
+            );
         }
         return result;
     }

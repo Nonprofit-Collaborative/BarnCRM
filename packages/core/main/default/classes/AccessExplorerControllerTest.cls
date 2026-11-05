@@ -393,12 +393,28 @@ private class AccessExplorerControllerTest {
                 messages.add(refusal('access', 'not an id', null));
                 messages.add(refusal('access', UserInfo.getOrganizationId(), null));
             }
-            Assert.areEqual(System.Label.Core_AccessExplorer_PermissionRequired, messages[0], '');
-            Assert.areEqual(System.Label.Core_AccessExplorer_PermissionRequired, messages[1], '');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_AccessExplorer_PermissionRequired'),
+                messages[0],
+                ''
+            );
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_AccessExplorer_PermissionRequired'),
+                messages[1],
+                ''
+            );
             Assert.isTrue(messages[2].contains('No_Such_Object__c'), messages[2]);
             Assert.isTrue(messages[3].contains('No_Such_Field__c'), messages[3]);
-            Assert.areEqual(System.Label.Core_AccessExplorer_UnknownSubject, messages[4], '');
-            Assert.areEqual(System.Label.Core_AccessExplorer_UnknownSubject, messages[5], '');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject'),
+                messages[4],
+                ''
+            );
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject'),
+                messages[5],
+                ''
+            );
         }
     }
 

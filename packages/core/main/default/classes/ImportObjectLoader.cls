@@ -146,7 +146,7 @@ public with sharing class ImportObjectLoader {
         }
         writeBack(lines, steps, outcome, several && !dryRun);
         if (!dryRun && !journal(batch.Id, outcome.journal, createdPages)) {
-            outcome.notes.add(Label.Core_Import_LogJournalFailed);
+            outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogJournalFailed'));
         }
         return outcome;
     }
@@ -233,9 +233,9 @@ public with sharing class ImportObjectLoader {
                 hasValues = hasValues || has;
             }
             if (String.isBlank(row.Raw_Values_JSON__c)) {
-                line.error = Label.Core_Import_ErrorRowUnreadable;
+                line.error = BarnHelp.text('Core', 'Core_Import_ErrorRowUnreadable');
             } else if (!hasValues) {
-                line.error = Label.Core_Import_ErrorRowEmpty;
+                line.error = BarnHelp.text('Core', 'Core_Import_ErrorRowEmpty');
             }
             lines.add(line);
         }
@@ -513,7 +513,7 @@ public with sharing class ImportObjectLoader {
         for (Item item : loading) {
             if (item.error == null && item.creates && batch.Match_Only__c == true) {
                 // A file that only matches creates nothing (R-IB15).
-                item.error = Label.Core_Import_ErrorMatchOnlyWouldCreate;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorMatchOnlyWouldCreate');
             }
         }
         decide(type, loading, plans, outcome);
@@ -582,7 +582,7 @@ public with sharing class ImportObjectLoader {
         if (skipped) {
             outcome.notes.add(
                 String.format(
-                    Label.Core_Import_LogRelatedParentFieldSkipped,
+                    BarnHelp.text('Core', 'Core_Import_LogRelatedParentFieldSkipped'),
                     new List<String>{ planned.field.getLabel() }
                 )
             );
@@ -603,8 +603,8 @@ public with sharing class ImportObjectLoader {
                 }
                 if (parent.error != null || (!dryRun && parent.recordId == null)) {
                     item.error = step.related
-                        ? Label.Core_Import_ErrorRelatedParentFailed
-                        : Label.Core_Import_ErrorParentNotSaved;
+                        ? BarnHelp.text('Core', 'Core_Import_ErrorRelatedParentFailed')
+                        : BarnHelp.text('Core', 'Core_Import_ErrorParentNotSaved');
                     break;
                 }
                 Object held = item.stored == null
@@ -649,7 +649,7 @@ public with sharing class ImportObjectLoader {
             if (token == null) {
                 outcome.notes.add(
                     String.format(
-                        Label.Core_Import_LogAttributeUnknown,
+                        BarnHelp.text('Core', 'Core_Import_LogAttributeUnknown'),
                         new List<String>{ attribute }
                     )
                 );
@@ -659,7 +659,7 @@ public with sharing class ImportObjectLoader {
             if (DataProtectedFields.isProtected(type, field.getName())) {
                 outcome.notes.add(
                     String.format(
-                        Label.Core_Import_LogFieldProtected,
+                        BarnHelp.text('Core', 'Core_Import_LogFieldProtected'),
                         new List<String>{ field.getLabel() }
                     )
                 );
@@ -692,7 +692,7 @@ public with sharing class ImportObjectLoader {
             // A lookup to several objects is read by record ID only.
             outcome.notes.add(
                 String.format(
-                    Label.Core_Import_LogLookupPolymorphic,
+                    BarnHelp.text('Core', 'Core_Import_LogLookupPolymorphic'),
                     new List<String>{ planned.field.getLabel() }
                 )
             );
@@ -704,7 +704,7 @@ public with sharing class ImportObjectLoader {
             planned.findsNobody = true;
             outcome.notes.add(
                 String.format(
-                    Label.Core_Import_LogLookupFieldUnusable,
+                    BarnHelp.text('Core', 'Core_Import_LogLookupFieldUnusable'),
                     new List<String>{ planned.field.getLabel(), chosen.abbreviate(80) }
                 )
             );
@@ -768,7 +768,7 @@ public with sharing class ImportObjectLoader {
             if (pending) {
                 outcome.notes.add(
                     String.format(
-                        Label.Core_Import_LogLookupLoadedHere,
+                        BarnHelp.text('Core', 'Core_Import_LogLookupLoadedHere'),
                         new List<String>{ planned.field.getLabel() }
                     )
                 );
@@ -811,7 +811,7 @@ public with sharing class ImportObjectLoader {
                 item.row.Several_Matches__c = true;
                 if (!mostRecent) {
                     item.error = String.format(
-                        Label.Core_Import_ErrorLookupSeveral,
+                        BarnHelp.text('Core', 'Core_Import_ErrorLookupSeveral'),
                         new List<String>{ planned.field.getLabel(), value.abbreviate(80) }
                     );
                     continue;
@@ -825,7 +825,7 @@ public with sharing class ImportObjectLoader {
                 leftEmpty = true;
             } else {
                 item.error = String.format(
-                    Label.Core_Import_ErrorLookupNotFound,
+                    BarnHelp.text('Core', 'Core_Import_ErrorLookupNotFound'),
                     new List<String>{ planned.field.getLabel(), value.abbreviate(80) }
                 );
             }
@@ -833,7 +833,7 @@ public with sharing class ImportObjectLoader {
         if (leftEmpty) {
             outcome.notes.add(
                 String.format(
-                    Label.Core_Import_LogLookupLeftEmpty,
+                    BarnHelp.text('Core', 'Core_Import_LogLookupLeftEmpty'),
                     new List<String>{ planned.field.getLabel() }
                 )
             );
@@ -993,7 +993,7 @@ public with sharing class ImportObjectLoader {
                 if (item.error == null && item.creates) {
                     item.creates = false;
                     item.error = String.format(
-                        Label.Core_Import_ErrorNoRecordMatched,
+                        BarnHelp.text('Core', 'Core_Import_ErrorNoRecordMatched'),
                         new List<String>{ ImportObjectSchema.labelOf(type, keyField) }
                     );
                 }
@@ -1017,7 +1017,7 @@ public with sharing class ImportObjectLoader {
             }
             item.stored = stored.get(item.recordId);
             if (item.stored == null) {
-                item.error = Label.Core_Import_ErrorRecordNotFound;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorRecordNotFound');
             }
         }
     }
@@ -1074,12 +1074,12 @@ public with sharing class ImportObjectLoader {
         List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesFor(probes, null);
         if (found == null && ImportDuplicateRuleMatcher.lastAskFailed()) {
             for (Item item : asked) {
-                item.error = Label.Core_Import_ErrorDuplicateRulesUnavailable;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorDuplicateRulesUnavailable');
             }
             return;
         }
         if (found == null) {
-            outcome.notes.add(Label.Core_Import_LogNoDuplicateRuleRecords);
+            outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogNoDuplicateRuleRecords'));
             return;
         }
         Set<String> ids = new Set<String>();
@@ -1095,7 +1095,10 @@ public with sharing class ImportObjectLoader {
                 continue;
             }
             if (taken.contains(matched)) {
-                asked[i].error = Label.Core_Import_ErrorDuplicateRuleRecordRepeated;
+                asked[i].error = BarnHelp.text(
+                    'Core',
+                    'Core_Import_ErrorDuplicateRuleRecordRepeated'
+                );
                 continue;
             }
             taken.add(matched);
@@ -1129,14 +1132,14 @@ public with sharing class ImportObjectLoader {
         }
         if (kept.isEmpty()) {
             if (loadedEarlier) {
-                item.error = Label.Core_Import_ErrorDuplicateRuleRecordRepeated;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorDuplicateRuleRecordRepeated');
             }
             return null;
         }
         if (kept.size() > 1) {
             item.row.Several_Matches__c = true;
             if (!mostRecent) {
-                item.error = Label.Core_Import_ErrorSeveralDuplicateRuleRecords;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorSeveralDuplicateRuleRecords');
                 return null;
             }
         }
@@ -1182,7 +1185,7 @@ public with sharing class ImportObjectLoader {
                 ImportMatcher.nameKey(String.valueOf(held)) != item.key
             ) {
                 item.error = String.format(
-                    Label.Core_Import_ErrorDuplicateRuleKeyDiffers,
+                    BarnHelp.text('Core', 'Core_Import_ErrorDuplicateRuleKeyDiffers'),
                     new List<String>{ field.getLabel() }
                 );
             }
@@ -1220,7 +1223,7 @@ public with sharing class ImportObjectLoader {
         Set<Id> visible = ids.isEmpty() ? new Set<Id>() : visibleIds(type, ids);
         for (Item item : items) {
             if (item.error == null && !visible.contains(item.recordId)) {
-                item.error = Label.Core_Import_ErrorRecordNotFound;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorRecordNotFound');
             }
         }
     }
@@ -1240,12 +1243,12 @@ public with sharing class ImportObjectLoader {
             Id candidate = ImportValues.idOrNull(value);
             if (candidate == null) {
                 item.error = String.format(
-                    Label.Core_Import_ErrorRecordIdInvalid,
+                    BarnHelp.text('Core', 'Core_Import_ErrorRecordIdInvalid'),
                     new List<String>{ String.isBlank(value) ? '' : value.abbreviate(40) }
                 );
             } else if (candidate.getSObjectType() != type) {
                 item.error = String.format(
-                    Label.Core_Import_ErrorRecordIdWrongObject,
+                    BarnHelp.text('Core', 'Core_Import_ErrorRecordIdWrongObject'),
                     new List<String>{
                         value.abbreviate(40),
                         type.getDescribe(SObjectDescribeOptions.DEFERRED).getLabel()
@@ -1264,8 +1267,8 @@ public with sharing class ImportObjectLoader {
         if (String.isBlank(value)) {
             item.error = String.format(
                 operation == ImportObjectSchema.OPERATION_UPSERT
-                    ? Label.Core_Import_ErrorKeyMissing
-                    : Label.Core_Import_ErrorMatchValueMissing,
+                    ? BarnHelp.text('Core', 'Core_Import_ErrorKeyMissing')
+                    : BarnHelp.text('Core', 'Core_Import_ErrorMatchValueMissing'),
                 new List<String>{ ImportObjectSchema.labelOf(type, keyField) }
             );
             return;
@@ -1295,7 +1298,7 @@ public with sharing class ImportObjectLoader {
             if (match != null && found.several.contains(item.key)) {
                 item.row.Several_Matches__c = true;
                 if (!mostRecent) {
-                    item.error = Label.Core_Import_ErrorSeveralRecords;
+                    item.error = BarnHelp.text('Core', 'Core_Import_ErrorSeveralRecords');
                     continue;
                 }
             }
@@ -1335,7 +1338,7 @@ public with sharing class ImportObjectLoader {
             }
             String digest = ImportValues.digest(RECORD_DIGEST, item.key);
             if (earlier.contains(digest) || inChunk.contains(digest)) {
-                item.error = Label.Core_Import_ErrorRecordRepeated;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorRecordRepeated');
                 continue;
             }
             inChunk.add(digest);
@@ -1425,7 +1428,7 @@ public with sharing class ImportObjectLoader {
                 ) {
                     outcome.notes.add(
                         String.format(
-                            Label.Core_Import_LogCannotClear,
+                            BarnHelp.text('Core', 'Core_Import_LogCannotClear'),
                             new List<String>{ field.getLabel() }
                         )
                     );
@@ -1438,7 +1441,7 @@ public with sharing class ImportObjectLoader {
                 ) {
                     outcome.notes.add(
                         String.format(
-                            Label.Core_Import_LogFieldProtected,
+                            BarnHelp.text('Core', 'Core_Import_LogFieldProtected'),
                             new List<String>{ field.getLabel() }
                         )
                     );
@@ -1623,8 +1626,8 @@ public with sharing class ImportObjectLoader {
     /** Why a later row of a key whose first row failed loads nothing of that object. */
     private static String firstRowFailed(Step step) {
         return step.given.needsOwnValue
-            ? Label.Core_Import_ErrorKeyFirstRowFailed
-            : Label.Core_Import_ErrorRelatedParentFailed;
+            ? BarnHelp.text('Core', 'Core_Import_ErrorKeyFirstRowFailed')
+            : BarnHelp.text('Core', 'Core_Import_ErrorRelatedParentFailed');
     }
 
     /**
@@ -1643,8 +1646,8 @@ public with sharing class ImportObjectLoader {
         return new List<String>{
             String.format(
                 dryRun == true
-                    ? Label.Core_Import_LogRelatedDryRun
-                    : Label.Core_Import_LogRelatedCommit,
+                    ? BarnHelp.text('Core', 'Core_Import_LogRelatedDryRun')
+                    : BarnHelp.text('Core', 'Core_Import_LogRelatedCommit'),
                 new List<String>{
                     String.valueOf(created == null ? 0 : created),
                     String.valueOf(rejected == null ? 0 : rejected)
@@ -1704,7 +1707,9 @@ public with sharing class ImportObjectLoader {
             // Ticked so the rows a looser rule matched can be read before a commit (R-IT16).
             row.Duplicate_Rule_Match__c = result.ruleMatch && error == null;
             if (row.Duplicate_Rule_Match__c) {
-                outcome.notes.add(Label.Core_Import_LogDuplicateRuleMatchesRecords);
+                outcome.notes.add(
+                    BarnHelp.text('Core', 'Core_Import_LogDuplicateRuleMatchesRecords')
+                );
             }
             // A parent saved for a row whose related record failed stays its resulting record.
             Item first = result.first;
@@ -1800,7 +1805,7 @@ public with sharing class ImportObjectLoader {
                 : null;
             if (error == null && item.error != null) {
                 error = String.format(
-                    Label.Core_Import_ErrorRelatedRecord,
+                    BarnHelp.text('Core', 'Core_Import_ErrorRelatedRecord'),
                     new List<String>{ item.error }
                 );
             }
@@ -1830,7 +1835,7 @@ public with sharing class ImportObjectLoader {
 
     private static String noAccess(Schema.DescribeFieldResult field) {
         return String.format(
-            Label.Core_Import_LogAttributeNoAccess,
+            BarnHelp.text('Core', 'Core_Import_LogAttributeNoAccess'),
             new List<String>{ field.getLabel() }
         );
     }

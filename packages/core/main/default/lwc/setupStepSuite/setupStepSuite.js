@@ -1,15 +1,11 @@
 import { LightningElement, api } from 'lwc';
 import EDITION from '@salesforce/label/c.Core_SuiteChoice_EditionLabel';
-import GIVING_INSTALLED from '@salesforce/label/c.Core_SuiteChoice_GivingInstalled';
-import GIVING_NEEDED from '@salesforce/label/c.Core_SuiteChoice_GivingNeeded';
 import INSTALL from '@salesforce/label/c.Core_SuiteChoice_InstallButton';
-import NO_INSTALL_LINK from '@salesforce/label/c.Core_SuiteChoice_NoInstallLink';
 import READ_ABOUT from '@salesforce/label/c.Core_SuiteChoice_ReadAbout';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import STANDARD_NAME from '@salesforce/label/c.Core_SuiteChoice_StandardName';
 import NONPROFIT_NAME from '@salesforce/label/c.Core_SuiteChoice_NonprofitName';
-import CHOSEN_ONCE from '@salesforce/label/c.Core_SuiteChoice_ChosenOnce';
 import CHANGE_HELP from '@salesforce/label/c.Core_SuiteChoice_ChangeHelpLink';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -44,17 +40,25 @@ export default class SetupStepSuite extends LightningElement {
     get chooseInFirstRun() {
       return helpText('Core', 'Core_SuiteChoice_ChooseInFirstRun');
     },
-    givingInstalled: GIVING_INSTALLED,
-    givingNeeded: GIVING_NEEDED,
+    get givingInstalled() {
+      return helpText('Core', 'Core_SuiteChoice_GivingInstalled');
+    },
+    get givingNeeded() {
+      return helpText('Core', 'Core_SuiteChoice_GivingNeeded');
+    },
     install: INSTALL,
     get installHelp() {
       return helpText('Core', 'Core_SuiteChoice_InstallHelp');
     },
-    noInstallLink: NO_INSTALL_LINK,
+    get noInstallLink() {
+      return helpText('Core', 'Core_SuiteChoice_NoInstallLink');
+    },
     readAbout: READ_ABOUT,
     checkAgain: CHECK_AGAIN,
     newTab: NEW_TAB,
-    chosenOnce: CHOSEN_ONCE,
+    get chosenOnce() {
+      return helpText('Core', 'Core_SuiteChoice_ChosenOnce');
+    },
     changeHelp: CHANGE_HELP
   };
 

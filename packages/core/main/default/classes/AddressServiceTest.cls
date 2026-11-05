@@ -961,7 +961,7 @@ private class AddressServiceTest {
 
             Assert.isFalse(result.isSuccess(), 'The household would have no address in use');
             Assert.areEqual(
-                Label.Core_Address_CannotUntickOnlyDefault,
+                BarnHelp.text('Core', 'Core_Address_CannotUntickOnlyDefault'),
                 result.getErrors()[0].getMessage(),
                 'The person is told what to do instead'
             );

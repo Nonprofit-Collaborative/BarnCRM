@@ -144,7 +144,7 @@ private class HouseholdMergeServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_HouseholdMerge_ErrorMergeFailed,
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorMergeFailed'),
                 message,
                 'The person is told the merge did not happen'
             );
@@ -235,7 +235,11 @@ private class HouseholdMergeServiceTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_HouseholdMerge_ErrorMergeFailed, message, 'Refused');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorMergeFailed'),
+                message,
+                'Refused'
+            );
             Assert.areEqual(victimId, householdOf(wei.Id), 'Nobody was moved');
             Assert.areEqual(
                 1,
@@ -727,8 +731,8 @@ private class HouseholdMergeServiceTest {
 
             Assert.areEqual(
                 new List<String>{
-                    Label.Core_HouseholdMerge_ErrorNativeHousehold,
-                    Label.Core_HouseholdMerge_ErrorNativeHousehold
+                    BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorNativeHousehold'),
+                    BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorNativeHousehold')
                 },
                 messages,
                 'Either direction is refused, before anything is moved.'
@@ -763,7 +767,7 @@ private class HouseholdMergeServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_HouseholdMerge_ErrorNotHousehold,
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorNotHousehold'),
                 message,
                 'The refusal names the problem in plain language'
             );
@@ -796,7 +800,7 @@ private class HouseholdMergeServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_HouseholdMerge_ErrorSameRecord,
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorSameRecord'),
                 message,
                 'The refusal is clear'
             );
@@ -938,7 +942,7 @@ private class HouseholdMergeServiceTest {
             String message = mergeAs(reader, survivor.Id, victim.Id);
 
             Assert.areEqual(
-                Label.Core_HouseholdMerge_ErrorNoEditAccess,
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorNoEditAccess'),
                 message,
                 'The refusal is the plain one'
             );
@@ -983,7 +987,7 @@ private class HouseholdMergeServiceTest {
             String message = mergeAs(staff, survivorId, victimId);
 
             Assert.areEqual(
-                Label.Core_HouseholdMerge_ErrorNoEditAccess,
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorNoEditAccess'),
                 message,
                 'A household the person may only read is not merged'
             );
@@ -1189,7 +1193,7 @@ private class HouseholdMergeServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_HouseholdMerge_ErrorSplitNotMembers,
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorSplitNotMembers'),
                 message,
                 'The refusal says the people are not in this household'
             );
@@ -1213,7 +1217,7 @@ private class HouseholdMergeServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_HouseholdMerge_ErrorSplitNoMembers,
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorSplitNoMembers'),
                 message,
                 'The refusal asks for at least one person'
             );
@@ -1271,7 +1275,7 @@ private class HouseholdMergeServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_HouseholdMerge_ErrorSplitSameHousehold,
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorSplitSameHousehold'),
                 message,
                 'The refusal says what to do instead'
             );
@@ -1533,7 +1537,7 @@ private class HouseholdMergeServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_HouseholdMerge_ErrorMergeFailed,
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorMergeFailed'),
                 refused,
                 'Only HouseholdMergeService can make the authorization the writer needs'
             );

@@ -162,7 +162,7 @@ private class HealthCheckFixesTest {
                     Assert.fail('The failure reaches the panel.');
                 } catch (AuraHandledException expected) {
                     Assert.areEqual(
-                        System.Label.Core_HealthCheck_FixFailed,
+                        BarnHelp.text('Core', 'Core_HealthCheck_FixFailed'),
                         expected.getMessage(),
                         'As a sentence.'
                     );
@@ -349,7 +349,7 @@ private class HealthCheckFixesTest {
                 Assert.isTrue(
                     report.fixOutcome.contains(
                         String.format(
-                            System.Label.Core_HealthCheck_FixStoppedOnly,
+                            BarnHelp.text('Core', 'Core_HealthCheck_FixStoppedOnly'),
                             new List<Object>{ otherJob }
                         )
                     ),
@@ -423,7 +423,7 @@ private class HealthCheckFixesTest {
                 Assert.isTrue(
                     report.fixOutcome.contains(
                         String.format(
-                            System.Label.Core_HealthCheck_FixStoppedOnly,
+                            BarnHelp.text('Core', 'Core_HealthCheck_FixStoppedOnly'),
                             new List<Object>{ otherJob }
                         )
                     ),
@@ -454,7 +454,7 @@ private class HealthCheckFixesTest {
                     Assert.fail('An unknown fix is refused.');
                 } catch (AuraHandledException expected) {
                     Assert.areEqual(
-                        System.Label.Core_HealthCheck_FixUnknown,
+                        BarnHelp.text('Core', 'Core_HealthCheck_FixUnknown'),
                         expected.getMessage(),
                         'Refused with a sentence.'
                     );

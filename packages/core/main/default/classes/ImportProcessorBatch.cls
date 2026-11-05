@@ -243,7 +243,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             Import_Template__c template = ImportBatchService.templateFor(batch);
             pass = batch == null ? null : batch.Pass_Number__c;
             if (batch == null || template == null) {
-                throw new ImportException(Label.Core_Import_ErrorTemplateGone);
+                throw new ImportException(BarnHelp.text('Core', 'Core_Import_ErrorTemplateGone'));
             }
             // The file's own values come before the template's defaults (R-IB14).
             ImportMapping mapping = ImportMapping.parse(
@@ -277,7 +277,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             rejectChunk(scope, e.getMessage());
             addLog(
                 String.format(
-                    Label.Core_Import_LogChunkFailed,
+                    BarnHelp.text('Core', 'Core_Import_LogChunkFailed'),
                     new List<String>{ String.valueOf(chunksRun), e.getMessage() }
                 )
             );
@@ -290,13 +290,15 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
         try {
             List<String> lines = new List<String>();
             lines.add(
-                dryRun ? Label.Core_Import_LogDryRunHeader : Label.Core_Import_LogCommitHeader
+                dryRun
+                    ? BarnHelp.text('Core', 'Core_Import_LogDryRunHeader')
+                    : BarnHelp.text('Core', 'Core_Import_LogCommitHeader')
             );
             // Chunk failures first: the run log is cut at its field's length, and they matter most.
             if (rowIds != null) {
                 lines.add(
                     String.format(
-                        Label.Core_Import_LogCorrectedRetry,
+                        BarnHelp.text('Core', 'Core_Import_LogCorrectedRetry'),
                         new List<String>{ String.valueOf(rowIds.size()) }
                     )
                 );
@@ -305,14 +307,16 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             if (cleared > 0) {
                 lines.add(
                     String.format(
-                        dryRun ? Label.Core_Import_LogWouldClear : Label.Core_Import_LogCleared,
+                        dryRun
+                            ? BarnHelp.text('Core', 'Core_Import_LogWouldClear')
+                            : BarnHelp.text('Core', 'Core_Import_LogCleared'),
                         new List<String>{ String.valueOf(cleared) }
                     )
                 );
             }
             lines.addAll(new List<String>(notes));
             if (notesCut) {
-                lines.add(Label.Core_Import_LogNotesCut);
+                lines.add(BarnHelp.text('Core', 'Core_Import_LogNotesCut'));
             }
             ImportBatchService.finish(
                 batchId,
@@ -341,7 +345,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
             ImportRowProcessor.startPass(rejected, pass);
             rejected.Status__c = ImportRowProcessor.STATUS_REJECTED;
             rejected.Error_Message__c = String.isBlank(reason)
-                ? Label.Core_Import_ErrorSaveFailed
+                ? BarnHelp.text('Core', 'Core_Import_ErrorSaveFailed')
                 : reason.abbreviate(4000);
             rows.add(rejected);
         }

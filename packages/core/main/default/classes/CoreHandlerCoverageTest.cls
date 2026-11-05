@@ -83,7 +83,7 @@ private class CoreHandlerCoverageTest {
                 'An address with no account to belong to is refused'
             );
             Assert.areEqual(
-                Label.Core_Address_PropagationFailed,
+                BarnHelp.text('Core', 'Core_Address_PropagationFailed'),
                 onlyMessage(unsaved),
                 'With the message that says the address could not be kept'
             );
@@ -377,7 +377,7 @@ private class CoreHandlerCoverageTest {
                 }
             ) {
                 Assert.areEqual(
-                    Label.Core_Affiliation_PrimaryFailed,
+                    BarnHelp.text('Core', 'Core_Affiliation_PrimaryFailed'),
                     onlyMessage(record),
                     'The person sees the affiliation message, once'
                 );
@@ -405,12 +405,12 @@ private class CoreHandlerCoverageTest {
             }
 
             Assert.areEqual(
-                Label.Core_Affiliation_PrimaryFailed,
+                BarnHelp.text('Core', 'Core_Affiliation_PrimaryFailed'),
                 onlyMessage(inserted),
                 'On insert'
             );
             Assert.areEqual(
-                Label.Core_Affiliation_PrimaryFailed,
+                BarnHelp.text('Core', 'Core_Affiliation_PrimaryFailed'),
                 onlyMessage(updated),
                 'On update'
             );
@@ -573,7 +573,7 @@ private class CoreHandlerCoverageTest {
                 }
             ) {
                 Assert.areEqual(
-                    Label.Core_Relationship_SyncFailed,
+                    BarnHelp.text('Core', 'Core_Relationship_SyncFailed'),
                     onlyMessage(record),
                     'The person sees the relationship message, once'
                 );
@@ -600,8 +600,16 @@ private class CoreHandlerCoverageTest {
                 clearOverrides();
             }
 
-            Assert.areEqual(Label.Core_Relationship_SyncFailed, onlyMessage(inserted), 'On insert');
-            Assert.areEqual(Label.Core_Relationship_SyncFailed, onlyMessage(updated), 'On update');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Relationship_SyncFailed'),
+                onlyMessage(inserted),
+                'On insert'
+            );
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Relationship_SyncFailed'),
+                onlyMessage(updated),
+                'On update'
+            );
         }
     }
 

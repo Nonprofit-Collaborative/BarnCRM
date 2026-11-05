@@ -66,7 +66,7 @@ private class CustomMetadataDeployCallbackTest {
             Test.stopTest();
 
             String expected = String.format(
-                Label.Core_CmdtManager_DeployFailed,
+                BarnHelp.text('Core', 'Core_CmdtManager_DeployFailed'),
                 new List<Object>{ 'Mentor', failure.problem }
             );
             Assert.areEqual(
@@ -93,8 +93,16 @@ private class CustomMetadataDeployCallbackTest {
             String none = CustomMetadataDeployCallback.reasonOf(null);
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_CmdtManager_DeployFailedNoReason, reason, 'Fallback');
-            Assert.areEqual(Label.Core_CmdtManager_DeployFailedNoReason, none, 'No result at all');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_CmdtManager_DeployFailedNoReason'),
+                reason,
+                'Fallback'
+            );
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_CmdtManager_DeployFailedNoReason'),
+                none,
+                'No result at all'
+            );
         }
     }
 }

@@ -9,6 +9,13 @@ import applyChange from '@salesforce/apex/FieldAccessController.apply';
 import undoChange from '@salesforce/apex/FieldAccessController.undo';
 import listChanges from '@salesforce/apex/FieldAccessController.listChanges';
 import listObjects from '@salesforce/apex/DataDictionaryController.listObjects';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_FieldAccess_PreviewSummary: '{0} rows change on {1} permission sets; {2} are already right.',
+  Core_FieldAccess_Applied: 'Changed {0} rows; {1} refused.',
+  Core_FieldAccess_Conflict: '{0} is set to No Access.'
+});
 
 jest.mock('@salesforce/apex/FieldAccessController.getStatus', () => ({ default: jest.fn() }), {
   virtual: true
@@ -42,21 +49,6 @@ jest.mock(
 jest.mock(
   '@salesforce/label/c.Core_FieldAccess_NowText',
   () => ({ default: 'Read: {0} of {2}. Edit: {1} of {2}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_FieldAccess_PreviewSummary',
-  () => ({ default: '{0} rows change on {1} permission sets; {2} are already right.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_FieldAccess_Applied',
-  () => ({ default: 'Changed {0} rows; {1} refused.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_FieldAccess_Conflict',
-  () => ({ default: '{0} is set to No Access.' }),
   { virtual: true }
 );
 

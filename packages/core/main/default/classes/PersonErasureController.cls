@@ -34,7 +34,7 @@ public with sharing class PersonErasureController {
             failed instanceof PersonErasure.ErasureException,
             'PersonErasureController',
             personId,
-            Label.Core_Households_ErrorUnexpected
+            BarnHelp.text('Core', 'Core_Households_ErrorUnexpected')
         );
     }
 }

@@ -5,16 +5,12 @@ import changeEdition from '@salesforce/apex/SetupAssistantController.changeEditi
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import STANDARD_NAME from '@salesforce/label/c.Core_SuiteChoice_StandardName';
 import NONPROFIT_NAME from '@salesforce/label/c.Core_SuiteChoice_NonprofitName';
-import NOT_CHOSEN from '@salesforce/label/c.Core_Edition_NotChosen';
 import CHANGE_TOGGLE from '@salesforce/label/c.Core_Edition_ChangeToggle';
 import TO_STANDARD from '@salesforce/label/c.Core_Edition_SwitchToStandard';
 import TO_NONPROFIT from '@salesforce/label/c.Core_Edition_SwitchToNonprofit';
 import CONFIRM_TITLE from '@salesforce/label/c.Core_Edition_ConfirmTitle';
-import CONFIRM_TO_NONPROFIT from '@salesforce/label/c.Core_Edition_ConfirmToNonprofit';
-import CONFIRM_TO_STANDARD from '@salesforce/label/c.Core_Edition_ConfirmToStandard';
 import CONFIRM_BUTTON from '@salesforce/label/c.Core_Edition_ChangeToggle';
 import CANCEL_BUTTON from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import SAVED from '@salesforce/label/c.Core_Edition_Saved';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const STANDARD = 'Standard';
@@ -29,12 +25,16 @@ export default class EditionSetting extends LightningElement {
   helpReady = isHelpLoaded('Core');
 
   labels = {
-    notChosen: NOT_CHOSEN,
+    get notChosen() {
+      return helpText('Core', 'Core_Edition_NotChosen');
+    },
     changeToggle: CHANGE_TOGGLE,
     get changeIntro() {
       return helpText('Core', 'Core_Edition_ChangeIntro');
     },
-    saved: SAVED
+    get saved() {
+      return helpText('Core', 'Core_Edition_Saved');
+    }
   };
 
   current;
@@ -94,7 +94,10 @@ export default class EditionSetting extends LightningElement {
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
       label: CONFIRM_TITLE,
-      message: target === NONPROFIT ? CONFIRM_TO_NONPROFIT : CONFIRM_TO_STANDARD,
+      message:
+        target === NONPROFIT
+          ? helpText('Core', 'Core_Edition_ConfirmToNonprofit')
+          : helpText('Core', 'Core_Edition_ConfirmToStandard'),
       confirmLabel: CONFIRM_BUTTON,
       cancelLabel: CANCEL_BUTTON
     });
@@ -106,7 +109,7 @@ export default class EditionSetting extends LightningElement {
     this.savedMessage = undefined;
     try {
       this.apply(await changeEdition({ suite: target }));
-      this.savedMessage = SAVED;
+      this.savedMessage = helpText('Core', 'Core_Edition_Saved');
     } catch (error) {
       this.errorMessage = messageOf(error);
     } finally {

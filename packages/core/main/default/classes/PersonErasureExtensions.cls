@@ -75,7 +75,10 @@ public with sharing class PersonErasureExtensions {
             ErrorLogger.SEVERITY_ERROR
         );
         return new PersonErasure.ErasureException(
-            String.format(Label.Core_Erase_ExtensionFailed, new List<String>{ className })
+            String.format(
+                BarnHelp.text('Core', 'Core_Erase_ExtensionFailed'),
+                new List<String>{ className }
+            )
         );
     }
 }

@@ -39,17 +39,6 @@ import FALSE_LABEL from '@salesforce/label/c.Core_BulkUpdate_False';
 import USE_LOGIC from '@salesforce/label/c.Core_Filter_UseLogic';
 import LOGIC from '@salesforce/label/c.Core_Filter_Logic';
 import LOADING from '@salesforce/label/c.Core_Filter_Loading';
-import ERROR_CHOOSE_FIELD from '@salesforce/label/c.Core_Filter_ErrorChooseField';
-import ERROR_CHOOSE_OPERATOR from '@salesforce/label/c.Core_Filter_ErrorChooseOperator';
-import ERROR_VALUE_REQUIRED from '@salesforce/label/c.Core_Filter_ErrorValueRequired';
-import ERROR_NUMBER from '@salesforce/label/c.Core_Filter_ErrorNumber';
-import ERROR_DAYS from '@salesforce/label/c.Core_Filter_ErrorDays';
-import ERROR_FIELD_UNAVAILABLE from '@salesforce/label/c.Core_Filter_ErrorFieldUnavailable';
-import ERROR_LOGIC_SYNTAX from '@salesforce/label/c.Core_Filter_ErrorLogicSyntax';
-import ERROR_LOGIC_UNKNOWN from '@salesforce/label/c.Core_Filter_ErrorLogicUnknown';
-import ERROR_LOGIC_MISSING from '@salesforce/label/c.Core_Filter_ErrorLogicMissing';
-import ERROR_INVALID_DOCUMENT from '@salesforce/label/c.Core_Filter_ErrorInvalidDocument';
-import ERROR_SUMMARY from '@salesforce/label/c.Core_Filter_ErrorSummary';
 import SUMMARY_ALL from '@salesforce/label/c.Core_Filter_SummaryAll';
 import SUMMARY_LOGIC from '@salesforce/label/c.Core_Filter_SummaryLogic';
 import OP_EQUALS from '@salesforce/label/c.Core_Filter_OpEquals';
@@ -107,11 +96,11 @@ function operatorLabel(field, operator) {
   return special || OPERATOR_LABELS[operator] || '';
 }
 
-const VALUE_PROBLEM_LABELS = {
-  valueRequired: ERROR_VALUE_REQUIRED,
-  number: ERROR_NUMBER,
-  days: ERROR_DAYS
-};
+const VALUE_PROBLEM_LABELS = () => ({
+  valueRequired: helpText('Core', 'Core_Filter_ErrorValueRequired'),
+  number: helpText('Core', 'Core_Filter_ErrorNumber'),
+  days: helpText('Core', 'Core_Filter_ErrorDays')
+});
 
 const FIELD_PREFIX = 'f:';
 const PARENT_PREFIX = 'r:';
@@ -179,7 +168,9 @@ export default class FilterBuilder extends LightningElement {
       return helpText('Core', 'Core_Filter_Empty');
     },
     loading: LOADING,
-    errorSummary: ERROR_SUMMARY,
+    get errorSummary() {
+      return helpText('Core', 'Core_Filter_ErrorSummary');
+    },
     operator: OPERATOR,
     chooseOperator: CHOOSE_OPERATOR,
     value: VALUE,
@@ -604,17 +595,17 @@ export default class FilterBuilder extends LightningElement {
 
   rowProblem(row) {
     if (row.unavailable) {
-      return format(ERROR_FIELD_UNAVAILABLE, row.rawField);
+      return format(helpText('Core', 'Core_Filter_ErrorFieldUnavailable'), row.rawField);
     }
     const field = this.leafField(row);
     if (!field) {
-      return ERROR_CHOOSE_FIELD;
+      return helpText('Core', 'Core_Filter_ErrorChooseField');
     }
     if (!row.operator || !operatorsFor(field, !this.hideRelativeDates).includes(row.operator)) {
-      return ERROR_CHOOSE_OPERATOR;
+      return helpText('Core', 'Core_Filter_ErrorChooseOperator');
     }
     const problem = valueProblem(valueKindFor(field, row.operator), row.inputValue);
-    return problem ? VALUE_PROBLEM_LABELS[problem] : undefined;
+    return problem ? VALUE_PROBLEM_LABELS()[problem] : undefined;
   }
 
   logicMessage() {
@@ -623,12 +614,12 @@ export default class FilterBuilder extends LightningElement {
       return undefined;
     }
     if (found.problem === 'unknown') {
-      return format(ERROR_LOGIC_UNKNOWN, found.condition);
+      return format(helpText('Core', 'Core_Filter_ErrorLogicUnknown'), found.condition);
     }
     if (found.problem === 'missing') {
-      return format(ERROR_LOGIC_MISSING, found.condition);
+      return format(helpText('Core', 'Core_Filter_ErrorLogicMissing'), found.condition);
     }
-    return ERROR_LOGIC_SYNTAX;
+    return helpText('Core', 'Core_Filter_ErrorLogicSyntax');
   }
 
   firstProblem() {
@@ -741,7 +732,7 @@ export default class FilterBuilder extends LightningElement {
       try {
         parsed = parseDocument(this._value);
       } catch {
-        this.loadError = ERROR_INVALID_DOCUMENT;
+        this.loadError = helpText('Core', 'Core_Filter_ErrorInvalidDocument');
         return;
       }
       const rows = [];

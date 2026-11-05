@@ -99,7 +99,7 @@ private class BulkDeleteBackupTest {
                 Assert.fail('Refused.');
             } catch (AuraHandledException refused) {
                 Assert.areEqual(
-                    System.Label.Core_BulkDelete_ErrorNoPermission,
+                    BarnHelp.text('Core', 'Core_BulkDelete_ErrorNoPermission'),
                     refused.getMessage()
                 );
             }

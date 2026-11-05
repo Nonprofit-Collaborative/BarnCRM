@@ -45,8 +45,8 @@ public with sharing class HealthCheckHouseholdChecks {
                 PersonLinkOrphanSelector.relationships(LINKS_SHOWN),
                 System.Label.Core_HealthCheck_RelationshipsNoPersonTitleOne,
                 System.Label.Core_HealthCheck_RelationshipsNoPersonTitle,
-                System.Label.Core_HealthCheck_RelationshipsNoPersonDetailOne,
-                System.Label.Core_HealthCheck_RelationshipsNoPersonDetail,
+                BarnHelp.text('Core', 'Core_HealthCheck_RelationshipsNoPersonDetailOne'),
+                BarnHelp.text('Core', 'Core_HealthCheck_RelationshipsNoPersonDetail'),
                 HealthCheckService.SEVERITY_WARNING,
                 false
             );
@@ -62,8 +62,8 @@ public with sharing class HealthCheckHouseholdChecks {
                 PersonLinkOrphanSelector.affiliations(LINKS_SHOWN),
                 System.Label.Core_HealthCheck_AffiliationsNoPersonTitleOne,
                 System.Label.Core_HealthCheck_AffiliationsNoPersonTitle,
-                System.Label.Core_HealthCheck_AffiliationsNoPersonDetailOne,
-                System.Label.Core_HealthCheck_AffiliationsNoPersonDetail,
+                BarnHelp.text('Core', 'Core_HealthCheck_AffiliationsNoPersonDetailOne'),
+                BarnHelp.text('Core', 'Core_HealthCheck_AffiliationsNoPersonDetail'),
                 HealthCheckService.SEVERITY_WARNING,
                 false
             );
@@ -101,13 +101,19 @@ public with sharing class HealthCheckHouseholdChecks {
                     );
                 }
             }
-            detail = System.Label.Core_HealthCheck_PeopleWithoutHouseholdJunctionDetail;
-            detailOne = System.Label.Core_HealthCheck_PeopleWithoutHouseholdJunctionDetailOne;
+            detail = BarnHelp.text('Core', 'Core_HealthCheck_PeopleWithoutHouseholdJunctionDetail');
+            detailOne = BarnHelp.text(
+                'Core',
+                'Core_HealthCheck_PeopleWithoutHouseholdJunctionDetailOne'
+            );
         } else {
             count = HouseholdOrphanSelector.countContactsWithoutAccount(countCap + 1);
             first.addAll(HouseholdOrphanSelector.contactsWithoutAccount(LINKS_SHOWN));
-            detail = System.Label.Core_HealthCheck_PeopleWithoutHouseholdContactDetail;
-            detailOne = System.Label.Core_HealthCheck_PeopleWithoutHouseholdContactDetailOne;
+            detail = BarnHelp.text('Core', 'Core_HealthCheck_PeopleWithoutHouseholdContactDetail');
+            detailOne = BarnHelp.text(
+                'Core',
+                'Core_HealthCheck_PeopleWithoutHouseholdContactDetailOne'
+            );
         }
         return orphanFinding(
             'people_without_household',
@@ -140,8 +146,8 @@ public with sharing class HealthCheckHouseholdChecks {
             first,
             System.Label.Core_HealthCheck_EmptyHouseholdsTitleOne,
             System.Label.Core_HealthCheck_EmptyHouseholdsTitle,
-            System.Label.Core_HealthCheck_EmptyHouseholdsDetailOne,
-            System.Label.Core_HealthCheck_EmptyHouseholdsDetail,
+            BarnHelp.text('Core', 'Core_HealthCheck_EmptyHouseholdsDetailOne'),
+            BarnHelp.text('Core', 'Core_HealthCheck_EmptyHouseholdsDetail'),
             HealthCheckService.SEVERITY_INFO,
             true
         );
@@ -183,13 +189,13 @@ public with sharing class HealthCheckHouseholdChecks {
                 ' ' +
                 HealthCheckService.forCount(
                     first.size(),
-                    System.Label.Core_HealthCheck_OrphansFirstListedOne,
+                    BarnHelp.text('Core', 'Core_HealthCheck_OrphansFirstListedOne'),
                     System.Label.Core_HealthCheck_OrphansFirstListed,
                     new List<Object>{ String.valueOf(first.size()) }
                 );
         }
         if (mayBeNativeHousehold && hasNativeHouseholds()) {
-            text += ' ' + System.Label.Core_HealthCheck_OrphansNativeNote;
+            text += ' ' + BarnHelp.text('Core', 'Core_HealthCheck_OrphansNativeNote');
         }
         List<HealthCheckService.Link> links = new List<HealthCheckService.Link>();
         for (SObject record : first) {

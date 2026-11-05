@@ -586,7 +586,7 @@ private class ImportObjectSchemaTest {
             );
             Assert.areEqual(
                 String.format(
-                    Label.Core_Import_ErrorPeopleUpdateOnly,
+                    BarnHelp.text('Core', 'Core_Import_ErrorPeopleUpdateOnly'),
                     new List<String>{
                         Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
                             .getLabelPlural()
@@ -596,13 +596,17 @@ private class ImportObjectSchemaTest {
                 'People are inserted by a people mapping.'
             );
             Assert.areEqual(
-                Label.Core_Import_ErrorNothingMapped,
+                BarnHelp.text('Core', 'Core_Import_ErrorNothingMapped'),
                 refusals.get('nothing'),
                 'Empty.'
             );
-            Assert.areEqual(Label.Core_Import_ErrorIdColumnMissing, refusals.get('noId'), 'No ID.');
             Assert.areEqual(
-                Label.Core_Import_ErrorKeyFieldRequired,
+                BarnHelp.text('Core', 'Core_Import_ErrorIdColumnMissing'),
+                refusals.get('noId'),
+                'No ID.'
+            );
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Import_ErrorKeyFieldRequired'),
                 refusals.get('noKey'),
                 'No key.'
             );

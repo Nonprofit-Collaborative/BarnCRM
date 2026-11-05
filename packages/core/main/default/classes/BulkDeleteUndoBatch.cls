@@ -185,7 +185,7 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
                         objectName,
                         recordId,
                         null,
-                        System.Label.Core_BulkDelete_UndoPurged
+                        BarnHelp.text('Core', 'Core_BulkDelete_UndoPurged')
                     )
                 );
             } else if (record.get('IsDeleted') != true) {
@@ -223,7 +223,9 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
                     objectName,
                     toUndelete[i],
                     null,
-                    emptied ? System.Label.Core_BulkDelete_UndoPurged : String.join(parts, ' ')
+                    emptied
+                        ? BarnHelp.text('Core', 'Core_BulkDelete_UndoPurged')
+                        : String.join(parts, ' ')
                 )
             );
         }
@@ -253,7 +255,7 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
                 LIMIT 1
             ];
             String line = String.format(
-                System.Label.Core_BulkDelete_LogUndone,
+                BarnHelp.text('Core', 'Core_BulkDelete_LogUndone'),
                 new List<Object>{
                     UserInfo.getName(),
                     Datetime.now().format(),
@@ -265,7 +267,7 @@ public with sharing class BulkDeleteUndoBatch implements Database.Batchable<SObj
                 }
             );
             if (journalIncomplete) {
-                line += '\n' + System.Label.Core_BulkUpdate_LogJournalIncomplete;
+                line += '\n' + BarnHelp.text('Core', 'Core_BulkUpdate_LogJournalIncomplete');
             }
             job.Run_Log__c = (String.isBlank(job.Run_Log__c) ? line : job.Run_Log__c + '\n' + line)
                 .right(32768);

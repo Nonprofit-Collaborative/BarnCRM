@@ -105,7 +105,7 @@ public with sharing class FilterValueBinder {
         if (!field.isFilterable() || !operatorsFor(field.getType()).contains(operator)) {
             throw new RollupFilterParser.RollupFilterException(
                 String.format(
-                    System.Label.Core_Filter_ErrorOperatorType,
+                    BarnHelp.text('Core', 'Core_Filter_ErrorOperatorType'),
                     new List<Object>{ fieldPath, String.valueOf(operator) }
                 )
             );
@@ -296,7 +296,10 @@ public with sharing class FilterValueBinder {
 
     private RollupFilterParser.RollupFilterException valueDoesNotFit() {
         return new RollupFilterParser.RollupFilterException(
-            String.format(System.Label.Core_Filter_ErrorValueType, new List<Object>{ path })
+            String.format(
+                BarnHelp.text('Core', 'Core_Filter_ErrorValueType'),
+                new List<Object>{ path }
+            )
         );
     }
 }

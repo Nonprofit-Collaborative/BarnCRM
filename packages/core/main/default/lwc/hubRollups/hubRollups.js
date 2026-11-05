@@ -3,12 +3,11 @@ import { NavigationMixin } from 'lightning/navigation';
 import getHomeModel from '@salesforce/apex/HubController.getHomeModel';
 import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink';
 import HEADING from '@salesforce/label/c.Core_Rollups_FreshnessTitle';
-import NEVER from '@salesforce/label/c.Core_Rollups_FreshnessNever';
 import STALE from '@salesforce/label/c.Core_Rollups_FreshnessStale';
 import LINK from '@salesforce/label/c.Core_Rollups_FreshnessLink';
-import LOAD_ERROR from '@salesforce/label/c.Core_HubHome_LoadErrorMessage';
 import NOT_RUN from '@salesforce/label/c.Core_OrgOptimizer_BadgeNotRun';
 import OVERDUE from '@salesforce/label/c.Core_HubHome_BadgeOverdue';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ROLLUPS_SECTION = 'Rollups';
 
@@ -18,9 +17,21 @@ const ROLLUPS_SECTION = 'Rollups';
  * with another tool sees no tile.
  */
 export default class HubRollups extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   labels = {
     heading: HEADING,
-    never: NEVER,
+    get never() {
+      return helpText('Core', 'Core_Rollups_FreshnessNever');
+    },
     stale: STALE,
     link: LINK,
     notRun: NOT_RUN,
@@ -49,7 +60,7 @@ export default class HubRollups extends NavigationMixin(LightningElement) {
       this.errorMessage = undefined;
       this.loaded = true;
     } else if (error) {
-      this.errorMessage = LOAD_ERROR;
+      this.errorMessage = helpText('Core', 'Core_HubHome_LoadErrorMessage');
     }
   }
 
@@ -63,7 +74,7 @@ export default class HubRollups extends NavigationMixin(LightningElement) {
         state: { [link.sectionKey]: ROLLUPS_SECTION }
       });
     } catch {
-      this.errorMessage = LOAD_ERROR;
+      this.errorMessage = helpText('Core', 'Core_HubHome_LoadErrorMessage');
     }
   }
 }

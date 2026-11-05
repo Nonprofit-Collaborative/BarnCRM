@@ -48,7 +48,7 @@ public with sharing class HealthCheckAccessChecks {
             return new HealthCheckService.Finding(
                 'access_checks_need_admin',
                 System.Label.Core_HealthCheck_AccessNeedsAdminTitle,
-                System.Label.Core_HealthCheck_AccessNeedsAdminDetail,
+                BarnHelp.text('Core', 'Core_HealthCheck_AccessNeedsAdminDetail'),
                 HealthCheckService.SEVERITY_INFO,
                 HealthCheckService.CATEGORY_ACCESS
             );
@@ -66,7 +66,7 @@ public with sharing class HealthCheckAccessChecks {
         return new HealthCheckService.Finding(
                 'no_admin',
                 System.Label.Core_HealthCheck_NoAdminTitle,
-                System.Label.Core_HealthCheck_NoAdminDetail,
+                BarnHelp.text('Core', 'Core_HealthCheck_NoAdminDetail'),
                 HealthCheckService.SEVERITY_ERROR,
                 HealthCheckService.CATEGORY_ACCESS
             )
@@ -92,8 +92,8 @@ public with sharing class HealthCheckAccessChecks {
                 ),
                 HealthCheckService.forCount(
                     without,
-                    System.Label.Core_HealthCheck_UsersWithoutAccessDetailOne,
-                    System.Label.Core_HealthCheck_UsersWithoutAccessDetail,
+                    BarnHelp.text('Core', 'Core_HealthCheck_UsersWithoutAccessDetailOne'),
+                    BarnHelp.text('Core', 'Core_HealthCheck_UsersWithoutAccessDetail'),
                     count
                 ),
                 HealthCheckService.SEVERITY_WARNING,

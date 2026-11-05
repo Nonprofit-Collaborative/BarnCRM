@@ -9,8 +9,6 @@ import HOUSEHOLDS from '@salesforce/label/c.Core_SettingsGroup_Households';
 import ORGANIZATIONS from '@salesforce/label/c.Core_HubHome_QuickLinkOrganizations';
 import FIND from '@salesforce/label/c.Core_Find_Title';
 import GIFT_ENTRY from '@salesforce/label/c.Core_HubHome_QuickLinkGiftEntry';
-import HOUSEHOLDS_LINE from '@salesforce/label/c.Core_HubHome_QuickLinkHouseholdsLine';
-import ORGANIZATIONS_LINE from '@salesforce/label/c.Core_HubHome_QuickLinkOrganizationsLine';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const PEOPLE_LINK = 'People';
@@ -58,13 +56,13 @@ export default class HubQuickLinks extends NavigationMixin(LightningElement) {
       {
         tab: HOUSEHOLDS_TAB,
         label: HOUSEHOLDS,
-        line: HOUSEHOLDS_LINE,
+        line: helpText('Core', 'Core_HubHome_QuickLinkHouseholdsLine'),
         iconName: iconFor(HOUSEHOLDS_TAB)
       },
       {
         tab: 'Organizations',
         label: ORGANIZATIONS,
-        line: ORGANIZATIONS_LINE,
+        line: helpText('Core', 'Core_HubHome_QuickLinkOrganizationsLine'),
         iconName: iconFor('Organizations')
       },
       {

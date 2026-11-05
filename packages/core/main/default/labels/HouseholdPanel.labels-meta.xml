@@ -9,30 +9,6 @@
         <value>Make Primary</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdPanel_MakePrimarySuccess</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Members panel: toast after primary contact changed; {0} is the person</shortDescription>
-        <value>{0} is now the primary contact.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdPanel_MakePrimaryFailed</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Members panel: message when the primary contact could not be changed</shortDescription>
-        <value>The primary contact could not be changed. Check that you can edit this household and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdPanel_NotAMember</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Members panel: message when the person chosen as primary is not in the household</shortDescription>
-        <value>That person is not in this household, so they cannot be its primary contact.</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdPanel_Loading</fullName>
         <categories>Households</categories>
         <language>en_US</language>
@@ -63,14 +39,6 @@
         <protected>false</protected>
         <shortDescription>Household panel on a person: what a screen reader hears while it loads</shortDescription>
         <value>Loading household</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdPanel_OfPersonLoadFailed</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Household panel on a person: message when the household could not be read</shortDescription>
-        <value>The household could not be loaded. Refresh the page and try again.</value>
     </labels>
     <labels>
         <fullName>Core_HouseholdPanel_MemberCountOne</fullName>
@@ -121,14 +89,6 @@
         <value>Add {0} to this household</value>
     </labels>
     <labels>
-        <fullName>Core_HouseholdPanel_AddExistingNoResults</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Members panel: message when a search finds nobody, flexible membership mode</shortDescription>
-        <value>No matches. Keep typing, or add them as a new person below.</value>
-    </labels>
-    <labels>
         <fullName>Core_HouseholdPanel_AddNewHeading</fullName>
         <categories>Households</categories>
         <language>en_US</language>
@@ -159,37 +119,5 @@
         <protected>false</protected>
         <shortDescription>Members panel: last name field on the new person form</shortDescription>
         <value>Last Name</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdPanel_AddMemberMissingPerson</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Members panel: nothing was chosen to add, flexible membership mode</shortDescription>
-        <value>Choose a person to add.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdPanel_AddMemberMissingName</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Members panel: the new person form was saved with no last name</shortDescription>
-        <value>Enter at least a last name before saving.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdPanel_AddMemberFailed</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Members panel: the person could not be added, flexible membership mode</shortDescription>
-        <value>This person could not be added. Check that you can create contacts and edit this household, and try again.</value>
-    </labels>
-    <labels>
-        <fullName>Core_HouseholdPanel_AddSearchFailed</fullName>
-        <categories>Households</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Members panel: search for an existing person failed (flexible mode)</shortDescription>
-        <value>The search could not be completed. Refresh the page and try again.</value>
     </labels>
 </CustomLabels>

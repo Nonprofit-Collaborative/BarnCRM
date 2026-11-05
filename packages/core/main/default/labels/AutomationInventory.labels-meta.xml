@@ -17,36 +17,12 @@
         <value>Automation Inventory</value>
     </labels>
     <labels>
-        <fullName>Core_DataDictionary_AutomationNotRead</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Dictionary: automation not read for {0}</shortDescription>
-        <value>Could not read all automation for: {0}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_AutomationTruncated</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Dictionary: automation list cut for {0}</shortDescription>
-        <value>Only the first 200 triggers and 200 flows are listed for: {0}.</value>
-    </labels>
-    <labels>
         <fullName>Core_DataDictionary_DownloadAutomation</fullName>
         <categories>DataDictionary</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Data Dictionary: automation download button</shortDescription>
         <value>Download Automation CSV</value>
-    </labels>
-    <labels>
-        <fullName>Core_DataDictionary_DownloadedAutomation</fullName>
-        <categories>DataDictionary</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Data Dictionary: automation download done; {0} rows</shortDescription>
-        <value>Downloaded {0} automation rows.</value>
     </labels>
     <labels>
         <fullName>Core_DataDictionary_ColAutomationRuns</fullName>

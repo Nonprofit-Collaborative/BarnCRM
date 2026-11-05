@@ -200,7 +200,7 @@ private class HouseholdMergeControllerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_HouseholdMerge_ErrorNotHousehold,
+                BarnHelp.text('Core', 'Core_HouseholdMerge_ErrorNotHousehold'),
                 message,
                 'The screen shows the same words the guide quotes'
             );
@@ -234,7 +234,7 @@ private class HouseholdMergeControllerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_Households_ErrorUnexpected,
+                BarnHelp.text('Core', 'Core_Households_ErrorUnexpected'),
                 message,
                 'The person is told something went wrong, in words meant for them'
             );

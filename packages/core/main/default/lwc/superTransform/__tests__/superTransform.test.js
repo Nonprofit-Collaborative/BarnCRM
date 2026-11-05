@@ -15,6 +15,22 @@ import saveSavedList from '@salesforce/apex/BulkUpdateController.saveSavedList';
 import renameSavedList from '@salesforce/apex/BulkUpdateController.renameSavedList';
 import deleteSavedList from '@salesforce/apex/BulkUpdateController.deleteSavedList';
 import * as navigation from 'lightning/navigation';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_SuperTransform_SavedSaved: 'Saved the list {0}.',
+  Core_SuperTransform_SavedLoaded: 'Loaded the list {0}.',
+  Core_SuperTransform_SavedSkipped: 'Loaded the list {0}. {1} change(s) were left out.',
+  Core_SuperTransform_SavedMissingFields: 'The list {0} was not loaded: {1}.',
+  Core_SuperTransform_SavedRenamed: 'Renamed the list to {0}.',
+  Core_SuperTransform_SavedDeleted: 'Deleted the list {0}.',
+  Core_SuperTransform_MatchCount: '{0} {1} match.',
+  Core_SuperTransform_NoFilter: 'No condition is set. This changes every {0}: {1} records.',
+  Core_SuperTransform_OverLimit: '{0} records match, more than the {1} one run may change.',
+  Core_SuperTransform_AlreadyHeld: '{0} of the {1} records shown already have these values.',
+  Core_SuperTransform_ConfirmMessage: 'Change {0} on {1} {2}.',
+  Core_BulkUpdate_Summary: '{0} matched: {1} updated, {2} unchanged, {3} failed.'
+});
 
 jest.mock('@salesforce/apex/BulkUpdateController.getSavedLists', () => ({ default: jest.fn() }), {
   virtual: true
@@ -31,36 +47,6 @@ jest.mock('@salesforce/apex/BulkUpdateController.renameSavedList', () => ({ defa
 jest.mock('@salesforce/apex/BulkUpdateController.deleteSavedList', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_SavedSaved',
-  () => ({ default: 'Saved the list {0}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_SavedLoaded',
-  () => ({ default: 'Loaded the list {0}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_SavedSkipped',
-  () => ({ default: 'Loaded the list {0}. {1} change(s) were left out.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_SavedMissingFields',
-  () => ({ default: 'The list {0} was not loaded: {1}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_SavedRenamed',
-  () => ({ default: 'Renamed the list to {0}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_SavedDeleted',
-  () => ({ default: 'Deleted the list {0}.' }),
-  { virtual: true }
-);
 jest.mock('@salesforce/label/c.Core_Format_Parenthetical', () => ({ default: '{0} ({1})' }), {
   virtual: true
 });
@@ -89,36 +75,6 @@ jest.mock('@salesforce/apex/BulkUpdateController.start', () => ({ default: jest.
 jest.mock('@salesforce/apex/BulkUpdateController.getJob', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_MatchCount',
-  () => ({ default: '{0} {1} match.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_NoFilter',
-  () => ({ default: 'No condition is set. This changes every {0}: {1} records.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_OverLimit',
-  () => ({ default: '{0} records match, more than the {1} one run may change.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_AlreadyHeld',
-  () => ({ default: '{0} of the {1} records shown already have these values.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_SuperTransform_ConfirmMessage',
-  () => ({ default: 'Change {0} on {1} {2}.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Core_BulkUpdate_Summary',
-  () => ({ default: '{0} matched: {1} updated, {2} unchanged, {3} failed.' }),
-  { virtual: true }
-);
 
 const OBJECTS = [
   { label: 'Account', value: 'Account' },

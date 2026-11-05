@@ -80,7 +80,7 @@ public with sharing class CoexistenceService {
         if (String.isBlank(mode) || !VALID_MODES.contains(mode)) {
             throw new CoexistenceException(
                 String.format(
-                    System.Label.Core_CoexistenceMode_InvalidMode,
+                    BarnHelp.text('Core', 'Core_CoexistenceMode_InvalidMode'),
                     new List<Object>{ mode }
                 )
             );
@@ -211,7 +211,7 @@ public with sharing class CoexistenceService {
             return hidden == 0
                 ? null
                 : String.format(
-                      System.Label.Core_Coexistence_SwitchToContactRefused,
+                      BarnHelp.text('Core', 'Core_Coexistence_SwitchToContactRefused'),
                       new List<Object>{ String.valueOf(hidden) }
                   );
         }
@@ -219,7 +219,7 @@ public with sharing class CoexistenceService {
         return stranded == 0
             ? null
             : String.format(
-                  System.Label.Core_Coexistence_SwitchToJunctionRefused,
+                  BarnHelp.text('Core', 'Core_Coexistence_SwitchToJunctionRefused'),
                   new List<Object>{ String.valueOf(stranded) }
               );
     }
@@ -307,7 +307,9 @@ public with sharing class CoexistenceService {
     @NamespaceAccessible
     public static void applyMode(String mode) {
         if (!BarnCRMPermissions.canManageSettings()) {
-            throw new CoexistenceException(System.Label.Core_HealthCheck_PermissionRequired);
+            throw new CoexistenceException(
+                BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired')
+            );
         }
         setMode(mode);
     }

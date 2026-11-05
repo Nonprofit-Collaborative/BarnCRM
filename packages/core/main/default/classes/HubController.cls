@@ -92,7 +92,7 @@ public with sharing class HubController {
             return buildModel();
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
-            throw UserErrors.message(System.Label.Core_HubHome_LoadErrorMessage);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_HubHome_LoadErrorMessage'));
         }
     }
 
@@ -112,7 +112,7 @@ public with sharing class HubController {
             ErrorLogger.log(e, ERROR_CONTEXT);
             throw UserErrors.message(
                 String.format(
-                    System.Label.Core_HubHomeActions_NewHouseholdFailed,
+                    BarnHelp.text('Core', 'Core_HubHomeActions_NewHouseholdFailed'),
                     new List<Object>{ e.getMessage() }
                 )
             );

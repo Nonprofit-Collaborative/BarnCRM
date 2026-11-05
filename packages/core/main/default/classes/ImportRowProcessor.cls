@@ -237,7 +237,7 @@ public with sharing class ImportRowProcessor {
         ) {
             // The records are saved; what is lost is the ability to put these updates back,
             // and the run log is where the administrator is told (R-IJ4).
-            outcome.notes.add(Label.Core_Import_LogJournalFailed);
+            outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogJournalFailed'));
         }
         return outcome;
     }
@@ -283,9 +283,9 @@ public with sharing class ImportRowProcessor {
         }
         outcome.notes.add(
             String.isBlank(chosen)
-                ? Label.Core_Import_LogNoExternalIdField
+                ? BarnHelp.text('Core', 'Core_Import_LogNoExternalIdField')
                 : String.format(
-                      Label.Core_Import_LogMatchFieldUnavailable,
+                      BarnHelp.text('Core', 'Core_Import_LogMatchFieldUnavailable'),
                       new List<String>{ chosen.trim() }
                   )
         );
@@ -566,7 +566,7 @@ public with sharing class ImportRowProcessor {
                 Schema.SObjectType expected = which == 0 ? Account.SObjectType : personType;
                 if (parsed == null) {
                     item.error = String.format(
-                        Label.Core_Import_ErrorRecordIdInvalid,
+                        BarnHelp.text('Core', 'Core_Import_ErrorRecordIdInvalid'),
                         new List<String>{ given }
                     );
                 } else if (parsed.getSObjectType() != expected) {
@@ -591,7 +591,7 @@ public with sharing class ImportRowProcessor {
                 Id parsed = ImportValues.idOrNull(given);
                 if (!recordTypeById.containsKey(parsed)) {
                     item.error = String.format(
-                        Label.Core_Import_ErrorRecordIdNotFound,
+                        BarnHelp.text('Core', 'Core_Import_ErrorRecordIdNotFound'),
                         new List<String>{ given }
                     );
                     continue;
@@ -621,8 +621,8 @@ public with sharing class ImportRowProcessor {
     private static String wrongKind(Integer which, String given) {
         return String.format(
             which == 0
-                ? Label.Core_Import_ErrorRecordIdNotOrganization
-                : Label.Core_Import_ErrorRecordIdNotPerson,
+                ? BarnHelp.text('Core', 'Core_Import_ErrorRecordIdNotOrganization')
+                : BarnHelp.text('Core', 'Core_Import_ErrorRecordIdNotPerson'),
             new List<String>{ given }
         );
     }
@@ -706,7 +706,7 @@ public with sharing class ImportRowProcessor {
         if (!usable) {
             outcome.notes.add(
                 String.format(
-                    Label.Core_Import_LogOrganizationRecordTypeUnavailable,
+                    BarnHelp.text('Core', 'Core_Import_LogOrganizationRecordTypeUnavailable'),
                     new List<String>{ unusableRecordType }
                 )
             );
@@ -739,7 +739,10 @@ public with sharing class ImportRowProcessor {
                 if (ImportMatcher.isHeldByMany(item.organizationKey)) {
                     item.severalMatches = true;
                     if (!mostRecent) {
-                        item.error = Label.Core_Import_ErrorSeveralOrganizationsMatch;
+                        item.error = BarnHelp.text(
+                            'Core',
+                            'Core_Import_ErrorSeveralOrganizationsMatch'
+                        );
                         continue;
                     }
                 }
@@ -748,14 +751,14 @@ public with sharing class ImportRowProcessor {
             }
             if (batch.Match_Only__c == true) {
                 // A file that only matches creates no organization (R-IB15).
-                item.error = Label.Core_Import_ErrorMatchOnlyNoMatch;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorMatchOnlyNoMatch');
                 continue;
             }
             if (item.organizationName == null) {
-                item.error = Label.Core_Import_ErrorOrganizationNameMissing;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorOrganizationNameMissing');
             } else if (!usable) {
                 item.error = String.format(
-                    Label.Core_Import_ErrorOrganizationRecordTypeUnavailable,
+                    BarnHelp.text('Core', 'Core_Import_ErrorOrganizationRecordTypeUnavailable'),
                     new List<String>{ unusableRecordType }
                 );
             }
@@ -837,7 +840,7 @@ public with sharing class ImportRowProcessor {
                 item.organizationId = created;
                 item.createdAnything = true;
             } else if (item.error == null) {
-                item.error = Label.Core_Import_ErrorOrganizationNotSaved;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorOrganizationNotSaved');
             }
         }
     }
@@ -971,7 +974,7 @@ public with sharing class ImportRowProcessor {
         for (String fieldLabel : ImportMatcher.unreadableFields()) {
             outcome.notes.add(
                 String.format(
-                    Label.Core_Import_LogMatchFieldNoAccess,
+                    BarnHelp.text('Core', 'Core_Import_LogMatchFieldNoAccess'),
                     new List<String>{ fieldLabel }
                 )
             );
@@ -1021,7 +1024,7 @@ public with sharing class ImportRowProcessor {
                 !item.comingPerson2 &&
                 describesPerson(item, ImportMapping.ENTITY_CONTACT_2);
             if (newFirst || newSecond) {
-                item.error = Label.Core_Import_ErrorMatchOnlyNoMatch;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorMatchOnlyNoMatch');
             }
         }
     }
@@ -1048,7 +1051,7 @@ public with sharing class ImportRowProcessor {
             attribute(item.byEntity, ImportMapping.ENTITY_CONTACT_2, 'FirstName')
         );
         if (first1 == first2) {
-            item.error = Label.Core_Import_ErrorTwoPeopleOneKey;
+            item.error = BarnHelp.text('Core', 'Core_Import_ErrorTwoPeopleOneKey');
             return;
         }
         item.personKey1 = ImportMatcher.firstNameKey(item.personKey1, first1);
@@ -1261,7 +1264,7 @@ public with sharing class ImportRowProcessor {
                     found = null;
                     coming = false;
                     if (item.error == null) {
-                        item.error = Label.Core_Import_ErrorSeveralPeopleMatch;
+                        item.error = BarnHelp.text('Core', 'Core_Import_ErrorSeveralPeopleMatch');
                     }
                 }
             }
@@ -1362,7 +1365,7 @@ public with sharing class ImportRowProcessor {
                 continue;
             }
             if (item.values.isEmpty()) {
-                item.error = Label.Core_Import_ErrorRowUnreadable;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorRowUnreadable');
                 continue;
             }
             Boolean hasOrganization = item.organizationKey != null || item.organizationName != null;
@@ -1376,7 +1379,7 @@ public with sharing class ImportRowProcessor {
                 identifiesPerson(item, ImportMapping.ENTITY_CONTACT_1) ||
                 identifiesPerson(item, ImportMapping.ENTITY_CONTACT_2);
             if (!identifiesSomebody) {
-                item.error = Label.Core_Import_ErrorRowIdentifiesNobody;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorRowIdentifiesNobody');
                 continue;
             }
             if (
@@ -1385,14 +1388,14 @@ public with sharing class ImportRowProcessor {
                 !item.comingPerson1 &&
                 !hasLastName(item, ImportMapping.ENTITY_CONTACT_1)
             ) {
-                item.error = Label.Core_Import_ErrorLastNameMissing;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorLastNameMissing');
             } else if (
                 hasPerson2 &&
                 item.person2Id == null &&
                 !item.comingPerson2 &&
                 !hasLastName(item, ImportMapping.ENTITY_CONTACT_2)
             ) {
-                item.error = Label.Core_Import_ErrorLastNameMissing;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorLastNameMissing');
             }
         }
     }
@@ -1699,7 +1702,7 @@ public with sharing class ImportRowProcessor {
         List<String> sharedKeys = new List<String>();
         Id personRecordTypeId = personAccounts ? anyPersonRecordTypeId() : null;
         if (personAccounts && personRecordTypeId == null) {
-            outcome.notes.add(Label.Core_Import_LogPersonRecordTypeMissing);
+            outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogPersonRecordTypeMissing'));
             return;
         }
         for (Working item : working) {
@@ -1786,8 +1789,12 @@ public with sharing class ImportRowProcessor {
             if (created == null) {
                 String reason = failedByKey.get(sharedKeys[i]);
                 sharing[i].error = String.format(
-                    Label.Core_Import_ErrorSamePersonNotSaved,
-                    new List<String>{ reason == null ? Label.Core_Import_ErrorSaveFailed : reason }
+                    BarnHelp.text('Core', 'Core_Import_ErrorSamePersonNotSaved'),
+                    new List<String>{
+                        reason == null
+                            ? BarnHelp.text('Core', 'Core_Import_ErrorSaveFailed')
+                            : reason
+                    }
                 );
             } else if (isFirst) {
                 sharing[i].person1Id = created;
@@ -2223,7 +2230,7 @@ public with sharing class ImportRowProcessor {
                 // is a note for the run log rather than a rejected row (R-IB5).
                 outcome.notes.add(
                     String.format(
-                        Label.Core_Import_LogHouseholdNotTagged,
+                        BarnHelp.text('Core', 'Core_Import_LogHouseholdNotTagged'),
                         new List<String>{ message(results[i]) }
                     )
                 );
@@ -2398,7 +2405,7 @@ public with sharing class ImportRowProcessor {
             }
         }
         if (!ImportJournalService.write(batch.Id, ImportJournalService.PHASE_CREATED, created)) {
-            outcome.notes.add(Label.Core_Import_LogJournalFailed);
+            outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogJournalFailed'));
         }
     }
 
@@ -2506,7 +2513,7 @@ public with sharing class ImportRowProcessor {
         if (processor == null) {
             outcome.notes.add(
                 String.format(
-                    Label.Core_Import_LogEntitiesNotLoaded,
+                    BarnHelp.text('Core', 'Core_Import_LogEntitiesNotLoaded'),
                     new List<String>{ String.join(new List<String>(deferred), ', ') }
                 )
             );
@@ -2575,7 +2582,7 @@ public with sharing class ImportRowProcessor {
                 continue;
             }
             item.error = String.format(
-                Label.Core_Import_ErrorEntitiesNotLoaded,
+                BarnHelp.text('Core', 'Core_Import_ErrorEntitiesNotLoaded'),
                 new List<String>{ String.join(carried, ', '), reason }
             );
             item.row.Status__c = STATUS_REJECTED;
@@ -2609,7 +2616,7 @@ public with sharing class ImportRowProcessor {
             }
             if (STATUS_REJECTED.equals(item.row.Status__c)) {
                 item.error = String.isBlank(item.row.Error_Message__c)
-                    ? Label.Core_Import_ErrorSaveFailed
+                    ? BarnHelp.text('Core', 'Core_Import_ErrorSaveFailed')
                     : item.row.Error_Message__c;
             } else if (STATUS_CREATED.equals(item.row.Status__c)) {
                 item.createdAnything = true;
@@ -2668,7 +2675,7 @@ public with sharing class ImportRowProcessor {
         Set<Id> allowedTypes = personAccounts ? OrgShapeDetector.personRecordTypeIds() : null;
         List<List<SObject>> found = ImportDuplicateRuleMatcher.matchesFor(probes, allowedTypes);
         if (found == null) {
-            outcome.notes.add(Label.Core_Import_LogNoDuplicateRulePeople);
+            outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogNoDuplicateRulePeople'));
         }
         // The match sources answer for a person the rules found nobody for, or could not ask
         // about: values on related records the rules cannot see (ADR-0133). A person the rules
@@ -2688,7 +2695,11 @@ public with sharing class ImportRowProcessor {
             List<SObject> candidates = found != null && !found[i].isEmpty()
                 ? found[i]
                 : bySource[i];
-            Id matched = chosenByRule(item, candidates, Label.Core_Import_ErrorSeveralPeopleMatch);
+            Id matched = chosenByRule(
+                item,
+                candidates,
+                BarnHelp.text('Core', 'Core_Import_ErrorSeveralPeopleMatch')
+            );
             if (matched == null) {
                 continue;
             }
@@ -2698,7 +2709,7 @@ public with sharing class ImportRowProcessor {
                 item.person2Id = matched;
             }
             if (item.person1Id == item.person2Id) {
-                item.error = Label.Core_Import_ErrorDuplicateRuleOnePerson;
+                item.error = BarnHelp.text('Core', 'Core_Import_ErrorDuplicateRuleOnePerson');
             }
         }
     }
@@ -2758,14 +2769,14 @@ public with sharing class ImportRowProcessor {
             new Set<Id>{ recordTypeId }
         );
         if (found == null) {
-            outcome.notes.add(Label.Core_Import_LogNoDuplicateRuleOrganizations);
+            outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogNoDuplicateRuleOrganizations'));
             return;
         }
         for (Integer i = 0; i < asked.size(); i++) {
             Id matched = chosenByRule(
                 asked[i],
                 found[i],
-                Label.Core_Import_ErrorSeveralOrganizationsMatch
+                BarnHelp.text('Core', 'Core_Import_ErrorSeveralOrganizationsMatch')
             );
             if (matched != null) {
                 asked[i].organizationId = matched;
@@ -2806,10 +2817,10 @@ public with sharing class ImportRowProcessor {
             // Ticked so the rows a looser rule matched can be read before a commit (R-IT16).
             row.Duplicate_Rule_Match__c = item.duplicateRuleMatch && item.error == null;
             if (row.Duplicate_Rule_Match__c) {
-                outcome.notes.add(Label.Core_Import_LogDuplicateRuleMatches);
+                outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogDuplicateRuleMatches'));
             }
             if (item.severalMatches && item.error == null) {
-                outcome.notes.add(Label.Core_Import_LogSeveralMatchesUsedRecent);
+                outcome.notes.add(BarnHelp.text('Core', 'Core_Import_LogSeveralMatchesUsedRecent'));
             }
             // A rejected row still points at whatever it matched or saved before it failed
             // (a person whose save went through, say), so nothing it left is untraceable.
@@ -2861,7 +2872,7 @@ public with sharing class ImportRowProcessor {
         }
         List<Database.Error> errors = results[firstIndex].getErrors();
         String line = String.format(
-            Label.Core_Import_LogRowsNotSaved,
+            BarnHelp.text('Core', 'Core_Import_LogRowsNotSaved'),
             new List<String>{
                 String.valueOf(failed),
                 String.valueOf(
@@ -3021,7 +3032,7 @@ public with sharing class ImportRowProcessor {
                 Integer row = ImportValues.rowNumber(item.row);
                 outcome.notes.add(
                     String.format(
-                        Label.Core_Import_LogCheckboxValueUnreadable,
+                        BarnHelp.text('Core', 'Core_Import_LogCheckboxValueUnreadable'),
                         new List<String>{
                             row == null ? '' : String.valueOf(row),
                             columns.get(target),
@@ -3062,7 +3073,7 @@ public with sharing class ImportRowProcessor {
             if (field == null) {
                 outcome.notes.add(
                     String.format(
-                        Label.Core_Import_LogAttributeUnknown,
+                        BarnHelp.text('Core', 'Core_Import_LogAttributeUnknown'),
                         new List<String>{ attributeName }
                     )
                 );
@@ -3081,7 +3092,7 @@ public with sharing class ImportRowProcessor {
             } catch (Exception ignored) {
                 outcome.notes.add(
                     String.format(
-                        Label.Core_Import_LogValueNotAccepted,
+                        BarnHelp.text('Core', 'Core_Import_LogValueNotAccepted'),
                         new List<String>{ attributeName, value }
                     )
                 );
@@ -3092,7 +3103,7 @@ public with sharing class ImportRowProcessor {
     /** The run log line for a field the importing user may not write. */
     private static String noAccessNote(Schema.DescribeFieldResult describe) {
         return String.format(
-            Label.Core_Import_LogAttributeNoAccess,
+            BarnHelp.text('Core', 'Core_Import_LogAttributeNoAccess'),
             new List<String>{ describe.getLabel() }
         );
     }
@@ -3240,7 +3251,9 @@ public with sharing class ImportRowProcessor {
         for (Database.Error error : result.getErrors()) {
             parts.add(error.getMessage());
         }
-        return parts.isEmpty() ? Label.Core_Import_ErrorSaveFailed : String.join(parts, ' ');
+        return parts.isEmpty()
+            ? BarnHelp.text('Core', 'Core_Import_ErrorSaveFailed')
+            : String.join(parts, ' ');
     }
 
     /** A person type the running user can create with, never merely the first in the org. */

@@ -11,7 +11,7 @@ public with sharing class WhereUsedController {
         try {
             if (!BarnCRMPermissions.canManageSettings()) {
                 throw new WhereUsedService.WhereUsedException(
-                    System.Label.Core_WhereUsed_ErrorNoPermission
+                    BarnHelp.text('Core', 'Core_WhereUsed_ErrorNoPermission')
                 );
             }
             return WhereUsedService.find(objectName, fieldName);

@@ -180,7 +180,7 @@ private class ImportMatchAnyFieldTest {
                 Assert.areEqual(1, committed.rejected, 'The value no record holds.');
                 Assert.areEqual(
                     String.format(
-                        Label.Core_Import_ErrorNoRecordMatched,
+                        BarnHelp.text('Core', 'Core_Import_ErrorNoRecordMatched'),
                         new List<String>{
                             Duplicate_Dismissal__c.Pair_Key__c.getDescribe().getLabel()
                         }
@@ -227,7 +227,7 @@ private class ImportMatchAnyFieldTest {
 
                 Assert.areEqual(1, rejecting.rejected, 'Several records reject by default.');
                 Assert.areEqual(
-                    Label.Core_Import_ErrorSeveralRecords,
+                    BarnHelp.text('Core', 'Core_Import_ErrorSeveralRecords'),
                     rejected.Error_Message__c,
                     'Saying why.'
                 );
@@ -253,14 +253,14 @@ private class ImportMatchAnyFieldTest {
                     new List<Map<String, String>>{ new Map<String, String>{ 'Reason' => 'x' } }
                 );
                 Assert.areEqual(
-                    Label.Core_Import_ErrorMatchFieldRequired,
+                    BarnHelp.text('Core', 'Core_Import_ErrorMatchFieldRequired'),
                     ImportObjectSchema.refusal(template, mapping()),
                     'A field must be chosen.'
                 );
                 set(Import_Template__c.Load_Match_Field__c, 'CreatedDate');
                 Assert.areEqual(
                     String.format(
-                        Label.Core_Import_ErrorMatchFieldUnusable,
+                        BarnHelp.text('Core', 'Core_Import_ErrorMatchFieldUnusable'),
                         new List<String>{ 'CreatedDate' }
                     ),
                     ImportObjectSchema.refusal(template, mapping()),
@@ -269,7 +269,7 @@ private class ImportMatchAnyFieldTest {
                 set(Import_Template__c.Load_Match_Field__c, 'Pair_Key__c');
                 Assert.areEqual(
                     String.format(
-                        Label.Core_Import_ErrorMatchColumnMissing,
+                        BarnHelp.text('Core', 'Core_Import_ErrorMatchColumnMissing'),
                         new List<String>{
                             Duplicate_Dismissal__c.Pair_Key__c.getDescribe().getLabel()
                         }
@@ -330,7 +330,7 @@ private class ImportMatchAnyFieldTest {
                 } catch (ImportException e) {
                     Assert.areEqual(
                         String.format(
-                            Label.Core_Import_ErrorMatchFieldUnusable,
+                            BarnHelp.text('Core', 'Core_Import_ErrorMatchFieldUnusable'),
                             new List<String>{ 'Birthdate' }
                         ),
                         e.getMessage(),
@@ -434,7 +434,7 @@ private class ImportMatchAnyFieldTest {
                     new List<Map<String, String>>{ affiliation(ana.Id, '555-0100', 'Volunteer') }
                 );
                 String expected = String.format(
-                    Label.Core_Import_ErrorFieldNotSelective,
+                    BarnHelp.text('Core', 'Core_Import_ErrorFieldNotSelective'),
                     new List<String>{
                         Account.Phone.getDescribe().getLabel(),
                         Account.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)

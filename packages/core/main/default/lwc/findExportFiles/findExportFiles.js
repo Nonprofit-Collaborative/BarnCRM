@@ -2,14 +2,11 @@ import { LightningElement, api } from 'lwc';
 import startServerExport from '@salesforce/apex/FindController.startServerExport';
 import serverExportStatus from '@salesforce/apex/FindController.serverExportStatus';
 
-import STARTED from '@salesforce/label/c.Core_Find_ExportFilesStarted';
 import METER_LABEL from '@salesforce/label/c.Core_Find_ExportMenu';
-import DONE from '@salesforce/label/c.Core_Find_ExportFilesDone';
-import FAILED from '@salesforce/label/c.Core_Find_ExportFilesFailed';
 import FILES from '@salesforce/label/c.Core_Find_ExportFilesList';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import { messageFrom, format } from 'c/findCsv';
-import { helpText } from 'c/barnHelpText';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const POLL_MILLISECONDS = 5000;
 
@@ -19,6 +16,16 @@ const POLL_MILLISECONDS = 5000;
  * in the person's Files. Find calls `start`; nothing shows until then.
  */
 export default class FindExportFiles extends LightningElement {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   job;
   errorMessage;
   timer;
@@ -68,9 +75,11 @@ export default class FindExportFiles extends LightningElement {
     if (!this.job.done) {
       return this.job.chunksTotal
         ? helpText('Core', 'Core_Find_ExportFilesProgress', this.progressValue)
-        : STARTED;
+        : helpText('Core', 'Core_Find_ExportFilesStarted');
     }
-    return this.job.failed ? FAILED : format(DONE, (this.job.files || []).length);
+    return this.job.failed
+      ? helpText('Core', 'Core_Find_ExportFilesFailed')
+      : format(helpText('Core', 'Core_Find_ExportFilesDone'), (this.job.files || []).length);
   }
 
   get noticeVariant() {

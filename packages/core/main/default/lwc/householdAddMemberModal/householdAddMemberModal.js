@@ -12,7 +12,6 @@ import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import ADD_EXISTING_HEADING from '@salesforce/label/c.Core_HouseholdPanel_AddExistingHeading';
 import ADD_EXISTING_PLACEHOLDER from '@salesforce/label/c.Core_HouseholdPanel_AddExistingPlaceholder';
 import ADD_EXISTING_RESULT_FOR from '@salesforce/label/c.Core_HouseholdPanel_AddExistingResultFor';
-import ADD_EXISTING_NO_RESULTS from '@salesforce/label/c.Core_HouseholdPanel_AddExistingNoResults';
 import ADD_NEW_HEADING from '@salesforce/label/c.Core_HouseholdPanel_AddNewHeading';
 import SALUTATION from '@salesforce/label/c.Core_HouseholdPanel_Salutation';
 import FIRST_NAME from '@salesforce/label/c.Core_HouseholdPanel_FirstName';
@@ -54,7 +53,9 @@ export default class HouseholdAddMemberModal extends LightningModal {
     cancel: CANCEL,
     addExistingHeading: ADD_EXISTING_HEADING,
     addExistingPlaceholder: ADD_EXISTING_PLACEHOLDER,
-    addExistingNoResults: ADD_EXISTING_NO_RESULTS,
+    get addExistingNoResults() {
+      return helpText('Core', 'Core_HouseholdPanel_AddExistingNoResults');
+    },
     addNewHeading: ADD_NEW_HEADING,
     salutation: SALUTATION,
     firstName: FIRST_NAME,

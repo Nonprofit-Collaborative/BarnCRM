@@ -229,7 +229,8 @@ private class SettingsServiceTest {
             } catch (SettingsService.SettingsException e) {
                 refused = true;
                 Assert.isTrue(
-                    e.getMessage().endsWith(System.Label.Core_Settings_InvalidValueError),
+                    e.getMessage()
+                        .endsWith(BarnHelp.text('Core', 'Core_Settings_InvalidValueError')),
                     'The message says the value is not one this setting takes: ' + e.getMessage()
                 );
             }
@@ -253,7 +254,7 @@ private class SettingsServiceTest {
             } catch (SettingsService.SettingsException e) {
                 refused = true;
                 Assert.areEqual(
-                    System.Label.Core_Settings_UnknownKeyError,
+                    BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'),
                     e.getMessage(),
                     'The message tells Maria what to do'
                 );
@@ -307,7 +308,7 @@ private class SettingsServiceTest {
                         System.Label.Core_Format_Pair,
                         new List<Object>{
                             'Automation paused until',
-                            System.Label.Core_Settings_InvalidValueError
+                            BarnHelp.text('Core', 'Core_Settings_InvalidValueError')
                         }
                     ),
                     e.getMessage(),
@@ -805,7 +806,7 @@ private class SettingsServiceTest {
             Test.stopTest();
 
             String expected = String.format(
-                System.Label.Core_Settings_NumberOutOfRange,
+                BarnHelp.text('Core', 'Core_Settings_NumberOutOfRange'),
                 new List<Object>{ 'Rows per import chunk', '1', '2000' }
             );
             Assert.areEqual(expected, tooLow, 'Below the range is refused, naming both ends');
@@ -853,11 +854,11 @@ private class SettingsServiceTest {
             Test.stopTest();
 
             Assert.isTrue(
-                wrongObject.endsWith(System.Label.Core_Settings_InvalidValueError),
+                wrongObject.endsWith(BarnHelp.text('Core', 'Core_Settings_InvalidValueError')),
                 'A record of another object is refused: ' + wrongObject
             );
             Assert.isTrue(
-                notAnId.endsWith(System.Label.Core_Settings_InvalidValueError),
+                notAnId.endsWith(BarnHelp.text('Core', 'Core_Settings_InvalidValueError')),
                 'A name typed instead of a picked record is refused: ' + notAnId
             );
             Assert.isNull(accepted, 'A record of the row object is accepted');
@@ -884,7 +885,7 @@ private class SettingsServiceTest {
             Test.stopTest();
 
             Assert.isTrue(
-                unknown.endsWith(System.Label.Core_Settings_InvalidValueError),
+                unknown.endsWith(BarnHelp.text('Core', 'Core_Settings_InvalidValueError')),
                 'A record type the object does not have is refused, with the known one beside it'
             );
             Assert.isNull(accepted, 'A record type the object has is accepted');
@@ -920,7 +921,7 @@ private class SettingsServiceTest {
             Test.stopTest();
 
             Assert.isTrue(
-                unknown.endsWith(System.Label.Core_Settings_InvalidValueError),
+                unknown.endsWith(BarnHelp.text('Core', 'Core_Settings_InvalidValueError')),
                 'A record type the org does not have is refused'
             );
             Assert.isNotNull(household, 'The Household record type is refused');
@@ -930,7 +931,7 @@ private class SettingsServiceTest {
             } else {
                 Assert.isTrue(
                     none != null &&
-                    none.contains(System.Label.Core_Settings_NoRecordTypeNotAllowed),
+                    none.contains(BarnHelp.text('Core', 'Core_Settings_NoRecordTypeNotAllowed')),
                     'No record type is refused where a candidate exists, saying why'
                 );
             }
@@ -966,7 +967,7 @@ private class SettingsServiceTest {
             Test.stopTest();
 
             Assert.isTrue(
-                unknown.endsWith(System.Label.Core_Settings_InvalidValueError),
+                unknown.endsWith(BarnHelp.text('Core', 'Core_Settings_InvalidValueError')),
                 'A field the object does not have is refused: ' + unknown
             );
             Assert.isNull(accepted, 'Fields the object offers are accepted');

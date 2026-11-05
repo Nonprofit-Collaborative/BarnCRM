@@ -46,7 +46,7 @@ private class HealthCheckLastRunTest {
             Assert.areEqual(1, after.infos, 'One for information');
             Assert.areEqual(
                 String.format(
-                    System.Label.Core_HealthCheck_LastResult,
+                    BarnHelp.text('Core', 'Core_HealthCheck_LastResult'),
                     new List<Object>{ 1, 2, 1 }
                 ),
                 after.result,

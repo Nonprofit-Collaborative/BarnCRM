@@ -63,7 +63,9 @@ public with sharing class FindInlineEditService {
         for (Id recordId : ids) {
             SObject record = current.get(recordId);
             if (record == null) {
-                summary.errors.add(rowError(recordId, System.Label.Core_Find_ErrorEditNotFound));
+                summary.errors.add(
+                    rowError(recordId, BarnHelp.text('Core', 'Core_Find_ErrorEditNotFound'))
+                );
                 continue;
             }
             SObject change = type.newSObject(recordId);
@@ -132,11 +134,13 @@ public with sharing class FindInlineEditService {
         }
         if (rows == null || rows.isEmpty()) {
             throw new BulkUpdateFields.BulkUpdateException(
-                System.Label.Core_BulkUpdate_ErrorNoChanges
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
             );
         }
         if (rows.size() > MAX_RECORDS) {
-            throw new BulkUpdateFields.BulkUpdateException(System.Label.Core_Find_ErrorEditTooMany);
+            throw new BulkUpdateFields.BulkUpdateException(
+                BarnHelp.text('Core', 'Core_Find_ErrorEditTooMany')
+            );
         }
         Map<String, Schema.DescribeFieldResult> fieldByName = new Map<String, Schema.DescribeFieldResult>();
         Map<Id, Map<String, Object>> wantedById = new Map<Id, Map<String, Object>>();
@@ -164,7 +168,7 @@ public with sharing class FindInlineEditService {
         }
         if (wantedById.isEmpty()) {
             throw new BulkUpdateFields.BulkUpdateException(
-                System.Label.Core_BulkUpdate_ErrorNoChanges
+                BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
             );
         }
         return wantedById;
@@ -175,10 +179,14 @@ public with sharing class FindInlineEditService {
         try {
             recordId = Id.valueOf(String.valueOf(raw));
         } catch (Exception notAnId) {
-            throw new BulkUpdateFields.BulkUpdateException(System.Label.Core_Find_ErrorEditRecord);
+            throw new BulkUpdateFields.BulkUpdateException(
+                BarnHelp.text('Core', 'Core_Find_ErrorEditRecord')
+            );
         }
         if (recordId.getSObjectType() != type) {
-            throw new BulkUpdateFields.BulkUpdateException(System.Label.Core_Find_ErrorEditRecord);
+            throw new BulkUpdateFields.BulkUpdateException(
+                BarnHelp.text('Core', 'Core_Find_ErrorEditRecord')
+            );
         }
         return recordId;
     }
@@ -190,7 +198,7 @@ public with sharing class FindInlineEditService {
             if (!field.isNillable()) {
                 throw new BulkUpdateFields.BulkUpdateException(
                     String.format(
-                        System.Label.Core_BulkUpdate_ErrorRequired,
+                        BarnHelp.text('Core', 'Core_BulkUpdate_ErrorRequired'),
                         new List<Object>{ field.getLabel() }
                     )
                 );
@@ -251,7 +259,7 @@ public with sharing class FindInlineEditService {
             Committed_By__c = UserInfo.getUserId(),
             Undo_Deadline__c = now.addDays(ImportBatchService.undoWindowDays()),
             Run_Log__c = String.format(
-                System.Label.Core_Find_LogEdited,
+                BarnHelp.text('Core', 'Core_Find_LogEdited'),
                 new List<Object>{
                     UserInfo.getName(),
                     now.format(),

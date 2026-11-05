@@ -160,7 +160,7 @@ private class CustomMetadataManagerServiceTest {
             Test.stopTest();
 
             String expected = String.format(
-                Label.Core_CmdtManager_ShippedReadOnly,
+                BarnHelp.text('Core', 'Core_CmdtManager_ShippedReadOnly'),
                 new List<Object>{ 'Spouse' }
             );
             Assert.areEqual(expected, editRefusal, 'A shipped row is read only');
@@ -180,7 +180,7 @@ private class CustomMetadataManagerServiceTest {
 
             Assert.areEqual(
                 String.format(
-                    Label.Core_CmdtManager_NotAChoice,
+                    BarnHelp.text('Core', 'Core_CmdtManager_NotAChoice'),
                     new List<Object>{
                         'Mentor',
                         Relationship__c.Type__c.getDescribe().getLabel(),
@@ -206,7 +206,7 @@ private class CustomMetadataManagerServiceTest {
 
             Assert.areEqual(
                 String.format(
-                    Label.Core_CmdtManager_DuplicateActive,
+                    BarnHelp.text('Core', 'Core_CmdtManager_DuplicateActive'),
                     new List<Object>{ 'Spouse', 'Spouse' }
                 ),
                 message,
@@ -227,11 +227,19 @@ private class CustomMetadataManagerServiceTest {
             String noReciprocal = refusal(input(null, 'Close friend', 'Friend', ''));
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_CmdtManager_NameRequired, noName, 'Name required');
-            Assert.areEqual(Label.Core_CmdtManager_NameTooLong, longName, 'Name limit');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_CmdtManager_NameRequired'),
+                noName,
+                'Name required'
+            );
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_CmdtManager_NameTooLong'),
+                longName,
+                'Name limit'
+            );
             Assert.areEqual(
                 String.format(
-                    Label.Core_CmdtManager_FieldRequired,
+                    BarnHelp.text('Core', 'Core_CmdtManager_FieldRequired'),
                     new List<Object>{
                         Relationship_Type__mdt.Reciprocal_Type__c.getDescribe().getLabel()
                     }
@@ -283,7 +291,11 @@ private class CustomMetadataManagerServiceTest {
             String message = refusal(input(null, 'Close friend', 'Friend', 'Friend'));
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_CmdtManager_DeployRefused, message, 'Says what to turn on');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_CmdtManager_DeployRefused'),
+                message,
+                'Says what to turn on'
+            );
             Assert.areEqual(
                 1,
                 [SELECT COUNT() FROM Error_Log__c WHERE Context__c = 'Custom metadata'],
@@ -510,7 +522,7 @@ private class CustomMetadataManagerServiceTest {
             Assert.areEqual(true, valuesOf(restored).get('Active__c'), 'Restored');
             Assert.areEqual(
                 String.format(
-                    Label.Core_CmdtManager_ShippedReadOnly,
+                    BarnHelp.text('Core', 'Core_CmdtManager_ShippedReadOnly'),
                     new List<Object>{ 'Address (person)' }
                 ),
                 editRefusal,
@@ -559,7 +571,7 @@ private class CustomMetadataManagerServiceTest {
 
             Assert.areEqual(
                 String.format(
-                    Label.Core_MatchSource_NoSuchObject,
+                    BarnHelp.text('Core', 'Core_MatchSource_NoSuchObject'),
                     new List<Object>{ 'No_Such_Thing__c' }
                 ),
                 noObject,
@@ -578,7 +590,7 @@ private class CustomMetadataManagerServiceTest {
                 'A lookup to anything but a contact, account or Individual: ' + notAPersonLookup
             );
             String notTextMessage = String.format(
-                Label.Core_MatchSource_NotFilterableText,
+                BarnHelp.text('Core', 'Core_MatchSource_NotFilterableText'),
                 new List<Object>{
                     Address__c.Is_Default__c.getDescribe().getLabel(),
                     Schema.SObjectType.Address__c.getLabel()
@@ -587,7 +599,7 @@ private class CustomMetadataManagerServiceTest {
             Assert.areEqual(notTextMessage, notText, 'A value field that is not text');
             Assert.areEqual(notTextMessage, postalNotText, 'A postal field that is not text');
             Assert.areEqual(
-                Label.Core_MatchSource_PostalRequired,
+                BarnHelp.text('Core', 'Core_MatchSource_PostalRequired'),
                 noPostal,
                 'Address needs postal'
             );

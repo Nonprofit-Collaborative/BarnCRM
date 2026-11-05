@@ -5,10 +5,8 @@ import insertOption from '@salesforce/label/c.Core_Import_OperationInsert';
 import updateOption from '@salesforce/label/c.Core_Import_OperationUpdate';
 import upsertOption from '@salesforce/label/c.Core_Import_OperationUpsert';
 import updateByFieldOption from '@salesforce/label/c.Core_Import_OperationUpdateByField';
-import noMatchFields from '@salesforce/label/c.Core_Import_LoadNoMatchFields';
 import deleteOption from '@salesforce/label/c.Core_Import_OperationDelete';
 import matchFieldLabel from '@salesforce/label/c.Core_Import_LoadMatchFieldLabel';
-import noKeyFields from '@salesforce/label/c.Core_Import_LoadNoKeyFields';
 import notFoundLabel from '@salesforce/label/c.Core_Import_LookupNotFoundLabel';
 import rejectOption from '@salesforce/label/c.Core_Import_LookupRejectOption';
 import leaveEmptyOption from '@salesforce/label/c.Core_Import_LookupLeaveEmptyOption';
@@ -203,7 +201,9 @@ export default class ImportLoadOptions extends LightningElement {
   }
 
   get noFieldsText() {
-    return this.operation === UPSERT ? noKeyFields : noMatchFields;
+    return this.operation === UPSERT
+      ? helpText('Core', 'Core_Import_LoadNoKeyFields')
+      : helpText('Core', 'Core_Import_LoadNoMatchFields');
   }
 
   get notFoundOptions() {

@@ -253,7 +253,7 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
                     if (unreadableLogged.add(relationship)) {
                         ErrorLogger.logMessage(
                             String.format(
-                                System.Label.Core_Households_TidyProbeFailed,
+                                BarnHelp.text('Core', 'Core_Households_TidyProbeFailed'),
                                 new List<String>{ relationship, unreadable.getMessage() }
                             ),
                             LOG_CONTEXT,
@@ -406,7 +406,7 @@ public without sharing class EmptyHouseholdTidyBatch implements Database.Batchab
         if (!failures.isEmpty()) {
             ErrorLogger.logMessage(
                 String.format(
-                    System.Label.Core_Households_TidyNotRemoved,
+                    BarnHelp.text('Core', 'Core_Households_TidyNotRemoved'),
                     new List<String>{ String.valueOf(failures.size()), failures[0] }
                 ),
                 LOG_CONTEXT,

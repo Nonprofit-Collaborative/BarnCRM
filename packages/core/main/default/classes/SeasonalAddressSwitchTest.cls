@@ -163,7 +163,7 @@ private class SeasonalAddressSwitchTest {
                     Assert.fail('Saving Seasonal Addresses must need Manage BarnCRM Settings');
                 } catch (AuraHandledException expected) {
                     Assert.areEqual(
-                        System.Label.Core_Settings_PermissionRequiredError,
+                        BarnHelp.text('Core', 'Core_Settings_PermissionRequiredError'),
                         expected.getMessage(),
                         'The refusal names the permission'
                     );

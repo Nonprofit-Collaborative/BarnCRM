@@ -367,7 +367,11 @@ private class HouseholdWriterTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_Households_ErrorCreateNoAccess, message, 'Refused');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess'),
+                message,
+                'Refused'
+            );
             Assert.areEqual(0, householdsNamed('Reader Household'), 'Nothing was created');
         }
     }
@@ -387,7 +391,11 @@ private class HouseholdWriterTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_Households_ErrorCreateNoAccess, message, 'Refused');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Households_ErrorCreateNoAccess'),
+                message,
+                'Refused'
+            );
             Assert.areEqual(0, householdsNamed('Field Household'), 'Nothing was created');
         }
     }
@@ -416,7 +424,11 @@ private class HouseholdWriterTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_Households_ErrorCreateNoHouseholdAccess, message, 'Refused');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Households_ErrorCreateNoHouseholdAccess'),
+                message,
+                'Refused'
+            );
             Assert.areEqual(0, householdsNamed('Split Household'), 'Nothing was created');
         }
     }
@@ -450,7 +462,11 @@ private class HouseholdWriterTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(Label.Core_Households_ErrorNotAHousehold, message, 'Refused');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Households_ErrorNotAHousehold'),
+                message,
+                'Refused'
+            );
             Assert.areEqual(0, householdsNamed('Other Type'), 'Nothing was created');
         }
     }

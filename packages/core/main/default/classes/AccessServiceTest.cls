@@ -188,7 +188,7 @@ private class AccessServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_Access_ErrorRoleNotFound,
+                BarnHelp.text('Core', 'Core_Access_ErrorRoleNotFound'),
                 message,
                 'An unknown role should be reported in the words the admin guide uses.'
             );
@@ -214,7 +214,7 @@ private class AccessServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_Access_ErrorUserNotFound,
+                BarnHelp.text('Core', 'Core_Access_ErrorUserNotFound'),
                 message,
                 'Maria should be told the person is not there or is no longer active.'
             );
@@ -254,7 +254,7 @@ private class AccessServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_Access_ErrorLastAdmin,
+                BarnHelp.text('Core', 'Core_Access_ErrorLastAdmin'),
                 message,
                 'Maria should be told to give the role to someone else first.'
             );
@@ -628,7 +628,7 @@ private class AccessServiceTest {
                 'A row whose label cannot be read is listed without a sentence.'
             );
             Assert.areEqual(
-                Label.Core_Access_ErrorAddOnNotFound,
+                BarnHelp.text('Core', 'Core_Access_ErrorAddOnNotFound'),
                 refusal,
                 'A set named only by a row from another namespace should never be given.'
             );
@@ -792,7 +792,7 @@ private class AccessServiceTest {
                     AccessService.assignAddOn(new Set<Id>{ david.Id }, name);
                 } catch (AccessService.AccessException e) {
                     Assert.areEqual(
-                        Label.Core_Access_ErrorAddOnNotFound,
+                        BarnHelp.text('Core', 'Core_Access_ErrorAddOnNotFound'),
                         e.getMessage(),
                         'The refusal should say the permission is not one the page can give.'
                     );
@@ -848,11 +848,15 @@ private class AccessServiceTest {
 
             Assert.isFalse(priyaCanAssign, 'A standard user cannot assign permission sets.');
             Assert.areEqual(
-                Label.Core_Access_ErrorNoPermission,
+                BarnHelp.text('Core', 'Core_Access_ErrorNoPermission'),
                 assignMessage,
                 'Priya, without Manage BarnCRM Settings, should be refused by the service itself.'
             );
-            Assert.areEqual(Label.Core_Access_ErrorNoPermission, removeMessage, 'Nor remove.');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Access_ErrorNoPermission'),
+                removeMessage,
+                'Nor remove.'
+            );
             Assert.areEqual(0, countAddOn(david.Id, BULK_UPDATE), 'Nothing should be assigned.');
         }
     }
@@ -881,12 +885,12 @@ private class AccessServiceTest {
             Test.stopTest();
 
             Assert.areEqual(
-                Label.Core_Access_ErrorNeedsAccessManager,
+                BarnHelp.text('Core', 'Core_Access_ErrorNeedsAccessManager'),
                 assignMessage,
                 'The person should be told what Setup permission is missing.'
             );
             Assert.areEqual(
-                Label.Core_Access_ErrorNeedsAccessManager,
+                BarnHelp.text('Core', 'Core_Access_ErrorNeedsAccessManager'),
                 removeMessage,
                 'Nor remove them.'
             );
@@ -916,7 +920,7 @@ private class AccessServiceTest {
                 rows,
                 AccessService.errorsOf(results),
                 new Map<Id, User>{ david.Id => david },
-                Label.Core_Access_ErrorAddOnRemoveRefused,
+                BarnHelp.text('Core', 'Core_Access_ErrorAddOnRemoveRefused'),
                 'BarnCRM Bulk Update'
             );
             Test.stopTest();
@@ -973,7 +977,7 @@ private class AccessServiceTest {
                 rows,
                 AccessService.errorsOf(results),
                 people,
-                Label.Core_Access_ErrorAddOnRefused,
+                BarnHelp.text('Core', 'Core_Access_ErrorAddOnRefused'),
                 'BarnCRM Duplicate Review'
             );
             Test.stopTest();

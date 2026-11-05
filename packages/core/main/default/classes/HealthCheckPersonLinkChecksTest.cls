@@ -76,7 +76,7 @@ private class HealthCheckPersonLinkChecksTest {
             );
             Assert.isTrue(
                 finding.detail.contains(
-                    System.Label.Core_HealthCheck_RelationshipsNoPersonDetailOne
+                    BarnHelp.text('Core', 'Core_HealthCheck_RelationshipsNoPersonDetailOne')
                 ),
                 'It says what to do next.'
             );
@@ -152,7 +152,7 @@ private class HealthCheckPersonLinkChecksTest {
             );
             Assert.isTrue(
                 finding.detail.contains(
-                    System.Label.Core_HealthCheck_AffiliationsNoPersonDetailOne
+                    BarnHelp.text('Core', 'Core_HealthCheck_AffiliationsNoPersonDetailOne')
                 ),
                 'It says what to do next.'
             );

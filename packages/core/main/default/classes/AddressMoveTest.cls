@@ -136,7 +136,7 @@ private class AddressMoveTest {
                 'Ana belongs to two households, so the card asks which.'
             );
             Assert.areEqual(
-                System.Label.Core_Address_MoveNotTheirHousehold,
+                BarnHelp.text('Core', 'Core_Address_MoveNotTheirHousehold'),
                 refusal,
                 'A household she does not belong to is refused.'
             );
@@ -289,7 +289,11 @@ private class AddressMoveTest {
             }
             Test.stopTest();
 
-            Assert.areEqual(System.Label.Core_Address_MoveNoPrimary, refusal, 'Refused.');
+            Assert.areEqual(
+                BarnHelp.text('Core', 'Core_Address_MoveNoPrimary'),
+                refusal,
+                'Refused.'
+            );
         }
     }
 

@@ -199,7 +199,7 @@ public with sharing class PersonErasure {
     public static Result erase(Id personId, String typedName, String requestReference) {
         SObject person = checkedPerson(personId);
         if (normalized(typedName) != normalized((String) person.get('Name'))) {
-            throw new ErasureException(Label.Core_Erase_NameMismatch);
+            throw new ErasureException(BarnHelp.text('Core', 'Core_Erase_NameMismatch'));
         }
         Savepoint before = Database.setSavepoint();
         Result result;
@@ -233,18 +233,18 @@ public with sharing class PersonErasure {
     /** The person, refused with a reason when they may not be erased by this user. */
     private static SObject checkedPerson(Id personId) {
         if (!FeatureManagement.checkPermission(PERMISSION)) {
-            throw new ErasureException(Label.Core_Erase_NoPermission);
+            throw new ErasureException(BarnHelp.text('Core', 'Core_Erase_NoPermission'));
         }
         Schema.SObjectType type = personId == null ? null : personId.getSObjectType();
         if (type != Contact.SObjectType && type != Account.SObjectType) {
-            throw new ErasureException(Label.Core_Erase_NotAPerson);
+            throw new ErasureException(BarnHelp.text('Core', 'Core_Erase_NotAPerson'));
         }
         List<SObject> found = readAll(type, new Set<Id>{ personId });
         if (
             found.isEmpty() ||
             (type == Account.SObjectType && !PersonRecordSelector.isPersonRecord(found[0]))
         ) {
-            throw new ErasureException(Label.Core_Erase_NotAPerson);
+            throw new ErasureException(BarnHelp.text('Core', 'Core_Erase_NotAPerson'));
         }
         String id18 = String.valueOf(personId);
         List<Erasure__c> earlier = [
@@ -257,7 +257,7 @@ public with sharing class PersonErasure {
         if (!earlier.isEmpty()) {
             throw new ErasureException(
                 String.format(
-                    Label.Core_Erase_AlreadyErased,
+                    BarnHelp.text('Core', 'Core_Erase_AlreadyErased'),
                     new List<String>{ earlier[0].CreatedDate.format() }
                 )
             );
@@ -344,7 +344,7 @@ public with sharing class PersonErasure {
         if (!refused.isEmpty()) {
             throw new ErasureException(
                 String.format(
-                    Label.Core_Erase_CannotEdit,
+                    BarnHelp.text('Core', 'Core_Erase_CannotEdit'),
                     new List<String>{ String.join(refused, ', ') }
                 )
             );
@@ -409,14 +409,17 @@ public with sharing class PersonErasure {
         } catch (DmlException refusedChange) {
             throw new ErasureException(
                 String.format(
-                    Label.Core_Erase_Refused,
+                    BarnHelp.text('Core', 'Core_Erase_Refused'),
                     new List<String>{ refusedChange.getDmlMessage(0) }
                 )
             );
         } catch (Exception failed) {
             ErrorLogger.log(failed, 'PersonErasure.run');
             throw new ErasureException(
-                String.format(Label.Core_Erase_Refused, new List<String>{ failed.getMessage() })
+                String.format(
+                    BarnHelp.text('Core', 'Core_Erase_Refused'),
+                    new List<String>{ failed.getMessage() }
+                )
             );
         } finally {
             for (String automation : ADDRESS_AUTOMATIONS) {
@@ -528,8 +531,8 @@ public with sharing class PersonErasure {
         BarnCRM_Settings__c settings = SettingsService.getSettings();
         Boolean deletesEmpty = settings != null && settings.Delete_Empty_Households__c == true;
         return deletesEmpty
-            ? Label.Core_Erase_NoteHouseholdKept
-            : Label.Core_Erase_NoteHouseholdKeptSetting;
+            ? BarnHelp.text('Core', 'Core_Erase_NoteHouseholdKept')
+            : BarnHelp.text('Core', 'Core_Erase_NoteHouseholdKeptSetting');
     }
 
     /**
@@ -647,11 +650,11 @@ public with sharing class PersonErasure {
                 changed
             );
             if (natives.contains(householdId)) {
-                change.note = Label.Core_Erase_NoteNativeHousehold;
+                change.note = BarnHelp.text('Core', 'Core_Erase_NoteNativeHousehold');
             } else if (releasedIds.contains(householdId)) {
-                change.note = Label.Core_Erase_NoteCustomNameReleased;
+                change.note = BarnHelp.text('Core', 'Core_Erase_NoteCustomNameReleased');
             } else {
-                change.note = Label.Core_Erase_NoteRenamed;
+                change.note = BarnHelp.text('Core', 'Core_Erase_NoteRenamed');
             }
             result.changes.add(change);
         }
@@ -725,11 +728,21 @@ public with sharing class PersonErasure {
             }
             historyToDelete.get(key).add(recordId);
             result.changes.add(
-                new Change(DELETED, historyLabel, howMany, Label.Core_Erase_NoteHistoryDeleted)
+                new Change(
+                    DELETED,
+                    historyLabel,
+                    howMany,
+                    BarnHelp.text('Core', 'Core_Erase_NoteHistoryDeleted')
+                )
             );
         } else if (howMany > 0) {
             result.changes.add(
-                new Change(KEPT, historyLabel, howMany, Label.Core_Erase_NoteHistoryKept)
+                new Change(
+                    KEPT,
+                    historyLabel,
+                    howMany,
+                    BarnHelp.text('Core', 'Core_Erase_NoteHistoryKept')
+                )
             );
         }
     }
@@ -816,7 +829,14 @@ public with sharing class PersonErasure {
 
     private static void noteByHand(List<Change> rows, String objectLabel, Integer howMany) {
         if (howMany > 0) {
-            rows.add(new Change(KEPT, objectLabel, howMany, Label.Core_Erase_NoteByHand));
+            rows.add(
+                new Change(
+                    KEPT,
+                    objectLabel,
+                    howMany,
+                    BarnHelp.text('Core', 'Core_Erase_NoteByHand')
+                )
+            );
         }
     }
 
@@ -948,7 +968,7 @@ public with sharing class PersonErasure {
         if (clearing != null && !clearing.blocked.isEmpty()) {
             throw new ErasureException(
                 String.format(
-                    Label.Core_Erase_CannotEditFields,
+                    BarnHelp.text('Core', 'Core_Erase_CannotEditFields'),
                     new List<String>{
                         clearing.record.getSObjectType()
                             .getDescribe(SObjectDescribeOptions.DEFERRED)
@@ -971,7 +991,7 @@ public with sharing class PersonErasure {
         add(result, CLEARED, objectLabel, one, clearing.cleared, note);
         if (!clearing.required.isEmpty()) {
             Change kept = new Change(KEPT, objectLabel, one, clearing.required);
-            kept.note = Label.Core_Erase_NoteRequired;
+            kept.note = BarnHelp.text('Core', 'Core_Erase_NoteRequired');
             result.changes.add(kept);
         }
     }

@@ -114,7 +114,7 @@ public with sharing class OrgOptimizerSetupController {
     @AuraEnabled
     public static Result getFindings() {
         if (!hasPermission()) {
-            throw UserErrors.message(Label.Core_OrgOptimizer_ErrorNoPermission);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_OrgOptimizer_ErrorNoPermission'));
         }
         Datetime now = Datetime.now();
         Result result = new Result();

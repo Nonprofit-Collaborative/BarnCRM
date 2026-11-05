@@ -191,7 +191,10 @@ private class ImportObjectUndoTest {
                 'The record the import created is.'
             );
             Assert.isTrue(
-                undoJournal().contains(Label.Core_Import_UndoKeptNotCreatedByImport.left(40)),
+                undoJournal()
+                    .contains(
+                        BarnHelp.text('Core', 'Core_Import_UndoKeptNotCreatedByImport').left(40)
+                    ),
                 'The kept record is journaled with why.'
             );
         }

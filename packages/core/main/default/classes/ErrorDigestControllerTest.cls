@@ -103,7 +103,7 @@ private class ErrorDigestControllerTest {
                         Assert.fail('David should not be able to ' + action + '.');
                     } catch (AuraHandledException expected) {
                         Assert.areEqual(
-                            Label.Core_ErrorDigest_PermissionRequired,
+                            BarnHelp.text('Core', 'Core_ErrorDigest_PermissionRequired'),
                             expected.getMessage(),
                             'The message names the permission David needs.'
                         );

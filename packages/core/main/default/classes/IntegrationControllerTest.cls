@@ -48,7 +48,7 @@ private class IntegrationControllerTest {
             Test.stopTest();
 
             Assert.areEqual(
-                System.Label.Core_Integrations_LoadErrorMessage,
+                BarnHelp.text('Core', 'Core_Integrations_LoadErrorMessage'),
                 message,
                 'The page gets the label, not a stack trace'
             );

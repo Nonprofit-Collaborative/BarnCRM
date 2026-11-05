@@ -12,8 +12,14 @@ import mergeHouseholds from '@salesforce/apex/HouseholdMergeController.mergeHous
 import splitHousehold from '@salesforce/apex/HouseholdMergeController.splitHousehold';
 import getMembers from '@salesforce/apex/HouseholdController.getMembers';
 import { EnclosingTabId, getTabInfo, openSubtab, refreshTab } from 'lightning/platformWorkspaceApi';
-import { setHelpTextForTest, clearHelpTextForTest } from 'c/barnHelpText';
+import { clearHelpTextForTest, setHelpTextForTest } from 'c/barnHelpText';
 import { comparisonRows, householdPickerFilter, splitColumns } from '../mergeSplitModel';
+
+const MESSAGES = {
+  Core_HouseholdMerge_CustomNameKept:
+    "The name you chose is kept as this household's own name; the naming automation will not change it. Clear Custom Name on the household if you want it to follow the members again.",
+  Core_HouseholdMerge_ConfirmBody: '{0} will be combined into {1}.'
+};
 
 const mockNavigate = jest.fn();
 jest.mock(
@@ -70,21 +76,8 @@ jest.mock(
 
 // Stubbed to real-looking wording so a test can check the sentence reached the toast; jest's
 // default stub for a label is just its API name, which would never contain "Custom Name".
-jest.mock(
-  '@salesforce/label/c.Core_HouseholdMerge_CustomNameKept',
-  () => ({
-    default:
-      "The name you chose is kept as this household's own name; the naming automation will not change it. Clear Custom Name on the household if you want it to follow the members again."
-  }),
-  { virtual: true }
-);
 
 // Stubbed as the "{0} ... {1}" template so a test can check both names reach the confirm dialog.
-jest.mock(
-  '@salesforce/label/c.Core_HouseholdMerge_ConfirmBody',
-  () => ({ default: '{0} will be combined into {1}.' }),
-  { virtual: true }
-);
 
 jest.mock('@salesforce/label/c.Core_Shared_MoveTo', () => ({ default: 'Move to {0}' }), {
   virtual: true
@@ -222,6 +215,7 @@ describe('c-household-merge-split', () => {
     BarnConfirmModal.open.mockResolvedValue(true);
     jest.spyOn(Toast, 'show');
     setHelpTextForTest({
+      ...MESSAGES,
       Core_HouseholdMerge_StaysIn: 'Stays in {0}',
       Core_HouseholdMerge_MovesTo: 'Moves to {0}',
       Core_HouseholdMerge_PlaceNew: 'a New Household',

@@ -57,78 +57,6 @@
         <value>Search Kinds of Record</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_NoObjects</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Empty state: no object the person may change</shortDescription>
-        <value>There is no object you may change. Ask your BarnCRM admin for edit access to the records you need to change.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_ObjectFirst</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Empty state of steps 2 and 3 before an object is chosen</shortDescription>
-        <value>Choose an object first.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_Counting</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Live count while it is being worked out</shortDescription>
-        <value>Counting the matching records.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_MatchCount</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Live count; {0} count, {1} plural object label</shortDescription>
-        <value>{0} {1} match.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_NoneMatch</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Live count of zero; {0} plural object label</shortDescription>
-        <value>No {0} match these conditions.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_NoFilter</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Warning: no condition set; {0} object label, {1} count</shortDescription>
-        <value>No condition is set. This changes every {0}: {1} records.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_OverLimit</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Warning: over the run limit; {0} count, {1} run limit</shortDescription>
-        <value>{0} records match, more than the {1} one run may change. Narrow the conditions, or run it in parts.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_TooManyToCount</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Warning: too many records to count; {0} run limit</shortDescription>
-        <value>More records match than the {0} one run may change. Narrow the conditions.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_FixConditions</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Live count while a condition is unfinished</shortDescription>
-        <value>Finish the conditions above to count the records.</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_Action</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>
@@ -185,30 +113,6 @@
         <value>Add a Field</value>
     </labels>
     <labels>
-        <fullName>Core_SuperTransform_FieldLimit</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Line by Add a Field; {0} most changes</shortDescription>
-        <value>Up to {0} fields in one run.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_PreviewCount</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Line over the preview table; {0} count, {1} records shown</shortDescription>
-        <value>{0} records match. The first {1}, before and after:</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_AlreadyHeld</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Under the preview; {0} unchanged, {1} records shown</shortDescription>
-        <value>{0} of the {1} records shown already have these values and will not be saved.</value>
-    </labels>
-    <labels>
         <fullName>Core_SuperTransform_ChangesTo</fullName>
         <categories>SuperTransform</categories>
         <language>en_US</language>
@@ -231,22 +135,6 @@
         <protected>false</protected>
         <shortDescription>Super Transformer: Button and confirmation heading: start the run</shortDescription>
         <value>Run Super Transformer</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_ConfirmMessage</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Confirmation; {0} fields, {1} count, {2} plural object</shortDescription>
-        <value>Change {0} on {1} {2}.</value>
-    </labels>
-    <labels>
-        <fullName>Core_SuperTransform_ConfirmDetail</fullName>
-        <categories>SuperTransform</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Super Transformer: Confirmation detail line</shortDescription>
-        <value>It runs in the background with your own access. You can undo it from Data Jobs for as long as an import can be undone.</value>
     </labels>
     <labels>
         <fullName>Core_SuperTransform_TypeToConfirm</fullName>

@@ -117,7 +117,7 @@ public with sharing class CorePostInstallRetryQueueable implements Queueable {
         ErrorLogger.log(
             new AccessService.AccessException(
                 String.format(
-                    System.Label.Core_PostInstall_AdminRoleNotGiven,
+                    BarnHelp.text('Core', 'Core_PostInstall_AdminRoleNotGiven'),
                     new List<Object>{ String.valueOf(MAX_ATTEMPTS) }
                 )
             ),

@@ -40,7 +40,7 @@ public with sharing class ContactAddressHandler extends TriggerHandler {
         } catch (Exception thrown) {
             ErrorLogger.log(thrown, 'ContactAddressHandler.capture');
             for (Contact person : contacts) {
-                person.addError(Label.Core_Address_PropagationFailed);
+                person.addError(BarnHelp.text('Core', 'Core_Address_PropagationFailed'));
             }
         }
     }

@@ -14,14 +14,12 @@ import runLogHeading from '@salesforce/label/c.Core_Import_RunLogHeading';
 import rejectedHeading from '@salesforce/label/c.Core_Import_RejectedHeading';
 import rowNumberHeader from '@salesforce/label/c.Core_Import_ResultsRow';
 import reasonHeader from '@salesforce/label/c.Core_Import_ResultsReason';
-import noRejectedRows from '@salesforce/label/c.Core_Import_NoRejectedRows';
-import rejectedShownOf from '@salesforce/label/c.Core_Import_RejectedShownOf';
-import runningMessage from '@salesforce/label/c.Core_Import_RunningMessage';
 import loadingAltText from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import changedValuesHeading from '@salesforce/label/c.Core_Import_ChangedValuesHeading';
 import columnHeader from '@salesforce/label/c.Core_Import_ColumnHeader';
 import beforeHeader from '@salesforce/label/c.Core_Import_ChangesBefore';
 import afterHeader from '@salesforce/label/c.Core_Import_ChangesAfter';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * What an import did, or on a dry run what it would do: the four counts, the run log, and
@@ -33,6 +31,16 @@ import afterHeader from '@salesforce/label/c.Core_Import_ChangesAfter';
  * See docs/admin-guide/importing.md.
  */
 export default class ImportResults extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Core');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Core').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   /** The batch view from ImportController. */
   @api batch;
   /** The rejected rows of that batch, already fetched. */
@@ -45,8 +53,12 @@ export default class ImportResults extends NavigationMixin(LightningElement) {
     rejectedHeading,
     rowNumberHeader,
     reasonHeader,
-    noRejectedRows,
-    runningMessage,
+    get noRejectedRows() {
+      return helpText('Core', 'Core_Import_NoRejectedRows');
+    },
+    get runningMessage() {
+      return helpText('Core', 'Core_Import_RunningMessage');
+    },
     loadingAltText,
     changedValuesHeading,
     columnHeader,
@@ -130,7 +142,7 @@ export default class ImportResults extends NavigationMixin(LightningElement) {
     const shown = Array.isArray(this.rejectedRows) ? this.rejectedRows.length : 0;
     const total = (this.batch && this.batch.rejected) || 0;
     return shown > 0 && total > shown
-      ? rejectedShownOf
+      ? helpText('Core', 'Core_Import_RejectedShownOf')
           .replace('{0}', shown.toLocaleString())
           .replace('{1}', total.toLocaleString())
       : '';

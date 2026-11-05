@@ -257,7 +257,10 @@ public with sharing class SetupChangeController {
             parsed = Date.valueOf(day.trim());
         } catch (Exception badDate) {
             throw UserErrors.message(
-                String.format(Label.Core_SetupChanges_ErrorBadDate, new List<String>{ day })
+                String.format(
+                    BarnHelp.text('Core', 'Core_SetupChanges_ErrorBadDate'),
+                    new List<String>{ day }
+                )
             );
         }
         return Datetime.newInstance(parsed.addDays(plusDays), Time.newInstance(0, 0, 0, 0));
@@ -318,7 +321,7 @@ public with sharing class SetupChangeController {
             ? permissionOverride
             : FeatureManagement.checkPermission(PERMISSION);
         if (!allowed) {
-            throw UserErrors.message(Label.Core_OrgOptimizer_ErrorNoPermission);
+            throw UserErrors.message(BarnHelp.text('Core', 'Core_OrgOptimizer_ErrorNoPermission'));
         }
     }
 }

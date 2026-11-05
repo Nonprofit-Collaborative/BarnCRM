@@ -94,7 +94,7 @@ public with sharing class AddressTriggerHandler extends TriggerHandler {
     private void report(Exception thrown, List<Address__c> records, String context) {
         ErrorLogger.log(thrown, context);
         for (Address__c address : records) {
-            address.addError(Label.Core_Address_PropagationFailed);
+            address.addError(BarnHelp.text('Core', 'Core_Address_PropagationFailed'));
         }
     }
 
