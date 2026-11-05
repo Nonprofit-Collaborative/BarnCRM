@@ -1421,41 +1421,34 @@ private class SettingsControllerTest {
 		return null;
 	}
 
-	// Owner QA 2026-10-31: the Custom Metadata note stayed after the Apex setting was turned on.
+	// Owner QA 2026-10-31 and 2026-11-05: the Custom Metadata note stayed after the Apex setting
+	// was turned on, and BarnCRM Admin alone should be enough to save entries.
 	@IsTest
-	static void theMetadataCheckNeedsThePermissionAndConfirmsTheSettingByAWorkingSave() {
+	static void theMetadataCheckIsMetByBarnCrmAdminOrMetadataAdminAlone() {
 		Map<String, Boolean> withoutPermission;
-		System.runAs(TestUsers.admin()) {
+		System.runAs(TestUsers.standardUser('NoMetadata')) {
 			withoutPermission = SettingsController.getSetupChecks();
 		}
-		User metadataAdmin = TestUsers.withPermissionSets(
-			new List<String>{ TestUsers.CORE_ADMIN, 'BarnCRM_Metadata_Admin' }
-		);
-		Map<String, Boolean> beforeAnySave;
-		Map<String, Boolean> afterASave;
-		System.runAs(metadataAdmin) {
-			beforeAnySave = SettingsController.getSetupChecks();
-			// What CustomMetadataDeployCallback writes when a deployment succeeds.
-			insert as system new Setting_Change__c(
-				Setting_Name__c = 'Relationship_Type.Org_Close_friend',
-				Changed_By__c = UserInfo.getUserId(),
-				Changed_At__c = System.now(),
-				Deployment_Id__c = '0Af000000000001AAA'
-			);
-			afterASave = SettingsController.getSetupChecks();
+		Map<String, Boolean> admin;
+		System.runAs(TestUsers.admin()) {
+			admin = SettingsController.getSetupChecks();
+		}
+		Map<String, Boolean> metadataAdmin;
+		System.runAs(TestUsers.withPermissionSets(new List<String>{ 'BarnCRM_Metadata_Admin' })) {
+			metadataAdmin = SettingsController.getSetupChecks();
 		}
 
 		Assert.isFalse(
 			withoutPermission.get(SettingsController.CHECK_METADATA),
 			'Without Manage BarnCRM Metadata the note is not done'
 		);
-		Assert.isFalse(
-			beforeAnySave.containsKey(SettingsController.CHECK_METADATA),
-			'Apex cannot read the Apex setting, so before a save works the answer is unknown'
+		Assert.isTrue(
+			admin.get(SettingsController.CHECK_METADATA),
+			'BarnCRM Admin carries Manage BarnCRM Metadata, before any save'
 		);
 		Assert.isTrue(
-			afterASave.get(SettingsController.CHECK_METADATA),
-			'A finished Custom Metadata save shows the setting lets saves through'
+			metadataAdmin.get(SettingsController.CHECK_METADATA),
+			'BarnCRM Metadata Admin still carries it on its own'
 		);
 	}
 

@@ -1072,29 +1072,15 @@ public with sharing class SettingsController {
 	}
 
 	/**
-	 * Whether Custom Metadata saves can work for this person (owner QA, 2026-10-31). False
-	 * without Manage BarnCRM Metadata, which Apex reads directly. Apex cannot read the Apex
-	 * Settings option "Deploy Metadata from Non-Certified Package Versions via Apex" (Setup
-	 * and the Metadata API only), so the setting counts as on only once a Custom Metadata save
-	 * has finished: the audit row CustomMetadataDeployCallback writes for a succeeded
-	 * deployment. Null, can't confirm, when the permission is held and no save has worked yet.
+	 * Whether this person may save Custom Metadata entries: Manage BarnCRM Metadata, which
+	 * BarnCRM Admin and BarnCRM Metadata Admin carry. Apex cannot read the Apex Settings option
+	 * "Deploy Metadata from Non-Certified Package Versions via Apex", so the note does not ask
+	 * about it: an admin who had turned it on still saw the note until a save worked (owner QA,
+	 * 2026-10-31 and 2026-11-05). A save it blocks says what to turn on
+	 * (Core_CmdtManager_DeployRefused).
 	 */
 	private static Boolean metadataSavesReady() {
-		if (!FeatureManagement.checkPermission(METADATA_PERMISSION)) {
-			return false;
-		}
-		try {
-			List<Setting_Change__c> saved = [
-				SELECT Id
-				FROM Setting_Change__c
-				WHERE Deployment_Id__c != NULL
-				WITH USER_MODE
-				LIMIT 1
-			];
-			return saved.isEmpty() ? null : true;
-		} catch (Exception unreadable) {
-			return null;
-		}
+		return FeatureManagement.checkPermission(METADATA_PERMISSION);
 	}
 
 	/**

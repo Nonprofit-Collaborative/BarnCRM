@@ -110,7 +110,11 @@ private class MatchSourceControllerTest {
 
 	@IsTest
 	static void anAdminWithoutMetadataAdminReadsOnly() {
-		System.runAs(TestUsers.admin()) {
+		// BarnCRM Admin carries Manage BarnCRM Metadata, so this is an org's own permission set
+		// holding Manage BarnCRM Settings alone.
+		User settingsOnly = TestUsers.standardUser('SettingsOnly');
+		SettingsTestPermissions.grantTo('Settings_Only_Match', settingsOnly.Id);
+		System.runAs(settingsOnly) {
 			Test.startTest();
 			MatchSourceController.View view = MatchSourceController.getView();
 			Test.stopTest();

@@ -4,8 +4,9 @@
   <label>BarnCRM Admin</label>
   <description>
     For the person who configures BarnCRM: settings, automation control, Error Log. View All and
-    Modify All on Account and Contact let its data tools reach every person (ADR-0142). Never
-    meant to be cloned.
+    Modify All on Account and Contact let its data tools reach every person (ADR-0142). It also
+    carries Manage BarnCRM Metadata, so an admin saves Custom Metadata entries and match sources
+    without a second permission set (owner QA, 2026-11-05). Never meant to be cloned.
   </description>
   <classAccesses>
     <apexClass>AccessController</apexClass>
@@ -29,6 +30,10 @@
   </classAccesses>
   <classAccesses>
     <apexClass>CreatePersonAction</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>CustomMetadataManagerController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -120,6 +125,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>ImportNewFieldController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>ImportRowCorrectionController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -201,8 +210,16 @@
   </customPermissions>
   <customPermissions>
     <enabled>true</enabled>
+    <name>Manage_BarnCRM_Metadata</name>
+  </customPermissions>
+  <customPermissions>
+    <enabled>true</enabled>
     <name>Manage_BarnCRM_Settings</name>
   </customPermissions>
+  <externalCredentialPrincipalAccesses>
+    <enabled>true</enabled>
+    <externalCredentialPrincipal>Barn_Org_Connection-Principal</externalCredentialPrincipal>
+  </externalCredentialPrincipalAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Account.Alternate_Email__c</field>

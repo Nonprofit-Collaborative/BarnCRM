@@ -144,7 +144,11 @@ private class ImportNewFieldServiceTest {
 
 	@IsTest
 	static void refusesWithoutThePermissions() {
-		System.runAs(TestUsers.admin()) {
+		// BarnCRM Admin carries Manage BarnCRM Metadata, so this is an org's own permission set
+		// holding Manage BarnCRM Settings alone.
+		User settingsOnly = TestUsers.standardUser('SettingsOnly');
+		SettingsTestPermissions.grantTo('Settings_Only_Field', settingsOnly.Id);
+		System.runAs(settingsOnly) {
 			ImportNewFieldService.systemPermissionOverride = true;
 			ImportNewFieldService.connectedOverride = true;
 			Assert.isFalse(ImportNewFieldService.connection().canCreate, 'no Metadata Admin');
