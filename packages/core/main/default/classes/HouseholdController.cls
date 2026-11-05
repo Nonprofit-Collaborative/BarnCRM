@@ -218,10 +218,18 @@ public with sharing class HouseholdController {
 		return value == null ? '' : value.replaceAll('\\s+', ' ').trim();
 	}
 
+	/** The People column; a member who has died is marked, so the greetings read clearly (owner QA, 2026-11-05). */
 	private static String describe(List<HouseholdService.Person> members) {
 		List<String> names = new List<String>();
 		for (HouseholdService.Person person : members) {
-			names.add(person.fullName());
+			names.add(
+				person.isDeceased == true
+					? String.format(
+							BarnHelp.text('Core', 'Core_Households_PreviewDeceasedMember'),
+							new List<Object>{ person.fullName() }
+					  )
+					: person.fullName()
+			);
 		}
 		return String.join(names, ', ');
 	}
