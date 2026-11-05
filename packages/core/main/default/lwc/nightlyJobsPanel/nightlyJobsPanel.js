@@ -1,6 +1,7 @@
 import { LightningElement, api } from 'lwc';
 // Bare, and correctly so: a custom permission defined in the same package resolves without a
 // namespace prefix.
+import LOCALE from '@salesforce/i18n/locale';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import getPanel from '@salesforce/apex/NightlyJobsController.getPanel';
 import schedule from '@salesforce/apex/NightlyJobsController.schedule';
@@ -18,10 +19,17 @@ import UNEXPECTED_ERROR from '@salesforce/label/c.Core_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
-/** Minutes after midnight as the reader writes a time of day, for example 1:15 AM. */
+/**
+ * Minutes after midnight as the reader writes a time of day in their Salesforce locale, for
+ * example 1:15 AM. A clock time, not an instant: formatted as UTC so no time zone moves it.
+ */
 export function timeOfDay(minute) {
-  const at = new Date(2000, 0, 1, Math.floor(minute / 60), minute % 60);
-  return at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  const at = new Date(Date.UTC(2000, 0, 1, Math.floor(minute / 60), minute % 60));
+  return at.toLocaleTimeString(LOCALE, {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: 'UTC'
+  });
 }
 
 /**

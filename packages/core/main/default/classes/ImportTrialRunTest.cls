@@ -135,8 +135,14 @@ private class ImportTrialRunTest {
 			);
 			Assert.areEqual(trialStart, after.Started_At__c, 'The import starts with its trial.');
 			Assert.isTrue(
-				after.Run_Log__c.contains(BarnHelp.text('Core', 'Core_Import_LogCommitHeader')),
-				'The log keeps both parts.'
+				after.Run_Log__c.contains('Imported the first ' + TRIAL + ' rows.'),
+				'The log keeps the trial part, with its row count.'
+			);
+			Assert.isTrue(
+				after.Run_Log__c.contains(
+					'Imported the remaining ' + (FILE_ROWS - TRIAL) + ' rows.'
+				),
+				'And the rest, with its own row count.'
 			);
 			Assert.isNull(ImportUndoService.refusal(after), 'And can be undone as one.');
 		}

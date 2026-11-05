@@ -46,6 +46,31 @@ private class AutomationControlSettingServiceTest {
 				'Paused for everyone'
 			);
 			Assert.areEqual(1, changesNamed('Automation Control:'), 'The change is recorded');
+			Assert.areEqual(
+				1,
+				changesNamed('Automation Control: Whole Organization'),
+				'The log names the org row once, without the level word'
+			);
+		}
+	}
+
+	@IsTest
+	static void removingAnOwnerThatIsGoneDeletesNothingAndRefusesNothing() {
+		System.runAs(TestUsers.admin()) {
+			// A well-formed User id with no record behind it, as a deleted user leaves.
+			String gone = String.valueOf(UserInfo.getUserId()).substring(0, 12) + 'ZZZ';
+			Exception refused;
+
+			Test.startTest();
+			try {
+				AutomationControlSettingService.remove(gone);
+			} catch (Exception e) {
+				refused = e;
+			}
+			Test.stopTest();
+
+			Assert.isNull(refused, 'A remove of a missing owner is not an error');
+			Assert.areEqual(0, changesNamed('Automation Control:'), 'And nothing was changed');
 		}
 	}
 
@@ -135,8 +160,8 @@ private class AutomationControlSettingServiceTest {
 			Assert.areEqual(
 				new List<String>{
 					BarnHelp.text('Core', 'Core_AutomationControl_OrgRowStays'),
-					BarnHelp.text('Core', 'Core_AutomationControl_OwnerNotFound'),
-					BarnHelp.text('Core', 'Core_AutomationControl_OwnerNotFound')
+					BarnHelp.text('Core', 'Core_AutomationControl_OwnerGone'),
+					BarnHelp.text('Core', 'Core_AutomationControl_OwnerGone')
 				},
 				messages,
 				'Each refusal says what to do'

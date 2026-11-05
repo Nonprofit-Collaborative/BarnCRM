@@ -26,6 +26,8 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
 	private Set<String> notes = new Set<String>();
 	private Boolean notesCut = false;
 	private Integer chunksRun = 0;
+	/** Rows the finished chunks processed, for the trial and remaining-rows log lines. */
+	private Integer rowsRun = 0;
 	/** Values empty cells cleared, or would clear, over the chunks (R-IT19). */
 	private Integer cleared = 0;
 	/** The gift amounts the entity processor read, added up over the chunks (R-IB10). */
@@ -263,6 +265,7 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
 			processorState = ImportEntityProcessors.carriedState;
 			addNotes(outcome);
 			cleared += outcome.cleared;
+			rowsRun += rows.size();
 			if (outcome.fileAmount != null) {
 				fileAmount = (fileAmount == null ? 0 : fileAmount) + outcome.fileAmount;
 			}
@@ -289,11 +292,21 @@ public with sharing class ImportProcessorBatch implements Database.Batchable<SOb
 	public void finish(Database.BatchableContext context) {
 		try {
 			List<String> lines = new List<String>();
-			lines.add(
-				dryRun
-					? BarnHelp.text('Core', 'Core_Import_LogDryRunHeader')
-					: BarnHelp.text('Core', 'Core_Import_LogCommitHeader')
-			);
+			String header = BarnHelp.text('Core', 'Core_Import_LogCommitHeader');
+			if (dryRun) {
+				header = BarnHelp.text('Core', 'Core_Import_LogDryRunHeader');
+			} else if (rowIds == null && trialRows != null) {
+				header = String.format(
+					BarnHelp.text('Core', 'Core_Import_LogTrialHeader'),
+					new List<String>{ String.valueOf(rowsRun) }
+				);
+			} else if (rowIds == null && afterRow != null) {
+				header = String.format(
+					BarnHelp.text('Core', 'Core_Import_LogRemainingHeader'),
+					new List<String>{ String.valueOf(rowsRun) }
+				);
+			}
+			lines.add(header);
 			// Chunk failures first: the run log is cut at its field's length, and they matter most.
 			if (rowIds != null) {
 				lines.add(

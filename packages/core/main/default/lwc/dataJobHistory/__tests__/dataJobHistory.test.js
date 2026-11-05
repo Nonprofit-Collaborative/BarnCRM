@@ -362,7 +362,10 @@ describe('c-data-job-history', () => {
       organizations: 0,
       updates: 2,
       total: 8,
-      others: [{ objectName: 'Gift__c', label: 'Gifts', count: 4 }]
+      others: [
+        { objectName: 'Gift__c', label: 'Gifts', count: 4 },
+        { objectName: 'Pledge__c', label: 'Pledges', count: 0 }
+      ]
     });
     startUndo.mockResolvedValue({ ...IMPORT_JOB, status: 'Undoing' });
     const element = await render();
@@ -374,6 +377,7 @@ describe('c-data-job-history', () => {
     expect(previewUndo).toHaveBeenCalledWith({ batchId: IMPORT_JOB.id });
     expect(one(element, 'people').value).toBe(5);
     expect(one(element, 'other-Gift__c').label).toContain('Gifts');
+    expect(one(element, 'other-Pledge__c')).toBeNull();
     expect(one(element, 'import-undo-start').disabled).toBe(false);
 
     one(element, 'import-undo-start').click();

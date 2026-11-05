@@ -204,4 +204,51 @@ private class NpspHouseholdUseTest {
 			Assert.areEqual(reason, message, 'The person sees the reason, not a generic error');
 		}
 	}
+
+	private static HealthCheckService.Finding overlapFinding() {
+		for (HealthCheckService.Finding finding : HealthCheckService.run()) {
+			if ('npsp_upkeep_overlap'.equals(finding.key)) {
+				return finding;
+			}
+		}
+		return null;
+	}
+
+	@IsTest
+	static void healthCheckReportsUpkeepOnWhileNpspHouseholdsAreInUse() {
+		System.runAs(TestUsers.admin()) {
+			TestSettings.newInstall();
+			useSource(new FakeSource(false, false));
+			FeatureSwitchService.turnOn(FeatureSwitchService.HOUSEHOLD_UPKEEP);
+			Assert.isNull(overlapFinding(), 'Nothing to report while NPSP is not in use');
+
+			// NPSP arrives, with the Household Account model, after Upkeep was switched on.
+			useSource(new FakeSource(true, true));
+			Test.startTest();
+			HealthCheckService.Finding finding = overlapFinding();
+			Test.stopTest();
+
+			Assert.isNotNull(finding, 'Both packages would make households, so it is reported');
+			Assert.areEqual(HealthCheckService.SEVERITY_WARNING, finding.severity, 'A warning');
+			Assert.areEqual(
+				HealthCheckService.SECTION_GENERAL,
+				finding.fixTarget,
+				'It links to the General page, where the adoption panel is'
+			);
+		}
+	}
+
+	@IsTest
+	static void healthCheckSaysNothingWhenUpkeepIsOff() {
+		System.runAs(TestUsers.admin()) {
+			TestSettings.newInstall();
+			useSource(new FakeSource(true, true));
+
+			Test.startTest();
+			HealthCheckService.Finding finding = overlapFinding();
+			Test.stopTest();
+
+			Assert.isNull(finding, 'Upkeep is off, so nothing overlaps');
+		}
+	}
 }

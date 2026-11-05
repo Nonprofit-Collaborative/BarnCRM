@@ -99,7 +99,9 @@ When you are ready for BarnCRM to keep your households:
 3. In BarnCRM Settings, **General**, choose **Turn On** in the **Household Upkeep** row.
 
 An org upgraded with Household Upkeep already on keeps it on, and its row shows the same
-explanation until both are done, so you know to finish them.
+explanation until both are done, so you know to finish them. Health Check also watches for it:
+if Household Upkeep is on and NPSP households come into use afterwards, it reports **NPSP and
+BarnCRM Both Make Households** with a button to this panel.
 
 ## Names and Greetings
 

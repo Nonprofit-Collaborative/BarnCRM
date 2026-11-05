@@ -125,6 +125,7 @@ Cy,Dupe,cy.dupe@example.org,Active
 | 3 | Search for Testa Rivera and Cara Lind. | Testa Rivera exists (first person in the file); Cara Lind (third) does not yet. |
 | 4 | Select **Import the Remaining Rows**. | Results for the whole file: **Created** 3, **Matched, nothing changed** 1, **Rejected** 1. |
 | 5 | Open **Recent Imports**. | One import for the file, not two. |
+| 5a | Open the import's run log. | It has two lines: "Imported the first 2 rows." and "Imported the remaining 3 rows." |
 | 6 | Select **Undo**, then **Undo This Import**, and **Refresh** until **Undone**. | **People to remove** was 3. Testa Rivera, Ben Okoro and Cara Lind are all gone. |
 
 **Cleanup:** none.
