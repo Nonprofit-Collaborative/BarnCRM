@@ -78,9 +78,23 @@ public with sharing class FirstRunController {
         } catch (Exception e) {
             ErrorLogger.log(e, ERROR_CONTEXT);
         }
+        startNightlyRun();
     }
 
-    /** Test seam: true lets a test see the hourly tab access check started. */
+    /**
+     * Schedules the nightly run unless it is scheduled already, leaving every step switch as it
+     * is. A fresh install is scheduled by its install step; this covers an org built from source
+     * and one where that step failed. Never throws.
+     */
+    private static void startNightlyRun() {
+        try {
+            NightlyJobs.start();
+        } catch (Exception e) {
+            ErrorLogger.log(e, ERROR_CONTEXT);
+        }
+    }
+
+    /** Test seam: true lets a test see the hourly tab access check and nightly run started. */
     @TestVisible
     private static Boolean startTabCheckInTests = false;
 

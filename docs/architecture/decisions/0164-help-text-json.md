@@ -1,4 +1,4 @@
-# ADR-NEXT: Help and guidance prose in packaged JSON catalogs, not custom labels
+# ADR-0164: Help and guidance prose in packaged JSON catalogs, not custom labels
 
 **Status:** Proposed (owner request, Brandon, 2026-11-04; awaits owner confirmation)
 **Date:** 2026-11-04

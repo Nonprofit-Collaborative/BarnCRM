@@ -127,6 +127,8 @@ function importCoreComponent(name) {
       return import('c/seasonalAddressJob');
     case 'errorDigestJob':
       return import('c/errorDigestJob');
+    case 'nightlyJobsPanel':
+      return import('c/nightlyJobsPanel');
     case 'moduleManager':
       return import('c/moduleManager');
     case 'customMetadataManager':

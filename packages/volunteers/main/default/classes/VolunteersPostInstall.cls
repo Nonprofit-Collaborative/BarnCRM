@@ -64,6 +64,8 @@ public with sharing class VolunteersPostInstall implements InstallHandler, Modul
      * @param installerId the person to give Volunteers Admin, or null for nobody
      */
     public void runSetup(Id installerId) {
+        // Jobs scheduled on their own before the nightly run become its steps (R-NJ5).
+        NightlyJobs.adoptOldSchedules();
         // Each entry point records its own failures and returns, so nothing here throws.
         AutomationControl.ensureDefaultsDuringInstall(SWITCH_CONTEXT);
         ImportTemplateService.materializeDefaultsDuringInstall(IMPORT_CONTEXT);

@@ -142,4 +142,26 @@ describe('c-feature-settings', () => {
 
     expect(turnedOn).not.toHaveBeenCalled();
   });
+
+  it('says why a feature waits and disables its Turn On', async () => {
+    getFeatures.mockResolvedValue({
+      canEdit: true,
+      features: [
+        {
+          key: 'HouseholdUpkeep',
+          name: 'Household Upkeep',
+          description: 'Households.',
+          isOn: false,
+          blockedReason: 'NPSP households are still in use.'
+        },
+        { key: 'Relationships', name: 'Relationships', description: 'Both sides.', isOn: false }
+      ]
+    });
+    const element = await build();
+
+    expect(all(element, 'blocked').map((notice) => notice.message)).toEqual([
+      'NPSP households are still in use.'
+    ]);
+    expect(all(element, 'turn-on').map((button) => button.disabled)).toEqual([true, false]);
+  });
 });

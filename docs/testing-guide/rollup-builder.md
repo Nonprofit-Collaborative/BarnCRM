@@ -343,11 +343,11 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 1 | Open **BarnCRM Settings**, **Rollups** section. | **Time of the nightly run** shows **2:00 AM**, never blank. Its list offers every hour from **12:00 AM (midnight)** to **11:00 PM**. |
 | 2 | Choose **11:00 PM** and save. | The setting saves and shows **11:00 PM**. |
 | 3 | Open the **Rollup Builder** tab. | The text above the buttons reads "Nightly recalculation is scheduled for 11:00 PM." |
-| 4 | In Setup, open **Scheduled Jobs**. | One job named **BarnCRM Rollups**, next run today or tomorrow at 11:00 PM. |
+| 4 | In Setup, open **Scheduled Jobs**. | One job named **BarnCRM Nightly Jobs** (the nightly run all steps share, see [Nightly Jobs](../admin-guide/nightly-jobs.md)), next run at midnight; the Nightly Jobs panel lists the rollup step at 11:00 PM. |
 | 5 | On the **Rollup Builder** tab, click **Stop the nightly recalculation**, then **Recalculate All**, then **Run Tonight**. | The notice reads "One recalculation of every total is set for the next 11:00 PM." |
 | 6 | Click **Schedule nightly recalculation**. | The text reads "Nightly recalculation is scheduled for 11:00 PM." |
 
-**Cleanup:** set **Time of the nightly run** back to **2:00 AM** and check the Rollup Builder tab says 2:00 AM; in Setup, **Scheduled Jobs**, delete the one-off **BarnCRM Rollups** job with a date in its name.
+**Cleanup:** set **Time of the nightly run** back to **2:00 AM** and check the Rollup Builder tab says 2:00 AM; in Setup, **Scheduled Jobs**, delete the one-off **BarnCRM Rollups** job with a date in its name (made by **Run Tonight** while the nightly run was stopped); leave **BarnCRM Nightly Jobs** scheduled.
 
 ## T-RB-24: Delete a Rollup You Made, and Not a Shipped One
 

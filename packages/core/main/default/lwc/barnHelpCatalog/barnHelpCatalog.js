@@ -1,5 +1,5 @@
 /**
- * Help text catalogs (ADR-NEXT help-text-json), framework-free: no lightning/* or @salesforce/*
+ * Help text catalogs (ADR-0164 help-text-json), framework-free: no lightning/* or @salesforce/*
  * import, so a WordPress block or Node can reuse it (plan 9.9).
  *
  * Each package ships its help and guidance prose as one JSON static resource, BarnHelp_<Package>,

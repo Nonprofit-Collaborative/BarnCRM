@@ -10,7 +10,7 @@ import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
  *
  * <c-barn-help help-package="Core" help-key="Core_Example_Help" learn-more-url={helpUrl}></c-barn-help>
  * <c-barn-help content={text}></c-barn-help>
- * The popover text comes from the package's help catalog (ADR-NEXT help-text-json) when
+ * The popover text comes from the package's help catalog (ADR-0164 help-text-json) when
  * help-key is set, or from content. Either part may be left out.
  */
 export default class BarnHelp extends LightningElement {

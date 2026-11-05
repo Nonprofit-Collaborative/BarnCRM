@@ -120,4 +120,52 @@
         <shortDescription>Automation page: who paused; {0} is the name.</shortDescription>
         <value>Paused by {0}.</value>
     </labels>
+    <labels>
+        <fullName>Core_AutomationControl_PeopleTitle</fullName>
+        <categories>Core, Automation</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation page: section for the Automation Control rows</shortDescription>
+        <value>Pause or Bypass for Some People</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutomationControl_FlowsTitle</fullName>
+        <categories>Core, Automation</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation page: section for an org's own flows</shortDescription>
+        <value>Your Own Flows</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutomationControl_CatchUpButton</fullName>
+        <categories>Core, Automation</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation page: Catch Up Now button</shortDescription>
+        <value>Catch Up Now</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutomationControl_WholeOrganization</fullName>
+        <categories>Core, Automation</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation page: the org default row</shortDescription>
+        <value>Whole Organization</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutomationControl_KindUser</fullName>
+        <categories>Core, Automation</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation page: a row or choice for one user</shortDescription>
+        <value>User</value>
+    </labels>
+    <labels>
+        <fullName>Core_AutomationControl_AddFor</fullName>
+        <categories>Core, Automation</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation page: add a profile or user row</shortDescription>
+        <value>Add a Profile or User</value>
+    </labels>
 </CustomLabels>
