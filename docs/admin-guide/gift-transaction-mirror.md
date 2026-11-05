@@ -66,7 +66,8 @@ Transaction Mirror page says the mirror is not available, and nothing else happe
    same as what you see; Setup, Object Manager, Gift Transaction, Fields, Status lists both. The
    setting starts as `Paid`.
 3. Open **BarnCRM Settings**, choose **Giving**, and set:
-   - **Gift Transaction mirror paid status**, if your paid value is not `Paid`;
+   - **Gift Transaction mirror paid status**, if your paid value is not `Paid` (a dropdown of
+     your org's active Status values);
    - **Gift Transaction mirror start date**: only gifts dated on or after it are copied; while it
      says **Not set**, nothing is copied. If you
      loaded your Nonprofit Cloud gifts into BarnCRM, choose the day after the last load, so those
@@ -121,9 +122,10 @@ message appears when your org's Gift Transaction fields differ from what this ve
 Nothing is wrong with your data in that case, but the mirror cannot work in that org until
 BarnCRM is corrected: report it on GitHub (see [Support](../../SUPPORT.md)).
 
-**The page says the paid status is not one of your org's Status values.** The value must match an
-active Status exactly, including capitals, as its API name. Copy it again from Setup, Object
-Manager, Gift Transaction, Fields, Status.
+**The page says the paid status is not one of your org's Status values.** The setting is a
+dropdown of the active Status values, so this means the saved value was retired in Setup (it
+still shows in the dropdown). Choose a current value. If the box is plain text, the org has no
+Gift Transaction Status field; type the API name exactly, including capitals.
 
 **Every gift from before the mirror was set up got a second Gift Transaction.** The start date was
 set before the day you loaded your Nonprofit Cloud gifts. Delete the extra Gift Transactions in

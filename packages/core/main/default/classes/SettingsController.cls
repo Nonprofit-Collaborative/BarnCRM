@@ -780,6 +780,7 @@ public with sharing class SettingsController {
 			definition.Data_Type__c
 		);
 		setting.value = SettingsService.asText(value);
+		keepShownValue(setting);
 		if (isOrganizationRecordType(settingsObject, definition.Setting_Key__c)) {
 			// Never blank: the stored record type, or the one detection picks while nothing
 			// usable is stored (R-O5). Showing it is not saving it; install stores it.
@@ -902,6 +903,21 @@ public with sharing class SettingsController {
 			definition.Data_Type__c
 		);
 		Boolean isFields = SettingsService.FIELD_LIST.equalsIgnoreCase(definition.Data_Type__c);
+		if (SettingsService.PICKLIST_FROM_FIELD.equalsIgnoreCase(definition.Data_Type__c)) {
+			// The field's active values, or a plain text box while this org lacks the field.
+			List<Schema.PicklistEntry> active = SettingsService.activeFieldValues(definition);
+			if (active == null) {
+				setting.dataType = TYPE_TEXT;
+				return true;
+			}
+			for (Schema.PicklistEntry entry : active) {
+				Option option = new Option();
+				option.value = entry.getValue();
+				option.label = entry.getLabel();
+				setting.options.add(option);
+			}
+			return true;
+		}
 		if (!isRecord && !isRecordType && !isRecordTypes && !isFields) {
 			return true;
 		}
@@ -942,6 +958,29 @@ public with sharing class SettingsController {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * A Picklist From Field row whose stored value the field no longer lists as active still
+	 * shows it, as a choice, so nothing is silently replaced; it stays until somebody chooses
+	 * another.
+	 */
+	private static void keepShownValue(SettingModel setting) {
+		if (
+			!SettingsService.PICKLIST_FROM_FIELD.equalsIgnoreCase(setting.dataType) ||
+			String.isBlank(setting.value)
+		) {
+			return;
+		}
+		for (Option option : setting.options) {
+			if (option.value == setting.value) {
+				return;
+			}
+		}
+		Option kept = new Option();
+		kept.value = setting.value;
+		kept.label = setting.value;
+		setting.options.add(kept);
 	}
 
 	private static List<Option> toOptions(Setting_Definition__mdt definition) {

@@ -1223,6 +1223,59 @@ private class SettingsControllerTest {
 		}
 	}
 
+	private static SettingsController.SettingModel fieldPicklistRow(String source) {
+		SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+			new Setting_Definition__mdt(
+				DeveloperName = 'Address_Card_Fields',
+				MasterLabel = 'Address Card Fields',
+				Setting_Key__c = 'Address_Card_Fields__c',
+				Section__c = 'Addresses',
+				Module__c = 'Core',
+				Data_Type__c = SettingsService.PICKLIST_FROM_FIELD,
+				Record_Object__c = source,
+				Sort_Order__c = 1
+			)
+		};
+		return SettingsController.getConsoleModel().sections[0].settings[0];
+	}
+
+	@IsTest
+	static void aPicklistFromFieldRowOffersActiveValuesAndShowsAnInactiveStoredOne() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			SettingsController.SettingModel row = fieldPicklistRow('Account.Industry');
+			Test.stopTest();
+
+			Integer activeCount = 0;
+			for (Schema.PicklistEntry entry : Account.Industry.getDescribe().getPicklistValues()) {
+				activeCount += entry.isActive() ? 1 : 0;
+			}
+			Assert.areEqual(SettingsService.PICKLIST_FROM_FIELD, row.dataType);
+			Assert.areEqual(activeCount, row.options.size(), 'Only active values are offered');
+
+			insert new BarnCRM_Settings__c(
+				SetupOwnerId = UserInfo.getOrganizationId(),
+				Address_Card_Fields__c = 'Retired Value'
+			);
+			SettingsService.clearCaches();
+			row = fieldPicklistRow('Account.Industry');
+			Assert.areEqual('Retired Value', row.value, 'The stored value is shown');
+			Assert.areEqual(activeCount + 1, row.options.size(), 'and kept as a choice');
+		}
+	}
+
+	@IsTest
+	static void aPicklistFromFieldRowTheOrgLacksFallsBackToText() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			SettingsController.SettingModel row = fieldPicklistRow('Not_An_Object__c.Status__c');
+			Test.stopTest();
+
+			Assert.areEqual('Text', row.dataType, 'A text box while the field is absent');
+			Assert.isTrue(row.options.isEmpty(), 'No choices');
+		}
+	}
+
 	@IsTest
 	static void setupChecksSayWhetherEachPrerequisiteIsMet() {
 		System.runAs(TestUsers.admin()) {

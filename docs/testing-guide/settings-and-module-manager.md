@@ -502,3 +502,15 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 9 | Set **Days to keep merge history** to 5 and save. | A value below 30 is not accepted (the range is 30 to 3650). Set it back to 365. |
 
 **Cleanup:** press **Schedule Daily Run** on the Error Log section again.
+
+## T-SET-26: A Setting That Picks From Another Field's Values
+
+**Purpose:** confirm a Picklist From Field setting offers only active values, keeps a retired saved value, and falls back to a text box when the field is absent.
+**Prerequisites:** the admin user; BarnCRM Mirror installed. For steps 1 to 3, an org with Nonprofit Cloud (Gift Transaction Status); for step 4, an org without it.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Giving**, **BarnCRM Mirror**. | **Gift Transaction mirror paid status** is a dropdown showing `Paid` (the default, with the Default badge); it lists only the active Gift Transaction Status values. |
+| 2 | Choose another value and save. | The save succeeds and the page keeps the choice. Recent changes lists it. |
+| 3 | In Setup, make that Status value inactive; reload the setting. | The dropdown still shows the saved value, and saving the section keeps it. |
+| 4 | In an org without Nonprofit Cloud, open the same setting. | A text box showing `Paid`; any text saves. |
