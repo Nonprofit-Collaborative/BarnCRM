@@ -41,11 +41,13 @@ public class GivingTestDataFactory {
             WHERE
                 CronJobDetail.Name LIKE 'BarnCRM Giving%'
                 OR CronJobDetail.Name = :AcknowledgmentScheduler.JOB_NAME
+                OR CronJobDetail.Name = :NightlyJobs.jobName()
             WITH SYSTEM_MODE
         ]) {
             System.abortJob(job.Id);
         }
         ScheduledJobSelector.forget();
+        NightlyJobs.forget();
     }
 
     /**

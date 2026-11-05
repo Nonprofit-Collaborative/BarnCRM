@@ -84,7 +84,7 @@ private class GiftTransactionMirrorRunTest {
 
     private static void clearOrgJob() {
         TestDataFactory.clearScheduledJobs(
-            new List<String>{ GiftTransactionMirrorSchedulable.JOB_NAME }
+            new List<String>{ NightlyJobs.jobName() }
         );
         ScheduledJobSelector.forget();
     }
@@ -97,7 +97,10 @@ private class GiftTransactionMirrorRunTest {
             insertGift(100);
             GiftTransactionMirrorSchema.absentForTest = true;
             Assert.isNull(GiftTransactionMirrorBatch.run(), 'No run starts (R-GT1).');
-            Assert.isTrue(new MirrorNightlyJobProvider().nightlyJobs().isEmpty(), 'No job.');
+            Assert.isFalse(
+                NightlyJobs.isOn(GiftTransactionMirrorSchedulable.step()),
+                'Not in tonight\'s run.'
+            );
             Test.startTest();
             runInline(new GiftTransactionMirrorBatch(null, null));
             Test.stopTest();
@@ -197,26 +200,17 @@ private class GiftTransactionMirrorRunTest {
             clearOrgJob();
             GiftTransactionMirrorSchema.useStandIns();
             Test.startTest();
-            GiftTransactionMirrorSchedulable.schedule();
-            GiftTransactionMirrorSchedulable.schedule();
-            Assert.areEqual(
-                1,
-                [
-                    SELECT COUNT()
-                    FROM CronTrigger
-                    WHERE CronJobDetail.Name = :GiftTransactionMirrorSchedulable.JOB_NAME
-                    WITH SYSTEM_MODE
-                ],
-                'A second press returns the job already there.'
-            );
+            Id first = GiftTransactionMirrorSchedulable.schedule();
+            Id second = GiftTransactionMirrorSchedulable.schedule();
+            Assert.areEqual(first, second, 'A second press returns the run already there.');
+            ScheduledJobSelector.forget();
+            NightlyJobs.forget();
             Assert.isNotNull(GiftTransactionMirrorSchedulable.nextRunAt());
             Assert.isFalse(GiftTransactionMirrorSchedulable.isRunning());
-
-            Boolean listed = false;
-            for (NightlyJob job : new MirrorNightlyJobProvider().nightlyJobs()) {
-                listed = listed || job.label() == Label.Mirror_NightlyJob_GiftTransactionMirrorName;
-            }
-            Assert.isTrue(listed, 'Health Check lists the job while the mirror is on (ADR-0075).');
+            Assert.isTrue(
+                NightlyJobs.isOn(GiftTransactionMirrorSchedulable.step()),
+                'In tonight\'s run while the mirror is on.'
+            );
 
             Assert.isFalse(reported(), 'Just scheduled: nothing to say yet.');
             MirrorHealthCheckExtension.nowForTest = System.now().addDays(3);
@@ -226,6 +220,7 @@ private class GiftTransactionMirrorRunTest {
 
             new GiftTransactionMirrorSchedulable().execute(null);
             GiftTransactionMirrorSchedulable.stop();
+            NightlyJobs.forget();
             Assert.isNull(GiftTransactionMirrorSchedulable.scheduledAt(), 'Stopped.');
             Test.stopTest();
         }

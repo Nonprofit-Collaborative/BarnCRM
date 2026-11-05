@@ -29,6 +29,11 @@ Households belong to the **Household Upkeep** feature. Turn it on in first-run s
 with **Turn On** in its row on **General** in BarnCRM Settings. Everything you can change is on
 the BarnCRM Settings page, so nobody needs to open Salesforce Setup.
 
+In an org with NPSP, Household Upkeep cannot be turned on while NPSP households are in use (NPSP
+still creates household accounts, or some are not yet adopted). The row says why;
+[Adopting Your NPSP Households](npsp-households.md#then-turn-on-household-upkeep) gives the
+steps.
+
 **The Household record type and the Households tab.** BarnCRM installs one Account record
 type, **Household**. Setup lists it on every install, because a package cannot leave out a
 record type it ships, but BarnCRM never gives it to anyone, so nobody is ever offered it when

@@ -12,8 +12,8 @@ It copies in one direction only, from gifts to Gift Transactions. It is separate
 [Opportunity Mirror](opportunity-mirror.md), which has its own setting. Each gift remembers its
 Gift Transaction in its **Gift Transaction ID**, so nothing is ever copied twice.
 
-The mirror works in runs: **Run Now**, and a nightly run at 1:35 AM in your organization's time
-zone. Saving a gift does not copy it at once. Nonprofit Cloud works out its donor summaries in
+The mirror works in runs: **Run Now**, and a step of [BarnCRM Nightly Jobs](nightly-jobs.md)
+at 1:35 AM in your organization's time zone, switched on while the mirror is on. Saving a gift does not copy it at once. Nonprofit Cloud works out its donor summaries in
 its own scheduled runs, so a gift copied at once would not show on a donor page any sooner.
 A run in which a gift could not be copied is not counted as completed, so the next run tries that
 gift again; the Error Log says why it failed.
@@ -77,8 +77,8 @@ Transaction Mirror page says the mirror is not available, and nothing else happe
    Designations** list view, and paste each fund's Gift Designation record ID (the 18-character
    code in its web address) into **Gift Designation ID**.
 5. Still in **Giving**, open **Gift Transaction Mirror** (the row shows only to someone with the
-   permission set). Click **Run Now** once, and **Schedule Nightly Run**, so the mirror catches
-   up every night. The page shows when the last run completed and what it did, and Health Check
+   permission set). Click **Run Now** once, and **Schedule Nightly Run**, which switches the mirror's step
+   on in [BarnCRM Nightly Jobs](nightly-jobs.md), so the mirror catches up every night. The page shows when the last run completed and what it did, and Health Check
    warns if two days pass without one.
 
 **Whose access the run uses.** A run reads and writes with the access of the person who started

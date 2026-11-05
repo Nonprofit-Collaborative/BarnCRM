@@ -38,14 +38,4 @@ public with sharing class TabAccessScheduler implements Schedulable {
     public static Boolean isScheduled() {
         return ScheduledJobSelector.isScheduled(JOB_NAME);
     }
-
-    /** The hourly check as Health Check's nightly jobs list sees it. */
-    public static NightlyJob nightlyJob() {
-        return new NamedNightlyJob(
-            System.Label.Core_HealthCheck_JobTabAccess,
-            JOB_NAME,
-            HOURLY_CRON,
-            new TabAccessScheduler()
-        );
-    }
 }

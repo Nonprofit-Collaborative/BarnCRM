@@ -1,5 +1,5 @@
 // Smoke test: three pages' help loads from the real packaged catalogs through the real store,
-// and every key those pages read comes back as text (ADR-NEXT help-text-json).
+// and every key those pages read comes back as text (ADR-0164 help-text-json).
 import { createHelpStore } from 'c/barnHelpCatalog';
 
 const fs = require('fs');

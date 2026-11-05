@@ -1,5 +1,5 @@
 /**
- * Tests for BarnHelp (ADR-NEXT help-text-json): help text by key from the BarnHelp_* static
+ * Tests for BarnHelp (ADR-0164 help-text-json): help text by key from the BarnHelp_* static
  * resources, with language fallback to English and empty text, never an exception, when a key,
  * resource or translation is missing.
  */

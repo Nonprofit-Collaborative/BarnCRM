@@ -100,7 +100,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 2 | Set **Opportunity mirror start date** to today and save. Reopen the page. | `Direction: Opportunities to Gifts. Won Opportunities closed on or after <today> become gifts.` |
 | 3 | Create a won Opportunity of 60, closed today, with Luis Garcia's account and Luis as primary contact. Click **Run Now** and wait a minute. | A gift of 60 appears on Luis Garcia's record. In **Gifts and Their Opportunities** its **Opportunity ID** names that Opportunity. |
 | 4 | Create a won Opportunity of 80 closed last month and click **Run Now**. | No gift of 80 is made. |
-| 5 | Click **Schedule Nightly Run**. | `Next nightly run: <date> 1:30 AM`. The button changes to **Stop Nightly Run**. |
+| 5 | Click **Schedule Nightly Run**. | `Next nightly run: <date> 1:30 AM`. The button changes to **Stop Nightly Run**. The mirror is now a switched-on step of [BarnCRM Nightly Jobs](../admin-guide/nightly-jobs.md), the one nightly run. |
 | 6 | Click **Stop Nightly Run** (undo). | `The nightly run is not scheduled.` The button changes back to **Schedule Nightly Run**. |
 
 **Cleanup:** set **Opportunity mirror direction** to **Off**; delete the 60 gift and the two Opportunities.
