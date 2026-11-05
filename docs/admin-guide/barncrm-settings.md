@@ -483,12 +483,11 @@ not done says **Not done yet** with a warning icon, and a **Check Again** button
 once you have made the change: when the change is there, the note goes. Otherwise the note is
 an instruction only, and it stays there after you make the change, because BarnCRM cannot tell.
 
-The General note has two parts. BarnCRM reads whether you hold **BarnCRM Metadata Admin**. It
-cannot read the Apex Settings switch (only Setup shows it), so it counts the switch as on once
-a Custom Metadata save has worked. Until then the note says so: turn the switch on if your
-BarnCRM is an installed package, save an entry on the **Custom Metadata** page, then select
-**Check Again**. Where BarnCRM was deployed as source, not installed as a package, the switch
-is not needed and the first save works without it.
+The General note only checks whether you hold **Manage BarnCRM Metadata** (BarnCRM Admin or
+BarnCRM Metadata Admin); a person who holds it sees no note. It does not check the Apex
+Settings switch **Deploy Metadata from Non-Certified Package Versions via Apex**, because
+Apex cannot read it. If BarnCRM is an installed package and that switch is off, a Custom
+Metadata save fails and says to turn it on; see [Custom metadata](custom-metadata.md#how-to-turn-it-on).
 Nothing on the note changes your org: you make the change in Setup yourself.
 
 Salesforce has no stable link to a single object, permission set or Lightning page, so for
@@ -496,7 +495,7 @@ those the button opens the list and the first step says which one to click.
 
 | Section | What to change in Setup | Open in Setup opens | Checked by BarnCRM |
 |---|---|---|---|
-| General | To save Custom Metadata entries in an installed package: turn on **Deploy Metadata from Non-Certified Package Versions via Apex**. The **BarnCRM Metadata Admin** permission it also needs is given on the Access page, under Extra Permissions | Apex Settings | Yes, with Check Again: the permission directly, the switch once a Custom Metadata save has worked |
+| General | To save Custom Metadata entries: hold **Manage BarnCRM Metadata**, which BarnCRM Admin and **BarnCRM Metadata Admin** carry. Assign one of those sets | Permission Sets | Yes, with Check Again: the permission directly (not the Apex Settings switch) |
 | Duplicate Matching | To review duplicates: keep the standard duplicate rules active. The **BarnCRM Duplicate Review** permission is given on the Access page, under Extra Permissions, to people with a Sales Cloud or Service Cloud license | Duplicate Rules | No: the Duplicates panel shows each rule as On or Off |
 | Rollups | Create the field a new rollup writes to before you build it | Object Manager (click the object, then Fields & Relationships, New) | No |
 | Error Log | Allow the org to send email, or no digest is sent (Access level: All email) | Deliverability | Yes, with Check Again |
