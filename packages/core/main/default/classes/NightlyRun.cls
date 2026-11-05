@@ -1,5 +1,5 @@
 /**
- * The nightly run (ADR-NEXT nightly-job-dispatcher, canonical model R-NJ1 to R-NJ6): scheduled
+ * The nightly run (ADR-0166 nightly-job-dispatcher, canonical model R-NJ1 to R-NJ6): scheduled
  * once, every day at midnight, it takes every step `NightlyJobs.steps()` lists, one at a time.
  *
  * Each link of the run is one short transaction, chained as a delayed queueable:

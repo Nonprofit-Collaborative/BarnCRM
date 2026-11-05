@@ -1,5 +1,5 @@
 /**
- * One step of BarnCRM's nightly run (ADR-NEXT nightly-job-dispatcher, canonical model R-NJ2):
+ * One step of BarnCRM's nightly run (ADR-0166 nightly-job-dispatcher, canonical model R-NJ2):
  * a key, a label, a time of day and the schedulable that does the work, run with no context.
  * Core builds its own steps in `NightlyJobs`; a module builds its own in its
  * `NightlyStepProvider`. Steps are built fresh each time they are asked for, so `active` reads

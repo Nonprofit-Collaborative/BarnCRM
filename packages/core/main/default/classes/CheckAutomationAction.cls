@@ -1,6 +1,6 @@
 /**
  * The Check BarnCRM Automation action: whether an organization's own flow should run now,
- * answering the same questions BarnCRM's trigger dispatcher asks (ADR-NEXT dispatcher errors and
+ * answering the same questions BarnCRM's trigger dispatcher asks (ADR-0165 dispatcher errors and
  * Automation Control). A flow calls it first and ends when Run is false.
  *
  * It answers false when the BarnCRM Automation Control setting that applies to the person saving

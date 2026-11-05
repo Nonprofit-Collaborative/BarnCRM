@@ -1,5 +1,5 @@
 /**
- * The BarnCRM Automation Control setting (ADR-NEXT dispatcher errors and Automation Control):
+ * The BarnCRM Automation Control setting (ADR-0165 dispatcher errors and Automation Control):
  * Pause All or Bypass for the person saving stops every BarnCRM automation that can be paused,
  * on a real Contact trigger, while an always-run rule still runs; the Check BarnCRM Automation
  * action gives an organization's own flow the same answer; and catching up never throws.

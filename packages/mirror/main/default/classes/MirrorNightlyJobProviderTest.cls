@@ -1,5 +1,5 @@
 /**
- * Mirror's steps of the nightly run (ADR-NEXT nightly-job-dispatcher): the Opportunity mirror's
+ * Mirror's steps of the nightly run (ADR-0166 nightly-job-dispatcher): the Opportunity mirror's
  * run is in tonight's run only while a direction is chosen, and its page switches it on and off.
  */
 @IsTest(testFor='ApexClass:MirrorNightlyJobProvider, ApexClass:OpportunityMirrorSchedulable')

@@ -55,7 +55,7 @@ public with sharing class AcknowledgmentScheduler implements Schedulable {
     }
 
     /**
-     * The send as a step of the nightly run (ADR-NEXT nightly-job-dispatcher): quarter to three,
+     * The send as a step of the nightly run (ADR-0166 nightly-job-dispatcher): quarter to three,
      * after the installment top up and the overdue pass, so a gift that arrived overnight has its
      * totals before the donor is thanked. Shipped off: it emails donors.
      */

@@ -1,6 +1,6 @@
 /**
  * The seam a dependent package uses to add its steps to BarnCRM's nightly run without Core
- * depending on it (ADR-NEXT nightly-job-dispatcher, the shape of ADR-0075 and ADR-0057). Core
+ * depending on it (ADR-0166 nightly-job-dispatcher, the shape of ADR-0075 and ADR-0057). Core
  * finds an implementation by class name with `Type.forName` in `NightlyJobs` and calls it only
  * when it is installed.
  */

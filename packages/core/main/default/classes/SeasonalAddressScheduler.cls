@@ -1,5 +1,5 @@
 /**
- * The seasonal address swap, a step of the nightly run at 0:30 (ADR-NEXT
+ * The seasonal address swap, a step of the nightly run at 0:30 (ADR-0166
  * nightly-job-dispatcher), which runs while the Seasonal Addresses switch on the Addresses page
  * of the BarnCRM Settings console is on.
  *

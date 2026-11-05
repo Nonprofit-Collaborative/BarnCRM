@@ -1,5 +1,5 @@
 /**
- * The nightly run itself (ADR-NEXT nightly-job-dispatcher, R-NJ2, R-NJ3, R-NJ6): each test
+ * The nightly run itself (ADR-0166 nightly-job-dispatcher, R-NJ2, R-NJ3, R-NJ6): each test
  * drives the links by hand, with chaining off and the platform's job count given, so it checks
  * what every link decides without waiting for any of them.
  */

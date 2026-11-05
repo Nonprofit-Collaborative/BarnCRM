@@ -3,7 +3,7 @@
   <deploymentStatus>Deployed</deploymentStatus>
   <description>
     One step of BarnCRM's nightly run, or the run itself: its on/off switch where it has one and
-    how it last ran (canonical model Section 29ZR, ADR-NEXT nightly-job-dispatcher). Name is the
+    how it last ran (canonical model Section 29ZR, ADR-0166 nightly-job-dispatcher). Name is the
     step's key. Written only by BarnCRM code in system mode. Private: BarnCRM Admin sees all rows.
   </description>
   <enableActivities>false</enableActivities>

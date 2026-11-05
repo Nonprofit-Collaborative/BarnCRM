@@ -25,7 +25,7 @@ public with sharing class GrantReminderScheduler implements Schedulable {
     }
 
     /**
-     * The job as a step of the nightly run (ADR-NEXT nightly-job-dispatcher): six in the
+     * The job as a step of the nightly run (ADR-0166 nightly-job-dispatcher): six in the
      * morning, before the working day.
      */
     public static NightlyStep step() {

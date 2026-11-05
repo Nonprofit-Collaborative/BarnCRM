@@ -1,7 +1,7 @@
 /**
  * The Seasonal Addresses switch on the Addresses page of BarnCRM Settings: saving it on makes
  * sure the nightly run is scheduled and puts the swap in tonight's run, saving it off leaves the
- * swap out (ADR-NEXT nightly-job-dispatcher), and neither doubles the schedule.
+ * swap out (ADR-0166 nightly-job-dispatcher), and neither doubles the schedule.
  *
  * An org may already have BarnCRM jobs scheduled, so every count is taken against what the org
  * held before the test changed anything, and the run's own test job is cleared first.

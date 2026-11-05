@@ -1,7 +1,7 @@
 /**
  * The nightly rollup run, and the two buttons on the Rollups page that turn it on and off.
  *
- * The run is a step of Core's one nightly run (ADR-NEXT nightly-job-dispatcher) at the hour the
+ * The run is a step of Core's one nightly run (ADR-0166 nightly-job-dispatcher) at the hour the
  * Time of the Nightly Run setting holds; the buttons switch the step on and off. The switch is an
  * administrator's, not Setup's: it lives in the BarnCRM Settings console.
  */

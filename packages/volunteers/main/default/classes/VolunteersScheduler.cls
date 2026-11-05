@@ -36,7 +36,7 @@ public with sharing class VolunteersScheduler implements Schedulable {
     }
 
     /**
-     * The job as a step of the nightly run (ADR-NEXT nightly-job-dispatcher): three in the
+     * The job as a step of the nightly run (ADR-0166 nightly-job-dispatcher): three in the
      * morning, after the 2:00 AM rollups, before the day's sign-ups.
      */
     public static NightlyStep step() {

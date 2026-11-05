@@ -1,6 +1,6 @@
 /**
  * The error digest panel (C-23): switching the digest on and off as a step of the nightly run
- * (ADR-NEXT nightly-job-dispatcher), sending now, and that only an administrator can do either.
+ * (ADR-0166 nightly-job-dispatcher), sending now, and that only an administrator can do either.
  */
 @IsTest(testFor='ApexClass:ErrorDigestController, ApexClass:ErrorDigestScheduler')
 private class ErrorDigestControllerTest {

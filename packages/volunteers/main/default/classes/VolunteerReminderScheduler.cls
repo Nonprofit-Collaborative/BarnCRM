@@ -25,7 +25,7 @@ public with sharing class VolunteerReminderScheduler implements Schedulable {
     }
 
     /**
-     * The job as a step of the nightly run (ADR-NEXT nightly-job-dispatcher): seven in the
+     * The job as a step of the nightly run (ADR-0166 nightly-job-dispatcher): seven in the
      * morning, after the 3:00 AM shift run has created the day's shifts.
      */
     public static NightlyStep step() {

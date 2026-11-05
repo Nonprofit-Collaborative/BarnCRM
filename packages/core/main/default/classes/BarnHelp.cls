@@ -1,5 +1,5 @@
 /**
- * Help and guidance text for Apex, from the packaged JSON catalogs (ADR-NEXT help-text-json).
+ * Help and guidance text for Apex, from the packaged JSON catalogs (ADR-0164 help-text-json).
  *
  * Each package ships its help prose as one static resource, BarnHelp_<Package>, shaped
  * { "languages": ["en"], "texts": { "<key>": "<text>" } }, keyed by the API name the text had as

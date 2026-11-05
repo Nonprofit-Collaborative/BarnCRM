@@ -1,6 +1,6 @@
 /**
  * The Automation page manages the BarnCRM Automation Control rows, an org's own flows and Catch
- * Up Now (canonical model R-A8, ADR-NEXT dispatcher errors and Automation Control 2.6 to 2.8).
+ * Up Now (canonical model R-A8, ADR-0165 dispatcher errors and Automation Control 2.6 to 2.8).
  */
 @IsTest(
     testFor='ApexClass:AutomationControlSettingService, ApexClass:AutomationControlController, ApexClass:AutomationSettingsWriter'

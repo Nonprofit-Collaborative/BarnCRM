@@ -903,7 +903,7 @@ dispatcher finds them by undoing the failed attempt to a savepoint and running t
 automations again over halves of the records; it refuses the records not yet cleared together
 when the transaction lacks the room to try again. A failure of an Always Runs automation still
 refuses every record in front of it. The failure is logged once, and each record refused while
-narrowing gets its own Error Log entry naming its row (ADR-NEXT dispatcher errors and
+narrowing gets its own Error Log entry naming its row (ADR-0165 dispatcher errors and
 Automation Control).
 **R-A7 Automation Control pauses or bypasses per org, profile or user.** The BarnCRM
 Automation Control setting holds Pause All and Bypass (both off by default) at the org default,
@@ -913,7 +913,7 @@ skipped, alongside the per-transaction bypass, the timed pause and the switch, w
 Every shipped flow template ends when either applies, and the Check BarnCRM Automation action
 answers an organization's own flow the same way, adding the timed pause and the switch of a
 flow listed as `Flow:` plus its API name. Resuming the timed pause queues the household
-catch-up and the waiting rollups; skipped saves are not replayed (ADR-NEXT dispatcher errors
+catch-up and the waiting rollups; skipped saves are not replayed (ADR-0165 dispatcher errors
 and Automation Control).
 **R-A8 The Automation page manages Automation Control, own flows and the catch-up.** Writes
 require Manage BarnCRM Settings and are logged as setting changes. The org default row is always
@@ -6201,7 +6201,7 @@ segment qualifies each custom name for the org. The built document adds `Email` 
 for people, a limit of 200 rows, and one more condition joined by AND to the template's logic:
 `Deceased__c` equals false for people, `Is_Organization__c` equals true for organizations
 (households are accounts too). A template's name is a custom label and its description is help
-text in the Giving help catalog (`BarnHelp_Giving`, ADR-NEXT help-text-json). The five
+text in the Giving help catalog (`BarnHelp_Giving`, ADR-0164 help-text-json). The five
 templates:
 
 | Key | Name | Filter |
@@ -12173,7 +12173,7 @@ or off. Nothing BarnCRM or NPSP stores is changed.
 ### Definition
 
 One step of BarnCRM's nightly run, or the run itself: its on/off switch where it has one, and
-what happened the last time it ran (architect review RT-10 and L-10, ADR-NEXT
+what happened the last time it ran (architect review RT-10 and L-10, ADR-0166
 nightly-job-dispatcher). The steps themselves are code, registered by Core and by each module;
 a row exists only to remember a switch or a result.
 
@@ -12592,9 +12592,9 @@ mirrors the primary member).
 | 0.16 | 2026-11-02 | Logic Models L-06 (ADR-0163 `0163-funders-reporting-links.md`). `Grant_Requirement__c` (29ZI) gains Logic Model Outcome (`Outcome_Id__c`, Text(18)), a Logic Models element named by record identifier, with rule R-GQ6. Neither module references the other. |
 | 0.16 | 2026-11-02 | Funders F-06 (ADR-0163 `0163-funders-reporting-links.md`). New Section 29ZO Funder Report Template (`Funder_Report_Template__c` and the shipped `Funder_Report_Template_Default__mdt`), rules R-FT1 to R-FT3. |
 | 0.16 | 2026-11-02 | Funders F-07 (ADR-0163 `0163-funders-reporting-links.md`). Grant (29ZH) gains rule R-GN9, the board dashboard (revenue mix, concentration, restricted balances), read from grants and, by describe, Giving and the F-03 ledger; no new object or field. |
-| v1.0 | 2026-11-04 | One nightly job dispatcher (architect review RT-10, L-10, ADR-NEXT nightly-job-dispatcher). New Core object Nightly Job (`Nightly_Job__c`, 29ZR) with rules R-NJ1 to R-NJ7: one nightly schedule runs every step in sequence, each step keeping its switch and last result; about 19 separate scheduled jobs are replaced and adopted on upgrade. R-SU2 and R-IN5 read the nightly run instead of their own jobs. |
+| v1.0 | 2026-11-04 | One nightly job dispatcher (architect review RT-10, L-10, ADR-0166 nightly-job-dispatcher). New Core object Nightly Job (`Nightly_Job__c`, 29ZR) with rules R-NJ1 to R-NJ7: one nightly schedule runs every step in sequence, each step keeping its switch and last result; about 19 separate scheduled jobs are replaced and adopted on upgrade. R-SU2 and R-IN5 read the nightly run instead of their own jobs. |
 | v1.0 | 2026-11-04 | Record retention (architect review L-08). `BarnCRM_Settings__c` gains `Merge_Journal_Retention_Days__c` (365), `Setting_Change_Retention_Days__c` (730), `Import_History_Retention_Days__c` (365) and `Field_Utilization_Retention_Days__c` (730). New rule R-NJ8 (the Record Cleanup step); R-S2 and R-FU7 amended. No object added. |
-| 0.17 | 2026-11-04 | Dispatcher error contract (RT-05, ADR-NEXT dispatcher errors and Automation Control). Section 10 gains rule R-A6: a failure refuses only its own records, the rest of the save goes ahead. No object or field added. |
+| 0.17 | 2026-11-04 | Dispatcher error contract (RT-05, ADR-0165 dispatcher errors and Automation Control). Section 10 gains rule R-A6: a failure refuses only its own records, the rest of the save goes ahead. No object or field added. |
 | 0.17 | 2026-11-04 | BarnCRM Automation Control (RT-13, same ADR). New hierarchy custom setting `BarnCRM_Automation_Control__c` with `Pause_All__c` and `Bypass__c` (Section 10, rule R-A7), read by the dispatcher, every shipped flow template and the Check BarnCRM Automation action. |
 | 0.17 | 2026-11-04 | Automation page manages Automation Control (RT-13, same ADR, decisions 2.6 to 2.8). Section 10 gains rule R-A8: org, profile and user rows edited in the console, an org's own flows listed as `Flow:` switch rows, and Catch Up Now. No object or field added. |
 | 0.17 | 2026-11-04 | Household Upkeep and NPSP (RT-04). Household Adoption (Section 29ZQ) gains rule R-HA6: Household Upkeep cannot be turned on while NPSP households are in use, detected by describe. No object or field added. |

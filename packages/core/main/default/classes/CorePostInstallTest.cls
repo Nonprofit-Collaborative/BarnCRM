@@ -410,7 +410,7 @@ private class CorePostInstallTest {
         }
     }
 
-    /** The nightly run's schedule, which does the swap (ADR-NEXT nightly-job-dispatcher). */
+    /** The nightly run's schedule, which does the swap (ADR-0166 nightly-job-dispatcher). */
     private static Integer swapJobs() {
         return [
             SELECT COUNT()

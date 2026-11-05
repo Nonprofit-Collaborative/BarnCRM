@@ -1,6 +1,6 @@
 /**
  * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the Funders step to the
- * one nightly run (ADR-NEXT nightly-job-dispatcher): the grant requirement reminder run (F-02).
+ * one nightly run (ADR-0166 nightly-job-dispatcher): the grant requirement reminder run (F-02).
  */
 @NamespaceAccessible
 public with sharing class FundersNightlyJobProvider implements NightlyStepProvider {

@@ -1,5 +1,5 @@
 /**
- * The Import row cleanup (R-IR5), a step of the nightly run at 1:15 (ADR-NEXT
+ * The Import row cleanup (R-IR5), a step of the nightly run at 1:15 (ADR-0166
  * nightly-job-dispatcher). When rows are deleted is the Import setting Delete Import Rows; Never
  * keeps them, so the step needs no switch of its own.
  *

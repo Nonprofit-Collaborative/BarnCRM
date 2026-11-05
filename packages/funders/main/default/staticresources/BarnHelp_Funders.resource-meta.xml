@@ -3,7 +3,7 @@
   <cacheControl>Public</cacheControl>
   <contentType>application/json</contentType>
   <description>
-    Funders help and guidance text in English, keyed by the former custom label name (ADR-NEXT
+    Funders help and guidance text in English, keyed by the former custom label name (ADR-0164
     help-text-json). Read by c/barnHelpText and the BarnHelp Apex class. Checked by
     scripts/ci/check-help-text.py.
   </description>

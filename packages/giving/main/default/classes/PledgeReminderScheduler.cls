@@ -51,7 +51,7 @@ public with sharing class PledgeReminderScheduler implements Schedulable {
     }
 
     /**
-     * The reminders as a step of the nightly run (ADR-NEXT nightly-job-dispatcher): three
+     * The reminders as a step of the nightly run (ADR-0166 nightly-job-dispatcher): three
      * fifteen, after the installment overdue pass, so an installment that went overdue overnight
      * carries its status before the donor hears about it. Shipped off: it emails donors.
      */
