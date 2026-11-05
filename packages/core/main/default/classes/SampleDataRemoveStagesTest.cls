@@ -234,6 +234,94 @@ private class SampleDataRemoveStagesTest {
 		}
 	}
 
+	private static Address__c homeAddress(Id householdId, Id contactId, String street) {
+		return new Address__c(
+			Account__c = householdId,
+			Contact__c = contactId,
+			Type__c = 'Home',
+			Street__c = street,
+			City__c = 'Springfield',
+			State__c = 'IL',
+			Postal_Code__c = '62704',
+			Country__c = 'US'
+		);
+	}
+
+	@IsTest
+	static void testRemovalDeletesSampleAddressesAndKeepsAnAdministratorsOwn() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			loadTwoHundredHouseholds();
+			Account sampleHousehold = [
+				SELECT Id
+				FROM Account
+				WHERE Sample_Data__c = TRUE AND Sample_Data_Key__c = 'H0'
+				LIMIT 1
+			];
+			Contact samplePerson = [
+				SELECT Id
+				FROM Contact
+				WHERE Sample_Data__c = TRUE
+				LIMIT 1
+			];
+			Account ownHousehold = new Account(Name = 'A real household');
+			insert ownHousehold;
+			Contact ownPerson = new Contact(LastName = 'Real', AccountId = ownHousehold.Id);
+			insert ownPerson;
+			insert new List<Address__c>{
+				homeAddress(sampleHousehold.Id, null, '1 Sample Household Way'),
+				homeAddress(null, samplePerson.Id, '2 Sample Person Way'),
+				homeAddress(null, ownPerson.Id, '3 Administrator Way')
+			};
+
+			System.assertEquals(
+				2,
+				[
+					SELECT COUNT()
+					FROM Address__c
+					WHERE Street__c IN ('1 Sample Household Way', '2 Sample Person Way')
+				],
+				'both sample addresses exist before removal'
+			);
+			SampleDataRemoveStages stages = new SampleDataRemoveStages();
+			Integer count = stages.stageCount();
+			Test.startTest();
+			for (Integer stage = 0; stage < count; stage++) {
+				stages.runStage(stage);
+			}
+			Test.stopTest();
+
+			System.assertEquals(0, [SELECT COUNT() FROM Account WHERE Sample_Data__c = TRUE]);
+			System.assertEquals(
+				0,
+				[
+					SELECT COUNT()
+					FROM Address__c
+					WHERE Account__c = NULL AND Contact__c = NULL AND Person_Account__c = NULL
+				],
+				'no address is left with no owner'
+			);
+			System.assertEquals(
+				0,
+				[
+					SELECT COUNT()
+					FROM Address__c
+					WHERE Street__c IN ('1 Sample Household Way', '2 Sample Person Way')
+				],
+				'the sample household and person addresses are gone'
+			);
+			System.assertEquals(
+				1,
+				[SELECT COUNT() FROM Address__c WHERE Street__c = '3 Administrator Way'],
+				'an address on a person the admin entered is not touched'
+			);
+			System.assertEquals(
+				0,
+				new SampleDataSelector().getSampleAddressIds().size(),
+				'nothing is left to find'
+			);
+		}
+	}
+
 	@IsTest
 	static void testATestContextRunsTheFirstStageOnly() {
 		System.runAs(TestUsers.adminWithInstalledModules()) {
