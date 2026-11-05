@@ -13,11 +13,19 @@
   border-radius: var(--slds-g-radius-border-2, 0.25rem);
   padding: var(--slds-g-spacing-2, 0.5rem);
   background-color: var(--slds-g-color-surface-container-1, #fff);
-  cursor: grab;
-  touch-action: pan-y;
 }
 
-.split-tile:focus {
+/* The drag handle: the one stop that picks the tile up; the checkbox and menu stay their own. */
+.split-handle {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--slds-g-sizing-9, 2rem);
+  cursor: grab;
+  touch-action: pan-y;
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+}
+
+.split-handle:focus-visible {
   outline: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-border-accent-1, #0176d3);
   outline-offset: 2px;
 }

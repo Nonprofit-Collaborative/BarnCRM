@@ -169,7 +169,8 @@ Setup. The section lists:
 To add one, choose **Profile** or **User** under **Add a Profile or User**, pick the profile or
 the person, and select **Add**. The new row starts with **Bypass** ticked, the usual reason to
 add one; change either box at any time. Each box saves as soon as you click it, and every
-change is recorded with your name and the value before, like the switches below. **Remove**
+change is recorded with your name and the value before, like the switches below (the
+organization's row is recorded as "Automation Control: Whole Organization"). **Remove**
 deletes the row, so that profile or person follows the organization's row again.
 
 A profile or user row replaces the organization's row for those people, both boxes together.

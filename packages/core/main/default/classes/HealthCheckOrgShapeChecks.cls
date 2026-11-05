@@ -61,6 +61,40 @@ public with sharing class HealthCheckOrgShapeChecks {
 		}
 	}
 
+	/** Household Upkeep is on while NPSP households are still in use. */
+	public class NpspUpkeepOverlapCheck implements HealthCheckService.Check {
+		public HealthCheckService.Finding run() {
+			return npspUpkeepOverlapFinding();
+		}
+	}
+
+	/**
+	 * Household Upkeep was switched on, and NPSP households came into use afterwards (NPSP
+	 * installed, or its Household Account model chosen). Turning Upkeep on is refused while
+	 * NPSP households are in use, but nothing re-checks later, so both packages would make
+	 * a household for the same person. A warning: the fix is to adopt the households or
+	 * change NPSP's Account Model, both done on the adoption panel's page (General).
+	 */
+	private static HealthCheckService.Finding npspUpkeepOverlapFinding() {
+		if (
+			!FeatureSwitchService.isOn(FeatureSwitchService.HOUSEHOLD_UPKEEP) ||
+			!NpspHouseholdSource.householdsInUse()
+		) {
+			return null;
+		}
+		return new HealthCheckService.Finding(
+				'npsp_upkeep_overlap',
+				System.Label.Core_HealthCheck_NpspUpkeepOverlapTitle,
+				BarnHelp.text('Core', 'Core_HealthCheck_NpspUpkeepOverlapDetail'),
+				HealthCheckService.SEVERITY_WARNING,
+				HealthCheckService.CATEGORY_SETTINGS
+			)
+			.withFix(
+				System.Label.Core_HealthCheck_NpspUpkeepOverlapFix,
+				HealthCheckService.SECTION_GENERAL
+			);
+	}
+
 	/** How many households here are already the Nonprofit Cloud native ones. */
 	public class NativeHouseholdsCheck implements HealthCheckService.Check {
 		public HealthCheckService.Finding run() {

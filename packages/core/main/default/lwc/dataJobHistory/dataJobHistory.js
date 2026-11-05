@@ -394,12 +394,15 @@ export default class DataJobHistory extends NavigationMixin(LightningElement) {
       { key: 'people', label: IMPORT_CONFIRM_PEOPLE, value: view.people || 0 },
       { key: 'households', label: IMPORT_CONFIRM_HOUSEHOLDS, value: view.households || 0 },
       { key: 'organizations', label: IMPORT_CONFIRM_ORGANIZATIONS, value: view.organizations || 0 },
-      // An installed module's own records, such as gifts, each under the org's own label.
-      ...(view.others || []).map((other) => ({
-        key: `other-${other.objectName}`,
-        label: other.label,
-        value: other.count || 0
-      })),
+      // An installed module's own records, such as gifts, each under the org's own label; one
+      // this import made none of is left out.
+      ...(view.others || [])
+        .filter((other) => other.count > 0)
+        .map((other) => ({
+          key: `other-${other.objectName}`,
+          label: other.label,
+          value: other.count
+        })),
       { key: 'updates', label: IMPORT_CONFIRM_UPDATES, value: view.updates || 0 }
     ];
   }

@@ -84,7 +84,7 @@ public without sharing class RecordRetentionBatch implements Database.Batchable<
 		Database.executeBatch(new RecordRetentionBatch(SETTING_CHANGES), CHUNK_SIZE);
 	}
 
-	/** The step: twenty past one, after the import row cleanup at 1:15. No switch. */
+	/** The step: twenty past one. No switch. The import row cleanup is its pass 7. */
 	public static NightlyStep step() {
 		return new NightlyStep(
 			JOB_NAME,

@@ -157,19 +157,25 @@
                                                 <li
                                                     key={member.personId}
                                                     class={member.tileClass}
-                                                    data-drag-id={member.personId}
-                                                    data-drag-label={member.name}
-                                                    tabindex="0"
-                                                    aria-describedby="split-drag-help"
-                                                    onpointerdown={handleDragPointerDown}
-                                                    onkeydown={handleDragKeyDown}
                                                 >
                                                     <div class="slds-grid slds-grid_vertical-align-center">
-                                                        <lightning-icon
-                                                            icon-name="utility:drag_and_drop"
-                                                            size="x-small"
+                                                        <span
                                                             class="slds-var-m-right_x-small split-handle"
-                                                        ></lightning-icon>
+                                                            role="button"
+                                                            tabindex="0"
+                                                            title={dragHelp}
+                                                            aria-label={member.name}
+                                                            aria-describedby="split-drag-help"
+                                                            data-drag-id={member.personId}
+                                                            data-drag-label={member.name}
+                                                            onpointerdown={handleDragPointerDown}
+                                                            onkeydown={handleDragKeyDown}
+                                                        >
+                                                            <lightning-icon
+                                                                icon-name="utility:drag_and_drop"
+                                                                size="x-small"
+                                                            ></lightning-icon>
+                                                        </span>
                                                         <div class="slds-col">
                                                             <lightning-input
                                                                 type="checkbox"

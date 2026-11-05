@@ -495,6 +495,12 @@ public with sharing class HealthCheckService {
 		);
 		steps.add(
 			new CheckStep(
+				'npsp_upkeep_overlap',
+				new HealthCheckOrgShapeChecks.NpspUpkeepOverlapCheck()
+			)
+		);
+		steps.add(
+			new CheckStep(
 				'native_households',
 				new HealthCheckOrgShapeChecks.NativeHouseholdsCheck()
 			)

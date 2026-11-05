@@ -492,12 +492,18 @@ describe('c-household-merge-split', () => {
       );
     });
 
-    it('marks every tile as draggable by pointer and keyboard', async () => {
+    it('puts the drag on a handle, one drag stop beside the checkbox and menu', async () => {
       const element = await openOn('Household', true);
-      const tile = element.shadowRoot.querySelector('[data-drag-id]');
+      const handle = element.shadowRoot.querySelector('[data-drag-id]');
 
-      expect(tile.getAttribute('tabindex')).toBe('0');
-      expect(tile.getAttribute('aria-describedby')).toBeTruthy();
+      expect(handle.tagName).toBe('SPAN');
+      expect(handle.getAttribute('role')).toBe('button');
+      expect(handle.getAttribute('tabindex')).toBe('0');
+      expect(handle.getAttribute('aria-label')).toBe(handle.dataset.dragLabel);
+      expect(handle.getAttribute('aria-describedby')).toBeTruthy();
+      const tile = handle.closest('li');
+      expect(tile.getAttribute('tabindex')).toBeNull();
+      expect(tile.hasAttribute('data-drag-id')).toBe(false);
       expect(element.shadowRoot.querySelector('[aria-live="polite"]')).not.toBeNull();
     });
 
