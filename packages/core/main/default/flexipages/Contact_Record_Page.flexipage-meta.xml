@@ -427,6 +427,12 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentName>recordGlance</componentName>
+        <identifier>recordGlance</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>runtime_sales_merge:mergeCandidatesPreviewCard</componentName>
         <identifier>runtime_sales_merge_mergeCandidatesPreviewCard</identifier>
       </componentInstance>
