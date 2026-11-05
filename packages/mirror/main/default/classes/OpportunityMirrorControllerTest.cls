@@ -369,7 +369,7 @@ private class OpportunityMirrorControllerTest {
 			Test.startTest();
 			System.runAs(admin) {
 				Assert.areEqual(
-					Label.Mirror_OpportunityMirror_CopyAgainGiftsOnly,
+					BarnHelp.text('Mirror', 'Mirror_OpportunityMirror_CopyAgainGiftsOnly'),
 					refusalOf(new Action('copyAgain')),
 					'A gift is never changed from its Opportunity.'
 				);

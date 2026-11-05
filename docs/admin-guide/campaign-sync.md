@@ -29,7 +29,7 @@ Campaign's own money totals come from Opportunities, not from gifts, so they sta
 unless your organization also mirrors gifts to Opportunities.
 
 Campaign sync never deletes a Campaign you have. Deleting an appeal leaves its Campaign,
-and its members, where they are. The one exception is a Campaign that **Sync all appeals**
+and its members, where they are. The one exception is a Campaign that **Sync All Appeals**
 created a moment earlier and then could not link to its appeal (see Common mistakes): it is
 removed again, so the next run does not leave a second one beside it.
 
@@ -44,7 +44,7 @@ Campaigns, and the Campaign sync page says so.
 2. Open **BarnCRM Settings**, choose **Giving**, and switch on **Copy appeals to
    Campaigns**.
 3. Still in **Giving**, open **Campaign Sync**. It shows how many appeals have a Campaign.
-   It counts up to 10,000 appeals; past that a number reads `10000+`. Click **Sync all appeals** once, so the appeals you already had get their Campaigns.
+   It counts up to 10,000 appeals; past that a number reads `10000+`. Click **Sync All Appeals** once, so the appeals you already had get their Campaigns.
 
 **Who gets a Campaign when they save an appeal.** The Campaign is created with the access of
 the person saving the appeal. Salesforce only lets someone create Campaigns when their user
@@ -55,9 +55,9 @@ appeals**. Choose one:
 
 - tick **Marketing User** for the people who create appeals, and give them Campaign create
   and edit access; or
-- leave their access as it is, and click **Sync all appeals** after a batch of new appeals.
+- leave their access as it is, and click **Sync All Appeals** after a batch of new appeals.
 
-Clicking **Sync all appeals** needs the Manage BarnCRM Settings permission (the BarnCRM
+Clicking **Sync All Appeals** needs the Manage BarnCRM Settings permission (the BarnCRM
 Admin permission set has it) as well as Campaign access.
 
 **Two switches, one of them in charge.** **Copy appeals to campaigns** in BarnCRM Settings
@@ -70,7 +70,7 @@ appeals** follows **Copy appeals to campaigns** alone.
 **Very large saves.** When one save holds so many appeals that copying them would push it
 past Salesforce's limits, for example a data load of thousands of appeals from Apex or a
 tool that sends them in one transaction, the appeals save without their Campaigns and one
-Warning says so. Click **Sync all appeals** afterwards. A load that sends 200 rows at a
+Warning says so. Click **Sync All Appeals** afterwards. A load that sends 200 rows at a
 time, as Data Loader does by default, is copied as usual.
 
 ## A Five-Minute Walkthrough
@@ -80,7 +80,7 @@ sync switched on as above.
 
 1. Open **BarnCRM Settings**, **Giving**, **Campaign Sync**. Note the numbers: for
    example `0 of 6 appeals have a Campaign.`
-2. Click **Sync all appeals**. The page says the sync has started. Wait a minute and reload
+2. Click **Sync All Appeals**. The page says the sync has started. Wait a minute and reload
    the page: every appeal now has a Campaign.
 3. Open the **Appeals** tab and click **New**. Name it `Giving Tuesday`, set a **Goal** of
    5,000 and a **Start Date**, and save.
@@ -101,7 +101,7 @@ it cannot create Campaigns (see How to turn it on). The Error Log has one Warnin
 person creates appeals; later edits by the same person are skipped without a new Warning, so
 the log does not fill up. Otherwise a rule on Campaign refused it: a validation rule or a
 required field your organization added to Campaign. The Error Log has a Warning naming the
-appeal and what Salesforce said. Fix the cause, then click **Sync all appeals**.
+appeal and what Salesforce said. Fix the cause, then click **Sync All Appeals**.
 
 **Sync all appeals made a Campaign but the appeal still has none.** The Campaign was made,
 but the appeal itself could not be saved with its Campaign ID: a rule on Appeal refused it,
@@ -112,7 +112,7 @@ left behind: delete it, or paste its ID onto the appeal once the cause is fixed.
 
 **A child appeal's Campaign has no Parent Campaign.** When a parent appeal and its child are
 saved together and the parent's Campaign is refused, the child's Campaign is made without a
-parent. Fix what refused the parent's Campaign, then click **Sync all appeals**: it puts
+parent. Fix what refused the parent's Campaign, then click **Sync All Appeals**: it puts
 every child Campaign under its parent's.
 
 **Editing a copied field on the Campaign.** The next time the appeal changes, its values

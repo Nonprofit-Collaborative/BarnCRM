@@ -139,7 +139,9 @@ public with sharing class AccountingExportService {
 		}
 		ExportFile again = build(fromDate, toDate, null, paymentMethod, onlyUnposted);
 		if (again.digest == null || again.digest != downloadedDigest) {
-			throw new ExportException(Label.Mirror_AccountingExport_ChangedSinceDownload);
+			throw new ExportException(
+				BarnHelp.text('Mirror', 'Mirror_AccountingExport_ChangedSinceDownload')
+			);
 		}
 		try {
 			return GiftPostingService.markPosted(again.giftIds);

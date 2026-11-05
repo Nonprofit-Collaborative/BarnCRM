@@ -9,9 +9,9 @@ import counts from '@salesforce/label/c.Mirror_CampaignSync_Counts';
 import noCampaignAccess from '@salesforce/label/c.Mirror_CampaignSync_NoCampaignAccess';
 import noManagePermission from '@salesforce/label/c.Mirror_CampaignSync_NoManagePermission';
 import syncAllLabel from '@salesforce/label/c.Mirror_CampaignSync_SyncAll';
-import running from '@salesforce/label/c.Mirror_CampaignSync_Running';
 import errorFailed from '@salesforce/label/c.Mirror_CampaignSync_ErrorFailed';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { iconFor } from 'c/barnIcons';
 
 /**
  * The Campaign sync page (feature X-02). The controller decides what the org and the person
@@ -64,8 +64,12 @@ export default class CampaignSync extends LightningElement {
     noCampaignAccess,
     noManagePermission,
     syncAll: syncAllLabel,
-    running
+    get running() {
+      return helpText('Mirror', 'Mirror_CampaignSync_Running');
+    }
   };
+
+  icons = { campaignSync: iconFor('Campaign_Sync') };
 
   status;
   working = false;
@@ -112,6 +116,14 @@ export default class CampaignSync extends LightningElement {
     const linked = `${this.status.linkedCount}${this.status.linkedCountCapped ? '+' : ''}`;
     const appeals = `${this.status.appealCount}${this.status.appealCountCapped ? '+' : ''}`;
     return counts.replace('{0}', linked).replace('{1}', appeals);
+  }
+
+  get linkedCount() {
+    return this.status.linkedCount;
+  }
+
+  get appealCount() {
+    return this.status.appealCount;
   }
 
   get noAccessShown() {

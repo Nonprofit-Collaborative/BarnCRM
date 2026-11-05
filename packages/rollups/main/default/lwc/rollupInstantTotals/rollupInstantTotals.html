@@ -7,17 +7,17 @@
                 <p class="slds-var-m-bottom_x-small" data-id="intro">{labels.intro}</p>
             </template>
             <template lwc:if={error}>
-                <p class="slds-text-color_error" role="alert" data-id="error">{error}</p>
+                <c-barn-notice class="slds-var-m-bottom_x-small" variant="error" message={error} data-id="error"></c-barn-notice>
             </template>
             <template lwc:if={notice}>
-                <p role="status" data-id="notice">{notice}</p>
+                <c-barn-notice class="slds-var-m-bottom_x-small" variant="success" message={notice} data-id="notice"></c-barn-notice>
             </template>
             <template for:each={rows} for:item="row">
                 <div key={row.key} class="slds-var-p-vertical_x-small" data-object={row.objectApiName}>
                     <template lwc:if={showIntro}>
                         <p class="slds-text-title_bold">{row.label}</p>
                     </template>
-                    <p data-id="status">{row.statusText}</p>
+                    <c-barn-status-badge status={row.tone} label={row.statusText} data-id="status"></c-barn-status-badge>
                     <template lwc:if={row.countText}>
                         <p class="slds-text-color_weak" data-id="count">{row.countText}</p>
                     </template>
@@ -55,6 +55,7 @@
                     <template lwc:if={row.showSetup}>
                         <div class="slds-box slds-var-m-top_small" data-id="setup">
                             <h3 class="slds-text-heading_small">{setupTitle}</h3>
+                            <c-barn-notice class="slds-var-m-top_x-small" variant="info" message={flowOption} data-id="flow-option"></c-barn-notice>
                             <ol class="slds-list_ordered slds-var-m-vertical_small">
                                 <template for:each={setupSteps} for:item="step">
                                     <li key={step.key}>{step.text}</li>

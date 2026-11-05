@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Record_Object__c</fullName>
   <description>
-    The object a Record row picks from, whose record types a Record Type List row lists, or whose fields a Field List row lists, by API name without a namespace prefix.
+    The object a Record row picks from, whose record types a Record Type List row lists, or whose fields a Field List row lists, by API name without a namespace prefix. A Picklist From Field row names its source field here as Object.Field.
   </description>
   <externalId>false</externalId>
   <fieldManageability>DeveloperControlled</fieldManageability>

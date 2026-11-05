@@ -398,6 +398,11 @@ at something, you choose it:
 - **One record type**, such as **Record type for organizations**, is a dropdown of your active
   record types by the name you see in Setup, or **No record type** when there are none.
 - **A choice from a fixed list**, such as **Coexistence mode**, is a dropdown.
+- **A choice from another field's values**, such as **Gift Transaction mirror paid status**, is
+  a dropdown of the active values of that field in your org (here, Status on Gift Transaction),
+  so you pick instead of typing. If your org no longer lists the value you saved as active, the
+  dropdown still shows it and it keeps working until you choose another. In an org without the
+  field (no Nonprofit Cloud), the setting is a plain text box that shows its default.
 
 Every setting shows its default until you change it. A dropdown, a number or a text setting
 that has not been saved yet shows the value BarnCRM is already using (for example **Default

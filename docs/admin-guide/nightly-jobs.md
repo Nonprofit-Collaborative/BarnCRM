@@ -3,7 +3,8 @@
 ## What It Does
 
 BarnCRM does its regular overnight work in one nightly run. The run is one scheduled job,
-**BarnCRM Nightly Jobs**, that starts at midnight in your organization's time zone and takes
+**BarnCRM Nightly Jobs**, that starts at midnight in the time zone of the person who scheduled it (the panel's times are in
+that zone, written the way your Salesforce locale writes them) and takes
 each job in turn, one at a time, at its usual time or as soon as the job before it has
 finished, whichever is later. A job never starts while the one before it is still working, so
 the jobs never compete with each other for the platform's limits.

@@ -944,6 +944,113 @@ private class SettingsServiceTest {
 		}
 	}
 
+	private static void stubFieldPicklistRow(String source) {
+		SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+			new Setting_Definition__mdt(
+				DeveloperName = 'Address_Card_Fields',
+				MasterLabel = 'Address Card Fields',
+				Setting_Key__c = 'Address_Card_Fields__c',
+				Section__c = 'Addresses',
+				Module__c = 'Core',
+				Data_Type__c = SettingsService.PICKLIST_FROM_FIELD,
+				Record_Object__c = source,
+				Sort_Order__c = 1
+			)
+		};
+	}
+
+	@IsTest
+	static void aPicklistFromFieldTakesOnlyActiveValuesAndKeepsAStoredOneThatWentInactive() {
+		System.runAs(TestUsers.admin()) {
+			stubFieldPicklistRow('Account.Industry');
+			String active;
+			for (Schema.PicklistEntry entry : Account.Industry.getDescribe().getPicklistValues()) {
+				if (entry.isActive()) {
+					active = entry.getValue();
+					break;
+				}
+			}
+
+			Test.startTest();
+			String refused = refusalOf('Address_Card_Fields__c', 'Not An Industry Value');
+			String accepted = refusalOf('Address_Card_Fields__c', active);
+			Test.stopTest();
+
+			Assert.isTrue(
+				refused.endsWith(BarnHelp.text('Core', 'Core_Settings_InvalidValueError')),
+				'A value the field does not list as active is refused: ' + refused
+			);
+			Assert.isNull(accepted, 'An active value is accepted');
+			Assert.areEqual(
+				active,
+				BarnCRM_Settings__c.getOrgDefaults().Address_Card_Fields__c,
+				'Saved org-wide'
+			);
+			Assert.isNull(
+				refusalOf('Address_Card_Fields__c', active),
+				'The stored value saves again unchanged'
+			);
+		}
+	}
+
+	@IsTest
+	static void aPicklistFromFieldTheOrgLacksTakesAnyText() {
+		System.runAs(TestUsers.admin()) {
+			stubFieldPicklistRow('Not_An_Object__c.Status__c');
+
+			Test.startTest();
+			Assert.isNull(
+				SettingsService.activeFieldValues(SettingDefinitionSelector.getAll()[0]),
+				'No field, no choices'
+			);
+			String accepted = refusalOf('Address_Card_Fields__c', 'Anything');
+			Test.stopTest();
+
+			Assert.isNull(accepted, 'Any text saves while the field is absent');
+		}
+	}
+
+	@IsTest
+	static void aPicklistFromFieldSavesItsShownDefaultAndMatchesCaseExactly() {
+		System.runAs(TestUsers.admin()) {
+			SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>{
+				new Setting_Definition__mdt(
+					DeveloperName = 'Error_Digest_Frequency',
+					MasterLabel = 'Error Digest Frequency',
+					Setting_Key__c = 'Error_Digest_Frequency__c',
+					Section__c = 'Errors',
+					Module__c = 'Core',
+					Data_Type__c = SettingsService.PICKLIST_FROM_FIELD,
+					Record_Object__c = 'Account.Industry',
+					Sort_Order__c = 1
+				)
+			};
+			// A saved row with this setting blank: the console shows the declared default.
+			insert new BarnCRM_Settings__c(
+				SetupOwnerId = UserInfo.getOrganizationId(),
+				Error_Digest_Frequency__c = null
+			);
+			String active;
+			for (Schema.PicklistEntry entry : Account.Industry.getDescribe().getPicklistValues()) {
+				if (entry.isActive()) {
+					active = entry.getValue();
+					break;
+				}
+			}
+
+			Test.startTest();
+			String keptDefault = refusalOf('Error_Digest_Frequency__c', 'Daily');
+			String otherCase = refusalOf('Error_Digest_Frequency__c', active.toLowerCase());
+			Test.stopTest();
+
+			Assert.isNull(
+				keptDefault,
+				'The shown default saves although the field does not list it'
+			);
+			Assert.isNotNull(otherCase, 'An active value in another case is refused');
+		}
+	}
+
 	@IsTest
 	static void aFieldListTakesOnlyFieldsTheObjectOffersAndSavesOrgWide() {
 		System.runAs(TestUsers.admin()) {

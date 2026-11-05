@@ -68,7 +68,7 @@ describe('c-campaign-sync', () => {
   it('counts the appeals with a Campaign and offers Sync all appeals', async () => {
     const element = await mount(READY);
     expect(find(element, 'on')).not.toBeNull();
-    expect(find(element, 'counts').textContent).toBe('2 of 6 appeals have a Campaign.');
+    expect(find(element, 'counts').label).toBe('2 of 6 appeals have a Campaign.');
     expect(find(element, 'sync-all').disabled).toBe(false);
     expect(find(element, 'no-access')).toBeNull();
   });
@@ -81,7 +81,7 @@ describe('c-campaign-sync', () => {
       linkedCount: 2,
       linkedCountCapped: false
     });
-    expect(find(element, 'counts').textContent).toBe('2 of 10000+ appeals have a Campaign.');
+    expect(find(element, 'counts').label).toBe('2 of 10000+ appeals have a Campaign.');
   });
 
   it('says so, and offers nothing, where the org has no Campaigns', async () => {
@@ -123,7 +123,7 @@ describe('c-campaign-sync', () => {
     const element = await mount(READY);
     find(element, 'sync-all').click();
     await flush();
-    expect(find(element, 'error').textContent).toBe('Only someone with permission.');
+    expect(find(element, 'error').message).toBe('Only someone with permission.');
   });
 
   it('falls back to a plain message when loading fails without one', async () => {
@@ -131,6 +131,6 @@ describe('c-campaign-sync', () => {
     const element = createElement('c-campaign-sync', { is: CampaignSync });
     document.body.appendChild(element);
     await flush();
-    expect(find(element, 'error').textContent).toBe('Something went wrong.');
+    expect(find(element, 'error').message).toBe('Something went wrong.');
   });
 });

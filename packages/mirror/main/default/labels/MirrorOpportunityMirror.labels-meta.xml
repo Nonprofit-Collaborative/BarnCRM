@@ -385,14 +385,6 @@
     <value>A run is already in progress. Wait for it to finish, then try again.</value>
   </labels>
   <labels>
-    <fullName>Mirror_OpportunityMirror_CopyAgainGiftsOnly</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Page refusal: copy again needs Gifts to Opportunities</shortDescription>
-    <value>Copy these gifts again works only in Gifts to Opportunities: a gift is never changed from its Opportunity.</value>
-  </labels>
-  <labels>
     <fullName>Mirror_OpportunityMirror_NoLinkAccess</fullName>
     <categories>Mirror, Opportunity Mirror</categories>
     <language>en_US</language>
@@ -487,22 +479,6 @@
     <protected>false</protected>
     <shortDescription>Button: copy a range again</shortDescription>
     <value>Copy These Gifts Again</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_GiftSide</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Reconciliation: gift count and total</shortDescription>
-    <value>Gifts: {0}, total {1}</value>
-  </labels>
-  <labels>
-    <fullName>Mirror_OpportunityMirror_OpportunitySide</fullName>
-    <categories>Mirror, Opportunity Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Reconciliation: won Opportunity count and total</shortDescription>
-    <value>Won Opportunities: {0}, total {1}</value>
   </labels>
   <labels>
     <fullName>Mirror_OpportunityMirror_DifferenceCount</fullName>

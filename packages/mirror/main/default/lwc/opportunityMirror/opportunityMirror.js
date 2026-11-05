@@ -28,8 +28,6 @@ import fromDate from '@salesforce/label/c.Mirror_OpportunityMirror_FromDate';
 import toDate from '@salesforce/label/c.Mirror_OpportunityMirror_ToDate';
 import compareLabel from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCompare';
 import copyAgain from '@salesforce/label/c.Mirror_OpportunityMirror_CopyAgain';
-import giftSide from '@salesforce/label/c.Mirror_OpportunityMirror_GiftSide';
-import opportunitySide from '@salesforce/label/c.Mirror_OpportunityMirror_OpportunitySide';
 import noDifferences from '@salesforce/label/c.Core_AccessCompare_NoDifferences';
 import differenceCount from '@salesforce/label/c.Mirror_OpportunityMirror_DifferenceCount';
 import columnGift from '@salesforce/label/c.Giving_Section_Gift';
@@ -45,6 +43,7 @@ import lastRun from '@salesforce/label/c.Mirror_OpportunityMirror_LastRun';
 import noLastRun from '@salesforce/label/c.Mirror_OpportunityMirror_NoLastRun';
 import loading from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { iconFor } from 'c/barnIcons';
 
 const GIFTS_TO_OPPORTUNITIES = 'GiftsToOpportunities';
 const OFF = 'Off';
@@ -102,8 +101,14 @@ export default class OpportunityMirror extends LightningElement {
     fromDate,
     toDate,
     compare: compareLabel,
-    copyAgain
+    copyAgain,
+    columnGift,
+    columnGiftAmount,
+    columnOpportunity,
+    columnOpportunityAmount
   };
+
+  icons = { opportunityMirror: iconFor('Opportunity_Mirror') };
 
   columns = [
     {
@@ -196,12 +201,6 @@ export default class OpportunityMirror extends LightningElement {
     return this.working || (!this.loaded && !this.error);
   }
 
-  money(amount) {
-    return new Intl.NumberFormat(LOCALE, { style: 'currency', currency: CURRENCY }).format(
-      amount || 0
-    );
-  }
-
   /** A date the server sends as yyyy-mm-dd, in the viewer's locale, on that same day. */
   day(value) {
     return new Intl.DateTimeFormat(LOCALE, { dateStyle: 'medium', timeZone: 'UTC' }).format(
@@ -292,16 +291,13 @@ export default class OpportunityMirror extends LightningElement {
     return Boolean(this.comparison && this.comparison.differenceCount > 0);
   }
 
-  get giftSideText() {
-    return fill(giftSide, this.comparison.giftCount, this.money(this.comparison.giftTotal));
+  get currencyCode() {
+    return CURRENCY;
   }
 
-  get opportunitySideText() {
-    return fill(
-      opportunitySide,
-      this.comparison.opportunityCount,
-      this.money(this.comparison.opportunityTotal)
-    );
+  /** No differences is good news; any difference is a warning. */
+  get differenceVariant() {
+    return this.hasDifferences ? 'warning' : 'success';
   }
 
   get differenceText() {

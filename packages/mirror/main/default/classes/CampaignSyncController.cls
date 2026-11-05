@@ -83,7 +83,7 @@ public with sharing class CampaignSyncController {
 			return Label.Mirror_CampaignSync_NoCampaignAccess;
 		}
 		if (current.running) {
-			return Label.Mirror_CampaignSync_Running;
+			return BarnHelp.text('Mirror', 'Mirror_CampaignSync_Running');
 		}
 		return null;
 	}

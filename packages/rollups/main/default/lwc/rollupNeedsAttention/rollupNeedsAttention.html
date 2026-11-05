@@ -1,12 +1,32 @@
 <template>
     <template lwc:if={shown}>
-        <section class="slds-var-m-top_medium">
-            <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.title}</h2>
+        <section class="slds-var-m-horizontal_medium slds-var-m-bottom_medium" data-id="needs-attention">
+            <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">
+                {labels.title}
+                <template lwc:if={hasCount}>
+                    <c-barn-status-badge
+                        class="slds-var-m-left_x-small"
+                        status="warning"
+                        label={itemCountText}
+                        data-id="count"
+                    ></c-barn-status-badge>
+                </template>
+            </h2>
             <template lwc:if={error}>
-                <p class="slds-text-color_error" role="alert" data-id="error">{error}</p>
+                <c-barn-notice
+                    class="slds-var-m-bottom_x-small"
+                    variant="error"
+                    message={error}
+                    data-id="error"
+                ></c-barn-notice>
             </template>
             <template lwc:if={notice}>
-                <p role="status" data-id="notice">{notice}</p>
+                <c-barn-notice
+                    class="slds-var-m-bottom_x-small"
+                    variant="success"
+                    message={notice}
+                    data-id="notice"
+                ></c-barn-notice>
             </template>
             <template lwc:if={attention}>
                 <p data-id="waiting">{attention.waiting}</p>
@@ -20,12 +40,28 @@
                     ></lightning-button>
                 </template>
                 <template lwc:if={showNightlyOff}>
-                    <p class="slds-text-color_error" data-id="nightly-off">{labels.nightlyOff}</p>
+                    <c-barn-notice
+                        class="slds-var-m-vertical_x-small"
+                        variant="warning"
+                        message={labels.nightlyOff}
+                        data-id="nightly-off"
+                    ></c-barn-notice>
                 </template>
-                <p data-id="last-run">{attention.lastRun}</p>
+                <p class="slds-text-body_small slds-text-color_weak" data-id="last-run">{attention.lastRun}</p>
 
                 <h3 class="slds-text-title_bold slds-var-m-top_small">{labels.failedTitle}</h3>
                 <template lwc:if={hasFailed}>
+                    <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_x-small">
+                        <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+                            <c-barn-stat-tile
+                                label={labels.failedTitle}
+                                value={failedCount}
+                                bordered
+                                align="start"
+                                data-id="failed-count"
+                            ></c-barn-stat-tile>
+                        </div>
+                    </div>
                     <lightning-datatable
                         data-id="failed"
                         key-field="key"
@@ -53,7 +89,12 @@
                     </template>
                 </template>
                 <template lwc:else>
-                    <p data-id="nothing-failed">{labels.nothingFailed}</p>
+                    <c-barn-empty-state
+                        size="compact"
+                        illustration="all-clear"
+                        heading={labels.nothingFailed}
+                        data-id="nothing-failed"
+                    ></c-barn-empty-state>
                 </template>
             </template>
         </section>

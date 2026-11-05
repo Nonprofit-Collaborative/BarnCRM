@@ -12,10 +12,10 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Giving**, and open **Campaign Sync**. | The **Campaign Sync** card says `Campaign sync is off. Switch on Copy appeals to Campaigns in the Giving section of BarnCRM Settings, then come back to sync your appeals.` No **Sync all appeals** button shows. |
+| 1 | Open **BarnCRM Settings**, **Giving**, and open **Campaign Sync**. | The **Campaign Sync** card says `Campaign sync is off. Switch on Copy appeals to Campaigns in the Giving section of BarnCRM Settings, then come back to sync your appeals.` No **Sync All Appeals** button shows. |
 | 2 | In **Giving**, tick **Copy appeals to campaigns** and save. | The setting saves. |
-| 3 | Open **Campaign Sync** again. | `Campaign sync is on. Saving an appeal creates or updates its Campaign.` and `0 of 7 appeals have a Campaign.` **Sync all appeals** is enabled. |
-| 4 | Click **Sync all appeals**. | `Sync all appeals is running in the background. Reload this page in a minute to see new counts. Anything that could not be copied is in the Error Log.` |
+| 3 | Open **Campaign Sync** again. | `Campaign sync is on. Saving an appeal creates or updates its Campaign.` and `0 of 7 appeals have a Campaign.` **Sync All Appeals** is enabled. |
+| 4 | Click **Sync All Appeals**. | `Sync all appeals is running in the background. Reload this page in a minute to see new counts. Anything that could not be copied is in the Error Log.` |
 | 5 | Wait a minute and reload the page. | `7 of 7 appeals have a Campaign.` |
 | 6 | Open the App Launcher, search **Campaigns**, and open the list. | Seven Campaigns named after the appeals. **Spring Appeal** shows **Annual Fund** as its Parent Campaign. |
 | 7 | Open the **Appeals** tab and choose the **Appeals and Their Campaigns** list view. | Every appeal has a **Campaign ID** starting `701`. |
@@ -47,7 +47,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As read-only, open the App Launcher and search `Campaign Sync`. | No **Campaign Sync** item is found. |
-| 2 | As staff, open the **Campaign Sync** tab from the App Launcher. | The card shows `You cannot create and edit Campaigns, so appeals you save get no Campaign...` and `Only someone with the Manage BarnCRM Settings permission can sync all appeals.` **Sync all appeals** is disabled. |
+| 2 | As staff, open the **Campaign Sync** tab from the App Launcher. | The card shows `You cannot create and edit Campaigns, so appeals you save get no Campaign...` and `Only someone with the Manage BarnCRM Settings permission can sync all appeals.` **Sync All Appeals** is disabled. |
 | 3 | As admin, in **BarnCRM Settings**, **Giving**, untick **Copy appeals to campaigns** and save. | The setting saves. |
 | 4 | Change the **Goal** of `Giving Tuesday` to 9,000 and save. Reload its Campaign. | Expected Revenue is still 7,500. Every Campaign is still there. |
 | 5 | Tick **Copy appeals to campaigns** again and save `Giving Tuesday` once more. | The Campaign's Expected Revenue is 9,000. |
@@ -126,13 +126,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the App Launcher and the **Accounting Export** tab. | **Accounting Export** card with **From**, **To**, **Fund** (placeholder **All funds**), **Payment Method** (**All payment methods**), **Only gifts not yet posted** and **Download file**. |
-| 2 | Set **From** and **To** to the first and last day of last month. Click **Download file**. | `accounting-export-<from>-to-<to>.csv` downloads. The page says `<rows> rows from <gifts> gifts. Net total <amount>.` |
+| 1 | Open the App Launcher and the **Accounting Export** tab. | **Accounting Export** card with **From**, **To**, **Fund** (placeholder **All funds**), **Payment Method** (**All payment methods**), **Only gifts not yet posted** and **Download File**. |
+| 2 | Set **From** and **To** to the first and last day of last month. Click **Download File**. | `accounting-export-<from>-to-<to>.csv` downloads. The page says `<rows> rows from <gifts> gifts. Net total <amount>.` |
 | 3 | Open the file. | Header row: `Date,Gift Number,Original Gift,Donor,Fund,Accounting Code,Payment Method,Reference,Amount`. Every date is in the range, and Amount adds up to the net total. |
 | 4 | Choose **Building Fund** in **Fund** and download. | Every row says Building Fund, accounting code 4100. |
 | 5 | Also choose **Check** in **Payment Method** and download. | Only Check rows to Building Fund remain (or `No gifts in this range.`). |
 | 6 | Set a week next year and download. | No file. `No gifts in this range.` |
-| 7 | Clear **From** and click **Download file**. | `Choose a From date and a To date.` |
+| 7 | Clear **From** and click **Download File**. | `Choose a From date and a To date.` |
 | 8 | Set **To** before **From** and download. | `The To date is before the From date.` |
 
 **Cleanup:** None.
@@ -144,9 +144,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Choose **Building Fund** and download last month. | `To mark gifts posted, download the export for all funds: a gift split across funds would be locked when only part of it is in this file.` No **Mark these gifts posted** button. |
-| 2 | Clear **Fund** and download again. | **Mark these gifts posted** shows, with `Once this file is in your accounting system, mark its gifts posted. A posted gift cannot be changed or deleted.` |
-| 3 | Click **Mark these gifts posted**. | `Marked <n> gifts posted. Gifts already posted were left as they were.` The button goes away. |
+| 1 | Choose **Building Fund** and download last month. | `To mark gifts posted, download the export for all funds: a gift split across funds would be locked when only part of it is in this file.` No **Mark These Gifts Posted** button. |
+| 2 | Clear **Fund** and download again. | **Mark These Gifts Posted** shows, with `Once this file is in your accounting system, mark its gifts posted. A posted gift cannot be changed or deleted.` |
+| 3 | Click **Mark These Gifts Posted**. | `Marked <n> gifts posted. Gifts already posted were left as they were.` The button goes away. |
 | 4 | Open one gift from the file and change its amount. | Refused: `This gift has been posted to accounting, so its date, amount, donor, payment method, reference and funds cannot change and it cannot be deleted...` |
 | 5 | Tick **Only gifts not yet posted** and download last month. | `No gifts in this range.` |
 | 6 | On that gift's **Posting** card, enter a reason in **Why is this gift being unposted?** and click **Unpost** (undo). | `Unposted. The reason is in the Error Log. Mark it posted again after your next export.` |
@@ -163,7 +163,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 |---|---|---|
 | 1 | As read-only, search the App Launcher for `Accounting Export`. | No **Accounting Export** item is found. |
 | 2 | As staff, do the same. | No **Accounting Export** item is found. |
-| 3 | As admin, give staff **Accounting Export**. As staff, open the tab and download last month. | A file downloads, holding only the gifts staff can see. **Mark these gifts posted** shows, because the set includes Post Gifts. |
+| 3 | As admin, give staff **Accounting Export**. As staff, open the tab and download last month. | A file downloads, holding only the gifts staff can see. **Mark These Gifts Posted** shows, because the set includes Post Gifts. |
 
 **Cleanup:** remove **Accounting Export** from staff.
 
@@ -239,7 +239,7 @@ If step 1 answers `donor_not_found`, the API user cannot see contacts: see [Inbo
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In **Giving**, set **Gift Transaction mirror paid status** to a value that is not a Status of your Gift Transactions, the start date to the first of this month, the direction to **Gifts to Gift Transactions**, and save. Open **Gift Transaction Mirror**. | `The Gift Transaction mirror paid status, <value>, is not one of the active Status values ...` **Run Now** is disabled. |
-| 2 | Set the paid status back to your paid value (`Paid` in a standard org) and reopen the page. | `Direction: Gifts to Gift Transactions. Received gifts dated on or after <date> get a matching Gift Transaction with status <value>.` |
+| 2 | Set the paid status back to your paid value (`Paid` in a standard org; in an org with Nonprofit Cloud it is a dropdown of the active Status values, and a saved value Setup has since retired still shows in it) and reopen the page. | `Direction: Gifts to Gift Transactions. Received gifts dated on or after <date> get a matching Gift Transaction with status <value>.` |
 | 3 | On the **Funds** tab, choose **Funds and Their Gift Designations** and paste a Gift Designation's record ID into the default fund's **Gift Designation ID**. | Saved. |
 | 4 | Record a gift of 100 from Luis Garcia on **Quick Gift Entry**, dated today. On the page click **Run Now**, wait a minute and reload. | `Last completed run: started <time>. Gift Transaction mirror run: <n> Gift Transactions created, ...` with at least one designation written. The gift's **Gift Transaction ID** is filled in; that Gift Transaction has Original Amount 100, Transaction Date today and one designation of 100. |
 | 5 | Change the gift's amount to 150, click **Run Now**, wait and reload the Gift Transaction. | Original Amount 150. The designation is unchanged. |

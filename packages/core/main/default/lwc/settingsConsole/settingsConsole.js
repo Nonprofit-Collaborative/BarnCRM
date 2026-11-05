@@ -420,7 +420,12 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
       isText: setting.dataType === 'Text',
       isNumber: setting.dataType === 'Number',
       // A Record Type row is one choice from a list, so it is the same dropdown (ADR-0141).
-      isPicklist: setting.dataType === 'Picklist' || setting.dataType === 'RecordType',
+      // A Picklist From Field row is the same dropdown, of a field's active values; while the
+      // org lacks the field the server sends it as Text.
+      isPicklist:
+        setting.dataType === 'Picklist' ||
+        setting.dataType === 'RecordType' ||
+        setting.dataType === 'PicklistFromField',
       isDateTime: setting.dataType === 'DateTime',
       // A blank date and time is never an empty box with nothing said: it reads "Not set", and
       // the row's description says what that means for it.

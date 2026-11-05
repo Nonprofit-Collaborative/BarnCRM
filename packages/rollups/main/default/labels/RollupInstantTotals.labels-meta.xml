@@ -126,7 +126,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Instant totals: link that downloads the deploy zip</shortDescription>
-        <value>Download deploy package</value>
+        <value>Download Deploy Package</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_InstantDownloadRemoval</fullName>
@@ -134,7 +134,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Instant totals: link that downloads the removal zip</shortDescription>
-        <value>Download removal package</value>
+        <value>Download Removal Package</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_InstantSetupTitle</fullName>

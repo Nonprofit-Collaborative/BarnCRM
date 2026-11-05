@@ -8,11 +8,12 @@ Affiliation**.
 
 Before you start: open the **BarnCRM** app. Adding, changing and removing these needs the Team
 Member, Coordinator, Fundraising Staff or Admin role. The **Relationships** card is on every
-person; the **Affiliations** card is on every person and organization.
+person; the **Affiliations** card is on every person and organization. Both are on the
+record's **Connections** tab.
 
 ## To Add a Relationship
 
-1. Open the person. Find the **Relationships** card.
+1. Open the person and click the **Connections** tab. Find the **Relationships** card.
 2. Click **Add Relationship**. The **New Relationship** form opens.
 3. In **Related Person**, choose the other person.
 4. Choose a **Type**: what the other person is to this person. Choose from Spouse, Partner,
@@ -51,7 +52,8 @@ ended, use **End It** instead, so the history stays.
 
 ## To Add an Affiliation
 
-1. Open the person (or the organization). Find the **Affiliations** card.
+1. Open the person (or the organization) and click the **Connections** tab. Find the
+   **Affiliations** card.
 2. Click **Add Affiliation**. The **New Affiliation** form opens.
 3. Choose the **Organization** (or, on an organization, the **Person**).
 4. Fill in **Role** in your own words, for example Board chair.

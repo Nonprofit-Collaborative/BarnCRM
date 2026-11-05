@@ -43,11 +43,6 @@ jest.mock(
   { virtual: true }
 );
 jest.mock(
-  '@salesforce/label/c.Mirror_GiftTransactionMirror_GiftTransactionSide',
-  () => ({ default: 'Paid Gift Transactions: {0}, total {1}' }),
-  { virtual: true }
-);
-jest.mock(
   '@salesforce/label/c.Mirror_OpportunityMirror_DifferenceCountAll',
   () => ({ default: 'Differences found: {0}. All are listed.' }),
   { virtual: true }
@@ -109,7 +104,7 @@ describe('c-gift-transaction-mirror', () => {
 
   it('names the start date and paid status, and offers Run Now and Schedule Nightly Run', async () => {
     const element = await mount(READY);
-    expect(find(element, 'direction').textContent).toBe(
+    expect(find(element, 'direction').message).toBe(
       'Direction: Gifts to Gift Transactions. Received gifts dated on or after Jan 1, 2026 get a matching Gift Transaction with status Paid.'
     );
     expect(find(element, 'run-now').disabled).toBe(false);
@@ -125,7 +120,7 @@ describe('c-gift-transaction-mirror', () => {
 
   it('shows why nothing is copied yet and keeps the buttons off', async () => {
     const element = await mount({ ...READY, notReadyReason: 'Set a start date.' });
-    expect(find(element, 'not-ready').textContent).toBe('Set a start date.');
+    expect(find(element, 'not-ready').message).toBe('Set a start date.');
     expect(find(element, 'direction')).toBeNull();
     expect(find(element, 'run-now').disabled).toBe(true);
   });
@@ -151,7 +146,7 @@ describe('c-gift-transaction-mirror', () => {
     const element = await mount(READY);
     find(element, 'run-now').click();
     await flush();
-    expect(find(element, 'error').textContent).toBe('A run is already in progress.');
+    expect(find(element, 'error').message).toBe('A run is already in progress.');
   });
 
   it('compares a range and copies those gifts again', async () => {
@@ -160,12 +155,11 @@ describe('c-gift-transaction-mirror', () => {
     const element = await mount(READY);
     find(element, 'compare').click();
     await flush();
-    expect(find(element, 'gift-transaction-side').textContent).toBe(
-      'Paid Gift Transactions: 1, total $100.00'
-    );
-    expect(find(element, 'difference-count').textContent).toBe(
-      'Differences found: 1. All are listed.'
-    );
+    expect(find(element, 'gift-count').value).toBe(2);
+    expect(find(element, 'gift-total').value).toBe(150);
+    expect(find(element, 'gift-transaction-count').value).toBe(1);
+    expect(find(element, 'gift-transaction-total').value).toBe(100);
+    expect(find(element, 'difference-count').message).toBe('Differences found: 1. All are listed.');
     find(element, 'copy-again').click();
     await flush();
     expect(copyRangeAgain).toHaveBeenCalledWith(
@@ -178,7 +172,7 @@ describe('c-gift-transaction-mirror', () => {
     const element = await mount(READY);
     find(element, 'compare').click();
     await flush();
-    expect(find(element, 'error').textContent).toBe('Choose a shorter range.');
+    expect(find(element, 'error').message).toBe('Choose a shorter range.');
   });
 });
 

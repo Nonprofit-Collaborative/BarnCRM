@@ -3,6 +3,7 @@ import NightlyJobsPanel, { timeOfDay } from 'c/nightlyJobsPanel';
 import getPanel from '@salesforce/apex/NightlyJobsController.getPanel';
 import schedule from '@salesforce/apex/NightlyJobsController.schedule';
 
+jest.mock('@salesforce/i18n/locale', () => ({ default: 'en-US' }), { virtual: true });
 jest.mock('@salesforce/apex/NightlyJobsController.getPanel', () => ({ default: jest.fn() }), {
   virtual: true
 });

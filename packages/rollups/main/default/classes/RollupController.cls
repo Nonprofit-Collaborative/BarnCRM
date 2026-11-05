@@ -234,7 +234,7 @@ public with sharing class RollupController {
 			Rollup_Definition__c definition = require(definitionId);
 			if (definition.Is_Package_Default__c == true) {
 				throw new RollupService.RollupServiceException(
-					Label.Core_RollupBuilder_DeleteShipped
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_DeleteShipped')
 				);
 			}
 			refuseWhileAFullRunIsGoing();
@@ -382,7 +382,11 @@ public with sharing class RollupController {
 			refuseWhileTurnedOff();
 			List<String> nightly = new List<String>{ RollupScheduler.nightlyTime() };
 			if (RollupScheduler.isScheduled()) {
-				return String.format(Label.Core_RollupBuilder_TonightAlreadyScheduled, nightly);
+				return BarnHelp.text(
+					'Rollups',
+					'Core_RollupBuilder_TonightAlreadyScheduled',
+					nightly
+				);
 			}
 			RollupScheduler.scheduleTonight();
 			return String.format(Label.Core_RollupBuilder_TonightScheduled, nightly);

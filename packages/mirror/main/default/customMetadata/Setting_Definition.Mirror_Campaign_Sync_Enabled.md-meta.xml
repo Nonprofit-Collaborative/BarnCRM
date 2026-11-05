@@ -28,7 +28,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Give every appeal a matching Salesforce Campaign and keep it up to date, so Campaign Members and marketing tools work. Needs an org with Campaigns. Then run Sync all appeals on the Campaign sync page.</value>
+        <value xsi:type="xsd:string">Give every appeal a matching Salesforce Campaign and keep it up to date, so Campaign Members and marketing tools work. Needs an org with Campaigns. Then run Sync All Appeals on the Campaign Sync page.</value>
     </values>
     <values>
         <field>Help_Path__c</field>

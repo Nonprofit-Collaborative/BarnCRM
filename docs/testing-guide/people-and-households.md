@@ -131,6 +131,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | Select **Merge or Split**, then the **Split** tab. | Under **Choose Who Moves Out**, two columns: **Stays in** the household's name, holding the three members as tiles with checkboxes, and an empty **Moves to a New Household**. **Split** is disabled until someone is in the Moves column. |
 | 1a | Drag Ben's tile into **Moves to a New Household** (on a tablet, press and hold first), then use **Move to** with the household's name in his tile's menu. | The drag moves Ben across and ticks his checkbox, and a screen reader hears **Moved Ben Testwell to a New Household.**; the menu moves him back and unticks it. With the keyboard: focus his tile, Space, Right Arrow, Space does the same. |
+| 1b | Press Tab through the first tile. | Each tile has three stops: a drag handle (a button named for the person), the checkbox and the **Move to** menu. Only the handle starts a drag, with the mouse, press and hold, or Space and the arrow keys. |
 | 2 | Tick Cara, leave **A new household**, and select **Split**. | Cara's tile moves to the Moves column. A dialog headed **Split This Household?** opens. |
 | 3 | Select **Split** in the dialog. | Toast **Moved. Both household names and member counts are up to date.** Cara's new household **The Testwell Family** has Member Count **1**; the original has **2**. |
 | 4 | Undo: on Cara's new household, **Merge or Split**, **Split**, tick Cara, choose **An existing household**, pick the original in **Find the Other Household**, and split. | The Moves column heading changes to **Moves to** the original's name. Cara is back in the original (Member Count **3**). Her emptied household remains with Member Count **0** and keeps its name, because **Delete Empty Households** ships off. |
@@ -202,9 +203,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open The Garcia Family. | Sections **Details** and **Name and Greetings**; panels **Members** and **Addresses**; actions **Edit**, **Log an Interaction**, **Merge or Split**, **Delete**. |
-| 2 | Open **Bayview Hardware** from **Organizations**. | **Details** with Website; **Affiliations** and **Addresses** panels; no **Name and Greetings**, no **Members**, no **Merge or Split**. |
-| 3 | Open Harper Garcia. | Sections **Person**, **Household**, **Reaching This Person**; panels **Household**, **Relationships**, **Affiliations**, **Addresses**; no **Merge or Split**. |
+| 1 | Open The Garcia Family. | Tabs **Details**, **Connections**, **Related**, with **Details** open: sections **Details** and **Name and Greetings**. On **Connections**: panels **Members** and **Addresses**. Actions **Edit**, **Log an Interaction**, **Merge or Split**, **Delete**. |
+| 2 | Open **Bayview Hardware** from **Organizations**. | **Details** tab with Website; **Connections** tab with the **Affiliations** and **Addresses** panels; no **Name and Greetings**, no **Members**, no **Merge or Split**. |
+| 3 | Open Harper Garcia. | **Details** tab: sections **Person**, **Household**, **Reaching This Person**. **Connections** tab: panels **Household**, **Relationships**, **Affiliations**, **Addresses**. **Related** tab: the related lists. No **Merge or Split**. |
+| 4 | Narrow the browser to phone width and open Harper Garcia again. | The three tabs still show and switch; the sidebar cards stack below. |
+| 5 | In an org with Core and no other module, look at the top of Harper Garcia's sidebar. | No glance card and no empty space: the Record Glance host shows nothing until a module adds a card. |
 
 **Cleanup:** None.
 

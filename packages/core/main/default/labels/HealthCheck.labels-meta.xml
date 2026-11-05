@@ -617,6 +617,22 @@
         <value>1 Shipped Import Template Is Missing</value>
     </labels>
     <labels>
+        <fullName>Core_HealthCheck_NpspUpkeepOverlapFix</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button that opens the NPSP household adoption panel from a finding.</shortDescription>
+        <value>Open NPSP Household Adoption</value>
+    </labels>
+    <labels>
+        <fullName>Core_HealthCheck_NpspUpkeepOverlapTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Health Check title: Household Upkeep is on while NPSP households are in use.</shortDescription>
+        <value>NPSP and BarnCRM Both Make Households</value>
+    </labels>
+    <labels>
         <fullName>Core_HealthCheck_UsersWithoutAccessTitleOne</fullName>
         <categories>Core</categories>
         <language>en_US</language>

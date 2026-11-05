@@ -117,7 +117,7 @@ public with sharing class AutomationControlSettingService {
 	/** Saves both boxes for the org default, a profile or a user. Saving the same writes nothing. */
 	public static void save(String ownerId, Boolean pauseAll, Boolean bypass) {
 		requirePermission();
-		Id owner = checkedOwner(ownerId);
+		Id owner = checkedOwner(ownerId, false, false);
 		BarnCRM_Automation_Control__c stored = stored(owner);
 		Boolean targetPause = pauseAll == true;
 		Boolean targetBypass = bypass == true;
@@ -140,7 +140,7 @@ public with sharing class AutomationControlSettingService {
 	/** Adds a profile or user row with Bypass on, the usual reason to add one; one already there stays. */
 	public static void add(String ownerId) {
 		requirePermission();
-		Id owner = checkedOwner(ownerId);
+		Id owner = checkedOwner(ownerId, true, false);
 		if (owner == UserInfo.getOrganizationId() || stored(owner) != null) {
 			return;
 		}
@@ -150,7 +150,7 @@ public with sharing class AutomationControlSettingService {
 	/** Deletes a profile or user row, so it follows the org default again. */
 	public static void remove(String ownerId) {
 		requirePermission();
-		Id owner = checkedOwner(ownerId);
+		Id owner = checkedOwner(ownerId, false, true);
 		if (owner == UserInfo.getOrganizationId()) {
 			throw new AutomationControl.AutomationControlException(
 				BarnHelp.text('Core', 'Core_AutomationControl_OrgRowStays')
@@ -331,8 +331,12 @@ public with sharing class AutomationControlSettingService {
 		}
 	}
 
-	/** This org, or a Profile or User that exists; anything else is refused with a message. */
-	private static Id checkedOwner(String ownerId) {
+	/**
+	 * This org, or a Profile or User that exists; anything else is refused with a message that
+	 * fits adding (forAdd) or saving and removing. With keepMissing, a Profile or User id that no longer exists is let through, so a
+	 * remove can still delete the row stored for it.
+	 */
+	private static Id checkedOwner(String ownerId, Boolean forAdd, Boolean keepMissing) {
 		Id owner;
 		try {
 			owner = String.isBlank(ownerId) ? null : Id.valueOf(ownerId.trim());
@@ -348,19 +352,44 @@ public with sharing class AutomationControlSettingService {
 		} else if (owner != null && owner.getSObjectType() == User.SObjectType) {
 			exists = ![SELECT Id FROM User WHERE Id = :owner WITH USER_MODE LIMIT 1].isEmpty();
 		}
+		if (!exists && keepMissing && owner != null && levelOf(owner) != LEVEL_ORGANIZATION) {
+			missingOwner = owner;
+			return owner;
+		}
 		if (!exists) {
 			throw new AutomationControl.AutomationControlException(
-				BarnHelp.text('Core', 'Core_AutomationControl_OwnerNotFound')
+				forAdd
+					? BarnHelp.text('Core', 'Core_AutomationControl_OwnerNotFound')
+					: BarnHelp.text('Core', 'Core_AutomationControl_OwnerGone')
 			);
 		}
 		return owner;
 	}
 
-	/** The row stored for exactly this owner, or null; costs no query. */
+	/** A profile or user id that checkedOwner let through although it no longer exists. */
+	private static Id missingOwner;
+
+	/**
+	 * The row stored for exactly this owner, or null; costs no query, except for an owner that
+	 * no longer exists, which the platform's cached lookup cannot answer: that one is read
+	 * directly, so a remove can still delete the row it left behind.
+	 */
 	private static BarnCRM_Automation_Control__c stored(Id owner) {
-		BarnCRM_Automation_Control__c found = owner == UserInfo.getOrganizationId()
-			? BarnCRM_Automation_Control__c.getOrgDefaults()
-			: BarnCRM_Automation_Control__c.getValues(owner);
+		BarnCRM_Automation_Control__c found;
+		if (owner != missingOwner) {
+			found = owner == UserInfo.getOrganizationId()
+				? BarnCRM_Automation_Control__c.getOrgDefaults()
+				: BarnCRM_Automation_Control__c.getValues(owner);
+		} else {
+			List<BarnCRM_Automation_Control__c> rows = [
+				SELECT Id, SetupOwnerId, Pause_All__c, Bypass__c
+				FROM BarnCRM_Automation_Control__c
+				WHERE SetupOwnerId = :owner
+				WITH SYSTEM_MODE
+				LIMIT 1
+			];
+			found = rows.isEmpty() ? null : rows[0];
+		}
 		return found == null || found.Id == null ? null : found;
 	}
 
@@ -393,11 +422,19 @@ public with sharing class AutomationControlSettingService {
 		String level = levelOf(owner);
 		String name = String.valueOf(owner);
 		if (level == LEVEL_PROFILE) {
-			name = [SELECT Name FROM Profile WHERE Id = :owner WITH USER_MODE LIMIT 1].Name;
+			List<Profile> found = [
+				SELECT Name
+				FROM Profile
+				WHERE Id = :owner
+				WITH USER_MODE
+				LIMIT 1
+			];
+			name = found.isEmpty() ? name : found[0].Name;
 		} else if (level == LEVEL_USER) {
-			name = [SELECT Name FROM User WHERE Id = :owner WITH USER_MODE LIMIT 1].Name;
+			List<User> found = [SELECT Name FROM User WHERE Id = :owner WITH USER_MODE LIMIT 1];
+			name = found.isEmpty() ? name : found[0].Name;
 		} else {
-			name = 'Whole Organization';
+			return 'Automation Control: Whole Organization';
 		}
 		return 'Automation Control: ' + level + ' ' + name;
 	}

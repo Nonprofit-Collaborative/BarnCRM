@@ -160,7 +160,10 @@ private class RollupDefinitionTransferTest {
 			System.Assert.areEqual(Label.Core_RollupBuilder_ImportTwice, rows[1].reason);
 			System.Assert.areEqual(Label.Core_RollupBuilder_ErrorNameNeeded, rows[2].reason);
 			System.Assert.isTrue(rows[3].reason.contains('notAnAttribute'), rows[3].reason);
-			System.Assert.areEqual(Label.Core_RollupBuilder_ImportShipped, rows[4].reason);
+			System.Assert.areEqual(
+				BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportShipped'),
+				rows[4].reason
+			);
 			System.Assert.areEqual(
 				RollupDefinitionTransfer.REFUSED,
 				rows[5].outcome,
@@ -199,8 +202,8 @@ private class RollupDefinitionTransferTest {
 			}
 			System.Assert.areEqual(
 				new List<String>{
-					Label.Core_RollupBuilder_ImportNotAFile,
-					Label.Core_RollupBuilder_ImportNotAFile,
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportNotAFile'),
+					BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportNotAFile'),
 					Label.Core_RollupBuilder_ImportNewer
 				},
 				messages

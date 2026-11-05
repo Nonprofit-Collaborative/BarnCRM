@@ -625,14 +625,6 @@
         <value>Run Tonight</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_TonightAlreadyScheduled</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Run tonight, already covered: {0} is the nightly time</shortDescription>
-        <value>The nightly run already recalculates every Every night and Both total at {0}. Instantly totals are kept by each save; to rebuild them too, choose Start now.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_TonightScheduled</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -753,12 +745,12 @@
         <value>Started. The waiting totals are recalculated in the background, usually within a minute. Refresh to see what is left.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_DeleteShipped</fullName>
+        <fullName>Core_RollupBuilder_Advanced</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Delete refused: the rollup came with BarnCRM</shortDescription>
-        <value>This rollup came with BarnCRM, so it cannot be deleted: Restore shipped rollups would bring it back. Switch it off instead.</value>
+        <shortDescription>Rollup Builder: heading of the collapsed Advanced section</shortDescription>
+        <value>Advanced</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_Deleted</fullName>
@@ -798,7 +790,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>File input: a rollups file made by Export</shortDescription>
-        <value>Import from a file</value>
+        <value>Import From a File</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ImportApply</fullName>
@@ -849,14 +841,6 @@
         <value>Not imported yet: import the same file again to finish</value>
     </labels>
     <labels>
-        <fullName>Core_RollupBuilder_ImportNotAFile</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import refused: not a rollups file</shortDescription>
-        <value>This is not a BarnCRM rollups file. Choose a file made by Export to a file.</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupBuilder_ImportNewer</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
@@ -879,14 +863,6 @@
         <protected>false</protected>
         <shortDescription>Import: a Definition Key appears twice in the file</shortDescription>
         <value>This rollup is in the file twice. Only the first one is used.</value>
-    </labels>
-    <labels>
-        <fullName>Core_RollupBuilder_ImportShipped</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import: the rollup comes with BarnCRM</shortDescription>
-        <value>This rollup comes with BarnCRM, so it is not imported. Use Restore shipped rollups here instead.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_ImportUnknown</fullName>

@@ -219,8 +219,9 @@ private class ImportProcessorBatchTest {
 					job.execute(null, chunk);
 					queries.add(Limits.getQueries() - queriesBefore);
 					queryRows.add(Limits.getQueryRows() - rowsBefore);
-					// What the batch holds between chunks, the Stateful job itself.
-					carried.add(JSON.serialize(job).length());
+					// What the batch holds between chunks, the Stateful job itself. Counters gain
+					// digits as they count, so numbers are masked: only lists and text may not grow.
+					carried.add(JSON.serialize(job).replaceAll('[0-9]+', '0').length());
 					chunk = new List<Import_Row__c>();
 				}
 			}

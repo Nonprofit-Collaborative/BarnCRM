@@ -14,7 +14,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Assistive text of the remove button on a condition. {0} is its number.</shortDescription>
-        <value>Remove condition {0}</value>
+        <value>Remove Condition {0}</value>
     </labels>
     <labels>
         <fullName>Core_Filter_ConditionLegend</fullName>

@@ -931,6 +931,51 @@ describe('c-settings-console', () => {
     });
   });
 
+  it('shows a Picklist From Field row as a dropdown of its options and saves the choice', async () => {
+    getConsoleModel.mockResolvedValue({
+      canEdit: true,
+      sections: [
+        {
+          name: 'Giving',
+          settings: [
+            {
+              key: 'Gift_Transaction_Mirror_Status__c',
+              label: 'Gift Transaction mirror paid status',
+              description: 'The Status your paid Gift Transactions have.',
+              dataType: 'PicklistFromField',
+              section: 'Giving',
+              component: null,
+              helpUrl: null,
+              value: 'Paid',
+              checked: false,
+              options: [
+                { label: 'Paid', value: 'Paid' },
+                { label: 'Pending', value: 'Pending' }
+              ]
+            }
+          ]
+        }
+      ]
+    });
+    const element = build();
+    openSection('Giving');
+    await settle();
+
+    const combobox = element.shadowRoot.querySelector(
+      'lightning-combobox[data-key="Gift_Transaction_Mirror_Status__c"]'
+    );
+    expect(combobox.options).toHaveLength(2);
+    expect(combobox.value).toBe('Paid');
+    combobox.dispatchEvent(new CustomEvent('change', { detail: { value: 'Pending' } }));
+    await settle();
+    clickSave(element);
+    await settle();
+
+    expect(saveSettings).toHaveBeenCalledWith({
+      values: { Gift_Transaction_Mirror_Status__c: 'Pending' }
+    });
+  });
+
   it('lets Maria choose one record type for organizations, or none', async () => {
     getConsoleModel.mockResolvedValue({
       canEdit: true,

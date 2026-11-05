@@ -28,6 +28,7 @@ public with sharing class SettingsService {
 	public static final String RECORD_TYPE = 'RecordType';
 	public static final String RECORD_TYPE_LIST = 'RecordTypeList';
 	public static final String FIELD_LIST = 'FieldList';
+	public static final String PICKLIST_FROM_FIELD = 'PicklistFromField';
 
 	/**
 	 * The Core checkbox settings that ship switched on, and the reason this map has to exist.
@@ -164,6 +165,7 @@ public with sharing class SettingsService {
 			stored == null || (stored instanceof String && String.isBlank((String) stored));
 		Boolean fillable =
 			PICKLIST.equalsIgnoreCase(dataType) ||
+			PICKLIST_FROM_FIELD.equalsIgnoreCase(dataType) ||
 			NUMBER_TYPE.equalsIgnoreCase(dataType) ||
 			TEXT_TYPE.equalsIgnoreCase(dataType);
 		if (!blank || !fillable) {
@@ -256,7 +258,11 @@ public with sharing class SettingsService {
 				throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'));
 			}
 			Object oldValue = record.get(token);
-			Object newValue = checkedValue(values.get(key), field, definition);
+			// A blank stored value is shown as the declared default, so that value saves as is.
+			Object shownValue = oldValue != null
+				? oldValue
+				: type.newSObject(null, true).get(token);
+			Object newValue = checkedValue(values.get(key), field, definition, shownValue);
 			String oldText = asText(oldValue);
 			String newText = asText(newValue);
 			if (oldText.equals(newText)) {
@@ -426,11 +432,12 @@ public with sharing class SettingsService {
 	private static Object checkedValue(
 		Object rawValue,
 		Schema.DescribeFieldResult field,
-		Setting_Definition__mdt definition
+		Setting_Definition__mdt definition,
+		Object oldValue
 	) {
 		try {
 			Object newValue = coerce(rawValue, field);
-			checkAllowedValue(definition, newValue);
+			checkAllowedValue(definition, newValue, oldValue);
 			return newValue;
 		} catch (SettingsException refused) {
 			if (refused.getMessage() != BarnHelp.text('Core', 'Core_Settings_InvalidValueError')) {
@@ -452,8 +459,16 @@ public with sharing class SettingsService {
 	 * A picklist row may only be set to one of the choices it ships, so a direct call to the
 	 * controller cannot store a value the console would never offer.
 	 */
-	private static void checkAllowedValue(Setting_Definition__mdt definition, Object newValue) {
+	private static void checkAllowedValue(
+		Setting_Definition__mdt definition,
+		Object newValue,
+		Object oldValue
+	) {
 		if (definition == null || newValue == null) {
+			return;
+		}
+		if (PICKLIST_FROM_FIELD.equalsIgnoreCase(definition.Data_Type__c)) {
+			checkFieldPicklist(definition, String.valueOf(newValue), asText(oldValue));
 			return;
 		}
 		if (RECORD.equalsIgnoreCase(definition.Data_Type__c)) {
@@ -522,6 +537,63 @@ public with sharing class SettingsService {
 				)
 			);
 		}
+	}
+
+	/**
+	 * A Picklist From Field row holds one of its field's active values, or the value already
+	 * stored (kept, so a section still saves after the org retires it). While the org does not
+	 * have the field, the row is a text box and any text saves.
+	 */
+	private static void checkFieldPicklist(
+		Setting_Definition__mdt definition,
+		String candidate,
+		String stored
+	) {
+		List<Schema.PicklistEntry> active = activeFieldValues(definition);
+		// Exact case: the readers compare the stored value case-sensitively.
+		if (active == null || (candidate != null && candidate.equals(stored))) {
+			return;
+		}
+		for (Schema.PicklistEntry entry : active) {
+			if (entry.getValue().equals(candidate)) {
+				return;
+			}
+		}
+		throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_InvalidValueError'));
+	}
+
+	/**
+	 * The active values of the picklist field a Picklist From Field row names in Record Object
+	 * as `Object.Field`, or null when this org has no such object or picklist field, which is
+	 * when the console falls back to a text box.
+	 */
+	public static List<Schema.PicklistEntry> activeFieldValues(Setting_Definition__mdt definition) {
+		String source = definition?.Record_Object__c;
+		Integer dot = source == null ? -1 : source.indexOf('.');
+		if (dot < 1) {
+			return null;
+		}
+		Schema.SObjectType type = typeByName(source.substring(0, dot).trim());
+		if (type == null) {
+			return null;
+		}
+		Schema.SObjectField token = type.getDescribe(SObjectDescribeOptions.DEFERRED)
+			.fields.getMap()
+			.get(source.substring(dot + 1).trim());
+		if (token == null) {
+			return null;
+		}
+		Schema.DescribeFieldResult field = token.getDescribe();
+		if (field.getType() != Schema.DisplayType.PICKLIST) {
+			return null;
+		}
+		List<Schema.PicklistEntry> active = new List<Schema.PicklistEntry>();
+		for (Schema.PicklistEntry entry : field.getPicklistValues()) {
+			if (entry.isActive()) {
+				active.add(entry);
+			}
+		}
+		return active;
 	}
 
 	/** A Record row holds the Id of a record of its own object, and nothing else (ADR-0074). */

@@ -17,10 +17,10 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | From the App Launcher, open the **BarnCRM Admin** app and click **Rollup Builder**. | The **Rollup Builder** tab opens. |
-| 2 | Look at the page. | A **Rollup Builder** card holds a **Rollups** card that starts "Every total BarnCRM keeps up to date for you, and when each one was last calculated." Under it is a **Needs Attention** section. No read only notice is shown. |
-| 3 | Look at the buttons above the list. | **Schedule nightly recalculation** (or **Stop the nightly recalculation**), **Recalculate All**, **Restore Shipped Rollups** and **New Rollup** are all enabled. |
-| 4 | If the button reads **Stop the nightly recalculation**, click it. | The text above the buttons reads "Nightly recalculation is not scheduled yet." **Needs Attention** shows "The nightly run is not scheduled, so totals a bulk change missed are not put right overnight." |
-| 5 | Click **Schedule nightly recalculation**. | The text reads "Nightly recalculation is scheduled for 2:00 AM." The button now reads **Stop the nightly recalculation**, and the not scheduled warning under **Needs Attention** is gone. |
+| 2 | Look at the page. | A **Rollup Builder** card holds a **Rollups** card that starts "Every total BarnCRM keeps up to date for you, and when each one was last calculated." Above it, **Needs Attention** shows only while something needs attention (with a count badge). A collapsed **Advanced** section at the bottom holds **Instant Totals**. No read only notice is shown. |
+| 3 | Look at the buttons above the list. | **Schedule Nightly Recalculation** (or **Stop the Nightly Recalculation**), **Recalculate All**, **Restore Shipped Rollups** and **New Rollup** are all enabled. |
+| 4 | If the button reads **Stop the Nightly Recalculation**, click it. | The text above the buttons reads "Nightly recalculation is not scheduled yet." **Needs Attention** shows "The nightly run is not scheduled, so totals a bulk change missed are not put right overnight." |
+| 5 | Click **Schedule Nightly Recalculation**. | The text reads "Nightly recalculation is scheduled for 2:00 AM." The button now reads **Stop the Nightly Recalculation**, and the not scheduled warning under **Needs Attention** is gone. |
 | 6 | Open the **BarnCRM Admin** app, then **BarnCRM Settings**, then the **Rollups** section. | The section opens the same Rollup Builder list, with the same schedule message. |
 
 **Cleanup:** leave the nightly run scheduled.
@@ -149,7 +149,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 |---|---|---|
 | 1 | Log in as the staff user. In the App Launcher, search for "Rollup" and open the **Rollup Builder** tab. | The **Rollup Builder** tab opens. |
 | 2 | Look at the top of the list. | A grey notice reads "You can see these totals but not change them. Ask your BarnCRM admin for the Manage BarnCRM Settings permission." |
-| 3 | Look at the buttons and rows. | **Schedule nightly recalculation** (or **Stop the nightly recalculation**), **Recalculate All**, **Restore Shipped Rollups** and **New Rollup** are disabled. On every row the **Mode** list, **Active** toggle, **Recalculate**, **Edit** and **Copy** are disabled. |
+| 3 | Look at the buttons and rows. | **Schedule Nightly Recalculation** (or **Stop the Nightly Recalculation**), **Recalculate All**, **Restore Shipped Rollups** and **New Rollup** are disabled. On every row the **Mode** list, **Active** toggle, **Recalculate**, **Edit** and **Copy** are disabled. |
 | 4 | Find **Test children per household**. | The row shows its name, description, what it counts, where it shows and its **Last Calculated** time. |
 | 5 | Look below the list. | No **Needs Attention** section is shown. |
 | 6 | Log in as the read-only user and repeat steps 1 to 5. | Same results as the staff user. |
@@ -293,14 +293,14 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 ## T-RB-19: Skip a Rollup for People with a Custom Permission
 
-**Purpose:** confirm saves by a holder of the rollup's bypass custom permission leave its total alone, Recalculate still corrects it, and an unknown name is refused.
+**Purpose:** confirm the bypass custom permission is picked from a list, saves by a holder of it leave the total alone, and Recalculate still corrects it.
 **Prerequisites:** admin user; T-RB-02 done; **Test children per household** in **Both (recommended)** and active; **The Garcia Family** shows **Test Children Count** 1.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In Setup, **Custom Permissions**, click **New**. Label **Test Data Migration**, name `Test_Data_Migration`. Save. Create a permission set **Test Data Migration**, add that custom permission under **Custom Permissions**, and assign the permission set to yourself. | The permission set is assigned to you. |
-| 2 | On the **Rollup Builder** tab, edit **Test children per household**, go to **Check and save** and enter `No_Such_Permission` in **Skip for people with this custom permission (optional)**. Click **Save**. | The save is refused: "No custom permission named No_Such_Permission exists in this org. ..." |
-| 3 | Replace it with `Test_Data_Migration` and click **Save**. | The rollup saves. |
+| 2 | On the **Rollup Builder** tab, edit **Test children per household**, go to **Check and save** and open **Skip for people with this custom permission (optional)**. | A list, not a text box: **None** first (selected), then the org's custom permissions, each as "label (API name)", including **Test Data Migration (Test_Data_Migration)**. |
+| 3 | Choose **Test Data Migration (Test_Data_Migration)** and click **Save**. | The rollup saves. |
 | 4 | Open Diego Garcia. Edit **Household Role** from **Child** to **Other** and save. Wait a minute, then open **The Garcia Family** and refresh. | **Test Children Count** still shows 1: your save skipped this rollup. |
 | 5 | On the **Rollup Builder** tab, click **Recalculate** on **Test children per household**. When it finishes, refresh **The Garcia Family**. | **Test Children Count** shows 0. |
 
@@ -344,8 +344,8 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 2 | Choose **11:00 PM** and save. | The setting saves and shows **11:00 PM**. |
 | 3 | Open the **Rollup Builder** tab. | The text above the buttons reads "Nightly recalculation is scheduled for 11:00 PM." |
 | 4 | In Setup, open **Scheduled Jobs**. | One job named **BarnCRM Nightly Jobs** (the nightly run all steps share, see [Nightly Jobs](../admin-guide/nightly-jobs.md)), next run at midnight; the Nightly Jobs panel lists the rollup step at 11:00 PM. |
-| 5 | On the **Rollup Builder** tab, click **Stop the nightly recalculation**, then **Recalculate All**, then **Run Tonight**. | The notice reads "One recalculation of every total is set for the next 11:00 PM." |
-| 6 | Click **Schedule nightly recalculation**. | The text reads "Nightly recalculation is scheduled for 11:00 PM." |
+| 5 | On the **Rollup Builder** tab, click **Stop the Nightly Recalculation**, then **Recalculate All**, then **Run Tonight**. | The notice reads "One recalculation of every total is set for the next 11:00 PM." |
+| 6 | Click **Schedule Nightly Recalculation**. | The text reads "Nightly recalculation is scheduled for 11:00 PM." |
 
 **Cleanup:** set **Time of the nightly run** back to **2:00 AM** and check the Rollup Builder tab says 2:00 AM; in Setup, **Scheduled Jobs**, delete the one-off **BarnCRM Rollups** job with a date in its name (made by **Run Tonight** while the nightly run was stopped); leave **BarnCRM Nightly Jobs** scheduled.
 
@@ -375,7 +375,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 |---|---|---|
 | 1 | On the **Rollup Builder** tab, tick **Include in the export** on **Test children per household** and click **Export to a File**. | The browser saves `barncrm-rollups.json`. Rows of rollups that came with BarnCRM have no tick box. |
 | 2 | Open the file in a text editor. | It starts with `"format" : "BarnCRM rollups"` and `"version" : 1`, and holds one rollup with `"name" : "Test children per household"` and a `"definitionKey"` starting `Custom_`. It has no `recordId` and no last calculated date. |
-| 3 | Back on the tab, under **Import from a file**, choose the file. | A table lists **Test children per household** with "Will replace the rollup here with the same Definition Key". Nothing is saved yet. |
+| 3 | Back on the tab, under **Import From a File**, choose the file. | A table lists **Test children per household** with "Will replace the rollup here with the same Definition Key". Nothing is saved yet. |
 | 4 | Click **Cancel**. | The table closes. |
 | 5 | Choose the file again and click **Import These Rollups**. | The table reads **Updated** for the rollup, and the notice reads "Import finished: see each rollup below. Imported rollups are calculated in their next run, or click Recalculate." The list still has one **Test children per household**, still active. |
 | 6 | Untick the box and click **Export to a File** again. | The file holds every rollup you made and none that came with BarnCRM. |
@@ -390,8 +390,8 @@ The **Records to count** option in step 2 is named from your org's object and fi
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Save a text file named `not-rollups.json` holding `{}`. On the **Rollup Builder** tab, choose it under **Import from a file**. | A red message reads "This is not a BarnCRM rollups file. Choose a file made by Export to a file." No table opens. |
-| 2 | Log in as the staff user and open the **Rollup Builder** tab. | **Export to a File**, **Import from a file** and the tick boxes are disabled or not shown. |
+| 1 | Save a text file named `not-rollups.json` holding `{}`. On the **Rollup Builder** tab, choose it under **Import From a File**. | A red message reads "This is not a BarnCRM rollups file. Choose a file made by Export to a file." No table opens. |
+| 2 | Log in as the staff user and open the **Rollup Builder** tab. | **Export to a File**, **Import From a File** and the tick boxes are disabled or not shown. |
 
 **Cleanup:** delete `not-rollups.json`.
 
@@ -403,9 +403,9 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | On the **Rollup Builder** tab, build a rollup on **Contact**, field **Test shift hours**, counting **Shift, by Volunteer**, **Sum** of **Hours**, mode **Both (recommended)**. Stay on **Check and save**. | The notice "Instant totals are not available yet for Shifts..." is shown and **Mode** offers **Every night** and **Both (recommended)** only. Under **Mode**: **Not set up: these totals update every night and when you click Recalculate.** with **Turn On Instant Totals**. |
-| 2 | Save. Scroll to **Instant Totals** below the rollups. | **Shift** is listed: **Not set up**, **1 instant rollup counts this object.**, and **Turn On Instant Totals**. |
-| 3 | Click **Turn On Instant Totals**. | **Turn On Instant Totals for Shift** opens with five steps, the **Trigger** (`trigger BarnRollup_Shift_c on Shift__c (...)` with one line, `RollupInstantTrigger.run();`), the **Test Class** (`BarnRollup_Shift_c_Test`), a CLI command naming `--tests BarnRollup_Shift_c_Test`, and **Download deploy package**. |
-| 4 | Click **Download deploy package**. | `BarnRollup_Shift_c.zip` downloads, holding `package.xml`, `triggers/BarnRollup_Shift_c.trigger` and `classes/BarnRollup_Shift_c_Test.cls` with their `-meta.xml` files. |
+| 2 | Save. Open **Advanced** below the rollups to reach **Instant Totals**. | **Shift** is listed: **Not set up**, **1 instant rollup counts this object.**, and **Turn On Instant Totals**. |
+| 3 | Click **Turn On Instant Totals**. | **Turn On Instant Totals for Shift** opens with five steps, the **Trigger** (`trigger BarnRollup_Shift_c on Shift__c (...)` with one line, `RollupInstantTrigger.run();`), the **Test Class** (`BarnRollup_Shift_c_Test`), a CLI command naming `--tests BarnRollup_Shift_c_Test`, and **Download Deploy Package**. |
+| 4 | Click **Download Deploy Package**. | `BarnRollup_Shift_c.zip` downloads, holding `package.xml`, `triggers/BarnRollup_Shift_c.trigger` and `classes/BarnRollup_Shift_c_Test.cls` with their `-meta.xml` files. |
 | 5 | Follow steps 1 and 2 of the panel in this org's Developer Console (use **Copy** for each piece of code), and run the test. | The test passes. |
 | 6 | Reload the **Rollup Builder** tab. | **Shift** shows **On: the trigger BarnRollup_Shift_c updates these totals at once.** with **Turn Off Instant Totals** and **Remove the Trigger**. |
 | 7 | Open a contact, add a **Shift** with **Hours** 3, wait a few seconds and reload the contact. | **Test shift hours** is 3 without clicking **Recalculate**. |
@@ -424,7 +424,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 2 | Add another **Shift** with **Hours** 2 to the same contact, wait a few seconds and reload. | **Test shift hours** is still 3. |
 | 3 | In BarnCRM Settings, open the **Automation** page. | **Instant rollups on Shift** is listed and off. |
 | 4 | Back on **Instant Totals**, click **Turn On Instant Totals**, then click **Recalculate** on the rollup. | **Instant totals on Shift are turned back on.**, and after the recalculation **Test shift hours** is 5. |
-| 5 | Click **Remove the Trigger**. | **Remove the Trigger for Shift** opens with three steps, a CLI command with `--test-level RunLocalTests`, and **Download removal package** (`BarnRollup_Shift_c_Removal.zip`, holding `package.xml` and `destructiveChanges.xml`). |
+| 5 | Click **Remove the Trigger**. | **Remove the Trigger for Shift** opens with three steps, a CLI command with `--test-level RunLocalTests`, and **Download Removal Package** (`BarnRollup_Shift_c_Removal.zip`, holding `package.xml` and `destructiveChanges.xml`). |
 | 6 | Sign in as a user with BarnCRM Staff and Rollup Builder User only and open the **Rollup Builder** tab. | **Shift** is listed with **Remove the Trigger** but no **Turn Off Instant Totals** button. |
 
 **Cleanup:** delete `BarnRollup_Shift_c` and `BarnRollup_Shift_c_Test` in Setup (sandbox), then the rollup.
@@ -459,7 +459,7 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 5 | In DLRS, open **Test child count**. | It is still active: BarnCRM changed nothing. |
 | 6 | Back in the list, switch **Active** off for the rollup, then on again. Click **Cancel** in the dialog. | Switching off asks nothing. Switching on opens **Switch Off the DLRS Rollup**; after **Cancel** the switch is back off. |
 | 7 | Switch **Active** on again and click **OK**. | The rollup is on, and a second **Recent Changes** row is written. |
-| 8 | Tick the rollup, click **Export to a File**, delete the rollup, and import the file under **Import from a file**. | The table reads **Not saved** with the DLRS sentence; nothing is saved. |
+| 8 | Tick the rollup, click **Export to a File**, delete the rollup, and import the file under **Import From a File**. | The table reads **Not saved** with the DLRS sentence; nothing is saved. |
 
 **Cleanup:** delete the BarnCRM rollup; keep the DLRS rollup and field for T-RB-34.
 

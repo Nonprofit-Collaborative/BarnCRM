@@ -9,9 +9,7 @@
     </lightning-progress-indicator>
 
     <template lwc:if={error}>
-        <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-vertical_small" role="alert">
-            <span data-id="error">{error}</span>
-        </div>
+        <c-barn-notice class="slds-var-m-vertical_small" variant="error" message={error} data-id="error"></c-barn-notice>
     </template>
 
     <div class="slds-var-m-top_small">
@@ -22,7 +20,7 @@
         <template lwc:elseif={isChoose}>
             <template lwc:if={hasCandidates}>
                 <template lwc:if={hasCopyable}>
-                    <h4 class="slds-text-heading_x-small slds-var-m-bottom_x-small">{labels.canCopy}</h4>
+                    <h4 class="slds-text-title_bold slds-var-m-bottom_x-small">{labels.canCopy}</h4>
                     <template for:each={copyable} for:item="candidate">
                         <div key={candidate.key} class="slds-var-m-bottom_x-small" data-id="copyable">
                             <lightning-input
@@ -37,7 +35,7 @@
                     </template>
                 </template>
                 <template lwc:if={hasStaying}>
-                    <h4 class="slds-text-heading_x-small slds-var-m-vertical_x-small">{labels.stays}</h4>
+                    <h4 class="slds-text-title_bold slds-var-m-vertical_x-small">{labels.stays}</h4>
                     <template for:each={staying} for:item="candidate">
                         <div key={candidate.key} class="slds-var-m-bottom_x-small" data-id="staying">
                             <p class="slds-text-title_bold">{candidate.label}</p>
@@ -52,7 +50,11 @@
                 </template>
             </template>
             <template lwc:else>
-                <p data-id="none-active">{labels.noneActive}</p>
+                <c-barn-empty-state
+                    size="compact"
+                    heading={labels.noneActive}
+                    data-id="none-active"
+                ></c-barn-empty-state>
             </template>
         </template>
 
@@ -75,7 +77,11 @@
 
         <template lwc:elseif={isCompare}>
             <template lwc:if={nothingCopied}>
-                <p data-id="nothing-copied">{labels.nothingCopied}</p>
+                <c-barn-empty-state
+                    size="compact"
+                    heading={labels.nothingCopied}
+                    data-id="nothing-copied"
+                ></c-barn-empty-state>
             </template>
             <template for:each={rowViews} for:item="row">
                 <div key={row.key} class="slds-var-m-bottom_small" data-id="row">
@@ -94,7 +100,7 @@
                             <p class="slds-text-body_small slds-text-color_weak">{labels.noRecords}</p>
                         </template>
                         <template lwc:elseif={row.compared}>
-                            <table class="slds-table slds-table_bordered slds-table_cell-buffer" data-id="comparison">
+                            <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked" data-id="comparison">
                                 <thead>
                                     <tr>
                                         <th scope="col">{labels.record}</th>
@@ -106,10 +112,10 @@
                                 <tbody>
                                     <template for:each={row.comparisons} for:item="compared">
                                         <tr key={compared.recordId}>
-                                            <td>{compared.recordName}</td>
-                                            <td>{compared.dlrsValue}</td>
-                                            <td>{compared.barncrmValue}</td>
-                                            <td data-id="result">{compared.result}</td>
+                                            <td data-label={labels.record}>{compared.recordName}</td>
+                                            <td data-label={labels.valueNow}>{compared.dlrsValue}</td>
+                                            <td data-label={labels.valueBarn}>{compared.barncrmValue}</td>
+                                            <td data-label={labels.result} data-id="result">{compared.result}</td>
                                         </tr>
                                     </template>
                                 </tbody>

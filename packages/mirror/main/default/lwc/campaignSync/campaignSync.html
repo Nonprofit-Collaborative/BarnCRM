@@ -1,33 +1,31 @@
 <template>
     <template lwc:if={helpReady}>
-    <lightning-card title={labels.title} icon-name="custom:custom35">
+    <lightning-card title={labels.title} icon-name={icons.campaignSync}>
         <div class="slds-var-p-horizontal_medium">
             <p class="slds-var-m-bottom_medium" data-id="intro">{labels.intro}</p>
             <c-settings-setup-notes notes={setupNotes}></c-settings-setup-notes>
             <template lwc:if={unavailableShown}>
-                <p class="slds-var-m-bottom_medium" role="status" data-id="unavailable">
-                    {labels.unavailable}
-                </p>
+                <c-barn-notice class="slds-var-m-bottom_medium" variant="warning" message={labels.unavailable} data-id="unavailable"></c-barn-notice>
             </template>
             <template lwc:if={offShown}>
-                <p class="slds-var-m-bottom_medium" role="status" data-id="off">
-                    {labels.switchedOff}
-                </p>
+                <c-barn-notice class="slds-var-m-bottom_medium" variant="info" message={labels.switchedOff} data-id="off"></c-barn-notice>
             </template>
             <template lwc:if={onShown}>
-                <p class="slds-var-m-bottom_small" role="status" data-id="on">{labels.switchedOn}</p>
+                <c-barn-notice class="slds-var-m-bottom_small" variant="success" message={labels.switchedOn} data-id="on"></c-barn-notice>
                 <template lwc:if={countsText}>
-                    <p class="slds-var-m-bottom_small" data-id="counts">{countsText}</p>
+                    <c-barn-meter
+                        class="slds-var-m-bottom_small"
+                        label={countsText}
+                        value={linkedCount}
+                        max={appealCount}
+                        data-id="counts"
+                    ></c-barn-meter>
                 </template>
                 <template lwc:if={noAccessShown}>
-                    <p class="slds-text-color_error slds-var-m-bottom_small" data-id="no-access">
-                        {labels.noCampaignAccess}
-                    </p>
+                    <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={labels.noCampaignAccess} data-id="no-access"></c-barn-notice>
                 </template>
                 <template lwc:if={noManageShown}>
-                    <p class="slds-text-color_weak slds-var-m-bottom_small" data-id="no-manage">
-                        {labels.noManagePermission}
-                    </p>
+                    <c-barn-notice class="slds-var-m-bottom_small" variant="info" message={labels.noManagePermission} data-id="no-manage"></c-barn-notice>
                 </template>
                 <div class="slds-var-m-vertical_medium">
                     <lightning-button
@@ -39,15 +37,11 @@
                     ></lightning-button>
                 </div>
                 <template lwc:if={runningShown}>
-                    <p class="slds-var-m-bottom_medium" role="status" data-id="running">
-                        {labels.running}
-                    </p>
+                    <c-barn-notice class="slds-var-m-bottom_medium" variant="info" message={labels.running} data-id="running"></c-barn-notice>
                 </template>
             </template>
             <template lwc:if={error}>
-                <p class="slds-text-color_error slds-var-m-bottom_medium" role="alert" data-id="error">
-                    {error}
-                </p>
+                <c-barn-notice class="slds-var-m-bottom_medium" variant="error" message={error} data-id="error"></c-barn-notice>
             </template>
         </div>
     </lightning-card>
