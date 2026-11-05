@@ -94,6 +94,8 @@ private class GetDataJobStatusActionTest {
             }
 
             Test.startTest();
+            // The message catalog is read once per transaction; count only the requests' queries.
+            BarnHelp.text('Core', 'Core_AgentActions_DataJobNotFound');
             Integer queriesBefore = Limits.getQueries();
             List<GetDataJobStatusAction.Result> results = GetDataJobStatusAction.getStatus(
                 requests
