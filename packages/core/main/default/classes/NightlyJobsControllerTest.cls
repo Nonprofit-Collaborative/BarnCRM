@@ -81,7 +81,7 @@ private class NightlyJobsControllerTest {
                     Assert.fail('Scheduling needs Manage BarnCRM Settings');
                 } catch (AuraHandledException expected) {
                     Assert.areEqual(
-                        System.Label.Core_HealthCheck_PermissionRequired,
+                        BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired'),
                         expected.getMessage(),
                         'Names the permission'
                     );

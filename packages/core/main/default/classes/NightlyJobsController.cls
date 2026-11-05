@@ -59,7 +59,9 @@ public with sharing class NightlyJobsController {
     public static PanelView schedule() {
         try {
             if (!BarnCRMPermissions.canManageSettings()) {
-                throw new NightlyJobsException(System.Label.Core_HealthCheck_PermissionRequired);
+                throw new NightlyJobsException(
+                    BarnHelp.text('Core', 'Core_HealthCheck_PermissionRequired')
+                );
             }
             NightlyJobs.scheduleAll();
             return currentView();
