@@ -662,6 +662,8 @@ private class MatchSourceServiceTest {
 			Contact incoming = new Contact(LastName = 'Desk', Email = 'pair@example.org');
 
 			Test.startTest();
+			// The message catalog is read once per transaction; count only the sources' queries.
+			BarnHelp.text('Core', 'Core_MatchSource_NoSuchObject');
 			MatchSourceSelector.queryReserve = Limits.getLimitQueries();
 			Integer queriesBefore = Limits.getQueries();
 			List<DuplicateService.Pair> pairs = MatchSourceService.pairsFor(
