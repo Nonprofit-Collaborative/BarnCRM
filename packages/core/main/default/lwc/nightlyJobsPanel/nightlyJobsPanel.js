@@ -1,7 +1,7 @@
 import { LightningElement, api } from 'lwc';
+import LOCALE from '@salesforce/i18n/locale';
 // Bare, and correctly so: a custom permission defined in the same package resolves without a
 // namespace prefix.
-import LOCALE from '@salesforce/i18n/locale';
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import getPanel from '@salesforce/apex/NightlyJobsController.getPanel';
 import schedule from '@salesforce/apex/NightlyJobsController.schedule';

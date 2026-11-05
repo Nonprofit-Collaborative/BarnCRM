@@ -1,6 +1,6 @@
 /**
  * The glance card on Core's record pages shows what installed modules return and nothing of
- * its own (people-14, ADR-NEXT `NEXT-record-glance-extension.md`). No module is present in
+ * its own (people-14, ADR-0167). No module is present in
  * Core's tests, so extensions are injected by class name, as modules register theirs.
  */
 @IsTest(testFor='ApexClass:RecordGlanceController, ApexClass:RecordGlanceExtensions')

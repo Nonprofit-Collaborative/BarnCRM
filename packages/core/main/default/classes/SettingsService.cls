@@ -258,7 +258,11 @@ public with sharing class SettingsService {
 				throw new SettingsException(BarnHelp.text('Core', 'Core_Settings_UnknownKeyError'));
 			}
 			Object oldValue = record.get(token);
-			Object newValue = checkedValue(values.get(key), field, definition, oldValue);
+			// A blank stored value is shown as the declared default, so that value saves as is.
+			Object shownValue = oldValue != null
+				? oldValue
+				: type.newSObject(null, true).get(token);
+			Object newValue = checkedValue(values.get(key), field, definition, shownValue);
 			String oldText = asText(oldValue);
 			String newText = asText(newValue);
 			if (oldText.equals(newText)) {
@@ -546,11 +550,12 @@ public with sharing class SettingsService {
 		String stored
 	) {
 		List<Schema.PicklistEntry> active = activeFieldValues(definition);
-		if (active == null || candidate == stored) {
+		// Exact case: the readers compare the stored value case-sensitively.
+		if (active == null || (candidate != null && candidate.equals(stored))) {
 			return;
 		}
 		for (Schema.PicklistEntry entry : active) {
-			if (entry.getValue() == candidate) {
+			if (entry.getValue().equals(candidate)) {
 				return;
 			}
 		}

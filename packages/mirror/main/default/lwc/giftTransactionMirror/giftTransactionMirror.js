@@ -184,12 +184,6 @@ export default class GiftTransactionMirror extends LightningElement {
     return this.working || (!this.view.loaded && !this.error);
   }
 
-  money(amount) {
-    return new Intl.NumberFormat(LOCALE, { style: 'currency', currency: CURRENCY }).format(
-      amount || 0
-    );
-  }
-
   /** A date the server sends as yyyy-mm-dd, in the viewer's locale, on that same day. */
   day(value) {
     return new Intl.DateTimeFormat(LOCALE, { dateStyle: 'medium', timeZone: 'UTC' }).format(

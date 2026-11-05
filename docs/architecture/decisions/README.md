@@ -175,6 +175,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0164](0164-help-text-json.md) | Help and guidance prose in packaged JSON catalogs, not custom labels | Proposed |
 | [0165](0165-dispatcher-errors-and-automation-control.md) | A handler failure refuses only its own records, and one Automation Control setting pauses or bypasses automation per org, profile or user | Proposed |
 | [0166](0166-nightly-job-dispatcher.md) | One nightly job dispatcher runs every BarnCRM nightly job in sequence | Accepted |
+| [0167](0167-record-glance-extension.md) | Modules add a glance card to Core's record pages through an extension seam | Proposed |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

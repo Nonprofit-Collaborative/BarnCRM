@@ -74,7 +74,7 @@ Opportunity mirror page says so.
    permission set). Click **Run Now** once, to copy what you already have, and **Schedule
    nightly run**, which switches the mirror on in [BarnCRM Nightly Jobs](nightly-jobs.md), the
    one nightly run, so the mirror catches up every night at 1:30 AM (or when the step before
-   it has finished), in your organization's time zone. The page shows when the last run
+   it has finished), in the time zone of the person who scheduled it. The page shows when the last run
    completed and what it did, and Health Check warns if two days pass without one.
 
 **Whose access the copy uses.** Opportunities are written with the access of the person saving

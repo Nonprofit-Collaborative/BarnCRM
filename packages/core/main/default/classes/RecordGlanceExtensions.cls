@@ -1,6 +1,6 @@
 /**
- * Finds the record glance extensions dependent packages installed (people-14, ADR-NEXT
- * `NEXT-record-glance-extension.md`), the pattern `WhereUsedExtensions` uses (ADR-0159). A class
+ * Finds the record glance extensions dependent packages installed (people-14, ADR-0167),
+ * the pattern `WhereUsedExtensions` uses (ADR-0159). A class
  * that is not installed, cannot be built or does not implement the interface is absent, and a
  * failure is logged: the record page must open whatever a module does.
  */

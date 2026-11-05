@@ -973,7 +973,7 @@ public with sharing class SettingsController {
 			return;
 		}
 		for (Option option : setting.options) {
-			if (option.value == setting.value) {
+			if (setting.value.equals(option.value)) {
 				return;
 			}
 		}
