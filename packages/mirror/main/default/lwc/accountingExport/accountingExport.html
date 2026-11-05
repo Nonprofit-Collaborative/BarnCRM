@@ -1,6 +1,6 @@
 <template>
     <template lwc:if={helpReady}>
-    <lightning-card title={labels.title} icon-name="custom:custom21">
+    <lightning-card title={labels.title} icon-name={icons.accountingExport}>
         <div class="slds-var-p-horizontal_medium">
             <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
             <p class="slds-text-color_weak slds-var-m-bottom_medium" data-id="visibility">
@@ -66,12 +66,10 @@
                 ></lightning-button>
             </div>
             <template lwc:if={error}>
-                <p class="slds-text-color_error slds-var-m-bottom_medium" role="alert" data-id="error">
-                    {error}
-                </p>
+                <c-barn-notice class="slds-var-m-bottom_medium" variant="error" message={error} data-id="error"></c-barn-notice>
             </template>
             <template lwc:if={message}>
-                <p class="slds-var-m-bottom_medium" role="status" data-id="message">{message}</p>
+                <c-barn-notice class="slds-var-m-bottom_medium" variant="success" message={message} data-id="message"></c-barn-notice>
             </template>
             <template lwc:if={showMarkPosted}>
                 <div class="slds-var-m-bottom_medium">
@@ -85,9 +83,7 @@
                 </div>
             </template>
             <template lwc:if={showNeedsAllFunds}>
-                <p class="slds-text-color_weak slds-var-m-bottom_medium" data-id="needs-all-funds">
-                    {labels.markNeedsAllFunds}
-                </p>
+                <c-barn-notice class="slds-var-m-bottom_medium" variant="info" message={labels.markNeedsAllFunds} data-id="needs-all-funds"></c-barn-notice>
             </template>
         </div>
     </lightning-card>

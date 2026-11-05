@@ -48,6 +48,16 @@ const STATUS_TEXT = {
   notAvailable: STATUS_NOT_AVAILABLE
 };
 
+/** The status vocabulary word for each state: a trigger that is inactive is the one to look at. */
+const TONE = {
+  builtIn: 'on',
+  on: 'on',
+  off: 'off',
+  inactive: 'warning',
+  notSetUp: 'neutral',
+  notAvailable: 'neutral'
+};
+
 const SETUP = 'setup';
 const REMOVAL = 'removal';
 
@@ -171,6 +181,7 @@ export default class RollupInstantTotals extends LightningElement {
           showTurnOff: state.status === 'on' && this.canManage,
           showRemove: ['on', 'off', 'inactive'].includes(state.status),
           status: state.status,
+          tone: TONE[state.status] || 'neutral',
           showSetup: open && this.panel === SETUP && Boolean(this.code),
           showRemoval: open && this.panel === REMOVAL && Boolean(this.code)
         };
@@ -279,6 +290,11 @@ export default class RollupInstantTotals extends LightningElement {
 
   get setupTitle() {
     return format(SETUP_TITLE, this.openLabel);
+  }
+
+  /** The Flow template, offered ahead of the trigger steps: no code and no deploy. */
+  get flowOption() {
+    return helpText('Rollups', 'Core_RollupBuilder_InstantFlowOption');
   }
 
   get removeTitle() {

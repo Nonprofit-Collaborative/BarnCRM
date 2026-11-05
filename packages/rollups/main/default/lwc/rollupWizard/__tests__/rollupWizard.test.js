@@ -299,7 +299,7 @@ describe('c-rollup-wizard', () => {
     await next(element);
     await next(element);
 
-    expect(query(element, 'no-instant').textContent).toBe(
+    expect(query(element, 'no-instant').message).toBe(
       'Instant totals are not available yet for Gifts.'
     );
     const mode = query(element, 'mode');
@@ -326,7 +326,7 @@ describe('c-rollup-wizard', () => {
     await next(element);
     const offered = query(element, 'aggregate').options.map((option) => option.value);
     expect(offered).toEqual(['SUM', 'COUNT', 'FIRST', 'LAST']);
-    expect(query(element, 'currency-warning').textContent).toBe('More than one currency.');
+    expect(query(element, 'currency-warning').message).toBe('More than one currency.');
   });
 
   it('asks First for the field that decides the order', async () => {
@@ -404,7 +404,8 @@ describe('c-rollup-wizard', () => {
     const element = await build(DRAFT);
     await toLastStep(element);
     const bypass = query(element, 'bypass-permission');
-    expect(bypass.value).toBeUndefined();
+    expect(bypass.value).toBe('--none--');
+    expect(bypass.options[0].value).toBe('--none--');
 
     bypass.dispatchEvent(new CustomEvent('change', { detail: { value: 'Data_Migration' } }));
     await flush();
@@ -464,7 +465,7 @@ describe('c-rollup-wizard', () => {
     await toLastStep(element);
     query(element, 'save').click();
     await flush();
-    expect(query(element, 'error-message').textContent).toBe('Another rollup fills this field.');
+    expect(query(element, 'error-message').message).toBe('Another rollup fills this field.');
   });
 
   it('previews the total on a picked record and counts what it maintains', async () => {

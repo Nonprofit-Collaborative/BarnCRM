@@ -39,6 +39,7 @@ import TARGET_FILTER from '@salesforce/label/c.Core_RollupBuilder_TargetFilter';
 import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
 import DESCRIPTION from '@salesforce/label/c.Core_RollupBuilder_Description';
 import BYPASS_PERMISSION from '@salesforce/label/c.Core_RollupBuilder_BypassPermission';
+import NONE from '@salesforce/label/c.Core_AccessCompare_None';
 import MODE from '@salesforce/label/c.Core_Rollups_ColumnMode';
 import ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
 import SUMMARY from '@salesforce/label/c.Core_RollupBuilder_Summary';
@@ -101,6 +102,9 @@ import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
 import COPIED from '@salesforce/label/c.Core_RollupBuilder_InstantCopied';
 import COPY_FAILED from '@salesforce/label/c.Core_RollupBuilder_InstantCopyFailed';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+
+/** The combobox value for no bypass permission; a custom permission name never looks like it. */
+const NO_BYPASS = '--none--';
 
 /** The stored modes (canonical model R-R4): Instantly alone, and Both. */
 const MODE_REAL_TIME = 'Real-time';
@@ -913,6 +917,27 @@ export default class RollupWizard extends LightningElement {
         this.change({ sourceField: undefined });
       }
     }
+  }
+
+  /** The custom permissions of the org, with None first; a saved name the list lacks stays. */
+  get bypassOptions() {
+    const options = (this.model && this.model.customPermissions) || [];
+    const saved = this.current && this.current.bypassPermission;
+    const known = options.some((option) => option.value === saved);
+    return [
+      { label: NONE, value: NO_BYPASS },
+      ...(saved && !known ? [{ label: saved, value: saved }] : []),
+      ...options
+    ];
+  }
+
+  get bypassValue() {
+    return (this.current && this.current.bypassPermission) || NO_BYPASS;
+  }
+
+  handleBypass(event) {
+    const value = event.detail.value;
+    this.change({ bypassPermission: value === NO_BYPASS ? undefined : value });
   }
 
   handleFilter(event) {

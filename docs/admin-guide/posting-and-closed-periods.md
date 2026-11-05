@@ -50,10 +50,10 @@ You need the sample data, Jen with the **Accounting Export** and **Giving Read O
 sets, and David with **Giving Staff**.
 
 1. As Jen, open **Accounting Export**, set **From** and **To** to the first and last day of last
-   month, and click **Download file**.
-2. Click **Mark these gifts posted**. The page says how many gifts it marked. If the button says
+   month, and click **Download File**.
+2. Click **Mark These Gifts Posted**. The page says how many gifts it marked. If the button says
    the gifts changed since the download, download again and then mark.
-3. Tick **Only gifts not yet posted** and click **Download file** again. The page says
+3. Tick **Only gifts not yet posted** and click **Download File** again. The page says
    `No gifts in this range.`: every gift in last month is now posted.
 4. Open one of those gifts. The **Posting** card on the right says when it was posted and by
    whom.

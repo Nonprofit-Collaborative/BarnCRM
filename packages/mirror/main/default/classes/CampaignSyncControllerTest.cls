@@ -142,7 +142,7 @@ private class CampaignSyncControllerTest {
 			Assert.isNull(CampaignSyncController.refusal(status), 'Everything allows it.');
 			status.running = true;
 			Assert.areEqual(
-				Label.Mirror_CampaignSync_Running,
+				BarnHelp.text('Mirror', 'Mirror_CampaignSync_Running'),
 				CampaignSyncController.refusal(status)
 			);
 			status.canSync = false;

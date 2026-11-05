@@ -13,6 +13,7 @@ import deleteRollup from '@salesforce/apex/RollupController.deleteRollup';
 import exportDefinitions from '@salesforce/apex/RollupDefinitionTransfer.exportDefinitions';
 import importDefinitions from '@salesforce/apex/RollupDefinitionTransfer.importDefinitions';
 import LightningConfirm from 'lightning/confirm';
+import { setHelpTextForTest } from 'c/barnHelpText';
 
 jest.mock(
   '@salesforce/apex/RollupDefinitionTransfer.exportDefinitions',
@@ -83,11 +84,7 @@ jest.mock(
   () => ({ default: 'Delete {0}? This cannot be undone.' }),
   { virtual: true }
 );
-jest.mock(
-  '@salesforce/label/c.Core_RollupBuilder_DeleteShipped',
-  () => ({ default: 'Switch it off instead.' }),
-  { virtual: true }
-);
+setHelpTextForTest({ Core_RollupBuilder_DeleteShipped: 'Switch it off instead.' });
 
 const mockNavigate = jest.fn();
 jest.mock(
@@ -274,12 +271,12 @@ describe('c-rollup-definitions', () => {
       const element = await listed();
       const sentences = [...element.shadowRoot.querySelectorAll('[data-id="sentence"]')];
       expect(sentences.map((node) => node.textContent)).toEqual([giving.sentence, hours.sentence]);
-      const status = element.shadowRoot.querySelector('[data-id="status"]');
-      expect(status.textContent).toBe(giving.status);
-      expect(status.className).toContain('slds-text-color_error');
+      const status = element.shadowRoot.querySelector('[data-id="status"] c-barn-status-badge');
+      expect(status.label).toBe(giving.status);
+      expect(status.status).toBe('error');
       const conflicts = element.shadowRoot.querySelectorAll('[data-id="conflict"]');
       expect(conflicts.length).toBe(1);
-      expect(conflicts[0].textContent).toContain('Old total');
+      expect(conflicts[0].message).toContain('Old total');
     });
 
     it('groups the rollups by the object that shows the total (U12)', async () => {
@@ -345,7 +342,7 @@ describe('c-rollup-definitions', () => {
     await flush();
 
     expect(recalculate).toHaveBeenCalledWith({ definitionId: ROLLUP.recordId });
-    expect(element.shadowRoot.querySelector('[data-id="notice-message"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="notice-message"]').message).toContain(
       'Recalculation started.'
     );
   });
@@ -387,7 +384,7 @@ describe('c-rollup-definitions', () => {
 
     expect(setActive).toHaveBeenCalledWith({ definitionId: ROLLUP.recordId, active: false });
     expect(toggle.checked).toBe(true);
-    expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="error-message"]').message).toContain(
       'You do not have permission.'
     );
   });
@@ -527,7 +524,7 @@ describe('c-rollup-definitions', () => {
 
     expect(runTonight).toHaveBeenCalled();
     expect(recalculateAll).not.toHaveBeenCalled();
-    expect(element.shadowRoot.querySelector('[data-id="notice-message"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="notice-message"]').message).toBe(
       'One recalculation is set for 2:00 AM tonight.'
     );
   });
@@ -594,7 +591,7 @@ describe('c-rollup-definitions', () => {
         definitionId: MINE.recordId,
         clearValues: true
       });
-      expect(element.shadowRoot.querySelector('[data-id="notice-message"]').textContent).toBe(
+      expect(element.shadowRoot.querySelector('[data-id="notice-message"]').message).toBe(
         'c.Core_RollupEase_DeletedCleared'
       );
     });
@@ -619,7 +616,7 @@ describe('c-rollup-definitions', () => {
 
       expect(panel(element)).toBeNull();
       expect(deleteRollup).not.toHaveBeenCalled();
-      expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toBe(
+      expect(element.shadowRoot.querySelector('[data-id="error-message"]').message).toBe(
         'Switch it off instead.'
       );
     });
@@ -712,7 +709,7 @@ describe('c-rollup-definitions', () => {
       );
       await settle();
 
-      expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toBe(
+      expect(element.shadowRoot.querySelector('[data-id="error-message"]').message).toBe(
         'Not a rollups file.'
       );
       expect(element.shadowRoot.querySelector('[data-id="import"]')).toBeNull();

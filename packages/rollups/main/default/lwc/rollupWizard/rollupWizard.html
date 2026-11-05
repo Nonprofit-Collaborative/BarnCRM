@@ -28,9 +28,7 @@
     <h3 class="slds-text-heading_small slds-var-m-vertical_small" data-id="step-title">{stepTitle}</h3>
 
     <template lwc:if={hasError}>
-        <div class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small" role="alert">
-            <span data-id="error-message">{error}</span>
-        </div>
+        <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={error} data-id="error-message"></c-barn-notice>
     </template>
 
     <template lwc:if={isStep1}>
@@ -223,9 +221,7 @@
             ></lightning-combobox>
         </template>
         <template lwc:if={currencyWarning}>
-            <div class="slds-box slds-box_x-small slds-theme_warning slds-var-m-top_small" role="status">
-                <span data-id="currency-warning">{currencyWarning}</span>
-            </div>
+            <c-barn-notice class="slds-var-m-top_small" variant="warning" message={currencyWarning} data-id="currency-warning"></c-barn-notice>
         </template>
     </template>
 
@@ -310,9 +306,7 @@
         <lightning-input name="name" data-id="name" label={labels.name} value={draft.name} required onchange={handleInput}></lightning-input>
         <lightning-textarea name="description" label={labels.description} value={draft.description} onchange={handleInput}></lightning-textarea>
         <template lwc:if={noInstantNotice}>
-            <div class="slds-box slds-box_x-small slds-theme_info slds-var-m-vertical_small" role="status">
-                <span data-id="no-instant">{noInstantNotice}</span>
-            </div>
+            <c-barn-notice class="slds-var-m-vertical_small" variant="info" message={noInstantNotice} data-id="no-instant"></c-barn-notice>
         </template>
         <lightning-radio-group name="mode" data-id="mode" label={labels.mode} value={draft.mode} options={modeOptions} onchange={handleInput}></lightning-radio-group>
         <div class="slds-var-m-vertical_x-small" data-id="mode-consequences">
@@ -327,14 +321,15 @@
             <c-rollup-instant-totals object-api-name={instantObject} can-manage={canManageInstant}></c-rollup-instant-totals>
         </template>
         <lightning-input type="toggle" name="active" label={labels.active} checked={draft.active} onchange={handleInput}></lightning-input>
-        <lightning-input
+        <lightning-combobox
             name="bypassPermission"
             data-id="bypass-permission"
             label={labels.bypassPermission}
             field-level-help={labels.bypassPermissionHelp}
-            value={draft.bypassPermission}
-            onchange={handleInput}
-        ></lightning-input>
+            value={bypassValue}
+            options={bypassOptions}
+            onchange={handleBypass}
+        ></lightning-combobox>
     </template>
 
     <div class="slds-var-m-top_medium slds-clearfix">

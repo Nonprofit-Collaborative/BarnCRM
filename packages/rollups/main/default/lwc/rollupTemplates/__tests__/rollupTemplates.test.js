@@ -164,6 +164,6 @@ describe('c-rollup-templates', () => {
     document.body.appendChild(element);
     await openPanel(element);
 
-    expect(query(element, '[data-id="error"]').textContent).toBe('No permission.');
+    expect(query(element, '[data-id="error"]').message).toBe('No permission.');
   });
 });

@@ -1,39 +1,36 @@
 <template>
     <template lwc:if={helpReady}>
-    <lightning-card title={labels.title} icon-name="custom:custom63">
+    <lightning-card title={labels.title} icon-name={icons.rollups}>
         <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
             <p class="slds-var-m-bottom_small">{labels.intro}</p>
 
-            <template lwc:if={isReadOnly}>
-                <div class="slds-box slds-box_x-small slds-theme_shade slds-var-m-bottom_small">
-                    <p data-id="read-only-notice">{labels.readOnly}</p>
+            <template lwc:if={hasAnyRollup}>
+                <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small">
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+                        <c-barn-stat-tile label={labels.title} value={rollupCount} bordered align="start" data-id="rollup-count"></c-barn-stat-tile>
+                    </div>
+                    <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+                        <c-barn-stat-tile label={labels.columnActive} value={activeCount} bordered align="start" data-id="active-count"></c-barn-stat-tile>
+                    </div>
                 </div>
+            </template>
+
+            <template lwc:if={isReadOnly}>
+                <c-barn-notice class="slds-var-m-bottom_small" variant="info" message={labels.readOnly} data-id="read-only-notice"></c-barn-notice>
             </template>
 
             <template lwc:if={hasError}>
-                <div
-                    class="slds-box slds-box_x-small slds-theme_error slds-var-m-bottom_small"
-                    role="alert"
-                >
-                    <span data-id="error-message">{errorMessage}</span>
-                </div>
+                <c-barn-notice class="slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
             </template>
 
             <template lwc:if={hasNotice}>
-                <div
-                    class="slds-box slds-box_x-small slds-theme_success slds-var-m-bottom_small"
-                    role="status"
-                    aria-live="polite"
-                >
-                    <span data-id="notice-message">{noticeMessage}</span>
-                </div>
+                <c-barn-notice class="slds-var-m-bottom_small" variant="success" message={noticeMessage} data-id="notice-message"></c-barn-notice>
             </template>
 
             <template lwc:if={deleting}>
-                <div
-                    class="slds-box slds-theme_warning slds-var-m-bottom_small"
-                    role="dialog"
-                    aria-labelledby="delete-heading"
+                <c-barn-notice
+                    class="slds-var-m-bottom_small"
+                    variant="warning"
                     data-id="delete-panel"
                 >
                     <h3 id="delete-heading" class="slds-text-heading_small">{labels.deleteHeading}</h3>
@@ -61,7 +58,7 @@
                             onclick={handleConfirmDelete}
                         ></lightning-button>
                     </div>
-                </div>
+                </c-barn-notice>
             </template>
 
             <div class="slds-box slds-box_x-small slds-var-m-bottom_small">
@@ -83,9 +80,12 @@
                     </template>
                 </p>
                 <template lwc:if={isStale}>
-                    <p class="slds-text-color_error" data-id="stale-warning">
-                        {labels.freshnessStale}
-                    </p>
+                    <c-barn-notice
+                        class="slds-var-m-vertical_x-small"
+                        variant="warning"
+                        message={labels.freshnessStale}
+                        data-id="stale-warning"
+                    ></c-barn-notice>
                 </template>
                 <p data-id="schedule-message">{scheduleMessage}</p>
                 <div class="slds-var-m-top_x-small">
@@ -140,9 +140,12 @@
                     <div class="slds-box slds-var-m-top_small" data-id="estimate">
                         <p role="status" data-id="estimate-summary">{estimate.summary}</p>
                         <template lwc:if={estimate.workingHours}>
-                            <p class="slds-text-color_error" data-id="working-hours">
-                                {labels.workingHours}
-                            </p>
+                            <c-barn-notice
+                                class="slds-var-m-vertical_x-small"
+                                variant="warning"
+                                message={labels.workingHours}
+                                data-id="working-hours"
+                            ></c-barn-notice>
                         </template>
                         <div class="slds-var-m-top_x-small">
                             <lightning-button
@@ -169,8 +172,8 @@
                     </div>
                 </template>
                 <template lwc:if={builder}>
+                    <p class="slds-var-m-top_small slds-text-body_small slds-text-color_weak" data-id="drop-hint">{labels.dropHint}</p>
                     <lightning-input
-                        class="slds-var-m-top_small"
                         type="file"
                         data-id="import-file"
                         label={labels.importFile}
@@ -182,7 +185,7 @@
                 <template lwc:if={importRows}>
                     <div class="slds-box slds-var-m-top_small" data-id="import">
                         <table
-                            class="slds-table slds-table_cell-buffer slds-table_bordered"
+                            class="slds-table slds-table_cell-buffer slds-table_bordered slds-max-medium-table_stacked"
                             aria-label={labels.importFile}
                         >
                             <thead>
@@ -194,8 +197,8 @@
                             <tbody>
                                 <template for:each={importRows} for:item="row">
                                     <tr key={row.key} data-id="import-row">
-                                        <th scope="row">{row.name}</th>
-                                        <td>{row.text}</td>
+                                        <th scope="row" data-label={labels.columnRollup}>{row.name}</th>
+                                        <td data-label={labels.importColumn}>{row.text}</td>
                                     </tr>
                                 </template>
                             </tbody>
@@ -222,7 +225,13 @@
             </div>
 
             <template lwc:if={isEmpty}>
-                <p data-id="empty-message">{labels.emptyList}</p>
+                <c-barn-empty-state
+                    illustration="setup"
+                    size="small"
+                    heading={labels.title}
+                    message={labels.emptyList}
+                    data-id="empty-message"
+                ></c-barn-empty-state>
             </template>
 
             <template lwc:if={hasAnyRollup}>
@@ -237,7 +246,12 @@
                 ></lightning-input>
             </template>
             <template lwc:if={noMatches}>
-                <p data-id="no-matches">{labels.noMatches}</p>
+                <c-barn-empty-state
+                    illustration="no-data"
+                    size="compact"
+                    heading={labels.noMatches}
+                    data-id="no-matches"
+                ></c-barn-empty-state>
             </template>
 
             <template lwc:if={hasRows}>
@@ -245,6 +259,7 @@
                     <table
                         class="slds-table slds-table_cell-buffer slds-table_bordered"
                         aria-label={labels.title}
+                        data-wide-table
                     >
                         <thead>
                             <tr class="slds-line-height_reset">
@@ -284,13 +299,13 @@
                                         <div>{row.name}</div>
                                         <div class="slds-text-body_small">{row.description}</div>
                                         <template for:each={row.conflicts} for:item="conflict">
-                                            <div
+                                            <c-barn-notice
                                                 key={conflict.key}
-                                                class="slds-text-body_small slds-text-color_error"
+                                                class="slds-var-m-top_xx-small"
+                                                variant="warning"
+                                                message={conflict.text}
                                                 data-id="conflict"
-                                            >
-                                                {conflict.text}
-                                            </div>
+                                            ></c-barn-notice>
                                         </template>
                                     </th>
                                     <td class="slds-cell-wrap">
@@ -299,7 +314,9 @@
                                             {row.counts}: {row.target}
                                         </div>
                                     </td>
-                                    <td class={row.statusClass} data-id="status">{row.status}</td>
+                                    <td data-id="status">
+                                        <c-barn-status-badge status={row.statusTone} label={row.status}></c-barn-status-badge>
+                                    </td>
                                     <td>
                                         <lightning-combobox
                                             data-id={row.recordId}

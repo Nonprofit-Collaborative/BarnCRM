@@ -7,11 +7,3 @@ packages/giving/main/default/lwc/giftBatchEntry/giftBatchEntry.html table-stacke
 packages/giving/main/default/lwc/quickGiftEntry/quickGiftEntry.html solid-box 2
 packages/giving/main/default/lwc/receiptActions/receiptActions.html table-stacked 1
 packages/giving/main/default/lwc/receiptSettings/receiptSettings.html table-stacked 1
-packages/rollups/main/default/lwc/rollupBuilder/rollupBuilder.html solid-box 2
-packages/rollups/main/default/lwc/rollupDefinitions/rollupDefinitions.html solid-box 3
-packages/rollups/main/default/lwc/rollupDefinitions/rollupDefinitions.html table-stacked 2
-packages/rollups/main/default/lwc/rollupDlrsImport/rollupDlrsImport.html solid-box 1
-packages/rollups/main/default/lwc/rollupDlrsImport/rollupDlrsImport.html table-stacked 1
-packages/rollups/main/default/lwc/rollupExplain/rollupExplain.html solid-box 1
-packages/rollups/main/default/lwc/rollupTemplates/rollupTemplates.html solid-box 1
-packages/rollups/main/default/lwc/rollupWizard/rollupWizard.html solid-box 2

@@ -17,7 +17,6 @@ import runNowLabel from '@salesforce/label/c.Core_HealthCheck_RunNowButton';
 import scheduleNightly from '@salesforce/label/c.Giving_NightlyJobs_ScheduleButton';
 import stopSchedule from '@salesforce/label/c.Giving_NightlyJobs_StopButton';
 import copyAgain from '@salesforce/label/c.Mirror_OpportunityMirror_CopyAgain';
-import giftTransactionSide from '@salesforce/label/c.Mirror_GiftTransactionMirror_GiftTransactionSide';
 import columnGiftTransaction from '@salesforce/label/c.Mirror_GiftTransactionMirror_ColumnGiftTransaction';
 import columnGiftTransactionAmount from '@salesforce/label/c.Mirror_GiftTransactionMirror_ColumnGiftTransactionAmount';
 import columnTransactionDate from '@salesforce/label/c.Mirror_GiftTransactionMirror_ColumnTransactionDate';
@@ -34,7 +33,6 @@ import reconciliationTitle from '@salesforce/label/c.Mirror_OpportunityMirror_Re
 import fromDate from '@salesforce/label/c.Mirror_OpportunityMirror_FromDate';
 import toDate from '@salesforce/label/c.Mirror_OpportunityMirror_ToDate';
 import compareLabel from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCompare';
-import giftSide from '@salesforce/label/c.Mirror_OpportunityMirror_GiftSide';
 import noDifferences from '@salesforce/label/c.Core_AccessCompare_NoDifferences';
 import differenceCount from '@salesforce/label/c.Mirror_OpportunityMirror_DifferenceCount';
 import differenceCountAll from '@salesforce/label/c.Mirror_OpportunityMirror_DifferenceCountAll';
@@ -45,6 +43,7 @@ import columnDifference from '@salesforce/label/c.Core_AccessCompare_ColDifferen
 import errorFailed from '@salesforce/label/c.Mirror_OpportunityMirror_ErrorFailed';
 import { differenceTextOf, fill, isoDate, rowsOf, viewOf } from './mirrorView';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { iconFor } from 'c/barnIcons';
 
 /** How often the page asks whether a run it shows as running has finished. */
 const POLL_MS = 10000;
@@ -94,8 +93,14 @@ export default class GiftTransactionMirror extends LightningElement {
     fromDate,
     toDate,
     compare: compareLabel,
-    copyAgain
+    copyAgain,
+    columnGift,
+    columnGiftAmount,
+    columnGiftTransaction,
+    columnGiftTransactionAmount
   };
+
+  icons = { giftTransactionMirror: iconFor('Gift_Transaction_Mirror') };
 
   columns = [
     {
@@ -230,16 +235,13 @@ export default class GiftTransactionMirror extends LightningElement {
     return Boolean(this.comparison && this.comparison.differenceCount > 0);
   }
 
-  get giftSideText() {
-    return fill(giftSide, this.comparison.giftCount, this.money(this.comparison.giftTotal));
+  get currencyCode() {
+    return CURRENCY;
   }
 
-  get giftTransactionSideText() {
-    return fill(
-      giftTransactionSide,
-      this.comparison.giftTransactionCount,
-      this.money(this.comparison.giftTransactionTotal)
-    );
+  /** No differences is good news; any difference is a warning. */
+  get differenceVariant() {
+    return this.hasDifferences ? 'warning' : 'success';
   }
 
   get differenceText() {

@@ -113,7 +113,7 @@ describe('c-rollup-builder', () => {
     await flush();
 
     expect(wizard(element)).toBeNull();
-    expect(element.shadowRoot.querySelector('[data-id="notice"]').textContent).toBe('Saved.');
+    expect(element.shadowRoot.querySelector('[data-id="notice"]').message).toBe('Saved.');
     expect(list(element).refresh).toHaveBeenCalled();
   });
 
@@ -131,7 +131,7 @@ describe('c-rollup-builder', () => {
     await flush();
 
     const notice = element.shadowRoot.querySelector('[data-id="other-rollup-tools"]');
-    expect(notice.textContent).toContain('c.Core_OtherRollupTools_Title');
+    expect(notice.title).toBe('c.Core_OtherRollupTools_Title');
     expect(notice.textContent).toContain('This org also runs DLRS.');
     expect(element.shadowRoot.querySelector('[data-id="import-from-dlrs"]')).toBeNull();
   });
@@ -161,7 +161,7 @@ describe('c-rollup-builder', () => {
     await flush();
 
     expect(importer()).toBeNull();
-    expect(element.shadowRoot.querySelector('[data-id="notice"]').textContent).toBe('1 turned on');
+    expect(element.shadowRoot.querySelector('[data-id="notice"]').message).toBe('1 turned on');
     expect(list(element).refresh).toHaveBeenCalled();
   });
 

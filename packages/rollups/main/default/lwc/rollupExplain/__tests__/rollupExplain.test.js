@@ -106,6 +106,6 @@ describe('c-rollup-explain', () => {
     element.recordId = '003000000000001AAA';
     document.body.appendChild(element);
     await flush();
-    expect(query(element, 'error').textContent).toBe('No access.');
+    expect(query(element, 'error').message).toBe('No access.');
   });
 });

@@ -26,6 +26,7 @@ import marked from '@salesforce/label/c.Mirror_AccountingExport_Marked';
 import markNeedsAllFunds from '@salesforce/label/c.Mirror_AccountingExport_MarkNeedsAllFunds';
 import { BYTE_ORDER_MARK, bodyMessage, saveBlob } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { iconFor } from 'c/barnIcons';
 
 const REVOKE_DELAY_MS = 1000;
 
@@ -48,6 +49,8 @@ export default class AccountingExport extends LightningElement {
       });
     }
   }
+
+  icons = { accountingExport: iconFor('Accounting_Export') };
 
   labels = {
     title,

@@ -133,7 +133,7 @@ public with sharing class RollupDefinitionTransfer {
 					}
 					Boolean shipped = existing != null && existing.Is_Package_Default__c == true;
 					if (shipped || shippedKeys.contains(key)) {
-						throw refusal(Label.Core_RollupBuilder_ImportShipped);
+						throw refusal(BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportShipped'));
 					}
 					Rollup_Definition__c record = checked(rollup, existing, known);
 					if (existing == null) {
@@ -167,7 +167,7 @@ public with sharing class RollupDefinitionTransfer {
 		try {
 			parsed = JSON.deserializeUntyped(fileText);
 		} catch (Exception unreadable) {
-			throw refusal(Label.Core_RollupBuilder_ImportNotAFile);
+			throw refusal(BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportNotAFile'));
 		}
 		Map<String, Object> file = parsed instanceof Map<String, Object>
 			? (Map<String, Object>) parsed
@@ -178,7 +178,7 @@ public with sharing class RollupDefinitionTransfer {
 			!(version instanceof Integer) ||
 			!(file.get('rollups') instanceof List<Object>)
 		) {
-			throw refusal(Label.Core_RollupBuilder_ImportNotAFile);
+			throw refusal(BarnHelp.text('Rollups', 'Core_RollupBuilder_ImportNotAFile'));
 		}
 		if ((Integer) version > FORMAT_VERSION) {
 			throw refusal(Label.Core_RollupBuilder_ImportNewer);

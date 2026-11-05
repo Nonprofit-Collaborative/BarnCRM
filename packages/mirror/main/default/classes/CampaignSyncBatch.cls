@@ -55,8 +55,9 @@ public with sharing class CampaignSyncBatch implements Database.Batchable<SObjec
 			Database.executeBatch(new CampaignSyncBatch(true), CHUNK_SIZE);
 		}
 		ErrorLogger.logMessage(
-			String.format(
-				Label.Mirror_CampaignSync_LogRunSummary,
+			BarnHelp.text(
+				'Mirror',
+				'Mirror_CampaignSync_LogRunSummary',
 				new List<Object>{
 					childrenOnly ? 2 : 1,
 					totals.created,

@@ -11,6 +11,8 @@ import IMPORT_FROM_DLRS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportT
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/rollupTabLabel';
 import { bodyMessage } from 'c/findCsv';
+import { iconFor } from 'c/barnIcons';
+import ADVANCED from '@salesforce/label/c.Core_RollupBuilder_Advanced';
 
 const TAB_ICON = 'utility:builder';
 
@@ -20,7 +22,14 @@ const TAB_ICON = 'utility:builder';
  * Copy, which open the five steps. Saving refreshes the list.
  */
 export default class RollupBuilder extends LightningElement {
-  labels = { title: TITLE, otherTools: OTHER_TOOLS, importFromDlrs: IMPORT_FROM_DLRS };
+  labels = {
+    title: TITLE,
+    otherTools: OTHER_TOOLS,
+    importFromDlrs: IMPORT_FROM_DLRS,
+    advanced: ADVANCED
+  };
+
+  icons = { rollups: iconFor('Rollup_Builder') };
 
   model;
   draft;

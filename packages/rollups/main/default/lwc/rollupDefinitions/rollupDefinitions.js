@@ -46,7 +46,6 @@ import START_NOW from '@salesforce/label/c.Core_RollupBuilder_StartNow';
 import RUN_TONIGHT from '@salesforce/label/c.Core_RollupBuilder_RunTonight';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import DELETE_ROLLUP from '@salesforce/label/c.Core_Find_Delete';
-import DELETE_SHIPPED from '@salesforce/label/c.Core_RollupBuilder_DeleteShipped';
 import DELETED from '@salesforce/label/c.Core_RollupBuilder_Deleted';
 import EXPORT_ROLLUPS from '@salesforce/label/c.Core_RollupBuilder_Export';
 import EXPORT_SELECT from '@salesforce/label/c.Core_RollupBuilder_ExportSelect';
@@ -74,15 +73,16 @@ import DELETE_KEEP from '@salesforce/label/c.Core_RollupEase_DeleteKeep';
 import DELETE_CLEAR from '@salesforce/label/c.Core_RollupEase_DeleteClear';
 import DELETED_CLEARED from '@salesforce/label/c.Core_RollupEase_DeletedCleared';
 import { bodyMessage } from 'c/findCsv';
+import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
-/** How each recalculation state is styled in the Status column (U6). */
-const STATUS_CLASS = {
-  failed: 'slds-text-color_error',
-  waiting: 'slds-text-color_default',
-  running: 'slds-text-color_default',
-  off: 'slds-text-color_weak',
-  clear: 'slds-text-color_weak'
+/** The status vocabulary word for each recalculation state in the Status column (U6). */
+const STATUS_TONE = {
+  failed: 'error',
+  waiting: 'pending',
+  running: 'running',
+  off: 'off',
+  clear: 'success'
 };
 
 /** The words for each import outcome, before saving and after (ADR-0136). */
@@ -136,7 +136,12 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
    */
   @api builder = false;
 
+  icons = { rollups: iconFor('Rollup_Builder') };
+
   labels = {
+    get dropHint() {
+      return helpText('Rollups', 'Core_Rollups_ImportDropHint');
+    },
     newRollup: NEW_ROLLUP,
     edit: EDIT,
     copy: COPY,
@@ -148,7 +153,9 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
     runTonight: RUN_TONIGHT,
     cancel: CANCEL,
     deleteRollup: DELETE_ROLLUP,
-    deleteShipped: DELETE_SHIPPED,
+    get deleteShipped() {
+      return helpText('Rollups', 'Core_RollupBuilder_DeleteShipped');
+    },
     deleted: DELETED,
     exportRollups: EXPORT_ROLLUPS,
     exportSelect: EXPORT_SELECT,
@@ -253,7 +260,7 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
       hasLastCalculated: !!rollup.lastCalculated,
       exportable: this.builder && !rollup.packageDefault,
       selected: this.selectedIds.includes(rollup.recordId),
-      statusClass: STATUS_CLASS[rollup.statusLevel] || 'slds-text-color_weak',
+      statusTone: STATUS_TONE[rollup.statusLevel] || 'neutral',
       conflicts: (rollup.conflicts || []).map((text, index) => ({ key: String(index), text }))
     }));
   }
@@ -305,6 +312,14 @@ export default class RollupDefinitions extends NavigationMixin(LightningElement)
 
   get hasAnyRollup() {
     return this.rows.length > 0;
+  }
+
+  get rollupCount() {
+    return this.rows.length;
+  }
+
+  get activeCount() {
+    return this.rows.filter((row) => row.active).length;
   }
 
   handleSearch(event) {

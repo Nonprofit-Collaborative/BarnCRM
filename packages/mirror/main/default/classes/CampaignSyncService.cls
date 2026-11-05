@@ -154,8 +154,9 @@ public with sharing class CampaignSyncService {
 			if (oldById == null && !noAccessLogged) {
 				noAccessLogged = true;
 				ErrorLogger.logMessage(
-					String.format(
-						Label.Mirror_CampaignSync_LogNoAccess,
+					BarnHelp.text(
+						'Mirror',
+						'Mirror_CampaignSync_LogNoAccess',
 						new List<Object>{ scope.size() }
 					),
 					CONTEXT,
@@ -170,7 +171,7 @@ public with sharing class CampaignSyncService {
 			if (!noHeadroomLogged) {
 				noHeadroomLogged = true;
 				ErrorLogger.logMessage(
-					Label.Mirror_CampaignSync_LogNoHeadroom,
+					BarnHelp.text('Mirror', 'Mirror_CampaignSync_LogNoHeadroom'),
 					CONTEXT,
 					ErrorLogger.SEVERITY_WARNING
 				);
@@ -330,8 +331,9 @@ public with sharing class CampaignSyncService {
 				messages.add(error.getMessage());
 			}
 			log(
-				String.format(
-					Label.Mirror_CampaignSync_LogOrphan,
+				BarnHelp.text(
+					'Mirror',
+					'Mirror_CampaignSync_LogOrphan',
 					new List<Object>{
 						String.valueOf(orphans[i].Id),
 						orphanedFor[i].Name,

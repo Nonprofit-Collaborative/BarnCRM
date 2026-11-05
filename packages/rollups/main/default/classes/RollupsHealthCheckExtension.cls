@@ -281,8 +281,9 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 				return new HealthCheckService.Finding(
 						'rollup_queue_failed',
 						System.Label.Core_HealthCheck_RollupQueueFailedTitle,
-						String.format(
-							System.Label.Core_HealthCheck_RollupQueueFailedDetail,
+						BarnHelp.text(
+							'Rollups',
+							'Core_HealthCheck_RollupQueueFailedDetail',
 							new List<Object>{ failed.format() }
 						),
 						HealthCheckService.SEVERITY_WARNING,
@@ -293,8 +294,9 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 			return new HealthCheckService.Finding(
 					'rollup_queue_stuck',
 					System.Label.Core_HealthCheck_RollupQueueStuckTitle,
-					String.format(
-						System.Label.Core_HealthCheck_RollupQueueStuckDetail,
+					BarnHelp.text(
+						'Rollups',
+						'Core_HealthCheck_RollupQueueStuckDetail',
 						new List<Object>{ stuck.format(), queueStuckAfterMinutes.format() }
 					),
 					HealthCheckService.SEVERITY_WARNING,

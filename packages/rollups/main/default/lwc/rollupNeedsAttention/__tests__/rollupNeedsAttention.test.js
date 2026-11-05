@@ -65,6 +65,21 @@ describe('c-rollup-needs-attention', () => {
     jest.clearAllMocks();
   });
 
+  it('counts what needs attention in a badge, and shows nothing when nothing does', async () => {
+    const element = await build(ATTENTION);
+    // Two failed records and the nightly run not scheduled.
+    expect(query(element, 'count').label).toBe('3');
+
+    const clean = await build({
+      canManage: true,
+      waiting: 'Nothing waiting.',
+      failed: [],
+      nightlyScheduled: true,
+      lastRun: 'Last full run: Completed.'
+    });
+    expect(query(clean, 'needs-attention')).toBeNull();
+  });
+
   it('shows what is waiting, each failed record with a link, and the nightly warning', async () => {
     const element = await build(ATTENTION);
 
@@ -90,7 +105,7 @@ describe('c-rollup-needs-attention', () => {
     await flush();
 
     expect(retry).toHaveBeenCalledWith({ entryIds: ['a0Q000000000001AAA'] });
-    expect(query(element, 'notice').textContent).toBe('Back in the queue.');
+    expect(query(element, 'notice').message).toBe('Back in the queue.');
     expect(query(element, 'nothing-failed')).not.toBeNull();
   });
 
@@ -114,7 +129,7 @@ describe('c-rollup-needs-attention', () => {
     await flush();
 
     expect(processNow).toHaveBeenCalledTimes(1);
-    expect(query(element, 'notice').textContent).toBe('Started.');
+    expect(query(element, 'notice').message).toBe('Started.');
     expect(query(element, 'start-now')).toBeNull();
 
     const readOnly = await build({ ...ATTENTION, hasWaiting: true, canManage: false });

@@ -90,7 +90,7 @@ describe('c-rollup-instant-totals', () => {
     getStates.mockResolvedValue([SHIFT, ON]);
     const element = await build({ canManage: true });
 
-    const statuses = all(element, 'status').map((node) => node.textContent);
+    const statuses = all(element, 'status').map((node) => node.label);
     expect(statuses[1]).toBe('On: the trigger BarnRollup_Visit_c updates these totals at once.');
     expect(all(element, 'count')[0].textContent).toBe('2 instant rollups count this object.');
     expect(all(element, 'turn-on').map((node) => node.dataset.object)).toEqual(['Shift__c']);
@@ -142,7 +142,7 @@ describe('c-rollup-instant-totals', () => {
     await flush();
 
     expect(writeText).toHaveBeenCalledWith(CODE.testSource);
-    expect(query(element, 'notice').textContent).toBe('Copied.');
+    expect(query(element, 'notice').message).toBe('Copied.');
   });
 
   it('turns instant totals off with no deploy and says so', async () => {
@@ -154,7 +154,7 @@ describe('c-rollup-instant-totals', () => {
     await flush();
 
     expect(setTurnedOn).toHaveBeenCalledWith({ objectApiName: 'Visit__c', turnedOn: false });
-    expect(query(element, 'notice').textContent).toBe('Instant totals on Visit are turned off.');
+    expect(query(element, 'notice').message).toBe('Instant totals on Visit are turned off.');
     expect(query(element, 'turn-off')).toBeNull();
     expect(query(element, 'turn-on')).not.toBeNull();
   });
@@ -192,7 +192,7 @@ describe('c-rollup-instant-totals', () => {
       body: { message: 'You need the Manage BarnCRM Settings permission.' }
     });
     const element = await build({});
-    expect(query(element, 'error').textContent).toBe(
+    expect(query(element, 'error').message).toBe(
       'You need the Manage BarnCRM Settings permission.'
     );
   });

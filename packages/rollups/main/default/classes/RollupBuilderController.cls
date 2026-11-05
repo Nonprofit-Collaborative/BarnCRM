@@ -148,6 +148,9 @@ public with sharing class RollupBuilderController {
 		/** The nightly run's time as the reader writes it, for example 2:00 AM (U10). */
 		@AuraEnabled
 		public String nightlyTime { get; set; }
+		/** The org's custom permissions, for the Bypass Permission list (value is the API name). */
+		@AuraEnabled
+		public List<Option> customPermissions { get; set; }
 	}
 
 	/** One rollup as the Builder edits it. */
@@ -214,6 +217,21 @@ public with sharing class RollupBuilderController {
 		}
 	}
 
+	/**
+	 * The org's custom permissions, labelled by name, for the Bypass Permission list. A packaged
+	 * one is written with its namespace, as the permission check reads it.
+	 */
+	private static List<Option> customPermissionOptions() {
+		List<Option> options = new List<Option>();
+		for (CustomPermission permission : RollupSelector.customPermissions()) {
+			String name = String.isBlank(permission.NamespacePrefix)
+				? permission.DeveloperName
+				: permission.NamespacePrefix + '__' + permission.DeveloperName;
+			options.add(new Option(name, permission.MasterLabel + ' (' + name + ')'));
+		}
+		return options;
+	}
+
 	@AuraEnabled(cacheable=true)
 	public static BuilderModel getModel() {
 		try {
@@ -230,6 +248,7 @@ public with sharing class RollupBuilderController {
 			model.canImportFromDlrs = model.canManage && canImportFromDlrs();
 			model.inSave = RollupService.recalculatesInTheSave();
 			model.nightlyTime = RollupScheduler.nightlyTime();
+			model.customPermissions = customPermissionOptions();
 			return model;
 		} catch (Exception caught) {
 			throw asUserError(caught);
