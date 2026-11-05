@@ -152,7 +152,9 @@ public with sharing class FindRelatedRecords {
             rows < 1 ||
             rows > MAX_CHILD_ROWS
         ) {
-            throw new QueryCompiler.QueryCompilerException(System.Label.Core_Find_ErrorChildColumn);
+            throw new QueryCompiler.QueryCompilerException(
+                BarnHelp.text('Core', 'Core_Find_ErrorChildColumn')
+            );
         }
         List<String> fields = new List<String>{ 'Id' };
         for (Object rawField : rawFields) {
@@ -207,7 +209,7 @@ public with sharing class FindRelatedRecords {
     private static Map<String, Object> asMap(Object raw) {
         if (!(raw instanceof Map<String, Object>)) {
             throw new QueryCompiler.QueryCompilerException(
-                System.Label.Core_Find_ErrorInvalidQuery
+                BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery')
             );
         }
         return (Map<String, Object>) raw;
@@ -225,7 +227,7 @@ public with sharing class FindRelatedRecords {
     private static QueryCompiler.QueryCompilerException refusedRelated(String name) {
         return new QueryCompiler.QueryCompilerException(
             String.format(
-                System.Label.Core_Find_ErrorRelated,
+                BarnHelp.text('Core', 'Core_Find_ErrorRelated'),
                 new List<Object>{ String.valueOf(name).abbreviate(80) }
             )
         );

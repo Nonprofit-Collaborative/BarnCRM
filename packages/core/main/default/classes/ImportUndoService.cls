@@ -89,7 +89,7 @@ public with sharing class ImportUndoService {
         }
         // A field access change puts permission rows back, on the Field Access Manager (R-FA1).
         if (FieldAccessService.OPERATION_ACCESS.equals(batch.Operation__c)) {
-            view.reason = Label.Core_Import_UndoErrorAccessChange;
+            view.reason = BarnHelp.text('Core', 'Core_Import_UndoErrorAccessChange');
             return view;
         }
         countTagged(batch.Id, view);

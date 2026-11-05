@@ -200,7 +200,7 @@ private class FindRelatedRecordsTest {
                     null
                 ),
                 String.format(
-                    System.Label.Core_Find_ErrorRelated,
+                    BarnHelp.text('Core', 'Core_Find_ErrorRelated'),
                     new List<Object>{ 'Error_Log__c.User__c' }
                 )
             );
@@ -215,7 +215,7 @@ private class FindRelatedRecordsTest {
                     null
                 ),
                 String.format(
-                    System.Label.Core_Find_ErrorRelated,
+                    BarnHelp.text('Core', 'Core_Find_ErrorRelated'),
                     new List<Object>{ 'No_Such_Object__c' }
                 )
             );
@@ -225,7 +225,7 @@ private class FindRelatedRecordsTest {
                     new List<Object>{ new Map<String, Object>{ 'relationship' => 'Nothing_Here' } }
                 ),
                 String.format(
-                    System.Label.Core_Find_ErrorRelated,
+                    BarnHelp.text('Core', 'Core_Find_ErrorRelated'),
                     new List<Object>{ 'Nothing_Here' }
                 )
             );
@@ -240,7 +240,7 @@ private class FindRelatedRecordsTest {
                         }
                     }
                 ),
-                System.Label.Core_Find_ErrorChildColumn
+                BarnHelp.text('Core', 'Core_Find_ErrorChildColumn')
             );
             expectRefusal(
                 query(
@@ -251,7 +251,7 @@ private class FindRelatedRecordsTest {
                     },
                     null
                 ),
-                System.Label.Core_Find_ErrorRelatedCount
+                BarnHelp.text('Core', 'Core_Find_ErrorRelatedCount')
             );
         }
     }

@@ -1154,7 +1154,9 @@ public with sharing class AccessExplorerController {
         try {
             return Id.valueOf(value);
         } catch (Exception invalid) {
-            throw new AccessExplorerException(System.Label.Core_AccessExplorer_UnknownSubject);
+            throw new AccessExplorerException(
+                BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject')
+            );
         }
     }
 
@@ -1167,7 +1169,9 @@ public with sharing class AccessExplorerController {
             LIMIT 1
         ];
         if (found.isEmpty()) {
-            throw new AccessExplorerException(System.Label.Core_AccessExplorer_UnknownSubject);
+            throw new AccessExplorerException(
+                BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject')
+            );
         }
         return found[0];
     }
@@ -1177,7 +1181,9 @@ public with sharing class AccessExplorerController {
             ? querySets('Id = :setId', new Map<String, Object>{ 'setId' => permissionSetId })
             : new List<PermissionSet>();
         if (found.isEmpty()) {
-            throw new AccessExplorerException(System.Label.Core_AccessExplorer_UnknownSubject);
+            throw new AccessExplorerException(
+                BarnHelp.text('Core', 'Core_AccessExplorer_UnknownSubject')
+            );
         }
         return found[0];
     }
@@ -1190,7 +1196,7 @@ public with sharing class AccessExplorerController {
         if (described == null || !FindController.isOffered(described)) {
             throw new AccessExplorerException(
                 String.format(
-                    System.Label.Core_AccessExplorer_UnknownObject,
+                    BarnHelp.text('Core', 'Core_AccessExplorer_UnknownObject'),
                     new List<Object>{ String.isBlank(objectName) ? '' : objectName }
                 )
             );
@@ -1209,7 +1215,7 @@ public with sharing class AccessExplorerController {
         if (token == null) {
             throw new AccessExplorerException(
                 String.format(
-                    System.Label.Core_AccessExplorer_UnknownField,
+                    BarnHelp.text('Core', 'Core_AccessExplorer_UnknownField'),
                     new List<Object>{ fieldName }
                 )
             );
@@ -1219,7 +1225,9 @@ public with sharing class AccessExplorerController {
 
     private static void requirePermission() {
         if (!FeatureManagement.checkPermission(PERMISSION)) {
-            throw new AccessExplorerException(System.Label.Core_AccessExplorer_PermissionRequired);
+            throw new AccessExplorerException(
+                BarnHelp.text('Core', 'Core_AccessExplorer_PermissionRequired')
+            );
         }
     }
 
@@ -1228,7 +1236,7 @@ public with sharing class AccessExplorerController {
             caught,
             caught instanceof AccessExplorerException,
             context,
-            System.Label.Core_AccessExplorer_UnexpectedError
+            BarnHelp.text('Core', 'Core_AccessExplorer_UnexpectedError')
         );
     }
 }

@@ -393,7 +393,7 @@ public with sharing class TabAccessService {
             PermissionSetAssignment assignment = refused[i];
             String setName = setNames.get(assignment.PermissionSetId);
             String detail = String.format(
-                Label.Core_Access_TabRefusalDetail,
+                BarnHelp.text('Core', 'Core_Access_TabRefusalDetail'),
                 new List<Object>{
                     setName == null ? String.valueOf(assignment.PermissionSetId) : setName,
                     assignment.AssigneeId

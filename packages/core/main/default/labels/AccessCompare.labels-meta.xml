@@ -49,14 +49,6 @@
         <value>Second</value>
     </labels>
     <labels>
-        <fullName>Core_AccessCompare_Choose</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access compare: prompt</shortDescription>
-        <value>Choose two to compare.</value>
-    </labels>
-    <labels>
         <fullName>Core_AccessCompare_Similarity</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>
@@ -97,28 +89,12 @@
         <value>Fields</value>
     </labels>
     <labels>
-        <fullName>Core_AccessCompare_Counts</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access compare: {0} is rows that differ, {1} is rows compared</shortDescription>
-        <value>{0} of {1} rows differ.</value>
-    </labels>
-    <labels>
         <fullName>Core_AccessCompare_NoDifferences</fullName>
         <categories>AccessExplorer</categories>
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Access compare: nothing differs</shortDescription>
         <value>No differences.</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessCompare_OnlyIn</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Access compare: {0} is a name, {1} is permissions only that side has</shortDescription>
-        <value>Only {0}: {1}.</value>
     </labels>
     <labels>
         <fullName>Core_AccessCompare_None</fullName>
@@ -191,13 +167,5 @@
         <protected>false</protected>
         <shortDescription>Modify all report: standard object</shortDescription>
         <value>Standard</value>
-    </labels>
-    <labels>
-        <fullName>Core_AccessModifyAll_Truncated</fullName>
-        <categories>AccessExplorer</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Modify all report: {0} is the row limit</shortDescription>
-        <value>The list is cut at {0} rows.</value>
     </labels>
 </CustomLabels>

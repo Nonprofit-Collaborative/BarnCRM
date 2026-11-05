@@ -94,7 +94,7 @@ public with sharing class FieldAccessRecordJob implements Queueable {
             Committed_By__c = UserInfo.getUserId(),
             Undo_Deadline__c = startedAt.addDays(ImportBatchService.undoWindowDays()),
             Run_Log__c = String.format(
-                System.Label.Core_FieldAccess_LogApplied,
+                BarnHelp.text('Core', 'Core_FieldAccess_LogApplied'),
                 new List<Object>{
                     byName,
                     startedAt.format(),
@@ -121,7 +121,7 @@ public with sharing class FieldAccessRecordJob implements Queueable {
             ? ImportBatchService.STATUS_UNDO_FAILED
             : ImportBatchService.STATUS_UNDONE;
         String line = String.format(
-            System.Label.Core_FieldAccess_LogUndone,
+            BarnHelp.text('Core', 'Core_FieldAccess_LogUndone'),
             new List<Object>{
                 byName,
                 startedAt.format(),

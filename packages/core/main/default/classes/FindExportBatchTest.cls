@@ -156,7 +156,10 @@ private class FindExportBatchTest {
                 FindController.serverExportStatus(started.jobId, '%');
                 Assert.fail('A tag that is not one is refused.');
             } catch (AuraHandledException refused) {
-                Assert.areEqual(System.Label.Core_Find_ExportFilesNotFound, refused.getMessage());
+                Assert.areEqual(
+                    BarnHelp.text('Core', 'Core_Find_ExportFilesNotFound'),
+                    refused.getMessage()
+                );
             }
         }
     }

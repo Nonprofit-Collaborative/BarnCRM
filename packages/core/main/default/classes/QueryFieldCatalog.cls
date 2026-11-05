@@ -283,7 +283,7 @@ public with sharing class QueryFieldCatalog {
     private static QueryFieldCatalogException unknownObject(String objectApiName) {
         return new QueryFieldCatalogException(
             String.format(
-                System.Label.Core_Filter_ErrorUnknownObject,
+                BarnHelp.text('Core', 'Core_Filter_ErrorUnknownObject'),
                 new List<Object>{ String.valueOf(objectApiName) }
             )
         );
@@ -292,7 +292,7 @@ public with sharing class QueryFieldCatalog {
     private static QueryFieldCatalogException unknownField(String path) {
         return new QueryFieldCatalogException(
             String.format(
-                System.Label.Core_Filter_ErrorUnknownField,
+                BarnHelp.text('Core', 'Core_Filter_ErrorUnknownField'),
                 new List<Object>{ String.valueOf(path) }
             )
         );

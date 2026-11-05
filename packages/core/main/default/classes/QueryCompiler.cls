@@ -68,23 +68,23 @@ public with sharing class QueryCompiler {
         try {
             raw = (Map<String, Object>) JSON.deserializeUntyped(queryJson);
         } catch (Exception unreadable) {
-            throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
+            throw new QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery'));
         }
         if (raw == null) {
-            throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
+            throw new QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery'));
         }
         try {
             return read(raw);
         } catch (TypeException wrongShape) {
             // A part of the right name but the wrong shape, such as "orderBy": ["Name"].
-            throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
+            throw new QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery'));
         }
     }
 
     private static QueryDocument read(Map<String, Object> raw) {
         Object version = raw.get('version');
         if (version != null && String.valueOf(version) != String.valueOf(SUPPORTED_VERSION)) {
-            throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
+            throw new QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery'));
         }
         QueryDocument document = new QueryDocument();
         document.objectName = (String) raw.get('object');
@@ -96,7 +96,7 @@ public with sharing class QueryCompiler {
             document.fields.add(String.valueOf(field));
         }
         if (document.fields.isEmpty() || document.fields.size() > MAX_FIELDS) {
-            throw new QueryCompilerException(System.Label.Core_Find_ErrorFieldCount);
+            throw new QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorFieldCount'));
         }
         Object filter = raw.get('filter');
         document.filter = filter == null
@@ -105,7 +105,9 @@ public with sharing class QueryCompiler {
         if (raw.get('orderBy') instanceof List<Object>) {
             List<Object> orderBy = (List<Object>) raw.get('orderBy');
             if (orderBy.size() > 1) {
-                throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
+                throw new QueryCompilerException(
+                    BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery')
+                );
             }
             if (!orderBy.isEmpty()) {
                 Map<String, Object> order = (Map<String, Object>) orderBy[0];
@@ -114,7 +116,9 @@ public with sharing class QueryCompiler {
                     ? 'ASC'
                     : String.valueOf(order.get('direction')).toUpperCase();
                 if (direction != 'ASC' && direction != 'DESC') {
-                    throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
+                    throw new QueryCompilerException(
+                        BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery')
+                    );
                 }
                 document.orderDirection = direction;
             }
@@ -128,11 +132,13 @@ public with sharing class QueryCompiler {
             document.related.size() > FindRelatedRecords.MAX_RELATED ||
             document.children.size() > FindRelatedRecords.MAX_CHILD_COLUMNS
         ) {
-            throw new QueryCompilerException(System.Label.Core_Find_ErrorRelatedCount);
+            throw new QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorRelatedCount'));
         }
         if (raw.get('aggregate') != null) {
             if (!(raw.get('aggregate') instanceof Map<String, Object>)) {
-                throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
+                throw new QueryCompilerException(
+                    BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery')
+                );
             }
             document.aggregate = (Map<String, Object>) raw.get('aggregate');
         }
@@ -153,7 +159,7 @@ public with sharing class QueryCompiler {
             if (!sortField.isSortable()) {
                 throw new QueryCompilerException(
                     String.format(
-                        System.Label.Core_Find_ErrorSortField,
+                        BarnHelp.text('Core', 'Core_Find_ErrorSortField'),
                         new List<Object>{ document.orderField }
                     )
                 );
@@ -331,7 +337,7 @@ public with sharing class QueryCompiler {
         if (String.isBlank(path) || !FIELD_PATH.matcher(path).matches()) {
             throw new QueryCompilerException(
                 String.format(
-                    System.Label.Core_Filter_ErrorUnknownField,
+                    BarnHelp.text('Core', 'Core_Filter_ErrorUnknownField'),
                     new List<Object>{ String.valueOf(path).abbreviate(80) }
                 )
             );
@@ -349,7 +355,7 @@ public with sharing class QueryCompiler {
             return new List<Object>();
         }
         if (!(raw instanceof List<Object>)) {
-            throw new QueryCompilerException(System.Label.Core_Find_ErrorInvalidQuery);
+            throw new QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery'));
         }
         return (List<Object>) raw;
     }
@@ -362,7 +368,7 @@ public with sharing class QueryCompiler {
             rows = null;
         }
         if (rows == null || rows.stripTrailingZeros().scale() > 0 || rows < 1 || rows > MAX_ROWS) {
-            throw new QueryCompilerException(System.Label.Core_Find_ErrorRowLimit);
+            throw new QueryCompilerException(BarnHelp.text('Core', 'Core_Find_ErrorRowLimit'));
         }
         return rows.intValue();
     }

@@ -29,8 +29,6 @@ import LOOK_UP from '@salesforce/label/c.Core_AccessExplorer_LookUp';
 import LOOK_UP_PERSON from '@salesforce/label/c.Core_Section_Person';
 import LOOK_UP_SET from '@salesforce/label/c.Core_AccessExplorer_KindSet';
 import SEARCH_PLACEHOLDER from '@salesforce/label/c.Core_AccessExplorer_SearchPlaceholder';
-import NO_MATCHES from '@salesforce/label/c.Core_AccessExplorer_NoMatches';
-import CHOOSE_SUBJECT from '@salesforce/label/c.Core_AccessExplorer_ChooseSubject';
 import INACTIVE from '@salesforce/label/c.Core_MatchLogic_Inactive';
 import KIND_PROFILE from '@salesforce/label/c.Core_AccessExplorer_KindProfile';
 import KIND_GROUP from '@salesforce/label/c.Core_AccessExplorer_KindGroup';
@@ -45,12 +43,7 @@ import FIELD_NONE from '@salesforce/label/c.Core_AccessExplorer_FieldNone';
 import GRANTS_HEADING from '@salesforce/label/c.Core_AccessExplorer_GrantsHeading';
 import PEOPLE_HEADING from '@salesforce/label/c.Core_AccessExplorer_PeopleHeading';
 import SHOW_MORE from '@salesforce/label/c.Core_AccessExplorer_ShowMore';
-import TRUNCATED from '@salesforce/label/c.Core_AccessExplorer_Truncated';
-import TAB_CHECK_SCHEDULED from '@salesforce/label/c.Core_AccessExplorer_TabCheckScheduled';
-import TAB_CHECK_NOT_SCHEDULED from '@salesforce/label/c.Core_AccessExplorer_TabCheckNotScheduled';
 import DOWNLOAD from '@salesforce/label/c.Core_AccessExplorer_Download';
-import DOWNLOADED from '@salesforce/label/c.Core_AccessExplorer_Downloaded';
-import NOTHING_TO_SHOW from '@salesforce/label/c.Core_AccessExplorer_NothingToShow';
 import YES from '@salesforce/label/c.Core_AccessExplorer_Yes';
 import ALWAYS from '@salesforce/label/c.Core_AccessExplorer_Always';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
@@ -130,8 +123,12 @@ export default class AccessExplorer extends LightningElement {
     show: SHOW,
     lookUp: LOOK_UP,
     searchPlaceholder: SEARCH_PLACEHOLDER,
-    noMatches: NO_MATCHES,
-    chooseSubject: CHOOSE_SUBJECT,
+    get noMatches() {
+      return helpText('Core', 'Core_AccessExplorer_NoMatches');
+    },
+    get chooseSubject() {
+      return helpText('Core', 'Core_AccessExplorer_ChooseSubject');
+    },
     inactive: INACTIVE,
     sourcesHeading: SOURCES_HEADING,
     objectsHeading: OBJECTS_HEADING,
@@ -151,10 +148,16 @@ export default class AccessExplorer extends LightningElement {
     get alwaysField() {
       return helpText('Core', 'Core_AccessExplorer_AlwaysField');
     },
-    tabCheckScheduled: TAB_CHECK_SCHEDULED,
-    tabCheckNotScheduled: TAB_CHECK_NOT_SCHEDULED,
+    get tabCheckScheduled() {
+      return helpText('Core', 'Core_AccessExplorer_TabCheckScheduled');
+    },
+    get tabCheckNotScheduled() {
+      return helpText('Core', 'Core_AccessExplorer_TabCheckNotScheduled');
+    },
     download: DOWNLOAD,
-    nothingToShow: NOTHING_TO_SHOW,
+    get nothingToShow() {
+      return helpText('Core', 'Core_AccessExplorer_NothingToShow');
+    },
     loading: LOADING,
     showTechnicalNames: SHOW_TECHNICAL_NAMES
   };
@@ -297,7 +300,7 @@ export default class AccessExplorer extends LightningElement {
 
   get truncatedMessage() {
     return this.objectAccess && this.objectAccess.truncated
-      ? format(TRUNCATED, MAX_GRANTS)
+      ? format(helpText('Core', 'Core_AccessExplorer_Truncated'), MAX_GRANTS)
       : undefined;
   }
 
@@ -528,6 +531,9 @@ export default class AccessExplorer extends LightningElement {
       path: column.fieldName
     }));
     downloadCsv(FILE_BASE, columns, table.rows);
-    this.noticeMessage = format(DOWNLOADED, String(table.rows.length));
+    this.noticeMessage = format(
+      helpText('Core', 'Core_AccessExplorer_Downloaded'),
+      String(table.rows.length)
+    );
   }
 }

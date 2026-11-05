@@ -2,6 +2,11 @@ import { createElement } from 'lwc';
 import FindExportFiles from 'c/findExportFiles';
 import startServerExport from '@salesforce/apex/FindController.startServerExport';
 import serverExportStatus from '@salesforce/apex/FindController.serverExportStatus';
+import { setHelpTextForTest } from 'c/barnHelpText';
+
+setHelpTextForTest({
+  Core_Find_ExportFilesDone: 'Ready: {0} files.'
+});
 
 jest.mock('@salesforce/apex/FindController.startServerExport', () => ({ default: jest.fn() }), {
   virtual: true
@@ -9,13 +14,6 @@ jest.mock('@salesforce/apex/FindController.startServerExport', () => ({ default:
 jest.mock('@salesforce/apex/FindController.serverExportStatus', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Core_Find_ExportFilesDone',
-  () => ({ default: 'Ready: {0} files.' }),
-  {
-    virtual: true
-  }
-);
 
 // eslint-disable-next-line @lwc/lwc/no-async-operation
 const flush = () => new Promise((resolve) => setTimeout(resolve, 0));

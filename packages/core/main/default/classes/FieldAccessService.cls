@@ -141,7 +141,7 @@ public with sharing class FieldAccessService {
     /** Why the running user may not change field access, or null when they may. */
     public static String refusal() {
         if (!FeatureManagement.checkPermission(SETTINGS_PERMISSION)) {
-            return System.Label.Core_FieldAccess_NeedsSettings;
+            return BarnHelp.text('Core', 'Core_FieldAccess_NeedsSettings');
         }
         Boolean manages = manageProfilesOverride;
         if (manages == null) {
@@ -153,7 +153,7 @@ public with sharing class FieldAccessService {
             ];
             manages = !access.isEmpty() && access[0].PermissionsManageProfilesPermissionsets;
         }
-        return manages ? null : System.Label.Core_FieldAccess_NeedsManageProfiles;
+        return manages ? null : BarnHelp.text('Core', 'Core_FieldAccess_NeedsManageProfiles');
     }
 
     public static void enforce() {
@@ -195,16 +195,18 @@ public with sharing class FieldAccessService {
             try {
                 ids.add(Id.valueOf(String.valueOf(value)));
             } catch (Exception notAnId) {
-                throw new FieldAccessException(System.Label.Core_FieldAccess_SetNotAllowed);
+                throw new FieldAccessException(
+                    BarnHelp.text('Core', 'Core_FieldAccess_SetNotAllowed')
+                );
             }
         }
         if (ids.isEmpty()) {
-            throw new FieldAccessException(System.Label.Core_FieldAccess_NoSets);
+            throw new FieldAccessException(BarnHelp.text('Core', 'Core_FieldAccess_NoSets'));
         }
         if (ids.size() > MAX_SETS) {
             throw new FieldAccessException(
                 String.format(
-                    System.Label.Core_FieldAccess_TooManySets,
+                    BarnHelp.text('Core', 'Core_FieldAccess_TooManySets'),
                     new List<Object>{ MAX_SETS }
                 )
             );
@@ -220,7 +222,7 @@ public with sharing class FieldAccessService {
             )
         );
         if (found.size() != ids.size()) {
-            throw new FieldAccessException(System.Label.Core_FieldAccess_SetNotAllowed);
+            throw new FieldAccessException(BarnHelp.text('Core', 'Core_FieldAccess_SetNotAllowed'));
         }
         return found;
     }
@@ -234,7 +236,7 @@ public with sharing class FieldAccessService {
         if (described == null || !FindController.isOffered(described)) {
             throw new FieldAccessException(
                 String.format(
-                    System.Label.Core_FieldAccess_UnknownObject,
+                    BarnHelp.text('Core', 'Core_FieldAccess_UnknownObject'),
                     new List<Object>{ objectName == null ? '' : objectName }
                 )
             );
@@ -366,7 +368,7 @@ public with sharing class FieldAccessService {
             if (item.access != NONE && removedObjects.contains(item.described.getName())) {
                 throw new FieldAccessException(
                     String.format(
-                        System.Label.Core_FieldAccess_Conflict,
+                        BarnHelp.text('Core', 'Core_FieldAccess_Conflict'),
                         new List<Object>{ item.described.getLabel() }
                     )
                 );
@@ -509,25 +511,27 @@ public with sharing class FieldAccessService {
                 changeJson
             );
             if (document.get('version') != 1 || !(document.get('items') instanceof List<Object>)) {
-                throw new FieldAccessException(System.Label.Core_FieldAccess_BadDocument);
+                throw new FieldAccessException(
+                    BarnHelp.text('Core', 'Core_FieldAccess_BadDocument')
+                );
             }
             return document;
         } catch (FieldAccessException known) {
             throw known;
         } catch (Exception unreadable) {
-            throw new FieldAccessException(System.Label.Core_FieldAccess_BadDocument);
+            throw new FieldAccessException(BarnHelp.text('Core', 'Core_FieldAccess_BadDocument'));
         }
     }
 
     private static List<Item> items(Map<String, Object> document) {
         List<Object> raw = (List<Object>) document.get('items');
         if (raw.isEmpty()) {
-            throw new FieldAccessException(System.Label.Core_FieldAccess_NoItems);
+            throw new FieldAccessException(BarnHelp.text('Core', 'Core_FieldAccess_NoItems'));
         }
         if (raw.size() > MAX_ITEMS) {
             throw new FieldAccessException(
                 String.format(
-                    System.Label.Core_FieldAccess_TooManyItems,
+                    BarnHelp.text('Core', 'Core_FieldAccess_TooManyItems'),
                     new List<Object>{ MAX_ITEMS }
                 )
             );
@@ -542,7 +546,9 @@ public with sharing class FieldAccessService {
             item.described = requireObject((String) entry.get('object'));
             item.access = String.valueOf(entry.get('access'));
             if (item.access != READ && item.access != EDIT && item.access != NONE) {
-                throw new FieldAccessException(System.Label.Core_FieldAccess_BadDocument);
+                throw new FieldAccessException(
+                    BarnHelp.text('Core', 'Core_FieldAccess_BadDocument')
+                );
             }
             String fieldName = (String) entry.get('field');
             if (String.isNotBlank(fieldName)) {
@@ -555,7 +561,7 @@ public with sharing class FieldAccessService {
                 if (item.field == null) {
                     throw new FieldAccessException(
                         String.format(
-                            System.Label.Core_FieldAccess_FieldNotAllowed,
+                            BarnHelp.text('Core', 'Core_FieldAccess_FieldNotAllowed'),
                             new List<Object>{ fieldName }
                         )
                     );
@@ -563,7 +569,7 @@ public with sharing class FieldAccessService {
                 if (item.access == EDIT && isReadOnly(item.field)) {
                     throw new FieldAccessException(
                         String.format(
-                            System.Label.Core_FieldAccess_ReadOnlyField,
+                            BarnHelp.text('Core', 'Core_FieldAccess_ReadOnlyField'),
                             new List<Object>{ item.field.getLabel() }
                         )
                     );
@@ -586,12 +592,14 @@ public with sharing class FieldAccessService {
         Plan checked = plan(changeJson);
         Integer count = checked.changes.size();
         if (count == 0) {
-            throw new FieldAccessException(System.Label.Core_FieldAccess_NothingToChange);
+            throw new FieldAccessException(
+                BarnHelp.text('Core', 'Core_FieldAccess_NothingToChange')
+            );
         }
         if (count > maxRows) {
             throw new FieldAccessException(
                 String.format(
-                    System.Label.Core_FieldAccess_TooManyRows,
+                    BarnHelp.text('Core', 'Core_FieldAccess_TooManyRows'),
                     new List<Object>{ count, maxRows }
                 )
             );
@@ -599,7 +607,7 @@ public with sharing class FieldAccessService {
         if (confirmedCount != count) {
             throw new FieldAccessException(
                 String.format(
-                    System.Label.Core_FieldAccess_CountChanged,
+                    BarnHelp.text('Core', 'Core_FieldAccess_CountChanged'),
                     new List<Object>{ count, confirmedCount == null ? 0 : confirmedCount }
                 )
             );
@@ -736,17 +744,17 @@ public with sharing class FieldAccessService {
     /** Why a change cannot be undone now, or null when it can. */
     public static String undoRefusal(Import_Batch__c job) {
         if (job == null || job.Operation__c != OPERATION_ACCESS) {
-            return System.Label.Core_FieldAccess_UndoNotFound;
+            return BarnHelp.text('Core', 'Core_FieldAccess_UndoNotFound');
         }
         Boolean undoable =
             job.Status__c == ImportBatchService.STATUS_COMPLETE ||
             job.Status__c == ImportBatchService.STATUS_UNDO_FAILED;
         if (!undoable || job.Undo_Deadline__c == null) {
-            return System.Label.Core_FieldAccess_UndoNotAllowed;
+            return BarnHelp.text('Core', 'Core_FieldAccess_UndoNotAllowed');
         }
         if (job.Undo_Deadline__c < Datetime.now()) {
             return String.format(
-                System.Label.Core_FieldAccess_UndoWindowClosed,
+                BarnHelp.text('Core', 'Core_FieldAccess_UndoWindowClosed'),
                 new List<Object>{ job.Undo_Deadline__c.format() }
             );
         }
@@ -828,7 +836,7 @@ public with sharing class FieldAccessService {
                     ImportJournalService.ACTION_NOT_RESTORED,
                     change
                 );
-                keptEntry.put('reason', System.Label.Core_FieldAccess_ChangedSince);
+                keptEntry.put('reason', BarnHelp.text('Core', 'Core_FieldAccess_ChangedSince'));
                 result.entries.add(keptEntry);
                 continue;
             }

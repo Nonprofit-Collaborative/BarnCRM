@@ -131,12 +131,12 @@ private class FindInlineEditServiceTest {
 
             System.runAs(maria()) {
                 Map<String, String> expected = new Map<String, String>{
-                    JSON.serialize(tooMany) => System.Label.Core_Find_ErrorEditTooMany,
+                    JSON.serialize(tooMany) => BarnHelp.text('Core', 'Core_Find_ErrorEditTooMany'),
                     JSON.serialize(
                         new List<Object>{
                             new Map<String, Object>{ 'Id' => organization.Id, 'Title' => 'X' }
                         }
-                    ) => System.Label.Core_Find_ErrorEditRecord,
+                    ) => BarnHelp.text('Core', 'Core_Find_ErrorEditRecord'),
                     '[]' => BarnHelp.text('Core', 'Core_BulkUpdate_ErrorNoChanges')
                 };
                 for (String sent : expected.keySet()) {

@@ -274,7 +274,7 @@ public with sharing class FindController {
         try {
             requirePermission();
             if (String.isBlank(tag) || !EXPORT_TAG.matcher(tag).matches()) {
-                throw new FindException(System.Label.Core_Find_ExportFilesNotFound);
+                throw new FindException(BarnHelp.text('Core', 'Core_Find_ExportFilesNotFound'));
             }
             return serverExport(Id.valueOf(jobId), tag);
         } catch (Exception caught) {
@@ -300,7 +300,7 @@ public with sharing class FindController {
             LIMIT 1
         ];
         if (jobs.isEmpty()) {
-            throw new FindException(System.Label.Core_Find_ExportFilesNotFound);
+            throw new FindException(BarnHelp.text('Core', 'Core_Find_ExportFilesNotFound'));
         }
         view.status = jobs[0].Status;
         view.chunksDone = jobs[0].JobItemsProcessed;
@@ -362,7 +362,7 @@ public with sharing class FindController {
         try {
             requirePermission();
             if (String.isBlank(name) || name.trim().length() > 80) {
-                throw new FindException(System.Label.Core_Find_ErrorName);
+                throw new FindException(BarnHelp.text('Core', 'Core_Find_ErrorName'));
             }
             QueryCompiler.Compiled compiled = QueryCompiler.compile(queryJson);
             Saved_Query__c query = new Saved_Query__c(
@@ -478,10 +478,10 @@ public with sharing class FindController {
                   LIMIT 1
               ];
         if (found.isEmpty()) {
-            throw new FindException(System.Label.Core_Find_ErrorNotFound);
+            throw new FindException(BarnHelp.text('Core', 'Core_Find_ErrorNotFound'));
         }
         if (found[0].OwnerId != UserInfo.getUserId()) {
-            throw new FindException(System.Label.Core_Find_ErrorNotYours);
+            throw new FindException(BarnHelp.text('Core', 'Core_Find_ErrorNotYours'));
         }
         return found[0];
     }
@@ -495,7 +495,7 @@ public with sharing class FindController {
 
     private static void requirePermission() {
         if (!FeatureManagement.checkPermission(PERMISSION)) {
-            throw new FindException(System.Label.Core_Find_ErrorNoPermission);
+            throw new FindException(BarnHelp.text('Core', 'Core_Find_ErrorNoPermission'));
         }
     }
 
@@ -506,6 +506,11 @@ public with sharing class FindController {
             caught instanceof QueryCompiler.QueryCompilerException ||
             caught instanceof QueryFieldCatalog.QueryFieldCatalogException ||
             caught instanceof BulkUpdateFields.BulkUpdateException;
-        return UserErrors.wrap(caught, shown, context, System.Label.Core_Find_UnexpectedError);
+        return UserErrors.wrap(
+            caught,
+            shown,
+            context,
+            BarnHelp.text('Core', 'Core_Find_UnexpectedError')
+        );
     }
 }

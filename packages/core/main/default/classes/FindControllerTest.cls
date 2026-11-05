@@ -51,7 +51,7 @@ private class FindControllerTest {
                     System.Assert.fail('Find needs its permission');
                 } catch (AuraHandledException refused) {
                     System.Assert.areEqual(
-                        System.Label.Core_Find_ErrorNoPermission,
+                        BarnHelp.text('Core', 'Core_Find_ErrorNoPermission'),
                         refused.getMessage(),
                         'The message names the permission'
                     );
@@ -141,7 +141,7 @@ private class FindControllerTest {
                     System.Assert.fail('Only the owner may delete it');
                 } catch (AuraHandledException refused) {
                     System.Assert.areEqual(
-                        System.Label.Core_Find_ErrorNotYours,
+                        BarnHelp.text('Core', 'Core_Find_ErrorNotYours'),
                         refused.getMessage(),
                         'And he is told to save a copy'
                     );

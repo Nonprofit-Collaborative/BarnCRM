@@ -179,20 +179,20 @@ private class FindSummaryTest {
         System.runAs(TestUsers.admin()) {
             expectRefusal(
                 new Map<String, Object>{ 'function' => 'average' },
-                System.Label.Core_Find_ErrorSummary
+                BarnHelp.text('Core', 'Core_Find_ErrorSummary')
             );
             String runLogLabel = Schema.SObjectType.Import_Batch__c.fields.Run_Log__c.getLabel();
             expectRefusal(
                 new Map<String, Object>{ 'function' => 'sum', 'field' => 'Run_Log__c' },
                 String.format(
-                    System.Label.Core_Find_ErrorSummaryField,
+                    BarnHelp.text('Core', 'Core_Find_ErrorSummaryField'),
                     new List<Object>{ runLogLabel }
                 )
             );
             expectRefusal(
                 new Map<String, Object>{ 'function' => 'count', 'groupBy' => 'Run_Log__c' },
                 String.format(
-                    System.Label.Core_Find_ErrorSummaryGroup,
+                    BarnHelp.text('Core', 'Core_Find_ErrorSummaryGroup'),
                     new List<Object>{ runLogLabel }
                 )
             );
@@ -202,7 +202,7 @@ private class FindSummaryTest {
                     'field' => 'Rows_Updated__c; DELETE'
                 },
                 String.format(
-                    System.Label.Core_Filter_ErrorUnknownField,
+                    BarnHelp.text('Core', 'Core_Filter_ErrorUnknownField'),
                     new List<Object>{ 'Rows_Updated__c; DELETE' }
                 )
             );

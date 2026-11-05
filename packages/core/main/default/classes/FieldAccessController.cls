@@ -311,7 +311,7 @@ public with sharing class FieldAccessController {
                 parsed = Id.valueOf(jobId);
             } catch (Exception notAnId) {
                 throw new FieldAccessService.FieldAccessException(
-                    System.Label.Core_FieldAccess_UndoNotFound
+                    BarnHelp.text('Core', 'Core_FieldAccess_UndoNotFound')
                 );
             }
             return outcomeOf(FieldAccessService.undo(parsed));
@@ -372,7 +372,7 @@ public with sharing class FieldAccessController {
             caught,
             caught instanceof FieldAccessService.FieldAccessException,
             context,
-            System.Label.Core_FieldAccess_UnexpectedError
+            BarnHelp.text('Core', 'Core_FieldAccess_UnexpectedError')
         );
     }
 }
