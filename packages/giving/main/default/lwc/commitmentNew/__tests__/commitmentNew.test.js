@@ -1,3 +1,6 @@
+// The CurrentPageReference test adapter is emitted to on purpose, which is how a wired component
+// is driven from a test.
+/* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { createElement } from 'lwc';
 import CommitmentNew from 'c/commitmentNew';
 import { CurrentPageReference } from 'lightning/navigation';
@@ -125,7 +128,7 @@ describe('c-commitment-new', () => {
   it('fills in the donor of the page New was chosen from', async () => {
     getDefaults.mockResolvedValue({ ...DEFAULTS, donorId: CONTACT_ID, donorKind: 'person' });
     const json = JSON.stringify({ attributes: { recordId: CONTACT_ID } });
-    const element = await build({ inContextOfRef: '1.' + Buffer.from(json).toString('base64') });
+    const element = await build({ inContextOfRef: '1.' + btoa(json) });
 
     expect(getDefaults).toHaveBeenCalledWith({ contextId: CONTACT_ID });
     expect(field(element, 'donor-person').value).toBe(CONTACT_ID);

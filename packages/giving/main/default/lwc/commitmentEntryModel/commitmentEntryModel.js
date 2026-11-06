@@ -39,7 +39,7 @@ export function contextIdFrom(state) {
     const parent = JSON.parse(decodeBase64(encoded));
     const recordId = parent && parent.attributes && parent.attributes.recordId;
     return recordId && ID_PATTERN.test(recordId) ? recordId : undefined;
-  } catch (unreadable) {
+  } catch {
     return undefined;
   }
 }

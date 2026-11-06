@@ -308,7 +308,7 @@ export default class CommitmentNew extends NavigationMixin(LightningElement) {
       if (request === this.previewRequest) {
         this.previewText = this.describe(previewFigures(result));
       }
-    } catch (error) {
+    } catch {
       if (request === this.previewRequest) {
         this.previewText = undefined;
       }

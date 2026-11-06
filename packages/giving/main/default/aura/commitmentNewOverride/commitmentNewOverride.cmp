@@ -3,5 +3,5 @@
   component, so this wrapper holds nothing but the New Commitment screen (commitmentNew).
 -->
 <aura:component implements="lightning:actionOverride,lightning:isUrlAddressable">
-    <c:commitmentNew />
+  <c:commitmentNew />
 </aura:component>

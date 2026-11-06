@@ -13,7 +13,7 @@ const CONTACT_ID = '003000000000001AAA';
 
 function inContext(recordId) {
   const json = JSON.stringify({ type: 'standard__recordPage', attributes: { recordId } });
-  return '1.' + Buffer.from(json).toString('base64');
+  return '1.' + btoa(json);
 }
 
 describe('commitmentEntryModel', () => {
