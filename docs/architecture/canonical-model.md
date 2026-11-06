@@ -10423,6 +10423,9 @@ one cohort of a program at a time. A cohort deleted later empties the field (Set
   intake picklists' active values and default from describe, with a link to the enrollment's
   fields in Setup (Object Manager by API name). The section name `Programs` is in Core's
   `SettingSections`. It also holds the Participant Privacy preset (R-EN7).
+- **Weeks Ahead to Create Sessions:** `Programs_Settings__c` field `Session_Horizon_Weeks__c` (Number(2, 0),
+  default 8, 1 to 26), set in the Programs section of BarnCRM Settings
+  (`Setting_Definition.Programs_Session_Horizon_Weeks`) and read by `SessionScheduleService.horizonWeeks` (R-SS2).
 - **Participant privacy (R-EN7, R-SD6):** the public group `Programs_Participants` (no bosses);
   the hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox,
   default unchecked, which is Shared); `ProgramsSharing` writes the shares (handler
@@ -10989,11 +10992,13 @@ day; Repeat Every 1 to 52; End Time after Start Time when both are set; End Date
 Start Date (validation rule).
 
 **R-SS2 Which days and how far.** A day is a session day by R-SSC1's rule (29T). An active
-schedule keeps sessions created from today to eight weeks ahead (fixed, as Volunteers' default
-horizon). Each run creates the session days after Created Through (or from today, or Start
+schedule keeps sessions created from today to `Programs_Settings__c.Session_Horizon_Weeks__c`
+weeks ahead (Weeks Ahead to Create Sessions, 1 to 26, default 8; blank or out of range reads
+as 8). Each run creates the session days after Created Through (or from today, or Start
 Date, if later) up to the horizon and End Date, and moves Created Through forward. A day is
 skipped when it already has a session of this schedule (any status) or a session, not
-Cancelled, of the same service for the same cohort (none: a program-wide session). Each new
+Cancelled, of the same service for the same cohort (none: a program-wide session), including
+one created earlier in the same run by another schedule. Each new
 session is Scheduled, takes the schedule's service, cohort and times, links to the schedule,
 and is named as the panel names one (service and date).
 
@@ -12749,6 +12754,7 @@ mirrors the primary member).
 | 1.0 | 2026-11-05 | Shipped relationship types can be turned off (owner request, ADR-0170). `BarnCRM_Settings__c` gains `Relationship_Types_Turned_Off__c` (Section 12); Relationship Type and rule R-D2 say how a turned-off shipped row is read. No other object or field added. |
 | 1.0 | 2026-11-06 | Session End Time (modules-24, owner decision D-183). `Session__c` gains `End_Time__c` (Time) with rule R-SE6 and validation rule `End_After_Start`; the Schedule Sessions panel sets it (R-SE4). No other object or field added. |
 | 1.0 | 2026-11-06 | Session Schedule (modules-24, D-183, ADR-NEXT). New in the Programs module: Session Schedule (`Session_Schedule__c`, 29ZA7), master-detail to Program, with rules R-SS1 to R-SS7. `Session__c` gains `Session_Schedule__c` (Lookup, SetNull). R-SE4 says the panel can save its pattern as a schedule. |
+| 1.0 | 2026-11-06 | Session horizon setting (modules-24, D-183). `Programs_Settings__c` gains `Session_Horizon_Weeks__c` (Number(2, 0), default 8, 1 to 26). R-SS2 reads it instead of a fixed eight weeks, and skips a day another schedule filled earlier in the same run. |
 
 ---
 ## 32. Entity ownership by package

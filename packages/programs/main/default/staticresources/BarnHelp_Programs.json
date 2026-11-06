@@ -34,7 +34,7 @@
     "Programs_Roster_Empty": "No one to list. Click Enroll Someone to add a person, or turn on Show Ended to see past enrollments.",
     "Programs_Schedule_EndBeforeStart": "Choose an end time after the start time, or leave the end time empty.",
     "Programs_Schedule_IntroProgram": "Sessions scheduled here are for everyone enrolled in the program. To schedule for one cohort, use the panel on the cohort.",
-    "Programs_Schedule_SavedRepeating": "Repeating schedule saved. Sessions created: {0}. BarnCRM keeps adding them eight weeks ahead; manage it under Session Schedules.",
+    "Programs_Schedule_SavedRepeating": "Repeating schedule saved. Sessions created: {0}. BarnCRM keeps adding them each night; manage it under Session Schedules.",
     "Programs_SessionSchedule_Created": "Sessions created: {0}.",
     "Programs_SessionSchedule_EditNote": "Sessions exist through {0}. A change to the days or times applies after that day; to apply it to sessions already created, use Remove Future Sessions.",
     "Programs_SessionSchedule_Inactive": "This schedule is not active, so it creates no new sessions. The sessions it made stay. Tick Active to start it again.",

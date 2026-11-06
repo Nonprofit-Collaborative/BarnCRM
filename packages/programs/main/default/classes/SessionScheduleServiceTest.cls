@@ -73,7 +73,7 @@ private class SessionScheduleServiceTest {
 				'Named as the panel names one.'
 			);
 			Assert.areEqual(
-				MONDAY.addDays(7 * SessionScheduleService.HORIZON_WEEKS),
+				MONDAY.addDays(7 * SessionScheduleService.DEFAULT_HORIZON_WEEKS),
 				[SELECT Created_Through__c FROM Session_Schedule__c WITH SYSTEM_MODE]
 				.Created_Through__c
 			);
@@ -249,10 +249,55 @@ private class SessionScheduleServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				90,
+				9,
 				[SELECT COUNT() FROM Session__c WITH SYSTEM_MODE],
-				'The batch ran the ten left: nine Mondays each.'
+				'The batch ran the ten left, and ten schedules for one group made each Monday once.'
 			);
+		}
+	}
+
+	@IsTest
+	static void twoSchedulesForOneGroupMakeEachDayOnceInOneRun() {
+		System.runAs(admin()) {
+			Service__c service = tutoring();
+			Session_Schedule__c first = scheduleOf(service, 'Monday;Wednesday', 1);
+			Session_Schedule__c second = scheduleOf(service, 'Monday', 1);
+			AutomationControl.bypass('Session_Schedule_Rules');
+			insert new List<Session_Schedule__c>{ first, second };
+			AutomationControl.clearBypass('Session_Schedule_Rules');
+
+			Test.startTest();
+			Integer created = SessionScheduleService.run(new Set<Id>{ first.Id, second.Id });
+			Test.stopTest();
+
+			Assert.areEqual(17, created, 'Nine Mondays and eight Wednesdays, each once.');
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Session__c WHERE Session_Date__c = :MONDAY WITH SYSTEM_MODE],
+				'One session on the first Monday, not two.'
+			);
+		}
+	}
+
+	@IsTest
+	static void theHorizonFollowsWeeksAheadToCreateSessions() {
+		System.runAs(admin()) {
+			upsert new Programs_Settings__c(
+				SetupOwnerId = UserInfo.getOrganizationId(),
+				Session_Horizon_Weeks__c = 2
+			);
+			Service__c service = tutoring();
+			Session_Schedule__c schedule = scheduleOf(service, 'Monday', 1);
+			AutomationControl.bypass('Session_Schedule_Rules');
+			insert schedule;
+			AutomationControl.clearBypass('Session_Schedule_Rules');
+
+			Test.startTest();
+			Integer created = SessionScheduleService.run(new Set<Id>{ schedule.Id });
+			Test.stopTest();
+
+			Assert.areEqual(2, SessionScheduleService.horizonWeeks());
+			Assert.areEqual(3, created, 'Mondays today through two weeks ahead.');
 		}
 	}
 

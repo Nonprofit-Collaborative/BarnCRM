@@ -437,6 +437,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 5 | Take attendance on the first upcoming session (mark the member Present and save). As the admin user, open the schedule and click **Remove Future Sessions**, then **Cancel** in the confirm. | Nothing changes. |
 | 6 | Click **Remove Future Sessions** again and confirm. | "Sessions removed: N." The attended session and any session dated today stay; the other upcoming Tuesday and Thursday sessions are replaced by Wednesday sessions at the same times. |
 | 7 | Untick **Active** and save. | The panel says the schedule is not active and creates no new sessions; every session stays. |
+| 7a | As the admin user, in BarnCRM Settings, Programs, check **Weeks ahead to create sessions** shows 8; set it to 10 and save. Tick **Active** on the schedule again and save. | The panel then says sessions are created through a day 10 weeks ahead (after the save's run, or **Create Sessions Now**). Set the setting back to 8. |
 | 8 | As the staff user, open the schedule. | **Remove Future Sessions** is not offered (staff cannot delete sessions). As the Read Only user, the schedule shows with no buttons and cannot be edited. |
 | 9 | Try to delete the cohort. | Refused while it has a session schedule. |
 

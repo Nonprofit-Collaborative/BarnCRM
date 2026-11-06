@@ -30,8 +30,10 @@ any. Core must run on a Platform-only org, so Salesforce recurring Events are no
    lookup (SetNull) and is otherwise an ordinary session.
 2. **The same days rule and horizon as shift schedules.** A day is a session day by R-SSC1's
    rule (weekday chosen, within the dates, whole weeks from Start Date's Monday divisible by
-   Repeat Every). An active schedule keeps sessions created from today to eight weeks ahead,
-   Volunteers' default horizon, fixed rather than a setting: nothing has asked for another
+   Repeat Every). An active schedule keeps sessions created from today to Weeks Ahead to
+   Create Sessions (`Programs_Settings__c.Session_Horizon_Weeks__c`, 1 to 26, default 8, as
+   Volunteers' shift horizon; the integrator asked for the setting on review). Before it, the
+   draft fixed eight weeks, as nothing had asked for another
    value. `Created_Through__c` records the last day done, so a run is idempotent and a session
    someone deleted is not recreated. A day that already has a session of the schedule, or a
    session (not Cancelled) of the same service for the same cohort, is skipped, so the

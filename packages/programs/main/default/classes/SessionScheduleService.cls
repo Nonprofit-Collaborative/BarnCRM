@@ -5,7 +5,8 @@
  *
  * A run (R-SS2) locks its schedules first (R-SS3), creates the days after Created Through (or
  * from today or Start Date, if later) up to the horizon and End Date, skips a day that already
- * has a session of the schedule or of the same service and cohort, and moves Created Through
+ * has a session of the schedule or of the same service and cohort (or that another schedule
+ * took earlier in the same run), and moves Created Through
  * forward. Sessions are a date and a local time, so no time zone applies. Editing or ending a
  * schedule never deletes a session (R-SS4); only Remove Future Sessions does, after a confirm
  * (R-SS5).
@@ -15,8 +16,10 @@
  */
 public with sharing class SessionScheduleService {
 	public static final String MODULE_NAME = 'Programs';
-	/** How far ahead an active schedule keeps sessions (R-SS2), as Volunteers' default. */
-	public static final Integer HORIZON_WEEKS = 8;
+	/** Weeks Ahead to Create Sessions when never saved, blank or out of range (R-SS2). */
+	public static final Integer DEFAULT_HORIZON_WEEKS = 8;
+	private static final String SETTINGS_OBJECT = 'Programs_Settings__c';
+	private static Integer horizonWeeks;
 
 	/** Monday first, as the multi-select stores them. Not named WEEKDAYS (case-insensitive). */
 	private static final List<String> DAY_NAMES = new List<String>{
@@ -44,9 +47,32 @@ public with sharing class SessionScheduleService {
 		return todayOverride == null ? Date.today() : todayOverride;
 	}
 
+	/** How far ahead an active schedule keeps sessions: Weeks Ahead to Create Sessions, 1 to 26. */
+	public static Integer horizonWeeks() {
+		if (horizonWeeks == null) {
+			horizonWeeks = DEFAULT_HORIZON_WEEKS;
+			try {
+				Object stored = SettingsService.getValue(
+					SETTINGS_OBJECT,
+					'Session_Horizon_Weeks__c'
+				);
+				Integer weeks = stored == null
+					? null
+					: Decimal.valueOf(String.valueOf(stored)).intValue();
+				if (weeks != null && weeks >= 1 && weeks <= 26) {
+					horizonWeeks = weeks;
+				}
+			} catch (Exception unreadable) {
+				// Never saved or unreadable: the shipped value applies.
+				horizonWeeks = DEFAULT_HORIZON_WEEKS;
+			}
+		}
+		return horizonWeeks;
+	}
+
 	/** The last day a run fills: the horizon, or End Date when sooner. */
 	public static Date lastDay(Session_Schedule__c schedule) {
-		Date horizon = today().addDays(7 * HORIZON_WEEKS);
+		Date horizon = today().addDays(7 * horizonWeeks());
 		return schedule.End_Date__c != null &&
 			schedule.End_Date__c < horizon
 			? schedule.End_Date__c
@@ -109,6 +135,9 @@ public with sharing class SessionScheduleService {
 			serviceIds,
 			today()
 		);
+		// Days a schedule earlier in this run claims for its service and cohort, so two schedules
+		// for the same group never both create one (R-SS2).
+		Set<String> claimed = new Set<String>();
 		for (Session_Schedule__c schedule : schedules) {
 			if (!fromDays.containsKey(schedule.Id)) {
 				continue;
@@ -126,7 +155,8 @@ public with sharing class SessionScheduleService {
 			}
 			List<Date> days = new List<Date>();
 			for (Date day : sessionDays(schedule, fromDays.get(schedule.Id), lastDay(schedule))) {
-				if (!taken.contains(day)) {
+				String key = schedule.Service__c + '|' + schedule.Cohort__c + '|' + day;
+				if (!taken.contains(day) && claimed.add(key)) {
 					days.add(day);
 				}
 			}

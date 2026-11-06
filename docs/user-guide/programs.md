@@ -291,7 +291,7 @@ For a class that runs until you stop it, save the pattern as a repeating schedul
 2. Open the schedule from **Session Schedules**. Its panel says, for example, "Every session is
    created through 26 Apr 2027. BarnCRM adds more each night."
 
-BarnCRM keeps sessions created eight weeks ahead. To change the days or times, edit the
+BarnCRM keeps sessions created eight weeks ahead (your admin can change how many). To change the days or times, edit the
 schedule: the change applies after the last day already created. To end it, untick **Active**
 or set an **End Date**; the sessions already made stay. An admin can click **Remove Future
 Sessions** on the schedule to replace the upcoming sessions that have no attendance yet.

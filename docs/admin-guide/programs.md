@@ -61,6 +61,11 @@ The module adds a **Programs** section to BarnCRM Settings (in the Programs grou
 settings (BarnCRM Admin). Everything on it applies to the whole organization: the intake
 picklists and Participant Privacy.
 
+The same section also has **Weeks ahead to create sessions** (1 to 26, default 8, saved
+org-wide): how far ahead repeating session schedules keep their sessions created (see Repeating
+Session Schedules). Change it there and click **Save**; the next run, or **Create Sessions Now**,
+fills up to the new horizon. A shorter value deletes nothing.
+
 **Intake and Eligibility Picklists.** The page lists the three intake picklists on an enrollment
 (**Referral Source**, **Eligibility Status** and **Eligibility Basis**) with the choices each
 offers now and its default. They ship with:
@@ -434,11 +439,13 @@ optional **Cohort**, the **Days of the Week**, **Repeat Every (Weeks)**, a **Sta
 - **Make one** with **Save as Repeating Schedule** on the **Schedule Sessions** panel (a weekly
   schedule from the panel's service, cohort, dates, days and times), or with **New** in the
   **Session Schedules** list on the program or cohort page. There is no tab.
-- **What it creates.** An active schedule keeps Scheduled sessions created from today to eight
-  weeks ahead (or its End Date), on save, every night (the **Session Schedules** step of the
+- **What it creates.** An active schedule keeps Scheduled sessions created from today to
+  **Weeks ahead to create sessions** ahead (8 by default; see Programs Settings), or to its End
+  Date, on save, every night (the **Session Schedules** step of the
   nightly run, 3:10 AM) and when you click **Create Sessions Now** on the schedule page. A day
   that already has a session of the schedule, or a session of the same service for the same
-  cohort that is not Cancelled, is skipped. The schedule page says how many sessions the next
+  cohort that is not Cancelled, is skipped, and two schedules for the same service and cohort
+  never both create one for the same day in one run. The schedule page says how many sessions the next
   run creates and through which day.
 - **Editing or ending never deletes a session.** A change to the days or times applies after
   the last day already created (**Created Through**). Untick **Active**, set an earlier **End
@@ -446,7 +453,9 @@ optional **Cohort**, the **Days of the Week**, **Repeat Every (Weeks)**, a **Sta
 - **Remove Future Sessions** on the schedule page, after a confirm, deletes the schedule's
   sessions after today that are still Scheduled and have no attendance, then an active schedule
   creates those days again from its current pattern. Held, cancelled and attended sessions
-  stay. Only users who may delete sessions (Programs Admin) see it.
+  stay. Only users who may delete sessions (Programs Admin) see it. This is deliberate: Programs
+  Staff cannot delete sessions anywhere, so they cannot remove them in bulk here either. Ask a
+  Programs Admin to run it, or give that person Programs Admin.
 - **Access.** Programs Admin creates, edits and deletes schedules; Programs Staff create and
   edit them; Programs Read Only reads them. A service or cohort with schedules cannot be deleted
   until its schedules are.
