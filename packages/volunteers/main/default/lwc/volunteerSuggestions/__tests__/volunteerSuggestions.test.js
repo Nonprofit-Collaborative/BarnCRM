@@ -42,20 +42,6 @@ jest.mock(
   () => ({ default: 'Ranked from {0}' }),
   { virtual: true }
 );
-jest.mock(
-  '@salesforce/label/c.Volunteers_Suggestions_BookFailed',
-  () => ({ default: 'Not saved.' }),
-  {
-    virtual: true
-  }
-);
-jest.mock(
-  '@salesforce/label/c.Volunteers_Suggestions_LoadFailed',
-  () => ({ default: 'Not loaded.' }),
-  {
-    virtual: true
-  }
-);
 
 const SHIFT_ID = 'a06000000000001AAA';
 
@@ -178,7 +164,7 @@ describe('c-volunteer-suggestions', () => {
     element.shadowRoot.querySelector('.sign-up').click();
     await flush();
 
-    expect(byId(element, 'error-message').textContent).toBe('Already signed up.');
+    expect(byId(element, 'error-message').message).toBe('Already signed up.');
   });
 
   it('falls back to a plain message when the failure has no text', async () => {
@@ -190,7 +176,7 @@ describe('c-volunteer-suggestions', () => {
     element.shadowRoot.querySelector('.sign-up').click();
     await flush();
 
-    expect(byId(element, 'error-message').textContent).toBe('Not saved.');
+    expect(byId(element, 'error-message').message).toBe('c.Volunteers_Suggestions_BookFailed');
   });
 
   it('shows a load failure', async () => {
@@ -198,7 +184,8 @@ describe('c-volunteer-suggestions', () => {
     const element = build();
     await flush();
 
-    expect(byId(element, 'error-message').textContent).toBe('Not loaded.');
+    expect(byId(element, 'error-message').message).toBe('c.Volunteers_Suggestions_LoadFailed');
+    expect(byId(element, 'error-message').variant).toBe('error');
   });
 
   it('shows only the best ten and notes when more volunteers were not ranked', async () => {

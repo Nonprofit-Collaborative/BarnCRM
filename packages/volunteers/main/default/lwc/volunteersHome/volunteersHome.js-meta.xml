@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Volunteers Home: three figures that open their lists (approved hours this month, hours to
+    approve, shifts needing people) (vis-modules-19).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Volunteers Home</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

@@ -1,0 +1,4 @@
+/* The preview scrolls inside the action once the letter is longer than about seven lines. */
+.preview {
+  max-height: calc(var(--slds-g-sizing-10, 3rem) * 7);
+}

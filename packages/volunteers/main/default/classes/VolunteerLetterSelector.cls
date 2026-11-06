@@ -86,4 +86,23 @@ public with sharing class VolunteerLetterSelector {
 			ORDER BY Volunteer_Job__r.Name
 		];
 	}
+
+	/** Each person (contact or person account) with approved hours in the period, up to a cap. */
+	public static List<AggregateResult> peopleWithApprovedHours(
+		Date fromDate,
+		Date toDate,
+		Integer cap
+	) {
+		return [
+			SELECT Contact__c, Account__c
+			FROM Volunteer_Hours__c
+			WHERE
+				Status__c = :VolunteerHoursService.STATUS_APPROVED
+				AND Date_Worked__c >= :fromDate
+				AND Date_Worked__c <= :toDate
+			WITH USER_MODE
+			GROUP BY Contact__c, Account__c
+			LIMIT :cap
+		];
+	}
 }

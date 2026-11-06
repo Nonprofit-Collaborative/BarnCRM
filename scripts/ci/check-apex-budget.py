@@ -39,7 +39,8 @@ CAPS = {
     "core": 1_982_000,
     "rollups": 374_000,
     "giving": 587_000,
-    "volunteers": 166_000,
+    # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
+    "volunteers": 182_000,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
     "programs": 153_000,
     "logicmodels": 65_000,

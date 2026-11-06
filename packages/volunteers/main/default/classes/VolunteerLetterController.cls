@@ -14,8 +14,74 @@ public with sharing class VolunteerLetterController {
 			recordId != null &&
 			(recordId.getSObjectType() == Contact.SObjectType ||
 			!VolunteerLetterSelector.personAccounts(new Set<Id>{ recordId }).isEmpty());
+		Map<String, Object> context = listContext(canManage, canManage && isPerson);
+		context.put('isPerson', isPerson);
+		return context;
+	}
+
+	/**
+	 * What Volunteer Letters on Approve Hours shows when it opens (modules-20): the permission,
+	 * the active templates and the person picker's object (person accounts where the org has
+	 * them, as Log Hours picks).
+	 */
+	@AuraEnabled
+	public static Map<String, Object> getListContext() {
+		Boolean canManage = VolunteerHoursService.canManage();
+		Map<String, Object> context = listContext(canManage, canManage);
+		Boolean personAccounts = HouseholdService.isPersonAccountOrg();
+		context.put('personObject', personAccounts ? 'Account' : 'Contact');
+		context.put('personFilterField', personAccounts ? PERSON_ACCOUNT_FILTER_FIELD : null);
+		return context;
+	}
+
+	private static final String PERSON_ACCOUNT_FILTER_FIELD = 'IsPersonAccount'; // detection-only: a record picker filter field, sent only after isPersonAccountOrg found person accounts
+
+	/**
+	 * Starts one background job of letters for the chosen people or, with none chosen, for
+	 * everyone with approved hours in the period (up to MAX_PEOPLE). Returns how many people the
+	 * job covers; the job's notification says how it went.
+	 */
+	@AuraEnabled
+	public static Integer startLetters(
+		Id templateId,
+		Date fromDate,
+		Date toDate,
+		List<Id> personIds
+	) {
+		try {
+			Set<Id> people = new Set<Id>(personIds == null ? new List<Id>() : personIds);
+			people.remove(null);
+			if (people.isEmpty() && fromDate != null && toDate != null) {
+				for (
+					AggregateResult row : VolunteerLetterSelector.peopleWithApprovedHours(
+						fromDate,
+						toDate,
+						MAX_PEOPLE + 1
+					)
+				) {
+					Id contactId = (Id) row.get('Contact__c');
+					people.add(contactId != null ? contactId : (Id) row.get('Account__c'));
+				}
+				people.remove(null);
+				if (people.size() > MAX_PEOPLE) {
+					throw new VolunteerLetterService.VolunteerLetterException(
+						BarnHelp.text('Volunteers', 'Volunteers_Letters_TooMany')
+					);
+				}
+			}
+			VolunteerLetterBatch.startFor(templateId, fromDate, toDate, new List<Id>(people));
+			return people.size();
+		} catch (Exception failure) {
+			throw report(failure, templateId);
+		}
+	}
+
+	private static final Integer MAX_PEOPLE = 2000;
+
+	/** The permission, the active templates when shown, and whether the legal name is blank. */
+	private static Map<String, Object> listContext(Boolean canManage, Boolean showTemplates) {
 		List<Map<String, String>> templates = new List<Map<String, String>>();
-		if (canManage && isPerson) {
+		if (showTemplates) {
 			Map<String, String> typeLabels = typeLabels();
 			for (
 				Volunteer_Letter_Template__c template : VolunteerLetterSelector.activeTemplates()
@@ -32,7 +98,6 @@ public with sharing class VolunteerLetterController {
 		}
 		return new Map<String, Object>{
 			'canManage' => canManage,
-			'isPerson' => isPerson,
 			'templates' => templates,
 			'organizationNameBlank' => String.isBlank(
 				BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c
@@ -107,7 +172,7 @@ public with sharing class VolunteerLetterController {
 			failure instanceof VolunteerLetterService.VolunteerLetterException,
 			CONTEXT,
 			recordId,
-			Label.Volunteers_Letter_ActionFailed
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_ActionFailed')
 		);
 	}
 }

@@ -4,7 +4,7 @@
  */
 public with sharing class VolunteerHoursSelector {
 	private static final String APPROVAL_FIELDS =
-		'SELECT Id, Name, Status__c, Date_Worked__c, Hours__c, Rejection_Reason__c, ' +
+		'SELECT Id, Name, Status__c, Date_Worked__c, Hours__c, Rejection_Reason__c, Notes__c, ' +
 		'Contact__r.Name, Account__r.Name, Volunteer_Job__r.Name, Volunteer_Shift__r.Name ' +
 		'FROM Volunteer_Hours__c WHERE Status__c = :status';
 

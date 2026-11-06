@@ -3,7 +3,7 @@
   <fullName>Weekdays__c</fullName>
   <externalId>false</externalId>
   <inlineHelpText>The days of the week a shift falls on.</inlineHelpText>
-  <label>Weekdays</label>
+  <label>Days of the Week</label>
   <required>false</required>
   <trackTrending>false</trackTrending>
   <type>MultiselectPicklist</type>

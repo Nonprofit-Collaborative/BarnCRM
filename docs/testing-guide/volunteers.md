@@ -12,7 +12,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | From the App Launcher, open **BarnCRM Volunteers**. | The tabs **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Sign-Ups**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer Requirements**, **Dashboards** and **Reports** show. There is no **Volunteer Settings** tab. |
+| 1 | From the App Launcher, open **BarnCRM Volunteers**. | It opens on **Volunteers Home** with three figures: **Hours This Month** (badge **Approved**), **Volunteer Hours** (badge **Submitted**, 4) and **Shifts Needing Volunteers**, and the **Approved Hours This Year by Job** chart. Clicking **Volunteer Hours** opens **Approve Hours**; clicking **Shifts Needing Volunteers** opens that list view. The tabs **Volunteers Home**, **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Sign-Ups**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer Requirements**, **Dashboards** and **Reports** show. There is no **Volunteer Settings** tab. |
 | 2 | Open **Volunteer Jobs**, list view **All Jobs**. | **Food pantry sort**, **Front desk** and **Community garden** are listed. |
 | 3 | Open **Volunteer Shifts**, list view **Shifts Needing Volunteers**. | Upcoming Open shifts of **Front desk** and **Community garden** are listed, each named from its job and start (for example "Front desk: 28 Oct 2026, 9:00 AM"). |
 | 3a | Open **Volunteer Sign-Ups**, list view **All Sign-Ups**. | The sample sign-ups are listed with their shift, person and status. |
@@ -43,9 +43,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open "Test shift". | The **Sign-Ups** card shows **Volunteers needed** 2, **Slots filled** 0, **Slots remaining** 2 and "Nobody is signed up for this shift yet." |
+| 1 | Open "Test shift". | The **Sign-Ups** card shows **Volunteers needed** 2, **Slots filled** 0, **Slots remaining** 2 as figures, an empty bar for places filled, and "Nobody is signed up for this shift yet." with an **Add Sign-Up** button. |
 | 2 | Click **Add Sign-Up**. | A form shows a **Person** picker, a **Status** box set to **Signed up**, and **Save** and **Cancel**. **Save** is disabled until a person is chosen. |
-| 3 | Choose a sample person from **The Garcia Family** and click **Save**. | "Sign-up added." shows under the figures and as a toast. **Slots filled** is 1, **Slots remaining** 1. The table **Sign-ups for Test shift** lists the person with Status **Signed up** and **Attended** and **No show** buttons. |
+| 3 | Choose a sample person from **The Garcia Family** and click **Save**. | "Sign-up added." shows under the figures and as a toast. **Slots filled** is 1, **Slots remaining** 1. The table **Sign-ups for Test shift** lists the person with a **Status** picker set to **Signed up**. The shift has not started, so there are no **Attended** or **No Show** buttons and no **Close Shift**. |
 | 4 | Click **Add Sign-Up**, choose the same person again and click **Save**. | Refused: "This person is already signed up for Test shift. Change the sign-up that is there instead of adding another." **Slots filled** stays 1. |
 | 5 | Add a second person from the same household. | **Slots filled** 2, **Slots remaining** 0. |
 | 6 | In the second person's row, change **Status** to **Cancelled**. | A message "(the person's name): Cancelled." shows. **Slots filled** 1, **Slots remaining** 1. The row stays in the table. |
@@ -61,10 +61,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open "Test shift". In the first person's row click **Attended**. | Status shows **Attended**, the **Attended** button goes, and the message says "(the person's name): Attended. An hours entry was recorded for this attendance." |
-| 2 | In the second person's row click **No Show**. | Status shows **No show**. No hours message shows. |
-| 3 | Open **Volunteer Hours**, list view **Awaiting Approval**. | One new entry for the first person: **Hours** 3, **Date Worked** the shift's date, **Job** "Test sorting", **Volunteer Shift** "Test shift", **Status** Submitted. |
-| 4 | Back on the shift, change the first person's Status to **Confirmed**, then click **Attended** again. | No second hours entry is created: **Awaiting Approval** still shows one entry for this shift. |
+| 1 | Edit "Test shift": set **Start Time** to yesterday 9:00 AM and **End Time** to yesterday 12:00 PM, and save. | The **Sign-Ups** rows now show the status as a badge with a **Change** link, and **Attended** and **No Show** buttons. **Close Shift** shows at the top of the panel. |
+| 2 | In the first person's row click **Attended**. | The badge shows **Attended** (green), the **Attended** button goes, and the message says "(the person's name): Attended. An hours entry was recorded for this attendance." |
+| 3 | In the second person's row click **No Show**. | The badge shows **No show** (amber). No hours message shows. |
+| 4 | Open **Volunteer Hours**, list view **Awaiting Approval**. | One new entry for the first person: **Hours** 3, **Date Worked** the shift's date, **Job** "Test sorting", **Volunteer Shift** "Test shift", **Status** Submitted. |
+| 5 | Back on the shift, click **Change** in the first person's row and pick **Confirmed**, then click **Attended** again. | No second hours entry is created: **Awaiting Approval** still shows one entry for this shift. |
 
 **Cleanup:** keep the 3-hour entry for T-VOL-06.
 
@@ -91,12 +92,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Approve Hours**. | The card **Approve Volunteer Hours** shows, **Show** set to **Submitted**, with columns **Person**, **Job**, **Shift**, **Date worked** and **Hours**. **Approve** and **Reject** are disabled. |
+| 1 | Open **Approve Hours**. | The page **Approve Volunteer Hours** shows, **Show** set to **Submitted**, with columns **Person**, **Job**, **Shift**, **Date worked**, **Hours** and **Notes**. **Approve** and **Reject** are disabled. Each person's name is a link; clicking one opens that hours entry. |
 | 2 | Set **From** to today and **To** to yesterday. | The field says "From must be on or before To." and the list does not change. |
 | 3 | Clear both dates. In **Job**, choose "Test sorting". | Only the two "Test sorting" entries are listed. |
 | 4 | Tick the 3-hour entry and click **Approve**. | "Entries approved: 1." shows under the buttons and as a toast. The entry leaves the list. |
 | 5 | Tick the 2-hour entry and click **Reject**. Leave **Reason for rejecting** empty and click **Reject Selected**. | Nothing is rejected; the field says "Say why these hours are rejected, so the person who entered them knows what to fix." |
-| 6 | Type "Wrong date" and click **Reject Selected**. | "Entries rejected: 1." The list says "No hours match these filters." |
+| 6 | Type "Wrong date" and click **Reject Selected**. | "Entries rejected: 1." The list shows an all-clear picture with "No hours match these filters." |
 | 7 | Set **Show** to **Rejected**. | The 2-hour entry is listed with **Rejection Reason** "Wrong date". Only **Reopen** shows. |
 | 8 | Tick it and click **Reopen**. | "Entries reopened: 1." It is back under **Submitted**. |
 | 9 | Open the job "Test sorting". | **Total Hours** is 3 (only the Approved entry counts). |
@@ -255,4 +256,76 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 3 | In the Developer Console, run `VolunteerReminderBatch.startMorning();` as the admin. Reopen the sign-up. | **Reminder Sent On** has a date and time; the mailbox received one reminder greeting Dana by first name. |
 | 4 | Check Email Opt Out on Dana's account, clear **Reminder Sent On** and run it again. | No email, and **Reminder Sent On** stays empty. |
 
-**Cleanup:** cancel the sign-up, uncheck Email Opt Out, and switch **Send shift reminders** off if it was off before.
+**Cleanup:** cancel the sign-up, uncheck Email Opt Out, and switch **Send Shift Reminders** off if it was off before.
+
+## T-VOL-17: Close a Shift From the Sign-Ups Panel
+
+**Purpose:** confirm Close Shift completes a started shift and can mark the people still booked as no shows.
+**Prerequisites:** coordinator; a shift that started yesterday, Status Open, with three sign-ups: one Attended, one Signed up, one Confirmed.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the shift and click **Close Shift**. | A dialog **Close Shift** asks "Close this shift? 2 people are still Signed up or Confirmed. Mark them No Show?" with **Mark No Show and Close** chosen and **Close Without Changing Them** offered. |
+| 2 | Click **Cancel**. | Nothing changes; the shift is still Open. |
+| 3 | Click **Close Shift**, keep **Mark No Show and Close**, and click **Close Shift**. | "Shift closed. Everyone still Signed up or Confirmed is now No Show." The two rows show **No show**, the Attended row is unchanged, **Close Shift** is gone, and the shift's **Status** is **Completed**. |
+| 4 | As a Read Only user, open a started Open shift. | No **Close Shift** button. |
+
+**Cleanup:** set the shift back to Open if it is reused.
+
+## T-VOL-18: Volunteer Letter Periods
+
+**Purpose:** confirm the Volunteer Letter action offers This Year, Last Year and Custom.
+**Prerequisites:** coordinator; a person with approved hours last year; an active Hours letter template.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the person in the BarnCRM Volunteers app and click **Volunteer Letter**. | **Period** shows **This Year**, and no date fields. |
+| 2 | Choose **Last Year** and click **Preview**. | The preview counts last year's approved hours only. |
+| 3 | Choose **Custom**. | **From** and **To** show, filled with last year's dates. A From after the To is refused on Preview. |
+
+**Cleanup:** none.
+
+## T-VOL-19: Log Hours From a Shift, a Job and a Person
+
+**Purpose:** confirm the Log Hours action prefills from the record and saves like New.
+**Prerequisites:** Team Member; a shift from 9:00 to 12:00 with a job; a person.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the shift and click **Log Hours**. | A **Log Hours** form with **Person** empty, and **Job**, **Volunteer Shift**, **Date Worked** (the shift's day) and **Hours** 3 filled. |
+| 2 | Choose the person and click **Save**. | "Hours logged." The form closes; the new entry is **Submitted**, on the shift and the job. |
+| 3 | Open the job and click **Log Hours**. | Only **Job** is filled. Click **Save** without a person: **Person** is required. |
+| 4 | Open the person and click **Log Hours**. | **Person** is filled with them. Fill in a job, a date and 2 hours and save: the entry is theirs. |
+| 5 | As a Read Only user, open the shift and click **Log Hours**. | A note says your role cannot enter volunteer hours; no form. |
+
+**Cleanup:** delete the hours entries.
+
+## T-VOL-20: Create Shifts Now on a Shift Schedule
+
+**Purpose:** confirm the schedule page previews the next run and Create Shifts Now fills it at once.
+**Prerequisites:** coordinator; a job; Weeks Ahead to Create Shifts at 8.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the job, in **Shift Schedules**, click **New**. | The form shows **Days of the Week**, **Repeat Every (Weeks)**, **Start Time** and **End Time**. |
+| 2 | Pick Saturday, 1 week, 9:00 to 12:00, Start Date today, Volunteers Needed 4; save; open the schedule at once. | **Details** and **Related** tabs, and a **Volunteer Shifts** card beside them saying how many shifts will be created through a day 8 weeks ahead (or, if the save's own run already finished, that every shift is created through that day). |
+| 3 | Set **Weeks Ahead to Create Shifts** to 10 in BarnCRM Settings and reopen the schedule. | The card says 2 shifts (the two new Saturdays) will be created through a day 10 weeks ahead, and **Create Shifts Now** is enabled. |
+| 4 | Click **Create Shifts Now**. | "Shifts created: 2." The card says every shift is created through that day and the button is disabled; the two shifts are in **Related**. |
+| 5 | Untick **Active** and save. | The card says the schedule is not active and creates no shifts; no button. |
+
+**Cleanup:** set Weeks Ahead to Create Shifts back to 8; delete the schedule and its shifts.
+
+## T-VOL-21: Volunteer Letters for Many People
+
+**Purpose:** confirm Volunteer Letters on Approve Hours makes letters for everyone with approved hours, or for chosen people, without Flow Builder.
+**Prerequisites:** coordinator; two people with approved hours this year and one with none; an active Hours letter template.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Approve Hours**. | A **Volunteer Letters** button at the top right. As a Read Only user there is none. |
+| 2 | Click it. Keep **This Year** and **Everyone with approved hours in the period**; click **Make Letters**. | The dialog closes and a toast says letters are being made for 2 people. Within a few minutes each of the two has a PDF in **Files**, and a notification says 2 letters were made. |
+| 3 | Open it again, choose **People I choose**, and click **Make Letters** with nobody picked. | "Choose at least one person." Nothing starts. |
+| 4 | Pick the person with no hours, then pick them again. | One name shows, once. Click **Make Letters**: a toast for 1 person; the notification says 1 was skipped with no approved hours. |
+| 5 | Choose **Custom** with a From a year before anyone worked and a To a month later; choose **Everyone**; click **Make Letters**. | "Nobody has approved hours in this period, so no letters were started." |
+
+**Cleanup:** delete the letter files.

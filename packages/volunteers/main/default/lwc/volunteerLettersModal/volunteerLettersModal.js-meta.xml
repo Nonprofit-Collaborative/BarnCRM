@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Volunteer Letters, opened from Approve Hours: letters for everyone with approved hours in a
+    period, or for chosen people, as one background job.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

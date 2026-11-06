@@ -101,6 +101,7 @@ const ICONS = Object.freeze({
   Volunteer_Requirement__c: 'custom:custom86',
   Volunteer_Shift__c: 'custom:custom74',
   Volunteer_Signup__c: 'custom:custom2',
+  Volunteers_Home: 'custom:custom52',
   // Standard records with no BarnCRM tab
   Account: 'standard:account',
   Contact: 'standard:contact'

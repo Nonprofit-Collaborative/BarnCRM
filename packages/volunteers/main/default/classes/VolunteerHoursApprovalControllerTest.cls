@@ -283,7 +283,7 @@ private class VolunteerHoursApprovalControllerTest {
 			'Too many names the limit: ' + overLimit
 		);
 		Assert.areEqual(
-			Label.Volunteers_Approve_ActionFailed,
+			BarnHelp.text('Volunteers', 'Volunteers_Approve_ActionFailed'),
 			unknownStatus,
 			'A status the screen does not offer is refused.'
 		);

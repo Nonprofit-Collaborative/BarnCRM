@@ -23,8 +23,9 @@ users can look at jobs, shifts and sign-ups but change nothing.
      and were never closed).
 3. Click a name to open the record. Every sign-up, across all shifts, is also listed on the **Volunteer Sign-Ups** tab, list view **All Sign-Ups**.
 
-You should see: a job page with its details and the **Shifts**, **Shift Schedules** and
-**Job Skills** lists, or a shift page with the **Sign-Ups** panel at the top.
+You should see: a job page with the **Shifts**, **Shift Schedules** and **Job Skills** lists and
+its details beside them, or a shift page with the **Sign-Ups** panel in the main column and
+**Details** and **Related** tabs beside it.
 
 ## To Create a Job
 
@@ -59,7 +60,7 @@ the dated shifts for you. Coordinators and Team Members can do this; only an adm
 schedule.
 
 1. Open the job and find the **Shift Schedules** list. Click **New**.
-2. Fill in **Schedule Name**, **Weekdays** (pick one or more), **Repeat Every (Weeks)** (1 for
+2. Fill in **Schedule Name**, **Days of the Week** (pick one or more), **Repeat Every (Weeks)** (1 for
    every week, 2 for every other week), **Start Time**, **End Time**, **Start Date** and
    **Volunteers Needed**. Leave **End Date** empty to keep it running, and **Location** empty to
    use the job's.
@@ -69,6 +70,11 @@ You should see: within about a minute, the new shifts in the job's **Shifts** li
 the **Shift Schedule** it came from. **Created Through** on the schedule shows the last day it
 has created shifts for. BarnCRM keeps adding shifts every night, a set number of weeks ahead
 (your admin sets how many).
+
+On the schedule's page, the **Volunteer Shifts** card says what comes next, for example "12
+shifts will be created through 27 Apr 2026". To create them now instead of waiting, click
+**Create Shifts Now**. You should see: "Shifts created: 12." and the card saying every shift is
+created through that day.
 
 **Changing a schedule** changes only its future shifts that nobody is using. Shifts with a
 sign-up or hours are kept as they are, and **Shifts Kept** on the schedule says how many. Check
@@ -117,8 +123,9 @@ volunteer.
 ## To Change a Sign-Up's Status
 
 1. On the shift's **Sign-Ups** panel, find the person's row.
-2. Pick the new status in the **Status** column: **Signed up**, **Confirmed**, **Attended**,
-   **No show** or **Cancelled**.
+2. Before the shift starts, pick the new status in the **Status** column: **Signed up**,
+   **Confirmed**, **Attended**, **No show** or **Cancelled**. Once it has started, the status
+   shows as a badge: click **Change** beside it to open the same list.
 
 You should see: the change saved at once, and a message naming the person and the new status.
 A **Cancelled** sign-up frees its slot.
@@ -127,17 +134,19 @@ A **Cancelled** sign-up frees its slot.
 
 1. Open the shift.
 2. In each person's row, under **Attendance**, click **Attended** or **No Show**.
-3. When everyone is marked, click **Edit** on the shift, set **Status** to **Completed**, and
-   click **Save**.
+3. When everyone is marked, click **Close Shift** at the top of the **Sign-Ups** panel. If anyone
+   is still **Signed up** or **Confirmed**, choose **Mark No Show and Close** or **Close Without
+   Changing Them**, then click **Close Shift**.
 
 You should see: for each person marked **Attended**, the message "An hours entry was recorded
 for this attendance." BarnCRM creates their hours for the length of the shift, waiting for
 approval like any other entry (if your admin has this turned on). Marking someone **Attended**
-a second time records nothing more, and changing the status back deletes nothing.
+a second time records nothing more, and changing the status back deletes nothing. After
+**Close Shift**, the message "Shift closed." and the shift's **Status** is **Completed**.
 
 ## To Edit a Sign-Up's Notes or Remove a Sign-Up
 
-1. On the shift page, scroll to the **Sign-Ups** related list below the details.
+1. On the shift page, click the **Related** tab and find the **Sign-Ups** related list.
 2. Open the row menu and choose **Edit** to change **Notes**, or **Delete** to remove the
    sign-up (Salesforce asks you to confirm).
 
@@ -177,14 +186,14 @@ change their sign-up to **Cancelled**.
   saving a shift schedule. Why and what to do: one of the schedule fields is missing or out of
   range. The message lists each rule; fix the field and save.
 - Problem: a schedule's shifts stop a few weeks out, or none appeared. Why and what to do: open
-  the schedule and click **Save** to fill the missing days now. If it keeps happening, tell your
+  the schedule and click **Create Shifts Now** to fill the missing days now. If it keeps happening, tell your
   admin: the nightly job that creates shifts may not be running.
 - Problem: "This job has shifts or volunteer hours, so it cannot be deleted ..." Why and what to
   do: clear **Active** on the job instead.
 - Problem: the **Sign-Ups** panel has no **Add Sign-Up** button or attendance buttons. Why and
   what to do: you have read only access. Ask your admin if you need to sign people up.
 - Problem: "Showing the first ... sign-ups." Why and what to do: the panel shows a limited
-  number of rows. Use the **Sign-Ups** related list below the details to see them all.
+  number of rows. Use the **Sign-Ups** related list on the **Related** tab to see them all.
 
 ## Related
 
