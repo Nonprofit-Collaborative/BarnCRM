@@ -1210,4 +1210,12 @@ When: {1}</value>
         <shortDescription>Volunteer Letters button that starts the letters</shortDescription>
         <value>Make Letters</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_Home_HoursThisMonth</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteers Home figure: approved hours worked this month</shortDescription>
+        <value>Hours This Month</value>
+    </labels>
 </CustomLabels>

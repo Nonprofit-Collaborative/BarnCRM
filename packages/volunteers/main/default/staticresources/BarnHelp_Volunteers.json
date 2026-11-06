@@ -7,6 +7,7 @@
     "Volunteers_HealthCheck_HorizonDetailOne": "This active schedule should have shifts {0} weeks ahead (Weeks Ahead to Create Shifts, Volunteers section) but stops more than two days short, so nobody can sign up for the missing days. The nightly Volunteer Schedules job is usually not running: use the fix for unscheduled nightly jobs. To fill it now, open the schedule and click Create Shifts Now.",
     "Volunteers_HealthCheck_PastShiftsDetail": "These shifts ended more than {0} days ago and nobody closed them. Attendance was probably never marked, so the people who came have no hours. Open each shift, mark who came on its Sign-Ups panel, then click Close Shift there, or set Status to Cancelled if it did not happen.",
     "Volunteers_HealthCheck_PastShiftsDetailOne": "This shift ended more than {0} days ago and nobody closed it. Attendance was probably never marked, so the people who came have no hours. Open the shift, mark who came on its Sign-Ups panel, then click Close Shift there, or set Status to Cancelled if it did not happen.",
+    "Volunteers_Home_LoadError": "The figures were not loaded. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Volunteers_JobNotice_LettersFailed": "Some letters were not made. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Volunteers_Letter_ActionFailed": "The letter was not made. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Volunteers_Letters_ChooseSomeone": "Choose at least one person.",

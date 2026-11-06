@@ -93,6 +93,7 @@ Rules:
 | volunteers | Volunteer_Requirement__c | Custom86: RedCross |
 | volunteers | Volunteer_Shift__c | Custom74: HotAirBalloon |
 | volunteers | Volunteer_Signup__c | Custom2: Fan |
+| volunteers | Volunteers_Home | Custom52: Balls |
 
 ## Card Icons
 

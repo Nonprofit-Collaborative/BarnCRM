@@ -69,10 +69,12 @@ setup pages that are no longer in the menu (**Donor Level Ladder**, **Stewardshi
 also in the App Launcher. Below are two charts, **Giving by Month** and **Open Asks by Stage**;
 click a chart to open its report.
 
-The **BarnCRM Volunteers** app has **Volunteer Jobs**, **Volunteer Shifts**, **Volunteer
-Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**, **Volunteer
-Requirements**, **Dashboards** and **Reports**. The module's settings are the **Volunteers**
-section of **BarnCRM Settings**.
+The **BarnCRM Volunteers** app has **Volunteers Home**, **Volunteer Jobs**, **Volunteer
+Shifts**, **Volunteer Hours**, **Approve Hours**, **Volunteer Letter Templates**, **Skills**,
+**Volunteer Requirements**, **Dashboards** and **Reports**. It opens on **Volunteers Home**:
+approved hours this month, hours waiting for approval and shifts that still need people, each
+a figure you click to open its list, above a chart of this year's hours by job. The module's
+settings are the **Volunteers** section of **BarnCRM Settings**.
 
 Your admin may also have added the module pages you use most to the BarnCRM apps: **Quick Gift
 Entry**, **Gifts**, **Commitments** and **Gift Batches**, or **Volunteer Shifts** and

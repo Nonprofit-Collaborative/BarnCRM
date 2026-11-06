@@ -97,6 +97,7 @@
   <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
   <label>BarnCRM Volunteers</label>
   <navType>Console</navType>
+  <tabs>Volunteers_Home</tabs>
   <tabs>Volunteer_Job__c</tabs>
   <tabs>Volunteer_Shift__c</tabs>
   <tabs>Volunteer_Signup__c</tabs>
@@ -132,6 +133,9 @@
     </mappings>
     <mappings>
       <tab>Volunteer_Signup__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Volunteers_Home</tab>
     </mappings>
     <mappings>
       <tab>standard-Dashboard</tab>

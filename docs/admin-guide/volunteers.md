@@ -54,11 +54,17 @@ finishes, BarnCRM does five things on its own:
    [Hour letters and certificates](#hour-letters-and-certificates)). An upgrade adds only a
    shipped template you do not have, and never changes one you edited.
 
-Open the **BarnCRM Volunteers** app from the App Launcher. It has the tabs **Volunteer Jobs**,
-**Volunteer Shifts**, **Volunteer Hours**, **Skills**, **Dashboards** and **Reports** for
-everyone with a Volunteers set, **Approve Hours** and **Volunteer Requirements** for
-coordinators and admins, and **Volunteer Letter Templates** for admins only. The module's
+Open the **BarnCRM Volunteers** app from the App Launcher. It has the tabs **Volunteers Home**,
+**Volunteer Jobs**, **Volunteer Shifts**, **Volunteer Hours**, **Skills**, **Dashboards** and
+**Reports** for everyone with a Volunteers set, **Approve Hours** and **Volunteer Requirements**
+for coordinators and admins, and **Volunteer Letter Templates** for admins only. The module's
 settings are in the **Volunteers** section of **BarnCRM Settings**.
+
+**Volunteers Home** is the app's first tab: three figures, each opening its list (approved
+**Hours This Month**, hours waiting for approval, which opens **Approve Hours** for a
+coordinator, and **Shifts Needing Volunteers**), then the **Approved Hours This Year by Job**
+chart. A figure the person cannot read is left out; counts stop at 2,000 and show "2,000+".
+To change the chart, edit the page in the Lightning App Builder.
 
 Each of Jobs, Shifts, Hours, Requirements and Skills opens with ready-made list views:
 **All Jobs**, **Active Jobs** and **Inactive Jobs**; **All Shifts**, **Shifts Needing Volunteers** (open shifts

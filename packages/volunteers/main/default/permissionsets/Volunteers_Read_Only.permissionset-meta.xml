@@ -34,6 +34,10 @@
     <apexClass>VolunteerSuggestionController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>VolunteersHomeController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>false</editable>
     <field>Account.Availability_Days__c</field>
@@ -424,6 +428,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Volunteer_Signup__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Volunteers_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <userPermissions>

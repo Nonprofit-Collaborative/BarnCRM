@@ -1,0 +1,33 @@
+<template>
+  <lightning-card>
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={loading}>
+        <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+      </template>
+      <template lwc:if={showError}>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+      </template>
+      <template lwc:if={hasTiles}>
+        <div class="slds-grid slds-wrap slds-gutters_x-small" data-id="tiles">
+          <template for:each={tiles} for:item="tile">
+            <div key={tile.name} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-3 slds-var-m-bottom_x-small">
+              <c-barn-stat-tile
+                label={tile.label}
+                value={tile.value}
+                icon-name={tile.iconName}
+                badge-label={tile.badgeLabel}
+                badge-variant={tile.badgeVariant}
+                align="start"
+                bordered
+                clickable
+                name={tile.name}
+                onselect={handleTileSelect}
+                data-id={tile.name}
+              ></c-barn-stat-tile>
+            </div>
+          </template>
+        </div>
+      </template>
+    </div>
+  </lightning-card>
+</template>
