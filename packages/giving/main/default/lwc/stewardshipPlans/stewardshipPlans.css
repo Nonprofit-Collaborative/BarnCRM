@@ -5,7 +5,7 @@
 }
 
 .step-handle-cell {
-  width: 2rem;
+  width: var(--slds-g-sizing-9, 2rem);
 }
 
 .step-row_dragging {

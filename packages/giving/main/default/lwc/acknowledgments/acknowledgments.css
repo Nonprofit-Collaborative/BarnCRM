@@ -5,7 +5,7 @@
 }
 
 .rule-handle-cell {
-  width: 2rem;
+  width: var(--slds-g-sizing-9, 2rem);
 }
 
 .rule-row_dragging {
