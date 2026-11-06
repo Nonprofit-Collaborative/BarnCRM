@@ -45,6 +45,7 @@ public with sharing class NightlyJobs {
 		'GivingNightlyJobProvider',
 		'MirrorNightlyJobProvider',
 		'VolunteersNightlyJobProvider',
+		'ProgramsNightlyJobProvider',
 		'LogicModelsNightlyJobProvider',
 		'FundersNightlyJobProvider'
 	};

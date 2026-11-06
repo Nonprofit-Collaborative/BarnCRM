@@ -6,6 +6,7 @@
   <columns>Cohort__c</columns>
   <columns>Session_Date__c</columns>
   <columns>Start_Time__c</columns>
+  <columns>End_Time__c</columns>
   <columns>Status__c</columns>
   <filterScope>Everything</filterScope>
   <label>All Sessions</label>

@@ -56,6 +56,7 @@
     <fields>Cohort__c</fields>
     <fields>Session_Date__c</fields>
     <fields>Start_Time__c</fields>
+    <fields>End_Time__c</fields>
     <fields>Status__c</fields>
     <relatedList>Session__c.Service__c</relatedList>
     <sortField>Session_Date__c</sortField>

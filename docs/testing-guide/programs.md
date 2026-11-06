@@ -367,7 +367,8 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 4 | Click **Remove** by Ben. | Ben leaves the members and is offered again under the people to add; his enrollment stays, with no cohort. |
 | 4a | Drag Ben by the handle beside his name onto the member list (mouse). Remove him again; on a phone, press and hold the handle and drag; remove him again; by keyboard, Tab to his handle, press Space, Left Arrow, Space. | Each time the member list is outlined while Ben is over it, and dropping adds him ("1 person added." or similar). Dropping him back on the enrolled list, or Escape, adds nobody. A screen reader hears each step. Ticks, **Select All** and **Add to Cohort** still work. |
 | 5 | On an enrollment in another program, set **Cohort** to Spring. | Refused: the cohort must belong to the enrollment's program. |
-| 6 | In **Schedule Sessions**, pick Tutoring, keep the cohort's dates, tick Monday and Wednesday, set a Start Time. | The line under the form gives the number of sessions (4 for a range starting on a Monday). Click **Schedule**: "4 sessions scheduled.", listed under the cohort's **Sessions**, each named "Tutoring (date)". |
+| 6 | In **Schedule Sessions**, pick Tutoring, keep the cohort's dates, tick Monday and Wednesday, set a Start Time of 18:00 and an End Time of 17:00. Then change the End Time to 19:30. | With 17:00 the line asks for an end time after the start time and **Schedule** is off. With 19:30 the line gives the number of sessions (4 for a range starting on a Monday). Click **Schedule**: "4 sessions scheduled.", listed under the cohort's **Sessions** with Start Time and End Time, each named "Tutoring (date)". |
+| 6a | Open one of those sessions and set its End Time before its Start Time. Save. | Refused: "Choose an end time after the start time." The session's header shows both times. |
 | 7 | Set **To** before **From**, then untick every day. | The line asks for dates, then for days; **Schedule** is off. |
 | 8 | As the staff user, open the program's **Service Delivery Log**, pick Tutoring and the first session's date, mark Ana Present and save. Then open that session. | The session's log lists only the cohort members (Ana, Cara) with Ana already Present. |
 | 9 | Mark Cara Present and save. | "2 service deliveries saved."; the session's Status is Held. The session's **Service Deliveries** list shows two, and the program has no second delivery for Ana that day. |
@@ -418,6 +419,26 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the program. | The highlights header is at the top; the tabs **People**, **Attendance**, **Sessions**, **Eligibility** and **Details** show, with **People** open on the **Program Roster** panel. **Services**, **Enrollments** and **Cohorts** lists are at the side. |
+| 1 | Open the program. | The highlights header is at the top; the tabs **People**, **Attendance**, **Sessions**, **Eligibility** and **Details** show, with **People** open on the **Program Roster** panel. **Services**, **Enrollments**, **Cohorts** and **Session Schedules** lists are at the side. |
 | 2 | Click each tab in turn. | **Attendance**: the **Service Delivery Log**. **Sessions**: **Schedule Sessions**. **Eligibility**: **Eligibility Rules**. **Details**: the program's fields. |
 | 3 | Open the program in the Salesforce mobile app. | The same tabs show, with the lists under them. |
+
+## T-PRG-25: Repeating Session Schedules
+
+**Purpose:** confirm a session schedule creates its sessions eight weeks ahead, never deletes one when edited or ended, and that Remove Future Sessions keeps attended sessions (modules-24, D-183).
+**Prerequisites:** the admin user; the staff user (Programs Staff); the Read Only user; a program with an active service "Tutoring" and a cohort "Spring" with a member.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the staff user, on the cohort's **Schedule Sessions** panel, pick Tutoring, From today, To three months ahead, tick Tuesday and Thursday, Start Time 16:00, End Time 17:30. Click **Save as Repeating Schedule**. | "Repeating schedule saved. Sessions created: N." with N the Tuesdays and Thursdays of the next eight weeks. The cohort's **Session Schedules** list shows "Tutoring, Spring"; its **Sessions** list shows the sessions with both times. |
+| 2 | Open the schedule. | The side panel says every session is created through a day eight weeks ahead, and that edits apply after that day. **Create Sessions Now** is off; the related **Sessions** list shows the same sessions. |
+| 3 | Click **Save as Repeating Schedule** again on the panel with the same values. | A second schedule is saved but creates no session: every day already has one for the cohort. Delete that second schedule; its sessions list was empty and nothing else changes. |
+| 4 | On the schedule, change **Days of the Week** to Wednesday. Save. | No session is deleted or moved; the panel still says sessions exist through the same day. |
+| 5 | Take attendance on the first upcoming session (mark the member Present and save). As the admin user, open the schedule and click **Remove Future Sessions**, then **Cancel** in the confirm. | Nothing changes. |
+| 6 | Click **Remove Future Sessions** again and confirm. | "Sessions removed: N." The attended session and any session dated today stay; the other upcoming Tuesday and Thursday sessions are replaced by Wednesday sessions at the same times. |
+| 7 | Untick **Active** and save. | The panel says the schedule is not active and creates no new sessions; every session stays. |
+| 7a | As the admin user, in BarnCRM Settings, Programs, check **Weeks ahead to create sessions** shows 8; set it to 10 and save. Tick **Active** on the schedule again and save. | The panel then says sessions are created through a day 10 weeks ahead (after the save's run, or **Create Sessions Now**). Set the setting back to 8. |
+| 8 | As the staff user, open the schedule. | **Remove Future Sessions** is not offered (staff cannot delete sessions). As the Read Only user, the schedule shows with no buttons and cannot be edited. |
+| 9 | Try to delete the cohort. | Refused while it has a session schedule. |
+
+**Cleanup:** delete the schedule (its sessions stay), then the sessions without attendance.

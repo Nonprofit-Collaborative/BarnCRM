@@ -96,6 +96,22 @@
     <type>Flexipage</type>
     <pageOrSobjectType>Session__c</pageOrSobjectType>
   </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Session schedule, with Create Sessions Now</comment>
+    <content>Session_Schedule_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Session_Schedule__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Session schedule, with Create Sessions Now</comment>
+    <content>Session_Schedule_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Session_Schedule__c</pageOrSobjectType>
+  </actionOverrides>
   <brand>
     <headerColor>#007A9E</headerColor>
     <logo>BarnCRM_Programs_Logo</logo>

@@ -6,6 +6,10 @@
  * cohort when called from one. A day that already has a session of the service for the same
  * cohort (none on a program), other than a cancelled one, is skipped and counted. User mode throughout; plain wrappers (plan Section 9.9); anything
  * unexpected is recorded in the Error Log before it is reported (plan Section 7.2).
+ *
+ * It also serves repeating session schedules (modules-24, canonical model 29ZA7): the panel's
+ * Save as Repeating Schedule (R-SS6), and the schedule page's preview, Create Sessions Now
+ * (R-SS3) and Remove Future Sessions (R-SS5), which call `SessionScheduleService`.
  */
 public with sharing class SessionScheduleController {
 	private static final String CONTEXT = 'Schedule sessions panel';
@@ -44,6 +48,35 @@ public with sharing class SessionScheduleController {
 		/** After scheduling: how many chosen days were skipped because they had a session. */
 		@AuraEnabled
 		public Integer skipped = 0;
+		/** Whether the user may save the pattern as a repeating schedule (R-SS6). */
+		@AuraEnabled
+		public Boolean canSaveSchedule = false;
+		/** After saving a repeating schedule: its Id. */
+		@AuraEnabled
+		public Id scheduleId;
+	}
+
+	/** A session schedule's state for its page's panel. */
+	public class Preview {
+		@AuraEnabled
+		public Boolean active = false;
+		@AuraEnabled
+		public Boolean turnedOff = false;
+		@AuraEnabled
+		public Boolean canCreate = false;
+		@AuraEnabled
+		public Boolean canRemove = false;
+		/** How many sessions the next run creates, through `through`. */
+		@AuraEnabled
+		public Integer missing = 0;
+		@AuraEnabled
+		public Date through;
+		@AuraEnabled
+		public Date createdThrough;
+		@AuraEnabled
+		public Integer created = 0;
+		@AuraEnabled
+		public Integer removed = 0;
 	}
 
 	@AuraEnabled
@@ -77,15 +110,17 @@ public with sharing class SessionScheduleController {
 	}
 
 	/**
-	 * Creates one Scheduled session of the service on each date, at the start time when one is
-	 * given ("HH:mm", seconds and more ignored), for the cohort when `recordId` is one.
+	 * Creates one Scheduled session of the service on each date, at the start and end times when
+	 * given ("HH:mm", seconds and more ignored), for the cohort when `recordId` is one. An end
+	 * not after the start is refused by the session's validation rule (R-SE6).
 	 */
 	@AuraEnabled
 	public static Schedule scheduleSessions(
 		Id recordId,
 		Id serviceId,
 		List<Date> dates,
-		String startTime
+		String startTime,
+		String endTime
 	) {
 		if (serviceId == null) {
 			throw UserErrors.message(Label.Programs_Schedule_ServiceRequired);
@@ -101,17 +136,10 @@ public with sharing class SessionScheduleController {
 			);
 		}
 		Time starts = parsedTime(startTime);
+		Time ends = parsedTime(endTime);
 		try {
 			Schedule schedule = scheduleFor(recordId);
-			Option service = null;
-			for (Option offered : schedule.services) {
-				if ((Id) offered.value == serviceId) {
-					service = offered;
-				}
-			}
-			if (service == null) {
-				throw UserErrors.message(Label.Programs_Schedule_ServiceRequired);
-			}
+			Option service = offeredService(schedule, serviceId);
 			List<Date> sorted = new List<Date>(unique);
 			sorted.sort();
 			// Running it twice must not double the sessions: a day that already has one of this
@@ -135,6 +163,7 @@ public with sharing class SessionScheduleController {
 						Cohort__c = schedule.cohortId,
 						Session_Date__c = day,
 						Start_Time__c = starts,
+						End_Time__c = ends,
 						Status__c = SessionAttendance.SCHEDULED
 					)
 				);
@@ -149,7 +178,126 @@ public with sharing class SessionScheduleController {
 		}
 	}
 
+	/**
+	 * R-SS6: saves the panel's pattern as an active weekly session schedule, from `fromDate` to
+	 * `toDate`, on the chosen weekdays ("0" is Sunday, as the panel numbers them), and creates its
+	 * sessions at once. Returns the panel's state with the schedule's Id and how many it created.
+	 */
+	@AuraEnabled
+	public static Schedule saveRepeatingSchedule(
+		Id recordId,
+		Id serviceId,
+		Date fromDate,
+		Date toDate,
+		List<String> weekdays,
+		String startTime,
+		String endTime
+	) {
+		Time starts = parsedTime(startTime);
+		Time ends = parsedTime(endTime);
+		try {
+			Schedule schedule = scheduleFor(recordId);
+			Option service = offeredService(schedule, serviceId);
+			String name =
+				service.label + (schedule.cohortName == null ? '' : ', ' + schedule.cohortName);
+			Session_Schedule__c saved = new Session_Schedule__c(
+				Name = name.left(NAME_LENGTH),
+				Program__c = schedule.programId,
+				Service__c = serviceId,
+				Cohort__c = schedule.cohortId,
+				Weekdays__c = SessionScheduleService.weekdayNames(weekdays),
+				Every_N_Weeks__c = 1,
+				Start_Date__c = fromDate,
+				End_Date__c = toDate,
+				Start_Time__c = starts,
+				End_Time__c = ends
+			);
+			Database.insert(saved, true, AccessLevel.USER_MODE);
+			schedule.scheduleId = saved.Id;
+			schedule.created = SessionScheduleService.run(new Set<Id>{ saved.Id });
+			return schedule;
+		} catch (Exception failure) {
+			throw report(failure, recordId);
+		}
+	}
+
+	/** The schedule page's panel: how many sessions the next run creates, through which day. */
+	@AuraEnabled
+	public static Preview getSchedulePreview(Id scheduleId) {
+		try {
+			return previewOf(scheduleId);
+		} catch (Exception failure) {
+			throw report(failure, scheduleId);
+		}
+	}
+
+	/** R-SS3: runs the schedule now, as the nightly run would, and returns the fresh preview. */
+	@AuraEnabled
+	public static Preview createSessionsNow(Id scheduleId) {
+		try {
+			if (!previewOf(scheduleId).canCreate) {
+				throw UserErrors.message(failed());
+			}
+			Integer created = SessionScheduleService.run(new Set<Id>{ scheduleId });
+			Preview preview = previewOf(scheduleId);
+			preview.created = created;
+			return preview;
+		} catch (Exception failure) {
+			throw report(failure, scheduleId);
+		}
+	}
+
+	/** R-SS5, after the page's confirm: removes and recreates the schedule's future sessions. */
+	@AuraEnabled
+	public static Preview removeFutureSessions(Id scheduleId) {
+		try {
+			if (!previewOf(scheduleId).canRemove) {
+				throw UserErrors.message(failed());
+			}
+			Integer removed = SessionScheduleService.removeFutureSessions(scheduleId);
+			Preview preview = previewOf(scheduleId);
+			preview.removed = removed;
+			return preview;
+		} catch (Exception failure) {
+			throw report(failure, scheduleId);
+		}
+	}
+
 	// ------------------------------------------------------------------------------ helpers
+
+	private static Option offeredService(Schedule schedule, Id serviceId) {
+		for (Option offered : schedule.services) {
+			if ((Id) offered.value == serviceId) {
+				return offered;
+			}
+		}
+		throw UserErrors.message(Label.Programs_Schedule_ServiceRequired);
+	}
+
+	private static Preview previewOf(Id scheduleId) {
+		Session_Schedule__c schedule = scheduleId == null
+			? null
+			: SessionScheduleSelector.forPreview(scheduleId);
+		if (schedule == null) {
+			throw UserErrors.message(failed());
+		}
+		Preview preview = new Preview();
+		preview.active = schedule.Active__c == true;
+		preview.turnedOff = SessionScheduleService.isTurnedOff();
+		preview.createdThrough = schedule.Created_Through__c;
+		preview.through = SessionScheduleService.lastDay(schedule);
+		preview.canCreate =
+			preview.active &&
+			!preview.turnedOff &&
+			Schema.SObjectType.Session__c.isCreateable();
+		preview.canRemove = !preview.turnedOff && Schema.SObjectType.Session__c.isDeletable();
+		List<Date> missing = SessionScheduleService.missingDays(
+				new List<Session_Schedule__c>{ schedule }
+			)
+			.get(schedule.Id);
+		preview.missing = missing == null ? 0 : missing.size();
+		return preview;
+	}
 
 	private static Schedule scheduleFor(Id recordId) {
 		Schedule schedule = new Schedule();
@@ -178,12 +326,13 @@ public with sharing class SessionScheduleController {
 			schedule.services.add(option);
 		}
 		schedule.canSchedule = Schema.SObjectType.Session__c.isCreateable();
+		schedule.canSaveSchedule =
+			schedule.canSchedule && Schema.SObjectType.Session_Schedule__c.isCreateable();
 		return schedule;
 	}
 
-	/** "Service name date", cut to fit the name field. */
-	@TestVisible
-	private static String sessionName(String serviceName, Date day) {
+	/** "Service name date", cut to fit the name field; schedules name sessions the same way. */
+	public static String sessionName(String serviceName, Date day) {
 		String suffix = ' ' + day.format();
 		String base = serviceName == null ? '' : serviceName;
 		return base.left(NAME_LENGTH - suffix.length()) + suffix;

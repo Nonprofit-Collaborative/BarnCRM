@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Session_Schedule__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The repeating schedule that created this session. Empty for a session added by hand or with Schedule Sessions.</inlineHelpText>
+  <label>Session Schedule</label>
+  <referenceTo>Session_Schedule__c</referenceTo>
+  <relationshipLabel>Sessions</relationshipLabel>
+  <relationshipName>Sessions</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

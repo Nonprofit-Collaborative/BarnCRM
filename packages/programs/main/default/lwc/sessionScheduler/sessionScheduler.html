@@ -66,10 +66,28 @@
               onchange={handleStartTimeChange}
             ></lightning-input>
           </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <lightning-input
+              data-id="end-time"
+              type="time"
+              label={labels.endTime}
+              value={endTime}
+              onchange={handleEndTimeChange}
+            ></lightning-input>
+          </div>
         </div>
         <p data-id="preview" class="slds-text-body_small slds-var-m-top_small" aria-live="polite">{preview}</p>
         <div role="status" data-id="result" class="slds-var-m-vertical_small">{resultMessage}</div>
-        <div class="slds-grid slds-grid_align-end slds-var-m-bottom_small">
+        <div class="slds-grid slds-grid_align-end slds-wrap slds-gutters_xx-small slds-var-m-bottom_small">
+          <template lwc:if={canSaveSchedule}>
+            <lightning-button
+              data-id="save-repeating"
+              class="slds-var-m-right_x-small"
+              label={labels.saveRepeating}
+              disabled={saveRepeatingDisabled}
+              onclick={handleSaveRepeating}
+            ></lightning-button>
+          </template>
           <lightning-button
             data-id="schedule"
             variant="brand"

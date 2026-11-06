@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>End_After_Start</fullName>
+  <active>true</active>
+  <description>
+    R-SE6: when both times are set, a session ends after it starts.
+  </description>
+  <errorConditionFormula>
+AND(
+  NOT(ISBLANK(Start_Time__c)),
+  NOT(ISBLANK(End_Time__c)),
+  End_Time__c &lt;= Start_Time__c
+)
+  </errorConditionFormula>
+  <errorDisplayField>End_Time__c</errorDisplayField>
+  <errorMessage>
+    Choose an end time after the start time.
+  </errorMessage>
+</ValidationRule>

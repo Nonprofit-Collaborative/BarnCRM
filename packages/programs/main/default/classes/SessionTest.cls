@@ -120,7 +120,8 @@ private class SessionTest {
 				spring.Id,
 				service.Id,
 				new List<Date>{ second, first, second, null },
-				'18:30:00.000'
+				'18:30:00.000',
+				'20:00'
 			);
 			Test.stopTest();
 
@@ -133,7 +134,7 @@ private class SessionTest {
 			Assert.isTrue(offered.canSchedule, 'The admin may schedule.');
 			Assert.areEqual(2, done.created, 'One per distinct date.');
 			List<Session__c> sessions = [
-				SELECT Name, Cohort__c, Session_Date__c, Start_Time__c, Status__c
+				SELECT Name, Cohort__c, Session_Date__c, Start_Time__c, End_Time__c, Status__c
 				FROM Session__c
 				WITH SYSTEM_MODE
 				ORDER BY Session_Date__c
@@ -142,6 +143,7 @@ private class SessionTest {
 			Assert.areEqual(first, sessions[0].Session_Date__c);
 			Assert.areEqual(spring.Id, sessions[0].Cohort__c, 'For the cohort.');
 			Assert.areEqual(Time.newInstance(18, 30, 0, 0), sessions[0].Start_Time__c);
+			Assert.areEqual(Time.newInstance(20, 0, 0, 0), sessions[0].End_Time__c);
 			Assert.areEqual(SessionAttendance.SCHEDULED, sessions[0].Status__c);
 			Assert.isTrue(sessions[0].Name.startsWith('Tutoring '), 'Named after the service.');
 		}
@@ -157,6 +159,7 @@ private class SessionTest {
 				service.Program__c,
 				service.Id,
 				new List<Date>{ Date.newInstance(2027, 4, 5) },
+				null,
 				null
 			);
 			Test.stopTest();
@@ -171,6 +174,29 @@ private class SessionTest {
 			];
 			Assert.isNull(session.Cohort__c, 'For everyone in the program.');
 			Assert.isNull(session.Start_Time__c, 'No start time given.');
+		}
+	}
+
+	@IsTest
+	static void aSessionEndsAfterItStarts() {
+		System.runAs(admin()) {
+			Service__c service = tutoring();
+			Session__c session = new Session__c(
+				Name = 'Late',
+				Service__c = service.Id,
+				Session_Date__c = Date.newInstance(2027, 4, 5),
+				Start_Time__c = Time.newInstance(18, 0, 0, 0),
+				End_Time__c = Time.newInstance(18, 0, 0, 0)
+			);
+
+			Test.startTest();
+			Database.SaveResult refused = Database.insert(session, false);
+			session.End_Time__c = Time.newInstance(19, 0, 0, 0);
+			Database.SaveResult saved = Database.insert(session, false);
+			Test.stopTest();
+
+			Assert.isFalse(refused.isSuccess(), 'R-SE6: an end not after the start is refused.');
+			Assert.isTrue(saved.isSuccess(), 'An end after the start saves.');
 		}
 	}
 
@@ -196,6 +222,7 @@ private class SessionTest {
 				spring.Id,
 				service.Id,
 				new List<Date>{ first, second },
+				null,
 				null
 			);
 			List<Date> taken = SessionScheduleController.getTakenDays(
@@ -208,6 +235,7 @@ private class SessionTest {
 				spring.Id,
 				service.Id,
 				new List<Date>{ first, second, third },
+				null,
 				null
 			);
 			Test.stopTest();
@@ -265,6 +293,7 @@ private class SessionTest {
 								service.Program__c,
 								meal.Id,
 								one,
+								null,
 								null
 							);
 						}
@@ -273,6 +302,7 @@ private class SessionTest {
 								service.Program__c,
 								inactive.Id,
 								one,
+								null,
 								null
 							);
 						}
@@ -281,6 +311,7 @@ private class SessionTest {
 								service.Program__c,
 								service.Id,
 								tooMany,
+								null,
 								null
 							);
 						}
@@ -289,6 +320,7 @@ private class SessionTest {
 								service.Program__c,
 								service.Id,
 								one,
+								'09:00',
 								'25:00'
 							);
 						}
@@ -297,6 +329,7 @@ private class SessionTest {
 								service.Program__c,
 								service.Id,
 								new List<Date>(),
+								null,
 								null
 							);
 						}
