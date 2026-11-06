@@ -154,6 +154,28 @@ describe('c-match-source-manager', () => {
     expect(one(element, '[data-id="try"]')).not.toBeNull();
   });
 
+  it('turns a shipped source off at once, with no deployment to wait on (D-184)', async () => {
+    getView.mockResolvedValue(view(true, [source()]));
+    setArchived.mockResolvedValue(null);
+    const element = await render();
+    getView.mockClear();
+
+    const toggle = one(element, '[data-id="toggle"]');
+    toggle.checked = false;
+    toggle.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    await flush();
+
+    expect(setArchived).toHaveBeenCalledWith({
+      typeName: 'Match_Source__mdt',
+      developerName: 'Address_Person',
+      archived: true
+    });
+    expect(getOutcome).not.toHaveBeenCalled();
+    expect(getView).toHaveBeenCalled();
+    expect(one(element, '[data-id="status"]').textContent).toContain('Core_MatchLogic_TurnedOff');
+  });
+
   it('lets a shipped source be deactivated but not edited', async () => {
     getView.mockResolvedValue(view(true, [source()]));
     setArchived.mockResolvedValue('0Af000000000001');

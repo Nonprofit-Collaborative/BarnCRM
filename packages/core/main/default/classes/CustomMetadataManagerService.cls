@@ -181,6 +181,7 @@ public with sharing class CustomMetadataManagerService {
 		};
 		matchSources.choicesObject = Match_Source__mdt.SObjectType;
 		matchSources.shippedArchivable = true;
+		matchSources.shippedOffSetting = BarnCRM_Settings__c.Match_Sources_Turned_Off__c;
 		matchSources.validator = new MatchSourceService.Validator();
 		matchSources.listed = false;
 
@@ -304,8 +305,14 @@ public with sharing class CustomMetadataManagerService {
 		if (editable.shippedArchivable) {
 			CustomMetadataManagerSelector.StoredRow found = rowNamed(rows, developerName);
 			if (isShipped(found) && editable.shippedOffSetting != null) {
+				// A shipped row archived the old way (ADR-0133) is deployed active once more.
+				Id deployment = null;
+				String archiveName = editable.archiveField.getDescribe().getLocalName();
+				if (archived != true && !isTrue(found.values.get(archiveName))) {
+					deployment = setShippedArchived(editable, found, true);
+				}
 				setShippedTurnedOff(editable, rows, found, archived == true);
-				return null;
+				return deployment;
 			}
 			if (isShipped(found)) {
 				return setShippedArchived(editable, found, archived != true);

@@ -580,20 +580,36 @@ private class CustomMetadataManagerServiceTest {
 	}
 
 	@IsTest
-	static void aShippedSourceIsArchivedAndRestoredButNeverEdited() {
+	static void aShippedSourceIsTurnedOffInTheSettingAndNeverEdited() {
 		System.runAs(TestUsers.admin()) {
 			stubSources(
 				new List<CustomMetadataManagerSelector.StoredRow>{
-					source('Address_Person', true, true)
+					source('Address_Person', true, true),
+					source('Address_Household', false, true)
 				}
 			);
 			CapturingDeployer deployer = new CapturingDeployer();
 			CustomMetadataManagerService.deployer = deployer;
 
 			Test.startTest();
-			CustomMetadataManagerService.setArchived(SOURCE_TYPE, 'Address_Person', true);
-			Metadata.CustomMetadata archived = (Metadata.CustomMetadata) deployer.container.getMetadata()[0];
-			CustomMetadataManagerService.setArchived(SOURCE_TYPE, 'Address_Person', false);
+			Id offJob = CustomMetadataManagerService.setArchived(
+				SOURCE_TYPE,
+				'Address_Person',
+				true
+			);
+			String listed = SettingsService.getSettings().Match_Sources_Turned_Off__c;
+			Id onJob = CustomMetadataManagerService.setArchived(
+				SOURCE_TYPE,
+				'Address_Person',
+				false
+			);
+			Assert.isNull(deployer.container, 'Turning a shipped source off or on deploys nothing');
+			// A shipped source archived the old way (ADR-0133) is deployed active again.
+			Id legacyJob = CustomMetadataManagerService.setArchived(
+				SOURCE_TYPE,
+				'Address_Household',
+				false
+			);
 			Metadata.CustomMetadata restored = (Metadata.CustomMetadata) deployer.container.getMetadata()[0];
 			CustomMetadataManagerService.RowInput edit = sourceInput(
 				'Address__c',
@@ -606,24 +622,30 @@ private class CustomMetadataManagerServiceTest {
 			String editRefusal = sourceRefusal(edit);
 			Test.stopTest();
 
+			Assert.isNull(offJob, 'Turning off is saved at once');
+			Assert.isNull(onJob, 'So is turning on');
+			Assert.areEqual('Address_Person', listed, 'Listed while off');
+			Assert.isTrue(
+				String.isBlank(SettingsService.getSettings().Match_Sources_Turned_Off__c),
+				'Turned on again'
+			);
+			Assert.isNotNull(legacyJob, 'The archived shipped row is deployed');
 			Assert.areEqual(
 				NamespaceUtil.prefix() +
 					'Match_Source.' +
 					NamespaceUtil.prefix() +
-					'Address_Person',
-				archived.fullName,
-				'The shipped row itself is deployed, by its packaged name'
+					'Address_Household',
+				restored.fullName,
+				'By its packaged name'
 			);
-			Map<String, Object> values = valuesOf(archived);
-			Assert.areEqual(false, values.get('Active__c'), 'Archived');
+			Map<String, Object> values = valuesOf(restored);
+			Assert.areEqual(true, values.get('Active__c'), 'Restored');
 			Assert.areEqual(true, values.get('Is_Shipped__c'), 'Still marked shipped');
 			Assert.areEqual(
 				'Street__c',
 				values.get('Value_Field__c'),
 				'Values deployed as shipped'
 			);
-			Assert.areEqual('Address (person)', archived.label, 'Label kept');
-			Assert.areEqual(true, valuesOf(restored).get('Active__c'), 'Restored');
 			Assert.areEqual(
 				String.format(
 					BarnHelp.text('Core', 'Core_CmdtManager_ShippedReadOnly'),

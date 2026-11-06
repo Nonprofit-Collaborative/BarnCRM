@@ -22,7 +22,8 @@ public with sharing class MatchSourceSelector {
 				Value_Field__c,
 				Postal_Code_Field__c,
 				Parent_Field__c,
-				Normalization__c
+				Normalization__c,
+				Is_Shipped__c
 			FROM Match_Source__mdt
 			WHERE Active__c = TRUE
 			WITH SYSTEM_MODE
