@@ -3,10 +3,13 @@ import {
   STAGES,
   backwardLinks,
   canLink,
+  canMoveTo,
   columns,
   defaultReportKeys,
+  dropOrders,
   escapeHtml,
   findings,
+  hasIndicators,
   isComputed,
   linkTargets,
   liveLinks,
@@ -153,6 +156,30 @@ describe('logicModelRules', () => {
     expect(moveOrders(model(), 'nope', 1)).toEqual([]);
     expect(nextOrder(model(), 'Activity')).toBe(30);
     expect(nextOrder(model(), 'Outcome_Long')).toBe(10);
+  });
+
+  it('places a dragged part in a column and keeps a measured part measured (DnD-2)', () => {
+    expect(dropOrders(model(), 'ac2', 'Activity', 0)).toEqual([
+      { id: 'ac2', sortOrder: 10 },
+      { id: 'ac1', sortOrder: 20 }
+    ]);
+    expect(dropOrders(model(), 'in1', 'Activity', 1)).toEqual([
+      { id: 'ac1', sortOrder: 10 },
+      { id: 'in1', sortOrder: 20 },
+      { id: 'ac2', sortOrder: 30 }
+    ]);
+    expect(dropOrders(model(), 'in1', 'Activity', 9).map((row) => row.id)).toEqual([
+      'ac1',
+      'ac2',
+      'in1'
+    ]);
+    expect(dropOrders(model(), 'in1', 'Outcome_Long')).toEqual([{ id: 'in1', sortOrder: 10 }]);
+    expect(hasIndicators(model(), 'oc1')).toBe(true);
+    expect(hasIndicators(model(), 'ac1')).toBe(false);
+    expect(canMoveTo(model(), 'oc1', 'Outcome_Long')).toBe(true);
+    expect(canMoveTo(model(), 'oc1', 'Impact')).toBe(false);
+    expect(canMoveTo(model(), 'ac1', 'Impact')).toBe(true);
+    expect(canMoveTo(model(), 'ac1', 'Nowhere')).toBe(false);
   });
 
   it('decides when a source can be saved', () => {

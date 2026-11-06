@@ -230,6 +230,35 @@ export function moveOrders(model, elementId, direction) {
   return list.map((item, position) => ({ id: item.id, sortOrder: (position + 1) * 10 }));
 }
 
+/** True when indicators measure the element, which keeps it in a measured column (R-IN1). */
+export function hasIndicators(model, elementId) {
+  return ((model && model.indicators) || []).some((indicator) => indicator.elementId === elementId);
+}
+
+/**
+ * True when a drag may take the element into the column `stageKey` (DnD-2): any column, except
+ * that an element with indicators stays in Outputs or an Outcomes column, as the Edit form's
+ * Column list offers. Backward arrows are checked on the drop, so the refusal can name them.
+ */
+export function canMoveTo(model, elementId, stageKey) {
+  const stage = stageByKey(stageKey);
+  return Boolean(stage) && (stage.measured || !hasIndicators(model, elementId));
+}
+
+/**
+ * The new sort orders of the column `stageKey` once the element is put at `toIndex` among the
+ * column's other elements (a drag drop, DnD-2): every element numbered 10, 20, 30 in its new
+ * order. The element is placed whichever column it is in now.
+ */
+export function dropOrders(model, elementId, stageKey, toIndex) {
+  const column = columns(model).find((col) => col.key === stageKey);
+  const rest = (column ? column.elements : []).filter((item) => item.id !== elementId);
+  const at = Number.isInteger(toIndex) ? Math.max(0, Math.min(toIndex, rest.length)) : rest.length;
+  const ids = rest.map((item) => item.id);
+  ids.splice(at, 0, elementId);
+  return ids.map((id, position) => ({ id, sortOrder: (position + 1) * 10 }));
+}
+
 /** The sort order for a new element added at the end of a column. */
 export function nextOrder(model, stageKey) {
   const column = columns(model).find((col) => col.key === stageKey);

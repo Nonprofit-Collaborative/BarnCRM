@@ -14,7 +14,7 @@ import {
   stageOf,
   takesIndicators
 } from 'c/logicModelRules';
-import { LABELS, format, messageFrom, stageLabel } from 'c/logicModelText';
+import { LABELS, backwardMessage, format, messageFrom, stageLabel } from 'c/logicModelText';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import BarnConfirmModal from 'c/barnConfirmModal';
 
@@ -51,6 +51,7 @@ export default class LogicModelPart extends LightningElement {
   draftAssumption = '';
   editingLinkId;
   draftLinkAssumption = '';
+  focusAssumption = false;
 
   get element() {
     return ((this.model && this.model.elements) || []).find((item) => item.id === this.elementId);
@@ -152,13 +153,8 @@ export default class LogicModelPart extends LightningElement {
     // An arrow may never point backward (R-LL2): say which ones the new column would turn.
     const backward = backwardLinks(this.model, this.elementId, this.draftStage);
     if (backward.length) {
-      const arrows = backward
-        .map((link) => format(LABELS.arrowPair, link.fromName, link.toName))
-        .join('; ');
       this.dispatchEvent(
-        new CustomEvent('failure', {
-          detail: { message: format(LABELS.backwardArrows, arrows) }
-        })
+        new CustomEvent('failure', { detail: { message: backwardMessage(backward) } })
       );
       return undefined;
     }
@@ -257,6 +253,30 @@ export default class LogicModelPart extends LightningElement {
     this.addingArrow = true;
     this.draftTargetId = undefined;
     this.draftAssumption = '';
+  }
+
+  /**
+   * Opens the Add Arrow form with the part it leads to already chosen: the builder calls this
+   * when an arrow is dragged from this part onto a later one (DnD-3). Focus goes to the
+   * assumption, the one thing left to fill in.
+   */
+  @api
+  startArrow(targetId) {
+    this.editing = false;
+    this.addingArrow = true;
+    this.draftTargetId = targetId;
+    this.draftAssumption = '';
+    this.focusAssumption = true;
+  }
+
+  renderedCallback() {
+    if (this.focusAssumption) {
+      const field = this.template.querySelector('[data-id="arrow-assumption"]');
+      if (field) {
+        this.focusAssumption = false;
+        field.focus();
+      }
+    }
   }
 
   handleDraftTarget(event) {
