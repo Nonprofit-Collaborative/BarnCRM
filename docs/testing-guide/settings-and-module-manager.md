@@ -177,6 +177,21 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 **Cleanup:** deactivate or delete `My_Test_Flow`.
 
+## T-SET-07D: The Automation Tab
+
+**Purpose:** confirm Automation has its own tab in the admin apps (D-184) and the Settings section still works.
+**Prerequisites:** admin user; a staff user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **BarnCRM Admin** app. | The tabs read **BarnCRM Settings**, **Data Manager**, **Data Hygiene**, **Duplicate Matching**, **Automation**, then any module admin tabs, and **Error Log** last. **Automation** has a factory icon. |
+| 2 | Click **Automation**. | The **Automation** card (factory icon) shows the pause controls, the switches, **Pause or Bypass for Some People** and **Your Own Flows**, as on **BarnCRM Settings**, **Automation**. |
+| 3 | Open **BarnCRM Admin Console** and click **Automation**. | It opens as a workspace tab with the same card. |
+| 4 | Open **BarnCRM Settings**, **Automation**. | The same card shows there; a switch changed on one page shows changed on the other after a reload. |
+| 5 | As the staff user, open the App Launcher and search `Automation`. | No **Automation** tab is offered. |
+
+**Cleanup:** None.
+
 ## T-SET-08: Turn on a Feature Left Off
 
 **Purpose:** confirm a feature that is off can be turned on once, behind a confirmation, and its tabs appear.

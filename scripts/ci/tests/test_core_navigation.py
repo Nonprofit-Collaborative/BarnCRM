@@ -155,7 +155,8 @@ class CoreAppOrder(unittest.TestCase):
             self.assertNotIn(tool, admin, f"{tool} opens from its Data Manager card (D-135)")
         # admin-22: the raw Import Rows tab opens from Super Importer's results, not the nav.
         self.assertNotIn("Import_Row__c", admin)
-        self.assertEqual(admin, ["BarnCRM_Settings", "Data_Manager", "Data_Hygiene", "Duplicate_Matching", "Error_Log__c"])
+        # D-184: Automation is its own tab, before Error Log.
+        self.assertEqual(admin, ["BarnCRM_Settings", "Data_Manager", "Data_Hygiene", "Duplicate_Matching", "Automation", "Error_Log__c"])
         # D-183: the Record Inspector is button only; its tab stays for the button to open, not in the nav.
         self.assertNotIn("Record_Inspector", admin)
 

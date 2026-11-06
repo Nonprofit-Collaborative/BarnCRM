@@ -25,11 +25,13 @@ and nothing to install: installing or upgrading each package creates the switch 
 automation it ships, and leaves every switch you already have as you set it. If a switch is
 ever missing, the automation still runs, and Health Check names it and offers to restore it.
 
-You will find it in two places:
+You will find it in these places:
 
-- **BarnCRM Settings, then Automation.** This is the full page: the list of every
-  automation with its on and off switch, the pause button, **Catch Up Now**, the people and
-  profiles that pause or bypass automation, and your own flows.
+- **The Automation tab** in **BarnCRM Admin** and **BarnCRM Admin Console** (BarnCRM Admin
+  only, D-184). This is the full page: the list of every automation with its on and off
+  switch, the pause button, **Catch Up Now**, the people and profiles that pause or bypass
+  automation, and your own flows.
+- **BarnCRM Settings, then Automation.** The same panel, kept where admins already look for it.
 - **The BarnCRM home page.** While automation is paused, a banner appears at the top
   of the home page telling you what is paused and when it will come back on.
 

@@ -1665,6 +1665,10 @@
     <visibility>Available</visibility>
   </tabSettings>
   <tabSettings>
+    <tab>Automation</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>BarnCRM_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>
