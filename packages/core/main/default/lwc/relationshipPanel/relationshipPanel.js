@@ -4,7 +4,8 @@ import { NavigationMixin } from 'lightning/navigation';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { gql, graphql } from 'lightning/graphql';
 import { deleteRecord, updateRecord } from 'lightning/uiRecordApi';
-import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import { getObjectInfo, getPicklistValues } from 'lightning/uiObjectInfoApi';
+import getTurnedOffTypes from '@salesforce/apex/RelationshipController.getTurnedOffTypes';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import { iconFor } from 'c/barnIcons';
 import { localIsoDate } from 'c/findCsv';
@@ -13,6 +14,7 @@ import { followLinkInWorkspace } from 'c/workspaceTabs';
 
 import RELATIONSHIP_SCHEMA from '@salesforce/schema/Relationship__c';
 import END_DATE_FIELD from '@salesforce/schema/Relationship__c.End_Date__c';
+import TYPE_FIELD from '@salesforce/schema/Relationship__c.Type__c';
 
 import ACTIONS_FOR from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
 import EDIT_ACTION from '@salesforce/label/c.Core_CmdtManager_EditAction';
@@ -29,7 +31,8 @@ import UNNAMED_PERSON from '@salesforce/label/c.Core_Affiliation_UnnamedPerson';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const RELATIONSHIP_OBJECT = 'Relationship__c';
-const FORM_FIELDS = ['Type__c', 'Status__c', 'Start_Date__c', 'End_Date__c', 'Description__c'];
+// Type is a picker of its own, so a type the administrator turned off is not offered.
+const FORM_FIELDS = ['Status__c', 'Start_Date__c', 'End_Date__c', 'Description__c'];
 const CURRENT_STATUS = 'Current';
 
 /**
@@ -185,6 +188,56 @@ export default class RelationshipPanel extends NavigationMixin(LightningElement)
     }
   }
 
+  typeValues = [];
+  turnedOffTypes = [];
+  typeValue;
+
+  @wire(getPicklistValues, {
+    recordTypeId: '$relationshipInfo.defaultRecordTypeId',
+    fieldApiName: TYPE_FIELD
+  })
+  receiveTypeValues({ data }) {
+    if (data) {
+      this.typeValues = data.values;
+    }
+  }
+
+  // Lower case Type values turned off (ADR-0170); the server refuses them anyway.
+  @wire(getTurnedOffTypes)
+  receiveTurnedOffTypes({ data }) {
+    if (data) {
+      this.turnedOffTypes = data;
+    }
+  }
+
+  get typeLabel() {
+    const field = this.relationshipInfo && this.relationshipInfo.fields[TYPE_FIELD.fieldApiName];
+    return field ? field.label : '';
+  }
+
+  /** The Type choices for a new relationship: every active value not turned off. */
+  get typeOptions() {
+    const off = new Set(this.turnedOffTypes);
+    return this.typeValues
+      .filter((entry) => !off.has(String(entry.value).toLowerCase()))
+      .map((entry) => ({ label: entry.label, value: entry.value }));
+  }
+
+  handleTypeChange(event) {
+    this.typeValue = event.detail.value;
+  }
+
+  /** Adds the chosen type to the fields the form saves. */
+  handleFormSubmit(event) {
+    event.preventDefault();
+    const picker = this.template.querySelector('[data-id="type"]');
+    if (picker && !picker.reportValidity()) {
+      return;
+    }
+    const fields = { ...event.detail.fields, [TYPE_FIELD.fieldApiName]: this.typeValue };
+    this.template.querySelector('lightning-record-edit-form').submit(fields);
+  }
+
   /** Add relationship, only for someone who can create relationships (Read Only cannot). */
   get canAdd() {
     return Boolean(this.relationshipInfo && this.relationshipInfo.createable);
@@ -321,6 +374,7 @@ export default class RelationshipPanel extends NavigationMixin(LightningElement)
   }
 
   handleAdd() {
+    this.typeValue = undefined;
     this.showForm = true;
   }
 

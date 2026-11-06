@@ -8,6 +8,11 @@
  */
 @IsTest(testFor='ApexClass:CustomMetadataManagerController')
 private class CustomMetadataManagerControllerTest {
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.admin();
+	}
+
 	private static final String TYPE_NAME = 'Relationship_Type__mdt';
 	private static final Id JOB = FakeIds.ofPrefix('0Af', 3);
 
@@ -170,5 +175,55 @@ private class CustomMetadataManagerControllerTest {
 				'Refused first'
 			);
 		}
+	}
+
+	@IsTest
+	static void onlyAHolderTurnsAShippedTypeOff() {
+		User maria = maria();
+		CustomMetadataManagerSelector.StoredRow spouse = new CustomMetadataManagerSelector.StoredRow();
+		spouse.developerName = 'Spouse';
+		spouse.label = 'Spouse';
+		spouse.values.put('Type__c', 'Spouse');
+		spouse.values.put('Reciprocal_Type__c', 'Spouse');
+		spouse.values.put('Active__c', true);
+		spouse.values.put('Is_Shipped__c', true);
+		CustomMetadataManagerSelector.rowsOverride = new Map<String, List<CustomMetadataManagerSelector.StoredRow>>{
+			Relationship_Type__mdt.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+				.getName() => new List<CustomMetadataManagerSelector.StoredRow>{ spouse }
+		};
+		User david;
+		System.runAs(TestUsers.admin()) {
+			david = SettingsTestPermissions.buildStandardUser('David', 'Okafor', 'cmdtdv2');
+			insert david;
+		}
+		String refused;
+		String jobId;
+
+		Test.startTest();
+		System.runAs(david) {
+			try {
+				CustomMetadataManagerController.setArchived(TYPE_NAME, 'Spouse', true);
+			} catch (AuraHandledException e) {
+				refused = e.getMessage();
+			}
+		}
+		String afterDavid = SettingsService.getSettings().Relationship_Types_Turned_Off__c;
+		System.runAs(maria) {
+			jobId = CustomMetadataManagerController.setArchived(TYPE_NAME, 'Spouse', true);
+		}
+		Test.stopTest();
+
+		Assert.areEqual(
+			BarnHelp.text('Core', 'Core_CmdtManager_PermissionRequired'),
+			refused,
+			'David cannot turn a type off'
+		);
+		Assert.isNull(afterDavid, 'Nothing was saved for him');
+		Assert.isNull(jobId, 'Maria turns it off at once');
+		Assert.areEqual(
+			'Spouse',
+			SettingsService.getSettings().Relationship_Types_Turned_Off__c,
+			'Spouse is listed as off'
+		);
 	}
 }

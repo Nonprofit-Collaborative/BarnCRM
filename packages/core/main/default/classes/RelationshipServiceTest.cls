@@ -6,7 +6,7 @@
  * assertion here is unverified. They are written to the same standard as if they had run, and
  * the first person with a scratch org should run them before trusting the feature.
  */
-@IsTest(testFor='ApexClass:RelationshipService')
+@IsTest(testFor='ApexClass:RelationshipService, ApexClass:RelationshipController')
 private class RelationshipServiceTest {
 	@TestSetup
 	static void createTestUser() {
@@ -533,6 +533,161 @@ private class RelationshipServiceTest {
 				Relationship__c.Reciprocal_Type__c.getDescribe().isRestrictedPicklist(),
 				'Reciprocal Type takes any type the mapping gives, so a custom type is added once'
 			);
+		}
+	}
+
+	// ------------------------------------------------------------- shipped types turned off
+
+	/** A mapping row as the selector returns it; DeveloperName can only be set this way. */
+	private static Relationship_Type__mdt typeRow(
+		String developerName,
+		String type,
+		String reciprocal,
+		Boolean shipped
+	) {
+		return (Relationship_Type__mdt) JSON.deserialize(
+			JSON.serialize(
+				new Map<String, Object>{
+					'DeveloperName' => developerName,
+					Relationship_Type__mdt.Type__c.getDescribe().getName() => type,
+					Relationship_Type__mdt.Reciprocal_Type__c.getDescribe().getName() => reciprocal,
+					Relationship_Type__mdt.Is_Shipped__c.getDescribe().getName() => shipped,
+					Relationship_Type__mdt.Active__c.getDescribe().getName() => true
+				}
+			),
+			Relationship_Type__mdt.class
+		);
+	}
+
+	/** The shipped Spouse, Grandparent and Grandchild rows, read again. */
+	private static void shippedTypes(String grandparentReciprocal) {
+		RelationshipSelector.typeMappingOverride = new List<Relationship_Type__mdt>{
+			typeRow('Spouse', 'Spouse', 'Spouse', true),
+			typeRow('Grandparent', 'Grandparent', grandparentReciprocal, true),
+			typeRow('Grandchild', 'Grandchild', 'Grandparent', true)
+		};
+		RelationshipService.clearTypeCache();
+	}
+
+	private static void turnOff(String names) {
+		SettingsService.saveSystemValue('Relationship_Types_Turned_Off__c', names);
+		RelationshipService.clearTypeCache();
+	}
+
+	@IsTest
+	static void aTurnedOffTypeIsNotOfferedAndANewOneIsRefused() {
+		System.runAs(TestUsers.admin()) {
+			RelationshipTestDataFactory.quietOtherAutomations();
+			List<Contact> people = RelationshipTestDataFactory.contacts(2, 'Garcia');
+			shippedTypes('Grandchild');
+			turnOff('Grandparent');
+
+			Test.startTest();
+			List<String> offered = RelationshipController.getTurnedOffTypes();
+			Database.SaveResult result = Database.insert(
+				RelationshipTestDataFactory.between(people[0], people[1], 'Grandparent'),
+				false
+			);
+			Database.SaveResult spouse = Database.insert(
+				RelationshipTestDataFactory.between(people[0], people[1], 'Spouse'),
+				false
+			);
+			Test.stopTest();
+
+			Assert.areEqual(new List<String>{ 'grandparent' }, offered, 'The card leaves it out');
+			Assert.isFalse(result.isSuccess(), 'A new Grandparent relationship is refused');
+			Assert.areEqual(
+				String.format(
+					BarnHelp.text('Core', 'Core_Relationship_TypeTurnedOff'),
+					new List<Object>{ 'Grandparent' }
+				),
+				result.getErrors()[0].getMessage(),
+				'Saying why and where to turn it back on'
+			);
+			Assert.isTrue(spouse.isSuccess(), 'A type still on saves as before');
+		}
+	}
+
+	@IsTest
+	static void relationshipsThatAlreadyHaveATurnedOffTypeKeepWorking() {
+		System.runAs(TestUsers.admin()) {
+			RelationshipTestDataFactory.quietOtherAutomations();
+			List<Contact> people = RelationshipTestDataFactory.contacts(3, 'Garcia');
+			shippedTypes('Grandchild');
+			Relationship__c grandparent = RelationshipTestDataFactory.between(
+				people[0],
+				people[1],
+				'Grandparent'
+			);
+			insert grandparent;
+			Relationship__c spouse = RelationshipTestDataFactory.between(
+				people[0],
+				people[2],
+				'Spouse'
+			);
+			insert spouse;
+			turnOff('Grandparent');
+
+			Test.startTest();
+			grandparent.Description__c = 'Visits every Sunday';
+			Database.SaveResult edited = Database.update(grandparent, false);
+			spouse.Type__c = 'Grandparent';
+			Database.SaveResult retyped = Database.update(spouse, false);
+			Test.stopTest();
+
+			Assert.isTrue(edited.isSuccess(), 'An existing Grandparent relationship is edited');
+			Relationship__c other = otherSideOf(people[1].Id);
+			Assert.areEqual('Grandchild', other.Type__c, 'Its other side keeps its type');
+			Assert.areEqual(
+				'Visits every Sunday',
+				other.Description__c,
+				'And is still kept in step'
+			);
+			Assert.isFalse(retyped.isSuccess(), 'Changing another one to Grandparent is refused');
+			Assert.areEqual(
+				'Grandchild',
+				RelationshipService.reciprocalOf('Grandparent'),
+				'The mapping still applies, so the existing pairs stay right'
+			);
+		}
+	}
+
+	@IsTest
+	static void anUpgradeOfTheShippedRowLeavesItOff() {
+		System.runAs(TestUsers.admin()) {
+			shippedTypes('Grandchild');
+			turnOff('Grandparent');
+
+			Test.startTest();
+			// The next package version ships the row with a new reciprocal; the row is read
+			// again, and the setting, which the upgrade never touches, still lists it.
+			shippedTypes('Grandkid');
+			Boolean stillOff = RelationshipService.isTurnedOff('Grandparent');
+			String reciprocal = RelationshipService.reciprocalOf('Grandparent');
+			Test.stopTest();
+
+			Assert.isTrue(stillOff, 'Turned off survives the upgrade');
+			Assert.areEqual('Grandkid', reciprocal, 'The package still updates the row');
+			Assert.isFalse(RelationshipService.isTurnedOff('Spouse'), 'Others stay on');
+		}
+	}
+
+	@IsTest
+	static void herOwnActiveRowForATurnedOffTypeWins() {
+		System.runAs(TestUsers.admin()) {
+			RelationshipSelector.typeMappingOverride = new List<Relationship_Type__mdt>{
+				typeRow('Friend', 'Friend', 'Friend', true),
+				typeRow('Org_Friend_ab12', 'Friend', 'Colleague', false)
+			};
+			turnOff('Friend');
+
+			Test.startTest();
+			Boolean off = RelationshipService.isTurnedOff('Friend');
+			String reciprocal = RelationshipService.reciprocalOf('Friend');
+			Test.stopTest();
+
+			Assert.isFalse(off, 'Her own row offers Friend again');
+			Assert.areEqual('Colleague', reciprocal, 'With her mapping');
 		}
 	}
 

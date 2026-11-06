@@ -277,6 +277,62 @@ describe('c-custom-metadata-manager', () => {
     });
   });
 
+  it('turns a shipped relationship type off and on at once, with no deployment to wait on', async () => {
+    const switchable = types();
+    switchable[0].shippedArchivable = true;
+    switchable[0].shippedSwitch = true;
+    switchable[0].rows.push({
+      developerName: 'Grandparent',
+      label: 'Grandparent',
+      shipped: true,
+      archived: true,
+      values: { Type__c: 'Grandparent', Reciprocal_Type__c: 'Grandchild', Description__c: null }
+    });
+    getTypes.mockResolvedValue(switchable);
+    setArchived.mockResolvedValue(null);
+    const element = await build();
+    const shipped = find(element, 'shipped-rows');
+    const actions = shipped.columns.find((column) => column.type === 'action');
+    const offered = jest.fn();
+
+    actions.typeAttributes.rowActions({ archived: false }, offered);
+    actions.typeAttributes.rowActions({ archived: true }, offered);
+    expect(offered.mock.calls[0][0]).toEqual([
+      { label: 'c.Core_ModuleManager_TurnOffButton', name: 'archive' }
+    ]);
+    expect(offered.mock.calls[1][0]).toEqual([
+      { label: 'c.Core_ModuleManager_TurnOnButton', name: 'restore' }
+    ]);
+    expect(shipped.data.map((row) => row.statusText)).toEqual([
+      'c.Core_CmdtManager_StatusInUse',
+      'c.Core_Feature_Off'
+    ]);
+
+    shipped.dispatchEvent(
+      new CustomEvent('rowaction', {
+        detail: { action: { name: 'archive' }, row: shipped.data[0] }
+      })
+    );
+    await flush();
+
+    expect(setArchived).toHaveBeenCalledWith({
+      typeName: TYPE,
+      developerName: 'Spouse',
+      archived: true
+    });
+    expect(find(element, 'status').textContent).toBe('c.Core_CmdtManager_TurnedOff');
+    expect(getOutcome).not.toHaveBeenCalled();
+    expect(getTypes).toHaveBeenCalledTimes(2);
+
+    shipped.dispatchEvent(
+      new CustomEvent('rowaction', {
+        detail: { action: { name: 'restore' }, row: shipped.data[1] }
+      })
+    );
+    await flush();
+    expect(find(element, 'status').textContent).toBe('c.Core_CmdtManager_TurnedOn');
+  });
+
   it('shows a load failure in words', async () => {
     getTypes.mockRejectedValue({});
     const element = await build();

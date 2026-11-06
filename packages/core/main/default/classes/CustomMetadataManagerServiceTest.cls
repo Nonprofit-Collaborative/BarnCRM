@@ -144,19 +144,14 @@ private class CustomMetadataManagerServiceTest {
 	}
 
 	@IsTest
-	static void aShippedRowCannotBeChangedOrArchived() {
+	static void aShippedRowCannotBeChanged() {
 		System.runAs(TestUsers.admin()) {
 			shippedSpouseAndOwnFriend();
-			CustomMetadataManagerService.deployer = new CapturingDeployer();
-			String archiveRefusal;
+			CapturingDeployer deployer = new CapturingDeployer();
+			CustomMetadataManagerService.deployer = deployer;
 
 			Test.startTest();
 			String editRefusal = refusal(input('Spouse', 'Spouse', 'Spouse', 'Partner'));
-			try {
-				CustomMetadataManagerService.setArchived(TYPE_NAME, 'Spouse', true);
-			} catch (CustomMetadataManagerService.CustomMetadataManagerException e) {
-				archiveRefusal = e.getMessage();
-			}
 			Test.stopTest();
 
 			String expected = String.format(
@@ -164,7 +159,115 @@ private class CustomMetadataManagerServiceTest {
 				new List<Object>{ 'Spouse' }
 			);
 			Assert.areEqual(expected, editRefusal, 'A shipped row is read only');
-			Assert.areEqual(expected, archiveRefusal, 'A shipped row cannot be archived either');
+			Assert.isNull(deployer.container, 'Nothing is deployed');
+		}
+	}
+
+	@IsTest
+	static void mariaTurnsAShippedTypeOffAndOnWithoutTouchingTheRow() {
+		System.runAs(TestUsers.admin()) {
+			stubRows(
+				new List<CustomMetadataManagerSelector.StoredRow>{
+					row('Spouse', 'Spouse', 'Spouse', true, true),
+					row('Grandparent', 'Grandparent', 'Grandchild', true, true)
+				}
+			);
+			CapturingDeployer deployer = new CapturingDeployer();
+			CustomMetadataManagerService.deployer = deployer;
+
+			Test.startTest();
+			Id offJob = CustomMetadataManagerService.setArchived(TYPE_NAME, 'Grandparent', true);
+			CustomMetadataManagerService.setArchived(TYPE_NAME, 'Spouse', true);
+			String bothOff = SettingsService.getSettings().Relationship_Types_Turned_Off__c;
+			CustomMetadataManagerService.TypeView view = viewNamed(
+				CustomMetadataManagerService.getTypes(),
+				TYPE_NAME
+			);
+			Id onJob = CustomMetadataManagerService.setArchived(TYPE_NAME, 'Spouse', false);
+			Test.stopTest();
+
+			Assert.isNull(offJob, 'Turning off is saved at once, with no deployment');
+			Assert.isNull(onJob, 'So is turning on');
+			Assert.isNull(deployer.container, 'The shipped row itself is never deployed');
+			Assert.areEqual('Grandparent,Spouse', bothOff, 'Both are listed while off');
+			Assert.isTrue(view.rows[0].archived, 'The page shows a turned off row as not in use');
+			Assert.areEqual(
+				'Grandparent',
+				SettingsService.getSettings().Relationship_Types_Turned_Off__c,
+				'Turning Spouse on takes only Spouse off the list'
+			);
+			List<String> audited = new List<String>();
+			for (Setting_Change__c change : [
+				SELECT New_Value__c
+				FROM Setting_Change__c
+				WHERE Setting_Name__c = 'BarnCRM_Settings__c.Relationship_Types_Turned_Off__c'
+				ORDER BY CreatedDate, Id
+			]) {
+				audited.add(change.New_Value__c);
+			}
+			Assert.areEqual(
+				new List<String>{ 'Grandparent', 'Grandparent,Spouse', 'Grandparent' },
+				audited,
+				'Each change is audited'
+			);
+		}
+	}
+
+	@IsTest
+	static void aShippedTypeIsTurnedOnOnlyWhileNoOtherRowHoldsIt() {
+		System.runAs(TestUsers.admin()) {
+			stubRows(
+				new List<CustomMetadataManagerSelector.StoredRow>{
+					row('Friend', 'Friend', 'Friend', true, true),
+					row('Org_Friend_x2y3', 'Friend', 'Friend', true, false)
+				}
+			);
+			SettingsService.saveSystemValue('Relationship_Types_Turned_Off__c', 'Friend');
+			String refused;
+
+			Test.startTest();
+			try {
+				CustomMetadataManagerService.setArchived(TYPE_NAME, 'Friend', false);
+			} catch (CustomMetadataManagerService.CustomMetadataManagerException e) {
+				refused = e.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.isNotNull(refused, 'Her own active Friend row has replaced the shipped one');
+			Assert.areEqual(
+				'Friend',
+				SettingsService.getSettings().Relationship_Types_Turned_Off__c,
+				'The shipped row stays off'
+			);
+		}
+	}
+
+	@IsTest
+	static void relationshipTypesAreHiddenWhileRelationshipsAreOff() {
+		System.runAs(TestUsers.admin()) {
+			shippedSpouseAndOwnFriend();
+			SettingsService.saveSystemValue(
+				'Features_Turned_On__c',
+				FeatureSwitchService.ADDRESSES
+			);
+			String refused;
+
+			Test.startTest();
+			List<CustomMetadataManagerService.TypeView> types = CustomMetadataManagerService.getTypes();
+			try {
+				CustomMetadataManagerService.setArchived(TYPE_NAME, 'Spouse', true);
+			} catch (CustomMetadataManagerService.CustomMetadataManagerException e) {
+				refused = e.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.isNull(viewNamed(types, TYPE_NAME), 'Not listed while the feature is off');
+			Assert.isNotNull(viewNamed(types, 'Merge_Rule__mdt'), 'Other lists still are');
+			Assert.areEqual(
+				BarnHelp.text('Core', 'Core_CmdtManager_UnknownType'),
+				refused,
+				'Nor can a type be turned off'
+			);
 		}
 	}
 
@@ -366,7 +469,8 @@ private class CustomMetadataManagerServiceTest {
 			Assert.isNull(viewNamed(types, SOURCE_TYPE), 'Match sources are not listed here');
 			CustomMetadataManagerService.TypeView view = viewNamed(types, TYPE_NAME);
 			Assert.isNotNull(view, 'Named without a namespace');
-			Assert.isFalse(view.shippedArchivable, 'A shipped relationship type has no actions');
+			Assert.isTrue(view.shippedArchivable, 'A shipped relationship type can be turned off');
+			Assert.isTrue(view.shippedSwitch, 'Turned off by a setting, with no deployment');
 			Assert.areEqual(3, view.fields.size(), 'Type, reciprocal type and description');
 			Assert.isFalse(view.fields[0].choices.isEmpty(), 'Type offers the Type list choices');
 			Assert.isTrue(view.rows[0].shipped, 'Spouse is shipped');

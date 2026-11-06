@@ -83,6 +83,10 @@ The list ships ready to use, and none of it depends on anyone's gender.
 | Other | Other |
 
 To add your own types, such as Mentor and Mentee, see [Custom metadata](custom-metadata.md).
+To stop offering a shipped type your organization does not use, turn it off on the same
+page ([Turning Off a Shipped Relationship Type](custom-metadata.md#turning-off-a-shipped-relationship-type)):
+the **Type** list on the card leaves it out and a new relationship of that type is refused,
+while the relationships that already have it keep it.
 
 ## A Five-Minute Walkthrough
 
@@ -128,7 +132,8 @@ ones you created). Pick one from the list view menu at the top left.
 
 The 11 relationship types in the table above ship with BarnCRM as custom metadata
 (Relationship Type), so a new org can add relationships straight away, with no sample data.
-Relationships between people are not shipped, because they describe your own people.
+Any of them can be turned off on the Custom Metadata page, and an upgrade never turns one
+back on. Relationships between people are not shipped, because they describe your own people.
 
 ## Common Mistakes
 

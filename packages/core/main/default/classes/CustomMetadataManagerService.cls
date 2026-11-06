@@ -52,6 +52,14 @@ public with sharing class CustomMetadataManagerService {
 		 * listed on the Custom metadata page: Match Source, on Matching Logic (ADR-0139).
 		 */
 		public Boolean listed = true;
+		/**
+		 * For a shipped-archivable type whose shipped rows are turned off by a setting rather
+		 * than deployed: the BarnCRM Settings field listing their DeveloperNames. The row is
+		 * never changed, so an upgrade cannot turn it back on (ADR-0170). Null otherwise.
+		 */
+		public Schema.SObjectField shippedOffSetting;
+		/** The Core feature the type belongs to; while it is off the type is not offered. */
+		public String feature;
 	}
 
 	/** A type's own check of a save; throws CustomMetadataManagerException to refuse it. */
@@ -69,6 +77,9 @@ public with sharing class CustomMetadataManagerService {
 		public String help;
 		@AuraEnabled
 		public Boolean shippedArchivable;
+		/** True when a shipped row is turned off and on at once, with no deployment. */
+		@AuraEnabled
+		public Boolean shippedSwitch;
 		@AuraEnabled
 		public List<FieldView> fields;
 		@AuraEnabled
@@ -143,6 +154,9 @@ public with sharing class CustomMetadataManagerService {
 			Relationship_Type__mdt.Reciprocal_Type__c => Relationship__c.Type__c
 		};
 		relationshipTypes.choicesObject = Relationship__c.SObjectType;
+		relationshipTypes.shippedArchivable = true;
+		relationshipTypes.shippedOffSetting = BarnCRM_Settings__c.Relationship_Types_Turned_Off__c;
+		relationshipTypes.feature = FeatureSwitchService.RELATIONSHIPS;
 
 		EditableType matchSources = new EditableType();
 		matchSources.type = Match_Source__mdt.SObjectType;
@@ -203,7 +217,7 @@ public with sharing class CustomMetadataManagerService {
 	public static List<TypeView> getTypes() {
 		List<TypeView> views = new List<TypeView>();
 		for (EditableType editable : registry().values()) {
-			if (editable.listed) {
+			if (editable.listed && isFeatureOn(editable)) {
 				views.add(viewOf(editable));
 			}
 		}
@@ -216,6 +230,7 @@ public with sharing class CustomMetadataManagerService {
 		view.label = editable.label;
 		view.help = editable.help;
 		view.shippedArchivable = editable.shippedArchivable;
+		view.shippedSwitch = editable.shippedOffSetting != null;
 		view.fields = new List<FieldView>();
 		for (Schema.SObjectField token : editable.fields) {
 			Schema.DescribeFieldResult field = token.getDescribe();
@@ -279,12 +294,19 @@ public with sharing class CustomMetadataManagerService {
 		return enqueue(editable, developerName, input.label.trim(), values, existing);
 	}
 
-	/** Archives a row (it stops being used) or restores it. */
+	/**
+	 * Archives a row (it stops being used) or restores it. Returns the deployment Id, or null
+	 * when the change was a setting and is already saved (a shipped row turned off or on).
+	 */
 	public static Id setArchived(String typeName, String developerName, Boolean archived) {
 		EditableType editable = editableType(typeName);
 		List<CustomMetadataManagerSelector.StoredRow> rows = rowsOf(editable);
 		if (editable.shippedArchivable) {
 			CustomMetadataManagerSelector.StoredRow found = rowNamed(rows, developerName);
+			if (isShipped(found) && editable.shippedOffSetting != null) {
+				setShippedTurnedOff(editable, rows, found, archived == true);
+				return null;
+			}
 			if (isShipped(found)) {
 				return setShippedArchived(editable, found, archived != true);
 			}
@@ -332,6 +354,54 @@ public with sharing class CustomMetadataManagerService {
 			values,
 			shipped
 		);
+	}
+
+	/**
+	 * Turns a shipped row off or on by listing its DeveloperName in the type's setting, which
+	 * is saved at once and audited (ADR-0170). The row is never deployed, so its label and
+	 * values stay the package's to update. Turning one on is refused while another active row
+	 * holds the same unique value, as restoring any row is.
+	 */
+	private static void setShippedTurnedOff(
+		EditableType editable,
+		List<CustomMetadataManagerSelector.StoredRow> rows,
+		CustomMetadataManagerSelector.StoredRow shipped,
+		Boolean off
+	) {
+		if (!off && editable.uniqueField != null) {
+			requireUnique(editable, rows, shipped.values, shipped);
+		}
+		String key = editable.shippedOffSetting.getDescribe().getLocalName();
+		String stored = (String) SettingsService.getSettings().get(key);
+		List<String> names = new List<String>();
+		for (String part : String.isBlank(stored) ? new List<String>() : stored.split(',')) {
+			String name = part.trim();
+			if (String.isNotBlank(name) && !name.equalsIgnoreCase(shipped.developerName)) {
+				names.add(name);
+			}
+		}
+		if (off) {
+			names.add(shipped.developerName);
+		}
+		names.sort();
+		String joined = String.join(names, ',');
+		if (joined.length() > editable.shippedOffSetting.getDescribe().getLength()) {
+			throw new CustomMetadataManagerException(
+				BarnHelp.text('Core', 'Core_CmdtManager_SaveError')
+			);
+		}
+		SettingsService.saveSystemValue(key, joined);
+	}
+
+	/** The names in a comma separated setting, trimmed and lower case. */
+	public static Set<String> namesIn(String stored) {
+		Set<String> names = new Set<String>();
+		for (String part : String.isBlank(stored) ? new List<String>() : stored.split(',')) {
+			if (String.isNotBlank(part)) {
+				names.add(part.trim().toLowerCase());
+			}
+		}
+		return names;
 	}
 
 	/**
@@ -556,7 +626,7 @@ public with sharing class CustomMetadataManagerService {
 
 	private static EditableType editableType(String typeName) {
 		EditableType editable = String.isBlank(typeName) ? null : registry().get(typeName);
-		if (editable == null) {
+		if (editable == null || !isFeatureOn(editable)) {
 			throw new CustomMetadataManagerException(
 				BarnHelp.text('Core', 'Core_CmdtManager_UnknownType')
 			);
@@ -613,7 +683,19 @@ public with sharing class CustomMetadataManagerService {
 		EditableType editable,
 		CustomMetadataManagerSelector.StoredRow row
 	) {
-		return isTrue(row.values.get(editable.archiveField.getDescribe().getLocalName()));
+		if (!isTrue(row.values.get(editable.archiveField.getDescribe().getLocalName()))) {
+			return false;
+		}
+		if (editable.shippedOffSetting == null || !isShipped(row)) {
+			return true;
+		}
+		String key = editable.shippedOffSetting.getDescribe().getLocalName();
+		Set<String> off = namesIn((String) SettingsService.getSettings().get(key));
+		return !off.contains(row.developerName.toLowerCase());
+	}
+
+	private static Boolean isFeatureOn(EditableType editable) {
+		return editable.feature == null || FeatureSwitchService.isOn(editable.feature);
 	}
 
 	private static Boolean isTrue(Object value) {

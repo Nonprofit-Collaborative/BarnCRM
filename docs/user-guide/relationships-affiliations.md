@@ -18,7 +18,8 @@ record's **Connections** tab.
 3. In **Related Person**, choose the other person.
 4. Choose a **Type**: what the other person is to this person. Choose from Spouse, Partner,
    Parent, Child, Sibling, Grandparent, Grandchild, Friend, Colleague, Employer contact or
-   Other.
+   Other, and any your admin added. A type your admin turned off is not in the list;
+   relationships that already have it keep it.
 5. Leave **Status** as Current. Optional: **Start Date** and **Description**.
 6. Click **Add Relationship** at the foot of the form.
 

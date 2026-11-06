@@ -41,7 +41,7 @@ page, even if that puts it out of reading order.
 | [Installing](installing.md) | INST | 3 | The install pre-check (edition, Apex, labels, objects, name collisions, test fit), the production test list, the release destructive manifest |
 | [People and households](people-and-households.md) | HH | 21 | Households, members, naming and greetings, merge and split, preferred phone, interactions, record pages, record types, adopting NPSP households |
 | [Addresses](addresses.md) | ADDR | 20 | Address records, primary address, the Address Updates setting, Move the Household Here and Give This Address to Members, seasonal addresses and the nightly swap, address history (status, dates, former addresses, undeliverable) and Address Card Fields |
-| [Relationships and affiliations](relationships-and-affiliations.md) | REL | 10 | Two-sided relationships, affiliations, primary affiliation |
+| [Relationships and affiliations](relationships-and-affiliations.md) | REL | 11 | Two-sided relationships, affiliations, primary affiliation, turning shipped types off |
 | [Apps and Navigation](apps-and-navigation.md) | APP | 5 | The four BarnCRM apps, who sees each, their tabs, App Navigation Style, module pages in them |
 | [Settings and Module Manager](settings-and-module-manager.md) | SET | 25 | BarnCRM Settings console, Access, Module Manager, editions, automation control, home page, organization address, values from Setup, Integrations, People and Households and boxes, keeping a shown default, Finish Setup, save cues, Health and Error Log links, narrow screens, name pattern parts |
 | [Setup Assistant](setup-assistant.md) | SA | 11 | First-run setup, edition choice, Setup Assistant steps, sample data load and remove |

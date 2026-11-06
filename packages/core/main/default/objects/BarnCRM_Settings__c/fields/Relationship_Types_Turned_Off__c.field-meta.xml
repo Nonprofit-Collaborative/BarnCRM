@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Relationship_Types_Turned_Off__c</fullName>
+  <description>The comma separated names of the shipped relationship types turned off on the Custom Metadata page. They are not offered for new relationships; existing ones keep working. Written by the custom metadata manager (ADR-0170).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The relationship types BarnCRM ships that you turned off on the Custom Metadata page.</inlineHelpText>
+  <label>Relationship Types Turned Off</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+</CustomField>
