@@ -20,7 +20,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 |---|---|---|
 | 1 | Open the **BarnCRM Funders** app. | It opens on **Board Dashboard** (first tab), then **Grant Pipeline**, **Grants**, **Reports**, **Error Log** (last). |
 | 2 | **Grants**, **New**. Name `2027 Literacy Grant`, leave **Funder** empty, **Save**. | Refused: **Funder** is required. |
-| 3 | Funder `Lakeside Foundation`, Funder Contact `Pat Rivera`, Amount Requested `25,000`, Application Deadline 10 days from today, **Save**. | The grant's page shows the **Program** card. **Stage** is **Prospect**; **Submitted Date** and **Decision Date** are empty. |
+| 3 | Funder `Lakeside Foundation`, Funder Contact `Pat Rivera`, Amount Requested `25,000`, Application Deadline 10 days from today, **Save**. | The grant's page opens on **Overview** (details, and the **Program** card with Programs), with tabs **Money**, **Reporting**, **Writing** and **Related**; on a phone the same tabs. **Money** holds the Award Schedule, Payments and Restricted Fund Entries; **Reporting** the Requirements list, Logic Model Outcomes and Funder Report; **Writing** the Answer Library. **Stage** is **Prospect**; **Submitted Date** and **Decision Date** are empty. |
 | 4 | **Edit**, Stage **Applied**, **Save**. | **Submitted Date** is today. |
 | 5 | **Edit**, Submitted Date one week ago, Stage **Invited to Apply**, **Save**; then Stage **Applied** again. | **Submitted Date** stays one week ago. |
 | 6 | **Edit**, Amount Requested `-5`, **Save**. | Refused: `Amount Requested and Amount Awarded can't be negative.` |
@@ -58,8 +58,13 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 4 | Change the amount to `24,000`, dates January 1 to December 31 next year, tick **Restricted**, **Save**. | `Awarded. Open 2027 Literacy Grant to build its payment schedule.` with the name as a link. The card leaves the board. **Awarded This Fiscal Year** shows 24,000 and `1 grants awarded`. The grant has **Decision Date** today, **Amount Awarded** 24,000, the award dates and **Restricted** ticked. |
 | 5 | On `Arts Grant`, menu, **Move to Withdrawn**. | It leaves the board and the deadlines list. |
 | 6 | Open `2027 Literacy Grant`'s **Grant History** related list. | Each move is listed. |
+| 7 | Create `Drag Grant` at **Prospect**. On the board drag its card by the handle to **Applied**. | `Moved to Applied.`; the card is in **Applied**. The column under the pointer is outlined while dragging. |
+| 8 | Tab to `Drag Grant`'s handle, press Space, Right Arrow once, then Escape. | A screen reader hears it picked up, the column and position, then cancelled; nothing moves. |
+| 9 | Press Space, Right Arrow until **Awarded**, then Space. | **Record the Award** opens; close it: the card stays in **Applied**. |
+| 10 | On a touch device (or browser touch emulation), press and hold the handle, then drag to **Declined**. | It leaves the board. A quick swipe on the board scrolls instead of dragging. |
+| 11 | As read-only, open **Grant Pipeline**. | No handles and no Awarded, Declined or Withdrawn zones; the menu offers only **Open**. |
 
-**Cleanup:** None.
+**Cleanup:** Delete `Drag Grant` as the admin.
 
 ## T-FUN-04: The Program a Grant Pays For
 

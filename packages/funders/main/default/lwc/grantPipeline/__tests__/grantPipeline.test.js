@@ -302,10 +302,67 @@ describe('c-grant-pipeline', () => {
     const element = await render({ ...BOARD, canEdit: false, canCreate: false });
     expect(one(element, '[data-id="read-only"]')).not.toBeNull();
     expect(one(element, '[data-id="new-grant"]')).toBeNull();
+    expect(one(element, '[data-drag-id]')).toBeNull();
+    expect(one(element, '[data-id="drop-zone"]')).toBeNull();
     const items = [
       ...all(element, 'lightning-button-menu')[0].querySelectorAll('lightning-menu-item')
     ].map((item) => item.value);
     expect(items).toEqual(['open']);
+  });
+
+  it('moves a grant by keyboard drag to the next column (DnD-1)', async () => {
+    moveStage.mockResolvedValue();
+    const element = await render();
+    const zones = all(element, '[data-id="drop-zone"]').map((zone) => zone.dataset.dropZone);
+    expect(zones).toEqual(['Awarded', 'Declined', 'Withdrawn']);
+
+    const handle = one(element, '[data-drag-id="a01000000000001AAA"]');
+    expect(handle.getAttribute('tabindex')).toBe('0');
+    const press = (key) =>
+      handle.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+    press(' ');
+    await flush();
+    expect(one(element, '[data-id="drag-announcer"]').textContent).toContain('Core_Drag_PickedUp');
+    press('ArrowRight');
+    press('Enter');
+    await flush();
+
+    expect(moveStage).toHaveBeenCalledWith({
+      grantId: 'a01000000000001AAA',
+      stage: 'Letter of Inquiry',
+      amountAwarded: null
+    });
+    // The card menu is still there for the same move.
+    expect(all(element, 'lightning-button-menu')).toHaveLength(2);
+  });
+
+  it('opens Record the Award when a card is dropped on Awarded', async () => {
+    GrantAwardModal.open.mockResolvedValue(undefined);
+    const element = await render();
+    const handle = one(element, '[data-drag-id="a01000000000002AAA"]');
+    const press = (key) =>
+      handle.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+    press(' ');
+    press('ArrowRight');
+    press(' ');
+    await flush();
+
+    expect(GrantAwardModal.open).toHaveBeenCalled();
+    expect(GrantAwardModal.open.mock.calls[0][0].grant.id).toBe('a01000000000002AAA');
+    expect(moveStage).not.toHaveBeenCalled();
+  });
+
+  it('cancels a keyboard drag with Escape and moves nothing', async () => {
+    const element = await render();
+    const handle = one(element, '[data-drag-id="a01000000000001AAA"]');
+    const press = (key) =>
+      handle.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+    press(' ');
+    press('ArrowRight');
+    press('Escape');
+    await flush();
+    expect(moveStage).not.toHaveBeenCalled();
+    expect(GrantAwardModal.open).not.toHaveBeenCalled();
   });
 
   it('says so when there are no open grants or deadlines', async () => {

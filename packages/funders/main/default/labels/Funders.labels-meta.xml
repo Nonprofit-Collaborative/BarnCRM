@@ -9,6 +9,38 @@
         <value>Choose the program in the Program card on the grant's page. This is not a program.</value>
     </labels>
     <labels>
+        <fullName>Funders_GrantTab_Overview</fullName>
+        <categories>GrantPage</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant page tab: details, program and fund</shortDescription>
+        <value>Overview</value>
+    </labels>
+    <labels>
+        <fullName>Funders_GrantTab_Money</fullName>
+        <categories>GrantPage</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant page tab: award schedule, payments and restricted ledger</shortDescription>
+        <value>Money</value>
+    </labels>
+    <labels>
+        <fullName>Funders_GrantTab_Reporting</fullName>
+        <categories>GrantPage</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant page tab: requirements, outcomes and funder report</shortDescription>
+        <value>Reporting</value>
+    </labels>
+    <labels>
+        <fullName>Funders_GrantTab_Writing</fullName>
+        <categories>GrantPage</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant page tab: the answer library</shortDescription>
+        <value>Writing</value>
+    </labels>
+    <labels>
         <fullName>Funders_HealthCheck_PastDeadlineTitleOne</fullName>
         <categories>HealthCheck</categories>
         <language>en_US</language>

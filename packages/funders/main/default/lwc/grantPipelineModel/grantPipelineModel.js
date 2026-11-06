@@ -86,6 +86,37 @@ export function moveTargets(allStages, current) {
   return (allStages || []).filter((stage) => stage !== current);
 }
 
+/**
+ * The stages that have no column (Awarded, Declined, Withdrawn): the drop zones at the end of
+ * the board (DnD-1), in stage order.
+ *
+ * @param {string[]} allStages every stage, in order
+ * @param {string[]} openStages the stages drawn as columns
+ */
+export function closedStages(allStages, openStages) {
+  const open = new Set(openStages || []);
+  return (allStages || []).filter((stage) => !open.has(stage));
+}
+
+/**
+ * Marks what a drag in progress touches (DnD-1): the zone under the pointer or keyboard as
+ * `isTarget`, and the card being carried as `isDragging`. Copies; the input is left as is.
+ *
+ * @param {object[]} columns columns with `stage` and `cards` (each card with `id`)
+ * @param {{active: boolean, itemId: string, fromZone: string, overZone: string}} dragState
+ */
+export function markDrag(columns, dragState) {
+  const active = Boolean(dragState && dragState.active);
+  return (columns || []).map((column) => ({
+    ...column,
+    isTarget: active && dragState.overZone === column.stage && dragState.fromZone !== column.stage,
+    cards: (column.cards || []).map((card) => ({
+      ...card,
+      isDragging: active && dragState.itemId === card.id
+    }))
+  }));
+}
+
 /** A deadline this many days away or fewer is due soon (vis-modules-17). */
 export const SOON_DAYS = 14;
 

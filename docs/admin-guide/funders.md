@@ -93,6 +93,20 @@ On the **Grants** tab click **New** and fill in:
 | Owner | The staff member responsible. |
 | Funding Source | What kind of funder: Foundation, Corporate, Federal, Federal Pass-Through, State, Local Government or Other. The board dashboard groups awards by it. |
 
+### The Grant Page
+
+A grant's page groups its panels into tabs, on a phone too:
+
+| Tab | What is on it |
+|---|---|
+| Overview | The grant's details, and the Program and Giving Fund cards (each only with its module). |
+| Money | The Award Schedule card, the Payments list and the Restricted Fund Entries list. |
+| Reporting | The Requirements list, the Logic Model Outcomes card (with Logic Models) and the Funder Report card. |
+| Writing | The Answer Library card. |
+| Related | Every related list, including any your organization adds. |
+
+To change the page, edit **Grant Record Page** in Lightning App Builder.
+
 ### Government Awards
 
 A grant's **Government Award** section holds what a government award (or any award that asks for
@@ -172,7 +186,11 @@ The **Grant Pipeline** tab is where most people work:
 - **Board**: one column per open stage, each with its count and amount, and a card per grant
   showing its name (a link that opens the grant), the amount requested, the funder, the deadline
   and the owner. A deadline within 14 days shows a **Due in** badge (amber), a past one an
-  **Overdue** badge (red). Click a card's menu to open the grant or move it to another stage.
+  **Overdue** badge (red). Click a card's menu to open the grant or move it to another stage,
+  or drag the card by its handle into another column, or onto the **Awarded**, **Declined** and
+  **Withdrawn** zones after the last column. Dragging works with a mouse, by touch (press and
+  hold first) and by keyboard (Space, the arrow keys, Space; Escape cancels), and a screen
+  reader hears each step. The menu stays for every move.
 - **Record the Award**: moving a grant to **Awarded** opens a dialog that also asks **Amount
   Awarded** (the amount requested is filled in), **Award Start Date**, **Award End Date** and
   **Restricted**, all optional. On save a message links to the grant, where the Award Schedule
@@ -183,7 +201,7 @@ The **Grant Pipeline** tab is where most people work:
   and overdue ones badged. A requirement row has a **Mark Submitted** button; after it, an
   **Undo** link puts the requirement's status and Submitted Date back while the tab stays open.
 
-Moving and the menu's stage choices are offered only to people who can edit grants, and **Mark
+Moving, dragging and the menu's stage choices are offered only to people who can edit grants, and **Mark
 Submitted** only to people who can change requirements.
 
 ## The Board Dashboard Tab

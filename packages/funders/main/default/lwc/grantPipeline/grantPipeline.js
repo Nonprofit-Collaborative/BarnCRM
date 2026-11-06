@@ -7,12 +7,16 @@ import markSubmitted from '@salesforce/apex/GrantPipelineController.markSubmitte
 import undoSubmitted from '@salesforce/apex/GrantPipelineController.undoSubmitted';
 import {
   buildColumns,
+  closedStages,
   deadlineRows,
   daysBetween,
   initialsOf,
+  markDrag,
   moveTargets,
   urgencyOf
 } from 'c/grantPipelineModel';
+import { createDragController } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
 import { format, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import GrantAwardModal from 'c/grantAwardModal';
@@ -50,6 +54,7 @@ const ACTION_OPEN = 'open';
 const KIND_REQUIREMENT = 'requirement';
 const MOVE_PREFIX = 'move:';
 const STAGE_AWARDED = 'Awarded';
+const HELP_PACKAGES = ['Funders', 'Core'];
 
 const messageOf = (error) => messageFrom(error, helpText('Funders', 'Funders_Shared_NotSaved'));
 
@@ -62,12 +67,18 @@ const recordHref = (recordId) => `/lightning/r/${recordId}/view`;
  * to Awarded opens Record the Award), and the deadlines coming up (R-GN7), each requirement with
  * Mark Submitted and its Undo (modules-17).
  *
+ * A person who may edit grants can also drag a card to another column, or onto the Awarded,
+ * Declined and Withdrawn zones at the end of the board (DnD-1, c/barnDrag): by pointer, by touch
+ * after a short press and hold, or by keyboard from the card's handle (Space, arrows, Space;
+ * Escape cancels), each step announced. The card menu stays, and on a phone it is the main way.
+ * Dropping on Awarded opens Record the Award, as the menu does.
+ *
  * The columns, deadline rows and urgency are worked out by the framework-free
  * `grantPipelineModel`; this component only draws them and talks to `GrantPipelineController`.
  * Moving is offered only to a person who may edit grants.
  */
 export default class GrantPipeline extends NavigationMixin(LightningElement) {
-  helpReady = isHelpLoaded('Funders');
+  helpReady = isHelpLoaded(HELP_PACKAGES);
 
   labels = {
     title: TITLE,
@@ -110,14 +121,50 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
   errorMessage;
   /** What the last Mark Submitted replaced, while its Undo is offered. */
   lastMarked;
+  /** The drag in progress, from c/barnDrag, for the highlight. */
+  dragState;
+  /** What the board last announced to a screen reader. */
+  liveText = '';
+  drag;
 
   connectedCallback() {
     if (!this.helpReady) {
-      loadHelp('Funders').then(() => {
+      loadHelp(HELP_PACKAGES).then(() => {
         this.helpReady = true;
       });
     }
+    this.drag = createDragController({
+      root: this.template,
+      layout: 'columns',
+      // Read when spoken, not now: the help catalog may still be on its way.
+      messages: {
+        pickedUp: (name) => dragMessages().pickedUp(name),
+        position: (zone, position, count) => dragMessages().position(zone, position, count),
+        dropped: (name, zone) => dragMessages().dropped(name, zone),
+        cancelled: (name) => dragMessages().cancelled(name)
+      },
+      announce: (text) => {
+        this.liveText = text;
+      },
+      onChange: (state) => {
+        this.dragState = state;
+      },
+      canDrop: (itemId, fromZone, toZone) => fromZone !== toZone,
+      onDrop: ({ itemId, fromZone, toZone }) => {
+        if (!toZone || fromZone === toZone) {
+          return false;
+        }
+        this.moveTo(itemId, toZone);
+        return true;
+      }
+    });
     this.load();
+  }
+
+  disconnectedCallback() {
+    if (this.drag) {
+      this.drag.destroy();
+    }
   }
 
   async load() {
@@ -204,6 +251,40 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
 
   get canEdit() {
     return Boolean(this.board && this.board.canEdit);
+  }
+
+  /** The columns as drawn: the drag highlight on the target column and the carried card. */
+  get boardColumns() {
+    return markDrag(this.columns, this.dragState).map((column) => ({
+      ...column,
+      zoneClass:
+        'grant-column slds-box slds-box_x-small slds-theme_shade' +
+        (column.isTarget ? ' grant-zone_target' : ''),
+      cards: column.cards.map((card) => ({
+        ...card,
+        cardClass:
+          'slds-item grant-card slds-var-m-bottom_x-small' +
+          (card.isDragging ? ' grant-card_dragging' : '')
+      }))
+    }));
+  }
+
+  /** Awarded, Declined and Withdrawn as drop zones at the end of the board (DnD-1). */
+  get dropZones() {
+    if (!this.canEdit) {
+      return [];
+    }
+    const over = this.dragState && this.dragState.active ? this.dragState.overZone : null;
+    return closedStages(this.board.allStages, this.board.stages).map((stage) => ({
+      key: stage,
+      stage,
+      zoneClass:
+        'grant-drop-zone slds-box slds-box_x-small' + (over === stage ? ' grant-zone_target' : '')
+    }));
+  }
+
+  get dragHelp() {
+    return dragInstructions();
   }
 
   get canCreate() {
@@ -305,6 +386,14 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
       this.lastMarked = undefined;
       this.toast(messageOf(error), 'error');
     }
+  }
+
+  handleDragPointerDown(event) {
+    this.drag.pointerDown(event);
+  }
+
+  handleDragKeyDown(event) {
+    this.drag.keyDown(event);
   }
 
   handleCardMenu(event) {

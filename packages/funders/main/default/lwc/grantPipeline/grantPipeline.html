@@ -116,13 +116,16 @@
       </template>
 
       <template lwc:if={showColumns}>
+        <span id="grant-drag-help" class="slds-assistive-text">{dragHelp}</span>
         <div class="grant-board" data-id="board">
-          <template for:each={columns} for:item="column">
+          <template for:each={boardColumns} for:item="column">
             <section
               key={column.key}
-              class="grant-column slds-box slds-box_x-small slds-theme_shade"
+              class={column.zoneClass}
               data-id="column"
               data-stage={column.stage}
+              data-drop-zone={column.stage}
+              data-drop-label={column.stage}
               aria-label={column.stage}
             >
               <header class="slds-var-m-bottom_x-small">
@@ -143,14 +146,28 @@
               </template>
               <ul class="slds-has-dividers_around-space">
                 <template for:each={column.cards} for:item="card">
-                  <li
-                    key={card.id}
-                    class="slds-item grant-card slds-var-m-bottom_x-small"
-                    data-id={card.id}
-                    data-card
-                  >
+                  <li key={card.id} class={card.cardClass} data-id={card.id} data-card>
                     <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-start">
-                      <h3 class="slds-text-title_bold slds-truncate" title={card.name}>
+                      <template lwc:if={canEdit}>
+                        <span
+                          class="grant-handle slds-var-m-right_xx-small"
+                          role="button"
+                          tabindex="0"
+                          title={dragHelp}
+                          aria-label={card.name}
+                          aria-describedby="grant-drag-help"
+                          data-drag-id={card.id}
+                          data-drag-label={card.name}
+                          onpointerdown={handleDragPointerDown}
+                          onkeydown={handleDragKeyDown}
+                        >
+                          <lightning-icon
+                            icon-name="utility:drag_and_drop"
+                            size="x-small"
+                          ></lightning-icon>
+                        </span>
+                      </template>
+                      <h3 class="slds-col slds-text-title_bold slds-truncate" title={card.name}>
                         <a
                           href={card.href}
                           data-id={card.id}
@@ -228,6 +245,23 @@
               </ul>
             </section>
           </template>
+          <template for:each={dropZones} for:item="zone">
+            <section
+              key={zone.key}
+              class={zone.zoneClass}
+              data-id="drop-zone"
+              data-drop-zone={zone.stage}
+              data-drop-label={zone.stage}
+              aria-label={zone.stage}
+            >
+              <h2 class="slds-text-heading_small slds-truncate" title={zone.stage}>
+                {zone.stage}
+              </h2>
+            </section>
+          </template>
+        </div>
+        <div aria-live="polite" class="slds-assistive-text" data-id="drag-announcer">
+          {liveText}
         </div>
       </template>
 

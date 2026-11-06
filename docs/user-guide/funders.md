@@ -21,7 +21,10 @@ program officer is a contact at that organization.
 5. Fill in **Amount Requested** and the **Application Deadline** if you know them, then click
    **Save**.
 
-You should see: the grant's page with a **Program** card at the top.
+You should see: the grant's page, open on its **Overview** tab. The other tabs hold the money
+(**Money**: the Award Schedule, payments and restricted ledger), what you owe the funder
+(**Reporting**: requirements, outcomes and the funder report), your reusable answers
+(**Writing**) and every related list (**Related**).
 
 ## The Stages
 
@@ -55,6 +58,12 @@ the next 14 days shows an amber badge (`10 days left`, `Due today`), a past one 
 
 1. On the grant's card, click the menu (the small arrow).
 2. Choose **Move to** and the stage.
+
+Or drag the card by its handle (the dotted grip before its name) into another column, or onto
+**Awarded**, **Declined** or **Withdrawn** at the end of the board. On a touch screen, press and
+hold the handle a moment before dragging. With the keyboard, tab to the handle, press Space,
+use the arrow keys to choose the column, and press Space again (Escape cancels). Dropping on
+**Awarded** opens **Record the Award**, as the menu does. On a phone the menu is the easiest way.
 
 You should see: `Moved to` and the stage, and the card in its new column. A grant moved to
 **Awarded**, **Declined** or **Withdrawn** leaves the board.
