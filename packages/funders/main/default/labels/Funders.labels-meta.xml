@@ -185,6 +185,22 @@
         <value>Amount Awarded</value>
     </labels>
     <labels>
+        <fullName>Funders_Pipeline_NoGrants</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant Pipeline empty state heading</shortDescription>
+        <value>No Open Grants Yet</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_NoDeadlines</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Upcoming Deadlines empty state heading</shortDescription>
+        <value>Nothing Due Soon</value>
+    </labels>
+    <labels>
         <fullName>Funders_Shared_Print</fullName>
         <categories>Funders</categories>
         <language>en_US</language>

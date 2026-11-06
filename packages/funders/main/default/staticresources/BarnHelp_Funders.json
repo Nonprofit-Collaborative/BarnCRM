@@ -3,6 +3,7 @@
   "texts": {
     "Funders_Answers_Empty": "No answers yet. Keep the application answers you reuse on the Grant Answers tab.",
     "Funders_Answers_LoadFailed": "The Answer Library did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Funders_Award_Saved": "Awarded. Open {0} to build its payment schedule.",
     "Funders_Board_Empty": "Nothing to show for this fiscal year yet.",
     "Funders_Board_Help": "This fiscal year: grants awarded and, with Giving, gifts designated to funds. Each person sees totals of what they can read.",
     "Funders_Board_LoadFailed": "The Board Dashboard did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
@@ -12,14 +13,15 @@
     "Funders_Outcomes_LoadFailed": "The Logic Model Outcomes did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Funders_Outcomes_NotAnOutcome": "That is not an outcome or output from a logic model. Choose one from the list.",
     "Funders_Pipeline_DeadlinesEmpty": "No application deadlines or grant requirements due in the next 60 days.",
-    "Funders_Pipeline_Empty": "No open grants yet. Click New Grant to add the first one.",
-    "Funders_Pipeline_Intro": "Every open grant by stage, and the application deadlines coming up. Use a card's menu to open a grant or move it to another stage.",
+    "Funders_Pipeline_Empty": "Click New Grant to add the first one.",
+    "Funders_Pipeline_Intro": "Every open grant by stage, and the deadlines coming up. Click a grant to open it; use its menu to move it to another stage.",
     "Funders_Pipeline_LoadFailed": "The Grant Pipeline did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Funders_Program_LoadFailed": "The Program card did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Funders_Report_Help": "Open the file in a browser to print it or save it as a PDF, or in a word processor to edit it before you send it.",
     "Funders_Report_LoadFailed": "The Funder Report was not prepared. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Funders_Schedule_LoadFailed": "The Award Schedule did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Funders_Shared_NotSaved": "The change was not saved. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
-    "Funders_Undo_Changed": "This was changed since, so it was not undone. Open the record to change it."
+    "Funders_Undo_Changed": "This was changed since, so it was not undone. Open the record to change it.",
+    "Funders_Undo_Done": "Undone."
   }
 }

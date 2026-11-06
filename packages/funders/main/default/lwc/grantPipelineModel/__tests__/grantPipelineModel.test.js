@@ -1,6 +1,28 @@
-import { buildColumns, daysBetween, deadlineRows, moveTargets } from 'c/grantPipelineModel';
+import {
+  buildColumns,
+  daysBetween,
+  deadlineRows,
+  initialsOf,
+  moveTargets,
+  urgencyOf
+} from 'c/grantPipelineModel';
 
 describe('grantPipelineModel', () => {
+  it('says how urgent a deadline is in the status vocabulary', () => {
+    expect(urgencyOf(-1)).toBe('overdue');
+    expect(urgencyOf(0)).toBe('due soon');
+    expect(urgencyOf(14)).toBe('due soon');
+    expect(urgencyOf(15)).toBeNull();
+    expect(urgencyOf(null)).toBeNull();
+  });
+
+  it('takes up to two initials from a name', () => {
+    expect(initialsOf('Ana Maria Ruiz')).toBe('AM');
+    expect(initialsOf('maria')).toBe('M');
+    expect(initialsOf('')).toBe('');
+    expect(initialsOf(null)).toBe('');
+  });
+
   it('counts whole days either way and refuses unreadable dates', () => {
     expect(daysBetween('2026-11-02', '2026-11-12')).toBe(10);
     expect(daysBetween('2026-11-02', '2026-10-31')).toBe(-2);
