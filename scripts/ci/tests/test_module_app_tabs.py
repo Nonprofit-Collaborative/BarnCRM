@@ -216,7 +216,8 @@ class CoreAppsTest(unittest.TestCase):
     no app: they open from their Data Manager cards (D-135)."""
 
     # Import_Row__c opens from Super Importer's results (admin-22), not from an app's nav.
-    DATA_MANAGER_ONLY = {"Find", "Import", "Bulk_Update", "Import_Row__c"}
+    # Record_Inspector opens from the Inspect This Record button only (D-183).
+    DATA_MANAGER_ONLY = {"Find", "Import", "Bulk_Update", "Import_Row__c", "Record_Inspector"}
 
     def test_every_core_tab_is_in_a_core_app_and_every_app_tab_exists(self):
         root = os.path.join(HERE, "..", "..", "..")
