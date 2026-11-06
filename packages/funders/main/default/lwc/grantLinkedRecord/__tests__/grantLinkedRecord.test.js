@@ -139,9 +139,9 @@ describe.each(KINDS)('c-grant-linked-record ($kind)', (k) => {
     expect(k.set).toHaveBeenCalledWith({ grantId: GRANT_ID, [k.idKey]: null });
   });
 
-  it('says so without the module, and when the named record has gone', async () => {
+  it('draws nothing without the module, and says when the named record has gone', async () => {
     let element = await render({ ...CARD, available: false, canEdit: false, options: [] });
-    expect(one(element, '[data-id="not-installed"]')).not.toBeNull();
+    expect(one(element, '[data-id="card"]')).toBeNull();
     expect(one(element, `[data-id="${k.dataId}"]`)).toBeNull();
     document.body.removeChild(element);
 

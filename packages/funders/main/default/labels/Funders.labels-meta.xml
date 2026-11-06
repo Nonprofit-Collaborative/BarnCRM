@@ -241,14 +241,6 @@
         <value>No program</value>
     </labels>
     <labels>
-        <fullName>Funders_Program_NotInstalled</fullName>
-        <categories>GrantProgram</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown without the Programs module</shortDescription>
-        <value>Install the Programs module to name the program this grant pays for.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Program_Missing</fullName>
         <categories>GrantProgram</categories>
         <language>en_US</language>

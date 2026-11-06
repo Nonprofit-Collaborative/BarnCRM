@@ -68,7 +68,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In an org without Programs, open a grant. | The **Program** card says to install the Programs module. Nothing to choose. |
+| 1 | In an org without Programs, open a grant. | There is no **Program** card. |
 | 2 | In an org with Programs and a program `After School`, open a grant. | The card offers **No program** and `After School`; **Save** is disabled. |
 | 3 | Choose `After School`, **Save**. | `Program saved.` Reload: `After School` is chosen. |
 | 4 | As the admin, delete `After School`, then open the grant. | The card says the program has been deleted or you cannot see it. |
@@ -155,9 +155,10 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 1 | As staff, open `Two Year Award`. | The **Award Schedule** card shows Amount Awarded 25,000, Amount Scheduled 0, Amount Received 0, **Payment Frequency** Annual and **Build Schedule**. |
 | 2 | Choose **Quarterly**, then **Annual**. | Eight payments of 3,125, then two of 12,500 on January 1 of each year. |
 | 3 | Click **Build Schedule**. | `Saved.`; two **Expected** payments; Amount Scheduled 25,000; **Build Schedule** is gone. The grant's **Payment Frequency** is Annual. |
-| 4 | Click **Mark Received** on the first payment. | `Saved.`; it is **Received** with today's date; Amount Received 12,500, on the card and on the grant. |
+| 4 | Click **Mark Received** on the first payment. | `Saved.` with **Undo**; it is **Received** with today's date; Amount Received 12,500, on the card and on the grant; the received bar shows 50%. |
+| 4a | Click **Undo**, then **Mark Received** on the first payment again. | `Undone.`; the payment is **Expected** with no Received Date and Amount Received is 0; then Received again as in step 4. |
 | 5 | In the **Payments** list, set the second payment to **Cancelled**. | Scheduled 12,500. **Build Schedule** stays hidden (a payment is Received). |
-| 6 | Create a grant `Not Yet` at **Applied** and open it. | The card says what a schedule needs; no **Build Schedule**. |
+| 6 | Create a grant `Not Yet` at **Applied** and open it. Then set it **Awarded** with Amount Awarded and Award Start Date only. | First the card says to record the award first; then `Add the Award End Date to build a schedule.`; no **Build Schedule**. |
 | 7 | As read-only, open `Two Year Award`. | The payments show; no **Mark Received** and no **Build Schedule**. |
 | 8 | Load sample data and open **Youth Programs Award**. | Two payments of 17,500: the first Received on the award start date, the second Expected six months later. |
 | 9 | As the admin, delete `Two Year Award`. | Its payments go with it. |
@@ -177,7 +178,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 4 | Change the payment's **Amount** to 9,000, then its **Received Date** to the first of the month. | The Received entry follows: 9,000, dated the first. |
 | 5 | Set the payment to **Expected**. | The Received entry is removed; the Spent entry stays. |
 | 6 | Untick **Restricted**, add a second payment of 500 as **Received**. | No entry is added. |
-| 7 | Without Giving: look at the **Giving Fund** card. | It says to install the Giving module. Typing text into **Giving Fund** on the grant is refused. |
+| 7 | Without Giving: look for the **Giving Fund** card. | There is none. Typing text into **Giving Fund** on the grant is refused. |
 | 8 | With Giving: choose an active fund on the card and click **Save**. | `Saved.` and the fund's name; the grant's **Giving Fund** holds an 18-character ID. Choose **No fund** and save to clear it. |
 | 9 | As read-only, open the grant. | The entries and totals show; no **New** on the entries and the fund is shown by name. |
 | 10 | Load sample data and open **Youth Programs Award**. | **Restricted** is ticked: Received 17,500, Spent 6,000 (`Tutor stipends`), balance 11,500. |
@@ -255,7 +256,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | 4 | Open `Final report`. | **Logic Model Outcome** holds an 18-character record ID. |
 | 5 | Edit `Final report` and type `abc` into **Logic Model Outcome**; **Save**. | Refused: `Choose an outcome or output from a logic model in the Logic Model Outcomes card on the grant's page. This is not one.` |
 | 6 | As the admin, delete the outcome in the Logic Model Builder, then reopen `Youth Grant`. | The card says `The outcome this requirement named cannot be found. Choose another.` |
-| 7 | In an org without Logic Models, open a grant. | The card says `Install the Logic Models module to link each requirement to the outcome it reports on.` |
+| 7 | In an org without Logic Models, open a grant. | There is no **Logic Model Outcomes** card. |
 
 **Cleanup:** none.
 

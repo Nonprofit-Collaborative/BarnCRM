@@ -115,7 +115,7 @@ Only when your organization uses Programs.
 2. Click **Save**.
 
 You should see: `Program saved.` Choose **No program** and **Save** to clear it. Without Programs
-the card says to install the Programs module. If the program was deleted, the card says so;
+there is no Program card. If the program was deleted, the card says so;
 choose another.
 
 ## To Link a Requirement to the Outcome It Reports On
@@ -179,7 +179,8 @@ it.
 When a funder pays an award in parts (for example once a year for three years):
 
 1. Open the grant. It must be **Awarded**, with **Amount Awarded**, **Award Start Date** and
-   **Award End Date** filled in.
+   **Award End Date** filled in. If one is missing, the card names only that one (for example
+   `Add the Award End Date to build a schedule.`).
 2. On the **Award Schedule** card, choose the **Payment Frequency**.
 3. Check the payments listed: the amount split evenly, the first on the award start date.
 4. Click **Build Schedule**.
@@ -192,9 +193,11 @@ shows the total. To change one payment's date or amount, or add or cancel one, u
 
 On the grant's **Award Schedule** card, click **Mark Received** on the payment.
 
-You should see: `Saved.`, the payment **Received** with today's date, and **Amount Received** at
-the top of the card going up by its amount. If it came in on another day, open the payment and
-change **Received Date**.
+You should see: `Saved.` with an **Undo** link, the payment **Received** with today's date, and
+**Amount Received** at the top of the card going up by its amount; the bar under the totals shows
+how much of the award has come in. Clicked the wrong payment? Click **Undo** while the page is
+open: the payment goes back to **Expected** and its restricted ledger entry is removed
+(`Undone.`). If it came in on another day, open the payment and change **Received Date**.
 
 ## To Keep a Restricted Grant's Ledger
 

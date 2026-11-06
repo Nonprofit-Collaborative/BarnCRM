@@ -41,14 +41,6 @@
         <value>No fund</value>
     </labels>
     <labels>
-        <fullName>Funders_Fund_NotInstalled</fullName>
-        <categories>GivingFund</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Giving Fund card without Giving</shortDescription>
-        <value>Install the Giving module to name the fund this grant's money is booked to.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Grant_BadFund</fullName>
         <categories>GivingFund</categories>
         <language>en_US</language>

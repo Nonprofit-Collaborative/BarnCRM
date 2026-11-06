@@ -140,7 +140,8 @@ organizations moves the grants to the one you keep.
 
 With the Programs module installed, the grant's page has a **Program** card. Choose the program
 from the list and click **Save**; choose **No program** to clear it. Without Programs the card
-says that programs are not installed and there is nothing to choose. The grant stores the
+is not shown at all (staff cannot install a module, so the page does not ask them to). The
+Giving Fund and Logic Model Outcomes cards do the same without their module. The grant stores the
 program's record ID, so Funders works without Programs; if the program is later deleted, the card
 says the program cannot be found and you can choose another.
 
@@ -156,7 +157,7 @@ glance what you will report.
 
 Any requirement type can name an outcome; Deliverable and Narrative Report are the usual ones. The
 requirement stores the outcome's record ID in **Logic Model Outcome**, so Funders and Logic Models
-never need each other: without Logic Models the card says it is not installed, and if the outcome
+never need each other: without Logic Models the card is not shown, and if the outcome
 is later deleted the card says it cannot be found. The automation **Requirement: outcome is an
 outcome** always runs and refuses anything in that field that is not one. Choosing an
 outcome needs edit access to requirements (Funders Staff or Admin) and read access to Logic
@@ -355,7 +356,9 @@ shows **Amount Scheduled** (every payment not Cancelled) and **Amount Received**
 
 The grant's page has an **Award Schedule** card. Once the grant is **Awarded** with an **Amount
 Awarded**, an **Award Start Date** and an **Award End Date**, and has no expected or received
-payment yet, the card offers **Build Schedule**:
+payment yet, the card offers **Build Schedule**. Until then it names only what is missing: the
+Awarded stage, one of those fields, or award dates in the wrong order. The card shows Amount
+Awarded, Amount Scheduled and Amount Received as tiles, with a bar for the share received.
 
 1. Choose the **Payment Frequency**: **Once**, **Annual**, **Semiannual**, **Quarterly** or
    **Monthly**.
@@ -367,7 +370,9 @@ payment yet, the card offers **Build Schedule**:
 
 After that, change a payment's date or amount, add one, or cancel one in the grant's **Payments**
 list. **Mark Received** on the card sets a payment Received; its **Received Date** fills in with
-today unless you typed one. That is the automation **Grant payment received** on the
+today unless you typed one, and the card offers **Undo** while it is open: the payment goes back
+to Expected with its earlier Received Date, and the Received ledger entry it wrote is removed,
+unless the payment was changed since. That is the automation **Grant payment received** on the
 **Automation** page; switch it off while you import past payments.
 
 ## Restricted Funds
@@ -398,7 +403,7 @@ import past payments and entries.
 
 With the Giving module installed, the grant's page has a **Giving Fund** card. Choose the fund the
 organization books this money to in Giving and click **Save**. Like the program, the grant stores
-the fund's record ID, so Funders works without Giving; without Giving the card says so. Funders
+the fund's record ID, so Funders works without Giving; without Giving the card is not shown. Funders
 reads only the fund's name: Giving's own fund totals count the gifts you record in Giving, and the
 grant's restricted ledger counts its entries, so nothing is counted twice.
 

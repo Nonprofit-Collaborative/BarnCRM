@@ -25,7 +25,10 @@
     "Funders_Program_LoadFailed": "The Program card did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Funders_Report_Help": "Open the file in a browser to print it or save it as a PDF, or in a word processor to edit it before you send it.",
     "Funders_Report_LoadFailed": "The Funder Report was not prepared. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Funders_Schedule_DatesReversed": "The {0} is before the {1}. Correct the dates to build a schedule.",
     "Funders_Schedule_LoadFailed": "The Award Schedule did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Funders_Schedule_NeedsAwarded": "Record the award first: move the grant to Awarded, then build its schedule here.",
+    "Funders_Schedule_NeedsFields": "Add the {0} to build a schedule.",
     "Funders_Shared_NotSaved": "The change was not saved. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Funders_Undo_Changed": "This was changed since, so it was not undone. Open the record to change it.",
     "Funders_Undo_Done": "Undone."
