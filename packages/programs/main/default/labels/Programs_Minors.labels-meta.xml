@@ -214,7 +214,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Eligibility rules panel: no basis</shortDescription>
-        <value>Leave the Basis Alone</value>
+        <value>Don't Change the Basis</value>
     </labels>
     <labels>
         <fullName>Programs_Elig_DefaultTitle</fullName>

@@ -370,7 +370,9 @@ their stage, and a **Remove** button on each (the enrollment is kept, out of the
 **Add People**:
 
 - **Enrolled in the program, not in a cohort:** the program's open enrollments that have no
-  cohort, each with a box. Tick the ones to add, or **Select All**.
+  cohort, each with a box. Tick the ones to add, or **Select All**. A person can also be dragged
+  by the handle beside their name onto the member list (mouse, touch press and hold, or
+  keyboard); dragging a ticked person adds everyone ticked, at once.
 - **Someone else:** pick a person and click **Add to List**. Repeat for as many as you need.
 
 Click **Add to Cohort**. A ticked enrollment, or a picked person who already has an open
@@ -516,18 +518,21 @@ sets the **Eligibility Date** when the status becomes a decision (Eligible or No
 clears it when the result is Review. Screening only suggests: staff can still change any
 enrollment by hand.
 
-Rules live in the **Eligibility Rules** panel on the program page (under the Service Delivery
-Log). Only Programs Admin can change them; Programs Staff see them and can screen.
+Rules live in the **Eligibility Rules** panel, on the program page's **Eligibility** tab. Only
+Programs Admin can change them; Programs Staff see them and can screen.
 
 1. Click **Add a Rule**. A rule says: **when all** of its conditions are true, the **Result** is
    Eligible, Not Eligible or Review, with a **Reason** (up to 255 characters, shown on the
-   enrollment) and optionally an **Eligibility Basis**.
+   enrollment) and optionally an **Eligibility Basis** (or **Don't Change the Basis**).
 2. Each condition picks an **Enrollment Field**, a comparison (**equal to**, **not equal to**,
    **one of**, **not one of**, **greater than**, **greater than or equal to**, **less than**,
    **less than or equal to**, **blank**, **not blank**) and a **Value**. For **one of** and
-   **not one of**, separate the choices with commas.
+   **not one of** on a picklist field, move the choices you want from **Available** to
+   **Chosen**; on a text field, separate the choices with commas.
 3. Rules are checked top to bottom and **the first rule whose conditions all hold decides**; use
-   **Move Up** and **Move Down** to order them. Put the narrowest rules first.
+   **Move Up** and **Move Down** to order them, or drag a rule by its handle (on a phone, press
+   and hold the handle; by keyboard, focus the handle, press Space, use the arrow keys, then
+   Space again). Put the narrowest rules first.
 4. Under **When No Rule Applies**, choose the **Default Result** (Review to start with) and an
    optional **Default Reason**.
 5. Click **Save Rules**. The panel refuses rules it cannot use and says why (for example a

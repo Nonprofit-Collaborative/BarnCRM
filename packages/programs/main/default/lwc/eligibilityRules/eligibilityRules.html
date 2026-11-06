@@ -30,9 +30,29 @@
         <c-barn-empty-state illustration="setup" heading={labels.noRules} data-id="no-rules"></c-barn-empty-state>
       </template>
 
+      <p class="slds-assistive-text" id="drag-help">{dragHelp}</p>
+      <p class="slds-assistive-text" role="status" aria-live="polite" data-id="drag-live">{announcement}</p>
+      <div data-drop-zone="rules" data-drop-label={labels.title} data-id="rules-zone">
       <template for:each={ruleViews} for:item="rule">
-        <div key={rule.key} class="slds-box slds-var-m-bottom_small" data-id="rule">
+        <div key={rule.key} class={rule.boxClass} data-id="rule">
           <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_x-small">
+            <template lwc:if={canDrag}>
+              <span
+                class="drag-handle slds-var-m-right_x-small"
+                role="button"
+                tabindex="0"
+                title={dragHelp}
+                aria-label={rule.title}
+                aria-describedby="drag-help"
+                data-drag-id={rule.key}
+                data-drag-label={rule.title}
+                data-id="drag"
+                onpointerdown={handlePointerDown}
+                onkeydown={handleDragKey}
+              >
+                <lightning-icon icon-name="utility:drag_and_drop" size="x-small"></lightning-icon>
+              </span>
+            </template>
             <h3 class="slds-text-heading_small slds-col slds-grow" data-id="rule-title">{rule.title}</h3>
             <template lwc:if={canEdit}>
               <lightning-button-icon
@@ -105,6 +125,22 @@
                   ></lightning-input>
                 </template>
               </div>
+              <template lwc:if={condition.showChoices}>
+                <div class="slds-col slds-size_1-of-1 slds-var-m-top_x-small">
+                  <lightning-dual-listbox
+                    label={labels.value}
+                    source-label={labels.availableValues}
+                    selected-label={labels.chosenValues}
+                    options={condition.choiceOptions}
+                    value={condition.chosen}
+                    data-id="choices"
+                    data-rule={rule.index}
+                    data-condition={condition.index}
+                    disabled={readOnly}
+                    onchange={handleChoicesChange}
+                  ></lightning-dual-listbox>
+                </div>
+              </template>
               <template lwc:if={canEdit}>
                 <template lwc:if={condition.canRemove}>
                   <div class="slds-col slds-size_1-of-1">
@@ -168,6 +204,7 @@
           </div>
         </div>
       </template>
+      </div>
 
       <template lwc:if={canEdit}>
         <lightning-button label={labels.addRule} data-id="add-rule" onclick={handleAddRule} disabled={controlsDisabled}></lightning-button>

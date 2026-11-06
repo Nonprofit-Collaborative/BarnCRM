@@ -234,4 +234,83 @@ describe('c-cohort-members', () => {
     await flush();
     expect(q(element, 'error-message').message).toContain('Programs_Fail_Cohort');
   });
+
+  describe('dragging people onto the member list (DnD-4)', () => {
+    const key = (target, name) =>
+      target.dispatchEvent(new KeyboardEvent('keydown', { key: name, bubbles: true }));
+
+    async function dragByKeyboard(handle, keys) {
+      key(handle, ' ');
+      await flush();
+      for (const name of keys) {
+        key(handle, name);
+        // eslint-disable-next-line no-await-in-loop
+        await flush();
+      }
+    }
+
+    it('gives each person who may be added a keyboard reachable handle', async () => {
+      getMembers.mockResolvedValue(membersOf());
+      const element = await render();
+      const handles = qa(element, 'drag');
+      expect(handles).toHaveLength(2);
+      expect(handles[0].dataset.dragId).toBe(BEN.enrollmentId);
+      expect(handles[0].getAttribute('tabindex')).toBe('0');
+      expect(handles[0].getAttribute('aria-describedby')).toMatch(/^drag-help/);
+      expect(q(element, 'drag-hint').textContent).toBe('c.Programs_Cohort_DragHint');
+      expect(q(element, 'tick')).not.toBeNull();
+      expect(q(element, 'select-all')).not.toBeNull();
+    });
+
+    it('adds the dragged person alone when they are not ticked', async () => {
+      getMembers.mockResolvedValue(membersOf());
+      addMembers.mockResolvedValue(
+        membersOf({ members: [ANA, BEN], candidates: [CARA], added: 1 })
+      );
+      const element = await render();
+
+      await dragByKeyboard(qa(element, 'drag')[0], ['ArrowLeft', ' ']);
+
+      expect(addMembers).toHaveBeenCalledWith({
+        cohortId: COHORT_ID,
+        enrollmentIds: [BEN.enrollmentId],
+        personIds: []
+      });
+      expect(qa(element, 'member')).toHaveLength(2);
+      expect(q(element, 'drag-live').textContent).toBe('c.Core_Drag_Dropped');
+    });
+
+    it('adds everyone ticked when the dragged person is ticked, and keeps picked people', async () => {
+      getMembers.mockResolvedValue(membersOf());
+      getPersonName.mockResolvedValue('Dee Park');
+      addMembers.mockResolvedValue(
+        membersOf({ members: [ANA, BEN, CARA], candidates: [], added: 2 })
+      );
+      const element = await render();
+      q(element, 'select-all').click();
+      q(element, 'person-picker').dispatchEvent(
+        new CustomEvent('change', { detail: { recordId: '003000000000009AAA' } })
+      );
+      await flush();
+      q(element, 'add-to-list').click();
+      await flush();
+
+      await dragByKeyboard(qa(element, 'drag')[1], ['ArrowLeft', ' ']);
+
+      expect(addMembers.mock.calls[0][0].enrollmentIds).toEqual([
+        BEN.enrollmentId,
+        CARA.enrollmentId
+      ]);
+      expect(addMembers.mock.calls[0][0].personIds).toEqual([]);
+      expect(qa(element, 'picked')).toHaveLength(1);
+    });
+
+    it('adds nobody when the person is dropped back on the enrolled list', async () => {
+      getMembers.mockResolvedValue(membersOf());
+      const element = await render();
+      await dragByKeyboard(qa(element, 'drag')[0], ['ArrowDown', ' ']);
+      expect(addMembers).not.toHaveBeenCalled();
+      expect(q(element, 'drag-live').textContent).toBe('c.Core_Drag_Cancelled');
+    });
+  });
 });

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    The program record page: the Program Roster panel, the Service Delivery Log and the Schedule
-    Sessions panel, above the program's details and its Services, Enrollments and Cohorts lists.
+    The program record page: People, Attendance, Sessions, Eligibility and Details tabs, with
+    the Services, Enrollments and Cohorts lists at the side.
   </description>
   <flexiPageRegions>
     <itemInstances>
@@ -29,43 +29,155 @@
         <identifier>programRosterPanel</identifier>
       </componentInstance>
     </itemInstances>
+    <name>programPeopleTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <componentInstance>
         <componentName>serviceDeliveryLog</componentName>
         <identifier>serviceDeliveryLogPanel</identifier>
       </componentInstance>
     </itemInstances>
-    <itemInstances>
-      <componentInstance>
-        <componentName>eligibilityRules</componentName>
-        <identifier>eligibilityRulesPanel</identifier>
-      </componentInstance>
-    </itemInstances>
+    <name>programAttendanceTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <componentInstance>
         <componentName>sessionScheduler</componentName>
         <identifier>sessionSchedulerPanel</identifier>
       </componentInstance>
     </itemInstances>
+    <name>programSessionsTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>eligibilityRules</componentName>
+        <identifier>eligibilityRulesPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>programEligibilityTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <componentInstance>
         <componentName>force:detailPanel</componentName>
         <identifier>programDetailPanel</identifier>
       </componentInstance>
     </itemInstances>
+    <name>programDetailsTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>active</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>programPeopleTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>People</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>programPeopleTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>programAttendanceTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Attendance</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>programAttendanceTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>programSessionsTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Sessions</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>programSessionsTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>programEligibilityTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Eligibility</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>programEligibilityTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>programDetailsTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Standard.Tab.detail</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>programDetailsTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>programTabs</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>tabs</name>
+          <value>programTabs</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tabset</componentName>
+        <identifier>programTabset</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>main</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <componentInstance>
         <componentName>force:relatedListContainer</componentName>
         <identifier>programRelatedLists</identifier>
       </componentInstance>
     </itemInstances>
-    <name>main</name>
+    <name>sidebar</name>
     <type>Region</type>
   </flexiPageRegions>
   <masterLabel>Program Record Page</masterLabel>
   <sobjectType>Program__c</sobjectType>
   <template>
-    <name>flexipage:recordHomeSingleColTemplateDesktop</name>
+    <name>flexipage:recordHomeTemplateDesktop</name>
   </template>
   <type>RecordPage</type>
 </FlexiPage>

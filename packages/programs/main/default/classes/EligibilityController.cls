@@ -39,6 +39,9 @@ public with sharing class EligibilityController {
 		/** string, number, date or boolean. */
 		@AuraEnabled
 		public String kind;
+		/** A picklist field's active values, offered as a list for "one of" and "not one of". */
+		@AuraEnabled
+		public List<String> choices = new List<String>();
 	}
 
 	/** One open enrollment, with the intake values the rules read. */
@@ -251,6 +254,13 @@ public with sharing class EligibilityController {
 			field.apiName = describe.getName();
 			field.label = describe.getLabel();
 			field.kind = kindOf(describe.getType());
+			if (describe.getType() == Schema.DisplayType.PICKLIST) {
+				for (Schema.PicklistEntry entry : describe.getPicklistValues()) {
+					if (entry.isActive()) {
+						field.choices.add(entry.getValue());
+					}
+				}
+			}
 			fields.put(name, field);
 		}
 		return fields;

@@ -26,8 +26,10 @@ you work with, ask your admin (see
    - Enrollments: **All Enrollments** or **Open Enrollments** (Applied or Enrolled).
 3. Click a name to open the record.
 
-You should see: a program page with the **Program Roster** panel at the top, then its details
-and the **Services** and **Enrollments** lists.
+You should see: a program page with tabs: **People** (the **Program Roster** panel, open
+first), **Attendance** (the **Service Delivery Log**), **Sessions** (**Schedule Sessions**),
+**Eligibility** (the **Eligibility Rules**) and **Details**. The **Services**, **Enrollments** and
+**Cohorts** lists are at the side (below the tabs on a phone).
 
 ## To Create a Program and Its Services
 
@@ -100,7 +102,7 @@ click the person's name to open the enrollment and edit it there.
 ## To Take Attendance or Record Services
 
 1. Open the program.
-2. In the **Service Delivery Log** panel under the roster, pick the **Service** and the
+2. On the **Attendance** tab, in the **Service Delivery Log** panel, pick the **Service** and the
    **Date** (today to start with).
 3. Everyone with an open enrollment is listed. Set each person's **Attendance** (Present,
    Excused Absence or Unexcused Absence) and **Quantity**, or click **Mark All Present** to set
@@ -124,7 +126,8 @@ what was recorded without the controls.
 
 For a drop-in service where nobody is recorded by name (a walk-in meal, a pantry line):
 
-1. On the program, in the **Service Delivery Log** panel, pick the **Service** and the **Date**.
+1. On the program's **Attendance** tab, in the **Service Delivery Log** panel, pick the
+   **Service** and the **Date**.
 2. Under the rows, find **People counted without names for this service and day**. Type how many
    people you served in **People Served, Not Named**.
 3. Click **Add to the Count**.
@@ -151,7 +154,8 @@ on the **Referrals** tab shows everything not yet closed.
 
 ## To Check Whether Someone Is Eligible
 
-If your admin has set up eligibility rules, the program page has an **Eligibility Rules** panel.
+If your admin has set up eligibility rules, the program page's **Eligibility** tab has an
+**Eligibility Rules** panel.
 Under **Preview and Screen**, choose a person from **Open Enrollment** to see what the rules
 would decide (Eligible, Not Eligible or Review) and why, then click **Screen This Enrollment** to
 save that result, or **Screen Open Enrollments** to do everyone. Screening sets the person's
@@ -235,6 +239,11 @@ A cohort is a group that goes through a program together, such as the spring cla
      All**;
    - for anyone else, pick the person and click **Add to List**, as many times as you need.
 3. Click **Add to Cohort**.
+
+Or drag a person from **Enrolled in the program, not in a cohort** onto the member list by the
+handle beside their name: dragging someone who is ticked adds everyone ticked. On a phone, press
+and hold the handle first; by keyboard, focus the handle, press Space, then Left Arrow to the
+member list and Space again (Escape cancels).
 
 You should see: "(number) people added." Someone already enrolled in the program is moved into
 the cohort; someone who was not is enrolled, as Enrolled, in the cohort. Anyone who could not be

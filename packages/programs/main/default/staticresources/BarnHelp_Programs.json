@@ -1,6 +1,7 @@
 {
   "languages": ["en"],
   "texts": {
+    "Programs_Cohort_DragHint": "You can also drag a person, or everyone ticked, onto the member list above.",
     "Programs_Cohort_MembersEmpty": "Nobody is in this cohort yet.",
     "Programs_Dashboard_Intro": "How your programs are doing in the period you pick. Figures count only the records you can see.",
     "Programs_Elig_Intro": "Rules are checked in order, and the first whose conditions all hold decides. Screening sets each open enrollment's Eligibility Status, Basis and Reason.",
