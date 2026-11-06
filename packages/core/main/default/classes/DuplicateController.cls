@@ -308,6 +308,19 @@ public with sharing class DuplicateController {
 		for (Duplicate_Reason__c reason : DuplicateSelector.reasonRows(keysBySet.keySet())) {
 			reasons.put(reason.Set_Id__c, reason.Reason__c);
 		}
+		// A set a duplicate rule wrote (no match source reason) shows only the households that
+		// share real evidence with another in it, so a rule's city only match is never offered.
+		Set<Id> ruleAccountIds = new Set<Id>();
+		for (DuplicateRecordSet found : sets) {
+			if (!reasons.containsKey(String.valueOf(found.Id))) {
+				for (DuplicateRecordItem item : found.DuplicateRecordItems) {
+					if (item.RecordId.getSObjectType() == Account.SObjectType) {
+						ruleAccountIds.add(item.RecordId);
+					}
+				}
+			}
+		}
+		Map<Id, Account> evidence = DuplicateSelector.householdEvidence(ruleAccountIds);
 		Map<Id, RecordView> byRecord = describeRecords(recordIds);
 		List<SuggestionView> result = new List<SuggestionView>();
 		for (DuplicateRecordSet found : sets) {
@@ -321,9 +334,16 @@ public with sharing class DuplicateController {
 			view.ruleLabel = found.DuplicateRule == null ? null : found.DuplicateRule.MasterLabel;
 			String sourceReason = reasons.get(String.valueOf(found.Id));
 			view.reason = sourceReason != null ? sourceReason : view.ruleLabel;
-			Boolean complete = found.DuplicateRecordItems.size() > 1;
+			List<Id> shown = new List<Id>();
 			for (DuplicateRecordItem item : found.DuplicateRecordItems) {
-				RecordView record = byRecord.get(item.RecordId);
+				shown.add(item.RecordId);
+			}
+			if (sourceReason == null) {
+				shown = DuplicateService.householdsWithEvidence(shown, evidence);
+			}
+			Boolean complete = shown.size() > 1;
+			for (Id shownId : shown) {
+				RecordView record = byRecord.get(shownId);
 				if (record == null) {
 					complete = false;
 					break;

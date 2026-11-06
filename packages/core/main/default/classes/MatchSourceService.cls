@@ -660,8 +660,7 @@ public with sharing class MatchSourceService {
 	}
 
 	/** Lower case, punctuation gone, whitespace collapsed, common words shortened. */
-	@TestVisible
-	private static String street(String value) {
+	public static String street(String value) {
 		if (String.isBlank(value)) {
 			return null;
 		}

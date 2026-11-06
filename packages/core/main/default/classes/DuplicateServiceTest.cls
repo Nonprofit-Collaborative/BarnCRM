@@ -90,6 +90,128 @@ private class DuplicateServiceTest {
 		}
 	}
 
+	private static Account home(String name, String street, String city, String postalCode) {
+		return new Account(
+			Name = name,
+			BillingStreet = street,
+			BillingCity = city,
+			BillingState = 'OH',
+			BillingPostalCode = postalCode
+		);
+	}
+
+	/**
+	 * QA 2026-11-05: two households that share only a city and state are not evidence of one
+	 * household, alone or together, and a blank never matches a blank.
+	 */
+	@IsTest
+	static void aCityAndStateAloneAreNeverEvidenceOfOneHousehold() {
+		System.runAs(TestUsers.admin()) {
+			Account hall = home('The Hall Family', '8848 Highland Ln', 'Toledo', '43622');
+			Account shah = home('The Shah-Duarte Family', '9719 Harbor Dr', 'Toledo', '43621');
+			Assert.isFalse(
+				DuplicateService.householdsShareEvidence(hall, shah),
+				'Only the city and state are the same.'
+			);
+			Assert.isFalse(
+				DuplicateService.householdsShareEvidence(
+					home('The Hall Family', null, 'Toledo', null),
+					home('The Shah-Duarte Family', null, 'Toledo', null)
+				),
+				'Blank streets and postal codes are not the same street or postal code.'
+			);
+			Assert.isFalse(
+				DuplicateService.householdsShareEvidence(
+					home('The Nguyen Family', '8455 Ridge Rd', 'El Paso', '79921'),
+					home('The Nguyen Family', '2789 Harbor Ave', 'El Paso', '79998')
+				),
+				'The same name in the same city is not enough.'
+			);
+			Assert.isFalse(
+				DuplicateService.householdsShareEvidence(
+					home('The Perez Family', '9896 Juniper Rd', 'Macon', '31218'),
+					home('The Jones Family', '8003 Highland Dr', 'Macon', '31218')
+				),
+				'Different names in one postal code are not enough.'
+			);
+			Assert.isFalse(
+				DuplicateService.householdsShareEvidence(new Account(), new Account()),
+				'Two blank households share nothing.'
+			);
+			Assert.isFalse(DuplicateService.householdsShareEvidence(hall, null), 'Half a pair.');
+		}
+	}
+
+	@IsTest
+	static void aStreetPhoneOrNameWithPostalCodeIsEvidenceOfOneHousehold() {
+		System.runAs(TestUsers.admin()) {
+			Assert.isTrue(
+				DuplicateService.householdsShareEvidence(
+					home('The Hall Family', '8848 Highland Lane', 'Toledo', '43622'),
+					home('The Hall Family', '8848 highland ln.', 'Toledo', '43622-1234')
+				),
+				'The same name at the same full address.'
+			);
+			Assert.isTrue(
+				DuplicateService.householdsShareEvidence(
+					home('The Hall Family', '8848 Highland Ln', 'Toledo', null),
+					home('Hall Household', '8848 Highland Ln', 'TOLEDO', null)
+				),
+				'The same street in the same city.'
+			);
+			Assert.isFalse(
+				DuplicateService.householdsShareEvidence(
+					home('The Hall Family', '8848 Highland Ln', 'Toledo', '43622'),
+					home('The Hall Family', '8848 Highland Ln', 'Dayton', '45402')
+				),
+				'The same street in another city and postal code is another address.'
+			);
+			Account withPhone = home('The Hall Family', null, 'Toledo', null);
+			withPhone.Phone = '(419) 555-0100';
+			Account samePhone = home('The Shah Family', null, 'Toledo', null);
+			samePhone.Phone = '419.555.0100';
+			Assert.isTrue(
+				DuplicateService.householdsShareEvidence(withPhone, samePhone),
+				'The same phone.'
+			);
+			Assert.isTrue(
+				DuplicateService.householdsShareEvidence(
+					home('The Hall Family', '1 A St', 'Toledo', '43622'),
+					home('the hall family', '9 B St', 'Toledo', '43622')
+				),
+				'The same name in the same postal code.'
+			);
+		}
+	}
+
+	@IsTest
+	static void aRuleSuggestionKeepsOnlyTheHouseholdsWithEvidence() {
+		System.runAs(TestUsers.admin()) {
+			Id a = Id.valueOf('001' + '1'.leftPad(12, '0'));
+			Id b = Id.valueOf('001' + '2'.leftPad(12, '0'));
+			Id c = Id.valueOf('001' + '3'.leftPad(12, '0'));
+			Id person = fakeContactId(4);
+			Map<Id, Account> households = new Map<Id, Account>{
+				a => home('The Hall Family', '8848 Highland Ln', 'Toledo', '43622'),
+				b => home('The Hall Family', '8848 Highland Ln', 'Toledo', '43622'),
+				c => home('The Shah-Duarte Family', '9719 Harbor Dr', 'Toledo', '43621')
+			};
+			Assert.areEqual(
+				new List<Id>{ a, b, person },
+				DuplicateService.householdsWithEvidence(
+					new List<Id>{ a, c, b, person },
+					households
+				),
+				'The household that shares only the city goes; people are left as they are.'
+			);
+			Assert.areEqual(
+				new List<Id>(),
+				DuplicateService.householdsWithEvidence(new List<Id>{ a, c }, households),
+				'A pair that shares only the city leaves nothing to show.'
+			);
+		}
+	}
+
 	@IsTest
 	static void threeRecordsInOneSuggestionMakeThreePairs() {
 		System.runAs(TestUsers.admin()) {

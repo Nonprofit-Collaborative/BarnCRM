@@ -106,13 +106,77 @@ private class DuplicateScanBatchTest {
 		}
 	}
 
+	/** A household at the address these tests share, so two of them share real evidence. */
+	private static Account atOneAddress(Account household) {
+		return inCity(household, '12 Dupscan Lane', '43622');
+	}
+
+	private static Account inCity(Account household, String street, String postalCode) {
+		household.BillingStreet = street;
+		household.BillingCity = 'Toledo';
+		household.BillingState = 'OH';
+		household.BillingPostalCode = postalCode;
+		return household;
+	}
+
+	/**
+	 * QA 2026-11-05: the standard Account rule paired households that shared only a city and
+	 * state (their names, "The X Family", are alike to its company name matching). Such a
+	 * pair is not written; a pair of the same name at the same address is.
+	 */
+	@IsTest
+	static void aRulePairOfHouseholdsSharingOnlyACityIsNotWritten() {
+		System.runAs(TestUsers.admin()) {
+			List<Account> accounts = (List<Account>) insertAllowingDuplicates(
+				new List<Account>{
+					inCity(
+						HouseholdTestDataFactory.newHousehold('The Hall Family'),
+						'8848 Highland Ln',
+						'43622'
+					),
+					inCity(
+						HouseholdTestDataFactory.newHousehold('The Shah-Duarte Family'),
+						'9719 Harbor Dr',
+						'43621'
+					),
+					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupscan Family')),
+					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupscan Family'))
+				}
+			);
+			DuplicateService.stubMatches = new List<DuplicateService.Pair>{
+				new DuplicateService.Pair(accounts[0].Id, accounts[1].Id, null),
+				new DuplicateService.Pair(accounts[2].Id, accounts[3].Id, null)
+			};
+
+			Test.startTest();
+			Integer written = DuplicateScanBatch.scanChunk(accounts, null);
+			Test.stopTest();
+
+			if (!ruleActiveFor('Account')) {
+				// Skipped: no active rule for accounts in this org, so no suggestion can be written.
+				Assert.areEqual(0, written, 'With no active rule nothing is written.');
+				return;
+			}
+			Assert.areEqual(1, written, 'Only the pair at one address is written.');
+			Set<Id> named = new Set<Id>();
+			for (DuplicateRecordItem item : [SELECT RecordId FROM DuplicateRecordItem]) {
+				named.add(item.RecordId);
+			}
+			Assert.areEqual(
+				new Set<Id>{ accounts[2].Id, accounts[3].Id },
+				named,
+				'The two households that share only a city are in no suggestion.'
+			);
+		}
+	}
+
 	@IsTest
 	static void onlyAPairOfHouseholdsIsWritten() {
 		System.runAs(TestUsers.admin()) {
 			List<Account> accounts = (List<Account>) insertAllowingDuplicates(
 				new List<Account>{
-					HouseholdTestDataFactory.newHousehold('The Dupscan Family'),
-					HouseholdTestDataFactory.newHousehold('The Dupscan Family'),
+					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupscan Family')),
+					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupscan Family')),
 					new Account(Name = 'The Dupscan Family')
 				}
 			);
@@ -149,8 +213,8 @@ private class DuplicateScanBatchTest {
 		System.runAs(TestUsers.admin()) {
 			List<Account> accounts = (List<Account>) insertAllowingDuplicates(
 				new List<Account>{
-					HouseholdTestDataFactory.newHousehold('The Dupscan Family'),
-					HouseholdTestDataFactory.newHousehold('The Dupscan Family'),
+					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupscan Family')),
+					atOneAddress(HouseholdTestDataFactory.newHousehold('The Dupscan Family')),
 					new Account(Name = 'Dupscan Hardware')
 				}
 			);

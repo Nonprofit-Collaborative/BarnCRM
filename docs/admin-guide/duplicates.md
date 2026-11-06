@@ -24,6 +24,16 @@ The scan also compares **people's names**, ignoring case, spacing and punctuatio
 Smith" and "Jonathon Smith" are noticed. A similar name is never enough on its own, and the
 scan knows about households; see [Similar Names](#similar-names).
 
+A household pair a duplicate rule finds is listed only when the two households also share real
+evidence: the same billing street with the same city or postal code, the same phone, or the
+same name with the same postal code. Salesforce's standard account rule treats household names
+such as "The Hall Family" and "The Shah-Duarte Family" as alike and then pairs them on the
+billing city alone, so without this check every two households in one city would be listed. A
+city, a state or both are never enough, and a blank value never matches a blank one. The
+check also applies to suggestions the rule writes when a household is saved: a household in
+one that shares only a city with the others is left off the card, and a card left with fewer
+than two households is not shown.
+
 ## How to Turn It On
 
 There is nothing to install, but on a new install the **Duplicate Matching** feature is off

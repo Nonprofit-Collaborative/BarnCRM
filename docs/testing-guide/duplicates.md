@@ -261,3 +261,16 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 5 | As a user without **BarnCRM Admin**, open the **Duplicate Matching** tab. | No **Auto-Merge** area. |
 
 **Cleanup:** Delete the Zztest Auto records.
+
+## T-DUP-18: Households Sharing Only a City Are Not Paired
+
+**Purpose:** Confirm two households that share only a billing city and state are never listed, while two at one address are.
+**Prerequisites:** admin. In Setup, **Duplicate Rules**, the **Standard Account Duplicate Rule** is active.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Home**, click **New Household** twice, then edit them: `The Zztest Hall Family`, Billing Street `8848 Highland Ln`, City `Toledo`, State `OH`, Zip `43622`; and `The Zztest Shah Family`, Billing Street `9719 Harbor Dr`, City `Toledo`, State `OH`, Zip `43621`. Save past any warning. | Both save. |
+| 2 | On **Duplicate Matching**, **Review**, scan and refresh. | No suggestion pairs `The Zztest Hall Family` with `The Zztest Shah Family`, and neither appears on a card with only households that share its city. |
+| 3 | Create a third household `The Zztest Hall Family`, Billing Street `8848 Highland Lane`, City `Toledo`, State `OH`, Zip `43622`. Save past the warning. Scan and refresh. | A pair of the two `The Zztest Hall Family` households, with **Merge Households**. `The Zztest Shah Family` is not on it. |
+
+**Cleanup:** Dismiss the pair with **Not a Duplicate** (or merge it) and delete the Zztest households.
