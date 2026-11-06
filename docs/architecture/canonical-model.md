@@ -8650,6 +8650,41 @@ other part is still listed; a capped object is named on the page.
 Tooling API and are not listed, and the page and guide say so. Flows no
 record triggers (screen, scheduled, called by another flow) belong to no object and are not listed.
 
+### Automation tab inventory (C-60, D-184)
+
+The Automation tab lists every automation in the org in one table
+(`OrgAutomationController.getInventory`, `OrgAutomationInventory`), with whether the BarnCRM
+Automation Control setting covers it. It adds no object or field.
+
+**R-OA1 What is listed.** BarnCRM's switches (`Automation_Setting__c`, an org's own listed
+`Flow:` rows excepted, which are listed as flows), every flow with a trigger type (record before
+or after save, before delete, scheduled, platform event) and every process (`ProcessType`
+Workflow, InvocableProcess, CustomEvent) from `FlowDefinitionView`, active or not, and every Apex
+trigger with its source from `ApexTrigger`. Validation rules and workflow rules come from the
+org connection's scan (R-OA7, when built). Each row: type, name, API name, object (a custom
+object's Id read back to its API name through `EntityDefinition`), status (On, Off or Always
+Runs for a switch; Active or Inactive otherwise), owner, when it runs, Covered by Pause All.
+**R-OA2 Owner.** A namespace that is BarnCRM's is BarnCRM; any other namespace is that managed
+package. With no namespace, BarnCRM's flow templates (by API name) and its triggers (those that
+call `TriggerDispatcher.run(`, and its four platform event triggers by name) are BarnCRM;
+everything else is This Org. A CI test keeps the two name lists in step with the packages.
+**R-OA3 Covered by Pause All.** Yes for a BarnCRM switch and template and a dispatcher trigger;
+No for an Always Runs switch and BarnCRM's platform event triggers (R-A3) and for a managed
+package's flow. An org trigger is Yes when its source calls the dispatcher, Check BarnCRM
+Automation, `AutomationControl` or names `BarnCRM_Automation_Control__c`, else No. An org flow
+is Not Checked until the org connection's scan reads what refers to Check BarnCRM Automation.
+**R-OA4 User mode, capped, partial.** Every query is user-mode SOQL; 2,000 flows and 500
+triggers at most (the page says when a cap was hit). A part that cannot be read (switches, flows,
+triggers) is named and the rest is listed. Needs `Manage_BarnCRM_Settings`.
+**R-OA5 How to make it respect Pause All.** For an org item not covered (or not checked) the
+page shows what to add: for a flow or process, the Check BarnCRM Automation action and a
+Decision on Run (with `Flow:` and the API name for its own switch); for a trigger, the Apex
+call to `CheckAutomationAction.check`; for a validation or workflow rule, the formula wrapped in
+`AND(NOT($Setup.BarnCRM_Automation_Control__c.Pause_All__c), NOT(...Bypass__c), ...)`. Names
+carry this org's namespace prefix. Filters (object, owner) and the CSV work on the loaded rows.
+**R-OA6 What may be deactivated.** Only an org's own (owner This Org) active flow or validation
+rule; never BarnCRM's or a managed package's.
+
 ---
 
 ---

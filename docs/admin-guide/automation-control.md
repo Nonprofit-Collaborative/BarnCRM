@@ -223,6 +223,31 @@ standard field, an address copied to its household, the other side of a relation
 up by saving those records again, for example with **Bulk Update** changing nothing but a
 harmless field.
 
+## Every Automation in This Org
+
+Below the Automation panel, the **Automation** tab has an **Automation Inventory** card: one
+table of every automation in the org (C-60, D-184).
+
+- **What is listed:** BarnCRM's automations with their switch (On, Off or Always Runs), every
+  record-triggered, scheduled and platform event flow and every Process Builder process, active
+  or inactive, and every Apex trigger, active or inactive.
+- **Owner:** BarnCRM, **This Org** (your own), or a managed package's namespace.
+- **Covered by Pause All:** **Yes** when the BarnCRM Automation Control setting (Pause All and
+  Bypass) stops it: BarnCRM's automations and flow templates, and your own triggers whose code
+  checks the setting. **No** for automations that always run, BarnCRM's error recording, a
+  managed package's flows and your triggers that do not check it. **Not Checked** for your own
+  flows: whether a flow calls Check BarnCRM Automation can only be read through the org
+  connection.
+- **How to Make This Respect Pause All:** the row menu of your own automation that is not
+  covered shows what to add, ready to copy: the Check BarnCRM Automation action and Decision for
+  a flow, the Apex lines for a trigger, the wrapped formula for a validation or workflow rule.
+- **Object** and **Owner** filter the table; **Download CSV** saves what is shown;
+  **Refresh** reads it again.
+
+It is read as you, with the same queries the Data Dictionary uses, and needs the Manage BarnCRM
+Settings permission. A very large org is capped at 2,000 flows and 500 triggers, and the card
+says so.
+
 ## Running Your Own Version Instead
 
 If an automation does almost what you want, do not change ours: an upgrade would undo your

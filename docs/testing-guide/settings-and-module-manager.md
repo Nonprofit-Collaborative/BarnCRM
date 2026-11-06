@@ -192,6 +192,23 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 **Cleanup:** None.
 
+## T-SET-07E: Automation Inventory
+
+**Purpose:** confirm the Automation tab lists every automation with owner and Pause All coverage, filters, a CSV and the snippets (C-60).
+**Prerequisites:** admin user; `My_Test_Flow` from T-SET-07C (active, record-triggered on Contact); an active Apex trigger of your own on Account that does not check the setting, `MyAccountTrigger`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Automation** tab and scroll to **Automation Inventory**. | A table with **Name**, **Type**, **Object**, **Status**, **Owner**, **Runs** and **Covered by Pause All**. `Household naming` (or another BarnCRM automation) reads **BarnCRM Automation**, **On**, **BarnCRM**, **Yes**. `ContactTrigger` reads **Apex Trigger**, **BarnCRM**, **Yes**. `ErrorLogEventTrigger` reads **No**. |
+| 2 | Find `My_Test_Flow` and `MyAccountTrigger`. | The flow: **Flow**, **Contact**, **Active**, **This Org**, **Not Checked**, with a note under the intro explaining Not Checked. The trigger: **This Org**, **No**. |
+| 3 | Open the row menu of `MyAccountTrigger` and choose **How to Make This Respect Pause All**. | A section headed with that title and the trigger's name shows a sentence and four lines of Apex calling `CheckAutomationAction.check`, with **Copy** and **Close**. **Copy** puts the code on the clipboard. |
+| 4 | Do the same for `My_Test_Flow`. | The steps name the Check BarnCRM Automation action and a Decision on Run; the code reads `Flow:My_Test_Flow`. |
+| 5 | Open the row menu of a BarnCRM row. | No **How to Make This Respect Pause All** is offered. |
+| 6 | Set **Object** to **Account**, then **Owner** to **This Org**. | Only Account rows, then only your own Account automation. Set **Owner** to a value with nothing on Account: "No automation matches these filters." |
+| 7 | Clear the filters and click **Download CSV**. | A file `Automation-Inventory-<date>.csv` with every row shown, including API names and the object API name. |
+
+**Cleanup:** delete `MyAccountTrigger` if you made it for this script.
+
 ## T-SET-08: Turn on a Feature Left Off
 
 **Purpose:** confirm a feature that is off can be turned on once, behind a confirmation, and its tabs appear.

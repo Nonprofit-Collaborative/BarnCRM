@@ -11,6 +11,12 @@
         <identifier>automationControl1</identifier>
       </componentInstance>
     </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>automationInventory</componentName>
+        <identifier>automationInventory1</identifier>
+      </componentInstance>
+    </itemInstances>
     <name>main</name>
     <type>Region</type>
   </flexiPageRegions>

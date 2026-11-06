@@ -1,0 +1,95 @@
+<template>
+    <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="custom:custom32">
+        <div slot="actions">
+            <lightning-button
+                data-id="refresh"
+                label={labels.refresh}
+                onclick={handleRefresh}
+                disabled={loading}
+            ></lightning-button>
+            <lightning-button
+                data-id="download"
+                class="slds-var-m-left_x-small"
+                label={labels.download}
+                onclick={handleDownload}
+                disabled={downloadDisabled}
+            ></lightning-button>
+        </div>
+        <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
+            <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+
+            <template lwc:if={errorMessage}>
+                <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="error" data-id="error" message={errorMessage}></c-barn-notice>
+            </template>
+            <template lwc:if={unreadableMessage}>
+                <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="warning" data-id="unreadable" message={unreadableMessage}></c-barn-notice>
+            </template>
+            <template lwc:if={isTruncated}>
+                <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="warning" data-id="truncated" message={labels.truncated}></c-barn-notice>
+            </template>
+            <template lwc:if={hasNotChecked}>
+                <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="info" data-id="not-checked" message={labels.notCheckedHelp}></c-barn-notice>
+            </template>
+
+            <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-combobox
+                        data-id="object-filter"
+                        label={labels.object}
+                        value={objectFilter}
+                        options={objectOptions}
+                        onchange={handleObject}
+                    ></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+                    <lightning-combobox
+                        data-id="owner-filter"
+                        label={labels.owner}
+                        value={ownerFilter}
+                        options={ownerOptions}
+                        onchange={handleOwner}
+                    ></lightning-combobox>
+                </div>
+            </div>
+
+            <template lwc:if={loading}>
+                <lightning-spinner alternative-text={labels.refresh} size="small"></lightning-spinner>
+            </template>
+            <template lwc:if={hasRows}>
+                <lightning-datatable
+                    data-id="inventory"
+                    key-field="key"
+                    data={filteredRows}
+                    columns={columns}
+                    hide-checkbox-column
+                    sorted-by={sortedBy}
+                    sorted-direction={sortDirection}
+                    onsort={handleSort}
+                    onrowaction={handleRowAction}
+                ></lightning-datatable>
+            </template>
+            <template lwc:if={showEmpty}>
+                <c-barn-empty-state data-id="empty" size="compact" heading={labels.empty}></c-barn-empty-state>
+            </template>
+
+            <template lwc:if={snippet}>
+                <section class="slds-var-m-top_medium" data-id="snippet" aria-live="polite">
+                    <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{snippet.heading}</h3>
+                    <p class="slds-var-m-bottom_x-small" data-id="snippet-steps">{snippet.steps}</p>
+                    <pre class="slds-box slds-box_x-small slds-scrollable_x" data-id="snippet-code">{snippet.code}</pre>
+                    <div class="slds-var-m-top_x-small">
+                        <lightning-button data-id="copy" label={labels.copy} onclick={handleCopy}></lightning-button>
+                        <lightning-button
+                            data-id="close-snippet"
+                            class="slds-var-m-left_x-small"
+                            label={labels.close}
+                            onclick={handleCloseSnippet}
+                        ></lightning-button>
+                    </div>
+                </section>
+            </template>
+        </div>
+    </lightning-card>
+    </template>
+</template>

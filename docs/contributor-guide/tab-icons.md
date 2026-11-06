@@ -112,6 +112,7 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | core | addressPanel | custom:custom78 | Address__c |
 | core | affiliationPanel | custom:custom33 | Affiliation__c |
 | core | automationControl | custom:custom32 | Automation |
+| core | automationInventory | custom:custom32 | Automation |
 | core | errorLogTile | custom:custom53 | Error_Log__c |
 | core | householdMembersPanel | custom:custom15 | Households |
 | core | householdOfPerson | custom:custom15 | Households |

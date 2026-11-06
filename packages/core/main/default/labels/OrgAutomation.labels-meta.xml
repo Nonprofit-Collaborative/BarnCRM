@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_OrgAutomation_Owner</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory column: who owns the automation.</shortDescription>
+        <value>Owner</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_Covered</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory column: whether Pause All stops it.</shortDescription>
+        <value>Covered by Pause All</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_OwnerOrg</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory owner: the org itself.</shortDescription>
+        <value>This Org</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_NotChecked</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory: coverage not checked yet.</shortDescription>
+        <value>Not Checked</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_TypeBarn</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory type: a BarnCRM automation switch.</shortDescription>
+        <value>BarnCRM Automation</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_TypeProcess</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory type: a process builder process.</shortDescription>
+        <value>Process Builder</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_TypeValidation</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory type: a validation rule.</shortDescription>
+        <value>Validation Rule</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_TypeWorkflow</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory type: a workflow rule.</shortDescription>
+        <value>Workflow Rule</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_AlwaysRuns</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory status: always runs.</shortDescription>
+        <value>Always Runs</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_HowTo</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory row action and section title.</shortDescription>
+        <value>How to Make This Respect Pause All</value>
+    </labels>
+</CustomLabels>
