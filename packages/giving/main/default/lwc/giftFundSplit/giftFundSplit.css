@@ -1,7 +1,7 @@
 .split-bar {
   position: relative;
   display: flex;
-  height: 2rem;
+  height: var(--slds-g-sizing-9, 2rem);
   border-radius: var(--slds-g-radius-border-2, 0.25rem);
   overflow: visible;
   background: var(--slds-g-color-neutral-base-90, #e5e5e5);
@@ -44,10 +44,10 @@
 /* A wide invisible hit area with a visible grip, so a finger can take hold of it (DnD-4). */
 .split-divider {
   position: absolute;
-  top: -0.25rem;
-  bottom: -0.25rem;
-  width: 1.5rem;
-  margin-left: -0.75rem;
+  top: calc(-1 * var(--slds-g-spacing-1, 0.25rem));
+  bottom: calc(-1 * var(--slds-g-spacing-1, 0.25rem));
+  width: var(--slds-g-sizing-7, 1.5rem);
+  margin-left: calc(-1 * var(--slds-g-spacing-3, 0.75rem));
   cursor: ew-resize;
   touch-action: none;
   display: flex;
@@ -56,11 +56,11 @@
 
 .split-divider::after {
   content: '';
-  width: 0.375rem;
-  height: 100%;
+  width: var(--slds-g-sizing-2, 0.375rem);
+  align-self: stretch;
   border-radius: var(--slds-g-radius-border-2, 0.25rem);
   background: var(--slds-g-color-neutral-base-100, #fff);
-  border: 1px solid var(--slds-g-color-neutral-base-30, #444);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-neutral-base-30, #444);
 }
 
 .split-divider:focus {
