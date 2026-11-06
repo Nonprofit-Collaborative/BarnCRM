@@ -161,8 +161,14 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 5 | Click **New** for a contact who is not enrolled in Food pantry, with **Hot meal**. | Saved with no enrollment. |
 | 6 | In **BarnCRM Settings**, open **Automation** and find **Service Delivery: absences, enrollment**. | Listed as always on, with no switch. |
 | 7 | Open **Hot meal** and try to delete it. | Refused: the service has deliveries. |
+| 8 | In the **BarnCRM Programs** app, open an Enrolled Food pantry person and click **Record Service**. | A form with **Person** filled in, **Service** listing every active service as "Program: Service", **Delivery Date** today, **Attendance** Present and **Quantity** 1. There is no Contact or Account field. |
+| 9 | Pick **Grocery bag** and click **Save**. | "Service recorded." The form closes; the new delivery has the person as **Contact** and their Food pantry enrollment filled in. |
+| 10 | Open that person's Food pantry enrollment and click **Record Service**. Set **Attendance** to **Excused Absence**. | **Person** and the enrollment's services are filled in (one service is chosen for you); **Quantity** is greyed out. Save: the delivery has quantity 0 and is linked to the enrollment. |
+| 11 | On the same enrollment, click **Record Service**, change **Person** to someone else and save. | Saved for the other person, not linked to this enrollment. |
+| 12 | On a household or organization account in the Programs app, open the actions. | No **Record Service**. On a person account org, a person account shows it. |
+| 13 | As the Read Only user, click **Record Service** on a person. | The form says you can see services but not record them; there is no **Save**. |
 
-**Cleanup:** delete the deliveries made in steps 1 and 5. Run T-PRG-08 to remove the sample data.
+**Cleanup:** delete the deliveries made in steps 1, 5 and 9 to 11. Run T-PRG-08 to remove the sample data.
 
 ## T-PRG-11: Intake and Eligibility, and the Programs Settings Page
 

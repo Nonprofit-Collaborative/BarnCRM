@@ -164,6 +164,22 @@
               <value>Account.Log_Interaction</value>
             </valueListItems>
             <valueListItems>
+              <value>Account.Record_Service</value>
+              <visibilityRule>
+                <booleanFilter>1 AND 2</booleanFilter>
+                <criteria>
+                  <leftValue>{!Record.RecordType.DeveloperName}</leftValue>
+                  <operator>NE</operator>
+                  <rightValue>Household</rightValue>
+                </criteria>
+                <criteria>
+                  <leftValue>{!Record.Is_Organization__c}</leftValue>
+                  <operator>EQUAL</operator>
+                  <rightValue>false</rightValue>
+                </criteria>
+              </visibilityRule>
+            </valueListItems>
+            <valueListItems>
               <value>Account.Merge_Household</value>
               <visibilityRule>
                 <criteria>

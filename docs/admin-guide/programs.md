@@ -229,6 +229,15 @@ what is recorded without the controls. The panel lists up to 200 people.
 You can also enter a delivery by hand on the **Service Deliveries** tab, for example for a person
 who is not enrolled. The list views are **All Service Deliveries** and **This Week**.
 
+**Record Service** is the shorter way: an action at the top of a person's page in the Programs
+app (**Programs Contact Record Page**; on **Programs Account Record Page** it shows only on a
+person, not on a household or an organization) and of every enrollment. It asks for one
+**Person** (filled in from the page, so no Contact or Account to choose between), the
+**Service**, **Delivery Date**, **Attendance** and **Quantity**, and saves through the same
+rules. From an enrollment it offers that program's services and links the delivery to the
+enrollment. Programs Staff and Admin can save; Read Only users are told they cannot. On your own
+record pages, add it from Lightning App Builder (dynamic actions on the highlights panel).
+
 Rules:
 
 - **One person per delivery**, a contact or an account, as for enrollments.

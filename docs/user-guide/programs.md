@@ -167,7 +167,18 @@ by hand.
 
 ## To Record a Service by Hand
 
-For someone who is not enrolled, or a one-off:
+For someone who is not enrolled, or a one-off, the quickest way is **Record Service** at the
+top of the person's page (in the **BarnCRM Programs** app) or of their enrollment:
+
+1. Click **Record Service**. The **Person** is filled in (from an enrollment, the program's
+   services are offered and the delivery is linked to that enrollment).
+2. Pick the **Service**, check the **Delivery Date** (today), the **Attendance** (Present) and
+   the **Quantity** (1), and click **Save**.
+
+You should see "Service recorded." One **Person** picker covers everyone, so there is no
+Contact or Account to choose between.
+
+Or, the standard way:
 
 1. Open the **Service Deliveries** tab and click **New**.
 2. Pick the **Service**, then a **Contact** or an **Account** (not both; an Account must be a
