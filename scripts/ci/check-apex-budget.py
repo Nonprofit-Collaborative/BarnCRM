@@ -48,7 +48,9 @@ CAPS = {
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     "volunteers": 182_000,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
-    "programs": 153_000,
+    # Raised 2026-11-06 for repeating session schedules (modules-24, D-183): the run, nightly
+    # batch, save job, trigger handler and selector, and the schedule page's controller methods.
+    "programs": 168_000,
     "logicmodels": 65_000,
     # Raised from 95,000 for the Funders usability stage: Undo for Mark Received and Mark
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).

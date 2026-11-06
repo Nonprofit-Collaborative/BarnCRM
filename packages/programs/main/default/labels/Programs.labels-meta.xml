@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>Programs_NightlyJobs_SchedulesName</fullName>
+        <categories>Programs, Nightly Jobs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Nightly jobs: the session schedule run</shortDescription>
+        <value>Session Schedules</value>
+    </labels>
+    <labels>
         <fullName>Programs_Enrollment_AlreadyOpen</fullName>
         <categories>Programs</categories>
         <language>en_US</language>

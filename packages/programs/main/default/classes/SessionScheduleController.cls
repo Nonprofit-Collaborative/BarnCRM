@@ -185,9 +185,8 @@ public with sharing class SessionScheduleController {
 		return schedule;
 	}
 
-	/** "Service name date", cut to fit the name field. */
-	@TestVisible
-	private static String sessionName(String serviceName, Date day) {
+	/** "Service name date", cut to fit the name field; schedules name sessions the same way. */
+	public static String sessionName(String serviceName, Date day) {
 		String suffix = ' ' + day.format();
 		String base = serviceName == null ? '' : serviceName;
 		return base.left(NAME_LENGTH - suffix.length()) + suffix;
