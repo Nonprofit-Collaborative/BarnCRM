@@ -74,7 +74,7 @@ The **Asks** tab has the list views **Open Asks**, **My Open Asks** and **All As
 
 - **Deleting a donor** keeps the ask, with no donor, and it can still be closed.
 - **Erase a Person** clears **Next Step** on their asks and turns open ones into **Withdrawn**. The asks are kept, like gifts.
-- **To reopen an ask,** choose **Reopen Ask** on its card in **Recently Closed** and confirm, or edit it and set **Outcome** back to **Open**. **Closed Date** clears. A linked gift or pledge stays linked; remove the link by editing the ask if it no longer applies.
+- **To reopen an ask,** choose **Reopen Ask** on its card in **Recently Closed** or at the top of the ask's page (any age) and confirm, or edit it and set **Outcome** back to **Open**. **Closed Date** clears. A linked gift or pledge stays linked; remove the link by editing the ask if it no longer applies.
 
 ## What This Does Not Do Yet
 

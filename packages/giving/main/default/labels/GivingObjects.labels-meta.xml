@@ -344,4 +344,36 @@
         <shortDescription>Lock override log: an empty value</shortDescription>
         <value>none</value>
     </labels>
+    <labels>
+        <fullName>Giving_QuickStatus_CancelPendingGift</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Gift quick action: title and button that cancel a pending gift</shortDescription>
+        <value>Cancel Pending Gift</value>
+    </labels>
+    <labels>
+        <fullName>Giving_QuickStatus_ThankAgain</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Gift quick action: title and button that re-queue the thank-you</shortDescription>
+        <value>Thank Again</value>
+    </labels>
+    <labels>
+        <fullName>Giving_QuickStatus_DoNotThank</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Gift quick action: title and button that skip the thank-you</shortDescription>
+        <value>Do Not Thank</value>
+    </labels>
+    <labels>
+        <fullName>Giving_QuickStatus_MarkPlanComplete</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Stewardship plan quick action: title and button that complete the plan</shortDescription>
+        <value>Mark Plan Complete</value>
+    </labels>
 </CustomLabels>

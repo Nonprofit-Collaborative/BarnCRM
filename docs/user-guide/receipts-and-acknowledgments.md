@@ -63,9 +63,11 @@ Only your admin can add or change rules, or turn on **Send emails nightly**. The
 
 ## To Thank a Donor Again, or Not at All
 
-1. Open the gift and click **Edit**.
-2. Set **Acknowledgment Status** to **To acknowledge** to queue it again, or **Do not acknowledge** to leave it out.
-3. Click **Save**.
+1. Open the gift.
+2. Click **Thank Again** at the top of the page to queue it again, or **Do Not Thank** to leave it out. **Thank Again** shows when the gift is not already queued; **Do Not Thank** shows while it is.
+3. Click the same button in the window to confirm.
+
+You can still click **Edit** and set **Acknowledgment Status** to **To acknowledge** or **Do not acknowledge** instead.
 
 You should see: the gift back in the queue, or out of it. BarnCRM never re-queues an acknowledged gift on its own.
 

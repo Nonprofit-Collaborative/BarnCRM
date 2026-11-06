@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionSubtype>ScreenAction</actionSubtype>
+  <description>
+    Reopens a closed ask, after a one-line confirm. A gift or pledge it recorded stays linked.
+  </description>
+  <height>250</height>
+  <label>Reopen Ask</label>
+  <lightningWebComponent>askReopen</lightningWebComponent>
+  <optionsCreateFeedItem>false</optionsCreateFeedItem>
+  <type>LightningWebComponent</type>
+</QuickAction>

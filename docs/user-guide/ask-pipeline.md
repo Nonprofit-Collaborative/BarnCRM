@@ -51,7 +51,7 @@ The reminder follows the donor's own **Next Ask Date**: while a donor has open a
 
 You should see: the card back in its stage column with outcome **Open**. **Closed Date** clears. A gift or pledge linked when it closed stays linked.
 
-For an ask closed more than 30 days ago, open the ask, edit it and set **Outcome** back to **Open**.
+For an ask closed more than 30 days ago, open the ask and click **Reopen Ask** at the top of the page, then confirm. On an open ask the window says there is nothing to reopen.
 
 ## To See What Changed
 

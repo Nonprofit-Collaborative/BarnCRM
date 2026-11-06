@@ -255,3 +255,21 @@ For every script on this page:
 | 7 | Open an organization with a primary contact, tick **Email Opt Out** on that contact, and enter a 7777 gift from the organization. Open the Thank-Yous page. | The gift is counted under **Opted out of email, sent by letter**: an organization's thank-you follows its primary contact's opt-out. |
 
 **Cleanup:** As admin, **Edit** `Test email` and clear **Active**. Clear **Email Opt Out** on Rosa Hall and the primary contact, and mark the step 7 gift **Do not acknowledge**.
+
+## T-RCPT-15: One-Step Actions on Gift and Plan Pages
+
+**Purpose:** confirm Cancel Pending Gift, Thank Again, Do Not Thank and Mark Plan Complete change one field after a confirm, and show only where they apply (people-giving-19).
+**Prerequisites:** a user with Giving Staff; a Pending gift; a Received gift whose **Acknowledgment Status** is **Acknowledged**; a Running stewardship plan.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the Pending gift. | **Cancel Pending Gift** is at the top of the page. |
+| 2 | Click **Cancel Pending Gift** and confirm. | A success toast. **Status** is **Cancelled**; the button is gone. |
+| 3 | Open the Received, acknowledged gift. | **Thank Again** shows; **Do Not Thank** and **Cancel Pending Gift** do not. |
+| 4 | Click **Thank Again** and confirm. | **Acknowledgment Status** is **To acknowledge**; the gift is counted on the Thank-Yous page. **Do Not Thank** now shows instead of **Thank Again**. |
+| 5 | Click **Do Not Thank** and confirm. | **Acknowledgment Status** is **Do not acknowledge**; the gift leaves the Thank-Yous count. |
+| 6 | Open the Running plan and click **Mark Plan Complete**, then confirm. | **Status** is **Complete** and **Completed Date** is today. Its open tasks are untouched. |
+| 7 | Click **Mark Plan Complete** again. | The window says the plan is not running and offers only **Close**. |
+| 8 | As a read-only user, open a Pending gift and click **Cancel Pending Gift**, then confirm. | The window shows the save was refused and stays open; the gift is unchanged. |
+
+**Cleanup:** delete the test gifts and set the plan back to **Running** if it is shared test data.

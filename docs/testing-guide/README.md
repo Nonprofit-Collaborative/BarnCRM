@@ -55,9 +55,9 @@ page, even if that puts it out of reading order.
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
 | [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 18 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import, splitting a gift across funds, gift and commitment page tabs, Giving at a Glance |
 | [Giving: commitments](giving-commitments.md) | COM | 11 | Pledges, recurring gifts, payments, nightly jobs, pledge reminders |
-| [Giving: asks](giving-asks.md) | ASK | 9 | Ask stages, the Ask Pipeline board, moving and closing asks, gifts and pledges from won asks, reopening, history, read only access, the donor's Next Ask Date from open asks, a person account as one donor |
+| [Giving: asks](giving-asks.md) | ASK | 10 | Ask stages, the Ask Pipeline board, moving and closing asks, gifts and pledges from won asks, reopening (board and ask page), history, read only access, the donor's Next Ask Date from open asks, a person account as one donor |
 | [Giving: soft credits, tributes and matching](giving-soft-credits-tributes-matching.md) | CRED | 10 | Soft credits, tributes, matching gifts |
-| [Giving: receipts and acknowledgments](giving-receipts-and-acknowledgments.md) | RCPT | 14 | Receipts, year-end statements, void and reissue, receipt lock, acknowledgments |
+| [Giving: receipts and acknowledgments](giving-receipts-and-acknowledgments.md) | RCPT | 15 | Receipts, year-end statements, void and reissue, receipt lock, acknowledgments, one-step gift and plan actions |
 | [Giving: ask cadence](giving-ask-cadence.md) | ASK | 2 | Next Ask Date, nightly reminder task, Who Is Due list |
 | [Giving: donor scoring](giving-donor-scoring.md) | RFM | 3 | Scores and segment on the donor, cutoffs, segment templates |
 | [Giving: refunds and write-offs](giving-refunds.md) | REF | 7 | Refunds and their effect on totals |

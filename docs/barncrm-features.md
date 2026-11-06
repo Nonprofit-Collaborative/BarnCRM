@@ -416,6 +416,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Date defaults to today | Minor | A gift saved without a date is dated today. | Shipped | G-01 |
 | Gift statuses | Minor | Received, Pending, Refunded, Written off and Cancelled. | Shipped | G-01, G-04 |
 | Cancelled gifts | Minor | A Pending gift that will never be paid is set to Cancelled: no negative gift, out of every total and export, allowed even in a closed month, and logged. | Shipped | G-04, ADR-0054 |
+| One-step record actions | Minor | Buttons that change one field after a one-line confirm, shown only where they apply: Cancel Pending Gift, Thank Again and Do Not Thank on a gift, Reopen Ask on an ask, Mark Plan Complete on a stewardship plan. The object's own rules and the person's access still decide the save. | In review (v1.0) | people-giving-19 |
 | Cancelling frees the installment | Minor | Cancelling a gift expected to pay a pledge installment frees that installment for the next gift. | Shipped | G-04 |
 | Payment methods | Minor | Cash, Check, Card, ACH, Stock, In-kind, Grant and Other, with a reference such as check number. | Shipped | G-01 |
 | Refund reverses matched credit | Minor | Refunding the employer's gift writes a matching negative credit for the employee, so partial refunds leave partial recognition. | Shipped | G-10, ADR-0031 |

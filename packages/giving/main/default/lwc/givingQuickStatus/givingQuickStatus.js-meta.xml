@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The one-line confirm behind Giving's one-step status quick actions: Cancel Pending Gift, Thank Again, Do Not Thank, Reopen Ask and Mark Plan Complete.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionSubtype>ScreenAction</actionSubtype>
+  <description>
+    Cancels a pending gift that will never be paid, after a one-line confirm. Shown only while the
+    gift is Pending.
+  </description>
+  <height>250</height>
+  <label>Cancel Pending Gift</label>
+  <lightningWebComponent>giftCancelPending</lightningWebComponent>
+  <optionsCreateFeedItem>false</optionsCreateFeedItem>
+  <type>LightningWebComponent</type>
+</QuickAction>

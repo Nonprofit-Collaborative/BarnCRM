@@ -676,6 +676,36 @@
               </visibilityRule>
             </valueListItems>
             <valueListItems>
+              <value>Gift__c.Cancel_Pending_Gift</value>
+              <visibilityRule>
+                <criteria>
+                  <leftValue>{!Record.Status__c}</leftValue>
+                  <operator>EQUAL</operator>
+                  <rightValue>Pending</rightValue>
+                </criteria>
+              </visibilityRule>
+            </valueListItems>
+            <valueListItems>
+              <value>Gift__c.Thank_Again</value>
+              <visibilityRule>
+                <criteria>
+                  <leftValue>{!Record.Acknowledgment_Status__c}</leftValue>
+                  <operator>NE</operator>
+                  <rightValue>To acknowledge</rightValue>
+                </criteria>
+              </visibilityRule>
+            </valueListItems>
+            <valueListItems>
+              <value>Gift__c.Do_Not_Thank</value>
+              <visibilityRule>
+                <criteria>
+                  <leftValue>{!Record.Acknowledgment_Status__c}</leftValue>
+                  <operator>EQUAL</operator>
+                  <rightValue>To acknowledge</rightValue>
+                </criteria>
+              </visibilityRule>
+            </valueListItems>
+            <valueListItems>
               <value>Delete</value>
             </valueListItems>
           </valueList>

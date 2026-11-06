@@ -45,6 +45,49 @@
     </layoutColumns>
     <style>OneColumn</style>
   </layoutSections>
+  <platformActionList>
+    <actionListContext>Record</actionListContext>
+    <platformActionListItems>
+      <actionName>Edit</actionName>
+      <actionType>StandardButton</actionType>
+      <sortOrder>0</sortOrder>
+    </platformActionListItems>
+    <platformActionListItems>
+      <actionName>Stewardship_Plan__c.Mark_Plan_Complete</actionName>
+      <actionType>QuickAction</actionType>
+      <sortOrder>1</sortOrder>
+    </platformActionListItems>
+    <platformActionListItems>
+      <actionName>ChangeOwnerOne</actionName>
+      <actionType>StandardButton</actionType>
+      <sortOrder>2</sortOrder>
+    </platformActionListItems>
+    <platformActionListItems>
+      <actionName>Clone</actionName>
+      <actionType>StandardButton</actionType>
+      <sortOrder>3</sortOrder>
+    </platformActionListItems>
+    <platformActionListItems>
+      <actionName>Delete</actionName>
+      <actionType>StandardButton</actionType>
+      <sortOrder>4</sortOrder>
+    </platformActionListItems>
+    <platformActionListItems>
+      <actionName>LogACall</actionName>
+      <actionType>QuickAction</actionType>
+      <sortOrder>5</sortOrder>
+    </platformActionListItems>
+    <platformActionListItems>
+      <actionName>NewTask</actionName>
+      <actionType>QuickAction</actionType>
+      <sortOrder>6</sortOrder>
+    </platformActionListItems>
+    <platformActionListItems>
+      <actionName>NewEvent</actionName>
+      <actionType>QuickAction</actionType>
+      <sortOrder>7</sortOrder>
+    </platformActionListItems>
+  </platformActionList>
   <showHighlightsPanel>true</showHighlightsPanel>
   <showInteractionLogPanel>false</showInteractionLogPanel>
 </Layout>

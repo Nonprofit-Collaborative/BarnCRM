@@ -143,3 +143,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | Read the new asks' record numbers. | Each reads `ASK-` and six digits. |
 
 **Cleanup:** delete the test asks and clear Eli's **Next Ask Date**.
+
+## T-ASK-12: Reopen Ask From the Ask Page
+
+**Purpose:** confirm the Reopen Ask action on an ask's page reopens a closed ask of any age, and says so on an open one (people-giving-19).
+**Prerequisites:** a user with Giving Staff; one closed ask (Outcome Declined) and one open ask.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the closed ask and click **Reopen Ask** at the top of the page. | A **Reopen Ask** window asks to confirm, with **Reopen Ask** and **Cancel**. |
+| 2 | Click **Cancel**. | The window closes; the ask is unchanged. |
+| 3 | Click **Reopen Ask** again and confirm. | A success toast. **Outcome** is **Open** and **Closed Date** is empty. |
+| 4 | Open the open ask and click **Reopen Ask**. | The window says the ask is already open and offers only **Close**. |
+
+**Cleanup:** close the reopened ask as Declined again, or delete it.

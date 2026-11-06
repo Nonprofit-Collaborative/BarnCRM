@@ -31,8 +31,10 @@ You should see: a linked negative gift for the remaining amount, and the origina
 
 A Pending gift is money you expect. If it will never arrive, cancel it instead of writing it off: nothing was received.
 
-1. Open the gift and click **Edit**.
-2. Set **Status** to **Cancelled** and click **Save**.
+1. Open the gift and click **Cancel Pending Gift** at the top of the page.
+2. Click **Cancel Pending Gift** in the window to confirm.
+
+The button shows only while the gift is Pending. You can still click **Edit** and set **Status** to **Cancelled** instead.
 
 You should see: the gift saved as `Cancelled`, with no negative gift. A Cancelled gift is in no total, export, receipt or thank-you. If it was paying a pledge installment, that payment is free for the next gift. If the money turns up after all, set the gift back to **Pending**, then to **Received**.
 
