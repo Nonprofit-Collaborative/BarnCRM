@@ -427,6 +427,12 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentName>recordInspectorButton</componentName>
+        <identifier>recordInspectorButton</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>recordGlance</componentName>
         <identifier>recordGlance</identifier>
       </componentInstance>
@@ -441,12 +447,6 @@
       <componentInstance>
         <componentName>runtime_sales_activities:activityPanel</componentName>
         <identifier>runtime_sales_activities_activityPanel</identifier>
-      </componentInstance>
-    </itemInstances>
-    <itemInstances>
-      <componentInstance>
-        <componentName>recordInspectorButton</componentName>
-        <identifier>recordInspectorButton</identifier>
       </componentInstance>
     </itemInstances>
     <name>sidebar</name>

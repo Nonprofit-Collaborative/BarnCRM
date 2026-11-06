@@ -9,7 +9,7 @@ standard navigation and console navigation.
 |---|---|---|---|
 | **BarnCRM** | Everyone with a BarnCRM role | Standard: each record opens in place of the page | Home, Contacts, Households, Organizations, Data Manager |
 | **BarnCRM Console** | Everyone with a BarnCRM role | Console: records stay open side by side in tabs | Home, Contacts, Households, Organizations, Addresses, Relationships, Affiliations, Household Members, Data Manager |
-| **BarnCRM Admin** | The BarnCRM Admin role only | Standard | BarnCRM Settings, Data Manager, Org Optimizer, Duplicate Matching, Record Inspector, Error Log |
+| **BarnCRM Admin** | The BarnCRM Admin role only | Standard | BarnCRM Settings, Data Manager, Org Optimizer, Duplicate Matching, Error Log |
 | **BarnCRM Admin Console** | The BarnCRM Admin role only | Console | The same as BarnCRM Admin |
 
 The everyday apps give you one home page that tells you what to do next, a setup checklist
@@ -25,7 +25,7 @@ a module's pages follow it.
 
 Each page's icon matches what it does, and the page header and its console tab show the same
 one: a gear for **BarnCRM Settings**, building blocks for **Data Manager**, a stethoscope for
-**Org Optimizer**, scales for **Duplicate Matching**, a camera for **Record Inspector**, a bell
+**Org Optimizer**, scales for **Duplicate Matching**, a bell
 for **Error Log**, a telescope for
 **Find** and a form for **Import**. **Households** show people, **Organizations** a building,
 **Addresses** a map. On Data Manager, Org Optimizer, Duplicate Matching, Find and Import the
@@ -48,7 +48,8 @@ is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**
 | Find, Import and Super Transformer | The **Data Manager** tab, in any BarnCRM app |
 | Setup checklist, Health Check, What's new | The **Home** tab of **BarnCRM** or **BarnCRM Console** |
 | BarnCRM Settings, Access, Module Manager, Features | **BarnCRM Settings** tab in **BarnCRM Admin** or **BarnCRM Admin Console** |
-| Org Optimizer, Duplicate Matching, Record Inspector, Error Log | **BarnCRM Admin** or **BarnCRM Admin Console** |
+| Org Optimizer, Duplicate Matching, Error Log | **BarnCRM Admin** or **BarnCRM Admin Console** |
+| Record Inspector | The **Inspect This Record** button at the top of the right column on Contact and Account pages (it has no tab in the apps, D-183) |
 | Rollup Builder (Rollup Builder module) | **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Gifts and everything around them (Giving module) | The **BarnCRM Fundraising** app, and the BarnCRM apps once added (below) |
 | Volunteer shifts and hours (Volunteers module) | The **BarnCRM Volunteers** app, and the BarnCRM apps once added (below) |
