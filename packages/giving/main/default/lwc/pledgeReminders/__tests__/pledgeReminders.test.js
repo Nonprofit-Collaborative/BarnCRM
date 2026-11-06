@@ -155,16 +155,20 @@ describe('c-pledge-reminders', () => {
       (cell) => cell.textContent
     );
     expect(timings).toEqual(['7 days before', '30 days after', 'On the due date']);
-    expect(q(element, 'template-missing').textContent).toContain('Template not found');
+    const missing = q(element, 'template-missing');
+    expect(missing.status).toBe('error');
+    expect(missing.label).toContain('Template not found');
     expect(q(element, 'template-name').textContent).toBe('Pledge Soon');
-    expect(element.shadowRoot.querySelectorAll('[data-id="step-active"]')[1].textContent).toBe(
-      'Inactive'
-    );
+    const inactive = element.shadowRoot.querySelectorAll('[data-id="step-active"]');
+    expect(inactive.length).toBe(1);
+    expect(inactive[0].status).toBe('inactive');
+    expect(inactive[0].label).toBe('Inactive');
   });
 
   it('says reminders are off and refuses to send while they are', async () => {
     const element = await mount(pageData({ enabled: false }));
-    expect(q(element, 'off-notice').textContent).toContain('Reminders are off');
+    expect(q(element, 'off-notice').variant).toBe('warning');
+    expect(q(element, 'off-notice').message).toContain('Reminders are off');
     expect(q(element, 'send-now').disabled).toBe(true);
   });
 
@@ -172,12 +176,12 @@ describe('c-pledge-reminders', () => {
     sendNow.mockResolvedValue(pageData());
     const element = await mount(pageData());
     expect(q(element, 'off-notice')).toBeNull();
-    expect(q(element, 'emails-due').textContent).toBe('2');
+    expect(q(element, 'emails-due').value).toBe(2);
     q(element, 'send-now').click();
     await flush();
     await flush();
     expect(sendNow).toHaveBeenCalledTimes(1);
-    expect(q(element, 'notice-message').textContent).toBe('The run has started.');
+    expect(q(element, 'notice-message').message).toBe('The run has started.');
   });
 
   it('disables sending for a person without the permission', async () => {
@@ -213,6 +217,6 @@ describe('c-pledge-reminders', () => {
     q(element, 'send-now').click();
     await flush();
     await flush();
-    expect(q(element, 'error-message').textContent).toBe('Pledge reminders are turned off.');
+    expect(q(element, 'error-message').message).toBe('Pledge reminders are turned off.');
   });
 });

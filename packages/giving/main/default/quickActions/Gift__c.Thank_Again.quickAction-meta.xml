@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionSubtype>ScreenAction</actionSubtype>
+  <description>Puts a gift back in the thank-you queue, after a one-line confirm.</description>
+  <height>250</height>
+  <label>Thank Again</label>
+  <lightningWebComponent>giftThankAgain</lightningWebComponent>
+  <optionsCreateFeedItem>false</optionsCreateFeedItem>
+  <type>LightningWebComponent</type>
+</QuickAction>

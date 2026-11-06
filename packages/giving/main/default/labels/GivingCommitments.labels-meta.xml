@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>Giving_CommitmentNew_AmountEachTime</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>New Commitment screen: the amount of each payment of a recurring gift.</shortDescription>
+        <value>Amount Each Time</value>
+    </labels>
+    <labels>
+        <fullName>Giving_CommitmentNew_LastPaymentDate</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>New Commitment screen: the date of a pledge's last payment.</shortDescription>
+        <value>Last Payment Date</value>
+    </labels>
+    <labels>
+        <fullName>Giving_CommitmentNew_RecurringGift</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>New Commitment screen: the choice for an open-ended recurring gift.</shortDescription>
+        <value>Recurring Gift</value>
+    </labels>
+    <labels>
+        <fullName>Giving_CommitmentNew_Title</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Title of the New Commitment screen.</shortDescription>
+        <value>New Commitment</value>
+    </labels>
+    <labels>
         <fullName>Giving_Commitment_ActionCancel</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
@@ -31,6 +63,14 @@
         <protected>true</protected>
         <shortDescription>The button that resumes a paused commitment.</shortDescription>
         <value>Resume</value>
+    </labels>
+    <labels>
+        <fullName>Giving_Commitment_CancelConfirmTitle</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Heading of the question asked before a commitment is cancelled.</shortDescription>
+        <value>Cancel This Commitment?</value>
     </labels>
     <labels>
         <fullName>Giving_Commitment_StatusChanged</fullName>
@@ -121,6 +161,14 @@
         <value>Paid</value>
     </labels>
     <labels>
+        <fullName>Giving_SchedulePreview_EmptyHeading</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Heading of the payment schedule card when a commitment has no payments.</shortDescription>
+        <value>No Payments Yet</value>
+    </labels>
+    <labels>
         <fullName>Giving_SchedulePreview_GenerateError</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
@@ -165,7 +213,7 @@
         <categories>Giving</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Label on the summary line under the schedule, before the total expected.</shortDescription>
-        <value>Total expected:</value>
+        <shortDescription>Label of the tile above the schedule that shows the total expected.</shortDescription>
+        <value>Total Expected</value>
     </labels>
 </CustomLabels>

@@ -20,6 +20,8 @@ public with sharing class AcknowledgmentService {
 	public static final String SEND_PERMISSION = 'Send_Acknowledgments';
 
 	private static final String CONTEXT_SEND = 'AcknowledgmentService.sendEmails';
+	/** The length of `Acknowledgment__c.Failure_Reason__c`. */
+	private static final Integer FAILURE_REASON_LENGTH = 255;
 
 	public class AcknowledgmentException extends Exception {
 	}
@@ -264,10 +266,12 @@ public with sharing class AcknowledgmentService {
 			Id templateId = templateIds.get(row.Template__c);
 			if (templateId == null) {
 				row.Status__c = STATUS_FAILED;
-				row.Failure_Reason__c = String.format(
-					Label.Giving_Acknowledgment_TemplateNotFound,
-					new List<String>{ String.valueOf(row.Template__c) }
-				);
+				row.Failure_Reason__c = BarnHelp.text(
+						'Giving',
+						'Giving_Acknowledgment_TemplateNotFound',
+						new List<Object>{ String.valueOf(row.Template__c), matches[index].ruleName }
+					)
+					.left(FAILURE_REASON_LENGTH);
 				row.Gift_Key__c = null;
 				unsendable.add(row);
 				counts.errors++;

@@ -92,7 +92,9 @@ Click **Preview** to see the letter filled in for a sample gift from a sample do
 tax sentences and signature BarnCRM adds. The preview is the wording, not the printed page:
 to check the PDF layout, issue a receipt for a test gift. Then click **Save**. If the letter
 you edited is not the one in use, **Use This Letter** switches it on and switches the other
-one of its kind off. Only one letter of each kind is in use at a time.
+one of its kind off. Only one letter of each kind is in use at a time. Whether a save, a
+switch or a restore worked stays on the page as a notice above the tabs until your next
+action, so you never miss it.
 
 If you edited a letter before this editor existed and gave it your own header, the next time
 you open it check the top: the old shipped letterhead is removed for you, but a header you

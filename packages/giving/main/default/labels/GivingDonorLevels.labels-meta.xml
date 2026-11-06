@@ -65,12 +65,12 @@
     <value>Level</value>
   </labels>
   <labels>
-    <fullName>Giving_DonorLevels_ColumnFrom</fullName>
+    <fullName>Giving_DonorLevels_EmptyHeading</fullName>
     <categories>Giving, Donor Levels</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Donor levels page: minimum column</shortDescription>
-    <value>From</value>
+    <shortDescription>Donor levels page: empty ladder heading</shortDescription>
+    <value>No Levels Yet</value>
   </labels>
   <labels>
     <fullName>Giving_DonorLevels_ColumnUpTo</fullName>

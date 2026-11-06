@@ -70,3 +70,27 @@ export function listRows(columns) {
   });
   return rows;
 }
+
+/** The key of the column that holds the asks closed in the last few weeks. */
+export const CLOSED_COLUMN = '__closed__';
+
+/**
+ * The Recently Closed column, drawn after the stage columns (people-giving-19): the asks the
+ * server sent as recently closed, newest first, so one closed by mistake can be reopened from its
+ * card. Null when there are none, so the board draws no empty column.
+ */
+export function closedColumn(cards) {
+  const list = cards || [];
+  if (!list.length) {
+    return null;
+  }
+  return {
+    key: CLOSED_COLUMN,
+    stage: null,
+    isOther: false,
+    isClosed: true,
+    count: list.length,
+    amount: list.reduce((sum, card) => sum + (card.amount || 0), 0),
+    cards: list.map((card) => ({ ...card, daysInStage: null }))
+  };
+}

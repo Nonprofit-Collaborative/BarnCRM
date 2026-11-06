@@ -6,7 +6,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Gift batch: add a line</shortDescription>
-    <value>Add line</value>
+    <value>Add Line</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_Balanced</fullName>
@@ -89,28 +89,12 @@
     <value>Entered</value>
   </labels>
   <labels>
-    <fullName>Giving_GiftBatch_ErrorAlreadyPosted</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: batch already posted</shortDescription>
-    <value>This batch has already been posted. Its gifts were created then, and posting again would create them twice.</value>
-  </labels>
-  <labels>
     <fullName>Giving_GiftBatch_ErrorBatchMissing</fullName>
     <categories>Giving, Gift Batch</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Gift batch: batch not found</shortDescription>
     <value>This batch could not be found. It may have been deleted.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_ErrorEditAfterPost</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: batch posted, cannot change</shortDescription>
-    <value>This batch has been posted, so its lines can no longer be changed. To correct a gift, refund or write off that gift.</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_ErrorLineMissing</fullName>
@@ -127,38 +111,6 @@
     <protected>false</protected>
     <shortDescription>Gift batch: batch could not be opened</shortDescription>
     <value>This batch could not be opened. Ask your BarnCRM admin to check the Error Log.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_ErrorNoAccess</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: may view but not change batch</shortDescription>
-    <value>You can see this batch but not change or post it. Ask your BarnCRM admin for the Giving Staff permission set, or for edit access to this batch.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_ErrorNoControlTotal</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: batch has no control total</shortDescription>
-    <value>Enter the control total from the deposit slip before posting, so there is something to check against.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_ErrorNoRows</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: batch has no lines</shortDescription>
-    <value>This batch has no lines yet, so there is nothing to post.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_ErrorOverControlTotal</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: lines total more than control</shortDescription>
-    <value>This batch does not balance: the lines add up to {0} more than the control total. Look for a line entered twice or a mistyped amount, then post again.</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_ErrorPostFailed</fullName>
@@ -185,14 +137,6 @@
     <value>This line has no gift date. Give it one, or set the batch's default gift date.</value>
   </labels>
   <labels>
-    <fullName>Giving_GiftBatch_ErrorRowDonorBoth</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: line names two donors</shortDescription>
-    <value>This line names both a person and an organization. A gift has exactly one donor.</value>
-  </labels>
-  <labels>
     <fullName>Giving_GiftBatch_ErrorRowDonorMissing</fullName>
     <categories>Giving, Gift Batch</categories>
     <language>en_US</language>
@@ -209,28 +153,12 @@
     <value>This line has no payment method. Give it one, or set the batch's default payment method.</value>
   </labels>
   <labels>
-    <fullName>Giving_GiftBatch_ErrorRowsIncomplete</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: some lines unfinished</shortDescription>
-    <value>Some lines are not finished. Fix the lines marked below, then post again.</value>
-  </labels>
-  <labels>
     <fullName>Giving_GiftBatch_ErrorSaveRows</fullName>
     <categories>Giving, Gift Batch</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Gift batch: lines could not be saved</shortDescription>
     <value>Your lines could not be saved. Nothing was lost from the screen: try again in a moment.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_ErrorShortOfControlTotal</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: lines total less than control</shortDescription>
-    <value>This batch does not balance: the lines add up to {0} less than the control total. Find the missing gift or correct the control total, then post again.</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_FromBatch</fullName>
@@ -241,28 +169,12 @@
     <value>As the batch</value>
   </labels>
   <labels>
-    <fullName>Giving_GiftBatch_NoLines</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: batch has no lines yet</shortDescription>
-    <value>No lines yet. Click Add line and type the first check.</value>
-  </labels>
-  <labels>
     <fullName>Giving_GiftBatch_Post</fullName>
     <categories>Giving, Gift Batch</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Gift batch: post the batch</shortDescription>
-    <value>Post batch</value>
-  </labels>
-  <labels>
-    <fullName>Giving_GiftBatch_PostedToast</fullName>
-    <categories>Giving, Gift Batch</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Gift batch: batch posted toast</shortDescription>
-    <value>Batch posted: {0} gifts created.</value>
+    <value>Create Gifts</value>
   </labels>
   <labels>
     <fullName>Giving_GiftBatch_RemoveLine</fullName>
@@ -287,5 +199,13 @@
     <protected>false</protected>
     <shortDescription>Gift batch: grid card title</shortDescription>
     <value>Lines</value>
+  </labels>
+  <labels>
+    <fullName>Giving_GiftBatch_NoLines</fullName>
+    <categories>Giving, Gift Batch</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Gift batch: empty grid heading</shortDescription>
+    <value>No Lines Yet</value>
   </labels>
 </CustomLabels>

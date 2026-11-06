@@ -1,47 +1,55 @@
 <template>
-  <lightning-card title={labels.title} icon-name="custom:custom5">
-    <div class="slds-var-p-horizontal_medium">
-      <template lwc:if={hasError}>
-        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
-          {errorMessage}
-        </p>
-      </template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name={icons.tribute}>
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={hasError}>
+          <div class="slds-var-m-bottom_small">
+            <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+          </div>
+        </template>
 
-      <template lwc:if={isEmpty}>
-        <p data-id="empty-state" class="slds-text-body_regular">{labels.none}</p>
-      </template>
+        <template lwc:if={isEmpty}>
+          <c-barn-empty-state
+            size="compact"
+            heading={labels.none}
+            message={labels.noneMessage}
+            data-id="empty-state"
+          ></c-barn-empty-state>
+        </template>
 
-      <template lwc:if={hasTribute}>
-        <p data-id="summary" class="slds-text-body_regular">{summary}</p>
-        <p data-id="status" class="slds-text-body_small slds-var-m-top_xx-small">
-          {statusText}
-          <template lwc:if={tribute.notificationSentDate}>
-            <lightning-formatted-date-time
-              value={tribute.notificationSentDate}
-            ></lightning-formatted-date-time>
+        <template lwc:if={hasTribute}>
+          <p data-id="summary" class="slds-text-body_regular">{summary}</p>
+          <p data-id="status" class="slds-var-m-top_xx-small">
+            <c-barn-status-badge status={statusWord} label={statusText}></c-barn-status-badge>
+            <template lwc:if={tribute.notificationSentDate}>
+              <lightning-formatted-date-time
+                class="slds-text-body_small slds-text-color_weak slds-var-m-left_x-small"
+                value={tribute.notificationSentDate}
+              ></lightning-formatted-date-time>
+            </template>
+          </p>
+          <template lwc:if={tribute.message}>
+            <p data-id="message" class="slds-text-body_small slds-var-m-top_x-small">
+              {tribute.message}
+            </p>
           </template>
-        </p>
-        <template lwc:if={tribute.message}>
-          <p data-id="message" class="slds-text-body_small slds-var-m-top_x-small">
-            {tribute.message}
-          </p>
+          <template lwc:if={showBlockedReason}>
+            <div class="slds-var-m-top_x-small">
+              <c-barn-notice variant="warning" message={blockedReason} data-id="blocked-reason"></c-barn-notice>
+            </div>
+          </template>
+          <template lwc:if={showMarkSent}>
+            <lightning-button
+              data-id="mark-sent"
+              class="slds-var-m-top_small"
+              variant="brand"
+              label={labels.markSent}
+              disabled={markSentDisabled}
+              onclick={handleMarkSent}
+            ></lightning-button>
+          </template>
         </template>
-        <template lwc:if={showBlockedReason}>
-          <p data-id="blocked-reason" class="slds-text-body_small slds-var-m-top_x-small">
-            {blockedReason}
-          </p>
-        </template>
-        <template lwc:if={showMarkSent}>
-          <lightning-button
-            data-id="mark-sent"
-            class="slds-var-m-top_small"
-            variant="brand"
-            label={labels.markSent}
-            disabled={markSentDisabled}
-            onclick={handleMarkSent}
-          ></lightning-button>
-        </template>
-      </template>
-    </div>
-  </lightning-card>
+      </div>
+    </lightning-card>
+  </template>
 </template>

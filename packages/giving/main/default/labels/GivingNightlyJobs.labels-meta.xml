@@ -65,14 +65,6 @@
     <value>The run failed. The reason is in the Error Log.</value>
   </labels>
   <labels>
-    <fullName>Giving_NightlyJobs_NeverRun</fullName>
-    <categories>Giving, Nightly Jobs</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Nightly jobs page: a job that has never run</shortDescription>
-    <value>Has not run yet.</value>
-  </labels>
-  <labels>
     <fullName>Giving_NightlyJobs_NextRunHeading</fullName>
     <categories>Giving, Nightly Jobs</categories>
     <language>en_US</language>

@@ -57,7 +57,7 @@ Admin Guide's Importing page has the detail.
 The **BarnCRM Fundraising** app opens on **Fundraising Home**, then has **Quick Gift Entry**,
 **Contacts**, **Households**, **Organizations**, **Gifts**, **Commitments**, **Installments**
 (each pledge payment), **Ask Pipeline**, **Asks**, **Gift Batches**, **Funds**, **Appeals**,
-**Tributes**, **Receipts**, **Stewardship Plans**, **Acknowledgment Queue**, **Donor
+**Tributes**, **Receipts**, **Stewardship Plans**, **Thank-Yous**, **Donor
 Segments**, **Dashboards** and **Reports**, plus **Quick Gift Entry** in the utility bar at the
 bottom of the screen.
 

@@ -50,7 +50,7 @@ You are David, and you are setting up funds before your first gift entry session
 7. Enter a gift for any donor without choosing a fund (see the Gifts page). Open the gift
    and look at its allocations: one allocation for the whole amount, pointing at `General`.
 8. Return to the `General` fund. Once the giving totals have been calculated, **Total
-   Raised** shows the gift and **Rollups Last Calculated** shows when the number was worked
+   Raised** shows the gift and **Totals Last Updated** shows when the number was worked
    out.
 
 ## List Views
@@ -71,6 +71,6 @@ You are David, and you are setting up funds before your first gift entry session
 - **Expecting an import to move Total Raised the instant it finishes.** A gift saved by a
   person updates its funds' totals a few seconds after the save (see "After the save, or
   during it" in [Rollups](rollups.md)), and the totals from an import or other bulk change
-  catch up within minutes. **Rollups Last Calculated** on the fund
+  catch up within minutes. **Totals Last Updated** on the fund
   tells you when the number was worked out, so you always know whether you are looking at a
   fresh number.

@@ -4,19 +4,21 @@
 
 Donor scoring rates every donor on three questions: how recently did they give, how often,
 and how much. Each answer becomes a score from 1 to 5, the three scores are added into one
-**RFM Score** (3 to 15), and BarnCRM names a **segment** from them: Champion, Loyal,
-Promising, At Risk, Lapsed or Occasional. RFM means recency, frequency, monetary.
+**Donor Score** (3 to 15), and BarnCRM names a **Giving Pattern** from them: Champion, Loyal,
+Promising, At Risk, Lapsed or Occasional. The three scores are **Recency Score**,
+**Frequency Score** and **Amount Score** (often called RFM elsewhere).
 
 Nothing is typed in. The three inputs are totals the Rollup Builder keeps on every person,
 household and organization, so a score always agrees with the numbers printed beside it.
-Scores show in the **Giving** section of the donor's record, and every one is a normal field,
+The pattern shows in the **Giving** section of the donor's record and the scores in **Giving
+Details** below it, on the **Details** tab. Every one is a normal field,
 so Find can filter, sort and show them, and donor segments can use them.
 
 | Score | What it measures | Where it comes from |
 |---|---|---|
 | Recency | Days since the donor's last gift | **Days Since Last Gift**, from **Last Gift Date** |
 | Frequency | Gifts in the recent window | **Recent Gift Count**, a rollup of gifts in the last 730 days |
-| Monetary | Giving in the recent window | **Recent Giving**, a rollup of gifts in the last 730 days |
+| Amount | Giving in the recent window | **Recent Giving**, a rollup of gifts in the last 730 days |
 
 A donor with no gift has no scores and no segment.
 
@@ -28,7 +30,7 @@ Each score uses four cutoffs, which you can change (see below). With the default
 |---|---|---|---|---|---|
 | Recency (days since last gift) | 90 or fewer | 91 to 180 | 181 to 365 | 366 to 730 | more than 730 |
 | Frequency (gifts in the window) | 6 or more | 4 to 5 | 2 to 3 | 1 | none |
-| Monetary (given in the window) | 5,000 or more | 1,000 to 4,999 | 250 to 999 | 50 to 249 | under 50 |
+| Amount (given in the window) | 5,000 or more | 1,000 to 4,999 | 250 to 999 | 50 to 249 | under 50 |
 
 The segment is the first line that fits, with R, F and M the three scores:
 
@@ -73,9 +75,10 @@ accounts or both; scores already on records stay as they are.
 
 ## Using Scores
 
-- **On the donor:** the Giving section of the record shows the segment, the score, the three
-  scores, days since the last gift, the recent gift count and recent giving.
-- **In Find:** choose **RFM Segment**, **RFM Score** or any score as a column or a condition.
+- **On the donor:** the **Giving** section shows the **Giving Pattern**; **Giving Details**
+  shows the **Donor Score**, the three scores, days since the last gift, the recent gift count
+  and recent giving.
+- **In Find:** choose **Giving Pattern**, **Donor Score** or any score as a column or a condition.
 - **In donor segments:** [Donor segments](donor-segments.md) has two starter templates,
   **Champions** and **Slipping Donors**.
 

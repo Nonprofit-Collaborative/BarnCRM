@@ -114,9 +114,21 @@ describe('c-gift-soft-credits', () => {
     getCredits.emit({ credits: [], canAdd: true, canRemove: true });
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="empty-state"]').textContent).toBe(
-      'Nobody yet.'
-    );
+    const empty = element.shadowRoot.querySelector('[data-id="empty-state"]');
+    expect(empty.size).toBe('compact');
+    expect(empty.heading).toBe('c.Giving_SoftCredits_EmptyHeading');
+    expect(empty.message).toBe('Nobody yet.');
+  });
+
+  it('shows email and mailing city under each name in the person picker', async () => {
+    const element = createComponent();
+    getCredits.emit(PANEL);
+    await flush();
+    element.shadowRoot.querySelector('[data-id="add-button"]').click();
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="person-picker"]').displayInfo).toEqual({
+      additionalFields: ['Email', 'MailingCity']
+    });
   });
 
   it('adds a credit a person entered', async () => {
@@ -187,7 +199,7 @@ describe('c-gift-soft-credits', () => {
     element.shadowRoot.querySelector('.remove-button').click();
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent.trim()).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="error-message"]').message).toBe(
       'BarnCRM created this credit and keeps it up to date.'
     );
   });

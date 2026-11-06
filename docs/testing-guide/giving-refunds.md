@@ -68,8 +68,8 @@ For every script on this page:
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Rosa Hall**. Read the Giving section. | **Total Giving** 80.00 (250 and 500 fully reversed, 80 kept). **Gift Count** 3. **Largest Gift** 500.00. **Last Gift Date** today. |
-| 2 | Open Rosa Hall's household. | The same **Total Giving** and **Gift Count**. **Rollups Last Calculated** is a moment ago. |
+| 1 | Open **Rosa Hall**. Read the Giving and Giving Details sections. | **Total Giving** 80.00 (250 and 500 fully reversed, 80 kept). **Gift Count** 3. **Largest Gift** 500.00. **Last Gift Date** today. |
+| 2 | Open Rosa Hall's household. | The same **Total Giving** and **Gift Count**. **Totals Last Updated** is a moment ago. |
 | 3 | Open **Charlotte Williams** (sample data: one gift of 1,450, fully refunded). | **Total Giving** 0.00, not blank. **Gift Count** 1. |
 | 4 | Open **General Fund**. Note **Total Raised**. Enter a gift from Rosa Hall for 40, then refund all 40 of it. Refresh the fund. | **Total Raised** is the same as before the 40 gift. **Gift Count** is one higher. |
 

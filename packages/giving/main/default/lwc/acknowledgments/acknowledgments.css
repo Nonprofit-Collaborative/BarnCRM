@@ -1,0 +1,18 @@
+/* The grip only shows that the row moves; the whole row is what is dragged. */
+.rule-handle {
+  display: inline-block;
+  cursor: grab;
+}
+
+.rule-handle-cell {
+  width: var(--slds-g-sizing-9, 2rem);
+}
+
+.rule-row_dragging {
+  opacity: 0.5;
+}
+
+/* The row a carried rule would go above. */
+.rule-row_drop {
+  box-shadow: inset 0 var(--slds-g-sizing-border-2, 2px) 0 var(--slds-g-color-accent-1, #0176d3);
+}

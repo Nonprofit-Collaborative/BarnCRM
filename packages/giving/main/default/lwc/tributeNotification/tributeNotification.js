@@ -11,13 +11,30 @@ import NOT_SENT from '@salesforce/label/c.Giving_TributeNotification_NotSent';
 import NOTIFY_PREFIX from '@salesforce/label/c.Giving_TributeNotification_NotifyPrefix';
 import ACTION_FAILED from '@salesforce/label/c.Giving_SoftCredits_ActionFailed';
 import { bodyMessage } from 'c/findCsv';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { iconFor } from 'c/barnIcons';
 
 export default class TributeNotification extends LightningElement {
+  helpReady = isHelpLoaded('Giving');
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Giving').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
   @api recordId;
+
+  icons = { tribute: iconFor('Tribute__c') };
 
   labels = {
     title: TITLE,
     none: NONE,
+    get noneMessage() {
+      return helpText('Giving', 'Giving_TributeNotification_Empty');
+    },
     markSent: MARK_SENT,
     sent: SENT,
     notSent: NOT_SENT,
@@ -69,6 +86,11 @@ export default class TributeNotification extends LightningElement {
       return '';
     }
     return this.tribute.notificationSent ? this.labels.sent : this.labels.notSent;
+  }
+
+  /** Sent is done; a letter still to send is waiting on someone. */
+  get statusWord() {
+    return this.tribute && this.tribute.notificationSent ? 'done' : 'pending';
   }
 
   get blockedReason() {

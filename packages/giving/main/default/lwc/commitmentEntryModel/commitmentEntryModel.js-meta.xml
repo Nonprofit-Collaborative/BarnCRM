@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The New Commitment screen's logic in plain JavaScript: the record it was opened from, when the
+    entries are complete enough to preview, and the figures of a previewed schedule. Imported by
+    commitmentNew.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

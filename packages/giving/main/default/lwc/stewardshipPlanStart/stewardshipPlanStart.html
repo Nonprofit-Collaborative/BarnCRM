@@ -1,15 +1,31 @@
 <template>
-  <div class="slds-p-around_medium">
-    <h2 class="slds-text-heading_small slds-m-bottom_small">{labels.heading}</h2>
+  <div class="slds-var-p-around_medium">
+    <h2 class="slds-text-heading_medium slds-var-m-bottom_small">{labels.heading}</h2>
 
     <template lwc:if={loadError}>
-      <p role="alert" class="slds-text-color_error slds-m-bottom_small" data-id="load-error">{loadError}</p>
+      <c-barn-notice
+        class="slds-var-m-bottom_small"
+        data-id="load-error"
+        variant="error"
+        message={loadError}
+      ></c-barn-notice>
     </template>
     <template lwc:elseif={noAccess}>
-      <p role="status" class="slds-m-bottom_small" data-id="no-access">{labels.noAccess}</p>
+      <c-barn-notice
+        class="slds-var-m-bottom_small"
+        data-id="no-access"
+        variant="warning"
+        message={labels.noAccess}
+      ></c-barn-notice>
     </template>
     <template lwc:elseif={noPlans}>
-      <p role="status" class="slds-m-bottom_small" data-id="no-plans">{labels.none}</p>
+      <c-barn-empty-state
+        class="slds-var-m-bottom_small"
+        data-id="no-plans"
+        size="compact"
+        illustration="setup"
+        message={labels.none}
+      ></c-barn-empty-state>
     </template>
     <template lwc:elseif={loaded}>
       <lightning-combobox
@@ -21,16 +37,21 @@
         onchange={handlePlanChange}
       ></lightning-combobox>
       <template lwc:if={description}>
-        <p class="slds-m-top_x-small slds-text-color_weak" data-id="description">{description}</p>
+        <p
+          class="slds-var-m-top_x-small slds-text-body_small slds-text-color_weak"
+          data-id="description"
+        >
+          {description}
+        </p>
       </template>
     </template>
 
-    <div class="slds-m-top_medium slds-text-align_right">
+    <div class="slds-var-m-top_medium slds-text-align_right">
       <lightning-button
         data-id="cancel"
         label={labels.cancel}
         onclick={handleCancel}
-        class="slds-m-right_x-small"
+        class="slds-var-m-right_x-small"
       ></lightning-button>
       <template lwc:if={canChoose}>
         <lightning-button

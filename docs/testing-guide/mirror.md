@@ -149,7 +149,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 3 | Click **Mark These Gifts Posted**. | `Marked <n> gifts posted. Gifts already posted were left as they were.` The button goes away. |
 | 4 | Open one gift from the file and change its amount. | Refused: `This gift has been posted to accounting, so its date, amount, donor, payment method, reference and funds cannot change and it cannot be deleted...` |
 | 5 | Tick **Only gifts not yet posted** and download last month. | `No gifts in this range.` |
-| 6 | On that gift's **Posting** card, enter a reason in **Why is this gift being unposted?** and click **Unpost** (undo). | `Unposted. The reason is in the Error Log. Mark it posted again after your next export.` |
+| 6 | On that gift's **Posting** card, enter a reason in **Why is this gift being unposted?** and click **Unpost** (undo). | A green notice: `Unposted. The reason is in the Error Log. After your next export, choose Mark These Gifts Posted on the Accounting Export page to post it again.` |
 | 7 | Download last month again with **Only gifts not yet posted** ticked. | The file holds that one gift's rows. |
 
 **Cleanup:** None (posted flags are harmless to later scripts; unpost more gifts the same way if needed).

@@ -181,8 +181,7 @@ public with sharing class CommitmentService {
 	 * back where it belongs, because every date is computed from the start rather than
 	 * from the date before it.
 	 */
-	@TestVisible
-	private static Date dueDateFor(Commitment__c commitment, Integer index) {
+	public static Date dueDateFor(Commitment__c commitment, Integer index) {
 		Date start = commitment.Start_Date__c;
 		String frequency = commitment.Frequency__c;
 		if ('Weekly'.equals(frequency)) {

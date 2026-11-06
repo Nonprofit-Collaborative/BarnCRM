@@ -35,6 +35,7 @@ import NAME_FIELD from '@salesforce/label/c.Giving_Segments_NameField';
 import SAVE_AS_SEGMENT from '@salesforce/label/c.Giving_Segments_SaveAsSegment';
 import SAVED from '@salesforce/label/c.Giving_Segments_Saved';
 import SEGMENTS_HEADING from '@salesforce/label/c.Giving_Segments_SegmentsHeading';
+import EMPTY_HEADING from '@salesforce/label/c.Giving_Segments_EmptyHeading';
 import SEGMENT_FIELD from '@salesforce/label/c.Giving_Segments_SegmentField';
 import OPTION_MINE from '@salesforce/label/c.Core_Format_Parenthetical';
 import OPTION_SHARED from '@salesforce/label/c.Giving_Segments_OptionShared';
@@ -76,6 +77,7 @@ export default class DonorSegments extends NavigationMixin(LightningElement) {
     get empty() {
       return helpText('Giving', 'Giving_Segments_Empty');
     },
+    emptyHeading: EMPTY_HEADING,
     showList: SHOW_LIST,
     layoutField: LAYOUT_FIELD,
     export: EXPORT,

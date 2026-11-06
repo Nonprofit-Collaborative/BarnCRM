@@ -169,14 +169,6 @@
     <value>Issued</value>
   </labels>
   <labels>
-    <fullName>Giving_Receipt_ColumnVoidReason</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts panel: column, why it was voided</shortDescription>
-    <value>Void Reason</value>
-  </labels>
-  <labels>
     <fullName>Giving_Receipt_ColumnFile</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
@@ -189,8 +181,8 @@
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Receipts panel: the gift has no receipt</shortDescription>
-    <value>No receipt has been issued for this gift yet.</value>
+    <shortDescription>Receipts panel: empty heading, the gift has no receipt</shortDescription>
+    <value>No Receipts Yet</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_IssueButton</fullName>

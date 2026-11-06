@@ -52,7 +52,7 @@ Do this as David, on a phone, starting from the sample data.
    `1042`. This is the field Jen uses when she reconciles with the bank, so it is worth
    the two seconds.
 8. Confirm **Appeal** says Spring Appeal. If it does not, tap it and pick Spring Appeal.
-9. Tap **Save and New**. A light notice with a green check icon says **Gift G-000123 saved**, with the gift's name as
+9. Tap **Save and New**. A green notice with a check icon says **Gift G-000123 saved**, with the gift's name as
    a link, and the form clears itself for the next gift while keeping today's date, the
    appeal, and the fund. You are ready for the next check with one tap.
 10. Enter a second gift the same way: a different donor, `25`, Cash, no check number.
@@ -97,23 +97,74 @@ amount and due date of its next payment. Enter a gift from that donor, of that a
 that day. The list chooses that payment and says it was suggested. Save, open the pledge
 again, and the payment is Paid and the balance has gone down.
 
+## Entering a Gift from a Donor's Page
+
+The **Enter a Gift** button on a person's, household's or organization's page (the
+`Contact.Enter_Gift` and `Account.Enter_Gift` actions, which replace New Gift) opens this same
+form in a window, with that record already chosen as the donor. Save closes the window and
+refreshes the page; Save and New keeps it open for the next gift from the same donor. Staff
+on a donor's page therefore get every part of the form: gifts of goods, Pays a scheduled
+payment, the Fund, and the tribute and matching sections below. The Gifts tab's own **New**
+button stays for admins who want the full record form.
+
+Any page or button can also open the **Quick Gift Entry** tab for a known donor by passing
+the donor's record Id as `c__donorId` in the page state (a Lightning navigation to the
+`Quick_Gift_Entry` tab with `state: { c__donorId: '<Id>' }`). The form starts with that
+donor chosen, as it does on a record page.
+
+## Tributes and Matching Gifts at Entry
+
+Two collapsed sections sit under **Fund**. Leave them closed for an ordinary gift.
+
+- **This Gift Honors Someone**: choose **Type** (In honor of or In memory of), then either
+  pick the honoree in **Honoree Contact** or type their name in **Honoree Name**, and
+  optionally who to tell (**Notification Recipient Contact**, or a name). Saving the gift
+  saves its tribute in the same step, so a gift is never saved without the tribute typed for
+  it. The tribute then appears on the gift's Tribute card and in the tribute notification
+  list, exactly as one added from the gift page. Anything typed in the section makes a
+  tribute: the form asks for the type and the honoree if one is missing.
+- **Matches an Employee's Gift** (organization donors only): lists up to 50 recent gifts from
+  people whose **Employer** is this organization that are not matched yet, newest first.
+  Choose the employee's gift and save: both gifts are linked through **Matched Gift** and the
+  employee gets a matched donor soft credit on the organization's gift, as when the match is
+  linked from the gift page. The list is empty until people have their Employer filled in.
+
 ## Common Mistakes
 
 **The donor is not in BarnCRM yet.** Common at an event. Leave the donor toggle on
-**Person** and tap **Not in the list? Add a new person** under the donor box. The standard
-new person form opens; fill it in and save. You come back to Quick Gift Entry with what you
-had typed still there: search for the new person in the donor box and pick them. For a new
-organization, create it from the Organizations tab first.
+**Person** and tap **Not in the list? Add a new person** under the donor box. A window over
+the form (the Core `householdAddMemberModal` in its person mode) asks for Salutation, First
+and Last Name, Email, Street, City and Postal Code and saves the contact exactly as Contact
+New does, so the household is made automatically and the org's duplicate rules run. It also
+names anyone already in BarnCRM with the same name, to pick instead. The new person becomes
+the donor and nothing typed so far is lost. Gift Batches offer the same window on each
+line's donor. Where people are person accounts, the standard new person form opens instead;
+you come back with what you typed and search for the new person. For a new organization,
+create it from the Organizations tab first.
+
+**The gift goes to more than one fund.** Open **Split Across Funds** (gifts of money only)
+and add a row per fund, by amount or percent: the same fund split editor as the gift page's
+**Edit Funds**. **Fund** turns off while two or more rows are set, and the save needs every
+row to name its own fund and the rows to add up to the amount; otherwise the section shows
+"A split is for a gift of money: choose a different fund on every row, give each an amount,
+and make the rows add up to the gift's amount." The gift and its allocations save together,
+with no default allocation in between.
 
 **A field shows a message after you tap Save.** The message sits under the field it is
 about, and the cursor moves to the first one. Fix that field and its message goes away;
 then tap Save again.
 
-**Picking the wrong donor because two people share a name.** The donor box shows the
-name only. Before you save, check the name in the box is the person you meant; after you
-save, the confirmation link opens the gift so you can look. If you saved a gift against
-the wrong donor, open the gift and change the donor: nothing is locked until a receipt is
-issued.
+**Picking the wrong donor because two people share a name.** Each name in the donor list
+shows the person's email and mailing city under it (an organization shows its billing
+city), so two Ana Garcias can be told apart. Before you save, check the person you picked;
+after you save, the confirmation link opens the gift so you can look. If you saved a gift
+against the wrong donor, open the gift and change the donor: nothing is locked until a
+receipt is issued.
+
+**"Choose one donor: a person or an organization, not both."** A gift has exactly one
+donor. The form sends only the one you picked, so you see this message only when a gift
+is saved some other way (the Gifts tab New, an import) with both Donor Contact and Donor
+Account filled in. Clear one of them.
 
 **Entering a refund as a negative amount here.** The form refuses it and says: **Enter an
 amount greater than zero. A refund is entered from the original gift, not here.** A
@@ -168,3 +219,5 @@ For the person building a report later, these are the fields the form writes.
 | Fund | the gift's single allocation |
 | Check or reference number | Payment Reference |
 | Pays a scheduled payment | Installment, and that payment's pledge in Commitment |
+| This Gift Honors Someone | a Tribute on the gift: Type, Honoree Contact (or Honoree Account) or Honoree Name, Notification Recipient Contact (or Account) or Notification Recipient Name |
+| Matches an Employee's Gift | Matched Gift, on both gifts of the pair |

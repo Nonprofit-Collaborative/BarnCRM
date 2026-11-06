@@ -1,4 +1,11 @@
-import { buildColumns, daysBetween, listRows, OTHER_COLUMN } from 'c/askPipelineModel';
+import {
+  buildColumns,
+  closedColumn,
+  CLOSED_COLUMN,
+  daysBetween,
+  listRows,
+  OTHER_COLUMN
+} from 'c/askPipelineModel';
 
 describe('askPipelineModel', () => {
   it('counts whole days between two ISO dates, never below zero', () => {
@@ -61,5 +68,19 @@ describe('askPipelineModel', () => {
     );
     expect(listRows(columns).map((row) => row.id)).toEqual(['early', 'late']);
     expect(listRows(null)).toEqual([]);
+  });
+
+  it('gathers the recently closed asks into one column, or none when there are none', () => {
+    const column = closedColumn([
+      { id: 'c1', amount: 100, outcome: 'Won' },
+      { id: 'c2', amount: null, outcome: 'Declined' }
+    ]);
+    expect(column.key).toBe(CLOSED_COLUMN);
+    expect(column.isClosed).toBe(true);
+    expect(column.count).toBe(2);
+    expect(column.amount).toBe(100);
+    expect(column.cards[0].daysInStage).toBeNull();
+    expect(closedColumn([])).toBeNull();
+    expect(closedColumn(undefined)).toBeNull();
   });
 });

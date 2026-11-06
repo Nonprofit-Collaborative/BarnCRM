@@ -1,0 +1,38 @@
+<template>
+  <div class="slds-var-p-around_medium">
+    <h2 class="slds-text-heading_medium slds-var-m-bottom_small" data-id="title">{title}</h2>
+
+    <template lwc:if={ready}>
+      <template lwc:if={errorMessage}>
+        <div class="slds-var-m-bottom_small">
+          <c-barn-notice variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+        </div>
+      </template>
+      <template lwc:if={applies}>
+        <p class="slds-var-m-bottom_small" data-id="confirm-text">{confirmText}</p>
+      </template>
+      <template lwc:if={showNotApplicable}>
+        <div class="slds-var-m-bottom_small">
+          <c-barn-notice variant="info" message={notApplicableText} data-id="not-applicable"></c-barn-notice>
+        </div>
+      </template>
+    </template>
+    <template lwc:else>
+      <lightning-spinner size="small" alternative-text={title}></lightning-spinner>
+    </template>
+
+    <div class="slds-grid slds-grid_align-end slds-var-m-top_medium">
+      <lightning-button label={dismissLabel} onclick={handleDismiss} data-id="dismiss"></lightning-button>
+      <template lwc:if={applies}>
+        <lightning-button
+          class="slds-var-m-left_x-small"
+          variant={confirmVariant}
+          label={title}
+          disabled={busy}
+          onclick={handleConfirm}
+          data-id="confirm"
+        ></lightning-button>
+      </template>
+    </div>
+  </div>
+</template>

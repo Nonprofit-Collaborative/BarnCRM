@@ -202,7 +202,7 @@ describe('c-donor-segments', () => {
   it('shows a refusal from the server', async () => {
     getPage.mockRejectedValue({ body: { message: 'Find is required.' } });
     const element = await render();
-    expect(byId(element, 'error-message').textContent).toContain('Find is required.');
+    expect(byId(element, 'error-message').message).toContain('Find is required.');
   });
 
   it('lists the segment in its own columns', async () => {
@@ -226,7 +226,7 @@ describe('c-donor-segments', () => {
     const element = await render();
     await choose(element, 'segment', ORG_SEGMENT.recordId);
     expect(byId(element, 'layout').options.map((option) => option.value)).toEqual(['all']);
-    expect(byId(element, 'people-only')).not.toBeNull();
+    expect(byId(element, 'people-only').variant).toBe('info');
   });
 
   it('exports every page for Mailchimp, one row per address, as CSV', async () => {
@@ -263,7 +263,7 @@ describe('c-donor-segments', () => {
     expect(lines).toHaveLength(3);
     expect(lines[1]).toBe('ana@example.org,Ana,Ruiz,Lapsed people');
     // One address is shared, so the notice is the one that also counts duplicates left out.
-    expect(byId(element, 'notice-message').textContent).toContain(
+    expect(byId(element, 'notice-message').message).toContain(
       'c.Giving_Segments_ExportedDuplicates'
     );
   });

@@ -31,8 +31,10 @@ You should see: a linked negative gift for the remaining amount, and the origina
 
 A Pending gift is money you expect. If it will never arrive, cancel it instead of writing it off: nothing was received.
 
-1. Open the gift and click **Edit**.
-2. Set **Status** to **Cancelled** and click **Save**.
+1. Open the gift and click **Cancel Pending Gift** at the top of the page.
+2. Click **Cancel Pending Gift** in the window to confirm.
+
+The button shows only while the gift is Pending. You can still click **Edit** and set **Status** to **Cancelled** instead.
 
 You should see: the gift saved as `Cancelled`, with no negative gift. A Cancelled gift is in no total, export, receipt or thank-you. If it was paying a pledge installment, that payment is free for the next gift. If the money turns up after all, set the gift back to **Pending**, then to **Received**.
 
@@ -45,7 +47,7 @@ You should see: the gift saved as `Cancelled`, with no negative gift. A Cancelle
 - **Matching gifts**: refunding the company's gift gives the employee a negative **Matched Donor** credit for what went back. You do not unlink the pair first. Refunding the employee's own gift does not change the match.
 - **Thank-yous** already sent stand. Refunds are never acknowledged.
 
-Totals are recalculated by BarnCRM, sometimes a little later. **Rollups Last Calculated** on a record says when its numbers were worked out.
+Totals are recalculated by BarnCRM, sometimes a little later. **Totals Last Updated** on a record says when its numbers were worked out.
 
 ## Common Problems
 

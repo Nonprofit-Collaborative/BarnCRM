@@ -27,7 +27,7 @@ import FIELD_MINIMUM from '@salesforce/label/c.Giving_Stewardship_FieldMinimum';
 import FIELD_DESCRIPTION from '@salesforce/label/c.Core_Shared_Description';
 import STEPS_HEADING from '@salesforce/label/c.Giving_Stewardship_StepsHeading';
 import ADD_STEP from '@salesforce/label/c.Core_Shared_AddStep';
-import MOVE_UP from '@salesforce/label/c.Giving_Stewardship_MoveUp';
+import MOVE_UP from '@salesforce/label/c.Core_Shared_MoveUp';
 import MOVE_DOWN from '@salesforce/label/c.Core_Shared_MoveDown';
 import REMOVE_STEP from '@salesforce/label/c.Core_Find_Remove';
 import STEP_SUBJECT from '@salesforce/label/c.Giving_Stewardship_StepSubject';
@@ -44,6 +44,16 @@ import SELECTED from '@salesforce/label/c.Core_DataDictionary_SelectedLabel';
 import COLUMN_ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { iconFor } from 'c/barnIcons';
+import { createDragController } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
+
+/** The ids with one of them taken out and put back at a position among the rest. */
+function placeAt(ids, id, index) {
+  const others = ids.filter((other) => other !== id);
+  others.splice(index, 0, id);
+  return others;
+}
 
 const EMPTY_TEMPLATE = {
   recordId: null,
@@ -72,20 +82,58 @@ const EMPTY_STEP = {
  * steps are one idea and every setting belongs in the console. It says out loud, next to the
  * steps, that editing a plan does not reach into plans already running (R-SP7), because that is
  * the question an administrator asks the moment she changes a step.
+ *
+ * Steps reorder with Move Up and Move Down, or by dragging a step row (the Core kit's
+ * `c/barnDrag`: mouse, touch after a press and hold, or Space and the arrow keys); every move is
+ * announced in a live region.
  */
 export default class StewardshipPlans extends LightningElement {
-  helpReady = isHelpLoaded('Giving');
+  helpReady = isHelpLoaded(['Giving', 'Core']);
+
+  icons = { page: iconFor('Stewardship_Plans') };
+
+  liveMessage = '';
+  /** The drag in progress, as c/barnDrag reports it. */
+  dragState = {};
+  drag;
 
   connectedCallback() {
     if (!this.helpReady) {
-      loadHelp('Giving').then(() => {
+      loadHelp(['Giving', 'Core']).then(() => {
         this.helpReady = true;
       });
+    }
+    this.drag = createDragController({
+      root: this.template,
+      layout: 'list',
+      messages: dragMessages(),
+      announce: (text) => {
+        this.liveMessage = text;
+      },
+      onChange: (state) => {
+        this.dragState = state;
+      },
+      onDrop: ({ itemId, fromIndex, toIndex }) => {
+        if (fromIndex === toIndex) {
+          return false;
+        }
+        const ids = this.steps.map((step) => step.recordId);
+        return this.saveOrder(placeAt(ids, itemId, toIndex), itemId, false);
+      }
+    });
+  }
+
+  disconnectedCallback() {
+    if (this.drag) {
+      this.drag.destroy();
     }
   }
 
   labels = {
     title: TITLE,
+    get dragInstructions() {
+      return dragInstructions();
+    },
     get intro() {
       return helpText('Giving', 'Giving_Stewardship_Intro');
     },
@@ -216,6 +264,7 @@ export default class StewardshipPlans extends LightningElement {
       ...template,
       stepCount: template.steps ? template.steps.length : 0,
       activeText: template.active ? this.labels.active : this.labels.inactive,
+      activeStatus: template.active ? 'on' : 'off',
       toggleLabel: template.active ? this.labels.turnOff : this.labels.turnOn,
       isSelected: template.recordId === this.selectedId,
       rowClass:
@@ -243,13 +292,32 @@ export default class StewardshipPlans extends LightningElement {
       return [];
     }
     const last = template.steps.length - 1;
-    return template.steps.map((step, index) => ({
-      ...step,
-      position: index + 1,
-      isFirst: index === 0,
-      isLast: index === last,
-      assigneeText: step.assignedUserName ? step.assignedUserName : step.assignTo
-    }));
+    const state = this.dragState || {};
+    const others = state.active
+      ? template.steps.map((step) => step.recordId).filter((id) => id !== state.itemId)
+      : [];
+    const dropBefore = state.active ? others[state.overIndex] : undefined;
+    const movable = this.canEdit;
+    return template.steps.map((step, index) => {
+      let rowClass = 'slds-hint-parent';
+      if (state.active && step.recordId === state.itemId) {
+        rowClass += ' step-row_dragging';
+      } else if (step.recordId === dropBefore) {
+        rowClass += ' step-row_drop';
+      }
+      return {
+        ...step,
+        position: index + 1,
+        isFirst: index === 0,
+        isLast: index === last,
+        cannotMoveUp: this.cannotEdit || index === 0,
+        cannotMoveDown: this.cannotEdit || index === last,
+        dragId: movable ? step.recordId : undefined,
+        tabIndex: movable ? '0' : undefined,
+        rowClass,
+        assigneeText: step.assignedUserName ? step.assignedUserName : step.assignTo
+      };
+    });
   }
 
   get hasSteps() {
@@ -385,11 +453,46 @@ export default class StewardshipPlans extends LightningElement {
     const from = ids.indexOf(recordId);
     const to = from + offset;
     if (from < 0 || to < 0 || to >= ids.length) {
-      return Promise.resolve();
+      return Promise.resolve(false);
     }
-    ids[from] = ids[to];
-    ids[to] = recordId;
-    return this.run(reorderSteps({ templateId: this.selectedId, stepIds: ids }));
+    return this.saveOrder(placeAt(ids, recordId, to), recordId, true);
+  }
+
+  /**
+   * Saves the step order. Move Up and Move Down are announced here; a drag is announced by the
+   * drag controller. Resolves true when the order was saved, false when it was refused.
+   */
+  saveOrder(ids, movedId, announce) {
+    const moved = this.steps.find((step) => step.recordId === movedId);
+    const said = helpText(
+      'Giving',
+      'Giving_Stewardship_StepMoved',
+      moved ? moved.subject : '',
+      ids.indexOf(movedId) + 1,
+      ids.length
+    );
+    return this.run(reorderSteps({ templateId: this.selectedId, stepIds: ids })).then(() => {
+      if (this.errorMessage) {
+        return false;
+      }
+      if (announce) {
+        this.liveMessage = said;
+      }
+      return true;
+    });
+  }
+
+  // Dragging a step row through c/barnDrag: Move Up and Move Down do the same.
+  handlePointerDown(event) {
+    if (!this.cannotEdit) {
+      this.drag.pointerDown(event);
+    }
+  }
+
+  handleDragKey(event) {
+    if (!this.cannotEdit) {
+      this.drag.keyDown(event);
+    }
   }
 
   /** Every write goes through here, so one place says what happened and refreshes the page. */

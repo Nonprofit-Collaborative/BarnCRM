@@ -245,55 +245,6 @@
     <itemInstances>
       <componentInstance>
         <componentInstanceProperties>
-          <name>actionNames</name>
-          <valueList>
-            <valueListItems>
-              <value>Edit</value>
-            </valueListItems>
-            <valueListItems>
-              <value>ChangeOwnerOne</value>
-            </valueListItems>
-            <valueListItems>
-              <value>Share</value>
-            </valueListItems>
-            <valueListItems>
-              <value>Delete</value>
-            </valueListItems>
-          </valueList>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
-          <name>collapsed</name>
-          <value>false</value>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
-          <name>enableActionsConfiguration</name>
-          <value>true</value>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
-          <name>enableActionsInNative</name>
-          <value>true</value>
-        </componentInstanceProperties>
-        <componentInstanceProperties>
-          <name>hideChatterActions</name>
-          <value>true</value>
-        </componentInstanceProperties>
-        <componentName>force:highlightsPanel</componentName>
-        <identifier>commitmentHighlightsPanel</identifier>
-      </componentInstance>
-    </itemInstances>
-    <name>header</name>
-    <type>Region</type>
-  </flexiPageRegions>
-  <flexiPageRegions>
-    <itemInstances>
-      <componentInstance>
-        <componentName>commitmentSchedulePreview</componentName>
-        <identifier>commitmentSchedulePanel</identifier>
-      </componentInstance>
-    </itemInstances>
-    <itemInstances>
-      <componentInstance>
-        <componentInstanceProperties>
           <name>columns</name>
           <value>Facet-commitment</value>
         </componentInstanceProperties>
@@ -333,16 +284,10 @@
         <identifier>totalsSection</identifier>
       </componentInstance>
     </itemInstances>
-    <name>main</name>
-    <type>Region</type>
+    <name>Facet-detailsTab</name>
+    <type>Facet</type>
   </flexiPageRegions>
   <flexiPageRegions>
-    <itemInstances>
-      <componentInstance>
-        <componentName>runtime_sales_activities:activityPanel</componentName>
-        <identifier>commitmentActivityPanel</identifier>
-      </componentInstance>
-    </itemInstances>
     <itemInstances>
       <componentInstance>
         <componentInstanceProperties>
@@ -399,6 +344,115 @@
         </componentInstanceProperties>
         <componentName>lst:dynamicRelatedList</componentName>
         <identifier>commitmentGiftsList</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>Facet-relatedTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>active</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>Facet-detailsTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Standard.Tab.detail</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>detailsTab</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>Facet-relatedTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Standard.Tab.relatedLists</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>relatedTab</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>Facet-recordTabs</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>actionNames</name>
+          <valueList>
+            <valueListItems>
+              <value>Edit</value>
+            </valueListItems>
+            <valueListItems>
+              <value>ChangeOwnerOne</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Share</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Delete</value>
+            </valueListItems>
+          </valueList>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>collapsed</name>
+          <value>false</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>enableActionsConfiguration</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>enableActionsInNative</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>hideChatterActions</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentName>force:highlightsPanel</componentName>
+        <identifier>commitmentHighlightsPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>header</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>commitmentSchedulePreview</componentName>
+        <identifier>commitmentSchedulePanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>tabs</name>
+          <value>Facet-recordTabs</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tabset</componentName>
+        <identifier>recordTabs</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>main</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>runtime_sales_activities:activityPanel</componentName>
+        <identifier>commitmentActivityPanel</identifier>
       </componentInstance>
     </itemInstances>
     <name>sidebar</name>

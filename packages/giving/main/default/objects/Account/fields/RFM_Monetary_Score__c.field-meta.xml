@@ -3,7 +3,7 @@
   <fullName>RFM_Monetary_Score__c</fullName>
   <externalId>false</externalId>
   <inlineHelpText>1 to 5, 5 for a donor who gave the most in the recent window. Cutoffs are in Donor Levels settings.</inlineHelpText>
-  <label>Monetary Score</label>
+  <label>Amount Score</label>
   <precision>1</precision>
   <required>false</required>
   <scale>0</scale>

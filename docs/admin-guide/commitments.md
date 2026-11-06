@@ -17,7 +17,23 @@ to a spreadsheet.
 ## How to Turn It On
 
 Commitments come with the Giving module. When Giving is on, the Commitments and
-Installments tabs are in the app and no further step is required.
+Pledge Payments tabs are in the app and no further step is required. Pledge Payments is
+the tab for the payment (Installment) records; only its label changed, and its API name
+is still `Installment__c`.
+
+**New** on Commitment opens the **New Commitment** screen, not the standard form. A pledge
+is entered as its **Pledge Total**, **How Often**, **First Payment Date** and **Number of
+Payments** (or **Last Payment Date**); a recurring gift as its **Amount Each Time**, **How
+Often** and **Start Date**. A one-line preview of the payments shows before anything is
+saved. The screen saves through the same code as the Ask Pipeline's **Record a Pledge**,
+so a pledge from either place is the same record: the total, the number of payments, and
+an amount each time that is the total divided evenly, rounded down, with the last payment
+taking up the cents (rule R-CM5). The override is set on the Commitment object for desktop
+and phone, through a small Aura wrapper (`commitmentNewOverride`), because Salesforce
+overrides a standard button only with an Aura component. **Edit** still opens the standard
+form, which is where **Day of Month** is set. To put the standard New form back, open
+**Setup**, **Object Manager**, **Commitment**, **Buttons, Links, and Actions**, edit **New**
+and choose **No override**.
 
 Three settings control how the schedules behave. Open **BarnCRM Settings** and choose
 **Giving**; they sit in that section alongside the default fund and appeal:
@@ -64,15 +80,16 @@ own **Recalculate Now** button on the Donor Levels page.)
 
 The same page is where you check on them afterwards. Each job shows when it last finished
 and what it did, for example "Marked 4 payments overdue." A job that ran and had nothing to
-do says so ("No payments were overdue.") rather than staying blank, so a blank line means
-the job has not run at all.
+do says so ("No payments were overdue.") rather than staying blank. A job that has not run
+at all reads **Never run**.
 
 Three things the page can tell you:
 
 - **Not scheduled.** Nobody has switched the jobs on in this org. Nothing is late, because
   nothing was ever going to run. The button under the line says **Schedule Nightly Run**.
 - **Scheduled, with a last run and a next run.** This is the normal state.
-- **Scheduled but has not run in more than 36 hours.** Something stopped the job. Open the
+- **Scheduled but has not run in more than 36 hours.** A yellow warning sits under the job.
+  Something stopped the job. Open the
   **Error Log** in BarnCRM Settings: a job that fails writes there and carries on with
   the rest of its work rather than stopping, so the log tells you which commitment or which
   payment is the problem.
@@ -102,17 +119,17 @@ Start from the sample data. The first part is David's work, the last step is Jen
 
 ### David Records a Pledge
 
-1. Open the **Commitments** tab and choose **New**.
-2. Set **Type** to Pledge.
-3. In **Donor**, choose a person from a household in the sample data, for example Ana
-   Nguyen. Leave the account donor field empty: a commitment has one donor, not two.
-4. Set **Expected Total** to 1,200 and **Amount** to 100. The amount is what is expected
-   each time, not the total.
-5. Set **Frequency** to Monthly and **Start date** to the first day of next month.
-6. Leave **Day of month** empty. The day of the start date is used.
-7. Set **Installments planned** to 12 and **End date** to the day before the first
-   anniversary of the start date.
-8. Choose **Save**. You will see twelve scheduled payments on the commitment, the first
+1. Open the **Commitments** tab and choose **New**. The **New Commitment** screen opens.
+2. Under **Donor**, keep **Person** and choose a person from a household in the sample
+   data, for example Ana Nguyen.
+3. Under **Type**, keep **Pledge**.
+4. Set **Pledge Total** to 1,200 and **How Often** to Monthly.
+5. Set **First Payment Date** to the first day of next month.
+6. Set **Number of Payments** to 12 (or set **Last Payment Date** eleven months after the
+   first; the screen counts the payments).
+7. Read the **Payment Schedule** line: "12 payments of $100.00, the last one $100.00 on"
+   the date eleven months on.
+8. Choose **Save**. You will see the commitment with twelve scheduled payments, the first
    one due next month and the last one eleven months later, each for 100. The balance
    reads 1,200 because nothing has been paid yet.
 
@@ -124,15 +141,14 @@ Start from the sample data. The first part is David's work, the last step is Jen
     choose the first payment.
 11. Choose **Save**, then go back to the commitment. The first payment now reads **Paid**,
     paid to date reads 100, and the balance reads 1,100. The gift is at the top of the
-    commitment's **Gifts** list.
+    commitment's **Gifts** list on the **Related** tab.
 
 If David had left **Installment** empty, BarnCRM would have linked the gift to the
 oldest unpaid payment by itself, because the automatic setting is on.
 
-If David had left **Expected Total** empty, BarnCRM would have filled it in on save as the
-amount times the installments planned, 1,200 here, so the balance is right from the start.
-It does the same whenever a pledge is saved with the total cleared. A total you type is
-always kept.
+If a pledge is later edited on the standard form with **Expected Total** cleared, BarnCRM
+fills it in on save as the amount times the installments planned, so the balance stays
+right. A total you type is always kept.
 
 If Ana later asks for that payment back, David records it with **Refund or Write Off** on
 the gift (see [Refunds and write-offs](refunds.md)). The negative gift names the same pledge
@@ -144,8 +160,8 @@ Active again.
 ### David Pauses a Recurring Gift
 
 12. Open the **Commitments** tab and open one of the sample recurring gifts, or create one:
-    Type Recurring, Amount 25, Frequency Monthly, a start date, no expected total and no
-    end date. A recurring gift has payments generated a year ahead, not forever.
+    **New**, **Type** Recurring Gift, **Amount Each Time** 25, **How Often** Monthly and a
+    **Start Date**. A recurring gift has payments generated a year ahead, not forever.
 13. On the payment schedule card, choose **Pause**. The status changes to Paused, no
     further payments are generated, and the payments already scheduled stay where they
     are. The card then offers **Resume** instead of Pause: choose it when the donor starts
@@ -153,12 +169,14 @@ Active again.
     and their original numbering.
 
 The same card offers **Mark Complete** for a commitment that is finished and **Cancel
-commitment** for one the donor has stopped. Cancelling marks the unpaid payments Skipped
-and deletes nothing.
+Commitment** for one the donor has stopped. Cancel Commitment is a red-text button, last
+in the row, and asks first ("Cancel This Commitment?", with the number of unpaid payments
+that will be marked Skipped; **Keep It** backs out). Cancelling marks the unpaid payments
+Skipped and deletes nothing.
 
 ### Jen Checks What Is Overdue
 
-14. Open the **Installments** tab and choose the **Overdue** list view. Every payment
+14. Open the **Pledge Payments** tab and choose the **Overdue** list view. Every payment
     already marked Overdue is here, with its commitment, its donor, and what was expected.
     A payment is marked Overdue by the overdue pass, so this list fills up the first night
     after you schedule the nightly jobs (see "Switching the nightly jobs on"). If the list
@@ -170,15 +188,18 @@ and deletes nothing.
 ## List Views
 
 **Commitments** has **All Commitments**, **My Commitments**, **Active Pledges**, **Active
-Recurring Gifts** and **Paused Commitments**. **Installments** has **All Installments**,
-**Overdue** and **Upcoming 30 Days**.
+Recurring Gifts** and **Paused Commitments**. **Pledge Payments** has **All Installments**,
+**Overdue** and **Upcoming 30 Days**. Salesforce opens a tab on the list view each person
+used last (the first visit shows Recently Viewed); there is no setting that makes
+**Overdue** every person's default, so the User Guide tells staff to choose it once.
 
 ## Common Mistakes
 
-**Entering the total in the amount field.** Amount is what is expected each time. A
-1,200 pledge paid monthly has an amount of 100 and an expected total of 1,200. If the
-schedule comes out with twelve payments of 1,200, this is what happened: correct the
-amount and save, and the unpaid payments are rebuilt.
+**Entering the total in the amount field.** On the standard Edit form, Amount is what is
+expected each time. A 1,200 pledge paid monthly has an amount of 100 and an expected total
+of 1,200. If the schedule comes out with twelve payments of 1,200, this is what happened:
+correct the amount and save, and the unpaid payments are rebuilt. The New Commitment
+screen asks for the total instead, so a new pledge cannot be entered this way.
 
 **Naming two donors.** A commitment is from one donor: a person or an account, never
 both. Saving with both filled in stops with "Choose one donor for this commitment, either

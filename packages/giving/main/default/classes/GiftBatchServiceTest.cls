@@ -268,13 +268,15 @@ private class GiftBatchServiceTest {
 
 				Assert.isFalse(shortOutcome.success, 'A short batch does not post.');
 				Assert.areEqual(
-					Label.Giving_GiftBatch_ErrorShortOfControlTotal.replace('{0}', '12.50'),
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorShortOfControlTotal')
+						.replace('{0}', '12.50'),
 					shortOutcome.formError,
 					'It says how far out, to the cent, and which way, as the grid does.'
 				);
 				Assert.isFalse(overOutcome.success, 'An over batch does not post.');
 				Assert.areEqual(
-					Label.Giving_GiftBatch_ErrorOverControlTotal.replace('{0}', '10.00'),
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorOverControlTotal')
+						.replace('{0}', '10.00'),
 					overOutcome.formError,
 					'A whole number of dollars still shows its cents.'
 				);
@@ -303,12 +305,12 @@ private class GiftBatchServiceTest {
 				Test.stopTest();
 
 				Assert.areEqual(
-					Label.Giving_GiftBatch_ErrorNoRows,
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoRows'),
 					emptyOutcome.formError,
 					'Empty.'
 				);
 				Assert.areEqual(
-					Label.Giving_GiftBatch_ErrorNoControlTotal,
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoControlTotal'),
 					uncheckedOutcome.formError,
 					'Nothing to check against.'
 				);
@@ -347,7 +349,7 @@ private class GiftBatchServiceTest {
 
 				Assert.isFalse(outcome.success, 'Unfinished lines stop the post.');
 				Assert.areEqual(
-					Label.Giving_GiftBatch_ErrorRowsIncomplete,
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorRowsIncomplete'),
 					outcome.formError,
 					'Why.'
 				);
@@ -359,7 +361,12 @@ private class GiftBatchServiceTest {
 					found.contains('1:' + Label.Giving_GiftBatch_ErrorRowDonorMissing),
 					'1'
 				);
-				Assert.isTrue(found.contains('2:' + Label.Giving_GiftBatch_ErrorRowDonorBoth), '2');
+				Assert.isTrue(
+					found.contains(
+						'2:' + BarnHelp.text('Giving', 'Giving_GiftEntry_ErrorOneDonor')
+					),
+					'2'
+				);
 				Assert.isTrue(found.contains('3:' + Label.Giving_GiftBatch_ErrorRowAmount), '3');
 				Assert.isTrue(
 					found.contains('1:' + Label.Giving_GiftBatch_ErrorRowPaymentMethod),
@@ -391,7 +398,11 @@ private class GiftBatchServiceTest {
 				Test.stopTest();
 
 				Assert.isFalse(outcome.success, 'The post fails.');
-				Assert.areEqual(Label.Giving_GiftBatch_ErrorPostFailed, outcome.formError, 'Why.');
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorCreateFailed'),
+					outcome.formError,
+					'Why.'
+				);
 				Assert.areEqual(2, outcome.lineProblems.size(), 'Each refused line is named.');
 				Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'No gift survives the rollback.');
 				Assert.areEqual(
@@ -511,7 +522,11 @@ private class GiftBatchServiceTest {
 				Test.stopTest();
 
 				Assert.isFalse(outcome.success, 'One refused line stops the post.');
-				Assert.areEqual(Label.Giving_GiftBatch_ErrorPostFailed, outcome.formError, 'Why.');
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorCreateFailed'),
+					outcome.formError,
+					'Why.'
+				);
 				Assert.areEqual(1, outcome.lineProblems.size(), 'Only the refused line is named.');
 				Assert.areEqual(137, outcome.lineProblems[0].lineNumber, 'It is line 137.');
 			}
@@ -545,7 +560,11 @@ private class GiftBatchServiceTest {
 				Test.stopTest();
 
 				Assert.isFalse(again.success, 'A second post is refused.');
-				Assert.areEqual(Label.Giving_GiftBatch_ErrorAlreadyPosted, again.formError, 'Why.');
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorAlreadyCreated'),
+					again.formError,
+					'Why.'
+				);
 				Assert.areEqual(1, [SELECT COUNT() FROM Gift__c], 'The deposit is not doubled.');
 
 				tuesday.Control_Total__c = 200;
@@ -624,7 +643,11 @@ private class GiftBatchServiceTest {
 				Test.stopTest();
 
 				Assert.isFalse(outcome.success, 'Read access is not enough to post.');
-				Assert.areEqual(Label.Giving_GiftBatch_ErrorNoAccess, outcome.formError, 'Why.');
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoAccess'),
+					outcome.formError,
+					'Why.'
+				);
 			}
 			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'No gift was created.');
 			Assert.areEqual(

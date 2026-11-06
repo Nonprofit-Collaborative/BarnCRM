@@ -1,6 +1,6 @@
 <template>
     <template lwc:if={helpReady}>
-  <lightning-card title={labels.title} icon-name="custom:custom26">
+  <lightning-card title={labels.title} icon-name={icons.softCredit}>
     <lightning-button
       slot="actions"
       data-id="add-button"
@@ -11,13 +11,18 @@
 
     <div class="slds-var-p-horizontal_medium">
       <template lwc:if={hasError}>
-        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
-          {errorMessage}
-        </p>
+        <div class="slds-var-m-bottom_small">
+          <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+        </div>
       </template>
 
       <template lwc:if={isEmpty}>
-        <p data-id="empty-state" class="slds-text-body_regular">{labels.empty}</p>
+        <c-barn-empty-state
+          size="compact"
+          heading={labels.emptyHeading}
+          message={labels.empty}
+          data-id="empty-state"
+        ></c-barn-empty-state>
       </template>
 
       <template lwc:if={hasCredits}>
@@ -31,10 +36,11 @@
                 format-style="currency"
               ></lightning-formatted-number>
               <template lwc:if={credit.isAutomatic}>
-                <lightning-badge
-                  class="automatic-badge"
+                <c-barn-status-badge
+                  class="automatic-badge slds-var-m-left_x-small"
+                  status="info"
                   label={labels.automaticBadge}
-                ></lightning-badge>
+                ></c-barn-status-badge>
                 <lightning-helptext content={labels.automaticHelp}></lightning-helptext>
               </template>
               <template lwc:if={credit.showRemove}>
@@ -58,6 +64,7 @@
             data-id="person-picker"
             label={labels.personLabel}
             object-api-name="Contact"
+            display-info={personDisplayInfo}
             onchange={handlePersonChange}
           ></lightning-record-picker>
           <lightning-combobox
