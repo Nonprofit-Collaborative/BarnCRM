@@ -412,7 +412,8 @@ page (sessions with no cohort), creates many sessions at once:
 
 1. Pick the **Service** (only Active ones are offered).
 2. Choose the **From** and **To** dates (a cohort's own dates to start with), the **Days of the
-   Week**, and a **Start Time** if you want one.
+   Week**, and a **Start Time** and **End Time** if you want them. The end must be after the
+   start; the panel says so and **Schedule** stays off until it is.
 3. The panel shows how many sessions that makes. Click **Schedule**. One Scheduled session is
    created for each chosen weekday between the two dates, named after the service and the date.
 

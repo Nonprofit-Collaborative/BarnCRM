@@ -12,6 +12,7 @@ import FROM_DATE from '@salesforce/label/c.Core_SetupChanges_From';
 import TO_DATE from '@salesforce/label/c.Core_SetupChanges_To';
 import WEEKDAYS from '@salesforce/label/c.Programs_Schedule_Weekdays';
 import START_TIME from '@salesforce/label/c.Programs_Schedule_StartTime';
+import END_TIME from '@salesforce/label/c.Programs_Schedule_EndTime';
 import SCHEDULE from '@salesforce/label/c.Programs_Schedule_Schedule';
 import NO_SERVICES from '@salesforce/label/c.Programs_Schedule_NoServices';
 import CHOOSE_DATES from '@salesforce/label/c.Programs_Schedule_ChooseDates';
@@ -31,6 +32,7 @@ import {
   newAndSkipped,
   previewMessage,
   sessionDates,
+  timesInOrder,
   weekdayOptions
 } from './schedule';
 import { bodyMessage } from 'c/findCsv';
@@ -54,6 +56,7 @@ export default class SessionScheduler extends LightningElement {
     to: TO_DATE,
     weekdays: WEEKDAYS,
     startTime: START_TIME,
+    endTime: END_TIME,
     schedule: SCHEDULE,
     noServices: NO_SERVICES,
     loading: LOADING
@@ -65,6 +68,7 @@ export default class SessionScheduler extends LightningElement {
   toDate;
   chosenWeekdays = [];
   startTime;
+  endTime;
   /** ISO dates in the chosen range that already have a session (R-SE4). */
   takenDays = [];
   takenRequest = 0;
@@ -160,6 +164,9 @@ export default class SessionScheduler extends LightningElement {
   }
 
   get preview() {
+    if (!timesInOrder(this.startTime, this.endTime)) {
+      return helpText('Programs', 'Programs_Schedule_EndBeforeStart');
+    }
     return previewMessage(
       this.planned,
       {
@@ -180,6 +187,7 @@ export default class SessionScheduler extends LightningElement {
     return (
       this.busy ||
       !this.serviceId ||
+      !timesInOrder(this.startTime, this.endTime) ||
       planned.problem !== null ||
       planned.tooMany ||
       newAndSkipped(planned.dates, this.takenDays).toCreate === 0
@@ -214,6 +222,11 @@ export default class SessionScheduler extends LightningElement {
     this.startTime = event.target.value || undefined;
   }
 
+  handleEndTimeChange(event) {
+    this.clearMessages();
+    this.endTime = event.target.value || undefined;
+  }
+
   handleSchedule() {
     const planned = this.planned;
     if (this.scheduleDisabled) {
@@ -225,7 +238,8 @@ export default class SessionScheduler extends LightningElement {
       recordId: this.recordId,
       serviceId: this.serviceId,
       dates: planned.dates,
-      startTime: this.startTime || null
+      startTime: this.startTime || null,
+      endTime: this.endTime || null
     })
       .then((schedule) => {
         this.schedule = schedule;

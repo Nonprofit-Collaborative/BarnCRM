@@ -11,6 +11,7 @@ import {
   parseIsoDate,
   previewMessage,
   sessionDates,
+  timesInOrder,
   toIsoDate,
   weekdayOptions
 } from '../schedule';
@@ -145,6 +146,14 @@ describe('schedule (framework free)', () => {
       previewMessage({ problem: null, dates: ['a', 'b'] }, { ...labels, none: 'none' }, ['a', 'b'])
     ).toBe('0 sessions skipped 2');
   });
+
+  it('wants an end time after the start time when both are set', () => {
+    expect(timesInOrder(undefined, '09:00')).toBe(true);
+    expect(timesInOrder('09:00:00.000', null)).toBe(true);
+    expect(timesInOrder('09:00:00.000', '10:30:00.000')).toBe(true);
+    expect(timesInOrder('09:00', '09:00:00.000')).toBe(false);
+    expect(timesInOrder('18:00', '09:00')).toBe(false);
+  });
 });
 
 describe('c-session-scheduler', () => {
@@ -169,6 +178,14 @@ describe('c-session-scheduler', () => {
     const time = q(element, 'start-time');
     time.value = '18:30:00.000';
     time.dispatchEvent(new CustomEvent('change'));
+    const endTime = q(element, 'end-time');
+    endTime.value = '17:00:00.000';
+    endTime.dispatchEvent(new CustomEvent('change'));
+    await flush();
+    expect(q(element, 'preview').textContent).toContain('Programs_Schedule_EndBeforeStart');
+    expect(q(element, 'schedule').disabled).toBe(true);
+    endTime.value = '20:00:00.000';
+    endTime.dispatchEvent(new CustomEvent('change'));
     await flush();
     expect(q(element, 'preview').textContent).toBe('4 sessions');
     expect(q(element, 'schedule').disabled).toBe(false);
@@ -181,7 +198,8 @@ describe('c-session-scheduler', () => {
       recordId: COHORT_ID,
       serviceId: SERVICE_ID,
       dates: ['2027-03-01', '2027-03-03', '2027-03-08', '2027-03-10'],
-      startTime: '18:30:00.000'
+      startTime: '18:30:00.000',
+      endTime: '20:00:00.000'
     });
     expect(q(element, 'result').textContent).toBe('4 made');
     expect(refreshed).toHaveBeenCalled();

@@ -266,7 +266,8 @@ the **Cohort** field on their enrollment.
 
 1. Open the cohort (for its sessions) or the program (for sessions open to everyone enrolled).
 2. In the **Schedule Sessions** panel, pick the **Service**, the **From** and **To** dates and
-   the **Days of the Week**, and a **Start Time** if you like.
+   the **Days of the Week**, and a **Start Time** and **End Time** if you like (the end after
+   the start).
 3. Check the line under the form, for example "12 sessions will be scheduled", and click
    **Schedule**.
 

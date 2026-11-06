@@ -88,6 +88,17 @@ export function newAndSkipped(dates, taken) {
   return { toCreate: (dates || []).length - skipped, skipped };
 }
 
+/**
+ * False only when both times are set and the end is not after the start (R-SE6). Times are
+ * "HH:mm" with optional seconds, so they compare as text once both have hours and minutes.
+ */
+export function timesInOrder(start, end) {
+  if (!start || !end) {
+    return true;
+  }
+  return String(end).slice(0, 5) > String(start).slice(0, 5);
+}
+
 /** "N sessions scheduled." or "N sessions will be scheduled.", then the skipped days if any. */
 export function countMessage(count, skipped, labels) {
   const main = count === 1 ? labels.one : format(labels.many, count);

@@ -965,8 +965,16 @@
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>Schedule sessions: start time not understood</shortDescription>
-        <value>Enter the start time as hours and minutes, for example 18:30.</value>
+        <shortDescription>Schedule sessions: start or end time not understood</shortDescription>
+        <value>Enter times as hours and minutes, for example 18:30.</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_EndTime</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: end time</shortDescription>
+        <value>End Time</value>
     </labels>
     <labels>
         <fullName>Programs_Schedule_ChooseDates</fullName>

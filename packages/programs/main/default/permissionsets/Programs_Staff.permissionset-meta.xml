@@ -238,6 +238,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Session__c.End_Time__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Enrollment__c.Eligibility_Reason__c</field>
     <readable>true</readable>
   </fieldPermissions>

@@ -30,6 +30,10 @@
         <field>Start_Time__c</field>
       </layoutItems>
       <layoutItems>
+        <behavior>Edit</behavior>
+        <field>End_Time__c</field>
+      </layoutItems>
+      <layoutItems>
         <behavior>Required</behavior>
         <field>Status__c</field>
       </layoutItems>

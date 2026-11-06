@@ -77,15 +77,17 @@ public with sharing class SessionScheduleController {
 	}
 
 	/**
-	 * Creates one Scheduled session of the service on each date, at the start time when one is
-	 * given ("HH:mm", seconds and more ignored), for the cohort when `recordId` is one.
+	 * Creates one Scheduled session of the service on each date, at the start and end times when
+	 * given ("HH:mm", seconds and more ignored), for the cohort when `recordId` is one. An end
+	 * not after the start is refused by the session's validation rule (R-SE6).
 	 */
 	@AuraEnabled
 	public static Schedule scheduleSessions(
 		Id recordId,
 		Id serviceId,
 		List<Date> dates,
-		String startTime
+		String startTime,
+		String endTime
 	) {
 		if (serviceId == null) {
 			throw UserErrors.message(Label.Programs_Schedule_ServiceRequired);
@@ -101,6 +103,7 @@ public with sharing class SessionScheduleController {
 			);
 		}
 		Time starts = parsedTime(startTime);
+		Time ends = parsedTime(endTime);
 		try {
 			Schedule schedule = scheduleFor(recordId);
 			Option service = null;
@@ -135,6 +138,7 @@ public with sharing class SessionScheduleController {
 						Cohort__c = schedule.cohortId,
 						Session_Date__c = day,
 						Start_Time__c = starts,
+						End_Time__c = ends,
 						Status__c = SessionAttendance.SCHEDULED
 					)
 				);

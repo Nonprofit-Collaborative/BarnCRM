@@ -66,6 +66,15 @@
               onchange={handleStartTimeChange}
             ></lightning-input>
           </div>
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <lightning-input
+              data-id="end-time"
+              type="time"
+              label={labels.endTime}
+              value={endTime}
+              onchange={handleEndTimeChange}
+            ></lightning-input>
+          </div>
         </div>
         <p data-id="preview" class="slds-text-body_small slds-var-m-top_small" aria-live="polite">{preview}</p>
         <div role="status" data-id="result" class="slds-var-m-vertical_small">{resultMessage}</div>

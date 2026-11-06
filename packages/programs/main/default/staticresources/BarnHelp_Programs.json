@@ -32,6 +32,7 @@
     "Programs_RecordService_NoServices": "There is no active service to record. Add one in a program's Services list first.",
     "Programs_RecordService_Saved": "Service recorded.",
     "Programs_Roster_Empty": "No one to list. Click Enroll Someone to add a person, or turn on Show Ended to see past enrollments.",
+    "Programs_Schedule_EndBeforeStart": "Choose an end time after the start time, or leave the end time empty.",
     "Programs_Schedule_IntroProgram": "Sessions scheduled here are for everyone enrolled in the program. To schedule for one cohort, use the panel on the cohort.",
     "Programs_Settings_Intro": "The choices your organization makes for the Programs module. Changes apply to everyone.",
     "Programs_Settings_PicklistsIntro": "The choices staff pick from on an enrollment. Add, rename or deactivate a choice on the field in Setup; a deactivated choice stays on the enrollments that have it.",

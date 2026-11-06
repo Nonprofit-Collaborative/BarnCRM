@@ -10884,6 +10884,7 @@ record of its own (ADR-0160 decision 12).
 | Cohort | reference(Cohort) | no | The cohort the session is for, a cohort of the service's program (R-SE1). Empty: for everyone enrolled in the program. |
 | Session Date | date | yes | The day of the session. |
 | Start Time | time | no | When the session starts. |
+| End Time | time | no | When the session ends, later the same day (R-SE6). |
 | Status | picklist(Scheduled, Held, Cancelled) | yes (defaults Scheduled) | Whether the session is still to come, took place or was called off. |
 
 ### Relationships
@@ -10908,13 +10909,16 @@ recorded and saves nothing.
 
 **R-SE4 Sessions are scheduled in a batch, not by a rule.** The Schedule Sessions panel (on a
 cohort, and on a program for sessions with no cohort) creates one Scheduled session for each
-chosen weekday between two dates, with a start time, at most 200 at a time. The dates are worked
+chosen weekday between two dates, with a start and end time, at most 200 at a time. The dates are worked
 out in a framework-free module (plan 9.9); the server checks again that the service is the
 program's, the cohort is the program's, and the count. No schedule record is kept: each session
 is edited or cancelled on its own, and scheduling again adds more.
 
 **R-SE5 Who.** As R-CO1: sessions hold no participant data and are shared as Program is. A
 session with deliveries cannot be deleted (Restrict on the delivery's Session); cancel it instead.
+
+**R-SE6 End after start.** End Time, when both times are set, is after Start Time (validation
+rule; modules-24, D-183). Either may be empty.
 
 ### Salesforce implementation
 
@@ -10926,9 +10930,10 @@ session with deliveries cannot be deleted (Restrict on the delivery's Session); 
 | Cohort | `Cohort__c` | Lookup to `Cohort__c`, delete constraint SetNull, relationship name Sessions |
 | Session Date | `Session_Date__c` | Date, required |
 | Start Time | `Start_Time__c` | Time |
+| End Time | `End_Time__c` | Time |
 | Status | `Status__c` | Picklist, restricted, required, default Scheduled |
 
-- **Validation rule:** `Cohort_In_Program` (R-SE1).
+- **Validation rules:** `Cohort_In_Program` (R-SE1), `End_After_Start` (R-SE6).
 - **List views:** All Sessions, Upcoming Sessions (Scheduled, from today).
 - **Session page:** `Session_Record_Page` with the `serviceDeliveryLog` panel in its session
   form (R-SE2, R-SE3), through `ServiceDeliveryLogController.getSessionLog` and `saveSession`.
@@ -12631,6 +12636,7 @@ mirrors the primary member).
 | 1.0 | 2026-11-05 | Settings picklist from a field. `Setting_Definition__mdt.Data_Type__c` gains PicklistFromField; its source field is named in the existing `Record_Object__c` as `Object.Field`. No new field. The Gift Transaction mirror paid status row uses it for Gift Transaction Status. |
 | 1.0 | 2026-11-05 | Field Use required, default value and at default (owner QA 2026-11-05, ADR-0169). Section 29F: R-FU2 now counts required fields and checkboxes; new rules R-FU13 (Required and Default Value from describe) and R-FU14 (At Default, one more grouped count per field). No object or field added; snapshots unchanged. |
 | 1.0 | 2026-11-05 | Shipped relationship types can be turned off (owner request, ADR-0170). `BarnCRM_Settings__c` gains `Relationship_Types_Turned_Off__c` (Section 12); Relationship Type and rule R-D2 say how a turned-off shipped row is read. No other object or field added. |
+| 1.0 | 2026-11-06 | Session End Time (modules-24, owner decision D-183). `Session__c` gains `End_Time__c` (Time) with rule R-SE6 and validation rule `End_After_Start`; the Schedule Sessions panel sets it (R-SE4). No other object or field added. |
 
 ---
 ## 32. Entity ownership by package
