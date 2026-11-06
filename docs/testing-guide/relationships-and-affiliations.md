@@ -152,3 +152,22 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 7 | Add an affiliation (see T-REL-07) and check **Current Affiliations**, then end it and check **Former Affiliations**. | The affiliation moves from **Current Affiliations** to **Former Affiliations**. **My Affiliations** shows it throughout. |
 
 **Cleanup:** delete the relationships and affiliations you added.
+
+## T-REL-11: Turn a Shipped Relationship Type Off and On
+
+**Purpose:** an admin turns off a shipped type the organization does not use; it is no longer offered or accepted for new relationships, and existing ones keep it.
+**Prerequisites:** admin user (BarnCRM Admin), **Relationships** on, T-REL-01 steps 1 to 4 done (Harper and Luis are Spouse). A second browser or window signed in as a staff user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin open **BarnCRM Settings**, **General**, **Custom Metadata**. Under **Relationship types**, open the menu of **Spouse** in **Shipped with BarnCRM**. | The menu offers only **Turn Off**. |
+| 2 | Choose **Turn Off**. | At once, with no wait, the page says **Spouse is turned off. It is no longer offered for new relationships, and the ones that already have it keep it.** The Spouse row's status is **Off**. |
+| 3 | As staff open Harper Garcia. | The Luis line still reads **Luis Garcia**, **Spouse**. |
+| 4 | Edit the Luis line (menu, **Edit**), change **Description**, and save. Open Luis. | Saved. Luis's Harper line is still **Spouse** and shows the new description. |
+| 5 | On Harper select **Add Relationship** and open the **Type** list. | **Spouse** is not offered; the other ten types are. |
+| 6 | On the **Relationships** tab select **New**, choose Harper and Diego Garcia, Type **Spouse**, and save. | Refused: **Spouse is turned off for new relationships in this organization. Choose another type, or ask your BarnCRM admin to turn it back on in BarnCRM Settings, Custom Metadata.** |
+| 7 | As admin, look at **Recent Changes** on the Custom Metadata page. | A change to the relationship types turned off lists **Spouse** as the new value, with your name. |
+| 8 | Choose **Turn On** from the Spouse row's menu. | The page says **Spouse is turned on and offered for new relationships again.** Status **In use**. As staff, reload Harper: **Spouse** is offered again. |
+| 9 | Optional, on an org where the **Relationships** feature has not been turned on yet: open **Custom Metadata**. | There is no **Relationship types** list; **Merge Rules** is still there. |
+
+**Cleanup:** make sure Spouse is turned on (step 8).

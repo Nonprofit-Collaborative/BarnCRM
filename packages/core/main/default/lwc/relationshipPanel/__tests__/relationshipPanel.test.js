@@ -5,8 +5,18 @@ import { createElement } from 'lwc';
 import RelationshipPanel from 'c/relationshipPanel';
 import { graphql } from 'lightning/graphql';
 import { deleteRecord, updateRecord } from 'lightning/uiRecordApi';
-import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import { getObjectInfo, getPicklistValues } from 'lightning/uiObjectInfoApi';
+import getTurnedOffTypes from '@salesforce/apex/RelationshipController.getTurnedOffTypes';
 import BarnConfirmModal from 'c/barnConfirmModal';
+
+jest.mock(
+  '@salesforce/apex/RelationshipController.getTurnedOffTypes',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
 
 const mockNavigate = jest.fn();
 jest.mock(
@@ -332,5 +342,54 @@ describe('c-relationship-panel', () => {
     );
     expect(fields[0]).toBe('Person_Account__c');
     expect(fields[1]).toBe('Related_Person_Account__c');
+  });
+
+  it('offers every Type but the ones turned off, and saves the one chosen', async () => {
+    const element = build();
+    graphql.emit(response([]));
+    getPicklistValues.emit({
+      values: [
+        { label: 'Spouse', value: 'Spouse' },
+        { label: 'Grandparent', value: 'Grandparent' },
+        { label: 'Friend', value: 'Friend' }
+      ]
+    });
+    getTurnedOffTypes.emit(['grandparent']);
+    await flush();
+    element.shadowRoot.querySelector('[data-id="add-relationship"]').click();
+    await flush();
+
+    const fields = Array.from(element.shadowRoot.querySelectorAll('lightning-input-field')).map(
+      (n) => n.fieldName
+    );
+    expect(fields).not.toContain('Type__c');
+    const picker = element.shadowRoot.querySelector('[data-id="type"]');
+    expect(picker.options.map((o) => o.value)).toEqual(['Spouse', 'Friend']);
+
+    picker.dispatchEvent(new CustomEvent('change', { detail: { value: 'Friend' } }));
+    await flush();
+    const form = element.shadowRoot.querySelector('lightning-record-edit-form');
+    form.submit = jest.fn();
+    picker.reportValidity = () => true;
+    form.dispatchEvent(
+      new CustomEvent('submit', { detail: { fields: { Status__c: 'Current' } }, cancelable: true })
+    );
+
+    expect(form.submit).toHaveBeenCalledWith({ Status__c: 'Current', Type__c: 'Friend' });
+  });
+
+  it('saves nothing until a Type is chosen', async () => {
+    const element = build();
+    graphql.emit(response([]));
+    await flush();
+    element.shadowRoot.querySelector('[data-id="add-relationship"]').click();
+    await flush();
+
+    const form = element.shadowRoot.querySelector('lightning-record-edit-form');
+    form.submit = jest.fn();
+    element.shadowRoot.querySelector('[data-id="type"]').reportValidity = () => false;
+    form.dispatchEvent(new CustomEvent('submit', { detail: { fields: {} }, cancelable: true }));
+
+    expect(form.submit).not.toHaveBeenCalled();
   });
 });

@@ -19,17 +19,38 @@ import SHIPPED_HEADING from '@salesforce/label/c.Core_CmdtManager_ShippedHeading
 import NEW_TITLE from '@salesforce/label/c.Core_CmdtManager_NewTitle';
 import EDIT_TITLE from '@salesforce/label/c.Core_CmdtManager_EditTitle';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
+import TURN_OFF from '@salesforce/label/c.Core_ModuleManager_TurnOffButton';
+import TURN_ON from '@salesforce/label/c.Core_ModuleManager_TurnOnButton';
+import OFF from '@salesforce/label/c.Core_Feature_Off';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const POLL_INTERVAL_MS = 3000;
 const POLL_ATTEMPTS = 20;
 
+/** A row's status: Off for a shipped row turned off, otherwise In use or Archived. */
+function statusOf(row, shippedSwitch) {
+  if (!row.archived) {
+    return IN_USE;
+  }
+  return row.shipped && shippedSwitch ? OFF : ARCHIVED;
+}
+
+/** What the page says once a shipped row is turned off or on. */
+function appliedMessage(turnedOff, label) {
+  const text = turnedOff
+    ? helpText('Core', 'Core_CmdtManager_TurnedOff')
+    : helpText('Core', 'Core_CmdtManager_TurnedOn');
+  return text.replace('{0}', label);
+}
+
 /**
  * The Custom metadata page in BarnCRM Settings: the organization's own rows of each editable
  * list, which it can add, edit, archive and restore, above the rows BarnCRM ships, which it
- * can only read. Saving is a metadata deployment, so the page waits on its outcome
- * (0085-custom-metadata-manager-edits-only-types-read-directly.md).
+ * can only read, or archive where the type allows it. Saving is a metadata deployment, so the
+ * page waits on its outcome (0085-custom-metadata-manager-edits-only-types-read-directly.md).
+ * A shipped relationship type is turned off and on through a setting instead, saved at once
+ * (NEXT-shipped-relationship-types-can-be-turned-off.md).
  */
 export default class CustomMetadataManager extends LightningElement {
   helpReady = isHelpLoaded('Core');
@@ -90,7 +111,7 @@ export default class CustomMetadataManager extends LightningElement {
         label: row.label,
         shipped: row.shipped,
         archived: row.archived,
-        statusText: row.archived ? ARCHIVED : IN_USE
+        statusText: statusOf(row, type.shippedSwitch)
       }));
       const own = rows.filter((row) => !row.shipped);
       return {
@@ -101,7 +122,17 @@ export default class CustomMetadataManager extends LightningElement {
         ],
         // A shipped row can only be archived or restored, and only where its type allows it.
         shippedColumns: type.shippedArchivable
-          ? [...columns, { type: 'action', typeAttributes: { rowActions: this.shippedRowActions } }]
+          ? [
+              ...columns,
+              {
+                type: 'action',
+                typeAttributes: {
+                  rowActions: type.shippedSwitch
+                    ? this.shippedSwitchActions
+                    : this.shippedRowActions
+                }
+              }
+            ]
           : columns,
         ownRows: own,
         hasOwnRows: own.length > 0,
@@ -114,6 +145,13 @@ export default class CustomMetadataManager extends LightningElement {
   shippedRowActions = (row, done) => {
     done([
       row.archived ? { label: RESTORE, name: 'restore' } : { label: ARCHIVE, name: 'archive' }
+    ]);
+  };
+
+  // A shipped row whose type is switched by a setting: Turn Off or Turn On, saved at once.
+  shippedSwitchActions = (row, done) => {
+    done([
+      row.archived ? { label: TURN_ON, name: 'restore' } : { label: TURN_OFF, name: 'archive' }
     ]);
   };
 
@@ -160,10 +198,12 @@ export default class CustomMetadataManager extends LightningElement {
     if (action === 'edit') {
       this.openForm(typeName, row);
     } else {
+      const archiving = action === 'archive';
       this.start(
         typeName,
         row.label,
-        setArchived({ typeName, developerName: row.developerName, archived: action === 'archive' })
+        setArchived({ typeName, developerName: row.developerName, archived: archiving }),
+        archiving
       );
     }
   }
@@ -222,11 +262,17 @@ export default class CustomMetadataManager extends LightningElement {
     }
   }
 
-  async start(typeName, label, request) {
+  async start(typeName, label, request, archiving) {
     this.busy = true;
     this.errorMessage = undefined;
     try {
       const jobId = await request;
+      if (!jobId) {
+        // No deployment: a shipped row turned off or on, already saved.
+        this.finish(appliedMessage(archiving, label), undefined);
+        this.load();
+        return true;
+      }
       this.pending = { jobId, label };
       this.statusMessage = helpText('Core', 'Core_CmdtManager_Saving');
       this.poll(jobId, label, POLL_ATTEMPTS);

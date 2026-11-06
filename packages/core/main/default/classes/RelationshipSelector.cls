@@ -55,9 +55,11 @@ public with sharing class RelationshipSelector {
 	}
 
 	/**
-	 * The shipped mapping from a type to its reciprocal. Read as shipped rather than in user
-	 * mode: it is package metadata, read only to administrators, and it holds no organization
-	 * data (the same reasoning as AutomationRegistrySelector).
+	 * The active mapping rows from a type to its reciprocal, shipped and the organization's
+	 * own. Read as shipped rather than in user mode: it is package metadata, read only to
+	 * administrators, and it holds no organization data (the same reasoning as
+	 * AutomationRegistrySelector). A shipped row the administrator turned off is still
+	 * returned; `RelationshipService` decides what that means (ADR-NEXT).
 	 */
 	public static List<Relationship_Type__mdt> selectTypeMappings() {
 		if (typeMappingOverride != null) {
@@ -70,6 +72,7 @@ public with sharing class RelationshipSelector {
 				Type__c,
 				Reciprocal_Type__c,
 				Is_Gendered__c,
+				Is_Shipped__c,
 				Active__c
 			FROM Relationship_Type__mdt
 			WHERE Active__c = TRUE

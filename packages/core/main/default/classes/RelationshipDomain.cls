@@ -69,6 +69,10 @@ public with sharing class RelationshipDomain {
 	 * A duplicate is counted in one direction: this person, that person, this type. A to B as
 	 * Parent and B to A as Parent are two different relationships, which is what makes the
 	 * other side of A to B as Parent (B to A as Child) legal rather than a duplicate.
+	 *
+	 * It also refuses a type the administrator turned off (ADR-NEXT) on a new relationship or
+	 * a change of type. A relationship that already has that type, and the other side BarnCRM
+	 * writes, which skips these checks, are left alone.
 	 */
 	public static void validate(List<Relationship__c> records, Map<Id, SObject> previousById) {
 		if (records == null || records.isEmpty()) {
@@ -76,7 +80,7 @@ public with sharing class RelationshipDomain {
 		}
 		List<Relationship__c> wellFormed = new List<Relationship__c>();
 		for (Relationship__c record : records) {
-			if (!checkPeople(record)) {
+			if (!checkType(record, previousById) || !checkPeople(record)) {
 				continue;
 			}
 			wellFormed.add(record);
@@ -85,6 +89,24 @@ public with sharing class RelationshipDomain {
 			return;
 		}
 		rejectDuplicates(wellFormed, previousById);
+	}
+
+	/** False, with the record refused, when it newly takes a type that is turned off. */
+	private static Boolean checkType(Relationship__c record, Map<Id, SObject> previousById) {
+		Relationship__c previous = previousById == null
+			? null
+			: (Relationship__c) previousById.get(record.Id);
+		Boolean newType = previous == null || record.Type__c != previous.Type__c;
+		if (newType && RelationshipService.isTurnedOff(record.Type__c)) {
+			record.addError(
+				String.format(
+					BarnHelp.text('Core', 'Core_Relationship_TypeTurnedOff'),
+					new List<Object>{ record.Type__c }
+				)
+			);
+			return false;
+		}
+		return true;
 	}
 
 	/**

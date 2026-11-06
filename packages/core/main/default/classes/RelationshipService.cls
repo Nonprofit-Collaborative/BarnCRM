@@ -51,6 +51,7 @@ public with sharing class RelationshipService {
 	private static final String TYPE_OTHER = 'Other';
 
 	private static Map<String, String> reciprocalByType;
+	private static Set<String> typesTurnedOff;
 
 	/**
 	 * Whether the org asks BarnCRM to keep both sides in step (R-RL1). An org that has
@@ -80,18 +81,56 @@ public with sharing class RelationshipService {
 		return String.isBlank(mapped) ? TYPE_OTHER : mapped;
 	}
 
+	/**
+	 * Whether a new relationship may not be given this type: a shipped type the administrator
+	 * turned off on the Custom Metadata page, with no other active row for the same type
+	 * (ADR-NEXT, `NEXT-shipped-relationship-types-can-be-turned-off.md`).
+	 */
+	public static Boolean isTurnedOff(String type) {
+		return String.isNotBlank(type) && turnedOffTypes().contains(type.toLowerCase());
+	}
+
+	/** The types turned off, lower case, as `isTurnedOff` reads them. */
+	public static Set<String> turnedOffTypes() {
+		if (reciprocalByType == null) {
+			loadTypeMappings();
+		}
+		return typesTurnedOff;
+	}
+
 	@TestVisible
 	private static void clearTypeCache() {
 		reciprocalByType = null;
+		typesTurnedOff = null;
 	}
 
+	/**
+	 * Reads the mapping. A shipped row that is turned off still maps its type, so the
+	 * relationships that already have it keep working; any other active row for the same type
+	 * wins over it, and only a type no such row maps counts as turned off.
+	 */
 	private static void loadTypeMappings() {
 		reciprocalByType = new Map<String, String>();
+		typesTurnedOff = new Set<String>();
+		Map<String, String> fromTurnedOff = new Map<String, String>();
+		Set<String> offNames = CustomMetadataManagerService.namesIn(
+			SettingsService.getSettings().Relationship_Types_Turned_Off__c
+		);
 		for (Relationship_Type__mdt mapping : RelationshipSelector.selectTypeMappings()) {
-			if (
-				String.isNotBlank(mapping.Type__c) && String.isNotBlank(mapping.Reciprocal_Type__c)
-			) {
-				reciprocalByType.put(mapping.Type__c.toLowerCase(), mapping.Reciprocal_Type__c);
+			if (String.isBlank(mapping.Type__c) || String.isBlank(mapping.Reciprocal_Type__c)) {
+				continue;
+			}
+			Boolean off =
+				mapping.Is_Shipped__c == true &&
+				mapping.DeveloperName != null &&
+				offNames.contains(mapping.DeveloperName.toLowerCase());
+			Map<String, String> target = off ? fromTurnedOff : reciprocalByType;
+			target.put(mapping.Type__c.toLowerCase(), mapping.Reciprocal_Type__c);
+		}
+		for (String type : fromTurnedOff.keySet()) {
+			if (!reciprocalByType.containsKey(type)) {
+				reciprocalByType.put(type, fromTurnedOff.get(type));
+				typesTurnedOff.add(type);
 			}
 		}
 	}

@@ -40,6 +40,10 @@ public with sharing class SampleDataConnections {
 			if (person == null || relatedPerson == null || person == relatedPerson) {
 				continue;
 			}
+			// A type the administrator turned off would be refused, failing the whole load.
+			if (RelationshipService.isTurnedOff((String) row.get('type'))) {
+				continue;
+			}
 			relationships.add(
 				new Relationship__c(
 					Sample_Data__c = true,

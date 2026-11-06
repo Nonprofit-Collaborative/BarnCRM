@@ -23,7 +23,10 @@ same way and needs the same permission set and Setup step as this page.
 
 The entries BarnCRM ships are shown on the same page, marked **Shipped with BarnCRM**,
 and cannot be changed. Upgrades keep them up to date, and they never overwrite what you
-added.
+added. A shipped relationship type your organization does not use can be turned off (see
+[Turning Off a Shipped Relationship Type](#turning-off-a-shipped-relationship-type)).
+The Relationship types list is shown only while the **Relationships** feature is on
+(BarnCRM Settings, General, Features).
 
 ## How to Turn It On
 
@@ -61,7 +64,7 @@ them.
    **Type**, and add two values: `Mentor` and `Mentee`. Save.
 2. Open **BarnCRM Settings**, **General**, **Custom Metadata**. Under **Relationship
    types** you see two tables. **Added by Your Organization** is empty. **Shipped with
-   BarnCRM** lists the eleven types, with no actions on them.
+   BarnCRM** lists the eleven types; each one's menu offers only **Turn Off**.
 3. Click **Add**. Fill in:
    - **Name**: Mentor
    - **Type**: Mentor
@@ -92,10 +95,12 @@ them.
   reads that type's own row whenever the other person's side is saved. Add both rows (Mentor
   to Mentee, and Mentee to Mentor). A type you add that is its own reciprocal, such as
   Neighbor to Neighbor, needs one row.
-- **Trying to change a shipped type.** Shipped types have no actions. To use a different
-  reciprocal for one of them, add your own type with a different name, for example
-  `Employer` instead of `Employer contact`. A type can have only one active row, so the
-  page refuses a second row for a type that already has one.
+- **Trying to change a shipped type.** A shipped type can only be turned off and on. To use
+  a different reciprocal for one of them, turn it off and add your own row for the same
+  Type, or add your own type with a different name, for example `Employer` instead of
+  `Employer contact`. A type can have only one active row, so the page refuses a second
+  row for a type that already has one, and refuses to turn a shipped type back on while
+  your own row for that Type is in use.
 - **Expecting Delete.** There is no delete. Salesforce does not let an app delete custom
   metadata, so you archive an entry instead, and it stops being used. An archived entry can
   be restored. To remove it for good, delete it in Setup (Custom Metadata Types,
@@ -106,6 +111,35 @@ them.
   after the page says it is still saving). Each new entry gets a short code at the end of
   its API name in Setup, for example `Org_Mentor_k3x9`, so the second add never overwrites
   the first. You may end up with two entries: archive the one you do not want.
+
+## Turning Off a Shipped Relationship Type
+
+If your organization never uses a type BarnCRM ships, for example **Grandparent** and
+**Grandchild**, turn it off so nobody picks it by mistake.
+
+1. Open **BarnCRM Settings**, **General**, **Custom Metadata**.
+2. Under **Relationship types**, in **Shipped with BarnCRM**, open the menu at the end of
+   the row and choose **Turn Off**. The change is saved at once, with no wait: the page says
+   "Grandparent is turned off. It is no longer offered for new relationships, and the ones
+   that already have it keep it." and the row's status is **Off**.
+3. Choose **Turn On** from the same menu to offer it again.
+
+What turning off does:
+
+- The **Type** list on a person's relationship card no longer offers it, and a new
+  relationship of that type, or a change to that type, is refused wherever it is saved
+  (Salesforce's own edit page, an import, the API) with "Grandparent is turned off for new
+  relationships in this organization. Choose another type, or ask your BarnCRM admin to turn
+  it back on in BarnCRM Settings, Custom Metadata." Loading sample data skips it.
+- Relationships that already have the type keep it, still show it, and both sides stay in
+  step.
+- BarnCRM still writes the other side of a pair whose other side is turned off. If you turn
+  off only Grandchild, a new Grandparent relationship still gives the other person
+  Grandchild. Turn off both sides of a pair to stop it entirely.
+- The shipped row itself is not changed: BarnCRM lists it as off in a setting. An upgrade
+  can still update its name or reciprocal, and never turns it back on.
+- Each change is listed under **Recent Changes**, with your name and the list before and
+  after.
 
 ## Match Sources
 
@@ -118,7 +152,7 @@ in the **Matching Logic** area of the **Duplicate Matching** tab; see
 
 | List | Here | Why |
 |---|---|---|
-| Relationship types | Add, edit, archive | BarnCRM reads the list directly, so an entry you add is used at once. |
+| Relationship types | Add, edit, archive; turn a shipped one off and on | BarnCRM reads the list directly, so an entry you add is used at once. Shown while the Relationships feature is on. |
 | Merge rules | Add, edit, archive | BarnCRM reads the list directly at each merge. |
 | Match sources | On the Duplicate Matching tab, Matching Logic: add, edit, deactivate; deactivate and activate a shipped one | BarnCRM reads the list directly when it scans for duplicates and matches an import. |
 | Rollups, import templates | No | BarnCRM copies the shipped entries into the Rollups and Import pages, which is where you add and change your own. |
