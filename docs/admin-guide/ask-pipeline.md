@@ -47,7 +47,8 @@ By default every fundraiser sees every ask (Public Read/Write), because a small 
 In the **BarnCRM Fundraising** app, the **Ask Pipeline** tab shows:
 
 - Totals at the top: **Open Asks** (count), **Open Ask Total**, **Won This Fiscal Year** (count and ask amount) and **Declined This Fiscal Year** (count). The fiscal year is your org's fiscal year from Setup, counted by **Closed Date**. The totals are always exact.
-- The **Board** (one column per stage with its count and total) and the **List**. The board draws up to 1,000 open ask cards and says so when there are more.
+- The **Board** (one column per stage with its count and total) and the **List**. The board draws up to 1,000 open ask cards and says so when there are more. A last **Recently Closed** column shows up to 50 asks closed in the last 30 days, each with its outcome, and its card menu has **Reopen Ask**.
+- Cards move by dragging (mouse, or touch with a press and hold), by keyboard (focus the card, Space to pick it up, arrow keys, Enter to drop, Escape to cancel), or by the card menu's **Move to**. Every move is read out to screen readers. Recently Closed and Not in Your Stage List cards cannot be dragged, and nothing can be dropped on those columns.
 - **Everyone's Asks** and **My Asks** filters, and a **New Ask** button.
 
 The **Asks** tab has the list views **Open Asks**, **My Open Asks** and **All Asks**. An **Asks** related list, with a **New** button, is on person, household and organization pages in the BarnCRM Fundraising app. The user guide page [The Ask Pipeline](../user-guide/ask-pipeline.md) covers the daily steps.
@@ -59,7 +60,7 @@ The **Asks** tab has the list views **Open Asks**, **My Open Asks** and **All As
 3. Choose **New Ask**. Pick a **Donor Contact**, type an **Ask Amount** of 1,000 and a **Target Date**, and save. The card is in **Identified**.
 4. Drag the card to **Cultivating**. The column counts and totals change.
 5. In the card's menu choose **Close Ask**. Under **How Did It End?** choose **Won**, then **Record the Gift Now**, and save.
-6. The card leaves the board. **Won This Fiscal Year** shows 1, and the gift is on the donor's record.
+6. The card moves to **Recently Closed** with a **Won** badge. **Won This Fiscal Year** shows 1, and the gift is on the donor's record.
 
 ## Common Mistakes
 
@@ -73,7 +74,7 @@ The **Asks** tab has the list views **Open Asks**, **My Open Asks** and **All As
 
 - **Deleting a donor** keeps the ask, with no donor, and it can still be closed.
 - **Erase a Person** clears **Next Step** on their asks and turns open ones into **Withdrawn**. The asks are kept, like gifts.
-- **To reopen an ask,** edit it and set **Outcome** back to **Open**. **Closed Date** clears.
+- **To reopen an ask,** choose **Reopen Ask** on its card in **Recently Closed** and confirm, or edit it and set **Outcome** back to **Open**. **Closed Date** clears. A linked gift or pledge stays linked; remove the link by editing the ask if it no longer applies.
 
 ## What This Does Not Do Yet
 

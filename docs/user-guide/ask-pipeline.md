@@ -16,7 +16,7 @@ You should see: the ask on the board, in its stage column.
 
 ## To Read the Board
 
-The numbers at the top are **Open Asks**, **Open Ask Total**, **Won This Fiscal Year** and **Declined This Fiscal Year**. Each column shows its stage with a count and a total. Each card shows the donor, ask amount, target date, next step, who it is assigned to and "N days in this stage". Only open asks are on the board.
+The numbers at the top are **Open Asks**, **Open Ask Total**, **Won This Fiscal Year** and **Declined This Fiscal Year**. Each column shows its stage with a count and a total. Each card shows the donor, ask amount, target date, next step, who it is assigned to and "N days in this stage". The last column, **Recently Closed**, shows asks closed in the last 30 days with their outcome (up to 50).
 
 Click **Everyone's Asks** or **My Asks** to filter by who an ask is assigned to. Click **List** for a table of the same open asks, in stage order, and **Board** to go back.
 
@@ -24,7 +24,7 @@ If a column is called **Not in Your Stage List**, your admin renamed or removed 
 
 ## To Move an Ask
 
-Drag the card to another column. Or open the card's menu and choose **Move to** and the stage.
+Drag the card to another column (on a touch screen, press and hold the card first). Or, with the keyboard, focus the card, press Space, use the arrow keys to choose the column and press Enter (Escape cancels). Or open the card's menu and choose **Move to** and the stage.
 
 You should see: the card in its new column, the counts and totals updated, and "0 days in this stage".
 
@@ -40,13 +40,18 @@ You should see: the card in its new column, the counts and totals updated, and "
 4. Optionally type a **Next Ask Date**, the day to ask this donor again.
 5. Click **Save**.
 
-You should see: the card leaves the board and the totals change. The gift or pledge, the link and the outcome save together, or none of them does.
+You should see: the card moves to **Recently Closed** with its outcome, and the totals change. The gift or pledge, the link and the outcome save together, or none of them does.
 
 The reminder follows the donor's own **Next Ask Date**: while a donor has open asks, it is the earliest **Target Date** among them. When you close the donor's last open ask, fill in the ask's **Next Ask Date** as you close it, and the donor's date becomes that date (if it is after today). Without one, the donor's date is cleared. A date someone changed by hand on the donor is always kept ([Ask reminders](ask-reminders.md)).
 
 ## To Reopen an Ask
 
-Open the ask, edit it and set **Outcome** back to **Open**. **Closed Date** clears and the ask returns to the board.
+1. In **Recently Closed**, open the card's menu and choose **Reopen Ask**.
+2. Click **Reopen Ask** in the window to confirm.
+
+You should see: the card back in its stage column with outcome **Open**. **Closed Date** clears. A gift or pledge linked when it closed stays linked.
+
+For an ask closed more than 30 days ago, open the ask, edit it and set **Outcome** back to **Open**.
 
 ## To See What Changed
 

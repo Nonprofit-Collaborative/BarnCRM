@@ -48,7 +48,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | Read the first column. | Count 2 and total 7,000.00. Each card shows donor, ask amount, target date, next step, assigned to and "0 days in this stage". |
 | 3 | Drag the Luis Garcia card to **Cultivating**. | The card moves. **Identified** shows 1 and 2,000.00; **Cultivating** shows 1 and 5,000.00. |
 | 4 | Open the Harper Garcia card's menu. | It offers **Move to** each other stage, **Open** and **Close Ask**. |
-| 5 | Choose **Move to Ask Planned**. | The card moves to **Ask Planned**. |
+| 5 | Choose **Move to Ask Planned**. | The card moves to **Ask Planned**, and a screen reader hears "Moved the ask from Identified to Ask Planned." |
+| 5a | Focus the Harper Garcia card, press Space, then the Right arrow, then Enter. On a touch screen, press and hold the Luis Garcia card and drag it to **Qualified**. | Each card moves one column and the move is announced; Escape before Enter leaves the card where it was. |
+| 5b | On a card choose **Close Ask**, **Won**, **Link a Gift or Pledge Already Entered**, and type in the gift picker, then the pledge picker. Cancel. | Each gift shows its name with gift date and amount; each pledge its start date and expected total. |
 | 6 | Click **List**. | A table with **Ask**, **Donor**, **Stage**, **Ask Amount**, **Target Date**, **Next Step**, **Assigned To** and **Days in Stage**, in stage order. Click **Board** to return. |
 | 7 | Click **My Asks**, then **Everyone's Asks**. | **My Asks** shows only asks assigned to you; **Everyone's Asks** shows both. |
 
@@ -62,7 +64,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | On card A choose **Close Ask**. **How Did It End?** `Won`. | **What Did It Produce?** shows **Record the Gift Now**, **Record a Pledge**, **Link a Gift or Pledge Already Entered** and **Record It Later**. |
-| 2 | Choose **Record the Gift Now**: **Amount** `1000`, **Gift Date** today, a **How It Arrived** value. Save. | The card leaves the board. **Won This Fiscal Year** counts it. |
+| 2 | Choose **Record the Gift Now**: **Amount** `1000`, **Gift Date** today, a **How It Arrived** value. Save. | The card moves to **Recently Closed** with a **Won** badge. **Won This Fiscal Year** counts it. |
 | 3 | Open ask A. | **Outcome** Won, **Closed Date** today, **Resulting Gift** filled in. Open the gift: donor, fund and appeal match the ask, and the gift is posted as Quick Gift Entry would post it. |
 | 4 | On card B choose **Close Ask**, **Won**, **Record a Pledge**: **Pledge Total** `1200`, **First Payment Date** today, **How Often** `Monthly`, **Number of Payments** `12`. Save. | Ask B shows **Resulting Commitment**. The commitment is type Pledge with a 12 row payment schedule of 100.00 each. |
 | 5 | On card C choose **Close Ask**, **Won**, **Link a Gift or Pledge Already Entered**, and pick the 300 gift of Luis Garcia. Save. | Ask C shows that gift as **Resulting Gift**. |
@@ -78,9 +80,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On card E choose **Close Ask**, **Declined**, **Next Ask Date** a date six months out. Save. | The card leaves the board. **Declined This Fiscal Year** counts it. |
+| 1 | On card E choose **Close Ask**, **Declined**, **Next Ask Date** a date six months out. Save. | The card moves to **Recently Closed** with a **Declined** badge and cannot be dragged. **Declined This Fiscal Year** counts it. |
 | 2 | Open ask E. | **Outcome** Declined, **Closed Date** today, **Next Ask Date** as typed. |
-| 3 | On card F choose **Close Ask**, **Withdrawn**, no **Next Ask Date**. Save. | The card leaves the board. **Declined This Fiscal Year** does not change. |
+| 3 | On card F choose **Close Ask**, **Withdrawn**, no **Next Ask Date**. Save. | The card moves to **Recently Closed**. **Declined This Fiscal Year** does not change. |
 | 4 | Open ask F. | **Outcome** Withdrawn, **Closed Date** today. |
 
 **Cleanup:** keep E for T-ASK-06.
@@ -88,12 +90,13 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 ## T-ASK-06: Reopen and History
 
 **Purpose:** confirm reopening and the history list.
-**Prerequisites:** staff; ask E (Declined).
+**Prerequisites:** staff; ask E (Declined) and ask F (Withdrawn).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open ask E, edit it, set **Outcome** to `Open`. Save. | Saved. **Closed Date** is empty. |
-| 2 | Open **Ask Pipeline**. | Ask E is on the board again. |
+| 1 | On **Ask Pipeline**, in **Recently Closed**, open card E's menu and choose **Reopen Ask**. | A window says the ask goes back on the board at its stage and a linked gift or pledge stays linked. Choose **Cancel**: nothing changes. |
+| 2 | Choose **Reopen Ask** again and confirm. | "The ask from ... is open again, at ..." Ask E is back in its stage column. Open it: **Outcome** Open, **Closed Date** empty. |
+| 2a | Open ask F, edit it, set **Outcome** to `Open`. Save. | Saved. **Closed Date** is empty and F is back on the board. |
 | 3 | Change E's **Ask Amount** to `2500` and **Target Date**. Save. | Saved. |
 | 4 | On ask E, read the **Ask History** list. | Rows for the **Outcome** change (Declined to Open), the **Ask Amount** change and the **Target Date** change, each with who and when. |
 

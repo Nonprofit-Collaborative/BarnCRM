@@ -16,6 +16,9 @@ public with sharing class AskPipelineController {
 	/** The most cards the board draws; the totals are counted by the database and stay exact. */
 	@TestVisible
 	private static Integer maxCards = 1000;
+	/** How far back, in days, and how many, the Recently Closed column reaches. */
+	private static final Integer RECENT_DAYS = 30;
+	private static final Integer MAX_RECENT = 50;
 
 	public static final String RESULT_GIFT = 'gift';
 	public static final String RESULT_PLEDGE = 'pledge';
@@ -32,6 +35,9 @@ public with sharing class AskPipelineController {
 		public List<Total> stageTotals = new List<Total>();
 		@AuraEnabled
 		public List<Card> cards = new List<Card>();
+		/** Asks closed in the last few weeks, newest first, so a mistaken close can be undone. */
+		@AuraEnabled
+		public List<Card> recentlyClosed = new List<Card>();
 		@AuraEnabled
 		public Boolean truncated = false;
 		@AuraEnabled
@@ -88,6 +94,10 @@ public with sharing class AskPipelineController {
 		public String ownerName;
 		@AuraEnabled
 		public Date stageChangedDate;
+		@AuraEnabled
+		public String outcome;
+		@AuraEnabled
+		public Date closedDate;
 	}
 
 	/** One choice in a list. */
@@ -165,6 +175,15 @@ public with sharing class AskPipelineController {
 				board.cards.add(toCard(ask));
 			}
 			board.truncated = board.openCount > board.cards.size();
+			for (
+				Ask__c ask : AskSelector.recentlyClosed(
+					ownerId,
+					board.today.addDays(-RECENT_DAYS),
+					MAX_RECENT
+				)
+			) {
+				board.recentlyClosed.add(toCard(ask));
+			}
 			Map<String, AskSelector.StageTotal> closed = AskSelector.closedThisFiscalYear(ownerId);
 			AskSelector.StageTotal won = closed.get(AskRules.OUTCOME_WON);
 			if (won != null) {
@@ -194,6 +213,33 @@ public with sharing class AskPipelineController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.moveStage', askId);
+			throw UserErrors.message(Label.Giving_Ask_ErrorUnexpected);
+		}
+	}
+
+	/**
+	 * Reopens a closed ask (people-giving-19): its outcome goes back to Open, the ask rules clear
+	 * its Closed Date, and it returns to its stage on the board. A gift or pledge it recorded stays
+	 * linked, because those are real records the ask produced.
+	 */
+	@AuraEnabled
+	public static void reopenAsk(Id askId) {
+		if (!Schema.SObjectType.Ask__c.isUpdateable()) {
+			throw UserErrors.message(Label.Giving_Ask_ErrorNoPermission);
+		}
+		if (askId == null || AskSelector.forClose(askId) == null) {
+			throw UserErrors.message(Label.Giving_Ask_ErrorNotFound);
+		}
+		try {
+			Database.update(
+				new Ask__c(Id = askId, Outcome__c = AskRules.OUTCOME_OPEN),
+				true,
+				AccessLevel.USER_MODE
+			);
+		} catch (DmlException e) {
+			throw UserErrors.message(e.getDmlMessage(0));
+		} catch (Exception e) {
+			ErrorLogger.log(e, CONTEXT + '.reopenAsk', askId);
 			throw UserErrors.message(Label.Giving_Ask_ErrorUnexpected);
 		}
 	}
@@ -375,6 +421,11 @@ public with sharing class AskPipelineController {
 		card.nextStep = ask.Next_Step__c;
 		card.stageChangedDate = ask.Stage_Changed_Date__c;
 		card.ownerName = ask.Owner?.Name;
+		// Only the Recently Closed query reads these; an open ask's card has no outcome to show.
+		if (ask.isSet(Ask__c.Outcome__c)) {
+			card.outcome = ask.Outcome__c;
+			card.closedDate = ask.Closed_Date__c;
+		}
 		if (ask.Donor_Contact__c != null) {
 			card.donorId = ask.Donor_Contact__c;
 			card.donorName = ask.Donor_Contact__r?.Name;

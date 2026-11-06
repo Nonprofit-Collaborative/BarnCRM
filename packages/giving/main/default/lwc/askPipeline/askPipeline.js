@@ -4,7 +4,12 @@ import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getBoard from '@salesforce/apex/AskPipelineController.getBoard';
 import moveStage from '@salesforce/apex/AskPipelineController.moveStage';
 import closeAsk from '@salesforce/apex/AskPipelineController.closeAsk';
-import { buildColumns, listRows } from 'c/askPipelineModel';
+import reopenAsk from '@salesforce/apex/AskPipelineController.reopenAsk';
+import BarnConfirmModal from 'c/barnConfirmModal';
+import { iconFor } from 'c/barnIcons';
+import { buildColumns, closedColumn, listRows } from 'c/askPipelineModel';
+import { createDragController } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
 
 import TITLE from '@salesforce/label/c.Giving_AskPipeline_Title';
 import VIEW_BOARD from '@salesforce/label/c.Giving_AskPipeline_ViewBoard';
@@ -59,10 +64,16 @@ import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import CLOSED from '@salesforce/label/c.Giving_AskPipeline_Closed';
 import MOVED from '@salesforce/label/c.Core_Shared_MovedTo';
 import ERROR_ACTION from '@salesforce/label/c.Giving_AskPipeline_ErrorAction';
+import REOPEN_ASK from '@salesforce/label/c.Giving_AskPipeline_ReopenAsk';
+import RECENTLY_CLOSED from '@salesforce/label/c.Giving_AskPipeline_RecentlyClosed';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ACTION_OPEN = 'open';
 const ACTION_CLOSE = 'close';
+const ACTION_REOPEN = 'reopen';
+const WON = 'Won';
+const CARD_CLASS = 'slds-item ask-card slds-var-m-bottom_x-small';
+const COLUMN_CLASS = 'ask-column';
 const MOVE_PREFIX = 'move:';
 const CONTACT_PREFIX = '003';
 
@@ -75,17 +86,27 @@ const messageOf = (error) =>
 /**
  * The Ask Pipeline (G-26, canonical model Section 25R): every open ask by stage as a board or a
  * list, with the totals at the top, a drag or a menu to move an ask, and the Close Ask dialog that
- * records what a win produced (R-SO5).
+ * records what a win produced (R-SO5). A Recently Closed column after the stages holds the asks
+ * closed in the last 30 days, each with Reopen Ask on its menu (people-giving-19).
+ *
+ * Dragging a card runs on the Core kit's `c/barnDrag` (pointer events, so touch works after a
+ * press and hold, plus Space and the arrow keys); the card's Move to menu stays, and every move
+ * is announced in a live region.
  *
  * The columns are worked out by the framework-free `askPipelineModel`; this component only draws
- * them and talks to `AskPipelineController`. Moving and closing are offered only to a person who
- * may edit asks.
+ * them and talks to `AskPipelineController`. Moving, closing and reopening are offered only to a
+ * person who may edit asks.
  */
 export default class AskPipeline extends NavigationMixin(LightningElement) {
-  helpReady = isHelpLoaded('Giving');
+  helpReady = isHelpLoaded(['Giving', 'Core']);
+
+  icons = { pipeline: iconFor('Ask_Pipeline') };
 
   labels = {
     title: TITLE,
+    get dragInstructions() {
+      return dragInstructions();
+    },
     get intro() {
       return helpText('Giving', 'Giving_AskPipeline_Intro');
     },
@@ -164,13 +185,25 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
     { label: COL_DAYS, fieldName: 'daysInStage', type: 'number' }
   ];
 
+  /** The display info every record picker in the suite carries, so two look-alikes differ. */
+  giftDisplayInfo = { primaryField: 'Name', additionalFields: ['Gift_Date__c', 'Amount__c'] };
+  pledgeDisplayInfo = {
+    primaryField: 'Name',
+    additionalFields: ['Start_Date__c', 'Expected_Total__c']
+  };
+
   board;
   columns = [];
+  closed;
   view = 'board';
   scope = 'all';
   isLoading = true;
   errorMessage;
-  draggedId;
+  liveMessage = '';
+
+  /** The drag in progress, as c/barnDrag reports it: the carried card and the column under it. */
+  dragState = {};
+  drag;
 
   closing;
   form = {};
@@ -179,11 +212,35 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
 
   connectedCallback() {
     if (!this.helpReady) {
-      loadHelp('Giving').then(() => {
+      loadHelp(['Giving', 'Core']).then(() => {
         this.helpReady = true;
       });
     }
+    this.drag = createDragController({
+      root: this.template,
+      layout: 'columns',
+      messages: dragMessages(),
+      announce: (text) => {
+        this.liveMessage = text;
+      },
+      onChange: (state) => {
+        this.dragState = state;
+      },
+      onDrop: ({ itemId, toZone }) => {
+        const card = this.findCard(itemId);
+        if (!toZone || !card || card.stage === toZone) {
+          return false;
+        }
+        return this.move(itemId, toZone, false);
+      }
+    });
     this.load();
+  }
+
+  disconnectedCallback() {
+    if (this.drag) {
+      this.drag.destroy();
+    }
   }
 
   async load() {
@@ -194,9 +251,12 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
       this.columns = this.decorate(
         buildColumns(this.board.stages, this.board.stageTotals, this.board.cards, this.board.today)
       );
+      const closed = closedColumn(this.board.recentlyClosed);
+      this.closed = closed ? this.decorateClosed(closed) : undefined;
     } catch (error) {
       this.errorMessage = messageOf(error);
       this.columns = [];
+      this.closed = undefined;
     } finally {
       this.isLoading = false;
     }
@@ -210,7 +270,6 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
       ...column,
       title: column.isOther ? OTHER_COLUMN_LABEL : column.stage,
       isEmpty: column.cards.length === 0,
-      dropClass: 'ask-column slds-box slds-box_x-small slds-theme_shade',
       cards: column.cards.map((card) => ({
         ...card,
         donorLabel: card.donorName || NO_DONOR,
@@ -220,10 +279,41 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
             ? null
             : format(DAYS_IN_STAGE, card.daysInStage),
         menuLabel: format(CARD_ACTIONS, card.name),
-        draggable: canEdit ? 'true' : 'false',
+        canDrag: canEdit,
         menuItems: this.menuFor(card, stages, canEdit)
       }))
     }));
+  }
+
+  /** The Recently Closed column: each card shows how it ended and offers Reopen Ask. */
+  decorateClosed(column) {
+    const canEdit = this.canEdit;
+    const outcomes = {
+      Won: OUTCOME_WON,
+      Declined: OUTCOME_DECLINED,
+      Withdrawn: OUTCOME_WITHDRAWN
+    };
+    return {
+      ...column,
+      title: RECENTLY_CLOSED,
+      isEmpty: false,
+      cards: column.cards.map((card) => {
+        const items = [{ label: OPEN, value: ACTION_OPEN, key: ACTION_OPEN }];
+        if (canEdit) {
+          items.push({ label: REOPEN_ASK, value: ACTION_REOPEN, key: ACTION_REOPEN });
+        }
+        return {
+          ...card,
+          donorLabel: card.donorName || NO_DONOR,
+          daysText: null,
+          menuLabel: format(CARD_ACTIONS, card.name),
+          canDrag: false,
+          outcomeLabel: outcomes[card.outcome] || card.outcome,
+          outcomeStatus: card.outcome === WON ? 'success' : 'closed',
+          menuItems: items
+        };
+      })
+    };
   }
 
   menuFor(card, stages, canEdit) {
@@ -264,8 +354,44 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
     return Boolean(this.board) && !this.hasError;
   }
 
+  /** Nothing open and nothing recently closed: the empty state instead of a bare board. */
   get isEmpty() {
-    return this.hasBoard && this.board.openCount === 0;
+    return this.hasBoard && this.board.openCount === 0 && !this.closed;
+  }
+
+  /** The stage columns, then Recently Closed, with the drop highlight and the carried card. */
+  get boardColumns() {
+    const all = this.closed ? [...this.columns, this.closed] : this.columns;
+    const state = this.dragState || {};
+    return all.map((column) => {
+      // Only a stage in the list takes a drop: not Other, not Recently Closed.
+      const isZone = this.canEdit && !column.isOther && !column.isClosed;
+      return {
+        ...column,
+        zoneId: isZone ? column.stage : undefined,
+        dropClass:
+          state.active && isZone && column.stage === state.overZone
+            ? `${COLUMN_CLASS} ask-column_drop`
+            : COLUMN_CLASS,
+        cards: column.cards.map((card) => {
+          let cardClass = CARD_CLASS;
+          if (card.canDrag && isZone) {
+            cardClass += ' ask-card_movable';
+          }
+          if (state.active && card.id === state.itemId) {
+            cardClass += ' ask-card_dragging';
+          }
+          const movable = card.canDrag && isZone;
+          return {
+            ...card,
+            cardClass,
+            showHandle: movable,
+            dragId: movable ? card.id : undefined,
+            tabIndex: movable ? '0' : undefined
+          };
+        })
+      };
+    });
   }
 
   get showBoard() {
@@ -322,40 +448,72 @@ export default class AskPipeline extends NavigationMixin(LightningElement) {
       this.openRecord(askId);
     } else if (value === ACTION_CLOSE) {
       this.startClose(askId);
+    } else if (value === ACTION_REOPEN) {
+      this.reopen(askId);
     } else if (value.startsWith(MOVE_PREFIX)) {
       this.move(askId, value.substring(MOVE_PREFIX.length));
     }
   }
 
-  // Drag and drop: the menu does the same for a keyboard or a screen reader.
-  handleDragStart(event) {
-    this.draggedId = event.currentTarget.dataset.id;
-    if (event.dataTransfer) {
-      event.dataTransfer.setData('text/plain', this.draggedId);
+  // Drag and drop through c/barnDrag; the card's Move to menu does the same.
+  handlePointerDown(event) {
+    if (event.currentTarget.dataset.dragId) {
+      this.drag.pointerDown(event);
     }
   }
 
-  handleDragOver(event) {
-    if (this.canEdit && event.currentTarget.dataset.stage) {
-      event.preventDefault();
+  handleDragKey(event) {
+    if (event.currentTarget.dataset.dragId) {
+      this.drag.keyDown(event);
     }
   }
 
-  handleDrop(event) {
-    event.preventDefault();
-    const stage = event.currentTarget.dataset.stage;
-    const askId = this.draggedId;
-    this.draggedId = undefined;
+  /**
+   * Moves an ask to another stage. A move from the menu is announced here; a drag is announced
+   * by the drag controller. Resolves true when the move was saved, false when it was refused.
+   */
+  async move(askId, stage, announce = true) {
     const card = this.findCard(askId);
-    if (stage && card && card.stage !== stage) {
-      this.move(askId, stage);
-    }
-  }
-
-  async move(askId, stage) {
     try {
       await moveStage({ askId, stage });
       this.toast(format(MOVED, stage), 'success');
+      if (announce) {
+        this.liveMessage = helpText(
+          'Giving',
+          'Giving_AskPipeline_Moved',
+          card ? card.donorLabel : askId,
+          stage
+        );
+      }
+      await this.load();
+      return true;
+    } catch (error) {
+      this.toast(messageOf(error), 'error');
+      return false;
+    }
+  }
+
+  /** Reopens a recently closed ask after a one-line confirm (people-giving-19). */
+  async reopen(askId) {
+    const card = this.closed && this.closed.cards.find((candidate) => candidate.id === askId);
+    if (!card) {
+      return;
+    }
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: REOPEN_ASK,
+      message: helpText('Giving', 'Giving_AskPipeline_ReopenConfirm', card.donorLabel, card.stage),
+      confirmLabel: REOPEN_ASK,
+      cancelLabel: CANCEL
+    });
+    if (!confirmed) {
+      return;
+    }
+    try {
+      await reopenAsk({ askId });
+      const done = helpText('Giving', 'Giving_AskPipeline_Reopened', card.donorLabel, card.stage);
+      this.toast(done, 'success');
+      this.liveMessage = done;
       await this.load();
     } catch (error) {
       this.toast(messageOf(error), 'error');
