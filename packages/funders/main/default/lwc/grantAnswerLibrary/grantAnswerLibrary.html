@@ -19,7 +19,21 @@
       </template>
 
       <template lwc:if={isEmpty}>
-        <p data-id="empty" class="slds-text-body_small">{labels.empty}</p>
+        <c-barn-empty-state
+          data-id="empty"
+          size="small"
+          heading={labels.noAnswers}
+          message={labels.empty}
+        >
+          <template lwc:if={canCreate}>
+            <lightning-button
+              data-id="empty-new"
+              variant="brand"
+              label={labels.newAnswer}
+              onclick={handleNew}
+            ></lightning-button>
+          </template>
+        </c-barn-empty-state>
       </template>
 
       <template lwc:if={hasAnswers}>

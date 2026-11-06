@@ -1,7 +1,7 @@
 {
   "languages": ["en"],
   "texts": {
-    "Funders_Answers_Empty": "No answers yet. Keep the application answers you reuse on the Grant Answers tab.",
+    "Funders_Answers_Empty": "Keep the application answers you reuse on the Grant Answers tab.",
     "Funders_Answers_LoadFailed": "The Answer Library did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Funders_Award_Saved": "Awarded. Open {0} to build its payment schedule.",
     "Funders_Board_Empty": "Nothing to show for this fiscal year yet.",

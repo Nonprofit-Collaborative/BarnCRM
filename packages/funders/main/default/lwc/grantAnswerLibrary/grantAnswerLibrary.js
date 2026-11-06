@@ -20,6 +20,7 @@ import WORDS from '@salesforce/label/c.Funders_Answers_Words';
 import LAST_USED from '@salesforce/label/c.Funders_Answers_LastUsed';
 import NEVER_USED from '@salesforce/label/c.Funders_Answers_NeverUsed';
 import NO_MATCH from '@salesforce/label/c.Funders_Answers_NoMatch';
+import NO_ANSWERS from '@salesforce/label/c.Funders_Answers_NoAnswers';
 import NEW_ANSWER from '@salesforce/label/c.Funders_Answers_New';
 import ERROR_LOAD from '@salesforce/label/c.Funders_Answers_ErrorLoad';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -45,7 +46,8 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
     get empty() {
       return helpText('Funders', 'Funders_Answers_Empty');
     },
-    noMatch: NO_MATCH
+    noMatch: NO_MATCH,
+    noAnswers: NO_ANSWERS
   };
 
   library;
