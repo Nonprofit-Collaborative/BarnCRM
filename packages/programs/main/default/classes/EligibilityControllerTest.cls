@@ -79,6 +79,14 @@ private class EligibilityControllerTest {
 			Set<String> names = new Set<String>();
 			for (EligibilityController.Field field : state.fields) {
 				names.add(field.apiName);
+				if (field.apiName == 'Referral_Source__c') {
+					Assert.isTrue(
+						field.choices.contains('School'),
+						'A picklist offers its choices.'
+					);
+				} else if (field.apiName == 'Intake_Date__c') {
+					Assert.isTrue(field.choices.isEmpty(), 'A date field has no choices.');
+				}
 			}
 			Assert.isTrue(names.contains('Referral_Source__c'), 'An intake picklist is offered.');
 			Assert.isTrue(names.contains('Intake_Date__c'), 'An intake date is offered.');
@@ -251,7 +259,7 @@ private class EligibilityControllerTest {
 				Assert.fail('A missing program must be refused.');
 			} catch (AuraHandledException refused) {
 				Assert.areEqual(
-					Label.Programs_Elig_ActionFailed,
+					BarnHelp.text('Programs', 'Programs_Fail_Elig'),
 					refused.getMessage(),
 					'Said in the label.'
 				);

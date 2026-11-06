@@ -15,7 +15,7 @@
           <lightning-spinner alternative-text={label.loading} size="small"></lightning-spinner>
         </template>
         <template lwc:if={errorMessage}>
-          <p class="slds-text-color_error" role="alert" data-id="error">{errorMessage}</p>
+          <c-barn-notice variant="error" message={errorMessage} data-id="error"></c-barn-notice>
         </template>
         <template lwc:if={lastService}>
           <p class="slds-text-body_regular slds-var-m-bottom_x-small" data-id="last-service">
@@ -29,7 +29,7 @@
           </p>
         </template>
         <template lwc:if={showEmpty}>
-          <p class="slds-text-body_regular" data-id="empty">{label.empty}</p>
+          <c-barn-empty-state size="compact" heading={label.empty} data-id="empty"></c-barn-empty-state>
         </template>
         <ul class="slds-has-dividers_bottom-space">
           <template for:each={rows} for:item="row">
@@ -45,7 +45,7 @@
                   onclick={handleOpen}
                   >{row.programLabel}</a
                 >
-                <span class={row.badgeClass} data-id="stage">{row.stageLabel}</span>
+                <c-barn-status-badge status={row.statusWord} label={row.stageLabel} data-id="stage"></c-barn-status-badge>
               </div>
               <template lwc:if={row.startDate}>
                 <p class="slds-text-body_small slds-text-color_weak" data-id="started">

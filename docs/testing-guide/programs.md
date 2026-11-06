@@ -161,8 +161,14 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 5 | Click **New** for a contact who is not enrolled in Food pantry, with **Hot meal**. | Saved with no enrollment. |
 | 6 | In **BarnCRM Settings**, open **Automation** and find **Service Delivery: absences, enrollment**. | Listed as always on, with no switch. |
 | 7 | Open **Hot meal** and try to delete it. | Refused: the service has deliveries. |
+| 8 | In the **BarnCRM Programs** app, open an Enrolled Food pantry person and click **Record Service**. | A form with **Person** filled in, **Service** listing every active service as "Program: Service", **Delivery Date** today, **Attendance** Present and **Quantity** 1. There is no Contact or Account field. |
+| 9 | Pick **Grocery bag** and click **Save**. | "Service recorded." The form closes; the new delivery has the person as **Contact** and their Food pantry enrollment filled in. |
+| 10 | Open that person's Food pantry enrollment and click **Record Service**. Set **Attendance** to **Excused Absence**. | **Person** and the enrollment's services are filled in (one service is chosen for you); **Quantity** is greyed out. Save: the delivery has quantity 0 and is linked to the enrollment. |
+| 11 | On the same enrollment, click **Record Service**, change **Person** to someone else and save. | Saved for the other person, not linked to this enrollment. |
+| 12 | On a household or organization account in the Programs app, open the actions. | No **Record Service**. On a person account org, a person account shows it. |
+| 13 | As the Read Only user, click **Record Service** on a person. | The form says you can see services but not record them; there is no **Save**. |
 
-**Cleanup:** delete the deliveries made in steps 1 and 5. Run T-PRG-08 to remove the sample data.
+**Cleanup:** delete the deliveries made in steps 1, 5 and 9 to 11. Run T-PRG-08 to remove the sample data.
 
 ## T-PRG-11: Intake and Eligibility, and the Programs Settings Page
 
@@ -206,10 +212,10 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As the admin, open **BarnCRM Settings**, the **Programs** section, then **Programs Settings**. | A **Participant Privacy** card with **Shared** chosen, "Default: Shared" under it, and **Save** greyed out. |
+| 1 | As the admin, open **BarnCRM Settings**, the **Programs** section, then **Programs Settings**. | A **Participant Privacy** section with **Shared** chosen, "Default: Shared" under it, and no save bar. |
 | 2 | As the first staff user, enroll a test person in the program on its **Program Roster** panel, then record one delivery for them in the **Service Delivery Log**. | Both saved. |
 | 3 | As the second staff user, open the program and the **Enrollments** and **Service Deliveries** tabs, **All** lists. | The enrollment and the delivery are listed. |
-| 4 | As the admin, choose **Private** on the Participant Privacy card and click **Save**. | "Saved. It applies to every enrollment and delivery within a minute." **Save** is greyed out again. |
+| 4 | As the admin, choose **Private** under Participant Privacy. A save bar with **Discard** and **Save** appears at the bottom; click **Save**. | A green notice: "Saved. It applies to every enrollment and delivery within a minute." The save bar goes away. (Choosing again and clicking **Discard** puts the saved choice back.) |
 | 5 | Wait a minute. As the second staff user, repeat step 3. | Neither record is listed, on the roster or the tabs. |
 | 6 | As the first staff user, repeat step 3. | Both are listed: they own them. |
 | 7 | As the admin, repeat step 3. | Both are listed. |
@@ -227,7 +233,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As the admin, open the **BarnCRM Programs** app. | **Programs Dashboard** is the first tab. |
-| 2 | Open **Programs Dashboard**. | Period **This Month**; seven tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Counted Without Names, Services Delivered, Attendance Rate) and a **By Program** table listing every Active program by name. |
+| 2 | Open **Programs Dashboard**. | Period **This Month**; seven tiles (Active Programs, Open Enrollments, New Enrollments, People Served, Counted Without Names, Services Delivered, Attendance Rate), a **Tools** row with a tile for each Programs tab (each opens its list), and a **By Program** table listing every Active program by name, the rate shown as a bar and a percent. |
 | 3 | Compare the program's row with its **Program Roster** panel and today's log. | Open Enrollments matches the roster's Applied plus Enrolled; Services Delivered counts the Present delivery only; Attendance Rate is 50%; People Served is 1. |
 | 4 | Pick **Last Year**. | The figures reload for last year; a program with no activity then shows 0 and "None yet" for the rate. |
 | 5 | Click a program's name. | The program opens. |
@@ -313,8 +319,8 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As the admin, open the program. Find the **Eligibility Rules** panel. | It says there are no rules yet; **Add a Rule** is offered. |
-| 2 | Click **Add a Rule**. Condition: **Referral Source** equal to Self. **Result** Not Eligible, **Reason** "Self referral is not accepted", **Eligibility Basis** Referral. Add a second rule: **Referral Source** one of "School, Another Agency", **Result** Eligible, **Reason** "Referred by a partner". Leave **Default Result** at Review. | **Unsaved changes** shows; **Save Rules** is enabled. |
+| 1 | As the admin, open the program and its **Eligibility** tab. Find the **Eligibility Rules** panel. | It says there are no rules yet; **Add a Rule** is offered. |
+| 2 | Click **Add a Rule**. Condition: **Referral Source** equal to Self. **Result** Not Eligible, **Reason** "Self referral is not accepted", **Eligibility Basis** Referral. Add a second rule: **Referral Source** one of, then move School and Another Agency from **Available** to **Chosen**; **Result** Eligible, **Reason** "Referred by a partner". Leave **Default Result** at Review. | For **one of** on Referral Source an **Available** and **Chosen** list shows instead of a typed box; the **Eligibility Basis** list starts with **Don't Change the Basis**. **Unsaved changes** shows; **Save Rules** is enabled. |
 | 3 | Under **Preview and Screen**, pick each person in turn. | Self: "These rules would give Not Eligible: Self referral is not accepted"; School: Eligible with its reason; Other: Review with "No rule applied." |
 | 4 | Click **Screen Open Enrollments** before saving. | "Save the rules first". Nothing changes. |
 | 5 | Click **Save Rules**, then **Screen Open Enrollments**. | "Screened: 1 Eligible, 1 Not Eligible, 1 Review, 0 left alone." |
@@ -322,7 +328,8 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 7 | Set Other to **Eligible** by hand, then screen again. | "... 1 left alone." and Other is still Eligible. Tick **Also screen enrollments already Eligible or Not Eligible** and screen again: Other returns to Review. |
 | 8 | Add a rule whose condition field is blank, or clear a rule's **Reason**, and **Save Rules**. | Refused with a sentence naming the rule; the saved rules are unchanged. |
 | 9 | Move rule 2 above rule 1, save, and preview Self. | Unchanged result (the rules do not overlap); with a rule 1 of **Referral Source** not blank, moving it first decides every row. |
-| 10 | As the staff user, open the program. | The rules show but cannot be changed; **Screen Open Enrollments** works. |
+| 10 | Drag rule 2 by its handle above rule 1 with the mouse; then do the same on a phone (press and hold the handle); then by keyboard (Tab to the handle, Space, Up Arrow, Space). | Each time the rules swap, a line shows where the rule will land while dragging, **Unsaved changes** shows, and a screen reader hears "Moved Rule 2 to Eligibility Rules." Escape during a drag puts the rule back. **Move Up** and **Move Down** still work. |
+| 11 | As the staff user, open the program. | The rules show but cannot be changed and have no drag handles; **Screen Open Enrollments** works. |
 
 **Cleanup:** clear the rules (remove each rule and **Save Rules**) and reset the enrollments' eligibility.
 
@@ -358,6 +365,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 2 | Under **Add People**, tick Ana and Ben. Pick Cara under the person picker and click **Add to List**. Click **Add to Cohort**. | "3 people added." All three are members; Cara now has an Enrolled enrollment in the program, in the cohort. |
 | 3 | Pick Ana again, add her to the list and click **Add to Cohort**. | Ana is listed under **Not Added** with the reason; nobody is added twice. |
 | 4 | Click **Remove** by Ben. | Ben leaves the members and is offered again under the people to add; his enrollment stays, with no cohort. |
+| 4a | Drag Ben by the handle beside his name onto the member list (mouse). Remove him again; on a phone, press and hold the handle and drag; remove him again; by keyboard, Tab to his handle, press Space, Left Arrow, Space. | Each time the member list is outlined while Ben is over it, and dropping adds him ("1 person added." or similar). Dropping him back on the enrolled list, or Escape, adds nobody. A screen reader hears each step. Ticks, **Select All** and **Add to Cohort** still work. |
 | 5 | On an enrollment in another program, set **Cohort** to Spring. | Refused: the cohort must belong to the enrollment's program. |
 | 6 | In **Schedule Sessions**, pick Tutoring, keep the cohort's dates, tick Monday and Wednesday, set a Start Time. | The line under the form gives the number of sessions (4 for a range starting on a Monday). Click **Schedule**: "4 sessions scheduled.", listed under the cohort's **Sessions**, each named "Tutoring (date)". |
 | 7 | Set **To** before **From**, then untick every day. | The line asks for dates, then for days; **Schedule** is off. |
@@ -402,3 +410,14 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 7 | Mark Ben Present on yesterday's list and click **Save**, then change **Date**. | No dialog (nothing is unsaved). |
 
 **Cleanup:** delete the test deliveries.
+
+## T-PRG-24: Program Page Tabs
+
+**Purpose:** confirm the program page groups its panels into tabs and keeps its lists at the side.
+**Prerequisites:** the staff user; an Active program with a service, an enrollment and a cohort.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the program. | The highlights header is at the top; the tabs **People**, **Attendance**, **Sessions**, **Eligibility** and **Details** show, with **People** open on the **Program Roster** panel. **Services**, **Enrollments** and **Cohorts** lists are at the side. |
+| 2 | Click each tab in turn. | **Attendance**: the **Service Delivery Log**. **Sessions**: **Schedule Sessions**. **Eligibility**: **Eligibility Rules**. **Details**: the program's fields. |
+| 3 | Open the program in the Salesforce mobile app. | The same tabs show, with the lists under them. |

@@ -17,9 +17,7 @@
       </template>
 
       <template lwc:if={errorMessage}>
-        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
-          {errorMessage}
-        </p>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-show slds-var-m-bottom_small"></c-barn-notice>
       </template>
       <div role="status" data-id="result" class="slds-assistive-text">{resultMessage}</div>
 
@@ -120,7 +118,16 @@
       </template>
 
       <template lwc:if={isEmpty}>
-        <p data-id="empty" class="slds-text-body_regular slds-var-m-bottom_small">{labels.empty}</p>
+        <c-barn-empty-state illustration="no-data" heading={labels.empty} data-id="empty">
+          <template lwc:if={showAddGoal}>
+            <lightning-button
+              data-id="empty-add-goal"
+              label={labels.addGoal}
+              disabled={controlsDisabled}
+              onclick={handleAddGoal}
+            ></lightning-button>
+          </template>
+        </c-barn-empty-state>
       </template>
 
       <ul class="slds-has-dividers_bottom-space">
@@ -131,11 +138,14 @@
                 <h3 class="slds-text-heading_small" data-id="goal-title">{goal.name}</h3>
               </div>
               <div class="slds-col slds-grow-none">
-                <span class={goal.statusClass} data-id="goal-status-badge">{goal.status}</span>
+                <c-barn-status-badge status={goal.statusWord} label={goal.status} data-id="goal-status-badge"></c-barn-status-badge>
                 <template lwc:if={goal.reviewDue}>
-                  <span class="slds-badge slds-theme_warning slds-var-m-left_xx-small" data-id="review-due"
-                    >{labels.reviewDue}</span
-                  >
+                  <c-barn-status-badge
+                    status="review"
+                    label={labels.reviewDue}
+                    class="slds-var-m-left_xx-small"
+                    data-id="review-due"
+                  ></c-barn-status-badge>
                 </template>
               </div>
             </div>
@@ -149,16 +159,20 @@
               <p class="slds-text-body_small" data-id="goal-outcome-line">{goal.outcome}</p>
             </template>
             <template lwc:if={goal.outcomeMissing}>
-              <p class="slds-text-body_small slds-text-color_error" data-id="outcome-missing">
-                {labels.outcomeMissing}
-              </p>
+              <c-barn-notice variant="warning" message={labels.outcomeMissing} data-id="outcome-missing"></c-barn-notice>
             </template>
             <template lwc:if={goal.description}>
               <p class="slds-text-body_regular slds-var-m-top_xx-small">{goal.description}</p>
             </template>
 
             <template lwc:if={goal.progress}>
-              <p class="slds-text-body_small slds-var-m-top_x-small" data-id="progress">{goal.progress}</p>
+              <c-barn-meter
+                class="slds-show slds-var-m-top_x-small"
+                value={goal.progressPercent}
+                value-text={goal.progress}
+                size="small"
+                data-id="progress"
+              ></c-barn-meter>
             </template>
             <ul class="slds-var-m-left_small">
               <template for:each={goal.steps} for:item="step">

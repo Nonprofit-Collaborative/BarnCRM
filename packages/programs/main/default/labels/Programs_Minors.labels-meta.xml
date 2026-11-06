@@ -129,14 +129,6 @@
         <value>No rule applied.</value>
     </labels>
     <labels>
-        <fullName>Programs_Elig_ActionFailed</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Eligibility rules panel: unexpected failure, logged</shortDescription>
-        <value>The eligibility rules could not be loaded or saved. The details are in the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Programs_Elig_Title</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -222,7 +214,7 @@
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Eligibility rules panel: no basis</shortDescription>
-        <value>Leave the Basis Alone</value>
+        <value>Don't Change the Basis</value>
     </labels>
     <labels>
         <fullName>Programs_Elig_DefaultTitle</fullName>

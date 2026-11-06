@@ -89,7 +89,8 @@ group, a housing program), so you choose:
 | **Shared** (the default) | Everyone with a Programs permission set, as before this setting existed. |
 | **Private** | The person who created the record (its owner), the people above them in the role hierarchy, and Programs Admin. |
 
-Choose one under **Participant Privacy** and click **Save**. The change applies within a minute,
+Choose one under **Participant Privacy** and click **Save** on the bar that appears at the
+bottom of the page (**Discard** puts the saved choice back). The change applies within a minute,
 to every enrollment and delivery, old and new, and is listed under **Recent Changes** in BarnCRM
 Settings. Case notes are private whichever you choose (see Case Notes).
 
@@ -227,6 +228,15 @@ what is recorded without the controls. The panel lists up to 200 people.
 
 You can also enter a delivery by hand on the **Service Deliveries** tab, for example for a person
 who is not enrolled. The list views are **All Service Deliveries** and **This Week**.
+
+**Record Service** is the shorter way: an action at the top of a person's page in the Programs
+app (**Programs Contact Record Page**; on **Programs Account Record Page** it shows only on a
+person, not on a household or an organization) and of every enrollment. It asks for one
+**Person** (filled in from the page, so no Contact or Account to choose between), the
+**Service**, **Delivery Date**, **Attendance** and **Quantity**, and saves through the same
+rules. From an enrollment it offers that program's services and links the delivery to the
+enrollment. Programs Staff and Admin can save; Read Only users are told they cannot. On your own
+record pages, add it from Lightning App Builder (dynamic actions on the highlights panel).
 
 Rules:
 
@@ -369,7 +379,9 @@ their stage, and a **Remove** button on each (the enrollment is kept, out of the
 **Add People**:
 
 - **Enrolled in the program, not in a cohort:** the program's open enrollments that have no
-  cohort, each with a box. Tick the ones to add, or **Select All**.
+  cohort, each with a box. Tick the ones to add, or **Select All**. A person can also be dragged
+  by the handle beside their name onto the member list (mouse, touch press and hold, or
+  keyboard); dragging a ticked person adds everyone ticked, at once.
 - **Someone else:** pick a person and click **Add to List**. Repeat for as many as you need.
 
 Click **Add to Cohort**. A ticked enrollment, or a picked person who already has an open
@@ -443,10 +455,13 @@ default, **Last Month**, **This Year**, **Last Year** or **Last 12 Months**). Ti
 | Services Delivered | Service deliveries marked Present in the period. |
 | Attendance Rate | Present deliveries as a share of all deliveries in the period, absences included. |
 
-Below the tiles, a table gives the same figures for each program (including **Counted Without
-Names**), plus **Completed** (enrollments
-completed in the period); click a program's name to open it. It lists every Active program and
-any other program with activity in the period.
+Below the tiles, **Tools** has a tile for each Programs tab the person can open (Programs,
+Cohorts, Sessions, Enrollments, Service Deliveries, Case Notes, Referrals, Service Counts and
+Goals), so the dashboard is the Programs app's home page. Then a **By Program** table gives the
+same figures for each program (including **Counted Without Names**), plus **Completed**
+(enrollments completed in the period), with each program's attendance rate drawn as a bar beside
+the percent; click a program's name to open it. It lists every Active program and any other
+program with activity in the period.
 
 Each person sees figures for the records they can see. With Participant Privacy set to Private,
 a staff member's dashboard counts only their own enrollments and deliveries, while Programs Admin
@@ -512,18 +527,21 @@ sets the **Eligibility Date** when the status becomes a decision (Eligible or No
 clears it when the result is Review. Screening only suggests: staff can still change any
 enrollment by hand.
 
-Rules live in the **Eligibility Rules** panel on the program page (under the Service Delivery
-Log). Only Programs Admin can change them; Programs Staff see them and can screen.
+Rules live in the **Eligibility Rules** panel, on the program page's **Eligibility** tab. Only
+Programs Admin can change them; Programs Staff see them and can screen.
 
 1. Click **Add a Rule**. A rule says: **when all** of its conditions are true, the **Result** is
    Eligible, Not Eligible or Review, with a **Reason** (up to 255 characters, shown on the
-   enrollment) and optionally an **Eligibility Basis**.
+   enrollment) and optionally an **Eligibility Basis** (or **Don't Change the Basis**).
 2. Each condition picks an **Enrollment Field**, a comparison (**equal to**, **not equal to**,
    **one of**, **not one of**, **greater than**, **greater than or equal to**, **less than**,
    **less than or equal to**, **blank**, **not blank**) and a **Value**. For **one of** and
-   **not one of**, separate the choices with commas.
+   **not one of** on a picklist field, move the choices you want from **Available** to
+   **Chosen**; on a text field, separate the choices with commas.
 3. Rules are checked top to bottom and **the first rule whose conditions all hold decides**; use
-   **Move Up** and **Move Down** to order them. Put the narrowest rules first.
+   **Move Up** and **Move Down** to order them, or drag a rule by its handle (on a phone, press
+   and hold the handle; by keyboard, focus the handle, press Space, use the arrow keys, then
+   Space again). Put the narrowest rules first.
 4. Under **When No Rule Applies**, choose the **Default Result** (Review to start with) and an
    optional **Default Reason**.
 5. Click **Save Rules**. The panel refuses rules it cannot use and says why (for example a

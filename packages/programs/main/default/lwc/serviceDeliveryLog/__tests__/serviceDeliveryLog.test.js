@@ -424,12 +424,12 @@ describe('c-service-delivery-log', () => {
     find(element, 'mark-all-present').click();
     find(element, 'save').click();
     await flush();
-    expect(find(element, 'error-message').textContent).toContain('Quantity cannot be negative.');
+    expect(find(element, 'error-message').message).toContain('Quantity cannot be negative.');
 
     getLog.mockRejectedValue({});
     const second = await render();
-    expect(second.shadowRoot.querySelector('[data-id="error-message"]').textContent).toContain(
-      'Programs_Log_ActionFailed'
+    expect(second.shadowRoot.querySelector('[data-id="error-message"]').message).toContain(
+      'Programs_Fail_Log'
     );
   });
 });

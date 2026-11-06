@@ -27,6 +27,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>RecordServiceController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>ServiceDeliveryLogController</apexClass>
     <enabled>true</enabled>
   </classAccesses>

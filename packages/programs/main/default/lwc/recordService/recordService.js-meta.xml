@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Records one service delivery by hand, with a single Person picker, from a person or an
+    enrollment (modules-14).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Record Service</masterLabel>
+  <targets>
+    <target>lightning__RecordAction</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordAction">
+      <actionType>ScreenAction</actionType>
+      <objects>
+        <object>Contact</object>
+        <object>Account</object>
+        <object>Enrollment__c</object>
+      </objects>
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

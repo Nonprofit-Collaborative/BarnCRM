@@ -243,6 +243,9 @@
               <value>Contact.Log_Interaction</value>
             </valueListItems>
             <valueListItems>
+              <value>Contact.Record_Service</value>
+            </valueListItems>
+            <valueListItems>
               <value>Contact.Erase_Person</value>
               <visibilityRule>
                 <criteria>

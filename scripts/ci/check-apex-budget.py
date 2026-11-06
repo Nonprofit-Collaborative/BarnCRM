@@ -40,7 +40,8 @@ CAPS = {
     "rollups": 374_000,
     "giving": 587_000,
     "volunteers": 166_000,
-    "programs": 148_000,
+    # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
+    "programs": 153_000,
     "logicmodels": 65_000,
     "funders": 95_000,
     "mirror": 182_000,

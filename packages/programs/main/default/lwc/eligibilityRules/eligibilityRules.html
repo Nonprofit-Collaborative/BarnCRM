@@ -9,28 +9,50 @@
       <p class="slds-text-body_regular slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
 
       <template lwc:if={errorMessage}>
-        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">{errorMessage}</p>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-show slds-var-m-bottom_small"></c-barn-notice>
       </template>
 
       <template lwc:if={hasProblems}>
-        <ul role="alert" data-id="problems" class="slds-text-color_error slds-var-m-bottom_small">
-          <template for:each={problemItems} for:item="problem">
-            <li key={problem.key} data-id="problem">{problem.text}</li>
-          </template>
-        </ul>
+        <c-barn-notice variant="error" data-id="problems" class="slds-show slds-var-m-bottom_small">
+          <ul class="slds-list_dotted">
+            <template for:each={problemItems} for:item="problem">
+              <li key={problem.key} data-id="problem">{problem.text}</li>
+            </template>
+          </ul>
+        </c-barn-notice>
       </template>
 
       <template lwc:if={readOnly}>
-        <p class="slds-text-body_small slds-text-color_weak" data-id="read-only">{labels.readOnly}</p>
+        <c-barn-notice message={labels.readOnly} data-id="read-only" class="slds-show slds-var-m-bottom_small"></c-barn-notice>
       </template>
 
       <template lwc:if={noRules}>
-        <p class="slds-text-body_regular" data-id="no-rules">{labels.noRules}</p>
+        <c-barn-empty-state illustration="setup" heading={labels.noRules} data-id="no-rules"></c-barn-empty-state>
       </template>
 
+      <p class="slds-assistive-text" id="drag-help">{dragHelp}</p>
+      <p class="slds-assistive-text" role="status" aria-live="polite" data-id="drag-live">{announcement}</p>
+      <div data-drop-zone="rules" data-drop-label={labels.title} data-id="rules-zone">
       <template for:each={ruleViews} for:item="rule">
-        <div key={rule.key} class="slds-box slds-var-m-bottom_small" data-id="rule">
+        <div key={rule.key} class={rule.boxClass} data-id="rule">
           <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_x-small">
+            <template lwc:if={canDrag}>
+              <span
+                class="drag-handle slds-var-m-right_x-small"
+                role="button"
+                tabindex="0"
+                title={dragHelp}
+                aria-label={rule.title}
+                aria-describedby="drag-help"
+                data-drag-id={rule.key}
+                data-drag-label={rule.title}
+                data-id="drag"
+                onpointerdown={handlePointerDown}
+                onkeydown={handleDragKey}
+              >
+                <lightning-icon icon-name="utility:drag_and_drop" size="x-small"></lightning-icon>
+              </span>
+            </template>
             <h3 class="slds-text-heading_small slds-col slds-grow" data-id="rule-title">{rule.title}</h3>
             <template lwc:if={canEdit}>
               <lightning-button-icon
@@ -103,6 +125,22 @@
                   ></lightning-input>
                 </template>
               </div>
+              <template lwc:if={condition.showChoices}>
+                <div class="slds-col slds-size_1-of-1 slds-var-m-top_x-small">
+                  <lightning-dual-listbox
+                    label={labels.value}
+                    source-label={labels.availableValues}
+                    selected-label={labels.chosenValues}
+                    options={condition.choiceOptions}
+                    value={condition.chosen}
+                    data-id="choices"
+                    data-rule={rule.index}
+                    data-condition={condition.index}
+                    disabled={readOnly}
+                    onchange={handleChoicesChange}
+                  ></lightning-dual-listbox>
+                </div>
+              </template>
               <template lwc:if={canEdit}>
                 <template lwc:if={condition.canRemove}>
                   <div class="slds-col slds-size_1-of-1">
@@ -166,6 +204,7 @@
           </div>
         </div>
       </template>
+      </div>
 
       <template lwc:if={canEdit}>
         <lightning-button label={labels.addRule} data-id="add-rule" onclick={handleAddRule} disabled={controlsDisabled}></lightning-button>
@@ -210,7 +249,7 @@
         <div class="slds-var-m-top_medium">
           <h3 class="slds-text-heading_small">{labels.previewTitle}</h3>
           <template lwc:if={noPeople}>
-            <p class="slds-text-body_regular" data-id="no-people">{labels.noPeople}</p>
+            <c-barn-empty-state size="compact" heading={labels.noPeople} data-id="no-people"></c-barn-empty-state>
           </template>
           <template lwc:if={hasPeople}>
             <lightning-combobox

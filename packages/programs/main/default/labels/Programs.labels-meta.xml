@@ -9,6 +9,14 @@
         <value>This person already has an open enrollment in {0}. Change that enrollment instead of adding another, or end it first.</value>
     </labels>
     <labels>
+        <fullName>Programs_RecordService_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Record Service action: heading</shortDescription>
+        <value>Record Service</value>
+    </labels>
+    <labels>
         <fullName>Programs_Roster_Title</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -81,28 +89,12 @@
         <value>Choose the person to enroll.</value>
     </labels>
     <labels>
-        <fullName>Programs_Roster_ActionFailed</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Unexpected roster failure, logged</shortDescription>
-        <value>The roster could not be updated. The details are in the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Programs_Person_Empty</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Programs card when the person has no enrollment</shortDescription>
         <value>Not enrolled in any program.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Person_LoadFailed</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs card could not load</shortDescription>
-        <value>The programs could not be loaded. Refresh to try again.</value>
     </labels>
     <labels>
         <fullName>Programs_Person_MoreThanShown</fullName>
@@ -265,14 +257,6 @@
         <value>Showing the first 200. Record the others on the Service Deliveries tab.</value>
     </labels>
     <labels>
-        <fullName>Programs_Log_ActionFailed</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Unexpected Service Delivery Log failure, logged</shortDescription>
-        <value>The service delivery log could not be updated. The details are in the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Programs_Settings_Title</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -319,14 +303,6 @@
         <protected>true</protected>
         <shortDescription>Viewer may not manage settings</shortDescription>
         <value>Only someone who can manage BarnCRM settings can change the Programs settings.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Settings_LoadFailed</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs settings could not load, logged</shortDescription>
-        <value>The Programs settings could not be loaded. The details are in the Error Log.</value>
     </labels>
     <labels>
         <fullName>Programs_Erase_NeedProgramsAdmin</fullName>
@@ -391,14 +367,6 @@
         <protected>true</protected>
         <shortDescription>Programs settings: saved message</shortDescription>
         <value>Saved. It applies to every enrollment and delivery within a minute.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Settings_SaveFailed</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs settings: save failed</shortDescription>
-        <value>Participant Privacy could not be saved. Try again; if it fails again, the Error Log says why.</value>
     </labels>
     <labels>
         <fullName>Programs_Person_LastService</fullName>
@@ -545,22 +513,6 @@
         <value>Showing the first 200 programs by name. The tiles count them all.</value>
     </labels>
     <labels>
-        <fullName>Programs_Dashboard_LoadFailed</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs dashboard: load failed</shortDescription>
-        <value>The dashboard could not load. Try a shorter period; if it fails again, the Error Log says why.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_PersonEnrollments_LoadFailed</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Programs card on a person: load failed</shortDescription>
-        <value>The Programs card could not load. Refresh the page; if it fails again, the Error Log says why.</value>
-    </labels>
-    <labels>
         <fullName>Programs_Dashboard_NoAccess</fullName>
         <categories>Programs</categories>
         <language>en_US</language>
@@ -623,14 +575,6 @@
         <protected>true</protected>
         <shortDescription>Service plan: outcome not offered for this enrollment</shortDescription>
         <value>Choose an outcome from the list.</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Plan_ActionFailed</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Service plan: unexpected failure</shortDescription>
-        <value>Something went wrong with the service plan. Try again, or ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Programs_Plan_Title</fullName>
@@ -791,14 +735,6 @@
         <protected>true</protected>
         <shortDescription>Service plan: new case note button</shortDescription>
         <value>New Note</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Cohort_ActionFailed</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Cohort members: unexpected failure</shortDescription>
-        <value>Something went wrong with the cohort. Try again, or ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Programs_Cohort_AddPeople</fullName>
@@ -1023,14 +959,6 @@
         <protected>true</protected>
         <shortDescription>Service delivery log: session heading; {0} service, {1} date</shortDescription>
         <value>{0} on {1}</value>
-    </labels>
-    <labels>
-        <fullName>Programs_Schedule_ActionFailed</fullName>
-        <categories>Programs</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Schedule sessions: unexpected failure</shortDescription>
-        <value>Something went wrong scheduling sessions. Try again, or ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Programs_Schedule_BadTime</fullName>
