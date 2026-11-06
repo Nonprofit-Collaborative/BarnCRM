@@ -654,6 +654,7 @@
     "Core_Households_ErrorMoveNotFound": "That person or that household could not be found. Refresh the page and try again.",
     "Core_Households_ErrorNoSettingsPermission": "You do not have permission to do this. Recomputing every household needs the Manage BarnCRM Settings permission: ask your BarnCRM admin.",
     "Core_Households_ErrorNotAHousehold": "The record you chose is not a household. Choose a household and try again.",
+    "Core_Households_PreviewDeceasedMember": "{0} (deceased)",
     "Core_Households_ErrorPersonToOrganization": "This person is in a household, so Account Name must stay a household. To connect them to an organization, add an affiliation. To move them, use Move to another household.",
     "Core_Households_ErrorRecordTypeMissing": "The Household record type is missing or hidden from you, so no household could be created. Ask your BarnCRM admin to check your access to household records.",
     "Core_Households_ErrorSaveFailed": "A household could not be saved, so its name or its member count may be out of date.",
