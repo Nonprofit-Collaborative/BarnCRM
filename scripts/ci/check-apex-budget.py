@@ -38,7 +38,9 @@ CAPS = {
     # leading space, so tabs cut about 19 percent) plus about 2 percent.
     "core": 1_982_000,
     "rollups": 374_000,
-    "giving": 587_000,
+    # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
+    # Quick Gift Entry tribute, match and split (people-giving-13, 16, 23).
+    "giving": 592_000,
     "volunteers": 166_000,
     "programs": 148_000,
     "logicmodels": 65_000,
