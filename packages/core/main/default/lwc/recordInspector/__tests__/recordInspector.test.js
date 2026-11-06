@@ -3,11 +3,22 @@ import RecordInspector from 'c/recordInspector';
 import WhereUsedModal from 'c/whereUsedModal';
 import inspect from '@salesforce/apex/RecordInspectorController.inspect';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
-import { filterRows, normalize } from '../inspectorRows';
+import pageLink from '@salesforce/apex/RecordInspectorController.pageLink';
+import * as navigation from 'lightning/navigation';
+import { filterRows, normalize, parseRecordId } from '../inspectorRows';
 
 jest.mock('@salesforce/apex/RecordInspectorController.inspect', () => ({ default: jest.fn() }), {
   virtual: true
 });
+
+jest.mock(
+  '@salesforce/apex/RecordInspectorController.pageLink',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
 
 jest.mock(
   '@salesforce/apex/DataManagerController.findToolStateKey',
@@ -22,6 +33,7 @@ const mockNavigate = jest.fn();
 jest.mock(
   'lightning/navigation',
   () => {
+    const { createTestWireAdapter } = require('@salesforce/wire-service-jest-util');
     const Navigate = Symbol('Navigate');
     const NavigationMixin = (Base) =>
       class extends Base {
@@ -30,7 +42,11 @@ jest.mock(
         }
       };
     NavigationMixin.Navigate = Navigate;
-    return { NavigationMixin, __esModule: true };
+    return {
+      NavigationMixin,
+      CurrentPageReference: createTestWireAdapter(jest.fn()),
+      __esModule: true
+    };
   },
   { virtual: true }
 );
@@ -220,6 +236,107 @@ describe('c-record-inspector', () => {
     expect(q(element, '[data-id="error-message"]').message).toBe('Not for you.');
     expect(q(element, '[data-id="field-table"]')).toBeNull();
   });
+
+  it('on a record page ignores the page state and shows no ID box', async () => {
+    const element = mount();
+    navigation.CurrentPageReference.emit({ state: { c__recordId: '001000000000009AAA' } });
+    await flush();
+
+    expect(inspect).not.toHaveBeenCalled();
+    expect(q(element, '[data-id="record-input"]')).toBeNull();
+    expect(q(element, '[data-id="record-heading"]')).toBeNull();
+  });
+});
+
+describe('c-record-inspector on the Record Inspector page', () => {
+  const LINK = { tabApiName: 'Record_Inspector', recordIdKey: 'c__recordId' };
+
+  function mountPage() {
+    const element = createElement('c-record-inspector', { is: RecordInspector });
+    document.body.appendChild(element);
+    pageLink.emit(LINK);
+    return element;
+  }
+
+  afterEach(() => {
+    while (document.body.firstChild) {
+      document.body.removeChild(document.body.firstChild);
+    }
+    jest.clearAllMocks();
+  });
+
+  it('reads the record the page state names at once and shows which record it is', async () => {
+    inspect.mockResolvedValue({ ...INSPECTION, recordName: 'Ana Garcia' });
+    const element = mountPage();
+    navigation.CurrentPageReference.emit({ state: { c__recordId: INSPECTION.recordId } });
+    await flush();
+    await flush();
+
+    expect(inspect).toHaveBeenCalledWith({ recordId: INSPECTION.recordId });
+    expect(rowNames(element)).toEqual(['LastName', 'Email', 'Fax', 'Notes__c']);
+    const link = q(element, '[data-id="record-link"]');
+    expect(link.textContent).toBe('Ana Garcia');
+    expect(link.getAttribute('href')).toBe(`/lightning/r/${INSPECTION.recordId}/view`);
+    expect(q(element, '[data-id="record-object"]').textContent).toBe('Contact');
+    expect(q(element, '[data-id="record-input"]').value).toBe(INSPECTION.recordId);
+    expect(q(element, '[data-id="inspect-button"]')).not.toBeNull();
+  });
+
+  it('with no ID offers a box for an ID or link and reads nothing', async () => {
+    const element = mountPage();
+    navigation.CurrentPageReference.emit({ state: {} });
+    await flush();
+
+    expect(inspect).not.toHaveBeenCalled();
+    expect(q(element, '[data-id="record-input"]')).not.toBeNull();
+    expect(q(element, '[data-id="intro"]')).not.toBeNull();
+    expect(q(element, '[data-id="inspect-button"]')).toBeNull();
+  });
+
+  it('opens the page on a pasted record link through the page state', async () => {
+    const element = mountPage();
+    navigation.CurrentPageReference.emit({ state: {} });
+    await flush();
+
+    const input = q(element, '[data-id="record-input"]');
+    input.value = 'https://example.lightning.force.com/lightning/r/Contact/003000000000002AAA/view';
+    input.dispatchEvent(new CustomEvent('change', { detail: { value: input.value } }));
+    q(element, '[data-id="go-button"]').click();
+
+    expect(mockNavigate).toHaveBeenCalledWith({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Record_Inspector' },
+      state: { c__recordId: '003000000000002AAA' }
+    });
+  });
+
+  it('says so when the pasted text holds no record ID', async () => {
+    const element = mountPage();
+    navigation.CurrentPageReference.emit({ state: {} });
+    await flush();
+
+    const input = q(element, '[data-id="record-input"]');
+    input.dispatchEvent(new CustomEvent('change', { detail: { value: 'not a record' } }));
+    q(element, '[data-id="go-button"]').click();
+    await flush();
+
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(inspect).not.toHaveBeenCalled();
+    expect(q(element, '[data-id="error-message"]').message).toMatch(
+      /Core_RecordInspector_BadInput/
+    );
+  });
+
+  it('says so when the page state names no record', async () => {
+    const element = mountPage();
+    navigation.CurrentPageReference.emit({ state: { c__recordId: 'nonsense' } });
+    await flush();
+
+    expect(inspect).not.toHaveBeenCalled();
+    expect(q(element, '[data-id="error-message"]').message).toMatch(
+      /Core_RecordInspector_BadInput/
+    );
+  });
 });
 
 describe('inspectorRows', () => {
@@ -239,5 +356,20 @@ describe('inspectorRows', () => {
   it('normalizes input', () => {
     expect(normalize('  AbC ')).toBe('abc');
     expect(normalize(undefined)).toBe('');
+  });
+
+  it('finds the record ID in an ID or a record link', () => {
+    const id = '003000000000002AAA';
+    expect(parseRecordId(` ${id} `)).toBe(id);
+    expect(parseRecordId('003000000000002')).toBe('003000000000002');
+    expect(parseRecordId(`https://x.lightning.force.com/lightning/r/Contact/${id}/view`)).toBe(id);
+    expect(parseRecordId(`https://x.my.salesforce.com/${id}?srPos=0`)).toBe(id);
+    expect(
+      parseRecordId(`https://x.lightning.force.com/lightning/n/Record_Inspector?c__recordId=${id}`)
+    ).toBe(id);
+    expect(parseRecordId('https://x.lightning.force.com/lightning/o/Contact/list')).toBeUndefined();
+    expect(parseRecordId('AccountSettings')).toBeUndefined();
+    expect(parseRecordId('')).toBeUndefined();
+    expect(parseRecordId(undefined)).toBeUndefined();
   });
 });

@@ -445,8 +445,8 @@
     </itemInstances>
     <itemInstances>
       <componentInstance>
-        <componentName>recordInspector</componentName>
-        <identifier>recordInspector</identifier>
+        <componentName>recordInspectorButton</componentName>
+        <identifier>recordInspectorButton</identifier>
       </componentInstance>
     </itemInstances>
     <name>sidebar</name>

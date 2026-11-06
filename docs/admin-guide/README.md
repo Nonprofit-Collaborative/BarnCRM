@@ -158,7 +158,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-53 and C-53b Access Explorer, with Compare Two and the Modify All Report (a section of Org Optimizer) | [access-explorer.md](access-explorer.md) | Core |
 | C-65 Field Access Manager (give or remove Read and Edit across permission sets, with a preview and undo; Access Explorer's Change Field Access view) | [field-access-manager.md](field-access-manager.md) | Core |
 | C-56 Setup Changes (who changed what in Setup, kept beyond 180 days; the Setup Changes section of Org Optimizer) | [setup-changes.md](setup-changes.md) | Core |
-| C-55 Record Inspector (every readable field of one record, on record pages) | [record-inspector.md](record-inspector.md) | Core |
+| C-55 Record Inspector (every readable field of one record, on a page of its own opened from record pages) | [record-inspector.md](record-inspector.md) | Core |
 | C-59 Where Used and Retire a Field (which BarnCRM setup uses a field or object; from the Data Dictionary, Field Use and the Record Inspector) | [where-used.md](where-used.md) | Core |
 | AIR-01 AI-Readiness Export (the AI-Readiness Export section of Org Optimizer) | [ai-readiness-export.md](ai-readiness-export.md) | Core |
 

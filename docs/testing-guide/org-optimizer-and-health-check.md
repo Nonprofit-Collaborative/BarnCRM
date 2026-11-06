@@ -348,7 +348,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 6 | In **Rollup Builder**, make a rollup that counts Contacts with **Test Retire** not blank on their organization; then repeat step 3. | The rollup is listed under **Rollups** (Named in: Filter on counted records). |
 | 7 | Click **Show Uses of the Whole Kind of Record**. | The title becomes **Where Used: Contact**, the list shows setup that works on Contact (Named in: Works on this kind of record), and **Retire a Field** is gone. Click **Show Uses of This Field** to go back. |
 | 8 | Repeat step 3 for the standard field **Last Name**. | The last step says the field can't be deleted and to keep it hidden. |
-| 9 | Choose **Field Use**, count **Contact**, and choose **Where Used** on a row; then open a Contact with the **Record Inspector**, inspect it and click the **Where Used** button beside **Test Retire**. | The same window opens from both places. |
+| 9 | Choose **Field Use**, count **Contact**, and choose **Where Used** on a row; then open a Contact, click **Inspect This Record** and click the **Where Used** button beside **Test Retire**. | The same window opens from both places. |
 | 10 | With Programs installed, give a program an eligibility rule on **Referral Source**, then run **Where Used** for the Enrollment field **Referral Source**. | The program is listed under **Programs** (Named in: Eligibility Rules) with an "If deleted" line and a link that opens the program. |
 | 11 | With Logic Models installed, give an indicator a computed source counted by a date field, then run **Where Used** for that date field. | The indicator is listed under **Indicators** (Named in: Source Definition) with a link that opens its logic model. |
 

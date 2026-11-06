@@ -80,4 +80,20 @@
         <shortDescription>Record Inspector marker for a value that was cut.</shortDescription>
         <value>Shortened</value>
     </labels>
+    <labels>
+        <fullName>Core_RecordInspector_RecordInput</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector page box for a record ID or record link.</shortDescription>
+        <value>Record ID or Link</value>
+    </labels>
+    <labels>
+        <fullName>Core_RecordInspector_Go</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Record Inspector page button that reads the pasted record.</shortDescription>
+        <value>Inspect</value>
+    </labels>
 </CustomLabels>
