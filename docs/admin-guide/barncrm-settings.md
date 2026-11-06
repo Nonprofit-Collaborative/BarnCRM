@@ -341,15 +341,26 @@ every account without one is an organization. Where your org has one, an account
 without a record type takes the user's default record type, so **No record type** would not
 work and saving it is refused.
 
-BarnCRM never adds an Organization record type. On install it picks one you already have and
-saves it, so the row is never blank:
+On install BarnCRM picks a record type you already have and saves it, so the row is never
+blank:
 
 1. A record type your accounts already use comes first.
 2. Among those (or among all, when none is used), **Organization**, then **Business
    Account**, then **Business**, then **Default**, by the name in Setup; otherwise the first
    by name.
-3. A household or person account record type is never offered or picked.
+3. A household or person account record type is never offered or picked, and neither is
+   BarnCRM's own **BarnCRM Organization** (below).
 4. With none left, **No record type**.
+
+**BarnCRM Organization, for an org with no record type of its own** (D-184). BarnCRM ships one
+Account record type for organizations, **BarnCRM Organization**. It is active but given to
+nobody, so no one is offered it and nobody's default changes, and BarnCRM never chooses it for
+you. This row offers it, beside **No record type**, only while your org has no Account record
+type of its own. Choose it when you want organizations to have a record type (for their own
+page layout, list views and reports) and have none: save it here, then give it to everyone who
+creates organizations in Setup (their profile's Record Type Settings, or a permission set of
+your own). Once chosen it stays chosen, even if you later add a record type of your own, until
+you change this row. Orgs that already have a record type of their own never see it offered.
 
 Change it if the guess is wrong. Saving a person account record type or one named Household
 is refused. Accounts already saved keep their record type; only which accounts count as

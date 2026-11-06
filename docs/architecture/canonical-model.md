@@ -717,19 +717,30 @@ uses; the field is shared across record types and its meaning differs by record 
 defined above. Member Count, Anniversary, the two greeting fields, and Custom Name are
 not shown for Organization records on the Account record page.
 
-**R-O4 Defined by the org's own record type (ADR-0141).** Core ships no Organization record
-type. `BarnCRM_Settings__c.Organization_Record_Type__c` names one active Account record
+**R-O4 Defined by the org's own record type (ADR-0141).** `BarnCRM_Settings__c.Organization_Record_Type__c` names one active Account record
 type, by developer name, or holds `Master` for "No record type"; a person record type or one
 whose developer name or label contains Household is refused. `Master` is offered and saved
 only when the org has no candidate (R-O5): where one exists, an account saved without a record
 type takes the user's default record type, and the master record type Id is refused for a user
 who can use another, so a stored `Master` there is stale and replaced by detection. One record type, never several.
 
+**R-O4a The shipped record type, only where the org has none (D-184, ADR-NEXT).** Core ships
+one Account record type for organizations, `BarnCRM_Organization` (label BarnCRM
+Organization), active and given to no profile or permission set, so no user is offered it and
+no default changes. It is never a candidate (R-O5): detection never picks it, and it never
+makes a stored `Master` stale. The setting offers it beside "No record type" only while the
+org has no candidate of its own, or while it is the stored value, and a stored
+`BarnCRM_Organization` stays in force while it is active, even after the org adds a record
+type of its own, so nothing switches an org's organizations without an administrator choosing.
+The administrator who chooses it gives it to the people who create organizations (profile or
+permission set), as with any record type.
+
 **R-O5 Detection.** When the setting is blank, or names a record type that is gone, inactive
 or otherwise no longer a candidate (each install, upgrade or source deploy stores the result
 in both cases), the organization record type is
 detected: the candidates are the active Account record types that are not person types and
-whose developer name or label does not contain Household; one already used by at least one
+whose developer name or label does not contain Household, other than Core's own
+`BarnCRM_Organization` (R-O4a); one already used by at least one
 account comes first; then the developer names Organization, Business_Account, Business and
 Default, in that order; then the first by label. With no candidate the result is `Master`.
 Detection never creates, activates or shows a record type.
@@ -12786,6 +12797,7 @@ mirrors the primary member).
 | 1.0 | 2026-11-06 | Session horizon setting (modules-24, D-183). `Programs_Settings__c` gains `Session_Horizon_Weeks__c` (Number(2, 0), default 8, 1 to 26). R-SS2 reads it instead of a fixed eight weeks, and skips a day another schedule filled earlier in the same run. |
 | 1.0 | 2026-11-06 | Shipped match sources turned off through a setting (owner decision D-184, ADR-NEXT). `BarnCRM_Settings__c` gains `Match_Sources_Turned_Off__c` (Section 12); Match Source's Active definition now says BarnCRM changes it only on the organization's own rows. |
 | 1.0 | 2026-11-06 | Addresses of deleted records (owner decision D-184). `BarnCRM_Settings__c` gains `Address_Delete_Behavior__c` (Section 12; Delete or Keep, default Delete) and `Address__c` gains `Deleted_With__c` (Text 40), with rule R-AD11: a deleted household's, organization's or person's addresses are deleted with it and restored with it, never on a merge. |
+| 1.0 | 2026-11-06 | Shipped organization record type (owner decision D-184, ADR-NEXT, amends ADR-0141 decision 2). Account gains the record type `BarnCRM_Organization` (active, given to nobody). Section 8 gains R-O4a: offered for organizations only where the org has no record type of its own, never detected, never switched to automatically; R-O5 leaves it out of the candidates. |
 
 ---
 ## 32. Entity ownership by package

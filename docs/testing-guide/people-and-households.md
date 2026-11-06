@@ -286,21 +286,22 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-HH-19: Record Type for Organizations Is Detected and Can Be Changed
 
-**Purpose:** BarnCRM picks the org's own record type for organizations and never adds one.
+**Purpose:** BarnCRM picks the org's own record type for organizations, and offers its own BarnCRM Organization only where the org has none (D-184).
 **Prerequisites:** admin. Run once in a Person Accounts org (it has **Business Account**) and once in a Platform-only org.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **General**. | **Record type for organizations** shows **Business Account** in the Person Accounts org and **No record type** in the Platform-only org; never blank. |
-| 2 | Open the dropdown. | In the Person Accounts org it lists the org's active Account record types and no **No record type**; in the Platform-only org it lists only **No record type**. Never **Household** or a person account record type. |
+| 2 | Open the dropdown. | In the Person Accounts org it lists the org's active Account record types and no **No record type** or **BarnCRM Organization**; in the Platform-only org it lists **No record type** and **BarnCRM Organization**. Never **Household** or a person account record type. In Setup, Object Manager, Account, Record Types, **BarnCRM Organization** is active, and no profile has it. |
 | 3 | Open the **Organizations** tab. | Accounts of the chosen record type are listed; households and person accounts are not. |
 | 4 | Open one of those organizations. | The **Affiliations** panel and the website show; no **Name and Greetings**, no **Members**, no **Erase Person**. |
 | 5 | Import a file with one person and the organization `Zztest Rt Org`. | `Zztest Rt Org` is created with the chosen record type (or none, for **No record type**) and appears on the **Organizations** tab. |
 | 6 | In an org with a second business record type, choose it in the setting and save. | Saved, and listed in **Recent Changes**. The **Organizations** tab now lists accounts of that record type instead. Open one: **Is Organization** is checked, and the **Affiliations** panel and website show, with Giving and Volunteers the organization sections too; an account of the first record type now shows **Is Organization** unchecked. |
 | 7 | With that record type still chosen, import a file with one person and the organization `Zztest Rt Org 2`, give an organization an address in its billing fields, and load sample data in a sandbox without it. | `Zztest Rt Org 2` is created with that record type; the organization with the billing address gets a first address of type **Work**; sample data's organizations get that record type and the sample data count lists them. |
 | 8 | As a user whose profile and permission sets do not give that record type, import a file with two people: one at `Zztest Rt Org 2` (now in Salesforce) and one at the new organization `Zztest Rt Org 3`. | The first row loads, linked to `Zztest Rt Org 2`. The second is rejected with **This row's organization is not in Salesforce yet, and you cannot use the ... record type**, naming it by its label; the run log says no new organization was created for the same reason. `Zztest Rt Org 3` is not created. |
+| 9 | In the Platform-only org, choose **BarnCRM Organization** and save. Give it to your profile in Setup (Record Type Settings), then import a file with one person and the organization `Zztest Rt Org 4`. | Saved. `Zztest Rt Org 4` is created as **BarnCRM Organization** and is on the **Organizations** tab. Run **Health Check**: no **You Cannot Use the Record Type for Organizations**. |
 
-**Cleanup:** set the setting back to its first value; delete `Zztest Rt Org` and the imported person.
+**Cleanup:** set the setting back to its first value (and take **BarnCRM Organization** off your profile); delete `Zztest Rt Org`, `Zztest Rt Org 4` and the imported people.
 
 ## T-HH-20: An Org Already Running BarnCRM Keeps Its Organizations
 

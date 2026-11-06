@@ -24,7 +24,9 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Accounts of this record type are treated as organizations. BarnCRM never adds an Organization record type: on install it picks one your org already has, or No record type when it has none. A household or person account record type is never offered. Accounts keep their record type when you change this; only which accounts count as organizations changes.</value>
+    <value
+      xsi:type="xsd:string"
+    >Accounts of this record type are treated as organizations. On install BarnCRM picks one your org already has, or No record type when it has none. Where your org has none, BarnCRM Organization, which BarnCRM ships and gives to nobody, is offered too: choose it, then give it to the people who create organizations. A household or person account record type is never offered. Accounts keep their record type when you change this; only which accounts count as organizations changes.</value>
   </values>
   <values>
     <field>Help_Path__c</field>

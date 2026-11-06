@@ -1,10 +1,11 @@
 /**
  * Tells which accounts are organizations (canonical model R-O4, R-O5, ADR-0141).
  *
- * Core ships no Organization record type. Organizations are the accounts of one record type
- * the org already has, named by `BarnCRM_Settings__c.Organization_Record_Type__c` (a developer
- * name), or of no record type when it holds `Master`. This class is the one place that reads
- * it, so Core and every module ask here rather than naming a record type.
+ * Organizations are the accounts of one record type, named by
+ * `BarnCRM_Settings__c.Organization_Record_Type__c` (a developer name), or of no record type
+ * when it holds `Master`. This class is the one place that reads it, so Core and every module
+ * ask here rather than naming a record type. Core's own `BarnCRM_Organization` is never a
+ * candidate: it is offered only where the org has none of its own (R-O4a, D-184).
  *
  * When nothing usable is stored (a new install before its first save, or a record type since
  * deactivated or deleted) the record type is detected: the active Account record types that
@@ -22,6 +23,10 @@ public with sharing class AccountKinds {
 	/** The setting's key on `BarnCRM_Settings__c`. */
 	@NamespaceAccessible
 	public static final String KEY_ORGANIZATION_RECORD_TYPE = 'Organization_Record_Type__c';
+
+	/** Core's own record type for organizations, given to nobody (R-O4a, D-184). */
+	@NamespaceAccessible
+	public static final String SHIPPED_RECORD_TYPE = 'BarnCRM_Organization';
 
 	/** Developer names preferred, in this order, among the candidates detection weighs. */
 	private static final List<String> PREFERRED_NAMES = new List<String>{
@@ -86,7 +91,7 @@ public with sharing class AccountKinds {
 		String resolved;
 		if (NO_RECORD_TYPE.equalsIgnoreCase(stored)) {
 			resolved = NO_RECORD_TYPE;
-		} else if (String.isNotBlank(stored) && isCandidate(stored)) {
+		} else if (String.isNotBlank(stored) && (isCandidate(stored) || isShippedInForce(stored))) {
 			resolved = stored;
 		} else {
 			resolved = detectOrganizationRecordType();
@@ -259,7 +264,7 @@ public with sharing class AccountKinds {
 	public static void storeDetectedIfBlank() {
 		String stored = storedValue();
 		Boolean usableNone = NO_RECORD_TYPE.equalsIgnoreCase(stored) && noRecordTypeAllowed();
-		if (usableNone || isCandidate(stored)) {
+		if (usableNone || isCandidate(stored) || isShippedInForce(stored)) {
 			return;
 		}
 		SettingsService.saveSystemValue(
@@ -280,7 +285,36 @@ public with sharing class AccountKinds {
 		}
 		String name = developerName == null ? '' : developerName.toLowerCase();
 		String shown = label == null ? '' : label.toLowerCase();
-		return !name.contains(HOUSEHOLD_WORD) && !shown.contains(HOUSEHOLD_WORD);
+		return !name.contains(HOUSEHOLD_WORD) &&
+			!shown.contains(HOUSEHOLD_WORD) &&
+			!SHIPPED_RECORD_TYPE.equalsIgnoreCase(name);
+	}
+
+	/**
+	 * The record types the setting offers: the candidates, and Core's own `BarnCRM_Organization`
+	 * while it is active and the org has no candidate or has chosen it (R-O4a).
+	 */
+	@NamespaceAccessible
+	public static List<Schema.RecordTypeInfo> organizationChoices() {
+		List<Schema.RecordTypeInfo> choices = candidateRecordTypes();
+		Schema.RecordTypeInfo shipped = shippedRecordType();
+		if (shipped != null && (choices.isEmpty() || isShippedInForce(storedValue()))) {
+			choices.add(shipped);
+		}
+		return choices;
+	}
+
+	/** Core's own record type for organizations when it is active here, else null. */
+	private static Schema.RecordTypeInfo shippedRecordType() {
+		Schema.RecordTypeInfo info = accountDescribe()
+			.getRecordTypeInfosByDeveloperName()
+			.get(SHIPPED_RECORD_TYPE);
+		return info != null && info.isActive() ? info : null;
+	}
+
+	/** Whether this stored value is Core's own record type, still active, so it stays chosen. */
+	private static Boolean isShippedInForce(String stored) {
+		return SHIPPED_RECORD_TYPE.equalsIgnoreCase(stored) && shippedRecordType() != null;
 	}
 
 	/**
