@@ -4,8 +4,10 @@ import getSettingsLink from '@salesforce/apex/SettingsController.getSettingsLink
 import getState from '@salesforce/apex/ModuleManagerController.getState';
 import HEADING from '@salesforce/label/c.Core_HubModules_Title';
 import LINK from '@salesforce/label/c.Core_HubModules_ManagerLink';
-import STATUS_ON from '@salesforce/label/c.Core_ModuleManager_StatusOn';
-import STATUS_OFF from '@salesforce/label/c.Core_ModuleManager_StatusOff';
+// Every module on this card is installed, so the badge says only On or Off: "Installed and off"
+// read as "Installed" at a glance (owner QA, 2026-11-05).
+import STATUS_ON from '@salesforce/label/c.Core_Feature_On';
+import STATUS_OFF from '@salesforce/label/c.Core_Feature_Off';
 import OPEN_APP from '@salesforce/label/c.Core_ModuleManager_OpenApp';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 

@@ -89,9 +89,9 @@ describe('c-hub-modules', () => {
       'Mirror'
     ]);
     expect(all(element, 'module-status').map((n) => n.label)).toEqual([
-      'c.Core_ModuleManager_StatusOn',
-      'c.Core_ModuleManager_StatusOff',
-      'c.Core_ModuleManager_StatusOn'
+      'c.Core_Feature_On',
+      'c.Core_Feature_Off',
+      'c.Core_Feature_On'
     ]);
     // On is success, Off is neutral: one status vocabulary (vis-core-1).
     expect(all(element, 'module-status').map((n) => n.status)).toEqual(['on', 'off', 'on']);

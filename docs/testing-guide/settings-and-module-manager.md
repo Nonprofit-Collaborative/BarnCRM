@@ -103,7 +103,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 2 | Look at a **Not installed** row. | "No install link is published for this module yet." (no module has a published install version on main). |
 | 3 | Look at the **Core** row. | **Installed**, with no **Turn Off** button. |
 | 4 | On the **BarnCRM Volunteers** row, click **Turn Off**. | The row says **Installed and off**. **Turn On** replaces **Turn Off**. |
-| 5 | Open the **Home** tab and find the **Modules** card. | **BarnCRM Volunteers** shows **Installed and off**. |
+| 5 | Open the **Home** tab and find the **Modules** card. | **BarnCRM Volunteers** shows **Off**. |
 | 6 | Back in **Modules**, click **Turn On** on the Volunteers row. | The row says **Installed** again. No error shows. |
 | 7 | Click **What an Uninstall Deletes** on the Volunteers row. | A box starts "Uninstalling this module deletes these records, and the fields it added to people, households and organizations. Export what you need first." and lists each object with a count (a `+` means at least that many), then **Open Installed Packages**. |
 | 8 | Click **Check again**. | The report box closes and the list reloads with the same statuses. |
