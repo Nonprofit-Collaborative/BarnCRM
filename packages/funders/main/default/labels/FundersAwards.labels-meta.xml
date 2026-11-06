@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Funders_Calendar_ErrorLoad</fullName>
-        <categories>GrantCalendar</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Grant Calendar: load failed</shortDescription>
-        <value>The Grant Calendar could not load. Try again, or ask your admin to look at the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Calendar_Next</fullName>
         <categories>GrantCalendar</categories>
         <language>en_US</language>
@@ -49,14 +41,6 @@
         <value>No fund</value>
     </labels>
     <labels>
-        <fullName>Funders_Fund_NotInstalled</fullName>
-        <categories>GivingFund</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Giving Fund card without Giving</shortDescription>
-        <value>Install the Giving module to name the fund this grant's money is booked to.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Grant_BadFund</fullName>
         <categories>GivingFund</categories>
         <language>en_US</language>
@@ -79,14 +63,6 @@
         <protected>true</protected>
         <shortDescription>Award Schedule: what Build Schedule needs; also its refusal</shortDescription>
         <value>To build a schedule, the grant must be Awarded, with an Amount Awarded, an Award Start Date and an Award End Date, and have no expected or received payments.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Schedule_ErrorLoad</fullName>
-        <categories>AwardSchedule</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Award Schedule card: load failed</shortDescription>
-        <value>The award schedule could not load. Try again, or ask your admin to look at the Error Log.</value>
     </labels>
     <labels>
         <fullName>Funders_Schedule_ErrorRows</fullName>

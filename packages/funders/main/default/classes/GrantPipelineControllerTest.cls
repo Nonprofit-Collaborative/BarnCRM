@@ -137,6 +137,51 @@ private class GrantPipelineControllerTest {
 	}
 
 	@IsTest
+	static void recordTheAwardSavesThePeriodAndRestrictedInOneStep() {
+		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
+			Date today = Date.today();
+			Map<String, Grant__c> byName = grants(today);
+			Id applied = byName.get('Applied').Id;
+			Id soon = byName.get('Soon').Id;
+			Date start = Date.newInstance(2027, 1, 1);
+			Date finish = Date.newInstance(2027, 12, 31);
+
+			Test.startTest();
+			GrantPipelineController.Board board = GrantPipelineController.getBoard(false);
+			GrantPipelineController.recordAward(applied, 4500, start, finish, true);
+			GrantPipelineController.recordAward(soon, null, null, null, null);
+			Test.stopTest();
+
+			Grant__c awarded = [
+				SELECT
+					Stage__c,
+					Amount_Awarded__c,
+					Award_Start_Date__c,
+					Award_End_Date__c,
+					Restricted__c
+				FROM Grant__c
+				WHERE Id = :applied
+				WITH SYSTEM_MODE
+			];
+			Assert.areEqual(GrantService.STAGE_AWARDED, awarded.Stage__c, 'Awarded');
+			Assert.areEqual(4500, awarded.Amount_Awarded__c, 'With the amount');
+			Assert.areEqual(start, awarded.Award_Start_Date__c, 'The start date');
+			Assert.areEqual(finish, awarded.Award_End_Date__c, 'The end date');
+			Assert.isTrue(awarded.Restricted__c, 'And restricted');
+			Grant__c bare = reread(soon);
+			Assert.areEqual(GrantService.STAGE_AWARDED, bare.Stage__c, 'Every field is optional');
+			Assert.isNull(bare.Amount_Awarded__c, 'Nothing typed, nothing set');
+			Boolean sawFields = false;
+			for (GrantPipelineController.Card card : board.cards) {
+				if (card.id == applied) {
+					sawFields = card.restricted == false && card.awardStartDate == null;
+				}
+			}
+			Assert.isTrue(sawFields, 'A card carries what the dialog starts from');
+		}
+	}
+
+	@IsTest
 	static void aBadStageAndAReaderAreRefused() {
 		Id grantId;
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
@@ -157,7 +202,14 @@ private class GrantPipelineControllerTest {
 			} catch (AuraHandledException e) {
 				refusal = e.getMessage();
 			}
+			String awardRefusal;
+			try {
+				GrantPipelineController.recordAward(grantId, 10, null, null, null);
+			} catch (AuraHandledException e) {
+				awardRefusal = e.getMessage();
+			}
 			Test.stopTest();
+			Assert.areEqual(refusal, awardRefusal, 'Record the Award is refused the same way');
 			Assert.areEqual(
 				Label.Funders_Pipeline_ErrorNoPermission,
 				refusal,

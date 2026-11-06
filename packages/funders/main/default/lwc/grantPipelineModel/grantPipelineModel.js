@@ -85,3 +85,64 @@ export function deadlineRows(grants, today) {
 export function moveTargets(allStages, current) {
   return (allStages || []).filter((stage) => stage !== current);
 }
+
+/**
+ * The stages that have no column (Awarded, Declined, Withdrawn): the drop zones at the end of
+ * the board (DnD-1), in stage order.
+ *
+ * @param {string[]} allStages every stage, in order
+ * @param {string[]} openStages the stages drawn as columns
+ */
+export function closedStages(allStages, openStages) {
+  const open = new Set(openStages || []);
+  return (allStages || []).filter((stage) => !open.has(stage));
+}
+
+/**
+ * Marks what a drag in progress touches (DnD-1): the zone under the pointer or keyboard as
+ * `isTarget`, and the card being carried as `isDragging`. Copies; the input is left as is.
+ *
+ * @param {object[]} columns columns with `stage` and `cards` (each card with `id`)
+ * @param {{active: boolean, itemId: string, fromZone: string, overZone: string}} dragState
+ */
+export function markDrag(columns, dragState) {
+  const active = Boolean(dragState && dragState.active);
+  return (columns || []).map((column) => ({
+    ...column,
+    isTarget: active && dragState.overZone === column.stage && dragState.fromZone !== column.stage,
+    cards: (column.cards || []).map((card) => ({
+      ...card,
+      isDragging: active && dragState.itemId === card.id
+    }))
+  }));
+}
+
+/** A deadline this many days away or fewer is due soon (vis-modules-17). */
+export const SOON_DAYS = 14;
+
+/**
+ * How urgent a deadline is, as a status word of the UX kit's vocabulary: `overdue` when past,
+ * `due soon` within SOON_DAYS (today included), otherwise null.
+ *
+ * @param {number|null} daysLeft days from today to the deadline
+ */
+export function urgencyOf(daysLeft) {
+  if (daysLeft === null || daysLeft === undefined) {
+    return null;
+  }
+  if (daysLeft < 0) {
+    return 'overdue';
+  }
+  return daysLeft <= SOON_DAYS ? 'due soon' : null;
+}
+
+/** Up to two initials from a person's name ("Ana Ruiz" is "AR"); empty for no name. */
+export function initialsOf(name) {
+  return String(name || '')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join('');
+}

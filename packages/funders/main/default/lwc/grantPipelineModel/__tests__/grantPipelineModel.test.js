@@ -1,6 +1,57 @@
-import { buildColumns, daysBetween, deadlineRows, moveTargets } from 'c/grantPipelineModel';
+import {
+  buildColumns,
+  closedStages,
+  daysBetween,
+  deadlineRows,
+  initialsOf,
+  markDrag,
+  moveTargets,
+  urgencyOf
+} from 'c/grantPipelineModel';
 
 describe('grantPipelineModel', () => {
+  it('lists the stages with no column as drop zones, in stage order', () => {
+    expect(
+      closedStages(
+        ['Prospect', 'Applied', 'Awarded', 'Declined', 'Withdrawn'],
+        ['Prospect', 'Applied']
+      )
+    ).toEqual(['Awarded', 'Declined', 'Withdrawn']);
+    expect(closedStages(undefined, ['Prospect'])).toEqual([]);
+  });
+
+  it('marks the drag target column and the carried card', () => {
+    const columns = [
+      { stage: 'Prospect', cards: [{ id: 'a' }, { id: 'b' }] },
+      { stage: 'Applied', cards: [] }
+    ];
+    const marked = markDrag(columns, {
+      active: true,
+      itemId: 'a',
+      fromZone: 'Prospect',
+      overZone: 'Applied'
+    });
+    expect(marked.map((column) => column.isTarget)).toEqual([false, true]);
+    expect(marked[0].cards.map((card) => card.isDragging)).toEqual([true, false]);
+    expect(columns[0].isTarget).toBeUndefined();
+    expect(markDrag(columns, undefined)[1].isTarget).toBe(false);
+  });
+
+  it('says how urgent a deadline is in the status vocabulary', () => {
+    expect(urgencyOf(-1)).toBe('overdue');
+    expect(urgencyOf(0)).toBe('due soon');
+    expect(urgencyOf(14)).toBe('due soon');
+    expect(urgencyOf(15)).toBeNull();
+    expect(urgencyOf(null)).toBeNull();
+  });
+
+  it('takes up to two initials from a name', () => {
+    expect(initialsOf('Ana Maria Ruiz')).toBe('AM');
+    expect(initialsOf('maria')).toBe('M');
+    expect(initialsOf('')).toBe('');
+    expect(initialsOf(null)).toBe('');
+  });
+
   it('counts whole days either way and refuses unreadable dates', () => {
     expect(daysBetween('2026-11-02', '2026-11-12')).toBe(10);
     expect(daysBetween('2026-11-02', '2026-10-31')).toBe(-2);

@@ -1,0 +1,70 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <template lwc:if={errorMessage}>
+      <c-barn-notice
+        variant="error"
+        message={errorMessage}
+        data-id="award-error"
+        class="slds-var-m-bottom_small"
+      ></c-barn-notice>
+    </template>
+    <div class="slds-grid slds-wrap slds-gutters_x-small" data-id="award-dialog">
+      <div class="slds-col slds-size_1-of-1 slds-var-m-bottom_x-small">
+        <lightning-input
+          data-id="award-amount"
+          type="number"
+          formatter="currency"
+          step="0.01"
+          min="0"
+          label={labels.amount}
+          value={amount}
+          onchange={handleAmount}
+        ></lightning-input>
+      </div>
+      <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-var-m-bottom_x-small">
+        <lightning-input
+          data-id="award-start"
+          type="date"
+          label={fieldLabels.start}
+          value={startDate}
+          onchange={handleStart}
+        ></lightning-input>
+      </div>
+      <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-var-m-bottom_x-small">
+        <lightning-input
+          data-id="award-end"
+          type="date"
+          label={fieldLabels.end}
+          value={endDate}
+          min={startDate}
+          onchange={handleEnd}
+        ></lightning-input>
+      </div>
+      <div class="slds-col slds-size_1-of-1">
+        <lightning-input
+          data-id="award-restricted"
+          type="checkbox"
+          label={fieldLabels.restricted}
+          checked={restricted}
+          onchange={handleRestricted}
+        ></lightning-input>
+      </div>
+    </div>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button
+      data-id="award-cancel"
+      label={labels.cancel}
+      onclick={handleCancel}
+    ></lightning-button>
+    <lightning-button
+      data-id="award-save"
+      class="slds-var-m-left_x-small"
+      variant="brand"
+      label={labels.save}
+      disabled={isSaving}
+      onclick={handleSave}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

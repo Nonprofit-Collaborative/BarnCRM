@@ -116,7 +116,7 @@ public with sharing class GrantReportController {
 			return data;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getReportData', grantId);
-			throw UserErrors.message(Label.Funders_Report_ErrorLoad);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Report_LoadFailed'));
 		}
 	}
 

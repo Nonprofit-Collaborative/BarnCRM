@@ -9,6 +9,14 @@
         <value>Answer Library</value>
     </labels>
     <labels>
+        <fullName>Funders_Answers_NoAnswers</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer Library empty state heading</shortDescription>
+        <value>No Answers Yet</value>
+    </labels>
+    <labels>
         <fullName>Funders_Answers_Search</fullName>
         <categories>Funders</categories>
         <language>en_US</language>

@@ -76,7 +76,7 @@ public with sharing class FundersBoardController {
 			return board;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getBoard');
-			throw UserErrors.message(Label.Funders_Board_ErrorLoad);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Board_LoadFailed'));
 		}
 	}
 

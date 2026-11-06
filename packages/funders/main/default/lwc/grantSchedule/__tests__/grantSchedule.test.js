@@ -3,9 +3,15 @@ import GrantSchedule from 'c/grantSchedule';
 import getSchedule from '@salesforce/apex/GrantScheduleController.getSchedule';
 import saveSchedule from '@salesforce/apex/GrantScheduleController.saveSchedule';
 import markReceived from '@salesforce/apex/GrantScheduleController.markReceived';
+import undoReceived from '@salesforce/apex/GrantScheduleController.undoReceived';
 import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
+import { clearHelpTextForTest, setHelpTextForTest } from 'c/barnHelpText';
 
 const TOAST = 'lightning__showtoast';
+
+jest.mock('@salesforce/apex/GrantScheduleController.undoReceived', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 
 jest.mock('@salesforce/apex/GrantScheduleController.getSchedule', () => ({ default: jest.fn() }), {
   virtual: true
@@ -128,10 +134,56 @@ describe('c-grant-schedule', () => {
     expect(getSchedule).toHaveBeenCalledTimes(2);
   });
 
+  it('offers Undo after Mark Received and puts the payment back', async () => {
+    markReceived.mockResolvedValue({ id: PAYMENT_ID, status: 'Expected', dateValue: null });
+    undoReceived.mockResolvedValue();
+    const element = await render(SCHEDULED);
+    const toasts = [];
+    element.addEventListener(TOAST, (event) => toasts.push(event.detail));
+    expect(one(element, '[data-id="undo-received"]')).toBeNull();
+
+    one(element, '[data-id="mark-received"]').click();
+    await flush();
+    const undo = one(element, '[data-id="undo-received"]');
+    expect(undo).not.toBeNull();
+
+    undo.dispatchEvent(new CustomEvent('action'));
+    await flush();
+    expect(undoReceived).toHaveBeenCalledWith({
+      paymentId: PAYMENT_ID,
+      status: 'Expected',
+      receivedDate: null
+    });
+    expect(one(element, '[data-id="undo-received"]')).toBeNull();
+    expect(toasts[toasts.length - 1]).toMatchObject({ variant: 'success' });
+  });
+
+  it('shows the share of the award received as a meter', async () => {
+    const element = await render(SCHEDULED);
+    expect(one(element, '[data-id="received-meter"]').value).toBe(50);
+    expect(one(element, '[data-id="received-meter"]').valueText).toBe('50%');
+  });
+
   it('says what a schedule needs when it cannot be built', async () => {
     const element = await render({ ...BUILDABLE, stage: 'Applied', canBuild: false });
-    expect(one(element, '[data-id="cannot-build"]')).not.toBeNull();
+    expect(one(element, '[data-id="cannot-build"]').textContent).toBe(
+      'c.Funders_Schedule_NeedsAwarded'
+    );
     expect(one(element, '[data-id="build"]')).toBeNull();
+  });
+
+  it('names only the missing award field', async () => {
+    setHelpTextForTest({ Funders_Schedule_NeedsFields: 'Add the {0} to build a schedule.' });
+    const element = await render({
+      ...BUILDABLE,
+      endDate: null,
+      canBuild: false,
+      fieldLabels: { ...BUILDABLE.fieldLabels, endDate: 'Award End Date' }
+    });
+    expect(one(element, '[data-id="cannot-build"]').textContent).toBe(
+      'Add the Award End Date to build a schedule.'
+    );
+    clearHelpTextForTest();
   });
 
   it('hides Mark Received from someone who cannot change payments', async () => {
@@ -153,6 +205,6 @@ describe('c-grant-schedule', () => {
     broken.recordId = GRANT_ID;
     document.body.appendChild(broken);
     await flush();
-    expect(one(broken, '[data-id="error-message"]').textContent).toBe('Could not load.');
+    expect(one(broken, '[data-id="error-message"]').message).toBe('Could not load.');
   });
 });
