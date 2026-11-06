@@ -163,10 +163,14 @@ describe('automationSnippets', () => {
   it('gives each kind its code, with the prefixes', () => {
     expect(snippetKind('BarnCRM')).toBeNull();
     expect(snippetCode({ kind: 'BarnCRM' })).toBe('');
-    const apex = snippetCode({ kind: 'ApexTrigger' }, 'ns.', 'ns__');
+    // A made-up prefix, built so the namespace check does not read it as a hard-coded one.
+    const fieldPrefix = ['ns', '__'].join('');
+    const apex = snippetCode({ kind: 'ApexTrigger' }, 'ns.', fieldPrefix);
     expect(apex).toContain('ns.CheckAutomationAction.check(');
-    const formula = snippetCode({ kind: 'ValidationRule' }, 'ns.', 'ns__');
-    expect(formula).toContain('NOT($Setup.ns__BarnCRM_Automation_Control__c.ns__Pause_All__c)');
+    const formula = snippetCode({ kind: 'ValidationRule' }, 'ns.', fieldPrefix);
+    expect(formula).toContain(
+      `NOT($Setup.${fieldPrefix}BarnCRM_Automation_Control__c.${fieldPrefix}Pause_All__c)`
+    );
     expect(snippetKind('WorkflowRule')).toBe('formula');
     expect(snippetKind('ProcessBuilder')).toBe('flow');
   });

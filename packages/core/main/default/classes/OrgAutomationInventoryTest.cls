@@ -87,6 +87,7 @@ private class OrgAutomationInventoryTest {
 
 	@IsTest
 	static void anOrgFlowIsNotCheckedAndCanBeDeactivatedWhileActive() {
+		// runs-as: deploying user (rows built in memory; no record or permission is read)
 		Map<String, Object> values = new Map<String, Object>{
 			'DurableId' => '300000000000001AAA',
 			'ApiName' => 'My_Gift_Flow',
@@ -116,6 +117,7 @@ private class OrgAutomationInventoryTest {
 
 	@IsTest
 	static void anOrgTriggerIsCoveredOnlyWhenItAsksTheSetting() {
+		// runs-as: deploying user (rows built in memory; no record or permission is read)
 		Map<String, Object> values = new Map<String, Object>{
 			'Name' => 'GiftTriggerOwn',
 			'Status' => 'Active',
