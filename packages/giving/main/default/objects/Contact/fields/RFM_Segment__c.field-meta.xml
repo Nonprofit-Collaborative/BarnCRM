@@ -3,7 +3,7 @@
   <fullName>RFM_Segment__c</fullName>
   <externalId>false</externalId>
   <inlineHelpText>Champion, Loyal, Promising, At Risk, Lapsed or Occasional, named from the three scores. Empty for a donor with no gifts.</inlineHelpText>
-  <label>RFM Segment</label>
+  <label>Giving Pattern</label>
   <length>40</length>
   <required>false</required>
   <trackTrending>false</trackTrending>

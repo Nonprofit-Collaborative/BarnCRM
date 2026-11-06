@@ -1,4 +1,10 @@
-import { addMonths, buildPayments, MAX_PAYMENTS } from 'c/grantScheduleModel';
+import {
+  addMonths,
+  buildNeeds,
+  buildPayments,
+  MAX_PAYMENTS,
+  percentOf
+} from 'c/grantScheduleModel';
 
 describe('grantScheduleModel', () => {
   it('adds months on the same day, or the last day of a shorter month', () => {
@@ -73,5 +79,43 @@ describe('grantScheduleModel', () => {
     expect(
       buildPayments({ amount: 1, start: '2027-01-01', end: '2037-01-01', frequency: 'Monthly' })
     ).toEqual([]);
+  });
+
+  it('names only what a schedule still needs', () => {
+    expect(
+      buildNeeds({
+        stage: 'Awarded',
+        amountAwarded: 1000,
+        startDate: '2027-01-01',
+        endDate: '2027-12-31'
+      })
+    ).toEqual({ notAwarded: false, missing: [], reversed: false });
+    expect(buildNeeds({ stage: 'Awarded', amountAwarded: 1000, startDate: '2027-01-01' })).toEqual({
+      notAwarded: false,
+      missing: ['endDate'],
+      reversed: false
+    });
+    expect(buildNeeds({ stage: 'Applied' })).toEqual({
+      notAwarded: true,
+      missing: ['awarded', 'startDate', 'endDate'],
+      reversed: false
+    });
+    expect(
+      buildNeeds({
+        stage: 'Awarded',
+        amountAwarded: 1000,
+        startDate: '2027-12-31',
+        endDate: '2027-01-01'
+      }).reversed
+    ).toBe(true);
+    expect(buildNeeds(undefined).notAwarded).toBe(true);
+  });
+
+  it('works out a whole percent, kept between 0 and 100', () => {
+    expect(percentOf(12500, 25000)).toBe(50);
+    expect(percentOf(1, 3)).toBe(33);
+    expect(percentOf(30000, 25000)).toBe(100);
+    expect(percentOf(5, 0)).toBe(0);
+    expect(percentOf(5, null)).toBe(0);
   });
 });

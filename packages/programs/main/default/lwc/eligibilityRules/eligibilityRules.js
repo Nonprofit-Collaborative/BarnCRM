@@ -39,7 +39,6 @@ import SAVE_FIRST from '@salesforce/label/c.Programs_Elig_SaveFirst';
 import NO_RULE_MATCHED from '@salesforce/label/c.Programs_Elig_NoRuleMatched';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Elig_MoreThanShown';
 import READ_ONLY from '@salesforce/label/c.Programs_Elig_ReadOnly';
-import ACTION_FAILED from '@salesforce/label/c.Programs_Elig_ActionFailed';
 import OP_EQUALS from '@salesforce/label/c.Programs_Elig_OpEquals';
 import OP_NOT_EQUALS from '@salesforce/label/c.Programs_Elig_OpNotEquals';
 import OP_IN from '@salesforce/label/c.Programs_Elig_OpIn';
@@ -51,6 +50,8 @@ import OP_LESS_OR_EQUAL from '@salesforce/label/c.Programs_Elig_OpLessOrEqual';
 import OP_BLANK from '@salesforce/label/c.Programs_Elig_OpBlank';
 import OP_NOT_BLANK from '@salesforce/label/c.Programs_Elig_OpNotBlank';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import AVAILABLE_VALUES from '@salesforce/label/c.Core_Filter_AvailableValues';
+import CHOSEN_VALUES from '@salesforce/label/c.Core_Filter_ChosenValues';
 
 import {
   RESULTS,
@@ -66,6 +67,18 @@ import {
 } from './eligibilityEngine';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { createDragController, moveItem } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
+
+const HELP = ['Programs', 'Core'];
+
+/** Comma text (how the panel holds a list value) as the list a dual listbox shows. */
+function listOf(text) {
+  return String(text || '')
+    .split(',')
+    .map((part) => part.trim())
+    .filter((part) => part !== '');
+}
 
 const OPERATOR_LABELS = {
   equals: OP_EQUALS,
@@ -87,7 +100,7 @@ const OPERATOR_LABELS = {
  * and Reason.
  */
 export default class EligibilityRules extends LightningElement {
-  helpReady = isHelpLoaded('Programs');
+  helpReady = isHelpLoaded(HELP);
 
   @api recordId;
 
@@ -122,8 +135,17 @@ export default class EligibilityRules extends LightningElement {
     includeDecided: INCLUDE_DECIDED,
     moreThanShown: MORE_THAN_SHOWN,
     readOnly: READ_ONLY,
-    loading: LOADING
+    loading: LOADING,
+    value: VALUE,
+    availableValues: AVAILABLE_VALUES,
+    chosenValues: CHOSEN_VALUES
   };
+
+  /** The last drag step, read out by the aria-live region. */
+  announcement = '';
+  /** c/barnDrag's state while a rule is dragged: which one, and where it would land. */
+  dragState;
+  drag;
 
   state;
   config = parseRules('');
@@ -138,11 +160,55 @@ export default class EligibilityRules extends LightningElement {
 
   connectedCallback() {
     if (!this.helpReady) {
-      loadHelp('Programs').then(() => {
+      loadHelp(HELP).then(() => {
         this.helpReady = true;
       });
     }
+    // DnD-5: a rule is dragged by its handle (mouse, pen, or touch after a press and hold) or by
+    // keyboard (Space, the arrow keys, Space again); Move Up and Move Down stay as the plain path.
+    this.drag = createDragController({
+      root: this.template,
+      layout: 'list',
+      messages: dragMessages(),
+      announce: (text) => {
+        this.announcement = text;
+      },
+      onChange: (state) => {
+        this.dragState = state;
+      },
+      onDrop: ({ itemId, toIndex }) => {
+        const from = this.config.rules.findIndex((rule) => rule.id === itemId);
+        if (from < 0 || from === toIndex) {
+          return false;
+        }
+        this.touch({ ...this.config, rules: moveItem(this.config.rules, from, toIndex) });
+        return true;
+      }
+    });
     this.load();
+  }
+
+  disconnectedCallback() {
+    if (this.drag) {
+      this.drag.destroy();
+    }
+  }
+
+  get dragHelp() {
+    return dragInstructions();
+  }
+
+  /** Two or more rules can be put in order by dragging; a reader cannot. */
+  get canDrag() {
+    return this.canEdit && this.config.rules.length > 1;
+  }
+
+  handlePointerDown(event) {
+    this.drag.pointerDown(event);
+  }
+
+  handleDragKey(event) {
+    this.drag.keyDown(event);
   }
 
   load() {
@@ -157,7 +223,7 @@ export default class EligibilityRules extends LightningElement {
         }
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Elig'));
       })
       .finally(() => {
         this.loading = false;
@@ -228,27 +294,61 @@ export default class EligibilityRules extends LightningElement {
     ];
   }
 
+  /** A picklist field's choices by API name (modules-9: picked from a list, not typed). */
+  get choicesByField() {
+    const map = {};
+    ((this.state && this.state.fields) || []).forEach((field) => {
+      if (field.choices && field.choices.length) {
+        map[field.apiName] = field.choices.map((value) => ({ label: value, value }));
+      }
+    });
+    return map;
+  }
+
   get ruleViews() {
-    const last = this.config.rules.length - 1;
-    return this.config.rules.map((rule, index) => ({
+    const rules = this.config.rules;
+    const last = rules.length - 1;
+    const choices = this.choicesByField;
+    const drag = this.dragState && this.dragState.active ? this.dragState : null;
+    // While dragging, the rule the dragged one would land before (or after, at the end).
+    const others = drag ? rules.filter((rule) => rule.id !== drag.itemId) : [];
+    const before = drag && drag.overIndex >= 0 ? others[drag.overIndex] : null;
+    const after =
+      drag && drag.overIndex === others.length && others.length ? others[others.length - 1] : null;
+    return rules.map((rule, index) => ({
       key: rule.id,
       index,
       title: format(RULE, index + 1),
+      boxClass: [
+        'slds-box slds-var-m-bottom_small',
+        drag && drag.itemId === rule.id ? 'rule-dragging' : '',
+        before && before.id === rule.id ? 'rule-over-before' : '',
+        after && after.id === rule.id ? 'rule-over-after' : ''
+      ]
+        .filter(Boolean)
+        .join(' '),
       result: rule.result,
       reason: rule.reason,
       basis: rule.basis,
       moveUpDisabled: index === 0,
       moveDownDisabled: index === last,
-      conditions: rule.all.map((condition, position) => ({
-        key: `${rule.id}-${position}`,
-        index: position,
-        field: condition.field,
-        operator: condition.operator,
-        value: condition.value,
-        showValue: needsValue(condition.operator),
-        valueLabel: isListOperator(condition.operator) ? `${VALUE} (${VALUE_LIST})` : VALUE,
-        canRemove: rule.all.length > 1
-      }))
+      conditions: rule.all.map((condition, position) => {
+        const options = choices[condition.field];
+        const showChoices = !!options && isListOperator(condition.operator);
+        return {
+          key: `${rule.id}-${position}`,
+          index: position,
+          field: condition.field,
+          operator: condition.operator,
+          value: condition.value,
+          showChoices,
+          choiceOptions: options || [],
+          chosen: showChoices ? listOf(condition.value) : [],
+          showValue: needsValue(condition.operator) && !showChoices,
+          valueLabel: isListOperator(condition.operator) ? `${VALUE} (${VALUE_LIST})` : VALUE,
+          canRemove: rule.all.length > 1
+        };
+      })
     }));
   }
 
@@ -380,6 +480,10 @@ export default class EligibilityRules extends LightningElement {
     this.changeCondition(event, { value: event.target.value });
   }
 
+  handleChoicesChange(event) {
+    this.changeCondition(event, { value: (event.detail.value || []).join(', ') });
+  }
+
   handleResultChange(event) {
     this.changeRule(this.ruleOf(event), { result: event.detail.value });
   }
@@ -423,7 +527,7 @@ export default class EligibilityRules extends LightningElement {
         }
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Elig'));
       })
       .finally(() => {
         this.busy = false;
@@ -456,7 +560,7 @@ export default class EligibilityRules extends LightningElement {
         return this.load();
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Elig'));
       })
       .finally(() => {
         this.busy = false;

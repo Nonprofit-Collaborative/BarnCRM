@@ -3,32 +3,62 @@ import getModel from '@salesforce/apex/LogicModelBuilderController.getModel';
 import getPrograms from '@salesforce/apex/LogicModelBuilderController.getPrograms';
 import setProgram from '@salesforce/apex/LogicModelBuilderController.setProgram';
 import saveElement from '@salesforce/apex/LogicModelBuilderController.saveElement';
+import saveOrder from '@salesforce/apex/LogicModelBuilderController.saveOrder';
 
 import { downloadCsv } from 'c/findCsv';
+import { createDragController } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
 import {
   RESULTS_SHEET_COLUMNS,
+  backwardLinks,
+  canMoveTo,
   columns,
+  dropOrders,
   findings,
+  linkTargets,
   liveLinks,
   nextOrder,
   resultsSheetRows,
   stageByKey
 } from 'c/logicModelRules';
-import { LABELS, format, messageFrom, stageLabel } from 'c/logicModelText';
+import {
+  LABELS,
+  arrowDragMessages,
+  backwardMessage,
+  DRAG_TEXT,
+  format,
+  messageFrom,
+  stageLabel
+} from 'c/logicModelText';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const ORGANIZATION = '';
 const SELECTED_PART = 'selected-part';
 const PART_TILE = 'part-tile';
+const HELP = ['LogicModels', 'Core'];
+
+/** The width at which the columns sit side by side (logicModelBuilder.css); below it they stack. */
+const SIDE_BY_SIDE = '(min-width: 64em)';
+
+function columnsSideBySide() {
+  return typeof window === 'undefined' || typeof window.matchMedia !== 'function'
+    ? true
+    : window.matchMedia(SIDE_BY_SIDE).matches;
+}
 
 /**
  * The Logic Model Builder panel on a logic model (L-01 to L-04): whose model it is, the seven
  * columns of parts drawn left to right, the selected part with its arrows and indicators, what
  * needs attention, and the Logic Model Report.
  * Every save returns the whole model, which the panel redraws.
+ *
+ * Drag and drop is an addition (DnD-2, DnD-3, c/barnDrag): a part's handle moves it within its
+ * column or to another one, and its arrow handle dropped on a later part opens Add Arrow with
+ * that part chosen. Edit, Move Up, Move Down and Add Arrow stay. On a phone, where the columns
+ * stack, a part reorders within its column only and arrows are drawn with the form.
  */
 export default class LogicModelBuilder extends LightningElement {
-  helpReady = isHelpLoaded('LogicModels');
+  helpReady = isHelpLoaded(HELP);
 
   @api recordId;
 
@@ -45,17 +75,66 @@ export default class LogicModelBuilder extends LightningElement {
   programOptions = [];
   draftProgramId = ORGANIZATION;
   focusTarget;
+  /** c/barnDrag's state while a part is moved, and while an arrow is drawn. */
+  moveState = {};
+  arrowState = {};
+  dragAnnouncement = '';
+  /** The part an arrow was dropped on: the Add Arrow form opens with it once drawn. */
+  pendingArrowTarget;
 
   connectedCallback() {
     if (!this.helpReady) {
-      loadHelp('LogicModels').then(() => {
+      loadHelp(HELP).then(() => {
         this.helpReady = true;
       });
     }
+    const announce = (text) => {
+      this.dragAnnouncement = text;
+    };
+    this.moveDrag = createDragController({
+      root: this.template,
+      layout: 'columns',
+      // A column is a move zone and each part row an arrow zone; both carry data-drop-zone.
+      zoneSelector: '[data-move-zone]',
+      itemSelector: '[data-move-handle]',
+      messages: dragMessages(),
+      announce,
+      onChange: (state) => {
+        this.moveState = state;
+      },
+      canDrop: (itemId, fromZone, toZone) =>
+        fromZone === toZone || (columnsSideBySide() && canMoveTo(this.model, itemId, toZone)),
+      onDrop: (drop) => this.dropPart(drop)
+    });
+    this.arrowDrag = createDragController({
+      root: this.template,
+      layout: 'columns',
+      zoneSelector: '[data-arrow-zone]',
+      itemSelector: '[data-arrow-handle]',
+      messages: arrowDragMessages(),
+      announce,
+      onChange: (state) => {
+        this.arrowState = state;
+      },
+      canDrop: (itemId, fromZone, toZone) =>
+        columnsSideBySide() &&
+        linkTargets(this.model, itemId).some((element) => element.id === toZone),
+      onDrop: (drop) => this.dropArrow(drop)
+    });
     this.load();
   }
 
+  disconnectedCallback() {
+    if (this.moveDrag) {
+      this.moveDrag.destroy();
+    }
+    if (this.arrowDrag) {
+      this.arrowDrag.destroy();
+    }
+  }
+
   renderedCallback() {
+    this.openPendingArrow();
     this.applyFocus();
   }
 
@@ -222,8 +301,13 @@ export default class LogicModelBuilder extends LightningElement {
 
   get columns() {
     const linked = this.linkedIds;
+    const move = this.moveState || {};
+    const arrow = this.arrowState || {};
+    const canEdit = this.canEdit;
     return columns(this.model).map((column, index) => {
       const name = stageLabel(column.key);
+      const over = !!move.active && move.overZone === column.key;
+      const others = column.elements.filter((element) => element.id !== move.itemId);
       return {
         key: column.key,
         name,
@@ -232,14 +316,134 @@ export default class LogicModelBuilder extends LightningElement {
         addLabel: format(LABELS.addTo, name),
         adding: this.addingStage === column.key,
         empty: column.elements.length === 0,
-        elements: column.elements.map((element) => ({
-          id: element.id,
-          name: element.name,
-          pressed: element.id === this.selectedId ? 'true' : 'false',
-          className: this.partClass(element.id, linked)
-        }))
+        columnClass: [
+          'diagram__column',
+          over ? 'diagram__column_over' : '',
+          over && move.overIndex === others.length ? 'diagram__column_drop-end' : ''
+        ]
+          .filter(Boolean)
+          .join(' '),
+        elements: column.elements.map((element) => {
+          const moving = !!move.active && move.itemId === element.id;
+          const before = over && !moving && others.indexOf(element) === move.overIndex;
+          const arrowSource = !!arrow.active && arrow.itemId === element.id;
+          const arrowTarget = !!arrow.active && arrow.overZone === element.id;
+          return {
+            id: element.id,
+            name: element.name,
+            pressed: element.id === this.selectedId ? 'true' : 'false',
+            className: this.partClass(element.id, linked),
+            rowClass: [
+              'part-row',
+              moving ? 'part-row_moving' : '',
+              before ? 'part-row_drop-before' : '',
+              arrowSource ? 'part-row_arrow-source' : '',
+              arrowTarget ? 'part-row_arrow-target' : ''
+            ]
+              .filter(Boolean)
+              .join(' '),
+            moveLabel: DRAG_TEXT.moveHandle(element.name),
+            arrowLabel: DRAG_TEXT.arrowHandle(element.name),
+            canDrawArrow: canEdit && linkTargets(this.model, element.id).length > 0
+          };
+        })
       };
     });
+  }
+
+  get dragInstructions() {
+    return dragInstructions();
+  }
+
+  get arrowInstructions() {
+    return DRAG_TEXT.arrowInstructions();
+  }
+
+  get dragHint() {
+    return DRAG_TEXT.hint();
+  }
+
+  // -------------------------------------------------------------------- drag and drop
+
+  handleMovePointerDown(event) {
+    if (this.canEdit && !this.busy) {
+      this.moveDrag.pointerDown(event);
+    }
+  }
+
+  handleMoveKey(event) {
+    if (this.canEdit && !this.busy) {
+      this.moveDrag.keyDown(event);
+    }
+  }
+
+  handleArrowPointerDown(event) {
+    if (this.canEdit && !this.busy) {
+      this.arrowDrag.pointerDown(event);
+    }
+  }
+
+  handleArrowKey(event) {
+    if (this.canEdit && !this.busy) {
+      this.arrowDrag.keyDown(event);
+    }
+  }
+
+  /**
+   * A part dropped in a column (DnD-2): within its own column the column is renumbered, as Move
+   * Up and Move Down do; in another column it changes column first, then takes its place. A
+   * change the arrow rules refuse snaps back with the Edit form's message naming the arrows.
+   */
+  dropPart({ itemId, fromZone, toZone, toIndex }) {
+    const element = this.model.elements.find((item) => item.id === itemId);
+    if (!element) {
+      return false;
+    }
+    if (fromZone === toZone) {
+      const orders = dropOrders(this.model, itemId, toZone, toIndex);
+      return this.run(saveOrder({ modelId: this.model.id, ordersJson: JSON.stringify(orders) }));
+    }
+    const backward = backwardLinks(this.model, itemId, toZone);
+    if (backward.length) {
+      this.errorMessage = backwardMessage(backward);
+      return false;
+    }
+    const stage = stageByKey(toZone);
+    const changed = {
+      id: itemId,
+      name: element.name,
+      description: element.description,
+      type: stage.type,
+      term: stage.term
+    };
+    return this.run(
+      saveElement({ elementJson: JSON.stringify(changed) }).then((model) =>
+        saveOrder({
+          modelId: model.id,
+          ordersJson: JSON.stringify(dropOrders(model, itemId, toZone, toIndex))
+        })
+      )
+    );
+  }
+
+  /** An arrow dropped on a later part (DnD-3): Add Arrow opens on the first part with it chosen. */
+  dropArrow({ itemId, toZone }) {
+    this.addingStage = undefined;
+    this.selectedId = itemId;
+    this.pendingArrowTarget = toZone;
+    return true;
+  }
+
+  openPendingArrow() {
+    if (!this.pendingArrowTarget) {
+      return;
+    }
+    const part = this.template.querySelector('[data-id="selected-part"]');
+    if (part) {
+      const target = this.pendingArrowTarget;
+      this.pendingArrowTarget = undefined;
+      part.startArrow(target);
+    }
   }
 
   handleSelect(event) {
@@ -337,7 +541,7 @@ export default class LogicModelBuilder extends LightningElement {
 
   // ---------------------------------------------------------------------------- saving
 
-  /** Runs one save, shows the model it returns and announces it once. */
+  /** Runs one save, shows the model it returns and announces it once; true when it saved. */
   run(call, after) {
     this.busy = true;
     this.errorMessage = undefined;
@@ -349,10 +553,13 @@ export default class LogicModelBuilder extends LightningElement {
         }
         this.resultMessage = LABELS.saved;
         this.focusTarget = 'result';
+        return true;
       })
       .catch((error) => {
         this.errorMessage = messageFrom(error);
         this.focusTarget = 'error-message';
+        // A drop that failed snaps back (c/barnDrag reads false as refused).
+        return false;
       })
       .finally(() => {
         this.busy = false;

@@ -1,72 +1,72 @@
 <template>
-  <lightning-card title={labels.title} icon-name="custom:custom62">
-    <div class="slds-var-p-horizontal_medium">
-      <template lwc:if={isLoading}>
-        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
-      </template>
+  <template lwc:if={showCard}>
+    <lightning-card title={labels.title} icon-name="custom:custom62" data-id="card">
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={isLoading}>
+          <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+        </template>
 
-      <template lwc:if={errorMessage}>
-        <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
-      </template>
+        <template lwc:if={errorMessage}>
+          <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
+        </template>
 
-      <template lwc:if={notInstalled}>
-        <p data-id="not-installed" class="slds-text-body_small">{labels.notInstalled}</p>
-      </template>
+        <template lwc:if={noRequirements}>
+          <p data-id="no-requirements" class="slds-text-body_small">{labels.noRequirements}</p>
+        </template>
 
-      <template lwc:if={noRequirements}>
-        <p data-id="no-requirements" class="slds-text-body_small">{labels.noRequirements}</p>
-      </template>
-
-      <template lwc:if={hasRows}>
-        <ul class="slds-has-dividers_bottom-space">
-          <template for:each={rows} for:item="row">
-            <li key={row.id} data-id="requirement" class="slds-item">
-              <p class="slds-text-title_bold">{row.heading}</p>
-              <template lwc:if={row.canEdit}>
-                <div class="slds-grid slds-grid_vertical-align-end slds-var-m-top_xx-small">
-                  <lightning-combobox
-                    class="slds-col slds-grow"
-                    data-id={row.id}
-                    label={labels.title}
-                    variant="label-hidden"
-                    options={row.options}
-                    value={row.value}
-                    onchange={handleChange}
-                  ></lightning-combobox>
-                  <lightning-button
-                    class="slds-var-m-left_x-small"
-                    data-id={row.id}
-                    label={row.saveLabel}
-                    disabled={row.saveDisabled}
-                    onclick={handleSave}
-                  ></lightning-button>
-                </div>
-              </template>
-              <template lwc:else>
-                <p data-id="read-only" class="slds-text-body_regular">{row.readOnlyName}</p>
-              </template>
-              <template lwc:if={row.missing}>
-                <p data-id="missing" class="slds-text-body_small slds-text-color_error">
-                  {row.missingText}
-                </p>
-              </template>
-              <template lwc:if={row.noIndicators}>
-                <p data-id="no-indicators" class="slds-text-body_small slds-text-color_weak">
-                  {row.noIndicatorsText}
-                </p>
-              </template>
-              <template for:each={row.indicators} for:item="indicator">
-                <div key={indicator.key} data-id="indicator" class="slds-var-m-top_x-small">
-                  <p class="slds-text-body_small">{indicator.title}</p>
-                  <template for:each={indicator.lines} for:item="line">
-                    <p key={line.key} class="slds-text-body_small slds-text-color_weak">{line.text}</p>
-                  </template>
-                </div>
-              </template>
-            </li>
-          </template>
-        </ul>
-      </template>
-    </div>
-  </lightning-card>
+        <template lwc:if={hasRows}>
+          <ul class="slds-has-dividers_bottom-space">
+            <template for:each={rows} for:item="row">
+              <li key={row.id} data-id="requirement" class="slds-item">
+                <p class="slds-text-title_bold">{row.heading}</p>
+                <template lwc:if={row.canEdit}>
+                  <div class="slds-grid slds-grid_vertical-align-end slds-var-m-top_xx-small">
+                    <lightning-combobox
+                      class="slds-col slds-grow"
+                      data-id={row.id}
+                      label={labels.title}
+                      variant="label-hidden"
+                      options={row.options}
+                      value={row.value}
+                      onchange={handleChange}
+                    ></lightning-combobox>
+                    <lightning-button
+                      class="slds-var-m-left_x-small"
+                      data-id={row.id}
+                      label={row.saveLabel}
+                      disabled={row.saveDisabled}
+                      onclick={handleSave}
+                    ></lightning-button>
+                  </div>
+                </template>
+                <template lwc:else>
+                  <p data-id="read-only" class="slds-text-body_regular">{row.readOnlyName}</p>
+                </template>
+                <template lwc:if={row.missing}>
+                  <p data-id="missing" class="slds-text-body_small slds-text-color_error">
+                    {row.missingText}
+                  </p>
+                </template>
+                <template lwc:if={row.noIndicators}>
+                  <p data-id="no-indicators" class="slds-text-body_small slds-text-color_weak">
+                    {row.noIndicatorsText}
+                  </p>
+                </template>
+                <template for:each={row.indicators} for:item="indicator">
+                  <div key={indicator.key} data-id="indicator" class="slds-var-m-top_x-small">
+                    <p class="slds-text-body_small">{indicator.title}</p>
+                    <template for:each={indicator.lines} for:item="line">
+                      <p key={line.key} class="slds-text-body_small slds-text-color_weak">
+                        {line.text}
+                      </p>
+                    </template>
+                  </div>
+                </template>
+              </li>
+            </template>
+          </ul>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
 </template>

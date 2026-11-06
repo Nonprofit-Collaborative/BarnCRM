@@ -39,7 +39,8 @@ is reused with a new interface rather than a new mechanism.
   Date and Donor Level, labelled from the fields, read with the viewer's access (no card for
   someone who cannot read gifts or those fields), and **Enter a Gift**, shown only to someone
   who can create a gift, opening Quick Gift Entry with the donor (`c__donorId`). The button
-  reads its name from the `New_Gift` quick action, so the two never disagree.
+  reads its name from the donor page's `Enter_Gift` quick action (renamed from `New_Gift` by
+  people-giving-12), so the two never disagree.
 
 ## Alternatives considered
 

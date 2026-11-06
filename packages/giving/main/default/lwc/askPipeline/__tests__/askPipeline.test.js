@@ -3,7 +3,12 @@ import AskPipeline from 'c/askPipeline';
 import getBoard from '@salesforce/apex/AskPipelineController.getBoard';
 import moveStage from '@salesforce/apex/AskPipelineController.moveStage';
 import closeAsk from '@salesforce/apex/AskPipelineController.closeAsk';
+import reopenAsk from '@salesforce/apex/AskPipelineController.reopenAsk';
+import BarnConfirmModal from 'c/barnConfirmModal';
 
+jest.mock('@salesforce/apex/AskPipelineController.reopenAsk', () => ({ default: jest.fn() }), {
+  virtual: true
+});
 jest.mock('@salesforce/apex/AskPipelineController.getBoard', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -81,6 +86,12 @@ async function render(board = BOARD) {
   return element;
 }
 
+function pointer(type, pointerType, clientX, clientY) {
+  const event = new CustomEvent(type);
+  Object.assign(event, { pointerId: 1, pointerType, button: 0, clientX, clientY });
+  return event;
+}
+
 const all = (element, selector) => [...element.shadowRoot.querySelectorAll(selector)];
 const one = (element, selector) => element.shadowRoot.querySelector(selector);
 
@@ -116,15 +127,91 @@ describe('c-ask-pipeline', () => {
     expect(getBoard).toHaveBeenCalledTimes(2);
   });
 
-  it('moves a card dropped on another column', async () => {
+  it('moves a card dragged with the mouse onto another column, and announces it', async () => {
     moveStage.mockResolvedValue();
     const element = await render();
+    const columns = all(element, '[data-id="column"]');
+    columns.forEach((column, index) => {
+      column.getBoundingClientRect = () => ({
+        left: index * 100,
+        right: index * 100 + 90,
+        top: 0,
+        bottom: 500
+      });
+    });
     const card = all(element, '[data-card]')[0];
-    card.dispatchEvent(new CustomEvent('dragstart'));
-    const identified = all(element, '[data-id="column"]')[0];
-    identified.dispatchEvent(new CustomEvent('drop'));
+    expect(card.dataset.dragId).toBe('a01000000000001AAA');
+    card.dispatchEvent(pointer('pointerdown', 'mouse', 150, 50));
+    window.dispatchEvent(pointer('pointermove', 'mouse', 40, 50));
+    await flush();
+    expect(columns[0].className).toContain('ask-column_drop');
+    expect(all(element, '[data-card]')[0].className).toContain('ask-card_dragging');
+    window.dispatchEvent(pointer('pointerup', 'mouse', 40, 50));
+    await flush();
     await flush();
     expect(moveStage).toHaveBeenCalledWith({ askId: 'a01000000000001AAA', stage: 'Identified' });
+    expect(one(element, '[data-id="live"]').textContent).toBe('c.Core_Drag_Dropped');
+  });
+
+  it('offers no drop on the column of stages no longer in the list', async () => {
+    const element = await render();
+    const columns = all(element, '[data-id="column"]');
+    expect(columns[0].dataset.dropZone).toBe('Identified');
+    expect(columns[2].dataset.dropZone).toBeUndefined();
+    // The card in that column cannot be picked up either.
+    expect(all(element, '[data-card]')[1].dataset.dragId).toBeUndefined();
+  });
+
+  it('shows recently closed asks with their outcome and reopens one after a confirm', async () => {
+    reopenAsk.mockResolvedValue();
+    BarnConfirmModal.open.mockResolvedValue(true);
+    const element = await render({
+      ...BOARD,
+      recentlyClosed: [
+        {
+          id: 'a01000000000003AAA',
+          name: 'ASK-00000003',
+          stage: 'Asked',
+          donorName: 'Sam Park',
+          amount: 900,
+          outcome: 'Won',
+          closedDate: '2026-10-30'
+        }
+      ]
+    });
+    const titles = all(element, '[data-id="column"] h2').map((node) => node.textContent.trim());
+    expect(titles[titles.length - 1]).toBe('c.Giving_AskPipeline_RecentlyClosed');
+    const badge = one(element, '[data-id="outcome"]');
+    expect(badge.status).toBe('success');
+    const menus = all(element, 'lightning-button-menu');
+    const closedMenu = menus[menus.length - 1];
+    const values = [...closedMenu.querySelectorAll('lightning-menu-item')].map((i) => i.value);
+    expect(values).toEqual(['open', 'reopen']);
+    // A closed card cannot be dragged.
+    expect(all(element, '[data-drag-handle]')).toHaveLength(1);
+
+    closedMenu.dispatchEvent(new CustomEvent('select', { detail: { value: 'reopen' } }));
+    await flush();
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ confirmLabel: 'c.Giving_AskPipeline_ReopenAsk' })
+    );
+    expect(reopenAsk).toHaveBeenCalledWith({ askId: 'a01000000000003AAA' });
+    expect(getBoard).toHaveBeenCalledTimes(2);
+  });
+
+  it('reopens nothing when the confirm is cancelled', async () => {
+    BarnConfirmModal.open.mockResolvedValue(false);
+    const element = await render({
+      ...BOARD,
+      recentlyClosed: [{ id: 'a01000000000003AAA', stage: 'Asked', outcome: 'Declined' }]
+    });
+    expect(one(element, '[data-id="outcome"]').status).toBe('closed');
+    const menus = all(element, 'lightning-button-menu');
+    menus[menus.length - 1].dispatchEvent(
+      new CustomEvent('select', { detail: { value: 'reopen' } })
+    );
+    await flush();
+    expect(reopenAsk).not.toHaveBeenCalled();
   });
 
   it('switches to My Asks and to the list', async () => {
@@ -135,6 +222,7 @@ describe('c-ask-pipeline', () => {
     await flush();
     expect(getBoard).toHaveBeenLastCalledWith({ mineOnly: true });
 
+    expect(one(element, '[data-id="open-amount"]').formatStyle).toBe('currency');
     one(element, '[data-id="view"]').dispatchEvent(
       new CustomEvent('change', { detail: { value: 'list' } })
     );
@@ -170,6 +258,21 @@ describe('c-ask-pipeline', () => {
     expect(one(element, '[data-id="close-dialog"]')).toBeNull();
   });
 
+  it('shows the date and amount beside each gift and pledge offered to link', async () => {
+    const element = await render();
+    all(element, 'lightning-button-menu')[0].dispatchEvent(
+      new CustomEvent('select', { detail: { value: 'close' } })
+    );
+    await flush();
+    one(element, '[data-field="result"]').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'link' } })
+    );
+    await flush();
+    const pickers = all(element, 'lightning-record-picker');
+    expect(pickers[0].displayInfo.additionalFields).toEqual(['Gift_Date__c', 'Amount__c']);
+    expect(pickers[1].displayInfo.additionalFields).toEqual(['Start_Date__c', 'Expected_Total__c']);
+  });
+
   it('keeps the dialog open and shows the reason when closing is refused', async () => {
     closeAsk.mockResolvedValue({ success: false, error: 'Another donor' });
     const element = await render();
@@ -186,7 +289,7 @@ describe('c-ask-pipeline', () => {
     await flush();
 
     expect(closeAsk.mock.calls[0][0].input.result).toBeNull();
-    expect(one(element, '[data-id="close-error"]').textContent.trim()).toBe('Another donor');
+    expect(one(element, '[data-id="close-error"]').message).toBe('Another donor');
   });
 
   it('offers a reader nothing to change', async () => {
@@ -197,7 +300,14 @@ describe('c-ask-pipeline', () => {
       ...all(element, 'lightning-button-menu')[0].querySelectorAll('lightning-menu-item')
     ].map((item) => item.value);
     expect(items).toEqual(['open']);
-    expect(all(element, '[data-card]')[0].getAttribute('draggable')).toBe('false');
+    expect(all(element, '[data-drag-handle]')).toHaveLength(0);
+    const card = all(element, '[data-card]')[0];
+    expect(card.dataset.dragId).toBeUndefined();
+    card.dispatchEvent(pointer('pointerdown', 'mouse', 150, 50));
+    window.dispatchEvent(pointer('pointermove', 'mouse', 40, 50));
+    window.dispatchEvent(pointer('pointerup', 'mouse', 40, 50));
+    await flush();
+    expect(moveStage).not.toHaveBeenCalled();
   });
 
   it('says so when there are no open asks, and shows a load failure', async () => {
@@ -209,6 +319,6 @@ describe('c-ask-pipeline', () => {
     const element = createElement('c-ask-pipeline', { is: AskPipeline });
     document.body.appendChild(element);
     await flush();
-    expect(one(element, '[data-id="error-message"]').textContent.trim()).toBe('Could not load');
+    expect(one(element, '[data-id="error-message"]').message).toBe('Could not load');
   });
 });

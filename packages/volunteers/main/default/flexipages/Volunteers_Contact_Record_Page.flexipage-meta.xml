@@ -361,6 +361,9 @@
               <value>Contact.Log_Interaction</value>
             </valueListItems>
             <valueListItems>
+              <value>Contact.Log_Hours</value>
+            </valueListItems>
+            <valueListItems>
               <value>Contact.Volunteer_Letter</value>
             </valueListItems>
             <valueListItems>

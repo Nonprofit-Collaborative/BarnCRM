@@ -194,3 +194,21 @@ periods `2026 Q2` (1 April to 30 June 2026, target 30, result 25), `2026 Q3`, `2
 | 6 | In an org with Core and Logic Models only, open **Source**, choose **Computed**. | No **Template** box: only the saved query form. |
 
 **Cleanup:** Delete the indicator and the saved query.
+
+## T-LM-12: Drag and Drop
+
+**Purpose:** confirm parts move and arrows draw by drag, by keyboard and by touch, alongside the existing buttons (DnD-2, DnD-3).
+**Prerequisites:** staff, the model from T-LM-02 on a wide screen (columns side by side); a phone or a narrow window for step 7.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Look at the columns. | Each part has a grip handle at its left and, unless it is in **Impact** or has every later part linked already, an arrow handle at its right. A hint under the columns says parts and arrows can be dragged. **Move Up**, **Move Down**, **Edit** and **Add Arrow** are still in a part's details. |
+| 2 | Add `Books` to **Inputs** below `Two tutors`. Drag `Books` by its handle above `Two tutors`. | A blue line shows where it lands; after the drop `Books` is above `Two tutors` and the status says `Saved.` |
+| 3 | Drag `Books` into **Activities** below `Weekly sessions`. | `Books` is under **Activities**, below `Weekly sessions`. Reload: it stays there. |
+| 4 | Drag `Weekly sessions` into **Inputs**. | Refused: the part goes back to **Activities** and the message names the arrow `Two tutors to Weekly sessions`, as **Edit** does. |
+| 5 | Drag the arrow handle of `Books` onto `Sessions held`. | `Books` is selected; under **Leads To** the **Add Arrow** form is open with **Part It Leads To** set to `Sessions held` and focus in **Assumption**. Nothing is saved until **Save**. Dragging onto `Two tutors` (an earlier column) does not highlight it and drops nothing. |
+| 6 | With the keyboard, Tab to the handle of `Books`, press Space, Up, Space. Then Tab to its arrow handle, press Space, Right until `Reads at home` is announced, Space. Repeat a move and press Escape. | A screen reader announces picking up, each position, and the drop; the part moves and the arrow form opens as in steps 2 and 5. Escape puts the part back and says the move was cancelled. Focus stays on the handle. |
+| 7 | On a phone (or a window narrower than 1024 pixels), press and hold a part's handle and drag it within its column; then try to drag it into the next column. | The part reorders within its column. It does not drop in another column (use **Edit**). No arrow handles or drag hint show; **Add Arrow** works as before. A quick swipe over a part scrolls the page. |
+| 8 | As read-only, open the model. | No handles and no drag hint. |
+
+**Cleanup:** Delete `Books` and the arrow, if saved.

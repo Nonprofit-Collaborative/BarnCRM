@@ -17,6 +17,20 @@ An acknowledgment is not a receipt. A receipt is the tax document with a number 
 is [receipts.md](receipts.md). A donor usually gets both, and they are separate on purpose:
 the thank you is yours to write and rewrite, and the receipt is not.
 
+## The Thank-Yous Page
+
+The page and its tab in the BarnCRM Fundraising app are called **Thank-Yous**. It opens on the
+work: **Waiting to Go** (emails ready, letters ready, opted out, no one to send to, no rule
+matches, last and next run, and the send buttons), then **Recent Runs**. The rules sit below in
+a collapsed **Rules (Admin)** section, which opens on its own for someone with Manage BarnCRM
+Settings and stays closed for everyone else.
+
+To change the order rules are tried in, drag a rule by its handle, or use **Move Up** and
+**Move Down** beside it. With a keyboard, focus the row, press Space to pick it up, the arrow
+keys to move it, and Enter to drop it (Escape cancels). Each move saves straight away,
+renumbers the rules 10, 20, 30 in the new order, and is read out to screen readers. Only
+someone with Manage BarnCRM Settings can reorder rules.
+
 ## How to Turn It On
 
 Everything is in the app, with one exception noted at step 3.
@@ -29,7 +43,7 @@ Everything is in the app, with one exception noted at step 3.
    BarnCRM ships one to start from, called **BarnCRM: thank you for your gift**. Writing or
    changing a template is the one place you may find yourself in Setup, under Email
    Templates, and it is where Salesforce keeps template editing for everybody.
-4. Create your rules with **New Rule** on the Acknowledgments page. The rule form opens on the
+4. Create your rules with **New Rule** in **Rules (Admin)** on the Thank-Yous page. The rule form opens on the
    page itself; to change a rule later, click **Edit** beside it. Each rule has:
    - an **order**, lowest first. The first rule that matches a gift wins, so put your most
      specific rule at the top;
@@ -65,7 +79,7 @@ Start with the sample data loaded (see [sample-data.md](sample-data.md)).
    everything else gets an email.
 4. Enter a gift for $50 from one of the sample households, using **Quick Gift Entry**. Enter
    a second gift for $2,500 from another one.
-5. Go back to the Acknowledgments page. The queue now reads **1 email** and **1 letter**,
+5. Go back to the Thank-Yous page. The queue now reads **1 email** and **1 letter**,
    plus whatever the sample gifts added.
 6. Press **Send Emails Now**. The page shows the run finishing and the count sent. Open the
    $50 gift: its acknowledgment status is now **Acknowledged**, with today's date, and its
@@ -86,15 +100,16 @@ Acknowledgment Runs**.
 
 **Two rules that both match, in the wrong order.** A rule with no minimum and no maximum
 matches everything, so if it sits above your major gift rule, your major donors get the
-standard email. Fix the order numbers, lowest for the most specific rule. Changing a rule
+standard email. Drag the specific rule above it, or use **Move Up**. Changing a rule
 takes effect for gifts still in the queue: nothing is stored on a gift until it is sent.
 
 **A template that is no longer there.** If the template a rule uses is deleted or switched
 off, the page shows **Template not found** beside the rule, and any acknowledgment that
-tries to use it is marked Failed with that reason rather than sending an empty message.
-Click **Edit** beside the rule and choose another template. The same happens to a rule
+tries to use it is marked Failed rather than sending an empty message. Its **Failure Reason**
+names both the missing template and the rule, and says to edit the rule on the Thank-Yous
+page. Click **Edit** beside the rule and choose another template. The same happens to a rule
 created on the standard record page with a template name typed by hand, which is why rules
-are best created on the Acknowledgments page.
+are best created on the Thank-Yous page.
 
 **An organization gift with nobody to email.** A gift credited to an organization that has no
 primary contact has no email address to send to. The run counts it under **could not be
@@ -106,7 +121,7 @@ rule that sends organization gifts by letter.
 **Email Opt Out** is ticked. For a person's gift that is the donor; for an organization or
 household gift it is the account's primary contact, the person the email would have gone to.
 The gift is left in the queue with no acknowledgment record and no error, and the
-Acknowledgments page counts it on its own line, **Opted out of email, sent by letter**. Those
+Thank-Yous page counts it on its own line, **Opted out of email, sent by letter**. Those
 gifts are also counted in **Letters ready to merge**, and the next **Download letters to
 merge** puts them in the file, so the donor is still thanked. If you do not send letters,
 they wait in the queue until you do, or until someone sets the gift's acknowledgment status

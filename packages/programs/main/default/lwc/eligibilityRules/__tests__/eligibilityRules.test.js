@@ -288,6 +288,64 @@ describe('c-eligibility-rules', () => {
     expect(findAll(element, 'rule')).toHaveLength(2);
   });
 
+  it('offers the choices of a picklist field as a list for one of (modules-9)', async () => {
+    const fields = [
+      {
+        apiName: 'Referral_Source__c',
+        label: 'Referral Source',
+        kind: 'string',
+        choices: ['Self', 'School', 'Another Agency']
+      },
+      { apiName: 'Intake_Date__c', label: 'Intake Date', kind: 'date', choices: [] }
+    ];
+    getState.mockResolvedValue(stateOf({ fields }));
+    saveRules.mockResolvedValue([]);
+    const element = await mount();
+
+    // Rule 1 is "equal to": a typed box. Rule 2 is "one of" on a picklist: the dual list.
+    const choices = findAll(element, 'choices');
+    expect(choices).toHaveLength(1);
+    expect(choices[0].value).toEqual(['School', 'Another Agency']);
+    expect(choices[0].options.map((option) => option.value)).toEqual(fields[0].choices);
+    expect(findAll(element, 'value')).toHaveLength(1);
+
+    choices[0].dispatchEvent(new CustomEvent('change', { detail: { value: ['Self', 'School'] } }));
+    await flush();
+    find(element, 'save').click();
+    await flush();
+    const sent = JSON.parse(saveRules.mock.calls[0][0].rules);
+    expect(sent.rules[1].all[0].value).toEqual(['Self', 'School']);
+  });
+
+  it('moves a rule by its drag handle from the keyboard (DnD-5)', async () => {
+    getState.mockResolvedValue(stateOf());
+    const element = await mount();
+    const handles = findAll(element, 'drag');
+    expect(handles).toHaveLength(2);
+    expect(handles[0].getAttribute('tabindex')).toBe('0');
+    expect(handles[0].getAttribute('aria-describedby')).toMatch(/^drag-help/);
+    expect(findAll(element, 'move-up')).toHaveLength(2);
+
+    const key = (target, name) =>
+      target.dispatchEvent(new KeyboardEvent('keydown', { key: name, bubbles: true }));
+    key(handles[0], ' ');
+    await flush();
+    expect(find(element, 'drag-live').textContent).toBe('c.Core_Drag_PickedUp');
+    key(handles[0], 'ArrowDown');
+    await flush();
+    key(handles[0], ' ');
+    await flush();
+    await flush();
+
+    expect(Array.from(findAll(element, 'rule-title')).map((title) => title.textContent)).toEqual([
+      'Rule 1',
+      'Rule 2'
+    ]);
+    expect(findAll(element, 'reason')[0].value).toBe('Referred by a partner');
+    expect(find(element, 'unsaved')).not.toBeNull();
+    expect(find(element, 'drag-live').textContent).toBe('c.Core_Drag_Dropped');
+  });
+
   it('screens one enrollment or all, only after the rules are saved', async () => {
     getState.mockResolvedValue(stateOf());
     screen.mockResolvedValue({
@@ -325,7 +383,7 @@ describe('c-eligibility-rules', () => {
     find(element, 'screen-all').click();
     await flush();
     expect(screen).toHaveBeenCalledTimes(2);
-    expect(find(element, 'error-message').textContent).toContain('Programs_Elig_SaveFirst');
+    expect(find(element, 'error-message').message).toContain('Programs_Elig_SaveFirst');
   });
 
   it('is read only without permission, and says so when there are no rules', async () => {
@@ -335,6 +393,7 @@ describe('c-eligibility-rules', () => {
     expect(find(element, 'add-rule')).toBeNull();
     expect(find(element, 'save')).toBeNull();
     expect(find(element, 'screen-all')).toBeNull();
+    expect(find(element, 'drag')).toBeNull();
 
     getState.mockResolvedValue(stateOf({ rules: null, people: [] }));
     const empty = await mount();
@@ -345,6 +404,6 @@ describe('c-eligibility-rules', () => {
   it('shows a failure to load in its own words', async () => {
     getState.mockRejectedValue({ body: { message: 'No access.' } });
     const element = await mount();
-    expect(find(element, 'error-message').textContent).toContain('No access.');
+    expect(find(element, 'error-message').message).toContain('No access.');
   });
 });

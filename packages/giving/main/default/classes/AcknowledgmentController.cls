@@ -1,5 +1,5 @@
 /**
- * What the Acknowledgments page calls.
+ * What the Thank-Yous page (the `acknowledgments` component) calls.
  *
  * Thin on purpose. Every rule lives in `AcknowledgmentRuleService`, `AcknowledgmentService` and
  * `AcknowledgmentRunService`, which are testable without a screen; this class turns their
@@ -7,6 +7,10 @@
  * render.
  */
 public with sharing class AcknowledgmentController {
+	/** The gap between rule numbers after a reorder, and the most rules one reorder renumbers. */
+	private static final Integer ORDER_STEP = 10;
+	private static final Integer MAX_RULES = 500;
+
 	/** One rule, flattened, with the template resolved to the label an administrator recognizes. */
 	public class RuleView {
 		@AuraEnabled
@@ -155,6 +159,45 @@ public with sharing class AcknowledgmentController {
 			return currentView();
 		} catch (Exception failure) {
 			throw asUserError(failure, 'AcknowledgmentController.setSchedule');
+		}
+	}
+
+	/**
+	 * Puts the rules in a new order, as dragged or moved up and down on the page: each rule's
+	 * Order becomes 10, 20, 30 and so on in the order given, in one save, so a rule always has
+	 * room to go between two others when it is typed by hand (people-giving DnD-2).
+	 */
+	@AuraEnabled
+	public static PageView reorderRules(List<Id> ruleIds) {
+		try {
+			if (!BarnCRMPermissions.canManageSettings()) {
+				throw new AcknowledgmentService.AcknowledgmentException(
+					BarnHelp.text('Giving', 'Giving_Acknowledgments_ErrorReorderNotPermitted')
+				);
+			}
+			List<Acknowledgment_Rule__c> rules = new List<Acknowledgment_Rule__c>();
+			Integer position = 0;
+			for (Id ruleId : ruleIds == null ? new List<Id>() : ruleIds) {
+				if (
+					ruleId == null ||
+					ruleId.getSObjectType() != Acknowledgment_Rule__c.SObjectType
+				) {
+					continue;
+				}
+				position++;
+				rules.add(
+					new Acknowledgment_Rule__c(Id = ruleId, Order__c = position * ORDER_STEP)
+				);
+				if (rules.size() == MAX_RULES) {
+					break;
+				}
+			}
+			if (!rules.isEmpty()) {
+				Database.update(rules, true, AccessLevel.USER_MODE);
+			}
+			return currentView();
+		} catch (Exception failure) {
+			throw asUserError(failure, 'AcknowledgmentController.reorderRules');
 		}
 	}
 

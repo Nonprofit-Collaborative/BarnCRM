@@ -18,11 +18,19 @@ import ROLE_LABEL from '@salesforce/label/c.Giving_SoftCredits_RoleLabel';
 import CUSTOM_ROLE_LABEL from '@salesforce/label/c.Giving_SoftCredits_CustomRoleLabel';
 import AMOUNT_LABEL from '@salesforce/label/c.Giving_AskPipeline_FieldAmount';
 import ACTION_FAILED from '@salesforce/label/c.Giving_SoftCredits_ActionFailed';
+import EMPTY_HEADING from '@salesforce/label/c.Giving_SoftCredits_EmptyHeading';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { iconFor } from 'c/barnIcons';
 
 const ROLE_OTHER = 'Other';
 const DEFAULT_ROLE = 'Solicitor';
+
+/**
+ * Two people with the same name look different in the picker: email and mailing city sit under
+ * each name (people-giving-1), so a credit does not land on the wrong John Smith.
+ */
+const PERSON_DISPLAY_INFO = { additionalFields: ['Email', 'MailingCity'] };
 
 export default class GiftSoftCredits extends LightningElement {
   helpReady = isHelpLoaded('Giving');
@@ -37,8 +45,13 @@ export default class GiftSoftCredits extends LightningElement {
 
   @api recordId;
 
+  icons = { softCredit: iconFor('Soft_Credit__c') };
+
+  personDisplayInfo = PERSON_DISPLAY_INFO;
+
   labels = {
     title: TITLE,
+    emptyHeading: EMPTY_HEADING,
     get empty() {
       return helpText('Giving', 'Giving_SoftCredits_Empty');
     },

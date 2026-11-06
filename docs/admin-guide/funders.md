@@ -42,8 +42,9 @@ finishes, BarnCRM does three things on its own:
 2. Gives you, the person who installed it, the **Funders Admin** permission set.
 3. Gives everyone who already has a BarnCRM role their Funders permission set (see below).
 
-Then open the **BarnCRM Funders** app from the App Launcher. Its tabs are **Grant Pipeline**,
-**Board Dashboard**, **Grant Calendar**, **Grants**, **Grant Requirements**, **Grant Answers**,
+Then open the **BarnCRM Funders** app from the App Launcher. It opens on the **Board Dashboard**,
+the module's home. Its tabs are **Board Dashboard**, **Grant Pipeline**, **Grant Calendar**,
+**Grants**, **Grant Requirements**, **Grant Answers**,
 **Funder Report Templates** (admins only), **Reports** and **Error Log**; Grant Pipeline and
 Grants also join the BarnCRM apps. The morning reminder job is a step of
 [BarnCRM Nightly Jobs](nightly-jobs.md), which a new install schedules; if Health Check says
@@ -92,6 +93,20 @@ On the **Grants** tab click **New** and fill in:
 | Owner | The staff member responsible. |
 | Funding Source | What kind of funder: Foundation, Corporate, Federal, Federal Pass-Through, State, Local Government or Other. The board dashboard groups awards by it. |
 
+### The Grant Page
+
+A grant's page groups its panels into tabs, on a phone too:
+
+| Tab | What is on it |
+|---|---|
+| Overview | The grant's details, and the Program and Giving Fund cards (each only with its module). |
+| Money | The Award Schedule card, the Payments list and the Restricted Fund Entries list. |
+| Reporting | The Requirements list, the Logic Model Outcomes card (with Logic Models) and the Funder Report card. |
+| Writing | The Answer Library card. |
+| Related | Every related list, including any your organization adds. |
+
+To change the page, edit **Grant Record Page** in Lightning App Builder.
+
 ### Government Awards
 
 A grant's **Government Award** section holds what a government award (or any award that asks for
@@ -139,7 +154,8 @@ organizations moves the grants to the one you keep.
 
 With the Programs module installed, the grant's page has a **Program** card. Choose the program
 from the list and click **Save**; choose **No program** to clear it. Without Programs the card
-says that programs are not installed and there is nothing to choose. The grant stores the
+is not shown at all (staff cannot install a module, so the page does not ask them to). The
+Giving Fund and Logic Model Outcomes cards do the same without their module. The grant stores the
 program's record ID, so Funders works without Programs; if the program is later deleted, the card
 says the program cannot be found and you can choose another.
 
@@ -155,7 +171,7 @@ glance what you will report.
 
 Any requirement type can name an outcome; Deliverable and Narrative Report are the usual ones. The
 requirement stores the outcome's record ID in **Logic Model Outcome**, so Funders and Logic Models
-never need each other: without Logic Models the card says it is not installed, and if the outcome
+never need each other: without Logic Models the card is not shown, and if the outcome
 is later deleted the card says it cannot be found. The automation **Requirement: outcome is an
 outcome** always runs and refuses anything in that field that is not one. Choosing an
 outcome needs edit access to requirements (Funders Staff or Admin) and read access to Logic
@@ -165,28 +181,41 @@ Models; the outcomes and results shown follow each person's own Logic Models acc
 
 The **Grant Pipeline** tab is where most people work:
 
-- **Totals** at the top: open requests and the amount requested, and grants awarded this fiscal
-  year with the amount awarded.
+- **Totals** at the top as tiles: open requests and the amount requested, and the amount awarded
+  this fiscal year, with the number of grants awarded under them.
 - **Board**: one column per open stage, each with its count and amount, and a card per grant
-  showing the funder, the amount requested, the deadline and the owner. Click a card's menu to
-  open the grant or move it to another stage. Moving to **Awarded** asks for the amount awarded
-  (the amount requested is filled in for you).
+  showing its name (a link that opens the grant), the amount requested, the funder, the deadline
+  and the owner. A deadline within 14 days shows a **Due in** badge (amber), a past one an
+  **Overdue** badge (red). Click a card's menu to open the grant or move it to another stage,
+  or drag the card by its handle into another column, or onto the **Awarded**, **Declined** and
+  **Withdrawn** zones after the last column. Dragging works with a mouse, by touch (press and
+  hold first) and by keyboard (Space, the arrow keys, Space; Escape cancels), and a screen
+  reader hears each step. The menu stays for every move.
+- **Record the Award**: moving a grant to **Awarded** opens a dialog that also asks **Amount
+  Awarded** (the amount requested is filled in), **Award Start Date**, **Award End Date** and
+  **Restricted**, all optional. On save a message links to the grant, where the Award Schedule
+  card builds the payments.
 - **Everyone** or **Mine**: all open grants, or only those you own.
 - **Upcoming Deadlines**: every open grant whose application deadline is past or within the next
-  60 days, and every open requirement due in that time or overdue, soonest first, with overdue
-  ones marked. A requirement row has a **Mark Submitted** button.
+  60 days, and every open requirement due in that time or overdue, soonest first, with due soon
+  and overdue ones badged. A requirement row has a **Mark Submitted** button; after it, an
+  **Undo** link puts the requirement's status and Submitted Date back while the tab stays open.
 
-Moving and the menu's stage choices are offered only to people who can edit grants, and **Mark
+Moving, dragging and the menu's stage choices are offered only to people who can edit grants, and **Mark
 Submitted** only to people who can change requirements.
 
 ## The Board Dashboard Tab
 
-The **Board Dashboard** tab answers the questions a board asks about money, for the current
-fiscal year. Everyone with a Funders set sees it; it only reads, and it stores nothing.
+The **Board Dashboard** tab is the Funders app's home and answers the questions a board asks
+about money, for the current fiscal year. Everyone with a Funders set sees it; it only reads, and
+it stores nothing. At the top, tiles show **Revenue This Fiscal Year**, **Awarded This Fiscal
+Year**, with Giving **Gifts to funds**, and, with restricted fund tracking, **Restricted Grants:
+Balance**. Under them, a tile for each Funders tab the person can open (Grant Pipeline, Grant
+Calendar, Grants, Grant Requirements, Grant Answers and, for admins, Funder Report Templates).
 
 - **Revenue Mix**: grants awarded this fiscal year (stage Awarded, decision date this fiscal year)
   totaled by **Funding Source**, and, with Giving, one more line for gifts designated to funds
-  this fiscal year. Each line shows its amount and share. Grants with no funding source show as
+  this fiscal year. Each line shows its amount and share as a bar. Grants with no funding source show as
   "Not set"; fill it in so the mix is right.
 - **Concentration**: the organizations giving the most, each with its share of that revenue (its
   grants awarded plus, with Giving, its Giving This Year). The dashboard flags a single source
@@ -197,8 +226,8 @@ fiscal year. Everyone with a Funders set sees it; it only reads, and it stores n
   (received less spent and released) is listed too.
 
 Without Giving, or for someone without access to it, the dashboard shows the grant figures alone.
-Each person sees totals of the records they can read. Print it with your browser's print command
-for a board packet.
+Each person sees totals of the records they can read. For a board packet, click **Print**: the
+browser's print dialog opens with the app's header and navigation left off.
 
 **A grant also recorded as a Giving gift is counted twice.** The dashboard adds grants and gifts
 side by side and does not match one to the other, so a grant whose payment you also enter as a
@@ -345,7 +374,9 @@ shows **Amount Scheduled** (every payment not Cancelled) and **Amount Received**
 
 The grant's page has an **Award Schedule** card. Once the grant is **Awarded** with an **Amount
 Awarded**, an **Award Start Date** and an **Award End Date**, and has no expected or received
-payment yet, the card offers **Build Schedule**:
+payment yet, the card offers **Build Schedule**. Until then it names only what is missing: the
+Awarded stage, one of those fields, or award dates in the wrong order. The card shows Amount
+Awarded, Amount Scheduled and Amount Received as tiles, with a bar for the share received.
 
 1. Choose the **Payment Frequency**: **Once**, **Annual**, **Semiannual**, **Quarterly** or
    **Monthly**.
@@ -357,7 +388,9 @@ payment yet, the card offers **Build Schedule**:
 
 After that, change a payment's date or amount, add one, or cancel one in the grant's **Payments**
 list. **Mark Received** on the card sets a payment Received; its **Received Date** fills in with
-today unless you typed one. That is the automation **Grant payment received** on the
+today unless you typed one, and the card offers **Undo** while it is open: the payment goes back
+to Expected with its earlier Received Date, and the Received ledger entry it wrote is removed,
+unless the payment was changed since. That is the automation **Grant payment received** on the
 **Automation** page; switch it off while you import past payments.
 
 ## Restricted Funds
@@ -388,7 +421,7 @@ import past payments and entries.
 
 With the Giving module installed, the grant's page has a **Giving Fund** card. Choose the fund the
 organization books this money to in Giving and click **Save**. Like the program, the grant stores
-the fund's record ID, so Funders works without Giving; without Giving the card says so. Funders
+the fund's record ID, so Funders works without Giving; without Giving the card is not shown. Funders
 reads only the fund's name: Giving's own fund totals count the gifts you record in Giving, and the
 grant's restricted ledger counts its entries, so nothing is counted twice.
 
@@ -399,7 +432,8 @@ submitted, due dates of open requirements, and expected payments, each on its da
 its grant. An overdue item shows a warning icon, the word Overdue (in its hover text and for screen readers) and bold text, not red alone. A key under the month heading names the border colours: Application (blue), Grant Requirement (orange), Grant Payment (green), plus the Overdue mark. Use **Previous**, **Next** and **Today** to move between
 months, and **Everyone** or **Mine** as on the Grant Pipeline (Mine: grants you own and
 requirements assigned to you). It shows the same deadlines as the pipeline's **Upcoming
-Deadlines**, plus payments.
+Deadlines**, plus payments with their amounts in your currency. **Print** prints the month
+without the app's header and navigation.
 
 ## Sample Data
 
@@ -426,18 +460,19 @@ Do this as Maria, who holds the Admin role, with a second user, Dana, who has no
 4. Open **Grant Pipeline**. The grant is in the **Prospect** column, and in **Upcoming
    Deadlines**.
 5. From the card's menu choose **Move to Applied**. Open the grant: **Submitted Date** is today.
-6. Back on the board, choose **Move to Awarded** and accept 25,000. The grant leaves the board and
-   **Awarded This Fiscal Year** shows 25,000; its **Decision Date** is today.
+6. Back on the board, choose **Move to Awarded**. In **Record the Award** accept 25,000, set
+   **Award Start Date** to January 1 next year and **Award End Date** to December 31 the year
+   after, tick **Restricted** and click **Save**. The grant leaves the board, **Awarded This
+   Fiscal Year** shows 25,000 and its **Decision Date** is today.
 7. Try to delete the organization. Salesforce refuses and names the grant.
 8. On the grant's **Requirements** list click **New**: "Year 1 report", due in 5 days, **Assigned
    To** Dana. On **Grant Pipeline** it shows under **Upcoming Deadlines** with **Mark Submitted**.
 9. The next morning Dana has a task "Year 1 report due for 2027 Literacy Grant" (and an
    email, if you turned **Email reminders** on).
    Click **Mark Submitted**: the row leaves the list and the requirement's **Submitted Date** is
-   today.
-10. On the grant, set **Award Start Date** to January 1 next year and **Award End Date** to
-    December 31 the year after, and tick **Restricted**. On the **Award Schedule** card choose
-    **Annual**: two payments of 12,500, a year apart. Click **Build Schedule**.
+   today. Click **Undo**: it is back, not submitted; mark it again.
+10. Open the grant. On the **Award Schedule** card choose **Annual**: two payments of 12,500, a
+    year apart. Click **Build Schedule**.
 11. Open **Grant Calendar** and move to January next year: the first payment is on January 1.
 12. Back on the grant, click **Mark Received** on the first payment. **Amount Received** and
     **Restricted Received** show 12,500, and the **Restricted Fund Entries** list has its Received

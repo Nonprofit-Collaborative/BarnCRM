@@ -7,15 +7,21 @@
         </p>
 
         <template lwc:if={errorMessage}>
-            <p class="slds-text-color_error slds-var-m-bottom_small" data-id="error" role="alert">
-                {errorMessage}
-            </p>
+            <c-barn-notice
+                class="slds-show slds-var-m-bottom_small"
+                variant="error"
+                message={errorMessage}
+                data-id="error"
+            ></c-barn-notice>
         </template>
 
         <template lwc:if={noticeMessage}>
-            <p class="slds-var-m-bottom_small" data-id="notice" role="status" aria-live="polite">
-                {noticeMessage}
-            </p>
+            <c-barn-notice
+                class="slds-show slds-var-m-bottom_small"
+                variant="success"
+                message={noticeMessage}
+                data-id="notice"
+            ></c-barn-notice>
         </template>
 
         <div class="slds-box slds-box_x-small slds-var-m-bottom_small">
@@ -52,9 +58,12 @@
             </div>
 
             <template lwc:if={showReadOnlyNote}>
-                <p class="slds-text-body_small slds-var-m-top_x-small" data-id="read-only">
-                    {labels.readOnly}
-                </p>
+                <c-barn-notice
+                    class="slds-show slds-var-m-top_x-small"
+                    variant="info"
+                    message={labels.readOnly}
+                    data-id="read-only"
+                ></c-barn-notice>
             </template>
         </div>
 
@@ -90,9 +99,12 @@
                         </p>
                     </template>
                     <template lwc:if={job.stale}>
-                        <p class="slds-text-color_error" data-id="job-stale" role="status">
-                            {labels.stale}
-                        </p>
+                        <c-barn-notice
+                            class="slds-show slds-var-m-top_x-small"
+                            variant="warning"
+                            message={labels.stale}
+                            data-id="job-stale"
+                        ></c-barn-notice>
                     </template>
                 </li>
             </template>

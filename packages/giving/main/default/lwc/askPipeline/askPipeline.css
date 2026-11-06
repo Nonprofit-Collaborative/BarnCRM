@@ -8,9 +8,34 @@
 
 .ask-column {
   flex: 0 0 16rem;
+  padding: var(--slds-g-spacing-2, 0.5rem);
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #e5e5e5);
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
+}
+
+/* The column a carried card would land in. */
+.ask-column_drop {
+  border-color: var(--slds-g-color-accent-1, #0176d3);
+  box-shadow: inset 0 0 0 var(--slds-g-sizing-border-2, 2px) var(--slds-g-color-accent-1, #0176d3);
 }
 
 .ask-card {
-  cursor: grab;
   background: var(--slds-g-color-surface-container-1, #ffffff);
+}
+
+/* Only a card that can move shows the grab cursor; the browser does not select text mid-drag. */
+.ask-card_movable {
+  cursor: grab;
+  user-select: none;
+}
+
+.ask-card_dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+/* The grip only shows that the card moves; the whole card is what is dragged. */
+.ask-card__handle {
+  cursor: grab;
 }

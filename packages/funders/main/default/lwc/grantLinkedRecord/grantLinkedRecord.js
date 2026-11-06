@@ -8,11 +8,9 @@ import setFund from '@salesforce/apex/GrantFundController.setFund';
 
 import PROGRAM_TITLE from '@salesforce/label/c.Core_Shared_Program';
 import PROGRAM_NONE from '@salesforce/label/c.Funders_Program_None';
-import PROGRAM_NOT_INSTALLED from '@salesforce/label/c.Funders_Program_NotInstalled';
 import PROGRAM_MISSING from '@salesforce/label/c.Funders_Program_Missing';
 import PROGRAM_SAVED from '@salesforce/label/c.Funders_Program_Saved';
 import FUND_NONE from '@salesforce/label/c.Funders_Fund_None';
-import FUND_NOT_INSTALLED from '@salesforce/label/c.Funders_Fund_NotInstalled';
 import FUND_MISSING from '@salesforce/label/c.Funders_Fund_Missing';
 import FUND_SAVED from '@salesforce/label/c.Core_Shared_Saved';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
@@ -39,7 +37,6 @@ const KINDS = {
     nameOf: (card) => card.programName,
     labels: {
       none: PROGRAM_NONE,
-      notInstalled: PROGRAM_NOT_INSTALLED,
       missing: PROGRAM_MISSING,
       saved: PROGRAM_SAVED
     }
@@ -54,7 +51,6 @@ const KINDS = {
     nameOf: (card) => card.fundName,
     labels: {
       none: FUND_NONE,
-      notInstalled: FUND_NOT_INSTALLED,
       missing: FUND_MISSING,
       saved: FUND_SAVED
     }
@@ -64,7 +60,9 @@ const KINDS = {
 /**
  * A linked-record card on a grant's page: the program or the Giving fund a grant names, chosen
  * from the other module's records and saved by record identifier, so Funders works without
- * Programs or Giving. Without the module it says so; a record that has gone says so too.
+ * Programs or Giving. Without the module the card is not drawn at all (modules-6: staff cannot
+ * install anything, and the admin guide says what each card needs); a record that has gone says
+ * so.
  */
 export default class GrantLinkedRecord extends LightningElement {
   @api recordId;
@@ -122,6 +120,10 @@ export default class GrantLinkedRecord extends LightningElement {
 
   get notInstalled() {
     return Boolean(this.card) && !this.card.available;
+  }
+
+  get showCard() {
+    return !this.notInstalled;
   }
 
   get isMissing() {

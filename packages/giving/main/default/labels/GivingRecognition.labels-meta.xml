@@ -129,6 +129,14 @@
     <value>Why they are recognized</value>
   </labels>
   <labels>
+    <fullName>Giving_SoftCredits_EmptyHeading</fullName>
+    <categories>Giving, Soft Credits</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Soft credits panel: empty heading</shortDescription>
+    <value>No Soft Credits Yet</value>
+  </labels>
+  <labels>
     <fullName>Giving_SoftCredits_Title</fullName>
     <categories>Giving, Soft Credits</categories>
     <language>en_US</language>
@@ -173,8 +181,8 @@
     <categories>Giving, Tributes</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>No tribute on this gift</shortDescription>
-    <value>This gift was not given in honor of or in memory of anyone.</value>
+    <shortDescription>Tribute panel: empty heading</shortDescription>
+    <value>No Tribute</value>
   </labels>
   <labels>
     <fullName>Giving_TributeNotification_NotFound</fullName>
@@ -215,14 +223,6 @@
     <protected>false</protected>
     <shortDescription>Tribute panel title</shortDescription>
     <value>Tribute</value>
-  </labels>
-  <labels>
-    <fullName>Giving_SoftCredits_RecomputeDeferred</fullName>
-    <categories>Giving, Soft Credits</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Household recompute deferred</shortDescription>
-    <value>Household soft credits for {0} household(s) could not be recomputed now, because no asynchronous capacity was left. They are corrected the next time each gift is saved.</value>
   </labels>
   <labels>
     <fullName>Giving_MatchingGift_GiftNotReceived</fullName>

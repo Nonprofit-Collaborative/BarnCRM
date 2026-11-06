@@ -148,6 +148,49 @@ private class AcknowledgmentSendTest {
 	}
 
 	@IsTest
+	static void aRuleWhoseTemplateIsGoneSaysWhichRuleToFix() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			AcknowledgmentTestData.enable();
+			insert AcknowledgmentTestData.buildRule(
+				'Spring thanks',
+				100,
+				AcknowledgmentRuleService.CHANNEL_EMAIL,
+				'No_Such_Template_Here'
+			);
+			Contact donor = AcknowledgmentTestData.insertDonor('Ada', 'Byron', 'ada@example.org');
+			Gift__c gift = GivingTestDataFactory.buildGift(donor.Id, 50);
+			insert gift;
+			AcknowledgmentService.emailSender = new RecordingEmailSender();
+
+			Test.startTest();
+			AcknowledgmentService.SendCounts counts = AcknowledgmentService.sendEmails(
+				queuedGiftsInMemory(new List<Id>{ gift.Id }),
+				null
+			);
+			Test.stopTest();
+
+			Assert.areEqual(1, counts.errors, 'The thank you did not go.');
+			Acknowledgment__c row = [
+				SELECT Status__c, Failure_Reason__c
+				FROM Acknowledgment__c
+				WHERE Gift__c = :gift.Id
+				WITH SYSTEM_MODE
+			];
+			Assert.areEqual(AcknowledgmentService.STATUS_FAILED, row.Status__c);
+			Assert.areEqual(
+				BarnHelp.text(
+					'Giving',
+					'Giving_Acknowledgment_TemplateNotFound',
+					new List<Object>{ 'No_Such_Template_Here', 'Spring thanks' }
+				),
+				row.Failure_Reason__c,
+				'The reason names the template and the rule to edit (people-giving-10).'
+			);
+			Assert.isTrue(row.Failure_Reason__c.contains('Spring thanks'), 'The rule is named.');
+		}
+	}
+
+	@IsTest
 	static void aSendRecordsWhatWentAndStampsTheGift() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			AcknowledgmentTestData.enable();

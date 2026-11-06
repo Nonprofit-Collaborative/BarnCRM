@@ -11,7 +11,15 @@
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
+    <apexClass>ShiftScheduleController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>VolunteerHoursApprovalController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>VolunteerLogHoursController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -24,6 +32,10 @@
   </classAccesses>
   <classAccesses>
     <apexClass>VolunteerSuggestionController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>VolunteersHomeController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <fieldPermissions>
@@ -416,6 +428,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Volunteer_Signup__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Volunteers_Home</tab>
     <visibility>Visible</visibility>
   </tabSettings>
   <userPermissions>

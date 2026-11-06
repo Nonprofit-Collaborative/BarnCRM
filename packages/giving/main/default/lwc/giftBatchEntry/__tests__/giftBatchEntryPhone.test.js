@@ -52,7 +52,7 @@ describe('c-gift-batch-entry on a phone', () => {
     await settle();
 
     const note = element.shadowRoot.querySelector('[data-id="use-computer"]');
-    expect(note.textContent).toBe('c.Giving_GiftBatch_UseComputer');
+    expect(note.message).toBe('c.Giving_GiftBatch_UseComputer');
     expect(element.shadowRoot.querySelectorAll('[data-field="amount"]')).toHaveLength(1);
   });
 });

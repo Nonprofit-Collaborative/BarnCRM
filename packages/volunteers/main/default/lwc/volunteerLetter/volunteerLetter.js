@@ -4,7 +4,8 @@ import { CloseActionScreenEvent } from 'lightning/actions';
 import getActionContext from '@salesforce/apex/VolunteerLetterController.getActionContext';
 import previewLetter from '@salesforce/apex/VolunteerLetterController.preview';
 import generateLetter from '@salesforce/apex/VolunteerLetterController.generate';
-import { localIsoDate } from 'c/findCsv';
+import { CUSTOM, THIS_YEAR, periodDates, periodOptions } from 'c/volunteerPeriods';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 import HEADING from '@salesforce/label/c.Volunteers_LetterAction_Heading';
 import TEMPLATE from '@salesforce/label/c.Core_Import_StepTemplate';
@@ -18,23 +19,27 @@ import NOT_A_PERSON from '@salesforce/label/c.Volunteers_Letter_NotAPerson';
 import NEED_PERMISSION from '@salesforce/label/c.Volunteers_Letter_NeedManagePermission';
 import NO_TEMPLATE from '@salesforce/label/c.Volunteers_Letter_NoActiveTemplate';
 import BAD_PERIOD from '@salesforce/label/c.Volunteers_Letter_BadPeriod';
-import ACTION_FAILED from '@salesforce/label/c.Volunteers_Letter_ActionFailed';
 import NO_LEGAL_NAME from '@salesforce/label/c.Volunteers_LetterAction_NoLegalName';
+import PERIOD from '@salesforce/label/c.Core_Shared_Period';
+import THIS_YEAR_LABEL from '@salesforce/label/c.Volunteers_Shared_ThisYear';
+import LAST_YEAR_LABEL from '@salesforce/label/c.Volunteers_Shared_LastYear';
+import CUSTOM_LABEL from '@salesforce/label/c.Core_DataDictionary_ColCustom';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
-
-/** A date as the lightning-input date value: yyyy-mm-dd, in the user's own day. */
-const isoDate = localIsoDate;
 
 /**
  * The Volunteer letter action on a contact or person account (V-08): choose a template and a
- * period, preview the letter, then save it as a PDF in the person's Files.
+ * period (This Year, Last Year or Custom dates, modules-4), preview the letter, then save it as
+ * a PDF in the person's Files.
  */
 export default class VolunteerLetter extends LightningElement {
   @api recordId;
 
+  helpReady = isHelpLoaded('Volunteers');
+
   labels = {
     heading: HEADING,
     template: TEMPLATE,
+    period: PERIOD,
     fromDate: FROM_DATE,
     toDate: TO_DATE,
     preview: PREVIEW,
@@ -44,13 +49,44 @@ export default class VolunteerLetter extends LightningElement {
     noLegalName: NO_LEGAL_NAME
   };
 
+  periodOptions = periodOptions({
+    thisYear: THIS_YEAR_LABEL,
+    lastYear: LAST_YEAR_LABEL,
+    custom: CUSTOM_LABEL
+  });
+
   context;
   templateId;
-  fromDate = isoDate(new Date(new Date().getFullYear(), 0, 1));
-  toDate = isoDate(new Date());
+  period = THIS_YEAR;
+  fromDate = periodDates(THIS_YEAR).fromDate;
+  toDate = periodDates(THIS_YEAR).toDate;
   previewBody;
   notice;
   working = false;
+
+  connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Volunteers').then(() => {
+        this.helpReady = true;
+      });
+    }
+  }
+
+  get isCustom() {
+    return this.period === CUSTOM;
+  }
+
+  /** A preset fills the dates; Custom keeps the last dates and shows them to change. */
+  handlePeriodChange(event) {
+    this.period = event.detail.value;
+    const dates = periodDates(this.period);
+    if (dates) {
+      this.fromDate = dates.fromDate;
+      this.toDate = dates.toDate;
+    }
+    this.previewBody = undefined;
+    this.notice = undefined;
+  }
 
   @wire(getActionContext, { recordId: '$recordId' })
   loadContext({ data, error }) {
@@ -185,6 +221,6 @@ export default class VolunteerLetter extends LightningElement {
     if (error && typeof error.message === 'string' && error.message) {
       return error.message;
     }
-    return ACTION_FAILED;
+    return helpText('Volunteers', 'Volunteers_Letter_ActionFailed');
   }
 }

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Volunteers Home (vis-modules-19): the three figures, then the approved hours chart, which an
+    administrator can move or swap in the App Builder.
+  </description>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>volunteersHome</componentName>
+        <identifier>volunteersHome1</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>reportName</name>
+          <value>Approved_Hours_This_Year_by_Job</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>showRefreshButton</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:reportChart</componentName>
+        <identifier>hoursByJobChart</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>main</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <masterLabel>Volunteers Home</masterLabel>
+  <template>
+    <name>flexipage:defaultAppHomeTemplate</name>
+  </template>
+  <type>AppPage</type>
+</FlexiPage>

@@ -13,3 +13,33 @@
 .grant-card {
   background: var(--slds-g-color-surface-container-1, #ffffff);
 }
+
+/* DnD-1: the closed stages a card can be dropped on, after the columns. */
+.grant-drop-zone {
+  flex: 0 0 10rem;
+  min-height: var(--slds-g-sizing-12, 5rem);
+  border-style: dashed;
+}
+
+.grant-zone_target {
+  border-color: var(--slds-g-color-border-accent-1, #0176d3);
+  background-color: var(--slds-g-color-surface-container-2, #f3f3f3);
+}
+
+.grant-handle {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--slds-g-sizing-9, 2rem);
+  cursor: grab;
+  touch-action: pan-y;
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+}
+
+.grant-handle:focus-visible {
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-border-accent-1, #0176d3);
+  outline-offset: 2px;
+}
+
+.grant-card_dragging {
+  opacity: 0.6;
+}

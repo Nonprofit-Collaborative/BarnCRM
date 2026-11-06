@@ -21,7 +21,10 @@ program officer is a contact at that organization.
 5. Fill in **Amount Requested** and the **Application Deadline** if you know them, then click
    **Save**.
 
-You should see: the grant's page with a **Program** card at the top.
+You should see: the grant's page, open on its **Overview** tab. The other tabs hold the money
+(**Money**: the Award Schedule, payments and restricted ledger), what you owe the funder
+(**Reporting**: requirements, outcomes and the funder report), your reusable answers
+(**Writing**) and every related list (**Related**).
 
 ## The Stages
 
@@ -42,23 +45,40 @@ or **Withdrawn**, an empty **Decision Date** becomes today. A date you typed is 
 ## To Work the Grant Pipeline
 
 1. Click the **Grant Pipeline** tab.
-2. Read the totals at the top: **Open Requests**, **Amount Requested** on them, and **Awarded This
+2. Read the tiles at the top: **Open Requests**, **Amount Requested** on them, and **Awarded This
    Fiscal Year**.
 3. Choose **Everyone** for every open grant, or **Mine** for the ones you own.
 
 You should see: one column per open stage, each with its count and amount, and a card for each
-grant showing its funder, amount requested, deadline, next step and owner.
+grant showing its name, amount requested, funder, deadline, next step and owner. A deadline in
+the next 14 days shows an amber badge (`10 days left`, `Due today`), a past one a red badge
+(`3 days overdue`). Click a grant's name to open it.
 
 ## To Move a Grant to Another Stage
 
 1. On the grant's card, click the menu (the small arrow).
 2. Choose **Move to** and the stage.
 
+Or drag the card by its handle (the dotted grip before its name) into another column, or onto
+**Awarded**, **Declined** or **Withdrawn** at the end of the board. On a touch screen, press and
+hold the handle a moment before dragging. With the keyboard, tab to the handle, press Space,
+use the arrow keys to choose the column, and press Space again (Escape cancels). Dropping on
+**Awarded** opens **Record the Award**, as the menu does. On a phone the menu is the easiest way.
+
 You should see: `Moved to` and the stage, and the card in its new column. A grant moved to
 **Awarded**, **Declined** or **Withdrawn** leaves the board.
 
-Moving to **Awarded** first asks for the **Amount Awarded**, filled in with the amount requested.
-Change it if the funder gave a different amount, then click **Save**.
+## To Record the Award
+
+1. On the grant's card, click the menu, then **Move to Awarded**.
+2. In **Record the Award**, check **Amount Awarded** (filled in with the amount requested) and,
+   from the award letter, fill in **Award Start Date**, **Award End Date** and **Restricted**.
+   Each is optional.
+3. Click **Save**.
+
+You should see: `Awarded. Open` and the grant's name `to build its payment schedule.`, with the
+grant's name as a link. If the save is refused (for example an end date before the start
+date), the dialog stays open with the reason.
 
 ## To See the Deadlines Coming Up
 
@@ -66,29 +86,30 @@ Under the board, **Upcoming Deadlines** lists every grant at Prospect, Letter of
 Invited to Apply whose application deadline is past or within the next 60 days, and every open
 requirement due in that time or overdue, soonest first. Under each name it says **Application**,
 or the requirement's type and grant.
-Each row says how many days are left, `Due today`, or how many days overdue (in red). Click a
-grant's name to open it.
+Each row says how many days are left, `Due today`, or how many days overdue; within 14 days it
+is an amber badge, overdue a red one. Click a grant's name to open it.
 
 ## To See a Month of Deadlines
 
 Open the **Grant Calendar** tab. Each day shows its application deadlines, requirements due and
 payments expected. An overdue item shows a warning icon, the word **Overdue** and bold text (not red alone). A key under the month heading names the border colours: **Application** (blue), **Grant Requirement** (orange) and **Grant Payment** (green), plus the **Overdue** mark. Click one to open it. Use **Previous Month** and
 **Next Month** to move, and **Mine** to see only your grants and the requirements assigned to
-you.
+you. Click **Print** to print the month without the app's header and navigation.
 
 ## To Show the Board Where the Money Comes From
 
-1. In the **BarnCRM Funders** app, open the **Board Dashboard** tab.
+1. Open the **BarnCRM Funders** app. It opens on the **Board Dashboard**, its home: tiles for
+   this fiscal year's revenue and awards, then a tile for each Funders tab.
 2. Read the three parts, all for this fiscal year:
    - **Revenue Mix**: grants awarded by funding source and, if you use Giving, gifts to funds,
-     each with its amount and share.
+     each with its amount and share as a bar.
    - **Concentration**: the five organizations giving the most, with a warning when one gives
      more than 25 percent or the five together more than half.
    - **Restricted Balances**: restricted funds and what each raised, and restricted grants'
      balances once fund tracking is in use.
 
 You should see: amounts in your currency and shares as percents, or `Nothing to show for this
-fiscal year yet.` To print it for a board packet, use your browser's print command. If a line says
+fiscal year yet.` To print it for a board packet, click **Print**. If a line says
 **Not set**, those grants have no **Funding Source**; fill it in on each grant.
 
 If your organization also enters a grant's payments as Giving gifts, that money is counted twice:
@@ -103,7 +124,7 @@ Only when your organization uses Programs.
 2. Click **Save**.
 
 You should see: `Program saved.` Choose **No program** and **Save** to clear it. Without Programs
-the card says to install the Programs module. If the program was deleted, the card says so;
+there is no Program card. If the program was deleted, the card says so;
 choose another.
 
 ## To Link a Requirement to the Outcome It Reports On
@@ -156,8 +177,9 @@ date changes, you are reminded again.
 1. On the **Grant Pipeline**, under **Upcoming Deadlines**, find the requirement.
 2. Click **Mark Submitted**.
 
-You should see: `Marked submitted.` and the row leaves the list. The requirement's **Status** is
-**Submitted** and its **Submitted Date** today. You can also open the requirement and set
+You should see: `Marked submitted.` with an **Undo** link, and the row leaves the list. The
+requirement's **Status** is **Submitted** and its **Submitted Date** today. Clicked it by
+mistake? Click **Undo**: the status and date go back to what they were (`Undone.`). You can also open the requirement and set
 **Status** yourself: **Accepted** when the funder approves it, **Waived** when the funder excuses
 it.
 
@@ -166,7 +188,8 @@ it.
 When a funder pays an award in parts (for example once a year for three years):
 
 1. Open the grant. It must be **Awarded**, with **Amount Awarded**, **Award Start Date** and
-   **Award End Date** filled in.
+   **Award End Date** filled in. If one is missing, the card names only that one (for example
+   `Add the Award End Date to build a schedule.`).
 2. On the **Award Schedule** card, choose the **Payment Frequency**.
 3. Check the payments listed: the amount split evenly, the first on the award start date.
 4. Click **Build Schedule**.
@@ -179,9 +202,11 @@ shows the total. To change one payment's date or amount, or add or cancel one, u
 
 On the grant's **Award Schedule** card, click **Mark Received** on the payment.
 
-You should see: `Saved.`, the payment **Received** with today's date, and **Amount Received** at
-the top of the card going up by its amount. If it came in on another day, open the payment and
-change **Received Date**.
+You should see: `Saved.` with an **Undo** link, the payment **Received** with today's date, and
+**Amount Received** at the top of the card going up by its amount; the bar under the totals shows
+how much of the award has come in. Clicked the wrong payment? Click **Undo** while the page is
+open: the payment goes back to **Expected** and its restricted ledger entry is removed
+(`Undone.`). If it came in on another day, open the payment and change **Received Date**.
 
 ## To Keep a Restricted Grant's Ledger
 

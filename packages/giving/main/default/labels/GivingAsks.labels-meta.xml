@@ -137,6 +137,22 @@
     <value>New Ask</value>
   </labels>
   <labels>
+    <fullName>Giving_AskPipeline_ReopenAsk</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: card menu item and confirm button reopening a closed ask</shortDescription>
+    <value>Reopen Ask</value>
+  </labels>
+  <labels>
+    <fullName>Giving_AskPipeline_RecentlyClosed</fullName>
+    <categories>Giving, Asks</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Ask Pipeline: column of asks closed in the last 30 days</shortDescription>
+    <value>Recently Closed</value>
+  </labels>
+  <labels>
     <fullName>Giving_AskPipeline_TileOpen</fullName>
     <categories>Giving, Asks</categories>
     <language>en_US</language>

@@ -42,6 +42,43 @@ export function addMonths(iso, months) {
 }
 
 /**
+ * What a grant still lacks before its schedule can be built (modules-16), so the card names only
+ * that: `notAwarded` when the stage is not Awarded, `missing` the empty fields among the amount
+ * awarded ("awarded"), the award start date ("startDate") and end date ("endDate"), and
+ * `reversed` when the end date is before the start date.
+ *
+ * @param {{stage: string, amountAwarded: number, startDate: string, endDate: string}} schedule
+ * @returns {{notAwarded: boolean, missing: string[], reversed: boolean}}
+ */
+export function buildNeeds(schedule) {
+  const { stage, amountAwarded, startDate, endDate } = schedule || {};
+  const missing = [];
+  if (!(Number(amountAwarded) > 0)) {
+    missing.push('awarded');
+  }
+  if (!startDate) {
+    missing.push('startDate');
+  }
+  if (!endDate) {
+    missing.push('endDate');
+  }
+  return {
+    notAwarded: stage !== 'Awarded',
+    missing,
+    reversed: Boolean(startDate && endDate && endDate < startDate)
+  };
+}
+
+/** The percent of `part` in `whole`, whole numbers from 0 to 100; 0 when there is no whole. */
+export function percentOf(part, whole) {
+  const total = Number(whole);
+  if (!(total > 0)) {
+    return 0;
+  }
+  return Math.max(0, Math.min(100, Math.round((Number(part) / total) * 100)));
+}
+
+/**
  * The payments of a schedule.
  *
  * @param {{amount: number, start: string, end: string, frequency: string}} award the amount

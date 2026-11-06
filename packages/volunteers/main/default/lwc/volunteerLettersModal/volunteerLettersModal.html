@@ -1,0 +1,122 @@
+<template>
+  <lightning-modal-header label={labels.title}></lightning-modal-header>
+  <lightning-modal-body>
+    <div class="slds-is-relative">
+      <template lwc:if={isLoading}>
+        <div class="slds-is-relative slds-var-p-around_large" data-id="loading">
+          <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+        </div>
+      </template>
+      <template lwc:if={working}>
+        <lightning-spinner alternative-text={labels.loading} size="small" data-id="working"></lightning-spinner>
+      </template>
+
+      <template lwc:if={blocker}>
+        <c-barn-notice variant="error" message={blocker} data-id="blocker"></c-barn-notice>
+      </template>
+
+      <template lwc:if={showForm}>
+        <p class="slds-var-m-bottom_small" data-id="intro">{intro}</p>
+        <template lwc:if={showLegalNameWarning}>
+          <c-barn-notice
+            class="slds-var-m-bottom_small"
+            variant="warning"
+            message={labels.noLegalName}
+            data-id="legal-name-warning"
+          ></c-barn-notice>
+        </template>
+        <lightning-combobox
+          data-id="template"
+          label={labels.template}
+          options={templateOptions}
+          value={templateId}
+          required
+          onchange={handleTemplateChange}
+        ></lightning-combobox>
+        <lightning-combobox
+          data-id="period"
+          label={labels.period}
+          options={periodOptions}
+          value={period}
+          onchange={handlePeriodChange}
+        ></lightning-combobox>
+        <template lwc:if={isCustom}>
+          <div class="slds-grid slds-wrap slds-gutters_x-small">
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+              <lightning-input
+                data-id="from"
+                type="date"
+                label={labels.fromDate}
+                value={fromDate}
+                required
+                onchange={handleFromChange}
+              ></lightning-input>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+              <lightning-input
+                data-id="to"
+                type="date"
+                label={labels.toDate}
+                value={toDate}
+                required
+                onchange={handleToChange}
+              ></lightning-input>
+            </div>
+          </div>
+        </template>
+        <lightning-radio-group
+          class="slds-var-m-top_small"
+          data-id="who"
+          label={labels.who}
+          options={whoOptions}
+          value={who}
+          onchange={handleWhoChange}
+        ></lightning-radio-group>
+        <template lwc:if={isChosen}>
+          <lightning-record-picker
+            class="slds-var-m-top_x-small"
+            data-id="person-picker"
+            label={labels.person}
+            object-api-name={personObject}
+            filter={personFilter}
+            onchange={handlePersonPick}
+          ></lightning-record-picker>
+          <template lwc:if={hasPeople}>
+            <ul class="slds-listbox slds-listbox_horizontal slds-var-m-top_x-small" data-id="people">
+              <template for:each={personPills} for:item="person">
+                <li key={person.id} class="slds-listbox-item">
+                  <lightning-pill
+                    label={person.name}
+                    data-person-id={person.id}
+                    onremove={handleRemovePerson}
+                  ></lightning-pill>
+                </li>
+              </template>
+            </ul>
+          </template>
+        </template>
+      </template>
+
+      <div aria-live="polite">
+        <template lwc:if={showNotice}>
+          <c-barn-notice class="slds-var-m-top_small" variant="warning" message={notice} data-id="notice"></c-barn-notice>
+        </template>
+      </div>
+    </div>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button
+      data-id="cancel"
+      label={labels.cancel}
+      onclick={handleCancel}
+      class="slds-var-m-right_x-small"
+    ></lightning-button>
+    <lightning-button
+      data-id="make"
+      variant="brand"
+      label={labels.make}
+      disabled={makeDisabled}
+      onclick={handleMake}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

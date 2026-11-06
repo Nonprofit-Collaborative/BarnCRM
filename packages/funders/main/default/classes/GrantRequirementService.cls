@@ -47,9 +47,51 @@ public with sharing class GrantRequirementService {
 
 	/**
 	 * Marks one requirement Submitted, as the person: the dates automation fills the Submitted
-	 * Date.
+	 * Date. Returns what it replaced, for Undo (modules-17).
 	 */
-	public static void markSubmitted(Id requirementId) {
+	public static FundersUndoState markSubmitted(Id requirementId) {
+		FundersUndoState previous = new FundersUndoState();
+		for (Grant_Requirement__c row : [
+			SELECT Id, Status__c, Submitted_Date__c
+			FROM Grant_Requirement__c
+			WHERE Id = :requirementId
+			WITH USER_MODE
+			LIMIT 1
+		]) {
+			previous.id = row.Id;
+			previous.status = row.Status__c;
+			previous.dateValue = row.Submitted_Date__c;
+		}
 		update as user new Grant_Requirement__c(Id = requirementId, Status__c = STATUS_SUBMITTED);
+		return previous;
+	}
+
+	/**
+	 * Undo for Mark Submitted (modules-17): puts back the open status and the Submitted Date the
+	 * requirement had, as the person. Only a requirement still Submitted goes back, and only to an
+	 * open status; anything changed since is left alone.
+	 *
+	 * @return true when it was put back
+	 */
+	public static Boolean undoSubmitted(Id requirementId, String status, Date submittedDate) {
+		if (requirementId == null || !isOpen(status)) {
+			return false;
+		}
+		List<Grant_Requirement__c> rows = [
+			SELECT Id, Status__c
+			FROM Grant_Requirement__c
+			WHERE Id = :requirementId
+			WITH USER_MODE
+			LIMIT 1
+		];
+		if (rows.isEmpty() || rows[0].Status__c != STATUS_SUBMITTED) {
+			return false;
+		}
+		update as user new Grant_Requirement__c(
+			Id = requirementId,
+			Status__c = status,
+			Submitted_Date__c = submittedDate
+		);
+		return true;
 	}
 }

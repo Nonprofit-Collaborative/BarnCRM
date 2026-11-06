@@ -2,8 +2,8 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>RFM_Score__c</fullName>
   <externalId>false</externalId>
-  <inlineHelpText>The recency, frequency and monetary scores added, 3 to 15.</inlineHelpText>
-  <label>RFM Score</label>
+  <inlineHelpText>The recency, frequency and amount scores added, 3 to 15.</inlineHelpText>
+  <label>Donor Score</label>
   <precision>2</precision>
   <required>false</required>
   <scale>0</scale>

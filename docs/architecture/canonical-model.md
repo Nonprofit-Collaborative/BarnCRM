@@ -4616,7 +4616,7 @@ carries on (R-E1).
 
 ### Salesforce implementation
 
-- **Object:** `Installment__c`, auto-number Name with format `IN-{000000}`.
+- **Object:** `Installment__c`, auto-number Name with format `IN-{000000}`. Labelled Pledge Payment (plural Pledge Payments) from v1.0, so its tab reads Pledge Payments; the API name is unchanged.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -6684,9 +6684,9 @@ numbers printed beside it and an organization can change what "recent" means wit
 | Days Since Last Gift | `Days_Since_Last_Gift__c` | Formula (Number) |
 | Recency Score | `RFM_Recency_Score__c` | Number |
 | Frequency Score | `RFM_Frequency_Score__c` | Number |
-| Monetary Score | `RFM_Monetary_Score__c` | Number |
-| RFM Score | `RFM_Score__c` | Number |
-| RFM Segment | `RFM_Segment__c` | Text (40) |
+| Amount Score | `RFM_Monetary_Score__c` | Number |
+| Donor Score | `RFM_Score__c` | Number |
+| Giving Pattern | `RFM_Segment__c` | Text (40) |
 
 - **Fields on `Giving_Settings__c`:** the three cutoff fields of R-DT3 (Text, with defaults).
 
@@ -6845,7 +6845,7 @@ why the definition keeps its own Last Calculated as well.
 | Soft Credit Count | `Soft_Credit_Count__c` | Number |
 | In-kind Value | `In_Kind_Value__c` | Currency |
 | In-kind Gift Count | `In_Kind_Gift_Count__c` | Number |
-| Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
+| Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 
 - **Fields on Contact** (shipped by Giving): the same fifteen API names, with the same
   types and the same definitions.
@@ -6858,7 +6858,7 @@ why the definition keeps its own Last Calculated as well.
 | Total Raised This Year | `Total_Raised_This_Year__c` | Currency |
 | Gift Count | `Gift_Count__c` | Number |
 | Last Gift Date | `Last_Gift_Date__c` | Date |
-| Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
+| Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 
 - **Fields on `Appeal__c`:**
 
@@ -6866,21 +6866,21 @@ why the definition keeps its own Last Calculated as well.
 |---|---|---|
 | Total Raised | `Total_Raised__c` | Currency |
 | Gift Count | `Gift_Count__c` | Number |
-| Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
+| Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 
 - **Fields on `Commitment__c`:**
 
 | Attribute | API name | Type |
 |---|---|---|
 | Paid To Date | `Paid_To_Date__c` | Currency |
-| Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
+| Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 
 - **Fields on `Installment__c`:**
 
 | Attribute | API name | Type |
 |---|---|---|
 | Paid Amount | `Paid_Amount__c` | Currency |
-| Rollups Last Calculated | `Rollups_Last_Calculated__c` | DateTime |
+| Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 
 - **Shipped defaults:** one `Rollup_Definition_Default__mdt` row per line in the tables
   above, per scope.
@@ -9760,7 +9760,7 @@ and counted like any other. ADR-0128 (`0128-volunteer-recurring-shifts.md`) reco
 |---|---|---|---|
 | Name | text | yes | What the coordinator calls the schedule, for example "Saturday sorting". |
 | Job | reference(Job) | yes | The job whose shifts the schedule creates. |
-| Weekdays | multi-select(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) | yes | The days of the week a shift falls on. |
+| Days of the Week | multi-select(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) | yes | The days of the week a shift falls on (labelled Weekdays before v1.0). |
 | Repeat Every (Weeks) | integer | yes (defaults 1) | 1 for every week, 2 for every other week, and so on, counted from the week of Start Date. |
 | Start Time | time | yes | When each shift starts. |
 | End Time | time | yes | When each shift ends, later the same day. |
@@ -9847,7 +9847,7 @@ Cancelled.
 | Attribute | API name | Type |
 |---|---|---|
 | Job | `Job__c` | Master-Detail to `Volunteer_Job__c` |
-| Weekdays | `Weekdays__c` | Multi-Select Picklist: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday |
+| Days of the Week | `Weekdays__c` | Multi-Select Picklist: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday |
 | Repeat Every (Weeks) | `Every_N_Weeks__c` | Number (2, 0), default 1 |
 | Start Time | `Start_Time__c` | Time |
 | End Time | `End_Time__c` | Time |
@@ -12591,6 +12591,7 @@ mirrors the primary member).
 | v0.13 | 2026-10-31 | Donor segments (G-28, D-156). New Section 25O, rules R-DS1 to R-DS6: a segment is a Saved Query of Contact or Account (no new object), with five starter templates held as documented JSON, a count, a list and Mailchimp, Constant Contact and all-columns CSV exports; no sending, no settings key. Contact and Account gain the formula `Change_From_Last_Year__c` (Giving This Year minus Giving Last Year), so upgraders can be filtered. |
 | v0.13 | 2026-10-31 | Pledge reminders (G-30). Objects `Pledge_Reminder_Step__c` (Section 25P) and `Pledge_Reminder__c` (25Q) added; `Giving_Settings__c` gains `Pledge_Reminders_Enabled__c` (off by default), `Pledge_Reminders_Last_Run__c` and `Pledge_Reminders_Last_Run_Summary__c`. Rules R-PR1 to R-PR6. No field is added to `Installment__c` or `Commitment__c`. |
 | v0.15 | 2026-11-02 | Donor scoring (G-19). New Section 25T, rules R-DT1 to R-DT6. Eight attributes added to Account and Contact (`Recent_Gift_Count__c`, `Recent_Giving__c`, `Days_Since_Last_Gift__c`, `RFM_Recency_Score__c`, `RFM_Frequency_Score__c`, `RFM_Monetary_Score__c`, `RFM_Score__c`, `RFM_Segment__c`); six rollup definition rows (`Contact_`, `Account_` and `Household_` `Recent_Gift_Count` and `Recent_Giving`, last 730 days); `Giving_Settings__c` gains the three cutoff fields; two Automation Registry rows; two donor segment templates. No object added. |
+| v1.0 | 2026-11-04 | Usability rollout (people-giving-11, people-giving-15). No object or field added. `Installment__c` is relabelled Pledge Payment, plural Pledge Payments (label only; the API name and the tab's API name are unchanged). New on `Commitment__c` opens the New Commitment screen; a pledge is still saved with `Expected_Total__c`, `Installments_Planned__c` and `Amount__c` as the total divided evenly, rounded down (R-CM5), now built in one place (`CommitmentEntry`) for that screen and the Ask Pipeline's Record a Pledge (R-SO5). |
 | 0.13 | 2026-10-31 | Solicitation pipeline (G-26, ADR-0153). New entity Ask (Section 25R, `Ask__c`) with rules R-SO1 to R-SO8: an Opportunity-free ask with the organization's own stages, an outcome kept apart from the stage, stage history, and a win that creates or links the gift or commitment. Giving Settings gains `Ask_Stages__c` (Section 21A). `Next_Ask_Date__c` is the hook ask cadence (G-29) reads. |
 | 0.14 | 2026-10-31 | Logic Models L-01 and L-02 (ADR-0154 `0154-logic-models-module.md`). New in the Logic Models module: Logic Model (`Logic_Model__c`, 29ZC), Logic Model Element (`Logic_Model_Element__c`, 29ZD), Logic Model Link (`Logic_Model_Link__c`, 29ZE), Indicator (`Indicator__c`, 29ZF) and Indicator Period (`Indicator_Period__c`, 29ZG), with rules R-LM1 to R-LM3, R-LE1 to R-LE3, R-LL1 to R-LL3, R-IN1, R-IN2, R-IP1 and R-IP2. Indicator takes the place of P-03's Outcome. Specified ahead of the build. |
 | 0.14 | 2026-10-31 | Landing batch A renumbering. No object or field added. Branches built in parallel had reused section letters; in PR order they are now 25O Donor Segments, 25P Pledge Reminder Step, 25Q Pledge Reminder, 25R Ask, 25S Ask cadence, 29W Setup Change, 29X Saved Transform, 29Y Program, 29Z Service, 29ZA Enrollment, 29ZB Service Delivery, 29ZC Logic Model, 29ZD Logic Model Element, 29ZE Logic Model Link, 29ZF Indicator, 29ZG Indicator Period. Every citation in docs and code was repointed to the section its author meant. |

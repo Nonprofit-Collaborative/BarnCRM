@@ -23,7 +23,6 @@ import TOO_MANY from '@salesforce/label/c.Programs_Schedule_TooMany';
 import CREATED_ONE from '@salesforce/label/c.Programs_Schedule_CreatedOne';
 import CREATED_MANY from '@salesforce/label/c.Programs_Schedule_CreatedMany';
 import SKIPPED from '@salesforce/label/c.Programs_Schedule_Skipped';
-import ACTION_FAILED from '@salesforce/label/c.Programs_Schedule_ActionFailed';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import {
@@ -97,7 +96,7 @@ export default class SessionScheduler extends LightningElement {
         return this.loadTaken();
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Schedule'));
       })
       .finally(() => {
         this.loading = false;
@@ -123,7 +122,7 @@ export default class SessionScheduler extends LightningElement {
         }
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Schedule'));
       });
   }
 
@@ -240,7 +239,7 @@ export default class SessionScheduler extends LightningElement {
         return this.loadTaken();
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Schedule'));
       })
       .finally(() => {
         this.busy = false;

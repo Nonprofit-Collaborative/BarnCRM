@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    The thank you queue: your rules, what is waiting to go, and the buttons that send it.
+    The Thank-Yous page: what is waiting to be thanked, the buttons that send it, and the rules.
   </description>
   <flexiPage>Acknowledgments</flexiPage>
-  <label>Acknowledgment Queue</label>
+  <label>Thank-Yous</label>
   <motif>Custom71: Headset</motif>
 </CustomTab>

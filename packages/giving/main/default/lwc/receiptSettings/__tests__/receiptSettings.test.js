@@ -206,7 +206,7 @@ describe('c-receipt-settings', () => {
   it('says so, and locks the editor, for somebody who cannot manage settings', async () => {
     const element = await loaded(false);
 
-    expect(byId(element, 'read-only')).not.toBeNull();
+    expect(byId(element, 'read-only').variant).toBe('info');
     expect(byId(element, 'save').disabled).toBe(true);
     expect(byId(element, 'editor').disabled).toBe(true);
   });
@@ -218,7 +218,38 @@ describe('c-receipt-settings', () => {
 
     byId(element, 'generate').click();
     await flush();
+    await flush();
 
     expect(startStatementRun).toHaveBeenCalledWith({ statementYear: 2026 });
+    expect(byId(element, 'result').variant).toBe('success');
+    expect(byId(element, 'result').message).toBe('c.Giving_Receipt_StartedMessage');
+  });
+
+  it('keeps a refused save on the page as an error notice', async () => {
+    saveTemplate.mockRejectedValueOnce({ body: { message: 'You cannot change settings.' } });
+    const element = await loaded(true);
+
+    byId(element, 'save').click();
+    await flush();
+    await flush();
+
+    expect(byId(element, 'result').variant).toBe('error');
+    expect(byId(element, 'result').message).toBe('You cannot change settings.');
+  });
+
+  it('shows each run status as a badge, and an empty state before the first run', async () => {
+    const element = await loaded(true);
+    expect(byId(element, 'no-runs').heading).toBe('c.Giving_Receipt_NoRuns');
+
+    getRuns.emit([
+      { id: 'r1', name: 'RR-1', statementYear: 2025, status: 'Completed with errors', errors: 2 },
+      { id: 'r2', name: 'RR-2', statementYear: 2025, status: 'Failed', errors: 0 }
+    ]);
+    await flush();
+
+    const badges = element.shadowRoot.querySelectorAll('[data-id="run-status"]');
+    expect([...badges].map((badge) => badge.status)).toEqual(['warning', 'failed']);
+    expect(badges[0].label).toBe('Completed with errors');
+    expect(byId(element, 'no-runs')).toBeNull();
   });
 });

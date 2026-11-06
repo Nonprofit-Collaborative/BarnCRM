@@ -71,9 +71,12 @@ You are David, and a check from Maria's neighbour arrived this morning.
 In the BarnCRM Fundraising app a gift opens on the packaged **Gift Record Page**. Its action bar
 carries **Edit**, **Refund or Write Off** and **Delete**. **Refund or Write Off** shows only
 while the gift's **Status** is `Received`, because only a received gift can be refunded. The
+main column has three tabs: **Details** (the gift's field sections), **Credits and Tributes**
+(the **Soft Credits** and **Tribute** cards) and **Related**. On **Related**, the
 **Gift Allocations** list (largest first), the **Refunds and Write-Offs** list (newest
 first), the **Tributes** list (with **New**) and the **Acknowledgments** list are part of the
-page itself, so they look the same whichever page layout your profiles use. A gift that pays
+page itself, so they look the same whichever page layout your profiles use. The sidebar keeps
+**Posting** and **Receipt Actions**. A gift that pays
 a pledge or recurring gift shows it in **Commitment** and **Installment**, both of which you
 can also set on the new gift form. The
 **Activity** panel can log a call, create a task or create an event.
@@ -83,6 +86,33 @@ App Builder and drag in the **Dynamic Related List - Single** component. Adding 
 Gift page layout alone does not put it on this page: the layout is what Salesforce shows
 when a gift is opened outside the BarnCRM Fundraising app, or on a record page your organization
 built that still uses the related list component.
+
+## Splitting a Gift Across Funds
+
+The **Gift Allocations** card (Lightning component `giftAllocations`, for Gift record pages)
+lists the funds a gift went to, with the amount and percent of each, and carries **Edit
+Funds**. **Edit Funds** opens the fund split editor: one row per fund, each with an
+**Amount** and a **Percent** (type either; BarnCRM works out the other), **Add a Fund**, a
+delete button per row, and a "Left to assign" badge that turns green at 0.00. With two or
+more funds a bar shows the split; drag a divider on it, or select a divider and press the
+arrow keys (Page Up and Page Down move ten percent), to move money between the two funds
+beside it. **Save** stays off until every row has its own fund and an amount and nothing is
+left to assign.
+
+The save replaces the gift's allocations in one transaction. A fund already on the gift
+keeps its allocation, a new fund takes over the allocation of a fund that left, and only
+what is left over is inserted or deleted. The allocation rules still apply: the split must
+total the gift, and a gift posted to accounting or dated in a closed period keeps its funds.
+On such a gift the card shows the lock's own message, "This gift is in the books ... Record a
+refund instead", in place of **Edit Funds**.
+
+Access: the person needs create and edit on Gift Allocations (**Giving Staff** and **Giving
+Admin** have both) and the `GiftAllocationController` class (both, and **Giving Read Only**
+to see the card). Taking a fund off a gift deletes an allocation, which needs delete on Gift
+Allocations: **Giving Admin** and **Giving Staff** both have it (plan D-176), so staff can
+correct a split without an admin. A custom permission set without delete can still move money
+between funds and add funds, and is told to ask an admin to remove one. Quick Gift Entry
+offers the same editor as **Split Across Funds** for a new gift.
 
 ## Lifting the Receipt Lock
 

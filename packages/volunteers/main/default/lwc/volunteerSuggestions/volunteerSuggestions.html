@@ -8,7 +8,12 @@
         </template>
 
         <template lwc:if={hasError}>
-          <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">{errorMessage}</p>
+          <c-barn-notice
+            data-id="error-message"
+            class="slds-var-m-bottom_small"
+            variant="error"
+            message={errorMessage}
+          ></c-barn-notice>
         </template>
 
         <div role="status" class="slds-var-m-bottom_small">
@@ -20,7 +25,12 @@
         <p data-id="subtitle" class="slds-text-body_small slds-var-m-bottom_small">{labels.subtitle}</p>
 
         <template lwc:if={isEmpty}>
-          <p data-id="empty-state" class="slds-text-body_regular">{labels.empty}</p>
+          <c-barn-empty-state
+            data-id="empty-state"
+            illustration="no-data"
+            size="small"
+            heading={labels.empty}
+          ></c-barn-empty-state>
         </template>
 
         <template lwc:if={hasRows}>

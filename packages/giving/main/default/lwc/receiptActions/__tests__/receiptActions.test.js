@@ -4,6 +4,7 @@ import ReceiptActions from 'c/receiptActions';
 import getGiftReceiptState from '@salesforce/apex/ReceiptController.getGiftReceiptState';
 import issueReceipt from '@salesforce/apex/ReceiptController.issue';
 import voidAndReissue from '@salesforce/apex/ReceiptController.voidAndReissue';
+import BarnConfirmModal from 'c/barnConfirmModal';
 
 jest.mock(
   '@salesforce/apex/ReceiptController.getGiftReceiptState',
@@ -164,7 +165,50 @@ describe('c-receipt-actions', () => {
     getGiftReceiptState.error({});
     await flush();
 
-    expect(byId(element, 'load-error').textContent).toBe('That did not work.');
+    expect(byId(element, 'load-error').message).toBe('That did not work.');
+  });
+
+  it('asks before voiding, and voids nothing when the person keeps the receipt', async () => {
+    const element = build();
+    getGiftReceiptState.emit({ canIssue: true, alreadyReceipted: true, receipts: [ISSUED] });
+    await flush();
+    const reason = byId(element, 'void-reason');
+    reason.dispatchEvent(new CustomEvent('change', { detail: { value: 'Wrong amount' } }));
+    await flush();
+
+    BarnConfirmModal.open.mockResolvedValueOnce(false);
+    byId(element, 'void-and-reissue').click();
+    await flush();
+    await flush();
+    const asked = BarnConfirmModal.open.mock.calls[0][0];
+    expect(asked.label).toBe('c.Giving_Receipt_VoidConfirmTitle');
+    expect(asked.message).toBe('c.Giving_Receipt_VoidConfirmMessage');
+    expect(asked.confirmVariant).toBe('destructive');
+    expect(voidAndReissue).not.toHaveBeenCalled();
+
+    BarnConfirmModal.open.mockResolvedValueOnce(true);
+    byId(element, 'void-and-reissue').click();
+    await flush();
+    await flush();
+    expect(voidAndReissue).toHaveBeenCalledWith({ receiptId: ISSUED.id, reason: 'Wrong amount' });
+  });
+
+  it('lays the receipts out as a stacking table with status badges', async () => {
+    const element = build();
+    getGiftReceiptState.emit({
+      canIssue: true,
+      alreadyReceipted: true,
+      receipts: [ISSUED, { ...ISSUED, id: 'a02000000000002', status: 'Void' }]
+    });
+    await flush();
+    expect(element.shadowRoot.querySelector('table').className).toContain(
+      'slds-max-medium-table_stacked'
+    );
+    const badges = [...element.shadowRoot.querySelectorAll('c-barn-status-badge')];
+    expect(badges.map((badge) => badge.status)).toEqual(['current', 'neutral']);
+    element.shadowRoot.querySelectorAll('td').forEach((cell) => {
+      expect(cell.getAttribute('data-label')).toBeTruthy();
+    });
   });
 
   it('offers nothing to a user who cannot issue receipts', async () => {

@@ -335,4 +335,70 @@ private class AskPipelineControllerTest {
 			Assert.areEqual(Label.Giving_Ask_ErrorNoPermission, refusal, 'Moving refused.');
 		}
 	}
+
+	@IsTest
+	static void aRecentlyClosedAskShowsInItsColumnAndReopens() {
+		System.runAs(staff()) {
+			Ask__c closed = ask(donor('Park').Id, 'Asked', 900);
+			closed.Outcome__c = AskRules.OUTCOME_DECLINED;
+			insert closed;
+
+			Test.startTest();
+			AskPipelineController.Board before = AskPipelineController.getBoard(false);
+			AskPipelineController.reopenAsk(closed.Id);
+			AskPipelineController.Board after = AskPipelineController.getBoard(true);
+			Test.stopTest();
+
+			Assert.areEqual(
+				1,
+				before.recentlyClosed.size(),
+				'The closed ask is in Recently Closed.'
+			);
+			Assert.areEqual(AskRules.OUTCOME_DECLINED, before.recentlyClosed[0].outcome);
+			Assert.isNotNull(before.recentlyClosed[0].closedDate, 'With the day it closed.');
+			Assert.areEqual(0, before.cards.size(), 'And not among the open cards.');
+
+			Ask__c reopened = [
+				SELECT Outcome__c, Closed_Date__c, Stage__c
+				FROM Ask__c
+				WHERE Id = :closed.Id
+				WITH SYSTEM_MODE
+			];
+			Assert.areEqual(AskRules.OUTCOME_OPEN, reopened.Outcome__c, 'Reopened.');
+			Assert.isNull(reopened.Closed_Date__c, 'The ask rules clear the Closed Date.');
+			Assert.areEqual('Asked', reopened.Stage__c, 'It keeps its stage.');
+			Assert.areEqual(1, after.cards.size(), 'It is back on the board.');
+			Assert.areEqual(0, after.recentlyClosed.size(), 'And out of Recently Closed.');
+		}
+	}
+
+	@IsTest
+	static void reopeningAMissingAskOrWithoutEditIsRefused() {
+		Ask__c closed;
+		System.runAs(staff()) {
+			closed = ask(donor('Ruiz').Id, 'Asked', 100);
+			closed.Outcome__c = AskRules.OUTCOME_WITHDRAWN;
+			insert closed;
+			String missing;
+			try {
+				AskPipelineController.reopenAsk(null);
+			} catch (AuraHandledException e) {
+				missing = e.getMessage();
+			}
+			Assert.areEqual(Label.Giving_Ask_ErrorNotFound, missing, 'Nothing to reopen.');
+		}
+		User reader = TestUsers.peopleReaderWith(
+			'AskReopenReader',
+			new List<String>{ 'Giving_Read_Only' }
+		);
+		System.runAs(reader) {
+			String refusal;
+			try {
+				AskPipelineController.reopenAsk(closed.Id);
+			} catch (AuraHandledException e) {
+				refusal = e.getMessage();
+			}
+			Assert.areEqual(Label.Giving_Ask_ErrorNoPermission, refusal, 'A reader cannot reopen.');
+		}
+	}
 }

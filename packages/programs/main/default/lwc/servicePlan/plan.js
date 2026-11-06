@@ -10,6 +10,20 @@ export const REVIEW_MONTHS = 3;
 const DONE = 'Done';
 const NOT_STARTED = 'Not Started';
 
+/**
+ * The status word (the suite's status vocabulary, c/barnStatus) for a goal's stored status:
+ * Achieved is done, In Progress is under way, and Not Started and Not Achieved stay neutral.
+ */
+export function goalStatusWord(status) {
+  if (status === 'Achieved') {
+    return 'achieved';
+  }
+  if (status === 'In Progress') {
+    return 'in-progress';
+  }
+  return 'neutral';
+}
+
 /** Replaces {0}, {1} and so on in a label with the values given. */
 export function format(template, ...values) {
   return values.reduce(
@@ -119,7 +133,7 @@ export function goalCards(plan, today, labels, locale) {
       description: goal.description,
       status: labelOf(plan.goalStatuses, goal.status),
       closed: !!goal.closed,
-      statusClass: goal.closed ? 'slds-badge slds-badge_lightest' : 'slds-badge',
+      statusWord: goalStatusWord(goal.status),
       facts: facts.join(' · '),
       reviews: reviews.join(' · '),
       reviewDue: isReviewDue(goal, today),
@@ -129,6 +143,7 @@ export function goalCards(plan, today, labels, locale) {
           : '',
       outcomeMissing: !!(plan.outcomesAvailable && goal.outcomeMissing),
       progress: steps.length ? format(labels.stepsDone, done, steps.length) : '',
+      progressPercent: steps.length ? Math.round((done * 100) / steps.length) : 0,
       steps: steps.map((step) => ({
         id: step.id,
         name: step.name,

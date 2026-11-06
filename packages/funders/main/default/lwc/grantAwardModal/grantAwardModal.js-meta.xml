@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Record the Award: a platform modal that moves a grant to Awarded with the amount awarded, the
+    award period and Restricted (modules-16, vis-modules-11).
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

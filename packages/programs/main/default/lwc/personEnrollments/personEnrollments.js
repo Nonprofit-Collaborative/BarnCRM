@@ -6,7 +6,6 @@ import TITLE from '@salesforce/label/c.Core_Settings_NavGroup_Programs';
 import EMPTY from '@salesforce/label/c.Programs_Person_Empty';
 import STARTED from '@salesforce/label/c.Core_DataJobs_Started';
 import ENDED from '@salesforce/label/c.Core_EraseAction_Ended';
-import LOAD_FAILED from '@salesforce/label/c.Programs_Person_LoadFailed';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Person_MoreThanShown';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
@@ -14,6 +13,7 @@ import LAST_SERVICE from '@salesforce/label/c.Programs_Person_LastService';
 import SERVICES_ATTENDED from '@salesforce/label/c.Programs_Person_ServicesAttended';
 
 import { canShow, enrollmentRows, lastService } from './enrollmentRows';
+import { helpText, loadHelp } from 'c/barnHelpText';
 
 /**
  * The Programs card on a person (P-01): every enrollment they have, open ones first, with the
@@ -49,9 +49,12 @@ export default class PersonEnrollments extends NavigationMixin(LightningElement)
         this.result = result;
         this.errorMessage = undefined;
       })
-      .catch(() => {
-        this.errorMessage = LOAD_FAILED;
-      })
+      .catch(() =>
+        // The message is in the help catalog (modules-1); never the error's own text.
+        loadHelp('Programs').then(() => {
+          this.errorMessage = helpText('Programs', 'Programs_Fail_PersonCard');
+        })
+      )
       .finally(() => {
         this.loading = false;
       });

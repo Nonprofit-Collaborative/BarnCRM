@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
+  <cacheControl>Public</cacheControl>
+  <contentType>text/css</contentType>
+  <description>
+    Print stylesheet for the Board Dashboard and Grant Calendar: hides the app chrome so only the
+    page prints (modules-5). Loaded by c/fundersPrint.
+  </description>
+</StaticResource>

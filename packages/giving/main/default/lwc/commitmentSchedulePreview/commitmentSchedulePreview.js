@@ -19,15 +19,21 @@ import ACTION_RESUME from '@salesforce/label/c.Giving_Commitment_ActionResume';
 import ACTION_CANCEL from '@salesforce/label/c.Giving_Commitment_ActionCancel';
 import ACTION_COMPLETE from '@salesforce/label/c.Giving_Commitment_ActionComplete';
 import STATUS_CHANGED from '@salesforce/label/c.Giving_Commitment_StatusChanged';
+import CANCEL_TITLE from '@salesforce/label/c.Giving_Commitment_CancelConfirmTitle';
+import KEEP_IT from '@salesforce/label/c.Core_Find_DeleteConfirmCancel';
+import EMPTY_HEADING from '@salesforce/label/c.Giving_SchedulePreview_EmptyHeading';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
-const BADGE_BY_STATUS = {
-  Paid: 'slds-theme_success',
-  'Partially paid': 'slds-theme_warning',
-  Overdue: 'slds-theme_error',
-  Skipped: 'slds-theme_shade'
+/** Each payment status in the suite's status vocabulary (c/barnStatus). */
+const TONE_BY_STATUS = {
+  Paid: 'success',
+  'Partially paid': 'warning',
+  Overdue: 'overdue',
+  Skipped: 'skipped'
 };
+const SETTLED_STATUSES = ['Paid', 'Partially paid', 'Skipped'];
 
 /**
  * The payment schedule of a commitment, shown on the commitment record page: what is due,
@@ -50,6 +56,7 @@ export default class CommitmentSchedulePreview extends LightningElement {
 
   labels = {
     title: TITLE,
+    emptyHeading: EMPTY_HEADING,
     get empty() {
       return helpText('Giving', 'Giving_SchedulePreview_Empty');
     },
@@ -129,9 +136,34 @@ export default class CommitmentSchedulePreview extends LightningElement {
     }
   }
 
-  /** Pause, resume, cancel, or complete, named by the button that was pressed. */
-  async handleStatusChange(event) {
-    const action = event.target.dataset.action;
+  /** Pause, resume or complete, named by the button that was pressed. */
+  handleStatusChange(event) {
+    return this.changeStatus(event.target.dataset.action);
+  }
+
+  /** The payments a cancel marks Skipped: nothing paid on them yet. */
+  get unpaidCount() {
+    return this.installments.filter(
+      (row) => !SETTLED_STATUSES.includes(row.status) && !(Number(row.paidAmount) > 0)
+    ).length;
+  }
+
+  /** Cancelling skips every unpaid payment, so it is asked about first (people-giving-2). */
+  async handleCancel() {
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: CANCEL_TITLE,
+      message: helpText('Giving', 'Giving_SchedulePreview_CancelMessage', String(this.unpaidCount)),
+      cancelLabel: KEEP_IT,
+      confirmLabel: ACTION_CANCEL,
+      confirmVariant: 'destructive-text'
+    });
+    if (confirmed === true) {
+      await this.changeStatus('cancel');
+    }
+  }
+
+  async changeStatus(action) {
     this.loading = true;
     this.errorMessage = undefined;
     this.noticeMessage = undefined;
@@ -153,13 +185,13 @@ export default class CommitmentSchedulePreview extends LightningElement {
     this.canGenerate = Boolean(schedule && schedule.canGenerate);
   }
 
-  /** Adds the badge class each status wears, so the template stays free of logic. */
+  /** Adds the tone each status wears, so the template stays free of logic. */
   decorate(schedule) {
     const rows = schedule && schedule.installments ? schedule.installments : [];
     return rows.map((row) => ({
       ...row,
       key: row.recordId || `preview-${row.sequence}`,
-      badgeClass: BADGE_BY_STATUS[row.status] || 'slds-theme_default'
+      tone: TONE_BY_STATUS[row.status] || 'neutral'
     }));
   }
 }

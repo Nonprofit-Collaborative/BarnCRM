@@ -38,6 +38,26 @@ public with sharing class ShiftScheduleSelector {
 		];
 	}
 
+	/** One schedule the user can see, for the Create Shifts Now preview, without a lock. */
+	public static Shift_Schedule__c scheduleForPreview(Id scheduleId) {
+		List<Shift_Schedule__c> found = [
+			SELECT
+				Id,
+				Weekdays__c,
+				Every_N_Weeks__c,
+				Start_Time__c,
+				Start_Date__c,
+				End_Date__c,
+				Active__c,
+				Created_Through__c
+			FROM Shift_Schedule__c
+			WHERE Id = :scheduleId
+			WITH USER_MODE
+			LIMIT 1
+		];
+		return found.isEmpty() ? null : found[0];
+	}
+
 	/**
 	 * Every schedule that may still create shifts, and every one a large save left shifts to
 	 * remove for (Rebuild Pending, R-SSC6), active or not, for the batch.

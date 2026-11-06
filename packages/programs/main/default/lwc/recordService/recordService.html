@@ -1,0 +1,88 @@
+<template>
+  <lightning-quick-action-panel header={labels.title}>
+    <template lwc:if={helpReady}>
+      <div class="slds-is-relative">
+        <template lwc:if={working}>
+          <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+        </template>
+
+        <template lwc:if={loadError}>
+          <c-barn-notice variant="error" message={loadError} data-id="load-error" class="slds-show"></c-barn-notice>
+        </template>
+        <template lwc:elseif={noAccess}>
+          <c-barn-notice message={labels.noAccess} data-id="no-access" class="slds-show"></c-barn-notice>
+        </template>
+        <template lwc:elseif={noServices}>
+          <c-barn-notice message={labels.noServices} data-id="no-services" class="slds-show"></c-barn-notice>
+        </template>
+        <template lwc:elseif={canRecord}>
+          <lightning-record-picker
+            data-id="person"
+            label={labels.person}
+            object-api-name={form.personObjectApiName}
+            filter={personFilter}
+            value={personId}
+            required
+            onchange={handlePersonChange}
+          ></lightning-record-picker>
+          <lightning-combobox
+            data-id="service"
+            class="slds-show slds-var-m-top_small"
+            label={labels.service}
+            options={form.services}
+            value={serviceId}
+            required
+            onchange={handleServiceChange}
+          ></lightning-combobox>
+          <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-top_small">
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+              <lightning-input
+                data-id="date"
+                type="date"
+                label={form.dateLabel}
+                value={deliveryDate}
+                required
+                onchange={handleDateChange}
+              ></lightning-input>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+              <lightning-combobox
+                data-id="attendance"
+                label={labels.attendance}
+                options={form.attendance}
+                value={attendance}
+                onchange={handleAttendanceChange}
+              ></lightning-combobox>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+              <lightning-input
+                data-id="quantity"
+                type="number"
+                step="any"
+                min="0"
+                label={form.quantityLabel}
+                value={quantity}
+                disabled={isAbsence}
+                onchange={handleQuantityChange}
+              ></lightning-input>
+            </div>
+          </div>
+        </template>
+      </div>
+    </template>
+
+    <div slot="footer">
+      <lightning-button data-id="cancel" label={labels.cancel} onclick={handleCancel}></lightning-button>
+      <template lwc:if={canRecord}>
+        <lightning-button
+          data-id="save"
+          class="slds-var-m-left_x-small"
+          variant="brand"
+          label={labels.save}
+          disabled={saveDisabled}
+          onclick={handleSave}
+        ></lightning-button>
+      </template>
+    </div>
+  </lightning-quick-action-panel>
+</template>

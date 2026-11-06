@@ -233,7 +233,7 @@ private class GiftBatchControllerTest {
 					Assert.fail('A posted batch cannot be typed into.');
 				} catch (AuraHandledException e) {
 					Assert.areEqual(
-						Label.Giving_GiftBatch_ErrorEditAfterPost,
+						BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorEditAfterCreate'),
 						e.getMessage(),
 						'Why.'
 					);
@@ -277,7 +277,11 @@ private class GiftBatchControllerTest {
 					GiftBatchController.saveLines(tuesday.Id, seen.lines, null);
 					Assert.fail('A reader cannot save lines.');
 				} catch (AuraHandledException e) {
-					Assert.areEqual(Label.Giving_GiftBatch_ErrorNoAccess, e.getMessage(), 'Why.');
+					Assert.areEqual(
+						BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoAccess'),
+						e.getMessage(),
+						'Why.'
+					);
 				}
 				GiftBatchController.PostResult refused = GiftBatchController.postBatch(tuesday.Id);
 				Test.stopTest();
@@ -285,7 +289,11 @@ private class GiftBatchControllerTest {
 				Assert.isFalse(seen.canEdit, 'The grid is told to offer no buttons.');
 				Assert.areEqual(1, seen.lines.size(), 'The reader still sees the lines.');
 				Assert.isFalse(refused.success, 'A reader cannot post.');
-				Assert.areEqual(Label.Giving_GiftBatch_ErrorNoAccess, refused.formError, 'Why.');
+				Assert.areEqual(
+					BarnHelp.text('Giving', 'Giving_GiftBatch_ErrorNoAccess'),
+					refused.formError,
+					'Why.'
+				);
 			}
 			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c], 'Nothing was posted.');
 		}

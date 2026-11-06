@@ -104,9 +104,9 @@ describe('c-volunteer-readiness', () => {
     getReadiness.emit({ canSee: true, steps: [] });
     await flush();
 
-    expect(element.shadowRoot.querySelector('.empty').textContent).toBe(
-      'c.Volunteers_Readiness_Empty'
-    );
+    const empty = element.shadowRoot.querySelector('.empty');
+    expect(empty.heading).toBe('c.Volunteers_Readiness_Empty');
+    expect(empty.size).toBe('compact');
     expect(element.shadowRoot.querySelectorAll('li.step')).toHaveLength(0);
   });
 
@@ -121,14 +121,16 @@ describe('c-volunteer-readiness', () => {
     expect(steps[0].querySelector('a')).toBeNull();
     expect(steps[0].querySelector('.step-type').textContent).toBe('Application');
     expect(steps[0].querySelector('.status').textContent).toBe('c.Volunteers_Readiness_NotStarted');
-    expect(steps[0].querySelector('.state').textContent).toBe('c.Volunteers_Readiness_NotCurrent');
+    expect(steps[0].querySelector('.state').label).toBe('c.Volunteers_Readiness_NotCurrent');
+    // Not current is never the quietest badge.
+    expect(steps[0].querySelector('.state').status).toBe('attention');
 
     const link = steps[1].querySelector('a.step-type');
     expect(link.textContent).toBe('Background check');
     expect(link.getAttribute('href')).toBe(`/${CHECK_ID}`);
     expect(steps[1].querySelector('.status').textContent).toBe('Completed');
-    expect(steps[1].querySelector('.state').textContent).toBe('c.Volunteers_Readiness_Current');
-    expect(steps[1].querySelector('.state').className).toContain('slds-theme_success');
+    expect(steps[1].querySelector('.state').label).toBe('c.Volunteers_Readiness_Current');
+    expect(steps[1].querySelector('.state').status).toBe('current');
     expect(steps[1].querySelector('.completed lightning-formatted-date-time').value).toBe(
       '2026-10-01'
     );
@@ -176,8 +178,9 @@ describe('c-volunteer-readiness', () => {
     getReadiness.error({ body: { message: 'FIELD_CUSTOM_VALIDATION_EXCEPTION secret detail' } });
     await flush();
 
-    const alert = element.shadowRoot.querySelector('[role="alert"]');
-    expect(alert.textContent).toBe('c.Volunteers_Readiness_LoadFailed');
+    const alert = element.shadowRoot.querySelector('c-barn-notice.error');
+    expect(alert.message).toBe('c.Volunteers_Readiness_LoadFailed');
+    expect(alert.variant).toBe('error');
     expect(element.shadowRoot.textContent).not.toContain('secret detail');
   });
 
@@ -190,7 +193,7 @@ describe('c-volunteer-readiness', () => {
     getObjectInfo.emit({ queryable: true });
     await flush();
 
-    expect(element.shadowRoot.querySelector('[role="alert"]')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('c-barn-notice.error')).not.toBeNull();
   });
 
   it('shows nothing when it cannot load for a user who cannot see requirements', async () => {
@@ -200,7 +203,7 @@ describe('c-volunteer-readiness', () => {
     await flush();
 
     expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
-    expect(element.shadowRoot.querySelector('[role="alert"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('c-barn-notice.error')).toBeNull();
   });
 
   it('shows nothing when it cannot load and the object cannot be read at all', async () => {

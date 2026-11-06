@@ -6,10 +6,10 @@ import sendEmailsNow from '@salesforce/apex/AcknowledgmentController.sendEmailsN
 import produceLetters from '@salesforce/apex/AcknowledgmentController.produceLetters';
 import markLettersSent from '@salesforce/apex/AcknowledgmentController.markLettersSent';
 import setSchedule from '@salesforce/apex/AcknowledgmentController.setSchedule';
+import reorderRules from '@salesforce/apex/AcknowledgmentController.reorderRules';
 
 import TITLE from '@salesforce/label/c.Giving_Acknowledgments_Title';
 import OFF from '@salesforce/label/c.Giving_Acknowledgments_Off';
-import NO_RULES from '@salesforce/label/c.Giving_Acknowledgments_NoRules';
 import QUEUE_HEADING from '@salesforce/label/c.Giving_Acknowledgments_QueueHeading';
 import EMAIL_QUEUE from '@salesforce/label/c.Giving_Acknowledgments_EmailQueue';
 import LETTER_QUEUE from '@salesforce/label/c.Giving_Acknowledgments_LetterQueue';
@@ -20,12 +20,10 @@ import QUEUE_CAPPED from '@salesforce/label/c.Giving_Acknowledgments_QueueCapped
 import SEND_EMAILS from '@salesforce/label/c.Giving_Acknowledgments_SendEmails';
 import EMAILS_STARTED from '@salesforce/label/c.Giving_Acknowledgments_EmailsStarted';
 import PRODUCE_LETTERS from '@salesforce/label/c.Giving_Acknowledgments_ProduceLetters';
-import LETTERS_READY from '@salesforce/label/c.Giving_Acknowledgments_LettersReady';
 import MARK_SENT from '@salesforce/label/c.Giving_Acknowledgments_MarkSent';
 import LETTERS_MARKED_SENT from '@salesforce/label/c.Giving_Acknowledgments_LettersMarkedSent';
 import NIGHTLY from '@salesforce/label/c.Giving_Acknowledgments_Nightly';
 import NEXT_RUN from '@salesforce/label/c.Giving_Acknowledgments_NextRun';
-import NOT_SCHEDULED from '@salesforce/label/c.Giving_Acknowledgments_NotScheduled';
 import LAST_RUN from '@salesforce/label/c.Core_HealthCheck_LastRunLabel';
 import NEVER_RUN from '@salesforce/label/c.Giving_Acknowledgments_NeverRun';
 import RULES_HEADING from '@salesforce/label/c.Giving_Acknowledgments_RulesHeading';
@@ -60,15 +58,44 @@ import COLUMN_ERRORS from '@salesforce/label/c.Giving_Acknowledgments_ColumnErro
 import COLUMN_FINISHED from '@salesforce/label/c.Giving_Acknowledgments_ColumnFinished';
 import DOWNLOAD_FILE from '@salesforce/label/c.Giving_Acknowledgments_DownloadFile';
 import ANY_AMOUNT from '@salesforce/label/c.Giving_Acknowledgments_AnyAmount';
+import MOVE_UP from '@salesforce/label/c.Core_Shared_MoveUp';
+import MOVE_DOWN from '@salesforce/label/c.Core_Shared_MoveDown';
+import COLUMN_ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
 import { bodyMessage } from 'c/findCsv';
+import { iconFor } from 'c/barnIcons';
+import { createDragController } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const FILE_DOWNLOAD_PATH = '/sfc/servlet.shepherd/document/download/';
 const CHANNEL_EMAIL = 'Email';
+const RULES_SECTION = 'rules';
+
+/** The ids with one of them taken out and put back at a position among the rest. */
+function placeAt(ids, id, index) {
+  const others = ids.filter((other) => other !== id);
+  others.splice(index, 0, id);
+  return others;
+}
+
+/** A run's status word for the shared status badge; the badge text stays the run's own status. */
+const RUN_STATUS_WORDS = {
+  Queued: 'queued',
+  Running: 'running',
+  'Ready to merge': 'attention',
+  Completed: 'completed',
+  'Completed with errors': 'warning',
+  Failed: 'failed'
+};
 
 /**
- * The thank you queue, as Maria reads it: what is waiting, what would send it, and the three
- * buttons that do it.
+ * The Thank-Yous page, as Maria reads it: what is waiting, what would send it, the three buttons
+ * that do it, and the recent runs, first. The rules come after, in a section headed Rules (Admin)
+ * that starts open only for someone who may change them (people-giving-18).
+ *
+ * The rule order can be changed by dragging a rule row (the Core kit's `c/barnDrag`: mouse, touch
+ * after a press and hold, or Space and the arrow keys) or with Move Up and Move Down; either
+ * renumbers the rules 10, 20, 30 in one save and announces the move in a live region.
  *
  * A rule is created and edited here, in a standard record edit form, rather than on the
  * standard New page, for one reason: a rule names its email template by developer name, and no
@@ -85,6 +112,29 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
       loadHelp(['Core', 'Giving']).then(() => {
         this.helpReady = true;
       });
+    }
+    this.drag = createDragController({
+      root: this.template,
+      layout: 'list',
+      messages: dragMessages(),
+      announce: (text) => {
+        this.liveMessage = text;
+      },
+      onChange: (state) => {
+        this.dragState = state;
+      },
+      onDrop: ({ itemId, fromIndex, toIndex }) => {
+        if (fromIndex === toIndex) {
+          return false;
+        }
+        return this.saveOrder(placeAt(this.ruleIds, itemId, toIndex), itemId, false);
+      }
+    });
+  }
+
+  disconnectedCallback() {
+    if (this.drag) {
+      this.drag.destroy();
     }
   }
 
@@ -138,7 +188,18 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
       return helpText('Giving', 'Giving_Acknowledgments_Intro');
     },
     off: OFF,
-    noRules: NO_RULES,
+    get noRules() {
+      return helpText('Giving', 'Giving_Acknowledgments_NoRules');
+    },
+    get rulesHelp() {
+      return helpText('Giving', 'Giving_Acknowledgments_RulesHelp');
+    },
+    get dragInstructions() {
+      return dragInstructions();
+    },
+    moveUp: MOVE_UP,
+    moveDown: MOVE_DOWN,
+    columnActions: COLUMN_ACTIONS,
     queueHeading: QUEUE_HEADING,
     emailQueue: EMAIL_QUEUE,
     letterQueue: LETTER_QUEUE,
@@ -151,7 +212,9 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
     markSent: MARK_SENT,
     nightly: NIGHTLY,
     nextRun: NEXT_RUN,
-    notScheduled: NOT_SCHEDULED,
+    get notScheduled() {
+      return helpText('Giving', 'Giving_Acknowledgments_NotScheduled');
+    },
     lastRun: LAST_RUN,
     neverRun: NEVER_RUN,
     rulesHeading: RULES_HEADING,
@@ -181,11 +244,18 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
     downloadFile: DOWNLOAD_FILE
   };
 
+  icons = { page: iconFor('Acknowledgments') };
+
   page;
   wiredPage;
   errorMessage;
   noticeMessage;
+  liveMessage = '';
   busy = false;
+
+  /** The drag in progress, as c/barnDrag reports it. */
+  dragState = {};
+  drag;
 
   /** The rule form: closed, open on a new rule (null id), or open on an existing one. */
   showRuleForm = false;
@@ -231,6 +301,15 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
 
   get canManage() {
     return !!this.page && this.page.canManage === true;
+  }
+
+  /** The rules section starts open for someone who may change the rules, closed for the rest. */
+  get rulesSectionOpen() {
+    return this.canManage ? RULES_SECTION : [];
+  }
+
+  get ruleIds() {
+    return this.hasRules ? this.page.rules.map((rule) => rule.id) : [];
   }
 
   /** The templates the org has, offered by name; the rule stores the developer name. */
@@ -281,14 +360,31 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
     if (!this.hasRules) {
       return [];
     }
-    return this.page.rules.map((rule) => ({
-      ...rule,
-      templateText: rule.templateFound ? rule.templateLabel : TEMPLATE_NOT_FOUND,
-      templateMissing: rule.templateFound === false,
-      activeText: rule.active ? '' : this.labels.inactive,
-      editTitle: EDIT_RULE_OF.replace('{0}', rule.name),
-      matchesText: this.describe(rule)
-    }));
+    const last = this.page.rules.length - 1;
+    const state = this.dragState || {};
+    const others = state.active ? this.ruleIds.filter((id) => id !== state.itemId) : [];
+    const dropBefore = state.active ? others[state.overIndex] : undefined;
+    return this.page.rules.map((rule, index) => {
+      let rowClass = 'slds-hint-parent';
+      if (state.active && rule.id === state.itemId) {
+        rowClass += ' rule-row_dragging';
+      } else if (rule.id === dropBefore) {
+        rowClass += ' rule-row_drop';
+      }
+      return {
+        ...rule,
+        templateText: rule.templateFound ? rule.templateLabel : TEMPLATE_NOT_FOUND,
+        templateMissing: rule.templateFound === false,
+        inactive: !rule.active,
+        editTitle: EDIT_RULE_OF.replace('{0}', rule.name),
+        matchesText: this.describe(rule),
+        cannotMoveUp: this.busy || index === 0,
+        cannotMoveDown: this.busy || index === last,
+        dragId: this.canManage ? rule.id : undefined,
+        tabIndex: this.canManage ? '0' : undefined,
+        rowClass
+      };
+    });
   }
 
   get runs() {
@@ -298,6 +394,7 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
     return this.page.runs.map((run) => ({
       ...run,
       finishedText: run.finished ? new Date(run.finished).toLocaleString() : '',
+      statusWord: RUN_STATUS_WORDS[run.status] || run.status,
       hasFile: !!run.mergeFileId,
       fileUrl: run.mergeFileId ? FILE_DOWNLOAD_PATH + run.mergeFileId : ''
     }));
@@ -413,7 +510,7 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
   }
 
   handleProduceLetters() {
-    return this.run(produceLetters(), LETTERS_READY);
+    return this.run(produceLetters(), helpText('Giving', 'Giving_Acknowledgments_LettersReady'));
   }
 
   handleMarkSent(event) {
@@ -425,6 +522,61 @@ export default class Acknowledgments extends NavigationMixin(LightningElement) {
 
   handleScheduleChange(event) {
     return this.run(setSchedule({ scheduled: event.target.checked }), undefined);
+  }
+
+  handleMoveUp(event) {
+    return this.moveRule(event.currentTarget.dataset.recordId, -1);
+  }
+
+  handleMoveDown(event) {
+    return this.moveRule(event.currentTarget.dataset.recordId, 1);
+  }
+
+  moveRule(ruleId, offset) {
+    const ids = this.ruleIds;
+    const from = ids.indexOf(ruleId);
+    const to = from + offset;
+    if (from < 0 || to < 0 || to >= ids.length) {
+      return Promise.resolve(false);
+    }
+    return this.saveOrder(placeAt(ids, ruleId, to), ruleId, true);
+  }
+
+  /**
+   * Saves the whole order at once; the server renumbers the rules 10, 20, 30. A Move Up or Move
+   * Down is announced here; a drag is announced by the drag controller. Resolves true when saved.
+   */
+  saveOrder(ids, movedId, announce) {
+    const moved = this.page.rules.find((rule) => rule.id === movedId);
+    const said = helpText(
+      'Giving',
+      'Giving_Acknowledgments_RuleMoved',
+      moved ? moved.name : '',
+      ids.indexOf(movedId) + 1,
+      ids.length
+    );
+    return this.run(reorderRules({ ruleIds: ids }), said).then(() => {
+      if (this.errorMessage) {
+        return false;
+      }
+      if (announce) {
+        this.liveMessage = said;
+      }
+      return true;
+    });
+  }
+
+  // Dragging a rule row through c/barnDrag: Move Up and Move Down do the same.
+  handlePointerDown(event) {
+    if (this.canManage && !this.busy) {
+      this.drag.pointerDown(event);
+    }
+  }
+
+  handleDragKey(event) {
+    if (this.canManage && !this.busy) {
+      this.drag.keyDown(event);
+    }
   }
 
   /** Every action is the same three steps, so they are written once. */

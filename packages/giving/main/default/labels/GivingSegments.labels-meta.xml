@@ -169,6 +169,14 @@
     <value>Your Segments</value>
   </labels>
   <labels>
+    <fullName>Giving_Segments_EmptyHeading</fullName>
+    <categories>Giving, Segments</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Segments: heading when no segment is saved yet</shortDescription>
+    <value>No Segments Yet</value>
+  </labels>
+  <labels>
     <fullName>Giving_Segments_SegmentField</fullName>
     <categories>Giving, Segments</categories>
     <language>en_US</language>

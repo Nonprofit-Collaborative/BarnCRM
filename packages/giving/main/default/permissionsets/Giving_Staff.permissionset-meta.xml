@@ -24,6 +24,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>CommitmentEntryController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>DonorLevelController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -37,6 +41,10 @@
   </classAccesses>
   <classAccesses>
     <apexClass>GiftBatchController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>GiftAllocationController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
@@ -1377,7 +1385,7 @@
   </objectPermissions>
   <objectPermissions>
     <allowCreate>true</allowCreate>
-    <allowDelete>false</allowDelete>
+    <allowDelete>true</allowDelete>
     <allowEdit>true</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>

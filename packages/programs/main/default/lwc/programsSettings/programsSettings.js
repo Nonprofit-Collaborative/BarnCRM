@@ -8,19 +8,17 @@ import DEFAULT_VALUE from '@salesforce/label/c.Programs_Settings_Default';
 import CHANGE_IN_SETUP from '@salesforce/label/c.Programs_Settings_ChangeInSetup';
 import CHANGE_FOR from '@salesforce/label/c.Programs_Settings_ChangeFor';
 import NO_ACCESS from '@salesforce/label/c.Programs_Settings_NoAccess';
-import LOAD_FAILED from '@salesforce/label/c.Programs_Settings_LoadFailed';
 import PRIVACY_TITLE from '@salesforce/label/c.Programs_Settings_PrivacyTitle';
 import PRIVACY_LEGEND from '@salesforce/label/c.Programs_Settings_PrivacyLegend';
 import PRIVACY_SHARED from '@salesforce/label/c.Programs_Settings_PrivacyShared';
 import PRIVACY_PRIVATE from '@salesforce/label/c.Programs_Settings_PrivacyPrivate';
 import PRIVACY_DEFAULT from '@salesforce/label/c.Programs_Settings_PrivacyDefault';
-import SAVE from '@salesforce/label/c.Core_Kit_Save';
 import SAVED from '@salesforce/label/c.Programs_Settings_Saved';
-import SAVE_FAILED from '@salesforce/label/c.Programs_Settings_SaveFailed';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import { PRIVATE, picklistRows, privacyOptions, storedPrivacy } from './settingsRows';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { iconFor } from 'c/barnIcons';
 
 /**
  * The Programs module's settings page, reached from the Programs section of BarnCRM Settings:
@@ -47,9 +45,10 @@ export default class ProgramsSettings extends LightningElement {
       return helpText('Programs', 'Programs_Settings_PrivacyIntro');
     },
     privacyLegend: PRIVACY_LEGEND,
-    privacyDefault: PRIVACY_DEFAULT,
-    save: SAVE
+    privacyDefault: PRIVACY_DEFAULT
   };
+
+  icons = { settings: iconFor('Programs_Settings') };
 
   privacyOptions = privacyOptions({ shared: PRIVACY_SHARED, private: PRIVACY_PRIVATE });
 
@@ -76,7 +75,7 @@ export default class ProgramsSettings extends LightningElement {
         this.show(settings);
       })
       .catch((error) => {
-        this.errorMessage = messageOf(error, LOAD_FAILED);
+        this.errorMessage = messageOf(error, helpText('Programs', 'Programs_Fail_SettingsLoad'));
       })
       .finally(() => {
         this.loading = false;
@@ -100,13 +99,19 @@ export default class ProgramsSettings extends LightningElement {
     return picklistRows(this.settings, { defaultValue: DEFAULT_VALUE, changeFor: CHANGE_FOR });
   }
 
-  get saveDisabled() {
-    return this.saving || this.chosenPrivacy === storedPrivacy(this.settings);
+  /** One unsaved change while the chosen preset differs from the stored one; the save bar shows. */
+  get dirtyCount() {
+    return this.settings && this.chosenPrivacy !== storedPrivacy(this.settings) ? 1 : 0;
   }
 
   handlePrivacyChange(event) {
     this.chosenPrivacy = event.detail.value;
     this.savedMessage = undefined;
+  }
+
+  handleDiscard() {
+    this.chosenPrivacy = storedPrivacy(this.settings);
+    this.errorMessage = undefined;
   }
 
   handleSavePrivacy() {
@@ -119,7 +124,7 @@ export default class ProgramsSettings extends LightningElement {
         this.savedMessage = SAVED;
       })
       .catch((error) => {
-        this.errorMessage = messageOf(error, SAVE_FAILED);
+        this.errorMessage = messageOf(error, helpText('Programs', 'Programs_Fail_SettingsSave'));
       })
       .finally(() => {
         this.saving = false;

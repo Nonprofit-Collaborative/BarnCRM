@@ -97,10 +97,11 @@ and do not save.
 ## To Read the Totals on a Record
 
 **Giving totals.** In the **BarnCRM Fundraising** app, a person, household or organization has a
-**Giving** section: **Total Giving**, **Gift Count**, **First Gift Date**, **Last Gift Date**,
-**Largest Gift**, **Giving This Year**, **Giving Last Year**, **Giving Two Years Ago**,
-**Pledge Balance**, **Total Soft Credits**, **In-kind Value** and others, plus **Donor Level**.
-**Rollups Last Calculated** shows when these were last worked out. See [Gifts](gifts.md).
+**Giving** section on its **Details** tab: **Total Giving**, **Giving This Year**, **Giving Last
+Year**, **Largest Gift**, **Last Gift Date**, **Pledge Balance**, **Donor Level** and **Giving
+Pattern**. **Giving Details** below it holds **Gift Count**, **First Gift Date**, **Total Soft
+Credits**, the donor scores and the recent giving figures.
+**Totals Last Updated** shows when these were last worked out. See [Gifts](gifts.md).
 
 **Volunteer totals.** In the **BarnCRM Volunteers** app, a person's **Volunteer Profile**
 section shows **Volunteer Hours Total**, **Volunteer Hours This Year**, **Volunteer Hours Last

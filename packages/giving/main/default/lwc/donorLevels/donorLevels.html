@@ -5,21 +5,30 @@
       <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
 
       <template lwc:if={hasError}>
-        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
-          {errorMessage}
-        </p>
+        <c-barn-notice
+          class="slds-show slds-var-m-bottom_small"
+          variant="error"
+          message={errorMessage}
+          data-id="error-message"
+        ></c-barn-notice>
       </template>
 
       <template lwc:if={hasNotice}>
-        <p role="status" data-id="notice-message" class="slds-text-body_small slds-var-m-bottom_small">
-          {noticeMessage}
-        </p>
+        <c-barn-notice
+          class="slds-show slds-var-m-bottom_small"
+          variant="success"
+          message={noticeMessage}
+          data-id="notice-message"
+        ></c-barn-notice>
       </template>
 
       <template lwc:if={showOffNotice}>
-        <p data-id="off-notice" class="slds-text-body_small slds-var-m-bottom_small">
-          {labels.off}
-        </p>
+        <c-barn-notice
+          class="slds-show slds-var-m-bottom_small"
+          variant="warning"
+          message={labels.off}
+          data-id="off-notice"
+        ></c-barn-notice>
       </template>
 
       <dl class="slds-dl_horizontal slds-var-m-bottom_small">
@@ -32,7 +41,12 @@
       </dl>
 
       <template lwc:if={isEmpty}>
-        <p data-id="empty-state" class="slds-text-body_regular">{labels.empty}</p>
+        <c-barn-empty-state
+          illustration="setup"
+          heading={labels.emptyHeading}
+          message={labels.empty}
+          data-id="empty-state"
+        ></c-barn-empty-state>
       </template>
 
       <template lwc:if={hasLadder}>
@@ -74,7 +88,11 @@
                   </template>
                 </td>
                 <td data-id="donor-count" data-label={labels.columnDonors}>{rung.donorCount}</td>
-                <td data-id="rung-active" data-label={labels.columnActive}>{rung.activeText}</td>
+                <td data-id="rung-active" data-label={labels.columnActive}>
+                  <template lwc:if={rung.activeText}>
+                    <c-barn-status-badge status="inactive" label={rung.activeText}></c-barn-status-badge>
+                  </template>
+                </td>
               </tr>
             </template>
           </tbody>

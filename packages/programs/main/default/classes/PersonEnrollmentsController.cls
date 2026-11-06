@@ -62,10 +62,9 @@ public with sharing class PersonEnrollmentsController {
 		} catch (Exception failure) {
 			// Anything unexpected is in the Error Log before the card says it could not load.
 			ErrorLogger.log(failure, CONTEXT, personId);
-			AuraHandledException refused = new AuraHandledException(
-				Label.Programs_PersonEnrollments_LoadFailed
-			);
-			refused.setMessage(Label.Programs_PersonEnrollments_LoadFailed);
+			String message = BarnHelp.text('Programs', 'Programs_Fail_PersonCard');
+			AuraHandledException refused = new AuraHandledException(message);
+			refused.setMessage(message);
 			throw refused;
 		}
 	}

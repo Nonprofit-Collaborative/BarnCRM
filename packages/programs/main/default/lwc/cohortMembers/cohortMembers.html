@@ -7,26 +7,26 @@
       </template>
 
       <template lwc:if={errorMessage}>
-        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
-          {errorMessage}
-        </p>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-show slds-var-m-bottom_small"></c-barn-notice>
       </template>
 
       <div role="status" data-id="result" class="slds-var-m-bottom_small">{resultMessage}</div>
 
       <template lwc:if={hasFailures}>
-        <div data-id="failures" class="slds-box slds-theme_shade slds-var-m-bottom_small">
-          <p class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.notAdded}</p>
+        <c-barn-notice variant="warning" title={labels.notAdded} data-id="failures" class="slds-show slds-var-m-bottom_small">
           <ul class="slds-list_dotted">
             <template for:each={failures} for:item="failure">
               <li key={failure.key} data-id="failure">{failure.personName}: {failure.message}</li>
             </template>
           </ul>
-        </div>
+        </c-barn-notice>
       </template>
 
       <template lwc:if={loaded}>
         <p data-id="member-count" class="slds-text-title_bold slds-var-m-bottom_x-small">{memberCount}</p>
+        <p class="slds-assistive-text" id="drag-help">{dragHelp}</p>
+        <p class="slds-assistive-text" role="status" aria-live="polite" data-id="drag-live">{announcement}</p>
+        <div class={membersZoneClass} data-drop-zone="members" data-drop-label={labels.title} data-id="members-zone">
         <template lwc:if={hasMembers}>
           <ul class="slds-has-dividers_bottom-space">
             <template for:each={members} for:item="member">
@@ -53,8 +53,9 @@
           </ul>
         </template>
         <template lwc:else>
-          <p data-id="members-empty" class="slds-text-body_regular">{labels.membersEmpty}</p>
+          <c-barn-empty-state illustration="no-data" heading={labels.membersEmpty} data-id="members-empty"></c-barn-empty-state>
         </template>
+        </div>
         <template lwc:if={moreThanShown}>
           <p data-id="more" class="slds-text-body_small slds-text-color_weak">{labels.moreThanShown}</p>
         </template>
@@ -76,9 +77,25 @@
               </template>
             </div>
             <template lwc:if={hasCandidates}>
-              <ul>
+              <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_x-small" data-id="drag-hint">{labels.dragHint}</p>
+              <ul data-drop-zone="candidates" data-drop-label={labels.candidates} data-id="candidates-zone">
                 <template for:each={candidates} for:item="candidate">
-                  <li key={candidate.key} data-id="candidate">
+                  <li key={candidate.key} data-id="candidate" class="slds-grid slds-grid_vertical-align-center">
+                    <span
+                      class="drag-handle slds-var-m-right_x-small"
+                      role="button"
+                      tabindex="0"
+                      title={dragHelp}
+                      aria-label={candidate.personName}
+                      aria-describedby="drag-help"
+                      data-drag-id={candidate.enrollmentId}
+                      data-drag-label={candidate.personName}
+                      data-id="drag"
+                      onpointerdown={handlePointerDown}
+                      onkeydown={handleDragKey}
+                    >
+                      <lightning-icon icon-name="utility:drag_and_drop" size="x-small"></lightning-icon>
+                    </span>
                     <lightning-input
                       data-id="tick"
                       data-enrollment={candidate.enrollmentId}
@@ -93,7 +110,7 @@
               </ul>
             </template>
             <template lwc:else>
-              <p data-id="no-candidates" class="slds-text-body_small slds-text-color_weak">{labels.noCandidates}</p>
+              <c-barn-empty-state size="compact" heading={labels.noCandidates} data-id="no-candidates"></c-barn-empty-state>
             </template>
 
             <template lwc:if={canEnroll}>

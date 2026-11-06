@@ -6,7 +6,6 @@ import { indicatorLines } from 'c/grantReportModel';
 import { messageFrom as messageOf } from 'c/findCsv';
 
 import TITLE from '@salesforce/label/c.Funders_Outcomes_Title';
-import NOT_INSTALLED from '@salesforce/label/c.Funders_Outcomes_NotInstalled';
 import NO_REQUIREMENTS from '@salesforce/label/c.Funders_Outcomes_NoRequirements';
 import NONE from '@salesforce/label/c.Core_Shared_NoOutcome';
 import MISSING from '@salesforce/label/c.Funders_Outcomes_Missing';
@@ -23,12 +22,12 @@ const NONE_VALUE = '';
  * The Logic Model Outcomes card on a grant's page (L-06, canonical model 29ZI R-GQ6): each
  * requirement with the Logic Models outcome or output it reports on, chosen here and saved by
  * record identifier, and that outcome's indicator results for the award period. Without Logic
- * Models it says so.
+ * Models the card is not drawn at all (modules-6).
  */
 export default class GrantOutcomes extends LightningElement {
   @api recordId;
 
-  labels = { title: TITLE, notInstalled: NOT_INSTALLED, noRequirements: NO_REQUIREMENTS };
+  labels = { title: TITLE, noRequirements: NO_REQUIREMENTS };
 
   card;
   choices = {};
@@ -56,6 +55,10 @@ export default class GrantOutcomes extends LightningElement {
 
   get notInstalled() {
     return Boolean(this.card) && !this.card.available;
+  }
+
+  get showCard() {
+    return !this.notInstalled;
   }
 
   get noRequirements() {

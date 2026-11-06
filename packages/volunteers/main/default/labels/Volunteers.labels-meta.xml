@@ -121,14 +121,6 @@
         <value>Skipped ({0}): {1}</value>
     </labels>
     <labels>
-        <fullName>Volunteers_JobNotice_LettersFailed</fullName>
-        <categories>Volunteers, Job Notifications</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Job notification: where to read why letters failed</shortDescription>
-        <value>Open the Error Log to see why the failures happened.</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Letter_TemplateNotFound</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
@@ -143,14 +135,6 @@
         <protected>true</protected>
         <shortDescription>The letter action found no active template to offer</shortDescription>
         <value>No volunteer letter template is active. Ask your BarnCRM admin to activate one on the Volunteer Letter Templates tab.</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Letter_ActionFailed</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Unexpected failure in the Volunteer letter action</shortDescription>
-        <value>Something went wrong with the letter. Try again, and if it happens again ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Volunteers_LetterAction_NoLegalName</fullName>
@@ -255,14 +239,6 @@
         <protected>true</protected>
         <shortDescription>Too many entries in one call; {0} is the limit</shortDescription>
         <value>Select at most {0} hours entries at a time.</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Approve_ActionFailed</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Unexpected failure on the Approve Hours screen</shortDescription>
-        <value>Something went wrong with these hours. Try again, and if it happens again ask your BarnCRM admin to check the Error Log.</value>
     </labels>
     <labels>
         <fullName>Volunteers_Approve_Title</fullName>
@@ -593,14 +569,6 @@
         <value>Choose the person to sign up first.</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Signups_ActionFailed</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Unexpected failure on the Sign-ups panel</shortDescription>
-        <value>Something went wrong with sign-ups. Try again, and if it happens again ask your BarnCRM admin to check the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_NightlyJobs_SchedulesName</fullName>
         <categories>Volunteers, Nightly Jobs</categories>
         <language>en_US</language>
@@ -713,22 +681,6 @@ When: {1}</value>
         <protected>true</protected>
         <shortDescription>Suggested Volunteers: signed up; {0} is the person's name</shortDescription>
         <value>{0} is signed up for this shift.</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Suggestions_BookFailed</fullName>
-        <categories>Volunteers, Suggestions</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Suggested Volunteers: the sign-up did not save</shortDescription>
-        <value>The sign-up could not be saved. Try again, or use Add Sign-Up in the Sign-Ups panel.</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_Suggestions_LoadFailed</fullName>
-        <categories>Volunteers, Suggestions</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Suggested Volunteers: the suggestions did not load</shortDescription>
-        <value>The suggestions could not be loaded. Refresh the page to try again.</value>
     </labels>
     <labels>
         <fullName>Volunteers_Suggestions_MoreConsidered</fullName>
@@ -851,14 +803,6 @@ When: {1}</value>
         <value>Expires</value>
     </labels>
     <labels>
-        <fullName>Volunteers_Readiness_LoadFailed</fullName>
-        <categories>Volunteers</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The readiness card could not be loaded</shortDescription>
-        <value>Readiness could not be loaded. Click Refresh, or reload the page.</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_Erase_HoursKept</fullName>
         <categories>Erase</categories>
         <language>en_US</language>
@@ -931,22 +875,6 @@ When: {1}</value>
         <value>{0} Past Shift Is Still Open</value>
     </labels>
     <labels>
-        <fullName>Volunteers_HealthCheck_PastShiftsDetail</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Past shifts still Open, why and how to fix; {0} is the days</shortDescription>
-        <value>These shifts ended more than {0} days ago and nobody closed them. Attendance was probably never marked, so the people who came have no hours. Open each shift, mark who came on its Sign-Ups panel, then set Status to Completed, or to Cancelled if it did not happen.</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_HealthCheck_PastShiftsDetailOne</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>One past shift still Open, why and how to fix; {0} is the days</shortDescription>
-        <value>This shift ended more than {0} days ago and nobody closed it. Attendance was probably never marked, so the people who came have no hours. Open the shift, mark who came on its Sign-Ups panel, then set Status to Completed, or to Cancelled if it did not happen.</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_HealthCheck_PastShiftsFix</fullName>
         <categories>HealthCheck</categories>
         <language>en_US</language>
@@ -969,22 +897,6 @@ When: {1}</value>
         <protected>false</protected>
         <shortDescription>Schedule horizon not filled title, one schedule; {0} is 1</shortDescription>
         <value>{0} Shift Schedule Has Not Created Shifts Far Enough Ahead</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_HealthCheck_HorizonDetail</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Schedule horizon not filled, why and how to fix; {0} is the weeks</shortDescription>
-        <value>These active schedules should have shifts {0} weeks ahead (Weeks Ahead to Create Shifts, Volunteers section) but stop more than two days short, so nobody can sign up for the missing days. The nightly Volunteer Schedules job is usually not running: use the fix for unscheduled nightly jobs. To fill one now, open it and save it.</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_HealthCheck_HorizonDetailOne</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>One schedule horizon not filled, why and how to fix; {0} is the weeks</shortDescription>
-        <value>This active schedule should have shifts {0} weeks ahead (Weeks Ahead to Create Shifts, Volunteers section) but stops more than two days short, so nobody can sign up for the missing days. The nightly Volunteer Schedules job is usually not running: use the fix for unscheduled nightly jobs. To fill it now, open the schedule and save it.</value>
     </labels>
     <labels>
         <fullName>Volunteers_HealthCheck_CoordinatorAccessTitle</fullName>
@@ -1201,5 +1113,109 @@ When: {1}</value>
         <protected>false</protected>
         <shortDescription>Health Check: refusal when the person cannot manage settings</shortDescription>
         <value>Health Check findings need Manage BarnCRM Settings.</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Shared_ThisYear</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Letter period choice: 1 January to today</shortDescription>
+        <value>This Year</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Shared_LastYear</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Letter period choice: the whole of last year</shortDescription>
+        <value>Last Year</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_CloseShift</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Sign-Ups panel button and dialog title: set the shift to Completed</shortDescription>
+        <value>Close Shift</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_CloseMarkNoShow</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Close Shift choice: mark the people still booked No show</shortDescription>
+        <value>Mark No Show and Close</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Signups_CloseKeep</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Close Shift choice: leave the people still booked as they are</shortDescription>
+        <value>Close Without Changing Them</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_LogHours_Title</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Heading of the Log Hours action</shortDescription>
+        <value>Log Hours</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Schedule_CreateNow</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button on a shift schedule that creates its missing shifts now</shortDescription>
+        <value>Create Shifts Now</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letters_Title</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Approve Hours button and dialog title: letters for many people</shortDescription>
+        <value>Volunteer Letters</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letters_Who</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer Letters: who the letters are for</shortDescription>
+        <value>Letters For</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letters_Everyone</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer Letters choice: everyone with approved hours</shortDescription>
+        <value>Everyone with approved hours in the period</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letters_Chosen</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer Letters choice: people picked one by one</shortDescription>
+        <value>People I choose</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letters_Make</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer Letters button that starts the letters</shortDescription>
+        <value>Make Letters</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Home_HoursThisMonth</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteers Home figure: approved hours worked this month</shortDescription>
+        <value>Hours This Month</value>
     </labels>
 </CustomLabels>

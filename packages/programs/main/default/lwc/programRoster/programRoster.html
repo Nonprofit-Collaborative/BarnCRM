@@ -17,20 +17,30 @@
       </template>
 
       <template lwc:if={hasError}>
-        <p role="alert" tabindex="-1" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
-          {errorMessage}
-        </p>
+        <c-barn-notice
+          variant="error"
+          message={errorMessage}
+          tabindex="-1"
+          data-id="error-message"
+          class="slds-show slds-var-m-bottom_small"
+        ></c-barn-notice>
       </template>
 
       <template lwc:if={loaded}>
-        <dl class="slds-grid slds-wrap slds-var-m-bottom_small">
+        <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small">
           <template for:each={figures} for:item="figure">
-            <div key={figure.value} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
-              <dt class="slds-text-title">{figure.label}</dt>
-              <dd data-id="figure" data-stage={figure.value} class="slds-text-heading_small">{figure.count}</dd>
+            <div key={figure.value} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+              <c-barn-stat-tile
+                label={figure.label}
+                value={figure.count}
+                bordered
+                align="start"
+                data-id="figure"
+                data-stage={figure.value}
+              ></c-barn-stat-tile>
             </div>
           </template>
-        </dl>
+        </div>
         <lightning-input
           data-id="show-ended"
           type="toggle"
@@ -86,7 +96,16 @@
       </div>
 
       <template lwc:if={isEmpty}>
-        <p data-id="empty-state" class="slds-text-body_regular">{labels.empty}</p>
+        <c-barn-empty-state illustration="no-data" heading={labels.empty} size="small" data-id="empty-state">
+          <template lwc:if={canAdd}>
+            <lightning-button
+              data-id="empty-enroll"
+              label={labels.enroll}
+              disabled={addDisabled}
+              onclick={handleShowForm}
+            ></lightning-button>
+          </template>
+        </c-barn-empty-state>
       </template>
 
       <template lwc:if={hasEnrollments}>

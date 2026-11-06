@@ -9,6 +9,38 @@
         <value>Choose the program in the Program card on the grant's page. This is not a program.</value>
     </labels>
     <labels>
+        <fullName>Funders_GrantTab_Overview</fullName>
+        <categories>GrantPage</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant page tab: details, program and fund</shortDescription>
+        <value>Overview</value>
+    </labels>
+    <labels>
+        <fullName>Funders_GrantTab_Money</fullName>
+        <categories>GrantPage</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant page tab: award schedule, payments and restricted ledger</shortDescription>
+        <value>Money</value>
+    </labels>
+    <labels>
+        <fullName>Funders_GrantTab_Reporting</fullName>
+        <categories>GrantPage</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant page tab: requirements, outcomes and funder report</shortDescription>
+        <value>Reporting</value>
+    </labels>
+    <labels>
+        <fullName>Funders_GrantTab_Writing</fullName>
+        <categories>GrantPage</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Grant page tab: the answer library</shortDescription>
+        <value>Writing</value>
+    </labels>
+    <labels>
         <fullName>Funders_HealthCheck_PastDeadlineTitleOne</fullName>
         <categories>HealthCheck</categories>
         <language>en_US</language>
@@ -185,12 +217,28 @@
         <value>Amount Awarded</value>
     </labels>
     <labels>
-        <fullName>Funders_Pipeline_ErrorLoad</fullName>
+        <fullName>Funders_Pipeline_NoGrants</fullName>
         <categories>GrantPipeline</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>The pipeline could not load</shortDescription>
-        <value>The Grant Pipeline could not load. Try again, or ask your admin to look at the Error Log.</value>
+        <shortDescription>Grant Pipeline empty state heading</shortDescription>
+        <value>No Open Grants Yet</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Pipeline_NoDeadlines</fullName>
+        <categories>GrantPipeline</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Upcoming Deadlines empty state heading</shortDescription>
+        <value>Nothing Due Soon</value>
+    </labels>
+    <labels>
+        <fullName>Funders_Shared_Print</fullName>
+        <categories>Funders</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button: print the Board Dashboard or Grant Calendar</shortDescription>
+        <value>Print</value>
     </labels>
     <labels>
         <fullName>Funders_Pipeline_ErrorNoPermission</fullName>
@@ -225,14 +273,6 @@
         <value>No program</value>
     </labels>
     <labels>
-        <fullName>Funders_Program_NotInstalled</fullName>
-        <categories>GrantProgram</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown without the Programs module</shortDescription>
-        <value>Install the Programs module to name the program this grant pays for.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Program_Missing</fullName>
         <categories>GrantProgram</categories>
         <language>en_US</language>
@@ -247,14 +287,6 @@
         <protected>true</protected>
         <shortDescription>Toast after saving the program</shortDescription>
         <value>Program saved.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Program_ErrorLoad</fullName>
-        <categories>GrantProgram</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The Program card could not load</shortDescription>
-        <value>The program could not load. Try again, or ask your admin to look at the Error Log.</value>
     </labels>
     <labels>
         <fullName>Funders_NightlyJobs_RemindersName</fullName>

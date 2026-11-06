@@ -54,12 +54,22 @@ export function attendanceRate(figures, noneLabel) {
   return `${Math.round(((figures.delivered || 0) * 100) / total)}%`;
 }
 
-/** The tiles across the top, in order. */
+/** Present deliveries as a fraction of all deliveries (0.75), or null when there were none. */
+export function rateFraction(figures) {
+  const total = figures && figures.deliveries ? figures.deliveries : 0;
+  return total === 0 ? null : (figures.delivered || 0) / total;
+}
+
+/**
+ * The tiles across the top, in order. Counts are numbers (the stat tile formats them for the
+ * person's locale); the rate is a fraction shown as a percent, or the none label as text.
+ */
 export function tiles(dashboard, labels) {
   if (!dashboard || !dashboard.canSee) {
     return [];
   }
   const totals = dashboard.totals || {};
+  const rate = rateFraction(totals);
   return [
     { key: 'active', label: labels.activePrograms, value: dashboard.activePrograms || 0 },
     { key: 'open', label: labels.openEnrollments, value: totals.openEnrollments || 0 },
@@ -67,23 +77,59 @@ export function tiles(dashboard, labels) {
     { key: 'people', label: labels.peopleServed, value: totals.peopleServed || 0 },
     { key: 'counted', label: labels.peopleCounted, value: totals.peopleCounted || 0 },
     { key: 'delivered', label: labels.delivered, value: totals.delivered || 0 },
-    { key: 'rate', label: labels.attendanceRate, value: attendanceRate(totals, labels.noRate) }
-  ].map((tile) => ({ ...tile, value: String(tile.value) }));
+    {
+      key: 'rate',
+      label: labels.attendanceRate,
+      value: rate === null ? labels.noRate : rate,
+      formatStyle: 'percent'
+    }
+  ].map((tile) => ({ formatStyle: 'decimal', ...tile }));
 }
 
-/** One row per program, in the server's order (by name), with a link and its rate. */
+/**
+ * One row per program, in the server's order (by name), with a link and its rate: the text
+ * ("75%" or the none label) and the percent the rate's meter draws (0 when none).
+ */
 export function programRows(dashboard, noRateLabel) {
   const programs = dashboard && dashboard.programs ? dashboard.programs : [];
-  return programs.map((program) => ({
-    key: program.programId,
-    name: program.name || '',
-    href: `/lightning/r/Program__c/${program.programId}/view`,
-    openEnrollments: program.openEnrollments || 0,
-    newEnrollments: program.newEnrollments || 0,
-    completedEnrollments: program.completedEnrollments || 0,
-    peopleServed: program.peopleServed || 0,
-    peopleCounted: program.peopleCounted || 0,
-    delivered: program.delivered || 0,
-    rate: attendanceRate(program, noRateLabel)
-  }));
+  return programs.map((program) => {
+    const rate = rateFraction(program);
+    return {
+      key: program.programId,
+      name: program.name || '',
+      href: `/lightning/r/Program__c/${program.programId}/view`,
+      openEnrollments: program.openEnrollments || 0,
+      newEnrollments: program.newEnrollments || 0,
+      completedEnrollments: program.completedEnrollments || 0,
+      peopleServed: program.peopleServed || 0,
+      peopleCounted: program.peopleCounted || 0,
+      delivered: program.delivered || 0,
+      rate: attendanceRate(program, noRateLabel),
+      ratePercent: rate === null ? 0 : Math.round(rate * 100)
+    };
+  });
+}
+
+/**
+ * The module home's tool tiles (vis-modules-19): one per Programs tab the person can open, in
+ * the app's tab order, from the object descriptions the platform returned (results the person
+ * cannot read are left out). `describe(apiName)` gives the tile's line; `iconOf(apiName)` its icon.
+ */
+export function toolTiles(objectInfos, apiNames, describe, iconOf) {
+  const byName = {};
+  ((objectInfos && objectInfos.results) || []).forEach((item) => {
+    if (item && item.statusCode === 200 && item.result) {
+      byName[item.result.apiName] = item.result;
+    }
+  });
+  return apiNames
+    .filter((apiName) => byName[apiName])
+    .map((apiName) => ({
+      key: apiName,
+      name: apiName,
+      label: byName[apiName].labelPlural || byName[apiName].label || apiName,
+      description: describe(apiName),
+      iconName: iconOf(apiName),
+      href: `/lightning/o/${apiName}/home`
+    }));
 }

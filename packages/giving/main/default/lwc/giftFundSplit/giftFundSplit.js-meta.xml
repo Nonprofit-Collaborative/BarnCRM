@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The fund split editor: rows of a fund and an amount or percent, what is left to assign, and
+    a stacked bar whose dividers move money between two funds by drag or keyboard. Used by the
+    gift page's Gift Allocations card and by Quick Gift Entry.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

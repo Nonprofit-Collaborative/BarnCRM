@@ -32,7 +32,7 @@
     </values>
     <values>
         <field>Navigation_Label__c</field>
-        <value xsi:type="xsd:string">Acknowledgment Queue</value>
+        <value xsi:type="xsd:string">Thank-Yous</value>
     </values>
     <values>
         <field>Sort_Order__c</field>

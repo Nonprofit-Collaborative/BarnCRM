@@ -1,13 +1,17 @@
 <template>
-  <div class="slds-p-around_medium">
-    <h2 class="slds-text-heading_small slds-m-bottom_small">{labels.heading}</h2>
+  <div class="slds-var-p-around_medium">
+    <h2 class="slds-text-heading_medium slds-var-m-bottom_small">{labels.heading}</h2>
 
     <template lwc:if={loadError}>
-      <p role="alert" class="slds-text-color_error slds-m-bottom_small" data-id="load-error">{loadError}</p>
+      <div class="slds-var-m-bottom_small">
+        <c-barn-notice variant="error" message={loadError} data-id="load-error"></c-barn-notice>
+      </div>
     </template>
 
     <template lwc:if={noAccess}>
-      <p role="status" class="slds-m-bottom_small" data-id="no-access">{labels.noAccess}</p>
+      <div class="slds-var-m-bottom_small">
+        <c-barn-notice variant="warning" message={labels.noAccess} data-id="no-access"></c-barn-notice>
+      </div>
     </template>
     <template lwc:else>
       <lightning-radio-group
@@ -20,7 +24,7 @@
         onchange={handleModeChange}
       ></lightning-radio-group>
 
-      <p class="slds-m-vertical_x-small" data-id="remaining">
+      <p class="slds-var-m-vertical_x-small" data-id="remaining">
         {labels.remaining}:
         <lightning-formatted-number
           value={remainingAmount}
@@ -50,12 +54,12 @@
       ></lightning-input>
     </template>
 
-    <div class="slds-m-top_medium slds-text-align_right">
+    <div class="slds-var-m-top_medium slds-text-align_right">
       <lightning-button
         data-id="cancel"
         label={labels.cancel}
         onclick={handleCancel}
-        class="slds-m-right_x-small"
+        class="slds-var-m-right_x-small"
       ></lightning-button>
       <template lwc:if={canEnter}>
         <lightning-button

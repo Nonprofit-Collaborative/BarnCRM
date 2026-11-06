@@ -193,6 +193,22 @@
         <value>Record It</value>
     </labels>
     <labels>
+        <fullName>Giving_FundSplit_AddFund</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Fund split editor: add a row button</shortDescription>
+        <value>Add a Fund</value>
+    </labels>
+    <labels>
+        <fullName>Giving_FundSplit_EditFunds</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Gift Allocations card: open the fund split editor</shortDescription>
+        <value>Edit Funds</value>
+    </labels>
+    <labels>
         <fullName>Giving_RefundGift_Heading</fullName>
         <categories>Giving</categories>
         <language>en_US</language>
@@ -327,5 +343,37 @@
         <protected>true</protected>
         <shortDescription>Lock override log: an empty value</shortDescription>
         <value>none</value>
+    </labels>
+    <labels>
+        <fullName>Giving_QuickStatus_CancelPendingGift</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Gift quick action: title and button that cancel a pending gift</shortDescription>
+        <value>Cancel Pending Gift</value>
+    </labels>
+    <labels>
+        <fullName>Giving_QuickStatus_ThankAgain</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Gift quick action: title and button that re-queue the thank-you</shortDescription>
+        <value>Thank Again</value>
+    </labels>
+    <labels>
+        <fullName>Giving_QuickStatus_DoNotThank</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Gift quick action: title and button that skip the thank-you</shortDescription>
+        <value>Do Not Thank</value>
+    </labels>
+    <labels>
+        <fullName>Giving_QuickStatus_MarkPlanComplete</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Stewardship plan quick action: title and button that complete the plan</shortDescription>
+        <value>Mark Plan Complete</value>
     </labels>
 </CustomLabels>

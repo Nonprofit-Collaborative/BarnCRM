@@ -8,7 +8,6 @@ import NOT_POSTED from '@salesforce/label/c.Giving_PostingCard_NotPosted';
 import NOT_IN_BOOKS from '@salesforce/label/c.Giving_PostingCard_NotInBooks';
 import REASON_LABEL from '@salesforce/label/c.Giving_PostingCard_ReasonLabel';
 import UNPOST_BUTTON from '@salesforce/label/c.Giving_PostingCard_UnpostButton';
-import UNPOSTED from '@salesforce/label/c.Giving_PostingCard_Unposted';
 import REASON_REQUIRED from '@salesforce/label/c.Giving_Posting_ReasonRequired';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Giving_Periods_UnexpectedError';
 import { bodyMessage } from 'c/findCsv';
@@ -104,7 +103,7 @@ export default class GiftPosting extends LightningElement {
     try {
       this.state = await unpost({ giftId: this.recordId, reason: this.reason });
       this.reason = '';
-      this.noticeMessage = UNPOSTED;
+      this.noticeMessage = helpText('Giving', 'Giving_PostingCard_Unposted');
     } catch (error) {
       this.errorMessage = bodyMessage(error, UNEXPECTED_ERROR);
     } finally {

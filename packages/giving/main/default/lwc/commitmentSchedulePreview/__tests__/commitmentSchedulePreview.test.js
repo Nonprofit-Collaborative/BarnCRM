@@ -3,6 +3,8 @@ import CommitmentSchedulePreview from 'c/commitmentSchedulePreview';
 import getSchedule from '@salesforce/apex/CommitmentController.getSchedule';
 import generateNow from '@salesforce/apex/CommitmentController.generateNow';
 import changeStatus from '@salesforce/apex/CommitmentController.changeStatus';
+import BarnConfirmModal from 'c/barnConfirmModal';
+import { clearHelpTextForTest, setHelpTextForTest } from 'c/barnHelpText';
 
 jest.mock('@salesforce/apex/CommitmentController.getSchedule', () => ({ default: jest.fn() }), {
   virtual: true
@@ -75,9 +77,70 @@ describe('c-commitment-schedule-preview', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    const badges = element.shadowRoot.querySelectorAll('lightning-badge');
-    expect(badges[0].className).toContain('slds-theme_success');
-    expect(badges[1].className).toContain('slds-theme_error');
+    const badges = element.shadowRoot.querySelectorAll('c-barn-status-badge');
+    expect(badges[0].status).toBe('success');
+    expect(badges[0].label).toBe('Paid');
+    expect(badges[1].status).toBe('overdue');
+  });
+
+  it('shows a skipped payment as a neutral badge', async () => {
+    getSchedule.mockResolvedValue({
+      ...SCHEDULE,
+      installments: [{ ...SCHEDULE.installments[1], status: 'Skipped' }]
+    });
+    const element = build();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(element.shadowRoot.querySelector('c-barn-status-badge').status).toBe('skipped');
+  });
+
+  it('asks before cancelling and cancels only when confirmed', async () => {
+    getSchedule.mockResolvedValue(SCHEDULE);
+    changeStatus.mockResolvedValue({ ...SCHEDULE, commitmentStatus: 'Cancelled' });
+    BarnConfirmModal.open.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+    const element = build();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    const cancel = element.shadowRoot.querySelector('[data-id="cancel"]');
+    expect(cancel.variant).toBe('destructive-text');
+    cancel.click();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    const dialog = BarnConfirmModal.open.mock.calls[0][0];
+    expect(dialog.label).toBe('c.Giving_Commitment_CancelConfirmTitle');
+    expect(dialog.confirmLabel).toBe('c.Giving_Commitment_ActionCancel');
+    expect(dialog.cancelLabel).toBe('c.Core_Find_DeleteConfirmCancel');
+    expect(dialog.confirmVariant).toBe('destructive-text');
+    expect(dialog.message).toContain('Giving_SchedulePreview_CancelMessage');
+    expect(changeStatus).not.toHaveBeenCalled();
+
+    element.shadowRoot.querySelector('[data-id="cancel"]').click();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(changeStatus).toHaveBeenCalledWith({
+      commitmentId: 'a00000000000001',
+      action: 'cancel'
+    });
+  });
+
+  it('counts only the unpaid payments in the cancel question', async () => {
+    setHelpTextForTest({ Giving_SchedulePreview_CancelMessage: 'The {0} unpaid payments.' });
+    getSchedule.mockResolvedValue(SCHEDULE);
+    BarnConfirmModal.open.mockResolvedValue(false);
+    const element = build();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    element.shadowRoot.querySelector('[data-id="cancel"]').click();
+    await Promise.resolve();
+
+    expect(BarnConfirmModal.open.mock.calls[0][0].message).toBe('The 1 unpaid payments.');
+    clearHelpTextForTest();
   });
 
   it('offers to generate a schedule when there is none', async () => {
@@ -185,24 +248,25 @@ describe('c-commitment-schedule-preview', () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    element.shadowRoot.querySelector('[data-id="cancel"]').click();
+    element.shadowRoot.querySelector('[data-id="complete"]').click();
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toBe(
-      'That change is not allowed.'
-    );
+    const error = element.shadowRoot.querySelector('[data-id="error"]');
+    expect(error.variant).toBe('error');
+    expect(error.message).toBe('That change is not allowed.');
   });
 
-  it('shows the total expected under the schedule', async () => {
+  it('shows the total expected in a tile above the schedule', async () => {
     getSchedule.mockResolvedValue(SCHEDULE);
     const element = build();
     await Promise.resolve();
     await Promise.resolve();
 
-    const total = element.shadowRoot.querySelector('[data-id="total"]');
-    expect(total).not.toBeNull();
-    expect(total.querySelector('lightning-formatted-number').value).toBe(200);
+    const tile = element.shadowRoot.querySelector('[data-id="total"] c-barn-stat-tile');
+    expect(tile.value).toBe(200);
+    expect(tile.formatStyle).toBe('currency');
+    expect(tile.label).toBe('c.Giving_SchedulePreview_Total');
   });
 
   it('says so when the schedule cannot be read', async () => {
@@ -212,6 +276,6 @@ describe('c-commitment-schedule-preview', () => {
     await Promise.resolve();
 
     const error = element.shadowRoot.querySelector('[data-id="error"]');
-    expect(error.textContent).toBe('No access to this commitment.');
+    expect(error.message).toBe('No access to this commitment.');
   });
 });

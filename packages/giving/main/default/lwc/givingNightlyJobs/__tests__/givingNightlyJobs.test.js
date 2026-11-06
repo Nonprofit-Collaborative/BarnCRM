@@ -67,11 +67,9 @@ jest.mock(
   { virtual: true }
 );
 
-jest.mock(
-  '@salesforce/label/c.Giving_NightlyJobs_NeverRun',
-  () => ({ default: 'Has not run yet.' }),
-  { virtual: true }
-);
+jest.mock('@salesforce/label/c.Giving_PledgeReminders_NeverRun', () => ({ default: 'Never run' }), {
+  virtual: true
+});
 
 const TOP_UP = {
   name: 'Installment top up, 1:15 AM',
@@ -183,7 +181,8 @@ describe('c-giving-nightly-jobs', () => {
 
     const warnings = element.shadowRoot.querySelectorAll('[data-id="job-stale"]');
     expect(warnings).toHaveLength(1);
-    expect(warnings[0].textContent).toBe(
+    expect(warnings[0].variant).toBe('warning');
+    expect(warnings[0].message).toBe(
       'This job was due and did not record a run. Open the Error Log to see why.'
     );
   });
@@ -224,7 +223,7 @@ describe('c-giving-nightly-jobs', () => {
     await flush();
 
     expect(runNow).toHaveBeenCalled();
-    expect(element.shadowRoot.querySelector('[data-id="notice"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="notice"]').message).toBe(
       'The top up and the overdue pass have started. Refresh this page in a minute to see what they did.'
     );
   });
@@ -242,7 +241,7 @@ describe('c-giving-nightly-jobs', () => {
     element.shadowRoot.querySelector('[data-id="schedule-button"]').click();
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="error"]').textContent).toBe(
+    expect(element.shadowRoot.querySelector('[data-id="error"]').message).toBe(
       'Scheduling the nightly jobs needs the Manage BarnCRM Settings permission.'
     );
   });

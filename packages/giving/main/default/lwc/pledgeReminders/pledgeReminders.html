@@ -5,45 +5,87 @@
       <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
 
       <template lwc:if={hasError}>
-        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
-          {errorMessage}
-        </p>
+        <c-barn-notice
+          class="slds-show slds-var-m-bottom_small"
+          variant="error"
+          message={errorMessage}
+          data-id="error-message"
+        ></c-barn-notice>
       </template>
 
       <template lwc:if={hasNotice}>
-        <p role="status" data-id="notice-message" class="slds-text-body_small slds-var-m-bottom_small">
-          {noticeMessage}
-        </p>
+        <c-barn-notice
+          class="slds-show slds-var-m-bottom_small"
+          variant="success"
+          message={noticeMessage}
+          data-id="notice-message"
+        ></c-barn-notice>
       </template>
 
       <template lwc:if={showOffNotice}>
-        <p data-id="off-notice" class="slds-text-body_small slds-var-m-bottom_small">
-          {labels.off}
-        </p>
+        <c-barn-notice
+          class="slds-show slds-var-m-bottom_small"
+          variant="warning"
+          message={labels.off}
+          data-id="off-notice"
+        ></c-barn-notice>
       </template>
 
       <template lwc:if={hasPage}>
-        <h3 class="slds-text-heading_small slds-var-m-top_small">{labels.queueHeading}</h3>
-        <dl class="slds-dl_horizontal slds-var-m-bottom_small">
-          <dt class="slds-dl_horizontal__label">{labels.emailsDue}</dt>
-          <dd data-id="emails-due" class="slds-dl_horizontal__detail">{page.emailsDue}</dd>
-          <dt class="slds-dl_horizontal__label">{labels.lettersDue}</dt>
-          <dd data-id="letters-due" class="slds-dl_horizontal__detail">{page.lettersDue}</dd>
-          <dt class="slds-dl_horizontal__label">{labels.withoutRecipient}</dt>
-          <dd data-id="without-recipient" class="slds-dl_horizontal__detail">
-            {page.withoutRecipient}
-          </dd>
-          <dt class="slds-dl_horizontal__label">{labels.lettersWaiting}</dt>
-          <dd data-id="letters-waiting" class="slds-dl_horizontal__detail">
-            {page.lettersWaiting}
-          </dd>
-          <dt class="slds-dl_horizontal__label">{labels.lettersAwaiting}</dt>
-          <dd data-id="letters-awaiting" class="slds-dl_horizontal__detail">
-            {page.lettersAwaitingConfirmation}
+        <h3 class="slds-text-heading_small slds-var-m-top_small slds-var-m-bottom_x-small">
+          {labels.queueHeading}
+        </h3>
+        <div class="slds-grid slds-wrap slds-gutters_x-small">
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+            <c-barn-stat-tile
+              data-id="emails-due"
+              label={labels.emailsDue}
+              value={page.emailsDue}
+              bordered
+              align="start"
+            ></c-barn-stat-tile>
+          </div>
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+            <c-barn-stat-tile
+              data-id="letters-due"
+              label={labels.lettersDue}
+              value={page.lettersDue}
+              bordered
+              align="start"
+            ></c-barn-stat-tile>
+          </div>
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+            <c-barn-stat-tile
+              data-id="without-recipient"
+              label={labels.withoutRecipient}
+              value={page.withoutRecipient}
+              bordered
+              align="start"
+            ></c-barn-stat-tile>
+          </div>
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+            <c-barn-stat-tile
+              data-id="letters-waiting"
+              label={labels.lettersWaiting}
+              value={page.lettersWaiting}
+              bordered
+              align="start"
+            ></c-barn-stat-tile>
+          </div>
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+            <c-barn-stat-tile
+              data-id="letters-awaiting"
+              label={labels.lettersAwaiting}
+              value={page.lettersAwaitingConfirmation}
+              bordered
+              align="start"
+            ></c-barn-stat-tile>
             <template lwc:if={hasLettersFile}>
               <a data-id="letters-file" href={lettersFileUrl}>{labels.downloadFile}</a>
             </template>
-          </dd>
+          </div>
+        </div>
+        <dl class="slds-dl_horizontal slds-var-m-bottom_small">
           <dt class="slds-dl_horizontal__label">{labels.lastRun}</dt>
           <dd data-id="last-run" class="slds-dl_horizontal__detail">{lastRunText}</dd>
           <dt class="slds-dl_horizontal__label">{labels.nextRun}</dt>
@@ -86,7 +128,12 @@
 
       <h3 class="slds-text-heading_small">{labels.stepsHeading}</h3>
       <template lwc:if={showNoSteps}>
-        <p data-id="no-steps" class="slds-text-body_regular">{labels.noSteps}</p>
+        <c-barn-empty-state
+          size="compact"
+          heading={labels.noStepsHeading}
+          message={labels.noSteps}
+          data-id="no-steps"
+        ></c-barn-empty-state>
       </template>
       <template lwc:if={hasSteps}>
         <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
@@ -109,7 +156,13 @@
                     label={step.name}
                     onclick={handleOpenStep}
                   ></lightning-button>
-                  <span data-id="step-active" class="slds-text-body_small">{step.activeText}</span>
+                  <template lwc:if={step.activeText}>
+                    <c-barn-status-badge
+                      data-id="step-active"
+                      status="inactive"
+                      label={step.activeText}
+                    ></c-barn-status-badge>
+                  </template>
                   <template lwc:if={canManage}>
                     <lightning-button
                       data-id="step-edit"
@@ -126,9 +179,11 @@
                 <td data-label={labels.columnChannel}>{step.channel}</td>
                 <td data-label={labels.columnTemplate}>
                   <template lwc:if={step.templateMissing}>
-                    <span data-id="template-missing" class="slds-text-color_error">
-                      {step.templateText}
-                    </span>
+                    <c-barn-status-badge
+                      data-id="template-missing"
+                      status="error"
+                      label={step.templateText}
+                    ></c-barn-status-badge>
                   </template>
                   <template lwc:else>
                     <span data-id="template-name">{step.templateText}</span>
@@ -200,7 +255,11 @@
 
       <h3 class="slds-text-heading_small">{labels.logHeading}</h3>
       <template lwc:if={showNoReminders}>
-        <p data-id="no-log" class="slds-text-body_regular">{labels.noLog}</p>
+        <c-barn-empty-state
+          size="compact"
+          heading={labels.noLog}
+          data-id="no-log"
+        ></c-barn-empty-state>
       </template>
       <template lwc:if={hasReminders}>
         <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
@@ -222,11 +281,14 @@
                 <td data-label={labels.columnStep}>{reminder.stepName}</td>
                 <td data-label={labels.columnChannel}>{reminder.channel}</td>
                 <td data-id="reminder-status" data-label={labels.columnStatus}>
-                  {reminder.status}
+                  <c-barn-status-badge
+                    status={reminder.tone}
+                    label={reminder.status}
+                  ></c-barn-status-badge>
                   <template lwc:if={reminder.failureReason}>
-                    <span data-id="reminder-failure" class="slds-text-color_error">
+                    <p data-id="reminder-failure" class="slds-text-body_small">
                       {reminder.failureReason}
-                    </span>
+                    </p>
                   </template>
                 </td>
                 <td data-label={labels.columnSentOn}>{reminder.sentOnText}</td>

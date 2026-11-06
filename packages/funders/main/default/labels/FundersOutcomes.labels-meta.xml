@@ -9,14 +9,6 @@
         <value>Logic Model Outcomes</value>
     </labels>
     <labels>
-        <fullName>Funders_Outcomes_NotInstalled</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Outcomes card without Logic Models</shortDescription>
-        <value>Install the Logic Models module to link each requirement to the outcome it reports on.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Outcomes_NoRequirements</fullName>
         <categories>Funders</categories>
         <language>en_US</language>
@@ -39,14 +31,6 @@
         <protected>true</protected>
         <shortDescription>Outcome saved on a requirement</shortDescription>
         <value>Outcome saved.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Outcomes_BadOutcome</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Requirement outcome field holds something that is not an outcome</shortDescription>
-        <value>Choose an outcome or output from a logic model in the Logic Model Outcomes card on the grant's page. This is not one.</value>
     </labels>
     <labels>
         <fullName>Funders_Outcomes_NoIndicators</fullName>

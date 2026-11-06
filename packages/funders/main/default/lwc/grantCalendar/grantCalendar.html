@@ -1,8 +1,16 @@
 <template>
-  <lightning-card title={labels.title} icon-name="custom:custom82">
-    <div slot="actions" class="slds-grid slds-grid_vertical-align-center slds-wrap">
+  <template lwc:if={helpReady}>
+  <c-barn-page-shell
+    title={labels.title}
+    purpose={labels.intro}
+    icon-name={icon}
+    title-hidden
+    data-id="shell"
+  >
+    <div slot="actions" class="slds-grid slds-grid_vertical-align-center slds-wrap barn-print-hide">
       <lightning-radio-group
         data-id="scope"
+        class="slds-var-m-right_small"
         name="scope"
         label={labels.scope}
         variant="label-hidden"
@@ -11,8 +19,14 @@
         value={scope}
         onchange={handleScope}
       ></lightning-radio-group>
+      <lightning-button
+        data-id="print"
+        label={labels.print}
+        icon-name="utility:print"
+        onclick={handlePrint}
+      ></lightning-button>
     </div>
-    <div class="slds-var-p-horizontal_medium">
+    <div>
       <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
         <lightning-button-icon
           data-id="previous"
@@ -59,7 +73,12 @@
       </template>
 
       <template lwc:if={errorMessage}>
-        <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
+        <c-barn-notice
+          variant="error"
+          message={errorMessage}
+          data-id="error-message"
+          class="slds-var-m-bottom_small"
+        ></c-barn-notice>
       </template>
 
       <table class="barn-calendar slds-size_full" data-id="calendar">
@@ -114,5 +133,6 @@
         </tbody>
       </table>
     </div>
-  </lightning-card>
+  </c-barn-page-shell>
+  </template>
 </template>

@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import GiftPosting from 'c/giftPosting';
 import getState from '@salesforce/apex/GiftPostingController.getState';
 import unpost from '@salesforce/apex/GiftPostingController.unpost';
+import { setHelpTextForTest } from 'c/barnHelpText';
 
 jest.mock('@salesforce/apex/GiftPostingController.getState', () => ({ default: jest.fn() }), {
   virtual: true
@@ -11,11 +12,7 @@ jest.mock('@salesforce/apex/GiftPostingController.unpost', () => ({ default: jes
   virtual: true
 });
 
-jest.mock(
-  '@salesforce/label/c.Giving_PostingCard_Unposted',
-  () => ({ default: 'Unposted. The reason is in the Error Log.' }),
-  { virtual: true }
-);
+setHelpTextForTest({ Giving_PostingCard_Unposted: 'Unposted. The reason is in the Error Log.' });
 
 const POSTED = {
   inBooks: true,
@@ -102,7 +99,7 @@ describe('c-gift-posting', () => {
     await flushPromises();
 
     expect(unpost).toHaveBeenCalledWith({ giftId: 'a0B000000000001AAA', reason: 'Wrong fund' });
-    expect(byId(element, 'notice').textContent).toContain('Unposted.');
+    expect(byId(element, 'notice').message).toContain('Unposted.');
     expect(byId(element, 'not-posted')).not.toBeNull();
   });
 
@@ -115,6 +112,6 @@ describe('c-gift-posting', () => {
     byId(element, 'unpost').click();
     await flushPromises();
 
-    expect(byId(element, 'error').textContent).toContain('Post Gifts');
+    expect(byId(element, 'error').message).toContain('Post Gifts');
   });
 });

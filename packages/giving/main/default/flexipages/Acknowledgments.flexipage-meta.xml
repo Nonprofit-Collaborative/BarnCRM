@@ -13,7 +13,7 @@
     <name>main</name>
     <type>Region</type>
   </flexiPageRegions>
-  <masterLabel>Acknowledgments</masterLabel>
+  <masterLabel>Thank-Yous</masterLabel>
   <template>
     <name>flexipage:defaultAppHomeTemplate</name>
   </template>

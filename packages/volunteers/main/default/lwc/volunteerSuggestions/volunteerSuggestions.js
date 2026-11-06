@@ -11,8 +11,6 @@ import ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
 import SIGN_UP from '@salesforce/label/c.Volunteers_Suggestions_SignUp';
 import SIGN_UP_FOR from '@salesforce/label/c.Volunteers_Suggestions_SignUpFor';
 import BOOKED from '@salesforce/label/c.Volunteers_Suggestions_Booked';
-import BOOK_FAILED from '@salesforce/label/c.Volunteers_Suggestions_BookFailed';
-import LOAD_FAILED from '@salesforce/label/c.Volunteers_Suggestions_LoadFailed';
 import MORE_CONSIDERED from '@salesforce/label/c.Volunteers_Suggestions_MoreConsidered';
 import R_SKILLS from '@salesforce/label/c.Volunteers_Suggestions_ReasonSkills';
 import R_INTERESTS from '@salesforce/label/c.Volunteers_Suggestions_ReasonInterests';
@@ -84,7 +82,7 @@ export default class VolunteerSuggestions extends NavigationMixin(LightningEleme
           : [];
       })
       .catch(() => {
-        this.errorMessage = LOAD_FAILED;
+        this.errorMessage = helpText('Volunteers', 'Volunteers_Suggestions_LoadFailed');
       })
       .finally(() => {
         this.loading = false;
@@ -170,7 +168,10 @@ export default class VolunteerSuggestions extends NavigationMixin(LightningEleme
         return this.load();
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, BOOK_FAILED);
+        this.errorMessage = bodyMessage(
+          error,
+          helpText('Volunteers', 'Volunteers_Suggestions_BookFailed')
+        );
       })
       .finally(() => {
         this.busy = false;

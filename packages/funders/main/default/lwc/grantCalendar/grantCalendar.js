@@ -3,13 +3,17 @@ import { NavigationMixin } from 'lightning/navigation';
 import getCalendar from '@salesforce/apex/GrantCalendarController.getCalendar';
 import { monthRange, monthWeeks, shiftMonth, weekdayOrder } from 'c/grantCalendarModel';
 import { messageFrom } from 'c/findCsv';
+import { iconFor } from 'c/barnIcons';
+import { printPage } from 'c/fundersPrint';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import LOCALE from '@salesforce/i18n/locale';
+import CURRENCY from '@salesforce/i18n/currency';
 import FIRST_DAY_OF_WEEK from '@salesforce/i18n/firstDayOfWeek';
 
 import TITLE from '@salesforce/label/c.Funders_Calendar_Title';
 import PREVIOUS from '@salesforce/label/c.Funders_Calendar_Previous';
 import NEXT from '@salesforce/label/c.Funders_Calendar_Next';
-import ERROR_LOAD from '@salesforce/label/c.Funders_Calendar_ErrorLoad';
+import PRINT from '@salesforce/label/c.Funders_Shared_Print';
 import SCOPE_EVERYONE from '@salesforce/label/c.Funders_Pipeline_ScopeEveryone';
 import SCOPE_MINE from '@salesforce/label/c.Funders_Pipeline_ScopeMine';
 import KIND_APPLICATION_LABEL from '@salesforce/label/c.Funders_Pipeline_KindApplication';
@@ -28,7 +32,7 @@ const CLASS_BY_KIND = {
   payment: 'barn-item barn-item_payment slds-size_full'
 };
 
-const messageOf = (error) => messageFrom(error, ERROR_LOAD);
+const messageOf = (error) => messageFrom(error, helpText('Funders', 'Funders_Calendar_LoadFailed'));
 
 /** Salesforce counts the first day of the week from 1 for Sunday; the model from 0. */
 const firstDay = () => {
@@ -46,13 +50,21 @@ const firstDay = () => {
  * overdue rows with the Grant Pipeline's own `deadlineRows`; this component only draws them.
  */
 export default class GrantCalendar extends NavigationMixin(LightningElement) {
+  helpReady = isHelpLoaded('Funders');
+
   labels = {
     title: TITLE,
+    get intro() {
+      return helpText('Funders', 'Funders_Calendar_Intro');
+    },
     previous: PREVIOUS,
     next: NEXT,
     scope: SCOPE_EVERYONE,
-    overdue: OVERDUE
+    overdue: OVERDUE,
+    print: PRINT
   };
+
+  icon = iconFor('Grant_Calendar');
 
   kindLabels = { requirement: '', payment: '' };
 
@@ -69,6 +81,11 @@ export default class GrantCalendar extends NavigationMixin(LightningElement) {
   errorMessage;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Funders').then(() => {
+        this.helpReady = true;
+      });
+    }
     const now = new Date();
     this.year = now.getFullYear();
     this.month = now.getMonth() + 1;
@@ -167,10 +184,27 @@ export default class GrantCalendar extends NavigationMixin(LightningElement) {
       const amount =
         item.amount === null || item.amount === undefined
           ? ''
-          : ` ${new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 2 }).format(item.amount)}`;
+          : ` ${this.formatMoney(item.amount)}`;
       return `${paymentLabel || ''}: ${item.grantName || ''}${amount}`;
     }
     return `${KIND_APPLICATION_LABEL}: ${item.name || ''}`;
+  }
+
+  /** A payment amount as money in the person's currency (vis-modules-8). */
+  formatMoney(amount) {
+    try {
+      return new Intl.NumberFormat(LOCALE, {
+        style: 'currency',
+        currency: CURRENCY || 'USD'
+      }).format(amount);
+    } catch {
+      // An unknown currency code: the number alone.
+      return new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 2 }).format(amount);
+    }
+  }
+
+  handlePrint() {
+    printPage(this);
   }
 
   handleScope(event) {

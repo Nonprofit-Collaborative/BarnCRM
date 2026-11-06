@@ -348,15 +348,27 @@ private class ServiceDeliveryLogControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(Label.Programs_Log_ActionFailed, messages[0], 'Unknown attendance.');
+			Assert.areEqual(
+				BarnHelp.text('Programs', 'Programs_Fail_Log'),
+				messages[0],
+				'Unknown attendance.'
+			);
 			Assert.isNotNull(messages[1], 'A negative quantity is refused.');
 			Assert.areNotEqual(
-				Label.Programs_Log_ActionFailed,
+				BarnHelp.text('Programs', 'Programs_Fail_Log'),
 				messages[1],
 				'In the rule own words.'
 			);
-			Assert.areEqual(Label.Programs_Log_ActionFailed, messages[2], 'No program.');
-			Assert.areEqual(Label.Programs_Log_ActionFailed, messages[3], 'No service or day.');
+			Assert.areEqual(
+				BarnHelp.text('Programs', 'Programs_Fail_Log'),
+				messages[2],
+				'No program.'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Programs', 'Programs_Fail_Log'),
+				messages[3],
+				'No service or day.'
+			);
 			Assert.areEqual(0, [SELECT COUNT() FROM Service_Delivery__c], 'Nothing was saved.');
 		}
 	}

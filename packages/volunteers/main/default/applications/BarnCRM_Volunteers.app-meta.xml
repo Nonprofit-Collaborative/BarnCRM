@@ -18,6 +18,38 @@
   </actionOverrides>
   <actionOverrides>
     <actionName>View</actionName>
+    <comment>Volunteer job, with Log Hours</comment>
+    <content>Volunteer_Job_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Volunteer_Job__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Volunteer job, with Log Hours</comment>
+    <content>Volunteer_Job_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Volunteer_Job__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Shift schedule, with Create Shifts Now</comment>
+    <content>Shift_Schedule_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Shift_Schedule__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Shift schedule, with Create Shifts Now</comment>
+    <content>Shift_Schedule_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Shift_Schedule__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
     <comment>Households, organizations and person accounts, with volunteer readiness</comment>
     <content>Volunteers_Account_Record_Page</content>
     <formFactor>Large</formFactor>
@@ -65,6 +97,7 @@
   <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
   <label>BarnCRM Volunteers</label>
   <navType>Console</navType>
+  <tabs>Volunteers_Home</tabs>
   <tabs>Volunteer_Job__c</tabs>
   <tabs>Volunteer_Shift__c</tabs>
   <tabs>Volunteer_Signup__c</tabs>
@@ -100,6 +133,9 @@
     </mappings>
     <mappings>
       <tab>Volunteer_Signup__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Volunteers_Home</tab>
     </mappings>
     <mappings>
       <tab>standard-Dashboard</tab>

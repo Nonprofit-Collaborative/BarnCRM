@@ -116,6 +116,61 @@ public with sharing class AskSelector {
 			  ];
 	}
 
+	/**
+	 * The asks closed on or after a date, newest first, for the board's Recently Closed column,
+	 * where an ask closed by mistake can be reopened (people-giving-19).
+	 */
+	public static List<Ask__c> recentlyClosed(Id ownerId, Date since, Integer maxRows) {
+		return ownerId == null
+			? [
+					SELECT
+						Id,
+						Name,
+						Stage__c,
+						Outcome__c,
+						Closed_Date__c,
+						Amount__c,
+						Target_Date__c,
+						Next_Step__c,
+						Stage_Changed_Date__c,
+						Donor_Contact__c,
+						Donor_Contact__r.Name,
+						Donor_Account__c,
+						Donor_Account__r.Name,
+						Owner.Name
+					FROM Ask__c
+					WHERE Outcome__c IN :AskRules.CLOSED_OUTCOMES AND Closed_Date__c >= :since
+					WITH USER_MODE
+					ORDER BY Closed_Date__c DESC, Name
+					LIMIT :maxRows
+			  ]
+			: [
+					SELECT
+						Id,
+						Name,
+						Stage__c,
+						Outcome__c,
+						Closed_Date__c,
+						Amount__c,
+						Target_Date__c,
+						Next_Step__c,
+						Stage_Changed_Date__c,
+						Donor_Contact__c,
+						Donor_Contact__r.Name,
+						Donor_Account__c,
+						Donor_Account__r.Name,
+						Owner.Name
+					FROM Ask__c
+					WHERE
+						Outcome__c IN :AskRules.CLOSED_OUTCOMES
+						AND Closed_Date__c >= :since
+						AND OwnerId = :ownerId
+					WITH USER_MODE
+					ORDER BY Closed_Date__c DESC, Name
+					LIMIT :maxRows
+			  ];
+	}
+
 	/** One ask, with what closing it needs; null when the person cannot see it. */
 	public static Ask__c forClose(Id askId) {
 		List<Ask__c> asks = [

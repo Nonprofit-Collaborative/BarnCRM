@@ -20,7 +20,8 @@ Three things to hold on to, because they are the questions people ask first:
   cancelled and leaves the tasks alone, because a task is a record of somebody's work.
   Closing the leftovers is theirs to do.
 - **You close a plan yourself.** BarnCRM does not mark a plan complete when its last
-  task closes. See "What this does not do yet" at the end. When you set **Status** to
+  task closes. See "What this does not do yet" at the end. **Mark Plan Complete** at the
+  top of a Running plan's page does it in one click. When you set **Status** to
   Complete or Cancelled, **Completed Date** fills in as today unless you typed one, and it
   clears if you set the plan back to Running.
 
@@ -59,7 +60,10 @@ copies of it are running right now, and whether it is switched on.
      to one named person every time;
    - a **priority**;
    - **comments**, optional, which become the task's description.
-4. Use **Move up** and **Move Down** to put the steps in the order they should happen.
+4. Drag a step by its handle, or use **Move Up** and **Move Down**, to put the steps in the
+   order they should happen. With a keyboard, focus the step, press Space, use the arrow keys
+   and press Enter (Escape cancels). Each move saves straight away and is read out to screen
+   readers.
 5. Choose **Turn On** in the plan's row when the steps are right.
 
 The page says it where you will read it, and it is worth repeating: editing a plan changes

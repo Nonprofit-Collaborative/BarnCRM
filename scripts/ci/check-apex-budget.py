@@ -38,11 +38,21 @@ CAPS = {
     # leading space, so tabs cut about 19 percent) plus about 2 percent.
     "core": 1_982_000,
     "rollups": 374_000,
-    "giving": 587_000,
-    "volunteers": 166_000,
-    "programs": 148_000,
+    # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
+    # Quick Gift Entry tribute, match and split (people-giving-13, 16, 23), and the New
+    # Commitment screen's shared pledge builder (CommitmentEntry, people-giving-11), and
+    # Giving at a Glance (GivingRecordGlanceExtension, people-giving-14), and the Thank-Yous
+    # page's rule reorder and missing-template reason (people-giving-18), and the Ask
+    # Pipeline's Recently Closed column and Reopen Ask (people-giving-19).
+    "giving": 608_000,
+    # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
+    "volunteers": 182_000,
+    # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
+    "programs": 153_000,
     "logicmodels": 65_000,
-    "funders": 95_000,
+    # Raised from 95,000 for the Funders usability stage: Undo for Mark Received and Mark
+    # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).
+    "funders": 100_500,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

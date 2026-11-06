@@ -121,9 +121,9 @@ describe('c-grant-outcomes', () => {
     );
   });
 
-  it('says when Logic Models is not installed or there are no requirements', async () => {
+  it('draws nothing without Logic Models, and says when there are no requirements', async () => {
     let element = await render({ available: false, canEdit: false, options: [], rows: [] });
-    expect(one(element, '[data-id="not-installed"]')).not.toBeNull();
+    expect(one(element, '[data-id="card"]')).toBeNull();
     document.body.removeChild(element);
     element = await render({ available: true, canEdit: true, options: [], rows: [] });
     expect(one(element, '[data-id="no-requirements"]')).not.toBeNull();

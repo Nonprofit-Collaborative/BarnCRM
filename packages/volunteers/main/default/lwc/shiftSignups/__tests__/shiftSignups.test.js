@@ -20,7 +20,14 @@ import ShiftSignups from 'c/shiftSignups';
 import getPanel from '@salesforce/apex/VolunteerShiftSignupsController.getPanel';
 import addSignup from '@salesforce/apex/VolunteerShiftSignupsController.addSignup';
 import setStatus from '@salesforce/apex/VolunteerShiftSignupsController.setStatus';
+import closeShift from '@salesforce/apex/VolunteerShiftSignupsController.closeShift';
+import BarnConfirmModal from 'c/barnConfirmModal';
 
+jest.mock(
+  '@salesforce/apex/VolunteerShiftSignupsController.closeShift',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
 jest.mock(
   '@salesforce/apex/VolunteerShiftSignupsController.getPanel',
   () => ({ default: jest.fn() }),
@@ -80,6 +87,10 @@ function panelOf(signups, extra) {
     personFilterField: null,
     statusOptions: OPTIONS,
     hoursWritten: false,
+    shiftStarted: true,
+    shiftClosed: false,
+    canClose: false,
+    openCount: signups.length,
     ...extra
   };
 }
@@ -116,9 +127,10 @@ describe('c-shift-signups', () => {
     await flush();
 
     expect(getPanel).toHaveBeenCalledWith({ shiftId: SHIFT_ID });
-    expect(byId(element, 'needed').textContent).toBe('4');
-    expect(byId(element, 'filled').textContent).toBe('1');
-    expect(byId(element, 'remaining').textContent).toBe('3');
+    expect(byId(element, 'needed').value).toBe(4);
+    expect(byId(element, 'filled').value).toBe(1);
+    expect(byId(element, 'remaining').value).toBe(3);
+    expect(byId(element, 'filled-meter').max).toBe(4);
     expect(byId(element, 'caption')).not.toBeNull();
     expect(element.shadowRoot.querySelectorAll('[data-id="signup"]').length).toBe(1);
     expect(element.shadowRoot.querySelector('.mark-attended').ariaLabel).toBe(
@@ -151,7 +163,7 @@ describe('c-shift-signups', () => {
       status: 'Signed up'
     });
     expect(byId(element, 'add-form')).toBeNull();
-    expect(byId(element, 'filled').textContent).toBe('1');
+    expect(byId(element, 'filled').value).toBe(1);
     // Announced once, in the status region, not by a toast as well.
     expect(byId(element, 'result-text').textContent).toContain('Volunteers_Signups_Added');
     expect(byId(element, 'result-warning')).toBeNull();
@@ -232,6 +244,11 @@ describe('c-shift-signups', () => {
     const element = build();
     await flush();
 
+    // Once the shift has started, the status is a badge and Change opens the picker.
+    expect(element.shadowRoot.querySelector('.status-picker')).toBeNull();
+    expect(element.shadowRoot.querySelector('.status-badge').status).toBe('neutral');
+    element.shadowRoot.querySelector('.change-status').click();
+    await flush();
     element.shadowRoot
       .querySelector('.status-picker')
       .dispatchEvent(new CustomEvent('change', { detail: { value: 'Confirmed' } }));
@@ -252,9 +269,83 @@ describe('c-shift-signups', () => {
     element.shadowRoot.querySelector('.mark-no-show').click();
     await flush();
 
-    expect(byId(element, 'error-message').textContent.trim()).toBe(
+    expect(byId(element, 'error-message').querySelector('c-barn-notice').message).toBe(
       'This person is already signed up.'
     );
+  });
+
+  it('before the shift starts, offers the status picker and no attendance buttons', async () => {
+    getPanel.mockResolvedValue(panelOf([ANA], { shiftStarted: false }));
+    const element = build();
+    await flush();
+
+    expect(element.shadowRoot.querySelector('.status-picker')).not.toBeNull();
+    expect(element.shadowRoot.querySelector('.mark-attended')).toBeNull();
+    expect(element.shadowRoot.querySelector('.change-status')).toBeNull();
+    expect(byId(element, 'close-shift')).toBeNull();
+  });
+
+  it('shows an empty state with Add Sign-Up when nobody is booked', async () => {
+    getPanel.mockResolvedValue(panelOf([]));
+    const element = build();
+    await flush();
+
+    expect(byId(element, 'empty-state').illustration).toBe('no-data');
+    byId(element, 'empty-add').click();
+    await flush();
+    expect(byId(element, 'add-form')).not.toBeNull();
+  });
+
+  it('closes the shift, marking the people still booked as no shows', async () => {
+    getPanel.mockResolvedValue(panelOf([ANA], { canClose: true }));
+    closeShift.mockResolvedValue(
+      panelOf([{ ...ANA, status: 'No show' }], { canClose: false, shiftClosed: true })
+    );
+    BarnConfirmModal.open = jest.fn().mockResolvedValue({ choice: 'noShow', checked: [] });
+    const element = build();
+    await flush();
+
+    byId(element, 'close-shift').click();
+    await flush();
+
+    const asked = BarnConfirmModal.open.mock.calls[0][0];
+    expect(asked.choicesLabel).toBe('c.Volunteers_Signups_CloseQuestionOne');
+    expect(asked.choices.map((choice) => choice.value)).toEqual(['noShow', 'keep']);
+    expect(closeShift).toHaveBeenCalledWith({ shiftId: SHIFT_ID, markNoShow: true });
+    expect(byId(element, 'result-text').textContent).toContain('Volunteers_Signups_ClosedNoShow');
+    expect(byId(element, 'close-shift')).toBeNull();
+  });
+
+  it('closes without changing anyone, and asks a plain question when nobody is still booked', async () => {
+    getPanel.mockResolvedValue(panelOf([ANA], { canClose: true }));
+    closeShift.mockResolvedValue(panelOf([ANA], { canClose: false, shiftClosed: true }));
+    BarnConfirmModal.open = jest.fn().mockResolvedValue({ choice: 'keep', checked: [] });
+    const element = build();
+    await flush();
+    byId(element, 'close-shift').click();
+    await flush();
+    expect(closeShift).toHaveBeenLastCalledWith({ shiftId: SHIFT_ID, markNoShow: false });
+
+    getPanel.mockResolvedValue(panelOf([], { canClose: true, openCount: 0 }));
+    BarnConfirmModal.open = jest.fn().mockResolvedValue(true);
+    const second = build();
+    await flush();
+    byId(second, 'close-shift').click();
+    await flush();
+    expect(BarnConfirmModal.open.mock.calls[0][0].message).toBe(
+      'c.Volunteers_Signups_CloseConfirm'
+    );
+    expect(closeShift).toHaveBeenLastCalledWith({ shiftId: SHIFT_ID, markNoShow: false });
+  });
+
+  it('does nothing when closing is cancelled', async () => {
+    getPanel.mockResolvedValue(panelOf([ANA], { canClose: true }));
+    BarnConfirmModal.open = jest.fn().mockResolvedValue(undefined);
+    const element = build();
+    await flush();
+    byId(element, 'close-shift').click();
+    await flush();
+    expect(closeShift).not.toHaveBeenCalled();
   });
 
   it('links each row to its sign-up record, named for the person', async () => {

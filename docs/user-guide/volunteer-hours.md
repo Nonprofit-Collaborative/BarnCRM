@@ -22,6 +22,18 @@ The quickest way: on the shift's **Sign-Ups** panel, click **Attended** in the p
 BarnCRM records hours for the length of the shift. See
 [To mark attendance after a shift](volunteer-shifts.md#to-mark-attendance-after-a-shift).
 
+## To Log Hours From a Person, Shift or Job
+
+1. Open the person, the shift or the job in the **BarnCRM Volunteers** app.
+2. Click **Log Hours** in the actions at the top of the record.
+3. Check what is filled in: a person fills **Person**; a job fills **Job**; a shift fills
+   **Job**, **Volunteer Shift**, **Date Worked** and **Hours** (the shift's length). Fill in the
+   rest, and change anything that differs, for example someone who left early.
+4. Add **Notes** if useful and click **Save**.
+
+You should see: "Hours logged." and the form closes. The entry waits as **Submitted** until a
+coordinator approves it (if your organization requires approval).
+
 ## To Log Hours by Hand
 
 Use this for work that was not on a shift, or a shift with no hours recorded.
@@ -46,8 +58,10 @@ Needs **Manage Volunteers**.
 1. Click the **Approve Hours** tab.
 2. Leave **Show** on **Submitted** to see the entries waiting. To narrow the list, choose a
    **Job**, or set **From** and **To** (dates worked).
-3. Tick the entries to approve, or tick the box in the heading row to select the whole page.
-4. Click **Approve**.
+3. Check odd entries first: the **Notes** column shows what the person wrote (point at a long
+   note to read it all), and clicking a person's name opens the entry itself.
+4. Tick the entries to approve, or tick the box in the heading row to select the whole page.
+5. Click **Approve**.
 
 You should see: "Entries approved: 3." (with your number), and the entries gone from the
 Submitted list. They count in totals from now on, and record you in **Reviewed By** and the time
@@ -128,14 +142,28 @@ Needs **Manage Volunteers**.
 1. Open the person in the **BarnCRM Volunteers** app.
 2. Click **Volunteer Letter** in the actions at the top of the record.
 3. Choose the **Template** (an hours letter or a certificate).
-4. Check **From** and **To**. They start at 1 January this year and today.
+4. Choose the **Period**: **This Year** (1 January to today, the default), **Last Year** (the
+   whole year before), or **Custom** to type **From** and **To** dates.
 5. Click **Preview** to read the letter, then **Generate**.
 
 You should see: "The letter is saved as a PDF in this person's Files." The letter counts only
 **Approved** hours with a **Date Worked** in the period.
 
-To make letters for a whole list of people at once, ask your admin: see
-[Hour letters and certificates](../admin-guide/volunteers.md#hour-letters-and-certificates).
+## To Make Letters for Many People at Once
+
+Needs **Manage Volunteers**.
+
+1. Open the **Approve Hours** tab in the **BarnCRM Volunteers** app and click **Volunteer
+   Letters** at the top right.
+2. Choose the **Template** and the **Period**, as for one letter.
+3. Under **Letters For**, keep **Everyone with approved hours in the period**, or choose **People
+   I choose** and pick each person in **Person** (click the x on a name to take it off).
+4. Click **Make Letters**.
+
+You should see: "Letters are being made for 12 people. You get a notification when they are
+done." Each letter appears in that person's **Files** within a few minutes, and the notification
+says how many were made and who was skipped. If nobody has approved hours in the period, the
+dialog says so and starts nothing.
 
 ## Common Problems
 

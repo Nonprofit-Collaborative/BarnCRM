@@ -30,12 +30,64 @@
   display: none;
 }
 
+/*
+ * A part's row: its move handle, the tile, and its arrow handle (DnD-2, DnD-3). The drag
+ * highlights: the moved part faded, a brand line where it would land, the arrow's two ends.
+ */
+.part-row {
+  display: flex;
+  align-items: center;
+  gap: var(--slds-g-spacing-1, 0.25rem);
+  margin-bottom: var(--slds-g-spacing-1, 0.25rem);
+  border-top: var(--slds-g-sizing-border-2, 2px) solid transparent;
+}
+
+.part-row_moving {
+  opacity: 0.4;
+}
+
+.part-row_drop-before {
+  border-top-color: var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.diagram__column_over {
+  outline: var(--slds-g-sizing-border-1, 1px) dashed var(--slds-g-color-brand-base-50, #0176d3);
+  outline-offset: var(--slds-g-sizing-border-2, 2px);
+}
+
+.diagram__column_drop-end {
+  border-bottom: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.part-row_arrow-source .part,
+.part-row_arrow-target .part {
+  border: var(--slds-g-sizing-border-2, 2px) dashed var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.part-row__handle {
+  flex: 0 0 auto;
+  cursor: grab;
+  touch-action: none;
+  padding: var(--slds-g-spacing-1, 0.25rem) 0;
+  border-radius: var(--slds-g-radius-border-1, 0.125rem);
+}
+
+.part-row__handle:focus-visible {
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+/* On a phone the columns stack: arrows are drawn with the Add Arrow form only. */
+.part-row__arrow,
+.drag-hint {
+  display: none;
+}
+
 /* A part as a compact tile: two lines of its name, then an ellipsis. */
 .part {
   display: block;
-  width: stretch;
+  flex: 1 1 auto;
+  min-width: 0;
   text-align: left;
-  margin-bottom: var(--slds-g-spacing-1, 0.25rem);
   padding: var(--slds-g-spacing-2, 0.5rem);
   border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #c9c9c9);
   border-radius: var(--slds-g-radius-border-2, 0.25rem);
@@ -93,6 +145,11 @@
   }
 
   .separator__across {
+    display: block;
+  }
+
+  .part-row__arrow,
+  .drag-hint {
     display: block;
   }
 

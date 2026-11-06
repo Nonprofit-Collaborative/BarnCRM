@@ -13,7 +13,8 @@ import NEW_LEVEL from '@salesforce/label/c.Giving_DonorLevels_NewLevel';
 import RECALCULATE from '@salesforce/label/c.Giving_DonorLevels_Recalculate';
 import RECALCULATE_STARTED from '@salesforce/label/c.Giving_DonorLevels_RecalculateStarted';
 import COLUMN_LEVEL from '@salesforce/label/c.Giving_DonorLevels_ColumnLevel';
-import COLUMN_FROM from '@salesforce/label/c.Giving_DonorLevels_ColumnFrom';
+import COLUMN_FROM from '@salesforce/label/c.Core_SetupChanges_From';
+import EMPTY_HEADING from '@salesforce/label/c.Giving_DonorLevels_EmptyHeading';
 import COLUMN_UP_TO from '@salesforce/label/c.Giving_DonorLevels_ColumnUpTo';
 import COLUMN_DONORS from '@salesforce/label/c.Giving_DonorLevels_ColumnDonors';
 import COLUMN_ACTIVE from '@salesforce/label/c.Core_MatchLogic_Active';
@@ -53,6 +54,7 @@ export default class DonorLevels extends NavigationMixin(LightningElement) {
     get empty() {
       return helpText('Giving', 'Giving_DonorLevels_Empty');
     },
+    emptyHeading: EMPTY_HEADING,
     newLevel: NEW_LEVEL,
     recalculate: RECALCULATE,
     columnLevel: COLUMN_LEVEL,

@@ -53,6 +53,14 @@ You should see: the part at the bottom of its column.
    that would make one of its arrows point backward; the message names those arrows ("From to
    To"), so delete them first or pick a column that keeps every arrow forward.
 3. Click **Move Up** or **Move Down** to change its place in its column.
+
+   Or drag the part by its handle (the grip at its left) or by the part itself: up or down
+   within its column, or into another column to change its column. A blue line shows where it
+   will land. A move the arrow rules refuse puts the part back and shows the same message as
+   **Edit**. With the keyboard, Tab to the handle, press Space, use the arrow keys (Left and
+   Right change column, Up and Down change place), then press Space again; Escape cancels. On a
+   phone, where the columns stack, press and hold the handle to reorder within a column; use
+   **Edit** to change the column.
 4. Click **Delete**, then **Delete** again in the dialog to confirm. Its arrows, and its
    indicators with their periods, are deleted too.
 
@@ -65,6 +73,12 @@ An arrow says one part leads to another, and the assumption says why you believe
 3. Choose the **Part It Leads To**. Only parts in later columns are offered.
 4. Type the **Assumption**, for example "Students who attend twice a week read more at home", and
    click **Save**.
+
+Or drag the arrow handle at the right of a part onto a part in a later column: the part's
+details open with **Add Arrow** filled in with the part you dropped on, so only the assumption
+is left to type. Parts the arrow cannot go to (earlier columns, or a part it already leads to)
+do not take the drop. With the keyboard, Tab to the arrow handle, press Space, use Left and
+Right to pick the part, then press Space again. On a phone, use **Add Arrow**.
 
 To change an assumption, click **Edit** beside the arrow. To remove an arrow, click **Remove**,
 then **Remove** in the dialog.

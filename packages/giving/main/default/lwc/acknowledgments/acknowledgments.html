@@ -1,251 +1,392 @@
 <template>
-    <template lwc:if={helpReady}>
-  <lightning-card title={labels.title} icon-name="custom:custom71">
-    <div class="slds-var-p-horizontal_medium">
-      <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
-      <c-settings-setup-notes notes={setupNotes}></c-settings-setup-notes>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name={icons.page}>
+      <div class="slds-var-p-horizontal_medium">
+        <p class="slds-text-body_regular slds-var-m-bottom_small">{labels.intro}</p>
 
-      <template lwc:if={hasError}>
-        <p role="alert" data-id="error-message" class="slds-text-color_error slds-var-m-bottom_small">
-          {errorMessage}
-        </p>
-      </template>
+        <div class="slds-assistive-text" aria-live="polite" data-id="live">{liveMessage}</div>
+        <span id="rule-drag-help" class="slds-assistive-text">{labels.dragInstructions}</span>
 
-      <template lwc:if={hasNotice}>
-        <p role="status" data-id="notice-message" class="slds-text-body_small slds-var-m-bottom_small">
-          {noticeMessage}
-        </p>
-      </template>
-
-      <template lwc:if={showOffNotice}>
-        <p data-id="off-notice" class="slds-text-body_small slds-var-m-bottom_small">
-          {labels.off}
-        </p>
-      </template>
-
-      <template lwc:if={hasPage}>
-        <h3 class="slds-text-heading_small slds-var-m-top_small">{labels.queueHeading}</h3>
-        <dl class="slds-dl_horizontal slds-var-m-bottom_small">
-          <dt class="slds-dl_horizontal__label">{labels.emailQueue}</dt>
-          <dd data-id="email-queue" class="slds-dl_horizontal__detail">{page.emailQueue}</dd>
-          <dt class="slds-dl_horizontal__label">{labels.letterQueue}</dt>
-          <dd data-id="letter-queue" class="slds-dl_horizontal__detail">{page.letterQueue}</dd>
-          <dt class="slds-dl_horizontal__label">{labels.optedOut}</dt>
-          <dd data-id="opted-out" class="slds-dl_horizontal__detail">{page.optedOutOfEmail}</dd>
-          <dt class="slds-dl_horizontal__label">{labels.unmatched}</dt>
-          <dd data-id="unmatched-queue" class="slds-dl_horizontal__detail">
-            {page.unmatchedQueue}
-          </dd>
-          <dt class="slds-dl_horizontal__label">{labels.withoutRecipient}</dt>
-          <dd data-id="without-recipient" class="slds-dl_horizontal__detail">
-            {page.withoutRecipient}
-          </dd>
-          <dt class="slds-dl_horizontal__label">{labels.lastRun}</dt>
-          <dd data-id="last-run" class="slds-dl_horizontal__detail">{lastRunText}</dd>
-          <dt class="slds-dl_horizontal__label">{labels.nextRun}</dt>
-          <dd data-id="next-run" class="slds-dl_horizontal__detail">{nextRunText}</dd>
-        </dl>
-
-        <template lwc:if={showQueueCapped}>
-          <p data-id="queue-capped" class="slds-text-body_small slds-var-m-bottom_small">
-            {labels.queueCapped}
-          </p>
+        <template lwc:if={hasError}>
+          <c-barn-notice
+            data-id="error-message"
+            class="slds-var-m-bottom_small"
+            variant="error"
+            message={errorMessage}
+          ></c-barn-notice>
         </template>
 
-        <div class="slds-var-m-bottom_medium">
-          <lightning-button
-            data-id="send-emails"
-            variant="brand"
-            label={labels.sendEmails}
-            disabled={sendDisabled}
-            onclick={handleSendEmails}
-          ></lightning-button>
-          <lightning-button
-            data-id="produce-letters"
-            class="slds-var-m-left_x-small"
-            label={labels.produceLetters}
-            disabled={lettersDisabled}
-            onclick={handleProduceLetters}
-          ></lightning-button>
-          <lightning-input
-            data-id="nightly"
-            class="slds-var-m-top_x-small"
-            type="toggle"
-            label={labels.nightly}
-            checked={scheduled}
-            disabled={scheduleDisabled}
-            onchange={handleScheduleChange}
-          ></lightning-input>
-        </div>
-      </template>
+        <template lwc:if={hasNotice}>
+          <c-barn-notice
+            data-id="notice-message"
+            class="slds-var-m-bottom_small"
+            variant="success"
+            message={noticeMessage}
+          ></c-barn-notice>
+        </template>
 
-      <h3 class="slds-text-heading_small">{labels.rulesHeading}</h3>
-      <template lwc:if={showNoRules}>
-        <p data-id="no-rules" class="slds-text-body_regular">{labels.noRules}</p>
-      </template>
-      <template lwc:if={hasRules}>
-        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
-          <thead>
-            <tr class="slds-line-height_reset">
-              <th scope="col">{labels.columnOrder}</th>
-              <th scope="col">{labels.columnRule}</th>
-              <th scope="col">{labels.columnChannel}</th>
-              <th scope="col">{labels.columnTemplate}</th>
-              <th scope="col">{labels.columnMatches}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <template for:each={rules} for:item="rule">
-              <tr key={rule.id} data-id="rule">
-                <td data-label={labels.columnOrder}>{rule.order}</td>
-                <td data-label={labels.columnRule}>
-                  <lightning-button
-                    data-id="rule-link"
-                    data-record-id={rule.id}
-                    variant="base"
-                    label={rule.name}
-                    onclick={handleOpenRule}
-                  ></lightning-button>
-                  <span data-id="rule-active" class="slds-text-body_small">{rule.activeText}</span>
-                  <template lwc:if={canManage}>
-                    <lightning-button
-                      data-id="rule-edit"
-                      data-record-id={rule.id}
-                      class="slds-var-m-left_x-small"
-                      variant="base"
-                      label={labels.editRule}
-                      title={rule.editTitle}
-                      onclick={handleEditRule}
-                    ></lightning-button>
-                  </template>
-                </td>
-                <td data-label={labels.columnChannel}>{rule.channel}</td>
-                <td data-label={labels.columnTemplate}>
-                  <template lwc:if={rule.templateMissing}>
-                    <span data-id="template-missing" class="slds-text-color_error">
-                      {rule.templateText}
-                    </span>
-                  </template>
-                  <template lwc:else>
-                    <span data-id="template-name">{rule.templateText}</span>
-                  </template>
-                </td>
-                <td data-id="rule-matches" data-label={labels.columnMatches}>{rule.matchesText}</td>
-              </tr>
-            </template>
-          </tbody>
-        </table>
-      </template>
+        <template lwc:if={showOffNotice}>
+          <c-barn-notice
+            data-id="off-notice"
+            class="slds-var-m-bottom_small"
+            variant="warning"
+            message={labels.off}
+          ></c-barn-notice>
+        </template>
 
-      <template lwc:if={showRuleForm}>
-        <div data-id="rule-form" class="slds-box slds-var-m-top_small slds-var-m-bottom_medium">
-          <h3 class="slds-text-heading_small slds-var-m-bottom_small">{ruleFormHeading}</h3>
-          <lightning-record-edit-form
-            object-api-name="Acknowledgment_Rule__c"
-            record-id={editingRuleId}
-            onsubmit={handleRuleSubmit}
-            onsuccess={handleRuleSaved}
-          >
-            <lightning-messages></lightning-messages>
-            <lightning-input-field field-name="Name"></lightning-input-field>
-            <lightning-input-field field-name="Order__c"></lightning-input-field>
-            <lightning-input-field field-name="Active__c"></lightning-input-field>
-            <lightning-input-field
-              data-id="rule-channel"
-              field-name="Channel__c"
-              onchange={handleChannelChange}
-            ></lightning-input-field>
-            <template lwc:if={ruleIsEmail}>
-              <lightning-combobox
-                data-id="rule-template"
-                label={labels.templateField}
-                field-level-help={labels.templateFieldHelp}
-                placeholder={labels.templatePlaceholder}
-                options={templateOptions}
-                value={ruleTemplate}
-                message-when-value-missing={labels.templateRequired}
-                required
-                onchange={handleRuleTemplateChange}
-              ></lightning-combobox>
-            </template>
-            <lightning-input-field field-name="Minimum_Amount__c"></lightning-input-field>
-            <lightning-input-field field-name="Maximum_Amount__c"></lightning-input-field>
-            <lightning-input-field field-name="Gift_Type__c"></lightning-input-field>
-            <lightning-input-field field-name="Appeal__c"></lightning-input-field>
-            <lightning-input-field field-name="First_Gift_Only__c"></lightning-input-field>
-            <lightning-input-field field-name="Description__c"></lightning-input-field>
-            <div class="slds-var-m-top_small">
-              <lightning-button
-                data-id="rule-cancel"
-                label={labels.cancelRule}
-                onclick={handleCancelRule}
-              ></lightning-button>
-              <lightning-button
-                data-id="rule-save"
-                class="slds-var-m-left_x-small"
-                variant="brand"
-                type="submit"
-                label={labels.saveRule}
-              ></lightning-button>
+        <template lwc:if={hasPage}>
+          <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.queueHeading}</h3>
+          <div class="slds-grid slds-wrap slds-gutters_x-small">
+            <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+              <c-barn-stat-tile
+                data-id="email-queue"
+                label={labels.emailQueue}
+                value={page.emailQueue}
+                bordered
+                align="start"
+              ></c-barn-stat-tile>
             </div>
-          </lightning-record-edit-form>
-        </div>
-      </template>
-      <template lwc:elseif={canManage}>
-        <div class="slds-var-m-top_small slds-var-m-bottom_medium">
-          <lightning-button
-            data-id="new-rule"
-            label={labels.newRule}
-            onclick={handleNewRule}
-          ></lightning-button>
-        </div>
-      </template>
+            <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+              <c-barn-stat-tile
+                data-id="letter-queue"
+                label={labels.letterQueue}
+                value={page.letterQueue}
+                bordered
+                align="start"
+              ></c-barn-stat-tile>
+            </div>
+            <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+              <c-barn-stat-tile
+                data-id="opted-out"
+                label={labels.optedOut}
+                value={page.optedOutOfEmail}
+                bordered
+                align="start"
+              ></c-barn-stat-tile>
+            </div>
+            <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+              <c-barn-stat-tile
+                data-id="unmatched-queue"
+                label={labels.unmatched}
+                value={page.unmatchedQueue}
+                bordered
+                align="start"
+              ></c-barn-stat-tile>
+            </div>
+            <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+              <c-barn-stat-tile
+                data-id="without-recipient"
+                label={labels.withoutRecipient}
+                value={page.withoutRecipient}
+                bordered
+                align="start"
+              ></c-barn-stat-tile>
+            </div>
+          </div>
 
-      <h3 class="slds-text-heading_small">{labels.runsHeading}</h3>
-      <template lwc:if={showNoRuns}>
-        <p data-id="no-runs" class="slds-text-body_regular">{labels.noRuns}</p>
-      </template>
-      <template lwc:if={hasRuns}>
-        <table class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked">
-          <thead>
-            <tr class="slds-line-height_reset">
-              <th scope="col">{labels.columnRun}</th>
-              <th scope="col">{labels.columnChannel}</th>
-              <th scope="col">{labels.columnStatus}</th>
-              <th scope="col">{labels.columnSent}</th>
-              <th scope="col">{labels.columnErrors}</th>
-              <th scope="col">{labels.columnFinished}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <template for:each={runs} for:item="run">
-              <tr key={run.id} data-id="run">
-                <td data-label={labels.columnRun}>{run.name}</td>
-                <td data-label={labels.columnChannel}>{run.channel}</td>
-                <td data-id="run-status" data-label={labels.columnStatus}>{run.status}</td>
-                <td data-id="run-sent" data-label={labels.columnSent}>{run.sent}</td>
-                <td data-id="run-errors" data-label={labels.columnErrors}>{run.errors}</td>
-                <td data-label={labels.columnFinished}>
-                  {run.finishedText}
-                  <template lwc:if={run.hasFile}>
-                    <a data-id="merge-file" href={run.fileUrl}>{labels.downloadFile}</a>
-                  </template>
-                  <template lwc:if={run.waitingToBeMarkedSent}>
-                    <lightning-button
-                      data-id="mark-sent"
-                      data-record-id={run.id}
-                      class="slds-var-m-left_x-small"
-                      label={labels.markSent}
-                      onclick={handleMarkSent}
-                    ></lightning-button>
-                  </template>
-                </td>
+          <dl class="slds-dl_horizontal slds-var-m-bottom_small">
+            <dt class="slds-dl_horizontal__label">{labels.lastRun}</dt>
+            <dd data-id="last-run" class="slds-dl_horizontal__detail">{lastRunText}</dd>
+            <dt class="slds-dl_horizontal__label">{labels.nextRun}</dt>
+            <dd data-id="next-run" class="slds-dl_horizontal__detail">{nextRunText}</dd>
+          </dl>
+
+          <template lwc:if={showQueueCapped}>
+            <c-barn-notice
+              data-id="queue-capped"
+              class="slds-var-m-bottom_small"
+              message={labels.queueCapped}
+            ></c-barn-notice>
+          </template>
+
+          <div class="slds-var-m-bottom_medium">
+            <lightning-button
+              data-id="send-emails"
+              variant="brand"
+              label={labels.sendEmails}
+              disabled={sendDisabled}
+              onclick={handleSendEmails}
+            ></lightning-button>
+            <lightning-button
+              data-id="produce-letters"
+              class="slds-var-m-left_x-small"
+              label={labels.produceLetters}
+              disabled={lettersDisabled}
+              onclick={handleProduceLetters}
+            ></lightning-button>
+            <lightning-input
+              data-id="nightly"
+              class="slds-var-m-top_x-small"
+              type="toggle"
+              label={labels.nightly}
+              checked={scheduled}
+              disabled={scheduleDisabled}
+              onchange={handleScheduleChange}
+            ></lightning-input>
+          </div>
+        </template>
+
+        <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.runsHeading}</h3>
+        <template lwc:if={showNoRuns}>
+          <c-barn-empty-state
+            data-id="no-runs"
+            class="slds-var-m-bottom_medium"
+            size="compact"
+            message={labels.noRuns}
+          ></c-barn-empty-state>
+        </template>
+        <template lwc:if={hasRuns}>
+          <table
+            class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked slds-var-m-bottom_medium"
+          >
+            <thead>
+              <tr class="slds-line-height_reset">
+                <th scope="col" data-label={labels.columnRun}>{labels.columnRun}</th>
+                <th scope="col" data-label={labels.columnChannel}>{labels.columnChannel}</th>
+                <th scope="col" data-label={labels.columnStatus}>{labels.columnStatus}</th>
+                <th scope="col" data-label={labels.columnSent}>{labels.columnSent}</th>
+                <th scope="col" data-label={labels.columnErrors}>{labels.columnErrors}</th>
+                <th scope="col" data-label={labels.columnFinished}>{labels.columnFinished}</th>
               </tr>
+            </thead>
+            <tbody>
+              <template for:each={runs} for:item="run">
+                <tr key={run.id} data-id="run">
+                  <td data-label={labels.columnRun}>{run.name}</td>
+                  <td data-label={labels.columnChannel}>{run.channel}</td>
+                  <td data-label={labels.columnStatus}>
+                    <c-barn-status-badge
+                      data-id="run-status"
+                      status={run.statusWord}
+                      label={run.status}
+                    ></c-barn-status-badge>
+                  </td>
+                  <td data-id="run-sent" data-label={labels.columnSent}>{run.sent}</td>
+                  <td data-id="run-errors" data-label={labels.columnErrors}>{run.errors}</td>
+                  <td data-label={labels.columnFinished}>
+                    {run.finishedText}
+                    <template lwc:if={run.hasFile}>
+                      <a data-id="merge-file" class="slds-var-m-left_x-small" href={run.fileUrl}
+                        >{labels.downloadFile}</a
+                      >
+                    </template>
+                    <template lwc:if={run.waitingToBeMarkedSent}>
+                      <lightning-button
+                        data-id="mark-sent"
+                        data-record-id={run.id}
+                        class="slds-var-m-left_x-small"
+                        label={labels.markSent}
+                        onclick={handleMarkSent}
+                      ></lightning-button>
+                    </template>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </template>
+
+        <lightning-accordion
+          data-id="rules-section"
+          allow-multiple-sections-open
+          active-section-name={rulesSectionOpen}
+        >
+          <lightning-accordion-section name="rules" label={labels.rulesHeading}>
+            <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small">
+              {labels.rulesHelp}
+            </p>
+            <c-settings-setup-notes notes={setupNotes}></c-settings-setup-notes>
+
+            <template lwc:if={showNoRules}>
+              <c-barn-empty-state
+                data-id="no-rules"
+                size="compact"
+                illustration="setup"
+                message={labels.noRules}
+              ></c-barn-empty-state>
             </template>
-          </tbody>
-        </table>
-      </template>
-    </div>
-  </lightning-card>
-    </template>
+            <template lwc:if={hasRules}>
+              <table
+                class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked"
+                data-id="rules-table"
+              >
+                <thead>
+                  <tr class="slds-line-height_reset">
+                    <template lwc:if={canManage}>
+                      <th scope="col" class="rule-handle-cell">
+                        <span class="slds-assistive-text">{labels.columnOrder}</span>
+                      </th>
+                    </template>
+                    <th scope="col" data-label={labels.columnOrder}>{labels.columnOrder}</th>
+                    <th scope="col" data-label={labels.columnRule}>{labels.columnRule}</th>
+                    <th scope="col" data-label={labels.columnChannel}>{labels.columnChannel}</th>
+                    <th scope="col" data-label={labels.columnTemplate}>{labels.columnTemplate}</th>
+                    <th scope="col" data-label={labels.columnMatches}>{labels.columnMatches}</th>
+                    <template lwc:if={canManage}>
+                      <th scope="col">
+                        <span class="slds-assistive-text">{labels.columnActions}</span>
+                      </th>
+                    </template>
+                  </tr>
+                </thead>
+                <tbody data-drop-zone="rules" data-drop-label={labels.rulesHeading}>
+                  <template for:each={rules} for:item="rule">
+                    <tr
+                      key={rule.id}
+                      data-id="rule"
+                      data-rule-id={rule.id}
+                      data-drag-id={rule.dragId}
+                      data-drag-label={rule.name}
+                      tabindex={rule.tabIndex}
+                      aria-describedby="rule-drag-help"
+                      class={rule.rowClass}
+                      onpointerdown={handlePointerDown}
+                      onkeydown={handleDragKey}
+                    >
+                      <template lwc:if={canManage}>
+                        <td class="rule-handle-cell">
+                          <span class="rule-handle" data-drag-handle aria-hidden="true">
+                            <lightning-icon
+                              icon-name="utility:drag_and_drop"
+                              size="x-small"
+                            ></lightning-icon>
+                          </span>
+                        </td>
+                      </template>
+                      <td data-id="rule-order" data-label={labels.columnOrder}>{rule.order}</td>
+                      <td data-label={labels.columnRule}>
+                        <lightning-button
+                          data-id="rule-link"
+                          data-record-id={rule.id}
+                          variant="base"
+                          label={rule.name}
+                          onclick={handleOpenRule}
+                        ></lightning-button>
+                        <template lwc:if={rule.inactive}>
+                          <c-barn-status-badge
+                            data-id="rule-active"
+                            class="slds-var-m-left_x-small"
+                            status="inactive"
+                            label={labels.inactive}
+                          ></c-barn-status-badge>
+                        </template>
+                      </td>
+                      <td data-label={labels.columnChannel}>{rule.channel}</td>
+                      <td data-label={labels.columnTemplate}>
+                        <template lwc:if={rule.templateMissing}>
+                          <c-barn-status-badge
+                            data-id="template-missing"
+                            status="error"
+                            label={rule.templateText}
+                          ></c-barn-status-badge>
+                        </template>
+                        <template lwc:else>
+                          <span data-id="template-name">{rule.templateText}</span>
+                        </template>
+                      </td>
+                      <td data-id="rule-matches" data-label={labels.columnMatches}>
+                        {rule.matchesText}
+                      </td>
+                      <template lwc:if={canManage}>
+                        <td data-label={labels.columnActions}>
+                          <lightning-button
+                            data-id="rule-edit"
+                            data-record-id={rule.id}
+                            variant="base"
+                            label={labels.editRule}
+                            title={rule.editTitle}
+                            onclick={handleEditRule}
+                          ></lightning-button>
+                          <lightning-button
+                            data-id="rule-up"
+                            data-record-id={rule.id}
+                            class="slds-var-m-left_x-small"
+                            label={labels.moveUp}
+                            disabled={rule.cannotMoveUp}
+                            onclick={handleMoveUp}
+                          ></lightning-button>
+                          <lightning-button
+                            data-id="rule-down"
+                            data-record-id={rule.id}
+                            class="slds-var-m-left_x-small"
+                            label={labels.moveDown}
+                            disabled={rule.cannotMoveDown}
+                            onclick={handleMoveDown}
+                          ></lightning-button>
+                        </td>
+                      </template>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </template>
+
+            <template lwc:if={showRuleForm}>
+              <div data-id="rule-form" class="slds-box slds-var-m-top_small slds-var-m-bottom_medium">
+                <h3 class="slds-text-heading_small slds-var-m-bottom_small">{ruleFormHeading}</h3>
+                <lightning-record-edit-form
+                  object-api-name="Acknowledgment_Rule__c"
+                  record-id={editingRuleId}
+                  onsubmit={handleRuleSubmit}
+                  onsuccess={handleRuleSaved}
+                >
+                  <lightning-messages></lightning-messages>
+                  <lightning-input-field field-name="Name"></lightning-input-field>
+                  <lightning-input-field field-name="Order__c"></lightning-input-field>
+                  <lightning-input-field field-name="Active__c"></lightning-input-field>
+                  <lightning-input-field
+                    data-id="rule-channel"
+                    field-name="Channel__c"
+                    onchange={handleChannelChange}
+                  ></lightning-input-field>
+                  <template lwc:if={ruleIsEmail}>
+                    <lightning-combobox
+                      data-id="rule-template"
+                      label={labels.templateField}
+                      field-level-help={labels.templateFieldHelp}
+                      placeholder={labels.templatePlaceholder}
+                      options={templateOptions}
+                      value={ruleTemplate}
+                      message-when-value-missing={labels.templateRequired}
+                      required
+                      onchange={handleRuleTemplateChange}
+                    ></lightning-combobox>
+                  </template>
+                  <lightning-input-field field-name="Minimum_Amount__c"></lightning-input-field>
+                  <lightning-input-field field-name="Maximum_Amount__c"></lightning-input-field>
+                  <lightning-input-field field-name="Gift_Type__c"></lightning-input-field>
+                  <lightning-input-field field-name="Appeal__c"></lightning-input-field>
+                  <lightning-input-field field-name="First_Gift_Only__c"></lightning-input-field>
+                  <lightning-input-field field-name="Description__c"></lightning-input-field>
+                  <div class="slds-var-m-top_small">
+                    <lightning-button
+                      data-id="rule-cancel"
+                      label={labels.cancelRule}
+                      onclick={handleCancelRule}
+                    ></lightning-button>
+                    <lightning-button
+                      data-id="rule-save"
+                      class="slds-var-m-left_x-small"
+                      variant="brand"
+                      type="submit"
+                      label={labels.saveRule}
+                    ></lightning-button>
+                  </div>
+                </lightning-record-edit-form>
+              </div>
+            </template>
+            <template lwc:elseif={canManage}>
+              <div class="slds-var-m-top_small slds-var-m-bottom_medium">
+                <lightning-button
+                  data-id="new-rule"
+                  label={labels.newRule}
+                  onclick={handleNewRule}
+                ></lightning-button>
+              </div>
+            </template>
+          </lightning-accordion-section>
+        </lightning-accordion>
+      </div>
+    </lightning-card>
+  </template>
 </template>

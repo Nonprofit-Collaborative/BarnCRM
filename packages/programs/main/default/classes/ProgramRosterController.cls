@@ -71,7 +71,7 @@ public with sharing class ProgramRosterController {
 	@AuraEnabled
 	public static Roster getRoster(Id programId, Boolean showEnded) {
 		if (programId == null) {
-			throw UserErrors.message(Label.Programs_Roster_ActionFailed);
+			throw UserErrors.message(failed());
 		}
 		try {
 			return rosterFor(programId, showEnded == true);
@@ -84,7 +84,7 @@ public with sharing class ProgramRosterController {
 	@AuraEnabled
 	public static Roster enroll(Id programId, Id personId, String stage, Boolean showEnded) {
 		if (programId == null) {
-			throw UserErrors.message(Label.Programs_Roster_ActionFailed);
+			throw UserErrors.message(failed());
 		}
 		if (personId == null) {
 			throw UserErrors.message(Label.Programs_Roster_PersonRequired);
@@ -110,13 +110,13 @@ public with sharing class ProgramRosterController {
 	@AuraEnabled
 	public static Roster setStage(Id enrollmentId, String stage, Boolean showEnded) {
 		if (enrollmentId == null || String.isBlank(stage)) {
-			throw UserErrors.message(Label.Programs_Roster_ActionFailed);
+			throw UserErrors.message(failed());
 		}
 		String wanted = checkedStage(stage);
 		try {
 			Id programId = EnrollmentSelector.selectProgramIdOf(enrollmentId);
 			if (programId == null) {
-				throw UserErrors.message(Label.Programs_Roster_ActionFailed);
+				throw UserErrors.message(failed());
 			}
 			Database.update(
 				new List<Enrollment__c>{ new Enrollment__c(Id = enrollmentId, Stage__c = wanted) },
@@ -135,7 +135,7 @@ public with sharing class ProgramRosterController {
 		String programName = EnrollmentSelector.selectProgramNames(new Set<Id>{ programId })
 			.get(programId);
 		if (programName == null) {
-			throw UserErrors.message(Label.Programs_Roster_ActionFailed);
+			throw UserErrors.message(failed());
 		}
 		Roster roster = new Roster();
 		roster.programName = programName;
@@ -209,7 +209,12 @@ public with sharing class ProgramRosterController {
 				return entry.getValue();
 			}
 		}
-		throw UserErrors.message(Label.Programs_Roster_ActionFailed);
+		throw UserErrors.message(failed());
+	}
+
+	/** What staff are told when the roster's work failed (modules-1). */
+	private static String failed() {
+		return BarnHelp.text('Programs', 'Programs_Fail_Roster');
 	}
 
 	/**
@@ -224,6 +229,6 @@ public with sharing class ProgramRosterController {
 			return UserErrors.message(((DmlException) failure).getDmlMessage(0));
 		}
 		ErrorLogger.log(failure, CONTEXT, recordId);
-		return UserErrors.message(Label.Programs_Roster_ActionFailed);
+		return UserErrors.message(failed());
 	}
 }

@@ -26,7 +26,6 @@ import NOT_ADDED from '@salesforce/label/c.Programs_Cohort_NotAdded';
 import REMOVED from '@salesforce/label/c.Programs_Cohort_Removed';
 import MORE_THAN_SHOWN from '@salesforce/label/c.Programs_Cohort_MoreThanShown';
 import TOO_MANY from '@salesforce/label/c.Programs_Cohort_TooMany';
-import ACTION_FAILED from '@salesforce/label/c.Programs_Cohort_ActionFailed';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 
 import {
@@ -43,6 +42,11 @@ import {
 } from './members';
 import { bodyMessage } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { createDragController } from 'c/barnDrag';
+import { dragInstructions, dragMessages } from 'c/barnDragText';
+
+const HELP = ['Programs', 'Core'];
+const MEMBERS_ZONE = 'members';
 
 /**
  * The Cohort Members panel on a cohort (P-11, R-CO3): the cohort's members, and many people
@@ -50,7 +54,7 @@ import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
  * one. Each person is added or refused on their own; the refused are listed with the reason.
  */
 export default class CohortMembers extends LightningElement {
-  helpReady = isHelpLoaded('Programs');
+  helpReady = isHelpLoaded(HELP);
 
   @api recordId;
 
@@ -58,6 +62,9 @@ export default class CohortMembers extends LightningElement {
     title: TITLE,
     get membersEmpty() {
       return helpText('Programs', 'Programs_Cohort_MembersEmpty');
+    },
+    get dragHint() {
+      return helpText('Programs', 'Programs_Cohort_DragHint');
     },
     remove: REMOVE,
     addPeople: ADD_PEOPLE,
@@ -82,14 +89,70 @@ export default class CohortMembers extends LightningElement {
   busy = false;
   errorMessage;
   resultMessage;
+  /** The last drag step, read out by the aria-live region. */
+  announcement = '';
+  /** c/barnDrag's state while a person is dragged: who, and whether over the member list. */
+  dragState;
+  drag;
 
   connectedCallback() {
     if (!this.helpReady) {
-      loadHelp('Programs').then(() => {
+      loadHelp(HELP).then(() => {
         this.helpReady = true;
       });
     }
+    // DnD-4: drag a person (or everyone ticked, when the dragged one is ticked) from the
+    // enrolled list onto the member list, by mouse, touch press and hold, or keyboard (Space,
+    // Left Arrow to the member list, Space). Ticks, Select All and Add to Cohort stay.
+    this.drag = createDragController({
+      root: this.template,
+      layout: 'columns',
+      messages: dragMessages(),
+      announce: (text) => {
+        this.announcement = text;
+      },
+      onChange: (state) => {
+        this.dragState = state;
+      },
+      canDrop: (itemId, fromZone, toZone) => toZone === MEMBERS_ZONE,
+      onDrop: ({ itemId, toZone }) => {
+        if (toZone !== MEMBERS_ZONE) {
+          return false;
+        }
+        const group = this.ticked.includes(itemId) ? this.ticked : [itemId];
+        return this.addChosen(group, []).then((ok) => {
+          if (ok) {
+            this.ticked = this.ticked.filter((id) => !group.includes(id));
+          }
+          return ok;
+        });
+      }
+    });
     this.load();
+  }
+
+  disconnectedCallback() {
+    if (this.drag) {
+      this.drag.destroy();
+    }
+  }
+
+  get dragHelp() {
+    return dragInstructions();
+  }
+
+  get membersZoneClass() {
+    const over =
+      this.dragState && this.dragState.active && this.dragState.overZone === MEMBERS_ZONE;
+    return over ? 'members-zone members-zone_over' : 'members-zone';
+  }
+
+  handlePointerDown(event) {
+    this.drag.pointerDown(event);
+  }
+
+  handleDragKey(event) {
+    this.drag.keyDown(event);
   }
 
   load() {
@@ -99,7 +162,7 @@ export default class CohortMembers extends LightningElement {
         this.data = data;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Cohort'));
       })
       .finally(() => {
         this.loading = false;
@@ -232,7 +295,17 @@ export default class CohortMembers extends LightningElement {
     if (this.addDisabled) {
       return Promise.resolve();
     }
-    const payload = addPayload(this.data && this.data.candidates, this.ticked, this.picked);
+    return this.addChosen(this.ticked, this.picked).then((ok) => {
+      if (ok) {
+        this.ticked = [];
+        this.picked = [];
+      }
+    });
+  }
+
+  /** Adds these ticked enrollments and picked people; resolves true when the server answered. */
+  addChosen(ticked, picked) {
+    const payload = addPayload(this.data && this.data.candidates, ticked, picked);
     this.clearMessages();
     this.busy = true;
     return addMembers({ cohortId: this.recordId, ...payload })
@@ -244,11 +317,11 @@ export default class CohortMembers extends LightningElement {
           addedMany: ADDED_MANY,
           someFailed: SOME_FAILED
         });
-        this.ticked = [];
-        this.picked = [];
+        return true;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Cohort'));
+        return false;
       })
       .finally(() => {
         this.busy = false;
@@ -265,7 +338,7 @@ export default class CohortMembers extends LightningElement {
         this.resultMessage = REMOVED;
       })
       .catch((error) => {
-        this.errorMessage = bodyMessage(error, ACTION_FAILED);
+        this.errorMessage = bodyMessage(error, helpText('Programs', 'Programs_Fail_Cohort'));
       })
       .finally(() => {
         this.busy = false;

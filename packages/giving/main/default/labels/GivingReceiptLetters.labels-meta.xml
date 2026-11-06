@@ -89,12 +89,12 @@
     <value>SAMPLE-000001</value>
   </labels>
   <labels>
-    <fullName>Giving_Receipt_NoPreviewTitle</fullName>
+    <fullName>Giving_Receipt_NoTemplatesHeading</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Receipts page: toast title, preview failed</shortDescription>
-    <value>No Preview</value>
+    <shortDescription>Receipts page: heading when the org has no letters</shortDescription>
+    <value>No Receipt Letters</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_StatementYear</fullName>
@@ -117,16 +117,8 @@
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Receipts page: no statement run yet</shortDescription>
-    <value>No statement run has been started yet.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_RestoredTitle</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: toast title, letters restored</shortDescription>
-    <value>Letters Restored</value>
+    <shortDescription>Receipts page: heading when no statement run has started</shortDescription>
+    <value>No Statement Runs Yet</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_RestoredMessage</fullName>
@@ -137,44 +129,12 @@
     <value>The letters BarnCRM ships are back.</value>
   </labels>
   <labels>
-    <fullName>Giving_Receipt_NotRestoredTitle</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: toast title, letters not restored</shortDescription>
-    <value>Letters Not Restored</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_SavedTitle</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: toast title, letter saved</shortDescription>
-    <value>Letter Saved</value>
-  </labels>
-  <labels>
     <fullName>Giving_Receipt_SavedMessage</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: toast, letter saved</shortDescription>
     <value>Your receipt letter has been saved.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_NotSavedTitle</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: toast title, letter not saved</shortDescription>
-    <value>Letter Not Saved</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_ActivatedTitle</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: toast title, letter switched on</shortDescription>
-    <value>Letter Switched On</value>
   </labels>
   <labels>
     <fullName>Giving_Receipt_ActivatedMessage</fullName>
@@ -185,35 +145,11 @@
     <value>This letter is now the one BarnCRM uses.</value>
   </labels>
   <labels>
-    <fullName>Giving_Receipt_NotActivatedTitle</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: toast title, letter not switched on</shortDescription>
-    <value>Letter Not Switched On</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_StartedTitle</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: toast title, statement run started</shortDescription>
-    <value>Statements Started</value>
-  </labels>
-  <labels>
     <fullName>Giving_Receipt_StartedMessage</fullName>
     <categories>Giving, Receipts</categories>
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Receipts page: toast, statement run started</shortDescription>
     <value>Year end statements are being generated. Click Refresh to see the run's progress below.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Receipt_NotStartedTitle</fullName>
-    <categories>Giving, Receipts</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Receipts page: toast title, statement run not started</shortDescription>
-    <value>Statements Not Started</value>
   </labels>
 </CustomLabels>
