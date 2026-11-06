@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionSubtype>ScreenAction</actionSubtype>
+  <description>
+    Edit this schedule, with a line that says how many shifts the pattern makes as you change the
+    days and dates.
+  </description>
+  <label>Edit Schedule</label>
+  <lightningWebComponent>shiftScheduleForm</lightningWebComponent>
+  <optionsCreateFeedItem>false</optionsCreateFeedItem>
+  <type>LightningWebComponent</type>
+</QuickAction>

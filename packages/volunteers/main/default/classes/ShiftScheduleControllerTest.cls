@@ -112,4 +112,25 @@ private class ShiftScheduleControllerTest {
 		}
 		Assert.isTrue(refused, 'No schedule, no preview.');
 	}
+
+	@IsTest
+	static void theFormPreviewCountsFromTheOrgsTodayToTheHorizon() {
+		useClock();
+		ShiftScheduleController.FormSettings settings;
+		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+			Test.startTest();
+			settings = ShiftScheduleController.getFormSettings();
+			Test.stopTest();
+		}
+		Assert.areEqual(
+			Date.newInstance(2026, 3, 2),
+			settings.today,
+			'Today in the org time zone.'
+		);
+		Assert.areEqual(
+			VolunteerSettings.shiftHorizonWeeks(),
+			settings.horizonWeeks,
+			'The horizon the run uses.'
+		);
+	}
 }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <isExposed>true</isExposed>
+  <masterLabel>Shift Schedule Form</masterLabel>
+  <description>
+    New or edit a shift schedule, with a line that says how many shifts the pattern makes through the horizon as the fields change.
+  </description>
+  <targets>
+    <target>lightning__RecordAction</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordAction">
+      <actionType>ScreenAction</actionType>
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

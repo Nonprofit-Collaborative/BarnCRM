@@ -27,6 +27,22 @@ public with sharing class ShiftScheduleController {
 		public Date createdThrough;
 	}
 
+	/** What the schedule form's live preview counts from (D-183): the org's today and the horizon. */
+	public class FormSettings {
+		@AuraEnabled
+		public Date today;
+		@AuraEnabled
+		public Integer horizonWeeks;
+	}
+
+	@AuraEnabled(cacheable=true)
+	public static FormSettings getFormSettings() {
+		FormSettings settings = new FormSettings();
+		settings.today = ShiftScheduleService.today();
+		settings.horizonWeeks = VolunteerSettings.shiftHorizonWeeks();
+		return settings;
+	}
+
 	@AuraEnabled
 	public static Preview getPreview(Id scheduleId) {
 		try {
