@@ -118,7 +118,8 @@ public with sharing class GivingRecordGlanceExtension implements RecordGlanceExt
 				return described[0].getLabel();
 			}
 		} catch (Exception notReadable) {
-			// Falls through to the page title below.
+			// The action cannot be read here, so the page title stands in.
+			return Label.Giving_QuickGiftEntry_Heading;
 		}
 		return Label.Giving_QuickGiftEntry_Heading;
 	}
