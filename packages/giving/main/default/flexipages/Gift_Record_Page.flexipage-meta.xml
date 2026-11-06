@@ -410,6 +410,12 @@
     </itemInstances>
     <itemInstances>
       <componentInstance>
+        <componentName>giftAllocations</componentName>
+        <identifier>giftAllocationsPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>receiptActions</componentName>
         <identifier>giftReceiptActionsPanel</identifier>
       </componentInstance>
