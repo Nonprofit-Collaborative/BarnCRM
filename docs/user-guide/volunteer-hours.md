@@ -22,6 +22,18 @@ The quickest way: on the shift's **Sign-Ups** panel, click **Attended** in the p
 BarnCRM records hours for the length of the shift. See
 [To mark attendance after a shift](volunteer-shifts.md#to-mark-attendance-after-a-shift).
 
+## To Log Hours From a Person, Shift or Job
+
+1. Open the person, the shift or the job in the **BarnCRM Volunteers** app.
+2. Click **Log Hours** in the actions at the top of the record.
+3. Check what is filled in: a person fills **Person**; a job fills **Job**; a shift fills
+   **Job**, **Volunteer Shift**, **Date Worked** and **Hours** (the shift's length). Fill in the
+   rest, and change anything that differs, for example someone who left early.
+4. Add **Notes** if useful and click **Save**.
+
+You should see: "Hours logged." and the form closes. The entry waits as **Submitted** until a
+coordinator approves it (if your organization requires approval).
+
 ## To Log Hours by Hand
 
 Use this for work that was not on a shift, or a shift with no hours recorded.

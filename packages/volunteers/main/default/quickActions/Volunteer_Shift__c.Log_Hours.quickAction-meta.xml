@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionSubtype>ScreenAction</actionSubtype>
+  <description>
+    Log volunteer hours for this shift, with the job, the shift, the date and the shift's length
+    filled in.
+  </description>
+  <label>Log Hours</label>
+  <lightningWebComponent>volunteerLogHours</lightningWebComponent>
+  <optionsCreateFeedItem>false</optionsCreateFeedItem>
+  <type>LightningWebComponent</type>
+</QuickAction>

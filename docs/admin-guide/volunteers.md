@@ -405,8 +405,9 @@ option in BarnCRM Settings turns it off.
 
 ## Signing People Up for a Shift
 
-Open a shift (from **Volunteer Shifts**, or from its job). The **Sign-Ups** panel at the top
-of the page shows how many **volunteers are needed**, how many **slots are filled** and how many
+Open a shift (from **Volunteer Shifts**, or from its job). The shift page puts the **Sign-Ups**
+panel and **Suggested Volunteers** in the main column, and the shift's details and related lists
+as two tabs beside them. The **Sign-Ups** panel shows how many **volunteers are needed**, how many **slots are filled** and how many
 **remain** as three figures, with a bar for the share of places filled, and lists who is signed
 up. A cancelled sign-up frees its slot; slots remaining goes below zero when more people are
 booked than were asked for, which is allowed. With nobody booked yet, the panel says so and
@@ -430,7 +431,7 @@ offers **Add Sign-Up**.
   and Close** (the default) or **Close Without Changing Them**. It needs edit access to shifts,
   which the Volunteers Admin, Coordinator and Staff sets give.
 - Click a person's name to open their sign-up record. The shift page also has a **Sign-Ups**
-  related list below the details: use it to edit a sign-up's **Notes** (row menu, **Edit**) or to
+  related list on its **Related** tab: use it to edit a sign-up's **Notes** (row menu, **Edit**) or to
   remove one (row menu, **Delete**, which asks you to confirm). To keep the record but free the
   slot, set its **Status** to Cancelled instead of deleting it.
 
@@ -472,6 +473,21 @@ People with equal scores are listed by name. The onboarding signal needs the per
 card to be able to see onboarding steps (Admin and Coordinator); for Team Members it is left
 out. A person is never hidden for a low score: unavailable and not-cleared people sort lower and
 say why, and the coordinator decides.
+
+## Logging Hours
+
+Hours can be entered with **New** on the **Volunteer Hours** tab, as always, or with the **Log
+Hours** action at the top of a person (contact or person account), a shift or a job in the
+BarnCRM Volunteers app. Log Hours opens a short form with one **Person** picker (person accounts
+only, in an org that has them) and the record's values filled in: a person fills the person, a
+job fills the job, and a shift fills the job, the shift, the date and the shift's length. On a
+household or organization, pick the person. It saves like **New**, so every hours rule applies
+and the entry waits as Submitted when approval is required. Anyone who can create hours
+entries can use it; others see a note saying their role cannot enter hours. The job page also
+lists the job's shifts, schedules and skills in its main column, with the details beside them.
+
+To add Log Hours to a record page of your own, add the **Log Hours** action of that object
+(Contact, Account, Volunteer Shift or Volunteer Job) to the page's highlights panel.
 
 ## Approving Hours
 

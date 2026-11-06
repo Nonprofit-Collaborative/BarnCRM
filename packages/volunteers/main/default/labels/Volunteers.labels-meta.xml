@@ -1170,4 +1170,12 @@ When: {1}</value>
         <shortDescription>Close Shift choice: leave the people still booked as they are</shortDescription>
         <value>Close Without Changing Them</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_LogHours_Title</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Heading of the Log Hours action</shortDescription>
+        <value>Log Hours</value>
+    </labels>
 </CustomLabels>

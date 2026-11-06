@@ -23,8 +23,9 @@ users can look at jobs, shifts and sign-ups but change nothing.
      and were never closed).
 3. Click a name to open the record. Every sign-up, across all shifts, is also listed on the **Volunteer Sign-Ups** tab, list view **All Sign-Ups**.
 
-You should see: a job page with its details and the **Shifts**, **Shift Schedules** and
-**Job Skills** lists, or a shift page with the **Sign-Ups** panel at the top.
+You should see: a job page with the **Shifts**, **Shift Schedules** and **Job Skills** lists and
+its details beside them, or a shift page with the **Sign-Ups** panel in the main column and
+**Details** and **Related** tabs beside it.
 
 ## To Create a Job
 
@@ -140,7 +141,7 @@ a second time records nothing more, and changing the status back deletes nothing
 
 ## To Edit a Sign-Up's Notes or Remove a Sign-Up
 
-1. On the shift page, scroll to the **Sign-Ups** related list below the details.
+1. On the shift page, click the **Related** tab and find the **Sign-Ups** related list.
 2. Open the row menu and choose **Edit** to change **Notes**, or **Delete** to remove the
    sign-up (Salesforce asks you to confirm).
 
@@ -187,7 +188,7 @@ change their sign-up to **Cancelled**.
 - Problem: the **Sign-Ups** panel has no **Add Sign-Up** button or attendance buttons. Why and
   what to do: you have read only access. Ask your admin if you need to sign people up.
 - Problem: "Showing the first ... sign-ups." Why and what to do: the panel shows a limited
-  number of rows. Use the **Sign-Ups** related list below the details to see them all.
+  number of rows. Use the **Sign-Ups** related list on the **Related** tab to see them all.
 
 ## Related
 

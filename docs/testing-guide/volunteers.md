@@ -284,3 +284,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 3 | Choose **Custom**. | **From** and **To** show, filled with last year's dates. A From after the To is refused on Preview. |
 
 **Cleanup:** none.
+
+## T-VOL-19: Log Hours From a Shift, a Job and a Person
+
+**Purpose:** confirm the Log Hours action prefills from the record and saves like New.
+**Prerequisites:** Team Member; a shift from 9:00 to 12:00 with a job; a person.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the shift and click **Log Hours**. | A **Log Hours** form with **Person** empty, and **Job**, **Volunteer Shift**, **Date Worked** (the shift's day) and **Hours** 3 filled. |
+| 2 | Choose the person and click **Save**. | "Hours logged." The form closes; the new entry is **Submitted**, on the shift and the job. |
+| 3 | Open the job and click **Log Hours**. | Only **Job** is filled. Click **Save** without a person: **Person** is required. |
+| 4 | Open the person and click **Log Hours**. | **Person** is filled with them. Fill in a job, a date and 2 hours and save: the entry is theirs. |
+| 5 | As a Read Only user, open the shift and click **Log Hours**. | A note says your role cannot enter volunteer hours; no form. |
+
+**Cleanup:** delete the hours entries.

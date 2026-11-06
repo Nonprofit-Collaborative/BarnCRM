@@ -18,6 +18,22 @@
   </actionOverrides>
   <actionOverrides>
     <actionName>View</actionName>
+    <comment>Volunteer job, with Log Hours</comment>
+    <content>Volunteer_Job_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Volunteer_Job__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Volunteer job, with Log Hours</comment>
+    <content>Volunteer_Job_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Volunteer_Job__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
     <comment>Households, organizations and person accounts, with volunteer readiness</comment>
     <content>Volunteers_Account_Record_Page</content>
     <formFactor>Large</formFactor>
