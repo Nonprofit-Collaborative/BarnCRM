@@ -315,6 +315,23 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** set Weeks Ahead to Create Shifts back to 8; delete the schedule and its shifts.
 
+## T-VOL-22: Shift Schedule Form Preview
+
+**Purpose:** confirm New Shift Schedule and Edit Schedule say how many shifts the pattern makes as the fields change (modules-24, D-183).
+**Prerequisites:** coordinator; a job; Weeks Ahead to Create Shifts at 8.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the job and click **New Shift Schedule**. | A form with the schedule fields, **Job** filled with this job, and a line asking you to choose at least one day of the week. |
+| 2 | Pick Saturday and Sunday. | The line asks for a start date. |
+| 3 | Set **Start Date** to today. | About 16 shifts "will be created through" a day 8 weeks from today. |
+| 4 | Set **Repeat Every (Weeks)** to 2. | About half as many shifts. |
+| 5 | Set **End Date** before **Start Date**. | The line asks for an end date on or after the start date. Clear **End Date**. |
+| 6 | Fill in a name and times and click **Save**. | "Shift schedule saved." The form closes; the schedule is in **Shift Schedules** and its shifts appear within a minute. |
+| 7 | Open the schedule and click **Edit Schedule**. | The saved values, and "With these settings the schedule has" a number of shifts "from today through" the horizon day. Untick **Active**: the line says the schedule creates no shifts. Cancel. |
+
+**Cleanup:** delete the schedule and its shifts.
+
 ## T-VOL-21: Volunteer Letters for Many People
 
 **Purpose:** confirm Volunteer Letters on Approve Hours makes letters for everyone with approved hours, or for chosen people, without Flow Builder.

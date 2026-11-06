@@ -2,7 +2,7 @@
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
     The volunteer job record page: the job's shifts, shift schedules and skills in the main
-    column, its details beside them, and Log Hours among the actions.
+    column, its details beside them, and Log Hours and New Shift Schedule among the actions.
   </description>
   <flexiPageRegions>
     <itemInstances>
@@ -15,6 +15,9 @@
             </valueListItems>
             <valueListItems>
               <value>Volunteer_Job__c.Log_Hours</value>
+            </valueListItems>
+            <valueListItems>
+              <value>Volunteer_Job__c.New_Shift_Schedule</value>
             </valueListItems>
             <valueListItems>
               <value>Clone</value>

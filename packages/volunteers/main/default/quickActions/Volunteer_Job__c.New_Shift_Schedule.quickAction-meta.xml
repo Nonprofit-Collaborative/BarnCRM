@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<QuickAction xmlns="http://soap.sforce.com/2006/04/metadata">
+  <actionSubtype>ScreenAction</actionSubtype>
+  <description>
+    Add a shift schedule to this job, with a line that says how many shifts it makes as you choose
+    the days and dates.
+  </description>
+  <label>New Shift Schedule</label>
+  <lightningWebComponent>shiftScheduleForm</lightningWebComponent>
+  <optionsCreateFeedItem>false</optionsCreateFeedItem>
+  <type>LightningWebComponent</type>
+</QuickAction>
