@@ -79,6 +79,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 10 | Open **Luis Garcia**'s page in the BarnCRM Fundraising app and click **Enter a Gift** in the action bar. | A window titled **Enter a Gift** opens with Quick Gift Entry inside (no second Quick Gift Entry title), **Person** chosen and **Luis Garcia** in **Donor**. |
 | 11 | Enter **Amount** `15`, **Payment Method** `Cash`, click **Save**. | The window closes, a "Gift Saved" toast shows, and the gift is in the page's **Gifts** list. |
 | 12 | Open **Founders Consulting Group** and click **Enter a Gift**. | **Organization** is chosen with Founders Consulting Group as donor. Close the window. |
+| 13 | On the **Quick Gift Entry** tab type **Amount** `40`, then click **Not in the list? Add a new person**. | A **Not in the list? Add a new person** window over the form asks for Salutation, First Name, Last Name, Email, Street, City and Postal Code. |
+| 14 | Type `Test` `Newdonor`, an email, and click **Save**. | The window closes; **Donor** shows Test Newdonor and **Amount** still reads 40. Do not save the gift yet. |
+| 15 | Open **Split Across Funds**, set the first row to General Fund 30.00, click **Add a Fund**, choose **Building Fund** (T-GIFT-16) for the rest. | **Fund** above is greyed out; "Left to assign: $0.00". |
+| 16 | Change the second row to 5.00 and click **Save**. | Not saved: the section opens with "A split is for a gift of money: choose a different fund on every row, give each an amount, and make the rows add up to the gift's amount." |
+| 17 | Set the second row back to 10.00 and click **Save**. Open the gift. | **Gift Allocations** shows General Fund 30.00 and Building Fund 10.00, no third row. |
+| 18 | Open a draft gift batch, click **Not in the list? Add a new person** under a line's donor, create `Test Batchdonor`. | The window closes and the line's donor is Test Batchdonor; the batch shows unsaved changes. |
 
 **Cleanup:** set **Default appeal** back to empty if later scripts expect none.
 

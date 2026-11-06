@@ -8,6 +8,7 @@ import getBatch from '@salesforce/apex/GiftBatchController.getBatch';
 import saveLines from '@salesforce/apex/GiftBatchController.saveLines';
 import postBatch from '@salesforce/apex/GiftBatchController.postBatch';
 import getPaymentChoices from '@salesforce/apex/GiftBatchController.getPaymentChoices';
+import HouseholdAddMemberModal from 'c/householdAddMemberModal';
 
 jest.mock('@salesforce/apex/GiftBatchController.getBatch', () => ({ default: jest.fn() }), {
   virtual: true
@@ -256,6 +257,28 @@ describe('c-gift-batch-entry', () => {
 
     expect(pick(element, 'kind')).toBeNull();
     expect(pick(element, 'donor').objectApiName).toBe('Account');
+  });
+
+  it('creates a first-time donor in a window and puts them on the line', async () => {
+    const NEW_PERSON = '003000000000009AAA';
+    HouseholdAddMemberModal.open.mockResolvedValueOnce({ id: NEW_PERSON, name: 'Test Batchdonor' });
+    const element = await build(view({ lines: [line('a0C1', 10, { donorContactId: null })] }));
+
+    pick(element, 'new-person').click();
+    await settle();
+
+    expect(HouseholdAddMemberModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: 'person' })
+    );
+    expect(pick(element, 'donor').value).toBe(NEW_PERSON);
+  });
+
+  it('offers no New Person where people are person accounts', async () => {
+    const element = await build(
+      view({ hasPersonAccounts: true, lines: [line('a0C1', 10, { donorContactId: null })] })
+    );
+
+    expect(pick(element, 'new-person')).toBeNull();
   });
 
   it('offers someone who may only read the batch no way to change or post it', async () => {

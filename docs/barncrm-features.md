@@ -432,6 +432,8 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Tribute and matching gift at entry | Minor | Quick Gift Entry's collapsed "This Gift Honors Someone" section saves the tribute with the gift, and "Matches an Employee's Gift" links an organization's gift to an employee's gift chosen from a list. | In review (v1.0) | people-giving-23, G-10 |
 | Donor pickers show email and city | Minor | The Quick Gift Entry and Gift Batch donor lists show email and mailing city for a person and billing city for an organization, so namesakes are told apart. | In review (v1.0) | people-giving-1 |
 | Create Gifts and kit look for gift entry | Minor | The batch button is Create Gifts with plain wording (post means accounting only); Quick Gift Entry and Gift Batches use the kit notices, figures, empty state and table recipe. | In review (v1.0) | people-giving-3, people-giving-8, people-giving-10 |
+| New donor without leaving gift entry | Minor | Not in the list? Add a new person opens a window over Quick Gift Entry or a Gift Batch line (name, email, address, with a same-name hint), and the new person becomes the donor with everything typed kept. | In review (v1.0) | people-giving-13 |
+| Split Across Funds in Quick Gift Entry | Minor | A collapsed section with the fund split editor saves a new gift and its allocations together, the rows adding up to the gift. | In review (v1.0) | people-giving-16 |
 | Pay a scheduled pledge payment | Minor | Quick Gift Entry and the Gift Batches "Pays" column list the donor's open pledge payments, suggest the one a gift pays, and let staff pick it. | Shipped | G-03, G-17, G-24, ADR-0084 |
 | Stock and planned gift types | Minor | Extra fields for stock and planned gifts. | Planned (1.x) | G-21 |
 

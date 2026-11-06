@@ -17,7 +17,7 @@ You should see: the batch page with its **Batch** details and, below them, the *
 ## To Type the Lines
 
 1. Click **Add Line**.
-2. In **Donor**, choose **Person** or **Organization**, then search by name. Each name in the list shows the person's email and city (an organization's city), so you can tell two people with the same name apart.
+2. In **Donor**, choose **Person** or **Organization**, then search by name. Each name in the list shows the person's email and city (an organization's city), so you can tell two people with the same name apart. A first-time donor? Click **Not in the list? Add a new person** under the line's donor: a window creates the person and puts them on the line.
 3. Type the **Amount** and the **Check Number**.
 4. Leave **Date**, **Payment Method**, **Fund** and **Appeal** empty to use the batch's (the method shows **As the batch**). Fill one in only when this check is different.
 5. Repeat for every check.

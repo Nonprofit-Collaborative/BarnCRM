@@ -10,12 +10,12 @@ Quick Gift Entry is the first tab of the BarnCRM Fundraising app. On a computer 
 
 1. Open the **Quick Gift Entry** tab, or click **Quick Gift Entry** in the utility bar.
 2. Under **Who gave this gift**, choose **Person** or **Organization**.
-3. Search for the donor in **Donor** (or **Organization**). Each name in the list shows the person's email and city (an organization's city), so you can tell two people with the same name apart. If the person is not there, click **Not in the list? Add a new person**, create them, then come back and search again.
+3. Search for the donor in **Donor** (or **Organization**). Each name in the list shows the person's email and city (an organization's city), so you can tell two people with the same name apart. If the person is not there, click **Not in the list? Add a new person**: a window asks for their name, email and address, and on **Save** the new person becomes the donor, with everything you already typed kept. If the window says someone with that name is already in BarnCRM, choose that person instead.
 4. Type the **Amount**.
 5. Check the **Gift Date**. It starts at today.
 6. Choose the **Payment Method** (for example **Check**, **Card** or **Cash**).
 7. Type the **Check or reference number** if there is one.
-8. Check **Appeal** and **Fund**. They start at your organization's defaults; change them if the donor said otherwise.
+8. Check **Appeal** and **Fund**. They start at your organization's defaults; change them if the donor said otherwise. To split the gift across two or more funds (for example half to the building fund), open **Split Across Funds** and add a row per fund; **Fund** is then turned off, and **Save** needs the rows to add up to the amount.
 9. Click **Save**, or **Save and New** to start the next gift straight away.
 
 You should see: a green notice with a check icon saying "Gift G-000123 saved" and an **Open This Gift** link. **Save and New** keeps the date, the appeal and the fund, and clears the rest.

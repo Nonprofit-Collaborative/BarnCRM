@@ -132,10 +132,23 @@ Two collapsed sections sit under **Fund**. Leave them closed for an ordinary gif
 ## Common Mistakes
 
 **The donor is not in BarnCRM yet.** Common at an event. Leave the donor toggle on
-**Person** and tap **Not in the list? Add a new person** under the donor box. The standard
-new person form opens; fill it in and save. You come back to Quick Gift Entry with what you
-had typed still there: search for the new person in the donor box and pick them. For a new
-organization, create it from the Organizations tab first.
+**Person** and tap **Not in the list? Add a new person** under the donor box. A window over
+the form (the Core `householdAddMemberModal` in its person mode) asks for Salutation, First
+and Last Name, Email, Street, City and Postal Code and saves the contact exactly as Contact
+New does, so the household is made automatically and the org's duplicate rules run. It also
+names anyone already in BarnCRM with the same name, to pick instead. The new person becomes
+the donor and nothing typed so far is lost. Gift Batches offer the same window on each
+line's donor. Where people are person accounts, the standard new person form opens instead;
+you come back with what you typed and search for the new person. For a new organization,
+create it from the Organizations tab first.
+
+**The gift goes to more than one fund.** Open **Split Across Funds** (gifts of money only)
+and add a row per fund, by amount or percent: the same fund split editor as the gift page's
+**Edit Funds**. **Fund** turns off while two or more rows are set, and the save needs every
+row to name its own fund and the rows to add up to the amount; otherwise the section shows
+"A split is for a gift of money: choose a different fund on every row, give each an amount,
+and make the rows add up to the gift's amount." The gift and its allocations save together,
+with no default allocation in between.
 
 **A field shows a message after you tap Save.** The message sits under the field it is
 about, and the cursor moves to the first one. Fix that field and its message goes away;
