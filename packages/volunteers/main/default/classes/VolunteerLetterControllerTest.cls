@@ -227,22 +227,24 @@ private class VolunteerLetterControllerTest {
 	static void volunteerLettersForChosenPeopleAreRefusedToStaff() {
 		Integer chosen;
 		String refused;
+		Id person = personId();
+		Id template = hoursLetterId();
 		Test.startTest();
 		System.runAs(user(COORDINATOR)) {
 			chosen = VolunteerLetterController.startLetters(
-				hoursLetterId(),
+				template,
 				FROM_DATE,
 				TO_DATE,
-				new List<Id>{ personId(), personId() }
+				new List<Id>{ person, person }
 			);
 		}
 		System.runAs(user(STAFFER)) {
 			try {
 				VolunteerLetterController.startLetters(
-					hoursLetterId(),
+					template,
 					FROM_DATE,
 					TO_DATE,
-					new List<Id>{ personId() }
+					new List<Id>{ person }
 				);
 			} catch (AuraHandledException shown) {
 				refused = shown.getMessage();
