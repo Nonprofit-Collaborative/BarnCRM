@@ -34,6 +34,22 @@
   </actionOverrides>
   <actionOverrides>
     <actionName>View</actionName>
+    <comment>Shift schedule, with Create Shifts Now</comment>
+    <content>Shift_Schedule_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Shift_Schedule__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Shift schedule, with Create Shifts Now</comment>
+    <content>Shift_Schedule_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Shift_Schedule__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
     <comment>Households, organizations and person accounts, with volunteer readiness</comment>
     <content>Volunteers_Account_Record_Page</content>
     <formFactor>Large</formFactor>

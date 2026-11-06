@@ -899,22 +899,6 @@ When: {1}</value>
         <value>{0} Shift Schedule Has Not Created Shifts Far Enough Ahead</value>
     </labels>
     <labels>
-        <fullName>Volunteers_HealthCheck_HorizonDetail</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Schedule horizon not filled, why and how to fix; {0} is the weeks</shortDescription>
-        <value>These active schedules should have shifts {0} weeks ahead (Weeks Ahead to Create Shifts, Volunteers section) but stop more than two days short, so nobody can sign up for the missing days. The nightly Volunteer Schedules job is usually not running: use the fix for unscheduled nightly jobs. To fill one now, open it and save it.</value>
-    </labels>
-    <labels>
-        <fullName>Volunteers_HealthCheck_HorizonDetailOne</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>One schedule horizon not filled, why and how to fix; {0} is the weeks</shortDescription>
-        <value>This active schedule should have shifts {0} weeks ahead (Weeks Ahead to Create Shifts, Volunteers section) but stops more than two days short, so nobody can sign up for the missing days. The nightly Volunteer Schedules job is usually not running: use the fix for unscheduled nightly jobs. To fill it now, open the schedule and save it.</value>
-    </labels>
-    <labels>
         <fullName>Volunteers_HealthCheck_CoordinatorAccessTitle</fullName>
         <categories>HealthCheck</categories>
         <language>en_US</language>
@@ -1177,5 +1161,13 @@ When: {1}</value>
         <protected>true</protected>
         <shortDescription>Heading of the Log Hours action</shortDescription>
         <value>Log Hours</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Schedule_CreateNow</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button on a shift schedule that creates its missing shifts now</shortDescription>
+        <value>Create Shifts Now</value>
     </labels>
 </CustomLabels>

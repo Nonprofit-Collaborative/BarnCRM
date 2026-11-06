@@ -222,8 +222,8 @@ public with sharing class VolunteersHealthCheckExtension implements HealthCheckE
 		String detail = String.format(
 			oneOrMany(
 				howMany,
-				Label.Volunteers_HealthCheck_HorizonDetailOne,
-				Label.Volunteers_HealthCheck_HorizonDetail
+				BarnHelp.text('Volunteers', 'Volunteers_HealthCheck_HorizonDetailOne'),
+				BarnHelp.text('Volunteers', 'Volunteers_HealthCheck_HorizonDetail')
 			),
 			new List<Object>{ weeks.format() }
 		);

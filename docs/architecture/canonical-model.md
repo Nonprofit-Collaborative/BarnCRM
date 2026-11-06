@@ -9760,7 +9760,7 @@ and counted like any other. ADR-0128 (`0128-volunteer-recurring-shifts.md`) reco
 |---|---|---|---|
 | Name | text | yes | What the coordinator calls the schedule, for example "Saturday sorting". |
 | Job | reference(Job) | yes | The job whose shifts the schedule creates. |
-| Weekdays | multi-select(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) | yes | The days of the week a shift falls on. |
+| Days of the Week | multi-select(Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday) | yes | The days of the week a shift falls on (labelled Weekdays before v1.0). |
 | Repeat Every (Weeks) | integer | yes (defaults 1) | 1 for every week, 2 for every other week, and so on, counted from the week of Start Date. |
 | Start Time | time | yes | When each shift starts. |
 | End Time | time | yes | When each shift ends, later the same day. |
@@ -9847,7 +9847,7 @@ Cancelled.
 | Attribute | API name | Type |
 |---|---|---|
 | Job | `Job__c` | Master-Detail to `Volunteer_Job__c` |
-| Weekdays | `Weekdays__c` | Multi-Select Picklist: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday |
+| Days of the Week | `Weekdays__c` | Multi-Select Picklist: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday |
 | Repeat Every (Weeks) | `Every_N_Weeks__c` | Number (2, 0), default 1 |
 | Start Time | `Start_Time__c` | Time |
 | End Time | `End_Time__c` | Time |

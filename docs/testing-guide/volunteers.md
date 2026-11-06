@@ -299,3 +299,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 5 | As a Read Only user, open the shift and click **Log Hours**. | A note says your role cannot enter volunteer hours; no form. |
 
 **Cleanup:** delete the hours entries.
+
+## T-VOL-20: Create Shifts Now on a Shift Schedule
+
+**Purpose:** confirm the schedule page previews the next run and Create Shifts Now fills it at once.
+**Prerequisites:** coordinator; a job; Weeks Ahead to Create Shifts at 8.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the job, in **Shift Schedules**, click **New**. | The form shows **Days of the Week**, **Repeat Every (Weeks)**, **Start Time** and **End Time**. |
+| 2 | Pick Saturday, 1 week, 9:00 to 12:00, Start Date today, Volunteers Needed 4; save; open the schedule at once. | **Details** and **Related** tabs, and a **Volunteer Shifts** card beside them saying how many shifts will be created through a day 8 weeks ahead (or, if the save's own run already finished, that every shift is created through that day). |
+| 3 | Set **Weeks Ahead to Create Shifts** to 10 in BarnCRM Settings and reopen the schedule. | The card says 2 shifts (the two new Saturdays) will be created through a day 10 weeks ahead, and **Create Shifts Now** is enabled. |
+| 4 | Click **Create Shifts Now**. | "Shifts created: 2." The card says every shift is created through that day and the button is disabled; the two shifts are in **Related**. |
+| 5 | Untick **Active** and save. | The card says the schedule is not active and creates no shifts; no button. |
+
+**Cleanup:** set Weeks Ahead to Create Shifts back to 8; delete the schedule and its shifts.

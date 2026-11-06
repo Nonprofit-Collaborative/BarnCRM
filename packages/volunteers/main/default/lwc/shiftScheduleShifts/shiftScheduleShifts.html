@@ -1,0 +1,44 @@
+<template>
+  <lightning-card title={title} icon-name="custom:custom74">
+    <template lwc:if={showButton}>
+      <lightning-button
+        slot="actions"
+        data-id="create-now"
+        label={labels.createNow}
+        disabled={buttonDisabled}
+        onclick={handleCreateNow}
+      ></lightning-button>
+    </template>
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={isLoading}>
+        <div class="slds-is-relative slds-var-p-around_large" data-id="loading">
+          <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+        </div>
+      </template>
+      <template lwc:if={working}>
+        <div class="slds-is-relative slds-var-p-around_medium" data-id="working">
+          <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+        </div>
+      </template>
+      <template lwc:if={errorMessage}>
+        <c-barn-notice
+          class="slds-var-m-bottom_small"
+          variant="error"
+          message={errorMessage}
+          data-id="error-message"
+        ></c-barn-notice>
+      </template>
+      <template lwc:if={resultMessage}>
+        <c-barn-notice
+          class="slds-var-m-bottom_small"
+          variant="success"
+          message={resultMessage}
+          data-id="result-message"
+        ></c-barn-notice>
+      </template>
+      <template lwc:if={previewText}>
+        <p data-id="preview">{previewText}</p>
+      </template>
+    </div>
+  </lightning-card>
+</template>

@@ -282,7 +282,7 @@ schedule** to the job: on the job, in the **Shift Schedules** list, click **New*
 | Field | What to enter |
 |---|---|
 | Schedule Name | What you call it, for example "Saturday sorting". |
-| Weekdays | The days a shift falls on. Pick several for "Tuesdays and Thursdays". |
+| Days of the Week | The days a shift falls on. Pick several for "Tuesdays and Thursdays". |
 | Repeat Every (Weeks) | 1 for every week, 2 for every other week, counted from the week of the start date. |
 | Start Time, End Time | The times of each shift, in your organization's time zone (Setup, **Company Information**). A 9:00 shift stays at 9:00 when the clocks change. |
 | Start Date, End Date | The first and last days a shift may fall on. Leave End Date empty to keep it running. |
@@ -297,6 +297,15 @@ schedule it came from. Every night
 at 3:00 AM BarnCRM adds the next days, so the schedule always reaches the horizon. **Created
 Through** on the schedule shows the last day it has created shifts for.
 
+**The schedule page.** A schedule's record page shows its details and its shifts as tabs, and
+beside them a **Volunteer Shifts** card that says what the next run creates, for example "12
+shifts will be created through 27 Apr 2026", or that every shift is already created through a
+day. **Create Shifts Now** on that card creates the missing shifts at once, with the same rules
+as the nightly job, instead of waiting for it. The card says how many it created. An inactive
+schedule, or Volunteers turned off in Module Manager, creates nothing, and the card says why.
+The button needs create access to shifts, which the Volunteers Admin, Coordinator and Staff sets
+give.
+
 **Changing a schedule changes only future shifts nobody is using.** When you change the days,
 Repeat Every (Weeks), times, start date, places or location, BarnCRM removes the schedule's future
 shifts that have no sign-ups, no hours and are not cancelled, and creates them again from the
@@ -305,8 +314,8 @@ are, and no day gets a second shift. **Shifts Kept** on the schedule then says h
 shifts with a sign-up or hours were kept (cancelled shifts are not counted): check those by hand,
 because they still have the old times. The next save that changes none of those fields and not
 the end clears the number. Changing only the name changes no existing shift. Any save of an
-active schedule also creates the days up to the horizon it is still missing, so to fill a
-schedule now, open it and save it. When one save changes many
+active schedule also creates the days up to the horizon it is still missing; to fill a
+schedule now without changing it, click **Create Shifts Now** on its page. When one save changes many
 schedules (an import or a mass edit), the ones beyond what a single save can handle are updated
 in the background a few minutes later, or by the nightly job at the latest: until then they keep
 their old shifts and show no Shifts Kept. Deleting many schedules at once works the same way:
@@ -606,7 +615,7 @@ is turned off. Counts stop at 1,000, and each finding about records links the fi
 |---|---|---|
 | **Volunteer hours entries have waited more than 14 days for approval** (amber) | Hours count in no total and no letter until a coordinator approves them, so the volunteer looks as if they gave less time than they did. | **Open Approve Hours**, choose Submitted, and approve each entry, or reject it with a reason when it is wrong. |
 | **Past shifts are still Open** (blue) | Nothing closes a shift by itself. A shift that ended more than 7 days ago and is still Open usually means attendance was never marked, so the people who came have no hours. | **Open the shift list** opens the **Past Shifts Still Open** list view, which shows the same shifts the finding counts. Open each shift, mark who came on its Sign-Ups panel, then click **Close Shift** there (or set Status to Cancelled if it did not happen). |
-| **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Weeks Ahead to Create Shifts** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and save it. |
+| **Shift schedules have not created shifts far enough ahead** (amber) | A schedule should keep shifts created as many weeks ahead as **Weeks Ahead to Create Shifts** says. One more than two days short (or short of its End Date) means nobody can be signed up for the days missing. | Usually the nightly Volunteer Schedules job is not running: if Health Check also lists nightly jobs that are not scheduled, use that fix. To fill one schedule now, open it from the finding and click **Create Shifts Now**. |
 | **Volunteer coordinators do not have the Volunteers Coordinator permission set** (amber) | Someone with the Coordinator role cannot approve hours or work with shifts without it, or without Volunteers Admin, so people who hold Volunteers Admin are not listed. BarnCRM gives it every night, so this happens when the role was given in Setup today or the nightly access check failed. | **Give Volunteers Coordinator now** gives it within about a minute, after you confirm the names. Or assign the set in Setup. |
 | **Shipped volunteer totals are turned off** (blue) | The fields those totals fill stop updating, and the reports, list views and dashboard that use them go stale. | If you turned them off on purpose, nothing is wrong. Otherwise **Open Rollup Builder**, set each one Active, then choose **Recalculate**. A shipped total that is missing altogether is the Rollup Builder's own **Shipped totals are missing** finding, which can restore it. |
 

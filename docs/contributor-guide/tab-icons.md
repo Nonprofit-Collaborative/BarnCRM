@@ -150,5 +150,6 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | programs | sessionScheduler | custom:custom20 | Session__c |
 | rollups | rollupBuilder | custom:custom63 | Rollup_Builder |
 | rollups | rollupDefinitions | custom:custom63 | Rollup_Builder |
+| volunteers | shiftScheduleShifts | custom:custom74 | Volunteer_Shift__c |
 | volunteers | shiftSignups | custom:custom2 | Volunteer_Signup__c |
 | volunteers | volunteerHoursApproval | custom:custom91 | Volunteer_Approve_Hours |

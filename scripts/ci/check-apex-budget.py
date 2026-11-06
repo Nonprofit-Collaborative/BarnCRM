@@ -39,7 +39,7 @@ CAPS = {
     "core": 1_982_000,
     "rollups": 374_000,
     "giving": 587_000,
-    "volunteers": 170_000,  # 2026-11-05: Log Hours action (modules-14)
+    "volunteers": 175_000,  # 2026-11-05: Log Hours (modules-14), Create Shifts Now (modules-15)
     "programs": 148_000,
     "logicmodels": 65_000,
     "funders": 95_000,

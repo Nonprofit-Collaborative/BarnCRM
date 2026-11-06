@@ -60,7 +60,7 @@ the dated shifts for you. Coordinators and Team Members can do this; only an adm
 schedule.
 
 1. Open the job and find the **Shift Schedules** list. Click **New**.
-2. Fill in **Schedule Name**, **Weekdays** (pick one or more), **Repeat Every (Weeks)** (1 for
+2. Fill in **Schedule Name**, **Days of the Week** (pick one or more), **Repeat Every (Weeks)** (1 for
    every week, 2 for every other week), **Start Time**, **End Time**, **Start Date** and
    **Volunteers Needed**. Leave **End Date** empty to keep it running, and **Location** empty to
    use the job's.
@@ -70,6 +70,11 @@ You should see: within about a minute, the new shifts in the job's **Shifts** li
 the **Shift Schedule** it came from. **Created Through** on the schedule shows the last day it
 has created shifts for. BarnCRM keeps adding shifts every night, a set number of weeks ahead
 (your admin sets how many).
+
+On the schedule's page, the **Volunteer Shifts** card says what comes next, for example "12
+shifts will be created through 27 Apr 2026". To create them now instead of waiting, click
+**Create Shifts Now**. You should see: "Shifts created: 12." and the card saying every shift is
+created through that day.
 
 **Changing a schedule** changes only its future shifts that nobody is using. Shifts with a
 sign-up or hours are kept as they are, and **Shifts Kept** on the schedule says how many. Check
@@ -181,7 +186,7 @@ change their sign-up to **Cancelled**.
   saving a shift schedule. Why and what to do: one of the schedule fields is missing or out of
   range. The message lists each rule; fix the field and save.
 - Problem: a schedule's shifts stop a few weeks out, or none appeared. Why and what to do: open
-  the schedule and click **Save** to fill the missing days now. If it keeps happening, tell your
+  the schedule and click **Create Shifts Now** to fill the missing days now. If it keeps happening, tell your
   admin: the nightly job that creates shifts may not be running.
 - Problem: "This job has shifts or volunteer hours, so it cannot be deleted ..." Why and what to
   do: clear **Active** on the job instead.
