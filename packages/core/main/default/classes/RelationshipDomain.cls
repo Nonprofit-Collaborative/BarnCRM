@@ -70,7 +70,7 @@ public with sharing class RelationshipDomain {
 	 * Parent and B to A as Parent are two different relationships, which is what makes the
 	 * other side of A to B as Parent (B to A as Child) legal rather than a duplicate.
 	 *
-	 * It also refuses a type the administrator turned off (ADR-NEXT) on a new relationship or
+	 * It also refuses a type the administrator turned off (ADR-0170) on a new relationship or
 	 * a change of type. A relationship that already has that type, and the other side BarnCRM
 	 * writes, which skips these checks, are left alone.
 	 */

@@ -202,7 +202,7 @@ export default class RelationshipPanel extends NavigationMixin(LightningElement)
     }
   }
 
-  // Lower case Type values turned off (ADR-NEXT); the server refuses them anyway.
+  // Lower case Type values turned off (ADR-0170); the server refuses them anyway.
   @wire(getTurnedOffTypes)
   receiveTurnedOffTypes({ data }) {
     if (data) {

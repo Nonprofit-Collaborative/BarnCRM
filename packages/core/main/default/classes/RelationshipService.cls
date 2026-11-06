@@ -84,7 +84,7 @@ public with sharing class RelationshipService {
 	/**
 	 * Whether a new relationship may not be given this type: a shipped type the administrator
 	 * turned off on the Custom Metadata page, with no other active row for the same type
-	 * (ADR-NEXT, `NEXT-shipped-relationship-types-can-be-turned-off.md`).
+	 * (ADR-0170).
 	 */
 	public static Boolean isTurnedOff(String type) {
 		return String.isNotBlank(type) && turnedOffTypes().contains(type.toLowerCase());

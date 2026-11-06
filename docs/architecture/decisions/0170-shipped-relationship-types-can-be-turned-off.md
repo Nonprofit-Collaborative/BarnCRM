@@ -1,4 +1,4 @@
-# ADR-NEXT: Shipped relationship types can be turned off
+# ADR-0170: Shipped relationship types can be turned off
 
 **Status:** Accepted (owner request, Brandon, 2026-11-05)
 **Date:** 2026-11-05

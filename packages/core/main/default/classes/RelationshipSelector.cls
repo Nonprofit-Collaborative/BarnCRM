@@ -59,7 +59,7 @@ public with sharing class RelationshipSelector {
 	 * own. Read as shipped rather than in user mode: it is package metadata, read only to
 	 * administrators, and it holds no organization data (the same reasoning as
 	 * AutomationRegistrySelector). A shipped row the administrator turned off is still
-	 * returned; `RelationshipService` decides what that means (ADR-NEXT).
+	 * returned; `RelationshipService` decides what that means (ADR-0170).
 	 */
 	public static List<Relationship_Type__mdt> selectTypeMappings() {
 		if (typeMappingOverride != null) {

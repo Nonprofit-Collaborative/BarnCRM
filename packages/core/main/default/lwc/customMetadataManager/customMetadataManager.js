@@ -50,7 +50,7 @@ function appliedMessage(turnedOff, label) {
  * can only read, or archive where the type allows it. Saving is a metadata deployment, so the
  * page waits on its outcome (0085-custom-metadata-manager-edits-only-types-read-directly.md).
  * A shipped relationship type is turned off and on through a setting instead, saved at once
- * (NEXT-shipped-relationship-types-can-be-turned-off.md).
+ * (ADR-0170).
  */
 export default class CustomMetadataManager extends LightningElement {
   helpReady = isHelpLoaded('Core');

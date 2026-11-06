@@ -55,7 +55,7 @@ public with sharing class CustomMetadataManagerService {
 		/**
 		 * For a shipped-archivable type whose shipped rows are turned off by a setting rather
 		 * than deployed: the BarnCRM Settings field listing their DeveloperNames. The row is
-		 * never changed, so an upgrade cannot turn it back on (ADR-NEXT). Null otherwise.
+		 * never changed, so an upgrade cannot turn it back on (ADR-0170). Null otherwise.
 		 */
 		public Schema.SObjectField shippedOffSetting;
 		/** The Core feature the type belongs to; while it is off the type is not offered. */
@@ -358,7 +358,7 @@ public with sharing class CustomMetadataManagerService {
 
 	/**
 	 * Turns a shipped row off or on by listing its DeveloperName in the type's setting, which
-	 * is saved at once and audited (ADR-NEXT). The row is never deployed, so its label and
+	 * is saved at once and audited (ADR-0170). The row is never deployed, so its label and
 	 * values stay the package's to update. Turning one on is refused while another active row
 	 * holds the same unique value, as restoring any row is.
 	 */
