@@ -632,6 +632,75 @@ private class QuickGiftEntryControllerTest {
 		}
 	}
 
+	private static QuickGiftEntryController.AllocationInput share(Id fundId, Decimal amount) {
+		QuickGiftEntryController.AllocationInput entry = new QuickGiftEntryController.AllocationInput();
+		entry.fundId = fundId;
+		entry.amount = amount;
+		return entry;
+	}
+
+	@IsTest
+	static void savesASplitAcrossFundsWithTheGiftInOneSave() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Fund__c annual = makeFund();
+			Fund__c roof = new Fund__c(Name = 'Roof Repair', Active__c = true);
+			insert roof;
+			Contact donor = makeContact();
+			QuickGiftEntryController.GiftInput input = baseInput();
+			input.donorContactId = donor.Id;
+			input.allocations = new List<QuickGiftEntryController.AllocationInput>{
+				share(annual.Id, 30),
+				share(roof.Id, 20)
+			};
+
+			Test.startTest();
+			QuickGiftEntryController.SaveResult result = QuickGiftEntryController.saveGift(input);
+			Test.stopTest();
+
+			Assert.isTrue(result.success, 'Saved: ' + result.formError);
+			Map<Id, Decimal> amountByFund = new Map<Id, Decimal>();
+			for (Gift_Allocation__c row : [
+				SELECT Fund__c, Amount__c
+				FROM Gift_Allocation__c
+				WHERE Gift__c = :result.giftId
+				WITH SYSTEM_MODE
+			]) {
+				amountByFund.put(row.Fund__c, row.Amount__c);
+			}
+			Assert.areEqual(2, amountByFund.size(), 'Two allocations and no default one.');
+			Assert.areEqual(30, amountByFund.get(annual.Id), 'Annual share.');
+			Assert.areEqual(20, amountByFund.get(roof.Id), 'Roof share.');
+		}
+	}
+
+	@IsTest
+	static void refusesASplitThatDoesNotAddUpAndSavesNothing() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			Fund__c annual = makeFund();
+			Fund__c roof = new Fund__c(Name = 'Roof Repair', Active__c = true);
+			insert roof;
+			Contact donor = makeContact();
+			QuickGiftEntryController.GiftInput input = baseInput();
+			input.donorContactId = donor.Id;
+			input.allocations = new List<QuickGiftEntryController.AllocationInput>{
+				share(annual.Id, 30),
+				share(roof.Id, 10)
+			};
+
+			Test.startTest();
+			QuickGiftEntryController.SaveResult result = QuickGiftEntryController.saveGift(input);
+			Test.stopTest();
+
+			Assert.isFalse(result.success, 'Refused.');
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorSplit'),
+				messagesByField(result.fieldErrors).get('allocations'),
+				'Says the split must add up.'
+			);
+			Assert.areEqual(0, [SELECT COUNT() FROM Gift__c WITH SYSTEM_MODE], 'Nothing saved.');
+		}
+	}
+
 	@IsTest
 	static void saysSoWhenNothingArrivedToSave() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {

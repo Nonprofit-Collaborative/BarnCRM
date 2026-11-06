@@ -197,6 +197,7 @@
                     placeholder={labels.donorPlaceholder}
                     object-api-name={fundObjectApiName}
                     value={fundId}
+                    disabled={isSplit}
                     onchange={handleFundChange}
                     data-id="fund"
                 ></lightning-record-picker>
@@ -283,6 +284,19 @@
                                 {labels.matchEmpty}
                             </p>
                         </template>
+                    </lightning-accordion-section>
+                </template>
+                <template lwc:if={isMoneyGift}>
+                    <lightning-accordion-section name="split" label={labels.splitSection} data-id="split-section">
+                        <template lwc:if={splitError}>
+                            <c-barn-notice variant="error" message={splitError} data-id="split-error"></c-barn-notice>
+                        </template>
+                        <c-gift-fund-split
+                            total={amount}
+                            allocations={allocations}
+                            onchange={handleSplitChange}
+                            data-id="split"
+                        ></c-gift-fund-split>
                     </lightning-accordion-section>
                 </template>
             </lightning-accordion>

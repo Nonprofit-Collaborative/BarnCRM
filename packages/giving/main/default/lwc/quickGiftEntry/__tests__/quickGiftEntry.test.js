@@ -7,6 +7,7 @@ import getDonorKind from '@salesforce/apex/QuickGiftEntryController.getDonorKind
 import getMatchableGifts from '@salesforce/apex/QuickGiftEntryController.getMatchableGifts';
 import saveGift from '@salesforce/apex/QuickGiftEntryController.saveGift';
 import getPaymentChoices from '@salesforce/apex/QuickGiftEntryController.getPaymentChoices';
+import HouseholdAddMemberModal from 'c/householdAddMemberModal';
 
 const mockNavigate = jest.fn();
 jest.mock(
@@ -232,16 +233,93 @@ describe('c-quick-gift-entry', () => {
     expect(amount.reportValidity).toHaveBeenCalledTimes(2);
   });
 
-  it('opens the standard new person form and stays on this form after it saves', async () => {
+  it('creates a new person in a window and makes them the donor, keeping what was typed', async () => {
+    HouseholdAddMemberModal.open.mockResolvedValueOnce({ id: CONTACT_ID, name: 'Ana Garcia' });
+    const element = build();
+    await settle();
+    change(pick(element, 'amount'), { value: '75' });
+
+    pick(element, 'new-person').click();
+    await settle();
+
+    expect(HouseholdAddMemberModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: 'person', size: 'small' })
+    );
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(pick(element, 'donor-person').value).toBe(CONTACT_ID);
+    expect(pick(element, 'amount').value).toBe('75');
+  });
+
+  it('leaves the donor alone when the New Person window closes without a person', async () => {
+    HouseholdAddMemberModal.open.mockResolvedValueOnce(undefined);
+    const element = build();
+    await settle();
+
+    pick(element, 'new-person').click();
+    await settle();
+
+    expect(pick(element, 'donor-person').value).toBeFalsy();
+  });
+
+  it('opens the standard new person form where people are person accounts', async () => {
+    getDefaults.mockResolvedValue({ ...DEFAULTS, hasPersonAccounts: true });
     const element = build();
     await settle();
 
     pick(element, 'new-person').click();
 
+    expect(HouseholdAddMemberModal.open).not.toHaveBeenCalled();
     const pageReference = mockNavigate.mock.calls[0][0];
     expect(pageReference.type).toBe('standard__objectPage');
-    expect(pageReference.attributes).toEqual({ objectApiName: 'Contact', actionName: 'new' });
+    expect(pageReference.attributes).toEqual({ objectApiName: 'Account', actionName: 'new' });
     expect(pageReference.state.navigationLocation).toBe('RELATED_LIST');
+  });
+
+  it('sends a split across funds and turns the single Fund off while it applies', async () => {
+    const element = build();
+    await settle();
+    await enterAGift(element);
+
+    change(pick(element, 'split'), {
+      allocations: [
+        { fundId: 'a01000000000001AAA', amount: '30' },
+        { fundId: 'a01000000000002AAA', amount: 20 }
+      ],
+      valid: true
+    });
+    await settle();
+    expect(pick(element, 'fund').disabled).toBe(true);
+
+    pick(element, 'save').click();
+    await settle();
+
+    expect(saveGift.mock.calls[0][0].input.allocations).toEqual([
+      { fundId: 'a01000000000001AAA', amount: 30 },
+      { fundId: 'a01000000000002AAA', amount: 20 }
+    ]);
+  });
+
+  it('shows the controller message about a split inside the split section', async () => {
+    saveGift.mockResolvedValue({
+      success: false,
+      fieldErrors: [{ field: 'allocations', message: 'Make the rows add up.' }]
+    });
+    const element = build();
+    await settle();
+    await enterAGift(element);
+    change(pick(element, 'split'), {
+      allocations: [
+        { fundId: 'a01000000000001AAA', amount: 30 },
+        { fundId: 'a01000000000002AAA', amount: 10 }
+      ],
+      valid: false
+    });
+    await settle();
+
+    pick(element, 'save').click();
+    await settle();
+
+    expect(pick(element, 'split-error').message).toBe('Make the rows add up.');
   });
 
   it('offers a new person only while the donor is a person', async () => {
@@ -282,7 +360,8 @@ describe('c-quick-gift-entry', () => {
         honoreeName: null,
         notifyId: null,
         notifyName: null,
-        matchedGiftId: null
+        matchedGiftId: null,
+        allocations: null
       }
     });
     expect(pick(element, 'saved')).not.toBeNull();

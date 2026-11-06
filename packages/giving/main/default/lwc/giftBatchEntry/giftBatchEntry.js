@@ -48,6 +48,8 @@ import unsaved from '@salesforce/label/c.Core_Shared_UnsavedChanges';
 import savedToast from '@salesforce/label/c.Giving_GiftBatch_Saved';
 import errorLoadBatch from '@salesforce/label/c.Giving_GiftBatch_ErrorLoadBatch';
 import errorSaveRows from '@salesforce/label/c.Giving_GiftBatch_ErrorSaveRows';
+import newPerson from '@salesforce/label/c.Giving_QuickGiftEntry_NewPerson';
+import HouseholdAddMemberModal from 'c/householdAddMemberModal';
 import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -87,6 +89,7 @@ export default class GiftBatchEntry extends LightningElement {
 
   labels = {
     title,
+    newPerson,
     controlTotalLabel,
     enteredLabel,
     get createdNote() {
@@ -343,6 +346,10 @@ export default class GiftBatchEntry extends LightningElement {
     return this.loaded && !this.batch.hasPersonAccounts;
   }
 
+  get offerNewPerson() {
+    return this.showKind && !this.locked;
+  }
+
   /** What each row of the grid draws. */
   get rows() {
     return this.lines.map((line, index) => ({
@@ -453,6 +460,29 @@ export default class GiftBatchEntry extends LightningElement {
       }
       this.forgetPayment(line);
     });
+  }
+
+  /**
+   * New Person on a line (people-giving-13): a window creates the person and puts them on the
+   * line, so a first-time donor's check does not mean leaving the batch. Offered only where
+   * people are contacts, because the window creates a contact.
+   */
+  async handleNewPerson(event) {
+    const key = event.currentTarget.dataset.key;
+    const created = await HouseholdAddMemberModal.open({
+      label: newPerson,
+      size: 'small',
+      mode: 'person'
+    });
+    const line = this.lines.find((candidate) => candidate.key === key);
+    if (!created || !created.id || !line) {
+      return;
+    }
+    line.donorContactId = created.id;
+    line.donorAccountId = null;
+    this.forgetPayment(line);
+    this.lines = [...this.lines];
+    this.dirty = true;
   }
 
   handleField(event) {

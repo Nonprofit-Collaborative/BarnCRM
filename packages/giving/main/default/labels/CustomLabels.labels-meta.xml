@@ -248,4 +248,12 @@
         <shortDescription>Quick gift entry: tribute section</shortDescription>
         <value>This Gift Honors Someone</value>
     </labels>
+    <labels>
+        <fullName>Giving_QuickGiftEntry_SplitSection</fullName>
+        <categories>Giving</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Quick gift entry: split across funds section</shortDescription>
+        <value>Split Across Funds</value>
+    </labels>
 </CustomLabels>

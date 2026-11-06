@@ -169,15 +169,21 @@ public with sharing class QuickGiftEntryController {
 				);
 				return result;
 			}
-			Database.insert(gift, true, AccessLevel.USER_MODE);
+			Boolean split = input.isSplit();
+			insertGift(gift, split);
 			Tribute__c tribute = input.toTribute(gift.Id);
 			if (tribute != null) {
 				Database.insert(tribute, true, AccessLevel.USER_MODE);
 			}
-			Boolean applyChosenFundWasApplied = applyChosenFund(
-				gift,
-				asId(input.fundId, Fund__c.SObjectType)
-			);
+			Boolean applyChosenFundWasApplied = true;
+			if (split) {
+				Database.insert(input.toAllocations(gift.Id), true, AccessLevel.USER_MODE);
+			} else {
+				applyChosenFundWasApplied = applyChosenFund(
+					gift,
+					asId(input.fundId, Fund__c.SObjectType)
+				);
+			}
 			result.success = true;
 			result.giftId = gift.Id;
 			result.giftName = nameOf(gift.Id);
@@ -195,6 +201,21 @@ public with sharing class QuickGiftEntryController {
 			ErrorLogger.log(e, CONTEXT + '.saveGift');
 			result.formError = Label.Giving_QuickGiftEntry_ErrorUnexpected;
 			return result;
+		}
+	}
+
+	/**
+	 * A gift split across funds (people-giving-16) is inserted without the default allocation,
+	 * because its own allocations follow in the same transaction and must total the gift alone
+	 * (R-GA1), the way the import saves a split. The caller's suppression is put back after.
+	 */
+	private static void insertGift(Gift__c gift, Boolean split) {
+		Boolean callerSuppression = GiftService.suppressDefaultAllocations;
+		try {
+			GiftService.suppressDefaultAllocations = split || callerSuppression;
+			Database.insert(gift, true, AccessLevel.USER_MODE);
+		} finally {
+			GiftService.suppressDefaultAllocations = callerSuppression;
 		}
 	}
 
@@ -440,6 +461,14 @@ public with sharing class QuickGiftEntryController {
 		}
 	}
 
+	/** One fund and its share of a split gift. */
+	public class AllocationInput {
+		@AuraEnabled
+		public String fundId;
+		@AuraEnabled
+		public Decimal amount;
+	}
+
 	/** What came of a save. */
 	public class SaveResult {
 		@AuraEnabled
@@ -502,6 +531,62 @@ public with sharing class QuickGiftEntryController {
 		/** The employee's gift an organization's gift matches (R-G11). */
 		@AuraEnabled
 		public String matchedGiftId;
+		/** The funds the gift is split across, two or more; otherwise empty and fundId applies. */
+		@AuraEnabled
+		public List<AllocationInput> allocations;
+
+		public Boolean isSplit() {
+			return this.allocations != null && this.allocations.size() > 1;
+		}
+
+		/** One allocation row per fund in the split, all inserted with the gift. */
+		public List<Gift_Allocation__c> toAllocations(Id giftId) {
+			List<Gift_Allocation__c> rows = new List<Gift_Allocation__c>();
+			for (AllocationInput entry : this.allocations) {
+				rows.add(
+					new Gift_Allocation__c(
+						Gift__c = giftId,
+						Fund__c = asId(entry.fundId, Fund__c.SObjectType),
+						Amount__c = entry.amount
+					)
+				);
+			}
+			return rows;
+		}
+
+		/**
+		 * A split is for a gift of money: every row names its own fund and an amount above
+		 * zero, and the rows add up to the gift's amount exactly (R-GA1).
+		 */
+		private void validateSplit(List<FieldError> errors) {
+			if (!isSplit()) {
+				return;
+			}
+			Boolean fits = !isInKind() && this.amount != null;
+			Set<Id> funds = new Set<Id>();
+			Decimal total = 0;
+			for (AllocationInput entry : this.allocations) {
+				Id fundId = entry == null ? null : asId(entry.fundId, Fund__c.SObjectType);
+				if (
+					fundId == null ||
+					!funds.add(fundId) ||
+					entry.amount == null ||
+					entry.amount <= 0
+				) {
+					fits = false;
+					break;
+				}
+				total += entry.amount;
+			}
+			if (!fits || total != this.amount) {
+				errors.add(
+					new FieldError(
+						'allocations',
+						BarnHelp.text('Giving', 'Giving_QuickGiftEntry_ErrorSplit')
+					)
+				);
+			}
+		}
 
 		public List<FieldError> validate() {
 			List<FieldError> errors = new List<FieldError>();
@@ -529,6 +614,7 @@ public with sharing class QuickGiftEntryController {
 			validatePayment(errors);
 			validateTribute(errors);
 			validateMatch(errors);
+			validateSplit(errors);
 			return errors;
 		}
 

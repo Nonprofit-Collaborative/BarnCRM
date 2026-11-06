@@ -142,6 +142,16 @@
                         data-id="donor"
                         onchange={handleDonor}
                       ></lightning-record-picker>
+                      <template lwc:if={offerNewPerson}>
+                        <lightning-button
+                          variant="base"
+                          label={labels.newPerson}
+                          icon-name="utility:add"
+                          data-key={row.key}
+                          data-id="new-person"
+                          onclick={handleNewPerson}
+                        ></lightning-button>
+                      </template>
                     </template>
                     <template lwc:else>
                       <lightning-record-picker

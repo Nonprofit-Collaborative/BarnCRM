@@ -43,6 +43,8 @@ import errorUnexpected from '@salesforce/label/c.Giving_QuickGiftEntry_ErrorUnex
 import fundNotApplied from '@salesforce/label/c.Giving_QuickGiftEntry_FundNotApplied';
 import tributeSection from '@salesforce/label/c.Giving_QuickGiftEntry_TributeSection';
 import matchSection from '@salesforce/label/c.Giving_QuickGiftEntry_MatchSection';
+import splitSection from '@salesforce/label/c.Giving_QuickGiftEntry_SplitSection';
+import HouseholdAddMemberModal from 'c/householdAddMemberModal';
 import matchNone from '@salesforce/label/c.Core_AccessCompare_None';
 import paysLabel from '@salesforce/label/c.Giving_GiftEntryPays_Label';
 import paysNone from '@salesforce/label/c.Giving_GiftEntryPays_None';
@@ -85,11 +87,17 @@ const FIELD_ORDER = [
   ['fundId', 'fund'],
   ['tributeType', 'tribute-type'],
   ['honoree', 'honoree', 'honoree-name'],
-  ['matchedGiftId', 'matched-gift']
+  ['matchedGiftId', 'matched-gift'],
+  ['allocations', 'split']
 ];
 
 /** Which collapsed section holds the field a message is about, so it can be opened. */
-const SECTION_OF = { tributeType: 'tribute', honoree: 'tribute', matchedGiftId: 'match' };
+const SECTION_OF = {
+  tributeType: 'tribute',
+  honoree: 'tribute',
+  matchedGiftId: 'match',
+  allocations: 'split'
+};
 
 /**
  * One line of the "Matches an Employee's Gift" list: who gave, how much and when, then the
@@ -197,7 +205,8 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     },
     get matchEmpty() {
       return helpText('Giving', 'Giving_QuickGiftEntry_MatchEmpty');
-    }
+    },
+    splitSection
   };
 
   donorKind = PERSON;
@@ -232,6 +241,8 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
   matchChoices = [];
   matchLoaded = false;
   matchLookup = 0;
+  /** The funds the gift is split across (people-giving-16), as { fundId, amount }. */
+  allocations = [];
   /** The collapsed sections the person has opened. */
   openSections = [];
 
@@ -573,6 +584,7 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     if (this.isInKindGift) {
       this.amount = undefined;
       this.matchedGiftId = '';
+      this.allocations = [];
     } else {
       this.inKindDescription = undefined;
       this.fairMarketValue = undefined;
@@ -605,6 +617,21 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     this.fundId = event.detail ? event.detail.recordId : undefined;
   }
 
+  /** Two or more funds make a split; it then replaces the single Fund for this gift. */
+  get isSplit() {
+    return this.isMoneyGift && this.allocations.length > 1;
+  }
+
+  get splitError() {
+    return this.fieldErrors.allocations;
+  }
+
+  handleSplitChange(event) {
+    this.markChanged(event);
+    const detail = event.detail || {};
+    this.allocations = Array.isArray(detail.allocations) ? detail.allocations : [];
+  }
+
   /**
    * Any edit makes this a gift that has not been saved yet, and takes away the controller's
    * message from the field being edited: the person is fixing it.
@@ -621,8 +648,27 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     }
   }
 
-  /** New person: the standard new record form, so the person is created the usual way. */
-  handleNewPerson() {
+  /**
+   * New person (people-giving-13): a window over this form creates the person and makes them
+   * the donor, so nothing typed so far is lost. Where people are accounts, the standard new
+   * record form is used instead, because the window creates a contact.
+   */
+  async handleNewPerson() {
+    if (!this.hasPersonAccounts) {
+      const created = await HouseholdAddMemberModal.open({
+        label: newPerson,
+        size: 'small',
+        mode: 'person'
+      });
+      if (created && created.id) {
+        this.markChanged();
+        this.donorKind = PERSON;
+        this.donorId = created.id;
+        this.forgetMatch();
+        this.schedulePaymentLookup();
+      }
+      return;
+    }
     this[NavigationMixin.Navigate]({
       type: 'standard__objectPage',
       attributes: { objectApiName: this.personObjectApiName, actionName: 'new' },
@@ -791,7 +837,13 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
       honoreeName: this.honoreeName || null,
       notifyId: this.notifyId || null,
       notifyName: this.notifyName || null,
-      matchedGiftId: this.showMatch && this.matchedGiftId ? this.matchedGiftId : null
+      matchedGiftId: this.showMatch && this.matchedGiftId ? this.matchedGiftId : null,
+      allocations: this.isSplit
+        ? this.allocations.map((entry) => ({
+            fundId: entry.fundId || null,
+            amount: this.numberOrNull(entry.amount)
+          }))
+        : null
     };
   }
 
@@ -888,6 +940,7 @@ export default class QuickGiftEntry extends NavigationMixin(LightningElement) {
     TRIBUTE_FIELDS.forEach((field) => {
       this[field] = undefined;
     });
+    this.allocations = [];
     this.openSections = [];
     this.forgetPayment();
     this.forgetMatch();
