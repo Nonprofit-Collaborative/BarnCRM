@@ -419,6 +419,25 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the program. | The highlights header is at the top; the tabs **People**, **Attendance**, **Sessions**, **Eligibility** and **Details** show, with **People** open on the **Program Roster** panel. **Services**, **Enrollments** and **Cohorts** lists are at the side. |
+| 1 | Open the program. | The highlights header is at the top; the tabs **People**, **Attendance**, **Sessions**, **Eligibility** and **Details** show, with **People** open on the **Program Roster** panel. **Services**, **Enrollments**, **Cohorts** and **Session Schedules** lists are at the side. |
 | 2 | Click each tab in turn. | **Attendance**: the **Service Delivery Log**. **Sessions**: **Schedule Sessions**. **Eligibility**: **Eligibility Rules**. **Details**: the program's fields. |
 | 3 | Open the program in the Salesforce mobile app. | The same tabs show, with the lists under them. |
+
+## T-PRG-25: Repeating Session Schedules
+
+**Purpose:** confirm a session schedule creates its sessions eight weeks ahead, never deletes one when edited or ended, and that Remove Future Sessions keeps attended sessions (modules-24, D-183).
+**Prerequisites:** the admin user; the staff user (Programs Staff); the Read Only user; a program with an active service "Tutoring" and a cohort "Spring" with a member.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the staff user, on the cohort's **Schedule Sessions** panel, pick Tutoring, From today, To three months ahead, tick Tuesday and Thursday, Start Time 16:00, End Time 17:30. Click **Save as Repeating Schedule**. | "Repeating schedule saved. Sessions created: N." with N the Tuesdays and Thursdays of the next eight weeks. The cohort's **Session Schedules** list shows "Tutoring, Spring"; its **Sessions** list shows the sessions with both times. |
+| 2 | Open the schedule. | The side panel says every session is created through a day eight weeks ahead, and that edits apply after that day. **Create Sessions Now** is off; the related **Sessions** list shows the same sessions. |
+| 3 | Click **Save as Repeating Schedule** again on the panel with the same values. | A second schedule is saved but creates no session: every day already has one for the cohort. Delete that second schedule; its sessions list was empty and nothing else changes. |
+| 4 | On the schedule, change **Days of the Week** to Wednesday. Save. | No session is deleted or moved; the panel still says sessions exist through the same day. |
+| 5 | Take attendance on the first upcoming session (mark the member Present and save). As the admin user, open the schedule and click **Remove Future Sessions**, then **Cancel** in the confirm. | Nothing changes. |
+| 6 | Click **Remove Future Sessions** again and confirm. | "Sessions removed: N." The attended session and any session dated today stay; the other upcoming Tuesday and Thursday sessions are replaced by Wednesday sessions at the same times. |
+| 7 | Untick **Active** and save. | The panel says the schedule is not active and creates no new sessions; every session stays. |
+| 8 | As the staff user, open the schedule. | **Remove Future Sessions** is not offered (staff cannot delete sessions). As the Read Only user, the schedule shows with no buttons and cannot be edited. |
+| 9 | Try to delete the cohort. | Refused while it has a session schedule. |
+
+**Cleanup:** delete the schedule (its sessions stay), then the sessions without attendance.

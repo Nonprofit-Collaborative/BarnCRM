@@ -9,6 +9,30 @@
         <value>Session Schedules</value>
     </labels>
     <labels>
+        <fullName>Programs_Schedule_CreateNow</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Session schedule: create its missing sessions now</shortDescription>
+        <value>Create Sessions Now</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_RemoveFuture</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Session schedule: remove its unattended future sessions</shortDescription>
+        <value>Remove Future Sessions</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Schedule_SaveRepeating</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Schedule sessions: save the pattern as a repeating schedule</shortDescription>
+        <value>Save as Repeating Schedule</value>
+    </labels>
+    <labels>
         <fullName>Programs_Enrollment_AlreadyOpen</fullName>
         <categories>Programs</categories>
         <language>en_US</language>

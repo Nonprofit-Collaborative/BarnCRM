@@ -417,12 +417,41 @@ page (sessions with no cohort), creates many sessions at once:
 3. The panel shows how many sessions that makes. Click **Schedule**. One Scheduled session is
    created for each chosen weekday between the two dates, named after the service and the date.
 
-At most 200 sessions are created at a time. Nothing keeps the pattern: each session is then
+At most 200 sessions are created at a time. **Schedule** keeps no pattern: each session is then
 edited or cancelled on its own. Running it again does not duplicate: days that already have a
 session of the same service for the same cohort (on the program page, sessions with no cohort),
 other than Cancelled sessions, are skipped, and the preview and the result say how many ("Days
 that already have a session are skipped: 2."). **Schedule** is disabled when every chosen day
 already has one.
+
+### Repeating Session Schedules
+
+A **Session Schedule** keeps a pattern and creates its sessions for you, the way a Volunteers
+shift schedule creates shifts (modules-24). It belongs to a program and names a **Service**, an
+optional **Cohort**, the **Days of the Week**, **Repeat Every (Weeks)**, a **Start Time** and
+**End Time**, a **Start Date** and an optional **End Date**, and **Active**.
+
+- **Make one** with **Save as Repeating Schedule** on the **Schedule Sessions** panel (a weekly
+  schedule from the panel's service, cohort, dates, days and times), or with **New** in the
+  **Session Schedules** list on the program or cohort page. There is no tab.
+- **What it creates.** An active schedule keeps Scheduled sessions created from today to eight
+  weeks ahead (or its End Date), on save, every night (the **Session Schedules** step of the
+  nightly run, 3:10 AM) and when you click **Create Sessions Now** on the schedule page. A day
+  that already has a session of the schedule, or a session of the same service for the same
+  cohort that is not Cancelled, is skipped. The schedule page says how many sessions the next
+  run creates and through which day.
+- **Editing or ending never deletes a session.** A change to the days or times applies after
+  the last day already created (**Created Through**). Untick **Active**, set an earlier **End
+  Date** or delete the schedule and it only stops creating sessions.
+- **Remove Future Sessions** on the schedule page, after a confirm, deletes the schedule's
+  sessions after today that are still Scheduled and have no attendance, then an active schedule
+  creates those days again from its current pattern. Held, cancelled and attended sessions
+  stay. Only users who may delete sessions (Programs Admin) see it.
+- **Access.** Programs Admin creates, edits and deletes schedules; Programs Staff create and
+  edit them; Programs Read Only reads them. A service or cohort with schedules cannot be deleted
+  until its schedules are.
+- **Automation.** The **Session schedule: create its sessions** row on the Automation page can
+  be switched off; sessions then appear with the nightly run or **Create Sessions Now**.
 
 ### Taking Attendance on a Session
 

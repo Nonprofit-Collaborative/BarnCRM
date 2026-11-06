@@ -78,7 +78,16 @@
         </div>
         <p data-id="preview" class="slds-text-body_small slds-var-m-top_small" aria-live="polite">{preview}</p>
         <div role="status" data-id="result" class="slds-var-m-vertical_small">{resultMessage}</div>
-        <div class="slds-grid slds-grid_align-end slds-var-m-bottom_small">
+        <div class="slds-grid slds-grid_align-end slds-wrap slds-gutters_xx-small slds-var-m-bottom_small">
+          <template lwc:if={canSaveSchedule}>
+            <lightning-button
+              data-id="save-repeating"
+              class="slds-var-m-right_x-small"
+              label={labels.saveRepeating}
+              disabled={saveRepeatingDisabled}
+              onclick={handleSaveRepeating}
+            ></lightning-button>
+          </template>
           <lightning-button
             data-id="schedule"
             variant="brand"

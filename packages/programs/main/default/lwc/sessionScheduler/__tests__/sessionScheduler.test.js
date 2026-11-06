@@ -3,6 +3,7 @@ import SessionScheduler from 'c/sessionScheduler';
 import getSchedule from '@salesforce/apex/SessionScheduleController.getSchedule';
 import scheduleSessions from '@salesforce/apex/SessionScheduleController.scheduleSessions';
 import getTakenDays from '@salesforce/apex/SessionScheduleController.getTakenDays';
+import saveRepeatingSchedule from '@salesforce/apex/SessionScheduleController.saveRepeatingSchedule';
 import {
   MAX_SESSIONS,
   countMessage,
@@ -25,6 +26,11 @@ jest.mock(
 );
 jest.mock(
   '@salesforce/apex/SessionScheduleController.scheduleSessions',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/SessionScheduleController.saveRepeatingSchedule',
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -203,6 +209,47 @@ describe('c-session-scheduler', () => {
     });
     expect(q(element, 'result').textContent).toBe('4 made');
     expect(refreshed).toHaveBeenCalled();
+  });
+
+  it('saves the pattern as a repeating schedule', async () => {
+    getSchedule.mockResolvedValue(scheduleOf({ canSaveSchedule: true }));
+    saveRepeatingSchedule.mockResolvedValue(
+      scheduleOf({ canSaveSchedule: true, created: 4, scheduleId: 'a0T000000000001AAA' })
+    );
+    const element = await render();
+    expect(q(element, 'save-repeating').disabled).toBe(true);
+    q(element, 'weekdays').dispatchEvent(
+      new CustomEvent('change', { detail: { value: ['1', '3'] } })
+    );
+    await flush();
+    const refreshed = jest.fn();
+    element.addEventListener('lightning__refresh', refreshed);
+    q(element, 'save-repeating').click();
+    await flush();
+    expect(saveRepeatingSchedule).toHaveBeenCalledWith({
+      recordId: COHORT_ID,
+      serviceId: SERVICE_ID,
+      fromDate: '2027-03-01',
+      toDate: '2027-03-14',
+      weekdays: ['1', '3'],
+      startTime: null,
+      endTime: null
+    });
+    expect(q(element, 'result').textContent).toContain('Programs_Schedule_SavedRepeating');
+    expect(refreshed).toHaveBeenCalled();
+
+    saveRepeatingSchedule.mockRejectedValue({ body: { message: 'Pick a day.' } });
+    q(element, 'weekdays').dispatchEvent(new CustomEvent('change', { detail: { value: ['1'] } }));
+    await flush();
+    q(element, 'save-repeating').click();
+    await flush();
+    expect(q(element, 'error-message').message).toContain('Pick a day.');
+  });
+
+  it('offers no repeating schedule without access to schedules', async () => {
+    getSchedule.mockResolvedValue(scheduleOf());
+    const element = await render();
+    expect(q(element, 'save-repeating')).toBeNull();
   });
 
   it('changes the service and dates, and shows a refusal', async () => {

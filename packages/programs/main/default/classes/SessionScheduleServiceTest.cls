@@ -5,7 +5,7 @@
  * (R-SS1).
  */
 @IsTest(
-	testFor='ApexClass:SessionScheduleService, ApexClass:SessionScheduleSelector, ApexClass:SessionScheduleBatch, ApexClass:SessionScheduleJob, ApexClass:SessionScheduleTriggerHandler, ApexClass:ProgramsNightlyJobProvider'
+	testFor='ApexClass:SessionScheduleService, ApexClass:SessionScheduleSelector, ApexClass:SessionScheduleBatch, ApexClass:SessionScheduleJob, ApexClass:SessionScheduleTriggerHandler, ApexClass:ProgramsNightlyJobProvider, ApexClass:SessionScheduleController'
 )
 private class SessionScheduleServiceTest {
 	private static final String ADMIN = 'Programs_Admin';
@@ -278,6 +278,79 @@ private class SessionScheduleServiceTest {
 			for (Database.SaveResult result : results) {
 				Assert.isFalse(result.isSuccess(), 'R-SS1 refuses it.');
 			}
+		}
+	}
+
+	// ------------------------------------------------------------------------------ the panels
+
+	@IsTest
+	static void thePanelSavesItsPatternAsARepeatingSchedule() {
+		System.runAs(admin()) {
+			Service__c service = tutoring();
+			Cohort__c spring = new Cohort__c(Name = 'Spring', Program__c = service.Program__c);
+			insert spring;
+
+			Test.startTest();
+			SessionScheduleController.Schedule saved = SessionScheduleController.saveRepeatingSchedule(
+				spring.Id,
+				service.Id,
+				MONDAY,
+				MONDAY.addDays(13),
+				new List<String>{ '1', '3' },
+				'16:00',
+				null
+			);
+			Test.stopTest();
+
+			Assert.isTrue(saved.canSaveSchedule, 'The admin may save schedules.');
+			Assert.areEqual(4, saved.created, 'Two Mondays and two Wednesdays.');
+			Session_Schedule__c schedule = [
+				SELECT Name, Cohort__c, Weekdays__c, Every_N_Weeks__c, End_Date__c
+				FROM Session_Schedule__c
+				WHERE Id = :saved.scheduleId
+				WITH SYSTEM_MODE
+			];
+			Assert.areEqual('Tutoring, Spring', schedule.Name);
+			Assert.areEqual(spring.Id, schedule.Cohort__c);
+			Assert.areEqual('Monday;Wednesday', schedule.Weekdays__c);
+			Assert.areEqual(1, schedule.Every_N_Weeks__c);
+			Assert.areEqual(spring.Id, sessionsOf(schedule.Id)[0].Cohort__c, 'For the cohort.');
+		}
+	}
+
+	@IsTest
+	static void theSchedulePagePreviewsCreatesAndRemoves() {
+		System.runAs(admin()) {
+			Service__c service = tutoring();
+			Session_Schedule__c schedule = scheduleOf(service, 'Tuesday;Thursday', 1);
+			insert schedule;
+
+			Test.startTest();
+			SessionScheduleController.Preview before = SessionScheduleController.getSchedulePreview(
+				schedule.Id
+			);
+			SessionScheduleController.Preview created = SessionScheduleController.createSessionsNow(
+				schedule.Id
+			);
+			SessionScheduleController.Preview removed = SessionScheduleController.removeFutureSessions(
+				schedule.Id
+			);
+			String refusal;
+			try {
+				SessionScheduleController.getSchedulePreview(null);
+			} catch (AuraHandledException refused) {
+				refusal = refused.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.areEqual(16, before.missing);
+			Assert.isTrue(before.canCreate && before.canRemove, 'The admin may do both.');
+			Assert.areEqual(MONDAY.addDays(56), before.through);
+			Assert.areEqual(16, created.created);
+			Assert.areEqual(0, created.missing);
+			Assert.areEqual(16, removed.removed, 'None attended: all removed, then recreated.');
+			Assert.areEqual(16, sessionsOf(schedule.Id).size());
+			Assert.areEqual(BarnHelp.text('Programs', 'Programs_Fail_Schedule'), refusal);
 		}
 	}
 }

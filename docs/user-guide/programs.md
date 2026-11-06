@@ -28,8 +28,8 @@ you work with, ask your admin (see
 
 You should see: a program page with tabs: **People** (the **Program Roster** panel, open
 first), **Attendance** (the **Service Delivery Log**), **Sessions** (**Schedule Sessions**),
-**Eligibility** (the **Eligibility Rules**) and **Details**. The **Services**, **Enrollments** and
-**Cohorts** lists are at the side (below the tabs on a phone).
+**Eligibility** (the **Eligibility Rules**) and **Details**. The **Services**, **Enrollments**,
+**Cohorts** and **Session Schedules** lists are at the side (below the tabs on a phone).
 
 ## To Create a Program and Its Services
 
@@ -280,6 +280,24 @@ You should see: "12 sessions scheduled." (with the skipped count when there is o
 "2 sessions scheduled. Days that already have a session are skipped: 2."). The sessions are in the cohort's **Sessions** list and
 on the **Sessions** tab. To move or call off one session, open it and edit its date or set its
 **Status** to **Cancelled**.
+
+## To Keep Sessions Coming Every Week
+
+For a class that runs until you stop it, save the pattern as a repeating schedule instead.
+
+1. Fill in the **Schedule Sessions** panel as above and click **Save as Repeating Schedule**.
+   (Or click **New** in the **Session Schedules** list on the program or cohort, and set
+   **Repeat Every (Weeks)** to 2 for every other week.)
+2. Open the schedule from **Session Schedules**. Its panel says, for example, "Every session is
+   created through 26 Apr 2027. BarnCRM adds more each night."
+
+BarnCRM keeps sessions created eight weeks ahead. To change the days or times, edit the
+schedule: the change applies after the last day already created. To end it, untick **Active**
+or set an **End Date**; the sessions already made stay. An admin can click **Remove Future
+Sessions** on the schedule to replace the upcoming sessions that have no attendance yet.
+
+You should see: "Repeating schedule saved. Sessions created: 12. ..." under the panel, and the
+new sessions in the **Sessions** list.
 
 ## To Take Attendance at a Session
 
