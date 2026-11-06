@@ -70,7 +70,6 @@
   <tabs>Data_Manager</tabs>
   <tabs>Data_Hygiene</tabs>
   <tabs>Duplicate_Matching</tabs>
-  <tabs>Record_Inspector</tabs>
   <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
   <workspaceConfig>
@@ -85,9 +84,6 @@
     </mappings>
     <mappings>
       <tab>Duplicate_Matching</tab>
-    </mappings>
-    <mappings>
-      <tab>Record_Inspector</tab>
     </mappings>
     <mappings>
       <tab>Error_Log__c</tab>
