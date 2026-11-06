@@ -177,6 +177,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0166](0166-nightly-job-dispatcher.md) | One nightly job dispatcher runs every BarnCRM nightly job in sequence | Accepted |
 | [0167](0167-record-glance-extension.md) | Modules add a glance card to Core's record pages through an extension seam | Proposed |
 | [0168](0168-household-duplicates-need-evidence.md) | A household pair from the org's duplicate rules is shown only with household evidence (narrows 0050) | Accepted |
+| [0169](0169-field-use-required-and-defaults.md) | Field Use shows required, default value and at default; required fields and checkboxes are counted | Accepted |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

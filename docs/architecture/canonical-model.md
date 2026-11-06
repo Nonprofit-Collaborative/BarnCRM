@@ -8535,8 +8535,8 @@ or big object), minus this object; every call checks the chosen name against the
 again. Fields come from that object's describe. No typed text reaches a query.
 **R-FU2 What is counted.** A field is counted when the runner can read it and either create or
 edit it, and it is not a formula, roll-up, auto number or compound (address or location)
-field. Required (non-nillable) fields and checkboxes are counted (ADR-NEXT
-field-use-required-and-defaults; ADR-0086 left them out); a checkbox is never empty, so it is
+field. Required (non-nillable) fields and checkboxes are counted (ADR-0169;
+ADR-0086 left them out); a checkbox is never empty, so it is
 filled on every record and needs no count query.
 **R-FU3 User mode.** Every count, read and write is in user mode, so a count covers the records
 the person on the page can see. Written into the page and the admin guide.
@@ -12620,7 +12620,7 @@ mirrors the primary member).
 | 0.17 | 2026-11-04 | Automation page manages Automation Control (RT-13, same ADR, decisions 2.6 to 2.8). Section 10 gains rule R-A8: org, profile and user rows edited in the console, an org's own flows listed as `Flow:` switch rows, and Catch Up Now. No object or field added. |
 | 0.17 | 2026-11-04 | Household Upkeep and NPSP (RT-04). Household Adoption (Section 29ZQ) gains rule R-HA6: Household Upkeep cannot be turned on while NPSP households are in use, detected by describe. No object or field added. |
 | 1.0 | 2026-11-05 | Settings picklist from a field. `Setting_Definition__mdt.Data_Type__c` gains PicklistFromField; its source field is named in the existing `Record_Object__c` as `Object.Field`. No new field. The Gift Transaction mirror paid status row uses it for Gift Transaction Status. |
-| 1.0 | 2026-11-05 | Field Use required, default value and at default (owner QA 2026-11-05, ADR-NEXT field-use-required-and-defaults). Section 29F: R-FU2 now counts required fields and checkboxes; new rules R-FU13 (Required and Default Value from describe) and R-FU14 (At Default, one more grouped count per field). No object or field added; snapshots unchanged. |
+| 1.0 | 2026-11-05 | Field Use required, default value and at default (owner QA 2026-11-05, ADR-0169). Section 29F: R-FU2 now counts required fields and checkboxes; new rules R-FU13 (Required and Default Value from describe) and R-FU14 (At Default, one more grouped count per field). No object or field added; snapshots unchanged. |
 
 ---
 ## 32. Entity ownership by package
