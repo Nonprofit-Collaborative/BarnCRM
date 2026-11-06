@@ -86,7 +86,7 @@ Use this when a donor asks for part of a gift to go to another fund, for example
 
 You should see: "Funds saved. The gift's allocations now match the split." and one row per fund. With two or more funds you can also drag a divider on the bar under the rows, or select it and press the arrow keys, to move money between the two funds beside it.
 
-If **Edit Funds** is missing and the card says "This gift is in the books", the gift is posted to accounting or dated in a closed period: record a refund instead, or ask your bookkeeper. Removing a fund from a gift needs an admin unless you hold **Giving Admin**.
+If **Edit Funds** is missing and the card says "This gift is in the books", the gift is posted to accounting or dated in a closed period: record a refund instead, or ask your bookkeeper. **Giving Staff** and **Giving Admin** can remove a fund from a gift; if the editor says you cannot, ask your BarnCRM admin.
 
 ## To Add a Soft Credit
 

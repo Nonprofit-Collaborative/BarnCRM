@@ -106,8 +106,9 @@ refund instead", in place of **Edit Funds**.
 Access: the person needs create and edit on Gift Allocations (**Giving Staff** and **Giving
 Admin** have both) and the `GiftAllocationController` class (both, and **Giving Read Only**
 to see the card). Taking a fund off a gift deletes an allocation, which needs delete on Gift
-Allocations: **Giving Admin** has it, **Giving Staff** does not, so staff can move money
-between funds and add funds but are told to ask an admin to remove one. Quick Gift Entry
+Allocations: **Giving Admin** and **Giving Staff** both have it (plan D-176), so staff can
+correct a split without an admin. A custom permission set without delete can still move money
+between funds and add funds, and is told to ask an admin to remove one. Quick Gift Entry
 offers the same editor as **Split Across Funds** for a new gift.
 
 ## Lifting the Receipt Lock
