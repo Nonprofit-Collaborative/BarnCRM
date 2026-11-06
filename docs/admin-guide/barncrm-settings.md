@@ -53,7 +53,7 @@ finishing; anyone else can close it (see below).
 Every Core feature starts off, so its automation is held: no household is created for a new
 contact, no address is copied, no reciprocal relationship is made, no primary affiliation is
 set and no preferred email is filled in. Households are caught up automatically: when
-**Household Upkeep** is turned on (in first-run setup or in **General**), BarnCRM gives a
+**Households** is turned on (in first-run setup or in **General**), BarnCRM gives a
 household to every person added while it was off, in the background, usually within a few
 minutes, exactly as it would have when they were saved. That includes people stored as
 accounts (Person Accounts) when your org uses the flexible way of belonging to a household:
@@ -124,7 +124,7 @@ to the people who should see them, shows its settings, and starts its automation
 | Data Manager | Data Manager, Import, Find and Super Transformer | Those four tabs and the Import section |
 | Duplicate Matching | Duplicate suggestions, review and matching logic | The Duplicate Matching tab and the Duplicate Matching section |
 | Org Optimizer and Health Check | The Org Optimizer tab and Health Check | The Org Optimizer tab, the Health section and the Org Optimizer section (its three thresholds) |
-| Household upkeep | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
+| Households | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
 | Addresses | Address capture and the primary address | Its three automations and the Addresses section |
 | Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships box on People and Households |
 | Affiliations | The primary affiliation | Its automation |
@@ -146,7 +146,7 @@ roles given in Setup or by user access policies). A large org may take a few min
 up. Do not assign the BarnCRM Tab permission sets by hand: the hourly run removes them from
 anyone who should not have them.
 
-The Households tab works the same way. **Household Upkeep** carries the **BarnCRM Households**
+The Households tab works the same way. **Households** carries the **BarnCRM Households**
 permission set, which shows the Households tab and nothing else (it gives no record type). Once
 the feature is on, BarnCRM gives it to everyone with a BarnCRM Admin, Staff or Read Only role.
 
@@ -331,7 +331,7 @@ parts separated by commas.
 
 ### Record Type for Organizations
 
-**General** always shows **Record type for organizations**, whether or not Household Upkeep is
+**General** always shows **Record type for organizations**, whether or not Households is
 on, because import, addresses and Giving use organizations either way. Accounts of the record
 type chosen here are your organizations: they appear on the **Organizations** tab, get the
 organization parts of the record page, are matched as organizations by import, and an import

@@ -15,7 +15,7 @@ The templates only name columns. Nothing in BarnCRM depends on NPSP being instal
 If BarnCRM is installed in the same org as NPSP, start by adopting NPSP's households in place
 ([Adopting Your NPSP Households](npsp-households.md)) rather than loading the contacts file:
 your people are already there. Then set NPSP's Account Model to One-to-One or Individual and
-turn on Household Upkeep, in that order: BarnCRM does not let Household Upkeep on while NPSP
+turn on Households, in that order: BarnCRM does not let Households on while NPSP
 households are in use.
 
 ## 2. How to Turn It On

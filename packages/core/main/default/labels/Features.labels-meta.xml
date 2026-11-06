@@ -13,8 +13,8 @@
         <categories>Core</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Name of the Household upkeep feature in Settings, General.</shortDescription>
-        <value>Household Upkeep</value>
+        <shortDescription>Name of the Households feature in Settings, General.</shortDescription>
+        <value>Households</value>
     </labels>
     <labels>
         <fullName>Core_Feature_Addresses_Name</fullName>

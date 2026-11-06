@@ -2,7 +2,7 @@
 
 Scripts for people, households, the Members and Household panels, names and greetings, merge and split, preferred phone, interaction notes and the record pages. Setup detail: [Households](../admin-guide/households.md), [Household members](../admin-guide/household-members.md), [Household names and greetings](../admin-guide/household-naming.md), [Merging and splitting households](../admin-guide/household-merge-split.md), [Preferred phone](../admin-guide/preferred-phone.md), [Interaction notes](../admin-guide/interaction-notes.md), [Record pages](../admin-guide/record-pages.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. T-HH-14 needs a person account, so skip it there. The **Household Upkeep** and **Preferred Email and Phone** features must be on (BarnCRM Settings, **General**). Open every record from the **BarnCRM** app. Check which way of belonging the org uses (BarnCRM Settings, **People and Households**, **How people belong to a household**): **One household per person (simple)** or **A person can belong to more than one household (flexible)**. Steps that differ between the two say so. The sample people are contacts in both org shapes.
+Before you start: an org from [Before you test](before-you-test.md), with Core deployed and sample data loaded unless a script says otherwise. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data: create the Zztest fixture first and read Garcia as Zztest. T-HH-14 needs a person account, so skip it there. The **Households** and **Preferred Email and Phone** features must be on (BarnCRM Settings, **General**). Open every record from the **BarnCRM** app. Check which way of belonging the org uses (BarnCRM Settings, **People and Households**, **How people belong to a household**): **One household per person (simple)** or **A person can belong to more than one household (flexible)**. Steps that differ between the two say so. The sample people are contacts in both org shapes.
 
 ## T-HH-01: A New Person Gets a Household
 
@@ -263,9 +263,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete both contacts and their households, then deactivate the duplicate rule.
 
-## T-HH-18: Households Tab Only While Household Upkeep Is On, Household Record Type Never Offered
+## T-HH-18: Households Tab Only While Households Is On, Household Record Type Never Offered
 
-**Purpose:** no install adds a record type anyone can pick; turning Household Upkeep on shows the Households tab to BarnCRM role holders, and households are still made only by BarnCRM.
+**Purpose:** no install adds a record type anyone can pick; turning Households on shows the Households tab to BarnCRM role holders, and households are still made only by BarnCRM.
 **Prerequisites:** a fresh scratch org of the Platform-only shape (no Account record types) with Core deployed and first-run setup not finished; a staff user with the Staff role.
 
 | Step | Action | Expected result |
@@ -273,7 +273,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 1 | As the staff user, open the **BarnCRM** app. | No **Households** tab. |
 | 2 | As the staff user, open Accounts and click **New**. | No record type choice; the new account form opens straight away. |
 | 3 | As admin, in Setup, open Object Manager, Account, Record Types. | **Household** is listed and active. No **Organization** record type. |
-| 4 | As admin, finish first-run setup with **Household Upkeep** ticked (or choose **Turn On** in its row on **General**). | The confirmation says Household Upkeep adds the Households tab and that households are created with **New Household** on BarnCRM Home, not the standard **New** button. |
+| 4 | As admin, finish first-run setup with **Households** ticked (or choose **Turn On** in its row on **General**). | The confirmation says Households adds the Households tab and that households are created with **New Household** on BarnCRM Home, not the standard **New** button. |
 | 5 | Wait a few minutes. As the staff user, reload the **BarnCRM** app. | The **Households** tab is there. |
 | 6 | As the staff user, open Accounts and click **New**. | Still no record type choice and no **Household**; the account saves with no record type and appears on **Organizations**, not **Households**. |
 | 7 | As the staff user, click **New Household** on BarnCRM Home, save, then edit the household's phone and save. | The household is created and appears on the **Households** tab; the edit saves. |
@@ -282,7 +282,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 10 | As admin, in Setup, open the staff user's permission set assignments, then the **BarnCRM Households** permission set's record type settings. | **BarnCRM Households** is assigned; it grants no record type. |
 | 11 | In an org that already ran BarnCRM before this change, deploy it, then as admin open **BarnCRM Staff** and its record type settings. | **Household** is no longer listed; staff can still open and edit existing households. |
 
-**Cleanup:** none (Household Upkeep cannot be turned off).
+**Cleanup:** none (Households cannot be turned off).
 
 ## T-HH-19: Record Type for Organizations Is Detected and Can Be Changed
 
@@ -338,17 +338,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** none after step 8.
 
-## T-HH-22: Household Upkeep Waits While NPSP Households Are in Use
+## T-HH-22: Households Waits While NPSP Households Are in Use
 
-**Purpose:** BarnCRM and NPSP never both make a household for the same person ([Then Turn On Household Upkeep](../admin-guide/npsp-households.md#then-turn-on-household-upkeep)).
-**Prerequisites:** admin; Household Upkeep off. Step 1 runs in an org without NPSP; steps 2 to 5 need **an org with NPSP installed** whose Account Model is **Household Account**, with at least one NPSP household. BarnCRM's own tests use a stand-in for NPSP.
+**Purpose:** BarnCRM and NPSP never both make a household for the same person ([Then Turn On Households](../admin-guide/npsp-households.md#then-turn-on-households)).
+**Prerequisites:** admin; Households off. Step 1 runs in an org without NPSP; steps 2 to 5 need **an org with NPSP installed** whose Account Model is **Household Account**, with at least one NPSP household. BarnCRM's own tests use a stand-in for NPSP.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In an org without NPSP, open **BarnCRM Settings**, **General**, **Features**. | The **Household Upkeep** row has **Turn On** and no NPSP explanation. |
-| 2 | In the NPSP org, open the same row. | The row says NPSP households are still in use, with the steps, and offers no **Turn On**. In first-run setup the **Household Upkeep** box is unticked and cannot be ticked, and finishing turns the other ticked features on. |
+| 1 | In an org without NPSP, open **BarnCRM Settings**, **General**, **Features**. | The **Households** row has **Turn On** and no NPSP explanation. |
+| 2 | In the NPSP org, open the same row. | The row says NPSP households are still in use, with the steps, and offers no **Turn On**. In first-run setup the **Households** box is unticked and cannot be ticked, and finishing turns the other ticked features on. |
 | 3 | Adopt every NPSP household (T-HH-21 steps 4 and 5) and return. | The row still shows the explanation: NPSP's Account Model is still Household Account. |
 | 4 | In NPSP Settings, set **Account Model** to **One-to-One** and save. Return to **Features**. | The explanation is gone and **Turn On** is offered. |
-| 5 | Choose **Turn On** and confirm. | Household Upkeep is on. Add a contact: it gets one BarnCRM household, and NPSP makes no household account for it. |
+| 5 | Choose **Turn On** and confirm. | Households is on. Add a contact: it gets one BarnCRM household, and NPSP makes no household account for it. |
 
-**Cleanup:** none (Household Upkeep cannot be turned off).
+**Cleanup:** none (Households cannot be turned off).

@@ -17,7 +17,7 @@ What loads, exactly:
 
 | Records | How many | What is in them |
 |---|---|---|
-| Households | 200 | Shared surnames, different surnames, hyphenated names, single-person households, ten three-generation households, five with a deceased member, three with a custom name (each keeps the name it was given and still gets a formal and an informal greeting from its people, whether Household Upkeep is on or off) |
+| Households | 200 | Shared surnames, different surnames, hyphenated names, single-person households, ten three-generation households, five with a deceased member, three with a custom name (each keeps the name it was given and still gets a formal and an informal greeting from its people, whether Households is on or off) |
 | People | 440 | Heads, partners, children, a few with preferred names |
 | Organizations | 25 | Local businesses, schools and a college, Rotary clubs, two foundations and a church |
 | Connections | 60 | Parents, siblings, friends, colleagues and grandparents in different households, a few marked Former; the other side of each one is created by the connection rules, as it would be for a connection you enter |
@@ -164,9 +164,9 @@ household records, names, greetings, member counts, and Members panel.
    naturally, for example "Mr. and Mrs." followed by the names, and a first-names-only
    informal greeting, because they were computed by the naming rules from the sample
    household's members. The load works out every sample household's name, greetings and
-   member count as the people are added, even while **Household Upkeep** is off, so the
+   member count as the people are added, even while **Households** is off, so the
    sample set always arrives fully named. Your own households are only kept up to date
-   while Household Upkeep is on.
+   while Households is on.
 4. Still on the Garcia household, look at the **Gifts** related list (Giving installed).
    The family has given in each of the last three years, which is what a renewing donor
    looks like in the retention report.
