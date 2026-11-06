@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    The grant record page in tabs (modules-7): Overview (details, Program and Giving Fund cards),
-    Money (Award Schedule, Payments, Restricted Fund Entries), Reporting (Requirements, Logic
-    Model Outcomes, Funder Report), Writing (Answer Library) and Related (every related list)
-    (F-01, F-03, F-05).
+    The grant record page in tabs (modules-7): Overview, Money, Reporting, Writing and Related,
+    each holding the grant's cards and related lists (F-01, F-03, F-05).
   </description>
   <flexiPageRegions>
     <itemInstances>
