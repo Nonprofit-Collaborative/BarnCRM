@@ -281,8 +281,8 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 7 | Drag the divider back to the middle with the mouse or a finger. | The split returns to about 50% each and the totals still leave 0.00 to assign. |
 | 8 | Choose **General Fund** in the second row too. | A warning: "Each fund can be chosen once. Put all of its amount on one row." **Save** is off. Choose **Building Fund** again. |
 | 9 | Click **Save**. | "Funds saved. The gift's allocations now match the split." Two rows, General Fund and Building Fund, adding up to 200.00. Building Fund's **Total Raised** includes its share after the next rollup. |
-| 10 | Click **Edit Funds**, delete the Building Fund row, set General Fund to 200.00, click **Save**. | Refused: "Taking a fund off a gift deletes its allocation, and you do not have delete access to Gift Allocations. Ask your BarnCRM admin to make this change." Nothing changes. |
-| 11 | Repeat step 10 as the Giving Admin user. | Saved: one row, General Fund 200.00. |
+| 10 | Still as the Giving Staff user, click **Edit Funds**, delete the Building Fund row, set General Fund to 200.00, click **Save**. | Saved: one row, General Fund 200.00. Giving Staff may delete Gift Allocations (plan D-176). |
+| 11 | Split the gift again (General Fund 100.00, Building Fund 100.00), then as the Giving Admin user repeat step 10. | Saved: one row, General Fund 200.00. |
 | 12 | Mark the gift posted on the **Accounting Export** page and reopen it. | **Edit Funds** is gone; an info notice reads "This gift is in the books (posted to accounting, or dated in a closed period), so its funds and amounts to each cannot change. Record a refund instead." |
 
 **Cleanup:** unpost the gift from its **Posting** card, then delete it.
