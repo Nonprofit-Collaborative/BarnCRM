@@ -340,7 +340,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As the staff user, open Test Person's enrollment. | The **Service Plan** panel is at the top, saying there are no goals yet, with **Add Goal**. |
+| 1 | As the staff user, open Test Person's enrollment. | The page has a header, a main column with **Service Plan** (open first) and **Details** tabs, and the related lists in the sidebar. The **Service Plan** tab says there are no goals yet, with **Add Goal**. |
 | 2 | Click **Add Goal**, type "Find stable housing", Status In Progress, a Target Date next month, a Next Review date of yesterday. Save. | The goal is listed with "Target (the date)" and **Review due**. |
 | 3 | Under the goal add the steps "Apply" and "Visit". Tick "Apply". | "1 of 2 steps done"; opening the step record shows today as Completed Date. Untick it: the Completed Date empties. |
 | 4 | Click **Mark Reviewed**. | A date three months on is offered. Save Review: Last reviewed is today, Next review the date offered, **Review due** is gone. |
@@ -361,7 +361,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As the staff user, open the program and, in **Cohorts**, click **New**. Name it "Spring", Start Date the first of next month, End Date two weeks later. Save. | The cohort opens with the **Cohort Members** panel ("Members (0)") and the **Schedule Sessions** panel. An End Date before the Start Date is refused. |
+| 1 | As the staff user, open the program and, in **Cohorts**, click **New**. Name it "Spring", Start Date the first of next month, End Date two weeks later. Save. | The cohort opens with **Members** (the **Cohort Members** panel, "Members (0)"), **Schedule** (the **Schedule Sessions** panel) and **Details** tabs in the main column and its related lists in the sidebar. An End Date before the Start Date is refused. |
 | 2 | Under **Add People**, tick Ana and Ben. Pick Cara under the person picker and click **Add to List**. Click **Add to Cohort**. | "3 people added." All three are members; Cara now has an Enrolled enrollment in the program, in the cohort. |
 | 3 | Pick Ana again, add her to the list and click **Add to Cohort**. | Ana is listed under **Not Added** with the reason; nobody is added twice. |
 | 4 | Click **Remove** by Ben. | Ben leaves the members and is offered again under the people to add; his enrollment stays, with no cohort. |

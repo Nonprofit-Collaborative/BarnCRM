@@ -2,7 +2,8 @@
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
     The cohort record page: the Cohort Members panel, where staff add many people at once, and
-    the Schedule Sessions panel, above the cohort's details and its sessions.
+    the Schedule Sessions panel, in tabs with the cohort's details, and its related lists in the
+    sidebar (D-184).
   </description>
   <flexiPageRegions>
     <itemInstances>
@@ -29,31 +30,107 @@
         <identifier>cohortMembersPanel</identifier>
       </componentInstance>
     </itemInstances>
+    <name>cohortMembersTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <componentInstance>
         <componentName>sessionScheduler</componentName>
         <identifier>sessionSchedulerPanel</identifier>
       </componentInstance>
     </itemInstances>
+    <name>cohortScheduleTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <componentInstance>
         <componentName>force:detailPanel</componentName>
         <identifier>cohortDetailPanel</identifier>
       </componentInstance>
     </itemInstances>
+    <name>cohortDetailsTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>active</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>cohortMembersTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Members</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>cohortMembersTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>cohortScheduleTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Schedule</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>cohortScheduleTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>cohortDetailsTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Standard.Tab.detail</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>cohortDetailsTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>cohortTabs</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>tabs</name>
+          <value>cohortTabs</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tabset</componentName>
+        <identifier>cohortTabset</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>main</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <componentInstance>
         <componentName>force:relatedListContainer</componentName>
         <identifier>cohortRelatedLists</identifier>
       </componentInstance>
     </itemInstances>
-    <name>main</name>
+    <name>sidebar</name>
     <type>Region</type>
   </flexiPageRegions>
   <masterLabel>Cohort Record Page</masterLabel>
   <sobjectType>Cohort__c</sobjectType>
   <template>
-    <name>flexipage:recordHomeSingleColTemplateDesktop</name>
+    <name>flexipage:recordHomeTemplateDesktop</name>
   </template>
   <type>RecordPage</type>
 </FlexiPage>

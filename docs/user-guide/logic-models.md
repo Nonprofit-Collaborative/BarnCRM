@@ -17,7 +17,7 @@ program.
 1. Click the **Logic Models** tab, then **New**.
 2. Type a **Name**, for example "Reading Program Model", and click **Save**.
 
-You should see: the model's page with the **Logic Model Builder** panel. **For** shows **The whole
+You should see: the model's page with the **Builder** tab (the **Logic Model Builder** panel), a **Details** tab and the related lists in the sidebar. **For** shows **The whole
 organization**. If the organization already has a model, the save is refused with `The
 organization already has a logic model. Open that one instead of adding another.`
 

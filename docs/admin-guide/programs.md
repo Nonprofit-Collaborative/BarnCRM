@@ -307,8 +307,8 @@ Only a goal on the note's own enrollment can be picked. The note stays private t
 
 A participant's **service plan** is the set of **goals** on their enrollment: find stable
 housing, pass the high school equivalency test, open a bank account. Each goal has **steps**, the
-actions that lead to it. Staff keep the plan on the **Service Plan** panel at the top of the
-enrollment page.
+actions that lead to it. Staff keep the plan on the **Service Plan** tab of the
+enrollment page (its related lists are in the sidebar).
 
 A goal has:
 
@@ -379,7 +379,7 @@ its enrollments and sessions and empties their Cohort.
 
 ### Adding People: the Cohort Members Panel
 
-The cohort page opens on the **Cohort Members** panel. It lists the cohort's members, with
+The cohort page opens on the **Members** tab, with the **Cohort Members** panel (the **Schedule** and **Details** tabs follow, and the related lists are in the sidebar). It lists the cohort's members, with
 their stage, and a **Remove** button on each (the enrollment is kept, out of the cohort). Under
 **Add People**:
 
@@ -464,7 +464,7 @@ optional **Cohort**, the **Days of the Week**, **Repeat Every (Weeks)**, a **Sta
 
 ### Taking Attendance on a Session
 
-Open the session. The **Service Delivery Log** panel shows its service and day, and lists the
+Open the session. On the **Attendance** tab, the **Service Delivery Log** panel shows its service and day, and lists the
 cohort's open enrollments (or the program's, when the session has no cohort), with what is
 recorded for each at that session. Set attendance and click **Save**, as on the program.
 
