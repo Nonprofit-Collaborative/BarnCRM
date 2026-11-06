@@ -27,18 +27,25 @@ public with sharing class ShiftScheduleController {
 		public Date createdThrough;
 	}
 
-	/** What the schedule form's live preview counts from (D-183): the org's today and the horizon. */
+	/**
+	 * What the schedule form's live preview counts from (D-183): the org's today, its local time
+	 * now (a shift today that has already started is not created), and the horizon. Not cached,
+	 * so the form always counts from the moment it opens.
+	 */
 	public class FormSettings {
 		@AuraEnabled
 		public Date today;
 		@AuraEnabled
+		public String now;
+		@AuraEnabled
 		public Integer horizonWeeks;
 	}
 
-	@AuraEnabled(cacheable=true)
+	@AuraEnabled
 	public static FormSettings getFormSettings() {
 		FormSettings settings = new FormSettings();
 		settings.today = ShiftScheduleService.today();
+		settings.now = ShiftScheduleService.now().format('HH:mm', ShiftScheduleService.timeZone());
 		settings.horizonWeeks = VolunteerSettings.shiftHorizonWeeks();
 		return settings;
 	}

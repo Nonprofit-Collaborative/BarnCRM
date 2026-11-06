@@ -287,7 +287,8 @@ schedule** to the job: on the job, click **New Shift Schedule** (or **New** in t
 Schedules** list) and fill in the fields below. In **New Shift Schedule**, a line under the
 fields says how many shifts the pattern makes from today through the horizon, for example "12
 shifts will be created through 27 Apr 2026", and changes as you pick days, the repeat and the
-dates (D-183). **Edit Schedule** on a schedule's page is the same form for an existing schedule.
+dates (D-183). As **Create Shifts Now** does, it leaves out a shift today whose start time has
+already passed. **Edit Schedule** on a schedule's page is the same form for an existing schedule.
 
 | Field | What to enter |
 |---|---|

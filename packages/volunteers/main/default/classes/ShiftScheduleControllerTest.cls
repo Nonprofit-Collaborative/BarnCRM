@@ -127,6 +127,7 @@ private class ShiftScheduleControllerTest {
 			settings.today,
 			'Today in the org time zone.'
 		);
+		Assert.areEqual('12:00', settings.now, 'Noon in the org time zone.');
 		Assert.areEqual(
 			VolunteerSettings.shiftHorizonWeeks(),
 			settings.horizonWeeks,

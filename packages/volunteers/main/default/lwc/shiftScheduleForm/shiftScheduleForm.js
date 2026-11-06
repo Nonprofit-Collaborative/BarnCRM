@@ -1,4 +1,4 @@
-import { LightningElement, api, wire } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import Toast from 'lightning/toast';
 import { CloseActionScreenEvent } from 'lightning/actions';
 import { notifyRecordUpdateAvailable } from 'lightning/uiRecordApi';
@@ -17,6 +17,7 @@ const SCHEDULE_OBJECT = 'Shift_Schedule__c';
 const PATTERN_FIELDS = {
   Weekdays__c: 'weekdays',
   Every_N_Weeks__c: 'everyNWeeks',
+  Start_Time__c: 'startTime',
   Start_Date__c: 'startDate',
   End_Date__c: 'endDate',
   Active__c: 'active'
@@ -40,19 +41,20 @@ export default class ShiftScheduleForm extends LightningElement {
   saving = false;
   helpReady = isHelpLoaded('Volunteers');
 
-  @wire(getFormSettings)
-  wiredSettings({ data }) {
-    if (data) {
-      this.settings = data;
-    }
-  }
-
   connectedCallback() {
     if (!this.helpReady) {
       loadHelp('Volunteers').then(() => {
         this.helpReady = true;
       });
     }
+    // Not cached: today and the time now are read when the form opens.
+    getFormSettings()
+      .then((data) => {
+        this.settings = data;
+      })
+      .catch(() => {
+        // No preview line; the form still saves.
+      });
   }
 
   get isEdit() {
@@ -78,7 +80,12 @@ export default class ShiftScheduleForm extends LightningElement {
     if (!this.pattern.active) {
       return helpText('Volunteers', 'Volunteers_Schedule_Inactive');
     }
-    const result = shiftPreview(this.pattern, this.settings.today, this.settings.horizonWeeks);
+    const result = shiftPreview(
+      this.pattern,
+      this.settings.today,
+      this.settings.horizonWeeks,
+      this.settings.now
+    );
     if (result.problem === 'weekdays') {
       return helpText('Volunteers', 'Volunteers_ScheduleForm_NoDays');
     }

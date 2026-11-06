@@ -33,17 +33,27 @@ function chosenDays(weekdays) {
   return new Set(names.map((name) => DAY_NAMES.indexOf(String(name).trim())).filter((i) => i >= 0));
 }
 
+/** "HH:mm" from a time value ("16:00:00.000Z" or "16:00"), or null. */
+function hoursAndMinutes(value) {
+  const match = /^(\d{2}):(\d{2})/.exec(String(value || ''));
+  return match ? `${match[1]}:${match[2]}` : null;
+}
+
 /**
  * How many shifts the pattern creates from `today` through the horizon (`horizonWeeks` ahead)
- * or the end date, whichever is first.
+ * or the end date, whichever is first. As Create Shifts Now, a shift today whose start time is
+ * before `nowTime` (the org's local "HH:mm") is not counted: it has already started.
  *
  * @returns {{count: number, through: string|null, problem: string|null}} problem is 'weekdays'
  *   when no day is chosen, 'dates' when the start date is missing or the end is before it.
  */
-export function shiftPreview(pattern, today, horizonWeeks) {
+export function shiftPreview(pattern, today, horizonWeeks, nowTime) {
   const start = parse(pattern.startDate);
   const end = parse(pattern.endDate);
   const now = parse(today);
+  const startTime = hoursAndMinutes(pattern.startTime);
+  const clock = hoursAndMinutes(nowTime);
+  const todayStarted = startTime !== null && clock !== null && startTime < clock;
   const chosen = chosenDays(pattern.weekdays);
   if (chosen.size === 0) {
     return { count: 0, through: null, problem: 'weekdays' };
@@ -58,7 +68,8 @@ export function shiftPreview(pattern, today, horizonWeeks) {
   let count = 0;
   for (let time = Math.max(start, now); time <= through; time += DAY_MS) {
     const weeks = Math.round((mondayOf(time) - firstMonday) / (7 * DAY_MS));
-    if (chosen.has(weekdayIndex(time)) && weeks % every === 0) {
+    const started = time === now && todayStarted;
+    if (chosen.has(weekdayIndex(time)) && weeks % every === 0 && !started) {
       count++;
     }
   }
