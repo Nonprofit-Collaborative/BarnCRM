@@ -80,4 +80,12 @@
     <shortDescription>Record page tab: Credits and Tributes</shortDescription>
     <value>Credits and Tributes</value>
   </labels>
+  <labels>
+    <fullName>Giving_Glance_Title</fullName>
+    <categories>Giving, Record pages</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Giving at a Glance card title</shortDescription>
+    <value>Giving at a Glance</value>
+  </labels>
 </CustomLabels>

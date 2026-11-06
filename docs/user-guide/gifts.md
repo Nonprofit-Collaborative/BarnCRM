@@ -54,17 +54,27 @@ You should see: the gift page shows an **In-kind Gift** section with **In-kind D
 
 You should see: the gift in the record's **Gifts** list. For money promised but not arrived yet, an admin can use **New** on the **Gifts** tab and set **Status** to `Pending`.
 
+## To See Giving From the BarnCRM App
+
+In the **BarnCRM** app, a person, household or organization page has a **Giving at a Glance** card at the top of the sidebar: **Total Giving**, **Last Gift Date** and **Donor Level**.
+
+1. Open the person, household or organization in the **BarnCRM** app.
+2. Read the **Giving at a Glance** card.
+3. To record a gift, click **Enter a Gift** on the card. Quick Gift Entry opens with the donor filled in.
+
+You should see: the card's figures move once the gift is saved and the page is refreshed. No card means you have no Giving permission set; no **Enter a Gift** button means you can read gifts but not enter them.
+
 ## To Read a Gift Page
 
-A gift opens on the gift record page. From top to bottom:
+A gift opens on the gift record page, with three tabs: **Details** (open first), **Credits and Tributes** and **Related**. From top to bottom:
 
 - The action bar: **Edit**, **Refund or Write Off** (only while **Status** is `Received`) and **Delete**.
-- **Gift**: donor, **Household** (filled in from the donor, so you never set it), **Appeal**, **Commitment** and **Installment** (the pledge payment the gift pays, if any), **Amount**, **Gift Date**, **Payment Method**, **Status**, **Payment Reference**.
+- On **Details**, **Gift**: donor, **Household** (filled in from the donor, so you never set it), **Appeal**, **Commitment** and **Installment** (the pledge payment the gift pays, if any), **Amount**, **Gift Date**, **Payment Method**, **Status**, **Payment Reference**.
 - **Acknowledgment, Receipt and Recognition**: **Acknowledgment Status**, **Acknowledgment Date**, **Receipt Number**, **Matched Gift**, **Tribute**, and on a refund, **Original Gift** and **Refund Reason**.
 - **In-kind Gift**, only on an in-kind gift.
-- Side panels: **Posting**, **Receipts**, **Soft Credits**, **Tribute**, and **Activity**.
-- **Gift Allocations**: which funds the gift went to, with **Edit Funds** (see [To split a gift across funds](#to-split-a-gift-across-funds)).
-- Lists: **Refunds and Write-Offs**, **Tributes** and **Acknowledgments** (each thank-you sent for the gift).
+- Side panels: **Posting**, **Gift Allocations** (which funds the gift went to, with **Edit Funds**: see [To split a gift across funds](#to-split-a-gift-across-funds)), **Receipts** and **Activity**.
+- On **Credits and Tributes**: the **Soft Credits** and **Tribute** panels.
+- On **Related**, lists: **Gift Allocations** (which funds the gift went to), **Refunds and Write-Offs**, **Tributes** and **Acknowledgments** (each thank-you sent for the gift).
 
 Gift statuses:
 

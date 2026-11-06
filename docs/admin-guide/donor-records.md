@@ -22,9 +22,13 @@ opens people, households and organizations on them.
 
 Two things to know:
 
-- **In the BarnCRM app, records open on Core's pages, which show no giving.** BarnCRM Core
-  is also used by organizations that do not fundraise, so it cannot show giving. If your
-  staff work in the BarnCRM app and should see giving there too, open Setup, then
+- **In the BarnCRM app, records open on Core's pages, with a Giving at a Glance card.** With
+  Giving installed, the top of the sidebar on a person, household or organization shows
+  **Giving at a Glance**: **Total Giving**, **Last Gift Date**, **Donor Level** and an
+  **Enter a Gift** button that opens Quick Gift Entry with the donor filled in. Nothing to
+  turn on. The card shows only to people with a Giving permission set, and the button only
+  to people who can create gifts. Without Giving the card is not there. If your staff should
+  see the whole Giving page in the BarnCRM app instead, open Setup, then
   **Lightning App Builder**, edit **Giving Contact Record Page**, choose **Activation**,
   then **App, Record Type, and Profile**, and assign it to the BarnCRM app on desktop and
   phone. Do the same for **Giving Account Record Page**. This is the one step that needs
@@ -32,7 +36,8 @@ Two things to know:
 - **If your organization has its own Contact or Account record page,** it keeps showing
   wherever you assigned it. To add giving to it instead, open it in the Lightning App Builder
   and add the giving fields from the field list, and the **Dynamic Related List - Single**
-  component for Gifts, Commitments, Soft Credits, Receipts and Stewardship Plans.
+  component for Gifts, Commitments, Soft Credits, Receipts and Stewardship Plans. For the
+  glance card, add the **Record Glance** component.
 
 ## A Five-Minute Walkthrough
 

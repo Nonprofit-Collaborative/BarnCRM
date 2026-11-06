@@ -1254,6 +1254,12 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentName>recordGlance</componentName>
+        <identifier>recordGlance</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>runtime_sales_activities:activityPanel</componentName>
         <identifier>runtime_sales_activities_activityPanel</identifier>
       </componentInstance>

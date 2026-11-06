@@ -325,3 +325,19 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 4 | Open a sample pledge from the **Commitments** tab. | The payment schedule at the top, then tabs **Details** (sections **Commitment**, **Schedule**, **Totals**) and **Related** (the **Gifts** list). |
 
 **Cleanup:** none.
+
+## T-GIFT-18: Giving at a Glance in the BarnCRM App
+
+**Purpose:** Core's person and organization pages show Giving's summary card, and Enter a Gift opens Quick Gift Entry for that donor.
+**Prerequisites:** staff (Giving Staff); a read-only user with Giving Read Only; sample data loaded.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the **BarnCRM** app, open **Harper Garcia**. | The sidebar starts with **Giving at a Glance**: **Total Giving**, **Last Gift Date**, **Donor Level** (when she has one) and **Enter a Gift**. |
+| 2 | Click **Enter a Gift**. | Quick Gift Entry opens with Harper Garcia as the donor. |
+| 3 | Save a gift of 25, go back to Harper and refresh. | **Total Giving** has gone up by 25 and **Last Gift Date** is today. |
+| 4 | Open **The Garcia Family** and an organization that gave. | Each shows the card with its own figures. |
+| 5 | As the read-only user, open Harper Garcia. | The card shows without **Enter a Gift**. |
+| 6 | As a user with no Giving permission set, open Harper Garcia. | No card; the sidebar starts with the next card. |
+
+**Cleanup:** refund or delete the gift from step 3.
