@@ -314,3 +314,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 5 | Untick **Active** and save. | The card says the schedule is not active and creates no shifts; no button. |
 
 **Cleanup:** set Weeks Ahead to Create Shifts back to 8; delete the schedule and its shifts.
+
+## T-VOL-21: Volunteer Letters for Many People
+
+**Purpose:** confirm Volunteer Letters on Approve Hours makes letters for everyone with approved hours, or for chosen people, without Flow Builder.
+**Prerequisites:** coordinator; two people with approved hours this year and one with none; an active Hours letter template.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Approve Hours**. | A **Volunteer Letters** button at the top right. As a Read Only user there is none. |
+| 2 | Click it. Keep **This Year** and **Everyone with approved hours in the period**; click **Make Letters**. | The dialog closes and a toast says letters are being made for 2 people. Within a few minutes each of the two has a PDF in **Files**, and a notification says 2 letters were made. |
+| 3 | Open it again, choose **People I choose**, and click **Make Letters** with nobody picked. | "Choose at least one person." Nothing starts. |
+| 4 | Pick the person with no hours, then pick them again. | One name shows, once. Click **Make Letters**: a toast for 1 person; the notification says 1 was skipped with no approved hours. |
+| 5 | Choose **Custom** with a From a year before anyone worked and a To a month later; choose **Everyone**; click **Make Letters**. | "Nobody has approved hours in this period, so no letters were started." |
+
+**Cleanup:** delete the letter files.

@@ -397,7 +397,15 @@ new template active to try it. A person with no approved hours in the period get
 and the action says so. On a household or organization account the action says that letters
 are for people.
 
-**A list of people.** In Flow Builder, the **Generate volunteer letters** action takes a list of
+**Many people at once, without Flow Builder.** On the **Approve Hours** tab, **Volunteer
+Letters** (top right, for anyone with Manage Volunteers) opens a dialog: choose the **Template**,
+the **Period** (This Year, Last Year or Custom, as on the single letter) and **Letters For**:
+**Everyone with approved hours in the period** (up to 2,000 people; for more, choose a shorter
+period) or **People I choose**, picked one at a time. **Make Letters** starts the same background
+job as the flow action below, says how many people it covers, and ends with the same
+notification. Nobody with approved hours in the period starts nothing, and the dialog says so.
+
+**A list of people from a flow.** In Flow Builder, the **Generate volunteer letters** action takes a list of
 person Ids, a letter **Type** and the period, and makes the letters in the background, ten people
 at a time; each appears in that person's **Files** within a few minutes. The Type is the picklist
 value as written on the template, **Hours letter** or **Certificate**, and the action uses that

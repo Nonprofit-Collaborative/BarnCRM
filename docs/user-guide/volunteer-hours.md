@@ -149,8 +149,21 @@ Needs **Manage Volunteers**.
 You should see: "The letter is saved as a PDF in this person's Files." The letter counts only
 **Approved** hours with a **Date Worked** in the period.
 
-To make letters for a whole list of people at once, ask your admin: see
-[Hour letters and certificates](../admin-guide/volunteers.md#hour-letters-and-certificates).
+## To Make Letters for Many People at Once
+
+Needs **Manage Volunteers**.
+
+1. Open the **Approve Hours** tab in the **BarnCRM Volunteers** app and click **Volunteer
+   Letters** at the top right.
+2. Choose the **Template** and the **Period**, as for one letter.
+3. Under **Letters For**, keep **Everyone with approved hours in the period**, or choose **People
+   I choose** and pick each person in **Person** (click the x on a name to take it off).
+4. Click **Make Letters**.
+
+You should see: "Letters are being made for 12 people. You get a notification when they are
+done." Each letter appears in that person's **Files** within a few minutes, and the notification
+says how many were made and who was skipped. If nobody has approved hours in the period, the
+dialog says so and starts nothing.
 
 ## Common Problems
 

@@ -134,6 +134,29 @@ public with sharing class VolunteerLetterBatch implements Database.Batchable<Vol
 		return jobIds;
 	}
 
+	/**
+	 * One job for a list of people, one template and one period, from Volunteer Letters on
+	 * Approve Hours (modules-20): the same checks, job and notification as the flow action.
+	 * Returns null when the list is empty.
+	 */
+	public static Id startFor(Id templateId, Date fromDate, Date toDate, List<Id> personIds) {
+		VolunteerLetterService.requireManage();
+		VolunteerLetterService.validate(templateId, fromDate, toDate);
+		Work shape = new Work();
+		shape.templateId = templateId;
+		shape.fromDate = fromDate;
+		shape.toDate = toDate;
+		Set<Id> people = new Set<Id>(personIds == null ? new List<Id>() : personIds);
+		people.remove(null);
+		List<Work> allWork = chunks(
+			new Map<String, Work>{ '' => shape },
+			new Map<String, List<Id>>{ '' => new List<Id>(people) }
+		);
+		return allWork.isEmpty()
+			? null
+			: Database.executeBatch(new VolunteerLetterBatch(allWork, JobNotifier.starter()), 1);
+	}
+
 	public Iterable<Work> start(Database.BatchableContext context) {
 		return work;
 	}

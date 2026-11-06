@@ -1,5 +1,8 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import Toast from 'lightning/toast';
+import VolunteerLettersModal from 'c/volunteerLettersModal';
+import LETTERS from '@salesforce/label/c.Volunteers_Letters_Title';
 import getHours from '@salesforce/apex/VolunteerHoursApprovalController.getHours';
 import approveHours from '@salesforce/apex/VolunteerHoursApprovalController.approve';
 import rejectHours from '@salesforce/apex/VolunteerHoursApprovalController.reject';
@@ -97,7 +100,8 @@ export default class VolunteerHoursApproval extends NavigationMixin(LightningEle
     next: NEXT,
     empty: EMPTY,
     reasonRequired: REASON_REQUIRED,
-    loading: LOADING
+    loading: LOADING,
+    letters: LETTERS
   };
 
   statusOptions = [STATUS_SUBMITTED, STATUS_APPROVED, STATUS_REJECTED].map((value) => ({
@@ -244,6 +248,14 @@ export default class VolunteerHoursApproval extends NavigationMixin(LightningEle
   /** Nothing waiting for approval is a good empty (ux-kit.md, Empty states). */
   get emptyIllustration() {
     return this.status === STATUS_SUBMITTED ? 'all-clear' : 'no-data';
+  }
+
+  /** Letters for many people at once, without Flow Builder (modules-20). */
+  async handleOpenLetters() {
+    const started = await VolunteerLettersModal.open({ size: 'small', label: LETTERS });
+    if (started) {
+      Toast.show({ label: started, variant: 'success' }, this);
+    }
   }
 
   /** A person's name opens the hours entry, to check it before approving (modules-3). */

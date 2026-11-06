@@ -182,4 +182,79 @@ private class VolunteerLetterControllerTest {
 			'The reason reaches the screen.'
 		);
 	}
+
+	@IsTest
+	static void volunteerLettersStartOneJobForEveryoneWithApprovedHours() {
+		Map<String, Object> context;
+		Integer everyone;
+		Integer nobody;
+		Test.startTest();
+		System.runAs(user(COORDINATOR)) {
+			context = VolunteerLetterController.getListContext();
+			everyone = VolunteerLetterController.startLetters(
+				hoursLetterId(),
+				FROM_DATE,
+				TO_DATE,
+				null
+			);
+			nobody = VolunteerLetterController.startLetters(
+				hoursLetterId(),
+				FROM_DATE.addYears(-5),
+				TO_DATE.addYears(-5),
+				new List<Id>()
+			);
+		}
+		Test.stopTest();
+
+		Assert.isTrue((Boolean) context.get('canManage'), 'The coordinator may.');
+		Assert.areEqual(2, ((List<Object>) context.get('templates')).size(), 'One per type.');
+		Assert.isNotNull(context.get('personObject'), 'The picker knows its object.');
+		Assert.areEqual(1, everyone, 'Rivera has approved hours in March.');
+		Assert.areEqual(0, nobody, 'Nobody worked five years ago.');
+		Assert.areEqual(
+			1,
+			[
+				SELECT COUNT()
+				FROM AsyncApexJob
+				WHERE ApexClass.Name = 'VolunteerLetterBatch'
+				WITH SYSTEM_MODE
+			],
+			'One job, and none for nobody.'
+		);
+	}
+
+	@IsTest
+	static void volunteerLettersForChosenPeopleAreRefusedToStaff() {
+		Integer chosen;
+		String refused;
+		Test.startTest();
+		System.runAs(user(COORDINATOR)) {
+			chosen = VolunteerLetterController.startLetters(
+				hoursLetterId(),
+				FROM_DATE,
+				TO_DATE,
+				new List<Id>{ personId(), personId() }
+			);
+		}
+		System.runAs(user(STAFFER)) {
+			try {
+				VolunteerLetterController.startLetters(
+					hoursLetterId(),
+					FROM_DATE,
+					TO_DATE,
+					new List<Id>{ personId() }
+				);
+			} catch (AuraHandledException shown) {
+				refused = shown.getMessage();
+			}
+		}
+		Test.stopTest();
+
+		Assert.areEqual(1, chosen, 'A person chosen twice gets one letter.');
+		Assert.areEqual(
+			Label.Volunteers_Letter_NeedManagePermission,
+			refused,
+			'Staff are told why not.'
+		);
+	}
 }

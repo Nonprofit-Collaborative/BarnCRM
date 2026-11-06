@@ -1170,4 +1170,44 @@ When: {1}</value>
         <shortDescription>Button on a shift schedule that creates its missing shifts now</shortDescription>
         <value>Create Shifts Now</value>
     </labels>
+    <labels>
+        <fullName>Volunteers_Letters_Title</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Approve Hours button and dialog title: letters for many people</shortDescription>
+        <value>Volunteer Letters</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letters_Who</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer Letters: who the letters are for</shortDescription>
+        <value>Letters For</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letters_Everyone</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer Letters choice: everyone with approved hours</shortDescription>
+        <value>Everyone with approved hours in the period</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letters_Chosen</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer Letters choice: people picked one by one</shortDescription>
+        <value>People I choose</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Letters_Make</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteer Letters button that starts the letters</shortDescription>
+        <value>Make Letters</value>
+    </labels>
 </CustomLabels>

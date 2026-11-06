@@ -17,6 +17,8 @@ jest.mock(
   { virtual: true }
 );
 import VolunteerHoursApproval from 'c/volunteerHoursApproval';
+import VolunteerLettersModal from 'c/volunteerLettersModal';
+import Toast from 'lightning/toast';
 import getHours from '@salesforce/apex/VolunteerHoursApprovalController.getHours';
 import approveHours from '@salesforce/apex/VolunteerHoursApprovalController.approve';
 import rejectHours from '@salesforce/apex/VolunteerHoursApprovalController.reject';
@@ -332,6 +334,7 @@ describe('c-volunteer-hours-approval', () => {
 
     expect(byId(element, 'read-only')).not.toBeNull();
     expect(byId(element, 'approve')).toBeNull();
+    expect(byId(element, 'letters')).toBeNull();
     expect(element.shadowRoot.querySelectorAll('.row-select').length).toBe(0);
   });
 
@@ -374,5 +377,26 @@ describe('c-volunteer-hours-approval', () => {
     expect(notes.textContent).toBe('Stayed late to restock.');
     expect(notes.title).toBe('Stayed late to restock.');
     expect(element.shadowRoot.textContent).toContain('Notes');
+  });
+
+  it('opens Volunteer Letters and shows what it started (modules-20)', async () => {
+    getHours.mockResolvedValue(pageOf([ANA]));
+    VolunteerLettersModal.open = jest
+      .fn()
+      .mockResolvedValue('Letters are being made for 4 people.');
+    const toast = jest.spyOn(Toast, 'show');
+    const element = build();
+    await flush();
+
+    byId(element, 'letters').click();
+    await flush();
+
+    expect(VolunteerLettersModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ size: 'small' })
+    );
+    expect(toast).toHaveBeenCalledWith(
+      { label: 'Letters are being made for 4 people.', variant: 'success' },
+      expect.anything()
+    );
   });
 });

@@ -7,6 +7,15 @@
       purpose={labels.intro}
       title-hidden
     >
+      <template lwc:if={canManage}>
+        <lightning-button
+          slot="actions"
+          data-id="letters"
+          label={labels.letters}
+          icon-name="utility:page"
+          onclick={handleOpenLetters}
+        ></lightning-button>
+      </template>
       <div class="slds-is-relative">
         <template lwc:if={busy}>
           <lightning-spinner alternative-text={labels.loading} size="small" data-id="loading"></lightning-spinner>
