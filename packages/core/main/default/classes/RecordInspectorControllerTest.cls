@@ -46,6 +46,12 @@ private class RecordInspectorControllerTest {
 			Assert.isNotNull(context.label, 'With its label.');
 			Assert.isNotNull(find(inspection, 'Id'), 'The standard fields are listed too.');
 			Assert.isNotNull(find(inspection, 'CreatedDate').value, 'A date reads as text.');
+			Assert.areEqual(
+				find(inspection, 'Name').value,
+				inspection.recordName,
+				'The record is named by its name field.'
+			);
+			Assert.isNotNull(inspection.recordName, 'An Error Log entry has a name.');
 
 			Map<String, Schema.SObjectField> described = Schema.Error_Log__c.SObjectType
 				.getDescribe(SObjectDescribeOptions.DEFERRED)
@@ -111,6 +117,26 @@ private class RecordInspectorControllerTest {
 					);
 				}
 			}
+		}
+	}
+
+	@IsTest
+	static void thePageLinkIsQualifiedForTheOrg() {
+		System.runAs(TestUsers.admin()) {
+			RecordInspectorController.PageLink link = RecordInspectorController.pageLink();
+
+			Assert.areEqual(
+				NamespaceUtil.qualify(RecordInspectorController.PAGE_TAB),
+				link.tabApiName,
+				'The tab carries the org prefix, if any.'
+			);
+			Assert.isTrue(link.tabApiName.endsWith('Record_Inspector'), link.tabApiName);
+			Assert.areEqual(
+				NamespaceUtil.stateKey(RecordInspectorController.RECORD_ID_PARAMETER),
+				link.recordIdKey,
+				'The state key is qualified as Find qualifies its keys.'
+			);
+			Assert.isTrue(link.recordIdKey.endsWith('__recordId'), link.recordIdKey);
 		}
 	}
 

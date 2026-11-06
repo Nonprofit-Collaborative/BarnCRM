@@ -1,0 +1,14 @@
+<template>
+    <template lwc:if={canUse}>
+        <div class="slds-var-m-bottom_small">
+            <lightning-button
+                data-id="inspect-button"
+                label={label}
+                icon-name="utility:search"
+                stretch
+                disabled={notReady}
+                onclick={handleClick}
+            ></lightning-button>
+        </div>
+    </template>
+</template>

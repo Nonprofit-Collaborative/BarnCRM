@@ -25,3 +25,22 @@ export function filterRows(rows, term) {
     )
   );
 }
+
+/** A 15 or 18 character record ID with at least one digit, as every key prefix has. */
+const ID = /^(?=[a-zA-Z0-9]*\d)(?:[a-zA-Z0-9]{18}|[a-zA-Z0-9]{15})$/;
+
+/**
+ * The record ID in what a person pasted: an ID on its own, or a link to a record page in either
+ * Lightning (`/lightning/r/Contact/<id>/view`) or Salesforce Classic (`/<id>`), or a link to
+ * this page that names one (`?c__recordId=<id>`). Undefined when there is none.
+ */
+export function parseRecordId(text) {
+  const value = (text || '').toString().trim();
+  if (ID.test(value)) {
+    return value;
+  }
+  const [path, query = ''] = value.split('#')[0].split('?');
+  const segments = path.split('/').reverse();
+  const values = query.split('&').map((pair) => pair.split('=')[1]);
+  return [...segments, ...values].find((part) => part && ID.test(part));
+}

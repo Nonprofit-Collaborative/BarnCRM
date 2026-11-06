@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    An Inspect This Record button that opens the Record Inspector page on this record: every field
+    you can read, with API names and values. Shown to BarnCRM Admins only.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Record Inspector Button</masterLabel>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+</LightningComponentBundle>

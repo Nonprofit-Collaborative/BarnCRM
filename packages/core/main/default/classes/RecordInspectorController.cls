@@ -43,11 +43,42 @@ public with sharing class RecordInspectorController {
 		public String objectApiName;
 		@AuraEnabled
 		public String objectLabel;
+		/** The record's name field value, when the person can read it; null otherwise. */
+		@AuraEnabled
+		public String recordName;
 		@AuraEnabled
 		public List<FieldRow> fields = new List<FieldRow>();
 		/** True when the object has more readable fields than one read can carry. */
 		@AuraEnabled
 		public Boolean fieldsCut = false;
+	}
+
+	/** The tab and page state key that open the Record Inspector page on one record. */
+	public class PageLink {
+		@AuraEnabled
+		public String tabApiName;
+		@AuraEnabled
+		public String recordIdKey;
+	}
+
+	/** The Record Inspector tab, unqualified; `pageLink` adds the org's prefix. */
+	@TestVisible
+	private static final String PAGE_TAB = 'Record_Inspector';
+	/** The page state parameter that names the record to inspect. */
+	@TestVisible
+	private static final String RECORD_ID_PARAMETER = 'recordId';
+
+	/**
+	 * The names a page reference to the Record Inspector page needs, qualified for this org, so
+	 * no component writes a literal tab name or `c__recordId` (the key is `<ns>__recordId` once
+	 * a namespace exists). Names only: the page itself checks the permission.
+	 */
+	@AuraEnabled(cacheable=true)
+	public static PageLink pageLink() {
+		PageLink link = new PageLink();
+		link.tabApiName = NamespaceUtil.qualify(PAGE_TAB);
+		link.recordIdKey = NamespaceUtil.stateKey(RECORD_ID_PARAMETER);
+		return link;
 	}
 
 	/** The record's readable fields, sorted by label. */
@@ -84,7 +115,11 @@ public with sharing class RecordInspectorController {
 				);
 			}
 			for (Schema.DescribeFieldResult field : readable) {
-				result.fields.add(row(field, record));
+				FieldRow fieldRow = row(field, record);
+				if (field.isNameField() && result.recordName == null) {
+					result.recordName = fieldRow.value;
+				}
+				result.fields.add(fieldRow);
 			}
 			result.fields.sort(new ByLabel());
 			return result;

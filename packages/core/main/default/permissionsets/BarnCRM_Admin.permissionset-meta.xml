@@ -1677,6 +1677,10 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
+    <tab>Record_Inspector</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Relationship__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>

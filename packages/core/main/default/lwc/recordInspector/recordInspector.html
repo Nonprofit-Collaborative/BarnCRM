@@ -1,29 +1,61 @@
 <template>
     <template lwc:if={helpReady}>
     <template lwc:if={canUse}>
-        <lightning-card title={labels.title} icon-name="standard:search">
+        <lightning-card title={labels.title} icon-name={iconName}>
             <span slot="actions">
-                <lightning-button
-                    data-id="inspect-button"
-                    label={inspectLabel}
-                    variant="neutral"
-                    disabled={loading}
-                    onclick={handleInspect}
-                ></lightning-button>
+                <template lwc:if={canInspect}>
+                    <lightning-button
+                        data-id="inspect-button"
+                        label={inspectLabel}
+                        variant="neutral"
+                        disabled={loading}
+                        onclick={handleInspect}
+                    ></lightning-button>
+                </template>
             </span>
 
             <div class="slds-var-p-horizontal_medium slds-var-p-bottom_medium">
+                <template lwc:if={onPage}>
+                    <div class="slds-grid slds-grid_vertical-align-end slds-var-m-bottom_small">
+                        <lightning-input
+                            class="slds-col slds-grow"
+                            data-id="record-input"
+                            label={labels.recordInput}
+                            value={pageInput}
+                            onchange={handlePageInput}
+                            onkeyup={handlePageKey}
+                        ></lightning-input>
+                        <lightning-button
+                            class="slds-col slds-grow-none slds-var-m-left_x-small"
+                            data-id="go-button"
+                            label={labels.go}
+                            variant="brand"
+                            disabled={loading}
+                            onclick={handleGo}
+                        ></lightning-button>
+                    </div>
+                </template>
+
                 <template lwc:if={hasError}>
                     <c-barn-notice
                         class="slds-var-m-bottom_small"
                         data-id="error-message"
                         variant="error"
-                        message={errorMessage}
+                        message={shownError}
                     ></c-barn-notice>
                 </template>
 
                 <template lwc:if={showIntro}>
-                    <p data-id="intro">{labels.intro}</p>
+                    <p data-id="intro">{introText}</p>
+                </template>
+
+                <template lwc:if={showRecordHeading}>
+                    <p class="slds-text-heading_small slds-var-m-bottom_small" data-id="record-heading">
+                        <a data-id="record-link" href={recordUrl}>{recordName}</a>
+                        <span class="slds-text-color_weak slds-var-m-left_x-small" data-id="record-object"
+                            >{inspection.objectLabel}</span
+                        >
+                    </p>
                 </template>
 
                 <template lwc:if={loading}>

@@ -1,12 +1,16 @@
 import { LightningElement, api, wire } from 'lwc';
-import { NavigationMixin } from 'lightning/navigation';
+import { CurrentPageReference, NavigationMixin } from 'lightning/navigation';
 import findToolStateKey from '@salesforce/apex/DataManagerController.findToolStateKey';
+import pageLink from '@salesforce/apex/RecordInspectorController.pageLink';
+import { iconFor } from 'c/barnIcons';
 import { fieldSetupPath } from 'c/setupLinks';
 // Bare, and correctly so: a custom permission defined in the same package resolves without a
 // namespace prefix.
 import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import inspect from '@salesforce/apex/RecordInspectorController.inspect';
-import { filterRows } from './inspectorRows';
+import { filterRows, parseRecordId } from './inspectorRows';
+import RECORD_INPUT from '@salesforce/label/c.Core_RecordInspector_RecordInput';
+import GO from '@salesforce/label/c.Core_RecordInspector_Go';
 
 import TITLE from '@salesforce/label/c.Core_RecordInspector_Title';
 import INSPECT from '@salesforce/label/c.Core_RecordInspector_Inspect';
@@ -31,9 +35,14 @@ import WHERE_USED_ALT from '@salesforce/label/c.Core_WhereUsed_Title';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
- * The Record Inspector (C-55): a record page component that lists every field the viewer may
- * read on the record, with its label, API name, type and value, including fields that are not on
- * the page layout. Search narrows the list and a button copies a field's API name.
+ * The Record Inspector (C-55): lists every field the viewer may read on one record, with its
+ * label, API name, type and value, including fields that are not on the page layout. Search
+ * narrows the list and a button copies a field's API name.
+ *
+ * It runs on its own page (the Record Inspector tab), opened by the Inspect This Record button
+ * (c/recordInspectorButton) with the record ID in the page state, and reads that record at once;
+ * opened with no ID, it asks for an ID or a record link. On a record page it inspects that
+ * record when asked, as it did before the page existed.
  *
  * Read only. Which fields appear, and whether the record can be read at all, is decided in Apex
  * in user mode; this component adds nothing to what the person can already see. It reads
@@ -43,6 +52,8 @@ import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 /** The Find tab, and the suffix of the page state key that chooses its object. */
 const FIND_TAB = 'Find';
 const TOOL_STATE_SUFFIX = 'tool';
+/** The suffix of the page state key that names the record, e.g. `c__recordId`. */
+const RECORD_ID_STATE = '__recordId';
 
 export default class RecordInspector extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
@@ -55,7 +66,115 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
     }
   }
 
+  /** Set on a record page only; on the Record Inspector page the record comes from the URL. */
   @api recordId;
+
+  /** The record the page state names, on the Record Inspector page. */
+  pageRecordId;
+  /** What is typed in the page's Record ID or Link box. */
+  pageInput = '';
+  /** The Record Inspector tab and state key, qualified for the org (Apex). */
+  link;
+  iconName = iconFor('Record_Inspector');
+
+  @wire(pageLink)
+  wiredPageLink({ data }) {
+    if (data) {
+      this.link = data;
+    }
+  }
+
+  /** On the Record Inspector page: reads the record the page state names, at once. */
+  @wire(CurrentPageReference)
+  handlePageReference(pageReference) {
+    if (this.recordId || !this.canUse) {
+      return;
+    }
+    const state = (pageReference && pageReference.state) || {};
+    const key = Object.keys(state).find((name) => name.endsWith(RECORD_ID_STATE));
+    const asked = key ? state[key] : undefined;
+    const requested = parseRecordId(asked);
+    if (requested && requested === this.pageRecordId) {
+      return;
+    }
+    this.pageRecordId = requested;
+    this.pageInput = asked || '';
+    this.inspection = undefined;
+    this.errorMessage = undefined;
+    // A flag, not the text: the page state can arrive before the help text has loaded.
+    this.badInput = !requested && !!asked;
+    if (requested) {
+      this.handleInspect();
+    }
+  }
+
+  /** True when the pasted text or the page state holds no record ID. */
+  badInput = false;
+
+  get onPage() {
+    return !this.recordId;
+  }
+
+  /** The record to read: the record page's, or the one the Record Inspector page names. */
+  get targetId() {
+    return this.recordId || this.pageRecordId;
+  }
+
+  get canInspect() {
+    return !!this.targetId;
+  }
+
+  get introText() {
+    return this.onPage
+      ? helpText('Core', 'Core_RecordInspector_PageIntro')
+      : helpText('Core', 'Core_RecordInspector_Intro');
+  }
+
+  /** The inspected record's name, linked back to its page, shown on the Record Inspector page. */
+  get showRecordHeading() {
+    return this.onPage && this.hasInspection;
+  }
+
+  get recordName() {
+    return (this.inspection && (this.inspection.recordName || this.inspection.recordId)) || '';
+  }
+
+  get recordUrl() {
+    return this.inspection ? `/lightning/r/${this.inspection.recordId}/view` : undefined;
+  }
+
+  handlePageInput(event) {
+    this.pageInput = event.detail.value;
+  }
+
+  /** Enter in the box inspects, as the button does. */
+  handlePageKey(event) {
+    if (event.key === 'Enter') {
+      this.pageInput = event.target.value;
+      this.handleGo();
+    }
+  }
+
+  /** Inspects the pasted ID or link, through the page state so the address names the record. */
+  handleGo() {
+    const requested = parseRecordId(this.pageInput);
+    if (!requested) {
+      this.inspection = undefined;
+      this.errorMessage = undefined;
+      this.badInput = true;
+      return undefined;
+    }
+    if (requested === this.pageRecordId || !this.link) {
+      this.pageRecordId = requested;
+      return this.handleInspect();
+    }
+    this[NavigationMixin.Navigate]({
+      type: 'standard__navItemPage',
+      attributes: { apiName: this.link.tabApiName },
+      state: { [this.link.recordIdKey]: requested }
+    });
+    return undefined;
+  }
 
   /** The page state key Find reads its tool from, e.g. `c__tool`; the object key is its sibling. */
   toolStateKey;
@@ -69,10 +188,9 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
 
   labels = {
     title: TITLE,
-    get intro() {
-      return helpText('Core', 'Core_RecordInspector_Intro');
-    },
     inspect: INSPECT,
+    recordInput: RECORD_INPUT,
+    go: GO,
     refresh: REFRESH,
     loading: LOADING,
     search: SEARCH,
@@ -106,7 +224,7 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
   }
 
   get showIntro() {
-    return !this.inspection && !this.loading && !this.errorMessage;
+    return !this.inspection && !this.loading && !this.hasError;
   }
 
   get inspectLabel() {
@@ -180,8 +298,12 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
     return !!(this.inspection && this.inspection.fieldsCut);
   }
 
+  get shownError() {
+    return this.badInput ? helpText('Core', 'Core_RecordInspector_BadInput') : this.errorMessage;
+  }
+
   get hasError() {
-    return !!this.errorMessage;
+    return !!this.shownError;
   }
 
   get hasCopied() {
@@ -191,8 +313,9 @@ export default class RecordInspector extends NavigationMixin(LightningElement) {
   handleInspect() {
     this.loading = true;
     this.errorMessage = undefined;
+    this.badInput = false;
     this.copiedMessage = undefined;
-    return inspect({ recordId: this.recordId })
+    return inspect({ recordId: this.targetId })
       .then((result) => {
         this.inspection = result;
       })

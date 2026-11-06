@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    The Record Inspector: every field of one record you can read, with API names and values.
+    Opened from the Inspect This Record button on a record page, or by pasting a record ID or link.
+  </description>
+  <flexiPage>Record_Inspector</flexiPage>
+  <label>Record Inspector</label>
+  <motif>Custom38: Camera</motif>
+</CustomTab>

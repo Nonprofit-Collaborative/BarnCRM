@@ -29,6 +29,7 @@ const ICONS = Object.freeze({
   Import: 'custom:custom18',
   Import_Row__c: 'custom:custom83',
   Organizations: 'custom:custom24',
+  Record_Inspector: 'custom:custom38',
   Relationship__c: 'custom:custom37',
   // Funders
   Funder_Report_Template__c: 'custom:custom99',

@@ -28,6 +28,7 @@ Rules:
 | core | Import | Custom18: Form |
 | core | Import_Row__c | Custom83: Pencil |
 | core | Organizations | Custom24: Building |
+| core | Record_Inspector | Custom38: Camera |
 | core | Relationship__c | Custom37: Bridge |
 | funders | Funder_Report_Template__c | Custom99: TVCRT |
 | funders | Funders_Board | Custom100: TVWidescreen |
@@ -114,6 +115,7 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | core | householdOfPerson | custom:custom15 | Households |
 | core | hubErrors | custom:custom53 | Error_Log__c |
 | core | hubWelcome | custom:custom1 | BarnCRM_Home |
+| core | recordInspector | custom:custom38 | Record_Inspector |
 | core | relationshipPanel | custom:custom37 | Relationship__c |
 | funders | fundersBoard | custom:custom100 | Funders_Board |
 | funders | grantAnswerLibrary | custom:custom87 | Grant_Answer__c |

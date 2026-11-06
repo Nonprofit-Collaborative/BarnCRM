@@ -27,27 +27,42 @@ combined address and location fields (their separate parts, such as street and c
 as fields of their own). A value longer than 2,000 characters is cut there and marked
 **Shortened**.
 
+The Record Inspector has a page of its own, the **Record Inspector** tab. You reach it in two
+ways:
+
+- From a record: click the **Inspect This Record** button on the record page. The Record
+  Inspector page opens on that record and reads it at once.
+- From the navigation: open **Record Inspector** in the **BarnCRM Admin** or **BarnCRM Admin
+  Console** app, and paste a record's ID or the address of its page.
+
 ## How to Turn It On
 
 You need the BarnCRM Admin role (the BarnCRM Admin permission set, which carries the Manage
-BarnCRM Settings permission). Nobody else sees the component. There is nothing to schedule and
-no setting to change.
+BarnCRM Settings permission and shows the Record Inspector tab). Nobody else sees the button
+or the tab. There is nothing to schedule and no setting to change.
 
-BarnCRM already puts it in the right column of the Contact and Account record pages that
-install with Core. Only people with the BarnCRM Admin role see it. To add it to other pages:
+BarnCRM already puts the **Inspect This Record** button in the right column of the Contact and
+Account record pages that install with Core. Only people with the BarnCRM Admin role see it.
+To add it to other pages:
 
 1. Open any record page and choose **Edit Page** from the gear menu.
-2. From the component list, drag **Record Inspector** onto the page, in a side column or a tab.
+2. From the component list, drag **Record Inspector Button** onto the page, usually in a side
+   column.
 3. Click **Save**, and activate the page if it is not already active.
 
 You can add it to the record page of any kind of record, yours or BarnCRM's.
 
+If you would rather see the fields on the record page itself, drag the **Record Inspector**
+component onto the page instead of the button. It shows a collapsed card that reads the record
+when you click **Inspect This Record**, and works as the page does below.
+
 ## How to Use It
 
-1. Open a record whose page has the Record Inspector. The card is collapsed and has read nothing
-   yet.
-2. Click **Inspect This Record**. The table lists every field you can read, sorted by label,
-   with a count such as "120 fields".
+1. Open a record whose page has the **Inspect This Record** button, and click it. The Record
+   Inspector page opens. At the top are the record's name, which links back to its page, and
+   the kind of record, such as **Contact**.
+2. The table lists every field you can read, sorted by label, with a count such as "120
+   fields".
 3. Type in **Search Fields** to narrow the list. It matches the label, the API name, the type
    and the value, and ignores capital letters.
 4. Click **Copy** beside an API name to copy it, ready to paste into an import file, a flow or a
@@ -60,9 +75,29 @@ You can add it to the record page of any kind of record, yours or BarnCRM's.
    setup uses it ([Where Used and Retire a Field](where-used.md)).
 7. Click **Refresh** to read the record again after an edit.
 
+To inspect another record without leaving the page, paste its ID (15 or 18 characters) or the
+address of its record page into **Record ID or Link** and press Enter or click **Inspect**. The
+page's own address then names that record, so you can bookmark it or send it to another
+BarnCRM Admin.
+
+## Walkthrough: Find Where a Value Lives
+
+A volunteer coordinator says a Contact's "preferred name" shows in a mailing but not on the
+page.
+
+1. Open the Contact and click **Inspect This Record**.
+2. Type the value from the mailing in **Search Fields**. One row is left: a field called
+   **Nickname**, API name `Nickname__c`, that is not on the page layout.
+3. Click **Copy** beside `Nickname__c` and paste it into the mailing's merge field notes.
+4. Click **Open in Setup** beside the field to add it to the page layout if staff should see it.
+
 ## What Can Go Wrong
 
-- **The card says you need the Manage BarnCRM Settings permission.** Ask a BarnCRM Admin to
+- **There is no Inspect This Record button.** You do not have the BarnCRM Admin role, or the
+  record page does not carry the button: add **Record Inspector Button** to it (above).
+- **The page says it is not a record ID or a link to a record.** Paste the whole ID, or the
+  full address from the browser's address bar while the record is open.
+- **The page says you need the Manage BarnCRM Settings permission.** Ask a BarnCRM Admin to
   assign you the BarnCRM Admin permission set.
 - **A field you expect is not listed.** Field security hides it from you. Ask the person who
   looks after profiles and permission sets whether you should be able to read it.

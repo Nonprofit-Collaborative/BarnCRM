@@ -39,7 +39,7 @@ and the lists do not stack into one long page:
   **Affiliations** and **Addresses**.
 - **Related**: the related lists.
 
-The actions bar and the sidebar (activity, Potential Duplicates, Record Inspector) stay outside
+The actions bar and the sidebar (activity, Potential Duplicates, the **Inspect This Record** button) stay outside
 the tabs. The top of the sidebar holds the **Record Glance** host, where an installed module
 can add a small summary card, for example a giving summary. With no module that adds one, it
 shows nothing and takes no space.
