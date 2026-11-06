@@ -88,7 +88,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 ## T-DUP-06: A Deactivated Match Source Finds Nothing
 
 **Purpose:** Confirm Matching Logic lists the shipped sources in words, deactivating one stops its pairs, and activating brings them back.
-**Prerequisites:** admin, holding **BarnCRM Metadata Admin** (the create script gives it).
+**Prerequisites:** admin with **BarnCRM Admin**, which includes the permission to save match sources.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -105,7 +105,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 ## T-DUP-07: Adding a Match Source, and a Bad One Refused
 
 **Purpose:** Confirm Matching Logic offers only fields that can work, checks a new source against the org before saving, and saves a good one.
-**Prerequisites:** admin with **BarnCRM Metadata Admin**. In an org where BarnCRM is installed as a package, **Deploy Metadata from Non-Certified Package Versions via Apex** is on in Setup, **Apex Settings**.
+**Prerequisites:** admin with **BarnCRM Admin**. In an org where BarnCRM is installed as a package, **Deploy Metadata from Non-Certified Package Versions via Apex** is on in Setup, **Apex Settings** (if it is off, a save fails with a message naming it).
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -148,18 +148,18 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 **Cleanup:** Remove **BarnCRM Duplicate Review** from the staff user.
 
-## T-DUP-10: Matching Logic Without BarnCRM Metadata Admin
+## T-DUP-10: Matching Logic Without Permission to Save
 
-**Purpose:** Confirm an administrator without Metadata Admin can read the match sources and try a value, but not change them.
-**Prerequisites:** admin; a second admin session or the CLI to restore the set.
+**Purpose:** Confirm a person without BarnCRM Admin or BarnCRM Metadata Admin can read the match sources and try a value, but not change them.
+**Prerequisites:** a user who has the **Duplicate Matching** tab through **BarnCRM Duplicate Review** only: no BarnCRM Admin, no BarnCRM Metadata Admin. (An admin cannot do this by removing Metadata Admin, because BarnCRM Admin carries the permission.)
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | In **BarnCRM Settings**, **Access**, **Extra Permissions**, remove **BarnCRM Metadata Admin** from yourself and confirm. | A message says you no longer have it. |
-| 2 | Reload **Duplicate Matching** and choose **Matching Logic**. | **You can see the match sources. Adding or changing one needs the BarnCRM Metadata Admin permission set.** No **Add**, no **Edit** and no **Active** switch; each card shows an **Active** or **Inactive** badge instead. |
+| 1 | Sign in as that user and open **Duplicate Matching**. | The tab shows. |
+| 2 | Choose **Matching Logic**. | **You can see the match sources. Adding or changing one needs the BarnCRM Metadata Admin permission set.** No **Add**, no **Edit** and no **Active** switch; each card shows an **Active** or **Inactive** badge instead. |
 | 3 | Choose **Try a Value** on **Contact Point Email** (or **Address (person)** where there are no contact point objects), enter `Someone@Example.org` (for the address source, `1 Main St` and postal code `12345`), and choose **Try**. | A **Compared as:** line with the value as compared, then the matching records or a line saying nobody holds it. Nothing is saved. |
 
-**Cleanup:** Give yourself **BarnCRM Metadata Admin** again on the **Access** page.
+**Cleanup:** none.
 
 ## T-DUP-11: A Long Review List
 
@@ -219,7 +219,7 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 ## T-DUP-15: Merge Rules and the Setting for Other Fields
 
 **Purpose:** Confirm merge rules are listed on the Custom Metadata page, a bad one is refused, and the setting for other fields shows its default.
-**Prerequisites:** admin with **BarnCRM Metadata Admin**. In an org where BarnCRM is installed as a package, **Deploy Metadata from Non-Certified Package Versions via Apex** is on in Setup, **Apex Settings**.
+**Prerequisites:** admin with **BarnCRM Admin**. In an org where BarnCRM is installed as a package, **Deploy Metadata from Non-Certified Package Versions via Apex** is on in Setup, **Apex Settings** (if it is off, a save fails with a message naming it).
 
 | Step | Action | Expected result |
 |---|---|---|

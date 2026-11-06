@@ -61,7 +61,7 @@ describe('c-settings-setup-notes', () => {
   });
 
   it.each([
-    ['General', 'metadata', '/lightning/setup/ApexSettings/home'],
+    ['General', 'metadata', '/lightning/setup/PermSets/home'],
     ['Duplicate Matching', 'duplicates', '/lightning/setup/DuplicateRules/home'],
     ['Rollups', 'rollupField', '/lightning/setup/ObjectManager/home'],
     ['Error Log', 'emailDeliverability', '/lightning/setup/OrgEmailSettings/home'],
@@ -141,10 +141,10 @@ describe('c-settings-setup-notes', () => {
     expect(note(general, 'fiscalYear')).toBeNull();
   });
 
-  // Owner QA 2026-10-31: the note stayed after Deploy Metadata from Non-Certified Package
-  // Versions via Apex was turned on.
+  // Owner QA 2026-10-31 and 2026-11-05: the note stayed after Deploy Metadata from Non-Certified
+  // Package Versions via Apex was turned on. It is now about the permission alone.
   describe('Custom Metadata note on General', () => {
-    it('goes once Apex confirms saves work', async () => {
+    it('is not shown to a holder of the permission', async () => {
       getSetupChecks.mockResolvedValue({ metadata: true });
 
       expect(note(await render('General'), 'metadata')).toBeNull();
@@ -161,15 +161,12 @@ describe('c-settings-setup-notes', () => {
       expect(metadata.querySelector('[data-id="unconfirmed"]')).toBeNull();
     });
 
-    it('says it cannot confirm the setting, with Check Again, until a save works', async () => {
-      getSetupChecks.mockResolvedValue({});
+    it('goes after Check Again once the permission is given', async () => {
+      getSetupChecks.mockResolvedValue({ metadata: false });
       const element = await render('General');
       const metadata = note(element, 'metadata');
-
-      expect(metadata.querySelector('[data-id="status"]')).toBeNull();
-      expect(metadata.querySelector('[data-id="unconfirmed"]').textContent.trim()).toBe(
-        'c.Core_SetupNote_Metadata_Unconfirmed'
-      );
+      expect(metadata.textContent).toContain('c.Core_SetupNote_Metadata_What');
+      expect(metadata.textContent).not.toContain('Non-Certified');
 
       getSetupChecks.mockResolvedValue({ metadata: true });
       metadata.querySelector('[data-id="check-again"]').click();

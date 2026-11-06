@@ -126,6 +126,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 6 | Open **Households** and search for `Garcia`, then `Staff Household`. | Neither is found. |
 | 7 | Search **Contacts** for `Rita Real`. | Rita Real is still there. |
 | 8 | With Giving, open the **Gifts** tab, **All** list view. | No sample gifts remain. |
+| 9 | Run **Health Check** in **BarnCRM Settings** and look for addresses with no owner. | No address is reported without a person, household or organization; no sample address is left behind. An address you gave Rita Real is still there. |
 
 **Cleanup:** run T-SA-08 to load the sample data again.
 

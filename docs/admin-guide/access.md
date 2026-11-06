@@ -38,7 +38,7 @@ so it is listed only where Giving is installed, which makes five:
 
 | Role | Who it is for | What it gives |
 |---|---|---|
-| BarnCRM Admin (its card and the role list say **BarnCRM Admin Group**, its label in Salesforce) | The person who configures the app, usually you | Everything, including BarnCRM Settings |
+| BarnCRM Admin (its card and the role list say **BarnCRM Admin Group**, its label in Salesforce) | The person who configures the app, usually you | Everything, including BarnCRM Settings, saving Custom Metadata, matching logic and setting up Create New Field in an import |
 | Fundraising Staff (with Giving) | Development and fundraising staff | Day to day work with people, households, and giving, including the Giving Staff permission set |
 | Team Member | Staff, members, or volunteers who do the day to day work | Day to day work with people, households, and organizations, plus program and service records when the Programs module is on |
 | Coordinator | Whoever schedules people and tracks their time | Day to day work with people, households, and organizations, plus volunteer shifts and hours when the Volunteers module is on |
@@ -181,7 +181,7 @@ Core's six are always listed:
 | BarnCRM Bulk Delete | Delete many records at once from a Find query, with undo from the Recycle Bin. Give it together with Find and Export. Marked with a warning. |
 | BarnCRM Erase People | Erase a person on their request (the right to be forgotten), which cannot be undone. Marked with a warning. |
 | BarnCRM Duplicate Review | Review suggested duplicate people and households, including reading the **Review** list on the Duplicate Matching tab (scanning, dismissing and merging there stay with BarnCRM Admin). Works only for people with a Sales Cloud or Service Cloud license. |
-| BarnCRM Metadata Admin | Save changes on the Custom Metadata page of BarnCRM Settings, which changes the org's configuration. For people who already administer the org. |
+| BarnCRM Metadata Admin | Save changes on the Custom metadata page of BarnCRM Settings and in matching logic, which change the org's configuration. BarnCRM Admin already includes this, so it is only for someone who is not a BarnCRM Admin. |
 
 A module's sets are listed after them, only where that module is installed:
 

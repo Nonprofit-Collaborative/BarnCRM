@@ -28,9 +28,8 @@ const NOTES = () => ({
       get steps() {
         return helpText('Core', 'Core_SetupNote_Metadata_Steps');
       },
-      link: 'apexSettings',
-      check: 'metadata',
-      unconfirmed: helpText('Core', 'Core_SetupNote_Metadata_Unconfirmed')
+      link: 'permissionSets',
+      check: 'metadata'
     }
   ],
   'duplicate matching': [

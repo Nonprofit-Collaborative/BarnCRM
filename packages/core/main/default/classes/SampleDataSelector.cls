@@ -133,6 +133,41 @@ public with sharing class SampleDataSelector {
 	}
 
 	/**
+	 * Addresses that belong to a sample household, organization or person (an Account, a
+	 * Contact or a person Account flagged Sample_Data__c). The address automation made them
+	 * from the sample records' address fields; they carry no checkbox of their own. One
+	 * query for each owner lookup, because a semi-join cannot sit inside an OR.
+	 */
+	public List<Id> getSampleAddressIds() {
+		Set<Id> ids = new Set<Id>();
+		for (Address__c row : [
+			SELECT Id
+			FROM Address__c
+			WHERE Account__c IN (SELECT Id FROM Account WHERE Sample_Data__c = TRUE)
+			WITH USER_MODE
+		]) {
+			ids.add(row.Id);
+		}
+		for (Address__c row : [
+			SELECT Id
+			FROM Address__c
+			WHERE Contact__c IN (SELECT Id FROM Contact WHERE Sample_Data__c = TRUE)
+			WITH USER_MODE
+		]) {
+			ids.add(row.Id);
+		}
+		for (Address__c row : [
+			SELECT Id
+			FROM Address__c
+			WHERE Person_Account__c IN (SELECT Id FROM Account WHERE Sample_Data__c = TRUE)
+			WITH USER_MODE
+		]) {
+			ids.add(row.Id);
+		}
+		return new List<Id>(ids);
+	}
+
+	/**
 	 * The other side of each of these relationships, where the relationship automation built
 	 * it and it is not flagged as sample data yet.
 	 */
