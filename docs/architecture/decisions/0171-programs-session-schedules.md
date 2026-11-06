@@ -1,4 +1,4 @@
-# ADR-NEXT: Repeating sessions are a saved schedule that creates ordinary sessions to a rolling horizon
+# ADR-0171: Repeating sessions are a saved schedule that creates ordinary sessions to a rolling horizon
 
 **Status:** Accepted (owner decision, Brandon, 2026-11-06, plan D-183: "Repeating events
 (modules-24): build all")

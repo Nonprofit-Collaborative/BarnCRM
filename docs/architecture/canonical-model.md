@@ -10958,7 +10958,7 @@ rule; modules-24, D-183). Either may be empty.
 A repeating pattern of sessions for one service, for a cohort or for everyone in the program:
 "Tutoring, Tuesdays and Thursdays, 16:00 to 17:30" (modules-24, owner decision D-183). It
 creates ordinary sessions a set number of weeks ahead, as a Shift Schedule creates shifts (29T),
-and never deletes one on its own. ADR-NEXT (`NEXT-programs-session-schedules.md`) records why.
+and never deletes one on its own. ADR-0171 records why.
 
 ### Attributes
 
@@ -12753,7 +12753,7 @@ mirrors the primary member).
 | 1.0 | 2026-11-05 | Field Use required, default value and at default (owner QA 2026-11-05, ADR-0169). Section 29F: R-FU2 now counts required fields and checkboxes; new rules R-FU13 (Required and Default Value from describe) and R-FU14 (At Default, one more grouped count per field). No object or field added; snapshots unchanged. |
 | 1.0 | 2026-11-05 | Shipped relationship types can be turned off (owner request, ADR-0170). `BarnCRM_Settings__c` gains `Relationship_Types_Turned_Off__c` (Section 12); Relationship Type and rule R-D2 say how a turned-off shipped row is read. No other object or field added. |
 | 1.0 | 2026-11-06 | Session End Time (modules-24, owner decision D-183). `Session__c` gains `End_Time__c` (Time) with rule R-SE6 and validation rule `End_After_Start`; the Schedule Sessions panel sets it (R-SE4). No other object or field added. |
-| 1.0 | 2026-11-06 | Session Schedule (modules-24, D-183, ADR-NEXT). New in the Programs module: Session Schedule (`Session_Schedule__c`, 29ZA7), master-detail to Program, with rules R-SS1 to R-SS7. `Session__c` gains `Session_Schedule__c` (Lookup, SetNull). R-SE4 says the panel can save its pattern as a schedule. |
+| 1.0 | 2026-11-06 | Session Schedule (modules-24, D-183, ADR-0171). New in the Programs module: Session Schedule (`Session_Schedule__c`, 29ZA7), master-detail to Program, with rules R-SS1 to R-SS7. `Session__c` gains `Session_Schedule__c` (Lookup, SetNull). R-SE4 says the panel can save its pattern as a schedule. |
 | 1.0 | 2026-11-06 | Session horizon setting (modules-24, D-183). `Programs_Settings__c` gains `Session_Horizon_Weeks__c` (Number(2, 0), default 8, 1 to 26). R-SS2 reads it instead of a fixed eight weeks, and skips a day another schedule filled earlier in the same run. |
 
 ---

@@ -1,5 +1,5 @@
 /**
- * Repeating sessions (modules-24, ADR-NEXT programs-session-schedules, canonical model 29ZA7):
+ * Repeating sessions (modules-24, ADR-0171, canonical model 29ZA7):
  * which days a schedule falls on, the run that creates its sessions up to the horizon, and
  * Remove Future Sessions.
  *
