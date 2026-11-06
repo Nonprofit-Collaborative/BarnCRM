@@ -18,7 +18,7 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Funders** app. | Tabs: **Grant Pipeline**, **Grants**, **Reports**, **Error Log** (last). |
+| 1 | Open the **BarnCRM Funders** app. | It opens on **Board Dashboard** (first tab), then **Grant Pipeline**, **Grants**, **Reports**, **Error Log** (last). |
 | 2 | **Grants**, **New**. Name `2027 Literacy Grant`, leave **Funder** empty, **Save**. | Refused: **Funder** is required. |
 | 3 | Funder `Lakeside Foundation`, Funder Contact `Pat Rivera`, Amount Requested `25,000`, Application Deadline 10 days from today, **Save**. | The grant's page shows the **Program** card. **Stage** is **Prospect**; **Submitted Date** and **Decision Date** are empty. |
 | 4 | **Edit**, Stage **Applied**, **Save**. | **Submitted Date** is today. |
@@ -38,9 +38,10 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **Grant Pipeline**. | Columns **Prospect**, **Letter of Inquiry**, **Invited to Apply**, **Applied**, each with a count and an amount. **Open Requests** counts both grants; **Amount Requested** is 35,000. |
-| 2 | Read **Upcoming Deadlines**. | `Arts Grant` first, `3 days overdue` in red; then `2027 Literacy Grant` with `10 days left`. |
+| 2 | Read **Upcoming Deadlines**. | `Arts Grant` first with a red `3 days overdue` badge; then `2027 Literacy Grant` with an amber `10 days left` badge. The `2027 Literacy Grant` card shows the same amber badge, its amount in larger type and the owner's initials. |
 | 3 | Choose **Mine**. | Only `2027 Literacy Grant` (the staff user owns it). |
 | 4 | Choose **Everyone**, then a card's menu, **Open**. | The grant's page opens. |
+| 5 | Back on the board, click a card's grant name. | The grant's page opens. The totals are tiles; the intro reads `Click a grant to open it`. |
 
 **Cleanup:** None.
 
@@ -52,10 +53,11 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | On `2027 Literacy Grant`, menu, **Move to Applied**. | `Moved to Applied.`; the card is in **Applied**, and the grant leaves **Upcoming Deadlines**. |
-| 2 | Menu, **Move to Awarded**. | **Record the Award** asks for **Amount Awarded**, showing 25,000. |
-| 3 | Change it to `24,000`, **Save**. | The card leaves the board. **Awarded This Fiscal Year** shows 24,000 and `1 grants awarded`. The grant's **Decision Date** is today and **Amount Awarded** 24,000. |
-| 4 | On `Arts Grant`, menu, **Move to Withdrawn**. | It leaves the board and the deadlines list. |
-| 5 | Open `2027 Literacy Grant`'s **Grant History** related list. | Each move is listed. |
+| 2 | Menu, **Move to Awarded**. | A **Record the Award** dialog asks **Amount Awarded** (showing 25,000), **Award Start Date**, **Award End Date** and **Restricted**. Tab and Shift+Tab stay inside it; Escape closes it with nothing saved. |
+| 3 | Set an end date before the start date, **Save**. | The dialog stays open with the reason. |
+| 4 | Change the amount to `24,000`, dates January 1 to December 31 next year, tick **Restricted**, **Save**. | `Awarded. Open 2027 Literacy Grant to build its payment schedule.` with the name as a link. The card leaves the board. **Awarded This Fiscal Year** shows 24,000 and `1 grants awarded`. The grant has **Decision Date** today, **Amount Awarded** 24,000, the award dates and **Restricted** ticked. |
+| 5 | On `Arts Grant`, menu, **Move to Withdrawn**. | It leaves the board and the deadlines list. |
+| 6 | Open `2027 Literacy Grant`'s **Grant History** related list. | Each move is listed. |
 
 **Cleanup:** None.
 
@@ -133,8 +135,9 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff, open **Grant Pipeline**, **Upcoming Deadlines**. | `Q1 financial` first with `3 days overdue` in red, then `Year 1 report` with `7 days left`; under each, its type and `Youth Grant`. Each has **Mark Submitted**. |
-| 2 | Click **Mark Submitted** on `Year 1 report`. | `Marked submitted.`; the row leaves the list; its **Submitted Date** is today. |
+| 1 | As staff, open **Grant Pipeline**, **Upcoming Deadlines**. | `Q1 financial` first with a red `3 days overdue` badge, then `Year 1 report` with `7 days left`; under each, its type and `Youth Grant`. Each has **Mark Submitted**. |
+| 2 | Click **Mark Submitted** on `Year 1 report`. | `Marked submitted.` with an **Undo** link; the row leaves the list; its **Submitted Date** is today. |
+| 2a | Click **Undo**. | `Undone.`; the row is back with **Mark Submitted**; the requirement's **Status** is what it was and **Submitted Date** is empty. Mark it submitted again. |
 | 3 | As read-only, open **Grant Pipeline**. | `Q1 financial` is listed with no **Mark Submitted**. |
 | 4 | As the admin, open **Health Check**. | `1 grant requirement is overdue`, linked to `Q1 financial`. |
 | 5 | Set `Q1 financial` to **Waived** and run Health Check again. | The finding is gone. |
@@ -190,8 +193,9 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As staff, open the **Grant Calendar** tab in **BarnCRM Funders**. | This month, today in bold. `Application: Calendar Test` on its day; the sample requirements and the sample award's expected payment on theirs if they fall this month. The tab is next to **Grant Pipeline**. |
-| 2 | Open **Grant Pipeline**. | Every application and requirement under **Upcoming Deadlines** that falls this month is on the calendar too; when overdue it is red on the pipeline and marked with the warning icon and **Overdue** on the calendar (see step 10). |
-| 3 | Click **Next Month** until the sample award's second payment shows. | `Grant Payment: Youth Programs Award 17,500` on its due date. |
+| 2 | Open **Grant Pipeline**. | Every application and requirement under **Upcoming Deadlines** that falls this month is on the calendar too; when overdue it has a red badge on the pipeline and is marked with the warning icon and **Overdue** on the calendar (see step 10). |
+| 3 | Click **Next Month** until the sample award's second payment shows. | `Grant Payment: Youth Programs Award $17,500.00` (in your currency) on its due date. |
+| 3a | Click **Print**. | The print preview shows the month without the app's header, navigation or buttons. |
 | 4 | Click the payment, then go back and click `Calendar Test`. | Each opens its record. |
 | 5 | Mark the payment **Received** and return to the calendar. | It is gone: only expected payments show. |
 | 6 | Choose **Mine**. | Only `Calendar Test` and requirements assigned to staff or on staff's grants. |
@@ -279,11 +283,13 @@ permission set from the role. Have one organization, `Lakeside Foundation`, with
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As staff with Giving access, open the **Board Dashboard** tab. | **Revenue Mix**: `Gifts to funds` 50,000 (50%), `Federal` 30,000 (30%), `Not set` 20,000 (20%), **Total** 100,000. `Old award` is not counted. |
-| 2 | Read **Concentration**. | `Lakeside Foundation` 35,000 (35%) first, then `State Agency`; a warning that Lakeside gives 35% (above 25 percent); a warning that the five largest give more than half. |
+| 1 | As staff with Giving access, open the **BarnCRM Funders** app. | It opens on **Board Dashboard**. Tiles: **Revenue This Fiscal Year** 100,000, **Awarded This Fiscal Year** 50,000, **Gifts to funds** 50,000. A **Tools** group has a tile per Funders tab staff can open (no Funder Report Templates); each opens its tab. **Revenue Mix**: a bar per line, `Gifts to funds` 50,000 (50%), `Federal` 30,000 (30%), `Not set` 20,000 (20%). `Old award` is not counted. |
+| 2 | Read **Concentration**. | `Lakeside Foundation` 35,000 (35%) first, then `State Agency`, each with a bar; one amber notice holding the two warnings: Lakeside gives 35% (above 25 percent), and the five largest give more than half. |
 | 3 | Read **Restricted Balances**. | Under **Restricted Funds: Raised This Fiscal Year**, `Scholarships` 12,000; the unrestricted fund is not listed. |
 | 4 | As staff without Giving access, open the tab. | Revenue Mix shows `Federal` and `Not set` only, total 50,000; Restricted Balances says `Nothing to show for this fiscal year yet.` |
 | 5 | As the admin, give `State award` the Funding Source **State**; reload as staff. | `Not set` is replaced by `State`. |
-| 6 | With restricted fund tracking (F-03) installed, mark `Federal award` restricted and record 10,000 received; reload. | Under **Restricted Grants: Balance**, `Federal award` 10,000. |
+| 6 | With restricted fund tracking (F-03) installed, mark `Federal award` restricted and record 10,000 received; reload. | Under **Restricted Grants: Balance**, `Federal award` 10,000, and a **Restricted Grants: Balance** tile of 10,000. |
+| 7 | Click **Print**. | The print preview shows the dashboard without the app's header, navigation, Print button or tool tiles. |
+| 8 | At phone width, open the tab. | Tiles two to a row; the restricted tables stack each row. |
 
 **Cleanup:** none.

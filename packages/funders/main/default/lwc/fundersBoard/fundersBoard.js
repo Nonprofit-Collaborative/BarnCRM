@@ -1,14 +1,17 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
+import { getObjectInfos } from 'lightning/uiObjectInfoApi';
 import getBoard from '@salesforce/apex/FundersBoardController.getBoard';
 import { concentration, fill, revenueMix, showShare } from 'c/fundersBoardModel';
 import { showMoney } from 'c/grantReportModel';
 import { messageFrom as messageOf } from 'c/findCsv';
+import { iconFor } from 'c/barnIcons';
+import { printPage } from 'c/fundersPrint';
 
 import TITLE from '@salesforce/label/c.Funders_Board_Title';
 import MIX from '@salesforce/label/c.Funders_Board_Mix';
 import GIFTS from '@salesforce/label/c.Funders_Board_Gifts';
 import NOT_SET from '@salesforce/label/c.Core_Settings_NotSet';
-import TOTAL from '@salesforce/label/c.Funders_Board_Total';
 import CONCENTRATION from '@salesforce/label/c.Funders_Board_Concentration';
 import SINGLE_RISK from '@salesforce/label/c.Funders_Board_SingleRisk';
 import TOP_FIVE_RISK from '@salesforce/label/c.Funders_Board_TopFiveRisk';
@@ -16,15 +19,38 @@ import NO_RISK from '@salesforce/label/c.Funders_Board_NoRisk';
 import RESTRICTED from '@salesforce/label/c.Funders_Board_Restricted';
 import FUNDS from '@salesforce/label/c.Funders_Board_Funds';
 import GRANTS from '@salesforce/label/c.Funders_Board_Grants';
-import ERROR_LOAD from '@salesforce/label/c.Funders_Board_ErrorLoad';
+import REVENUE from '@salesforce/label/c.Funders_Board_Revenue';
+import AWARDED from '@salesforce/label/c.Funders_Pipeline_TileAwarded';
+import NOTHING_YET from '@salesforce/label/c.Funders_Board_NothingYet';
+import PRINT from '@salesforce/label/c.Funders_Shared_Print';
+import TOOLS from '@salesforce/label/c.Core_SettingsGroup_Tools';
+import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
+import PIPELINE from '@salesforce/label/c.Funders_Pipeline_Title';
+import CALENDAR from '@salesforce/label/c.Funders_Calendar_Title';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
+/** The Funders tabs the home lists, in the app's order; objects are named by their plural. */
+const TOOL_TABS = [
+  { name: 'Grant_Pipeline', page: true },
+  { name: 'Grant_Calendar', page: true },
+  { name: 'Grant__c' },
+  { name: 'Grant_Requirement__c' },
+  { name: 'Grant_Answer__c' },
+  { name: 'Funder_Report_Template__c' }
+];
+const OBJECT_NAMES = TOOL_TABS.filter((tab) => !tab.page).map((tab) => tab.name);
+
+const sumOf = (slices) =>
+  (slices || []).reduce((sum, slice) => sum + (Number(slice.amount) || 0), 0);
+
 /**
- * The Board Dashboard tab (F-07, canonical model 29ZH R-GN9): this fiscal year's revenue mix,
- * concentration and restricted balances. The shares and flags are the framework-free
- * `fundersBoardModel`'s; this component only lays them out. It reads and stores nothing else.
+ * The Board Dashboard tab, the Funders app's home (F-07, canonical model 29ZH R-GN9;
+ * vis-modules-19): this fiscal year's figures as tiles, the Funders tools, the revenue mix and the
+ * concentration as meters, and the restricted balances. The shares and flags are the
+ * framework-free `fundersBoardModel`'s; this component only lays them out. Print opens the
+ * browser's print dialog without the app chrome, for the board packet.
  */
-export default class FundersBoard extends LightningElement {
+export default class FundersBoard extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Funders');
 
   labels = {
@@ -32,22 +58,28 @@ export default class FundersBoard extends LightningElement {
     get help() {
       return helpText('Funders', 'Funders_Board_Help');
     },
-    mix: MIX,
-    total: TOTAL,
-    concentration: CONCENTRATION
-  };
-  labelsRestricted = {
-    title: RESTRICTED,
-    funds: FUNDS,
-    grants: GRANTS,
     get empty() {
       return helpText('Funders', 'Funders_Board_Empty');
-    }
+    },
+    mix: MIX,
+    concentration: CONCENTRATION,
+    restricted: RESTRICTED,
+    funds: FUNDS,
+    grants: GRANTS,
+    revenue: REVENUE,
+    awarded: AWARDED,
+    gifts: GIFTS,
+    nothingYet: NOTHING_YET,
+    print: PRINT,
+    name: NAME
   };
+
+  icon = iconFor('Funders_Board');
 
   board;
   errorMessage;
   isLoading = true;
+  objectInfos = {};
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -58,6 +90,18 @@ export default class FundersBoard extends LightningElement {
     this.load();
   }
 
+  /** The plural names of the Funders objects the person can see, for the tool tiles. */
+  @wire(getObjectInfos, { objectApiNames: OBJECT_NAMES })
+  wiredInfos({ data }) {
+    const infos = {};
+    ((data && data.results) || []).forEach((entry) => {
+      if (entry && entry.statusCode === 200 && entry.result) {
+        infos[entry.result.apiName] = entry.result;
+      }
+    });
+    this.objectInfos = infos;
+  }
+
   async load() {
     this.isLoading = true;
     try {
@@ -65,7 +109,7 @@ export default class FundersBoard extends LightningElement {
       this.errorMessage = undefined;
     } catch (error) {
       this.board = undefined;
-      this.errorMessage = messageOf(error, ERROR_LOAD);
+      this.errorMessage = messageOf(error, helpText('Funders', 'Funders_Board_LoadFailed'));
     } finally {
       this.isLoading = false;
     }
@@ -73,6 +117,10 @@ export default class FundersBoard extends LightningElement {
 
   money(amount) {
     return showMoney(amount, this.board.currencyCode);
+  }
+
+  get currencyCode() {
+    return (this.board && this.board.currencyCode) || undefined;
   }
 
   get mix() {
@@ -83,17 +131,18 @@ export default class FundersBoard extends LightningElement {
     return Boolean(this.board) && this.mix.rows.length > 0;
   }
 
-  get mixRows() {
-    return this.mix.rows.map((row) => ({
+  /** A meter per row: the share has a shape, and the amount and percent are in its text. */
+  meterRows(rows) {
+    return rows.map((row) => ({
       key: row.key,
-      name: row.name,
-      amount: this.money(row.amount),
+      label: `${row.name}: ${this.money(row.amount)}`,
+      percent: Math.round((Number(row.share) || 0) * 100),
       share: showShare(row.share)
     }));
   }
 
-  get mixTotal() {
-    return this.money(this.mix.total);
+  get mixRows() {
+    return this.meterRows(this.mix.rows);
   }
 
   get spread() {
@@ -101,13 +150,100 @@ export default class FundersBoard extends LightningElement {
   }
 
   get sourceRows() {
-    return this.spread.top.map((source) => ({
-      key: source.key,
-      name: source.name,
-      amount: this.money(source.amount),
-      share: showShare(source.share)
-    }));
+    return this.meterRows(this.spread.top);
   }
+
+  // ------------------------------------------------------------------ tiles
+
+  get revenueTotal() {
+    return this.board ? this.mix.total : 0;
+  }
+
+  get awardedTotal() {
+    return this.board ? sumOf(this.board.grantsBySource) : 0;
+  }
+
+  get showGifts() {
+    return Boolean(this.board && this.board.givingAvailable);
+  }
+
+  get giftsTotal() {
+    return this.board ? Number(this.board.giftsThisYear) || 0 : 0;
+  }
+
+  get showRestrictedTile() {
+    return Boolean(this.board && this.board.ledgerAvailable);
+  }
+
+  get restrictedTotal() {
+    return this.board ? sumOf(this.board.restrictedGrants) : 0;
+  }
+
+  // ------------------------------------------------------------------ tools
+
+  get toolGroups() {
+    const tiles = [];
+    TOOL_TABS.forEach((tab) => {
+      const label = this.toolLabel(tab);
+      if (!label) {
+        return;
+      }
+      tiles.push({
+        name: tab.name,
+        label,
+        description: this.toolDescription(tab.name),
+        iconName: iconFor(tab.name)
+      });
+    });
+    return [{ name: 'tools', label: TOOLS, tiles }];
+  }
+
+  toolLabel(tab) {
+    if (tab.name === 'Grant_Pipeline') {
+      return PIPELINE;
+    }
+    if (tab.name === 'Grant_Calendar') {
+      return CALENDAR;
+    }
+    const info = this.objectInfos[tab.name];
+    return info ? info.labelPlural : '';
+  }
+
+  toolDescription(name) {
+    switch (name) {
+      case 'Grant_Pipeline':
+        return helpText('Funders', 'Funders_Home_PipelineTile');
+      case 'Grant_Calendar':
+        return helpText('Funders', 'Funders_Home_CalendarTile');
+      case 'Grant__c':
+        return helpText('Funders', 'Funders_Home_GrantsTile');
+      case 'Grant_Requirement__c':
+        return helpText('Funders', 'Funders_Home_RequirementsTile');
+      case 'Grant_Answer__c':
+        return helpText('Funders', 'Funders_Home_AnswersTile');
+      default:
+        return helpText('Funders', 'Funders_Home_TemplatesTile');
+    }
+  }
+
+  handleTool(event) {
+    const name = event.detail.name;
+    const tab = TOOL_TABS.find((candidate) => candidate.name === name);
+    if (!tab) {
+      return;
+    }
+    this[NavigationMixin.Navigate](
+      tab.page
+        ? { type: 'standard__navItemPage', attributes: { apiName: name } }
+        : { type: 'standard__objectPage', attributes: { objectApiName: name, actionName: 'home' } }
+    );
+  }
+
+  handlePrint() {
+    printPage(this);
+  }
+
+  // ------------------------------------------------------------- the sections
 
   get flags() {
     const spread = this.spread;
