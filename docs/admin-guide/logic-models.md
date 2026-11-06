@@ -103,6 +103,15 @@ desktop panel the diagram scrolls sideways.
   every arrow forward. The builder checks before saving, and the server refuses the same move.
 - Parts keep the order you add them in. Use **Move Up** and **Move Down** in a part's details to
   change it.
+- Drag and drop is an addition for editors (DnD-2, DnD-3), built on the UX kit's `c/barnDrag`:
+  a part's handle (or the part itself, by mouse or pen) moves it within its column or to
+  another column, saving the same column change and order as **Edit** and **Move Up** or
+  **Move Down**; a part with indicators can only be dropped in an output or outcome column, and
+  a move that would turn an arrow backward snaps back with the **Edit** message. A part's arrow
+  handle dropped on a later part opens **Add Arrow** with that part chosen; nothing saves until
+  **Save**. Every drag works by keyboard (Space, arrow keys, Space; Escape cancels) and touch
+  (press and hold), and is announced to screen readers. On a phone the columns stack, so a drag
+  reorders within a column only and arrows use the form. Read-only users see no handles.
 
 ### Arrows and Assumptions
 

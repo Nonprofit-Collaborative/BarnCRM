@@ -92,7 +92,14 @@
                     ></lightning-icon>
                   </div>
                 </template>
-                <section class="diagram__column" data-id="column" data-stage={column.key}>
+                <section
+                  class={column.columnClass}
+                  data-id="column"
+                  data-stage={column.key}
+                  data-move-zone="true"
+                  data-drop-zone={column.key}
+                  data-drop-label={column.name}
+                >
                   <h3 class="slds-text-title_bold slds-var-m-bottom_x-small column__heading">
                     <span>{column.name}</span>
                     <lightning-badge
@@ -107,18 +114,67 @@
                     </p>
                   </template>
                   <template for:each={column.elements} for:item="element">
-                    <button
+                    <div
                       key={element.id}
-                      type="button"
-                      class={element.className}
-                      title={element.name}
-                      aria-pressed={element.pressed}
-                      data-id="part"
-                      data-record-id={element.id}
-                      onclick={handleSelect}
+                      class={element.rowClass}
+                      data-id="part-row"
+                      data-arrow-zone="true"
+                      data-drop-zone={element.id}
+                      data-drop-label={element.name}
                     >
-                      <span class="part__name">{element.name}</span>
-                    </button>
+                      <template lwc:if={canEdit}>
+                        <span
+                          class="part-row__handle"
+                          role="button"
+                          tabindex="0"
+                          title={element.moveLabel}
+                          aria-label={element.moveLabel}
+                          aria-describedby="move-drag-help"
+                          data-id="move-handle"
+                          data-move-handle="true"
+                          data-drag-id={element.id}
+                          data-drag-label={element.name}
+                          onpointerdown={handleMovePointerDown}
+                          onkeydown={handleMoveKey}
+                        >
+                          <lightning-icon
+                            icon-name="utility:drag_and_drop"
+                            size="xx-small"
+                          ></lightning-icon>
+                        </span>
+                      </template>
+                      <button
+                        type="button"
+                        class={element.className}
+                        title={element.name}
+                        aria-pressed={element.pressed}
+                        data-id="part"
+                        data-record-id={element.id}
+                        data-drag-id={element.id}
+                        onclick={handleSelect}
+                        onpointerdown={handleMovePointerDown}
+                      >
+                        <span class="part__name">{element.name}</span>
+                      </button>
+                      <template lwc:if={element.canDrawArrow}>
+                        <span
+                          class="part-row__handle part-row__arrow"
+                          role="button"
+                          tabindex="0"
+                          title={element.arrowLabel}
+                          aria-label={element.arrowLabel}
+                          aria-describedby="arrow-drag-help"
+                          data-id="arrow-handle"
+                          data-arrow-handle="true"
+                          data-drag-id={element.id}
+                          data-drag-label={element.name}
+                          onpointerdown={handleArrowPointerDown}
+                          onkeydown={handleArrowKey}
+                        >
+                          <lightning-icon icon-name="utility:forward" size="xx-small"></lightning-icon>
+                        </span>
+                      </template>
+                    </div>
                   </template>
                   <template lwc:if={canEdit}>
                     <template lwc:if={column.adding}>
@@ -164,6 +220,20 @@
               </div>
             </template>
           </div>
+
+          <template lwc:if={canEdit}>
+            <p
+              class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_small drag-hint"
+              data-id="drag-hint"
+            >
+              {dragHint}
+            </p>
+            <span id="move-drag-help" class="slds-assistive-text">{dragInstructions}</span>
+            <span id="arrow-drag-help" class="slds-assistive-text">{arrowInstructions}</span>
+          </template>
+          <p aria-live="polite" class="slds-assistive-text" data-id="drag-announcement">
+            {dragAnnouncement}
+          </p>
 
           <template lwc:if={hasSelection}>
             <c-logic-model-part

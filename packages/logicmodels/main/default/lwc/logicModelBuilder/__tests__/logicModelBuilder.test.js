@@ -4,6 +4,7 @@ import getModel from '@salesforce/apex/LogicModelBuilderController.getModel';
 import getPrograms from '@salesforce/apex/LogicModelBuilderController.getPrograms';
 import setProgram from '@salesforce/apex/LogicModelBuilderController.setProgram';
 import saveElement from '@salesforce/apex/LogicModelBuilderController.saveElement';
+import saveOrder from '@salesforce/apex/LogicModelBuilderController.saveOrder';
 import { downloadCsv } from 'c/findCsv';
 
 jest.mock('c/findCsv', () => ({ ...jest.requireActual('c/findCsv'), downloadCsv: jest.fn() }));
@@ -27,6 +28,13 @@ jest.mock(
 );
 jest.mock(
   '@salesforce/apex/LogicModelBuilderController.saveElement',
+  () => ({ default: jest.fn() }),
+  {
+    virtual: true
+  }
+);
+jest.mock(
+  '@salesforce/apex/LogicModelBuilderController.saveOrder',
   () => ({ default: jest.fn() }),
   {
     virtual: true
@@ -256,5 +264,116 @@ describe('c-logic-model-builder', () => {
     panel.dispatchEvent(new CustomEvent('back'));
     await flush();
     expect(element.shadowRoot.activeElement).toBe(part);
+  });
+
+  describe('drag and drop (DnD-2, DnD-3)', () => {
+    const chain = (extra = {}) =>
+      model({
+        elements: [
+          { id: 'e1', name: 'Tutors', type: 'Input', sortOrder: 10 },
+          { id: 'a1', name: 'Sessions', type: 'Activity', sortOrder: 10 },
+          { id: 'a2', name: 'Calls', type: 'Activity', sortOrder: 20 },
+          { id: 'o1', name: 'Sessions held', type: 'Output', sortOrder: 10 }
+        ],
+        links: [{ id: 'l1', fromId: 'a1', toId: 'o1' }],
+        ...extra
+      });
+    const key = (name) => new KeyboardEvent('keydown', { key: name, bubbles: true });
+    const handle = (element, id, partId) =>
+      element.shadowRoot.querySelector(`[data-id="${id}"][data-drag-id="${partId}"]`);
+    async function press(target, ...names) {
+      for (const name of names) {
+        target.dispatchEvent(key(name));
+        // eslint-disable-next-line no-await-in-loop
+        await flush();
+      }
+    }
+
+    it('shows the handles to an editor only, the arrow handle where a later part exists', async () => {
+      const element = await render(chain());
+      expect(qa(element, 'move-handle')).toHaveLength(4);
+      expect(handle(element, 'arrow-handle', 'o1')).toBeNull();
+      expect(handle(element, 'arrow-handle', 'e1')).not.toBeNull();
+      expect(q(element, 'drag-hint').textContent).toContain('c.LogicModels_Drag_Hint');
+      document.body.removeChild(element);
+      const reader = await render(chain({ canEdit: false }));
+      expect(qa(reader, 'move-handle')).toHaveLength(0);
+      expect(qa(reader, 'arrow-handle')).toHaveLength(0);
+      expect(q(reader, 'drag-hint')).toBeNull();
+    });
+
+    it('reorders a part within its column by keyboard', async () => {
+      const element = await render(chain());
+      saveOrder.mockResolvedValue(chain());
+      await press(handle(element, 'move-handle', 'a2'), ' ');
+      expect(q(element, 'drag-announcement').textContent).toContain('c.Core_Drag_PickedUp');
+      await press(handle(element, 'move-handle', 'a2'), 'ArrowUp', ' ');
+      await flush();
+      expect(saveOrder).toHaveBeenCalledTimes(1);
+      expect(JSON.parse(saveOrder.mock.calls[0][0].ordersJson)).toEqual([
+        { id: 'a2', sortOrder: 10 },
+        { id: 'a1', sortOrder: 20 }
+      ]);
+      expect(saveElement).not.toHaveBeenCalled();
+    });
+
+    it('moves a part to another column, then to its place there', async () => {
+      const element = await render(chain());
+      const moved = chain({
+        elements: [
+          { id: 'e1', name: 'Tutors', type: 'Activity', sortOrder: 10 },
+          { id: 'a1', name: 'Sessions', type: 'Activity', sortOrder: 10 },
+          { id: 'a2', name: 'Calls', type: 'Activity', sortOrder: 20 },
+          { id: 'o1', name: 'Sessions held', type: 'Output', sortOrder: 10 }
+        ]
+      });
+      saveElement.mockResolvedValue(moved);
+      saveOrder.mockResolvedValue(moved);
+      await press(handle(element, 'move-handle', 'e1'), ' ', 'ArrowRight', ' ');
+      await flush();
+      expect(JSON.parse(saveElement.mock.calls[0][0].elementJson)).toEqual({
+        id: 'e1',
+        name: 'Tutors',
+        type: 'Activity',
+        term: null
+      });
+      expect(JSON.parse(saveOrder.mock.calls[0][0].ordersJson)).toEqual([
+        { id: 'e1', sortOrder: 10 },
+        { id: 'a1', sortOrder: 20 },
+        { id: 'a2', sortOrder: 30 }
+      ]);
+    });
+
+    it('snaps back a move that would turn an arrow backward, naming it', async () => {
+      const element = await render(chain());
+      // Sessions leads to Sessions held (an output): Sessions may not move past Outputs.
+      await press(handle(element, 'move-handle', 'a1'), ' ', 'ArrowRight', 'ArrowRight', ' ');
+      await flush();
+      expect(saveElement).not.toHaveBeenCalled();
+      expect(saveOrder).not.toHaveBeenCalled();
+      expect(errorText(element)).toBe('c.LogicModels_Builder_BackwardArrows');
+      expect(q(element, 'drag-announcement').textContent).toContain('c.Core_Drag_Cancelled');
+    });
+
+    it('opens Add Arrow with the part an arrow is dropped on', async () => {
+      const element = await render(chain());
+      await press(handle(element, 'arrow-handle', 'e1'), ' ');
+      expect(q(element, 'drag-announcement').textContent).toContain(
+        'c.LogicModels_Drag_ArrowPickedUp'
+      );
+      // Right walks the later parts in order: Sessions, Calls.
+      await press(handle(element, 'arrow-handle', 'e1'), 'ArrowRight', 'ArrowRight');
+      expect(q(element, 'drag-announcement').textContent).toContain(
+        'c.LogicModels_Drag_ArrowPosition'
+      );
+      expect(q(element, 'part-row').className).toContain('part-row_arrow-source');
+      await press(handle(element, 'arrow-handle', 'e1'), ' ');
+      await flush();
+      const panel = q(element, 'selected-part');
+      expect(panel.elementId).toBe('e1');
+      const target = panel.shadowRoot.querySelector('[data-id="arrow-target"]');
+      expect(target.value).toBe('a2');
+      expect(panel.shadowRoot.querySelector('[data-id="arrow-assumption"]')).not.toBeNull();
+    });
   });
 });

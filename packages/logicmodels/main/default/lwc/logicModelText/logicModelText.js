@@ -319,6 +319,33 @@ export function format(template, ...values) {
   });
 }
 
+/** Why a column change is refused: the arrows it would turn backward (R-LL2). */
+export function backwardMessage(backward) {
+  const arrows = backward.map((link) => format(LABELS.arrowPair, link.fromName, link.toName));
+  return format(LABELS.backwardArrows, arrows.join('; '));
+}
+
+/**
+ * The words of a part's two drag handles (DnD-2, DnD-3), from the LogicModels help catalog.
+ * Moving a part speaks c/barnDragText's Core words; drawing an arrow speaks its own.
+ */
+export const DRAG_TEXT = Object.freeze({
+  moveHandle: (name) => helpText('LogicModels', 'LogicModels_Drag_MoveHandle', name),
+  arrowHandle: (name) => helpText('LogicModels', 'LogicModels_Drag_ArrowHandle', name),
+  arrowInstructions: () => helpText('LogicModels', 'LogicModels_Drag_ArrowInstructions'),
+  hint: () => helpText('LogicModels', 'LogicModels_Drag_Hint')
+});
+
+/** What c/barnDrag announces while an arrow is drawn from one part to another (DnD-3). */
+export function arrowDragMessages() {
+  return {
+    pickedUp: (name) => helpText('LogicModels', 'LogicModels_Drag_ArrowPickedUp', name),
+    position: (zone) => helpText('LogicModels', 'LogicModels_Drag_ArrowPosition', zone),
+    dropped: (name, zone) => helpText('LogicModels', 'LogicModels_Drag_ArrowDropped', name, zone),
+    cancelled: (name) => helpText('LogicModels', 'LogicModels_Drag_ArrowCancelled', name)
+  };
+}
+
 /** The message of a refused or failed call. */
 export function messageFrom(error) {
   if (error && error.body && error.body.message) {
