@@ -175,18 +175,20 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 ## T-DM-09: Field Use Counts, Saves and Compares
 
-**Purpose:** Confirm the on-demand count, the saved counts, the change column and the technical names toggle.
+**Purpose:** Confirm the on-demand count, the saved counts, the change column, the technical names toggle, and the Required, Default Value and At Default columns.
 **Prerequisites:** admin.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **Org Optimizer** and choose **Field Use**. | **Field Use**, with **Kind of record** set to **Choose a kind of record**. |
-| 2 | In **Kind of record**, choose **Account**. | A progress bar fills while it reads **Counted N of N fields.** The table has **Field**, **Record Type**, **Filled**, **With a Value** and **Records** columns, and no **API Name**; rows appear for **Household** and **Organization**. |
+| 2 | In **Kind of record**, choose **Account**. | A progress bar fills while it reads **Counted N of N fields.** The table has **Field**, **Record Type**, **Required**, **Default Value**, **Filled**, **With a Value**, **Records** and **At Default** columns, and no **API Name**; rows appear for **Household** and **Organization**. **Account Name** is listed with **Required** checked. |
 | 3 | Turn on **Show technical names**, then turn it off again. | The **API Name** column appears after **Field**, then goes away. |
 | 4 | Read the line above the table. | **No counts have been saved for this kind of record yet.** |
 | 5 | Read the small text under the button group, then click **Save Snapshot**. | The small text reads "Keeps this count so your next count shows what changed." Then **Saved N counts.** |
 | 6 | Open any sample organization and fill in **Website**. Return and click **Count Again**. | The Website row for **Organization** shows a higher **Filled**; **Saved** shows the earlier percentage and **Change Since Saved Count** shows the rise. |
 | 7 | Check the bell. | No notification for the count. |
+| 8 | In **Kind of record**, choose **Address**. | **Status** shows **Default Value** `Current` and an **At Default** percentage no higher than **Filled**; **Verification Status** shows `Unverified`. **Primary** (a checkbox) shows **Filled** 100%, **Default Value** **False** (unless your org changed it) and an **At Default** equal to the share of addresses not marked primary. A field with no default, such as **Street**, has blank **Default Value** and **At Default**. |
+| 9 | Sort by **At Default**. | Rows sort by the share; blank rows sort together. |
 
 **Cleanup:** Clear the Website you added. Delete the **Field Utilization Snapshot** records if you want a tidy org.
 

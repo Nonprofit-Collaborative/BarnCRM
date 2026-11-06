@@ -7,6 +7,8 @@
  * see. Object and field names come only from describe (R-FU1), so no text a person typed
  * reaches a query. A field is counted with one `COUNT(field)` query grouped by record type,
  * which the platform charges as one query row per group however large the object is (R-FU4).
+ * Required and Default Value come from describe; At Default is one more `COUNT(Id)` query per
+ * field with a literal or picklist default, grouped the same way (R-FU13, R-FU14).
  */
 public with sharing class FieldUtilizationService {
 	/** How many recent records a field that cannot be counted is sampled on (R-FU4). */
@@ -31,7 +33,6 @@ public with sharing class FieldUtilizationService {
 	private static final String RECORD_TYPE_FIELD = 'recordtypeid';
 	private static final String MODIFIED_FIELD = 'lastmodifieddate';
 	private static final Set<Schema.DisplayType> NEVER_COUNTED = new Set<Schema.DisplayType>{
-		Schema.DisplayType.BOOLEAN,
 		Schema.DisplayType.ADDRESS,
 		Schema.DisplayType.LOCATION,
 		Schema.DisplayType.ID
@@ -87,7 +88,6 @@ public with sharing class FieldUtilizationService {
 			if (
 				field.isAccessible() &&
 				fillable &&
-				field.isNillable() &&
 				!field.isCalculated() &&
 				!field.isAutoNumber() &&
 				!NEVER_COUNTED.contains(field.getType())
@@ -143,6 +143,7 @@ public with sharing class FieldUtilizationService {
 	/**
 	 * Counts one field and returns one unsaved snapshot per record type that has records
 	 * (R-FU6). A field that cannot be filtered, or whose count is refused, is sampled (R-FU4).
+	 * A checkbox is never empty, so it is filled on every record and needs no query (R-FU2).
 	 */
 	public static List<Field_Utilization_Snapshot__c> count(
 		Schema.DescribeSObjectResult described,
@@ -153,7 +154,10 @@ public with sharing class FieldUtilizationService {
 		Map<String, Integer> looked = totals;
 		Map<String, Integer> filled;
 		Boolean sampled = !field.isFilterable();
-		if (!sampled) {
+		if (field.getType() == Schema.DisplayType.BOOLEAN) {
+			sampled = false;
+			filled = totals;
+		} else if (!sampled) {
 			try {
 				filled = filledByRecordType(described, fieldName);
 			} catch (System.QueryException refused) {
@@ -236,30 +240,191 @@ public with sharing class FieldUtilizationService {
 			described.getSObjectType() != Field_Utilization_Snapshot__c.SObjectType;
 	}
 
+	/**
+	 * True when describe marks the field required: a person creating a record must fill it, so
+	 * it can be created and holds no default and no empty value. A checkbox is never empty but
+	 * is defaulted, so it is never required. Page layouts and validation rules are not read
+	 * (R-FU13).
+	 */
+	public static Boolean isRequired(Schema.DescribeFieldResult field) {
+		return field.isCreateable() && !field.isNillable() && !field.isDefaultedOnCreate();
+	}
+
+	/** A field's default value as describe gives it (R-FU13). */
+	public class FieldDefault {
+		/** The literal or picklist value to show; null when the default is a formula. */
+		public String shown;
+		/** The default formula's text, when it is not a simple literal. */
+		public String formula;
+		/** The value records are compared with for At Default; null when not comparable. */
+		public Object value;
+	}
+
+	/** The field's default value, or null when it has none (R-FU13). */
+	public static FieldDefault defaultOf(Schema.DescribeFieldResult field) {
+		String picklistDefault;
+		if (field.getType() == Schema.DisplayType.PICKLIST) {
+			for (Schema.PicklistEntry entry : field.getPicklistValues()) {
+				if (entry.isActive() && entry.isDefaultValue()) {
+					picklistDefault = entry.getValue();
+					break;
+				}
+			}
+		}
+		return defaultOf(
+			field.getType(),
+			field.getDefaultValue(),
+			field.getDefaultValueFormula(),
+			picklistDefault,
+			field.isFilterable() && !field.isEncrypted()
+		);
+	}
+
+	/**
+	 * The default from describe's parts. A default formula that is only a quoted text (on a
+	 * text field) or only a number (on a number field) is a literal; any other formula is shown
+	 * as a formula and has no At Default. A value is compared only on a filterable field of a
+	 * kind COMPARABLE lists.
+	 */
+	@TestVisible
+	private static FieldDefault defaultOf(
+		Schema.DisplayType type,
+		Object literal,
+		String formula,
+		String picklistDefault,
+		Boolean filterable
+	) {
+		FieldDefault found = new FieldDefault();
+		String text = formula == null ? '' : formula.trim();
+		if (picklistDefault != null) {
+			found.value = picklistDefault;
+		} else if (type == Schema.DisplayType.BOOLEAN) {
+			found.value = literal instanceof Boolean
+				? (Boolean) literal
+				: 'true'.equalsIgnoreCase(text);
+		} else if (literal != null) {
+			found.value = NUMBERS.contains(type)
+				? (Object) Decimal.valueOf(String.valueOf(literal))
+				: String.valueOf(literal);
+		} else if (TEXTS.contains(type) && QUOTED.matcher(text).matches()) {
+			found.value = text.substring(1, text.length() - 1);
+		} else if (NUMBERS.contains(type) && PLAIN_NUMBER.matcher(text).matches()) {
+			found.value = Decimal.valueOf(text);
+		} else if (String.isNotBlank(text)) {
+			found.formula = text;
+			return found;
+		}
+		if (found.value == null || String.isBlank(String.valueOf(found.value))) {
+			return null;
+		}
+		found.shown = String.valueOf(found.value);
+		if (found.value instanceof Boolean) {
+			found.shown = (Boolean) found.value
+				? System.Label.Core_BulkUpdate_True
+				: System.Label.Core_BulkUpdate_False;
+		}
+		if (!filterable || !(COMPARABLE.contains(type) || picklistDefault != null)) {
+			found.value = null;
+		}
+		return found;
+	}
+
+	/**
+	 * Records holding the field's default, by record type key (R-FU14): one `COUNT(Id)` query
+	 * in user mode, grouped like the filled count, the default passed as a bind. Null when the
+	 * default cannot be compared, or the call has no query left for it.
+	 */
+	public static Map<String, Integer> atDefaultByRecordType(
+		Schema.DescribeSObjectResult described,
+		Schema.DescribeFieldResult field,
+		FieldDefault fieldDefault
+	) {
+		if (
+			fieldDefault == null ||
+			fieldDefault.value == null ||
+			Limits.getQueries() >= Limits.getLimitQueries() - 1
+		) {
+			return null;
+		}
+		return countByRecordType(
+			described,
+			'Id',
+			' WHERE ' + String.escapeSingleQuotes(field.getName()) + ' = :atDefault',
+			new Map<String, Object>{ 'atDefault' => fieldDefault.value }
+		);
+	}
+
+	private static final Set<Schema.DisplayType> TEXTS = new Set<Schema.DisplayType>{
+		Schema.DisplayType.STRING,
+		Schema.DisplayType.TEXTAREA,
+		Schema.DisplayType.EMAIL,
+		Schema.DisplayType.PHONE,
+		Schema.DisplayType.URL,
+		Schema.DisplayType.COMBOBOX,
+		Schema.DisplayType.PICKLIST
+	};
+	private static final Set<Schema.DisplayType> NUMBERS = new Set<Schema.DisplayType>{
+		Schema.DisplayType.DOUBLE,
+		Schema.DisplayType.CURRENCY,
+		Schema.DisplayType.PERCENT,
+		Schema.DisplayType.INTEGER,
+		Schema.DisplayType.LONG
+	};
+	/** Kinds whose default records are compared with; percent is left out (its scale varies). */
+	private static final Set<Schema.DisplayType> COMPARABLE = new Set<Schema.DisplayType>{
+		Schema.DisplayType.STRING,
+		Schema.DisplayType.TEXTAREA,
+		Schema.DisplayType.EMAIL,
+		Schema.DisplayType.PHONE,
+		Schema.DisplayType.URL,
+		Schema.DisplayType.COMBOBOX,
+		Schema.DisplayType.PICKLIST,
+		Schema.DisplayType.DOUBLE,
+		Schema.DisplayType.CURRENCY,
+		Schema.DisplayType.INTEGER,
+		Schema.DisplayType.LONG,
+		Schema.DisplayType.BOOLEAN
+	};
+	private static final Pattern QUOTED = Pattern.compile('^"[^"\\\\]*"$|^\'[^\'\\\\]*\'$');
+	private static final Pattern PLAIN_NUMBER = Pattern.compile('^-?\\d+(\\.\\d+)?$');
+
 	private static Map<String, Integer> filledByRecordType(
 		Schema.DescribeSObjectResult described,
 		String fieldName
 	) {
+		return countByRecordType(
+			described,
+			String.escapeSingleQuotes(fieldName),
+			'',
+			new Map<String, Object>()
+		);
+	}
+
+	/** One `COUNT(countOf)` query grouped by record type, in user mode, keyed like the totals. */
+	private static Map<String, Integer> countByRecordType(
+		Schema.DescribeSObjectResult described,
+		String countOf,
+		String whereClause,
+		Map<String, Object> binds
+	) {
 		Boolean grouped = groupsByRecordType(described);
 		String query = soql(
-			(grouped ? 'RecordTypeId, ' : '') +
-				'COUNT(' +
-				String.escapeSingleQuotes(fieldName) +
-				') n',
+			(grouped ? 'RecordTypeId, ' : '') + 'COUNT(' + countOf + ') n',
 			described,
-			grouped ? ' GROUP BY RecordTypeId' : ''
+			whereClause + (grouped ? ' GROUP BY RecordTypeId' : '')
 		);
-		Map<String, Integer> filled = new Map<String, Integer>();
+		Map<String, Integer> counted = new Map<String, Integer>();
 		for (
-			AggregateResult row : (List<AggregateResult>) Database.query(
+			AggregateResult row : (List<AggregateResult>) Database.queryWithBinds(
 				query,
+				binds,
 				AccessLevel.USER_MODE
 			)
 		) {
 			Object recordTypeId = grouped ? row.get('RecordTypeId') : null;
-			add(filled, recordTypeKey(described, recordTypeId), (Integer) row.get('n'));
+			add(counted, recordTypeKey(described, recordTypeId), (Integer) row.get('n'));
 		}
-		return filled;
+		return counted;
 	}
 
 	private static void sample(

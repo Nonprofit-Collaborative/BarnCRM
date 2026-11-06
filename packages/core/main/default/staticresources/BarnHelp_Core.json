@@ -447,7 +447,7 @@
     "Core_FieldUtilization_NoFields": "This kind of record has no fields that can be counted.",
     "Core_FieldUtilization_NoRecords": "There are no records of this kind to count.",
     "Core_FieldUtilization_NotCounted": "These fields could not be counted: {0}",
-    "Core_FieldUtilization_PageIntro": "Choose a kind of record to see how many records fill each field, by record type. Counts change nothing.",
+    "Core_FieldUtilization_PageIntro": "Choose a kind of record to see how many records fill each field, by record type. Counts change nothing. Required and Default Value come from each field's setup; At Default is the share of records still holding a plain or picklist default, and is blank for a formula default.",
     "Core_FieldUtilization_PermissionRequired": "You need the Manage BarnCRM Settings permission to count field use.",
     "Core_FieldUtilization_Progress": "Counted {0} of {1} fields.",
     "Core_FieldUtilization_SaveHelp": "Keeps this count so your next count shows what changed.",

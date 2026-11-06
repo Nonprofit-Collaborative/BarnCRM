@@ -54,6 +54,21 @@ public with sharing class FieldUtilizationController {
 		public Decimal percent { get; set; }
 		@AuraEnabled
 		public Boolean sampled { get; set; }
+		/** Whether describe marks the field required (R-FU13); set on counted rows only. */
+		@AuraEnabled
+		public Boolean required { get; set; }
+		/** The literal or picklist default to show; blank for none or a formula (R-FU13). */
+		@AuraEnabled
+		public String defaultValue { get; set; }
+		/** The default formula's text, when the default is a formula (R-FU13). */
+		@AuraEnabled
+		public String defaultFormula { get; set; }
+		/** Records holding the default; null when not compared (R-FU14). */
+		@AuraEnabled
+		public Integer atDefault { get; set; }
+		/** atDefault as a percentage of total, one decimal; null when not compared. */
+		@AuraEnabled
+		public Decimal atDefaultPercent { get; set; }
 	}
 
 	/** What the page needs before it counts. */
@@ -218,6 +233,7 @@ public with sharing class FieldUtilizationController {
 					continue;
 				}
 				try {
+					List<CountRow> counted = new List<CountRow>();
 					for (
 						Field_Utilization_Snapshot__c row : FieldUtilizationService.count(
 							described,
@@ -225,8 +241,10 @@ public with sharing class FieldUtilizationController {
 							totals
 						)
 					) {
-						result.rows.add(toRow(row, labels));
+						counted.add(toRow(row, labels));
 					}
+					describeInto(counted, described, field);
+					result.rows.addAll(counted);
 				} catch (Exception fieldFailure) {
 					firstFailure = firstFailure == null ? fieldFailure : firstFailure;
 					result.failed.add(field.getLabel());
@@ -679,6 +697,53 @@ public with sharing class FieldUtilizationController {
 			: (Decimal.valueOf(row.filled) * 100).divide(row.total, 1);
 		row.sampled = snapshot.Sampled__c == true;
 		return row;
+	}
+
+	/**
+	 * Adds Required, Default Value and At Default to one field's counted rows (R-FU13, R-FU14).
+	 * At Default is counted only when no row was sampled; a refused query leaves it blank.
+	 */
+	private static void describeInto(
+		List<CountRow> rows,
+		Schema.DescribeSObjectResult described,
+		Schema.DescribeFieldResult field
+	) {
+		Boolean required = FieldUtilizationService.isRequired(field);
+		FieldUtilizationService.FieldDefault fieldDefault = FieldUtilizationService.defaultOf(
+			field
+		);
+		Boolean sampled = false;
+		for (CountRow row : rows) {
+			row.required = required;
+			row.defaultValue = fieldDefault == null ? null : fieldDefault.shown;
+			row.defaultFormula = fieldDefault == null ? null : fieldDefault.formula;
+			sampled = sampled || row.sampled;
+		}
+		if (sampled || rows.isEmpty()) {
+			return;
+		}
+		Map<String, Integer> atDefault;
+		try {
+			atDefault = FieldUtilizationService.atDefaultByRecordType(
+				described,
+				field,
+				fieldDefault
+			);
+		} catch (System.QueryException refused) {
+			atDefault = null;
+		}
+		if (atDefault == null) {
+			return;
+		}
+		for (CountRow row : rows) {
+			Integer found = atDefault.containsKey(row.recordType)
+				? atDefault.get(row.recordType)
+				: 0;
+			row.atDefault = Math.min(found, row.total);
+			row.atDefaultPercent = row.total == 0
+				? null
+				: (Decimal.valueOf(row.atDefault) * 100).divide(row.total, 1);
+		}
 	}
 
 	private static Boolean canDeleteSnapshots() {
