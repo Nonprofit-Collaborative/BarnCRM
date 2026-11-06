@@ -42,7 +42,9 @@ CAPS = {
     "volunteers": 166_000,
     "programs": 148_000,
     "logicmodels": 65_000,
-    "funders": 95_000,
+    # Raised from 95,000 for the Funders usability stage: Undo for Mark Received and Mark
+    # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).
+    "funders": 100_500,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

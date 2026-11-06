@@ -41,14 +41,6 @@
         <value>Outcome saved.</value>
     </labels>
     <labels>
-        <fullName>Funders_Outcomes_BadOutcome</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Requirement outcome field holds something that is not an outcome</shortDescription>
-        <value>Choose an outcome or output from a logic model in the Logic Model Outcomes card on the grant's page. This is not one.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Outcomes_NoIndicators</fullName>
         <categories>Funders</categories>
         <language>en_US</language>

@@ -134,7 +134,11 @@ private class GrantCalendarControllerTest {
 			}
 			Test.stopTest();
 
-			Assert.areEqual(Label.Funders_Calendar_ErrorLoad, refusal, 'Refused with a message');
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Calendar_LoadFailed'),
+				refusal,
+				'Refused with a message'
+			);
 		}
 	}
 }

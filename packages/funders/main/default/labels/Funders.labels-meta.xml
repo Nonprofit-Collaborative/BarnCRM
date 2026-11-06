@@ -185,12 +185,12 @@
         <value>Amount Awarded</value>
     </labels>
     <labels>
-        <fullName>Funders_Pipeline_ErrorLoad</fullName>
-        <categories>GrantPipeline</categories>
+        <fullName>Funders_Shared_Print</fullName>
+        <categories>Funders</categories>
         <language>en_US</language>
         <protected>true</protected>
-        <shortDescription>The pipeline could not load</shortDescription>
-        <value>The Grant Pipeline could not load. Try again, or ask your admin to look at the Error Log.</value>
+        <shortDescription>Button: print the Board Dashboard or Grant Calendar</shortDescription>
+        <value>Print</value>
     </labels>
     <labels>
         <fullName>Funders_Pipeline_ErrorNoPermission</fullName>
@@ -247,14 +247,6 @@
         <protected>true</protected>
         <shortDescription>Toast after saving the program</shortDescription>
         <value>Program saved.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Program_ErrorLoad</fullName>
-        <categories>GrantProgram</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The Program card could not load</shortDescription>
-        <value>The program could not load. Try again, or ask your admin to look at the Error Log.</value>
     </labels>
     <labels>
         <fullName>Funders_NightlyJobs_RemindersName</fullName>

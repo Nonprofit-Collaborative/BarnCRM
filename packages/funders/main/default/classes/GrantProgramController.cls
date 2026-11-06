@@ -72,7 +72,7 @@ public with sharing class GrantProgramController {
 			return card;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getProgram', grantId);
-			throw UserErrors.message(Label.Funders_Program_ErrorLoad);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Program_LoadFailed'));
 		}
 	}
 
@@ -90,7 +90,7 @@ public with sharing class GrantProgramController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.setProgram', grantId);
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorUnexpected);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Shared_NotSaved'));
 		}
 	}
 }

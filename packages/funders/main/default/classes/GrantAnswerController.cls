@@ -61,7 +61,7 @@ public with sharing class GrantAnswerController {
 			return library;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getLibrary');
-			throw UserErrors.message(Label.Funders_Answers_ErrorLoad);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Answers_LoadFailed'));
 		}
 	}
 

@@ -1,0 +1,23 @@
+/* Board Dashboard and Grant Calendar print stylesheet (modules-5): the app chrome is hidden so
+   the printed page is the board packet only. Loaded by c/fundersPrint before window.print(). */
+@media print {
+  .oneHeader,
+  one-appnav,
+  .tabsetHeader,
+  .tabBarContainer,
+  .forceUtilityBarContainer,
+  .barn-print-hide {
+    display: none !important;
+  }
+
+  .viewport,
+  .oneCenterStage,
+  .oneContent,
+  .desktop.container,
+  .navexWorkspaceManager {
+    position: static !important;
+    overflow: visible !important;
+    height: auto !important;
+    padding-top: 0 !important;
+  }
+}

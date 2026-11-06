@@ -91,6 +91,13 @@ public with sharing class GrantPipelineController {
 		/** For a payment row on the Grant Calendar (F-08): the amount expected. */
 		@AuraEnabled
 		public Decimal amount;
+		/** For a board card: what Record the Award starts from (modules-16). */
+		@AuraEnabled
+		public Date awardStartDate;
+		@AuraEnabled
+		public Date awardEndDate;
+		@AuraEnabled
+		public Boolean restricted;
 	}
 
 	public static final String KIND_APPLICATION = 'application';
@@ -142,7 +149,11 @@ public with sharing class GrantPipelineController {
 					AccessLevel.USER_MODE
 				)
 			) {
-				board.cards.add(toCard(grant));
+				Card card = toCard(grant);
+				card.awardStartDate = grant.Award_Start_Date__c;
+				card.awardEndDate = grant.Award_End_Date__c;
+				card.restricted = grant.Restricted__c;
+				board.cards.add(card);
 			}
 			board.truncated = board.openCount > board.cards.size();
 
@@ -186,7 +197,7 @@ public with sharing class GrantPipelineController {
 			return board;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getBoard');
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorLoad);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_LoadFailed'));
 		}
 	}
 
@@ -212,7 +223,50 @@ public with sharing class GrantPipelineController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.moveStage', grantId);
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorUnexpected);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Shared_NotSaved'));
+		}
+	}
+
+	/**
+	 * Record the Award (modules-16): moves one grant to Awarded with what the award letter says,
+	 * each optional: the amount awarded, the award period and whether the money is restricted. A
+	 * blank value leaves the grant's own value as it is. The grant rules check the dates and fill
+	 * in the decision date (R-GN3).
+	 */
+	@AuraEnabled
+	public static void recordAward(
+		Id grantId,
+		Decimal amountAwarded,
+		Date startDate,
+		Date endDate,
+		Boolean restricted
+	) {
+		if (!Schema.SObjectType.Grant__c.isUpdateable()) {
+			throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
+		}
+		if (grantId == null) {
+			throw UserErrors.message(Label.Funders_Pipeline_ErrorStage);
+		}
+		try {
+			Grant__c grant = new Grant__c(Id = grantId, Stage__c = GrantService.STAGE_AWARDED);
+			if (amountAwarded != null) {
+				grant.Amount_Awarded__c = amountAwarded;
+			}
+			if (startDate != null) {
+				grant.Award_Start_Date__c = startDate;
+			}
+			if (endDate != null) {
+				grant.Award_End_Date__c = endDate;
+			}
+			if (restricted != null) {
+				grant.Restricted__c = restricted;
+			}
+			Database.update(grant, true, AccessLevel.USER_MODE);
+		} catch (DmlException e) {
+			throw UserErrors.message(e.getDmlMessage(0));
+		} catch (Exception e) {
+			ErrorLogger.log(e, CONTEXT + '.recordAward', grantId);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Shared_NotSaved'));
 		}
 	}
 
@@ -232,25 +286,49 @@ public with sharing class GrantPipelineController {
 		return row;
 	}
 
-	/** F-02: marks one requirement Submitted; the dates automation fills its Submitted Date. */
+	/**
+	 * F-02: marks one requirement Submitted; the dates automation fills its Submitted Date. Returns
+	 * what it replaced, for Undo (modules-17).
+	 */
 	@AuraEnabled
-	public static void markSubmitted(Id requirementId) {
+	public static FundersUndoState markSubmitted(Id requirementId) {
 		if (!Schema.SObjectType.Grant_Requirement__c.fields.Status__c.isUpdateable()) {
 			throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
 		}
 		try {
-			GrantRequirementService.markSubmitted(requirementId);
+			return GrantRequirementService.markSubmitted(requirementId);
 		} catch (DmlException e) {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.markSubmitted', requirementId);
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorUnexpected);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Shared_NotSaved'));
+		}
+	}
+
+	/** modules-17: Undo for Mark Submitted, from what markSubmitted returned. */
+	@AuraEnabled
+	public static void undoSubmitted(Id requirementId, String status, Date submittedDate) {
+		if (!Schema.SObjectType.Grant_Requirement__c.fields.Status__c.isUpdateable()) {
+			throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
+		}
+		Boolean undone;
+		try {
+			undone = GrantRequirementService.undoSubmitted(requirementId, status, submittedDate);
+		} catch (DmlException e) {
+			throw UserErrors.message(e.getDmlMessage(0));
+		} catch (Exception e) {
+			ErrorLogger.log(e, CONTEXT + '.undoSubmitted', requirementId);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Shared_NotSaved'));
+		}
+		if (!undone) {
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Undo_Changed'));
 		}
 	}
 
 	private static String selectCards() {
 		return 'SELECT Id, Name, Stage__c, Funder__c, Funder__r.Name, Amount_Requested__c,' +
-			' Application_Deadline__c, Next_Step__c, Owner.Name FROM Grant__c';
+			' Application_Deadline__c, Next_Step__c, Owner.Name, Award_Start_Date__c,' +
+			' Award_End_Date__c, Restricted__c FROM Grant__c';
 	}
 
 	/** A grant as a card or deadline row; the Grant Calendar draws the same shape. */
