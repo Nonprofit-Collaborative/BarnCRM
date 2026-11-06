@@ -10423,6 +10423,9 @@ one cohort of a program at a time. A cohort deleted later empties the field (Set
   intake picklists' active values and default from describe, with a link to the enrollment's
   fields in Setup (Object Manager by API name). The section name `Programs` is in Core's
   `SettingSections`. It also holds the Participant Privacy preset (R-EN7).
+- **Weeks Ahead to Create Sessions:** `Programs_Settings__c` field `Session_Horizon_Weeks__c` (Number(2, 0),
+  default 8, 1 to 26), set in the Programs section of BarnCRM Settings
+  (`Setting_Definition.Programs_Session_Horizon_Weeks`) and read by `SessionScheduleService.horizonWeeks` (R-SS2).
 - **Participant privacy (R-EN7, R-SD6):** the public group `Programs_Participants` (no bosses);
   the hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox,
   default unchecked, which is Shared); `ProgramsSharing` writes the shares (handler
@@ -10450,7 +10453,7 @@ repository and are checked against an org with PMM when MIG-09 is built.
 | Service: Name, Program, Description, Unit of Measure, Active | Service: Name, Program, Description, Unit of Measurement, Status | Status Active maps to Active checked |
 | Enrollment: Program, Contact, Stage, Start Date, End Date, Cohort | Program Engagement: Program, Contact, Stage, Start Date, End Date, Program Cohort | Stages: Applied to Applied; Enrolled and Active to Enrolled; Completed to Completed; Withdrawn to Withdrawn |
 | Cohort: Name, Program, Status, Start Date, End Date (29ZA5, P-11) | Program Cohort: Name, Program, Status, Start Date, End Date | Status values match (Planned, Active, Completed) |
-| Session: Name, Service, Session Date, Start Time, Status (29ZA6, P-11) | Service Session: Name, Service Schedule's Service, Session Start, Status | PMM keeps a Service Schedule above its sessions; BarnCRM has none (ADR-0160 decision 14). Status: Pending to Scheduled, Complete to Held, Canceled to Cancelled |
+| Session: Name, Service, Session Date, Start Time, End Time, Status (29ZA6, P-11) | Service Session: Name, Service Schedule's Service, Session Start, Session End, Status | PMM keeps a Service Schedule above its sessions; BarnCRM's Session Schedule (29ZA7) is optional, so a session names its service itself. Status: Pending to Scheduled, Complete to Held, Canceled to Cancelled |
 
 ### On a person, Health Check and sample data
 
@@ -10832,6 +10835,8 @@ there is no membership record.
   with cohorts cannot be deleted until they are.
 - **Cohort to Enrollment**, one to many, through the enrollment's Cohort (R-EN8): the members.
 - **Cohort to Session**, one to many, through the session's Cohort (29ZA6).
+- **Cohort to Session Schedule**, one to many, through the schedule's Cohort (29ZA7), delete
+  Restrict.
 
 ### Rules
 
@@ -10884,7 +10889,9 @@ record of its own (ADR-0160 decision 12).
 | Cohort | reference(Cohort) | no | The cohort the session is for, a cohort of the service's program (R-SE1). Empty: for everyone enrolled in the program. |
 | Session Date | date | yes | The day of the session. |
 | Start Time | time | no | When the session starts. |
+| End Time | time | no | When the session ends, later the same day (R-SE6). |
 | Status | picklist(Scheduled, Held, Cancelled) | yes (defaults Scheduled) | Whether the session is still to come, took place or was called off. |
+| Session Schedule | reference(Session Schedule) | no | The repeating schedule that created the session (29ZA7). Empty for a session made by hand or by the Schedule Sessions panel. |
 
 ### Relationships
 
@@ -10892,6 +10899,8 @@ record of its own (ADR-0160 decision 12).
   detail, so a service keeps its sessions' history: a service with sessions cannot be deleted;
   clear its Active box instead.
 - **Session to Cohort**, many to one, optional, delete SetNull.
+- **Session to Session Schedule**, many to one, optional, delete SetNull: deleting a schedule
+  keeps its sessions.
 - **Session to Service Delivery**, one to many, through the delivery's Session (R-SD7).
 
 ### Rules
@@ -10908,13 +10917,17 @@ recorded and saves nothing.
 
 **R-SE4 Sessions are scheduled in a batch, not by a rule.** The Schedule Sessions panel (on a
 cohort, and on a program for sessions with no cohort) creates one Scheduled session for each
-chosen weekday between two dates, with a start time, at most 200 at a time. The dates are worked
+chosen weekday between two dates, with a start and end time, at most 200 at a time. The dates are worked
 out in a framework-free module (plan 9.9); the server checks again that the service is the
-program's, the cohort is the program's, and the count. No schedule record is kept: each session
-is edited or cancelled on its own, and scheduling again adds more.
+program's, the cohort is the program's, and the count. The panel keeps no pattern itself: each
+session it makes is edited or cancelled on its own, and scheduling again adds more. Save as
+Repeating Schedule saves the panel's pattern as a Session Schedule (29ZA7, R-SS6) instead.
 
 **R-SE5 Who.** As R-CO1: sessions hold no participant data and are shared as Program is. A
 session with deliveries cannot be deleted (Restrict on the delivery's Session); cancel it instead.
+
+**R-SE6 End after start.** End Time, when both times are set, is after Start Time (validation
+rule; modules-24, D-183). Either may be empty.
 
 ### Salesforce implementation
 
@@ -10926,13 +10939,121 @@ session with deliveries cannot be deleted (Restrict on the delivery's Session); 
 | Cohort | `Cohort__c` | Lookup to `Cohort__c`, delete constraint SetNull, relationship name Sessions |
 | Session Date | `Session_Date__c` | Date, required |
 | Start Time | `Start_Time__c` | Time |
+| End Time | `End_Time__c` | Time |
 | Status | `Status__c` | Picklist, restricted, required, default Scheduled |
+| Session Schedule | `Session_Schedule__c` | Lookup to `Session_Schedule__c`, delete constraint SetNull, relationship name Sessions |
 
-- **Validation rule:** `Cohort_In_Program` (R-SE1).
+- **Validation rules:** `Cohort_In_Program` (R-SE1), `End_After_Start` (R-SE6).
 - **List views:** All Sessions, Upcoming Sessions (Scheduled, from today).
 - **Session page:** `Session_Record_Page` with the `serviceDeliveryLog` panel in its session
   form (R-SE2, R-SE3), through `ServiceDeliveryLogController.getSessionLog` and `saveSession`.
 - **PMM mapping:** Service Session (29ZA, PMM mapping).
+
+---
+
+## 29ZA7. Session Schedule
+
+### Definition
+
+A repeating pattern of sessions for one service, for a cohort or for everyone in the program:
+"Tutoring, Tuesdays and Thursdays, 16:00 to 17:30" (modules-24, owner decision D-183). It
+creates ordinary sessions a set number of weeks ahead, as a Shift Schedule creates shifts (29T),
+and never deletes one on its own. ADR-0171 records why.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text(80) | yes | What staff call the schedule, for example "Spring tutoring". |
+| Program | reference(Program) | yes | The program the schedule belongs to. |
+| Service | reference(Service) | yes | The service of the program its sessions give (R-SS1). |
+| Cohort | reference(Cohort) | no | The cohort of the program its sessions are for (R-SS1). Empty: for everyone enrolled in the program. |
+| Days of the Week | multi-select(Monday to Sunday) | yes | The days of the week a session falls on. |
+| Repeat Every (Weeks) | integer | yes (defaults 1) | 1 for every week, 2 for every other week, and so on, counted from the week of Start Date. |
+| Start Time | time | no | Copied to each session's Start Time. |
+| End Time | time | no | Copied to each session's End Time; after Start Time when both are set. |
+| Start Date | date | yes | The first day a session may fall on. |
+| End Date | date | no | The last day a session may fall on; empty means until the schedule is ended. |
+| Active | boolean | yes (defaults true) | Whether the schedule still creates sessions. |
+| Created Through | date | computed | The last day the schedule has created sessions for. Kept by the run; never edited. |
+
+### Relationships
+
+- **Session Schedule to Program**, many to one, master-detail: shared as its program is; deleting
+  the program deletes its schedules.
+- **Session Schedule to Service** and **to Cohort**, many to one, delete Restrict: a service or
+  cohort with schedules cannot be deleted until they are.
+- **Session Schedule to Session**, one to many, through the session's Session Schedule.
+
+### Rules
+
+**R-SS1 Valid pattern.** The service and the cohort, when set, are the program's; at least one
+day; Repeat Every 1 to 52; End Time after Start Time when both are set; End Date not before
+Start Date (validation rule).
+
+**R-SS2 Which days and how far.** A day is a session day by R-SSC1's rule (29T). An active
+schedule keeps sessions created from today to `Programs_Settings__c.Session_Horizon_Weeks__c`
+weeks ahead (Weeks Ahead to Create Sessions, 1 to 26, default 8; blank or out of range reads
+as 8). Each run creates the session days after Created Through (or from today, or Start
+Date, if later) up to the horizon and End Date, and moves Created Through forward. A day is
+skipped when it already has a session of this schedule (any status) or a session, not
+Cancelled, of the same service for the same cohort (none: a program-wide session), including
+one created earlier in the same run by another schedule. Each new
+session is Scheduled, takes the schedule's service, cohort and times, links to the schedule,
+and is named as the panel names one (service and date).
+
+**R-SS3 When it runs.** Saving an active schedule queues a run for it, except the run's own save
+of Created Through (`Session_Schedule_Rules`). The Programs nightly step runs every active
+schedule, ten per transaction. Create Sessions Now on the schedule page runs it at once. A run
+locks the schedule rows first, so two runs never create the same day. Nothing runs while the
+module is turned off.
+
+**R-SS4 Editing and ending never delete.** A change to the pattern applies to the days after
+Created Through. Clearing Active, an earlier End Date or deleting the schedule only stops new
+sessions; the sessions it made stay (a deleted schedule's lose their link).
+
+**R-SS5 Remove Future Sessions.** On the schedule page, after a confirm, deletes the schedule's
+sessions dated after today that are Scheduled and have no service delivery, in user mode (only
+a user who may delete sessions sees it), sets Created Through to today, and runs an active
+schedule, which recreates those days from its current pattern. Held, Cancelled and attended
+sessions are kept, and their days are not given a second session.
+
+**R-SS6 From the panel.** Save as Repeating Schedule on the Schedule Sessions panel creates an
+active weekly schedule from the panel's service, cohort, From and To dates, days and times,
+named after the service (and cohort), and runs it at once.
+
+**R-SS7 Who.** As R-CO1: Programs Admin creates, edits and deletes schedules; Programs Staff
+create and edit them; Programs Read Only reads them. Created Through is read only in every
+permission set and written by the run in system mode.
+
+### Salesforce implementation
+
+- **Object:** `Session_Schedule__c`, name field Text(80) labelled Schedule Name, sharing
+  controlled by the program.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Program | `Program__c` | Master-Detail to `Program__c`, relationship name Session_Schedules |
+| Service | `Service__c` | Lookup to `Service__c`, required, delete constraint Restrict, relationship name Session_Schedules |
+| Cohort | `Cohort__c` | Lookup to `Cohort__c`, delete constraint Restrict, relationship name Session_Schedules |
+| Days of the Week | `Weekdays__c` | Multi-Select Picklist: Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday |
+| Repeat Every (Weeks) | `Every_N_Weeks__c` | Number (2, 0), required, default 1 |
+| Start Time | `Start_Time__c` | Time |
+| End Time | `End_Time__c` | Time |
+| Start Date | `Start_Date__c` | Date, required |
+| End Date | `End_Date__c` | Date |
+| Active | `Active__c` | Checkbox, default true |
+| Created Through | `Created_Through__c` | Date, read only in every permission set |
+
+- **Validation rule:** `Session_Schedule_Valid` (R-SS1).
+- **Automation:** registry row `Session_Schedule_Rules` (`SessionScheduleTriggerHandler`), which
+  queues `SessionScheduleJob`; nightly batch `SessionScheduleBatch`, started at 3:10 AM by
+  `ProgramsScheduler` (job name `BarnCRM Session Schedules`), which
+  `ProgramsNightlyJobProvider` supplies as a step of the nightly run (Section 29ZR). Run and
+  removal in `SessionScheduleService`; queries in `SessionScheduleSelector`.
+- **Schedule page:** `Session_Schedule_Record_Page` with the `sessionScheduleSessions` panel
+  (preview, Create Sessions Now, Remove Future Sessions) through `SessionScheduleController`.
+  Schedules are listed on the program and cohort pages; there is no tab.
 
 ---
 
@@ -12631,6 +12752,9 @@ mirrors the primary member).
 | 1.0 | 2026-11-05 | Settings picklist from a field. `Setting_Definition__mdt.Data_Type__c` gains PicklistFromField; its source field is named in the existing `Record_Object__c` as `Object.Field`. No new field. The Gift Transaction mirror paid status row uses it for Gift Transaction Status. |
 | 1.0 | 2026-11-05 | Field Use required, default value and at default (owner QA 2026-11-05, ADR-0169). Section 29F: R-FU2 now counts required fields and checkboxes; new rules R-FU13 (Required and Default Value from describe) and R-FU14 (At Default, one more grouped count per field). No object or field added; snapshots unchanged. |
 | 1.0 | 2026-11-05 | Shipped relationship types can be turned off (owner request, ADR-0170). `BarnCRM_Settings__c` gains `Relationship_Types_Turned_Off__c` (Section 12); Relationship Type and rule R-D2 say how a turned-off shipped row is read. No other object or field added. |
+| 1.0 | 2026-11-06 | Session End Time (modules-24, owner decision D-183). `Session__c` gains `End_Time__c` (Time) with rule R-SE6 and validation rule `End_After_Start`; the Schedule Sessions panel sets it (R-SE4). No other object or field added. |
+| 1.0 | 2026-11-06 | Session Schedule (modules-24, D-183, ADR-0171). New in the Programs module: Session Schedule (`Session_Schedule__c`, 29ZA7), master-detail to Program, with rules R-SS1 to R-SS7. `Session__c` gains `Session_Schedule__c` (Lookup, SetNull). R-SE4 says the panel can save its pattern as a schedule. |
+| 1.0 | 2026-11-06 | Session horizon setting (modules-24, D-183). `Programs_Settings__c` gains `Session_Horizon_Weeks__c` (Number(2, 0), default 8, 1 to 26). R-SS2 reads it instead of a fixed eight weeks, and skips a day another schedule filled earlier in the same run. |
 
 ---
 ## 32. Entity ownership by package
@@ -12728,6 +12852,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Goal Step | Programs | 0.15 (P-10) | 29ZA4 |
 | Cohort | Programs | 0.15 (P-11) | 29ZA5 |
 | Session | Programs | 0.15 (P-11) | 29ZA6 |
+| Session Schedule | Programs | 1.0 (modules-24) | 29ZA7 |
 | Programs Settings (custom setting, Participant Privacy preset) | Programs | 0.14 (P-08) | 29ZA |
 | Service Delivery | Programs | 0.13 (P-02) | 29ZB |
 | Programs entities | Programs | v0.9 | 30 |

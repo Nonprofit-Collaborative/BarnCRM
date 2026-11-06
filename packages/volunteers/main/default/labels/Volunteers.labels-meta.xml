@@ -1163,6 +1163,22 @@ When: {1}</value>
         <value>Log Hours</value>
     </labels>
     <labels>
+        <fullName>Volunteers_ScheduleForm_Edit</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Heading of the Edit Schedule action</shortDescription>
+        <value>Edit Shift Schedule</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_ScheduleForm_New</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Heading of the New Shift Schedule action</shortDescription>
+        <value>New Shift Schedule</value>
+    </labels>
+    <labels>
         <fullName>Volunteers_Schedule_CreateNow</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>

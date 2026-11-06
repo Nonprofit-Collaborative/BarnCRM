@@ -36,10 +36,19 @@
     <fields>Service__c</fields>
     <fields>Session_Date__c</fields>
     <fields>Start_Time__c</fields>
+    <fields>End_Time__c</fields>
     <fields>Status__c</fields>
     <relatedList>Session__c.Cohort__c</relatedList>
     <sortField>Session_Date__c</sortField>
     <sortOrder>Asc</sortOrder>
+  </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Service__c</fields>
+    <fields>Weekdays__c</fields>
+    <fields>Start_Time__c</fields>
+    <fields>Active__c</fields>
+    <relatedList>Session_Schedule__c.Cohort__c</relatedList>
   </relatedLists>
   <showEmailCheckbox>false</showEmailCheckbox>
   <showHighlightsPanel>false</showHighlightsPanel>

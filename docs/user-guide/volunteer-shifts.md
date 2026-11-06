@@ -59,11 +59,12 @@ Work that happens every week is set up once, as a shift schedule on the job, and
 the dated shifts for you. Coordinators and Team Members can do this; only an admin deletes a
 schedule.
 
-1. Open the job and find the **Shift Schedules** list. Click **New**.
+1. Open the job and click **New Shift Schedule**.
 2. Fill in **Schedule Name**, **Days of the Week** (pick one or more), **Repeat Every (Weeks)** (1 for
    every week, 2 for every other week), **Start Time**, **End Time**, **Start Date** and
    **Volunteers Needed**. Leave **End Date** empty to keep it running, and **Location** empty to
-   use the job's.
+   use the job's. As you choose, a line under the fields says how many shifts this makes, for
+   example "12 shifts will be created through 27 Apr 2026".
 3. Leave **Active** ticked and click **Save**.
 
 You should see: within about a minute, the new shifts in the job's **Shifts** list, each showing

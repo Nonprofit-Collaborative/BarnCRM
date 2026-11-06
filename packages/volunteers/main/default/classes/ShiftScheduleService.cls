@@ -339,7 +339,8 @@ public with sharing class ShiftScheduleService {
 		return orgDate(now());
 	}
 
-	private static String timeZone() {
+	/** The org's time zone, in which every schedule's times are read. */
+	public static String timeZone() {
 		if (timeZoneOverride != null) {
 			return timeZoneOverride;
 		}

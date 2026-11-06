@@ -27,22 +27,21 @@ combined address and location fields (their separate parts, such as street and c
 as fields of their own). A value longer than 2,000 characters is cut there and marked
 **Shortened**.
 
-The Record Inspector has a page of its own, the **Record Inspector** tab. You reach it in two
-ways:
-
-- From a record: click the **Inspect This Record** button on the record page. The Record
-  Inspector page opens on that record and reads it at once.
-- From the navigation: open **Record Inspector** in the **BarnCRM Admin** or **BarnCRM Admin
-  Console** app, and paste a record's ID or the address of its page.
+The Record Inspector is button only (D-183): it has no tab in the BarnCRM Admin apps. Click the
+**Inspect This Record** button on a record page and the Record Inspector page opens on that
+record and reads it at once. Once there, paste another record's ID or the address of its page
+to inspect that one. (The page itself still exists, so an admin can also find **Record
+Inspector** under **All Items** in the App Launcher.)
 
 ## How to Turn It On
 
 You need the BarnCRM Admin role (the BarnCRM Admin permission set, which carries the Manage
-BarnCRM Settings permission and shows the Record Inspector tab). Nobody else sees the button
-or the tab. There is nothing to schedule and no setting to change.
+BarnCRM Settings permission and the Record Inspector page the button opens). Nobody else sees
+the button. There is nothing to schedule and no setting to change.
 
-BarnCRM already puts the **Inspect This Record** button in the right column of the Contact and
-Account record pages that install with Core. Only people with the BarnCRM Admin role see it.
+BarnCRM already puts the **Inspect This Record** button at the top of the right column of the
+Contact and Account record pages that install with Core, so you find it without scrolling.
+Only people with the BarnCRM Admin role see it.
 To add it to other pages:
 
 1. Open any record page and choose **Edit Page** from the gear menu.

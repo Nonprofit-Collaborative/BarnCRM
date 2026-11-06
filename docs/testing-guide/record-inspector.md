@@ -12,7 +12,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open a sample Contact. | The sidebar shows an **Inspect This Record** button, and no Record Inspector card. |
+| 1 | Open a sample Contact. | The **Inspect This Record** button is the first item at the top of the right column, with no scrolling, and there is no Record Inspector card. |
 | 2 | Click **Inspect This Record**. | The **Record Inspector** page opens and reads the record at once: the Contact's name (a link) and **Contact** above a table of fields sorted by **Field**, with **API Name**, **Type** and **Value**, and a count such as "120 fields". It includes a field that is not on the Contact page layout. |
 | 3 | Type `email` in **Search Fields**. | Only fields with email in the label, API name, type or value remain, and the count updates. |
 | 4 | Clear the search, then click **Copy** beside the **Last Name** row. | A short confirmation shows. Pasting elsewhere gives `LastName`. |
@@ -31,8 +31,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Admin** app. | **Record Inspector** is in the navigation, just before **Error Log**, which is last. |
-| 2 | Click **Record Inspector**. | The page shows a **Record ID or Link** box, an **Inspect** button and a short note on what to paste. No table. |
+| 1 | Open the **BarnCRM Admin** app. | **Record Inspector** is not in the navigation (it is button only, D-183); **Error Log** is last. |
+| 2 | Open the App Launcher, choose **All Items** and click **Record Inspector**. | The page shows a **Record ID or Link** box, an **Inspect** button and a short note on what to paste. No table. |
 | 3 | Type `not a record` and click **Inspect**. | An error says it is not a record ID or a link to a record. |
 | 4 | Copy the address of an Organization's record page, paste it in the box and press Enter. | The page reads the Organization: its name and **Account** above the table. The address bar now names the record, so the link can be shared with another admin. |
 | 5 | Paste the 18 character ID of a Contact and click **Inspect**. | The page reads the Contact. |
