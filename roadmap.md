@@ -2,7 +2,7 @@
 
 Purpose: planned work with status, by release. Mirrors Section 6 (6.0a release plan, 6.1.5 competitive research) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Feature status detail lives in `docs/barncrm-features.md`.
 
-Status as of 2026-11-06: all of Batch B is in `main`: the nonprofit stage (Giving, Programs, Volunteers, Funders, Logic Models usability and visual rollout, release 0.18) landed as #958 (ca99c753) after the owner QA fixes; the release gate passed on `barn-sales` and `oi-test` (4,914 of 4,914); released to `barn-npc` (all packages); `mwdbdevsb` not yet deployed (needs approval and the D-177 scope); next Batch C (Forms, Contact Point Sync, Events, Portal Builder). Earlier, status as of 2026-11-05: the Batch B Core stage (#912) and stage 2, Core follow-ups, Rollups and Mirror (#918) are in `main`; released to `barn-npc` (Core and universal modules) and `mwdbdevsb` (Core and Rollups); the owner QA round landed #923 to #930 in `main`, not yet deployed (D-177 to D-180); the nonprofit stage of Batch B is held until the QA fixes are done; then Batch C (Forms, Contact Point Sync, Events, Portal Builder). Earlier, status as of 2026-11-04: releases 0.15 to 0.17 (batch B) built and integrated on `landing/batch-b`; release 0.18 (usability and visual polish, architect-review fixes; D-170 to D-173) added to v1.0 and partly built: UX kit, help catalogs, logos, Core and Logic Models rollouts and the install and automation stack merged into `landing/batch-b` through #898; the nonprofit module rollouts (Giving, Programs, Volunteers, Funders, Logic Models part 3) are on hold behind Core, then universal modules, then nonprofit modules; messages move (AR-01) and the Apex trim pass still to build; Project Management module placed in release 1.17, Batch I (D-175). Nothing of batch B is in `main` yet. Earlier, status as of 2026-11-02: every v1.0 item (releases 0.15 to 0.17, batch B) built and integrated on `landing/batch-b`, not yet in `main` (status Built until the landing gate passes and it is squash-merged; D-167: all of v1.0 built before any testing cycle). Landing batch A (releases 0.12 to 0.14) landed in `main` (status Landed until the batch's release gate, deploys and QA are done); last shipped version 0.11; release plan adopted (D-155); competitive research added 48 features (D-156); the eleven research proposals approved and placed, v1.0 after Brandon's initial QA (D-157). History: `changelog.md` (newest first) and this file's earlier versions in git (`git log -p -- roadmap.md`; the last iteration-based version is at ef92381b).
+Status as of 2026-11-06: all of Batch B is in `main`: the nonprofit stage (Giving, Programs, Volunteers, Funders, Logic Models usability and visual rollout, release 0.18) landed as #958 (ca99c753) after the owner QA fixes; the release gate passed on `barn-sales` and `oi-test` (4,914 of 4,914); released to `barn-npc` (all packages); `mwdbdevsb` not yet deployed (needs approval and the D-179 scope); next Batch C (Forms, Contact Point Sync, Events, Portal Builder). Earlier, status as of 2026-11-05: the Batch B Core stage (#912) and stage 2, Core follow-ups, Rollups and Mirror (#918) are in `main`; released to `barn-npc` (Core and universal modules) and `mwdbdevsb` (Core and Rollups); the owner QA round landed #923 to #930 in `main`, not yet deployed (D-179 to D-182); the nonprofit stage of Batch B is held until the QA fixes are done; then Batch C (Forms, Contact Point Sync, Events, Portal Builder). Earlier, status as of 2026-11-04: releases 0.15 to 0.17 (batch B) built and integrated on `landing/batch-b`; release 0.18 (usability and visual polish, architect-review fixes; D-170 to D-173) added to v1.0 and partly built: UX kit, help catalogs, logos, Core and Logic Models rollouts and the install and automation stack merged into `landing/batch-b` through #898; the nonprofit module rollouts (Giving, Programs, Volunteers, Funders, Logic Models part 3) are on hold behind Core, then universal modules, then nonprofit modules; messages move (AR-01) and the Apex trim pass still to build; Project Management module placed in release 1.17, Batch I (D-175). Nothing of batch B is in `main` yet. Earlier, status as of 2026-11-02: every v1.0 item (releases 0.15 to 0.17, batch B) built and integrated on `landing/batch-b`, not yet in `main` (status Built until the landing gate passes and it is squash-merged; D-167: all of v1.0 built before any testing cycle). Landing batch A (releases 0.12 to 0.14) landed in `main` (status Landed until the batch's release gate, deploys and QA are done); last shipped version 0.11; release plan adopted (D-155); competitive research added 48 features (D-156); the eleven research proposals approved and placed, v1.0 after Brandon's initial QA (D-157). History: `changelog.md` (newest first) and this file's earlier versions in git (`git log -p -- roadmap.md`; the last iteration-based version is at ef92381b).
 
 ## Rules (D-155 to D-157, plan 9.7 to 9.9)
 
@@ -20,13 +20,13 @@ Status as of 2026-11-06: all of Batch B is in `main`: the nonprofit stage (Givin
 |---|---|---|
 | A | 0.12, 0.13, 0.14 | Access Explorer, admin visibility and Core follow-ups; Programs, solicitation pipeline, Logic Models, volunteer reminders |
 | B | 0.15, 0.16, 0.17, 0.18 | Programs depth, Logic Models and Funders complete, Nonprofit Cloud mirror, Field Access Manager, usability and visual polish (0.18, D-170), architect-review fixes (0.18, D-172, D-173); 0.18 is the v1.0 candidate; namespace registration and a sandbox-only managed beta follow the v1.0 test cycle and precede the first production pilot (D-173) |
-| C | 1.1, 1.2, 1.3 | Forms engine, Contact Point Sync, Address Verification, Migration Assistant, volunteer self-service, online donations, recurring donor health, engagement score |
-| D | 1.4, 1.5, 1.6 | Archive by Query, generic merge, field history, Corporate Hub documents and compliance, Memberships, GDPR |
-| E | 1.7, 1.8, 1.9 | Migrations, board governance, Portal Builder, board, volunteer and member portals, grant management |
-| F | 1.10, 1.11, 1.12 | Scholarships and Outbound Grants, Event Management |
-| G | 1.13, 1.14 | Gala seating, multi-brand management, LWC Builder start |
-| H | 1.15, 1.16 | LWC Builder complete, Territory Management, Grid tool; Backup Sets and files import last |
-| I | 1.17 | Project Management module, possibly a PSA tool (D-175); later by Brandon's direction |
+| C | 1.1, 1.2, 1.3 | Forms engine, Contact Point Sync, Event Management (core, then complete with call for speakers, sponsorship, check-in; moved up by Brandon, D-177), Portal Builder with the volunteer, speaker and donor portal templates (1.3, D-178; PB-01 waits on the item 30 terms check) |
+| D | 1.4, 1.5, 1.6 | Migration Assistant, volunteer self-service, recurring donor health, engagement score, Giving minors, Archive by Query, generic merge, field history |
+| E | 1.7, 1.8, 1.9 | Corporate Hub documents and compliance, Memberships, GDPR, Migrations |
+| F | 1.10, 1.11, 1.12 | Board governance, board and member portals (Portal Builder moved to Batch C, D-178), grant management, Scholarships and Outbound Grants |
+| G | 1.13, 1.14, 1.15 | Gala seating, multi-brand management, LWC Builder start, Address Verification and online donations (moved later by Brandon, D-177) |
+| H | 1.16, 1.17 | LWC Builder complete, Territory Management, Grid tool; Backup Sets and files import last (D-157) |
+| I | 1.18 | Project Management module, possibly a PSA tool (D-175); later by Brandon's direction |
 
 ## Releases
 
@@ -160,124 +160,9 @@ Added 2026-11-04 (D-170). v1.0 is everything through the last Batch B release. E
 | V-10b | Volunteer shift reminders: "still need you" nudge for unfilled shifts (split from V-10) | Minor | Planned | D-165 |
 | UX-F4 | Module UX kit pass: Programs, Giving, Volunteers and Logic Models pages (absorbed into UX-V1 and UX-V4, release 0.18, D-170) | Minor | Absorbed into UX-V1 and UX-V4 (D-170) | D-165 |
 
-### 1.2 (Batch C): Address Verification, Migration Assistant, volunteer self-service
+### 1.2 (Batch C): Event Management core
 
-| ID | Item | Size | Status | Source |
-|---|---|---|---|---|
-| C-46 | Address Verification module (ADR first) | Major | Planned | D-112 |
-| MIG-01 | Migration Assistant framework (plan 11.2 item 32 decisions first) | Major | Planned | D-125 |
-| V-09 | Public volunteer sign-up on the Forms engine | Major | Planned | D-157 |
-| MIG-10 | Integrations page: detected apps and migration links | Minor | Planned | D-125 |
-| MIG-06 | Stripe receiver (X-08) and Zapier recipes | Minor | Planned | D-125 |
-| MIG-08 | DLRS and NPSP rollups into Rollup Builder | Minor | Planned | D-125 |
-| V-12 | Volunteer value rate | Minor | Planned | D-156 |
-| V-13 | Volunteer recognition and milestones | Minor | Planned | D-156 |
-| G-35 | Giving setup tabs move to Admin_Tabs | Minor | Planned | D-165 |
-
-### 1.3 (Batch C): Online donations, recurring donor health, engagement score
-
-| ID | Item | Size | Status | Source |
-|---|---|---|---|---|
-| G-34 | Online donation page handing off to the org's own Stripe or PayPal checkout | Major | Planned | D-157 |
-| G-27 | Recurring donor health | Major | Planned | D-156 |
-| C-64 | Engagement score | Major | Planned | D-157 |
-| G-21 | Stock and planned gift types | Minor | Planned | Plan 5.2 |
-| G-31 | Donor-advised fund and gift-source fields | Minor | Planned | D-156 |
-| G-32 | Wealth data fields and import template | Minor | Planned | D-156 |
-| G-33 | Quick Gift Entry donor panel | Minor | Planned | D-156 |
-| G-36 | One staff-facing word for Pledge versus Commitment (needs Brandon) | Minor | Planned | D-165 |
-| G-37 | Pledge reminders on the GivingScheduler Nightly Jobs path (needs Brandon) | Minor | Planned | D-165 |
-
-### 1.4 (Batch D): Archive, generic merge, field history, Volunteers minors
-
-| ID | Item | Size | Status | Source |
-|---|---|---|---|---|
-| C-67 | Archive by Query (uses shipped tools; defines the file format Backup Sets reuse) | Major | Planned | D-157 |
-| C-62 | Generic Record Merge | Major | Planned | D-156 |
-| C-68 | Field History Keeper | Major | Planned | D-157 |
-| V-14 | Shift minimum, maximum and waitlist | Minor | Planned | D-156 |
-| V-15 | Minor volunteers and guardian consent | Minor | Planned | D-156 |
-| V-16 | Group and standing sign-ups | Minor | Planned | D-156 |
-| V-17 | Background check details on onboarding | Minor | Planned | D-156 |
-| P-09 | Waitlists and capacity | Minor | Planned | Plan 5.4 |
-| C-71 | Fold the remaining inline AuraHandledException blocks into UserErrors | Minor | Planned | D-165 |
-
-### 1.5 (Batch D): Corporate Hub, documents and compliance
-
-| ID | Item | Size | Status | Source |
-|---|---|---|---|---|
-| CH-01 | Document and policy library (ADR first) | Major | Planned | D-118 |
-| CH-03 | Compliance calendar | Major | Planned | D-118 |
-| CH-04 | Shipped compliance templates | Major | Planned | D-118 |
-| CH-02 | Policy acknowledgments | Minor | Planned | D-118 |
-| CH-06 | Extra templates | Minor | Planned | D-118 |
-| CH-07 | Required-policies set | Minor | Planned | D-118 |
-| CH-08 | Contracts and renewals | Minor | Planned | D-118 |
-
-### 1.6 (Batch D): Memberships, GDPR
-
-| ID | Item | Size | Status | Source |
-|---|---|---|---|---|
-| G-22a | Memberships module: types, tiers, members (ADR first) | Major | Planned | D-157 |
-| G-22b | Memberships: renewals, reminders, lapse handling | Major | Planned | D-157 |
-| CH-05 | GDPR template set | Major | Planned | D-118 |
-| G-22c | Memberships: benefits per tier | Minor | Planned | D-157 |
-| G-22d | Memberships Essentials compatibility | Minor | Planned | D-157 |
-| MIG-03 | V4S to Volunteers adapter | Minor | Planned | D-125 |
-
-### 1.7 (Batch E): Migrations
-
-| ID | Item | Size | Status | Source |
-|---|---|---|---|---|
-| MIG-02 | NPC Party Relationship Groups to households | Major | Planned | D-125 |
-| MIG-04 | NPC gifts to Giving | Major | Planned | D-125 |
-| MIG-05 | NPSP migration kit, with a Levels, Engagement Plans and rollups parity report | Major | Planned | D-125, D-156 |
-| MIG-09 | PMM to Programs | Minor | Planned | D-125 |
-| MIG-07 | DonorPerfect, Bloomerang, Little Green Light templates, then Neon, CiviCRM, Raiser's Edge NXT | Minor | Planned | D-125 |
-| L-05 | Evidence log | Minor | Planned | Plan 5.7 |
-
-### 1.8 (Batch E): Board governance and Portal Builder
-
-| ID | Item | Size | Status | Source |
-|---|---|---|---|---|
-| CH-09 | Board governance | Major | Planned | D-118 |
-| CH-10 | Board meetings | Major | Planned | D-118 |
-| PB-01 | Portal Builder (ADR first) | Major | Planned (blocked: plan 11.2 item 30 terms check) | D-118, D-120 |
-| CH-11 | Motions, votes and resolutions | Minor | Planned | D-118 |
-| CH-12 | Conflict-of-interest disclosures | Minor | Planned | D-118 |
-| CH-13 | Board giving participation | Minor | Planned | D-118 |
-| CH-14 | Board dashboard | Minor | Planned | D-118 |
-| CH-15 | Board skills and diversity matrix | Minor | Planned | D-156 |
-| CH-16 | Meeting action items | Minor | Planned | D-156 |
-
-### 1.9 (Batch E): Board, volunteer and member portals, grant management
-
-| ID | Item | Size | Status | Source |
-|---|---|---|---|---|
-| PB-02 | Board portal template | Major | Planned | D-118 |
-| F-09 | Grant Finder | Major | Planned | D-121 |
-| PB-03 | Volunteer portal template (moved earlier) | Minor | Planned | D-118, D-157 |
-| PB-09 | Member directory portal template | Minor | Planned | D-157 |
-| F-10 | Application tasks and checklists | Minor | Planned | D-121 |
-| F-11 | Document tracking | Minor | Planned | D-121 |
-| F-12 | Budget versus awarded | Minor | Planned | D-121 |
-| F-13 | Renewals | Minor | Planned | D-121 |
-
-### 1.10 (Batch F): Scholarships and Outbound Grants
-
-| ID | Item | Size | Status | Source |
-|---|---|---|---|---|
-| SG-01 | Programs and cycles (ADR first) | Major | Planned | D-122 |
-| SG-02 | Applications on the Forms engine | Major | Planned | D-122 |
-| SG-03 | Reviewers and scoring | Major | Planned | D-122 |
-| SG-04 | Awards | Minor | Planned | D-122 |
-| SG-05 | Disbursements | Minor | Planned | D-122 |
-| SG-06 | Recipient reporting | Minor | Planned | D-122 |
-| SG-08 | Grantmaking dashboard | Minor | Planned | D-122 |
-| PB-06 | Applicant portal template (SG-07) | Minor | Planned | D-122 |
-| SG-09 | Conditional disbursements | Minor | Planned | D-156 |
-
-### 1.11 (Batch F): Event Management core
+Moved up from the old 1.11 (Brandon, 2026-11-04, D-177): Events reuse the Forms engine right after it ships in 1.1.
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
@@ -291,21 +176,146 @@ Added 2026-11-04 (D-170). v1.0 is everything through the last Batch B release. E
 | EV-14 | Event reminders and No-Show status | Minor | Planned | D-156 |
 | CH-17 | Committees and working groups | Minor | Planned | D-156 |
 
-### 1.12 (Batch F): Event Management complete, check-in, donor portal
+### 1.3 (Batch C): Event Management complete and Portal Builder
+
+The Event items of the old 1.12, moved up with 1.2 (D-177). Portal Builder (PB-01) and the portal templates whose data already exists (PB-03, PB-07, PB-08) join them (Brandon, 2026-11-04, D-178). PB-01 starts only after the plan 11.2 item 30 terms check confirms option B; if it does not, the Portal Builder items are re-slotted. PB-02 (1.11), CH-18 and CH-19 (1.14), PB-09 (1.11), PB-06 (1.12) stay with their modules.
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
 | EV-06 | Call for speakers | Major | Planned | D-123 |
 | EV-09 | Sponsorship management | Major | Planned | D-123 |
 | EV-12 | QR check-in | Major | Planned | D-156 |
+| PB-01 | Portal Builder (ADR first) | Major | Planned (blocked: terms check) | D-118, D-120, D-178 |
 | EV-11 | Event dashboard and conference template | Minor | Planned | D-123 |
-| PB-07 | Speaker portal template (EV-07) | Minor | Planned | D-123 |
 | EV-15 | Event appointments with hosts | Minor | Planned | D-156 |
-| PB-08 | Donor portal template | Minor | Planned | D-156 |
-| CH-18 | Board packet read tracking | Minor | Planned | D-156 |
-| CH-19 | Board self-assessment | Minor | Planned | D-156 |
+| PB-03 | Volunteer portal template (moved earlier) | Minor | Planned | D-118, D-157, D-178 |
+| PB-07 | Speaker portal template (EV-07) | Minor | Planned | D-123, D-178 |
+| PB-08 | Donor portal template | Minor | Planned | D-156, D-178 |
 
-### 1.13 (Batch G): Gala seating, multi-brand management
+### 1.4 (Batch D): Migration Assistant, volunteer self-service
+
+C-46 Address Verification moved to release 1.15 (Brandon, 2026-11-04, D-177).
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| MIG-01 | Migration Assistant framework (plan 11.2 item 32 decisions first) | Major | Planned | D-125 |
+| V-09 | Public volunteer sign-up on the Forms engine | Major | Planned | D-157 |
+| MIG-10 | Integrations page: detected apps and migration links | Minor | Planned | D-125 |
+| MIG-06 | Stripe receiver (X-08) and Zapier recipes | Minor | Planned | D-125 |
+| MIG-08 | DLRS and NPSP rollups into Rollup Builder | Minor | Planned | D-125 |
+| V-12 | Volunteer value rate | Minor | Planned | D-156 |
+| V-13 | Volunteer recognition and milestones | Minor | Planned | D-156 |
+| G-35 | Giving setup tabs move to Admin_Tabs | Minor | Planned | D-165 |
+
+### 1.5 (Batch D): Recurring donor health, engagement score, Giving minors
+
+G-34 online donation page moved to release 1.15 with C-46 (D-177), as did G-21 and G-31. G-27 stays here, after MIG-06 in 1.4.
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| G-27 | Recurring donor health | Major | Planned | D-156 |
+| C-64 | Engagement score | Major | Planned | D-157 |
+| G-32 | Wealth data fields and import template | Minor | Planned | D-156 |
+| G-33 | Quick Gift Entry donor panel | Minor | Planned | D-156 |
+| G-36 | One staff-facing word for Pledge versus Commitment (needs Brandon) | Minor | Planned | D-165 |
+| G-37 | Pledge reminders on the GivingScheduler Nightly Jobs path (needs Brandon) | Minor | Planned | D-165 |
+
+### 1.6 (Batch D): Archive, generic merge, field history, Volunteers minors
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| C-67 | Archive by Query (uses shipped tools; defines the file format Backup Sets reuse) | Major | Planned | D-157 |
+| C-62 | Generic Record Merge | Major | Planned | D-156 |
+| C-68 | Field History Keeper | Major | Planned | D-157 |
+| V-14 | Shift minimum, maximum and waitlist | Minor | Planned | D-156 |
+| V-15 | Minor volunteers and guardian consent | Minor | Planned | D-156 |
+| V-16 | Group and standing sign-ups | Minor | Planned | D-156 |
+| V-17 | Background check details on onboarding | Minor | Planned | D-156 |
+| P-09 | Waitlists and capacity | Minor | Planned | Plan 5.4 |
+| C-71 | Fold the remaining inline AuraHandledException blocks into UserErrors | Minor | Planned | D-165 |
+
+### 1.7 (Batch E): Corporate Hub, documents and compliance
+
+C-46 Address Verification is not a prerequisite (D-178): hub addresses are unverified until C-46 ships in 1.15.
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| CH-01 | Document and policy library (ADR first) | Major | Planned | D-118 |
+| CH-03 | Compliance calendar | Major | Planned | D-118 |
+| CH-04 | Shipped compliance templates | Major | Planned | D-118 |
+| CH-02 | Policy acknowledgments | Minor | Planned | D-118 |
+| CH-06 | Extra templates | Minor | Planned | D-118 |
+| CH-07 | Required-policies set | Minor | Planned | D-118 |
+| CH-08 | Contracts and renewals | Minor | Planned | D-118 |
+
+### 1.8 (Batch E): Memberships, GDPR
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| G-22a | Memberships module: types, tiers, members (ADR first) | Major | Planned | D-157 |
+| G-22b | Memberships: renewals, reminders, lapse handling | Major | Planned | D-157 |
+| CH-05 | GDPR template set | Major | Planned | D-118 |
+| G-22c | Memberships: benefits per tier | Minor | Planned | D-157 |
+| G-22d | Memberships Essentials compatibility | Minor | Planned | D-157 |
+| MIG-03 | V4S to Volunteers adapter | Minor | Planned | D-125 |
+
+### 1.9 (Batch E): Migrations
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| MIG-02 | NPC Party Relationship Groups to households | Major | Planned | D-125 |
+| MIG-04 | NPC gifts to Giving | Major | Planned | D-125 |
+| MIG-05 | NPSP migration kit, with a Levels, Engagement Plans and rollups parity report | Major | Planned | D-125, D-156 |
+| MIG-09 | PMM to Programs | Minor | Planned | D-125 |
+| MIG-07 | DonorPerfect, Bloomerang, Little Green Light templates, then Neon, CiviCRM, Raiser's Edge NXT | Minor | Planned | D-125 |
+| L-05 | Evidence log | Minor | Planned | Plan 5.7 |
+
+### 1.10 (Batch F): Board governance
+
+Portal Builder (PB-01) moved to release 1.3 (D-178); the board portal template (PB-02) follows in 1.11.
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| CH-09 | Board governance | Major | Planned | D-118 |
+| CH-10 | Board meetings | Major | Planned | D-118 |
+| CH-11 | Motions, votes and resolutions | Minor | Planned | D-118 |
+| CH-12 | Conflict-of-interest disclosures | Minor | Planned | D-118 |
+| CH-13 | Board giving participation | Minor | Planned | D-118 |
+| CH-14 | Board dashboard | Minor | Planned | D-118 |
+| CH-15 | Board skills and diversity matrix | Minor | Planned | D-156 |
+| CH-16 | Meeting action items | Minor | Planned | D-156 |
+
+### 1.11 (Batch F): Board and member portals, grant management
+
+PB-03 moved to release 1.3 (D-178). PB-02 needs Portal Builder (1.3) and board governance (1.10); PB-09 needs Portal Builder (1.3) and Memberships (1.8).
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| PB-02 | Board portal template | Major | Planned | D-118 |
+| F-09 | Grant Finder | Major | Planned | D-121 |
+| PB-09 | Member directory portal template | Minor | Planned | D-157 |
+| F-10 | Application tasks and checklists | Minor | Planned | D-121 |
+| F-11 | Document tracking | Minor | Planned | D-121 |
+| F-12 | Budget versus awarded | Minor | Planned | D-121 |
+| F-13 | Renewals | Minor | Planned | D-121 |
+
+### 1.12 (Batch F): Scholarships and Outbound Grants
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| SG-01 | Programs and cycles (ADR first) | Major | Planned | D-122 |
+| SG-02 | Applications on the Forms engine | Major | Planned | D-122 |
+| SG-03 | Reviewers and scoring | Major | Planned | D-122 |
+| SG-04 | Awards | Minor | Planned | D-122 |
+| SG-05 | Disbursements | Minor | Planned | D-122 |
+| SG-06 | Recipient reporting | Minor | Planned | D-122 |
+| SG-08 | Grantmaking dashboard | Minor | Planned | D-122 |
+| PB-06 | Applicant portal template (SG-07) | Minor | Planned | D-122 |
+| SG-09 | Conditional disbursements | Minor | Planned | D-156 |
+
+### 1.13 (Batch G): Gala seating, multi-brand management, portal templates
+
+PB-07 and PB-08 moved to release 1.3 (D-178). PB-04 and PB-05 need Portal Builder (1.3) and their data modules.
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
@@ -316,7 +326,9 @@ Added 2026-11-04 (D-170). v1.0 is everything through the last Batch B release. E
 | PB-05 | Partner portal template | Minor | Planned | D-118 |
 | SG-10 | Reviewer panels and load balancing | Minor | Planned | D-156 |
 
-### 1.14 (Batch G): Brand visibility and LWC Builder start
+### 1.14 (Batch G): Brand visibility, LWC Builder start, board portal follow-ups
+
+CH-18 and CH-19 came from the old 1.12 (D-177): they need the board portal (PB-02, 1.11) and stay with the portal releases.
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
@@ -326,8 +338,21 @@ Added 2026-11-04 (D-170). v1.0 is everything through the last Batch B release. E
 | C-47d | Brand lookup in modules, Bulk Update and import mapping | Minor | Planned | D-119 |
 | C-47e | Brand filters on list views, reports and dashboards | Minor | Planned | D-119 |
 | C-47f | Receipt numbering per brand | Minor | Planned | D-119 |
+| CH-18 | Board packet read tracking | Minor | Planned | D-156 |
+| CH-19 | Board self-assessment | Minor | Planned | D-156 |
 
-### 1.15 (Batch H): LWC Builder complete, Territory Management, Grid tool
+### 1.15 (Batch G): Address Verification, online donations
+
+Moved later by Brandon (2026-11-04, D-177). G-34 still needs MIG-06 (1.4) and the Forms engine (1.1); G-27 stays in 1.5. G-21 and G-31 came from the old 1.3. C-46 is no longer a prerequisite of Corporate Hub or Portal Builder (D-178), so their addresses are unverified until it ships here.
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| C-46 | Address Verification module (ADR first) | Major | Planned | D-112 |
+| G-34 | Online donation page handing off to the org's own Stripe or PayPal checkout | Major | Planned | D-157 |
+| G-21 | Stock and planned gift types | Minor | Planned | Plan 5.2 |
+| G-31 | Donor-advised fund and gift-source fields | Minor | Planned | D-156 |
+
+### 1.16 (Batch H): LWC Builder complete, Territory Management, Grid tool
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
@@ -340,7 +365,7 @@ Added 2026-11-04 (D-170). v1.0 is everything through the last Batch B release. E
 | C-41b | Saved grids | Minor | Planned | D-98 |
 | C-40b | Round-robin and capacity routing | Minor | Planned | D-156 |
 
-### 1.16 (Batch H): Backup Sets and files import (late by Brandon's direction)
+### 1.17 (Batch H): Backup Sets and files import (late by Brandon's direction)
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
@@ -350,7 +375,7 @@ Added 2026-11-04 (D-170). v1.0 is everything through the last Batch B release. E
 | CH-20 | Meeting availability poll | Minor | Planned | D-156 |
 | MIG-11 | Outbound Funds importer (only when installed) | Minor | Planned | D-156 |
 
-### 1.17 (Batch I): Project Management module (later by Brandon's direction)
+### 1.18 (Batch I): Project Management module (later by Brandon's direction)
 
 Brandon (2026-11-04, D-175): a PM module that handles projects in various ways, including Salesforce implementation projects, perhaps a PSA tool. A universal module (both editions proposed), so it follows the Core, universal, nonprofit order (D-38). The item list is provisional until the spec is written.
 
