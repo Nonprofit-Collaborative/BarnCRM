@@ -41,8 +41,9 @@ CAPS = {
     # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
     # Quick Gift Entry tribute, match and split (people-giving-13, 16, 23), and the New
     # Commitment screen's shared pledge builder (CommitmentEntry, people-giving-11), and
-    # Giving at a Glance (GivingRecordGlanceExtension, people-giving-14).
-    "giving": 604_000,
+    # Giving at a Glance (GivingRecordGlanceExtension, people-giving-14), and the Thank-Yous
+    # page's rule reorder and missing-template reason (people-giving-18).
+    "giving": 605_500,
     "volunteers": 166_000,
     "programs": 148_000,
     "logicmodels": 65_000,
