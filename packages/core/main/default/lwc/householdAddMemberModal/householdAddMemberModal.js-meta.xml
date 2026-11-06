@@ -2,9 +2,8 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    The Add Member dialog of the Members panel: search for a person or add someone new in the
-    flexible way of belonging, the new contact form in the simple way. Its person mode is the
-    New Person window of Giving's Quick Gift Entry and Gift Batch, so it is exposed.
+    The Add Member dialog of the Members panel, and in person mode the New Person window of
+    Giving's Quick Gift Entry and Gift Batch, so it is exposed.
   </description>
   <isExposed>true</isExposed>
 </LightningComponentBundle>
