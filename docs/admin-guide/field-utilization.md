@@ -36,8 +36,10 @@ Start from the sample data (see [Sample data](sample-data.md)).
    as it counts the fields, 40 at a time, with a progress bar. When it is done it reads, for
    example, "Counted 56 of 56 fields."
 3. The table lists every field it counted, once per record type: Household and Organization.
-   Each row shows the field's label, how many records have it filled in, how many records there
-   are, and the percentage. Sort by **Filled** to put the least used fields first. Turn on
+   Each row shows the field's label, whether it is **Required**, its **Default Value**, how many
+   records have it filled in, how many records there are, the percentage, and **At Default**:
+   the share of records still holding the default. Sort by **Filled** to put the least used
+   fields first. Turn on
    **Show technical names** above the table to add the **API Name** column (it starts off).
 4. Choose **Save Snapshot**. Small text under the button says "Keeps this count so
    your next count shows what changed." The page reads, for example, "Saved 112 counts."
@@ -55,10 +57,26 @@ Start from the sample data (see [Sample data](sample-data.md)).
   record gets the whole organization.
 - **Kinds of records.** The list offers every kind of record you can open in Find. Settings and
   system records are left out.
-- **Fields.** Every field a person can fill in. Left out: formula and roll-up fields, automatic
-  numbers, checkboxes (a checkbox always has a value), fields Salesforce requires on every record,
-  fields only Salesforce sets (such as Last Viewed), and fields you cannot read or edit. An
-  address is counted as its parts (street, city and so on).
+- **Fields.** Every field a person can fill in, including required fields and checkboxes. Left
+  out: formula and roll-up fields, automatic numbers, fields only Salesforce sets (such as Last
+  Viewed), and fields you cannot read or edit. An address is counted as its parts (street, city
+  and so on). A checkbox always has a value, so it is always 100% filled; its **At Default**
+  column is the one to read.
+- **Required.** Checked when the field's setup makes it required on every new record: it cannot
+  be empty and has no default. It comes from the field's setup only: a field that a page layout
+  or a validation rule makes required is not marked. A checkbox is never marked required.
+- **Default Value.** The value a new record gets when nobody fills the field in: a plain value
+  (such as `Open` or `25`), the picklist's default value, or **True** or **False** for a
+  checkbox. A default worked out by a formula (such as today's date plus 7 days) shows as
+  **Formula**. Blank when the field has no default.
+- **At Default.** The share of the counted records whose field still holds its default value.
+  A high share can mean people never change it, or that the default is right; a picklist at
+  100% default may not need to be on the page at all. It is counted with one extra count per
+  field, so it follows the same record types, the same records you can see and the same size
+  limit as **Filled**. It is blank when the default is a formula, when there is no default, for
+  a percent field, for a field that cannot be filtered (such as long text), and for a
+  **Sampled** row. For a checkbox whose default is False, At Default is the share left
+  unchecked. At Default is not kept in saved snapshots.
 - **Long text fields** (such as Description) cannot be counted across a whole kind of record, so
   they are counted on the 200 most recently changed records instead. Their rows are marked
   **Sampled**, and the percentage is for those 200 records, not for all of them.
@@ -169,7 +187,7 @@ count and save instead.
 Choose **Save Snapshot** after any count you want to compare against later.
 
 **Expecting a field to be counted that is not in the table.** A field is left out when it is a
-formula, a checkbox, required on every record, or hidden from you (see **What Is Counted**). Give
+formula, an automatic number, set only by Salesforce, or hidden from you (see **What Is Counted**). Give
 yourself read and edit access to the field and count again.
 
 ## Fields Behind This Page, for Report Builders

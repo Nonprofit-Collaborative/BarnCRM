@@ -107,11 +107,14 @@ private class FieldUtilizationControllerTest {
 				planFields.add(info.fieldName);
 			}
 			Assert.isTrue(planFields.contains(REASON), 'Reason is to be counted.');
-			Assert.isFalse(
+			Assert.isTrue(
 				planFields.contains(Duplicate_Dismissal__c.Pair_Key__c.getDescribe().getName()),
-				'A field required on every record is always filled, so it is not counted (R-FU2).'
+				'A required field is counted too, so the page can say it is required (R-FU2).'
 			);
 			Assert.areEqual(1, chunk.rows.size(), 'No record types, so one row per field.');
+			Assert.isFalse(chunk.rows[0].required, 'Reason may be left empty (R-FU13).');
+			Assert.isNull(chunk.rows[0].defaultValue, 'Reason has no default.');
+			Assert.isNull(chunk.rows[0].atDefault, 'No default, so nothing to compare.');
 			Assert.areEqual(120, chunk.rows[0].filled, 'Every filled Reason is counted.');
 			Assert.areEqual(200, chunk.rows[0].total, 'Every dismissal is looked at.');
 			Assert.areEqual(60.0, chunk.rows[0].percent, 'As a percentage.');
@@ -404,7 +407,7 @@ private class FieldUtilizationControllerTest {
 	}
 
 	@IsTest
-	static void formulaCheckboxAndAutomaticFieldsAreLeftOut() {
+	static void formulaAndAutomaticFieldsAreLeftOutButCheckboxesAreCounted() {
 		System.runAs(TestUsers.admin()) {
 			Set<String> counted = FieldUtilizationService.countableFieldsByName(
 					Field_Utilization_Snapshot__c.SObjectType.getDescribe(
@@ -424,12 +427,179 @@ private class FieldUtilizationControllerTest {
 				),
 				'Formula.'
 			);
-			Assert.isFalse(
+			Assert.isTrue(
 				counted.contains(Field_Utilization_Snapshot__c.Sampled__c.getDescribe().getName()),
-				'Checkbox.'
+				'Checkbox, for its default (R-FU2, R-FU14).'
 			);
 			Assert.isFalse(counted.contains('Name'), 'Auto number.');
 			Assert.isFalse(counted.contains('Id'), 'Identifier.');
+		}
+	}
+
+	@IsTest
+	static void requiredFollowsDescribe() {
+		// runs-as: deploying user (field describe only, no data access)
+		Assert.isTrue(
+			FieldUtilizationService.isRequired(Duplicate_Dismissal__c.Pair_Key__c.getDescribe()),
+			'Not nillable, no default: required (R-FU13).'
+		);
+		Assert.isFalse(
+			FieldUtilizationService.isRequired(Duplicate_Dismissal__c.Reason__c.getDescribe()),
+			'May be left empty.'
+		);
+		Assert.isFalse(
+			FieldUtilizationService.isRequired(Import_Batch__c.Is_Dry_Run__c.getDescribe()),
+			'A checkbox is never empty but is never called required.'
+		);
+	}
+
+	@IsTest
+	static void literalAndFormulaDefaultsAreToldApart() {
+		// runs-as: deploying user (pure function over describe parts; no query is run)
+		FieldUtilizationService.FieldDefault text = FieldUtilizationService.defaultOf(
+			Schema.DisplayType.STRING,
+			null,
+			'"Open"',
+			null,
+			true
+		);
+		Assert.areEqual('Open', text.shown, 'A quoted text formula is a literal.');
+		Assert.areEqual('Open', text.value, 'And is compared.');
+		Assert.isNull(text.formula, 'Not shown as a formula.');
+
+		FieldUtilizationService.FieldDefault amount = FieldUtilizationService.defaultOf(
+			Schema.DisplayType.CURRENCY,
+			null,
+			' 25.50 ',
+			null,
+			true
+		);
+		Assert.areEqual(25.50, amount.value, 'A number formula on a number field is a literal.');
+
+		FieldUtilizationService.FieldDefault today = FieldUtilizationService.defaultOf(
+			Schema.DisplayType.DATE,
+			null,
+			'TODAY() + 7',
+			null,
+			true
+		);
+		Assert.isNull(today.shown, 'A formula has no literal to show.');
+		Assert.areEqual('TODAY() + 7', today.formula, 'Its text is kept for the page.');
+		Assert.isNull(today.value, 'A formula default is never compared.');
+		Assert.isNull(
+			FieldUtilizationService.atDefaultByRecordType(
+				FieldUtilizationService.countable(DISMISSAL),
+				Duplicate_Dismissal__c.Reason__c.getDescribe(),
+				today
+			),
+			'So it has no At Default count.'
+		);
+
+		FieldUtilizationService.FieldDefault joined = FieldUtilizationService.defaultOf(
+			Schema.DisplayType.STRING,
+			null,
+			'"a" & "b"',
+			null,
+			true
+		);
+		Assert.areEqual('"a" & "b"', joined.formula, 'Joined text is a formula, not a literal.');
+
+		FieldUtilizationService.FieldDefault percent = FieldUtilizationService.defaultOf(
+			Schema.DisplayType.PERCENT,
+			null,
+			'10',
+			null,
+			true
+		);
+		Assert.areEqual('10', percent.shown, 'A percent default is shown.');
+		Assert.isNull(percent.value, 'But not compared: its scale varies.');
+
+		FieldUtilizationService.FieldDefault unfilterable = FieldUtilizationService.defaultOf(
+			Schema.DisplayType.TEXTAREA,
+			null,
+			'"Notes"',
+			null,
+			false
+		);
+		Assert.areEqual('Notes', unfilterable.shown, 'Shown.');
+		Assert.isNull(unfilterable.value, 'A field that cannot be filtered is not compared.');
+
+		FieldUtilizationService.FieldDefault unchecked = FieldUtilizationService.defaultOf(
+			Schema.DisplayType.BOOLEAN,
+			false,
+			null,
+			null,
+			true
+		);
+		Assert.areEqual(System.Label.Core_BulkUpdate_False, unchecked.shown, 'Checkbox off.');
+		Assert.areEqual(false, unchecked.value, 'Holding the default means unchecked.');
+
+		Assert.isNull(
+			FieldUtilizationService.defaultOf(Schema.DisplayType.STRING, null, null, null, true),
+			'No default.'
+		);
+		Assert.isNull(
+			FieldUtilizationService.defaultOf(Schema.DisplayType.STRING, null, '""', null, true),
+			'An empty text default is no default.'
+		);
+	}
+
+	@IsTest
+	static void picklistAndCheckboxDefaultsAreCountedAtDefault() {
+		String batchObject = Import_Batch__c.SObjectType.getDescribe(
+				SObjectDescribeOptions.DEFERRED
+			)
+			.getName();
+		String status = Import_Batch__c.Status__c.getDescribe().getName();
+		String dryRun = Import_Batch__c.Is_Dry_Run__c.getDescribe().getName();
+		String fileName = Import_Batch__c.File_Name__c.getDescribe().getName();
+		System.runAs(TestUsers.admin()) {
+			FieldUtilizationController.Chunk chunk;
+			System.runAs(maria()) {
+				List<Import_Batch__c> batches = new List<Import_Batch__c>();
+				for (Integer i = 0; i < 10; i++) {
+					Import_Batch__c batch = new Import_Batch__c(File_Name__c = 'gifts' + i);
+					if (i >= 4) {
+						batch.Status__c = 'Complete';
+					}
+					if (i >= 7) {
+						batch.Is_Dry_Run__c = false;
+					}
+					batches.add(batch);
+				}
+				insert batches;
+				Test.startTest();
+				chunk = FieldUtilizationController.countFields(
+					batchObject,
+					new List<String>{ status, dryRun, fileName }
+				);
+				Test.stopTest();
+			}
+
+			Assert.isTrue(chunk.failed.isEmpty(), 'Nothing failed: ' + chunk.failed);
+			Map<String, FieldUtilizationController.CountRow> byField = new Map<String, FieldUtilizationController.CountRow>();
+			for (FieldUtilizationController.CountRow row : chunk.rows) {
+				byField.put(row.fieldName, row);
+			}
+			FieldUtilizationController.CountRow statusRow = byField.get(status);
+			Assert.areEqual('Draft', statusRow.defaultValue, 'The picklist default value.');
+			Assert.isFalse(statusRow.required, 'Status may be left empty.');
+			Assert.areEqual(4, statusRow.atDefault, 'Four batches kept Draft (R-FU14).');
+			Assert.areEqual(40.0, statusRow.atDefaultPercent, 'Of the ten counted.');
+
+			FieldUtilizationController.CountRow dryRunRow = byField.get(dryRun);
+			Assert.areEqual(
+				System.Label.Core_BulkUpdate_True,
+				dryRunRow.defaultValue,
+				'The checkbox default.'
+			);
+			Assert.areEqual(10, dryRunRow.filled, 'A checkbox is never empty.');
+			Assert.areEqual(7, dryRunRow.atDefault, 'Seven batches kept the default.');
+			Assert.areEqual(70.0, dryRunRow.atDefaultPercent, 'As a percentage.');
+
+			FieldUtilizationController.CountRow fileRow = byField.get(fileName);
+			Assert.isNull(fileRow.defaultValue, 'No default.');
+			Assert.isNull(fileRow.atDefaultPercent, 'So no At Default.');
 		}
 	}
 

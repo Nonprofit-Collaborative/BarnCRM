@@ -8534,8 +8534,10 @@ not a custom setting, deprecated, share, history, feed, change event, metadata, 
 or big object), minus this object; every call checks the chosen name against the global describe
 again. Fields come from that object's describe. No typed text reaches a query.
 **R-FU2 What is counted.** A field is counted when the runner can read it and either create or
-edit it, and it is not a formula, roll-up, auto number, checkbox, compound (address or
-location) or non-nillable field.
+edit it, and it is not a formula, roll-up, auto number or compound (address or location)
+field. Required (non-nillable) fields and checkboxes are counted (ADR-0169;
+ADR-0086 left them out); a checkbox is never empty, so it is
+filled on every record and needs no count query.
 **R-FU3 User mode.** Every count, read and write is in user mode, so a count covers the records
 the person on the page can see. Written into the page and the admin guide.
 **R-FU4 Count, else sample.** A filterable field is counted with one `COUNT(field)` query
@@ -8579,6 +8581,20 @@ button; Cancel or a failed chunk stops the job and keeps what was read, the date
 finished stay blank and are named, and Continue carries on from the last chunk that finished. A field
 with more than 1,000 distinct values in one chunk gets no Last Used dates (it is already named as
 cut at 500 values). No Batch Apex and nothing stored.
+**R-FU13 Required and default, from describe.** Each counted row carries Required (the field
+is createable, not nillable and not defaulted on create; a checkbox is never required) and its
+Default Value: the active picklist value marked default, the checkbox default (true or false),
+a literal default, or a default formula that is only a quoted text (on a text field) or only a
+number (on a number field); any other default formula is shown as Formula. Page layouts and
+validation rules are not read. Nothing is stored: no object or field is added.
+**R-FU14 At Default.** For a field whose default is a literal, picklist or checkbox value, one
+more `COUNT(Id)` query in user mode, grouped by record type like R-FU4, counts the records whose
+field equals the default (passed as a bind), as a share of the records counted, capped at the
+record count. Not counted for formula defaults, percent fields, fields that cannot be filtered
+or are encrypted, sampled rows, or when the call has fewer than two queries left; a refused
+query leaves it blank. A field costs at most two queries (count and At Default, or count and
+sample), so a 40-field call stays under 100 queries. Not saved in snapshots
+(`Field_Utilization_Snapshot__c` gains no field).
 
 ### Salesforce implementation
 
@@ -12604,6 +12620,7 @@ mirrors the primary member).
 | 0.17 | 2026-11-04 | Automation page manages Automation Control (RT-13, same ADR, decisions 2.6 to 2.8). Section 10 gains rule R-A8: org, profile and user rows edited in the console, an org's own flows listed as `Flow:` switch rows, and Catch Up Now. No object or field added. |
 | 0.17 | 2026-11-04 | Household Upkeep and NPSP (RT-04). Household Adoption (Section 29ZQ) gains rule R-HA6: Household Upkeep cannot be turned on while NPSP households are in use, detected by describe. No object or field added. |
 | 1.0 | 2026-11-05 | Settings picklist from a field. `Setting_Definition__mdt.Data_Type__c` gains PicklistFromField; its source field is named in the existing `Record_Object__c` as `Object.Field`. No new field. The Gift Transaction mirror paid status row uses it for Gift Transaction Status. |
+| 1.0 | 2026-11-05 | Field Use required, default value and at default (owner QA 2026-11-05, ADR-0169). Section 29F: R-FU2 now counts required fields and checkboxes; new rules R-FU13 (Required and Default Value from describe) and R-FU14 (At Default, one more grouped count per field). No object or field added; snapshots unchanged. |
 
 ---
 ## 32. Entity ownership by package

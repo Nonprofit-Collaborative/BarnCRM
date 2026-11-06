@@ -23,6 +23,10 @@ import COL_RECORDS from '@salesforce/label/c.Core_FieldUtilization_ColRecords';
 import COL_PREVIOUS from '@salesforce/label/c.Core_FieldUtilization_ColPrevious';
 import COL_CHANGE from '@salesforce/label/c.Core_FieldUtilization_ColChange';
 import COL_SAMPLED from '@salesforce/label/c.Core_FieldUtilization_ColSampled';
+import COL_REQUIRED from '@salesforce/label/c.Core_DataDictionary_ColRequired';
+import COL_DEFAULT from '@salesforce/label/c.Core_FieldUtilization_ColDefault';
+import COL_AT_DEFAULT from '@salesforce/label/c.Core_FieldUtilization_ColAtDefault';
+import DEFAULT_FORMULA from '@salesforce/label/c.Core_DataDictionary_ColFormula';
 import HISTORY_TITLE from '@salesforce/label/c.Core_FieldUtilization_HistoryTitle';
 import HISTORY_COL_TAKEN_AT from '@salesforce/label/c.Core_FieldUtilization_HistoryColTakenAt';
 import HISTORY_COL_SAVED_BY from '@salesforce/label/c.Core_FieldUtilization_HistoryColSavedBy';
@@ -53,6 +57,8 @@ const COLUMNS = [
   { label: COL_FIELD, fieldName: 'fieldLabel', sortable: true },
   { label: COL_API_NAME, fieldName: 'fieldName', sortable: true, technical: true },
   { label: COL_RECORD_TYPE, fieldName: 'recordTypeLabel', sortable: true },
+  { label: COL_REQUIRED, fieldName: 'required', type: 'boolean', sortable: true },
+  { label: COL_DEFAULT, fieldName: 'defaultShown', sortable: true },
   {
     label: COL_FILLED,
     fieldName: 'share',
@@ -62,6 +68,13 @@ const COLUMNS = [
   },
   { label: COL_WITH_VALUE, fieldName: 'filled', type: 'number', sortable: true },
   { label: COL_RECORDS, fieldName: 'total', type: 'number', sortable: true },
+  {
+    label: COL_AT_DEFAULT,
+    fieldName: 'atDefaultShare',
+    type: 'percent',
+    sortable: true,
+    typeAttributes: PERCENT
+  },
   {
     label: COL_PREVIOUS,
     fieldName: 'previousShare',
@@ -460,6 +473,9 @@ export default class FieldUtilization extends LightningElement {
       return {
         ...row,
         share: isBlank(row.percent) ? null : row.percent / 100,
+        // R-FU13: a formula default shows as Formula; R-FU14: blank when not compared.
+        defaultShown: row.defaultFormula ? DEFAULT_FORMULA : row.defaultValue || null,
+        atDefaultShare: isBlank(row.atDefaultPercent) ? null : row.atDefaultPercent / 100,
         previousShare: isBlank(before) ? null : before / 100,
         change:
           isBlank(before) || isBlank(row.percent)

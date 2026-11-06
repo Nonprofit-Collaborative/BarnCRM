@@ -104,4 +104,20 @@
         <shortDescription>Field utilization: Sampled column</shortDescription>
         <value>Sampled</value>
     </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ColDefault</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: Default Value column</shortDescription>
+        <value>Default Value</value>
+    </labels>
+    <labels>
+        <fullName>Core_FieldUtilization_ColAtDefault</fullName>
+        <categories>FieldUtilization</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field utilization: At Default column (share of records holding the default)</shortDescription>
+        <value>At Default</value>
+    </labels>
 </CustomLabels>

@@ -182,6 +182,41 @@ describe('c-field-utilization', () => {
     expect(fieldNames()[1]).toBe('fieldName');
   });
 
+  it('shows Required, Default Value and At Default for each counted field (R-FU13, R-FU14)', async () => {
+    getPlan.mockResolvedValue({ ...PLAN, chunkSize: 40 });
+    countFields.mockResolvedValue({
+      rows: [
+        { ...row('Phone', 80, 80.0), required: true },
+        {
+          ...row('Website', 10, 10.0),
+          defaultValue: 'Draft',
+          atDefault: 40,
+          atDefaultPercent: 40.0
+        },
+        { ...row('Fax', 100, 100.0), defaultFormula: 'TODAY() + 7' }
+      ],
+      failed: []
+    });
+    const element = render();
+    await choose(element, 'Account');
+
+    const table = find(element, 'results');
+    const names = table.columns.map((c) => c.fieldName);
+    expect(names).toEqual(expect.arrayContaining(['required', 'defaultShown', 'atDefaultShare']));
+    expect(names.indexOf('atDefaultShare')).toBe(names.indexOf('total') + 1);
+    expect(table.columns.find((c) => c.fieldName === 'atDefaultShare').type).toBe('percent');
+    expect(table.columns.find((c) => c.fieldName === 'required').type).toBe('boolean');
+
+    const [phone, website, fax] = table.data;
+    expect(phone.required).toBe(true);
+    expect(phone.defaultShown).toBeNull();
+    expect(phone.atDefaultShare).toBeNull();
+    expect(website.defaultShown).toBe('Draft');
+    expect(website.atDefaultShare).toBeCloseTo(0.4);
+    expect(fax.defaultShown).toBe('c.Core_DataDictionary_ColFormula');
+    expect(fax.atDefaultShare).toBeNull();
+  });
+
   it('says an object over the size limit is not counted, and counts nothing', async () => {
     getPlan.mockResolvedValue({ ...PLAN, total: 2000000, tooLarge: true, fields: [] });
     const element = render();
