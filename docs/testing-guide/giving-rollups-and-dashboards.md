@@ -153,7 +153,7 @@ For every script on this page:
 | 1 | As admin, open **BarnCRM Fundraising**. | It opens on **Fundraising Home**, the first tab. **Installments** follows **Commitments** in the menu. **Donor Level Ladder**, **Stewardship Plan Setup**, **Pledge Reminders** and **Receipt Letters** are not in the menu. |
 | 2 | Read the figures. | Five bordered figures with their tab icons: **Gifts** (badge **To acknowledge**), **Installments** (badge **Overdue**), **My Asks Due This Month**, **Gift Batches** (badge **Open**), **Stewardship Plans** (badge **Running**). A badge on a zero count is grey. |
 | 3 | Click **Installments**. | The Installments list view **Overdue** opens; its count matches the figure. Go back. |
-| 4 | Click **Gifts**. | The **Acknowledgment Queue** opens. Go back and click **My Asks Due This Month**: the Asks list view of that name opens. |
+| 4 | Click **Gifts**. | The **Thank-Yous** page opens. Go back and click **My Asks Due This Month**: the Asks list view of that name opens. |
 | 5 | Click **Enter a Gift**. | Quick Gift Entry opens. |
 | 6 | On Fundraising Home, read **Fundraising Setup**. | Four tiles, each with its tab's icon and one line: **Donor Level Ladder**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt Letters**. Click each: its page opens. |
 | 7 | Read the charts. | **Giving by Month** (a column per month) and **Open Asks by Stage** (a bar per stage) show sample data, in Salesforce's own colors, and follow dark mode when it is on. Click one: its report opens from the **BarnCRM Giving** folder. |

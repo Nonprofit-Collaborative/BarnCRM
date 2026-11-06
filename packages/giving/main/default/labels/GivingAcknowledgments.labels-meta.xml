@@ -17,14 +17,6 @@
     <value>The email could not be sent and Salesforce gave no reason.</value>
   </labels>
   <labels>
-    <fullName>Giving_Acknowledgment_TemplateNotFound</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments: a rule names a template that does not exist</shortDescription>
-    <value>The email template {0} is not in this org. Check the developer name on the rule against the list on the Acknowledgments page.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Acknowledgment_TemplatesMissing</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
@@ -85,8 +77,8 @@
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Acknowledgments page: heading</shortDescription>
-    <value>Acknowledgments</value>
+    <shortDescription>Thank-Yous page: heading</shortDescription>
+    <value>Thank-Yous</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_Off</fullName>
@@ -95,14 +87,6 @@
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the feature is off</shortDescription>
     <value>Acknowledging gifts is switched off, so nothing is joining the queue. Turn on Acknowledge gifts in BarnCRM Settings, under Giving.</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Acknowledgments_NoRules</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: no rules exist</shortDescription>
-    <value>You have no rules yet, so no gift is being queued for a thank you. Add one with New rule.</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_QueueHeading</fullName>
@@ -185,14 +169,6 @@
     <value>Download Letters to Merge</value>
   </labels>
   <labels>
-    <fullName>Giving_Acknowledgments_LettersReady</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: the letter file has been produced</shortDescription>
-    <value>The letter file is ready on the run below. Merge it, print it, and then choose Mark as sent.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Acknowledgments_MarkSent</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
@@ -225,14 +201,6 @@
     <value>Next run</value>
   </labels>
   <labels>
-    <fullName>Giving_Acknowledgments_NotScheduled</fullName>
-    <categories>Giving, Acknowledgments</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Acknowledgments page: the nightly send is off</shortDescription>
-    <value>Not scheduled. Nothing goes out until you press Send.</value>
-  </labels>
-  <labels>
     <fullName>Giving_Acknowledgments_NeverRun</fullName>
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
@@ -245,8 +213,8 @@
     <categories>Giving, Acknowledgments</categories>
     <language>en_US</language>
     <protected>false</protected>
-    <shortDescription>Acknowledgments page: the rules section heading</shortDescription>
-    <value>Your Rules, in the Order They Are Considered</value>
+    <shortDescription>Thank-Yous page: the collapsible rules section heading</shortDescription>
+    <value>Rules (Admin)</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_NewRule</fullName>
@@ -390,7 +358,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Acknowledgments page: the link to a letter run's merge file</shortDescription>
-    <value>Download the file</value>
+    <value>Download File</value>
   </labels>
   <labels>
     <fullName>Giving_Acknowledgments_AnyAmount</fullName>

@@ -199,4 +199,50 @@ private class AcknowledgmentControllerTest {
 			Assert.isNotNull(view.lastRun, 'And the time it finished is kept beside it.');
 		}
 	}
+
+	@IsTest
+	static void theRulesAreRenumberedInTheOrderGiven() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			twoRules();
+			List<Acknowledgment_Rule__c> rules = [
+				SELECT Id, Name
+				FROM Acknowledgment_Rule__c
+				WITH SYSTEM_MODE
+				ORDER BY Order__c
+			];
+
+			Test.startTest();
+			AcknowledgmentController.PageView view = AcknowledgmentController.reorderRules(
+				new List<Id>{ rules[1].Id, rules[0].Id }
+			);
+			Test.stopTest();
+
+			Assert.areEqual('Everything else', view.rules[0].name, 'The moved rule is first.');
+			Assert.areEqual(10, view.rules[0].order, 'Numbered 10.');
+			Assert.areEqual(20, view.rules[1].order, 'The other follows at 20.');
+		}
+	}
+
+	@IsTest
+	static void someoneWhoCannotManageSettingsCannotReorder() {
+		Id ruleId;
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			twoRules();
+			ruleId = [SELECT Id FROM Acknowledgment_Rule__c WITH SYSTEM_MODE LIMIT 1].Id;
+		}
+		User staff = TestUsers.standardUserWith('AckOrder', new List<String>{ 'Giving_Staff' });
+		System.runAs(staff) {
+			String message;
+			try {
+				AcknowledgmentController.reorderRules(new List<Id>{ ruleId });
+			} catch (Exception refused) {
+				message = refused.getMessage();
+			}
+			Assert.areEqual(
+				BarnHelp.text('Giving', 'Giving_Acknowledgments_ErrorReorderNotPermitted'),
+				message,
+				'The refusal names the permission.'
+			);
+		}
+	}
 }

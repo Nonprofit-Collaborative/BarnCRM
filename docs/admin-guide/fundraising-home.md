@@ -7,7 +7,7 @@ me today" in one look, so a fundraiser no longer starts on a menu of twenty tabs
 
 - Five figures, each a link to the list behind it:
   - **Gifts** with **To acknowledge**: received gifts waiting for a thank you. Opens the
-    **Acknowledgment Queue**.
+    **Thank-Yous** page.
   - **Installments** with **Overdue**: pledge payments past due. Opens the Installments list
     view **Overdue**.
   - **My Asks Due This Month**: your own open asks whose Target Date falls this month. Opens the

@@ -51,10 +51,10 @@ Enter all the year's gifts first. A donor who already has a statement for the ye
 
 The thank-you page shows what is waiting, sorted into queues by your organization's rules.
 
-1. Open the **Acknowledgment Queue** tab.
+1. Open the **Thank-Yous** tab. The rules are in **Rules (Admin)** at the bottom, closed unless you manage BarnCRM settings.
 2. Read **Waiting to Go**: **Emails ready to send**, **Letters ready to merge**, **Opted out of email, sent by letter**, **Waiting, matched by no rule** and **Could not be sent, nobody to email**. A donor who has ticked **Email Opt Out** (for an organization, its primary contact) is never emailed a thank-you; their gift goes in the letter file instead.
 3. Click **Send Emails Now** to send the email queue.
-4. Click **Download Letters to Merge** to get the letter queue as a spreadsheet. Under **Recent Runs**, click **Download the file**, merge it with your letter, and print.
+4. Click **Download Letters to Merge** to get the letter queue as a spreadsheet. Under **Recent Runs**, click **Download File**, merge it with your letter, and print.
 5. When the letters are posted, click **Mark as Sent** on that run.
 
 You should see: each run under **Recent Runs** with **Status**, **Sent** and **Errors**. A thanked gift's **Acknowledgment Status** is **Acknowledged**, with an **Acknowledgment Date**. Letters stay in the queue until you click **Mark as Sent**.

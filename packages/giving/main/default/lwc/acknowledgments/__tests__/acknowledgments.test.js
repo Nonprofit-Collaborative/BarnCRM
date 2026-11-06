@@ -4,6 +4,7 @@ import getPage from '@salesforce/apex/AcknowledgmentController.getPage';
 import sendEmailsNow from '@salesforce/apex/AcknowledgmentController.sendEmailsNow';
 import produceLetters from '@salesforce/apex/AcknowledgmentController.produceLetters';
 import markLettersSent from '@salesforce/apex/AcknowledgmentController.markLettersSent';
+import reorderRules from '@salesforce/apex/AcknowledgmentController.reorderRules';
 
 jest.mock(
   '@salesforce/apex/AcknowledgmentController.getPage',
@@ -78,23 +79,14 @@ jest.mock(
 );
 
 jest.mock(
-  '@salesforce/label/c.Giving_Acknowledgments_NotScheduled',
-  () => ({ default: 'Not scheduled. Nothing goes out until you press Send.' }),
-  { virtual: true }
-);
-
-jest.mock(
   '@salesforce/label/c.Giving_Acknowledgments_EmailsStarted',
   () => ({ default: 'The email send has started. The run below shows how it goes.' }),
   { virtual: true }
 );
 
 jest.mock(
-  '@salesforce/label/c.Giving_Acknowledgments_LettersReady',
-  () => ({
-    default:
-      'The letter file is ready on the run below. Merge it, print it, and then choose Mark as sent.'
-  }),
+  '@salesforce/apex/AcknowledgmentController.reorderRules',
+  () => ({ default: jest.fn() }),
   { virtual: true }
 );
 
@@ -217,11 +209,12 @@ describe('c-acknowledgments', () => {
     getPage.emit(PAGE);
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="email-queue"]').textContent).toBe('4');
-    expect(element.shadowRoot.querySelector('[data-id="letter-queue"]').textContent).toBe('2');
-    expect(element.shadowRoot.querySelector('[data-id="unmatched-queue"]').textContent).toBe('1');
-    expect(element.shadowRoot.querySelector('[data-id="without-recipient"]').textContent).toBe('3');
-    expect(element.shadowRoot.querySelector('[data-id="opted-out"]').textContent).toBe('1');
+    const tile = (id) => element.shadowRoot.querySelector(`[data-id="${id}"]`).value;
+    expect(tile('email-queue')).toBe(4);
+    expect(tile('letter-queue')).toBe(2);
+    expect(tile('unmatched-queue')).toBe(1);
+    expect(tile('without-recipient')).toBe(3);
+    expect(tile('opted-out')).toBe(1);
   });
 
   it('names a template a rule points at that this org does not have', async () => {
@@ -231,7 +224,8 @@ describe('c-acknowledgments', () => {
 
     const missing = element.shadowRoot.querySelector('[data-id="template-missing"]');
     expect(missing).not.toBeNull();
-    expect(missing.textContent.trim()).toBe('Template not found');
+    expect(missing.label).toBe('Template not found');
+    expect(missing.status).toBe('error');
   });
 
   it('describes what each rule matches, and says so when a rule matches everything', async () => {
@@ -250,8 +244,8 @@ describe('c-acknowledgments', () => {
     await flush();
 
     const flags = element.shadowRoot.querySelectorAll('[data-id="rule-active"]');
-    expect(flags[0].textContent.trim()).toBe('');
-    expect(flags[1].textContent.trim()).toBe('Inactive');
+    expect(flags).toHaveLength(1);
+    expect(flags[0].label).toBe('Inactive');
   });
 
   it('says the last run happened and that nothing is scheduled', async () => {
@@ -263,7 +257,7 @@ describe('c-acknowledgments', () => {
       'Emailed thank yous: 12 sent, 0 did not go.'
     );
     expect(element.shadowRoot.querySelector('[data-id="next-run"]').textContent.trim()).toBe(
-      'Not scheduled. Nothing goes out until you press Send.'
+      'c.Giving_Acknowledgments_NotScheduled'
     );
   });
 
@@ -311,7 +305,7 @@ describe('c-acknowledgments', () => {
     await flush();
 
     expect(sendEmailsNow).toHaveBeenCalled();
-    expect(element.shadowRoot.querySelector('[data-id="notice-message"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="notice-message"]').message).toContain(
       'The email send has started.'
     );
   });
@@ -341,7 +335,7 @@ describe('c-acknowledgments', () => {
     await flush();
 
     expect(markLettersSent).toHaveBeenCalledWith({ runId: 'a07000000000001AAA' });
-    expect(element.shadowRoot.querySelector('[data-id="notice-message"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="notice-message"]').message).toContain(
       'Those letters are recorded as sent.'
     );
   });
@@ -360,7 +354,7 @@ describe('c-acknowledgments', () => {
     element.shadowRoot.querySelector('[data-id="send-emails"]').click();
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="error-message"]').message).toContain(
       'Send Acknowledgments permission'
     );
   });
@@ -506,5 +500,71 @@ describe('c-acknowledgments', () => {
 
     expect(element.shadowRoot.querySelector('[data-id="new-rule"]')).toBeNull();
     expect(element.shadowRoot.querySelector('[data-id="rule-edit"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-id="rule-up"]')).toBeNull();
+    expect(element.shadowRoot.querySelector('[data-drag-id]')).toBeNull();
+    // The rules section starts closed for staff and open for an admin.
+    const section = element.shadowRoot.querySelector('[data-id="rules-section"]');
+    expect(section.activeSectionName).toEqual([]);
+  });
+
+  it('puts the daily sending first and the rules last, open for an admin', async () => {
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+
+    const order = [
+      ...element.shadowRoot.querySelectorAll(
+        '[data-id="send-emails"], [data-id="run"], [data-id="rules-section"]'
+      )
+    ].map((node) => node.dataset.id);
+    expect(order).toEqual(['send-emails', 'run', 'rules-section']);
+    expect(element.shadowRoot.querySelector('[data-id="rules-section"]').activeSectionName).toBe(
+      'rules'
+    );
+    const badge = element.shadowRoot.querySelector('[data-id="run-status"]');
+    expect(badge.status).toBe('attention');
+  });
+
+  it('moves a rule down with Move Down, saving the whole order, and announces it', async () => {
+    reorderRules.mockResolvedValue(PAGE);
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+
+    const ups = element.shadowRoot.querySelectorAll('[data-id="rule-up"]');
+    expect(ups[0].disabled).toBe(true);
+    element.shadowRoot.querySelectorAll('[data-id="rule-down"]')[0].click();
+    await flush();
+    await flush();
+
+    expect(reorderRules).toHaveBeenCalledWith({
+      ruleIds: ['a06000000000002AAA', 'a06000000000001AAA']
+    });
+    expect(element.shadowRoot.querySelector('[data-id="live"]').textContent).toBe(
+      'c.Giving_Acknowledgments_RuleMoved'
+    );
+  });
+
+  it('reorders the rules by keyboard drag', async () => {
+    reorderRules.mockResolvedValue(PAGE);
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+
+    const row = element.shadowRoot.querySelectorAll('[data-drag-id]')[1];
+    const key = (name) => {
+      const event = new CustomEvent('keydown', { cancelable: true });
+      Object.assign(event, { key: name });
+      return event;
+    };
+    row.dispatchEvent(key(' '));
+    row.dispatchEvent(key('ArrowUp'));
+    row.dispatchEvent(key('Enter'));
+    await flush();
+    await flush();
+
+    expect(reorderRules).toHaveBeenCalledWith({
+      ruleIds: ['a06000000000002AAA', 'a06000000000001AAA']
+    });
   });
 });

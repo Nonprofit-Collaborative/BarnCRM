@@ -78,7 +78,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Stewardship: button, make a template inactive</shortDescription>
-    <value>Turn off</value>
+    <value>Turn Off</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_ColumnPlan</fullName>
@@ -135,14 +135,6 @@
     <protected>false</protected>
     <shortDescription>Stewardship: heading above the steps of a plan</shortDescription>
     <value>Steps</value>
-  </labels>
-  <labels>
-    <fullName>Giving_Stewardship_MoveUp</fullName>
-    <categories>Giving, Stewardship</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Stewardship: button, move a step earlier</shortDescription>
-    <value>Move up</value>
   </labels>
   <labels>
     <fullName>Giving_Stewardship_StepSubject</fullName>

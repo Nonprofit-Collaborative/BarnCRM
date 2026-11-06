@@ -173,8 +173,9 @@ describe('c-stewardship-plans', () => {
     const running = element.shadowRoot.querySelectorAll('[data-id="plan-running"]');
     expect(running[0].textContent).toBe('7');
     const active = element.shadowRoot.querySelectorAll('[data-id="plan-active"]');
-    expect(active[0].textContent).toBe('On');
-    expect(active[1].textContent).toBe('Off');
+    expect(active[0].label).toBe('On');
+    expect(active[0].status).toBe('on');
+    expect(active[1].label).toBe('Off');
   });
 
   it('says on the page itself that an edit does not reach a running plan', async () => {
@@ -182,7 +183,7 @@ describe('c-stewardship-plans', () => {
     getPage.emit(PAGE);
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="running-notice"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="running-notice"]').message).toContain(
       'Plans already running keep the tasks they laid out'
     );
   });
@@ -269,7 +270,7 @@ describe('c-stewardship-plans', () => {
         active: false
       }
     });
-    expect(element.shadowRoot.querySelector('[data-id="notice-message"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="notice-message"]').message).toContain(
       'Saved.'
     );
   });
@@ -328,6 +329,56 @@ describe('c-stewardship-plans', () => {
       templateId: WELCOME_ID,
       stepIds: [STEP_TWO, STEP_ONE]
     });
+    await flush();
+    expect(element.shadowRoot.querySelector('[data-id="live"]').textContent).toBe(
+      'c.Giving_Stewardship_StepMoved'
+    );
+  });
+
+  it('moves a step by dragging its row with the mouse', async () => {
+    reorderSteps.mockResolvedValue(undefined);
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+    await select(element, 0);
+
+    const zone = element.shadowRoot.querySelector('[data-drop-zone="steps"]');
+    zone.getBoundingClientRect = () => ({ left: 0, right: 500, top: 0, bottom: 100 });
+    const rows = [...element.shadowRoot.querySelectorAll('[data-drag-id]')];
+    rows.forEach((row, index) => {
+      row.getBoundingClientRect = () => ({
+        left: 0,
+        right: 500,
+        top: index * 40,
+        bottom: index * 40 + 40,
+        width: 500,
+        height: 40
+      });
+    });
+    const pointer = (type, y) => {
+      const event = new CustomEvent(type, { cancelable: true });
+      Object.assign(event, {
+        pointerId: 1,
+        pointerType: 'mouse',
+        button: 0,
+        clientX: 50,
+        clientY: y
+      });
+      return event;
+    };
+    rows[1].dispatchEvent(pointer('pointerdown', 60));
+    window.dispatchEvent(pointer('pointermove', 5));
+    window.dispatchEvent(pointer('pointerup', 5));
+    await flush();
+    await flush();
+    // Let the drag controller drop its one-click guard before the next test clicks.
+    // eslint-disable-next-line @lwc/lwc/no-async-operation
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(reorderSteps).toHaveBeenCalledWith({
+      templateId: WELCOME_ID,
+      stepIds: [STEP_TWO, STEP_ONE]
+    });
   });
 
   it('cannot move the first step up or the last step down', async () => {
@@ -378,7 +429,7 @@ describe('c-stewardship-plans', () => {
     element.shadowRoot.querySelector('[data-id="save-plan"]').click();
     await flush();
 
-    expect(element.shadowRoot.querySelector('[data-id="error-message"]').textContent).toContain(
+    expect(element.shadowRoot.querySelector('[data-id="error-message"]').message).toContain(
       'A minimum amount means nothing on a manual plan.'
     );
   });
