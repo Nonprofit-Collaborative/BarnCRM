@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Deleted_With__c</fullName>
+  <description>The household, organization or person this address was deleted with, as the lookup field and the owner's Id, so restoring that record from the Recycle Bin restores the address (R-AD11, D-184). Written by BarnCRM only; there is no reason to edit it by hand.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Set by BarnCRM when this address is deleted with its household or person, so it comes back when they are restored.</inlineHelpText>
+  <label>Deleted With</label>
+  <length>40</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

@@ -139,6 +139,10 @@ The card has no Edit or Delete button. Change the address on its own record:
 
 You should see: the change on the record's **Addresses** card without a reload.
 
+Deleting a household, organization or person also deletes their addresses, unless your
+administrator chose to keep them. Restoring the record from the Recycle Bin brings its
+addresses back. Merging two people keeps both people's addresses on the one you keep.
+
 ## To Set a Person's Email Addresses
 
 Each person has **Personal Email**, **Work Email** and **Alternate Email**, and **Preferred

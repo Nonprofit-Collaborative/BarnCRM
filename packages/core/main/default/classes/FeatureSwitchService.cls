@@ -165,13 +165,16 @@ public with sharing class FeatureSwitchService {
 				.runs(
 					new List<String>{
 						'Account_Address_Capture',
+						'Account_Address_Delete',
 						'Address_Default_Propagation',
-						'Contact_Address_Capture'
+						'Contact_Address_Capture',
+						'Contact_Address_Delete'
 					}
 				)
 				.rows(
 					new List<String>{
 						'Contact_Address_Change_Behavior',
+						'Address_Delete_Behavior',
 						'Seasonal_Addresses',
 						'Seasonal_Address_Job'
 					}

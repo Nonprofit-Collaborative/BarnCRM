@@ -125,7 +125,7 @@ to the people who should see them, shows its settings, and starts its automation
 | Duplicate Matching | Duplicate suggestions, review and matching logic | The Duplicate Matching tab and the Duplicate Matching section |
 | Org Optimizer and Health Check | The Org Optimizer tab and Health Check | The Org Optimizer tab, the Health section and the Org Optimizer section (its three thresholds) |
 | Households | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
-| Addresses | Address capture and the primary address | Its three automations and the Addresses section |
+| Addresses | Address capture, the primary address, and the addresses of deleted records | Its five automations and the Addresses section |
 | Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships box on People and Households |
 | Affiliations | The primary affiliation | Its automation |
 | Preferred email and phone | Copying the preferred email into the standard email and the preferred phone into the standard phone | Its three automations |

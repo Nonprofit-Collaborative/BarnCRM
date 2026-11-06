@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Addresses of deleted records</label>
+  <protected>true</protected>
+  <values>
+    <field>Data_Type__c</field>
+    <value xsi:type="xsd:string">Picklist</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value
+      xsi:type="xsd:string"
+    >Choose what happens to the addresses of a household, organization or person when it is deleted. Delete their addresses: they go to the Recycle Bin with it, and come back when it is restored. Each address belongs to one household, organization or person, so no one else's address is touched, and a merge keeps them on the record that stays. Keep their addresses: they stay on file, belonging to nobody.</value>
+  </values>
+  <values>
+    <field>Help_Path__c</field>
+    <value xsi:type="xsd:string">addresses.md</value>
+  </values>
+  <values>
+    <field>Module__c</field>
+    <value xsi:type="xsd:string">Core</value>
+  </values>
+  <values>
+    <field>Picklist_Values__c</field>
+    <value xsi:type="xsd:string">Delete:Delete their addresses;Keep:Keep their addresses</value>
+  </values>
+  <values>
+    <field>Section__c</field>
+    <value xsi:type="xsd:string">Addresses</value>
+  </values>
+  <values>
+    <field>Setting_Key__c</field>
+    <value xsi:type="xsd:string">Address_Delete_Behavior__c</value>
+  </values>
+  <values>
+    <field>Settings_Object__c</field>
+    <value xsi:type="xsd:string">BarnCRM_Settings__c</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">12</value>
+  </values>
+</CustomMetadata>

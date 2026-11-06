@@ -1083,6 +1083,7 @@ the Setup Assistant now writes them through Giving's step (ADR-0059).
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Contact_Address_Change_Behavior__c` | picklist(Update household, Create personal address, Manual) | Update household | Address Updates: who moves when an address changes. Everyone in the household moves together, only that person moves, or nobody moves until you choose (R-AD3, R-AD5, ADR-0140). A blank reads and shows as Update household. |
+| `Address_Delete_Behavior__c` | picklist(Delete, Keep) | Delete | Addresses of Deleted Records: what happens to the addresses of a household, organization or person when it is deleted (R-AD11, D-184). Delete (the shipped choice, and what a blank means): they go to the Recycle Bin with it and come back when it is restored. Keep: they stay, belonging to nobody, as before this setting. Held as text, as every Core picklist setting is (ADR-0019). |
 | `Relationship_Auto_Reciprocal__c` | boolean | true | Whether the package creates and maintains the other side of every relationship (R-RL1). The default is applied in Apex by `SettingsService`, not by the field's own default value (ADR-0035). |
 | `Address_Card_Fields__c` | text (field list) | none ticked | Address Card Fields: the Address fields the Addresses card shows on every address, beyond the ones it always shows, by API name separated by commas, chosen from a checkbox list in the console (R-AD10). A field the user cannot read is left out for that user, and a field the card already shows is not repeated. |
 | `Seasonal_Address_Last_Run__c` | datetime | empty | When the seasonal address swap job last completed, shown on the Hub; written by the job (C-18, R-AD4, R-AD8). |
@@ -7146,6 +7147,7 @@ history is not lost when someone moves.
 | Status | picklist(Current, Former, Undeliverable) | no (a new address is saved Current) | Whether the address is in use now, was used before, or has mail coming back (R-AD10). A blank reads as Current. |
 | Start Date | date | no | The day this address came into use, set on a move (R-AD10). |
 | End Date | date | no | The day this address stopped being used, set on a move (R-AD10). |
+| Deleted With | text (40) | no | The owner this address was deleted with, as its lookup field's name and the owner's Id (`Contact__c:003...`), so restoring the owner restores the address (R-AD11). Written by BarnCRM only, never shown on a page. |
 
 ### Relationships
 
@@ -7305,6 +7307,29 @@ Undeliverable (`Status__c`). An address saved with no status is saved Current.
 - **The check.** Data Hygiene, and Find through it, lists the primary addresses marked
   Undeliverable: the households, organizations and people whose mail is coming back.
 
+**R-AD11 Addresses follow their owner to the Recycle Bin (D-184).** When a household,
+organization, person or person account is deleted, the Addresses of Deleted Records setting
+(`Address_Delete_Behavior__c`) decides what happens to its addresses. Delete (the default):
+they are deleted with it. An address has one owner (R-AD1), so no other record's address is
+ever touched. In an org where a household's people are its contacts, deleting the household
+deletes those people too, and their own addresses go with them. Keep: they stay, with the
+lookup the platform cleared, as before the setting. Rules that hold either way:
+
+- **A merge is not a delete.** The platform moves the losing record's addresses to the
+  survivor, and they stay there.
+- **Restoring restores them.** Before the delete each address is marked with its owner
+  (`Deleted_With__c`), because the platform clears the lookup and does not put it back.
+  Restoring the owner from the Recycle Bin restores the addresses marked with it and links
+  them again, whatever the setting says by then.
+- **System mode, as package upkeep of dependent rows.** The person who deletes the owner need
+  not be able to delete addresses themselves (ADR-0021); a failure is logged and never blocks
+  the delete.
+- **BarnCRM's own deletes are unchanged.** The empty household tidy-up (R-H12a) and erasure
+  (R-ER2) already delete the addresses themselves.
+- **Part of Addresses.** Two automations, Addresses of a deleted person and Addresses of a
+  deleted account, belong to the Addresses feature (ADR-0124) and can be switched off on the
+  Automation page like any other.
+
 **R-AD9 Moving a household on purpose.** The address card offers two moves, in every Address
 Updates setting (ADR-0140). Each checks the user's own access as any address write does,
 works for many records in one save, and keeps what it replaces as history (R-AD7):
@@ -7350,11 +7375,12 @@ works for many records in one save, and keeps what it replaces as history (R-AD7
 | Status | `Status__c` | Picklist: Current (default), Former, Undeliverable |
 | Start Date | `Start_Date__c` | Date |
 | End Date | `End_Date__c` | Date |
+| Deleted With | `Deleted_With__c` | Text (40) |
 
 - **Standard fields written:** `Account.BillingStreet`, `BillingCity`, `BillingState`,
   `BillingPostalCode`, `BillingCountry`; `Contact.MailingStreet`, `MailingCity`,
   `MailingState`, `MailingPostalCode`, `MailingCountry`.
-- **Settings keys:** `Contact_Address_Change_Behavior__c`, `Seasonal_Address_Last_Run__c`,
+- **Settings keys:** `Contact_Address_Change_Behavior__c`, `Address_Delete_Behavior__c`, `Seasonal_Address_Last_Run__c`,
   `Seasonal_Address_Last_Run_Summary__c`, `Address_Card_Fields__c` (Section 12).
 - **Service:** `AddressService`, `AddressTriggerHandler`, `AddressSelector` (the
   Addresses card reads and saves through Lightning Data Service, ADR-0093 record reads
@@ -12759,6 +12785,7 @@ mirrors the primary member).
 | 1.0 | 2026-11-06 | Session Schedule (modules-24, D-183, ADR-0171). New in the Programs module: Session Schedule (`Session_Schedule__c`, 29ZA7), master-detail to Program, with rules R-SS1 to R-SS7. `Session__c` gains `Session_Schedule__c` (Lookup, SetNull). R-SE4 says the panel can save its pattern as a schedule. |
 | 1.0 | 2026-11-06 | Session horizon setting (modules-24, D-183). `Programs_Settings__c` gains `Session_Horizon_Weeks__c` (Number(2, 0), default 8, 1 to 26). R-SS2 reads it instead of a fixed eight weeks, and skips a day another schedule filled earlier in the same run. |
 | 1.0 | 2026-11-06 | Shipped match sources turned off through a setting (owner decision D-184, ADR-NEXT). `BarnCRM_Settings__c` gains `Match_Sources_Turned_Off__c` (Section 12); Match Source's Active definition now says BarnCRM changes it only on the organization's own rows. |
+| 1.0 | 2026-11-06 | Addresses of deleted records (owner decision D-184). `BarnCRM_Settings__c` gains `Address_Delete_Behavior__c` (Section 12; Delete or Keep, default Delete) and `Address__c` gains `Deleted_With__c` (Text 40), with rule R-AD11: a deleted household's, organization's or person's addresses are deleted with it and restored with it, never on a merge. |
 
 ---
 ## 32. Entity ownership by package
