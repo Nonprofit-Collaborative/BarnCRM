@@ -98,7 +98,8 @@ public with sharing class ModuleManagerService {
 			'Service__c',
 			'Service_Count__c',
 			'Service_Delivery__c',
-			'Session__c'
+			'Session__c',
+			'Session_Schedule__c'
 		},
 		'LogicModels' => new List<String>{
 			'Indicator__c',

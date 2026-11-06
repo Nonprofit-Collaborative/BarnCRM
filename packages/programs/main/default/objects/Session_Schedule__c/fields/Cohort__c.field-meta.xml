@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Cohort__c</fullName>
+  <deleteConstraint>Restrict</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The cohort the sessions are for, a cohort of the schedule's program. Leave it empty for everyone enrolled in the program.</inlineHelpText>
+  <label>Cohort</label>
+  <referenceTo>Cohort__c</referenceTo>
+  <relationshipLabel>Session Schedules</relationshipLabel>
+  <relationshipName>Session_Schedules</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>
