@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Volunteers_Glance_Title</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteering glance card title</shortDescription>
+        <value>Volunteering at a Glance</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Glance_ViewHours</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteering glance button to the hours</shortDescription>
+        <value>View Volunteer Hours</value>
+    </labels>
+</CustomLabels>

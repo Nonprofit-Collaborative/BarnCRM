@@ -174,7 +174,10 @@ Members and Read Only users, and on a household or organization, the card shows 
 adding a row, click the card's **Refresh** button to see it.
 
 - **In the BarnCRM app, people open on Core's page, which has neither the readiness card nor
-  the Volunteer Profile section (see What it does).** To show them there too, open Setup, then **Lightning App Builder**, edit **Volunteers Contact Record
+  the Volunteer Profile section (see What it does).** Its sidebar does show **Volunteering at a
+  Glance** (status, hours this year and in all, last volunteer date, and **View Volunteer
+  Hours**), next to the other modules' glance cards (see
+  [Record pages](record-pages.md)). To show the full section and card there too, open Setup, then **Lightning App Builder**, edit **Volunteers Contact Record
   Page**, choose **Activation**, then **App, Record Type, and Profile**, and assign it to the
   BarnCRM app on desktop and phone. Do the same for **Volunteers Account Record Page** where
   your people are person accounts.

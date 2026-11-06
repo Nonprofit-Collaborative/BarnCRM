@@ -164,7 +164,9 @@ To make letters for a whole list of people at once, ask your admin: see
 - Problem: a person's totals did not go up. Why and what to do: only **Approved** hours count.
   Check the entry's **Status**.
 - Problem: no **Volunteer Profile** section or readiness card. Why and what to do: you opened
-  the person in another app, or the person has no **Volunteer Status** yet. Switch to the
+  the person in another app, or the person has no **Volunteer Status** yet. In the **BarnCRM**
+  app, the **Volunteering at a Glance** card at the top of the sidebar gives the status, hours
+  and last volunteer date, with **View Volunteer Hours**; for the full section, switch to the
   **BarnCRM Volunteers** app, or ask a coordinator to set the status. The readiness card is
   empty for anyone without the Coordinator or Admin role.
 - Problem: "No letter: this person has no approved volunteer hours in the period." Why and what
