@@ -21,6 +21,16 @@ the member count and the formal greeting. If your org turned off automatic house
 records membership the flexible way, the household field may stay blank: open the household
 from the **Household** card or the **Households** tab.
 
+## To See Everything About a Person in One Place
+
+The top of a person's sidebar shows a small card from each installed module that has something
+about them: **Giving at a Glance** (their giving), **Programs at a Glance** (open enrollments,
+last service), **Volunteering at a Glance** (status and hours) and **Grants at a Glance** (grants
+they are the funder contact on). Each card has a button to the full list, for example **View
+Enrollments**, so you do not need to switch apps. A card you have no access to, or with
+nothing to show, does not appear. An organization's page shows its giving and, for a funder,
+its grants.
+
 ## To Start From a Household
 
 1. On the **Home** tab, click **New Household**.

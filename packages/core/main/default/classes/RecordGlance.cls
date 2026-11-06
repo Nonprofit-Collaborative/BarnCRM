@@ -84,6 +84,46 @@ public with sharing class RecordGlance {
 			actions.add(action);
 			return this;
 		}
+
+		/**
+		 * A button to the record's related list of one lookup, for example a person's
+		 * enrollments (modules-21). No button when the record's object has no related list for
+		 * that lookup.
+		 */
+		@NamespaceAccessible
+		public Card addRelatedListAction(String label, Id recordId, Schema.SObjectField lookup) {
+			Schema.SObjectType parent = recordId == null ? null : recordId.getSObjectType();
+			String relationship = relationshipName(parent, lookup);
+			if (relationship == null) {
+				return this;
+			}
+			return addAction(
+				label,
+				new Map<String, Object>{
+					'type' => 'standard__recordRelationshipPage',
+					'attributes' => new Map<String, Object>{
+						'recordId' => recordId,
+						'objectApiName' => String.valueOf(parent),
+						'relationshipApiName' => relationship,
+						'actionName' => 'view'
+					}
+				}
+			);
+		}
+	}
+
+	/** The related list name of a lookup on its parent object, or null. */
+	@TestVisible
+	private static String relationshipName(Schema.SObjectType parent, Schema.SObjectField lookup) {
+		if (parent == null || lookup == null) {
+			return null;
+		}
+		for (Schema.ChildRelationship child : parent.getDescribe().getChildRelationships()) {
+			if (child.getField() == lookup) {
+				return child.getRelationshipName();
+			}
+		}
+		return null;
 	}
 
 	/** One figure: a label and a value of one kind. */

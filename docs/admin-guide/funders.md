@@ -161,6 +161,16 @@ outcome** always runs and refuses anything in that field that is not one. Choosi
 outcome needs edit access to requirements (Funders Staff or Admin) and read access to Logic
 Models; the outcomes and results shown follow each person's own Logic Models access.
 
+### Grants at a Glance
+
+On Core's organization and person pages (the BarnCRM app), a funder organization, and a person
+who is the **Funder Contact** on a grant, show **Grants at a Glance** at the top of the
+sidebar (modules-21): **Grants** (how many), **Open Grants** (Prospect to Applied) and
+**Amount Awarded** (awarded grants only), with **View Grants**, which opens that record's grant
+list. It shows beside the other modules' glance cards (see [Record pages](record-pages.md)),
+only to someone who can read grants, and only when there is a grant. Someone who cannot read
+**Amount Awarded** sees the card without it.
+
 ## The Grant Pipeline Tab
 
 The **Grant Pipeline** tab is where most people work:

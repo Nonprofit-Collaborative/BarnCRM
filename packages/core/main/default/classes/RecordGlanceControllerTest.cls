@@ -154,4 +154,28 @@ private class RecordGlanceControllerTest {
 			'Each unusable class is logged'
 		);
 	}
+
+	@IsTest
+	static void aRelatedListButtonOpensTheRecordsListOfThatLookup() {
+		System.runAs(TestUsers.admin()) {
+			Id accountId = FakeIds.of(Account.SObjectType, 1);
+			RecordGlance.Card card = new RecordGlance.Card('stub', 'Stub Card', 'standard:account')
+				.addRelatedListAction('People', accountId, Contact.AccountId)
+				.addRelatedListAction('Nothing', accountId, Contact.Email)
+				.addRelatedListAction('No record', null, Contact.AccountId);
+			Assert.areEqual(
+				1,
+				card.actions.size(),
+				'Only a lookup with a related list gets a button'
+			);
+			Map<String, Object> page = (Map<String, Object>) JSON.deserializeUntyped(
+				card.actions[0].pageReference
+			);
+			Map<String, Object> attributes = (Map<String, Object>) page.get('attributes');
+			Assert.areEqual('standard__recordRelationshipPage', page.get('type'), 'A related list');
+			Assert.areEqual(accountId, attributes.get('recordId'), 'Of the record');
+			Assert.areEqual('Account', attributes.get('objectApiName'), 'On its object');
+			Assert.areEqual('Contacts', attributes.get('relationshipApiName'), 'For that lookup');
+		}
+	}
 }

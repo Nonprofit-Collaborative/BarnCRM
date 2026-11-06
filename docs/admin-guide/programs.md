@@ -466,6 +466,12 @@ many services they have attended in all (absences are not counted). On an
 account the card shows only for a person account, never on a household or an organization. A
 user without a Programs permission set sees no card.
 
+In the BarnCRM app, Core's person page shows **Programs at a Glance** at the top of its
+sidebar instead (modules-21): Open Enrollments, Last Service and Services Attended, the same
+figures as this card, and **View Enrollments**, which opens the person's enrollment list. It
+shows beside the other modules' glance cards (see [Record pages](record-pages.md)) and only to
+someone with a Programs permission set, for a person with an enrollment or a service.
+
 The card is on the Programs app's own Contact and Account record pages, **Programs Contact
 Record Page** and **Programs Account Record Page**: BarnCRM's person pages plus the card. In the
 other BarnCRM apps the person page stays as it was. To show the card there too, add the

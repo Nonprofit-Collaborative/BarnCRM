@@ -352,3 +352,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 5 | Choose **Turn On** and confirm. | Household Upkeep is on. Add a contact: it gets one BarnCRM household, and NPSP makes no household account for it. |
 
 **Cleanup:** none (Household Upkeep cannot be turned off).
+
+## T-HH-23: One Person Page Across Modules
+
+**Purpose:** confirm each installed module adds its glance card to Core's person and organization pages, and a person's part in every module shows on one page (modules-21).
+**Prerequisites:** admin; Giving, Programs, Volunteers and Funders installed. A person `Ana Glance` with a gift, one open and one completed enrollment, two services attended, **Volunteer Status** Active with approved hours, and who is the **Funder Contact** on an applied grant from `Lakeside Foundation`, which also has one awarded grant of 10,000. A second person `Ben Glance` with none of these. A user with BarnCRM Read Only and no module permission set.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the **BarnCRM** app open `Ana Glance`. | The top of the sidebar shows **Giving at a Glance**, **Programs at a Glance**, **Volunteering at a Glance** and **Grants at a Glance**, in that order. |
+| 2 | Read **Programs at a Glance**. | **Open Enrollments** 1, **Last Service** the date of the later service, **Services Attended** 2. |
+| 3 | Click **View Enrollments**. | The person's Enrollments list opens with both enrollments. |
+| 4 | Back on the person, read **Volunteering at a Glance** and click **View Volunteer Hours**. | **Volunteer Status** Active, **Volunteer Hours This Year**, **Volunteer Hours Total** and **Last Volunteer Date** match the Volunteer Profile fields; the button opens the person's Volunteer Hours list. |
+| 5 | Read **Grants at a Glance** and click **View Grants**. | **Grants** 1, **Open Grants** 1, **Amount Awarded** 0; the button opens the grants the person is funder contact on. |
+| 6 | Open `Lakeside Foundation`. | **Grants at a Glance**: **Grants** 2, **Open Grants** 1, **Amount Awarded** 10,000. No Programs or Volunteering card on an organization. |
+| 7 | Open `Ben Glance`. | No Programs, Volunteering or Grants card and no empty space for them. |
+| 8 | Log in as the Read Only user without module permission sets and open `Ana Glance`. | No Programs, Volunteering or Grants card. |
+
+**Cleanup:** None.

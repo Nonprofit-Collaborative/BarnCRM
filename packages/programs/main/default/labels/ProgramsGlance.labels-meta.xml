@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Programs_Glance_Title</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs glance card title</shortDescription>
+        <value>Programs at a Glance</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Glance_OpenEnrollments</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs glance open enrollments figure</shortDescription>
+        <value>Open Enrollments</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Glance_LastService</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs glance last service figure</shortDescription>
+        <value>Last Service</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Glance_ServicesAttended</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs glance services attended figure</shortDescription>
+        <value>Services Attended</value>
+    </labels>
+    <labels>
+        <fullName>Programs_Glance_ViewEnrollments</fullName>
+        <categories>Programs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Programs glance button to the enrollments</shortDescription>
+        <value>View Enrollments</value>
+    </labels>
+</CustomLabels>

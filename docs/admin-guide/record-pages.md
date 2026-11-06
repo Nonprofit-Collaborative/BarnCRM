@@ -44,6 +44,22 @@ the tabs. The top of the sidebar holds the **Record Glance** host, where an inst
 can add a small summary card, for example a giving summary. With no module that adds one, it
 shows nothing and takes no space.
 
+So one person page shows a person's part in every installed module (modules-21), each module
+adds its own card, in this order, each with a button to the module's full list:
+
+| Card | Module | On | Shows | Button |
+|---|---|---|---|---|
+| **Giving at a Glance** | Giving | People and accounts | Total Giving, Last Gift Date, Donor Level | **Enter a Gift** |
+| **Programs at a Glance** | Programs | People (contacts and person accounts) | Open Enrollments, Last Service, Services Attended | **View Enrollments** |
+| **Volunteering at a Glance** | Volunteers | People (contacts) | Volunteer Status, Volunteer Hours This Year, Volunteer Hours Total, Last Volunteer Date | **View Volunteer Hours** |
+| **Grants at a Glance** | Funders | Funder organizations, and people who are a grant's funder contact | Grants, Open Grants, Amount Awarded | **View Grants** |
+
+A card shows only to someone who can read what it shows (a field they cannot read is left
+off), and only when there is something to show: no card for a person who never enrolled,
+volunteered or was a funder contact. Core holds no reference to any module: each registers its
+card through the extension seam (ADR-0167). Logic Models adds no card, since a logic model
+belongs to a program, not a person.
+
 What changes with the record:
 
 - **A household** shows the **Members** panel and a **Name and Greetings** section

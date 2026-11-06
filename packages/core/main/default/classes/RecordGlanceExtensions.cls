@@ -9,7 +9,10 @@ public with sharing class RecordGlanceExtensions {
 	/** The class names dependent packages register, in the order their cards show. */
 	@NamespaceAccessible
 	public static final List<String> EXTENSION_CLASSES = new List<String>{
-		'GivingRecordGlanceExtension'
+		'GivingRecordGlanceExtension',
+		'ProgramsRecordGlanceExtension',
+		'VolunteersRecordGlanceExtension',
+		'FundersRecordGlanceExtension'
 	};
 
 	/** Injected by Core's tests by class name, since no other package is there to resolve. */
