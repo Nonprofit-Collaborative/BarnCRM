@@ -1,4 +1,4 @@
-# ADR-NEXT: Radius Find measures from a shipped postal code table, with no outside geocoding
+# ADR-0179: Radius Find measures from a shipped postal code table, with no outside geocoding
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-06

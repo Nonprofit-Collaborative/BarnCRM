@@ -8389,7 +8389,7 @@ browser, one sheet with a header row of column labels, numbers as numbers, dates
 dates, and everything else as text. The workbook is written by BarnCRM's own module, with no
 third-party code (the same reasoning as ADR-0049).
 
-**R-SQ13 Distance from a place** (C-69, D-157; ADR-NEXT, `NEXT-radius-find-postal-centroids.md`).
+**R-SQ13 Distance from a place** (C-69, D-157; ADR-0179, `0179-radius-find-postal-centroids.md`).
 The document has one more optional key, `radius`: `{ field, miles, latitude, longitude }`
 (version stays 1). `field` is a compound address or location field of the query's object that
 the running user can read (describe); `miles` a whole number from 1 to 500; latitude and
@@ -13572,7 +13572,7 @@ mirrors the primary member).
 | 1.0 | 2026-11-06 | Session horizon setting (modules-24, D-183). `Programs_Settings__c` gains `Session_Horizon_Weeks__c` (Number(2, 0), default 8, 1 to 26). R-SS2 reads it instead of a fixed eight weeks, and skips a day another schedule filled earlier in the same run. |
 | 1.0 | 2026-11-06 | Shipped match sources turned off through a setting (owner decision D-184, ADR-0172). `BarnCRM_Settings__c` gains `Match_Sources_Turned_Off__c` (Section 12); Match Source's Active definition now says BarnCRM changes it only on the organization's own rows. |
 | 1.0 | 2026-11-06 | Addresses of deleted records (owner decision D-184). `BarnCRM_Settings__c` gains `Address_Delete_Behavior__c` (Section 12; Delete or Keep, default Delete) and `Address__c` gains `Deleted_With__c` (Text 40), with rule R-AD11: a deleted household's, organization's or person's addresses are deleted with it and restored with it, never on a merge. |
-| 1.1 | 2026-11-06 | Radius Find (C-69, D-157, ADR-NEXT). No object or field added. Section 29D gains rule R-SQ13: the query document's optional `radius` key (distance from a US postal code or a record's address, compiled to SOQL `DISTANCE`), the shipped static resource `BarnZipCentroids` (US Census Bureau 2023 Gazetteer ZCTA internal points, public domain) and the `FindRadius` class. |
+| 1.1 | 2026-11-06 | Radius Find (C-69, D-157, ADR-0179). No object or field added. Section 29D gains rule R-SQ13: the query document's optional `radius` key (distance from a US postal code or a record's address, compiled to SOQL `DISTANCE`), the shipped static resource `BarnZipCentroids` (US Census Bureau 2023 Gazetteer ZCTA internal points, public domain) and the `FindRadius` class. |
 | 1.0 | 2026-11-06 | Shipped organization record type (owner decision D-184, ADR-0173, amends ADR-0141 decision 2). Account gains the record type `BarnCRM_Organization` (active, given to nobody). Section 8 gains R-O4a: offered for organizations only where the org has no record type of its own, never detected, never switched to automatically; R-O5 leaves it out of the candidates. |
 | 1.1 | 2026-11-06 | Forms module (C-42a, D-157, ADR-0175 `0175-forms-module.md`). New package BarnCRM Forms with Sections 29ZW Form (`Form__c`), 29ZX Form Version (`Form_Version__c`) and 29ZY Form Submission (`Form_Submission__c`), rules R-FM1, R-FM2 and R-FS1 to R-FS4. Core gains no object or field: only the `FormAttachmentExtension` seam and the catalog row `BarnCRM_Module.Forms`. |
 | 1.1 | 2026-11-06 | BarnCRM Contact Point Sync module (C-45, D-111, ADR-0176 contact point sync module). New package `contactpoints`: Contact Point Link (`Contact_Point_Link__c`, 29ZZ, rules R-CPL1 to R-CPL4) and Contact Point Sync Settings (`Contact_Point_Sync_Settings__c`, 29ZZ1, R-CPS1). No Core object or field added. |

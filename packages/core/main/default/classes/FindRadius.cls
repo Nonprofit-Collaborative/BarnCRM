@@ -4,7 +4,7 @@
  * addresses and SOQL `DISTANCE`, with no outside geocoding.
  *
  * The point is a US postal code, read from the shipped `BarnZipCentroids` static resource (one
- * internal point per ZCTA from the US Census Bureau 2023 Gazetteer, ADR-NEXT), or the
+ * internal point per ZCTA from the US Census Bureau 2023 Gazetteer, ADR-0179), or the
  * address of a record the person names, read from that record's own geocode. It reaches the
  * query as two numbers, so the query document holds `{ field, miles, latitude, longitude }` and
  * nothing a person typed ever becomes query text.
