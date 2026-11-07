@@ -54,7 +54,7 @@ public with sharing class ReportSubscriptions {
 	}
 
 	/** What the person chose: daily, weekly on a day, or monthly on a date, at an hour (0 to 23). */
-	public class Schedule {
+	public class Choice {
 		public Id reportId;
 		public String frequency;
 		public String weekday;
@@ -109,7 +109,7 @@ public with sharing class ReportSubscriptions {
 					BarnHelp.text('Core', 'Core_ReportSubscriptions_ConnectionNeeded')
 				);
 			}
-			Schedule chosen = (Schedule) JSON.deserialize(scheduleJson, Schedule.class);
+			Choice chosen = (Choice) JSON.deserialize(scheduleJson, Choice.class);
 			if (!valid(chosen)) {
 				throw new SubscriptionException(
 					BarnHelp.text('Core', 'Core_ReportSubscriptions_ScheduleInvalid')
@@ -174,7 +174,7 @@ public with sharing class ReportSubscriptions {
 	}
 
 	@TestVisible
-	private static Boolean valid(Schedule chosen) {
+	private static Boolean valid(Choice chosen) {
 		if (chosen == null || chosen.reportId == null || !FREQUENCIES.contains(chosen.frequency)) {
 			return false;
 		}
@@ -192,7 +192,7 @@ public with sharing class ReportSubscriptions {
 
 	/** The notification body: the report, its schedule, and an email to the subscriber only. */
 	@TestVisible
-	private static Map<String, Object> body(Schedule chosen, String reportName) {
+	private static Map<String, Object> body(Choice chosen, String reportName) {
 		Map<String, Object> details = new Map<String, Object>{ 'time' => chosen.hour };
 		if (chosen.frequency == 'weekly') {
 			details.put('daysOfWeek', new List<String>{ chosen.weekday });
@@ -230,10 +230,10 @@ public with sharing class ReportSubscriptions {
 	 * per-user limit and creates one. Logs only a failure, in words, under the job's context.
 	 */
 	public with sharing class SubscribeJob implements Queueable, Database.AllowsCallouts {
-		private final Schedule chosen;
+		private final Choice chosen;
 		private final String reportName;
 
-		public SubscribeJob(Schedule chosen, String reportName) {
+		public SubscribeJob(Choice chosen, String reportName) {
 			this.chosen = chosen;
 			this.reportName = reportName;
 		}
@@ -262,7 +262,7 @@ public with sharing class ReportSubscriptions {
 
 	/** Returns null when saved, else why not in words. */
 	@TestVisible
-	private static String save(Schedule chosen, String reportName) {
+	private static String save(Choice chosen, String reportName) {
 		String body = JSON.serialize(body(chosen, reportName));
 		String query =
 			'analytics/notifications?source=' +

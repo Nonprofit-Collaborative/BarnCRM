@@ -4,7 +4,8 @@ private class ReportSubscriptionsTest {
 		'BarnCRM_Admin',
 		'BarnCRM_Metadata_Admin'
 	};
-	private static final Id REPORT_ID = '00O000000000001AAA';
+	// 15 characters, so Apex adds the right case suffix and JSON.deserialize accepts it.
+	private static final Id REPORT_ID = '00O000000000001';
 
 	private static List<HttpRequest> sent = new List<HttpRequest>();
 
@@ -47,8 +48,8 @@ private class ReportSubscriptionsTest {
 		TestUsers.withPermissionSets(CONNECTION_ADMIN);
 	}
 
-	private static ReportSubscriptions.Schedule weekly() {
-		ReportSubscriptions.Schedule chosen = new ReportSubscriptions.Schedule();
+	private static ReportSubscriptions.Choice weekly() {
+		ReportSubscriptions.Choice chosen = new ReportSubscriptions.Choice();
 		chosen.reportId = REPORT_ID;
 		chosen.frequency = 'weekly';
 		chosen.weekday = 'mon';
@@ -96,7 +97,7 @@ private class ReportSubscriptionsTest {
 			ImportNewFieldService.systemPermissionOverride = true;
 			ImportNewFieldService.connectedOverride = true;
 			ImportNewFieldService.calloutStatusOverride = 'Enabled';
-			ReportSubscriptions.Schedule chosen = weekly();
+			ReportSubscriptions.Choice chosen = weekly();
 			chosen.weekday = 'someday';
 			try {
 				ReportSubscriptions.subscribe(JSON.serialize(chosen));
@@ -114,7 +115,7 @@ private class ReportSubscriptionsTest {
 	@IsTest
 	static void validAcceptsEachFrequencyAndRefusesBadValues() {
 		System.runAs(TestUsers.withPermissionSets(CONNECTION_ADMIN)) {
-			ReportSubscriptions.Schedule chosen = weekly();
+			ReportSubscriptions.Choice chosen = weekly();
 			Assert.isTrue(ReportSubscriptions.valid(chosen), 'Weekly on Monday.');
 			chosen.frequency = 'daily';
 			Assert.isTrue(ReportSubscriptions.valid(chosen), 'Daily.');
