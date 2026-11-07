@@ -59,7 +59,9 @@ design fits it, and builds no public or guest access.
    person may create, with `links` setting its lookups to another entry, the person, the
    organization or the record the form was filled from, and `values` for constants). Fields map
    to an entry by `target.record`. Person and organization are found before they are written;
-   related records are always created, in the listed order.
+   related records are always created, in the listed order. A person with no last name or an
+   organization with no name that matches nobody is skipped (its questions were optional and
+   left blank), and so is a related record linking to a skipped one.
 7. **One matcher: Core's.** Forms never adds a matcher. A person is found by email
    (`ImportMatcher.contactsByEmail`), then by last name and postal code
    (`ImportMatcher.contactsByNameAndPostalCode`), each narrowed by first name

@@ -12685,6 +12685,8 @@ and writes nothing. Process Again uses the Person and Organization staff set on 
 
 **R-FS3 All or nothing.** The records of one submission are written under one savepoint in the
 user's mode; any failure rolls them back and the submission is kept as Failed with the reason.
+A person with no last name or an organization with no name that matches nobody is skipped (its
+questions were optional and left blank), and so is a related record linking to a skipped one.
 
 **R-FS4 Modules hear about it.** After the records are written, each installed
 `FormAttachmentExtension` that handles the context record's object receives a

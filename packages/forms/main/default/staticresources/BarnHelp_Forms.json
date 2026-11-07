@@ -1,0 +1,15 @@
+{
+  "languages": ["en"],
+  "texts": {
+    "Forms_Definition_NotJson": "The form's questions can't be read. Ask your BarnCRM admin to open the form in the Form Builder and save it again.",
+    "Forms_Submit_AlreadyProcessed": "This submission is already processed, so there is nothing to process again.",
+    "Forms_Submit_Failed": "Nothing was written: {0}",
+    "Forms_Submit_ManyOrganizations": "More than one organization matches these answers, so none was changed. Choose the right one in Organization, then select Process Again.",
+    "Forms_Submit_ManyPeople": "More than one person matches these answers, so nobody was changed. Choose the right person in Person, then select Process Again.",
+    "Forms_Submit_ModuleFailed": "The records were written, but another BarnCRM module could not take this submission: {0}",
+    "Forms_Submit_NoField": "{0} has no field {1}. Ask your BarnCRM admin to fix the form in the Form Builder.",
+    "Forms_Submit_NoObject": "This org has no object {0}. Ask your BarnCRM admin to fix the form in the Form Builder.",
+    "Forms_Submit_NotFound": "This submission can't be found. It may have been deleted, or you may not have access to it.",
+    "Forms_Submit_NotPublished": "This form isn't published, so it can't be filled in. Ask your BarnCRM admin to publish it."
+  }
+}
