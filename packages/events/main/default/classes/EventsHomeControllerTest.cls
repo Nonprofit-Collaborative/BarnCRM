@@ -56,6 +56,12 @@ private class EventsHomeControllerTest {
 			Datetime start = Datetime.now().addDays(7);
 			Event__c first = event('Monthly Class', start, 'Open');
 			insert as user first;
+			insert as user new Ticket_Type__c(
+				Event__c = first.Id,
+				Name = 'General',
+				Price__c = 15,
+				Sales_End__c = start.addHours(-1)
+			);
 
 			Test.startTest();
 			Integer made = EventsHomeController.repeatEvent(
@@ -79,6 +85,19 @@ private class EventsHomeControllerTest {
 				start.addDays(27),
 				copies[0].Registration_Closes__c,
 				'Registration window moved with it'
+			);
+			List<Ticket_Type__c> tickets = [
+				SELECT Name, Price__c, Sales_End__c
+				FROM Ticket_Type__c
+				WHERE Event__c = :copies[0].Id
+				WITH USER_MODE
+			];
+			Assert.areEqual(1, tickets.size(), 'The ticket types are copied');
+			Assert.areEqual(15, tickets[0].Price__c, 'With their price');
+			Assert.areEqual(
+				start.addDays(28).addHours(-1),
+				tickets[0].Sales_End__c,
+				'Sales window moved with the occurrence'
 			);
 		}
 	}

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    One kind of ticket for an event, such as General, Student or VIP, with its price and quantity
+    (canonical model 29EV2). BarnCRM records the price and never takes a payment.
+  </description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>false</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Ticket Type</label>
+  <nameField>
+    <label>Ticket Type Name</label>
+    <trackHistory>false</trackHistory>
+    <type>Text</type>
+  </nameField>
+  <pluralLabel>Ticket Types</pluralLabel>
+  <sharingModel>ControlledByParent</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

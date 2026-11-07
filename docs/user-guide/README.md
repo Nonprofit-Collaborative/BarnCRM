@@ -55,7 +55,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ### Event Management
 
-- [Events](events.md): finding, creating and repeating events.
+- [Events](events.md): finding, creating and repeating events, and setting up tickets.
 
 ### Reports
 

@@ -88,4 +88,52 @@
         <shortDescription>Repeat Event dialog: how many occurrences to add</shortDescription>
         <value>Occurrences to Add</value>
     </labels>
+    <labels>
+        <fullName>Events_EventTab_Tickets</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab and section: the event's ticket types</shortDescription>
+        <value>Tickets</value>
+    </labels>
+    <labels>
+        <fullName>Events_Tickets_NewTicketType</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Tickets tab button that adds a ticket type</shortDescription>
+        <value>New Ticket Type</value>
+    </labels>
+    <labels>
+        <fullName>Events_Tickets_NewPromoCode</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Tickets tab button that adds a promo code</shortDescription>
+        <value>New Promo Code</value>
+    </labels>
+    <labels>
+        <fullName>Events_Tickets_Expired</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Promo code state: its valid dates are over</shortDescription>
+        <value>Expired</value>
+    </labels>
+    <labels>
+        <fullName>Events_Tickets_Scheduled</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Promo code state: its valid dates have not started</shortDescription>
+        <value>Scheduled</value>
+    </labels>
+    <labels>
+        <fullName>Events_Tickets_NoLimit</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Tickets tab: a quantity or use limit left empty</shortDescription>
+        <value>No limit</value>
+    </labels>
 </CustomLabels>
