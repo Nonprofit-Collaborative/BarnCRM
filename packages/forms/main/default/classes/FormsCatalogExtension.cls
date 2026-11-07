@@ -62,7 +62,12 @@ public with sharing class FormsCatalogExtension implements FormCatalogExtension 
 			return null;
 		}
 		String link = urls[0] + '/FormsPublic?form=' + formId;
-		return contextRecordId == null ? link : link + '&record=' + contextRecordId;
+		if (contextRecordId == null) {
+			return link;
+		}
+		// `record=<id>.<signed claim>`: the record identifier alone does not open the form.
+		String claim = FormIntakeService.claimFor(formId, contextRecordId);
+		return claim == null ? null : link + '&record=' + contextRecordId + '.' + claim;
 	}
 
 	@TestVisible

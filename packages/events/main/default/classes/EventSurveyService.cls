@@ -11,6 +11,7 @@
 public with sharing class EventSurveyService {
 	public static final Integer MAX_ANSWERS_LENGTH = 32000;
 	private static final Integer CLIPPED_TEXT_LENGTH = 500;
+	private static final String ATTENDED = 'Attended';
 
 	/** The survey form an event names, or null when none, or the text is not an identifier. */
 	public static Id formId(String formKey) {
@@ -24,12 +25,15 @@ public with sharing class EventSurveyService {
 		}
 	}
 
-	/** The survey form of the attendee's event, in the person's own access; null when none. */
+	/**
+	 * The survey form of the attendee's event, in the person's own access; null when none or when
+	 * the attendee is not Attended (the survey is for people who came).
+	 */
 	public static Id formForAttendee(Id attendeeId) {
 		for (Event_Attendee__c attendee : [
 			SELECT Event_Registration__r.Event__r.Survey_Form_Key__c
 			FROM Event_Attendee__c
-			WHERE Id = :attendeeId
+			WHERE Id = :attendeeId AND Status__c = :ATTENDED
 			WITH USER_MODE
 		]) {
 			return formId(attendee.Event_Registration__r.Event__r.Survey_Form_Key__c);
@@ -49,7 +53,7 @@ public with sharing class EventSurveyService {
 		for (Event_Attendee__c attendee : [
 			SELECT Event_Registration__r.Event__r.Survey_Form_Key__c
 			FROM Event_Attendee__c
-			WHERE Id IN :attendees
+			WHERE Id IN :attendees AND Status__c = :ATTENDED
 			WITH SYSTEM_MODE
 		]) {
 			Id formId = formId(attendee.Event_Registration__r.Event__r.Survey_Form_Key__c);

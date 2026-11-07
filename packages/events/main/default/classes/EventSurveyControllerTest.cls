@@ -173,6 +173,32 @@ private class EventSurveyControllerTest {
 	}
 
 	@IsTest
+	static void anAttendeeLinkNeedsASignedClaimAndOnlyAttendedPeopleGetOne() {
+		System.runAs(staff()) {
+			FormCatalogTestSupport.install(new Catalog());
+			Event__c event = past(FORM_KEY);
+			Event_Attendee__c came = attendee(event, 'Came');
+			Event_Attendee__c stayed = attendee(event, 'Stayed');
+			stayed.Status__c = 'No-Show';
+			update as user stayed;
+			EventFormAttachment attachment = new EventFormAttachment();
+
+			Assert.isTrue(
+				attachment.signedClaim(came.Id),
+				'An attendee link carries a signed claim'
+			);
+			Assert.isFalse(attachment.signedClaim(event.Id), 'A registration link does not');
+			Assert.isNotNull(attachment.formFor(came.Id), 'Someone who attended is surveyed');
+			Assert.isNull(attachment.formFor(stayed.Id), 'A no-show is refused');
+			Map<Id, String> links = EventSurveyService.linksFor(
+				new List<Event_Attendee__c>{ came, stayed }
+			);
+			Assert.isTrue(links.containsKey(came.Id));
+			Assert.isFalse(links.containsKey(stayed.Id), 'No link for a no-show');
+		}
+	}
+
+	@IsTest
 	static void anEventWithoutASurveyKeepsRegistrationsAndIgnoresSurveyAnswers() {
 		System.runAs(staff()) {
 			FormCatalogTestSupport.install(new Catalog());

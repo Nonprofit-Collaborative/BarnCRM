@@ -17,6 +17,7 @@ public with sharing class FormsTestModule implements FormAttachmentExtension {
 		FormAttachmentExtensions.EXTENSION_CLASSES.add('FormsTestModule');
 		heard.clear();
 		fail = false;
+		signed = false;
 	}
 
 	public Boolean handles(Schema.SObjectType contextType) {
@@ -25,6 +26,13 @@ public with sharing class FormsTestModule implements FormAttachmentExtension {
 
 	public Id formFor(Id contextRecordId) {
 		return attachedFormId;
+	}
+
+	/** Whether its records need a signed claim; off unless a test turns it on. */
+	public static Boolean signed = false;
+
+	public Boolean signedClaim(Id contextRecordId) {
+		return signed;
 	}
 
 	public void received(FormSubmissionReceipt receipt) {

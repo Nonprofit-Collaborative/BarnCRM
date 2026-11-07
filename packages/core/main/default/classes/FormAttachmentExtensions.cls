@@ -48,6 +48,29 @@ public with sharing class FormAttachmentExtensions {
 		return null;
 	}
 
+	/** Whether a module asks that a public link to this record carry a signed claim (EV-18). */
+	@NamespaceAccessible
+	public static Boolean signedClaimRequired(Id contextRecordId) {
+		if (contextRecordId == null) {
+			return false;
+		}
+		for (FormAttachmentExtension extension : handling(contextRecordId)) {
+			try {
+				if (extension.signedClaim(contextRecordId) == true) {
+					return true;
+				}
+			} catch (Exception failed) {
+				ErrorLogger.log(
+					failed,
+					'FormAttachmentExtensions.signedClaimRequired',
+					contextRecordId
+				);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * Hands a processed submission to every extension that handles its context record's object.
 	 * Each runs under its own savepoint: one that fails is rolled back and logged, and its message

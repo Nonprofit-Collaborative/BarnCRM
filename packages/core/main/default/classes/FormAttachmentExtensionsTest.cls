@@ -30,6 +30,10 @@ private class FormAttachmentExtensionsTest {
 			return formId;
 		}
 
+		public Boolean signedClaim(Id contextRecordId) {
+			return true;
+		}
+
 		public void received(FormSubmissionReceipt receipt) {
 			heard.add(receipt);
 		}
@@ -42,6 +46,10 @@ private class FormAttachmentExtensionsTest {
 		}
 
 		public Id formFor(Id contextRecordId) {
+			throw new System.TypeException('Cannot tell');
+		}
+
+		public Boolean signedClaim(Id contextRecordId) {
 			throw new System.TypeException('Cannot tell');
 		}
 

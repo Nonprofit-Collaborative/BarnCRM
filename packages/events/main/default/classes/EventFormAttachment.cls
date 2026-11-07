@@ -23,6 +23,11 @@ public with sharing class EventFormAttachment implements FormAttachmentExtension
 		return contextType == Event__c.SObjectType || contextType == Event_Attendee__c.SObjectType;
 	}
 
+	/** An attendee's survey link names the person's own record, so it carries a signed claim. */
+	public Boolean signedClaim(Id contextRecordId) {
+		return contextRecordId.getSObjectType() == Event_Attendee__c.SObjectType;
+	}
+
 	/**
 	 * An event's registration form, or, for an attendee (the context of a post-event survey link,
 	 * EV-18), the survey form of the attendee's event.

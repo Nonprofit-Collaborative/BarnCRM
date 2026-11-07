@@ -198,6 +198,47 @@ private class FormIntakeServiceTest {
 	}
 
 	@IsTest
+	static void aRecordThatNeedsASignedClaimIsClosedWithoutOne() {
+		System.runAs(admin()) {
+			Form__c form = FormsTestData.publicVolunteerInterest(50);
+			Account gala = AccountKindsTestData.organization('Zzpublic Gala');
+			insert as user gala;
+			FormsTestModule.register();
+			FormsTestModule.signed = true;
+			FormsTestModule.attachedFormId = form.Id;
+			FormIntakeService.actAsGuest = true;
+			String claim = FormIntakeService.claimFor(form.Id, gala.Id);
+			Assert.isNotNull(claim, 'A public form signs a claim');
+
+			String ticket = ticketAfterWaiting(form.Id);
+			Assert.areEqual(
+				FormIntakeService.CLOSED,
+				FormIntakeService.submit(ticket, sam(), null, gala.Id).status,
+				'No signature'
+			);
+			Assert.areEqual(
+				FormIntakeService.CLOSED,
+				FormIntakeService.submit(ticket, sam(), null, gala.Id + '.' + claim.reverse())
+					.status,
+				'A wrong signature'
+			);
+			Assert.areEqual(
+				FormIntakeService.CLOSED,
+				FormIntakeService.submit(ticket, sam(), null, gala.Id + '.').status,
+				'An empty signature'
+			);
+			Assert.areEqual(0, submissions().size(), 'Nothing was stored');
+
+			Assert.areEqual(
+				FormIntakeService.RECEIVED,
+				FormIntakeService.submit(ticket, sam(), null, gala.Id + '.' + claim).status,
+				'The right signature'
+			);
+			Assert.areEqual(gala.Id, Id.valueOf(submissions()[0].Context_Record_Id__c));
+		}
+	}
+
+	@IsTest
 	static void aSignedInCallerIsProcessedAtOnceThroughRest() {
 		System.runAs(admin()) {
 			AccountKindsTestData.useRecordTypeTheUserCanUse();

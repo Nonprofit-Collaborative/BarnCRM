@@ -160,8 +160,12 @@ public without sharing class FormIntakeService {
 		if (version == null) {
 			return receipt;
 		}
-		Id contextId = idOrNull(contextRecordId);
-		if (String.isNotBlank(contextRecordId) && contextId == null) {
+		String claim = claimPart(contextRecordId);
+		Id contextId = idOrNull(idPart(contextRecordId));
+		if (
+			(String.isNotBlank(contextRecordId) && contextId == null) ||
+			(contextId != null && !claimAllowed(version.Form__c, contextId, claim))
+		) {
 			receipt.status = CLOSED;
 			return receipt;
 		}
@@ -356,6 +360,50 @@ public without sharing class FormIntakeService {
 			),
 			AccessLevel.SYSTEM_MODE
 		);
+	}
+
+	/**
+	 * The signed claim for a link that names a record (EV-18): an HMAC-SHA256 of the form and the
+	 * record, with the signing key of the form's current public version (the key of decision 5,
+	 * no new secret). Null when the form is not public.
+	 */
+	public static String claimFor(Id formId, Id contextRecordId) {
+		Form_Version__c version = contextRecordId == null ? null : latestPublicVersion(formId);
+		if (version == null) {
+			return null;
+		}
+		Blob mac = Crypto.generateMac(
+			'hmacSHA256',
+			Blob.valueOf('claim:' + formId + ':' + contextRecordId),
+			EncodingUtil.convertFromHex(version.Signing_Key__c)
+		);
+		return EncodingUtil.base64Encode(mac).replace('+', '-').replace('/', '_').remove('=');
+	}
+
+	/**
+	 * Whether a public submission may use this record. A record whose module asks for a signed
+	 * claim (`FormAttachmentExtensions.signedClaimRequired`) needs the right signature and the
+	 * module's own say that this form is the one attached to it, which for an attendee means the
+	 * attendee attended. Any other record needs nothing more.
+	 */
+	private static Boolean claimAllowed(Id formId, Id contextId, String claim) {
+		if (!FormAttachmentExtensions.signedClaimRequired(contextId)) {
+			return true;
+		}
+		String expected = claimFor(formId, contextId);
+		return expected != null &&
+			String.isNotBlank(claim) &&
+			expected == claim &&
+			FormAttachmentExtensions.formFor(contextId) == formId;
+	}
+
+	/** The record id of `recordId` or `recordId.signature`. */
+	private static String idPart(String value) {
+		return value == null ? null : value.substringBefore('.');
+	}
+
+	private static String claimPart(String value) {
+		return value == null || !value.contains('.') ? null : value.substringAfter('.');
 	}
 
 	private static Form_Version__c latestPublicVersion(Id formId) {

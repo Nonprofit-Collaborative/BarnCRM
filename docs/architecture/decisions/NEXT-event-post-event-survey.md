@@ -28,7 +28,7 @@ Salesforce Site. Events cannot read Forms' objects, and Core cannot name them (t
    ADR-0167 and ADR-0175 mechanism: a class name Core resolves with `NamespaceUtil.resolveType`,
    absent when not installed, a failure logged and skipped. Forms implements it
    (`FormsCatalogExtension`): published forms with Public set, a form's questions read from its
-   definition, and the address `<first active Site URL>/FormsPublic?form=<id>&record=<id>` from
+   definition, and the address `<first active Site URL>/FormsPublic?form=<id>&record=<id>.<claim>` from
    the same Sites list the Form Builder uses (`FormsSites`). Without Forms the registry reports
    `isAvailable` false and the Survey section of the event page draws nothing.
 3. **The attendee is the form's context record.** The link carries the attendee's record
@@ -37,10 +37,21 @@ Salesforce Site. Events cannot read Forms' objects, and Core cannot name them (t
    event, which is exactly the check ADR-0184 decision 3 requires before a public form honours a
    context record, and its `received` keeps the answers instead of registering anyone. A survey
    form needs no question that finds or writes a person.
+
+   **The link carries a signed claim.** The attendee's identifier alone must not open the form, so
+   the address is `...&record=<attendee id>.<claim>`. The claim is an HMAC-SHA256 of
+   `claim:<form id>:<attendee id>` with the signing key of the form's current public version, the
+   key ADR-0184 decision 5 already generates for tickets (no new secret;
+   `FormIntakeService.claimFor`). `FormAttachmentExtension` gains `signedClaim(recordId)`, true
+   for attendees; the public intake closes a submission for such a record with a missing or wrong
+   claim and stores nothing. An attendee who is not Attended gets no link and no survey form
+   (`formFor` returns null, so processing holds the submission as ADR-0184 decision 3 says).
+   Republishing the form issues a new key, so links sent earlier stop working until the follow-up
+   is sent again; a form is not republished casually, and this is the cost of no new secret.
 4. **Answers are kept in Events.** `Event_Survey_Response__c` (canonical model 29EV18) is a detail
    of the attendee (Controlled by Parent, so the registration's privacy applies): the answers as
-   JSON, when received and the submission's identifier as text. A later submission from the same
-   attendee replaces the earlier one. The event is the attendee's event, so a report or the summary
+   JSON, when received and the submission's identifier as text. One response per attendee: a
+   second submit replaces the first (chosen over refusing it, so a person can correct an answer). The event is the attendee's event, so a report or the summary
    reads responses by event through the attendee. Events staff therefore read the summary without
    any Forms permission.
 5. **The follow-up carries the link.** In the morning run's follow-up phase (ADR-0182 decision 6),
@@ -71,8 +82,8 @@ Salesforce Site. Events cannot read Forms' objects, and Core cannot name them (t
 
 ## Consequences
 
-- A link works for anyone who holds it and answers for that attendee; the survey should not ask
-  for anything sensitive (stated in the admin guide).
+- A link still works for anyone who holds that attendee's whole link, but a record identifier
+  alone does not; the survey should not ask for anything sensitive (stated in the admin guide).
 - A response reaches Events up to 15 minutes after it is sent (ADR-0184 decision 2: public
   submissions are processed on the schedule).
 - Answers are JSON, so a report reads who answered and when, not an individual answer.

@@ -58,8 +58,15 @@ private class FormsCatalogExtensionTest {
 				'https://zzforms.example.org/FormsPublic?form=' +
 					publicForm.Id +
 					'&record=' +
-					UserInfo.getUserId(),
+					UserInfo.getUserId() +
+					'.' +
+					FormIntakeService.claimFor(publicForm.Id, UserInfo.getUserId()),
 				link
+			);
+			Assert.areNotEqual(
+				FormIntakeService.claimFor(publicForm.Id, UserInfo.getUserId()),
+				FormIntakeService.claimFor(publicForm.Id, publicForm.Id),
+				'The claim belongs to one record'
 			);
 			Assert.isFalse(bare.contains('record='));
 			Assert.isNull(refused, 'A form that is not public has no address');
