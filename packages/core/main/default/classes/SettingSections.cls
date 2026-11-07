@@ -64,6 +64,9 @@ public with sharing class SettingSections {
 	public static final String PROGRAMS = 'Programs';
 	@NamespaceAccessible
 	public static final String ADDRESSES = 'Addresses';
+	/** The Contact Point Sync module's switches and the link to its page, listed under People. */
+	@NamespaceAccessible
+	public static final String CONTACT_POINTS = 'Contact Points';
 	/** A sub-section of People and Households, and a page until P1 (see HOUSEHOLDS). */
 	@NamespaceAccessible
 	public static final String RELATIONSHIPS = 'Relationships';
@@ -81,6 +84,7 @@ public with sharing class SettingSections {
 			PEOPLE_AND_HOUSEHOLDS,
 			DUPLICATE_MATCHING,
 			ADDRESSES,
+			CONTACT_POINTS,
 			GIVING,
 			RECEIPTS,
 			FUNDERS,
