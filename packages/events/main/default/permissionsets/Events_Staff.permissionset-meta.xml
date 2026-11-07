@@ -455,11 +455,6 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
-    <field>Event_Table__c.Capacity__c</field>
-    <readable>true</readable>
-  </fieldPermissions>
-  <fieldPermissions>
-    <editable>true</editable>
     <field>Event_Table__c.Host__c</field>
     <readable>true</readable>
   </fieldPermissions>
