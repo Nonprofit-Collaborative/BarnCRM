@@ -125,9 +125,9 @@ to the people who should see them, shows its settings, and starts its automation
 | Duplicate Matching | Duplicate suggestions, review and matching logic | The Duplicate Matching tab and the Duplicate Matching section |
 | Org Optimizer and Health Check | The Org Optimizer tab and Health Check | The Org Optimizer tab, the Health section and the Org Optimizer section (its three thresholds) |
 | Households | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
-| Addresses | Address capture, the primary address, and the addresses of deleted records | Its five automations and the Addresses section |
-| Relationships | Keeping both sides of a relationship in step | Its automation, the Relationships box on People and Households, the Relationships card on a person's Connections tab, the Relationship types list in Custom Metadata, and import mappings that load relationships (in Data Manager and the Import wizard; kept, and listed again when it is turned back on) |
-| Affiliations | The primary affiliation | Its automation |
+| Addresses | Address capture, the primary address, and the addresses of deleted records | Its five automations, the Addresses section and the Addresses card on every record page that shows it (D-185) |
+| Relationships | Keeping both sides of a relationship in step | Its automation, the Relationships box on People and Households, the Relationships card on a person's Connections tab, the Relationships tile on the Sample Data card (D-185), the Relationship types list in Custom Metadata, and import mappings that load relationships (in Data Manager and the Import wizard; kept, and listed again when it is turned back on) |
+| Affiliations | The primary affiliation | Its automation and the Affiliations card on every record page that shows it (D-185) |
 | Preferred email and phone | Copying the preferred email into the standard email and the preferred phone into the standard phone | Its three automations |
 
 Rules that enforce data (relationship, affiliation and rollup definition checks) belong to no
