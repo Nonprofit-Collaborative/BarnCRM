@@ -31,6 +31,12 @@
     </itemInstances>
     <itemInstances>
       <componentInstance>
+        <componentName>eventVolunteers</componentName>
+        <identifier>eventVolunteers</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>force:detailPanel</componentName>
         <identifier>eventDetailPanel</identifier>
       </componentInstance>

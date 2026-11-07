@@ -301,6 +301,23 @@ a booked slot **Completed** or **No-Show**, **Release the Slot** (clears the per
 Slot** and **Reopen Slot**, and has **Edit** and **Delete**. Two slots of one host that overlap
 are flagged, never refused. Staff and admins book and change slots; Read Only sees them.
 
+### Volunteers
+
+When **BarnCRM Volunteers** is installed, the **Details** tab also shows a **Volunteers** section:
+the event's volunteer jobs, each with its shifts and how many volunteers have signed up out of how
+many are wanted. **New Job Name** with **Add Job** adds a job for this event; **Add Shift** on a
+job opens a small form (**Starts**, **Ends**, **Volunteers Needed**, starting at the event's first
+hour) and **Save** adds the shift. A shift outside the event's dates only warns, because setup the
+day before and teardown the day after are ordinary.
+
+The jobs and shifts are ordinary Volunteers records, so sign-up, reminders, nudges, hours and
+totals work on them as on any other: open the job's name to manage it in Volunteers. Event
+Management only needs Core; it reaches Volunteers through a Core extension point, remembers the
+event on the job as its record ID in the **Event ID** field (text, not a link), and shows nothing
+when Volunteers is not installed. Who may add jobs and shifts is decided by the Volunteers
+permission sets (Coordinator, Staff, Admin), not the Events ones. Deleting an event leaves its
+volunteer jobs in Volunteers, where their hours and history stay.
+
 ## Settings
 
 As an admin, open the **Events** section of **BarnCRM Settings**. Each setting saves org-wide as
@@ -362,5 +379,5 @@ is left alone.
 
 ## Not Yet
 
-Session sign-up, a public event page, speaker portal, check-in codes and volunteer shifts for an
-event come in later releases.
+Session sign-up, a public event page, speaker portal and check-in codes for an event come in later
+releases.

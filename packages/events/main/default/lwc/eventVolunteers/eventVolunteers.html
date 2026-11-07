@@ -1,0 +1,118 @@
+<template>
+  <template lwc:if={showSection}>
+    <div class="slds-var-m-bottom_medium" data-id="volunteers">
+      <h2 class="slds-text-heading_small" data-id="title">{text.title}</h2>
+      <p class="slds-text-color_weak slds-var-m-bottom_small" data-id="intro">{text.intro}</p>
+
+      <template lwc:if={hasError}>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+      </template>
+
+      <template lwc:if={isAvailable}>
+        <p data-id="summary">{summary}</p>
+
+        <div class="slds-grid slds-grid_vertical-align-end slds-var-m-vertical_small">
+          <lightning-input
+            class="slds-col slds-grow"
+            data-id="job-name"
+            label={text.jobName}
+            value={newJobName}
+            maxlength="80"
+            onchange={handleJobName}
+          ></lightning-input>
+          <lightning-button
+            class="slds-var-m-left_small"
+            data-id="add-job"
+            label={text.addJob}
+            disabled={cannotAddJob}
+            onclick={handleAddJob}
+          ></lightning-button>
+        </div>
+
+        <template lwc:if={showEmpty}>
+          <c-barn-empty-state data-id="empty-state" message={text.empty}></c-barn-empty-state>
+        </template>
+
+        <template for:each={jobs} for:item="job">
+          <div key={job.id} class="slds-var-m-bottom_medium" data-id="job">
+            <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+              <h3 class="slds-text-heading_small"><a href={job.href}>{job.name}</a></h3>
+              <lightning-button
+                data-id={job.id}
+                data-action="open-shift"
+                label={text.addShift}
+                onclick={handleOpenShift}
+              ></lightning-button>
+            </div>
+
+            <template lwc:if={job.isAddingShift}>
+              <div class="slds-box slds-var-m-vertical_x-small" data-id="shift-form">
+                <div class="slds-grid slds-wrap slds-gutters_small">
+                  <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12">
+                    <lightning-input
+                      type="datetime"
+                      data-field="startTime"
+                      data-id="shift-start"
+                      label={text.from}
+                      value={shiftForm.startTime}
+                      onchange={handleShiftField}
+                    ></lightning-input>
+                  </div>
+                  <div class="slds-col slds-size_1-of-1 slds-medium-size_5-of-12">
+                    <lightning-input
+                      type="datetime"
+                      data-field="endTime"
+                      data-id="shift-end"
+                      label={text.to}
+                      value={shiftForm.endTime}
+                      onchange={handleShiftField}
+                    ></lightning-input>
+                  </div>
+                  <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12">
+                    <lightning-input
+                      type="number"
+                      data-field="needed"
+                      data-id="shift-needed"
+                      label={text.needed}
+                      value={shiftForm.needed}
+                      min="1"
+                      onchange={handleShiftField}
+                    ></lightning-input>
+                  </div>
+                </div>
+                <p class="slds-text-color_error" data-id="shift-problem">{shiftProblemText}</p>
+                <lightning-button
+                  data-id="shift-cancel"
+                  label={labels.cancel}
+                  onclick={handleShiftCancel}
+                ></lightning-button>
+                <lightning-button
+                  class="slds-var-m-left_x-small"
+                  data-id="shift-save"
+                  variant="brand"
+                  label={labels.save}
+                  disabled={cannotSaveShift}
+                  onclick={handleShiftSave}
+                ></lightning-button>
+              </div>
+            </template>
+
+            <template lwc:if={job.hasShifts}>
+              <ul>
+                <template for:each={job.shifts} for:item="shift">
+                  <li key={shift.id} class="slds-var-m-vertical_xx-small" data-id="shift">
+                    <c-barn-status-badge status={shift.badge} label={shift.fill}></c-barn-status-badge>
+                    <span class="slds-var-m-left_x-small">{shift.when}</span>
+                  </li>
+                </template>
+              </ul>
+            </template>
+            <template lwc:else>
+              <p class="slds-text-color_weak">{text.noShifts}</p>
+            </template>
+          </div>
+        </template>
+      </template>
+    </div>
+  </template>
+</template>

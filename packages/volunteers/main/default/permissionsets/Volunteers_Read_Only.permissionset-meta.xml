@@ -260,6 +260,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Volunteer_Job__c.Event_Key__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Volunteer_Job__c.Rollups_Last_Calculated__c</field>
     <readable>true</readable>
   </fieldPermissions>

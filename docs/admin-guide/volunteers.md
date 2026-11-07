@@ -461,6 +461,15 @@ approved hours in the period), and how many failed; for failures it says to try 
 ask a BarnCRM admin to check the [Error Log](error-log.md) if it happens again. It is the BarnCRM job notification, so the **Send Long Job Notifications**
 option in BarnCRM Settings turns it off.
 
+## Jobs Made for an Event
+
+When BarnCRM Event Management is installed, its event page can add volunteer jobs and shifts here
+for an event. Such a job carries the event's record ID in **Event ID** (text, not a link) and is
+otherwise an ordinary job: sign-up, reminders, nudges, hours and totals work on its shifts as on
+any other. Leave **Event ID** as it is; clearing it makes the job disappear from the event page.
+Event Management needs nothing from you beyond the Volunteers permission sets, and Volunteers does
+not need Event Management.
+
 ## Signing People Up for a Shift
 
 Open a shift (from **Volunteer Shifts**, or from its job). The shift page puts the **Sign-Ups**
