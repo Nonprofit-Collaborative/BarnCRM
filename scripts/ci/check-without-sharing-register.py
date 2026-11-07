@@ -21,7 +21,7 @@ TOP_LEVEL = re.compile(
     r"without sharing\s+class\s+(\w+)",
     re.M | re.I,
 )
-ROW = re.compile(r"^\|\s*([A-Za-z]\w*)\s*\|\s*(?:Integrity|Upkeep|Org job|Org figure|Platform)\s*\|", re.M)
+ROW = re.compile(r"^\|\s*([A-Za-z]\w*)\s*\|\s*(?:Integrity|Upkeep|Org job|Org figure|Platform|Portal)\s*\|", re.M)
 
 
 def main():

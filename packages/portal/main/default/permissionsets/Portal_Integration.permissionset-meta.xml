@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>Portal Builder Integration</label>
+  <description>
+    For the one integration user the portal client signs in as: calls the portal API and nothing
+    else. Grants no object access. Never given automatically.
+  </description>
+  <classAccesses>
+    <apexClass>PortalApi</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <userPermissions>
+    <enabled>true</enabled>
+    <name>ApexRestServices</name>
+  </userPermissions>
+  <userPermissions>
+    <enabled>true</enabled>
+    <name>ApiEnabled</name>
+  </userPermissions>
+</PermissionSet>

@@ -9,7 +9,7 @@ entry. Test classes are not listed.
 The default is `with sharing` or `inherited sharing` and user-mode queries and DML (plan Section
 4.13). ADR-0021 (system mode writes for package owned data) and its extensions (ADR-0027 for
 scheduled upkeep, ADR-0057 and ADR-0134) are the authority for every exception. The reasons fall
-into five kinds:
+into six kinds:
 
 | Kind | Meaning |
 |---|---|
@@ -18,6 +18,7 @@ into five kinds:
 | Org job | A scheduled or queued job works on the whole org, not on what its scheduler can see. |
 | Org figure | A total or count must be the organization's figure, not the viewer's share. |
 | Platform | The platform allows the write only as the system (an Apex sharing reason share, a protected custom setting). |
+| Portal | Called by the portal integration user, which has no object access; every read and write is scoped in code to the verified portal person and their template (ADR-NEXT portal builder). |
 
 ## Core
 
@@ -119,6 +120,13 @@ into five kinds:
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
 | FormIntakeService | Platform | A Site guest user, who has no object access, loads one published public form and version and stores one Received submission; it never reads a person, an organization or any other record, and processing runs later in user mode | ADR-0184 public forms on a Salesforce Site |
+
+## Portal Builder
+
+| Class | Kind | What it reaches past sharing for | Authority |
+|---|---|---|---|
+| PortalAuth | Portal | Portals, accesses and sessions, and the one Contact an email names, to send and check sign-in codes and resolve sessions; only hashes are stored | ADR-0021, ADR-NEXT portal builder |
+| PortalData | Portal | The verified person's own Contact and the records a template names, filtered by that person or the catalog's fixed tests; only `edit` fields are written | ADR-0021, ADR-NEXT portal builder |
 
 ## Mirror
 

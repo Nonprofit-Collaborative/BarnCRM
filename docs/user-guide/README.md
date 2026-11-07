@@ -61,6 +61,10 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Events](events.md): finding, creating and repeating events, setting up tickets, building the agenda, adding speakers, registering people and their reminder and follow-up emails.
 
+### Portal Builder
+
+- [Portals](portal-builder.md): who can sign in to a portal, ending someone's portal sessions, and what a person sees when they sign in.
+
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.

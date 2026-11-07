@@ -49,6 +49,8 @@ public with sharing class BarnCRMShippedPermissionSets {
 		'Logic_Models_Read_Only',
 		'Logic_Models_Staff',
 		'Opportunity_Mirror',
+		'Portal_Admin',
+		'Portal_Integration',
 		'Programs_Admin',
 		'Programs_Read_Only',
 		'Programs_Staff',

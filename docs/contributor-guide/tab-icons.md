@@ -76,6 +76,8 @@ Rules:
 | forms | Form_Submission__c | Custom51: Apple |
 | forms | Form__c | Custom28: Cellphone |
 | logicmodels | Logic_Model__c | Custom62: Chalkboard |
+| portal | Portal_Access__c | Custom77: Locked |
+| portal | Portal__c | Custom47: Knight |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |
 | mirror | Gift_Transaction_Mirror | Custom31: Car |

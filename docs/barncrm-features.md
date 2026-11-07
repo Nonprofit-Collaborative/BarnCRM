@@ -771,13 +771,13 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 8. Portal Builder
 
-**Edition:** Both editions. Depends on Core only; each template needs only its own module and is offered only when that module is installed. No package directory exists yet. Portal users log in at no additional Salesforce license cost: an on-platform Salesforce Site with BarnCRM's own login layer is required, and an off-platform portal is an optional later connector; confirming the on-platform option waits on a check of Salesforce's terms (plan 11.2 item 30, D-120). No Experience Cloud dependency. Planned after the Core quality pass and after C-45 and C-46; not scheduled to an iteration (plan 5.9, D-118). Supersedes the proposed Website and portal tool (plan 6.1.1 item 12) and pairs with the Forms module (C-42).
+**Edition:** Both editions. Package `packages/portal` (BarnCRM Portal Builder), depends on Core only. Off-platform portals with their own one-time-code login, reaching Salesforce through one integration user and a person-scoped portal API (D-187, ADR-NEXT portal builder); no Experience Cloud, no Site guest user, no paid service. A template names the modules it needs and is unavailable while one is turned off. Supersedes the proposed Website and portal tool (plan 6.1.1 item 12) and pairs with the Forms module (C-42).
 
 ### 8.1 Portals
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Portal Builder | Major | Builds logged-in portals from templates, for people verified against their BarnCRM record, with logins at no additional Salesforce license cost. | Planned (1.x) | PB-01 |
+| Portal Builder | Major | Portals on the organization's own website for people verified against their BarnCRM record: sign-in by a code Salesforce emails, an optional or required authenticator second factor, lockout and rate limits, sessions staff can end; a JSON template of pages, fields and actions (own record, related records, catalog); the portal API run as one integration user; a framework-free browser client and a minimal WordPress plugin that keeps the OAuth secret on the server. | Built (Batch C, in review) | PB-01 (D-187) |
 | Board portal template | Major | Board members see meetings, agendas, packets and minutes, approve minutes, record votes, and complete disclosures and policy acknowledgments. Needs Corporate Hub. | Planned (1.x) | PB-02 |
 | Volunteer portal template | Major | Volunteers see shifts, sign up, log hours and keep their profile current. Needs Volunteers. | Planned (1.x) | PB-03 |
 | Service portal template | Major | Clients see their program enrollments and services. Needs Programs. | Planned (1.x) | PB-04 |

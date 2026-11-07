@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Code Minutes</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Code_Minutes__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Portal_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Portals</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Portal</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Number</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">20</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">How long an emailed sign-in code works, in minutes, from 2 to 30. Default: 10.</value></values>
+    <values><field>Min_Value__c</field><value xsi:type="xsd:double">2</value></values>
+    <values><field>Max_Value__c</field><value xsi:type="xsd:double">30</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">portal-builder.md</value></values>
+</CustomMetadata>

@@ -28,9 +28,9 @@ Settings** permission to install, turn on, turn off, or check what an uninstall 
 
 Which modules are listed depends on the edition chosen in first-run setup (see
 [BarnCRM Settings, First-run setup](barncrm-settings.md#first-run-setup)). The Standard Edition (or no edition chosen yet) lists
-Core, BarnCRM Rollup Builder, BarnCRM Forms, BarnCRM Contact Point Sync and BarnCRM Event
-Management. The Nonprofit Edition lists all eleven: Core, BarnCRM Rollup Builder, BarnCRM Forms,
-BarnCRM Contact Point Sync, BarnCRM Event Management, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM
+Core, BarnCRM Rollup Builder, BarnCRM Forms, BarnCRM Contact Point Sync, BarnCRM Event
+Management and BarnCRM Portal Builder. The Nonprofit Edition lists all twelve: Core, BarnCRM Rollup Builder, BarnCRM Forms,
+BarnCRM Contact Point Sync, BarnCRM Event Management, BarnCRM Portal Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM
 Funders and BarnCRM Mirror. A module that is installed is always listed, whatever the edition. See
 [Editions](editions.md).
 

@@ -139,7 +139,8 @@ public with sharing class ModuleManagerService {
 			'Sponsor_Deliverable__c',
 			'Sponsorship_Level__c',
 			'Ticket_Type__c'
-		}
+		},
+		'Portal' => new List<String>{ 'Portal__c', 'Portal_Access__c', 'Portal_Session__c' }
 	};
 
 	/** The permission set Turn on gives the person who turned the module on. */
@@ -153,7 +154,8 @@ public with sharing class ModuleManagerService {
 		'Funders' => 'Funders_Admin',
 		'Forms' => 'Forms_Admin',
 		'ContactPoints' => 'Contact_Point_Sync_Admin',
-		'Events' => 'Events_Admin'
+		'Events' => 'Events_Admin',
+		'Portal' => 'Portal_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */

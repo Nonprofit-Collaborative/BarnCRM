@@ -46,7 +46,8 @@ public class TestUsers {
 		'Funders_Admin',
 		'Forms_Admin',
 		'Contact_Point_Sync_Admin',
-		'Events_Admin'
+		'Events_Admin',
+		'Portal_Admin'
 	};
 
 	/**
