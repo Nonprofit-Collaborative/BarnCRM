@@ -255,27 +255,29 @@ private class EventApplicationsControllerTest {
 
 	@IsTest
 	static void theSpeakerNoticesShipWithTemplatesAndTheyAreTheDefaults() {
-		Assert.areEqual(
-			'BarnCRM_Speaker_Accepted',
-			EventsSettings.acceptNoticeTemplate(),
-			'Accepted'
-		);
-		Assert.areEqual(
-			'BarnCRM_Speaker_Declined',
-			EventsSettings.declineNoticeTemplate(),
-			'Declined'
-		);
-		Assert.areEqual(
-			2,
-			[
-				SELECT COUNT()
-				FROM EmailTemplate
-				WHERE
-					DeveloperName IN ('BarnCRM_Speaker_Accepted', 'BarnCRM_Speaker_Declined')
-					AND IsActive = TRUE
-			],
-			'Both shipped templates are in the org'
-		);
+		System.runAs(staff()) {
+			Assert.areEqual(
+				'BarnCRM_Speaker_Accepted',
+				EventsSettings.acceptNoticeTemplate(),
+				'Accepted'
+			);
+			Assert.areEqual(
+				'BarnCRM_Speaker_Declined',
+				EventsSettings.declineNoticeTemplate(),
+				'Declined'
+			);
+			Assert.areEqual(
+				2,
+				[
+					SELECT COUNT()
+					FROM EmailTemplate
+					WHERE
+						DeveloperName IN ('BarnCRM_Speaker_Accepted', 'BarnCRM_Speaker_Declined')
+						AND IsActive = TRUE
+				],
+				'Both shipped templates are in the org'
+			);
+		}
 	}
 
 	@IsTest
