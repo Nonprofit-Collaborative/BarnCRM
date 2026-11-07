@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+  <available>true</available>
+  <description>
+    A thank-you BarnCRM ships to start from, sent after an event to each person marked
+    Attended. Edit it, or write your own and name it in Events settings. The person is the contact
+    it is addressed to; the attendee is the record it is about.
+  </description>
+  <encodingKey>UTF-8</encodingKey>
+  <name>BarnCRM: event follow-up</name>
+  <style>none</style>
+  <subject>Thank you for coming to {!Event_Attendee__c.Event_Name__c}</subject>
+  <type>text</type>
+  <uiType>Aloha</uiType>
+</EmailTemplate>

@@ -32,6 +32,10 @@ used, and BarnCRM takes no payment.
   `EventRegistrationsController`), `EventRegistrationService` with `EventPersonMatcher` (Core's
   matchers, household-aware) and `EventPricing`, and `EventFormAttachment`, Core's form seam
   (`FormAttachmentExtensions`), used only when Forms is installed.
+- Reminders, follow-ups and No-Show (EV-14): `Events_Settings__c` (29EV10) with its Setting
+  Definitions (section Events), `EventsSettings`, the nightly step `EventEmailScheduler` given to
+  Core through `EventsNightlyJobProvider` (`NightlyJobs.PROVIDER_CLASSES`), `EventEmailBatch` and
+  `EventEmailService`; templates in the `BarnCRM_Events` email folder.
 - Permission sets Events Admin, Staff and Read Only, given by role through `EventsAccessSync`;
   install steps in `EventsPostInstall`.
 - Help and messages in `BarnHelp_Events.json`.

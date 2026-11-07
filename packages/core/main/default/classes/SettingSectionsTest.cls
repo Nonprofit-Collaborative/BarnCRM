@@ -19,6 +19,10 @@ private class SettingSectionsTest {
 				'Twenty-one section names are agreed across the suite'
 			);
 			Assert.isTrue(
+				SettingSections.isKnown(SettingSections.EVENTS),
+				'Events is a section Event Management ships rows into'
+			);
+			Assert.isTrue(
 				SettingSections.isKnown(SettingSections.FUNDERS),
 				'Funders is a section the Funders module ships rows into'
 			);

@@ -55,7 +55,10 @@ public with sharing class SettingSections {
 	/** The Funders module's grant reminder settings, listed under Fundraising. */
 	@NamespaceAccessible
 	public static final String FUNDERS = 'Funders';
-	/** The Event Management module's settings (notice templates), listed after Funders. */
+	/**
+	 * The Event Management module's settings (speaker notice templates, EV-06; reminder,
+	 * follow-up and No-Show settings, EV-14), listed after Funders.
+	 */
 	@NamespaceAccessible
 	public static final String EVENTS = 'Events';
 	@NamespaceAccessible

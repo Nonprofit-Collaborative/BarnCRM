@@ -55,7 +55,8 @@ const GROUPS = [
     label: PROGRAMS,
     sections: [
       ['Programs', 'utility:education'],
-      ['Volunteers', 'utility:people']
+      ['Volunteers', 'utility:people'],
+      ['Events', 'utility:event']
     ]
   },
   { name: 'more', label: MORE, sections: [] },

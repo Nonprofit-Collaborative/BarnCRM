@@ -1,0 +1,9 @@
+Dear {!Contact.FirstName, friend},
+
+This is a reminder that you are registered for {!Event_Attendee__c.Event_Name__c}. We look forward to seeing you there.
+
+If you can no longer come, please let us know so we can offer your place to someone else.
+
+With thanks,
+
+{!Organization.Name}
