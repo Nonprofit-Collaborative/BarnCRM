@@ -4,6 +4,47 @@
  */
 public with sharing class AddressSelector {
 	/**
+	 * The addresses these owners hold, for marking before they are deleted with them (R-AD11).
+	 * System mode, as package upkeep of rows that depend on the deleted record: only the owner
+	 * lookups are read, and nothing is shown to the user.
+	 */
+	public static List<Address__c> selectOwnedBy(Set<Id> ownerIds) {
+		return [
+			SELECT Id, Account__c, Contact__c, Person_Account__c
+			FROM Address__c
+			WHERE
+				Account__c IN :ownerIds
+				OR Contact__c IN :ownerIds
+				OR Person_Account__c IN :ownerIds
+			WITH SYSTEM_MODE
+			LIMIT 10000
+		];
+	}
+
+	/** The addresses in the Recycle Bin marked with these owners (R-AD11), in system mode. */
+	public static List<Address__c> selectDeletedWith(Set<String> marks) {
+		return [
+			SELECT Id, Deleted_With__c
+			FROM Address__c
+			WHERE IsDeleted = TRUE AND Deleted_With__c IN :marks
+			WITH SYSTEM_MODE
+			LIMIT 10000
+			ALL ROWS
+		];
+	}
+
+	/** The contacts these accounts hold, which deleting the accounts deletes too (R-AD11). */
+	public static List<Contact> selectContactsOf(Set<Id> accountIds) {
+		return [
+			SELECT Id, AccountId
+			FROM Contact
+			WHERE AccountId IN :accountIds
+			WITH SYSTEM_MODE
+			LIMIT 10000
+		];
+	}
+
+	/**
 	 * Every address belonging to any of the given owners, whether the owner is a
 	 * household or organization account, a contact, or a person account. Ordered so the
 	 * address in use comes first and the newest address comes next, which is the order

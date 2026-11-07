@@ -62,17 +62,27 @@ public with sharing class MatchSourceService {
 	/**
 	 * The active sources this org can use: the object exists, every field it names exists, and
 	 * the running user can read them. A source that fails any of these is skipped, never an
-	 * error, which is what lets Core ship contact point sources to a Platform-only org.
+	 * error, which is what lets Core ship contact point sources to a Platform-only org. A
+	 * shipped source turned off in the setting is skipped too (D-184).
 	 */
 	public static List<Source> usableSources() {
 		List<Source> result = new List<Source>();
 		for (Match_Source__mdt row : MatchSourceSelector.selectActiveSources()) {
-			Source source = resolve(row);
+			Source source = isTurnedOff(row) ? null : resolve(row);
 			if (source != null) {
 				result.add(source);
 			}
 		}
 		return result;
+	}
+
+	/** True for a shipped source listed in `Match_Sources_Turned_Off__c` (D-184). */
+	public static Boolean isTurnedOff(Match_Source__mdt row) {
+		return row.Is_Shipped__c == true &&
+			CustomMetadataManagerService.namesIn(
+					SettingsService.getSettings().Match_Sources_Turned_Off__c
+				)
+				.contains(row.DeveloperName.toLowerCase());
 	}
 
 	/**

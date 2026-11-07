@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Match_Sources_Turned_Off__c</fullName>
+  <description>The comma separated names of the shipped match sources turned off in Duplicate Matching, Matching Logic. Duplicate matching and import matching do not use them. Written by the custom metadata manager (D-184).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The match sources BarnCRM ships that you turned off in Duplicate Matching, Matching Logic.</inlineHelpText>
+  <label>Match Sources Turned Off</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+</CustomField>

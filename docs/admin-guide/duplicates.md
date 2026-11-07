@@ -227,8 +227,10 @@ BarnCRM ships six sources, marked **Shipped with BarnCRM**:
 
 The contact point objects exist only in some orgs (Nonprofit Cloud has them). Where an
 object is missing, its source does nothing; nothing breaks. A shipped source can be
-deactivated and activated again, but not changed; upgrades keep it up to date and never
-overwrite what you added.
+turned off and on again with its **Active** switch, but not changed. Turning a shipped source
+off or on is saved at once as a setting (D-184), so there is nothing to wait for, and upgrades
+leave it as you set it while keeping the source itself up to date; they never overwrite what
+you added. Your own sources are saved as metadata and take about a minute.
 
 How values are compared:
 

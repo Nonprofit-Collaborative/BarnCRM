@@ -135,12 +135,12 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-07A: One Failing Row Does Not Stop the Rest
 
 **Purpose:** confirm that when BarnCRM automation fails on one record of a bulk save, only that record is refused.
-**Prerequisites:** admin user, Household Upkeep on, **Create Households Automatically** on. In Setup, an Account validation rule `Test_No_Refuse` with the formula `CONTAINS(Name, "Refuseme")` and the message "Test rule". A CSV of five people, last names `Avery`, `Blake`, `Refuseme`, `Drew`, `Emery`, first name `Test`.
+**Prerequisites:** admin user, Households on, **Create Households Automatically** on. In Setup, an Account validation rule `Test_No_Refuse` with the formula `CONTAINS(Name, "Refuseme")` and the message "Test rule". A CSV of five people, last names `Avery`, `Blake`, `Refuseme`, `Drew`, `Emery`, first name `Test`.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Import the CSV with the **Generic contact list** template into People (see [Imports](imports.md)). | The run finishes. Four people are imported, each in a new household. One row is rejected: the `Refuseme` row, with a message saying the record was not saved. |
-| 2 | Open **BarnCRM Settings**, **Error Log**. | An entry from the household upkeep automation names the failure. If the failure reached the trigger dispatcher, a Warning entry also says "Row 3 of this save was not saved" (the row in that save). |
+| 2 | Open **BarnCRM Settings**, **Error Log**. | An entry from the household automation names the failure. If the failure reached the trigger dispatcher, a Warning entry also says "Row 3 of this save was not saved" (the row in that save). |
 | 3 | Search for `Avery` and `Emery`. | Both exist, each with a household. |
 
 **Cleanup:** delete the validation rule and the four test people and their households.
@@ -148,7 +148,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-07B: Bypass Automation for One User
 
 **Purpose:** confirm the BarnCRM Automation Control setting skips automation for one user only.
-**Prerequisites:** admin user, Household Upkeep on, **Create Households Automatically** on. A second user, Sam, with the BarnCRM Staff role.
+**Prerequisites:** admin user, Households on, **Create Households Automatically** on. A second user, Sam, with the BarnCRM Staff role.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -334,7 +334,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-17: People and Households, and Boxes on Every Page
 
 **Purpose:** confirm Households and Relationships are one **People and Households** section, every section groups its settings into headed boxes, and links to the old sections land in the right box.
-**Prerequisites:** admin user. The **Household Upkeep** and **Relationships** features on, and **Send long job notifications** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update All Household Names** in step 4.
+**Prerequisites:** admin user. The **Households** and **Relationships** features on, and **Send long job notifications** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update All Household Names** in step 4.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -453,7 +453,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-23: Settings Save Cues, Setting Names, Health and Error Log Links, Narrow Screens
 
 **Purpose:** confirm a panel says it saves on its own, the save bar says what it covers, setting names read as form labels, Health and Error Log open Org Optimizer, and a narrow screen gets a Section box.
-**Prerequisites:** admin user; the Org Optimizer and Household Upkeep features on.
+**Prerequisites:** admin user; the Org Optimizer and Households features on.
 
 | Step | Action | Expected result |
 |---|---|---|

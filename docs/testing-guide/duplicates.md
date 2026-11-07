@@ -94,10 +94,10 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 |---|---|---|
 | 1 | Open the **Duplicate Matching** tab and choose **Matching Logic**. | Under one intro line with a help icon, six cards, each with a **Shipped with BarnCRM** badge and its **Active** switch on: **Contact Point Email**, **Contact Point Phone**, **Contact Point Address**, **Address (person)**, **Address (household)**, **Address (person account)**. Each has one line such as **Email Address on Contact Point Email, compared as Email**. In an org without contact point objects, those three say **Not used in this org**. Shipped cards have **Show Details** and **Try a Value**, and no **Edit**. |
 | 2 | Choose **Show Details** on the **Address (household)** card. | **Object** Address, **Value compared** Street, **Postal code field** Postal Code, **Belongs to** a household or a person account, **Linked through the field** the household lookup, **How values are compared** starting **Address:**. The button now reads **Hide Details**. |
-| 3 | Turn off the **Active** switch on **Address (household)**. | The switch stays on while **Saving. Salesforce applies the change in the background, usually within a minute.** shows, then **Saved.** and the switch reads **Inactive**. |
+| 3 | Turn off the **Active** switch on **Address (household)**. | At once, with no saving wait: **Address (household) is turned off. Duplicate Matching and import matching no longer use it.** and the switch is off. In Setup, **Custom Metadata Types**, **Match Source**, the **Address (household)** row still has **Active** ticked (the row is never changed, D-184). |
 | 4 | Create a household `Pine Test Household` with a primary address **Street** `5616 Pine Dr`, **Postal Code** `78728` (the **Staff Household**'s address). | Both save. |
 | 5 | On **Review**, scan and refresh. | No pair with `Pine Test Household`. |
-| 6 | Back on **Matching Logic**, turn on the **Active** switch on **Address (household)**. | **Saved.** The switch reads **Active**. |
+| 6 | Back on **Matching Logic**, turn on the **Active** switch on **Address (household)**. | At once: **Address (household) is turned on and used for matching again.** The switch is on. |
 | 7 | Scan and refresh. | A pair of `Pine Test Household` and **Staff Household**, reason **Same address on Address (household)**. |
 
 **Cleanup:** Delete `Pine Test Household` and its address; the pair goes with it.

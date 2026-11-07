@@ -12,4 +12,10 @@ public with sharing class RelationshipController {
 		types.sort();
 		return types;
 	}
+
+	/** Whether the Relationships feature is on: the card shows nothing while it is off. */
+	@AuraEnabled(cacheable=true)
+	public static Boolean isFeatureOn() {
+		return FeatureSwitchService.isOn(FeatureSwitchService.RELATIONSHIPS);
+	}
 }

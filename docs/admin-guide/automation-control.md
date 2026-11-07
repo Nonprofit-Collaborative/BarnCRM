@@ -64,7 +64,7 @@ the records in first and the automatic housekeeping to happen afterwards, so not
    a pause lasts" below).
 7. Now switch off a single automation instead. Find **Household upkeep when a person
    changes** in the list and click its switch to **Off**. Only that one stops running. For a
-   few seconds a line next to the switch says "Household upkeep when a person changes is
+   few seconds a line next to the switch says "Households when a person changes is
    off. Turn it back on here." (a screen reader announces it).
    Everything else carries on.
 8. Switch it back **On**. Every change you make here is recorded with your name, the time,

@@ -8,8 +8,9 @@ Affiliation**.
 
 Before you start: open the **BarnCRM** app. Adding, changing and removing these needs the Team
 Member, Coordinator, Fundraising Staff or Admin role. The **Relationships** card is on every
-person; the **Affiliations** card is on every person and organization. Both are on the
-record's **Connections** tab.
+person while your admin has the **Relationships** feature on, and is hidden while it is off; the
+**Affiliations** card is on every person and organization. Both are on the record's
+**Connections** tab.
 
 ## To Add a Relationship
 

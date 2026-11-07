@@ -73,7 +73,7 @@ Do these in order.
    **Finish Setup**; everyone else sees "An administrator needs to finish setting up
    BarnCRM." Core was deployed to `mwdbdevsb` once before, so open **BarnCRM Settings**,
    **General** first: if no window shows, setup is finished and T-SA-01 is Skipped.
-   **Warning:** turning **Household Upkeep** on (in first-run setup or in **General**) queues a
+   **Warning:** turning **Households** on (in first-run setup or in **General**) queues a
    background catch-up that gives a household to existing contacts that have none, on real
    records. That is a bulk change to real data. Decide before you finish setup or switch it on;
    the household scripts need it on, so run them only in a sandbox you can refresh.

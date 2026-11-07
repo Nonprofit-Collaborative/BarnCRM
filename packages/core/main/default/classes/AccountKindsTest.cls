@@ -119,6 +119,49 @@ private class AccountKindsTest {
 		}
 	}
 
+	/**
+	 * R-O4a, D-184: Core's own BarnCRM Organization is never a candidate, so detection never
+	 * picks it; it is offered only without a candidate, and stays in force once chosen.
+	 */
+	@IsTest
+	static void theShippedRecordTypeIsOfferedOnlyWhereTheOrgHasNoneAndStaysOnceChosen() {
+		System.runAs(TestUsers.admin()) {
+			String shipped = AccountKinds.SHIPPED_RECORD_TYPE;
+			Assert.isFalse(AccountKinds.isOffered(shipped, 'BarnCRM Organization', false));
+			Assert.isFalse(AccountKinds.isCandidate(shipped), 'Never a candidate');
+			Set<String> offered = new Set<String>();
+			for (Schema.RecordTypeInfo info : AccountKinds.organizationChoices()) {
+				offered.add(info.getDeveloperName());
+			}
+			Boolean hasOwn = !AccountKinds.candidateRecordTypes().isEmpty();
+			Assert.areEqual(!hasOwn, offered.contains(shipped), 'Offered only without one');
+			Schema.RecordTypeInfo own = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
+				.get(shipped);
+			Assert.isNotNull(own, 'Core ships the record type');
+			Assert.isTrue(own.isActive(), 'Shipped active');
+
+			store(shipped);
+			SettingsService.clearCaches();
+			AccountKinds.reset();
+			Test.startTest();
+			String inForce = AccountKinds.organizationRecordTypeName();
+			AccountKinds.storeDetectedIfBlank();
+			Test.stopTest();
+
+			Assert.areEqual(shipped, inForce, 'Chosen, it is the record type for organizations');
+			Assert.areEqual(
+				shipped,
+				SettingsService.getSettings().Organization_Record_Type__c,
+				'Install never replaces it'
+			);
+			Boolean listed = false;
+			for (Schema.RecordTypeInfo info : AccountKinds.organizationChoices()) {
+				listed = listed || info.getDeveloperName() == shipped;
+			}
+			Assert.isTrue(listed, 'Listed while it is the stored value');
+		}
+	}
+
 	@IsTest
 	static void storedNoRecordTypeMakesAccountsWithoutOneOrganizations() {
 		System.runAs(TestUsers.admin()) {

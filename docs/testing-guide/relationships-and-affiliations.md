@@ -171,3 +171,19 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 9 | Optional, on an org where the **Relationships** feature has not been turned on yet: open **Custom Metadata**. | There is no **Relationship types** list; **Merge Rules** is still there. |
 
 **Cleanup:** make sure Spouse is turned on (step 8).
+
+## T-REL-12: Relationships Off Hides What Belongs to It
+
+**Purpose:** while the **Relationships** feature is off, nothing that belongs to it shows (D-184).
+**Prerequisites:** admin user (BarnCRM Admin), **Relationships** on, T-REL-01 steps 1 to 4 done (Harper and Luis are Spouse).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **General**, **Features**, turn **Relationships** off and save. | Saved. |
+| 2 | Open Harper Garcia and click the **Connections** tab. | There is no **Relationships** card; the other cards are there. |
+| 3 | Open the **Data Manager** tab and look at the import mappings card. | No **Relationships** mapping is listed. |
+| 4 | Open **Import** and look at the templates offered. | No **Relationships** template is offered. |
+| 5 | Open **BarnCRM Settings**, **People and Households**, then **General**, **Custom Metadata**. | No **Relationships** box and no **Relationship types** list. |
+| 6 | Turn **Relationships** back on and save. Repeat steps 2 to 4. | The card, the mapping and the template are back; Harper's Luis line is still **Spouse**. |
+
+**Cleanup:** leave **Relationships** on (step 6).

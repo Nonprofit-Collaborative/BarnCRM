@@ -630,12 +630,12 @@ public with sharing class SettingsService {
 
 	/**
 	 * The record types a Record Type row offers, besides "No record type": for Account, the
-	 * organization candidates (AccountKinds, never a person or household type); for any other
-	 * object, its active record types.
+	 * organization candidates (AccountKinds, never a person or household type), with Core's own
+	 * where the org has none (R-O4a); for any other object, its active record types.
 	 */
 	public static List<Schema.RecordTypeInfo> recordTypeChoices(Schema.SObjectType type) {
 		if (type == Account.SObjectType) {
-			return AccountKinds.candidateRecordTypes();
+			return AccountKinds.organizationChoices();
 		}
 		return recordTypes(type);
 	}

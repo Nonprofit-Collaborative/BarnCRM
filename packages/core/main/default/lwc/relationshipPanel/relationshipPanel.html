@@ -1,5 +1,5 @@
 <template>
-    <template lwc:if={helpReady}>
+    <template lwc:if={isShown}>
   <lightning-card title={labels.panelTitle} icon-name={icons.relationship}>
     <template lwc:if={canAdd}>
       <lightning-button

@@ -165,7 +165,7 @@ describe('c-first-run-modal', () => {
   it('says why a feature waits, never ticks it, and leaves it out of the save (RT-04)', async () => {
     const waiting = {
       key: 'HouseholdUpkeep',
-      name: 'Household Upkeep',
+      name: 'Households',
       description: 'Households.',
       isOn: false,
       blockedReason: 'NPSP households are still in use.'

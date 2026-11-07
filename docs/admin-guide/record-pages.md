@@ -18,7 +18,7 @@ another, and nobody has to maintain separate page layouts for them.
 There is nothing to turn on, and nothing to do in Salesforce Setup. The pages arrive with
 Core, and the **BarnCRM** app opens households, organizations and people on them, on the
 desktop and on the phone. Core ships one Account record type, **Household**, which no user has
-until Household Upkeep is on ([Households](households.md)), and no Contact record type, so it
+until Households is on ([Households](households.md)), and no Contact record type, so it
 does not disturb any you already have. An account is an organization when it has the record
 type chosen in **Record type for organizations** on **General** (or, when **No record type** is
 chosen, no record type); the pages and the **Organizations** list read that through the

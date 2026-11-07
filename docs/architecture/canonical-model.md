@@ -717,19 +717,30 @@ uses; the field is shared across record types and its meaning differs by record 
 defined above. Member Count, Anniversary, the two greeting fields, and Custom Name are
 not shown for Organization records on the Account record page.
 
-**R-O4 Defined by the org's own record type (ADR-0141).** Core ships no Organization record
-type. `BarnCRM_Settings__c.Organization_Record_Type__c` names one active Account record
+**R-O4 Defined by the org's own record type (ADR-0141).** `BarnCRM_Settings__c.Organization_Record_Type__c` names one active Account record
 type, by developer name, or holds `Master` for "No record type"; a person record type or one
 whose developer name or label contains Household is refused. `Master` is offered and saved
 only when the org has no candidate (R-O5): where one exists, an account saved without a record
 type takes the user's default record type, and the master record type Id is refused for a user
 who can use another, so a stored `Master` there is stale and replaced by detection. One record type, never several.
 
+**R-O4a The shipped record type, only where the org has none (D-184, ADR-NEXT).** Core ships
+one Account record type for organizations, `BarnCRM_Organization` (label BarnCRM
+Organization), active and given to no profile or permission set, so no user is offered it and
+no default changes. It is never a candidate (R-O5): detection never picks it, and it never
+makes a stored `Master` stale. The setting offers it beside "No record type" only while the
+org has no candidate of its own, or while it is the stored value, and a stored
+`BarnCRM_Organization` stays in force while it is active, even after the org adds a record
+type of its own, so nothing switches an org's organizations without an administrator choosing.
+The administrator who chooses it gives it to the people who create organizations (profile or
+permission set), as with any record type.
+
 **R-O5 Detection.** When the setting is blank, or names a record type that is gone, inactive
 or otherwise no longer a candidate (each install, upgrade or source deploy stores the result
 in both cases), the organization record type is
 detected: the candidates are the active Account record types that are not person types and
-whose developer name or label does not contain Household; one already used by at least one
+whose developer name or label does not contain Household, other than Core's own
+`BarnCRM_Organization` (R-O4a); one already used by at least one
 account comes first; then the developer names Organization, Business_Account, Business and
 Default, in that order; then the first by label. With no candidate the result is `Master`.
 Detection never creates, activates or shows a record type.
@@ -1083,6 +1094,7 @@ the Setup Assistant now writes them through Giving's step (ADR-0059).
 | Key | Type | Default | Definition |
 |---|---|---|---|
 | `Contact_Address_Change_Behavior__c` | picklist(Update household, Create personal address, Manual) | Update household | Address Updates: who moves when an address changes. Everyone in the household moves together, only that person moves, or nobody moves until you choose (R-AD3, R-AD5, ADR-0140). A blank reads and shows as Update household. |
+| `Address_Delete_Behavior__c` | picklist(Delete, Keep) | Delete | Addresses of Deleted Records: what happens to the addresses of a household, organization or person when it is deleted (R-AD11, D-184). Delete (the shipped choice, and what a blank means): they go to the Recycle Bin with it and come back when it is restored. Keep: they stay, belonging to nobody, as before this setting. Held as text, as every Core picklist setting is (ADR-0019). |
 | `Relationship_Auto_Reciprocal__c` | boolean | true | Whether the package creates and maintains the other side of every relationship (R-RL1). The default is applied in Apex by `SettingsService`, not by the field's own default value (ADR-0035). |
 | `Address_Card_Fields__c` | text (field list) | none ticked | Address Card Fields: the Address fields the Addresses card shows on every address, beyond the ones it always shows, by API name separated by commas, chosen from a checkbox list in the console (R-AD10). A field the user cannot read is left out for that user, and a field the card already shows is not repeated. |
 | `Seasonal_Address_Last_Run__c` | datetime | empty | When the seasonal address swap job last completed, shown on the Hub; written by the job (C-18, R-AD4, R-AD8). |
@@ -1145,6 +1157,7 @@ Added by the suite choice (C-30) and the Module Manager (C-24).
 | `Modules_Turned_Off__c` | text (255) | empty | The comma separated names of the installed modules the administrator turned off in the Module Manager. While a module is listed, its automations do not run, except those that always run (ADR-0024); Core cannot be listed. Written by the Module Manager, not edited as a setting (ADR-0073, `0073-module-manager-turns-automation-off-and-never-installs.md`). |
 | `Features_Turned_On__c` | text (255) | empty | The comma separated keys of the Core features turned on (`DataManager`, `DuplicateReview`, `OrgOptimizer`, `HouseholdUpkeep`, `Addresses`, `Relationships`, `Affiliations`, `PreferredEmail`). Empty means every feature is on: an org upgraded from before features existed. A new install stores `None` (every feature off) until first-run setup; finishing it with every feature unticked stores `NoneChosen` (every feature off, setup done). A key once added is never removed: features are one-way. While a key is missing, its tabs' BarnCRM Tab permission sets are held by nobody, its rows are hidden in BarnCRM Settings, and its group's automations do not run. Written by General, Features and first-run setup, not edited as a setting (ADR-0124, `0124-edition-gates-visibility.md`). |
 | `Relationship_Types_Turned_Off__c` | text (255) | empty | The comma separated DeveloperNames of the shipped Relationship Type rows the administrator turned off on the Custom Metadata page (ADR-0170). A listed row's Type is not offered for a new relationship, and a new relationship or a change of type to it is refused; its reciprocal mapping still applies, so existing relationships of that type keep working and display. Listing a row never changes the row itself, so a package upgrade that updates its label or reciprocal leaves it off. Only rows with `Is_Shipped__c` true are listed; the organization's own rows are archived instead. Written by `CustomMetadataManagerService` (Manage BarnCRM Metadata), audited, not edited as a Setting Definition row; empty means every shipped type is on, so it needs no `SHIPPED_DEFAULTS` entry. |
+| `Match_Sources_Turned_Off__c` | text (255) | empty | The comma separated DeveloperNames of the shipped Match Source rows the administrator turned off in Duplicate Matching, Matching Logic (D-184, ADR-NEXT). A listed source is not used by the duplicate scan or import matching. Listing a row never changes the row itself, so a package upgrade leaves it off. Only rows with `Is_Shipped__c` true are listed; the organization's own rows are archived instead. Written by `CustomMetadataManagerService` (Manage BarnCRM Metadata), audited, not edited as a Setting Definition row; empty means every shipped source is on, so it needs no `SHIPPED_DEFAULTS` entry. |
 | `Hide_Nonprofit_Modules__c` | boolean | false | Whether the Module Manager hides the nonprofit modules: the modules in the module catalog whose `Editions__c` does not name the Standard edition (`Standard`), so only the Nonprofit Edition offers them. Stored as the opposite of the page's Show Nonprofit Modules checkbox (checked when this is false) so that a settings row saved before the field existed, or a blank value, shows the modules: only a deliberate tick hides. When true, the Modules section keeps its Show Nonprofit Modules checkbox, shows a count of installed nonprofit modules that are hidden, and lists no nonprofit module. Org-wide; it hides rows only and installs, removes and turns off nothing. Written by the Module Manager's checkbox through `ModuleManagerService`, which checks Manage BarnCRM Settings; not edited as a Setting Definition row. Ships off, so it needs no `SHIPPED_DEFAULTS` entry (ADR-0035). |
 | `Modules_Setup_Run__c` | text (255) | empty | The comma separated keys (`Core` and the module catalog's names, such as `Giving`) of the packages whose setup steps have run in this org. Each package's post-install class adds its own key at the end of its steps, at every install and upgrade, when `scripts/org/deploy-packages.sh` runs those steps, and when an administrator presses Finish Setup (FS1). A package that is here, ships setup steps (its post-install class implements `ModuleSetup`) and is not listed gets a Health Check finding and a notice on the Modules page. Bookkeeping written by `ModuleSetups` with no audit row; not edited as a Setting Definition row. Empty until the first setup runs, so it needs no `SHIPPED_DEFAULTS` entry. |
 | `Shipped_Defaults_Applied__c` | text (255) | empty | How many entries of each package's `SHIPPED_ON_ADDED_IN_UPGRADES` list (the checkbox settings that ship on and were added in an upgrade, in its post-install class) this org has had turned on once, as lower case `package:count` pairs (`core:1,giving:1`) (QA-F2). The setup steps (`ShippedDefaultUpgrades`) set each entry past the count to true on a stored settings record, so an org that saved its settings before the field existed gets the shipped value, then raise the count; an org that never saved those settings is only counted, since its shipped default already applies. A setting turned off afterwards stays off. Bookkeeping with no audit row; not edited as a Setting Definition row. |
@@ -1482,9 +1495,11 @@ replace a shipped mapping with its own.
 values pair people or households as likely duplicates, read directly by the duplicate scan
 (Section 29A) and by import matching (R-IT16). One row per object and parent link. Registered with the
 custom metadata manager, which saves it, but not listed on the Custom metadata page: an
-administrator adds, edits and deactivates their own rows, and deactivates or activates a
-shipped one, in the Duplicate Matching tab's Matching Logic area (R-D2; ADR-0139,
-`0139-duplicate-matching-tool.md`).
+administrator adds, edits and deactivates their own rows, and turns a shipped one off or on,
+in the Duplicate Matching tab's Matching Logic area (R-D2; ADR-0139,
+`0139-duplicate-matching-tool.md`). Turning a shipped row off lists it in
+`BarnCRM_Settings__c.Match_Sources_Turned_Off__c` and leaves the row itself unchanged
+(D-184, ADR-NEXT).
 
 | Field | API name | Type | Definition |
 |---|---|---|---|
@@ -1495,7 +1510,7 @@ shipped one, in the Duplicate Matching tab's Matching Logic area (R-D2; ADR-0139
 | Postal Code Field | `Postal_Code_Field__c` | text (80) | Address sources only: the field holding the postal code, compared with the street. Filterable text, like Value Field. |
 | Parent Field | `Parent_Field__c` | text (80) | The lookup to the record the value belongs to; a save is refused unless it can point at a Contact, an Account or an Individual. A parent that is a Contact or an Account is used; an Individual resolves to the contacts whose `IndividualId` is it and, for person accounts, the accounts whose `PersonIndividualId` is it (each read by name, only where the field exists); any other parent is skipped. |
 | Normalization | `Normalization__c` | picklist(Email, Phone, Address) | How a value is made comparable: Email trimmed and lower case; Phone digits only, an 11 digit number starting 1 without the 1; Address street folded (lower case, no punctuation, common words abbreviated) plus postal code (no spaces, upper case, US ZIP+4 cut to five). |
-| Active | `Active__c` | boolean, default true | Whether the source is used. Subscriber controlled, so archiving a shipped source survives an upgrade. |
+| Active | `Active__c` | boolean, default true | Whether the source is used. BarnCRM changes it only on the organization's own rows: a shipped source is turned off through `Match_Sources_Turned_Off__c` (ADR-NEXT). A shipped row archived before that (this field cleared, ADR-0133) still reads as off, and turning it on deploys it active. |
 | Is Shipped | `Is_Shipped__c` | boolean, default false | True on every row the package ships (R-D2). |
 
 Shipped rows: Contact Point Email (`ContactPointEmail`, `EmailAddress`, `ParentId`, Email),
@@ -7143,6 +7158,7 @@ history is not lost when someone moves.
 | Status | picklist(Current, Former, Undeliverable) | no (a new address is saved Current) | Whether the address is in use now, was used before, or has mail coming back (R-AD10). A blank reads as Current. |
 | Start Date | date | no | The day this address came into use, set on a move (R-AD10). |
 | End Date | date | no | The day this address stopped being used, set on a move (R-AD10). |
+| Deleted With | text (40) | no | The owner this address was deleted with, as its lookup field's name and the owner's Id (`Contact__c:003...`), so restoring the owner restores the address (R-AD11). Written by BarnCRM only, never shown on a page. |
 
 ### Relationships
 
@@ -7302,6 +7318,29 @@ Undeliverable (`Status__c`). An address saved with no status is saved Current.
 - **The check.** Data Hygiene, and Find through it, lists the primary addresses marked
   Undeliverable: the households, organizations and people whose mail is coming back.
 
+**R-AD11 Addresses follow their owner to the Recycle Bin (D-184).** When a household,
+organization, person or person account is deleted, the Addresses of Deleted Records setting
+(`Address_Delete_Behavior__c`) decides what happens to its addresses. Delete (the default):
+they are deleted with it. An address has one owner (R-AD1), so no other record's address is
+ever touched. In an org where a household's people are its contacts, deleting the household
+deletes those people too, and their own addresses go with them. Keep: they stay, with the
+lookup the platform cleared, as before the setting. Rules that hold either way:
+
+- **A merge is not a delete.** The platform moves the losing record's addresses to the
+  survivor, and they stay there.
+- **Restoring restores them.** Before the delete each address is marked with its owner
+  (`Deleted_With__c`), because the platform clears the lookup and does not put it back.
+  Restoring the owner from the Recycle Bin restores the addresses marked with it and links
+  them again, whatever the setting says by then.
+- **System mode, as package upkeep of dependent rows.** The person who deletes the owner need
+  not be able to delete addresses themselves (ADR-0021); a failure is logged and never blocks
+  the delete.
+- **BarnCRM's own deletes are unchanged.** The empty household tidy-up (R-H12a) and erasure
+  (R-ER2) already delete the addresses themselves.
+- **Part of Addresses.** Two automations, Addresses of a deleted person and Addresses of a
+  deleted account, belong to the Addresses feature (ADR-0124) and can be switched off on the
+  Automation page like any other.
+
 **R-AD9 Moving a household on purpose.** The address card offers two moves, in every Address
 Updates setting (ADR-0140). Each checks the user's own access as any address write does,
 works for many records in one save, and keeps what it replaces as history (R-AD7):
@@ -7347,11 +7386,12 @@ works for many records in one save, and keeps what it replaces as history (R-AD7
 | Status | `Status__c` | Picklist: Current (default), Former, Undeliverable |
 | Start Date | `Start_Date__c` | Date |
 | End Date | `End_Date__c` | Date |
+| Deleted With | `Deleted_With__c` | Text (40) |
 
 - **Standard fields written:** `Account.BillingStreet`, `BillingCity`, `BillingState`,
   `BillingPostalCode`, `BillingCountry`; `Contact.MailingStreet`, `MailingCity`,
   `MailingState`, `MailingPostalCode`, `MailingCountry`.
-- **Settings keys:** `Contact_Address_Change_Behavior__c`, `Seasonal_Address_Last_Run__c`,
+- **Settings keys:** `Contact_Address_Change_Behavior__c`, `Address_Delete_Behavior__c`, `Seasonal_Address_Last_Run__c`,
   `Seasonal_Address_Last_Run_Summary__c`, `Address_Card_Fields__c` (Section 12).
 - **Service:** `AddressService`, `AddressTriggerHandler`, `AddressSelector` (the
   Addresses card reads and saves through Lightning Data Service, ADR-0093 record reads
@@ -12755,6 +12795,9 @@ mirrors the primary member).
 | 1.0 | 2026-11-06 | Session End Time (modules-24, owner decision D-183). `Session__c` gains `End_Time__c` (Time) with rule R-SE6 and validation rule `End_After_Start`; the Schedule Sessions panel sets it (R-SE4). No other object or field added. |
 | 1.0 | 2026-11-06 | Session Schedule (modules-24, D-183, ADR-0171). New in the Programs module: Session Schedule (`Session_Schedule__c`, 29ZA7), master-detail to Program, with rules R-SS1 to R-SS7. `Session__c` gains `Session_Schedule__c` (Lookup, SetNull). R-SE4 says the panel can save its pattern as a schedule. |
 | 1.0 | 2026-11-06 | Session horizon setting (modules-24, D-183). `Programs_Settings__c` gains `Session_Horizon_Weeks__c` (Number(2, 0), default 8, 1 to 26). R-SS2 reads it instead of a fixed eight weeks, and skips a day another schedule filled earlier in the same run. |
+| 1.0 | 2026-11-06 | Shipped match sources turned off through a setting (owner decision D-184, ADR-NEXT). `BarnCRM_Settings__c` gains `Match_Sources_Turned_Off__c` (Section 12); Match Source's Active definition now says BarnCRM changes it only on the organization's own rows. |
+| 1.0 | 2026-11-06 | Addresses of deleted records (owner decision D-184). `BarnCRM_Settings__c` gains `Address_Delete_Behavior__c` (Section 12; Delete or Keep, default Delete) and `Address__c` gains `Deleted_With__c` (Text 40), with rule R-AD11: a deleted household's, organization's or person's addresses are deleted with it and restored with it, never on a merge. |
+| 1.0 | 2026-11-06 | Shipped organization record type (owner decision D-184, ADR-NEXT, amends ADR-0141 decision 2). Account gains the record type `BarnCRM_Organization` (active, given to nobody). Section 8 gains R-O4a: offered for organizations only where the org has no record type of its own, never detected, never switched to automatically; R-O5 leaves it out of the candidates. |
 
 ---
 ## 32. Entity ownership by package
