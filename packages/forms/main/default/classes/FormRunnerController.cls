@@ -116,23 +116,21 @@ public with sharing class FormRunnerController {
 	 * nothing saved; otherwise the submission is kept and its outcome returned.
 	 *
 	 * @param answersJson the answers by field key, as JSON
+	 * @param filesJson the files for file questions, `{ key: { name, data } }` as JSON, or blank
 	 */
 	@AuraEnabled
 	public static FormSubmitService.Result submit(
 		Id formId,
 		String answersJson,
-		Id contextRecordId
+		Id contextRecordId,
+		String filesJson
 	) {
 		try {
-			Object answers = JSON.deserializeUntyped(
-				String.isBlank(answersJson) ? '{}' : answersJson
-			);
 			return FormSubmitService.submit(
 				formId,
-				answers instanceof Map<String, Object>
-					? (Map<String, Object>) answers
-					: new Map<String, Object>(),
-				contextRecordId
+				FormRules.jsonMap(answersJson),
+				contextRecordId,
+				FormRules.jsonMap(filesJson)
 			);
 		} catch (FormSubmitService.FormException e) {
 			throw UserErrors.message(e.getMessage());

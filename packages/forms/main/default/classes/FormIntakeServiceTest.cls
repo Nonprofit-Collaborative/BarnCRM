@@ -46,7 +46,7 @@ private class FormIntakeServiceTest {
 	static void aPublicFormLoadsWithoutItsRecordsOrTargets() {
 		System.runAs(admin()) {
 			Form__c form = FormsTestData.publicVolunteerInterest(50);
-			FormIntakeService.PublicForm view = FormPublicController.getForm(form.Id);
+			FormIntakeService.PublicForm view = FormPublicController.getForm(form.Id, null);
 			Assert.isNotNull(view, 'The public form loads');
 			Assert.isFalse(view.definition.contains('records'), 'No records are published');
 			Assert.isFalse(view.definition.contains('LastName'), 'No field names are published');
@@ -55,9 +55,12 @@ private class FormIntakeServiceTest {
 				view.ticket.split(':').size(),
 				'The ticket is version, time, signature'
 			);
-			Assert.isNull(FormPublicController.getForm('not an id'), 'Nonsense finds nothing');
 			Assert.isNull(
-				FormPublicController.getForm(FormsTestData.volunteerInterest().Id),
+				FormPublicController.getForm('not an id', null),
+				'Nonsense finds nothing'
+			);
+			Assert.isNull(
+				FormPublicController.getForm(FormsTestData.volunteerInterest().Id, null),
 				'A form that is not public is not served'
 			);
 		}
@@ -248,13 +251,15 @@ private class FormIntakeServiceTest {
 				ticket,
 				JSON.serialize(sam()),
 				'',
+				null,
+				null,
 				null
 			);
 			Assert.areEqual(FormIntakeService.RECEIVED, receipt.status, 'Received');
 			update as user new Form__c(Id = form.Id, Status__c = 'Closed');
 			Assert.areEqual(
 				FormIntakeService.CLOSED,
-				FormPublicController.submit(ticket, '{}', '', null).status,
+				FormPublicController.submit(ticket, '{}', '', null, null, null).status,
 				'A closed form takes nothing'
 			);
 		}

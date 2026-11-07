@@ -224,4 +224,20 @@ describe('c/formDefinition', () => {
     expect(codes(checkDefinition(overwriting))).toEqual(['publicOverwrite']);
     expect(codes(checkDefinition({ ...overwriting, public: { enabled: false } }))).toEqual([]);
   });
+
+  it('checks the days a saved link works, and keeps file questions off records (C-42c)', () => {
+    const saving = { ...good(), public: { enabled: true, saveForLater: true, resumeDays: 14 } };
+    expect(checkDefinition(saving)).toEqual([]);
+    const tooLong = { ...good(), public: { enabled: true, resumeDays: 31 } };
+    expect(codes(checkDefinition(tooLong))).toEqual(['badPublicResumeDays']);
+
+    const withFile = good();
+    withFile.steps[0].fields.push({ key: 'cv', label: 'Resume', type: 'file' });
+    expect(checkDefinition(withFile)).toEqual([]);
+    withFile.steps[0].fields[withFile.steps[0].fields.length - 1].target = {
+      record: withFile.records[0].key,
+      field: 'Description'
+    };
+    expect(codes(checkDefinition(withFile))).toEqual(['fileTarget']);
+  });
 });

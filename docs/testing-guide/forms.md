@@ -113,3 +113,24 @@ the Admin Guide (Setup steps 1 to 5).
 
 **Cleanup:** delete the submission, set the form back to Published or delete it, delete the
 Site if you made one only for this.
+
+## T-FORM-07: Files and Save for Later
+
+**Purpose:** confirm a file is kept on the submission and the person, a wrong or large file is
+refused, and saved answers reopen from the emailed link only.
+**Prerequisites:** T-FORM-06 done (public form, Site, processing scheduled); Admin Guide Site
+steps 6 and 7 done; an inbox you can read.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the Form Builder add a question **Resume**, Type **File**, not written to a record; turn on **Let People Save and Finish Later**, **Days a Saved Link Works** `2`; **Publish**. | Published. Choosing a record for the file question instead shows a problem and blocks Publish. |
+| 2 | In a private window open the public link; for Resume choose a `.html` file. | "Choose a PDF, picture, Word, Excel, CSV or text file." |
+| 3 | Choose a PDF over 1 MB and send. | Says the files can be at most 1024 KB; nothing is sent. |
+| 4 | Fill in `Sam`, `Zztest`, `sam.zztest@example.org`, choose a small PDF, then **Save and Finish Later**, enter your email, **Email Me the Link**. | "Your answers are saved..." and an email arrives with a link. |
+| 5 | Open the link. | The form opens with the answers filled in and a note to choose files again. |
+| 6 | Choose the PDF again and send. | The thank-you message. |
+| 7 | Open the link again. | "This link to saved answers has expired or was already used." and an empty form. |
+| 8 | Signed in, after processing, open the submission and Sam Zztest. | The PDF is under the submission's Files and Sam's Files. |
+| 9 | As staff, fill in the form on its **Fill In** tab with a file. | Processed; the file is on the submission and the person. |
+
+**Cleanup:** delete the submissions and files, remove the file question, republish.

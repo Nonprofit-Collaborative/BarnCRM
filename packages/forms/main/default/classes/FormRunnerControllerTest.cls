@@ -45,6 +45,7 @@ private class FormRunnerControllerTest {
 			FormSubmitService.Result result = FormRunnerController.submit(
 				form.Id,
 				'{"last":"Zzrunner","email":"zz.runner@example.org"}',
+				null,
 				null
 			);
 			Test.stopTest();
@@ -56,11 +57,11 @@ private class FormRunnerControllerTest {
 			);
 			Assert.areEqual(
 				FormSubmitService.INVALID,
-				FormRunnerController.submit(form.Id, '', null).status,
+				FormRunnerController.submit(form.Id, '', null, null).status,
 				'No answers: the last name is required'
 			);
 			try {
-				FormRunnerController.submit(draft.Id, '{}', null);
+				FormRunnerController.submit(draft.Id, '{}', null, null);
 				Assert.fail('A draft is refused');
 			} catch (AuraHandledException expected) {
 				Assert.isTrue(String.isNotBlank(expected.getMessage()), 'In plain words');

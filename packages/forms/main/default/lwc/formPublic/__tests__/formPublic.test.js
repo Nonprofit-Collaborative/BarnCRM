@@ -2,8 +2,12 @@ import { createElement } from 'lwc';
 import FormPublic from 'c/formPublic';
 import getForm from '@salesforce/apex/FormPublicController.getForm';
 import submit from '@salesforce/apex/FormPublicController.submit';
+import saveDraft from '@salesforce/apex/FormPublicController.saveDraft';
 
 jest.mock('@salesforce/apex/FormPublicController.getForm', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/FormPublicController.saveDraft', () => ({ default: jest.fn() }), {
   virtual: true
 });
 jest.mock('@salesforce/apex/FormPublicController.submit', () => ({ default: jest.fn() }), {
@@ -66,7 +70,8 @@ describe('c-form-public', () => {
     submit.mockResolvedValue({ status: 'Received', message: 'Thanks!' });
     const element = await render({ formId: FORM.formId, recordId: 'a05000000000001' });
     expect(find(element, '[data-id="title"]').textContent).toBe('Volunteer Sign-Up');
-    expect(getForm).toHaveBeenCalledWith({ formId: FORM.formId });
+    expect(getForm).toHaveBeenCalledWith({ formId: FORM.formId, resumeToken: null });
+    expect(find(element, '[data-id="save-open"]')).toBeNull();
 
     find(element, '[data-id="submit"]').click();
     await flush();
@@ -81,7 +86,9 @@ describe('c-form-public', () => {
       ticket: FORM.ticket,
       answersJson: JSON.stringify({ last: 'Zzpublic' }),
       trap: '',
-      contextRecordId: 'a05000000000001'
+      contextRecordId: 'a05000000000001',
+      filesJson: '{}',
+      resumeToken: null
     });
     expect(find(element, '[data-id="outcome"] c-barn-notice').message).toBe('Thanks!');
     expect(find(element, '[data-id="submit"]')).toBeNull();
@@ -103,6 +110,99 @@ describe('c-form-public', () => {
     await flush();
     await flush();
     expect(find(element, '[data-id="answer-problem"]')).not.toBeNull();
+  });
+
+  it('sends a chosen file beside the answers, and refuses files that are too large', async () => {
+    const withFile = JSON.stringify({
+      schemaVersion: 1,
+      steps: [
+        {
+          key: 'you',
+          fields: [
+            { key: 'last', label: 'Last Name', type: 'text', required: true },
+            { key: 'cv', label: 'Resume', type: 'file' }
+          ]
+        }
+      ],
+      public: { enabled: true }
+    });
+    getForm.mockResolvedValue({ ...FORM, definition: withFile });
+    submit.mockResolvedValue({ status: 'Received' });
+    const element = await render({ formId: FORM.formId });
+    answer(element, 'last', 'Zzpublic');
+    const big = new File(['x'], 'big.pdf', { type: 'application/pdf' });
+    Object.defineProperty(big, 'size', { value: 2 * 1024 * 1024 });
+    find(element, '[data-key="cv"]').dispatchEvent(
+      new CustomEvent('change', { detail: { files: [big] } })
+    );
+    await flush();
+    expect(find(element, '[data-id="file-name"]').textContent).toBe('big.pdf');
+    find(element, '[data-id="submit"]').click();
+    await flush();
+    expect(submit).not.toHaveBeenCalled();
+    expect(find(element, '[data-id="answer-problem"]')).not.toBeNull();
+
+    const small = new File(['hello'], 'cv.pdf', { type: 'application/pdf' });
+    find(element, '[data-key="cv"]').dispatchEvent(
+      new CustomEvent('change', { detail: { files: [small] } })
+    );
+    find(element, '[data-id="submit"]').click();
+    await flush();
+    await flush();
+    await flush();
+    const sent = submit.mock.calls[0][0];
+    expect(JSON.parse(sent.answersJson)).toEqual({ last: 'Zzpublic', cv: 'cv.pdf' });
+    expect(JSON.parse(sent.filesJson)).toEqual({ cv: { name: 'cv.pdf', data: btoa('hello') } });
+  });
+
+  it('saves the answers for later and opens them again from the emailed link', async () => {
+    getForm.mockResolvedValue({ ...FORM, canSave: true });
+    saveDraft.mockResolvedValueOnce({ status: 'Invalid', problems: { saveForLater: 'badEmail' } });
+    saveDraft.mockResolvedValueOnce({ status: 'Saved' });
+    const element = await render({ formId: FORM.formId });
+    answer(element, 'last', 'Zzlater');
+    find(element, '[data-id="save-open"]').click();
+    await flush();
+    find(element, '[data-id="save-email"]').dispatchEvent(
+      new CustomEvent('change', { detail: { value: 'nope' } })
+    );
+    find(element, '[data-id="save-send"]').click();
+    await flush();
+    await flush();
+    expect(find(element, '[data-id="save-problem"]')).not.toBeNull();
+    find(element, '[data-id="save-send"]').click();
+    await flush();
+    await flush();
+    expect(saveDraft).toHaveBeenLastCalledWith({
+      ticket: FORM.ticket,
+      answersJson: JSON.stringify({ last: 'Zzlater' }),
+      trap: '',
+      email: 'nope',
+      step: 0
+    });
+    expect(find(element, '[data-id="outcome"]')).not.toBeNull();
+    expect(find(element, '[data-id="submit"]')).toBeNull();
+
+    document.body.removeChild(element);
+    getForm.mockResolvedValue({ ...FORM, answers: '{"last":"Zzlater"}', step: 0 });
+    submit.mockResolvedValue({ status: 'Received' });
+    const resumed = await render({ formId: FORM.formId, resumeToken: 'tok' });
+    expect(getForm).toHaveBeenLastCalledWith({ formId: FORM.formId, resumeToken: 'tok' });
+    expect(find(resumed, '[data-id="notice"]')).not.toBeNull();
+    find(resumed, '[data-id="submit"]').click();
+    await flush();
+    await flush();
+    expect(submit.mock.calls[0][0].resumeToken).toBe('tok');
+  });
+
+  it('opens a fresh form when the emailed link no longer works', async () => {
+    getForm.mockResolvedValueOnce(null);
+    getForm.mockResolvedValueOnce(FORM);
+    const element = await render({ formId: FORM.formId, resumeToken: 'gone' });
+    await flush();
+    expect(getForm).toHaveBeenLastCalledWith({ formId: FORM.formId, resumeToken: null });
+    expect(find(element, '[data-id="notice"]')).not.toBeNull();
+    expect(find(element, '[data-id="title"]')).not.toBeNull();
   });
 
   it('says the form is not open when it is not public', async () => {

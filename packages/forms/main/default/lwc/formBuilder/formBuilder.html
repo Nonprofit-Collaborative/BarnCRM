@@ -442,6 +442,27 @@
                 disabled={readOnly}
                 onchange={handlePublicChange}
               ></lightning-textarea>
+              <lightning-input
+                type="toggle"
+                data-id="public-save"
+                data-setting="saveForLater"
+                label={publicText.saveForLater}
+                checked={publicSettings.saveForLater}
+                disabled={readOnly}
+                onchange={handlePublicChange}
+              ></lightning-input>
+              <template lwc:if={publicSettings.saveForLater}>
+                <lightning-input
+                  type="number"
+                  data-setting="resumeDays"
+                  label={publicText.resumeDays}
+                  value={publicSettings.resumeDays}
+                  min="1"
+                  max="30"
+                  disabled={readOnly}
+                  onchange={handlePublicChange}
+                ></lightning-input>
+              </template>
             </template>
             <template lwc:if={isPublishedPublic}>
               <p class="slds-var-m-top_small">{publicText.links}</p>

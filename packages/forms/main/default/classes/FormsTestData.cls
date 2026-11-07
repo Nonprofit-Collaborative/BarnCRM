@@ -119,7 +119,25 @@ public class FormsTestData {
 
 	/** The volunteer interest form, published as a public form with its signing key. */
 	public static Form__c publicVolunteerInterest(Integer hourlyLimit) {
-		Form__c form = published('Public Volunteer Interest', publicDefinition(hourlyLimit));
+		return publicForm(publicDefinition(hourlyLimit));
+	}
+
+	/**
+	 * The public volunteer interest form with a file question `cv` and save for later (C-42c).
+	 */
+	public static Form__c publicWithFileAndSaving() {
+		Map<String, Object> definition = publicDefinition(50);
+		((Map<String, Object>) definition.get('public')).put('saveForLater', true);
+		Map<String, Object> firstStep = (Map<String, Object>) ((List<Object>) definition.get(
+			'steps'
+		))[0];
+		((List<Object>) firstStep.get('fields')).add(field('cv', 'file', false, null, null));
+		return publicForm(definition);
+	}
+
+	/** A form published as a public form with its signing key. */
+	public static Form__c publicForm(Map<String, Object> definition) {
+		Form__c form = published('Public Volunteer Interest', definition);
 		update as user new Form__c(Id = form.Id, Public__c = true);
 		FormIntakeService.giveKey(
 			[SELECT Id FROM Form_Version__c WHERE Form__c = :form.Id WITH USER_MODE][0].Id

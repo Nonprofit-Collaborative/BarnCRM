@@ -78,6 +78,20 @@
                     onchange={handleAnswer}
                   ></lightning-combobox>
                 </template>
+                <template lwc:if={question.isFile}>
+                  <lightning-input
+                    data-key={question.key}
+                    type="file"
+                    label={question.label}
+                    field-level-help={question.help}
+                    required={question.required}
+                    accept={fileAccept}
+                    onchange={handleFile}
+                  ></lightning-input>
+                  <template lwc:if={question.fileName}>
+                    <p class="slds-text-body_small" data-id="file-name">{question.fileName}</p>
+                  </template>
+                </template>
                 <template lwc:if={question.error}>
                   <div class="slds-text-color_error" data-id="answer-problem">{question.error}</div>
                 </template>

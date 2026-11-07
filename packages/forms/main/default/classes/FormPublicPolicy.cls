@@ -12,8 +12,10 @@ public with sharing class FormPublicPolicy {
 	private static final Set<String> FORMS_OBJECTS = new Set<String>{
 		'form__c',
 		'form_version__c',
-		'form_submission__c'
+		'form_submission__c',
+		'form_draft__c'
 	};
+	public static final Integer DEFAULT_RESUME_DAYS = 7;
 	private static final Set<Schema.DisplayType> NEVER_ANSWERED = new Set<Schema.DisplayType>{
 		Schema.DisplayType.REFERENCE,
 		Schema.DisplayType.ENCRYPTEDSTRING
@@ -38,6 +40,16 @@ public with sharing class FormPublicPolicy {
 
 	public static Integer hourlyLimit(Map<String, Object> definition) {
 		return whole(settings(definition).get('hourlyLimit'), DEFAULT_HOURLY_LIMIT, 1, 1000);
+	}
+
+	/** True when a person may save their answers and finish later from an emailed link (C-42c). */
+	public static Boolean canSave(Map<String, Object> definition) {
+		return isPublic(definition) && settings(definition).get('saveForLater') == true;
+	}
+
+	/** How many days an emailed link to saved answers works. */
+	public static Integer resumeDays(Map<String, Object> definition) {
+		return whole(settings(definition).get('resumeDays'), DEFAULT_RESUME_DAYS, 1, 30);
 	}
 
 	/** The form's own thank-you text, or null for the shipped one. */

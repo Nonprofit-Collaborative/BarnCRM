@@ -93,6 +93,24 @@ off-platform through an integration user, so the rules cannot live only in a Sit
 10. **Page delivery.** The Visualforce page `FormsPublic` loads `c:formPublic` through Lightning
     Out (`formsPublicApp`, `ltng:allowGuestAccess`); no Experience Cloud. The address is
     `<site URL>/FormsPublic?form=<form id>` (`&record=<id>` for a form attached to a record).
+11. **Files and save for later (C-42c, amendment of 2026-11-07).** Both go through the same
+    intake and the same spam checks, and neither lets a guest read a record:
+    - A `file` question's answer is the file's name; the file is sent beside the answers as
+      base64 and stored by the intake as a Salesforce File on the submission (system mode, as the
+      submission is), then shared with the person and organization by processing as the staff
+      user. Only documents and pictures are taken (no HTML, SVG or scripts), and at most 1 MB per
+      submission, because the base64 text and its decoded copy must fit the 6 MB a request's
+      Apex may hold. The staff runner takes files the same way. Salesforce forces one more Setup
+      step for a Site: Salesforce Files General Settings, "Allow site guest users to upload
+      files".
+    - Saving for later is per form (`public.saveForLater`, `public.resumeDays` 1 to 30, default
+      7). The intake makes a random 256-bit token, stores only its SHA-256 hash on a Form Draft
+      with the answers (files left out), the version and an expiry, and emails the link
+      `FormsPublic?form=<id>&resume=<token>` built from the Site's own address, never from the
+      caller, so the org cannot be made to mail an outside link. The email address is not stored.
+      A link opens the draft's version only, until it expires or the form is sent; drafts count
+      toward the hourly limit; processing deletes expired drafts. Not offered on a form opened
+      from a record, since the link does not carry the record.
 
 ## Alternatives considered
 
@@ -116,5 +134,7 @@ off-platform through an integration user, so the rules cannot live only in a Sit
   them as on any held one.
 - The administrator who schedules processing must stay active (Health Check already reports jobs
   owned by inactive users).
-- C-42c (file upload, save and resume) builds on the same intake: drafts and files are stored by
-  the intake and never read back except by the person holding the emailed link.
+- C-42c (file upload, save and resume) builds on the same intake (decision 11): drafts and files
+  are stored by the intake and never read back except by the person holding the emailed link.
+- Files larger than 1 MB together need a later change (for example a chunked upload); the
+  limit is shown to the person when they choose a file.

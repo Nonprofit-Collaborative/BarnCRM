@@ -149,7 +149,13 @@ export const TYPE_OPTIONS = Object.freeze([
   { value: 'number', label: TYPE_NUMBER },
   { value: 'date', label: TYPE_DATE },
   { value: 'checkbox', label: TYPE_CHECKBOX },
-  { value: 'picklist', label: TYPE_PICKLIST }
+  { value: 'picklist', label: TYPE_PICKLIST },
+  {
+    value: 'file',
+    get label() {
+      return helpText('Forms', 'Forms_Builder_TypeFile');
+    }
+  }
 ]);
 
 export const OPERATOR_OPTIONS = Object.freeze([
@@ -247,12 +253,15 @@ const DEFINITION_PROBLEMS = {
   badPublicSeconds: (a) => helpText('Forms', 'Forms_Problem_badPublicSeconds', ...a),
   badPublicLimit: (a) => helpText('Forms', 'Forms_Problem_badPublicLimit', ...a),
   badPublicConfirmation: (a) => helpText('Forms', 'Forms_Problem_badPublicConfirmation', ...a),
-  publicOverwrite: (a) => helpText('Forms', 'Forms_Problem_publicOverwrite', ...a)
+  publicOverwrite: (a) => helpText('Forms', 'Forms_Problem_publicOverwrite', ...a),
+  badPublicResumeDays: (a) => helpText('Forms', 'Forms_Problem_badPublicResumeDays', ...a),
+  fileTarget: (a) => helpText('Forms', 'Forms_Problem_fileTarget', ...a)
 };
 
 /** The public form page's words (C-42b): what became of the answers sent, by status. */
 const PUBLIC_RESULTS = {
   Received: () => helpText('Forms', 'Forms_Public_Received'),
+  Saved: () => helpText('Forms', 'Forms_Public_Saved'),
   Retry: () => helpText('Forms', 'Forms_Public_Retry'),
   Expired: () => helpText('Forms', 'Forms_Public_Expired'),
   Busy: () => helpText('Forms', 'Forms_Public_Busy'),
@@ -272,6 +281,28 @@ export function publicResultText(status, confirmation) {
 export function trapLabel() {
   return helpText('Forms', 'Forms_Public_Trap');
 }
+
+/** The public page's save-for-later and resume words (C-42c). */
+export const SAVE_TEXT = Object.freeze({
+  get button() {
+    return helpText('Forms', 'Forms_Public_SaveButton');
+  },
+  get intro() {
+    return helpText('Forms', 'Forms_Public_SaveIntro');
+  },
+  get email() {
+    return helpText('Forms', 'Forms_Public_SaveEmail');
+  },
+  get send() {
+    return helpText('Forms', 'Forms_Public_SaveSend');
+  },
+  get resumed() {
+    return helpText('Forms', 'Forms_Public_Resumed');
+  },
+  get linkGone() {
+    return helpText('Forms', 'Forms_Public_LinkGone');
+  }
+});
 
 /** The Form Builder's public settings, worded from the help catalog. */
 export const PUBLIC_SETTING_TEXT = Object.freeze({
@@ -293,6 +324,12 @@ export const PUBLIC_SETTING_TEXT = Object.freeze({
   get confirmation() {
     return helpText('Forms', 'Forms_Builder_PublicConfirmation');
   },
+  get saveForLater() {
+    return helpText('Forms', 'Forms_Builder_PublicSaveForLater');
+  },
+  get resumeDays() {
+    return helpText('Forms', 'Forms_Builder_PublicResumeDays');
+  },
   get links() {
     return helpText('Forms', 'Forms_Builder_PublicLinks');
   },
@@ -311,7 +348,10 @@ const ANSWER_PROBLEMS = {
   aboveMax: (a) => helpText('Forms', 'Forms_Answer_aboveMax', ...a),
   badDate: (a) => helpText('Forms', 'Forms_Answer_badDate', ...a),
   notAnOption: (a) => helpText('Forms', 'Forms_Answer_notAnOption', ...a),
-  tooLong: (a) => helpText('Forms', 'Forms_Answer_tooLong', ...a)
+  tooLong: (a) => helpText('Forms', 'Forms_Answer_tooLong', ...a),
+  badFileType: (a) => helpText('Forms', 'Forms_Answer_badFileType', ...a),
+  fileMissing: (a) => helpText('Forms', 'Forms_Answer_fileMissing', ...a),
+  fileTooLarge: (a) => helpText('Forms', 'Forms_Answer_fileTooLarge', ...a)
 };
 
 function worded(table, problem) {

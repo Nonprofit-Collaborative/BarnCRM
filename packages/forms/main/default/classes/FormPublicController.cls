@@ -1,14 +1,17 @@
 /**
- * The public form page on a Salesforce Site (C-42b; ADR-0184 public forms on a Salesforce Site,
- * decisions 1 and 10): the only class the Site guest user may run (`Forms_Public_Guest`). Thin by
- * design: `FormIntakeService` decides, and nothing here reads or writes a record itself.
+ * The public form page on a Salesforce Site (C-42b, C-42c; ADR-NEXT public forms on a Salesforce
+ * Site, decisions 1, 10 and 11): the only class the Site guest user may run (`Forms_Public_Guest`).
+ * Thin by design: `FormIntakeService` decides, and nothing here reads or writes a record itself.
  */
 public with sharing class FormPublicController {
 	private static final String CONTEXT = 'FormPublicController';
 
-	/** The form to fill in, or null when it is not published or not public. */
+	/**
+	 * The form to fill in, or null when it is not published or not public. With an emailed resume
+	 * token, the form with the answers saved behind it, or null when the link no longer works.
+	 */
 	@AuraEnabled
-	public static FormIntakeService.PublicForm getForm(String formId) {
+	public static FormIntakeService.PublicForm getForm(String formId, String resumeToken) {
 		Id given;
 		try {
 			given = Id.valueOf(formId);
@@ -16,42 +19,68 @@ public with sharing class FormPublicController {
 			return null;
 		}
 		try {
-			return given.getSObjectType() != Form__c.SObjectType
-				? null
-				: FormIntakeService.load(given);
+			if (given.getSObjectType() != Form__c.SObjectType) {
+				return null;
+			}
+			return String.isBlank(resumeToken)
+				? FormIntakeService.load(given)
+				: FormIntakeService.resume(given, resumeToken);
 		} catch (Exception e) {
 			throw failed(e, '.getForm');
 		}
 	}
 
 	/**
-	 * Sends the answers. Nothing about any record comes back: only whether they were received,
-	 * or which answers to fix.
+	 * Sends the answers and their files. Nothing about any record comes back: only whether they
+	 * were received, or which answers to fix.
 	 *
 	 * @param answersJson the answers by field key, as JSON
 	 * @param trap the hidden question's answer, blank from a person
+	 * @param filesJson the files for file questions, `{ key: { name, data } }` as JSON, or blank
+	 * @param resumeToken the emailed token the form was resumed with, or blank
 	 */
 	@AuraEnabled
 	public static FormIntakeService.Receipt submit(
 		String ticket,
 		String answersJson,
 		String trap,
-		String contextRecordId
+		String contextRecordId,
+		String filesJson,
+		String resumeToken
 	) {
 		try {
-			Object answers = JSON.deserializeUntyped(
-				String.isBlank(answersJson) ? '{}' : answersJson
-			);
 			return FormIntakeService.submit(
 				ticket,
-				answers instanceof Map<String, Object>
-					? (Map<String, Object>) answers
-					: new Map<String, Object>(),
+				FormRules.jsonMap(answersJson),
 				trap,
-				contextRecordId
+				contextRecordId,
+				FormRules.jsonMap(filesJson),
+				resumeToken
 			);
 		} catch (Exception e) {
 			throw failed(e, '.submit');
+		}
+	}
+
+	/** Saves the answers so far and emails a link to finish later (C-42c). */
+	@AuraEnabled
+	public static FormIntakeService.Receipt saveDraft(
+		String ticket,
+		String answersJson,
+		String trap,
+		String email,
+		Integer step
+	) {
+		try {
+			return FormIntakeService.saveDraft(
+				ticket,
+				FormRules.jsonMap(answersJson),
+				trap,
+				email,
+				step
+			);
+		} catch (Exception e) {
+			throw failed(e, '.saveDraft');
 		}
 	}
 

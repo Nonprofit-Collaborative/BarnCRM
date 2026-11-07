@@ -18,6 +18,69 @@ const MIN_PHONE_DIGITS = 7;
 /** The longest text answer when the form sets none: a text field, then a long text field. */
 export const DEFAULT_MAX_LENGTH = Object.freeze({ text: 255, textarea: 32768 });
 
+/** The kinds of file a file question takes (C-42c), as `FormRules.FILE_TYPES` holds them. */
+export const FILE_TYPES = Object.freeze([
+  'pdf',
+  'jpg',
+  'jpeg',
+  'png',
+  'gif',
+  'heic',
+  'doc',
+  'docx',
+  'xls',
+  'xlsx',
+  'csv',
+  'txt',
+  'rtf',
+  'odt'
+]);
+
+/** The most one submission's files may hold together, as `FormFiles.MAX_BYTES`. */
+export const MAX_FILE_BYTES = 1024 * 1024;
+
+/** The `accept` list for a file input. */
+export const FILE_ACCEPT = FILE_TYPES.map((kind) => '.' + kind).join(',');
+
+/**
+ * What is wrong with the files chosen, by field key, or an empty object: together they must fit
+ * MAX_FILE_BYTES. `files` is `{ key: { name, size } }` or browser File objects.
+ */
+export function checkFileSizes(files) {
+  const problems = {};
+  let total = 0;
+  Object.keys(files || {}).forEach((key) => {
+    total += files[key].size || 0;
+    if (total > MAX_FILE_BYTES) {
+      problems[key] = problem('fileTooLarge', Math.round(MAX_FILE_BYTES / 1024));
+    }
+  });
+  return problems;
+}
+
+/** Reads a browser file as `{ name, data }`, the data in base64, as the server takes it. */
+export function readFile(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = String(reader.result);
+      resolve({ name: file.name, data: text.substring(text.indexOf(',') + 1) });
+    };
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+/** Reads every chosen file, `{ key: File }`, into `{ key: { name, data } }`. */
+export async function readFiles(files) {
+  const read = {};
+  for (const key of Object.keys(files || {})) {
+    // eslint-disable-next-line no-await-in-loop
+    read[key] = await readFile(files[key]);
+  }
+  return read;
+}
+
 /** Whether an answer counts as not given: missing, null, or only spaces. False is an answer. */
 export function isBlank(value) {
   return value === undefined || value === null || String(value).trim() === '';
@@ -170,6 +233,12 @@ export function checkAnswer(field, value) {
       return DATE.test(text) && !Number.isNaN(Date.parse(text + 'T00:00:00Z'))
         ? null
         : problem('badDate');
+    case 'file':
+      return FILE_TYPES.includes(text.split('.').pop().toLowerCase()) &&
+        text.includes('.') &&
+        text.length <= 255
+        ? null
+        : problem('badFileType');
     case 'picklist':
       return (field.options || []).some((option) => String(option.value) === text)
         ? null
@@ -258,6 +327,7 @@ export function questionViews(definition, stepIndex, answers, problems) {
       isCheckbox: field.type === 'checkbox',
       isLong: field.type === 'textarea',
       isPicklist: field.type === 'picklist',
+      isFile: field.type === 'file',
       isInput: Boolean(INPUT_TYPES[field.type]),
       inputType: INPUT_TYPES[field.type],
       options: (field.options || []).map((option) => ({
