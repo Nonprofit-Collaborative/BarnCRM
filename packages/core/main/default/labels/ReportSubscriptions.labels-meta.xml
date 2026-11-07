@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_ReportSubscriptions_Title</fullName>
+        <categories>ReportSubscriptions</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Report Subscriptions: section title in Org Optimizer</shortDescription>
+        <value>Report Subscriptions</value>
+    </labels>
+    <labels>
+        <fullName>Core_ReportSubscriptions_Subscribe</fullName>
+        <categories>ReportSubscriptions</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Report Subscriptions: button that opens a report's schedule</shortDescription>
+        <value>Subscribe</value>
+    </labels>
+    <labels>
+        <fullName>Core_ReportSubscriptions_Frequency</fullName>
+        <categories>ReportSubscriptions</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Report Subscriptions: label of the how-often choice</shortDescription>
+        <value>Frequency</value>
+    </labels>
+    <labels>
+        <fullName>Core_ReportSubscriptions_Daily</fullName>
+        <categories>ReportSubscriptions</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Report Subscriptions: frequency option</shortDescription>
+        <value>Daily</value>
+    </labels>
+    <labels>
+        <fullName>Core_ReportSubscriptions_Weekly</fullName>
+        <categories>ReportSubscriptions</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Report Subscriptions: frequency option</shortDescription>
+        <value>Weekly</value>
+    </labels>
+    <labels>
+        <fullName>Core_ReportSubscriptions_Monthly</fullName>
+        <categories>ReportSubscriptions</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Report Subscriptions: frequency option</shortDescription>
+        <value>Monthly</value>
+    </labels>
+    <labels>
+        <fullName>Core_ReportSubscriptions_Day</fullName>
+        <categories>ReportSubscriptions</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Report Subscriptions: label of the weekday or day of month choice</shortDescription>
+        <value>Day</value>
+    </labels>
+</CustomLabels>
