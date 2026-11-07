@@ -1,7 +1,7 @@
 /**
  * The org's own Tooling API, called through the org connection `Barn_Org_Connection` (ADR-0148)
  * with the running job's session, for the Automation tab's scan, deactivation and restore
- * (ADR-NEXT, D-184). Only a queued job calls it: a Lightning session cannot call the API.
+ * (ADR-0174, D-184). Only a queued job calls it: a Lightning session cannot call the API.
  */
 public with sharing class OrgToolingApi {
 	@TestVisible

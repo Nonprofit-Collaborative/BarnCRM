@@ -1,4 +1,4 @@
-# ADR-NEXT: Deactivate org flows and validation rules with a snapshot and restore
+# ADR-0174: Deactivate org flows and validation rules with a snapshot and restore
 
 **Status:** Accepted (owner decision, Brandon, 2026-11-06, plan D-184: an optional "Deactivate
 org flows and validation rules" tool with a snapshot and Restore, available in sandboxes, and in

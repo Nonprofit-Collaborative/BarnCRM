@@ -46,7 +46,7 @@ const BUSY = ['Running', 'Restoring'];
 const RESTORABLE = ['Done', 'Partial'];
 
 /**
- * Deactivate Org Flows and Validation Rules (C-60, D-184, ADR-NEXT): choose the org's own active
+ * Deactivate Org Flows and Validation Rules (C-60, D-184, ADR-0174): choose the org's own active
  * flows and validation rules, confirm (a typed phrase in production), and a snapshot is saved
  * before they are turned off. Each run is listed with every item's result, and Restore puts back
  * exactly what it changed. The parent reads again and passes the new state in.

@@ -1,6 +1,6 @@
 /**
  * Deactivate Org Flows and Validation Rules, and Restore (canonical model Section 10A, R-AS4 to
- * R-AS8, ADR-NEXT, D-184). Queued jobs, each its own transaction, through the org connection:
+ * R-AS8, ADR-0174, D-184). Queued jobs, each its own transaction, through the org connection:
  *
  * 1. Snapshot: reads every chosen item's current state from the Tooling API and saves it before
  *    anything changes; an item that is not the org's own, or not active, is left Unchanged.

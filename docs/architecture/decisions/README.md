@@ -180,6 +180,9 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0169](0169-field-use-required-and-defaults.md) | Field Use shows required, default value and at default; required fields and checkboxes are counted | Accepted |
 | [0170](0170-shipped-relationship-types-can-be-turned-off.md) | Shipped relationship types can be turned off through a setting, never by changing the row | Accepted (owner request) |
 | [0171](0171-programs-session-schedules.md) | Repeating sessions are a saved schedule that creates ordinary sessions to a rolling horizon | Accepted (owner decision) |
+| [0172](0172-shipped-match-sources-turned-off-by-a-setting.md) | Shipped match sources are turned off by a setting | Accepted (owner decision) |
+| [0173](0173-shipped-organization-record-type-for-orgs-without-one.md) | Core ships an organization record type, offered only where the org has none | Accepted (owner decision) |
+| [0174](0174-deactivate-org-automation-with-a-snapshot.md) | Deactivate org flows and validation rules with a snapshot and restore | Accepted (owner decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

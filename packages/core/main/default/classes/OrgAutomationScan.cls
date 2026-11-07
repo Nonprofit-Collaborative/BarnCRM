@@ -1,5 +1,5 @@
 /**
- * The scan of the Automation tab (canonical model Section 10A, R-AS2 and R-AS3, ADR-NEXT): a
+ * The scan of the Automation tab (canonical model Section 10A, R-AS2 and R-AS3, ADR-0174): a
  * queued job reads through the org connection what user-mode SOQL cannot, the validation rules,
  * the workflow rules and what refers to Check BarnCRM Automation or the BarnCRM Automation
  * Control fields, and saves it as the one Scan snapshot the inventory adds to its rows.

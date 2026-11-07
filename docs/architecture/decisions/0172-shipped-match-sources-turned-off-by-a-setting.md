@@ -1,4 +1,4 @@
-# ADR-NEXT: Shipped match sources are turned off by a setting
+# ADR-0172: Shipped match sources are turned off by a setting
 
 **Status:** Accepted (owner decision D-184, Brandon, 2026-11-06)
 **Date:** 2026-11-06

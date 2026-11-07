@@ -1,4 +1,4 @@
-# ADR-NEXT: Core ships an organization record type, offered only where the org has none
+# ADR-0173: Core ships an organization record type, offered only where the org has none
 
 **Status:** Accepted (owner decision D-184, Brandon, 2026-11-06)
 **Date:** 2026-11-06

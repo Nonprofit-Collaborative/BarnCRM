@@ -211,7 +211,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 ## T-SET-07F: Scan Org Automation Through the Org Connection
 
-**Purpose:** confirm the scan lists validation and workflow rules and checks the org's own flows (C-60, ADR-NEXT "Deactivate org flows and validation rules with a snapshot and restore").
+**Purpose:** confirm the scan lists validation and workflow rules and checks the org's own flows (C-60, ADR-0174 "Deactivate org flows and validation rules with a snapshot and restore").
 **Prerequisites:** an admin with BarnCRM Admin and BarnCRM Metadata Admin, Customize Application and Modify Metadata; the org connection set up with Enabled for Callouts on ([T-IMP-18](imports.md#t-imp-18-create-a-new-field-from-a-column)); `My_Test_Flow` from T-SET-07C (calls Check BarnCRM Automation); a second active flow of your own, `My_Plain_Flow`, that does not; an active validation rule on Contact, `Test_Paused_Rule`, whose formula reads `$Setup.BarnCRM_Automation_Control__c.Pause_All__c`; an active validation rule on Account, `Test_Plain_Rule`, that does not.
 
 | Step | Action | Expected result |
@@ -228,7 +228,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 ## T-SET-07G: Deactivate Org Flows and Validation Rules, Then Restore
 
-**Purpose:** confirm a snapshot is saved before the org's own flows and rules are turned off, each result is shown, and Restore puts back exactly the snapshot (C-60, D-184, ADR-NEXT "Deactivate org flows and validation rules with a snapshot and restore").
+**Purpose:** confirm a snapshot is saved before the org's own flows and rules are turned off, each result is shown, and Restore puts back exactly the snapshot (C-60, D-184, ADR-0174 "Deactivate org flows and validation rules with a snapshot and restore").
 **Prerequisites:** the admin, connection, flows and rules from T-SET-07F, scanned; a sandbox, then (for step 8 only) a production org or Developer Edition org, where the same steps apply.
 
 | Step | Action | Expected result |

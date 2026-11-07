@@ -127,7 +127,7 @@ ALLOWED = {
     "Report": "reports not run for a year, read by Org Optimizer's Unused setup section (owner decision 2026-10-13). Platform feature, every edition; queried dynamically, so it cannot break the compile.",
     "PermissionSetGroupComponent": "which permission sets are inside a group, so Unused setup does not call them unassigned. Platform feature, every edition; queried dynamically.",
     "FlowDefinitionView":"inactive flows, read by Org Optimizer's Unused setup section (owner decision 2026-10-13). Platform feature, every edition; queried dynamically.",
-    # Tooling API objects, read by Scan Org Automation through the org connection (ADR-NEXT,
+    # Tooling API objects, read by Scan Org Automation through the org connection (ADR-0174,
     # D-184). Named only in callout query strings, so they cannot break the compile.
     "CustomField": "the BarnCRM Automation Control fields a formula or flow refers to, for Covered by Pause All (R-AS3). Tooling API, every edition with API access.",
     "MetadataComponentDependency": "what refers to Check BarnCRM Automation or the setting, for Covered by Pause All (R-AS3). Tooling API, every edition with API access.",
