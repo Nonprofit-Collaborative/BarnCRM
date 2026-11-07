@@ -167,7 +167,7 @@ private class EventEmailServiceTest {
 			Assert.areEqual(0, sent, 'Nothing sent');
 			Assert.areEqual(1, steps.size(), 'One nightly step');
 			Assert.isFalse(steps[0].active, 'Inactive while everything is off');
-			Assert.areEqual(3, EventsSettings.reminderLeadDays(), 'Lead days as saved');
+			Assert.areEqual(3, EventsSettings.reminderLeadDays(), 'Days before as saved');
 		}
 	}
 
