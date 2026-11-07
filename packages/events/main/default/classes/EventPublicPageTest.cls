@@ -9,7 +9,8 @@
 	testFor='ApexClass:EventPublicPage, ApexClass:EventsHealthCheckExtension, ApexClass:EventsSettings'
 )
 private class EventPublicPageTest {
-	private static final String FORM_KEY = 'a0B000000000001AAA';
+	// Any record identifier stands for the form: Events never reads it.
+	private static final String FORM_KEY = 'a0B000000000001';
 
 	@TestSetup
 	static void createTestUser() {
@@ -138,7 +139,7 @@ private class EventPublicPageTest {
 			String shown = JSON.serialize(page);
 			Assert.areEqual('Spring Gala', page.get('title'));
 			Assert.areEqual(EventPublicPage.OPEN, page.get('registration'));
-			Assert.areEqual(FORM_KEY, page.get('formId'));
+			Assert.areEqual(String.valueOf(Id.valueOf(FORM_KEY)), page.get('formId'));
 			Assert.isFalse(shown.contains('secret-join-link'), 'Online link never shown');
 			Assert.isFalse(shown.contains('Private travel note'), 'Speaker needs never shown');
 			Assert.isFalse(shown.contains('pat@example.org'), 'No email');
