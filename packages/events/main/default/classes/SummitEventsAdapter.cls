@@ -1,5 +1,5 @@
 /**
- * Summit Events compatibility (EV-10; ADR-NEXT `NEXT-event-registrations.md`, decision 7).
+ * Summit Events compatibility (EV-10; ADR-0182 `0182-event-registrations.md`, decision 7).
  *
  * Summit Events is a separate package many orgs do not have, so its objects are named only in
  * strings built at run time and read with dynamic SOQL: nothing here is checked by the compiler,
