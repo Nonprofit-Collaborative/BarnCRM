@@ -5,10 +5,10 @@
  * the guest who sent the answers never reads a record.
  *
  * Four scheduled jobs, at :00, :15, :30 and :45 (a cron expression takes one minute value). Each
- * enqueues this class as a queueable when anything is waiting, which processes a few submissions
- * per transaction and enqueues itself again while more wait.
+ * enqueues `Run` when anything is waiting, which processes a few submissions per transaction and
+ * enqueues itself again while more wait (a Queueable may not also be Schedulable).
  */
-public with sharing class FormPublicProcessor implements Schedulable, Queueable {
+public with sharing class FormPublicProcessor implements Schedulable {
 	public static final String JOB_NAME = 'BarnCRM Forms Public Processing';
 	@TestVisible
 	private static final List<Integer> MINUTES = new List<Integer>{ 0, 15, 30, 45 };
@@ -45,31 +45,35 @@ public with sharing class FormPublicProcessor implements Schedulable, Queueable 
 
 	public void execute(SchedulableContext context) {
 		if (!waiting(1).isEmpty()) {
-			System.enqueueJob(new FormPublicProcessor());
+			System.enqueueJob(new Run());
 		}
 	}
 
-	public void execute(QueueableContext context) {
-		List<Form_Submission__c> batch = waiting(PER_RUN + 1);
-		Integer done = 0;
-		for (Form_Submission__c submission : batch) {
-			if (done == PER_RUN) {
-				break;
+	/** Processes up to PER_RUN waiting submissions, then enqueues itself while more wait. */
+	public class Run implements Queueable {
+		public void execute(QueueableContext context) {
+			List<Form_Submission__c> batch = waiting(PER_RUN + 1);
+			Integer done = 0;
+			for (Form_Submission__c submission : batch) {
+				if (done == PER_RUN) {
+					break;
+				}
+				done++;
+				try {
+					FormSubmitService.processReceived(submission.Id);
+				} catch (Exception e) {
+					// Marked Failed so it is not taken up again; staff can Process Again.
+					ErrorLogger.log(e, CONTEXT + '.execute', submission.Id);
+					markFailed(submission.Id, e);
+				}
 			}
-			done++;
-			try {
-				FormSubmitService.processReceived(submission.Id);
-			} catch (Exception e) {
-				// Marked Failed so it is not taken up again; staff can Process Again.
-				ErrorLogger.log(e, CONTEXT + '.execute', submission.Id);
-				markFailed(submission.Id, e);
+			if (batch.size() > PER_RUN && !Test.isRunningTest()) {
+				System.enqueueJob(new Run());
 			}
-		}
-		if (batch.size() > PER_RUN && !Test.isRunningTest()) {
-			System.enqueueJob(new FormPublicProcessor());
 		}
 	}
 
+	@TestVisible
 	private static void markFailed(Id submissionId, Exception e) {
 		try {
 			update as user new Form_Submission__c(

@@ -64,4 +64,35 @@ private class FormPublicProcessorTest {
 			);
 		}
 	}
+
+	@IsTest
+	static void aSubmissionThatCannotBeProcessedIsMarkedFailed() {
+		System.runAs(admin()) {
+			Form__c form = FormsTestData.publicVolunteerInterest(50);
+			FormIntakeService.actAsGuest = true;
+			String ticket = FormIntakeService.load(form.Id).ticket;
+			FormIntakeService.clockShiftMs = 10000;
+			FormIntakeService.submit(
+				ticket,
+				new Map<String, Object>{ 'first' => 'Lee', 'last' => 'Zzfail' },
+				null,
+				null
+			);
+			Id waitingId = FormPublicProcessor.waiting(1)[0].Id;
+
+			FormPublicProcessor.markFailed(waitingId, new DmlException('Zzbroken'));
+
+			Form_Submission__c after = [
+				SELECT Status__c, Message__c
+				FROM Form_Submission__c
+				WHERE Id = :waitingId
+				WITH USER_MODE
+			];
+			Assert.areEqual(FormSubmitService.FAILED, after.Status__c, 'Failed');
+			Assert.isTrue(after.Message__c.contains('Zzbroken'), 'Says why');
+			Assert.isTrue(FormPublicProcessor.waiting(1).isEmpty(), 'Not taken up again');
+			FormsSites.testSites = null;
+			Assert.isNotNull(FormsSites.active(), 'The org is asked for its Sites');
+		}
+	}
 }

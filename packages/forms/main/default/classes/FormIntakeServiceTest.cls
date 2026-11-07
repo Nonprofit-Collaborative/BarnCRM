@@ -156,7 +156,11 @@ private class FormIntakeServiceTest {
 			FormSubmitService.Result result = FormSubmitService.processReceived(submissionId);
 			Test.stopTest();
 
-			Assert.areEqual(FormSubmitService.PROCESSED, result.status, result.message);
+			Assert.areEqual(
+				FormSubmitService.PROCESSED,
+				result.status,
+				'Processed: ' + result.message
+			);
 			Contact after = [
 				SELECT MailingPostalCode
 				FROM Contact
