@@ -12924,6 +12924,7 @@ on its own.
 | Registration Closes | `Registration_Closes__c` | DateTime |
 | Description | `Description__c` | Long Text Area(32768) |
 | Series | `Series__c` | Lookup(Event), Clear on delete |
+| Registration Form Key | `Registration_Form_Key__c` | Text(18): the Forms form registrants fill in, by record identifier (EV-02, ADR-0014) |
 
 - **Validation rules:** `End_After_Start` (R-EV1), `Capacity_Above_Zero` (R-EV2),
   `Registration_Closes_After_Opens` (R-EV3).
@@ -13232,6 +13233,104 @@ a second assignment of the same speaker to the same session.
 
 - **Validation rules:** `Speaker_Required_When_Created`, `Speaker_From_Same_Event` (R-SSP1).
 - **Automation:** `EventKeyHandler` through the registry row `Session_Speaker_Key` (always runs).
+
+---
+
+## 29EV8. Event Registration
+
+### Definition
+
+One booking for an event (EV-02): the person who registered, the attendees it holds, the promo
+code used and what is owed. BarnCRM records the amount owed and never takes a payment (plan
+Section 1.5). Design: ADR-NEXT `NEXT-event-registrations.md`.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Event | reference to Event | yes | The event booked. |
+| Registrant | reference to Person | yes, when created | The Core person who registered, matched or created (R-ERG1). |
+| Status | picklist | yes | Registered, Waitlisted (every attendee waits for a seat) or Cancelled. |
+| Promo Code | reference to Promo Code | no | The code applied (R-ERG2). |
+| Amount Owed | currency | no | The attendees' prices with the code applied. |
+| Source | picklist | yes | Staff, Form or Summit Events. Default Staff. |
+| Form Submission Key | text | no | The Forms submission's record identifier, as text (ADR-0014). |
+
+### Rules
+
+**R-ERG1 A registrant is a Core person, never a duplicate.** Found by Core's matcher (email, then
+last name and postal code, each narrowed by first name, then the org's duplicate rules); a key
+several people hold is never guessed. A guest is looked for in the registrant's household first,
+and a new guest joins that household.
+
+**R-ERG2 A code is the event's own, active, inside its dates, for the ticket and under its use
+limit.** Uses are the event's registrations with the code that are not cancelled.
+
+**R-ERG3 Registrations are private.** Only holders of an Events permission set see them.
+
+### Salesforce implementation
+
+- **Object:** `Event_Registration__c`, name field Auto Number (`REG-{000000}`), sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Lookup(Event), required, Restrict delete |
+| Registrant | `Contact__c` | Lookup(Contact), Clear on delete |
+| Status | `Status__c` | Picklist (Registered, Waitlisted, Cancelled), restricted, required |
+| Promo Code | `Promo_Code__c` | Lookup(Promo Code), Clear on delete |
+| Amount Owed | `Amount_Owed__c` | Currency(16, 2) |
+| Source | `Source__c` | Picklist (Staff, Form, Summit Events), restricted, required |
+| Form Submission Key | `Form_Submission_Key__c` | Text(18) |
+
+- **Service:** `EventRegistrationService` (user mode, one savepoint) with `EventPersonMatcher`
+  (Core's `ImportMatcher` and `ImportDuplicateRuleMatcher`). Forms reaches it through
+  `EventFormAttachment` (Core's `FormAttachmentExtension`); the event names its form in
+  `Registration_Form_Key__c` (29EV1).
+
+---
+
+## 29EV9. Event Attendee
+
+### Definition
+
+One person attending an event on a registration (EV-02), with the ticket they hold and whether
+they came.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Registration | reference to Event Registration | yes | The booking it belongs to. |
+| Person | reference to Person | yes, when created | The Core person attending. |
+| Ticket Type | reference to Ticket Type | no | The ticket held. |
+| Price | currency | no | The ticket's price with the registration's code applied (R-PC5). |
+| Status | picklist | yes | Registered, Waitlisted, Cancelled, Attended or No-Show. |
+
+### Rules
+
+**R-EAT1 Seats.** Attendees Registered, Attended or No-Show take a seat. With no seat left on the
+event's capacity or the ticket's quantity, a new attendee is Waitlisted; Move Off Waitlist checks
+the seats again.
+
+**R-EAT2 A person attends an event once.** A person who already holds an attendee on the event
+that is not cancelled is not added again.
+
+### Salesforce implementation
+
+- **Object:** `Event_Attendee__c`, name field Text (the person's name), master-detail to Event
+  Registration (`Event_Registration__c`, relationship Attendees), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Registration | `Event_Registration__c` | Master-Detail(Event Registration) |
+| Person | `Contact__c` | Lookup(Contact), Clear on delete |
+| Ticket Type | `Ticket_Type__c` | Lookup(Ticket Type), Clear on delete |
+| Price | `Price__c` | Currency(16, 2) |
+| Status | `Status__c` | Picklist (Registered, Waitlisted, Cancelled, Attended, No-Show), restricted, required |
+
+- **Panel:** the Registrations tab of the event page (`eventRegistrations`), with
+  `EventRegistrationsController` (thin, user mode); counts, status badges and menu items come
+  from the framework-free module `eventRegistrationsModel.js` (plan 9.9).
 
 ---
 
@@ -13728,6 +13827,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Event Session | Event Management | 1.2 (EV-04) | 29EV5 |
 | Event Speaker | Event Management | 1.2 (EV-05) | 29EV6 |
 | Session Speaker | Event Management | 1.2 (EV-05) | 29EV7 |
+| Event Registration | Event Management | 1.2 (EV-02) | 29EV8 |
+| Event Attendee | Event Management | 1.2 (EV-02) | 29EV9 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |

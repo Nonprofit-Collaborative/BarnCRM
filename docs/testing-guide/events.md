@@ -116,3 +116,27 @@ removal.
 | 10 | As read-only, open **Speakers**. | The list shows; no **Add Speaker**. |
 
 **Cleanup:** None.
+
+## T-EV-07: Registrations and the Waitlist
+
+**Purpose:** confirm hand registration matches Core people without duplicates, puts guests in the
+household, applies codes, waitlists when full and changes attendance.
+**Prerequisites:** staff; an event with Capacity `2`, an active ticket type `General` priced `40`
+and a promo code `HALF` (Percent, 50, Maximum Uses 1); a person `Jane Doe`, email
+`jane@example.org`, in a household.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event, click **Registrations**. | An empty state and **New Registration**. |
+| 2 | **New Registration**: type First Name `Jane`, Last Name `Doe`, Email `JANE@example.org`; Promo Code `half`; **Register**. | Registered 1. A row `Jane Doe`, **General**, price 20, **Registered**. No new person: People still has one Jane Doe. |
+| 3 | **New Registration**: pick `Jane Doe` in **Existing Person**, **Register**. | Refused: nobody new to register, Jane Doe already registered. |
+| 4 | **New Registration**: type `Sam` `Lee`; **Add Guest** `Max` `Lee`; Promo Code `HALF`; **Register**. | Refused: the code has been used as many times as it allows. Nothing saved. |
+| 5 | Clear the code, **Register**. | Registered 1, waitlisted 1: Sam holds the last seat, Max is **Waitlisted**. Max is a new person in Sam's household. |
+| 6 | Max's menu **Move Off Waitlist**. | Refused: no seat is free. |
+| 7 | Jane's menu **Cancel Registration**, confirm. Then Max's menu **Move Off Waitlist**. | Jane is **Cancelled**; Max is **Registered**. |
+| 8 | Sam's menu **Mark Attended**; Max's menu **Mark No-Show**. | The badges show **Attended** and **No-Show**; the summary counts 1 attended. |
+| 9 | As read-only, open **Registrations**. | The list shows; no **New Registration** and no menus. |
+| 10 | As a user with no Events set, open the **Event Registrations** list in a report. | No registrations are visible. |
+
+**Cleanup:** None.
