@@ -23,13 +23,14 @@ public with sharing class FormRules {
 
 	/** Reads a definition's JSON into maps and lists. */
 	public static Map<String, Object> parse(String definitionJson) {
+		Object parsed;
 		try {
-			Object parsed = JSON.deserializeUntyped(definitionJson);
-			if (parsed instanceof Map<String, Object>) {
-				return (Map<String, Object>) parsed;
-			}
+			parsed = JSON.deserializeUntyped(definitionJson);
 		} catch (JSONException notJson) {
-			// Falls through to the one refusal below.
+			parsed = null;
+		}
+		if (parsed instanceof Map<String, Object>) {
+			return (Map<String, Object>) parsed;
 		}
 		throw new DefinitionException(BarnHelp.text('Forms', 'Forms_Definition_NotJson'));
 	}
