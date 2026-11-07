@@ -36,7 +36,12 @@ ORG_LIMIT = 6_000_000
 CAPS = {
     # Set 2026-11-05 to each package's size with Apex indented by tabs (the org counts every
     # leading space, so tabs cut about 19 percent) plus about 2 percent.
-    "core": 1_982_000,
+    # Raised 2026-11-06 for the Automation tab's whole-org inventory (C-60, D-184:
+    # OrgAutomationInventory and OrgAutomationController), then for Scan Org Automation through
+    # the org connection (OrgToolingApi, OrgAutomationScan; ADR-NEXT, D-184), then for Deactivate
+    # Org Flows and Validation Rules with its snapshot and Restore (OrgAutomationDeactivation,
+    # the controller's deactivate and restore; ADR-NEXT, D-184).
+    "core": 2_006_000,
     "rollups": 374_000,
     # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
     # Quick Gift Entry tribute, match and split (people-giving-13, 16, 23), and the New

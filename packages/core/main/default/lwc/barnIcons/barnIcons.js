@@ -16,6 +16,7 @@ const ICONS = Object.freeze({
   // Core
   Address__c: 'custom:custom78',
   Affiliation__c: 'custom:custom33',
+  Automation: 'custom:custom32',
   BarnCRM_Home: 'custom:custom1',
   BarnCRM_Settings: 'custom:custom67',
   Bulk_Update: 'custom:custom19',

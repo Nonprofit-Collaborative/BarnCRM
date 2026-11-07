@@ -1,0 +1,61 @@
+<template>
+    <section data-id="deactivate">
+        <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.title}</h3>
+        <p class="slds-var-m-bottom_small" data-id="deactivate-intro">{labels.intro}</p>
+
+        <template lwc:if={errorMessage}>
+            <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="error" data-id="deactivate-error" message={errorMessage}></c-barn-notice>
+        </template>
+
+        <template lwc:if={hasRows}>
+            <lightning-datatable
+                data-id="choose"
+                key-field="key"
+                data={rows}
+                columns={chooseColumns}
+                selected-rows={selectedIds}
+                onrowselection={handleSelect}
+            ></lightning-datatable>
+            <lightning-button
+                data-id="deactivate-button"
+                class="slds-show slds-var-m-top_x-small"
+                variant="destructive"
+                label={labels.deactivate}
+                onclick={handleDeactivate}
+                disabled={deactivateDisabled}
+            ></lightning-button>
+        </template>
+        <template lwc:else>
+            <p class="slds-text-body_small slds-text-color_weak" data-id="none-to-choose">{labels.noneToChoose}</p>
+        </template>
+
+        <template lwc:if={hasSnapshots}>
+            <h3 class="slds-text-heading_small slds-var-m-top_medium slds-var-m-bottom_x-small">{labels.snapshots}</h3>
+            <template for:each={snapshotViews} for:item="snapshot">
+                <div key={snapshot.id} class="slds-box slds-box_x-small slds-var-m-bottom_small" data-id="snapshot">
+                    <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-var-m-bottom_x-small">
+                        <p class="slds-col slds-text-title_bold" data-id="snapshot-heading">{snapshot.heading}</p>
+                        <template lwc:if={snapshot.canRestore}>
+                            <lightning-button
+                                data-id="restore"
+                                data-snapshot={snapshot.id}
+                                label={labels.restore}
+                                onclick={handleRestore}
+                            ></lightning-button>
+                        </template>
+                    </div>
+                    <template lwc:if={snapshot.running}>
+                        <p class="slds-text-body_small slds-var-m-bottom_x-small" data-id="snapshot-running" aria-live="polite">{runningText}</p>
+                    </template>
+                    <lightning-datatable
+                        data-id="snapshot-items"
+                        key-field="recordId"
+                        data={snapshot.items}
+                        columns={itemColumns}
+                        hide-checkbox-column
+                    ></lightning-datatable>
+                </div>
+            </template>
+        </template>
+    </section>
+</template>

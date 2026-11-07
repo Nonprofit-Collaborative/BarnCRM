@@ -127,7 +127,14 @@ ALLOWED = {
     "Report": "reports not run for a year, read by Org Optimizer's Unused setup section (owner decision 2026-10-13). Platform feature, every edition; queried dynamically, so it cannot break the compile.",
     "PermissionSetGroupComponent": "which permission sets are inside a group, so Unused setup does not call them unassigned. Platform feature, every edition; queried dynamically.",
     "FlowDefinitionView":"inactive flows, read by Org Optimizer's Unused setup section (owner decision 2026-10-13). Platform feature, every edition; queried dynamically.",
-    "SetupAuditTrail": "the Setup changes the nightly Setup Changes copy keeps beyond 180 days (C-56, R-SC1). Platform setup object, every edition; queried dynamically, read only.",
+    # Tooling API objects, read by Scan Org Automation through the org connection (ADR-NEXT,
+    # D-184). Named only in callout query strings, so they cannot break the compile.
+    "CustomField": "the BarnCRM Automation Control fields a formula or flow refers to, for Covered by Pause All (R-AS3). Tooling API, every edition with API access.",
+    "MetadataComponentDependency": "what refers to Check BarnCRM Automation or the setting, for Covered by Pause All (R-AS3). Tooling API, every edition with API access.",
+    "ValidationRule": "the org's validation rules on the Automation tab (R-AS3), and the ones Deactivate Org Flows and Validation Rules turns off and restores (R-AS4 to R-AS8). Tooling API, every edition with API access.",
+    "FlowDefinition": "a flow's active version, saved before Deactivate Org Flows and Validation Rules turns it off and put back by Restore (R-AS4 to R-AS8). Tooling API, every edition with API access.",
+    "WorkflowRule": "the org's workflow rules on the Automation tab (R-AS3). Tooling API, every edition with API access.",
+    "SetupAuditTrail":"the Setup changes the nightly Setup Changes copy keeps beyond 180 days (C-56, R-SC1). Platform setup object, every edition; queried dynamically, read only.",
     # Setup objects. These are how a package inspects or assigns its own access.
     "PermissionSet": "the packaged permission sets, plan Section 4.8.",
     "PermissionSetAssignment": "assigning them, and asserting the assignment in tests.",

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Core_OrgAutomation_Owner</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory column: who owns the automation.</shortDescription>
+        <value>Owner</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_Covered</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory column: whether Pause All stops it.</shortDescription>
+        <value>Covered by Pause All</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_OwnerOrg</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory owner: the org itself.</shortDescription>
+        <value>This Org</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_NotChecked</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory: coverage not checked yet.</shortDescription>
+        <value>Not Checked</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_TypeBarn</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory type: a BarnCRM automation switch.</shortDescription>
+        <value>BarnCRM Automation</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_TypeProcess</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory type: a process builder process.</shortDescription>
+        <value>Process Builder</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_TypeValidation</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory type: a validation rule.</shortDescription>
+        <value>Validation Rule</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_TypeWorkflow</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory type: a workflow rule.</shortDescription>
+        <value>Workflow Rule</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_AlwaysRuns</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory status: always runs.</shortDescription>
+        <value>Always Runs</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_HowTo</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory row action and section title.</shortDescription>
+        <value>How to Make This Respect Pause All</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_Scan</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory button: read rules and coverage through the org connection.</shortDescription>
+        <value>Scan Org Automation</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_DeactivateTitle</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation tab section and confirm title: the deactivate tool.</shortDescription>
+        <value>Deactivate Org Flows and Validation Rules</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_DeactivateSelected</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation tab button: snapshot and deactivate the chosen items.</shortDescription>
+        <value>Deactivate Selected</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_Snapshots</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation tab heading: the list of deactivation runs.</shortDescription>
+        <value>Deactivation Snapshots</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_ConfirmPhrase</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>The phrase typed to confirm a deactivation in production.</shortDescription>
+        <value>DEACTIVATE</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_ResultDeactivated</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Deactivation item result: turned off.</shortDescription>
+        <value>Deactivated</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_ResultLeft</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Deactivation item result: not changed, with the reason beside it.</shortDescription>
+        <value>Left As It Is</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_ResultFailed</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Deactivation item result or run status: the change was refused.</shortDescription>
+        <value>Failed</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_ResultPending</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Deactivation item result: saved in the snapshot, not changed yet.</shortDescription>
+        <value>Waiting</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_ResultRestored</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Deactivation item result or run status: put back from the snapshot.</shortDescription>
+        <value>Restored</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_StatusPartial</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Deactivation run status: some items changed, some failed.</shortDescription>
+        <value>Partly Done</value>
+    </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_StatusRestoring</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Deactivation run status: Restore is running.</shortDescription>
+        <value>Restoring</value>
+    </labels>
+</CustomLabels>

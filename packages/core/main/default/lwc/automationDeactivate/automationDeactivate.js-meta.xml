@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Deactivate Org Flows and Validation Rules on the Automation tab (C-60, D-184): a snapshot
+    first, then the change, each item's result, and Restore.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

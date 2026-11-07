@@ -19,7 +19,7 @@ takes the apps in a queued job: wait a minute and reload before checking the App
 | 3 | Open a household. | It replaces the page and shows the BarnCRM household page. |
 | 4 | Open **BarnCRM Console** and its navigation menu (the arrow next to the app name). | **Home**, **Contacts**, **Households**, **Organizations**, **Addresses**, **Relationships**, **Affiliations**, **Household Members**, **Data Manager**. |
 | 5 | Open a household, then one of its addresses. | The household opens in its own tab; the address opens as a subtab under it. |
-| 6 | Open **BarnCRM Admin**. | Standard navigation, with a navy header. Tabs: **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching**, **Error Log** (last). **Super Importer**, **Super Transformer** and **Import Rows** are not in the navigation. It opens on **BarnCRM Settings**. |
+| 6 | Open **BarnCRM Admin**. | Standard navigation, with a navy header. Tabs: **BarnCRM Settings**, **Data Manager**, **Org Optimizer**, **Duplicate Matching**, **Automation**, **Error Log** (last). **Super Importer**, **Super Transformer** and **Import Rows** are not in the navigation. It opens on **BarnCRM Settings**. |
 | 7 | Open **BarnCRM Admin Console** and its navigation menu. | The same five tabs, opening as workspace tabs, with **Error Log** last. With a module deployed (for example the Rollup Builder), its admin tabs come before **Error Log**. |
 | 8 | As staff, open the App Launcher and type `BarnCRM`. | **BarnCRM** and **BarnCRM Console** are listed. **BarnCRM Admin** and **BarnCRM Admin Console** are not. |
 | 9 | As admin, on **BarnCRM Settings**, **Access**, remove the staff user's role. Wait a minute; as staff, reload and open the App Launcher. | No BarnCRM app is listed. |

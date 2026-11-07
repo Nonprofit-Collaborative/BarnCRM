@@ -955,6 +955,80 @@ names recompute and the waiting rollups.
 
 ---
 
+## 10A. Automation Snapshot
+
+### Definition
+
+One read of the org's automation through the org connection (a Scan), or one run of
+**Deactivate Org Flows and Validation Rules** (a Deactivation), with each item's state before
+and after (C-60, plan D-184, ADR-NEXT "Deactivate org automation with a snapshot and restore").
+Neutral: it names no nonprofit concept and is in Core.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | The snapshot's identifier, assigned automatically. |
+| Kind | choice | yes | Scan or Deactivation. |
+| Status | choice | yes | Running, Done, Partial (some items failed), Failed (nothing could be done), Restoring, Restored. |
+| Items | long text | no | The items as JSON (R-AS2). |
+| Message | long text | no | Why a whole run failed, in words. |
+| Restored At | datetime | no | When a Restore of a deactivation finished. |
+
+### Rules
+
+**R-AS1 Who and how.** Only someone who may use the org connection (Manage BarnCRM Metadata and
+Manage BarnCRM Settings, plus Customize Application and Modify Metadata, as ADR-0148) starts a
+scan, a deactivation or a restore, and only once the connection is set up with callouts on. Each
+runs as a queued job that calls the org's own Tooling API through `Barn_Org_Connection` with the
+job's session; nothing calls an outside service.
+**R-AS2 Items.** A scan's Items hold the org's validation rules (Id, name, object, active,
+namespace) and workflow rules (Id, name, object, namespace), and the flows, triggers and rules
+whose metadata refers to Check BarnCRM Automation or the `BarnCRM_Automation_Control__c` fields
+(`MetadataComponentDependency`). A deactivation's Items hold, per item: kind (Flow or
+ValidationRule), Id, API name, object, the state before (active; a flow's active version
+number), the result (Changed, Unchanged, Failed with the reason) and, after a restore, the
+restore result.
+**R-AS3 Scan.** One scan is kept: a new scan deletes the older ones once it is saved. The
+inventory (R-OA1) adds the scan's validation and workflow rules and sets Covered by Pause All
+for the org's flows from it.
+**R-AS4 Snapshot first.** A deactivation reads every chosen item's current state from the
+Tooling API and saves it before changing anything. Only an org's own (no namespace, not
+BarnCRM's) active flow or validation rule is changed; anything else is Unchanged with the
+reason. A flow is deactivated by setting its definition's active version to 0; a validation
+rule by saving its metadata with active false.
+**R-AS5 Partial results.** Each item's result is saved; a failure on one never stops the rest.
+An item waits as Pending between the snapshot and its change. Status is Done when every item
+that could change did and none failed, Partial when some changed and some failed, Failed when
+none changed.
+**R-AS6 Restore.** Restore puts back exactly the snapshot for each item that changed: the
+flow's active version number, the rule's active state. Items that did not change are left
+alone. One run at a time: a deactivation or restore is refused while another is Running or
+Restoring.
+**R-AS7 Production.** In production the page shows a warning and needs the confirmation phrase
+typed; in a sandbox a plain confirmation.
+**R-AS8 Kept.** Deactivation snapshots are kept until deleted, so a restore stays possible.
+
+### Salesforce implementation
+
+- **Object** `Automation_Snapshot__c`, auto number Name `ASN-{000000}`, private sharing,
+  reports on, no activities, feeds or history. Only `BarnCRM_Admin` is granted it: Read,
+  Create, Edit, Delete, View All and Modify All.
+
+| Attribute | API name | Type | Notes |
+|---|---|---|---|
+| Kind | `Kind__c` | Picklist, restricted | Scan, Deactivation. |
+| Status | `Status__c` | Picklist, restricted | Running, Done, Partial, Failed, Restoring, Restored. |
+| Items | `Items__c` | Long Text Area(131072) | JSON. |
+| Message | `Message__c` | Long Text Area(32768) | |
+| Restored At | `Restored_At__c` | DateTime | |
+
+- **Service:** `OrgToolingApi` (Tooling API calls through the connection), `OrgAutomationScan`
+  (the scan job), `OrgAutomationDeactivation` (deactivate and restore jobs),
+  `OrgAutomationController`.
+
+---
+
 ## 11. Setting Change
 
 ### Definition
@@ -8689,6 +8763,41 @@ other part is still listed; a capped object is named on the page.
 **R-AI4 Not covered.** Validation rules, workflow rules and process builder criteria need the
 Tooling API and are not listed, and the page and guide say so. Flows no
 record triggers (screen, scheduled, called by another flow) belong to no object and are not listed.
+
+### Automation tab inventory (C-60, D-184)
+
+The Automation tab lists every automation in the org in one table
+(`OrgAutomationController.getInventory`, `OrgAutomationInventory`), with whether the BarnCRM
+Automation Control setting covers it. It adds no object or field.
+
+**R-OA1 What is listed.** BarnCRM's switches (`Automation_Setting__c`, an org's own listed
+`Flow:` rows excepted, which are listed as flows), every flow with a trigger type (record before
+or after save, before delete, scheduled, platform event) and every process (`ProcessType`
+Workflow, InvocableProcess, CustomEvent) from `FlowDefinitionView`, active or not, and every Apex
+trigger with its source from `ApexTrigger`. Validation rules and workflow rules come from the
+org connection's scan (Section 10A, R-AS3). Each row: type, name, API name, object (a custom
+object's Id read back to its API name through `EntityDefinition`), status (On, Off or Always
+Runs for a switch; Active or Inactive otherwise), owner, when it runs, Covered by Pause All.
+**R-OA2 Owner.** A namespace that is BarnCRM's is BarnCRM; any other namespace is that managed
+package. With no namespace, BarnCRM's flow templates (by API name) and its triggers (those that
+call `TriggerDispatcher.run(`, and its four platform event triggers by name) are BarnCRM;
+everything else is This Org. A CI test keeps the two name lists in step with the packages.
+**R-OA3 Covered by Pause All.** Yes for a BarnCRM switch and template and a dispatcher trigger;
+No for an Always Runs switch and BarnCRM's platform event triggers (R-A3) and for a managed
+package's flow. An org trigger is Yes when its source calls the dispatcher, Check BarnCRM
+Automation, `AutomationControl` or names `BarnCRM_Automation_Control__c`, else No. An org flow
+is Not Checked until the org connection's scan reads what refers to Check BarnCRM Automation.
+**R-OA4 User mode, capped, partial.** Every query is user-mode SOQL; 2,000 flows and 500
+triggers at most (the page says when a cap was hit). A part that cannot be read (switches, flows,
+triggers) is named and the rest is listed. Needs `Manage_BarnCRM_Settings`.
+**R-OA5 How to make it respect Pause All.** For an org item not covered (or not checked) the
+page shows what to add: for a flow or process, the Check BarnCRM Automation action and a
+Decision on Run (with `Flow:` and the API name for its own switch); for a trigger, the Apex
+call to `CheckAutomationAction.check`; for a validation or workflow rule, the formula wrapped in
+`AND(NOT($Setup.BarnCRM_Automation_Control__c.Pause_All__c), NOT(...Bypass__c), ...)`. Names
+carry this org's namespace prefix. Filters (object, owner) and the CSV work on the loaded rows.
+**R-OA6 What may be deactivated.** Only an org's own (owner This Org) active flow or validation
+rule; never BarnCRM's or a managed package's.
 
 ---
 

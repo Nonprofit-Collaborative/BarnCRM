@@ -15,6 +15,7 @@ Rules:
 |---|---|---|
 | core | Address__c | Custom78: Map |
 | core | Affiliation__c | Custom33: Desk |
+| core | Automation | Custom32: Factory |
 | core | BarnCRM_Home | Custom1: Heart |
 | core | BarnCRM_Settings | Custom67: Gears |
 | core | Bulk_Update | Custom19: Wrench |
@@ -110,7 +111,8 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 |---|---|---|---|
 | core | addressPanel | custom:custom78 | Address__c |
 | core | affiliationPanel | custom:custom33 | Affiliation__c |
-| core | automationControl | custom:custom67 | BarnCRM_Settings |
+| core | automationControl | custom:custom32 | Automation |
+| core | automationInventory | custom:custom32 | Automation |
 | core | errorLogTile | custom:custom53 | Error_Log__c |
 | core | householdMembersPanel | custom:custom15 | Households |
 | core | householdOfPerson | custom:custom15 | Households |
