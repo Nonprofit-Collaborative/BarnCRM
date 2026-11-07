@@ -278,8 +278,8 @@ public with sharing class EventAppointmentsController {
 	}
 
 	private static String title(String hostName, Datetime start) {
-		String time = start == null ? '' : start.format('h:mm a');
-		return (hostName + ' ' + time).trim().left(80);
+		String clock = start == null ? '' : start.format('h:mm a');
+		return (hostName + ' ' + clock).trim().left(80);
 	}
 
 	private static Slot toSlot(Event_Appointment__c record) {
