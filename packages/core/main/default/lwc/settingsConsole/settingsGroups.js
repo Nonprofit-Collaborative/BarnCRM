@@ -236,7 +236,9 @@ const PAGE_GROUPS = {
         'Attendance_Creates_Hours__c',
         'Shift_Horizon_Weeks__c',
         'Reminders_Enabled__c',
-        'Reminder_Lead_Days__c'
+        'Reminder_Lead_Days__c',
+        'Nudges_Enabled__c',
+        'Nudge_Lead_Days__c'
       ]
     }
   ],
