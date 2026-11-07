@@ -95,6 +95,14 @@ that nothing is set to end: usually one started before this version of BarnCRM, 
 set somewhere other than this page. Open this page, click **Resume Automation**, and pause
 again for a set time if you still need to.
 
+## Automations Whose Feature Is Off
+
+An automation that belongs to a Core feature (Addresses, Relationships, Affiliations,
+Households, Preferred Email) does not run while that feature is off in BarnCRM Settings,
+General, Features. Its row stays in the list, with its own switch as you left it, and underneath
+the description reads "Stopped: its feature is turned off in BarnCRM Settings, General, Features.
+It runs again when the feature is turned on."
+
 ## Automations That Always Run
 
 Pause stops BarnCRM filling things in for you. It never stops BarnCRM refusing

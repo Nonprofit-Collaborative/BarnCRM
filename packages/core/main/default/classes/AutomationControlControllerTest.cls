@@ -118,6 +118,36 @@ private class AutomationControlControllerTest {
 		}
 	}
 
+	/** D-185: a row whose feature is off stays listed and is marked stopped. */
+	@IsTest
+	static void aRowWhoseFeatureIsOffIsListedAndMarkedStopped() {
+		System.runAs(TestUsers.admin()) {
+			TestDataFactory.insertAutomationSettings(
+				new Map<String, Boolean>{
+					'Relationship_Reciprocal' => true,
+					'Account_Address_Capture' => true
+				}
+			);
+			TestDataFactory.defaultSettings();
+			SettingsService.saveSystemValue(
+				'Features_Turned_On__c',
+				FeatureSwitchService.ADDRESSES
+			);
+
+			Test.startTest();
+			AutomationControlController.AutomationPageView page = AutomationControlController.getPage();
+			Test.stopTest();
+
+			Map<String, AutomationControlController.AutomationView> byName = new Map<String, AutomationControlController.AutomationView>();
+			for (AutomationControlController.AutomationView view : page.automations) {
+				byName.put(view.automationName, view);
+			}
+			Assert.isTrue(byName.containsKey('Relationship_Reciprocal'), 'The row stays listed');
+			Assert.isTrue(byName.get('Relationship_Reciprocal').featureOff, 'Marked stopped');
+			Assert.isFalse(byName.get('Account_Address_Capture').featureOff, 'Its feature is on');
+		}
+	}
+
 	@IsTest
 	static void mariaPausesResumesAndSwitchesOneAutomationOff() {
 		System.runAs(TestUsers.admin()) {

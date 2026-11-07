@@ -198,7 +198,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **General**, **Features**, turn **Affiliations** off and save. | Saved. |
 | 2 | Open Harper Garcia, then an organization, then the same records in the Giving, Programs and Volunteers apps. | The **Affiliations** card is gone on every page; the **Addresses** card is still there. |
-| 3 | Open **Automation**. | The Affiliations automation row is still listed (rows are never hidden). |
+| 3 | Open **Automation**. | The Affiliations automation row is still listed (rows are never hidden), and under its description reads "Stopped: its feature is turned off in BarnCRM Settings, General, Features." |
 | 4 | Turn **Affiliations** back on and turn **Addresses** off. Repeat step 2. | The **Affiliations** card is back and the **Addresses** card is gone on every page. |
 | 5 | Turn **Addresses** back on. | The **Addresses** card is back. |
 
