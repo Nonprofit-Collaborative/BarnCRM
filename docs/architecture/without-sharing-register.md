@@ -114,6 +114,12 @@ into five kinds:
 | ContactPointSyncService | Upkeep | The person's managed Contact Points, Individual and Contact Point Links, which the saver may not be able to see or edit | ADR-0021, ADR-0176 contact point sync module |
 | ContactPointBackfillBatch | Org job | Every person in the org, synced as a save would; started only from the Contact Point Sync page by a holder of Manage BarnCRM Settings | ADR-0021, ADR-0176 contact point sync module |
 
+## Forms
+
+| Class | Kind | What it reaches past sharing for | Authority |
+|---|---|---|---|
+| FormIntakeService | Platform | A Site guest user, who has no object access, loads one published public form and version and stores one Received submission; it never reads a person, an organization or any other record, and processing runs later in user mode | ADR-NEXT public forms on a Salesforce Site |
+
 ## Mirror
 
 | Class | Kind | What it reaches past sharing for | Authority |

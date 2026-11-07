@@ -1,7 +1,8 @@
 # Forms
 
-Scripts for the Forms module (C-42a): the Form Builder, conditions, publishing, the Form Runner,
-matching and Process Again. Setup detail: [Forms](../admin-guide/forms.md).
+Scripts for the Forms module (C-42a, C-42b): the Form Builder, conditions, publishing, the Form
+Runner, matching, Process Again, and public forms on a Salesforce Site. Setup detail:
+[Forms](../admin-guide/forms.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and Forms
 deployed. Forms works on the platform-only shape and in both editions. Give the testers their
@@ -88,3 +89,27 @@ written to a related record's object you then remove from the org.
 | 3 | Fill the form in. | The submission is Failed, `Nothing was written:` with the missing field; nothing else changed. |
 
 **Cleanup:** remove the question, publish.
+
+## T-FORM-06: Public Form on a Salesforce Site
+
+**Purpose:** confirm a public form stores answers with no access to records, and processing
+matches and fills blanks only.
+**Prerequisites:** admin; the form from T-FORM-01; a person on file, `Sam Zztest`,
+`sam.zztest@example.org`, mailing postal code `11111`; an active Salesforce Site set up as in
+the Admin Guide (Setup steps 1 to 5).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the Form Builder, turn on **Public on a Salesforce Site**, set **When Found** to **Replace field values with the answers**. | **Fix Before Publishing** says a public form can only fill in blank fields; Publish is unavailable. |
+| 2 | Set **When Found** back to fill blanks, **Publish**. | Published; the panel lists the form's link on the Site. |
+| 3 | Open **Health Check** in the Settings console. | **A Site guest user can't open public forms** and **Public form answers are not being processed**. No finding that a guest can read people. |
+| 4 | Select **Give Forms Public Guest**, confirm; then **Schedule Processing**, confirm. | Both findings clear on the re-run. |
+| 5 | In a private browser window (not signed in), open the link. | The form shows, with its steps; no BarnCRM data shows anywhere. |
+| 6 | Enter `Sam`, `Zztest`, `sam.zztest@example.org`, postal code `22222`, and send. | The thank-you message; nothing says whether Sam was found. |
+| 7 | Leave the page open over a day, then send again. | Asked to reload the page; nothing is stored. |
+| 8 | Signed in, open **Form Submissions**. | A submission with Status **Received**, Source **Public**, no Person. |
+| 9 | Wait for the next quarter hour (or run Health Check's schedule again later), reopen it. | Status **Processed**; Person is Sam Zztest (no new contact); Sam's postal code is still `11111`. |
+| 10 | Set the form's **Status** to **Closed** and reload the public page. | "This form isn't open right now." |
+
+**Cleanup:** delete the submission, set the form back to Published or delete it, delete the
+Site if you made one only for this.

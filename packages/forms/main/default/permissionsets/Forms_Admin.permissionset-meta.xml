@@ -14,6 +14,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>FormPublicRest</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>FormRunnerController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -57,6 +61,11 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>false</editable>
+    <field>Form_Submission__c.Source__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>true</editable>
     <field>Form_Version__c.Definition__c</field>
     <readable>true</readable>
@@ -69,6 +78,11 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Form__c.Description__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Form__c.Public__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

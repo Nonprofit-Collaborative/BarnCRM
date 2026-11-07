@@ -30,6 +30,12 @@ public with sharing class FormBuilderController {
 		/** Whether the person may change the form. */
 		@AuraEnabled
 		public Boolean canEdit = false;
+		/** Whether the published version may be filled in on a Site (C-42b). */
+		@AuraEnabled
+		public Boolean isPublic = false;
+		/** The public form's address on each active Site, when it is public. */
+		@AuraEnabled
+		public List<String> publicLinks = new List<String>();
 	}
 
 	/** An object or a field to choose, with the field's type. */
@@ -144,18 +150,26 @@ public with sharing class FormBuilderController {
 				);
 			}
 			FormSubmitService.checkTargets(definition);
+			Boolean isPublic = FormPublicPolicy.isPublic(definition);
+			String refused = isPublic ? FormPublicPolicy.problem(definition) : null;
+			if (refused != null) {
+				throw new FormSubmitService.FormException(refused);
+			}
 			BuilderView current = view(formId);
 			Integer next = (current.publishedVersion == null ? 0 : current.publishedVersion) + 1;
-			insert as user new Form_Version__c(
+			Form_Version__c version = new Form_Version__c(
 				Form__c = formId,
 				Version__c = next,
 				Definition__c = definitionJson
 			);
+			insert as user version;
+			FormIntakeService.giveKey(version.Id);
 			update as user new Form__c(
 				Id = formId,
 				Definition__c = definitionJson,
 				Status__c = 'Published',
-				Published_Version__c = next
+				Published_Version__c = next,
+				Public__c = isPublic
 			);
 			return view(formId);
 		} catch (FormRules.DefinitionException e) {
@@ -172,7 +186,7 @@ public with sharing class FormBuilderController {
 
 	private static BuilderView view(Id formId) {
 		List<Form__c> forms = [
-			SELECT Id, Name, Status__c, Definition__c, Published_Version__c
+			SELECT Id, Name, Status__c, Definition__c, Published_Version__c, Public__c
 			FROM Form__c
 			WHERE Id = :formId
 			WITH USER_MODE
@@ -194,6 +208,12 @@ public with sharing class FormBuilderController {
 		result.canEdit =
 			Schema.SObjectType.Form__c.isUpdateable() &&
 			Schema.SObjectType.Form_Version__c.isCreateable();
+		result.isPublic = form.Public__c == true && form.Status__c == 'Published';
+		if (result.isPublic) {
+			for (String base : FormsSites.activeSiteUrls()) {
+				result.publicLinks.add(base + '/FormsPublic?form=' + form.Id);
+			}
+		}
 		return result;
 	}
 

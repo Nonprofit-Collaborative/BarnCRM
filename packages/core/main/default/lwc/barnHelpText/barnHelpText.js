@@ -18,7 +18,9 @@ import { createHelpStore } from 'c/barnHelpCatalog';
 
 // The URL of another package's catalog: Core's own, with the name swapped. The prefix before
 // the name (a namespace, once there is one) is kept, so nothing is hard-coded. The timestamp
-// segment is dropped: it is Core's, and a module's catalog changes when the module does.
+// segment is dropped: it is Core's, and a module's catalog changes when the module does. The
+// path before /resource/ is kept too, so a page on a Salesforce Site with a path prefix (a
+// public form, C-42b) reads the catalog from its own Site.
 function urlFor(name) {
   const url = String(CORE_HELP_URL || '');
   const at = url.lastIndexOf('BarnHelp_Core');
@@ -27,7 +29,9 @@ function urlFor(name) {
   }
   const lastSlash = url.lastIndexOf('/', at);
   const prefix = url.substring(lastSlash + 1, at);
-  return '/resource/' + prefix + name;
+  const resourceAt = url.indexOf('/resource/');
+  const site = resourceAt > 0 ? url.substring(0, resourceAt) : '';
+  return site + '/resource/' + prefix + name;
 }
 
 function fetchJson(url) {

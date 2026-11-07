@@ -228,3 +228,42 @@ export function countedAnswers(definition, answers) {
   });
   return counted;
 }
+
+const INPUT_TYPES = Object.freeze({
+  text: 'text',
+  email: 'email',
+  phone: 'tel',
+  number: 'number',
+  date: 'date'
+});
+
+/**
+ * The questions of one step as a page draws them: the shown fields with their answer, input
+ * type, options and problem (`{ code, args }` or null). The staff runner and the public page
+ * (C-42b) both draw from this, so they show the same questions the same way.
+ */
+export function questionViews(definition, stepIndex, answers, problems) {
+  const shown = visibility(definition, answers);
+  const step = definition.steps[stepIndex];
+  const given = answers || {};
+  return step.fields
+    .filter((field) => shown[field.key])
+    .map((field) => ({
+      key: field.key,
+      label: field.label,
+      help: field.help,
+      required: field.required,
+      value: given[field.key] === undefined ? '' : given[field.key],
+      checked: given[field.key] === true,
+      isCheckbox: field.type === 'checkbox',
+      isLong: field.type === 'textarea',
+      isPicklist: field.type === 'picklist',
+      isInput: Boolean(INPUT_TYPES[field.type]),
+      inputType: INPUT_TYPES[field.type],
+      options: (field.options || []).map((option) => ({
+        value: String(option.value),
+        label: option.label || String(option.value)
+      })),
+      problem: (problems || {})[field.key] || null
+    }));
+}

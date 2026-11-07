@@ -12613,6 +12613,7 @@ read outside Salesforce (plan 9.9).
 | Status | picklist | yes (Draft) | Draft (never published), Published (filled from its latest version) or Closed (kept, no longer filled in) (R-FM2). |
 | Definition | long text | yes | The working definition as JSON (R-FM1). |
 | Published Version | number | no (set by BarnCRM) | The number of the latest Form Version, empty before the first publish. |
+| Public | checkbox | no (set by BarnCRM) | The published version may be filled in on a Salesforce Site or by an API caller (R-FM3). Copied from the definition's `public.enabled` on publish. |
 
 ### Rules
 
@@ -12636,6 +12637,9 @@ read outside Salesforce (plan 9.9).
   or to `context` (the record the form was filled from). `values` maps a field to a constant. At
   most one person, one organization and ten records.
 - A target: `{ "record": "<record key>", "field": "<field API name>" }`.
+- `public` (optional, C-42b): `{ "enabled", "minSeconds"?, "hourlyLimit"?, "confirmation"? }`.
+  minSeconds 0 to 600 (default 3), hourlyLimit 1 to 1000 (default 50), confirmation up to 1,000
+  characters. A public form may not use onMatch `overwrite`.
 
 The engine (`formDefinition.js`) refuses a definition that breaks any of these, naming the first
 problem; the builder saves only a definition it accepts.
@@ -12643,6 +12647,13 @@ problem; the builder saves only a definition it accepts.
 **R-FM2 Publishing freezes a version.** Publish checks the definition, copies it into a new Form
 Version numbered one more than the last, sets Published Version and Status Published. Closing a
 form stops it being offered; it can be published again.
+
+**R-FM3 What a public form may write (C-42b, ADR-NEXT public forms on a Salesforce Site).** A form
+with `public.enabled` is published only when every record is a person, an organization or a
+custom object that is not a Forms object or a custom setting, every answer is mapped to a field
+the publisher may create that is not a lookup and not encrypted, and no record overwrites on a
+match. The same check runs again before a public submission is processed. Publishing sets Public
+and gives the new version its signing key.
 
 ### Salesforce implementation
 
@@ -12655,6 +12666,7 @@ form stops it being offered; it can be published again.
 | Status | `Status__c` | Picklist (Draft, Published, Closed), restricted, default Draft |
 | Definition | `Definition__c` | Long Text Area(131072) |
 | Published Version | `Published_Version__c` | Number(6, 0) |
+| Public | `Public__c` | Checkbox, default false |
 
 - **Engine:** framework-free modules `formDefinition.js` (parse, check, defaults), `formRules.js`
   (conditions, visibility, answer checks, step order) and `formMapping.js` (what a submission
@@ -12679,6 +12691,7 @@ submission is read against the questions it answered (R-FM2).
 | Form | reference | yes | The form, master-detail. |
 | Version | number | yes | 1 for the first publish, then one more each time. |
 | Definition | long text | yes | The definition as published (R-FM1). |
+| Signing Key | text | no (set by BarnCRM) | A random key, made at publish, that signs the tickets a public form is loaded with (R-FS5). No permission set reads it. |
 
 ### Salesforce implementation
 
@@ -12690,6 +12703,7 @@ submission is read against the questions it answered (R-FM2).
 | Form | `Form__c` | Master-Detail(Form) |
 | Version | `Version__c` | Number(6, 0) |
 | Definition | `Definition__c` | Long Text Area(131072) |
+| Signing Key | `Signing_Key__c` | Text(64) |
 
 - **Permission sets:** Forms Admin creates them by publishing; nobody edits them (no edit
   permission on Definition or Version in any set); every set reads them.
@@ -12710,7 +12724,8 @@ lost.
 |---|---|---|---|
 | Form | reference | yes | The form, master-detail. |
 | Form Version | reference | yes | The version answered. |
-| Status | picklist | yes | Processed, Needs Review (R-FS2) or Failed (R-FS3). |
+| Status | picklist | yes | Received (a public submission waiting, R-FS5), Processed, Needs Review (R-FS2) or Failed (R-FS3). |
+| Source | picklist | yes (Staff) | Staff (filled in by a signed-in user through the runner) or Public (a Site or an API caller, R-FS5). |
 | Answers | long text | yes | The answers as JSON, by field key, hidden fields left out (R-FS1). |
 | Outcome | long text | no | What was written as JSON: each record key with its record identifier and whether it was matched, created or updated. |
 | Message | text | no | Why the submission needs review or failed, in plain words. |
@@ -12738,6 +12753,19 @@ questions were optional and left blank), and so is a related record linking to a
 `FormSubmissionReceipt` in the same transaction (ADR-0175 decision 9). A failing extension is
 logged and the submission is marked Needs Review with its message; the records stay.
 
+**R-FS5 A public submission is only stored (C-42b).** The public entry point checks, in order: a
+filled honeypot (answer "received", store nothing), the ticket's signature and age (24 hours),
+the form's minSeconds, the form's hourlyLimit of public submissions in the last hour, and the
+answers (R-FS1). It then inserts one submission with Status Received and Source Public, and
+returns no record identifier and nothing about matching. A caller that is a signed-in user (an
+integration user) has it processed at once, as itself (R-FS6).
+
+**R-FS6 Processing a public submission (C-42b).** A received submission is processed in user mode
+by the scheduled `FormPublicProcessor` (as the administrator who scheduled it) or by its signed-in
+caller: R-FM3 is checked again, every record uses `fillBlanks`, a `context` link is kept only when
+a module's `FormAttachmentExtension` names this form for that record (else Needs Review), and a
+person matched to a person account is held for review. Otherwise R-FS1 to R-FS4 apply.
+
 ### Salesforce implementation
 
 - **Object:** `Form_Submission__c`, name field Auto Number `FS-{000000}`, master-detail to
@@ -12747,7 +12775,8 @@ logged and the submission is marked Needs Review with its message; the records s
 |---|---|---|
 | Form | `Form__c` | Master-Detail(Form) |
 | Form Version | `Form_Version__c` | Lookup(Form Version), restrict delete |
-| Status | `Status__c` | Picklist (Processed, Needs Review, Failed), restricted |
+| Status | `Status__c` | Picklist (Received, Processed, Needs Review, Failed), restricted |
+| Source | `Source__c` | Picklist (Staff, Public), restricted, default Staff |
 | Answers | `Answers__c` | Long Text Area(131072) |
 | Outcome | `Outcome__c` | Long Text Area(32768) |
 | Message | `Message__c` | Text(255) |
@@ -12760,7 +12789,12 @@ logged and the submission is marked Needs Review with its message; the records s
   `FormSubmissionController` (thin). Core: `FormAttachmentExtension`, `FormAttachmentExtensions`,
   `FormSubmissionReceipt`.
 - **Permission sets:** Forms Admin and Forms Staff create submissions and set Person and
-  Organization; Forms Read Only reads them. Only Forms Admin deletes them.
+  Organization; Forms Read Only reads them. Only Forms Admin deletes them. Source is read only in
+  every set. `Forms_Public_Guest` (for a Site guest user) grants no object or field, only the
+  class `FormPublicController` and the page `FormsPublic`.
+- **Public classes (C-42b):** `FormPublicPolicy` (R-FM3), `FormIntakeService` (R-FS5, the only
+  `without sharing` class), `FormPublicController` and `FormPublicRest` (thin),
+  `FormPublicProcessor` (R-FS6), `FormsHealthCheckExtension` (Site and guest checks).
 
 ---
 
@@ -14096,6 +14130,7 @@ mirrors the primary member).
 | 1.1 | 2026-11-06 | Volunteer unfilled shift nudges (V-10b, D-165). `Volunteer_Shift__c` (29K) gains `Nudge_Sent_On__c` (DateTime); `Volunteer_Settings__c` (29N) gains `Nudges_Enabled__c` (false) and `Nudge_Lead_Days__c` (3, 1 to 14). New rule R-VU6a (29L): one nudge per unfilled shift to the job's regular volunteers, from the 7:15 AM nightly step. |
 | 1.0 | 2026-11-06 | Shipped organization record type (owner decision D-184, ADR-0173, amends ADR-0141 decision 2). Account gains the record type `BarnCRM_Organization` (active, given to nobody). Section 8 gains R-O4a: offered for organizations only where the org has no record type of its own, never detected, never switched to automatically; R-O5 leaves it out of the candidates. |
 | 1.1 | 2026-11-06 | Forms module (C-42a, D-157, ADR-0175 `0175-forms-module.md`). New package BarnCRM Forms with Sections 29ZW Form (`Form__c`), 29ZX Form Version (`Form_Version__c`) and 29ZY Form Submission (`Form_Submission__c`), rules R-FM1, R-FM2 and R-FS1 to R-FS4. Core gains no object or field: only the `FormAttachmentExtension` seam and the catalog row `BarnCRM_Module.Forms`. |
+| 1.1 | 2026-11-07 | Public forms (C-42b, D-157, ADR-NEXT public forms on a Salesforce Site). `Form__c` gains `Public__c` (Checkbox); `Form_Version__c` gains `Signing_Key__c` (Text 64); `Form_Submission__c` gains `Source__c` (Staff, Public) and Status value Received. R-FM1 gains the `public` block; new rules R-FM3, R-FS5 and R-FS6. |
 | 1.1 | 2026-11-06 | BarnCRM Contact Point Sync module (C-45, D-111, ADR-0176 contact point sync module). New package `contactpoints`: Contact Point Link (`Contact_Point_Link__c`, 29ZZ, rules R-CPL1 to R-CPL4) and Contact Point Sync Settings (`Contact_Point_Sync_Settings__c`, 29ZZ1, R-CPS1). No Core object or field added. |
 | 1.1 | 2026-11-07 | Contact Point Sync: person accounts and household moves (C-45e, D-186, ADR-0176 decisions 14 and 15). Rules R-CPL5 and R-CPL6 added to Contact Point Link. Two Automation Registry rows (`Contact_Point_Sync_Account`, `Contact_Point_Sync_Membership`). No object or field added. |
 | 1.2 | 2026-11-06 | Event Management module (EV-01, EV-03, EV-04, EV-05; ADR-0177 `0177-events-module.md`, D-123, D-177). Seven objects in the new package `packages/events`: Event (`Event__c`, 29EV1), Ticket Type (`Ticket_Type__c`, 29EV2), Promo Code (`Promo_Code__c`, 29EV3), Event Track (`Event_Track__c`, 29EV4), Event Session (`Event_Session__c`, 29EV5), Event Speaker (`Event_Speaker__c`, 29EV6) and Session Speaker (`Session_Speaker__c`, 29EV7), with rules R-EV1 to R-EV4, R-TT1 to R-TT4, R-PC1 to R-PC5, R-ETR1, R-ESN1 to R-ESN5, R-ESP1 to R-ESP3 and R-SSP1. Registrations, attendees, call for speakers and sponsorship are designed in the ADR and added by their items. |

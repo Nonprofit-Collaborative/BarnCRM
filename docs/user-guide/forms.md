@@ -33,6 +33,14 @@ the same way, and the answers are linked to that record.
 2. Its **Submission** tab shows the **Status**, the answers by question, and under **Records
    Written** each record found or added, with a link to it.
 
+## Answers From a Public Form
+
+Your admin can put a form on a public web page. Answers sent there show on the **Form
+Submissions** tab with **Source Public** and status **Received** until BarnCRM writes them to
+your records, within about 15 minutes. A public form only fills in fields that are blank on a
+person already in BarnCRM; it never replaces what you know. If the answers look wrong, change
+the records by hand; a submission held for review is finished the same way as any other.
+
 ## To Finish a Submission Held for Review
 
 A submission is held, with status **Needs Review**, when more than one person (or organization)

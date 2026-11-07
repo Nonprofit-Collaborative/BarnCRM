@@ -71,7 +71,9 @@ CAPS = {
     "funders": 100_500,
     # Forms engine and builder (C-42a, D-157): submit service, server rules, thin controllers.
     # Batch C landing 2026-11-07: 42,867 measured (C-42a), plus about 2.5%.
-    "forms": 44_000,
+    # C-42b public forms (guest intake, allowlist, processor, Health Check, REST): 70,142
+    # measured, plus about 2.5%.
+    "forms": 72_000,
     # New 2026-11-06 for Contact Point Sync (C-45, ADR-0176 contact point sync module):
     # 43,980 measured with the page and backfill, plus about 2 percent.
     # C-45e (D-186): 45,798 measured with person accounts and household-move sync, plus about 2%.

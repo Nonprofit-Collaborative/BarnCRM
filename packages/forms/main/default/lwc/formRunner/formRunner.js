@@ -9,13 +9,11 @@ import {
   countedAnswers,
   nextStep,
   previousStep,
-  visibility,
+  questionViews,
   visibleSteps
 } from 'c/formRules';
 import { HELP, LABELS, answerText, messageFrom, resultText } from 'c/formText';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
-
-const INPUT_TYPES = { text: 'text', email: 'email', phone: 'tel', number: 'number', date: 'date' };
 
 /**
  * The Form Runner (C-42a; ADR-0175 `0175-forms-module.md`, decision 12): a published form filled
@@ -170,32 +168,10 @@ export default class FormRunner extends NavigationMixin(LightningElement) {
   }
 
   get questions() {
-    const shown = visibility(this.model, this.answers);
-    const step = this.model.steps[this.current];
-    return step.fields
-      .filter((field) => shown[field.key])
-      .map((field) => {
-        const problem = this.problems[field.key];
-        return {
-          key: field.key,
-          label: field.label,
-          help: field.help,
-          required: field.required,
-          value: this.answers[field.key] === undefined ? '' : this.answers[field.key],
-          checked: this.answers[field.key] === true,
-          isCheckbox: field.type === 'checkbox',
-          isLong: field.type === 'textarea',
-          isPicklist: field.type === 'picklist',
-          isInput: Boolean(INPUT_TYPES[field.type]),
-          inputType: INPUT_TYPES[field.type],
-          options: (field.options || []).map((option) => ({
-            value: String(option.value),
-            label: option.label || String(option.value)
-          })),
-          error: problem ? answerText(problem) : '',
-          className: problem ? 'slds-form-element slds-has-error' : 'slds-form-element'
-        };
-      });
+    return questionViews(this.model, this.current, this.answers, this.problems).map((question) => ({
+      ...question,
+      error: question.problem ? answerText(question.problem) : ''
+    }));
   }
 
   handleAnswer(event) {

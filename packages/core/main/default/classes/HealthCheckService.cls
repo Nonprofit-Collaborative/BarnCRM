@@ -51,6 +51,7 @@ public with sharing class HealthCheckService {
 	public static final String SEVERITY_INFO = 'Info';
 	@NamespaceAccessible
 	public static final String SEVERITY_WARNING = 'Warning';
+	@NamespaceAccessible
 	public static final String SEVERITY_ERROR = 'Error';
 
 	@NamespaceAccessible

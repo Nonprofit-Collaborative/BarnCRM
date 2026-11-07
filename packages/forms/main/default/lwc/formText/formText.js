@@ -242,8 +242,64 @@ const DEFINITION_PROBLEMS = {
   badValue: (a) => helpText('Forms', 'Forms_Problem_badValue', ...a),
   personNeedsLastName: (a) => helpText('Forms', 'Forms_Problem_personNeedsLastName', ...a),
   personNeedsEmail: (a) => helpText('Forms', 'Forms_Problem_personNeedsEmail', ...a),
-  organizationNeedsName: (a) => helpText('Forms', 'Forms_Problem_organizationNeedsName', ...a)
+  organizationNeedsName: (a) => helpText('Forms', 'Forms_Problem_organizationNeedsName', ...a),
+  badPublic: (a) => helpText('Forms', 'Forms_Problem_badPublic', ...a),
+  badPublicSeconds: (a) => helpText('Forms', 'Forms_Problem_badPublicSeconds', ...a),
+  badPublicLimit: (a) => helpText('Forms', 'Forms_Problem_badPublicLimit', ...a),
+  badPublicConfirmation: (a) => helpText('Forms', 'Forms_Problem_badPublicConfirmation', ...a),
+  publicOverwrite: (a) => helpText('Forms', 'Forms_Problem_publicOverwrite', ...a)
 };
+
+/** The public form page's words (C-42b): what became of the answers sent, by status. */
+const PUBLIC_RESULTS = {
+  Received: () => helpText('Forms', 'Forms_Public_Received'),
+  Retry: () => helpText('Forms', 'Forms_Public_Retry'),
+  Expired: () => helpText('Forms', 'Forms_Public_Expired'),
+  Busy: () => helpText('Forms', 'Forms_Public_Busy'),
+  Closed: () => helpText('Forms', 'Forms_Public_Closed'),
+  Failed: () => helpText('Forms', 'Forms_Public_Failed')
+};
+
+/** The words for a public result: the form's own confirmation when received, if it has one. */
+export function publicResultText(status, confirmation) {
+  if (status === 'Received' && confirmation) {
+    return confirmation;
+  }
+  return (PUBLIC_RESULTS[status] || PUBLIC_RESULTS.Failed)();
+}
+
+/** The hidden question a person never sees and a script fills in (the honeypot). */
+export function trapLabel() {
+  return helpText('Forms', 'Forms_Public_Trap');
+}
+
+/** The Form Builder's public settings, worded from the help catalog. */
+export const PUBLIC_SETTING_TEXT = Object.freeze({
+  get heading() {
+    return helpText('Forms', 'Forms_Builder_PublicHeading');
+  },
+  get intro() {
+    return helpText('Forms', 'Forms_Builder_PublicIntro');
+  },
+  get enabled() {
+    return helpText('Forms', 'Forms_Builder_PublicEnabled');
+  },
+  get minSeconds() {
+    return helpText('Forms', 'Forms_Builder_PublicMinSeconds');
+  },
+  get hourlyLimit() {
+    return helpText('Forms', 'Forms_Builder_PublicHourlyLimit');
+  },
+  get confirmation() {
+    return helpText('Forms', 'Forms_Builder_PublicConfirmation');
+  },
+  get links() {
+    return helpText('Forms', 'Forms_Builder_PublicLinks');
+  },
+  get noSite() {
+    return helpText('Forms', 'Forms_Builder_PublicNoSite');
+  }
+});
 
 const ANSWER_PROBLEMS = {
   required: (a) => helpText('Forms', 'Forms_Answer_required', ...a),
