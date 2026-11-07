@@ -1,4 +1,4 @@
-# ADR-NEXT: The BarnCRM Forms module: versioned JSON form definitions, a framework-free engine, Core's matchers, and a Core seam for modules that attach forms
+# ADR-0175: The BarnCRM Forms module: versioned JSON form definitions, a framework-free engine, Core's matchers, and a Core seam for modules that attach forms
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-06

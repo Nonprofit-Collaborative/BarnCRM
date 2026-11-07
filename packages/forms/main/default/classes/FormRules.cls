@@ -1,6 +1,6 @@
 /**
- * The form's rules on the server, which decides what counts (canonical model R-FS1; ADR-NEXT
- * `NEXT-forms-module.md`, decision 5): conditions, which questions show, answer checks and the
+ * The form's rules on the server, which decides what counts (canonical model R-FS1; ADR-0175
+ * `0175-forms-module.md`, decision 5): conditions, which questions show, answer checks and the
  * answers that count. The same rules as the framework-free `c/formRules` module the pages use,
  * held to the same cases (`formRules/__tests__/data/formVectors.json`, `FormRulesTest`).
  *

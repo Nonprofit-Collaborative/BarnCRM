@@ -1,5 +1,5 @@
 /**
- * What a module hears about one processed form submission (ADR-NEXT `NEXT-forms-module.md`,
+ * What a module hears about one processed form submission (ADR-0175 `0175-forms-module.md`,
  * decision 9; canonical model R-FS4). Plain values only, so neither Forms nor the module needs
  * the other's types.
  */

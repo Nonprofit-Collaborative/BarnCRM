@@ -1,6 +1,6 @@
 /**
- * Turns a form's answers into BarnCRM records (canonical model 29ZY, R-FS1 to R-FS4; ADR-NEXT
- * `NEXT-forms-module.md`, decisions 6 to 9).
+ * Turns a form's answers into BarnCRM records (canonical model 29ZY, R-FS1 to R-FS4; ADR-0175
+ * `0175-forms-module.md`, decisions 6 to 9).
  *
  * The server decides: the published version's rules are applied again (`FormRules`), hidden
  * answers are dropped, and the answers are kept on a Form Submission before anything else is

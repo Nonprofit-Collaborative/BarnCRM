@@ -1,6 +1,6 @@
 /**
  * A module attaches a form to its own records and hears about each processed submission, and a
- * module that fails never stops the form (ADR-NEXT `NEXT-forms-module.md`, decision 9). Core has
+ * module that fails never stops the form (ADR-0175 `0175-forms-module.md`, decision 9). Core has
  * no module, so extensions are injected by class name, as modules register theirs.
  */
 @IsTest(testFor='ApexClass:FormAttachmentExtensions')

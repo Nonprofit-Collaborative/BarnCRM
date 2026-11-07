@@ -4,7 +4,7 @@
 
 Forms staff build once and fill in many times: multi-step forms, conditional questions, matching
 to existing people and organizations through Core's matchers, and records created or updated in
-BarnCRM (C-42a, ADR-NEXT `NEXT-forms-module.md`). The engine other modules reuse: Event
+BarnCRM (C-42a, ADR-0175 `0175-forms-module.md`). The engine other modules reuse: Event
 Management registrations, V-09, the donation page and Scholarships applications.
 
 ## First ships in

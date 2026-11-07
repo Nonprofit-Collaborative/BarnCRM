@@ -12553,8 +12553,8 @@ pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
 
 ### Definition
 
-A form staff build once and fill in many times (C-42a, Forms module, ADR-NEXT
-`NEXT-forms-module.md`): steps of questions, conditions that show or hide a question or a step,
+A form staff build once and fill in many times (C-42a, Forms module, ADR-0175
+`0175-forms-module.md`): steps of questions, conditions that show or hide a question or a step,
 and what a submission writes (a person, an organization, related records). The questions live in
 one JSON definition, so a form is versioned by copying one value and the same definition can be
 read outside Salesforce (plan 9.9).
@@ -12690,7 +12690,7 @@ questions were optional and left blank), and so is a related record linking to a
 
 **R-FS4 Modules hear about it.** After the records are written, each installed
 `FormAttachmentExtension` that handles the context record's object receives a
-`FormSubmissionReceipt` in the same transaction (ADR-NEXT decision 9). A failing extension is
+`FormSubmissionReceipt` in the same transaction (ADR-0175 decision 9). A failing extension is
 logged and the submission is marked Needs Review with its message; the records stay.
 
 ### Salesforce implementation
@@ -13077,7 +13077,7 @@ mirrors the primary member).
 | 1.0 | 2026-11-06 | Shipped match sources turned off through a setting (owner decision D-184, ADR-0172). `BarnCRM_Settings__c` gains `Match_Sources_Turned_Off__c` (Section 12); Match Source's Active definition now says BarnCRM changes it only on the organization's own rows. |
 | 1.0 | 2026-11-06 | Addresses of deleted records (owner decision D-184). `BarnCRM_Settings__c` gains `Address_Delete_Behavior__c` (Section 12; Delete or Keep, default Delete) and `Address__c` gains `Deleted_With__c` (Text 40), with rule R-AD11: a deleted household's, organization's or person's addresses are deleted with it and restored with it, never on a merge. |
 | 1.0 | 2026-11-06 | Shipped organization record type (owner decision D-184, ADR-0173, amends ADR-0141 decision 2). Account gains the record type `BarnCRM_Organization` (active, given to nobody). Section 8 gains R-O4a: offered for organizations only where the org has no record type of its own, never detected, never switched to automatically; R-O5 leaves it out of the candidates. |
-| 1.1 | 2026-11-06 | Forms module (C-42a, D-157, ADR-NEXT `NEXT-forms-module.md`). New package BarnCRM Forms with Sections 29ZW Form (`Form__c`), 29ZX Form Version (`Form_Version__c`) and 29ZY Form Submission (`Form_Submission__c`), rules R-FM1, R-FM2 and R-FS1 to R-FS4. Core gains no object or field: only the `FormAttachmentExtension` seam and the catalog row `BarnCRM_Module.Forms`. |
+| 1.1 | 2026-11-06 | Forms module (C-42a, D-157, ADR-0175 `0175-forms-module.md`). New package BarnCRM Forms with Sections 29ZW Form (`Form__c`), 29ZX Form Version (`Form_Version__c`) and 29ZY Form Submission (`Form_Submission__c`), rules R-FM1, R-FM2 and R-FS1 to R-FS4. Core gains no object or field: only the `FormAttachmentExtension` seam and the catalog row `BarnCRM_Module.Forms`. |
 
 ---
 ## 32. Entity ownership by package
@@ -13223,8 +13223,8 @@ so nothing below that is nonprofit-specific ships in Core.
 | Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
 | Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and `FundersAccessSync` (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantLinkedRecord`, kind Program) |
 | Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
-| Forms app, permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and `FormsAccessSync` (ADR-NEXT `NEXT-forms-module.md`). Console app `BarnCRM_Forms` with the Forms and Form Submissions tabs and Error Log last; the Form record page carries the builder and the runner, the Form Submission page the submission panel |
-| Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-NEXT `NEXT-forms-module.md` decision 9) |
+| Forms app, permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and `FormsAccessSync` (ADR-0175 `0175-forms-module.md`). Console app `BarnCRM_Forms` with the Forms and Form Submissions tabs and Error Log last; the Form record page carries the builder and the runner, the Form Submission page the submission panel |
+| Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-0175 `0175-forms-module.md` decision 9) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror was brought forward from v0.9 to v0.6 and is built in release

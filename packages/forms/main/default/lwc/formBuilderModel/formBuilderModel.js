@@ -1,5 +1,5 @@
 /**
- * What the Form Builder does to a definition (C-42a; ADR-NEXT `NEXT-forms-module.md`, decision
+ * What the Form Builder does to a definition (C-42a; ADR-0175 `0175-forms-module.md`, decision
  * 12): add, change, move and remove steps, questions and records, and set a condition.
  * Framework-free (plan 9.9): every function takes a definition and returns a changed copy, so a
  * WordPress block can build forms with the same code.

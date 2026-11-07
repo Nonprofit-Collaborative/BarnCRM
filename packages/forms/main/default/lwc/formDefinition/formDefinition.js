@@ -1,6 +1,6 @@
 /**
- * The form definition: its shape, defaults and checks (canonical model 29ZW, R-FM1; ADR-NEXT
- * `NEXT-forms-module.md`, decision 3). Framework-free (plan 9.9): no lightning or @salesforce
+ * The form definition: its shape, defaults and checks (canonical model 29ZW, R-FM1; ADR-0175
+ * `0175-forms-module.md`, decision 3). Framework-free (plan 9.9): no lightning or @salesforce
  * imports, so a WordPress block or Node can read and check the same JSON.
  *
  * A problem is `{ code, args }`: the code says what is wrong and the args name the parts, so the

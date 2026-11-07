@@ -1,6 +1,6 @@
 /**
- * The server applies the form's rules exactly as the pages do (canonical model R-FS1; ADR-NEXT
- * `NEXT-forms-module.md`, decision 5). The cases are the shared vectors of `c/formRules`
+ * The server applies the form's rules exactly as the pages do (canonical model R-FS1; ADR-0175
+ * `0175-forms-module.md`, decision 5). The cases are the shared vectors of `c/formRules`
  * (`formRules/__tests__/data/formVectors.json`), copied below as they are; a Jest test fails when
  * the two copies differ.
  */

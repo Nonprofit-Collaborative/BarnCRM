@@ -934,7 +934,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # Funders depends on Core only (ADR-0161, amended by ADR-0162 decision 1): its totals are
   # platform roll-up summaries, not Rollup Builder definitions.
   MODULES+=(funders)
-  # Forms depends on Core only (ADR-NEXT, forms module).
+  # Forms depends on Core only (ADR-0175, forms module).
   MODULES+=(forms)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
@@ -1097,7 +1097,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "check syncs the access."
   fi
 
-  # The same gap for the Forms permission sets (ADR-NEXT, forms module, decision 11).
+  # The same gap for the Forms permission sets (ADR-0175, forms module, decision 11).
   echo ""
   echo "== Queueing the Forms access sync =="
   if ! printf '%s\n' 'new FormsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then

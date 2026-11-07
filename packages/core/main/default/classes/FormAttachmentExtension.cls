@@ -1,7 +1,7 @@
 /**
  * The seam a module uses to attach a BarnCRM Forms form to its own records and to receive what
- * those forms collect, without either package depending on the other (ADR-NEXT
- * `NEXT-forms-module.md`, decision 9). Event Management is the first user: an event holds its
+ * those forms collect, without either package depending on the other (ADR-0175
+ * `0175-forms-module.md`, decision 9). Event Management is the first user: an event holds its
  * registration form's record identifier as text, and each processed registration reaches the
  * module in the same transaction as the person it matched or created.
  *

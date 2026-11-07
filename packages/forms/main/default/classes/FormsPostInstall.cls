@@ -1,6 +1,6 @@
 /**
- * What the BarnCRM Forms module does at install and at every upgrade (ADR-NEXT
- * `NEXT-forms-module.md`).
+ * What the BarnCRM Forms module does at install and at every upgrade (ADR-0175
+ * `0175-forms-module.md`).
  *
  * Each step is safe to run twice and none can abort an install, since every failure is written
  * to the Error Log instead:
