@@ -1,0 +1,209 @@
+<template>
+  <template lwc:if={helpReady}>
+    <p class="slds-var-m-bottom_small slds-text-color_weak" data-id="intro">{labels.intro}</p>
+
+    <template lwc:if={hasAttendees}>
+      <p class="slds-var-m-bottom_small" data-id="summary">{summaryText}</p>
+
+      <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+        <lightning-input
+          class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3"
+          data-id="search"
+          type="search"
+          label={labels.search}
+          value={term}
+          onchange={handleTerm}
+        ></lightning-input>
+        <template lwc:if={canCheckIn}>
+          <lightning-input
+            class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3"
+            data-id="code"
+            label={labels.codeLabel}
+            value={code}
+            onchange={handleCode}
+          ></lightning-input>
+          <div class="slds-col">
+            <lightning-button
+              data-id="code-submit"
+              label={labels.codeSubmit}
+              disabled={busy}
+              onclick={handleSubmitCode}
+            ></lightning-button>
+            <template lwc:if={showScanButton}>
+              <lightning-button
+                data-id="scan"
+                class="slds-var-m-left_x-small"
+                label={labels.scan}
+                icon-name="utility:photo"
+                onclick={handleScan}
+              ></lightning-button>
+            </template>
+          </div>
+        </template>
+      </div>
+      <template lwc:if={showCameraHelp}>
+        <p class="slds-text-color_weak slds-var-m-top_x-small" data-id="camera-help">{cameraHelp}</p>
+      </template>
+    </template>
+
+    <template lwc:if={scanning}>
+      <div class="slds-box slds-var-m-vertical_small" data-id="scanner">
+        <video data-id="scan-video" class="slds-size_1-of-1" playsinline muted></video>
+        <lightning-button
+          data-id="scan-stop"
+          label={labels.stopScan}
+          onclick={handleStopScan}
+        ></lightning-button>
+      </div>
+    </template>
+
+    <template lwc:if={showWalkInButton}>
+      <lightning-button
+        data-id="walk-in"
+        class="slds-var-m-vertical_small"
+        label={labels.walkIn}
+        icon-name="utility:adduser"
+        onclick={handleOpenWalkIn}
+      ></lightning-button>
+    </template>
+
+    <template lwc:if={walkInOpen}>
+      <div class="slds-box slds-var-m-vertical_small" data-id="walk-in-form">
+        <div class="slds-grid slds-wrap slds-gutters_x-small">
+          <lightning-input
+            class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4"
+            data-field="firstName"
+            label={labels.firstName}
+            value={walkInForm.firstName}
+            onchange={handleWalkInField}
+          ></lightning-input>
+          <lightning-input
+            class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4"
+            data-field="lastName"
+            label={labels.lastName}
+            value={walkInForm.lastName}
+            required
+            onchange={handleWalkInField}
+          ></lightning-input>
+          <lightning-input
+            class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4"
+            data-field="email"
+            type="email"
+            label={labels.email}
+            value={walkInForm.email}
+            onchange={handleWalkInField}
+          ></lightning-input>
+          <template lwc:if={hasTickets}>
+            <lightning-combobox
+              class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4"
+              data-field="ticketTypeId"
+              label={labels.ticket}
+              options={ticketOptions}
+              value={walkInForm.ticketTypeId}
+              onchange={handleWalkInField}
+            ></lightning-combobox>
+          </template>
+        </div>
+        <div class="slds-var-m-top_small">
+          <lightning-button
+            data-id="walk-in-cancel"
+            label={labels.close}
+            onclick={handleCloseWalkIn}
+          ></lightning-button>
+          <lightning-button
+            data-id="walk-in-add"
+            class="slds-var-m-left_x-small"
+            variant="brand"
+            label={labels.walkInAdd}
+            disabled={cannotAddWalkIn}
+            onclick={handleAddWalkIn}
+          ></lightning-button>
+        </div>
+      </div>
+    </template>
+
+    <template lwc:if={showQr}>
+      <div class="slds-box slds-var-m-vertical_small slds-text-align_center" data-id="qr-panel">
+        <p class="slds-text-heading_small">{qrTitle}</p>
+        <img src={qrImage} alt={qrTitle} data-id="qr-image" />
+        <div>
+          <lightning-button
+            data-id="qr-close"
+            label={labels.close}
+            onclick={handleHideQr}
+          ></lightning-button>
+        </div>
+      </div>
+    </template>
+
+    <template lwc:if={isLoading}>
+      <lightning-spinner alternative-text={labels.checkIn} size="small"></lightning-spinner>
+    </template>
+
+    <template lwc:if={hasError}>
+      <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+    </template>
+
+    <template lwc:if={truncated}>
+      <c-barn-notice variant="info" message={labels.truncated} data-id="truncated"></c-barn-notice>
+    </template>
+
+    <template lwc:if={showEmpty}>
+      <c-barn-empty-state data-id="empty-state" message={labels.empty}></c-barn-empty-state>
+    </template>
+
+    <template lwc:if={showNoMatch}>
+      <p class="slds-var-m-top_small slds-text-color_weak" data-id="no-match">{labels.noMatch}</p>
+    </template>
+
+    <template lwc:if={hasRows}>
+      <table
+        class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_stacked-horizontal slds-var-m-top_small"
+        data-id="attendees"
+      >
+        <thead>
+          <tr class="slds-line-height_reset">
+            <th scope="col">{labels.name}</th>
+            <th scope="col">{labels.email}</th>
+            <th scope="col">{labels.ticket}</th>
+            <th scope="col">{labels.status}</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <template for:each={rows} for:item="row">
+            <tr key={row.id} data-id="attendee-row">
+              <th scope="row" data-label={labels.name}>
+                <a href={row.href}>{row.name}</a>
+              </th>
+              <td data-label={labels.email}>{row.email}</td>
+              <td data-label={labels.ticket}>{row.ticketName}</td>
+              <td data-label={labels.status}>{row.status}</td>
+              <td>
+                <template lwc:if={canCheckIn}>
+                  <lightning-button
+                    data-id={row.id}
+                    data-action="toggle"
+                    label={row.buttonLabel}
+                    variant={row.buttonVariant}
+                    disabled={busy}
+                    onclick={handleToggle}
+                  ></lightning-button>
+                </template>
+                <lightning-button-icon
+                  data-id={row.id}
+                  data-action="qr"
+                  class="slds-var-m-left_x-small"
+                  icon-name="utility:apps"
+                  alternative-text={row.qrLabel}
+                  title={row.qrLabel}
+                  onclick={handleShowQr}
+                ></lightning-button-icon>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </template>
+  </template>
+</template>

@@ -318,6 +318,30 @@ when Volunteers is not installed. Who may add jobs and shifts is decided by the 
 permission sets (Coordinator, Staff, Admin), not the Events ones. Deleting an event leaves its
 volunteer jobs in Volunteers, where their hours and history stay.
 
+### Check-In
+
+The **Check-In** tab is for the door. It lists everyone who holds a seat (Registered, Attended or
+No-Show) with a count of who is in and who is still to come.
+
+- **Search** by name, email or ticket; every word typed must match.
+- **Check In** moves a person to Attended; **Undo Check-In** puts them back to Registered. This is
+  the same status the Registrations menu sets, so the Registrations tab and the reports agree.
+- **QR code.** The QR button beside a person draws their code in the browser, to show on a phone
+  or print. The code holds only the attendee's record ID, so no extra field is stored. The
+  drawing library (QR Code Generator for JavaScript, MIT license) ships inside the package as the
+  static resource `BarnQrCode` and is listed in the repository's `NOTICE` file; no outside
+  service is called.
+- **Scan with Camera** appears where the browser can read QR codes (Chrome and Edge on Android
+  and desktop; not Safari or Firefox at the time of writing). It reads a code, checks that person
+  in and stops. Everywhere else, type or paste the code into **Ticket code** and click **Check In
+  by Code**. A code from another event is refused.
+- **Add Walk-In** registers a person who is not on the list (matched to Core people like any
+  registration, source Staff) and checks them in at once. A walk-in is not held to the event's
+  capacity or waitlist, since the person is already at the door. No promo code or guests.
+
+Checking in needs the Events Staff or Events Admin permission set; Events Read Only can look and
+show a QR code.
+
 ## Settings
 
 As an admin, open the **Events** section of **BarnCRM Settings**. Each setting saves org-wide as
@@ -379,5 +403,5 @@ is left alone.
 
 ## Not Yet
 
-Session sign-up, a public event page, speaker portal and check-in codes for an event come in later
-releases.
+Session sign-up, a public event page, speaker portal and ticket emails with the QR code for an
+event come in later releases.

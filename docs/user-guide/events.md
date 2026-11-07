@@ -142,3 +142,16 @@ still **Registered** as **No-Show** once the event is over. An attendee's **Remi
 
 If your organization uses Summit Events, its registrations appear here each morning with source
 **Summit Events**; change an imported attendee in BarnCRM.
+
+## Check People In
+
+1. Open the event and click the **Check-In** tab. The line at the top shows how many are in.
+2. Find the person: type part of their name, email or ticket in **Search**, then click **Check
+   In**. **Undo Check-In** takes it back.
+3. With a ticket's QR code: click **Scan with Camera** and hold the code to the camera (if you
+   do not see the button, your browser cannot scan; type the code into **Ticket code** and click
+   **Check In by Code** instead).
+4. To give someone their QR code, click the QR button beside their name and show or print it.
+5. Someone arrives who is not on the list: **Add Walk-In**, type their name (and email if you
+   have it), choose a ticket and click **Add and Check In**. Walk-ins can take the event past its
+   capacity.

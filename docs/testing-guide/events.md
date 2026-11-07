@@ -297,3 +297,27 @@ the Events Staff and Volunteers Coordinator permission sets; an event that start
 | 10 | In an org with Event Management but not Volunteers, open an event. | No **Volunteers** section anywhere on the page. |
 
 **Cleanup:** delete the test job in Volunteers.
+
+## T-EV-10: Check-In and QR Codes
+
+**Purpose:** confirm staff check people in by search, by typed or scanned code and as walk-ins,
+and that QR codes are drawn in the browser.
+**Prerequisites:** staff; an event with Capacity `2`, an active ticket type `General`, and two
+registered attendees `Jane Doe` (email `jane@example.org`) and `Sam Lee`; a second event with one
+attendee. A phone or laptop camera and Chrome or Edge for step 6.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event, click **Check-In**. | Two rows and the line `0 of 2 checked in, 2 still to come.` |
+| 2 | Type `jane` in **Search**. | Only Jane Doe shows. Clear it. |
+| 3 | Click **Check In** on Jane. | A toast; Jane is **Attended**, her button reads **Undo Check-In**, the line reads `1 of 2`. On **Registrations** Jane is **Attended**. |
+| 4 | Click **Undo Check-In** on Jane. | Jane is **Registered** again. |
+| 5 | Click the QR button beside Sam. | A QR code appears under the title `QR code for Sam Lee`. Browser network tools show no request to any outside host. **Close** hides it. |
+| 6 | Click **Scan with Camera** and show Sam's QR code from another screen. | Sam is checked in and the camera stops. In a browser with no scan support the button is absent and a note explains. |
+| 7 | Copy a QR code's ID of an attendee of the second event into **Ticket code**, click **Check In by Code**. | Refused: no attendee on this event matches that code. Nobody changes. |
+| 8 | Type Sam's code, click **Check In by Code**. | A message that Sam is already checked in. |
+| 9 | **Add Walk-In**: Last Name `Door`, **Add and Check In**. | A new row `Door`, **Attended**, though the event is at capacity. Registrations shows source **Staff**. |
+| 10 | As read-only, open **Check-In**. | The list and QR buttons show; no **Check In** buttons, **Add Walk-In** or code box. |
+
+**Cleanup:** None.

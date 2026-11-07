@@ -30,6 +30,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>EventCheckInController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>EventSpeakersController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
