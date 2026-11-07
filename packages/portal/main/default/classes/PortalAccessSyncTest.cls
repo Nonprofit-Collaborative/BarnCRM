@@ -1,6 +1,6 @@
 /**
- * BarnCRM Admin holders get Portal Builder Admin (ADR-NEXT
- * `NEXT-portal-builder-off-platform-portal-api.md`, decision 10), at install, at Turn on and with
+ * BarnCRM Admin holders get Portal Builder Admin (ADR-0185
+ * `0185-portal-builder-off-platform-portal-api.md`, decision 10), at install, at Turn on and with
  * the hourly access check; nobody else does, and nobody gets the integration set.
  */
 @IsTest(testFor='ApexClass:PortalAccessSync')

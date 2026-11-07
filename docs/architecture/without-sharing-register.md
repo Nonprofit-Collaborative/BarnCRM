@@ -18,7 +18,7 @@ into six kinds:
 | Org job | A scheduled or queued job works on the whole org, not on what its scheduler can see. |
 | Org figure | A total or count must be the organization's figure, not the viewer's share. |
 | Platform | The platform allows the write only as the system (an Apex sharing reason share, a protected custom setting). |
-| Portal | Called by the portal integration user, which has no object access; every read and write is scoped in code to the verified portal person and their template (ADR-NEXT portal builder). |
+| Portal | Called by the portal integration user, which has no object access; every read and write is scoped in code to the verified portal person and their template (ADR-0185 portal builder). |
 
 ## Core
 
@@ -125,8 +125,8 @@ into six kinds:
 
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
-| PortalAuth | Portal | Portals, accesses and sessions, and the one Contact an email names, to send and check sign-in codes and resolve sessions; only hashes are stored | ADR-0021, ADR-NEXT portal builder |
-| PortalData | Portal | The verified person's own Contact and the records a template names, filtered by that person or the catalog's fixed tests; only `edit` fields are written | ADR-0021, ADR-NEXT portal builder |
+| PortalAuth | Portal | Portals, accesses and sessions, and the one Contact an email names, to send and check sign-in codes and resolve sessions; only hashes are stored | ADR-0021, ADR-0185 portal builder |
+| PortalData | Portal | The verified person's own Contact and the records a template names, filtered by that person or the catalog's fixed tests; only `edit` fields are written | ADR-0021, ADR-0185 portal builder |
 
 ## Mirror
 

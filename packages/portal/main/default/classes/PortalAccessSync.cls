@@ -1,6 +1,6 @@
 /**
  * Gives Portal Builder Admin to everyone holding BarnCRM Admin, directly or through a role
- * (ADR-NEXT `NEXT-portal-builder-off-platform-portal-api.md`, decision 10; ADR-0131 module access
+ * (ADR-0185 `0185-portal-builder-off-platform-portal-api.md`, decision 10; ADR-0131 module access
  * sync by role). Portal Builder Integration is never given here: the admin assigns it to the one
  * integration user.
  *

@@ -940,7 +940,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(contactpoints)
   # Event Management depends on Core only (ADR-0177, events module).
   MODULES+=(events)
-  # Portal Builder depends on Core only (ADR-NEXT, portal builder).
+  # Portal Builder depends on Core only (ADR-0185, portal builder).
   MODULES+=(portal)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
@@ -1128,7 +1128,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "access check syncs the access."
   fi
 
-  # The same gap for the Portal Builder admin set (ADR-NEXT, portal builder, decision 10).
+  # The same gap for the Portal Builder admin set (ADR-0185, portal builder, decision 10).
   echo ""
   echo "== Queueing the Portal Builder access sync =="
   if ! printf '%s\n' 'new PortalAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then

@@ -1,6 +1,6 @@
 /**
  * A module offers a portal action by name, and a module that is missing or fails never stops a
- * portal (ADR-NEXT `NEXT-portal-builder-off-platform-portal-api.md`, decision 9). Core has no
+ * portal (ADR-0185 `0185-portal-builder-off-platform-portal-api.md`, decision 9). Core has no
  * module, so extensions are injected by class name.
  */
 @IsTest(testFor='ApexClass:PortalActionExtensions')

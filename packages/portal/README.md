@@ -3,7 +3,7 @@
 ## Purpose
 
 Logged-in portals people use off-platform, with no Salesforce license per person (PB-01, D-118,
-D-187, ADR-NEXT `NEXT-portal-builder-off-platform-portal-api.md`). The portal client (in
+D-187, ADR-0185 `0185-portal-builder-off-platform-portal-api.md`). The portal client (in
 `portal-client/` at the repository root, not deployed to Salesforce) signs in as one integration
 user and calls this package's person-scoped API. Salesforce sends and checks the one-time code,
 checks the optional authenticator code and issues sessions; every call returns or changes only

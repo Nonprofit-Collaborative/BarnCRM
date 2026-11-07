@@ -1,5 +1,5 @@
 /**
- * Portal sign-in and sessions (ADR-NEXT `NEXT-portal-builder-off-platform-portal-api.md`,
+ * Portal sign-in and sessions (ADR-0185 `0185-portal-builder-off-platform-portal-api.md`,
  * decisions 4 to 7; canonical model 29PB2 to 29PB4).
  *
  * Salesforce sends and checks the one-time code, checks the authenticator code, and issues the

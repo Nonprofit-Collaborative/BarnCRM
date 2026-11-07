@@ -771,7 +771,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 8. Portal Builder
 
-**Edition:** Both editions. Package `packages/portal` (BarnCRM Portal Builder), depends on Core only. Off-platform portals with their own one-time-code login, reaching Salesforce through one integration user and a person-scoped portal API (D-187, ADR-NEXT portal builder); no Experience Cloud, no Site guest user, no paid service. A template names the modules it needs and is unavailable while one is turned off. Supersedes the proposed Website and portal tool (plan 6.1.1 item 12) and pairs with the Forms module (C-42).
+**Edition:** Both editions. Package `packages/portal` (BarnCRM Portal Builder), depends on Core only. Off-platform portals with their own one-time-code login, reaching Salesforce through one integration user and a person-scoped portal API (D-187, ADR-0185 portal builder); no Experience Cloud, no Site guest user, no paid service. A template names the modules it needs and is unavailable while one is turned off. Supersedes the proposed Website and portal tool (plan 6.1.1 item 12) and pairs with the Forms module (C-42).
 
 ### 8.1 Portals
 

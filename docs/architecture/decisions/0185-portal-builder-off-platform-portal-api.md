@@ -1,4 +1,4 @@
-# ADR-NEXT: Portal Builder: an off-platform portal with its own one-time-code login, reaching Salesforce through one integration user and a person-scoped portal API
+# ADR-0185: Portal Builder: an off-platform portal with its own one-time-code login, reaching Salesforce through one integration user and a person-scoped portal API
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-07

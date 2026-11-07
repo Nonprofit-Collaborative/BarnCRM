@@ -1,6 +1,6 @@
 /**
- * What the BarnCRM Portal Builder module does at install and at every upgrade (ADR-NEXT
- * `NEXT-portal-builder-off-platform-portal-api.md`).
+ * What the BarnCRM Portal Builder module does at install and at every upgrade (ADR-0185
+ * `0185-portal-builder-off-platform-portal-api.md`).
  *
  * Each step is safe to run twice and none can abort an install, since every failure is written
  * to the Error Log instead:

@@ -1,6 +1,6 @@
 /**
- * The portal API the off-platform client calls as the integration user (ADR-NEXT
- * `NEXT-portal-builder-off-platform-portal-api.md`, decision 8):
+ * The portal API the off-platform client calls as the integration user (ADR-0185
+ * `0185-portal-builder-off-platform-portal-api.md`, decision 8):
  * `/services/apexrest/barncrm/portal/v1/<route>`. Thin: it reads JSON, calls `PortalAuth` and
  * `PortalData`, and writes plain JSON, `{ "ok": true, ... }` or `{ "ok": false, "error": code }`.
  *

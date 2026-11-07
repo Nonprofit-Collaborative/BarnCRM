@@ -1,6 +1,6 @@
 /**
- * Finds the portal action extensions modules installed (ADR-NEXT
- * `NEXT-portal-builder-off-platform-portal-api.md`, decision 9), the pattern
+ * Finds the portal action extensions modules installed (ADR-0185
+ * `0185-portal-builder-off-platform-portal-api.md`, decision 9), the pattern
  * `FormAttachmentExtensions` uses (ADR-0175). A class that is not installed, cannot be built or
  * does not implement the interface is absent, and a failure is logged: a portal works without
  * any module's actions.

@@ -1,5 +1,5 @@
 /**
- * A portal template (ADR-NEXT `NEXT-portal-builder-off-platform-portal-api.md`, decision 3;
+ * A portal template (ADR-0185 `0185-portal-builder-off-platform-portal-api.md`, decision 3;
  * canonical model R-PB2): the JSON parsed and checked against this org's schema. The same shape
  * is checked in the client by `portal-client/src/template.js`; this class is the one the server
  * trusts. A template that fails any check is refused whole, never partly used.

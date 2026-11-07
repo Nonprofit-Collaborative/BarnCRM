@@ -1,6 +1,6 @@
 /**
- * The secrets Portal Builder's sign-in uses (ADR-NEXT
- * `NEXT-portal-builder-off-platform-portal-api.md`, decisions 4 to 6): random tokens and codes
+ * The secrets Portal Builder's sign-in uses (ADR-0185
+ * `0185-portal-builder-off-platform-portal-api.md`, decisions 4 to 6): random tokens and codes
  * from `Crypto`, SHA-256 hashes (the only form they are stored in), a constant-time comparison,
  * and time-based authenticator codes (TOTP, RFC 6238: HMAC-SHA1, 30-second steps, six digits).
  * No state and no database.

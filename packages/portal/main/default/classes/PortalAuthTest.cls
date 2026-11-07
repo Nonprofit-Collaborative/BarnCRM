@@ -1,7 +1,7 @@
 /**
  * Pat signs in to a portal with a code Salesforce emails and checks; nobody learns who is on
  * file; wrong codes lock; the second factor works; and staff end sessions from Salesforce
- * (ADR-NEXT `NEXT-portal-builder-off-platform-portal-api.md`, decisions 4 to 7).
+ * (ADR-0185 `0185-portal-builder-off-platform-portal-api.md`, decisions 4 to 7).
  */
 @IsTest(testFor='ApexClass:PortalAuth')
 private class PortalAuthTest {

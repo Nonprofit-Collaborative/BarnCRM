@@ -85,7 +85,7 @@ CAPS = {
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.
     # INTEGRATION-PENDING: set after all Batch C wave 2 merges.
     "events": 999_000,
-    # Portal Builder (PB-01, ADR-NEXT portal builder): sign-in, sessions, template checks and the
+    # Portal Builder (PB-01, ADR-0185 portal builder): sign-in, sessions, template checks and the
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.
     "portal": 50_000,

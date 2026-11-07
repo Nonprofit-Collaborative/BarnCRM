@@ -1,6 +1,6 @@
 /**
- * What a signed-in portal person sees and changes (ADR-NEXT
- * `NEXT-portal-builder-off-platform-portal-api.md`, decisions 3, 8 and 9; canonical model R-PB2,
+ * What a signed-in portal person sees and changes (ADR-0185
+ * `0185-portal-builder-off-platform-portal-api.md`, decisions 3, 8 and 9; canonical model R-PB2,
  * R-PB3). Every read and write is the verified person's and only what their portal's template
  * allows: a related page is filtered by its person field, an update re-reads the record through
  * the same filter, a create always sets the person field, and only `edit` fields are written.

@@ -1,7 +1,7 @@
 /**
  * The seam a module uses to offer an action on a Portal Builder page, such as signing up for a
- * volunteer shift (PB-03), without either package depending on the other (ADR-NEXT
- * `NEXT-portal-builder-off-platform-portal-api.md`, decision 9). A template names the action as
+ * volunteer shift (PB-03), without either package depending on the other (ADR-0185
+ * `0185-portal-builder-off-platform-portal-api.md`, decision 9). A template names the action as
  * `Module.Action`; Portal Builder finds the extension through `PortalActionExtensions`.
  *
  * Portal Builder calls `run` only for a verified portal person and only for a record it has
