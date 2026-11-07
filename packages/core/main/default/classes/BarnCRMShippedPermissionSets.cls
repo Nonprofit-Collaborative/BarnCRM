@@ -34,6 +34,7 @@ public with sharing class BarnCRMShippedPermissionSets {
 		'Events_Read_Only',
 		'Events_Staff',
 		'Forms_Admin',
+		'Forms_Public_Guest',
 		'Forms_Read_Only',
 		'Forms_Staff',
 		'Funders_Admin',

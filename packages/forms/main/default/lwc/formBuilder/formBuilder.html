@@ -394,6 +394,65 @@
               </fieldset>
             </div>
           </div>
+
+          <fieldset class="slds-box slds-var-m-top_medium" data-id="public">
+            <legend class="slds-text-heading_small">{publicText.heading}</legend>
+            <p class="slds-text-color_weak slds-var-m-bottom_x-small">{publicText.intro}</p>
+            <lightning-input
+              type="toggle"
+              data-id="public-enabled"
+              data-setting="enabled"
+              label={publicText.enabled}
+              checked={publicSettings.enabled}
+              disabled={readOnly}
+              onchange={handlePublicChange}
+            ></lightning-input>
+            <template lwc:if={publicSettings.enabled}>
+              <div class="slds-grid slds-wrap slds-gutters_small">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                  <lightning-input
+                    type="number"
+                    data-setting="minSeconds"
+                    label={publicText.minSeconds}
+                    value={publicSettings.minSeconds}
+                    min="0"
+                    max="600"
+                    disabled={readOnly}
+                    onchange={handlePublicChange}
+                  ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+                  <lightning-input
+                    type="number"
+                    data-setting="hourlyLimit"
+                    label={publicText.hourlyLimit}
+                    value={publicSettings.hourlyLimit}
+                    min="1"
+                    max="1000"
+                    disabled={readOnly}
+                    onchange={handlePublicChange}
+                  ></lightning-input>
+                </div>
+              </div>
+              <lightning-textarea
+                data-setting="confirmation"
+                label={publicText.confirmation}
+                value={publicSettings.confirmation}
+                max-length="1000"
+                disabled={readOnly}
+                onchange={handlePublicChange}
+              ></lightning-textarea>
+            </template>
+            <template lwc:if={isPublishedPublic}>
+              <p class="slds-var-m-top_small">{publicText.links}</p>
+              <template for:each={publicLinks} for:item="link">
+                <p key={link} class="slds-text-font_monospace" data-id="public-link">{link}</p>
+              </template>
+              <template lwc:if={noSite}>
+                <p class="slds-text-color_weak" data-id="no-site">{publicText.noSite}</p>
+              </template>
+            </template>
+          </fieldset>
         </template>
       </div>
     </lightning-card>

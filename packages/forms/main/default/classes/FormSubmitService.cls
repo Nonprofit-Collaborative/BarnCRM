@@ -20,6 +20,8 @@ public with sharing class FormSubmitService {
 	public static final String INVALID = 'Invalid';
 	private static final String CONTEXT = 'FormSubmitService';
 	private static final Integer MESSAGE_LENGTH = 255;
+	private static final String PERSON_ACCOUNT_FIELD = 'IsPersonAccount'; // detection-only: read only after the describe found person accounts
+	private static final String PERSON_ACCOUNT_QUERY = 'SELECT IsPersonAccount FROM Contact WHERE Id = :found'; // detection-only: run only after the describe found person accounts
 
 	/** A request the person can fix, worded for them. */
 	public class FormException extends Exception {
@@ -105,6 +107,26 @@ public with sharing class FormSubmitService {
 	 * on it, so a review is resolved without asking anyone to fill the form in twice.
 	 */
 	public static Result reprocess(Id submissionId) {
+		Form_Submission__c submission = stored(submissionId);
+		if (submission.Status__c == PROCESSED) {
+			throw new FormException(BarnHelp.text('Forms', 'Forms_Submit_AlreadyProcessed'));
+		}
+		return processStored(submission);
+	}
+
+	/**
+	 * Processes a public submission the intake stored (R-FS6), in user mode as the person
+	 * running it: the allowlist is checked again before anything is written (R-FM3).
+	 */
+	public static Result processReceived(Id submissionId) {
+		Form_Submission__c submission = stored(submissionId);
+		if (submission.Status__c != FormIntakeService.RECEIVED) {
+			throw new FormException(BarnHelp.text('Forms', 'Forms_Submit_AlreadyProcessed'));
+		}
+		return processStored(submission);
+	}
+
+	private static Form_Submission__c stored(Id submissionId) {
 		List<Form_Submission__c> found = [
 			SELECT
 				Id,
@@ -115,6 +137,7 @@ public with sharing class FormSubmitService {
 				Answers__c,
 				Context_Record_Id__c,
 				Status__c,
+				Source__c,
 				Person__c,
 				Organization__c
 			FROM Form_Submission__c
@@ -124,19 +147,55 @@ public with sharing class FormSubmitService {
 		if (found.isEmpty()) {
 			throw new FormException(BarnHelp.text('Forms', 'Forms_Submit_NotFound'));
 		}
-		Form_Submission__c submission = found[0];
-		if (submission.Status__c == PROCESSED) {
-			throw new FormException(BarnHelp.text('Forms', 'Forms_Submit_AlreadyProcessed'));
-		}
+		return found[0];
+	}
+
+	private static Result processStored(Form_Submission__c submission) {
 		Map<String, Object> counted = (Map<String, Object>) JSON.deserializeUntyped(
 			String.isBlank(submission.Answers__c) ? '{}' : submission.Answers__c
 		);
-		return process(
-			new Form__c(Id = submission.Form__c, Name = submission.Form__r.Name),
-			submission,
-			FormRules.parse(submission.Form_Version__r.Definition__c),
-			counted
-		);
+		Form__c form = new Form__c(Id = submission.Form__c, Name = submission.Form__r.Name);
+		Map<String, Object> definition = FormRules.parse(submission.Form_Version__r.Definition__c);
+		String refused = isPublic(submission) ? publicRefusal(form, submission, definition) : null;
+		if (refused != null) {
+			Result result = new Result();
+			result.submissionId = submission.Id;
+			result.status = NEEDS_REVIEW;
+			result.message = refused.abbreviate(MESSAGE_LENGTH);
+			update as user new Form_Submission__c(
+				Id = submission.Id,
+				Status__c = NEEDS_REVIEW,
+				Message__c = result.message
+			);
+			return result;
+		}
+		return process(form, submission, definition, counted);
+	}
+
+	private static Boolean isPublic(Form_Submission__c submission) {
+		return submission.Source__c == FormIntakeService.SOURCE_PUBLIC;
+	}
+
+	/**
+	 * Why a public submission is held rather than written, or null (R-FS6): a mapping the
+	 * allowlist refuses, or a record it was filled from that no module names this form for.
+	 */
+	private static String publicRefusal(
+		Form__c form,
+		Form_Submission__c submission,
+		Map<String, Object> definition
+	) {
+		String problem = FormPublicPolicy.problem(definition);
+		if (problem != null) {
+			return problem;
+		}
+		if (
+			String.isNotBlank(submission.Context_Record_Id__c) &&
+			FormAttachmentExtensions.formFor(Id.valueOf(submission.Context_Record_Id__c)) != form.Id
+		) {
+			return BarnHelp.text('Forms', 'Forms_Public_ContextNotAttached');
+		}
+		return null;
 	}
 
 	private static Form__c publishedForm(Id formId) {
@@ -185,6 +244,10 @@ public with sharing class FormSubmitService {
 		System.Savepoint before = Database.setSavepoint();
 		try {
 			for (Plan entry : plan(definition, counted)) {
+				if (isPublic(submission)) {
+					// An anonymous answer never replaces what is on file (R-FS6).
+					entry.onMatch = 'fillBlanks';
+				}
 				Id chosen = entry.kind == 'person'
 					? chosenPerson
 					: (entry.kind == 'organization' ? chosenOrganization : null);
@@ -469,7 +532,32 @@ public with sharing class FormSubmitService {
 		return changed;
 	}
 
+	/**
+	 * The person found, unless they are stored as a person account: a person account is held for
+	 * review, never written through its contact (R-FS6, closing ADR-0175's person account note).
+	 */
 	private static Id findPerson(Plan entry) {
+		Id found = findContact(entry);
+		if (
+			found == null ||
+			!Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+				.fields.getMap()
+				.containsKey(PERSON_ACCOUNT_FIELD.toLowerCase())
+		) {
+			return found;
+		}
+		List<SObject> rows = Database.queryWithBinds(
+			PERSON_ACCOUNT_QUERY,
+			new Map<String, Object>{ 'found' => found },
+			AccessLevel.USER_MODE
+		);
+		if (!rows.isEmpty() && rows[0].get(PERSON_ACCOUNT_FIELD) == true) {
+			throw new AmbiguousException(BarnHelp.text('Forms', 'Forms_Submit_PersonAccount'));
+		}
+		return found;
+	}
+
+	private static Id findContact(Plan entry) {
 		String first = text(entry.fields, 'FirstName');
 		ImportMatcher.forgetHeldKeys();
 		String emailKey = ImportMatcher.emailKey(text(entry.fields, 'Email'));

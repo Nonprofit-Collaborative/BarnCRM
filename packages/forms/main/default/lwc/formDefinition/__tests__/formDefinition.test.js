@@ -4,6 +4,7 @@ import {
   checkDefinition,
   conditionFields,
   emptyDefinition,
+  isPublic,
   objectOf,
   parseDefinition,
   serializeDefinition,
@@ -199,5 +200,28 @@ describe('c/formDefinition', () => {
     expect(conditionFields(null)).toEqual([]);
     expect(definition.records.map(objectOf)).toEqual(['Contact', 'Account', 'Interest__c']);
     expect(objectOf(null)).toBeNull();
+  });
+
+  it('checks the public settings and refuses overwriting on a public form (C-42b)', () => {
+    const open = { ...good(), public: { enabled: true, minSeconds: 5, hourlyLimit: 20 } };
+    expect(isPublic(open)).toBe(true);
+    expect(checkDefinition(open)).toEqual([]);
+    expect(isPublic(good())).toBe(false);
+
+    const wrong = {
+      ...good(),
+      public: { enabled: true, minSeconds: -1, hourlyLimit: 2.5, confirmation: 'x'.repeat(1001) }
+    };
+    expect(codes(checkDefinition(wrong))).toEqual([
+      'badPublicSeconds',
+      'badPublicLimit',
+      'badPublicConfirmation'
+    ]);
+    expect(codes(checkDefinition({ ...good(), public: [] }))).toEqual(['badPublic']);
+
+    const overwriting = { ...good(), public: { enabled: true } };
+    overwriting.records[0].matching = { rule: 'email', onMatch: 'overwrite' };
+    expect(codes(checkDefinition(overwriting))).toEqual(['publicOverwrite']);
+    expect(codes(checkDefinition({ ...overwriting, public: { enabled: false } }))).toEqual([]);
   });
 });

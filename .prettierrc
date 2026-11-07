@@ -62,6 +62,12 @@
       "options": {
         "parser": "html"
       }
+    },
+    {
+      "files": "**/pages/*.page",
+      "options": {
+        "parser": "html"
+      }
     }
   ]
 }

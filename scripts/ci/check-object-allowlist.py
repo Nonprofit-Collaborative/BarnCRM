@@ -135,6 +135,8 @@ ALLOWED = {
     "FlowDefinition": "a flow's active version, saved before Deactivate Org Flows and Validation Rules turns it off and put back by Restore (R-AS4 to R-AS8). Tooling API, every edition with API access.",
     "WorkflowRule": "the org's workflow rules on the Automation tab (R-AS3). Tooling API, every edition with API access.",
     "SetupAuditTrail":"the Setup changes the nightly Setup Changes copy keeps beyond 180 days (C-56, R-SC1). Platform setup object, every edition; queried dynamically, read only.",
+    "Site": "the org's active Salesforce Sites and their guest users, for public forms' Health Check and links (C-42b). Setup object in every edition BarnCRM supports, read only.",
+    "SiteDetail": "a Salesforce Site's secure address, for public form links (C-42b). Setup object in every edition BarnCRM supports, read only.",
     # Setup objects. These are how a package inspects or assigns its own access.
     "PermissionSet": "the packaged permission sets, plan Section 4.8.",
     "PermissionSetAssignment": "assigning them, and asserting the assignment in tests.",

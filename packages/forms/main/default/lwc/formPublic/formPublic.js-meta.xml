@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    A public form on a Salesforce Site, loaded by the FormsPublic page through Lightning Out (formsPublicApp). Stores the answers for processing and says only whether they were received.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

@@ -254,7 +254,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 
 | Feature | Page | Package |
 |---|---|---|
-| C-42a Forms: install, roles, the Form Builder (steps, questions, records to write, conditions, preview, publish), filling in a form, matching people and organizations, form submissions and Process Again | [forms.md](forms.md) | BarnCRM Forms |
+| C-42a, C-42b Forms: install, roles, the Form Builder (steps, questions, records to write, conditions, preview, publish), filling in a form, matching people and organizations, public forms on a Salesforce Site (Site setup, Health Check checks, processing, integrations), form submissions and Process Again | [forms.md](forms.md) | BarnCRM Forms |
 
 ### Event Management
 

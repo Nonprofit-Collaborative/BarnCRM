@@ -9,9 +9,10 @@ writes them into your records: it **matches** the person (and, if the form asks,
 organization) to someone already in BarnCRM, adds them only when nobody matches, and adds any
 **related record** the form writes, such as an affiliation between the two.
 
-In this release staff fill forms in inside BarnCRM, for example while on the phone with someone
-or from a paper sign-up sheet. Public forms on a website, file uploads and save-and-resume come
-in later releases and use the same forms.
+Staff fill forms in inside BarnCRM, for example while on the phone with someone or from a paper
+sign-up sheet. A form can also be made **public**: anyone with its link fills it in on a
+Salesforce Site, with no login (see [Public Forms](#public-forms)). File uploads and
+save-and-resume come in a later release and use the same forms.
 
 Other BarnCRM modules can attach a form to their own records (for example, an event's
 registration form in the Event Management module). The form is then filled in from that record
@@ -33,7 +34,9 @@ and gives everyone who already has a BarnCRM role their Forms permission set (se
 Then open the **BarnCRM Forms** app from the App Launcher. Its tabs are **Forms** and **Form
 Submissions**.
 
-Forms has no settings, so it adds no section to BarnCRM Settings. It has no nightly job.
+Forms has no settings, so it adds no section to BarnCRM Settings. It has no nightly job. Public
+forms add their own checks to **Health Check** and a processing job you schedule from there (see
+[Public Forms](#public-forms)).
 
 ### Roles and Permission Sets
 
@@ -124,9 +127,73 @@ Writing is all or nothing: if any record cannot be written, nothing is, and the 
 kept as **Failed** with the reason. Fix the cause (often a field's access or a validation rule)
 and select **Process Again**.
 
+## Public Forms
+
+A public form is filled in by anyone with its link, on a **Salesforce Site**, with no login and
+no Salesforce license. BarnCRM keeps the people on your Site away from your data:
+
+- The Site's guest user gets **no access to any record**. It may only open the public form page
+  and send answers. The answers are stored as a submission with **Status Received** and
+  **Source Public**, and nothing else is read or written.
+- The answers are written to your records later, by **public form processing**, which runs every
+  15 minutes as the administrator who scheduled it, with the same matching as a staff form.
+- The person filling it in is told only that the answers were received. Whether they matched
+  someone on file is never shown to them.
+- A public form only **fills in blank fields** of a person or organization already on file; it
+  never replaces what you know.
+- Scripts are kept out with no outside service: a hidden question only scripts fill in, a
+  minimum time before sending (**Seconds Before Sending**, default 3), a limit on how many sends
+  the form takes an hour (**Sends Per Hour**, default 50), and a signed link that lasts a day.
+
+### Setting Up a Site (Once)
+
+Salesforce requires these steps in **Setup**, and no app can do them for you:
+
+1. **Setup > Sites**: register your Sites domain, if the org has none yet.
+2. Select **New**, give the Site a label and name, set **Active Site Home Page** to
+   **FormsPublic**, and save.
+3. On the Site, select **Public Access Settings** only if you want to check it: the guest user
+   needs no object access for forms. Under **Site Visualforce Pages**, add **FormsPublic** if it
+   is not listed.
+4. Choose the Site's default owner for records its guest user creates, if Salesforce asks.
+5. **Activate** the Site.
+
+Then open **Health Check** in the Settings console. With a public form published it checks:
+
+| Check | What to do |
+|---|---|
+| No active Site for public forms | Do the steps above. |
+| A Site guest user can't open public forms | Select **Give Forms Public Guest**. It gives the Site's guest user the Forms Public Guest permission set: the public form page and its Apex class, nothing else. |
+| A Site guest user can read people or organizations | Remove Read on Contact and Account from the guest user's profile and permission sets in Setup. BarnCRM never changes this for you. |
+| Public form answers are not being processed | Select **Schedule Processing**. It runs every 15 minutes as you, so keep your user active. |
+| Public form answers are waiting | Answers have waited over an hour: check processing is scheduled and its user is active, then the Error Log. |
+
+### Making a Form Public
+
+In the Form Builder, at the bottom, turn on **Public on a Salesforce Site**, set **Seconds
+Before Sending**, **Sends Per Hour** and an optional **Thank-You Message**, and **Publish**. A
+public form may write people, organizations and custom objects, through fields you can create
+that are not lookups or encrypted (lookups are set by the record links you choose), and must
+use **Fill in only the fields that are blank**; Publish names anything that breaks this. After
+publishing, the Form Builder lists the form's link on each active Site:
+`<your Site address>/FormsPublic?form=<form record Id>`. A form attached to a record by another
+module adds `&record=<record Id>`; BarnCRM writes the link only when that module says the record
+uses this form.
+
+Closing the form (Status **Closed**) stops its public link at once.
+
+### Integrations and Portals
+
+A portal or website off Salesforce can serve the same public form through a signed-in
+integration user, at `/services/apexrest/barncrm/forms/v1/<form record Id>` (GET loads the form,
+POST sends `ticket`, `answers` and `trap`). Give that user the **Forms Staff** permission set
+and access to what the form writes; its answers are processed at once, as that user. The same
+checks apply.
+
 ## Form Submissions
 
-Every sent form is a **Form Submission**: its **Status** (Processed, Needs Review or Failed), the
+Every sent form is a **Form Submission**: its **Status** (Received, Processed, Needs Review or
+Failed), its **Source** (Staff or Public), the
 answers, the **Person** and **Organization** it matched or added, and the version of the form it
 was filled in from. Its record page shows the answers by question and the records written,
 each linked. Reports on Form Submissions work like any other.
@@ -134,5 +201,6 @@ each linked. Reports on Form Submissions work like any other.
 ## Limits
 
 A form has at most 20 steps, 100 questions and 10 records to write, and a picklist at most 200
-choices. A form writes at most one person and one organization. Person accounts are matched as
-contacts in this release.
+choices. A form writes at most one person and one organization. A person who is stored as a
+person account is never changed by a form: the submission is held as Needs Review so you can
+update them by hand.

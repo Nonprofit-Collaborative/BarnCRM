@@ -7,6 +7,7 @@ import {
   isBlank,
   nextStep,
   previousStep,
+  questionViews,
   visibility,
   visibleSteps
 } from 'c/formRules';
@@ -105,5 +106,40 @@ describe('c/formRules steps and answers', () => {
     });
     expect(checkAnswer({ type: 'checkbox', required: true }, 'true')).toBeNull();
     expect(checkAnswer({ type: 'date' }, '2026-11-06')).toBeNull();
+  });
+
+  it('draws the shown questions of a step with their answers and problems', () => {
+    const oneStep = {
+      steps: [
+        {
+          key: 'you',
+          fields: [
+            { key: 'age', label: 'Age', type: 'number' },
+            {
+              key: 'guardian',
+              label: 'Guardian',
+              type: 'text',
+              showWhen: { all: [{ field: 'age', op: 'lessThan', value: 18 }] }
+            },
+            { key: 'kind', label: 'Kind', type: 'picklist', options: [{ value: 1 }] },
+            { key: 'ok', label: 'OK', type: 'checkbox' }
+          ]
+        }
+      ]
+    };
+    const problem = { code: 'required', args: [] };
+    const views = questionViews(oneStep, 0, { age: 40, ok: true }, { kind: problem });
+    expect(views.map((view) => view.key)).toEqual(['age', 'kind', 'ok']);
+    expect(views[0]).toMatchObject({
+      isInput: true,
+      inputType: 'number',
+      value: 40,
+      problem: null
+    });
+    expect(views[1]).toMatchObject({ isPicklist: true, problem, value: '' });
+    expect(views[1].options).toEqual([{ value: '1', label: '1' }]);
+    expect(views[2]).toMatchObject({ isCheckbox: true, checked: true });
+    const young = questionViews(oneStep, 0, { age: 10 }, null);
+    expect(young.map((view) => view.key)).toContain('guardian');
   });
 });

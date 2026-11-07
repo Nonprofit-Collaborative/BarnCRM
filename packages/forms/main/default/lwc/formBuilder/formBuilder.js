@@ -6,6 +6,7 @@ import saveDraft from '@salesforce/apex/FormBuilderController.saveDraft';
 import publish from '@salesforce/apex/FormBuilderController.publish';
 import {
   CONTEXT_LINK,
+  PUBLIC_DEFAULTS,
   checkDefinition,
   parseDefinition,
   serializeDefinition
@@ -37,6 +38,7 @@ import {
   LABELS,
   MODE_OPTIONS,
   OPERATOR_OPTIONS,
+  PUBLIC_SETTING_TEXT,
   TYPE_OPTIONS,
   contextLinkLabel,
   messageFrom,
@@ -182,6 +184,54 @@ export default class FormBuilder extends LightningElement {
 
   get publishDisabled() {
     return this.busy || this.hasProblems;
+  }
+
+  // ---- public form settings (C-42b) ----
+
+  get publicText() {
+    return PUBLIC_SETTING_TEXT;
+  }
+
+  /** The `public` block with its defaults shown, so no setting is blank. */
+  get publicSettings() {
+    const settings = this.definition.public || {};
+    return {
+      enabled: settings.enabled === true,
+      minSeconds: settings.minSeconds ?? PUBLIC_DEFAULTS.minSeconds,
+      hourlyLimit: settings.hourlyLimit ?? PUBLIC_DEFAULTS.hourlyLimit,
+      confirmation: settings.confirmation || ''
+    };
+  }
+
+  handlePublicChange(event) {
+    const setting = event.target.dataset.setting;
+    const settings = { ...(this.definition.public || {}) };
+    if (setting === 'enabled') {
+      settings.enabled = event.detail.checked;
+    } else if (setting === 'confirmation') {
+      settings.confirmation = event.detail.value;
+    } else {
+      const text = String(event.detail.value ?? '').trim();
+      settings[setting] = text === '' ? undefined : Number(text);
+    }
+    Object.keys(settings).forEach((key) => {
+      if (settings[key] === undefined || settings[key] === '') {
+        delete settings[key];
+      }
+    });
+    this.change({ ...this.definition, public: settings });
+  }
+
+  get isPublishedPublic() {
+    return Boolean(this.form && this.form.isPublic);
+  }
+
+  get publicLinks() {
+    return (this.form && this.form.publicLinks) || [];
+  }
+
+  get noSite() {
+    return this.publicLinks.length === 0;
   }
 
   get steps() {

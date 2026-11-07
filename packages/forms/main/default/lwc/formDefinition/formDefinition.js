@@ -11,7 +11,10 @@
  *   steps: [{ key, title, showWhen?, fields: [{ key, label, type, required?, help?, options?,
  *     maxLength?, min?, max?, showWhen?, target?: { record, field } }] }],
  *   records: [{ key, kind: 'person' | 'organization' | 'related', object?, matching?: { rule,
- *     onMatch }, links?: { field: recordKey | 'context' }, values?: { field: constant } }] }
+ *     onMatch }, links?: { field: recordKey | 'context' }, values?: { field: constant } }],
+ *   public?: { enabled, minSeconds?, hourlyLimit?, confirmation? } }
+ * `public` (C-42b, ADR-NEXT public forms on a Salesforce Site) lets the published version be
+ * filled in on a Salesforce Site or by an API caller.
  */
 
 export const SCHEMA_VERSION = 1;
@@ -61,6 +64,14 @@ export const LIMITS = Object.freeze({
   conditionDepth: 3,
   keyLength: 40
 });
+
+/** A public form's spam settings: their ranges and the values used when one is not set. */
+export const PUBLIC_LIMITS = Object.freeze({
+  minSeconds: [0, 600],
+  hourlyLimit: [1, 1000],
+  confirmation: 1000
+});
+export const PUBLIC_DEFAULTS = Object.freeze({ minSeconds: 3, hourlyLimit: 50 });
 
 const KEY = /^[A-Za-z][A-Za-z0-9_]*$/;
 const FIELD_NAME = /^[A-Za-z][A-Za-z0-9_]*$/;
@@ -328,6 +339,49 @@ function checkRequiredTargets(definition) {
   return found;
 }
 
+/** True when the definition may be filled in on a Salesforce Site or by an API caller. */
+export function isPublic(definition) {
+  return Boolean(definition && definition.public && definition.public.enabled === true);
+}
+
+function inRange(value, [low, high]) {
+  return value === undefined || (Number.isInteger(value) && value >= low && value <= high);
+}
+
+/** Problems with the `public` block: its settings, and no overwrite on a public form (R-FM3). */
+function checkPublic(definition) {
+  const settings = definition.public;
+  if (settings === undefined || settings === null) {
+    return [];
+  }
+  if (typeof settings !== 'object' || Array.isArray(settings)) {
+    return [problem('badPublic')];
+  }
+  const found = [];
+  if (!inRange(settings.minSeconds, PUBLIC_LIMITS.minSeconds)) {
+    found.push(problem('badPublicSeconds', ...PUBLIC_LIMITS.minSeconds));
+  }
+  if (!inRange(settings.hourlyLimit, PUBLIC_LIMITS.hourlyLimit)) {
+    found.push(problem('badPublicLimit', ...PUBLIC_LIMITS.hourlyLimit));
+  }
+  const confirmation = settings.confirmation;
+  if (
+    confirmation !== undefined &&
+    confirmation !== null &&
+    (typeof confirmation !== 'string' || confirmation.length > PUBLIC_LIMITS.confirmation)
+  ) {
+    found.push(problem('badPublicConfirmation', PUBLIC_LIMITS.confirmation));
+  }
+  if (settings.enabled === true) {
+    (definition.records || []).forEach((record) => {
+      if (record && record.matching && record.matching.onMatch === 'overwrite') {
+        found.push(problem('publicOverwrite', record.key));
+      }
+    });
+  }
+  return found;
+}
+
 /**
  * Every problem with a definition, in reading order: steps and fields, then records. An empty
  * list means the definition can be saved and published.
@@ -390,5 +444,6 @@ export function checkDefinition(definition) {
   }
   found.push(...checkLinks(records));
   found.push(...checkRequiredTargets({ ...definition, steps, records }));
+  found.push(...checkPublic({ ...definition, records }));
   return found;
 }

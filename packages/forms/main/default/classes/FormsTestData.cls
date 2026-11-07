@@ -101,4 +101,29 @@ public class FormsTestData {
 	public static Form__c volunteerInterest() {
 		return published('Volunteer Interest', definition());
 	}
+
+	/** The volunteer interest definition, public, at most `hourlyLimit` sends an hour (C-42b). */
+	public static Map<String, Object> publicDefinition(Integer hourlyLimit) {
+		Map<String, Object> definition = definition();
+		definition.put(
+			'public',
+			new Map<String, Object>{
+				'enabled' => true,
+				'minSeconds' => 3,
+				'hourlyLimit' => hourlyLimit,
+				'confirmation' => 'Thanks for signing up.'
+			}
+		);
+		return definition;
+	}
+
+	/** The volunteer interest form, published as a public form with its signing key. */
+	public static Form__c publicVolunteerInterest(Integer hourlyLimit) {
+		Form__c form = published('Public Volunteer Interest', publicDefinition(hourlyLimit));
+		update as user new Form__c(Id = form.Id, Public__c = true);
+		FormIntakeService.giveKey(
+			[SELECT Id FROM Form_Version__c WHERE Form__c = :form.Id WITH USER_MODE][0].Id
+		);
+		return form;
+	}
 }
