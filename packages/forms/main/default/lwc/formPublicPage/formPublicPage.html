@@ -1,0 +1,110 @@
+<template>
+  <template lwc:if={helpReady}>
+    <main class="slds-container_large slds-container_center slds-var-p-around_medium">
+      <template lwc:if={loading}>
+        <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+      </template>
+      <template lwc:if={missing}>
+        <div data-id="missing">
+          <c-barn-notice variant="info" message={missingText}></c-barn-notice>
+        </div>
+      </template>
+
+      <template lwc:if={view}>
+        <article data-id="page">
+          <h1 class="slds-text-heading_large slds-var-m-bottom_x-small" data-id="title">
+            {view.title}
+          </h1>
+          <template lwc:if={view.when}>
+            <p class="slds-text-heading_small slds-var-m-bottom_small" data-id="when">
+              {view.when}
+            </p>
+          </template>
+          <template lwc:if={view.facts.length}>
+            <dl class="slds-var-m-bottom_small">
+              <template for:each={view.facts} for:item="fact">
+                <div key={fact.key} class="slds-var-m-bottom_xx-small" data-id="fact">
+                  <dt class="slds-text-title">{fact.label}</dt>
+                  <dd>{fact.value}</dd>
+                </div>
+              </template>
+            </dl>
+          </template>
+          <template lwc:if={view.description}>
+            <p class="description slds-var-m-bottom_medium" data-id="description">
+              {view.description}
+            </p>
+          </template>
+
+          <template for:each={view.sections} for:item="section">
+            <section key={section.key} class="slds-var-m-bottom_medium" data-id="section">
+              <h2 class="slds-text-heading_medium slds-var-m-bottom_x-small">{section.title}</h2>
+              <ul class="slds-has-dividers_bottom-space">
+                <template for:each={section.items} for:item="item">
+                  <li key={item.key} class="slds-item" data-id="item">
+                    <div class="slds-text-heading_small">{item.title}</div>
+                    <template lwc:if={item.when}>
+                      <div class="slds-text-body_small">{item.when}</div>
+                    </template>
+                    <template lwc:if={item.subtitle}>
+                      <div class="slds-text-body_small slds-text-color_weak">{item.subtitle}</div>
+                    </template>
+                    <template lwc:if={item.price}>
+                      <div class="slds-text-body_regular" data-id="price">{item.price}</div>
+                    </template>
+                    <template lwc:if={item.note}>
+                      <div class="slds-text-body_small" data-id="note">{item.note}</div>
+                    </template>
+                    <template for:each={item.badges} for:item="badge">
+                      <span
+                        key={badge.key}
+                        class="slds-badge slds-var-m-right_xx-small"
+                        data-id="badge"
+                        >{badge.text}</span
+                      >
+                    </template>
+                    <template lwc:if={item.text}>
+                      <p class="description slds-var-m-top_xx-small">{item.text}</p>
+                    </template>
+                  </li>
+                </template>
+              </ul>
+            </section>
+          </template>
+
+          <section class="slds-var-m-top_medium" data-id="registration">
+            <h2 class="slds-text-heading_medium slds-var-m-bottom_x-small">{registerText}</h2>
+            <template lwc:if={view.message}>
+              <p class="slds-var-m-bottom_small" data-id="message">{view.message}</p>
+            </template>
+            <template lwc:if={view.formId}>
+              <c-form-public form-id={view.formId} record-id={recordId}></c-form-public>
+            </template>
+          </section>
+        </article>
+      </template>
+
+      <template lwc:if={listing}>
+        <section data-id="list">
+          <h1 class="slds-text-heading_large slds-var-m-bottom_small">{listing.title}</h1>
+          <template lwc:if={listEmpty}>
+            <p data-id="list-empty">{listing.empty}</p>
+          </template>
+          <ul class="slds-has-dividers_bottom-space">
+            <template for:each={listing.items} for:item="item">
+              <li key={item.key} class="slds-item" data-id="list-item">
+                <a href={item.href} class="slds-text-heading_small">{item.title}</a>
+                <template lwc:if={item.when}>
+                  <div class="slds-text-body_small">{item.when}</div>
+                </template>
+                <template lwc:if={item.subtitle}>
+                  <div class="slds-text-body_small slds-text-color_weak">{item.subtitle}</div>
+                </template>
+              </li>
+            </template>
+          </ul>
+        </section>
+      </template>
+    </main>
+  </template>
+</template>

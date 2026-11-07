@@ -259,6 +259,49 @@ with source **Form**; a question with the key `ticketType` (a ticket type's name
 key `promoCode` choose the ticket and the code. A submission that cannot be registered (a used-up
 code, an unknown ticket) is kept for review in Forms. Without Forms, register people on the tab.
 
+### Public Event Page
+
+An event can have a public page on your Salesforce Site, the same Site public forms use (see
+[Forms](forms.md), Public Forms). Public pages need **BarnCRM Forms**: without it there is no
+public page, the rest of Event Management works as before, and Health Check says so.
+
+On the event's **Details** tab, in **Public Page**, choose what is published. Nothing is public
+until you turn it on.
+
+| Field | What it shows |
+|---|---|
+| Public Page | The page exists while the event is **Open** or **Closed** (never Draft, Completed or Cancelled): name, dates, format, venue, description, active tickets whose sales have not ended (price, description) and **Confirmed** sessions. |
+| Show Speakers | Confirmed speakers' names, headlines and bios, and who speaks in each session. |
+| Show Seats Left | Seats left for each ticket (the fewer of the event's Capacity and the ticket's Quantity), or that it is full and new registrations join the waitlist. |
+
+Never shown: the online link (registrants get it from reminders), capacity itself, promo codes,
+registrations, attendees, or speakers' email, travel and audiovisual needs.
+
+**Addresses**, on your Site's address (for example `https://example.my.site.com`):
+
+- one event: `<site address>/FormsPublic?record=<event record ID>`
+- a list of Open public events that have not ended, soonest first (up to 50):
+  `<site address>/FormsPublic?list=events`
+
+**Registration.** While the event is **Open** and now is between **Registration Opens** and
+**Registration Closes**, the page shows the form named in **Registration Form Key** (on the
+Registration section of the Details tab). The form must be published and public in Forms;
+otherwise the page says registration is not taken online. Answers get the public form checks
+(hidden question, timing, hourly limit) and are processed by the scheduled public form processing
+as for any public form, so people are matched, never duplicated, and seats, codes and the
+waitlist apply exactly as on the Registrations tab.
+
+**Paid tickets.** BarnCRM takes no payment. A ticket with a price shows the price and the
+**Public page payment note** setting (default "Pay at the door or by arrangement with us."); a
+free ticket shows Free. The registration records the amount owed.
+
+**Off-platform sites.** Portal Builder or any other site can show the same pages through the
+Forms API as its integration user: `GET /services/apexrest/barncrm/forms/v1/pages/<event ID>`
+and `GET /services/apexrest/barncrm/forms/v1/pages?kind=events`, then post the answers to the
+form endpoint with the event's ID as `contextRecordId` (see Forms, Integrations and Portals). Give
+that user **Events Staff** too, so its registrations are written at once; otherwise they wait for
+the scheduled processing.
+
 ### Dashboard and Event Templates
 
 The top of the **Details** tab is the **Event Dashboard**: days to go, counts of ticket types,
@@ -357,6 +400,7 @@ you change it.
 | Mark no-shows | Off | Once an event has ended (within seven days), attendees still **Registered** become **No-Show**. | At the next 7:30 AM run |
 | Accepted speaker notice template | Empty (no email) | The developer name of the email template sent when a speaker application is accepted (see Call for Speakers). | At the next decision |
 | Declined speaker notice template | Empty (no email) | The developer name of the email template sent when a speaker application is declined. | At the next decision |
+| Public page payment note | Pay at the door or by arrangement with us. | Shown beside each ticket with a price on a public event page, since BarnCRM takes no payment. | At once |
 
 ## Reminders, Follow-Ups and No-Shows
 
@@ -403,5 +447,5 @@ is left alone.
 
 ## Not Yet
 
-Session sign-up, a public event page, speaker portal and ticket emails with the QR code for an
+Session sign-up, speaker portal and ticket emails with the QR code for an
 event come in later releases.

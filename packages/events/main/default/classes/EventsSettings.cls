@@ -64,6 +64,14 @@ public with sharing class EventsSettings {
 		return textOr('Follow_Up_Template__c', DEFAULT_FOLLOW_UP_TEMPLATE);
 	}
 
+	/** The note shown beside a priced ticket on a public event page (EV-16); never blank. */
+	public static String publicPaymentNote() {
+		return textOr(
+			'Public_Payment_Note__c',
+			BarnHelp.text('Events', 'Events_Public_PaymentNoteDefault')
+		);
+	}
+
 	private static String textOr(String key, String shipped) {
 		String value = textOrNull(key);
 		return value == null ? shipped : value;

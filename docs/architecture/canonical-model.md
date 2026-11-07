@@ -12994,6 +12994,9 @@ with its own tickets, agenda and later its own registrations.
 | Description | long text | no | What it is about. |
 | Series | reference to Event | no | For a later occurrence of a recurring event, the first event of the series (R-EV4). |
 | External Key | text | no | The key of the record this event was imported from, unique: `summit:` and the Summit Events instance's identifier (EV-10). |
+| Public Page | boolean | yes (defaults false) | Whether the event has a public page on the organization's Site and API (EV-16, R-EV5). |
+| Show Speakers | boolean | yes (defaults false) | Whether the public page names the event's confirmed speakers, with headline and bio (R-EV5). |
+| Show Seats Left | boolean | yes (defaults false) | Whether the public page shows seats left per ticket type (R-EV5). |
 
 ### Relationships
 
@@ -13017,6 +13020,14 @@ the framework-free module `eventsModel.js`; a monthly occurrence keeps the day o
 month's last day when it is shorter. Nothing keeps occurrences in step afterwards: each is edited
 on its own.
 
+**R-EV5 A public page shows only what the event publishes (EV-16, ADR-NEXT public event pages).**
+A page is served only while Public Page is on and the status is Open or Closed. It shows the
+event's name, description, dates, format, venue and registration times; active ticket types whose
+sales have not ended, with price (a priced one with the Events Settings payment note) and, with
+Show Seats Left, seats left; Confirmed sessions; and, with Show Speakers, Confirmed speakers' names,
+headlines and bios. Never the online link, capacity, codes, registrations or attendees. The
+registration form is shown while the status is Open and now is inside the registration times.
+
 ### Salesforce implementation
 
 - **Object:** `Event__c`, name field Text, label Event Name, sharing Public Read/Write, tab Events
@@ -13038,6 +13049,9 @@ on its own.
 | Series | `Series__c` | Lookup(Event), Clear on delete |
 | Registration Form Key | `Registration_Form_Key__c` | Text(18): the Forms form registrants fill in, by record identifier (EV-02, ADR-0014) |
 | External Key | `External_Key__c` | Text(80), unique, external ID (EV-10) |
+| Public Page | `Public_Page__c` | Checkbox, default false (EV-16) |
+| Show Speakers | `Public_Speakers__c` | Checkbox, default false (EV-16) |
+| Show Seats Left | `Public_Seats__c` | Checkbox, default false (EV-16) |
 
 - **Validation rules:** `End_After_Start` (R-EV1), `Capacity_Above_Zero` (R-EV2),
   `Registration_Closes_After_Opens` (R-EV3).
@@ -13787,6 +13801,7 @@ follow-up and No-Show settings (EV-14).
 | Send follow-ups | boolean | yes (defaults false) | Whether the morning run emails each person marked Attended within seven days after the event. |
 | Follow-up email template | text | yes (defaults BarnCRM_Event_Follow_Up) | The unique name of the follow-up's email template. |
 | Mark no-shows | boolean | yes (defaults false) | Whether the morning run marks attendees still Registered as No-Show once an event (ended within seven days) is over. |
+| Payment note | text | yes (defaults "Pay at the door or by arrangement with us.") | Shown beside each priced ticket on a public event page (EV-16): BarnCRM takes no payment. A blank one reads as the default. |
 | Accepted Notice Template | text | no | Developer name of the email template sent when an application is accepted. |
 | Declined Notice Template | text | no | Developer name of the email template sent when an application is declined. |
 
@@ -13815,11 +13830,12 @@ reads as its shipped value.
 | Send follow-ups | `Follow_Ups_Enabled__c` | Checkbox, default false |
 | Follow-up email template | `Follow_Up_Template__c` | Text(80), default BarnCRM_Event_Follow_Up |
 | Mark no-shows | `Mark_No_Shows__c` | Checkbox, default false |
+| Payment note | `Public_Payment_Note__c` | Text(255), default "Pay at the door or by arrangement with us." |
 
 - **Setting Definitions:** `Events_Reminders_Enabled`, `Events_Reminder_Lead_Days`,
   `Events_Reminder_Template`, `Events_Follow_Ups_Enabled`, `Events_Follow_Up_Template`,
   `Events_Mark_No_Shows` (sort 10 to 60), `Events_Accept_Notice_Template` (70),
-  `Events_Decline_Notice_Template` (80), section Events (Core's `SettingSections.EVENTS`).
+  `Events_Decline_Notice_Template` (80), `Events_Public_Payment_Note` (90), section Events (Core's `SettingSections.EVENTS`).
 - **Automation:** the nightly step `EventEmailScheduler` (7:30 AM, through
   `EventsNightlyJobProvider`) starts `EventEmailBatch`; the work is `EventEmailService`. Email
   templates `BarnCRM_Event_Reminder` and `BarnCRM_Event_Follow_Up` ship in the folder BarnCRM
@@ -14390,6 +14406,7 @@ mirrors the primary member).
 | 1.3 | 2026-11-07 | Event Management call for speakers (EV-06; ADR-0180 `0180-events-call-for-speakers.md`, ADR-0177 decision 11, D-123, D-177). New Sections 29EV20 Speaker Application (`Speaker_Application__c`, rules R-SA1, R-SA2, R-SA4, R-SA5), 29EV21 Speaker Review (`Speaker_Review__c`, R-SA3) and 29EV25 Events Settings (`Events_Settings__c`, R-ES1). Core gains the settings section name `Events`. Numbers 29EV22 to 29EV24 are reserved for sponsorship (EV-09). |
 | 1.3 | 2026-11-07 | Event Management sponsorship (EV-09; ADR-0181 `0181-events-sponsorship.md`, ADR-0177 decision 11, D-123, D-177). New Sections 29EV22 Sponsorship Level (`Sponsorship_Level__c`, R-SP3), 29EV23 Event Sponsor (`Event_Sponsor__c`, R-SP1, R-SP4) and 29EV24 Sponsor Deliverable (`Sponsor_Deliverable__c`). Core gains the `LinkedRecords` seam (no object or field). |
 | 1.3 | 2026-11-07 | Event Appointment (`Event_Appointment__c`, 29EV15, EV-15, ADR-0177 decision 13) with rules R-EAP1 to R-EAP6. |
+| 1.2 | 2026-11-07 | Public event pages (EV-16, D-186, ADR-NEXT public event pages). `Event__c` (29EV1) gains `Public_Page__c`, `Public_Speakers__c` and `Public_Seats__c` (Checkbox, default false) and rule R-EV5; `Events_Settings__c` (29EV25) gains `Public_Payment_Note__c` (setting `Events_Public_Payment_Note`, sort 90). Core gains the `PublicPageExtension` seam (no object or field). |
 | 1.3 | 2026-11-07 | Portal Builder module (PB-01, D-118, D-178, D-187; ADR-0185 `0185-portal-builder-off-platform-portal-api.md`). New package `packages/portal`: Portal (`Portal__c`, 29PB1), Portal Access (`Portal_Access__c`, 29PB2), Portal Session (`Portal_Session__c`, 29PB3) and Portal Settings (`Portal_Settings__c`, 29PB4), rules R-PB1 to R-PB4, R-PA1, R-PA2, R-PS1, R-PS2 and R-PST1. Core gains no object or field: only the `PortalActionExtension` seam, the Portals settings section and the catalog row `BarnCRM_Module.Portal`. |
 
 ---

@@ -83,6 +83,33 @@
         <behavior>Edit</behavior>
         <field>Registration_Closes__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Registration_Form_Key__c</field>
+      </layoutItems>
+    </layoutColumns>
+  </layoutSections>
+  <layoutSections>
+    <customLabel>true</customLabel>
+    <detailHeading>true</detailHeading>
+    <editHeading>true</editHeading>
+    <label>Public Page</label>
+    <style>TwoColumnsTopToBottom</style>
+    <layoutColumns>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Public_Page__c</field>
+      </layoutItems>
+    </layoutColumns>
+    <layoutColumns>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Public_Speakers__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Public_Seats__c</field>
+      </layoutItems>
     </layoutColumns>
   </layoutSections>
   <layoutSections>

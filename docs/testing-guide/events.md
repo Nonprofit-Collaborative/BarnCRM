@@ -1,6 +1,6 @@
 # Event Management
 
-Scripts for events and the Events page (EV-01 to EV-06, EV-08 to EV-12, EV-14 and EV-15). Setup
+Scripts for events and the Events page (EV-01 to EV-06, EV-08 to EV-12 and EV-14 to EV-16). Setup
 detail:
 [Event Management](../admin-guide/events.md).
 
@@ -322,3 +322,30 @@ attendee. A phone or laptop camera and Chrome or Edge for step 6.
 | 10 | As read-only, open **Check-In**. | The list and QR buttons show; no **Check In** buttons, **Add Walk-In** or code box. |
 
 **Cleanup:** None.
+
+## T-EV-16: Public Event Page and Registration
+
+**Purpose:** confirm an event's public page shows only what staff published, takes registrations
+through the public form intake, and that Events still works without Forms.
+**Prerequisites:** admin; BarnCRM Forms installed with an active Site set up for public forms
+(see the Forms testing guide); a published public form with questions `first`, `last`, `email`
+and a `ticketType` choice listing `General` and `Student`, and public processing scheduled. An
+Open event with Capacity `2`, an Online Link, tickets `General` (price `25`) and `Student` (price
+`0`), one inactive ticket `Old`, a Confirmed session `Keynote` and a Draft session `Secret Talk`,
+a Confirmed speaker and an Invited one, and the form's record ID in **Registration Form Key**.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In a private browser window, open `<site address>/FormsPublic?record=<event ID>`. | `This page isn't available right now.`: Public Page is off. |
+| 2 | Tick **Public Page** on the event; reload. | The event's name, dates, venue and description; **Tickets** lists General with `$25.00` and `Pay at the door or by arrangement with us.`, and Student with **Free**; **Agenda** lists Keynote only. No Old ticket, Secret Talk, speakers, seat counts or online link. The registration form shows under **Register**. |
+| 3 | Tick **Show Speakers** and **Show Seats Left**; reload. | **Speakers** lists the Confirmed speaker only (name, headline, bio); Keynote reads `With` and their name; each ticket shows `Seats left: 2`. |
+| 4 | In **BarnCRM Settings**, Events, change **Public page payment note** to `Pay by check at the door.`; reload. | General shows the new note. |
+| 5 | Fill in the form as `Robin Zzpage`, ticket `General`, and send. | The form's confirmation shows. Within 15 minutes (or after **Process Again** on the Received submission), **Registrations** shows Robin with source **Form**, ticket General, amount owed 25. |
+| 6 | Reload the page. | General shows `Seats left: 1`. |
+| 7 | Open `<site address>/FormsPublic?list=events`. | **Upcoming Events** lists the event, linked to its page. |
+| 8 | Set **Registration Closes** to yesterday; reload the event page. | `Registration for this event is closed.`; no form. Set the event to **Draft**: the page is unavailable and the list no longer shows it. |
+| 9 | As the integration user (see Forms, Integrations and Portals), GET `/services/apexrest/barncrm/forms/v1/pages/<event ID>` with the event Open again. | The same page as JSON, with `formId`; no online link, codes or attendee data. |
+| 10 | In an org with Event Management and no Forms, tick **Public Page** on an Open event and run **Health Check**. | Warning `Public event pages need BarnCRM Forms`. Events, tickets and registrations work as before. |
+
+**Cleanup:** delete Robin Zzpage's registration and contact; untick **Public Page**.

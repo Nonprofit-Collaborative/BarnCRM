@@ -119,7 +119,13 @@ into six kinds:
 
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
-| FormIntakeService | Platform | A Site guest user, who has no object access, loads one published public form and version and stores one Received submission; it never reads a person, an organization or any other record, and processing runs later in user mode | ADR-0184 public forms on a Salesforce Site |
+| FormIntakeService | Platform | A Site guest user, who has no object access, loads one published public form and version and stores one Received submission; it never reads a person, an organization or any other record, and processing runs later in user mode. It also serves a module's public page (EV-16) and checks only that the form the page names is published and public | ADR-0184 public forms on a Salesforce Site, ADR-NEXT public event pages |
+
+## Event Management
+
+| Class | Kind | What it reaches past sharing for | Authority |
+|---|---|---|---|
+| EventPublicPage | Platform | A Site guest user or the API's integration user reads one event staff marked Public Page (Open or Closed only): its public fields, active tickets, confirmed sessions, seat counts with Show Seats Left, and confirmed speakers' names, headlines and bios with Show Speakers; never the online link, codes, registrations, attendees or other person fields | ADR-NEXT public event pages |
 
 ## Portal Builder
 

@@ -143,6 +143,23 @@ still **Registered** as **No-Show** once the event is over. An attendee's **Remi
 If your organization uses Summit Events, its registrations appear here each morning with source
 **Summit Events**; change an imported attendee in BarnCRM.
 
+## Publish an Event Page
+
+When your organization uses BarnCRM Forms and a Salesforce Site, an event can have a public page
+where people read about it and register.
+
+1. Open the event and, on **Details**, edit the **Public Page** section.
+2. Tick **Public Page**. Tick **Show Speakers** to name confirmed speakers with their headline and
+   bio, and **Show Seats Left** to show how many seats each ticket has left.
+3. To take registrations on the page, enter your public registration form's record ID in
+   **Registration Form Key** and set the event to **Open**.
+4. Share the page's address from your admin: your Site address followed by
+   `/FormsPublic?record=` and the event's record ID.
+
+The page shows only confirmed sessions and speakers and active tickets; tickets with a price show
+the price and a note on how to pay, since BarnCRM takes no payment. People who register through
+the page appear on **Registrations** with source **Form**, usually within 15 minutes.
+
 ## Check People In
 
 1. Open the event and click the **Check-In** tab. The line at the top shows how many are in.
