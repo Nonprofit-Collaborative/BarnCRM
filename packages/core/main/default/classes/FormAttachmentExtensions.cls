@@ -6,9 +6,9 @@
  */
 @NamespaceAccessible
 public with sharing class FormAttachmentExtensions {
-	/** The class names modules register. Event Management adds its class here (EV-02). */
+	/** The class names modules register: Event Management's registrations (EV-02). */
 	@NamespaceAccessible
-	public static final List<String> EXTENSION_CLASSES = new List<String>();
+	public static final List<String> EXTENSION_CLASSES = new List<String>{ 'EventFormAttachment' };
 
 	/** Injected by tests by class name, since no module is there to resolve. */
 	@TestVisible

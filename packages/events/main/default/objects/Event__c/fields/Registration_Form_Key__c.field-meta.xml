@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Registration_Form_Key__c</fullName>
+  <description>Set from the Forms module (ADR-0014): the registration form's record identifier, as text, so Events never depends on Forms.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The BarnCRM Forms form people fill in to register, by its record ID. Leave empty when you register people on the Registrations tab.</inlineHelpText>
+  <label>Registration Form Key</label>
+  <length>18</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

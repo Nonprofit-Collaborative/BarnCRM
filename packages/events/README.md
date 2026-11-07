@@ -27,6 +27,11 @@ used, and BarnCRM takes no payment.
   (`eventRepeatModal`), the framework-free module `eventsModel` and the thin controller
   `EventsHomeController`.
 - The event record page `Event_Record_Page`: Core's header, main and sidebar template with tabs.
+- Registrations (EV-02): `Event_Registration__c` (Private) and `Event_Attendee__c` (29EV8,
+  29EV9), the Registrations tab (`eventRegistrations`, `eventRegistrationsModel`,
+  `EventRegistrationsController`), `EventRegistrationService` with `EventPersonMatcher` (Core's
+  matchers, household-aware) and `EventPricing`, and `EventFormAttachment`, Core's form seam
+  (`FormAttachmentExtensions`), used only when Forms is installed.
 - Permission sets Events Admin, Staff and Read Only, given by role through `EventsAccessSync`;
   install steps in `EventsPostInstall`.
 - Help and messages in `BarnHelp_Events.json`.

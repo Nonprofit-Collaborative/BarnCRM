@@ -177,6 +177,94 @@
         <value>Unscheduled</value>
     </labels>
     <labels>
+        <fullName>Events_EventTab_Registrations</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: who registered and who attends</shortDescription>
+        <value>Registrations</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_New</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Registrations tab button that opens the registration form</shortDescription>
+        <value>New Registration</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_Register</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Registration form button that saves the registration</shortDescription>
+        <value>Register</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_AddGuest</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Registration form button that adds a guest row</shortDescription>
+        <value>Add Guest</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_ExistingPerson</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Registration form: the picker for a person already in BarnCRM</shortDescription>
+        <value>Existing Person</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_MarkAttended</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendee menu item: the person came</shortDescription>
+        <value>Mark Attended</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_MarkNoShow</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendee menu item: the person did not come</shortDescription>
+        <value>Mark No-Show</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_MarkRegistered</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendee menu item: back to Registered</shortDescription>
+        <value>Mark Registered</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_MoveOffWaitlist</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendee menu item: give a waitlisted person a free seat</shortDescription>
+        <value>Move Off Waitlist</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_CancelAttendee</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendee menu item: cancel this one person</shortDescription>
+        <value>Cancel Attendee</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_CancelRegistration</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendee menu item and button: cancel the whole booking</shortDescription>
+        <value>Cancel Registration</value>
+    </labels>
+    <labels>
         <fullName>Events_EventTab_Speakers</fullName>
         <categories>Events</categories>
         <language>en_US</language>

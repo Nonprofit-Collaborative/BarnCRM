@@ -222,7 +222,44 @@ read that record, its name shows under the sponsor; otherwise nothing shows. Spo
 neither module. Removing a level leaves its sponsors with no level, keeping their amounts and
 checklists.
 
+### Registrations
+
+The **Registrations** tab lists everyone registered for the event, newest booking first, with
+their booking number, ticket, price and status, and a line counting who holds a seat, who waits
+and who attended (with the seats left when the event has a capacity).
+
+**New Registration** registers someone by hand. Pick them in **Existing Person**, or type their
+first and last name, email and postal code: BarnCRM looks for them among your people (by email,
+then last name and postal code, each with the first name, then your duplicate rules) and creates
+them only when nobody matches, so registering never makes a duplicate. When two or more people
+match, nothing is saved and you are asked to pick the person. **Add Guest** adds a row for each
+person they bring; a guest is looked for in the registrant's household first and, when new, is
+created in that household. Choose each person's ticket and type a promo code if they have one.
+
+| Registration rule | What happens |
+|---|---|
+| Ticket | Must be one of the event's active ticket types. With none chosen, the first active one is used; an event with no ticket types registers people at no price. |
+| Promo code | Must be this event's, active, inside its dates, for one of the chosen tickets and under its Maximum Uses (registrations that are not cancelled count). Its discount sets each attendee's price. |
+| Seats | Registered, Attended and No-Show attendees hold a seat. With no seat left on the event's Capacity or the ticket's Quantity, a new attendee is **Waitlisted**. |
+| Once per event | A person already registered (not cancelled) is left out and named in a message. |
+| Amount Owed | The prices of the attendees holding a seat. BarnCRM records it and takes no payment. |
+
+Each attendee's menu changes their status: **Mark Attended**, **Mark No-Show**, **Mark
+Registered**, **Move Off Waitlist** (only when a seat is free; nothing moves off the waitlist on
+its own), **Cancel Attendee** and **Cancel Registration** (everyone on the booking). The
+registration's status follows its attendees: Registered while anyone holds a seat, Waitlisted
+while everyone waits, otherwise Cancelled.
+
+Registrations hold personal data, so they are private: only people with an Events permission set
+see them (Events Read Only reads them; Events Staff and Events Admin change them).
+
+**With BarnCRM Forms.** Put a Forms form's record ID in the event's **Registration Form Key**.
+Each submission of that form filled from the event registers the person Forms matched or created,
+with source **Form**; a question with the key `ticketType` (a ticket type's name) and one with the
+key `promoCode` choose the ticket and the code. A submission that cannot be registered (a used-up
+code, an unknown ticket) is kept for review in Forms. Without Forms, register people on the tab.
+
 ## Not Yet
 
-Registration and attendees, session sign-up, a public event page, speaker portal, check-in,
-reminders and volunteer shifts for an event come in later releases.
+Session sign-up, a public event page, speaker portal, check-in codes, reminders and volunteer
+shifts for an event come in later releases.

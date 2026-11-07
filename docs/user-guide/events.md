@@ -89,3 +89,19 @@ Use **When** to look at one day at a time, or at the sessions with no time yet.
 3. Choose **Accept** to make the applicant a speaker (as **Invited**) or **Decline**, and confirm.
    If your admin chose email templates, the applicant gets the notice. If not, or if they have no
    email address, a message tells you, and the application shows why.
+
+## Register People
+
+1. Open the event and click the **Registrations** tab, then **New Registration**.
+2. Pick the person in **Existing Person**, or type their name, email and postal code. BarnCRM
+   finds them among your people before creating anyone; if several people match, pick the right
+   one instead.
+3. Choose their ticket and type a promo code if they have one.
+4. **Add Guest** for each person they bring. A guest already in their household is found there;
+   a new guest joins it.
+5. Click **Register**. Anyone already registered is left out and named. When the event or the
+   ticket is full, people go on the waitlist.
+
+From an attendee's menu, **Mark Attended** or **Mark No-Show** after the event, **Move Off
+Waitlist** when a seat frees up, **Cancel Attendee** for one person or **Cancel Registration** for
+the whole booking.

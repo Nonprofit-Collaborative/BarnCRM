@@ -120,6 +120,8 @@ public with sharing class ModuleManagerService {
 		'ContactPoints' => new List<String>{ 'Contact_Point_Link__c' },
 		'Events' => new List<String>{
 			'Event__c',
+			'Event_Attendee__c',
+			'Event_Registration__c',
 			'Event_Session__c',
 			'Event_Speaker__c',
 			'Event_Sponsor__c',
