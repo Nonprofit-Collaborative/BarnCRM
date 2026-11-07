@@ -10,9 +10,8 @@ public with sharing class PublicPageExtensions {
 	@NamespaceAccessible
 	public static final List<String> EXTENSION_CLASSES = new List<String>{ 'EventPublicPage' };
 
-	/** The class whose presence means a package that serves public pages is installed (Forms). */
-	@TestVisible
-	private static final String HOST_CLASS = 'FormIntakeService';
+	/** The module key of the package that serves public pages (BarnCRM Forms). */
+	private static final String HOST_MODULE = 'Forms';
 
 	/** Injected by tests by class name, since no module is there to resolve. */
 	@TestVisible
@@ -48,7 +47,15 @@ public with sharing class PublicPageExtensions {
 	/** Whether a package that serves public pages (BarnCRM Forms) is installed. */
 	@NamespaceAccessible
 	public static Boolean hostInstalled() {
-		return hostForTest != null ? hostForTest : NamespaceUtil.resolveType(HOST_CLASS) != null;
+		if (hostForTest != null) {
+			return hostForTest;
+		}
+		for (ModuleManagerService.ModuleStatus module : ModuleManagerService.getModules()) {
+			if (HOST_MODULE.equalsIgnoreCase(module.getName())) {
+				return module.getStatus() != ModuleManagerService.STATUS_NOT_INSTALLED;
+			}
+		}
+		return false;
 	}
 
 	/** One record's public page, or null when no module publishes it. */
