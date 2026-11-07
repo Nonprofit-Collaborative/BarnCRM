@@ -136,3 +136,27 @@ later, with no ticket types, tracks or sessions.
 | 7 | As read-only, open the event. | The dashboard shows; no **Event Templates**. |
 
 **Cleanup:** delete the test events.
+
+## T-EV-08: Appointments
+
+**Purpose:** confirm adding slots for a host, booking, the no-double-booking rule and status
+changes.
+**Prerequisites:** staff, an event that starts tomorrow at 08:00 and ends at 18:00, and people
+`Priya Rao` (host), `Sam Lee` (a second host) and `Omar Hill`.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event, click **Appointments**. | An empty state and the **Add Slots for a Host** form. **Add Slots** is disabled. |
+| 2 | Pick `Priya Rao` as **Host**, set **Day** to the event's day, **From** 09:00, **To** 10:00, **Minutes per Slot** 20, **Location** `Table 4`. | The line says it adds 3 slots of 20 minutes; **Add Slots** is enabled. |
+| 3 | Click **Add Slots**. | A group `Priya Rao` with 3 **Open** slots at 9:00, 9:20 and 9:40; the heading says 3 open, 0 booked. |
+| 4 | Add the same window for Priya again. | The line says 3 slots overlap and are left out; **Add Slots** stays disabled. |
+| 5 | Set **To** to 18:30 (past the event's end). | A warning that some slots fall outside the event's dates. Set it back to 10:00. |
+| 6 | Row menu of the 9:00 slot, **Book a Person**, pick `Omar Hill`. | The slot is **Booked** with Omar Hill; the heading says 2 open, 1 booked. |
+| 7 | Add a 9:00 to 9:20 slot for `Sam Lee`. Book `Omar Hill` into it. | Refused: that person is already booked at the same time with another host. |
+| 8 | Row menu of Omar's slot: **Mark No-Show**, then **Release the Slot**. | **No-Show**, then **Open** with no person. |
+| 9 | Row menu of an open slot: **Cancel Slot**, then **Reopen Slot**. | **Cancelled**, then **Open**. |
+| 10 | Row menu **Edit** on a slot: set End before Start. | Refused: End must be after Start. |
+| 11 | As read-only, open **Appointments**. | The slots show; no **Add Slots** form and no **Book a Person**. |
+
+**Cleanup:** delete the test event.

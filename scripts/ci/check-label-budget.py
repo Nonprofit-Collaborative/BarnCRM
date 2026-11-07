@@ -38,7 +38,8 @@ import sys
 # Event Management: 59 labels) and its Core and Volunteers items (C-61/C-63, C-69, V-10b); the
 # check below already holds no unused label and no help prose. A module's labels reach an org
 # only when that module is installed.
-BUDGET = 3245
+# Raised by 1 for the event page's Appointments tab label (EV-15).
+BUDGET = 3246
 TARGET = 3000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 

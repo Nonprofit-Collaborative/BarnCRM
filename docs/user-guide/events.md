@@ -63,6 +63,19 @@ set up yet also offers **Event Templates**: choose **Community Conference** to p
 tickets, sessions and planning dates, then click **Apply Template** to add them as drafts you can
 change. Nothing is added until you click it.
 
+## Offer Appointments with Hosts
+
+1. Open the event and click the **Appointments** tab.
+2. Under **Add Slots for a Host**, pick the **Host**, the **Day**, the time window (**From** and
+   **To**) and the **Minutes per Slot**. The line below says how many slots it will add.
+3. Click **Add Slots**. The slots appear under the host, each **Open**.
+4. To book someone, open the slot's menu, choose **Book a Person** and pick them. A person cannot
+   be booked into two slots that overlap.
+5. Afterwards use the menu to mark the slot **Completed** or **No-Show**, **Release the Slot** to
+   free it, or **Cancel Slot**.
+
+A red note means two of one host's slots overlap. Change one, or leave it if that is intended.
+
 ## Add Speakers
 
 1. Open the event and click the **Speakers** tab.

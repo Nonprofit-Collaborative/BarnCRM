@@ -1,0 +1,171 @@
+<template>
+  <template lwc:if={helpReady}>
+    <p class="slds-var-m-bottom_small slds-text-color_weak" data-id="intro">{text.intro}</p>
+
+    <template lwc:if={canAdd}>
+      <div class="slds-box slds-var-m-bottom_medium" data-id="add-form">
+        <h2 class="slds-text-heading_small">{text.addTitle}</h2>
+        <lightning-record-picker
+          data-id="host"
+          label={fieldLabels.Host__c}
+          placeholder={fieldLabels.Host__c}
+          object-api-name="Contact"
+          onchange={handleHost}
+        ></lightning-record-picker>
+        <div class="slds-grid slds-wrap slds-gutters_small">
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+            <lightning-input
+              type="date"
+              data-field="date"
+              data-id="date"
+              label={text.day}
+              value={form.date}
+              onchange={handleField}
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+            <lightning-input
+              type="time"
+              data-field="from"
+              data-id="from"
+              label={text.from}
+              value={form.from}
+              onchange={handleField}
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+            <lightning-input
+              type="time"
+              data-field="to"
+              data-id="to"
+              label={text.to}
+              value={form.to}
+              onchange={handleField}
+            ></lightning-input>
+          </div>
+          <div class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+            <lightning-input
+              type="number"
+              data-field="minutes"
+              data-id="minutes"
+              label={text.minutes}
+              value={form.minutes}
+              min="5"
+              max="480"
+              onchange={handleField}
+            ></lightning-input>
+          </div>
+        </div>
+        <lightning-input
+          data-field="location"
+          data-id="location"
+          label={fieldLabels.Location__c}
+          value={form.location}
+          maxlength="255"
+          onchange={handleField}
+        ></lightning-input>
+        <p class="slds-var-m-top_x-small slds-text-color_weak" data-id="preview">{previewText}</p>
+        <template lwc:if={outsideEvent}>
+          <c-barn-notice variant="warning" message={outsideText} data-id="outside"></c-barn-notice>
+        </template>
+        <lightning-button
+          class="slds-var-m-top_small"
+          data-id="add"
+          variant="brand"
+          label={text.add}
+          disabled={cannotAdd}
+          onclick={handleAdd}
+        ></lightning-button>
+      </div>
+    </template>
+
+    <template lwc:if={isLoading}>
+      <lightning-spinner alternative-text={labels.appointments} size="small"></lightning-spinner>
+    </template>
+
+    <template lwc:if={hasError}>
+      <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+    </template>
+
+    <template lwc:if={showEmpty}>
+      <c-barn-empty-state data-id="empty-state" message={text.empty}></c-barn-empty-state>
+    </template>
+
+    <template for:each={groups} for:item="group">
+      <div key={group.key} class="slds-var-m-bottom_medium" data-id="host-group">
+        <h3 class="slds-text-heading_small">
+          {group.hostName}
+          <span class="slds-text-color_weak slds-text-body_regular slds-var-m-left_x-small">
+            {group.summary}
+          </span>
+        </h3>
+        <table
+          class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_stacked-horizontal"
+        >
+          <thead>
+            <tr class="slds-line-height_reset">
+              <th scope="col">{fieldLabels.Start__c}</th>
+              <th scope="col">{fieldLabels.Status__c}</th>
+              <th scope="col">{fieldLabels.Contact__c}</th>
+              <th scope="col">{fieldLabels.Location__c}</th>
+              <th scope="col"><span class="slds-assistive-text">{labels.actions}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={group.slots} for:item="slot">
+              <tr key={slot.id} data-id="slot-row">
+                <th scope="row" data-label={fieldLabels.Start__c}>
+                  {slot.when}
+                  <template lwc:if={slot.clash}>
+                    <p class="slds-text-color_error" data-id="clash">{clashText}</p>
+                  </template>
+                </th>
+                <td data-label={fieldLabels.Status__c}>
+                  <c-barn-status-badge status={slot.badge} label={slot.status}></c-barn-status-badge>
+                </td>
+                <td data-label={fieldLabels.Contact__c}>
+                  <template lwc:if={slot.personHref}>
+                    <a href={slot.personHref}>{slot.contactName}</a>
+                  </template>
+                  <template lwc:if={slot.isBooking}>
+                    <lightning-record-picker
+                      data-id={slot.id}
+                      label={text.pickPerson}
+                      variant="label-hidden"
+                      placeholder={text.pickPerson}
+                      object-api-name="Contact"
+                      onchange={handlePerson}
+                    ></lightning-record-picker>
+                    <lightning-button
+                      data-id="book-cancel"
+                      label={labels.cancel}
+                      onclick={handleBookCancel}
+                    ></lightning-button>
+                  </template>
+                </td>
+                <td data-label={fieldLabels.Location__c}>{slot.location}</td>
+                <td>
+                  <lightning-button-menu
+                    data-id={slot.id}
+                    alternative-text={slot.menuLabel}
+                    icon-size="x-small"
+                    menu-alignment="right"
+                    onselect={handleMenu}
+                  >
+                    <template for:each={slot.menuItems} for:item="item">
+                      <lightning-menu-item
+                        key={item.value}
+                        label={item.label}
+                        value={item.value}
+                      ></lightning-menu-item>
+                    </template>
+                  </lightning-button-menu>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </div>
+    </template>
+  </template>
+</template>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Person_Required_When_Booked</fullName>
+  <active>true</active>
+  <description>R-EAP4: a slot becomes Booked only with a person in it. A person erased later leaves it Booked with none, and editing the slot is still allowed.</description>
+  <errorConditionFormula>
+AND(
+  ISPICKVAL(Status__c, 'Booked'),
+  ISBLANK(Contact__c),
+  OR(ISNEW(), ISCHANGED(Status__c), ISCHANGED(Contact__c))
+)
+  </errorConditionFormula>
+  <errorDisplayField>Contact__c</errorDisplayField>
+  <errorMessage>Choose the person who is booked, or set the status to Open.</errorMessage>
+</ValidationRule>

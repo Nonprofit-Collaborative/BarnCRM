@@ -79,7 +79,8 @@ CAPS = {
     # EV-03 to EV-05).
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.
     # Raised for the event dashboard and templates (EV-11): 35,343 measured, plus about 2.5%.
-    "events": 36_200,
+    # Raised for event appointments (EV-15): 42,558 measured, plus about 2.7%.
+    "events": 43_700,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

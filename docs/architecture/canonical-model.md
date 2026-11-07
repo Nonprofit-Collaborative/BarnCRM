@@ -13235,6 +13235,70 @@ a second assignment of the same speaker to the same session.
 
 ---
 
+## 29EV15. Event Appointment
+
+### Definition
+
+One bookable slot with a host during an event (EV-15, ADR-0177 decision 13): a mentor, advisor or
+staff member's time, open until a person is booked into it. Numbered for its plan item so it does
+not collide with registrations (EV-02).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Appointment Title | text | yes | The host's name and the start time, set when slots are added. |
+| Event | reference to Event | yes | The event. |
+| Host | reference to Contact | yes, when created (R-EAP3) | The Core person who hosts. |
+| Person | reference to Contact | when Booked (R-EAP4) | The person booked into the slot; empty while it is Open. |
+| Start, End | date and time | yes | When the slot runs; End after Start (R-EAP1), inside the event's dates (R-EAP2). |
+| Status | picklist | yes | Open (default), Booked, Completed, No-Show or Cancelled. |
+| Location | text | no | A table, room or meeting link. |
+| Notes | long text | no | What staff or the host should know. |
+
+### Rules
+
+**R-EAP1 A slot ends after it starts.** Validation rule `End_After_Start`.
+
+**R-EAP2 A slot falls inside its event.** Validation rule `Inside_Event_Dates`.
+
+**R-EAP3 A new slot names its host.** Validation rule `Host_Required_When_Created`; a host
+deleted or erased later leaves the slot with none.
+
+**R-EAP4 Booked needs a person.** Validation rule `Person_Required_When_Booked`, checked only
+when the status or person changes, so a person erased later does not block editing the slot.
+
+**R-EAP5 Booking is one person at a time, never twice at once.** The Appointments tab books only
+an Open slot (under a record lock), and refuses a person who already has a Booked slot that
+overlaps it in the same event. Releasing a slot clears the person and returns it to Open.
+
+**R-EAP6 A host's overlapping slots are flagged, not refused.** The tab marks two live slots of
+one host that overlap (Cancelled slots take no time); Add Slots leaves out a new slot that
+overlaps one the host already has.
+
+### Salesforce implementation
+
+- **Object:** `Event_Appointment__c`, name field Text, label Appointment Title, master-detail to
+  Event (`Event__c`, relationship Appointments), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Host | `Host__c` | Lookup(Contact), Clear on delete |
+| Person | `Contact__c` | Lookup(Contact), Clear on delete |
+| Start, End | `Start__c`, `End__c` | Date/Time, required |
+| Status | `Status__c` | Picklist (Open, Booked, Completed, No-Show, Cancelled), restricted, required |
+| Location | `Location__c` | Text(255) |
+| Notes | `Notes__c` | Long Text Area(2000) |
+
+- **Validation rules:** `End_After_Start`, `Inside_Event_Dates`, `Host_Required_When_Created`,
+  `Person_Required_When_Booked`.
+- **Panel:** the Appointments tab of the event page (`eventAppointments`), with
+  `EventAppointmentsController` (thin, user mode) and the browser module
+  `eventAppointmentsModel` (slots, clashes, grouping).
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -13598,6 +13662,7 @@ mirrors the primary member).
 | 1.1 | 2026-11-06 | Forms module (C-42a, D-157, ADR-0175 `0175-forms-module.md`). New package BarnCRM Forms with Sections 29ZW Form (`Form__c`), 29ZX Form Version (`Form_Version__c`) and 29ZY Form Submission (`Form_Submission__c`), rules R-FM1, R-FM2 and R-FS1 to R-FS4. Core gains no object or field: only the `FormAttachmentExtension` seam and the catalog row `BarnCRM_Module.Forms`. |
 | 1.1 | 2026-11-06 | BarnCRM Contact Point Sync module (C-45, D-111, ADR-0176 contact point sync module). New package `contactpoints`: Contact Point Link (`Contact_Point_Link__c`, 29ZZ, rules R-CPL1 to R-CPL4) and Contact Point Sync Settings (`Contact_Point_Sync_Settings__c`, 29ZZ1, R-CPS1). No Core object or field added. |
 | 1.2 | 2026-11-06 | Event Management module (EV-01, EV-03, EV-04, EV-05; ADR-0177 `0177-events-module.md`, D-123, D-177). Seven objects in the new package `packages/events`: Event (`Event__c`, 29EV1), Ticket Type (`Ticket_Type__c`, 29EV2), Promo Code (`Promo_Code__c`, 29EV3), Event Track (`Event_Track__c`, 29EV4), Event Session (`Event_Session__c`, 29EV5), Event Speaker (`Event_Speaker__c`, 29EV6) and Session Speaker (`Session_Speaker__c`, 29EV7), with rules R-EV1 to R-EV4, R-TT1 to R-TT4, R-PC1 to R-PC5, R-ETR1, R-ESN1 to R-ESN5, R-ESP1 to R-ESP3 and R-SSP1. Registrations, attendees, call for speakers and sponsorship are designed in the ADR and added by their items. |
+| 1.3 | 2026-11-07 | Event Appointment (`Event_Appointment__c`, 29EV15, EV-15, ADR-0177 decision 13) with rules R-EAP1 to R-EAP6. |
 
 ---
 ## 32. Entity ownership by package
@@ -13728,6 +13793,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Event Session | Event Management | 1.2 (EV-04) | 29EV5 |
 | Event Speaker | Event Management | 1.2 (EV-05) | 29EV6 |
 | Session Speaker | Event Management | 1.2 (EV-05) | 29EV7 |
+| Event Appointment | Event Management | 1.3 (EV-15) | 29EV15 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |

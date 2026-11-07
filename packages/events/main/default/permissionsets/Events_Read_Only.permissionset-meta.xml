@@ -20,6 +20,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>EventAppointmentsController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>EventTicketsController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -45,6 +49,26 @@
   <fieldPermissions>
     <editable>false</editable>
     <field>Event_Session__c.Room__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Event_Appointment__c.Contact__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Event_Appointment__c.Host__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Event_Appointment__c.Location__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Event_Appointment__c.Notes__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -223,6 +247,15 @@
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <object>Event_Session__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>false</allowCreate>
+    <allowDelete>false</allowDelete>
+    <allowEdit>false</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Event_Appointment__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <objectPermissions>

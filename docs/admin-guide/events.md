@@ -179,6 +179,28 @@ day) as drafts; any that would fall outside the event's dates are left out and t
 how many. The apply is all or nothing, and an event that already has any ticket type, track or
 session refuses it.
 
+### Appointments
+
+The **Appointments** tab holds bookable slots with a **host**, such as mentor or advisor time at a
+conference. Each slot is an **Event Appointment** with a host (a Core person), a start and end, a
+status, a location and an optional person booked into it.
+
+| Field | What it is |
+|---|---|
+| Host | The Core person who hosts. Required for a new slot. |
+| Person | Who is booked; empty while the slot is **Open**. |
+| Start, End | When it runs: End after Start, inside the event's own dates. |
+| Status | Open (the default), Booked, Completed, No-Show or Cancelled. |
+| Location | A table, a room or a meeting link. |
+
+**Add Slots** picks a host, a day, a time window and the minutes per slot, and adds the slots
+back to back (up to 100 at a time); the line under the form says how many it will add. A slot that
+overlaps one the host already has is left out. A row menu **Book a Person** puts a person in an
+open slot; a person cannot be booked into two overlapping slots in one event. The menu also marks
+a booked slot **Completed** or **No-Show**, **Release the Slot** (clears the person), **Cancel
+Slot** and **Reopen Slot**, and has **Edit** and **Delete**. Two slots of one host that overlap
+are flagged, never refused. Staff and admins book and change slots; Read Only sees them.
+
 ## Not Yet
 
 Registration and attendees, session sign-up, a public event page, call for speakers, speaker portal, sponsorship, check-in,
