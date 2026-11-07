@@ -1,4 +1,4 @@
-# ADR-NEXT: Duplicate Rules Starter and report subscriptions through the org connection
+# ADR-0178: Duplicate Rules Starter and report subscriptions through the org connection
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-06
