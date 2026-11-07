@@ -53,6 +53,10 @@ public with sharing class OrgToolingApi {
 		return parts.isEmpty() ? '\'\'' : String.join(parts, ',');
 	}
 
+	// The call already goes through the named credential Barn_Org_Connection; it adds no
+	// authorization header (ADR-0148), so the job's own session is sent, as ImportNewFieldService
+	// sends it in the SOAP header. No stored secret is involved.
+	@SuppressWarnings('PMD.ApexSuggestUsingNamedCred')
 	private static String send(String method, String path, String body) {
 		HttpRequest call = new HttpRequest();
 		call.setEndpoint(BASE + path);
