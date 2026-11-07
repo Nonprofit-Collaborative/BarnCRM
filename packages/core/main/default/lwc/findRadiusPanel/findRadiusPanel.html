@@ -1,0 +1,84 @@
+<template>
+    <template lwc:if={helpReady}>
+    <template lwc:if={hasError}>
+        <div class="slds-text-color_error slds-var-m-bottom_x-small" role="alert" data-id="radius-error">
+            {errorMessage}
+        </div>
+    </template>
+
+    <h3 class="slds-text-heading_small slds-var-m-bottom_xx-small">{labels.radius}</h3>
+    <p class="slds-text-color_weak slds-var-m-bottom_x-small">{labels.help}</p>
+
+    <template lwc:if={noOptions}>
+        <p class="slds-text-color_weak" data-id="no-fields">{labels.noFields}</p>
+    </template>
+    <template lwc:elseif={active}>
+        <div role="group" aria-label={labels.radius} class="slds-box slds-box_x-small" data-id="radius">
+            <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-12">
+                    <lightning-combobox
+                        data-id="field"
+                        label={labels.address}
+                        options={options}
+                        value={field}
+                        onchange={handleFieldChange}
+                    ></lightning-combobox>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-12">
+                    <lightning-input
+                        data-id="miles"
+                        type="number"
+                        min="1"
+                        max="500"
+                        step="1"
+                        label={labels.miles}
+                        value={miles}
+                        onchange={handleMilesChange}
+                    ></lightning-input>
+                </div>
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
+                    <lightning-input
+                        data-id="place"
+                        label={labels.place}
+                        value={placeText}
+                        onchange={handlePlaceChange}
+                    ></lightning-input>
+                </div>
+                <div class="slds-col slds-shrink-none">
+                    <lightning-button
+                        data-id="use"
+                        variant="brand-outline"
+                        label={labels.use}
+                        onclick={handleUse}
+                    ></lightning-button>
+                </div>
+                <div class="slds-col slds-shrink-none">
+                    <lightning-button
+                        data-id="remove"
+                        variant="destructive-text"
+                        label={labels.remove}
+                        onclick={handleRemove}
+                    ></lightning-button>
+                </div>
+            </div>
+            <template lwc:if={center}>
+                <p class="slds-var-m-top_x-small" data-id="center">{centerText}</p>
+                <template lwc:if={centerNote}>
+                    <p class="slds-text-color_weak" data-id="center-note">{centerNote}</p>
+                </template>
+            </template>
+            <template lwc:if={showNeedsPlace}>
+                <p class="slds-text-color_weak slds-var-m-top_x-small" data-id="needs-place">{labels.needsPlace}</p>
+            </template>
+        </div>
+    </template>
+    <template lwc:else>
+        <lightning-button
+            data-id="add"
+            variant="neutral"
+            label={labels.radius}
+            onclick={handleAdd}
+        ></lightning-button>
+    </template>
+    </template>
+</template>

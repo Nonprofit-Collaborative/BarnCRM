@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
+  <cacheControl>Public</cacheControl>
+  <contentType>text/plain</contentType>
+  <description>
+    US postal code centers for Radius Find (C-69): zip,latitude,longitude records split by
+    semicolons, from the US Census Bureau 2023 Gazetteer ZCTA file (public domain).
+  </description>
+</StaticResource>

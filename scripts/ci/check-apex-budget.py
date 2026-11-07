@@ -46,7 +46,8 @@ CAPS = {
     # Form attachment seam (C-42a: FormAttachmentExtension, FormAttachmentExtensions, receipt).
     # Raised 2026-11-06 for the Duplicate Rules Starter (C-61, D-156: DuplicateRulesStarter and
     # OrgMetadataApi, the Metadata API through the org connection), then for Report Subscriptions
-    # (C-63, D-156: ReportSubscriptions and OrgToolingApi.rest).
+    # (C-63, D-156: ReportSubscriptions and OrgToolingApi.rest), then for Radius Find (C-69,
+    # D-157: FindRadius, QueryCompiler's radius condition, FindController's center lookup).
     "core": 2_059_000,
     "rollups": 374_000,
     # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
