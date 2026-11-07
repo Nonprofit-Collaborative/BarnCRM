@@ -273,6 +273,14 @@
         <value>Event reminders, follow-ups and no-shows</value>
     </labels>
     <labels>
+        <fullName>Events_NightlyJobs_SummitName</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Nightly run step name: Summit Events import</shortDescription>
+        <value>Summit Events import</value>
+    </labels>
+    <labels>
         <fullName>Events_EventTab_Speakers</fullName>
         <categories>Events</categories>
         <language>en_US</language>

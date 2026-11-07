@@ -80,8 +80,9 @@ CAPS = {
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.
     # EV-02 registrations (service, matcher, pricing, Forms seam, Registrations tab): 57,286
     # measured, plus about 2.5%. EV-14 reminders, follow-ups and No-Show (settings, nightly
-    # step, batch, email service): 67,896 measured, plus about 2.5%.
-    "events": 69_600,
+    # step, batch, email service): 67,896 measured, plus about 2.5%. EV-10 Summit Events import
+    # (adapter, batch, step; dynamic SOQL, no dependency): 82,652 measured, plus about 2.5%.
+    "events": 84_400,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

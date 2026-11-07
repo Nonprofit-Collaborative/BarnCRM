@@ -12882,6 +12882,7 @@ with its own tickets, agenda and later its own registrations.
 | Registration Opens, Registration Closes | date and time | no | When registration is taken (R-EV3, used by EV-02). |
 | Description | long text | no | What it is about. |
 | Series | reference to Event | no | For a later occurrence of a recurring event, the first event of the series (R-EV4). |
+| External Key | text | no | The key of the record this event was imported from, unique: `summit:` and the Summit Events instance's identifier (EV-10). |
 
 ### Relationships
 
@@ -12925,6 +12926,7 @@ on its own.
 | Description | `Description__c` | Long Text Area(32768) |
 | Series | `Series__c` | Lookup(Event), Clear on delete |
 | Registration Form Key | `Registration_Form_Key__c` | Text(18): the Forms form registrants fill in, by record identifier (EV-02, ADR-0014) |
+| External Key | `External_Key__c` | Text(80), unique, external ID (EV-10) |
 
 - **Validation rules:** `End_After_Start` (R-EV1), `Capacity_Above_Zero` (R-EV2),
   `Registration_Closes_After_Opens` (R-EV3).
@@ -13255,6 +13257,7 @@ Section 1.5). Design: ADR-NEXT `NEXT-event-registrations.md`.
 | Amount Owed | currency | no | The attendees' prices with the code applied. |
 | Source | picklist | yes | Staff, Form or Summit Events. Default Staff. |
 | Form Submission Key | text | no | The Forms submission's record identifier, as text (ADR-0014). |
+| External Key | text | no | The key of the booking this was imported from, unique: `summit:` and the Summit Events registration's identifier (EV-10, R-ERG4). |
 
 ### Rules
 
@@ -13267,6 +13270,11 @@ and a new guest joins that household.
 limit.** Uses are the event's registrations with the code that are not cancelled.
 
 **R-ERG3 Registrations are private.** Only holders of an Events permission set see them.
+
+**R-ERG4 A Summit Events registration is imported once.** With Summit Events installed, the
+morning run imports each Summit registration (not Started or Cancelled) as a registration with one
+attendee, keyed by its External Key, through R-ERG1; a registration already imported is never
+imported again, and later changes are made in BarnCRM.
 
 ### Salesforce implementation
 
@@ -13281,7 +13289,11 @@ limit.** Uses are the event's registrations with the code that are not cancelled
 | Amount Owed | `Amount_Owed__c` | Currency(16, 2) |
 | Source | `Source__c` | Picklist (Staff, Form, Summit Events), restricted, required |
 | Form Submission Key | `Form_Submission_Key__c` | Text(18) |
+| External Key | `External_Key__c` | Text(80), unique, external ID (EV-10) |
 
+- **Summit Events:** `SummitEventsAdapter` (dynamic SOQL by object name, no dependency) with
+  `SummitEventsBatch` and the nightly step `SummitEventsScheduler`, listed only when Summit Events
+  is installed (R-ERG4).
 - **Service:** `EventRegistrationService` (user mode, one savepoint) with `EventPersonMatcher`
   (Core's `ImportMatcher` and `ImportDuplicateRuleMatcher`). Forms reaches it through
   `EventFormAttachment` (Core's `FormAttachmentExtension`); the event names its form in

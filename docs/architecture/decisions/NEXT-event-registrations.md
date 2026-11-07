@@ -71,10 +71,13 @@ when Forms is absent, and Summit Events is a package many orgs do not have.
    otherwise see everyone as No-Show).
 7. **Summit Events adapter (EV-10), inactive without Summit.** `SummitEventsAdapter` reads Summit's
    objects by name only (dynamic SOQL, no reference the compiler checks), so the package installs
-   and runs with no Summit; with Summit absent it does nothing and its nightly step is inactive.
-   With Summit present, the nightly step takes Summit registrations changed in the last two days:
-   each Summit event instance becomes an event (keyed by `Event__c.External_Key__c`), each
-   registration a registration and one attendee (keyed by `External_Key__c`), and the registrant
+   and runs with no Summit; with Summit absent it does nothing and its nightly step is not listed.
+   With Summit present, a 7:15 AM nightly step (before the reminders) takes every Summit
+   registration the first time and afterwards those changed in the last two days, leaving out
+   Started and Cancelled ones: each Summit event instance becomes an event (keyed by
+   `Event__c.External_Key__c`), each registration a registration and one attendee (keyed by
+   `External_Key__c`, imported once; Summit's Attended or No Show is kept, and later changes are
+   made in BarnCRM), and the registrant
    lands in Core people through decision 2's matching, never a duplicate. The matched person is
    written back to Summit's contact field when it is blank. Summit's own Lead handling is not
    touched: no Lead is read or written in this package (the standard-object rule); Lead matching,
