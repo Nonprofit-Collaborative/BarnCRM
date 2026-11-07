@@ -184,14 +184,16 @@ Accept makes the applicant a speaker at the event (status **Invited**), or links
 already are; Decline makes none. A decided proposal cannot be scored or decided again from the tab;
 change it with **Edit** if you need to.
 
-**Notices.** Accepting or declining emails the applicant when you have chosen an email template for
-that outcome. Open **BarnCRM Settings**, **Events**, and enter the **developer name** of each
-template (an email template you made in Setup, for example `Speaker_Accepted`). The applicant is the
-recipient and the application is the record the template merges, so `{!Contact.FirstName}` and
-`{!Speaker_Application__c.Name}` work. Leave a setting empty to send no email for that outcome.
-If a notice cannot go out, because no template is chosen, the template is missing or inactive, the
-applicant has no email address or the send failed, the decision is still saved and **Notice
-Result** on the application says why.
+**Notices.** Accepting or declining emails the applicant. BarnCRM ships two text email templates
+in the folder **BarnCRM Events**, **BarnCRM: speaker proposal accepted** (`BarnCRM_Speaker_Accepted`)
+and **BarnCRM: speaker proposal declined** (`BarnCRM_Speaker_Declined`), and they are the defaults.
+Edit them in Setup, or write your own and open **BarnCRM Settings**, **Events**, and enter its
+unique name. The applicant is the recipient and the application is the record the template
+merges, so `{!Contact.FirstName}` and `{!Speaker_Application__c.Name}` work. A blank setting
+reads as the shipped template. To send no email for an outcome, make its template inactive.
+If a notice cannot go out, because the template is missing or inactive, the applicant has no email
+address or the send failed, the decision is still saved and **Notice Result** on the application
+says why.
 
 ### Sponsorship
 
@@ -355,8 +357,8 @@ you change it.
 | Send follow-ups | Off | Each person marked **Attended** gets one follow-up email after the event ends (within seven days). | At the next 7:30 AM run |
 | Follow-up email template | BarnCRM_Event_Follow_Up | The unique name of the email template follow-ups use. | At the next 7:30 AM run |
 | Mark no-shows | Off | Once an event has ended (within seven days), attendees still **Registered** become **No-Show**. | At the next 7:30 AM run |
-| Accepted speaker notice template | Empty (no email) | The developer name of the email template sent when a speaker application is accepted (see Call for Speakers). | At the next decision |
-| Declined speaker notice template | Empty (no email) | The developer name of the email template sent when a speaker application is declined. | At the next decision |
+| Accepted speaker notice template | BarnCRM_Speaker_Accepted | The unique name of the email template sent when a speaker application is accepted (see Call for Speakers). A blank value reads as the shipped template. | At the next decision |
+| Declined speaker notice template | BarnCRM_Speaker_Declined | The unique name of the email template sent when a speaker application is declined. A blank value reads as the shipped template; to send no email, make the template inactive. | At the next decision |
 
 ## Reminders, Follow-Ups and No-Shows
 

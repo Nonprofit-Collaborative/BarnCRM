@@ -113,6 +113,23 @@ there:
 Removal deletes the sample grants with their requirements, payments and entries; your own grants are never touched. Nothing is loaded for
 Funders when the core sample organizations are not there.
 
+### With Event Management Installed
+
+With the **Event Management** package installed, the same action also loads, after Funders if it
+is there, for the sample people (and the sample organizations, for sponsors):
+
+| Records | How many | What is in them |
+|---|---|---|
+| Events | 2 | **Harvest Community Conference** (Open, in progress: it started yesterday and ends tomorrow, capacity 150) and **Neighborhood Garden Night** (Open, in 14 days, capacity 40) |
+| Conference setup | 1 set | 3 tracks (Programs, Operations, Technology), 8 sessions over the three days with rooms and one Draft, 3 speakers placed on 6 session slots, 3 ticket types (General, Student, Volunteer) and the promo code **EARLYBIRD** (20 percent off) |
+| Registrations | 10 | 6 for the conference (one with a guest, two using EARLYBIRD) with 4 of the 7 attendees checked in (**Attended**), and 4 for the garden night, all **Registered**; amounts owed follow the ticket and code |
+| Sponsorship | 3 levels, 3 sponsors, 4 deliverables | Gold, Silver and Supporter levels; three sample organizations as sponsors (Confirmed, Committed, Prospect) with their deliverables in different statuses |
+| Speaker application | 1 with 2 reviews | **Small Teams, Big Data** (In Review, Technology track), scored 4 by you and 5 by another reviewer |
+
+Removal deletes the sample registrations first and then the sample events with everything under
+them; your own events and registrations are never touched. Nothing is loaded for Events when the
+core sample people are not there.
+
 ## 2. How to Turn It On
 
 1. Open **BarnCRM Settings**.

@@ -1,6 +1,7 @@
 # Event Management
 
-Scripts for events and the Events page (EV-01 to EV-06, EV-08 to EV-12, EV-14 and EV-15). Setup
+Scripts for events and the Events page (EV-01 to EV-06, EV-08 to EV-12, EV-14 and EV-15) and
+their sample data. Setup
 detail:
 [Event Management](../admin-guide/events.md).
 
@@ -123,8 +124,8 @@ removal.
 **Purpose:** confirm adding applications, scoring, accept and decline with notices, and the
 Events settings.
 **Prerequisites:** staff, an event, two people with emails (`Ana Garcia`, `Sam Lee`) and one with
-none (`Kim Wu`), and two active email templates with developer names `Speaker_Accepted` and
-`Speaker_Declined`.
+none (`Kim Wu`), and one active email template with the developer name `Speaker_Declined`. The
+shipped templates `BarnCRM_Speaker_Accepted` and `BarnCRM_Speaker_Declined` are the defaults.
 **Smoke:** no
 
 | Step | Action | Expected result |
@@ -134,9 +135,9 @@ none (`Kim Wu`), and two active email templates with developer names `Speaker_Ac
 | 3 | Menu **Score** on `Scaling Flows`, 5, Save. | Status **In Review**; average `5.0 (1)`. |
 | 4 | Score `Scaling Flows` again with 3. | Still one review; average `3.0 (1)`. |
 | 5 | Menu **Score** on `Old Topics`, 1. | `Scaling Flows` is listed first. |
-| 6 | **Accept** `Scaling Flows`, confirm (no templates chosen yet). | A warning: no notice was sent, no template chosen; status **Accepted**. The row says why. |
-| 7 | Open **BarnCRM Settings**, **Events**, enter `Speaker_Accepted` and `Speaker_Declined`. | Both saved. |
-| 8 | **Decline** `Old Topics`, confirm. | Declined, and the notice was emailed. No speaker is made for Sam Lee. |
+| 6 | Open **BarnCRM Settings**, **Events**. | **Accepted Notice Template** shows `BarnCRM_Speaker_Accepted` and **Declined Notice Template** shows `BarnCRM_Speaker_Declined`, neither blank. |
+| 7 | **Accept** `Scaling Flows`, confirm. | Status **Accepted**, and the notice was emailed from the shipped accepted template. |
+| 8 | In Settings, enter `Speaker_Declined` as the declined template. **Decline** `Old Topics`, confirm. | Declined, and the notice was emailed from your template. No speaker is made for Sam Lee. |
 | 9 | Open **Speakers**. | `Ana Garcia`, **Invited**, and no one else. |
 | 10 | **Decline** `Quiet Talk`. | Declined; a warning that the applicant has no email address. |
 | 11 | Open a declined row's menu. | Only **Edit**: no Score, Accept or Decline. |
@@ -320,5 +321,24 @@ attendee. A phone or laptop camera and Chrome or Edge for step 6.
 | 8 | Type Sam's code, click **Check In by Code**. | A message that Sam is already checked in. |
 | 9 | **Add Walk-In**: Last Name `Door`, **Add and Check In**. | A new row `Door`, **Attended**, though the event is at capacity. Registrations shows source **Staff**. |
 | 10 | As read-only, open **Check-In**. | The list and QR buttons show; no **Check In** buttons, **Add Walk-In** or code box. |
+
+**Cleanup:** None.
+
+## T-EV-16: Sample Data
+
+**Purpose:** confirm the Event Management sample data loads for the sample people and takes
+away only itself.
+**Prerequisites:** admin; Core's sample data not yet loaded; one event of your own with a
+registration.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | **BarnCRM Settings**, **Load Sample Data**, wait for it to finish. | The Sample Data card shows an **Events** count of `2`. |
+| 2 | Open **Events**. | **Harvest Community Conference** (in progress) and **Neighborhood Garden Night** (in 14 days) beside your own event. |
+| 3 | Open the conference, **Check-In**. | Four attendees are **Attended**, three still **Registered**. |
+| 4 | **Agenda**, **Speakers**, **Applications**, **Sponsors**. | Eight sessions in three tracks, three speakers, one In Review application `Small Teams, Big Data` with two scores (average `4.5`), three sponsors at three levels with deliverables. |
+| 5 | **Tickets**. | General, Student and Volunteer, and the code `EARLYBIRD`. |
+| 6 | **Remove Sample Data**. | Both sample events and every registration under them are gone; your own event and its registration stay. |
 
 **Cleanup:** None.

@@ -1,0 +1,9 @@
+Dear {!Contact.FirstName, friend},
+
+Thank you for proposing "{!Speaker_Application__c.Name}". We had more proposals than places, and we are sorry to say we are not able to include yours this time.
+
+We value the care you put into it, and we hope you will propose again in the future.
+
+With thanks,
+
+{!Organization.Name}
