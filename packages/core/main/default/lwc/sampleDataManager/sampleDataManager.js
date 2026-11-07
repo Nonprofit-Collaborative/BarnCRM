@@ -1,10 +1,11 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, wire } from 'lwc';
 import Toast from 'lightning/toast';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import getStatus from '@salesforce/apex/SampleDataController.getStatus';
 import loadSampleData from '@salesforce/apex/SampleDataController.loadSampleData';
 import removeSampleData from '@salesforce/apex/SampleDataController.removeSampleData';
 import canManageSampleData from '@salesforce/apex/SampleDataController.canManageSampleData';
+import relationshipsOn from '@salesforce/apex/RelationshipController.isFeatureOn';
 
 import cardTitle from '@salesforce/label/c.Core_SampleData_CardTitle';
 import loadButtonLabel from '@salesforce/label/c.Core_SampleData_LoadButton';
@@ -91,6 +92,9 @@ export default class SampleDataManager extends LightningElement {
   contactCount = 0;
   organizationCount = 0;
   relationshipCount = 0;
+
+  // The Relationships tile hides while the Relationships feature is off (D-185).
+  @wire(relationshipsOn) relationshipsFeature;
   affiliationCount = 0;
   // One entry per installed module sample set, each carrying its own label, so a module
   // that ships sample data adds a count here without this component changing (C-10).
@@ -202,14 +206,20 @@ export default class SampleDataManager extends LightningElement {
         key: 'organizations',
         label: this.labels.organizationsLabel,
         value: this.organizationCount
-      },
-      {
+      }
+    ];
+    if (this.relationshipsFeature && this.relationshipsFeature.data) {
+      tiles.push({
         key: 'relationships',
         label: this.labels.relationshipsLabel,
         value: this.relationshipCount
-      },
-      { key: 'affiliations', label: this.labels.affiliationsLabel, value: this.affiliationCount }
-    ];
+      });
+    }
+    tiles.push({
+      key: 'affiliations',
+      label: this.labels.affiliationsLabel,
+      value: this.affiliationCount
+    });
     this.moduleCounts.forEach((module) => {
       tiles.push({
         key: `module-${module.name}`,

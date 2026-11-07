@@ -103,6 +103,9 @@ export default class AutomationControl extends LightningElement {
       return helpText('Core', 'Core_AutomationControl_ResumesItself');
     },
     alwaysRuns: ALWAYS_RUNS,
+    get featureOff() {
+      return helpText('Core', 'Core_AutomationControl_FeatureOff');
+    },
     peopleTitle: PEOPLE_TITLE,
     flowsTitle: FLOWS_TITLE,
     catchUpButton: CATCH_UP_BUTTON,
@@ -201,6 +204,7 @@ export default class AutomationControl extends LightningElement {
       return {
         ...automation,
         alwaysRuns: automation.alwaysRuns === true,
+        featureOff: automation.featureOff === true,
         toggleDisabled: this.controlsDisabled || automation.alwaysRuns === true,
         removable: automation.removable === true,
         removeTitle: `${REMOVE}: ${automation.label}`,

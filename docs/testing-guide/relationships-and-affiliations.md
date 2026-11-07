@@ -184,6 +184,22 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | Open the **Data Manager** tab and look at the import mappings card. | No **Relationships** mapping is listed. |
 | 4 | Open **Import** and look at the templates offered. | No **Relationships** template is offered. |
 | 5 | Open **BarnCRM Settings**, **People and Households**, then **General**, **Custom Metadata**. | No **Relationships** box and no **Relationship types** list. |
-| 6 | Turn **Relationships** back on and save. Repeat steps 2 to 4. | The card, the mapping and the template are back; Harper's Luis line is still **Spouse**. |
+| 6 | Open **Sample Data** in **BarnCRM Settings**, **General**. | The counts show no **Relationships** tile (D-185). |
+| 7 | Turn **Relationships** back on and save. Repeat steps 2 to 4 and 6. | The card, the mapping, the template and the tile are back; Harper's Luis line is still **Spouse**. |
 
-**Cleanup:** leave **Relationships** on (step 6).
+**Cleanup:** leave **Relationships** on (step 7).
+
+## T-REL-13: Addresses or Affiliations Off Hides Their Cards
+
+**Purpose:** while the **Addresses** or **Affiliations** feature is off, its card shows on no record page (D-185).
+**Prerequisites:** admin user (BarnCRM Admin), **Addresses** and **Affiliations** on, Harper Garcia with an address and an affiliation.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **General**, **Features**, turn **Affiliations** off and save. | Saved. |
+| 2 | Open Harper Garcia, then an organization, then the same records in the Giving, Programs and Volunteers apps. | The **Affiliations** card is gone on every page; the **Addresses** card is still there. |
+| 3 | Open **Automation**. | The Affiliations automation row is still listed (rows are never hidden), and under its description reads "Stopped: its feature is turned off in BarnCRM Settings, General, Features." |
+| 4 | Turn **Affiliations** back on and turn **Addresses** off. Repeat step 2. | The **Affiliations** card is back and the **Addresses** card is gone on every page. |
+| 5 | Turn **Addresses** back on. | The **Addresses** card is back. |
+
+**Cleanup:** leave both features on (step 5).

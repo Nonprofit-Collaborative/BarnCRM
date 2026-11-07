@@ -6,7 +6,16 @@ import getStatus from '@salesforce/apex/SampleDataController.getStatus';
 import loadSampleData from '@salesforce/apex/SampleDataController.loadSampleData';
 import removeSampleData from '@salesforce/apex/SampleDataController.removeSampleData';
 import canManageSampleData from '@salesforce/apex/SampleDataController.canManageSampleData';
+import relationshipsOn from '@salesforce/apex/RelationshipController.isFeatureOn';
 
+jest.mock(
+  '@salesforce/apex/RelationshipController.isFeatureOn',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
 jest.mock('@salesforce/apex/SampleDataController.getStatus', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -67,9 +76,10 @@ async function flushMicrotasks() {
   }
 }
 
-function createManager() {
+function createManager(relationshipsFeatureOn = true) {
   const element = createElement('c-sample-data-manager', { is: SampleDataManager });
   document.body.appendChild(element);
+  relationshipsOn.emit(relationshipsFeatureOn);
   return element;
 }
 
@@ -192,6 +202,23 @@ describe('c-sample-data-manager', () => {
     const tiles = element.shadowRoot.querySelectorAll('[data-id="tile"]');
     const values = Array.from(tiles).map((el) => String(el.value));
     expect(values).toEqual(['200', '440', '25', '60', '80', '709']);
+  });
+
+  it('hides the Relationships tile while the Relationships feature is off (D-185)', async () => {
+    canManageSampleData.mockResolvedValue(true);
+    getStatus.mockResolvedValue(LOADED_STATUS);
+
+    const element = createManager(false);
+    await flushPromises();
+
+    const tiles = element.shadowRoot.querySelectorAll('[data-id="tile"]');
+    expect(Array.from(tiles).map((el) => String(el.value))).toEqual([
+      '200',
+      '440',
+      '25',
+      '80',
+      '709'
+    ]);
   });
 
   it('shows a tile for each module sample set, labelled by the module', async () => {

@@ -9,6 +9,26 @@ private class AffiliationControllerTest {
 		TestUsers.admin();
 	}
 
+	/** D-185: the card is hidden while Affiliations is off and shown while it is on. */
+	@IsTest
+	static void theCardIsHiddenWhileAffiliationsIsOff() {
+		System.runAs(TestUsers.admin()) {
+			SettingsService.saveSystemValue(
+				'Features_Turned_On__c',
+				FeatureSwitchService.RELATIONSHIPS
+			);
+			Boolean whileOff = AffiliationController.isFeatureOn();
+			SettingsService.saveSystemValue(
+				'Features_Turned_On__c',
+				FeatureSwitchService.AFFILIATIONS
+			);
+			Boolean whileOn = AffiliationController.isFeatureOn();
+
+			Assert.isFalse(whileOff, 'The card is hidden while the feature is off');
+			Assert.isTrue(whileOn, 'The card shows once the feature is on');
+		}
+	}
+
 	@IsTest
 	static void aContactsCardAddsAnOrganization() {
 		System.runAs(TestUsers.admin()) {
