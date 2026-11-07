@@ -163,6 +163,7 @@ public with sharing class EventsHomeController {
 				copies.add(copyAt(source, start));
 			}
 			Database.insert(copies, true, AccessLevel.USER_MODE);
+			copyTicketTypes(source, copies);
 			return copies.size();
 		} catch (AuraHandledException e) {
 			Database.rollback(savepoint);
@@ -196,6 +197,41 @@ public with sharing class EventsHomeController {
 			Description__c = source.Description__c,
 			Series__c = source.Series__c != null ? source.Series__c : source.Id
 		);
+	}
+
+	/** Each occurrence gets the event's ticket types, their sales windows moved with it. */
+	private static void copyTicketTypes(Event__c source, List<Event__c> copies) {
+		List<Ticket_Type__c> tickets = [
+			SELECT
+				Name,
+				Price__c,
+				Quantity__c,
+				Sales_Start__c,
+				Sales_End__c,
+				Description__c,
+				Active__c,
+				Sort_Order__c
+			FROM Ticket_Type__c
+			WHERE Event__c = :source.Id
+			WITH USER_MODE
+			ORDER BY Sort_Order__c ASC NULLS LAST, Name
+			LIMIT 100
+		];
+		if (tickets.isEmpty()) {
+			return;
+		}
+		List<Ticket_Type__c> made = new List<Ticket_Type__c>();
+		for (Event__c copy : copies) {
+			Long shift = copy.Start__c.getTime() - source.Start__c.getTime();
+			for (Ticket_Type__c ticket : tickets) {
+				Ticket_Type__c clone = ticket.clone(false, true, false, false);
+				clone.Event__c = copy.Id;
+				clone.Sales_Start__c = moved(ticket.Sales_Start__c, shift);
+				clone.Sales_End__c = moved(ticket.Sales_End__c, shift);
+				made.add(clone);
+			}
+		}
+		Database.insert(made, true, AccessLevel.USER_MODE);
 	}
 
 	private static Datetime moved(Datetime value, Long shift) {

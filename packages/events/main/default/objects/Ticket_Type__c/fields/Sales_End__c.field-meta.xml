@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Sales_End__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>When this ticket stops selling. Empty means when registration closes.</inlineHelpText>
+  <label>Sales End</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>DateTime</type>
+</CustomField>

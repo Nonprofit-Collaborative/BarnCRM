@@ -116,7 +116,7 @@ public with sharing class ModuleManagerService {
 			'Grant_Payment__c',
 			'Grant_Requirement__c'
 		},
-		'Events' => new List<String>{ 'Event__c' }
+		'Events' => new List<String>{ 'Event__c', 'Promo_Code__c', 'Ticket_Type__c' }
 	};
 
 	/** The permission set Turn on gives the person who turned the module on. */

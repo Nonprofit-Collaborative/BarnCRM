@@ -49,3 +49,24 @@ Only role). Each gets its Events permission set from the role.
 |---|---|---|
 | 1 | As read-only, open **Events Home**. | Events are listed; there is no **New Event**, and the row menu offers only **Open**. |
 | 2 | As staff, open an event and try to delete it. | Staff cannot delete an event. As admin, delete works. |
+| 3 | As read-only, open an event's **Tickets** tab. | Tickets and codes are listed; there is no **New Ticket Type** or **New Promo Code**. |
+
+## T-EV-04: Ticket Types and Promo Codes
+
+**Purpose:** confirm ticket types and codes save with their rules and show on the Tickets tab.
+**Prerequisites:** staff, an event with Capacity `100`.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event, click **Tickets**. | Two empty sections, **Tickets** and **Promo Codes**, with **New Ticket Type** and **New Promo Code**. |
+| 2 | **New Ticket Type**: `General`, Price `-5`, save. | Refused: `Price cannot be below 0. Use 0 for a free ticket.` |
+| 3 | Price `50`, Quantity `80`, save. Add `Student`, Price `20`, Quantity `40`. | Both listed, `$50.00` and `$20.00`, each **Active**. A warning says the quantities add up to 120, more than the capacity of 100. |
+| 4 | **New Promo Code**: `early`, Percent, Discount Value `120`, save. | Refused: `A percent discount can be at most 100.` |
+| 5 | Discount Value `10`, Ticket Type `General`, save. | Listed as `early`, `10%`, `General`, **Active**. |
+| 6 | Add another code `EARLY`, Amount `5`. | Refused: the code `EARLY` is already used for this event. |
+| 7 | Edit `early`: Valid Until yesterday. | It shows **Expired**. |
+| 8 | Delete `Student` from its row menu and confirm. | It is gone and the capacity warning with it. |
+| 9 | On **Events Home**, **Repeat Event** for this event, one occurrence. Open the copy's **Tickets**. | `General` is there with its price; no promo codes. |
+
+**Cleanup:** Delete the copy as admin.

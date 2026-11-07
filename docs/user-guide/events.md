@@ -27,5 +27,16 @@ For a class or meeting that happens again and again:
 2. Choose **Every Week**, **Every Two Weeks** or **Every Month**, and how many occurrences to add.
 3. Check the dates under **Preview**, then click **Repeat Event**.
 
-Each new date is a draft copy of the event. Change each one on its own; open the first event to
-see them all under **Occurrences**.
+Each new date is a draft copy of the event, with its ticket types. Change each one on its own;
+open the first event to see them all under **Occurrences**.
+
+## Set Up Tickets
+
+1. Open the event and click the **Tickets** tab.
+2. Click **New Ticket Type**. Give it a name, such as `General`, and a **Price** (0 for free).
+   Set a **Quantity** to limit how many are sold, or leave it empty. Save.
+3. For a discount, click **New Promo Code**. Type the code, choose **Percent** or **Amount** and
+   the **Discount Value**. To limit it to one ticket, choose the **Ticket Type**. Save.
+
+To change or remove a ticket or code, use its row menu. BarnCRM records prices only; payments
+are taken outside BarnCRM.

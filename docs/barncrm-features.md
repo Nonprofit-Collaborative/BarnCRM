@@ -833,7 +833,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Call for speakers | Major | Speaker applications with review, scoring, and accept or decline notices. | Planned (TBD) | EV-06 |
 | Speaker portal | Major | Speakers use the speaker portal template of Portal Builder. Needs Portal Builder. | Planned (TBD) | EV-07, PB-07 |
 | Sponsorship management | Major | Sponsor organizations, tiers, benefits, a deliverables checklist (logo, booth, passes) and status; linked to a Giving gift or commitment, or a Funders award, when installed. | Planned (TBD) | EV-09 |
-| Ticket types | Minor | Price, quantity, sales dates and promo codes; payments happen outside BarnCRM. | Planned (TBD) | EV-03 |
+| Ticket types | Minor | Ticket types with price, quantity, sales dates and active, on the event's Tickets tab with a warning when the quantities exceed the capacity; promo codes (percent or amount off, one ticket type or all, use limit, valid dates), one per event whatever the case; Repeat Event copies ticket types. Payments happen outside BarnCRM. | Built, not merged (release 1.2, `feature/ev-03-ticket-types`) | EV-03 |
 | Speakers | Minor | Profiles on Core people, session assignments and needs (travel, A/V). | Planned (TBD) | EV-05 |
 | Volunteer integration | Minor | Event volunteer jobs and shifts in Volunteers, through an optional link. | Planned (TBD) | EV-08 |
 | Summit Events compatibility | Minor | Summit registrants land in BarnCRM people and households without duplicates. | Planned (TBD) | EV-10 |

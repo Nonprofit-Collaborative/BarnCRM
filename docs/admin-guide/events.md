@@ -54,7 +54,7 @@ were cancelled, latest first. Each event's name opens it. **New Event** opens th
 From an event's row menu, **Repeat Event** asks how it repeats (**Every Week**, **Every Two
 Weeks** or **Every Month**) and how many occurrences to add (1 to 52), and lists the new dates
 before anything is saved. Each occurrence is a **Draft** copy of the event, as long as the event,
-with its registration window moved by the same amount, and its **Series** field names the first
+with its registration window moved by the same amount and its ticket types copied, and its **Series** field names the first
 event of the series. A monthly event keeps its day of the month, or the last day of a shorter
 month. After that each occurrence is changed on its own; nothing keeps them in step.
 
@@ -73,6 +73,39 @@ related lists in the sidebar. The **Details** tab holds the event's fields:
 | Capacity | The most people it can take; empty for no limit. |
 | Registration Opens, Registration Closes | When registration is taken; Closes must be after Opens. |
 | Series | On a repeated occurrence, the first event of its series. |
+
+### Tickets
+
+The **Tickets** tab lists the event's **ticket types** and **promo codes**. **New Ticket Type**
+and **New Promo Code** open a short form; each row's menu has **Edit** and **Delete**.
+
+| Ticket type field | What it is |
+|---|---|
+| Ticket Type Name | What registrants see, such as General, Student or VIP. |
+| Price | What you charge; 0 for a free ticket. Never below 0. BarnCRM takes no payment. |
+| Quantity | How many may be sold; empty for no limit. At least 1 when set. |
+| Sales Start, Sales End | When it is on sale; End after Start. Empty means the registration window. |
+| Active | Offered to registrants. Clear it to stop offering a ticket without deleting it. |
+| Sort Order | Its place in the list, lowest first. |
+
+When the quantities of the active ticket types add up to more than the event's capacity, the tab
+warns you. It refuses nothing, since not every ticket sells.
+
+| Promo code field | What it is |
+|---|---|
+| Code | What a registrant types. One per event, whatever its case: `EARLY` and `early` are the same code. Spaces around it are trimmed. Another event may use the same code. |
+| Discount Type, Discount Value | A percent off (above 0, at most 100) or an amount off (above 0). A discount never takes a price below 0. |
+| Ticket Type | The one ticket type it applies to; empty for all of the event's tickets. |
+| Maximum Uses | How many registrations may use it; empty for no limit. |
+| Valid From, Valid Until | When it works; Until after From. |
+| Active | The code can be used. |
+
+Each code shows **Active**, **Inactive**, **Scheduled** (its dates have not started) or
+**Expired**. The one-per-event rule is an automation that always runs (**Promo Code: one per
+event** on the **Automation** tab); it cannot be switched off.
+
+**Repeat Event** copies the event's ticket types to each occurrence, their sales dates moved
+with it; promo codes are not copied.
 
 ## Not Yet
 

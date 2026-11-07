@@ -35,6 +35,16 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentName>eventTickets</componentName>
+        <identifier>eventTickets</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>eventTicketsTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
         <componentInstanceProperties>
           <name>active</name>
           <value>true</value>
@@ -49,6 +59,20 @@
         </componentInstanceProperties>
         <componentName>flexipage:tab</componentName>
         <identifier>eventDetailsTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>eventTicketsTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>{!$Label.Events_EventTab_Tickets}</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>eventTicketsTabItem</identifier>
       </componentInstance>
     </itemInstances>
     <name>eventTabs</name>

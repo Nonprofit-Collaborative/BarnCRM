@@ -9,8 +9,16 @@
     "Events_Repeat_BadCount": "Choose from 1 to {0} occurrences.",
     "Events_Repeat_BadDates": "Each new date must be after the event's own start. Nothing was saved.",
     "Events_Repeat_Done": "{0} occurrences added as drafts.",
-    "Events_Repeat_Intro": "Each new date gets a draft copy of {0}, as long as the event, linked to the first event of the series.",
+    "Events_PromoCode_Duplicate": "The code {0} is already used for this event. Choose another code, or edit the one already there.",
+    "Events_Repeat_Intro": "Each new date gets a draft copy of {0}, as long as the event, with its ticket types, linked to the first event of the series.",
     "Events_Repeat_NoPermission": "You do not have access to create events. Ask your BarnCRM admin for the Events Staff permission set.",
-    "Events_Shared_NotSaved": "Nothing was saved. Try again. If it happens again, ask your BarnCRM admin to check the Error Log."
+    "Events_Shared_DeleteConfirm": "Delete {0}? This cannot be undone here, but it stays in the Recycle Bin for 15 days.",
+    "Events_Shared_NotSaved": "Nothing was saved. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Events_Tickets_Intro": "The kinds of ticket this event offers and the codes that give a discount. BarnCRM records prices and takes no payments.",
+    "Events_Tickets_LoadFailed": "The tickets could not be loaded. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Events_Tickets_NoCodes": "No promo codes. Add one to give a discount on this event's tickets.",
+    "Events_Tickets_NoTickets": "No ticket types yet. Add one, such as General or Student, with its price.",
+    "Events_Tickets_OverCapacity": "The ticket quantities add up to {0}, more than the event's capacity of {1}. That is allowed, since not every ticket sells, but check it is what you want.",
+    "Events_Tickets_Until": "Until {0}"
   }
 }
