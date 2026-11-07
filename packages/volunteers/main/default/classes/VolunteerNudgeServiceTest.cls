@@ -78,8 +78,13 @@ private class VolunteerNudgeServiceTest {
 			);
 
 			runBatch();
-			runBatch();
+			Database.QueryLocatorIterator stillDue = VolunteerNudgeSelector.dueLocator(
+					ShiftScheduleService.now(),
+					VolunteerReminderService.windowEnd(3)
+				)
+				.iterator();
 
+			Assert.isFalse(stillDue.hasNext(), 'A stamped shift is not due a second time.');
 			Assert.areEqual(1, stub.received.size(), 'Only the free, reachable regular, once.');
 			Assert.areEqual(
 				'ana@example.org',
