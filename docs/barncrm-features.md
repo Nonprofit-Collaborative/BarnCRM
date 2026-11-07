@@ -821,13 +821,13 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 11. Event Management
 
-**Edition:** Both editions (proposed). Depends on Core only; Volunteers, Giving, Funders and Portal Builder are optional links. No package directory exists yet. Replaces the post-1.0 Events package and keeps Summit Events compatibility; able to run a community "Dreamin" conference. Planned after Core QA and the current module round, release target TBD, not v1.0; a new ADR is needed before build (plan 5.12, D-123).
+**Edition:** Both editions. Depends on Core only; Volunteers, Giving, Funders, Forms and Portal Builder are optional links through Core extension points. Package `packages/events` (BarnCRM Event Management), app BarnCRM Events. Replaces the post-1.0 Events package and keeps Summit Events compatibility; able to run a community "Dreamin" conference. Release 1.2 and 1.3 (plan 5.12, D-123, D-177; new ADR, events module).
 
 ### 11.1 Events, Sessions and Sponsors
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Events | Major | Single, multi-day or recurring events, venue or virtual, capacity, status and a public event page. | Planned (TBD) | EV-01 |
+| Events | Major | Single, multi-day or recurring events, venue or virtual, capacity, status and a registration window, on an event page in tabs. The Events Home page lists upcoming or past events with New Event; Repeat Event adds up to 52 weekly, every-two-weeks or monthly draft occurrences in one series, previewed first. Events Admin, Staff (never deletes an event) and Read Only sets, given through the Access roles. The public event page waits on its guest-user design. | Built, not merged (release 1.2, `feature/ev-01-events-package`) | EV-01, new ADR (events module) |
 | Registrations and attendees | Major | Registrants matched to Core people without duplicates (household-aware), waitlist, check-in and attendance. | Planned (TBD) | EV-02 |
 | Tracks, sessions and agenda | Major | Tracks, rooms, time slots, session capacity and sign-up, and a published agenda. | Planned (TBD) | EV-04 |
 | Call for speakers | Major | Speaker applications with review, scoring, and accept or decline notices. | Planned (TBD) | EV-06 |

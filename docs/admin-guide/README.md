@@ -249,6 +249,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | F-06 Funder report merge template: Funder Report Templates | [funders.md](funders.md#funder-report-templates) | BarnCRM Funders |
 | F-07 Board dashboard: the Board Dashboard tab | [funders.md](funders.md#the-board-dashboard-tab) | BarnCRM Funders |
 
+### Event Management
+
+| Feature | Page | Package |
+|---|---|---|
+| EV-01 Events: install, roles, the Events page, Repeat Event, the event page | [events.md](events.md) | BarnCRM Event Management |
+
 ### Moving From Another System
 
 | Feature | Page | Package |

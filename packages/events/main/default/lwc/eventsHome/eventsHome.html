@@ -1,0 +1,124 @@
+<template>
+  <template lwc:if={helpReady}>
+    <c-barn-page-shell
+      title={title}
+      purpose={labels.intro}
+      icon-name={icon}
+      title-hidden
+      data-id="shell"
+    >
+      <div slot="actions" class="slds-grid slds-grid_vertical-align-center slds-wrap">
+        <lightning-radio-group
+          data-id="view"
+          class="slds-var-m-right_small"
+          name="view"
+          label={labels.when}
+          variant="label-hidden"
+          type="button"
+          options={viewOptions}
+          value={view}
+          onchange={handleView}
+        ></lightning-radio-group>
+        <template lwc:if={canCreate}>
+          <lightning-button
+            data-id="new-event"
+            variant="brand"
+            label={labels.newEvent}
+            onclick={handleNewEvent}
+          ></lightning-button>
+        </template>
+      </div>
+
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={title} size="small"></lightning-spinner>
+      </template>
+
+      <template lwc:if={hasError}>
+        <c-barn-notice
+          variant="error"
+          message={errorMessage}
+          data-id="error-message"
+          class="slds-var-m-bottom_small"
+        ></c-barn-notice>
+      </template>
+
+      <template lwc:if={truncatedMessage}>
+        <c-barn-notice
+          message={truncatedMessage}
+          data-id="truncated"
+          class="slds-var-m-bottom_small"
+        ></c-barn-notice>
+      </template>
+
+      <template lwc:if={showEmpty}>
+        <c-barn-empty-state data-id="empty-state" message={emptyMessage}>
+          <template lwc:if={canCreate}>
+            <lightning-button
+              data-id="empty-new-event"
+              variant="brand"
+              label={labels.newEvent}
+              onclick={handleNewEvent}
+            ></lightning-button>
+          </template>
+        </c-barn-empty-state>
+      </template>
+
+      <template lwc:if={hasRows}>
+        <table
+          class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_stacked-horizontal"
+          data-id="events"
+        >
+          <thead>
+            <tr class="slds-line-height_reset">
+              <th scope="col">{fieldLabels.Name}</th>
+              <th scope="col">{labels.when}</th>
+              <th scope="col">{fieldLabels.Status__c}</th>
+              <th scope="col">{fieldLabels.Format__c}</th>
+              <th scope="col">{labels.where}</th>
+              <th scope="col">{fieldLabels.Capacity__c}</th>
+              <th scope="col"><span class="slds-assistive-text">{labels.actions}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={rows} for:item="row">
+              <tr key={row.id} data-id="event-row" data-event={row.id}>
+                <th scope="row" data-label={fieldLabels.Name}>
+                  <a href={row.href} data-id={row.id} onclick={handleOpen}>{row.name}</a>
+                </th>
+                <td data-label={labels.when}>{row.whenText}</td>
+                <td data-label={fieldLabels.Status__c}>
+                  <c-barn-status-badge
+                    status={row.statusWord}
+                    label={row.status}
+                  ></c-barn-status-badge>
+                </td>
+                <td data-label={fieldLabels.Format__c}>{row.format}</td>
+                <td data-label={labels.where}>{row.whereText}</td>
+                <td data-label={fieldLabels.Capacity__c}>
+                  <lightning-formatted-number value={row.capacity}></lightning-formatted-number>
+                </td>
+                <td>
+                  <lightning-button-menu
+                    data-id={row.id}
+                    alternative-text={row.menuLabel}
+                    icon-size="x-small"
+                    menu-alignment="right"
+                    onselect={handleMenu}
+                  >
+                    <template for:each={row.menuItems} for:item="item">
+                      <lightning-menu-item
+                        key={item.value}
+                        label={item.label}
+                        value={item.value}
+                      ></lightning-menu-item>
+                    </template>
+                  </lightning-button-menu>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </template>
+    </c-barn-page-shell>
+  </template>
+</template>

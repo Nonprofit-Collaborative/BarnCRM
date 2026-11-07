@@ -43,7 +43,8 @@ public class TestUsers {
 		'Volunteers_Admin',
 		'Programs_Admin',
 		'Logic_Models_Admin',
-		'Funders_Admin'
+		'Funders_Admin',
+		'Events_Admin'
 	};
 
 	/**

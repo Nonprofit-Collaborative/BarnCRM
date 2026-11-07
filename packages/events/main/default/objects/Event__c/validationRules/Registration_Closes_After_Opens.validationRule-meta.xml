@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Registration_Closes_After_Opens</fullName>
+  <active>true</active>
+  <description>R-EV3: registration closes after it opens, when both are set.</description>
+  <errorConditionFormula>
+AND(
+  NOT(ISBLANK(Registration_Opens__c)),
+  NOT(ISBLANK(Registration_Closes__c)),
+  Registration_Closes__c &lt;= Registration_Opens__c
+)
+  </errorConditionFormula>
+  <errorDisplayField>Registration_Closes__c</errorDisplayField>
+  <errorMessage>Registration Closes must be after Registration Opens.</errorMessage>
+</ValidationRule>

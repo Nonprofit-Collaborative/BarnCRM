@@ -1,0 +1,16 @@
+{
+  "languages": ["en"],
+  "texts": {
+    "Events_Home_EmptyPast": "No past events yet. Events show here once they end or are cancelled.",
+    "Events_Home_EmptyUpcoming": "Nothing coming up. Create an event to start planning it.",
+    "Events_Home_Intro": "Every event the organization runs. Open one to set up its tickets, agenda and speakers.",
+    "Events_Home_LoadFailed": "The events could not be loaded. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Events_Home_Truncated": "Showing the first {0} events. Use the list views on the Events tab to see the rest.",
+    "Events_Repeat_BadCount": "Choose from 1 to {0} occurrences.",
+    "Events_Repeat_BadDates": "Each new date must be after the event's own start. Nothing was saved.",
+    "Events_Repeat_Done": "{0} occurrences added as drafts.",
+    "Events_Repeat_Intro": "Each new date gets a draft copy of {0}, as long as the event, linked to the first event of the series.",
+    "Events_Repeat_NoPermission": "You do not have access to create events. Ask your BarnCRM admin for the Events Staff permission set.",
+    "Events_Shared_NotSaved": "Nothing was saved. Try again. If it happens again, ask your BarnCRM admin to check the Error Log."
+  }
+}

@@ -2,7 +2,8 @@
 # check-standard-objects.sh
 #
 # Fails (exit 1) if any file under packages/core, packages/rollups, packages/giving,
-# packages/volunteers, packages/programs, packages/logicmodels, or packages/funders (excluding
+# packages/volunteers, packages/programs, packages/logicmodels, packages/funders, or
+# packages/events (excluding
 # README.md files)
 # references, as whole
 # words, case-sensitive: Opportunity, Campaign, Lead, Case, OpportunityContactRole,
@@ -80,7 +81,7 @@
 set -euo pipefail
 
 DIRS=(packages/core packages/rollups packages/giving packages/volunteers packages/programs
-  packages/logicmodels packages/funders)
+  packages/logicmodels packages/funders packages/events)
 
 PATTERN='\b(Opportunity|OpportunityContactRole|Campaign|CampaignMember|Lead|Case|PersonAccount|IsPersonAccount|GiftTransaction)\b|__dlm\b'
 

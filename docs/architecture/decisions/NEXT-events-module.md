@@ -48,7 +48,7 @@ pages need a guest-user security design of their own.
    an automation that always runs (registry row `Promo_Code_Key`, ADR-0024) sets the unique
    `Code_Key__c`. Prices are what the organization charges; BarnCRM takes no payment (Section 1.5).
    The price a registrant owes with a code applied is worked out by the framework-free module
-   `eventTickets.js` (plan 9.9), shared by the staff pages now and registration (EV-02) later.
+   `eventTicketsModel.js` (plan 9.9), shared by the staff pages now and registration (EV-02) later.
 4. **Tracks, sessions and the agenda (EV-04).** `Event_Track__c` (29EV4, a detail of the event)
    and `Event_Session__c` (29EV5, a detail of the event, with an optional track): start and end,
    room (text: a room is a name on the agenda, not a record to manage), capacity, type (Talk,
@@ -69,9 +69,9 @@ pages need a guest-user security design of their own.
    speaks once per event
    and once per session: automations that always run (`Event_Speaker_Key`, `Session_Speaker_Key`)
    set unique key fields. A validation rule keeps a session's speaker in the session's own event.
-6. **Staff pages.** The **Events** tab (an app page) lists upcoming, draft and past events with
+6. **Staff pages.** The **Events Home** tab (an app page) lists upcoming and past events with
    New Event and Repeat Event; the event record page uses Core's header, main and sidebar template
-   with tabs (Overview, Tickets, Agenda, Speakers, Details) and the related lists in the sidebar.
+   with tabs (Details, Tickets, Agenda, Speakers) and the related lists in the sidebar.
    Every panel's Apex controller is thin and returns plain JSON shapes; grouping, conflict checks,
    series dates and prices run in framework-free modules (plan 9.9).
 7. **Access.** `Events_Admin` (everything) to holders of `BarnCRM_Admin`; `Events_Staff` (create
