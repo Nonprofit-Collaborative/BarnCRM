@@ -92,7 +92,11 @@ private class OrgAutomationScanTest {
 			Test.stopTest();
 
 			Automation_Snapshot__c scan = OrgAutomationScan.latest();
-			Assert.areEqual(OrgAutomationScan.STATUS_DONE, scan.Status__c, scan.Message__c);
+			Assert.areEqual(
+				OrgAutomationScan.STATUS_DONE,
+				scan.Status__c,
+				'Scan: ' + scan.Message__c
+			);
 
 			Map<String, OrgAutomationInventory.Row> rows = new Map<String, OrgAutomationInventory.Row>();
 			OrgAutomationInventory.Result result = OrgAutomationController.getInventory();
