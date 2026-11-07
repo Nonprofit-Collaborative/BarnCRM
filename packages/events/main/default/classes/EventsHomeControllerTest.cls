@@ -62,6 +62,7 @@ private class EventsHomeControllerTest {
 				Price__c = 15,
 				Sales_End__c = start.addHours(-1)
 			);
+			insert as user new Event_Track__c(Event__c = first.Id, Name = 'Beginners');
 
 			Test.startTest();
 			Integer made = EventsHomeController.repeatEvent(
@@ -98,6 +99,11 @@ private class EventsHomeControllerTest {
 				start.addDays(28).addHours(-1),
 				tickets[0].Sales_End__c,
 				'Sales window moved with the occurrence'
+			);
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Event_Track__c WHERE Event__c = :copies[1].Id WITH USER_MODE],
+				'The tracks are copied'
 			);
 		}
 	}

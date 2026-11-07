@@ -1,0 +1,44 @@
+.agenda-board {
+  display: flex;
+  gap: var(--slds-g-spacing-3, 0.75rem);
+  overflow-x: auto;
+  padding-bottom: var(--slds-g-spacing-3, 0.75rem);
+  align-items: flex-start;
+}
+
+.agenda-column {
+  flex: 0 0 16rem;
+  min-height: var(--slds-g-sizing-12, 5rem);
+}
+
+.agenda-card {
+  background: var(--slds-g-color-surface-container-1, #ffffff);
+}
+
+/* R-ESN4: a session that clashes carries an accent border beside its notes. */
+.agenda-card_clash {
+  border-left: var(--slds-g-sizing-border-3, 3px) solid var(--slds-g-color-error-1, #ba0517);
+}
+
+.agenda-zone_target {
+  border-color: var(--slds-g-color-border-accent-1, #0176d3);
+  background-color: var(--slds-g-color-surface-container-2, #f3f3f3);
+}
+
+.agenda-handle {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--slds-g-sizing-9, 2rem);
+  cursor: grab;
+  touch-action: pan-y;
+  border-radius: var(--slds-g-radius-border-2, 0.25rem);
+}
+
+.agenda-handle:focus-visible {
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-border-accent-1, #0176d3);
+  outline-offset: 2px;
+}
+
+.agenda-card_dragging {
+  opacity: 0.6;
+}

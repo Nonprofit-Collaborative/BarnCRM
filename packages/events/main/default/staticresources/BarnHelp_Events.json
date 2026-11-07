@@ -1,6 +1,12 @@
 {
   "languages": ["en"],
   "texts": {
+    "Events_Agenda_Empty": "No tracks or sessions yet. Add a track for each strand of the event, then add its sessions.",
+    "Events_Agenda_Intro": "The event's sessions by track. Move a session with its menu, or drag its handle, or press Space on the handle and use the arrow keys. Clashes are flagged, never refused.",
+    "Events_Agenda_LoadFailed": "The agenda could not be loaded. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Events_Agenda_RoomClash": "Same room at the same time as {0}",
+    "Events_Agenda_SpeakerClash": "A speaker is also in {0} at the same time",
+    "Events_Agenda_Truncated": "Showing the first {0} sessions. Use the Event Sessions reports to see the rest.",
     "Events_Home_EmptyPast": "No past events yet. Events show here once they end or are cancelled.",
     "Events_Home_EmptyUpcoming": "Nothing coming up. Create an event to start planning it.",
     "Events_Home_Intro": "Every event the organization runs. Open one to set up its tickets, agenda and speakers.",
@@ -10,7 +16,7 @@
     "Events_Repeat_BadDates": "Each new date must be after the event's own start. Nothing was saved.",
     "Events_Repeat_Done": "{0} occurrences added as drafts.",
     "Events_PromoCode_Duplicate": "The code {0} is already used for this event. Choose another code, or edit the one already there.",
-    "Events_Repeat_Intro": "Each new date gets a draft copy of {0}, as long as the event, with its ticket types, linked to the first event of the series.",
+    "Events_Repeat_Intro": "Each new date gets a draft copy of {0}, as long as the event, with its ticket types and tracks, linked to the first event of the series.",
     "Events_Repeat_NoPermission": "You do not have access to create events. Ask your BarnCRM admin for the Events Staff permission set.",
     "Events_Shared_DeleteConfirm": "Delete {0}? This cannot be undone here, but it stays in the Recycle Bin for 15 days.",
     "Events_Shared_NotSaved": "Nothing was saved. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",

@@ -54,8 +54,8 @@ were cancelled, latest first. Each event's name opens it. **New Event** opens th
 From an event's row menu, **Repeat Event** asks how it repeats (**Every Week**, **Every Two
 Weeks** or **Every Month**) and how many occurrences to add (1 to 52), and lists the new dates
 before anything is saved. Each occurrence is a **Draft** copy of the event, as long as the event,
-with its registration window moved by the same amount and its ticket types copied, and its **Series** field names the first
-event of the series. A monthly event keeps its day of the month, or the last day of a shorter
+with its registration window moved by the same amount and its ticket types and tracks copied,
+and its **Series** field names the first event of the series. A monthly event keeps its day of the month, or the last day of a shorter
 month. After that each occurrence is changed on its own; nothing keeps them in step.
 
 ## The Event Page
@@ -107,7 +107,36 @@ event** on the **Automation** tab); it cannot be switched off.
 **Repeat Event** copies the event's ticket types to each occurrence, their sales dates moved
 with it; promo codes are not copied.
 
+### Agenda
+
+The **Agenda** tab is the **Agenda Builder**: a column for each **track** (in Sort Order), then
+**No Track**, each with its sessions by time. **When** shows one day, **Unscheduled** (sessions
+with no time yet) or all of them. **New Track** and **New Session** open a short form; a track's
+menu has **Edit** and **Delete**, and deleting a track keeps its sessions, with no track.
+
+| Session field | What it is |
+|---|---|
+| Session Title | What the session is called. |
+| Track | Its track, one of this event's; empty for none. |
+| Start, End | When it runs: both or neither, End after Start, inside the event's own dates. |
+| Room | Where it runs, as text. |
+| Session Type | Talk, Workshop, Panel, Keynote, Break or Other. |
+| Status | Draft, Confirmed or Cancelled. |
+| Capacity | The most people it takes; empty for the room's own limit. |
+
+A session moves to another track three ways, and only its track changes:
+
+- its menu: **Move to** and the track;
+- dragging the handle beside its title onto another column (on a touch screen, press and hold
+  first);
+- the keyboard: focus the handle, press Space, use the arrow keys, press Space to drop or Escape
+  to cancel. A screen reader announces each step.
+
+Two sessions in the same room at overlapping times, or with a speaker in common, are flagged in
+red on both cards. Nothing is refused, and cancelled sessions are left out. **Repeat Event**
+copies tracks but not sessions.
+
 ## Not Yet
 
-Registration and attendees, a public event page, call for speakers, sponsorship, check-in,
+Registration and attendees, session sign-up, a public event page, call for speakers, sponsorship, check-in,
 reminders and volunteer shifts for an event come in later releases.

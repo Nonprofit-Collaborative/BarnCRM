@@ -70,3 +70,26 @@ Only role). Each gets its Events permission set from the role.
 | 9 | On **Events Home**, **Repeat Event** for this event, one occurrence. Open the copy's **Tickets**. | `General` is there with its price; no promo codes. |
 
 **Cleanup:** Delete the copy as admin.
+
+## T-EV-05: Agenda Builder
+
+**Purpose:** confirm tracks and sessions, moving by menu, drag and keyboard, and clash flags.
+**Prerequisites:** staff, an event from 9:00 AM to 5:00 PM on one day.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event, click **Agenda**. | An empty state with **New Track** and **New Session**. |
+| 2 | **New Track** `Admins` (Sort Order 1), then `Developers` (Sort Order 2). | Columns **Admins**, **Developers** and **No Track**, in that order. |
+| 3 | **New Session** `Keynote`, no track, 9:00 to 10:00 AM, Room `Hall A`. | It shows under **No Track** with its time and `Keynote, Hall A`. |
+| 4 | **New Session** `After Hours`, 6:00 to 7:00 PM. | Refused: the session must start and end within the event's dates. |
+| 5 | **New Session** `Flows 101`, track Admins, 9:30 to 10:30 AM, Room `hall a`. | Both `Keynote` and `Flows 101` show a red note: same room at the same time as the other. |
+| 6 | From `Flows 101`'s menu choose **Move to Developers**. | It moves to **Developers**; its time and room are unchanged; the room note stays. |
+| 7 | Drag `Flows 101` by its handle onto **No Track**. | It moves there. |
+| 8 | Tab to `Flows 101`'s handle, press Space, Left Arrow, Space. | A screen reader announces each step; it moves one column left. |
+| 9 | Edit `Keynote`: Status **Cancelled**. | The clash notes go away. |
+| 10 | **New Session** `Lightning Talks` with no Start or End. In **When** choose **Unscheduled**. | Only `Lightning Talks` shows. |
+| 11 | Delete the `Admins` track and confirm. | Its sessions stay, under **No Track**. |
+| 12 | As read-only, open **Agenda**. | No drag handles, no **New Track** or **New Session**. |
+
+**Cleanup:** None.

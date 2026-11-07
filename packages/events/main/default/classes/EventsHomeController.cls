@@ -164,6 +164,7 @@ public with sharing class EventsHomeController {
 			}
 			Database.insert(copies, true, AccessLevel.USER_MODE);
 			copyTicketTypes(source, copies);
+			copyTracks(source, copies);
 			return copies.size();
 		} catch (AuraHandledException e) {
 			Database.rollback(savepoint);
@@ -232,6 +233,28 @@ public with sharing class EventsHomeController {
 			}
 		}
 		Database.insert(made, true, AccessLevel.USER_MODE);
+	}
+
+	/** Each occurrence gets the event's tracks; its sessions are planned anew. */
+	private static void copyTracks(Event__c source, List<Event__c> copies) {
+		List<Event_Track__c> tracks = [
+			SELECT Name, Description__c, Sort_Order__c
+			FROM Event_Track__c
+			WHERE Event__c = :source.Id
+			WITH USER_MODE
+			LIMIT 50
+		];
+		List<Event_Track__c> made = new List<Event_Track__c>();
+		for (Event__c copy : copies) {
+			for (Event_Track__c track : tracks) {
+				Event_Track__c clone = track.clone(false, true, false, false);
+				clone.Event__c = copy.Id;
+				made.add(clone);
+			}
+		}
+		if (!made.isEmpty()) {
+			Database.insert(made, true, AccessLevel.USER_MODE);
+		}
 	}
 
 	private static Datetime moved(Datetime value, Long shift) {

@@ -1,0 +1,163 @@
+<template>
+  <template lwc:if={helpReady}>
+    <p class="slds-var-m-bottom_small slds-text-color_weak" data-id="intro">{labels.intro}</p>
+    <div class="slds-grid slds-grid_vertical-align-end slds-wrap slds-var-m-bottom_small">
+      <lightning-combobox
+        data-id="day"
+        class="slds-var-m-right_small"
+        name="day"
+        label={labels.when}
+        options={dayOptions}
+        value={day}
+        onchange={handleDay}
+      ></lightning-combobox>
+      <template lwc:if={canAddTrack}>
+        <lightning-button
+          data-id="new-track"
+          class="slds-var-m-right_x-small"
+          label={labels.newTrack}
+          onclick={handleNewTrack}
+        ></lightning-button>
+      </template>
+      <template lwc:if={canAddSession}>
+        <lightning-button
+          data-id="new-session"
+          label={labels.newSession}
+          onclick={handleNewSession}
+        ></lightning-button>
+      </template>
+    </div>
+
+    <template lwc:if={isLoading}>
+      <lightning-spinner alternative-text={labels.agenda} size="small"></lightning-spinner>
+    </template>
+
+    <template lwc:if={hasError}>
+      <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+    </template>
+
+    <template lwc:if={truncatedMessage}>
+      <c-barn-notice
+        message={truncatedMessage}
+        data-id="truncated"
+        class="slds-var-m-bottom_small"
+      ></c-barn-notice>
+    </template>
+
+    <template lwc:if={showEmpty}>
+      <c-barn-empty-state data-id="empty-state" message={labels.empty}></c-barn-empty-state>
+    </template>
+
+    <template lwc:if={showBoard}>
+      <span id="agenda-drag-help" class="slds-assistive-text">{dragHelp}</span>
+      <div class="agenda-board" data-id="board">
+        <template for:each={columns} for:item="column">
+          <section
+            key={column.id}
+            class={column.zoneClass}
+            data-id="column"
+            data-column={column.id}
+            data-drop-zone={column.id}
+            data-drop-label={column.name}
+            aria-label={column.name}
+          >
+            <header
+              class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-m-bottom_x-small"
+            >
+              <h2 class="slds-text-heading_small slds-truncate" title={column.name}>
+                {column.name}
+              </h2>
+              <template lwc:if={column.isTrack}>
+                <lightning-button-menu
+                  data-id={column.id}
+                  alternative-text={column.menuLabel}
+                  icon-size="x-small"
+                  menu-alignment="right"
+                  onselect={handleTrackMenu}
+                >
+                  <template for:each={trackMenuItems} for:item="item">
+                    <lightning-menu-item
+                      key={item.value}
+                      label={item.label}
+                      value={item.value}
+                    ></lightning-menu-item>
+                  </template>
+                </lightning-button-menu>
+              </template>
+            </header>
+            <ul class="slds-has-dividers_around-space">
+              <template for:each={column.cards} for:item="card">
+                <li key={card.id} class={card.cardClass} data-id="session-card" data-session={card.id}>
+                  <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-start">
+                    <template lwc:if={canMove}>
+                      <span
+                        class="agenda-handle slds-var-m-right_xx-small"
+                        role="button"
+                        tabindex="0"
+                        title={dragHelp}
+                        aria-label={card.name}
+                        aria-describedby="agenda-drag-help"
+                        data-drag-id={card.id}
+                        data-drag-label={card.name}
+                        onpointerdown={handleDragPointerDown}
+                        onkeydown={handleDragKeyDown}
+                      >
+                        <lightning-icon icon-name="utility:drag_and_drop" size="x-small"></lightning-icon>
+                      </span>
+                    </template>
+                    <div class="slds-col slds-truncate">
+                      <button
+                        class="slds-button slds-text-title_bold slds-truncate"
+                        title={card.name}
+                        data-id={card.id}
+                        onclick={handleOpenSession}
+                      >
+                        {card.name}
+                      </button>
+                      <p class="slds-text-body_small">{card.whenText}</p>
+                      <p class="slds-text-body_small slds-text-color_weak">{card.detailText}</p>
+                      <template lwc:if={card.isCancelled}>
+                        <c-barn-status-badge status="inactive" label={card.status}></c-barn-status-badge>
+                      </template>
+                      <template lwc:if={card.hasNotes}>
+                        <ul data-id="clashes">
+                          <template for:each={card.notes} for:item="note">
+                            <li key={note.key} class="slds-text-body_small slds-text-color_error">
+                              <lightning-icon
+                                icon-name="utility:warning"
+                                size="xx-small"
+                                variant="error"
+                                class="slds-var-m-right_xx-small"
+                              ></lightning-icon>
+                              {note.text}
+                            </li>
+                          </template>
+                        </ul>
+                      </template>
+                    </div>
+                    <lightning-button-menu
+                      data-id={card.id}
+                      alternative-text={card.menuLabel}
+                      icon-size="x-small"
+                      menu-alignment="right"
+                      onselect={handleSessionMenu}
+                    >
+                      <template for:each={card.menuItems} for:item="item">
+                        <lightning-menu-item
+                          key={item.value}
+                          label={item.label}
+                          value={item.value}
+                        ></lightning-menu-item>
+                      </template>
+                    </lightning-button-menu>
+                  </div>
+                </li>
+              </template>
+            </ul>
+          </section>
+        </template>
+      </div>
+      <div aria-live="polite" class="slds-assistive-text" data-id="drag-announcer">{liveText}</div>
+    </template>
+  </template>
+</template>
