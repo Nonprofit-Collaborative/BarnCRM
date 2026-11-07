@@ -23,6 +23,9 @@ used, and BarnCRM takes no payment.
 ## Contents
 
 - Objects: `Event__c` (canonical model Section 29EV1).
+- The **Event Calendar** tab (`eventCalendar`, tab `Events_Calendar`): month, week and list views,
+  filters and an `.ics` download per entry, with the framework-free `eventCalendarModel` and the
+  thin controller `EventCalendarController` (EV-19).
 - The **Events** page (`eventsHome`, tab `Events_Home`) with New Event and Repeat Event
   (`eventRepeatModal`), the framework-free module `eventsModel` and the thin controller
   `EventsHomeController`.

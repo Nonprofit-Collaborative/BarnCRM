@@ -47,6 +47,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>EventCalendarController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>EventApplicationsController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -594,6 +598,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Events_Home</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Events_Calendar</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

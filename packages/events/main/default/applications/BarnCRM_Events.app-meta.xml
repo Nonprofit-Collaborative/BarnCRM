@@ -33,6 +33,7 @@
   <label>BarnCRM Events</label>
   <navType>Console</navType>
   <tabs>Events_Home</tabs>
+  <tabs>Events_Calendar</tabs>
   <tabs>Event__c</tabs>
   <tabs>Event_Speaker__c</tabs>
   <tabs>standard-report</tabs>
@@ -47,6 +48,9 @@
     </mappings>
     <mappings>
       <tab>Event_Speaker__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Events_Calendar</tab>
     </mappings>
     <mappings>
       <tab>Events_Home</tab>

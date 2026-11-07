@@ -1,0 +1,126 @@
+/* Widths of 100% come from the slds-size_full utility class on the table and each item. */
+.barn-calendar {
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.barn-calendar th {
+  padding: var(--slds-g-spacing-1, 0.25rem);
+  text-align: left;
+}
+
+.barn-day {
+  height: calc(var(--slds-g-sizing-10, 3rem) * 2);
+  padding: var(--slds-g-spacing-1, 0.25rem);
+  vertical-align: top;
+  border: var(--slds-g-sizing-border-1, 1px) solid var(--slds-g-color-border-1, #e5e5e5);
+}
+
+.barn-day_outside {
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
+}
+
+.barn-day_today .barn-day-number {
+  font-weight: var(--slds-g-font-weight-7, 700);
+  color: var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.barn-day-number {
+  display: block;
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+}
+
+.barn-calendar ul,
+.barn-week ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* The week view: seven equal columns that wrap at narrow widths. */
+.barn-week .barn-day {
+  flex: 1 1 calc(100% / 7);
+  min-width: calc(var(--slds-g-sizing-10, 3rem) * 3);
+  height: auto;
+  min-height: calc(var(--slds-g-sizing-10, 3rem) * 4);
+}
+
+.barn-item {
+  display: block;
+  margin-top: var(--slds-g-sizing-1, 0.125rem);
+  padding: 0 var(--slds-g-spacing-1, 0.25rem);
+  overflow: hidden;
+  border: 0;
+  border-left: var(--slds-g-sizing-border-3, 3px) solid transparent;
+  border-radius: var(--slds-g-radius-border-1, 0.125rem);
+  background: var(--slds-g-color-surface-container-2, #f3f3f3);
+  color: var(--slds-g-color-on-surface-2, #2e2e2e);
+  font-size: var(--slds-g-font-scale-neg-1, 0.75rem);
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.barn-item:focus,
+.barn-link:focus {
+  outline: var(--slds-g-sizing-border-2, 2px) solid var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.barn-item_event {
+  border-left-color: var(--slds-g-color-brand-base-50, #0176d3);
+}
+
+.barn-item_session {
+  border-left-color: var(--slds-g-color-success-base-50, #2e844a);
+}
+
+/* A cancelled entry is struck through, never shown by colour alone. */
+.barn-item_cancelled {
+  text-decoration: line-through;
+}
+
+.barn-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--slds-g-color-brand-base-50, #0176d3);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* At phone width the month grid becomes a list of the days that have something on them. */
+@media (max-width: 48em) {
+  .barn-calendar thead {
+    display: none;
+  }
+
+  .barn-calendar tr,
+  .barn-calendar td {
+    display: block;
+  }
+
+  .barn-day {
+    height: auto;
+  }
+
+  .barn-day_empty {
+    display: none;
+  }
+
+  .barn-item {
+    white-space: normal;
+  }
+}
+
+@media print {
+  .barn-print-hide,
+  lightning-button-icon {
+    display: none;
+  }
+
+  .barn-day {
+    height: auto;
+  }
+}
