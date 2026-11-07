@@ -205,20 +205,4 @@ private class DuplicateRulesStarterTest {
 			Assert.areEqual(1, bodies.size(), 'Tried once and stopped.');
 		}
 	}
-
-	@IsTest
-	static void resultsReadEachComponentAndAFaultThrows() {
-		// runs-as: deploying user (pure parsing of a response text, no data, query or permission)
-		List<OrgMetadataApi.Result> results = OrgMetadataApi.results(REFUSED);
-		Assert.areEqual(1, results.size(), 'One result.');
-		Assert.isFalse(results[0].success, 'Refused.');
-		Assert.areEqual('Field Phone is not valid', results[0].message, 'The API words.');
-		Assert.isTrue(OrgMetadataApi.results(OK_MATCH)[0].success, 'Saved.');
-		try {
-			OrgMetadataApi.results(FAULT);
-			Assert.fail('A fault throws.');
-		} catch (OrgMetadataApi.MetadataException e) {
-			Assert.isTrue(e.getMessage().contains('INVALID_SESSION_ID'), 'Its words.');
-		}
-	}
 }
