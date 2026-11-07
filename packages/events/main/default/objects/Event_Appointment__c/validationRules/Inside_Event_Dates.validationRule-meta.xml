@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Inside_Event_Dates</fullName>
+  <active>true</active>
+  <description>R-EAP2: an appointment falls inside its event, from the event's start to its end.</description>
+  <errorConditionFormula>
+AND(
+  NOT(ISBLANK(Start__c)),
+  NOT(ISBLANK(End__c)),
+  OR(
+    Start__c &lt; Event__r.Start__c,
+    End__c &gt; Event__r.End__c
+  )
+)
+  </errorConditionFormula>
+  <errorDisplayField>Start__c</errorDisplayField>
+  <errorMessage>The appointment must start and end within the event's own Start and End.</errorMessage>
+</ValidationRule>

@@ -13667,6 +13667,70 @@ reads as its shipped value.
 
 ---
 
+## 29EV15. Event Appointment
+
+### Definition
+
+One bookable slot with a host during an event (EV-15, ADR-0177 decision 13): a mentor, advisor or
+staff member's time, open until a person is booked into it. Numbered for its plan item so it does
+not collide with registrations (EV-02).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Appointment Title | text | yes | The host's name and the start time, set when slots are added. |
+| Event | reference to Event | yes | The event. |
+| Host | reference to Contact | yes, when created (R-EAP3) | The Core person who hosts. |
+| Person | reference to Contact | when Booked (R-EAP4) | The person booked into the slot; empty while it is Open. |
+| Start, End | date and time | yes | When the slot runs; End after Start (R-EAP1), inside the event's dates (R-EAP2). |
+| Status | picklist | yes | Open (default), Booked, Completed, No-Show or Cancelled. |
+| Location | text | no | A table, room or meeting link. |
+| Notes | long text | no | What staff or the host should know. |
+
+### Rules
+
+**R-EAP1 A slot ends after it starts.** Validation rule `End_After_Start`.
+
+**R-EAP2 A slot falls inside its event.** Validation rule `Inside_Event_Dates`.
+
+**R-EAP3 A new slot names its host.** Validation rule `Host_Required_When_Created`; a host
+deleted or erased later leaves the slot with none.
+
+**R-EAP4 Booked needs a person.** Validation rule `Person_Required_When_Booked`, checked only
+when the status or person changes, so a person erased later does not block editing the slot.
+
+**R-EAP5 Booking is one person at a time, never twice at once.** The Appointments tab books only
+an Open slot (under a record lock), and refuses a person who already has a Booked slot that
+overlaps it in the same event. Releasing a slot clears the person and returns it to Open.
+
+**R-EAP6 A host's overlapping slots are flagged, not refused.** The tab marks two live slots of
+one host that overlap (Cancelled slots take no time); Add Slots leaves out a new slot that
+overlaps one the host already has.
+
+### Salesforce implementation
+
+- **Object:** `Event_Appointment__c`, name field Text, label Appointment Title, master-detail to
+  Event (`Event__c`, relationship Appointments), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Host | `Host__c` | Lookup(Contact), Clear on delete |
+| Person | `Contact__c` | Lookup(Contact), Clear on delete |
+| Start, End | `Start__c`, `End__c` | Date/Time, required |
+| Status | `Status__c` | Picklist (Open, Booked, Completed, No-Show, Cancelled), restricted, required |
+| Location | `Location__c` | Text(255) |
+| Notes | `Notes__c` | Long Text Area(2000) |
+
+- **Validation rules:** `End_After_Start`, `Inside_Event_Dates`, `Host_Required_When_Created`,
+  `Person_Required_When_Booked`.
+- **Panel:** the Appointments tab of the event page (`eventAppointments`), with
+  `EventAppointmentsController` (thin, user mode) and the browser module
+  `eventAppointmentsModel` (slots, clashes, grouping).
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -14034,6 +14098,7 @@ mirrors the primary member).
 
 | 1.3 | 2026-11-07 | Event Management call for speakers (EV-06; ADR-0180 `0180-events-call-for-speakers.md`, ADR-0177 decision 11, D-123, D-177). New Sections 29EV20 Speaker Application (`Speaker_Application__c`, rules R-SA1, R-SA2, R-SA4, R-SA5), 29EV21 Speaker Review (`Speaker_Review__c`, R-SA3) and 29EV25 Events Settings (`Events_Settings__c`, R-ES1). Core gains the settings section name `Events`. Numbers 29EV22 to 29EV24 are reserved for sponsorship (EV-09). |
 | 1.3 | 2026-11-07 | Event Management sponsorship (EV-09; ADR-0181 `0181-events-sponsorship.md`, ADR-0177 decision 11, D-123, D-177). New Sections 29EV22 Sponsorship Level (`Sponsorship_Level__c`, R-SP3), 29EV23 Event Sponsor (`Event_Sponsor__c`, R-SP1, R-SP4) and 29EV24 Sponsor Deliverable (`Sponsor_Deliverable__c`). Core gains the `LinkedRecords` seam (no object or field). |
+| 1.3 | 2026-11-07 | Event Appointment (`Event_Appointment__c`, 29EV15, EV-15, ADR-0177 decision 13) with rules R-EAP1 to R-EAP6. |
 
 ---
 ## 32. Entity ownership by package
@@ -14172,6 +14237,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Events Settings | Event Management | 1.3 (EV-06) | 29EV25 |
 | Event Registration | Event Management | 1.2 (EV-02) | 29EV8 |
 | Event Attendee | Event Management | 1.2 (EV-02) | 29EV9 |
+| Event Appointment | Event Management | 1.3 (EV-15) | 29EV15 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |

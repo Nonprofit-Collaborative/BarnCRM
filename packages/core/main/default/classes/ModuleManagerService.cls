@@ -122,6 +122,7 @@ public with sharing class ModuleManagerService {
 			'Event__c',
 			'Event_Attendee__c',
 			'Event_Registration__c',
+			'Event_Appointment__c',
 			'Event_Session__c',
 			'Event_Speaker__c',
 			'Event_Sponsor__c',

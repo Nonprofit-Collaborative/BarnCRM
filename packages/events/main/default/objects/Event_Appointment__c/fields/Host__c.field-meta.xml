@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Host__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The Core person who hosts the appointment: a mentor, an advisor, a staff member.</inlineHelpText>
+  <label>Host</label>
+  <referenceTo>Contact</referenceTo>
+  <relationshipLabel>Event Appointments Hosted</relationshipLabel>
+  <relationshipName>Event_Appointments_Hosted</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

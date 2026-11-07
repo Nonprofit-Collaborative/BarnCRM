@@ -289,6 +289,14 @@
         <value>Speakers</value>
     </labels>
     <labels>
+        <fullName>Events_EventTab_Appointments</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: appointment slots with hosts</shortDescription>
+        <value>Appointments</value>
+    </labels>
+    <labels>
         <fullName>Events_Speakers_AddSpeaker</fullName>
         <categories>Events</categories>
         <language>en_US</language>
