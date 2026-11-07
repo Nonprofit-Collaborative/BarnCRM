@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Duplicate Rules Starter on Duplicate Matching, Review (C-61, D-156): creates or repairs
+    BarnCRM's recommended matching and duplicate rules through the org connection.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

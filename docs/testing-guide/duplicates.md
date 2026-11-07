@@ -274,3 +274,19 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 | 3 | Create a third household `The Zztest Hall Family`, Billing Street `8848 Highland Lane`, City `Toledo`, State `OH`, Zip `43622`. Save past the warning. Scan and refresh. | A pair of the two `The Zztest Hall Family` households, with **Merge Households**. `The Zztest Shah Family` is not on it. |
 
 **Cleanup:** Dismiss the pair with **Not a Duplicate** (or merge it) and delete the Zztest households.
+
+## T-DUP-19: Duplicate Rules Starter
+
+**Purpose:** Confirm the starter shows the org's rules untouched, creates BarnCRM's people and household rules through the org connection, and explains a missing connection.
+**Prerequisites:** admin with **BarnCRM Metadata Admin**, Customize Application and Modify Metadata. Not in `mwdbdevsb` without Brandon's approval (it writes org metadata). For step 1 the org connection is not set up; for steps 3 onward it is set up and connected (see [Creating a New Field From an Import](../admin-guide/import-new-fields.md)).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Duplicate Matching**, **Review**, choose **Duplicate Rules Starter**. | A section **Duplicate Rules Starter** opens under the rules box with its intro, a notice that the org connection is needed and the connection panel. **Set Up Rules** is disabled. Under **People** and **Households**, the rule in words and your own rules, each "(active, left as it is)" or "(inactive, left as it is)". |
+| 2 | Set up the connection from the panel, then choose **Refresh**. | The notice is gone. Both sets are ticked with **Set Up will:** two steps each (create the matching rule, create the duplicate rule). |
+| 3 | Choose **Set Up Rules**. | A dialog lists the four steps. Confirm. A line says BarnCRM is writing the rules. |
+| 4 | Wait a few minutes. | The line is replaced by a green notice **Duplicate Rules Starter finished. Set up and active: People, Households.** Both sets read **Set up and active.** |
+| 5 | In Setup, open **Matching Rules** and **Duplicate Rules**. | **BarnCRM People Match** and **BarnCRM Household Match** are Active; **BarnCRM People Duplicates** and **BarnCRM Household Duplicates** are Active, action Allow with Alert and Report, and the household rule has the condition Account Record Type equals Household. The standard rules are unchanged. |
+| 6 | Deactivate **BarnCRM People Duplicates** in Setup. Back on the starter choose **Refresh**. | **People** is ticked with one step: rewrite BarnCRM's duplicate rule and activate it. **Set Up Rules** repairs it; **Households** stays **Set up and active.** |
+
+**Cleanup:** In Setup, deactivate and delete the four BarnCRM rules if the org should not keep them.

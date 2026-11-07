@@ -1,0 +1,71 @@
+<template>
+  <section class="slds-box slds-box_x-small slds-var-m-vertical_small" data-id="starter">
+    <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.title}</h3>
+    <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+
+    <template lwc:if={errorMessage}>
+      <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+    </template>
+    <template lwc:if={needsPermission}>
+      <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="info" message={labels.noPermission} data-id="no-permission"></c-barn-notice>
+    </template>
+    <template lwc:if={needsConnection}>
+      <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="info" message={labels.connectionNeeded} data-id="connection-needed"></c-barn-notice>
+      <c-import-field-connection class="slds-show slds-var-m-bottom_small" data-id="connection"></c-import-field-connection>
+    </template>
+    <template lwc:if={running}>
+      <p class="slds-text-body_small slds-var-m-bottom_small" role="status" aria-live="polite" data-id="running">{labels.running}</p>
+    </template>
+    <template lwc:elseif={view}>
+      <template lwc:if={view.lastResult}>
+        <c-barn-notice class="slds-show slds-var-m-bottom_small" variant={lastResultVariant} message={view.lastResult} data-id="last-result"></c-barn-notice>
+      </template>
+    </template>
+
+    <template for:each={sets} for:item="set">
+      <div key={set.key} class="slds-var-m-bottom_small" data-id="set">
+        <template lwc:if={set.actionable}>
+          <lightning-input
+            type="checkbox"
+            label={set.heading}
+            data-key={set.key}
+            data-id="choose"
+            checked={set.checked}
+            onchange={handleChoose}
+          ></lightning-input>
+        </template>
+        <template lwc:else>
+          <p class="slds-text-title_bold">{set.heading}</p>
+        </template>
+        <p class="slds-text-body_small" data-id="summary">{set.summary}</p>
+        <template lwc:if={set.stateText}>
+          <p class="slds-text-body_small slds-text-color_success" data-id="state">{set.stateText}</p>
+        </template>
+        <template lwc:if={set.hasSteps}>
+          <template lwc:if={set.actionable}>
+            <p class="slds-text-body_small slds-var-m-top_xx-small">{labels.stepsLead}</p>
+          </template>
+          <ul class="slds-list_dotted slds-text-body_small">
+            <template for:each={set.steps} for:item="step">
+              <li key={step} data-id="step">{step}</li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:if={set.hasOrgRules}>
+          <p class="slds-text-body_small slds-var-m-top_xx-small">{labels.orgRulesLead}</p>
+          <ul class="slds-list_dotted slds-text-body_small">
+            <template for:each={set.orgRules} for:item="rule">
+              <li key={rule} data-id="org-rule">{rule}</li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else>
+          <p class="slds-text-body_small slds-text-color_weak">{set.noOrgRules}</p>
+        </template>
+      </div>
+    </template>
+
+    <lightning-button variant="brand" label={labels.setUp} disabled={setUpDisabled} onclick={handleSetUp} data-id="set-up"></lightning-button>
+    <lightning-button class="slds-var-m-left_x-small" label={labels.refresh} disabled={working} onclick={handleRefresh} data-id="refresh"></lightning-button>
+  </section>
+</template>
