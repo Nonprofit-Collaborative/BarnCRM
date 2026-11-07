@@ -20,6 +20,8 @@ public with sharing class FindController {
 	public static final String PERMISSION = 'Find_And_Export_Records';
 	public static final Integer DEFAULT_EXPORT_LIMIT = 50000;
 	public static final Integer MAX_EXPORT_LIMIT = 500000;
+	/** The most records counted as "no geocode" for a radius; a count reads a row per record. */
+	private static final Integer MAX_WITHOUT_GEOCODE = 10000;
 	@TestVisible
 	private static Integer maxSavedQueries = 500;
 
@@ -85,6 +87,12 @@ public with sharing class FindController {
 		public String lastId;
 		@AuraEnabled
 		public Boolean done;
+		/**
+		 * With a radius (C-69): how many records the query's other conditions keep that have a
+		 * postal code but no geocode, so a distance cannot place them. Null without a radius.
+		 */
+		@AuraEnabled
+		public Integer withoutGeocode;
 	}
 
 	@AuraEnabled
@@ -161,9 +169,41 @@ public with sharing class FindController {
 			result.soql = compiled.display;
 			result.rows = QueryCompiler.run(compiled);
 			result.done = true;
+			if (QueryCompiler.parse(queryJson).radius != null) {
+				result.withoutGeocode = QueryCompiler.countWithoutGeocode(
+					queryJson,
+					MAX_WITHOUT_GEOCODE
+				);
+			}
 			return result;
 		} catch (Exception caught) {
 			throw asUserError(caught, 'Run a Find query');
+		}
+	}
+
+	/** The address and location fields of an object a radius can use (C-69, R-SQ13). */
+	@AuraEnabled(cacheable=true)
+	public static List<FindRadius.FieldOption> listRadiusFields(String objectApiName) {
+		try {
+			requirePermission();
+			return FindRadius.fieldOptions(objectApiName);
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Find radius fields');
+		}
+	}
+
+	/**
+	 * The point a radius is measured from: a US postal code, or the Id of a record whose
+	 * address is used (C-69, R-SQ13). No outside geocoding: the postal code table ships with
+	 * BarnCRM and a record's own geocode is already stored on it.
+	 */
+	@AuraEnabled
+	public static FindRadius.Center resolveRadiusCenter(String text) {
+		try {
+			requirePermission();
+			return FindRadius.resolveCenter(text);
+		} catch (Exception caught) {
+			throw asUserError(caught, 'Find radius center');
 		}
 	}
 
@@ -504,6 +544,7 @@ public with sharing class FindController {
 		Boolean shown =
 			caught instanceof FindException ||
 			caught instanceof QueryCompiler.QueryCompilerException ||
+			caught instanceof FindRadius.FindRadiusException ||
 			caught instanceof QueryFieldCatalog.QueryFieldCatalogException ||
 			caught instanceof BulkUpdateFields.BulkUpdateException;
 		return UserErrors.wrap(

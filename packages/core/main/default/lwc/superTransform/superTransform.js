@@ -225,6 +225,8 @@ export default class SuperTransform extends LightningElement {
   savedNameText = '';
   /** Find's conditions on related records, kept as the document's `related` (admin-14). */
   relatedJson = '';
+  /** Find's distance from a place (C-69), kept as the document's `radius`. */
+  radiusJson = '';
   /** What Find handed over, waiting for the page to load; and the last one used. */
   pendingStart;
   usedStart;
@@ -267,11 +269,13 @@ export default class SuperTransform extends LightningElement {
       this.filterValid = true;
       this.relatedJson =
         Array.isArray(start.related) && start.related.length ? JSON.stringify(start.related) : '';
+      this.radiusJson = start.radius ? JSON.stringify(start.radius) : '';
       this.changes = [this.newChange()];
       this.invalidate();
-      this.noticeMessage = this.relatedJson
-        ? helpText('Core', 'Core_SuperTransform_FromFindRelated')
-        : helpText('Core', 'Core_SuperTransform_FromFind');
+      this.noticeMessage =
+        this.relatedJson || this.radiusJson
+          ? helpText('Core', 'Core_SuperTransform_FromFindRelated')
+          : helpText('Core', 'Core_SuperTransform_FromFind');
     });
     this.scheduleCount(0);
   }
@@ -621,6 +625,7 @@ export default class SuperTransform extends LightningElement {
     this.objectApiName = event.detail.value;
     this.filterJson = '';
     this.relatedJson = '';
+    this.radiusJson = '';
     this.filterValid = true;
     this.targets = [];
     this.changes = [];
@@ -650,6 +655,9 @@ export default class SuperTransform extends LightningElement {
     }
     if (this.relatedJson) {
       document.related = JSON.parse(this.relatedJson);
+    }
+    if (this.radiusJson) {
+      document.radius = JSON.parse(this.radiusJson);
     }
     return JSON.stringify(document);
   }
@@ -977,6 +985,7 @@ export default class SuperTransform extends LightningElement {
       this.targets = targets;
       this.filterJson = definition.filter ? JSON.stringify(definition.filter) : '';
       this.relatedJson = '';
+      this.radiusJson = '';
       this.filterValid = true;
       const wanted = definition.changes || [];
       const kept = wanted.filter((change) => this.targetOf(change.field));

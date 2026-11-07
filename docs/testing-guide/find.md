@@ -167,3 +167,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 6 | Choose **Bulk Delete**, then **Preview**. | The **Bulk Delete** panel opens right under the buttons, above **Results**. Select **Close** without typing the count; nothing was deleted. |
 
 **Cleanup:** none (nothing was changed or deleted).
+
+## T-FIND-11: Distance From a Place
+
+**Purpose:** confirm Find keeps records within a number of miles of a US postal code or a record's address, and says why records with no geocode are missing.
+**Prerequisites:** admin; geocoding on for Contact (Setup, Data Integration Rules) with at least two contacts geocoded with mailing addresses in different cities, and one contact with a mailing postal code but no geocode.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Find**, choose **Contact**, add **Last Name**, and press **Distance From a Place**. | **Address to Measure**, **Within (Miles)** (25), **Postal Code or Record Id** and **Use This Place** appear. |
+| 2 | Choose **Mailing Address**, type the postal code of the first contact's city, press **Use This Place**, then **Run**. | "Measuring from Postal code ...". The first contact is listed, the other city's contact is not. A note says 1 record with a postal code has no geocode. |
+| 3 | Type `00000` and press **Use This Place**. | A message says it is not a postal code BarnCRM has a location for. |
+| 4 | Type `1 Main Street, Boston` and press **Use This Place**. | A message says street addresses are not looked up and to use a postal code or record. |
+| 5 | Paste the first contact's record Id and press **Use This Place**. | "Measuring from the address on that Contact." |
+| 6 | Paste the Id of the contact with a postal code but no geocode. | The center is the postal code's, with a note that the record has no geocode. |
+| 7 | Open **Show Query**. | The SOQL reads `DISTANCE(MailingAddress, GEOLOCATION(...), 'mi') < 25`. Switch to typed query and back: the distance is kept. |
+| 8 | With the distance set, open **Change Records**, **Super Transformer**. | The page opens with Contact and the same conditions; its count equals the number of records Find listed. |
+
+**Cleanup:** none.

@@ -160,6 +160,33 @@ The list offers each kind of record that points at the object, with the lookup i
 through in brackets, because one object can point at another in more than one way. You can add
 two related-records conditions to a query; they are combined with the other conditions by AND.
 
+### 7.1a Distance From a Place
+
+Under **Distance From a Place**, press the button to keep only the records whose address is
+within a number of miles of a point. Choose the **Address to Measure** (for example Mailing
+Address on a contact), the number of **Miles** (a whole number from 1 to 500) and the place:
+type a US postal code, or paste the Id of a record whose address should be the center, then
+press **Use This Place**. Find shows what it is measuring from ("Measuring from Postal code
+02134."). A query holds one distance, combined with the other conditions by AND.
+
+- **No outside lookup.** BarnCRM never sends an address anywhere. A postal code is read from a
+  table that ships with BarnCRM (one center point per US ZIP Code Tabulation Area, from the US
+  Census Bureau 2023 Gazetteer files, public domain data), and a record's address is read from
+  the geocode Salesforce already stores on it. A typed street address is refused with a message
+  that says to use the postal code or a record.
+- **Records with no geocode are not found.** Distance uses the latitude and longitude Salesforce
+  stores on an address when geocoding is turned on for that object (Setup, Data Integration
+  Rules). A record whose address has no geocode is never within a distance. After a run Find
+  says how many records with a postal code have no geocode, so they are not silently missing.
+  If the center record has no geocode, the center of its postal code is used and Find says so;
+  with neither, Find asks for a postal code instead.
+- **Table limits.** US postal codes only. The table covers ZIP Code Tabulation Areas, so a post
+  office box only ZIP code may not be found: Find says the code is not one it has a location for.
+- **Where it applies.** The same distance narrows exports, summaries, Bulk Update, Bulk Delete
+  and Super Transformer when they start from Find, so a bulk change reaches the same records
+  Find listed. Typed queries read `DISTANCE(MailingAddress, GEOLOCATION(lat, lon), 'mi') < 25`
+  back into the builder (miles and "less than" only).
+
 ### 7.2 Related Record Columns
 
 Under **Related Record Columns**, choose a kind of related record and up to five of its

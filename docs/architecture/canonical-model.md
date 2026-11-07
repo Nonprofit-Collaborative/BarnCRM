@@ -8389,6 +8389,25 @@ browser, one sheet with a header row of column labels, numbers as numbers, dates
 dates, and everything else as text. The workbook is written by BarnCRM's own module, with no
 third-party code (the same reasoning as ADR-0049).
 
+**R-SQ13 Distance from a place** (C-69, D-157; ADR-NEXT, `NEXT-radius-find-postal-centroids.md`).
+The document has one more optional key, `radius`: `{ field, miles, latitude, longitude }`
+(version stays 1). `field` is a compound address or location field of the query's object that
+the running user can read (describe); `miles` a whole number from 1 to 500; latitude and
+longitude numbers in range. It compiles to `DISTANCE(field, GEOLOCATION(:radiusLatitude,
+:radiusLongitude), 'mi') < :radiusMiles`, ANDed with the other conditions, every value a bind
+variable, in user mode (R-SQ2). The point is never typed into a query: Find looks it up on the
+server from a US postal code (the shipped static resource `BarnZipCentroids`, one internal
+point per ZCTA from the US Census Bureau 2023 Gazetteer, public domain) or from the stored
+geocode of a record the person names, falling back to that record's postal code center (and
+saying so), else refusing; a street address is refused. A record with no geocode never
+matches; a run also counts (up to 10,000) the records the other conditions keep that have a
+postal code and no geocode on a standard address, as `withoutGeocode`, so Find can say why
+they are missing. Everything that compiles a document (results, export, server export, Bulk
+Update, Bulk Delete, summaries, donor segments, indicator sources) honors the radius;
+Super Transformer is handed it with the filter. Typed query text reads
+`DISTANCE(f, GEOLOCATION(lat, lon), 'mi') < n` back into `radius` (R-SQ7); a second distance,
+`>`, or another unit is refused.
+
 ### Salesforce implementation
 
 - **Object:** `Saved_Query__c`, sharing model Private.
@@ -8403,8 +8422,10 @@ third-party code (the same reasoning as ADR-0049).
 - **Apex sharing reason:** `Shared_With_Find_Users__c` (Apex sharing reason API names end in `__c`).
 - **Settings key:** `Find_Export_Row_Limit__c` (Section 12, v0.7 keys).
 - **Services:** `QueryCompiler`, `QueryFieldCatalog`, `RollupFilterParser` (bound mode),
-  `FindController`, `SavedQuerySharingWriter`; from C-36 `FindInlineEditService` (R-SQ10).
-- **Browser modules:** `findQueryText` (R-SQ7), `xlsxWriter` (R-SQ11), `findCsv`.
+  `FindController`, `SavedQuerySharingWriter`; from C-36 `FindInlineEditService` (R-SQ10); from
+  C-69 `FindRadius` (R-SQ13) and the static resource `BarnZipCentroids`.
+- **Browser modules:** `findQueryText` (R-SQ7), `xlsxWriter` (R-SQ11), `findCsv`; the component
+  `findRadiusPanel` (R-SQ13).
 - **Permission:** custom permission `Find_And_Export_Records`, in `BarnCRM_Admin` and in its own
   permission set `BarnCRM_Find_And_Export`, assignable alone.
 - **UI:** the Find tab (app page `Find`, component `findRecords`), built on `filterBuilder`.
@@ -12906,6 +12927,7 @@ mirrors the primary member).
 | 1.0 | 2026-11-06 | Session horizon setting (modules-24, D-183). `Programs_Settings__c` gains `Session_Horizon_Weeks__c` (Number(2, 0), default 8, 1 to 26). R-SS2 reads it instead of a fixed eight weeks, and skips a day another schedule filled earlier in the same run. |
 | 1.0 | 2026-11-06 | Shipped match sources turned off through a setting (owner decision D-184, ADR-0172). `BarnCRM_Settings__c` gains `Match_Sources_Turned_Off__c` (Section 12); Match Source's Active definition now says BarnCRM changes it only on the organization's own rows. |
 | 1.0 | 2026-11-06 | Addresses of deleted records (owner decision D-184). `BarnCRM_Settings__c` gains `Address_Delete_Behavior__c` (Section 12; Delete or Keep, default Delete) and `Address__c` gains `Deleted_With__c` (Text 40), with rule R-AD11: a deleted household's, organization's or person's addresses are deleted with it and restored with it, never on a merge. |
+| 1.1 | 2026-11-06 | Radius Find (C-69, D-157, ADR-NEXT). No object or field added. Section 29D gains rule R-SQ13: the query document's optional `radius` key (distance from a US postal code or a record's address, compiled to SOQL `DISTANCE`), the shipped static resource `BarnZipCentroids` (US Census Bureau 2023 Gazetteer ZCTA internal points, public domain) and the `FindRadius` class. |
 | 1.0 | 2026-11-06 | Shipped organization record type (owner decision D-184, ADR-0173, amends ADR-0141 decision 2). Account gains the record type `BarnCRM_Organization` (active, given to nobody). Section 8 gains R-O4a: offered for organizations only where the org has no record type of its own, never detected, never switched to automatically; R-O5 leaves it out of the candidates. |
 
 ---

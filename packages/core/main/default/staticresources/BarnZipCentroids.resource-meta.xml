@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
+  <cacheControl>Public</cacheControl>
+  <contentType>text/plain</contentType>
+  <description>
+    US postal code centroids for Radius Find (C-69): one internal point per ZIP Code Tabulation
+    Area from the US Census Bureau 2023 Gazetteer (public domain), as zip,latitude,longitude
+    records separated by semicolons. Read by the FindRadius Apex class.
+  </description>
+</StaticResource>
