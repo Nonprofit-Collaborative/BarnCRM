@@ -4,7 +4,7 @@
 
 Events the organization runs, from an evening talk to a community conference: the event itself,
 its ticket types and promo codes, its tracks, sessions and agenda, and its speakers (plan Section
-5.12, ADR-NEXT `NEXT-events-module.md`). Registrations, call for speakers, sponsorship, check-in
+5.12, ADR-0177 `0177-events-module.md`). Registrations, call for speakers, sponsorship, check-in
 and reminders follow in their own items, on the data model the ADR sets out.
 
 ## First ships in

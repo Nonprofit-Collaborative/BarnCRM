@@ -1,5 +1,5 @@
 /**
- * The "once per event" rules of the Event Management module (ADR-NEXT `NEXT-events-module.md`),
+ * The "once per event" rules of the Event Management module (ADR-0177 `0177-events-module.md`),
  * run by the Core trigger dispatcher through registry rows that always run (ADR-0024): R-PC1, a
  * promo code is unique within its event, regardless of case (row `Promo_Code_Key`); R-ESP1, a
  * person speaks once per event, and R-ESP2, a speaker's empty name is the person's (row

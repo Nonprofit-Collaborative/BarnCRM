@@ -1,5 +1,5 @@
 /**
- * BarnCRM's roles get the Event Management sets (ADR-NEXT decision 7): BarnCRM Admin holders
+ * BarnCRM's roles get the Event Management sets (ADR-0177 decision 7): BarnCRM Admin holders
  * Events Admin, the Team Member and Coordinator roles Events Staff and the Read Only role Events
  * Read Only, at install, at Turn on and with the hourly access check.
  */

@@ -1,5 +1,5 @@
 /**
- * The Events page (EV-01, canonical model 29EV1, ADR-NEXT `NEXT-events-module.md` decision 6):
+ * The Events page (EV-01, canonical model 29EV1, ADR-0177 `0177-events-module.md` decision 6):
  * the organization's upcoming or past events, and Repeat Event (R-EV4).
  *
  * Thin by design (plan Section 9.9): it returns plain shapes, and the dates of a series, the date

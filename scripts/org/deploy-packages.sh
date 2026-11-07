@@ -938,7 +938,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(forms)
   # Contact Point Sync depends on Core only (ADR-0176 contact point sync module).
   MODULES+=(contactpoints)
-  # Event Management depends on Core only (ADR-NEXT, events module).
+  # Event Management depends on Core only (ADR-0177, events module).
   MODULES+=(events)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
@@ -1118,7 +1118,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "access check syncs the access."
   fi
 
-  # The same gap for the Event Management permission sets (ADR-NEXT, events module, decision 7).
+  # The same gap for the Event Management permission sets (ADR-0177, events module, decision 7).
   echo ""
   echo "== Queueing the Event Management access sync =="
   if ! printf '%s\n' 'new EventsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then

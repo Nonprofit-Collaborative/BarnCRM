@@ -68,7 +68,7 @@ CAPS = {
     # New 2026-11-06 for Contact Point Sync (C-45, ADR-0176 contact point sync module):
     # 43,980 measured with the page and backfill, plus about 2 percent.
     "contactpoints": 45_000,
-    # Event Management (ADR-NEXT, events module): events, tickets, agenda and speakers (EV-01,
+    # Event Management (ADR-0177, events module): events, tickets, agenda and speakers (EV-01,
     # EV-03 to EV-05).
     "events": 75_000,
     "mirror": 182_000,

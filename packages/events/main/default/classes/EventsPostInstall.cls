@@ -1,6 +1,6 @@
 /**
- * What the BarnCRM Event Management module does at install and at every upgrade (ADR-NEXT
- * `NEXT-events-module.md`).
+ * What the BarnCRM Event Management module does at install and at every upgrade (ADR-0177
+ * `0177-events-module.md`).
  *
  * Each step is safe to run twice and none can abort an install, since every failure is written
  * to the Error Log instead:

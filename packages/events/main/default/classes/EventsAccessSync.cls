@@ -1,5 +1,5 @@
 /**
- * Gives the Event Management permission sets to BarnCRM's roles (ADR-NEXT `NEXT-events-module.md`,
+ * Gives the Event Management permission sets to BarnCRM's roles (ADR-0177 `0177-events-module.md`,
  * decision 7): Events Admin to everyone holding BarnCRM Admin, directly or through a role, Events
  * Staff to the Team Member, Coordinator and Fundraising Staff roles, and Events Read Only to the
  * Read Only role. The roles are permission set groups, followed through

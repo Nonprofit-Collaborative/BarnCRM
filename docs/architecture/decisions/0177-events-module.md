@@ -1,4 +1,4 @@
-# ADR-NEXT: The BarnCRM Event Management module: its own package on Core, events with ticket types, tracks, sessions and speakers, and room for registration, sponsorship and check-in
+# ADR-0177: The BarnCRM Event Management module: its own package on Core, events with ticket types, tracks, sessions and speakers, and room for registration, sponsorship and check-in
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-06
