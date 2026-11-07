@@ -9165,6 +9165,7 @@ occurrence of it.
 | Location | text | no | Where the work happens, when it is the same for every shift. |
 | Coordinator | reference(User) | no | The staff member who runs this job. |
 | Active | boolean | yes (defaults true) | Whether this job is offered when a new shift is scheduled. |
+| Event ID | text | no | Set by Event Management (EV-08) when the job was made for an event: the event's record ID kept as text, never a lookup (ADR-0177 decision 12). Empty for every other job. |
 | Total Hours | decimal | computed | Approved hours ever recorded against this job. |
 | Last Volunteer Date | date | computed | The most recent day anybody worked this job. |
 | Totals Last Updated | datetime | computed | When BarnCRM last worked out this job's totals. |
@@ -9201,11 +9202,14 @@ shift and changes nothing already recorded, including its totals.
 | Location | `Location__c` | Text(255) |
 | Coordinator | `Coordinator__c` | Lookup to User |
 | Active | `Active__c` | Checkbox, default true |
+| Event ID | `Event_Key__c` | Text(18), external ID (EV-08) |
 | Total Hours | `Total_Hours__c` | Number(10, 2) |
 | Last Volunteer Date | `Last_Volunteer_Date__c` | Date |
 | Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 | Sample Data | `Sample_Data__c` | Checkbox, default false (v0.8) |
 
+- **Event extension:** `VolunteersEventExtension` (EV-08) lists and creates an event's jobs and
+  shifts for Event Management through Core's `EventVolunteerExtension`.
 - **Service:** `VolunteerJobTriggerHandler`, `VolunteerJobSelector`,
   `VolunteerIntegritySelector` (the R-VJ1 counts, without sharing).
 

@@ -160,3 +160,27 @@ changes.
 | 11 | As read-only, open **Appointments**. | The slots show; no **Add Slots** form and no **Book a Person**. |
 
 **Cleanup:** delete the test event.
+
+## T-EV-09: Event Volunteers
+
+**Purpose:** confirm event volunteer jobs and shifts are kept in Volunteers through Core, and that
+the section is absent without Volunteers.
+**Prerequisites:** Core, Event Management and Volunteers deployed; a coordinator who holds both
+the Events Staff and Volunteers Coordinator permission sets; an event that starts in 30 days from
+08:00 to 18:00.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event; look under the **Event Dashboard** on **Details**. | A **Volunteers** section with an empty state and **Add Job**, disabled. |
+| 2 | Type `Registration Desk` in **New Job Name**; click **Add Job**. | A job `Registration Desk` with no shifts. |
+| 3 | Click **Add Shift** on it. | A form with **Starts** at the event's start, **Ends** an hour later, **Volunteers Needed** 2. |
+| 4 | Set **Volunteers Needed** to 0. | **Save** is disabled and the form says to ask for at least 1. |
+| 5 | Set it to 3; set **Starts** to the evening before the event. | A note that the shift is outside the event's dates; **Save** is enabled. |
+| 6 | Click **Save**. | A shift appears with `0 of 3 signed up`. |
+| 7 | Click the job's name. | The Volunteer Job opens in Volunteers with **Event ID** set; its Shifts list shows the shift. |
+| 8 | In Volunteers, sign a volunteer up for that shift; reload the event. | The shift shows `1 of 3 signed up`. |
+| 9 | As someone with Events Staff only, open the event and add a job. | Refused with a message that the Volunteers permission may be needed; nothing is saved. |
+| 10 | In an org with Event Management but not Volunteers, open an event. | No **Volunteers** section anywhere on the page. |
+
+**Cleanup:** delete the test job in Volunteers.

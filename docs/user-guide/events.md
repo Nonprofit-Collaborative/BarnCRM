@@ -76,6 +76,14 @@ change. Nothing is added until you click it.
 
 A red note means two of one host's slots overlap. Change one, or leave it if that is intended.
 
+## Plan Volunteers
+
+If your organization uses Volunteers, the **Details** tab of an event has a **Volunteers**
+section. Type a job name, such as `Registration Desk`, and click **Add Job**. Then click **Add
+Shift** on the job, set when it starts and ends and how many volunteers you need, and click
+**Save**. Each shift shows how many have signed up. Open the job's name to manage sign-ups and
+hours in Volunteers. You need the Volunteers permission to add jobs and shifts.
+
 ## Add Speakers
 
 1. Open the event and click the **Speakers** tab.
