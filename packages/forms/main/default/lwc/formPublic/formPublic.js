@@ -18,7 +18,7 @@ import { HELP, LABELS, SAVE_TEXT, answerText, publicResultText, trapLabel } from
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
- * A public form on a Salesforce Site (C-42b, C-42c; ADR-NEXT public forms on a Salesforce Site,
+ * A public form on a Salesforce Site (C-42b, C-42c; ADR-0184 public forms on a Salesforce Site,
  * decisions 1, 4, 5, 10 and 11), loaded by the `FormsPublic` page through Lightning Out. The same
  * questions, conditions and checks as the staff runner (`c/formRules`, `c/formDefinition`); the
  * answers and files go to `FormPublicController`, which stores them for processing and says only
