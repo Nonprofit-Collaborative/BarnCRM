@@ -12591,7 +12591,7 @@ with its own tickets, agenda and later its own registrations.
 to 52 later occurrences, every week, every two weeks or every month, each a copy of the event with
 its start and end moved, status Draft, its ticket types and tracks copied (never its sessions,
 speakers or codes), and Series set to the first event of the series. The dates are worked out by
-the framework-free module `eventSeries.js`; a monthly occurrence keeps the day of the month, or the
+the framework-free module `eventsModel.js`; a monthly occurrence keeps the day of the month, or the
 month's last day when it is shorter. Nothing keeps occurrences in step afterwards: each is edited
 on its own.
 
@@ -12617,8 +12617,8 @@ on its own.
 
 - **Validation rules:** `End_After_Start` (R-EV1), `Capacity_Above_Zero` (R-EV2),
   `Registration_Closes_After_Opens` (R-EV3).
-- **Record page:** `Event_Record_Page`, Core's header, main and sidebar template; tabs Overview,
-  Tickets, Agenda, Speakers and Details; related lists in the sidebar.
+- **Record page:** `Event_Record_Page`, Core's header, main and sidebar template; tabs Details,
+  Tickets, Agenda and Speakers; related lists in the sidebar.
 - **Controllers:** `EventsHomeController` (the Events page and Repeat Event), thin, plain JSON
   shapes, user mode.
 
@@ -13432,6 +13432,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and `ProgramsAccessSync` (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
 | Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
 | Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and `FundersAccessSync` (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantLinkedRecord`, kind Program) |
+| Events app, permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and `EventsAccessSync` (ADR-NEXT `NEXT-events-module.md`). Console app `BarnCRM_Events` with the Events Home and Events tabs and Error Log last; the Event record page carries the event's tabs |
 | Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud

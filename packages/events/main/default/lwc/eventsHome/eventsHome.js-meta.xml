@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Events page: upcoming or past events with their dates, status, format and place, New
+    Event and Repeat Event (EV-01).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Events Home</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

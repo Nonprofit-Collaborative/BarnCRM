@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Upcoming_Events</fullName>
+  <columns>NAME</columns>
+  <columns>Start__c</columns>
+  <columns>Format__c</columns>
+  <columns>Venue_Name__c</columns>
+  <columns>Capacity__c</columns>
+  <filterScope>Everything</filterScope>
+  <filters>
+    <field>Status__c</field>
+    <operation>equals</operation>
+    <value>Draft,Open,Closed</value>
+  </filters>
+  <label>Upcoming and Draft Events</label>
+</ListView>

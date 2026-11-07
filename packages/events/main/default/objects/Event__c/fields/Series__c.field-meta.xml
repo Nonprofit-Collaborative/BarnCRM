@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Series__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <description>R-EV4: on a later occurrence of a recurring event, the first event of the series. Set by Repeat Event.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>For a repeating event, the first event of the series. Empty on the first event.</inlineHelpText>
+  <label>Series</label>
+  <referenceTo>Event__c</referenceTo>
+  <relationshipLabel>Occurrences</relationshipLabel>
+  <relationshipName>Occurrences</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

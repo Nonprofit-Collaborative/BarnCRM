@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Registration_Opens__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>When people can start to register. Empty means as soon as the event is Open.</inlineHelpText>
+  <label>Registration Opens</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>DateTime</type>
+</CustomField>
