@@ -229,3 +229,23 @@ BarnCRM person, Summit contact blank) Registered, and a new person Started.
 | 5 | Run the step again. | No second event or registration. |
 
 **Cleanup:** None.
+
+## T-EV-07: Event Dashboard and Conference Template
+
+**Purpose:** confirm the dashboard counts and that the template is opt-in, previewed first and
+applied once.
+**Prerequisites:** staff and a new event `Test Dreamin` that starts in 60 days and ends two days
+later, with no ticket types, tracks or sessions.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event; look at the top of **Details**. | **Event Dashboard** with about 60 days to go, four counts of 0 and three setup steps **To Do**. **Event Templates** is offered. |
+| 2 | Open **Agenda** and **Tickets**. | Both empty: no template was applied by itself. |
+| 3 | On **Details** choose **Community Conference**. | A summary (3 tracks, 4 ticket types, 13 sessions) and the **Planning Timeline** with dates; nothing is added yet. |
+| 4 | Click **Apply Template**. | A success message; the counts show 3 tracks, 4 ticket types and 13 sessions, and **Event Templates** is gone. |
+| 5 | Open **Agenda**. | Three track columns plus No Track; sessions are drafts on days 1 and 2. |
+| 6 | Make an event with the same dates but ending one day after it starts; choose the template. | The summary says some sessions fall outside the event's dates and are left out. |
+| 7 | As read-only, open the event. | The dashboard shows; no **Event Templates**. |
+
+**Cleanup:** delete the test events.

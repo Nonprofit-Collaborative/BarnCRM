@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
+  <cacheControl>Public</cacheControl>
+  <contentType>application/json</contentType>
+  <description>
+    Event templates as JSON (EV-11): tracks, ticket types, sessions and a planning timeline an
+    admin can apply to an event on request, never by default. Read by EventDashboardController.
+  </description>
+</StaticResource>

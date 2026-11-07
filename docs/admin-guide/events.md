@@ -259,6 +259,26 @@ with source **Form**; a question with the key `ticketType` (a ticket type's name
 key `promoCode` choose the ticket and the code. A submission that cannot be registered (a used-up
 code, an unknown ticket) is kept for review in Forms. Without Forms, register people on the tab.
 
+### Dashboard and Event Templates
+
+The top of the **Details** tab is the **Event Dashboard**: days to go, counts of ticket types,
+tracks, sessions and speakers (with how many speakers are confirmed), and the setup steps still to
+do (ticket types, sessions, speakers). It reads this event only.
+
+An event with no ticket types, tracks or sessions also shows **Event Templates**, to anyone who
+may add those records. A template is a ready-made plan, shipped as JSON (the static resource
+`BarnEventTemplates`). The **Community Conference** template is the "Dreamin" style event: an Admins,
+a Developers and a Nonprofit track, a keynote, talks and workshops on two days, a lunch break each
+day, four ticket types (Attendee, Student, Speaker, Sponsor) and a **Planning Timeline** (open the
+call for speakers, sponsor outreach, recruiting volunteers, reminders, check-in), each step dated
+back from the event's start.
+
+Choosing a template only previews it. Nothing is added until you press **Apply Template**, and no
+template is ever applied by itself. Sessions are placed from the event's start (day 1 is its first
+day) as drafts; any that would fall outside the event's dates are left out and the preview says
+how many. The apply is all or nothing, and an event that already has any ticket type, track or
+session refuses it.
+
 ## Settings
 
 As an admin, open the **Events** section of **BarnCRM Settings**. Each setting saves org-wide as

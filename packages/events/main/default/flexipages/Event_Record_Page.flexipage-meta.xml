@@ -25,6 +25,12 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentName>eventDashboard</componentName>
+        <identifier>eventDashboard</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>force:detailPanel</componentName>
         <identifier>eventDetailPanel</identifier>
       </componentInstance>
