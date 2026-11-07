@@ -7,10 +7,19 @@ import { graphql } from 'lightning/graphql';
 import { deleteRecord, updateRecord } from 'lightning/uiRecordApi';
 import { getObjectInfo, getPicklistValues } from 'lightning/uiObjectInfoApi';
 import getTurnedOffTypes from '@salesforce/apex/RelationshipController.getTurnedOffTypes';
+import isFeatureOn from '@salesforce/apex/RelationshipController.isFeatureOn';
 import BarnConfirmModal from 'c/barnConfirmModal';
 
 jest.mock(
   '@salesforce/apex/RelationshipController.getTurnedOffTypes',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/RelationshipController.isFeatureOn',
   () => {
     const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
     return { default: createApexTestWireAdapter(jest.fn()) };
@@ -85,6 +94,7 @@ function build(objectApiName = 'Contact', access = STAFF_ACCESS) {
   element.objectApiName = objectApiName;
   document.body.appendChild(element);
   getObjectInfo.emit(access);
+  isFeatureOn.emit(true);
   return element;
 }
 
@@ -104,6 +114,18 @@ describe('c-relationship-panel', () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+  });
+
+  it('shows nothing while the Relationships feature is off (D-184)', async () => {
+    const element = build();
+    isFeatureOn.emit(false);
+    graphql.emit(response([SPOUSE]));
+    await flush();
+
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+    isFeatureOn.emit(true);
+    await flush();
+    expect(element.shadowRoot.querySelector('lightning-card')).not.toBeNull();
   });
 
   it('offers neither Add relationship nor Remove to someone who can only read relationships', async () => {

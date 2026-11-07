@@ -710,6 +710,12 @@ public with sharing class ImportTemplateService {
 		return null;
 	}
 
+	/** Whether a template loads relationships while the Relationships feature is off (ADR-0124). */
+	public static Boolean isHidden(Import_Template__c template) {
+		return ImportObjectSchema.typeOf(template) == Relationship__c.SObjectType &&
+			!FeatureSwitchService.isOn(FeatureSwitchService.RELATIONSHIPS);
+	}
+
 	/**
 	 * The active templates, materializing the shipped defaults first when the org has none.
 	 * This is what the wizard asks for when it opens.

@@ -126,7 +126,7 @@ to the people who should see them, shows its settings, and starts its automation
 | Org Optimizer and Health Check | The Org Optimizer tab and Health Check | The Org Optimizer tab, the Health section and the Org Optimizer section (its three thresholds) |
 | Households | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
 | Addresses | Address capture, the primary address, and the addresses of deleted records | Its five automations and the Addresses section |
-| Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships box on People and Households |
+| Relationships | Keeping both sides of a relationship in step | Its automation, the Relationships box on People and Households, the Relationships card on a person's Connections tab, the Relationship types list in Custom Metadata, and import mappings that load relationships (in Data Manager and the Import wizard; kept, and listed again when it is turned back on) |
 | Affiliations | The primary affiliation | Its automation |
 | Preferred email and phone | Copying the preferred email into the standard email and the preferred phone into the standard phone | Its three automations |
 
