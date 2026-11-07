@@ -7,7 +7,7 @@
  * Requires PHP: 7.4
  * License: BSD-3-Clause
  *
- * How it works (ADR-NEXT portal builder, decision 8):
+ * How it works (ADR-0185 portal builder, decision 8):
  * - The shortcode [barncrm_portal key="..."] writes a div that js/boot.js fills.
  * - The browser calls this site's REST route /wp-json/barncrm-portal/v1/<path>.
  * - This plugin gets an access token for the integration user with the OAuth client credentials

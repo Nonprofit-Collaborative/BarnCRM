@@ -1,6 +1,6 @@
 # BarnCRM Portal Client
 
-The website half of BarnCRM Portal Builder (ADR-NEXT portal builder, D-187). It is not deployed to Salesforce. Setup, from the Salesforce side: [Admin Guide, Portal Builder](../docs/admin-guide/portal-builder.md).
+The website half of BarnCRM Portal Builder (ADR-0185 portal builder, D-187). It is not deployed to Salesforce. Setup, from the Salesforce side: [Admin Guide, Portal Builder](../docs/admin-guide/portal-builder.md).
 
 | Path | What it is |
 |---|---|

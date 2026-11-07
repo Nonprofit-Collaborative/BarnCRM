@@ -2,7 +2,7 @@
  * Calls the BarnCRM portal API through the website's own proxy (the WordPress plugin, or any
  * server that does the same job). The browser never holds the OAuth secret or the session token:
  * the proxy adds the integration user's access token, keeps the session token in an HttpOnly
- * cookie and strips it from answers (ADR-NEXT portal builder, decision 8).
+ * cookie and strips it from answers (ADR-0185 portal builder, decision 8).
  *
  * Framework-free: works in any browser and in Node with a fetch implementation.
  */
