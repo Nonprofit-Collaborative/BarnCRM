@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Notice_Result__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Why no notice went out, when it did not: no template chosen, no email address, or a send error.</inlineHelpText>
+  <label>Notice Result</label>
+  <length>255</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+</CustomField>

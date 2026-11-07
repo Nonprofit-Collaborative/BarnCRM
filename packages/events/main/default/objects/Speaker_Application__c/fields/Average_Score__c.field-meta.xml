@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Average_Score__c</fullName>
+  <inlineHelpText>The scores added together and divided by the number of reviews. Empty before the first review.</inlineHelpText>
+  <label>Average Score</label>
+  <trackTrending>false</trackTrending>
+  <formula>IF(Review_Count__c = 0, NULL, Total_Score__c / Review_Count__c)</formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+  <precision>18</precision>
+  <scale>1</scale>
+  <type>Number</type>
+</CustomField>

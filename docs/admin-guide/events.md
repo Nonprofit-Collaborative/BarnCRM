@@ -159,7 +159,41 @@ time is flagged on the **Agenda**, never refused. One speaker per person and one
 session are automations that always run (**Event Speaker: one per person** and **Session
 Speaker: once per session** on the **Automation** tab).
 
+### Call for Speakers
+
+The **Applications** tab is the call for speakers. Each **speaker application** is one proposal:
+a title, the **Applicant** (a Core person), an abstract and, if the applicant named one, a track.
+**Add Application** adds one; applications that come in another way (a form, later the speaker
+portal) land in the same list. Proposals are listed with the best average score first.
+
+| Application field | What it is |
+|---|---|
+| Proposal Title | The name of the proposed talk. |
+| Applicant | The Core person who applied. Required when the application is added. |
+| Status | Submitted (the default), In Review, Accepted, Declined or Withdrawn. |
+| Reviews, Average Score | How many reviewers scored it and their average, worked out by BarnCRM. |
+| Notice Sent, Notice Result | When the decision email went out, or why none did. |
+
+A reviewer opens a proposal's menu and chooses **Score**: a score from 1 to 5 and an optional note.
+Each reviewer has one score per proposal; scoring again replaces it. The first score moves a
+Submitted proposal to In Review. Scores, with the reviewer's name and note, show under the
+proposal.
+
+**Accept** and **Decline** are in the menu of a proposal that is still Submitted or In Review.
+Accept makes the applicant a speaker at the event (status **Invited**), or links the speaker they
+already are; Decline makes none. A decided proposal cannot be scored or decided again from the tab;
+change it with **Edit** if you need to.
+
+**Notices.** Accepting or declining emails the applicant when you have chosen an email template for
+that outcome. Open **BarnCRM Settings**, **Events**, and enter the **developer name** of each
+template (an email template you made in Setup, for example `Speaker_Accepted`). The applicant is the
+recipient and the application is the record the template merges, so `{!Contact.FirstName}` and
+`{!Speaker_Application__c.Name}` work. Leave a setting empty to send no email for that outcome.
+If a notice cannot go out, because no template is chosen, the template is missing or inactive, the
+applicant has no email address or the send failed, the decision is still saved and **Notice
+Result** on the application says why.
+
 ## Not Yet
 
-Registration and attendees, session sign-up, a public event page, call for speakers, speaker portal, sponsorship, check-in,
-reminders and volunteer shifts for an event come in later releases.
+Registration and attendees, session sign-up, a public event page, speaker portal, sponsorship,
+check-in, reminders and volunteer shifts for an event come in later releases.

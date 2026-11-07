@@ -13250,6 +13250,148 @@ a second assignment of the same speaker to the same session.
 
 ---
 
+## 29EV20. Speaker Application
+
+### Definition
+
+A person's proposal to speak at an event (EV-06, the call for speakers): a title, an abstract, an
+optional track, reviewers' scores and a decision. Accepting it makes the applicant a speaker at the
+event (29EV6). Same review pattern as the Funders and Programs reviews, with no dependency on them.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Proposal Title | text | yes | The name of the proposed talk. |
+| Event | reference to Event | yes | The event the proposal is for. |
+| Applicant | reference to Contact | yes, when created (R-SA1) | The Core person who applied. |
+| Abstract | long text | no | What the talk covers. |
+| Track | reference to Event Track | no | The track the applicant named. |
+| Status | picklist | yes | Submitted, In Review, Accepted, Declined or Withdrawn. Default Submitted. |
+| Speaker | reference to Event Speaker | no | Set when the application is accepted (R-SA4). |
+| Notice Sent | date and time | no | When the accept or decline email went out. |
+| Notice Result | text | no | Why no notice went out, when it did not (R-SA5). |
+| Reviews, Total Score | roll-up summary | no | The count and the sum of the application's reviews. |
+| Average Score | formula | no | Total Score divided by Reviews; empty before the first review (R-SA2). |
+
+### Rules
+
+**R-SA1 An application names a Core person.** A validation rule requires the applicant when the
+application is created; a person deleted or erased later leaves the application with none.
+
+**R-SA2 The average score is computed, never typed.** Roll-up summaries count and add the
+application's reviews; a formula divides them.
+
+**R-SA4 Only an undecided application is decided or scored.** Submitted and In Review applications
+can be scored, accepted or declined; the first score moves Submitted to In Review. Accepting
+finds the applicant's speaker at the event (29EV6) or makes one (status Invited), and links it.
+Declining makes no speaker. An accepted application with no applicant is refused. A decided
+application is edited as a record, not decided again.
+
+**R-SA5 A notice never undoes a decision.** Accepting or declining sends the applicant one email
+when a template is chosen for that outcome in Events Settings (29EV25), with the applicant as the
+recipient and the application as the record it merges. When no email goes out (no template chosen,
+the template is missing or inactive, the applicant has no email address, or the send fails) the
+decision stands and Notice Result says why; when it goes, Notice Sent holds the time.
+
+### Salesforce implementation
+
+- **Object:** `Speaker_Application__c`, name field Text, label Proposal Title, master-detail to
+  Event (`Event__c`, relationship Speaker Applications), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Applicant | `Contact__c` | Lookup(Contact), Clear on delete |
+| Abstract | `Abstract__c` | Long Text Area(32768) |
+| Track | `Track__c` | Lookup(Event Track), Clear on delete |
+| Status | `Status__c` | Picklist (Submitted, In Review, Accepted, Declined, Withdrawn), restricted, required |
+| Speaker | `Event_Speaker__c` | Lookup(Event Speaker), Clear on delete |
+| Notice Sent | `Notice_Sent__c` | Date/Time |
+| Notice Result | `Notice_Result__c` | Text(255) |
+| Reviews | `Review_Count__c` | Roll-Up Summary (COUNT Speaker Review) |
+| Total Score | `Total_Score__c` | Roll-Up Summary (SUM Speaker Review Score) |
+| Average Score | `Average_Score__c` | Formula (Number, 1 decimal) |
+
+- **Validation rule:** `Applicant_Required_When_Created` (R-SA1).
+- **Panel:** the Applications tab of the event page (`eventApplications`), with
+  `EventApplicationsController` (thin, user mode) and the framework-free `eventApplicationsModel`.
+
+---
+
+## 29EV21. Speaker Review
+
+### Definition
+
+One reviewer's score and note for a speaker application (EV-06).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Application | reference to Speaker Application | yes | The application scored. |
+| Reviewer | reference to User | no | The person who scored it; set to the person saving. |
+| Score | number | yes | A whole number from 1 to 5 (R-SA3). |
+| Notes | long text | no | Why. |
+
+### Rules
+
+**R-SA3 One score per reviewer per application, from 1 to 5.** A validation rule keeps the score
+a whole number from 1 to 5. The Applications tab saves the viewing person's review as an upsert, so
+a second save replaces the first; reviews cannot be added or replaced once the application is
+decided.
+
+### Salesforce implementation
+
+- **Object:** `Speaker_Review__c`, name field Auto Number (`SRV-{000000}`), master-detail to
+  Speaker Application (`Speaker_Application__c`, relationship Reviews), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Application | `Speaker_Application__c` | Master-Detail(Speaker Application) |
+| Reviewer | `Reviewer__c` | Lookup(User), Clear on delete |
+| Score | `Score__c` | Number(1, 0), required |
+| Notes | `Notes__c` | Long Text Area(5000) |
+
+- **Validation rule:** `Score_From_One_To_Five` (R-SA3).
+
+---
+
+## 29EV25. Events Settings
+
+### Definition
+
+The Event Management module's org-wide settings (ADR-0017), edited in the Events section of BarnCRM
+Settings: the email template for each speaker application outcome.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Accepted Notice Template | text | no | Developer name of the email template sent when an application is accepted. |
+| Declined Notice Template | text | no | Developer name of the email template sent when an application is declined. |
+
+### Rules
+
+**R-ES1 A blank template means no email.** A blank, never-saved or unreadable value reads as no
+template (R-SA5). A template is named by developer name as text, because no lookup to an email
+template is possible (ADR-0032).
+
+### Salesforce implementation
+
+- **Object:** `Events_Settings__c`, hierarchy custom setting, visibility Protected, read through
+  Core's `SettingsService` by `EventsSettings`.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Accepted Notice Template | `Accept_Notice_Template__c` | Text(80) |
+| Declined Notice Template | `Decline_Notice_Template__c` | Text(80) |
+
+- **Setting Definitions:** `Events_Accept_Notice_Template`, `Events_Decline_Notice_Template`,
+  section Events (Core's `SettingSections.EVENTS`).
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -13615,6 +13757,8 @@ mirrors the primary member).
 | 1.1 | 2026-11-07 | Contact Point Sync: person accounts and household moves (C-45e, D-186, ADR-0176 decisions 14 and 15). Rules R-CPL5 and R-CPL6 added to Contact Point Link. Two Automation Registry rows (`Contact_Point_Sync_Account`, `Contact_Point_Sync_Membership`). No object or field added. |
 | 1.2 | 2026-11-06 | Event Management module (EV-01, EV-03, EV-04, EV-05; ADR-0177 `0177-events-module.md`, D-123, D-177). Seven objects in the new package `packages/events`: Event (`Event__c`, 29EV1), Ticket Type (`Ticket_Type__c`, 29EV2), Promo Code (`Promo_Code__c`, 29EV3), Event Track (`Event_Track__c`, 29EV4), Event Session (`Event_Session__c`, 29EV5), Event Speaker (`Event_Speaker__c`, 29EV6) and Session Speaker (`Session_Speaker__c`, 29EV7), with rules R-EV1 to R-EV4, R-TT1 to R-TT4, R-PC1 to R-PC5, R-ETR1, R-ESN1 to R-ESN5, R-ESP1 to R-ESP3 and R-SSP1. Registrations, attendees, call for speakers and sponsorship are designed in the ADR and added by their items. |
 
+| 1.3 | 2026-11-07 | Event Management call for speakers (EV-06; ADR-NEXT `NEXT-events-call-for-speakers.md`, ADR-0177 decision 11, D-123, D-177). New Sections 29EV20 Speaker Application (`Speaker_Application__c`, rules R-SA1, R-SA2, R-SA4, R-SA5), 29EV21 Speaker Review (`Speaker_Review__c`, R-SA3) and 29EV25 Events Settings (`Events_Settings__c`, R-ES1). Core gains the settings section name `Events`. Numbers 29EV22 to 29EV24 are reserved for sponsorship (EV-09). |
+
 ---
 ## 32. Entity ownership by package
 One row per entity in the model, so a contributor or an agent can tell at a glance which
@@ -13744,6 +13888,9 @@ included; standard objects the packages extend are named by the entity that gove
 | Event Session | Event Management | 1.2 (EV-04) | 29EV5 |
 | Event Speaker | Event Management | 1.2 (EV-05) | 29EV6 |
 | Session Speaker | Event Management | 1.2 (EV-05) | 29EV7 |
+| Speaker Application | Event Management | 1.3 (EV-06) | 29EV20 |
+| Speaker Review | Event Management | 1.3 (EV-06) | 29EV21 |
+| Events Settings | Event Management | 1.3 (EV-06) | 29EV25 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |

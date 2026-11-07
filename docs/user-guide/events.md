@@ -66,3 +66,14 @@ Use **When** to look at one day at a time, or at the sessions with no time yet.
    and click **Save**. The **x** beside a session takes them out of it.
 5. **Remove** takes a speaker off the event and out of their sessions; the person stays in
    BarnCRM.
+
+## Review Speaker Applications
+
+1. Open the event and click the **Applications** tab. **Add Application** adds a proposal: its
+   title, the applicant and the abstract.
+2. From a proposal's menu choose **Score**, pick 1 to 5, add a note if you like and click **Save**.
+   You have one score per proposal; scoring again replaces yours. The list shows the best average
+   first.
+3. Choose **Accept** to make the applicant a speaker (as **Invited**) or **Decline**, and confirm.
+   If your admin chose email templates, the applicant gets the notice. If not, or if they have no
+   email address, a message tells you, and the application shows why.
