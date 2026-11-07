@@ -32,6 +32,7 @@ PLACEHOLDER_PACKAGES = {
     "funders",
     "forms",
     "contactpoints",
+    "events",
 }
 
 

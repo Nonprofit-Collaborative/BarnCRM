@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Discount_Above_Zero</fullName>
+  <active>true</active>
+  <description>R-PC2: a discount is above zero.</description>
+  <errorConditionFormula>Discount_Value__c &lt;= 0</errorConditionFormula>
+  <errorDisplayField>Discount_Value__c</errorDisplayField>
+  <errorMessage>Discount Value must be above 0.</errorMessage>
+</ValidationRule>

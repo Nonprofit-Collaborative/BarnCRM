@@ -256,6 +256,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | C-42a Forms: install, roles, the Form Builder (steps, questions, records to write, conditions, preview, publish), filling in a form, matching people and organizations, form submissions and Process Again | [forms.md](forms.md) | BarnCRM Forms |
 
+### Event Management
+
+| Feature | Page | Package |
+|---|---|---|
+| EV-01 Events: install, roles, the Events page, Repeat Event, the event page; EV-03 ticket types and promo codes; EV-04 the Agenda Builder; EV-05 speakers | [events.md](events.md) | BarnCRM Event Management |
+
 ### Moving From Another System
 
 | Feature | Page | Package |

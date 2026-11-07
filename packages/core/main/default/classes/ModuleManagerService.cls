@@ -117,7 +117,16 @@ public with sharing class ModuleManagerService {
 			'Grant_Requirement__c'
 		},
 		'Forms' => new List<String>{ 'Form__c', 'Form_Submission__c', 'Form_Version__c' },
-		'ContactPoints' => new List<String>{ 'Contact_Point_Link__c' }
+		'ContactPoints' => new List<String>{ 'Contact_Point_Link__c' },
+		'Events' => new List<String>{
+			'Event__c',
+			'Event_Session__c',
+			'Event_Speaker__c',
+			'Event_Track__c',
+			'Promo_Code__c',
+			'Session_Speaker__c',
+			'Ticket_Type__c'
+		}
 	};
 
 	/** The permission set Turn on gives the person who turned the module on. */
@@ -130,7 +139,8 @@ public with sharing class ModuleManagerService {
 		'LogicModels' => 'Logic_Models_Admin',
 		'Funders' => 'Funders_Admin',
 		'Forms' => 'Forms_Admin',
-		'ContactPoints' => 'Contact_Point_Sync_Admin'
+		'ContactPoints' => 'Contact_Point_Sync_Admin',
+		'Events' => 'Events_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */

@@ -22,7 +22,8 @@ const LOGOS = {
   Programs: 'BarnCRM_Programs_Logo',
   Funders: 'BarnCRM_Funders_Logo',
   LogicModels: 'BarnCRM_Logic_Models_Logo',
-  Forms: 'BarnCRM_Forms_Logo'
+  Forms: 'BarnCRM_Forms_Logo',
+  Events: 'BarnCRM_Events_Logo'
 };
 
 function logoUrl(name) {

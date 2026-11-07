@@ -5,7 +5,7 @@
 
 <org alias> is an org you have already connected with `sf org login web --alias <alias>`.
 --modules names the packages you plan to install (folders under packages/: core, rollups,
-giving, volunteers, programs, logicmodels, funders, mirror); the packages they depend on are
+giving, volunteers, programs, logicmodels, funders, events, mirror); the packages they depend on are
 added. The default is every package. --apex-limit is the org's Apex code limit in characters,
 when Salesforce support has raised it from the default 6,000,000.
 

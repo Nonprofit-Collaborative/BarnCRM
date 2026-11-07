@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Start_And_End_Together</fullName>
+  <active>true</active>
+  <description>R-ESN1: a session has a start and an end, or neither.</description>
+  <errorConditionFormula>ISBLANK(Start__c) &lt;&gt; ISBLANK(End__c)</errorConditionFormula>
+  <errorMessage>Fill in both Start and End, or leave both empty while the session is not scheduled.</errorMessage>
+</ValidationRule>

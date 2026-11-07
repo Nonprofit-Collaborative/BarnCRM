@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Speaker_From_Same_Event</fullName>
+  <active>true</active>
+  <description>R-SSP1: a session's speaker is one of the session's own event's speakers.</description>
+  <errorConditionFormula>
+AND(
+  NOT(ISBLANK(Event_Speaker__c)),
+  Event_Speaker__r.Event__c &lt;&gt; Event_Session__r.Event__c
+)
+  </errorConditionFormula>
+  <errorDisplayField>Event_Speaker__c</errorDisplayField>
+  <errorMessage>Choose a speaker of this session's own event.</errorMessage>
+</ValidationRule>

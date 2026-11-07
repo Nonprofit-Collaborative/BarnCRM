@@ -1,0 +1,154 @@
+<template>
+  <template lwc:if={helpReady}>
+    <p class="slds-var-m-bottom_small slds-text-color_weak" data-id="intro">{labels.intro}</p>
+
+    <template lwc:if={isLoading}>
+      <lightning-spinner alternative-text={labels.tickets} size="small"></lightning-spinner>
+    </template>
+
+    <template lwc:if={hasError}>
+      <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+    </template>
+
+    <template lwc:if={showContent}>
+      <template lwc:if={capacityWarning}>
+        <c-barn-notice
+          variant="warning"
+          message={capacityWarning}
+          data-id="capacity-warning"
+          class="slds-var-m-bottom_small"
+        ></c-barn-notice>
+      </template>
+
+      <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+        <h2 class="slds-text-heading_small">{labels.tickets}</h2>
+        <template lwc:if={canAddTicket}>
+          <lightning-button
+            data-id="new-ticket"
+            label={labels.newTicket}
+            onclick={handleNewTicket}
+          ></lightning-button>
+        </template>
+      </div>
+      <template lwc:if={hasTickets}>
+        <table
+          class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_stacked-horizontal slds-var-m-top_x-small"
+          data-id="tickets"
+        >
+          <thead>
+            <tr class="slds-line-height_reset">
+              <th scope="col">{ticketLabels.Name}</th>
+              <th scope="col">{ticketLabels.Price__c}</th>
+              <th scope="col">{ticketLabels.Quantity__c}</th>
+              <th scope="col">{labels.when}</th>
+              <th scope="col">{ticketLabels.Active__c}</th>
+              <th scope="col"><span class="slds-assistive-text">{labels.actions}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={ticketRows} for:item="row">
+              <tr key={row.id} data-id="ticket-row">
+                <th scope="row" data-label={ticketLabels.Name}>{row.name}</th>
+                <td data-label={ticketLabels.Price__c}>{row.priceText}</td>
+                <td data-label={ticketLabels.Quantity__c}>{row.quantityText}</td>
+                <td data-label={labels.when}>{row.windowText}</td>
+                <td data-label={ticketLabels.Active__c}>
+                  <c-barn-status-badge
+                    status={row.badge.status}
+                    label={row.badge.label}
+                  ></c-barn-status-badge>
+                </td>
+                <td>
+                  <lightning-button-menu
+                    data-id={row.id}
+                    alternative-text={row.menuLabel}
+                    icon-size="x-small"
+                    menu-alignment="right"
+                    onselect={handleTicketMenu}
+                  >
+                    <template for:each={menuItems} for:item="item">
+                      <lightning-menu-item
+                        key={item.value}
+                        label={item.label}
+                        value={item.value}
+                      ></lightning-menu-item>
+                    </template>
+                  </lightning-button-menu>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </template>
+      <template lwc:else>
+        <c-barn-empty-state data-id="no-tickets" message={labels.noTickets}></c-barn-empty-state>
+      </template>
+
+      <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-m-top_large">
+        <h2 class="slds-text-heading_small">{codesTitle}</h2>
+        <template lwc:if={canAddCode}>
+          <lightning-button
+            data-id="new-code"
+            label={labels.newCode}
+            onclick={handleNewCode}
+          ></lightning-button>
+        </template>
+      </div>
+      <template lwc:if={hasCodes}>
+        <table
+          class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_stacked-horizontal slds-var-m-top_x-small"
+          data-id="codes"
+        >
+          <thead>
+            <tr class="slds-line-height_reset">
+              <th scope="col">{codeLabels.Name}</th>
+              <th scope="col">{codeLabels.Discount_Value__c}</th>
+              <th scope="col">{codeLabels.Ticket_Type__c}</th>
+              <th scope="col">{codeLabels.Max_Uses__c}</th>
+              <th scope="col">{labels.when}</th>
+              <th scope="col">{codeLabels.Active__c}</th>
+              <th scope="col"><span class="slds-assistive-text">{labels.actions}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={codeRows} for:item="row">
+              <tr key={row.id} data-id="code-row">
+                <th scope="row" data-label={codeLabels.Name}>{row.code}</th>
+                <td data-label={codeLabels.Discount_Value__c}>{row.discountText}</td>
+                <td data-label={codeLabels.Ticket_Type__c}>{row.ticketText}</td>
+                <td data-label={codeLabels.Max_Uses__c}>{row.usesText}</td>
+                <td data-label={labels.when}>{row.windowText}</td>
+                <td data-label={codeLabels.Active__c}>
+                  <c-barn-status-badge
+                    status={row.badge.status}
+                    label={row.badge.label}
+                  ></c-barn-status-badge>
+                </td>
+                <td>
+                  <lightning-button-menu
+                    data-id={row.id}
+                    alternative-text={row.menuLabel}
+                    icon-size="x-small"
+                    menu-alignment="right"
+                    onselect={handleCodeMenu}
+                  >
+                    <template for:each={menuItems} for:item="item">
+                      <lightning-menu-item
+                        key={item.value}
+                        label={item.label}
+                        value={item.value}
+                      ></lightning-menu-item>
+                    </template>
+                  </lightning-button-menu>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </template>
+      <template lwc:else>
+        <c-barn-empty-state data-id="no-codes" message={labels.noCodes}></c-barn-empty-state>
+      </template>
+    </template>
+  </template>
+</template>

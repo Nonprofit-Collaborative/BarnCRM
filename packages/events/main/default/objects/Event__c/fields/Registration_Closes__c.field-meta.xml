@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Registration_Closes__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>When registration ends. Empty means when the event starts.</inlineHelpText>
+  <label>Registration Closes</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>DateTime</type>
+</CustomField>

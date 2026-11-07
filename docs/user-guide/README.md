@@ -57,6 +57,10 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Forms](forms.md): filling in a form a step at a time, seeing a submission and the records it wrote, and finishing one held for review.
 
+### Event Management
+
+- [Events](events.md): finding, creating and repeating events, setting up tickets, building the agenda and adding speakers.
+
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.

@@ -17,6 +17,7 @@ color (no error red, warning orange or yellow), so a launcher tile never reads a
   BarnCRM_Funders_Logo      funders      award ribbon      #7A5300  BarnCRM Funders
   BarnCRM_Logic_Models_Logo logicmodels  flow arrows       #3B44B5  BarnCRM Logic Models
   BarnCRM_Forms_Logo        forms        form page         #0B5C7A  BarnCRM Forms
+  BarnCRM_Events_Logo       events       calendar          #0B6B6B  BarnCRM Events
 
 Fundraising was red (#C23934) until 2026-11-04 (owner decision: red means error in the UI, the
 reason D-58 declined red for the brand). The asset was renamed from Fundraising_Logo then:
@@ -56,6 +57,7 @@ VARIANTS = [
     ("funders", "BarnCRM_Funders_Logo", "funders", (0x7A, 0x53, 0x00), "ribbon"),
     ("logicmodels", "BarnCRM_Logic_Models_Logo", "logic-models", (0x3B, 0x44, 0xB5), "flow"),
     ("forms", "BarnCRM_Forms_Logo", "forms", (0x0B, 0x5C, 0x7A), "form"),
+    ("events", "BarnCRM_Events_Logo", "events", (0x0B, 0x6B, 0x6B), "calendar"),
 ]
 BRAND_DIR = "docs/brand"
 
@@ -240,8 +242,25 @@ def in_form(x, y):
     return not tick
 
 
+def in_calendar(x, y):
+    """Events: a calendar page, two rings on its header bar and a grid of four days."""
+    half_w, top, bottom = 0.46, -0.36, 0.46
+    if abs(x) <= 0.30 and abs(abs(x) - 0.22) <= 0.06 and -0.52 <= y <= -0.26:
+        return True  # the rings
+    if abs(x) > half_w or not top <= y <= bottom:
+        return False
+    if y <= -0.14:
+        return True  # the header bar
+    edge = 0.07
+    if abs(x) >= half_w - edge or y >= bottom - edge:
+        return True  # the page's border
+    cells = [(-0.17, 0.04), (0.17, 0.04), (-0.17, 0.27), (0.17, 0.27)]
+    return any(abs(x - cx) <= 0.09 and abs(y - cy) <= 0.07 for cx, cy in cells)
+
+
 GLYPHS = {
     "form": in_form,
+    "calendar": in_calendar,
     "gear": in_gear,
     "heart": in_heart,
     "person": in_person,

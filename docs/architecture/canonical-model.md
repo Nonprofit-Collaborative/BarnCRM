@@ -12818,6 +12818,382 @@ three switches read as on before the first save.
 
 ---
 
+## 29EV1. Event
+
+### Definition
+
+One event the organization runs: an evening talk, a class, a gala, a multi-day conference (EV-01,
+Event Management module, ADR-NEXT `NEXT-events-module.md`). A multi-day event is one event whose
+start and end fall on different days. A recurring event is a series of events, each an occurrence
+with its own tickets, agenda and later its own registrations.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the event is called, as people see it. |
+| Status | picklist | yes | Draft (being planned, not announced), Open (announced, registration open), Closed (registration closed), Completed (held), Cancelled. Default Draft. |
+| Format | picklist | yes | In Person, Virtual or Hybrid. Default In Person. |
+| Start, End | date and time | yes | When the event starts and ends (R-EV1). |
+| Venue Name, Venue Address | text | no | Where it is held, for an in person or hybrid event. |
+| Online Link | URL | no | Where to join, for a virtual or hybrid event. |
+| Capacity | number | no | The most people it can take; empty for no limit (R-EV2). |
+| Registration Opens, Registration Closes | date and time | no | When registration is taken (R-EV3, used by EV-02). |
+| Description | long text | no | What it is about. |
+| Series | reference to Event | no | For a later occurrence of a recurring event, the first event of the series (R-EV4). |
+
+### Relationships
+
+- An event has ticket types (29EV2), promo codes (29EV3), tracks (29EV4), sessions (29EV5) and
+  speakers (29EV6), each a detail of the event.
+- A later occurrence names the first event of its series; the first names none.
+
+### Rules
+
+**R-EV1 An event ends after it starts.** A validation rule refuses an end before the start.
+
+**R-EV2 Capacity is a whole number above zero, or empty.**
+
+**R-EV3 Registration closes after it opens**, when both are set.
+
+**R-EV4 Repeat Event makes occurrences, not a rule.** Repeat Event (on the Events page) creates up
+to 52 later occurrences, every week, every two weeks or every month, each a copy of the event with
+its start and end moved, status Draft, its ticket types and tracks copied (never its sessions,
+speakers or codes), and Series set to the first event of the series. The dates are worked out by
+the framework-free module `eventsModel.js`; a monthly occurrence keeps the day of the month, or the
+month's last day when it is shorter. Nothing keeps occurrences in step afterwards: each is edited
+on its own.
+
+### Salesforce implementation
+
+- **Object:** `Event__c`, name field Text, label Event Name, sharing Public Read/Write, tab Events
+  (the object) and the Events page (`Events_Home`) in the BarnCRM Events app.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Status | `Status__c` | Picklist, restricted, required |
+| Format | `Format__c` | Picklist, restricted, required |
+| Start | `Start__c` | DateTime, required |
+| End | `End__c` | DateTime, required |
+| Venue Name | `Venue_Name__c` | Text(255) |
+| Venue Address | `Venue_Address__c` | Text Area(255) |
+| Online Link | `Online_Link__c` | URL(255) |
+| Capacity | `Capacity__c` | Number(7, 0) |
+| Registration Opens | `Registration_Opens__c` | DateTime |
+| Registration Closes | `Registration_Closes__c` | DateTime |
+| Description | `Description__c` | Long Text Area(32768) |
+| Series | `Series__c` | Lookup(Event), Clear on delete |
+
+- **Validation rules:** `End_After_Start` (R-EV1), `Capacity_Above_Zero` (R-EV2),
+  `Registration_Closes_After_Opens` (R-EV3).
+- **Record page:** `Event_Record_Page`, Core's header, main and sidebar template; tabs Details,
+  Tickets, Agenda and Speakers; related lists in the sidebar.
+- **Controllers:** `EventsHomeController` (the Events page and Repeat Event), thin, plain JSON
+  shapes, user mode.
+
+---
+
+## 29EV2. Ticket Type
+
+### Definition
+
+One kind of ticket for an event, such as General, Student or VIP (EV-03). BarnCRM records the price
+the organization charges and never takes a payment (plan Section 1.5).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The ticket's name, as registrants see it. |
+| Event | reference to Event | yes | The event it admits to. |
+| Price | currency | yes | What it costs; 0 for a free ticket (R-TT1). Default 0. |
+| Quantity | number | no | How many may be sold; empty for no limit (R-TT2). |
+| Sales Start, Sales End | date and time | no | When it is on sale (R-TT3). |
+| Description | text | no | What it includes. |
+| Active | yes or no | yes | Offered to registrants. Default yes. |
+| Sort Order | number | no | Its place in the list of the event's tickets. |
+
+### Rules
+
+**R-TT1 A price is never negative.** **R-TT2 A quantity is above zero, or empty.**
+
+**R-TT3 Sales end after they start**, when both are set.
+
+**R-TT4 Quantities are a plan, not a cap on the event.** The Tickets panel shows the total of the
+quantities beside the event's capacity and warns when it is larger; it refuses nothing, since not
+every ticket sells. Sold counts arrive with registrations (EV-02).
+
+### Salesforce implementation
+
+- **Object:** `Ticket_Type__c`, name field Text, label Ticket Type Name, master-detail to Event
+  (`Event__c`, relationship Ticket Types), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Price | `Price__c` | Currency(16, 2), required, default 0 |
+| Quantity | `Quantity__c` | Number(7, 0) |
+| Sales Start | `Sales_Start__c` | DateTime |
+| Sales End | `Sales_End__c` | DateTime |
+| Description | `Description__c` | Text Area(255) |
+| Active | `Active__c` | Checkbox, default checked |
+| Sort Order | `Sort_Order__c` | Number(4, 0) |
+
+- **Validation rules:** `Price_Not_Negative` (R-TT1), `Quantity_Above_Zero` (R-TT2),
+  `Sales_End_After_Start` (R-TT3).
+- **Panel:** the Tickets tab of the event page (`eventTickets`), with `EventTicketsController`
+  (thin, user mode). Prices with a code applied are worked out by the framework-free module
+  `eventTicketsModel.js` (plan 9.9).
+
+---
+
+## 29EV3. Promo Code
+
+### Definition
+
+A code a registrant types for a discount on an event's tickets (EV-03): a percent or an amount off,
+for every ticket of the event or one ticket type, a set number of times, between two dates.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Code | text | yes | What the registrant types; unique within the event, regardless of case (R-PC1). |
+| Event | reference to Event | yes | The event it applies to. |
+| Discount Type | picklist | yes | Percent or Amount. Default Percent. |
+| Discount Value | number | yes | The percent (above 0, at most 100) or the amount off (above 0) (R-PC2). |
+| Ticket Type | reference to Ticket Type | no | The one ticket type it applies to; empty for all (R-PC3). |
+| Maximum Uses | number | no | How many registrations may use it; empty for no limit. |
+| Valid From, Valid Until | date and time | no | When it can be used (R-PC4). |
+| Active | yes or no | yes | Can be used. Default yes. |
+
+### Rules
+
+**R-PC1 A code is unique within its event.** An automation that always runs (registry row
+`Promo_Code_Key`, ADR-0024) trims the code, sets `Code_Key__c` to the event's identifier and the
+code in capitals, and refuses a second code with the same key in plain words; the unique field
+backs it against two saves at once. The same code may be used by two events.
+
+**R-PC2 A discount is above zero, and a percent at most 100.** Validation rules.
+
+**R-PC3 A code's ticket type is one of its own event's.** A required lookup filter.
+
+**R-PC4 A code's window ends after it starts**, when both are set.
+
+**R-PC5 A discount never takes a price below zero.** The module `eventTicketsModel.js` applies a
+code to a price: percent off rounded to the cent, an amount off capped at the price; a code is
+applied only while active, inside its window and for its ticket type.
+
+### Salesforce implementation
+
+- **Object:** `Promo_Code__c`, name field Text, label Code, master-detail to Event (`Event__c`,
+  relationship Promo Codes), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Discount Type | `Discount_Type__c` | Picklist (Percent, Amount), restricted, required |
+| Discount Value | `Discount_Value__c` | Number(16, 2), required |
+| Ticket Type | `Ticket_Type__c` | Lookup(Ticket Type), Clear on delete, required filter: same event |
+| Maximum Uses | `Max_Uses__c` | Number(7, 0) |
+| Valid From | `Valid_From__c` | DateTime |
+| Valid Until | `Valid_Until__c` | DateTime |
+| Active | `Active__c` | Checkbox, default checked |
+| Code Key | `Code_Key__c` | Text(120), unique, set by BarnCRM |
+
+- **Validation rules:** `Discount_Above_Zero`, `Percent_At_Most_100` (R-PC2),
+  `Valid_Until_After_From` (R-PC4), `Max_Uses_Above_Zero`.
+- **Automation:** `EventKeyHandler` through the registry row `Promo_Code_Key` (always runs).
+
+---
+
+## 29EV4. Event Track
+
+### Definition
+
+A strand of an event's agenda, such as "Admins" or "Developers" (EV-04). Sessions may sit in a
+track or in none.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The track's name. |
+| Event | reference to Event | yes | Its event. |
+| Description | text | no | Who it is for. |
+| Sort Order | number | no | Its column in the Agenda Builder. |
+
+### Rules
+
+**R-ETR1 Deleting a track keeps its sessions**, with no track.
+
+### Salesforce implementation
+
+- **Object:** `Event_Track__c`, name field Text, label Track Name, master-detail to Event
+  (`Event__c`, relationship Tracks), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Description | `Description__c` | Text Area(255) |
+| Sort Order | `Sort_Order__c` | Number(4, 0) |
+
+---
+
+## 29EV5. Event Session
+
+### Definition
+
+One talk, workshop, panel, keynote or break on an event's agenda (EV-04). A session without a time
+yet is unscheduled.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Title | text | yes | What the session is called. |
+| Event | reference to Event | yes | Its event. |
+| Track | reference to Event Track | no | Its track; one of its own event's (R-ESN3). |
+| Start, End | date and time | no | When it runs; both or neither (R-ESN1, R-ESN2). |
+| Room | text | no | Where it runs, as the agenda shows it. |
+| Capacity | number | no | The most people it takes; empty for the room's own limit. |
+| Session Type | picklist | yes | Talk, Workshop, Panel, Keynote, Break or Other. Default Talk. |
+| Status | picklist | yes | Draft, Confirmed or Cancelled. Default Confirmed. |
+| Description | long text | no | What it covers. |
+
+### Rules
+
+**R-ESN1 A session has a start and an end, or neither, and ends after it starts.**
+
+**R-ESN2 A session falls inside its event**, from the event's start to its end.
+
+**R-ESN3 A session's track is one of its own event's.** A required lookup filter.
+
+**R-ESN4 The Agenda Builder flags clashes and refuses none.** Two sessions in one room whose times
+overlap, and one speaker in two sessions whose times overlap, are flagged on the session cards
+(the framework-free module `eventAgendaModel.js`); cancelled sessions are ignored.
+
+**R-ESN5 Moving a session changes only its track.** Moving a session to another track by its menu,
+by drag and drop or by keyboard saves its Track and nothing else.
+
+### Salesforce implementation
+
+- **Object:** `Event_Session__c` (Programs owns `Session__c`), name field Text, label Session
+  Title, master-detail to Event (`Event__c`, relationship Sessions), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Track | `Track__c` | Lookup(Event Track), Clear on delete, required filter: same event |
+| Start | `Start__c` | DateTime |
+| End | `End__c` | DateTime |
+| Room | `Room__c` | Text(80) |
+| Capacity | `Capacity__c` | Number(6, 0) |
+| Session Type | `Session_Type__c` | Picklist, restricted, required |
+| Status | `Status__c` | Picklist (Draft, Confirmed, Cancelled), restricted, required |
+| Description | `Description__c` | Long Text Area(32768) |
+
+- **Validation rules:** `Start_And_End_Together`, `End_After_Start` (R-ESN1),
+  `Inside_Event_Dates` (R-ESN2), `Capacity_Above_Zero`.
+- **Panel:** the Agenda tab of the event page (`eventAgenda`), with `EventAgendaController` (thin,
+  user mode).
+
+---
+
+## 29EV6. Event Speaker
+
+### Definition
+
+A Core person speaking at an event (EV-05), with what the organization needs to know about them for
+that event: a headline and bio, their status, and travel and audiovisual needs.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The speaker's name as shown on the agenda; the person's name when left empty (R-ESP2). |
+| Event | reference to Event | yes | The event. |
+| Person | reference to Contact | yes, when created (R-ESP1) | The Core person. |
+| Headline | text | no | A line under their name, for example "Admin, Riverside Food Bank". |
+| Bio | long text | no | Their biography for this event. |
+| Status | picklist | yes | Invited, Confirmed, Declined or Cancelled. Default Invited. |
+| Travel Needs, AV Needs | text | no | What they need to get there and to present. |
+
+### Rules
+
+**R-ESP1 A speaker is a Core person, once per event.** A new speaker names a person; an automation
+that always runs (registry row `Event_Speaker_Key`) sets `Speaker_Key__c` to the event and person
+identifiers and refuses a second speaker for the same person at the same event. A person deleted
+or erased later leaves the speaker with no person.
+
+**R-ESP2 The name defaults to the person's.** The same automation fills an empty Name from the
+person's first and last name.
+
+**R-ESP3 Removing a speaker removes their session assignments.** The Speakers panel deletes a
+speaker's assignments first; a speaker deleted another way leaves assignments with no speaker,
+which the Agenda Builder does not show.
+
+### Salesforce implementation
+
+- **Object:** `Event_Speaker__c`, name field Text, label Speaker Name, master-detail to Event
+  (`Event__c`, relationship Speakers), sharing Controlled by Parent, tab Speakers.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Person | `Contact__c` | Lookup(Contact), Clear on delete |
+| Headline | `Headline__c` | Text(255) |
+| Bio | `Bio__c` | Long Text Area(32768) |
+| Status | `Status__c` | Picklist (Invited, Confirmed, Declined, Cancelled), restricted, required |
+| Travel Needs | `Travel_Needs__c` | Text Area(255) |
+| AV Needs | `AV_Needs__c` | Text Area(255) |
+| Speaker Key | `Speaker_Key__c` | Text(40), unique, set by BarnCRM |
+
+- **Validation rule:** `Person_Required_When_Created` (R-ESP1).
+- **Automation:** `EventKeyHandler` through the registry row `Event_Speaker_Key` (always runs).
+- **Panel:** the Speakers tab of the event page (`eventSpeakers`), with `EventSpeakersController`
+  (thin, user mode).
+
+---
+
+## 29EV7. Session Speaker
+
+### Definition
+
+A speaker's place in a session (EV-05): the speaker, the session and their role in it.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Session | reference to Event Session | yes | The session. |
+| Speaker | reference to Event Speaker | yes, when created | The speaker, from the session's own event (R-SSP1). |
+| Role | picklist | yes | Speaker, Moderator or Panelist. Default Speaker. |
+
+### Rules
+
+**R-SSP1 A speaker speaks in sessions of their own event, once per session.** A validation rule
+refuses a speaker from another event; an automation that always runs (registry row
+`Session_Speaker_Key`) sets `Assignment_Key__c` to the session and speaker identifiers and refuses
+a second assignment of the same speaker to the same session.
+
+### Salesforce implementation
+
+- **Object:** `Session_Speaker__c`, name field Auto Number, master-detail to Event Session
+  (`Event_Session__c`, relationship Session Speakers), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Session | `Event_Session__c` | Master-Detail(Event Session) |
+| Speaker | `Event_Speaker__c` | Lookup(Event Speaker), Clear on delete |
+| Role | `Role__c` | Picklist (Speaker, Moderator, Panelist), restricted, required |
+| Assignment Key | `Assignment_Key__c` | Text(40), unique, set by BarnCRM |
+
+- **Validation rules:** `Speaker_Required_When_Created`, `Speaker_From_Same_Event` (R-SSP1).
+- **Automation:** `EventKeyHandler` through the registry row `Session_Speaker_Key` (always runs).
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -13178,6 +13554,7 @@ mirrors the primary member).
 | 1.0 | 2026-11-06 | Shipped organization record type (owner decision D-184, ADR-0173, amends ADR-0141 decision 2). Account gains the record type `BarnCRM_Organization` (active, given to nobody). Section 8 gains R-O4a: offered for organizations only where the org has no record type of its own, never detected, never switched to automatically; R-O5 leaves it out of the candidates. |
 | 1.1 | 2026-11-06 | Forms module (C-42a, D-157, ADR-0175 `0175-forms-module.md`). New package BarnCRM Forms with Sections 29ZW Form (`Form__c`), 29ZX Form Version (`Form_Version__c`) and 29ZY Form Submission (`Form_Submission__c`), rules R-FM1, R-FM2 and R-FS1 to R-FS4. Core gains no object or field: only the `FormAttachmentExtension` seam and the catalog row `BarnCRM_Module.Forms`. |
 | 1.1 | 2026-11-06 | BarnCRM Contact Point Sync module (C-45, D-111, ADR-0176 contact point sync module). New package `contactpoints`: Contact Point Link (`Contact_Point_Link__c`, 29ZZ, rules R-CPL1 to R-CPL4) and Contact Point Sync Settings (`Contact_Point_Sync_Settings__c`, 29ZZ1, R-CPS1). No Core object or field added. |
+| 1.2 | 2026-11-06 | Event Management module (EV-01, EV-03, EV-04, EV-05; ADR-NEXT `NEXT-events-module.md`, D-123, D-177). Seven objects in the new package `packages/events`: Event (`Event__c`, 29EV1), Ticket Type (`Ticket_Type__c`, 29EV2), Promo Code (`Promo_Code__c`, 29EV3), Event Track (`Event_Track__c`, 29EV4), Event Session (`Event_Session__c`, 29EV5), Event Speaker (`Event_Speaker__c`, 29EV6) and Session Speaker (`Session_Speaker__c`, 29EV7), with rules R-EV1 to R-EV4, R-TT1 to R-TT4, R-PC1 to R-PC5, R-ETR1, R-ESN1 to R-ESN5, R-ESP1 to R-ESP3 and R-SSP1. Registrations, attendees, call for speakers and sponsorship are designed in the ADR and added by their items. |
 
 ---
 ## 32. Entity ownership by package
@@ -13301,6 +13678,13 @@ included; standard objects the packages extend are named by the entity that gove
 | Funder Report Template | Funders | 0.16 (F-06) | 29ZO |
 | Funder Report Template Default (shipped default) | Funders | 0.16 (F-06) | 29ZO |
 | Funders entities still to come | Funders | 0.16 and 0.17 | 30 |
+| Event | Event Management | 1.2 (EV-01) | 29EV1 |
+| Ticket Type | Event Management | 1.2 (EV-03) | 29EV2 |
+| Promo Code | Event Management | 1.2 (EV-03) | 29EV3 |
+| Event Track | Event Management | 1.2 (EV-04) | 29EV4 |
+| Event Session | Event Management | 1.2 (EV-04) | 29EV5 |
+| Event Speaker | Event Management | 1.2 (EV-05) | 29EV6 |
+| Session Speaker | Event Management | 1.2 (EV-05) | 29EV7 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
@@ -13324,6 +13708,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and `ProgramsAccessSync` (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
 | Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
 | Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and `FundersAccessSync` (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantLinkedRecord`, kind Program) |
+| Events app, permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and `EventsAccessSync` (ADR-NEXT `NEXT-events-module.md`). Console app `BarnCRM_Events` with the Events Home and Events tabs and Error Log last; the Event record page carries the event's tabs |
 | Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
 | Forms app, permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and `FormsAccessSync` (ADR-0175 `0175-forms-module.md`). Console app `BarnCRM_Forms` with the Forms and Form Submissions tabs and Error Log last; the Form record page carries the builder and the runner, the Form Submission page the submission panel |
 | Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-0175 `0175-forms-module.md` decision 9) |

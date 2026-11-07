@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Quantity_Above_Zero</fullName>
+  <active>true</active>
+  <description>R-TT2: a quantity is above zero, or empty.</description>
+  <errorConditionFormula>NOT(ISBLANK(Quantity__c)) &amp;&amp; Quantity__c &lt; 1</errorConditionFormula>
+  <errorDisplayField>Quantity__c</errorDisplayField>
+  <errorMessage>Quantity must be at least 1. Leave it empty for no limit.</errorMessage>
+</ValidationRule>

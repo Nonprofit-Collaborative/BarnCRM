@@ -821,20 +821,20 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 11. Event Management
 
-**Edition:** Both editions (proposed). Depends on Core only; Volunteers, Giving, Funders and Portal Builder are optional links. No package directory exists yet. Replaces the post-1.0 Events package and keeps Summit Events compatibility; able to run a community "Dreamin" conference. Planned after Core QA and the current module round, release target TBD, not v1.0; a new ADR is needed before build (plan 5.12, D-123).
+**Edition:** Both editions. Depends on Core only; Volunteers, Giving, Funders, Forms and Portal Builder are optional links through Core extension points. Package `packages/events` (BarnCRM Event Management), app BarnCRM Events. Replaces the post-1.0 Events package and keeps Summit Events compatibility; able to run a community "Dreamin" conference. Release 1.2 and 1.3 (plan 5.12, D-123, D-177; new ADR, events module).
 
 ### 11.1 Events, Sessions and Sponsors
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Events | Major | Single, multi-day or recurring events, venue or virtual, capacity, status and a public event page. | Planned (TBD) | EV-01 |
+| Events | Major | Single, multi-day or recurring events, venue or virtual, capacity, status and a registration window, on an event page in tabs. The Events Home page lists upcoming or past events with New Event; Repeat Event adds up to 52 weekly, every-two-weeks or monthly draft occurrences in one series, previewed first. Events Admin, Staff (never deletes an event) and Read Only sets, given through the Access roles. The public event page waits on its guest-user design. | Built, not merged (release 1.2, `feature/ev-01-events-package`) | EV-01, new ADR (events module) |
 | Registrations and attendees | Major | Registrants matched to Core people without duplicates (household-aware), waitlist, check-in and attendance. | Planned (TBD) | EV-02 |
-| Tracks, sessions and agenda | Major | Tracks, rooms, time slots, session capacity and sign-up, and a published agenda. | Planned (TBD) | EV-04 |
+| Tracks, sessions and agenda | Major | Tracks and sessions (time, room, type, status, capacity) on the event's Agenda tab: the Agenda Builder shows a column per track and No Track, by day; a session moves to another track by its menu, by drag and drop or by keyboard; room and speaker clashes are flagged, never refused. Repeat Event copies tracks. Session sign-up comes with registrations (EV-02); a published agenda with the public pages. | Built, not merged (release 1.2, `feature/ev-04-agenda`); sign-up and published agenda Planned | EV-04 |
 | Call for speakers | Major | Speaker applications with review, scoring, and accept or decline notices. | Planned (TBD) | EV-06 |
 | Speaker portal | Major | Speakers use the speaker portal template of Portal Builder. Needs Portal Builder. | Planned (TBD) | EV-07, PB-07 |
 | Sponsorship management | Major | Sponsor organizations, tiers, benefits, a deliverables checklist (logo, booth, passes) and status; linked to a Giving gift or commitment, or a Funders award, when installed. | Planned (TBD) | EV-09 |
-| Ticket types | Minor | Price, quantity, sales dates and promo codes; payments happen outside BarnCRM. | Planned (TBD) | EV-03 |
-| Speakers | Minor | Profiles on Core people, session assignments and needs (travel, A/V). | Planned (TBD) | EV-05 |
+| Ticket types | Minor | Ticket types with price, quantity, sales dates and active, on the event's Tickets tab with a warning when the quantities exceed the capacity; promo codes (percent or amount off, one ticket type or all, use limit, valid dates), one per event whatever the case; Repeat Event copies ticket types. Payments happen outside BarnCRM. | Built, not merged (release 1.2, `feature/ev-03-ticket-types`) | EV-03 |
+| Speakers | Minor | Speakers on Core people (one per person per event, named after them) with headline, bio, status and travel and A/V needs, on the event's Speakers tab and an Event Speakers tab; Add to Session puts a speaker in a session as Speaker, Moderator or Panelist; removing a speaker removes their assignments; speaker clashes show on the Agenda. | Built, not merged (release 1.2, `feature/ev-05-speakers`) | EV-05 |
 | Volunteer integration | Minor | Event volunteer jobs and shifts in Volunteers, through an optional link. | Planned (TBD) | EV-08 |
 | Summit Events compatibility | Minor | Summit registrants land in BarnCRM people and households without duplicates. | Planned (TBD) | EV-10 |
 | Event dashboard and conference template | Minor | An event dashboard and an opt-in community conference ("Dreamin") template with tracks, sessions, speakers, call for speakers, volunteers and sponsors; never applied by default. | Planned (TBD) | EV-11 |
