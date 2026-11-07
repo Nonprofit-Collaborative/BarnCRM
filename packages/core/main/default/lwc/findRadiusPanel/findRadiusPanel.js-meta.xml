@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Distance from a place in Find: keep the records whose address is within a number of miles of
+    a US postal code or of the address on a record (canonical model R-SQ13). Nested in
+    findRecords.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

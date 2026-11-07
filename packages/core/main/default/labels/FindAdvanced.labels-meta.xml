@@ -121,6 +121,46 @@
         <value>Use This Query</value>
     </labels>
     <labels>
+        <fullName>Core_Find_Radius</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Heading: distance from a place condition.</shortDescription>
+        <value>Distance From a Place</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RadiusAddress</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field label: which address or location field the distance is measured on.</shortDescription>
+        <value>Address to Measure</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RadiusMilesLabel</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field label: the distance in miles.</shortDescription>
+        <value>Within (Miles)</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RadiusPlace</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Field label: the postal code or record Id the distance is measured from.</shortDescription>
+        <value>Postal Code or Record Id</value>
+    </labels>
+    <labels>
+        <fullName>Core_Find_RadiusUse</fullName>
+        <categories>Find</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Button: look up the place the distance is measured from.</shortDescription>
+        <value>Use This Place</value>
+    </labels>
+    <labels>
         <fullName>Core_Find_RelatedRecords</fullName>
         <categories>Find</categories>
         <language>en_US</language>

@@ -45,6 +45,8 @@ public with sharing class QueryCompiler {
 		public List<Object> children = new List<Object>();
 		/** The summary (C-36, R-SQ9), as sent; null when there is none. */
 		public Map<String, Object> aggregate;
+		/** The radius condition (C-69, R-SQ13), as sent; null when there is none. */
+		public Map<String, Object> radius;
 	}
 
 	/** A compiled query: SOQL with bind names, its binds, and the rendering to show. */
@@ -141,6 +143,14 @@ public with sharing class QueryCompiler {
 				);
 			}
 			document.aggregate = (Map<String, Object>) raw.get('aggregate');
+		}
+		if (raw.get('radius') != null) {
+			if (!(raw.get('radius') instanceof Map<String, Object>)) {
+				throw new QueryCompilerException(
+					BarnHelp.text('Core', 'Core_Find_ErrorInvalidQuery')
+				);
+			}
+			document.radius = (Map<String, Object>) raw.get('radius');
 		}
 		return document;
 	}
@@ -242,6 +252,43 @@ public with sharing class QueryCompiler {
 		return count(selectAndWhere(parse(queryJson), null, null), atMost);
 	}
 
+	/**
+	 * How many records the document would keep if its radius were left out and that have a
+	 * postal code but no geocode (C-69, R-SQ13): the people a distance can never find. Zero
+	 * when the document has no radius or its field has no geocode columns to look at.
+	 */
+	public static Integer countWithoutGeocode(String queryJson, Integer atMost) {
+		QueryDocument document = parse(queryJson);
+		if (document.radius == null) {
+			return 0;
+		}
+		String clause;
+		try {
+			clause = FindRadius.missingGeocodeClause(
+				document.objectName,
+				String.valueOf(document.radius.get('field'))
+			);
+		} catch (FindRadius.FindRadiusException refused) {
+			throw new QueryCompilerException(refused.getMessage());
+		}
+		if (clause == null) {
+			return 0;
+		}
+		document.radius = null;
+		Compiled compiled = selectAndWhere(document, null, null);
+		Map<String, Object> binds = new Map<String, Object>(compiled.binds);
+		binds.put('countLimit', atMost);
+		return Database.countQueryWithBinds(
+			'SELECT COUNT()' +
+				compiled.fromWhere +
+				(compiled.fromWhere.contains(' WHERE ') ? ' AND ' : ' WHERE ') +
+				clause +
+				' LIMIT :countLimit',
+			binds,
+			AccessLevel.USER_MODE
+		);
+	}
+
 	/** As `count`, from a query already compiled, so it is not read and checked again. */
 	public static Integer count(Compiled compiled, Integer atMost) {
 		Map<String, Object> binds = new Map<String, Object>(compiled.binds);
@@ -297,6 +344,19 @@ public with sharing class QueryCompiler {
 			whereParts.add(joined.clause);
 			shownParts.add(joined.display);
 			binds.putAll(joined.binds);
+		}
+		if (document.radius != null) {
+			try {
+				FindRelatedRecords.Rendered near = FindRadius.condition(
+					objectName,
+					document.radius
+				);
+				whereParts.add(near.clause);
+				shownParts.add(near.display);
+				binds.putAll(near.binds);
+			} catch (FindRadius.FindRadiusException refused) {
+				throw new QueryCompilerException(refused.getMessage());
+			}
 		}
 		for (Object child : document.children) {
 			fields.add(FindRelatedRecords.childColumn(objectName, child).clause);

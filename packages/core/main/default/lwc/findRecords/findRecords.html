@@ -170,6 +170,14 @@
                     ></c-find-related-panel>
                 </div>
 
+                <div class="slds-var-m-top_medium">
+                    <c-find-radius-panel
+                        object-api-name={objectApiName}
+                        radius={radius}
+                        onchange={handleRadiusChange}
+                    ></c-find-radius-panel>
+                </div>
+
                 <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-top_medium">
                     <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
                         <lightning-combobox

@@ -204,12 +204,15 @@ class Parser {
     }
     if (this.isWord('WHERE')) {
       this.take();
-      const { filter, related } = this.where(true);
+      const { filter, related, radius } = this.where(true);
       if (filter) {
         document.filter = filter;
       }
       if (related.length > 0) {
         document.related = related;
+      }
+      if (radius) {
+        document.radius = radius;
       }
     }
     const order = this.orderBy();
@@ -288,11 +291,15 @@ class Parser {
     const tree = this.orExpression(allowRelated);
     const items = flattenAnd(tree);
     const related = items.filter((item) => item.type === 'related').map((item) => item.entry);
-    const rest = items.filter((item) => item.type !== 'related');
+    const radii = items.filter((item) => item.type === 'radius').map((item) => item.entry);
+    const rest = items.filter((item) => item.type !== 'related' && item.type !== 'radius');
     if (rest.some(containsRelated)) {
       throw new QueryTextError(PROBLEMS.RELATED_PLACE, 'Id IN (SELECT');
     }
-    return { filter: toFilter(rest), related };
+    if (radii.length > 1) {
+      throw new QueryTextError(PROBLEMS.UNSUPPORTED, 'DISTANCE');
+    }
+    return { filter: toFilter(rest), related, radius: radii[0] };
   }
 
   orExpression(allowRelated) {
@@ -339,6 +346,12 @@ class Parser {
 
   /** One comparison, or `Id [NOT] IN (SELECT ...)` for related records. */
   term(allowRelated) {
+    if (this.isWord('DISTANCE') && this.isPunct('(', 1)) {
+      if (!allowRelated) {
+        this.fail(PROBLEMS.RELATED_PLACE);
+      }
+      return { type: 'radius', entry: this.distance() };
+    }
     const field = this.name();
     if (this.isWord('LIKE')) {
       this.take();
@@ -429,6 +442,45 @@ class Parser {
     return this.fail();
   }
 
+  /**
+   * `DISTANCE(Field, GEOLOCATION(lat, lon), 'mi') < miles`, the radius condition (C-69). Only
+   * miles and `<` are what the document can hold.
+   */
+  distance() {
+    this.expectWord('DISTANCE');
+    this.expectPunct('(');
+    const field = this.name();
+    this.expectPunct(',');
+    this.expectWord('GEOLOCATION');
+    this.expectPunct('(');
+    const latitude = this.number();
+    this.expectPunct(',');
+    const longitude = this.number();
+    this.expectPunct(')');
+    this.expectPunct(',');
+    const unit = this.take();
+    if (!unit || unit.type !== 'string' || unquote(unit.text).toLowerCase() !== 'mi') {
+      this.at--;
+      this.fail(PROBLEMS.UNSUPPORTED);
+    }
+    this.expectPunct(')');
+    const operator = this.take();
+    if (!operator || operator.type !== 'op' || operator.text !== '<') {
+      this.at--;
+      this.fail(PROBLEMS.UNSUPPORTED);
+    }
+    return { field, miles: this.number(), latitude, longitude };
+  }
+
+  number() {
+    const token = this.take();
+    if (!token || token.type !== 'number') {
+      this.at--;
+      this.fail();
+    }
+    return Number(token.text);
+  }
+
   /** `SELECT lookup FROM Child [WHERE ...])`, after `Id [NOT] IN (`. */
   relatedRecords(has) {
     this.expectWord('SELECT');
@@ -514,7 +566,7 @@ function flattenAnd(node) {
 }
 
 function containsRelated(node) {
-  if (node.type === 'related') {
+  if (node.type === 'related' || node.type === 'radius') {
     return true;
   }
   if (node.items) {

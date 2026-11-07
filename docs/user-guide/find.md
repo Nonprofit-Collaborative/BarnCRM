@@ -68,6 +68,19 @@ prompt. **Show Query**, closed at first, holds the query in SOQL. You never need
 You should see: only the records that match. To show related records in a column instead,
 use **Related Record Columns** and **Add a Related Record Column**.
 
+## To Find Records Near a Place
+
+1. Under **Distance From a Place**, press **Distance From a Place**.
+2. Choose the **Address to Measure** (for example Mailing Address) and the number of **Miles**.
+3. Type a US postal code in **Postal Code or Record Id**, or paste the Id of a record whose
+   address should be the center. Press **Use This Place**.
+4. Press **Run**.
+
+You should see: "Measuring from Postal code 02134." and only the records within that many miles.
+If a note says some records have a postal code but no geocode, those records cannot be placed
+on the map, so a distance cannot find them: ask your admin to turn geocoding on. A street
+address cannot be typed: use its postal code, or a record that has the address.
+
 ## To Count or Total Instead of Listing
 
 1. Build the query, then press **Summarize**.
