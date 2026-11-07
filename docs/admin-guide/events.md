@@ -299,6 +299,25 @@ applies.
 **No-Show.** A No-Show keeps its seat and its price on the registration; change it from the
 attendee's menu when it is wrong.
 
+## Summit Events
+
+When the Summit Events package is installed, Event Management imports its registrations each
+morning; without Summit nothing about it shows. A step of [BarnCRM Nightly Jobs](nightly-jobs.md)
+named **Summit Events import** runs at 7:15 AM, before the reminders, and needs nothing set up.
+
+| Summit | BarnCRM |
+|---|---|
+| Event instance | An event, named after the instance title (or the Summit event), Open or Completed by its dates, created the first time one of its registrations is imported. Its **External Key** is `summit:` and the instance's ID. |
+| Registration | A registration with source **Summit Events** and one attendee, Registered, Attended or No-Show as in Summit. Its **External Key** is `summit:` and the registration's ID. |
+| Registrant | A Core person, found by Summit's contact or by BarnCRM's matching (email, then name and postal code, then your duplicate rules), created only when nobody matches. The person found is written back to the Summit registration's contact when it was blank. |
+
+The first import takes every Summit registration; later ones take those changed in the last two
+days. Started and Cancelled registrations are left out. A registration is imported once: later
+changes in Summit are not copied, so change the attendee in BarnCRM. Registrations that cannot be
+imported (for example two people match) are counted in a Warning in the **Error Log** and tried
+again while they stay recently changed. Summit's own handling of people outside its contact field
+is left alone.
+
 ## Not Yet
 
 Session sign-up, a public event page, speaker portal, check-in codes and volunteer shifts for an

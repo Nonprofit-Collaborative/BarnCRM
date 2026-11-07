@@ -210,3 +210,22 @@ with Sam **Attended** (with an email) and Max **Registered**.
 | 6 | Type `0` in **Days before an event to remind**. | Refused: the value must be from 1 to 30. |
 
 **Cleanup:** Set the template back to `BarnCRM_Event_Reminder` and turn the three settings off.
+
+## T-EV-09: Summit Events Import
+
+**Purpose:** confirm Summit Events registrants land in BarnCRM people without duplicates, and that
+nothing shows without Summit.
+**Prerequisites:** admin. Part A: an org without Summit Events. Part B: an org with Summit Events,
+a Summit event instance next week with two registrations: Jane Doe (`jane@example.org`, already a
+BarnCRM person, Summit contact blank) Registered, and a new person Started.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Part A: open **Nightly Jobs**. | No **Summit Events import** step. |
+| 2 | Part B: open **Nightly Jobs**; run **Summit Events import** now (or wait for 7:15 AM). | One event named after the instance, External Key `summit:` and its ID. One registration, source **Summit Events**, Jane **Registered**. |
+| 3 | Search People for Jane Doe. | One Jane Doe: no duplicate. The new person from the Started registration is not created. |
+| 4 | Open Jane's Summit registration. | Its contact is Jane. |
+| 5 | Run the step again. | No second event or registration. |
+
+**Cleanup:** None.

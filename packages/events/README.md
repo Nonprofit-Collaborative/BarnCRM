@@ -36,6 +36,9 @@ used, and BarnCRM takes no payment.
   Definitions (section Events), `EventsSettings`, the nightly step `EventEmailScheduler` given to
   Core through `EventsNightlyJobProvider` (`NightlyJobs.PROVIDER_CLASSES`), `EventEmailBatch` and
   `EventEmailService`; templates in the `BarnCRM_Events` email folder.
+- Summit Events (EV-10): `SummitEventsAdapter` (dynamic SOQL by object name, no dependency),
+  `SummitEventsBatch` and the 7:15 AM step `SummitEventsScheduler`, listed only when Summit Events
+  is installed; `External_Key__c` on `Event__c` and `Event_Registration__c`.
 - Permission sets Events Admin, Staff and Read Only, given by role through `EventsAccessSync`;
   install steps in `EventsPostInstall`.
 - Help and messages in `BarnHelp_Events.json`.

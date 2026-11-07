@@ -1,6 +1,7 @@
 /**
  * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the Event Management
- * steps to the one nightly run (ADR-0166): the morning event email run (EV-14).
+ * steps to the one nightly run (ADR-0166): the morning event email run (EV-14) and, only when
+ * Summit Events is installed, the Summit Events import (EV-10).
  */
 @NamespaceAccessible
 public with sharing class EventsNightlyJobProvider implements NightlyStepProvider {
@@ -10,6 +11,10 @@ public with sharing class EventsNightlyJobProvider implements NightlyStepProvide
 	}
 
 	public List<NightlyStep> nightlySteps() {
-		return new List<NightlyStep>{ EventEmailScheduler.step() };
+		List<NightlyStep> steps = new List<NightlyStep>{ EventEmailScheduler.step() };
+		if (SummitEventsAdapter.isInstalled()) {
+			steps.add(SummitEventsScheduler.step());
+		}
+		return steps;
 	}
 }

@@ -110,3 +110,6 @@ When your admin has turned them on, BarnCRM emails each registered person a remi
 before the event and each person you marked **Attended** a follow-up after it, and marks anyone
 still **Registered** as **No-Show** once the event is over. An attendee's **Reminder Sent On** and
 **Follow-Up Sent On** show when each went; clear one to send it again.
+
+If your organization uses Summit Events, its registrations appear here each morning with source
+**Summit Events**; change an imported attendee in BarnCRM.
