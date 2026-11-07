@@ -16,6 +16,16 @@ const codes = (problems) =>
   Object.fromEntries(Object.entries(problems).map(([key, found]) => [key, found.code]));
 
 describe('c/formRules shared vectors', () => {
+  it('are the same cases FormRulesTest holds the Apex rules to', () => {
+    const fs = require('fs');
+    const apex = fs.readFileSync('packages/forms/main/default/classes/FormRulesTest.cls', 'utf8');
+    const block = apex.split('// vectors:start')[1].split('// vectors:end')[0];
+    const text = [...block.matchAll(/'([^']*)'/g)].map((piece) => piece[1]).join('');
+    const { about, ...shared } = vectors;
+    expect(about).toBeTruthy();
+    expect(JSON.parse(text)).toEqual(shared);
+  });
+
   it.each(vectors.cases)('$name', (testCase) => {
     const { definition } = vectors;
     expect(visibleSteps(definition, testCase.answers)).toEqual(testCase.visibleSteps);
