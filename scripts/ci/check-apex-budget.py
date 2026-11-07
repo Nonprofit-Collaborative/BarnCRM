@@ -80,7 +80,8 @@ CAPS = {
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.
     # EV-02 registrations (service, matcher, pricing, Forms seam, Registrations tab): 57,286
     # measured, plus about 2.5%.
-    "events": 58_700,
+    # Raised for the Check-In tab (EV-12, EventCheckInController): 61,472, plus about 2.5%.
+    "events": 63_000,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

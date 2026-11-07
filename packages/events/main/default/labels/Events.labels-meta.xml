@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>Events_EventTab_CheckIn</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: check people in at the door</shortDescription>
+        <value>Check-In</value>
+    </labels>
+    <labels>
         <fullName>Events_Home_NewEvent</fullName>
         <categories>Events</categories>
         <language>en_US</language>

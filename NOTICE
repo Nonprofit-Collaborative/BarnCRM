@@ -2,3 +2,10 @@ BarnCRM
 Copyright 2026 The BarnCRM contributors
 
 This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Third-party software included in source form:
+
+QR Code Generator for JavaScript 1.4.4 (qrcode-generator), Copyright (c) 2009 Kazuhiko Arase,
+MIT license (http://www.opensource.org/licenses/mit-license.php). Kept unmodified, with its
+notice, as packages/events/main/default/staticresources/BarnQrCode.js. "QR Code" is a registered
+trademark of DENSO WAVE INCORPORATED.

@@ -38,8 +38,9 @@ import sys
 # Event Management: 59 labels) and its Core and Volunteers items (C-61/C-63, C-69, V-10b); the
 # check below already holds no unused label and no help prose. A module's labels reach an org
 # only when that module is installed. Raised by 8 for EV-02's Registrations tab (11 short button
-# and menu labels; its messages are help catalog text).
-BUDGET = 3253
+# and menu labels; its messages are help catalog text). Raised by 1 for EV-12's Check-In tab
+# title (every other string is help catalog text).
+BUDGET = 3254
 TARGET = 3000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 
