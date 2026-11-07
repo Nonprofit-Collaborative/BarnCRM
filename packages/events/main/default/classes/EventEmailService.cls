@@ -1,5 +1,5 @@
 /**
- * The morning event email run's work (EV-14; ADR-NEXT `NEXT-event-registrations.md`, decision
+ * The morning event email run's work (EV-14; ADR-0182 `0182-event-registrations.md`, decision
  * 6): reminders before an event, follow-ups after it and the No-Show status.
  *
  * Mail is composed by the platform from the template named in Events Settings, with the person
