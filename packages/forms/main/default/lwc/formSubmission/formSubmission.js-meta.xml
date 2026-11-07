@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    A form submission's answers by question, the records it wrote or found, and Process Again
+    for one held for review.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Form Submission</masterLabel>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordPage">
+      <objects>
+        <object>Form_Submission__c</object>
+      </objects>
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

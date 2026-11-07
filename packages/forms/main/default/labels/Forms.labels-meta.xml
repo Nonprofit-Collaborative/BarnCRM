@@ -184,4 +184,76 @@
         <shortDescription>Heading over the problems to fix</shortDescription>
         <value>Fix Before Publishing</value>
     </labels>
+    <labels>
+        <fullName>Forms_Runner_Title</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Form Runner panel title</shortDescription>
+        <value>Fill In a Form</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Runner_Form</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Form picker in the Form Runner</shortDescription>
+        <value>Form</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Runner_Submit</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that sends the answers</shortDescription>
+        <value>Submit</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Runner_Another</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that starts the form again</shortDescription>
+        <value>Fill In Another</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Runner_OpenSubmission</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that opens the submission just sent</shortDescription>
+        <value>Open Submission</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Submission_Title</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Submission panel title</shortDescription>
+        <value>Submission</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Submission_Answers</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answers section heading</shortDescription>
+        <value>Answers</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Submission_Written</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Records written section heading</shortDescription>
+        <value>Records Written</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Submission_ProcessAgain</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that processes a held submission again</shortDescription>
+        <value>Process Again</value>
+    </labels>
 </CustomLabels>

@@ -1,0 +1,58 @@
+<template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.submissionTitle} icon-name="custom:custom51">
+      <template lwc:if={canProcess}>
+        <lightning-button
+          slot="actions"
+          data-id="process-again"
+          label={labels.processAgain}
+          disabled={busy}
+          onclick={handleProcessAgain}
+        ></lightning-button>
+      </template>
+      <div class="slds-var-p-horizontal_medium slds-is-relative">
+        <template lwc:if={loading}>
+          <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+        </template>
+        <template lwc:if={errorMessage}>
+          <div class="slds-var-m-bottom_small" data-id="error">
+            <c-barn-notice variant="error" message={errorMessage}></c-barn-notice>
+          </div>
+        </template>
+        <p role="status" class="slds-var-m-bottom_small" data-id="result">{resultMessage}</p>
+
+        <template lwc:if={loaded}>
+          <p class="slds-var-m-bottom_small" data-id="status">
+            <c-barn-status-badge status={statusVariant} label={view.status}></c-barn-status-badge>
+          </p>
+          <template lwc:if={view.message}>
+            <div class="slds-var-m-bottom_small" data-id="message">
+              <c-barn-notice variant={statusVariant} message={view.message}></c-barn-notice>
+            </div>
+          </template>
+
+          <h3 class="slds-text-heading_small">{labels.answers}</h3>
+          <template lwc:if={hasAnswers}>
+            <dl class="slds-dl_horizontal slds-var-m-vertical_small" data-id="answers">
+              <template for:each={answers} for:item="row">
+                <dt key={row.key} class="slds-dl_horizontal__label">{row.label}</dt>
+                <dd key={row.key} class="slds-dl_horizontal__detail">{row.shown}</dd>
+              </template>
+            </dl>
+          </template>
+
+          <h3 class="slds-text-heading_small">{labels.written}</h3>
+          <template lwc:if={hasRecords}>
+            <ul class="slds-var-m-vertical_small" data-id="records">
+              <template for:each={records} for:item="record">
+                <li key={record.key}>
+                  <a href={record.url}>{record.label}</a>: {record.action}
+                </li>
+              </template>
+            </ul>
+          </template>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

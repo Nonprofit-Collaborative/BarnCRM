@@ -204,6 +204,16 @@ describe('c-form-builder', () => {
     });
   });
 
+  it('previews the draft in the Form Runner', async () => {
+    const element = await render(form(READY));
+
+    find(element, 'preview').click();
+    await flush();
+
+    const runner = find(element, 'preview-runner').querySelector('c-form-runner');
+    expect(JSON.parse(runner.definition).steps[0].fields[0].key).toBe('last');
+  });
+
   it('shows a form the person cannot change as read only', async () => {
     const element = await render(form(READY, { canEdit: false }));
 

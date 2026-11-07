@@ -53,6 +53,10 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Grants and funders](funders.md): adding grants, moving them through the stages on the Grant Pipeline, the deadlines coming up and the Grant Calendar, the program a grant pays for, an award's payments, a restricted grant's ledger and Giving fund, government award fields, the answer library, linking a requirement to the outcome it reports on, funder reports and the Board Dashboard.
 
+### Forms
+
+- [Forms](forms.md): filling in a form a step at a time, seeing a submission and the records it wrote, and finishing one held for review.
+
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.

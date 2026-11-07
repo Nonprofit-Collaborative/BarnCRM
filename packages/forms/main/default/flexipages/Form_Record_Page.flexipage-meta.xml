@@ -35,6 +35,16 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentName>formRunner</componentName>
+        <identifier>formRunnerPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>formRunnerTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
         <componentName>force:detailPanel</componentName>
         <identifier>formDetailPanel</identifier>
       </componentInstance>
@@ -59,6 +69,20 @@
         </componentInstanceProperties>
         <componentName>flexipage:tab</componentName>
         <identifier>formBuilderTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>formRunnerTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Fill In</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>formRunnerTabItem</identifier>
       </componentInstance>
     </itemInstances>
     <itemInstances>
