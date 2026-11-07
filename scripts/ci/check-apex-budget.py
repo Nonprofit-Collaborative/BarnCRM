@@ -48,7 +48,8 @@ CAPS = {
     # OrgMetadataApi, the Metadata API through the org connection), then for Report Subscriptions
     # (C-63, D-156: ReportSubscriptions and OrgToolingApi.rest), then for Radius Find (C-69,
     # D-157: FindRadius, QueryCompiler's radius condition, FindController's center lookup).
-    "core": 2_059_000,
+    # Batch C landing 2026-11-07: 2,057,941 measured with C-42a, C-61, C-63, C-69, plus 0.4%.
+    "core": 2_066_000,
     "rollups": 374_000,
     # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
     # Quick Gift Entry tribute, match and split (people-giving-13, 16, 23), and the New
@@ -58,7 +59,8 @@ CAPS = {
     # Pipeline's Recently Closed column and Reopen Ask (people-giving-19).
     "giving": 608_000,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
-    "volunteers": 182_000,
+    # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
+    "volunteers": 190_000,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
     # Raised 2026-11-06 for repeating session schedules (modules-24, D-183): the run, nightly
     # batch, save job, trigger handler and selector, and the schedule page's controller methods.
@@ -68,13 +70,15 @@ CAPS = {
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).
     "funders": 100_500,
     # Forms engine and builder (C-42a, D-157): submit service, server rules, thin controllers.
-    "forms": 60_000,
+    # Batch C landing 2026-11-07: 42,867 measured (C-42a), plus about 2.5%.
+    "forms": 44_000,
     # New 2026-11-06 for Contact Point Sync (C-45, ADR-0176 contact point sync module):
     # 43,980 measured with the page and backfill, plus about 2 percent.
     "contactpoints": 45_000,
     # Event Management (ADR-0177, events module): events, tickets, agenda and speakers (EV-01,
     # EV-03 to EV-05).
-    "events": 75_000,
+    # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.
+    "events": 30_000,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
