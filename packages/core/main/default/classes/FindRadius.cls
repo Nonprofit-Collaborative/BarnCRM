@@ -263,9 +263,9 @@ public with sharing class FindRadius {
 
 	/** A record's own geocode, read as the person; its postal code stands in when it has none. */
 	private static Center recordCenter(String recordId) {
-		Id id;
+		Id wanted;
 		try {
-			id = Id.valueOf(recordId);
+			wanted = Id.valueOf(recordId);
 		} catch (Exception notAnId) {
 			throw new FindRadiusException(
 				String.format(
@@ -275,7 +275,7 @@ public with sharing class FindRadius {
 			);
 		}
 		Schema.DescribeSObjectResult described = QueryFieldCatalog.describeObject(
-			id.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED).getName()
+			wanted.getSObjectType().getDescribe(SObjectDescribeOptions.DEFERRED).getName()
 		);
 		Map<String, Schema.SObjectField> fields = described.fields.getMap();
 		List<String> selected = new List<String>();
@@ -312,7 +312,7 @@ public with sharing class FindRadius {
 				' FROM ' +
 				described.getName() +
 				' WHERE Id = :recordId LIMIT 1',
-			new Map<String, Object>{ 'recordId' => id },
+			new Map<String, Object>{ 'recordId' => wanted },
 			AccessLevel.USER_MODE
 		);
 		if (found.isEmpty()) {
