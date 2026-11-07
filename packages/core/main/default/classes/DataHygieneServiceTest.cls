@@ -247,6 +247,11 @@ private class DataHygieneServiceTest {
 			}
 			addresses.add(new Address__c(Account__c = kept.Id, Type__c = 'Work', City__c = 'Kept'));
 			insert addresses;
+			// Orphans exist only when the org keeps the addresses of a deleted record (D-184).
+			SettingsService.saveSystemValue(
+				'Address_Delete_Behavior__c',
+				AddressDeleteHandler.KEEP
+			);
 			delete gone;
 			User maria = maria();
 
