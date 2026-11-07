@@ -1,5 +1,5 @@
 /**
- * The Contact Point Sync page (C-45; ADR-NEXT contact point sync module, decisions 10 and 11):
+ * The Contact Point Sync page (C-45; ADR-0176 contact point sync module, decisions 10 and 11):
  * whether each kind can be copied in this org and why not, the preview count, the last backfill,
  * and Run Backfill. Thin: it returns plain JSON and every text the page shows, so the page holds
  * no rules (plan 9.9).

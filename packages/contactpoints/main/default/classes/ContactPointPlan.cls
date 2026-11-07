@@ -1,5 +1,5 @@
 /**
- * What a person's Contact Points should be, worked out from plain maps (R-CPL2; ADR-NEXT contact
+ * What a person's Contact Points should be, worked out from plain maps (R-CPL2; ADR-0176 contact
  * point sync module, decisions 4 and 13). No query, no DML, no describe: the service reads the
  * records, hands their values here, and writes what comes back, so the rules can be tested and
  * ported on their own (plan 9.9).

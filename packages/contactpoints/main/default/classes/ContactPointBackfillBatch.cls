@@ -1,5 +1,5 @@
 /**
- * The backfill (ADR-NEXT contact point sync module, decision 10): syncs every person in the org,
+ * The backfill (ADR-0176 contact point sync module, decision 10): syncs every person in the org,
  * 200 at a time, exactly as a save would, then records when it finished and what it did on the
  * module's settings for the Contact Point Sync page.
  *

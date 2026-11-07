@@ -1,5 +1,5 @@
 /**
- * Contact Point Sync on Contact (registry row `Contact_Point_Sync_Person`; ADR-NEXT contact point
+ * Contact Point Sync on Contact (registry row `Contact_Point_Sync_Person`; ADR-0176 contact point
  * sync module, decisions 6 and 7). A switch on the Automation page that Pause All covers.
  *
  * - Before insert and update: gives a person with an email or phone to copy an Individual, so the

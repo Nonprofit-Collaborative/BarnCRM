@@ -88,7 +88,7 @@ PATTERN='\b(Opportunity|OpportunityContactRole|Campaign|CampaignMember|Lead|Case
 NPC_PATTERN='\b(PartyRelationshipGroup|PartyRoleRelation|AccountAccountRelation|AccountContactRelation|ContactContactRelation|ContactPointAddress|ContactPointEmail|ContactPointPhone|ContactPointConsent|PersonLifeEvent|GiftTransactionDesignation|GiftDesignation|GiftDefaultDesignation|GiftCommitment|GiftCommitmentSchedule|GiftSoftCredit|GiftTribute|GiftRefund|GiftEntry|GiftBatch|OutreachSourceCode|OutreachSummary|DonorGiftSummary|ProgramEnrollment|BenefitAssignment|BenefitDisbursement|RecordAggregationDefinition)\b'
 NPC_INCLUDES=(--include='*.cls' --include='*.trigger' --include='*.xml')
 
-# Contact Point Sync (C-45, plan D-111, ADR-NEXT contact point sync module)
+# Contact Point Sync (C-45, plan D-111, ADR-0176 contact point sync module)
 # -------------------------------------------------------------------------
 # packages/contactpoints exists to keep ContactPointEmail, ContactPointPhone and
 # ContactPointAddress in step, so those three names, and only those, are allowed there. Its Apex

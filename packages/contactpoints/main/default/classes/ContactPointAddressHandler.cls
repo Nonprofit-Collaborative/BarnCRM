@@ -1,5 +1,5 @@
 /**
- * Contact Point Sync on `Address__c` (registry row `Contact_Point_Sync_Address`; ADR-NEXT contact
+ * Contact Point Sync on `Address__c` (registry row `Contact_Point_Sync_Address`; ADR-0176 contact
  * point sync module, decisions 4, 6 and 7). A switch on the Automation page that Pause All covers.
  *
  * After an address is created, changed, deleted or restored, syncs the address copies of every

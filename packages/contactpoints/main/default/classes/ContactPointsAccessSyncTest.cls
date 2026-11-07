@@ -1,5 +1,5 @@
 /**
- * BarnCRM Admin holders get Contact Point Sync Admin (ADR-NEXT contact point sync module,
+ * BarnCRM Admin holders get Contact Point Sync Admin (ADR-0176 contact point sync module,
  * decision 12), at install, at Turn on and with the hourly access check; nobody else does.
  */
 @IsTest(testFor='ApexClass:ContactPointsAccessSync')

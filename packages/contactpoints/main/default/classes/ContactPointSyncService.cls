@@ -1,6 +1,6 @@
 /**
  * Keeps a person's Salesforce Contact Points in step with their BarnCRM email, phone and address
- * values (C-45; ADR-NEXT contact point sync module; canonical model 29ZZ).
+ * values (C-45; ADR-0176 contact point sync module; canonical model 29ZZ).
  *
  * One way: `ContactPointPlan` says what the person's copies should be, and this class makes the
  * managed Contact Points match, creating, adopting, updating and deleting them and their Contact

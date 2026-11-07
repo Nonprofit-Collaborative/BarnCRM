@@ -1,7 +1,7 @@
 /**
  * Maria opens the Contact Point Sync page: she sees what each kind can do here, the preview
  * count, and starts the backfill, which records what it did; the page refuses in words when the
- * org cannot copy anything or she lacks the permission (ADR-NEXT contact point sync module,
+ * org cannot copy anything or she lacks the permission (ADR-0176 contact point sync module,
  * decisions 10 and 11).
  */
 @IsTest(testFor='ApexClass:ContactPointSyncController')

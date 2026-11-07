@@ -65,7 +65,7 @@ CAPS = {
     "funders": 100_500,
     # Forms engine and builder (C-42a, D-157): submit service, server rules, thin controllers.
     "forms": 60_000,
-    # New 2026-11-06 for Contact Point Sync (C-45, ADR-NEXT contact point sync module):
+    # New 2026-11-06 for Contact Point Sync (C-45, ADR-0176 contact point sync module):
     # 43,980 measured with the page and backfill, plus about 2 percent.
     "contactpoints": 45_000,
     "mirror": 182_000,

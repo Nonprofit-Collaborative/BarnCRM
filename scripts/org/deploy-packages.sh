@@ -936,7 +936,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(funders)
   # Forms depends on Core only (ADR-0175, forms module).
   MODULES+=(forms)
-  # Contact Point Sync depends on Core only (ADR-NEXT contact point sync module).
+  # Contact Point Sync depends on Core only (ADR-0176 contact point sync module).
   MODULES+=(contactpoints)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
@@ -1107,7 +1107,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "check syncs the access."
   fi
 
-  # The same gap for the Contact Point Sync permission set (ADR-NEXT contact point sync module,
+  # The same gap for the Contact Point Sync permission set (ADR-0176 contact point sync module,
   # decision 12).
   echo ""
   echo "== Queueing the Contact Point Sync access sync =="

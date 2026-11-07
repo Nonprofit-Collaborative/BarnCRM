@@ -184,6 +184,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0173](0173-shipped-organization-record-type-for-orgs-without-one.md) | Core ships an organization record type, offered only where the org has none | Accepted (owner decision) |
 | [0174](0174-deactivate-org-automation-with-a-snapshot.md) | Deactivate org flows and validation rules with a snapshot and restore | Accepted (owner decision) |
 | [0175](0175-forms-module.md) | The BarnCRM Forms module: versioned JSON definitions, a framework-free engine, Core's matchers and a form attachment seam | Accepted (builder decision) |
+| [0176](0176-contact-point-sync-module.md) | The BarnCRM Contact Point Sync module: one-way copies of a person's email, phone and addresses into Contact Points | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

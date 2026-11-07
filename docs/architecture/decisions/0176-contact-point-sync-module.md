@@ -1,4 +1,4 @@
-# ADR-NEXT: The BarnCRM Contact Point Sync module: one-way copies of a person's email, phone and addresses into Contact Points
+# ADR-0176: The BarnCRM Contact Point Sync module: one-way copies of a person's email, phone and addresses into Contact Points
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-06

@@ -1,5 +1,5 @@
 /**
- * What the BarnCRM Contact Point Sync module does at install and at every upgrade (ADR-NEXT
+ * What the BarnCRM Contact Point Sync module does at install and at every upgrade (ADR-0176
  * contact point sync module).
  *
  * Each step is safe to run twice and none can abort an install, since every failure is written

@@ -1,6 +1,6 @@
 /**
  * Gives Contact Point Sync Admin to everyone holding BarnCRM Admin, directly or through a role
- * (ADR-NEXT contact point sync module, decision 12; ADR-0131 module access sync by role). Staff
+ * (ADR-0176 contact point sync module, decision 12; ADR-0131 module access sync by role). Staff
  * need nothing: the copy runs in system mode as upkeep (decision 9).
  *
  * It only gives, never takes away. It runs at install (`ContactPointsPostInstall`), and Core asks
