@@ -341,6 +341,27 @@ public with sharing class FormSubmitService {
 	}
 
 	/**
+	 * Throws a FormException naming the first object or field the definition writes that this org
+	 * lacks, so a form is never published with a target it cannot write (the Form Builder).
+	 */
+	public static void checkTargets(Map<String, Object> definition) {
+		Map<String, Object> everyAnswer = new Map<String, Object>();
+		for (Map<String, Object> field : FormRules.allFields(definition)) {
+			everyAnswer.put(String.valueOf(field.get('key')), '');
+		}
+		for (Plan entry : plan(definition, everyAnswer)) {
+			Map<String, Schema.SObjectField> fieldMap = typeOf(entry.objectName)
+				.getDescribe(SObjectDescribeOptions.DEFERRED)
+				.fields.getMap();
+			Set<String> names = new Set<String>(entry.fields.keySet());
+			names.addAll(entry.links.keySet());
+			for (String fieldName : names) {
+				describedField(fieldMap, entry.objectName, fieldName);
+			}
+		}
+	}
+
+	/**
 	 * Finds or creates one record of the plan and writes its values. Null when it is skipped: a
 	 * person with no last name or an organization with no name that matched nobody (the
 	 * questions were optional and left blank), or a related record linking to one skipped.
