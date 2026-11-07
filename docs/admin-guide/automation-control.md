@@ -236,8 +236,7 @@ table of every automation in the org (C-60, D-184).
   Bypass) stops it: BarnCRM's automations and flow templates, and your own triggers whose code
   checks the setting. **No** for automations that always run, BarnCRM's error recording, a
   managed package's flows and your triggers that do not check it. **Not Checked** for your own
-  flows: whether a flow calls Check BarnCRM Automation can only be read through the org
-  connection.
+  flows until a scan (below) has read whether they call Check BarnCRM Automation.
 - **How to Make This Respect Pause All:** the row menu of your own automation that is not
   covered shows what to add, ready to copy: the Check BarnCRM Automation action and Decision for
   a flow, the Apex lines for a trigger, the wrapped formula for a validation or workflow rule.
@@ -247,6 +246,26 @@ table of every automation in the org (C-60, D-184).
 It is read as you, with the same queries the Data Dictionary uses, and needs the Manage BarnCRM
 Settings permission. A very large org is capped at 2,000 flows and 500 triggers, and the card
 says so.
+
+### Scan Org Automation
+
+Validation rules, workflow rules and whether your own flows call Check BarnCRM Automation can
+only be read through Salesforce's Tooling API. **Scan Org Automation** reads them through the
+org connection, the same one-time connection Super Importer uses to create a field (see
+[Creating a New Field From an Import](import-new-fields.md): Set Up Connection, then
+Enabled for Callouts in Setup). Until it is set
+up, the card shows the connection's status and **Set Up Connection** to anyone who may use it.
+
+Using the connection needs the **BarnCRM Metadata Admin** permission set, Customize Application
+and Modify Metadata. The scan runs in the background; the card says it is scanning and updates
+when it finishes, then shows when it last scanned. After a scan:
+
+- Your validation rules and workflow rules join the table (a workflow rule's active state is
+  not read). A rule whose formula reads the BarnCRM Automation Control setting is **Yes**.
+- Each of your own flows is **Yes** when it uses Check BarnCRM Automation or reads the setting,
+  otherwise **No**.
+
+Only the newest scan is kept. Scan again after you change your automation.
 
 ## Running Your Own Version Instead
 

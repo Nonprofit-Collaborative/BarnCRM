@@ -1,10 +1,15 @@
 import { createElement } from 'lwc';
 import AutomationInventory from 'c/automationInventory';
 import getInventory from '@salesforce/apex/OrgAutomationController.getInventory';
+import startScan from '@salesforce/apex/OrgAutomationController.startScan';
 import { downloadCsv } from 'c/findCsv';
 import { snippetCode, snippetKind } from '../automationSnippets';
 
 jest.mock('@salesforce/apex/OrgAutomationController.getInventory', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+
+jest.mock('@salesforce/apex/OrgAutomationController.startScan', () => ({ default: jest.fn() }), {
   virtual: true
 });
 
@@ -156,6 +161,63 @@ describe('c-automation-inventory', () => {
     q(element, 'refresh').click();
     await flush();
     expect(q(element, 'error').message).toBe('No permission.');
+  });
+});
+
+describe('c-automation-inventory scan', () => {
+  afterEach(() => {
+    while (document.body.firstChild) {
+      document.body.removeChild(document.body.firstChild);
+    }
+    jest.clearAllMocks();
+    jest.useRealTimers();
+  });
+
+  it('shows the connection setup when it may be used but is not ready', async () => {
+    const element = await render({ ...INVENTORY, canUseConnection: true, connected: false });
+    expect(q(element, 'connection-needed')).not.toBeNull();
+    expect(q(element, 'scan')).toBeNull();
+  });
+
+  it('offers no scan to someone who may not use the connection', async () => {
+    const element = await render();
+    expect(q(element, 'scan')).toBeNull();
+    expect(q(element, 'connection-needed')).toBeNull();
+  });
+
+  it('starts a scan, says it runs and reads again until it finishes', async () => {
+    const element = await render({ ...INVENTORY, canUseConnection: true, connected: true });
+    expect(q(element, 'scan-line')).toBeNull();
+
+    jest.useFakeTimers();
+    startScan.mockResolvedValue('a0X000000000001AAA');
+    getInventory.mockResolvedValue({
+      ...INVENTORY,
+      canUseConnection: true,
+      connected: true,
+      scanStatus: 'Running'
+    });
+    q(element, 'scan-button').click();
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(startScan).toHaveBeenCalledTimes(1);
+    expect(q(element, 'scan-line').textContent).toBe('c.Core_AutomationInventory_ScanRunning');
+    expect(q(element, 'scan-button').disabled).toBe(true);
+
+    getInventory.mockResolvedValue({
+      ...INVENTORY,
+      canUseConnection: true,
+      connected: true,
+      scanStatus: 'Failed',
+      scanMessage: 'The scan did not finish.'
+    });
+    jest.advanceTimersByTime(4000);
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(getInventory).toHaveBeenCalledTimes(3);
+    expect(q(element, 'scan-line').textContent).toBe('The scan did not finish.');
   });
 });
 

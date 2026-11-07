@@ -524,6 +524,31 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Automation_Snapshot__c.Items__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Automation_Snapshot__c.Kind__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Automation_Snapshot__c.Message__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Automation_Snapshot__c.Restored_At__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Automation_Snapshot__c.Status__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Contact.AccountId</field>
     <readable>true</readable>
   </fieldPermissions>
@@ -1461,6 +1486,15 @@
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <object>Automation_Setting__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>true</modifyAllRecords>
+    <object>Automation_Snapshot__c</object>
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
   <objectPermissions>

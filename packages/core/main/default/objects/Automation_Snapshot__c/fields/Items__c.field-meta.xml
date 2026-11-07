@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Items__c</fullName>
+  <description>The items as JSON: for a scan, the validation and workflow rules read and what checks the BarnCRM Automation Control setting; for a deactivation, each item's state before, its result and its restore result.</description>
+  <label>Items</label>
+  <length>131072</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>5</visibleLines>
+</CustomField>

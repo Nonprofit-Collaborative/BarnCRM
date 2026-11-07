@@ -135,6 +135,18 @@ public with sharing class OrgAutomationInventory {
 		/** What a field or setting name needs in front of it (`ns__` or nothing). */
 		@AuraEnabled
 		public String fieldPrefix;
+		/** The newest scan through the org connection (R-AS3): its status, time and message. */
+		@AuraEnabled
+		public String scanStatus;
+		@AuraEnabled
+		public Datetime scannedAt;
+		@AuraEnabled
+		public String scanMessage;
+		/** The org connection: whether this person may use it, and whether it is ready. */
+		@AuraEnabled
+		public Boolean canUseConnection = false;
+		@AuraEnabled
+		public Boolean connected = false;
 	}
 
 	/** Test hook: a part (`Switches`, `Flows`, `Triggers`) made to fail. */
@@ -209,7 +221,65 @@ public with sharing class OrgAutomationInventory {
 		for (Integer i = 0; i < Math.min(triggers.size(), MAX_TRIGGERS); i++) {
 			result.rows.add(triggerRow(triggers[i]));
 		}
+		try {
+			addScan(result, OrgAutomationScan.latest());
+		} catch (Exception unreadable) {
+			// No scan can be read: the rows stand as SOQL read them.
+			result.scanStatus = null;
+		}
 		return result;
+	}
+
+	/**
+	 * Adds the newest scan (R-AS3): its validation and workflow rules as rows, and Covered by
+	 * Pause All for the org's own flows and triggers that refer to the setting.
+	 */
+	@TestVisible
+	private static void addScan(Result result, Automation_Snapshot__c scan) {
+		if (scan == null) {
+			return;
+		}
+		result.scanStatus = scan.Status__c;
+		result.scannedAt = scan.CreatedDate;
+		result.scanMessage = scan.Message__c;
+		if (scan.Status__c != OrgAutomationScan.STATUS_DONE || String.isBlank(scan.Items__c)) {
+			return;
+		}
+		OrgAutomationScan.Found found = (OrgAutomationScan.Found) JSON.deserialize(
+			scan.Items__c,
+			OrgAutomationScan.Found.class
+		);
+		result.truncated = result.truncated || found.truncated == true;
+		for (Row row : result.rows) {
+			Boolean refers = found.covered.contains(row.apiName);
+			if (row.owner == OWNER_ORG && row.covered == COVERED_UNKNOWN) {
+				row.covered = refers ? COVERED_YES : COVERED_NO;
+			} else if (row.owner == OWNER_ORG && refers) {
+				row.covered = COVERED_YES;
+			}
+		}
+		for (OrgAutomationScan.Rule rule : found.rules) {
+			Row row = new Row();
+			row.kind = rule.kind;
+			row.name = rule.name;
+			row.apiName = rule.name;
+			row.recordId = rule.recordId;
+			row.key = rule.kind + '|' + rule.recordId;
+			row.objectName = rule.objectName;
+			row.objectLabel = objectLabel(rule.objectName);
+			if (rule.active != null) {
+				row.status = rule.active ? STATUS_ACTIVE : STATUS_INACTIVE;
+			}
+			row.owner = ownerOf(rule.namespace, false);
+			row.covered = found.covered.contains(rule.recordId) || found.covered.contains(rule.name)
+				? COVERED_YES
+				: COVERED_NO;
+			row.canDeactivate =
+				rule.kind == KIND_VALIDATION &&
+				row.owner == OWNER_ORG &&
+				rule.active == true;
+			result.rows.add(row);
+		}
 	}
 
 	/** BarnCRM's own automations, by their switches; an org's listed flow is shown as a flow. */

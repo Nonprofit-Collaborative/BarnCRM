@@ -1,5 +1,7 @@
 import { LightningElement } from 'lwc';
 import getInventory from '@salesforce/apex/OrgAutomationController.getInventory';
+import startScan from '@salesforce/apex/OrgAutomationController.startScan';
+import SCAN from '@salesforce/label/c.Core_OrgAutomation_Scan';
 
 import TITLE from '@salesforce/label/c.Core_DataDictionary_AutomationTitle';
 import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
@@ -58,6 +60,11 @@ const OWNER_BARNCRM = 'BarnCRM';
 const OWNER_THIS_ORG = 'Org';
 const ALL_VALUE = '';
 const HOW_TO_ACTION = 'howTo';
+const SCAN_RUNNING = 'Running';
+const SCAN_FAILED = 'Failed';
+/** How often, and how many times, the page reads again while a scan runs. */
+const POLL_MS = 4000;
+const POLL_LIMIT = 45;
 
 /** The owner in words: BarnCRM, This Org, or the managed package's namespace. */
 function ownerText(owner) {
@@ -84,6 +91,13 @@ export default class AutomationInventory extends LightningElement {
     howTo: HOW_TO,
     copy: COPY,
     close: CLOSE,
+    scan: SCAN,
+    get connectionNeeded() {
+      return helpText('Core', 'Core_AutomationInventory_ConnectionNeeded');
+    },
+    get scanIntro() {
+      return helpText('Core', 'Core_AutomationInventory_ScanIntro');
+    },
     get intro() {
       return helpText('Core', 'Core_AutomationInventory_Intro');
     },
@@ -107,6 +121,8 @@ export default class AutomationInventory extends LightningElement {
   sortDirection = 'asc';
   /** The row whose snippet is shown. */
   snippetRow;
+  pollTimer;
+  polls = 0;
 
   connectedCallback() {
     if (!this.helpReady) {
@@ -117,15 +133,76 @@ export default class AutomationInventory extends LightningElement {
     this.load();
   }
 
+  disconnectedCallback() {
+    clearTimeout(this.pollTimer);
+  }
+
   async load() {
     this.loading = true;
     this.errorMessage = undefined;
     try {
       this.result = await getInventory();
+      this.pollWhileScanning();
     } catch (error) {
       this.errorMessage = bodyMessage(error);
     } finally {
       this.loading = false;
+    }
+  }
+
+  /** Reads again a few seconds later while a scan runs, up to POLL_LIMIT times. */
+  pollWhileScanning() {
+    clearTimeout(this.pollTimer);
+    if (!this.scanRunning || this.polls >= POLL_LIMIT) {
+      this.polls = 0;
+      return;
+    }
+    this.polls += 1;
+    // eslint-disable-next-line @lwc/lwc/no-async-operation
+    this.pollTimer = setTimeout(() => this.load(), POLL_MS);
+  }
+
+  get canScan() {
+    return Boolean(this.result && this.result.canUseConnection && this.result.connected);
+  }
+
+  get needsConnection() {
+    return Boolean(this.result && this.result.canUseConnection && !this.result.connected);
+  }
+
+  get scanRunning() {
+    return Boolean(this.result && this.result.scanStatus === SCAN_RUNNING);
+  }
+
+  get scanDisabled() {
+    return this.loading || this.scanRunning;
+  }
+
+  /** The newest scan in words: running, failed (why), or when it read the org. */
+  get scanLine() {
+    const result = this.result || {};
+    if (result.scanStatus === SCAN_RUNNING) {
+      return helpText('Core', 'Core_AutomationInventory_ScanRunning');
+    }
+    if (result.scanStatus === SCAN_FAILED) {
+      return result.scanMessage;
+    }
+    return result.scannedAt
+      ? helpText(
+          'Core',
+          'Core_AutomationInventory_ScannedAt',
+          new Date(result.scannedAt).toLocaleString()
+        )
+      : undefined;
+  }
+
+  async handleScan() {
+    this.errorMessage = undefined;
+    try {
+      await startScan();
+      await this.load();
+    } catch (error) {
+      this.errorMessage = bodyMessage(error);
     }
   }
 

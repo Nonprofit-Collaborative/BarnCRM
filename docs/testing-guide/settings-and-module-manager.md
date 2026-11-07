@@ -209,6 +209,23 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 **Cleanup:** delete `MyAccountTrigger` if you made it for this script.
 
+## T-SET-07F: Scan Org Automation Through the Org Connection
+
+**Purpose:** confirm the scan lists validation and workflow rules and checks the org's own flows (C-60, ADR-NEXT "Deactivate org flows and validation rules with a snapshot and restore").
+**Prerequisites:** an admin with BarnCRM Admin and BarnCRM Metadata Admin, Customize Application and Modify Metadata; the org connection set up with Enabled for Callouts on ([T-IMP-18](imports.md#t-imp-18-create-a-new-field-from-a-column)); `My_Test_Flow` from T-SET-07C (calls Check BarnCRM Automation); a second active flow of your own, `My_Plain_Flow`, that does not; an active validation rule on Contact, `Test_Paused_Rule`, whose formula reads `$Setup.BarnCRM_Automation_Control__c.Pause_All__c`; an active validation rule on Account, `Test_Plain_Rule`, that does not.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Automation** tab as an admin with BarnCRM Admin only. | No **Scan Org Automation** button; your flows read **Not Checked**. |
+| 2 | Open it as the admin from the prerequisites, before the connection is set up (or with Enabled for Callouts off). | "Set up the org connection to list validation and workflow rules..." with the connection's status and **Set Up Connection** (or the Setup steps and **Check Again**). |
+| 3 | With the connection ready, click **Scan Org Automation**. | "Scanning through the org connection..." and the button is greyed out. Within a minute the line reads "Last scanned" and a date and time. |
+| 4 | Find `My_Test_Flow` and `My_Plain_Flow`. | **Yes** and **No** under **Covered by Pause All**. |
+| 5 | Find `Test_Paused_Rule` and `Test_Plain_Rule`. | Both listed as **Validation Rule**, **Active**, **This Org**, on **Contact** and **Account**; **Yes** and **No**. A workflow rule, if the org has one, is listed with no status. |
+| 6 | Click **Scan Org Automation** again and wait. | The date and time update; the rows are the same. |
+| 7 | With Enabled for Callouts turned off in Setup, scan again. | The line names why the scan did not finish; an Error Log entry has the detail. Turn callouts back on. |
+
+**Cleanup:** keep the flows and rules for T-SET-07G.
+
 ## T-SET-08: Turn on a Feature Left Off
 
 **Purpose:** confirm a feature that is off can be turned on once, behind a confirmation, and its tabs appear.

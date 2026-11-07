@@ -80,4 +80,12 @@
         <shortDescription>Automation inventory row action and section title.</shortDescription>
         <value>How to Make This Respect Pause All</value>
     </labels>
+    <labels>
+        <fullName>Core_OrgAutomation_Scan</fullName>
+        <categories>Core</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Automation inventory button: read rules and coverage through the org connection.</shortDescription>
+        <value>Scan Org Automation</value>
+    </labels>
 </CustomLabels>

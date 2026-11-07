@@ -32,6 +32,26 @@
                 <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="info" data-id="not-checked" message={labels.notCheckedHelp}></c-barn-notice>
             </template>
 
+            <template lwc:if={canScan}>
+                <div class="slds-var-m-bottom_small" data-id="scan">
+                    <p class="slds-text-body_small slds-text-color_weak">{labels.scanIntro}</p>
+                    <lightning-button
+                        data-id="scan-button"
+                        class="slds-var-m-top_x-small slds-show"
+                        label={labels.scan}
+                        onclick={handleScan}
+                        disabled={scanDisabled}
+                    ></lightning-button>
+                    <template lwc:if={scanLine}>
+                        <p class="slds-text-body_small slds-var-m-top_x-small" data-id="scan-line" aria-live="polite">{scanLine}</p>
+                    </template>
+                </div>
+            </template>
+            <template lwc:if={needsConnection}>
+                <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="info" data-id="connection-needed" message={labels.connectionNeeded}></c-barn-notice>
+                <c-import-field-connection class="slds-show slds-var-m-bottom_small" data-id="connection"></c-import-field-connection>
+            </template>
+
             <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small">
                 <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
                     <lightning-combobox
