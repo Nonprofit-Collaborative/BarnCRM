@@ -160,6 +160,7 @@ ALLOWED = {
     "CronJobDetail": "their names, read back in tests.",
     # Duplicate management, C-20.
     "DuplicateRule": "which duplicate rules are active, read by the duplicate scan, C-20 (ADR-0050). Duplicate management is in every edition.",
+    "MatchingRule": "whether BarnCRM's own matching rules exist and are active, read by the Duplicate Rules Starter, C-61. Duplicate management is in every edition.",
     "DuplicateRecordSet": "a duplicate suggestion, written by the scan and read by the review panel, C-20.",
     "DuplicateRecordItem": "the records in a suggestion, C-20.",
     "DuplicateRecordItems": "not an object: the child relationship a subquery from DuplicateRecordSet names, C-20.",

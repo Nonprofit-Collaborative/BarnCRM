@@ -19,6 +19,7 @@ import ACTIVATE_LINK from '@salesforce/label/c.Core_Duplicates_ActivateLink';
 import SCAN_BUTTON from '@salesforce/label/c.Core_Duplicates_ScanButton';
 import LAST_SCAN from '@salesforce/label/c.Core_Duplicates_LastScan';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
+import STARTER_TITLE from '@salesforce/label/c.Core_DuplicateStarter_Title';
 import SUGGESTIONS_HEADING from '@salesforce/label/c.Core_Duplicates_SuggestionsHeading';
 import OBJECT_PERSON from '@salesforce/label/c.Core_Section_Person';
 import OBJECT_HOUSEHOLD from '@salesforce/label/c.Core_Section_Household';
@@ -116,6 +117,8 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
   focusFrom;
 
   setupUrl = SETUP_DUPLICATE_RULES;
+  starterOpen = false;
+  starterLabel = STARTER_TITLE;
 
   view;
   errorMessage;
@@ -408,6 +411,15 @@ export default class DuplicateReview extends NavigationMixin(LightningElement) {
 
   handleScan() {
     this.runAction(startScan(), helpText('Core', 'Core_Duplicates_ScanStarted'));
+  }
+
+  /** Opens or closes the Duplicate Rules Starter (C-61) under the rules box. */
+  handleToggleStarter() {
+    this.starterOpen = !this.starterOpen;
+  }
+
+  get starterExpanded() {
+    return String(this.starterOpen);
   }
 
   handleRefresh() {

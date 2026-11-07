@@ -132,6 +132,17 @@ The counts and the list include only the records you can open; the total include
 You need the **Rollup Builder User** permission set to see the card; ask your admin. If a
 total still looks wrong, tell your admin: they also see what it would be if recalculated now.
 
+## To Get a Report by Email
+
+1. Open the report and choose **Subscribe** (Salesforce's own button), then pick how often and
+   when. Salesforce emails you the report on that schedule.
+2. An admin who has the org connection can also subscribe from **Org Optimizer**, **Report
+   Subscriptions**: choose **Subscribe** next to a report, then **Frequency**, **Day** and
+   **Time**, and **Save**.
+
+Each person can have 7 report subscriptions in most orgs. To change or stop one, open the
+report and choose **Subscribe** again.
+
 ## Common Problems
 
 - Problem: the dashboard shows "The running user for this dashboard doesn't have permission to

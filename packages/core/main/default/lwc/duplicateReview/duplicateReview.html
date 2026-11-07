@@ -56,7 +56,19 @@
           disabled={busy}
           onclick={handleRefresh}
         ></lightning-button>
+        <template lwc:if={canManage}>
+          <lightning-button
+            class="slds-var-m-left_x-small"
+            data-id="starter-button"
+            label={starterLabel}
+            aria-expanded={starterExpanded}
+            onclick={handleToggleStarter}
+          ></lightning-button>
+        </template>
       </div>
+      <template lwc:if={starterOpen}>
+        <c-duplicate-rules-starter data-id="starter"></c-duplicate-rules-starter>
+      </template>
 
       <template lwc:if={scanRunning}>
         <p role="status" class="slds-text-body_small slds-var-m-top_x-small" data-id="scan-running">

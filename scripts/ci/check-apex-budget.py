@@ -44,7 +44,10 @@ CAPS = {
     # changes landed with them (AddressDeleteHandler, Match Sources turned off by a setting,
     # the shipped Organization record type, RelationshipController.isFeatureOn), then for the
     # Form attachment seam (C-42a: FormAttachmentExtension, FormAttachmentExtensions, receipt).
-    "core": 2_017_000,
+    # Raised 2026-11-06 for the Duplicate Rules Starter (C-61, D-156: DuplicateRulesStarter and
+    # OrgMetadataApi, the Metadata API through the org connection), then for Report Subscriptions
+    # (C-63, D-156: ReportSubscriptions and OrgToolingApi.rest).
+    "core": 2_059_000,
     "rollups": 374_000,
     # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
     # Quick Gift Entry tribute, match and split (people-giving-13, 16, 23), and the New
