@@ -240,4 +240,20 @@
         <shortDescription>Matching Logic: heading over the records found</shortDescription>
         <value>These records would match:</value>
     </labels>
+    <labels>
+        <fullName>Core_DuplicateStarter_Title</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicate Rules Starter: section title and the button that opens it</shortDescription>
+        <value>Duplicate Rules Starter</value>
+    </labels>
+    <labels>
+        <fullName>Core_DuplicateStarter_SetUp</fullName>
+        <categories>DuplicateMatching</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Duplicate Rules Starter: button that creates or repairs the chosen rules</shortDescription>
+        <value>Set Up Rules</value>
+    </labels>
 </CustomLabels>

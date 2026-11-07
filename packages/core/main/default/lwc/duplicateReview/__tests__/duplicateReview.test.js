@@ -28,6 +28,11 @@ jest.mock(
 jest.mock('@salesforce/apex/DuplicateController.getView', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/DuplicateRulesStarter.getView',
+  () => ({ default: jest.fn(() => Promise.resolve({ canUse: false, sets: [] })) }),
+  { virtual: true }
+);
 jest.mock('@salesforce/apex/DuplicateController.startScan', () => ({ default: jest.fn() }), {
   virtual: true
 });
@@ -130,6 +135,18 @@ describe('c-duplicate-review', () => {
     expect(q(element, 'setup-link').getAttribute('href')).toBe(
       '/lightning/setup/DuplicateRules/home'
     );
+  });
+
+  it('opens and closes the Duplicate Rules Starter under the rules', async () => {
+    const element = await mount(viewWith({}));
+    expect(q(element, 'starter')).toBeNull();
+    q(element, 'starter-button').click();
+    await flush();
+    expect(q(element, 'starter')).not.toBeNull();
+    expect(q(element, 'starter-button').getAttribute('aria-expanded')).toBe('true');
+    q(element, 'starter-button').click();
+    await flush();
+    expect(q(element, 'starter')).toBeNull();
   });
 
   it('lists each rule with whether it is on', async () => {
