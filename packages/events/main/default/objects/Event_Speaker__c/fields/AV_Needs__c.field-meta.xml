@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>AV_Needs__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>What they need to present: a projector, a microphone, a video call.</inlineHelpText>
+  <label>AV Needs</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>TextArea</type>
+</CustomField>

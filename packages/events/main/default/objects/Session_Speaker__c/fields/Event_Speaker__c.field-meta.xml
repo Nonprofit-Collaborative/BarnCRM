@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Event_Speaker__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The speaker, one of the session's own event's speakers.</inlineHelpText>
+  <label>Speaker</label>
+  <referenceTo>Event_Speaker__c</referenceTo>
+  <relationshipLabel>Session Assignments</relationshipLabel>
+  <relationshipName>Session_Assignments</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

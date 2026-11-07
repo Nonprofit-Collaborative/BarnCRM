@@ -93,3 +93,26 @@ Only role). Each gets its Events permission set from the role.
 | 12 | As read-only, open **Agenda**. | No drag handles, no **New Track** or **New Session**. |
 
 **Cleanup:** None.
+
+## T-EV-06: Speakers
+
+**Purpose:** confirm adding speakers from Core people, assignments, the one-per-person rules and
+removal.
+**Prerequisites:** staff, an event with two sessions at the same time, `Opening` and `Flows 101`
+(neither cancelled), and a person `Ana Garcia`.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event, click **Speakers**. | An empty state and **Add Speaker**. |
+| 2 | In **Add Speaker** pick `Ana Garcia`. | A row `Ana Garcia`, status **Invited**; her name opens the person. |
+| 3 | Pick `Ana Garcia` again. | Refused: Ana Garcia is already a speaker at this event. |
+| 4 | Row menu **Edit**: Headline `Architect`, Status **Confirmed**, AV Needs `Projector`. Save. | The row shows `Architect` and **Confirmed**. |
+| 5 | Row menu **Add to Session**: `Opening`, role **Speaker**, **Save**. | `Opening (Speaker)` under Sessions. |
+| 6 | **Add to Session** `Opening` again, role **Moderator**. | Refused: this speaker is already in this session. |
+| 7 | **Add to Session** `Flows 101`, **Panelist**. Open **Agenda**. | Both sessions show a red note: a speaker is also in the other at the same time. |
+| 8 | On **Speakers**, click the **x** beside `Flows 101`. | Only `Opening (Speaker)` remains. |
+| 9 | Row menu **Remove**, confirm. | The row is gone; `Ana Garcia` is still in BarnCRM. |
+| 10 | As read-only, open **Speakers**. | The list shows; no **Add Speaker**. |
+
+**Cleanup:** None.

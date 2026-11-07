@@ -119,8 +119,10 @@ public with sharing class ModuleManagerService {
 		'Events' => new List<String>{
 			'Event__c',
 			'Event_Session__c',
+			'Event_Speaker__c',
 			'Event_Track__c',
 			'Promo_Code__c',
+			'Session_Speaker__c',
 			'Ticket_Type__c'
 		}
 	};
