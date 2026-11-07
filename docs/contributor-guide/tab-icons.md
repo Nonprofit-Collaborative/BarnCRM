@@ -31,6 +31,7 @@ Rules:
 | core | Organizations | Custom24: Building |
 | core | Record_Inspector | Custom38: Camera |
 | core | Relationship__c | Custom37: Bridge |
+| events | Event_Speaker__c | Custom75: IPPhone |
 | events | Event__c | Custom89: Saxophone |
 | events | Events_Home | Custom81: MusicalNote |
 | funders | Funder_Report_Template__c | Custom99: TVCRT |

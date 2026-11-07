@@ -100,8 +100,21 @@ public with sharing class EventAgendaController {
 				LIMIT :maxRows
 			];
 			agenda.truncated = sessions.size() > maxSessions;
+			Map<Id, SessionRow> byId = new Map<Id, SessionRow>();
 			for (Integer i = 0; i < sessions.size() && i < maxSessions; i++) {
-				agenda.sessions.add(toRow(sessions[i]));
+				SessionRow row = toRow(sessions[i]);
+				byId.put(sessions[i].Id, row);
+				agenda.sessions.add(row);
+			}
+			Set<Id> sessionIds = byId.keySet();
+			for (Session_Speaker__c link : [
+				SELECT Event_Session__c, Event_Speaker__c
+				FROM Session_Speaker__c
+				WHERE Event_Session__c IN :sessionIds AND Event_Speaker__c != NULL
+				WITH USER_MODE
+				LIMIT 5000
+			]) {
+				byId.get(link.Event_Session__c).speakerIds.add(link.Event_Speaker__c);
 			}
 			return agenda;
 		} catch (Exception e) {

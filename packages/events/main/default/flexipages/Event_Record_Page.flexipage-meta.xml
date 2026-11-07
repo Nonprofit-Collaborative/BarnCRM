@@ -55,6 +55,16 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentName>eventSpeakers</componentName>
+        <identifier>eventSpeakers</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>eventSpeakersTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
         <componentInstanceProperties>
           <name>active</name>
           <value>true</value>
@@ -97,6 +107,20 @@
         </componentInstanceProperties>
         <componentName>flexipage:tab</componentName>
         <identifier>eventAgendaTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>eventSpeakersTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>{!$Label.Events_EventTab_Speakers}</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>eventSpeakersTabItem</identifier>
       </componentInstance>
     </itemInstances>
     <name>eventTabs</name>

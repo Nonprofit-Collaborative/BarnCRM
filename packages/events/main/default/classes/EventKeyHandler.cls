@@ -1,7 +1,9 @@
 /**
  * The "once per event" rules of the Event Management module (ADR-NEXT `NEXT-events-module.md`),
  * run by the Core trigger dispatcher through registry rows that always run (ADR-0024): R-PC1, a
- * promo code is unique within its event, regardless of case (row `Promo_Code_Key`).
+ * promo code is unique within its event, regardless of case (row `Promo_Code_Key`); R-ESP1, a
+ * person speaks once per event, and R-ESP2, a speaker's empty name is the person's (row
+ * `Event_Speaker_Key`); R-SSP1, a speaker is in a session once (row `Session_Speaker_Key`).
  *
  * Each object the handler serves names its key field, the field that groups (the event) and the
  * field that must not repeat in the group. The key is the group's identifier, a colon and the
@@ -26,7 +28,19 @@ public with sharing class EventKeyHandler extends TriggerHandler {
 	}
 
 	private static final Map<Schema.SObjectType, KeyRule> RULES = new Map<Schema.SObjectType, KeyRule>{
-		Promo_Code__c.SObjectType => new KeyRule('Code_Key__c', 'Event__c', 'Name', true)
+		Promo_Code__c.SObjectType => new KeyRule('Code_Key__c', 'Event__c', 'Name', true),
+		Event_Speaker__c.SObjectType => new KeyRule(
+			'Speaker_Key__c',
+			'Event__c',
+			'Contact__c',
+			false
+		),
+		Session_Speaker__c.SObjectType => new KeyRule(
+			'Assignment_Key__c',
+			'Event_Session__c',
+			'Event_Speaker__c',
+			false
+		)
 	};
 
 	@NamespaceAccessible
@@ -39,7 +53,34 @@ public with sharing class EventKeyHandler extends TriggerHandler {
 	}
 
 	public override void beforeInsert() {
+		defaultSpeakerNames(newRecords());
 		setKeys(newRecords());
+	}
+
+	/** R-ESP2: a new speaker with no name takes the person's first and last name. */
+	@TestVisible
+	private static void defaultSpeakerNames(List<SObject> records) {
+		if (records == null || records.isEmpty() || !(records[0] instanceof Event_Speaker__c)) {
+			return;
+		}
+		Set<Id> contactIds = new Set<Id>();
+		for (Event_Speaker__c speaker : (List<Event_Speaker__c>) records) {
+			if (String.isBlank(speaker.Name) && speaker.Contact__c != null) {
+				contactIds.add(speaker.Contact__c);
+			}
+		}
+		if (contactIds.isEmpty()) {
+			return;
+		}
+		Map<Id, Contact> people = new Map<Id, Contact>(
+			[SELECT Id, Name FROM Contact WHERE Id IN :contactIds WITH USER_MODE]
+		);
+		for (Event_Speaker__c speaker : (List<Event_Speaker__c>) records) {
+			Contact person = people.get(speaker.Contact__c);
+			if (String.isBlank(speaker.Name) && person != null) {
+				speaker.Name = person.Name.left(80);
+			}
+		}
 	}
 
 	public override void beforeUpdate() {
@@ -113,9 +154,15 @@ public with sharing class EventKeyHandler extends TriggerHandler {
 		return String.valueOf(Id.valueOf(String.valueOf(groupId))) + ':' + part;
 	}
 
-	/** The plain-words refusal for a repeat, naming the value repeated. */
+	/** The plain-words refusal for a repeat, naming the code or the speaker. */
 	private static String duplicateMessage(SObject record, KeyRule rule) {
-		List<Object> args = new List<Object>{ record.get(rule.valueField) };
+		if (record instanceof Session_Speaker__c) {
+			return BarnHelp.text('Events', 'Events_SessionSpeaker_Duplicate');
+		}
+		List<Object> args = new List<Object>{ record.get('Name') };
+		if (record instanceof Event_Speaker__c) {
+			return BarnHelp.text('Events', 'Events_Speaker_Duplicate', args);
+		}
 		return BarnHelp.text('Events', 'Events_PromoCode_Duplicate', args);
 	}
 }

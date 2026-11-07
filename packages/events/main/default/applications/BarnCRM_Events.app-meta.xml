@@ -34,6 +34,7 @@
   <navType>Console</navType>
   <tabs>Events_Home</tabs>
   <tabs>Event__c</tabs>
+  <tabs>Event_Speaker__c</tabs>
   <tabs>standard-report</tabs>
   <tabs>Error_Log__c</tabs>
   <uiType>Lightning</uiType>
@@ -43,6 +44,9 @@
     </mappings>
     <mappings>
       <tab>Event__c</tab>
+    </mappings>
+    <mappings>
+      <tab>Event_Speaker__c</tab>
     </mappings>
     <mappings>
       <tab>Events_Home</tab>

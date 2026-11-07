@@ -136,7 +136,30 @@ Two sessions in the same room at overlapping times, or with a speaker in common,
 red on both cards. Nothing is refused, and cancelled sessions are left out. **Repeat Event**
 copies tracks but not sessions.
 
+### Speakers
+
+The **Speakers** tab lists the event's **speakers**, each a Core person, with their headline,
+status and the sessions they are in. Picking a person in **Add Speaker** adds them at once, named
+after the person; their row menu has **Edit**, **Add to Session** and **Remove**. Removing a
+speaker takes them out of their sessions first; the person stays in BarnCRM. The **Event
+Speakers** tab in the app lists every speaker at every event.
+
+| Speaker field | What it is |
+|---|---|
+| Speaker Name | The name shown on the agenda; the person's name unless you change it. |
+| Person | The Core person who speaks. One speaker per person per event. |
+| Headline | A line under their name, such as their job and organization. |
+| Status | Invited (the default), Confirmed, Declined or Cancelled. |
+| Bio | A longer introduction. |
+| Travel Needs, AV Needs | What they need to get there and to present. |
+
+**Add to Session** puts a speaker in one of this event's sessions as a **Speaker**, **Moderator**
+or **Panelist**; the same speaker is in a session once. A speaker in two sessions at the same
+time is flagged on the **Agenda**, never refused. One speaker per person and one place per
+session are automations that always run (**Event Speaker: one per person** and **Session
+Speaker: once per session** on the **Automation** tab).
+
 ## Not Yet
 
-Registration and attendees, session sign-up, a public event page, call for speakers, sponsorship, check-in,
+Registration and attendees, session sign-up, a public event page, call for speakers, speaker portal, sponsorship, check-in,
 reminders and volunteer shifts for an event come in later releases.

@@ -54,3 +54,15 @@ are taken outside BarnCRM.
    the same time. Change one of them, or leave it if that is what you meant.
 
 Use **When** to look at one day at a time, or at the sessions with no time yet.
+
+## Add Speakers
+
+1. Open the event and click the **Speakers** tab.
+2. In **Add Speaker**, pick the person. They are added at once, as **Invited**, under their own
+   name.
+3. From their row menu choose **Edit** to add a headline, a bio, travel and A/V needs, or to set
+   their status to **Confirmed**.
+4. Choose **Add to Session**, pick the session and their role (Speaker, Moderator or Panelist),
+   and click **Save**. The **x** beside a session takes them out of it.
+5. **Remove** takes a speaker off the event and out of their sessions; the person stays in
+   BarnCRM.
