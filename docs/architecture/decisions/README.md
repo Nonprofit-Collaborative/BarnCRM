@@ -188,6 +188,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0177](0177-events-module.md) | The BarnCRM Event Management module: events with ticket types, tracks, sessions and speakers on Core | Accepted (builder decision) |
 | [0178](0178-duplicate-rules-and-report-subscriptions-through-the-org-connection.md) | Duplicate Rules Starter and report subscriptions through the org connection | Accepted (builder decision) |
 | [0179](0179-radius-find-postal-centroids.md) | Radius Find measures from a shipped postal code table, with no outside geocoding | Accepted (builder decision) |
+| [0180](0180-events-call-for-speakers.md) | Event Management call for speakers: applications, reviewers' scores, and accept or decline notices through chosen email templates | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

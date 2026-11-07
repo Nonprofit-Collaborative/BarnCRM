@@ -1,4 +1,4 @@
-# ADR-NEXT: Event Management call for speakers: applications, reviewers' scores, and accept or decline notices through chosen email templates
+# ADR-0180: Event Management call for speakers: applications, reviewers' scores, and accept or decline notices through chosen email templates
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-07
