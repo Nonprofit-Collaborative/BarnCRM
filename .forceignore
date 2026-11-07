@@ -5,3 +5,4 @@ jsconfig.json
 **/.gitkeep
 **/jsconfig.json
 **/.eslintrc.json
+portal-client/**

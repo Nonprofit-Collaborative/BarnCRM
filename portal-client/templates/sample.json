@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "key": "sample",
+  "title": "My Account",
+  "pages": [
+    {
+      "key": "profile",
+      "title": "My Details",
+      "kind": "person",
+      "fields": [
+        { "field": "FirstName" },
+        { "field": "LastName" },
+        { "field": "MobilePhone", "label": "Mobile", "edit": true },
+        { "field": "Description", "edit": true }
+      ],
+      "actions": ["update"]
+    },
+    {
+      "key": "roles",
+      "title": "My Roles",
+      "kind": "related",
+      "object": "Affiliation__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Organization__r.Name", "label": "Organization" },
+        { "field": "Role__c", "edit": true, "required": true },
+        { "field": "Status__c" }
+      ],
+      "where": [{ "field": "Status__c", "op": "equals", "value": "Current" }],
+      "orderBy": "Role__c ASC",
+      "actions": ["update"]
+    }
+  ]
+}
