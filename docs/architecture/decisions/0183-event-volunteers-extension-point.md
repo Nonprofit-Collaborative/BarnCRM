@@ -1,4 +1,4 @@
-# ADR-NEXT: Event volunteer jobs and shifts live in Volunteers, reached from Event Management through a Core extension point
+# ADR-0183: Event volunteer jobs and shifts live in Volunteers, reached from Event Management through a Core extension point
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-07
