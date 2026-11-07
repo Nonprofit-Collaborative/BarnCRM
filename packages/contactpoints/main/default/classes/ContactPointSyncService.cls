@@ -370,7 +370,6 @@ public without sharing class ContactPointSyncService {
 
 		private Map<Id, SObject> readPeople() {
 			Set<Id> ids = contactIds.clone();
-			ids.removeAll(PersonRecordSelector.getAccountsBehindPersonContacts(ids).keySet());
 			// Field names come from this module's own constants, never from a caller; escaped regardless.
 			String soql = String.escapeSingleQuotes(
 				'SELECT Id, FirstName, LastName, ' +
@@ -384,17 +383,40 @@ public without sharing class ContactPointSyncService {
 
 		/** Each person's current addresses: their own and their household's. */
 		private Map<Id, List<Map<String, Object>>> readAddresses(Set<Id> personIds) {
-			Map<Id, Id> householdByPerson = HouseholdService.getHouseholdIdsFor(personIds);
+			// A person account belongs to households, and owns addresses, by its account (decision 14).
+			Map<Id, Id> accountByContact = PersonRecordSelector.getAccountsBehindPersonContacts(
+				personIds
+			);
+			Map<Id, Id> contactByAccount = new Map<Id, Id>();
+			for (Id contactId : accountByContact.keySet()) {
+				contactByAccount.put(accountByContact.get(contactId), contactId);
+			}
+			Set<Id> askedAbout = new Set<Id>();
+			for (Id personId : personIds) {
+				askedAbout.add(
+					accountByContact.containsKey(personId)
+						? accountByContact.get(personId)
+						: personId
+				);
+			}
+			Map<Id, Id> householdByPerson = HouseholdService.getHouseholdIdsFor(askedAbout);
 			Set<Id> householdIds = new Set<Id>(householdByPerson.values());
 			householdIds.remove(null);
+			Set<Id> ownerAccounts = contactByAccount.keySet();
 			Map<Id, Set<Id>> peopleByHousehold = new Map<Id, Set<Id>>();
-			for (Id personId : householdByPerson.keySet()) {
-				Id householdId = householdByPerson.get(personId);
+			for (Id askedId : householdByPerson.keySet()) {
+				Id householdId = householdByPerson.get(askedId);
 				if (householdId != null) {
 					if (!peopleByHousehold.containsKey(householdId)) {
 						peopleByHousehold.put(householdId, new Set<Id>());
 					}
-					peopleByHousehold.get(householdId).add(personId);
+					peopleByHousehold
+						.get(householdId)
+						.add(
+							contactByAccount.containsKey(askedId)
+								? contactByAccount.get(askedId)
+								: askedId
+						);
 				}
 			}
 			Map<Id, List<Map<String, Object>>> result = new Map<Id, List<Map<String, Object>>>();
@@ -403,6 +425,7 @@ public without sharing class ContactPointSyncService {
 					Id,
 					Contact__c,
 					Account__c,
+					Person_Account__c,
 					Street__c,
 					City__c,
 					State__c,
@@ -414,7 +437,8 @@ public without sharing class ContactPointSyncService {
 				FROM Address__c
 				WHERE
 					(Contact__c IN :personIds
-					OR Account__c IN :householdIds)
+					OR Account__c IN :householdIds
+					OR Person_Account__c IN :ownerAccounts)
 					AND (Status__c = 'Current'
 					OR Status__c = NULL)
 				WITH SYSTEM_MODE
@@ -423,6 +447,10 @@ public without sharing class ContactPointSyncService {
 				Set<Id> owners = new Set<Id>();
 				if (address.Contact__c != null) {
 					owners.add(address.Contact__c);
+				} else if (address.Person_Account__c != null) {
+					if (contactByAccount.containsKey(address.Person_Account__c)) {
+						owners.add(contactByAccount.get(address.Person_Account__c));
+					}
 				} else if (peopleByHousehold.containsKey(address.Account__c)) {
 					owners.addAll(peopleByHousehold.get(address.Account__c));
 				}
@@ -738,15 +766,29 @@ public without sharing class ContactPointSyncService {
 
 	// ------------------------------------------------------------------------------ helpers
 
+	/**
+	 * The contacts behind these people. A person stored as a contact is itself; a person
+	 * account is the contact the platform keeps behind it (decision 14), found only where the
+	 * org has person accounts. Any other id is left out.
+	 */
 	private static Set<Id> contactsOnly(Set<Id> personIds) {
 		Set<Id> result = new Set<Id>();
 		if (personIds == null) {
 			return result;
 		}
+		Set<Id> accounts = new Set<Id>();
 		for (Id personId : personIds) {
-			if (personId != null && personId.getSObjectType() == Contact.SObjectType) {
-				result.add(personId);
+			if (personId == null) {
+				continue;
 			}
+			if (personId.getSObjectType() == Contact.SObjectType) {
+				result.add(personId);
+			} else if (personId.getSObjectType() == Account.SObjectType) {
+				accounts.add(personId);
+			}
+		}
+		if (!accounts.isEmpty() && HouseholdService.isPersonAccountOrg()) {
+			result.addAll(PersonRecordSelector.getPersonContactIds(accounts).values());
 		}
 		return result;
 	}

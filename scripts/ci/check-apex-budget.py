@@ -74,7 +74,8 @@ CAPS = {
     "forms": 44_000,
     # New 2026-11-06 for Contact Point Sync (C-45, ADR-0176 contact point sync module):
     # 43,980 measured with the page and backfill, plus about 2 percent.
-    "contactpoints": 45_000,
+    # C-45e (D-186): 45,798 measured with person accounts and household-move sync, plus about 2%.
+    "contactpoints": 46_800,
     # Event Management (ADR-0177, events module): events, tickets, agenda and speakers (EV-01,
     # EV-03 to EV-05).
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.

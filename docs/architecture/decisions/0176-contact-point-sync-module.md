@@ -40,8 +40,8 @@ this module.
    updated or deleted. When a new copy would duplicate an unlinked Contact Point on the same
    Individual with the same value, that row is adopted (linked) instead, so a first backfill in an
    org that already has Contact Points does not double them.
-4. **What maps.** Contacts only (people stored as accounts are left out; their saves do not fire
-   Contact triggers and their Individual link lives on Account).
+4. **What maps.** Contacts, and (amended 2026-11-07, D-186) people stored as person accounts,
+   where the org has them (decision 14).
    - Email: `Personal_Email__c`, `Work_Email__c`, `Alternate_Email__c` and the standard `Email`,
      one `ContactPointEmail` per distinct address (case ignored), `IsPrimary` on the one that
      equals `Email` (Core's preferred email, R-C6).
@@ -65,11 +65,13 @@ this module.
    copies. Deleting, restoring or changing an address syncs every person it applies to. Erasing a
    person (ADR-0110) clears their fields, so the sync deletes their managed copies; unlinked
    Contact Points are untouched, as ADR-0110 says.
-7. **Through Core's trigger framework.** Two registry rows, each a switch on the Automation page
-   that Pause All covers (not Always Runs): `Contact_Point_Sync_Person` on Contact
-   (`ContactPointPersonHandler`) and `Contact_Point_Sync_Address` on `Address__c`
-   (`ContactPointAddressHandler`), both on by default. A turned-off module runs neither (Core's
-   dispatcher skips a turned-off module's rows).
+7. **Through Core's trigger framework.** Four registry rows (two added 2026-11-07, D-186), each a
+   switch on the Automation page that Pause All covers (not Always Runs): `Contact_Point_Sync_Person`
+   on Contact (`ContactPointPersonHandler`), `Contact_Point_Sync_Address` on `Address__c`
+   (`ContactPointAddressHandler`), `Contact_Point_Sync_Account` on Account
+   (`ContactPointAccountHandler`, decision 14) and `Contact_Point_Sync_Membership` on
+   `Household_Member__c` (`ContactPointMembershipHandler`, decision 15), all on by default. A
+   turned-off module runs none (Core's dispatcher skips a turned-off module's rows).
 8. **Never fails a save.** The sync runs after the save, writes with partial success, and logs
    every refused row to the Error Log; any exception is caught and logged. When too few queries or
    DML statements are left in the transaction, the work is queued instead. The backfill repairs
@@ -100,6 +102,31 @@ this module.
 13. **Portable logic.** Which values map, how they are compared and what changes is decided by a
     pure function over plain maps (`ContactPointPlan`); the page's text and counts come from a
     thin controller returning plain JSON (plan 9.9).
+14. **Person accounts (D-186, 2026-11-07).** A person account is copied as the contact the
+    platform keeps behind it, so its links hang from that contact (`Contact_Point_Link__c` is
+    unchanged), its Individual is the contact's `IndividualId` (the same link as the account's
+    `PersonIndividualId`), and the plan reads the contact's values. Saves of a person account fire
+    Account triggers, not Contact triggers, so `ContactPointAccountHandler` syncs after an insert,
+    an undelete, a change of an email or phone field (`ContactPointPlan.accountFieldFor` names the
+    account field of each person field) or of the Individual, removes the copies before the
+    account is deleted, and syncs a merge's survivor. A person account's own addresses are
+    `Address__c.Person_Account__c`; its household addresses come through its account side of a
+    membership. Households and organizations are never touched. Person accounts stay optional:
+    no compile-time reference to `IsPersonAccount` or a person field; the handler reads field
+    names from the values a record carries, ids resolve through Core's `PersonRecordSelector`,
+    and an org without person accounts returns before anything else (the backfill already covers
+    the contacts behind them). Contact Point Sync keeps working unchanged on a Platform-only org.
+15. **Household moves sync at once (D-186).** In junction mode a person who joins, leaves or
+    moves household changes a `Household_Member__c` row, which fires no Contact trigger.
+    `ContactPointMembershipHandler` takes the people from Core's
+    `HouseholdService.membershipChangeOf` (which also forgets the cached household answers, so
+    the new household is read) and syncs their address copies in the same transaction, or in an
+    immediately queued job when the transaction has too little room (decision 8). In contact mode
+    the move is the contact's `AccountId`, which the Contact handler already syncs in the same
+    save; it now also forgets the cached households first. A household's address change was
+    already followed through `Address__c` (decision 6). A turned-off row (decision 7) leaves the
+    addresses to catch up at the next save or the backfill. Bulk-safe: one run per trigger chunk
+    of up to 200 rows.
 
 ## Alternatives considered
 
@@ -111,8 +138,10 @@ this module.
   already lives on `Address__c`, and consumers of Contact Points read current rows.
 - **User mode for the copy.** Rejected (decision 9): it leaves copies stale whenever someone
   without Contact Point access edits a person.
-- **Person accounts.** Left out of this release: their Individual link and email fields live on
-  Account and their saves fire Account triggers. A later release can add an Account handler.
+- **Person accounts left out.** The first release's choice; reversed by D-186 (decision 14).
+- **A second link object keyed to Account for person accounts.** Rejected: the contact behind a
+  person account already carries the fields, the Individual link and the master-detail the links
+  need.
 
 ## Consequences
 

@@ -44,6 +44,28 @@ public with sharing class ContactPointPlan {
 		return fields;
 	}
 
+	/**
+	 * The field a person stored as an account holds a person field's value on: the standard
+	 * field's person name (`Email` is `PersonEmail`), a custom field's `__pc` twin. Plain text,
+	 * so a person account's changes can be read without naming a field the org may lack.
+	 */
+	public static String accountFieldFor(String personField) {
+		if (personField.endsWith('__c')) {
+			return personField.removeEnd('__c') + '__pc';
+		}
+		// The account's own Phone is the phone on the person behind it.
+		return personField == 'Phone' ? 'Phone' : 'Person' + personField;
+	}
+
+	/** The account fields a person account's saves are checked against, one per person field. */
+	public static List<String> accountFields() {
+		List<String> fields = new List<String>();
+		for (String field : personFields()) {
+			fields.add(accountFieldFor(field));
+		}
+		return fields;
+	}
+
 	/** One Contact Point the person should have. */
 	public class Desired {
 		public String kind;

@@ -22,6 +22,22 @@ private class ContactPointPlanTest {
 	}
 
 	@IsTest
+	static void aPersonAccountHoldsEachPersonFieldUnderItsAccountName() {
+		Assert.areEqual('PersonEmail', ContactPointPlan.accountFieldFor('Email'));
+		Assert.areEqual('PersonHomePhone', ContactPointPlan.accountFieldFor('HomePhone'));
+		Assert.areEqual('Phone', ContactPointPlan.accountFieldFor('Phone'));
+		Assert.areEqual(
+			'Personal_Email__pc',
+			ContactPointPlan.accountFieldFor('Personal_Email__c')
+		);
+		Assert.areEqual(
+			ContactPointPlan.personFields().size(),
+			ContactPointPlan.accountFields().size(),
+			'One account field per person field'
+		);
+	}
+
+	@IsTest
 	static void oneCopyPerDistinctEmailAndPhoneThePreferredOnePrimary() {
 		Map<String, Object> person = new Map<String, Object>{
 			'Personal_Email__c' => 'ana@home.example',

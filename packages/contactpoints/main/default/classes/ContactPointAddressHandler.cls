@@ -20,6 +20,7 @@ public with sharing class ContactPointAddressHandler extends TriggerHandler {
 	private static final List<String> WATCHED = new List<String>{
 		'Contact__c',
 		'Account__c',
+		'Person_Account__c',
 		'Street__c',
 		'City__c',
 		'State__c',
@@ -70,8 +71,12 @@ public with sharing class ContactPointAddressHandler extends TriggerHandler {
 		for (SObject record : records) {
 			Id personId = (Id) record.get('Contact__c');
 			Id accountId = (Id) record.get('Account__c');
+			Id personAccountId = (Id) record.get('Person_Account__c');
 			if (personId != null) {
 				people.add(personId);
+			} else if (personAccountId != null) {
+				// A person account's own address (decision 14).
+				people.add(personAccountId);
 			} else if (accountId != null) {
 				households.add(accountId);
 			}
