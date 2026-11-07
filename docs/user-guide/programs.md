@@ -212,7 +212,7 @@ start the note with **New Note** under the goal (see below).
 A person's service plan is their goals, each with the steps toward it, kept on their enrollment.
 
 1. Open the person's enrollment (click their name in the **Program Roster** panel).
-2. On the **Service Plan** panel, click **Add Goal**. Write the **Goal** (for example, "Find stable
+2. On the **Service Plan** tab, click **Add Goal**. Write the **Goal** (for example, "Find stable
    housing"), and fill in what you know: a **Description**, the **Status**, who it is **Assigned
    To**, a **Target Date** and the **Next Review** date. Where your organization uses Logic Models
    you can also pick the **Outcome** the goal works toward.
@@ -245,7 +245,7 @@ A cohort is a group that goes through a program together, such as the spring cla
 
 1. Open the program and, in the **Cohorts** list, click **New**. Give the cohort a **Cohort
    Name**, and a **Start Date** and **End Date** if it has them. Click **Save**.
-2. On the cohort, the **Cohort Members** panel lists who is in it. Under **Add People**:
+2. On the cohort's **Members** tab, the **Cohort Members** panel lists who is in it. Under **Add People**:
    - tick the people already enrolled in the program who are not in a cohort, or click **Select
      All**;
    - for anyone else, pick the person and click **Add to List**, as many times as you need.
@@ -302,7 +302,7 @@ new sessions in the **Sessions** list.
 ## To Take Attendance at a Session
 
 1. Open the session (from the **Sessions** tab or the cohort's **Sessions** list).
-2. The **Service Delivery Log** panel shows the session's service and day and lists the
+2. On the **Attendance** tab, the **Service Delivery Log** panel shows the session's service and day and lists the
    cohort's members (everyone enrolled in the program for a session with no cohort). Set each
    person's **Attendance** and **Quantity**, or click **Mark All Present**.
 3. Click **Save**.
