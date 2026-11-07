@@ -49,18 +49,31 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 ## T-CPS-04: Switches and Pause All
 
-**Purpose:** confirm a kind turned off is left alone and that Pause All covers both automations.
+**Purpose:** confirm a kind turned off is left alone and that Pause All covers all four automations.
 **Prerequisites:** admin.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Contact Points**. Untick **Sync Phones** and save. | The setting saves. The Contact Point Sync page says Phone is `turned off in BarnCRM Settings, Contact Points.` |
 | 2 | Change a person's **Home Phone** and save. | Their Contact Point Phone keeps the old number. |
-| 3 | Tick **Sync Phones** again and save. Open the **Automation** page. | Two rows, **Contact Point Sync: People** and **Contact Point Sync: Addresses**, both on. |
+| 3 | Tick **Sync Phones** again and save. Open the **Automation** page. | Four rows, **Contact Point Sync: People**, **Addresses**, **Person Accounts** and **Household Moves**, all on. |
 | 4 | Click **Pause All**. Change the person's **Personal Email** and save. | Their Contact Point Email keeps the old address. |
 | 5 | Resume automation, then run the backfill from the Contact Point Sync page. | After the backfill, the phone and the email match the person. |
 
 **Cleanup:** Make sure automation is resumed.
+
+## T-CPS-06: Household Moves and Person Accounts
+
+**Purpose:** confirm a household move is copied at once, and that person accounts are copied like contacts where the org has them.
+**Prerequisites:** admin; two households with different current addresses; a person with an email who belongs to the first household. For step 3, an org with Person Accounts turned on (skip it in any other org).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Move the person to the second household (change their membership, or their account, to the second household). Do not save the person again. | Their Individual's Contact Point Address now shows the second household's street and no longer the first's. |
+| 2 | On the **Automation** page, switch off **Contact Point Sync: Household Moves**. Move the person back. | The Contact Point Address does not change yet. Switch the row back on and save the person: it catches up. |
+| 3 | Create a person account with an email and a home address; change the email. | Their Individual has the Contact Point Email and Address; the email follows the change. Deleting the person account removes the copies. |
+
+**Cleanup:** Switch **Household Moves** back on; delete the test people.
 
 ## T-CPS-05: An Org Without the Individual Object, and a Person Without the Permission
 

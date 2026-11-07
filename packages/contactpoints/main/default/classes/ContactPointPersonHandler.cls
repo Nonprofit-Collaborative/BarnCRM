@@ -53,6 +53,9 @@ public with sharing class ContactPointPersonHandler extends TriggerHandler {
 		if (ContactPointSyncService.running) {
 			return;
 		}
+		// A person who moved household: forget who was said to belong where, so the household
+		// addresses are read for the new household in this same transaction (decision 15).
+		HouseholdService.membershipChangeOf(newRecords(), oldRecordsById());
 		Set<Id> valuesOnly = new Set<Id>();
 		Set<Id> everything = new Set<Id>();
 		for (SObject record : newRecords()) {

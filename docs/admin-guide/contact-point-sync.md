@@ -18,7 +18,8 @@ BarnCRM itself never reads Contact Points. Only install this module if your org 
   the Individual object on in Setup, under **Data Protection and Privacy** ("Make data protection
   details available in records"). Without it the module installs but copies nothing, and its page
   says why.
-- People stored as person accounts are not copied in this release.
+- If your org stores people as person accounts, they are copied too, exactly like contacts.
+  Person accounts are optional: without them nothing changes.
 
 ## How the Copy Works
 
@@ -33,6 +34,10 @@ BarnCRM itself never reads Contact Points. Only install this module if your org 
   - Address: every **Current** address that is the person's own or their household's. The
     primary address is marked default. Former and undeliverable addresses are not copied: their
     Contact Points are removed, and the history stays on the address.
+- **Moving household.** When a person joins, leaves or moves to another household (or a
+  household's address changes), their address copies are updated right away, in the same save
+  (or in a background job straight after when the save has little room left), not at the
+  person's next save.
 - **Each copy hangs from the person's Individual.** A person with something to copy and no
   Individual gets one, named after them.
 - **Contact Points BarnCRM did not make are left alone.** BarnCRM remembers which Contact Points
@@ -58,8 +63,10 @@ In **BarnCRM Settings**, **Contact Points** section:
 Turning a kind off stops copying it and leaves the copies already made as they are. **Open
 Contact Point Sync** opens the module's page.
 
-The two automations, **Contact Point Sync: People** and **Contact Point Sync: Addresses**, are on
-the **Automation** page, where you can switch each off or pause all automation.
+The four automations, **Contact Point Sync: People**, **Contact Point Sync: Addresses**,
+**Contact Point Sync: Person Accounts** and **Contact Point Sync: Household Moves**, are on the
+**Automation** page, where you can switch each off or pause all automation. With Household Moves
+off, a moved person's addresses catch up at their next save or with the backfill.
 
 ## The Contact Point Sync Page
 

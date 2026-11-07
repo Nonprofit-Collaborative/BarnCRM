@@ -12802,6 +12802,19 @@ moves a second one onto the survivor is cleaned up at the survivor's sync.
 **R-CPL4 Delete follows the person.** Deleting a person deletes their managed Contact Points;
 their links go with them (master-detail) and come back on undelete, when the sync makes new copies.
 
+**R-CPL5 Person accounts (D-186).** Where the org stores people as person accounts, a person
+account is copied as the contact the platform keeps behind it: the link's Person is that contact,
+the values are the contact's, and the account's own addresses (`Address__c.Person_Account__c`) and
+household addresses (through the account side of a membership) count as the person's. Saves of the
+account trigger the sync (a new, restored or changed email or phone, a changed Individual, a merge
+survivor); deleting the account removes the copies. No Person Account field is named at compile
+time; an org without person accounts is unaffected.
+
+**R-CPL6 A household move syncs at once (D-186).** A person who joins, leaves or moves household
+(a membership row added, changed, ended, removed or restored, or a contact's account changed) has
+their address copies synced in that same transaction, or in an immediately queued job when it has
+too little room, not at their next save.
+
 ### Salesforce implementation
 
 - **Object:** `Contact_Point_Link__c`, name field AutoNumber `CPL-{000000}`, sharing Controlled By
@@ -12815,8 +12828,10 @@ their links go with them (master-detail) and come back on undelete, when the syn
 | Contact Point ID | `Contact_Point_Id__c` | Text(18) |
 
 - **Classes:** `ContactPointPlan` (the pure comparison), `ContactPointSyncService` (reads, plans,
-  writes), `ContactPointPersonHandler` and `ContactPointAddressHandler` (registry rows
-  `Contact_Point_Sync_Person`, `Contact_Point_Sync_Address`), `ContactPointBackfillBatch`.
+  writes), `ContactPointPersonHandler`, `ContactPointAddressHandler`, `ContactPointAccountHandler`
+  and `ContactPointMembershipHandler` (registry rows `Contact_Point_Sync_Person`,
+  `Contact_Point_Sync_Address`, `Contact_Point_Sync_Account`, `Contact_Point_Sync_Membership`),
+  `ContactPointBackfillBatch`.
 
 ---
 
@@ -13597,6 +13612,7 @@ mirrors the primary member).
 | 1.0 | 2026-11-06 | Shipped organization record type (owner decision D-184, ADR-0173, amends ADR-0141 decision 2). Account gains the record type `BarnCRM_Organization` (active, given to nobody). Section 8 gains R-O4a: offered for organizations only where the org has no record type of its own, never detected, never switched to automatically; R-O5 leaves it out of the candidates. |
 | 1.1 | 2026-11-06 | Forms module (C-42a, D-157, ADR-0175 `0175-forms-module.md`). New package BarnCRM Forms with Sections 29ZW Form (`Form__c`), 29ZX Form Version (`Form_Version__c`) and 29ZY Form Submission (`Form_Submission__c`), rules R-FM1, R-FM2 and R-FS1 to R-FS4. Core gains no object or field: only the `FormAttachmentExtension` seam and the catalog row `BarnCRM_Module.Forms`. |
 | 1.1 | 2026-11-06 | BarnCRM Contact Point Sync module (C-45, D-111, ADR-0176 contact point sync module). New package `contactpoints`: Contact Point Link (`Contact_Point_Link__c`, 29ZZ, rules R-CPL1 to R-CPL4) and Contact Point Sync Settings (`Contact_Point_Sync_Settings__c`, 29ZZ1, R-CPS1). No Core object or field added. |
+| 1.1 | 2026-11-07 | Contact Point Sync: person accounts and household moves (C-45e, D-186, ADR-0176 decisions 14 and 15). Rules R-CPL5 and R-CPL6 added to Contact Point Link. Two Automation Registry rows (`Contact_Point_Sync_Account`, `Contact_Point_Sync_Membership`). No object or field added. |
 | 1.2 | 2026-11-06 | Event Management module (EV-01, EV-03, EV-04, EV-05; ADR-0177 `0177-events-module.md`, D-123, D-177). Seven objects in the new package `packages/events`: Event (`Event__c`, 29EV1), Ticket Type (`Ticket_Type__c`, 29EV2), Promo Code (`Promo_Code__c`, 29EV3), Event Track (`Event_Track__c`, 29EV4), Event Session (`Event_Session__c`, 29EV5), Event Speaker (`Event_Speaker__c`, 29EV6) and Session Speaker (`Session_Speaker__c`, 29EV7), with rules R-EV1 to R-EV4, R-TT1 to R-TT4, R-PC1 to R-PC5, R-ETR1, R-ESN1 to R-ESN5, R-ESP1 to R-ESP3 and R-SSP1. Registrations, attendees, call for speakers and sponsorship are designed in the ADR and added by their items. |
 
 ---
