@@ -8,6 +8,7 @@ import AddressPanel from 'c/addressPanel';
 import { graphql } from 'lightning/graphql';
 import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi';
 import { getObjectInfo } from 'lightning/uiObjectInfoApi';
+import isFeatureOn from '@salesforce/apex/AddressMoveController.isFeatureOn';
 import getCardContext from '@salesforce/apex/AddressMoveController.getCardContext';
 import getMovePreview from '@salesforce/apex/AddressMoveController.getMovePreview';
 import useForWholeHousehold from '@salesforce/apex/AddressMoveController.useForWholeHousehold';
@@ -48,6 +49,14 @@ jest.mock('@salesforce/label/c.Core_Address_DateSince', () => ({ default: 'Since
   virtual: true
 });
 
+jest.mock(
+  '@salesforce/apex/AddressMoveController.isFeatureOn',
+  () => {
+    const { createApexTestWireAdapter } = jest.requireActual('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
 jest.mock(
   '@salesforce/apex/AddressMoveController.getCardContext',
   () => {
@@ -136,6 +145,7 @@ function build(objectApiName = 'Account', access = STAFF_ACCESS) {
   element.objectApiName = objectApiName;
   document.body.appendChild(element);
   getObjectInfo.emit(access);
+  isFeatureOn.emit(true);
   return element;
 }
 
@@ -149,6 +159,18 @@ describe('c-address-panel', () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+  });
+
+  it('shows nothing while the Addresses feature is off (D-185)', async () => {
+    const element = build();
+    isFeatureOn.emit(false);
+    graphql.emit(response([HOME]));
+    await flush();
+
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+    isFeatureOn.emit(true);
+    await flush();
+    expect(element.shadowRoot.querySelector('lightning-card')).not.toBeNull();
   });
 
   it('asks for the addresses of the record it sits on', async () => {
@@ -221,6 +243,7 @@ describe('c-address-panel', () => {
     element.recordId = RECORD_ID;
     element.objectApiName = 'Account';
     document.body.appendChild(element);
+    isFeatureOn.emit(true);
     graphql.emit(response([HOME, WINTER]));
     await flush();
 

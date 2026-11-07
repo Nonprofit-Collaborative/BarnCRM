@@ -4,6 +4,12 @@
  * in needs the server, because it depends on the record's type and the org's shape.
  */
 public with sharing class AffiliationController {
+	/** Whether the Affiliations feature is on: the card shows nothing while it is off (D-185). */
+	@AuraEnabled(cacheable=true)
+	public static Boolean isFeatureOn() {
+		return FeatureSwitchService.isOn(FeatureSwitchService.AFFILIATIONS);
+	}
+
 	/**
 	 * Which lookups a new affiliation added from this record's card fills in: the record's
 	 * own (`ownerField`) and the other end's (`otherEndField`).

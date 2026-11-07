@@ -195,7 +195,7 @@ BarnCRM's **Work Phone**.
 - Problem: you typed into **Email** or **Phone** and it changed back. Once a preferred email
   or phone is set, those fields are filled from your choice on every save. Edit the address
   or number you chose instead, or clear the preference.
-- Problem: there is no **Addresses** card. The Addresses feature is off. Ask your admin.
+- Problem: there is no **Addresses** card. The Addresses feature is off, and its card hides on every record page while it is (D-185). Ask your admin.
 
 ## Related
 

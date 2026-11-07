@@ -12,6 +12,7 @@ import { localIsoDate } from 'c/findCsv';
 import { opensElsewhere, recordHref } from 'c/recordRows';
 import { followLinkInWorkspace } from 'c/workspaceTabs';
 
+import isFeatureOn from '@salesforce/apex/AddressMoveController.isFeatureOn';
 import getCardContext from '@salesforce/apex/AddressMoveController.getCardContext';
 import getCardFields from '@salesforce/apex/AddressMoveController.getCardFields';
 import getMovePreview from '@salesforce/apex/AddressMoveController.getMovePreview';
@@ -262,6 +263,13 @@ export default class AddressPanel extends NavigationMixin(LightningElement) {
   helpReady = isHelpLoaded('Core');
 
   @wire(EnclosingTabId) enclosingTabId;
+
+  // The card shows nothing while the Addresses feature is off (D-185).
+  @wire(isFeatureOn) featureOn;
+
+  get isShown() {
+    return this.helpReady && Boolean(this.featureOn && this.featureOn.data);
+  }
 
   icons = { address: iconFor('Address__c') };
 
