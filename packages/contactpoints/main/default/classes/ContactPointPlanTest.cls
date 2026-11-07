@@ -1,0 +1,124 @@
+/**
+ * What a person's Contact Points should be (R-CPL2), worked out from plain values.
+ */
+@IsTest(testFor='ApexClass:ContactPointPlan')
+private class ContactPointPlanTest {
+	// runs-as: deploying user (pure logic: plans from plain maps, no DML or SOQL)
+
+	private static final Set<String> ALL_KINDS = new Set<String>{
+		ContactPointPlan.EMAIL,
+		ContactPointPlan.PHONE,
+		ContactPointPlan.ADDRESS
+	};
+
+	private static Map<String, ContactPointPlan.Desired> byKey(
+		List<ContactPointPlan.Desired> plan
+	) {
+		Map<String, ContactPointPlan.Desired> result = new Map<String, ContactPointPlan.Desired>();
+		for (ContactPointPlan.Desired wanted : plan) {
+			result.put(wanted.key(), wanted);
+		}
+		return result;
+	}
+
+	@IsTest
+	static void oneCopyPerDistinctEmailAndPhoneThePreferredOnePrimary() {
+		Map<String, Object> person = new Map<String, Object>{
+			'Personal_Email__c' => 'ana@home.example',
+			'Work_Email__c' => 'ANA@home.example ',
+			'Alternate_Email__c' => 'ana@work.example',
+			'Email' => 'ana@work.example',
+			'HomePhone' => '(555) 010-0001',
+			'MobilePhone' => '555 010 0002',
+			'Phone' => '555.010.0002'
+		};
+
+		Map<String, ContactPointPlan.Desired> plan = byKey(
+			ContactPointPlan.plan(person, null, ALL_KINDS)
+		);
+
+		Assert.areEqual(4, plan.size(), 'Two emails and two phones: duplicates are one copy');
+		ContactPointPlan.Desired personal = plan.get('Email|Personal_Email__c');
+		Assert.areEqual('ana@home.example', personal.values.get('EmailAddress'));
+		Assert.areEqual(false, personal.values.get('IsPrimary'), 'Not the preferred email');
+		Assert.areEqual(
+			true,
+			plan.get('Email|Alternate_Email__c').values.get('IsPrimary'),
+			'The address equal to Email is primary'
+		);
+		Assert.areEqual('Home', plan.get('Phone|HomePhone').values.get('PhoneType'));
+		Assert.areEqual(
+			true,
+			plan.get('Phone|MobilePhone').values.get('IsPrimary'),
+			'Digits compared: the mobile is the preferred phone'
+		);
+		Assert.isFalse(plan.containsKey('Phone|Phone'), 'The standard phone repeats the mobile');
+	}
+
+	@IsTest
+	static void onlyCurrentAddressesAndOnlyTheKindsAsked() {
+		List<Map<String, Object>> addresses = new List<Map<String, Object>>{
+			new Map<String, Object>{
+				'Id' => 'a01000000000001',
+				'Street__c' => '1 Main St',
+				'City__c' => 'Springfield',
+				'Postal_Code__c' => '01101',
+				'Is_Default__c' => true,
+				'Type__c' => 'Home',
+				'Status__c' => 'Current'
+			},
+			new Map<String, Object>{
+				'Id' => 'a01000000000002',
+				'Street__c' => '9 Old Rd',
+				'Status__c' => 'Former'
+			},
+			new Map<String, Object>{ 'Id' => 'a01000000000003' }
+		};
+
+		List<ContactPointPlan.Desired> plan = ContactPointPlan.plan(
+			new Map<String, Object>{ 'Email' => 'a@b.example' },
+			addresses,
+			new Set<String>{ ContactPointPlan.ADDRESS }
+		);
+
+		Assert.areEqual(1, plan.size(), 'A former and an empty address are not copied; no email');
+		Assert.areEqual('Address|a01000000000001', plan[0].key());
+		Assert.areEqual(true, plan[0].values.get('IsDefault'));
+		Assert.areEqual('Home', plan[0].values.get('Name'));
+		Assert.areEqual('1 main st|springfield|01101', plan[0].matchKey());
+	}
+
+	@IsTest
+	static void differencesAndMatchKeys() {
+		Map<String, Object> wanted = new Map<String, Object>{
+			'EmailAddress' => 'a@b.example',
+			'IsPrimary' => true
+		};
+		Assert.isTrue(
+			ContactPointPlan.differences(
+					wanted,
+					new Map<String, Object>{ 'EmailAddress' => 'a@b.example', 'IsPrimary' => true }
+				)
+				.isEmpty(),
+			'Nothing to change'
+		);
+		Assert.areEqual(
+			new Set<String>{ 'EmailAddress' },
+			ContactPointPlan.differences(
+				wanted,
+				new Map<String, Object>{ 'EmailAddress' => 'old@b.example', 'IsPrimary' => true }
+			)
+		);
+		Assert.areEqual(
+			'5550100001',
+			ContactPointPlan.matchKey(
+				ContactPointPlan.PHONE,
+				new Map<String, Object>{ 'TelephoneNumber' => '(555) 010-0001' }
+			)
+		);
+		Assert.isNull(
+			ContactPointPlan.matchKey(ContactPointPlan.ADDRESS, new Map<String, Object>())
+		);
+		Assert.isTrue(ContactPointPlan.plan(null, null, ALL_KINDS).isEmpty(), 'No person, no plan');
+	}
+}

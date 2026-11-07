@@ -1,0 +1,7 @@
+{
+  "languages": ["en"],
+  "texts": {
+    "ContactPoints_Log_NotQueued": "Contact Point Sync could not copy the changes of {0} people in this save and could not queue them either. Run the backfill on the Contact Point Sync page.",
+    "ContactPoints_Log_Refused": "Contact Point Sync could not save a {0} copy for {1}: {2}"
+  }
+}
