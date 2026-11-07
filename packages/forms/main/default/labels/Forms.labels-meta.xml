@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Forms_Builder_Title</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Form Builder panel title</shortDescription>
+        <value>Form Builder</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_SaveDraft</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that saves the form draft</shortDescription>
+        <value>Save Draft</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_Publish</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that publishes the form draft</shortDescription>
+        <value>Publish</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_AddQuestion</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Button that adds a question to a step</shortDescription>
+        <value>Add Question</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_StepTitle</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Step title input</shortDescription>
+        <value>Step Title</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_Question</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Question wording input</shortDescription>
+        <value>Question</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_Key</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Question key input</shortDescription>
+        <value>Key</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_LongText</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Answer type for a long text answer</shortDescription>
+        <value>Long Text</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_Choices</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Picklist choices input</shortDescription>
+        <value>Choices</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_WriteTo</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Record an answer is written to</shortDescription>
+        <value>Write To</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_ShowWhen</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Condition section heading</shortDescription>
+        <value>Show When</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_Always</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Condition choice: always shown</shortDescription>
+        <value>Always</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_AllTrue</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Condition choice: every clause holds</shortDescription>
+        <value>All Are True</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_AnyTrue</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Condition choice: one clause holds</shortDescription>
+        <value>Any Is True</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_GreaterThan</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Condition test: greater than</shortDescription>
+        <value>is greater than</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_LessThan</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Condition test: less than</shortDescription>
+        <value>is less than</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_Records</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Records section heading</shortDescription>
+        <value>Records to Write</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_AddRecord</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Menu that adds a record to write</shortDescription>
+        <value>Add Record</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_Related</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Record kind: a related record</shortDescription>
+        <value>Related Record</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_MatchBy</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>How a person or organization is matched</shortDescription>
+        <value>Match By</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_WhenFound</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>What happens to a matched record</shortDescription>
+        <value>When Found</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_LinkTo</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Record a lookup field links to</shortDescription>
+        <value>Link To</value>
+    </labels>
+    <labels>
+        <fullName>Forms_Builder_Problems</fullName>
+        <categories>Forms</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Heading over the problems to fix</shortDescription>
+        <value>Fix Before Publishing</value>
+    </labels>
+</CustomLabels>

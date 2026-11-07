@@ -10,6 +10,10 @@
     <visible>true</visible>
   </applicationVisibilities>
   <classAccesses>
+    <apexClass>FormBuilderController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>FormRunnerController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
