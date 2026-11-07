@@ -1,5 +1,5 @@
 /**
- * Public forms' checks in Health Check, in the Settings console (C-42b; ADR-NEXT public forms on
+ * Public forms' checks in Health Check, in the Settings console (C-42b; ADR-0184 public forms on
  * a Salesforce Site, decision 9; ADR-0057's extension seam, ADR-0125's fixes). Core finds this
  * class by name (`HealthCheckExtensions.EXTENSION_CLASSES`).
  *

@@ -192,6 +192,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0181](0181-events-sponsorship.md) | Event Management sponsorship: levels, sponsors on Core accounts, a deliverables checklist, and an optional link to Giving or Funders through Core | Accepted (builder decision) |
 | [0182](0182-event-registrations.md) | Event registrations and attendees, reminders and No-Show, and the Summit Events adapter | Accepted (builder decision) |
 | [0183](0183-event-volunteers-extension-point.md) | Event volunteer jobs and shifts live in Volunteers, reached from Event Management through a Core extension point | Accepted (builder decision) |
+| [0184](0184-public-forms-on-a-salesforce-site.md) | Public forms on a Salesforce Site: a guest intake that only stores answers, processing as a staff user, spam checks with no outside service, and one submit service for a Site page and an API caller | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

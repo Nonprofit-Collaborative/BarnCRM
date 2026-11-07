@@ -13,7 +13,7 @@
  *   records: [{ key, kind: 'person' | 'organization' | 'related', object?, matching?: { rule,
  *     onMatch }, links?: { field: recordKey | 'context' }, values?: { field: constant } }],
  *   public?: { enabled, minSeconds?, hourlyLimit?, confirmation? } }
- * `public` (C-42b, ADR-NEXT public forms on a Salesforce Site) lets the published version be
+ * `public` (C-42b, ADR-0184 public forms on a Salesforce Site) lets the published version be
  * filled in on a Salesforce Site or by an API caller.
  */
 

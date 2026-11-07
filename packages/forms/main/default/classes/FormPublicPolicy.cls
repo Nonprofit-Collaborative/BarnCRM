@@ -1,5 +1,5 @@
 /**
- * What a public form may do (canonical model R-FM3; ADR-NEXT public forms on a Salesforce Site,
+ * What a public form may do (canonical model R-FM3; ADR-0184 public forms on a Salesforce Site,
  * decisions 3, 4 and 6): its spam settings, the allowlist of what it may write, and the copy of
  * its definition a guest is given.
  *

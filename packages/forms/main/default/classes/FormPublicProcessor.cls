@@ -1,5 +1,5 @@
 /**
- * Processes public submissions (canonical model R-FS6; ADR-NEXT public forms on a Salesforce
+ * Processes public submissions (canonical model R-FS6; ADR-0184 public forms on a Salesforce
  * Site, decision 2). Scheduled from Health Check by an administrator, it runs as that
  * administrator, so Core's matchers find people in user mode exactly as for a staff submission;
  * the guest who sent the answers never reads a record.

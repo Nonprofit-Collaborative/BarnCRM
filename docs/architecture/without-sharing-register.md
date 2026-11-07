@@ -118,7 +118,7 @@ into five kinds:
 
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
-| FormIntakeService | Platform | A Site guest user, who has no object access, loads one published public form and version and stores one Received submission; it never reads a person, an organization or any other record, and processing runs later in user mode | ADR-NEXT public forms on a Salesforce Site |
+| FormIntakeService | Platform | A Site guest user, who has no object access, loads one published public form and version and stores one Received submission; it never reads a person, an organization or any other record, and processing runs later in user mode | ADR-0184 public forms on a Salesforce Site |
 
 ## Mirror
 

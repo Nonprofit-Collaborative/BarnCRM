@@ -1,5 +1,5 @@
 /**
- * The org's active Salesforce Sites, for public forms (C-42b; ADR-NEXT public forms on a
+ * The org's active Salesforce Sites, for public forms (C-42b; ADR-0184 public forms on a
  * Salesforce Site, decision 9): their guest users, for Health Check, and their addresses, for the
  * Form Builder's public links. Experience Cloud sites are left out (ADR-0009).
  *
