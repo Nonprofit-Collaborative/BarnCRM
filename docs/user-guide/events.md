@@ -67,6 +67,18 @@ Use **When** to look at one day at a time, or at the sessions with no time yet.
 5. **Remove** takes a speaker off the event and out of their sessions; the person stays in
    BarnCRM.
 
+## Manage Sponsors
+
+1. Open the event and click the **Sponsors** tab. **Add Level** makes a tier (Gold, Silver) with
+   its amount, benefits and a deliverables list, one per line.
+2. Choose a **Level** in the list above **Add Sponsor**, then pick the sponsoring organization. It
+   is added as **Prospect**, with the level's amount and checklist.
+3. In the checklist under a sponsor, change each item's status (Pending, Requested, Received,
+   Done) as the logo, booth and passes come together. **Add Deliverable** in the sponsor's menu
+   adds another item.
+4. From the sponsor's menu, **Edit** sets the status to **Committed** or **Confirmed**, the amount
+   and the contact. The total above the table adds up Committed and Confirmed amounts.
+
 ## Review Speaker Applications
 
 1. Open the event and click the **Applications** tab. **Add Application** adds a proposal: its

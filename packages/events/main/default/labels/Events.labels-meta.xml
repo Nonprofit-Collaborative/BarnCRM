@@ -208,4 +208,12 @@
         <shortDescription>Event page tab: the call for speakers, with proposals and their scores</shortDescription>
         <value>Applications</value>
     </labels>
+    <labels>
+        <fullName>Events_EventTab_Sponsors</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: sponsorship levels, sponsors and their deliverables</shortDescription>
+        <value>Sponsors</value>
+    </labels>
 </CustomLabels>

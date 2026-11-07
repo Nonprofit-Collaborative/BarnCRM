@@ -142,3 +142,27 @@ none (`Kim Wu`), and two active email templates with developer names `Speaker_Ac
 | 12 | As read-only, open **Applications**. | The list shows; no **Add Application**, no Score, Accept or Decline. |
 
 **Cleanup:** Delete the applications and Ana Garcia as a speaker.
+
+## T-EV-13: Sponsorship
+
+**Purpose:** confirm levels, adding sponsors with the level's amount and checklist, deliverable
+statuses, the totals and the one-per-organization rule.
+**Prerequisites:** staff, an event, and organizations `Acme Software` and `Beta Org`.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event, click **Sponsors**. | Empty states for levels and sponsors; **Add Level**. |
+| 2 | **Add Level**: Level Name `Gold`, Amount `5000`, Deliverables `Logo for the program`, `Booth`, `Passes` on three lines. Save. | A `Gold` row with amount 5,000. |
+| 3 | Choose level `Gold`, pick `Acme Software` in **Add Sponsor**. | A sponsor row, **Prospect**, amount 5,000, `0/3` deliverables; the checklist lists a Logo, a Booth and a Passes item. |
+| 4 | Pick `Acme Software` again. | Refused: Acme Software is already a sponsor of this event. |
+| 5 | Set the Logo item to **Done**. | The row shows `1/3`. |
+| 6 | Menu **Add Deliverable**: `Banner at the entrance`, Other, **Save**. | `1/4`; the new item is listed. |
+| 7 | Menu **Edit**: Status **Committed**. Save. | The line above the table reads Committed and confirmed: 5,000. |
+| 8 | Choose **No Level**, pick `Beta Org`. Edit it: Status **Confirmed**, Amount `1500`. | A second sponsor with no level; the total reads 6,500. |
+| 9 | Menu **Edit** on `Acme Software`: paste into **Linked Record** the identifier of any Giving gift (only if Giving is installed). | With Giving: its name shows under the sponsor. Without Giving, or an identifier of anything else: no name and no error. |
+| 10 | On the level `Gold` menu, **Remove**, confirm. | The level is gone; `Acme Software` stays with no level and its checklist. |
+| 11 | Menu **Remove** on `Beta Org`, confirm. | The sponsor and its checklist are gone; the organization is still in BarnCRM. |
+| 12 | As read-only, open **Sponsors**. | The lists show; no Add Level, no Add Sponsor, and the menus offer only Remove for staff (hidden or refused). |
+
+**Cleanup:** Delete the sponsors and levels.

@@ -122,11 +122,14 @@ public with sharing class ModuleManagerService {
 			'Event__c',
 			'Event_Session__c',
 			'Event_Speaker__c',
+			'Event_Sponsor__c',
 			'Event_Track__c',
 			'Promo_Code__c',
 			'Session_Speaker__c',
 			'Speaker_Application__c',
 			'Speaker_Review__c',
+			'Sponsor_Deliverable__c',
+			'Sponsorship_Level__c',
 			'Ticket_Type__c'
 		}
 	};

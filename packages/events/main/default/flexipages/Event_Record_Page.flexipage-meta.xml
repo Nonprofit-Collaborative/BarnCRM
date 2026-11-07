@@ -75,6 +75,16 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentName>eventSponsors</componentName>
+        <identifier>eventSponsors</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>eventSponsorsTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
         <componentInstanceProperties>
           <name>active</name>
           <value>true</value>
@@ -145,6 +155,20 @@
         </componentInstanceProperties>
         <componentName>flexipage:tab</componentName>
         <identifier>eventApplicationsTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>eventSponsorsTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>{!$Label.Events_EventTab_Sponsors}</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>eventSponsorsTabItem</identifier>
       </componentInstance>
     </itemInstances>
     <name>eventTabs</name>
