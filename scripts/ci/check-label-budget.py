@@ -40,7 +40,10 @@ import sys
 # only when that module is installed. Raised by 8 for EV-02's Registrations tab (11 short button
 # and menu labels; its messages are help catalog text), and by 1 for EV-14's nightly step name
 # and 1 for EV-10's.
-BUDGET = 3255
+# Batch C wave 2 landing: set to the merged total, 3,259: 17 Events labels, EV-02's Registrations
+# tab and 11 button and menu labels, the EV-10 and EV-14 nightly step names, and the EV-06
+# Applications, EV-09 Sponsors, EV-12 Check-In and EV-15 Appointments tab titles.
+BUDGET = 3259
 TARGET = 3000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 
