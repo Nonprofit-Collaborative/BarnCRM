@@ -230,7 +230,15 @@ public with sharing class FormSubmitService {
 				.abbreviate(MESSAGE_LENGTH);
 		}
 		submission.Outcome__c = JSON.serialize(result.records);
-		update as user submission;
+		// Only what processing changes: the form it belongs to (master-detail) never moves.
+		update as user new Form_Submission__c(
+			Id = submission.Id,
+			Status__c = submission.Status__c,
+			Message__c = submission.Message__c,
+			Outcome__c = submission.Outcome__c,
+			Person__c = submission.Person__c,
+			Organization__c = submission.Organization__c
+		);
 		result.status = submission.Status__c;
 		result.message = submission.Message__c;
 		return result;
