@@ -25,6 +25,9 @@ public with sharing class AutomationControlController {
 		/** True when this automation enforces a rule, so its switch is shown off and disabled. */
 		@AuraEnabled
 		public Boolean alwaysRuns { get; set; }
+		/** True while the BarnCRM feature this automation belongs to is off, so it is stopped (D-185). */
+		@AuraEnabled
+		public Boolean featureOff { get; set; }
 		/** True for an org's own listed flow (`Flow:` row), which the page can remove (R-A8). */
 		@AuraEnabled
 		public Boolean removable { get; set; }
@@ -193,6 +196,7 @@ public with sharing class AutomationControlController {
 		page.bypassLabel = Schema.SObjectType.BarnCRM_Automation_Control__c.fields.Bypass__c.getLabel();
 		page.profileOptions = AutomationControlSettingService.profileOptions();
 		Set<String> listed = new Set<String>();
+		Set<String> stoppedByFeature = FeatureSwitchService.automationsOff();
 		for (Automation_Setting__c setting : AutomationSettingSelector.selectAllForConsole()) {
 			if (setting.Automation_Name__c != null) {
 				listed.add(setting.Automation_Name__c.toLowerCase());
@@ -207,6 +211,10 @@ public with sharing class AutomationControlController {
 			// A rule enforcing automation is never running "on" a switch: it is shown off, and
 			// disabled, so nobody reads the page as saying it can be turned on (ADR-0024).
 			view.enabled = view.alwaysRuns ? false : setting.Enabled__c;
+			// A row whose feature is off stays listed, marked stopped (D-185); its own switch is kept.
+			view.featureOff =
+				setting.Automation_Name__c != null &&
+				stoppedByFeature.contains(setting.Automation_Name__c.toLowerCase());
 			view.removable = AutomationControlSettingService.isOwnFlow(setting);
 			page.automations.add(view);
 		}
