@@ -3,8 +3,7 @@
   <cacheControl>Public</cacheControl>
   <contentType>text/plain</contentType>
   <description>
-    US postal code centroids for Radius Find (C-69): one internal point per ZIP Code Tabulation
-    Area from the US Census Bureau 2023 Gazetteer (public domain), as zip,latitude,longitude
-    records separated by semicolons. Read by the FindRadius Apex class.
+    US postal code centers for Radius Find (C-69): zip,latitude,longitude records split by
+    semicolons, from the US Census Bureau 2023 Gazetteer ZCTA file (public domain).
   </description>
 </StaticResource>
