@@ -13,6 +13,7 @@ public with sharing class EventsSettings {
 	public static final Integer MAX_REMINDER_LEAD_DAYS = 30;
 	public static final String DEFAULT_REMINDER_TEMPLATE = 'BarnCRM_Event_Reminder';
 	public static final String DEFAULT_FOLLOW_UP_TEMPLATE = 'BarnCRM_Event_Follow_Up';
+	public static final String DEFAULT_SURVEY_TEMPLATE = 'BarnCRM_Event_Survey';
 
 	/** R-SA5: the developer name of the email template for an accepted application, or null. */
 	public static String acceptNoticeTemplate() {
@@ -62,6 +63,11 @@ public with sharing class EventsSettings {
 	/** The follow-up template's unique name. */
 	public static String followUpTemplate() {
 		return textOr('Follow_Up_Template__c', DEFAULT_FOLLOW_UP_TEMPLATE);
+	}
+
+	/** The template a follow-up uses when the event has a survey (EV-18). */
+	public static String surveyTemplate() {
+		return textOr('Survey_Template__c', DEFAULT_SURVEY_TEMPLATE);
 	}
 
 	private static String textOr(String key, String shipped) {

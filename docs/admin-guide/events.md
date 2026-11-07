@@ -354,6 +354,7 @@ you change it.
 | Reminder email template | BarnCRM_Event_Reminder | The unique name of the email template reminders use. | At the next 7:30 AM run |
 | Send follow-ups | Off | Each person marked **Attended** gets one follow-up email after the event ends (within seven days). | At the next 7:30 AM run |
 | Follow-up email template | BarnCRM_Event_Follow_Up | The unique name of the email template follow-ups use. | At the next 7:30 AM run |
+| Survey email template | BarnCRM_Event_Survey | The unique name of the email template a follow-up uses for an event that has a survey (see Post-Event Survey). | At the next 7:30 AM run |
 | Mark no-shows | Off | Once an event has ended (within seven days), attendees still **Registered** become **No-Show**. | At the next 7:30 AM run |
 | Accepted speaker notice template | Empty (no email) | The developer name of the email template sent when a speaker application is accepted (see Call for Speakers). | At the next decision |
 | Declined speaker notice template | Empty (no email) | The developer name of the email template sent when a speaker application is declined. | At the next decision |
@@ -381,6 +382,38 @@ applies.
 
 **No-Show.** A No-Show keeps its seat and its price on the registration; change it from the
 attendee's menu when it is wrong.
+
+## Post-Event Survey
+
+An event can send the people who came a link to a short survey, with the answers kept against
+each attendee and summarized on the event. It needs the BarnCRM **Forms** module: without Forms
+the **Survey** section on the event's Details tab is not drawn, and follow-ups are the plain
+thank-you.
+
+1. In Forms, build the survey form and publish it, and turn on **Public** for it in its
+   settings, so a person with no login can fill it in. Public forms need a Salesforce Site set up
+   once (see the Forms guide). A survey form needs no question that finds or creates a person:
+   the answers belong to the attendee whose link was used.
+2. On the event's **Details** tab, in **Post-Event Survey**, choose the form in **Survey Form**
+   and click **Save**. **No Survey** clears it. Only published public forms are listed.
+3. Turn on **Send follow-ups** in the Events settings.
+
+When the 7:30 AM run sends the follow-up to each person marked **Attended** (within seven days
+after the event), the email is the **Survey email template** (`BarnCRM_Event_Survey`, in the
+BarnCRM Events email folder) instead of the plain follow-up, and it carries that person's own
+link as `{!Event_Attendee__c.Survey_Link__c}`; keep that merge field in a template of your own.
+An event without a survey, or an org whose Site cannot be found, sends the plain follow-up.
+The link opens the form on your Site tied to that attendee, so each answer is stored with the
+attendee and event. Answering again replaces the earlier answers.
+
+**Results.** The same section shows how many answered and the response rate (of those sent a
+link), then one block per question in the form's order: numbers show the average, lowest and
+highest; picklists and checkboxes show counts and percentages; other answers list the newest
+twenty with the person's name. Every answer is also a **Survey Response** record you can report
+on (attendee, submitted on, answers as JSON).
+
+Answers are kept for as long as the attendee exists. Anyone holding the link can answer for
+that attendee, so do not ask for anything sensitive.
 
 ## Summit Events
 

@@ -1,0 +1,10 @@
+Dear {!Contact.FirstName, friend},
+
+Thank you for joining us at {!Event_Attendee__c.Event_Name__c}. We hope you enjoyed it.
+
+We would love to hear how it went. It takes a minute:
+{!Event_Attendee__c.Survey_Link__c}
+
+With thanks,
+
+{!Organization.Name}

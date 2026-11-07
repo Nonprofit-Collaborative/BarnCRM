@@ -199,6 +199,20 @@
     "Events_Tickets_NoCodes": "No promo codes. Add one to give a discount on this event's tickets.",
     "Events_Tickets_NoTickets": "No ticket types yet. Add one, such as General or Student, with its price.",
     "Events_Tickets_OverCapacity": "The ticket quantities add up to {0}, more than the event's capacity of {1}. That is allowed, since not every ticket sells, but check it is what you want.",
-    "Events_Tickets_Until": "Until {0}"
+    "Events_Tickets_Until": "Until {0}",
+    "Events_Survey_Answered": "{0} answered",
+    "Events_Survey_Average": "Average {0} (lowest {1}, highest {2})",
+    "Events_Survey_Counts": "{0} responses. {1} survey links sent to {2} who attended. Response rate: {3}.",
+    "Events_Survey_Form": "Survey Form",
+    "Events_Survey_Intro": "After the event, the morning email run sends each person marked Attended a link to this form, in place of the plain follow-up. Turn on Follow-Ups in Events settings. Choose a form that is published and public. Their answers are kept with the attendee.",
+    "Events_Survey_LoadFailed": "The survey could not be loaded. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Events_Survey_More": "{0} more not shown. Open the responses in a report to read them all.",
+    "Events_Survey_NoResponses": "No answers yet. They appear here after attendees open their link and send the form.",
+    "Events_Survey_None": "No Survey",
+    "Events_Survey_NotPublic": "That form is not a published public form. Choose a form from the list.",
+    "Events_Survey_Results": "Survey Results",
+    "Events_Survey_SaveFailed": "The survey could not be saved. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Events_Survey_Title": "Post-Event Survey",
+    "Events_Survey_Unavailable": "A form that is no longer published or public"
   }
 }

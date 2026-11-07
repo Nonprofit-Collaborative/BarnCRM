@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+  <available>true</available>
+  <description>
+    A thank-you with a link to the event's survey, which BarnCRM ships to start from. It goes in
+    place of the follow-up to each person marked Attended of an event that has a survey. Edit it,
+    or write your own and name it in Events settings. Keep the survey link merge field in it.
+  </description>
+  <encodingKey>UTF-8</encodingKey>
+  <name>BarnCRM: event survey</name>
+  <style>none</style>
+  <subject>How was {!Event_Attendee__c.Event_Name__c}?</subject>
+  <type>text</type>
+  <uiType>Aloha</uiType>
+</EmailTemplate>

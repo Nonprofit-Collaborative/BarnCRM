@@ -132,10 +132,34 @@ public with sharing class EventEmailService {
 	}
 
 	private static Integer email(String phase, List<Event_Attendee__c> attendees) {
+		if (phase != PHASE_FOLLOW_UP) {
+			return emailGroup(phase, attendees, EventsSettings.reminderTemplate(), null);
+		}
+		// An attendee of an event with a survey gets the survey template and their own link (EV-18).
+		Map<Id, String> links = EventSurveyService.linksFor(attendees);
+		List<Event_Attendee__c> withSurvey = new List<Event_Attendee__c>();
+		List<Event_Attendee__c> plain = new List<Event_Attendee__c>();
+		for (Event_Attendee__c attendee : attendees) {
+			(links.containsKey(attendee.Id) ? withSurvey : plain).add(attendee);
+		}
+		Integer sent = 0;
+		if (!withSurvey.isEmpty()) {
+			sent += emailGroup(phase, withSurvey, EventsSettings.surveyTemplate(), links);
+		}
+		if (!plain.isEmpty()) {
+			sent += emailGroup(phase, plain, EventsSettings.followUpTemplate(), null);
+		}
+		return sent;
+	}
+
+	/** Stamps and emails one group with one template; survey links, when given, are stamped too. */
+	private static Integer emailGroup(
+		String phase,
+		List<Event_Attendee__c> attendees,
+		String templateName,
+		Map<Id, String> surveyLinks
+	) {
 		Boolean remind = phase == PHASE_REMIND;
-		String templateName = remind
-			? EventsSettings.reminderTemplate()
-			: EventsSettings.followUpTemplate();
 		Id templateId = templateIdFor(templateName);
 		if (templateId == null) {
 			ErrorLogger.logMessage(
@@ -155,6 +179,9 @@ public with sharing class EventEmailService {
 		for (Event_Attendee__c attendee : attendees) {
 			Event_Attendee__c stamp = new Event_Attendee__c(Id = attendee.Id);
 			stamp.put(stampField, at);
+			if (surveyLinks != null) {
+				stamp.Survey_Link__c = surveyLinks.get(attendee.Id);
+			}
 			stamps.add(stamp);
 		}
 		List<Database.SaveResult> stamped = Database.update(stamps, false, AccessLevel.SYSTEM_MODE);

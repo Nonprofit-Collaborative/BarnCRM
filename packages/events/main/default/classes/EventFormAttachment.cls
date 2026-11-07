@@ -20,10 +20,17 @@ public with sharing class EventFormAttachment implements FormAttachmentExtension
 	}
 
 	public Boolean handles(Schema.SObjectType contextType) {
-		return contextType == Event__c.SObjectType;
+		return contextType == Event__c.SObjectType || contextType == Event_Attendee__c.SObjectType;
 	}
 
+	/**
+	 * An event's registration form, or, for an attendee (the context of a post-event survey link,
+	 * EV-18), the survey form of the attendee's event.
+	 */
 	public Id formFor(Id contextRecordId) {
+		if (contextRecordId.getSObjectType() == Event_Attendee__c.SObjectType) {
+			return EventSurveyService.formForAttendee(contextRecordId);
+		}
 		for (Event__c event : [
 			SELECT Registration_Form_Key__c
 			FROM Event__c
@@ -41,8 +48,19 @@ public with sharing class EventFormAttachment implements FormAttachmentExtension
 		return null;
 	}
 
-	/** Registers the submission's person; a submission with no person registers nobody. */
+	/**
+	 * Registers the submission's person; a submission with no person registers nobody. A survey
+	 * submission (context an attendee) keeps its answers on the attendee instead (EV-18).
+	 */
 	public void received(FormSubmissionReceipt receipt) {
+		if (
+			receipt != null &&
+			receipt.contextRecordId != null &&
+			receipt.contextRecordId.getSObjectType() == Event_Attendee__c.SObjectType
+		) {
+			EventSurveyService.store(receipt);
+			return;
+		}
 		if (receipt == null || receipt.personId == null) {
 			return;
 		}

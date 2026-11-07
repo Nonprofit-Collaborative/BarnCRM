@@ -79,7 +79,9 @@ CAPS = {
     # C-42c files and save for later (FormFiles, the intake's drafts, resume and emailed link,
     # expired-draft cleanup, REST save and resume): 82,204 measured, plus about 2%.
     # Batch C wave 2 landing: 82,322 measured (C-42b, C-42c), plus about 2%.
-    "forms": 84_000,
+    # EV-18 (D-186): 84,947 measured with FormsCatalogExtension (the form catalog seam), plus
+    # about 2%.
+    "forms": 86_700,
     # New 2026-11-06 for Contact Point Sync (C-45, ADR-0176 contact point sync module):
     # 43,980 measured with the page and backfill, plus about 2 percent.
     # C-45e (D-186): 45,798 measured with person accounts and household-move sync, plus about 2%.
@@ -91,7 +93,9 @@ CAPS = {
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.
     # Batch C wave 2 landing: 127,556 measured (EV-02, EV-06, EV-08 to EV-12, EV-14, EV-15),
     # plus about 2%.
-    "events": 130_100,
+    # EV-18 (D-186): 135,739 measured with the post-event survey (service, controller, survey
+    # email in the follow-up), plus about 2%.
+    "events": 138_500,
     # Portal Builder (PB-01, ADR-0185 portal builder): sign-in, sessions, template checks and the
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.

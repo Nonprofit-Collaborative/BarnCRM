@@ -1,0 +1,72 @@
+<template>
+  <template lwc:if={showSection}>
+    <div class="slds-var-m-bottom_medium" data-id="survey">
+      <h2 class="slds-text-heading_small" data-id="title">{text.title}</h2>
+      <p class="slds-text-color_weak slds-var-m-bottom_small" data-id="intro">{text.intro}</p>
+
+      <template lwc:if={hasError}>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+      </template>
+
+      <template lwc:if={isAvailable}>
+        <div class="slds-grid slds-grid_vertical-align-end slds-var-m-bottom_small">
+          <lightning-combobox
+            class="slds-col slds-grow"
+            data-id="form"
+            label={text.form}
+            options={formOptions}
+            value={chosenKey}
+            onchange={handleForm}
+          ></lightning-combobox>
+          <lightning-button
+            class="slds-var-m-left_small"
+            data-id="save"
+            variant="brand"
+            label={labels.save}
+            disabled={cannotSave}
+            onclick={handleSave}
+          ></lightning-button>
+        </div>
+
+        <template lwc:if={hasSurvey}>
+          <h3 class="slds-text-heading_small slds-var-m-top_medium">{text.results}</h3>
+          <p data-id="counts">{counts}</p>
+
+          <template lwc:if={showNoResponses}>
+            <c-barn-empty-state data-id="empty-state" message={text.noResponses}></c-barn-empty-state>
+          </template>
+
+          <template for:each={summary} for:item="entry">
+            <div key={entry.key} class="slds-var-m-vertical_small" data-id="question">
+              <p class="slds-text-title_bold" data-id="question-label">{entry.label}</p>
+              <p class="slds-text-color_weak">{entry.answeredText}</p>
+              <template lwc:if={entry.isNumber}>
+                <p data-id="average">{entry.averageText}</p>
+              </template>
+              <template lwc:if={entry.isChoice}>
+                <ul>
+                  <template for:each={entry.options} for:item="option">
+                    <li key={option.key} data-id="option">{option.text}</li>
+                  </template>
+                </ul>
+              </template>
+              <template lwc:if={entry.isText}>
+                <ul>
+                  <template for:each={entry.texts} for:item="one">
+                    <li key={one.key} class="slds-var-m-vertical_xx-small" data-id="text">
+                      {one.text}
+                      <span class="slds-text-color_weak"> {one.who}</span>
+                    </li>
+                  </template>
+                </ul>
+                <template lwc:if={entry.hasMore}>
+                  <p class="slds-text-color_weak">{entry.moreText}</p>
+                </template>
+              </template>
+            </div>
+          </template>
+        </template>
+      </template>
+    </div>
+  </template>
+</template>
