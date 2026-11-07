@@ -143,6 +143,7 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | giving | receiptActions | custom:custom23 | Receipt__c |
 | giving | stewardshipPlans | custom:custom4 | Stewardship_Plans |
 | giving | tributeNotification | custom:custom5 | Tribute__c |
+| forms | formBuilder | custom:custom28 | Form__c |
 | logicmodels | logicModelBuilder | custom:custom62 | Logic_Model__c |
 | mirror | accountingExport | custom:custom21 | Accounting_Export |
 | mirror | campaignSync | custom:custom35 | Campaign_Sync |
