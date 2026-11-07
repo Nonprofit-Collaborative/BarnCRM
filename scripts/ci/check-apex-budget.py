@@ -79,6 +79,10 @@ CAPS = {
     # EV-03 to EV-05).
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.
     "events": 30_000,
+    # Portal Builder (PB-01, ADR-NEXT portal builder): sign-in, sessions, template checks and the
+    # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
+    # so every check stays in Apex), plus about 2%.
+    "portal": 50_000,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

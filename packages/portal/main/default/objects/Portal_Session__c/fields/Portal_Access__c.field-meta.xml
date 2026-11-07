@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Portal_Access__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Whose sign-in this is.</inlineHelpText>
+  <label>Portal Access</label>
+  <referenceTo>Portal_Access__c</referenceTo>
+  <relationshipLabel>Portal Sessions</relationshipLabel>
+  <relationshipName>Portal_Sessions</relationshipName>
+  <relationshipOrder>0</relationshipOrder>
+  <reparentableMasterDetail>false</reparentableMasterDetail>
+  <trackTrending>false</trackTrending>
+  <type>MasterDetail</type>
+  <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

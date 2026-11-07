@@ -73,6 +73,9 @@ public with sharing class SettingSections {
 	/** Other products that complement or overlap BarnCRM, listed and linked, never depended on. */
 	@NamespaceAccessible
 	public static final String INTEGRATIONS = 'Integrations';
+	/** The Portal Builder module's sign-in switch and limits. */
+	@NamespaceAccessible
+	public static final String PORTALS = 'Portals';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -91,6 +94,7 @@ public with sharing class SettingSections {
 			ROLLUPS,
 			PROGRAMS,
 			VOLUNTEERS,
+			PORTALS,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,

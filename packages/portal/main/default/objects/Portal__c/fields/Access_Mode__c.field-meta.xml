@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Access_Mode__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Invited: only people with an active Portal Access. Any Matching Person: anyone whose email matches exactly one person.</inlineHelpText>
+  <label>Access Mode</label>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Invited</fullName>
+        <default>true</default>
+        <label>Invited</label>
+      </value>
+      <value>
+        <fullName>Any Matching Person</fullName>
+        <default>false</default>
+        <label>Any Matching Person</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

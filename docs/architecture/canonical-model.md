@@ -13235,6 +13235,199 @@ a second assignment of the same speaker to the same session.
 
 ---
 
+## 29PB1. Portal
+
+### Definition
+
+One logged-in portal an organization runs off-platform (PB-01, Portal Builder module, ADR-NEXT
+`NEXT-portal-builder-off-platform-portal-api.md`, D-187): its key, who may sign in, whether a
+second factor is used, and its template (pages, objects, fields and actions) as JSON.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What people see as the portal's title. |
+| Key | text | yes | The key the portal client names, unique (R-PB1). |
+| Status | picklist | yes | Active or Inactive. Default Inactive. Inactive refuses every sign-in and call. |
+| Access Mode | picklist | yes | Invited (only people with an active Portal Access) or Any Matching Person (anyone whose email matches exactly one person). Default Invited. |
+| Second Factor | picklist | yes | Off, Optional or Required. Default Off (R-PB4). |
+| Session Hours | number | no | How long a session lasts at most. Blank means 8. |
+| Sender Address | email | no | An organization-wide email address the sign-in code is sent from. Blank: the integration user's address. |
+| Template | long text | yes, to be used | The template as JSON (R-PB2). |
+
+### Rules
+
+**R-PB1 Keys are unique.** The client names a portal by key; the field is unique.
+
+**R-PB2 A template is checked on every call.** `PortalTemplate` parses it (`schemaVersion` 1) and
+checks it against the org's schema; a template that fails is refused as `portal_unavailable` and
+logged, never partly used. Pages are `person` (Contact, the verified person), `related` (a custom
+object whose `personField` looks up to Contact) or `catalog` (a custom object, read only, with fixed
+`where` tests). Editable fields are updateable, of a safe type, never a lookup.
+
+**R-PB3 Every read and write is the verified person's.** A related page reads and updates only
+records whose `personField` is the person and creates records with it set; a person page only
+the person's Contact; a catalog page only records passing its tests.
+
+**R-PB4 Second factor.** Required: a person not enrolled enrols at sign-in. Optional: enrolment is
+offered after sign-in. Off: never asked.
+
+### Salesforce implementation
+
+- **Object:** `Portal__c`, name field Text (Portal Name), sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Key | `Key__c` | Text(40), unique, external ID, required |
+| Status | `Status__c` | Picklist (Active, Inactive), restricted, required |
+| Access Mode | `Access_Mode__c` | Picklist (Invited, Any Matching Person), restricted, required |
+| Second Factor | `Second_Factor__c` | Picklist (Off, Optional, Required), restricted, required |
+| Session Hours | `Session_Hours__c` | Number(3, 0), default 8 |
+| Sender Address | `Sender_Address__c` | Email |
+| Template | `Template__c` | Long Text Area(131072) |
+
+---
+
+## 29PB2. Portal Access
+
+### Definition
+
+A person's right to sign in to one portal, with the sign-in failures and second factor enrolment
+that belong to them.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Portal | reference to Portal | yes | The portal. |
+| Person | reference to Contact | yes, to sign in | The person. Cleared when the person is deleted; an access with no person cannot sign in. |
+| Status | picklist | yes | Active or Suspended. Default Active. Suspended ends every session on the next call. |
+| Failed Attempts | number | no | Wrong codes in a row since the last sign-in (R-PA1). |
+| Locked Until | datetime | no | Set when failures reach the setting's limit. |
+| Second Factor Enrolled | boolean | yes | Whether an authenticator is confirmed. Clear it to reset. |
+| Second Factor Secret | text | no | The authenticator secret, base32. Granted to no one; read only by Portal Builder. |
+| Last Sign In | datetime | no | When the person last signed in. |
+
+### Rules
+
+**R-PA1 Lockout.** Each wrong code adds one to Failed Attempts; at the setting's limit (10) the
+access is locked for the setting's minutes (30). A sign-in resets the count. While locked no code is
+sent and no code is accepted.
+
+**R-PA2 One access per person per portal.** Any Matching Person portals create the access on first
+use only when the person has none.
+
+### Salesforce implementation
+
+- **Object:** `Portal_Access__c`, name field Auto Number (PA-{000000}), master-detail to Portal
+  (`Portal__c`, relationship Portal Accesses), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Portal | `Portal__c` | Master-Detail(Portal) |
+| Person | `Person__c` | Lookup(Contact), Clear on delete |
+| Status | `Status__c` | Picklist (Active, Suspended), restricted, required |
+| Failed Attempts | `Failed_Attempts__c` | Number(3, 0), default 0 |
+| Locked Until | `Locked_Until__c` | DateTime |
+| Second Factor Enrolled | `Second_Factor_Enrolled__c` | Checkbox, default false |
+| Second Factor Secret | `Second_Factor_Secret__c` | Text(64) |
+| Last Sign In | `Last_Sign_In__c` | DateTime |
+
+---
+
+## 29PB3. Portal Session
+
+### Definition
+
+One sign-in: from the code sent, through the second factor, to the active session the client holds
+a token for, until it ends.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Portal Access | reference to Portal Access | yes | Whose sign-in. |
+| Stage | picklist | yes | Code Sent, Second Factor, Enroll, Active or Ended. Set Ended to sign the session out. |
+| Token Hash | text | yes | SHA-256 of the challenge token, then of the session token (R-PS1). |
+| Code Hash | text | no | SHA-256 of the token hash and the code. |
+| Code Expires | datetime | no | When the code stops working. |
+| Attempts | number | no | Wrong codes on this challenge. |
+| Expires | datetime | no | When the active session ends at the latest. |
+| Last Used | datetime | no | The last call, for the idle limit. |
+
+### Rules
+
+**R-PS1 Only hashes are kept.** Tokens and codes are random from `Crypto`, sent once and never
+stored or returned again.
+
+**R-PS2 A session works only while it and its access and portal do.** Every call checks the stage,
+both expiries, the access status and lock, the portal status and the org-wide switch.
+
+### Salesforce implementation
+
+- **Object:** `Portal_Session__c`, name field Auto Number (PS-{000000}), master-detail to Portal
+  Access (`Portal_Access__c`, relationship Portal Sessions), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Portal Access | `Portal_Access__c` | Master-Detail(Portal Access) |
+| Stage | `Stage__c` | Picklist (Code Sent, Second Factor, Enroll, Active, Ended), restricted, required |
+| Token Hash | `Token_Hash__c` | Text(64), unique, external ID |
+| Code Hash | `Code_Hash__c` | Text(64) |
+| Code Expires | `Code_Expires__c` | DateTime |
+| Attempts | `Attempts__c` | Number(2, 0), default 0 |
+| Expires | `Expires__c` | DateTime |
+| Last Used | `Last_Used__c` | DateTime |
+
+---
+
+## 29PB4. Portal Settings
+
+### Definition
+
+Portal Builder's org-wide switch and sign-in limits, edited in the Portals section of BarnCRM
+Settings.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Portal Sign-In | boolean | yes (defaults false) | Whether any portal accepts sign-ins and calls. |
+| Code Minutes | number | no | How long a code works. Blank means 10. |
+| Code Requests per Hour | number | no | Codes one person may ask for per hour. Blank means 5. |
+| Emails per Portal per Hour | number | no | Codes one portal sends per hour. Blank means 200. |
+| Attempts per Code | number | no | Wrong tries before a code stops working. Blank means 5. |
+| Failures Before Lockout | number | no | Wrong codes in a row before a lockout. Blank means 10. |
+| Lockout Minutes | number | no | How long a lockout lasts. Blank means 30. |
+| Idle Minutes | number | no | How long a session may sit unused. Blank means 30. |
+
+### Rules
+
+**R-PST1 Limits are silent on sign-in.** A limit reached when a code is asked for sends nothing
+and answers as usual, so no answer says who is on file.
+
+### Salesforce implementation
+
+- **Object:** `Portal_Settings__c`, hierarchy custom setting, visibility Protected.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Portal Sign-In | `Enabled__c` | Checkbox, default false |
+| Code Minutes | `Code_Minutes__c` | Number(2, 0), default 10 |
+| Code Requests per Hour | `Code_Requests_Per_Hour__c` | Number(3, 0), default 5 |
+| Emails per Portal per Hour | `Emails_Per_Portal_Hour__c` | Number(5, 0), default 200 |
+| Attempts per Code | `Attempts_Per_Code__c` | Number(2, 0), default 5 |
+| Failures Before Lockout | `Failures_Before_Lockout__c` | Number(3, 0), default 10 |
+| Lockout Minutes | `Lockout_Minutes__c` | Number(4, 0), default 30 |
+| Idle Minutes | `Idle_Minutes__c` | Number(4, 0), default 30 |
+
+- **Setting Definitions:** `Portal_Enabled`, `Portal_Code_Minutes`, `Portal_Code_Requests`,
+  `Portal_Emails_Per_Hour`, `Portal_Attempts_Per_Code`, `Portal_Failures_Before_Lockout`,
+  `Portal_Lockout_Minutes`, `Portal_Idle_Minutes`, section Portals.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -13598,6 +13791,7 @@ mirrors the primary member).
 | 1.1 | 2026-11-06 | Forms module (C-42a, D-157, ADR-0175 `0175-forms-module.md`). New package BarnCRM Forms with Sections 29ZW Form (`Form__c`), 29ZX Form Version (`Form_Version__c`) and 29ZY Form Submission (`Form_Submission__c`), rules R-FM1, R-FM2 and R-FS1 to R-FS4. Core gains no object or field: only the `FormAttachmentExtension` seam and the catalog row `BarnCRM_Module.Forms`. |
 | 1.1 | 2026-11-06 | BarnCRM Contact Point Sync module (C-45, D-111, ADR-0176 contact point sync module). New package `contactpoints`: Contact Point Link (`Contact_Point_Link__c`, 29ZZ, rules R-CPL1 to R-CPL4) and Contact Point Sync Settings (`Contact_Point_Sync_Settings__c`, 29ZZ1, R-CPS1). No Core object or field added. |
 | 1.2 | 2026-11-06 | Event Management module (EV-01, EV-03, EV-04, EV-05; ADR-0177 `0177-events-module.md`, D-123, D-177). Seven objects in the new package `packages/events`: Event (`Event__c`, 29EV1), Ticket Type (`Ticket_Type__c`, 29EV2), Promo Code (`Promo_Code__c`, 29EV3), Event Track (`Event_Track__c`, 29EV4), Event Session (`Event_Session__c`, 29EV5), Event Speaker (`Event_Speaker__c`, 29EV6) and Session Speaker (`Session_Speaker__c`, 29EV7), with rules R-EV1 to R-EV4, R-TT1 to R-TT4, R-PC1 to R-PC5, R-ETR1, R-ESN1 to R-ESN5, R-ESP1 to R-ESP3 and R-SSP1. Registrations, attendees, call for speakers and sponsorship are designed in the ADR and added by their items. |
+| 1.3 | 2026-11-07 | Portal Builder module (PB-01, D-118, D-178, D-187; ADR-NEXT `NEXT-portal-builder-off-platform-portal-api.md`). New package `packages/portal`: Portal (`Portal__c`, 29PB1), Portal Access (`Portal_Access__c`, 29PB2), Portal Session (`Portal_Session__c`, 29PB3) and Portal Settings (`Portal_Settings__c`, 29PB4), rules R-PB1 to R-PB4, R-PA1, R-PA2, R-PS1, R-PS2 and R-PST1. Core gains no object or field: only the `PortalActionExtension` seam, the Portals settings section and the catalog row `BarnCRM_Module.Portal`. |
 
 ---
 ## 32. Entity ownership by package
@@ -13728,6 +13922,10 @@ included; standard objects the packages extend are named by the entity that gove
 | Event Session | Event Management | 1.2 (EV-04) | 29EV5 |
 | Event Speaker | Event Management | 1.2 (EV-05) | 29EV6 |
 | Session Speaker | Event Management | 1.2 (EV-05) | 29EV7 |
+| Portal | Portal Builder | 1.3 (PB-01) | 29PB1 |
+| Portal Access | Portal Builder | 1.3 (PB-01) | 29PB2 |
+| Portal Session | Portal Builder | 1.3 (PB-01) | 29PB3 |
+| Portal Settings | Portal Builder | 1.3 (PB-01) | 29PB4 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |

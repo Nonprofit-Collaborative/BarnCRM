@@ -83,6 +83,9 @@ const ICONS = Object.freeze({
   Logic_Model__c: 'custom:custom62',
   // Contact Point Sync
   Contact_Point_Sync: 'custom:custom59',
+  // Portal Builder
+  Portal_Access__c: 'custom:custom77',
+  Portal__c: 'custom:custom47',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Idle Minutes</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Idle_Minutes__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Portal_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Portals</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Portal</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Number</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">80</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">How long a portal session may sit unused before the person must sign in again, in minutes, from 5 to 480. Each portal's Session Hours caps a session however busy it is. Default: 30.</value></values>
+    <values><field>Min_Value__c</field><value xsi:type="xsd:double">5</value></values>
+    <values><field>Max_Value__c</field><value xsi:type="xsd:double">480</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">portal-builder.md</value></values>
+</CustomMetadata>
