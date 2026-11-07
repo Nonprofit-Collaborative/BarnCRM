@@ -585,6 +585,14 @@
         <value>Volunteer Shift Reminders</value>
     </labels>
     <labels>
+        <fullName>Volunteers_NightlyJobs_NudgesName</fullName>
+        <categories>Volunteers, Nightly Jobs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Nightly jobs: the unfilled shift nudge run and when it runs</shortDescription>
+        <value>Volunteer Unfilled Shift Nudges</value>
+    </labels>
+    <labels>
         <fullName>Volunteers_Reminders_SendFailed</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>

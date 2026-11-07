@@ -37,6 +37,7 @@ on and off; a job without a switch runs whenever its module is on):
 | 3:30 | Indicator results | Logic Models | No switch |
 | 6:00 | Grant reminders | Funders | No switch |
 | 7:00 | Volunteer shift reminders | Volunteers | No switch |
+| 7:15 | Volunteer unfilled shift nudges | Volunteers | No switch (the **Send unfilled shift nudges** setting decides) |
 
 The donor levels pass writes a donor only when its level or scores changed.
 

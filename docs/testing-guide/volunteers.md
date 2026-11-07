@@ -346,3 +346,20 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 5 | Choose **Custom** with a From a year before anyone worked and a To a month later; choose **Everyone**; click **Make Letters**. | "Nobody has approved hours in this period, so no letters were started." |
 
 **Cleanup:** delete the letter files.
+
+## T-VOL-23: Unfilled Shift Nudges Go Out Once
+
+**Purpose:** confirm an unfilled shift writes once to the job's regular volunteers, and nobody is emailed twice or against their wishes.
+**Prerequisites:** admin user; three active contacts with approved hours on one job: one with your own email address, one with **Email Opt Out** checked, one already signed up to the shift below; the nightly run scheduled (Health Check, **Schedule all nightly jobs**).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Volunteers**. | **Send unfilled shift nudges** is off by default and **Days before a shift to nudge** reads 3. |
+| 2 | Create a shift for that job that starts in 2 days and needs 2 people. Sign up the third contact. Open the shift. | **Slots Remaining** is 1. **Nudge Sent On** is empty and read-only for a Team Member, editable for a Coordinator. |
+| 3 | Switch **Send unfilled shift nudges** on. In the Developer Console, run `VolunteerNudgeBatch.startMorning();` as the admin. | The run starts. |
+| 4 | Check the mailbox of the first contact and open the shift. | One email naming the job, day and time. The opted-out and the already booked contacts received nothing. The shift now holds **Nudge Sent On**. |
+| 5 | Run `VolunteerNudgeBatch.startMorning();` again. | No second email. |
+| 6 | Clear **Nudge Sent On** and run it once more. | The email is sent again and the field is filled. |
+| 7 | Sign up one more person so the shift is full, clear **Nudge Sent On**, run it again. | No email: a full shift is never nudged. |
+
+**Cleanup:** switch **Send unfilled shift nudges** off; cancel the test shift.

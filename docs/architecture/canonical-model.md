@@ -9235,6 +9235,7 @@ heads on.
 | Slots Remaining | integer | computed | Volunteers Needed less Slots Filled. Negative when more came than were asked for, which is information, not an error. |
 | Total Hours | decimal | computed | Approved hours recorded against this shift. |
 | Totals Last Updated | datetime | computed | When BarnCRM last worked out this shift's totals. |
+| Nudge Sent On | datetime | no | When the "still need you" email for this unfilled shift went out (V-10b, R-VU6a). Empty means none was sent. BarnCRM writes it; a coordinator clears it to send the nudge again. |
 
 ### Relationships
 
@@ -9276,6 +9277,7 @@ Deleting a shift takes its sign-ups with it and leaves its hours, with the job, 
 | Slots Remaining | `Slots_Remaining__c` | Formula (Number): `Volunteers_Needed__c` less `Slots_Filled__c` |
 | Total Hours | `Total_Hours__c` | Number(10, 2) |
 | Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
+| Nudge Sent On | `Nudge_Sent_On__c` | DateTime, read-only on the layout; editable (to clear) for Admin and Coordinator |
 
 - **Validation rules:** `End_After_Start` (R-VS3).
 - **Service:** `VolunteerShiftTriggerHandler`, `VolunteerShiftSelector`.
@@ -9362,6 +9364,20 @@ names a person account field (QA-F3). The email goes through the platform's sing
 the person's own address, so the org's daily email limit applies: a message the platform refuses is not stamped,
 a Warning in the Error Log counts them, and the next morning's run tries them again while the
 shift is still ahead. Reminders ship off.
+
+**R-VU6a One nudge per unfilled shift (V-10b).** When Send Unfilled Shift Nudges is on (29N), a
+nightly step at 7:15 AM (`VolunteerNudgeScheduler`, a third Volunteers nightly job, no switch of
+its own) emails, for each Open shift that starts after now and before the start of the day Days
+Before a Shift to Nudge after today (org time zone, default 3, 1 to 14), whose Slots Remaining is
+above zero and whose Nudge Sent On is empty, the active volunteers (Volunteer Status Active) with
+approved hours on the shift's job, an email address and Email Opt Out unchecked, who have no
+sign-up of any status on the shift: the most hours first, at most three per open place and 25 per
+shift. People are Contacts; a person account volunteer is reached through the contact behind the
+account. Like R-VU6 the shift is stamped Nudge Sent On first and emailed only if the stamp saved
+(a failed stamp is a Warning in the Error Log); a shift none of whose emails went out has the
+stamp cleared so the next morning retries; a stamped shift is never nudged again; a shift with
+no one to write to stays stamped. The email goes through the platform's single email call, so
+the org's daily email limit applies. Nudges ship off.
 
 **R-VU7 Suggestions are read only and rank on data already held.** The Suggested Volunteers
 card on an Open shift (V-11) offers Contacts whose Volunteer Status is Active and who have no
@@ -9559,6 +9575,8 @@ module has no settings page of its own), never in Setup. Defaults are applied in
 | `Shift_Horizon_Weeks__c` | integer, 1 to 26 | 8 | How many weeks ahead recurring schedules keep their shifts created (V-07). |
 | `Reminders_Enabled__c` | boolean | false | Whether bookings get one reminder email before their shift (V-10, R-VU6). Ships off, because turning it on emails real people. |
 | `Reminder_Lead_Days__c` | integer, 1 to 14 | 1 | How many days before a shift its reminder goes out (V-10). |
+| `Nudges_Enabled__c` | boolean | false | Whether an unfilled shift emails the job's regular volunteers once (V-10b, R-VU6a). Ships off, because turning it on emails real people. |
+| `Nudge_Lead_Days__c` | integer, 1 to 14 | 3 | How many days before an unfilled shift its nudge goes out (V-10b). |
 
 ### Salesforce implementation
 
@@ -9571,6 +9589,8 @@ module has no settings page of its own), never in Setup. Defaults are applied in
 | Weeks Ahead to Create Shifts | `Shift_Horizon_Weeks__c` | Number(2, 0) |
 | Send Shift Reminders | `Reminders_Enabled__c` | Checkbox, default false |
 | Days Before a Shift to Remind | `Reminder_Lead_Days__c` | Number(2, 0), default 1 |
+| Send Unfilled Shift Nudges | `Nudges_Enabled__c` | Checkbox, default false |
+| Days Before a Shift to Nudge | `Nudge_Lead_Days__c` | Number(2, 0), default 3 |
 
 - **Setting Definition rows:** `Settings_Object__c` `Volunteer_Settings__c`, `Module__c`
   Volunteers, `Section__c` Volunteers, one per key.
@@ -13573,6 +13593,7 @@ mirrors the primary member).
 | 1.0 | 2026-11-06 | Shipped match sources turned off through a setting (owner decision D-184, ADR-0172). `BarnCRM_Settings__c` gains `Match_Sources_Turned_Off__c` (Section 12); Match Source's Active definition now says BarnCRM changes it only on the organization's own rows. |
 | 1.0 | 2026-11-06 | Addresses of deleted records (owner decision D-184). `BarnCRM_Settings__c` gains `Address_Delete_Behavior__c` (Section 12; Delete or Keep, default Delete) and `Address__c` gains `Deleted_With__c` (Text 40), with rule R-AD11: a deleted household's, organization's or person's addresses are deleted with it and restored with it, never on a merge. |
 | 1.1 | 2026-11-06 | Radius Find (C-69, D-157, ADR-0179). No object or field added. Section 29D gains rule R-SQ13: the query document's optional `radius` key (distance from a US postal code or a record's address, compiled to SOQL `DISTANCE`), the shipped static resource `BarnZipCentroids` (US Census Bureau 2023 Gazetteer ZCTA internal points, public domain) and the `FindRadius` class. |
+| 1.1 | 2026-11-06 | Volunteer unfilled shift nudges (V-10b, D-165). `Volunteer_Shift__c` (29K) gains `Nudge_Sent_On__c` (DateTime); `Volunteer_Settings__c` (29N) gains `Nudges_Enabled__c` (false) and `Nudge_Lead_Days__c` (3, 1 to 14). New rule R-VU6a (29L): one nudge per unfilled shift to the job's regular volunteers, from the 7:15 AM nightly step. |
 | 1.0 | 2026-11-06 | Shipped organization record type (owner decision D-184, ADR-0173, amends ADR-0141 decision 2). Account gains the record type `BarnCRM_Organization` (active, given to nobody). Section 8 gains R-O4a: offered for organizations only where the org has no record type of its own, never detected, never switched to automatically; R-O5 leaves it out of the candidates. |
 | 1.1 | 2026-11-06 | Forms module (C-42a, D-157, ADR-0175 `0175-forms-module.md`). New package BarnCRM Forms with Sections 29ZW Form (`Form__c`), 29ZX Form Version (`Form_Version__c`) and 29ZY Form Submission (`Form_Submission__c`), rules R-FM1, R-FM2 and R-FS1 to R-FS4. Core gains no object or field: only the `FormAttachmentExtension` seam and the catalog row `BarnCRM_Module.Forms`. |
 | 1.1 | 2026-11-06 | BarnCRM Contact Point Sync module (C-45, D-111, ADR-0176 contact point sync module). New package `contactpoints`: Contact Point Link (`Contact_Point_Link__c`, 29ZZ, rules R-CPL1 to R-CPL4) and Contact Point Sync Settings (`Contact_Point_Sync_Settings__c`, 29ZZ1, R-CPS1). No Core object or field added. |
