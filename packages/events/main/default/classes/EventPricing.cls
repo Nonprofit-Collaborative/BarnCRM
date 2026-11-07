@@ -1,7 +1,7 @@
 /**
  * The promo code rule (canonical model R-PC5, R-ERG2) on the server, where a Forms submission is
  * processed. It repeats `eventTicketsModel.js` exactly, and both are tested against the same
- * cases (ADR-NEXT `NEXT-event-registrations.md`, decision 3).
+ * cases (ADR-0182 `0182-event-registrations.md`, decision 3).
  */
 public with sharing class EventPricing {
 	public static final String ACTIVE = 'active';

@@ -1,6 +1,6 @@
 /**
- * Finds or creates the Core person an event registration is for (ADR-NEXT
- * `NEXT-event-registrations.md`, decision 2; canonical model R-ERG1), with Core's matchers only,
+ * Finds or creates the Core person an event registration is for (ADR-0182
+ * `0182-event-registrations.md`, decision 2; canonical model R-ERG1), with Core's matchers only,
  * in the order Forms uses (ADR-0175 decision 7): email, then last name and postal code, each
  * narrowed by first name, then the org's duplicate rules. A key several people hold is never
  * guessed. A guest is looked for in the registrant's household first, and a new guest joins it.

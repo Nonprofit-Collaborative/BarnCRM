@@ -1,6 +1,6 @@
 /**
- * Registers people for an event and changes their attendance (EV-02; ADR-NEXT
- * `NEXT-event-registrations.md`, decisions 2, 3 and 5; canonical model 29EV8 and 29EV9).
+ * Registers people for an event and changes their attendance (EV-02; ADR-0182
+ * `0182-event-registrations.md`, decisions 2, 3 and 5; canonical model 29EV8 and 29EV9).
  *
  * One registration names a registrant and its attendees: the registrant (unless they only book
  * for others) and any guests. People are found or created by `EventPersonMatcher` (Core's

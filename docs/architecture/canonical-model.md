@@ -13257,7 +13257,7 @@ a second assignment of the same speaker to the same session.
 
 One booking for an event (EV-02): the person who registered, the attendees it holds, the promo
 code used and what is owed. BarnCRM records the amount owed and never takes a payment (plan
-Section 1.5). Design: ADR-NEXT `NEXT-event-registrations.md`.
+Section 1.5). Design: ADR-0182 `0182-event-registrations.md`.
 
 ### Attributes
 

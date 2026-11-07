@@ -1,6 +1,6 @@
 /**
  * Event Management's side of Core's form seam (ADR-0175 `0175-forms-module.md`, decision 9;
- * ADR-NEXT `NEXT-event-registrations.md`, decision 4). An event names its registration form by
+ * ADR-0182 `0182-event-registrations.md`, decision 4). An event names its registration form by
  * the form's record identifier as text (`Registration_Form_Key__c`); each processed submission
  * filled from an event registers the person Forms matched or created, in the same transaction.
  *

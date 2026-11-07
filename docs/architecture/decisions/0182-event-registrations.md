@@ -1,4 +1,4 @@
-# ADR-NEXT: Event registrations and attendees, reminders and No-Show, and the Summit Events adapter
+# ADR-0182: Event registrations and attendees, reminders and No-Show, and the Summit Events adapter
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-07
