@@ -27,7 +27,8 @@ const GROUPS = [
     label: PEOPLE,
     sections: [
       ['People and Households', 'utility:groups'],
-      ['Addresses', 'utility:location']
+      ['Addresses', 'utility:location'],
+      ['Contact Points', 'utility:contact_request']
     ]
   },
   {

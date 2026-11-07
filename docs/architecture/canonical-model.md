@@ -12549,6 +12549,105 @@ pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
 
 ---
 
+## 29ZX. Contact Point Link
+
+### Definition
+
+One Salesforce Contact Point (`ContactPointEmail`, `ContactPointPhone` or `ContactPointAddress`)
+that the BarnCRM Contact Point Sync module (C-45, ADR-NEXT contact point sync module) made or
+adopted for a person, and the BarnCRM value it copies. A Contact Point with no link is never
+changed by the module.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number. |
+| Person | reference(Contact) | yes | The person the copy belongs to. |
+| Kind | picklist(Email, Phone, Address) | yes | Which Contact Point object the copy is. |
+| Source | text | yes | Where the value comes from: a Contact field API name, or an `Address__c` record ID. |
+| Contact Point ID | text | no | The ID of the Contact Point, held as text so the module names no standard object in metadata. Empty until the copy is made. |
+
+### Relationships
+
+- **Link to Contact**, many to one, as a detail of the person.
+
+### Rules
+
+**R-CPL1 BarnCRM is the source.** A sync computes the person's copies from their fields and
+`Address__c` (R-CPL2) and makes the managed Contact Points match: missing ones are created (or an
+unlinked one with the same value on the same Individual is adopted), changed ones are updated,
+and ones no longer wanted are deleted with their links. Nothing is read back from a Contact Point.
+
+**R-CPL2 What is copied.** Email: Personal, Work, Alternate and the standard Email, one copy per
+distinct address (case ignored), primary where it equals Email. Phone: Home, Mobile, Work, Other
+and the standard Phone, one per distinct number (digits compared), primary where it equals Phone.
+Address: each Current (or blank status) address of the person's own or of a household they belong
+to, default from Is Default. A kind turned off in the settings (29ZY) is left alone.
+
+**R-CPL3 One link per source.** A person has at most one link per Kind and Source; a merge that
+moves a second one onto the survivor is cleaned up at the survivor's sync.
+
+**R-CPL4 Delete follows the person.** Deleting a person deletes their managed Contact Points;
+their links go with them (master-detail) and come back on undelete, when the sync makes new copies.
+
+### Salesforce implementation
+
+- **Object:** `Contact_Point_Link__c`, name field AutoNumber `CPL-{000000}`, sharing Controlled By
+  Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Person | `Contact__c` | Master-Detail to Contact, relationship name Contact_Point_Links |
+| Kind | `Kind__c` | Picklist (Email, Phone, Address), restricted |
+| Source | `Source__c` | Text(40) |
+| Contact Point ID | `Contact_Point_Id__c` | Text(18) |
+
+- **Classes:** `ContactPointPlan` (the pure comparison), `ContactPointSyncService` (reads, plans,
+  writes), `ContactPointPersonHandler` and `ContactPointAddressHandler` (registry rows
+  `Contact_Point_Sync_Person`, `Contact_Point_Sync_Address`), `ContactPointBackfillBatch`.
+
+---
+
+## 29ZY. Contact Point Sync Settings
+
+### Definition
+
+The Contact Point Sync module's org-wide settings, edited in the Contact Points section of
+BarnCRM Settings, and the last backfill's record.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Sync Emails | boolean | yes (defaults true) | Whether email copies are kept (R-CPL2). |
+| Sync Phones | boolean | yes (defaults true) | Whether phone copies are kept. |
+| Sync Addresses | boolean | yes (defaults true) | Whether address copies are kept. |
+| Last Backfill | datetime | no | When the last backfill finished. Written by the module only. |
+| Last Backfill Summary | text | no | What it did: created, updated, deleted and failed. Written by the module only. |
+
+### Rules
+
+**R-CPS1 A never-saved setting reads as shipped.** Read through Core's `SettingsService`, so the
+three switches read as on before the first save.
+
+### Salesforce implementation
+
+- **Object:** `Contact_Point_Sync_Settings__c`, hierarchy custom setting, visibility Protected.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Sync Emails | `Sync_Emails__c` | Checkbox, default true |
+| Sync Phones | `Sync_Phones__c` | Checkbox, default true |
+| Sync Addresses | `Sync_Addresses__c` | Checkbox, default true |
+| Last Backfill | `Last_Backfill__c` | DateTime |
+| Last Backfill Summary | `Last_Backfill_Summary__c` | Text(255) |
+
+- **Setting Definitions:** `Contact_Point_Sync_Page`, `Contact_Point_Sync_Emails`,
+  `Contact_Point_Sync_Phones`, `Contact_Point_Sync_Addresses`, section Contact Points.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -12907,6 +13006,7 @@ mirrors the primary member).
 | 1.0 | 2026-11-06 | Shipped match sources turned off through a setting (owner decision D-184, ADR-0172). `BarnCRM_Settings__c` gains `Match_Sources_Turned_Off__c` (Section 12); Match Source's Active definition now says BarnCRM changes it only on the organization's own rows. |
 | 1.0 | 2026-11-06 | Addresses of deleted records (owner decision D-184). `BarnCRM_Settings__c` gains `Address_Delete_Behavior__c` (Section 12; Delete or Keep, default Delete) and `Address__c` gains `Deleted_With__c` (Text 40), with rule R-AD11: a deleted household's, organization's or person's addresses are deleted with it and restored with it, never on a merge. |
 | 1.0 | 2026-11-06 | Shipped organization record type (owner decision D-184, ADR-0173, amends ADR-0141 decision 2). Account gains the record type `BarnCRM_Organization` (active, given to nobody). Section 8 gains R-O4a: offered for organizations only where the org has no record type of its own, never detected, never switched to automatically; R-O5 leaves it out of the candidates. |
+| 1.1 | 2026-11-06 | BarnCRM Contact Point Sync module (C-45, D-111, ADR-NEXT contact point sync module). New package `contactpoints`: Contact Point Link (`Contact_Point_Link__c`, 29ZX, rules R-CPL1 to R-CPL4) and Contact Point Sync Settings (`Contact_Point_Sync_Settings__c`, 29ZY, R-CPS1). No Core object or field added. |
 
 ---
 ## 32. Entity ownership by package
@@ -12988,6 +13088,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Volunteer Sign-up | Volunteers | v0.8 | 29L |
 | Volunteer Hours | Volunteers | v0.8 | 29M |
 | Volunteer Settings | Volunteers | v0.8 | 29N |
+| Contact Point Link | Contact Point Sync | release 1.1 (C-45) | 29ZX |
+| Contact Point Sync Settings | Contact Point Sync | release 1.1 (C-45) | 29ZY |
 | Skill | Volunteers | v0.8 | 29P |
 | Volunteer Skill | Volunteers | v0.8 | 29Q |
 | Job Skill | Volunteers | v0.8 | 29R |

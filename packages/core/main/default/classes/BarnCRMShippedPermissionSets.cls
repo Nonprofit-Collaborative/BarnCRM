@@ -29,6 +29,7 @@ public with sharing class BarnCRMShippedPermissionSets {
 		'BarnCRM_Tab_Find',
 		'BarnCRM_Tab_Import',
 		'Campaign_Sync',
+		'Contact_Point_Sync_Admin',
 		'Funders_Admin',
 		'Funders_Read_Only',
 		'Funders_Staff',
