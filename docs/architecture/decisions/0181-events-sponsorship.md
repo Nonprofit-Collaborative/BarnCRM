@@ -1,4 +1,4 @@
-# ADR-NEXT: Event Management sponsorship: levels, sponsors on Core accounts, a deliverables checklist, and an optional link to Giving or Funders through Core
+# ADR-0181: Event Management sponsorship: levels, sponsors on Core accounts, a deliverables checklist, and an optional link to Giving or Funders through Core
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-07

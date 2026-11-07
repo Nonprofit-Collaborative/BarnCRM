@@ -1,7 +1,7 @@
 /**
  * The Core seam a module uses to show a record of an optional module that it holds by record
  * identifier as text, such as the Giving gift or commitment, or the Funders award, an event
- * sponsorship is tied to (EV-09, ADR-NEXT events sponsorship).
+ * sponsorship is tied to (EV-09, ADR-0181 events sponsorship).
  *
  * The module names no object of another module: it stores the identifier, and this class turns
  * it into a label. Only the records of the objects listed in `SUPPORTED` resolve, and only when
