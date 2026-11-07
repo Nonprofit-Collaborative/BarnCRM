@@ -1,0 +1,133 @@
+<template>
+  <template lwc:if={helpReady}>
+    <p class="slds-var-m-bottom_small slds-text-color_weak" data-id="intro">{labels.intro}</p>
+    <template lwc:if={canAdd}>
+      <lightning-button
+        data-id="add-application"
+        class="slds-var-m-bottom_small"
+        label={labels.addApplication}
+        icon-name="utility:add"
+        disabled={busy}
+        onclick={handleAdd}
+      ></lightning-button>
+    </template>
+
+    <template lwc:if={isLoading}>
+      <lightning-spinner alternative-text={labels.tab} size="small"></lightning-spinner>
+    </template>
+
+    <template lwc:if={hasError}>
+      <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+    </template>
+
+    <template lwc:if={showEmpty}>
+      <c-barn-empty-state data-id="empty-state" message={labels.empty}></c-barn-empty-state>
+    </template>
+
+    <template lwc:if={hasRows}>
+      <table
+        class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_stacked-horizontal"
+        data-id="applications"
+      >
+        <thead>
+          <tr class="slds-line-height_reset">
+            <th scope="col">{fieldLabels.Name}</th>
+            <th scope="col">{fieldLabels.Contact__c}</th>
+            <th scope="col">{fieldLabels.Track__c}</th>
+            <th scope="col">{fieldLabels.Status__c}</th>
+            <th scope="col">{fieldLabels.Average_Score__c}</th>
+            <th scope="col"><span class="slds-assistive-text">{labels.actions}</span></th>
+          </tr>
+        </thead>
+        <template for:each={rows} for:item="row">
+          <tbody key={row.id}>
+            <tr data-id="application-row">
+              <th scope="row" data-label={fieldLabels.Name}>
+                {row.name}
+                <template lwc:if={row.noticeResult}>
+                  <div class="slds-text-body_small slds-text-color_weak" data-id="notice-result">
+                    {row.noticeResult}
+                  </div>
+                </template>
+              </th>
+              <td data-label={fieldLabels.Contact__c}>
+                <template lwc:if={row.href}>
+                  <a href={row.href}>{row.applicant}</a>
+                </template>
+                <template lwc:else>{row.applicant}</template>
+              </td>
+              <td data-label={fieldLabels.Track__c}>{row.track}</td>
+              <td data-label={fieldLabels.Status__c}>
+                <c-barn-status-badge status={row.statusWord} label={row.status}></c-barn-status-badge>
+              </td>
+              <td data-label={fieldLabels.Average_Score__c} data-id="average">{row.averageText}</td>
+              <td>
+                <lightning-button-menu
+                  data-id={row.id}
+                  alternative-text={row.menuLabel}
+                  icon-size="x-small"
+                  menu-alignment="right"
+                  onselect={handleMenu}
+                >
+                  <template for:each={row.menuItems} for:item="item">
+                    <lightning-menu-item
+                      key={item.value}
+                      label={item.label}
+                      value={item.value}
+                    ></lightning-menu-item>
+                  </template>
+                </lightning-button-menu>
+              </td>
+            </tr>
+            <template lwc:if={row.isReviewing}>
+              <tr data-id="review-form-row">
+                <td colspan="6">
+                  <lightning-combobox
+                    data-id="review-score"
+                    label={fieldLabels.Score__c}
+                    options={scoreChoices}
+                    value={reviewing.score}
+                    onchange={handleScore}
+                  ></lightning-combobox>
+                  <lightning-textarea
+                    data-id="review-notes"
+                    label={fieldLabels.Notes__c}
+                    value={reviewing.notes}
+                    maxlength="5000"
+                    onchange={handleNotes}
+                  ></lightning-textarea>
+                  <div class="slds-var-m-top_x-small">
+                    <lightning-button
+                      data-id="review-cancel"
+                      label={labels.cancel}
+                      onclick={handleReviewCancel}
+                    ></lightning-button>
+                    <lightning-button
+                      data-id="review-save"
+                      class="slds-var-m-left_x-small"
+                      variant="brand"
+                      label={labels.save}
+                      disabled={cannotSaveReview}
+                      onclick={handleReviewSave}
+                    ></lightning-button>
+                  </div>
+                </td>
+              </tr>
+            </template>
+            <template lwc:if={row.hasReviews}>
+              <tr data-id="reviews-row">
+                <td colspan="6" class="slds-text-body_small">
+                  <ul>
+                    <template for:each={row.reviews} for:item="review">
+                      <li key={review.key} data-id="review">{review.text}</li>
+                    </template>
+                  </ul>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </template>
+      </table>
+    </template>
+  </template>
+</template>

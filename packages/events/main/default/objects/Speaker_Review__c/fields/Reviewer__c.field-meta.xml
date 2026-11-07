@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Reviewer__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The person who scored the application. Each reviewer has one review per application.</inlineHelpText>
+  <label>Reviewer</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+  <referenceTo>User</referenceTo>
+  <relationshipLabel>Speaker Reviews</relationshipLabel>
+  <relationshipName>Speaker_Reviews</relationshipName>
+</CustomField>

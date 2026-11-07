@@ -125,6 +125,8 @@ public with sharing class ModuleManagerService {
 			'Event_Track__c',
 			'Promo_Code__c',
 			'Session_Speaker__c',
+			'Speaker_Application__c',
+			'Speaker_Review__c',
 			'Ticket_Type__c'
 		}
 	};

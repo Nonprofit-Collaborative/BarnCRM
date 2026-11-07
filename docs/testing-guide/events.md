@@ -116,3 +116,29 @@ removal.
 | 10 | As read-only, open **Speakers**. | The list shows; no **Add Speaker**. |
 
 **Cleanup:** None.
+
+## T-EV-12: Call for Speakers
+
+**Purpose:** confirm adding applications, scoring, accept and decline with notices, and the
+Events settings.
+**Prerequisites:** staff, an event, two people with emails (`Ana Garcia`, `Sam Lee`) and one with
+none (`Kim Wu`), and two active email templates with developer names `Speaker_Accepted` and
+`Speaker_Declined`.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event, click **Applications**. | An empty state and **Add Application**. |
+| 2 | **Add Application**: Proposal Title `Scaling Flows`, Applicant `Ana Garcia`. Save. Add `Old Topics` for `Sam Lee` and `Quiet Talk` for `Kim Wu`. | Three rows, status **Submitted**. |
+| 3 | Menu **Score** on `Scaling Flows`, 5, Save. | Status **In Review**; average `5.0 (1)`. |
+| 4 | Score `Scaling Flows` again with 3. | Still one review; average `3.0 (1)`. |
+| 5 | Menu **Score** on `Old Topics`, 1. | `Scaling Flows` is listed first. |
+| 6 | **Accept** `Scaling Flows`, confirm (no templates chosen yet). | A warning: no notice was sent, no template chosen; status **Accepted**. The row says why. |
+| 7 | Open **BarnCRM Settings**, **Events**, enter `Speaker_Accepted` and `Speaker_Declined`. | Both saved. |
+| 8 | **Decline** `Old Topics`, confirm. | Declined, and the notice was emailed. No speaker is made for Sam Lee. |
+| 9 | Open **Speakers**. | `Ana Garcia`, **Invited**, and no one else. |
+| 10 | **Decline** `Quiet Talk`. | Declined; a warning that the applicant has no email address. |
+| 11 | Open a declined row's menu. | Only **Edit**: no Score, Accept or Decline. |
+| 12 | As read-only, open **Applications**. | The list shows; no **Add Application**, no Score, Accept or Decline. |
+
+**Cleanup:** Delete the applications and Ana Garcia as a speaker.

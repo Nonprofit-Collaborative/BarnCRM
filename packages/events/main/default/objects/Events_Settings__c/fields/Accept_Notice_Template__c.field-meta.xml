@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Accept_Notice_Template__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>
+    The developer name of the email template sent when a speaker application is accepted. Leave empty to send no email.
+  </inlineHelpText>
+  <label>Accepted Notice Template</label>
+  <length>80</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>
