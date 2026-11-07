@@ -91,7 +91,8 @@ CAPS = {
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.
     # Batch C wave 2 landing: 127,556 measured (EV-02, EV-06, EV-08 to EV-12, EV-14, EV-15),
     # plus about 2%.
-    "events": 130_100,
+    # EV-13 seating (EventSeatingController): 135,814 measured, plus about 2%.
+    "events": 138_600,
     # Portal Builder (PB-01, ADR-0185 portal builder): sign-in, sessions, template checks and the
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.
