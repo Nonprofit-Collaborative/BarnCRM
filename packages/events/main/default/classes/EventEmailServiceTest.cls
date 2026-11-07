@@ -197,4 +197,27 @@ private class EventEmailServiceTest {
 			Assert.areEqual('BarnCRM_Event_Reminder', EventsSettings.reminderTemplate(), 'Default');
 		}
 	}
+
+	@IsTest
+	static void chainsTheNextActivePhase() {
+		System.runAs(staff()) {
+			settings(true, false, true);
+			EventEmailBatch.chainInTests = true;
+
+			Test.startTest();
+			new EventEmailBatch(EventEmailService.PHASE_REMIND).finish(null);
+			Test.stopTest();
+
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM AsyncApexJob
+					WHERE ApexClass.Name = 'EventEmailBatch' AND JobType = 'BatchApex'
+					WITH SYSTEM_MODE
+				],
+				'The No-Show phase started after reminders'
+			);
+		}
+	}
 }

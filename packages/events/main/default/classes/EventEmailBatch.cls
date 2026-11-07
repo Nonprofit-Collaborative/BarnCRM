@@ -6,6 +6,9 @@
 public with sharing class EventEmailBatch implements Database.Batchable<SObject> {
 	public static final Integer CHUNK_SIZE = 100;
 	private static final String LOG_CONTEXT = 'EventEmailBatch';
+	/** A test calling `finish` itself (outside a running batch) sets this to see it chain. */
+	@TestVisible
+	private static Boolean chainInTests = false;
 
 	private final String phase;
 
@@ -38,7 +41,7 @@ public with sharing class EventEmailBatch implements Database.Batchable<SObject>
 	}
 
 	public void finish(Database.BatchableContext context) {
-		if (Test.isRunningTest()) {
+		if (Test.isRunningTest() && !chainInTests) {
 			// A test cannot start a batch from a batch's finish.
 			return;
 		}
