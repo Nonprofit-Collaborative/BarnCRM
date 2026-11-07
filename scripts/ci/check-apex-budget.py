@@ -42,8 +42,9 @@ CAPS = {
     # Org Flows and Validation Rules with its snapshot and Restore (OrgAutomationDeactivation,
     # the controller's deactivate and restore; ADR-0174, D-184), then for the D-184 household
     # changes landed with them (AddressDeleteHandler, Match Sources turned off by a setting,
-    # the shipped Organization record type, RelationshipController.isFeatureOn).
-    "core": 2_013_000,
+    # the shipped Organization record type, RelationshipController.isFeatureOn), then for the
+    # Form attachment seam (C-42a: FormAttachmentExtension, FormAttachmentExtensions, receipt).
+    "core": 2_017_000,
     "rollups": 374_000,
     # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
     # Quick Gift Entry tribute, match and split (people-giving-13, 16, 23), and the New
