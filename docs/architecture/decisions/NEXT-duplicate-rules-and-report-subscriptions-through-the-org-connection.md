@@ -67,9 +67,12 @@ Verdict: feasible. The page is built.
    then a delayed job checks each one every minute (up to 15 tries) and writes the duplicate
    rule once its matching rule is active. Each run ends with one Error Log entry in words; the
    page polls while the job runs.
-4. **C-63: subscribe the running user.** A page lists the reports in BarnCRM's report folders
-   with the person's existing subscription, the remaining count of 7, and **Subscribe** with a
-   frequency, day and hour; **Unsubscribe** deletes only that person's own subscription.
+4. **C-63: subscribe the running user.** Org Optimizer's Report Subscriptions section lists the
+   reports in BarnCRM's report folders, each linked, with **Subscribe** and a frequency, day and
+   hour. The job reads the person's subscription to that report and updates it, or checks the
+   per-user limit and creates one; it logs only a failure, in words, which the page polls for.
+   A Lightning call cannot read subscriptions (no API session), so the page does not list them
+   or unsubscribe; the report's own Subscribe button changes or removes one.
 5. **No connection.** Both pages explain the connection and show its setup panel; C-61 also
    links to Duplicate Rules in Setup, and C-63 keeps Open Report.
 

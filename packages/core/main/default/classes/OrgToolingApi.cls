@@ -1,7 +1,9 @@
 /**
  * The org's own Tooling API, called through the org connection `Barn_Org_Connection` (ADR-0148)
  * with the running job's session, for the Automation tab's scan, deactivation and restore
- * (ADR-0174, D-184). Only a queued job calls it: a Lightning session cannot call the API.
+ * (ADR-0174, D-184), and its REST API for the running user's report subscriptions (C-63, ADR
+ * "Duplicate Rules Starter and report subscriptions through the org connection"). Only a queued
+ * job calls it: a Lightning session cannot call the API.
  */
 public with sharing class OrgToolingApi {
 	@TestVisible
@@ -10,7 +12,7 @@ public with sharing class OrgToolingApi {
 		ImportNewFieldService.CONNECTION +
 		'/services/data/v' +
 		ImportNewFieldService.API_VERSION +
-		'/tooling/';
+		'/';
 	private static final Integer TIMEOUT_MS = 20000;
 
 	public class ToolingException extends Exception {
@@ -19,7 +21,7 @@ public with sharing class OrgToolingApi {
 	/** The rows of a Tooling query, as maps; the first page only (2,000 rows at most). */
 	public static List<Object> query(String soql) {
 		Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(
-			send('GET', 'query/?q=' + EncodingUtil.urlEncode(soql, 'UTF-8'), null)
+			send('GET', 'tooling/query/?q=' + EncodingUtil.urlEncode(soql, 'UTF-8'), null)
 		);
 		return (List<Object>) body.get('records');
 	}
@@ -27,8 +29,13 @@ public with sharing class OrgToolingApi {
 	/** One record of a Tooling object, with its Metadata. */
 	public static Map<String, Object> read(String objectName, String recordId) {
 		return (Map<String, Object>) JSON.deserializeUntyped(
-			send('GET', 'sobjects/' + objectName + '/' + recordId, null)
+			send('GET', 'tooling/sobjects/' + objectName + '/' + recordId, null)
 		);
+	}
+
+	/** A call to the org's REST API; `path` follows `/services/data/vXX.0/`. Returns the body. */
+	public static String rest(String method, String path, String body) {
+		return send(method, path, body);
 	}
 
 	/** Saves new Metadata on a Tooling record. */
@@ -39,7 +46,7 @@ public with sharing class OrgToolingApi {
 	) {
 		send(
 			'PATCH',
-			'sobjects/' + objectName + '/' + recordId,
+			'tooling/sobjects/' + objectName + '/' + recordId,
 			JSON.serialize(new Map<String, Object>{ 'Metadata' => metadata })
 		);
 	}
