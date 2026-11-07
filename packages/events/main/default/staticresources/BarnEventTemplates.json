@@ -1,0 +1,144 @@
+{
+  "templates": [
+    {
+      "key": "conference",
+      "name": "Community Conference",
+      "description": "A two-day community conference in the style of a Dreamin event: Admin, Developer and Nonprofit tracks, a keynote, talks, a lunch break each day, four kinds of ticket, and a planning timeline for the call for speakers, volunteers and sponsors.",
+      "tracks": [
+        { "name": "Admins", "sortOrder": 1 },
+        { "name": "Developers", "sortOrder": 2 },
+        { "name": "Nonprofit", "sortOrder": 3 }
+      ],
+      "ticketTypes": [
+        { "name": "Attendee", "price": 25, "sortOrder": 1 },
+        { "name": "Student", "price": 0, "quantity": 30, "sortOrder": 2 },
+        { "name": "Speaker", "price": 0, "quantity": 30, "sortOrder": 3 },
+        { "name": "Sponsor", "price": 0, "quantity": 40, "sortOrder": 4 }
+      ],
+      "sessions": [
+        {
+          "name": "Opening Keynote",
+          "type": "Keynote",
+          "day": 1,
+          "start": "09:00",
+          "end": "10:00",
+          "room": "Main Hall"
+        },
+        {
+          "name": "Admin Talk 1",
+          "type": "Talk",
+          "day": 1,
+          "start": "10:15",
+          "end": "11:00",
+          "room": "Room A",
+          "track": "Admins"
+        },
+        {
+          "name": "Developer Talk 1",
+          "type": "Talk",
+          "day": 1,
+          "start": "10:15",
+          "end": "11:00",
+          "room": "Room B",
+          "track": "Developers"
+        },
+        {
+          "name": "Nonprofit Talk 1",
+          "type": "Talk",
+          "day": 1,
+          "start": "10:15",
+          "end": "11:00",
+          "room": "Room C",
+          "track": "Nonprofit"
+        },
+        {
+          "name": "Lunch",
+          "type": "Break",
+          "day": 1,
+          "start": "12:00",
+          "end": "13:00",
+          "room": "Atrium"
+        },
+        {
+          "name": "Admin Workshop",
+          "type": "Workshop",
+          "day": 1,
+          "start": "13:00",
+          "end": "14:30",
+          "room": "Room A",
+          "track": "Admins"
+        },
+        {
+          "name": "Developer Workshop",
+          "type": "Workshop",
+          "day": 1,
+          "start": "13:00",
+          "end": "14:30",
+          "room": "Room B",
+          "track": "Developers"
+        },
+        {
+          "name": "Panel Discussion",
+          "type": "Panel",
+          "day": 2,
+          "start": "09:00",
+          "end": "10:00",
+          "room": "Main Hall"
+        },
+        {
+          "name": "Admin Talk 2",
+          "type": "Talk",
+          "day": 2,
+          "start": "10:15",
+          "end": "11:00",
+          "room": "Room A",
+          "track": "Admins"
+        },
+        {
+          "name": "Developer Talk 2",
+          "type": "Talk",
+          "day": 2,
+          "start": "10:15",
+          "end": "11:00",
+          "room": "Room B",
+          "track": "Developers"
+        },
+        {
+          "name": "Nonprofit Talk 2",
+          "type": "Talk",
+          "day": 2,
+          "start": "10:15",
+          "end": "11:00",
+          "room": "Room C",
+          "track": "Nonprofit"
+        },
+        {
+          "name": "Lunch",
+          "type": "Break",
+          "day": 2,
+          "start": "12:00",
+          "end": "13:00",
+          "room": "Atrium"
+        },
+        {
+          "name": "Closing Session",
+          "type": "Talk",
+          "day": 2,
+          "start": "15:00",
+          "end": "16:00",
+          "room": "Main Hall"
+        }
+      ],
+      "timeline": [
+        { "title": "Open the call for speakers", "daysBefore": 150 },
+        { "title": "Open sponsor outreach", "daysBefore": 140 },
+        { "title": "Close the call for speakers", "daysBefore": 100 },
+        { "title": "Publish the agenda and open ticket sales", "daysBefore": 75 },
+        { "title": "Recruit event volunteers", "daysBefore": 60 },
+        { "title": "Confirm sponsors and speakers", "daysBefore": 30 },
+        { "title": "Send attendee reminders", "daysBefore": 7 },
+        { "title": "Check in attendees at the door", "daysBefore": 0 }
+      ]
+    }
+  ]
+}

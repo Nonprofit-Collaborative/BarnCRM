@@ -55,6 +55,14 @@ are taken outside BarnCRM.
 
 Use **When** to look at one day at a time, or at the sessions with no time yet.
 
+## Read the Event Dashboard
+
+The top of an event's **Details** tab shows how many days are left, how many ticket types, tracks,
+sessions and speakers the event has, and which setup steps are still to do. An event with nothing
+set up yet also offers **Event Templates**: choose **Community Conference** to preview its tracks,
+tickets, sessions and planning dates, then click **Apply Template** to add them as drafts you can
+change. Nothing is added until you click it.
+
 ## Add Speakers
 
 1. Open the event and click the **Speakers** tab.

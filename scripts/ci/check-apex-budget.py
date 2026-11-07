@@ -78,7 +78,8 @@ CAPS = {
     # Event Management (ADR-0177, events module): events, tickets, agenda and speakers (EV-01,
     # EV-03 to EV-05).
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.
-    "events": 30_000,
+    # Raised for the event dashboard and templates (EV-11): 35,343 measured, plus about 2.5%.
+    "events": 36_200,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
