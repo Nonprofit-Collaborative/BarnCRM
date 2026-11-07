@@ -20,6 +20,7 @@ import ERRORS from '@salesforce/label/c.Core_OrgOptimizer_Errors';
 import STORAGE from '@salesforce/label/c.Core_OrgOptimizer_Storage';
 import SETUP from '@salesforce/label/c.Core_OrgOptimizer_Setup';
 import SETUP_CHANGES from '@salesforce/label/c.Core_SetupChanges_Title';
+import REPORT_SUBSCRIPTIONS from '@salesforce/label/c.Core_ReportSubscriptions_Title';
 import RUN_HEALTH_CHECK from '@salesforce/label/c.Core_OrgOptimizer_RunHealthCheck';
 import HEALTH_CHECK_NOT_RUN from '@salesforce/label/c.Core_OrgOptimizer_HealthCheckNotRunHeading';
 import BADGE_ALL_CLEAR from '@salesforce/label/c.Core_OrgOptimizer_BadgeAllClear';
@@ -86,6 +87,7 @@ export default class OrgOptimizer extends LightningElement {
     storage: STORAGE,
     setup: SETUP,
     setupChanges: SETUP_CHANGES,
+    reportSubscriptions: REPORT_SUBSCRIPTIONS,
     runHealthCheck: RUN_HEALTH_CHECK,
     get healthCheckIntro() {
       return helpText('Core', 'Core_OrgOptimizer_HealthCheckIntro');
@@ -196,6 +198,12 @@ export default class OrgOptimizer extends LightningElement {
           SETUP_CHANGES,
           helpText('Core', 'Core_OrgOptimizer_SetupChangesText'),
           'standard:timeslot'
+        ),
+        this.tile(
+          'reportSubscriptions',
+          REPORT_SUBSCRIPTIONS,
+          helpText('Core', 'Core_OrgOptimizer_ReportSubscriptionsText'),
+          'standard:report'
         ),
         this.tile(
           'accessExplorer',
@@ -349,6 +357,10 @@ export default class OrgOptimizer extends LightningElement {
 
   get setupChangesOpened() {
     return Boolean(this.opened.setupChanges);
+  }
+
+  get reportSubscriptionsOpened() {
+    return Boolean(this.opened.reportSubscriptions);
   }
 
   get accessExplorerOpened() {

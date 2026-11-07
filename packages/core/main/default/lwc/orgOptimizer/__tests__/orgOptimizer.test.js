@@ -61,6 +61,11 @@ jest.mock('@salesforce/apex/SetupChangeController.getChanges', () => ({ default:
 jest.mock('@salesforce/apex/SetupChangeController.copyNow', () => ({ default: jest.fn() }), {
   virtual: true
 });
+jest.mock(
+  '@salesforce/apex/ReportSubscriptions.getView',
+  () => ({ default: jest.fn(() => Promise.resolve({ canUseConnection: false, reports: [] })) }),
+  { virtual: true }
+);
 jest.mock('@salesforce/label/c.Core_OrgOptimizer_BadgeNew', () => ({ default: '{0} New' }), {
   virtual: true
 });
@@ -165,7 +170,15 @@ describe('c-org-optimizer as an administrator', () => {
     const groups = one(element, 'c-barn-tool-grid').groups;
     expect(groups.map((group) => group.tiles.map((tile) => tile.name))).toEqual([
       ['quality', 'fieldUtilization', 'dataDictionary', 'aiExport'],
-      ['healthCheck', 'errors', 'storage', 'setup', 'setupChanges', 'accessExplorer']
+      [
+        'healthCheck',
+        'errors',
+        'storage',
+        'setup',
+        'setupChanges',
+        'reportSubscriptions',
+        'accessExplorer'
+      ]
     ]);
     tiles(element).forEach((tile) => expect(tile.iconName).toMatch(/^standard:/));
   });
@@ -187,6 +200,7 @@ describe('c-org-optimizer as an administrator', () => {
       'storage',
       'setup',
       'setupChanges',
+      'reportSubscriptions',
       'accessExplorer'
     ]);
     expect(items[0].iconName).toBe('custom:custom94');
@@ -429,6 +443,13 @@ describe('c-org-optimizer as an administrator', () => {
     await activate(element, 'setupChanges');
     expect(one(element, 'c-setup-change-log')).not.toBeNull();
     expect(getChangeSummary).toHaveBeenCalledTimes(1);
+  });
+
+  it('opens Report Subscriptions only when its section is opened', async () => {
+    const element = await render();
+    expect(one(element, 'c-report-subscriptions')).toBeNull();
+    await activate(element, 'reportSubscriptions');
+    expect(one(element, 'c-report-subscriptions')).not.toBeNull();
   });
 
   it('runs Health Check only when asked, and refreshes its badge back on the Overview', async () => {

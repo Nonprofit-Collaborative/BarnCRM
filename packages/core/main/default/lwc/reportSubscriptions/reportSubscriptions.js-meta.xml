@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Report Subscriptions in Org Optimizer (C-63, D-156): BarnCRM's shipped reports with
+    Subscribe, which creates the person's own Salesforce report subscription through the org
+    connection.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>
