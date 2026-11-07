@@ -381,9 +381,12 @@ public with sharing class FormSubmitService {
 			? AccountKinds.organizationRecordTypeId()
 			: null;
 		// With no record type the field is left unset: an explicit null is refused (ADR-0141).
-		SObject record = recordTypeId == null
-			? type.newSObject()
-			: type.newSObject(recordTypeId, true);
+		// Defaults are not loaded here: the platform applies them on insert, and loading them
+		// would set fields the user may not be able to edit, which a user mode insert refuses.
+		SObject record = type.newSObject();
+		if (recordTypeId != null) {
+			record.put('RecordTypeId', recordTypeId);
+		}
 		for (String fieldName : entry.fields.keySet()) {
 			put(record, fieldMap, written.objectName, fieldName, entry.fields.get(fieldName));
 		}

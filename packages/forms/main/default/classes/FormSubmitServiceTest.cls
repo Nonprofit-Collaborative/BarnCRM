@@ -50,7 +50,11 @@ private class FormSubmitServiceTest {
 			FormSubmitService.Result result = FormSubmitService.submit(form.Id, pat(), gala.Id);
 			Test.stopTest();
 
-			Assert.areEqual(FormSubmitService.PROCESSED, result.status, result.message);
+			Assert.areEqual(
+				FormSubmitService.PROCESSED,
+				result.status,
+				'Processed: ' + result.message
+			);
 			Contact person = [
 				SELECT Id, FirstName, Email, MailingPostalCode
 				FROM Contact
@@ -126,11 +130,15 @@ private class FormSubmitServiceTest {
 			);
 			Test.stopTest();
 
-			Assert.areEqual(FormSubmitService.PROCESSED, kept.status, kept.message);
+			Assert.areEqual(FormSubmitService.PROCESSED, kept.status, 'Kept: ' + kept.message);
 			Assert.areEqual('updated', kept.records[0].action, 'Found and filled');
 			Assert.areEqual(onFile.Id, kept.records[0].recordId, 'The person on file');
 			Assert.areEqual(1, kept.records.size(), 'No organization named, so none and no link');
-			Assert.areEqual(FormSubmitService.PROCESSED, overwritten.status, overwritten.message);
+			Assert.areEqual(
+				FormSubmitService.PROCESSED,
+				overwritten.status,
+				'Overwritten: ' + overwritten.message
+			);
 			Contact after = [
 				SELECT Description, MailingPostalCode
 				FROM Contact
@@ -173,7 +181,11 @@ private class FormSubmitServiceTest {
 			Assert.areEqual(FormSubmitService.NEEDS_REVIEW, held.status, 'Two Pats: never guessed');
 			Assert.isTrue(held.records.isEmpty(), 'Nothing written while held');
 			Assert.areEqual(couple[2].Id, samResult.records[0].recordId, 'Sam is told apart');
-			Assert.areEqual(FormSubmitService.PROCESSED, again.status, again.message);
+			Assert.areEqual(
+				FormSubmitService.PROCESSED,
+				again.status,
+				'Processed again: ' + again.message
+			);
 			Assert.areEqual(couple[1].Id, again.records[0].recordId, 'The person staff chose');
 			Assert.areEqual(
 				3,

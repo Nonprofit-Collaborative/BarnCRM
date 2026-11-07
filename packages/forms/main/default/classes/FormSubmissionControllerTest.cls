@@ -53,7 +53,11 @@ private class FormSubmissionControllerTest {
 				},
 				'In the order the form asks'
 			);
-			Assert.areEqual(FormSubmitService.PROCESSED, again.status, again.message);
+			Assert.areEqual(
+				FormSubmitService.PROCESSED,
+				again.status,
+				'Processed again: ' + again.message
+			);
 			Assert.isFalse(after.canProcess, 'Nothing left to process');
 			Assert.areEqual(twins[0].Id, after.records[0].recordId, 'What was written');
 			try {
