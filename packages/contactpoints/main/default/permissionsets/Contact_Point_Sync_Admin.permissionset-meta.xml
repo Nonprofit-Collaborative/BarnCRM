@@ -7,6 +7,10 @@
     Points BarnCRM manages. Starting the backfill also needs the Manage BarnCRM Settings
     permission.
   </description>
+  <classAccesses>
+    <apexClass>ContactPointSyncController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>false</editable>
     <field>Contact_Point_Link__c.Contact_Point_Id__c</field>
@@ -30,4 +34,8 @@
     <object>Contact_Point_Link__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
+  <tabSettings>
+    <tab>Contact_Point_Sync</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
 </PermissionSet>

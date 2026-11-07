@@ -196,6 +196,10 @@ BarnCRM's **Work Phone**.
   or phone is set, those fields are filled from your choice on every save. Edit the address
   or number you chose instead, or clear the preference.
 - Problem: there is no **Addresses** card. The Addresses feature is off. Ask your admin.
+- Problem: you changed an email, phone or address in another Salesforce app (one that shows
+  Contact Points) and it changed back. Where your org has BarnCRM Contact Point Sync, those
+  copies come from the person's record in BarnCRM and are put back on the next save. Change
+  the email, phone or address on the person's record instead.
 
 ## Related
 
@@ -203,4 +207,5 @@ BarnCRM's **Work Phone**.
 - [Relationships and affiliations](relationships-affiliations.md)
 - Admin Guide: [Addresses](../admin-guide/addresses.md),
   [Email addresses](../admin-guide/emails.md),
-  [Preferred phone](../admin-guide/preferred-phone.md)
+  [Preferred phone](../admin-guide/preferred-phone.md),
+  [Contact Point Sync](../admin-guide/contact-point-sync.md)

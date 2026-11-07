@@ -111,6 +111,7 @@ into five kinds:
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
 | ContactPointSyncService | Upkeep | The person's managed Contact Points, Individual and Contact Point Links, which the saver may not be able to see or edit | ADR-0021, ADR-NEXT contact point sync module |
+| ContactPointBackfillBatch | Org job | Every person in the org, synced as a save would; started only from the Contact Point Sync page by a holder of Manage BarnCRM Settings | ADR-0021, ADR-NEXT contact point sync module |
 
 ## Mirror
 

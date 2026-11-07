@@ -1,7 +1,20 @@
 {
   "languages": ["en"],
   "texts": {
+    "ContactPoints_Backfill_Summary": "Created {0}, updated {1}, removed {2}, could not save {3}.",
+    "ContactPoints_Kind_Missing": "{0}: this org does not have the Contact Point {0} object, so nothing is copied.",
+    "ContactPoints_Kind_NoIndividual": "{0}: the Individual object is turned off, so nothing is copied. Turn on data protection details in Setup, Data Protection and Privacy, then run the backfill.",
+    "ContactPoints_Kind_Off": "{0}: turned off in BarnCRM Settings, Contact Points. Copies already made are left as they are.",
+    "ContactPoints_Kind_Ready": "{0}: copied after every save.",
+    "ContactPoints_Kind_Restricted": "{0}: copied after every save, but your own access to the Contact Point {0} object is restricted, so you may not see the copies.",
     "ContactPoints_Log_NotQueued": "Contact Point Sync could not copy the changes of {0} people in this save and could not queue them either. Run the backfill on the Contact Point Sync page.",
-    "ContactPoints_Log_Refused": "Contact Point Sync could not save a {0} copy for {1}: {2}"
+    "ContactPoints_Log_Refused": "Contact Point Sync could not save a {0} copy for {1}: {2}",
+    "ContactPoints_Page_Counts": "The backfill will check {0} people. BarnCRM manages {1} Contact Points now.",
+    "ContactPoints_Page_Failed": "The Contact Point Sync page could not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "ContactPoints_Page_Intro": "Copies each person's email addresses, phone numbers and current addresses to Salesforce Contact Points after every save, for the apps in your org that read them. BarnCRM is the source: edits made to a copy elsewhere are put back. Run the backfill once after installing to copy everyone already here.",
+    "ContactPoints_Page_LastBackfill": "Last backfill finished {0}. {1}",
+    "ContactPoints_Page_NoManagePermission": "Running the backfill needs the Manage BarnCRM Settings permission.",
+    "ContactPoints_Page_NothingToCopy": "Nothing can be copied in this org yet. Follow what the page says for each kind, then run the backfill.",
+    "ContactPoints_Page_Running": "The backfill is running. Refresh the page later to see what it did."
   }
 }

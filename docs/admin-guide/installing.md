@@ -36,7 +36,8 @@ stop mattering once BarnCRM is on AppExchange.
 | Logic Models | 58,027 | 106 | 5 |
 | Funders | 116,136 | 100 | 7 |
 | Mirror | 221,010 | 170 | 1 |
-| **Every package** | **4,280,027** | **4,120** | **87** |
+| Contact Point Sync | 43,980 | 2 | 2 |
+| **Every package** | **4,324,007** | **4,122** | **89** |
 | **Org limit** | 6,000,000 (can be raised) | 5,000 | 200 Enterprise, 2,000 Unlimited, 400 Developer |
 
 Measured 2026-11-04. The install pre-check below measures the release you are installing,
