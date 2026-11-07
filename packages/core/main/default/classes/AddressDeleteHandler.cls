@@ -47,16 +47,17 @@ public with sharing class AddressDeleteHandler extends TriggerHandler {
 				for (Schema.SObjectField owner : OWNERS) {
 					Id ownerId = (Id) address.get(owner);
 					if (ownerId != null && recordOf.containsKey(ownerId)) {
-						address.Deleted_With__c =
-							owner.getDescribe().getLocalName() +
-							':' +
-							ownerId;
+						// Only the mark is written, never the lookups: a merge reparents them.
+						Address__c mark = new Address__c(
+							Id = address.Id,
+							Deleted_With__c = owner.getDescribe().getLocalName() + ':' + ownerId
+						);
 						Id recordId = recordOf.get(ownerId);
 						if (!markedByRecord.containsKey(recordId)) {
 							markedByRecord.put(recordId, new List<Address__c>());
 						}
-						markedByRecord.get(recordId).add(address);
-						marked.add(address);
+						markedByRecord.get(recordId).add(mark);
+						marked.add(mark);
 					}
 				}
 			}

@@ -135,8 +135,13 @@ private class AccountKindsTest {
 			}
 			Boolean hasOwn = !AccountKinds.candidateRecordTypes().isEmpty();
 			Assert.areEqual(!hasOwn, offered.contains(shipped), 'Offered only without one');
+			Schema.RecordTypeInfo own = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
+				.get(shipped);
+			Assert.isNotNull(own, 'Core ships the record type');
+			Assert.isTrue(own.isActive(), 'Shipped active');
 
 			store(shipped);
+			SettingsService.clearCaches();
 			AccountKinds.reset();
 			Test.startTest();
 			String inForce = AccountKinds.organizationRecordTypeName();
