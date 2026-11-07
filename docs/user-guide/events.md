@@ -27,7 +27,7 @@ For a class or meeting that happens again and again:
 2. Choose **Every Week**, **Every Two Weeks** or **Every Month**, and how many occurrences to add.
 3. Check the dates under **Preview**, then click **Repeat Event**.
 
-Each new date is a draft copy of the event, with its ticket types. Change each one on its own;
+Each new date is a draft copy of the event, with its ticket types and tracks. Change each one on its own;
 open the first event to see them all under **Occurrences**.
 
 ## Set Up Tickets
@@ -40,3 +40,17 @@ open the first event to see them all under **Occurrences**.
 
 To change or remove a ticket or code, use its row menu. BarnCRM records prices only; payments
 are taken outside BarnCRM.
+
+## Build the Agenda
+
+1. Open the event and click the **Agenda** tab.
+2. Click **New Track** for each strand, such as `Admins` and `Developers`. Sessions for everyone,
+   such as a keynote, can stay in **No Track**.
+3. Click **New Session**. Give it a title, a track, a **Start** and **End** inside the event's
+   dates, and a **Room**. Save.
+4. To move a session to another track, choose **Move to** in its menu, or drag it by its handle.
+   With a keyboard, focus the handle, press Space, use the arrow keys and press Space again.
+5. A red note on a session means another session uses the same room, or the same speaker, at
+   the same time. Change one of them, or leave it if that is what you meant.
+
+Use **When** to look at one day at a time, or at the sessions with no time yet.

@@ -136,4 +136,44 @@
         <shortDescription>Tickets tab: a quantity or use limit left empty</shortDescription>
         <value>No limit</value>
     </labels>
+    <labels>
+        <fullName>Events_EventTab_Agenda</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: the Agenda Builder</shortDescription>
+        <value>Agenda</value>
+    </labels>
+    <labels>
+        <fullName>Events_Agenda_NewTrack</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Agenda tab button that adds a track</shortDescription>
+        <value>New Track</value>
+    </labels>
+    <labels>
+        <fullName>Events_Agenda_NewSession</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Agenda tab button that adds a session</shortDescription>
+        <value>New Session</value>
+    </labels>
+    <labels>
+        <fullName>Events_Agenda_NoTrack</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Agenda column of the sessions in no track</shortDescription>
+        <value>No Track</value>
+    </labels>
+    <labels>
+        <fullName>Events_Agenda_Unscheduled</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Agenda day choice: sessions with no time yet</shortDescription>
+        <value>Unscheduled</value>
+    </labels>
 </CustomLabels>
