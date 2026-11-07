@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Copies people's email, phone and addresses to Salesforce Contact Points: status, preview
+    count and Run Backfill.
+  </description>
+  <flexiPage>Contact_Point_Sync</flexiPage>
+  <label>Contact Point Sync</label>
+  <motif>Custom55: Big Top</motif>
+</CustomTab>

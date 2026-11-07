@@ -22,7 +22,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 - [Finding people and records](find.md): search, list views and the Find tab.
 - [Changing many records at once](super-transform.md): Super Transformer, with a preview and an undo, saved lists and a phone format.
 - [People and households](people-and-households.md): adding people, household members, names and greetings, merge and split, interaction notes.
-- [Addresses, email and phone](addresses-email-phone.md): several addresses, seasonal addresses, the preferred email and phone.
+- [Addresses, email and phone](addresses-email-phone.md): several addresses, seasonal addresses, the preferred email and phone, and their Contact Point copies where Contact Point Sync is installed.
 - [Relationships and affiliations](relationships-affiliations.md): how people are connected to each other and to organizations.
 - [Reviewing duplicates](duplicates.md): checking likely duplicate pairs and merging them.
 

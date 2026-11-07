@@ -62,8 +62,9 @@ CAPS = {
     # Raised from 95,000 for the Funders usability stage: Undo for Mark Received and Mark
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).
     "funders": 100_500,
-    # New 2026-11-06 for Contact Point Sync (C-45, ADR-NEXT contact point sync module).
-    "contactpoints": 40_000,
+    # New 2026-11-06 for Contact Point Sync (C-45, ADR-NEXT contact point sync module):
+    # 43,980 measured with the page and backfill, plus about 2 percent.
+    "contactpoints": 45_000,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
