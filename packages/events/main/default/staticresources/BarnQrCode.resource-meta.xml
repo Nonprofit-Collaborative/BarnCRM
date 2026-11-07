@@ -2,5 +2,8 @@
 <StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
   <cacheControl>Public</cacheControl>
   <contentType>application/javascript</contentType>
-  <description>QR Code Generator for JavaScript 1.4.4 (Kazuhiko Arase, MIT, unmodified, see NOTICE). Draws check-in QR codes in the browser (EV-12).</description>
+  <description>
+    QR Code Generator for JavaScript 1.4.4 (Kazuhiko Arase, MIT, unmodified, see NOTICE). Draws
+    check-in QR codes in the browser (EV-12).
+  </description>
 </StaticResource>
