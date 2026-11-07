@@ -22,6 +22,7 @@ private class AddressDeleteHandlerTest {
 			SELECT Id, IsDeleted, Account__c, Contact__c, Deleted_With__c
 			FROM Address__c
 			WHERE Id = :addressId
+			WITH SYSTEM_MODE
 			ALL ROWS
 		];
 	}
