@@ -196,7 +196,45 @@ with source **Form**; a question with the key `ticketType` (a ticket type's name
 key `promoCode` choose the ticket and the code. A submission that cannot be registered (a used-up
 code, an unknown ticket) is kept for review in Forms. Without Forms, register people on the tab.
 
+## Settings
+
+As an admin, open the **Events** section of **BarnCRM Settings**. Each setting saves org-wide as
+you change it.
+
+| Setting | Default | What it does | Takes effect |
+|---|---|---|---|
+| Send event reminders | Off | Each person Registered for an Open or Closed event gets one reminder email before it. | At the next 7:30 AM run |
+| Days before an event to remind | 2 | How many days before an event its reminders go out, from 1 to 30. | At the next 7:30 AM run |
+| Reminder email template | BarnCRM_Event_Reminder | The unique name of the email template reminders use. | At the next 7:30 AM run |
+| Send follow-ups | Off | Each person marked **Attended** gets one follow-up email after the event ends (within seven days). | At the next 7:30 AM run |
+| Follow-up email template | BarnCRM_Event_Follow_Up | The unique name of the email template follow-ups use. | At the next 7:30 AM run |
+| Mark no-shows | Off | Once an event has ended (within seven days), attendees still **Registered** become **No-Show**. | At the next 7:30 AM run |
+
+## Reminders, Follow-Ups and No-Shows
+
+A step of [BarnCRM Nightly Jobs](nightly-jobs.md) named **Event reminders, follow-ups and
+no-shows** runs each morning at 7:30 AM while Event Management and at least one of the three
+settings are on. It has no switch of its own; if Health Check shows the nightly run as not
+scheduled, use its **Schedule all nightly jobs** fix once. All three settings ship off, because
+turning them on emails real people.
+
+**Templates.** Two text templates ship in the **BarnCRM Events** email folder:
+`BarnCRM_Event_Reminder` and `BarnCRM_Event_Follow_Up`. Copy one in Setup, Classic Email
+Templates, change the copy and type its unique name in the setting. The person is the template's
+recipient (`{!Contact.FirstName}`) and the attendee its related record
+(`{!Event_Attendee__c.Event_Name__c}`). A template name that matches no template sends nothing
+and writes a Warning in the **Error Log**.
+
+**One email each.** Each attendee is stamped (**Reminder Sent On** or **Follow-Up Sent On**)
+before it is emailed and never emailed again for that step; a failed send clears the stamp so
+the next morning tries again, and is listed in the **Error Log**. Clear the stamp to send it
+again. People with no email or with Email Opt Out are skipped. The org's daily email limit
+applies.
+
+**No-Show.** A No-Show keeps its seat and its price on the registration; change it from the
+attendee's menu when it is wrong.
+
 ## Not Yet
 
 Session sign-up, a public event page, call for speakers, speaker portal, sponsorship, check-in
-codes, reminders and volunteer shifts for an event come in later releases.
+codes and volunteer shifts for an event come in later releases.

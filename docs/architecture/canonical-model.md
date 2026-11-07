@@ -13327,10 +13327,64 @@ that is not cancelled is not added again.
 | Ticket Type | `Ticket_Type__c` | Lookup(Ticket Type), Clear on delete |
 | Price | `Price__c` | Currency(16, 2) |
 | Status | `Status__c` | Picklist (Registered, Waitlisted, Cancelled, Attended, No-Show), restricted, required |
+| Reminder Sent On | `Reminder_Sent_On__c` | DateTime, set by the morning run (EV-14, R-EAT3) |
+| Follow-Up Sent On | `Follow_Up_Sent_On__c` | DateTime, set by the morning run (EV-14, R-EAT3) |
+| Event Name | `Event_Name__c` | Formula (Text): the event's name, for email templates |
+
+**R-EAT3 Each email goes once.** The morning run stamps an attendee before emailing it and clears
+the stamp when the send fails; clearing a stamp by hand sends that email again.
 
 - **Panel:** the Registrations tab of the event page (`eventRegistrations`), with
   `EventRegistrationsController` (thin, user mode); counts, status badges and menu items come
   from the framework-free module `eventRegistrationsModel.js` (plan 9.9).
+
+---
+
+## 29EV10. Events Settings
+
+### Definition
+
+The Event Management module's org-wide settings (EV-14), edited in the Events section of BarnCRM
+Settings.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Send event reminders | boolean | yes (defaults false) | Whether the morning run emails each registered person before an Open or Closed event. |
+| Days before an event to remind | number | yes (defaults 2) | The lead time, from 1 to 30 days (R-ES1). |
+| Reminder email template | text | yes (defaults BarnCRM_Event_Reminder) | The unique name of the reminder's email template. |
+| Send follow-ups | boolean | yes (defaults false) | Whether the morning run emails each person marked Attended within seven days after the event. |
+| Follow-up email template | text | yes (defaults BarnCRM_Event_Follow_Up) | The unique name of the follow-up's email template. |
+| Mark no-shows | boolean | yes (defaults false) | Whether the morning run marks attendees still Registered as No-Show once an event (ended within seven days) is over. |
+
+### Rules
+
+**R-ES1 A value out of range reads as the default.** A blank or out of range lead time reads as
+2, a blank template name as the shipped template; a never-saved setting reads as its shipped
+value.
+
+### Salesforce implementation
+
+- **Object:** `Events_Settings__c`, hierarchy custom setting, visibility Protected, read through
+  Core's `SettingsService` by `EventsSettings`.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Send event reminders | `Reminders_Enabled__c` | Checkbox, default false |
+| Days before an event to remind | `Reminder_Lead_Days__c` | Number(2, 0), default 2 |
+| Reminder email template | `Reminder_Template__c` | Text(80), default BarnCRM_Event_Reminder |
+| Send follow-ups | `Follow_Ups_Enabled__c` | Checkbox, default false |
+| Follow-up email template | `Follow_Up_Template__c` | Text(80), default BarnCRM_Event_Follow_Up |
+| Mark no-shows | `Mark_No_Shows__c` | Checkbox, default false |
+
+- **Setting Definitions:** `Events_Reminders_Enabled`, `Events_Reminder_Lead_Days`,
+  `Events_Reminder_Template`, `Events_Follow_Ups_Enabled`, `Events_Follow_Up_Template`,
+  `Events_Mark_No_Shows`, section Events.
+- **Automation:** the nightly step `EventEmailScheduler` (7:30 AM, through
+  `EventsNightlyJobProvider`) starts `EventEmailBatch`; the work is `EventEmailService`. Email
+  templates `BarnCRM_Event_Reminder` and `BarnCRM_Event_Follow_Up` ship in the folder BarnCRM
+  Events.
 
 ---
 

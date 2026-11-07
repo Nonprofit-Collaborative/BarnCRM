@@ -59,6 +59,9 @@ public with sharing class SettingSections {
 	public static final String ROLLUPS = 'Rollups';
 	@NamespaceAccessible
 	public static final String VOLUNTEERS = 'Volunteers';
+	/** Event Management's reminder, follow-up and No-Show settings (EV-14). */
+	@NamespaceAccessible
+	public static final String EVENTS = 'Events';
 	/** The Programs module's section, which opens its own settings page. */
 	@NamespaceAccessible
 	public static final String PROGRAMS = 'Programs';
@@ -91,6 +94,7 @@ public with sharing class SettingSections {
 			ROLLUPS,
 			PROGRAMS,
 			VOLUNTEERS,
+			EVENTS,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,

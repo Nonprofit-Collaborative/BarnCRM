@@ -182,6 +182,21 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Event_Attendee__c.Reminder_Sent_On__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Event_Attendee__c.Follow_Up_Sent_On__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Event_Attendee__c.Event_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Event__c.Venue_Address__c</field>
     <readable>true</readable>
   </fieldPermissions>

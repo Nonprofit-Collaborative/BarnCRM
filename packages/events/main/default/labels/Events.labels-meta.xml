@@ -265,6 +265,14 @@
         <value>Cancel Registration</value>
     </labels>
     <labels>
+        <fullName>Events_NightlyJobs_EmailsName</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Nightly run step name: event reminders, follow-ups and no-shows</shortDescription>
+        <value>Event reminders, follow-ups and no-shows</value>
+    </labels>
+    <labels>
         <fullName>Events_EventTab_Speakers</fullName>
         <categories>Events</categories>
         <language>en_US</language>

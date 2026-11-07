@@ -16,6 +16,8 @@
     "Events_Repeat_BadDates": "Each new date must be after the event's own start. Nothing was saved.",
     "Events_Repeat_Done": "{0} occurrences added as drafts.",
     "Events_PromoCode_Duplicate": "The code {0} is already used for this event. Choose another code, or edit the one already there.",
+    "Events_Emails_NoTemplate": "No event email went: there is no email template with the unique name {0}. Check the template named in Events settings.",
+    "Events_Emails_SendFailed": "{0} of {1} event emails could not be sent and will be tried again tomorrow. The first reason: {2}",
     "Events_Register_AllRegistered": "Nobody new to register: {0} already registered for this event.",
     "Events_Register_BadCode": "The code {0} cannot be used for this event now. Check the code, or register without it.",
     "Events_Register_CodeNotForTicket": "That code is not for the chosen tickets. Choose the ticket it is for, or register without it.",

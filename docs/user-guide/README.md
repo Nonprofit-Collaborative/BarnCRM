@@ -59,7 +59,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ### Event Management
 
-- [Events](events.md): finding, creating and repeating events, setting up tickets, building the agenda, adding speakers and registering people.
+- [Events](events.md): finding, creating and repeating events, setting up tickets, building the agenda, adding speakers, registering people and their reminder and follow-up emails.
 
 ### Reports
 

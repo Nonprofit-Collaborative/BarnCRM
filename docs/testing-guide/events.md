@@ -140,3 +140,23 @@ and a promo code `HALF` (Percent, 50, Maximum Uses 1); a person `Jane Doe`, emai
 | 10 | As a user with no Events set, open the **Event Registrations** list in a report. | No registrations are visible. |
 
 **Cleanup:** None.
+
+## T-EV-08: Reminders, Follow-Ups and No-Shows
+
+**Purpose:** confirm the morning run emails reminders and follow-ups once each and marks no-shows,
+and does nothing while the settings are off.
+**Prerequisites:** admin; Event Management on; the nightly run scheduled; an Open event starting
+tomorrow with Jane (a real inbox you can read) **Registered**; a second event that ended yesterday
+with Sam **Attended** (with an email) and Max **Registered**.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Events**. | Six settings: the three switches Off, lead days 2, the two shipped template names. |
+| 2 | Leave them off; in **Nightly Jobs**, run the step **Event reminders, follow-ups and no-shows** now (or wait for 7:30 AM). | Nothing is emailed; no attendee changes. |
+| 3 | Turn **Send event reminders**, **Send follow-ups** and **Mark no-shows** on; run the step again. | Jane gets the reminder naming the event; her **Reminder Sent On** is set. Sam gets the follow-up; **Follow-Up Sent On** is set. Max is **No-Show**. |
+| 4 | Run the step again. | No second email to Jane or Sam. |
+| 5 | Set **Reminder email template** to `No_Such_Template`; clear Jane's **Reminder Sent On**; run again. | No email; the **Error Log** has a Warning naming `No_Such_Template`; Jane's stamp stays blank. |
+| 6 | Type `0` in **Days before an event to remind**. | Refused: the value must be from 1 to 30. |
+
+**Cleanup:** Set the template back to `BarnCRM_Event_Reminder` and turn the three settings off.

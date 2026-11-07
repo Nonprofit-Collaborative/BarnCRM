@@ -82,3 +82,8 @@ Use **When** to look at one day at a time, or at the sessions with no time yet.
 From an attendee's menu, **Mark Attended** or **Mark No-Show** after the event, **Move Off
 Waitlist** when a seat frees up, **Cancel Attendee** for one person or **Cancel Registration** for
 the whole booking.
+
+When your admin has turned them on, BarnCRM emails each registered person a reminder a few days
+before the event and each person you marked **Attended** a follow-up after it, and marks anyone
+still **Registered** as **No-Show** once the event is over. An attendee's **Reminder Sent On** and
+**Follow-Up Sent On** show when each went; clear one to send it again.

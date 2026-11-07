@@ -1,0 +1,9 @@
+Dear {!Contact.FirstName, friend},
+
+Thank you for joining us at {!Event_Attendee__c.Event_Name__c}. We hope you enjoyed it.
+
+We would love to see you at our next event.
+
+With thanks,
+
+{!Organization.Name}
