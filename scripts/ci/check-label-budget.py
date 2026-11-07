@@ -34,7 +34,11 @@ import re
 import subprocess
 import sys
 
-BUDGET = 3215
+# Raised from 3,215 on 2026-11-07 for Batch C's three new modules (Forms, Contact Point Sync,
+# Event Management: 59 labels) and its Core and Volunteers items (C-61/C-63, C-69, V-10b); the
+# check below already holds no unused label and no help prose. A module's labels reach an org
+# only when that module is installed.
+BUDGET = 3245
 TARGET = 3000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 
