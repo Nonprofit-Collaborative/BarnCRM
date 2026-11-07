@@ -1,10 +1,13 @@
 /**
- * Public forms for an API caller (C-42b; ADR-NEXT public forms on a Salesforce Site, decision 7;
- * D-187): Portal Builder, or any off-platform page, serves a form through a signed-in integration
- * user. The same intake as the Site page (`FormIntakeService`), as plain JSON:
+ * Public forms for an API caller (C-42b, C-42c; ADR-NEXT public forms on a Salesforce Site,
+ * decisions 7 and 11; D-187): Portal Builder, or any off-platform page, serves a form through a
+ * signed-in integration user. The same intake as the Site page (`FormIntakeService`), as plain
+ * JSON:
  *
- *   GET  /services/apexrest/barncrm/forms/v1/<formId>  the public form, or 404
- *   POST /services/apexrest/barncrm/forms/v1/<formId>  { ticket, answers, trap, contextRecordId }
+ *   GET  /services/apexrest/barncrm/forms/v1/<formId>[?resume=<token>]  the public form, or 404
+ *   POST /services/apexrest/barncrm/forms/v1/<formId>
+ *        { ticket, answers, trap, contextRecordId, files?, resume? }  sends the answers
+ *        { ticket, answers, trap, saveFor: <email>, step }          saves them for later
  *        returns { status, message, problems }
  *
  * Not given to the Site guest user. The caller's submission is processed at once, as the caller,
@@ -14,9 +17,15 @@
 global with sharing class FormPublicRest {
 	@HttpGet
 	global static void getForm() {
+		RestRequest request = RestContext.request;
 		RestResponse response = RestContext.response;
-		Id formId = formIdOf(RestContext.request);
-		FormIntakeService.PublicForm form = formId == null ? null : FormIntakeService.load(formId);
+		Id formId = formIdOf(request);
+		String token = request.params == null ? null : request.params.get('resume');
+		FormIntakeService.PublicForm form = formId == null
+			? null
+			: (String.isBlank(token)
+					? FormIntakeService.load(formId)
+					: FormIntakeService.resume(formId, token));
 		response.addHeader('Content-Type', 'application/json');
 		response.statusCode = form == null ? 404 : 200;
 		response.responseBody = Blob.valueOf(form == null ? '{}' : JSON.serialize(form));
@@ -41,21 +50,34 @@ global with sharing class FormPublicRest {
 			return;
 		}
 		Map<String, Object> body = (Map<String, Object>) parsed;
-		Object answers = body.get('answers');
-		FormIntakeService.Receipt receipt = FormIntakeService.submit(
-			text(body.get('ticket')),
-			answers instanceof Map<String, Object>
-				? (Map<String, Object>) answers
-				: new Map<String, Object>(),
-			text(body.get('trap')),
-			text(body.get('contextRecordId'))
-		);
+		FormIntakeService.Receipt receipt = body.containsKey('saveFor')
+			? FormIntakeService.saveDraft(
+					text(body.get('ticket')),
+					mapOf(body.get('answers')),
+					text(body.get('trap')),
+					text(body.get('saveFor')),
+					body.get('step') instanceof Integer ? (Integer) body.get('step') : 0
+			  )
+			: FormIntakeService.submit(
+					text(body.get('ticket')),
+					mapOf(body.get('answers')),
+					text(body.get('trap')),
+					text(body.get('contextRecordId')),
+					mapOf(body.get('files')),
+					text(body.get('resume'))
+			  );
 		response.statusCode = 200;
 		response.responseBody = Blob.valueOf(JSON.serialize(receipt));
 	}
 
 	private static String text(Object value) {
 		return value instanceof String ? (String) value : null;
+	}
+
+	private static Map<String, Object> mapOf(Object value) {
+		return value instanceof Map<String, Object>
+			? (Map<String, Object>) value
+			: new Map<String, Object>();
 	}
 
 	private static Id formIdOf(RestRequest request) {

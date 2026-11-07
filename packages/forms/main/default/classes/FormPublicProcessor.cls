@@ -44,8 +44,24 @@ public with sharing class FormPublicProcessor implements Schedulable {
 	}
 
 	public void execute(SchedulableContext context) {
+		deleteExpiredDrafts();
 		if (!waiting(1).isEmpty()) {
 			System.enqueueJob(new Run());
+		}
+	}
+
+	/** Deletes answers saved for later whose emailed link has expired (C-42c, R-FS7). */
+	public static void deleteExpiredDrafts() {
+		try {
+			delete as user [
+				SELECT Id
+				FROM Form_Draft__c
+				WHERE Expires__c < :Datetime.now()
+				WITH USER_MODE
+				LIMIT 200
+			];
+		} catch (Exception e) {
+			ErrorLogger.log(e, CONTEXT + '.deleteExpiredDrafts');
 		}
 	}
 

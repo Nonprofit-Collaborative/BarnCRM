@@ -81,16 +81,33 @@ public with sharing class FormSubmitService {
 	 * @param contextRecordId the record the form was filled from, or null
 	 */
 	public static Result submit(Id formId, Map<String, Object> answers, Id contextRecordId) {
+		return submit(formId, answers, contextRecordId, null);
+	}
+
+	/**
+	 * Submits answers with the files for the form's file questions (C-42c, R-FS7).
+	 *
+	 * @param files `{ key: { name, data } }`, data in base64, or null
+	 */
+	public static Result submit(
+		Id formId,
+		Map<String, Object> answers,
+		Id contextRecordId,
+		Map<String, Object> files
+	) {
 		Form__c form = publishedForm(formId);
 		Form_Version__c version = latestVersion(form);
 		Map<String, Object> definition = FormRules.parse(version.Definition__c);
 		Result refused = new Result();
 		refused.problems = FormRules.checkAll(definition, answers);
+		Map<String, Object> counted = FormRules.countedAnswers(definition, answers);
+		List<FormFiles.Upload> uploads = refused.problems.isEmpty()
+			? FormFiles.read(definition, counted, files, refused.problems)
+			: null;
 		if (!refused.problems.isEmpty()) {
 			refused.status = INVALID;
 			return refused;
 		}
-		Map<String, Object> counted = FormRules.countedAnswers(definition, answers);
 		Form_Submission__c submission = new Form_Submission__c(
 			Form__c = form.Id,
 			Form_Version__c = version.Id,
@@ -99,6 +116,7 @@ public with sharing class FormSubmitService {
 			Context_Record_Id__c = contextRecordId
 		);
 		insert as user submission;
+		FormFiles.keep(submission.Id, uploads, false);
 		return process(form, submission, definition, counted);
 	}
 
@@ -263,6 +281,10 @@ public with sharing class FormSubmitService {
 					submission.Organization__c = written.recordId;
 				}
 			}
+			FormFiles.share(
+				submission.Id,
+				new List<Id>{ submission.Person__c, submission.Organization__c }
+			);
 			submission.Status__c = PROCESSED;
 			submission.Message__c = null;
 			List<String> failures = FormAttachmentExtensions.notify(

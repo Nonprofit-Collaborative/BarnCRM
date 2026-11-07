@@ -116,7 +116,12 @@ public with sharing class ModuleManagerService {
 			'Grant_Payment__c',
 			'Grant_Requirement__c'
 		},
-		'Forms' => new List<String>{ 'Form__c', 'Form_Submission__c', 'Form_Version__c' },
+		'Forms' => new List<String>{
+			'Form__c',
+			'Form_Draft__c',
+			'Form_Submission__c',
+			'Form_Version__c'
+		},
 		'ContactPoints' => new List<String>{ 'Contact_Point_Link__c' },
 		'Events' => new List<String>{
 			'Event__c',

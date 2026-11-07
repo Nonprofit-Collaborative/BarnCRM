@@ -1,6 +1,10 @@
 import {
+  FILE_ACCEPT,
+  MAX_FILE_BYTES,
   checkAll,
   checkAnswer,
+  checkFileSizes,
+  readFiles,
   checkStep,
   countedAnswers,
   evaluate,
@@ -106,6 +110,26 @@ describe('c/formRules steps and answers', () => {
     });
     expect(checkAnswer({ type: 'checkbox', required: true }, 'true')).toBeNull();
     expect(checkAnswer({ type: 'date' }, '2026-11-06')).toBeNull();
+  });
+
+  it('takes documents and pictures for a file question, within the size together', () => {
+    expect(checkAnswer({ type: 'file' }, 'Resume.PDF')).toBeNull();
+    expect(checkAnswer({ type: 'file' }, 'page.html')).toEqual({ code: 'badFileType', args: [] });
+    expect(checkAnswer({ type: 'file' }, 'pdf')).toEqual({ code: 'badFileType', args: [] });
+    expect(checkAnswer({ type: 'file', required: true }, '')).toEqual({
+      code: 'required',
+      args: []
+    });
+    expect(checkFileSizes({ a: { size: MAX_FILE_BYTES } })).toEqual({});
+    expect(checkFileSizes({ a: { size: MAX_FILE_BYTES }, b: { size: 1 } })).toEqual({
+      b: { code: 'fileTooLarge', args: [1024] }
+    });
+    expect(FILE_ACCEPT).toContain('.pdf');
+  });
+
+  it('reads a file as base64 for the server', async () => {
+    const read = await readFiles({ cv: new File(['hello'], 'cv.txt') });
+    expect(read).toEqual({ cv: { name: 'cv.txt', data: btoa('hello') } });
   });
 
   it('draws the shown questions of a step with their answers and problems', () => {

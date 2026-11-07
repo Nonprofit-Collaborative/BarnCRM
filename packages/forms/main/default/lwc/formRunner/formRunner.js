@@ -5,11 +5,14 @@ import getForm from '@salesforce/apex/FormRunnerController.getForm';
 import submit from '@salesforce/apex/FormRunnerController.submit';
 import { parseDefinition } from 'c/formDefinition';
 import {
+  FILE_ACCEPT,
+  checkFileSizes,
   checkStep,
   countedAnswers,
   nextStep,
   previousStep,
   questionViews,
+  readFiles,
   visibleSteps
 } from 'c/formRules';
 import { HELP, LABELS, answerText, messageFrom, resultText } from 'c/formText';
@@ -43,6 +46,8 @@ export default class FormRunner extends NavigationMixin(LightningElement) {
 
   helpReady = isHelpLoaded(HELP);
   labels = LABELS;
+  fileAccept = FILE_ACCEPT;
+  files = {};
   previewText;
   formOptions = [];
   chosenFormId;
@@ -131,6 +136,7 @@ export default class FormRunner extends NavigationMixin(LightningElement) {
     this.model = definition;
     this.form = form || this.form;
     this.answers = {};
+    this.files = {};
     this.problems = {};
     this.result = null;
     this.current = definition ? (visibleSteps(definition, {})[0] ?? -1) : -1;
@@ -170,6 +176,7 @@ export default class FormRunner extends NavigationMixin(LightningElement) {
   get questions() {
     return questionViews(this.model, this.current, this.answers, this.problems).map((question) => ({
       ...question,
+      fileName: question.isFile && this.files[question.key] ? this.files[question.key].name : '',
       error: question.problem ? answerText(question.problem) : ''
     }));
   }
@@ -180,6 +187,24 @@ export default class FormRunner extends NavigationMixin(LightningElement) {
       event.target.type === 'checkbox' || event.target.dataset.type === 'checkbox'
         ? event.detail.checked
         : event.detail.value;
+    this.setAnswer(key, value);
+  }
+
+  /** A file chosen for a file question (C-42c): its name is the answer, the file goes beside. */
+  handleFile(event) {
+    const key = event.target.dataset.key;
+    const file = (event.detail.files || [])[0];
+    const files = { ...this.files };
+    if (file) {
+      files[key] = file;
+    } else {
+      delete files[key];
+    }
+    this.files = files;
+    this.setAnswer(key, file ? file.name : '');
+  }
+
+  setAnswer(key, value) {
     this.answers = { ...this.answers, [key]: value };
     if (this.problems[key]) {
       const problems = { ...this.problems };
@@ -212,10 +237,24 @@ export default class FormRunner extends NavigationMixin(LightningElement) {
     this.busy = true;
     this.errorMessage = '';
     try {
+      const counted = countedAnswers(this.model, this.answers);
+      const chosen = {};
+      Object.keys(this.files).forEach((key) => {
+        if (counted[key] !== undefined) {
+          chosen[key] = this.files[key];
+        }
+      });
+      const tooLarge = checkFileSizes(chosen);
+      if (Object.keys(tooLarge).length) {
+        this.showServerProblems(tooLarge);
+        this.busy = false;
+        return;
+      }
       const result = await submit({
         formId: this.form.formId,
-        answersJson: JSON.stringify(countedAnswers(this.model, this.answers)),
-        contextRecordId: this.contextId
+        answersJson: JSON.stringify(counted),
+        contextRecordId: this.contextId,
+        filesJson: JSON.stringify(await readFiles(chosen))
       });
       if (result.status === 'Invalid') {
         this.showServerProblems(result.problems || {});
@@ -229,10 +268,10 @@ export default class FormRunner extends NavigationMixin(LightningElement) {
   }
 
   /** Answers the server refused: back to the first step with one, problems showing. */
-  showServerProblems(codes) {
+  showServerProblems(found) {
     const problems = {};
-    Object.keys(codes).forEach((key) => {
-      problems[key] = { code: codes[key], args: [] };
+    Object.keys(found).forEach((key) => {
+      problems[key] = typeof found[key] === 'string' ? { code: found[key], args: [] } : found[key];
     });
     const first = visibleSteps(this.model, this.answers).find((index) =>
       this.model.steps[index].fields.some((field) => problems[field.key])

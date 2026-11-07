@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Token_Hash__c</fullName>
+  <caseSensitive>true</caseSensitive>
+  <description>
+    SHA-256 of the emailed link's token, in hex (R-FS7). The token itself is never stored. No permission set reads it.
+  </description>
+  <externalId>true</externalId>
+  <label>Token Hash</label>
+  <length>64</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>true</unique>
+</CustomField>

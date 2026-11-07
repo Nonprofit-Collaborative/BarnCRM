@@ -12619,7 +12619,8 @@ read outside Salesforce (plan 9.9).
 - A step: `{ "key", "title", "showWhen"?, "fields": [...] }`; at least one step, at most 20.
 - A field: `{ "key", "label", "type", "required"?, "help"?, "options"?, "maxLength"?, "min"?,
   "max"?, "showWhen"?, "target"? }`. Types: text, textarea, email, phone, number, date, checkbox,
-  picklist. A picklist has `options`, each `{ "label", "value" }`. Keys are letters, digits and
+  picklist, file (C-42c). A picklist has `options`, each `{ "label", "value" }`. A file field has
+  no target: its answer is the file's name and the file is kept as R-FS7 says. Keys are letters, digits and
   underscores, start with a letter, and are unique across the form. At most 100 fields.
 - A condition (`showWhen`): `{ "all": [...] }` or `{ "any": [...] }` of tests
   `{ "field", "op", "value"? }` (op: equals, notEquals, isBlank, isNotBlank, contains,
@@ -12635,7 +12636,8 @@ read outside Salesforce (plan 9.9).
 - A target: `{ "record": "<record key>", "field": "<field API name>" }`.
 - `public` (optional, C-42b): `{ "enabled", "minSeconds"?, "hourlyLimit"?, "confirmation"? }`.
   minSeconds 0 to 600 (default 3), hourlyLimit 1 to 1000 (default 50), confirmation up to 1,000
-  characters. A public form may not use onMatch `overwrite`.
+  characters. A public form may not use onMatch `overwrite`. C-42c adds `saveForLater`? (default
+  false) and `resumeDays`? (1 to 30, default 7): R-FS7.
 
 The engine (`formDefinition.js`) refuses a definition that breaks any of these, naming the first
 problem; the builder saves only a definition it accepts.
@@ -12791,6 +12793,62 @@ person matched to a person account is held for review. Otherwise R-FS1 to R-FS4 
 - **Public classes (C-42b):** `FormPublicPolicy` (R-FM3), `FormIntakeService` (R-FS5, the only
   `without sharing` class), `FormPublicController` and `FormPublicRest` (thin),
   `FormPublicProcessor` (R-FS6), `FormsHealthCheckExtension` (Site and guest checks).
+- **Files (C-42c):** `FormFiles` (R-FS7).
+
+---
+
+## 29ZY1. Form Draft
+
+### Definition
+
+Answers to a public form saved for later (C-42c, ADR-NEXT public forms on a Salesforce Site,
+decision 11): the version they answer and a hash of the token in the emailed link. Never shown
+to the person who saved it except through that link; deleted when the form is sent or the link
+expires.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Form | reference | yes | The form, master-detail. |
+| Form Version | reference | no | The version the answers answer; a resumed form is always this version. Cleared if the version is deleted, which ends the link. |
+| Token Hash | text | yes | SHA-256 of the link's token in hex. The token itself is never stored. No permission set reads it. |
+| Expires | date/time | yes | When the link stops working (now plus `public.resumeDays`). |
+| Answers | long text | no | The answers that count so far, as JSON, without file answers. |
+| Step | number | no | The step the person was on. |
+
+### Rules
+
+**R-FS7 Files and saved answers (C-42c).** A file question's answer is the file's name; the file
+comes beside the answers as base64, must be named as answered and of a listed kind (documents and
+pictures: pdf, jpg, jpeg, png, gif, heic, doc, docx, xls, xlsx, csv, txt, rtf, odt), and one
+submission's files may hold at most 1 MB together. The intake (system mode, for a guest) or the
+staff runner (user mode) keeps each file as a Salesforce File on the submission; processing
+shares it with the person and organization written, once each. Saving for later is offered only
+on a public form with `saveForLater`: after the R-FS5 spam checks (drafts count toward the
+hourly limit) a random 256-bit token is made, its hash stored with the answers, and a link to
+`FormsPublic?form=<id>&resume=<token>` on the Site (or the first active Site, for an API caller)
+emailed to the address given, which is not stored. A link opens only before Expires and only on
+the draft's version; sending the form deletes the draft; `FormPublicProcessor` deletes expired
+drafts. If the email cannot be sent the draft is deleted and the person told.
+
+### Salesforce implementation
+
+- **Object:** `Form_Draft__c`, name field Auto Number `FD-{000000}`, master-detail to `Form__c`,
+  sharing controlled by parent, no tab, not searchable or reportable.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Form | `Form__c` | Master-Detail(Form) |
+| Form Version | `Form_Version__c` | Lookup(Form Version), set null on delete |
+| Token Hash | `Token_Hash__c` | Text(64), unique, case sensitive, external ID |
+| Expires | `Expires__c` | Date/Time |
+| Answers | `Answers__c` | Long Text Area(131072) |
+| Step | `Step__c` | Number(3, 0) |
+
+- **Permission sets:** only Forms Admin reads and deletes drafts (for the expired-draft cleanup it
+  schedules); no set creates or edits one or reads Token Hash. The intake writes them in system
+  mode.
 
 ---
 
@@ -13631,6 +13689,7 @@ mirrors the primary member).
 | 1.0 | 2026-11-06 | Shipped organization record type (owner decision D-184, ADR-0173, amends ADR-0141 decision 2). Account gains the record type `BarnCRM_Organization` (active, given to nobody). Section 8 gains R-O4a: offered for organizations only where the org has no record type of its own, never detected, never switched to automatically; R-O5 leaves it out of the candidates. |
 | 1.1 | 2026-11-06 | Forms module (C-42a, D-157, ADR-0175 `0175-forms-module.md`). New package BarnCRM Forms with Sections 29ZW Form (`Form__c`), 29ZX Form Version (`Form_Version__c`) and 29ZY Form Submission (`Form_Submission__c`), rules R-FM1, R-FM2 and R-FS1 to R-FS4. Core gains no object or field: only the `FormAttachmentExtension` seam and the catalog row `BarnCRM_Module.Forms`. |
 | 1.1 | 2026-11-07 | Public forms (C-42b, D-157, ADR-NEXT public forms on a Salesforce Site). `Form__c` gains `Public__c` (Checkbox); `Form_Version__c` gains `Signing_Key__c` (Text 64); `Form_Submission__c` gains `Source__c` (Staff, Public) and Status value Received. R-FM1 gains the `public` block; new rules R-FM3, R-FS5 and R-FS6. |
+| 1.1 | 2026-11-07 | Files and save for later on forms (C-42c, D-157, ADR-NEXT public forms on a Salesforce Site, decision 11). New Section 29ZY1 Form Draft (`Form_Draft__c`); R-FM1 gains the `file` type and `public.saveForLater` and `public.resumeDays`; new rule R-FS7. |
 | 1.1 | 2026-11-06 | BarnCRM Contact Point Sync module (C-45, D-111, ADR-0176 contact point sync module). New package `contactpoints`: Contact Point Link (`Contact_Point_Link__c`, 29ZZ, rules R-CPL1 to R-CPL4) and Contact Point Sync Settings (`Contact_Point_Sync_Settings__c`, 29ZZ1, R-CPS1). No Core object or field added. |
 | 1.2 | 2026-11-06 | Event Management module (EV-01, EV-03, EV-04, EV-05; ADR-0177 `0177-events-module.md`, D-123, D-177). Seven objects in the new package `packages/events`: Event (`Event__c`, 29EV1), Ticket Type (`Ticket_Type__c`, 29EV2), Promo Code (`Promo_Code__c`, 29EV3), Event Track (`Event_Track__c`, 29EV4), Event Session (`Event_Session__c`, 29EV5), Event Speaker (`Event_Speaker__c`, 29EV6) and Session Speaker (`Session_Speaker__c`, 29EV7), with rules R-EV1 to R-EV4, R-TT1 to R-TT4, R-PC1 to R-PC5, R-ETR1, R-ESN1 to R-ESN5, R-ESP1 to R-ESP3 and R-SSP1. Registrations, attendees, call for speakers and sponsorship are designed in the ADR and added by their items. |
 
@@ -13746,6 +13805,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Form | Forms | release 1.1 (C-42a) | 29ZW |
 | Form Version | Forms | release 1.1 (C-42a) | 29ZX |
 | Form Submission | Forms | release 1.1 (C-42a) | 29ZY |
+| Form Draft | Forms | release 1.1 (C-42c) | 29ZY1 |
 | Funders entities | Funders | v0.9 | 30 |
 | Grant | Funders | 0.16 (F-01) | 29ZH |
 | Grant Requirement | Funders | 0.16 (F-02) | 29ZI |

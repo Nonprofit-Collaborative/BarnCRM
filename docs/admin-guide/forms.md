@@ -157,6 +157,10 @@ Salesforce requires these steps in **Setup**, and no app can do them for you:
    is not listed.
 4. Choose the Site's default owner for records its guest user creates, if Salesforce asks.
 5. **Activate** the Site.
+6. Only if a public form asks for a file: **Setup > Salesforce Files > General Settings**, turn
+   on **Allow site guest users to upload files**. Salesforce does not let an app change this.
+7. Only if a public form lets people save and finish later: check **Setup > Deliverability**
+   allows **All email**, so the link can be emailed.
 
 Then open **Health Check** in the Settings console. With a public form published it checks:
 
@@ -182,11 +186,32 @@ uses this form.
 
 Closing the form (Status **Closed**) stops its public link at once.
 
+### Files and Save for Later
+
+A **File** question (in the question's **Type**) lets the person attach a document or picture:
+PDF, JPG, PNG, GIF, HEIC, Word, Excel, CSV, text, RTF or ODT, at most 1 MB for all the form's
+files together. A file question is not written to a field: the file is kept on the submission
+as a Salesforce File and, when the answers are processed, added to the person's and the
+organization's **Files** too. Staff filling in a form in the Form Runner attach files the same
+way.
+
+On a public form, turn on **Let People Save and Finish Later** and set **Days a Saved Link
+Works** (1 to 30, default 7). The person sees **Save and Finish Later**, gives an email
+address, and gets a link that opens the form with their answers filled in, on the same version
+of the form, until it expires or they send it. Files are not saved: they choose them again.
+BarnCRM keeps the answers in a **Form Draft** but not the email address, and stores only a
+scrambled copy of the link's code, so nobody can open a draft without the email. Saved drafts
+count toward **Sends Per Hour**, and public form processing deletes expired ones. Save and
+Finish Later is not offered on a form opened from a record (such as an event's registration).
+
 ### Integrations and Portals
 
 A portal or website off Salesforce can serve the same public form through a signed-in
 integration user, at `/services/apexrest/barncrm/forms/v1/<form record Id>` (GET loads the form,
-POST sends `ticket`, `answers` and `trap`). Give that user the **Forms Staff** permission set
+POST sends `ticket`, `answers` and `trap`, with optional `files` as `{ key: { name, data } }`
+in base64 and `resume` for a resumed form; POST with `saveFor` (an email address) and `step`
+saves the answers for later instead, and GET with `?resume=<code>` loads them). Give that user
+the **Forms Staff** permission set
 and access to what the form writes; its answers are processed at once, as that user. The same
 checks apply.
 
@@ -201,6 +226,7 @@ each linked. Reports on Form Submissions work like any other.
 ## Limits
 
 A form has at most 20 steps, 100 questions and 10 records to write, and a picklist at most 200
-choices. A form writes at most one person and one organization. A person who is stored as a
+choices. A form writes at most one person and one organization. The files sent with one form
+can be at most 1 MB together. A person who is stored as a
 person account is never changed by a form: the submission is held as Needs Review so you can
 update them by hand.

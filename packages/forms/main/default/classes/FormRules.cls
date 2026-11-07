@@ -12,6 +12,23 @@ public with sharing class FormRules {
 	private static final Pattern PHONE = Pattern.compile('^[+()0-9\\s.\\-x]+$');
 	private static final Pattern DATE_TEXT = Pattern.compile('^\\d{4}-\\d{2}-\\d{2}$');
 	private static final Integer MIN_PHONE_DIGITS = 7;
+	/** The kinds of file a file question takes (C-42c): documents and pictures, nothing a browser runs. */
+	public static final Set<String> FILE_TYPES = new Set<String>{
+		'pdf',
+		'jpg',
+		'jpeg',
+		'png',
+		'gif',
+		'heic',
+		'doc',
+		'docx',
+		'xls',
+		'xlsx',
+		'csv',
+		'txt',
+		'rtf',
+		'odt'
+	};
 	private static final Map<String, Integer> DEFAULT_MAX_LENGTH = new Map<String, Integer>{
 		'text' => 255,
 		'textarea' => 32768
@@ -33,6 +50,19 @@ public with sharing class FormRules {
 			return (Map<String, Object>) parsed;
 		}
 		throw new DefinitionException(BarnHelp.text('Forms', 'Forms_Definition_NotJson'));
+	}
+
+	/** A JSON object sent by a page or caller, such as answers, as a map: empty when it is not one. */
+	public static Map<String, Object> jsonMap(String text) {
+		Object parsed;
+		try {
+			parsed = String.isBlank(text) ? null : JSON.deserializeUntyped(text);
+		} catch (JSONException notJson) {
+			parsed = null;
+		}
+		return parsed instanceof Map<String, Object>
+			? (Map<String, Object>) parsed
+			: new Map<String, Object>();
 	}
 
 	/** The definition's steps, never null. */
@@ -213,6 +243,11 @@ public with sharing class FormRules {
 			}
 			when 'date' {
 				return isDate(text) ? null : 'badDate';
+			}
+			when 'file' {
+				// The answer is the file's name; the file itself is checked by FormFiles.
+				String kind = text.substringAfterLast('.').toLowerCase();
+				return FILE_TYPES.contains(kind) && text.length() <= 255 ? null : 'badFileType';
 			}
 			when 'picklist' {
 				for (Map<String, Object> option : maps(field.get('options'))) {

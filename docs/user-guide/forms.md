@@ -10,7 +10,8 @@ BarnCRM admin builds the forms (see [Forms](../admin-guide/forms.md) in the Admi
 2. Select the **Fill In** tab.
 3. Answer the questions on the first step and select **Next**. A question you must answer, or an
    answer BarnCRM cannot take (an email without an `@`, a date that is not a date), says what to
-   fix in red below it.
+   fix in red below it. A **file** question takes a document or picture (at most 1 MB for all
+   the form's files together).
 4. Some steps and questions appear only when an earlier answer calls for them, and the path at
    the top shows only the steps you will see. **Back** returns to the step before.
 5. On the last step select **Submit**.
@@ -40,6 +41,10 @@ Submissions** tab with **Source Public** and status **Received** until BarnCRM w
 your records, within about 15 minutes. A public form only fills in fields that are blank on a
 person already in BarnCRM; it never replaces what you know. If the answers look wrong, change
 the records by hand; a submission held for review is finished the same way as any other.
+
+A file sent with a form (a public one or one you fill in) is under the submission's **Files**,
+and once the answers are written, under the person's and organization's **Files** too. Someone
+who saved a public form to finish later shows up only when they send it.
 
 ## To Finish a Submission Held for Review
 

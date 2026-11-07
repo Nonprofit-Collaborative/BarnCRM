@@ -126,7 +126,8 @@ describe('c-form-runner', () => {
     expect(submit).toHaveBeenCalledWith({
       formId: 'a01000000000001',
       answersJson: JSON.stringify({ last: 'Lee', age: 30 }),
-      contextRecordId: '001000000000001'
+      contextRecordId: '001000000000001',
+      filesJson: '{}'
     });
     expect(find(element, '[data-id="outcome"] c-barn-notice').message).toBe(
       'c.Forms_Runner_Processed'

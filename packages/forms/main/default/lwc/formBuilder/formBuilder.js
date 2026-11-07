@@ -199,15 +199,17 @@ export default class FormBuilder extends LightningElement {
       enabled: settings.enabled === true,
       minSeconds: settings.minSeconds ?? PUBLIC_DEFAULTS.minSeconds,
       hourlyLimit: settings.hourlyLimit ?? PUBLIC_DEFAULTS.hourlyLimit,
-      confirmation: settings.confirmation || ''
+      confirmation: settings.confirmation || '',
+      saveForLater: settings.saveForLater === true,
+      resumeDays: settings.resumeDays ?? PUBLIC_DEFAULTS.resumeDays
     };
   }
 
   handlePublicChange(event) {
     const setting = event.target.dataset.setting;
     const settings = { ...(this.definition.public || {}) };
-    if (setting === 'enabled') {
-      settings.enabled = event.detail.checked;
+    if (setting === 'enabled' || setting === 'saveForLater') {
+      settings[setting] = event.detail.checked;
     } else if (setting === 'confirmation') {
       settings.confirmation = event.detail.value;
     } else {

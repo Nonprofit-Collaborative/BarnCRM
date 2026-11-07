@@ -12,9 +12,11 @@
  *     maxLength?, min?, max?, showWhen?, target?: { record, field } }] }],
  *   records: [{ key, kind: 'person' | 'organization' | 'related', object?, matching?: { rule,
  *     onMatch }, links?: { field: recordKey | 'context' }, values?: { field: constant } }],
- *   public?: { enabled, minSeconds?, hourlyLimit?, confirmation? } }
+ *   public?: { enabled, minSeconds?, hourlyLimit?, confirmation?, saveForLater?, resumeDays? } }
  * `public` (C-42b, ADR-NEXT public forms on a Salesforce Site) lets the published version be
- * filled in on a Salesforce Site or by an API caller.
+ * filled in on a Salesforce Site or by an API caller; `saveForLater` (C-42c) lets a person save
+ * their answers and finish from an emailed link that works for `resumeDays`. A `file` question
+ * (C-42c) has no target: its file is kept with the submission.
  */
 
 export const SCHEMA_VERSION = 1;
@@ -27,7 +29,8 @@ export const FIELD_TYPES = Object.freeze([
   'number',
   'date',
   'checkbox',
-  'picklist'
+  'picklist',
+  'file'
 ]);
 
 /** Tests a condition can make; the first five compare with `value`. */
@@ -69,9 +72,10 @@ export const LIMITS = Object.freeze({
 export const PUBLIC_LIMITS = Object.freeze({
   minSeconds: [0, 600],
   hourlyLimit: [1, 1000],
+  resumeDays: [1, 30],
   confirmation: 1000
 });
-export const PUBLIC_DEFAULTS = Object.freeze({ minSeconds: 3, hourlyLimit: 50 });
+export const PUBLIC_DEFAULTS = Object.freeze({ minSeconds: 3, hourlyLimit: 50, resumeDays: 7 });
 
 const KEY = /^[A-Za-z][A-Za-z0-9_]*$/;
 const FIELD_NAME = /^[A-Za-z][A-Za-z0-9_]*$/;
@@ -248,7 +252,10 @@ function checkField(field, keys, earlier, recordKeys) {
   }
   if (field.target !== undefined && field.target !== null) {
     const target = field.target;
-    if (!recordKeys.has(target.record)) {
+    if (field.type === 'file') {
+      // A file is kept with the submission and shared with the person, not written to a field.
+      found.push(problem('fileTarget', name));
+    } else if (!recordKeys.has(target.record)) {
       found.push(problem('unknownRecord', name, String(target.record)));
     } else if (typeof target.field !== 'string' || !FIELD_NAME.test(target.field)) {
       found.push(problem('noTargetField', name));
@@ -363,6 +370,9 @@ function checkPublic(definition) {
   }
   if (!inRange(settings.hourlyLimit, PUBLIC_LIMITS.hourlyLimit)) {
     found.push(problem('badPublicLimit', ...PUBLIC_LIMITS.hourlyLimit));
+  }
+  if (!inRange(settings.resumeDays, PUBLIC_LIMITS.resumeDays)) {
+    found.push(problem('badPublicResumeDays', ...PUBLIC_LIMITS.resumeDays));
   }
   const confirmation = settings.confirmation;
   if (
