@@ -1,0 +1,158 @@
+{
+  "about": "Shared cases for the form rules (plan 9.9): formRules.js (Jest) and FormRules.cls (FormRulesTest) are held to the same expectations. Change both when a case changes.",
+  "definition": {
+    "schemaVersion": 1,
+    "steps": [
+      {
+        "key": "about",
+        "title": "About You",
+        "fields": [
+          { "key": "firstName", "label": "First Name", "type": "text", "required": true },
+          { "key": "lastName", "label": "Last Name", "type": "text", "required": true },
+          { "key": "email", "label": "Email", "type": "email", "required": true },
+          { "key": "age", "label": "Age", "type": "number", "min": 14, "max": 120 },
+          {
+            "key": "role",
+            "label": "Role",
+            "type": "picklist",
+            "options": [
+              { "label": "Volunteer", "value": "Volunteer" },
+              { "label": "Donor", "value": "Donor" }
+            ]
+          },
+          {
+            "key": "shirt",
+            "label": "Shirt Size",
+            "type": "text",
+            "maxLength": 3,
+            "showWhen": { "all": [{ "field": "role", "op": "equals", "value": "volunteer" }] }
+          }
+        ]
+      },
+      {
+        "key": "minor",
+        "title": "Guardian",
+        "showWhen": { "any": [{ "field": "age", "op": "lessThan", "value": 18 }] },
+        "fields": [
+          { "key": "guardian", "label": "Guardian Name", "type": "text", "required": true },
+          { "key": "consent", "label": "Guardian Consent", "type": "checkbox", "required": true }
+        ]
+      },
+      {
+        "key": "more",
+        "title": "More",
+        "fields": [
+          { "key": "start", "label": "Start Date", "type": "date" },
+          { "key": "phone", "label": "Phone", "type": "phone" },
+          {
+            "key": "why",
+            "label": "Why",
+            "type": "textarea",
+            "showWhen": { "all": [{ "field": "shirt", "op": "isNotBlank" }] }
+          }
+        ]
+      }
+    ],
+    "records": [{ "key": "person", "kind": "person" }]
+  },
+  "cases": [
+    {
+      "name": "an adult volunteer",
+      "answers": {
+        "firstName": " Pat ",
+        "lastName": "Lee",
+        "email": "pat@example.org",
+        "age": "30",
+        "role": "Volunteer",
+        "shirt": "M",
+        "why": "To help",
+        "guardian": "Not asked"
+      },
+      "visibleSteps": [0, 2],
+      "counted": {
+        "firstName": "Pat",
+        "lastName": "Lee",
+        "email": "pat@example.org",
+        "age": 30,
+        "role": "Volunteer",
+        "shirt": "M",
+        "why": "To help"
+      },
+      "problems": {}
+    },
+    {
+      "name": "a minor without consent, hidden answers dropped",
+      "answers": {
+        "firstName": "Sam",
+        "lastName": "Lee",
+        "email": "sam@example.org",
+        "age": 16,
+        "role": "Donor",
+        "shirt": "XL",
+        "why": "Hidden because shirt is hidden",
+        "guardian": "Jo Lee"
+      },
+      "visibleSteps": [0, 1, 2],
+      "counted": {
+        "firstName": "Sam",
+        "lastName": "Lee",
+        "email": "sam@example.org",
+        "age": 16,
+        "role": "Donor",
+        "guardian": "Jo Lee",
+        "consent": false
+      },
+      "problems": { "consent": "mustTick" }
+    },
+    {
+      "name": "every kind of bad answer",
+      "answers": {
+        "firstName": "  ",
+        "lastName": "Lee",
+        "email": "not an email",
+        "age": "ten",
+        "role": "Board",
+        "start": "2026-02-30x",
+        "phone": "12"
+      },
+      "visibleSteps": [0, 2],
+      "counted": {
+        "lastName": "Lee",
+        "email": "not an email",
+        "age": "ten",
+        "role": "Board",
+        "start": "2026-02-30x",
+        "phone": "12"
+      },
+      "problems": {
+        "firstName": "required",
+        "email": "badEmail",
+        "age": "badNumber",
+        "role": "notAnOption",
+        "start": "badDate",
+        "phone": "badPhone"
+      }
+    },
+    {
+      "name": "limits",
+      "answers": {
+        "firstName": "Al",
+        "lastName": "Lee",
+        "email": "al@example.org",
+        "age": 121,
+        "role": "Volunteer",
+        "shirt": "XXXL"
+      },
+      "visibleSteps": [0, 2],
+      "counted": {
+        "firstName": "Al",
+        "lastName": "Lee",
+        "email": "al@example.org",
+        "age": 121,
+        "role": "Volunteer",
+        "shirt": "XXXL"
+      },
+      "problems": { "age": "aboveMax", "shirt": "tooLong" }
+    }
+  ]
+}

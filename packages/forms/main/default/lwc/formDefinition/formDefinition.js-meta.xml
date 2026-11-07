@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <isExposed>false</isExposed>
+  <description>The form definition as a framework-free module: shape, defaults and checks (plan 9.9, canonical model 29ZW).</description>
+</LightningComponentBundle>
