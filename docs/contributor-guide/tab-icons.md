@@ -69,6 +69,8 @@ Rules:
 | giving | Stewardship_Plan__c | Custom43: Jewel |
 | giving | Stewardship_Plans | Custom4: Hexagon |
 | giving | Tribute__c | Custom5: Leaf |
+| forms | Form_Submission__c | Custom51: Apple |
+| forms | Form__c | Custom28: Cellphone |
 | logicmodels | Logic_Model__c | Custom62: Chalkboard |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |

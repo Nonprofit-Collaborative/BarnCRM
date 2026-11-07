@@ -72,6 +72,9 @@ const ICONS = Object.freeze({
   Stewardship_Plan__c: 'custom:custom43',
   Stewardship_Plans: 'custom:custom4',
   Tribute__c: 'custom:custom5',
+  // Forms
+  Form_Submission__c: 'custom:custom51',
+  Form__c: 'custom:custom28',
   // Logic Models
   Logic_Model__c: 'custom:custom62',
   // Mirror

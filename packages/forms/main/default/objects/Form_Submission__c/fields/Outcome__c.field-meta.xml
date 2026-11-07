@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Outcome__c</fullName>
+  <description>What was written as JSON: each record key with its identifier and whether it was matched, created or updated (canonical model 29ZY).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>What was written, as JSON. The Submission panel shows it as links.</inlineHelpText>
+  <label>Outcome</label>
+  <length>32768</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>
