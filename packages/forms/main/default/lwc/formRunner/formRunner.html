@@ -1,0 +1,128 @@
+<template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={title} icon-name="custom:custom28">
+      <div class="slds-var-p-horizontal_medium slds-is-relative">
+        <template lwc:if={loading}>
+          <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+        </template>
+        <template lwc:if={showPicker}>
+          <lightning-combobox
+            data-id="picker"
+            label={labels.form}
+            value={chosenFormId}
+            options={pickerOptions}
+            onchange={handlePick}
+          ></lightning-combobox>
+        </template>
+        <template lwc:if={errorMessage}>
+          <div class="slds-var-m-vertical_small" data-id="error">
+            <c-barn-notice variant="error" message={errorMessage}></c-barn-notice>
+          </div>
+        </template>
+        <template lwc:if={isPreview}>
+          <div class="slds-var-m-bottom_small" data-id="preview-note">
+            <c-barn-notice variant="info" message={labels.previewNote}></c-barn-notice>
+          </div>
+        </template>
+
+        <template lwc:if={ready}>
+          <c-barn-step-flow
+            steps={pathSteps}
+            current-step={currentValue}
+            can-go-back={canGoBack}
+            onback={handleBack}
+          >
+            <template for:each={questions} for:item="question">
+              <div key={question.key} class="slds-var-m-bottom_small" data-id="question">
+                <template lwc:if={question.isInput}>
+                  <lightning-input
+                    data-key={question.key}
+                    type={question.inputType}
+                    label={question.label}
+                    field-level-help={question.help}
+                    required={question.required}
+                    value={question.value}
+                    onchange={handleAnswer}
+                  ></lightning-input>
+                </template>
+                <template lwc:if={question.isLong}>
+                  <lightning-textarea
+                    data-key={question.key}
+                    label={question.label}
+                    field-level-help={question.help}
+                    required={question.required}
+                    value={question.value}
+                    onchange={handleAnswer}
+                  ></lightning-textarea>
+                </template>
+                <template lwc:if={question.isCheckbox}>
+                  <lightning-input
+                    data-key={question.key}
+                    data-type="checkbox"
+                    type="checkbox"
+                    label={question.label}
+                    field-level-help={question.help}
+                    required={question.required}
+                    checked={question.checked}
+                    onchange={handleAnswer}
+                  ></lightning-input>
+                </template>
+                <template lwc:if={question.isPicklist}>
+                  <lightning-combobox
+                    data-key={question.key}
+                    label={question.label}
+                    field-level-help={question.help}
+                    required={question.required}
+                    value={question.value}
+                    options={question.options}
+                    onchange={handleAnswer}
+                  ></lightning-combobox>
+                </template>
+                <template lwc:if={question.error}>
+                  <div class="slds-text-color_error" data-id="answer-problem">{question.error}</div>
+                </template>
+              </div>
+            </template>
+            <div slot="actions">
+              <template lwc:if={isLast}>
+                <lightning-button
+                  data-id="submit"
+                  variant="brand"
+                  label={labels.submit}
+                  disabled={submitDisabled}
+                  onclick={handleSubmit}
+                ></lightning-button>
+              </template>
+              <template lwc:else>
+                <lightning-button
+                  data-id="next"
+                  variant="brand"
+                  label={labels.next}
+                  onclick={handleNext}
+                ></lightning-button>
+              </template>
+            </div>
+          </c-barn-step-flow>
+        </template>
+
+        <template lwc:if={result}>
+          <div class="slds-var-m-vertical_small" data-id="outcome" role="status">
+            <c-barn-notice variant={resultVariant} message={resultMessage}></c-barn-notice>
+          </div>
+          <lightning-button
+            data-id="open-submission"
+            label={labels.openSubmission}
+            onclick={handleOpenSubmission}
+          ></lightning-button>
+          <lightning-button
+            class="slds-var-m-left_x-small"
+            data-id="another"
+            variant="brand"
+            label={labels.another}
+            onclick={handleAnother}
+          ></lightning-button>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

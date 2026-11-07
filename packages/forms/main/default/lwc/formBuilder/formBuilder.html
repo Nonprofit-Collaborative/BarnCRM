@@ -1,6 +1,16 @@
 <template>
   <template lwc:if={helpReady}>
     <lightning-card title={labels.title} icon-name="custom:custom28">
+      <lightning-button-stateful
+        slot="actions"
+        class="slds-var-m-right_x-small"
+        data-id="preview"
+        label-when-off={labels.preview}
+        label-when-on={labels.preview}
+        icon-name-when-on="utility:check"
+        selected={previewing}
+        onclick={handlePreview}
+      ></lightning-button-stateful>
       <template lwc:if={canEdit}>
         <lightning-button
           slot="actions"
@@ -48,6 +58,12 @@
                   <li key={problem.id}>{problem.text}</li>
                 </template>
               </ul>
+            </div>
+          </template>
+
+          <template lwc:if={previewing}>
+            <div class="slds-box slds-var-m-bottom_small" data-id="preview-runner">
+              <c-form-runner definition={previewJson}></c-form-runner>
             </div>
           </template>
 

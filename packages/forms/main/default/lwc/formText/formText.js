@@ -55,6 +55,17 @@ import PERSON from '@salesforce/label/c.Core_Section_Person';
 import ORGANIZATION from '@salesforce/label/c.Core_Settings_NavGroup_Organization';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import STATUS from '@salesforce/label/c.Core_ImportRow_StatusLabel';
+import RUNNER_TITLE from '@salesforce/label/c.Forms_Runner_Title';
+import FORM from '@salesforce/label/c.Forms_Runner_Form';
+import SUBMIT from '@salesforce/label/c.Forms_Runner_Submit';
+import ANOTHER from '@salesforce/label/c.Forms_Runner_Another';
+import OPEN_SUBMISSION from '@salesforce/label/c.Forms_Runner_OpenSubmission';
+import SUBMISSION_TITLE from '@salesforce/label/c.Forms_Submission_Title';
+import ANSWERS from '@salesforce/label/c.Forms_Submission_Answers';
+import WRITTEN from '@salesforce/label/c.Forms_Submission_Written';
+import PROCESS_AGAIN from '@salesforce/label/c.Forms_Submission_ProcessAgain';
+import NEXT from '@salesforce/label/c.Core_Import_NextButton';
+import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
 import { helpText } from 'c/barnHelpText';
 
 export const HELP = ['Forms', 'Core'];
@@ -90,6 +101,23 @@ export const LABELS = Object.freeze({
   remove: REMOVE,
   loading: LOADING,
   status: STATUS,
+  preview: PREVIEW,
+  runnerTitle: RUNNER_TITLE,
+  form: FORM,
+  next: NEXT,
+  submit: SUBMIT,
+  another: ANOTHER,
+  openSubmission: OPEN_SUBMISSION,
+  submissionTitle: SUBMISSION_TITLE,
+  answers: ANSWERS,
+  written: WRITTEN,
+  processAgain: PROCESS_AGAIN,
+  get previewNote() {
+    return helpText('Forms', 'Forms_Runner_PreviewNote');
+  },
+  get notPublished() {
+    return helpText('Forms', 'Forms_Submit_NotPublished');
+  },
   get intro() {
     return helpText('Forms', 'Forms_Builder_Intro');
   },
@@ -243,6 +271,24 @@ export function problemText(problem) {
 /** A problem with an answer (c/formRules checkAnswer), in words. */
 export function answerText(problem) {
   return worded(ANSWER_PROBLEMS, problem);
+}
+
+/** What became of sent answers: thanks when processed, else why they are held. */
+export function resultText(result) {
+  if (result && result.status === 'Processed') {
+    return helpText('Forms', 'Forms_Runner_Processed');
+  }
+  return (result && result.message) || helpText('Forms', 'Forms_Runner_Held');
+}
+
+/** What a submission did to one record: found it, filled it in, or added it. */
+export function actionText(action) {
+  if (action === 'created') {
+    return helpText('Forms', 'Forms_Written_created');
+  }
+  return action === 'updated'
+    ? helpText('Forms', 'Forms_Written_updated')
+    : helpText('Forms', 'Forms_Written_matched');
 }
 
 /** The message of a failed server call, or the general one. */

@@ -16,6 +16,22 @@
     <type>Flexipage</type>
     <pageOrSobjectType>Form__c</pageOrSobjectType>
   </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Form submission, with its answers and Process Again</comment>
+    <content>Form_Submission_Record_Page</content>
+    <formFactor>Large</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Form_Submission__c</pageOrSobjectType>
+  </actionOverrides>
+  <actionOverrides>
+    <actionName>View</actionName>
+    <comment>Form submission, with its answers and Process Again</comment>
+    <content>Form_Submission_Record_Page</content>
+    <formFactor>Small</formFactor>
+    <type>Flexipage</type>
+    <pageOrSobjectType>Form_Submission__c</pageOrSobjectType>
+  </actionOverrides>
   <brand>
     <headerColor>#007A9E</headerColor>
     <logo>BarnCRM_Forms_Logo</logo>

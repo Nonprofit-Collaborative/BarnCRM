@@ -72,8 +72,18 @@ export default class FormBuilder extends LightningElement {
   loading = true;
   busy = false;
   dirty = false;
+  previewing = false;
   errorMessage;
   resultMessage;
+
+  /** The draft as the Form Runner previews it; it follows every change. */
+  get previewJson() {
+    return serializeDefinition(this.definition);
+  }
+
+  handlePreview() {
+    this.previewing = !this.previewing;
+  }
 
   connectedCallback() {
     if (!this.helpReady) {
