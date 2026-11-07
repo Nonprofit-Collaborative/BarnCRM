@@ -342,6 +342,30 @@ No-Show) with a count of who is in and who is still to come.
 Checking in needs the Events Staff or Events Admin permission set; Events Read Only can look and
 show a QR code.
 
+### Seating
+
+The **Seating** tab lays out a gala or any seated event. It holds **tables** and a **guest list**
+of everyone Registered or Attended.
+
+- **Add Table** takes a name, the seats (at least 1), an optional **Host** (a Core person) and an
+  optional **Sponsor** (a sponsor of this event from the Sponsors tab, for a table the sponsor
+  bought). **Edit** and **Remove** change a table; removing one leaves its guests registered with
+  no table.
+- **Seating a guest.** Choose a table in the guest's **Table** column. A **party** is the people
+  on one registration; they move together while **Keep Party Together** is on. A table may hold
+  more people than its seats: the chart turns yellow and a warning shows, but nothing is refused.
+- **Suggest Seating** places the guests with no table: whole parties, largest first, at the first
+  table with room for the whole party. It never fills a sponsor table and tells you how many guests
+  did not fit.
+- **Dietary Needs** and **Access Needs** (255 characters each) are saved when you leave the
+  field, and show beside the guest's name on the chart.
+- **Export Seating Chart** downloads a CSV (table, host, sponsor, seats, guest, organization,
+  ticket, dietary and access needs; guests with no table last) made in the browser.
+
+Editing needs the Events Staff or Events Admin permission set; Events Read Only can look and
+export. Needs are personal data: they are on the attendee, which only people with an Events
+permission set can see.
+
 ## Settings
 
 As an admin, open the **Events** section of **BarnCRM Settings**. Each setting saves org-wide as

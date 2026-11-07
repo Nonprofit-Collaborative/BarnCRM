@@ -322,3 +322,28 @@ attendee. A phone or laptop camera and Chrome or Edge for step 6.
 | 10 | As read-only, open **Check-In**. | The list and QR buttons show; no **Check In** buttons, **Add Walk-In** or code box. |
 
 **Cleanup:** None.
+
+## T-EV-16: Gala Tables and Seating
+
+**Purpose:** confirm staff add tables, seat parties together, are warned about over-capacity,
+record needs and export the chart.
+**Prerequisites:** staff; an event with an active ticket type `General`; a registration for
+`Pat Rivera` with one guest (two attendees), a registration for `Sam Lee` alone, an organization
+sponsor `Acme` added on the Sponsors tab.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event, click **Seating**. | No tables; three guests listed, the line `0 of 3 guests are seated; 3 have no table.` |
+| 2 | **Add Table**: name `Table 1`, seats `2`, **Save Table**. Add `Table 2` with `4` seats, and `Acme Table` with `4` seats and sponsor `Acme`. | Three cards, each `0 of N seats`; Acme Table shows `Sponsor: Acme`. |
+| 3 | Choose `Table 1` for Pat Rivera. | Pat and the guest both sit at Table 1; `2 of 2 seats`. |
+| 4 | Choose `Table 1` for Sam Lee. | A warning toast; the Table 1 card turns yellow and shows `1 more than the seats at Table 1.` Nothing is refused. |
+| 5 | Choose **No Table** for Sam Lee. | Sam is unseated; the warning clears. |
+| 6 | Clear **Keep Party Together**, choose `Table 2` for Pat. | Only Pat moves; the guest stays at Table 1. |
+| 7 | Type `Vegetarian` in Sam's **Dietary Needs**, click elsewhere. | Saved; reload and it is still there; it shows beside Sam on the chart once seated. |
+| 8 | Click **Suggest Seating**. | Sam is seated at the first table with room; no one is placed at Acme Table. |
+| 9 | Click **Export Seating Chart**. | A CSV downloads with a header row, one row per guest, `Vegetarian` in Sam's row, and the table, host and sponsor columns filled. Opening it in a spreadsheet shows no formula. |
+| 10 | **Remove** Table 2. | The card goes; its guests remain in the list with **No Table**. |
+| 11 | As read-only, open **Seating**. | The chart and export show; no **Add Table**, **Suggest Seating**, **Edit** or **Remove**, and the **Table** menus cannot save. |
+
+**Cleanup:** None.

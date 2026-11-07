@@ -155,3 +155,15 @@ If your organization uses Summit Events, its registrations appear here each morn
 5. Someone arrives who is not on the list: **Add Walk-In**, type their name (and email if you
    have it), choose a ticket and click **Add and Check In**. Walk-ins can take the event past its
    capacity.
+
+## Seat Guests at Tables
+
+1. Open the event and click the **Seating** tab.
+2. Click **Add Table**, name it, give its seats, and choose a host or a sponsor if it has one.
+3. In the guest list, choose a **Table** for each guest. People who registered together move
+   together; clear **Keep Party Together** to seat one person alone. **Suggest Seating** seats
+   everyone who has no table.
+4. If a table holds more people than its seats, it turns yellow and a message says so. You can
+   keep it or move someone.
+5. Type any dietary or access needs in the guest's row.
+6. Click **Export Seating Chart** to download a file for the caterer or venue.

@@ -13428,6 +13428,9 @@ they came.
 | Ticket Type | reference to Ticket Type | no | The ticket held. |
 | Price | currency | no | The ticket's price with the registration's code applied (R-PC5). |
 | Status | picklist | yes | Registered, Waitlisted, Cancelled, Attended or No-Show. |
+| Table | reference to Event Table | no | The table the person sits at (EV-13). |
+| Dietary Needs | text | no | Meal needs, up to 255 characters (EV-13). |
+| Access Needs | text | no | Access needs, up to 255 characters (EV-13). |
 
 ### Rules
 
@@ -13453,6 +13456,9 @@ that is not cancelled is not added again.
 | Reminder Sent On | `Reminder_Sent_On__c` | DateTime, set by the morning run (EV-14, R-EAT3) |
 | Follow-Up Sent On | `Follow_Up_Sent_On__c` | DateTime, set by the morning run (EV-14, R-EAT3) |
 | Event Name | `Event_Name__c` | Formula (Text): the event's name, for email templates |
+| Table | `Event_Table__c` | Lookup(Event Table), Clear on delete (EV-13) |
+| Dietary Needs | `Dietary_Needs__c` | Text(255) (EV-13) |
+| Access Needs | `Access_Needs__c` | Text(255) (EV-13) |
 
 **R-EAT3 Each email goes once.** The morning run stamps an attendee before emailing it and clears
 the stamp when the send fails; clearing a stamp by hand sends that email again.
@@ -13824,6 +13830,49 @@ reads as its shipped value.
   `EventsNightlyJobProvider`) starts `EventEmailBatch`; the work is `EventEmailService`. Email
   templates `BarnCRM_Event_Reminder` and `BarnCRM_Event_Follow_Up` ship in the folder BarnCRM
   Events.
+
+---
+
+## 29EV26. Event Table
+
+### Definition
+
+One table at a gala or other seated event (EV-13, ADR-NEXT `NEXT-events-gala-seating.md`): its seats,
+its host and, for a table a sponsor bought, the sponsor. Guests are seated by setting the table on
+their Event Attendee (29EV9).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Table Name | text | yes | For example Table 4. |
+| Event | reference to Event | yes | The event. |
+| Capacity | number | yes | Seats, at least 1. |
+| Host | reference to Person | no | The person who hosts the table. |
+| Sponsor | reference to Event Sponsor | no | Set when the table belongs to a sponsor of this event. |
+
+### Rules
+
+**R-ET1 Over capacity warns.** More people than seats is allowed and flagged, never refused.
+
+**R-ET2 A party sits together.** The people on one registration move together unless staff turn
+that off; Suggest Seating places whole parties and never fills a sponsor table.
+
+### Salesforce implementation
+
+- **Object:** `Event_Table__c`, name field Text (label Table Name), master-detail to Event
+  (`Event__c`, relationship Tables), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Capacity | `Capacity__c` | Number(4, 0), required |
+| Host | `Host__c` | Lookup(Contact), Clear on delete |
+| Sponsor | `Event_Sponsor__c` | Lookup(Event Sponsor), Clear on delete |
+
+- **Panel:** the Seating tab of the event page (`eventSeating`), with `EventSeatingController`
+  (thin, user mode); counts, parties, suggested seating and the CSV come from the framework-free
+  module `eventSeatingModel.js` (plan 9.9).
 
 ---
 
@@ -14390,6 +14439,7 @@ mirrors the primary member).
 | 1.3 | 2026-11-07 | Event Management call for speakers (EV-06; ADR-0180 `0180-events-call-for-speakers.md`, ADR-0177 decision 11, D-123, D-177). New Sections 29EV20 Speaker Application (`Speaker_Application__c`, rules R-SA1, R-SA2, R-SA4, R-SA5), 29EV21 Speaker Review (`Speaker_Review__c`, R-SA3) and 29EV25 Events Settings (`Events_Settings__c`, R-ES1). Core gains the settings section name `Events`. Numbers 29EV22 to 29EV24 are reserved for sponsorship (EV-09). |
 | 1.3 | 2026-11-07 | Event Management sponsorship (EV-09; ADR-0181 `0181-events-sponsorship.md`, ADR-0177 decision 11, D-123, D-177). New Sections 29EV22 Sponsorship Level (`Sponsorship_Level__c`, R-SP3), 29EV23 Event Sponsor (`Event_Sponsor__c`, R-SP1, R-SP4) and 29EV24 Sponsor Deliverable (`Sponsor_Deliverable__c`). Core gains the `LinkedRecords` seam (no object or field). |
 | 1.3 | 2026-11-07 | Event Appointment (`Event_Appointment__c`, 29EV15, EV-15, ADR-0177 decision 13) with rules R-EAP1 to R-EAP6. |
+| 1.3 | 2026-11-07 | Event Management gala seating (EV-13; ADR-NEXT `NEXT-events-gala-seating.md`, ADR-0177 decision 8, D-156, D-186). New Section 29EV26 Event Table (`Event_Table__c`, R-ET1, R-ET2); Event Attendee (29EV9) gains Table, Dietary Needs and Access Needs. |
 | 1.3 | 2026-11-07 | Portal Builder module (PB-01, D-118, D-178, D-187; ADR-0185 `0185-portal-builder-off-platform-portal-api.md`). New package `packages/portal`: Portal (`Portal__c`, 29PB1), Portal Access (`Portal_Access__c`, 29PB2), Portal Session (`Portal_Session__c`, 29PB3) and Portal Settings (`Portal_Settings__c`, 29PB4), rules R-PB1 to R-PB4, R-PA1, R-PA2, R-PS1, R-PS2 and R-PST1. Core gains no object or field: only the `PortalActionExtension` seam, the Portals settings section and the catalog row `BarnCRM_Module.Portal`. |
 
 ---
@@ -14531,6 +14581,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Event Sponsor | Event Management | 1.3 (EV-09) | 29EV23 |
 | Sponsor Deliverable | Event Management | 1.3 (EV-09) | 29EV24 |
 | Events Settings | Event Management | 1.3 (EV-06, EV-14) | 29EV25 |
+| Event Table | Event Management | 1.3 (EV-13) | 29EV26 |
 | Portal | Portal Builder | 1.3 (PB-01) | 29PB1 |
 | Portal Access | Portal Builder | 1.3 (PB-01) | 29PB2 |
 | Portal Session | Portal Builder | 1.3 (PB-01) | 29PB3 |
