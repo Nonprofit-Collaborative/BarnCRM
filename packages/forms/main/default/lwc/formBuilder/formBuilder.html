@@ -1,0 +1,401 @@
+<template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="custom:custom28">
+      <lightning-button-stateful
+        slot="actions"
+        class="slds-var-m-right_x-small"
+        data-id="preview"
+        label-when-off={labels.preview}
+        label-when-on={labels.preview}
+        icon-name-when-on="utility:check"
+        selected={previewing}
+        onclick={handlePreview}
+      ></lightning-button-stateful>
+      <template lwc:if={canEdit}>
+        <lightning-button
+          slot="actions"
+          data-id="save"
+          label={labels.saveDraft}
+          disabled={saveDisabled}
+          onclick={handleSave}
+        ></lightning-button>
+        <lightning-button
+          slot="actions"
+          class="slds-var-m-left_x-small"
+          data-id="publish"
+          variant="brand"
+          label={labels.publish}
+          disabled={publishDisabled}
+          onclick={handlePublish}
+        ></lightning-button>
+      </template>
+      <div class="slds-var-p-horizontal_medium slds-is-relative">
+        <template lwc:if={loading}>
+          <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+        </template>
+        <template lwc:if={errorMessage}>
+          <div class="slds-var-m-bottom_small" data-id="error">
+            <c-barn-notice variant="error" message={errorMessage}></c-barn-notice>
+          </div>
+        </template>
+        <p role="status" class="slds-var-m-bottom_small" data-id="result">{resultMessage}</p>
+
+        <template lwc:if={loaded}>
+          <p class="slds-var-m-bottom_small">{labels.intro}</p>
+          <p class="slds-text-color_weak slds-var-m-bottom_small" data-id="status">
+            {labels.status}: {statusLine}
+          </p>
+          <template lwc:if={readOnly}>
+            <div class="slds-var-m-bottom_small" data-id="read-only">
+              <c-barn-notice variant="info" message={labels.readOnly}></c-barn-notice>
+            </div>
+          </template>
+          <template lwc:if={hasProblems}>
+            <div class="slds-box slds-var-m-bottom_small" data-id="problems">
+              <h3 class="slds-text-heading_small">{labels.problems}</h3>
+              <ul class="slds-list_dotted">
+                <template for:each={problems} for:item="problem">
+                  <li key={problem.id}>{problem.text}</li>
+                </template>
+              </ul>
+            </div>
+          </template>
+
+          <template lwc:if={previewing}>
+            <div class="slds-box slds-var-m-bottom_small" data-id="preview-runner">
+              <c-form-runner definition={previewJson}></c-form-runner>
+            </div>
+          </template>
+
+          <div class="slds-grid slds-wrap slds-gutters_small">
+            <div class="slds-col slds-size_1-of-1 slds-large-size_1-of-3" data-id="outline">
+              <template for:each={steps} for:item="step">
+                <div key={step.key} class="slds-var-m-bottom_small">
+                  <button
+                    class={step.className}
+                    data-id="step"
+                    data-step={step.index}
+                    onclick={handleSelect}
+                  >
+                    {step.title}
+                  </button>
+                  <ul class="slds-var-m-left_medium">
+                    <template for:each={step.fields} for:item="field">
+                      <li key={field.key}>
+                        <button
+                          class={field.className}
+                          data-id="question"
+                          data-step={field.stepIndex}
+                          data-field={field.index}
+                          onclick={handleSelect}
+                        >
+                          {field.label}
+                        </button>
+                      </li>
+                    </template>
+                  </ul>
+                  <template lwc:if={step.empty}>
+                    <p class="slds-text-color_weak slds-var-m-left_medium">{labels.emptyStep}</p>
+                  </template>
+                  <template lwc:if={canEdit}>
+                    <lightning-button
+                      class="slds-var-m-left_medium"
+                      variant="base"
+                      data-id="add-question"
+                      data-step={step.index}
+                      label={labels.addQuestion}
+                      icon-name="utility:add"
+                      onclick={handleAddQuestion}
+                    ></lightning-button>
+                  </template>
+                </div>
+              </template>
+              <template lwc:if={canEdit}>
+                <lightning-button
+                  data-id="add-step"
+                  label={labels.addStep}
+                  icon-name="utility:add"
+                  onclick={handleAddStep}
+                ></lightning-button>
+              </template>
+
+              <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.records}</h3>
+              <p class="slds-text-color_weak slds-var-m-vertical_x-small">{labels.recordsIntro}</p>
+              <ul>
+                <template for:each={records} for:item="record">
+                  <li key={record.key}>
+                    <button
+                      class={record.className}
+                      data-id="record"
+                      data-record={record.index}
+                      onclick={handleSelect}
+                    >
+                      {record.label}
+                    </button>
+                  </li>
+                </template>
+              </ul>
+              <template lwc:if={canEdit}>
+                <lightning-button-menu
+                  data-id="add-record"
+                  label={labels.addRecord}
+                  icon-name="utility:down"
+                  onselect={handleAddRecord}
+                >
+                  <template for:each={addRecordItems} for:item="item">
+                    <lightning-menu-item
+                      key={item.value}
+                      value={item.value}
+                      label={item.label}
+                    ></lightning-menu-item>
+                  </template>
+                </lightning-button-menu>
+              </template>
+            </div>
+
+            <div class="slds-col slds-size_1-of-1 slds-large-size_2-of-3" data-id="editor">
+              <fieldset disabled={readOnly} class="slds-box">
+                <template lwc:if={editingStep}>
+                  <lightning-input
+                    data-id="step-title"
+                    label={labels.stepTitle}
+                    value={step.title}
+                    onchange={handleStepChange}
+                  ></lightning-input>
+                </template>
+
+                <template lwc:if={editingField}>
+                  <lightning-input
+                    data-id="question-label"
+                    data-name="label"
+                    label={labels.question}
+                    value={field.label}
+                    required
+                    onchange={handleFieldChange}
+                  ></lightning-input>
+                  <lightning-input
+                    data-id="question-key"
+                    data-name="key"
+                    label={labels.key}
+                    value={field.key}
+                    required
+                    onchange={handleFieldChange}
+                  ></lightning-input>
+                  <lightning-combobox
+                    data-id="question-type"
+                    data-name="type"
+                    label={labels.type}
+                    value={field.type}
+                    options={typeOptions}
+                    onchange={handleFieldChange}
+                  ></lightning-combobox>
+                  <lightning-input
+                    type="checkbox"
+                    class="slds-var-m-top_x-small"
+                    data-id="question-required"
+                    data-name="required"
+                    label={labels.required}
+                    checked={field.required}
+                    onchange={handleFieldChange}
+                  ></lightning-input>
+                  <lightning-input
+                    data-id="question-help"
+                    data-name="help"
+                    label={labels.helpText}
+                    value={field.help}
+                    onchange={handleFieldChange}
+                  ></lightning-input>
+                  <template lwc:if={isPicklist}>
+                    <lightning-textarea
+                      data-id="question-choices"
+                      data-name="options"
+                      label={labels.choices}
+                      field-level-help={labels.choicesHint}
+                      value={choicesText}
+                      onchange={handleFieldChange}
+                    ></lightning-textarea>
+                  </template>
+                  <div class="slds-grid slds-gutters_x-small slds-wrap">
+                    <div class="slds-col">
+                      <lightning-combobox
+                        data-id="target-record"
+                        data-name="record"
+                        label={labels.writeTo}
+                        value={targetRecord}
+                        options={targetRecordOptions}
+                        onchange={handleTargetChange}
+                      ></lightning-combobox>
+                    </div>
+                    <template lwc:if={hasTargetRecord}>
+                      <div class="slds-col">
+                        <lightning-combobox
+                          data-id="target-field"
+                          data-name="field"
+                          label={labels.field}
+                          value={targetField}
+                          options={targetFieldOptions}
+                          onchange={handleTargetChange}
+                        ></lightning-combobox>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+
+                <template lwc:if={conditionOwner}>
+                  <h3 class="slds-text-heading_small slds-var-m-top_medium">{labels.showWhen}</h3>
+                  <lightning-radio-group
+                    data-id="condition-mode"
+                    label={labels.showWhen}
+                    variant="label-hidden"
+                    type="button"
+                    value={condition.mode}
+                    options={modeOptions}
+                    onchange={handleModeChange}
+                  ></lightning-radio-group>
+                  <template lwc:if={showClauses}>
+                    <template for:each={clauses} for:item="clause">
+                      <div key={clause.id} class="slds-grid slds-gutters_x-small slds-wrap">
+                        <div class="slds-col">
+                          <lightning-combobox
+                            data-id="clause-field"
+                            data-index={clause.index}
+                            data-name="field"
+                            label={labels.question}
+                            value={clause.field}
+                            options={conditionFieldOptions}
+                            onchange={handleClauseChange}
+                          ></lightning-combobox>
+                        </div>
+                        <div class="slds-col">
+                          <lightning-combobox
+                            data-id="clause-op"
+                            data-index={clause.index}
+                            data-name="op"
+                            label={labels.operator}
+                            value={clause.op}
+                            options={operatorOptions}
+                            onchange={handleClauseChange}
+                          ></lightning-combobox>
+                        </div>
+                        <template lwc:if={clause.needsValue}>
+                          <div class="slds-col">
+                            <lightning-input
+                              data-id="clause-value"
+                              data-index={clause.index}
+                              data-name="value"
+                              label={labels.value}
+                              value={clause.value}
+                              onchange={handleClauseChange}
+                            ></lightning-input>
+                          </div>
+                        </template>
+                        <div class="slds-col slds-grow-none slds-align-bottom">
+                          <lightning-button-icon
+                            icon-name="utility:delete"
+                            alternative-text={labels.remove}
+                            data-id="clause-remove"
+                            data-index={clause.index}
+                            onclick={handleRemoveClause}
+                          ></lightning-button-icon>
+                        </div>
+                      </div>
+                    </template>
+                    <p class="slds-text-color_weak">{nestedNote}</p>
+                  </template>
+                  <template lwc:if={canAddCondition}>
+                    <lightning-button
+                      variant="base"
+                      data-id="add-condition"
+                      label={labels.addCondition}
+                      icon-name="utility:add"
+                      onclick={handleAddClause}
+                    ></lightning-button>
+                  </template>
+                  <template lwc:if={canEdit}>
+                    <div class="slds-var-m-top_medium">
+                      <lightning-button
+                        data-id="move-up"
+                        data-delta="-1"
+                        label={labels.moveUp}
+                        onclick={handleMove}
+                      ></lightning-button>
+                      <lightning-button
+                        class="slds-var-m-left_x-small"
+                        data-id="move-down"
+                        data-delta="1"
+                        label={labels.moveDown}
+                        onclick={handleMove}
+                      ></lightning-button>
+                      <lightning-button
+                        class="slds-var-m-left_x-small"
+                        variant="destructive-text"
+                        data-id="remove"
+                        label={labels.remove}
+                        onclick={handleRemove}
+                      ></lightning-button>
+                    </div>
+                  </template>
+                </template>
+
+                <template lwc:if={editingRecord}>
+                  <p class="slds-text-title_bold" data-id="record-kind">
+                    {record.key}: {recordKindLabel}
+                  </p>
+                  <template lwc:if={recordIsRelated}>
+                    <lightning-combobox
+                      data-id="record-object"
+                      data-name="object"
+                      label={labels.object}
+                      value={record.object}
+                      options={objectOptions}
+                      onchange={handleRecordChange}
+                    ></lightning-combobox>
+                    <template for:each={links} for:item="link">
+                      <lightning-combobox
+                        key={link.value}
+                        data-id="record-link"
+                        data-field={link.value}
+                        label={link.label}
+                        field-level-help={labels.linkTo}
+                        value={link.to}
+                        options={link.options}
+                        onchange={handleLinkChange}
+                      ></lightning-combobox>
+                    </template>
+                  </template>
+                  <template lwc:if={recordIsMatched}>
+                    <lightning-combobox
+                      data-id="record-rule"
+                      data-name="rule"
+                      label={labels.matchBy}
+                      value={recordRule}
+                      options={ruleOptions}
+                      onchange={handleRecordChange}
+                    ></lightning-combobox>
+                    <lightning-combobox
+                      data-id="record-on-match"
+                      data-name="onMatch"
+                      label={labels.whenFound}
+                      value={recordOnMatch}
+                      options={onMatchOptions}
+                      onchange={handleRecordChange}
+                    ></lightning-combobox>
+                  </template>
+                  <template lwc:if={canEdit}>
+                    <lightning-button
+                      class="slds-var-m-top_medium"
+                      variant="destructive-text"
+                      data-id="remove-record"
+                      label={labels.remove}
+                      onclick={handleRemoveRecord}
+                    ></lightning-button>
+                  </template>
+                </template>
+              </fieldset>
+            </div>
+          </div>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

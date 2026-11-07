@@ -69,6 +69,8 @@ Rules:
 | giving | Stewardship_Plan__c | Custom43: Jewel |
 | giving | Stewardship_Plans | Custom4: Hexagon |
 | giving | Tribute__c | Custom5: Leaf |
+| forms | Form_Submission__c | Custom51: Apple |
+| forms | Form__c | Custom28: Cellphone |
 | logicmodels | Logic_Model__c | Custom62: Chalkboard |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |
@@ -141,6 +143,9 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | giving | receiptActions | custom:custom23 | Receipt__c |
 | giving | stewardshipPlans | custom:custom4 | Stewardship_Plans |
 | giving | tributeNotification | custom:custom5 | Tribute__c |
+| forms | formBuilder | custom:custom28 | Form__c |
+| forms | formRunner | custom:custom28 | Form__c |
+| forms | formSubmission | custom:custom51 | Form_Submission__c |
 | logicmodels | logicModelBuilder | custom:custom62 | Logic_Model__c |
 | mirror | accountingExport | custom:custom21 | Accounting_Export |
 | mirror | campaignSync | custom:custom35 | Campaign_Sync |
