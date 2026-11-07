@@ -260,7 +260,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 
 | Feature | Page | Package |
 |---|---|---|
-| EV-01 Events: install, roles, the Events page, Repeat Event, the event page; EV-03 ticket types and promo codes; EV-04 the Agenda Builder; EV-05 speakers; EV-02 registrations, the waitlist and the Forms link; EV-14 settings, reminders, follow-ups and no-shows; EV-10 the Summit Events import | [events.md](events.md) | BarnCRM Event Management |
+| EV-01 Events: install, roles, the Events page, Repeat Event, the event page; EV-03 ticket types and promo codes; EV-04 the Agenda Builder; EV-05 speakers; EV-06 the call for speakers; EV-09 sponsorship; EV-02 registrations, the waitlist and the Forms link; EV-11 the event dashboard and templates; EV-15 appointments; EV-08 volunteers; EV-12 check-in and QR codes; EV-14 settings, reminders, follow-ups and no-shows; EV-10 the Summit Events import | [events.md](events.md) | BarnCRM Event Management |
 | PB-01 Portal Builder: the integration user and its license, the External Client App, portals and templates, sign-in settings, the WordPress plugin | [portal-builder.md](portal-builder.md) | BarnCRM Portal Builder |
 
 ### Moving From Another System

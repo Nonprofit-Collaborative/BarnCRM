@@ -1,5 +1,5 @@
 /**
- * The Event Management settings as the module's code reads them (canonical model 29EV10).
+ * The Event Management settings as the module's code reads them (canonical model 29EV25).
  *
  * Read through Core's `SettingsService`, which serves an org that has never saved its Events
  * Settings the record its first save would store (ADR-0035). A blank or out of range value reads

@@ -1,6 +1,7 @@
 # Event Management
 
-Scripts for events and the Events page (EV-01). Setup detail:
+Scripts for events and the Events page (EV-01 to EV-06, EV-08 to EV-12, EV-14 and EV-15). Setup
+detail:
 [Event Management](../admin-guide/events.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and Event
@@ -117,7 +118,7 @@ removal.
 
 **Cleanup:** None.
 
-## T-EV-12: Call for Speakers
+## T-EV-07: Call for Speakers
 
 **Purpose:** confirm adding applications, scoring, accept and decline with notices, and the
 Events settings.
@@ -143,7 +144,7 @@ none (`Kim Wu`), and two active email templates with developer names `Speaker_Ac
 
 **Cleanup:** Delete the applications and Ana Garcia as a speaker.
 
-## T-EV-13: Sponsorship
+## T-EV-08: Sponsorship
 
 **Purpose:** confirm levels, adding sponsors with the level's amount and checklist, deliverable
 statuses, the totals and the one-per-organization rule.
@@ -167,7 +168,7 @@ statuses, the totals and the one-per-organization rule.
 
 **Cleanup:** Delete the sponsors and levels.
 
-## T-EV-07: Registrations and the Waitlist
+## T-EV-09: Registrations and the Waitlist
 
 **Purpose:** confirm hand registration matches Core people without duplicates, puts guests in the
 household, applies codes, waitlists when full and changes attendance.
@@ -191,7 +192,7 @@ and a promo code `HALF` (Percent, 50, Maximum Uses 1); a person `Jane Doe`, emai
 
 **Cleanup:** None.
 
-## T-EV-08: Reminders, Follow-Ups and No-Shows
+## T-EV-10: Reminders, Follow-Ups and No-Shows
 
 **Purpose:** confirm the morning run emails reminders and follow-ups once each and marks no-shows,
 and does nothing while the settings are off.
@@ -211,7 +212,7 @@ with Sam **Attended** (with an email) and Max **Registered**.
 
 **Cleanup:** Set the template back to `BarnCRM_Event_Reminder` and turn the three settings off.
 
-## T-EV-09: Summit Events Import
+## T-EV-11: Summit Events Import
 
 **Purpose:** confirm Summit Events registrants land in BarnCRM people without duplicates, and that
 nothing shows without Summit.
@@ -230,7 +231,7 @@ BarnCRM person, Summit contact blank) Registered, and a new person Started.
 
 **Cleanup:** None.
 
-## T-EV-07: Event Dashboard and Conference Template
+## T-EV-12: Event Dashboard and Conference Template
 
 **Purpose:** confirm the dashboard counts and that the template is opt-in, previewed first and
 applied once.
@@ -250,7 +251,7 @@ later, with no ticket types, tracks or sessions.
 
 **Cleanup:** delete the test events.
 
-## T-EV-08: Appointments
+## T-EV-13: Appointments
 
 **Purpose:** confirm adding slots for a host, booking, the no-double-booking rule and status
 changes.
@@ -274,7 +275,7 @@ changes.
 
 **Cleanup:** delete the test event.
 
-## T-EV-09: Event Volunteers
+## T-EV-14: Event Volunteers
 
 **Purpose:** confirm event volunteer jobs and shifts are kept in Volunteers through Core, and that
 the section is absent without Volunteers.
@@ -298,7 +299,7 @@ the Events Staff and Volunteers Coordinator permission sets; an event that start
 
 **Cleanup:** delete the test job in Volunteers.
 
-## T-EV-10: Check-In and QR Codes
+## T-EV-15: Check-In and QR Codes
 
 **Purpose:** confirm staff check people in by search, by typed or scanned code and as walk-ins,
 and that QR codes are drawn in the browser.

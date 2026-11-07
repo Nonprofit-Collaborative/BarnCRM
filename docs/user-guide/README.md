@@ -59,7 +59,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ### Event Management
 
-- [Events](events.md): finding, creating and repeating events, setting up tickets, building the agenda, adding speakers, registering people and their reminder and follow-up emails.
+- [Events](events.md): finding, creating and repeating events, setting up tickets, building the agenda, reading the event dashboard, offering appointments, planning volunteers, adding speakers, managing sponsors, reviewing speaker applications, registering people and their reminder and follow-up emails, and checking people in.
 
 ### Portal Builder
 

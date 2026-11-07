@@ -13463,6 +13463,70 @@ the stamp when the send fails; clearing a stamp by hand sends that email again.
 
 ---
 
+## 29EV15. Event Appointment
+
+### Definition
+
+One bookable slot with a host during an event (EV-15, ADR-0177 decision 13): a mentor, advisor or
+staff member's time, open until a person is booked into it. Numbered for its plan item so it does
+not collide with registrations (EV-02).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Appointment Title | text | yes | The host's name and the start time, set when slots are added. |
+| Event | reference to Event | yes | The event. |
+| Host | reference to Contact | yes, when created (R-EAP3) | The Core person who hosts. |
+| Person | reference to Contact | when Booked (R-EAP4) | The person booked into the slot; empty while it is Open. |
+| Start, End | date and time | yes | When the slot runs; End after Start (R-EAP1), inside the event's dates (R-EAP2). |
+| Status | picklist | yes | Open (default), Booked, Completed, No-Show or Cancelled. |
+| Location | text | no | A table, room or meeting link. |
+| Notes | long text | no | What staff or the host should know. |
+
+### Rules
+
+**R-EAP1 A slot ends after it starts.** Validation rule `End_After_Start`.
+
+**R-EAP2 A slot falls inside its event.** Validation rule `Inside_Event_Dates`.
+
+**R-EAP3 A new slot names its host.** Validation rule `Host_Required_When_Created`; a host
+deleted or erased later leaves the slot with none.
+
+**R-EAP4 Booked needs a person.** Validation rule `Person_Required_When_Booked`, checked only
+when the status or person changes, so a person erased later does not block editing the slot.
+
+**R-EAP5 Booking is one person at a time, never twice at once.** The Appointments tab books only
+an Open slot (under a record lock), and refuses a person who already has a Booked slot that
+overlaps it in the same event. Releasing a slot clears the person and returns it to Open.
+
+**R-EAP6 A host's overlapping slots are flagged, not refused.** The tab marks two live slots of
+one host that overlap (Cancelled slots take no time); Add Slots leaves out a new slot that
+overlaps one the host already has.
+
+### Salesforce implementation
+
+- **Object:** `Event_Appointment__c`, name field Text, label Appointment Title, master-detail to
+  Event (`Event__c`, relationship Appointments), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Host | `Host__c` | Lookup(Contact), Clear on delete |
+| Person | `Contact__c` | Lookup(Contact), Clear on delete |
+| Start, End | `Start__c`, `End__c` | Date/Time, required |
+| Status | `Status__c` | Picklist (Open, Booked, Completed, No-Show, Cancelled), restricted, required |
+| Location | `Location__c` | Text(255) |
+| Notes | `Notes__c` | Long Text Area(2000) |
+
+- **Validation rules:** `End_After_Start`, `Inside_Event_Dates`, `Host_Required_When_Created`,
+  `Person_Required_When_Booked`.
+- **Panel:** the Appointments tab of the event page (`eventAppointments`), with
+  `EventAppointmentsController` (thin, user mode) and the browser module
+  `eventAppointmentsModel` (slots, clashes, grouping).
+
+---
+
 ## 29EV20. Speaker Application
 
 ### Definition
@@ -13760,70 +13824,6 @@ reads as its shipped value.
   `EventsNightlyJobProvider`) starts `EventEmailBatch`; the work is `EventEmailService`. Email
   templates `BarnCRM_Event_Reminder` and `BarnCRM_Event_Follow_Up` ship in the folder BarnCRM
   Events.
-
----
-
-## 29EV15. Event Appointment
-
-### Definition
-
-One bookable slot with a host during an event (EV-15, ADR-0177 decision 13): a mentor, advisor or
-staff member's time, open until a person is booked into it. Numbered for its plan item so it does
-not collide with registrations (EV-02).
-
-### Attributes
-
-| Attribute | Type | Required | Definition |
-|---|---|---|---|
-| Appointment Title | text | yes | The host's name and the start time, set when slots are added. |
-| Event | reference to Event | yes | The event. |
-| Host | reference to Contact | yes, when created (R-EAP3) | The Core person who hosts. |
-| Person | reference to Contact | when Booked (R-EAP4) | The person booked into the slot; empty while it is Open. |
-| Start, End | date and time | yes | When the slot runs; End after Start (R-EAP1), inside the event's dates (R-EAP2). |
-| Status | picklist | yes | Open (default), Booked, Completed, No-Show or Cancelled. |
-| Location | text | no | A table, room or meeting link. |
-| Notes | long text | no | What staff or the host should know. |
-
-### Rules
-
-**R-EAP1 A slot ends after it starts.** Validation rule `End_After_Start`.
-
-**R-EAP2 A slot falls inside its event.** Validation rule `Inside_Event_Dates`.
-
-**R-EAP3 A new slot names its host.** Validation rule `Host_Required_When_Created`; a host
-deleted or erased later leaves the slot with none.
-
-**R-EAP4 Booked needs a person.** Validation rule `Person_Required_When_Booked`, checked only
-when the status or person changes, so a person erased later does not block editing the slot.
-
-**R-EAP5 Booking is one person at a time, never twice at once.** The Appointments tab books only
-an Open slot (under a record lock), and refuses a person who already has a Booked slot that
-overlaps it in the same event. Releasing a slot clears the person and returns it to Open.
-
-**R-EAP6 A host's overlapping slots are flagged, not refused.** The tab marks two live slots of
-one host that overlap (Cancelled slots take no time); Add Slots leaves out a new slot that
-overlaps one the host already has.
-
-### Salesforce implementation
-
-- **Object:** `Event_Appointment__c`, name field Text, label Appointment Title, master-detail to
-  Event (`Event__c`, relationship Appointments), sharing Controlled by Parent.
-
-| Attribute | API name | Type |
-|---|---|---|
-| Event | `Event__c` | Master-Detail(Event) |
-| Host | `Host__c` | Lookup(Contact), Clear on delete |
-| Person | `Contact__c` | Lookup(Contact), Clear on delete |
-| Start, End | `Start__c`, `End__c` | Date/Time, required |
-| Status | `Status__c` | Picklist (Open, Booked, Completed, No-Show, Cancelled), restricted, required |
-| Location | `Location__c` | Text(255) |
-| Notes | `Notes__c` | Long Text Area(2000) |
-
-- **Validation rules:** `End_After_Start`, `Inside_Event_Dates`, `Host_Required_When_Created`,
-  `Person_Required_When_Booked`.
-- **Panel:** the Appointments tab of the event page (`eventAppointments`), with
-  `EventAppointmentsController` (thin, user mode) and the browser module
-  `eventAppointmentsModel` (slots, clashes, grouping).
 
 ---
 
@@ -14522,15 +14522,15 @@ included; standard objects the packages extend are named by the entity that gove
 | Event Session | Event Management | 1.2 (EV-04) | 29EV5 |
 | Event Speaker | Event Management | 1.2 (EV-05) | 29EV6 |
 | Session Speaker | Event Management | 1.2 (EV-05) | 29EV7 |
+| Event Registration | Event Management | 1.2 (EV-02) | 29EV8 |
+| Event Attendee | Event Management | 1.2 (EV-02) | 29EV9 |
+| Event Appointment | Event Management | 1.3 (EV-15) | 29EV15 |
 | Speaker Application | Event Management | 1.3 (EV-06) | 29EV20 |
 | Speaker Review | Event Management | 1.3 (EV-06) | 29EV21 |
 | Sponsorship Level | Event Management | 1.3 (EV-09) | 29EV22 |
 | Event Sponsor | Event Management | 1.3 (EV-09) | 29EV23 |
 | Sponsor Deliverable | Event Management | 1.3 (EV-09) | 29EV24 |
-| Events Settings | Event Management | 1.3 (EV-06) | 29EV25 |
-| Event Registration | Event Management | 1.2 (EV-02) | 29EV8 |
-| Event Attendee | Event Management | 1.2 (EV-02) | 29EV9 |
-| Event Appointment | Event Management | 1.3 (EV-15) | 29EV15 |
+| Events Settings | Event Management | 1.3 (EV-06, EV-14) | 29EV25 |
 | Portal | Portal Builder | 1.3 (PB-01) | 29PB1 |
 | Portal Access | Portal Builder | 1.3 (PB-01) | 29PB2 |
 | Portal Session | Portal Builder | 1.3 (PB-01) | 29PB3 |
