@@ -366,6 +366,26 @@ Editing needs the Events Staff or Events Admin permission set; Events Read Only 
 export. Needs are personal data: they are on the attendee, which only people with an Events
 permission set can see.
 
+### Badges and Sign-In Sheets
+
+The **Badges** tab prints what the door needs. Pages open in a new browser window and print from
+the browser, so nothing is sent to an outside service and no PDF is made; allow pop-ups for
+Salesforce if the browser blocks the window.
+
+- **Print Badges** prints a badge for each person Registered or Attended who matches the
+  **Search** and **Ticket Type** filters. Choose **Badge Size**: Large (4 x 3 in), Standard
+  (4 x 2 in) or Compact (3.4 x 2.3 in). Switch **Show Organization** (the person's account),
+  **Show Ticket Type** and **Show QR Code** on or off. The QR code is the same code the Check-In
+  tab reads, drawn in the browser by the `BarnQrCode` resource, so a scanned badge checks the
+  person in.
+- **Print Sign-In Sheet** prints a table of name, organization and ticket with a signature
+  column and ten blank lines for people who were not registered. Choose **Whole Event** or one
+  session; sessions have no attendance of their own, so a session sheet lists everyone
+  registered for the event.
+
+In the browser's print dialog choose Letter paper and turn off headers and footers for the
+cleanest badges. Events Read Only can print.
+
 ## Settings
 
 As an admin, open the **Events** section of **BarnCRM Settings**. Each setting saves org-wide as

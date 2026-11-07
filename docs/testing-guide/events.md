@@ -347,3 +347,27 @@ sponsor `Acme` added on the Sponsors tab.
 | 11 | As read-only, open **Seating**. | The chart and export show; no **Add Table**, **Suggest Seating**, **Edit** or **Remove**, and the **Table** menus cannot save. |
 
 **Cleanup:** None.
+
+## T-EV-17: Badges and Sign-In Sheets
+
+**Purpose:** confirm badges and sign-in sheets print from the browser with the chosen parts, and
+that nothing leaves the browser.
+**Prerequisites:** staff; an event with two ticket types (`VIP`, `General`), an attendee
+`Ann Lee` of organization `Acme` on `VIP` and `Bo Kim` on `General`, a session `Keynote`;
+pop-ups allowed for Salesforce.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event, click **Badges**. | The line `2 of 2 people will print.` |
+| 2 | Choose **Ticket Type** `VIP`. | The line reads `1 of 2`. Reset to **All Tickets**. |
+| 3 | Leave **Badge Size** Standard, switch **Show QR Code** on, click **Print Badges**. | A new window opens with two 4 x 2 in badges (name, `Acme`, ticket, QR code) and the print dialog. Network tools show no request to an outside host. |
+| 4 | Choose **Large** and switch **Show Organization** and **Show Ticket Type** off; print. | Badges are 4 x 3 in with the name (and QR code) only. |
+| 5 | Scan a printed QR code on the Check-In tab (or copy the code into **Ticket code**). | That person is checked in. |
+| 6 | Choose **Whole Event** under **Sheet For**, click **Print Sign-In Sheet**. | A table of both people with a Signature column and ten blank lines; heading shows the event name, date and venue. |
+| 7 | Choose `Keynote`, print again. | The heading names the session, its time and room. |
+| 8 | Rename an attendee to `<b>Zed</b>` and reprint. | The badge shows the text `<b>Zed</b>`, not bold type. |
+| 9 | Block pop-ups and click **Print Badges**. | A warning toast says the browser blocked the window. |
+| 10 | As read-only, open **Badges**. | Printing works. |
+
+**Cleanup:** Rename the attendee back.

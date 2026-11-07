@@ -344,4 +344,12 @@
         <shortDescription>Event page tab: tables, seating chart and dietary and access needs</shortDescription>
         <value>Seating</value>
     </labels>
+    <labels>
+        <fullName>Events_EventTab_Badges</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: printable badges and sign-in sheets</shortDescription>
+        <value>Badges</value>
+    </labels>
 </CustomLabels>

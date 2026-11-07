@@ -24,6 +24,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>EventBadgesController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>EventSpeakersController</apexClass>
     <enabled>true</enabled>
   </classAccesses>

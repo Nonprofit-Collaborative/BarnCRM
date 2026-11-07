@@ -167,3 +167,14 @@ If your organization uses Summit Events, its registrations appear here each morn
    keep it or move someone.
 5. Type any dietary or access needs in the guest's row.
 6. Click **Export Seating Chart** to download a file for the caterer or venue.
+
+## Print Badges and Sign-In Sheets
+
+1. Open the event and click the **Badges** tab.
+2. For badges: narrow the list with **Search** or **Ticket Type** if you only need some, choose a
+   **Badge Size**, and choose whether to show the organization, the ticket type and a QR code.
+3. Click **Print Badges**. A new window opens with the print dialog; print on Letter paper.
+   (If nothing opens, allow pop-ups for this site.)
+4. For a sign-in sheet: choose **Whole Event** or a session under **Sheet For** and click **Print
+   Sign-In Sheet**. People sign in the last column; the blank lines at the bottom are for people
+   who were not registered.
