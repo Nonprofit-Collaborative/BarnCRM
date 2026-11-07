@@ -267,6 +267,33 @@ when it finishes, then shows when it last scanned. After a scan:
 
 Only the newest scan is kept. Scan again after you change your automation.
 
+### Deactivate Org Flows and Validation Rules
+
+Pause All stops only what checks the setting. To switch off your own flows and validation rules
+that do not, for a data load or a migration, use **Deactivate Org Flows and Validation Rules**
+under the table (D-184). It appears to anyone who may use the org connection, once it is ready,
+and lists your own active flows, Process Builder processes and validation rules that match the
+filters (run **Scan Org Automation** first to list the rules). BarnCRM's flows and anything from
+a managed package are never listed. Apex triggers and workflow rules cannot be deactivated here.
+
+1. Tick the items and click **Deactivate Selected**.
+2. Confirm. In a sandbox this is a plain confirm. In production the dialog warns that these
+   items stop running for everyone until restored, and you type **DEACTIVATE** to go ahead.
+3. A snapshot of each item's state (a flow's active version, a rule's Active box) is saved
+   first, then the items are turned off in the background, up to 200 per run.
+
+Each run is listed under **Deactivation Snapshots** with its number, status, start time and who
+started it, and every item's result: **Deactivated**, **Left As It Is** (with the reason, such
+as already inactive or not your own), or **Failed** with the reason Salesforce gave. A run with
+some failures is **Partly Done**. Only one run or restore at a time.
+
+**Restore** puts back exactly what the snapshot recorded for each item that was deactivated:
+the same flow version is activated again and each rule is turned back on. Items left as they
+were are not touched. A run can be restored once, and its result is kept on each item.
+
+If you save a newer version of a flow in between, Restore still activates the version the
+snapshot names.
+
 ## Running Your Own Version Instead
 
 If an automation does almost what you want, do not change ours: an upgrade would undo your

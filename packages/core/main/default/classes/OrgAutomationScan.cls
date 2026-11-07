@@ -89,7 +89,9 @@ public with sharing class OrgAutomationScan implements Queueable, Database.Allow
 		// The setting's fields: a formula or flow that reads `$Setup` refers to them.
 		for (
 			Object each : OrgToolingApi.query(
-				'SELECT Id FROM CustomField WHERE TableEnumOrId IN (' + quoted(referenced) + ')'
+				'SELECT Id FROM CustomField WHERE TableEnumOrId IN (' +
+					OrgToolingApi.quoted(referenced) +
+					')'
 			)
 		) {
 			referenced.add((String) ((Map<String, Object>) each).get('Id'));
@@ -104,7 +106,7 @@ public with sharing class OrgAutomationScan implements Queueable, Database.Allow
 		List<Object> refs = OrgToolingApi.query(
 			'SELECT MetadataComponentId, MetadataComponentName, RefMetadataComponentId' +
 				' FROM MetadataComponentDependency WHERE RefMetadataComponentId IN (' +
-				quoted(referenced) +
+				OrgToolingApi.quoted(referenced) +
 				') LIMIT 2000'
 		);
 		found.truncated = rules.size() >= 2000 || workflows.size() >= 2000 || refs.size() >= 2000;
@@ -180,14 +182,6 @@ public with sharing class OrgAutomationScan implements Queueable, Database.Allow
 			ids.add(durable.left(15));
 		}
 		return ids;
-	}
-
-	private static String quoted(Set<String> values) {
-		List<String> parts = new List<String>();
-		for (String value : values) {
-			parts.add('\'' + String.escapeSingleQuotes(value) + '\'');
-		}
-		return parts.isEmpty() ? '\'\'' : String.join(parts, ',');
 	}
 
 	/** The newest finished scan, or null. */

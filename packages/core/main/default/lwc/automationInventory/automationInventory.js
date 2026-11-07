@@ -62,6 +62,7 @@ const ALL_VALUE = '';
 const HOW_TO_ACTION = 'howTo';
 const SCAN_RUNNING = 'Running';
 const SCAN_FAILED = 'Failed';
+const DEACTIVATION_BUSY = ['Running', 'Restoring'];
 /** How often, and how many times, the page reads again while a scan runs. */
 const POLL_MS = 4000;
 const POLL_LIMIT = 45;
@@ -150,10 +151,10 @@ export default class AutomationInventory extends LightningElement {
     }
   }
 
-  /** Reads again a few seconds later while a scan runs, up to POLL_LIMIT times. */
+  /** Reads again a few seconds later while a scan or deactivation runs, up to POLL_LIMIT times. */
   pollWhileScanning() {
     clearTimeout(this.pollTimer);
-    if (!this.scanRunning || this.polls >= POLL_LIMIT) {
+    if (!(this.scanRunning || this.deactivationRunning) || this.polls >= POLL_LIMIT) {
       this.polls = 0;
       return;
     }
@@ -172,6 +173,23 @@ export default class AutomationInventory extends LightningElement {
 
   get scanRunning() {
     return Boolean(this.result && this.result.scanStatus === SCAN_RUNNING);
+  }
+
+  get deactivationRunning() {
+    return this.snapshots.some((snapshot) => DEACTIVATION_BUSY.includes(snapshot.status));
+  }
+
+  get snapshots() {
+    return (this.result && this.result.snapshots) || [];
+  }
+
+  get isSandbox() {
+    return Boolean(this.result && this.result.isSandbox);
+  }
+
+  /** The org's own active flows and validation rules in the filtered list (R-OA6). */
+  get deactivatableRows() {
+    return this.filteredRows.filter((row) => row.canDeactivate);
   }
 
   get scanDisabled() {

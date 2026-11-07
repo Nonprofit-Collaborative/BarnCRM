@@ -219,6 +219,28 @@ describe('c-automation-inventory scan', () => {
     expect(getInventory).toHaveBeenCalledTimes(3);
     expect(q(element, 'scan-line').textContent).toBe('The scan did not finish.');
   });
+
+  it('hands the deactivate tool only the org items it may change, and reads again after', async () => {
+    const element = await render({
+      ...INVENTORY,
+      canUseConnection: true,
+      connected: true,
+      isSandbox: true,
+      snapshots: []
+    });
+    const tool = q(element, 'deactivate-tool');
+    expect(tool.rows.map((row) => row.key)).toEqual(['Flow|My_Gift_Flow']);
+    expect(tool.isSandbox).toBe(true);
+
+    tool.dispatchEvent(new CustomEvent('changed'));
+    await Promise.resolve();
+    expect(getInventory).toHaveBeenCalledTimes(2);
+  });
+
+  it('offers no deactivate tool without a ready connection', async () => {
+    const element = await render();
+    expect(q(element, 'deactivate-tool')).toBeNull();
+  });
 });
 
 describe('automationSnippets', () => {

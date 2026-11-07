@@ -44,6 +44,15 @@ public with sharing class OrgToolingApi {
 		);
 	}
 
+	/** Values for a query's `IN (...)`, each quoted and escaped; `''` when there are none. */
+	public static String quoted(Set<String> values) {
+		List<String> parts = new List<String>();
+		for (String value : values) {
+			parts.add('\'' + String.escapeSingleQuotes(value) + '\'');
+		}
+		return parts.isEmpty() ? '\'\'' : String.join(parts, ',');
+	}
+
 	private static String send(String method, String path, String body) {
 		HttpRequest call = new HttpRequest();
 		call.setEndpoint(BASE + path);

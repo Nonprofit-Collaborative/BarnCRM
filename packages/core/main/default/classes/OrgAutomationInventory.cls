@@ -40,10 +40,9 @@ public with sharing class OrgAutomationInventory {
 	/**
 	 * BarnCRM's own flows, by API name: the inactive templates an admin copies (ADR-0090). With no
 	 * namespace they cannot be told from the org's own any other way. A CI test keeps this list in
-	 * step with the packages' flow folders.
+	 * step with the packages' flow folders. Deactivation never changes them (R-AS5).
 	 */
-	@TestVisible
-	private static final Set<String> BARN_FLOWS = new Set<String>{
+	public static final Set<String> BARN_FLOWS = new Set<String>{
 		'Template_Account_Address_Capture',
 		'Template_Affiliation_Primary',
 		'Template_Affiliation_Primary_Delete',
@@ -147,6 +146,30 @@ public with sharing class OrgAutomationInventory {
 		public Boolean canUseConnection = false;
 		@AuraEnabled
 		public Boolean connected = false;
+		/** A sandbox confirms a deactivation plainly; production asks for the typed phrase. */
+		@AuraEnabled
+		public Boolean isSandbox = false;
+		/** The newest deactivation snapshots, each with its items (R-AS4 to R-AS8). */
+		@AuraEnabled
+		public List<Snapshot> snapshots = new List<Snapshot>();
+	}
+
+	/** One deactivation run, as the page shows it. */
+	public class Snapshot {
+		@AuraEnabled
+		public Id id;
+		@AuraEnabled
+		public String name;
+		@AuraEnabled
+		public String status;
+		@AuraEnabled
+		public Datetime createdAt;
+		@AuraEnabled
+		public String createdBy;
+		@AuraEnabled
+		public Datetime restoredAt;
+		@AuraEnabled
+		public List<OrgAutomationDeactivation.Item> items = new List<OrgAutomationDeactivation.Item>();
 	}
 
 	/** Test hook: a part (`Switches`, `Flows`, `Triggers`) made to fail. */

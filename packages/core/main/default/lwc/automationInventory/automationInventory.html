@@ -93,6 +93,17 @@
                 <c-barn-empty-state data-id="empty" size="compact" heading={labels.empty}></c-barn-empty-state>
             </template>
 
+            <template lwc:if={canScan}>
+                <c-automation-deactivate
+                    class="slds-show slds-var-m-top_medium"
+                    data-id="deactivate-tool"
+                    rows={deactivatableRows}
+                    snapshots={snapshots}
+                    is-sandbox={isSandbox}
+                    onchanged={handleRefresh}
+                ></c-automation-deactivate>
+            </template>
+
             <template lwc:if={snippet}>
                 <section class="slds-var-m-top_medium" data-id="snippet" aria-live="polite">
                     <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{snippet.heading}</h3>

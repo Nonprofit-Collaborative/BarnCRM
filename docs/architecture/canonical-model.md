@@ -987,7 +987,9 @@ BarnCRM's) active flow or validation rule is changed; anything else is Unchanged
 reason. A flow is deactivated by setting its definition's active version to 0; a validation
 rule by saving its metadata with active false.
 **R-AS5 Partial results.** Each item's result is saved; a failure on one never stops the rest.
-Status is Done when every item changed, Partial when some did, Failed when none did.
+An item waits as Pending between the snapshot and its change. Status is Done when every item
+that could change did and none failed, Partial when some changed and some failed, Failed when
+none changed.
 **R-AS6 Restore.** Restore puts back exactly the snapshot for each item that changed: the
 flow's active version number, the rule's active state. Items that did not change are left
 alone. One run at a time: a deactivation or restore is refused while another is Running or

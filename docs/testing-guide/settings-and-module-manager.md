@@ -226,6 +226,25 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 
 **Cleanup:** keep the flows and rules for T-SET-07G.
 
+## T-SET-07G: Deactivate Org Flows and Validation Rules, Then Restore
+
+**Purpose:** confirm a snapshot is saved before the org's own flows and rules are turned off, each result is shown, and Restore puts back exactly the snapshot (C-60, D-184, ADR-NEXT "Deactivate org flows and validation rules with a snapshot and restore").
+**Prerequisites:** the admin, connection, flows and rules from T-SET-07F, scanned; a sandbox, then (for step 8 only) a production org or Developer Edition org, where the same steps apply.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the **Automation** tab, find **Deactivate Org Flows and Validation Rules** under the table. | A list of your own active flows and validation rules only; no BarnCRM switch or flow, no trigger, no workflow rule, nothing from a managed package. **Deactivate Selected** is greyed out. |
+| 2 | Set the owner filter to **BarnCRM**. | "No flow or validation rule of your own that is active matches these filters..." Set it back to all. |
+| 3 | Tick `My_Plain_Flow` and `Test_Plain_Rule`, click **Deactivate Selected**. | In a sandbox, a plain confirm naming both items; no phrase to type. |
+| 4 | Confirm. | Under **Deactivation Snapshots**, a new run (ASN- number) **In Progress** with both items **Waiting**, then within a minute **Completed** with both **Deactivated**. In Setup, `My_Plain_Flow` has no active version and `Test_Plain_Rule` is inactive. |
+| 5 | Save an Account that `Test_Plain_Rule` would have refused. | It saves. |
+| 6 | Click **Restore** on the run and confirm. | **Restoring**, then **Restored**; both items read **Restored**. In Setup the flow's same version is active again and the rule is active. No **Restore** button remains on that run. |
+| 7 | Turn `Test_Plain_Rule` off in Setup. Without refreshing the Automation tab, deactivate it with `My_Plain_Flow`. | The rule reads **Left As It Is**, "It was already inactive, so it was left as it is."; the flow reads **Deactivated**. Restore turns the flow back on and leaves the rule off. Turn the rule back on in Setup. |
+| 8 | In a production org, choose one item and click **Deactivate Selected**. | The dialog warns "This is a production org..." and **Deactivate Selected** stays greyed out until you type **DEACTIVATE**. Cancel. |
+| 9 | While a run shows **In Progress**, look at **Deactivate Selected** and **Restore**. | Both are unavailable; the run says "Working through the org connection...". |
+
+**Cleanup:** restore every run, so all flows and rules are active again.
+
 ## T-SET-08: Turn on a Feature Left Off
 
 **Purpose:** confirm a feature that is off can be turned on once, behind a confirmation, and its tabs appear.
