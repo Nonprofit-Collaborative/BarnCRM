@@ -51,6 +51,9 @@ public with sharing class DataManagerController {
 		}
 		try {
 			for (Import_Template__c template : ImportTemplateSelector.selectActive()) {
+				if (ImportTemplateService.isHidden(template)) {
+					continue;
+				}
 				Mapping mapping = new Mapping();
 				mapping.id = template.Id;
 				mapping.name = template.Name;

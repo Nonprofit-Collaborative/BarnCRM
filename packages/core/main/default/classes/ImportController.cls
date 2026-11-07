@@ -343,7 +343,9 @@ public with sharing class ImportController {
 			enforcePermission();
 			List<TemplateView> result = new List<TemplateView>();
 			for (Import_Template__c template : ImportTemplateService.listActive()) {
-				result.add(toTemplateView(template));
+				if (!ImportTemplateService.isHidden(template)) {
+					result.add(toTemplateView(template));
+				}
 			}
 			return result;
 		} catch (Exception e) {

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<RecordType xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>BarnCRM_Organization</fullName>
+  <active>true</active>
+  <description>
+    An organization: a funder, partner, employer or vendor. Offered in BarnCRM Settings, General
+    only where the org has no Account record type of its own (D-184).
+  </description>
+  <label>BarnCRM Organization</label>
+</RecordType>

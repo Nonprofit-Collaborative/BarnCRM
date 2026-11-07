@@ -152,6 +152,10 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>OrgAutomationController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>OrgOptimizerSetupController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
@@ -516,6 +520,31 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Automation_Setting__c.Object_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Automation_Snapshot__c.Items__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Automation_Snapshot__c.Kind__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Automation_Snapshot__c.Message__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Automation_Snapshot__c.Restored_At__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Automation_Snapshot__c.Status__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
@@ -1465,6 +1494,15 @@
     <allowEdit>true</allowEdit>
     <allowRead>true</allowRead>
     <modifyAllRecords>true</modifyAllRecords>
+    <object>Automation_Snapshot__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>true</modifyAllRecords>
     <viewAllRecords>true</viewAllRecords>
     <object>Contact</object>
   </objectPermissions>
@@ -1663,6 +1701,10 @@
   <tabSettings>
     <tab>Household_Member__c</tab>
     <visibility>Available</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Automation</tab>
+    <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
     <tab>BarnCRM_Home</tab>

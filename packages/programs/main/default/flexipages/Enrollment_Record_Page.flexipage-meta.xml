@@ -60,25 +60,83 @@
         <identifier>servicePlanPanel</identifier>
       </componentInstance>
     </itemInstances>
+    <name>enrollmentServicePlanTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <componentInstance>
         <componentName>force:detailPanel</componentName>
         <identifier>enrollmentDetailPanel</identifier>
       </componentInstance>
     </itemInstances>
+    <name>enrollmentDetailsTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>active</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>enrollmentServicePlanTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Service Plan</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>enrollmentServicePlanTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>enrollmentDetailsTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Standard.Tab.detail</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>enrollmentDetailsTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>enrollmentTabs</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>tabs</name>
+          <value>enrollmentTabs</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tabset</componentName>
+        <identifier>enrollmentTabset</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>main</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <componentInstance>
         <componentName>force:relatedListContainer</componentName>
         <identifier>enrollmentRelatedLists</identifier>
       </componentInstance>
     </itemInstances>
-    <name>main</name>
+    <name>sidebar</name>
     <type>Region</type>
   </flexiPageRegions>
   <masterLabel>Enrollment Record Page</masterLabel>
   <sobjectType>Enrollment__c</sobjectType>
   <template>
-    <name>flexipage:recordHomeSingleColTemplateDesktop</name>
+    <name>flexipage:recordHomeTemplateDesktop</name>
   </template>
   <type>RecordPage</type>
 </FlexiPage>

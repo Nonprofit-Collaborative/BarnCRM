@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    The Automation page (D-184): the Automation panel (pause, switches, Automation Control) and
+    the org's automation inventory.
+  </description>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>automationControl</componentName>
+        <identifier>automationControl1</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>automationInventory</componentName>
+        <identifier>automationInventory1</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>main</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <masterLabel>Automation</masterLabel>
+  <template>
+    <name>flexipage:defaultAppHomeTemplate</name>
+  </template>
+  <type>AppPage</type>
+</FlexiPage>

@@ -101,7 +101,7 @@ describe('c-feature-settings', () => {
       features: [
         {
           key: 'HouseholdUpkeep',
-          name: 'Household Upkeep',
+          name: 'Households',
           description: 'Households.',
           isOn: false,
           confirmNote: 'Use New Household.'
@@ -149,7 +149,7 @@ describe('c-feature-settings', () => {
       features: [
         {
           key: 'HouseholdUpkeep',
-          name: 'Household Upkeep',
+          name: 'Households',
           description: 'Households.',
           isOn: false,
           blockedReason: 'NPSP households are still in use.'

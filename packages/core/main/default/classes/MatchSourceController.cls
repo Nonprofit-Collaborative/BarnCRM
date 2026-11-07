@@ -208,7 +208,7 @@ public with sharing class MatchSourceController {
 		view.developerName = row.DeveloperName;
 		view.label = row.MasterLabel;
 		view.shipped = row.Is_Shipped__c == true;
-		view.active = row.Active__c == true;
+		view.active = row.Active__c == true && !MatchSourceService.isTurnedOff(row);
 		view.values.put('Object_Name__c', row.Object_Name__c);
 		view.values.put('Value_Field__c', row.Value_Field__c);
 		view.values.put('Postal_Code_Field__c', row.Postal_Code_Field__c);

@@ -56,6 +56,23 @@ install and no Setup step. Once it is on, two things are worth setting once.
      move before a mailing goes out.
 4. Choose **Save**. The change applies to the next address you edit.
 
+**Addresses of deleted records** (on the same page) says what happens to a household's,
+organization's or person's addresses when it is deleted (D-184). It always shows one of these
+two; a new install shows the first.
+
+- **Delete their addresses** (the default): the addresses go to the Recycle Bin with the
+  record, and come back, linked to it again, when you restore it. Each address belongs to one
+  household, organization or person, so no one else's address is touched. Deleting a
+  household whose people are its contacts deletes those people too, and their addresses go
+  with them. A merge is not a delete: the addresses move to the record you keep.
+- **Keep their addresses**: the addresses stay on file, belonging to nobody, as they did
+  before this setting. Restoring the record does not link them again.
+
+BarnCRM's own clean-ups (the nightly tidy-up of empty households, and erasing a person) delete
+the addresses whichever you choose. The work is done by two automations on the
+**Automation** page, **Addresses of a deleted person** and **Addresses of a deleted account**;
+switching one off keeps the addresses as **Keep their addresses** does.
+
 Then turn on the seasonal address swap, which is off until you turn it on.
 
 5. Stay on the **Addresses** page and tick **Turn on seasonal addresses**, then choose **Save**.

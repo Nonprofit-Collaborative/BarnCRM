@@ -35,7 +35,7 @@ With Giving installed the assistant has nine steps; with Core alone it has eight
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open the **BarnCRM** app. Click the **Standard Edition** card. | The **Set Up BarnCRM** window shows both questions. |
-| 2 | Choose **Let me choose features**. | "Untick what you do not want yet. You can turn it on later in BarnCRM Settings, General. Turning a feature on cannot be undone." Eight ticked boxes: **Data Manager**, **Duplicate Matching**, **Org Optimizer and Health Check**, **Household Upkeep**, **Addresses**, **Relationships**, **Affiliations**, **Preferred Email and Phone**, each with a help icon describing it. |
+| 2 | Choose **Let me choose features**. | "Untick what you do not want yet. You can turn it on later in BarnCRM Settings, General. Turning a feature on cannot be undone." Eight ticked boxes: **Data Manager**, **Duplicate Matching**, **Org Optimizer and Health Check**, **Households**, **Addresses**, **Relationships**, **Affiliations**, **Preferred Email and Phone**, each with a help icon describing it. |
 | 3 | Untick **Data Manager** and **Duplicate Matching**. Click **Finish Setup**. | **BarnCRM Settings** opens on **General**. Without reloading the browser page, **Edition** reads **Standard Edition** (never "Not chosen yet"). **Data Manager** and **Duplicate Matching** show **Turn On**; the other six say **On**. |
 | 4 | Wait a few minutes (the tab sync runs in the background), reload, and open the app's navigation menu. | **Data Manager** is not listed (nor **Find**, which opens from Data Manager). **Org Optimizer** is listed. |
 | 5 | Look at the **Sections** list. | **Import** is not listed. |
@@ -144,7 +144,7 @@ Note: in an org that stores people as accounts, confirming step 2 also switches 
 | 5 | Click the notification. | **BarnCRM Settings** opens on **General**. |
 | 6 | Open **Households**, find **The Garcia Family**. | It exists, with its members. In the simple way of belonging, **Primary Contact** names its first person, and so does every other sample household's (a list view with a Primary Contact column shows none blank). |
 | 7 | With Giving, open **BarnCRM Settings**, **Rollups**, and select **Recalculate**. | Giving totals fill in (see [Load sample data](before-you-test.md#load-sample-data)). |
-| 8 | On an org where **Household Upkeep** is **Off** (for example one where first-run setup left it unticked), load sample data, then open the **Accounts** tab and search for "Garcia". | **The Garcia Family** is named from its people, with both greetings and a member count filled in. No sample household is named just "Household". |
+| 8 | On an org where **Households** is **Off** (for example one where first-run setup left it unticked), load sample data, then open the **Accounts** tab and search for "Garcia". | **The Garcia Family** is named from its people, with both greetings and a member count filled in. No sample household is named just "Household". |
 
 **Cleanup:** None (leave sample data loaded).
 

@@ -4,7 +4,7 @@
   <label>BarnCRM Households</label>
   <description>
     Shows the Households tab and nothing else, and gives no record type: BarnCRM creates
-    households in system mode (ADR-0141). Given and taken by BarnCRM while the Household Upkeep
+    households in system mode (ADR-0141). Given and taken by BarnCRM while the Households
     feature is on (ADR-0124); do not assign by hand.
   </description>
   <tabSettings>

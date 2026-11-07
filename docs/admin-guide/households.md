@@ -25,13 +25,13 @@ is checked by your rules as usual.
 
 ## How to Turn It On
 
-Households belong to the **Household Upkeep** feature. Turn it on in first-run setup, or later
+Households belong to the **Households** feature. Turn it on in first-run setup, or later
 with **Turn On** in its row on **General** in BarnCRM Settings. Everything you can change is on
 the BarnCRM Settings page, so nobody needs to open Salesforce Setup.
 
-In an org with NPSP, Household Upkeep cannot be turned on while NPSP households are in use (NPSP
+In an org with NPSP, Households cannot be turned on while NPSP households are in use (NPSP
 still creates household accounts, or some are not yet adopted). The row says why;
-[Adopting Your NPSP Households](npsp-households.md#then-turn-on-household-upkeep) gives the
+[Adopting Your NPSP Households](npsp-households.md#then-turn-on-households) gives the
 steps.
 
 **The Household record type and the Households tab.** BarnCRM installs one Account record
@@ -43,7 +43,7 @@ and by merge and split. Staff open and edit a household like any account. Do not
 Household record type to profiles or permission sets yourself: anyone who has it, and whose
 profile has no default Account record type, gets Household for every account they create.
 
-The **Households** tab is hidden until you turn Household Upkeep on. Turning it on shows the
+The **Households** tab is hidden until you turn Households on. Turning it on shows the
 tab to everyone with a BarnCRM role (Admin, Staff or Read Only), through the permission set
 **BarnCRM Households**, within a few minutes. The confirmation says so, and reminds staff to
 create households with **New Household** on BarnCRM Home, not the standard **New** button.
@@ -135,8 +135,8 @@ switched on but stores everyone as a contact, an install or upgrade leaves your 
 alone, and Health Check warns you if people stored as accounts appear later.
 
 In the flexible way, a new person stored as an account gets a household of their own when
-they are saved, as a contact does. People stored as accounts who were added while Household
-Upkeep was off are caught up when it is turned on, along with contacts: see "First-run setup" in
+they are saved, as a contact does. People stored as accounts who were added while Households
+was off are caught up when it is turned on, along with contacts: see "First-run setup" in
 the BarnCRM Settings guide.
 
 In the flexible way a contact's account can be an employer, so it is not the household by
@@ -162,7 +162,7 @@ the same Members panel. A household is still its own record, never a person.
 ## Common Mistakes
 
 **"There is no Households tab."**
-Household Upkeep is off. Turn it on in **General**; the tab reaches everyone with a BarnCRM
+Households is off. Turn it on in **General**; the tab reaches everyone with a BarnCRM
 role within a few minutes. Someone without a BarnCRM role does not get it: give them a role on
 the Access page.
 

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
-    The gift batch record page: the batch's control total and defaults, shown with Dynamic Forms.
+    The gift batch record page: the entry panel in the main column and the batch's control total
+    and defaults, shown with Dynamic Forms, in the sidebar (D-184).
   </description>
   <flexiPageRegions>
     <itemInstances>
@@ -125,6 +126,16 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentName>giftBatchEntry</componentName>
+        <identifier>giftBatchEntry</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>main</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
         <componentInstanceProperties>
           <name>columns</name>
           <value>Facet-batch</value>
@@ -137,19 +148,13 @@
         <identifier>batchSection</identifier>
       </componentInstance>
     </itemInstances>
-    <itemInstances>
-      <componentInstance>
-        <componentName>giftBatchEntry</componentName>
-        <identifier>giftBatchEntry</identifier>
-      </componentInstance>
-    </itemInstances>
-    <name>main</name>
+    <name>sidebar</name>
     <type>Region</type>
   </flexiPageRegions>
   <masterLabel>Gift Batch Record Page</masterLabel>
   <sobjectType>Gift_Batch__c</sobjectType>
   <template>
-    <name>flexipage:recordHomeSingleColTemplateDesktop</name>
+    <name>flexipage:recordHomeTemplateDesktop</name>
   </template>
   <type>RecordPage</type>
 </FlexiPage>

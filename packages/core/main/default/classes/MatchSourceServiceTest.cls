@@ -143,6 +143,51 @@ private class MatchSourceServiceTest {
 		}
 	}
 
+	/** D-184: a shipped source listed in the setting is not used; her own row of that name is. */
+	@IsTest
+	static void aShippedSourceTurnedOffInTheSettingIsNotUsed() {
+		System.runAs(TestUsers.admin()) {
+			Map<String, Object> fields = (Map<String, Object>) JSON.deserializeUntyped(
+				JSON.serialize(
+					row(
+						'Address_Person',
+						'Address__c',
+						'Street__c',
+						'Postal_Code__c',
+						'Contact__c',
+						'Address'
+					)
+				)
+			);
+			fields.put(NamespaceUtil.qualify('Is_Shipped__c'), true);
+			Match_Source__mdt shipped = (Match_Source__mdt) JSON.deserialize(
+				JSON.serialize(fields),
+				Match_Source__mdt.class
+			);
+			Match_Source__mdt own = row(
+				'Address_Household',
+				'Address__c',
+				'Street__c',
+				'Postal_Code__c',
+				'Account__c',
+				'Address'
+			);
+			MatchSourceSelector.sourcesOverride = new List<Match_Source__mdt>{ shipped, own };
+			SettingsService.saveSystemValue(
+				'Match_Sources_Turned_Off__c',
+				'Address_Person,Address_Household'
+			);
+
+			Test.startTest();
+			List<MatchSourceService.Source> sources = MatchSourceService.usableSources();
+			Test.stopTest();
+
+			Assert.areEqual(1, sources.size(), 'Only the source that is not shipped: ' + sources);
+			Assert.areEqual('Address_Household', sources[0].developerName);
+			Assert.isTrue(MatchSourceService.isTurnedOff(shipped), 'The shipped one is off');
+		}
+	}
+
 	/**
 	 * ADR-0013: Core runs on a Platform-only org and on one without the Data Protection and
 	 * Privacy objects (a real org sandbox was found without the contact point address,

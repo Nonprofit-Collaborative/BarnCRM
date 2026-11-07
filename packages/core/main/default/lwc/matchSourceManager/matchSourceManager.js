@@ -240,8 +240,9 @@ export default class MatchSourceManager extends LightningElement {
   }
 
   /**
-   * The switch is put back at once: it moves when the deployment has finished and the list is
-   * read again, so it never shows a state Salesforce has not applied.
+   * The switch is put back at once: it moves when the list is read again, so it never shows a
+   * state Salesforce has not applied. A shipped source is turned off or on in a setting, saved
+   * at once (D-184); the organization's own source waits on its deployment.
    */
   handleToggle(event) {
     const source = this.findSource(event.target.dataset.name);
@@ -252,7 +253,8 @@ export default class MatchSourceManager extends LightningElement {
         typeName: TYPE_NAME,
         developerName: source.developerName,
         archived: source.active
-      })
+      }),
+      source.active
     );
   }
 
@@ -302,11 +304,21 @@ export default class MatchSourceManager extends LightningElement {
     }
   }
 
-  async start(label, request) {
+  async start(label, request, turningOff) {
     this.busy = true;
     this.clearMessages();
     try {
-      this.track(await request, label);
+      const jobId = await request;
+      if (!jobId) {
+        // No deployment: a shipped source turned off or on in the setting, already saved.
+        const text = turningOff
+          ? helpText('Core', 'Core_MatchLogic_TurnedOff')
+          : helpText('Core', 'Core_MatchLogic_TurnedOn');
+        this.finish(text.replace('{0}', label), undefined);
+        this.load();
+        return;
+      }
+      this.track(jobId, label);
     } catch (error) {
       this.busy = false;
       this.errorMessage = bodyMessage(error, helpText('Core', 'Core_CmdtManager_LoadError'));

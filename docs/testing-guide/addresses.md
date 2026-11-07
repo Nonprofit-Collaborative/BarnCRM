@@ -315,3 +315,18 @@ shows a birthdate or email beside people who share a name.
 | 4 | Tick nobody and select **Give This Address to Members**. | The living members without an address of their own read the household's address. The deceased member's address has not changed. |
 
 **Cleanup:** delete the contact added in step 3 and the address added in step 1, and set **Address Updates** back to **Everyone in the household moves together**.
+
+## T-ADDR-21: Addresses Go and Come Back With Their Record
+
+**Purpose:** confirm a deleted organization's or person's addresses go to the Recycle Bin with it and come back with it, the Keep choice leaves them, and a merge keeps them (D-184).
+**Prerequisites:** admin; **Addresses of deleted records** shows **Delete their addresses** on **BarnCRM Settings**, **Addresses**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create an organization `Zztest Delete Org` and give it an address `1 Test Way` on its **Addresses** card. | Saved; the address is its primary. |
+| 2 | Delete `Zztest Delete Org`. Open the **Recycle Bin**. | Both the organization and the address `1 Test Way` are there. |
+| 3 | Restore `Zztest Delete Org` only. Open it. | Its **Addresses** card shows `1 Test Way` again as its primary. |
+| 4 | Set **Addresses of deleted records** to **Keep their addresses** and save. Delete `Zztest Delete Org` again. | The organization is in the Recycle Bin; on the **Addresses** tab `1 Test Way` is still there, with no account, contact or person account. |
+| 5 | Set the setting back to **Delete their addresses**. Create two people `Zztest Merge` and `Zztest Merge2`, give `Zztest Merge2` an address `2 Test Way`, and merge them keeping `Zztest Merge`. | `Zztest Merge` shows `2 Test Way` on its **Addresses** card; it is not in the Recycle Bin. |
+
+**Cleanup:** delete `Zztest Merge` and the address `1 Test Way`; empty them from the Recycle Bin.

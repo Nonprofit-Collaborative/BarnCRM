@@ -78,9 +78,9 @@ To take it back, Maria clicks **Undo This Adoption**, types the number shown, an
 **Undo**. Each household goes back to the record type it had, and BarnCRM's greetings, primary
 contact and custom name go back to what they were.
 
-## Then Turn On Household Upkeep
+## Then Turn On Households
 
-While NPSP households are in use, BarnCRM's **Household Upkeep** cannot be turned on: its row
+While NPSP households are in use, BarnCRM's **Households** cannot be turned on: its row
 on **General** (and in first-run setup) says why, and **Turn On** is not offered. Otherwise a
 new person could get a BarnCRM household and an NPSP household at once, and NPSP's household
 rollups, soft credits and Opportunity accounts would drift apart from BarnCRM's.
@@ -96,11 +96,11 @@ When you are ready for BarnCRM to keep your households:
 1. Adopt every NPSP household (above), until the section says none are left.
 2. In NPSP Settings, **People**, **Account Model**, set **Account Model** to **One-to-One** or
    **Individual**, and save. BarnCRM cannot change NPSP's settings for you.
-3. In BarnCRM Settings, **General**, choose **Turn On** in the **Household Upkeep** row.
+3. In BarnCRM Settings, **General**, choose **Turn On** in the **Households** row.
 
-An org upgraded with Household Upkeep already on keeps it on, and its row shows the same
+An org upgraded with Households already on keeps it on, and its row shows the same
 explanation until both are done, so you know to finish them. Health Check also watches for it:
-if Household Upkeep is on and NPSP households come into use afterwards, it reports **NPSP and
+if Households is on and NPSP households come into use afterwards, it reports **NPSP and
 BarnCRM Both Make Households** with a button to this panel.
 
 ## Names and Greetings
@@ -129,9 +129,9 @@ Admin can report on them), which says **Undone** or **Not Restored** with the re
 as its own when its people change, which undoes the names BarnCRM keeps. Turn it off before
 adopting.
 
-**Expecting Household Upkeep to turn on right after adopting.** It also waits until NPSP's
-Account Model is no longer Household Account. Change it in NPSP Settings, then turn Household
-Upkeep on.
+**Expecting Households to turn on right after adopting.** It also waits until NPSP's
+Account Model is no longer Household Account. Change it in NPSP Settings, then turn Households
+on.
 
 **Adopting while membership is set to membership records.** The section refuses and tells you
 to set Household membership to Contact first.

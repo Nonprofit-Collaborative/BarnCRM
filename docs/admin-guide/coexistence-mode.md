@@ -109,10 +109,10 @@ Adopting them is its own step, with a preview and an undo: **Adopt NPSP Househol
 **General** page ([Adopting Your NPSP Households](npsp-households.md)). Switching between NPSP
 coexistence and Standalone changes nothing about households either way.
 
-**Turning on Household Upkeep while NPSP still makes households.** BarnCRM does not allow it,
+**Turning on Households while NPSP still makes households.** BarnCRM does not allow it,
 in any mode: while NPSP's Account Model is Household Account, or NPSP households are not yet
-adopted, the Household Upkeep row says why and offers no **Turn On**
-([Then Turn On Household Upkeep](npsp-households.md#then-turn-on-household-upkeep)).
+adopted, the Households row says why and offers no **Turn On**
+([Then Turn On Households](npsp-households.md#then-turn-on-households)).
 
 **Expecting the mode to move data.** Confirming a mode records what is in your org and, for
 Nonprofit Cloud coexistence, sets household membership. It does not migrate anything, and

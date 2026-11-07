@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Address_Delete_Behavior__c</fullName>
+  <defaultValue>"Delete"</defaultValue>
+  <description
+  >Addresses of Deleted Records: what happens to a household's, organization's or person's addresses when it is deleted. Delete (they are deleted with it and restored with it, the shipped choice, and what a blank means) or Keep (they stay, belonging to nobody). Canonical model R-AD11, D-184. Held as text because a custom setting field cannot be a picklist; the settings console offers the two values.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Delete: the addresses go to the Recycle Bin with the record and come back when it is restored. Keep: the addresses stay, belonging to nobody.</inlineHelpText>
+  <label>Addresses of Deleted Records</label>
+  <length>40</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

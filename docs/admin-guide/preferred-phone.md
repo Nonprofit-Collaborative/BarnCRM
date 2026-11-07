@@ -22,7 +22,7 @@ you type in it. The copying only starts on a person once you choose one.
 
 The copy belongs to the **Preferred Email and Phone** feature (BarnCRM Settings, General) and has
 its own switch on the Automation page: **Copy preferred phone on a person**. It is on by default
-and separate from household upkeep. Switch it off only if you want the ordinary Phone box left
+and separate from the household automations. Switch it off only if you want the ordinary Phone box left
 exactly as typed.
 
 | Permission set | What they can do with Preferred Phone |

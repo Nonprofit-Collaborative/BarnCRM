@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    One read of the org's automation through the org connection, or one run of Deactivate Org
+    Flows and Validation Rules with each item's state before and after, so Restore can put it
+    back (canonical model Section 10A, D-184).
+  </description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>false</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Automation Snapshot</label>
+  <nameField>
+    <displayFormat>ASN-{000000}</displayFormat>
+    <label>Automation Snapshot Number</label>
+    <type>AutoNumber</type>
+  </nameField>
+  <pluralLabel>Automation Snapshots</pluralLabel>
+  <sharingModel>Private</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

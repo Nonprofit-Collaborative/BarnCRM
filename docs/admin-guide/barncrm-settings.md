@@ -53,7 +53,7 @@ finishing; anyone else can close it (see below).
 Every Core feature starts off, so its automation is held: no household is created for a new
 contact, no address is copied, no reciprocal relationship is made, no primary affiliation is
 set and no preferred email is filled in. Households are caught up automatically: when
-**Household Upkeep** is turned on (in first-run setup or in **General**), BarnCRM gives a
+**Households** is turned on (in first-run setup or in **General**), BarnCRM gives a
 household to every person added while it was off, in the background, usually within a few
 minutes, exactly as it would have when they were saved. That includes people stored as
 accounts (Person Accounts) when your org uses the flexible way of belonging to a household:
@@ -124,9 +124,9 @@ to the people who should see them, shows its settings, and starts its automation
 | Data Manager | Data Manager, Import, Find and Super Transformer | Those four tabs and the Import section |
 | Duplicate Matching | Duplicate suggestions, review and matching logic | The Duplicate Matching tab and the Duplicate Matching section |
 | Org Optimizer and Health Check | The Org Optimizer tab and Health Check | The Org Optimizer tab, the Health section and the Org Optimizer section (its three thresholds) |
-| Household upkeep | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
-| Addresses | Address capture and the primary address | Its three automations and the Addresses section |
-| Relationships | Keeping both sides of a relationship in step | Its automation and the Relationships box on People and Households |
+| Households | Creating, naming and tidying households | Its three automations and the household naming and tidy-up rows |
+| Addresses | Address capture, the primary address, and the addresses of deleted records | Its five automations and the Addresses section |
+| Relationships | Keeping both sides of a relationship in step | Its automation, the Relationships box on People and Households, the Relationships card on a person's Connections tab, the Relationship types list in Custom Metadata, and import mappings that load relationships (in Data Manager and the Import wizard; kept, and listed again when it is turned back on) |
 | Affiliations | The primary affiliation | Its automation |
 | Preferred email and phone | Copying the preferred email into the standard email and the preferred phone into the standard phone | Its three automations |
 
@@ -146,7 +146,7 @@ roles given in Setup or by user access policies). A large org may take a few min
 up. Do not assign the BarnCRM Tab permission sets by hand: the hourly run removes them from
 anyone who should not have them.
 
-The Households tab works the same way. **Household Upkeep** carries the **BarnCRM Households**
+The Households tab works the same way. **Households** carries the **BarnCRM Households**
 permission set, which shows the Households tab and nothing else (it gives no record type). Once
 the feature is on, BarnCRM gives it to everyone with a BarnCRM Admin, Staff or Read Only role.
 
@@ -331,7 +331,7 @@ parts separated by commas.
 
 ### Record Type for Organizations
 
-**General** always shows **Record type for organizations**, whether or not Household Upkeep is
+**General** always shows **Record type for organizations**, whether or not Households is
 on, because import, addresses and Giving use organizations either way. Accounts of the record
 type chosen here are your organizations: they appear on the **Organizations** tab, get the
 organization parts of the record page, are matched as organizations by import, and an import
@@ -341,15 +341,26 @@ every account without one is an organization. Where your org has one, an account
 without a record type takes the user's default record type, so **No record type** would not
 work and saving it is refused.
 
-BarnCRM never adds an Organization record type. On install it picks one you already have and
-saves it, so the row is never blank:
+On install BarnCRM picks a record type you already have and saves it, so the row is never
+blank:
 
 1. A record type your accounts already use comes first.
 2. Among those (or among all, when none is used), **Organization**, then **Business
    Account**, then **Business**, then **Default**, by the name in Setup; otherwise the first
    by name.
-3. A household or person account record type is never offered or picked.
+3. A household or person account record type is never offered or picked, and neither is
+   BarnCRM's own **BarnCRM Organization** (below).
 4. With none left, **No record type**.
+
+**BarnCRM Organization, for an org with no record type of its own** (D-184). BarnCRM ships one
+Account record type for organizations, **BarnCRM Organization**. It is active but given to
+nobody, so no one is offered it and nobody's default changes, and BarnCRM never chooses it for
+you. This row offers it, beside **No record type**, only while your org has no Account record
+type of its own. Choose it when you want organizations to have a record type (for their own
+page layout, list views and reports) and have none: save it here, then give it to everyone who
+creates organizations in Setup (their profile's Record Type Settings, or a permission set of
+your own). Once chosen it stays chosen, even if you later add a record type of your own, until
+you change this row. Orgs that already have a record type of their own never see it offered.
 
 Change it if the guess is wrong. Saving a person account record type or one named Household
 is refused. Accounts already saved keep their record type; only which accounts count as

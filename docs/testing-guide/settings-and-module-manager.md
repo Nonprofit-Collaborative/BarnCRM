@@ -135,12 +135,12 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-07A: One Failing Row Does Not Stop the Rest
 
 **Purpose:** confirm that when BarnCRM automation fails on one record of a bulk save, only that record is refused.
-**Prerequisites:** admin user, Household Upkeep on, **Create Households Automatically** on. In Setup, an Account validation rule `Test_No_Refuse` with the formula `CONTAINS(Name, "Refuseme")` and the message "Test rule". A CSV of five people, last names `Avery`, `Blake`, `Refuseme`, `Drew`, `Emery`, first name `Test`.
+**Prerequisites:** admin user, Households on, **Create Households Automatically** on. In Setup, an Account validation rule `Test_No_Refuse` with the formula `CONTAINS(Name, "Refuseme")` and the message "Test rule". A CSV of five people, last names `Avery`, `Blake`, `Refuseme`, `Drew`, `Emery`, first name `Test`.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Import the CSV with the **Generic contact list** template into People (see [Imports](imports.md)). | The run finishes. Four people are imported, each in a new household. One row is rejected: the `Refuseme` row, with a message saying the record was not saved. |
-| 2 | Open **BarnCRM Settings**, **Error Log**. | An entry from the household upkeep automation names the failure. If the failure reached the trigger dispatcher, a Warning entry also says "Row 3 of this save was not saved" (the row in that save). |
+| 2 | Open **BarnCRM Settings**, **Error Log**. | An entry from the household automation names the failure. If the failure reached the trigger dispatcher, a Warning entry also says "Row 3 of this save was not saved" (the row in that save). |
 | 3 | Search for `Avery` and `Emery`. | Both exist, each with a household. |
 
 **Cleanup:** delete the validation rule and the four test people and their households.
@@ -148,7 +148,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-07B: Bypass Automation for One User
 
 **Purpose:** confirm the BarnCRM Automation Control setting skips automation for one user only.
-**Prerequisites:** admin user, Household Upkeep on, **Create Households Automatically** on. A second user, Sam, with the BarnCRM Staff role.
+**Prerequisites:** admin user, Households on, **Create Households Automatically** on. A second user, Sam, with the BarnCRM Staff role.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -176,6 +176,74 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 4 | Select **Remove** on the row. | The row is gone and the flow is offered again. The flow itself is unchanged and still active. |
 
 **Cleanup:** deactivate or delete `My_Test_Flow`.
+
+## T-SET-07D: The Automation Tab
+
+**Purpose:** confirm Automation has its own tab in the admin apps (D-184) and the Settings section still works.
+**Prerequisites:** admin user; a staff user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **BarnCRM Admin** app. | The tabs read **BarnCRM Settings**, **Data Manager**, **Data Hygiene**, **Duplicate Matching**, **Automation**, then any module admin tabs, and **Error Log** last. **Automation** has a factory icon. |
+| 2 | Click **Automation**. | The **Automation** card (factory icon) shows the pause controls, the switches, **Pause or Bypass for Some People** and **Your Own Flows**, as on **BarnCRM Settings**, **Automation**. |
+| 3 | Open **BarnCRM Admin Console** and click **Automation**. | It opens as a workspace tab with the same card. |
+| 4 | Open **BarnCRM Settings**, **Automation**. | The same card shows there; a switch changed on one page shows changed on the other after a reload. |
+| 5 | As the staff user, open the App Launcher and search `Automation`. | No **Automation** tab is offered. |
+
+**Cleanup:** None.
+
+## T-SET-07E: Automation Inventory
+
+**Purpose:** confirm the Automation tab lists every automation with owner and Pause All coverage, filters, a CSV and the snippets (C-60).
+**Prerequisites:** admin user; `My_Test_Flow` from T-SET-07C (active, record-triggered on Contact); an active Apex trigger of your own on Account that does not check the setting, `MyAccountTrigger`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Automation** tab and scroll to **Automation Inventory**. | A table with **Name**, **Type**, **Object**, **Status**, **Owner**, **Runs** and **Covered by Pause All**. `Household naming` (or another BarnCRM automation) reads **BarnCRM Automation**, **On**, **BarnCRM**, **Yes**. `ContactTrigger` reads **Apex Trigger**, **BarnCRM**, **Yes**. `ErrorLogEventTrigger` reads **No**. |
+| 2 | Find `My_Test_Flow` and `MyAccountTrigger`. | The flow: **Flow**, **Contact**, **Active**, **This Org**, **Not Checked**, with a note under the intro explaining Not Checked. The trigger: **This Org**, **No**. |
+| 3 | Open the row menu of `MyAccountTrigger` and choose **How to Make This Respect Pause All**. | A section headed with that title and the trigger's name shows a sentence and four lines of Apex calling `CheckAutomationAction.check`, with **Copy** and **Close**. **Copy** puts the code on the clipboard. |
+| 4 | Do the same for `My_Test_Flow`. | The steps name the Check BarnCRM Automation action and a Decision on Run; the code reads `Flow:My_Test_Flow`. |
+| 5 | Open the row menu of a BarnCRM row. | No **How to Make This Respect Pause All** is offered. |
+| 6 | Set **Object** to **Account**, then **Owner** to **This Org**. | Only Account rows, then only your own Account automation. Set **Owner** to a value with nothing on Account: "No automation matches these filters." |
+| 7 | Clear the filters and click **Download CSV**. | A file `Automation-Inventory-<date>.csv` with every row shown, including API names and the object API name. |
+
+**Cleanup:** delete `MyAccountTrigger` if you made it for this script.
+
+## T-SET-07F: Scan Org Automation Through the Org Connection
+
+**Purpose:** confirm the scan lists validation and workflow rules and checks the org's own flows (C-60, ADR-0174 "Deactivate org flows and validation rules with a snapshot and restore").
+**Prerequisites:** an admin with BarnCRM Admin and BarnCRM Metadata Admin, Customize Application and Modify Metadata; the org connection set up with Enabled for Callouts on ([T-IMP-18](imports.md#t-imp-18-create-a-new-field-from-a-column)); `My_Test_Flow` from T-SET-07C (calls Check BarnCRM Automation); a second active flow of your own, `My_Plain_Flow`, that does not; an active validation rule on Contact, `Test_Paused_Rule`, whose formula reads `$Setup.BarnCRM_Automation_Control__c.Pause_All__c`; an active validation rule on Account, `Test_Plain_Rule`, that does not.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Automation** tab as an admin with BarnCRM Admin only. | No **Scan Org Automation** button; your flows read **Not Checked**. |
+| 2 | Open it as the admin from the prerequisites, before the connection is set up (or with Enabled for Callouts off). | "Set up the org connection to list validation and workflow rules..." with the connection's status and **Set Up Connection** (or the Setup steps and **Check Again**). |
+| 3 | With the connection ready, click **Scan Org Automation**. | "Scanning through the org connection..." and the button is greyed out. Within a minute the line reads "Last scanned" and a date and time. |
+| 4 | Find `My_Test_Flow` and `My_Plain_Flow`. | **Yes** and **No** under **Covered by Pause All**. |
+| 5 | Find `Test_Paused_Rule` and `Test_Plain_Rule`. | Both listed as **Validation Rule**, **Active**, **This Org**, on **Contact** and **Account**; **Yes** and **No**. A workflow rule, if the org has one, is listed with no status. |
+| 6 | Click **Scan Org Automation** again and wait. | The date and time update; the rows are the same. |
+| 7 | With Enabled for Callouts turned off in Setup, scan again. | The line names why the scan did not finish; an Error Log entry has the detail. Turn callouts back on. |
+
+**Cleanup:** keep the flows and rules for T-SET-07G.
+
+## T-SET-07G: Deactivate Org Flows and Validation Rules, Then Restore
+
+**Purpose:** confirm a snapshot is saved before the org's own flows and rules are turned off, each result is shown, and Restore puts back exactly the snapshot (C-60, D-184, ADR-0174 "Deactivate org flows and validation rules with a snapshot and restore").
+**Prerequisites:** the admin, connection, flows and rules from T-SET-07F, scanned; a sandbox, then (for step 8 only) a production org or Developer Edition org, where the same steps apply.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the **Automation** tab, find **Deactivate Org Flows and Validation Rules** under the table. | A list of your own active flows and validation rules only; no BarnCRM switch or flow, no trigger, no workflow rule, nothing from a managed package. **Deactivate Selected** is greyed out. |
+| 2 | Set the owner filter to **BarnCRM**. | "No flow or validation rule of your own that is active matches these filters..." Set it back to all. |
+| 3 | Tick `My_Plain_Flow` and `Test_Plain_Rule`, click **Deactivate Selected**. | In a sandbox, a plain confirm naming both items; no phrase to type. |
+| 4 | Confirm. | Under **Deactivation Snapshots**, a new run (ASN- number) **In Progress** with both items **Waiting**, then within a minute **Completed** with both **Deactivated**. In Setup, `My_Plain_Flow` has no active version and `Test_Plain_Rule` is inactive. |
+| 5 | Save an Account that `Test_Plain_Rule` would have refused. | It saves. |
+| 6 | Click **Restore** on the run and confirm. | **Restoring**, then **Restored**; both items read **Restored**. In Setup the flow's same version is active again and the rule is active. No **Restore** button remains on that run. |
+| 7 | Turn `Test_Plain_Rule` off in Setup. Without refreshing the Automation tab, deactivate it with `My_Plain_Flow`. | The rule reads **Left As It Is**, "It was already inactive, so it was left as it is."; the flow reads **Deactivated**. Restore turns the flow back on and leaves the rule off. Turn the rule back on in Setup. |
+| 8 | In a production org, choose one item and click **Deactivate Selected**. | The dialog warns "This is a production org..." and **Deactivate Selected** stays greyed out until you type **DEACTIVATE**. Cancel. |
+| 9 | While a run shows **In Progress**, look at **Deactivate Selected** and **Restore**. | Both are unavailable; the run says "Working through the org connection...". |
+
+**Cleanup:** restore every run, so all flows and rules are active again.
 
 ## T-SET-08: Turn on a Feature Left Off
 
@@ -334,7 +402,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-17: People and Households, and Boxes on Every Page
 
 **Purpose:** confirm Households and Relationships are one **People and Households** section, every section groups its settings into headed boxes, and links to the old sections land in the right box.
-**Prerequisites:** admin user. The **Household Upkeep** and **Relationships** features on, and **Send long job notifications** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update All Household Names** in step 4.
+**Prerequisites:** admin user. The **Households** and **Relationships** features on, and **Send long job notifications** ticked on **General**. A job notification for a household name recompute is easiest to get by clicking **Update All Household Names** in step 4.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -453,7 +521,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-23: Settings Save Cues, Setting Names, Health and Error Log Links, Narrow Screens
 
 **Purpose:** confirm a panel says it saves on its own, the save bar says what it covers, setting names read as form labels, Health and Error Log open Org Optimizer, and a narrow screen gets a Section box.
-**Prerequisites:** admin user; the Org Optimizer and Household Upkeep features on.
+**Prerequisites:** admin user; the Org Optimizer and Households features on.
 
 | Step | Action | Expected result |
 |---|---|---|

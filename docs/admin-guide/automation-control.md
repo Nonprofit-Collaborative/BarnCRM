@@ -25,11 +25,13 @@ and nothing to install: installing or upgrading each package creates the switch 
 automation it ships, and leaves every switch you already have as you set it. If a switch is
 ever missing, the automation still runs, and Health Check names it and offers to restore it.
 
-You will find it in two places:
+You will find it in these places:
 
-- **BarnCRM Settings, then Automation.** This is the full page: the list of every
-  automation with its on and off switch, the pause button, **Catch Up Now**, the people and
-  profiles that pause or bypass automation, and your own flows.
+- **The Automation tab** in **BarnCRM Admin** and **BarnCRM Admin Console** (BarnCRM Admin
+  only, D-184). This is the full page: the list of every automation with its on and off
+  switch, the pause button, **Catch Up Now**, the people and profiles that pause or bypass
+  automation, and your own flows.
+- **BarnCRM Settings, then Automation.** The same panel, kept where admins already look for it.
 - **The BarnCRM home page.** While automation is paused, a banner appears at the top
   of the home page telling you what is paused and when it will come back on.
 
@@ -64,7 +66,7 @@ the records in first and the automatic housekeeping to happen afterwards, so not
    a pause lasts" below).
 7. Now switch off a single automation instead. Find **Household upkeep when a person
    changes** in the list and click its switch to **Off**. Only that one stops running. For a
-   few seconds a line next to the switch says "Household upkeep when a person changes is
+   few seconds a line next to the switch says "Households when a person changes is
    off. Turn it back on here." (a screen reader announces it).
    Everything else carries on.
 8. Switch it back **On**. Every change you make here is recorded with your name, the time,
@@ -220,6 +222,77 @@ Anything else that was skipped (a preferred email or phone copied to the
 standard field, an address copied to its household, the other side of a relationship) is caught
 up by saving those records again, for example with **Bulk Update** changing nothing but a
 harmless field.
+
+## Every Automation in This Org
+
+Below the Automation panel, the **Automation** tab has an **Automation Inventory** card: one
+table of every automation in the org (C-60, D-184).
+
+- **What is listed:** BarnCRM's automations with their switch (On, Off or Always Runs), every
+  record-triggered, scheduled and platform event flow and every Process Builder process, active
+  or inactive, and every Apex trigger, active or inactive.
+- **Owner:** BarnCRM, **This Org** (your own), or a managed package's namespace.
+- **Covered by Pause All:** **Yes** when the BarnCRM Automation Control setting (Pause All and
+  Bypass) stops it: BarnCRM's automations and flow templates, and your own triggers whose code
+  checks the setting. **No** for automations that always run, BarnCRM's error recording, a
+  managed package's flows and your triggers that do not check it. **Not Checked** for your own
+  flows until a scan (below) has read whether they call Check BarnCRM Automation.
+- **How to Make This Respect Pause All:** the row menu of your own automation that is not
+  covered shows what to add, ready to copy: the Check BarnCRM Automation action and Decision for
+  a flow, the Apex lines for a trigger, the wrapped formula for a validation or workflow rule.
+- **Object** and **Owner** filter the table; **Download CSV** saves what is shown;
+  **Refresh** reads it again.
+
+It is read as you, with the same queries the Data Dictionary uses, and needs the Manage BarnCRM
+Settings permission. A very large org is capped at 2,000 flows and 500 triggers, and the card
+says so.
+
+### Scan Org Automation
+
+Validation rules, workflow rules and whether your own flows call Check BarnCRM Automation can
+only be read through Salesforce's Tooling API. **Scan Org Automation** reads them through the
+org connection, the same one-time connection Super Importer uses to create a field (see
+[Creating a New Field From an Import](import-new-fields.md): Set Up Connection, then
+Enabled for Callouts in Setup). Until it is set
+up, the card shows the connection's status and **Set Up Connection** to anyone who may use it.
+
+Using the connection needs the **BarnCRM Metadata Admin** permission set, Customize Application
+and Modify Metadata. The scan runs in the background; the card says it is scanning and updates
+when it finishes, then shows when it last scanned. After a scan:
+
+- Your validation rules and workflow rules join the table (a workflow rule's active state is
+  not read). A rule whose formula reads the BarnCRM Automation Control setting is **Yes**.
+- Each of your own flows is **Yes** when it uses Check BarnCRM Automation or reads the setting,
+  otherwise **No**.
+
+Only the newest scan is kept. Scan again after you change your automation.
+
+### Deactivate Org Flows and Validation Rules
+
+Pause All stops only what checks the setting. To switch off your own flows and validation rules
+that do not, for a data load or a migration, use **Deactivate Org Flows and Validation Rules**
+under the table (D-184). It appears to anyone who may use the org connection, once it is ready,
+and lists your own active flows, Process Builder processes and validation rules that match the
+filters (run **Scan Org Automation** first to list the rules). BarnCRM's flows and anything from
+a managed package are never listed. Apex triggers and workflow rules cannot be deactivated here.
+
+1. Tick the items and click **Deactivate Selected**.
+2. Confirm. In a sandbox this is a plain confirm. In production the dialog warns that these
+   items stop running for everyone until restored, and you type **DEACTIVATE** to go ahead.
+3. A snapshot of each item's state (a flow's active version, a rule's Active box) is saved
+   first, then the items are turned off in the background, up to 200 per run.
+
+Each run is listed under **Deactivation Snapshots** with its number, status, start time and who
+started it, and every item's result: **Deactivated**, **Left As It Is** (with the reason, such
+as already inactive or not your own), or **Failed** with the reason Salesforce gave. A run with
+some failures is **Partly Done**. Only one run or restore at a time.
+
+**Restore** puts back exactly what the snapshot recorded for each item that was deactivated:
+the same flow version is activated again and each rule is turned back on. Items left as they
+were are not touched. A run can be restored once, and its result is kept on each item.
+
+If you save a newer version of a flow in between, Restore still activates the version the
+snapshot names.
 
 ## Running Your Own Version Instead
 

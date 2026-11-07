@@ -19,8 +19,8 @@ which family it was.
 
 ## How to Turn It On
 
-Naming belongs to the **Household Upkeep** feature, which on a new install is off until you
-turn it on: choose **Turn On** in the **Household Upkeep** row in **BarnCRM Settings**,
+Naming belongs to the **Households** feature, which on a new install is off until you
+turn it on: choose **Turn On** in the **Households** row in **BarnCRM Settings**,
 **General** (or leave it ticked in first-run setup); see
 [BarnCRM Settings](barncrm-settings.md). Once it is on, the patterns work out of the box.
 To change them:

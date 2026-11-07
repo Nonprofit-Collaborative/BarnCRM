@@ -6,6 +6,7 @@ import { gql, graphql } from 'lightning/graphql';
 import { deleteRecord, updateRecord } from 'lightning/uiRecordApi';
 import { getObjectInfo, getPicklistValues } from 'lightning/uiObjectInfoApi';
 import getTurnedOffTypes from '@salesforce/apex/RelationshipController.getTurnedOffTypes';
+import isFeatureOn from '@salesforce/apex/RelationshipController.isFeatureOn';
 import BarnConfirmModal from 'c/barnConfirmModal';
 import { iconFor } from 'c/barnIcons';
 import { localIsoDate } from 'c/findCsv';
@@ -208,6 +209,13 @@ export default class RelationshipPanel extends NavigationMixin(LightningElement)
     if (data) {
       this.turnedOffTypes = data;
     }
+  }
+
+  // The card shows nothing while the Relationships feature is off (ADR-0124, D-184).
+  @wire(isFeatureOn) featureOn;
+
+  get isShown() {
+    return this.helpReady && Boolean(this.featureOn && this.featureOn.data);
   }
 
   get typeLabel() {

@@ -2,7 +2,7 @@
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
     The session record page: the Service Delivery Log panel, where staff take attendance for the
-    session, above the session's details and its service deliveries.
+    session, in tabs with the session's details, and its related lists in the sidebar (D-184).
   </description>
   <flexiPageRegions>
     <itemInstances>
@@ -29,25 +29,83 @@
         <identifier>sessionDeliveryLogPanel</identifier>
       </componentInstance>
     </itemInstances>
+    <name>sessionDeliveryLogTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <componentInstance>
         <componentName>force:detailPanel</componentName>
         <identifier>sessionDetailPanel</identifier>
       </componentInstance>
     </itemInstances>
+    <name>sessionDetailsTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>active</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>sessionDeliveryLogTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Attendance</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>sessionDeliveryLogTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>sessionDetailsTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Standard.Tab.detail</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>sessionDetailsTabItem</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>sessionTabs</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>tabs</name>
+          <value>sessionTabs</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tabset</componentName>
+        <identifier>sessionTabset</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>main</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <componentInstance>
         <componentName>force:relatedListContainer</componentName>
         <identifier>sessionRelatedLists</identifier>
       </componentInstance>
     </itemInstances>
-    <name>main</name>
+    <name>sidebar</name>
     <type>Region</type>
   </flexiPageRegions>
   <masterLabel>Session Record Page</masterLabel>
   <sobjectType>Session__c</sobjectType>
   <template>
-    <name>flexipage:recordHomeSingleColTemplateDesktop</name>
+    <name>flexipage:recordHomeTemplateDesktop</name>
   </template>
   <type>RecordPage</type>
 </FlexiPage>

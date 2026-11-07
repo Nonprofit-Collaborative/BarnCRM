@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Automation tab's inventory (C-60, D-184): every automation in the org, its owner and
+    whether Pause All covers it, with filters, a CSV and the code that makes an org item respect
+    Pause All.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Automation Inventory</masterLabel>
+  <targets>
+    <target>lightning__AppPage</target>
+  </targets>
+</LightningComponentBundle>

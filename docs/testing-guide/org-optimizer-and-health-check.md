@@ -354,14 +354,14 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Delete **Retire Check**, **Retire Mapping**, the rollup and the **Test Retire** field.
 
-## T-HC-21: Household Upkeep On While NPSP Households Are in Use
+## T-HC-21: Households On While NPSP Households Are in Use
 
 **Purpose:** Confirm Health Check reports both packages making households and links the adoption panel.
-**Prerequisites:** admin; an org with NPSP installed (Account Model **Household Account**) and Household Upkeep turned on before NPSP's model was set that way (for example turn Upkeep on with Account Model **One-to-One**, then set it back to **Household Account**).
+**Prerequisites:** admin; an org with NPSP installed (Account Model **Household Account**) and Households turned on before NPSP's model was set that way (for example turn Households on with Account Model **One-to-One**, then set it back to **Household Account**).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Org Optimizer**, **Health Check**, click **Run Again**. | **NPSP and BarnCRM Both Make Households**, **Warning**, saying Household Upkeep is on while NPSP households are in use, with the button **Open NPSP Household Adoption**. |
+| 1 | On **Org Optimizer**, **Health Check**, click **Run Again**. | **NPSP and BarnCRM Both Make Households**, **Warning**, saying Households is on while NPSP households are in use, with the button **Open NPSP Household Adoption**. |
 | 2 | Click **Open NPSP Household Adoption**. | **BarnCRM Settings** opens on **General**, with the **Adopt NPSP Households** panel. |
 | 3 | Adopt every NPSP household and set NPSP's **Account Model** to **One-to-One**, then **Run Again**. | The finding is gone. |
 | 4 | In an org without NPSP, **Run Again**. | No such finding. |

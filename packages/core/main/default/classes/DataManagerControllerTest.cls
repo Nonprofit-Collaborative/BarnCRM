@@ -64,6 +64,34 @@ private class DataManagerControllerTest {
 		}
 	}
 
+	/** D-184: a mapping that loads relationships is not listed while Relationships is off. */
+	@IsTest
+	static void aRelationshipMappingIsHiddenWhileRelationshipsIsOff() {
+		System.runAs(TestUsers.admin()) {
+			List<Import_Template__c> rows = templates(2);
+			rows[1].Target_Object__c = 'Relationship__c';
+			insert rows;
+			DataManagerController.permissionOverride = true;
+			SettingsService.saveSystemValue(
+				'Features_Turned_On__c',
+				FeatureSwitchService.ADDRESSES
+			);
+
+			Test.startTest();
+			List<DataManagerController.Mapping> whileOff = DataManagerController.getMappings();
+			Boolean cardShown = RelationshipController.isFeatureOn();
+			Test.stopTest();
+
+			Set<String> names = new Set<String>();
+			for (DataManagerController.Mapping mapping : whileOff) {
+				names.add(mapping.name);
+			}
+			Assert.isTrue(names.contains('Mapping 1000'), 'Other mappings stay');
+			Assert.isFalse(names.contains('Mapping 1001'), 'The relationships one is hidden');
+			Assert.isFalse(cardShown, 'The relationship card is hidden too');
+		}
+	}
+
 	@IsTest
 	static void eachMappingSaysWhatItLoadsInWordsNeverAnApiName() {
 		System.runAs(TestUsers.admin()) {

@@ -8,7 +8,7 @@
   </values>
   <values>
     <field>Description__c</field>
-    <value xsi:type="xsd:string">Copies the address a person chose as preferred (personal, work or alternate) into their standard email when the person is saved. It is separate from household upkeep, so switching household upkeep off does not stop it. Switch this off and the standard email is left as typed.</value>
+    <value xsi:type="xsd:string">Copies the address a person chose as preferred (personal, work or alternate) into their standard email when the person is saved. It is separate from the household automations, so switching those off does not stop it. Switch this off and the standard email is left as typed.</value>
   </values>
   <values>
     <field>Handler_Class__c</field>
