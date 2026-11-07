@@ -1,0 +1,40 @@
+<template>
+    <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name={icons.page}>
+        <div class="slds-var-p-horizontal_medium">
+            <p class="slds-var-m-bottom_medium" data-id="intro">{labels.intro}</p>
+            <template lwc:if={loaded}>
+                <ul class="slds-var-m-bottom_medium" data-id="kinds">
+                    <template for:each={kinds} for:item="line">
+                        <li key={line.kind} class="slds-var-m-bottom_x-small">
+                            <c-barn-notice variant={line.variant} message={line.message}></c-barn-notice>
+                        </li>
+                    </template>
+                </ul>
+                <p class="slds-var-m-bottom_small" data-id="counts">{countsText}</p>
+                <template lwc:if={lastText}>
+                    <p class="slds-var-m-bottom_small" data-id="last">{lastText}</p>
+                </template>
+                <template lwc:if={noManageShown}>
+                    <c-barn-notice class="slds-var-m-bottom_small" variant="info" message={labels.noManage} data-id="no-manage"></c-barn-notice>
+                </template>
+                <div class="slds-var-m-vertical_medium">
+                    <lightning-button
+                        variant="brand"
+                        label={labels.runBackfill}
+                        onclick={handleRun}
+                        disabled={runDisabled}
+                        data-id="run"
+                    ></lightning-button>
+                </div>
+                <template lwc:if={runningShown}>
+                    <c-barn-notice class="slds-var-m-bottom_medium" variant="info" message={labels.running} data-id="running"></c-barn-notice>
+                </template>
+            </template>
+            <template lwc:if={error}>
+                <c-barn-notice class="slds-var-m-bottom_medium" variant="error" message={error} data-id="error"></c-barn-notice>
+            </template>
+        </div>
+    </lightning-card>
+    </template>
+</template>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Sync Emails</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Sync_Emails__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Contact_Point_Sync_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Contact Points</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">ContactPoints</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">20</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">Copies each person's Personal, Work and Alternate email and their standard email to Salesforce email Contact Points, one per address, the preferred one marked primary. On by default. Turning it off leaves the copies already made as they are.</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">contact-point-sync.md</value></values>
+</CustomMetadata>

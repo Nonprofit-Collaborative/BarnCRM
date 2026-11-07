@@ -37,6 +37,7 @@ PACKAGES = {
     "logicmodels": "LogicModels",
     "funders": "Funders",
     "forms": "Forms",
+    "contactpoints": "ContactPoints",
     "mirror": "Mirror",
 }
 DASHES = (chr(0x2014), chr(0x2013))  # em and en dash, written by code point

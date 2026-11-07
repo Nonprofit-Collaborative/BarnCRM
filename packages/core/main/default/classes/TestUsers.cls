@@ -44,7 +44,8 @@ public class TestUsers {
 		'Programs_Admin',
 		'Logic_Models_Admin',
 		'Funders_Admin',
-		'Forms_Admin'
+		'Forms_Admin',
+		'Contact_Point_Sync_Admin'
 	};
 
 	/**

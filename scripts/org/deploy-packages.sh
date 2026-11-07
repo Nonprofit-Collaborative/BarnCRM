@@ -936,6 +936,8 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(funders)
   # Forms depends on Core only (ADR-0175, forms module).
   MODULES+=(forms)
+  # Contact Point Sync depends on Core only (ADR-NEXT contact point sync module).
+  MODULES+=(contactpoints)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
   RECORD_PACKAGES+=("${MODULES[@]}")
@@ -988,7 +990,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # BarnCRM_Module__mdt record (ADR-0137). The app
   # copies are written to a temporary metadata-format package; the repository's app files are
   # never changed. Nothing is deployed when no module names a tab.
-  deployed_modules=(rollups giving mirror programs logicmodels funders forms)
+  deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"
   python3 scripts/org/module-app-tabs.py "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1
@@ -1025,7 +1027,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     if volunteers_has_metadata; then
       SETUP_MODULES+=(Volunteers)
     fi
-    SETUP_MODULES+=(Programs LogicModels Funders Forms Mirror)
+    SETUP_MODULES+=(Programs LogicModels Funders Forms ContactPoints Mirror)
     for module in "${SETUP_MODULES[@]}"; do
       echo ""
       echo "== Running the ${module} module's setup steps =="
@@ -1103,6 +1105,15 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   if ! printf '%s\n' 'new FormsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
     echo "The Forms access sync was not queued. Nothing else is affected: the hourly access"
     echo "check syncs the access."
+  fi
+
+  # The same gap for the Contact Point Sync permission set (ADR-NEXT contact point sync module,
+  # decision 12).
+  echo ""
+  echo "== Queueing the Contact Point Sync access sync =="
+  if ! printf '%s\n' 'new ContactPointsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Contact Point Sync access sync was not queued. Nothing else is affected: the hourly"
+    echo "access check syncs the access."
   fi
 fi
 

@@ -77,6 +77,8 @@ const ICONS = Object.freeze({
   Form__c: 'custom:custom28',
   // Logic Models
   Logic_Model__c: 'custom:custom62',
+  // Contact Point Sync
+  Contact_Point_Sync: 'custom:custom55',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',

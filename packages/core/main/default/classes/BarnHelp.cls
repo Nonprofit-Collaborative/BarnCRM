@@ -31,7 +31,8 @@ public with sharing class BarnHelp {
 
 	/**
 	 * The help text for a key in a package's catalog (Core, Giving, Rollups, Volunteers,
-	 * Programs, LogicModels, Funders, Mirror), or an empty string when there is none.
+	 * Programs, LogicModels, Funders, ContactPoints, Mirror), or an empty string when there is
+	 * none.
 	 */
 	@NamespaceAccessible
 	public static String text(String packageName, String key) {

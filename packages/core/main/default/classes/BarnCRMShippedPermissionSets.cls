@@ -32,6 +32,7 @@ public with sharing class BarnCRMShippedPermissionSets {
 		'Forms_Admin',
 		'Forms_Read_Only',
 		'Forms_Staff',
+		'Contact_Point_Sync_Admin',
 		'Funders_Admin',
 		'Funders_Read_Only',
 		'Funders_Staff',
