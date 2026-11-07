@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Benefits__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>What a sponsor at this level receives, for example a booth, passes and a logo on the program.</inlineHelpText>
+  <label>Benefits</label>
+  <trackTrending>false</trackTrending>
+  <length>5000</length>
+  <type>LongTextArea</type>
+  <visibleLines>5</visibleLines>
+</CustomField>

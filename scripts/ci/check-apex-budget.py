@@ -80,7 +80,9 @@ CAPS = {
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.
     # Raised for the call for speakers (EV-06): applications controller with review, decision and
     # the notice send; 41,110 measured, plus about 2.5%.
-    "events": 42_200,
+    # Raised again for sponsorship (EV-09): sponsors controller and the deliverables template
+    # parser; 53,328 measured, plus about 2.5%. Core's LinkedRecords is in Core's own budget.
+    "events": 54_700,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

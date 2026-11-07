@@ -13342,6 +13342,141 @@ decided.
 
 ---
 
+## 29EV22. Sponsorship Level
+
+### Definition
+
+One tier of an event's sponsorship (EV-09): its name, what a sponsor at it is asked to give, what
+the sponsor receives and the deliverables a new sponsor at the level starts with.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Level Name | text | yes | For example Gold. |
+| Event | reference to Event | yes | The event. |
+| Amount | currency | no | What a sponsor at this level is asked to give. |
+| Benefits | long text | no | What a sponsor at this level receives. |
+| Deliverables | long text | no | One deliverable per line, the checklist a new sponsor starts with (R-SP3). |
+| Sort Order | number | no | Levels list from the lowest number up. Default 0. |
+
+### Rules
+
+**R-SP3 A level starts a sponsor's checklist.** Adding a sponsor at a level copies the amount and
+makes one deliverable per non-blank, non-repeated line of Deliverables, up to 50, each name cut to
+80 characters. A line whose first word is Logo, Booth or Passes (any case, punctuation ignored)
+gets that type; any other line is Other. Removing a level leaves its sponsors with no level.
+
+### Salesforce implementation
+
+- **Object:** `Sponsorship_Level__c`, name field Text, label Level Name, master-detail to Event
+  (`Event__c`, relationship Sponsorship Levels), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Amount | `Amount__c` | Currency(16, 2) |
+| Benefits | `Benefits__c` | Long Text Area(5000) |
+| Deliverables | `Deliverables__c` | Long Text Area(5000) |
+| Sort Order | `Sort_Order__c` | Number(3, 0), default 0 |
+
+- **Parsing:** `SponsorDeliverableTemplate` (R-SP3).
+
+---
+
+## 29EV23. Event Sponsor
+
+### Definition
+
+An organization sponsoring an event (EV-09): the Core account, its level, status and amount, and
+its deliverables checklist (29EV24). Optionally tied to a Giving gift or commitment, or a Funders
+award.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Sponsor Name | text | yes | The organization's name; the Sponsors tab fills it. |
+| Event | reference to Event | yes | The event. |
+| Organization | reference to Account | no | The sponsoring Core account (R-SP1). |
+| Level | reference to Sponsorship Level | no | The tier. |
+| Contact | reference to Contact | no | The sponsor's contact person. |
+| Status | picklist | yes | Prospect, Committed, Confirmed or Declined. Default Prospect. |
+| Amount | currency | no | What the sponsor has agreed to give; starts as the level's. |
+| Linked Record | text | no | The record identifier of a Giving gift or commitment, or a Funders award (R-SP4). |
+| Notes | text | no | Anything to remember. |
+| Deliverables, Deliverables Done | roll-up summary | no | The count of the checklist and of its Done items. |
+
+### Rules
+
+**R-SP1 One sponsorship per organization per event, from the event's own levels.** The Sponsors tab
+refuses a second sponsor for the same account at an event, and a level of another event.
+
+**R-SP4 The link to Giving or Funders is by identifier, labelled through Core.** Linked Record holds
+the identifier as text. Core's `LinkedRecords` names it (the record's name and the object's label)
+only when the object is one it supports (a gift, a commitment, a Funders award), is in the org and
+the person can read the record; otherwise the tab shows no name and no error. Events names no
+object of another module.
+
+### Salesforce implementation
+
+- **Object:** `Event_Sponsor__c`, name field Text, label Sponsor Name, master-detail to Event
+  (`Event__c`, relationship Sponsors), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Organization | `Account__c` | Lookup(Account), Clear on delete |
+| Level | `Level__c` | Lookup(Sponsorship Level), Clear on delete |
+| Contact | `Contact__c` | Lookup(Contact), Clear on delete |
+| Status | `Status__c` | Picklist (Prospect, Committed, Confirmed, Declined), restricted, required |
+| Amount | `Amount__c` | Currency(16, 2) |
+| Linked Record | `Linked_Record_Id__c` | Text(18) |
+| Notes | `Notes__c` | Text Area(255) |
+| Deliverables | `Deliverables_Total__c` | Roll-Up Summary (COUNT Sponsor Deliverable) |
+| Deliverables Done | `Deliverables_Done__c` | Roll-Up Summary (COUNT Sponsor Deliverable, Status = Done) |
+
+- **Core seam:** `LinkedRecords` (R-SP4).
+- **Panel:** the Sponsors tab of the event page (`eventSponsors`), with `EventSponsorsController`
+  (thin, user mode) and the framework-free `eventSponsorsModel`.
+
+---
+
+## 29EV24. Sponsor Deliverable
+
+### Definition
+
+One item on a sponsor's checklist (EV-09): a logo, a booth, passes, or anything else the sponsor
+is owed or owes.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Deliverable | text | yes | What it is, for example Logo for the program. |
+| Sponsor | reference to Event Sponsor | yes | The sponsor. |
+| Type | picklist | yes | Logo, Booth, Passes or Other. Default Other. |
+| Status | picklist | yes | Pending, Requested, Received or Done. Default Pending. |
+| Due Date | date | no | When it is needed. |
+| Quantity | number | no | How many, for example the number of passes. |
+| Notes | text | no | Details. |
+
+### Salesforce implementation
+
+- **Object:** `Sponsor_Deliverable__c`, name field Text, label Deliverable, master-detail to Event
+  Sponsor (`Event_Sponsor__c`, relationship Deliverables), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Sponsor | `Event_Sponsor__c` | Master-Detail(Event Sponsor) |
+| Type | `Type__c` | Picklist (Logo, Booth, Passes, Other), restricted, required |
+| Status | `Status__c` | Picklist (Pending, Requested, Received, Done), restricted, required |
+| Due Date | `Due_Date__c` | Date |
+| Quantity | `Quantity__c` | Number(4, 0) |
+| Notes | `Notes__c` | Text Area(255) |
+
+---
+
 ## 29EV25. Events Settings
 
 ### Definition
@@ -13742,6 +13877,7 @@ mirrors the primary member).
 | 1.2 | 2026-11-06 | Event Management module (EV-01, EV-03, EV-04, EV-05; ADR-0177 `0177-events-module.md`, D-123, D-177). Seven objects in the new package `packages/events`: Event (`Event__c`, 29EV1), Ticket Type (`Ticket_Type__c`, 29EV2), Promo Code (`Promo_Code__c`, 29EV3), Event Track (`Event_Track__c`, 29EV4), Event Session (`Event_Session__c`, 29EV5), Event Speaker (`Event_Speaker__c`, 29EV6) and Session Speaker (`Session_Speaker__c`, 29EV7), with rules R-EV1 to R-EV4, R-TT1 to R-TT4, R-PC1 to R-PC5, R-ETR1, R-ESN1 to R-ESN5, R-ESP1 to R-ESP3 and R-SSP1. Registrations, attendees, call for speakers and sponsorship are designed in the ADR and added by their items. |
 
 | 1.3 | 2026-11-07 | Event Management call for speakers (EV-06; ADR-NEXT `NEXT-events-call-for-speakers.md`, ADR-0177 decision 11, D-123, D-177). New Sections 29EV20 Speaker Application (`Speaker_Application__c`, rules R-SA1, R-SA2, R-SA4, R-SA5), 29EV21 Speaker Review (`Speaker_Review__c`, R-SA3) and 29EV25 Events Settings (`Events_Settings__c`, R-ES1). Core gains the settings section name `Events`. Numbers 29EV22 to 29EV24 are reserved for sponsorship (EV-09). |
+| 1.3 | 2026-11-07 | Event Management sponsorship (EV-09; ADR-NEXT `NEXT-events-sponsorship.md`, ADR-0177 decision 11, D-123, D-177). New Sections 29EV22 Sponsorship Level (`Sponsorship_Level__c`, R-SP3), 29EV23 Event Sponsor (`Event_Sponsor__c`, R-SP1, R-SP4) and 29EV24 Sponsor Deliverable (`Sponsor_Deliverable__c`). Core gains the `LinkedRecords` seam (no object or field). |
 
 ---
 ## 32. Entity ownership by package
@@ -13874,6 +14010,9 @@ included; standard objects the packages extend are named by the entity that gove
 | Session Speaker | Event Management | 1.2 (EV-05) | 29EV7 |
 | Speaker Application | Event Management | 1.3 (EV-06) | 29EV20 |
 | Speaker Review | Event Management | 1.3 (EV-06) | 29EV21 |
+| Sponsorship Level | Event Management | 1.3 (EV-09) | 29EV22 |
+| Event Sponsor | Event Management | 1.3 (EV-09) | 29EV23 |
+| Sponsor Deliverable | Event Management | 1.3 (EV-09) | 29EV24 |
 | Events Settings | Event Management | 1.3 (EV-06) | 29EV25 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |

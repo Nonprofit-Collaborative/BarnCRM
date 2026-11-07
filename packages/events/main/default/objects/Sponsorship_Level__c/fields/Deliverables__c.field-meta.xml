@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Deliverables__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>One deliverable per line. A sponsor added at this level starts with this checklist.</inlineHelpText>
+  <label>Deliverables</label>
+  <trackTrending>false</trackTrending>
+  <length>5000</length>
+  <type>LongTextArea</type>
+  <visibleLines>5</visibleLines>
+</CustomField>

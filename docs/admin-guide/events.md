@@ -193,7 +193,36 @@ If a notice cannot go out, because no template is chosen, the template is missin
 applicant has no email address or the send failed, the decision is still saved and **Notice
 Result** on the application says why.
 
+### Sponsorship
+
+The **Sponsors** tab runs the event's sponsorship. **Add Level** makes a tier, such as Gold, with an
+**Amount**, its **Benefits** and a **Deliverables** list: one deliverable per line, the checklist a
+new sponsor at that level starts with. A line that starts with Logo, Booth or Passes gets that type;
+any other line is type Other.
+
+To add a sponsor, optionally choose a **Level**, then pick the organization in **Add Sponsor**. The
+organization is a Core account. The sponsor starts as **Prospect**, with the level's amount and the
+level's checklist; an organization can sponsor an event once. A sponsor's row menu has **Edit**
+(level, status, amount, contact, notes and the linked record), **Add Deliverable** and **Remove**
+(which removes its checklist). Each checklist item has its own status: Pending, Requested,
+Received or Done; the **Deliverables** column shows how many are done. The line above the table
+adds up the amounts of **Committed** and **Confirmed** sponsors.
+
+| Sponsor status | Meaning |
+|---|---|
+| Prospect | Being asked; not counted in the total. |
+| Committed | Agreed to give; counted. |
+| Confirmed | The commitment is in hand; counted. |
+| Declined | Said no; not counted. |
+
+BarnCRM takes no payments: the amount is what the sponsor has agreed to give. To tie a sponsorship
+to the money, paste the record identifier of the Giving gift or commitment, or the Funders award,
+into **Linked Record** on the sponsor (**Edit**). When Giving or Funders is installed and you can
+read that record, its name shows under the sponsor; otherwise nothing shows. Sponsorship needs
+neither module. Removing a level leaves its sponsors with no level, keeping their amounts and
+checklists.
+
 ## Not Yet
 
-Registration and attendees, session sign-up, a public event page, speaker portal, sponsorship,
-check-in, reminders and volunteer shifts for an event come in later releases.
+Registration and attendees, session sign-up, a public event page, speaker portal, check-in,
+reminders and volunteer shifts for an event come in later releases.

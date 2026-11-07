@@ -38,6 +38,7 @@ ALLOWED_LITERALS = {
     "ModuleDetectionServiceTest.cls": "asserts the detection probes",
     "ModuleManagerServiceTest.cls": "asserts the admin permission set each module names",
     "NamespaceUtilTest.cls": "resolves a module object name without the module",
+    "LinkedRecords.cls": "the optional-module objects a link may name, found by describe (EV-09)",
     "BarnCRMShippedPermissionSets.cls": "every shipped set, never offered by C-65 (generated)",
 }
 
