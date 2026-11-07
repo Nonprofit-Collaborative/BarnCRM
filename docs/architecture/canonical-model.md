@@ -12549,6 +12549,174 @@ pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
 
 ---
 
+## 29ZW. Form
+
+### Definition
+
+A form staff build once and fill in many times (C-42a, Forms module, ADR-NEXT
+`NEXT-forms-module.md`): steps of questions, conditions that show or hide a question or a step,
+and what a submission writes (a person, an organization, related records). The questions live in
+one JSON definition, so a form is versioned by copying one value and the same definition can be
+read outside Salesforce (plan 9.9).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the form is called, for example "Volunteer Interest". |
+| Description | long text | no | What the form is for, for staff. |
+| Status | picklist | yes (Draft) | Draft (never published), Published (filled from its latest version) or Closed (kept, no longer filled in) (R-FM2). |
+| Definition | long text | yes | The working definition as JSON (R-FM1). |
+| Published Version | number | no (set by BarnCRM) | The number of the latest Form Version, empty before the first publish. |
+
+### Rules
+
+**R-FM1 The definition shape (schemaVersion 1).** A JSON object:
+`{ "schemaVersion": 1, "steps": [...], "records": [...] }`.
+
+- A step: `{ "key", "title", "showWhen"?, "fields": [...] }`; at least one step, at most 20.
+- A field: `{ "key", "label", "type", "required"?, "help"?, "options"?, "maxLength"?, "min"?,
+  "max"?, "showWhen"?, "target"? }`. Types: text, textarea, email, phone, number, date, checkbox,
+  picklist. A picklist has `options`, each `{ "label", "value" }`. Keys are letters, digits and
+  underscores, start with a letter, and are unique across the form. At most 100 fields.
+- A condition (`showWhen`): `{ "all": [...] }` or `{ "any": [...] }` of tests
+  `{ "field", "op", "value"? }` (op: equals, notEquals, isBlank, isNotBlank, contains,
+  greaterThan, lessThan) or nested groups. A test names a field on an earlier step or earlier on
+  the same step.
+- A record: `{ "key", "kind", "object"?, "matching"?, "links"?, "values"? }`. Kind person (Contact),
+  organization (Account of the organization record type) or related (`object` names a custom
+  object). `matching` (person and organization only): `{ "rule", "onMatch" }`; person rules
+  `email` or `emailThenNamePostal` (the default), organization rule `name`; onMatch `fillBlanks`
+  (the default) or `overwrite`. `links` (related only) maps a lookup field to another record key
+  or to `context` (the record the form was filled from). `values` maps a field to a constant. At
+  most one person, one organization and ten records.
+- A target: `{ "record": "<record key>", "field": "<field API name>" }`.
+
+The engine (`formDefinition.js`) refuses a definition that breaks any of these, naming the first
+problem; the builder saves only a definition it accepts.
+
+**R-FM2 Publishing freezes a version.** Publish checks the definition, copies it into a new Form
+Version numbered one more than the last, sets Published Version and Status Published. Closing a
+form stops it being offered; it can be published again.
+
+### Salesforce implementation
+
+- **Object:** `Form__c`, name field Text, label Form Name, sharing Public Read Only (Forms Admin
+  edits), tab Forms in the BarnCRM Forms app.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Description | `Description__c` | Long Text Area(32768) |
+| Status | `Status__c` | Picklist (Draft, Published, Closed), restricted, default Draft |
+| Definition | `Definition__c` | Long Text Area(131072) |
+| Published Version | `Published_Version__c` | Number(6, 0) |
+
+- **Engine:** framework-free modules `formDefinition.js` (parse, check, defaults), `formRules.js`
+  (conditions, visibility, answer checks, step order) and `formMapping.js` (what a submission
+  writes), with Jest tests. **Controller:** `FormBuilderController` (thin: the form, the objects
+  and fields a target may name from describe, save and publish, in user mode).
+- **Permission sets:** Forms Admin creates, edits, publishes and deletes forms; Forms Staff and
+  Forms Read Only read them.
+
+---
+
+## 29ZX. Form Version
+
+### Definition
+
+One published version of a form's definition, never changed after it is written, so every
+submission is read against the questions it answered (R-FM2).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Form | reference | yes | The form, master-detail. |
+| Version | number | yes | 1 for the first publish, then one more each time. |
+| Definition | long text | yes | The definition as published (R-FM1). |
+
+### Salesforce implementation
+
+- **Object:** `Form_Version__c`, name field Auto Number `V-{0000}`, master-detail to `Form__c`
+  (`Form__c`), no tab.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Form | `Form__c` | Master-Detail(Form) |
+| Version | `Version__c` | Number(6, 0) |
+| Definition | `Definition__c` | Long Text Area(131072) |
+
+- **Permission sets:** Forms Admin creates them by publishing; nobody edits them (no edit
+  permission on Definition or Version in any set); every set reads them.
+
+---
+
+## 29ZY. Form Submission
+
+### Definition
+
+One filled-in form: the answers, the version they answer, who it matched or created, and what was
+written (C-42a). A submission is kept even when nothing could be written, so nothing typed is
+lost.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Form | reference | yes | The form, master-detail. |
+| Form Version | reference | yes | The version answered. |
+| Status | picklist | yes | Processed, Needs Review (R-FS2) or Failed (R-FS3). |
+| Answers | long text | yes | The answers as JSON, by field key, hidden fields left out (R-FS1). |
+| Outcome | long text | no | What was written as JSON: each record key with its record identifier and whether it was matched, created or updated. |
+| Message | text | no | Why the submission needs review or failed, in plain words. |
+| Person | reference | no | The Contact matched or created; set by staff to resolve a review. |
+| Organization | reference | no | The organization Account matched or created; set by staff to resolve a review. |
+| Context Record Id | text | no | The record the form was filled from (an event, a program), as an identifier (ADR-0014 pattern). |
+
+### Rules
+
+**R-FS1 The server decides what counts.** Before writing, `FormRules` (Apex) applies the published
+version's conditions, drops hidden answers, refuses a missing required answer or one of the wrong
+type, and refuses a key the version does not have. The browser's checks are a convenience.
+
+**R-FS2 Never a guess.** A person or organization key held by several records
+(`ImportMatcher.isHeldByMany`, after first-name narrowing) holds the submission as Needs Review
+and writes nothing. Process Again uses the Person and Organization staff set on it.
+
+**R-FS3 All or nothing.** The records of one submission are written under one savepoint in the
+user's mode; any failure rolls them back and the submission is kept as Failed with the reason.
+
+**R-FS4 Modules hear about it.** After the records are written, each installed
+`FormAttachmentExtension` that handles the context record's object receives a
+`FormSubmissionReceipt` in the same transaction (ADR-NEXT decision 9). A failing extension is
+logged and the submission is marked Needs Review with its message; the records stay.
+
+### Salesforce implementation
+
+- **Object:** `Form_Submission__c`, name field Auto Number `FS-{000000}`, master-detail to
+  `Form__c`, sharing controlled by parent, tab Form Submissions in the BarnCRM Forms app.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Form | `Form__c` | Master-Detail(Form) |
+| Form Version | `Form_Version__c` | Lookup(Form Version), restrict delete |
+| Status | `Status__c` | Picklist (Processed, Needs Review, Failed), restricted |
+| Answers | `Answers__c` | Long Text Area(131072) |
+| Outcome | `Outcome__c` | Long Text Area(32768) |
+| Message | `Message__c` | Text(255) |
+| Person | `Person__c` | Lookup(Contact), set null on delete |
+| Organization | `Organization__c` | Lookup(Account), set null on delete |
+| Context Record Id | `Context_Record_Id__c` | Text(18) |
+
+- **Classes:** `FormRules` (server checks), `FormSubmitService` (matching through Core's
+  `ImportMatcher` and `ImportDuplicateRuleMatcher`, writes, outcome), `FormRunnerController` and
+  `FormSubmissionController` (thin). Core: `FormAttachmentExtension`, `FormAttachmentExtensions`,
+  `FormSubmissionReceipt`.
+- **Permission sets:** Forms Admin and Forms Staff create submissions and set Person and
+  Organization; Forms Read Only reads them. Only Forms Admin deletes them.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -12907,6 +13075,7 @@ mirrors the primary member).
 | 1.0 | 2026-11-06 | Shipped match sources turned off through a setting (owner decision D-184, ADR-0172). `BarnCRM_Settings__c` gains `Match_Sources_Turned_Off__c` (Section 12); Match Source's Active definition now says BarnCRM changes it only on the organization's own rows. |
 | 1.0 | 2026-11-06 | Addresses of deleted records (owner decision D-184). `BarnCRM_Settings__c` gains `Address_Delete_Behavior__c` (Section 12; Delete or Keep, default Delete) and `Address__c` gains `Deleted_With__c` (Text 40), with rule R-AD11: a deleted household's, organization's or person's addresses are deleted with it and restored with it, never on a merge. |
 | 1.0 | 2026-11-06 | Shipped organization record type (owner decision D-184, ADR-0173, amends ADR-0141 decision 2). Account gains the record type `BarnCRM_Organization` (active, given to nobody). Section 8 gains R-O4a: offered for organizations only where the org has no record type of its own, never detected, never switched to automatically; R-O5 leaves it out of the candidates. |
+| 1.1 | 2026-11-06 | Forms module (C-42a, D-157, ADR-NEXT `NEXT-forms-module.md`). New package BarnCRM Forms with Sections 29ZW Form (`Form__c`), 29ZX Form Version (`Form_Version__c`) and 29ZY Form Submission (`Form_Submission__c`), rules R-FM1, R-FM2 and R-FS1 to R-FS4. Core gains no object or field: only the `FormAttachmentExtension` seam and the catalog row `BarnCRM_Module.Forms`. |
 
 ---
 ## 32. Entity ownership by package
@@ -13015,6 +13184,9 @@ included; standard objects the packages extend are named by the entity that gove
 | Indicator Period | Logic Models | 0.14 (L-02) | 29ZG |
 | Household Adoption | Core | 0.17 (X-05) | 29ZQ |
 | Nightly Job | Core | v1.0 (architect review RT-10) | 29ZR |
+| Form | Forms | release 1.1 (C-42a) | 29ZW |
+| Form Version | Forms | release 1.1 (C-42a) | 29ZX |
+| Form Submission | Forms | release 1.1 (C-42a) | 29ZY |
 | Funders entities | Funders | v0.9 | 30 |
 | Grant | Funders | 0.16 (F-01) | 29ZH |
 | Grant Requirement | Funders | 0.16 (F-02) | 29ZI |
@@ -13049,6 +13221,8 @@ so nothing below that is nonprofit-specific ships in Core.
 | Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
 | Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and `FundersAccessSync` (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantLinkedRecord`, kind Program) |
 | Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
+| Forms app, permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and `FormsAccessSync` (ADR-NEXT `NEXT-forms-module.md`). Console app `BarnCRM_Forms` with the Forms and Form Submissions tabs and Error Log last; the Form record page carries the builder and the runner, the Form Submission page the submission panel |
+| Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-NEXT `NEXT-forms-module.md` decision 9) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror was brought forward from v0.9 to v0.6 and is built in release

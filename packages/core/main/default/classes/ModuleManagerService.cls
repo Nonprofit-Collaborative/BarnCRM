@@ -115,7 +115,8 @@ public with sharing class ModuleManagerService {
 			'Grant_Fund_Entry__c',
 			'Grant_Payment__c',
 			'Grant_Requirement__c'
-		}
+		},
+		'Forms' => new List<String>{ 'Form__c', 'Form_Submission__c', 'Form_Version__c' }
 	};
 
 	/** The permission set Turn on gives the person who turned the module on. */
@@ -126,7 +127,8 @@ public with sharing class ModuleManagerService {
 		'Volunteers' => 'Volunteers_Admin',
 		'Programs' => 'Programs_Admin',
 		'LogicModels' => 'Logic_Models_Admin',
-		'Funders' => 'Funders_Admin'
+		'Funders' => 'Funders_Admin',
+		'Forms' => 'Forms_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */

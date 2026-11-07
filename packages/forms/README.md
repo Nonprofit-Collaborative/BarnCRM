@@ -1,0 +1,28 @@
+# BarnCRM Forms
+
+## Purpose
+
+Forms staff build once and fill in many times: multi-step forms, conditional questions, matching
+to existing people and organizations through Core's matchers, and records created or updated in
+BarnCRM (C-42a, ADR-NEXT `NEXT-forms-module.md`). The engine other modules reuse: Event
+Management registrations, V-09, the donation page and Scholarships applications.
+
+## First ships in
+
+Release **1.1** (C-42a engine and builder). C-42b adds public forms on a Salesforce Site and C-42c
+file upload and save and resume.
+
+## Depends on
+
+- BarnCRM Core
+
+Nothing in this package references another module. A module attaches a form to its own records
+through Core's `FormAttachmentExtension` seam and holds the form's record identifier as text.
+
+## Contents
+
+- Objects: `Form__c`, `Form_Version__c`, `Form_Submission__c` (canonical model Sections 29ZW to
+  29ZY).
+- Permission sets `Forms_Admin`, `Forms_Staff`, `Forms_Read_Only`, given by role through
+  `FormsAccessSync`; install steps in `FormsPostInstall`.
+- Console app `BarnCRM_Forms` with the Forms and Form Submissions tabs, Error Log last.

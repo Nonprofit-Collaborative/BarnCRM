@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Definition__c</fullName>
+  <description>The working definition as JSON (canonical model 29ZW, R-FM1). Edited in the Form Builder.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The questions, conditions and records, as JSON. Edit them in the Form Builder.</inlineHelpText>
+  <label>Definition</label>
+  <length>131072</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>5</visibleLines>
+</CustomField>

@@ -62,6 +62,8 @@ CAPS = {
     # Raised from 95,000 for the Funders usability stage: Undo for Mark Received and Mark
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).
     "funders": 100_500,
+    # Forms engine and builder (C-42a, D-157): submit service, server rules, thin controllers.
+    "forms": 60_000,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

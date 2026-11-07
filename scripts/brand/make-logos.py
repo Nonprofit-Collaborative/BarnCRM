@@ -16,6 +16,7 @@ color (no error red, warning orange or yellow), so a launcher tile never reads a
   BarnCRM_Programs_Logo     programs     sprout            #7526A8  BarnCRM Programs
   BarnCRM_Funders_Logo      funders      award ribbon      #7A5300  BarnCRM Funders
   BarnCRM_Logic_Models_Logo logicmodels  flow arrows       #3B44B5  BarnCRM Logic Models
+  BarnCRM_Forms_Logo        forms        form page         #0B5C7A  BarnCRM Forms
 
 Fundraising was red (#C23934) until 2026-11-04 (owner decision: red means error in the UI, the
 reason D-58 declined red for the brand). The asset was renamed from Fundraising_Logo then:
@@ -54,6 +55,7 @@ VARIANTS = [
     ("programs", "BarnCRM_Programs_Logo", "programs", (0x75, 0x26, 0xA8), "sprout"),
     ("funders", "BarnCRM_Funders_Logo", "funders", (0x7A, 0x53, 0x00), "ribbon"),
     ("logicmodels", "BarnCRM_Logic_Models_Logo", "logic-models", (0x3B, 0x44, 0xB5), "flow"),
+    ("forms", "BarnCRM_Forms_Logo", "forms", (0x0B, 0x5C, 0x7A), "form"),
 ]
 BRAND_DIR = "docs/brand"
 
@@ -225,7 +227,21 @@ def in_flow(x, y):
     return False
 
 
+def in_form(x, y):
+    """Forms: a page with three answer lines, the last one ticked (a form filled in)."""
+    if not (abs(x) <= 0.42 and abs(y) <= 0.56):
+        return False
+    for line_y in (-0.32, -0.06):
+        if -0.26 <= x <= 0.26 and abs(y - line_y) <= 0.06:
+            return False
+    tick = near_segment(x, y, (-0.24, 0.24), (-0.10, 0.36), 0.06) or near_segment(
+        x, y, (-0.10, 0.36), (0.22, 0.12), 0.06
+    )
+    return not tick
+
+
 GLYPHS = {
+    "form": in_form,
     "gear": in_gear,
     "heart": in_heart,
     "person": in_person,
