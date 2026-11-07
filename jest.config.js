@@ -2,7 +2,8 @@ const { jestConfig } = require('@salesforce/sfdx-lwc-jest/config');
 
 module.exports = {
   ...jestConfig,
-  roots: ['<rootDir>/packages'],
+  // portal-client: the framework-free portal client (not deployed to Salesforce).
+  roots: ['<rootDir>/packages', '<rootDir>/portal-client'],
   moduleNameMapper: {
     // sfdx-lwc-jest ships no stub for lightning/actions, which a quick action screen uses to
     // close itself.
