@@ -36,9 +36,12 @@ org:
   license free, or the check in step 6 below fails, use a Salesforce Platform or Salesforce user
   with **API Enabled**. That costs one license for the whole portal, not one per person.
 
-**Confirm the terms with Salesforce.** Salesforce describes the Integration license as being for
-"system-to-system integrations" and says it "may not be used for human users to access Salesforce
-data or features through any user interface". A portal shows people their own records through
+**Confirm the terms with Salesforce.** Offer the Integration license first where you have one,
+and use the regular API-enabled user below if you do not or Salesforce says no; BarnCRM works with
+either. Salesforce's Spring '23 release notes
+([link](https://help.salesforce.com/s/articleView?id=release-notes.rn_api_integration_license.htm&release=242&type=5))
+say the license "may not be used for human users to access Salesforce data or features through
+any user interface", and describe it as for system-to-system integrations. A portal shows people their own records through
 your website. Whether that use is allowed under your contract is a question for your Salesforce
 account executive, not something BarnCRM can answer. Ask before you go live.
 

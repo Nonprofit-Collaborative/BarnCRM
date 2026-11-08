@@ -1,6 +1,11 @@
 # ADR-0185: Portal Builder: an off-platform portal with its own one-time-code login, reaching Salesforce through one integration user and a person-scoped portal API
 
 **Status:** Accepted (builder decision)
+**Amended by D-189 (2026-11-07):** Brandon prefers the free Salesforce Integration user license
+where the org has one. The admin guide offers it first, quotes Salesforce's restriction verbatim
+(Spring '23 release notes, linked below: the license "may not be used for human users to access
+Salesforce data or features through any user interface"), tells the org to confirm its use with
+Salesforce, and gives one regular API-enabled user as the fallback. The code works with either.
 **Date:** 2026-11-07
 **Source:** plan D-118 (Portal Builder module, Section 5.9), D-120 (amended here by D-187), D-178
 (Portal Builder in release 1.3 with PB-03, PB-07 and PB-08), D-187 (owner decision 2026-11-07),
