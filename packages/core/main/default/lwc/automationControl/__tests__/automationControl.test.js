@@ -138,6 +138,29 @@ describe('c-automation-control', () => {
     expect(reasons[0].textContent.trim().length).toBeGreaterThan(0);
   });
 
+  it('keeps a row whose feature is off listed and marks it stopped (D-185)', async () => {
+    const element = createComponent();
+    getPage.emit({
+      ...RUNNING_PAGE,
+      automations: [
+        RUNNING_PAGE.automations[0],
+        {
+          recordId: '001000000000002AAA',
+          automationName: 'Relationship_Reciprocal',
+          label: 'Relationship: reciprocal',
+          description: 'Creates the other side of a relationship.',
+          objectName: 'Relationship__c',
+          enabled: true,
+          featureOff: true
+        }
+      ]
+    });
+    await flush();
+
+    expect(element.shadowRoot.querySelectorAll('.automation-toggle').length).toBe(2);
+    expect(element.shadowRoot.querySelectorAll('[data-id="feature-off-reason"]').length).toBe(1);
+  });
+
   it('never asks the server to switch an automation that always runs', async () => {
     const element = createComponent();
     getPage.emit(ALWAYS_RUNS_PAGE);

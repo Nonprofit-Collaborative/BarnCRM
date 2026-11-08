@@ -66,8 +66,8 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Relationships | Major | Records how people are connected (spouse, parent, sibling, friend, colleague) and writes the matching record on the other person automatically. While the Relationships feature is off, the person's Relationships card and any import mapping that loads relationships are hidden (D-184). | Shipped; hiding: D-184 | C-15 |
-| Affiliations | Major | Records a person's connection to an organization (employer, board, congregation) with role, dates and one primary. | Shipped | C-16 |
+| Relationships | Major | Records how people are connected (spouse, parent, sibling, friend, colleague) and writes the matching record on the other person automatically. While the Relationships feature is off, the person's Relationships card, the Relationships tile on the Sample Data card and any import mapping that loads relationships are hidden (D-184, D-185). | Shipped; hiding: D-184, D-185 | C-15 |
+| Affiliations | Major | Records a person's connection to an organization (employer, board, congregation) with role, dates and one primary. While the Affiliations feature is off, the Affiliations card is hidden on every record page (D-185). | Shipped; hiding: D-185 | C-16 |
 | Eleven non-gendered relationship types | Minor | Ships types such as Parent and Child, Grandparent and Grandchild, Spouse, Partner, Sibling, Friend and Colleague, none gendered. | Shipped | C-15 |
 | Keep both sides in step setting | Minor | Org-wide or per-record switch for reciprocal relationship upkeep; editing or ending one side changes the other. Restoring either side from the recycle bin brings the other back. | Shipped | C-15 |
 | Primary affiliation on the person | Minor | The person's primary organization is shown on their record; ending that affiliation clears it. | Shipped | C-16 |

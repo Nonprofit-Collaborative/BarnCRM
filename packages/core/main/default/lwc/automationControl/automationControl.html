@@ -140,6 +140,14 @@
                                         {labels.alwaysRuns}
                                     </p>
                                 </template>
+                                <template lwc:if={automation.featureOff}>
+                                    <p
+                                        class="slds-text-body_small slds-text-color_weak"
+                                        data-id="feature-off-reason"
+                                    >
+                                        {labels.featureOff}
+                                    </p>
+                                </template>
                             </div>
                             <div class="slds-col slds-size_1-of-3">
                                 <lightning-input

@@ -3,6 +3,7 @@
 /* eslint-disable @lwc/lwc/no-unexpected-wire-adapter-usages */
 import { createElement } from 'lwc';
 import AffiliationPanel from 'c/affiliationPanel';
+import isFeatureOn from '@salesforce/apex/AffiliationController.isFeatureOn';
 import getCardContext from '@salesforce/apex/AffiliationController.getCardContext';
 import { graphql } from 'lightning/graphql';
 import { notifyRecordUpdateAvailable, updateRecord } from 'lightning/uiRecordApi';
@@ -58,6 +59,14 @@ function response(nodes) {
 }
 
 jest.mock(
+  '@salesforce/apex/AffiliationController.isFeatureOn',
+  () => {
+    const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
+    return { default: createApexTestWireAdapter(jest.fn()) };
+  },
+  { virtual: true }
+);
+jest.mock(
   '@salesforce/apex/AffiliationController.getCardContext',
   () => {
     const { createApexTestWireAdapter } = require('@salesforce/sfdx-lwc-jest');
@@ -104,6 +113,7 @@ function build(objectApiName = 'Contact', recordId = HARPER, access = STAFF_ACCE
   element.objectApiName = objectApiName;
   document.body.appendChild(element);
   getObjectInfo.emit(access);
+  isFeatureOn.emit(true);
   return element;
 }
 
@@ -123,6 +133,18 @@ describe('c-affiliation-panel', () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+  });
+
+  it('shows nothing while the Affiliations feature is off (D-185)', async () => {
+    const element = build();
+    isFeatureOn.emit(false);
+    graphql.emit(response([FOUNDATION]));
+    await flush();
+
+    expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
+    isFeatureOn.emit(true);
+    await flush();
+    expect(element.shadowRoot.querySelector('lightning-card')).not.toBeNull();
   });
 
   it('asks for the affiliations of the record it sits on', async () => {

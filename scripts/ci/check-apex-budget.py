@@ -53,7 +53,8 @@ CAPS = {
     # EventVolunteerExtension EV-08, PortalActionExtension PB-01), plus about 2%.
     # Batch C wave 3 landing: 2,073,413 measured (FormCatalogExtension seam EV-18,
     # PublicPageExtension seam EV-16, EventsSampleData registration C-10, portal action
-    # registry PB-03 and PB-07), plus about 2%.
+    # registry PB-03 and PB-07), plus about 2%. Main's D-185 feature-off cards and the
+    # Automation page's stopped marker merged in within that margin.
     "core": 2_114_900,
     "rollups": 374_000,
     # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),

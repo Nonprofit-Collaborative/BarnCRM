@@ -15,6 +15,7 @@ import AFFILIATION_SCHEMA from '@salesforce/schema/Affiliation__c';
 import ID_FIELD from '@salesforce/schema/Affiliation__c.Id';
 import IS_PRIMARY_FIELD from '@salesforce/schema/Affiliation__c.Is_Primary__c';
 import END_DATE_FIELD from '@salesforce/schema/Affiliation__c.End_Date__c';
+import isFeatureOn from '@salesforce/apex/AffiliationController.isFeatureOn';
 import getCardContext from '@salesforce/apex/AffiliationController.getCardContext';
 
 import ACTIONS_FOR from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
@@ -168,6 +169,13 @@ export default class AffiliationPanel extends NavigationMixin(LightningElement) 
   helpReady = isHelpLoaded('Core');
 
   @wire(EnclosingTabId) enclosingTabId;
+
+  // The card shows nothing while the Affiliations feature is off (D-185).
+  @wire(isFeatureOn) featureOn;
+
+  get isShown() {
+    return this.helpReady && Boolean(this.featureOn && this.featureOn.data);
+  }
 
   icons = { affiliation: iconFor('Affiliation__c') };
 

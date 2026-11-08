@@ -15,6 +15,26 @@ private class AddressMoveControllerTest {
 	private static final String HOME_STREET = '6830 Sunset Lane';
 	private static final String OWN_STREET = '1912 North Third Street';
 
+	/** D-185: the card is hidden while Addresses is off and shown while it is on. */
+	@IsTest
+	static void theCardIsHiddenWhileAddressesIsOff() {
+		System.runAs(TestUsers.admin()) {
+			SettingsService.saveSystemValue(
+				'Features_Turned_On__c',
+				FeatureSwitchService.RELATIONSHIPS
+			);
+			Boolean whileOff = AddressMoveController.isFeatureOn();
+			SettingsService.saveSystemValue(
+				'Features_Turned_On__c',
+				FeatureSwitchService.ADDRESSES
+			);
+			Boolean whileOn = AddressMoveController.isFeatureOn();
+
+			Assert.isFalse(whileOff, 'The card is hidden while the feature is off');
+			Assert.isTrue(whileOn, 'The card shows once the feature is on');
+		}
+	}
+
 	@IsTest
 	static void aHouseholdIsOfferedUpdateEveryonesAddress() {
 		System.runAs(TestUsers.admin()) {

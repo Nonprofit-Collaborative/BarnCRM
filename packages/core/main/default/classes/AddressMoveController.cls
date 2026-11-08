@@ -10,6 +10,12 @@
  * (Address Card Fields, R-AD10), those this user can read.
  */
 public with sharing class AddressMoveController {
+	/** Whether the Addresses feature is on: the card shows nothing while it is off (D-185). */
+	@AuraEnabled(cacheable=true)
+	public static Boolean isFeatureOn() {
+		return FeatureSwitchService.isOn(FeatureSwitchService.ADDRESSES);
+	}
+
 	/** What the card needs to offer the moves on this record. */
 	public class CardContext {
 		/** True on a household, where Update Everyone's Address is offered. */
