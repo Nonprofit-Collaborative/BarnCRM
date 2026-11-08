@@ -645,10 +645,12 @@ private class RollupEngineTest {
 				people.add(new Contact(LastName = 'Donor' + i, AccountId = anonymous.Id));
 			}
 			// Household upkeep runs once per 200 people saved, 25 times in one test transaction,
-			// which is the platform's limit being tested rather than the engine's.
+			// which is the platform's limit being tested rather than the engine's. So does
+			// Contact Point Sync's, where installed (Batch C): with both, the setup ran out of CPU.
 			AutomationControl.bypass('ContactTriggerHandler');
+			AutomationControl.bypass('Contact_Point_Sync_Person');
 			insert people;
-			AutomationControl.clearBypass('ContactTriggerHandler');
+			AutomationControl.clearAllBypasses();
 			Rollup_Definition__c count = definition(
 				'Contact',
 				'AccountId',
