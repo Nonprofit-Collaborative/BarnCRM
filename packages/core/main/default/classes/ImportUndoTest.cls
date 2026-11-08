@@ -670,7 +670,7 @@ private class ImportUndoTest {
 
 			undo(batch, Datetime.now());
 
-			Assert.isFalse(exists(credited.Id), 'The person goes.');
+			Assert.isFalse(exists(credited.Id), 'The person goes: ' + undoJournal(batch));
 			Assert.isTrue(
 				exists(credited.AccountId),
 				'The household its gifts are credited to stays.'
@@ -1032,7 +1032,10 @@ private class ImportUndoTest {
 
 			undo(batch, Datetime.now());
 
-			Assert.isFalse(exists(imported.Id), 'The tagged record went in the module pass.');
+			Assert.isFalse(
+				exists(imported.Id),
+				'The tagged record went in the module pass: ' + undoJournal(batch)
+			);
 			Assert.isFalse(exists(imported.AccountId), 'And its household after it.');
 			Assert.isTrue(
 				stub.askedAbout.contains(Contact.SObjectType),
@@ -1054,7 +1057,7 @@ private class ImportUndoTest {
 
 			Assert.isTrue(exists(kept.Id), 'The module said this one stays.');
 			Assert.isTrue(exists(kept.AccountId), 'So does the household they are still on.');
-			Assert.isFalse(exists(gone.Id), 'The other went.');
+			Assert.isFalse(exists(gone.Id), 'The other went: ' + undoJournal(batch));
 			Assert.isTrue(
 				undoJournal(batch).contains('A gift with a receipt still names this person.'),
 				'The reason is journaled (R-IB9).'
