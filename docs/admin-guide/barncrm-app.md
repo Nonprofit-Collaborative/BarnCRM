@@ -53,16 +53,20 @@ is the answer to that question. You start in **BarnCRM** (or **BarnCRM Console**
 | Rollup Builder (Rollup Builder module) | **BarnCRM Admin** or **BarnCRM Admin Console** |
 | Gifts and everything around them (Giving module) | The **BarnCRM Fundraising** app, and the BarnCRM apps once added (below) |
 | Volunteer shifts and hours (Volunteers module) | The **BarnCRM Volunteers** app, and the BarnCRM apps once added (below) |
+| Forms and form submissions (Forms module) | **BarnCRM** or **BarnCRM Console** (no app of its own) |
+| Events and speakers (Event Management module) | **BarnCRM** or **BarnCRM Console** (no app of its own) |
+| Portals (Portal Builder module) | **BarnCRM Admin** or **BarnCRM Admin Console** (no app of its own) |
 
 The home page's **Modules** list names each installed module, marked **On** or **Off** (turned
 off in BarnCRM Settings, Modules), with an **Open the App** link for a module that has an app
-of its own. The Rollup Builder module has no app of its own: its
-**Rollup Builder** tab is in the admin apps.
+of its own. Rollup Builder, Mirror, Forms, Event Management and Portal Builder have no app of
+their own (D-188 keeps the org under Salesforce's custom app limit): their pages are in the
+BarnCRM apps.
 
 ### A Module's Pages in the BarnCRM Apps
 
 Giving and Volunteers keep their own apps, and their pages can also sit in the BarnCRM apps
-so you need not switch apps:
+so you need not switch apps. The modules with no app have their pages only here:
 
 | Module | Added to **BarnCRM** and **BarnCRM Console** | Added to **BarnCRM Admin** and **BarnCRM Admin Console** |
 |---|---|---|
@@ -70,9 +74,27 @@ so you need not switch apps:
 | Giving | Quick Gift Entry, Gifts, Commitments, Gift Batches | Accounting Periods, Giving Nightly Jobs, Donor Level Ladder, Stewardship Plan Setup |
 | Volunteers | Volunteer Shifts, Volunteer Hours | |
 | Mirror | | Campaign Sync, Opportunity Mirror, Accounting Export |
+| Forms | Forms, Form Submissions | |
+| Event Management | Events Home, Events, Event Speakers | |
+| Portal Builder | | Portals, Portal Accesses |
+
+A module's pages go after **Data Manager** in the everyday apps and before **Error Log** in
+the admin apps, so Error Log stays last. A form, form submission or event opens on its own
+record page from any app, since its module makes that page the org default.
 
 - **Deployed from source** with `scripts/org/deploy-packages.sh`: the script adds the pages
-  of every module it deployed itself, as its last step. Nothing to do.
+  of every module it deployed itself, as its last step. Nothing to do. Each run sets the four
+  apps to exactly Core's pages plus those of the modules it deployed.
+- **Removing a module from a source install**: before deleting the module's components, set the
+  apps back without its pages, naming only the module folders you keep (here Giving and
+  Rollups):
+
+  ```
+  python3 scripts/org/module-app-tabs.py --all apps-out rollups giving
+  sf project deploy start --metadata-dir apps-out --target-org myorg
+  ```
+
+  With no module left, leave the folder names out.
 - **Installed as packages**: Salesforce does not let one package add its pages to another
   package's app, so you add them once by hand. **Home**, **Setup Checklist**, **Modules**
   lists the pages for each installed module. For each BarnCRM app you use:

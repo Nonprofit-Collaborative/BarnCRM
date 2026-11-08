@@ -993,11 +993,14 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # missing tab, ADR-0013), so each deployed module's tabs join the BarnCRM apps here, from its
   # BarnCRM_Module__mdt record (ADR-0137). The app
   # copies are written to a temporary metadata-format package; the repository's app files are
-  # never changed. Nothing is deployed when no module names a tab.
+  # never changed. --all writes all four apps every time, so each holds exactly Core plus the
+  # modules deployed here, and a module left out has its tabs taken out (ADR-NEXT, Batch C
+  # modules add their tabs to the BarnCRM apps). Forms, Event Management and Portal Builder
+  # have no app of their own: these apps are where their tabs live (D-188).
   deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"
-  python3 scripts/org/module-app-tabs.py "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1
+  python3 scripts/org/module-app-tabs.py --all "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1
   deploy_stage "Module tabs in the BarnCRM apps" --metadata-dir "$APP_TABS_DIR" || exit $?
   rm -rf "$APP_TABS_DIR"
 

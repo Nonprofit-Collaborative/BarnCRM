@@ -26,7 +26,10 @@ used, and BarnCRM takes no payment.
 - The **Events** page (`eventsHome`, tab `Events_Home`) with New Event and Repeat Event
   (`eventRepeatModal`), the framework-free module `eventsModel` and the thin controller
   `EventsHomeController`.
-- The event record page `Event_Record_Page`: Core's header, main and sidebar template with tabs.
+- The event record page `Event_Record_Page`: Core's header, main and sidebar template with tabs,
+  assigned as `Event__c`'s org default.
+- No app of its own (D-188): the Events Home, Events and Event Speakers tabs join BarnCRM and
+  BarnCRM Console through the catalog row's `Staff_Tabs__c` and `scripts/org/module-app-tabs.py`.
 - Registrations (EV-02): `Event_Registration__c` (Private) and `Event_Attendee__c` (29EV8,
   29EV9), the Registrations tab (`eventRegistrations`, `eventRegistrationsModel`,
   `EventRegistrationsController`), `EventRegistrationService` with `EventPersonMatcher` (Core's

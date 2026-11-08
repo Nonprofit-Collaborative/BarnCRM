@@ -18,7 +18,7 @@ publishes a version.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Forms** app, **Forms** tab, **New**. Name `Volunteer Interest`, save. | The record page opens on the **Builder** tab (the **Form Builder** panel) with one step, a person under **Records to Write**, and **Fix Before Publishing** listing that the person needs a question written to Last Name. **Publish** is disabled. |
+| 1 | Open the **BarnCRM** app, **Forms** tab (after **Data Manager**; there is no BarnCRM Forms app), **New**. Name `Volunteer Interest`, save. | The record page opens on the **Builder** tab (the **Form Builder** panel) with one step, a person under **Records to Write**, and **Fix Before Publishing** listing that the person needs a question written to Last Name. **Publish** is disabled. |
 | 2 | Set **Step Title** to `You`. Select **Add Question**: **Question** `Last Name`, **Required**, **Write To** `person (Person)`, **Field** `Last Name (LastName)`. Add `First Name` written to `FirstName` and `Email` (type Email) written to `Email`. | The three questions are under `You`. **Fix Before Publishing** is gone; **Publish** is enabled. |
 | 3 | Select **Add Question** on `You`: `Age`, type Number, not written to a record. Select **Add Step**: title `Guardian`, a question `Guardian Name`, required, written to the person's `Description`. | Two steps in the left column. |
 | 4 | Select the `Guardian` step. Under **Show When** choose **All Are True**, then the test `Age`, **is less than**, value `18`. | The condition shows one row. |

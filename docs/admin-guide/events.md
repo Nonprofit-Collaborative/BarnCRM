@@ -45,7 +45,12 @@ Nothing is set up in Salesforce Setup.
 
 ## The Events Page
 
-The **BarnCRM Events** app opens on the **Events Home** tab. It lists the events still to come,
+Event Management has no app of its own (D-188): its **Events Home**, **Events** and **Event
+Speakers** tabs are in the **BarnCRM** and **BarnCRM Console** apps, after **Data Manager** (see
+[The BarnCRM Apps](barncrm-app.md#a-modules-pages-in-the-barncrm-apps)). An event opens on its
+own record page from any app.
+
+The **Events Home** tab lists the events still to come,
 soonest first, with their dates, status, format and place; **Past** lists those that ended or
 were cancelled, latest first. Each event's name opens it. **New Event** opens the new event form.
 
