@@ -12918,7 +12918,7 @@ too little room, not at their next save.
 
 | Attribute | API name | Type |
 |---|---|---|
-| Person | `Contact__c` | Master-Detail to Contact, relationship name Contact_Point_Links |
+| Person | `Contact__c` | Master-Detail to Contact, relationship name Contact_Point_Links, not reparentable (a merge still moves links; an auto-merge undo does not record them, the sync rebuilds them) |
 | Kind | `Kind__c` | Picklist (Email, Phone, Address), restricted |
 | Source | `Source__c` | Text(40) |
 | Contact Point ID | `Contact_Point_Id__c` | Text(18) |

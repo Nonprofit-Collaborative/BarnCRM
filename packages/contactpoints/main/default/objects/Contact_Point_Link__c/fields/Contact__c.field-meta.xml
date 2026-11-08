@@ -8,7 +8,7 @@
   <relationshipLabel>Contact Point Links</relationshipLabel>
   <relationshipName>Contact_Point_Links</relationshipName>
   <relationshipOrder>0</relationshipOrder>
-  <reparentableMasterDetail>true</reparentableMasterDetail>
+  <reparentableMasterDetail>false</reparentableMasterDetail>
   <trackTrending>false</trackTrending>
   <type>MasterDetail</type>
   <writeRequiresMasterRead>false</writeRequiresMasterRead>
