@@ -1,5 +1,5 @@
 /**
- * The Event Calendar tab (EV-19, ADR-NEXT `NEXT-event-calendar.md`): the organization's events,
+ * The Event Calendar tab (EV-19, ADR-0189 `0189-event-calendar.md`): the organization's events,
  * and optionally their sessions, that fall in the days a month, week or list view shows.
  *
  * Thin by design (plan Section 9.9): it returns plain rows for the days asked for, and the

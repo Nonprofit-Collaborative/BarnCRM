@@ -1,4 +1,4 @@
-# ADR-NEXT: Event calendar: a month, week and list view of events and sessions on its own tab, filters in the browser, and a calendar file built in the browser
+# ADR-0189: Event calendar: a month, week and list view of events and sessions on its own tab, filters in the browser, and a calendar file built in the browser
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-07
