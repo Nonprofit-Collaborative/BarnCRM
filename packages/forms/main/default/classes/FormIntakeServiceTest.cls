@@ -29,7 +29,7 @@ private class FormIntakeServiceTest {
 
 	private static List<Form_Submission__c> submissions() {
 		return [
-			SELECT Id, Status__c, Source__c, Person__c, Message__c
+			SELECT Id, Status__c, Source__c, Person__c, Message__c, Context_Record_Id__c
 			FROM Form_Submission__c
 			WITH USER_MODE
 		];
