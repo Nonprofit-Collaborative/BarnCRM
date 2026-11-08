@@ -32,7 +32,6 @@ public with sharing class FormsSites {
 		if (cached != null) {
 			return cached;
 		}
-		cached = new List<SiteInfo>();
 		List<Site> sites = [
 			SELECT Id, Name, MasterLabel, GuestUserId
 			FROM Site
@@ -41,20 +40,40 @@ public with sharing class FormsSites {
 			ORDER BY MasterLabel
 			LIMIT :SITE_LIMIT
 		];
-		Map<String, String> urlByShortId = new Map<String, String>();
+		Set<String> durableIds = durableIdsOf(sites);
+		cached = fromRows(
+			sites,
+			sites.isEmpty()
+				? new List<SiteDetail>()
+				: [
+						SELECT DurableId, SecureUrl
+						FROM SiteDetail
+						WHERE DurableId IN :durableIds
+						WITH SYSTEM_MODE
+				  ]
+		);
+		return cached;
+	}
+
+	/** A Site's detail names it by its 15 or its 18 character id, so both are asked for. */
+	@TestVisible
+	private static Set<String> durableIdsOf(List<Site> sites) {
 		Set<String> durableIds = new Set<String>();
 		for (Site one : sites) {
 			durableIds.add(String.valueOf(one.Id).left(15));
 			durableIds.add(String.valueOf(one.Id));
 		}
-		for (SiteDetail detail : [
-			SELECT DurableId, SecureUrl
-			FROM SiteDetail
-			WHERE DurableId IN :durableIds
-			WITH SYSTEM_MODE
-		]) {
+		return durableIds;
+	}
+
+	/** Each Site with its guest user and the secure address its detail gives, if any. */
+	@TestVisible
+	private static List<SiteInfo> fromRows(List<Site> sites, List<SiteDetail> details) {
+		Map<String, String> urlByShortId = new Map<String, String>();
+		for (SiteDetail detail : details) {
 			urlByShortId.put(detail.DurableId.left(15), detail.SecureUrl);
 		}
+		List<SiteInfo> result = new List<SiteInfo>();
 		for (Site one : sites) {
 			SiteInfo info = new SiteInfo();
 			info.siteId = one.Id;
@@ -62,9 +81,9 @@ public with sharing class FormsSites {
 			info.guestUserId = one.GuestUserId;
 			String url = urlByShortId.get(String.valueOf(one.Id).left(15));
 			info.url = url == null ? null : url.removeEnd('/');
-			cached.add(info);
+			result.add(info);
 		}
-		return cached;
+		return result;
 	}
 
 	/** The secure base address of each active Site that has one. */
