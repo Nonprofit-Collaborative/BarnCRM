@@ -2,7 +2,7 @@
 
 Purpose: planned work with status, by release. Mirrors Section 6 (6.0a release plan, 6.1.5 competitive research) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Feature status detail lives in `docs/barncrm-features.md`.
 
-Status as of 2026-11-07: Batch B is finished: `main` 4ca13cb2 (#1002, D-185) released to `barn-npc` and `mwdbdevsb`. Batch C waves 1 and 2 are built and integrated on `landing/batch-c` (ec73c41e, ADR-0175 to ADR-0185); the batch gate on `barn-sales` stopped at the org's custom app limit (owner decision pending); wave 3 (EV-13, EV-16 to EV-19, PB-03, PB-07, PB-08, Events sample data) is being built. Earlier, status as of 2026-11-06 (later): Batch B follow-ups 2 (D-184) landed as #979 (cd1410ae): vis-modules-18 module record pages, Households rename, Match Sources off by a setting, address deletion setting, shipped Organization record type, Relationships hidden while off, C-60 Automation tab, inventory, scan and deactivate tool; `mwdbdevsb` released with Batch B Core (ca99c753, Rollups removed per D-179); next: `barn-npc` release of #979, `mwdbdevsb` Core release on approval, then Batch C. Earlier, status as of 2026-11-06: all of Batch B is in `main`: the nonprofit stage (Giving, Programs, Volunteers, Funders, Logic Models usability and visual rollout, release 0.18) landed as #958 (ca99c753) after the owner QA fixes; the release gate passed on `barn-sales` and `oi-test` (4,914 of 4,914); released to `barn-npc` (all packages); `mwdbdevsb` not yet deployed (needs approval and the D-179 scope); next Batch C (Forms, Contact Point Sync, Events, Portal Builder). Earlier, status as of 2026-11-05: the Batch B Core stage (#912) and stage 2, Core follow-ups, Rollups and Mirror (#918) are in `main`; released to `barn-npc` (Core and universal modules) and `mwdbdevsb` (Core and Rollups); the owner QA round landed #923 to #930 in `main`, not yet deployed (D-179 to D-182); the nonprofit stage of Batch B is held until the QA fixes are done; then Batch C (Forms, Contact Point Sync, Events, Portal Builder). Earlier, status as of 2026-11-04: releases 0.15 to 0.17 (batch B) built and integrated on `landing/batch-b`; release 0.18 (usability and visual polish, architect-review fixes; D-170 to D-173) added to v1.0 and partly built: UX kit, help catalogs, logos, Core and Logic Models rollouts and the install and automation stack merged into `landing/batch-b` through #898; the nonprofit module rollouts (Giving, Programs, Volunteers, Funders, Logic Models part 3) are on hold behind Core, then universal modules, then nonprofit modules; messages move (AR-01) and the Apex trim pass still to build; Project Management module placed in release 1.17, Batch I (D-175). Nothing of batch B is in `main` yet. Earlier, status as of 2026-11-02: every v1.0 item (releases 0.15 to 0.17, batch B) built and integrated on `landing/batch-b`, not yet in `main` (status Built until the landing gate passes and it is squash-merged; D-167: all of v1.0 built before any testing cycle). Landing batch A (releases 0.12 to 0.14) landed in `main` (status Landed until the batch's release gate, deploys and QA are done); last shipped version 0.11; release plan adopted (D-155); competitive research added 48 features (D-156); the eleven research proposals approved and placed, v1.0 after Brandon's initial QA (D-157). History: `changelog.md` (newest first) and this file's earlier versions in git (`git log -p -- roadmap.md`; the last iteration-based version is at ef92381b).
+Status as of 2026-11-08: Batch C (releases 1.1 to 1.3) is in `main`: landing #1026 (e4069239) after the release gate passed on `oi-test` and `barn-sales` (5,296 of 5,296), then #1027 (Contact Point Sync bulk CPU) and #1028 (barn-npc-only test fixes); released to `barn-npc` at 2c26fd7b with the module tabs in the BarnCRM apps (D-188); next: `mwdbdevsb` Core deploy (owner approval), QA and UX, then statuses move to Shipped. Earlier, status as of 2026-11-07: Batch B is finished: `main` 4ca13cb2 (#1002, D-185) released to `barn-npc` and `mwdbdevsb`. Batch C waves 1 and 2 are built and integrated on `landing/batch-c` (ec73c41e, ADR-0175 to ADR-0185); the batch gate on `barn-sales` stopped at the org's custom app limit (owner decision pending); wave 3 (EV-13, EV-16 to EV-19, PB-03, PB-07, PB-08, Events sample data) is being built. Earlier, status as of 2026-11-06 (later): Batch B follow-ups 2 (D-184) landed as #979 (cd1410ae): vis-modules-18 module record pages, Households rename, Match Sources off by a setting, address deletion setting, shipped Organization record type, Relationships hidden while off, C-60 Automation tab, inventory, scan and deactivate tool; `mwdbdevsb` released with Batch B Core (ca99c753, Rollups removed per D-179); next: `barn-npc` release of #979, `mwdbdevsb` Core release on approval, then Batch C. Earlier, status as of 2026-11-06: all of Batch B is in `main`: the nonprofit stage (Giving, Programs, Volunteers, Funders, Logic Models usability and visual rollout, release 0.18) landed as #958 (ca99c753) after the owner QA fixes; the release gate passed on `barn-sales` and `oi-test` (4,914 of 4,914); released to `barn-npc` (all packages); `mwdbdevsb` not yet deployed (needs approval and the D-179 scope); next Batch C (Forms, Contact Point Sync, Events, Portal Builder). Earlier, status as of 2026-11-05: the Batch B Core stage (#912) and stage 2, Core follow-ups, Rollups and Mirror (#918) are in `main`; released to `barn-npc` (Core and universal modules) and `mwdbdevsb` (Core and Rollups); the owner QA round landed #923 to #930 in `main`, not yet deployed (D-179 to D-182); the nonprofit stage of Batch B is held until the QA fixes are done; then Batch C (Forms, Contact Point Sync, Events, Portal Builder). Earlier, status as of 2026-11-04: releases 0.15 to 0.17 (batch B) built and integrated on `landing/batch-b`; release 0.18 (usability and visual polish, architect-review fixes; D-170 to D-173) added to v1.0 and partly built: UX kit, help catalogs, logos, Core and Logic Models rollouts and the install and automation stack merged into `landing/batch-b` through #898; the nonprofit module rollouts (Giving, Programs, Volunteers, Funders, Logic Models part 3) are on hold behind Core, then universal modules, then nonprofit modules; messages move (AR-01) and the Apex trim pass still to build; Project Management module placed in release 1.17, Batch I (D-175). Nothing of batch B is in `main` yet. Earlier, status as of 2026-11-02: every v1.0 item (releases 0.15 to 0.17, batch B) built and integrated on `landing/batch-b`, not yet in `main` (status Built until the landing gate passes and it is squash-merged; D-167: all of v1.0 built before any testing cycle). Landing batch A (releases 0.12 to 0.14) landed in `main` (status Landed until the batch's release gate, deploys and QA are done); last shipped version 0.11; release plan adopted (D-155); competitive research added 48 features (D-156); the eleven research proposals approved and placed, v1.0 after Brandon's initial QA (D-157). History: `changelog.md` (newest first) and this file's earlier versions in git (`git log -p -- roadmap.md`; the last iteration-based version is at ef92381b).
 
 ## Rules (D-155 to D-157, plan 9.7 to 9.9)
 
@@ -150,14 +150,14 @@ Added 2026-11-04 (D-170). v1.0 is everything through the last Batch B release. E
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| C-42a | Forms engine and builder (Forms module; ADR first) | Major | Built (on landing/batch-c, not yet gated) | D-157 |
-| C-42b | Public forms on a Salesforce Site (guest-user security design; ADR first) | Major | Built (on landing/batch-c, not yet gated) | D-157 |
-| C-45 | Contact Point Sync module (ADR first), incl. person accounts and household-move re-sync (D-186) | Major | Built (on landing/batch-c, not yet gated) | D-111 |
-| C-42c | Forms: file upload, save and resume | Minor | Built (on landing/batch-c, not yet gated) | D-157 |
-| C-61 | Duplicate Rules Starter | Minor | Built (on landing/batch-c, not yet gated) | D-156 |
-| C-63 | Report subscription setup (feasibility check first) | Minor | Built (on landing/batch-c, not yet gated) | D-156 |
-| C-69 | Radius Find | Minor | Built (on landing/batch-c, not yet gated) | D-157 |
-| V-10b | Volunteer shift reminders: "still need you" nudge for unfilled shifts (split from V-10) | Minor | Built (on landing/batch-c, not yet gated) | D-165 |
+| C-42a | Forms engine and builder (Forms module; ADR first) | Major | Landed (#1026) | D-157 |
+| C-42b | Public forms on a Salesforce Site (guest-user security design; ADR first) | Major | Landed (#1026) | D-157 |
+| C-45 | Contact Point Sync module (ADR first), incl. person accounts and household-move re-sync (D-186) | Major | Landed (#1026) | D-111 |
+| C-42c | Forms: file upload, save and resume | Minor | Landed (#1026) | D-157 |
+| C-61 | Duplicate Rules Starter | Minor | Landed (#1026) | D-156 |
+| C-63 | Report subscription setup (feasibility check first) | Minor | Landed (#1026) | D-156 |
+| C-69 | Radius Find | Minor | Landed (#1026) | D-157 |
+| V-10b | Volunteer shift reminders: "still need you" nudge for unfilled shifts (split from V-10) | Minor | Landed (#1026) | D-165 |
 | UX-F4 | Module UX kit pass: Programs, Giving, Volunteers and Logic Models pages (absorbed into UX-V1 and UX-V4, release 0.18, D-170) | Minor | Absorbed into UX-V1 and UX-V4 (D-170) | D-165 |
 
 ### 1.2 (Batch C): Event Management core
@@ -166,16 +166,16 @@ Moved up from the old 1.11 (Brandon, 2026-11-04, D-177): Events reuse the Forms 
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| EV-01 | Events (ADR first) | Major | Built (on landing/batch-c, not yet gated) | D-123 |
-| EV-02 | Registrations and attendees on the Forms engine | Major | Built (on landing/batch-c, not yet gated) | D-123 |
-| EV-04 | Tracks, sessions and agenda | Major | Built (on landing/batch-c, not yet gated) | D-123 |
-| EV-03 | Ticket types | Minor | Built (on landing/batch-c, not yet gated) | D-123 |
-| EV-05 | Speakers | Minor | Built (on landing/batch-c, not yet gated) | D-123 |
-| EV-08 | Volunteer integration | Minor | Built (on landing/batch-c, not yet gated) | D-123 |
-| EV-10 | Summit Events compatibility | Minor | Built (on landing/batch-c, not yet gated) | D-123 |
-| EV-14 | Event reminders and No-Show status | Minor | Built (on landing/batch-c, not yet gated) | D-156 |
-| EV-16 | Public event pages and online registration on a Salesforce Site, through the Forms public path (C-42b); no payments | Major | In progress | D-186 |
-| EV-19 | Event calendar: month and list views with filters | Minor | In progress | D-186 |
+| EV-01 | Events (ADR first) | Major | Landed (#1026) | D-123 |
+| EV-02 | Registrations and attendees on the Forms engine | Major | Landed (#1026) | D-123 |
+| EV-04 | Tracks, sessions and agenda | Major | Landed (#1026) | D-123 |
+| EV-03 | Ticket types | Minor | Landed (#1026) | D-123 |
+| EV-05 | Speakers | Minor | Landed (#1026) | D-123 |
+| EV-08 | Volunteer integration | Minor | Landed (#1026) | D-123 |
+| EV-10 | Summit Events compatibility | Minor | Landed (#1026) | D-123 |
+| EV-14 | Event reminders and No-Show status | Minor | Landed (#1026) | D-156 |
+| EV-16 | Public event pages and online registration on a Salesforce Site, through the Forms public path (C-42b); no payments | Major | Landed (#1026) | D-186 |
+| EV-19 | Event calendar: month and list views with filters | Minor | Landed (#1026) | D-186 |
 
 CH-17 moved to release 1.10 with the board roster it generalizes (CH-09) (Brandon, 2026-11-07, D-186). EV-16 and EV-19 added to Batch C (Brandon asked for more Event Management in Batch C, D-186).
 
@@ -185,18 +185,18 @@ The Event items of the old 1.12, moved up with 1.2 (D-177). Portal Builder (PB-0
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| EV-06 | Call for speakers | Major | Built (on landing/batch-c, not yet gated) | D-123 |
-| EV-09 | Sponsorship management | Major | Built (on landing/batch-c, not yet gated) | D-123 |
-| EV-12 | QR check-in | Major | Built (on landing/batch-c, not yet gated) | D-156 |
-| PB-01 | Portal Builder (ADR first): off-platform portal through one connecting user and a person-scoped API (D-187) | Major | Built (on landing/batch-c, not yet gated) | D-118, D-120, D-178, D-187 |
-| EV-13 | Gala tables and seating (moved up from 1.13, D-186) | Major | In progress | D-156, D-186 |
-| EV-17 | Name badges and sign-in sheets | Minor | In progress | D-186 |
-| EV-18 | Post-event survey and follow-up | Minor | In progress | D-186 |
-| EV-11 | Event dashboard and conference template | Minor | Built (on landing/batch-c, not yet gated) | D-123 |
-| EV-15 | Event appointments with hosts | Minor | Built (on landing/batch-c, not yet gated) | D-156 |
-| PB-03 | Volunteer portal template (moved earlier) | Minor | In progress | D-118, D-157, D-178 |
-| PB-07 | Speaker portal template (EV-07) | Minor | In progress | D-123, D-178 |
-| PB-08 | Donor portal template | Minor | In progress | D-156, D-178 |
+| EV-06 | Call for speakers | Major | Landed (#1026) | D-123 |
+| EV-09 | Sponsorship management | Major | Landed (#1026) | D-123 |
+| EV-12 | QR check-in | Major | Landed (#1026) | D-156 |
+| PB-01 | Portal Builder (ADR first): off-platform portal through one connecting user and a person-scoped API (D-187) | Major | Landed (#1026) | D-118, D-120, D-178, D-187 |
+| EV-13 | Gala tables and seating (moved up from 1.13, D-186) | Major | Landed (#1026) | D-156, D-186 |
+| EV-17 | Name badges and sign-in sheets | Minor | Landed (#1026) | D-186 |
+| EV-18 | Post-event survey and follow-up | Minor | Landed (#1026) | D-186 |
+| EV-11 | Event dashboard and conference template | Minor | Landed (#1026) | D-123 |
+| EV-15 | Event appointments with hosts | Minor | Landed (#1026) | D-156 |
+| PB-03 | Volunteer portal template (moved earlier) | Minor | Landed (#1026) | D-118, D-157, D-178 |
+| PB-07 | Speaker portal template (EV-07) | Minor | Landed (#1026) | D-123, D-178 |
+| PB-08 | Donor portal template | Minor | Landed (#1026) | D-156, D-178 |
 
 ### 1.4 (Batch D): Migration Assistant, volunteer self-service
 

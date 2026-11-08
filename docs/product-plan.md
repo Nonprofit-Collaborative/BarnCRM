@@ -36,6 +36,7 @@ Read it in this order:
 - Open work: engineering follow-ups and the 2026-10-12 landing work items in Section 11.3, owner questions in Section 11.2 items 14 to 27, next roadmap items X-07, rollup S9 and the rest of v0.11 hardening in Section 6.
 - 2026-11-05 owner QA round: #923 to #930 landed on `main` (not yet deployed). Batch B Core and the universal modules were released to `barn-npc` (validation 0Afhk0000027UY5CAM, 4,349 of 4,349) and Core plus Rollups to `mwdbdevsb` (validation 0AfWF00000HGwW60AL, 2,905 of 2,905; quick deploy 0AfWF00000HH9I20AL). The nonprofit stage of Batch B is held until the QA fixes are done. Decisions: D-25 amended, D-179 to D-182.
 - 2026-11-06 Batch B nonprofit stage: landing #958 squash-merged to `main` as ca99c753 (Giving, Programs, Volunteers, Funders and Logic Models usability and visual rollout, release 0.18). Release gate passed on `barn-sales` and `oi-test` (4,914 of 4,914, coverage 93%, 0 classes under floor). Released to `barn-npc` (validation 0Afhk00000287cgCAA, 4,422 of 4,422, 6,838 components; quick deploy 0Afhk0000028JkHCAU; 64 removed components deleted; post-install clean). `mwdbdevsb` not yet deployed (needs approval and the D-179 scope). Next: Batch C (Forms, Contact Point Sync, Events, Portal Builder).
+- 2026-11-08 Batch C (releases 1.1 to 1.3: Forms, Contact Point Sync, Event Management, Portal Builder and the volunteer, speaker and donor portal templates, plus C-61, C-63, C-69 and V-10b): landing #1026 squash-merged to `main` as e4069239 after the release gate passed on `oi-test` and `barn-sales` (5,296 of 5,296, coverage 93% and 92%). Follow-ups: #1027 (52b17c41, Contact Point Sync bulk CPU: more than 50 people per chunk queue the sync, describe cached) and #1028 (2c26fd7b, three tests that failed only on `barn-npc`, test-only). Module tabs go into the four BarnCRM apps (D-188, ADR-0192); the stale BarnCRM Rollup Builder app was deleted on `barn-sales` and `oi-test`. Released to `barn-npc` at 2c26fd7b (validation 0Afhk0000029iK1CAI, 4,741 of 4,741, 7,517 components; quick deploy 0Afhk0000029jhVCAQ), post-install and access sync run for all eleven modules, module tabs deployed to the apps. Waiting: `mwdbdevsb` Core deploy (Brandon's approval), QA and UX.
 - Full handoff, including the exact C-29 landing steps: `docs/contributor-guide/ci.md`, section "Handoff: open work and what still needs testing".
 
 ---
@@ -908,14 +909,14 @@ The Forms engine comes first after v1.0 so V-09, Event Management, Scholarships 
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| C-42a | Forms engine and builder: multi-step forms, conditional fields, matching to existing people and organizations, records created or updated in BarnCRM (Forms module; ADR first) | Major | Planned | D-157 |
-| C-42b | Public forms on a Salesforce Site: guest-user security design, spam protection, duplicate-safe matching (ADR first) | Major | Planned | D-157 |
-| C-45 | BarnCRM Contact Point Sync module (ADR first) | Major | Planned | D-111 |
-| C-42c | Forms: file upload and save and resume by emailed link | Minor | Planned | D-157 |
-| C-61 | Duplicate Rules Starter: creates or repairs a recommended matching and duplicate rule for people and households through the C-49d Metadata API connection | Minor | Planned | D-156 |
-| C-63 | Report subscription setup: schedule native report subscriptions (board, retention, rollup freshness) from a BarnCRM page; feasibility check first (needs the Reports REST API through the C-49d connection) | Minor | Planned | D-156 |
-| C-69 | Radius Find: a Find condition "within N miles of a postal code or address" using Salesforce's built-in geocodes, SOQL DISTANCE and a shipped postal-code centroid table; no outside geocoding | Minor | Planned | D-157 |
-| V-10b | Volunteer shift reminders: "still need you" nudge for unfilled shifts (split from V-10) | Minor | Planned | D-165 |
+| C-42a | Forms engine and builder: multi-step forms, conditional fields, matching to existing people and organizations, records created or updated in BarnCRM (Forms module; ADR first) | Major | Landed (#1026) | D-157 |
+| C-42b | Public forms on a Salesforce Site: guest-user security design, spam protection, duplicate-safe matching (ADR first) | Major | Landed (#1026) | D-157 |
+| C-45 | BarnCRM Contact Point Sync module (ADR first) | Major | Landed (#1026, #1027) | D-111 |
+| C-42c | Forms: file upload and save and resume by emailed link | Minor | Landed (#1026) | D-157 |
+| C-61 | Duplicate Rules Starter: creates or repairs a recommended matching and duplicate rule for people and households through the C-49d Metadata API connection | Minor | Landed (#1026) | D-156 |
+| C-63 | Report subscription setup: schedule native report subscriptions (board, retention, rollup freshness) from a BarnCRM page; feasibility check first (needs the Reports REST API through the C-49d connection) | Minor | Landed (#1026) | D-156 |
+| C-69 | Radius Find: a Find condition "within N miles of a postal code or address" using Salesforce's built-in geocodes, SOQL DISTANCE and a shipped postal-code centroid table; no outside geocoding | Minor | Landed (#1026) | D-157 |
+| V-10b | Volunteer shift reminders: "still need you" nudge for unfilled shifts (split from V-10) | Minor | Landed (#1026) | D-165 |
 | UX-F4 | Module UX kit pass: Programs, Giving, Volunteers and Logic Models pages move onto the UX kit (absorbed into UX-V1 and UX-V4, release 0.18, D-170) | Minor | Absorbed into UX-V1 and UX-V4 (D-170) | D-165 |
 
 #### Release 1.2 (Batch C): Event Management core
@@ -924,16 +925,16 @@ Moved up from the old 1.11 (Brandon, 2026-11-04, D-177): Events reuse the Forms 
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| EV-01 | Events (module; ADR first) | Major | Planned | D-123 |
-| EV-02 | Registrations and attendees on the Forms engine | Major | Planned | D-123 |
-| EV-04 | Tracks, sessions and agenda | Major | Planned | D-123 |
-| EV-03 | Ticket types | Minor | Planned | D-123 |
-| EV-05 | Speakers | Minor | Planned | D-123 |
-| EV-08 | Volunteer integration | Minor | Planned | D-123 |
-| EV-10 | Summit Events compatibility | Minor | Planned | D-123 |
-| EV-14 | Event reminder and follow-up emails, and a No-Show status | Minor | Planned | D-156 |
-| EV-16 | Public event pages and online registration on a Salesforce Site, through the Forms public path (C-42b); no payments | Major | Planned | D-186 |
-| EV-19 | Event calendar: month and list views of events and sessions, with filters | Minor | Planned | D-186 |
+| EV-01 | Events (module; ADR first) | Major | Landed (#1026) | D-123 |
+| EV-02 | Registrations and attendees on the Forms engine | Major | Landed (#1026) | D-123 |
+| EV-04 | Tracks, sessions and agenda | Major | Landed (#1026) | D-123 |
+| EV-03 | Ticket types | Minor | Landed (#1026) | D-123 |
+| EV-05 | Speakers | Minor | Landed (#1026) | D-123 |
+| EV-08 | Volunteer integration | Minor | Landed (#1026) | D-123 |
+| EV-10 | Summit Events compatibility | Minor | Landed (#1026) | D-123 |
+| EV-14 | Event reminder and follow-up emails, and a No-Show status | Minor | Landed (#1026) | D-156 |
+| EV-16 | Public event pages and online registration on a Salesforce Site, through the Forms public path (C-42b); no payments | Major | Landed (#1026) | D-186 |
+| EV-19 | Event calendar: month and list views of events and sessions, with filters | Minor | Landed (#1026) | D-186 |
 
 CH-17 moved to release 1.10 with the board roster it generalizes (CH-09) (Brandon, 2026-11-07, D-186). EV-16 and EV-19 added to Batch C (Brandon asked for more Event Management in Batch C, D-186).
 
@@ -943,18 +944,18 @@ The Event items of the old 1.12, moved up with 1.2 (D-177). Portal Builder (PB-0
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| EV-06 | Call for speakers | Major | Planned | D-123 |
-| EV-09 | Sponsorship management | Major | Planned | D-123 |
-| EV-12 | Event check-in with QR codes (generated in the browser, no outside service) and a staff check-in screen with walk-in add | Major | Planned | D-156 |
-| PB-01 | Portal Builder: templates, logins at no added license cost (ADR first). Off-platform portal with its own login, reading and writing through one Salesforce integration user (the free Salesforce Integration user licenses where the org has them), Titan and FormAssembly style (D-187); the Salesforce side is a person-scoped portal API | Major | Planned | D-118, D-120, D-178, D-187 |
-| EV-11 | Event dashboard and community conference template | Minor | Planned | D-123 |
-| EV-15 | Event appointments with hosts | Minor | Planned | D-156 |
-| EV-13 | Gala tables and seating: tables with capacity and host, guest assignment, seating chart export, dietary and access needs, sponsor tables (moved up from 1.13, D-186) | Major | Planned | D-156, D-186 |
-| EV-17 | Name badges and sign-in sheets: printable badges and per-session sign-in sheets generated in the browser | Minor | Planned | D-186 |
-| EV-18 | Post-event survey and follow-up: a Forms survey sent to attendees after the event, answers on the attendee record | Minor | Planned | D-186 |
-| PB-03 | Volunteer portal template: shifts, sign-ups, hours and profile (moved earlier, D-157) | Minor | Planned | D-118, D-157, D-178 |
-| PB-07 | Speaker portal template (EV-07) | Minor | Planned | D-123, D-178 |
-| PB-08 | Donor portal template: giving history, pledge balance, receipts, contact updates; no payments | Minor | Planned | D-156, D-178 |
+| EV-06 | Call for speakers | Major | Landed (#1026) | D-123 |
+| EV-09 | Sponsorship management | Major | Landed (#1026) | D-123 |
+| EV-12 | Event check-in with QR codes (generated in the browser, no outside service) and a staff check-in screen with walk-in add | Major | Landed (#1026) | D-156 |
+| PB-01 | Portal Builder: templates, logins at no added license cost (ADR first). Off-platform portal with its own login, reading and writing through one Salesforce integration user (the free Salesforce Integration user licenses where the org has them), Titan and FormAssembly style (D-187); the Salesforce side is a person-scoped portal API | Major | Landed (#1026) | D-118, D-120, D-178, D-187 |
+| EV-11 | Event dashboard and community conference template | Minor | Landed (#1026) | D-123 |
+| EV-15 | Event appointments with hosts | Minor | Landed (#1026) | D-156 |
+| EV-13 | Gala tables and seating: tables with capacity and host, guest assignment, seating chart export, dietary and access needs, sponsor tables (moved up from 1.13, D-186) | Major | Landed (#1026) | D-156, D-186 |
+| EV-17 | Name badges and sign-in sheets: printable badges and per-session sign-in sheets generated in the browser | Minor | Landed (#1026) | D-186 |
+| EV-18 | Post-event survey and follow-up: a Forms survey sent to attendees after the event, answers on the attendee record | Minor | Landed (#1026) | D-186 |
+| PB-03 | Volunteer portal template: shifts, sign-ups, hours and profile (moved earlier, D-157) | Minor | Landed (#1026) | D-118, D-157, D-178 |
+| PB-07 | Speaker portal template (EV-07) | Minor | Landed (#1026) | D-123, D-178 |
+| PB-08 | Donor portal template: giving history, pledge balance, receipts, contact updates; no payments | Minor | Landed (#1026) | D-156, D-178 |
 
 #### Release 1.4 (Batch D): Migration Assistant, volunteer self-service
 
@@ -2229,6 +2230,8 @@ Findings and decisions about the modules (Giving, Mirror, Volunteers, Programs, 
 | D-185 | Owner answers 2026-11-06, third set (Brandon): feature-off cards hide as recommended (the Affiliations and Addresses cards and the sample-data Relationships tile hide while their feature is off, like the Relationships card; Automation page rows for features that are off stay visible, marked stopped); of the Claude-made rules reviewed, Experience Cloud, other languages and multi-currency stay out of scope for now, and the others are not needed: the "not multi-platform" and "not an online giving platform or donor portal" non-goals are removed (Section 1.5), metadata deploy and anonymous Apex leave the never-build and out-of-scope lists (now simply not planned), and the server-side export beyond the 50,000-row browser limit is no longer ruled out; `mwdbdevsb` deploy of #979 (Core) approved | Keep every Claude-made non-goal | Brandon's answers to the decision provenance review |
 | D-186 | Owner answers 2026-11-07 (Brandon): CH-17 committees moves to release 1.10 with the board roster it generalizes (CH-09); V-10b nudges go to past volunteers with approved hours on the shift's job (at most 3 per open place, 25 per shift), as recommended; Contact Point Sync copies person accounts too (read through dynamic Apex, so no Person Account dependency) and re-syncs a person's household addresses right away when they move households, not at their next save; "finish the remaining Batch C items now" and "more Event Management in Batch C": EV-13 gala seating moves up from 1.13 to 1.3, and EV-16 public event pages and online registration (1.2), EV-17 badges and sign-in sheets (1.3), EV-18 post-event survey (1.3) and EV-19 event calendar (1.2) are added | Keep CH-17 in 1.2; person accounts later | Brandon's answers |
 | D-187 | Portal Builder (PB-01) login architecture (Brandon, 2026-11-07; resolves Section 11.2 item 30, amends D-120's on-platform requirement): the Titan and FormAssembly approach. The portal runs off-platform with its own login (one-time code by email, optional second factor) and reaches Salesforce through one integration user, compatible with the free Salesforce Integration user licenses where the org has them. The Salesforce side is a person-scoped portal API in the Portal Builder module: every call names the verified portal person and the API returns or changes only what that person's template allows. The on-platform Site with BarnCRM's own login (option B) is dropped after the 2026-11-07 terms check found nothing that allows it. Donated internal licenses (option C) stay documented for small boards | (B) on-platform Site login; Experience Cloud | Clearest security boundary and the pattern Titan and FormAssembly use; no added license; no guest-user system-mode reads |
+| D-188 | Module apps (Brandon, 2026-11-07: "Yes, they can use the existing app(s)"): the Batch C modules Forms, Event Management and Portal Builder ship no Lightning app of their own; their tabs join the existing BarnCRM apps (Error Log stays last), so the suite stays within an org's custom app limit (scratch orgs refused a 10th BarnCRM app; unpackaged source apps count toward an edition's limit) | One app per module | Custom app limit; fewer apps to navigate |
+| D-189 | Portal and API connecting user license (Brandon, 2026-11-07: "I prefer the free integration license if possible"; amends D-187): the portal API and the Forms and public-page REST work with either a free Salesforce Integration user or a regular API-enabled user. The admin guide offers the free Integration license first where the org has one, quotes Salesforce's own restriction (Spring '23 release notes: the license "may not be used for human users to access Salesforce data or features through any user interface") and tells the org to confirm its use with Salesforce, with one regular API-enabled user as the fallback | Regular user only | Owner preference for no added cost; the terms question stays with each org and Salesforce |
 
 ---
 
