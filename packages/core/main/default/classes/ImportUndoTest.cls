@@ -145,7 +145,10 @@ private class ImportUndoTest {
 	 * ones after it their own governor limits (the households pass alone, unless a test names
 	 * an earlier one), as the platform does for every chunk: the checks keep what they cannot
 	 * afford to ask about, so a budget the earlier passes spent here would keep records the
-	 * job itself deletes. Only for a caller that has not used Test.startTest.
+	 * job itself deletes. Only for a caller that has not used Test.startTest. A window opened
+	 * at an earlier pass still gives the households pass limits of its own, queued to run when
+	 * the window closes: on Nonprofit Cloud the people checks and the household check together
+	 * pass the 300 subqueries one transaction may spend, which the job never asks of one chunk.
 	 *
 	 * In that mode every pass, the last included, is handed its records as one chunk. A
 	 * chunk's checks cost about the same whatever its size, and the platform gives every chunk
@@ -165,6 +168,8 @@ private class ImportUndoTest {
 		List<String> passes = ImportUndoBatch.passes();
 		Assert.isTrue(freshFrom == null || passes.contains(freshFrom), 'No pass ' + freshFrom);
 		ImportUndoBatch job;
+		// Otherwise as the platform does: one chunk at a time, 100 at most.
+		Integer chunkSize = freshFrom != null ? MAX_ONE_CHUNK : 100;
 		for (String pass : passes) {
 			// Each pass carries what the judging passes found, as the job's own chain does.
 			job = job == null
@@ -173,26 +178,53 @@ private class ImportUndoTest {
 			if (pass == freshFrom) {
 				Test.startTest();
 			}
-			// Otherwise as the platform does: one chunk at a time, 100 at most.
-			Integer chunkSize = freshFrom != null ? MAX_ONE_CHUNK : 100;
-			Database.QueryLocatorIterator records = job.start(null).iterator();
-			List<SObject> scope = new List<SObject>();
-			while (records.hasNext()) {
-				scope.add(records.next());
-				if (scope.size() == chunkSize) {
-					job.execute(null, scope);
-					scope = new List<SObject>();
-				}
+			Boolean ownWindow = freshFrom != null && freshFrom != ImportUndoBatch.PASS_ACCOUNTS;
+			if (pass == ImportUndoBatch.PASS_ACCOUNTS && ownWindow) {
+				// Opened at an earlier pass, the window's limits are that pass's. The households
+				// pass gets limits of its own as well, as the job's own chunk would: queued here,
+				// it runs when the window closes. Nonprofit Cloud's Account check alone needs
+				// about 200 of the 300 subqueries.
+				System.enqueueJob(new OwnLimitsPass(job, chunkSize));
+				Test.stopTest();
+				continue;
 			}
-			if (!scope.isEmpty()) {
-				job.execute(null, scope);
-			}
+			runPass(job, chunkSize);
 			if (pass == ImportUndoBatch.PASS_ACCOUNTS) {
 				job.finish(null);
 				if (freshFrom != null) {
 					Test.stopTest();
 				}
 			}
+		}
+	}
+
+	/** Runs one pass through the job's own start query, `chunkSize` records at a time. */
+	private static void runPass(ImportUndoBatch job, Integer chunkSize) {
+		Database.QueryLocatorIterator records = job.start(null).iterator();
+		List<SObject> scope = new List<SObject>();
+		while (records.hasNext()) {
+			scope.add(records.next());
+			if (scope.size() == chunkSize) {
+				job.execute(null, scope);
+				scope = new List<SObject>();
+			}
+		}
+		if (!scope.isEmpty()) {
+			job.execute(null, scope);
+		}
+	}
+
+	/** The last pass, run from a queue so that it has governor limits of its own. */
+	private class OwnLimitsPass implements Queueable {
+		private final ImportUndoBatch job;
+		private final Integer chunkSize;
+		OwnLimitsPass(ImportUndoBatch job, Integer chunkSize) {
+			this.job = job;
+			this.chunkSize = chunkSize;
+		}
+		public void execute(QueueableContext context) {
+			runPass(job, chunkSize);
+			job.finish(null);
 		}
 	}
 
@@ -707,7 +739,10 @@ private class ImportUndoTest {
 				exists(credited.AccountId),
 				'The household its gifts are credited to stays.'
 			);
-			Assert.isFalse(exists(other.AccountId), 'A household nothing is credited to goes.');
+			Assert.isFalse(
+				exists(other.AccountId),
+				'A household nothing is credited to goes: ' + whyKept(batch)
+			);
 			Assert.isTrue(
 				undoJournal(batch).contains(BarnHelp.text('Core', 'Core_Import_UndoKeptCredited')),
 				'The reason is journaled (R-IB9).'
@@ -1069,7 +1104,10 @@ private class ImportUndoTest {
 				exists(imported.Id),
 				'The tagged record went in the module pass: ' + whyKept(batch)
 			);
-			Assert.isFalse(exists(imported.AccountId), 'And its household after it.');
+			Assert.isFalse(
+				exists(imported.AccountId),
+				'And its household after it: ' + whyKept(batch)
+			);
 			Assert.isTrue(
 				stub.askedAbout.contains(Contact.SObjectType),
 				'The module was asked before its tagged records went.'
