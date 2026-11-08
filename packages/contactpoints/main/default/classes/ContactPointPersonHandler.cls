@@ -46,7 +46,7 @@ public with sharing class ContactPointPersonHandler extends TriggerHandler {
 	}
 
 	public override void afterInsert() {
-		ContactPointSyncService.syncInserted(newRecordsById().keySet());
+		ContactPointSyncService.syncInserted(newRecordsById());
 	}
 
 	public override void afterUpdate() {

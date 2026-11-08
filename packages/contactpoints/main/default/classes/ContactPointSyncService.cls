@@ -133,12 +133,38 @@ public without sharing class ContactPointSyncService {
 	 * already made match during that insert is not read again: Core saves a new person's
 	 * mailing address as an address inside the insert, whose own sync copies it moments before
 	 * this, and a person's values cannot change between the two without a save of its own.
+	 * The people are not read again: the insert's records are in hand. A person no sync has
+	 * touched yet has no links (only a sync makes them), so their links are not read either.
 	 * Never throws.
 	 */
-	public static void syncInserted(Set<Id> personIds) {
-		if (personIds == null || personIds.isEmpty()) {
+	public static void syncInserted(Map<Id, SObject> inserted) {
+		if (inserted == null || inserted.isEmpty()) {
 			return;
 		}
+		Set<Id> personIds = inserted.keySet();
+		JUST_INSERTED.clear();
+		UNLINKED.clear();
+		for (Id personId : personIds) {
+			// A copy: trigger records are read only, and the sync links an Individual.
+			JUST_INSERTED.put(personId, inserted.get(personId).clone(true, true));
+			if (!KINDS_SYNCED_HERE.containsKey(personId)) {
+				UNLINKED.add(personId);
+			}
+		}
+		try {
+			syncInsertedByKinds(personIds);
+		} finally {
+			JUST_INSERTED.clear();
+			UNLINKED.clear();
+		}
+	}
+
+	/** The people of the insert being synced, as their insert saved them. */
+	private static final Map<Id, SObject> JUST_INSERTED = new Map<Id, SObject>();
+	/** Those of them no sync has touched, so they have no links yet. */
+	private static final Set<Id> UNLINKED = new Set<Id>();
+
+	private static void syncInsertedByKinds(Set<Id> personIds) {
 		Map<String, Set<Id>> peopleByKinds = new Map<String, Set<Id>>();
 		Map<String, Set<String>> kindsByKey = new Map<String, Set<String>>();
 		for (Id personId : personIds) {
@@ -384,7 +410,8 @@ public without sharing class ContactPointSyncService {
 		}
 
 		void go() {
-			people = readPeople();
+			Boolean fresh = UNLINKED.containsAll(contactIds);
+			people = JUST_INSERTED.keySet().containsAll(contactIds) ? justInserted() : readPeople();
 			if (people.isEmpty()) {
 				return;
 			}
@@ -404,7 +431,9 @@ public without sharing class ContactPointSyncService {
 				}
 			}
 			giveIndividuals(needingIndividual, true);
-			Map<Id, List<Contact_Point_Link__c>> linksByPerson = readLinks();
+			Map<Id, List<Contact_Point_Link__c>> linksByPerson = fresh
+				? new Map<Id, List<Contact_Point_Link__c>>()
+				: readLinks();
 			readAdoptable();
 			for (SObject person : people.values()) {
 				planPerson(
@@ -422,6 +451,14 @@ public without sharing class ContactPointSyncService {
 				}
 				KINDS_SYNCED_HERE.get(personId).addAll(kinds);
 			}
+		}
+
+		private Map<Id, SObject> justInserted() {
+			Map<Id, SObject> result = new Map<Id, SObject>();
+			for (Id contactId : contactIds) {
+				result.put(contactId, JUST_INSERTED.get(contactId));
+			}
+			return result;
 		}
 
 		private Map<Id, SObject> readPeople() {
