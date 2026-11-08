@@ -1048,8 +1048,12 @@ private class ImportUndoTest {
 	static void aRecordTheModuleKeepsIsKeptWithItsReason() {
 		System.runAs(TestUsers.admin()) {
 			Import_Batch__c batch = committedBatch();
-			Contact kept = importedPerson(batch, 'Ramirez');
-			Contact gone = importedPerson(batch, 'Lee');
+			// In one write, not two: the setup's saves share this transaction with the passes,
+			// whose checks keep what the queries left cannot pay for, and every module's
+			// automation on a new person adds to each save.
+			List<Contact> people = importedPeople(batch, 2);
+			Contact kept = people[0];
+			Contact gone = people[1];
 			StubProcessor stub = installStub(new List<Schema.SObjectType>());
 			stub.keep.put(kept.Id, 'A gift with a receipt still names this person.');
 
