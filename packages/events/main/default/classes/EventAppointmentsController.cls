@@ -214,9 +214,13 @@ public with sharing class EventAppointmentsController {
 					BarnHelp.text('Events', 'Events_Appointments_PersonBusy')
 				);
 			}
-			slot.Contact__c = contactId;
-			slot.Status__c = 'Booked';
-			update as user slot;
+			// Only the changed fields: the locked row carries Event__c, a master-detail that
+			// cannot be reparented, which a user-mode update refuses as not editable.
+			update as user new Event_Appointment__c(
+				Id = slot.Id,
+				Contact__c = contactId,
+				Status__c = 'Booked'
+			);
 		} catch (Exception e) {
 			fail(e, '.book', appointmentId);
 		}
@@ -243,11 +247,14 @@ public with sharing class EventAppointmentsController {
 					BarnHelp.text('Events', 'Events_Appointments_NoPerson')
 				);
 			}
+			Event_Appointment__c change = new Event_Appointment__c(
+				Id = slot.Id,
+				Status__c = status
+			);
 			if (status == 'Open') {
-				slot.Contact__c = null;
+				change.Contact__c = null;
 			}
-			slot.Status__c = status;
-			update as user slot;
+			update as user change;
 		} catch (Exception e) {
 			fail(e, '.setStatus', appointmentId);
 		}

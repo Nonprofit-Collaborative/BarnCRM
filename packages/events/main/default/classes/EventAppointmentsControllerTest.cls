@@ -235,7 +235,7 @@ private class EventAppointmentsControllerTest {
 				End__c = start.addHours(2),
 				Status__c = 'Booked'
 			);
-			Database.SaveResult saved = Database.insert(slot, AccessLevel.USER_MODE);
+			Database.SaveResult saved = Database.insert(slot, false, AccessLevel.USER_MODE);
 			Assert.isFalse(saved.isSuccess(), 'R-EAP4');
 			Event_Appointment__c noHost = new Event_Appointment__c(
 				Event__c = event.Id,
@@ -243,7 +243,10 @@ private class EventAppointmentsControllerTest {
 				Start__c = start.addHours(1),
 				End__c = start.addHours(2)
 			);
-			Assert.isFalse(Database.insert(noHost, AccessLevel.USER_MODE).isSuccess(), 'R-EAP3');
+			Assert.isFalse(
+				Database.insert(noHost, false, AccessLevel.USER_MODE).isSuccess(),
+				'R-EAP3'
+			);
 			Event_Appointment__c backwards = new Event_Appointment__c(
 				Event__c = event.Id,
 				Name = 'Backwards',
@@ -251,7 +254,10 @@ private class EventAppointmentsControllerTest {
 				Start__c = start.addHours(2),
 				End__c = start.addHours(1)
 			);
-			Assert.isFalse(Database.insert(backwards, AccessLevel.USER_MODE).isSuccess(), 'R-EAP1');
+			Assert.isFalse(
+				Database.insert(backwards, false, AccessLevel.USER_MODE).isSuccess(),
+				'R-EAP1'
+			);
 		}
 	}
 
