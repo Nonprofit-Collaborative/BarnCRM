@@ -304,6 +304,19 @@ export const SAVE_TEXT = Object.freeze({
   }
 });
 
+/** A module's public page and list (ADR-NEXT public event pages): the host's own words. */
+export const PAGE_TEXT = Object.freeze({
+  get missing() {
+    return helpText('Forms', 'Forms_Public_PageMissing');
+  },
+  get register() {
+    return helpText('Forms', 'Forms_Public_PageRegister');
+  },
+  timeRange(start, end) {
+    return helpText('Forms', 'Forms_Public_PageTimeRange', start, end);
+  }
+});
+
 /** The Form Builder's public settings, worded from the help catalog. */
 export const PUBLIC_SETTING_TEXT = Object.freeze({
   get heading() {

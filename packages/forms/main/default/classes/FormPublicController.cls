@@ -31,6 +31,29 @@ public with sharing class FormPublicController {
 	}
 
 	/**
+	 * A module's public page for one of its records, such as an event, as JSON, or null when it
+	 * is not published (ADR-NEXT public event pages, decision 6).
+	 */
+	@AuraEnabled
+	public static String getPage(String recordId) {
+		try {
+			return FormIntakeService.publicPage(recordId);
+		} catch (Exception e) {
+			throw failed(e, '.getPage');
+		}
+	}
+
+	/** A module's public list of one kind of page, such as `events`, as JSON, or null. */
+	@AuraEnabled
+	public static String listPages(String kind) {
+		try {
+			return FormIntakeService.publicList(kind);
+		} catch (Exception e) {
+			throw failed(e, '.listPages');
+		}
+	}
+
+	/**
 	 * Sends the answers and their files. Nothing about any record comes back: only whether they
 	 * were received, or which answers to fix.
 	 *

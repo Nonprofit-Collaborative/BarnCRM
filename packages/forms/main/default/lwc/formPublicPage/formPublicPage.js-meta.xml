@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    A module's public page (an event) or public list on a Salesforce Site, loaded by the FormsPublic page through Lightning Out (formsPublicApp). Shows what the module published and, while registration is open, its form through c-form-public.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

@@ -216,6 +216,21 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Event__c.Public_Page__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Event__c.Public_Speakers__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Event__c.Public_Seats__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Event_Registration__c.Sample_Data__c</field>
     <readable>true</readable>
   </fieldPermissions>

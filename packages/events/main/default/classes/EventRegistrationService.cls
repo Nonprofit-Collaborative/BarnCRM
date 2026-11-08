@@ -475,6 +475,28 @@ public with sharing class EventRegistrationService {
 		return fresh;
 	}
 
+	/**
+	 * Seats left for each ticket, the fewer of the event's and the ticket's, never below zero;
+	 * a ticket with no limit on either is left out (R-EAT1). Counts only, never an attendee row:
+	 * the public event page shows this (ADR-NEXT public event pages, decision 3).
+	 */
+	public static Map<Id, Integer> seatsLeft(Event__c event, List<Ticket_Type__c> tickets) {
+		SeatCounter counter = new SeatCounter(event, tickets);
+		Map<Id, Integer> left = new Map<Id, Integer>();
+		for (Ticket_Type__c ticket : tickets) {
+			Integer ticketLeft = counter.ticketLeft.get(ticket.Id);
+			Integer seats = counter.eventLeft == null
+				? ticketLeft
+				: (ticketLeft == null
+						? counter.eventLeft
+						: Math.min(ticketLeft, counter.eventLeft));
+			if (seats != null) {
+				left.put(ticket.Id, Math.max(seats, 0));
+			}
+		}
+		return left;
+	}
+
 	/** Free seats on the event's capacity and each ticket's quantity (R-EAT1). */
 	private inherited sharing class SeatCounter {
 		private Integer eventLeft;

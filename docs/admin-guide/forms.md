@@ -215,6 +215,11 @@ the **Forms Staff** permission set
 and access to what the form writes; its answers are processed at once, as that user. The same
 checks apply.
 
+The same Site page and API also serve a module's public pages: an event's page with its
+registration form (`FormsPublic?record=<event ID>`, `FormsPublic?list=events`, and
+`GET .../forms/v1/pages/<event ID>` or `GET .../forms/v1/pages?kind=events`). The module
+decides what is published; see [Event Management](events.md), Public Event Page.
+
 ## Form Submissions
 
 Every sent form is a **Form Submission**: its **Status** (Received, Processed, Needs Review or

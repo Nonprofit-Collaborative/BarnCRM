@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Public_Payment_Note__c</fullName>
+  <defaultValue>"Pay at the door or by arrangement with us."</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>Shown beside each priced ticket on a public event page. BarnCRM takes no payment. Default: Pay at the door or by arrangement with us.</inlineHelpText>
+  <label>Payment note</label>
+  <length>255</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>
