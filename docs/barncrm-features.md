@@ -826,7 +826,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 11. Event Management
 
-**Edition:** Both editions. Depends on Core only; Volunteers, Giving, Funders, Forms and Portal Builder are optional links through Core extension points. Package `packages/events` (BarnCRM Event Management), no app of its own: its tabs are in BarnCRM and BarnCRM Console (D-188, ADR-NEXT module tabs in the BarnCRM apps). Replaces the post-1.0 Events package and keeps Summit Events compatibility; able to run a community "Dreamin" conference. Release 1.2 and 1.3 (plan 5.12, D-123, D-177; new ADR, events module).
+**Edition:** Both editions. Depends on Core only; Volunteers, Giving, Funders, Forms and Portal Builder are optional links through Core extension points. Package `packages/events` (BarnCRM Event Management), no app of its own: its tabs are in BarnCRM and BarnCRM Console (D-188, ADR-0192 module tabs in the BarnCRM apps). Replaces the post-1.0 Events package and keeps Summit Events compatibility; able to run a community "Dreamin" conference. Release 1.2 and 1.3 (plan 5.12, D-123, D-177; new ADR, events module).
 
 ### 11.1 Events, Sessions and Sponsors
 
@@ -880,7 +880,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 13. Forms
 
-**Edition:** Both editions. Depends on Core only (new ADR, Forms module). Package `packages/forms`, no app of its own: its tabs are in BarnCRM and BarnCRM Console (D-188, ADR-NEXT module tabs in the BarnCRM apps).
+**Edition:** Both editions. Depends on Core only (new ADR, Forms module). Package `packages/forms`, no app of its own: its tabs are in BarnCRM and BarnCRM Console (D-188, ADR-0192 module tabs in the BarnCRM apps).
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|

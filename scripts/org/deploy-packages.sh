@@ -994,7 +994,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # BarnCRM_Module__mdt record (ADR-0137). The app
   # copies are written to a temporary metadata-format package; the repository's app files are
   # never changed. --all writes all four apps every time, so each holds exactly Core plus the
-  # modules deployed here, and a module left out has its tabs taken out (ADR-NEXT, Batch C
+  # modules deployed here, and a module left out has its tabs taken out (ADR-0192, Batch C
   # modules add their tabs to the BarnCRM apps). Forms, Event Management and Portal Builder
   # have no app of their own: these apps are where their tabs live (D-188).
   deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal)

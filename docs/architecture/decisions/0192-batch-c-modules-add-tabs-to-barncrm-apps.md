@@ -1,4 +1,4 @@
-# ADR-NEXT: Batch C modules add their tabs to the BarnCRM apps instead of shipping an app
+# ADR-0192: Batch C modules add their tabs to the BarnCRM apps instead of shipping an app
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-07

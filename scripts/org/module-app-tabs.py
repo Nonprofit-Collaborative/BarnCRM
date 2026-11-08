@@ -21,7 +21,7 @@ the script prints how many apps it wrote, so the caller can skip the deploy.
 
 With --all, all four apps are written, changed or not, so the deploy leaves each app holding
 exactly Core's tabs plus those of the folders named. That is how a removed module's tabs leave
-the apps: name only the modules kept (ADR-NEXT, Batch C modules add their tabs to the BarnCRM
+the apps: name only the modules kept (ADR-0192, Batch C modules add their tabs to the BarnCRM
 apps). Forms, Event Management and Portal Builder ship no app of their own (D-188); their
 record pages are each object's org default instead.
 """
