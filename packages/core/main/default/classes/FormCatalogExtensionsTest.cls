@@ -1,6 +1,6 @@
 /**
  * Events offers a survey only when a module keeps forms, and a module that fails never breaks
- * the page (ADR-NEXT). Core has no module, so extensions are injected by class name.
+ * the page (ADR-0188). Core has no module, so extensions are injected by class name.
  */
 @IsTest(testFor='ApexClass:FormCatalogExtensions')
 private class FormCatalogExtensionsTest {

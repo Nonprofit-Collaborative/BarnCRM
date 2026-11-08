@@ -1,5 +1,5 @@
 /**
- * The post-event survey's data work (EV-18; ADR-NEXT `NEXT-event-post-event-survey.md`): which
+ * The post-event survey's data work (EV-18; ADR-0188 `0188-event-post-event-survey.md`): which
  * form an attendee's event uses, the attendee's own survey address, and the stored answers.
  *
  * An event names its survey form by the form's record identifier as text

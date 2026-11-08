@@ -1,5 +1,5 @@
 /**
- * Finds the form catalog extension Forms installed (ADR-NEXT `NEXT-event-post-event-survey.md`),
+ * Finds the form catalog extension Forms installed (ADR-0188 `0188-event-post-event-survey.md`),
  * or answers that there is none, the ordinary case in an org without Forms. A class that is not
  * installed, cannot be built or does not implement the interface is absent, and a failure is
  * logged: a module's page must load whatever Forms does.

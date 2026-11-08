@@ -13037,7 +13037,7 @@ on its own.
 | Description | `Description__c` | Long Text Area(32768) |
 | Series | `Series__c` | Lookup(Event), Clear on delete |
 | Registration Form Key | `Registration_Form_Key__c` | Text(18): the Forms form registrants fill in, by record identifier (EV-02, ADR-0014) |
-| Survey Form Key | `Survey_Form_Key__c` | Text(18): the Forms form attendees are sent after the event, by record identifier (EV-18, ADR-NEXT) |
+| Survey Form Key | `Survey_Form_Key__c` | Text(18): the Forms form attendees are sent after the event, by record identifier (EV-18, ADR-0188) |
 | External Key | `External_Key__c` | Text(80), unique, external ID (EV-10) |
 | Sample Data | `Sample_Data__c` | Checkbox, default false: set on the events `EventsSampleData` loads, so Remove Sample Data deletes them with their tracks, sessions, tickets, codes, speakers, applications, levels and sponsors (C-10, `EventSampleDataLoader`) |
 
@@ -13541,7 +13541,7 @@ overlaps one the host already has.
 
 ### Definition
 
-One attendee's answers to the post-event survey of their event (EV-18, ADR-NEXT). The survey is a
+One attendee's answers to the post-event survey of their event (EV-18, ADR-0188). The survey is a
 Forms form the event names in `Survey_Form_Key__c`; the attendee opens it from the link in the
 follow-up email, so the form's submission is filled from the attendee and Core hands the answers
 to Events through `FormAttachmentExtension` (an attendee's survey form is its event's).
@@ -14508,7 +14508,7 @@ mirrors the primary member).
 | 1.3 | 2026-11-07 | Event check-in (EV-12; ADR-0177 decision 13). No object, field or rule added: the Check-In tab moves an attendee between Registered and Attended through `EventRegistrationService`, and a QR code holds the attendee's record identifier, so the check-in time and code fields that ADR-0177 decision 13 anticipated are not added. A walk-in is a registration (source Staff) made already Attended. The QR drawing library ships as the static resource `BarnQrCode`, listed in `NOTICE`. |
 | 1.3 | 2026-11-07 | Event Management sample data (C-10) and speaker notice defaults (EV-06, owner rule: settings are never blank). Event (29EV1) and Event Registration (29EV8) gain Sample Data (`Sample_Data__c`, Checkbox, default false). `EventsSampleData` implements Core's `SampleDataModule` and is registered in `SampleDataModules.MODULE_CLASS_NAMES` after Funders. Events Settings (29EV25): Accepted Notice Template and Declined Notice Template default to the shipped text templates `BarnCRM_Speaker_Accepted` and `BarnCRM_Speaker_Declined`; R-ES1 now reads a blank as the shipped template; R-SA5 amended to match. |
 | 1.3 | 2026-11-07 | Event Management gala seating (EV-13; ADR-0186 `0186-events-gala-seating.md`, ADR-0177 decision 8, D-156, D-186). New Section 29EV26 Event Table (`Event_Table__c`, R-ET1, R-ET2); Event Attendee (29EV9) gains Table, Dietary Needs and Access Needs. |
-| 1.3 | 2026-11-07 | Post-event survey (EV-18, D-186, ADR-NEXT). New Section 29EV18 Event Survey Response (`Event_Survey_Response__c`, R-ESV1 to R-ESV3); `Event__c` gains `Survey_Form_Key__c`, `Event_Attendee__c` gains `Survey_Link__c`, `Events_Settings__c` gains `Survey_Template__c`. Core gains the `FormCatalogExtension` seam (no object or field). |
+| 1.3 | 2026-11-07 | Post-event survey (EV-18, D-186, ADR-0188). New Section 29EV18 Event Survey Response (`Event_Survey_Response__c`, R-ESV1 to R-ESV3); `Event__c` gains `Survey_Form_Key__c`, `Event_Attendee__c` gains `Survey_Link__c`, `Events_Settings__c` gains `Survey_Template__c`. Core gains the `FormCatalogExtension` seam (no object or field). |
 | 1.3 | 2026-11-07 | Portal Builder module (PB-01, D-118, D-178, D-187; ADR-0185 `0185-portal-builder-off-platform-portal-api.md`). New package `packages/portal`: Portal (`Portal__c`, 29PB1), Portal Access (`Portal_Access__c`, 29PB2), Portal Session (`Portal_Session__c`, 29PB3) and Portal Settings (`Portal_Settings__c`, 29PB4), rules R-PB1 to R-PB4, R-PA1, R-PA2, R-PS1, R-PS2 and R-PST1. Core gains no object or field: only the `PortalActionExtension` seam, the Portals settings section and the catalog row `BarnCRM_Module.Portal`. |
 
 ---

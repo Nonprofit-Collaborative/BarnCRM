@@ -1,6 +1,6 @@
 /**
- * The Survey section of the event page's Details tab (EV-18, ADR-NEXT
- * `NEXT-event-post-event-survey.md`): pick the form attendees are sent after the event, and read
+ * The Survey section of the event page's Details tab (EV-18, ADR-0188
+ * `0188-event-post-event-survey.md`): pick the form attendees are sent after the event, and read
  * the answers that came back. The forms live in Forms and are reached only through Core's
  * `FormCatalogExtensions`, so this class never names a Forms object and the section is simply
  * absent (`available` false) when Forms is not installed. Thin by design (plan Section 9.9): the

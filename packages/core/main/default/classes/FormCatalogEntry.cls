@@ -1,7 +1,7 @@
 /**
  * One choice a form catalog offers a module: a form (key is its record identifier) or one of a
  * form's questions (key is the question's key). Plain values, so neither package needs the
- * other's types (ADR-NEXT `NEXT-event-post-event-survey.md`).
+ * other's types (ADR-0188 `0188-event-post-event-survey.md`).
  */
 @NamespaceAccessible
 public with sharing class FormCatalogEntry {

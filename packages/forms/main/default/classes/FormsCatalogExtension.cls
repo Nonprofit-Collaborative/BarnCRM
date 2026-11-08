@@ -1,5 +1,5 @@
 /**
- * Forms' side of Core's form catalog seam (ADR-NEXT `NEXT-event-post-event-survey.md`): lets a
+ * Forms' side of Core's form catalog seam (ADR-0188 `0188-event-post-event-survey.md`): lets a
  * module such as Event Management offer the published public forms, read a form's questions and
  * build the address a person with no login opens. Core finds this class by name
  * (`FormCatalogExtensions.EXTENSION_CLASSES`). Reads run with the person's own access.

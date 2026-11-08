@@ -1,7 +1,7 @@
 /**
  * The seam a module uses to offer a person the forms that can be filled in by anyone with a link,
- * and to build that link, without depending on the module that keeps forms (ADR-NEXT
- * `NEXT-event-post-event-survey.md`). Event Management's post-event survey (EV-18) is the first
+ * and to build that link, without depending on the module that keeps forms (ADR-0188
+ * `0188-event-post-event-survey.md`). Event Management's post-event survey (EV-18) is the first
  * user. Found by `FormCatalogExtensions`; absent when Forms is not installed. Everything runs
  * with the person's own access.
  */

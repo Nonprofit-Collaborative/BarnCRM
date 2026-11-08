@@ -196,6 +196,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0185](0185-portal-builder-off-platform-portal-api.md) | Portal Builder: an off-platform portal with its own one-time-code login, reaching Salesforce through one integration user and a person-scoped portal API | Accepted (builder decision) |
 | [0186](0186-events-gala-seating.md) | Event Management gala tables and seating | Accepted (builder decision) |
 | [0187](0187-events-badges-and-sign-in-sheets.md) | Event Management badges and sign-in sheets | Accepted (builder decision) |
+| [0188](0188-event-post-event-survey.md) | Post-event survey: a Forms form named on the event, sent in the follow-up email with the attendee's own link, answers kept per attendee, through a Core form catalog seam | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

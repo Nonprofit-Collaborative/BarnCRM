@@ -1,4 +1,4 @@
-# ADR-NEXT: Post-event survey: a Forms form named on the event, sent in the follow-up email with the attendee's own link, answers kept per attendee, through a Core form catalog seam
+# ADR-0188: Post-event survey: a Forms form named on the event, sent in the follow-up email with the attendee's own link, answers kept per attendee, through a Core form catalog seam
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-07

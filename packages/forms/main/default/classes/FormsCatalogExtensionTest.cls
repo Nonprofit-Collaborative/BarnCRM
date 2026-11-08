@@ -1,5 +1,5 @@
 /**
- * Forms' answers to Core's form catalog seam (ADR-NEXT): the public forms, a form's questions and
+ * Forms' answers to Core's form catalog seam (ADR-0188): the public forms, a form's questions and
  * the public address tied to a record.
  */
 @IsTest(testFor='ApexClass:FormsCatalogExtension')

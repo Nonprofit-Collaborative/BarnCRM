@@ -1,7 +1,7 @@
 /**
  * Lets a module's tests stand in for Forms' catalog extension, since Apex tests of a module that
- * does not depend on Forms cannot rely on Forms being installed (ADR-NEXT
- * `NEXT-event-post-event-survey.md`). Test only.
+ * does not depend on Forms cannot rely on Forms being installed (ADR-0188
+ * `0188-event-post-event-survey.md`). Test only.
  */
 @IsTest
 @NamespaceAccessible
