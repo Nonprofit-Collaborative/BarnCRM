@@ -10,7 +10,7 @@ private class ModuleDetectionServiceTest {
 	}
 
 	@IsTest
-	static void listsTheEightPackagesAndSaysWhichAreHere() {
+	static void listsEveryPackageAndSaysWhichAreHere() {
 		System.runAs(TestUsers.admin()) {
 			SettingDefinitionSelector.stubbedRows = new List<Setting_Definition__mdt>();
 			ModuleDetectionService.givingPresentOverride = true;
@@ -20,7 +20,11 @@ private class ModuleDetectionServiceTest {
 			List<ModuleDetectionService.ModuleInfo> modules = ModuleDetectionService.getModules();
 			Test.stopTest();
 
-			Assert.areEqual(8, modules.size(), 'The Nonprofit Edition is offered all eight');
+			Assert.areEqual(
+				nonprofitOffered(),
+				modules.size(),
+				'The Nonprofit Edition is offered every module in the catalog'
+			);
 			Assert.areEqual('Core', modules[0].name, 'Core comes first and is always here');
 			Assert.isTrue(modules[0].present, 'Core is the package this code is in');
 			for (Integer i = 1; i < modules.size(); i++) {
@@ -144,9 +148,9 @@ private class ModuleDetectionServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				8,
+				nonprofitOffered(),
 				modules.size(),
-				'Any org that chose the Nonprofit Edition is offered all eight, before Giving is here'
+				'Any org that chose the Nonprofit Edition is offered every module, before Giving is here'
 			);
 			Assert.areEqual('Giving', modules[2].name, 'Giving follows Rollup Builder');
 			Assert.isFalse(modules[2].present, 'And Giving is still shown as not installed');
@@ -172,9 +176,9 @@ private class ModuleDetectionServiceTest {
 				'The saved choice is read'
 			);
 			Assert.areEqual(
-				2 + installedModules().size(),
+				2 + standardExtras().size(),
 				modules.size(),
-				'Core and Rollup Builder, any module whose objects are here, and no other nonprofit module'
+				'Core, Rollup Builder, every-edition modules, any module whose objects are here, and no other nonprofit module'
 			);
 		}
 	}
@@ -669,15 +673,45 @@ private class ModuleDetectionServiceTest {
 		return names;
 	}
 
-	/** The expected modules first, then exactly the installed ones this org also has. */
+	/**
+	 * Besides Rollups and Giving, what the Standard Edition lists: every module installed here
+	 * and every module the catalog offers in both editions (Forms, Events and the like),
+	 * read from the catalog so a new every-edition module needs no test change.
+	 */
+	private static Set<String> standardExtras() {
+		Set<String> names = installedModules();
+		for (BarnCRM_Module__mdt row : BarnCRM_Module__mdt.getAll().values()) {
+			if (
+				row.DeveloperName != 'Rollups' &&
+				row.DeveloperName != 'Giving' &&
+				ModuleDetectionService.offeredIn(row, ModuleDetectionService.SUITE_STANDARD)
+			) {
+				names.add(row.DeveloperName);
+			}
+		}
+		return names;
+	}
+
+	/** Core and every catalog module the Nonprofit Edition offers, counted from the catalog. */
+	private static Integer nonprofitOffered() {
+		Integer count = 1;
+		for (BarnCRM_Module__mdt row : BarnCRM_Module__mdt.getAll().values()) {
+			if (ModuleDetectionService.offeredIn(row, ModuleDetectionService.SUITE_NONPROFIT)) {
+				count++;
+			}
+		}
+		return count;
+	}
+
+	/** The expected modules first, then exactly the other ones the Standard Edition lists. */
 	private static void assertListed(List<String> expected, List<String> actual, String message) {
-		Assert.areEqual(expected.size() + installedModules().size(), actual.size(), message);
+		Assert.areEqual(expected.size() + standardExtras().size(), actual.size(), message);
 		for (Integer i = 0; i < expected.size(); i++) {
 			Assert.areEqual(expected[i], actual[i], message);
 		}
 		Set<String> rest = new Set<String>(actual);
 		rest.removeAll(new Set<String>(expected));
-		Assert.areEqual(installedModules(), rest, message);
+		Assert.areEqual(standardExtras(), rest, message);
 	}
 
 	private static void chooseSuite(String suite) {
