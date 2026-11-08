@@ -6,10 +6,6 @@
     Runs events: creates and changes events and everything on them, and removes tickets,
     codes, tracks, sessions and speakers. Never deletes a whole event.
   </description>
-  <applicationVisibilities>
-    <application>BarnCRM_Events</application>
-    <visible>true</visible>
-  </applicationVisibilities>
   <classAccesses>
     <apexClass>EventAgendaController</apexClass>
     <enabled>true</enabled>

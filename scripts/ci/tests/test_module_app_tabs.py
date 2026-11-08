@@ -151,6 +151,15 @@ class ModuleAppTabsTest(unittest.TestCase):
         mat.write_package(root, out, {"giving"})
         self.assertEqual(read(source), before)
 
+    def test_all_writes_every_app_so_a_module_left_out_leaves_the_apps(self):
+        root, out = repo(), tempfile.mkdtemp()
+        written = mat.write_package(root, out, set(), write_all=True)
+
+        self.assertEqual(set(written), set(mat.STAFF_APPS + mat.ADMIN_APPS))
+        self.assertEqual(tabs(parsed(out, "BarnCRM_Standard")), ["BarnCRM_Home"], "Core's tabs only")
+        manifest = ET.parse(os.path.join(out, "package.xml")).getroot()
+        self.assertEqual(len(list(manifest.iter(f"{{{mat.NS}}}members"))), 4)
+
     def test_the_package_manifest_names_each_written_app(self):
         root, out = repo(), tempfile.mkdtemp()
         written = mat.write_package(root, out, {"rollups"})

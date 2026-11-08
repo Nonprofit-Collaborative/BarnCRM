@@ -5,10 +5,6 @@
   <description>
     Fills in published forms and works their submissions. Never builds or deletes a form.
   </description>
-  <applicationVisibilities>
-    <application>BarnCRM_Forms</application>
-    <visible>true</visible>
-  </applicationVisibilities>
   <classAccesses>
     <apexClass>FormPublicRest</apexClass>
     <enabled>true</enabled>

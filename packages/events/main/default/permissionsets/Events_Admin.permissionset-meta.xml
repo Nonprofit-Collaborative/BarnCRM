@@ -5,10 +5,6 @@
   <description>
     Everything in Event Management: creates, changes and deletes events and everything on them.
   </description>
-  <applicationVisibilities>
-    <application>BarnCRM_Events</application>
-    <visible>true</visible>
-  </applicationVisibilities>
   <classAccesses>
     <apexClass>EventAgendaController</apexClass>
     <enabled>true</enabled>

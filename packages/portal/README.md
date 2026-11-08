@@ -33,5 +33,7 @@ seam.
   `PortalTokens` (hashes, codes, authenticator codes).
 - Permission sets `Portal_Admin` (given to BarnCRM Admin holders by `PortalAccessSync`) and
   `Portal_Integration` (assigned by hand to the integration user only).
-- Console app `BarnCRM_Portal_Builder` with the Portals and Portal Accesses tabs, Error Log last.
+- No app of its own (D-188): the Portals and Portal Accesses tabs join BarnCRM Admin and BarnCRM
+  Admin Console, before Error Log, through the catalog row's `Admin_Tabs__c` and
+  `scripts/org/module-app-tabs.py`.
 - Settings in the Portals section of BarnCRM Settings.

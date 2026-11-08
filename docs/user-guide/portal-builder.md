@@ -7,7 +7,8 @@ Guide). This page is for staff who look after the people using them.
 
 ## Who Can Sign In
 
-1. Open the **BarnCRM Portal Builder** app and the **Portals** tab, then the portal.
+1. Open the **BarnCRM Admin** (or **BarnCRM Admin Console**) app and the **Portals** tab, then
+   the portal.
 2. A portal set to **Invited** lets in only the people with a **Portal Access** record for it.
    To invite someone, open the **Portal Accesses** tab, select **New**, and pick the portal and
    the person. Their email address in BarnCRM is the one they sign in with.

@@ -17,7 +17,7 @@ Only role). Each gets its Events permission set from the role.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **BarnCRM Events** app. | It opens on **Events Home**, then **Events**, **Reports** and **Error Log** last. The page says nothing is coming up and offers **New Event**. |
+| 1 | Open the **BarnCRM** app and look at its tabs, then the App Launcher. | **Events Home**, **Event Calendar**, **Events** and **Event Speakers** follow **Data Manager** (and the other modules' pages); the App Launcher lists no BarnCRM Events, BarnCRM Forms or BarnCRM Portal Builder app (D-188), and **BarnCRM Admin** has **Portals** and **Portal Accesses** before **Error Log**, which is last. Open **Events Home**: the page says nothing is coming up and offers **New Event**. |
 | 2 | Click **New Event**. Name `Spring Gala`, Start next Saturday 6:00 PM, End the same day 5:00 PM, save. | Refused: `End must be after Start.` |
 | 3 | Set End to 10:00 PM, Capacity `0`, save. | Refused: `Capacity must be at least 1. Leave it empty for no limit.` |
 | 4 | Set Capacity `200`, Venue Name `Town Hall`, save. | Saved as **Draft**, **In Person**. The page shows the highlights, a **Details** tab and the related lists in the sidebar. |

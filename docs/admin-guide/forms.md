@@ -31,8 +31,11 @@ Install it from **Module Manager** (see [Module Manager](module-manager.md)). Wh
 finishes, BarnCRM gives you, the person who installed it, the **Forms Admin** permission set,
 and gives everyone who already has a BarnCRM role their Forms permission set (see below).
 
-Then open the **BarnCRM Forms** app from the App Launcher. Its tabs are **Forms** and **Form
-Submissions**.
+Forms has no app of its own (D-188): its **Forms** and **Form Submissions** tabs are in the
+**BarnCRM** and **BarnCRM Console** apps, after **Data Manager**. A source install puts them
+there itself; after a package install, add them once in App Manager (see
+[The BarnCRM Apps](barncrm-app.md#a-modules-pages-in-the-barncrm-apps)). A form or submission
+opens on its own record page from any app.
 
 Forms has no settings, so it adds no section to BarnCRM Settings. It has no nightly job. Public
 forms add their own checks to **Health Check** and a processing job you schedule from there (see

@@ -12660,7 +12660,7 @@ and gives the new version its signing key.
 ### Salesforce implementation
 
 - **Object:** `Form__c`, name field Text, label Form Name, sharing Public Read Only (Forms Admin
-  edits), tab Forms in the BarnCRM Forms app.
+  edits), tab Forms in the BarnCRM apps (no module app, D-188).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -12771,7 +12771,7 @@ person matched to a person account is held for review. Otherwise R-FS1 to R-FS4 
 ### Salesforce implementation
 
 - **Object:** `Form_Submission__c`, name field Auto Number `FS-{000000}`, master-detail to
-  `Form__c`, sharing controlled by parent, tab Form Submissions in the BarnCRM Forms app.
+  `Form__c`, sharing controlled by parent, tab Form Submissions in the BarnCRM apps (D-188).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -13031,7 +13031,7 @@ registration form is shown while the status is Open and now is inside the regist
 ### Salesforce implementation
 
 - **Object:** `Event__c`, name field Text, label Event Name, sharing Public Read/Write, tab Events
-  (the object) and the Events page (`Events_Home`) in the BarnCRM Events app.
+  (the object) and the Events page (`Events_Home`) in the BarnCRM apps (no module app, D-188).
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -14700,9 +14700,9 @@ so nothing below that is nonprofit-specific ships in Core.
 | Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and `ProgramsAccessSync` (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
 | Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
 | Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and `FundersAccessSync` (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantLinkedRecord`, kind Program) |
-| Events app, permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and `EventsAccessSync` (ADR-0177 `0177-events-module.md`). Console app `BarnCRM_Events` with the Events Home and Events tabs and Error Log last; the Event record page carries the event's tabs |
+| Permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and `EventsAccessSync` (ADR-0177 `0177-events-module.md`). No app (D-188, ADR-NEXT module tabs in the BarnCRM apps): the Events Home, Events and Event Speakers tabs join BarnCRM and BarnCRM Console at deploy; the Event record page, the object's org default, carries the event's tabs |
 | Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
-| Forms app, permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and `FormsAccessSync` (ADR-0175 `0175-forms-module.md`). Console app `BarnCRM_Forms` with the Forms and Form Submissions tabs and Error Log last; the Form record page carries the builder and the runner, the Form Submission page the submission panel |
+| Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and `FormsAccessSync` (ADR-0175 `0175-forms-module.md`). No app (D-188, ADR-NEXT module tabs in the BarnCRM apps): the Forms and Form Submissions tabs join BarnCRM and BarnCRM Console at deploy; the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
 | Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-0175 `0175-forms-module.md` decision 9) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
