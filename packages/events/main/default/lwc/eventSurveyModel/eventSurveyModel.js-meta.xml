@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Framework-free survey rules for the event page's Survey section: reading answers, a summary per
+    question and the response rate. No Salesforce imports, so it ports to BarnCRM for WordPress.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

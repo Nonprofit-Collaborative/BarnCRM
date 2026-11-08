@@ -131,6 +131,7 @@ public with sharing class ModuleManagerService {
 			'Event_Session__c',
 			'Event_Speaker__c',
 			'Event_Sponsor__c',
+			'Event_Survey_Response__c',
 			'Event_Track__c',
 			'Promo_Code__c',
 			'Session_Speaker__c',

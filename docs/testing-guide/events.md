@@ -391,3 +391,26 @@ pop-ups allowed for Salesforce.
 | 10 | As read-only, open **Badges**. | Printing works. |
 
 **Cleanup:** Rename the attendee back.
+
+## T-EV-19: Post-Event Survey
+
+**Purpose:** confirm an event's survey form goes to attendees in the follow-up and the answers
+are summarized on the event; and that nothing shows without Forms.
+**Prerequisites:** admin; Event Management and Forms on; a Salesforce Site active with
+`Forms_Public_Guest` assigned to its guest user; a published public form `After the Event` with a
+number question `rating` and a text question `comment`; an event that ended yesterday with Sam
+(a real inbox you can read) **Attended**; follow-ups on.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the event, **Details**, find **Post-Event Survey**. | A **Survey Form** list with **No Survey** and `After the Event`; **Save** disabled. |
+| 2 | Choose `After the Event`, click **Save**. | **Survey Results** appears with `0 responses` and no answers yet. |
+| 3 | Run the step **Event reminders, follow-ups and no-shows** in **Nightly Jobs**. | Sam gets the survey email with a link; his **Survey Link** is filled in. |
+| 4 | Open the link in a private window, answer `rating` 4 and `comment` and send. | The form's confirmation shows. After the form processing job runs (up to 15 minutes), a **Survey Response** exists for Sam. |
+| 5 | Reload the event's **Details** tab. | `1 responses`, the rate against links sent, an average of 4 for `rating`, Sam's comment under his name. |
+| 6 | Open the link again and answer `rating` 5. | After processing, still one response; the average is 5. |
+| 7 | Choose **No Survey**, **Save**; clear Sam's **Follow-Up Sent On** and run the step. | Sam gets the plain follow-up, no link. |
+| 8 | In an org without Forms, open an event. | No **Post-Event Survey** section. |
+
+**Cleanup:** Delete the response, clear the survey form and turn follow-ups off.

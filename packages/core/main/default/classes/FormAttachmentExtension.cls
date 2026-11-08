@@ -18,6 +18,12 @@ public interface FormAttachmentExtension {
 	Id formFor(Id contextRecordId);
 
 	/**
+	 * Whether a public link to this record must carry a signed claim (EV-18): the module's link
+	 * names a person's own record, so the record identifier alone must not open the form.
+	 */
+	Boolean signedClaim(Id contextRecordId);
+
+	/**
 	 * Called once a submission filled from one of the module's records is processed: the person
 	 * and organization are written, so the module can write its own record for them.
 	 */

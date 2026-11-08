@@ -15,6 +15,7 @@ public with sharing class EventsSettings {
 	public static final String DEFAULT_FOLLOW_UP_TEMPLATE = 'BarnCRM_Event_Follow_Up';
 	public static final String DEFAULT_ACCEPT_NOTICE_TEMPLATE = 'BarnCRM_Speaker_Accepted';
 	public static final String DEFAULT_DECLINE_NOTICE_TEMPLATE = 'BarnCRM_Speaker_Declined';
+	public static final String DEFAULT_SURVEY_TEMPLATE = 'BarnCRM_Event_Survey';
 
 	/** R-SA5: the unique name of the email template for an accepted application. */
 	public static String acceptNoticeTemplate() {
@@ -64,6 +65,11 @@ public with sharing class EventsSettings {
 	/** The follow-up template's unique name. */
 	public static String followUpTemplate() {
 		return textOr('Follow_Up_Template__c', DEFAULT_FOLLOW_UP_TEMPLATE);
+	}
+
+	/** The template a follow-up uses when the event has a survey (EV-18). */
+	public static String surveyTemplate() {
+		return textOr('Survey_Template__c', DEFAULT_SURVEY_TEMPLATE);
 	}
 
 	private static String textOr(String key, String shipped) {

@@ -143,6 +143,17 @@ still **Registered** as **No-Show** once the event is over. An attendee's **Remi
 If your organization uses Summit Events, its registrations appear here each morning with source
 **Summit Events**; change an imported attendee in BarnCRM.
 
+## Send a Survey After an Event
+
+If your organization uses BarnCRM Forms, the event's **Details** tab has a **Post-Event Survey**
+section.
+
+1. Choose the form in **Survey Form** and click **Save**. Ask an admin if no form is listed:
+   the form must be published and public.
+2. After the event, people marked **Attended** get the survey link in their follow-up email
+   (the admin turns on follow-ups).
+3. Come back to the same section to see how many answered and a summary of each question.
+
 ## Check People In
 
 1. Open the event and click the **Check-In** tab. The line at the top shows how many are in.

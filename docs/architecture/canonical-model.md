@@ -13037,6 +13037,7 @@ on its own.
 | Description | `Description__c` | Long Text Area(32768) |
 | Series | `Series__c` | Lookup(Event), Clear on delete |
 | Registration Form Key | `Registration_Form_Key__c` | Text(18): the Forms form registrants fill in, by record identifier (EV-02, ADR-0014) |
+| Survey Form Key | `Survey_Form_Key__c` | Text(18): the Forms form attendees are sent after the event, by record identifier (EV-18, ADR-NEXT) |
 | External Key | `External_Key__c` | Text(80), unique, external ID (EV-10) |
 | Sample Data | `Sample_Data__c` | Checkbox, default false: set on the events `EventsSampleData` loads, so Remove Sample Data deletes them with their tracks, sessions, tickets, codes, speakers, applications, levels and sponsors (C-10, `EventSampleDataLoader`) |
 
@@ -13461,6 +13462,7 @@ that is not cancelled is not added again.
 | Table | `Event_Table__c` | Lookup(Event Table), Clear on delete (EV-13) |
 | Dietary Needs | `Dietary_Needs__c` | Text(255) (EV-13) |
 | Access Needs | `Access_Needs__c` | Text(255) (EV-13) |
+| Survey Link | `Survey_Link__c` | Text(255), set by the morning run when it sends the survey email (EV-18, R-ESV2) |
 
 **R-EAT3 Each email goes once.** The morning run stamps an attendee before emailing it and clears
 the stamp when the send fails; clearing a stamp by hand sends that email again.
@@ -13532,6 +13534,58 @@ overlaps one the host already has.
 - **Panel:** the Appointments tab of the event page (`eventAppointments`), with
   `EventAppointmentsController` (thin, user mode) and the browser module
   `eventAppointmentsModel` (slots, clashes, grouping).
+
+---
+
+## 29EV18. Event Survey Response
+
+### Definition
+
+One attendee's answers to the post-event survey of their event (EV-18, ADR-NEXT). The survey is a
+Forms form the event names in `Survey_Form_Key__c`; the attendee opens it from the link in the
+follow-up email, so the form's submission is filled from the attendee and Core hands the answers
+to Events through `FormAttachmentExtension` (an attendee's survey form is its event's).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Attendee | reference to Event Attendee | yes | Who answered; the event is the attendee's event. |
+| Answers | long text (JSON) | no | The answers by question key. |
+| Submitted On | datetime | no | When the answers were last received. |
+| Form Submission Key | text | no | The Forms submission's record identifier, as text (ADR-0014). |
+
+### Rules
+
+**R-ESV1 One response per attendee.** A later submission from the same attendee replaces the
+answers of the earlier one.
+
+**R-ESV2 The survey goes with the follow-up.** The morning run (EV-14) sends an attendee marked
+Attended, of an event with a survey form for which Forms can give a public address, the survey
+email template (setting `Survey_Template__c`) with the attendee's own address in `Survey_Link__c`;
+any other attendee gets the follow-up template. Each attendee is still emailed once.
+
+**R-ESV3 Forms optional.** Without Forms (no `FormCatalogExtension`) the Survey section is not
+shown, no survey email is chosen and follow-ups are unchanged.
+
+### Salesforce implementation
+
+- **Object:** `Event_Survey_Response__c`, name field auto-number (`ESR-{000000}`), master-detail to
+  Event Attendee (`Attendee__c`, relationship Survey_Responses), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Attendee | `Attendee__c` | Master-Detail(Event Attendee) |
+| Answers | `Answers__c` | Long Text Area(32768) |
+| Submitted On | `Submitted_On__c` | DateTime |
+| Form Submission Key | `Form_Submission_Key__c` | Text(18) |
+
+- **Panel:** the Survey section of the Details tab (`eventSurvey`), with `EventSurveyController`
+  (thin, user mode); the summary (average, counts, newest comments, response rate) comes from the
+  framework-free module `eventSurveyModel.js` (plan 9.9).
+- **Seam:** Core's `FormCatalogExtension` (publicForms, questions, publicLink), found by
+  `FormCatalogExtensions` and implemented by Forms' `FormsCatalogExtension`; Core's
+  `FormAttachmentExtension` is handled for Event Attendee records by `EventFormAttachment`.
 
 ---
 
@@ -13794,6 +13848,7 @@ follow-up and No-Show settings (EV-14).
 | Reminder email template | text | yes (defaults BarnCRM_Event_Reminder) | The unique name of the reminder's email template. |
 | Send follow-ups | boolean | yes (defaults false) | Whether the morning run emails each person marked Attended within seven days after the event. |
 | Follow-up email template | text | yes (defaults BarnCRM_Event_Follow_Up) | The unique name of the follow-up's email template. |
+| Survey email template | text | yes (defaults BarnCRM_Event_Survey) | The unique name of the follow-up template used when the event has a survey (EV-18). |
 | Mark no-shows | boolean | yes (defaults false) | Whether the morning run marks attendees still Registered as No-Show once an event (ended within seven days) is over. |
 | Accepted Notice Template | text | yes (defaults BarnCRM_Speaker_Accepted) | The unique name of the email template sent when an application is accepted. |
 | Declined Notice Template | text | yes (defaults BarnCRM_Speaker_Declined) | The unique name of the email template sent when an application is declined. |
@@ -13825,16 +13880,18 @@ reads as its shipped value.
 | Reminder email template | `Reminder_Template__c` | Text(80), default BarnCRM_Event_Reminder |
 | Send follow-ups | `Follow_Ups_Enabled__c` | Checkbox, default false |
 | Follow-up email template | `Follow_Up_Template__c` | Text(80), default BarnCRM_Event_Follow_Up |
+| Survey email template | `Survey_Template__c` | Text(80), default BarnCRM_Event_Survey (EV-18) |
 | Mark no-shows | `Mark_No_Shows__c` | Checkbox, default false |
 
 - **Setting Definitions:** `Events_Reminders_Enabled`, `Events_Reminder_Lead_Days`,
   `Events_Reminder_Template`, `Events_Follow_Ups_Enabled`, `Events_Follow_Up_Template`,
   `Events_Mark_No_Shows` (sort 10 to 60), `Events_Accept_Notice_Template` (70),
-  `Events_Decline_Notice_Template` (80), section Events (Core's `SettingSections.EVENTS`).
+  `Events_Decline_Notice_Template` (80), `Events_Survey_Template` (55), section Events (Core's
+  `SettingSections.EVENTS`).
 - **Automation:** the nightly step `EventEmailScheduler` (7:30 AM, through
   `EventsNightlyJobProvider`) starts `EventEmailBatch`; the work is `EventEmailService`. Email
-  templates `BarnCRM_Event_Reminder`, `BarnCRM_Event_Follow_Up`, `BarnCRM_Speaker_Accepted` and
-  `BarnCRM_Speaker_Declined` ship in the folder BarnCRM Events.
+  templates `BarnCRM_Event_Reminder`, `BarnCRM_Event_Follow_Up`, `BarnCRM_Event_Survey`,
+  `BarnCRM_Speaker_Accepted` and `BarnCRM_Speaker_Declined` ship in the folder BarnCRM Events.
 
 ---
 
@@ -14451,6 +14508,7 @@ mirrors the primary member).
 | 1.3 | 2026-11-07 | Event check-in (EV-12; ADR-0177 decision 13). No object, field or rule added: the Check-In tab moves an attendee between Registered and Attended through `EventRegistrationService`, and a QR code holds the attendee's record identifier, so the check-in time and code fields that ADR-0177 decision 13 anticipated are not added. A walk-in is a registration (source Staff) made already Attended. The QR drawing library ships as the static resource `BarnQrCode`, listed in `NOTICE`. |
 | 1.3 | 2026-11-07 | Event Management sample data (C-10) and speaker notice defaults (EV-06, owner rule: settings are never blank). Event (29EV1) and Event Registration (29EV8) gain Sample Data (`Sample_Data__c`, Checkbox, default false). `EventsSampleData` implements Core's `SampleDataModule` and is registered in `SampleDataModules.MODULE_CLASS_NAMES` after Funders. Events Settings (29EV25): Accepted Notice Template and Declined Notice Template default to the shipped text templates `BarnCRM_Speaker_Accepted` and `BarnCRM_Speaker_Declined`; R-ES1 now reads a blank as the shipped template; R-SA5 amended to match. |
 | 1.3 | 2026-11-07 | Event Management gala seating (EV-13; ADR-0186 `0186-events-gala-seating.md`, ADR-0177 decision 8, D-156, D-186). New Section 29EV26 Event Table (`Event_Table__c`, R-ET1, R-ET2); Event Attendee (29EV9) gains Table, Dietary Needs and Access Needs. |
+| 1.3 | 2026-11-07 | Post-event survey (EV-18, D-186, ADR-NEXT). New Section 29EV18 Event Survey Response (`Event_Survey_Response__c`, R-ESV1 to R-ESV3); `Event__c` gains `Survey_Form_Key__c`, `Event_Attendee__c` gains `Survey_Link__c`, `Events_Settings__c` gains `Survey_Template__c`. Core gains the `FormCatalogExtension` seam (no object or field). |
 | 1.3 | 2026-11-07 | Portal Builder module (PB-01, D-118, D-178, D-187; ADR-0185 `0185-portal-builder-off-platform-portal-api.md`). New package `packages/portal`: Portal (`Portal__c`, 29PB1), Portal Access (`Portal_Access__c`, 29PB2), Portal Session (`Portal_Session__c`, 29PB3) and Portal Settings (`Portal_Settings__c`, 29PB4), rules R-PB1 to R-PB4, R-PA1, R-PA2, R-PS1, R-PS2 and R-PST1. Core gains no object or field: only the `PortalActionExtension` seam, the Portals settings section and the catalog row `BarnCRM_Module.Portal`. |
 
 ---
@@ -14586,6 +14644,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Event Registration | Event Management | 1.2 (EV-02) | 29EV8 |
 | Event Attendee | Event Management | 1.2 (EV-02) | 29EV9 |
 | Event Appointment | Event Management | 1.3 (EV-15) | 29EV15 |
+| Event Survey Response | Event Management | 1.3 (EV-18) | 29EV18 |
 | Speaker Application | Event Management | 1.3 (EV-06) | 29EV20 |
 | Speaker Review | Event Management | 1.3 (EV-06) | 29EV21 |
 | Sponsorship Level | Event Management | 1.3 (EV-09) | 29EV22 |
