@@ -15,6 +15,12 @@ private class ImportRowCorrectionTest {
 	/** Every other row of the file has no last name, so 251 rows are rejected. */
 	private static final Integer REJECTS = 251;
 	private static final Integer CHUNK_ROWS = 200;
+	/**
+	 * The setup's chunks: two, not three. The tests here run out of queries after a dozen of
+	 * their own once modules add automation to the people the setup imports (Batch C), so the
+	 * setup's cost reaches them; a chunk costs about the same whatever its size.
+	 */
+	private static final Integer SETUP_CHUNK_ROWS = FILE_ROWS / 2;
 
 	/** A committed import with 251 rejected rows, built once, as the admin each test runs as. */
 	@TestSetup
@@ -48,17 +54,21 @@ private class ImportRowCorrectionTest {
 				Started_At__c = Datetime.now(),
 				Committed_By__c = UserInfo.getUserId()
 			);
-			drive(new ImportProcessorBatch(batch.Id, false));
+			drive(new ImportProcessorBatch(batch.Id, false), SETUP_CHUNK_ROWS);
 		}
 	}
 
 	/** Runs a processor job's start, its chunks and its finish in this transaction. */
 	private static void drive(ImportProcessorBatch job) {
+		drive(job, CHUNK_ROWS);
+	}
+
+	private static void drive(ImportProcessorBatch job, Integer chunkRows) {
 		List<Import_Row__c> chunk = new List<Import_Row__c>();
 		Database.QueryLocatorIterator found = job.start(null).iterator();
 		while (found.hasNext()) {
 			chunk.add((Import_Row__c) found.next());
-			if (chunk.size() == CHUNK_ROWS) {
+			if (chunk.size() == chunkRows) {
 				job.execute(null, chunk);
 				chunk = new List<Import_Row__c>();
 			}

@@ -394,8 +394,11 @@ private class ImportRowProcessorTest {
 			Test.stopTest();
 
 			Assert.areEqual(50, [SELECT COUNT() FROM Contact], 'Every row was loaded.');
+			// Under 25 for the import itself, plus a module's automation on the saves it makes:
+			// Contact Point Sync, where installed, costs about 6 a chunk (the new people's
+			// addresses, then their emails), the same for one row as for two hundred.
 			Assert.isTrue(
-				queriesUsed < 25,
+				queriesUsed < 32,
 				'Fifty rows cost a handful of queries, not one per row: got ' + queriesUsed
 			);
 		}
