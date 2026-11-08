@@ -63,7 +63,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ### Portal Builder
 
-- [Portals](portal-builder.md): who can sign in to a portal, ending someone's portal sessions, and what a person sees when they sign in.
+- [Portals](portal-builder.md): who can sign in to a portal, ending someone's portal sessions, what a person sees when they sign in, and what the volunteer, speaker and donor portals show and let them do.
 
 ### Reports
 

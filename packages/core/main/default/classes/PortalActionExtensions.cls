@@ -7,9 +7,12 @@
  */
 @NamespaceAccessible
 public with sharing class PortalActionExtensions {
-	/** The class names modules register. Volunteers adds its class here (PB-03). */
+	/** The class names modules register: Volunteers (PB-03) and Event Management (PB-07). */
 	@NamespaceAccessible
-	public static final List<String> EXTENSION_CLASSES = new List<String>();
+	public static final List<String> EXTENSION_CLASSES = new List<String>{
+		'VolunteersPortalExtension',
+		'EventsPortalExtension'
+	};
 
 	/** Injected by tests by class name, since no module is there to resolve. */
 	@TestVisible

@@ -98,7 +98,9 @@ CAPS = {
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.
     # Batch C wave 2 landing: 49,670 measured (PB-01 builder and client), plus about 2%.
-    "portal": 50_700,
+    # PB-03/07/08 templates: 50,774 measured (the read-only person link through one parent for the
+    # speaker's sessions), plus about 2%.
+    "portal": 51_800,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

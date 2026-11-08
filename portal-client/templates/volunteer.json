@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "key": "volunteer",
+  "title": "Volunteer Portal",
+  "requiresModules": ["Volunteers"],
+  "pages": [
+    {
+      "key": "shifts",
+      "title": "Open Shifts",
+      "kind": "catalog",
+      "object": "Volunteer_Shift__c",
+      "fields": [
+        { "field": "Volunteer_Job__r.Name", "label": "Job" },
+        { "field": "Start_Time__c", "label": "Starts" },
+        { "field": "End_Time__c", "label": "Ends" },
+        { "field": "Location__c", "label": "Where" },
+        { "field": "Slots_Remaining__c", "label": "Spots Left" }
+      ],
+      "where": [
+        { "field": "Status__c", "op": "equals", "value": "Open" },
+        { "field": "Start_Time__c", "op": "greaterOrEqual", "value": "NOW" }
+      ],
+      "orderBy": "Start_Time__c ASC",
+      "limit": 50,
+      "actions": [{ "extension": "Volunteers.SignUp", "label": "Sign Up" }]
+    },
+    {
+      "key": "signups",
+      "title": "My Shifts",
+      "kind": "related",
+      "object": "Volunteer_Signup__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Volunteer_Shift__r.Start_Time__c", "label": "Starts" },
+        { "field": "Volunteer_Shift__r.End_Time__c", "label": "Ends" },
+        { "field": "Volunteer_Shift__r.Location__c", "label": "Where" },
+        { "field": "Status__c" }
+      ],
+      "where": [{ "field": "Status__c", "op": "notEquals", "value": "Cancelled" }],
+      "orderBy": "CreatedDate DESC",
+      "limit": 100,
+      "actions": [{ "extension": "Volunteers.CancelSignup", "label": "Cancel Sign-Up" }]
+    },
+    {
+      "key": "hours",
+      "title": "My Hours",
+      "kind": "related",
+      "object": "Volunteer_Hours__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Date_Worked__c", "label": "Date", "edit": true, "required": true },
+        { "field": "Hours__c", "label": "Hours", "edit": true, "required": true },
+        { "field": "Notes__c", "label": "Notes", "edit": true },
+        { "field": "Volunteer_Job__r.Name", "label": "Job" },
+        { "field": "Status__c" },
+        { "field": "Rejection_Reason__c", "label": "Rejection Reason" }
+      ],
+      "orderBy": "Date_Worked__c DESC",
+      "limit": 100,
+      "actions": ["create"]
+    },
+    {
+      "key": "profile",
+      "title": "My Profile",
+      "kind": "person",
+      "fields": [
+        { "field": "FirstName" },
+        { "field": "LastName" },
+        { "field": "Email" },
+        { "field": "MobilePhone", "label": "Mobile", "edit": true },
+        { "field": "Availability_Days__c", "edit": true },
+        { "field": "Availability_Times__c", "edit": true },
+        { "field": "Emergency_Contact_Name__c", "edit": true },
+        { "field": "Emergency_Contact_Phone__c", "edit": true },
+        { "field": "Volunteer_Hours_Total__c", "label": "Total Hours" }
+      ],
+      "actions": ["update"]
+    }
+  ]
+}

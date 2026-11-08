@@ -50,6 +50,12 @@
     "Volunteers_Suggestions_BookFailed": "The sign-up was not saved. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Volunteers_Suggestions_Empty": "No volunteers to suggest. Suggestions come from people whose Volunteer Status is Active and who are not already signed up for this shift.",
     "Volunteers_Suggestions_LoadFailed": "The suggestions were not loaded. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
-    "Volunteers_Suggestions_Subtitle": "Active volunteers not yet signed up, best match first by skills, availability, hours on this job and onboarding."
+    "Volunteers_Suggestions_Subtitle": "Active volunteers not yet signed up, best match first by skills, availability, hours on this job and onboarding.",
+    "Volunteers_Portal_AlreadySignedUp": "You are already signed up for this shift.",
+    "Volunteers_Portal_Cancelled": "Your sign-up was cancelled.",
+    "Volunteers_Portal_CannotCancel": "This sign-up can no longer be cancelled here. Contact the volunteer coordinator.",
+    "Volunteers_Portal_ShiftClosed": "This shift is no longer open for sign-ups.",
+    "Volunteers_Portal_ShiftFull": "This shift is full.",
+    "Volunteers_Portal_SignedUp": "You are signed up for this shift."
   }
 }

@@ -36,9 +36,12 @@ org:
   license free, or the check in step 6 below fails, use a Salesforce Platform or Salesforce user
   with **API Enabled**. That costs one license for the whole portal, not one per person.
 
-**Confirm the terms with Salesforce.** Salesforce describes the Integration license as being for
-"system-to-system integrations" and says it "may not be used for human users to access Salesforce
-data or features through any user interface". A portal shows people their own records through
+**Confirm the terms with Salesforce.** Offer the Integration license first where you have one,
+and use the regular API-enabled user below if you do not or Salesforce says no; BarnCRM works with
+either. Salesforce's Spring '23 release notes
+([link](https://help.salesforce.com/s/articleView?id=release-notes.rn_api_integration_license.htm&release=242&type=5))
+say the license "may not be used for human users to access Salesforce data or features through
+any user interface", and describe it as for system-to-system integrations. A portal shows people their own records through
 your website. Whether that use is allowed under your contract is a question for your Salesforce
 account executive, not something BarnCRM can answer. Ask before you go live.
 
@@ -143,6 +146,46 @@ A template is JSON in the portal's Template field. The sample in
   it.
 - **requiresModules** lists module keys the portal needs; while one is not installed and on, the
   portal is unavailable.
+
+- A `related` page's `personField` may be `Parent__r.Contact__c`, a parent that itself looks up
+  to the person (such as a speaker's session assignments). A page like that is read only: it
+  shows records, never edits or adds them.
+
+### Ready-Made Templates
+
+Three templates ship in `portal-client/templates/`. Paste one into a portal's Template field. Each
+needs its module: while the module is turned off the portal is unavailable, and where the module
+is not installed its pages fail and the Error Log says which field is missing, so install and turn
+on the module first. Every page shows only the signed-in person's own records, and only the fields
+marked `edit` can be changed. The portal's API user needs no access to any of these objects.
+
+| Template | File and module | Pages |
+|---|---|---|
+| Volunteer Portal | `volunteer.json`, Volunteers | Open Shifts (Sign Up), My Shifts (Cancel Sign-Up), My Hours (view and log), My Profile |
+| Speaker Portal | `speaker.json`, Event Management | Events Open for Proposals (Propose a Talk), Open Proposals (edit, Withdraw), All My Proposals, My Sessions, My Speaker Details, My Details |
+| Donor Portal | `donor.json`, Giving | My Giving, Gift History, Pledges and Recurring Gifts, Receipts, My Contact Details |
+
+**Volunteer.** Sign Up adds the person to an open shift that has room and has not started, once
+per shift (a cancelled sign-up is reopened). Cancel Sign-Up works until the shift starts. A new
+hours entry takes a date, hours and notes; it starts Submitted, or Approved when Volunteers'
+**Hours Require Approval** setting is off, as any entry does, and the person cannot edit it
+afterwards. Coordinators approve hours as usual.
+
+**Speaker.** Propose a Talk starts a Submitted proposal named for the event, one per event at a
+time; the person then writes its title and abstract on Open Proposals, and can withdraw it until
+it is Accepted or Declined. Reviewers see it on the event's Applications tab like any other. An
+event is listed while its Status is Open and it has not ended. There is no call-for-speakers
+deadline in BarnCRM, so the portal shows event and session dates only. A speaker is shown each
+session staff assign them to, including its time and room, so assign a speaker only once the
+session's time can be public.
+
+**Donor.** Read only, except phone and mailing address on My Contact Details. Email is shown but
+not editable, because it is the person's sign-in. Receipts shows the list of issued receipts
+(number, date, amount); it does not send the document. There are no payments: BarnCRM takes no
+money. Cancelled gifts, pledges and recurring gifts are hidden.
+
+If your org has state and country picklists turned on, a changed State or Country must be a value
+in those lists.
 
 Salesforce checks the template on every request. If anything is wrong, the portal shows people
 "unavailable" and the reason is in the Error Log (for example "Page roles: Contact__c cannot be

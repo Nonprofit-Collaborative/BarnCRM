@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "key": "speaker",
+  "title": "Speaker Portal",
+  "requiresModules": ["Events"],
+  "pages": [
+    {
+      "key": "events",
+      "title": "Events Open for Proposals",
+      "kind": "catalog",
+      "object": "Event__c",
+      "fields": [
+        { "field": "Name", "label": "Event" },
+        { "field": "Start__c", "label": "Starts" },
+        { "field": "End__c", "label": "Ends" },
+        { "field": "Venue_Name__c", "label": "Venue" }
+      ],
+      "where": [
+        { "field": "Status__c", "op": "equals", "value": "Open" },
+        { "field": "End__c", "op": "greaterOrEqual", "value": "NOW" }
+      ],
+      "orderBy": "Start__c ASC",
+      "limit": 50,
+      "actions": [{ "extension": "Events.ApplyToSpeak", "label": "Propose a Talk" }]
+    },
+    {
+      "key": "proposals",
+      "title": "Open Proposals",
+      "kind": "related",
+      "object": "Speaker_Application__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Name", "label": "Title", "edit": true, "required": true },
+        { "field": "Abstract__c", "label": "Abstract", "edit": true },
+        { "field": "Event__r.Name", "label": "Event" },
+        { "field": "Track__r.Name", "label": "Track" },
+        { "field": "Status__c" }
+      ],
+      "where": [
+        { "field": "Status__c", "op": "notEquals", "value": "Accepted" },
+        { "field": "Status__c", "op": "notEquals", "value": "Declined" },
+        { "field": "Status__c", "op": "notEquals", "value": "Withdrawn" }
+      ],
+      "orderBy": "CreatedDate DESC",
+      "limit": 50,
+      "actions": ["update", { "extension": "Events.WithdrawProposal", "label": "Withdraw" }]
+    },
+    {
+      "key": "decisions",
+      "title": "All My Proposals",
+      "kind": "related",
+      "object": "Speaker_Application__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Name", "label": "Title" },
+        { "field": "Event__r.Name", "label": "Event" },
+        { "field": "Status__c" }
+      ],
+      "orderBy": "CreatedDate DESC",
+      "limit": 100,
+      "actions": []
+    },
+    {
+      "key": "sessions",
+      "title": "My Sessions",
+      "kind": "related",
+      "object": "Session_Speaker__c",
+      "personField": "Event_Speaker__r.Contact__c",
+      "fields": [
+        { "field": "Event_Session__r.Name", "label": "Session" },
+        { "field": "Event_Session__r.Start__c", "label": "Starts" },
+        { "field": "Event_Session__r.End__c", "label": "Ends" },
+        { "field": "Event_Session__r.Room__c", "label": "Room" },
+        { "field": "Role__c", "label": "Role" }
+      ],
+      "orderBy": "CreatedDate DESC",
+      "limit": 100,
+      "actions": []
+    },
+    {
+      "key": "speaker",
+      "title": "My Speaker Details",
+      "kind": "related",
+      "object": "Event_Speaker__c",
+      "personField": "Contact__c",
+      "fields": [
+        { "field": "Event__r.Name", "label": "Event" },
+        { "field": "Status__c" },
+        { "field": "Headline__c", "edit": true },
+        { "field": "Bio__c", "edit": true },
+        { "field": "AV_Needs__c", "edit": true },
+        { "field": "Travel_Needs__c", "edit": true }
+      ],
+      "orderBy": "CreatedDate DESC",
+      "limit": 50,
+      "actions": ["update"]
+    },
+    {
+      "key": "profile",
+      "title": "My Details",
+      "kind": "person",
+      "fields": [
+        { "field": "FirstName" },
+        { "field": "LastName" },
+        { "field": "Email" },
+        { "field": "MobilePhone", "label": "Mobile", "edit": true }
+      ],
+      "actions": ["update"]
+    }
+  ]
+}

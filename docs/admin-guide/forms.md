@@ -207,7 +207,8 @@ Finish Later is not offered on a form opened from a record (such as an event's r
 ### Integrations and Portals
 
 A portal or website off Salesforce can serve the same public form through a signed-in
-integration user, at `/services/apexrest/barncrm/forms/v1/<form record Id>` (GET loads the form,
+integration user (which license it needs is on the [Portal Builder](portal-builder.md) page),
+at `/services/apexrest/barncrm/forms/v1/<form record Id>` (GET loads the form,
 POST sends `ticket`, `answers` and `trap`, with optional `files` as `{ key: { name, data } }`
 in base64 and `resume` for a resumed form; POST with `saveFor` (an email address) and `step`
 saves the answers for later instead, and GET with `?resume=<code>` loads them). Give that user
