@@ -623,14 +623,20 @@ private class MatchSourceServiceTest {
 				MatchSourceSelector.cappedLookups >= 2,
 				'Each capped lookup is counted: ' + MatchSourceSelector.cappedLookups
 			);
-			List<Error_Log__c> logged = [
+			// Only this source's warnings: where a module (Contact Point Sync) gives the people
+			// Individuals, the lookup of who holds them reaches the lowered cap and warns too.
+			List<Error_Log__c> logged = new List<Error_Log__c>();
+			for (Error_Log__c entry : [
 				SELECT Severity__c, Message__c
 				FROM Error_Log__c
 				WHERE Context__c = 'Match sources'
-			];
+			]) {
+				if (entry.Message__c != null && entry.Message__c.contains('Address_Person')) {
+					logged.add(entry);
+				}
+			}
 			Assert.areEqual(1, logged.size(), 'One warning for the source: ' + logged);
 			Assert.areEqual(ErrorLogger.SEVERITY_WARNING, logged[0].Severity__c);
-			Assert.isTrue(logged[0].Message__c.contains('Address_Person'), 'Names the source');
 		}
 	}
 
