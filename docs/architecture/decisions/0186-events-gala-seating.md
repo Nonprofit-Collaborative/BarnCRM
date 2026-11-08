@@ -1,4 +1,4 @@
-# ADR-NEXT: Event Management gala tables and seating
+# ADR-0186: Event Management gala tables and seating
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-07

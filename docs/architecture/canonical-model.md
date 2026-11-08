@@ -13842,7 +13842,7 @@ reads as its shipped value.
 
 ### Definition
 
-One table at a gala or other seated event (EV-13, ADR-NEXT `NEXT-events-gala-seating.md`): its seats,
+One table at a gala or other seated event (EV-13, ADR-0186 `0186-events-gala-seating.md`): its seats,
 its host and, for a table a sponsor bought, the sponsor. Guests are seated by setting the table on
 their Event Attendee (29EV9).
 
@@ -14450,7 +14450,7 @@ mirrors the primary member).
 | 1.3 | 2026-11-07 | Event dashboard and Event Templates (EV-11; ADR-0177). No object, field or rule added. The Details tab gains the Event Dashboard (counts read from the event's own records by `EventDashboardController`) and, for an event with no ticket types, tracks or sessions, Event Templates: JSON in the static resource `BarnEventTemplates`, with one template, Community Conference (tracks, ticket types, sessions and a planning timeline). A template is applied only when staff press Apply Template, never by default. |
 | 1.3 | 2026-11-07 | Event check-in (EV-12; ADR-0177 decision 13). No object, field or rule added: the Check-In tab moves an attendee between Registered and Attended through `EventRegistrationService`, and a QR code holds the attendee's record identifier, so the check-in time and code fields that ADR-0177 decision 13 anticipated are not added. A walk-in is a registration (source Staff) made already Attended. The QR drawing library ships as the static resource `BarnQrCode`, listed in `NOTICE`. |
 | 1.3 | 2026-11-07 | Event Management sample data (C-10) and speaker notice defaults (EV-06, owner rule: settings are never blank). Event (29EV1) and Event Registration (29EV8) gain Sample Data (`Sample_Data__c`, Checkbox, default false). `EventsSampleData` implements Core's `SampleDataModule` and is registered in `SampleDataModules.MODULE_CLASS_NAMES` after Funders. Events Settings (29EV25): Accepted Notice Template and Declined Notice Template default to the shipped text templates `BarnCRM_Speaker_Accepted` and `BarnCRM_Speaker_Declined`; R-ES1 now reads a blank as the shipped template; R-SA5 amended to match. |
-| 1.3 | 2026-11-07 | Event Management gala seating (EV-13; ADR-NEXT `NEXT-events-gala-seating.md`, ADR-0177 decision 8, D-156, D-186). New Section 29EV26 Event Table (`Event_Table__c`, R-ET1, R-ET2); Event Attendee (29EV9) gains Table, Dietary Needs and Access Needs. |
+| 1.3 | 2026-11-07 | Event Management gala seating (EV-13; ADR-0186 `0186-events-gala-seating.md`, ADR-0177 decision 8, D-156, D-186). New Section 29EV26 Event Table (`Event_Table__c`, R-ET1, R-ET2); Event Attendee (29EV9) gains Table, Dietary Needs and Access Needs. |
 | 1.3 | 2026-11-07 | Portal Builder module (PB-01, D-118, D-178, D-187; ADR-0185 `0185-portal-builder-off-platform-portal-api.md`). New package `packages/portal`: Portal (`Portal__c`, 29PB1), Portal Access (`Portal_Access__c`, 29PB2), Portal Session (`Portal_Session__c`, 29PB3) and Portal Settings (`Portal_Settings__c`, 29PB4), rules R-PB1 to R-PB4, R-PA1, R-PA2, R-PS1, R-PS2 and R-PST1. Core gains no object or field: only the `PortalActionExtension` seam, the Portals settings section and the catalog row `BarnCRM_Module.Portal`. |
 
 ---
