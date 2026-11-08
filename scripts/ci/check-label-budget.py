@@ -43,7 +43,8 @@ import sys
 # Batch C wave 2 landing: set to the merged total, 3,259: 17 Events labels, EV-02's Registrations
 # tab and 11 button and menu labels, the EV-10 and EV-14 nightly step names, and the EV-06
 # Applications, EV-09 Sponsors, EV-12 Check-In and EV-15 Appointments tab titles.
-BUDGET = 3259
+# Raised by 1 for EV-13's Seating tab title (a flexipage tab title cannot read the help catalog).
+BUDGET = 3260
 TARGET = 3000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 

@@ -336,4 +336,12 @@
         <shortDescription>Event page tab: sponsorship levels, sponsors and their deliverables</shortDescription>
         <value>Sponsors</value>
     </labels>
+    <labels>
+        <fullName>Events_EventTab_Seating</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: tables, seating chart and dietary and access needs</shortDescription>
+        <value>Seating</value>
+    </labels>
 </CustomLabels>

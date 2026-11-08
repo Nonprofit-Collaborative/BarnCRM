@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Event_Sponsor__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>Set when the table belongs to a sponsor of this event.</inlineHelpText>
+  <label>Sponsor</label>
+  <referenceTo>Event_Sponsor__c</referenceTo>
+  <relationshipLabel>Tables</relationshipLabel>
+  <relationshipName>Tables</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>
