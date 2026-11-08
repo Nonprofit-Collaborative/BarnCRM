@@ -1,0 +1,106 @@
+<template>
+  <template lwc:if={helpReady}>
+    <p class="slds-var-m-bottom_small slds-text-color_weak" data-id="intro">{labels.intro}</p>
+
+    <template lwc:if={isLoading}>
+      <lightning-spinner alternative-text={labels.badges} size="small"></lightning-spinner>
+    </template>
+
+    <template lwc:if={hasError}>
+      <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+    </template>
+
+    <template lwc:if={truncated}>
+      <c-barn-notice variant="info" message={labels.truncated} data-id="truncated"></c-barn-notice>
+    </template>
+
+    <template lwc:if={showEmpty}>
+      <c-barn-empty-state data-id="empty-state" message={labels.empty}></c-barn-empty-state>
+    </template>
+
+    <template lwc:if={hasAttendees}>
+      <div class="slds-box slds-var-m-bottom_small">
+        <h3 class="slds-text-heading_small slds-var-m-bottom_small">{labels.badges}</h3>
+        <div class="slds-grid slds-wrap slds-gutters_x-small">
+          <lightning-input
+            class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3"
+            data-id="search"
+            type="search"
+            label={labels.search}
+            value={term}
+            onchange={handleTerm}
+          ></lightning-input>
+          <lightning-combobox
+            class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3"
+            data-id="ticket"
+            label={labels.ticketFilter}
+            options={ticketOptions}
+            value={ticket}
+            onchange={handleTicket}
+          ></lightning-combobox>
+          <lightning-combobox
+            class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3"
+            data-id="layout"
+            label={labels.layout}
+            options={layoutOptions}
+            value={layout}
+            onchange={handleLayout}
+          ></lightning-combobox>
+        </div>
+        <div class="slds-grid slds-wrap slds-var-m-top_x-small">
+          <lightning-input
+            class="slds-var-m-right_small"
+            data-id="show-organization"
+            type="checkbox"
+            label={labels.showOrganization}
+            checked={showOrganization}
+            onchange={handleOrganization}
+          ></lightning-input>
+          <lightning-input
+            class="slds-var-m-right_small"
+            data-id="show-ticket"
+            type="checkbox"
+            label={labels.showTicket}
+            checked={showTicket}
+            onchange={handleTicketShown}
+          ></lightning-input>
+          <lightning-input
+            data-id="show-qr"
+            type="checkbox"
+            label={labels.showQr}
+            checked={showQr}
+            onchange={handleQr}
+          ></lightning-input>
+        </div>
+        <p class="slds-var-m-vertical_x-small" data-id="count">{countText}</p>
+        <lightning-button
+          data-id="print-badges"
+          variant="brand"
+          label={labels.printBadges}
+          icon-name="utility:print"
+          disabled={cannotPrintBadges}
+          onclick={handlePrintBadges}
+        ></lightning-button>
+      </div>
+
+      <div class="slds-box">
+        <h3 class="slds-text-heading_small slds-var-m-bottom_small">{labels.sheetHeading}</h3>
+        <lightning-combobox
+          data-id="scope"
+          label={labels.sheetScope}
+          options={scopeOptions}
+          value={sheetScope}
+          onchange={handleScope}
+        ></lightning-combobox>
+        <lightning-button
+          data-id="print-sheet"
+          class="slds-var-m-top_small"
+          label={labels.printSheet}
+          icon-name="utility:print"
+          disabled={cannotPrintSheet}
+          onclick={handlePrintSheet}
+        ></lightning-button>
+      </div>
+    </template>
+  </template>
+</template>
