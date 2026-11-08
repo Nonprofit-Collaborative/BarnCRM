@@ -51,6 +51,13 @@ public without sharing class ContactPointSyncService {
 	/** True while a sync writes, so the person handler ignores the Individual link it sets. */
 	public static Boolean running = false;
 
+	/**
+	 * The Individuals this module created in this transaction. Every Contact Point on one of
+	 * them was made by a sync and is linked, so none is offered for adoption, and asking costs
+	 * a query for each kind on every save of a new person (an import chunk saves several times).
+	 */
+	private static final Set<Id> INDIVIDUALS_CREATED_HERE = new Set<Id>();
+
 	/** Kinds a test treats as missing from the org, to prove they are skipped and explained. */
 	@TestVisible
 	private static Set<String> missingForTest = new Set<String>();
@@ -281,6 +288,7 @@ public without sharing class ContactPointSyncService {
 				continue;
 			}
 			person.put(INDIVIDUAL_LINK, saved[i].getId());
+			INDIVIDUALS_CREATED_HERE.add(saved[i].getId());
 			if (save) {
 				SObject link = Contact.SObjectType.newSObject(person.Id);
 				link.put(INDIVIDUAL_LINK, saved[i].getId());
@@ -500,8 +508,9 @@ public without sharing class ContactPointSyncService {
 		private void readAdoptable() {
 			Set<Id> parents = new Set<Id>();
 			for (SObject person : people.values()) {
-				if (person.get(INDIVIDUAL_LINK) != null) {
-					parents.add((Id) person.get(INDIVIDUAL_LINK));
+				Id individual = (Id) person.get(INDIVIDUAL_LINK);
+				if (individual != null && !INDIVIDUALS_CREATED_HERE.contains(individual)) {
+					parents.add(individual);
 				}
 			}
 			if (parents.isEmpty()) {
