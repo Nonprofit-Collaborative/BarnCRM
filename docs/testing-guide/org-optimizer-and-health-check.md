@@ -367,3 +367,19 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 4 | In an org without NPSP, **Run Again**. | No such finding. |
 
 **Cleanup:** Put NPSP's Account Model back to what you want.
+
+## T-HC-22: Report Subscriptions
+
+**Purpose:** Confirm BarnCRM's reports are listed, a subscription is created for the person through the org connection, a second save updates it, and a missing connection is explained.
+**Prerequisites:** admin with **BarnCRM Metadata Admin**, Customize Application, Modify Metadata and Salesforce's Subscribe to Reports; Giving installed for its reports. For step 1 the org connection is not set up; from step 2 it is set up and connected (see [Creating a New Field From an Import](../admin-guide/import-new-fields.md)). Fewer than 7 report subscriptions of your own.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Org Optimizer**, open **Report Subscriptions**. | The intro, a notice that the org connection is needed and the connection panel. Every report in a BarnCRM folder (for example **Errors by Day**, **LYBUNT Donors**) is listed with its folder and description, each a link that opens the report in a new tab. No **Subscribe** button. |
+| 2 | Set up the connection from the panel, leave and reopen the section. | Each report has **Subscribe**. |
+| 3 | On **New Versus Retained Donors** choose **Subscribe**, then **Weekly**, **Monday**, **7:00 AM**, and **Save**. | **Saving your subscription.**, then a green **Subscribed. Salesforce will email you New Versus Retained Donors on the schedule you chose.** |
+| 4 | Open the report and choose **Subscribe**. | Salesforce shows your subscription: weekly on Monday at 7:00 AM, sent to you. |
+| 5 | Back on the section, subscribe to the same report **Monthly** on day **1**. | **Subscribed.** again. The report's **Subscribe** shows monthly on the 1st, and there is still one subscription to it, not two. |
+| 6 | With 7 subscriptions of your own, subscribe to another report. | A red notice: you already have 7 report subscriptions, the most Salesforce allows. |
+
+**Cleanup:** Remove the test subscriptions from each report's **Subscribe** button.

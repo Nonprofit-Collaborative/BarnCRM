@@ -2,8 +2,9 @@
 # check-standard-objects.sh
 #
 # Fails (exit 1) if any file under packages/core, packages/rollups, packages/giving,
-# packages/volunteers, packages/programs, packages/logicmodels, or packages/funders (excluding
-# README.md files)
+# packages/volunteers, packages/programs, packages/logicmodels, packages/funders, packages/forms,
+# packages/contactpoints, packages/events or packages/portal (excluding README.md files; see the Contact Point
+# Sync note below)
 # references, as whole
 # words, case-sensitive: Opportunity, Campaign, Lead, Case, OpportunityContactRole,
 # CampaignMember, PersonAccount, IsPersonAccount, or any Industries GiftTransaction / __dlm
@@ -80,13 +81,25 @@
 set -euo pipefail
 
 DIRS=(packages/core packages/rollups packages/giving packages/volunteers packages/programs
-  packages/logicmodels packages/funders)
+  packages/logicmodels packages/funders packages/forms packages/contactpoints
+  packages/events packages/portal)
 
 PATTERN='\b(Opportunity|OpportunityContactRole|Campaign|CampaignMember|Lead|Case|PersonAccount|IsPersonAccount|GiftTransaction)\b|__dlm\b'
 
 # Apex and metadata only. See the note above on JavaScript.
 NPC_PATTERN='\b(PartyRelationshipGroup|PartyRoleRelation|AccountAccountRelation|AccountContactRelation|ContactContactRelation|ContactPointAddress|ContactPointEmail|ContactPointPhone|ContactPointConsent|PersonLifeEvent|GiftTransactionDesignation|GiftDesignation|GiftDefaultDesignation|GiftCommitment|GiftCommitmentSchedule|GiftSoftCredit|GiftTribute|GiftRefund|GiftEntry|GiftBatch|OutreachSourceCode|OutreachSummary|DonorGiftSummary|ProgramEnrollment|BenefitAssignment|BenefitDisbursement|RecordAggregationDefinition)\b'
 NPC_INCLUDES=(--include='*.cls' --include='*.trigger' --include='*.xml')
+
+# Contact Point Sync (C-45, plan D-111, ADR-0176 contact point sync module)
+# -------------------------------------------------------------------------
+# packages/contactpoints exists to keep ContactPointEmail, ContactPointPhone and
+# ContactPointAddress in step, so those three names, and only those, are allowed there. Its Apex
+# reaches them through describe; its object and field metadata may not name them (checked with
+# Mirror's declarations below), because such a reference refuses the install on an org without
+# them. Every other name in both patterns is still forbidden in the package.
+CONTACT_POINT_DIR=packages/contactpoints
+CONTACT_POINT_NAMES='ContactPointAddress|ContactPointEmail|ContactPointPhone'
+CONTACT_POINT_NPC_PATTERN="${NPC_PATTERN//|ContactPointAddress|ContactPointEmail|ContactPointPhone|/|}"
 
 MARKER='// detection-only:'
 TEMPLATE_HEADINGS='/customMetadata/Import_Template_Default.'
@@ -100,7 +113,11 @@ VIOLATIONS=()
 for DIR in "${DIRS[@]}"; do
   [[ -d "$DIR" ]] || continue
   MATCHES=$(grep -rnwE "$PATTERN" "$DIR" --include='*' --exclude='README.md' 2>/dev/null || true)
-  NPC_MATCHES=$(grep -rnwE "$NPC_PATTERN" "$DIR" "${NPC_INCLUDES[@]}" \
+  DIR_NPC_PATTERN="$NPC_PATTERN"
+  if [[ "$DIR" == "$CONTACT_POINT_DIR" ]]; then
+    DIR_NPC_PATTERN="$CONTACT_POINT_NPC_PATTERN"
+  fi
+  NPC_MATCHES=$(grep -rnwE "$DIR_NPC_PATTERN" "$DIR" "${NPC_INCLUDES[@]}" \
     --exclude='README.md' 2>/dev/null || true)
   if [[ -n "$NPC_MATCHES" ]]; then
     MATCHES=$(printf '%s\n%s' "$MATCHES" "$NPC_MATCHES")
@@ -156,7 +173,8 @@ prose = re.compile(
 comment = re.compile(r"<!--.*?-->", re.DOTALL)
 def blank(match):
     return re.sub(r"[^\n]", " ", match.group(0))
-for directory, subdirs, files in os.walk("packages/mirror"):
+walked = [os.walk(root) for root in ("packages/mirror", "packages/contactpoints")]
+for directory, subdirs, files in (entry for walk in walked for entry in walk):
     subdirs.sort()
     parts = directory.split(os.sep)
     if "objects" not in parts:
@@ -180,7 +198,8 @@ PY
 )
 if [[ -n "$MIRROR_DECLARATIONS" ]]; then
   printf '%s\n' "$MIRROR_DECLARATIONS"
-  echo "FAIL: a Mirror object or field declaration names a standard/Industries object above." >&2
+  echo "FAIL: a Mirror or Contact Point Sync object or field declaration names a" >&2
+  echo "  standard/Industries object above." >&2
   echo "  Store the record ID as text and reach the object through dynamic Apex." >&2
   FAILED=1
 fi

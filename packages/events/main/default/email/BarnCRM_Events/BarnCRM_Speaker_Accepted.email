@@ -1,0 +1,9 @@
+Dear {!Contact.FirstName, friend},
+
+Thank you for proposing "{!Speaker_Application__c.Name}". We are glad to tell you that your proposal has been accepted.
+
+We will be in touch soon to confirm the details. If anything about your plans has changed, please reply and let us know.
+
+With thanks,
+
+{!Organization.Name}

@@ -13,6 +13,7 @@
  * from the detector on trust, and a skip is written to the debug log.
  */
 @IsTest
+@NamespaceAccessible
 public class PersonAccountTestShape {
 	public static final String NO_PERSON_ACCOUNTS = 'Skipped: this org does not store people as accounts (the Platform-only shape, ADR-0013).';
 	public static final String NO_PERSON_TYPE_FOR_USER = 'This org stores people as accounts but gives the running user none of its person record types, so person account coverage cannot run. Run scripts/org/grant-person-record-type.sh <alias> to give the System Administrator profile one.';
@@ -22,6 +23,7 @@ public class PersonAccountTestShape {
 	 * in an org that has none. Fails the calling test, with NO_PERSON_TYPE_FOR_USER, in an org
 	 * that has person accounts but gives the running user no person record type.
 	 */
+	@NamespaceAccessible
 	public static String skipReason() {
 		Schema.DescribeSObjectResult account = Account.SObjectType.getDescribe(
 			SObjectDescribeOptions.DEFERRED

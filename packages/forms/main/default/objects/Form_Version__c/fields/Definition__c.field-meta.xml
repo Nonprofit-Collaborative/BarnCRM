@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Definition__c</fullName>
+  <description>The definition as published (canonical model 29ZX). Never changed after it is written.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The questions as they were published, as JSON.</inlineHelpText>
+  <label>Definition</label>
+  <length>131072</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>5</visibleLines>
+</CustomField>

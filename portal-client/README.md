@@ -1,0 +1,62 @@
+# BarnCRM Portal Client
+
+The website half of BarnCRM Portal Builder (ADR-0185 portal builder, D-187). It is not deployed to Salesforce. Setup, from the Salesforce side: [Admin Guide, Portal Builder](../docs/admin-guide/portal-builder.md).
+
+| Path | What it is |
+|---|---|
+| `src/portalApi.js` | Calls the portal API through the website's proxy. Never holds the OAuth secret or the session token. |
+| `src/portalApp.js` | The sign-in screens (email, emailed code, authenticator) and the template's pages with edit forms. Framework-free; text only through `textContent`. |
+| `src/messages.js` | The words shown, English; pass a copy to `mountPortal` to change them. |
+| `src/portalTemplate.js` | `checkTemplate(json)`: the template shape rules Salesforce applies, to check a template before pasting it into a Portal. Salesforce also checks objects and fields against the org. |
+| `templates/sample.json` | A starting template: My Details (the person) and My Roles (their current affiliations). |
+| `templates/volunteer.json`, `speaker.json`, `donor.json` | The ready-made templates (PB-03, PB-07, PB-08). Each names its module in `requiresModules` (Volunteers, Event Management, Giving); module actions go through Core's `PortalActionExtension`. Checked against the package metadata by `__tests__/portalTemplates.test.js`. |
+| `wordpress/barncrm-portal/` | The WordPress plugin: settings page, the `[barncrm_portal key="..."]` shortcode, and the proxy. |
+| `build-wordpress.sh` | Builds `barncrm-portal.zip` with the client inside, for Plugins, Add New, Upload Plugin. |
+| `__tests__/` | Jest tests, run with the repository's `npm run test:unit`. |
+
+## WordPress
+
+1. Run `bash portal-client/build-wordpress.sh` and upload `barncrm-portal.zip` in Plugins, Add New, Upload Plugin. Activate **BarnCRM Portal**.
+2. In Settings, BarnCRM Portal, enter the Salesforce domain (`yourorg.my.salesforce.com`), the Consumer Key and the Consumer Secret of the External Client App. The secret is kept in the WordPress database and never shown again or sent to visitors.
+3. Put `[barncrm_portal key="<portal key>"]` on a page. The site must use HTTPS.
+4. Exclude that page from any full-page cache: the shortcode writes a nonce that must not be shared from a stale copy for more than a day.
+
+## Any Other Website
+
+The browser part needs a small server piece, the proxy, that does what the plugin's `barncrm_portal_proxy` does:
+
+- Accept only the API paths in `BARNCRM_PORTAL_PATHS`, from your own pages (a nonce or CSRF token, and a SameSite=Strict cookie).
+- Get an access token with the OAuth client credentials flow (`POST https://<domain>/services/oauth2/token`, `grant_type=client_credentials`), cache it, and add it as `Authorization: Bearer`. Keep the secret on the server.
+- Forward to `https://<domain>/services/apexrest/barncrm/portal/v1/<path>`. On `login/start`, set `portal` to the page's portal key.
+- When an answer carries `session`, store it in an HttpOnly, Secure, SameSite=Strict cookie and remove it from the answer. Send it back as the `X-Barn-Portal-Session` header on later calls. Clear the cookie on `logout` or `not_signed_in`.
+- Limit sign-in calls per visitor address.
+
+Then load the client as ES modules:
+
+```html
+<div id="portal"></div>
+<script type="module">
+  import { createPortalApi } from './portalApi.js';
+  import { mountPortal } from './portalApp.js';
+  const api = createPortalApi({ baseUrl: '/portal-proxy', portal: 'volunteers', nonce: '<from your server>' });
+  mountPortal(document.getElementById('portal'), { api });
+</script>
+```
+
+## The API
+
+Paths under `/services/apexrest/barncrm/portal/v1/`; every answer is JSON with `ok`, and `error` when refused.
+
+| Call | Body or query | Answer |
+|---|---|---|
+| `POST login/start` | `portal`, `email` | `challenge` (the same answer whether or not the email is on file) |
+| `POST login/verify` | `challenge`, `code` | `status`: `signedIn` (with `session`, `expires`), `secondFactor`, or `enroll` (with `secret`, `uri`) |
+| `POST login/second-factor` | `challenge`, `code` | `status` `signedIn`, `session`, `expires` |
+| `GET me` | | `title`, `firstName`, `secondFactor`, `pages` |
+| `GET page` | `key` | `fields`, `records` (`id`, `values`), `canUpdate`, `canCreate`, `actions` |
+| `POST page/save` | `page`, `recordId` (blank to add), `values` | `id` |
+| `POST page/action` | `page`, `recordId`, `action` | `message` |
+| `POST second-factor/enroll`, `second-factor/confirm` | `code` for confirm | `secret`, `uri`; then nothing |
+| `POST logout` | | nothing |
+
+Errors and their HTTP status: `not_signed_in` 401, `not_allowed` and `locked` 403, `not_found` 404, `portal_unavailable` 503, `server_error` 500, anything else (`code_invalid`, `code_expired`, `required_missing`, `invalid_value`, `save_failed`, `action_failed`, `invalid_request`) 400.

@@ -183,6 +183,24 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0172](0172-shipped-match-sources-turned-off-by-a-setting.md) | Shipped match sources are turned off by a setting | Accepted (owner decision) |
 | [0173](0173-shipped-organization-record-type-for-orgs-without-one.md) | Core ships an organization record type, offered only where the org has none | Accepted (owner decision) |
 | [0174](0174-deactivate-org-automation-with-a-snapshot.md) | Deactivate org flows and validation rules with a snapshot and restore | Accepted (owner decision) |
+| [0175](0175-forms-module.md) | The BarnCRM Forms module: versioned JSON definitions, a framework-free engine, Core's matchers and a form attachment seam | Accepted (builder decision) |
+| [0176](0176-contact-point-sync-module.md) | The BarnCRM Contact Point Sync module: one-way copies of a person's email, phone and addresses into Contact Points | Accepted (builder decision) |
+| [0177](0177-events-module.md) | The BarnCRM Event Management module: events with ticket types, tracks, sessions and speakers on Core | Accepted (builder decision) |
+| [0178](0178-duplicate-rules-and-report-subscriptions-through-the-org-connection.md) | Duplicate Rules Starter and report subscriptions through the org connection | Accepted (builder decision) |
+| [0179](0179-radius-find-postal-centroids.md) | Radius Find measures from a shipped postal code table, with no outside geocoding | Accepted (builder decision) |
+| [0180](0180-events-call-for-speakers.md) | Event Management call for speakers: applications, reviewers' scores, and accept or decline notices through chosen email templates | Accepted (builder decision) |
+| [0181](0181-events-sponsorship.md) | Event Management sponsorship: levels, sponsors on Core accounts, a deliverables checklist, and an optional link to Giving or Funders through Core | Accepted (builder decision) |
+| [0182](0182-event-registrations.md) | Event registrations and attendees, reminders and No-Show, and the Summit Events adapter | Accepted (builder decision) |
+| [0183](0183-event-volunteers-extension-point.md) | Event volunteer jobs and shifts live in Volunteers, reached from Event Management through a Core extension point | Accepted (builder decision) |
+| [0184](0184-public-forms-on-a-salesforce-site.md) | Public forms on a Salesforce Site: a guest intake that only stores answers, processing as a staff user, spam checks with no outside service, and one submit service for a Site page and an API caller | Accepted (builder decision) |
+| [0185](0185-portal-builder-off-platform-portal-api.md) | Portal Builder: an off-platform portal with its own one-time-code login, reaching Salesforce through one integration user and a person-scoped portal API | Accepted (builder decision) |
+| [0186](0186-events-gala-seating.md) | Event Management gala tables and seating | Accepted (builder decision) |
+| [0187](0187-events-badges-and-sign-in-sheets.md) | Event Management badges and sign-in sheets | Accepted (builder decision) |
+| [0188](0188-event-post-event-survey.md) | Post-event survey: a Forms form named on the event, sent in the follow-up email with the attendee's own link, answers kept per attendee, through a Core form catalog seam | Accepted (builder decision) |
+| [0189](0189-event-calendar.md) | Event calendar: a month, week and list view of events and sessions on its own tab, filters in the browser, and a calendar file built in the browser | Accepted (builder decision) |
+| [0190](0190-public-event-pages.md) | Public event pages and registration: Events publishes a page view through a Core seam, Forms serves it on its Site and API with the public form intake | Accepted (builder decision) |
+| [0191](0191-portal-templates-volunteer-speaker-donor.md) | Portal templates for volunteers, speakers and donors: shipped as template JSON, module actions through Core's seam, one read-only parent hop for the person | Accepted (builder decision) |
+| [0192](0192-batch-c-modules-add-tabs-to-barncrm-apps.md) | Batch C modules add their tabs to the BarnCRM apps instead of shipping an app | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

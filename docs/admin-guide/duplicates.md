@@ -97,6 +97,43 @@ the list, not on every card. **Not a Duplicate** and **Merge Households** open t
 form inside the suggestion's own card. When nothing is waiting the list shows **No Possible
 Duplicates** with a reminder to scan after a large import.
 
+### Duplicate Rules Starter
+
+Salesforce's standard rules pair households on a shared city and miss people who share an
+email but not a company. The **Duplicate Rules Starter** writes BarnCRM's recommended rules
+into your org instead:
+
+- **People** (Contact): the same first and last name, plus the same email, or the same mailing
+  street and postal code, or the same phone.
+- **Households** (Account, Household record type only, so organizations are never compared):
+  the same billing street with the same city or postal code, the same phone, or the same name
+  with the same postal code.
+
+Each is one matching rule and one duplicate rule, named **BarnCRM People Match** and
+**BarnCRM People Duplicates** (and the Household pair). The duplicate rules allow the save,
+alert the person saving and report the pair, so imports and the scan keep working.
+
+1. On **Duplicate Matching**, **Review**, choose **Duplicate Rules Starter** under the rules
+   box (BarnCRM Admin only).
+2. Each set shows the rule in words, your own duplicate rules on that object (always left as
+   they are), and what **Set Up Rules** will do: create both rules, or repair BarnCRM's rules
+   if they were turned off. A set that is already active says **Set up and active.**
+3. Tick the sets to set up, choose **Set Up Rules**, read the steps in the dialog and confirm.
+4. A background job writes the matching rules, waits for Salesforce to activate them (a few
+   minutes; it checks every minute for up to 15), then writes the duplicate rules. The page
+   checks every 10 seconds and shows the result in words; the Error Log keeps it too.
+
+What it never does: change, deactivate or delete a rule that is not named BarnCRM, or edit an
+active BarnCRM matching rule (Salesforce refuses edits to an active one). With your own rule
+and BarnCRM's both active on one object, a save can alert twice; turn one off in **Setup**,
+**Duplicate Rules** if you want only one.
+
+**Needs:** the org connection that Super Importer uses to create a field (see
+[Creating a Field From an Import](import-new-fields.md)), with **BarnCRM Metadata Admin**,
+Customize Application and Modify Metadata. Without it the starter says so, shows the connection
+panel, and the rules can be created by hand in Setup from the descriptions shown. In an org
+with person accounts the people rule covers people stored as contacts only.
+
 ### Settings
 
 In **BarnCRM Settings**, the **Duplicate Matching** section holds the tool's settings: a note

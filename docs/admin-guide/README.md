@@ -248,6 +248,20 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | L-06 Link outcomes to grant deliverables: the Logic Model Outcomes card on a requirement | [funders.md](funders.md#outcomes-a-requirement-reports-on) | BarnCRM Funders |
 | F-06 Funder report merge template: Funder Report Templates | [funders.md](funders.md#funder-report-templates) | BarnCRM Funders |
 | F-07 Board dashboard: the Board Dashboard tab | [funders.md](funders.md#the-board-dashboard-tab) | BarnCRM Funders |
+| C-45 Contact Point Sync: copying email, phone and addresses to Salesforce Contact Points, the settings, the backfill | [contact-point-sync.md](contact-point-sync.md) | BarnCRM Contact Point Sync |
+
+### Forms
+
+| Feature | Page | Package |
+|---|---|---|
+| C-42a to C-42c Forms: install, roles, the Form Builder (steps, questions, records to write, conditions, preview, publish), filling in a form, matching people and organizations, public forms on a Salesforce Site (Site setup, Health Check checks, processing, integrations), files and save for later, form submissions and Process Again | [forms.md](forms.md) | BarnCRM Forms |
+
+### Event Management
+
+| Feature | Page | Package |
+|---|---|---|
+| EV-01 Events: install, roles, the Events page, Repeat Event, the event page; EV-03 ticket types and promo codes; EV-04 the Agenda Builder; EV-05 speakers; EV-06 the call for speakers; EV-09 sponsorship; EV-02 registrations, the waitlist and the Forms link; EV-11 the event dashboard and templates; EV-15 appointments; EV-08 volunteers; EV-12 check-in and QR codes; EV-14 settings, reminders, follow-ups and no-shows; EV-10 the Summit Events import | [events.md](events.md) | BarnCRM Event Management |
+| PB-01 Portal Builder: the integration user and its license, the External Client App, portals and templates, sign-in settings, the WordPress plugin | [portal-builder.md](portal-builder.md) | BarnCRM Portal Builder |
 
 ### Moving From Another System
 

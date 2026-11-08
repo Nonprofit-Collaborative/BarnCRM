@@ -1,0 +1,81 @@
+<template>
+  <template lwc:if={helpReady}>
+    <div class="slds-var-m-bottom_medium">
+      <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center">
+        <h2 class="slds-text-heading_small" data-id="title">{text.title}</h2>
+        <span class="slds-text-heading_small" data-id="days">{daysText}</span>
+      </div>
+      <p class="slds-text-color_weak slds-var-m-bottom_small" data-id="intro">{text.intro}</p>
+
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={text.title} size="small"></lightning-spinner>
+      </template>
+
+      <template lwc:if={hasError}>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+      </template>
+
+      <template lwc:if={hasData}>
+        <div class="slds-grid slds-wrap slds-gutters_small" data-id="tiles">
+          <template for:each={tiles} for:item="tile">
+            <div key={tile.key} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4">
+              <c-barn-stat-tile label={tile.label} value={tile.value} bordered></c-barn-stat-tile>
+            </div>
+          </template>
+        </div>
+        <template lwc:if={speakersNote}>
+          <p class="slds-text-color_weak slds-var-m-top_x-small" data-id="speakers-note">
+            {speakersNote}
+          </p>
+        </template>
+
+        <h3 class="slds-text-heading_small slds-var-m-top_medium">{text.setup}</h3>
+        <ul class="slds-var-m-top_x-small" data-id="steps">
+          <template for:each={steps} for:item="step">
+            <li key={step.key} class="slds-var-m-bottom_xx-small">
+              <c-barn-status-badge status={step.status} label={step.badge}></c-barn-status-badge>
+              <span class="slds-var-m-left_x-small">{step.label}</span>
+            </li>
+          </template>
+        </ul>
+
+        <template lwc:if={showTemplates}>
+          <h3 class="slds-text-heading_small slds-var-m-top_medium">{text.template}</h3>
+          <p class="slds-text-color_weak" data-id="template-intro">{text.templateIntro}</p>
+          <lightning-combobox
+            data-id="template"
+            label={text.template}
+            variant="label-hidden"
+            placeholder={text.choose}
+            options={templateOptions}
+            value={templateKey}
+            onchange={handleTemplate}
+          ></lightning-combobox>
+          <template lwc:if={hasChosen}>
+            <p class="slds-var-m-top_x-small" data-id="template-description">
+              {chosenDescription}
+            </p>
+            <p class="slds-text-color_weak" data-id="template-summary">{planSummary}</p>
+            <h4 class="slds-text-heading_small slds-var-m-top_small">{text.timeline}</h4>
+            <ul data-id="timeline">
+              <template for:each={timelineSteps} for:item="step">
+                <li key={step.key} class="slds-var-m-vertical_xx-small">
+                  <c-barn-status-badge status={step.status} label={step.dueText}></c-barn-status-badge>
+                  <span class="slds-var-m-left_x-small">{step.title}</span>
+                </li>
+              </template>
+            </ul>
+            <lightning-button
+              class="slds-var-m-top_small"
+              data-id="apply"
+              variant="brand"
+              label={text.apply}
+              disabled={applyDisabled}
+              onclick={handleApply}
+            ></lightning-button>
+          </template>
+        </template>
+      </template>
+    </div>
+  </template>
+</template>

@@ -78,6 +78,7 @@ body:
         - Volunteers
         - Programs
         - Funders
+        - Event Management
         - Mirror
         - Not sure
     validations:

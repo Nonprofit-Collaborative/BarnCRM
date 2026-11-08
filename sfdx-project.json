@@ -59,6 +59,38 @@
       "dependencies": [{ "package": "BarnCRM Core" }]
     },
     {
+      "path": "packages/forms",
+      "default": false,
+      "package": "BarnCRM Forms",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
+      "path": "packages/contactpoints",
+      "default": false,
+      "package": "BarnCRM Contact Point Sync",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
+      "path": "packages/events",
+      "default": false,
+      "package": "BarnCRM Event Management",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
+      "path": "packages/portal",
+      "default": false,
+      "package": "BarnCRM Portal Builder",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
       "path": "packages/mirror",
       "default": false,
       "package": "BarnCRM Mirror",

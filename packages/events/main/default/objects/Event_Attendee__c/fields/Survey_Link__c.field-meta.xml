@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Survey_Link__c</fullName>
+  <description>Set by BarnCRM's morning event email run (EV-18): the address of this attendee's post-event survey, for the survey email's merge field.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The survey link sent to this attendee. It is set when the survey email goes out.</inlineHelpText>
+  <label>Survey Link</label>
+  <length>255</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

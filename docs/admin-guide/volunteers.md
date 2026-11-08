@@ -231,6 +231,8 @@ settings, and each saves as you change it.
 | Weeks ahead to create shifts | 8 | How many weeks ahead recurring schedules keep their shifts created, from 1 to 26. Default: 8. | A longer horizon at the next nightly run or schedule save; a shorter one removes no shift already created |
 | Send shift reminders | Off | Volunteers signed up for a shift get one reminder email before it. See Shift Reminders below. | At the next 7:00 AM run |
 | Days before a shift to remind | 1 | How many days before a shift its reminder goes out, from 1 to 14. Default: 1. | At the next 7:00 AM run |
+| Send unfilled shift nudges | Off | Active volunteers who have helped on a job before get one email when one of its upcoming shifts is still short. See Unfilled Shift Nudges below. | At the next 7:15 AM run |
+| Days before a shift to nudge | 3 | How many days before an unfilled shift its nudge goes out, from 1 to 14. Default: 3. | At the next 7:15 AM run |
 
 ## Shift Reminders
 
@@ -264,6 +266,34 @@ books at noon for a shift that evening. Tell such volunteers directly.
 **From address.** Reminders are sent from the user who scheduled the morning reminder job (the
 person who turned reminders on or saved the schedule), and replies go to that user. BarnCRM has
 no separate from address setting for volunteer reminders.
+
+## Unfilled Shift Nudges
+
+When **Send unfilled shift nudges** is on, a job named **Volunteer Unfilled Shift Nudges** runs
+each morning at 7:15 AM and writes once, for each open shift that starts within **Days before a
+shift to nudge** days and still has open places (**Slots Remaining** above zero). The email goes
+to active volunteers (**Volunteer Status** Active) who have approved hours on that shift's job,
+are not already signed up for the shift in any status, have an email address and do not have
+Email Opt Out checked. It names the job, the day and time and the place, and asks the person to
+tell the coordinator if they can come. Nobody can sign up from the email: BarnCRM has no public
+sign-up page yet.
+
+**How many people.** At most three people for each open place, and never more than 25 for one
+shift, starting with the people who have given the most hours on that job. A shift that needs
+one person writes to three, not to the whole roster.
+
+**Turning it on.** The setting ships off, because turning it on emails real people. Switch it on
+in **BarnCRM Settings**, **Volunteers**, and set **Days before a shift to nudge** (default 3,
+never blank). The job is a step of [BarnCRM Nightly Jobs](nightly-jobs.md) with no switch of its
+own: it runs whenever Volunteers is on and the setting is on. Emails go through your Salesforce
+org, so its daily email limit applies, and they come from the user who scheduled the nightly run.
+
+**Once per shift.** Each due shift is stamped first: its **Nudge Sent On** field holds the time.
+A stamped shift is never nudged again, even if it is still short the next day. A shift whose
+stamp could not be saved is held back and listed in the **Error Log** as a Warning. A shift
+none of whose emails went out has its stamp cleared, so the next morning's run tries again. To
+nudge a shift again, clear **Nudge Sent On** on the shift (Admin and Coordinator can edit it).
+A shift with nobody to write to is stamped and left alone.
 
 **Who is never emailed.** A person with **Email Opt Out** checked on their contact (or person
 account), a person with no email address, a sign-up that is Cancelled or marked No show or
@@ -430,6 +460,15 @@ app) with how many letters were made, how many people were skipped and why (for 
 approved hours in the period), and how many failed; for failures it says to try again and to
 ask a BarnCRM admin to check the [Error Log](error-log.md) if it happens again. It is the BarnCRM job notification, so the **Send Long Job Notifications**
 option in BarnCRM Settings turns it off.
+
+## Jobs Made for an Event
+
+When BarnCRM Event Management is installed, its event page can add volunteer jobs and shifts here
+for an event. Such a job carries the event's record ID in **Event ID** (text, not a link) and is
+otherwise an ordinary job: sign-up, reminders, nudges, hours and totals work on its shifts as on
+any other. Leave **Event ID** as it is; clearing it makes the job disappear from the event page.
+Event Management needs nothing from you beyond the Volunteers permission sets, and Volunteers does
+not need Event Management.
 
 ## Signing People Up for a Shift
 

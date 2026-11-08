@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Status__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Suspended stops sign-in and ends every session of this person on its next call.</inlineHelpText>
+  <label>Status</label>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Active</fullName>
+        <default>true</default>
+        <label>Active</label>
+      </value>
+      <value>
+        <fullName>Suspended</fullName>
+        <default>false</default>
+        <label>Suspended</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

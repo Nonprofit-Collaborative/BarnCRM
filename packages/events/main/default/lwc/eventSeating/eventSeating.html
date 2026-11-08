@@ -1,0 +1,247 @@
+<template>
+  <template lwc:if={helpReady}>
+    <p class="slds-var-m-bottom_small slds-text-color_weak" data-id="intro">{labels.intro}</p>
+
+    <template lwc:if={isLoading}>
+      <lightning-spinner alternative-text={labels.seating} size="small"></lightning-spinner>
+    </template>
+
+    <template lwc:if={hasError}>
+      <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+    </template>
+
+    <template lwc:if={truncated}>
+      <c-barn-notice variant="info" message={labels.truncated} data-id="truncated"></c-barn-notice>
+    </template>
+
+    <template lwc:if={data}>
+      <p class="slds-var-m-bottom_small" data-id="summary">{summaryText}</p>
+
+      <div class="slds-grid slds-wrap slds-grid_vertical-align-center slds-var-m-bottom_small">
+        <template lwc:if={canAddTable}>
+          <lightning-button
+            data-id="add-table"
+            class="slds-var-m-right_x-small"
+            label={labels.addTable}
+            icon-name="utility:add"
+            disabled={busy}
+            onclick={handleAddTable}
+          ></lightning-button>
+        </template>
+        <template lwc:if={canEdit}>
+          <lightning-button
+            data-id="suggest"
+            class="slds-var-m-right_x-small"
+            label={labels.suggest}
+            disabled={cannotSuggest}
+            onclick={handleSuggest}
+          ></lightning-button>
+          <lightning-input
+            data-id="keep-party"
+            class="slds-var-m-right_small"
+            type="checkbox"
+            label={labels.keepParty}
+            checked={keepParty}
+            onchange={handleKeepParty}
+          ></lightning-input>
+        </template>
+        <lightning-button
+          data-id="export"
+          label={labels.exportCsv}
+          icon-name="utility:download"
+          disabled={cannotExport}
+          onclick={handleExport}
+        ></lightning-button>
+      </div>
+
+      <template lwc:if={showForm}>
+        <div class="slds-box slds-var-m-bottom_small" data-id="table-form">
+          <div class="slds-grid slds-wrap slds-gutters_x-small">
+            <lightning-input
+              class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
+              data-field="name"
+              label={labels.tableName}
+              value={tableForm.name}
+              required
+              onchange={handleTableField}
+            ></lightning-input>
+            <lightning-input
+              class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
+              data-field="capacity"
+              type="number"
+              min="1"
+              label={labels.capacity}
+              value={tableForm.capacity}
+              required
+              onchange={handleTableField}
+            ></lightning-input>
+            <lightning-record-picker
+              class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
+              data-id="host"
+              label={labels.host}
+              placeholder={labels.host}
+              object-api-name="Contact"
+              value={tableForm.hostId}
+              onchange={handleHostPick}
+            ></lightning-record-picker>
+            <lightning-combobox
+              class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4"
+              data-field="sponsorId"
+              label={labels.sponsor}
+              options={sponsorOptions}
+              value={tableForm.sponsorId}
+              onchange={handleTableField}
+            ></lightning-combobox>
+          </div>
+          <div class="slds-var-m-top_small">
+            <lightning-button
+              data-id="table-cancel"
+              label={labels.cancel}
+              onclick={handleCancelTable}
+            ></lightning-button>
+            <lightning-button
+              data-id="table-save"
+              class="slds-var-m-left_x-small"
+              variant="brand"
+              label={labels.save}
+              disabled={cannotSaveTable}
+              onclick={handleSaveTable}
+            ></lightning-button>
+          </div>
+        </div>
+      </template>
+
+      <template lwc:if={showEmpty}>
+        <c-barn-empty-state data-id="empty-state" message={labels.empty}></c-barn-empty-state>
+      </template>
+
+      <template lwc:if={hasTables}>
+        <div class="slds-grid slds-wrap slds-gutters_x-small" data-id="chart">
+          <template for:each={chart} for:item="table">
+            <div
+              key={table.key}
+              class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-large-size_1-of-3 slds-var-m-bottom_small"
+            >
+              <div class={table.cardClass} data-id="table-card">
+                <div class="slds-grid slds-grid_align-spread">
+                  <a href={table.href} class="slds-text-heading_small">{table.name}</a>
+                  <span data-id="seats">{table.seatsText}</span>
+                </div>
+                <template lwc:if={table.hostText}>
+                  <p class="slds-text-color_weak">{table.hostText}</p>
+                </template>
+                <template lwc:if={table.sponsorText}>
+                  <p class="slds-text-color_weak">{table.sponsorText}</p>
+                </template>
+                <template lwc:if={table.isOver}>
+                  <p class="slds-text-title_bold" data-id="over">{table.overText}</p>
+                </template>
+                <template lwc:if={table.hasGuests}>
+                  <ul class="slds-var-m-top_x-small">
+                    <template for:each={table.guests} for:item="guest">
+                      <li key={guest.id} data-id="table-guest">
+                        {guest.name}
+                        <template lwc:if={guest.noteText}>
+                          <span class="slds-text-color_weak"> ({guest.noteText})</span>
+                        </template>
+                      </li>
+                    </template>
+                  </ul>
+                </template>
+                <template lwc:else>
+                  <p class="slds-text-color_weak slds-var-m-top_x-small">{labels.emptyTable}</p>
+                </template>
+                <template lwc:if={canAddTable}>
+                  <div class="slds-var-m-top_x-small">
+                    <lightning-button
+                      data-id={table.id}
+                      data-action="edit-table"
+                      variant="base"
+                      label={labels.edit}
+                      onclick={handleEditTable}
+                    ></lightning-button>
+                    <lightning-button
+                      data-id={table.id}
+                      data-action="delete-table"
+                      class="slds-var-m-left_small"
+                      variant="base"
+                      label={labels.remove}
+                      onclick={handleDeleteTable}
+                    ></lightning-button>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
+
+      <h3 class="slds-text-heading_small slds-var-m-vertical_small">{labels.guests}</h3>
+      <template lwc:if={showNoGuests}>
+        <p class="slds-text-color_weak" data-id="no-guests">{labels.noGuests}</p>
+      </template>
+      <template lwc:if={hasGuests}>
+        <table
+          class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_stacked-horizontal"
+          data-id="guests"
+        >
+          <thead>
+            <tr class="slds-line-height_reset">
+              <th scope="col">{labels.guest}</th>
+              <th scope="col">{labels.organization}</th>
+              <th scope="col">{labels.table}</th>
+              <th scope="col">{labels.dietary}</th>
+              <th scope="col">{labels.access}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={rows} for:item="row">
+              <tr key={row.id} data-id="guest-row">
+                <th scope="row" data-label={labels.guest}>
+                  <a href={row.href}>{row.name}</a>
+                </th>
+                <td data-label={labels.organization}>{row.organization}</td>
+                <td data-label={labels.table}>
+                  <lightning-combobox
+                    data-id={row.id}
+                    data-action="seat"
+                    label={labels.table}
+                    variant="label-hidden"
+                    options={tableOptions}
+                    value={row.tableValue}
+                    disabled={cannotSeat}
+                    onchange={handleSeat}
+                  ></lightning-combobox>
+                </td>
+                <td data-label={labels.dietary}>
+                  <lightning-input
+                    data-id={row.id}
+                    data-field="dietary"
+                    label={labels.dietary}
+                    variant="label-hidden"
+                    value={row.dietary}
+                    maxlength="255"
+                    readonly={readOnly}
+                    onblur={handleNeeds}
+                  ></lightning-input>
+                </td>
+                <td data-label={labels.access}>
+                  <lightning-input
+                    data-id={row.id}
+                    data-field="access"
+                    label={labels.access}
+                    variant="label-hidden"
+                    value={row.access}
+                    maxlength="255"
+                    readonly={readOnly}
+                    onblur={handleNeeds}
+                  ></lightning-input>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </template>
+    </template>
+  </template>
+</template>

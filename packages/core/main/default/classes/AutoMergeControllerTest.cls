@@ -109,7 +109,11 @@ private class AutoMergeControllerTest {
 
 			Assert.areEqual(4, [SELECT COUNT() FROM Contact WHERE Id IN :people WITH SYSTEM_MODE]);
 			AutoMergeController.PanelView view = AutoMergeController.getView();
-			Assert.areEqual(2, view.runs[0].undone);
+			Assert.areEqual(
+				2,
+				view.runs[0].undone,
+				'Both undone, with nothing left to note: ' + String.join(view.runs[0].notes, ' | ')
+			);
 			Assert.isFalse(view.runs[0].canUndo, 'Nothing is left to undo.');
 			try {
 				AutoMergeController.undoRun('run-undo');

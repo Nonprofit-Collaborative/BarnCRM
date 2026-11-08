@@ -1,0 +1,7 @@
+{
+  "languages": ["en"],
+  "texts": {
+    "Portal_Code_Email_Body": "Your sign-in code for {0} is {1}. It works for {2} minutes.\n\nIf you did not ask to sign in, you can ignore this email: nobody can sign in without the code.",
+    "Portal_Code_Email_Subject": "Your sign-in code for {0}"
+  }
+}

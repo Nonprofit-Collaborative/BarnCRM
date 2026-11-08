@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <availableInTouch>false</availableInTouch>
+  <confirmationTokenRequired>false</confirmationTokenRequired>
+  <description>
+    Public form page for a Salesforce Site: add it to the Site and give the guest user Forms Public
+    Guest.
+  </description>
+  <label>FormsPublic</label>
+</ApexPage>

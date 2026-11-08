@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The call for speakers' rules in plain JavaScript: which applications can still be scored or
+    decided, the score choices and how an average reads (canonical model 29EV20). Imported by
+    eventApplications.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

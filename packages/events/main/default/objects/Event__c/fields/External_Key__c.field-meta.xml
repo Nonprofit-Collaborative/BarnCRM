@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>External_Key__c</fullName>
+  <description>Set by BarnCRM (EV-10): the key of the record this event was imported from, such as summit: and a Summit Events instance identifier. Unique, so an instance becomes one event however often the import runs.</description>
+  <externalId>true</externalId>
+  <inlineHelpText>Where this event was imported from. Empty for an event made in BarnCRM.</inlineHelpText>
+  <label>External Key</label>
+  <length>80</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>true</unique>
+  <caseSensitive>false</caseSensitive>
+</CustomField>

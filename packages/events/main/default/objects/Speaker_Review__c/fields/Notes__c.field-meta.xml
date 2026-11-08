@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Notes__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Why the reviewer gave this score.</inlineHelpText>
+  <label>Notes</label>
+  <trackTrending>false</trackTrending>
+  <length>5000</length>
+  <type>LongTextArea</type>
+  <visibleLines>4</visibleLines>
+</CustomField>

@@ -123,6 +123,11 @@
                                 <c-setup-change-log></c-setup-change-log>
                             </div>
                         </template>
+                        <template lwc:if={reportSubscriptionsOpened}>
+                            <div class={sectionClass.reportSubscriptions} data-id="tab-reportSubscriptions">
+                                <c-report-subscriptions></c-report-subscriptions>
+                            </div>
+                        </template>
                         <template lwc:if={accessExplorerOpened}>
                             <div class={sectionClass.accessExplorer} data-id="tab-accessExplorer">
                                 <c-access-explorer></c-access-explorer>

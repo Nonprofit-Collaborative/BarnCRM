@@ -172,6 +172,15 @@ To send a reminder again, a Coordinator clears **Reminder Sent On**; it goes out
 morning if the shift is still within the reminder window. To stop a person being reminded,
 change their sign-up to **Cancelled**.
 
+## To Know Whether a Short Shift Was Announced
+
+When your admin has turned on **Send unfilled shift nudges**, a shift that starts in the next few
+days and still has open places emails the active volunteers who have helped on that job before
+and are not yet signed up, once, early in the morning. Open the shift and look at **Nudge Sent
+On**: a date and time means the email went out; empty means it has not yet, or nobody could be
+written to. People reply to you directly, so book anyone who says yes in the **Sign-Ups** panel.
+To send the nudge again, a Coordinator clears **Nudge Sent On**.
+
 ## Common Problems
 
 - Problem: "This person is already signed up for ..." when you add a sign-up. Why and what to

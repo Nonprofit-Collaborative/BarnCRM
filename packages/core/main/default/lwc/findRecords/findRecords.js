@@ -113,6 +113,8 @@ const START_NOTES = {
 const DEFAULT_ROWS = 200;
 /** Rows the table shows at first and adds on each Show More; exports never use it. */
 const PAGE_SIZE = 25;
+// The server counts records with no geocode up to this many (FindController).
+const MAX_NO_GEOCODE_SHOWN = 10000;
 /** How long typing must pause before the SOQL preview asks the server (FINDA-4). */
 const PREVIEW_DEBOUNCE_MS = 300;
 const OFFERED_TYPES = new Set(['address', 'location', 'base64']);
@@ -247,6 +249,9 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
   related = [];
   children = [];
   relatedValid = true;
+  // Radius Find (C-69): within N miles of a postal code or a record's address.
+  radius;
+  radiusValid = true;
   aggregate;
   childLabels = {};
   editableFields = new Set();
@@ -714,6 +719,9 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
     if (this.children.length > 0) {
       document.children = this.children;
     }
+    if (this.radius) {
+      document.radius = this.radius;
+    }
     if (withSummary && this.aggregate) {
       document.aggregate = this.aggregate;
     }
@@ -727,7 +735,12 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
       return false;
     }
     const builder = this.template.querySelector('c-filter-builder');
-    if (!this.filterValid || !this.relatedValid || (builder && !builder.reportValidity())) {
+    if (
+      !this.filterValid ||
+      !this.relatedValid ||
+      !this.radiusValid ||
+      (builder && !builder.reportValidity())
+    ) {
       this.errorMessage = helpText('Core', 'Core_Find_FixConditions');
       return false;
     }
@@ -753,7 +766,8 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
       !this.objectApiName ||
       this.columns.length === 0 ||
       !this.filterValid ||
-      !this.relatedValid
+      !this.relatedValid ||
+      !this.radiusValid
     ) {
       this.soql = '';
       return;
@@ -794,6 +808,12 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
     this.children = event.detail.children;
     this.relatedValid = event.detail.valid;
     this.loadChildLabels();
+    this.schedulePreview();
+  }
+
+  handleRadiusChange(event) {
+    this.radius = event.detail.radius;
+    this.radiusValid = event.detail.valid;
     this.schedulePreview();
   }
 
@@ -944,6 +964,15 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
       this.shownCount = PAGE_SIZE;
       this.draftValues = [];
       this.tableErrors = undefined;
+      // A record whose address has no geocode is never within a distance: say so (C-69).
+      if (result.withoutGeocode > 0) {
+        this.noticeMessage = format(
+          helpText('Core', 'Core_Find_RadiusNoGeocodeNote'),
+          result.withoutGeocode >= MAX_NO_GEOCODE_SHOWN
+            ? `${MAX_NO_GEOCODE_SHOWN.toLocaleString()} or more`
+            : String(result.withoutGeocode)
+        );
+      }
     });
   }
 
@@ -1139,6 +1168,9 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
     if (document.related) {
       start.related = document.related;
     }
+    if (document.radius) {
+      start.radius = document.radius;
+    }
     this.deleteQueryJson = undefined;
     this[NavigationMixin.Navigate]({
       type: 'standard__navItemPage',
@@ -1216,6 +1248,8 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
     this.rowLimit = document.limit || DEFAULT_ROWS;
     this.related = document.related || [];
     this.children = document.children || [];
+    this.radius = document.radius;
+    this.radiusValid = true;
     this.aggregate = document.aggregate;
     this.loadChildLabels();
     this.loadEditable();
@@ -1241,6 +1275,8 @@ export default class FindRecords extends NavigationMixin(LightningElement) {
     this.related = [];
     this.children = [];
     this.relatedValid = true;
+    this.radius = undefined;
+    this.radiusValid = true;
     this.aggregate = undefined;
     this.draftValues = [];
     this.tableErrors = undefined;

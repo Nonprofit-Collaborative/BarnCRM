@@ -9,7 +9,7 @@ entry. Test classes are not listed.
 The default is `with sharing` or `inherited sharing` and user-mode queries and DML (plan Section
 4.13). ADR-0021 (system mode writes for package owned data) and its extensions (ADR-0027 for
 scheduled upkeep, ADR-0057 and ADR-0134) are the authority for every exception. The reasons fall
-into five kinds:
+into six kinds:
 
 | Kind | Meaning |
 |---|---|
@@ -18,6 +18,7 @@ into five kinds:
 | Org job | A scheduled or queued job works on the whole org, not on what its scheduler can see. |
 | Org figure | A total or count must be the organization's figure, not the viewer's share. |
 | Platform | The platform allows the write only as the system (an Apex sharing reason share, a protected custom setting). |
+| Portal | Called by the portal integration user, which has no object access; every read and write is scoped in code to the verified portal person and their template (ADR-0185 portal builder). |
 
 ## Core
 
@@ -79,8 +80,10 @@ into five kinds:
 | VolunteerErasureSelector | Integrity | Every Volunteers record naming a person being erased, so erasure refuses rather than leaves one | ADR-0021 |
 | VolunteerHealthCheckSelector | Org figure | Private volunteer hours for Health Check's counts | ADR-0021, ADR-0057 |
 | VolunteerIntegritySelector | Integrity | Hours, sign-ups and attendance entries another staff member made | ADR-0021 |
+| VolunteerNudgeSelector | Org job | Every unfilled shift and the email address of each volunteer who has helped on its job, for the morning nudges | ADR-0021 |
 | VolunteerReminderSelector | Org job | Every booking and email address for the morning reminders | ADR-0021 |
 | VolunteersHouseholdDependentsExtension | Integrity | Private hours that keep a household from being deleted | ADR-0021 |
+| VolunteersPortalExtension | Portal | The shift a portal person signs up for and that person's own sign-up to cancel; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-0191 portal templates |
 
 ## Programs
 
@@ -105,6 +108,38 @@ into five kinds:
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
 | GrantReminderSelector | Org job | Every grant requirement for the morning reminders | ADR-0021 |
+
+## Contact Point Sync
+
+| Class | Kind | What it reaches past sharing for | Authority |
+|---|---|---|---|
+| ContactPointSyncService | Upkeep | The person's managed Contact Points, Individual and Contact Point Links, which the saver may not be able to see or edit | ADR-0021, ADR-0176 contact point sync module |
+| ContactPointBackfillBatch | Org job | Every person in the org, synced as a save would; started only from the Contact Point Sync page by a holder of Manage BarnCRM Settings | ADR-0021, ADR-0176 contact point sync module |
+
+## Forms
+
+| Class | Kind | What it reaches past sharing for | Authority |
+|---|---|---|---|
+| FormIntakeService | Platform | A Site guest user, who has no object access, loads one published public form and version and stores one Received submission; it never reads a person, an organization or any other record, and processing runs later in user mode. It also serves a module's public page (EV-16) and checks only that the form the page names is published and public | ADR-0184 public forms on a Salesforce Site, ADR-0190 public event pages |
+
+## Event Management
+
+| Class | Kind | What it reaches past sharing for | Authority |
+|---|---|---|---|
+| EventPublicPage | Platform | A Site guest user or the API's integration user reads one event staff marked Public Page (Open or Closed only): its public fields, active tickets, confirmed sessions, seat counts with Show Seats Left, and confirmed speakers' names, headlines and bios with Show Speakers; never the online link, codes, registrations, attendees or other person fields | ADR-0190 public event pages |
+
+## Portal Builder
+
+| Class | Kind | What it reaches past sharing for | Authority |
+|---|---|---|---|
+| PortalAuth | Portal | Portals, accesses and sessions, and the one Contact an email names, to send and check sign-in codes and resolve sessions; only hashes are stored | ADR-0021, ADR-0185 portal builder |
+| PortalData | Portal | The verified person's own Contact and the records a template names, filtered by that person or the catalog's fixed tests; only `edit` fields are written | ADR-0021, ADR-0185 portal builder |
+
+## Event Management
+
+| Class | Kind | What it reaches past sharing for | Authority |
+|---|---|---|---|
+| EventsPortalExtension | Portal | The open event a portal person proposes a talk for and that person's own proposal to withdraw; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-0191 portal templates |
 
 ## Mirror
 

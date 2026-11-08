@@ -115,7 +115,34 @@ public with sharing class ModuleManagerService {
 			'Grant_Fund_Entry__c',
 			'Grant_Payment__c',
 			'Grant_Requirement__c'
-		}
+		},
+		'Forms' => new List<String>{
+			'Form__c',
+			'Form_Draft__c',
+			'Form_Submission__c',
+			'Form_Version__c'
+		},
+		'ContactPoints' => new List<String>{ 'Contact_Point_Link__c' },
+		'Events' => new List<String>{
+			'Event__c',
+			'Event_Attendee__c',
+			'Event_Registration__c',
+			'Event_Appointment__c',
+			'Event_Session__c',
+			'Event_Speaker__c',
+			'Event_Sponsor__c',
+			'Event_Survey_Response__c',
+			'Event_Track__c',
+			'Promo_Code__c',
+			'Session_Speaker__c',
+			'Speaker_Application__c',
+			'Speaker_Review__c',
+			'Sponsor_Deliverable__c',
+			'Sponsorship_Level__c',
+			'Event_Table__c',
+			'Ticket_Type__c'
+		},
+		'Portal' => new List<String>{ 'Portal__c', 'Portal_Access__c', 'Portal_Session__c' }
 	};
 
 	/** The permission set Turn on gives the person who turned the module on. */
@@ -126,7 +153,11 @@ public with sharing class ModuleManagerService {
 		'Volunteers' => 'Volunteers_Admin',
 		'Programs' => 'Programs_Admin',
 		'LogicModels' => 'Logic_Models_Admin',
-		'Funders' => 'Funders_Admin'
+		'Funders' => 'Funders_Admin',
+		'Forms' => 'Forms_Admin',
+		'ContactPoints' => 'Contact_Point_Sync_Admin',
+		'Events' => 'Events_Admin',
+		'Portal' => 'Portal_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */

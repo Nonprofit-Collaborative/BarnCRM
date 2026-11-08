@@ -934,6 +934,14 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # Funders depends on Core only (ADR-0161, amended by ADR-0162 decision 1): its totals are
   # platform roll-up summaries, not Rollup Builder definitions.
   MODULES+=(funders)
+  # Forms depends on Core only (ADR-0175, forms module).
+  MODULES+=(forms)
+  # Contact Point Sync depends on Core only (ADR-0176 contact point sync module).
+  MODULES+=(contactpoints)
+  # Event Management depends on Core only (ADR-0177, events module).
+  MODULES+=(events)
+  # Portal Builder depends on Core only (ADR-0185, portal builder).
+  MODULES+=(portal)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
   RECORD_PACKAGES+=("${MODULES[@]}")
@@ -985,11 +993,14 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # missing tab, ADR-0013), so each deployed module's tabs join the BarnCRM apps here, from its
   # BarnCRM_Module__mdt record (ADR-0137). The app
   # copies are written to a temporary metadata-format package; the repository's app files are
-  # never changed. Nothing is deployed when no module names a tab.
-  deployed_modules=(rollups giving mirror programs logicmodels funders)
+  # never changed. --all writes all four apps every time, so each holds exactly Core plus the
+  # modules deployed here, and a module left out has its tabs taken out (ADR-0192, Batch C
+  # modules add their tabs to the BarnCRM apps). Forms, Event Management and Portal Builder
+  # have no app of their own: these apps are where their tabs live (D-188).
+  deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"
-  python3 scripts/org/module-app-tabs.py "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1
+  python3 scripts/org/module-app-tabs.py --all "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1
   deploy_stage "Module tabs in the BarnCRM apps" --metadata-dir "$APP_TABS_DIR" || exit $?
   rm -rf "$APP_TABS_DIR"
 
@@ -1023,7 +1034,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     if volunteers_has_metadata; then
       SETUP_MODULES+=(Volunteers)
     fi
-    SETUP_MODULES+=(Programs LogicModels Funders Mirror)
+    SETUP_MODULES+=(Programs LogicModels Funders Forms ContactPoints Events Portal Mirror)
     for module in "${SETUP_MODULES[@]}"; do
       echo ""
       echo "== Running the ${module} module's setup steps =="
@@ -1093,6 +1104,39 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   if ! printf '%s\n' 'new FundersAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
     echo "The Funders access sync was not queued. Nothing else is affected: the hourly access"
     echo "check syncs the access."
+  fi
+
+  # The same gap for the Forms permission sets (ADR-0175, forms module, decision 11).
+  echo ""
+  echo "== Queueing the Forms access sync =="
+  if ! printf '%s\n' 'new FormsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Forms access sync was not queued. Nothing else is affected: the hourly access"
+    echo "check syncs the access."
+  fi
+
+  # The same gap for the Contact Point Sync permission set (ADR-0176 contact point sync module,
+  # decision 12).
+  echo ""
+  echo "== Queueing the Contact Point Sync access sync =="
+  if ! printf '%s\n' 'new ContactPointsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Contact Point Sync access sync was not queued. Nothing else is affected: the hourly"
+    echo "access check syncs the access."
+  fi
+
+  # The same gap for the Event Management permission sets (ADR-0177, events module, decision 7).
+  echo ""
+  echo "== Queueing the Event Management access sync =="
+  if ! printf '%s\n' 'new EventsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Event Management access sync was not queued. Nothing else is affected: the hourly"
+    echo "access check syncs the access."
+  fi
+
+  # The same gap for the Portal Builder admin set (ADR-0185, portal builder, decision 10).
+  echo ""
+  echo "== Queueing the Portal Builder access sync =="
+  if ! printf '%s\n' 'new PortalAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Portal Builder access sync was not queued. Nothing else is affected: the hourly"
+    echo "access check syncs the access."
   fi
 fi
 

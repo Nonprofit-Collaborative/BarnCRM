@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Portal Sign-In</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Enabled__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Portal_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Portals</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Portal</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">10</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">Whether any portal accepts sign-ins and calls from the portal client. Off by default. Turning it off signs everyone out of every portal on their next click. Set up the integration user first (see the Portal Builder setup guide).</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">portal-builder.md</value></values>
+</CustomMetadata>

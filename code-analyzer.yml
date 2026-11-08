@@ -1,0 +1,7 @@
+# Salesforce Code Analyzer configuration (CI runs it from the repository root).
+ignores:
+  files:
+    # Third-party library shipped unmodified (MIT, listed in NOTICE): QR Code Generator for
+    # JavaScript, the EV-12 check-in QR codes. Linting it would mean modifying it. The repo's
+    # own eslint.config.js already ignores every static resource.
+    - '**/staticresources/BarnQrCode.js'

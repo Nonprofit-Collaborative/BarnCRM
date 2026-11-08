@@ -174,6 +174,47 @@ describe('c/findQueryText', () => {
     ).toBe('NOT 1');
   });
 
+  it('reads a distance from a place into the radius key, beside other conditions', () => {
+    const document = parseQueryText(
+      "SELECT Name FROM Contact WHERE LastName = 'Rivera' AND " +
+        "DISTANCE(MailingAddress, GEOLOCATION(42.3126, -71.0553), 'mi') < 25"
+    );
+
+    expect(document.radius).toEqual({
+      field: 'MailingAddress',
+      miles: 25,
+      latitude: 42.3126,
+      longitude: -71.0553
+    });
+    expect(document.filter.conditions).toEqual([
+      { id: 1, field: 'LastName', operator: 'equals', value: 'Rivera' }
+    ]);
+    expect(
+      parseQueryText(
+        "SELECT Name FROM Contact WHERE DISTANCE(MailingAddress, GEOLOCATION(1, 2), 'mi') < 3"
+      ).filter
+    ).toBeUndefined();
+  });
+
+  it('refuses a distance the document cannot hold', () => {
+    const base = 'SELECT Name FROM Contact WHERE ';
+    expect(problemOf(`${base}DISTANCE(MailingAddress, GEOLOCATION(1, 2), 'km') < 3`)).toBe(
+      PROBLEMS.UNSUPPORTED
+    );
+    expect(problemOf(`${base}DISTANCE(MailingAddress, GEOLOCATION(1, 2), 'mi') > 3`)).toBe(
+      PROBLEMS.UNSUPPORTED
+    );
+    expect(
+      problemOf(`${base}Name = 'a' OR DISTANCE(MailingAddress, GEOLOCATION(1, 2), 'mi') < 3`)
+    ).toBe(PROBLEMS.RELATED_PLACE);
+    expect(
+      problemOf(
+        `${base}DISTANCE(MailingAddress, GEOLOCATION(1, 2), 'mi') < 3 AND ` +
+          "DISTANCE(OtherAddress, GEOLOCATION(1, 2), 'mi') < 3"
+      )
+    ).toBe(PROBLEMS.UNSUPPORTED);
+  });
+
   it('refuses what the document cannot hold, saying where', () => {
     expect(problemOf('')).toBe(PROBLEMS.EMPTY);
     expect(problemOf('SELECT COUNT(Id) FROM Account')).toBe(PROBLEMS.UNSUPPORTED);

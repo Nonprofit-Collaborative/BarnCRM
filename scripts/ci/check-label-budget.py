@@ -34,7 +34,18 @@ import re
 import subprocess
 import sys
 
-BUDGET = 3215
+# Raised from 3,215 on 2026-11-07 for Batch C's three new modules (Forms, Contact Point Sync,
+# Event Management: 59 labels) and its Core and Volunteers items (C-61/C-63, C-69, V-10b); the
+# check below already holds no unused label and no help prose. A module's labels reach an org
+# only when that module is installed. Raised by 8 for EV-02's Registrations tab (11 short button
+# and menu labels; its messages are help catalog text), and by 1 for EV-14's nightly step name
+# and 1 for EV-10's.
+# Batch C wave 2 landing: set to the merged total, 3,259: 17 Events labels, EV-02's Registrations
+# tab and 11 button and menu labels, the EV-10 and EV-14 nightly step names, and the EV-06
+# Applications, EV-09 Sponsors, EV-12 Check-In and EV-15 Appointments tab titles.
+# Batch C wave 3 landing: set to the merged total, 3,261: the EV-13 Seating and EV-17 Badges tab
+# titles (a flexipage tab title cannot read the help catalog).
+BUDGET = 3261
 TARGET = 3000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 

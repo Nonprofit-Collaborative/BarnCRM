@@ -23,7 +23,17 @@ import sys
 LABEL = re.compile(r"<labels>(.*?)</labels>", re.DOTALL)
 LIMITS = {"fullName": 80, "shortDescription": 80, "value": 1000}
 PLACEHOLDER = re.compile(r"\{\d+\}")
-PLACEHOLDER_PACKAGES = {"core", "rollups", "volunteers", "programs", "logicmodels", "funders"}
+PLACEHOLDER_PACKAGES = {
+    "core",
+    "rollups",
+    "volunteers",
+    "programs",
+    "logicmodels",
+    "funders",
+    "forms",
+    "contactpoints",
+    "events",
+}
 
 
 def text_of(block, tag):

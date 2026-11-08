@@ -28,8 +28,9 @@ Settings** permission to install, turn on, turn off, or check what an uninstall 
 
 Which modules are listed depends on the edition chosen in first-run setup (see
 [BarnCRM Settings, First-run setup](barncrm-settings.md#first-run-setup)). The Standard Edition (or no edition chosen yet) lists
-Core and BarnCRM Rollup Builder. The Nonprofit Edition lists all eight: Core, BarnCRM Rollup
-Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM
+Core, BarnCRM Rollup Builder, BarnCRM Forms, BarnCRM Contact Point Sync, BarnCRM Event
+Management and BarnCRM Portal Builder. The Nonprofit Edition lists all twelve: Core, BarnCRM Rollup Builder, BarnCRM Forms,
+BarnCRM Contact Point Sync, BarnCRM Event Management, BarnCRM Portal Builder, BarnCRM Giving, BarnCRM Volunteers, BarnCRM Programs, BarnCRM Logic Models, BarnCRM
 Funders and BarnCRM Mirror. A module that is installed is always listed, whatever the edition. See
 [Editions](editions.md).
 
@@ -48,6 +49,9 @@ shows no section.
 No module is installed with Core or by first-run setup: a module is installed only when you
 install it from this section. An installed module's row links to its own app, where it has
 one. Rollup Builder has no app of its own: its **Rollup Builder** tab is in the **BarnCRM
+Admin** apps, and so is Contact Point Sync's **Contact Point Sync** tab. Forms, Event
+Management and Portal Builder have no app of their own either (D-188): Forms' and Event
+Management's tabs are in the everyday **BarnCRM** apps, Portal Builder's in the **BarnCRM
 Admin** apps. Volunteers has a Settings tab in its app, where its settings live; Giving's
 BarnCRM Fundraising app has no Settings tab, and Mirror has no app of its own. (Some module settings
 still show in BarnCRM Settings for now; they move to the module's app in a later release.) Core's own

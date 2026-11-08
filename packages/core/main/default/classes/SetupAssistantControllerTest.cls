@@ -210,7 +210,17 @@ private class SetupAssistantControllerTest {
 				state.suite.giving.docsUrl.endsWith('/giving/README.md'),
 				'The step can say where to read about Giving'
 			);
-			Assert.areEqual(8, state.modules.size(), 'The modules step now offers all eight');
+			Integer offered = 1;
+			for (BarnCRM_Module__mdt row : BarnCRM_Module__mdt.getAll().values()) {
+				if (ModuleDetectionService.offeredIn(row, ModuleDetectionService.SUITE_NONPROFIT)) {
+					offered++;
+				}
+			}
+			Assert.areEqual(
+				offered,
+				state.modules.size(),
+				'The modules step now offers Core and every module in the catalog'
+			);
 			Assert.areEqual(
 				8,
 				state.stepsTotal,

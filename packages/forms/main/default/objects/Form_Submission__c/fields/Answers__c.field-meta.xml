@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Answers__c</fullName>
+  <description>The answers as JSON, by field key, hidden fields left out (canonical model 29ZY, R-FS1).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The answers as JSON. The Submission panel shows them by question.</inlineHelpText>
+  <label>Answers</label>
+  <length>131072</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>5</visibleLines>
+</CustomField>

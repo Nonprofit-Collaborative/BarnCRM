@@ -13,7 +13,8 @@ public with sharing class VolunteersNightlyJobProvider implements NightlyStepPro
 	public List<NightlyStep> nightlySteps() {
 		return new List<NightlyStep>{
 			VolunteersScheduler.step(),
-			VolunteerReminderScheduler.step()
+			VolunteerReminderScheduler.step(),
+			VolunteerNudgeScheduler.step()
 		};
 	}
 }

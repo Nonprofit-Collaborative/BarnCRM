@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Host__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The person who hosts the table, such as a board member.</inlineHelpText>
+  <label>Host</label>
+  <referenceTo>Contact</referenceTo>
+  <relationshipLabel>Hosted Event Tables</relationshipLabel>
+  <relationshipName>Hosted_Event_Tables</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,49 @@
+<template>
+  <lightning-modal-header label={label}></lightning-modal-header>
+  <lightning-modal-body>
+    <p class="slds-var-m-bottom_small" data-id="repeat-intro">{intro}</p>
+    <lightning-radio-group
+      data-id="repeat-frequency"
+      class="slds-var-m-bottom_small"
+      name="frequency"
+      label={labels.repeats}
+      type="button"
+      options={frequencyOptions}
+      value={frequency}
+      onchange={handleFrequency}
+    ></lightning-radio-group>
+    <lightning-input
+      data-id="repeat-count"
+      class="slds-var-m-bottom_small"
+      type="number"
+      label={labels.howMany}
+      min="1"
+      max={maxCount}
+      step="1"
+      value={count}
+      onchange={handleCount}
+      required
+    ></lightning-input>
+    <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.preview}</h2>
+    <ul class="slds-list_dotted" data-id="repeat-preview">
+      <template for:each={previewRows} for:item="row">
+        <li key={row.key}>{row.text}</li>
+      </template>
+    </ul>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button
+      data-id="repeat-cancel"
+      label={labels.cancel}
+      onclick={handleCancel}
+    ></lightning-button>
+    <lightning-button
+      data-id="repeat-confirm"
+      class="slds-var-m-left_x-small"
+      variant="brand"
+      label={labels.confirm}
+      disabled={cannotConfirm}
+      onclick={handleConfirm}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>

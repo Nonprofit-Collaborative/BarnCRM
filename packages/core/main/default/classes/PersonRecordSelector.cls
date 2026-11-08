@@ -82,6 +82,7 @@ public with sharing class PersonRecordSelector {
 	 * True when this account record holds a person: its record type is a person type. The
 	 * record type is read from the values the record actually carries.
 	 */
+	@NamespaceAccessible
 	public static Boolean isPersonRecord(SObject record) {
 		if (record == null) {
 			return false;
@@ -234,6 +235,7 @@ public with sharing class PersonRecordSelector {
 	 * person, and every account in an org that does not store people as accounts, is absent
 	 * from the answer rather than mapped to null.
 	 */
+	@NamespaceAccessible
 	public static Map<Id, Id> getPersonContactIds(Set<Id> personRecordIds) {
 		Map<Id, Id> result = new Map<Id, Id>();
 		if (personRecordIds == null || personRecordIds.isEmpty()) {

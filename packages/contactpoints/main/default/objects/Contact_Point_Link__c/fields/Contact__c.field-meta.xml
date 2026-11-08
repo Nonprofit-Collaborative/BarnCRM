@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Contact__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The person this copy belongs to.</inlineHelpText>
+  <label>Person</label>
+  <referenceTo>Contact</referenceTo>
+  <relationshipLabel>Contact Point Links</relationshipLabel>
+  <relationshipName>Contact_Point_Links</relationshipName>
+  <relationshipOrder>0</relationshipOrder>
+  <reparentableMasterDetail>false</reparentableMasterDetail>
+  <trackTrending>false</trackTrending>
+  <type>MasterDetail</type>
+  <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

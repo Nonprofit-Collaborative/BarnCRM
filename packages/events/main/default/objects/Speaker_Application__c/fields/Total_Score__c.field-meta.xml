@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Total_Score__c</fullName>
+  <inlineHelpText>The scores added together.</inlineHelpText>
+  <label>Total Score</label>
+  <trackTrending>false</trackTrending>
+  <summaryForeignKey>Speaker_Review__c.Speaker_Application__c</summaryForeignKey>
+  <summarizedField>Speaker_Review__c.Score__c</summarizedField>
+  <summaryOperation>sum</summaryOperation>
+  <type>Summary</type>
+</CustomField>

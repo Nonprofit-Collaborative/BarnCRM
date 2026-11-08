@@ -1,0 +1,237 @@
+<template>
+  <template lwc:if={helpReady}>
+    <p class="slds-var-m-bottom_small slds-text-color_weak" data-id="intro">{labels.intro}</p>
+
+    <template lwc:if={hasSummary}>
+      <p class="slds-var-m-bottom_small" data-id="summary">{summaryText}</p>
+    </template>
+
+    <template lwc:if={showNewButton}>
+      <lightning-button
+        data-id="new-registration"
+        class="slds-var-m-bottom_small"
+        label={labels.newRegistration}
+        icon-name="utility:add"
+        onclick={handleOpenForm}
+      ></lightning-button>
+    </template>
+
+    <template lwc:if={formOpen}>
+      <div class="slds-box slds-var-m-bottom_small" data-id="registration-form">
+        <lightning-record-picker
+          data-id="existing-person"
+          label={labels.existingPerson}
+          placeholder={labels.existingPerson}
+          object-api-name="Contact"
+          onchange={handlePick}
+        ></lightning-record-picker>
+        <template lwc:if={showTypedPerson}>
+          <div class="slds-grid slds-wrap slds-gutters_x-small">
+            <lightning-input
+              class="slds-col slds-size_1-of-2"
+              data-field="firstName"
+              label={fieldLabels.Contact.FirstName}
+              value={form.firstName}
+              onchange={handleField}
+            ></lightning-input>
+            <lightning-input
+              class="slds-col slds-size_1-of-2"
+              data-field="lastName"
+              label={fieldLabels.Contact.LastName}
+              value={form.lastName}
+              required
+              onchange={handleField}
+            ></lightning-input>
+            <lightning-input
+              class="slds-col slds-size_1-of-2"
+              data-field="email"
+              type="email"
+              label={fieldLabels.Contact.Email}
+              value={form.email}
+              onchange={handleField}
+            ></lightning-input>
+            <lightning-input
+              class="slds-col slds-size_1-of-2"
+              data-field="postalCode"
+              label={fieldLabels.Contact.MailingPostalCode}
+              value={form.postalCode}
+              onchange={handleField}
+            ></lightning-input>
+          </div>
+        </template>
+        <div class="slds-grid slds-wrap slds-gutters_x-small">
+          <template lwc:if={hasTickets}>
+            <lightning-combobox
+              class="slds-col slds-size_1-of-2"
+              data-field="ticketTypeId"
+              label={fieldLabels.Attendee.Ticket_Type__c}
+              options={ticketOptions}
+              value={form.ticketTypeId}
+              onchange={handleField}
+            ></lightning-combobox>
+          </template>
+          <lightning-input
+            class="slds-col slds-size_1-of-2"
+            data-field="promoCode"
+            label={fieldLabels.Registration.Promo_Code__c}
+            value={form.promoCode}
+            onchange={handleField}
+          ></lightning-input>
+        </div>
+
+        <template for:each={guestRows} for:item="guest">
+          <div key={guest.key} class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-top_x-small" data-id="guest-row">
+            <lightning-input
+              class="slds-col slds-size_1-of-4"
+              data-index={guest.index}
+              data-field="firstName"
+              label={fieldLabels.Contact.FirstName}
+              value={guest.firstName}
+              onchange={handleGuestField}
+            ></lightning-input>
+            <lightning-input
+              class="slds-col slds-size_1-of-4"
+              data-index={guest.index}
+              data-field="lastName"
+              label={fieldLabels.Contact.LastName}
+              value={guest.lastName}
+              onchange={handleGuestField}
+            ></lightning-input>
+            <lightning-input
+              class="slds-col slds-size_1-of-4"
+              data-index={guest.index}
+              data-field="email"
+              type="email"
+              label={fieldLabels.Contact.Email}
+              value={guest.email}
+              onchange={handleGuestField}
+            ></lightning-input>
+            <template lwc:if={hasTickets}>
+              <lightning-combobox
+                class="slds-col slds-size_1-of-4"
+                data-index={guest.index}
+                data-field="ticketTypeId"
+                label={fieldLabels.Attendee.Ticket_Type__c}
+                options={ticketOptions}
+                value={guest.ticketTypeId}
+                onchange={handleGuestField}
+              ></lightning-combobox>
+            </template>
+            <lightning-button-icon
+              data-index={guest.index}
+              class="slds-align-bottom slds-var-m-left_x-small"
+              icon-name="utility:close"
+              variant="bare"
+              alternative-text={guest.removeLabel}
+              title={guest.removeLabel}
+              onclick={handleRemoveGuest}
+            ></lightning-button-icon>
+          </div>
+        </template>
+
+        <div class="slds-var-m-top_small">
+          <lightning-button
+            data-id="add-guest"
+            label={labels.addGuest}
+            icon-name="utility:adduser"
+            onclick={handleAddGuest}
+          ></lightning-button>
+          <lightning-button
+            data-id="form-cancel"
+            class="slds-var-m-left_x-small"
+            label={labels.cancel}
+            onclick={handleCloseForm}
+          ></lightning-button>
+          <lightning-button
+            data-id="form-register"
+            class="slds-var-m-left_x-small"
+            variant="brand"
+            label={labels.register}
+            disabled={cannotRegister}
+            onclick={handleRegister}
+          ></lightning-button>
+        </div>
+      </div>
+    </template>
+
+    <template lwc:if={isLoading}>
+      <lightning-spinner alternative-text={labels.registrations} size="small"></lightning-spinner>
+    </template>
+
+    <template lwc:if={hasError}>
+      <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+    </template>
+
+    <template lwc:if={truncated}>
+      <c-barn-notice variant="info" message={labels.truncated} data-id="truncated"></c-barn-notice>
+    </template>
+
+    <template lwc:if={showEmpty}>
+      <c-barn-empty-state data-id="empty-state" message={labels.empty}></c-barn-empty-state>
+    </template>
+
+    <template lwc:if={hasRows}>
+      <table
+        class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_stacked-horizontal"
+        data-id="attendees"
+      >
+        <thead>
+          <tr class="slds-line-height_reset">
+            <th scope="col">{fieldLabels.Attendee.Name}</th>
+            <th scope="col">{fieldLabels.Registration.Name}</th>
+            <th scope="col">{fieldLabels.Attendee.Ticket_Type__c}</th>
+            <th scope="col">{fieldLabels.Attendee.Price__c}</th>
+            <th scope="col">{fieldLabels.Attendee.Status__c}</th>
+            <th scope="col"><span class="slds-assistive-text">{labels.actions}</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <template for:each={rows} for:item="row">
+            <tr key={row.id} data-id="attendee-row">
+              <th scope="row" data-label={fieldLabels.Attendee.Name}>
+                <template lwc:if={row.href}>
+                  <a href={row.href}>{row.name}</a>
+                </template>
+                <template lwc:else>{row.name}</template>
+              </th>
+              <td data-label={fieldLabels.Registration.Name}>
+                <a href={row.registrationHref}>{row.registrationName}</a>
+              </td>
+              <td data-label={fieldLabels.Attendee.Ticket_Type__c}>{row.ticketName}</td>
+              <td data-label={fieldLabels.Attendee.Price__c}>
+                <lightning-formatted-number
+                  value={row.price}
+                  format-style="currency"
+                  currency-code={currencyCode}
+                ></lightning-formatted-number>
+              </td>
+              <td data-label={fieldLabels.Attendee.Status__c}>
+                <c-barn-status-badge status={row.statusWord} label={row.status}></c-barn-status-badge>
+              </td>
+              <td>
+                <template lwc:if={row.hasMenu}>
+                  <lightning-button-menu
+                    data-id={row.id}
+                    alternative-text={row.menuLabel}
+                    icon-size="x-small"
+                    menu-alignment="right"
+                    disabled={busy}
+                    onselect={handleMenu}
+                  >
+                    <template for:each={row.menuItems} for:item="item">
+                      <lightning-menu-item
+                        key={item.value}
+                        label={item.label}
+                        value={item.value}
+                      ></lightning-menu-item>
+                    </template>
+                  </lightning-button-menu>
+                </template>
+              </td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </template>
+  </template>
+</template>

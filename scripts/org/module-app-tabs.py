@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Writes copies of the four Core apps with each deployed module's tabs added, for a deploy.
 
-    python3 scripts/org/module-app-tabs.py OUT_DIR FOLDER [FOLDER ...]
+    python3 scripts/org/module-app-tabs.py [--all] OUT_DIR FOLDER [FOLDER ...]
 
 Core may not name a module's tab in its own apps: a deploy of Core alone would fail on the
 missing tab, and Core runs alone (ADR-0013). So the module tabs reach the BarnCRM apps from
@@ -18,6 +18,12 @@ The repository's app files are never changed. OUT_DIR receives a metadata-format
 (`package.xml` and `applications/<App>.app`) holding only the apps that changed, ready for
 `sf project deploy start --metadata-dir OUT_DIR`. Nothing is written when nothing changes, and
 the script prints how many apps it wrote, so the caller can skip the deploy.
+
+With --all, all four apps are written, changed or not, so the deploy leaves each app holding
+exactly Core's tabs plus those of the folders named. That is how a removed module's tabs leave
+the apps: name only the modules kept (ADR-0192, Batch C modules add their tabs to the BarnCRM
+apps). Forms, Event Management and Portal Builder ship no app of their own (D-188); their
+record pages are each object's org default instead.
 """
 
 import glob
@@ -99,10 +105,11 @@ def key(override):
     return tuple(override.findtext(q(tag)) for tag in ("actionName", "formFactor", "pageOrSobjectType"))
 
 
-def changed_app(app_path, tabs, overrides):
+def changed_app(app_path, tabs, overrides, write_all=False):
     """The app's XML with the tabs added after its last tab, or before Error Log when the app has
     it, since Error Log is always an app's last tab (D-135), with a console workspace mapping for
-    each, and the overrides after its last override; None when nothing is new."""
+    each, and the overrides after its last override; None when nothing is new, unless
+    write_all asks for the app as it is."""
     app = ET.parse(app_path).getroot()
     children = list(app)
     present = {child.text for child in children if child.tag == q("tabs")}
@@ -114,7 +121,7 @@ def changed_app(app_path, tabs, overrides):
             held.add(key(override))
             new_overrides.append(override)
     if not new_tabs and not new_overrides:
-        return None
+        return ET.tostring(app, encoding="unicode", xml_declaration=True) if write_all else None
     tab_positions = [i for i, child in enumerate(children) if child.tag == q("tabs")]
     error_log = [i for i in tab_positions if children[i].text == ERROR_LOG_TAB]
     start = error_log[0] if error_log else max(tab_positions) + 1
@@ -143,15 +150,16 @@ def api_version(root):
         return json.load(handle)["sourceApiVersion"]
 
 
-def write_package(root, out_dir, folders):
-    """Writes the changed apps and their package.xml; returns the app names written."""
+def write_package(root, out_dir, folders, write_all=False):
+    """Writes the changed apps (all four with write_all) and their package.xml; returns the app
+    names written."""
     tabs, overrides, missing = changes(root, folders)
     for name in missing:
         print(f"Skipped {name}: the catalog names it but the package ships no such tab.")
     written = []
     for app in STAFF_APPS + ADMIN_APPS:
         source = os.path.join(root, CORE, "applications", app + ".app-meta.xml")
-        xml = changed_app(source, tabs[app], overrides.get(app, []))
+        xml = changed_app(source, tabs[app], overrides.get(app, []), write_all)
         if xml is None:
             continue
         os.makedirs(os.path.join(out_dir, "applications"), exist_ok=True)
@@ -171,10 +179,12 @@ def write_package(root, out_dir, folders):
 
 
 def main(argv):
-    if len(argv) < 2:
-        print("Usage: module-app-tabs.py OUT_DIR FOLDER [FOLDER ...]", file=sys.stderr)
+    write_all = "--all" in argv
+    argv = [arg for arg in argv if arg != "--all"]
+    if len(argv) < (1 if write_all else 2):
+        print("Usage: module-app-tabs.py [--all] OUT_DIR FOLDER [FOLDER ...]", file=sys.stderr)
         return 2
-    written = write_package(ROOT, argv[0], set(argv[1:]))
+    written = write_package(ROOT, argv[0], set(argv[1:]), write_all)
     print(f"{len(written)} app(s) written: {', '.join(written) or 'none'}")
     return 0
 

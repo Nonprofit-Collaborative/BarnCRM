@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Valid_Until_After_From</fullName>
+  <active>true</active>
+  <description>R-PC4: a code's window ends after it starts, when both are set.</description>
+  <errorConditionFormula>
+AND(
+  NOT(ISBLANK(Valid_From__c)),
+  NOT(ISBLANK(Valid_Until__c)),
+  Valid_Until__c &lt;= Valid_From__c
+)
+  </errorConditionFormula>
+  <errorDisplayField>Valid_Until__c</errorDisplayField>
+  <errorMessage>Valid Until must be after Valid From.</errorMessage>
+</ValidationRule>

@@ -32,6 +32,11 @@ const ICONS = Object.freeze({
   Organizations: 'custom:custom24',
   Record_Inspector: 'custom:custom38',
   Relationship__c: 'custom:custom37',
+  // Events
+  Event__c: 'custom:custom89',
+  Event_Speaker__c: 'custom:custom75',
+  Events_Calendar: 'custom:custom66',
+  Events_Home: 'custom:custom81',
   // Funders
   Funder_Report_Template__c: 'custom:custom99',
   Funders_Board: 'custom:custom100',
@@ -72,8 +77,16 @@ const ICONS = Object.freeze({
   Stewardship_Plan__c: 'custom:custom43',
   Stewardship_Plans: 'custom:custom4',
   Tribute__c: 'custom:custom5',
+  // Forms
+  Form_Submission__c: 'custom:custom51',
+  Form__c: 'custom:custom28',
   // Logic Models
   Logic_Model__c: 'custom:custom62',
+  // Contact Point Sync
+  Contact_Point_Sync: 'custom:custom59',
+  // Portal Builder
+  Portal_Access__c: 'custom:custom77',
+  Portal__c: 'custom:custom47',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',

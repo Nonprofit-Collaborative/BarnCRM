@@ -1,0 +1,95 @@
+<template>
+  <section data-id="report-subscriptions">
+    <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.title}</h3>
+    <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+
+    <template lwc:if={errorMessage}>
+      <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+    </template>
+    <template lwc:if={needsPermission}>
+      <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="info" message={labels.openToSubscribe} data-id="open-to-subscribe"></c-barn-notice>
+    </template>
+    <template lwc:if={needsConnection}>
+      <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="info" message={labels.connectionNeeded} data-id="connection-needed"></c-barn-notice>
+      <c-import-field-connection class="slds-show slds-var-m-bottom_small" data-id="connection"></c-import-field-connection>
+    </template>
+
+    <template lwc:if={hasReports}>
+      <ul class="slds-has-dividers_bottom-space">
+        <template for:each={rows} for:item="row">
+          <li key={row.id} class="slds-item" data-id="report">
+            <div class="slds-grid slds-wrap slds-grid_vertical-align-center">
+              <div class="slds-col">
+                <a href={row.url} target="_blank" rel="noopener noreferrer" data-id="report-link">{row.name}</a>
+                <p class="slds-text-body_small slds-text-color_weak">{row.detail}</p>
+              </div>
+              <template lwc:if={row.canSubscribe}>
+                <lightning-button
+                  data-id={row.id}
+                  label={labels.subscribe}
+                  disabled={row.subscribeDisabled}
+                  onclick={handleEdit}
+                ></lightning-button>
+              </template>
+            </div>
+            <template lwc:if={row.editing}>
+              <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-top_x-small" data-id="schedule">
+                <lightning-combobox
+                  class="slds-col"
+                  label={labels.frequency}
+                  data-field="frequency"
+                  options={frequencyOptions}
+                  value={form.frequency}
+                  onchange={handleField}
+                ></lightning-combobox>
+                <template lwc:if={isWeekly}>
+                  <lightning-combobox
+                    class="slds-col"
+                    label={labels.day}
+                    data-field="weekday"
+                    options={weekdayOptions}
+                    value={form.weekday}
+                    onchange={handleField}
+                  ></lightning-combobox>
+                </template>
+                <template lwc:if={isMonthly}>
+                  <lightning-input
+                    class="slds-col"
+                    type="number"
+                    min="1"
+                    max="31"
+                    label={labels.day}
+                    data-field="monthDay"
+                    value={form.monthDay}
+                    onchange={handleField}
+                  ></lightning-input>
+                </template>
+                <lightning-combobox
+                  class="slds-col"
+                  label={labels.time}
+                  data-field="hour"
+                  options={hourOptions}
+                  value={hourValue}
+                  onchange={handleField}
+                ></lightning-combobox>
+              </div>
+              <div class="slds-var-m-top_x-small">
+                <lightning-button variant="brand" label={labels.save} onclick={handleSave} data-id="save"></lightning-button>
+                <lightning-button class="slds-var-m-left_x-small" label={labels.cancel} onclick={handleCancel} data-id="cancel"></lightning-button>
+              </div>
+            </template>
+            <template lwc:if={row.saving}>
+              <p class="slds-text-body_small slds-var-m-top_x-small" role="status" aria-live="polite" data-id="saving">{labels.saving}</p>
+            </template>
+            <template lwc:if={row.resultMessage}>
+              <c-barn-notice class="slds-show slds-var-m-top_x-small" variant={row.resultVariant} message={row.resultMessage} data-id="result"></c-barn-notice>
+            </template>
+          </li>
+        </template>
+      </ul>
+    </template>
+    <template lwc:elseif={view}>
+      <p class="slds-text-color_weak" data-id="no-reports">{labels.noReports}</p>
+    </template>
+  </section>
+</template>

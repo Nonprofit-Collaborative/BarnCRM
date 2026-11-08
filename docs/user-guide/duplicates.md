@@ -103,6 +103,14 @@ You should see: "Noted. This suggestion will not come back." It stays off the li
 later scans, too. A suggestion with three or more records is dismissed as a whole, so merge
 any real duplicates in it first.
 
+## When Saving Says "This May Be Someone Already in BarnCRM"
+
+If your admin set up BarnCRM's recommended duplicate rules (the **Duplicate Rules Starter**),
+saving a person or household that looks like one already there shows "This may be someone
+already in BarnCRM. Check the possible duplicates before saving." Look at the records it lists.
+If one is the same person or household, cancel and use that one; if not, save anyway. The save
+is never blocked, and the pair is reported for your admin's review list.
+
 ## Common Problems
 
 - Problem: "Possible duplicates can be listed only for people with a Sales Cloud or Service

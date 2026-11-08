@@ -25,6 +25,11 @@
     "Volunteers_Schedule_Created": "Shifts created: {0}.",
     "Volunteers_Schedule_Inactive": "This schedule is not active, so it creates no shifts. Tick Active to start it again.",
     "Volunteers_Schedule_LoadFailed": "The shifts for this schedule were not counted. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
+    "Volunteers_Nudges_Body": "We still need more volunteers for {0}, and you have helped with this work before. It starts {1}.",
+    "Volunteers_Nudges_Closing": "If you can come, please tell your volunteer coordinator as soon as you can. If someone has already filled the shift, thank you anyway, and please ignore this message.",
+    "Volunteers_Nudges_SendFailed": "{0} of {1} volunteer shift nudges were not sent. Their shift will be tried again tomorrow while it is still ahead. Salesforce said: {2}",
+    "Volunteers_Nudges_StampFailed": "{0} of {1} unfilled shifts were held back because the shift could not be marked as nudged, so nobody is emailed twice. They will be tried again tomorrow while the shift is still ahead. Salesforce said: {2}",
+    "Volunteers_Nudges_Subject": "Can you help? Volunteers still needed: {0}",
     "Volunteers_Schedule_Preview": "{0} shifts will be created through {1}.",
     "Volunteers_Schedule_PreviewOne": "1 shift will be created through {0}.",
     "Volunteers_Schedule_TurnedOff": "Volunteers is turned off in Module Manager, so no shifts are created.",
@@ -45,6 +50,12 @@
     "Volunteers_Suggestions_BookFailed": "The sign-up was not saved. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Volunteers_Suggestions_Empty": "No volunteers to suggest. Suggestions come from people whose Volunteer Status is Active and who are not already signed up for this shift.",
     "Volunteers_Suggestions_LoadFailed": "The suggestions were not loaded. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
-    "Volunteers_Suggestions_Subtitle": "Active volunteers not yet signed up, best match first by skills, availability, hours on this job and onboarding."
+    "Volunteers_Suggestions_Subtitle": "Active volunteers not yet signed up, best match first by skills, availability, hours on this job and onboarding.",
+    "Volunteers_Portal_AlreadySignedUp": "You are already signed up for this shift.",
+    "Volunteers_Portal_Cancelled": "Your sign-up was cancelled.",
+    "Volunteers_Portal_CannotCancel": "This sign-up can no longer be cancelled here. Contact the volunteer coordinator.",
+    "Volunteers_Portal_ShiftClosed": "This shift is no longer open for sign-ups.",
+    "Volunteers_Portal_ShiftFull": "This shift is full.",
+    "Volunteers_Portal_SignedUp": "You are signed up for this shift."
   }
 }

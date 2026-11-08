@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Percent_At_Most_100</fullName>
+  <active>true</active>
+  <description>R-PC2: a percent discount is at most 100.</description>
+  <errorConditionFormula>ISPICKVAL(Discount_Type__c, 'Percent') &amp;&amp; Discount_Value__c &gt; 100</errorConditionFormula>
+  <errorDisplayField>Discount_Value__c</errorDisplayField>
+  <errorMessage>A percent discount can be at most 100.</errorMessage>
+</ValidationRule>

@@ -31,6 +31,10 @@ Rules:
 | core | Organizations | Custom24: Building |
 | core | Record_Inspector | Custom38: Camera |
 | core | Relationship__c | Custom37: Bridge |
+| events | Event_Speaker__c | Custom75: IPPhone |
+| events | Event__c | Custom89: Saxophone |
+| events | Events_Calendar | Custom66: Dice |
+| events | Events_Home | Custom81: MusicalNote |
 | funders | Funder_Report_Template__c | Custom99: TVCRT |
 | funders | Funders_Board | Custom100: TVWidescreen |
 | funders | Grant_Answer__c | Custom87: Safe |
@@ -69,7 +73,12 @@ Rules:
 | giving | Stewardship_Plan__c | Custom43: Jewel |
 | giving | Stewardship_Plans | Custom4: Hexagon |
 | giving | Tribute__c | Custom5: Leaf |
+| contactpoints | Contact_Point_Sync | Custom59: Can |
+| forms | Form_Submission__c | Custom51: Apple |
+| forms | Form__c | Custom28: Cellphone |
 | logicmodels | Logic_Model__c | Custom62: Chalkboard |
+| portal | Portal_Access__c | Custom77: Locked |
+| portal | Portal__c | Custom47: Knight |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |
 | mirror | Gift_Transaction_Mirror | Custom31: Car |
@@ -141,6 +150,9 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | giving | receiptActions | custom:custom23 | Receipt__c |
 | giving | stewardshipPlans | custom:custom4 | Stewardship_Plans |
 | giving | tributeNotification | custom:custom5 | Tribute__c |
+| forms | formBuilder | custom:custom28 | Form__c |
+| forms | formRunner | custom:custom28 | Form__c |
+| forms | formSubmission | custom:custom51 | Form_Submission__c |
 | logicmodels | logicModelBuilder | custom:custom62 | Logic_Model__c |
 | mirror | accountingExport | custom:custom21 | Accounting_Export |
 | mirror | campaignSync | custom:custom35 | Campaign_Sync |

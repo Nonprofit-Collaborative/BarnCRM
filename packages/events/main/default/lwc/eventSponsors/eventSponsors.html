@@ -1,0 +1,226 @@
+<template>
+  <template lwc:if={helpReady}>
+    <p class="slds-var-m-bottom_small slds-text-color_weak" data-id="intro">{labels.intro}</p>
+
+    <template lwc:if={isLoading}>
+      <lightning-spinner alternative-text={labels.tab} size="small"></lightning-spinner>
+    </template>
+
+    <template lwc:if={hasError}>
+      <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+    </template>
+
+    <template lwc:if={hasData}>
+      <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{fieldLabels.Levels}</h3>
+      <template lwc:if={canAddLevel}>
+        <lightning-button
+          data-id="add-level"
+          class="slds-var-m-bottom_small"
+          label={labels.addLevel}
+          icon-name="utility:add"
+          disabled={busy}
+          onclick={handleAddLevel}
+        ></lightning-button>
+      </template>
+      <template lwc:if={noLevels}>
+        <c-barn-empty-state data-id="levels-empty" message={labels.levelsEmpty}></c-barn-empty-state>
+      </template>
+      <template lwc:if={hasLevels}>
+        <table
+          class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_stacked-horizontal slds-var-m-bottom_large"
+          data-id="levels"
+        >
+          <thead>
+            <tr class="slds-line-height_reset">
+              <th scope="col">{fieldLabels.LevelName}</th>
+              <th scope="col">{fieldLabels.LevelAmount}</th>
+              <th scope="col">{fieldLabels.LevelBenefits}</th>
+              <th scope="col"><span class="slds-assistive-text">{labels.actions}</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            <template for:each={levelRows} for:item="level">
+              <tr key={level.id} data-id="level-row">
+                <th scope="row" data-label={fieldLabels.LevelName}>{level.name}</th>
+                <td data-label={fieldLabels.LevelAmount}>{level.amountText}</td>
+                <td data-label={fieldLabels.LevelBenefits}>{level.benefits}</td>
+                <td>
+                  <lightning-button-menu
+                    data-id={level.id}
+                    data-kind="level"
+                    alternative-text={level.menuLabel}
+                    icon-size="x-small"
+                    menu-alignment="right"
+                    onselect={handleMenu}
+                  >
+                    <lightning-menu-item label={labels.edit} value="edit"></lightning-menu-item>
+                    <lightning-menu-item label={labels.remove} value="remove"></lightning-menu-item>
+                  </lightning-button-menu>
+                </td>
+              </tr>
+            </template>
+          </tbody>
+        </table>
+      </template>
+
+      <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.sponsorsHeading}</h3>
+      <p class="slds-var-m-bottom_small" data-id="totals">{totalsText}</p>
+      <template lwc:if={canAddSponsor}>
+        <div class="slds-var-m-bottom_small">
+          <lightning-combobox
+            data-id="add-level-choice"
+            label={fieldLabels.Level__c}
+            options={levelOptions}
+            value={newLevelId}
+            disabled={busy}
+            onchange={handleLevelChoice}
+          ></lightning-combobox>
+          <lightning-record-picker
+            data-id="add-sponsor"
+            label={labels.addSponsor}
+            placeholder={labels.addSponsor}
+            object-api-name="Account"
+            disabled={busy}
+            onchange={handlePick}
+          ></lightning-record-picker>
+        </div>
+      </template>
+      <template lwc:if={noSponsors}>
+        <c-barn-empty-state data-id="sponsors-empty" message={labels.empty}></c-barn-empty-state>
+      </template>
+      <template lwc:if={hasSponsors}>
+        <table
+          class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_stacked-horizontal"
+          data-id="sponsors"
+        >
+          <thead>
+            <tr class="slds-line-height_reset">
+              <th scope="col">{fieldLabels.Name}</th>
+              <th scope="col">{fieldLabels.Level__c}</th>
+              <th scope="col">{fieldLabels.Status__c}</th>
+              <th scope="col">{fieldLabels.Amount__c}</th>
+              <th scope="col">{fieldLabels.Deliverables_Total__c}</th>
+              <th scope="col"><span class="slds-assistive-text">{labels.actions}</span></th>
+            </tr>
+          </thead>
+          <template for:each={sponsorRows} for:item="sponsor">
+            <tbody key={sponsor.id}>
+              <tr data-id="sponsor-row">
+                <th scope="row" data-label={fieldLabels.Name}>
+                  <template lwc:if={sponsor.href}>
+                    <a href={sponsor.href}>{sponsor.name}</a>
+                  </template>
+                  <template lwc:else>{sponsor.name}</template>
+                  <template lwc:if={sponsor.linkedText}>
+                    <div class="slds-text-body_small slds-text-color_weak" data-id="linked">
+                      {sponsor.linkedText}
+                    </div>
+                  </template>
+                </th>
+                <td data-label={fieldLabels.Level__c}>{sponsor.levelName}</td>
+                <td data-label={fieldLabels.Status__c}>
+                  <c-barn-status-badge
+                    status={sponsor.statusWord}
+                    label={sponsor.status}
+                  ></c-barn-status-badge>
+                </td>
+                <td data-label={fieldLabels.Amount__c}>{sponsor.amountText}</td>
+                <td data-label={fieldLabels.Deliverables_Total__c} data-id="progress">
+                  {sponsor.progress}
+                </td>
+                <td>
+                  <lightning-button-menu
+                    data-id={sponsor.id}
+                    data-kind="sponsor"
+                    alternative-text={sponsor.menuLabel}
+                    icon-size="x-small"
+                    menu-alignment="right"
+                    onselect={handleMenu}
+                  >
+                    <template for:each={sponsor.menuItems} for:item="item">
+                      <lightning-menu-item
+                        key={item.value}
+                        label={item.label}
+                        value={item.value}
+                      ></lightning-menu-item>
+                    </template>
+                  </lightning-button-menu>
+                </td>
+              </tr>
+              <template lwc:if={sponsor.hasDeliverables}>
+                <tr data-id="checklist-row">
+                  <td colspan="6">
+                    <ul>
+                      <template for:each={sponsor.deliverables} for:item="item">
+                        <li key={item.id} data-id="deliverable" class="slds-grid slds-grid_vertical-align-end">
+                          <span class="slds-col slds-size_1-of-3">{item.text}</span>
+                          <lightning-combobox
+                            class="slds-col slds-size_1-of-3"
+                            data-id={item.id}
+                            data-kind="deliverable-status"
+                            label={fieldLabels.Deliverable_Status__c}
+                            variant="label-hidden"
+                            options={deliverableStatuses}
+                            value={item.status}
+                            disabled={busy}
+                            onchange={handleDeliverableStatus}
+                          ></lightning-combobox>
+                          <lightning-button-icon
+                            data-id={item.id}
+                            data-kind="deliverable-remove"
+                            icon-name="utility:close"
+                            variant="bare"
+                            size="small"
+                            alternative-text={item.removeLabel}
+                            title={item.removeLabel}
+                            disabled={busy}
+                            onclick={handleDeliverableRemove}
+                          ></lightning-button-icon>
+                        </li>
+                      </template>
+                    </ul>
+                  </td>
+                </tr>
+              </template>
+              <template lwc:if={sponsor.isAdding}>
+                <tr data-id="deliverable-form-row">
+                  <td colspan="6">
+                    <lightning-input
+                      data-id="deliverable-name"
+                      label={fieldLabels.Deliverable_Name}
+                      maxlength="80"
+                      value={adding.name}
+                      onchange={handleDeliverableName}
+                    ></lightning-input>
+                    <lightning-combobox
+                      data-id="deliverable-type"
+                      label={fieldLabels.Deliverable_Type__c}
+                      options={deliverableTypes}
+                      value={adding.type}
+                      onchange={handleDeliverableType}
+                    ></lightning-combobox>
+                    <div class="slds-var-m-top_x-small">
+                      <lightning-button
+                        data-id="deliverable-cancel"
+                        label={labels.cancel}
+                        onclick={handleDeliverableCancel}
+                      ></lightning-button>
+                      <lightning-button
+                        data-id="deliverable-save"
+                        class="slds-var-m-left_x-small"
+                        variant="brand"
+                        label={labels.save}
+                        disabled={cannotSaveDeliverable}
+                        onclick={handleDeliverableSave}
+                      ></lightning-button>
+                    </div>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </template>
+        </table>
+      </template>
+    </template>
+  </template>
+</template>

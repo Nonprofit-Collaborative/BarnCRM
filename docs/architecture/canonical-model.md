@@ -8389,6 +8389,25 @@ browser, one sheet with a header row of column labels, numbers as numbers, dates
 dates, and everything else as text. The workbook is written by BarnCRM's own module, with no
 third-party code (the same reasoning as ADR-0049).
 
+**R-SQ13 Distance from a place** (C-69, D-157; ADR-0179, `0179-radius-find-postal-centroids.md`).
+The document has one more optional key, `radius`: `{ field, miles, latitude, longitude }`
+(version stays 1). `field` is a compound address or location field of the query's object that
+the running user can read (describe); `miles` a whole number from 1 to 500; latitude and
+longitude numbers in range. It compiles to `DISTANCE(field, GEOLOCATION(:radiusLatitude,
+:radiusLongitude), 'mi') < :radiusMiles`, ANDed with the other conditions, every value a bind
+variable, in user mode (R-SQ2). The point is never typed into a query: Find looks it up on the
+server from a US postal code (the shipped static resource `BarnZipCentroids`, one internal
+point per ZCTA from the US Census Bureau 2023 Gazetteer, public domain) or from the stored
+geocode of a record the person names, falling back to that record's postal code center (and
+saying so), else refusing; a street address is refused. A record with no geocode never
+matches; a run also counts (up to 10,000) the records the other conditions keep that have a
+postal code and no geocode on a standard address, as `withoutGeocode`, so Find can say why
+they are missing. Everything that compiles a document (results, export, server export, Bulk
+Update, Bulk Delete, summaries, donor segments, indicator sources) honors the radius;
+Super Transformer is handed it with the filter. Typed query text reads
+`DISTANCE(f, GEOLOCATION(lat, lon), 'mi') < n` back into `radius` (R-SQ7); a second distance,
+`>`, or another unit is refused.
+
 ### Salesforce implementation
 
 - **Object:** `Saved_Query__c`, sharing model Private.
@@ -8403,8 +8422,10 @@ third-party code (the same reasoning as ADR-0049).
 - **Apex sharing reason:** `Shared_With_Find_Users__c` (Apex sharing reason API names end in `__c`).
 - **Settings key:** `Find_Export_Row_Limit__c` (Section 12, v0.7 keys).
 - **Services:** `QueryCompiler`, `QueryFieldCatalog`, `RollupFilterParser` (bound mode),
-  `FindController`, `SavedQuerySharingWriter`; from C-36 `FindInlineEditService` (R-SQ10).
-- **Browser modules:** `findQueryText` (R-SQ7), `xlsxWriter` (R-SQ11), `findCsv`.
+  `FindController`, `SavedQuerySharingWriter`; from C-36 `FindInlineEditService` (R-SQ10); from
+  C-69 `FindRadius` (R-SQ13) and the static resource `BarnZipCentroids`.
+- **Browser modules:** `findQueryText` (R-SQ7), `xlsxWriter` (R-SQ11), `findCsv`; the component
+  `findRadiusPanel` (R-SQ13).
 - **Permission:** custom permission `Find_And_Export_Records`, in `BarnCRM_Admin` and in its own
   permission set `BarnCRM_Find_And_Export`, assignable alone.
 - **UI:** the Find tab (app page `Find`, component `findRecords`), built on `filterBuilder`.
@@ -9144,6 +9165,7 @@ occurrence of it.
 | Location | text | no | Where the work happens, when it is the same for every shift. |
 | Coordinator | reference(User) | no | The staff member who runs this job. |
 | Active | boolean | yes (defaults true) | Whether this job is offered when a new shift is scheduled. |
+| Event ID | text | no | Set by Event Management (EV-08) when the job was made for an event: the event's record ID kept as text, never a lookup (ADR-0177 decision 12). Empty for every other job. |
 | Total Hours | decimal | computed | Approved hours ever recorded against this job. |
 | Last Volunteer Date | date | computed | The most recent day anybody worked this job. |
 | Totals Last Updated | datetime | computed | When BarnCRM last worked out this job's totals. |
@@ -9180,11 +9202,14 @@ shift and changes nothing already recorded, including its totals.
 | Location | `Location__c` | Text(255) |
 | Coordinator | `Coordinator__c` | Lookup to User |
 | Active | `Active__c` | Checkbox, default true |
+| Event ID | `Event_Key__c` | Text(18), external ID (EV-08) |
 | Total Hours | `Total_Hours__c` | Number(10, 2) |
 | Last Volunteer Date | `Last_Volunteer_Date__c` | Date |
 | Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 | Sample Data | `Sample_Data__c` | Checkbox, default false (v0.8) |
 
+- **Event extension:** `VolunteersEventExtension` (EV-08) lists and creates an event's jobs and
+  shifts for Event Management through Core's `EventVolunteerExtension`.
 - **Service:** `VolunteerJobTriggerHandler`, `VolunteerJobSelector`,
   `VolunteerIntegritySelector` (the R-VJ1 counts, without sharing).
 
@@ -9214,6 +9239,7 @@ heads on.
 | Slots Remaining | integer | computed | Volunteers Needed less Slots Filled. Negative when more came than were asked for, which is information, not an error. |
 | Total Hours | decimal | computed | Approved hours recorded against this shift. |
 | Totals Last Updated | datetime | computed | When BarnCRM last worked out this shift's totals. |
+| Nudge Sent On | datetime | no | When the "still need you" email for this unfilled shift went out (V-10b, R-VU6a). Empty means none was sent. BarnCRM writes it; a coordinator clears it to send the nudge again. |
 
 ### Relationships
 
@@ -9255,6 +9281,7 @@ Deleting a shift takes its sign-ups with it and leaves its hours, with the job, 
 | Slots Remaining | `Slots_Remaining__c` | Formula (Number): `Volunteers_Needed__c` less `Slots_Filled__c` |
 | Total Hours | `Total_Hours__c` | Number(10, 2) |
 | Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
+| Nudge Sent On | `Nudge_Sent_On__c` | DateTime, read-only on the layout; editable (to clear) for Admin and Coordinator |
 
 - **Validation rules:** `End_After_Start` (R-VS3).
 - **Service:** `VolunteerShiftTriggerHandler`, `VolunteerShiftSelector`.
@@ -9341,6 +9368,20 @@ names a person account field (QA-F3). The email goes through the platform's sing
 the person's own address, so the org's daily email limit applies: a message the platform refuses is not stamped,
 a Warning in the Error Log counts them, and the next morning's run tries them again while the
 shift is still ahead. Reminders ship off.
+
+**R-VU6a One nudge per unfilled shift (V-10b).** When Send Unfilled Shift Nudges is on (29N), a
+nightly step at 7:15 AM (`VolunteerNudgeScheduler`, a third Volunteers nightly job, no switch of
+its own) emails, for each Open shift that starts after now and before the start of the day Days
+Before a Shift to Nudge after today (org time zone, default 3, 1 to 14), whose Slots Remaining is
+above zero and whose Nudge Sent On is empty, the active volunteers (Volunteer Status Active) with
+approved hours on the shift's job, an email address and Email Opt Out unchecked, who have no
+sign-up of any status on the shift: the most hours first, at most three per open place and 25 per
+shift. People are Contacts; a person account volunteer is reached through the contact behind the
+account. Like R-VU6 the shift is stamped Nudge Sent On first and emailed only if the stamp saved
+(a failed stamp is a Warning in the Error Log); a shift none of whose emails went out has the
+stamp cleared so the next morning retries; a stamped shift is never nudged again; a shift with
+no one to write to stays stamped. The email goes through the platform's single email call, so
+the org's daily email limit applies. Nudges ship off.
 
 **R-VU7 Suggestions are read only and rank on data already held.** The Suggested Volunteers
 card on an Open shift (V-11) offers Contacts whose Volunteer Status is Active and who have no
@@ -9538,6 +9579,8 @@ module has no settings page of its own), never in Setup. Defaults are applied in
 | `Shift_Horizon_Weeks__c` | integer, 1 to 26 | 8 | How many weeks ahead recurring schedules keep their shifts created (V-07). |
 | `Reminders_Enabled__c` | boolean | false | Whether bookings get one reminder email before their shift (V-10, R-VU6). Ships off, because turning it on emails real people. |
 | `Reminder_Lead_Days__c` | integer, 1 to 14 | 1 | How many days before a shift its reminder goes out (V-10). |
+| `Nudges_Enabled__c` | boolean | false | Whether an unfilled shift emails the job's regular volunteers once (V-10b, R-VU6a). Ships off, because turning it on emails real people. |
+| `Nudge_Lead_Days__c` | integer, 1 to 14 | 3 | How many days before an unfilled shift its nudge goes out (V-10b). |
 
 ### Salesforce implementation
 
@@ -9550,6 +9593,8 @@ module has no settings page of its own), never in Setup. Defaults are applied in
 | Weeks Ahead to Create Shifts | `Shift_Horizon_Weeks__c` | Number(2, 0) |
 | Send Shift Reminders | `Reminders_Enabled__c` | Checkbox, default false |
 | Days Before a Shift to Remind | `Reminder_Lead_Days__c` | Number(2, 0), default 1 |
+| Send Unfilled Shift Nudges | `Nudges_Enabled__c` | Checkbox, default false |
+| Days Before a Shift to Nudge | `Nudge_Lead_Days__c` | Number(2, 0), default 3 |
 
 - **Setting Definition rows:** `Settings_Object__c` `Volunteer_Settings__c`, `Module__c`
   Volunteers, `Section__c` Volunteers, one per key.
@@ -12549,6 +12594,1561 @@ pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
 
 ---
 
+## 29ZW. Form
+
+### Definition
+
+A form staff build once and fill in many times (C-42a, Forms module, ADR-0175
+`0175-forms-module.md`): steps of questions, conditions that show or hide a question or a step,
+and what a submission writes (a person, an organization, related records). The questions live in
+one JSON definition, so a form is versioned by copying one value and the same definition can be
+read outside Salesforce (plan 9.9).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the form is called, for example "Volunteer Interest". |
+| Description | long text | no | What the form is for, for staff. |
+| Status | picklist | yes (Draft) | Draft (never published), Published (filled from its latest version) or Closed (kept, no longer filled in) (R-FM2). |
+| Definition | long text | yes | The working definition as JSON (R-FM1). |
+| Published Version | number | no (set by BarnCRM) | The number of the latest Form Version, empty before the first publish. |
+| Public | checkbox | no (set by BarnCRM) | The published version may be filled in on a Salesforce Site or by an API caller (R-FM3). Copied from the definition's `public.enabled` on publish. |
+
+### Rules
+
+**R-FM1 The definition shape (schemaVersion 1).** A JSON object:
+`{ "schemaVersion": 1, "steps": [...], "records": [...] }`.
+
+- A step: `{ "key", "title", "showWhen"?, "fields": [...] }`; at least one step, at most 20.
+- A field: `{ "key", "label", "type", "required"?, "help"?, "options"?, "maxLength"?, "min"?,
+  "max"?, "showWhen"?, "target"? }`. Types: text, textarea, email, phone, number, date, checkbox,
+  picklist, file (C-42c). A picklist has `options`, each `{ "label", "value" }`. A file field has
+  no target: its answer is the file's name and the file is kept as R-FS7 says. Keys are letters, digits and
+  underscores, start with a letter, and are unique across the form. At most 100 fields.
+- A condition (`showWhen`): `{ "all": [...] }` or `{ "any": [...] }` of tests
+  `{ "field", "op", "value"? }` (op: equals, notEquals, isBlank, isNotBlank, contains,
+  greaterThan, lessThan) or nested groups. A test names a field on an earlier step or earlier on
+  the same step.
+- A record: `{ "key", "kind", "object"?, "matching"?, "links"?, "values"? }`. Kind person (Contact),
+  organization (Account of the organization record type) or related (`object` names a custom
+  object). `matching` (person and organization only): `{ "rule", "onMatch" }`; person rules
+  `email` or `emailThenNamePostal` (the default), organization rule `name`; onMatch `fillBlanks`
+  (the default) or `overwrite`. `links` (related only) maps a lookup field to another record key
+  or to `context` (the record the form was filled from). `values` maps a field to a constant. At
+  most one person, one organization and ten records.
+- A target: `{ "record": "<record key>", "field": "<field API name>" }`.
+- `public` (optional, C-42b): `{ "enabled", "minSeconds"?, "hourlyLimit"?, "confirmation"? }`.
+  minSeconds 0 to 600 (default 3), hourlyLimit 1 to 1000 (default 50), confirmation up to 1,000
+  characters. A public form may not use onMatch `overwrite`. C-42c adds `saveForLater`? (default
+  false) and `resumeDays`? (1 to 30, default 7): R-FS7.
+
+The engine (`formDefinition.js`) refuses a definition that breaks any of these, naming the first
+problem; the builder saves only a definition it accepts.
+
+**R-FM2 Publishing freezes a version.** Publish checks the definition, copies it into a new Form
+Version numbered one more than the last, sets Published Version and Status Published. Closing a
+form stops it being offered; it can be published again.
+
+**R-FM3 What a public form may write (C-42b, ADR-0184 public forms on a Salesforce Site).** A form
+with `public.enabled` is published only when every record is a person, an organization or a
+custom object that is not a Forms object or a custom setting, every answer is mapped to a field
+the publisher may create that is not a lookup and not encrypted, and no record overwrites on a
+match. The same check runs again before a public submission is processed. Publishing sets Public
+and gives the new version its signing key.
+
+### Salesforce implementation
+
+- **Object:** `Form__c`, name field Text, label Form Name, sharing Public Read Only (Forms Admin
+  edits), tab Forms in the BarnCRM apps (no module app, D-188).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Description | `Description__c` | Long Text Area(32768) |
+| Status | `Status__c` | Picklist (Draft, Published, Closed), restricted, default Draft |
+| Definition | `Definition__c` | Long Text Area(131072) |
+| Published Version | `Published_Version__c` | Number(6, 0) |
+| Public | `Public__c` | Checkbox, default false |
+
+- **Engine:** framework-free modules `formDefinition.js` (parse, check, defaults), `formRules.js`
+  (conditions, visibility, answer checks, step order) and `formMapping.js` (what a submission
+  writes), with Jest tests. **Controller:** `FormBuilderController` (thin: the form, the objects
+  and fields a target may name from describe, save and publish, in user mode).
+- **Permission sets:** Forms Admin creates, edits, publishes and deletes forms; Forms Staff and
+  Forms Read Only read them.
+
+---
+
+## 29ZX. Form Version
+
+### Definition
+
+One published version of a form's definition, never changed after it is written, so every
+submission is read against the questions it answered (R-FM2).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Form | reference | yes | The form, master-detail. |
+| Version | number | yes | 1 for the first publish, then one more each time. |
+| Definition | long text | yes | The definition as published (R-FM1). |
+| Signing Key | text | no (set by BarnCRM) | A random key, made at publish, that signs the tickets a public form is loaded with (R-FS5). No permission set reads it. |
+
+### Salesforce implementation
+
+- **Object:** `Form_Version__c`, name field Auto Number `V-{0000}`, master-detail to `Form__c`
+  (`Form__c`), no tab.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Form | `Form__c` | Master-Detail(Form) |
+| Version | `Version__c` | Number(6, 0) |
+| Definition | `Definition__c` | Long Text Area(131072) |
+| Signing Key | `Signing_Key__c` | Text(64) |
+
+- **Permission sets:** Forms Admin creates them by publishing; nobody edits them (no edit
+  permission on Definition or Version in any set); every set reads them.
+
+---
+
+## 29ZY. Form Submission
+
+### Definition
+
+One filled-in form: the answers, the version they answer, who it matched or created, and what was
+written (C-42a). A submission is kept even when nothing could be written, so nothing typed is
+lost.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Form | reference | yes | The form, master-detail. |
+| Form Version | reference | yes | The version answered. |
+| Status | picklist | yes | Received (a public submission waiting, R-FS5), Processed, Needs Review (R-FS2) or Failed (R-FS3). |
+| Source | picklist | yes (Staff) | Staff (filled in by a signed-in user through the runner) or Public (a Site or an API caller, R-FS5). |
+| Answers | long text | yes | The answers as JSON, by field key, hidden fields left out (R-FS1). |
+| Outcome | long text | no | What was written as JSON: each record key with its record identifier and whether it was matched, created or updated. |
+| Message | text | no | Why the submission needs review or failed, in plain words. |
+| Person | reference | no | The Contact matched or created; set by staff to resolve a review. |
+| Organization | reference | no | The organization Account matched or created; set by staff to resolve a review. |
+| Context Record Id | text | no | The record the form was filled from (an event, a program), as an identifier (ADR-0014 pattern). |
+
+### Rules
+
+**R-FS1 The server decides what counts.** Before writing, `FormRules` (Apex) applies the published
+version's conditions, drops hidden answers, refuses a missing required answer or one of the wrong
+type, and refuses a key the version does not have. The browser's checks are a convenience.
+
+**R-FS2 Never a guess.** A person or organization key held by several records
+(`ImportMatcher.isHeldByMany`, after first-name narrowing) holds the submission as Needs Review
+and writes nothing. Process Again uses the Person and Organization staff set on it.
+
+**R-FS3 All or nothing.** The records of one submission are written under one savepoint in the
+user's mode; any failure rolls them back and the submission is kept as Failed with the reason.
+A person with no last name or an organization with no name that matches nobody is skipped (its
+questions were optional and left blank), and so is a related record linking to a skipped one.
+
+**R-FS4 Modules hear about it.** After the records are written, each installed
+`FormAttachmentExtension` that handles the context record's object receives a
+`FormSubmissionReceipt` in the same transaction (ADR-0175 decision 9). A failing extension is
+logged and the submission is marked Needs Review with its message; the records stay.
+
+**R-FS5 A public submission is only stored (C-42b).** The public entry point checks, in order: a
+filled honeypot (answer "received", store nothing), the ticket's signature and age (24 hours),
+the form's minSeconds, the form's hourlyLimit of public submissions in the last hour, and the
+answers (R-FS1). It then inserts one submission with Status Received and Source Public, and
+returns no record identifier and nothing about matching. A caller that is a signed-in user (an
+integration user) has it processed at once, as itself (R-FS6).
+
+**R-FS6 Processing a public submission (C-42b).** A received submission is processed in user mode
+by the scheduled `FormPublicProcessor` (as the administrator who scheduled it) or by its signed-in
+caller: R-FM3 is checked again, every record uses `fillBlanks`, a `context` link is kept only when
+a module's `FormAttachmentExtension` names this form for that record (else Needs Review), and a
+person matched to a person account is held for review. Otherwise R-FS1 to R-FS4 apply.
+
+### Salesforce implementation
+
+- **Object:** `Form_Submission__c`, name field Auto Number `FS-{000000}`, master-detail to
+  `Form__c`, sharing controlled by parent, tab Form Submissions in the BarnCRM apps (D-188).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Form | `Form__c` | Master-Detail(Form) |
+| Form Version | `Form_Version__c` | Lookup(Form Version), restrict delete |
+| Status | `Status__c` | Picklist (Received, Processed, Needs Review, Failed), restricted |
+| Source | `Source__c` | Picklist (Staff, Public), restricted, default Staff |
+| Answers | `Answers__c` | Long Text Area(131072) |
+| Outcome | `Outcome__c` | Long Text Area(32768) |
+| Message | `Message__c` | Text(255) |
+| Person | `Person__c` | Lookup(Contact), set null on delete |
+| Organization | `Organization__c` | Lookup(Account), set null on delete |
+| Context Record Id | `Context_Record_Id__c` | Text(18) |
+
+- **Classes:** `FormRules` (server checks), `FormSubmitService` (matching through Core's
+  `ImportMatcher` and `ImportDuplicateRuleMatcher`, writes, outcome), `FormRunnerController` and
+  `FormSubmissionController` (thin). Core: `FormAttachmentExtension`, `FormAttachmentExtensions`,
+  `FormSubmissionReceipt`.
+- **Permission sets:** Forms Admin and Forms Staff create submissions and set Person and
+  Organization; Forms Read Only reads them. Only Forms Admin deletes them. Source is read only in
+  every set. `Forms_Public_Guest` (for a Site guest user) grants no object or field, only the
+  class `FormPublicController` and the page `FormsPublic`.
+- **Public classes (C-42b):** `FormPublicPolicy` (R-FM3), `FormIntakeService` (R-FS5, the only
+  `without sharing` class), `FormPublicController` and `FormPublicRest` (thin),
+  `FormPublicProcessor` (R-FS6), `FormsHealthCheckExtension` (Site and guest checks).
+- **Files (C-42c):** `FormFiles` (R-FS7).
+
+---
+
+## 29ZY1. Form Draft
+
+### Definition
+
+Answers to a public form saved for later (C-42c, ADR-0184 public forms on a Salesforce Site,
+decision 11): the version they answer and a hash of the token in the emailed link. Never shown
+to the person who saved it except through that link; deleted when the form is sent or the link
+expires.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Form | reference | yes | The form, master-detail. |
+| Form Version | reference | no | The version the answers answer; a resumed form is always this version. Cleared if the version is deleted, which ends the link. |
+| Token Hash | text | yes | SHA-256 of the link's token in hex. The token itself is never stored. No permission set reads it. |
+| Expires | date/time | yes | When the link stops working (now plus `public.resumeDays`). |
+| Answers | long text | no | The answers that count so far, as JSON, without file answers. |
+| Step | number | no | The step the person was on. |
+
+### Rules
+
+**R-FS7 Files and saved answers (C-42c).** A file question's answer is the file's name; the file
+comes beside the answers as base64, must be named as answered and of a listed kind (documents and
+pictures: pdf, jpg, jpeg, png, gif, heic, doc, docx, xls, xlsx, csv, txt, rtf, odt), and one
+submission's files may hold at most 1 MB together. The intake (system mode, for a guest) or the
+staff runner (user mode) keeps each file as a Salesforce File on the submission; processing
+shares it with the person and organization written, once each. Saving for later is offered only
+on a public form with `saveForLater`: after the R-FS5 spam checks (drafts count toward the
+hourly limit) a random 256-bit token is made, its hash stored with the answers, and a link to
+`FormsPublic?form=<id>&resume=<token>` on the Site (or the first active Site, for an API caller)
+emailed to the address given, which is not stored. A link opens only before Expires and only on
+the draft's version; sending the form deletes the draft; `FormPublicProcessor` deletes expired
+drafts. If the email cannot be sent the draft is deleted and the person told.
+
+### Salesforce implementation
+
+- **Object:** `Form_Draft__c`, name field Auto Number `FD-{000000}`, master-detail to `Form__c`,
+  sharing controlled by parent, no tab, not searchable or reportable.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Form | `Form__c` | Master-Detail(Form) |
+| Form Version | `Form_Version__c` | Lookup(Form Version), set null on delete |
+| Token Hash | `Token_Hash__c` | Text(64), unique, case sensitive, external ID |
+| Expires | `Expires__c` | Date/Time |
+| Answers | `Answers__c` | Long Text Area(131072) |
+| Step | `Step__c` | Number(3, 0) |
+
+- **Permission sets:** only Forms Admin reads and deletes drafts (for the expired-draft cleanup it
+  schedules); no set creates or edits one or reads Token Hash. The intake writes them in system
+  mode.
+
+---
+
+## 29ZZ. Contact Point Link
+
+### Definition
+
+One Salesforce Contact Point (`ContactPointEmail`, `ContactPointPhone` or `ContactPointAddress`)
+that the BarnCRM Contact Point Sync module (C-45, ADR-0176 contact point sync module) made or
+adopted for a person, and the BarnCRM value it copies. A Contact Point with no link is never
+changed by the module.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number. |
+| Person | reference(Contact) | yes | The person the copy belongs to. |
+| Kind | picklist(Email, Phone, Address) | yes | Which Contact Point object the copy is. |
+| Source | text | yes | Where the value comes from: a Contact field API name, or an `Address__c` record ID. |
+| Contact Point ID | text | no | The ID of the Contact Point, held as text so the module names no standard object in metadata. Empty until the copy is made. |
+
+### Relationships
+
+- **Link to Contact**, many to one, as a detail of the person.
+
+### Rules
+
+**R-CPL1 BarnCRM is the source.** A sync computes the person's copies from their fields and
+`Address__c` (R-CPL2) and makes the managed Contact Points match: missing ones are created (or an
+unlinked one with the same value on the same Individual is adopted), changed ones are updated,
+and ones no longer wanted are deleted with their links. Nothing is read back from a Contact Point.
+
+**R-CPL2 What is copied.** Email: Personal, Work, Alternate and the standard Email, one copy per
+distinct address (case ignored), primary where it equals Email. Phone: Home, Mobile, Work, Other
+and the standard Phone, one per distinct number (digits compared), primary where it equals Phone.
+Address: each Current (or blank status) address of the person's own or of a household they belong
+to, default from Is Default. A kind turned off in the settings (29ZZ1) is left alone.
+
+**R-CPL3 One link per source.** A person has at most one link per Kind and Source; a merge that
+moves a second one onto the survivor is cleaned up at the survivor's sync.
+
+**R-CPL4 Delete follows the person.** Deleting a person deletes their managed Contact Points;
+their links go with them (master-detail) and come back on undelete, when the sync makes new copies.
+
+**R-CPL5 Person accounts (D-186).** Where the org stores people as person accounts, a person
+account is copied as the contact the platform keeps behind it: the link's Person is that contact,
+the values are the contact's, and the account's own addresses (`Address__c.Person_Account__c`) and
+household addresses (through the account side of a membership) count as the person's. Saves of the
+account trigger the sync (a new, restored or changed email or phone, a changed Individual, a merge
+survivor); deleting the account removes the copies. No Person Account field is named at compile
+time; an org without person accounts is unaffected.
+
+**R-CPL6 A household move syncs at once (D-186).** A person who joins, leaves or moves household
+(a membership row added, changed, ended, removed or restored, or a contact's account changed) has
+their address copies synced in that same transaction, or in an immediately queued job when it has
+too little room, not at their next save.
+
+### Salesforce implementation
+
+- **Object:** `Contact_Point_Link__c`, name field AutoNumber `CPL-{000000}`, sharing Controlled By
+  Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Person | `Contact__c` | Master-Detail to Contact, relationship name Contact_Point_Links, not reparentable (a merge still moves links; an auto-merge undo does not record them, the sync rebuilds them) |
+| Kind | `Kind__c` | Picklist (Email, Phone, Address), restricted |
+| Source | `Source__c` | Text(40) |
+| Contact Point ID | `Contact_Point_Id__c` | Text(18) |
+
+- **Classes:** `ContactPointPlan` (the pure comparison), `ContactPointSyncService` (reads, plans,
+  writes), `ContactPointPersonHandler`, `ContactPointAddressHandler`, `ContactPointAccountHandler`
+  and `ContactPointMembershipHandler` (registry rows `Contact_Point_Sync_Person`,
+  `Contact_Point_Sync_Address`, `Contact_Point_Sync_Account`, `Contact_Point_Sync_Membership`),
+  `ContactPointBackfillBatch`.
+
+---
+
+## 29ZZ1. Contact Point Sync Settings
+
+### Definition
+
+The Contact Point Sync module's org-wide settings, edited in the Contact Points section of
+BarnCRM Settings, and the last backfill's record.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Sync Emails | boolean | yes (defaults true) | Whether email copies are kept (R-CPL2). |
+| Sync Phones | boolean | yes (defaults true) | Whether phone copies are kept. |
+| Sync Addresses | boolean | yes (defaults true) | Whether address copies are kept. |
+| Last Backfill | datetime | no | When the last backfill finished. Written by the module only. |
+| Last Backfill Summary | text | no | What it did: created, updated, deleted and failed. Written by the module only. |
+
+### Rules
+
+**R-CPS1 A never-saved setting reads as shipped.** Read through Core's `SettingsService`, so the
+three switches read as on before the first save.
+
+### Salesforce implementation
+
+- **Object:** `Contact_Point_Sync_Settings__c`, hierarchy custom setting, visibility Protected.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Sync Emails | `Sync_Emails__c` | Checkbox, default true |
+| Sync Phones | `Sync_Phones__c` | Checkbox, default true |
+| Sync Addresses | `Sync_Addresses__c` | Checkbox, default true |
+| Last Backfill | `Last_Backfill__c` | DateTime |
+| Last Backfill Summary | `Last_Backfill_Summary__c` | Text(255) |
+
+- **Setting Definitions:** `Contact_Point_Sync_Page`, `Contact_Point_Sync_Emails`,
+  `Contact_Point_Sync_Phones`, `Contact_Point_Sync_Addresses`, section Contact Points.
+
+---
+
+## 29EV1. Event
+
+### Definition
+
+One event the organization runs: an evening talk, a class, a gala, a multi-day conference (EV-01,
+Event Management module, ADR-0177 `0177-events-module.md`). A multi-day event is one event whose
+start and end fall on different days. A recurring event is a series of events, each an occurrence
+with its own tickets, agenda and later its own registrations.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the event is called, as people see it. |
+| Status | picklist | yes | Draft (being planned, not announced), Open (announced, registration open), Closed (registration closed), Completed (held), Cancelled. Default Draft. |
+| Format | picklist | yes | In Person, Virtual or Hybrid. Default In Person. |
+| Start, End | date and time | yes | When the event starts and ends (R-EV1). |
+| Venue Name, Venue Address | text | no | Where it is held, for an in person or hybrid event. |
+| Online Link | URL | no | Where to join, for a virtual or hybrid event. |
+| Capacity | number | no | The most people it can take; empty for no limit (R-EV2). |
+| Registration Opens, Registration Closes | date and time | no | When registration is taken (R-EV3, used by EV-02). |
+| Description | long text | no | What it is about. |
+| Series | reference to Event | no | For a later occurrence of a recurring event, the first event of the series (R-EV4). |
+| External Key | text | no | The key of the record this event was imported from, unique: `summit:` and the Summit Events instance's identifier (EV-10). |
+| Public Page | boolean | yes (defaults false) | Whether the event has a public page on the organization's Site and API (EV-16, R-EV5). |
+| Show Speakers | boolean | yes (defaults false) | Whether the public page names the event's confirmed speakers, with headline and bio (R-EV5). |
+| Show Seats Left | boolean | yes (defaults false) | Whether the public page shows seats left per ticket type (R-EV5). |
+
+### Relationships
+
+- An event has ticket types (29EV2), promo codes (29EV3), tracks (29EV4), sessions (29EV5) and
+  speakers (29EV6), each a detail of the event.
+- A later occurrence names the first event of its series; the first names none.
+
+### Rules
+
+**R-EV1 An event ends after it starts.** A validation rule refuses an end before the start.
+
+**R-EV2 Capacity is a whole number above zero, or empty.**
+
+**R-EV3 Registration closes after it opens**, when both are set.
+
+**R-EV4 Repeat Event makes occurrences, not a rule.** Repeat Event (on the Events page) creates up
+to 52 later occurrences, every week, every two weeks or every month, each a copy of the event with
+its start and end moved, status Draft, its ticket types and tracks copied (never its sessions,
+speakers or codes), and Series set to the first event of the series. The dates are worked out by
+the framework-free module `eventsModel.js`; a monthly occurrence keeps the day of the month, or the
+month's last day when it is shorter. Nothing keeps occurrences in step afterwards: each is edited
+on its own.
+
+**R-EV5 A public page shows only what the event publishes (EV-16, ADR-0190 public event pages).**
+A page is served only while Public Page is on and the status is Open or Closed. It shows the
+event's name, description, dates, format, venue and registration times; active ticket types whose
+sales have not ended, with price (a priced one with the Events Settings payment note) and, with
+Show Seats Left, seats left; Confirmed sessions; and, with Show Speakers, Confirmed speakers' names,
+headlines and bios. Never the online link, capacity, codes, registrations or attendees. The
+registration form is shown while the status is Open and now is inside the registration times.
+
+### Salesforce implementation
+
+- **Object:** `Event__c`, name field Text, label Event Name, sharing Public Read/Write, tab Events
+  (the object) and the Events page (`Events_Home`) in the BarnCRM apps (no module app, D-188).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Status | `Status__c` | Picklist, restricted, required |
+| Format | `Format__c` | Picklist, restricted, required |
+| Start | `Start__c` | DateTime, required |
+| End | `End__c` | DateTime, required |
+| Venue Name | `Venue_Name__c` | Text(255) |
+| Venue Address | `Venue_Address__c` | Text Area(255) |
+| Online Link | `Online_Link__c` | URL(255) |
+| Capacity | `Capacity__c` | Number(7, 0) |
+| Registration Opens | `Registration_Opens__c` | DateTime |
+| Registration Closes | `Registration_Closes__c` | DateTime |
+| Description | `Description__c` | Long Text Area(32768) |
+| Series | `Series__c` | Lookup(Event), Clear on delete |
+| Registration Form Key | `Registration_Form_Key__c` | Text(18): the Forms form registrants fill in, by record identifier (EV-02, ADR-0014) |
+| Survey Form Key | `Survey_Form_Key__c` | Text(18): the Forms form attendees are sent after the event, by record identifier (EV-18, ADR-0188) |
+| External Key | `External_Key__c` | Text(80), unique, external ID (EV-10) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false: set on the events `EventsSampleData` loads, so Remove Sample Data deletes them with their tracks, sessions, tickets, codes, speakers, applications, levels and sponsors (C-10, `EventSampleDataLoader`) |
+| Public Page | `Public_Page__c` | Checkbox, default false (EV-16) |
+| Show Speakers | `Public_Speakers__c` | Checkbox, default false (EV-16) |
+| Show Seats Left | `Public_Seats__c` | Checkbox, default false (EV-16) |
+
+- **Validation rules:** `End_After_Start` (R-EV1), `Capacity_Above_Zero` (R-EV2),
+  `Registration_Closes_After_Opens` (R-EV3).
+- **Record page:** `Event_Record_Page`, Core's header, main and sidebar template; tabs Details,
+  Tickets, Agenda and Speakers; related lists in the sidebar.
+- **Controllers:** `EventsHomeController` (the Events page and Repeat Event), thin, plain JSON
+  shapes, user mode.
+
+---
+
+## 29EV2. Ticket Type
+
+### Definition
+
+One kind of ticket for an event, such as General, Student or VIP (EV-03). BarnCRM records the price
+the organization charges and never takes a payment (plan Section 1.5).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The ticket's name, as registrants see it. |
+| Event | reference to Event | yes | The event it admits to. |
+| Price | currency | yes | What it costs; 0 for a free ticket (R-TT1). Default 0. |
+| Quantity | number | no | How many may be sold; empty for no limit (R-TT2). |
+| Sales Start, Sales End | date and time | no | When it is on sale (R-TT3). |
+| Description | text | no | What it includes. |
+| Active | yes or no | yes | Offered to registrants. Default yes. |
+| Sort Order | number | no | Its place in the list of the event's tickets. |
+
+### Rules
+
+**R-TT1 A price is never negative.** **R-TT2 A quantity is above zero, or empty.**
+
+**R-TT3 Sales end after they start**, when both are set.
+
+**R-TT4 Quantities are a plan, not a cap on the event.** The Tickets panel shows the total of the
+quantities beside the event's capacity and warns when it is larger; it refuses nothing, since not
+every ticket sells. Sold counts arrive with registrations (EV-02).
+
+### Salesforce implementation
+
+- **Object:** `Ticket_Type__c`, name field Text, label Ticket Type Name, master-detail to Event
+  (`Event__c`, relationship Ticket Types), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Price | `Price__c` | Currency(16, 2), required, default 0 |
+| Quantity | `Quantity__c` | Number(7, 0) |
+| Sales Start | `Sales_Start__c` | DateTime |
+| Sales End | `Sales_End__c` | DateTime |
+| Description | `Description__c` | Text Area(255) |
+| Active | `Active__c` | Checkbox, default checked |
+| Sort Order | `Sort_Order__c` | Number(4, 0) |
+
+- **Validation rules:** `Price_Not_Negative` (R-TT1), `Quantity_Above_Zero` (R-TT2),
+  `Sales_End_After_Start` (R-TT3).
+- **Panel:** the Tickets tab of the event page (`eventTickets`), with `EventTicketsController`
+  (thin, user mode). Prices with a code applied are worked out by the framework-free module
+  `eventTicketsModel.js` (plan 9.9).
+
+---
+
+## 29EV3. Promo Code
+
+### Definition
+
+A code a registrant types for a discount on an event's tickets (EV-03): a percent or an amount off,
+for every ticket of the event or one ticket type, a set number of times, between two dates.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Code | text | yes | What the registrant types; unique within the event, regardless of case (R-PC1). |
+| Event | reference to Event | yes | The event it applies to. |
+| Discount Type | picklist | yes | Percent or Amount. Default Percent. |
+| Discount Value | number | yes | The percent (above 0, at most 100) or the amount off (above 0) (R-PC2). |
+| Ticket Type | reference to Ticket Type | no | The one ticket type it applies to; empty for all (R-PC3). |
+| Maximum Uses | number | no | How many registrations may use it; empty for no limit. |
+| Valid From, Valid Until | date and time | no | When it can be used (R-PC4). |
+| Active | yes or no | yes | Can be used. Default yes. |
+
+### Rules
+
+**R-PC1 A code is unique within its event.** An automation that always runs (registry row
+`Promo_Code_Key`, ADR-0024) trims the code, sets `Code_Key__c` to the event's identifier and the
+code in capitals, and refuses a second code with the same key in plain words; the unique field
+backs it against two saves at once. The same code may be used by two events.
+
+**R-PC2 A discount is above zero, and a percent at most 100.** Validation rules.
+
+**R-PC3 A code's ticket type is one of its own event's.** A required lookup filter.
+
+**R-PC4 A code's window ends after it starts**, when both are set.
+
+**R-PC5 A discount never takes a price below zero.** The module `eventTicketsModel.js` applies a
+code to a price: percent off rounded to the cent, an amount off capped at the price; a code is
+applied only while active, inside its window and for its ticket type.
+
+### Salesforce implementation
+
+- **Object:** `Promo_Code__c`, name field Text, label Code, master-detail to Event (`Event__c`,
+  relationship Promo Codes), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Discount Type | `Discount_Type__c` | Picklist (Percent, Amount), restricted, required |
+| Discount Value | `Discount_Value__c` | Number(16, 2), required |
+| Ticket Type | `Ticket_Type__c` | Lookup(Ticket Type), Clear on delete, required filter: same event |
+| Maximum Uses | `Max_Uses__c` | Number(7, 0) |
+| Valid From | `Valid_From__c` | DateTime |
+| Valid Until | `Valid_Until__c` | DateTime |
+| Active | `Active__c` | Checkbox, default checked |
+| Code Key | `Code_Key__c` | Text(120), unique, set by BarnCRM |
+
+- **Validation rules:** `Discount_Above_Zero`, `Percent_At_Most_100` (R-PC2),
+  `Valid_Until_After_From` (R-PC4), `Max_Uses_Above_Zero`.
+- **Automation:** `EventKeyHandler` through the registry row `Promo_Code_Key` (always runs).
+
+---
+
+## 29EV4. Event Track
+
+### Definition
+
+A strand of an event's agenda, such as "Admins" or "Developers" (EV-04). Sessions may sit in a
+track or in none.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The track's name. |
+| Event | reference to Event | yes | Its event. |
+| Description | text | no | Who it is for. |
+| Sort Order | number | no | Its column in the Agenda Builder. |
+
+### Rules
+
+**R-ETR1 Deleting a track keeps its sessions**, with no track.
+
+### Salesforce implementation
+
+- **Object:** `Event_Track__c`, name field Text, label Track Name, master-detail to Event
+  (`Event__c`, relationship Tracks), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Description | `Description__c` | Text Area(255) |
+| Sort Order | `Sort_Order__c` | Number(4, 0) |
+
+---
+
+## 29EV5. Event Session
+
+### Definition
+
+One talk, workshop, panel, keynote or break on an event's agenda (EV-04). A session without a time
+yet is unscheduled.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Title | text | yes | What the session is called. |
+| Event | reference to Event | yes | Its event. |
+| Track | reference to Event Track | no | Its track; one of its own event's (R-ESN3). |
+| Start, End | date and time | no | When it runs; both or neither (R-ESN1, R-ESN2). |
+| Room | text | no | Where it runs, as the agenda shows it. |
+| Capacity | number | no | The most people it takes; empty for the room's own limit. |
+| Session Type | picklist | yes | Talk, Workshop, Panel, Keynote, Break or Other. Default Talk. |
+| Status | picklist | yes | Draft, Confirmed or Cancelled. Default Confirmed. |
+| Description | long text | no | What it covers. |
+
+### Rules
+
+**R-ESN1 A session has a start and an end, or neither, and ends after it starts.**
+
+**R-ESN2 A session falls inside its event**, from the event's start to its end.
+
+**R-ESN3 A session's track is one of its own event's.** A required lookup filter.
+
+**R-ESN4 The Agenda Builder flags clashes and refuses none.** Two sessions in one room whose times
+overlap, and one speaker in two sessions whose times overlap, are flagged on the session cards
+(the framework-free module `eventAgendaModel.js`); cancelled sessions are ignored.
+
+**R-ESN5 Moving a session changes only its track.** Moving a session to another track by its menu,
+by drag and drop or by keyboard saves its Track and nothing else.
+
+### Salesforce implementation
+
+- **Object:** `Event_Session__c` (Programs owns `Session__c`), name field Text, label Session
+  Title, master-detail to Event (`Event__c`, relationship Sessions), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Track | `Track__c` | Lookup(Event Track), Clear on delete, required filter: same event |
+| Start | `Start__c` | DateTime |
+| End | `End__c` | DateTime |
+| Room | `Room__c` | Text(80) |
+| Capacity | `Capacity__c` | Number(6, 0) |
+| Session Type | `Session_Type__c` | Picklist, restricted, required |
+| Status | `Status__c` | Picklist (Draft, Confirmed, Cancelled), restricted, required |
+| Description | `Description__c` | Long Text Area(32768) |
+
+- **Validation rules:** `Start_And_End_Together`, `End_After_Start` (R-ESN1),
+  `Inside_Event_Dates` (R-ESN2), `Capacity_Above_Zero`.
+- **Panel:** the Agenda tab of the event page (`eventAgenda`), with `EventAgendaController` (thin,
+  user mode).
+
+---
+
+## 29EV6. Event Speaker
+
+### Definition
+
+A Core person speaking at an event (EV-05), with what the organization needs to know about them for
+that event: a headline and bio, their status, and travel and audiovisual needs.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The speaker's name as shown on the agenda; the person's name when left empty (R-ESP2). |
+| Event | reference to Event | yes | The event. |
+| Person | reference to Contact | yes, when created (R-ESP1) | The Core person. |
+| Headline | text | no | A line under their name, for example "Admin, Riverside Food Bank". |
+| Bio | long text | no | Their biography for this event. |
+| Status | picklist | yes | Invited, Confirmed, Declined or Cancelled. Default Invited. |
+| Travel Needs, AV Needs | text | no | What they need to get there and to present. |
+
+### Rules
+
+**R-ESP1 A speaker is a Core person, once per event.** A new speaker names a person; an automation
+that always runs (registry row `Event_Speaker_Key`) sets `Speaker_Key__c` to the event and person
+identifiers and refuses a second speaker for the same person at the same event. A person deleted
+or erased later leaves the speaker with no person.
+
+**R-ESP2 The name defaults to the person's.** The same automation fills an empty Name from the
+person's first and last name.
+
+**R-ESP3 Removing a speaker removes their session assignments.** The Speakers panel deletes a
+speaker's assignments first; a speaker deleted another way leaves assignments with no speaker,
+which the Agenda Builder does not show.
+
+### Salesforce implementation
+
+- **Object:** `Event_Speaker__c`, name field Text, label Speaker Name, master-detail to Event
+  (`Event__c`, relationship Speakers), sharing Controlled by Parent, tab Speakers.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Person | `Contact__c` | Lookup(Contact), Clear on delete |
+| Headline | `Headline__c` | Text(255) |
+| Bio | `Bio__c` | Long Text Area(32768) |
+| Status | `Status__c` | Picklist (Invited, Confirmed, Declined, Cancelled), restricted, required |
+| Travel Needs | `Travel_Needs__c` | Text Area(255) |
+| AV Needs | `AV_Needs__c` | Text Area(255) |
+| Speaker Key | `Speaker_Key__c` | Text(40), unique, set by BarnCRM |
+
+- **Validation rule:** `Person_Required_When_Created` (R-ESP1).
+- **Automation:** `EventKeyHandler` through the registry row `Event_Speaker_Key` (always runs).
+- **Panel:** the Speakers tab of the event page (`eventSpeakers`), with `EventSpeakersController`
+  (thin, user mode).
+
+---
+
+## 29EV7. Session Speaker
+
+### Definition
+
+A speaker's place in a session (EV-05): the speaker, the session and their role in it.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Session | reference to Event Session | yes | The session. |
+| Speaker | reference to Event Speaker | yes, when created | The speaker, from the session's own event (R-SSP1). |
+| Role | picklist | yes | Speaker, Moderator or Panelist. Default Speaker. |
+
+### Rules
+
+**R-SSP1 A speaker speaks in sessions of their own event, once per session.** A validation rule
+refuses a speaker from another event; an automation that always runs (registry row
+`Session_Speaker_Key`) sets `Assignment_Key__c` to the session and speaker identifiers and refuses
+a second assignment of the same speaker to the same session.
+
+### Salesforce implementation
+
+- **Object:** `Session_Speaker__c`, name field Auto Number, master-detail to Event Session
+  (`Event_Session__c`, relationship Session Speakers), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Session | `Event_Session__c` | Master-Detail(Event Session) |
+| Speaker | `Event_Speaker__c` | Lookup(Event Speaker), Clear on delete |
+| Role | `Role__c` | Picklist (Speaker, Moderator, Panelist), restricted, required |
+| Assignment Key | `Assignment_Key__c` | Text(40), unique, set by BarnCRM |
+
+- **Validation rules:** `Speaker_Required_When_Created`, `Speaker_From_Same_Event` (R-SSP1).
+- **Automation:** `EventKeyHandler` through the registry row `Session_Speaker_Key` (always runs).
+
+---
+
+## 29EV8. Event Registration
+
+### Definition
+
+One booking for an event (EV-02): the person who registered, the attendees it holds, the promo
+code used and what is owed. BarnCRM records the amount owed and never takes a payment (plan
+Section 1.5). Design: ADR-0182 `0182-event-registrations.md`.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Event | reference to Event | yes | The event booked. |
+| Registrant | reference to Person | yes, when created | The Core person who registered, matched or created (R-ERG1). |
+| Status | picklist | yes | Registered, Waitlisted (every attendee waits for a seat) or Cancelled. |
+| Promo Code | reference to Promo Code | no | The code applied (R-ERG2). |
+| Amount Owed | currency | no | The attendees' prices with the code applied. |
+| Source | picklist | yes | Staff, Form or Summit Events. Default Staff. |
+| Form Submission Key | text | no | The Forms submission's record identifier, as text (ADR-0014). |
+| External Key | text | no | The key of the booking this was imported from, unique: `summit:` and the Summit Events registration's identifier (EV-10, R-ERG4). |
+
+### Rules
+
+**R-ERG1 A registrant is a Core person, never a duplicate.** Found by Core's matcher (email, then
+last name and postal code, each narrowed by first name, then the org's duplicate rules); a key
+several people hold is never guessed. A guest is looked for in the registrant's household first,
+and a new guest joins that household.
+
+**R-ERG2 A code is the event's own, active, inside its dates, for the ticket and under its use
+limit.** Uses are the event's registrations with the code that are not cancelled.
+
+**R-ERG3 Registrations are private.** Only holders of an Events permission set see them.
+
+**R-ERG4 A Summit Events registration is imported once.** With Summit Events installed, the
+morning run imports each Summit registration (not Started or Cancelled) as a registration with one
+attendee, keyed by its External Key, through R-ERG1; a registration already imported is never
+imported again, and later changes are made in BarnCRM.
+
+### Salesforce implementation
+
+- **Object:** `Event_Registration__c`, name field Auto Number (`REG-{000000}`), sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Lookup(Event), required, Restrict delete |
+| Registrant | `Contact__c` | Lookup(Contact), Clear on delete |
+| Status | `Status__c` | Picklist (Registered, Waitlisted, Cancelled), restricted, required |
+| Promo Code | `Promo_Code__c` | Lookup(Promo Code), Clear on delete |
+| Amount Owed | `Amount_Owed__c` | Currency(16, 2) |
+| Source | `Source__c` | Picklist (Staff, Form, Summit Events), restricted, required |
+| Form Submission Key | `Form_Submission_Key__c` | Text(18) |
+| External Key | `External_Key__c` | Text(80), unique, external ID (EV-10) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false: set on the registrations `EventsSampleData` loads, deleted (with their attendees) before the sample events, because the event lookup restricts delete (C-10) |
+
+- **Summit Events:** `SummitEventsAdapter` (dynamic SOQL by object name, no dependency) with
+  `SummitEventsBatch` and the nightly step `SummitEventsScheduler`, listed only when Summit Events
+  is installed (R-ERG4).
+- **Service:** `EventRegistrationService` (user mode, one savepoint) with `EventPersonMatcher`
+  (Core's `ImportMatcher` and `ImportDuplicateRuleMatcher`). Forms reaches it through
+  `EventFormAttachment` (Core's `FormAttachmentExtension`); the event names its form in
+  `Registration_Form_Key__c` (29EV1).
+
+---
+
+## 29EV9. Event Attendee
+
+### Definition
+
+One person attending an event on a registration (EV-02), with the ticket they hold and whether
+they came.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Registration | reference to Event Registration | yes | The booking it belongs to. |
+| Person | reference to Person | yes, when created | The Core person attending. |
+| Ticket Type | reference to Ticket Type | no | The ticket held. |
+| Price | currency | no | The ticket's price with the registration's code applied (R-PC5). |
+| Status | picklist | yes | Registered, Waitlisted, Cancelled, Attended or No-Show. |
+| Table | reference to Event Table | no | The table the person sits at (EV-13). |
+| Dietary Needs | text | no | Meal needs, up to 255 characters (EV-13). |
+| Access Needs | text | no | Access needs, up to 255 characters (EV-13). |
+
+### Rules
+
+**R-EAT1 Seats.** Attendees Registered, Attended or No-Show take a seat. With no seat left on the
+event's capacity or the ticket's quantity, a new attendee is Waitlisted; Move Off Waitlist checks
+the seats again.
+
+**R-EAT2 A person attends an event once.** A person who already holds an attendee on the event
+that is not cancelled is not added again.
+
+### Salesforce implementation
+
+- **Object:** `Event_Attendee__c`, name field Text (the person's name), master-detail to Event
+  Registration (`Event_Registration__c`, relationship Attendees), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Registration | `Event_Registration__c` | Master-Detail(Event Registration) |
+| Person | `Contact__c` | Lookup(Contact), Clear on delete |
+| Ticket Type | `Ticket_Type__c` | Lookup(Ticket Type), Clear on delete |
+| Price | `Price__c` | Currency(16, 2) |
+| Status | `Status__c` | Picklist (Registered, Waitlisted, Cancelled, Attended, No-Show), restricted, required |
+| Reminder Sent On | `Reminder_Sent_On__c` | DateTime, set by the morning run (EV-14, R-EAT3) |
+| Follow-Up Sent On | `Follow_Up_Sent_On__c` | DateTime, set by the morning run (EV-14, R-EAT3) |
+| Event Name | `Event_Name__c` | Formula (Text): the event's name, for email templates |
+| Table | `Event_Table__c` | Lookup(Event Table), Clear on delete (EV-13) |
+| Dietary Needs | `Dietary_Needs__c` | Text(255) (EV-13) |
+| Access Needs | `Access_Needs__c` | Text(255) (EV-13) |
+| Survey Link | `Survey_Link__c` | Text(255), set by the morning run when it sends the survey email (EV-18, R-ESV2) |
+
+**R-EAT3 Each email goes once.** The morning run stamps an attendee before emailing it and clears
+the stamp when the send fails; clearing a stamp by hand sends that email again.
+
+- **Panel:** the Registrations tab of the event page (`eventRegistrations`), with
+  `EventRegistrationsController` (thin, user mode); counts, status badges and menu items come
+  from the framework-free module `eventRegistrationsModel.js` (plan 9.9).
+
+---
+
+## 29EV15. Event Appointment
+
+### Definition
+
+One bookable slot with a host during an event (EV-15, ADR-0177 decision 13): a mentor, advisor or
+staff member's time, open until a person is booked into it. Numbered for its plan item so it does
+not collide with registrations (EV-02).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Appointment Title | text | yes | The host's name and the start time, set when slots are added. |
+| Event | reference to Event | yes | The event. |
+| Host | reference to Contact | yes, when created (R-EAP3) | The Core person who hosts. |
+| Person | reference to Contact | when Booked (R-EAP4) | The person booked into the slot; empty while it is Open. |
+| Start, End | date and time | yes | When the slot runs; End after Start (R-EAP1), inside the event's dates (R-EAP2). |
+| Status | picklist | yes | Open (default), Booked, Completed, No-Show or Cancelled. |
+| Location | text | no | A table, room or meeting link. |
+| Notes | long text | no | What staff or the host should know. |
+
+### Rules
+
+**R-EAP1 A slot ends after it starts.** Validation rule `End_After_Start`.
+
+**R-EAP2 A slot falls inside its event.** Validation rule `Inside_Event_Dates`.
+
+**R-EAP3 A new slot names its host.** Validation rule `Host_Required_When_Created`; a host
+deleted or erased later leaves the slot with none.
+
+**R-EAP4 Booked needs a person.** Validation rule `Person_Required_When_Booked`, checked only
+when the status or person changes, so a person erased later does not block editing the slot.
+
+**R-EAP5 Booking is one person at a time, never twice at once.** The Appointments tab books only
+an Open slot (under a record lock), and refuses a person who already has a Booked slot that
+overlaps it in the same event. Releasing a slot clears the person and returns it to Open.
+
+**R-EAP6 A host's overlapping slots are flagged, not refused.** The tab marks two live slots of
+one host that overlap (Cancelled slots take no time); Add Slots leaves out a new slot that
+overlaps one the host already has.
+
+### Salesforce implementation
+
+- **Object:** `Event_Appointment__c`, name field Text, label Appointment Title, master-detail to
+  Event (`Event__c`, relationship Appointments), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Host | `Host__c` | Lookup(Contact), Clear on delete |
+| Person | `Contact__c` | Lookup(Contact), Clear on delete |
+| Start, End | `Start__c`, `End__c` | Date/Time, required |
+| Status | `Status__c` | Picklist (Open, Booked, Completed, No-Show, Cancelled), restricted, required |
+| Location | `Location__c` | Text(255) |
+| Notes | `Notes__c` | Long Text Area(2000) |
+
+- **Validation rules:** `End_After_Start`, `Inside_Event_Dates`, `Host_Required_When_Created`,
+  `Person_Required_When_Booked`.
+- **Panel:** the Appointments tab of the event page (`eventAppointments`), with
+  `EventAppointmentsController` (thin, user mode) and the browser module
+  `eventAppointmentsModel` (slots, clashes, grouping).
+
+---
+
+## 29EV18. Event Survey Response
+
+### Definition
+
+One attendee's answers to the post-event survey of their event (EV-18, ADR-0188). The survey is a
+Forms form the event names in `Survey_Form_Key__c`; the attendee opens it from the link in the
+follow-up email, so the form's submission is filled from the attendee and Core hands the answers
+to Events through `FormAttachmentExtension` (an attendee's survey form is its event's).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Attendee | reference to Event Attendee | yes | Who answered; the event is the attendee's event. |
+| Answers | long text (JSON) | no | The answers by question key. |
+| Submitted On | datetime | no | When the answers were last received. |
+| Form Submission Key | text | no | The Forms submission's record identifier, as text (ADR-0014). |
+
+### Rules
+
+**R-ESV1 One response per attendee.** A later submission from the same attendee replaces the
+answers of the earlier one.
+
+**R-ESV2 The survey goes with the follow-up.** The morning run (EV-14) sends an attendee marked
+Attended, of an event with a survey form for which Forms can give a public address, the survey
+email template (setting `Survey_Template__c`) with the attendee's own address in `Survey_Link__c`;
+any other attendee gets the follow-up template. Each attendee is still emailed once.
+
+**R-ESV3 Forms optional.** Without Forms (no `FormCatalogExtension`) the Survey section is not
+shown, no survey email is chosen and follow-ups are unchanged.
+
+### Salesforce implementation
+
+- **Object:** `Event_Survey_Response__c`, name field auto-number (`ESR-{000000}`), master-detail to
+  Event Attendee (`Attendee__c`, relationship Survey_Responses), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Attendee | `Attendee__c` | Master-Detail(Event Attendee) |
+| Answers | `Answers__c` | Long Text Area(32768) |
+| Submitted On | `Submitted_On__c` | DateTime |
+| Form Submission Key | `Form_Submission_Key__c` | Text(18) |
+
+- **Panel:** the Survey section of the Details tab (`eventSurvey`), with `EventSurveyController`
+  (thin, user mode); the summary (average, counts, newest comments, response rate) comes from the
+  framework-free module `eventSurveyModel.js` (plan 9.9).
+- **Seam:** Core's `FormCatalogExtension` (publicForms, questions, publicLink), found by
+  `FormCatalogExtensions` and implemented by Forms' `FormsCatalogExtension`; Core's
+  `FormAttachmentExtension` is handled for Event Attendee records by `EventFormAttachment`.
+
+---
+
+## 29EV20. Speaker Application
+
+### Definition
+
+A person's proposal to speak at an event (EV-06, the call for speakers): a title, an abstract, an
+optional track, reviewers' scores and a decision. Accepting it makes the applicant a speaker at the
+event (29EV6). Same review pattern as the Funders and Programs reviews, with no dependency on them.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Proposal Title | text | yes | The name of the proposed talk. |
+| Event | reference to Event | yes | The event the proposal is for. |
+| Applicant | reference to Contact | yes, when created (R-SA1) | The Core person who applied. |
+| Abstract | long text | no | What the talk covers. |
+| Track | reference to Event Track | no | The track the applicant named. |
+| Status | picklist | yes | Submitted, In Review, Accepted, Declined or Withdrawn. Default Submitted. |
+| Speaker | reference to Event Speaker | no | Set when the application is accepted (R-SA4). |
+| Notice Sent | date and time | no | When the accept or decline email went out. |
+| Notice Result | text | no | Why no notice went out, when it did not (R-SA5). |
+| Reviews, Total Score | roll-up summary | no | The count and the sum of the application's reviews. |
+| Average Score | formula | no | Total Score divided by Reviews; empty before the first review (R-SA2). |
+
+### Rules
+
+**R-SA1 An application names a Core person.** A validation rule requires the applicant when the
+application is created; a person deleted or erased later leaves the application with none.
+
+**R-SA2 The average score is computed, never typed.** Roll-up summaries count and add the
+application's reviews; a formula divides them.
+
+**R-SA4 Only an undecided application is decided or scored.** Submitted and In Review applications
+can be scored, accepted or declined; the first score moves Submitted to In Review. Accepting
+finds the applicant's speaker at the event (29EV6) or makes one (status Invited), and links it.
+Declining makes no speaker. An accepted application with no applicant is refused. A decided
+application is edited as a record, not decided again.
+
+**R-SA5 A notice never undoes a decision.** Accepting or declining sends the applicant one email
+from the template named for that outcome in Events Settings (29EV25, by default the shipped
+BarnCRM_Speaker_Accepted or BarnCRM_Speaker_Declined), with the applicant as the recipient and the
+application as the record it merges. When no email goes out (the template is missing or inactive, the applicant has no email address, or the send fails) the
+decision stands and Notice Result says why; when it goes, Notice Sent holds the time.
+
+### Salesforce implementation
+
+- **Object:** `Speaker_Application__c`, name field Text, label Proposal Title, master-detail to
+  Event (`Event__c`, relationship Speaker Applications), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Applicant | `Contact__c` | Lookup(Contact), Clear on delete |
+| Abstract | `Abstract__c` | Long Text Area(32768) |
+| Track | `Track__c` | Lookup(Event Track), Clear on delete |
+| Status | `Status__c` | Picklist (Submitted, In Review, Accepted, Declined, Withdrawn), restricted, required |
+| Speaker | `Event_Speaker__c` | Lookup(Event Speaker), Clear on delete |
+| Notice Sent | `Notice_Sent__c` | Date/Time |
+| Notice Result | `Notice_Result__c` | Text(255) |
+| Reviews | `Review_Count__c` | Roll-Up Summary (COUNT Speaker Review) |
+| Total Score | `Total_Score__c` | Roll-Up Summary (SUM Speaker Review Score) |
+| Average Score | `Average_Score__c` | Formula (Number, 1 decimal) |
+
+- **Validation rule:** `Applicant_Required_When_Created` (R-SA1).
+- **Panel:** the Applications tab of the event page (`eventApplications`), with
+  `EventApplicationsController` (thin, user mode) and the framework-free `eventApplicationsModel`.
+
+---
+
+## 29EV21. Speaker Review
+
+### Definition
+
+One reviewer's score and note for a speaker application (EV-06).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Application | reference to Speaker Application | yes | The application scored. |
+| Reviewer | reference to User | no | The person who scored it; set to the person saving. |
+| Score | number | yes | A whole number from 1 to 5 (R-SA3). |
+| Notes | long text | no | Why. |
+
+### Rules
+
+**R-SA3 One score per reviewer per application, from 1 to 5.** A validation rule keeps the score
+a whole number from 1 to 5. The Applications tab saves the viewing person's review as an upsert, so
+a second save replaces the first; reviews cannot be added or replaced once the application is
+decided.
+
+### Salesforce implementation
+
+- **Object:** `Speaker_Review__c`, name field Auto Number (`SRV-{000000}`), master-detail to
+  Speaker Application (`Speaker_Application__c`, relationship Reviews), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Application | `Speaker_Application__c` | Master-Detail(Speaker Application) |
+| Reviewer | `Reviewer__c` | Lookup(User), Clear on delete |
+| Score | `Score__c` | Number(1, 0), required |
+| Notes | `Notes__c` | Long Text Area(5000) |
+
+- **Validation rule:** `Score_From_One_To_Five` (R-SA3).
+
+---
+
+## 29EV22. Sponsorship Level
+
+### Definition
+
+One tier of an event's sponsorship (EV-09): its name, what a sponsor at it is asked to give, what
+the sponsor receives and the deliverables a new sponsor at the level starts with.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Level Name | text | yes | For example Gold. |
+| Event | reference to Event | yes | The event. |
+| Amount | currency | no | What a sponsor at this level is asked to give. |
+| Benefits | long text | no | What a sponsor at this level receives. |
+| Deliverables | long text | no | One deliverable per line, the checklist a new sponsor starts with (R-SP3). |
+| Sort Order | number | no | Levels list from the lowest number up. Default 0. |
+
+### Rules
+
+**R-SP3 A level starts a sponsor's checklist.** Adding a sponsor at a level copies the amount and
+makes one deliverable per non-blank, non-repeated line of Deliverables, up to 50, each name cut to
+80 characters. A line whose first word is Logo, Booth or Passes (any case, punctuation ignored)
+gets that type; any other line is Other. Removing a level leaves its sponsors with no level.
+
+### Salesforce implementation
+
+- **Object:** `Sponsorship_Level__c`, name field Text, label Level Name, master-detail to Event
+  (`Event__c`, relationship Sponsorship Levels), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Amount | `Amount__c` | Currency(16, 2) |
+| Benefits | `Benefits__c` | Long Text Area(5000) |
+| Deliverables | `Deliverables__c` | Long Text Area(5000) |
+| Sort Order | `Sort_Order__c` | Number(3, 0), default 0 |
+
+- **Parsing:** `SponsorDeliverableTemplate` (R-SP3).
+
+---
+
+## 29EV23. Event Sponsor
+
+### Definition
+
+An organization sponsoring an event (EV-09): the Core account, its level, status and amount, and
+its deliverables checklist (29EV24). Optionally tied to a Giving gift or commitment, or a Funders
+award.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Sponsor Name | text | yes | The organization's name; the Sponsors tab fills it. |
+| Event | reference to Event | yes | The event. |
+| Organization | reference to Account | no | The sponsoring Core account (R-SP1). |
+| Level | reference to Sponsorship Level | no | The tier. |
+| Contact | reference to Contact | no | The sponsor's contact person. |
+| Status | picklist | yes | Prospect, Committed, Confirmed or Declined. Default Prospect. |
+| Amount | currency | no | What the sponsor has agreed to give; starts as the level's. |
+| Linked Record | text | no | The record identifier of a Giving gift or commitment, or a Funders award (R-SP4). |
+| Notes | text | no | Anything to remember. |
+| Deliverables, Deliverables Done | roll-up summary | no | The count of the checklist and of its Done items. |
+
+### Rules
+
+**R-SP1 One sponsorship per organization per event, from the event's own levels.** The Sponsors tab
+refuses a second sponsor for the same account at an event, and a level of another event.
+
+**R-SP4 The link to Giving or Funders is by identifier, labelled through Core.** Linked Record holds
+the identifier as text. Core's `LinkedRecords` names it (the record's name and the object's label)
+only when the object is one it supports (a gift, a commitment, a Funders award), is in the org and
+the person can read the record; otherwise the tab shows no name and no error. Events names no
+object of another module.
+
+### Salesforce implementation
+
+- **Object:** `Event_Sponsor__c`, name field Text, label Sponsor Name, master-detail to Event
+  (`Event__c`, relationship Sponsors), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Organization | `Account__c` | Lookup(Account), Clear on delete |
+| Level | `Level__c` | Lookup(Sponsorship Level), Clear on delete |
+| Contact | `Contact__c` | Lookup(Contact), Clear on delete |
+| Status | `Status__c` | Picklist (Prospect, Committed, Confirmed, Declined), restricted, required |
+| Amount | `Amount__c` | Currency(16, 2) |
+| Linked Record | `Linked_Record_Id__c` | Text(18) |
+| Notes | `Notes__c` | Text Area(255) |
+| Deliverables | `Deliverables_Total__c` | Roll-Up Summary (COUNT Sponsor Deliverable) |
+| Deliverables Done | `Deliverables_Done__c` | Roll-Up Summary (COUNT Sponsor Deliverable, Status = Done) |
+
+- **Core seam:** `LinkedRecords` (R-SP4).
+- **Panel:** the Sponsors tab of the event page (`eventSponsors`), with `EventSponsorsController`
+  (thin, user mode) and the framework-free `eventSponsorsModel`.
+
+---
+
+## 29EV24. Sponsor Deliverable
+
+### Definition
+
+One item on a sponsor's checklist (EV-09): a logo, a booth, passes, or anything else the sponsor
+is owed or owes.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Deliverable | text | yes | What it is, for example Logo for the program. |
+| Sponsor | reference to Event Sponsor | yes | The sponsor. |
+| Type | picklist | yes | Logo, Booth, Passes or Other. Default Other. |
+| Status | picklist | yes | Pending, Requested, Received or Done. Default Pending. |
+| Due Date | date | no | When it is needed. |
+| Quantity | number | no | How many, for example the number of passes. |
+| Notes | text | no | Details. |
+
+### Salesforce implementation
+
+- **Object:** `Sponsor_Deliverable__c`, name field Text, label Deliverable, master-detail to Event
+  Sponsor (`Event_Sponsor__c`, relationship Deliverables), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Sponsor | `Event_Sponsor__c` | Master-Detail(Event Sponsor) |
+| Type | `Type__c` | Picklist (Logo, Booth, Passes, Other), restricted, required |
+| Status | `Status__c` | Picklist (Pending, Requested, Received, Done), restricted, required |
+| Due Date | `Due_Date__c` | Date |
+| Quantity | `Quantity__c` | Number(4, 0) |
+| Notes | `Notes__c` | Text Area(255) |
+
+---
+
+## 29EV25. Events Settings
+
+### Definition
+
+The Event Management module's org-wide settings (ADR-0017), edited in the Events section of BarnCRM
+Settings: the email template for each speaker application outcome (EV-06), and the reminder,
+follow-up and No-Show settings (EV-14).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Send event reminders | boolean | yes (defaults false) | Whether the morning run emails each registered person before an Open or Closed event. |
+| Days before an event to remind | number | yes (defaults 2) | The lead time, from 1 to 30 days (R-ES2). |
+| Reminder email template | text | yes (defaults BarnCRM_Event_Reminder) | The unique name of the reminder's email template. |
+| Send follow-ups | boolean | yes (defaults false) | Whether the morning run emails each person marked Attended within seven days after the event. |
+| Follow-up email template | text | yes (defaults BarnCRM_Event_Follow_Up) | The unique name of the follow-up's email template. |
+| Survey email template | text | yes (defaults BarnCRM_Event_Survey) | The unique name of the follow-up template used when the event has a survey (EV-18). |
+| Mark no-shows | boolean | yes (defaults false) | Whether the morning run marks attendees still Registered as No-Show once an event (ended within seven days) is over. |
+| Accepted Notice Template | text | yes (defaults BarnCRM_Speaker_Accepted) | The unique name of the email template sent when an application is accepted. |
+| Declined Notice Template | text | yes (defaults BarnCRM_Speaker_Declined) | The unique name of the email template sent when an application is declined. |
+| Payment note | text | yes (defaults "Pay at the door or by arrangement with us.") | Shown beside each priced ticket on a public event page (EV-16): BarnCRM takes no payment. A blank one reads as the default. |
+
+### Rules
+
+**R-ES1 A blank notice template reads as the shipped template.** A blank, never-saved or
+unreadable speaker notice template reads as the shipped template, BarnCRM_Speaker_Accepted or
+BarnCRM_Speaker_Declined (R-SA5), so a setting is never blank. A template is named by unique name
+as text, because no lookup to an email template is possible (ADR-0032). To send no email for an
+outcome, an administrator makes its template inactive: the decision is still saved and the
+application records that no notice went.
+
+**R-ES2 A value out of range reads as the default.** A blank or out of range lead time reads as
+2, a blank reminder or follow-up template name as the shipped template; a never-saved setting
+reads as its shipped value.
+
+### Salesforce implementation
+
+- **Object:** `Events_Settings__c`, hierarchy custom setting, visibility Protected, read through
+  Core's `SettingsService` by `EventsSettings`.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Accepted Notice Template | `Accept_Notice_Template__c` | Text(80), default BarnCRM_Speaker_Accepted |
+| Declined Notice Template | `Decline_Notice_Template__c` | Text(80), default BarnCRM_Speaker_Declined |
+| Send event reminders | `Reminders_Enabled__c` | Checkbox, default false |
+| Days before an event to remind | `Reminder_Lead_Days__c` | Number(2, 0), default 2 |
+| Reminder email template | `Reminder_Template__c` | Text(80), default BarnCRM_Event_Reminder |
+| Send follow-ups | `Follow_Ups_Enabled__c` | Checkbox, default false |
+| Follow-up email template | `Follow_Up_Template__c` | Text(80), default BarnCRM_Event_Follow_Up |
+| Survey email template | `Survey_Template__c` | Text(80), default BarnCRM_Event_Survey (EV-18) |
+| Mark no-shows | `Mark_No_Shows__c` | Checkbox, default false |
+| Payment note | `Public_Payment_Note__c` | Text(255), default "Pay at the door or by arrangement with us." |
+
+- **Setting Definitions:** `Events_Reminders_Enabled`, `Events_Reminder_Lead_Days`,
+  `Events_Reminder_Template`, `Events_Follow_Ups_Enabled`, `Events_Follow_Up_Template`,
+  `Events_Mark_No_Shows` (sort 10 to 60), `Events_Accept_Notice_Template` (70),
+  `Events_Decline_Notice_Template` (80), `Events_Survey_Template` (55),
+  `Events_Public_Payment_Note` (90), section Events (Core's `SettingSections.EVENTS`).
+- **Automation:** the nightly step `EventEmailScheduler` (7:30 AM, through
+  `EventsNightlyJobProvider`) starts `EventEmailBatch`; the work is `EventEmailService`. Email
+  templates `BarnCRM_Event_Reminder`, `BarnCRM_Event_Follow_Up`, `BarnCRM_Event_Survey`,
+  `BarnCRM_Speaker_Accepted` and `BarnCRM_Speaker_Declined` ship in the folder BarnCRM Events.
+
+---
+
+## 29EV26. Event Table
+
+### Definition
+
+One table at a gala or other seated event (EV-13, ADR-0186 `0186-events-gala-seating.md`): its seats,
+its host and, for a table a sponsor bought, the sponsor. Guests are seated by setting the table on
+their Event Attendee (29EV9).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Table Name | text | yes | For example Table 4. |
+| Event | reference to Event | yes | The event. |
+| Capacity | number | yes | Seats, at least 1. |
+| Host | reference to Person | no | The person who hosts the table. |
+| Sponsor | reference to Event Sponsor | no | Set when the table belongs to a sponsor of this event. |
+
+### Rules
+
+**R-ET1 Over capacity warns.** More people than seats is allowed and flagged, never refused.
+
+**R-ET2 A party sits together.** The people on one registration move together unless staff turn
+that off; Suggest Seating places whole parties and never fills a sponsor table.
+
+### Salesforce implementation
+
+- **Object:** `Event_Table__c`, name field Text (label Table Name), master-detail to Event
+  (`Event__c`, relationship Tables), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Capacity | `Capacity__c` | Number(4, 0), required |
+| Host | `Host__c` | Lookup(Contact), Clear on delete |
+| Sponsor | `Event_Sponsor__c` | Lookup(Event Sponsor), Clear on delete |
+
+- **Panel:** the Seating tab of the event page (`eventSeating`), with `EventSeatingController`
+  (thin, user mode); counts, parties, suggested seating and the CSV come from the framework-free
+  module `eventSeatingModel.js` (plan 9.9).
+
+---
+
+## 29PB1. Portal
+
+### Definition
+
+One logged-in portal an organization runs off-platform (PB-01, Portal Builder module, ADR-0185
+`0185-portal-builder-off-platform-portal-api.md`, D-187): its key, who may sign in, whether a
+second factor is used, and its template (pages, objects, fields and actions) as JSON.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What people see as the portal's title. |
+| Key | text | yes | The key the portal client names, unique (R-PB1). |
+| Status | picklist | yes | Active or Inactive. Default Inactive. Inactive refuses every sign-in and call. |
+| Access Mode | picklist | yes | Invited (only people with an active Portal Access) or Any Matching Person (anyone whose email matches exactly one person). Default Invited. |
+| Second Factor | picklist | yes | Off, Optional or Required. Default Off (R-PB4). |
+| Session Hours | number | no | How long a session lasts at most. Blank means 8. |
+| Sender Address | email | no | An organization-wide email address the sign-in code is sent from. Blank: the integration user's address. |
+| Template | long text | yes, to be used | The template as JSON (R-PB2). |
+
+### Rules
+
+**R-PB1 Keys are unique.** The client names a portal by key; the field is unique.
+
+**R-PB2 A template is checked on every call.** `PortalTemplate` parses it (`schemaVersion` 1) and
+checks it against the org's schema; a template that fails is refused as `portal_unavailable` and
+logged, never partly used. Pages are `person` (Contact, the verified person), `related` (a custom
+object whose `personField` looks up to Contact) or `catalog` (a custom object, read only, with fixed
+`where` tests). Editable fields are updateable, of a safe type, never a lookup. A related page's
+`personField` may be `Parent__r.Contact__c` (one parent hop to a lookup to Contact, ADR-0191
+`0191-portal-templates-volunteer-speaker-donor.md`): such a page is read only.
+
+**R-PB3 Every read and write is the verified person's.** A related page reads and updates only
+records whose `personField` is the person and creates records with it set; a person page only
+the person's Contact; a catalog page only records passing its tests.
+
+**R-PB4 Second factor.** Required: a person not enrolled enrols at sign-in. Optional: enrolment is
+offered after sign-in. Off: never asked.
+
+### Salesforce implementation
+
+- **Object:** `Portal__c`, name field Text (Portal Name), sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Key | `Key__c` | Text(40), unique, external ID, required |
+| Status | `Status__c` | Picklist (Active, Inactive), restricted, required |
+| Access Mode | `Access_Mode__c` | Picklist (Invited, Any Matching Person), restricted, required |
+| Second Factor | `Second_Factor__c` | Picklist (Off, Optional, Required), restricted, required |
+| Session Hours | `Session_Hours__c` | Number(3, 0), default 8 |
+| Sender Address | `Sender_Address__c` | Email |
+| Template | `Template__c` | Long Text Area(131072) |
+
+---
+
+## 29PB2. Portal Access
+
+### Definition
+
+A person's right to sign in to one portal, with the sign-in failures and second factor enrolment
+that belong to them.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Portal | reference to Portal | yes | The portal. |
+| Person | reference to Contact | yes, to sign in | The person. Cleared when the person is deleted; an access with no person cannot sign in. |
+| Status | picklist | yes | Active or Suspended. Default Active. Suspended ends every session on the next call. |
+| Failed Attempts | number | no | Wrong codes in a row since the last sign-in (R-PA1). |
+| Locked Until | datetime | no | Set when failures reach the setting's limit. |
+| Second Factor Enrolled | boolean | yes | Whether an authenticator is confirmed. Clear it to reset. |
+| Second Factor Secret | text | no | The authenticator secret, base32. Granted to no one; read only by Portal Builder. |
+| Last Sign In | datetime | no | When the person last signed in. |
+
+### Rules
+
+**R-PA1 Lockout.** Each wrong code adds one to Failed Attempts; at the setting's limit (10) the
+access is locked for the setting's minutes (30). A sign-in resets the count. While locked no code is
+sent and no code is accepted.
+
+**R-PA2 One access per person per portal.** Any Matching Person portals create the access on first
+use only when the person has none.
+
+### Salesforce implementation
+
+- **Object:** `Portal_Access__c`, name field Auto Number (PA-{000000}), master-detail to Portal
+  (`Portal__c`, relationship Portal Accesses), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Portal | `Portal__c` | Master-Detail(Portal) |
+| Person | `Person__c` | Lookup(Contact), Clear on delete |
+| Status | `Status__c` | Picklist (Active, Suspended), restricted, required |
+| Failed Attempts | `Failed_Attempts__c` | Number(3, 0), default 0 |
+| Locked Until | `Locked_Until__c` | DateTime |
+| Second Factor Enrolled | `Second_Factor_Enrolled__c` | Checkbox, default false |
+| Second Factor Secret | `Second_Factor_Secret__c` | Text(64) |
+| Last Sign In | `Last_Sign_In__c` | DateTime |
+
+---
+
+## 29PB3. Portal Session
+
+### Definition
+
+One sign-in: from the code sent, through the second factor, to the active session the client holds
+a token for, until it ends.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Portal Access | reference to Portal Access | yes | Whose sign-in. |
+| Stage | picklist | yes | Code Sent, Second Factor, Enroll, Active or Ended. Set Ended to sign the session out. |
+| Token Hash | text | yes | SHA-256 of the challenge token, then of the session token (R-PS1). |
+| Code Hash | text | no | SHA-256 of the token hash and the code. |
+| Code Expires | datetime | no | When the code stops working. |
+| Attempts | number | no | Wrong codes on this challenge. |
+| Expires | datetime | no | When the active session ends at the latest. |
+| Last Used | datetime | no | The last call, for the idle limit. |
+
+### Rules
+
+**R-PS1 Only hashes are kept.** Tokens and codes are random from `Crypto`, sent once and never
+stored or returned again.
+
+**R-PS2 A session works only while it and its access and portal do.** Every call checks the stage,
+both expiries, the access status and lock, the portal status and the org-wide switch.
+
+### Salesforce implementation
+
+- **Object:** `Portal_Session__c`, name field Auto Number (PS-{000000}), master-detail to Portal
+  Access (`Portal_Access__c`, relationship Portal Sessions), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Portal Access | `Portal_Access__c` | Master-Detail(Portal Access) |
+| Stage | `Stage__c` | Picklist (Code Sent, Second Factor, Enroll, Active, Ended), restricted, required |
+| Token Hash | `Token_Hash__c` | Text(64), unique, external ID |
+| Code Hash | `Code_Hash__c` | Text(64) |
+| Code Expires | `Code_Expires__c` | DateTime |
+| Attempts | `Attempts__c` | Number(2, 0), default 0 |
+| Expires | `Expires__c` | DateTime |
+| Last Used | `Last_Used__c` | DateTime |
+
+---
+
+## 29PB4. Portal Settings
+
+### Definition
+
+Portal Builder's org-wide switch and sign-in limits, edited in the Portals section of BarnCRM
+Settings.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Portal Sign-In | boolean | yes (defaults false) | Whether any portal accepts sign-ins and calls. |
+| Code Minutes | number | no | How long a code works. Blank means 10. |
+| Code Requests per Hour | number | no | Codes one person may ask for per hour. Blank means 5. |
+| Emails per Portal per Hour | number | no | Codes one portal sends per hour. Blank means 200. |
+| Attempts per Code | number | no | Wrong tries before a code stops working. Blank means 5. |
+| Failures Before Lockout | number | no | Wrong codes in a row before a lockout. Blank means 10. |
+| Lockout Minutes | number | no | How long a lockout lasts. Blank means 30. |
+| Idle Minutes | number | no | How long a session may sit unused. Blank means 30. |
+
+### Rules
+
+**R-PST1 Limits are silent on sign-in.** A limit reached when a code is asked for sends nothing
+and answers as usual, so no answer says who is on file.
+
+### Salesforce implementation
+
+- **Object:** `Portal_Settings__c`, hierarchy custom setting, visibility Protected.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Portal Sign-In | `Enabled__c` | Checkbox, default false |
+| Code Minutes | `Code_Minutes__c` | Number(2, 0), default 10 |
+| Code Requests per Hour | `Code_Requests_Per_Hour__c` | Number(3, 0), default 5 |
+| Emails per Portal per Hour | `Emails_Per_Portal_Hour__c` | Number(5, 0), default 200 |
+| Attempts per Code | `Attempts_Per_Code__c` | Number(2, 0), default 5 |
+| Failures Before Lockout | `Failures_Before_Lockout__c` | Number(3, 0), default 10 |
+| Lockout Minutes | `Lockout_Minutes__c` | Number(4, 0), default 30 |
+| Idle Minutes | `Idle_Minutes__c` | Number(4, 0), default 30 |
+
+- **Setting Definitions:** `Portal_Enabled`, `Portal_Code_Minutes`, `Portal_Code_Requests`,
+  `Portal_Emails_Per_Hour`, `Portal_Attempts_Per_Code`, `Portal_Failures_Before_Lockout`,
+  `Portal_Lockout_Minutes`, `Portal_Idle_Minutes`, section Portals.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -12906,7 +14506,31 @@ mirrors the primary member).
 | 1.0 | 2026-11-06 | Session horizon setting (modules-24, D-183). `Programs_Settings__c` gains `Session_Horizon_Weeks__c` (Number(2, 0), default 8, 1 to 26). R-SS2 reads it instead of a fixed eight weeks, and skips a day another schedule filled earlier in the same run. |
 | 1.0 | 2026-11-06 | Shipped match sources turned off through a setting (owner decision D-184, ADR-0172). `BarnCRM_Settings__c` gains `Match_Sources_Turned_Off__c` (Section 12); Match Source's Active definition now says BarnCRM changes it only on the organization's own rows. |
 | 1.0 | 2026-11-06 | Addresses of deleted records (owner decision D-184). `BarnCRM_Settings__c` gains `Address_Delete_Behavior__c` (Section 12; Delete or Keep, default Delete) and `Address__c` gains `Deleted_With__c` (Text 40), with rule R-AD11: a deleted household's, organization's or person's addresses are deleted with it and restored with it, never on a merge. |
+| 1.1 | 2026-11-06 | Radius Find (C-69, D-157, ADR-0179). No object or field added. Section 29D gains rule R-SQ13: the query document's optional `radius` key (distance from a US postal code or a record's address, compiled to SOQL `DISTANCE`), the shipped static resource `BarnZipCentroids` (US Census Bureau 2023 Gazetteer ZCTA internal points, public domain) and the `FindRadius` class. |
+| 1.1 | 2026-11-06 | Volunteer unfilled shift nudges (V-10b, D-165). `Volunteer_Shift__c` (29K) gains `Nudge_Sent_On__c` (DateTime); `Volunteer_Settings__c` (29N) gains `Nudges_Enabled__c` (false) and `Nudge_Lead_Days__c` (3, 1 to 14). New rule R-VU6a (29L): one nudge per unfilled shift to the job's regular volunteers, from the 7:15 AM nightly step. |
 | 1.0 | 2026-11-06 | Shipped organization record type (owner decision D-184, ADR-0173, amends ADR-0141 decision 2). Account gains the record type `BarnCRM_Organization` (active, given to nobody). Section 8 gains R-O4a: offered for organizations only where the org has no record type of its own, never detected, never switched to automatically; R-O5 leaves it out of the candidates. |
+| 1.1 | 2026-11-06 | Forms module (C-42a, D-157, ADR-0175 `0175-forms-module.md`). New package BarnCRM Forms with Sections 29ZW Form (`Form__c`), 29ZX Form Version (`Form_Version__c`) and 29ZY Form Submission (`Form_Submission__c`), rules R-FM1, R-FM2 and R-FS1 to R-FS4. Core gains no object or field: only the `FormAttachmentExtension` seam and the catalog row `BarnCRM_Module.Forms`. |
+| 1.1 | 2026-11-07 | Public forms (C-42b, D-157, ADR-0184 public forms on a Salesforce Site). `Form__c` gains `Public__c` (Checkbox); `Form_Version__c` gains `Signing_Key__c` (Text 64); `Form_Submission__c` gains `Source__c` (Staff, Public) and Status value Received. R-FM1 gains the `public` block; new rules R-FM3, R-FS5 and R-FS6. |
+| 1.1 | 2026-11-07 | Files and save for later on forms (C-42c, D-157, ADR-0184 public forms on a Salesforce Site, decision 11). New Section 29ZY1 Form Draft (`Form_Draft__c`); R-FM1 gains the `file` type and `public.saveForLater` and `public.resumeDays`; new rule R-FS7. |
+| 1.1 | 2026-11-06 | BarnCRM Contact Point Sync module (C-45, D-111, ADR-0176 contact point sync module). New package `contactpoints`: Contact Point Link (`Contact_Point_Link__c`, 29ZZ, rules R-CPL1 to R-CPL4) and Contact Point Sync Settings (`Contact_Point_Sync_Settings__c`, 29ZZ1, R-CPS1). No Core object or field added. |
+| 1.1 | 2026-11-07 | Contact Point Sync: person accounts and household moves (C-45e, D-186, ADR-0176 decisions 14 and 15). Rules R-CPL5 and R-CPL6 added to Contact Point Link. Two Automation Registry rows (`Contact_Point_Sync_Account`, `Contact_Point_Sync_Membership`). No object or field added. |
+| 1.2 | 2026-11-06 | Event Management module (EV-01, EV-03, EV-04, EV-05; ADR-0177 `0177-events-module.md`, D-123, D-177). Seven objects in the new package `packages/events`: Event (`Event__c`, 29EV1), Ticket Type (`Ticket_Type__c`, 29EV2), Promo Code (`Promo_Code__c`, 29EV3), Event Track (`Event_Track__c`, 29EV4), Event Session (`Event_Session__c`, 29EV5), Event Speaker (`Event_Speaker__c`, 29EV6) and Session Speaker (`Session_Speaker__c`, 29EV7), with rules R-EV1 to R-EV4, R-TT1 to R-TT4, R-PC1 to R-PC5, R-ETR1, R-ESN1 to R-ESN5, R-ESP1 to R-ESP3 and R-SSP1. Registrations, attendees, call for speakers and sponsorship are designed in the ADR and added by their items. |
+| 1.2 | 2026-11-07 | Event registrations and attendees (EV-02; ADR-0182 `0182-event-registrations.md`, ADR-0177 decision 8). New Sections 29EV8 Event Registration (`Event_Registration__c`, Private, rules R-ERG1 to R-ERG3) and 29EV9 Event Attendee (`Event_Attendee__c`, master-detail to the registration, rules R-EAT1 and R-EAT2). Event (29EV1) gains Registration Form Key (`Registration_Form_Key__c`, Text(18), the Forms form by record identifier, ADR-0014). Core registers `EventFormAttachment` in `FormAttachmentExtensions.EXTENSION_CLASSES` and lists the two objects in `ModuleManagerService`; no object or field is added to Core. |
+| 1.2 | 2026-11-07 | Summit Events compatibility (EV-10; ADR-0182 `0182-event-registrations.md` decision 7). Event (29EV1) and Event Registration (29EV8) gain External Key (`External_Key__c`, Text(80), unique, external ID, `summit:` and the Summit record's identifier), with rule R-ERG4 (a Summit registration is imported once). `SummitEventsAdapter` reads Summit's objects by name only and is listed in the nightly run only when Summit Events is installed. No Lead is read or written. |
+| 1.2 | 2026-11-07 | Event reminders, follow-ups and No-Show (EV-14; ADR-0182 `0182-event-registrations.md` decision 6). Events Settings (29EV25, `Events_Settings__c`) gains Send event reminders (`Reminders_Enabled__c`), Days before an event to remind (`Reminder_Lead_Days__c`, 1 to 30, default 2), Reminder email template (`Reminder_Template__c`), Send follow-ups (`Follow_Ups_Enabled__c`), Follow-up email template (`Follow_Up_Template__c`) and Mark no-shows (`Mark_No_Shows__c`), with rule R-ES2. Event Attendee (29EV9) gains Reminder Sent On (`Reminder_Sent_On__c`), Follow-Up Sent On (`Follow_Up_Sent_On__c`) and Event Name (`Event_Name__c`, formula, for email templates), with rule R-EAT3. Core lists `EventsNightlyJobProvider` in `NightlyJobs` and gains the settings section name `Events` (`SettingSections.EVENTS`). Email templates `BarnCRM_Event_Reminder` and `BarnCRM_Event_Follow_Up` ship in the folder BarnCRM Events. |
+| 1.2 | 2026-11-07 | Event volunteer jobs and shifts (EV-08; ADR-0183 `0183-event-volunteers-extension-point.md`, ADR-0177 decision 12). No Events object or field. Volunteer Job (29J, `Volunteer_Job__c`) gains Event ID (`Event_Key__c`, Text(18), external ID), the event's record identifier as text, never a lookup (ADR-0014). Core gains the `EventVolunteerExtension` interface, `EventVolunteerExtensions` (found by name) and the value classes `EventVolunteerJob` and `EventVolunteerShift`; Volunteers implements it as `VolunteersEventExtension`. The Events panel `eventVolunteers` draws nothing when Volunteers is absent. |
+| 1.3 | 2026-11-07 | Event Management call for speakers (EV-06; ADR-0180 `0180-events-call-for-speakers.md`, ADR-0177 decision 11, D-123, D-177). New Sections 29EV20 Speaker Application (`Speaker_Application__c`, rules R-SA1, R-SA2, R-SA4, R-SA5), 29EV21 Speaker Review (`Speaker_Review__c`, R-SA3) and 29EV25 Events Settings (`Events_Settings__c`, R-ES1). Core gains the settings section name `Events`. Numbers 29EV22 to 29EV24 are reserved for sponsorship (EV-09). |
+| 1.3 | 2026-11-07 | Event Management sponsorship (EV-09; ADR-0181 `0181-events-sponsorship.md`, ADR-0177 decision 11, D-123, D-177). New Sections 29EV22 Sponsorship Level (`Sponsorship_Level__c`, R-SP3), 29EV23 Event Sponsor (`Event_Sponsor__c`, R-SP1, R-SP4) and 29EV24 Sponsor Deliverable (`Sponsor_Deliverable__c`). Core gains the `LinkedRecords` seam (no object or field). |
+| 1.3 | 2026-11-07 | Event Appointment (`Event_Appointment__c`, 29EV15, EV-15, ADR-0177 decision 13) with rules R-EAP1 to R-EAP6. |
+| 1.3 | 2026-11-07 | Event dashboard and Event Templates (EV-11; ADR-0177). No object, field or rule added. The Details tab gains the Event Dashboard (counts read from the event's own records by `EventDashboardController`) and, for an event with no ticket types, tracks or sessions, Event Templates: JSON in the static resource `BarnEventTemplates`, with one template, Community Conference (tracks, ticket types, sessions and a planning timeline). A template is applied only when staff press Apply Template, never by default. |
+| 1.3 | 2026-11-07 | Event check-in (EV-12; ADR-0177 decision 13). No object, field or rule added: the Check-In tab moves an attendee between Registered and Attended through `EventRegistrationService`, and a QR code holds the attendee's record identifier, so the check-in time and code fields that ADR-0177 decision 13 anticipated are not added. A walk-in is a registration (source Staff) made already Attended. The QR drawing library ships as the static resource `BarnQrCode`, listed in `NOTICE`. |
+| 1.3 | 2026-11-07 | Event Management sample data (C-10) and speaker notice defaults (EV-06, owner rule: settings are never blank). Event (29EV1) and Event Registration (29EV8) gain Sample Data (`Sample_Data__c`, Checkbox, default false). `EventsSampleData` implements Core's `SampleDataModule` and is registered in `SampleDataModules.MODULE_CLASS_NAMES` after Funders. Events Settings (29EV25): Accepted Notice Template and Declined Notice Template default to the shipped text templates `BarnCRM_Speaker_Accepted` and `BarnCRM_Speaker_Declined`; R-ES1 now reads a blank as the shipped template; R-SA5 amended to match. |
+| 1.3 | 2026-11-07 | Event Management gala seating (EV-13; ADR-0186 `0186-events-gala-seating.md`, ADR-0177 decision 8, D-156, D-186). New Section 29EV26 Event Table (`Event_Table__c`, R-ET1, R-ET2); Event Attendee (29EV9) gains Table, Dietary Needs and Access Needs. |
+| 1.3 | 2026-11-07 | Post-event survey (EV-18, D-186, ADR-0188). New Section 29EV18 Event Survey Response (`Event_Survey_Response__c`, R-ESV1 to R-ESV3); `Event__c` gains `Survey_Form_Key__c`, `Event_Attendee__c` gains `Survey_Link__c`, `Events_Settings__c` gains `Survey_Template__c`. Core gains the `FormCatalogExtension` seam (no object or field). |
+| 1.2 | 2026-11-07 | Event calendar (EV-19, D-186, ADR-0189). No object or field added: the Event Calendar tab reads `Event__c` (29EV1) and `Event_Session__c` (29EV5) and builds an `.ics` file per entry in the browser. |
+| 1.2 | 2026-11-07 | Public event pages (EV-16, D-186, ADR-0190 public event pages). `Event__c` (29EV1) gains `Public_Page__c`, `Public_Speakers__c` and `Public_Seats__c` (Checkbox, default false) and rule R-EV5; `Events_Settings__c` (29EV25) gains `Public_Payment_Note__c` (setting `Events_Public_Payment_Note`, sort 90). Core gains the `PublicPageExtension` seam (no object or field). |
+| 1.3 | 2026-11-07 | Portal Builder module (PB-01, D-118, D-178, D-187; ADR-0185 `0185-portal-builder-off-platform-portal-api.md`). New package `packages/portal`: Portal (`Portal__c`, 29PB1), Portal Access (`Portal_Access__c`, 29PB2), Portal Session (`Portal_Session__c`, 29PB3) and Portal Settings (`Portal_Settings__c`, 29PB4), rules R-PB1 to R-PB4, R-PA1, R-PA2, R-PS1, R-PS2 and R-PST1. Core gains no object or field: only the `PortalActionExtension` seam, the Portals settings section and the catalog row `BarnCRM_Module.Portal`. |
+| 1.3 | 2026-11-07 | Portal templates for volunteers, speakers and donors (PB-03, PB-07, PB-08; ADR-0191 `0191-portal-templates-volunteer-speaker-donor.md`). No object or field added. R-PB2 gains a read-only `Parent__r.Contact__c` person link; Core's `PortalActionExtensions` lists the Volunteers and Event Management action classes. |
 
 ---
 ## 32. Entity ownership by package
@@ -12988,6 +14612,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Volunteer Sign-up | Volunteers | v0.8 | 29L |
 | Volunteer Hours | Volunteers | v0.8 | 29M |
 | Volunteer Settings | Volunteers | v0.8 | 29N |
+| Contact Point Link | Contact Point Sync | release 1.1 (C-45) | 29ZZ |
+| Contact Point Sync Settings | Contact Point Sync | release 1.1 (C-45) | 29ZZ1 |
 | Skill | Volunteers | v0.8 | 29P |
 | Volunteer Skill | Volunteers | v0.8 | 29Q |
 | Job Skill | Volunteers | v0.8 | 29R |
@@ -13015,6 +14641,10 @@ included; standard objects the packages extend are named by the entity that gove
 | Indicator Period | Logic Models | 0.14 (L-02) | 29ZG |
 | Household Adoption | Core | 0.17 (X-05) | 29ZQ |
 | Nightly Job | Core | v1.0 (architect review RT-10) | 29ZR |
+| Form | Forms | release 1.1 (C-42a) | 29ZW |
+| Form Version | Forms | release 1.1 (C-42a) | 29ZX |
+| Form Submission | Forms | release 1.1 (C-42a) | 29ZY |
+| Form Draft | Forms | release 1.1 (C-42c) | 29ZY1 |
 | Funders entities | Funders | v0.9 | 30 |
 | Grant | Funders | 0.16 (F-01) | 29ZH |
 | Grant Requirement | Funders | 0.16 (F-02) | 29ZI |
@@ -13025,6 +14655,28 @@ included; standard objects the packages extend are named by the entity that gove
 | Funder Report Template | Funders | 0.16 (F-06) | 29ZO |
 | Funder Report Template Default (shipped default) | Funders | 0.16 (F-06) | 29ZO |
 | Funders entities still to come | Funders | 0.16 and 0.17 | 30 |
+| Event | Event Management | 1.2 (EV-01) | 29EV1 |
+| Ticket Type | Event Management | 1.2 (EV-03) | 29EV2 |
+| Promo Code | Event Management | 1.2 (EV-03) | 29EV3 |
+| Event Track | Event Management | 1.2 (EV-04) | 29EV4 |
+| Event Session | Event Management | 1.2 (EV-04) | 29EV5 |
+| Event Speaker | Event Management | 1.2 (EV-05) | 29EV6 |
+| Session Speaker | Event Management | 1.2 (EV-05) | 29EV7 |
+| Event Registration | Event Management | 1.2 (EV-02) | 29EV8 |
+| Event Attendee | Event Management | 1.2 (EV-02) | 29EV9 |
+| Event Appointment | Event Management | 1.3 (EV-15) | 29EV15 |
+| Event Survey Response | Event Management | 1.3 (EV-18) | 29EV18 |
+| Speaker Application | Event Management | 1.3 (EV-06) | 29EV20 |
+| Speaker Review | Event Management | 1.3 (EV-06) | 29EV21 |
+| Sponsorship Level | Event Management | 1.3 (EV-09) | 29EV22 |
+| Event Sponsor | Event Management | 1.3 (EV-09) | 29EV23 |
+| Sponsor Deliverable | Event Management | 1.3 (EV-09) | 29EV24 |
+| Events Settings | Event Management | 1.3 (EV-06, EV-14) | 29EV25 |
+| Event Table | Event Management | 1.3 (EV-13) | 29EV26 |
+| Portal | Portal Builder | 1.3 (PB-01) | 29PB1 |
+| Portal Access | Portal Builder | 1.3 (PB-01) | 29PB2 |
+| Portal Session | Portal Builder | 1.3 (PB-01) | 29PB3 |
+| Portal Settings | Portal Builder | 1.3 (PB-01) | 29PB4 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
@@ -13048,7 +14700,10 @@ so nothing below that is nonprofit-specific ships in Core.
 | Programs app, permission sets (Admin, Staff, Read Only), Program Roster panel | Programs | Metadata and `ProgramsAccessSync` (ADR-0151). Console app `BarnCRM_Programs` with the Programs and Enrollments tabs; the Program record page carries the roster panel (`programRoster`) |
 | Logic Models app, permission sets (Admin, Staff, Read Only), Logic Model Builder panel | Logic Models | Metadata and `LogicModelsAccessSync` (ADR-0154 `0154-logic-models-module.md`). Console app `BarnCRM_Logic_Models` with the Logic Models tab; the Logic Model record page carries the builder panel (`logicModelBuilder`) |
 | Funders app, permission sets (Admin, Staff, Read Only), Grant Pipeline tab, program picker | Funders | Metadata and `FundersAccessSync` (ADR-0161 `0161-funders-module.md`). Console app `BarnCRM_Funders` with the Grant Pipeline, Grants and Grant Requirements tabs and Error Log last; the Grant record page carries the program picker (`grantLinkedRecord`, kind Program) |
+| Permission sets (Admin, Staff, Read Only), Events Home tab, Repeat Event | Event Management | Metadata and `EventsAccessSync` (ADR-0177 `0177-events-module.md`). No app (D-188, ADR-0192 module tabs in the BarnCRM apps): the Events Home, Event Calendar, Events and Event Speakers tabs join BarnCRM and BarnCRM Console at deploy; the Event record page, the object's org default, carries the event's tabs |
 | Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
+| Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and `FormsAccessSync` (ADR-0175 `0175-forms-module.md`). No app (D-188, ADR-0192 module tabs in the BarnCRM apps): the Forms and Form Submissions tabs join BarnCRM and BarnCRM Console at deploy; the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
+| Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-0175 `0175-forms-module.md` decision 9) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror was brought forward from v0.9 to v0.6 and is built in release

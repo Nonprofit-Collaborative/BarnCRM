@@ -14,6 +14,7 @@ public with sharing class VolunteerSettings {
 	public static final Integer DEFAULT_REMINDER_LEAD_DAYS = 1;
 	public static final Integer MIN_REMINDER_LEAD_DAYS = 1;
 	public static final Integer MAX_REMINDER_LEAD_DAYS = 14;
+	public static final Integer DEFAULT_NUDGE_LEAD_DAYS = 3;
 
 	/**
 	 * R-VG6: whether a new hours entry waits for a coordinator. On unless an administrator
@@ -65,6 +66,29 @@ public with sharing class VolunteerSettings {
 		}
 		if (days < MIN_REMINDER_LEAD_DAYS || days > MAX_REMINDER_LEAD_DAYS) {
 			return DEFAULT_REMINDER_LEAD_DAYS;
+		}
+		return days;
+	}
+
+	/** V-10b: whether volunteers are emailed about a shift that is still short. Off until turned on. */
+	public static Boolean nudgesEnabled() {
+		return flag('Nudges_Enabled__c', false);
+	}
+
+	/** V-10b: how many days before an unfilled shift its nudge goes out, 1 to 14. */
+	public static Integer nudgeLeadDays() {
+		Object stored = read('Nudge_Lead_Days__c');
+		if (stored == null) {
+			return DEFAULT_NUDGE_LEAD_DAYS;
+		}
+		Integer days;
+		try {
+			days = Decimal.valueOf(String.valueOf(stored)).intValue();
+		} catch (TypeException unreadable) {
+			return DEFAULT_NUDGE_LEAD_DAYS;
+		}
+		if (days < MIN_REMINDER_LEAD_DAYS || days > MAX_REMINDER_LEAD_DAYS) {
+			return DEFAULT_NUDGE_LEAD_DAYS;
 		}
 		return days;
 	}

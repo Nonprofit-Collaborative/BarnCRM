@@ -55,6 +55,12 @@ public with sharing class SettingSections {
 	/** The Funders module's grant reminder settings, listed under Fundraising. */
 	@NamespaceAccessible
 	public static final String FUNDERS = 'Funders';
+	/**
+	 * The Event Management module's settings (speaker notice templates, EV-06; reminder,
+	 * follow-up and No-Show settings, EV-14), listed after Funders.
+	 */
+	@NamespaceAccessible
+	public static final String EVENTS = 'Events';
 	@NamespaceAccessible
 	public static final String ROLLUPS = 'Rollups';
 	@NamespaceAccessible
@@ -64,12 +70,18 @@ public with sharing class SettingSections {
 	public static final String PROGRAMS = 'Programs';
 	@NamespaceAccessible
 	public static final String ADDRESSES = 'Addresses';
+	/** The Contact Point Sync module's switches and the link to its page, listed under People. */
+	@NamespaceAccessible
+	public static final String CONTACT_POINTS = 'Contact Points';
 	/** A sub-section of People and Households, and a page until P1 (see HOUSEHOLDS). */
 	@NamespaceAccessible
 	public static final String RELATIONSHIPS = 'Relationships';
 	/** Other products that complement or overlap BarnCRM, listed and linked, never depended on. */
 	@NamespaceAccessible
 	public static final String INTEGRATIONS = 'Integrations';
+	/** The Portal Builder module's sign-in switch and limits. */
+	@NamespaceAccessible
+	public static final String PORTALS = 'Portals';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -81,12 +93,15 @@ public with sharing class SettingSections {
 			PEOPLE_AND_HOUSEHOLDS,
 			DUPLICATE_MATCHING,
 			ADDRESSES,
+			CONTACT_POINTS,
 			GIVING,
 			RECEIPTS,
 			FUNDERS,
+			EVENTS,
 			ROLLUPS,
 			PROGRAMS,
 			VOLUNTEERS,
+			PORTALS,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,

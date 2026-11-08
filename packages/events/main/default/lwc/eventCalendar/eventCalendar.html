@@ -1,0 +1,233 @@
+<template>
+  <template lwc:if={helpReady}>
+    <c-barn-page-shell
+      title={title}
+      purpose={labels.intro}
+      icon-name={icon}
+      title-hidden
+      data-id="shell"
+    >
+      <div slot="actions" class="slds-grid slds-grid_vertical-align-center slds-wrap barn-print-hide">
+        <lightning-radio-group
+          data-id="view"
+          name="view"
+          label={labels.view}
+          variant="label-hidden"
+          type="button"
+          options={viewOptions}
+          value={view}
+          onchange={handleView}
+        ></lightning-radio-group>
+      </div>
+
+      <div>
+        <div class="slds-grid slds-grid_vertical-align-center slds-wrap slds-var-m-bottom_small">
+          <lightning-button-icon
+            data-id="previous"
+            icon-name="utility:chevronleft"
+            alternative-text={labels.previous}
+            title={labels.previous}
+            onclick={handlePrevious}
+          ></lightning-button-icon>
+          <h2
+            data-id="title"
+            class="slds-text-heading_medium slds-var-m-horizontal_small"
+            aria-live="polite"
+          >
+            {title}
+          </h2>
+          <lightning-button-icon
+            data-id="next"
+            icon-name="utility:chevronright"
+            alternative-text={labels.next}
+            title={labels.next}
+            onclick={handleNext}
+          ></lightning-button-icon>
+          <lightning-button
+            class="slds-var-m-left_small"
+            data-id="today"
+            label={labels.today}
+            onclick={handleToday}
+          ></lightning-button>
+        </div>
+
+        <div class="slds-grid slds-grid_vertical-align-end slds-wrap slds-var-m-bottom_small">
+          <lightning-combobox
+            class="slds-var-m-right_small"
+            data-id="status"
+            label={labels.status}
+            options={statusOptions}
+            value={status}
+            onchange={handleStatus}
+          ></lightning-combobox>
+          <lightning-combobox
+            class="slds-var-m-right_small"
+            data-id="format"
+            label={labels.format}
+            options={formatOptions}
+            value={format}
+            onchange={handleFormat}
+          ></lightning-combobox>
+          <lightning-input
+            type="checkbox"
+            data-id="sessions"
+            label={labels.sessions}
+            checked={showSessions}
+            onchange={handleSessions}
+          ></lightning-input>
+        </div>
+
+        <template lwc:if={isLoading}>
+          <lightning-spinner alternative-text={title} size="small"></lightning-spinner>
+        </template>
+
+        <template lwc:if={hasError}>
+          <c-barn-notice
+            variant="error"
+            message={errorMessage}
+            data-id="error-message"
+            class="slds-var-m-bottom_small"
+          ></c-barn-notice>
+        </template>
+
+        <template lwc:if={showTruncated}>
+          <c-barn-notice
+            variant="warning"
+            message={labels.truncated}
+            data-id="truncated"
+            class="slds-var-m-bottom_small"
+          ></c-barn-notice>
+        </template>
+
+        <template lwc:if={showEmpty}>
+          <c-barn-empty-state data-id="empty-state" message={labels.empty}></c-barn-empty-state>
+        </template>
+
+        <template lwc:if={isMonth}>
+          <table class="barn-calendar slds-size_full" data-id="month">
+            <caption class="slds-assistive-text">
+              {title}
+            </caption>
+            <thead>
+              <tr>
+                <template for:each={weekdays} for:item="weekday">
+                  <th key={weekday.key} scope="col" class="slds-text-title_bold">{weekday.name}</th>
+                </template>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={weeks} for:item="week">
+                <tr key={week.key} data-id="week">
+                  <template for:each={week.days} for:item="day">
+                    <td key={day.key} class={day.cellClass} data-id="day" data-date={day.date}>
+                      <span class="barn-day-number">{day.day}</span>
+                      <ul>
+                        <template for:each={day.items} for:item="item">
+                          <li key={item.dayKey}>
+                            <button
+                              type="button"
+                              data-id="item"
+                              data-kind={item.kind}
+                              data-record-id={item.recordId}
+                              data-object={item.objectApiName}
+                              class={item.itemClass}
+                              title={item.title}
+                              onclick={handleOpen}
+                            >
+                              {item.text}
+                            </button>
+                          </li>
+                        </template>
+                      </ul>
+                    </td>
+                  </template>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </template>
+
+        <template lwc:if={isWeek}>
+          <div class="barn-week slds-grid slds-wrap" data-id="week-view">
+            <template for:each={weekColumns} for:item="day">
+              <div key={day.key} class={day.cellClass} data-id="day" data-date={day.date}>
+                <span class="barn-day-number slds-text-title_bold">{day.heading}</span>
+                <ul>
+                  <template for:each={day.items} for:item="item">
+                    <li key={item.dayKey}>
+                      <button
+                        type="button"
+                        data-id="item"
+                        data-kind={item.kind}
+                        data-record-id={item.recordId}
+                        data-object={item.objectApiName}
+                        class={item.itemClass}
+                        title={item.title}
+                        onclick={handleOpen}
+                      >
+                        {item.text}
+                      </button>
+                    </li>
+                  </template>
+                </ul>
+              </div>
+            </template>
+          </div>
+        </template>
+
+        <template lwc:if={isList}>
+          <template for:each={listGroups} for:item="group">
+            <section key={group.key} class="slds-var-m-bottom_medium" data-id="list-day">
+              <h3 class="slds-text-heading_small slds-var-m-bottom_x-small">{group.heading}</h3>
+              <ul>
+                <template for:each={group.items} for:item="item">
+                  <li
+                    key={item.dayKey}
+                    class="slds-grid slds-grid_vertical-align-center slds-var-m-vertical_xx-small"
+                    data-id="list-item"
+                  >
+                    <div class="slds-col slds-grow">
+                      <p class="slds-text-title_bold">
+                        <button
+                          type="button"
+                          class="barn-link"
+                          data-id="item"
+                          data-kind={item.kind}
+                          data-record-id={item.recordId}
+                          data-object={item.objectApiName}
+                          aria-label={item.openLabel}
+                          onclick={handleOpen}
+                        >
+                          {item.name}
+                        </button>
+                        <c-barn-status-badge
+                          class="slds-var-m-left_x-small"
+                          status={item.badge}
+                          label={item.status}
+                        ></c-barn-status-badge>
+                      </p>
+                      <p class="slds-text-color_weak" data-id="when">{item.when}</p>
+                      <p class="slds-text-color_weak">
+                        {item.kindLabel}
+                        <template lwc:if={item.place}> | {item.place}</template>
+                        <template lwc:if={item.eventNote}> | {item.eventNote}</template>
+                      </p>
+                    </div>
+                    <lightning-button-icon
+                      data-id="download"
+                      data-key={item.key}
+                      icon-name="utility:download"
+                      alternative-text={item.downloadLabel}
+                      title={item.downloadLabel}
+                      onclick={handleDownload}
+                    ></lightning-button-icon>
+                  </li>
+                </template>
+              </ul>
+            </section>
+          </template>
+        </template>
+      </div>
+    </c-barn-page-shell>
+  </template>
+</template>

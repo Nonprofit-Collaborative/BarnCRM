@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Notice_Sent__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>When the accept or decline email went out. Empty when none was sent.</inlineHelpText>
+  <label>Notice Sent</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>DateTime</type>
+</CustomField>

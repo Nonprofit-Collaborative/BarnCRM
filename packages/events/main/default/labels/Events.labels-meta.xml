@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Events_EventTab_CheckIn</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: check people in at the door</shortDescription>
+        <value>Check-In</value>
+    </labels>
+    <labels>
+        <fullName>Events_Home_NewEvent</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Events page button that opens the new event form</shortDescription>
+        <value>New Event</value>
+    </labels>
+    <labels>
+        <fullName>Events_Home_Upcoming</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Events page view: events not yet over</shortDescription>
+        <value>Upcoming</value>
+    </labels>
+    <labels>
+        <fullName>Events_Home_Past</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Events page view: events over or cancelled</shortDescription>
+        <value>Past</value>
+    </labels>
+    <labels>
+        <fullName>Events_Home_RepeatEvent</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Row menu item and dialog button that repeats an event</shortDescription>
+        <value>Repeat Event</value>
+    </labels>
+    <labels>
+        <fullName>Events_Home_Where</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Events page column: the venue, or Online</shortDescription>
+        <value>Where</value>
+    </labels>
+    <labels>
+        <fullName>Events_Home_Online</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Where column for an event with an online link and no venue</shortDescription>
+        <value>Online</value>
+    </labels>
+    <labels>
+        <fullName>Events_Repeat_Repeats</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Repeat Event dialog: the how-often choice</shortDescription>
+        <value>Repeats</value>
+    </labels>
+    <labels>
+        <fullName>Events_Repeat_EveryWeek</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Repeat Event dialog choice</shortDescription>
+        <value>Every Week</value>
+    </labels>
+    <labels>
+        <fullName>Events_Repeat_EveryTwoWeeks</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Repeat Event dialog choice</shortDescription>
+        <value>Every Two Weeks</value>
+    </labels>
+    <labels>
+        <fullName>Events_Repeat_EveryMonth</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Repeat Event dialog choice</shortDescription>
+        <value>Every Month</value>
+    </labels>
+    <labels>
+        <fullName>Events_Repeat_HowMany</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Repeat Event dialog: how many occurrences to add</shortDescription>
+        <value>Occurrences to Add</value>
+    </labels>
+    <labels>
+        <fullName>Events_EventTab_Tickets</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab and section: the event's ticket types</shortDescription>
+        <value>Tickets</value>
+    </labels>
+    <labels>
+        <fullName>Events_Tickets_NewTicketType</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Tickets tab button that adds a ticket type</shortDescription>
+        <value>New Ticket Type</value>
+    </labels>
+    <labels>
+        <fullName>Events_Tickets_NewPromoCode</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Tickets tab button that adds a promo code</shortDescription>
+        <value>New Promo Code</value>
+    </labels>
+    <labels>
+        <fullName>Events_Tickets_Expired</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Promo code state: its valid dates are over</shortDescription>
+        <value>Expired</value>
+    </labels>
+    <labels>
+        <fullName>Events_Tickets_Scheduled</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Promo code state: its valid dates have not started</shortDescription>
+        <value>Scheduled</value>
+    </labels>
+    <labels>
+        <fullName>Events_Tickets_NoLimit</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Tickets tab: a quantity or use limit left empty</shortDescription>
+        <value>No limit</value>
+    </labels>
+    <labels>
+        <fullName>Events_EventTab_Agenda</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: the Agenda Builder</shortDescription>
+        <value>Agenda</value>
+    </labels>
+    <labels>
+        <fullName>Events_Agenda_NewTrack</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Agenda tab button that adds a track</shortDescription>
+        <value>New Track</value>
+    </labels>
+    <labels>
+        <fullName>Events_Agenda_NewSession</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Agenda tab button that adds a session</shortDescription>
+        <value>New Session</value>
+    </labels>
+    <labels>
+        <fullName>Events_Agenda_NoTrack</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Agenda column of the sessions in no track</shortDescription>
+        <value>No Track</value>
+    </labels>
+    <labels>
+        <fullName>Events_Agenda_Unscheduled</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Agenda day choice: sessions with no time yet</shortDescription>
+        <value>Unscheduled</value>
+    </labels>
+    <labels>
+        <fullName>Events_EventTab_Registrations</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: who registered and who attends</shortDescription>
+        <value>Registrations</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_New</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Registrations tab button that opens the registration form</shortDescription>
+        <value>New Registration</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_Register</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Registration form button that saves the registration</shortDescription>
+        <value>Register</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_AddGuest</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Registration form button that adds a guest row</shortDescription>
+        <value>Add Guest</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_ExistingPerson</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Registration form: the picker for a person already in BarnCRM</shortDescription>
+        <value>Existing Person</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_MarkAttended</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendee menu item: the person came</shortDescription>
+        <value>Mark Attended</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_MarkNoShow</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendee menu item: the person did not come</shortDescription>
+        <value>Mark No-Show</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_MarkRegistered</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendee menu item: back to Registered</shortDescription>
+        <value>Mark Registered</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_MoveOffWaitlist</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendee menu item: give a waitlisted person a free seat</shortDescription>
+        <value>Move Off Waitlist</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_CancelAttendee</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendee menu item: cancel this one person</shortDescription>
+        <value>Cancel Attendee</value>
+    </labels>
+    <labels>
+        <fullName>Events_Registrations_CancelRegistration</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Attendee menu item and button: cancel the whole booking</shortDescription>
+        <value>Cancel Registration</value>
+    </labels>
+    <labels>
+        <fullName>Events_NightlyJobs_EmailsName</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Nightly run step name: event reminders, follow-ups and no-shows</shortDescription>
+        <value>Event reminders, follow-ups and no-shows</value>
+    </labels>
+    <labels>
+        <fullName>Events_NightlyJobs_SummitName</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Nightly run step name: Summit Events import</shortDescription>
+        <value>Summit Events import</value>
+    </labels>
+    <labels>
+        <fullName>Events_EventTab_Speakers</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: the event's speakers</shortDescription>
+        <value>Speakers</value>
+    </labels>
+    <labels>
+        <fullName>Events_EventTab_Appointments</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: appointment slots with hosts</shortDescription>
+        <value>Appointments</value>
+    </labels>
+    <labels>
+        <fullName>Events_Speakers_AddSpeaker</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Speakers tab: the person picker that adds a speaker</shortDescription>
+        <value>Add Speaker</value>
+    </labels>
+    <labels>
+        <fullName>Events_Speakers_AddToSession</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Speakers tab menu item: put the speaker in a session</shortDescription>
+        <value>Add to Session</value>
+    </labels>
+    <labels>
+        <fullName>Events_EventTab_Applications</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: the call for speakers, with proposals and their scores</shortDescription>
+        <value>Applications</value>
+    </labels>
+    <labels>
+        <fullName>Events_EventTab_Sponsors</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: sponsorship levels, sponsors and their deliverables</shortDescription>
+        <value>Sponsors</value>
+    </labels>
+    <labels>
+        <fullName>Events_EventTab_Seating</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: tables, seating chart and dietary and access needs</shortDescription>
+        <value>Seating</value>
+    </labels>
+    <labels>
+        <fullName>Events_EventTab_Badges</fullName>
+        <categories>Events</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Event page tab: printable badges and sign-in sheets</shortDescription>
+        <value>Badges</value>
+    </labels>
+</CustomLabels>

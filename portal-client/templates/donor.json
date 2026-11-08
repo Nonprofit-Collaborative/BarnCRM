@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "key": "donor",
+  "title": "Donor Portal",
+  "requiresModules": ["Giving"],
+  "pages": [
+    {
+      "key": "summary",
+      "title": "My Giving",
+      "kind": "person",
+      "fields": [
+        { "field": "FirstName" },
+        { "field": "LastName" },
+        { "field": "Total_Giving__c", "label": "Total Giving" },
+        { "field": "Giving_This_Year__c", "label": "Giving This Year" },
+        { "field": "Giving_Last_Year__c", "label": "Giving Last Year" },
+        { "field": "Last_Gift_Date__c", "label": "Last Gift" },
+        { "field": "Pledge_Balance__c", "label": "Pledge Balance" }
+      ],
+      "actions": []
+    },
+    {
+      "key": "gifts",
+      "title": "Gift History",
+      "kind": "related",
+      "object": "Gift__c",
+      "personField": "Donor_Contact__c",
+      "fields": [
+        { "field": "Name", "label": "Gift Number" },
+        { "field": "Gift_Date__c", "label": "Date" },
+        { "field": "Amount__c", "label": "Amount" },
+        { "field": "Type__c", "label": "Type" },
+        { "field": "Status__c", "label": "Status" },
+        { "field": "Receipt_Number__c", "label": "Receipt Number" }
+      ],
+      "where": [{ "field": "Status__c", "op": "notEquals", "value": "Cancelled" }],
+      "orderBy": "Gift_Date__c DESC",
+      "limit": 100,
+      "actions": []
+    },
+    {
+      "key": "pledges",
+      "title": "Pledges and Recurring Gifts",
+      "kind": "related",
+      "object": "Commitment__c",
+      "personField": "Donor_Contact__c",
+      "fields": [
+        { "field": "Name", "label": "Number" },
+        { "field": "Type__c", "label": "Type" },
+        { "field": "Status__c", "label": "Status" },
+        { "field": "Amount__c", "label": "Amount" },
+        { "field": "Frequency__c", "label": "Frequency" },
+        { "field": "Expected_Total__c", "label": "Expected Total" },
+        { "field": "Paid_To_Date__c", "label": "Paid to Date" },
+        { "field": "Balance__c", "label": "Balance" },
+        { "field": "Start_Date__c", "label": "Starts" },
+        { "field": "End_Date__c", "label": "Ends" }
+      ],
+      "where": [{ "field": "Status__c", "op": "notEquals", "value": "Cancelled" }],
+      "orderBy": "Start_Date__c DESC",
+      "limit": 50,
+      "actions": []
+    },
+    {
+      "key": "receipts",
+      "title": "Receipts",
+      "kind": "related",
+      "object": "Receipt__c",
+      "personField": "Donor_Contact__c",
+      "fields": [
+        { "field": "Receipt_Number__c", "label": "Receipt Number" },
+        { "field": "Issue_Date__c", "label": "Issued" },
+        { "field": "Total_Amount__c", "label": "Amount" },
+        { "field": "Type__c", "label": "Type" }
+      ],
+      "where": [{ "field": "Status__c", "op": "equals", "value": "Issued" }],
+      "orderBy": "Issue_Date__c DESC",
+      "limit": 100,
+      "actions": []
+    },
+    {
+      "key": "contact",
+      "title": "My Contact Details",
+      "kind": "person",
+      "fields": [
+        { "field": "FirstName" },
+        { "field": "LastName" },
+        { "field": "Email" },
+        { "field": "Phone", "edit": true },
+        { "field": "MobilePhone", "label": "Mobile", "edit": true },
+        { "field": "MailingStreet", "label": "Street", "edit": true },
+        { "field": "MailingCity", "label": "City", "edit": true },
+        { "field": "MailingState", "label": "State", "edit": true },
+        { "field": "MailingPostalCode", "label": "Postal Code", "edit": true },
+        { "field": "MailingCountry", "label": "Country", "edit": true }
+      ],
+      "actions": ["update"]
+    }
+  ]
+}

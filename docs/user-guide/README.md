@@ -22,7 +22,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 - [Finding people and records](find.md): search, list views and the Find tab.
 - [Changing many records at once](super-transform.md): Super Transformer, with a preview and an undo, saved lists and a phone format.
 - [People and households](people-and-households.md): adding people, household members, names and greetings, merge and split, interaction notes.
-- [Addresses, email and phone](addresses-email-phone.md): several addresses, seasonal addresses, the preferred email and phone.
+- [Addresses, email and phone](addresses-email-phone.md): several addresses, seasonal addresses, the preferred email and phone, and their Contact Point copies where Contact Point Sync is installed.
 - [Relationships and affiliations](relationships-affiliations.md): how people are connected to each other and to organizations.
 - [Reviewing duplicates](duplicates.md): checking likely duplicate pairs and merging them.
 
@@ -52,6 +52,18 @@ What you can do depends on the role your admin gave you on the Access page (for 
 ### Funders (Nonprofit Edition)
 
 - [Grants and funders](funders.md): adding grants, moving them through the stages on the Grant Pipeline, the deadlines coming up and the Grant Calendar, the program a grant pays for, an award's payments, a restricted grant's ledger and Giving fund, government award fields, the answer library, linking a requirement to the outcome it reports on, funder reports and the Board Dashboard.
+
+### Forms
+
+- [Forms](forms.md): filling in a form a step at a time, seeing a submission and the records it wrote, and finishing one held for review.
+
+### Event Management
+
+- [Events](events.md): finding, creating and repeating events, setting up tickets, building the agenda, reading the event dashboard, offering appointments, planning volunteers, adding speakers, managing sponsors, reviewing speaker applications, registering people and their reminder and follow-up emails, and checking people in.
+
+### Portal Builder
+
+- [Portals](portal-builder.md): who can sign in to a portal, ending someone's portal sessions, what a person sees when they sign in, and what the volunteer, speaker and donor portals show and let them do.
 
 ### Reports
 

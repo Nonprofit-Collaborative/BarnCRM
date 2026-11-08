@@ -4,7 +4,7 @@
     list-package-tests.py <package> [<package> ...]
 
 A package is a folder under packages/ (core, rollups, giving, volunteers, programs,
-logicmodels, funders, mirror). Name every package the deploy carries. It prints one class
+logicmodels, funders, events, mirror). Name every package the deploy carries. It prints one class
 name per line, so in bash or zsh:
 
     sf project deploy validate ... --test-level RunSpecifiedTests \\

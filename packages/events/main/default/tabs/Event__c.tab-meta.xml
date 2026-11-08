@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customObject>true</customObject>
+  <description>Every event as a list, with the standard list views.</description>
+  <motif>Custom89: Saxophone</motif>
+</CustomTab>
