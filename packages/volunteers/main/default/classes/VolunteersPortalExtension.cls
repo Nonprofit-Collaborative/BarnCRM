@@ -1,6 +1,6 @@
 /**
- * The volunteer portal's two actions (PB-03; ADR-0185 decision 9 and ADR-NEXT
- * `NEXT-portal-templates-volunteer-speaker-donor.md`): `Volunteers.SignUp` on an open shift and `Volunteers.CancelSignup` on the person's own sign-up. Core finds this
+ * The volunteer portal's two actions (PB-03; ADR-0185 decision 9 and ADR-0191
+ * `0191-portal-templates-volunteer-speaker-donor.md`): `Volunteers.SignUp` on an open shift and `Volunteers.CancelSignup` on the person's own sign-up. Core finds this
  * class by name (`PortalActionExtensions.EXTENSION_CLASSES`); Portal Builder has already checked
  * that the record is on the verified person's page, and the person is the only one acted for.
  *

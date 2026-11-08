@@ -13984,8 +13984,8 @@ checks it against the org's schema; a template that fails is refused as `portal_
 logged, never partly used. Pages are `person` (Contact, the verified person), `related` (a custom
 object whose `personField` looks up to Contact) or `catalog` (a custom object, read only, with fixed
 `where` tests). Editable fields are updateable, of a safe type, never a lookup. A related page's
-`personField` may be `Parent__r.Contact__c` (one parent hop to a lookup to Contact, ADR-NEXT
-`NEXT-portal-templates-volunteer-speaker-donor.md`): such a page is read only.
+`personField` may be `Parent__r.Contact__c` (one parent hop to a lookup to Contact, ADR-0191
+`0191-portal-templates-volunteer-speaker-donor.md`): such a page is read only.
 
 **R-PB3 Every read and write is the verified person's.** A related page reads and updates only
 records whose `personField` is the person and creates records with it set; a person page only
@@ -14530,7 +14530,7 @@ mirrors the primary member).
 | 1.2 | 2026-11-07 | Event calendar (EV-19, D-186, ADR-0189). No object or field added: the Event Calendar tab reads `Event__c` (29EV1) and `Event_Session__c` (29EV5) and builds an `.ics` file per entry in the browser. |
 | 1.2 | 2026-11-07 | Public event pages (EV-16, D-186, ADR-0190 public event pages). `Event__c` (29EV1) gains `Public_Page__c`, `Public_Speakers__c` and `Public_Seats__c` (Checkbox, default false) and rule R-EV5; `Events_Settings__c` (29EV25) gains `Public_Payment_Note__c` (setting `Events_Public_Payment_Note`, sort 90). Core gains the `PublicPageExtension` seam (no object or field). |
 | 1.3 | 2026-11-07 | Portal Builder module (PB-01, D-118, D-178, D-187; ADR-0185 `0185-portal-builder-off-platform-portal-api.md`). New package `packages/portal`: Portal (`Portal__c`, 29PB1), Portal Access (`Portal_Access__c`, 29PB2), Portal Session (`Portal_Session__c`, 29PB3) and Portal Settings (`Portal_Settings__c`, 29PB4), rules R-PB1 to R-PB4, R-PA1, R-PA2, R-PS1, R-PS2 and R-PST1. Core gains no object or field: only the `PortalActionExtension` seam, the Portals settings section and the catalog row `BarnCRM_Module.Portal`. |
-| 1.3 | 2026-11-07 | Portal templates for volunteers, speakers and donors (PB-03, PB-07, PB-08; ADR-NEXT `NEXT-portal-templates-volunteer-speaker-donor.md`). No object or field added. R-PB2 gains a read-only `Parent__r.Contact__c` person link; Core's `PortalActionExtensions` lists the Volunteers and Event Management action classes. |
+| 1.3 | 2026-11-07 | Portal templates for volunteers, speakers and donors (PB-03, PB-07, PB-08; ADR-0191 `0191-portal-templates-volunteer-speaker-donor.md`). No object or field added. R-PB2 gains a read-only `Parent__r.Contact__c` person link; Core's `PortalActionExtensions` lists the Volunteers and Event Management action classes. |
 
 ---
 ## 32. Entity ownership by package

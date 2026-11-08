@@ -1,6 +1,6 @@
 /**
- * The speaker portal's two actions (PB-07; ADR-0185 decision 9, ADR-0180 and ADR-NEXT
- * `NEXT-portal-templates-volunteer-speaker-donor.md`): `Events.ApplyToSpeak` on an open event
+ * The speaker portal's two actions (PB-07; ADR-0185 decision 9, ADR-0180 and ADR-0191
+ * `0191-portal-templates-volunteer-speaker-donor.md`): `Events.ApplyToSpeak` on an open event
  * starts a Submitted proposal for the verified person, and `Events.WithdrawProposal` withdraws
  * one of their own that is not yet decided. Core finds this class by name
  * (`PortalActionExtensions.EXTENSION_CLASSES`); Portal Builder has already checked the record is

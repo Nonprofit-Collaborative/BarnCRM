@@ -1,4 +1,4 @@
-# ADR-NEXT: Portal templates for volunteers, speakers and donors: shipped as template JSON, module actions through Core's seam, one read-only parent hop for the person
+# ADR-0191: Portal templates for volunteers, speakers and donors: shipped as template JSON, module actions through Core's seam, one read-only parent hop for the person
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-07
