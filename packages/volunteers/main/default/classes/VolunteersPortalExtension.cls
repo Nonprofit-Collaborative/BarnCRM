@@ -40,7 +40,7 @@ public without sharing class VolunteersPortalExtension implements PortalActionEx
 
 	private static String signUp(Id personId, Id shiftId) {
 		List<Volunteer_Shift__c> shifts = [
-			SELECT Id, Status__c, Start_Time__c, Slots_Remaining__c, Volunteer_Job__r.Active__c
+			SELECT Id, Status__c, Start_Time__c, Volunteers_Needed__c, Volunteer_Job__r.Active__c
 			FROM Volunteer_Shift__c
 			WHERE Id = :shiftId
 			WITH SYSTEM_MODE
@@ -57,7 +57,14 @@ public without sharing class VolunteersPortalExtension implements PortalActionEx
 		) {
 			return BarnHelp.text('Volunteers', 'Volunteers_Portal_ShiftClosed');
 		}
-		if (shift.Slots_Remaining__c != null && shift.Slots_Remaining__c <= 0) {
+		// Counted now, not read from Slots Filled, which a roll-up brings up to date a moment later.
+		Integer filled = [
+			SELECT COUNT()
+			FROM Volunteer_Signup__c
+			WHERE Volunteer_Shift__c = :shiftId AND Status__c != 'Cancelled'
+			WITH SYSTEM_MODE
+		];
+		if (shift.Volunteers_Needed__c != null && filled >= shift.Volunteers_Needed__c) {
 			return BarnHelp.text('Volunteers', 'Volunteers_Portal_ShiftFull');
 		}
 		List<Volunteer_Signup__c> existing = [
