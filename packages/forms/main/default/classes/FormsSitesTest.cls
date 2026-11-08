@@ -47,6 +47,7 @@ private class FormsSitesTest {
 
 	@IsTest
 	static void aSiteWithoutAnAddressGivesNoLink() {
+		// runs-as: deploying user (pure logic over in-memory Site details, no DML or SOQL)
 		FormsSites.SiteInfo withUrl = new FormsSites.SiteInfo();
 		withUrl.name = 'Volunteer Forms';
 		withUrl.url = 'https://example.my.salesforce-sites.com/forms';
