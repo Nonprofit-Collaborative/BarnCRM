@@ -1,7 +1,7 @@
 /**
  * A module's public page, such as an event's, is served on the Site page and the REST API with
  * its form only while that form is published and public; otherwise the page shows no form and
- * the module's offline message. A record no module publishes has no page (EV-16; ADR-NEXT public
+ * the module's offline message. A record no module publishes has no page (EV-16; ADR-0190 public
  * event pages, decisions 4, 6 and 7).
  */
 @IsTest(

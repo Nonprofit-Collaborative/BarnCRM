@@ -13020,7 +13020,7 @@ the framework-free module `eventsModel.js`; a monthly occurrence keeps the day o
 month's last day when it is shorter. Nothing keeps occurrences in step afterwards: each is edited
 on its own.
 
-**R-EV5 A public page shows only what the event publishes (EV-16, ADR-NEXT public event pages).**
+**R-EV5 A public page shows only what the event publishes (EV-16, ADR-0190 public event pages).**
 A page is served only while Public Page is on and the status is Open or Closed. It shows the
 event's name, description, dates, format, venue and registration times; active ticket types whose
 sales have not ended, with price (a priced one with the Events Settings payment note) and, with
@@ -14526,7 +14526,7 @@ mirrors the primary member).
 | 1.3 | 2026-11-07 | Event Management gala seating (EV-13; ADR-0186 `0186-events-gala-seating.md`, ADR-0177 decision 8, D-156, D-186). New Section 29EV26 Event Table (`Event_Table__c`, R-ET1, R-ET2); Event Attendee (29EV9) gains Table, Dietary Needs and Access Needs. |
 | 1.3 | 2026-11-07 | Post-event survey (EV-18, D-186, ADR-0188). New Section 29EV18 Event Survey Response (`Event_Survey_Response__c`, R-ESV1 to R-ESV3); `Event__c` gains `Survey_Form_Key__c`, `Event_Attendee__c` gains `Survey_Link__c`, `Events_Settings__c` gains `Survey_Template__c`. Core gains the `FormCatalogExtension` seam (no object or field). |
 | 1.2 | 2026-11-07 | Event calendar (EV-19, D-186, ADR-0189). No object or field added: the Event Calendar tab reads `Event__c` (29EV1) and `Event_Session__c` (29EV5) and builds an `.ics` file per entry in the browser. |
-| 1.2 | 2026-11-07 | Public event pages (EV-16, D-186, ADR-NEXT public event pages). `Event__c` (29EV1) gains `Public_Page__c`, `Public_Speakers__c` and `Public_Seats__c` (Checkbox, default false) and rule R-EV5; `Events_Settings__c` (29EV25) gains `Public_Payment_Note__c` (setting `Events_Public_Payment_Note`, sort 90). Core gains the `PublicPageExtension` seam (no object or field). |
+| 1.2 | 2026-11-07 | Public event pages (EV-16, D-186, ADR-0190 public event pages). `Event__c` (29EV1) gains `Public_Page__c`, `Public_Speakers__c` and `Public_Seats__c` (Checkbox, default false) and rule R-EV5; `Events_Settings__c` (29EV25) gains `Public_Payment_Note__c` (setting `Events_Public_Payment_Note`, sort 90). Core gains the `PublicPageExtension` seam (no object or field). |
 | 1.3 | 2026-11-07 | Portal Builder module (PB-01, D-118, D-178, D-187; ADR-0185 `0185-portal-builder-off-platform-portal-api.md`). New package `packages/portal`: Portal (`Portal__c`, 29PB1), Portal Access (`Portal_Access__c`, 29PB2), Portal Session (`Portal_Session__c`, 29PB3) and Portal Settings (`Portal_Settings__c`, 29PB4), rules R-PB1 to R-PB4, R-PA1, R-PA2, R-PS1, R-PS2 and R-PST1. Core gains no object or field: only the `PortalActionExtension` seam, the Portals settings section and the catalog row `BarnCRM_Module.Portal`. |
 
 ---

@@ -32,7 +32,7 @@ public with sharing class FormPublicController {
 
 	/**
 	 * A module's public page for one of its records, such as an event, as JSON, or null when it
-	 * is not published (ADR-NEXT public event pages, decision 6).
+	 * is not published (ADR-0190 public event pages, decision 6).
 	 */
 	@AuraEnabled
 	public static String getPage(String recordId) {

@@ -1,5 +1,5 @@
 /**
- * A module's public page and list as a page shows them (ADR-NEXT public event pages, decision 6),
+ * A module's public page and list as a page shows them (ADR-0190 public event pages, decision 6),
  * framework free (plan 9.9) so an off-platform site can draw the same JSON. Every text comes
  * finished from the module; this module only formats dates in the page's time zone, amounts in
  * their currency, and the link from a list to each page.

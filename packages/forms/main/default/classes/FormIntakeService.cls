@@ -91,7 +91,7 @@ public without sharing class FormIntakeService {
 
 	/**
 	 * A module's public page for one of its records, as JSON, or null when no module publishes
-	 * it (ADR-NEXT public event pages, decisions 1, 4 and 6). The module reads its own record;
+	 * it (ADR-0190 public event pages, decisions 1, 4 and 6). The module reads its own record;
 	 * this class only checks that the form the page names is published and public, and when it
 	 * is not, the page shows no form and the module's offline message.
 	 */

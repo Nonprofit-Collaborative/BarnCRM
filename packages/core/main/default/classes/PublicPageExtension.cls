@@ -1,7 +1,7 @@
 /**
  * The seam a module uses to publish a public page for its own records, served by whichever
  * package hosts public pages (BarnCRM Forms: its Salesforce Site page and its REST API), without
- * either package depending on the other (ADR-NEXT public event pages, decision 1). Event
+ * either package depending on the other (ADR-0190 public event pages, decision 1). Event
  * Management is the first user (EV-16).
  *
  * Found by `PublicPageExtensions` with `NamespaceUtil.resolveType`, the mechanism of

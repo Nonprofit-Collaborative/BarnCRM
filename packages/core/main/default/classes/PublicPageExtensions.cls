@@ -1,5 +1,5 @@
 /**
- * Finds the public page extensions modules installed (ADR-NEXT public event pages, decision 1),
+ * Finds the public page extensions modules installed (ADR-0190 public event pages, decision 1),
  * the pattern `FormAttachmentExtensions` uses (ADR-0175). A class that is not installed, cannot
  * be built or does not implement the interface is absent, and a failure is logged and answered
  * as "no page": a public address never shows an error's detail.

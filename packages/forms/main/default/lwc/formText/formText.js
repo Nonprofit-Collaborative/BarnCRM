@@ -304,7 +304,7 @@ export const SAVE_TEXT = Object.freeze({
   }
 });
 
-/** A module's public page and list (ADR-NEXT public event pages): the host's own words. */
+/** A module's public page and list (ADR-0190 public event pages): the host's own words. */
 export const PAGE_TEXT = Object.freeze({
   get missing() {
     return helpText('Forms', 'Forms_Public_PageMissing');

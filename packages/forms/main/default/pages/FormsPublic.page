@@ -11,7 +11,7 @@
     Site, decision 10): <site URL>/FormsPublic?form=<form id>, with &record=<id> for a form a
     module attached to a record, or &resume=<token> from a save-for-later email (C-42c). With
     record=<id> and no form, a module's public page for that record, such as an event, with its
-    form; with list=<kind>, a module's public list, such as list=events (EV-16; ADR-NEXT public
+    form; with list=<kind>, a module's public list, such as list=events (EV-16; ADR-0190 public
     event pages, decision 7). It only hosts c:formPublic or c:formPublicPage through Lightning
     Out; FormPublicController decides everything on the server.
   -->

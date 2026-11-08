@@ -84,7 +84,7 @@ global with sharing class FormPublicRest {
 
 	/**
 	 * A module's public page (`pages/<recordId>`) or list (`pages?kind=events`), the same JSON the
-	 * Site page shows (ADR-NEXT public event pages, decision 6), or 404.
+	 * Site page shows (ADR-0190 public event pages, decision 6), or 404.
 	 */
 	private static void getPage(RestRequest request, RestResponse response) {
 		String path = request.requestURI.removeEnd('/');

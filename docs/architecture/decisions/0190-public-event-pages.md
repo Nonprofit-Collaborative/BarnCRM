@@ -1,4 +1,4 @@
-# ADR-NEXT: Public event pages and registration: Events publishes a page view through a Core seam, Forms serves it on its Site and API with the public form intake
+# ADR-0190: Public event pages and registration: Events publishes a page view through a Core seam, Forms serves it on its Site and API with the public form intake
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-07

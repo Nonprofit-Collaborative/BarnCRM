@@ -1,5 +1,5 @@
 /**
- * Public event pages' checks in Health Check, in the Settings console (EV-16; ADR-NEXT public
+ * Public event pages' checks in Health Check, in the Settings console (EV-16; ADR-0190 public
  * event pages, decision 8; ADR-0057's extension seam). Core finds this class by name
  * (`HealthCheckExtensions.EXTENSION_CLASSES`).
  *

@@ -3,7 +3,7 @@
  * payment note, seats left only with Show Seats Left, confirmed sessions, confirmed speakers only
  * with Show Speakers, and the registration form only while registration is open; a Draft or
  * unpublished event has no page, and the list shows upcoming public events (EV-16, R-EV5;
- * ADR-NEXT public event pages). Health Check reports a public event that cannot be shown.
+ * ADR-0190 public event pages). Health Check reports a public event that cannot be shown.
  */
 @IsTest(
 	testFor='ApexClass:EventPublicPage, ApexClass:EventsHealthCheckExtension, ApexClass:EventsSettings'

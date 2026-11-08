@@ -1,6 +1,6 @@
 /**
  * A module publishes pages for its own records through Core, a host is found by name, and a
- * module that fails answers "no page" (ADR-NEXT public event pages, decision 1). Core has no
+ * module that fails answers "no page" (ADR-0190 public event pages, decision 1). Core has no
  * module, so extensions are injected by class name, as modules register theirs.
  */
 @IsTest(testFor='ApexClass:PublicPageExtensions')

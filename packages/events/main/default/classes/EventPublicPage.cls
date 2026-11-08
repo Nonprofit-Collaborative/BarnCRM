@@ -1,5 +1,5 @@
 /**
- * Event Management's public pages (EV-16; ADR-NEXT public event pages, decisions 2, 3, 5 and 6;
+ * Event Management's public pages (EV-16; ADR-0190 public event pages, decisions 2, 3, 5 and 6;
  * canonical model R-EV5). Core finds this class by name (`PublicPageExtensions`) and BarnCRM
  * Forms serves what it returns on its Salesforce Site page and REST API; without Forms nothing
  * calls it.

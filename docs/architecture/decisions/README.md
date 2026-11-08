@@ -198,6 +198,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [0187](0187-events-badges-and-sign-in-sheets.md) | Event Management badges and sign-in sheets | Accepted (builder decision) |
 | [0188](0188-event-post-event-survey.md) | Post-event survey: a Forms form named on the event, sent in the follow-up email with the attendee's own link, answers kept per attendee, through a Core form catalog seam | Accepted (builder decision) |
 | [0189](0189-event-calendar.md) | Event calendar: a month, week and list view of events and sessions on its own tab, filters in the browser, and a calendar file built in the browser | Accepted (builder decision) |
+| [0190](0190-public-event-pages.md) | Public event pages and registration: Events publishes a page view through a Core seam, Forms serves it on its Site and API with the public form intake | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

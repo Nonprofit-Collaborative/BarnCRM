@@ -8,7 +8,7 @@ import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
  * A module's public page for one of its records, such as an event, or its public list, on a
- * Salesforce Site (EV-16; ADR-NEXT public event pages, decisions 4, 6 and 7), loaded by the
+ * Salesforce Site (EV-16; ADR-0190 public event pages, decisions 4, 6 and 7), loaded by the
  * `FormsPublic` page through Lightning Out. The module decides what is published; this page
  * draws it, and, while registration is open, the record's form through `c-form-public` with the
  * record as the form's context, so the answers take the public intake and its spam checks.
