@@ -62,6 +62,8 @@ public with sharing class PortalTemplate {
 		public String kind;
 		public Schema.SObjectType objectType;
 		public String personField;
+		/** True when the person is reached through one parent (`Parent__r.Contact__c`): read only. */
+		public Boolean personViaParent = false;
 		public List<FieldSpec> fields = new List<FieldSpec>();
 		public List<Condition> conditions = new List<Condition>();
 		public String orderBy;
@@ -159,12 +161,8 @@ public with sharing class PortalTemplate {
 		Map<String, Schema.SObjectField> fieldMap = page.objectType.getDescribe().fields.getMap();
 		if (page.kind == KIND_RELATED) {
 			page.personField = asText(raw.get('personField'));
-			Schema.SObjectField link = page.personField == null
-				? null
-				: fieldMap.get(page.personField.toLowerCase());
-			if (
-				link == null || !link.getDescribe().getReferenceTo().contains(Contact.SObjectType)
-			) {
+			page.personViaParent = page.personField != null && page.personField.contains('.');
+			if (!isPersonLink(page.personField, fieldMap)) {
 				throw new TemplateException(at + 'personField must be a lookup to Contact');
 			}
 		}
@@ -188,6 +186,39 @@ public with sharing class PortalTemplate {
 		}
 		parseActions(page, asList(raw.get('actions')), at);
 		return page;
+	}
+
+	/** A lookup to Contact, or `Parent__r.Contact__c`: one parent hop to a lookup to Contact. */
+	private static Boolean isPersonLink(String path, Map<String, Schema.SObjectField> fieldMap) {
+		if (String.isBlank(path)) {
+			return false;
+		}
+		if (!path.contains('.')) {
+			Schema.SObjectField link = fieldMap.get(path.toLowerCase());
+			return link != null &&
+				link.getDescribe().getReferenceTo().contains(Contact.SObjectType);
+		}
+		String relationship = path.substringBefore('.');
+		String parentField = path.substringAfter('.');
+		if (parentField.contains('.')) {
+			return false;
+		}
+		for (Schema.SObjectField field : fieldMap.values()) {
+			Schema.DescribeFieldResult describe = field.getDescribe();
+			if (
+				describe.getRelationshipName() != null &&
+				describe.getRelationshipName().equalsIgnoreCase(relationship) &&
+				describe.getReferenceTo().size() == 1
+			) {
+				Schema.SObjectField target = describe.getReferenceTo()[0]
+					.getDescribe()
+					.fields.getMap()
+					.get(parentField.toLowerCase());
+				return target != null &&
+					target.getDescribe().getReferenceTo().contains(Contact.SObjectType);
+			}
+		}
+		return false;
 	}
 
 	private static Schema.SObjectType customObject(String name, String at) {
@@ -228,6 +259,7 @@ public with sharing class PortalTemplate {
 		if (spec.edit) {
 			Boolean editable =
 				page.kind != KIND_CATALOG &&
+				!page.personViaParent &&
 				!spec.path.contains('.') &&
 				spec.describe.isUpdateable() &&
 				!spec.describe.isCalculated() &&
@@ -329,9 +361,9 @@ public with sharing class PortalTemplate {
 
 	private static void parseActions(PageSpec page, List<Object> actions, String at) {
 		for (Object action : actions) {
-			if (action == 'update' && page.kind != KIND_CATALOG) {
+			if (action == 'update' && page.kind != KIND_CATALOG && !page.personViaParent) {
 				page.canUpdate = true;
-			} else if (action == 'create' && page.kind == KIND_RELATED) {
+			} else if (action == 'create' && page.kind == KIND_RELATED && !page.personViaParent) {
 				page.canCreate = true;
 			} else if (action instanceof Map<String, Object>) {
 				Map<String, Object> extension = (Map<String, Object>) action;

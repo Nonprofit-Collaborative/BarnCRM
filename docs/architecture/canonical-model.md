@@ -13856,7 +13856,9 @@ second factor is used, and its template (pages, objects, fields and actions) as 
 checks it against the org's schema; a template that fails is refused as `portal_unavailable` and
 logged, never partly used. Pages are `person` (Contact, the verified person), `related` (a custom
 object whose `personField` looks up to Contact) or `catalog` (a custom object, read only, with fixed
-`where` tests). Editable fields are updateable, of a safe type, never a lookup.
+`where` tests). Editable fields are updateable, of a safe type, never a lookup. A related page's
+`personField` may be `Parent__r.Contact__c` (one parent hop to a lookup to Contact, ADR-NEXT
+`NEXT-portal-templates-volunteer-speaker-donor.md`): such a page is read only.
 
 **R-PB3 Every read and write is the verified person's.** A related page reads and updates only
 records whose `personField` is the person and creates records with it set; a person page only
@@ -14391,6 +14393,7 @@ mirrors the primary member).
 | 1.3 | 2026-11-07 | Event Management sponsorship (EV-09; ADR-0181 `0181-events-sponsorship.md`, ADR-0177 decision 11, D-123, D-177). New Sections 29EV22 Sponsorship Level (`Sponsorship_Level__c`, R-SP3), 29EV23 Event Sponsor (`Event_Sponsor__c`, R-SP1, R-SP4) and 29EV24 Sponsor Deliverable (`Sponsor_Deliverable__c`). Core gains the `LinkedRecords` seam (no object or field). |
 | 1.3 | 2026-11-07 | Event Appointment (`Event_Appointment__c`, 29EV15, EV-15, ADR-0177 decision 13) with rules R-EAP1 to R-EAP6. |
 | 1.3 | 2026-11-07 | Portal Builder module (PB-01, D-118, D-178, D-187; ADR-0185 `0185-portal-builder-off-platform-portal-api.md`). New package `packages/portal`: Portal (`Portal__c`, 29PB1), Portal Access (`Portal_Access__c`, 29PB2), Portal Session (`Portal_Session__c`, 29PB3) and Portal Settings (`Portal_Settings__c`, 29PB4), rules R-PB1 to R-PB4, R-PA1, R-PA2, R-PS1, R-PS2 and R-PST1. Core gains no object or field: only the `PortalActionExtension` seam, the Portals settings section and the catalog row `BarnCRM_Module.Portal`. |
+| 1.3 | 2026-11-07 | Portal templates for volunteers, speakers and donors (PB-03, PB-07, PB-08; ADR-NEXT `NEXT-portal-templates-volunteer-speaker-donor.md`). No object or field added. R-PB2 gains a read-only `Parent__r.Contact__c` person link; Core's `PortalActionExtensions` lists the Volunteers and Event Management action classes. |
 
 ---
 ## 32. Entity ownership by package

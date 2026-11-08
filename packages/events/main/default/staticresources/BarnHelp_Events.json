@@ -199,6 +199,12 @@
     "Events_Tickets_NoCodes": "No promo codes. Add one to give a discount on this event's tickets.",
     "Events_Tickets_NoTickets": "No ticket types yet. Add one, such as General or Student, with its price.",
     "Events_Tickets_OverCapacity": "The ticket quantities add up to {0}, more than the event's capacity of {1}. That is allowed, since not every ticket sells, but check it is what you want.",
-    "Events_Tickets_Until": "Until {0}"
+    "Events_Tickets_Until": "Until {0}",
+    "Events_Portal_Applied": "Your proposal was started. Add its title and abstract on the Open Proposals page.",
+    "Events_Portal_AlreadyApplied": "You already have a proposal for this event. Edit it on the Open Proposals page.",
+    "Events_Portal_CannotWithdraw": "This proposal has been decided or withdrawn, so it cannot be withdrawn.",
+    "Events_Portal_EventClosed": "This event is not taking proposals.",
+    "Events_Portal_NewProposal": "New proposal for {0}",
+    "Events_Portal_Withdrawn": "Your proposal was withdrawn."
   }
 }

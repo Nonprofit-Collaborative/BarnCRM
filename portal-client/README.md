@@ -9,6 +9,7 @@ The website half of BarnCRM Portal Builder (ADR-0185 portal builder, D-187). It 
 | `src/messages.js` | The words shown, English; pass a copy to `mountPortal` to change them. |
 | `src/portalTemplate.js` | `checkTemplate(json)`: the template shape rules Salesforce applies, to check a template before pasting it into a Portal. Salesforce also checks objects and fields against the org. |
 | `templates/sample.json` | A starting template: My Details (the person) and My Roles (their current affiliations). |
+| `templates/volunteer.json`, `speaker.json`, `donor.json` | The ready-made templates (PB-03, PB-07, PB-08). Each names its module in `requiresModules` (Volunteers, Event Management, Giving); module actions go through Core's `PortalActionExtension`. Checked against the package metadata by `__tests__/portalTemplates.test.js`. |
 | `wordpress/barncrm-portal/` | The WordPress plugin: settings page, the `[barncrm_portal key="..."]` shortcode, and the proxy. |
 | `build-wordpress.sh` | Builds `barncrm-portal.zip` with the client inside, for Plugins, Add New, Upload Plugin. |
 | `__tests__/` | Jest tests, run with the repository's `npm run test:unit`. |

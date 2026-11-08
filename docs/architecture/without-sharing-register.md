@@ -83,6 +83,7 @@ into six kinds:
 | VolunteerNudgeSelector | Org job | Every unfilled shift and the email address of each volunteer who has helped on its job, for the morning nudges | ADR-0021 |
 | VolunteerReminderSelector | Org job | Every booking and email address for the morning reminders | ADR-0021 |
 | VolunteersHouseholdDependentsExtension | Integrity | Private hours that keep a household from being deleted | ADR-0021 |
+| VolunteersPortalExtension | Portal | The shift a portal person signs up for and that person's own sign-up to cancel; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-NEXT portal templates |
 
 ## Programs
 
@@ -127,6 +128,12 @@ into six kinds:
 |---|---|---|---|
 | PortalAuth | Portal | Portals, accesses and sessions, and the one Contact an email names, to send and check sign-in codes and resolve sessions; only hashes are stored | ADR-0021, ADR-0185 portal builder |
 | PortalData | Portal | The verified person's own Contact and the records a template names, filtered by that person or the catalog's fixed tests; only `edit` fields are written | ADR-0021, ADR-0185 portal builder |
+
+## Event Management
+
+| Class | Kind | What it reaches past sharing for | Authority |
+|---|---|---|---|
+| EventsPortalExtension | Portal | The open event a portal person proposes a talk for and that person's own proposal to withdraw; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-NEXT portal templates |
 
 ## Mirror
 

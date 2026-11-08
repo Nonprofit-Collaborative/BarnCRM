@@ -11,7 +11,10 @@ what the verified person's template allows.
 
 ## First ships in
 
-Release **1.3** (PB-01). The volunteer (PB-03), speaker (PB-07) and donor (PB-08) templates follow.
+Release **1.3** (PB-01), with the volunteer (PB-03), speaker (PB-07) and donor (PB-08) templates in
+`portal-client/templates/`. Their module actions (`Volunteers.SignUp`, `Events.ApplyToSpeak` and
+the like) are classes in Volunteers and Event Management that Core's `PortalActionExtensions`
+finds by name; this package depends on neither.
 
 ## Depends on
 

@@ -37,6 +37,8 @@ function checkPage(page, problems) {
   if (page.kind === 'related' && typeof page.personField !== 'string') {
     problems.push(at + 'personField must be a lookup to Contact');
   }
+  // `Parent__r.Contact__c`: the person reached through one parent, read only.
+  const viaParent = page.kind === 'related' && String(page.personField).includes('.');
   const fields = Array.isArray(page.fields) ? page.fields : [];
   if (fields.length === 0 || fields.length > MAX_FIELDS) {
     problems.push(at + 'list 1 to ' + MAX_FIELDS + ' fields');
@@ -46,7 +48,7 @@ function checkPage(page, problems) {
       problems.push(at + 'each field needs a field name');
     } else if (field.edit === true && field.field.includes('.')) {
       problems.push(at + field.field + ' cannot be edited in a portal');
-    } else if (field.edit === true && field.field === page.personField) {
+    } else if (field.edit === true && (viaParent || field.field === page.personField)) {
       problems.push(at + field.field + ' cannot be edited in a portal');
     }
   });
@@ -67,8 +69,8 @@ function checkPage(page, problems) {
     problems.push(at + 'orderBy must be a field, then ASC or DESC');
   }
   (Array.isArray(page.actions) ? page.actions : []).forEach((action) => {
-    const update = action === 'update' && page.kind !== 'catalog';
-    const create = action === 'create' && page.kind === 'related';
+    const update = action === 'update' && page.kind !== 'catalog' && !viaParent;
+    const create = action === 'create' && page.kind === 'related' && !viaParent;
     if (update || create) {
       return;
     }

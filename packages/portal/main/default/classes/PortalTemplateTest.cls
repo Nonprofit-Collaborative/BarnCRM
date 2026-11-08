@@ -104,6 +104,58 @@ private class PortalTemplateTest {
 		}
 	}
 
+	private static final String VIA_PARENT = 'Reciprocal_Relationship__r.Contact__c';
+
+	private static Map<String, Object> viaParentTemplate(Map<String, Object> page) {
+		Map<String, Object> template = sample();
+		template.put('pages', new List<Object>{ page });
+		return template;
+	}
+
+	private static Map<String, Object> viaParentPage(String personField) {
+		return new Map<String, Object>{
+			'key' => 'kin',
+			'title' => 'Kin',
+			'kind' => 'related',
+			'object' => 'Relationship__c',
+			'personField' => personField,
+			'fields' => new List<Object>{ new Map<String, Object>{ 'field' => 'Name' } }
+		};
+	}
+
+	@IsTest
+	static void reachesThePersonThroughOneParentForReadingOnly() {
+		System.runAs(TestUsers.adminWith('Portal_Admin')) {
+			Map<String, Object> editPage = viaParentPage(VIA_PARENT);
+			editPage.put(
+				'fields',
+				new List<Object>{ new Map<String, Object>{ 'field' => 'Name', 'edit' => true } }
+			);
+			Map<String, Object> writePage = viaParentPage(VIA_PARENT);
+			writePage.put('actions', new List<Object>{ 'update' });
+
+			Test.startTest();
+			PortalTemplate template = PortalTemplate.parse(
+				JSON.serialize(viaParentTemplate(viaParentPage(VIA_PARENT)))
+			);
+			String editRefusal = refusal(viaParentTemplate(editPage));
+			String updateRefusal = refusal(viaParentTemplate(writePage));
+			String notContact = refusal(
+				viaParentTemplate(viaParentPage('Reciprocal_Relationship__r.Name'))
+			);
+			String twoHops = refusal(
+				viaParentTemplate(viaParentPage('Reciprocal_Relationship__r.Contact__r.Id'))
+			);
+			Test.stopTest();
+
+			Assert.isTrue(template.page('kin').personViaParent, 'Reached through the parent');
+			Assert.isNotNull(editRefusal, 'Nothing is editable through a parent');
+			Assert.isNotNull(updateRefusal, 'No update through a parent');
+			Assert.isNotNull(notContact, 'The parent field must be a Contact lookup');
+			Assert.isNotNull(twoHops, 'One hop only');
+		}
+	}
+
 	@IsTest
 	static void refusesABlankOrBrokenTemplate() {
 		System.runAs(TestUsers.adminWith('Portal_Admin')) {

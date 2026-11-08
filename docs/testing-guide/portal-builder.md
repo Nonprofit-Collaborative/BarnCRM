@@ -72,3 +72,56 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | Turn **Portal Sign-In** off and POST `login/start`. | 503 `portal_unavailable`. |
 
 **Cleanup:** set Status Active, Second Factor Off, and Portal Sign-In back on if needed.
+
+## T-PB-06: Volunteer Portal Template
+
+**Purpose:** confirm a volunteer signs up, cancels and logs hours for themselves only.
+**Prerequisites:** admin; Volunteers installed with sample data; a portal with key `volunteer`, Active, Invited, the template `portal-client/templates/volunteer.json`; two people `Pat Tester` (signed in as in T-PB-01) and `Lee Other`; an Open shift starting tomorrow with room, a full Open shift, and a shift that started yesterday.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | GET `me`, then GET `page?key=shifts`. | Four pages. Only Open shifts that start now or later, with Job, Starts, Ends, Where and Spots Left. |
+| 2 | POST `page/action` on the open shift with action `Volunteers.SignUp`. | 200 with "You are signed up for this shift." A Volunteer Signup for Pat, status Signed up, exists. |
+| 3 | Repeat step 2. | 200 with "You are already signed up for this shift."; still one sign-up. |
+| 4 | Sign up for the full shift. | 200 with "This shift is full."; no sign-up. |
+| 5 | GET `page?key=signups`, then POST `page/action` `Volunteers.CancelSignup` on Pat's sign-up. | The list shows only Pat's sign-ups. The cancel answers "Your sign-up was cancelled."; status Cancelled. |
+| 6 | Cancel a sign-up that belongs to Lee (use its Id). | 404 `not_found`; Lee's sign-up is unchanged. |
+| 7 | POST `page/save` on `hours` with no record, `Date_Worked__c` and `Hours__c` 2. | 200 with an Id. Pat has a Volunteer Hours entry, status Submitted (Approved if Hours Require Approval is off). |
+| 8 | POST `page/save` on `hours` naming that record. | 403 `not_allowed`: hours cannot be edited after saving. |
+| 9 | POST `page/save` on `hours` with `Status__c` set to Approved. | 403 `not_allowed`. |
+
+**Cleanup:** delete Pat's test sign-up and hours entry.
+
+## T-PB-07: Speaker Portal Template
+
+**Purpose:** confirm a speaker proposes, edits and withdraws only their own proposals and sees their sessions.
+**Prerequisites:** admin; Event Management installed; a portal with key `speaker`, Active, Invited, the template `portal-client/templates/speaker.json`; Pat Tester signed in; an Open event that has not ended, a Draft event, and a session at the Open event assigned to a speaker record for Pat.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | GET `page?key=events`. | Only the Open event that has not ended. |
+| 2 | POST `page/action` `Events.ApplyToSpeak` on it. | 200 with "Your proposal was started." A Speaker Application for Pat, Submitted, titled "New proposal for" the event. |
+| 3 | Repeat step 2. | 200 with "You already have a proposal for this event."; still one. |
+| 4 | POST `page/save` on `proposals` with a new `Name` and `Abstract__c`. | 200; the application shows them. |
+| 5 | POST `page/save` on `proposals` changing `Status__c`. | 403 `not_allowed`. |
+| 6 | Set the application to Accepted in Salesforce and GET `page?key=proposals`. | It is no longer listed; `decisions` still shows it as Accepted. POST `Events.WithdrawProposal` on it answers "This proposal has been decided or withdrawn, so it cannot be withdrawn." |
+| 7 | GET `page?key=sessions`. | Only Pat's session with its start, end, room and role; a save on that page is `not_allowed`. |
+| 8 | Propose for the Open event again and withdraw the new proposal. | Withdrawn; a second proposal can then be started. |
+
+**Cleanup:** delete the test applications.
+
+## T-PB-08: Donor Portal Template
+
+**Purpose:** confirm a donor sees only their own giving, with no payments and no edits beyond contact details.
+**Prerequisites:** admin; Giving installed with sample data; a portal with key `donor`, Active, Invited, the template `portal-client/templates/donor.json`; Pat Tester signed in with two gifts (one Cancelled), a pledge and an issued receipt; another donor with gifts.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | GET `page?key=summary`. | Pat's totals and Pledge Balance only. |
+| 2 | GET `page?key=gifts`. | Pat's gifts except the Cancelled one, newest first; none of the other donor's. |
+| 3 | GET `page?key=pledges` and `page?key=receipts`. | Pat's pledge with Paid to Date and Balance; Pat's issued receipt. No other donor's records. |
+| 4 | POST `page/save` on `contact` changing `MobilePhone` and `MailingCity`. | 200; changed in BarnCRM. |
+| 5 | POST `page/save` on `contact` changing `Email`. | 403 `not_allowed`. |
+| 6 | POST `page/save` on `gifts` with no record, or on a gift's Id. | 403 `not_allowed`. |
+
+**Cleanup:** restore Pat's phone and city.
