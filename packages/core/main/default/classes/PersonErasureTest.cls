@@ -322,7 +322,12 @@ private class PersonErasureTest {
 			Assert.areEqual('Jordan and Sam Lee', untouched.Name, 'The preview changes nothing');
 			Assert.isTrue(untouched.Custom_Name__c, 'Not even the box');
 
+			// The erase is its own transaction in the app, so it gets its own limits here: on
+			// Nonprofit Cloud the setup and the preview spend most of a test's 100 queries, and
+			// the erase alone about 43 with Contact Point Sync installed.
+			Test.startTest();
 			PersonErasure.Result result = PersonErasure.erase(jordan.Id, jordan.Name, 'PR-7');
+			Test.stopTest();
 
 			Account household = [
 				SELECT
