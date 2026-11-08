@@ -221,12 +221,10 @@ private class EventApplicationsControllerTest {
 		EventApplicationsController.emailSender = sender;
 		System.runAs(staff()) {
 			Event__c event = conference();
-			Speaker_Application__c noTemplate = application(event, 'One', 'a@example.org');
 			Speaker_Application__c missing = application(event, 'Two', 'b@example.org');
 			Speaker_Application__c noEmail = application(event, 'Three', null);
 
 			Test.startTest();
-			String off = EventApplicationsController.decide(noTemplate.Id, 'Declined', true).notice;
 			chooseTemplates(null, 'No_Such_Template');
 			String unknown = EventApplicationsController.decide(missing.Id, 'Declined', true)
 				.notice;
@@ -235,7 +233,6 @@ private class EventApplicationsControllerTest {
 			String blank = EventApplicationsController.decide(noEmail.Id, 'Declined', true).notice;
 			Test.stopTest();
 
-			Assert.areEqual(EventApplicationsController.NOTICE_OFF, off, 'No template chosen');
 			Assert.areEqual(
 				EventApplicationsController.NOTICE_UNKNOWN_TEMPLATE,
 				unknown,
@@ -244,14 +241,41 @@ private class EventApplicationsControllerTest {
 			Assert.areEqual(EventApplicationsController.NOTICE_NO_EMAIL, blank, 'No email address');
 			Assert.areEqual(0, sender.received.size(), 'Nothing sent');
 			Assert.areEqual(
-				3,
+				2,
 				[SELECT COUNT() FROM Speaker_Application__c WHERE Status__c = 'Declined'],
-				'All three decisions stand'
+				'Both decisions stand'
 			);
 			Assert.areEqual(
-				3,
+				2,
 				[SELECT COUNT() FROM Speaker_Application__c WHERE Notice_Result__c != NULL],
 				'Each records why no notice went'
+			);
+		}
+	}
+
+	@IsTest
+	static void theSpeakerNoticesShipWithTemplatesAndTheyAreTheDefaults() {
+		System.runAs(staff()) {
+			Assert.areEqual(
+				'BarnCRM_Speaker_Accepted',
+				EventsSettings.acceptNoticeTemplate(),
+				'Accepted'
+			);
+			Assert.areEqual(
+				'BarnCRM_Speaker_Declined',
+				EventsSettings.declineNoticeTemplate(),
+				'Declined'
+			);
+			Assert.areEqual(
+				2,
+				[
+					SELECT COUNT()
+					FROM EmailTemplate
+					WHERE
+						DeveloperName IN ('BarnCRM_Speaker_Accepted', 'BarnCRM_Speaker_Declined')
+						AND IsActive = TRUE
+				],
+				'Both shipped templates are in the org'
 			);
 		}
 	}

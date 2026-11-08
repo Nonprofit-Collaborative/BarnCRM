@@ -3,8 +3,8 @@
  *
  * Read through Core's `SettingsService`, which serves an org that has never saved its Events
  * Settings the record its first save would store (ADR-0035). A blank or out of range value reads
- * as the shipped one here, so no caller has to know the defaults. The speaker notice templates
- * ship blank: a blank one reads as null, which every caller takes as "send no email".
+ * as the shipped one here, so no caller has to know the defaults. That includes the two speaker
+ * notice templates, which ship as BarnCRM_Speaker_Accepted and BarnCRM_Speaker_Declined (R-ES1).
  */
 public with sharing class EventsSettings {
 	public static final String SETTINGS_OBJECT = 'Events_Settings__c';
@@ -13,15 +13,17 @@ public with sharing class EventsSettings {
 	public static final Integer MAX_REMINDER_LEAD_DAYS = 30;
 	public static final String DEFAULT_REMINDER_TEMPLATE = 'BarnCRM_Event_Reminder';
 	public static final String DEFAULT_FOLLOW_UP_TEMPLATE = 'BarnCRM_Event_Follow_Up';
+	public static final String DEFAULT_ACCEPT_NOTICE_TEMPLATE = 'BarnCRM_Speaker_Accepted';
+	public static final String DEFAULT_DECLINE_NOTICE_TEMPLATE = 'BarnCRM_Speaker_Declined';
 
-	/** R-SA5: the developer name of the email template for an accepted application, or null. */
+	/** R-SA5: the unique name of the email template for an accepted application. */
 	public static String acceptNoticeTemplate() {
-		return textOrNull('Accept_Notice_Template__c');
+		return textOr('Accept_Notice_Template__c', DEFAULT_ACCEPT_NOTICE_TEMPLATE);
 	}
 
-	/** R-SA5: the developer name of the email template for a declined application, or null. */
+	/** R-SA5: the unique name of the email template for a declined application. */
 	public static String declineNoticeTemplate() {
-		return textOrNull('Decline_Notice_Template__c');
+		return textOr('Decline_Notice_Template__c', DEFAULT_DECLINE_NOTICE_TEMPLATE);
 	}
 
 	/** Whether the morning run emails reminders. Ships off. */

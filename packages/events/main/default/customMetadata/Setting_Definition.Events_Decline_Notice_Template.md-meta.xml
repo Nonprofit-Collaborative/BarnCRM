@@ -28,7 +28,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">The developer name of the email template sent to an applicant when a speaker application is declined. Leave empty to send no email; the decision is still saved.</value>
+        <value xsi:type="xsd:string">The unique name of the email template sent to an applicant when a speaker application is declined. Default: BarnCRM_Speaker_Declined, which BarnCRM ships for you to edit. The applicant is the recipient and the application is the record the template merges. To send no email, make the template inactive; the decision is still saved.</value>
     </values>
     <values>
         <field>Help_Path__c</field>

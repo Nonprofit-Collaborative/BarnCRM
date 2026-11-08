@@ -33,8 +33,11 @@ creates the speaker and a draft session. This record fixes the details.
    custom setting, ADR-0017) holds the developer name of the accepted and the declined template, in
    a new Events section of BarnCRM Settings. The send follows ADR-0032 (`setTemplateId`, the
    applicant as target, the application as `WhatId`) through Core's `EmailSender`; the package
-   composes no email HTML. A blank setting sends nothing. A notice that cannot go out (no template,
-   template missing or inactive, no email address, a failed send) never undoes the decision: the
+   composes no email HTML. Amended 2026-11-07 (settings are never blank): the two settings default
+   to the shipped text templates `BarnCRM_Speaker_Accepted` and `BarnCRM_Speaker_Declined`, and a
+   blank setting reads as the shipped one; an administrator who wants no email makes the template
+   inactive. A notice that cannot go out (template missing or inactive, no email address, a failed
+   send) never undoes the decision: the
    application records the reason in `Notice_Result__c`, or the time in `Notice_Sent__c`.
 5. **A decided application is final in the tab.** Only Submitted and In Review applications can be
    scored or decided; changing a decision is an edit of the record, so one application never sends

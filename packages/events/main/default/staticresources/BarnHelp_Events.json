@@ -1,6 +1,7 @@
 {
   "languages": ["en"],
   "texts": {
+    "Events_SampleData_CountLabel": "Events",
     "Events_Sponsor_DeliverableNeedsName": "Enter what the sponsor is owed, for example Logo for the program.",
     "Events_Sponsor_Duplicate": "{0} is already a sponsor of this event. Edit the sponsor already there.",
     "Events_Sponsor_LevelOtherEvent": "That level belongs to another event. Choose a level of this event.",
@@ -31,7 +32,7 @@
     "Events_Applications_Review": "Score",
     "Events_Applications_ScoreRange": "Choose a score from 1 to 5.",
     "Events_Notice_NoEmail": "No notice was sent: the applicant has no email address.",
-    "Events_Notice_NoTemplate": "No notice was sent: no email template is chosen in Events settings.",
+    "Events_Notice_NoTemplate": "No notice was sent: no email template is named in Events settings.",
     "Events_Notice_Sent": "The notice was emailed to the applicant.",
     "Events_Notice_SendFailed": "The notice could not be sent. The decision is saved.",
     "Events_Notice_TemplateMissing": "No notice was sent: the email template chosen in Events settings was not found or is inactive.",

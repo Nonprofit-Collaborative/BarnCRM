@@ -13038,6 +13038,7 @@ on its own.
 | Series | `Series__c` | Lookup(Event), Clear on delete |
 | Registration Form Key | `Registration_Form_Key__c` | Text(18): the Forms form registrants fill in, by record identifier (EV-02, ADR-0014) |
 | External Key | `External_Key__c` | Text(80), unique, external ID (EV-10) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false: set on the events `EventsSampleData` loads, so Remove Sample Data deletes them with their tracks, sessions, tickets, codes, speakers, applications, levels and sponsors (C-10, `EventSampleDataLoader`) |
 
 - **Validation rules:** `End_After_Start` (R-EV1), `Capacity_Above_Zero` (R-EV2),
   `Registration_Closes_After_Opens` (R-EV3).
@@ -13401,6 +13402,7 @@ imported again, and later changes are made in BarnCRM.
 | Source | `Source__c` | Picklist (Staff, Form, Summit Events), restricted, required |
 | Form Submission Key | `Form_Submission_Key__c` | Text(18) |
 | External Key | `External_Key__c` | Text(80), unique, external ID (EV-10) |
+| Sample Data | `Sample_Data__c` | Checkbox, default false: set on the registrations `EventsSampleData` loads, deleted (with their attendees) before the sample events, because the event lookup restricts delete (C-10) |
 
 - **Summit Events:** `SummitEventsAdapter` (dynamic SOQL by object name, no dependency) with
   `SummitEventsBatch` and the nightly step `SummitEventsScheduler`, listed only when Summit Events
@@ -13566,9 +13568,9 @@ Declining makes no speaker. An accepted application with no applicant is refused
 application is edited as a record, not decided again.
 
 **R-SA5 A notice never undoes a decision.** Accepting or declining sends the applicant one email
-when a template is chosen for that outcome in Events Settings (29EV25), with the applicant as the
-recipient and the application as the record it merges. When no email goes out (no template chosen,
-the template is missing or inactive, the applicant has no email address, or the send fails) the
+from the template named for that outcome in Events Settings (29EV25, by default the shipped
+BarnCRM_Speaker_Accepted or BarnCRM_Speaker_Declined), with the applicant as the recipient and the
+application as the record it merges. When no email goes out (the template is missing or inactive, the applicant has no email address, or the send fails) the
 decision stands and Notice Result says why; when it goes, Notice Sent holds the time.
 
 ### Salesforce implementation
@@ -13787,14 +13789,17 @@ follow-up and No-Show settings (EV-14).
 | Send follow-ups | boolean | yes (defaults false) | Whether the morning run emails each person marked Attended within seven days after the event. |
 | Follow-up email template | text | yes (defaults BarnCRM_Event_Follow_Up) | The unique name of the follow-up's email template. |
 | Mark no-shows | boolean | yes (defaults false) | Whether the morning run marks attendees still Registered as No-Show once an event (ended within seven days) is over. |
-| Accepted Notice Template | text | no | Developer name of the email template sent when an application is accepted. |
-| Declined Notice Template | text | no | Developer name of the email template sent when an application is declined. |
+| Accepted Notice Template | text | yes (defaults BarnCRM_Speaker_Accepted) | The unique name of the email template sent when an application is accepted. |
+| Declined Notice Template | text | yes (defaults BarnCRM_Speaker_Declined) | The unique name of the email template sent when an application is declined. |
 
 ### Rules
 
-**R-ES1 A blank notice template means no email.** A blank, never-saved or unreadable speaker
-notice template reads as no template (R-SA5). A template is named by developer name as text,
-because no lookup to an email template is possible (ADR-0032).
+**R-ES1 A blank notice template reads as the shipped template.** A blank, never-saved or
+unreadable speaker notice template reads as the shipped template, BarnCRM_Speaker_Accepted or
+BarnCRM_Speaker_Declined (R-SA5), so a setting is never blank. A template is named by unique name
+as text, because no lookup to an email template is possible (ADR-0032). To send no email for an
+outcome, an administrator makes its template inactive: the decision is still saved and the
+application records that no notice went.
 
 **R-ES2 A value out of range reads as the default.** A blank or out of range lead time reads as
 2, a blank reminder or follow-up template name as the shipped template; a never-saved setting
@@ -13807,8 +13812,8 @@ reads as its shipped value.
 
 | Attribute | API name | Type |
 |---|---|---|
-| Accepted Notice Template | `Accept_Notice_Template__c` | Text(80) |
-| Declined Notice Template | `Decline_Notice_Template__c` | Text(80) |
+| Accepted Notice Template | `Accept_Notice_Template__c` | Text(80), default BarnCRM_Speaker_Accepted |
+| Declined Notice Template | `Decline_Notice_Template__c` | Text(80), default BarnCRM_Speaker_Declined |
 | Send event reminders | `Reminders_Enabled__c` | Checkbox, default false |
 | Days before an event to remind | `Reminder_Lead_Days__c` | Number(2, 0), default 2 |
 | Reminder email template | `Reminder_Template__c` | Text(80), default BarnCRM_Event_Reminder |
@@ -13822,8 +13827,8 @@ reads as its shipped value.
   `Events_Decline_Notice_Template` (80), section Events (Core's `SettingSections.EVENTS`).
 - **Automation:** the nightly step `EventEmailScheduler` (7:30 AM, through
   `EventsNightlyJobProvider`) starts `EventEmailBatch`; the work is `EventEmailService`. Email
-  templates `BarnCRM_Event_Reminder` and `BarnCRM_Event_Follow_Up` ship in the folder BarnCRM
-  Events.
+  templates `BarnCRM_Event_Reminder`, `BarnCRM_Event_Follow_Up`, `BarnCRM_Speaker_Accepted` and
+  `BarnCRM_Speaker_Declined` ship in the folder BarnCRM Events.
 
 ---
 
@@ -14386,10 +14391,16 @@ mirrors the primary member).
 | 1.1 | 2026-11-06 | BarnCRM Contact Point Sync module (C-45, D-111, ADR-0176 contact point sync module). New package `contactpoints`: Contact Point Link (`Contact_Point_Link__c`, 29ZZ, rules R-CPL1 to R-CPL4) and Contact Point Sync Settings (`Contact_Point_Sync_Settings__c`, 29ZZ1, R-CPS1). No Core object or field added. |
 | 1.1 | 2026-11-07 | Contact Point Sync: person accounts and household moves (C-45e, D-186, ADR-0176 decisions 14 and 15). Rules R-CPL5 and R-CPL6 added to Contact Point Link. Two Automation Registry rows (`Contact_Point_Sync_Account`, `Contact_Point_Sync_Membership`). No object or field added. |
 | 1.2 | 2026-11-06 | Event Management module (EV-01, EV-03, EV-04, EV-05; ADR-0177 `0177-events-module.md`, D-123, D-177). Seven objects in the new package `packages/events`: Event (`Event__c`, 29EV1), Ticket Type (`Ticket_Type__c`, 29EV2), Promo Code (`Promo_Code__c`, 29EV3), Event Track (`Event_Track__c`, 29EV4), Event Session (`Event_Session__c`, 29EV5), Event Speaker (`Event_Speaker__c`, 29EV6) and Session Speaker (`Session_Speaker__c`, 29EV7), with rules R-EV1 to R-EV4, R-TT1 to R-TT4, R-PC1 to R-PC5, R-ETR1, R-ESN1 to R-ESN5, R-ESP1 to R-ESP3 and R-SSP1. Registrations, attendees, call for speakers and sponsorship are designed in the ADR and added by their items. |
-
+| 1.2 | 2026-11-07 | Event registrations and attendees (EV-02; ADR-0182 `0182-event-registrations.md`, ADR-0177 decision 8). New Sections 29EV8 Event Registration (`Event_Registration__c`, Private, rules R-ERG1 to R-ERG3) and 29EV9 Event Attendee (`Event_Attendee__c`, master-detail to the registration, rules R-EAT1 and R-EAT2). Event (29EV1) gains Registration Form Key (`Registration_Form_Key__c`, Text(18), the Forms form by record identifier, ADR-0014). Core registers `EventFormAttachment` in `FormAttachmentExtensions.EXTENSION_CLASSES` and lists the two objects in `ModuleManagerService`; no object or field is added to Core. |
+| 1.2 | 2026-11-07 | Summit Events compatibility (EV-10; ADR-0182 `0182-event-registrations.md` decision 7). Event (29EV1) and Event Registration (29EV8) gain External Key (`External_Key__c`, Text(80), unique, external ID, `summit:` and the Summit record's identifier), with rule R-ERG4 (a Summit registration is imported once). `SummitEventsAdapter` reads Summit's objects by name only and is listed in the nightly run only when Summit Events is installed. No Lead is read or written. |
+| 1.2 | 2026-11-07 | Event reminders, follow-ups and No-Show (EV-14; ADR-0182 `0182-event-registrations.md` decision 6). Events Settings (29EV25, `Events_Settings__c`) gains Send event reminders (`Reminders_Enabled__c`), Days before an event to remind (`Reminder_Lead_Days__c`, 1 to 30, default 2), Reminder email template (`Reminder_Template__c`), Send follow-ups (`Follow_Ups_Enabled__c`), Follow-up email template (`Follow_Up_Template__c`) and Mark no-shows (`Mark_No_Shows__c`), with rule R-ES2. Event Attendee (29EV9) gains Reminder Sent On (`Reminder_Sent_On__c`), Follow-Up Sent On (`Follow_Up_Sent_On__c`) and Event Name (`Event_Name__c`, formula, for email templates), with rule R-EAT3. Core lists `EventsNightlyJobProvider` in `NightlyJobs` and gains the settings section name `Events` (`SettingSections.EVENTS`). Email templates `BarnCRM_Event_Reminder` and `BarnCRM_Event_Follow_Up` ship in the folder BarnCRM Events. |
+| 1.2 | 2026-11-07 | Event volunteer jobs and shifts (EV-08; ADR-0183 `0183-event-volunteers-extension-point.md`, ADR-0177 decision 12). No Events object or field. Volunteer Job (29J, `Volunteer_Job__c`) gains Event ID (`Event_Key__c`, Text(18), external ID), the event's record identifier as text, never a lookup (ADR-0014). Core gains the `EventVolunteerExtension` interface, `EventVolunteerExtensions` (found by name) and the value classes `EventVolunteerJob` and `EventVolunteerShift`; Volunteers implements it as `VolunteersEventExtension`. The Events panel `eventVolunteers` draws nothing when Volunteers is absent. |
 | 1.3 | 2026-11-07 | Event Management call for speakers (EV-06; ADR-0180 `0180-events-call-for-speakers.md`, ADR-0177 decision 11, D-123, D-177). New Sections 29EV20 Speaker Application (`Speaker_Application__c`, rules R-SA1, R-SA2, R-SA4, R-SA5), 29EV21 Speaker Review (`Speaker_Review__c`, R-SA3) and 29EV25 Events Settings (`Events_Settings__c`, R-ES1). Core gains the settings section name `Events`. Numbers 29EV22 to 29EV24 are reserved for sponsorship (EV-09). |
 | 1.3 | 2026-11-07 | Event Management sponsorship (EV-09; ADR-0181 `0181-events-sponsorship.md`, ADR-0177 decision 11, D-123, D-177). New Sections 29EV22 Sponsorship Level (`Sponsorship_Level__c`, R-SP3), 29EV23 Event Sponsor (`Event_Sponsor__c`, R-SP1, R-SP4) and 29EV24 Sponsor Deliverable (`Sponsor_Deliverable__c`). Core gains the `LinkedRecords` seam (no object or field). |
 | 1.3 | 2026-11-07 | Event Appointment (`Event_Appointment__c`, 29EV15, EV-15, ADR-0177 decision 13) with rules R-EAP1 to R-EAP6. |
+| 1.3 | 2026-11-07 | Event dashboard and Event Templates (EV-11; ADR-0177). No object, field or rule added. The Details tab gains the Event Dashboard (counts read from the event's own records by `EventDashboardController`) and, for an event with no ticket types, tracks or sessions, Event Templates: JSON in the static resource `BarnEventTemplates`, with one template, Community Conference (tracks, ticket types, sessions and a planning timeline). A template is applied only when staff press Apply Template, never by default. |
+| 1.3 | 2026-11-07 | Event check-in (EV-12; ADR-0177 decision 13). No object, field or rule added: the Check-In tab moves an attendee between Registered and Attended through `EventRegistrationService`, and a QR code holds the attendee's record identifier, so the check-in time and code fields that ADR-0177 decision 13 anticipated are not added. A walk-in is a registration (source Staff) made already Attended. The QR drawing library ships as the static resource `BarnQrCode`, listed in `NOTICE`. |
+| 1.3 | 2026-11-07 | Event Management sample data (C-10) and speaker notice defaults (EV-06, owner rule: settings are never blank). Event (29EV1) and Event Registration (29EV8) gain Sample Data (`Sample_Data__c`, Checkbox, default false). `EventsSampleData` implements Core's `SampleDataModule` and is registered in `SampleDataModules.MODULE_CLASS_NAMES` after Funders. Events Settings (29EV25): Accepted Notice Template and Declined Notice Template default to the shipped text templates `BarnCRM_Speaker_Accepted` and `BarnCRM_Speaker_Declined`; R-ES1 now reads a blank as the shipped template; R-SA5 amended to match. |
 | 1.3 | 2026-11-07 | Portal Builder module (PB-01, D-118, D-178, D-187; ADR-0185 `0185-portal-builder-off-platform-portal-api.md`). New package `packages/portal`: Portal (`Portal__c`, 29PB1), Portal Access (`Portal_Access__c`, 29PB2), Portal Session (`Portal_Session__c`, 29PB3) and Portal Settings (`Portal_Settings__c`, 29PB4), rules R-PB1 to R-PB4, R-PA1, R-PA2, R-PS1, R-PS2 and R-PST1. Core gains no object or field: only the `PortalActionExtension` seam, the Portals settings section and the catalog row `BarnCRM_Module.Portal`. |
 
 ---
