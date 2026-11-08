@@ -51,6 +51,29 @@ private class FormPublicPageTest {
 		}
 	}
 
+	/** A module whose page and list carry a value that cannot be sent as JSON. */
+	private class UnsendablePage implements PublicPageExtension {
+		public String kind() {
+			return 'events';
+		}
+
+		public Boolean handles(Schema.SObjectType recordType) {
+			return recordType == Account.SObjectType;
+		}
+
+		public Map<String, Object> page(Id recordId) {
+			return new Map<String, Object>{
+				'title' => 'Spring Gala',
+				'registration' => 'None',
+				'detail' => Account.SObjectType
+			};
+		}
+
+		public Map<String, Object> listPage() {
+			return new Map<String, Object>{ 'detail' => Account.SObjectType };
+		}
+	}
+
 	private static Id venue() {
 		Account record = new Account(Name = 'Grange Hall');
 		insert as user record;
@@ -89,6 +112,51 @@ private class FormPublicPageTest {
 			Assert.areEqual('Not taken online.', page.get('message'));
 			Assert.isNull(FormPublicController.getPage('not an id'), 'No such record');
 			Assert.isNull(FormPublicController.getPage(UserInfo.getUserId()), 'Not published');
+		}
+	}
+
+	@IsTest
+	static void aPageThatCannotBeSentFailsWithThePublicMessageAndIsLogged() {
+		System.runAs(admin()) {
+			PublicPageExtensions.useForTest(new UnsendablePage());
+			Id recordId = venue();
+			List<String> said = new List<String>();
+
+			Test.startTest();
+			try {
+				FormPublicController.getPage(recordId);
+			} catch (AuraHandledException e) {
+				said.add(e.getMessage());
+			}
+			try {
+				FormPublicController.listPages('events');
+			} catch (AuraHandledException e) {
+				said.add(e.getMessage());
+			}
+			Test.stopTest();
+
+			String message = BarnHelp.text('Forms', 'Forms_Public_Failed');
+			Assert.areEqual(new List<String>{ message, message }, said, 'Nothing internal shown');
+			Assert.areEqual(
+				2,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE Context__c LIKE 'FormPublicController.%'
+				],
+				'Each failure is logged for the admin'
+			);
+		}
+	}
+
+	@IsTest
+	static void aFormLinkThatNamesNoFormShowsNothing() {
+		System.runAs(admin()) {
+			Assert.isNull(FormPublicController.getForm('not an id', null), 'Not an id');
+			Assert.isNull(
+				FormPublicController.getForm(UserInfo.getUserId(), null),
+				'An id, but not a form'
+			);
 		}
 	}
 
