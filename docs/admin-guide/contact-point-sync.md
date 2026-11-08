@@ -26,6 +26,15 @@ BarnCRM itself never reads Contact Points. Only install this module if your org 
 - **BarnCRM is the source.** A change to a person's email, phone or address is copied to their
   Contact Points right after the save. Nothing flows back: if someone edits a copied Contact Point
   directly, BarnCRM puts its value back the next time that person is copied.
+- **When the copy is made.**
+  - **Immediately, in the same save,** for a save of up to 50 people: every edit on a record
+    page, a household of a few people moving together, a short list edit.
+  - **A few seconds later, by a background job,** for a save of more than 50 people at once, such
+    as a data load or a mass update. The save finishes faster and stays within Salesforce's
+    limits; every person is still copied. A report run in those seconds can miss the new copies.
+  - **In the same save, inside a BarnCRM import** (and any other background job), whatever its
+    size: background work has more time, and its one follow-on job is kept for its own next step.
+  - A save already close to Salesforce's limits is also handed to a background job.
 - **What is copied.**
   - Email: Personal, Work and Alternate email and the standard Email, one Contact Point per
     address. The one that matches the person's preferred email is marked primary.
@@ -36,8 +45,8 @@ BarnCRM itself never reads Contact Points. Only install this module if your org 
     Contact Points are removed, and the history stays on the address.
 - **Moving household.** When a person joins, leaves or moves to another household (or a
   household's address changes), their address copies are updated right away, in the same save
-  (or in a background job straight after when the save has little room left), not at the
-  person's next save.
+  (or in a background job straight after when the save moves more than 50 people or has little
+  room left), not at the person's next save.
 - **Each copy hangs from the person's Individual.** A person with something to copy and no
   Individual gets one, named after them.
 - **Contact Points BarnCRM did not make are left alone.** BarnCRM remembers which Contact Points
@@ -96,4 +105,7 @@ The page (BarnCRM Settings, **Contact Points**, **Open Contact Point Sync**) sho
   fix what Salesforce refused (often a required field or validation rule on the Contact Point
   object). Then run the backfill again.
 - **An app shows an old value.** Check the Automation page: if Contact Point Sync is switched off
-  or automation is paused, changes are not copied. Run the backfill once it is back on.
+  or automation is paused, changes are not copied. Run the backfill once it is back on. After a
+  data load of more than 50 people, give the background job a minute; if copies are still
+  missing, look in the Error Log for a Contact Point Sync warning that the job could not be
+  queued, and run the backfill.

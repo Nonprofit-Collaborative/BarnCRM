@@ -1194,12 +1194,9 @@ private class ImportRowProcessorTest {
 				);
 			}
 			ImportTestDataFactory.rows(batch, values);
-			// The import's own budget. Contact Point Sync, where installed (Batch C), adds its
-			// own work for each of the 400 new people, households and memberships, about a
-			// second of CPU on oi-test, which took this chunk past the budget; it is left out.
-			for (String sync : new List<String>{ 'Person', 'Account', 'Membership' }) {
-				AutomationControl.bypass('Contact_Point_Sync_' + sync);
-			}
+			// Contact Point Sync, where installed, is on: a save of this size queues its copies
+			// (ADR-0176 decision 16). Its cost inside a background chunk is budgeted in
+			// ContactPointBulkSyncTest.
 
 			Test.startTest();
 			ImportRowProcessor.Outcome outcome = run(false);

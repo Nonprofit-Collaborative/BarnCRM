@@ -127,6 +127,33 @@ this module.
     already followed through `Address__c` (decision 6). A turned-off row (decision 7) leaves the
     addresses to catch up at the next save or the backfill. Bulk-safe: one run per trigger chunk
     of up to 200 rows.
+16. **Large saves are queued; the sync's CPU is budgeted (2026-11-08).** The Batch C release gate
+    found the in-save sync too costly in bulk: a 5,000-person insert ran out of CPU and an import
+    chunk of 200 couples went past its 8,000 ms budget, so both tests had to switch the module
+    off. Profiling on `oi-test` showed most of the time was `Schema.getGlobalDescribe()`, asked
+    for each Contact Point made and at every check of the active kinds: a 200-person insert with
+    an email, phone and address each cost about 1,900 ms of CPU against 40 ms with the module off.
+    Now (a) the global describe and the Individual check are made once a transaction, a person's
+    "anything to copy" check no longer builds a plan, and trigger records are copied shallowly,
+    which brings the same insert synced inside the save to about 550 ms; and (b) a trigger chunk
+    of more than 50 people (`ContactPointSyncService.QUEUE_ABOVE`) has its sync done by a queued
+    job (the existing `Job`), about 170 ms for that insert. 50 because a save someone makes by hand
+    (a record page, a household of a few people moving together, a short list edit) stays well
+    under it and keeps its copies immediate (decision 15, D-186), while an import chunk or data
+    load of 200 does not spend its own time limit on copies nobody waits for; it is also the cap
+    Giving's soft credit recompute uses for a save's queued work. A large save queues only while
+    its transaction keeps 10 queueable jobs for everything else, so a synchronous transaction may
+    queue about 40 chunks (8,000 people); past that, and in a background transaction (an import's
+    batch, a chained job) whose single queueable job is not the sync's, the sync stays inside the
+    save, which there has the 60-second background limit. A save with under 2,000 ms of CPU left
+    is queued as one with too few queries or statements already was (decision 8). Within one
+    transaction a kind already queued for a person is not queued again, so two jobs never make
+    the same copy; the job reads the person when it runs, after the transaction's last save.
+    Individuals are still given before the save (decision 6), so parallel jobs never give one
+    person two. Automation Control and Pause All apply as before: they stop the handler, so a
+    switched-off save queues nothing. `ContactPointBulkSyncTest` budgets the in-save path (200
+    people within 2,500 ms; an import chunk of 200 couples within the import's own 8,000 ms, 60
+    query and 60 statement budgets), and the two bypassed tests run with the module on again.
 
 ## Alternatives considered
 
@@ -151,3 +178,5 @@ this module.
 - Contact Points the module manages are rewritten on each sync; edits made to them elsewhere do
   not last. The admin guide says so.
 - Saving a person costs a few more queries and DML statements while the module is on.
+- A save of more than 50 people sees its copies a few seconds later, when the queued job runs
+  (decision 16); a report run in the same moment can miss them.

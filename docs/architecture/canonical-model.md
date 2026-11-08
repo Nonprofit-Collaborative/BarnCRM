@@ -12909,7 +12909,13 @@ time; an org without person accounts is unaffected.
 **R-CPL6 A household move syncs at once (D-186).** A person who joins, leaves or moves household
 (a membership row added, changed, ended, removed or restored, or a contact's account changed) has
 their address copies synced in that same transaction, or in an immediately queued job when it has
-too little room, not at their next save.
+too little room or is a large save (R-CPL7), not at their next save.
+
+**R-CPL7 Large saves are queued (ADR-0176 decision 16).** A save of up to 50 people (one trigger
+chunk) is synced inside it. A save of more than 50 is synced by a queued job that reads the people
+when it runs, while the transaction keeps 10 queueable jobs for other work; otherwise, and in a
+background transaction, it is synced inside the save. Within one transaction a kind already queued
+for a person is not queued again. Every person's copies end up synced either way.
 
 ### Salesforce implementation
 
@@ -14514,6 +14520,7 @@ mirrors the primary member).
 | 1.1 | 2026-11-07 | Files and save for later on forms (C-42c, D-157, ADR-0184 public forms on a Salesforce Site, decision 11). New Section 29ZY1 Form Draft (`Form_Draft__c`); R-FM1 gains the `file` type and `public.saveForLater` and `public.resumeDays`; new rule R-FS7. |
 | 1.1 | 2026-11-06 | BarnCRM Contact Point Sync module (C-45, D-111, ADR-0176 contact point sync module). New package `contactpoints`: Contact Point Link (`Contact_Point_Link__c`, 29ZZ, rules R-CPL1 to R-CPL4) and Contact Point Sync Settings (`Contact_Point_Sync_Settings__c`, 29ZZ1, R-CPS1). No Core object or field added. |
 | 1.1 | 2026-11-07 | Contact Point Sync: person accounts and household moves (C-45e, D-186, ADR-0176 decisions 14 and 15). Rules R-CPL5 and R-CPL6 added to Contact Point Link. Two Automation Registry rows (`Contact_Point_Sync_Account`, `Contact_Point_Sync_Membership`). No object or field added. |
+| 1.1 | 2026-11-08 | Contact Point Sync: large saves queued (ADR-0176 decision 16). Rule R-CPL7 added to Contact Point Link; R-CPL6 names it. No object or field added. |
 | 1.2 | 2026-11-06 | Event Management module (EV-01, EV-03, EV-04, EV-05; ADR-0177 `0177-events-module.md`, D-123, D-177). Seven objects in the new package `packages/events`: Event (`Event__c`, 29EV1), Ticket Type (`Ticket_Type__c`, 29EV2), Promo Code (`Promo_Code__c`, 29EV3), Event Track (`Event_Track__c`, 29EV4), Event Session (`Event_Session__c`, 29EV5), Event Speaker (`Event_Speaker__c`, 29EV6) and Session Speaker (`Session_Speaker__c`, 29EV7), with rules R-EV1 to R-EV4, R-TT1 to R-TT4, R-PC1 to R-PC5, R-ETR1, R-ESN1 to R-ESN5, R-ESP1 to R-ESP3 and R-SSP1. Registrations, attendees, call for speakers and sponsorship are designed in the ADR and added by their items. |
 | 1.2 | 2026-11-07 | Event registrations and attendees (EV-02; ADR-0182 `0182-event-registrations.md`, ADR-0177 decision 8). New Sections 29EV8 Event Registration (`Event_Registration__c`, Private, rules R-ERG1 to R-ERG3) and 29EV9 Event Attendee (`Event_Attendee__c`, master-detail to the registration, rules R-EAT1 and R-EAT2). Event (29EV1) gains Registration Form Key (`Registration_Form_Key__c`, Text(18), the Forms form by record identifier, ADR-0014). Core registers `EventFormAttachment` in `FormAttachmentExtensions.EXTENSION_CLASSES` and lists the two objects in `ModuleManagerService`; no object or field is added to Core. |
 | 1.2 | 2026-11-07 | Summit Events compatibility (EV-10; ADR-0182 `0182-event-registrations.md` decision 7). Event (29EV1) and Event Registration (29EV8) gain External Key (`External_Key__c`, Text(80), unique, external ID, `summit:` and the Summit record's identifier), with rule R-ERG4 (a Summit registration is imported once). `SummitEventsAdapter` reads Summit's objects by name only and is listed in the nightly run only when Summit Events is installed. No Lead is read or written. |

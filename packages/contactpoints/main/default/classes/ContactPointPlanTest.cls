@@ -137,4 +137,31 @@ private class ContactPointPlanTest {
 		);
 		Assert.isTrue(ContactPointPlan.plan(null, null, ALL_KINDS).isEmpty(), 'No person, no plan');
 	}
+
+	@IsTest
+	static void hasEmailOrPhoneAgreesWithThePlan() {
+		Set<String> values = new Set<String>{ ContactPointPlan.EMAIL, ContactPointPlan.PHONE };
+		List<Map<String, Object>> people = new List<Map<String, Object>>{
+			new Map<String, Object>(),
+			new Map<String, Object>{ 'Email' => '   ' },
+			new Map<String, Object>{ 'HomePhone' => 'ext. -' },
+			new Map<String, Object>{ 'Work_Email__c' => 'ana@work.example' },
+			new Map<String, Object>{ 'OtherPhone' => '(555) 010-0001' }
+		};
+		for (Map<String, Object> person : people) {
+			Assert.areEqual(
+				!ContactPointPlan.plan(person, null, values).isEmpty(),
+				ContactPointPlan.hasEmailOrPhone(person, values),
+				'Same answer as the plan for ' + person
+			);
+		}
+		Assert.isFalse(
+			ContactPointPlan.hasEmailOrPhone(
+				new Map<String, Object>{ 'Email' => 'ana@home.example' },
+				new Set<String>{ ContactPointPlan.PHONE }
+			),
+			'Only the kinds asked about'
+		);
+		Assert.isFalse(ContactPointPlan.hasEmailOrPhone(null, values), 'No person');
+	}
 }

@@ -84,14 +84,36 @@ public without sharing class ContactPointSyncService {
 		if (missingForTest.contains(kind) || !OBJECT_BY_KIND.containsKey(kind)) {
 			return null;
 		}
-		return Schema.getGlobalDescribe().get(OBJECT_BY_KIND.get(kind));
+		return describedType(OBJECT_BY_KIND.get(kind));
 	}
 
 	/** Whether the org has the Individual object and the person's link to it. */
 	public static Boolean individualsAvailable() {
-		return !missingForTest.contains(INDIVIDUAL) &&
-			Schema.getGlobalDescribe().get(INDIVIDUAL) != null &&
-			Schema.SObjectType.Contact.fields.getMap().containsKey(INDIVIDUAL_LINK.toLowerCase());
+		if (missingForTest.contains(INDIVIDUAL)) {
+			return false;
+		}
+		if (individualLinkExists == null) {
+			individualLinkExists =
+				describedType(INDIVIDUAL) != null &&
+				Schema.SObjectType.Contact.fields.getMap()
+					.containsKey(INDIVIDUAL_LINK.toLowerCase());
+		}
+		return individualLinkExists;
+	}
+
+	/**
+	 * The org's objects, described once a transaction. A global describe costs milliseconds and
+	 * was asked for every copy made and at every check of what is active, which made a 200-person
+	 * save spend most of its sync time describing (ADR-0176 decision 16).
+	 */
+	private static Map<String, Schema.SObjectType> globalTypes;
+	private static Boolean individualLinkExists;
+
+	private static Schema.SObjectType describedType(String objectName) {
+		if (globalTypes == null) {
+			globalTypes = Schema.getGlobalDescribe();
+		}
+		return globalTypes.get(objectName);
 	}
 
 	/** Whether the admin left this kind on (Sync Emails, Sync Phones, Sync Addresses). */
@@ -141,12 +163,17 @@ public without sharing class ContactPointSyncService {
 		if (inserted == null || inserted.isEmpty()) {
 			return;
 		}
-		Set<Id> personIds = inserted.keySet();
+		Set<Id> personIds = new Set<Id>(inserted.keySet());
+		if (queuesBySize(personIds.size())) {
+			// A large save: its people are read again when the queued sync runs.
+			syncOrQueue(personIds, null);
+			return;
+		}
 		JUST_INSERTED.clear();
 		UNLINKED.clear();
 		for (Id personId : personIds) {
 			// A copy: trigger records are read only, and the sync links an Individual.
-			JUST_INSERTED.put(personId, inserted.get(personId).clone(true, true));
+			JUST_INSERTED.put(personId, inserted.get(personId).clone(true, false));
 			if (!KINDS_SYNCED_HERE.containsKey(personId)) {
 				UNLINKED.add(personId);
 			}
@@ -167,23 +194,7 @@ public without sharing class ContactPointSyncService {
 	private static void syncInsertedByKinds(Set<Id> personIds) {
 		Map<String, Set<Id>> peopleByKinds = new Map<String, Set<Id>>();
 		Map<String, Set<String>> kindsByKey = new Map<String, Set<String>>();
-		for (Id personId : personIds) {
-			Set<String> remaining = new Set<String>(OBJECT_BY_KIND.keySet());
-			if (KINDS_SYNCED_HERE.containsKey(personId)) {
-				remaining.removeAll(KINDS_SYNCED_HERE.get(personId));
-			}
-			if (remaining.isEmpty()) {
-				continue;
-			}
-			List<String> sorted = new List<String>(remaining);
-			sorted.sort();
-			String key = String.join(sorted, ';');
-			if (!peopleByKinds.containsKey(key)) {
-				peopleByKinds.put(key, new Set<Id>());
-				kindsByKey.put(key, remaining);
-			}
-			peopleByKinds.get(key).add(personId);
-		}
+		groupByKindsLeft(personIds, null, KINDS_SYNCED_HERE, peopleByKinds, kindsByKey);
 		for (String key : peopleByKinds.keySet()) {
 			Set<String> kinds = kindsByKey.get(key);
 			syncOrQueue(
@@ -194,7 +205,79 @@ public without sharing class ContactPointSyncService {
 	}
 
 	/**
-	 * Syncs these people now when the transaction has room, or queues the work when it does not.
+	 * Groups people by the kinds of `wanted` (all when null) that `done` does not already hold
+	 * for them. A person with none left is left out. Most people have nothing in `done`, so they
+	 * share one group without building a key of their own.
+	 */
+	private static void groupByKindsLeft(
+		Set<Id> personIds,
+		Set<String> wanted,
+		Map<Id, Set<String>> done,
+		Map<String, Set<Id>> peopleByKinds,
+		Map<String, Set<String>> kindsByKey
+	) {
+		Set<String> all = wanted == null ? new Set<String>(OBJECT_BY_KIND.keySet()) : wanted;
+		String allKey = keyOfKinds(all);
+		for (Id personId : personIds) {
+			Set<String> remaining = all;
+			String key = allKey;
+			if (done.containsKey(personId)) {
+				remaining = all.clone();
+				remaining.removeAll(done.get(personId));
+				if (remaining.isEmpty()) {
+					continue;
+				}
+				key = keyOfKinds(remaining);
+			}
+			if (!peopleByKinds.containsKey(key)) {
+				peopleByKinds.put(key, new Set<Id>());
+				kindsByKey.put(key, remaining);
+			}
+			peopleByKinds.get(key).add(personId);
+		}
+	}
+
+	private static String keyOfKinds(Set<String> kinds) {
+		List<String> sorted = new List<String>(kinds);
+		sorted.sort();
+		return String.join(sorted, ';');
+	}
+
+	// ------------------------------------------------------------------ large saves are queued
+
+	/**
+	 * A save of more people than this, in one trigger chunk, is synced by a queued job rather
+	 * than inside the save (ADR-0176 decision 16). Small saves, every edit made on a record page
+	 * and a household move of a family, stay immediate (decision 15, D-186); an import chunk or
+	 * a data load of 200 does not spend its own time limit on copies it does not wait for.
+	 */
+	public static final Integer QUEUE_ABOVE = 50;
+
+	/**
+	 * Queueable jobs a large save leaves for everything else in its transaction. A synchronous
+	 * transaction may queue 50; one already running in the background may queue only one, which
+	 * belongs to that job's own next step (an import's batch, a chained job), so there the sync
+	 * stays inside the save, which has the 60-second background time limit.
+	 */
+	private static final Integer QUEUE_SLOTS_KEPT = 10;
+
+	/** Set by a test to keep a large save's sync inside it, as a background job's would be. */
+	@TestVisible
+	private static Boolean inlineForTest = false;
+
+	/** The kinds already queued in this transaction, by person: the job reads them when it runs. */
+	private static final Map<Id, Set<String>> KINDS_QUEUED_HERE = new Map<Id, Set<String>>();
+
+	/** Whether a save of this many people has its sync queued. */
+	public static Boolean queuesBySize(Integer people) {
+		return people > QUEUE_ABOVE &&
+			inlineForTest != true &&
+			Limits.getLimitQueueableJobs() - Limits.getQueueableJobs() > QUEUE_SLOTS_KEPT;
+	}
+
+	/**
+	 * Syncs these people now when the save is small and the transaction has room, or queues the
+	 * work: a large save (`QUEUE_ABOVE`), or one with too few queries, statements or CPU left.
 	 * Never throws.
 	 */
 	public static void syncOrQueue(Set<Id> personIds, Set<String> onlyKinds) {
@@ -203,27 +286,53 @@ public without sharing class ContactPointSyncService {
 		}
 		Boolean roomy =
 			Limits.getLimitQueries() - Limits.getQueries() > 25 &&
-			Limits.getLimitDmlStatements() - Limits.getDmlStatements() > 12;
-		if (roomy) {
+			Limits.getLimitDmlStatements() - Limits.getDmlStatements() > 12 &&
+			Limits.getLimitCpuTime() - Limits.getCpuTime() > 2000;
+		if (roomy && !queuesBySize(personIds.size())) {
 			syncPeople(personIds, onlyKinds);
 			return;
 		}
-		try {
-			System.enqueueJob(new Job(personIds, onlyKinds));
-		} catch (Exception notQueued) {
-			ErrorLogger.logMessage(
-				BarnHelp.text(
-					'ContactPoints',
-					'ContactPoints_Log_NotQueued',
-					new List<Object>{ personIds.size() }
-				),
-				CONTEXT,
-				ErrorLogger.SEVERITY_WARNING
-			);
+		queue(personIds, onlyKinds);
+	}
+
+	/**
+	 * Queues the sync of these people, leaving out the kinds already queued for a person in this
+	 * transaction: that job reads the person when it runs, after this transaction's last save,
+	 * and two jobs on the same kind of the same person could each make a copy.
+	 */
+	private static void queue(Set<Id> personIds, Set<String> onlyKinds) {
+		Map<String, Set<Id>> peopleByKinds = new Map<String, Set<Id>>();
+		Map<String, Set<String>> kindsByKey = new Map<String, Set<String>>();
+		groupByKindsLeft(personIds, onlyKinds, KINDS_QUEUED_HERE, peopleByKinds, kindsByKey);
+		for (String key : peopleByKinds.keySet()) {
+			Set<Id> people = peopleByKinds.get(key);
+			Set<String> kinds = kindsByKey.get(key);
+			try {
+				System.enqueueJob(
+					new Job(people, kinds.size() == OBJECT_BY_KIND.size() ? null : kinds)
+				);
+			} catch (Exception notQueued) {
+				ErrorLogger.logMessage(
+					BarnHelp.text(
+						'ContactPoints',
+						'ContactPoints_Log_NotQueued',
+						new List<Object>{ people.size() }
+					),
+					CONTEXT,
+					ErrorLogger.SEVERITY_WARNING
+				);
+				continue;
+			}
+			for (Id personId : people) {
+				if (!KINDS_QUEUED_HERE.containsKey(personId)) {
+					KINDS_QUEUED_HERE.put(personId, new Set<String>());
+				}
+				KINDS_QUEUED_HERE.get(personId).addAll(kinds);
+			}
 		}
 	}
 
-	/** The queued sync, for a save that had too little room left. */
+	/** The queued sync, for a large save or one that had too little room left. */
 	public without sharing class Job implements Queueable {
 		private final Set<Id> personIds;
 		private final Set<String> onlyKinds;
@@ -304,9 +413,11 @@ public without sharing class ContactPointSyncService {
 		if (people == null || people.isEmpty() || kinds.isEmpty()) {
 			return;
 		}
+		Set<String> valueKinds = kinds.clone();
+		valueKinds.remove(ContactPointPlan.ADDRESS);
 		List<SObject> needing = new List<SObject>();
 		for (Contact person : people) {
-			if (person.get(INDIVIDUAL_LINK) == null && hasEmailOrPhone(person, kinds)) {
+			if (person.get(INDIVIDUAL_LINK) == null && hasEmailOrPhone(person, valueKinds)) {
 				needing.add(person);
 			}
 		}
@@ -317,10 +428,9 @@ public without sharing class ContactPointSyncService {
 		}
 	}
 
-	private static Boolean hasEmailOrPhone(Contact person, Set<String> kinds) {
-		Set<String> onlyValues = kinds.clone();
-		onlyValues.remove(ContactPointPlan.ADDRESS);
-		return !ContactPointPlan.plan(person.getPopulatedFieldsAsMap(), null, onlyValues).isEmpty();
+	private static Boolean hasEmailOrPhone(Contact person, Set<String> valueKinds) {
+		return !valueKinds.isEmpty() &&
+			ContactPointPlan.hasEmailOrPhone(person.getPopulatedFieldsAsMap(), valueKinds);
 	}
 
 	/**
@@ -332,7 +442,7 @@ public without sharing class ContactPointSyncService {
 		if (people.isEmpty()) {
 			return;
 		}
-		Schema.SObjectType individualType = Schema.getGlobalDescribe().get(INDIVIDUAL);
+		Schema.SObjectType individualType = describedType(INDIVIDUAL);
 		List<SObject> individuals = new List<SObject>();
 		for (SObject person : people) {
 			SObject record = individualType.newSObject();
