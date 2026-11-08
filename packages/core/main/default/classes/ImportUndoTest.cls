@@ -111,12 +111,22 @@ private class ImportUndoTest {
 	 * apart from what the test itself did a moment before.
 	 */
 	private static void undo(Import_Batch__c batch, Datetime undoStartedAt) {
+		undo(batch, undoStartedAt, ImportUndoBatch.PASS_ACCOUNTS);
+	}
+
+	/**
+	 * The same, with the passes from `freshFrom` on given their own governor limits. For a test
+	 * whose assertions rest on an earlier delete pass than the households one: in the job that
+	 * pass's chunk has its own limits, here it would share what the setup and the passes before
+	 * it spent, and an org with more automation on a new person (oi-test) spends more of it.
+	 */
+	private static void undo(Import_Batch__c batch, Datetime undoStartedAt, String freshFrom) {
 		Integer total = ImportUndoService.preview(batch.Id).total;
 		// Latched only: a job still queued when the test method ends runs then, and would
 		// repeat these passes with its own start, so it is aborted. The passes below are the
 		// only ones that run, each with this start.
 		System.abortJob(ImportUndoService.start(batch.Id, total));
-		runDeletePasses(batch, total, undoStartedAt, true);
+		runDeletePasses(batch, total, undoStartedAt, freshFrom);
 	}
 
 	/** More records than any test here imports, so a pass given this is one chunk. */
@@ -127,14 +137,15 @@ private class ImportUndoTest {
 		Integer total,
 		Datetime undoStartedAt
 	) {
-		runDeletePasses(batch, total, undoStartedAt, false);
+		runDeletePasses(batch, total, undoStartedAt, null);
 	}
 
 	/**
-	 * Runs every delete pass in this one test transaction. `accountsPassAlone` gives the last
-	 * pass its own governor limits, as the platform does for every chunk: its checks keep
-	 * what they cannot afford to ask about, so a budget the earlier passes spent here would
-	 * keep records the job itself deletes. Only for a caller that has not used Test.startTest.
+	 * Runs every delete pass in this one test transaction. `freshFrom` gives that pass and the
+	 * ones after it their own governor limits (the households pass alone, unless a test names
+	 * an earlier one), as the platform does for every chunk: the checks keep what they cannot
+	 * afford to ask about, so a budget the earlier passes spent here would keep records the
+	 * job itself deletes. Only for a caller that has not used Test.startTest.
 	 *
 	 * In that mode every pass, the last included, is handed its records as one chunk. A
 	 * chunk's checks cost about the same whatever its size, and the platform gives every chunk
@@ -148,22 +159,22 @@ private class ImportUndoTest {
 		Import_Batch__c batch,
 		Integer total,
 		Datetime undoStartedAt,
-		Boolean accountsPassAlone
+		String freshFrom
 	) {
 		// Every pass, the restore included: the job's first pass is a judging one.
 		List<String> passes = ImportUndoBatch.passes();
+		Assert.isTrue(freshFrom == null || passes.contains(freshFrom), 'No pass ' + freshFrom);
 		ImportUndoBatch job;
 		for (String pass : passes) {
 			// Each pass carries what the judging passes found, as the job's own chain does.
 			job = job == null
 				? new ImportUndoBatch(batch.Id, total, pass, 0, false, undoStartedAt)
 				: job.followedBy(pass);
-			Boolean alone = accountsPassAlone && pass == ImportUndoBatch.PASS_ACCOUNTS;
-			if (alone) {
+			if (pass == freshFrom) {
 				Test.startTest();
 			}
 			// Otherwise as the platform does: one chunk at a time, 100 at most.
-			Integer chunkSize = accountsPassAlone ? MAX_ONE_CHUNK : 100;
+			Integer chunkSize = freshFrom != null ? MAX_ONE_CHUNK : 100;
 			Database.QueryLocatorIterator records = job.start(null).iterator();
 			List<SObject> scope = new List<SObject>();
 			while (records.hasNext()) {
@@ -178,9 +189,9 @@ private class ImportUndoTest {
 			}
 			if (pass == ImportUndoBatch.PASS_ACCOUNTS) {
 				job.finish(null);
-			}
-			if (alone) {
-				Test.stopTest();
+				if (freshFrom != null) {
+					Test.stopTest();
+				}
 			}
 		}
 	}
@@ -688,7 +699,8 @@ private class ImportUndoTest {
 			// created after the import, so only the module can say it is still credited.
 			installDependents(new Set<Id>{ credited.AccountId }, false);
 
-			undo(batch, Datetime.now());
+			// The people pass is asserted on too, so it gets a chunk's own limits as well.
+			undo(batch, Datetime.now(), ImportUndoBatch.PASS_CONTACTS);
 
 			Assert.isFalse(exists(credited.Id), 'The person goes: ' + whyKept(batch));
 			Assert.isTrue(
@@ -1050,7 +1062,8 @@ private class ImportUndoTest {
 			Contact imported = importedPerson(batch, 'Ramirez');
 			StubProcessor stub = installStub(new List<Schema.SObjectType>{ Contact.SObjectType });
 
-			undo(batch, Datetime.now());
+			// The module pass is the one asserted on, so it gets a chunk's own limits.
+			undo(batch, Datetime.now(), ImportUndoBatch.PASS_TAGGED_PREFIX + 'Contact');
 
 			Assert.isFalse(
 				exists(imported.Id),
