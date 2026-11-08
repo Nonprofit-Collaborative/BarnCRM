@@ -125,6 +125,48 @@ public without sharing class ContactPointSyncService {
 
 	// ------------------------------------------------------------------------ entry points
 
+	/** The kinds a sync in this transaction has already made match, by contact id. */
+	private static final Map<Id, Set<String>> KINDS_SYNCED_HERE = new Map<Id, Set<String>>();
+
+	/**
+	 * Syncs people just inserted, after every handler of their insert has run. A kind a sync
+	 * already made match during that insert is not read again: Core saves a new person's
+	 * mailing address as an address inside the insert, whose own sync copies it moments before
+	 * this, and a person's values cannot change between the two without a save of its own.
+	 * Never throws.
+	 */
+	public static void syncInserted(Set<Id> personIds) {
+		if (personIds == null || personIds.isEmpty()) {
+			return;
+		}
+		Map<String, Set<Id>> peopleByKinds = new Map<String, Set<Id>>();
+		Map<String, Set<String>> kindsByKey = new Map<String, Set<String>>();
+		for (Id personId : personIds) {
+			Set<String> remaining = new Set<String>(OBJECT_BY_KIND.keySet());
+			if (KINDS_SYNCED_HERE.containsKey(personId)) {
+				remaining.removeAll(KINDS_SYNCED_HERE.get(personId));
+			}
+			if (remaining.isEmpty()) {
+				continue;
+			}
+			List<String> sorted = new List<String>(remaining);
+			sorted.sort();
+			String key = String.join(sorted, ';');
+			if (!peopleByKinds.containsKey(key)) {
+				peopleByKinds.put(key, new Set<Id>());
+				kindsByKey.put(key, remaining);
+			}
+			peopleByKinds.get(key).add(personId);
+		}
+		for (String key : peopleByKinds.keySet()) {
+			Set<String> kinds = kindsByKey.get(key);
+			syncOrQueue(
+				peopleByKinds.get(key),
+				kinds.size() == OBJECT_BY_KIND.size() ? null : kinds
+			);
+		}
+	}
+
 	/**
 	 * Syncs these people now when the transaction has room, or queues the work when it does not.
 	 * Never throws.
@@ -374,6 +416,12 @@ public without sharing class ContactPointSyncService {
 			}
 			write();
 			logProblems(problems);
+			for (Id personId : people.keySet()) {
+				if (!KINDS_SYNCED_HERE.containsKey(personId)) {
+					KINDS_SYNCED_HERE.put(personId, new Set<String>());
+				}
+				KINDS_SYNCED_HERE.get(personId).addAll(kinds);
+			}
 		}
 
 		private Map<Id, SObject> readPeople() {
