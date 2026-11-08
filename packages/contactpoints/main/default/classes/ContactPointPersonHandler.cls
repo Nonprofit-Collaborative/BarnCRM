@@ -17,6 +17,8 @@ public with sharing class ContactPointPersonHandler extends TriggerHandler {
 		ContactPointPlan.EMAIL,
 		ContactPointPlan.PHONE
 	};
+	/** Built once, not for every record of a save. */
+	private static final List<String> PERSON_FIELDS = ContactPointPlan.personFields();
 
 	/** Built by name from Core's dispatcher, so it needs a public constructor. */
 	@NamespaceAccessible
@@ -96,7 +98,7 @@ public with sharing class ContactPointPersonHandler extends TriggerHandler {
 		if (old == null) {
 			return true;
 		}
-		for (String field : ContactPointPlan.personFields()) {
+		for (String field : PERSON_FIELDS) {
 			if (record.get(field) != old.get(field)) {
 				return true;
 			}

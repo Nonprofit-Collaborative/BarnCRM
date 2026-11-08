@@ -1,8 +1,9 @@
 /**
  * A person who moves household takes the new household's addresses at once, in the same save and
- * not at their next one, 201 at a time too, and the Automation page's switch stops it; people
- * stored as person accounts are copied like contacts, where the org has them, and an org without
- * them copies nothing and fails nothing (D-186; ADR-0176 decisions 14 and 15).
+ * not at their next one, 201 at a time too (by a queued job, decision 16), and the Automation
+ * page's switch stops it; people stored as person accounts are copied like contacts, where the
+ * org has them, and an org without them copies nothing and fails nothing (D-186; ADR-0176
+ * decisions 14 to 16).
  */
 @IsTest(testFor='ApexClass:ContactPointMembershipHandler')
 private class ContactPointMoveTest {

@@ -66,6 +66,32 @@ public with sharing class ContactPointPlan {
 		return fields;
 	}
 
+	/**
+	 * Whether the person has an email or phone to copy for the kinds given: the same answer as
+	 * `plan` having an email or phone in it, without building it. Asked of every person in a
+	 * save, most of whom have neither (ADR-0176 decision 16).
+	 */
+	public static Boolean hasEmailOrPhone(Map<String, Object> person, Set<String> kinds) {
+		if (person == null || kinds == null) {
+			return false;
+		}
+		if (kinds.contains(EMAIL)) {
+			for (String field : EMAIL_FIELDS) {
+				if (normalEmail(text(person.get(field))) != null) {
+					return true;
+				}
+			}
+		}
+		if (kinds.contains(PHONE)) {
+			for (String field : PHONE_FIELDS) {
+				if (digits(text(person.get(field))) != null) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	/** One Contact Point the person should have. */
 	public class Desired {
 		public String kind;

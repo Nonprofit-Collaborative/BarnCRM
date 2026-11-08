@@ -19,6 +19,8 @@ public with sharing class ContactPointAccountHandler extends TriggerHandler {
 		ContactPointPlan.PHONE
 	};
 	private static final String INDIVIDUAL_LINK = 'PersonIndividualId';
+	/** Built once, not for every record of a save. */
+	private static final List<String> ACCOUNT_FIELDS = ContactPointPlan.accountFields();
 
 	/** Built by name from Core's dispatcher, so it needs a public constructor. */
 	@NamespaceAccessible
@@ -92,7 +94,7 @@ public with sharing class ContactPointAccountHandler extends TriggerHandler {
 	}
 
 	private static Boolean valuesChanged(Map<String, Object> now, Map<String, Object> before) {
-		for (String field : ContactPointPlan.accountFields()) {
+		for (String field : ACCOUNT_FIELDS) {
 			if (now.get(field) != before.get(field)) {
 				return true;
 			}

@@ -75,6 +75,19 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 **Cleanup:** Switch **Household Moves** back on; delete the test people.
 
+## T-CPS-07: A Large Save Is Copied by a Background Job
+
+**Purpose:** confirm a save of more than 50 people finishes without copying inside it and every person is still copied moments later, while a smaller save is copied at once.
+**Prerequisites:** admin; a CSV of 60 new people, each with a Last Name and an Email, and one of 10 more; Data Loader, Data Import Wizard or Workbench to insert them (not a BarnCRM import, which copies inside its own background job).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Insert the 10 people. Open one of them. | Their Contact Point Email is there straight away. |
+| 2 | Insert the 60 people. Wait about a minute, then open one of them. | Their Contact Point Email is there. In Setup, **Apex Jobs**, a `ContactPointSyncService.Job` (or `Job`) row has Completed. The Error Log has no Contact Point Sync warning. |
+| 3 | On the **Automation** page, switch off **Contact Point Sync: People**. Insert 60 more people. | No Contact Point Email is made for them, and no new sync job appears. Switch the row back on and run the backfill: they are copied. |
+
+**Cleanup:** Delete the test people; make sure **Contact Point Sync: People** is on.
+
 ## T-CPS-05: An Org Without the Individual Object, and a Person Without the Permission
 
 **Purpose:** confirm the module explains instead of failing, and the backfill needs Manage BarnCRM Settings.
