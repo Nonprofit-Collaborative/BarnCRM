@@ -10,6 +10,16 @@ Open the **Events Home** tab. **Upcoming** lists the events still to come, soone
 **Past** lists those that ended or were cancelled. Click an event's name to open it. The
 **Events** tab has list views of every event.
 
+## See Events on the Calendar
+
+1. Open the **Event Calendar** tab. Choose **Month**, **Week** or **List**; use the arrows and
+   **Today** to move.
+2. Narrow it with **Status** and **Format**. Turn on **Show Sessions** to see each event's
+   sessions as well.
+3. Click an entry to open it.
+4. To put an event or session in your own calendar, choose **List** and click its download
+   button, then open the `.ics` file that downloads.
+
 ## Create an Event
 
 1. On **Events Home**, click **New Event**.

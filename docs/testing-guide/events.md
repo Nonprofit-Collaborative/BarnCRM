@@ -414,3 +414,27 @@ number question `rating` and a text question `comment`; an event that ended yest
 | 8 | In an org without Forms, open an event. | No **Post-Event Survey** section. |
 
 **Cleanup:** Delete the response, clear the survey form and turn follow-ups off.
+
+## T-EV-20: Event Calendar
+
+**Purpose:** confirm the calendar shows events and sessions in a month, week and list, filters
+them, opens their records and downloads a calendar file made in the browser.
+**Prerequisites:** staff; an Open in-person event `Spring Gala` this month with a session
+`Opening Keynote`, a Cancelled virtual event `Donor Webinar` this month, and a Draft event next
+month.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Event Calendar** tab. | The current month in **Month** view with `Spring Gala` and `Donor Webinar` on their days (the webinar struck through); today marked. |
+| 2 | Click the next arrow, then **Today**. | The Draft event shows next month; **Today** returns to this month. |
+| 3 | Choose **Cancelled** in **Status**. | Only `Donor Webinar` shows. Choose **All Statuses**. |
+| 4 | Choose **Virtual** in **Format**, then **All Formats**. | Only the webinar shows, then both. |
+| 5 | Turn on **Show Sessions**. | `Opening Keynote (Session)` appears on the gala day. Turn it off and it goes. |
+| 6 | Choose **Week**. | The seven days around today with their entries; the arrows move a week. |
+| 7 | Choose **List**. | The month as days with entries, each with when, status, format and place; the keynote shows `Part of Spring Gala` with Show Sessions on. |
+| 8 | Click the download button on `Spring Gala`. | A file `spring-gala.ics` downloads. Browser network tools show no request to any outside host. Opening it in a calendar app shows the gala with its start, end and venue. |
+| 9 | Click an entry name. | The record opens. |
+| 10 | As read-only, open the tab. | The calendar and downloads work; nothing can be changed from it. |
+
+**Cleanup:** None.

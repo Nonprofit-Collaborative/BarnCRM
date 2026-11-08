@@ -96,8 +96,8 @@ CAPS = {
     # Events sample data (C-10: EventsSampleData, EventSampleDataLoader, conference, sponsors
     # and registrations): 146,523 measured, plus about 2%.
     # EV-13 seating (EventSeatingController), EV-17 badges (EventBadgesController), EV-18
-    # post-event survey.
-    "events": 180_000,
+    # post-event survey, EV-19 calendar (EventCalendarController).
+    "events": 190_000,
     # Portal Builder (PB-01, ADR-0185 portal builder): sign-in, sessions, template checks and the
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.

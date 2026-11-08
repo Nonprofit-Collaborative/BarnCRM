@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    A month, week or list calendar of events and their sessions, with a calendar file for each.
+  </description>
+  <flexiPage>Events_Calendar</flexiPage>
+  <label>Event Calendar</label>
+  <motif>Custom66: Dice</motif>
+</CustomTab>

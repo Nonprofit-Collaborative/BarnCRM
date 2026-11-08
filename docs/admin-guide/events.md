@@ -49,6 +49,21 @@ The **BarnCRM Events** app opens on the **Events Home** tab. It lists the events
 soonest first, with their dates, status, format and place; **Past** lists those that ended or
 were cancelled, latest first. Each event's name opens it. **New Event** opens the new event form.
 
+### Event Calendar
+
+The **Event Calendar** tab, beside Events Home, shows events as a **Month**, a **Week** or a
+**List**. The arrows move a step and **Today** comes back. **Status** and **Format** narrow what
+is shown without reloading; **Show Sessions** adds each event's sessions (a session follows its
+event's status and format filter) and is off until you turn it on, since a conference has many.
+A multi-day event shows on every day it spans; a cancelled one is struck through. Click an entry
+to open its record. In the **List** view each row has a download button that saves a calendar
+file (`.ics`) for that event or session, to add to your own calendar. The file is made in your
+browser: nothing is sent anywhere. Times are shown in your own time zone.
+
+The calendar reads up to 500 events and 1,000 sessions for the days shown and says so when it
+stopped; use the filters or the week view to narrow it. Everyone with an Events permission set
+sees it, with the records their sets allow. It needs no setup.
+
 ### Repeat Event
 
 From an event's row menu, **Repeat Event** asks how it repeats (**Every Week**, **Every Two
