@@ -1,4 +1,4 @@
-# ADR-NEXT: Event Management badges and sign-in sheets
+# ADR-0187: Event Management badges and sign-in sheets
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-07
