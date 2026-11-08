@@ -198,6 +198,26 @@ private class ImportUndoTest {
 		return text;
 	}
 
+	/** What a failed expectation needs to say: the undo journal, the limits spent, and the logged errors. */
+	private static String whyKept(Import_Batch__c batch) {
+		String text =
+			undoJournal(batch) +
+			' Queries ' +
+			Limits.getQueries() +
+			', subqueries ' +
+			Limits.getAggregateQueries() +
+			'. Logged:';
+		for (Error_Log__c entry : [
+			SELECT Context__c, Message__c
+			FROM Error_Log__c
+			ORDER BY CreatedDate
+			LIMIT 5
+		]) {
+			text += ' [' + entry.Context__c + '] ' + entry.Message__c;
+		}
+		return text;
+	}
+
 	private static Boolean exists(Id recordId) {
 		return [SELECT COUNT() FROM Account WHERE Id = :recordId] +
 			[SELECT COUNT() FROM Contact WHERE Id = :recordId] > 0;
@@ -670,7 +690,7 @@ private class ImportUndoTest {
 
 			undo(batch, Datetime.now());
 
-			Assert.isFalse(exists(credited.Id), 'The person goes: ' + undoJournal(batch));
+			Assert.isFalse(exists(credited.Id), 'The person goes: ' + whyKept(batch));
 			Assert.isTrue(
 				exists(credited.AccountId),
 				'The household its gifts are credited to stays.'
@@ -1034,7 +1054,7 @@ private class ImportUndoTest {
 
 			Assert.isFalse(
 				exists(imported.Id),
-				'The tagged record went in the module pass: ' + undoJournal(batch)
+				'The tagged record went in the module pass: ' + whyKept(batch)
 			);
 			Assert.isFalse(exists(imported.AccountId), 'And its household after it.');
 			Assert.isTrue(
@@ -1061,7 +1081,7 @@ private class ImportUndoTest {
 
 			Assert.isTrue(exists(kept.Id), 'The module said this one stays.');
 			Assert.isTrue(exists(kept.AccountId), 'So does the household they are still on.');
-			Assert.isFalse(exists(gone.Id), 'The other went: ' + undoJournal(batch));
+			Assert.isFalse(exists(gone.Id), 'The other went: ' + whyKept(batch));
 			Assert.isTrue(
 				undoJournal(batch).contains('A gift with a receipt still names this person.'),
 				'The reason is journaled (R-IB9).'
