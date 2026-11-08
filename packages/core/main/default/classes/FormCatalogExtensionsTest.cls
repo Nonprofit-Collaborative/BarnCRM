@@ -57,6 +57,8 @@ private class FormCatalogExtensionsTest {
 	@IsTest
 	static void absentWithoutAModule() {
 		System.runAs(TestUsers.admin()) {
+			// No class registered, so the answer does not depend on whether Forms is installed.
+			FormCatalogExtensions.EXTENSION_CLASSES.clear();
 			Test.startTest();
 			Boolean available = FormCatalogExtensions.isAvailable();
 			Test.stopTest();
