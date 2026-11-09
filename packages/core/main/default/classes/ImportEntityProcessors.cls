@@ -94,24 +94,10 @@ public with sharing class ImportEntityProcessors {
 	/** The class by name, namespace first; tests pass names of their own. */
 	@TestVisible
 	private static ImportEntityProcessor resolve(String className) {
-		Type processorType = NamespaceUtil.resolveType(className);
-		if (processorType == null) {
-			return null;
-		}
-		Object candidate;
-		try {
-			candidate = processorType.newInstance();
-		} catch (Exception cannotBuild) {
-			ErrorLogger.log(cannotBuild, 'ImportEntityProcessors.resolve');
-			return null;
-		}
-		if (candidate instanceof ImportEntityProcessor) {
-			return (ImportEntityProcessor) candidate;
-		}
-		ErrorLogger.log(
-			new System.TypeException(className + ' does not implement ImportEntityProcessor'),
+		return (ImportEntityProcessor) NamespaceUtil.build(
+			className,
+			ImportEntityProcessor.class,
 			'ImportEntityProcessors.resolve'
 		);
-		return null;
 	}
 }

@@ -159,24 +159,10 @@ public with sharing class SampleDataModules {
 	 */
 	@TestVisible
 	private static SampleDataModule resolve(String className) {
-		Type moduleType = NamespaceUtil.resolveType(className);
-		if (moduleType == null) {
-			return null;
-		}
-		Object candidate;
-		try {
-			candidate = moduleType.newInstance();
-		} catch (Exception cannotBuild) {
-			ErrorLogger.log(cannotBuild, 'SampleDataModules.resolve');
-			return null;
-		}
-		if (candidate instanceof SampleDataModule) {
-			return (SampleDataModule) candidate;
-		}
-		ErrorLogger.log(
-			new System.TypeException(className + ' does not implement SampleDataModule'),
+		return (SampleDataModule) NamespaceUtil.build(
+			className,
+			SampleDataModule.class,
 			'SampleDataModules.resolve'
 		);
-		return null;
 	}
 }

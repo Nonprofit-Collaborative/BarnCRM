@@ -73,24 +73,10 @@ public with sharing class EventVolunteerExtensions {
 	}
 
 	private static EventVolunteerExtension resolve(String className) {
-		Type extensionType = NamespaceUtil.resolveType(className);
-		if (extensionType == null) {
-			return null;
-		}
-		Object candidate;
-		try {
-			candidate = extensionType.newInstance();
-		} catch (Exception cannotBuild) {
-			ErrorLogger.log(cannotBuild, 'EventVolunteerExtensions.resolve');
-			return null;
-		}
-		if (candidate instanceof EventVolunteerExtension) {
-			return (EventVolunteerExtension) candidate;
-		}
-		ErrorLogger.log(
-			new System.TypeException(className + ' does not implement EventVolunteerExtension'),
+		return (EventVolunteerExtension) NamespaceUtil.build(
+			className,
+			EventVolunteerExtension.class,
 			'EventVolunteerExtensions.resolve'
 		);
-		return null;
 	}
 }

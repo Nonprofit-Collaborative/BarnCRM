@@ -113,24 +113,10 @@ public with sharing class FormAttachmentExtensions {
 	}
 
 	private static FormAttachmentExtension resolve(String className) {
-		Type extensionType = NamespaceUtil.resolveType(className);
-		if (extensionType == null) {
-			return null;
-		}
-		Object candidate;
-		try {
-			candidate = extensionType.newInstance();
-		} catch (Exception cannotBuild) {
-			ErrorLogger.log(cannotBuild, 'FormAttachmentExtensions.resolve');
-			return null;
-		}
-		if (candidate instanceof FormAttachmentExtension) {
-			return (FormAttachmentExtension) candidate;
-		}
-		ErrorLogger.log(
-			new System.TypeException(className + ' does not implement FormAttachmentExtension'),
+		return (FormAttachmentExtension) NamespaceUtil.build(
+			className,
+			FormAttachmentExtension.class,
 			'FormAttachmentExtensions.resolve'
 		);
-		return null;
 	}
 }

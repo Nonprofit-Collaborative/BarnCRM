@@ -44,24 +44,10 @@ public with sharing class WhereUsedExtensions {
 	}
 
 	private static WhereUsedExtension resolve(String className) {
-		Type extensionType = NamespaceUtil.resolveType(className);
-		if (extensionType == null) {
-			return null;
-		}
-		Object candidate;
-		try {
-			candidate = extensionType.newInstance();
-		} catch (Exception cannotBuild) {
-			ErrorLogger.log(cannotBuild, 'WhereUsedExtensions.resolve');
-			return null;
-		}
-		if (candidate instanceof WhereUsedExtension) {
-			return (WhereUsedExtension) candidate;
-		}
-		ErrorLogger.log(
-			new System.TypeException(className + ' does not implement WhereUsedExtension'),
+		return (WhereUsedExtension) NamespaceUtil.build(
+			className,
+			WhereUsedExtension.class,
 			'WhereUsedExtensions.resolve'
 		);
-		return null;
 	}
 }

@@ -111,24 +111,10 @@ public with sharing class PublicPageExtensions {
 	}
 
 	private static PublicPageExtension resolve(String className) {
-		Type extensionType = NamespaceUtil.resolveType(className);
-		if (extensionType == null) {
-			return null;
-		}
-		Object candidate;
-		try {
-			candidate = extensionType.newInstance();
-		} catch (Exception cannotBuild) {
-			ErrorLogger.log(cannotBuild, 'PublicPageExtensions.resolve');
-			return null;
-		}
-		if (candidate instanceof PublicPageExtension) {
-			return (PublicPageExtension) candidate;
-		}
-		ErrorLogger.log(
-			new System.TypeException(className + ' does not implement PublicPageExtension'),
+		return (PublicPageExtension) NamespaceUtil.build(
+			className,
+			PublicPageExtension.class,
 			'PublicPageExtensions.resolve'
 		);
-		return null;
 	}
 }
