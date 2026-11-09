@@ -3,11 +3,9 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>Salesforce Records Sync</label>
   <description>
-    For whoever keeps BarnCRM in step with Salesforce's own records: opens the Campaign sync,
-    Opportunity mirror and Gift Transaction mirror pages and edits the IDs they keep (an appeal's
-    Campaign ID, a gift's Opportunity and Gift Transaction IDs, a fund's Gift Designation ID).
-    Creating Campaigns, Opportunities or Gift Transactions also needs that object's access in
-    Setup. Replaces Campaign Sync, Opportunity Mirror and Gift Transaction Mirror (ADR-NEXT).
+    Opens the Campaign sync, Opportunity mirror and Gift Transaction mirror pages and edits the IDs
+    they keep. The Salesforce objects need their own access in Setup. Replaces Campaign Sync,
+    Opportunity Mirror and Gift Transaction Mirror.
   </description>
   <classAccesses>
     <apexClass>CampaignSyncController</apexClass>
