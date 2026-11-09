@@ -3,10 +3,8 @@
   <hasActivationRequired>false</hasActivationRequired>
   <label>Accounting Export</label>
   <description>
-    For the bookkeeper: downloads gifts from the Accounting Export page as a CSV file and marks
-    them posted (Export Accounting, Post Gifts). Reads the gift, allocation and fund fields the
-    export shows, so it needs no Giving set beside it (ADR-NEXT); which gifts appear still
-    follows the org's sharing.
+    For the bookkeeper: downloads gifts as a CSV file and marks them posted. Reads the gift fields
+    the file shows, so no Giving set is needed beside it; which gifts appear follows sharing.
   </description>
   <classAccesses>
     <apexClass>AccountingExportController</apexClass>
