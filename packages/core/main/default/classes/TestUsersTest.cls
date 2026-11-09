@@ -73,7 +73,12 @@ private class TestUsersTest {
 		User found = TestUsers.fromSetup('Foundagain');
 
 		Assert.areEqual(built.Id, found.Id, 'The user built under that last name.');
-		Assert.areEqual(built.Email, found.Email, 'With the fields the builders set.');
+		// The org keeps an email address in lower case, so the saved one is compared that way.
+		Assert.areEqual(
+			built.Email.toLowerCase(),
+			found.Email.toLowerCase(),
+			'With the fields the builders set.'
+		);
 		Assert.areEqual(built.ProfileId, found.ProfileId, 'On the profile it was built on.');
 	}
 
