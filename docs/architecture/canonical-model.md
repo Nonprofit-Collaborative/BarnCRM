@@ -7833,7 +7833,8 @@ Campaign of the gift's appeal, which is why it is an indexed external identifier
 - **Service:** `CampaignSyncService` (the copy), `CampaignSyncSelector` (appeal and Campaign
   reads, Campaign by dynamic query only), `CampaignSyncBatch` (R-CS6),
   `CampaignSyncController` and the `campaignSync` page reached from the Giving section of
-  BarnCRM Settings. Permission set: `Campaign_Sync`.
+  BarnCRM Settings. Permission set: `Salesforce_Records_Sync` (retired `Campaign_Sync` until the
+  next release, ADR-NEXT D4).
 
 ## 29C. Opportunity Mirror
 
@@ -8024,7 +8025,8 @@ only, because a gift is never edited from its Opportunity.
   `OpportunityMirrorController` and the `opportunityMirror` page reached from the Giving section
   of BarnCRM Settings, `MirrorSettingsWriter` (the runs' record of their last completed run)
   and `MirrorHealthCheckExtension` (the stale run finding, through the ADR-0057 seam).
-  Permission set: `Opportunity_Mirror`, which also carries the custom permission
+  Permission set: `Salesforce_Records_Sync` (retired `Opportunity_Mirror` until the next
+  release, ADR-NEXT D4), which also carries the custom permission
   `Use_Opportunity_Mirror`: the page's reads require it, and the console shows the page's row
   only to someone who has it (the Setting Definition's `Required_Permission__c`).
 - **List view** `Gifts_And_Opportunities` on Gift, shipped by Mirror, where Opportunity ID is
@@ -8230,7 +8232,8 @@ range that are dated on or after the start date.
   section of BarnCRM Settings. Shared with the Opportunity mirror: `MirrorSync`,
   `MirrorSettingsWriter` (the runs' record of their last completed run),
   `MirrorHealthCheckExtension` (the stale run finding) and `MirrorNightlyJobProvider` (the
-  nightly jobs list). Permission set: `Gift_Transaction_Mirror`, which also carries the custom
+  nightly jobs list). Permission set: `Salesforce_Records_Sync` (retired `Gift_Transaction_Mirror`
+  until the next release, ADR-NEXT D4), which also carries the custom
   permission `Use_Gift_Transaction_Mirror`: the page's reads require it, and the console shows
   the page's row only to someone who has it. It is offered on the Access page through an
   `Access_Add_On__mdt` row.
@@ -14549,6 +14552,7 @@ mirrors the primary member).
 | 1.3 | 2026-11-07 | Post-event survey (EV-18, D-186, ADR-0188). New Section 29EV18 Event Survey Response (`Event_Survey_Response__c`, R-ESV1 to R-ESV3); `Event__c` gains `Survey_Form_Key__c`, `Event_Attendee__c` gains `Survey_Link__c`, `Events_Settings__c` gains `Survey_Template__c`. Core gains the `FormCatalogExtension` seam (no object or field). |
 | 1.2 | 2026-11-07 | Event calendar (EV-19, D-186, ADR-0189). No object or field added: the Event Calendar tab reads `Event__c` (29EV1) and `Event_Session__c` (29EV5) and builds an `.ics` file per entry in the browser. |
 | 1.2 | 2026-11-07 | Public event pages (EV-16, D-186, ADR-0190 public event pages). `Event__c` (29EV1) gains `Public_Page__c`, `Public_Speakers__c` and `Public_Seats__c` (Checkbox, default false) and rule R-EV5; `Events_Settings__c` (29EV25) gains `Public_Payment_Note__c` (setting `Events_Public_Payment_Note`, sort 90). Core gains the `PublicPageExtension` seam (no object or field). |
+| 1.3 | 2026-11-09 | Simpler permission sets, Mirror (ADR-NEXT D4, D-191, release N). No object or field added. New permission sets `Salesforce_Records_Sync` (the grants of `Campaign_Sync`, `Opportunity_Mirror` and `Gift_Transaction_Mirror` together) and `Inbound_Gifts` (`Inbound_Gift_API` plus the `InboundGiftAction` class); the five old sets are labelled Retired and removed in the next release. `Accounting_Export` gains read on `Gift__c`, `Gift_Allocation__c`, `Fund__c`, Account and Contact and on the fields the export reads (`Fund__c.Accounting_Code__c`, `Gift_Allocation__c.Amount__c`, `Gift__c.Accounting_Posted_At__c`, `Accounting_Posted_By__c`, `Donor_Account__c`, `Donor_Contact__c`, `Original_Gift__c`, `Payment_Reference__c`). Mirror's `Access_Add_On__mdt` rows become `Salesforce_Records_Sync` (210), `Accounting_Export` (230) and `Inbound_Gifts` (240). New `MirrorAccessSync` gives the new sets to active holders of the old ones. |
 | 1.3 | 2026-11-07 | Portal Builder module (PB-01, D-118, D-178, D-187; ADR-0185 `0185-portal-builder-off-platform-portal-api.md`). New package `packages/portal`: Portal (`Portal__c`, 29PB1), Portal Access (`Portal_Access__c`, 29PB2), Portal Session (`Portal_Session__c`, 29PB3) and Portal Settings (`Portal_Settings__c`, 29PB4), rules R-PB1 to R-PB4, R-PA1, R-PA2, R-PS1, R-PS2 and R-PST1. Core gains no object or field: only the `PortalActionExtension` seam, the Portals settings section and the catalog row `BarnCRM_Module.Portal`. |
 | 1.3 | 2026-11-09 | Batch C review: Form Draft (29ZY1) gains Address Key (`Address_Key__c`, Text(64)); R-FS7 caps save-for-later links at 3 an hour per address and 100 an hour per form. |
 | 1.3 | 2026-11-09 | Batch C review: Portal Access (29PB2) gains Second Factor Last Step (`Second_Factor_Last_Step__c`, Number(18, 0)) and rule R-PA3, an authenticator code is used once. |

@@ -529,8 +529,8 @@ form at the top of that page:
 | Giving, Campaign Sync (BarnCRM Mirror) | **Marketing User** ticked on the user of each person who creates appeals | Users | No |
 | Giving, Opportunity Mirror (BarnCRM Mirror) | Opportunity create and edit for fundraising staff, if each gift should get its Opportunity at once | Permission Sets (click the set, then Object Settings, Opportunities) | No |
 
-Giving Staff, Giving Admin and Giving Read Only, and Mirror's Campaign Sync, Opportunity Mirror
-and Accounting Export, are given on the **Access** page, under Extra Permissions, so they need
+Giving Staff, Giving Admin and Giving Read Only, and Mirror's Salesforce Records Sync and
+Accounting Export, are given on the **Access** page, under Extra Permissions, so they need
 no note. Accounting Export has no Setup note.
 
 ## Common Mistakes
