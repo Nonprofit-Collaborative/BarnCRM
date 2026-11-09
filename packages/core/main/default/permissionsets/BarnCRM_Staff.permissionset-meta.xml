@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>BarnCRM Staff</label>
+  <label>BarnCRM Staff Access</label>
   <description>
-    For everyone doing the day job. Reads the Error Log so that a problem can be
-    described accurately, and changes nothing about how BarnCRM is configured.
+    Part of the Team Member and Fundraising Staff roles. Give a role, not this set. The day job;
+    reads the Error Log, and changes nothing about how BarnCRM is configured.
   </description>
   <classAccesses>
     <apexClass>AccessController</apexClass>

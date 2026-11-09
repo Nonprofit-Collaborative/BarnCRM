@@ -582,7 +582,7 @@ public with sharing class AccessExplorerController {
 			String namespace = NamespaceUtil.prefix().removeEnd('__');
 			Map<String, Object> binds = new Map<String, Object>{
 				'prefix' => String.isBlank(namespace) ? null : namespace,
-				'roles' => AccessService.ROLE_DEVELOPER_NAMES
+				'roles' => AccessService.knownRoles()
 			};
 			Map<Id, Grant> roles = new Map<Id, Grant>();
 			Map<Id, Grant> sets = new Map<Id, Grant>();
@@ -1076,7 +1076,7 @@ public with sharing class AccessExplorerController {
 			: permissionSet.PermissionSetGroup;
 		if (owner != null) {
 			return sameNamespace(owner.NamespacePrefix, namespace) &&
-				AccessService.ROLE_DEVELOPER_NAMES.contains(owner.DeveloperName)
+				AccessService.knownRoles().contains(owner.DeveloperName)
 				? BARN_ROLE
 				: null;
 		}

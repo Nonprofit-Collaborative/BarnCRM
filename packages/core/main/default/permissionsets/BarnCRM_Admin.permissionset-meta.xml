@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>BarnCRM Admin</label>
+  <label>BarnCRM Admin Access</label>
   <description>
-    For the person who configures BarnCRM: settings, custom metadata, automation control, Error
-    Log. View All and Modify All on Account and Contact let its data tools reach every person
-    (ADR-0142). Never meant to be cloned.
+    Part of the BarnCRM Admin role. Give the role, not this set. Settings, custom metadata,
+    automation control, Error Log; View All and Modify All on Account and Contact (ADR-0142).
   </description>
   <classAccesses>
     <apexClass>AccessController</apexClass>
@@ -25,6 +24,10 @@
   </classAccesses>
   <classAccesses>
     <apexClass>AutomationControlController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>BulkUpdateController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
