@@ -26,7 +26,7 @@ private class FeatureControllerTest {
 				'DataManager' => System.Label.Core_DataManager_Title,
 				'DuplicateReview' => System.Label.Core_DuplicateMatching_Title,
 				'OrgOptimizer' => System.Label.Core_Feature_OrgOptimizer_Name,
-				'HouseholdUpkeep' => System.Label.Core_Feature_HouseholdUpkeep_Name,
+				'HouseholdUpkeep' => System.Label.Core_SettingsGroup_Households,
 				'Addresses' => System.Label.Core_Feature_Addresses_Name,
 				'Relationships' => System.Label.Core_Feature_Relationships_Name,
 				'Affiliations' => System.Label.Core_Feature_Affiliations_Name,

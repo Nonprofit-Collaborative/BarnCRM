@@ -30,7 +30,7 @@ private class MatchingGiftRefundTest {
 	static void aFullyRefundedMatchLeavesTheEmployeeRecognizedForNothing() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Setup data = setUp();
-			MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+			match(data.employeeGift.Id, data.employerGift.Id);
 
 			Test.startTest();
 			Id refundId = GiftService.refund(data.employerGift.Id, 500, 'The company reversed it');
@@ -91,7 +91,7 @@ private class MatchingGiftRefundTest {
 	static void aPartlyRefundedMatchLeavesRecognitionForWhatTheEmployerStillHolds() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Setup data = setUp();
-			MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+			match(data.employeeGift.Id, data.employerGift.Id);
 			Id refundId = GiftService.refund(data.employerGift.Id, 200, 'Overpaid the match');
 
 			Assert.areEqual(
@@ -142,7 +142,7 @@ private class MatchingGiftRefundTest {
 	static void aWrittenOffMatchReversesTheCreditTheSameWay() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Setup data = setUp();
-			MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+			match(data.employeeGift.Id, data.employerGift.Id);
 
 			Test.startTest();
 			Id writeOffId = GiftService.writeOff(data.employerGift.Id, 'The check never cleared');
@@ -202,7 +202,7 @@ private class MatchingGiftRefundTest {
 	static void refundingTheEmployeeGiftLeavesTheMatchedCreditStanding() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Setup data = setUp();
-			MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+			match(data.employeeGift.Id, data.employerGift.Id);
 
 			Test.startTest();
 			Id refundId = GiftService.refund(data.employeeGift.Id, 500, 'Ana asked for hers back');
@@ -231,7 +231,7 @@ private class MatchingGiftRefundTest {
 	static void unlinkingAfterARefundRemovesBothHalvesOfThePair() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Setup data = setUp();
-			MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+			match(data.employeeGift.Id, data.employerGift.Id);
 			Id refundId = GiftService.refund(data.employerGift.Id, 200, 'Overpaid the match');
 			Assert.areEqual(
 				1,
@@ -240,7 +240,7 @@ private class MatchingGiftRefundTest {
 			);
 
 			Test.startTest();
-			MatchingGiftService.unlink(data.employerGift.Id);
+			match(data.employerGift.Id, null);
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -269,7 +269,7 @@ private class MatchingGiftRefundTest {
 			Id refundId = GiftService.refund(data.employerGift.Id, 200, 'Overpaid the match');
 
 			Test.startTest();
-			MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+			match(data.employeeGift.Id, data.employerGift.Id);
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -284,6 +284,14 @@ private class MatchingGiftRefundTest {
 				'whichever of the refund and the link happened first.'
 			);
 		}
+	}
+
+	/**
+	 * Sets Matched Gift on one gift, as the record page does. The trigger writes the other side
+	 * and the credit. A null partner clears the link.
+	 */
+	private static void match(Id giftId, Id partnerId) {
+		update new Gift__c(Id = giftId, Matched_Gift__c = partnerId);
 	}
 
 	private class Setup {

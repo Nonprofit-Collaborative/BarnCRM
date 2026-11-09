@@ -103,7 +103,7 @@ public with sharing class FeatureController {
 				return System.Label.Core_Feature_OrgOptimizer_Name;
 			}
 			when 'HouseholdUpkeep' {
-				return System.Label.Core_Feature_HouseholdUpkeep_Name;
+				return System.Label.Core_SettingsGroup_Households;
 			}
 			when 'Addresses' {
 				return System.Label.Core_Feature_Addresses_Name;

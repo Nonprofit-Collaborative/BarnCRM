@@ -1080,7 +1080,7 @@ private class SettingsControllerTest {
 			Assert.areEqual(
 				System.Label.Core_DataManager_Title +
 					', ' +
-					System.Label.Core_Feature_HouseholdUpkeep_Name,
+					System.Label.Core_SettingsGroup_Households,
 				changes[0].newValue,
 				'Each key reads as its feature name'
 			);

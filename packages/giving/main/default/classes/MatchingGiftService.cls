@@ -21,9 +21,9 @@
  * Where Employer is blank the link is accepted without complaint. Filling it in is what turns a
  * silent mistake into a message.
  *
- * There are two ways in and they enforce the same rules: `link` and `unlink`, which take two
- * record ids (no screen calls them today; the rule tests do), and `applyLinkChanges`, called by the gift trigger when someone edits the
- * Matched Gift field on the record page.
+ * There is one way in: `applyLinkChanges`, called by the gift trigger when someone edits the
+ * Matched Gift field on the record page, or an import does. A link the rules refuse is reported
+ * on the record being saved.
  *
  * A refund of the employer's gift reverses that credit rather than removing it (ADR-0031). The
  * negative gift `GiftService.refund` inserts is not half of a matching pair, so it earns no
@@ -33,83 +33,6 @@
  * holds rather than as the whole match.
  */
 public with sharing class MatchingGiftService {
-	public class MatchingGiftException extends Exception {
-	}
-
-	/**
-	 * Links an employee's gift to the employer's gift that matched it, from either side.
-	 */
-	public static void link(Id employeeGiftId, Id employerGiftId) {
-		if (employeeGiftId == null || employerGiftId == null) {
-			throw new MatchingGiftException(Label.Giving_MatchingGift_GiftNotFound);
-		}
-		if (employeeGiftId == employerGiftId) {
-			throw new MatchingGiftException(Label.Giving_MatchingGift_SameGift);
-		}
-		Map<Id, Gift__c> giftById = giftsById(new Set<Id>{ employeeGiftId, employerGiftId });
-		Gift__c employeeGift = giftById.get(employeeGiftId);
-		Gift__c employerGift = giftById.get(employerGiftId);
-		if (employeeGift == null || employerGift == null) {
-			throw new MatchingGiftException(Label.Giving_MatchingGift_GiftNotFound);
-		}
-		if (!isOrganizationGift(employerGift)) {
-			throw new MatchingGiftException(Label.Giving_MatchingGift_EmployerMustBeOrganization);
-		}
-		String problem = problemWith(employerGift, employeeGift);
-		if (problem != null) {
-			throw new MatchingGiftException(problem);
-		}
-
-		Database.update(
-			new List<Gift__c>{
-				new Gift__c(Id = employeeGiftId, Matched_Gift__c = employerGiftId),
-				new Gift__c(Id = employerGiftId, Matched_Gift__c = employeeGiftId)
-			},
-			true,
-			AccessLevel.USER_MODE
-		);
-		insertCredits(
-			missingCreditsFor(
-				new Map<Id, Id>{ employerGift.Id => donorPersonOf(employeeGift) },
-				new Map<Id, Gift__c>{ employerGift.Id => employerGift }
-			)
-		);
-		// A gift refunded in part is still linkable: R-G11 only refuses a link where the whole
-		// gift has gone back. Reversing here as well as on the refund keeps recognition at the
-		// amount still held whichever of the two happened first (ADR-0031).
-		syncReversalCredits(new Set<Id>{ employerGift.Id });
-	}
-
-	/**
-	 * Undoes a link from either side, and removes the credit the link created.
-	 */
-	public static void unlink(Id giftId) {
-		if (giftId == null) {
-			throw new MatchingGiftException(Label.Giving_MatchingGift_GiftNotFound);
-		}
-		Gift__c gift = giftsById(new Set<Id>{ giftId }).get(giftId);
-		if (gift == null) {
-			throw new MatchingGiftException(Label.Giving_MatchingGift_GiftNotFound);
-		}
-		if (gift.Matched_Gift__c == null) {
-			return;
-		}
-		Id otherGiftId = gift.Matched_Gift__c;
-		Database.update(
-			new List<Gift__c>{
-				new Gift__c(Id = giftId, Matched_Gift__c = null),
-				new Gift__c(Id = otherGiftId, Matched_Gift__c = null)
-			},
-			true,
-			AccessLevel.USER_MODE
-		);
-		Set<Id> pair = new Set<Id>{ giftId, otherGiftId };
-		removeMatchedDonorCredits(pair);
-		// The negative credits reverse the credit that has just gone, so they go with it: an
-		// orphaned minus 200 is a worse number than no rows at all (ADR-0031).
-		syncReversalCredits(pair);
-	}
-
 	/**
 	 * The trigger path: someone typed into Matched Gift on a gift record, or an import did.
 	 * Refuses a link the rules do not allow, writes the other side of the one they do, and
