@@ -236,4 +236,36 @@ describe('mountPortal', () => {
     expect(api.logout).toHaveBeenCalled();
     expect(root.querySelector('h2').textContent).toBe('Sign In');
   });
+
+  it('starts a page at its heading and the edit form at its first box', async () => {
+    const api = fakeApi();
+    await mountPortal(root, { api });
+    expect(document.activeElement).toBe(root.querySelector('h3'));
+
+    buttonNamed(root, 'Edit').click();
+    expect(document.activeElement).toBe(root.querySelector('[name="MobilePhone"]'));
+  });
+
+  it('shows an action result as a status, not an alert, and yes or no for a checkbox', async () => {
+    const api = fakeApi({
+      me: jest.fn(() => Promise.resolve({ ...MENU, firstName: '' })),
+      page: jest.fn(() =>
+        Promise.resolve({
+          ...PROFILE,
+          canUpdate: false,
+          actions: [{ name: 'thank', label: 'Send Thanks' }],
+          fields: [{ field: 'Active__c', label: 'Active', type: 'boolean', edit: false }],
+          records: [{ id: '003A', values: { Active__c: true } }]
+        })
+      )
+    });
+    await mountPortal(root, { api });
+    expect(root.querySelector('p')).toBeNull();
+    expect(root.querySelector('dd').textContent).toBe('Yes');
+
+    buttonNamed(root, 'Send Thanks').click();
+    await flush();
+    expect(root.querySelector('[role="status"]').textContent).toBe('Thanks sent');
+    expect(root.querySelector('[role="alert"]')).toBeNull();
+  });
 });

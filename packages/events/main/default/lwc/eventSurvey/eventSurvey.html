@@ -33,7 +33,7 @@
           <p data-id="counts">{counts}</p>
 
           <template lwc:if={showNoResponses}>
-            <c-barn-empty-state data-id="empty-state" message={text.noResponses}></c-barn-empty-state>
+            <c-barn-empty-state data-id="empty-state" size="compact" heading={text.noResponsesHeading} message={text.noResponses}></c-barn-empty-state>
           </template>
 
           <template for:each={summary} for:item="entry">

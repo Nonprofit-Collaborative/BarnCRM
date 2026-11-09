@@ -1,0 +1,5 @@
+/* The loading spinner covers this page's content only. */
+:host {
+  display: block;
+  position: relative;
+}

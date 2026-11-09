@@ -73,6 +73,9 @@ export default class EventRegistrations extends LightningElement {
     get empty() {
       return helpText('Events', 'Events_Registrations_Empty');
     },
+    get emptyHeading() {
+      return helpText('Events', 'Events_Registrations_EmptyHeading');
+    },
     get truncated() {
       return helpText('Events', 'Events_Registrations_Truncated');
     }

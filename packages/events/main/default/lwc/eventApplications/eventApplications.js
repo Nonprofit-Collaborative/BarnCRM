@@ -72,6 +72,9 @@ export default class EventApplications extends LightningElement {
     get empty() {
       return helpText('Events', 'Events_Applications_Empty');
     },
+    get emptyHeading() {
+      return helpText('Events', 'Events_Applications_EmptyHeading');
+    },
     get addApplication() {
       return helpText('Events', 'Events_Applications_Add');
     }

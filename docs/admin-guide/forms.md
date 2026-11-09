@@ -169,11 +169,11 @@ Then open **Health Check** in the Settings console. With a public form published
 
 | Check | What to do |
 |---|---|
-| No active Site for public forms | Do the steps above. |
-| A Site guest user can't open public forms | Select **Give Forms Public Guest**. It gives the Site's guest user the Forms Public Guest permission set: the public form page and its Apex class, nothing else. |
-| A Site guest user can read people or organizations | Remove Read on Contact and Account from the guest user's profile and permission sets in Setup. BarnCRM never changes this for you. |
-| Public form answers are not being processed | Select **Schedule Processing**. It runs every 15 minutes as you, so keep your user active. |
-| Public form answers are waiting | Answers have waited over an hour: check processing is scheduled and its user is active, then the Error Log. |
+| No Active Site for Public Forms | Do the steps above. |
+| A Site Guest User Can't Open Public Forms | Select **Give Forms Public Guest**. It gives the Site's guest user the Forms Public Guest permission set: the public form page and its Apex class, nothing else. |
+| A Site Guest User Can Read People or Organizations | Remove Read on Contact and Account from the guest user's profile and permission sets in Setup. BarnCRM never changes this for you. |
+| Public Form Answers Are Not Being Processed | Select **Schedule Processing**. It runs every 15 minutes as you, so keep your user active. |
+| Public Form Answers Are Waiting | Answers have waited over an hour: check processing is scheduled and its user is active, then the Error Log. |
 
 ### Making a Form Public
 

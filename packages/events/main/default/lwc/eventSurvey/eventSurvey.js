@@ -58,6 +58,7 @@ export default class EventSurvey extends LightningElement {
       form: helpText('Events', 'Events_Survey_Form'),
       noSurvey: helpText('Events', 'Events_Survey_None'),
       noResponses: helpText('Events', 'Events_Survey_NoResponses'),
+      noResponsesHeading: helpText('Events', 'Events_Survey_NoResponsesHeading'),
       results: helpText('Events', 'Events_Survey_Results')
     };
   }

@@ -48,6 +48,9 @@ export default class EventSeating extends LightningElement {
     get empty() {
       return helpText('Events', 'Events_Seating_Empty');
     },
+    get emptyHeading() {
+      return helpText('Events', 'Events_Seating_EmptyHeading');
+    },
     get addTable() {
       return helpText('Events', 'Events_Seating_AddTable');
     },

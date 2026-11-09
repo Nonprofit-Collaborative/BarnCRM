@@ -1,3 +1,9 @@
+/* The loading spinner covers this tab only, not the whole record page. */
+:host {
+  display: block;
+  position: relative;
+}
+
 .agenda-board {
   display: flex;
   gap: var(--slds-g-spacing-3, 0.75rem);

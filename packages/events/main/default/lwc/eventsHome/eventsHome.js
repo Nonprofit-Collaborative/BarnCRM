@@ -141,6 +141,12 @@ export default class EventsHome extends NavigationMixin(LightningElement) {
       : helpText('Events', 'Events_Home_EmptyUpcoming');
   }
 
+  get emptyHeading() {
+    return this.view === VIEW_PAST
+      ? helpText('Events', 'Events_Home_EmptyPastHeading')
+      : helpText('Events', 'Events_Home_EmptyUpcomingHeading');
+  }
+
   get truncatedMessage() {
     return this.home && this.home.truncated
       ? helpText('Events', 'Events_Home_Truncated', this.rows.length)

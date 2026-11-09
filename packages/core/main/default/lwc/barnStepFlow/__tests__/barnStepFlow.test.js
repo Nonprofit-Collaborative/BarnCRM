@@ -58,6 +58,19 @@ describe('c-barn-step-flow', () => {
     expect(handler).toHaveBeenCalledTimes(1);
   });
 
+  it('moves focus to the step heading when the step changes, not on first show', async () => {
+    const element = render({ currentStep: '1' });
+    const heading = one(element, 'heading');
+    const focus = jest.spyOn(heading, 'focus');
+    await Promise.resolve();
+    expect(focus).not.toHaveBeenCalled();
+
+    element.currentStep = '2';
+    await Promise.resolve();
+    expect(focus).toHaveBeenCalledTimes(1);
+    expect(heading.getAttribute('tabindex')).toBe('-1');
+  });
+
   it('story: an unknown step leaves the heading empty', () => {
     const element = render({ currentStep: '9' });
     expect(one(element, 'heading').textContent).toBe('');

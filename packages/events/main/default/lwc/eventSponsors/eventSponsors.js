@@ -75,6 +75,12 @@ export default class EventSponsors extends LightningElement {
     get levelsEmpty() {
       return helpText('Events', 'Events_Sponsors_LevelsEmpty');
     },
+    get levelsEmptyHeading() {
+      return helpText('Events', 'Events_Sponsors_LevelsEmptyHeading');
+    },
+    get emptyHeading() {
+      return helpText('Events', 'Events_Sponsors_EmptyHeading');
+    },
     get addSponsor() {
       return helpText('Events', 'Events_Sponsors_AddSponsor');
     },

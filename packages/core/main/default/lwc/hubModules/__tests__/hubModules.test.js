@@ -139,6 +139,22 @@ describe('c-hub-modules', () => {
     const logos = all(element, 'module-logo');
     expect(logos[1].src).toBe('/file-asset/BarnCRM_Fundraising_Logo');
     expect(logos[2].src).toBeUndefined();
+    expect(logos[2].fallbackIconName).toBe('standard:apps');
+  });
+
+  it('shows Portal Builder and Contact Point Sync with their tab icons', async () => {
+    getState.mockResolvedValue({
+      canEdit: true,
+      modules: [
+        { name: 'Portal', status: 'On', canSwitch: true },
+        { name: 'ContactPoints', status: 'On', canSwitch: true }
+      ]
+    });
+    const element = await build();
+
+    const logos = all(element, 'module-logo');
+    expect(logos[0].fallbackIconName).toBe('custom:custom47');
+    expect(logos[1].fallbackIconName).toBe('custom:custom59');
   });
 
   it('opens the Modules section of BarnCRM Settings by page reference', async () => {

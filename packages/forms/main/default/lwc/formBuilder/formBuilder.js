@@ -238,28 +238,32 @@ export default class FormBuilder extends LightningElement {
 
   get steps() {
     const { step: selectedStep, field: selectedField, record: selectedRecord } = this.selection;
-    return this.definition.steps.map((step, stepIndex) => ({
-      key: step.key,
-      index: stepIndex,
-      title: step.title || step.key,
-      selected: selectedRecord === null && selectedField === null && selectedStep === stepIndex,
-      className: this.itemClass(
-        selectedRecord === null && selectedField === null && selectedStep === stepIndex
-      ),
-      empty: step.fields.length === 0,
-      fields: step.fields.map((field, fieldIndex) => {
-        const selected =
-          selectedRecord === null && selectedStep === stepIndex && selectedField === fieldIndex;
-        return {
-          key: field.key,
-          stepIndex,
-          index: fieldIndex,
-          label: field.label || field.key,
-          selected,
-          className: this.itemClass(selected)
-        };
-      })
-    }));
+    return this.definition.steps.map((step, stepIndex) => {
+      const stepSelected =
+        selectedRecord === null && selectedField === null && selectedStep === stepIndex;
+      return {
+        key: step.key,
+        index: stepIndex,
+        title: step.title || step.key,
+        selected: stepSelected,
+        className: this.itemClass(stepSelected),
+        pressed: String(stepSelected),
+        empty: step.fields.length === 0,
+        fields: step.fields.map((field, fieldIndex) => {
+          const selected =
+            selectedRecord === null && selectedStep === stepIndex && selectedField === fieldIndex;
+          return {
+            key: field.key,
+            stepIndex,
+            index: fieldIndex,
+            label: field.label || field.key,
+            selected,
+            className: this.itemClass(selected),
+            pressed: String(selected)
+          };
+        })
+      };
+    });
   }
 
   get records() {
@@ -269,7 +273,8 @@ export default class FormBuilder extends LightningElement {
         key: record.key,
         index,
         label: `${record.key} (${KIND_LABELS[record.kind] || record.kind})`,
-        className: this.itemClass(selected)
+        className: this.itemClass(selected),
+        pressed: String(selected)
       };
     });
   }

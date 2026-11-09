@@ -1,0 +1,82 @@
+/*
+ * The portal's layout: one field per line, full-width inputs that fit a phone, spaced buttons,
+ * a marked alert and the current page in the menu. Fonts and colors come from the site's theme
+ * (inherit and currentColor), so the portal looks like the rest of the site.
+ */
+.barncrm-portal label {
+  display: block;
+  margin-top: 0.75em;
+  font-weight: 600;
+}
+
+.barncrm-portal input:not([type='checkbox']),
+.barncrm-portal select,
+.barncrm-portal textarea {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 32em;
+  margin-top: 0.25em;
+  font: inherit;
+}
+
+.barncrm-portal button {
+  margin: 0.75em 0.5em 0 0;
+  font: inherit;
+}
+
+.barncrm-portal .barn-portal-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.barncrm-portal .barn-portal-alert {
+  padding: 0.5em 0.75em;
+  border-left: 4px solid currentColor;
+  font-weight: 600;
+}
+
+.barncrm-portal .barn-portal-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5em;
+  margin: 1em 0;
+}
+
+.barncrm-portal .barn-portal-nav button {
+  margin: 0;
+}
+
+.barncrm-portal .barn-portal-nav [aria-current='page'] {
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.barncrm-portal .barn-portal-record {
+  margin: 1em 0;
+  padding: 1em;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+}
+
+.barncrm-portal dt {
+  font-weight: 600;
+}
+
+.barncrm-portal dd {
+  margin: 0 0 0.5em;
+}
+
+.barncrm-portal dd,
+.barncrm-portal code {
+  overflow-wrap: anywhere;
+}
+
+.barncrm-portal :focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}

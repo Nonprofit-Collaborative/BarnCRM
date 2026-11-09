@@ -101,6 +101,7 @@ export default class EventCalendar extends NavigationMixin(LightningElement) {
       format: helpText('Events', 'Events_Calendar_Format'),
       sessions: helpText('Events', 'Events_Calendar_ShowSessions'),
       empty: helpText('Events', 'Events_Calendar_Empty'),
+      emptyHeading: helpText('Events', 'Events_Calendar_EmptyHeading'),
       open: helpText('Events', 'Events_Calendar_Open'),
       download: helpText('Events', 'Events_Calendar_Download'),
       truncated: helpText('Events', 'Events_Calendar_Truncated'),

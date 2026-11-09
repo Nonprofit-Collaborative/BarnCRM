@@ -1,6 +1,6 @@
 # BarnCRM Testing Guide
 
-Applies to: BarnCRM landing/batch-b (v1.0 scope, releases 0.15 to 0.17), to be set to the final main merge commit at landing. Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main 203130d9 (v1.0 and Batch C, releases 0.12 to 1.3). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 Manual, step-by-step test scripts for checking a build in a scratch org or sandbox, feature by
 feature. Written for a tester: the project owner or a pilot org admin. Start with
@@ -70,7 +70,7 @@ page, even if that puts it out of reading order.
 | [Logic Models](logic-models.md) | LM | 12 | The Logic Model Builder: parts, arrows and assumptions, drag and drop, whose model it is, indicators and periods with progress, staff and read-only access, imported and computed results, the Logic Model Report |
 | [Funders](funders.md) | FUN | 16 | Grants and their stage dates, the Grant Pipeline board, totals and deadlines, the Grant Calendar, moving and awarding a grant, the program a grant pays for, Funders access, Health Check and sample data, grant requirements, reminder tasks and emails and their settings, Mark Submitted, overdue requirements, award schedules, restricted funds and the Giving fund, government award fields, the answer library, requirements linked to Logic Models outcomes, funder reports from a template, the Board Dashboard |
 | [Event Management](events.md) | EV | 21 | Events and their rules, the Events page, Repeat Event, Events access, ticket types and promo codes, the Agenda Builder, speakers, the call for speakers, sponsorship, registrations and the waitlist, reminders, follow-ups and no-shows, the Summit Events import, the event dashboard and conference template, appointments, event volunteers, check-in and QR codes, sample data, gala tables and seating, badges and sign-in sheets, the post-event survey, the event calendar, public event pages and registration |
-| [Portal Builder](portal-builder.md) | PB | 8 | Sign-in by emailed code, no user enumeration, lockout, the second factor, template pages and edits scoped to the person, staff ending sessions, the volunteer, speaker and donor templates |
+| [Portal Builder](portal-builder.md) | PB | 9 | Sign-in by emailed code, no user enumeration, lockout, the second factor, template pages and edits scoped to the person, staff ending sessions, the volunteer, speaker and donor templates, the portal on a WordPress page at phone width and by keyboard |
 | [Rollup Builder](rollup-builder.md) | RB | 39 | Building, recalculating and switching rollups, standard objects, parity options, export and import, instant totals on other objects |
 | [Accessibility and mobile](accessibility-and-mobile.md) | A11Y | 9 | Keyboard, focus, screen reader labels, zoom, Salesforce mobile app |
 

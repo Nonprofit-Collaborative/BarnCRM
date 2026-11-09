@@ -56,6 +56,11 @@ export default class ContactPointSync extends LightningElement {
     return Boolean(this.status);
   }
 
+  /** The first status read, or a backfill starting; never over an error. */
+  get loading() {
+    return !this.error && (!this.loaded || this.working);
+  }
+
   get kinds() {
     return (this.status.kinds || []).map((line) => ({
       ...line,

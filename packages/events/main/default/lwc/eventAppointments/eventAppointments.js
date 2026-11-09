@@ -100,6 +100,7 @@ export default class EventAppointments extends LightningElement {
     return {
       intro: helpText('Events', 'Events_Appointments_Intro'),
       empty: helpText('Events', 'Events_Appointments_Empty'),
+      emptyHeading: helpText('Events', 'Events_Appointments_EmptyHeading'),
       addTitle: helpText('Events', 'Events_Appointments_AddTitle'),
       day: helpText('Events', 'Events_Appointments_Day'),
       from: helpText('Events', 'Events_Appointments_From'),

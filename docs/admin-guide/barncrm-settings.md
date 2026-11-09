@@ -179,8 +179,9 @@ Start with the sample data loaded. Steps 1 to 6 are Maria. Step 7 is David.
 2. The console opens with the section list on the
    left and the first section showing on the right. The page name shows once, in the page
    header. The sections are listed in groups: **Organization** (General, Organization),
-   **People** (People and Households, Addresses), **Data** (Import, Duplicate Matching,
-   Rollups, Org Optimizer), **Fundraising** (Giving, Receipts, Funders), **Programs** (Volunteers) and
+   **People** (People and Households, Addresses, Contact Points, Portals), **Data** (Import,
+   Duplicate Matching, Rollups, Org Optimizer), **Fundraising** (Giving, Receipts, Funders),
+   **Programs** (Programs, Volunteers, Events) and
    **System** (Modules, Access, Automation, Integrations, Health, Error Log). A section a
    module adds that is not in these groups is listed under **More**, before System, so Error
    Log is always last. On a phone or other narrow screen the list is replaced by a

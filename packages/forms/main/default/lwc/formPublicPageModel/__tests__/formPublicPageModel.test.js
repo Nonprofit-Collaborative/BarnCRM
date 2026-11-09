@@ -1,4 +1,31 @@
-import { amountText, listView, pageView, sitePageUrl, whenText } from 'c/formPublicPageModel';
+import {
+  amountText,
+  listView,
+  nameTab,
+  pageView,
+  sitePageUrl,
+  whenText
+} from 'c/formPublicPageModel';
+
+describe('nameTab', () => {
+  it('sets the title, keeps it without a name, and is safe when the host refuses', () => {
+    const doc = { title: 'Form' };
+    expect(nameTab('Spring Gala', doc)).toBe(true);
+    expect(doc.title).toBe('Spring Gala');
+    expect(nameTab('', doc)).toBe(false);
+    expect(doc.title).toBe('Spring Gala');
+    const locked = {};
+    Object.defineProperty(locked, 'title', {
+      get: () => 'Form',
+      set: () => {
+        throw new Error('not allowed');
+      }
+    });
+    expect(nameTab('Spring Gala', locked)).toBe(false);
+    expect(locked.title).toBe('Form');
+    expect(nameTab('Spring Gala', null)).toBe(false);
+  });
+});
 
 const joiner = (start, end) => `${start} to ${end}`;
 

@@ -10,7 +10,7 @@ The website half of BarnCRM Portal Builder (ADR-0185 portal builder, D-187). It 
 | `src/portalTemplate.js` | `checkTemplate(json)`: the template shape rules Salesforce applies, to check a template before pasting it into a Portal. Salesforce also checks objects and fields against the org. |
 | `templates/sample.json` | A starting template: My Details (the person) and My Roles (their current affiliations). |
 | `templates/volunteer.json`, `speaker.json`, `donor.json` | The ready-made templates (PB-03, PB-07, PB-08). Each names its module in `requiresModules` (Volunteers, Event Management, Giving); module actions go through Core's `PortalActionExtension`. Checked against the package metadata by `__tests__/portalTemplates.test.js`. |
-| `wordpress/barncrm-portal/` | The WordPress plugin: settings page, the `[barncrm_portal key="..."]` shortcode, and the proxy. |
+| `wordpress/barncrm-portal/` | The WordPress plugin: settings page, the `[barncrm_portal key="..."]` shortcode, and the proxy. `css/portal.css` lays the portal out (one field per line, phone-width inputs, marked alerts) in the theme's own fonts and colors. |
 | `build-wordpress.sh` | Builds `barncrm-portal.zip` with the client inside, for Plugins, Add New, Upload Plugin. |
 | `__tests__/` | Jest tests, run with the repository's `npm run test:unit`. |
 
@@ -31,10 +31,11 @@ The browser part needs a small server piece, the proxy, that does what the plugi
 - When an answer carries `session`, store it in an HttpOnly, Secure, SameSite=Strict cookie and remove it from the answer. Send it back as the `X-Barn-Portal-Session` header on later calls. Clear the cookie on `logout` or `not_signed_in`.
 - Limit sign-in calls per visitor address.
 
-Then load the client as ES modules:
+Then load the client as ES modules, with the plugin's `css/portal.css` (or your own styles for the `barncrm-portal` and `barn-portal-*` classes):
 
 ```html
-<div id="portal"></div>
+<link rel="stylesheet" href="./portal.css" />
+<div id="portal" class="barncrm-portal"></div>
 <script type="module">
   import { createPortalApi } from './portalApi.js';
   import { mountPortal } from './portalApp.js';

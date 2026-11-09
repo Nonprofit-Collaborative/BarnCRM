@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-    <label>Sync Addresses</label>
+    <label>Sync addresses</label>
     <protected>true</protected>
     <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Sync_Addresses__c</value></values>
     <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Contact_Point_Sync_Settings__c</value></values>

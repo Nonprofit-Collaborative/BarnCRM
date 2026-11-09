@@ -61,6 +61,7 @@ export default class EventVolunteers extends LightningElement {
       title: helpText('Events', 'Events_Volunteers_Title'),
       intro: helpText('Events', 'Events_Volunteers_Intro'),
       empty: helpText('Events', 'Events_Volunteers_Empty'),
+      emptyHeading: helpText('Events', 'Events_Volunteers_EmptyHeading'),
       jobName: helpText('Events', 'Events_Volunteers_JobName'),
       addJob: helpText('Events', 'Events_Volunteers_AddJob'),
       addShift: helpText('Events', 'Events_Volunteers_AddShift'),
