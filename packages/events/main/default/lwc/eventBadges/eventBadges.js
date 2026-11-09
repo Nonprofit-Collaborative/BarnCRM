@@ -53,6 +53,9 @@ export default class EventBadges extends LightningElement {
     get empty() {
       return helpText('Events', 'Events_Badges_Empty');
     },
+    get emptyHeading() {
+      return helpText('Events', 'Events_Badges_EmptyHeading');
+    },
     get truncated() {
       return helpText('Events', 'Events_Badges_Truncated');
     },

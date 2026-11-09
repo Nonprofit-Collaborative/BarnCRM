@@ -53,6 +53,9 @@ export default class EventCheckIn extends LightningElement {
     get empty() {
       return helpText('Events', 'Events_CheckIn_Empty');
     },
+    get emptyHeading() {
+      return helpText('Events', 'Events_CheckIn_EmptyHeading');
+    },
     get noMatch() {
       return helpText('Events', 'Events_CheckIn_NoMatch');
     },

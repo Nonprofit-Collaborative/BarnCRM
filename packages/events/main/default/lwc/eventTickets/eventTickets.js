@@ -88,6 +88,12 @@ export default class EventTickets extends LightningElement {
     },
     get noCodes() {
       return helpText('Events', 'Events_Tickets_NoCodes');
+    },
+    get noTicketsHeading() {
+      return helpText('Events', 'Events_Tickets_NoTicketsHeading');
+    },
+    get noCodesHeading() {
+      return helpText('Events', 'Events_Tickets_NoCodesHeading');
     }
   };
 

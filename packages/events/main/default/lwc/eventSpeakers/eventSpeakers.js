@@ -64,6 +64,9 @@ export default class EventSpeakers extends LightningElement {
     },
     get empty() {
       return helpText('Events', 'Events_Speakers_Empty');
+    },
+    get emptyHeading() {
+      return helpText('Events', 'Events_Speakers_EmptyHeading');
     }
   };
 

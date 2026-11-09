@@ -10,6 +10,7 @@ import STATUS_ON from '@salesforce/label/c.Core_Feature_On';
 import STATUS_OFF from '@salesforce/label/c.Core_Feature_Off';
 import OPEN_APP from '@salesforce/label/c.Core_ModuleManager_OpenApp';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { iconFor } from 'c/barnIcons';
 
 const MODULES_SECTION = 'Modules';
 const NOT_INSTALLED = 'NotInstalled';
@@ -28,6 +29,18 @@ const LOGOS = {
 
 function logoUrl(name) {
   return LOGOS[name] ? `/file-asset/${LOGOS[name]}` : undefined;
+}
+
+// A module with no logo shows its main tab's icon, so the icon here matches the tab (D-170):
+// Portal Builder its Portals tab, Contact Point Sync its page tab. Others keep the apps icon.
+const FALLBACK_TABS = {
+  Portal: 'Portal__c',
+  ContactPoints: 'Contact_Point_Sync'
+};
+const DEFAULT_ICON = 'standard:apps';
+
+function fallbackIcon(name) {
+  return FALLBACK_TABS[name] ? iconFor(FALLBACK_TABS[name], DEFAULT_ICON) : DEFAULT_ICON;
 }
 
 /**
@@ -59,6 +72,7 @@ export default class HubModules extends NavigationMixin(LightningElement) {
           displayName: module.label || module.name,
           appUrl: module.appUrl,
           logoUrl: logoUrl(module.name),
+          fallbackIcon: fallbackIcon(module.name),
           statusText: module.status === 'Off' ? STATUS_OFF : STATUS_ON,
           status: module.status === 'Off' ? 'off' : 'on'
         }));
