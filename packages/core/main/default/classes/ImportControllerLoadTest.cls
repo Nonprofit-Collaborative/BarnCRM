@@ -130,7 +130,7 @@ private class ImportControllerLoadTest {
 				ImportTemplateService.LoadChoices choices = new ImportTemplateService.LoadChoices();
 				choices.operation = ImportObjectSchema.OPERATION_UPDATE;
 				choices.related = 'Affiliation__c.Organization__c';
-				ImportTemplateService.saveLoad(orgs.Id, choices);
+				ImportTestDataFactory.saveLoad(orgs.Id, choices);
 
 				Test.startTest();
 				List<ImportMapping.Target> options = ImportController.getRelatedOptions(orgs.Id);
@@ -204,7 +204,7 @@ private class ImportControllerLoadTest {
 				);
 				employer.lookupField = 'Name';
 				saved.columns.add(employer);
-				ImportTemplateService.saveMapping(template.Id, saved.serialize(), null);
+				ImportTestDataFactory.saveMapping(template.Id, saved.serialize(), null);
 
 				Test.startTest();
 				ImportMapping suggested = ImportMapping.parse(
@@ -259,7 +259,7 @@ private class ImportControllerLoadTest {
 				String unusable;
 				try {
 					load.matchField = 'Reason__c';
-					ImportTemplateService.saveLoad(template.Id, load);
+					ImportTestDataFactory.saveLoad(template.Id, load);
 				} catch (ImportException e) {
 					unusable = e.getMessage();
 				}

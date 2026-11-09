@@ -38,6 +38,67 @@ public class ImportTestDataFactory {
 		return template;
 	}
 
+	/**
+	 * Saves one part of a template the way the wizard does, through `saveUpload`, sending the
+	 * template's stored mapping and rule with it. Tests that check one part use these.
+	 */
+	public static Import_Template__c saveMapping(Id templateId, String mapping, String rule) {
+		ImportTemplateService.UploadChoices choices = new ImportTemplateService.UploadChoices();
+		choices.mappingDocument = mapping;
+		choices.matchingRule = rule;
+		return ImportTemplateService.saveUpload(templateId, choices);
+	}
+
+	/** As `saveMapping`, saving the load choices. */
+	public static Import_Template__c saveLoad(
+		Id templateId,
+		ImportTemplateService.LoadChoices load
+	) {
+		ImportTemplateService.UploadChoices choices = stored(templateId);
+		choices.load = load;
+		return ImportTemplateService.saveUpload(templateId, choices);
+	}
+
+	/** As `saveMapping`, saving the matching choices; their person rule is the template's. */
+	public static Import_Template__c saveMatching(
+		Id templateId,
+		ImportTemplateService.MatchingChoices matching
+	) {
+		ImportTemplateService.UploadChoices choices = stored(templateId);
+		choices.matchingRule = matching == null ? null : matching.personRule;
+		choices.matching = matching == null
+			? new ImportTemplateService.MatchingChoices()
+			: matching;
+		return ImportTemplateService.saveUpload(templateId, choices);
+	}
+
+	/** As `saveMapping`, saving how gifts match scheduled payments. */
+	public static Import_Template__c savePaymentMatching(
+		Id templateId,
+		String behaviour,
+		Integer windowDays,
+		Decimal tolerance
+	) {
+		ImportTemplateService.UploadChoices choices = stored(templateId);
+		choices.savePaymentMatching = true;
+		choices.paymentMatching = behaviour;
+		choices.matchDateWindowDays = windowDays;
+		choices.matchAmountTolerance = tolerance;
+		return ImportTemplateService.saveUpload(templateId, choices);
+	}
+
+	private static ImportTemplateService.UploadChoices stored(Id templateId) {
+		Import_Template__c template = [
+			SELECT Column_Mapping_JSON__c, Matching_Rule__c
+			FROM Import_Template__c
+			WHERE Id = :templateId
+		];
+		ImportTemplateService.UploadChoices choices = new ImportTemplateService.UploadChoices();
+		choices.mappingDocument = template.Column_Mapping_JSON__c;
+		choices.matchingRule = template.Matching_Rule__c;
+		return choices;
+	}
+
 	/** A batch against the given template, ready to have rows staged on it. */
 	@NamespaceAccessible
 	public static Import_Batch__c batch(Import_Template__c template) {

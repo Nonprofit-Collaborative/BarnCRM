@@ -48,6 +48,8 @@ private class FormPublicProcessorTest {
 				ticket,
 				new Map<String, Object>{ 'first' => 'Lee', 'last' => 'Zzqueue' },
 				null,
+				null,
+				null,
 				null
 			);
 			Assert.areEqual(1, FormPublicProcessor.waiting(10).size(), 'One waits');
@@ -75,6 +77,8 @@ private class FormPublicProcessorTest {
 			FormIntakeService.submit(
 				ticket,
 				new Map<String, Object>{ 'first' => 'Lee', 'last' => 'Zzfail' },
+				null,
+				null,
 				null,
 				null
 			);

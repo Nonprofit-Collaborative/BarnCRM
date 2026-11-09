@@ -26,7 +26,7 @@ import started from '@salesforce/label/c.Mirror_OpportunityMirror_Started';
 import reconciliationTitle from '@salesforce/label/c.Mirror_OpportunityMirror_ReconciliationTitle';
 import fromDate from '@salesforce/label/c.Mirror_OpportunityMirror_FromDate';
 import toDate from '@salesforce/label/c.Mirror_OpportunityMirror_ToDate';
-import compareLabel from '@salesforce/label/c.Core_RollupBuilder_DlrsImportCompare';
+import compareLabel from '@salesforce/label/c.Mirror_Sync_Compare';
 import copyAgain from '@salesforce/label/c.Mirror_OpportunityMirror_CopyAgain';
 import noDifferences from '@salesforce/label/c.Core_AccessCompare_NoDifferences';
 import differenceCount from '@salesforce/label/c.Mirror_OpportunityMirror_DifferenceCount';

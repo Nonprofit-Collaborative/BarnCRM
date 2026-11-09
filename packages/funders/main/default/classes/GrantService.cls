@@ -53,10 +53,6 @@ public with sharing class GrantService {
 	public class GrantException extends Exception {
 	}
 
-	public static Boolean isOpen(String stage) {
-		return OPEN_STAGES.contains(stage);
-	}
-
 	/**
 	 * R-GN3: an empty Submitted Date becomes today when a grant reaches Applied, and an empty
 	 * Decision Date when it reaches Awarded, Declined or Withdrawn. A date already there is kept.

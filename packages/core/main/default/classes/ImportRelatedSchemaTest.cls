@@ -120,13 +120,13 @@ private class ImportRelatedSchemaTest {
 				choices.operation = ImportObjectSchema.OPERATION_UPDATE_BY_FIELD;
 				choices.matchField = 'name';
 				choices.related = 'affiliation__c.organization__c';
-				template = ImportTemplateService.saveLoad(template.Id, choices);
+				template = ImportTestDataFactory.saveLoad(template.Id, choices);
 				Assert.areEqual('Affiliation__c', template.Related_Object__c, 'Describe names it.');
 				Assert.areEqual('Organization__c', template.Related_Parent_Field__c, 'Likewise.');
 
 				choices.related = 'Affiliation__c.Contact__c';
 				try {
-					ImportTemplateService.saveLoad(template.Id, choices);
+					ImportTestDataFactory.saveLoad(template.Id, choices);
 					Assert.fail('A field pointing at people does not link to organizations.');
 				} catch (ImportException e) {
 					Assert.isTrue(
@@ -140,7 +140,7 @@ private class ImportRelatedSchemaTest {
 				}
 
 				choices.related = '';
-				template = ImportTemplateService.saveLoad(template.Id, choices);
+				template = ImportTestDataFactory.saveLoad(template.Id, choices);
 				Assert.isNull(template.Related_Object__c, 'Cleared when none is chosen.');
 
 				template.Related_Object__c = 'Affiliation__c';

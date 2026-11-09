@@ -16,6 +16,15 @@ private class FormSubmitServiceTest {
 		return TestUsers.adminWith(FormsTestData.ADMIN);
 	}
 
+	/** Answers submitted with no files. */
+	private static FormSubmitService.Result submit(
+		Id formId,
+		Map<String, Object> answers,
+		Id contextRecordId
+	) {
+		return FormSubmitService.submit(formId, answers, contextRecordId, null);
+	}
+
 	private static Map<String, Object> pat() {
 		return new Map<String, Object>{
 			'first' => 'Pat',
@@ -47,7 +56,7 @@ private class FormSubmitServiceTest {
 			FormsTestModule.register();
 
 			Test.startTest();
-			FormSubmitService.Result result = FormSubmitService.submit(form.Id, pat(), gala.Id);
+			FormSubmitService.Result result = submit(form.Id, pat(), gala.Id);
 			Test.stopTest();
 
 			Assert.areEqual(
@@ -112,7 +121,7 @@ private class FormSubmitServiceTest {
 			answers.put('guardian', 'Jo Zzform');
 
 			Test.startTest();
-			FormSubmitService.Result kept = FormSubmitService.submit(
+			FormSubmitService.Result kept = submit(
 				FormsTestData.volunteerInterest().Id,
 				answers,
 				null
@@ -123,7 +132,7 @@ private class FormSubmitServiceTest {
 					'matching',
 					new Map<String, Object>{ 'rule' => 'email', 'onMatch' => 'overwrite' }
 				);
-			FormSubmitService.Result overwritten = FormSubmitService.submit(
+			FormSubmitService.Result overwritten = submit(
 				FormsTestData.published('Overwrite', overwriting).Id,
 				answers,
 				null
@@ -172,8 +181,8 @@ private class FormSubmitServiceTest {
 			sam.put('first', 'Sam');
 
 			Test.startTest();
-			FormSubmitService.Result held = FormSubmitService.submit(form.Id, answers, null);
-			FormSubmitService.Result samResult = FormSubmitService.submit(form.Id, sam, null);
+			FormSubmitService.Result held = submit(form.Id, answers, null);
+			FormSubmitService.Result samResult = submit(form.Id, sam, null);
 			update as user new Form_Submission__c(Id = held.submissionId, Person__c = couple[1].Id);
 			FormSubmitService.Result again = FormSubmitService.reprocess(held.submissionId);
 			Test.stopTest();
@@ -209,7 +218,7 @@ private class FormSubmitServiceTest {
 			answers.remove('last');
 			answers.put('email', 'not an email');
 
-			FormSubmitService.Result result = FormSubmitService.submit(form.Id, answers, null);
+			FormSubmitService.Result result = submit(form.Id, answers, null);
 
 			Assert.areEqual(FormSubmitService.INVALID, result.status);
 			Assert.areEqual(
@@ -237,7 +246,7 @@ private class FormSubmitServiceTest {
 			answers.remove('employer');
 
 			Test.startTest();
-			FormSubmitService.Result result = FormSubmitService.submit(form.Id, answers, null);
+			FormSubmitService.Result result = submit(form.Id, answers, null);
 			Test.stopTest();
 
 			Assert.areEqual(FormSubmitService.FAILED, result.status);
@@ -264,7 +273,7 @@ private class FormSubmitServiceTest {
 			answers.remove('employer');
 
 			Test.startTest();
-			FormSubmitService.Result result = FormSubmitService.submit(
+			FormSubmitService.Result result = submit(
 				FormsTestData.volunteerInterest().Id,
 				answers,
 				gala.Id
@@ -287,7 +296,7 @@ private class FormSubmitServiceTest {
 			Form__c draft = new Form__c(Name = 'Draft', Status__c = 'Draft');
 			insert as user draft;
 			try {
-				FormSubmitService.submit(draft.Id, pat(), null);
+				submit(draft.Id, pat(), null);
 				Assert.fail('A draft is refused');
 			} catch (FormSubmitService.FormException expected) {
 				Assert.isTrue(String.isNotBlank(expected.getMessage()), 'Said in plain words');

@@ -223,7 +223,7 @@ private class ImportSeveralObjectsSchemaTest {
 				);
 				Import_Template__c saved = template(mapping());
 				try {
-					ImportTemplateService.saveMapping(saved.Id, elsewhere.serialize(), null);
+					ImportTestDataFactory.saveMapping(saved.Id, elsewhere.serialize(), null);
 					Assert.fail('A column for an object not listed is refused on save.');
 				} catch (ImportException expected) {
 					Assert.areEqual(

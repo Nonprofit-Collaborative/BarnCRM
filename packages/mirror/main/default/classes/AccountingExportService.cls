@@ -78,14 +78,10 @@ public with sharing class AccountingExportService {
 	}
 
 	/**
-	 * The export for a range, narrowed to one fund and one payment method when they are given.
-	 * An empty range gives an ExportFile with no rows and no file.
+	 * The export for a range, narrowed to one fund and one payment method when they are given,
+	 * leaving out gifts already posted to accounting when `onlyUnposted` is set. An empty range
+	 * gives an ExportFile with no rows and no file.
 	 */
-	public static ExportFile build(Date fromDate, Date toDate, Id fundId, String paymentMethod) {
-		return build(fromDate, toDate, fundId, paymentMethod, false);
-	}
-
-	/** The export, leaving out gifts already posted to accounting when `onlyUnposted` is set. */
 	public static ExportFile build(
 		Date fromDate,
 		Date toDate,

@@ -47,7 +47,8 @@ import sys
 # titles (a flexipage tab title cannot read the help catalog).
 # Batch C review: lowered to 3,255 after merging six labels that held the same name for the same
 # thing (Super Importer, Opportunity Mirror, Gift Transaction Mirror, Seasonal Address Swap, "or").
-BUDGET = 3255
+# Raised by 1 for Mirror_Sync_Compare: Mirror's two pages read a Rollups label before.
+BUDGET = 3256
 TARGET = 3000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 

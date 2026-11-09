@@ -237,7 +237,7 @@ private class ImportMatchingRulesTest {
 			Boolean refused = false;
 			Test.startTest();
 			try {
-				ImportTemplateService.saveMatching(template.Id, choices);
+				ImportTestDataFactory.saveMatching(template.Id, choices);
 			} catch (ImportException e) {
 				refused = e.getMessage().contains('Email');
 			}
@@ -257,7 +257,7 @@ private class ImportMatchingRulesTest {
 			choices.severalMatches = 'use the most recently changed';
 
 			Test.startTest();
-			ImportTemplateService.saveMatching(template.Id, choices);
+			ImportTestDataFactory.saveMatching(template.Id, choices);
 			Test.stopTest();
 
 			Import_Template__c saved = ImportTemplateSelector.selectById(template.Id);
