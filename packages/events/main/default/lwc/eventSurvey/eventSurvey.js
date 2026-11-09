@@ -8,7 +8,7 @@ import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 
 /**
  * The Survey section of the event page's Details tab (EV-18): choose the form attendees are sent

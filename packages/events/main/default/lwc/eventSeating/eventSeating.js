@@ -19,7 +19,7 @@ import {
 
 import SEATING from '@salesforce/label/c.Events_EventTab_Seating';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 const NO_TABLE = '';
 
 /**

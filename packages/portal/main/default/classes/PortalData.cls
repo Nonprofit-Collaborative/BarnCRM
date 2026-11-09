@@ -27,15 +27,10 @@ public without sharing class PortalData {
 				}
 			);
 		}
-		Contact person = [
-			SELECT FirstName
-			FROM Contact
-			WHERE Id = :session.personId()
-			WITH SYSTEM_MODE
-		];
+		// The first name came with the session (`PortalAuth.resolve`): no query of its own.
 		return new Map<String, Object>{
 			'title' => String.isBlank(template.title) ? session.portal.Name : template.title,
-			'firstName' => person.FirstName,
+			'firstName' => session.access.Person__r.FirstName,
 			'secondFactor' => new Map<String, Object>{
 				'policy' => session.portal.Second_Factor__c,
 				'enrolled' => session.access.Second_Factor_Enrolled__c == true

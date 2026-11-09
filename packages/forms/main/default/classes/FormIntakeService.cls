@@ -150,7 +150,7 @@ public without sharing class FormIntakeService {
 	}
 
 	private static PublicForm viewOf(Form_Version__c version) {
-		Map<String, Object> definition = FormRules.parse(version.Definition__c);
+		Map<String, Object> definition = definitionOf(version);
 		PublicForm view = new PublicForm();
 		view.formId = version.Form__c;
 		view.name = version.Form__r.Name;
@@ -210,7 +210,7 @@ public without sharing class FormIntakeService {
 			receipt.status = CLOSED;
 			return receipt;
 		}
-		Map<String, Object> definition = FormRules.parse(version.Definition__c);
+		Map<String, Object> definition = definitionOf(version);
 		Map<String, Object> given = answers == null ? new Map<String, Object>() : answers;
 		receipt.problems = FormRules.checkAll(definition, given);
 		Map<String, Object> counted = FormRules.countedAnswers(definition, given);
@@ -262,7 +262,7 @@ public without sharing class FormIntakeService {
 		if (version == null) {
 			return receipt;
 		}
-		Map<String, Object> definition = FormRules.parse(version.Definition__c);
+		Map<String, Object> definition = definitionOf(version);
 		String base = resumeBase();
 		if (!FormPublicPolicy.canSave(definition) || base == null) {
 			receipt.status = CLOSED;
@@ -369,7 +369,7 @@ public without sharing class FormIntakeService {
 			receipt.status = EXPIRED;
 			return null;
 		}
-		Map<String, Object> definition = FormRules.parse(version.Definition__c);
+		Map<String, Object> definition = definitionOf(version);
 		if (!FormPublicPolicy.isPublic(definition)) {
 			receipt.status = CLOSED;
 		} else if (age < FormPublicPolicy.minSeconds(definition) * 1000L) {
@@ -478,9 +478,27 @@ public without sharing class FormIntakeService {
 		if (versions.isEmpty() || String.isBlank(versions[0].Signing_Key__c)) {
 			return null;
 		}
-		return FormPublicPolicy.isPublic(FormRules.parse(versions[0].Definition__c))
-			? versions[0]
-			: null;
+		return FormPublicPolicy.isPublic(definitionOf(versions[0])) ? versions[0] : null;
+	}
+
+	/** Each definition read once a request, as it was parsed by the checks before. */
+	private static final Map<String, Map<String, Object>> DEFINITIONS = new Map<String, Map<String, Object>>();
+
+	/**
+	 * The version's definition, parsed once: loading, sending and saving a form each read it
+	 * twice (the checks, then the work), and a large form's JSON is the costliest part. Keyed by
+	 * the JSON itself, so a changed definition is parsed afresh. Callers only read the map.
+	 */
+	private static Map<String, Object> definitionOf(Form_Version__c version) {
+		String source = version.Definition__c;
+		Map<String, Object> parsed = source == null ? null : DEFINITIONS.get(source);
+		if (parsed == null) {
+			parsed = FormRules.parse(source);
+			if (source != null) {
+				DEFINITIONS.put(source, parsed);
+			}
+		}
+		return parsed;
 	}
 
 	private static Form_Version__c versionOf(String versionId) {

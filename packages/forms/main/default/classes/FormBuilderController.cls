@@ -71,7 +71,7 @@ public with sharing class FormBuilderController {
 	public static List<Choice> getObjects() {
 		try {
 			List<Choice> choices = new List<Choice>();
-			for (Schema.SObjectType type : Schema.getGlobalDescribe().values()) {
+			for (Schema.SObjectType type : NamespaceUtil.globalDescribe().values()) {
 				Schema.DescribeSObjectResult described = type.getDescribe(
 					SObjectDescribeOptions.DEFERRED
 				);

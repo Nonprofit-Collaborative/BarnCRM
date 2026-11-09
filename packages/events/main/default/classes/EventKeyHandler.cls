@@ -84,12 +84,21 @@ public with sharing class EventKeyHandler extends TriggerHandler {
 	}
 
 	public override void beforeUpdate() {
-		setKeys(newRecords());
+		setKeys(newRecords(), oldRecordsById());
 	}
 
-	/** Sets each record's key and refuses a record whose key another record already has. */
 	@TestVisible
 	private static void setKeys(List<SObject> records) {
+		setKeys(records, null);
+	}
+
+	/**
+	 * Sets each record's key and refuses a record whose key another record already has. Saved
+	 * records are read only for keys a save changes: a key kept as it was is already unique (the
+	 * unique key field holds it), so an edit to anything else costs no query.
+	 */
+	@TestVisible
+	private static void setKeys(List<SObject> records, Map<Id, SObject> oldById) {
 		if (records == null || records.isEmpty()) {
 			return;
 		}
@@ -99,6 +108,7 @@ public with sharing class EventKeyHandler extends TriggerHandler {
 			return;
 		}
 		Map<String, SObject> byKey = new Map<String, SObject>();
+		Set<String> keys = new Set<String>();
 		for (SObject record : records) {
 			String key = keyOf(record, rule);
 			record.put(rule.keyField, key);
@@ -110,11 +120,14 @@ public with sharing class EventKeyHandler extends TriggerHandler {
 			} else {
 				byKey.put(key, record);
 			}
+			SObject old = oldById == null ? null : oldById.get(record.Id);
+			if (old == null || old.get(rule.keyField) != key) {
+				keys.add(key);
+			}
 		}
-		if (byKey.isEmpty()) {
+		if (keys.isEmpty()) {
 			return;
 		}
-		Set<String> keys = byKey.keySet();
 		// Access mode: AccessLevel.USER_MODE below; a record the person cannot see is still
 		// caught by the unique key field.
 		List<SObject> saved = Database.queryWithBinds(

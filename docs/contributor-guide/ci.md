@@ -299,6 +299,11 @@ Salesforce org is needed for this job. Steps:
    `oldRecords()`, `newRecordsById()` and `oldRecordsById()`, because the dispatcher narrows
    them and reruns a handler on the rest after a failure (ADR-0165 rule 3); only
    `TriggerHandler` reads the platform's own.
+   `scripts/ci/check-global-describe.py` fails the build if packaged Apex other than
+   `NamespaceUtil` calls `Schema.getGlobalDescribe()`. The describe costs about 12 ms of CPU in
+   a large org and cannot change within a transaction, so every class reads the one copy
+   `NamespaceUtil.globalDescribe()` keeps per transaction and running user (D-143). Test
+   classes are exempt.
 17. `python3 -m unittest discover -s scripts/migration/tests`, the migration kit's unit tests
    (C-31, [Migration kit](migration-kit.md)). They need no org, and one of them builds the
    mapping from the real package source, so a new object or field that breaks it fails here.

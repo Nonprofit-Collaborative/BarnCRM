@@ -41,6 +41,9 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 	}
 
 	public Map<String, Object> page(Id recordId) {
+		Datetime current = now();
+		// One query for the event with its tickets, sessions and speakers: a public page is the
+		// busiest read the module has, and each list used to cost a query of its own.
 		List<Event__c> events = [
 			SELECT
 				Id,
@@ -57,7 +60,43 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 				Registration_Closes__c,
 				Registration_Form_Key__c,
 				Public_Speakers__c,
-				Public_Seats__c
+				Public_Seats__c,
+				(
+					SELECT
+						Id,
+						Name,
+						Description__c,
+						Price__c,
+						Quantity__c,
+						Sales_Start__c,
+						Sales_End__c
+					FROM Ticket_Types__r
+					WHERE Active__c = TRUE AND (Sales_End__c = NULL OR Sales_End__c >= :current)
+					ORDER BY Sort_Order__c ASC NULLS LAST, Name
+					LIMIT :ITEM_LIMIT
+				),
+				(
+					SELECT
+						Id,
+						Name,
+						Description__c,
+						Start__c,
+						End__c,
+						Room__c,
+						Session_Type__c,
+						Track__r.Name
+					FROM Sessions__r
+					WHERE Status__c = :CONFIRMED
+					ORDER BY Start__c ASC NULLS LAST, Name
+					LIMIT :ITEM_LIMIT
+				),
+				(
+					SELECT Headline__c, Bio__c, Contact__r.FirstName, Contact__r.LastName
+					FROM Speakers__r
+					WHERE Status__c = :CONFIRMED
+					ORDER BY Contact__r.LastName, Contact__r.FirstName
+					LIMIT :ITEM_LIMIT
+				)
 			FROM Event__c
 			WHERE Id = :recordId AND Public_Page__c = TRUE AND Status__c IN :SHOWN_STATUSES
 			WITH SYSTEM_MODE
@@ -90,14 +129,14 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 			sections,
 			'agenda',
 			BarnHelp.text('Events', 'Events_Public_Agenda'),
-			sessions(event.Id, speakersBySession)
+			sessions(event, speakersBySession)
 		);
 		if (event.Public_Speakers__c) {
 			addSection(
 				sections,
 				'speakers',
 				BarnHelp.text('Events', 'Events_Public_Speakers'),
-				speakers(event.Id)
+				speakers(event)
 			);
 		}
 		view.put('sections', sections);
@@ -210,21 +249,13 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 		return new Map<String, Object>{ 'label' => label, 'value' => value };
 	}
 
-	/** Active tickets whose sales have not ended, with price and, if published, seats left. */
+	/**
+	 * Active tickets whose sales have not ended (read with the event), with price and, if
+	 * published, seats left.
+	 */
 	private static List<Object> tickets(Event__c event) {
 		Datetime current = now();
-		List<Ticket_Type__c> tickets = [
-			SELECT Id, Name, Description__c, Price__c, Quantity__c, Sales_Start__c, Sales_End__c
-			FROM Ticket_Type__c
-			WHERE
-				Event__c = :event.Id
-				AND Active__c = TRUE
-				AND (Sales_End__c = NULL
-				OR Sales_End__c >= :current)
-			WITH SYSTEM_MODE
-			ORDER BY Sort_Order__c ASC NULLS LAST, Name
-			LIMIT :ITEM_LIMIT
-		];
+		List<Ticket_Type__c> tickets = event.Ticket_Types__r;
 		Map<Id, Integer> left = event.Public_Seats__c
 			? EventRegistrationService.seatsLeft(event, tickets)
 			: new Map<Id, Integer>();
@@ -266,24 +297,10 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 		return items;
 	}
 
-	private static List<Object> sessions(Id eventId, Map<Id, List<String>> speakersBySession) {
+	/** Confirmed sessions, read with the event. */
+	private static List<Object> sessions(Event__c event, Map<Id, List<String>> speakersBySession) {
 		List<Object> items = new List<Object>();
-		for (Event_Session__c session : [
-			SELECT
-				Id,
-				Name,
-				Description__c,
-				Start__c,
-				End__c,
-				Room__c,
-				Session_Type__c,
-				Track__r.Name
-			FROM Event_Session__c
-			WHERE Event__c = :eventId AND Status__c = :CONFIRMED
-			WITH SYSTEM_MODE
-			ORDER BY Start__c ASC NULLS LAST, Name
-			LIMIT :ITEM_LIMIT
-		]) {
+		for (Event_Session__c session : event.Sessions__r) {
 			List<String> parts = new List<String>();
 			for (
 				String part : new List<String>{
@@ -350,16 +367,10 @@ public without sharing class EventPublicPage implements PublicPageExtension {
 		return names;
 	}
 
-	private static List<Object> speakers(Id eventId) {
+	/** Confirmed speakers, read with the event. */
+	private static List<Object> speakers(Event__c event) {
 		List<Object> items = new List<Object>();
-		for (Event_Speaker__c speaker : [
-			SELECT Headline__c, Bio__c, Contact__r.FirstName, Contact__r.LastName
-			FROM Event_Speaker__c
-			WHERE Event__c = :eventId AND Status__c = :CONFIRMED
-			WITH SYSTEM_MODE
-			ORDER BY Contact__r.LastName, Contact__r.FirstName
-			LIMIT :ITEM_LIMIT
-		]) {
+		for (Event_Speaker__c speaker : event.Speakers__r) {
 			items.add(
 				new Map<String, Object>{
 					'title' => nameOf(speaker.Contact__r.FirstName, speaker.Contact__r.LastName),

@@ -13,7 +13,7 @@ import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 
 /**
  * The Volunteers section of the event page's Details tab (EV-08): the event's volunteer jobs and

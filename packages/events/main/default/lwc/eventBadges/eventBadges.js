@@ -17,7 +17,7 @@ import {
 
 import BADGES from '@salesforce/label/c.Events_EventTab_Badges';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 const QR_CELL_SIZE = 4;
 const WHOLE_EVENT = '';
 const ALL_TICKETS = '';

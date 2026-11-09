@@ -164,8 +164,34 @@ public without sharing class PortalAuth {
 		if (String.isBlank(token)) {
 			throw new RefusalException('not_signed_in');
 		}
+		// Every signed-in request starts here, so the session, its access and its portal (both
+		// master-detail parents) are read in one query rather than three.
 		List<Portal_Session__c> found = [
-			SELECT Id, Stage__c, Expires__c, Last_Used__c, Portal_Access__c
+			SELECT
+				Id,
+				Stage__c,
+				Expires__c,
+				Last_Used__c,
+				Portal_Access__c,
+				Portal_Access__r.Id,
+				Portal_Access__r.Portal__c,
+				Portal_Access__r.Person__c,
+				Portal_Access__r.Person__r.Email,
+				Portal_Access__r.Person__r.FirstName,
+				Portal_Access__r.Status__c,
+				Portal_Access__r.Failed_Attempts__c,
+				Portal_Access__r.Locked_Until__c,
+				Portal_Access__r.Second_Factor_Enrolled__c,
+				Portal_Access__r.Second_Factor_Secret__c,
+				Portal_Access__r.Portal__r.Id,
+				Portal_Access__r.Portal__r.Name,
+				Portal_Access__r.Portal__r.Key__c,
+				Portal_Access__r.Portal__r.Status__c,
+				Portal_Access__r.Portal__r.Access_Mode__c,
+				Portal_Access__r.Portal__r.Second_Factor__c,
+				Portal_Access__r.Portal__r.Session_Hours__c,
+				Portal_Access__r.Portal__r.Sender_Address__c,
+				Portal_Access__r.Portal__r.Template__c
 			FROM Portal_Session__c
 			WHERE Token_Hash__c = :PortalTokens.hash(token)
 			WITH SYSTEM_MODE
@@ -175,8 +201,11 @@ public without sharing class PortalAuth {
 			throw new RefusalException('not_signed_in');
 		}
 		Portal_Session__c record = found[0];
-		Portal_Access__c access = accessOf(record);
-		Portal__c portal = portalOf(access);
+		Portal_Access__c access = record.Portal_Access__r;
+		Portal__c portal = access.Portal__r;
+		if (portal.Status__c != STATUS_ACTIVE) {
+			throw new RefusalException('portal_unavailable');
+		}
 		Integer idle = setting(settings().Idle_Minutes__c, 30, 5, 480);
 		Datetime current = now();
 		Boolean usable =

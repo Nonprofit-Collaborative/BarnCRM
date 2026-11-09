@@ -23,7 +23,7 @@ import OPEN from '@salesforce/label/c.Core_Shared_Open';
 import ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
 import ACTIONS_FOR from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 const ACTION_OPEN = 'open';
 const ACTION_REPEAT = 'repeat';
 const VIEW_UPCOMING = 'upcoming';

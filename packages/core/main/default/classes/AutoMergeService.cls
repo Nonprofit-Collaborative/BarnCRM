@@ -733,7 +733,7 @@ public with sharing class AutoMergeService {
 		}
 		Map<String, Schema.SObjectType> types = ownerByLink.isEmpty()
 			? new Map<String, Schema.SObjectType>()
-			: Schema.getGlobalDescribe();
+			: NamespaceUtil.globalDescribe();
 		for (String key : ownerByLink.keySet()) {
 			Map<Id, Merge_Journal__c> owners = ownerByLink.get(key);
 			String objectName = key.substringBefore('.');

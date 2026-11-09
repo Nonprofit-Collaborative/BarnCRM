@@ -104,16 +104,13 @@ public without sharing class ContactPointSyncService {
 	/**
 	 * The org's objects, described once a transaction. A global describe costs milliseconds and
 	 * was asked for every copy made and at every check of what is active, which made a 200-person
-	 * save spend most of its sync time describing (ADR-0176 decision 16).
+	 * save spend most of its sync time describing (ADR-0176 decision 16). Core's copy is read: a
+	 * person's save has usually described already, and one describe serves every class.
 	 */
-	private static Map<String, Schema.SObjectType> globalTypes;
 	private static Boolean individualLinkExists;
 
 	private static Schema.SObjectType describedType(String objectName) {
-		if (globalTypes == null) {
-			globalTypes = Schema.getGlobalDescribe();
-		}
-		return globalTypes.get(objectName);
+		return NamespaceUtil.globalDescribe().get(objectName);
 	}
 
 	/** Whether the admin left this kind on (Sync Emails, Sync Phones, Sync Addresses). */

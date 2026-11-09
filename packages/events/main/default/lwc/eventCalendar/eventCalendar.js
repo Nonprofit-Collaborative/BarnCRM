@@ -26,7 +26,7 @@ import { format, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 const VIEW_MONTH = 'month';
 const VIEW_WEEK = 'week';
 const VIEW_LIST = 'list';

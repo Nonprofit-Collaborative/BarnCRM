@@ -86,8 +86,6 @@ public with sharing class SummitEventsAdapter {
 	@TestVisible
 	private static Map<String, Id> writtenBack = new Map<String, Id>();
 
-	private static Map<String, Schema.SObjectType> typesByName;
-
 	private static String summitName(String name, String suffix) {
 		return (SUMMIT + SEPARATOR + name + SEPARATOR + suffix).toLowerCase();
 	}
@@ -427,7 +425,8 @@ public with sharing class SummitEventsAdapter {
 		if (writtenBack.isEmpty() || !fieldsOf(REGISTRATION_OBJECT).contains(R_CONTACT)) {
 			return;
 		}
-		Schema.SObjectType registrationType = typesByName.get(REGISTRATION_OBJECT);
+		Schema.SObjectType registrationType = NamespaceUtil.globalDescribe()
+			.get(REGISTRATION_OBJECT);
 		List<SObject> updates = new List<SObject>();
 		for (String registrationId : writtenBack.keySet()) {
 			SObject record = registrationType.newSObject(Id.valueOf(registrationId));
@@ -440,10 +439,8 @@ public with sharing class SummitEventsAdapter {
 
 	/** The lower-case field names of an object, or none when it is not in this org. */
 	private static Set<String> fieldsOf(String objectName) {
-		if (typesByName == null) {
-			typesByName = Schema.getGlobalDescribe();
-		}
-		Schema.SObjectType objectType = typesByName.get(objectName);
+		// Core's describe: read once a transaction and shared with every other class.
+		Schema.SObjectType objectType = NamespaceUtil.globalDescribe().get(objectName);
 		if (objectType == null) {
 			return new Set<String>();
 		}

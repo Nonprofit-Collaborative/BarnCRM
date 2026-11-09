@@ -17,7 +17,7 @@ import {
 
 import CHECK_IN from '@salesforce/label/c.Events_EventTab_CheckIn';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 const SCAN_INTERVAL_MS = 400;
 const QR_CELL_SIZE = 6;
 
