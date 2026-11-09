@@ -546,7 +546,9 @@ private class ErrorDigestServiceTest {
 			AdminDigestSummary.Summary summary;
 			System.runAs(admin) {
 				limitAt(10, 100);
-				summary = AdminDigestSummary.build(now.addDays(-7), now);
+				// The window ends after the inserts: CreatedDate is whole seconds, so a row kept
+				// in the second after `now` was taken would fall outside a window ending at `now`.
+				summary = AdminDigestSummary.build(now.addDays(-7), System.now());
 			}
 			Assert.areEqual(
 				2,
