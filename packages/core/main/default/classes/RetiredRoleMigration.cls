@@ -26,39 +26,34 @@ public with sharing class RetiredRoleMigration {
 	 */
 	public static void carryOver(Integer budget) {
 		try {
-			Map<String, PermissionSetGroup> roles = packagedRoles();
+			List<Holder> tried = new List<Holder>();
 			List<PermissionSetAssignment> toInsert = new List<PermissionSetAssignment>();
-			Map<Id, String> names = new Map<Id, String>();
-			Map<Id, String> labels = new Map<Id, String>();
-			for (Holder holder : holdersWithoutSuccessor(roles)) {
-				if (!holder.active || !READY.equalsIgnoreCase(holder.successor.Status)) {
-					continue;
-				}
+			for (Holder holder : holdersWithoutSuccessor(packagedRoles())) {
 				if (toInsert.size() >= budget) {
 					break;
 				}
-				toInsert.add(
-					new PermissionSetAssignment(
-						AssigneeId = holder.userId,
-						PermissionSetGroupId = holder.successor.Id
-					)
+				if (holder.active && READY.equalsIgnoreCase(holder.successor.Status)) {
+					tried.add(holder);
+					toInsert.add(
+						new PermissionSetAssignment(
+							AssigneeId = holder.userId,
+							PermissionSetGroupId = holder.successor.Id
+						)
+					);
+				}
+			}
+			if (!toInsert.isEmpty()) {
+				List<Database.SaveResult> results = Database.insert(
+					toInsert,
+					false,
+					AccessLevel.SYSTEM_MODE
 				);
-				names.put(holder.userId, holder.name);
-				labels.put(holder.userId, holder.retired.MasterLabel);
+				ErrorLogger.logMessages(
+					refusalMessages(tried, results),
+					CONTEXT,
+					ErrorLogger.SEVERITY_WARNING
+				);
 			}
-			if (toInsert.isEmpty()) {
-				return;
-			}
-			List<Database.SaveResult> results = Database.insert(
-				toInsert,
-				false,
-				AccessLevel.SYSTEM_MODE
-			);
-			ErrorLogger.logMessages(
-				refusalMessages(toInsert, results, names, labels, roles),
-				CONTEXT,
-				ErrorLogger.SEVERITY_WARNING
-			);
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT);
 		}
@@ -101,16 +96,9 @@ public with sharing class RetiredRoleMigration {
 	 */
 	@TestVisible
 	private static List<String> refusalMessages(
-		List<PermissionSetAssignment> rows,
-		List<Database.SaveResult> results,
-		Map<Id, String> names,
-		Map<Id, String> retiredLabels,
-		Map<String, PermissionSetGroup> roles
+		List<Holder> tried,
+		List<Database.SaveResult> results
 	) {
-		Map<Id, String> successorLabels = new Map<Id, String>();
-		for (PermissionSetGroup role : roles.values()) {
-			successorLabels.put(role.Id, role.MasterLabel);
-		}
 		List<String> messages = new List<String>();
 		for (Integer i = 0; i < results.size(); i++) {
 			Database.SaveResult result = results[i];
@@ -121,14 +109,14 @@ public with sharing class RetiredRoleMigration {
 			for (Database.Error error : result.getErrors()) {
 				said.add(error.getMessage());
 			}
-			Id userId = rows[i].AssigneeId;
+			Holder holder = tried[i];
 			messages.add(
 				String.format(
 					BarnHelp.text('Core', 'Core_Access_RetiredRoleRefused'),
 					new List<Object>{
-						names.get(userId),
-						retiredLabels.get(userId),
-						successorLabels.get(rows[i].PermissionSetGroupId),
+						holder.name,
+						holder.retired.MasterLabel,
+						holder.successor.MasterLabel,
 						String.join(said, ' ')
 					}
 				)
@@ -214,13 +202,16 @@ public with sharing class RetiredRoleMigration {
 	}
 
 	/** One person holding a retired role and not its successor. */
+	@TestVisible
 	private class Holder {
 		final Id userId;
+		@TestVisible
 		final String name;
 		final Boolean active;
 		final PermissionSetGroup retired;
 		final PermissionSetGroup successor;
 
+		@TestVisible
 		Holder(Id userId, User person, PermissionSetGroup retired, PermissionSetGroup successor) {
 			this.userId = userId;
 			this.name = person?.Name == null ? String.valueOf(userId) : person.Name;
