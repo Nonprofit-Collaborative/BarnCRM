@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>Salesforce Records Sync</label>
+  <description>
+    For whoever keeps BarnCRM in step with Salesforce's own records: opens the Campaign sync,
+    Opportunity mirror and Gift Transaction mirror pages and edits the IDs they keep (an appeal's
+    Campaign ID, a gift's Opportunity and Gift Transaction IDs, a fund's Gift Designation ID).
+    Creating Campaigns, Opportunities or Gift Transactions also needs that object's access in
+    Setup. Replaces Campaign Sync, Opportunity Mirror and Gift Transaction Mirror (ADR-NEXT).
+  </description>
+  <classAccesses>
+    <apexClass>CampaignSyncController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>GiftTransactionMirrorController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>OpportunityMirrorController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Use_Gift_Transaction_Mirror</name>
+  </customPermissions>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Use_Opportunity_Mirror</name>
+  </customPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Appeal__c.Campaign_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Fund__c.Gift_Designation_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Gift__c.Gift_Transaction_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Gift__c.Opportunity_Id__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <tabSettings>
+    <tab>Campaign_Sync</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Gift_Transaction_Mirror</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Opportunity_Mirror</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+</PermissionSet>
