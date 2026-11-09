@@ -18,11 +18,13 @@ private class ImportControllerLoadTest {
 	static void setUp() {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.defaultSettings();
+			// Built once for the class rather than in every test that runs as her.
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 		}
 	}
 
 	private static User admin() {
-		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+		return TestUsers.fromSetup('Maria');
 	}
 
 	@IsTest
@@ -130,7 +132,7 @@ private class ImportControllerLoadTest {
 				ImportTemplateService.LoadChoices choices = new ImportTemplateService.LoadChoices();
 				choices.operation = ImportObjectSchema.OPERATION_UPDATE;
 				choices.related = 'Affiliation__c.Organization__c';
-				ImportTemplateService.saveLoad(orgs.Id, choices);
+				ImportTestDataFactory.saveLoad(orgs.Id, choices);
 
 				Test.startTest();
 				List<ImportMapping.Target> options = ImportController.getRelatedOptions(orgs.Id);
@@ -204,7 +206,7 @@ private class ImportControllerLoadTest {
 				);
 				employer.lookupField = 'Name';
 				saved.columns.add(employer);
-				ImportTemplateService.saveMapping(template.Id, saved.serialize(), null);
+				ImportTestDataFactory.saveMapping(template.Id, saved.serialize(), null);
 
 				Test.startTest();
 				ImportMapping suggested = ImportMapping.parse(
@@ -259,7 +261,7 @@ private class ImportControllerLoadTest {
 				String unusable;
 				try {
 					load.matchField = 'Reason__c';
-					ImportTemplateService.saveLoad(template.Id, load);
+					ImportTestDataFactory.saveLoad(template.Id, load);
 				} catch (ImportException e) {
 					unusable = e.getMessage();
 				}

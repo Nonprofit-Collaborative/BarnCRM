@@ -1,6 +1,6 @@
 <template>
   <template lwc:if={helpReady}>
-    <main class="slds-container_large slds-container_center slds-var-p-around_medium">
+    <div class="slds-is-relative slds-container_large slds-container_center slds-var-p-around_medium">
       <template lwc:if={loading}>
         <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
       </template>
@@ -78,7 +78,7 @@
               <p class="slds-var-m-bottom_small" data-id="message">{view.message}</p>
             </template>
             <template lwc:if={view.formId}>
-              <c-form-public form-id={view.formId} record-id={recordId}></c-form-public>
+              <c-form-public form-id={view.formId} record-id={recordId} embedded></c-form-public>
             </template>
           </section>
         </article>
@@ -105,6 +105,6 @@
           </ul>
         </section>
       </template>
-    </main>
+    </div>
   </template>
 </template>

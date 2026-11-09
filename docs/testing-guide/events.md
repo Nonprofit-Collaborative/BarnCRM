@@ -9,6 +9,11 @@ Management deployed. Event Management works on the platform-only shape. Give the
 roles on the **Access** page: admin (Admin role), staff (Program Staff role) and read-only (Read
 Only role). Each gets its Events permission set from the role.
 
+Messages on every Events page: a refusal shows BarnCRM's own sentence, or the org's validation
+rule wording when a save breaks one (D-191). Only an unexpected failure shows the general text,
+such as `Nothing was saved. Try again. If it happens again, ask your BarnCRM admin to check the
+Error Log.`, and the Error Log then has the detail.
+
 ## T-EV-01: Create an Event and Find It
 
 **Purpose:** confirm an event saves with its rules and shows on the Events page.
@@ -317,7 +322,7 @@ attendee. A phone or laptop camera and Chrome or Edge for step 6.
 | 5 | Click the QR button beside Sam. | A QR code appears under the title `QR code for Sam Lee`. Browser network tools show no request to any outside host. **Close** hides it. |
 | 6 | Click **Scan with Camera** and show Sam's QR code from another screen. | Sam is checked in and the camera stops. In a browser with no scan support the button is absent and a note explains. |
 | 7 | Copy a QR code's ID of an attendee of the second event into **Ticket code**, click **Check In by Code**. | Refused: no attendee on this event matches that code. Nobody changes. |
-| 8 | Type Sam's code, click **Check In by Code**. | A message that Sam is already checked in. |
+| 8 | Type Sam's code and press Enter (no click). | A message that Sam is already checked in, as with **Check In by Code**. |
 | 9 | **Add Walk-In**: Last Name `Door`, **Add and Check In**. | A new row `Door`, **Attended**, though the event is at capacity. Registrations shows source **Staff**. |
 | 10 | As read-only, open **Check-In**. | The list and QR buttons show; no **Check In** buttons, **Add Walk-In** or code box. |
 
@@ -453,14 +458,17 @@ a Confirmed speaker and an Invited one, and the form's record ID in **Registrati
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In a private browser window, open `<site address>/FormsPublic?record=<event ID>`. | `This page isn't available right now.`: Public Page is off. |
-| 2 | Tick **Public Page** on the event; reload. | The event's name, dates, venue and description; **Tickets** lists General with `$25.00` and `Pay at the door or by arrangement with us.`, and Student with **Free**; **Agenda** lists Keynote only. No Old ticket, Secret Talk, speakers, seat counts or online link. The registration form shows under **Register**. |
+| 2 | Tick **Public Page** on the event; reload. | The event's name, dates, venue and description; **Tickets** lists General with `$25.00` and `Pay at the door or by arrangement with us.`, and Student with **Free**; **Agenda** lists Keynote only. No Old ticket, Secret Talk, speakers, seat counts or online link. The registration form shows under **Register**. The browser tab shows the event's name, not the form's (if the Site doesn't allow it, the tab shows `Form`: note it). |
 | 3 | Tick **Show Speakers** and **Show Seats Left**; reload. | **Speakers** lists the Confirmed speaker only (name, headline, bio); Keynote reads `With` and their name; each ticket shows `Seats left: 2`. |
 | 4 | In **BarnCRM Settings**, Events, change **Public page payment note** to `Pay by check at the door.`; reload. | General shows the new note. |
 | 5 | Fill in the form as `Robin Zzpage`, ticket `General`, and send. | The form's confirmation shows. Within 15 minutes (or after **Process Again** on the Received submission), **Registrations** shows Robin with source **Form**, ticket General, amount owed 25. |
 | 6 | Reload the page. | General shows `Seats left: 1`. |
-| 7 | Open `<site address>/FormsPublic?list=events`. | **Upcoming Events** lists the event, linked to its page. |
-| 8 | Set **Registration Closes** to yesterday; reload the event page. | `Registration for this event is closed.`; no form. Set the event to **Draft**: the page is unavailable and the list no longer shows it. |
-| 9 | As the integration user (see Forms, Integrations and Portals), GET `/services/apexrest/barncrm/forms/v1/pages/<event ID>` with the event Open again. | The same page as JSON, with `formId`; no online link, codes or attendee data. |
-| 10 | In an org with Event Management and no Forms, tick **Public Page** on an Open event and run **Health Check**. | Warning `Public event pages need BarnCRM Forms`. Events, tickets and registrations work as before. |
+| 7 | Open `<site address>/FormsPublic?list=events`. | **Upcoming Events** lists the event, linked to its page; the browser tab reads `Upcoming Events`. |
+| 7a | Set Student's **Sales End** to yesterday. Fill in the form as `Lee Zzpage`, ticket `Student`, send and process. | The submission is **Needs Review**, its message ending `The ticket type Student is not on sale now, so a form cannot register people for it.`; Lee is not registered. Clear Sales End. |
+| 8 | Open the event page in a second private window and leave it open. Set **Registration Closes** to yesterday; reload the first window. | `Registration for this event is closed.`; no form. |
+| 9 | In the second window, fill in the form as `Kim Zzpage` and send; process it. | The submission is **Needs Review**, its message ending `Registration for this event is closed.`; Kim is not registered. Set the event to **Draft**: the page is unavailable and the list no longer shows it. |
+| 10 | As the integration user (see Forms, Integrations and Portals), GET `/services/apexrest/barncrm/forms/v1/pages/<event ID>` with the event Open again. | The same page as JSON, with `formId`; no online link, codes or attendee data. |
+| 11 | In an org with Event Management and no Forms, tick **Public Page** on an Open event and run **Health Check**. | Warning **Public Event Pages Need BarnCRM Forms**. Events, tickets and registrations work as before. |
 
-**Cleanup:** delete Robin Zzpage's registration and contact; untick **Public Page**.
+**Cleanup:** delete Robin Zzpage's registration and contact and the Kim and Lee Zzpage contacts; untick
+**Public Page**.

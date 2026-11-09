@@ -169,9 +169,10 @@ public with sharing class FindController {
 			result.soql = compiled.display;
 			result.rows = QueryCompiler.run(compiled);
 			result.done = true;
-			if (QueryCompiler.parse(queryJson).radius != null) {
+			if (compiled.radiusField != null) {
+				// The query already compiled: the document is not read and checked again.
 				result.withoutGeocode = QueryCompiler.countWithoutGeocode(
-					queryJson,
+					compiled,
 					MAX_WITHOUT_GEOCODE
 				);
 			}

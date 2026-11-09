@@ -382,7 +382,7 @@ public with sharing class GiftTransactionMirrorSchema {
 		if (!described.containsKey(objectName)) {
 			Schema.SObjectType type = standInTypes != null
 				? standInTypes.get(objectName)
-				: Schema.getGlobalDescribe().get(objectName);
+				: NamespaceUtil.globalDescribe().get(objectName);
 			described.put(objectName, type == null ? null : new Described(type));
 		}
 		return described.get(objectName);

@@ -73,6 +73,7 @@
                 <div key={step.key} class="slds-var-m-bottom_small">
                   <button
                     class={step.className}
+                    aria-pressed={step.pressed}
                     data-id="step"
                     data-step={step.index}
                     onclick={handleSelect}
@@ -84,6 +85,7 @@
                       <li key={field.key}>
                         <button
                           class={field.className}
+                          aria-pressed={field.pressed}
                           data-id="question"
                           data-step={field.stepIndex}
                           data-field={field.index}
@@ -126,6 +128,7 @@
                   <li key={record.key}>
                     <button
                       class={record.className}
+                      aria-pressed={record.pressed}
                       data-id="record"
                       data-record={record.index}
                       onclick={handleSelect}

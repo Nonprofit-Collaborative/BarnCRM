@@ -18,6 +18,16 @@ private class FormIntakeServiceTest {
 		return TestUsers.adminWith(FormsTestData.ADMIN);
 	}
 
+	/** Answers sent with no files and no resume token. */
+	private static FormIntakeService.Receipt submit(
+		String ticket,
+		Map<String, Object> answers,
+		String trap,
+		String contextRecordId
+	) {
+		return FormIntakeService.submit(ticket, answers, trap, contextRecordId, null, null);
+	}
+
 	private static Map<String, Object> sam() {
 		return new Map<String, Object>{
 			'first' => 'Sam',
@@ -75,30 +85,42 @@ private class FormIntakeServiceTest {
 
 			Assert.areEqual(
 				FormIntakeService.RETRY,
-				FormIntakeService.submit(ticket, sam(), null, null).status,
+				submit(ticket, sam(), null, null).status,
 				'Sent in under three seconds: asked to send again'
 			);
 			Assert.areEqual(
 				FormIntakeService.RECEIVED,
-				FormIntakeService.submit(ticket, sam(), 'http://spam.example', null).status,
+				submit(ticket, sam(), 'http://spam.example', null).status,
 				'The hidden question filled: told received'
 			);
 			FormIntakeService.clockShiftMs = 10000;
 			Assert.areEqual(
 				FormIntakeService.EXPIRED,
-				FormIntakeService.submit(ticket.left(ticket.length() - 2) + 'xx', sam(), null, null)
-					.status,
+				submit(ticket.left(ticket.length() - 2) + 'xx', sam(), null, null).status,
 				'A forged signature is refused'
 			);
 			Assert.areEqual(
 				FormIntakeService.EXPIRED,
-				FormIntakeService.submit('nonsense', sam(), null, null).status,
+				submit(
+						ticket.substringBeforeLast(':') +
+							':' +
+							ticket.substringAfterLast(':').swapCase(),
+						sam(),
+						null,
+						null
+					)
+					.status,
+				'A signature in other letter case is refused'
+			);
+			Assert.areEqual(
+				FormIntakeService.EXPIRED,
+				submit('nonsense', sam(), null, null).status,
 				'Something that is not a ticket is refused'
 			);
 			FormIntakeService.clockShiftMs = 25L * 60 * 60 * 1000;
 			Assert.areEqual(
 				FormIntakeService.EXPIRED,
-				FormIntakeService.submit(ticket, sam(), null, null).status,
+				submit(ticket, sam(), null, null).status,
 				'A ticket over a day old is refused'
 			);
 			Assert.isTrue(submissions().isEmpty(), 'Nothing was stored');
@@ -112,7 +134,7 @@ private class FormIntakeServiceTest {
 			FormIntakeService.actAsGuest = true;
 			String ticket = ticketAfterWaiting(form.Id);
 
-			FormIntakeService.Receipt bad = FormIntakeService.submit(
+			FormIntakeService.Receipt bad = submit(
 				ticket,
 				new Map<String, Object>{ 'email' => 'not an email' },
 				null,
@@ -121,7 +143,7 @@ private class FormIntakeServiceTest {
 			Assert.areEqual(FormIntakeService.INVALID, bad.status, 'Bad answers are refused');
 			Assert.isTrue(bad.problems.containsKey('last'), 'The missing last name is named');
 
-			FormIntakeService.Receipt good = FormIntakeService.submit(ticket, sam(), '', '');
+			FormIntakeService.Receipt good = submit(ticket, sam(), '', '');
 			Assert.areEqual(FormIntakeService.RECEIVED, good.status, 'Stored');
 			Assert.areEqual('Thanks for signing up.', good.message, 'The form says thank you');
 			Assert.isFalse(JSON.serialize(good).contains('003'), 'No record identifier comes back');
@@ -133,7 +155,7 @@ private class FormIntakeServiceTest {
 
 			Assert.areEqual(
 				FormIntakeService.BUSY,
-				FormIntakeService.submit(ticket, sam(), null, null).status,
+				submit(ticket, sam(), null, null).status,
 				'Over the hourly limit: asked to try later'
 			);
 		}
@@ -152,7 +174,7 @@ private class FormIntakeServiceTest {
 			insert as user onFile;
 			Form__c form = FormsTestData.publicVolunteerInterest(50);
 			FormIntakeService.actAsGuest = true;
-			FormIntakeService.submit(ticketAfterWaiting(form.Id), sam(), null, null);
+			submit(ticketAfterWaiting(form.Id), sam(), null, null);
 			Id submissionId = submissions()[0].Id;
 
 			Test.startTest();
@@ -182,7 +204,7 @@ private class FormIntakeServiceTest {
 			Account gala = AccountKindsTestData.organization('Zzpublic Gala');
 			insert as user gala;
 			FormIntakeService.actAsGuest = true;
-			FormIntakeService.submit(ticketAfterWaiting(form.Id), sam(), null, gala.Id);
+			submit(ticketAfterWaiting(form.Id), sam(), null, gala.Id);
 
 			FormSubmitService.Result result = FormSubmitService.processReceived(
 				submissions()[0].Id
@@ -213,25 +235,29 @@ private class FormIntakeServiceTest {
 			String ticket = ticketAfterWaiting(form.Id);
 			Assert.areEqual(
 				FormIntakeService.CLOSED,
-				FormIntakeService.submit(ticket, sam(), null, gala.Id).status,
+				submit(ticket, sam(), null, gala.Id).status,
 				'No signature'
 			);
 			Assert.areEqual(
 				FormIntakeService.CLOSED,
-				FormIntakeService.submit(ticket, sam(), null, gala.Id + '.' + claim.reverse())
-					.status,
+				submit(ticket, sam(), null, gala.Id + '.' + claim.reverse()).status,
 				'A wrong signature'
 			);
 			Assert.areEqual(
 				FormIntakeService.CLOSED,
-				FormIntakeService.submit(ticket, sam(), null, gala.Id + '.').status,
+				submit(ticket, sam(), null, gala.Id + '.').status,
 				'An empty signature'
+			);
+			Assert.areEqual(
+				FormIntakeService.CLOSED,
+				submit(ticket, sam(), null, gala.Id + '.' + claim.swapCase()).status,
+				'The signature in other letter case'
 			);
 			Assert.areEqual(0, submissions().size(), 'Nothing was stored');
 
 			Assert.areEqual(
 				FormIntakeService.RECEIVED,
-				FormIntakeService.submit(ticket, sam(), null, gala.Id + '.' + claim).status,
+				submit(ticket, sam(), null, gala.Id + '.' + claim).status,
 				'The right signature'
 			);
 			Assert.areEqual(gala.Id, Id.valueOf(submissions()[0].Context_Record_Id__c));
@@ -279,6 +305,46 @@ private class FormIntakeServiceTest {
 			RestContext.request.requestURI = '/barncrm/forms/v1/nothing';
 			FormPublicRest.getForm();
 			Assert.areEqual(404, RestContext.response.statusCode, 'No such form');
+		}
+	}
+
+	/** A failure inside the REST API is logged and answered Failed, never as an exception. */
+	@IsTest
+	static void aRestFailureIsLoggedAndAnsweredFailed() {
+		System.runAs(admin()) {
+			Form__c form = FormsTestData.publicVolunteerInterest(50);
+			RestContext.request = new RestRequest();
+			RestContext.request.requestURI = '/barncrm/forms/v1/' + form.Id;
+			RestContext.request.requestBody = Blob.valueOf('{"ticket":"x","answers":{}}');
+			FormPublicRest.failureForTest = new System.IllegalArgumentException('Zzrest broke');
+
+			Test.startTest();
+			RestContext.response = new RestResponse();
+			FormPublicRest.submit();
+			RestResponse posted = RestContext.response;
+			RestContext.response = new RestResponse();
+			FormPublicRest.getForm();
+			RestResponse got = RestContext.response;
+			Test.stopTest();
+
+			for (RestResponse answer : new List<RestResponse>{ posted, got }) {
+				Assert.areEqual(500, answer.statusCode, 'A server failure');
+				Assert.areEqual(
+					'{"status":"Failed"}',
+					answer.responseBody.toString(),
+					'Only Failed, no exception text'
+				);
+			}
+			Assert.areEqual(
+				2,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE Context__c IN ('FormPublicRest.submit', 'FormPublicRest.getForm')
+					WITH SYSTEM_MODE
+				],
+				'Both are in the Error Log'
+			);
 		}
 	}
 

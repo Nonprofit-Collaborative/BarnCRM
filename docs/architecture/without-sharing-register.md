@@ -128,6 +128,12 @@ into six kinds:
 |---|---|---|---|
 | EventPublicPage | Platform | A Site guest user or the API's integration user reads one event staff marked Public Page (Open or Closed only): its public fields, active tickets, confirmed sessions, seat counts with Show Seats Left, and confirmed speakers' names, headlines and bios with Show Speakers; never the online link, codes, registrations, attendees or other person fields | ADR-0190 public event pages |
 
+One inner class of a `with sharing` class also runs without sharing (the register check counts only
+top-level classes, so it is listed here rather than as a row): `EventSurveyService.AttendeeFormReader`, kind
+Platform. A Site guest user, once a survey link's signed claim has matched, reads which form the
+Attended attendee's event names; it returns only that form identifier, never a record value
+(ADR-0188 decision 3).
+
 ## Portal Builder
 
 | Class | Kind | What it reaches past sharing for | Authority |

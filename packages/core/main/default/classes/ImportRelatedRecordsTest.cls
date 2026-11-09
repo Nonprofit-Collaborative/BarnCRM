@@ -22,11 +22,13 @@ private class ImportRelatedRecordsTest {
 	static void setUp() {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.defaultSettings();
+			// Built once for the class rather than in every test that runs as her.
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 		}
 	}
 
 	private static User admin() {
-		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+		return TestUsers.fromSetup('Maria');
 	}
 
 	/** Organizations updated by name, each row also creating an affiliation of a person. */

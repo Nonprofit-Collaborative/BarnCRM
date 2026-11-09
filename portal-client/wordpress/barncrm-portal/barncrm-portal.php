@@ -120,6 +120,7 @@ add_shortcode('barncrm_portal', function ($atts) {
         return '';
     }
     wp_enqueue_script_module('barncrm-portal', plugins_url('js/boot.js', __FILE__), array(), '0.1.0');
+    wp_enqueue_style('barncrm-portal', plugins_url('css/portal.css', __FILE__), array(), '0.1.0');
     return sprintf(
         '<div class="barncrm-portal" data-barncrm-portal="%s" data-barncrm-endpoint="%s" data-barncrm-nonce="%s"></div>',
         esc_attr($key),

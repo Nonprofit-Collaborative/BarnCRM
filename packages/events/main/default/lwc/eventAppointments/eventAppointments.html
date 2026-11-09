@@ -88,7 +88,7 @@
     </template>
 
     <template lwc:if={showEmpty}>
-      <c-barn-empty-state data-id="empty-state" message={text.empty}></c-barn-empty-state>
+      <c-barn-empty-state data-id="empty-state" size="compact" heading={text.emptyHeading} message={text.empty}></c-barn-empty-state>
     </template>
 
     <template for:each={groups} for:item="group">

@@ -81,7 +81,7 @@
         </table>
       </template>
       <template lwc:else>
-        <c-barn-empty-state data-id="no-tickets" message={labels.noTickets}></c-barn-empty-state>
+        <c-barn-empty-state data-id="no-tickets" size="compact" heading={labels.noTicketsHeading} message={labels.noTickets}></c-barn-empty-state>
       </template>
 
       <div class="slds-grid slds-grid_align-spread slds-grid_vertical-align-center slds-var-m-top_large">
@@ -147,7 +147,7 @@
         </table>
       </template>
       <template lwc:else>
-        <c-barn-empty-state data-id="no-codes" message={labels.noCodes}></c-barn-empty-state>
+        <c-barn-empty-state data-id="no-codes" size="compact" heading={labels.noCodesHeading} message={labels.noCodes}></c-barn-empty-state>
       </template>
     </template>
   </template>

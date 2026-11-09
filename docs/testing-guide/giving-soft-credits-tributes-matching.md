@@ -120,7 +120,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On the Summit Foundation gift, set **Matched Gift** to the Summit Foundation gift itself, save. | Refused: "A gift cannot match itself. Choose the other gift in the pair." |
+| 1 | On the Summit Foundation gift, set **Matched Gift** to the Summit Foundation gift itself, save. | Salesforce refuses the save. |
 | 2 | Set **Matched Gift** to the T-CRED-07 Founders Consulting Group gift (an organization's gift), save. | Refused: "The gift being matched has to come from a person. Choose the employee's own gift, not another organization's." |
 | 3 | On the Summit Foundation gift, set **Matched Gift** to Harper's gift (already linked). | Refused: "One of these gifts is already linked to a different gift. Unlink it first, then link it here." |
 | 4 | Refund Luis's gift in full (**Refund or Write Off**). Then on the Summit Foundation gift set **Matched Gift** to Luis's gift. | Refused: "A gift that has been refunded or written off cannot be part of a matching gift pair..." |

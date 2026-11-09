@@ -21,7 +21,7 @@
     </template>
 
     <template lwc:if={showEmpty}>
-      <c-barn-empty-state data-id="empty-state" message={labels.empty}></c-barn-empty-state>
+      <c-barn-empty-state data-id="empty-state" size="compact" heading={labels.emptyHeading} message={labels.empty}></c-barn-empty-state>
     </template>
 
     <template lwc:if={hasRows}>

@@ -11,12 +11,13 @@ portal runs off Salesforce, for example on your WordPress site, and reaches Sale
   code and checks it. Codes are stored only as hashes and are never returned to the website.
 - **Optional second factor.** A portal can also ask for a code from an authenticator app
   (Google Authenticator, Microsoft Authenticator, 1Password and the like). No text messages, so
-  nothing to pay for.
+  nothing to pay for. Each authenticator code works once: Second Factor Last Step on the Portal
+  Access records the last one used.
 - **Person-scoped pages.** Each portal has a template: its pages, the objects and fields on
   each, and what the person may change. Every request names the signed-in person, and Salesforce
   returns or changes only that person's records, only on those pages.
 - **Sessions you control from Salesforce.** Sessions end after a time limit, after sitting idle,
-  or the moment you suspend the person, set the portal Inactive or turn Portal Sign-In off.
+  or the moment you suspend the person, set the portal Inactive or turn Portal sign-in off.
 
 BarnCRM ships the portal client as source code (in the `portal-client` folder of the BarnCRM
 repository, with a small WordPress plugin). BarnCRM does not host portals and offers no
@@ -88,7 +89,7 @@ licenses (where your organization has them) may be simpler than a portal.
    ```
 
    The second call should answer `{"ok":false,"error":"portal_unavailable"}` (no portal yet, or
-   Portal Sign-In off). That answer means the user, the permission set and the app work. An
+   Portal sign-in off). That answer means the user, the permission set and the app work. An
    answer about a missing class or insufficient access means Salesforce would not give this
    license what the API needs: use the fallback user in step 2.
 7. **Install the portal client on your website.** For WordPress, run
@@ -96,8 +97,11 @@ licenses (where your organization has them) may be simpler than a portal.
    `barncrm-portal.zip` it makes in Plugins, Add New, Upload Plugin, activate **BarnCRM
    Portal**, and in Settings, BarnCRM Portal enter your Salesforce domain, the Consumer Key and
    Consumer Secret (kept on the server, never sent to visitors). Put the shortcode
-   `[barncrm_portal key="volunteers"]` on a page. The website must use HTTPS. For any other
-   website, the `portal-client/README.md` explains the small server piece you need.
+   `[barncrm_portal key="volunteers"]` on a page. The website must use HTTPS. Leave that page
+   out of any full-page cache (a caching plugin or your host's cache): a cached copy stops
+   working within a day. The plugin's small stylesheet puts one field per line and fits a
+   phone, in your theme's own fonts and colors. For any other website, the
+   `portal-client/README.md` explains the small server piece you need.
 8. **Add a portal.** In the **BarnCRM Admin** (or **BarnCRM Admin Console**) app, where Portal
    Builder's **Portals** and **Portal Accesses** tabs sit before **Error Log** (it has no app of
    its own, D-188), Portals, New: a name people see, a
@@ -106,7 +110,7 @@ licenses (where your organization has them) may be simpler than a portal.
 9. **Let people in.** For an Invited portal, add a Portal Access for each person (Portal
    Accesses, New, or the Portal Accesses list on the portal). For Any Matching Person, anyone
    whose email matches exactly one person in BarnCRM can sign in.
-10. **Turn Portal Sign-In on** in BarnCRM Settings, Portals.
+10. **Turn Portal sign-in on** in BarnCRM Settings, Portals.
 
 ## Templates
 
@@ -141,8 +145,16 @@ A template is JSON in the portal's Template field. The sample in
 - **fields** name API fields; `label` changes the label; `edit: true` lets the person change it;
   `required: true` keeps it filled. A field of a parent record can be shown, never edited, as
   `Parent__r.Name`. Lookups, formulas and system fields are never editable.
+- **Think twice before `edit: true` on `Email` of a person page.** The email is how a person
+  signs in. Someone who changes theirs to another person's address makes two people share it,
+  and then neither of them gets a code until staff fix one record. Prefer to let staff change
+  emails, or watch for changed emails if you allow it.
 - **where** tests are `{ "field": ..., "op": ..., "value": ... }` with `equals`, `notEquals`,
   `greaterOrEqual`, `lessOrEqual`, `isBlank`, `isNotBlank`; `TODAY` and `NOW` are allowed values.
+  A value is checked against the field's type when the portal's template is read: a date field
+  takes `2026-01-31`, `TODAY` or `NOW`; a date and time field `2026-01-31T09:00:00Z`, `TODAY`
+  (midnight) or `NOW`; a number field a number; a checkbox `true` or `false`. A value that does
+  not fit makes the template fail with a message naming the page and field.
 - **actions**: `update`, `create` (related pages: the person field is set for them), or a module's
   action such as `{ "extension": "Volunteers.SignUp", "label": "Sign Up" }` where that module offers
   it.
@@ -199,18 +211,21 @@ BarnCRM Settings, Portals (every change saves for the whole org):
 
 | Setting | Default | What it does |
 |---|---|---|
-| Portal Sign-In | Off | Whether any portal accepts sign-ins and requests |
-| Code Minutes | 10 | How long an emailed code works |
-| Code Requests per Hour | 5 | Codes one person may ask for per hour |
-| Emails per Portal per Hour | 200 | Codes one portal sends per hour |
-| Attempts per Code | 5 | Wrong tries before a code stops working |
-| Failures Before Lockout | 10 | Wrong codes in a row before a lockout |
-| Lockout Minutes | 30 | How long a lockout lasts |
-| Idle Minutes | 30 | How long a session may sit unused |
+| Portal sign-in | Off | Whether any portal accepts sign-ins and requests |
+| Minutes a code works | 10 | How long an emailed code works |
+| Code requests per person per hour | 5 | Codes one person may ask for per hour |
+| Code emails per portal per hour | 200 | Codes one portal sends per hour |
+| Wrong tries per code | 5 | Wrong tries before a code stops working |
+| Wrong codes before lockout | 10 | Wrong codes in a row before a lockout |
+| Lockout minutes | 30 | How long a lockout lasts |
+| Idle minutes before signing in again | 30 | How long a session may sit unused |
 
 A limit reached when someone asks for a code sends nothing and looks the same to them, so the
-portal never reveals who is in your database. The WordPress plugin also limits requests per
-visitor address.
+portal never reveals who is in your database. A wrong code always gets the same answer, whether
+the address is on file, the code has expired or the person is locked out; only someone who enters
+the right code is told it expired or that they are locked out. The WordPress plugin also limits sign-in requests
+per visitor address (20 in ten minutes). Behind a proxy or CDN, the website must see each
+visitor's own address (most hosts set this up); otherwise every visitor shares one limit.
 
 ## Ending Sessions and Unlocking People
 
@@ -219,7 +234,7 @@ visitor address.
 - **Stop a person:** set their Portal Access Status to Suspended.
 - **Unlock a person:** clear Locked Until on their Portal Access.
 - **Reset their authenticator:** clear Second Factor Enrolled; they enrol again next time.
-- **Stop a portal or all portals:** set the portal Inactive, or turn Portal Sign-In off.
+- **Stop a portal or all portals:** set the portal Inactive, or turn Portal sign-in off.
 - **Stop the website entirely:** revoke the External Client App's tokens or deactivate the
   integration user.
 
@@ -229,7 +244,7 @@ visitor address.
 organization-wide address, the person has an active Portal Access (Invited portals), their email
 matches exactly one person, and they are not locked. Email limits of your org apply.
 
-**The portal says it is unavailable.** Portal Sign-In is off, the portal is Inactive, the module
+**The portal says it is unavailable.** Portal sign-in is off, the portal is Inactive, the module
 is turned off, a required module is missing, or the template has a mistake (see the Error Log).
 
 **The test call in step 6 is refused.** The integration user lacks the Portal Builder

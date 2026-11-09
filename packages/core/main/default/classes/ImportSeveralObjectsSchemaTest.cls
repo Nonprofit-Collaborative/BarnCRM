@@ -20,11 +20,13 @@ private class ImportSeveralObjectsSchemaTest {
 	static void setUp() {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.defaultSettings();
+			// Built once for the class rather than in every test that runs as her.
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 		}
 	}
 
 	private static User admin() {
-		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+		return TestUsers.fromSetup('Maria');
 	}
 
 	/** Affiliations created and organizations updated by name, listed child first. */
@@ -223,7 +225,7 @@ private class ImportSeveralObjectsSchemaTest {
 				);
 				Import_Template__c saved = template(mapping());
 				try {
-					ImportTemplateService.saveMapping(saved.Id, elsewhere.serialize(), null);
+					ImportTestDataFactory.saveMapping(saved.Id, elsewhere.serialize(), null);
 					Assert.fail('A column for an object not listed is refused on save.');
 				} catch (ImportException expected) {
 					Assert.areEqual(

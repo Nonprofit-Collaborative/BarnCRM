@@ -15,8 +15,8 @@ lives in another package than the code resolving it must be:
   and ADR-0017 ask for an explicit one.
 
 Names come from every Automation_Registry__mdt record (resolved by Core) and from the string
-literals in PRODUCTION classes that call resolveType or Type.forName (test classes are skipped
-for now) whose value is the name of a class in another package. Same-package lookups (Core's own
+literals in PRODUCTION classes that call resolveType, NamespaceUtil.build or Type.forName (test
+classes are skipped for now) whose value is the name of a class in another package. Same-package lookups (Core's own
 handlers, Giving's receipt renderers) need nothing and are not checked.
 """
 
@@ -28,7 +28,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import apex_visibility as av  # noqa: E402
 
 RESOLVER_PACKAGE = "core"  # TriggerDispatcher, which builds every registered handler
-RESOLVES = re.compile(r"\bresolveType\s*\(|\bType\s*\.\s*forName\s*\(", re.I)
+RESOLVES = re.compile(
+    r"\bresolveType\s*\(|\bType\s*\.\s*forName\s*\(|\bNamespaceUtil\s*\.\s*build\s*\(", re.I
+)
 
 
 def named_classes(index, handlers):

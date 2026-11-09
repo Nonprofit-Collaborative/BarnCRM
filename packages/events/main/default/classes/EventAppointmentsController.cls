@@ -125,7 +125,10 @@ public with sharing class EventAppointmentsController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getAppointments', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Appointments_LoadFailed'));
+			throw UserErrors.wrapShowingDml(
+				e,
+				BarnHelp.text('Events', 'Events_Appointments_LoadFailed')
+			);
 		}
 	}
 
@@ -173,11 +176,12 @@ public with sharing class EventAppointmentsController {
 			return toAdd.size();
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.addSlots', eventId);
-			throw UserErrors.message(
-				e instanceof System.IllegalArgumentException
-					? e.getMessage()
-					: BarnHelp.text('Events', 'Events_Appointments_AddFailed')
-			);
+			throw e instanceof System.IllegalArgumentException
+				? UserErrors.message(e.getMessage())
+				: UserErrors.wrapShowingDml(
+						e,
+						BarnHelp.text('Events', 'Events_Appointments_AddFailed')
+				  );
 		}
 	}
 
@@ -277,11 +281,12 @@ public with sharing class EventAppointmentsController {
 
 	private static void fail(Exception e, String method, Id recordId) {
 		ErrorLogger.log(e, CONTEXT + method, recordId);
-		throw UserErrors.message(
-			e instanceof System.IllegalArgumentException
-				? e.getMessage()
-				: BarnHelp.text('Events', 'Events_Appointments_SaveFailed')
-		);
+		throw e instanceof System.IllegalArgumentException
+			? UserErrors.message(e.getMessage())
+			: UserErrors.wrapShowingDml(
+					e,
+					BarnHelp.text('Events', 'Events_Appointments_SaveFailed')
+			  );
 	}
 
 	private static String title(String hostName, Datetime start) {

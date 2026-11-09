@@ -136,7 +136,10 @@ public with sharing class EventDashboardController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getDashboard', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Dashboard_LoadFailed'));
+			throw UserErrors.wrapShowingDml(
+				e,
+				BarnHelp.text('Events', 'Events_Dashboard_LoadFailed')
+			);
 		}
 	}
 
@@ -208,7 +211,10 @@ public with sharing class EventDashboardController {
 			if (e instanceof System.IllegalArgumentException) {
 				throw UserErrors.message(e.getMessage());
 			}
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Dashboard_ApplyFailed'));
+			throw UserErrors.wrapShowingDml(
+				e,
+				BarnHelp.text('Events', 'Events_Dashboard_ApplyFailed')
+			);
 		}
 	}
 

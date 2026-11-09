@@ -126,7 +126,10 @@ public with sharing class EventTicketsController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getTickets', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Tickets_LoadFailed'));
+			throw UserErrors.wrapShowingDml(
+				e,
+				BarnHelp.text('Events', 'Events_Tickets_LoadFailed')
+			);
 		}
 	}
 

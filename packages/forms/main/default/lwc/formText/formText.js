@@ -68,7 +68,8 @@ import NEXT from '@salesforce/label/c.Core_Import_NextButton';
 import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
 import { helpText } from 'c/barnHelpText';
 
-export const HELP = ['Forms', 'Core'];
+// Forms reads only its own catalog: a public form page does not download Core's (about 190 KB).
+export const HELP = ['Forms'];
 
 export const LABELS = Object.freeze({
   title: TITLE,

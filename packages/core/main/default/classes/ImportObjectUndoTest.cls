@@ -24,11 +24,13 @@ private class ImportObjectUndoTest {
 	static void setUp() {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.defaultSettings();
+			// Built once for the class rather than in every test that runs as her.
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 		}
 	}
 
 	private static User admin() {
-		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+		return TestUsers.fromSetup('Maria');
 	}
 
 	/** Upserts the rows as a commit started a minute ago by the running user. */

@@ -113,6 +113,16 @@ describe('c-event-check-in', () => {
     expect(checkIn).not.toHaveBeenCalled();
   });
 
+  it('checks in when Enter ends a typed or scanned code', async () => {
+    const element = await render();
+    checkIn.mockResolvedValue('Attended');
+    const code = one(element, '[data-id="code"]');
+    type(code, JANE);
+    code.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+    await flush();
+    expect(checkIn).toHaveBeenCalledWith({ attendeeId: JANE, undo: false });
+  });
+
   it('does not check in someone already in', async () => {
     const element = await render();
     type(one(element, '[data-id="code"]'), MAX);

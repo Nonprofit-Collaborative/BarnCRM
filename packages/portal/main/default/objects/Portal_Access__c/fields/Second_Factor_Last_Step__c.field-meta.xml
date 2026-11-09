@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Second_Factor_Last_Step__c</fullName>
+  <description>The 30-second step of the last authenticator code accepted, so a code is used once (R-PA3). Only Portal Builder writes it.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The time step of the last authenticator code accepted. A code is never accepted twice.</inlineHelpText>
+  <label>Second Factor Last Step</label>
+  <precision>18</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

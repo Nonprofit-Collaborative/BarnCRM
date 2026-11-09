@@ -67,6 +67,22 @@ private class TestUsersTest {
 	}
 
 	@IsTest
+	static void aUserBuiltUnderALastNameIsFoundAgainByIt() {
+		User built = TestUsers.standardUser('Foundagain');
+
+		User found = TestUsers.fromSetup('Foundagain');
+
+		Assert.areEqual(built.Id, found.Id, 'The user built under that last name.');
+		// The org keeps an email address in lower case, so the saved one is compared that way.
+		Assert.areEqual(
+			built.Email.toLowerCase(),
+			found.Email.toLowerCase(),
+			'With the fields the builders set.'
+		);
+		Assert.areEqual(built.ProfileId, found.ProfileId, 'On the profile it was built on.');
+	}
+
+	@IsTest
 	static void otherPermissionSetsMakeAnotherUserHoldingOnlyThose() {
 		User reader = TestUsers.withPermissionSets(new List<String>{ 'BarnCRM_Read_Only' });
 

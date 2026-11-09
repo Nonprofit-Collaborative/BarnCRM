@@ -15,7 +15,7 @@ import {
   timelineFor
 } from 'c/eventDashboardModel';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 const TIMELINE_STATUS = { past: 'closed', soon: 'pending', later: 'neutral' };
 
 /**

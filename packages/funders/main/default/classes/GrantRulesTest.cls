@@ -177,8 +177,8 @@ private class GrantRulesTest {
 			Test.stopTest();
 
 			Assert.isFalse(deleted.isSuccess(), 'The platform refuses (Restrict)');
-			Assert.isTrue(GrantService.isOpen(GrantService.STAGE_APPLIED));
-			Assert.isFalse(GrantService.isOpen(GrantService.STAGE_DECLINED));
+			Assert.isTrue(GrantService.OPEN_STAGES.contains(GrantService.STAGE_APPLIED));
+			Assert.isFalse(GrantService.OPEN_STAGES.contains(GrantService.STAGE_DECLINED));
 		}
 	}
 }

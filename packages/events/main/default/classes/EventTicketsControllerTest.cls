@@ -152,6 +152,56 @@ private class EventTicketsControllerTest {
 	}
 
 	@IsTest
+	static void readsSavedCodesOnlyWhenAnEditChangesTheCode() {
+		System.runAs(staff()) {
+			Event__c event = gala();
+			List<Promo_Code__c> codes = new List<Promo_Code__c>{
+				new Promo_Code__c(
+					Event__c = event.Id,
+					Name = 'EARLY',
+					Discount_Type__c = 'Amount',
+					Discount_Value__c = 5
+				),
+				new Promo_Code__c(
+					Event__c = event.Id,
+					Name = 'LATE',
+					Discount_Type__c = 'Amount',
+					Discount_Value__c = 5
+				)
+			};
+			insert as user codes;
+			Map<Id, SObject> before = new Map<Id, SObject>(
+				[
+					SELECT Id, Event__c, Name, Code_Key__c
+					FROM Promo_Code__c
+					WHERE Event__c = :event.Id
+					WITH USER_MODE
+				]
+			);
+			Promo_Code__c discounted = ((Promo_Code__c) before.get(codes[0].Id)).clone(true);
+			discounted.Discount_Value__c = 10;
+			Promo_Code__c renamed = ((Promo_Code__c) before.get(codes[1].Id)).clone(true);
+			renamed.Name = 'early';
+
+			Test.startTest();
+			// The refusal reads the help catalog once a transaction; read it first, so only the
+			// saved codes are counted.
+			BarnHelp.text('Events', 'Events_PromoCode_Duplicate');
+			Integer atStart = Limits.getQueries();
+			EventKeyHandler.setKeys(new List<SObject>{ discounted }, before);
+			Integer forDiscount = Limits.getQueries() - atStart;
+			EventKeyHandler.setKeys(new List<SObject>{ renamed }, before);
+			Integer forRename = Limits.getQueries() - atStart - forDiscount;
+			Test.stopTest();
+
+			Assert.areEqual(0, forDiscount, 'A discount edit keeps the code: no query');
+			Assert.isFalse(discounted.hasErrors(), 'The discount edit is allowed');
+			Assert.areEqual(1, forRename, 'A renamed code is checked against saved codes');
+			Assert.isTrue(renamed.hasErrors(), 'Renaming LATE to early repeats EARLY: refused');
+		}
+	}
+
+	@IsTest
 	static void validationRulesGuardPricesAndDiscounts() {
 		System.runAs(staff()) {
 			Event__c event = gala();

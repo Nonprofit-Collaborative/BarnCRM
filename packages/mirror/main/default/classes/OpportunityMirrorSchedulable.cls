@@ -47,7 +47,7 @@ public with sharing class OpportunityMirrorSchedulable implements Schedulable {
 	public static NightlyStep step() {
 		return new NightlyStep(
 				JOB_NAME,
-				System.Label.Mirror_NightlyJob_MirrorName,
+				System.Label.Mirror_OpportunityMirror_Title,
 				1,
 				30,
 				new OpportunityMirrorSchedulable()

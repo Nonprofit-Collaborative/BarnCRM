@@ -22,7 +22,7 @@ import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
 import ACTIONS_FOR from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 const APPLICATION_FIELDS = ['Name', 'Contact__c', 'Track__c', 'Abstract__c', 'Status__c'];
 const NEW_APPLICATION_FIELDS = ['Name', 'Contact__c', 'Track__c', 'Abstract__c'];
 
@@ -71,6 +71,9 @@ export default class EventApplications extends LightningElement {
     },
     get empty() {
       return helpText('Events', 'Events_Applications_Empty');
+    },
+    get emptyHeading() {
+      return helpText('Events', 'Events_Applications_EmptyHeading');
     },
     get addApplication() {
       return helpText('Events', 'Events_Applications_Add');

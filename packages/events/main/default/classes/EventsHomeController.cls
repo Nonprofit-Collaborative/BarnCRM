@@ -102,7 +102,7 @@ public with sharing class EventsHomeController {
 			return home;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getEvents');
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Home_LoadFailed'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Home_LoadFailed'));
 		}
 	}
 
@@ -175,7 +175,7 @@ public with sharing class EventsHomeController {
 		} catch (Exception e) {
 			Database.rollback(savepoint);
 			ErrorLogger.log(e, CONTEXT + '.repeatEvent', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 

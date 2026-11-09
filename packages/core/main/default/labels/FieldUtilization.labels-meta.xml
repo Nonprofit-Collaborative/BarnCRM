@@ -17,14 +17,6 @@
         <value>Kind of record</value>
     </labels>
     <labels>
-        <fullName>Core_FieldUtilization_ChoosePlaceholder</fullName>
-        <categories>FieldUtilization</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Field utilization: object picker placeholder</shortDescription>
-        <value>Choose a kind of record</value>
-    </labels>
-    <labels>
         <fullName>Core_FieldUtilization_CountAgain</fullName>
         <categories>FieldUtilization</categories>
         <language>en_US</language>

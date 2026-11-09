@@ -51,7 +51,7 @@
       </template>
 
       <template lwc:if={showEmpty}>
-        <c-barn-empty-state data-id="empty-state" message={emptyMessage}>
+        <c-barn-empty-state data-id="empty-state" size="compact" heading={emptyHeading} message={emptyMessage}>
           <template lwc:if={canCreate}>
             <lightning-button
               data-id="empty-new-event"

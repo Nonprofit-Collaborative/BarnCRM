@@ -131,11 +131,21 @@ private class EventPublicPageTest {
 		System.runAs(staff()) {
 			Event__c event = gala(true, true, true);
 			seat(event);
+			// The help catalog and settings are read once a transaction: read them first, so
+			// the count below is the page's own.
+			BarnHelp.text('Events', 'Events_Public_Tickets');
+			EventsSettings.publicPaymentNote();
 
 			Test.startTest();
 			Map<String, Object> page = roundTrip(new EventPublicPage().page(event.Id));
+			Integer queries = Limits.getQueries();
 			Test.stopTest();
 
+			Assert.areEqual(
+				3,
+				queries,
+				'The event with tickets, sessions and speakers, seats left, and session speakers (was 6)'
+			);
 			String shown = JSON.serialize(page);
 			Assert.areEqual('Spring Gala', page.get('title'));
 			Assert.areEqual(EventPublicPage.OPEN, page.get('registration'));

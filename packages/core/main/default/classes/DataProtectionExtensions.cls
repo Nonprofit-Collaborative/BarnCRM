@@ -64,24 +64,10 @@ public with sharing class DataProtectionExtensions {
 	}
 
 	private static DataProtectionExtension resolve(String className) {
-		Type extensionType = NamespaceUtil.resolveType(className);
-		if (extensionType == null) {
-			return null;
-		}
-		Object candidate;
-		try {
-			candidate = extensionType.newInstance();
-		} catch (Exception cannotBuild) {
-			ErrorLogger.log(cannotBuild, 'DataProtectionExtensions.resolve');
-			return null;
-		}
-		if (candidate instanceof DataProtectionExtension) {
-			return (DataProtectionExtension) candidate;
-		}
-		ErrorLogger.log(
-			new System.TypeException(className + ' does not implement DataProtectionExtension'),
+		return (DataProtectionExtension) NamespaceUtil.build(
+			className,
+			DataProtectionExtension.class,
 			'DataProtectionExtensions.resolve'
 		);
-		return null;
 	}
 }

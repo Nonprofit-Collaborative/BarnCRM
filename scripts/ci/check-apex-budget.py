@@ -86,7 +86,10 @@ CAPS = {
     # Batch C wave 2 landing: 82,322 measured (C-42b, C-42c), plus about 2%.
     # Batch C wave 3 landing: 88,379 measured (FormsCatalogExtension EV-18, public event pages in
     # the intake, controller and REST EV-16), plus about 2%.
-    "forms": 90_100,
+    # Batch C review: 91,118 measured (save-for-later caps per address and per form, REST
+    # failures logged and answered Failed), plus about 2%. Batch C review landing: 91,142
+    # measured with every review branch merged; 93,000 still leaves about 2%.
+    "forms": 93_000,
     # New 2026-11-06 for Contact Point Sync (C-45, ADR-0176 contact point sync module):
     # 43,980 measured with the page and backfill, plus about 2 percent.
     # C-45e (D-186): 45,798 measured with person accounts and household-move sync, plus about 2%.
@@ -94,7 +97,12 @@ CAPS = {
     # about 2%. Batch C gate fixes: 50,837 measured (sync reads each kind once per new person,
     # no adoption lookup on Individuals it created), plus about 2%. Large saves queued (ADR-0176
     # decision 16, describe cached once a transaction): 54,759 measured, plus about 2%.
-    "contactpoints": 55_900,
+    # Batch C review: 59,043 measured (fewer queries a sync, a second change in one transaction
+    # synced, capitals counted as a change), plus about 2%. Erasure start seam (ADR-0193): 60,319
+    # measured (one address sync per erasure), plus about 2%. Batch C review landing: 61,454
+    # measured with every review branch merged (QA's per-values claim, perf's watched-field
+    # reads, the erasure start seam), plus about 2%.
+    "contactpoints": 62_700,
     # Event Management (ADR-0177, events module): events, tickets, agenda and speakers (EV-01,
     # EV-03 to EV-05).
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.
@@ -110,7 +118,10 @@ CAPS = {
     # Batch C wave 2 landing: 49,670 measured (PB-01 builder and client), plus about 2%.
     # Batch C wave 3 landing: 50,774 measured (PB-03, PB-07, PB-08 templates: the read-only
     # person link through one parent for the speaker's sessions), plus about 2%.
-    "portal": 51_800,
+    # Batch C review: 53,465 measured (one answer for every wrong code, authenticator codes used
+    # once, where values typed at parse time), plus about 2%. Batch C review landing: 54,467
+    # measured (QA's sign-in fixes plus perf's and simplification's portal changes), plus about 2%.
+    "portal": 55_600,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

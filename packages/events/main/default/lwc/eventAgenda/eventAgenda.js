@@ -77,6 +77,9 @@ export default class EventAgenda extends LightningElement {
     },
     get empty() {
       return helpText('Events', 'Events_Agenda_Empty');
+    },
+    get emptyHeading() {
+      return helpText('Events', 'Events_Agenda_EmptyHeading');
     }
   };
 

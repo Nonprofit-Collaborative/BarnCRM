@@ -185,7 +185,10 @@ public with sharing class EventApplicationsController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getApplications', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Applications_LoadFailed'));
+			throw UserErrors.wrapShowingDml(
+				e,
+				BarnHelp.text('Events', 'Events_Applications_LoadFailed')
+			);
 		}
 	}
 
@@ -238,7 +241,7 @@ public with sharing class EventApplicationsController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.saveReview', applicationId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 
@@ -291,7 +294,7 @@ public with sharing class EventApplicationsController {
 		} catch (Exception e) {
 			Database.rollback(savepoint);
 			ErrorLogger.log(e, CONTEXT + '.decide', applicationId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 

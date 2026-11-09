@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
   <labels>
+    <fullName>Mirror_Sync_Compare</fullName>
+    <categories>Mirror</categories>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>Mirror pages: button that compares the two sides</shortDescription>
+    <value>Compare</value>
+  </labels>
+  <labels>
     <fullName>Mirror_Sync_OtherMessages</fullName>
     <categories>Mirror</categories>
     <language>en_US</language>

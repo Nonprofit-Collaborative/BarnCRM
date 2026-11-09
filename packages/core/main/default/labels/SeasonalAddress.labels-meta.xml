@@ -17,14 +17,6 @@
         <value>Seasonal Addresses Last Swapped</value>
     </labels>
     <labels>
-        <fullName>Core_SeasonalAddress_PageTitle</fullName>
-        <categories>Addresses</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Settings console: heading of the seasonal swap panel</shortDescription>
-        <value>Seasonal Address Swap</value>
-    </labels>
-    <labels>
         <fullName>Core_SeasonalAddress_RunNow</fullName>
         <categories>Addresses</categories>
         <language>en_US</language>

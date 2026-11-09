@@ -13,9 +13,6 @@ public with sharing class TributeService {
 	public static final String TYPE_IN_MEMORY_OF = 'In memory of';
 	public static final String TYPE_IN_HONOR_OF = 'In honor of';
 
-	public class TributeException extends Exception {
-	}
-
 	/**
 	 * Records that the notification for these tributes has gone out, and when. A tribute already
 	 * marked sent keeps the date it already had.

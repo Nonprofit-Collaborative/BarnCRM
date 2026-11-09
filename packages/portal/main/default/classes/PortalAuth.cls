@@ -101,13 +101,10 @@ public without sharing class PortalAuth {
 		Portal_Session__c session = pending(challenge, new Set<String>{ STAGE_CODE_SENT });
 		Portal_Access__c access = accessOf(session);
 		Portal__c portal = portalOf(access);
-		checkCodeWindow(session, access);
 		String expected = PortalTokens.hash(
 			session.Token_Hash__c + ':' + (code == null ? '' : code.trim())
 		);
-		if (!PortalTokens.sameText(expected, session.Code_Hash__c)) {
-			fail(session, access);
-		}
+		checkCodeWindow(session, access, PortalTokens.sameText(expected, session.Code_Hash__c));
 		session.Code_Hash__c = null;
 		Boolean enrolled = access.Second_Factor_Enrolled__c == true;
 		if (portal.Second_Factor__c != FACTOR_OFF && enrolled) {
@@ -117,6 +114,7 @@ public without sharing class PortalAuth {
 		}
 		if (portal.Second_Factor__c == FACTOR_REQUIRED) {
 			access.Second_Factor_Secret__c = PortalTokens.newSecret();
+			access.Second_Factor_Last_Step__c = null;
 			update as system access;
 			session.Stage__c = STAGE_ENROLL;
 			update as system session;
@@ -134,10 +132,9 @@ public without sharing class PortalAuth {
 		);
 		Portal_Access__c access = accessOf(session);
 		Portal__c portal = portalOf(access);
-		checkCodeWindow(session, access);
-		if (!PortalTokens.authenticatorCodeMatches(access.Second_Factor_Secret__c, code, now())) {
-			fail(session, access);
-		}
+		Long step = freshStep(access, code);
+		checkCodeWindow(session, access, step != null);
+		access.Second_Factor_Last_Step__c = step;
 		if (session.Stage__c == STAGE_ENROLL) {
 			access.Second_Factor_Enrolled__c = true;
 		}
@@ -167,8 +164,34 @@ public without sharing class PortalAuth {
 		if (String.isBlank(token)) {
 			throw new RefusalException('not_signed_in');
 		}
+		// Every signed-in request starts here, so the session, its access and its portal (both
+		// master-detail parents) are read in one query rather than three.
 		List<Portal_Session__c> found = [
-			SELECT Id, Stage__c, Expires__c, Last_Used__c, Portal_Access__c
+			SELECT
+				Id,
+				Stage__c,
+				Expires__c,
+				Last_Used__c,
+				Portal_Access__c,
+				Portal_Access__r.Id,
+				Portal_Access__r.Portal__c,
+				Portal_Access__r.Person__c,
+				Portal_Access__r.Person__r.Email,
+				Portal_Access__r.Person__r.FirstName,
+				Portal_Access__r.Status__c,
+				Portal_Access__r.Failed_Attempts__c,
+				Portal_Access__r.Locked_Until__c,
+				Portal_Access__r.Second_Factor_Enrolled__c,
+				Portal_Access__r.Second_Factor_Secret__c,
+				Portal_Access__r.Portal__r.Id,
+				Portal_Access__r.Portal__r.Name,
+				Portal_Access__r.Portal__r.Key__c,
+				Portal_Access__r.Portal__r.Status__c,
+				Portal_Access__r.Portal__r.Access_Mode__c,
+				Portal_Access__r.Portal__r.Second_Factor__c,
+				Portal_Access__r.Portal__r.Session_Hours__c,
+				Portal_Access__r.Portal__r.Sender_Address__c,
+				Portal_Access__r.Portal__r.Template__c
 			FROM Portal_Session__c
 			WHERE Token_Hash__c = :PortalTokens.hash(token)
 			WITH SYSTEM_MODE
@@ -178,8 +201,11 @@ public without sharing class PortalAuth {
 			throw new RefusalException('not_signed_in');
 		}
 		Portal_Session__c record = found[0];
-		Portal_Access__c access = accessOf(record);
-		Portal__c portal = portalOf(access);
+		Portal_Access__c access = record.Portal_Access__r;
+		Portal__c portal = access.Portal__r;
+		if (portal.Status__c != STATUS_ACTIVE) {
+			throw new RefusalException('portal_unavailable');
+		}
 		Integer idle = setting(settings().Idle_Minutes__c, 30, 5, 480);
 		Datetime current = now();
 		Boolean usable =
@@ -216,24 +242,31 @@ public without sharing class PortalAuth {
 			throw new RefusalException('not_allowed');
 		}
 		session.access.Second_Factor_Secret__c = PortalTokens.newSecret();
+		session.access.Second_Factor_Last_Step__c = null;
 		update as system session.access;
 		return enrolment(session.portal, session.access, null, 'enrolling');
 	}
 
 	/** Confirms enrolment with a first authenticator code. */
 	public static void confirmEnrolment(Session session, String code) {
-		if (
-			session.access.Second_Factor_Enrolled__c == true ||
-			!PortalTokens.authenticatorCodeMatches(
-				session.access.Second_Factor_Secret__c,
-				code,
-				now()
-			)
-		) {
+		Long step = freshStep(session.access, code);
+		if (session.access.Second_Factor_Enrolled__c == true || step == null) {
 			throw new RefusalException('code_invalid');
 		}
 		session.access.Second_Factor_Enrolled__c = true;
+		session.access.Second_Factor_Last_Step__c = step;
 		update as system session.access;
+	}
+
+	/**
+	 * The step of an authenticator code that matches and is later than the last one accepted, or
+	 * null: a code already used, or an earlier one, counts as wrong (R-PA3).
+	 */
+	@TestVisible
+	private static Long freshStep(Portal_Access__c access, String code) {
+		Long step = PortalTokens.matchedStep(access.Second_Factor_Secret__c, code, now());
+		Decimal last = access.Second_Factor_Last_Step__c;
+		return step == null || (last != null && step <= last.longValue()) ? null : step;
 	}
 
 	// ---- Helpers --------------------------------------------------------------------------
@@ -413,7 +446,8 @@ public without sharing class PortalAuth {
 				Failed_Attempts__c,
 				Locked_Until__c,
 				Second_Factor_Enrolled__c,
-				Second_Factor_Secret__c
+				Second_Factor_Secret__c,
+				Second_Factor_Last_Step__c
 			FROM Portal_Access__c
 			WHERE Id = :session.Portal_Access__c
 			WITH SYSTEM_MODE
@@ -447,17 +481,36 @@ public without sharing class PortalAuth {
 		return access.Locked_Until__c != null && access.Locked_Until__c > now();
 	}
 
-	/** Refuses a challenge that has expired or whose person cannot sign in now. */
-	private static void checkCodeWindow(Portal_Session__c session, Portal_Access__c access) {
+	/**
+	 * Refuses a code that is wrong, expired, or for a person who cannot sign in now (R-PST1). A
+	 * wrong code always answers `code_invalid`, whatever the reason, so the answer is the same as
+	 * for an address not on file; `locked` and `code_expired` are told only to someone who gave
+	 * the right code, who already holds the inbox. Only a wrong code in time counts toward the
+	 * lockout (R-PA1).
+	 */
+	private static void checkCodeWindow(
+		Portal_Session__c session,
+		Portal_Access__c access,
+		Boolean correct
+	) {
+		Boolean expired = session.Code_Expires__c == null || session.Code_Expires__c < now();
+		if (expired) {
+			session.Stage__c = STAGE_ENDED;
+			update as system session;
+		}
 		if (access.Status__c != STATUS_ACTIVE || access.Person__c == null) {
+			throw new RefusalException('code_invalid');
+		}
+		if (!correct && !expired && !isLocked(access)) {
+			fail(session, access);
+		}
+		if (!correct) {
 			throw new RefusalException('code_invalid');
 		}
 		if (isLocked(access)) {
 			throw new RefusalException('locked');
 		}
-		if (session.Code_Expires__c == null || session.Code_Expires__c < now()) {
-			session.Stage__c = STAGE_ENDED;
-			update as system session;
+		if (expired) {
 			throw new RefusalException('code_expired');
 		}
 	}

@@ -10,7 +10,7 @@ import BarnConfirmModal from 'c/barnConfirmModal';
 
 import TITLE from '@salesforce/label/c.Core_FieldUtilization_PageTitle';
 import CHOOSE_LABEL from '@salesforce/label/c.Core_FieldUtilization_ChooseLabel';
-import CHOOSE_PLACEHOLDER from '@salesforce/label/c.Core_FieldUtilization_ChoosePlaceholder';
+import CHOOSE_PLACEHOLDER from '@salesforce/label/c.Core_Find_ChooseObject';
 import COUNT_AGAIN from '@salesforce/label/c.Core_FieldUtilization_CountAgain';
 import SAVE from '@salesforce/label/c.Core_FieldUtilization_Save';
 import COMPARED_WITH from '@salesforce/label/c.Core_FieldUtilization_ComparedWith';

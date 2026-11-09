@@ -99,7 +99,8 @@ private class AccountingExportServiceTest {
 				AUGUST_FIRST,
 				AUGUST_LAST,
 				null,
-				null
+				null,
+				false
 			);
 
 			Assert.areEqual(5, file.rowCount, file.csv);
@@ -153,13 +154,15 @@ private class AccountingExportServiceTest {
 				AUGUST_FIRST,
 				AUGUST_LAST,
 				building,
-				null
+				null,
+				false
 			);
 			AccountingExportService.ExportFile byMethod = AccountingExportService.build(
 				AUGUST_FIRST,
 				AUGUST_LAST,
 				null,
-				'Check'
+				'Check',
+				false
 			);
 
 			Assert.areEqual(1, byFund.rowCount);
@@ -175,7 +178,7 @@ private class AccountingExportServiceTest {
 			AccountingExportService.maxRows = 4;
 			String refusal;
 			try {
-				AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null);
+				AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null, false);
 			} catch (AccountingExportService.ExportException refused) {
 				refusal = refused.getMessage();
 			}
@@ -184,7 +187,8 @@ private class AccountingExportServiceTest {
 				AUGUST_FIRST,
 				AUGUST_LAST,
 				null,
-				null
+				null,
+				false
 			);
 
 			Assert.areEqual(Label.Mirror_AccountingExport_ErrorTooManyRows, refusal);
@@ -199,7 +203,8 @@ private class AccountingExportServiceTest {
 				Date.newInstance(2030, 1, 1),
 				Date.newInstance(2030, 1, 7),
 				null,
-				null
+				null,
+				false
 			);
 
 			Assert.areEqual(0, file.rowCount);
@@ -244,7 +249,8 @@ private class AccountingExportServiceTest {
 						(Date) args[0],
 						(Date) args[1],
 						(Id) args[2],
-						(String) args[3]
+						(String) args[3],
+						false
 					);
 					Assert.fail('Expected a refusal: ' + expected);
 				} catch (AccountingExportService.ExportException refused) {
@@ -263,7 +269,7 @@ private class AccountingExportServiceTest {
 			);
 			AccountingExportService.ExportFile file;
 			System.runAs(jen) {
-				file = AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null);
+				file = AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null, false);
 			}
 
 			Assert.areEqual(0, file.rowCount, 'Gifts are private, and Jen owns none of these.');
@@ -429,7 +435,8 @@ private class AccountingExportServiceTest {
 				);
 				Assert.areEqual(
 					5,
-					AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null).rowCount,
+					AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null, false)
+						.rowCount,
 					'The full file still holds them'
 				);
 			}
@@ -539,7 +546,13 @@ private class AccountingExportServiceTest {
 				)
 			);
 			System.runAs(reader) {
-				String digest = AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null)
+				String digest = AccountingExportService.build(
+						AUGUST_FIRST,
+						AUGUST_LAST,
+						null,
+						null,
+						false
+					)
 					.digest;
 				try {
 					AccountingExportService.markPosted(
@@ -594,7 +607,8 @@ private class AccountingExportServiceTest {
 	private static String downloadedDigest(User jen) {
 		String digest;
 		System.runAs(jen) {
-			digest = AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null).digest;
+			digest = AccountingExportService.build(AUGUST_FIRST, AUGUST_LAST, null, null, false)
+				.digest;
 		}
 		return digest;
 	}
@@ -615,7 +629,8 @@ private class AccountingExportServiceTest {
 					AUGUST_FIRST,
 					AUGUST_LAST,
 					null,
-					null
+					null,
+					false
 				);
 				Assert.areEqual(4, now.giftCount, 'Still four gifts');
 				Assert.areEqual(410, now.total, 'Still 410');

@@ -1,8 +1,17 @@
 <template>
     <template lwc:if={helpReady}>
-    <lightning-card title={labels.title} icon-name={icons.page}>
-        <div class="slds-var-p-horizontal_medium">
-            <p class="slds-var-m-bottom_medium" data-id="intro">{labels.intro}</p>
+    <!-- The App Page prints the name above this component, so the shell's title is for screen readers only. -->
+    <c-barn-page-shell
+        title={labels.title}
+        purpose={labels.intro}
+        icon-name={icons.page}
+        title-hidden
+        data-id="shell"
+    >
+        <div class="slds-is-relative">
+            <template lwc:if={loading}>
+                <lightning-spinner alternative-text={labels.title} size="small" data-id="loading"></lightning-spinner>
+            </template>
             <template lwc:if={loaded}>
                 <ul class="slds-var-m-bottom_medium" data-id="kinds">
                     <template for:each={kinds} for:item="line">
@@ -35,6 +44,6 @@
                 <c-barn-notice class="slds-var-m-bottom_medium" variant="error" message={error} data-id="error"></c-barn-notice>
             </template>
         </div>
-    </lightning-card>
+    </c-barn-page-shell>
     </template>
 </template>

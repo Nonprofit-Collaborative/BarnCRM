@@ -13,11 +13,14 @@ private class ErrorDigestServiceTest {
 
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.admin();
+		// Built once for the class rather than in every test that runs as her.
+		System.runAs(TestUsers.admin()) {
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+		}
 	}
 
 	private static User maria() {
-		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+		return TestUsers.fromSetup('Maria');
 	}
 
 	private static Error_Log__c entry(String source, String severity, String status) {
@@ -546,7 +549,9 @@ private class ErrorDigestServiceTest {
 			AdminDigestSummary.Summary summary;
 			System.runAs(admin) {
 				limitAt(10, 100);
-				summary = AdminDigestSummary.build(now.addDays(-7), now);
+				// The window ends after the inserts: CreatedDate is whole seconds, so a row kept
+				// in the second after `now` was taken would fall outside a window ending at `now`.
+				summary = AdminDigestSummary.build(now.addDays(-7), System.now());
 			}
 			Assert.areEqual(
 				2,

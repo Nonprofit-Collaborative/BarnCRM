@@ -4,6 +4,8 @@
  * it; the Automation page's switch still stops both. The sync's CPU is budgeted where it runs
  * inside the save (a background job's large save, an import chunk): 200 people, and an import
  * chunk of 200 couples within the import's own budget.
+ *
+ * Later: budget only Contact Point Sync's share, by timing the same insert with sync off.
  */
 @IsTest(testFor='ApexClass:ContactPointSyncService')
 private class ContactPointBulkSyncTest {
@@ -153,8 +155,13 @@ private class ContactPointBulkSyncTest {
 
 			Assert.areEqual(1 * 3 + 200 * 3, copied, 'An email, phone and address each');
 			// About 550 ms on an idle scratch org; 1,900 before decision 16 (a global describe
-			// for every copy made). A quarter of the synchronous limit.
-			Assert.isTrue(cpu <= 2500, 'CPU within budget (ms): ' + cpu);
+			// for every copy made). A quarter of the synchronous limit. An org with person
+			// accounts gets 3,000: it runs the Account handlers and the person checks on every
+			// household save. Measured 2026-11-09, Contact Point Sync's copy stages cost the same
+			// on both shapes (address copies 316 ms on oi-test, 312 on barn-sales); the extra
+			// was the person-account Account update and checks (2.6 to 2.7 s in all).
+			Integer budget = HouseholdService.isPersonAccountOrg() ? 3000 : 2500;
+			Assert.isTrue(cpu <= budget, 'CPU within budget (ms): ' + cpu + ' of ' + budget);
 		}
 	}
 

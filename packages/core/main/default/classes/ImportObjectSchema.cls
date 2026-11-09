@@ -885,7 +885,7 @@ public with sharing class ImportObjectSchema {
 	private static Map<String, String> allObjectKeys() {
 		if (allObjectKeysCache == null) {
 			allObjectKeysCache = new Map<String, String>();
-			for (String name : Schema.getGlobalDescribe().keySet()) {
+			for (String name : NamespaceUtil.globalDescribe().keySet()) {
 				allObjectKeysCache.put(normalized(localName(name).removeEnd('__c')), name);
 				allObjectKeysCache.put(normalized(name), name);
 			}

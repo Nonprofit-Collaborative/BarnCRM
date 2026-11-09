@@ -2,7 +2,7 @@ import { LightningElement, api } from 'lwc';
 import LOCALE from '@salesforce/i18n/locale';
 import getPage from '@salesforce/apex/FormPublicController.getPage';
 import listPages from '@salesforce/apex/FormPublicController.listPages';
-import { listView, pageView, sitePageUrl } from 'c/formPublicPageModel';
+import { listView, nameTab, pageView, sitePageUrl } from 'c/formPublicPageModel';
 import { HELP, LABELS, PAGE_TEXT } from 'c/formText';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
@@ -50,6 +50,7 @@ export default class FormPublicPage extends LightningElement {
       this.list = null;
     }
     this.missing = !this.page && !this.list;
+    nameTab((this.page && this.page.title) || (this.list && this.list.title));
     this.loading = false;
   }
 

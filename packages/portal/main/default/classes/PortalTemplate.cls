@@ -14,6 +14,9 @@ public with sharing class PortalTemplate {
 	public static final String KIND_PERSON = 'person';
 	public static final String KIND_RELATED = 'related';
 	public static final String KIND_CATALOG = 'catalog';
+	/** Where values read when the page is queried: today's date (midnight), and now. */
+	public static final String TODAY = 'TODAY';
+	public static final String NOW = 'NOW';
 	private static final Integer MAX_PAGES = 20;
 	private static final Integer MAX_FIELDS = 40;
 	private static final Integer MAX_ROWS = 200;
@@ -94,7 +97,9 @@ public with sharing class PortalTemplate {
 	public class Condition {
 		public String field;
 		public String op;
+		/** Typed for the field at parse time, or the word TODAY or NOW, read when queried. */
 		public Object value;
+		public Schema.DisplayType fieldType;
 	}
 
 	/** Parses and checks a template, or throws TemplateException saying what is wrong. */
@@ -162,7 +167,7 @@ public with sharing class PortalTemplate {
 		if (page.kind == KIND_RELATED) {
 			page.personField = asText(raw.get('personField'));
 			page.personViaParent = page.personField != null && page.personField.contains('.');
-			if (!isPersonLink(page.personField, fieldMap)) {
+			if (!isPersonLink(page.personField, page.objectType, fieldMap)) {
 				throw new TemplateException(at + 'personField must be a lookup to Contact');
 			}
 		}
@@ -189,42 +194,28 @@ public with sharing class PortalTemplate {
 	}
 
 	/** A lookup to Contact, or `Parent__r.Contact__c`: one parent hop to a lookup to Contact. */
-	private static Boolean isPersonLink(String path, Map<String, Schema.SObjectField> fieldMap) {
+	private static Boolean isPersonLink(
+		String path,
+		Schema.SObjectType objectType,
+		Map<String, Schema.SObjectField> fieldMap
+	) {
 		if (String.isBlank(path)) {
 			return false;
 		}
+		Schema.DescribeFieldResult link;
 		if (!path.contains('.')) {
-			Schema.SObjectField link = fieldMap.get(path.toLowerCase());
-			return link != null &&
-				link.getDescribe().getReferenceTo().contains(Contact.SObjectType);
+			Schema.SObjectField field = fieldMap.get(path.toLowerCase());
+			link = field == null ? null : field.getDescribe();
+		} else {
+			link = parentFieldOf(objectType, fieldMap, path);
 		}
-		String relationship = path.substringBefore('.');
-		String parentField = path.substringAfter('.');
-		if (parentField.contains('.')) {
-			return false;
-		}
-		for (Schema.SObjectField field : fieldMap.values()) {
-			Schema.DescribeFieldResult describe = field.getDescribe();
-			if (
-				describe.getRelationshipName() != null &&
-				describe.getRelationshipName().equalsIgnoreCase(relationship) &&
-				describe.getReferenceTo().size() == 1
-			) {
-				Schema.SObjectField target = describe.getReferenceTo()[0]
-					.getDescribe()
-					.fields.getMap()
-					.get(parentField.toLowerCase());
-				return target != null &&
-					target.getDescribe().getReferenceTo().contains(Contact.SObjectType);
-			}
-		}
-		return false;
+		return link != null && link.getReferenceTo().contains(Contact.SObjectType);
 	}
 
 	private static Schema.SObjectType customObject(String name, String at) {
 		Schema.SObjectType type = String.isBlank(name)
 			? null
-			: Schema.getGlobalDescribe().get(name.toLowerCase());
+			: NamespaceUtil.globalDescribe().get(name.toLowerCase());
 		if (
 			type == null ||
 			!type.getDescribe().isCustom() ||
@@ -249,7 +240,7 @@ public with sharing class PortalTemplate {
 		if (String.isBlank(spec.path)) {
 			throw new TemplateException(at + 'each field needs a field name');
 		}
-		spec.describe = describePath(spec.path, fieldMap);
+		spec.describe = describePath(spec.path, page.objectType, fieldMap);
 		if (spec.describe == null) {
 			throw new TemplateException(at + spec.path + ' is not a field here');
 		}
@@ -275,32 +266,59 @@ public with sharing class PortalTemplate {
 	/** A field, or one parent hop (`Parent__r.Name`, `Account.Name`) for reading. */
 	private static Schema.DescribeFieldResult describePath(
 		String path,
+		Schema.SObjectType objectType,
 		Map<String, Schema.SObjectField> fieldMap
 	) {
 		if (!path.contains('.')) {
 			Schema.SObjectField field = fieldMap.get(path.toLowerCase());
 			return field == null ? null : field.getDescribe();
 		}
-		String relationship = path.substringBefore('.');
+		return parentFieldOf(objectType, fieldMap, path);
+	}
+
+	/** Each object's single-target lookups by lower-case relationship name, built once. */
+	private static final Map<SObjectType, Map<String, DescribeFieldResult>> LOOKUPS = new Map<SObjectType, Map<String, DescribeFieldResult>>();
+
+	/**
+	 * The parent's field a one-hop path (`Parent__r.Name`) names, or null. Every portal request
+	 * parses the whole template, so finding a relationship by name used to describe the
+	 * object's fields one by one for each such path; the lookups are indexed once a
+	 * transaction instead.
+	 */
+	private static Schema.DescribeFieldResult parentFieldOf(
+		Schema.SObjectType objectType,
+		Map<String, Schema.SObjectField> fieldMap,
+		String path
+	) {
 		String parentField = path.substringAfter('.');
 		if (parentField.contains('.')) {
 			return null;
 		}
-		for (Schema.SObjectField field : fieldMap.values()) {
-			Schema.DescribeFieldResult describe = field.getDescribe();
-			if (
-				describe.getRelationshipName() != null &&
-				describe.getRelationshipName().equalsIgnoreCase(relationship) &&
-				describe.getReferenceTo().size() == 1
-			) {
-				Schema.SObjectField target = describe.getReferenceTo()[0]
-					.getDescribe()
-					.fields.getMap()
-					.get(parentField.toLowerCase());
-				return target == null ? null : target.getDescribe();
+		if (!LOOKUPS.containsKey(objectType)) {
+			Map<String, Schema.DescribeFieldResult> byName = new Map<String, Schema.DescribeFieldResult>();
+			for (Schema.SObjectField field : fieldMap.values()) {
+				Schema.DescribeFieldResult describe = field.getDescribe();
+				String name = describe.getRelationshipName();
+				if (
+					name != null &&
+					describe.getReferenceTo().size() == 1 &&
+					!byName.containsKey(name.toLowerCase())
+				) {
+					byName.put(name.toLowerCase(), describe);
+				}
 			}
+			LOOKUPS.put(objectType, byName);
 		}
-		return null;
+		Schema.DescribeFieldResult link = LOOKUPS.get(objectType)
+			.get(path.substringBefore('.').toLowerCase());
+		if (link == null) {
+			return null;
+		}
+		Schema.SObjectField target = link.getReferenceTo()[0]
+			.getDescribe()
+			.fields.getMap()
+			.get(parentField.toLowerCase());
+		return target == null ? null : target.getDescribe();
 	}
 
 	private static Condition parseCondition(
@@ -315,7 +333,10 @@ public with sharing class PortalTemplate {
 		if (condition.field == null || !fieldMap.containsKey(condition.field.toLowerCase())) {
 			throw new TemplateException(at + 'a where test names no field of the object');
 		}
-		condition.field = fieldMap.get(condition.field.toLowerCase()).getDescribe().getName();
+		Schema.DescribeFieldResult described = fieldMap.get(condition.field.toLowerCase())
+			.getDescribe();
+		condition.field = described.getName();
+		condition.fieldType = described.getType();
 		if (!OPS.contains(condition.op)) {
 			throw new TemplateException(at + 'where op ' + condition.op + ' is not known');
 		}
@@ -332,7 +353,64 @@ public with sharing class PortalTemplate {
 				at + 'a where value must be text, a number or true or false'
 			);
 		}
+		if (value != null && condition.op != 'isBlank' && condition.op != 'isNotBlank') {
+			try {
+				condition.value = typed(condition.fieldType, value);
+			} catch (Exception unfit) {
+				throw new TemplateException(
+					at +
+						'the where value ' +
+						value +
+						' does not fit ' +
+						condition.field +
+						' (' +
+						String.valueOf(condition.fieldType).toLowerCase() +
+						')'
+				);
+			}
+		}
 		return condition;
+	}
+
+	/**
+	 * A where value as the field's type, so the query never fails on it. TODAY and NOW stay words
+	 * for a date or date and time field, read when the page is queried.
+	 */
+	@TestVisible
+	private static Object typed(Schema.DisplayType fieldType, Object value) {
+		String text = String.valueOf(value).trim();
+		Boolean word = text.equals(TODAY) || text.equals(NOW);
+		switch on fieldType {
+			when DATE, DATETIME {
+				if (word) {
+					return text;
+				}
+				if (!(value instanceof String)) {
+					throw new TemplateException('Not a date');
+				}
+				return fieldType == Schema.DisplayType.DATE
+					? (Object) Date.valueOf(text)
+					: (Object) JSON.deserialize('"' + text + '"', Datetime.class);
+			}
+			when INTEGER {
+				return Integer.valueOf(text);
+			}
+			when DOUBLE, CURRENCY, PERCENT, LONG {
+				return Decimal.valueOf(text);
+			}
+			when BOOLEAN {
+				if (!text.equalsIgnoreCase('true') && !text.equalsIgnoreCase('false')) {
+					throw new TemplateException('Not true or false');
+				}
+				return text.equalsIgnoreCase('true');
+			}
+			when else {
+				if (word) {
+					throw new TemplateException('TODAY and NOW are for dates');
+				}
+				return text;
+			}
+		}
 	}
 
 	private static void parseOrder(

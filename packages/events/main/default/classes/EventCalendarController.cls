@@ -142,7 +142,10 @@ public with sharing class EventCalendarController {
 			throw UserErrors.message(e.getMessage());
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getCalendar');
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Calendar_LoadFailed'));
+			throw UserErrors.wrapShowingDml(
+				e,
+				BarnHelp.text('Events', 'Events_Calendar_LoadFailed')
+			);
 		}
 	}
 

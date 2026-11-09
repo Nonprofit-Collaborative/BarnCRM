@@ -173,12 +173,14 @@ private class EventDashboardControllerTest {
 	static void rollsBackWhenASessionBreaksARule() {
 		System.runAs(staff()) {
 			Event__c event = conference();
-			// Ends before it starts: the validation rule refuses it, so the tracks go too.
+			// Ends before it starts: the validation rule refuses it, so the tracks go too. Every
+			// list is sent, as the browser's plan always has (JSON leaves a missing list null).
 			String bad = JSON.serialize(
 				new Map<String, Object>{
 					'tracks' => new List<Object>{
 						new Map<String, Object>{ 'name' => 'Admins', 'sortOrder' => 1 }
 					},
+					'ticketTypes' => new List<Object>(),
 					'sessions' => new List<Object>{
 						new Map<String, Object>{
 							'name' => 'Backwards',
@@ -197,6 +199,11 @@ private class EventDashboardControllerTest {
 					0,
 					[SELECT COUNT() FROM Event_Track__c WHERE Event__c = :event.Id],
 					'Rolled back'
+				);
+				Assert.areNotEqual(
+					BarnHelp.text('Events', 'Events_Dashboard_ApplyFailed'),
+					refused.getMessage(),
+					'The validation rule speaks for itself, not the generic text (D-191)'
 				);
 			}
 		}

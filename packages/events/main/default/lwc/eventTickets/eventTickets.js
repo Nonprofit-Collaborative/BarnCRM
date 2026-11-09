@@ -28,7 +28,7 @@ import DATE_RANGE from '@salesforce/label/c.Core_Address_DateRange';
 import ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
 import ACTIONS_FOR from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 const TICKET = 'Ticket_Type__c';
 const CODE = 'Promo_Code__c';
 const TICKET_FIELDS = [
@@ -88,6 +88,12 @@ export default class EventTickets extends LightningElement {
     },
     get noCodes() {
       return helpText('Events', 'Events_Tickets_NoCodes');
+    },
+    get noTicketsHeading() {
+      return helpText('Events', 'Events_Tickets_NoTicketsHeading');
+    },
+    get noCodesHeading() {
+      return helpText('Events', 'Events_Tickets_NoCodesHeading');
     }
   };
 

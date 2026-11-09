@@ -63,24 +63,10 @@ public with sharing class RollupEngineExtensions {
 
 	@TestVisible
 	private static RollupEngineExtension resolve(String className) {
-		Type extensionType = NamespaceUtil.resolveType(className);
-		if (extensionType == null) {
-			return null;
-		}
-		Object candidate;
-		try {
-			candidate = extensionType.newInstance();
-		} catch (Exception cannotBuild) {
-			ErrorLogger.log(cannotBuild, 'RollupEngineExtensions.resolve');
-			return null;
-		}
-		if (candidate instanceof RollupEngineExtension) {
-			return (RollupEngineExtension) candidate;
-		}
-		ErrorLogger.log(
-			new System.TypeException(className + ' does not implement RollupEngineExtension'),
+		return (RollupEngineExtension) NamespaceUtil.build(
+			className,
+			RollupEngineExtension.class,
 			'RollupEngineExtensions.resolve'
 		);
-		return null;
 	}
 }

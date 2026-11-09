@@ -107,7 +107,7 @@ public with sharing class EventBadgesController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getBadges', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Badges_LoadFailed'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Badges_LoadFailed'));
 		}
 	}
 }

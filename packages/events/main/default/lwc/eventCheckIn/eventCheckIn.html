@@ -21,6 +21,7 @@
             label={labels.codeLabel}
             value={code}
             onchange={handleCode}
+            onkeydown={handleCodeKey}
           ></lightning-input>
           <div class="slds-col">
             <lightning-button
@@ -71,14 +72,14 @@
       <div class="slds-box slds-var-m-vertical_small" data-id="walk-in-form">
         <div class="slds-grid slds-wrap slds-gutters_x-small">
           <lightning-input
-            class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4"
+            class="slds-col slds-size_1-of-1 slds-small-size_1-of-2 slds-medium-size_1-of-4"
             data-field="firstName"
             label={labels.firstName}
             value={walkInForm.firstName}
             onchange={handleWalkInField}
           ></lightning-input>
           <lightning-input
-            class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4"
+            class="slds-col slds-size_1-of-1 slds-small-size_1-of-2 slds-medium-size_1-of-4"
             data-field="lastName"
             label={labels.lastName}
             value={walkInForm.lastName}
@@ -86,7 +87,7 @@
             onchange={handleWalkInField}
           ></lightning-input>
           <lightning-input
-            class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4"
+            class="slds-col slds-size_1-of-1 slds-small-size_1-of-2 slds-medium-size_1-of-4"
             data-field="email"
             type="email"
             label={labels.email}
@@ -95,7 +96,7 @@
           ></lightning-input>
           <template lwc:if={hasTickets}>
             <lightning-combobox
-              class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4"
+              class="slds-col slds-size_1-of-1 slds-small-size_1-of-2 slds-medium-size_1-of-4"
               data-field="ticketTypeId"
               label={labels.ticket}
               options={ticketOptions}
@@ -149,7 +150,7 @@
     </template>
 
     <template lwc:if={showEmpty}>
-      <c-barn-empty-state data-id="empty-state" message={labels.empty}></c-barn-empty-state>
+      <c-barn-empty-state data-id="empty-state" size="compact" heading={labels.emptyHeading} message={labels.empty}></c-barn-empty-state>
     </template>
 
     <template lwc:if={showNoMatch}>

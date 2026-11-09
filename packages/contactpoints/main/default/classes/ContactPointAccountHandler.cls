@@ -9,8 +9,8 @@
  * they are deleted; syncs a merge's survivor. Households and organizations are never touched.
  *
  * Person accounts stay optional: no compile-time reference to a person field. Fields are read
- * by name from the values a record carries, and an org without person accounts returns before
- * anything else runs. Never fails a save.
+ * by name, only those Account has in this org, and an org without person accounts returns
+ * before anything else runs. Never fails a save.
  */
 @NamespaceAccessible
 public with sharing class ContactPointAccountHandler extends TriggerHandler {
@@ -21,6 +21,11 @@ public with sharing class ContactPointAccountHandler extends TriggerHandler {
 	private static final String INDIVIDUAL_LINK = 'PersonIndividualId';
 	/** Built once, not for every record of a save. */
 	private static final List<String> ACCOUNT_FIELDS = ContactPointPlan.accountFields();
+	/** The watched fields this org's Account has, found once a transaction. */
+	private static List<String> watchedHere;
+	private static Boolean individualLinkHere;
+	/** By phase, the record each person account was last synced from in this transaction. */
+	private static final Map<String, Map<Id, SObject>> SYNCED_FROM = new Map<String, Map<Id, SObject>>();
 
 	/** Built by name from Core's dispatcher, so it needs a public constructor. */
 	@NamespaceAccessible
@@ -38,23 +43,63 @@ public with sharing class ContactPointAccountHandler extends TriggerHandler {
 		}
 		Set<Id> valuesOnly = new Set<Id>();
 		Set<Id> everything = new Set<Id>();
+		// Described only once a person account is in the save: a save of households alone (a
+		// household's name settled for its new members) reads no Account describe.
+		List<String> watched;
 		for (SObject record : newRecords()) {
 			if (!PersonRecordSelector.isPersonRecord(record)) {
 				continue;
 			}
-			Map<String, Object> now = record.getPopulatedFieldsAsMap();
-			Map<String, Object> before = oldRecordsById().get(record.Id).getPopulatedFieldsAsMap();
-			if (now.get(INDIVIDUAL_LINK) != before.get(INDIVIDUAL_LINK)) {
+			if (watched == null) {
+				watched = watchedFields();
+			}
+			// Only the watched fields are read: copying every field of the record into a map,
+			// twice per record, cost more than the comparison itself.
+			SObject before = oldRecordsById().get(record.Id);
+			if (individualLinkHere && record.get(INDIVIDUAL_LINK) != before.get(INDIVIDUAL_LINK)) {
 				everything.add(record.Id);
-			} else if (valuesChanged(now, before)) {
+			} else if (ContactPointPlan.anyChanged(record, before, watched)) {
 				valuesOnly.add(record.Id);
 			}
 		}
-		ContactPointSyncService.syncOrQueue(claimRunFor('afterUpdate', everything), null);
+		ContactPointSyncService.syncOrQueue(claimValues('afterUpdate', everything), null);
 		ContactPointSyncService.syncOrQueue(
-			claimRunFor('afterUpdateValues', valuesOnly),
+			claimValues('afterUpdateValues', valuesOnly),
 			VALUE_KINDS
 		);
+	}
+
+	/**
+	 * The person accounts not yet synced with the values they hold now: a re-fire of the same
+	 * save is synced once, a second, different change in the transaction again.
+	 */
+	private Set<Id> claimValues(String phase, Set<Id> accountIds) {
+		if (accountIds.isEmpty()) {
+			return accountIds;
+		}
+		// One claim for the save; only a person account already synced in this transaction is
+		// compared with the record it was synced from, by the watched fields alone.
+		Set<Id> result = claimRunFor(phase, accountIds);
+		if (!SYNCED_FROM.containsKey(phase)) {
+			SYNCED_FROM.put(phase, new Map<Id, SObject>());
+		}
+		Map<Id, SObject> last = SYNCED_FROM.get(phase);
+		List<String> fields = new List<String>(watchedFields());
+		if (individualLinkHere) {
+			fields.add(INDIVIDUAL_LINK);
+		}
+		for (Id accountId : accountIds) {
+			SObject now = newRecordsById().get(accountId);
+			if (
+				result.contains(accountId) ||
+				!last.containsKey(accountId) ||
+				ContactPointPlan.anyChanged(now, last.get(accountId), fields)
+			) {
+				result.add(accountId);
+				last.put(accountId, now);
+			}
+		}
+		return result;
 	}
 
 	public override void beforeDelete() {
@@ -93,12 +138,23 @@ public with sharing class ContactPointAccountHandler extends TriggerHandler {
 		return result;
 	}
 
-	private static Boolean valuesChanged(Map<String, Object> now, Map<String, Object> before) {
-		for (String field : ACCOUNT_FIELDS) {
-			if (now.get(field) != before.get(field)) {
-				return true;
+	/**
+	 * The watched fields Account has in this org, checked once a transaction: an org without
+	 * one (no Individual object, say) skips it rather than fail on reading it.
+	 */
+	@TestVisible
+	private static List<String> watchedFields() {
+		if (watchedHere == null) {
+			Map<String, Schema.SObjectField> fields = Schema.SObjectType.Account.fields.getMap();
+			List<String> found = new List<String>();
+			for (String field : ACCOUNT_FIELDS) {
+				if (fields.containsKey(field.toLowerCase())) {
+					found.add(field);
+				}
 			}
+			individualLinkHere = fields.containsKey(INDIVIDUAL_LINK.toLowerCase());
+			watchedHere = found;
 		}
-		return false;
+		return watchedHere;
 	}
 }

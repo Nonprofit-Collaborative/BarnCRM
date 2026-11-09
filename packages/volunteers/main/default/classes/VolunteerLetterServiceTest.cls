@@ -61,12 +61,15 @@ private class VolunteerLetterServiceTest {
 
 	/** Contacts the coordinator owns, so only the permission set decides what they may do. */
 	private static List<Contact> ownedContacts(Integer howMany) {
-		List<Contact> people = VolunteersTestData.contacts(howMany);
+		// Owned from the insert: one save per person, not an insert and then an owner update.
 		Id ownerId = user(COORDINATOR).Id;
-		for (Contact person : people) {
+		List<Contact> people = new List<Contact>();
+		for (Integer i = 0; i < howMany; i++) {
+			Contact person = HouseholdTestDataFactory.newContact('Vol', 'Unteer' + i);
 			person.OwnerId = ownerId;
+			people.add(person);
 		}
-		update people;
+		insert people;
 		return people;
 	}
 

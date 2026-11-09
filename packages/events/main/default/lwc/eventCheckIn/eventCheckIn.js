@@ -17,7 +17,7 @@ import {
 
 import CHECK_IN from '@salesforce/label/c.Events_EventTab_CheckIn';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 const SCAN_INTERVAL_MS = 400;
 const QR_CELL_SIZE = 6;
 
@@ -52,6 +52,9 @@ export default class EventCheckIn extends LightningElement {
     },
     get empty() {
       return helpText('Events', 'Events_CheckIn_Empty');
+    },
+    get emptyHeading() {
+      return helpText('Events', 'Events_CheckIn_EmptyHeading');
     },
     get noMatch() {
       return helpText('Events', 'Events_CheckIn_NoMatch');
@@ -235,6 +238,14 @@ export default class EventCheckIn extends LightningElement {
 
   handleCode(event) {
     this.code = event.detail.value || '';
+  }
+
+  /** Enter checks the code in, so a handheld scanner that types the code and Enter just works. */
+  handleCodeKey(event) {
+    if (event.key === 'Enter' && this.code && !this.busy) {
+      event.preventDefault();
+      this.handleSubmitCode();
+    }
   }
 
   async handleSubmitCode() {

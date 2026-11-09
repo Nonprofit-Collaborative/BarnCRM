@@ -1,3 +1,9 @@
+/* The loading spinner covers this page's content only. */
+:host {
+  display: block;
+  position: relative;
+}
+
 /* Widths of 100% come from the slds-size_full utility class on the table and each item. */
 .barn-calendar {
   table-layout: fixed;

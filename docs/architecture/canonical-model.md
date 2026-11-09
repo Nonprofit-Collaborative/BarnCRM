@@ -8960,7 +8960,10 @@ person's current name to confirm. A person with an Erasure record is not erased 
 
 **R-ER8 Modules decide about their own records.** Each installed module implementing
 `PersonErasureExtension` changes its own records in the same transaction and reports what it
-changed and kept. A module that is installed but cannot answer refuses the erasure.
+changed and kept. A module that is installed but cannot answer refuses the erasure. A module
+that also implements `PersonErasureStartExtension` is told before Core changes anything (once
+every check has passed) and always told when the run ends, succeeded or not (ADR-0193 erasure
+start seam); Contact Point Sync uses it to copy the person's addresses once, from the final state.
 
 **R-ER9 An erased person is not an orphan.** A person an Erasure record names is left out of
 "people with no household" in Health Check and data hygiene, in both membership modes.
@@ -12817,6 +12820,7 @@ expires.
 | Form | reference | yes | The form, master-detail. |
 | Form Version | reference | no | The version the answers answer; a resumed form is always this version. Cleared if the version is deleted, which ends the link. |
 | Token Hash | text | yes | SHA-256 of the link's token in hex. The token itself is never stored. No permission set reads it. |
+| Address Key | text | no | HMAC-SHA256 of the email address the link went to (trimmed, lower case), keyed with the version's signing key, in hex: counts links per address without storing the address. No permission set reads it. |
 | Expires | date/time | yes | When the link stops working (now plus `public.resumeDays`). |
 | Answers | long text | no | The answers that count so far, as JSON, without file answers. |
 | Step | number | no | The step the person was on. |
@@ -12832,7 +12836,9 @@ shares it with the person and organization written, once each. Saving for later 
 on a public form with `saveForLater`: after the R-FS5 spam checks (drafts count toward the
 hourly limit) a random 256-bit token is made, its hash stored with the answers, and a link to
 `FormsPublic?form=<id>&resume=<token>` on the Site (or the first active Site, for an API caller)
-emailed to the address given, which is not stored. A link opens only before Expires and only on
+emailed to the address given, which is not stored (only its Address Key). At most 3 links an
+hour go to one address for one form, and at most 100 an hour for one form (or the form's hourly
+limit, if lower); past either the answer is Busy and nothing is sent. A link opens only before Expires and only on
 the draft's version; sending the form deletes the draft; `FormPublicProcessor` deletes expired
 drafts. If the email cannot be sent the draft is deleted and the person told.
 
@@ -12846,6 +12852,7 @@ drafts. If the email cannot be sent the draft is deleted and the person told.
 | Form | `Form__c` | Master-Detail(Form) |
 | Form Version | `Form_Version__c` | Lookup(Form Version), set null on delete |
 | Token Hash | `Token_Hash__c` | Text(64), unique, case sensitive, external ID |
+| Address Key | `Address_Key__c` | Text(64) |
 | Expires | `Expires__c` | Date/Time |
 | Answers | `Answers__c` | Long Text Area(131072) |
 | Step | `Step__c` | Number(3, 0) |
@@ -14034,6 +14041,7 @@ that belong to them.
 | Locked Until | datetime | no | Set when failures reach the setting's limit. |
 | Second Factor Enrolled | boolean | yes | Whether an authenticator is confirmed. Clear it to reset. |
 | Second Factor Secret | text | no | The authenticator secret, base32. Granted to no one; read only by Portal Builder. |
+| Second Factor Last Step | number | no | The 30-second step of the last authenticator code accepted (R-PA3). Admins read it; only Portal Builder writes it. |
 | Last Sign In | datetime | no | When the person last signed in. |
 
 ### Rules
@@ -14044,6 +14052,10 @@ sent and no code is accepted.
 
 **R-PA2 One access per person per portal.** Any Matching Person portals create the access on first
 use only when the person has none.
+
+**R-PA3 An authenticator code is used once.** An authenticator code is accepted only for a step
+later than Second Factor Last Step, which it then becomes, so a code seen once cannot be replayed
+within its window. A new secret clears it.
 
 ### Salesforce implementation
 
@@ -14059,6 +14071,7 @@ use only when the person has none.
 | Locked Until | `Locked_Until__c` | DateTime |
 | Second Factor Enrolled | `Second_Factor_Enrolled__c` | Checkbox, default false |
 | Second Factor Secret | `Second_Factor_Secret__c` | Text(64) |
+| Second Factor Last Step | `Second_Factor_Last_Step__c` | Number(18, 0) |
 | Last Sign In | `Last_Sign_In__c` | DateTime |
 
 ---
@@ -14537,6 +14550,8 @@ mirrors the primary member).
 | 1.2 | 2026-11-07 | Event calendar (EV-19, D-186, ADR-0189). No object or field added: the Event Calendar tab reads `Event__c` (29EV1) and `Event_Session__c` (29EV5) and builds an `.ics` file per entry in the browser. |
 | 1.2 | 2026-11-07 | Public event pages (EV-16, D-186, ADR-0190 public event pages). `Event__c` (29EV1) gains `Public_Page__c`, `Public_Speakers__c` and `Public_Seats__c` (Checkbox, default false) and rule R-EV5; `Events_Settings__c` (29EV25) gains `Public_Payment_Note__c` (setting `Events_Public_Payment_Note`, sort 90). Core gains the `PublicPageExtension` seam (no object or field). |
 | 1.3 | 2026-11-07 | Portal Builder module (PB-01, D-118, D-178, D-187; ADR-0185 `0185-portal-builder-off-platform-portal-api.md`). New package `packages/portal`: Portal (`Portal__c`, 29PB1), Portal Access (`Portal_Access__c`, 29PB2), Portal Session (`Portal_Session__c`, 29PB3) and Portal Settings (`Portal_Settings__c`, 29PB4), rules R-PB1 to R-PB4, R-PA1, R-PA2, R-PS1, R-PS2 and R-PST1. Core gains no object or field: only the `PortalActionExtension` seam, the Portals settings section and the catalog row `BarnCRM_Module.Portal`. |
+| 1.3 | 2026-11-09 | Batch C review: Form Draft (29ZY1) gains Address Key (`Address_Key__c`, Text(64)); R-FS7 caps save-for-later links at 3 an hour per address and 100 an hour per form. |
+| 1.3 | 2026-11-09 | Batch C review: Portal Access (29PB2) gains Second Factor Last Step (`Second_Factor_Last_Step__c`, Number(18, 0)) and rule R-PA3, an authenticator code is used once. |
 | 1.3 | 2026-11-07 | Portal templates for volunteers, speakers and donors (PB-03, PB-07, PB-08; ADR-0191 `0191-portal-templates-volunteer-speaker-donor.md`). No object or field added. R-PB2 gains a read-only `Parent__r.Contact__c` person link; Core's `PortalActionExtensions` lists the Volunteers and Event Management action classes. |
 
 ---

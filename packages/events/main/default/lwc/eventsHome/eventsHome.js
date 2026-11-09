@@ -23,7 +23,7 @@ import OPEN from '@salesforce/label/c.Core_Shared_Open';
 import ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
 import ACTIONS_FOR from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 const ACTION_OPEN = 'open';
 const ACTION_REPEAT = 'repeat';
 const VIEW_UPCOMING = 'upcoming';
@@ -139,6 +139,12 @@ export default class EventsHome extends NavigationMixin(LightningElement) {
     return this.view === VIEW_PAST
       ? helpText('Events', 'Events_Home_EmptyPast')
       : helpText('Events', 'Events_Home_EmptyUpcoming');
+  }
+
+  get emptyHeading() {
+    return this.view === VIEW_PAST
+      ? helpText('Events', 'Events_Home_EmptyPastHeading')
+      : helpText('Events', 'Events_Home_EmptyUpcomingHeading');
   }
 
   get truncatedMessage() {

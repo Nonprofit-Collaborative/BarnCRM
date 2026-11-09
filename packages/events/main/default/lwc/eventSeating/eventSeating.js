@@ -19,7 +19,7 @@ import {
 
 import SEATING from '@salesforce/label/c.Events_EventTab_Seating';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 const NO_TABLE = '';
 
 /**
@@ -47,6 +47,9 @@ export default class EventSeating extends LightningElement {
     },
     get empty() {
       return helpText('Events', 'Events_Seating_Empty');
+    },
+    get emptyHeading() {
+      return helpText('Events', 'Events_Seating_EmptyHeading');
     },
     get addTable() {
       return helpText('Events', 'Events_Seating_AddTable');

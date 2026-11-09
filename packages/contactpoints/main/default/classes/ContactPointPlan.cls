@@ -244,16 +244,44 @@ public with sharing class ContactPointPlan {
 		return joined == '||' ? null : joined;
 	}
 
-	/** The fields of `wanted` whose value `current` does not already hold. */
+	/**
+	 * The fields of `wanted` whose value `current` does not already hold. Capitals count, so a
+	 * street corrected from "main st" to "Main St" reaches the copy.
+	 */
 	public static Set<String> differences(Map<String, Object> wanted, Map<String, Object> current) {
 		Set<String> result = new Set<String>();
 		for (String field : wanted.keySet()) {
 			Object have = current == null ? null : current.get(field);
-			if (blankAsEmpty(wanted.get(field)) != blankAsEmpty(have)) {
+			if (changed(blankAsEmpty(wanted.get(field)), blankAsEmpty(have))) {
 				result.add(field);
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * Whether a saved value changed, text compared case-sensitively (`!=` ignores case for text
+	 * in Apex, so a case-only correction was not seen as a change).
+	 */
+	public static Boolean changed(Object now, Object before) {
+		if (now instanceof String && before instanceof String) {
+			return !((String) now).equals((String) before);
+		}
+		return now != before;
+	}
+
+	/**
+	 * Whether any of these fields differs between two saves of a record (see `changed`): a
+	 * handler syncs a record a second time in a transaction only then, so a workflow or flow
+	 * re-fire is synced once while a second, different change is synced too.
+	 */
+	public static Boolean anyChanged(SObject now, SObject before, List<String> fields) {
+		for (String field : fields) {
+			if (changed(now.get(field), before.get(field))) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static String text(Object value) {

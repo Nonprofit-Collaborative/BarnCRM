@@ -8,7 +8,7 @@ import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 
 /**
  * The Survey section of the event page's Details tab (EV-18): choose the form attendees are sent
@@ -58,6 +58,7 @@ export default class EventSurvey extends LightningElement {
       form: helpText('Events', 'Events_Survey_Form'),
       noSurvey: helpText('Events', 'Events_Survey_None'),
       noResponses: helpText('Events', 'Events_Survey_NoResponses'),
+      noResponsesHeading: helpText('Events', 'Events_Survey_NoResponsesHeading'),
       results: helpText('Events', 'Events_Survey_Results')
     };
   }

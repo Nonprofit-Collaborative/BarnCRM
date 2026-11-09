@@ -149,7 +149,7 @@ private class ImportTransformTest {
 				Test.startTest();
 				String refusal;
 				try {
-					ImportTemplateService.saveMapping(
+					ImportTestDataFactory.saveMapping(
 						template.Id,
 						mapping.serialize(),
 						ImportTemplateService.RULE_EMAIL
@@ -180,7 +180,7 @@ private class ImportTransformTest {
 				);
 
 				Test.startTest();
-				ImportTemplateService.saveMapping(
+				ImportTestDataFactory.saveMapping(
 					template.Id,
 					changingMapping().serialize(),
 					ImportTemplateService.RULE_EMAIL

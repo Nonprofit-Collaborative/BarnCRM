@@ -25,11 +25,13 @@ private class ImportMatchAnyFieldTest {
 	static void setUp() {
 		System.runAs(TestUsers.admin()) {
 			TestDataFactory.defaultSettings();
+			// Built once for the class rather than in every test that runs as her.
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 		}
 	}
 
 	private static User admin() {
-		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+		return TestUsers.fromSetup('Maria');
 	}
 
 	/** A template loading this object, with these columns (source, target, lookup field). */
@@ -316,7 +318,7 @@ private class ImportMatchAnyFieldTest {
 				ImportTemplateService.LoadChoices choices = new ImportTemplateService.LoadChoices();
 				choices.operation = ImportObjectSchema.OPERATION_UPDATE_BY_FIELD;
 				choices.matchField = 'email';
-				template = ImportTemplateService.saveLoad(template.Id, choices);
+				template = ImportTestDataFactory.saveLoad(template.Id, choices);
 				Assert.areEqual(
 					ImportObjectSchema.OPERATION_UPDATE_BY_FIELD,
 					template.Load_Operation__c,
@@ -325,7 +327,7 @@ private class ImportMatchAnyFieldTest {
 				Assert.areEqual('Email', template.Load_Match_Field__c, 'As describe names it.');
 				choices.matchField = 'Birthdate';
 				try {
-					ImportTemplateService.saveLoad(template.Id, choices);
+					ImportTestDataFactory.saveLoad(template.Id, choices);
 					Assert.fail('A date cannot match rows.');
 				} catch (ImportException e) {
 					Assert.areEqual(

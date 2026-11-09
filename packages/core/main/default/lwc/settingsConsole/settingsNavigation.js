@@ -28,7 +28,8 @@ const GROUPS = [
     sections: [
       ['People and Households', 'utility:groups'],
       ['Addresses', 'utility:location'],
-      ['Contact Points', 'utility:contact_request']
+      ['Contact Points', 'utility:contact_request'],
+      ['Portals', 'utility:identity']
     ]
   },
   {

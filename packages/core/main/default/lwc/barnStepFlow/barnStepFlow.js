@@ -10,6 +10,8 @@ import STEP_OF from '@salesforce/label/c.Core_Kit_StepOf';
  * The path names each step, so the caller drops its own step heading; the flow keeps one
  * `h2` ("Step 2 of 6: Upload File") for screen readers. The caller owns the step: it passes
  * `current-step`, listens for `back`, and puts Next, Preview or Finish in the `actions` slot.
+ * When the step changes, focus moves to that heading, so a keyboard or screen reader user
+ * starts the new step at its top instead of on a button that may have gone.
  */
 export default class BarnStepFlow extends LightningElement {
   /** The steps in order, each `{ value, label }` with a short title-style label. */
@@ -20,6 +22,18 @@ export default class BarnStepFlow extends LightningElement {
   @api canGoBack = false;
 
   labels = { back: BACK };
+  shownStep;
+
+  renderedCallback() {
+    const changed = this.shownStep !== undefined && this.shownStep !== this.currentStep;
+    this.shownStep = this.currentStep;
+    if (changed) {
+      const heading = this.template.querySelector('[data-id="heading"]');
+      if (heading) {
+        heading.focus();
+      }
+    }
+  }
 
   get headingText() {
     const steps = this.steps || [];

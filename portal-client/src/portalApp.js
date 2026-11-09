@@ -42,24 +42,58 @@ function fill(template, value) {
   return template.replace('{0}', value);
 }
 
-function display(field, value) {
+function display(field, value, messages) {
   if (value === null || value === undefined || value === '') {
     return '';
   }
   if (field.type === 'boolean') {
-    return value ? 'Yes' : 'No';
+    return value ? (messages.yes ?? MESSAGES.yes) : (messages.no ?? MESSAGES.no);
   }
-  const option = (field.options || []).find((o) => o.value === value);
-  return option ? option.label : String(value);
+  const labelOf = (one) => {
+    const option = (field.options || []).find((o) => o.value === one);
+    return option ? option.label : one;
+  };
+  if (field.type === 'datetime') {
+    return new Date(value).toLocaleString();
+  }
+  return isMulti(field) ? chosenOf(value).map(labelOf).join(', ') : labelOf(String(value));
+}
+
+/** A stored date and time (UTC) as the visitor's local `yyyy-MM-ddTHH:mm` for an input. */
+function localInput(value) {
+  const at = new Date(value);
+  return new Date(at.getTime() - at.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+}
+
+function isMulti(field) {
+  return field.type === 'multipicklist';
+}
+
+/** A multi-select picklist's values: the field stores them joined with semicolons. */
+function chosenOf(value) {
+  return value === null || value === undefined || value === ''
+    ? []
+    : String(value)
+        .split(';')
+        .filter((one) => one !== '');
 }
 
 function inputFor(field, value, id) {
   const common = { id, name: field.field, required: field.required === true };
   if (field.options) {
-    const select = el('select', common, [el('option', { value: '', text: '' })]);
-    field.options.forEach((o) =>
+    const multi = isMulti(field);
+    const chosen = multi ? chosenOf(value) : [value === null || value === undefined ? '' : value];
+    const select = el('select', { ...common, multiple: multi }, [
+      multi ? null : el('option', { value: '', text: '' })
+    ]);
+    const options = field.options.slice();
+    // A value the field no longer offers is still shown, so an untouched field keeps it.
+    chosen
+      .filter((one) => one !== '' && !options.some((o) => o.value === one))
+      .forEach((one) => options.push({ value: one, label: one }));
+    options.forEach((o) =>
       select.appendChild(
-        el('option', { value: o.value, text: o.label, selected: o.value === value })
+        el('option', { value: o.value, text: o.label, selected: chosen.includes(o.value) })
       )
     );
     return select;
@@ -73,19 +107,37 @@ function inputFor(field, value, id) {
     return area;
   }
   const input = el('input', { ...common, type: INPUT_TYPES[field.type] || 'text' });
-  input.value = value === null || value === undefined ? '' : String(value).replace(/Z$/, '');
+  const blank = value === null || value === undefined || value === '';
+  input.value = blank ? '' : field.type === 'datetime' ? localInput(value) : String(value);
   return input;
 }
 
-function valuesOf(form, fields) {
+function valueOf(input) {
+  if (input.type === 'checkbox') {
+    return input.checked;
+  }
+  if (input.multiple) {
+    const chosen = Array.from(input.selectedOptions).map((o) => o.value);
+    return chosen.length === 0 ? null : chosen.join(';');
+  }
+  if (input.type === 'datetime-local' && input.value !== '') {
+    return new Date(input.value).toISOString(); // the visitor's local time, sent as UTC
+  }
+  return input.value === '' ? null : input.value;
+}
+
+/** The form's values; with `before`, only those changed since, so untouched fields are kept. */
+function valuesOf(form, fields, before) {
   const values = {};
   fields.forEach((field) => {
     const input = form.elements.namedItem(field.field);
     if (!input) {
       return;
     }
-    values[field.field] =
-      input.type === 'checkbox' ? input.checked : input.value === '' ? null : input.value;
+    const value = valueOf(input);
+    if (!before || before[field.field] !== value) {
+      values[field.field] = value;
+    }
   });
   return values;
 }
@@ -101,12 +153,16 @@ function valuesOf(form, fields) {
 export function mountPortal(root, { api, messages = MESSAGES }) {
   const state = { challenge: null, menu: null, pageKey: null };
 
-  function show(...nodes) {
-    root.replaceChildren(...nodes);
-    const focusable = root.querySelector('input, select, textarea, button');
+  function focusFirst(container) {
+    const focusable = container.querySelector('input, select, textarea, button');
     if (focusable) {
       focusable.focus();
     }
+  }
+
+  function show(...nodes) {
+    root.replaceChildren(...nodes.filter(Boolean));
+    focusFirst(root);
   }
 
   function alertBox(text) {
@@ -229,11 +285,12 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
   function recordForm(page, record, alertSlot, onDone) {
     const editable = page.fields.filter((f) => f.edit);
     const values = record ? record.values : {};
+    let before = null;
     const form = el('form', {
       class: 'barn-portal-form',
       onSubmit: () =>
         api
-          .save(page.key, record ? record.id : null, valuesOf(form, editable))
+          .save(page.key, record ? record.id : null, valuesOf(form, editable, before))
           .then(() => openPage(page.key, messages.saved))
           .catch((error) => failed(error, alertSlot))
     });
@@ -244,6 +301,8 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
     });
     form.appendChild(el('button', { type: 'submit', text: messages.save }));
     form.appendChild(el('button', { type: 'button', text: messages.cancel, onClick: onDone }));
+    // An edit sends only what changed: an untouched field is never rewritten or cleared.
+    before = record ? valuesOf(form, editable) : null;
     return form;
   }
 
@@ -252,7 +311,7 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
     const list = el('dl');
     page.fields.forEach((field) => {
       list.appendChild(el('dt', { text: field.label }));
-      list.appendChild(el('dd', { text: display(field, record.values[field.field]) }));
+      list.appendChild(el('dd', { text: display(field, record.values[field.field], messages) }));
     });
     const buttons = el('div', { class: 'barn-portal-actions' });
     if (page.canUpdate && page.fields.some((f) => f.edit)) {
@@ -260,8 +319,10 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
         el('button', {
           type: 'button',
           text: messages.edit,
-          onClick: () =>
-            card.replaceChildren(recordForm(page, record, alertSlot, () => openPage(page.key)))
+          onClick: () => {
+            card.replaceChildren(recordForm(page, record, alertSlot, () => openPage(page.key)));
+            focusFirst(card);
+          }
         })
       );
     }
@@ -273,9 +334,9 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
           onClick: () =>
             api
               .action(page.key, record.id, action.name)
-              .then((answer) =>
-                alertSlot.replaceChildren(alertBox(answer.message || messages.saved))
-              )
+              // The page is read again, so the record shows what the action changed; openPage
+              // shows the answer as a status line.
+              .then((answer) => openPage(page.key, answer.message || messages.saved))
               .catch((error) => failed(error, alertSlot))
         })
       );
@@ -322,19 +383,26 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
             el('button', {
               type: 'button',
               text: messages.add,
-              onClick: () =>
-                body.replaceChildren(recordForm(page, null, alertSlot, () => openPage(key)))
+              onClick: () => {
+                body.replaceChildren(recordForm(page, null, alertSlot, () => openPage(key)));
+                focusFirst(body);
+              }
             })
           );
         }
+        const heading = el('h3', { tabindex: '-1', text: page.title || page.key });
         show(
           el('h2', { text: state.menu.title }),
-          el('p', { text: fill(messages.greeting, state.menu.firstName || '') }),
+          state.menu.firstName
+            ? el('p', { text: fill(messages.greeting, state.menu.firstName) })
+            : null,
           nav(),
-          el('h3', { text: page.title || page.key }),
+          heading,
           alertSlot,
           body
         );
+        // A new page starts at its heading, so a screen reader says which page opened.
+        heading.focus();
       })
       .catch((error) => failed(error, alertSlot));
   }

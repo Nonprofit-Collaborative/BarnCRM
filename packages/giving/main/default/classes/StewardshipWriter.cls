@@ -81,18 +81,6 @@ public without sharing class StewardshipWriter {
 		}
 	}
 
-	/** Closing a plan is a person's act, so it is written as that person. */
-	public static void closePlan(Stewardship_Plan__c plan) {
-		if (plan == null) {
-			return;
-		}
-		try {
-			Database.update(plan, true, AccessLevel.USER_MODE);
-		} catch (Exception cannotClose) {
-			ErrorLogger.log(cannotClose, CONTEXT, plan.Id);
-		}
-	}
-
 	/**
 	 * Who each started plan's donor belongs to, in one query for the whole list. A donor the
 	 * package cannot read is simply absent from the map, and the service falls back to the person

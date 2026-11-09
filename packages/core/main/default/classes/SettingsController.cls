@@ -155,11 +155,6 @@ public with sharing class SettingsController {
 		public String changedBy;
 		@AuraEnabled
 		public Datetime changedAt;
-
-		@NamespaceAccessible
-		public String getSettingName() {
-			return settingName;
-		}
 	}
 
 	// Not cacheable: the console calls it again after a save, and a cached answer would show

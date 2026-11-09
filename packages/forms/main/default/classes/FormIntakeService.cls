@@ -29,6 +29,12 @@ public without sharing class FormIntakeService {
 	private static final Long TICKET_LIFE_MS = 24L * 60 * 60 * 1000;
 	private static final Long DAY_MS = 24L * 60 * 60 * 1000;
 	private static final Integer DRAFT_LENGTH = 131072;
+	/** Save-for-later links one address may be sent for one form in an hour (R-FS7). */
+	@TestVisible
+	private static final Integer LINKS_PER_ADDRESS_HOUR = 3;
+	/** Save-for-later links one form may send in an hour, at most (R-FS7). */
+	@TestVisible
+	private static final Integer LINKS_PER_FORM_HOUR = 100;
 	private static final String CONTEXT = 'FormIntakeService';
 
 	/** Set by tests to move the clock: milliseconds added to now. */
@@ -144,7 +150,7 @@ public without sharing class FormIntakeService {
 	}
 
 	private static PublicForm viewOf(Form_Version__c version) {
-		Map<String, Object> definition = FormRules.parse(version.Definition__c);
+		Map<String, Object> definition = definitionOf(version);
 		PublicForm view = new PublicForm();
 		view.formId = version.Form__c;
 		view.name = version.Form__r.Name;
@@ -154,16 +160,6 @@ public without sharing class FormIntakeService {
 		view.ticket = ticketFor(version, now());
 		view.canSave = FormPublicPolicy.canSave(definition);
 		return view;
-	}
-
-	/** Stores the answers with no files (C-42b callers). */
-	public static Receipt submit(
-		String ticket,
-		Map<String, Object> answers,
-		String trap,
-		String contextRecordId
-	) {
-		return submit(ticket, answers, trap, contextRecordId, null, null);
 	}
 
 	/**
@@ -204,7 +200,7 @@ public without sharing class FormIntakeService {
 			receipt.status = CLOSED;
 			return receipt;
 		}
-		Map<String, Object> definition = FormRules.parse(version.Definition__c);
+		Map<String, Object> definition = definitionOf(version);
 		Map<String, Object> given = answers == null ? new Map<String, Object>() : answers;
 		receipt.problems = FormRules.checkAll(definition, given);
 		Map<String, Object> counted = FormRules.countedAnswers(definition, given);
@@ -256,7 +252,7 @@ public without sharing class FormIntakeService {
 		if (version == null) {
 			return receipt;
 		}
-		Map<String, Object> definition = FormRules.parse(version.Definition__c);
+		Map<String, Object> definition = definitionOf(version);
 		String base = resumeBase();
 		if (!FormPublicPolicy.canSave(definition) || base == null) {
 			receipt.status = CLOSED;
@@ -275,12 +271,18 @@ public without sharing class FormIntakeService {
 			receipt.problems.put(SAVE_KEY, problem);
 			return receipt;
 		}
+		String addressKey = addressKeyOf(version, address);
+		if (tooManyLinks(version, definition, addressKey)) {
+			receipt.status = BUSY;
+			return receipt;
+		}
 		String token = EncodingUtil.convertToHex(Crypto.generateAesKey(256));
 		Integer days = FormPublicPolicy.resumeDays(definition);
 		Form_Draft__c draft = new Form_Draft__c(
 			Form__c = version.Form__c,
 			Form_Version__c = version.Id,
 			Token_Hash__c = hashOf(token),
+			Address_Key__c = addressKey,
 			Expires__c = Datetime.newInstance(now() + days * DAY_MS),
 			Answers__c = answersJson,
 			Step__c = step == null || step < 0 ? 0 : step
@@ -347,11 +349,17 @@ public without sharing class FormIntakeService {
 		}
 		Long issued = parts[1].isNumeric() ? Long.valueOf(parts[1]) : -1;
 		Long age = now() - issued;
-		if (ticketFor(version, issued) != ticket || issued < 0 || age < 0 || age > TICKET_LIFE_MS) {
+		// equals, not ==: Apex compares text with == ignoring case, and a signature must match exactly.
+		if (
+			!ticketFor(version, issued).equals(ticket) ||
+			issued < 0 ||
+			age < 0 ||
+			age > TICKET_LIFE_MS
+		) {
 			receipt.status = EXPIRED;
 			return null;
 		}
-		Map<String, Object> definition = FormRules.parse(version.Definition__c);
+		Map<String, Object> definition = definitionOf(version);
 		if (!FormPublicPolicy.isPublic(definition)) {
 			receipt.status = CLOSED;
 		} else if (age < FormPublicPolicy.minSeconds(definition) * 1000L) {
@@ -428,7 +436,7 @@ public without sharing class FormIntakeService {
 		String expected = claimFor(formId, contextId);
 		return expected != null &&
 			String.isNotBlank(claim) &&
-			expected == claim &&
+			expected.equals(claim) &&
 			FormAttachmentExtensions.formFor(contextId) == formId;
 	}
 
@@ -460,9 +468,27 @@ public without sharing class FormIntakeService {
 		if (versions.isEmpty() || String.isBlank(versions[0].Signing_Key__c)) {
 			return null;
 		}
-		return FormPublicPolicy.isPublic(FormRules.parse(versions[0].Definition__c))
-			? versions[0]
-			: null;
+		return FormPublicPolicy.isPublic(definitionOf(versions[0])) ? versions[0] : null;
+	}
+
+	/** Each definition read once a request, as it was parsed by the checks before. */
+	private static final Map<String, Map<String, Object>> DEFINITIONS = new Map<String, Map<String, Object>>();
+
+	/**
+	 * The version's definition, parsed once: loading, sending and saving a form each read it
+	 * twice (the checks, then the work), and a large form's JSON is the costliest part. Keyed by
+	 * the JSON itself, so a changed definition is parsed afresh. Callers only read the map.
+	 */
+	private static Map<String, Object> definitionOf(Form_Version__c version) {
+		String source = version.Definition__c;
+		Map<String, Object> parsed = source == null ? null : DEFINITIONS.get(source);
+		if (parsed == null) {
+			parsed = FormRules.parse(source);
+			if (source != null) {
+				DEFINITIONS.put(source, parsed);
+			}
+		}
+		return parsed;
 	}
 
 	private static Form_Version__c versionOf(String versionId) {
@@ -505,6 +531,50 @@ public without sharing class FormIntakeService {
 				WHERE Form__c = :formId AND CreatedDate >= :hourAgo
 				WITH SYSTEM_MODE
 			];
+	}
+
+	/**
+	 * Whether another emailed link would pass a cap (R-FS7): 3 an hour to one address for one
+	 * form, and 100 an hour for one form, or the form's hourly limit when that is lower. Links are
+	 * counted by their drafts, so a link already used to send the form no longer counts.
+	 */
+	private static Boolean tooManyLinks(
+		Form_Version__c version,
+		Map<String, Object> definition,
+		String addressKey
+	) {
+		Datetime hourAgo = Datetime.newInstance(now() - 60L * 60 * 1000);
+		Integer formCap = Math.min(FormPublicPolicy.hourlyLimit(definition), LINKS_PER_FORM_HOUR);
+		Integer toAddress = [
+			SELECT COUNT()
+			FROM Form_Draft__c
+			WHERE
+				Form__c = :version.Form__c
+				AND Address_Key__c = :addressKey
+				AND CreatedDate >= :hourAgo
+			WITH SYSTEM_MODE
+		];
+		if (toAddress >= LINKS_PER_ADDRESS_HOUR) {
+			return true;
+		}
+		return [
+				SELECT COUNT()
+				FROM Form_Draft__c
+				WHERE Form__c = :version.Form__c AND CreatedDate >= :hourAgo
+				WITH SYSTEM_MODE
+			] >= formCap;
+	}
+
+	/** The address as a keyed hash: links are counted per address, which is never stored. */
+	@TestVisible
+	private static String addressKeyOf(Form_Version__c version, String address) {
+		return EncodingUtil.convertToHex(
+			Crypto.generateMac(
+				'hmacSHA256',
+				Blob.valueOf(address.trim().toLowerCase()),
+				EncodingUtil.convertFromHex(version.Signing_Key__c)
+			)
+		);
 	}
 
 	private static Form_Draft__c draftFor(String token) {

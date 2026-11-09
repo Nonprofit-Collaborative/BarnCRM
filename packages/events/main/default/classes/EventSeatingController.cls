@@ -174,7 +174,10 @@ public with sharing class EventSeatingController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getSeating', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Seating_LoadFailed'));
+			throw UserErrors.wrapShowingDml(
+				e,
+				BarnHelp.text('Events', 'Events_Seating_LoadFailed')
+			);
 		}
 	}
 
@@ -216,7 +219,7 @@ public with sharing class EventSeatingController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.saveTable', input.eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 
@@ -233,7 +236,7 @@ public with sharing class EventSeatingController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.deleteTable', tableId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 
@@ -301,7 +304,7 @@ public with sharing class EventSeatingController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.assignSeats', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 
@@ -328,7 +331,7 @@ public with sharing class EventSeatingController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.saveNeeds', attendeeId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 }

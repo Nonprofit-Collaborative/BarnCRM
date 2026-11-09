@@ -359,7 +359,17 @@ public with sharing class PersonErasure {
 		for (String automation : ADDRESS_AUTOMATIONS) {
 			AutomationControl.bypass(automation);
 		}
+		// Every check has passed: a module that asked is told before anything changes, and is
+		// always told the run ended (ADR-0193 erasure start seam).
+		List<PersonErasureStartExtension> started = new List<PersonErasureStartExtension>();
 		try {
+			for (PersonErasureExtension extension : extensions) {
+				if (extension instanceof PersonErasureStartExtension) {
+					PersonErasureStartExtension starting = (PersonErasureStartExtension) extension;
+					started.add(starting);
+					starting.beforeErase(personId);
+				}
+			}
 			remove(addresses, Address__c.SObjectType, result);
 			endConnections(relationships, side, people, related, result);
 			endConnections(affiliations, null, people, null, result);
@@ -422,6 +432,13 @@ public with sharing class PersonErasure {
 				)
 			);
 		} finally {
+			for (PersonErasureStartExtension starting : started) {
+				try {
+					starting.afterErase(personId);
+				} catch (Exception notEnded) {
+					ErrorLogger.log(notEnded, 'PersonErasure.afterErase');
+				}
+			}
 			for (String automation : ADDRESS_AUTOMATIONS) {
 				AutomationControl.clearBypass(automation);
 			}

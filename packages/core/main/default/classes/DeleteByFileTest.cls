@@ -277,7 +277,7 @@ private class DeleteByFileTest {
 				ImportTemplateService.LoadChoices choices = new ImportTemplateService.LoadChoices();
 				choices.operation = ImportObjectSchema.OPERATION_DELETE;
 				try {
-					ImportTemplateService.saveLoad(template.Id, choices);
+					ImportTestDataFactory.saveLoad(template.Id, choices);
 					Assert.fail('Saving a delete is refused.');
 				} catch (ImportException refused) {
 					Assert.areEqual(

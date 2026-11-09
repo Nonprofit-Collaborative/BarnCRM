@@ -54,9 +54,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Contact Points**. Untick **Sync Phones** and save. | The setting saves. The Contact Point Sync page says Phone is `turned off in BarnCRM Settings, Contact Points.` |
+| 1 | Open **BarnCRM Settings**, **Contact Points**. Untick **Sync phones** and save. | The setting saves. The Contact Point Sync page says Phone is `turned off in BarnCRM Settings, Contact Points.` |
 | 2 | Change a person's **Home Phone** and save. | Their Contact Point Phone keeps the old number. |
-| 3 | Tick **Sync Phones** again and save. Open the **Automation** page. | Four rows, **Contact Point Sync: People**, **Addresses**, **Person Accounts** and **Household Moves**, all on. |
+| 3 | Tick **Sync phones** again and save. Open the **Automation** page. | Four rows, **Contact Point Sync: People**, **Addresses**, **Person Accounts** and **Household Moves**, all on. |
 | 4 | Click **Pause All**. Change the person's **Personal Email** and save. | Their Contact Point Email keeps the old address. |
 | 5 | Resume automation, then run the backfill from the Contact Point Sync page. | After the backfill, the phone and the email match the person. |
 

@@ -254,17 +254,30 @@ private class PortalDataTest {
 				Schema.SObjectType.Affiliation__c.fields.Is_Primary__c,
 				null
 			);
+			Object staff = PortalData.coerce(
+				Schema.SObjectType.Account.fields.NumberOfEmployees,
+				'12'
+			);
 			String bad;
 			try {
 				PortalData.coerce(Schema.SObjectType.Affiliation__c.fields.Status__c, 'Invented');
 			} catch (PortalAuth.RefusalException refused) {
 				bad = refused.getMessage();
 			}
+			String fraction;
+			try {
+				PortalData.coerce(Schema.SObjectType.Account.fields.NumberOfEmployees, '1.5');
+			} catch (PortalAuth.RefusalException refused) {
+				fraction = refused.getMessage();
+			}
 			Test.stopTest();
 
 			Assert.areEqual(Date.newInstance(2001, 2, 3), day, 'A date');
 			Assert.areEqual(false, off, 'A blank checkbox is false');
+			Assert.isTrue(staff instanceof Integer, 'A whole-number field takes an Integer');
+			Assert.areEqual(12, staff, 'Its value');
 			Assert.areEqual('invalid_value', bad, 'A picklist value must be one of its own');
+			Assert.areEqual('invalid_value', fraction, 'A whole-number field takes no fraction');
 		}
 	}
 }

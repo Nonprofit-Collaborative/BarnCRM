@@ -38,10 +38,6 @@ public with sharing class ImportRowProcessor {
 	@NamespaceAccessible
 	public static final String STATUS_SKIPPED = 'Skipped';
 
-	/** The class name a dependent package registers to resolve the rest of a row (R-IR6). */
-	@NamespaceAccessible
-	public static final String ENTITY_PROCESSOR_CLASS = ImportEntityProcessors.CLASS_NAME;
-
 	/** What a person account puts before a contact field's name (see `storedName`). */
 	private static final String PERSON_FIELD_PREFIX = 'Person';
 

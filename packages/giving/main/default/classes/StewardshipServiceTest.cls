@@ -274,7 +274,11 @@ private class StewardshipServiceTest {
 			Integer tasksBefore = [SELECT COUNT() FROM Task WHERE WhatId = :running.Id];
 
 			Test.startTest();
-			StewardshipService.close(running.Id, StewardshipService.STATUS_CANCELLED);
+			// Cancelled the way a person does it: Status changed on the plan record.
+			update new Stewardship_Plan__c(
+				Id = running.Id,
+				Status__c = StewardshipService.STATUS_CANCELLED
+			);
 			Test.stopTest();
 
 			Stewardship_Plan__c after = [

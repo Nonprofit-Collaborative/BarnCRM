@@ -1,5 +1,6 @@
 /**
- * Linking an employer's gift to the employee's gift that earned it (feature G-10).
+ * Linking an employer's gift to the employee's gift that earned it (feature G-10), through the
+ * Matched Gift field on the gift, which is the only way in.
  */
 @IsTest(testFor='ApexClass:MatchingGiftService')
 private class MatchingGiftServiceTest {
@@ -14,7 +15,7 @@ private class MatchingGiftServiceTest {
 			Setup data = setUp(true);
 
 			Test.startTest();
-			MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+			match(data.employeeGift.Id, data.employerGift.Id);
 			Test.stopTest();
 
 			Map<Id, Gift__c> saved = new Map<Id, Gift__c>(
@@ -87,15 +88,14 @@ private class MatchingGiftServiceTest {
 			Gift__c otherPersonGift = RecognitionTestData.gift(other.Id, null, 100);
 
 			Test.startTest();
-			Boolean refused = false;
-			try {
-				MatchingGiftService.link(data.employeeGift.Id, otherPersonGift.Id);
-			} catch (MatchingGiftService.MatchingGiftException expected) {
-				refused = true;
-			}
+			Database.SaveResult result = tryMatch(data.employeeGift.Id, otherPersonGift.Id);
 			Test.stopTest();
 
-			System.assertEquals(true, refused, 'A match is money a company paid');
+			assertRefused(
+				result,
+				Label.Giving_MatchingGift_EmployerMustBeOrganization,
+				'A match is money a company paid'
+			);
 		}
 	}
 
@@ -107,15 +107,14 @@ private class MatchingGiftServiceTest {
 			Gift__c otherOrgGift = RecognitionTestData.gift(null, other.Id, 100);
 
 			Test.startTest();
-			Boolean refused = false;
-			try {
-				MatchingGiftService.link(otherOrgGift.Id, data.employerGift.Id);
-			} catch (MatchingGiftService.MatchingGiftException expected) {
-				refused = true;
-			}
+			Database.SaveResult result = tryMatch(otherOrgGift.Id, data.employerGift.Id);
 			Test.stopTest();
 
-			System.assertEquals(true, refused, 'The gift being matched comes from a person');
+			assertRefused(
+				result,
+				Label.Giving_MatchingGift_EmployeeMustBePerson,
+				'The gift being matched comes from a person'
+			);
 		}
 	}
 
@@ -127,17 +126,12 @@ private class MatchingGiftServiceTest {
 			Gift__c elsewhereGift = RecognitionTestData.gift(null, elsewhere.Id, 500);
 
 			Test.startTest();
-			Boolean refused = false;
-			try {
-				MatchingGiftService.link(data.employeeGift.Id, elsewhereGift.Id);
-			} catch (MatchingGiftService.MatchingGiftException expected) {
-				refused = true;
-			}
+			Database.SaveResult result = tryMatch(data.employeeGift.Id, elsewhereGift.Id);
 			Test.stopTest();
 
-			System.assertEquals(
-				true,
-				refused,
+			assertRefused(
+				result,
+				Label.Giving_MatchingGift_EmployerMismatch,
 				'The employer on the person and the company that paid must agree'
 			);
 		}
@@ -149,7 +143,7 @@ private class MatchingGiftServiceTest {
 			Setup data = setUp(false);
 
 			Test.startTest();
-			MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+			match(data.employeeGift.Id, data.employerGift.Id);
 			Test.stopTest();
 
 			Gift__c saved = [SELECT Matched_Gift__c FROM Gift__c WHERE Id = :data.employeeGift.Id];
@@ -167,15 +161,12 @@ private class MatchingGiftServiceTest {
 			Setup data = setUp(true);
 
 			Test.startTest();
-			Boolean refused = false;
-			try {
-				MatchingGiftService.link(data.employerGift.Id, data.employerGift.Id);
-			} catch (MatchingGiftService.MatchingGiftException expected) {
-				refused = true;
-			}
+			Database.SaveResult result = tryMatch(data.employerGift.Id, data.employerGift.Id);
 			Test.stopTest();
 
-			System.assertEquals(true, refused, 'A gift does not match itself');
+			// The platform refuses a lookup to the record itself before any trigger runs, in its
+			// own words, so only the refusal is checked.
+			Assert.isFalse(result.isSuccess(), 'A gift does not match itself');
 		}
 	}
 
@@ -183,19 +174,20 @@ private class MatchingGiftServiceTest {
 	static void refusesAGiftAlreadyLinkedElsewhere() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Setup data = setUp(true);
-			MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+			match(data.employeeGift.Id, data.employerGift.Id);
 			Gift__c secondEmployerGift = RecognitionTestData.gift(null, data.riverbend.Id, 500);
 
 			Test.startTest();
-			Boolean refused = false;
-			try {
-				MatchingGiftService.link(data.employeeGift.Id, secondEmployerGift.Id);
-			} catch (MatchingGiftService.MatchingGiftException expected) {
-				refused = true;
-			}
+			// A second employer gift pointed at an employee gift that already has its match.
+			// (Editing the employee gift's own Matched Gift re-links it: a correction staff make.)
+			Database.SaveResult result = tryMatch(secondEmployerGift.Id, data.employeeGift.Id);
 			Test.stopTest();
 
-			System.assertEquals(true, refused, 'One gift matches one gift');
+			assertRefused(
+				result,
+				Label.Giving_MatchingGift_AlreadyLinked,
+				'One gift matches one gift'
+			);
 		}
 	}
 
@@ -203,10 +195,10 @@ private class MatchingGiftServiceTest {
 	static void unlinkClearsBothSidesAndTheCredit() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			Setup data = setUp(true);
-			MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+			match(data.employeeGift.Id, data.employerGift.Id);
 
 			Test.startTest();
-			MatchingGiftService.unlink(data.employerGift.Id);
+			match(data.employerGift.Id, null);
 			Test.stopTest();
 
 			for (Gift__c gift : [
@@ -230,8 +222,8 @@ private class MatchingGiftServiceTest {
 			Setup data = setUp(true);
 
 			Test.startTest();
-			MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
-			MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
+			match(data.employeeGift.Id, data.employerGift.Id);
+			match(data.employeeGift.Id, data.employerGift.Id);
 			Test.stopTest();
 
 			System.assertEquals(
@@ -250,17 +242,12 @@ private class MatchingGiftServiceTest {
 			update data.employeeGift;
 
 			Test.startTest();
-			String message = null;
-			try {
-				MatchingGiftService.link(data.employeeGift.Id, data.employerGift.Id);
-			} catch (MatchingGiftService.MatchingGiftException refused) {
-				message = refused.getMessage();
-			}
+			Database.SaveResult result = tryMatch(data.employeeGift.Id, data.employerGift.Id);
 			Test.stopTest();
 
-			System.assertEquals(
+			assertRefused(
+				result,
 				Label.Giving_MatchingGift_GiftNotReceived,
-				message,
 				'A refunded gift is not half of a matching pair'
 			);
 			Gift__c employerGift = [
@@ -361,6 +348,23 @@ private class MatchingGiftServiceTest {
 				'One matched donor credit per pair, from one query rather than two hundred'
 			);
 		}
+	}
+
+	/**
+	 * Sets Matched Gift on one gift, as the record page does. The trigger writes the other side
+	 * and the credit. A null partner clears the link.
+	 */
+	private static void match(Id giftId, Id partnerId) {
+		update new Gift__c(Id = giftId, Matched_Gift__c = partnerId);
+	}
+
+	private static Database.SaveResult tryMatch(Id giftId, Id partnerId) {
+		return Database.update(new Gift__c(Id = giftId, Matched_Gift__c = partnerId), false);
+	}
+
+	private static void assertRefused(Database.SaveResult result, String message, String reason) {
+		System.assertEquals(false, result.isSuccess(), reason);
+		System.assertEquals(message, result.getErrors()[0].getMessage(), reason);
 	}
 
 	private class Setup {

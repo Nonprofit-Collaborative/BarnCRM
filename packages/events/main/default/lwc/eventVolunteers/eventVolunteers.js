@@ -13,7 +13,7 @@ import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 
 /**
  * The Volunteers section of the event page's Details tab (EV-08): the event's volunteer jobs and
@@ -61,6 +61,7 @@ export default class EventVolunteers extends LightningElement {
       title: helpText('Events', 'Events_Volunteers_Title'),
       intro: helpText('Events', 'Events_Volunteers_Intro'),
       empty: helpText('Events', 'Events_Volunteers_Empty'),
+      emptyHeading: helpText('Events', 'Events_Volunteers_EmptyHeading'),
       jobName: helpText('Events', 'Events_Volunteers_JobName'),
       addJob: helpText('Events', 'Events_Volunteers_AddJob'),
       addShift: helpText('Events', 'Events_Volunteers_AddShift'),

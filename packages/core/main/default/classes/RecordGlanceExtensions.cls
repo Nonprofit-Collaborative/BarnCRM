@@ -57,24 +57,10 @@ public with sharing class RecordGlanceExtensions {
 	}
 
 	private static RecordGlanceExtension resolve(String className) {
-		Type extensionType = NamespaceUtil.resolveType(className);
-		if (extensionType == null) {
-			return null;
-		}
-		Object candidate;
-		try {
-			candidate = extensionType.newInstance();
-		} catch (Exception cannotBuild) {
-			ErrorLogger.log(cannotBuild, 'RecordGlanceExtensions.resolve');
-			return null;
-		}
-		if (candidate instanceof RecordGlanceExtension) {
-			return (RecordGlanceExtension) candidate;
-		}
-		ErrorLogger.log(
-			new System.TypeException(className + ' does not implement RecordGlanceExtension'),
+		return (RecordGlanceExtension) NamespaceUtil.build(
+			className,
+			RecordGlanceExtension.class,
 			'RecordGlanceExtensions.resolve'
 		);
-		return null;
 	}
 }

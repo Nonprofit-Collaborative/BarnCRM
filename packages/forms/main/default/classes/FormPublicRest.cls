@@ -18,10 +18,55 @@
  */
 @RestResource(urlMapping='/barncrm/forms/v1/*')
 global with sharing class FormPublicRest {
+	private static final String CONTEXT = 'FormPublicRest';
+
+	/** Set by tests to make the next call fail, so the failure path can be proved. */
+	@TestVisible
+	private static Exception failureForTest;
+
 	@HttpGet
 	global static void getForm() {
-		RestRequest request = RestContext.request;
-		RestResponse response = RestContext.response;
+		try {
+			failIfAsked();
+			answerGet(RestContext.request, RestContext.response);
+		} catch (Exception e) {
+			failed(RestContext.response, e, '.getForm');
+		}
+	}
+
+	@HttpPost
+	global static void submit() {
+		// Nothing half stored is kept, as when the Site controller's error ends its transaction.
+		System.Savepoint before = Database.setSavepoint();
+		try {
+			failIfAsked();
+			answerPost(RestContext.request, RestContext.response);
+		} catch (Exception e) {
+			Database.rollback(before);
+			failed(RestContext.response, e, '.submit');
+		}
+	}
+
+	private static void failIfAsked() {
+		if (Test.isRunningTest() && failureForTest != null) {
+			throw failureForTest;
+		}
+	}
+
+	/**
+	 * Logged to the Error Log as the Site controller does, and answered `{"status":"Failed"}`
+	 * with 500: a caller never sees an exception, a stack trace or a record detail.
+	 */
+	private static void failed(RestResponse response, Exception e, String method) {
+		ErrorLogger.log(e, CONTEXT + method);
+		response.addHeader('Content-Type', 'application/json');
+		response.statusCode = 500;
+		response.responseBody = Blob.valueOf(
+			JSON.serialize(new Map<String, Object>{ 'status' => FormIntakeService.FAILED })
+		);
+	}
+
+	private static void answerGet(RestRequest request, RestResponse response) {
 		if (isPagePath(request)) {
 			getPage(request, response);
 			return;
@@ -38,10 +83,7 @@ global with sharing class FormPublicRest {
 		response.responseBody = Blob.valueOf(form == null ? '{}' : JSON.serialize(form));
 	}
 
-	@HttpPost
-	global static void submit() {
-		RestRequest request = RestContext.request;
-		RestResponse response = RestContext.response;
+	private static void answerPost(RestRequest request, RestResponse response) {
 		response.addHeader('Content-Type', 'application/json');
 		Object parsed;
 		try {

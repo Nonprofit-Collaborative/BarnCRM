@@ -298,43 +298,4 @@ private class StewardshipWriterTest {
 			Assert.areEqual(0, [SELECT COUNT() FROM Task], 'There is nothing to assign');
 		}
 	}
-
-	@IsTest
-	static void closingAPlanSavesItsStatus() {
-		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Stewardship_Plan_Template__c template = templateWithSteps();
-			Contact person = new Contact(LastName = 'Ramirez');
-			insert person;
-			Stewardship_Plan__c plan = planFor(person.Id, template.Id);
-			insert plan;
-			plan.Status__c = 'Complete';
-			plan.Completed_Date__c = Date.today();
-
-			Test.startTest();
-			StewardshipWriter.closePlan(plan);
-			StewardshipWriter.closePlan(null);
-			Test.stopTest();
-
-			Stewardship_Plan__c closed = [
-				SELECT Status__c, Completed_Date__c
-				FROM Stewardship_Plan__c
-				WHERE Id = :plan.Id
-			];
-			Assert.areEqual('Complete', closed.Status__c, 'The plan is complete');
-			Assert.areEqual(Date.today(), closed.Completed_Date__c, 'On the day it was closed');
-		}
-	}
-
-	@IsTest
-	static void closingAPlanThatCannotBeSavedIsLoggedNotThrown() {
-		System.runAs(TestUsers.adminWith('Giving_Admin')) {
-			Stewardship_Plan__c neverSaved = new Stewardship_Plan__c(Status__c = 'Complete');
-
-			Test.startTest();
-			StewardshipWriter.closePlan(neverSaved);
-			Test.stopTest();
-
-			Assert.areEqual(0, [SELECT COUNT() FROM Stewardship_Plan__c], 'Nothing was written');
-		}
-	}
 }

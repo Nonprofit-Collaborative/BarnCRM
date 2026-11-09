@@ -198,6 +198,28 @@ private class EventSurveyControllerTest {
 		}
 	}
 
+	/**
+	 * The public intake checks an attendee's survey form as the Site guest user, which reads no
+	 * record; a user with no object access stands in for it.
+	 */
+	@IsTest
+	static void aUserWhoReadsNoRecordStillFindsAnAttendeesSurveyForm() {
+		System.runAs(staff()) {
+			Event__c event = past(FORM_KEY);
+			Event_Attendee__c came = attendee(event, 'Came');
+			User guestLike = TestUsers.minimumAccessUserWith('Guestlike', new List<String>());
+
+			Id found;
+			Test.startTest();
+			System.runAs(guestLike) {
+				found = new EventFormAttachment().formFor(came.Id);
+			}
+			Test.stopTest();
+
+			Assert.areEqual(FORM_KEY, String.valueOf(found), 'The survey form, read past access');
+		}
+	}
+
 	@IsTest
 	static void anEventWithoutASurveyKeepsRegistrationsAndIgnoresSurveyAnswers() {
 		System.runAs(staff()) {

@@ -26,14 +26,16 @@ private class GiftTransactionMirrorRunTest {
 			settings.Gift_Transaction_Mirror_Start__c = Datetime.newInstance(2026, 1, 1, 12, 0, 0);
 			upsert settings;
 		}
+		// Built once for the class rather than in every test that runs as her.
+		TestDataFactory.createUserOnTheRunningUsersProfile(
+			'Maria',
+			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin', 'Gift_Transaction_Mirror' }
+		);
 	}
 
 	/** Maria: an administrator who runs the mirror. */
 	private static User maria() {
-		return TestDataFactory.createUserOnTheRunningUsersProfile(
-			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin', 'Gift_Transaction_Mirror' }
-		);
+		return TestUsers.fromSetup('Maria');
 	}
 
 	private static Gift__c insertGift(Decimal amount) {

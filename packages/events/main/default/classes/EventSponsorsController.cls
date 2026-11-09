@@ -193,7 +193,10 @@ public with sharing class EventSponsorsController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getSponsors', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Sponsors_LoadFailed'));
+			throw UserErrors.wrapShowingDml(
+				e,
+				BarnHelp.text('Events', 'Events_Sponsors_LoadFailed')
+			);
 		}
 	}
 
@@ -289,7 +292,7 @@ public with sharing class EventSponsorsController {
 		} catch (Exception e) {
 			Database.rollback(savepoint);
 			ErrorLogger.log(e, CONTEXT + '.addSponsor', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 
@@ -335,7 +338,7 @@ public with sharing class EventSponsorsController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.setDeliverableStatus', deliverableId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 
@@ -352,7 +355,7 @@ public with sharing class EventSponsorsController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.removeSponsor', sponsorId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 
@@ -433,7 +436,7 @@ public with sharing class EventSponsorsController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.' + method);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 }

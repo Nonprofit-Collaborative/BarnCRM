@@ -35,6 +35,20 @@ private class PortalAuthTest {
 		}
 	}
 
+	private class SecondFactor implements Callable {
+		String challenge;
+		String code;
+
+		SecondFactor(String challenge, String code) {
+			this.challenge = challenge;
+			this.code = code;
+		}
+
+		public Object call(String action, Map<String, Object> args) {
+			return PortalAuth.verifySecondFactor(challenge, code);
+		}
+	}
+
 	private class Resolve implements Callable {
 		String token;
 
@@ -62,8 +76,17 @@ private class PortalAuthTest {
 			String challenge = PortalAuth.start(PortalTestData.KEY, '  Pat.Zzportal@Example.org ');
 			String code = PortalAuth.lastCodeForTest;
 			Map<String, Object> result = PortalAuth.verifyCode(challenge, code);
+			Integer queriesBefore = Limits.getQueries();
 			PortalAuth.Session session = PortalAuth.resolve((String) result.get('session'));
+			Integer resolveQueries = Limits.getQueries() - queriesBefore;
 			Test.stopTest();
+
+			Assert.areEqual(
+				1,
+				resolveQueries,
+				'Every signed-in request reads its session, access, person and portal in one query'
+			);
+			Assert.areEqual(PortalTestData.KEY, session.portal.Key__c, 'The portal comes with it');
 
 			Assert.areEqual('signedIn', result.get('status'), 'Signed in');
 			Portal_Session__c stored = [
@@ -165,6 +188,55 @@ private class PortalAuthTest {
 		}
 	}
 
+	/**
+	 * A wrong code answers code_invalid whether the address is on file, expired or locked out;
+	 * expiry and lockout are told only after the right code (R-PST1).
+	 */
+	@IsTest
+	static void aWrongCodeNeverSaysWhoIsOnFile() {
+		System.runAs(TestUsers.adminWith('Portal_Admin')) {
+			PortalTestData.enable();
+			Portal_Settings__c settings = Portal_Settings__c.getOrgDefaults();
+			settings.Failures_Before_Lockout__c = 3;
+			upsert settings;
+			Portal__c portal = PortalTestData.portal('Invited', 'Off');
+			PortalTestData.access(portal, PortalTestData.person('Zzportal', EMAIL));
+
+			Test.startTest();
+			String nobody = PortalAuth.start(PortalTestData.KEY, 'nobody.zzportal@example.org');
+			String expiring = PortalAuth.start(PortalTestData.KEY, EMAIL);
+			String late = PortalAuth.start(PortalTestData.KEY, EMAIL);
+			String lateCode = PortalAuth.lastCodeForTest;
+			String held = PortalAuth.start(PortalTestData.KEY, EMAIL);
+			String heldCode = PortalAuth.lastCodeForTest;
+			String burnt = PortalAuth.start(PortalTestData.KEY, EMAIL);
+			String wrong = heldCode == '000000' ? '111111' : '000000';
+			List<String> answers = new List<String>{ refusal(new Verify(nobody, wrong)) };
+			PortalAuth.nowForTest = Datetime.now().addMinutes(11);
+			answers.add(refusal(new Verify(expiring, wrong)));
+			answers.add(refusal(new Verify(late, lateCode)));
+			PortalAuth.nowForTest = null;
+			for (Integer i = 0; i < 3; i++) {
+				refusal(new Verify(burnt, wrong));
+			}
+			answers.add(refusal(new Verify(held, wrong)));
+			answers.add(refusal(new Verify(held, heldCode)));
+			Test.stopTest();
+
+			Assert.areEqual(
+				new List<String>{
+					'code_invalid',
+					'code_invalid',
+					'code_expired',
+					'code_invalid',
+					'locked'
+				},
+				answers,
+				'Not on file, expired and wrong, expired and right, locked and wrong, locked and right'
+			);
+		}
+	}
+
 	@IsTest
 	static void limitsSendNothingAndLookTheSame() {
 		System.runAs(TestUsers.adminWith('Portal_Admin')) {
@@ -206,11 +278,19 @@ private class PortalAuthTest {
 			);
 			String again = PortalAuth.start(PortalTestData.KEY, EMAIL);
 			Map<String, Object> asked = PortalAuth.verifyCode(again, PortalAuth.lastCodeForTest);
+			String replayed = refusal(
+				new SecondFactor(again, PortalTokens.authenticatorCode(secret, step))
+			);
 			Map<String, Object> second = PortalAuth.verifySecondFactor(
 				again,
-				PortalTokens.authenticatorCode(secret, step)
+				PortalTokens.authenticatorCode(secret, step + 1)
 			);
 			Test.stopTest();
+
+			Assert.areEqual('code_invalid', replayed, 'A code already used is refused (R-PA3)');
+			Decimal lastStep = [SELECT Second_Factor_Last_Step__c FROM Portal_Access__c LIMIT 1]
+			.Second_Factor_Last_Step__c;
+			Assert.areEqual(step + 1, lastStep.longValue(), 'The last step used is kept');
 
 			Assert.areEqual('enroll', enrol.get('status'), 'Enrolment first');
 			Assert.isTrue(

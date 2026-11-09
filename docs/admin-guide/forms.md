@@ -169,11 +169,11 @@ Then open **Health Check** in the Settings console. With a public form published
 
 | Check | What to do |
 |---|---|
-| No active Site for public forms | Do the steps above. |
-| A Site guest user can't open public forms | Select **Give Forms Public Guest**. It gives the Site's guest user the Forms Public Guest permission set: the public form page and its Apex class, nothing else. |
-| A Site guest user can read people or organizations | Remove Read on Contact and Account from the guest user's profile and permission sets in Setup. BarnCRM never changes this for you. |
-| Public form answers are not being processed | Select **Schedule Processing**. It runs every 15 minutes as you, so keep your user active. |
-| Public form answers are waiting | Answers have waited over an hour: check processing is scheduled and its user is active, then the Error Log. |
+| No Active Site for Public Forms | Do the steps above. |
+| A Site Guest User Can't Open Public Forms | Select **Give Forms Public Guest**. It gives the Site's guest user the Forms Public Guest permission set: the public form page and its Apex class, nothing else. |
+| A Site Guest User Can Read People or Organizations | Remove Read on Contact and Account from the guest user's profile and permission sets in Setup. BarnCRM never changes this for you. |
+| Public Form Answers Are Not Being Processed | Select **Schedule Processing**. It runs every 15 minutes as you, so keep your user active. |
+| Public Form Answers Are Waiting | Answers have waited over an hour: check processing is scheduled and its user is active, then the Error Log. |
 
 ### Making a Form Public
 
@@ -204,7 +204,12 @@ address, and gets a link that opens the form with their answers filled in, on th
 of the form, until it expires or they send it. Files are not saved: they choose them again.
 BarnCRM keeps the answers in a **Form Draft** but not the email address, and stores only a
 scrambled copy of the link's code, so nobody can open a draft without the email. Saved drafts
-count toward **Sends Per Hour**, and public form processing deletes expired ones. Save and
+count toward **Sends Per Hour**, and public form processing deletes expired ones. So the form
+cannot be used to flood an inbox or use up your org's daily email allowance, it sends at most
+3 links an hour to one email address and at most 100 links an hour in all (or the form's
+**Sends Per Hour**, if lower); past either, the person is told to try again later and no
+email goes out. To tell addresses apart BarnCRM keeps only a scrambled key of each, never the
+address. Save and
 Finish Later is not offered on a form opened from a record (such as an event's registration).
 
 ### Integrations and Portals

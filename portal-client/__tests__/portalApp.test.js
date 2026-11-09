@@ -145,6 +145,87 @@ describe('mountPortal', () => {
     expect(api.save).toHaveBeenCalledWith('profile', '003A', { MobilePhone: '555-0100' });
   });
 
+  it('edits a multi-select picklist and sends only the fields that changed', async () => {
+    const page = {
+      ...PROFILE,
+      fields: [
+        {
+          field: 'Skills__c',
+          label: 'Skills',
+          type: 'multipicklist',
+          edit: true,
+          options: [
+            { value: 'Cook', label: 'Cooking' },
+            { value: 'Drive', label: 'Driving' }
+          ]
+        },
+        {
+          field: 'Shirt__c',
+          label: 'Shirt',
+          type: 'picklist',
+          edit: true,
+          options: [{ value: 'M', label: 'Medium' }]
+        },
+        { field: 'MobilePhone', label: 'Mobile', type: 'phone', edit: true }
+      ],
+      records: [
+        { id: '003A', values: { Skills__c: 'Cook;Drive', Shirt__c: 'XL', MobilePhone: '555' } }
+      ]
+    };
+    const api = fakeApi({ page: jest.fn(() => Promise.resolve(page)) });
+    await mountPortal(root, { api });
+    expect(root.querySelector('dd').textContent).toBe('Cooking, Driving');
+
+    buttonNamed(root, 'Edit').click();
+    const skills = root.querySelector('[name="Skills__c"]');
+    expect(skills.multiple).toBe(true);
+    expect(root.querySelector('[name="Shirt__c"]').value).toBe('XL');
+    skills.options[1].selected = false;
+    submit(root, 'MobilePhone', '555');
+    await flush();
+
+    expect(api.save).toHaveBeenCalledWith('profile', '003A', { Skills__c: 'Cook' });
+  });
+
+  it('shows and edits a date and time in the visitor own time zone', async () => {
+    const stored = '2026-01-31T14:00:00.000Z';
+    const page = {
+      ...PROFILE,
+      fields: [{ field: 'Starts__c', label: 'Starts', type: 'datetime', edit: true }],
+      records: [{ id: '003A', values: { Starts__c: stored } }]
+    };
+    const api = fakeApi({ page: jest.fn(() => Promise.resolve(page)) });
+    await mountPortal(root, { api });
+    expect(root.querySelector('dd').textContent).toBe(new Date(stored).toLocaleString());
+
+    buttonNamed(root, 'Edit').click();
+    const local = new Date(Date.parse(stored) - new Date(stored).getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+    expect(root.querySelector('[name="Starts__c"]').value).toBe(local);
+    const later = local.slice(0, 11) + '18:30';
+    submit(root, 'Starts__c', later);
+    await flush();
+
+    expect(api.save).toHaveBeenCalledWith('profile', '003A', {
+      Starts__c: new Date(later).toISOString()
+    });
+  });
+
+  it('reads the page again after a module action', async () => {
+    const page = { ...PROFILE, actions: [{ name: 'Test.Thanks', label: 'Say Thanks' }] };
+    const api = fakeApi({ page: jest.fn(() => Promise.resolve(page)) });
+    await mountPortal(root, { api });
+
+    buttonNamed(root, 'Say Thanks').click();
+    await flush();
+    await flush();
+
+    expect(api.action).toHaveBeenCalledWith('profile', '003A', 'Test.Thanks');
+    expect(api.page).toHaveBeenCalledTimes(2);
+    expect(root.querySelector('[role="status"]').textContent).toBe('Thanks sent');
+  });
+
   it('signs out back to the email screen', async () => {
     const api = fakeApi();
     await mountPortal(root, { api });
@@ -154,5 +235,37 @@ describe('mountPortal', () => {
 
     expect(api.logout).toHaveBeenCalled();
     expect(root.querySelector('h2').textContent).toBe('Sign In');
+  });
+
+  it('starts a page at its heading and the edit form at its first box', async () => {
+    const api = fakeApi();
+    await mountPortal(root, { api });
+    expect(document.activeElement).toBe(root.querySelector('h3'));
+
+    buttonNamed(root, 'Edit').click();
+    expect(document.activeElement).toBe(root.querySelector('[name="MobilePhone"]'));
+  });
+
+  it('shows an action result as a status, not an alert, and yes or no for a checkbox', async () => {
+    const api = fakeApi({
+      me: jest.fn(() => Promise.resolve({ ...MENU, firstName: '' })),
+      page: jest.fn(() =>
+        Promise.resolve({
+          ...PROFILE,
+          canUpdate: false,
+          actions: [{ name: 'thank', label: 'Send Thanks' }],
+          fields: [{ field: 'Active__c', label: 'Active', type: 'boolean', edit: false }],
+          records: [{ id: '003A', values: { Active__c: true } }]
+        })
+      )
+    });
+    await mountPortal(root, { api });
+    expect(root.querySelector('p')).toBeNull();
+    expect(root.querySelector('dd').textContent).toBe('Yes');
+
+    buttonNamed(root, 'Send Thanks').click();
+    await flush();
+    expect(root.querySelector('[role="status"]').textContent).toBe('Thanks sent');
+    expect(root.querySelector('[role="alert"]')).toBeNull();
   });
 });

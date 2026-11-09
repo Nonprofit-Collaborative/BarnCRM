@@ -65,9 +65,9 @@ In **BarnCRM Settings**, **Contact Points** section:
 
 | Setting | What it does | Default |
 |---|---|---|
-| Sync Emails | Copies email addresses. | On |
-| Sync Phones | Copies phone numbers. | On |
-| Sync Addresses | Copies current addresses. | On |
+| Sync emails | Copies email addresses. | On |
+| Sync phones | Copies phone numbers. | On |
+| Sync addresses | Copies current addresses. | On |
 
 Turning a kind off stops copying it and leaves the copies already made as they are. **Open
 Contact Point Sync** opens the module's page.

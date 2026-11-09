@@ -17,7 +17,7 @@ import {
 
 import BADGES from '@salesforce/label/c.Events_EventTab_Badges';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 const QR_CELL_SIZE = 4;
 const WHOLE_EVENT = '';
 const ALL_TICKETS = '';
@@ -52,6 +52,9 @@ export default class EventBadges extends LightningElement {
     },
     get empty() {
       return helpText('Events', 'Events_Badges_Empty');
+    },
+    get emptyHeading() {
+      return helpText('Events', 'Events_Badges_EmptyHeading');
     },
     get truncated() {
       return helpText('Events', 'Events_Badges_Truncated');
