@@ -24,7 +24,11 @@ public with sharing class ProgramsAccessSync extends ModuleAccessSyncBase {
 		ADMIN_SET => new List<String>{ 'BarnCRM_Admin' }
 	};
 
-	/** Each other set, and the BarnCRM roles (permission set groups) whose holders get it. */
+	/**
+	 * Each other set, and the BarnCRM roles (permission set groups) whose holders get it. Unlike
+	 * the other modules, Fundraising Staff is deliberately absent: Programs Staff carries case
+	 * notes, so a fundraiser gets it per person (ADR-NEXT D3 as modified, D-191).
+	 */
 	@TestVisible
 	private static final Map<String, List<String>> BY_ROLE = new Map<String, List<String>>{
 		'Programs_Staff' => new List<String>{ 'Program_Staff', 'Volunteer_Coordinator' },

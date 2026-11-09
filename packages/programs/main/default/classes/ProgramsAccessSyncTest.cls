@@ -95,4 +95,17 @@ private class ProgramsAccessSyncTest {
 			);
 		}
 	}
+
+	/** ADR-NEXT D3 as modified: case notes do not follow Fundraising Staff. */
+	@IsTest
+	static void fundraisingStaffDoesNotGetProgramsStaff() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			List<String> roles = ProgramsAccessSync.BY_ROLE.get('Programs_Staff');
+			Test.stopTest();
+
+			Assert.isFalse(roles.contains('Fundraising_Staff'), 'Given per person instead');
+			Assert.isTrue(roles.contains('Program_Staff'), 'Team Members still get it');
+		}
+	}
 }

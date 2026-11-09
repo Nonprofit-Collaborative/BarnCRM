@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
+        <fullName>Volunteers_Access_AddOnCoordinator</fullName>
+        <categories>Access</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Access page: what Volunteers Coordinator grants</shortDescription>
+        <value>Approve, reject and correct everyone's volunteer hours, and manage skills, requirements and onboarding steps, on top of what the person's role gives.</value>
+    </labels>
+    <labels>
         <fullName>Volunteers_Hours_StatusThroughApproval</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>

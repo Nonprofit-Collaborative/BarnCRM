@@ -23,7 +23,9 @@ private class GivingAccessSyncTest {
 			Id userId = TestUsers.standardUser(name).Id;
 			ids.put(name, userId);
 			Id groupId = TestDataFactory.prepareRoleGroup(groupByName.get(name)).Id;
-			roles.add(new PermissionSetAssignment(AssigneeId = userId, PermissionSetGroupId = groupId));
+			roles.add(
+				new PermissionSetAssignment(AssigneeId = userId, PermissionSetGroupId = groupId)
+			);
 		}
 		Id direct = TestUsers.standardUserWith('Direct', new List<String>{ 'BarnCRM_Admin' }).Id;
 		ids.put('Direct', direct);

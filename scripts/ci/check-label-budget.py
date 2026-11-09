@@ -49,7 +49,9 @@ import sys
 # thing (Super Importer, Opportunity Mirror, Gift Transaction Mirror, Seasonal Address Swap, "or").
 # Raised by 1 for Mirror_Sync_Compare: Mirror's two pages read a Rollups label before.
 # Lowered to 3,254 after merging two more same-text pairs (Households, Choose a kind of record).
-BUDGET = 3254
+# Raised by 1 for Volunteers_Access_AddOnCoordinator: Volunteers Coordinator becomes an Access page
+# extra permission (simpler permission sets, D1); the Mirror merge in the same release removes 3.
+BUDGET = 3255
 TARGET = 3000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 
