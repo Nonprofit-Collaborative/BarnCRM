@@ -1,6 +1,6 @@
 # User Guide
 
-Applies to: BarnCRM landing/batch-c-review 05309896 (v1.0 and Batch C with its whole-solution review, releases 0.12 to 1.3). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM landing/batch-c-review da9fd9c0 (v1.0 and Batch C with its whole-solution review, releases 0.12 to 1.3). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 

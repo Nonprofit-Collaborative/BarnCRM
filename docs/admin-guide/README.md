@@ -1,6 +1,6 @@
 # Admin Guide
 
-Applies to: BarnCRM landing/batch-c-review 05309896 (v1.0 and Batch C with its whole-solution review, releases 0.12 to 1.3). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
+Applies to: BarnCRM landing/batch-c-review da9fd9c0 (v1.0 and Batch C with its whole-solution review, releases 0.12 to 1.3). Pre-release: no package version exists yet; this tracks the newest code on main. The page list is in the [Index](#index).
 
 > **Not for production orgs:** BarnCRM is in pilot. We do not recommend installing pilot or testing versions in a production Salesforce org. Use a sandbox, a free Developer Edition org or a scratch org.
 
