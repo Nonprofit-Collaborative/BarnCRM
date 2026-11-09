@@ -4,7 +4,7 @@ Scripts for the BarnCRM Settings console, Access, the Module Manager, Automation
 
 Before you start: an org from [Before you test](before-you-test.md), with every module deployed, the Nonprofit Edition chosen, every feature turned on in first-run setup, and sample data loaded unless a script says otherwise. Create the staff and read-only users from [Test users](before-you-test.md#test-users) first. In a [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox) there is no sample data and no module: skip the scripts that need a module, a staff user or the Nonprofit Edition, and put back any setting you change.
 
-The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**, the role's label in Salesforce; the admin guide calls the role BarnCRM Admin and names the card the same way.
+The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the role's label in Salesforce (its API name stays `BarnCRM_Admin_Group`).
 
 ## T-SET-01: Open the Settings Console
 
@@ -58,18 +58,18 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-04: Give and Remove a Role on the Access Page
 
 **Purpose:** confirm a role can be given and taken away from the app, with a confirmation each time.
-**Prerequisites:** admin user (a System Administrator, so it can assign permission sets). The staff user exists; if it already holds **Coordinator**, remove it first.
+**Prerequisites:** admin user (a System Administrator, so it can assign permission sets). The staff user exists; if it already holds **Read Only**, remove it first.
 **Smoke:** yes
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Access**. | A card titled **Access** shows one card per role: **BarnCRM Admin Group**, **Team Member**, **Coordinator**, **Read Only**, and **Fundraising Staff** with Giving. Each heading ends with a count in brackets. |
+| 1 | Open **BarnCRM Settings**, **Access**. | A card titled **Access** shows one card per role: **BarnCRM Admin**, **Team Member**, **Read Only**, and **Fundraising Staff** with Giving. No **Coordinator** card. Each heading ends with a count in brackets. |
 | 2 | In **Find a person**, type `Staff`. | **Staff Tester** is listed with an email address. |
-| 3 | Choose **Staff Tester**. In **Role**, choose **Coordinator**. Click **Give Access**. | A dialog titled **Give Access** asks "Give Staff Tester the Coordinator role?" with **Give Access** and **Cancel**. |
+| 3 | Choose **Staff Tester**. In **Role**, choose **Read Only**. Click **Give Access**. | A dialog titled **Give Access** asks "Give Staff Tester the Read Only role?" with **Give Access** and **Cancel**. |
 | 4 | Click **Cancel**. | The dialog closes and nothing changes. |
-| 5 | Click **Give Access** again and confirm with **Give Access**. | A **Done** toast: "Staff Tester now has the Coordinator role." **Staff Tester** appears on the **Coordinator** card and its count goes up by one. |
-| 6 | Click **Remove** beside **Staff Tester** on the **Coordinator** card. | A dialog titled **Remove Access**: "Remove the Coordinator role from Staff Tester? Any other role they hold stays in place." |
-| 7 | Click **Remove**. | "Staff Tester no longer has the Coordinator role." The name leaves the card. **Staff Tester** is still on the **Team Member** card. |
+| 5 | Click **Give Access** again and confirm with **Give Access**. | A **Done** toast: "Staff Tester now has the Read Only role." **Staff Tester** appears on the **Read Only** card and its count goes up by one. |
+| 6 | Click **Remove** beside **Staff Tester** on the **Read Only** card. | A dialog titled **Remove Access**: "Remove the Read Only role from Staff Tester? Any other role they hold stays in place." |
+| 7 | Click **Remove**. | "Staff Tester no longer has the Read Only role." The name leaves the card. **Staff Tester** is still on the **Team Member** card. |
 | 8 | Click **Create a User in Setup**. | Setup, Users opens in a new tab. |
 | 9 | Back on **Access**, read the **Needs a Change in Setup** note. | It says "Core's extra permissions and every permission set a module lists here are given on this page; any other is assigned in Setup.", numbers three steps starting "Click the module's permission set.", and has **Open in Setup**. |
 
@@ -78,16 +78,16 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 ## T-SET-05: Extra Permissions, and the Last Admin Is Protected
 
 **Purpose:** confirm an extra permission is given with its warning and removed, and the last BarnCRM Admin cannot be removed.
-**Prerequisites:** admin user, the only person on the **BarnCRM Admin Group** card (if the card is empty, give yourself the role first, as in T-SET-04). The staff user does not hold **BarnCRM Bulk Delete**.
+**Prerequisites:** admin user, the only person on the **BarnCRM Admin** card (if the card is empty, give yourself the role first, as in T-SET-04). The staff user does not hold **BarnCRM Bulk Delete**.
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Open **BarnCRM Settings**, **Access**. Scroll to **Extra Permissions**. | One card each for **BarnCRM Find and Export**, **BarnCRM Bulk Update**, **BarnCRM Bulk Delete**, **BarnCRM Erase People**, **BarnCRM Duplicate Review** and **BarnCRM Metadata Admin**, then the Giving and Mirror sets. Bulk Delete and Erase People carry the warning "This permission lets the person remove data. Give it only to someone you trust to do that." |
-| 2 | Choose **Staff Tester** in **Find a person**. In **Extra permission**, choose **BarnCRM Bulk Delete**. | Under the picker: "Delete many records at once from a Find query, with undo from the Recycle Bin. Give it together with Find and Export." and the remove-data warning. |
+| 2 | Choose **Staff Tester** in **Find a person**. In **Extra permission**, choose **BarnCRM Bulk Delete**. | Under the picker: "Delete many records at once from a Find query, with undo from the Recycle Bin. Includes Find and Export, so nothing else is needed." and the remove-data warning. |
 | 3 | Click **Give Permission**. | The dialog asks "Give Staff Tester the BarnCRM Bulk Delete permission?" and repeats the warning. |
 | 4 | Confirm with **Give Permission**. | "Staff Tester now has the BarnCRM Bulk Delete permission." The name appears on the **BarnCRM Bulk Delete** card. |
 | 5 | Click **Remove** beside the name on that card and confirm. | "Staff Tester no longer has the BarnCRM Bulk Delete permission." The card reads "No one has been given this permission here." Staff Tester's role is unchanged. |
-| 6 | On the **BarnCRM Admin Group** card, click **Remove** beside your own name. | The dialog adds "You are about to remove your own BarnCRM Admin role. You will lose access to BarnCRM Settings." |
+| 6 | On the **BarnCRM Admin** card, click **Remove** beside your own name. | The dialog adds "You are about to remove your own BarnCRM Admin role. You will lose access to BarnCRM Settings." |
 | 7 | Click **Remove**. | A **That Did Not Work** toast: "You cannot remove the last person from the BarnCRM Admin role. Give the role to someone else first." Your name stays on the card. |
 
 **Cleanup:** None.
@@ -582,3 +582,18 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin Group**
 | 2 | Choose another value and save. | The save succeeds and the page keeps the choice. Recent changes lists it. |
 | 3 | In Setup, make that Status value inactive; reload the setting. | The dropdown still shows the saved value, and saving the section keeps it. |
 | 4 | In an org without Nonprofit Cloud, open the same setting. | A text box showing `Paid`; any text saves. |
+
+## T-SET-27: Coordinator Holders Become Team Members
+
+**Purpose:** confirm the retired Coordinator role carries over to Team Member without taking anything away, and an inactive holder is named in the Error Log instead.
+**Prerequisites:** admin user with permission to run anonymous Apex; the staff user and a third user, Gone Tester, neither holding Team Member. Not on mwdbdevsb.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In Setup, **Users**, open Staff Tester, **Permission Set Group Assignments**, and add **Coordinator (Retired)**. Do the same for Gone Tester, then deactivate Gone Tester. | Both hold the group. |
+| 2 | Open **BarnCRM Settings**, **Access**. | No **Coordinator** card; neither person is on the **Team Member** card. |
+| 3 | In the Developer Console, run `TabAccessService.requestSync();` as anonymous Apex. Wait a minute and reload **Access**. | **Staff Tester** is on the **Team Member** card. In Setup, Staff Tester still holds **Coordinator (Retired)**. Gone Tester holds no Team Member. |
+| 4 | Run `CorePostInstall.runAsSourceDeploy();` as anonymous Apex, then open the **Error Log**. | A Warning: "Gone Tester is inactive and holds the Coordinator (Retired) role, so BarnCRM did not give them Team Member. ..." The run finished without an error. |
+| 5 | Open **Org Optimizer**, **Access Explorer**, and choose Staff Tester. | **Coordinator (Retired)** is listed as a BarnCRM role beside **Team Member**. |
+
+**Cleanup:** remove **Coordinator (Retired)** and **Team Member** from Staff Tester in Setup; remove the group from Gone Tester (reactivate first if Salesforce asks).

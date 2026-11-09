@@ -8427,7 +8427,8 @@ Super Transformer is handed it with the filter. Typed query text reads
 - **Browser modules:** `findQueryText` (R-SQ7), `xlsxWriter` (R-SQ11), `findCsv`; the component
   `findRadiusPanel` (R-SQ13).
 - **Permission:** custom permission `Find_And_Export_Records`, in `BarnCRM_Admin` and in its own
-  permission set `BarnCRM_Find_And_Export`, assignable alone.
+  permission set `BarnCRM_Find_And_Export`, assignable alone; `BarnCRM_Bulk_Update` and
+  `BarnCRM_Bulk_Delete` include all of its grants (ADR-NEXT D5).
 - **UI:** the Find tab (app page `Find`, component `findRecords`), built on `filterBuilder`.
 - **Data hygiene (R-SQ6):** services `DataHygieneService`, `DataHygieneController`; UI the Data quality section
   of the Org Optimizer tab (app page `Data_Hygiene`, shell `orgOptimizer`, component
@@ -8519,7 +8520,8 @@ holds the value the bulk update wrote; anything else is journaled as not put bac
 
 **R-BU6 Permission.** Every bulk update action requires the `Bulk_Update_Records` custom
 permission and, because every bulk update starts from a Find query, `Find_And_Export_Records`
-(R-SQ5). Neither grants record access.
+(R-SQ5). Neither grants record access. `BarnCRM_Bulk_Update` carries both, with every grant of
+`BarnCRM_Find_And_Export` (ADR-NEXT, simpler permission sets, D5), so it needs no pair.
 
 **R-BU7 Change with steps.** A change whose action is `transform` carries `transforms`, a list
 of steps in the transform document of R-IT15 (ADR-0081), and changes each record's own value.
@@ -8585,7 +8587,8 @@ NotRestored with the reason, and the Run Log says how many were restored, purged
 
 **R-BD6 Permission.** Every bulk delete action requires the `Bulk_Delete_Records` custom
 permission and `Find_And_Export_Records`. `Bulk_Delete_Records` is in its own permission set
-only, `BarnCRM_Bulk_Delete`, and in no role. Neither grants record access. What reads no query
+only, `BarnCRM_Bulk_Delete`, and in no role; that set also carries every grant of
+`BarnCRM_Find_And_Export` (ADR-NEXT D5), so it needs no pair. Neither grants record access. What reads no query
 needs only `Bulk_Delete_Records`: the list of jobs, a job's progress, the undo, and a delete by
 file (R-BD7), which needs import access instead of Find.
 
@@ -8636,7 +8639,8 @@ platform deletes with a parent are not in it.
   `BulkUpdateBatch` (the job), `BulkUpdateController`; `QueryCompiler` gains the count and the
   chunk read; `ImportUndoService` and `ImportUndoBatch` handle the Update operation.
 - **Permission:** custom permission `Bulk_Update_Records`, in `BarnCRM_Admin` and in its own
-  permission set `BarnCRM_Bulk_Update`, assigned beside `BarnCRM_Find_And_Export`.
+  permission set `BarnCRM_Bulk_Update`, which includes `BarnCRM_Find_And_Export`'s grants. The
+  `BulkUpdateController` class is in both sets (ADR-NEXT, gap fix).
 - **UI:** component `superTransform` on the Super Transformer tab (app page `Bulk_Update`),
   listing recent Super Transformer runs with their progress and undo. Find's Change Records menu
   opens that tab with the query's object, filter and `related` conditions in the page state key
@@ -14554,6 +14558,7 @@ mirrors the primary member).
 | 1.3 | 2026-11-09 | Batch C review: Portal Access (29PB2) gains Second Factor Last Step (`Second_Factor_Last_Step__c`, Number(18, 0)) and rule R-PA3, an authenticator code is used once. |
 | 1.3 | 2026-11-09 | Module detection by announcement (mwdbdevsb validation). No object or field added. `BarnCRM_Module__mdt` `Probe_Object__c` is cleared for every module that ships Setting Definition rows naming itself (Events, Volunteers, Funders, Programs, Portal, Contact Points): a customer org's own `Event__c` and `Volunteer_Hours__c` made Events and Volunteers read as installed. Forms and Logic Models, which ship no settings rows, probe `Form_Version__c` and `Logic_Model_Element__c` in place of `Form__c` and `Logic_Model__c`. Rollup Builder keeps `Rollup_Definition__c`. |
 | 1.3 | 2026-11-07 | Portal templates for volunteers, speakers and donors (PB-03, PB-07, PB-08; ADR-0191 `0191-portal-templates-volunteer-speaker-donor.md`). No object or field added. R-PB2 gains a read-only `Parent__r.Contact__c` person link; Core's `PortalActionExtensions` lists the Volunteers and Event Management action classes. |
+| 1.3 | 2026-11-09 | Simpler permission sets, Core (ADR-NEXT, D-191, release N). No object or field added. Coordinator (`Volunteer_Coordinator`) retired: the Access page stops offering it and `RetiredRoleMigration` gives its active holders Team Member; R-BU6 and R-BD6: `BarnCRM_Bulk_Update` and `BarnCRM_Bulk_Delete` include `BarnCRM_Find_And_Export`'s grants; `BarnCRM_Admin` gains `BulkUpdateController`. Labels only: BarnCRM Admin (group), BarnCRM Admin Access, Staff Access and Read Only Access, and "BarnCRM Auto:" on the eleven tab, Households and app sets. |
 
 ---
 ## 32. Entity ownership by package
@@ -14715,7 +14720,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Setup Assistant: fund and appeal step, receipt fields and wording of the identity step, first gift check | Giving | `GivingSetupAssistantExtension` through `SetupAssistantExtensions` |
 | Health Check: household, access, settings, org shape findings | Core | `HealthCheckService` |
 | Health Check: receipt generation, receipt lock override, unposted gifts in a closed period | Giving | `GivingHealthCheckExtension` (ADR-0057) |
-| Roles: Admin, Team Member (`Program_Staff`), Coordinator (`Volunteer_Coordinator`), Read Only | Core | Permission set groups |
+| Roles: BarnCRM Admin (`BarnCRM_Admin_Group`), Team Member (`Program_Staff`), Read Only; Coordinator (`Volunteer_Coordinator`) retired, its holders given Team Member by `RetiredRoleMigration` (ADR-NEXT D1) | Core | Permission set groups |
 | Role: Fundraising Staff | Giving | Permission set group |
 | Custom permission Manage BarnCRM Settings | Core | Metadata |
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |

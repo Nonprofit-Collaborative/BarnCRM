@@ -111,7 +111,7 @@ Two things to know about the schedule.
   swap is written to the Error Log instead of going through quietly.
 
 To let your team see and manage addresses, make sure they have one of the packaged access
-levels (BarnCRM Admin, Team Member, or Coordinator, or Fundraising Staff with
+levels (BarnCRM Admin or Team Member, or Fundraising Staff with
 Giving) on the **Access** page in
 BarnCRM Settings. Read Only users can see addresses and cannot change them: the Addresses
 card shows them no **Add Address** or **Set as Primary** button.

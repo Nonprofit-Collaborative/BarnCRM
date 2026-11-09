@@ -57,7 +57,7 @@ Do these in order.
    the org's own layouts elsewhere and the full list in the BarnCRM list views.
 3. **Hold these permission sets.** A System Administrator is not a BarnCRM Admin. Open
    **BarnCRM Settings**, **Access**, find yourself in **Find a person**, choose **BarnCRM
-   Admin Group** and select **Give Access** (see [Access](../admin-guide/access.md)). That role
+   Admin** and select **Give Access** (see [Access](../admin-guide/access.md)). That role
    already carries Find and Export and Bulk Update. Add these under **Extra Permissions** only
    while a script needs them, and remove them afterwards:
 
@@ -215,7 +215,7 @@ admin sees without a feature set (for example a BarnCRM Admin who cannot erase p
 duplicates), use one of these:
 
 - **A second admin user (preferred).** Create a third user as in step 1 with the **System
-  Administrator** profile, then give it only the **BarnCRM Admin Group** role on the Access page.
+  Administrator** profile, then give it only the **BarnCRM Admin** role on the Access page.
   It holds what a real BarnCRM Admin holds and none of the extra permissions. Give it one extra
   permission at a time when a script needs it.
 - **Your login user, for one script.** On the Access page, under **Extra Permissions**, select

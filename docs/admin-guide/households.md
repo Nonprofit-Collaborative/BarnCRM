@@ -45,7 +45,7 @@ profile has no default Account record type, gets Household for every account the
 
 The **Households** tab is hidden until you turn Households on. Turning it on shows the
 tab to everyone with a BarnCRM role (Admin, Staff or Read Only), through the permission set
-**BarnCRM Households**, within a few minutes. The confirmation says so, and reminds staff to
+**BarnCRM Auto: Households Tab**, within a few minutes. The confirmation says so, and reminds staff to
 create households with **New Household** on BarnCRM Home, not the standard **New** button.
 The permission set shows the tab and nothing else, and gives no record type. BarnCRM keeps it
 in step like the tool tab sets, so do not assign it by hand: the nightly run removes it from

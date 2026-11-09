@@ -83,7 +83,7 @@ scripts use what an earlier one created, so keep the order.
 **Core-only real-org sandbox (for example `mwdbdevsb`).** Run items 1 to 15 only; skip 16 to 25
 (Giving, Volunteers and Rollup Builder are not deployed). Set up as in
 [Core-only real-org sandbox](before-you-test.md#core-only-real-org-sandbox): Core deployed
-with `--core-only`, no sample data, work in the **BarnCRM** app, hold **BarnCRM Admin Group**,
+with `--core-only`, no sample data, work in the **BarnCRM** app, hold **BarnCRM Admin**,
 and create the **Zztest** fixture first. Read Garcia as Zztest in every script. Extra
 permissions: **BarnCRM Duplicate Review** for item 13 and **BarnCRM Erase People** for item
 15 only, removed straight after. Item 15 erases a fixture contact you created (Luis Zztest),

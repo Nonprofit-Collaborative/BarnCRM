@@ -6,7 +6,7 @@ use the right one. People also get three email boxes and a choice of which one y
 and a choice of which phone number to call.
 
 Before you start: open the **BarnCRM** app. Changing addresses, email and phone needs the Team
-Member, Coordinator, Fundraising Staff or Admin role. The **Addresses** card appears once your
+Member, Fundraising Staff or Admin role. The **Addresses** card appears once your
 admin has turned on the Addresses feature. Ask your admin; see
 [Addresses](../admin-guide/addresses.md).
 

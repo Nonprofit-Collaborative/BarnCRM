@@ -153,10 +153,12 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 5 | As staff, open the **Super Transformer** tab. | The five Super Transformer steps, then **Data Jobs** with "Start a change with Super Transformer above, or from a saved query in Find (Change Records, Super Transformer). Recent Super Transformer runs and their undo are listed here." and **Open Find**. Only staff's own jobs are listed; **Show everyone's jobs** is not offered. |
 | 6 | As admin, open the **Super Transformer** tab. | **Show everyone's jobs** is offered; ticking it lists other people's jobs too. |
 | 7 | As admin, give staff **BarnCRM Bulk Delete**. Log in as staff and run a Find query. | **Bulk Delete** is offered. On **Access**, the Bulk Delete give step showed the warning "This permission lets the person remove data. Give it only to someone you trust to do that." |
-| 8 | As admin, in Setup, open staff's user and check **Permission Set Assignments**. | **BarnCRM Tab: Bulk Update**, **BarnCRM Tab: Find** and **BarnCRM Tab: Data Manager** are assigned (given by BarnCRM, not by hand). |
+| 8 | As admin, in Setup, open staff's user and check **Permission Set Assignments**. | **BarnCRM Auto: Bulk Update Tab**, **BarnCRM Auto: Find Tab** and **BarnCRM Auto: Data Manager Tab** are assigned (given by BarnCRM, not by hand). |
 | 9 | As admin, remove **BarnCRM Bulk Update**, **BarnCRM Bulk Delete** and **BarnCRM Find and Export** from staff on **Access**. Log in as staff. | The **Find**, **Super Transformer** and **Data Manager** tabs are gone. |
+| 10 | As admin, give staff **BarnCRM Bulk Update** only (no Find and Export). Wait a minute. Log in as staff, open **Find** and run a query. | The **Find** tab is there, the query runs and **Super Transformer** is offered in **Change Records**: Bulk Update includes Find and Export. |
+| 11 | As admin, remove **BarnCRM Bulk Update** from staff. | Staff is back to no extra permissions. |
 
-**Cleanup:** none (step 9 resets staff).
+**Cleanup:** none (step 11 resets staff).
 
 ## T-BULK-10: The Bulk Path from Data Manager
 

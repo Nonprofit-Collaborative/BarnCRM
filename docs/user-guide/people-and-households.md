@@ -6,7 +6,7 @@ keeps its member count right. Organizations (employers, foundations, congregatio
 are kept separately.
 
 Before you start: open the **BarnCRM** app. Adding and changing people and households needs
-the Team Member, Coordinator, Fundraising Staff or Admin role. With Read Only you can look
+the Team Member, Fundraising Staff or Admin role. With Read Only you can look
 but not change; see [Read-only access](read-only-access.md).
 
 ## To Add a Person
