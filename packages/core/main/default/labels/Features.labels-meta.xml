@@ -9,14 +9,6 @@
         <value>Org Optimizer and Health Check</value>
     </labels>
     <labels>
-        <fullName>Core_Feature_HouseholdUpkeep_Name</fullName>
-        <categories>Core</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Name of the Households feature in Settings, General.</shortDescription>
-        <value>Households</value>
-    </labels>
-    <labels>
         <fullName>Core_Feature_Addresses_Name</fullName>
         <categories>Core</categories>
         <language>en_US</language>

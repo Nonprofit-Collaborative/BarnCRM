@@ -48,7 +48,8 @@ import sys
 # Batch C review: lowered to 3,255 after merging six labels that held the same name for the same
 # thing (Super Importer, Opportunity Mirror, Gift Transaction Mirror, Seasonal Address Swap, "or").
 # Raised by 1 for Mirror_Sync_Compare: Mirror's two pages read a Rollups label before.
-BUDGET = 3256
+# Lowered to 3,254 after merging two more same-text pairs (Households, Choose a kind of record).
+BUDGET = 3254
 TARGET = 3000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 
