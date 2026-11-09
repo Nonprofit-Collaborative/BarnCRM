@@ -1,6 +1,6 @@
 # BarnCRM Overview
 
-Applies to: BarnCRM landing/batch-c-review 32c5ba88 (v1.0 and Batch C with its whole-solution review, releases 0.12 to 1.3). Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM landing/batch-c-review 96a34e93 (v1.0 and Batch C with its whole-solution review, releases 0.12 to 1.3). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## What BarnCRM Is
 
