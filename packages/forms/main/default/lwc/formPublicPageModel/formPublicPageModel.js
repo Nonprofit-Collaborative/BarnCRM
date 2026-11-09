@@ -148,3 +148,20 @@ export function listView(list, locale, joiner, pageUrl) {
 export function sitePageUrl(recordId) {
   return `FormsPublic?record=${encodeURIComponent(recordId)}`;
 }
+
+/**
+ * Names the browser tab after what the page shows, such as the form or the event. The page's own
+ * title ("Form") stays when there is no name, or when the host does not let a component set it,
+ * as Lightning Out on a Site may not; the page works the same either way.
+ */
+export function nameTab(name, doc = typeof document === 'undefined' ? null : document) {
+  if (!name || !doc) {
+    return false;
+  }
+  try {
+    doc.title = name;
+    return true;
+  } catch {
+    return false;
+  }
+}

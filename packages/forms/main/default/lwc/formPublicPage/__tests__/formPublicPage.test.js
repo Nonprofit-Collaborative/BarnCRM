@@ -71,6 +71,7 @@ describe('c-form-public-page', () => {
     const element = await render({ recordId: 'a01000000000001' });
 
     expect(getPage).toHaveBeenCalledWith({ recordId: 'a01000000000001' });
+    expect(document.title).toBe('Spring Gala');
     expect(find(element, '[data-id="title"]').textContent).toContain('Spring Gala');
     expect(find(element, '[data-id="price"]').textContent).toBe('$50.00');
     expect(find(element, '[data-id="note"]').textContent).toBe('Pay at the door.');
@@ -113,6 +114,7 @@ describe('c-form-public-page', () => {
     );
     const element = await render({ listKind: 'events' });
 
+    expect(document.title).toBe('Upcoming Events');
     expect(listPages).toHaveBeenCalledWith({ kind: 'events' });
     const links = findAll(element, '[data-id="list-item"] a');
     expect(links).toHaveLength(1);

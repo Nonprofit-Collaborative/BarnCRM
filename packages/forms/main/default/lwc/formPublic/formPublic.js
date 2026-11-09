@@ -16,6 +16,7 @@ import {
 } from 'c/formRules';
 import { HELP, LABELS, SAVE_TEXT, answerText, publicResultText, trapLabel } from 'c/formText';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
+import { nameTab } from 'c/formPublicPageModel';
 
 /**
  * A public form on a Salesforce Site (C-42b, C-42c; ADR-0184 public forms on a Salesforce Site,
@@ -84,6 +85,10 @@ export default class FormPublic extends LightningElement {
         this.current = shown.includes(form.step) ? form.step : (shown[0] ?? -1);
         if (form.answers) {
           this.noticeMessage = SAVE_TEXT.resumed;
+        }
+        // Inside a module's page, that page names the tab after its record.
+        if (!this.embedded) {
+          nameTab(form.name);
         }
       } else {
         this.closedMessage = publicResultText('Closed');

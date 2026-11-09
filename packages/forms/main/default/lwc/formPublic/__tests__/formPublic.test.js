@@ -63,6 +63,17 @@ describe('c-form-public', () => {
       document.body.removeChild(document.body.firstChild);
     }
     jest.clearAllMocks();
+    document.title = 'Form';
+  });
+
+  it('names the browser tab after the form, but not inside a module page', async () => {
+    getForm.mockResolvedValue(FORM);
+    await render({ formId: FORM.formId });
+    expect(document.title).toBe('Volunteer Sign-Up');
+
+    document.title = 'Form';
+    await render({ formId: FORM.formId, embedded: true });
+    expect(document.title).toBe('Form');
   });
 
   it('shows the form and sends the answers with the ticket and the empty hidden question', async () => {

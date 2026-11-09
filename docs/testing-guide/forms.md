@@ -104,7 +104,7 @@ the Admin Guide (Setup steps 1 to 5).
 | 2 | Set **When Found** back to fill blanks, **Publish**. | Published; the panel lists the form's link on the Site. |
 | 3 | Open **Health Check** in the Settings console. | **A Site Guest User Can't Open Public Forms** and **Public Form Answers Are Not Being Processed**. No finding that a guest can read people. |
 | 4 | Select **Give Forms Public Guest**, confirm; then **Schedule Processing**, confirm. | Both findings clear on the re-run. |
-| 5 | In a private browser window (not signed in), open the link. Then open it on a phone, or narrow the window to phone width. | The form shows, with its steps; no BarnCRM data shows anywhere. At phone width it fills the screen at a readable size, with no sideways scrolling. After **Next**, a screen reader starts at the new step's "Step 2 of ..." heading. |
+| 5 | In a private browser window (not signed in), open the link. Then open it on a phone, or narrow the window to phone width. | The form shows, with its steps; no BarnCRM data shows anywhere. The browser tab shows the form's name (if the Site doesn't allow it, the tab shows `Form` and the form still works: note it). At phone width it fills the screen at a readable size, with no sideways scrolling. After **Next**, a screen reader starts at the new step's "Step 2 of ..." heading. |
 | 6 | Enter `Sam`, `Zztest`, `sam.zztest@example.org`, postal code `22222`, and send. | The thank-you message; nothing says whether Sam was found. |
 | 7 | Leave the page open over a day, then send again. | Asked to reload the page; nothing is stored. |
 | 8 | Signed in, open **Form Submissions**. | A submission with Status **Received**, Source **Public**, no Person. |
