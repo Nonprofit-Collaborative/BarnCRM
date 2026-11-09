@@ -133,6 +133,50 @@ private class ContactPointSyncServiceTest {
 	}
 
 	@IsTest
+	static void aSecondChangeInOneTransactionIsCopiedAndClearingIsCheap() {
+		System.runAs(TestUsers.admin()) {
+			if (!ready()) {
+				return;
+			}
+			Contact ana = person('Rivera', 'ana@home.example', '5550100001');
+			insert ana;
+			Id parent = individualOf(ana.Id);
+
+			Test.startTest();
+			ana.Personal_Email__c = 'ana@one.example';
+			update ana;
+			ana.Personal_Email__c = 'ana@two.example';
+			update ana;
+			List<SObject> afterTwo = copies('ContactPointEmail', parent, 'EmailAddress');
+			// Cleared without the sync, then synced alone, to count only what the sync reads.
+			AutomationControl.bypass('Contact_Point_Sync_Person');
+			ana.Personal_Email__c = null;
+			ana.Email = null;
+			ana.HomePhone = null;
+			update ana;
+			AutomationControl.clearBypass('Contact_Point_Sync_Person');
+			Integer before = Limits.getQueries();
+			ContactPointSyncService.Result cleared = ContactPointSyncService.syncPeople(
+				new Set<Id>{ ana.Id },
+				new Set<String>{ ContactPointPlan.EMAIL, ContactPointPlan.PHONE }
+			);
+			Integer spent = Limits.getQueries() - before;
+			Test.stopTest();
+
+			Assert.areEqual(1, afterTwo.size());
+			Assert.areEqual(
+				'ana@two.example',
+				afterTwo[0].get('EmailAddress'),
+				'The second change of the transaction reaches the copy'
+			);
+			Assert.isTrue(cleared.deleted >= 2, 'The email and phone copies are removed');
+			// The person and their links, nothing more: a cleared value reads no Contact Point
+			// (6 before the Batch C review: the copies and the adoptable rows of each kind).
+			Assert.isTrue(spent <= 2, 'Queries for clearing a person: ' + spent);
+		}
+	}
+
+	@IsTest
 	static void deletedWithThePersonAndMadeAgainOnRestore() {
 		System.runAs(TestUsers.admin()) {
 			if (!ready()) {
