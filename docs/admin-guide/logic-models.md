@@ -55,8 +55,7 @@ You never assign the Logic Models permission sets by hand. Give people their Bar
 | BarnCRM role | Logic Models set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Logic Models Admin | Everything, including deleting a whole logic model and choosing where an indicator's results come from |
-| Coordinator | Logic Models Staff | Create logic models and build them: add, change and remove parts, arrows, indicators and periods; never deletes a whole model |
-| Team Member | Logic Models Staff | The same as Coordinator |
+| Team Member, Fundraising Staff (Giving) | Logic Models Staff | Create logic models and build them: add, change and remove parts, arrows, indicators and periods; never deletes a whole model |
 | Read Only | Logic Models Read Only | Look at logic models, indicators and results |
 
 The sets are given at install, when you give a role on the Access page (within a minute), when

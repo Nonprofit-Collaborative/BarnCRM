@@ -49,7 +49,7 @@ You never assign the Forms permission sets by hand. Give people their BarnCRM ro
 | BarnCRM role | Forms set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Forms Admin | Everything: build, publish and delete forms, fill them in, work submissions |
-| Team Member, Coordinator | Forms Staff | Fill in published forms and work their submissions, including Process Again; never builds or deletes a form |
+| Team Member, Fundraising Staff (Giving) | Forms Staff | Fill in published forms and work their submissions, including Process Again; never builds or deletes a form |
 | Read Only | Forms Read Only | Look at forms and submissions |
 
 Filling in a form writes the person, organization and related records **as the person filling

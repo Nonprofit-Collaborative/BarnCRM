@@ -5,7 +5,7 @@ government funders, how far along each one is, the deadlines coming up, and the 
 requires.
 
 **Before you start:** open the **BarnCRM Funders** app from the App Launcher. Fundraising Staff,
-Team Members and Coordinators add grants and move them through the stages, but cannot delete a
+Team Members add grants and move them through the stages, but cannot delete a
 grant. Admins can also delete one. Read Only users can look but change nothing. If you need more
 access, ask your admin (see the [Funders admin guide](../admin-guide/funders.md#roles-and-permission-sets)).
 

@@ -61,7 +61,6 @@ You never assign the Funders permission sets by hand. Give people their BarnCRM 
 | Admin (anyone holding BarnCRM Admin) | Funders Admin | Everything, including deleting a grant |
 | Fundraising Staff (Giving) | Funders Staff | Create and edit grants and move them through the stages; add, change and remove requirements, payments and restricted fund entries; never delete a grant |
 | Team Member | Funders Staff | The same as Fundraising Staff |
-| Coordinator | Funders Staff | The same as Fundraising Staff |
 | Read Only | Funders Read Only | Look at grants, the pipeline and the calendar |
 
 The sets are given at install, when you give a role on the Access page (within a minute), when

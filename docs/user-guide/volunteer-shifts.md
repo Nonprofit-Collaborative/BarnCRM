@@ -8,7 +8,7 @@ A volunteer is a person you already have in BarnCRM. There is no separate volunt
 sign-ups and hours link to the person.
 
 **Before you start:** open the **BarnCRM Volunteers** app from the App Launcher. You need a
-Volunteers permission set, which comes with your BarnCRM role (Team Member, Coordinator, Admin or
+Volunteers permission set, which comes with your BarnCRM role (Team Member, Fundraising Staff, Admin or
 Read Only). If the app is missing, ask your admin (see the
 [Volunteers admin guide](../admin-guide/volunteers.md#roles-and-permission-sets)). Read Only
 users can look at jobs, shifts and sign-ups but change nothing.

@@ -6,8 +6,8 @@ BarnCRM. There is no separate participant record: an **enrollment** links the pe
 program, with a **stage** (Applied, Enrolled, Completed or Withdrawn).
 
 **Before you start:** open the **BarnCRM Programs** app from the App Launcher. You need a
-Programs permission set, which comes with your BarnCRM role (Team Member, Coordinator, Admin or
-Read Only). If the app is missing, ask your admin (see the
+Programs permission set, which comes with your BarnCRM role (Team Member, Admin or
+Read Only; Fundraising Staff alone does not include it). If the app is missing, ask your admin (see the
 [Programs admin guide](../admin-guide/programs.md#roles-and-permission-sets)). Read Only users
 can look at programs and enrollments but change nothing.
 

@@ -4,8 +4,8 @@ This page covers building a logic model in BarnCRM: the parts of your program fr
 in to the change you hope for, the arrows between them, and the indicators that measure your
 outputs and outcomes, with a target and a result for each period.
 
-**Before you start:** open the **BarnCRM Logic Models** app from the App Launcher. Program Staff
-and Coordinators build models and can delete parts, but not a whole model. Admins can also delete
+**Before you start:** open the **BarnCRM Logic Models** app from the App Launcher. Team Members
+and Fundraising Staff build models and can delete parts, but not a whole model. Admins can also delete
 a whole model. Read Only users can look but change nothing. If you need more access, ask your
 admin (see the [Logic Models admin guide](../admin-guide/logic-models.md#roles-and-permission-sets)).
 

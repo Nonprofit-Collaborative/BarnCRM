@@ -53,9 +53,8 @@ Maria's organization takes on new staff every few months. Every new hire gets th
    holds the Team Member role straight away. Maria checks on the Access page: the new name
    is on the Team Member card.
 
-If your org has Giving, Maria also creates Policy 2, then clicks **Apply Policy** once and
-applies it to every user it lists. Everyone who already holds BarnCRM Admin now also holds
-Giving Admin.
+If your org has Giving, Maria does not need Policy 2: BarnCRM gives Giving Admin to everyone
+who holds BarnCRM Admin within the hour. She can still create it to make that instant.
 
 ## The Policy Definitions
 
@@ -88,7 +87,7 @@ These apply only when the Giving module is installed.
 
 | Policy | Filter 1 | Action | Order |
 |---|---|---|---|
-| 2. BarnCRM: admins also get Giving Admin | Permission Set Group equals **BarnCRM Admin Group** (`BarnCRM_Admin_Group`) | Grant, Permission Set, **Giving Admin** (`Giving_Admin`) | 20 |
+| 2. BarnCRM: admins also get Giving Admin (optional: BarnCRM gives it within the hour) | Permission Set Group equals **BarnCRM Admin** (`BarnCRM_Admin_Group`) | Grant, Permission Set, **Giving Admin** (`Giving_Admin`) | 20 |
 | 3. BarnCRM: fundraising staff also get Giving Staff | Permission Set Group equals **Fundraising Staff** (`Fundraising_Staff`) | Grant, Permission Set, **Giving Staff** (`Giving_Staff`) | 30 |
 | 4. BarnCRM: read only also get Giving Read Only | Permission Set Group equals **Read Only** (`Read_Only`) | Grant, Permission Set, **Giving Read Only** (`Giving_Read_Only`) | 40 |
 

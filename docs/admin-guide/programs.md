@@ -125,9 +125,11 @@ You never assign the Programs permission sets by hand. Give people their BarnCRM
 | BarnCRM role | Programs set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Programs Admin | Everything, including deleting a record entered by accident |
-| Coordinator | Programs Staff | Set up programs, services, cohorts and sessions, enroll people and move them through the stages, take attendance, keep service plans; never deletes |
-| Team Member | Programs Staff | The same as Coordinator |
+| Team Member | Programs Staff | Set up programs, services, cohorts and sessions, enroll people and move them through the stages, take attendance, keep service plans; never deletes |
 | Read Only | Programs Read Only | Look at programs, services, cohorts, sessions, enrollments and service plans |
+
+Fundraising Staff does not get Programs Staff: program records hold the people you serve, which
+fundraisers do not need. A fundraiser who also runs a program gets the Team Member role as well.
 
 When it happens:
 

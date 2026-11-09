@@ -151,21 +151,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** delete both volunteer skills, then delete "Test driving" (it deletes once nobody holds it).
 
-## T-VOL-10: Coordinator Role Gives Approval
+## T-VOL-10: Volunteers Coordinator Gives Approval
 
-**Purpose:** confirm a Team Member cannot approve hours, and giving the Coordinator role gives Volunteers Coordinator with approval.
+**Purpose:** confirm a Team Member cannot approve hours, and giving Volunteers Coordinator as an extra permission on the Access page gives approval.
 **Prerequisites:** staff user and admin user; at least one Submitted entry the staff user did not enter (sample data has four).
 
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As staff, open **BarnCRM Volunteers**. | No **Approve Hours**, **Volunteer Requirements**, or **Volunteer Letter Templates** tab. |
 | 2 | Open **Volunteer Hours**, list view **All Hours**. | Only entries the staff user entered show; the sample entries do not. |
-| 3 | As admin, open **BarnCRM Settings**, **Access**. Find the staff user in **Find a person**, choose **Coordinator** and click **Give Access**, then confirm. | The staff user shows on the Coordinator card, still also on Team Member. |
-| 4 | Wait a minute. In Setup, open the staff user's **Permission Set Assignments**. | **Volunteers Coordinator** is assigned. |
+| 3 | As admin, open **BarnCRM Settings**, **Access**. Under **Extra Permissions**, give the staff user **Volunteers Coordinator**, then confirm. The **Role** list does not offer Coordinator. | The staff user shows beside **Volunteers Coordinator**, still also on the Team Member card. |
+| 4 | In Setup, open the staff user's **Permission Set Assignments**. | **Volunteers Coordinator** is assigned. |
 | 5 | As staff, reload the app and open **Approve Hours**. | The tab shows with **Approve** and **Reject**; the four sample Submitted entries are listed. |
 | 6 | Tick one and click **Approve**. | "Entries approved: 1." |
 
-**Cleanup:** as staff, reopen that entry. As admin, click **Remove** for the staff user on the Coordinator card, then remove **Volunteers Coordinator** in Setup (the module never takes a set away).
+**Cleanup:** as staff, reopen that entry. As admin, under **Extra Permissions**, click **Remove** beside the staff user for **Volunteers Coordinator**.
 
 ## T-VOL-11: Read-Only User Sees and Changes Nothing
 
