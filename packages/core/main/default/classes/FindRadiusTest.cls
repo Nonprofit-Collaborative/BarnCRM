@@ -247,11 +247,25 @@ private class FindRadiusTest {
 			User maria = TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
 
 			System.runAs(maria) {
+				// A plain run first, so neither run is charged for anything read once.
+				Integer before = Limits.getQueries();
+				FindController.QueryResult plain = FindController.runQuery(
+					'{"version": 1, "object": "Contact", "fields": ["LastName"]}'
+				);
+				Integer withoutRadius = Limits.getQueries() - before;
+				before = Limits.getQueries();
 				FindController.QueryResult result = FindController.runQuery(document(25));
+				Integer withRadius = Limits.getQueries() - before;
 				FindRadius.Center center = FindController.resolveRadiusCenter('02134');
 
 				System.Assert.areEqual(1, result.rows.size(), 'The one near record.');
 				System.Assert.areEqual(1, result.withoutGeocode, 'One cannot be placed.');
+				System.Assert.isNull(plain.withoutGeocode, 'No radius, no count.');
+				System.Assert.areEqual(
+					withoutRadius + 1,
+					withRadius,
+					'A radius adds the one count, nothing else.'
+				);
 				System.Assert.isNotNull(center.latitude, 'A postal code resolves.');
 				System.Assert.isFalse(
 					FindController.listRadiusFields('Contact').isEmpty(),

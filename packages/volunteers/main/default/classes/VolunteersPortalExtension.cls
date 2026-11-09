@@ -44,7 +44,10 @@ public without sharing class VolunteersPortalExtension implements PortalActionEx
 			FROM Volunteer_Shift__c
 			WHERE Id = :shiftId
 			WITH SYSTEM_MODE
+			FOR UPDATE
 		];
+		// The shift stays locked until this sign-up is saved, so two arriving at once are
+		// counted one after the other and the last place is never given twice.
 		if (shifts.isEmpty()) {
 			throw new System.QueryException('The shift is gone');
 		}

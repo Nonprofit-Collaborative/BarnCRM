@@ -62,6 +62,11 @@ public with sharing class QueryCompiler {
 		/** The FROM and WHERE part, for a count of the same records. */
 		@NamespaceAccessible
 		public String fromWhere;
+		/** The radius field (C-69), or null when the document has no radius. */
+		public String radiusField;
+		/** The FROM and WHERE part without the radius, and the binds the radius alone uses. */
+		public String fromWhereWithoutRadius;
+		public Set<String> radiusBinds = new Set<String>();
 	}
 
 	/** Reads a query document; refuses one that is not a version 1 document within limits. */
@@ -258,30 +263,36 @@ public with sharing class QueryCompiler {
 	 * when the document has no radius or its field has no geocode columns to look at.
 	 */
 	public static Integer countWithoutGeocode(String queryJson, Integer atMost) {
-		QueryDocument document = parse(queryJson);
-		if (document.radius == null) {
+		return countWithoutGeocode(compile(queryJson), atMost);
+	}
+
+	/**
+	 * As above, from the query already compiled for the run, so the document is not read and
+	 * checked a second time. Runs no query when there is no radius.
+	 */
+	public static Integer countWithoutGeocode(Compiled compiled, Integer atMost) {
+		if (compiled.radiusField == null) {
 			return 0;
 		}
 		String clause;
 		try {
-			clause = FindRadius.missingGeocodeClause(
-				document.objectName,
-				String.valueOf(document.radius.get('field'))
-			);
+			clause = FindRadius.missingGeocodeClause(compiled.objectName, compiled.radiusField);
 		} catch (FindRadius.FindRadiusException refused) {
 			throw new QueryCompilerException(refused.getMessage());
 		}
 		if (clause == null) {
 			return 0;
 		}
-		document.radius = null;
-		Compiled compiled = selectAndWhere(document, null, null);
 		Map<String, Object> binds = new Map<String, Object>(compiled.binds);
+		for (String name : compiled.radiusBinds) {
+			binds.remove(name);
+		}
 		binds.put('countLimit', atMost);
+		String fromWhere = compiled.fromWhereWithoutRadius;
 		return Database.countQueryWithBinds(
 			'SELECT COUNT()' +
-				compiled.fromWhere +
-				(compiled.fromWhere.contains(' WHERE ') ? ' AND ' : ' WHERE ') +
+				fromWhere +
+				(fromWhere.contains(' WHERE ') ? ' AND ' : ' WHERE ') +
 				clause +
 				' LIMIT :countLimit',
 			binds,
@@ -345,6 +356,9 @@ public with sharing class QueryCompiler {
 			shownParts.add(joined.display);
 			binds.putAll(joined.binds);
 		}
+		List<String> partsWithoutRadius = new List<String>(whereParts);
+		String radiusField;
+		Set<String> radiusBinds = new Set<String>();
 		if (document.radius != null) {
 			try {
 				FindRelatedRecords.Rendered near = FindRadius.condition(
@@ -354,6 +368,8 @@ public with sharing class QueryCompiler {
 				whereParts.add(near.clause);
 				shownParts.add(near.display);
 				binds.putAll(near.binds);
+				radiusField = String.valueOf(document.radius.get('field'));
+				radiusBinds.addAll(near.binds.keySet());
 			} catch (FindRadius.FindRadiusException refused) {
 				throw new QueryCompilerException(refused.getMessage());
 			}
@@ -377,6 +393,17 @@ public with sharing class QueryCompiler {
 		compiled.objectName = objectName;
 		compiled.fields = fields;
 		compiled.binds = binds;
+		if (radiusField != null) {
+			// Only the filter and related conditions: a radius count is never paged.
+			compiled.radiusField = radiusField;
+			compiled.radiusBinds = radiusBinds;
+			compiled.fromWhereWithoutRadius =
+				' FROM ' +
+				objectName +
+				(partsWithoutRadius.isEmpty()
+					? ''
+					: ' WHERE ' + String.join(partsWithoutRadius, ' AND '));
+		}
 		compiled.fromWhere =
 			' FROM ' +
 			objectName +

@@ -135,6 +135,48 @@ private class VolunteersPortalExtensionTest {
 	}
 
 	@IsTest
+	static void theLastPlaceIsGivenOnceEvenToSomeoneReturning() {
+		System.runAs(coordinator()) {
+			List<Contact> people = VolunteersTestData.contacts(2);
+			Volunteer_Shift__c oneSlot = futureShift(1);
+			VolunteersPortalExtension extension = new VolunteersPortalExtension();
+
+			Test.startTest();
+			extension.run(VolunteersPortalExtension.SIGN_UP, people[0].Id, oneSlot.Id);
+			extension.run(
+				VolunteersPortalExtension.CANCEL,
+				people[0].Id,
+				signupsOf(oneSlot.Id)[0].Id
+			);
+			String taken = extension.run(
+				VolunteersPortalExtension.SIGN_UP,
+				people[1].Id,
+				oneSlot.Id
+			);
+			String returning = extension.run(
+				VolunteersPortalExtension.SIGN_UP,
+				people[0].Id,
+				oneSlot.Id
+			);
+			Test.stopTest();
+
+			Assert.areEqual(BarnHelp.text('Volunteers', 'Volunteers_Portal_SignedUp'), taken);
+			Assert.areEqual(
+				BarnHelp.text('Volunteers', 'Volunteers_Portal_ShiftFull'),
+				returning,
+				'A cancelled sign-up is not reopened into a full shift'
+			);
+			Integer active = 0;
+			for (Volunteer_Signup__c signup : signupsOf(oneSlot.Id)) {
+				if (signup.Status__c != VolunteerSignupService.STATUS_CANCELLED) {
+					active++;
+				}
+			}
+			Assert.areEqual(1, active, 'One place, one person');
+		}
+	}
+
+	@IsTest
 	static void aPersonCancelsOnlyTheirOwnSignup() {
 		System.runAs(coordinator()) {
 			List<Contact> people = VolunteersTestData.contacts(2);
