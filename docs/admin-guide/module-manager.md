@@ -68,7 +68,10 @@ cleans up her data, and check what removing a module would cost.
    - **Installed**: installed and working, with a link to the module's own app. Core is
      always installed and on.
    - **Installed and off**: installed, and its automation is not running.
-   - **Not installed**: not in your org.
+   - **Not installed**: not in your org. An object of your own that shares a module object's
+     name, such as your own `Event__c` or `Volunteer_Hours__c`, does not make a module count as
+     installed: BarnCRM finds a module by the settings rows its package ships, or, for a module
+     with no settings, by an object only that module has.
 2. On a **Not installed** row, click **Install**. Salesforce's install screen opens in a new
    tab. Choose who to install for (**Install for Admins Only** is the safe choice), click
    **Install**, and wait for Salesforce's email. Come back and click **Check again**: the row

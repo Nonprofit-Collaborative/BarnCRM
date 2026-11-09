@@ -32,7 +32,7 @@
   </values>
   <values>
     <field>Probe_Object__c</field>
-    <value xsi:type="xsd:string">Volunteer_Hours__c</value>
+    <value xsi:nil="true" />
   </values>
   <values>
     <field>Requires__c</field>

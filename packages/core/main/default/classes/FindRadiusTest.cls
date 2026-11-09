@@ -165,7 +165,18 @@ private class FindRadiusTest {
 			}
 
 			System.Assert.isTrue(names.contains('MailingAddress'), 'Mailing address.');
-			System.Assert.isTrue(names.contains('OtherAddress'), 'Other address.');
+			// An org can hide the other address from administrators with field-level security,
+			// and then it is not offered: only a place the user can read is.
+			Schema.SObjectField other = Contact.SObjectType.getDescribe(
+					SObjectDescribeOptions.DEFERRED
+				)
+				.fields.getMap()
+				.get('OtherAddress');
+			System.Assert.areEqual(
+				other != null && other.getDescribe().isAccessible(),
+				names.contains('OtherAddress'),
+				'Other address, exactly when the user can read it.'
+			);
 			System.Assert.isFalse(names.contains('LastName'), 'Only places.');
 			System.Assert.areEqual(
 				'(MailingLatitude = NULL AND MailingPostalCode != NULL)',
