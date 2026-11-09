@@ -29,20 +29,33 @@ public with sharing class EventSurveyService {
 	 * The survey form of the attendee's event; null when none or when the attendee is not Attended
 	 * (the survey is for people who came).
 	 *
-	 * System mode: the public intake asks this as the Site guest user, which reads no record, once
-	 * the link's signed claim has matched (ADR-0188 decision 3). In user mode every guest's survey
-	 * was refused. It returns only a form identifier, never a record value.
+	 * Past sharing and in system mode: the public intake asks this as the Site guest user, which
+	 * reads no record and is shared none, once the link's signed claim has matched (ADR-0188
+	 * decision 3). Only this one read runs `without sharing` (`AttendeeFormReader`); the rest of
+	 * the class keeps sharing. In user mode, or with sharing, every guest's survey was refused. It
+	 * returns only a form identifier, never a record value.
 	 */
 	public static Id formForAttendee(Id attendeeId) {
-		for (Event_Attendee__c attendee : [
-			SELECT Event_Registration__r.Event__r.Survey_Form_Key__c
-			FROM Event_Attendee__c
-			WHERE Id = :attendeeId AND Status__c = :ATTENDED
-			WITH SYSTEM_MODE
-		]) {
-			return formId(attendee.Event_Registration__r.Event__r.Survey_Form_Key__c);
+		return new AttendeeFormReader().formOf(attendeeId);
+	}
+
+	/**
+	 * The one read a survey link's guest makes: which form the attendee's event names. Without
+	 * sharing, as the Site guest user is shared no attendee (without sharing register, under
+	 * Event Management).
+	 */
+	private without sharing class AttendeeFormReader {
+		Id formOf(Id attendeeId) {
+			for (Event_Attendee__c attendee : [
+				SELECT Event_Registration__r.Event__r.Survey_Form_Key__c
+				FROM Event_Attendee__c
+				WHERE Id = :attendeeId AND Status__c = :ATTENDED
+				WITH SYSTEM_MODE
+			]) {
+				return formId(attendee.Event_Registration__r.Event__r.Survey_Form_Key__c);
+			}
+			return null;
 		}
-		return null;
 	}
 
 	/**
