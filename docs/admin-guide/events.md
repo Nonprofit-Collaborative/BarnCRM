@@ -104,7 +104,7 @@ and **New Promo Code** open a short form; each row's menu has **Edit** and **Del
 | Ticket Type Name | What registrants see, such as General, Student or VIP. |
 | Price | What you charge; 0 for a free ticket. Never below 0. BarnCRM takes no payment. |
 | Quantity | How many may be sold; empty for no limit. At least 1 when set. |
-| Sales Start, Sales End | When it is on sale; End after Start. Empty means the registration window. |
+| Sales Start, Sales End | When it is on sale; End after Start. Empty means the registration window. A registration form takes the ticket only between them (a form that names no ticket takes the first one on sale); staff on the Registrations tab can use it any time. |
 | Active | Offered to registrants. Clear it to stop offering a ticket without deleting it. |
 | Sort Order | Its place in the list, lowest first. |
 
@@ -280,7 +280,8 @@ Each submission of that form filled from the event registers the person Forms ma
 with source **Form**; a question with the key `ticketType` (a ticket type's name) and one with the
 key `promoCode` choose the ticket and the code. A form registers people only while the event is
 **Open**, after **Registration Opens**, before **Registration Closes** and before the event ends.
-A submission that cannot be registered (outside those times, a used-up code, an unknown ticket)
+A submission that cannot be registered (outside those times, a ticket not on sale, a used-up
+code, an unknown ticket)
 is kept for review in Forms. Staff can still register anyone on the tab. Without Forms, register
 people on the tab.
 

@@ -301,6 +301,46 @@ private class FormIntakeServiceTest {
 		}
 	}
 
+	/** A failure inside the REST API is logged and answered Failed, never as an exception. */
+	@IsTest
+	static void aRestFailureIsLoggedAndAnsweredFailed() {
+		System.runAs(admin()) {
+			Form__c form = FormsTestData.publicVolunteerInterest(50);
+			RestContext.request = new RestRequest();
+			RestContext.request.requestURI = '/barncrm/forms/v1/' + form.Id;
+			RestContext.request.requestBody = Blob.valueOf('{"ticket":"x","answers":{}}');
+			FormPublicRest.failureForTest = new System.IllegalArgumentException('Zzrest broke');
+
+			Test.startTest();
+			RestContext.response = new RestResponse();
+			FormPublicRest.submit();
+			RestResponse posted = RestContext.response;
+			RestContext.response = new RestResponse();
+			FormPublicRest.getForm();
+			RestResponse got = RestContext.response;
+			Test.stopTest();
+
+			for (RestResponse answer : new List<RestResponse>{ posted, got }) {
+				Assert.areEqual(500, answer.statusCode, 'A server failure');
+				Assert.areEqual(
+					'{"status":"Failed"}',
+					answer.responseBody.toString(),
+					'Only Failed, no exception text'
+				);
+			}
+			Assert.areEqual(
+				2,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE Context__c IN ('FormPublicRest.submit', 'FormPublicRest.getForm')
+					WITH SYSTEM_MODE
+				],
+				'Both are in the Error Log'
+			);
+		}
+	}
+
 	@IsTest
 	static void theControllerSendsAnswers() {
 		System.runAs(admin()) {

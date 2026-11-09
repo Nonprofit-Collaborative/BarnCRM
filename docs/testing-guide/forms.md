@@ -132,5 +132,6 @@ steps 6 and 7 done; an inbox you can read.
 | 7 | Open the link again. | "This link to saved answers has expired or was already used." and an empty form. |
 | 8 | Signed in, after processing, open the submission and Sam Zztest. | The PDF is under the submission's Files and Sam's Files. |
 | 9 | As staff, fill in the form on its **Fill In** tab with a file. | Processed; the file is on the submission and the person. |
+| 10 | In the private window, **Save and Finish Later** to one email address four times within an hour (reload the form between). | Three emails arrive; the fourth time the page says to try again later and no email is sent. |
 
 **Cleanup:** delete the submissions and files, remove the file question, republish.

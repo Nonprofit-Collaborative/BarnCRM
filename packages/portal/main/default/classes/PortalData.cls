@@ -229,11 +229,15 @@ public without sharing class PortalData {
 		if (condition.op == 'isNotBlank') {
 			return condition.field + ' != null';
 		}
+		// The value was typed for its field when the template was read; only the words are left.
 		Object value = condition.value;
-		if (value == 'TODAY') {
-			value = Date.today();
-		} else if (value == 'NOW') {
-			value = Datetime.now();
+		Boolean isDate = condition.fieldType == Schema.DisplayType.DATE;
+		if (PortalTemplate.TODAY.equals(value)) {
+			value = isDate
+				? (Object) Date.today()
+				: (Object) Datetime.newInstance(Date.today(), Time.newInstance(0, 0, 0, 0));
+		} else if (PortalTemplate.NOW.equals(value)) {
+			value = isDate ? (Object) Date.today() : (Object) Datetime.now();
 		}
 		binds.put(name, value);
 		Map<String, String> operators = new Map<String, String>{

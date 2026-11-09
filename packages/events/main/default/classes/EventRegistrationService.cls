@@ -139,9 +139,11 @@ public with sharing class EventRegistrationService {
 		result.registrantId = registrantId;
 		Id householdId = EventPersonMatcher.householdOf(registrantId);
 
+		// A form sells only tickets on sale now; staff may use any active ticket.
+		Datetime onSaleAt = request.source == SOURCE_FORM ? now : null;
 		List<Seat> wanted = new List<Seat>();
 		if (request.registrantAttends != false) {
-			wanted.add(newSeat(registrantId, ticketFor(tickets, request.ticketType)));
+			wanted.add(newSeat(registrantId, ticketFor(tickets, request.ticketType, onSaleAt)));
 		}
 		for (GuestInput guest : request.guests == null ? new List<GuestInput>() : request.guests) {
 			if (guest == null || guest.person == null) {
@@ -150,7 +152,7 @@ public with sharing class EventRegistrationService {
 			wanted.add(
 				newSeat(
 					EventPersonMatcher.resolve(guest.person, householdId),
-					ticketFor(tickets, guest.ticketTypeId)
+					ticketFor(tickets, guest.ticketTypeId, onSaleAt)
 				)
 			);
 		}
@@ -375,7 +377,7 @@ public with sharing class EventRegistrationService {
 
 	private static List<Ticket_Type__c> activeTickets(Id eventId) {
 		return [
-			SELECT Id, Name, Price__c, Quantity__c
+			SELECT Id, Name, Price__c, Quantity__c, Sales_Start__c, Sales_End__c
 			FROM Ticket_Type__c
 			WHERE Event__c = :eventId AND Active__c = TRUE
 			WITH USER_MODE
@@ -384,21 +386,56 @@ public with sharing class EventRegistrationService {
 		];
 	}
 
-	/** The ticket named by identifier or name; blank means the first active one, or none. */
-	private static Ticket_Type__c ticketFor(List<Ticket_Type__c> tickets, String wanted) {
+	/**
+	 * The ticket named by identifier or name; blank means the first active one, or none. With
+	 * `onSaleAt` (a form), only a ticket on sale then: blank means the first on sale, and a named
+	 * ticket outside its Sales Start and Sales End is refused.
+	 */
+	private static Ticket_Type__c ticketFor(
+		List<Ticket_Type__c> tickets,
+		String wanted,
+		Datetime onSaleAt
+	) {
 		if (String.isBlank(wanted)) {
-			return tickets.isEmpty() ? null : tickets[0];
+			for (Ticket_Type__c ticket : tickets) {
+				if (onSaleAt == null || onSale(ticket, onSaleAt)) {
+					return ticket;
+				}
+			}
+			if (tickets.isEmpty()) {
+				return null;
+			}
+			throw notOnSale(tickets[0]);
 		}
 		for (Ticket_Type__c ticket : tickets) {
 			if (
 				String.valueOf(ticket.Id) == wanted.trim() ||
 				ticket.Name.equalsIgnoreCase(wanted.trim())
 			) {
+				if (onSaleAt != null && !onSale(ticket, onSaleAt)) {
+					throw notOnSale(ticket);
+				}
 				return ticket;
 			}
 		}
 		throw new RegistrationException(
 			BarnHelp.text('Events', 'Events_Register_UnknownTicket', new List<Object>{ wanted })
+		);
+	}
+
+	private static Boolean onSale(Ticket_Type__c ticket, Datetime at) {
+		return (ticket.Sales_Start__c == null || ticket.Sales_Start__c <= at) &&
+			(ticket.Sales_End__c == null ||
+			ticket.Sales_End__c >= at);
+	}
+
+	private static RegistrationException notOnSale(Ticket_Type__c ticket) {
+		return new RegistrationException(
+			BarnHelp.text(
+				'Events',
+				'Events_Register_TicketNotOnSale',
+				new List<Object>{ ticket.Name }
+			)
 		);
 	}
 

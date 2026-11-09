@@ -187,6 +187,31 @@ describe('mountPortal', () => {
     expect(api.save).toHaveBeenCalledWith('profile', '003A', { Skills__c: 'Cook' });
   });
 
+  it('shows and edits a date and time in the visitor own time zone', async () => {
+    const stored = '2026-01-31T14:00:00.000Z';
+    const page = {
+      ...PROFILE,
+      fields: [{ field: 'Starts__c', label: 'Starts', type: 'datetime', edit: true }],
+      records: [{ id: '003A', values: { Starts__c: stored } }]
+    };
+    const api = fakeApi({ page: jest.fn(() => Promise.resolve(page)) });
+    await mountPortal(root, { api });
+    expect(root.querySelector('dd').textContent).toBe(new Date(stored).toLocaleString());
+
+    buttonNamed(root, 'Edit').click();
+    const local = new Date(Date.parse(stored) - new Date(stored).getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+    expect(root.querySelector('[name="Starts__c"]').value).toBe(local);
+    const later = local.slice(0, 11) + '18:30';
+    submit(root, 'Starts__c', later);
+    await flush();
+
+    expect(api.save).toHaveBeenCalledWith('profile', '003A', {
+      Starts__c: new Date(later).toISOString()
+    });
+  });
+
   it('reads the page again after a module action', async () => {
     const page = { ...PROFILE, actions: [{ name: 'Test.Thanks', label: 'Say Thanks' }] };
     const api = fakeApi({ page: jest.fn(() => Promise.resolve(page)) });

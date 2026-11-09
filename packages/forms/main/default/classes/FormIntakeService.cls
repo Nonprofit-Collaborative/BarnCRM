@@ -29,6 +29,12 @@ public without sharing class FormIntakeService {
 	private static final Long TICKET_LIFE_MS = 24L * 60 * 60 * 1000;
 	private static final Long DAY_MS = 24L * 60 * 60 * 1000;
 	private static final Integer DRAFT_LENGTH = 131072;
+	/** Save-for-later links one address may be sent for one form in an hour (R-FS7). */
+	@TestVisible
+	private static final Integer LINKS_PER_ADDRESS_HOUR = 3;
+	/** Save-for-later links one form may send in an hour, at most (R-FS7). */
+	@TestVisible
+	private static final Integer LINKS_PER_FORM_HOUR = 100;
 	private static final String CONTEXT = 'FormIntakeService';
 
 	/** Set by tests to move the clock: milliseconds added to now. */
@@ -275,12 +281,18 @@ public without sharing class FormIntakeService {
 			receipt.problems.put(SAVE_KEY, problem);
 			return receipt;
 		}
+		String addressKey = addressKeyOf(version, address);
+		if (tooManyLinks(version, definition, addressKey)) {
+			receipt.status = BUSY;
+			return receipt;
+		}
 		String token = EncodingUtil.convertToHex(Crypto.generateAesKey(256));
 		Integer days = FormPublicPolicy.resumeDays(definition);
 		Form_Draft__c draft = new Form_Draft__c(
 			Form__c = version.Form__c,
 			Form_Version__c = version.Id,
 			Token_Hash__c = hashOf(token),
+			Address_Key__c = addressKey,
 			Expires__c = Datetime.newInstance(now() + days * DAY_MS),
 			Answers__c = answersJson,
 			Step__c = step == null || step < 0 ? 0 : step
@@ -511,6 +523,50 @@ public without sharing class FormIntakeService {
 				WHERE Form__c = :formId AND CreatedDate >= :hourAgo
 				WITH SYSTEM_MODE
 			];
+	}
+
+	/**
+	 * Whether another emailed link would pass a cap (R-FS7): 3 an hour to one address for one
+	 * form, and 100 an hour for one form, or the form's hourly limit when that is lower. Links are
+	 * counted by their drafts, so a link already used to send the form no longer counts.
+	 */
+	private static Boolean tooManyLinks(
+		Form_Version__c version,
+		Map<String, Object> definition,
+		String addressKey
+	) {
+		Datetime hourAgo = Datetime.newInstance(now() - 60L * 60 * 1000);
+		Integer formCap = Math.min(FormPublicPolicy.hourlyLimit(definition), LINKS_PER_FORM_HOUR);
+		Integer toAddress = [
+			SELECT COUNT()
+			FROM Form_Draft__c
+			WHERE
+				Form__c = :version.Form__c
+				AND Address_Key__c = :addressKey
+				AND CreatedDate >= :hourAgo
+			WITH SYSTEM_MODE
+		];
+		if (toAddress >= LINKS_PER_ADDRESS_HOUR) {
+			return true;
+		}
+		return [
+				SELECT COUNT()
+				FROM Form_Draft__c
+				WHERE Form__c = :version.Form__c AND CreatedDate >= :hourAgo
+				WITH SYSTEM_MODE
+			] >= formCap;
+	}
+
+	/** The address as a keyed hash: links are counted per address, which is never stored. */
+	@TestVisible
+	private static String addressKeyOf(Form_Version__c version, String address) {
+		return EncodingUtil.convertToHex(
+			Crypto.generateMac(
+				'hmacSHA256',
+				Blob.valueOf(address.trim().toLowerCase()),
+				EncodingUtil.convertFromHex(version.Signing_Key__c)
+			)
+		);
 	}
 
 	private static Form_Draft__c draftFor(String token) {

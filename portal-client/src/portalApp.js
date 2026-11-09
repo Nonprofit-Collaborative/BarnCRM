@@ -53,7 +53,16 @@ function display(field, value) {
     const option = (field.options || []).find((o) => o.value === one);
     return option ? option.label : one;
   };
+  if (field.type === 'datetime') {
+    return new Date(value).toLocaleString();
+  }
   return isMulti(field) ? chosenOf(value).map(labelOf).join(', ') : labelOf(String(value));
+}
+
+/** A stored date and time (UTC) as the visitor's local `yyyy-MM-ddTHH:mm` for an input. */
+function localInput(value) {
+  const at = new Date(value);
+  return new Date(at.getTime() - at.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
 }
 
 function isMulti(field) {
@@ -98,7 +107,8 @@ function inputFor(field, value, id) {
     return area;
   }
   const input = el('input', { ...common, type: INPUT_TYPES[field.type] || 'text' });
-  input.value = value === null || value === undefined ? '' : String(value).replace(/Z$/, '');
+  const blank = value === null || value === undefined || value === '';
+  input.value = blank ? '' : field.type === 'datetime' ? localInput(value) : String(value);
   return input;
 }
 
@@ -109,6 +119,9 @@ function valueOf(input) {
   if (input.multiple) {
     const chosen = Array.from(input.selectedOptions).map((o) => o.value);
     return chosen.length === 0 ? null : chosen.join(';');
+  }
+  if (input.type === 'datetime-local' && input.value !== '') {
+    return new Date(input.value).toISOString(); // the visitor's local time, sent as UTC
   }
   return input.value === '' ? null : input.value;
 }

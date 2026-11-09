@@ -66,14 +66,24 @@ public with sharing class PortalTokens {
 
 	/** Whether the code is the secret's code now, or one step either side. */
 	public static Boolean authenticatorCodeMatches(String secret, String code, Datetime now) {
+		return matchedStep(secret, code, now) != null;
+	}
+
+	/**
+	 * The 30-second step the code belongs to, now or one step either side, or null when it is
+	 * none of them. A caller keeps the step so the same code is never accepted twice (R-PA3).
+	 */
+	public static Long matchedStep(String secret, String code, Datetime now) {
 		if (String.isBlank(secret) || code == null || !code.trim().isNumeric()) {
-			return false;
+			return null;
 		}
 		Long step = now.getTime() / 1000 / STEP_SECONDS;
-		Boolean matched = false;
+		Long matched = null;
 		for (Integer drift = -DRIFT_STEPS; drift <= DRIFT_STEPS; drift++) {
 			// Every step is checked, so a match takes the same time wherever it is found.
-			matched = sameText(authenticatorCode(secret, step + drift), code.trim()) || matched;
+			if (sameText(authenticatorCode(secret, step + drift), code.trim())) {
+				matched = step + drift;
+			}
 		}
 		return matched;
 	}

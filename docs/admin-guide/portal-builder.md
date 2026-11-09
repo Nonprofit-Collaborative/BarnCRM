@@ -11,7 +11,8 @@ portal runs off Salesforce, for example on your WordPress site, and reaches Sale
   code and checks it. Codes are stored only as hashes and are never returned to the website.
 - **Optional second factor.** A portal can also ask for a code from an authenticator app
   (Google Authenticator, Microsoft Authenticator, 1Password and the like). No text messages, so
-  nothing to pay for.
+  nothing to pay for. Each authenticator code works once: Second Factor Last Step on the Portal
+  Access records the last one used.
 - **Person-scoped pages.** Each portal has a template: its pages, the objects and fields on
   each, and what the person may change. Every request names the signed-in person, and Salesforce
   returns or changes only that person's records, only on those pages.
@@ -143,8 +144,16 @@ A template is JSON in the portal's Template field. The sample in
 - **fields** name API fields; `label` changes the label; `edit: true` lets the person change it;
   `required: true` keeps it filled. A field of a parent record can be shown, never edited, as
   `Parent__r.Name`. Lookups, formulas and system fields are never editable.
+- **Think twice before `edit: true` on `Email` of a person page.** The email is how a person
+  signs in. Someone who changes theirs to another person's address makes two people share it,
+  and then neither of them gets a code until staff fix one record. Prefer to let staff change
+  emails, or watch for changed emails if you allow it.
 - **where** tests are `{ "field": ..., "op": ..., "value": ... }` with `equals`, `notEquals`,
   `greaterOrEqual`, `lessOrEqual`, `isBlank`, `isNotBlank`; `TODAY` and `NOW` are allowed values.
+  A value is checked against the field's type when the portal's template is read: a date field
+  takes `2026-01-31`, `TODAY` or `NOW`; a date and time field `2026-01-31T09:00:00Z`, `TODAY`
+  (midnight) or `NOW`; a number field a number; a checkbox `true` or `false`. A value that does
+  not fit makes the template fail with a message naming the page and field.
 - **actions**: `update`, `create` (related pages: the person field is set for them), or a module's
   action such as `{ "extension": "Volunteers.SignUp", "label": "Sign Up" }` where that module offers
   it.
@@ -211,7 +220,9 @@ BarnCRM Settings, Portals (every change saves for the whole org):
 | Idle Minutes | 30 | How long a session may sit unused |
 
 A limit reached when someone asks for a code sends nothing and looks the same to them, so the
-portal never reveals who is in your database. The WordPress plugin also limits sign-in requests
+portal never reveals who is in your database. A wrong code always gets the same answer, whether
+the address is on file, the code has expired or the person is locked out; only someone who enters
+the right code is told it expired or that they are locked out. The WordPress plugin also limits sign-in requests
 per visitor address (20 in ten minutes). Behind a proxy or CDN, the website must see each
 visitor's own address (most hosts set this up); otherwise every visitor shares one limit.
 

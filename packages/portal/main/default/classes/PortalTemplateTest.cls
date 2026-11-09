@@ -2,7 +2,7 @@
  * A template is parsed and checked against the org's schema, and anything a portal must never
  * do is refused whole (canonical model R-PB2).
  */
-@IsTest(testFor='ApexClass:PortalTemplate')
+@IsTest(testFor='ApexClass:PortalTemplate, ApexClass:PortalData')
 private class PortalTemplateTest {
 	@TestSetup
 	static void createTestUser() {
@@ -101,6 +101,52 @@ private class PortalTemplateTest {
 			}
 			Assert.isTrue(refusals[0].contains('cannot be edited'), refusals[0]);
 			Assert.isTrue(refusals[1].contains('custom object'), refusals[1]);
+		}
+	}
+
+	private static Map<String, Object> withTest(String field, String op, Object value) {
+		Map<String, Object> template = sample();
+		rolesPage(template)
+			.put(
+				'where',
+				new List<Object>{
+					new Map<String, Object>{ 'field' => field, 'op' => op, 'value' => value }
+				}
+			);
+		return template;
+	}
+
+	private static PortalTemplate.Condition onlyTest(Map<String, Object> template) {
+		return PortalTemplate.parse(JSON.serialize(template)).page('roles').conditions[0];
+	}
+
+	/** Where values are typed for their field when read, and one that cannot be is refused. */
+	@IsTest
+	static void typesWhereValuesForTheirFieldOrRefusesThem() {
+		System.runAs(TestUsers.adminWith('Portal_Admin')) {
+			Test.startTest();
+			Object day = onlyTest(withTest('Start_Date__c', 'greaterOrEqual', '2026-01-31')).value;
+			Object today = onlyTest(withTest('Start_Date__c', 'lessOrEqual', 'TODAY')).value;
+			Object primary = onlyTest(withTest('Is_Primary__c', 'equals', 'true')).value;
+			String badDate = refusal(withTest('Start_Date__c', 'equals', 'last week'));
+			String badFlag = refusal(withTest('Is_Primary__c', 'equals', 'maybe'));
+			String wordOnText = refusal(withTest('Role__c', 'equals', 'NOW'));
+			Map<String, Object> binds = new Map<String, Object>();
+			String soql = PortalData.conditionSoql(
+				onlyTest(withTest('Start_Date__c', 'lessOrEqual', 'NOW')),
+				'v0',
+				binds
+			);
+			Test.stopTest();
+
+			Assert.areEqual(Date.newInstance(2026, 1, 31), day, 'A date for a date field');
+			Assert.areEqual('TODAY', today, 'TODAY is read when the page is queried');
+			Assert.areEqual(true, primary, 'A checkbox takes true');
+			Assert.isTrue(badDate.contains('Start_Date__c'), badDate);
+			Assert.isNotNull(badFlag, 'A checkbox takes only true or false');
+			Assert.isNotNull(wordOnText, 'TODAY and NOW are for dates');
+			Assert.areEqual('Start_Date__c <= :v0', soql, 'A bound test');
+			Assert.areEqual(Date.today(), binds.get('v0'), 'NOW on a date field is today');
 		}
 	}
 
