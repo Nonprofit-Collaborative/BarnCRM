@@ -347,8 +347,12 @@ public without sharing class PortalData {
 				when DATETIME {
 					return (Datetime) JSON.deserialize('"' + text + '"', Datetime.class);
 				}
-				when DOUBLE, INTEGER {
+				when DOUBLE {
 					return Decimal.valueOf(text);
+				}
+				when INTEGER {
+					// A whole-number field takes an Integer: a Decimal put on it fails the save.
+					return Integer.valueOf(text);
 				}
 				when PICKLIST {
 					return allowedOption(field, text);

@@ -26,15 +26,19 @@ public with sharing class EventSurveyService {
 	}
 
 	/**
-	 * The survey form of the attendee's event, in the person's own access; null when none or when
-	 * the attendee is not Attended (the survey is for people who came).
+	 * The survey form of the attendee's event; null when none or when the attendee is not Attended
+	 * (the survey is for people who came).
+	 *
+	 * System mode: the public intake asks this as the Site guest user, which reads no record, once
+	 * the link's signed claim has matched (ADR-0188 decision 3). In user mode every guest's survey
+	 * was refused. It returns only a form identifier, never a record value.
 	 */
 	public static Id formForAttendee(Id attendeeId) {
 		for (Event_Attendee__c attendee : [
 			SELECT Event_Registration__r.Event__r.Survey_Form_Key__c
 			FROM Event_Attendee__c
 			WHERE Id = :attendeeId AND Status__c = :ATTENDED
-			WITH USER_MODE
+			WITH SYSTEM_MODE
 		]) {
 			return formId(attendee.Event_Registration__r.Event__r.Survey_Form_Key__c);
 		}

@@ -49,17 +49,42 @@ function display(field, value) {
   if (field.type === 'boolean') {
     return value ? 'Yes' : 'No';
   }
-  const option = (field.options || []).find((o) => o.value === value);
-  return option ? option.label : String(value);
+  const labelOf = (one) => {
+    const option = (field.options || []).find((o) => o.value === one);
+    return option ? option.label : one;
+  };
+  return isMulti(field) ? chosenOf(value).map(labelOf).join(', ') : labelOf(String(value));
+}
+
+function isMulti(field) {
+  return field.type === 'multipicklist';
+}
+
+/** A multi-select picklist's values: the field stores them joined with semicolons. */
+function chosenOf(value) {
+  return value === null || value === undefined || value === ''
+    ? []
+    : String(value)
+        .split(';')
+        .filter((one) => one !== '');
 }
 
 function inputFor(field, value, id) {
   const common = { id, name: field.field, required: field.required === true };
   if (field.options) {
-    const select = el('select', common, [el('option', { value: '', text: '' })]);
-    field.options.forEach((o) =>
+    const multi = isMulti(field);
+    const chosen = multi ? chosenOf(value) : [value === null || value === undefined ? '' : value];
+    const select = el('select', { ...common, multiple: multi }, [
+      multi ? null : el('option', { value: '', text: '' })
+    ]);
+    const options = field.options.slice();
+    // A value the field no longer offers is still shown, so an untouched field keeps it.
+    chosen
+      .filter((one) => one !== '' && !options.some((o) => o.value === one))
+      .forEach((one) => options.push({ value: one, label: one }));
+    options.forEach((o) =>
       select.appendChild(
-        el('option', { value: o.value, text: o.label, selected: o.value === value })
+        el('option', { value: o.value, text: o.label, selected: chosen.includes(o.value) })
       )
     );
     return select;
@@ -77,15 +102,29 @@ function inputFor(field, value, id) {
   return input;
 }
 
-function valuesOf(form, fields) {
+function valueOf(input) {
+  if (input.type === 'checkbox') {
+    return input.checked;
+  }
+  if (input.multiple) {
+    const chosen = Array.from(input.selectedOptions).map((o) => o.value);
+    return chosen.length === 0 ? null : chosen.join(';');
+  }
+  return input.value === '' ? null : input.value;
+}
+
+/** The form's values; with `before`, only those changed since, so untouched fields are kept. */
+function valuesOf(form, fields, before) {
   const values = {};
   fields.forEach((field) => {
     const input = form.elements.namedItem(field.field);
     if (!input) {
       return;
     }
-    values[field.field] =
-      input.type === 'checkbox' ? input.checked : input.value === '' ? null : input.value;
+    const value = valueOf(input);
+    if (!before || before[field.field] !== value) {
+      values[field.field] = value;
+    }
   });
   return values;
 }
@@ -229,11 +268,12 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
   function recordForm(page, record, alertSlot, onDone) {
     const editable = page.fields.filter((f) => f.edit);
     const values = record ? record.values : {};
+    let before = null;
     const form = el('form', {
       class: 'barn-portal-form',
       onSubmit: () =>
         api
-          .save(page.key, record ? record.id : null, valuesOf(form, editable))
+          .save(page.key, record ? record.id : null, valuesOf(form, editable, before))
           .then(() => openPage(page.key, messages.saved))
           .catch((error) => failed(error, alertSlot))
     });
@@ -244,6 +284,8 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
     });
     form.appendChild(el('button', { type: 'submit', text: messages.save }));
     form.appendChild(el('button', { type: 'button', text: messages.cancel, onClick: onDone }));
+    // An edit sends only what changed: an untouched field is never rewritten or cleared.
+    before = record ? valuesOf(form, editable) : null;
     return form;
   }
 
@@ -273,9 +315,8 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
           onClick: () =>
             api
               .action(page.key, record.id, action.name)
-              .then((answer) =>
-                alertSlot.replaceChildren(alertBox(answer.message || messages.saved))
-              )
+              // The page is read again, so the record shows what the action changed.
+              .then((answer) => openPage(page.key, answer.message || messages.saved))
               .catch((error) => failed(error, alertSlot))
         })
       );

@@ -20,6 +20,8 @@ public with sharing class EventRegistrationService {
 	public static final String SOURCE_STAFF = 'Staff';
 	public static final String SOURCE_FORM = 'Form';
 	public static final String SOURCE_SUMMIT = 'Summit Events';
+	/** The event status in which a form may register people. */
+	private static final String EVENT_OPEN = 'Open';
 
 	/** Attendee statuses that hold a seat (R-EAT1). */
 	public static final Set<String> SEATED = new Set<String>{
@@ -125,8 +127,11 @@ public with sharing class EventRegistrationService {
 				BarnHelp.text('Events', 'Events_Register_EventCancelled')
 			);
 		}
-		List<Ticket_Type__c> tickets = activeTickets(event.Id);
 		Datetime now = Datetime.now();
+		if (request.source == SOURCE_FORM) {
+			refuseOutsideWindow(event, now);
+		}
+		List<Ticket_Type__c> tickets = activeTickets(event.Id);
 		Promo_Code__c code = promoCode(event.Id, request.promoCode, now);
 
 		Result result = new Result();
@@ -321,10 +326,42 @@ public with sharing class EventRegistrationService {
 		);
 	}
 
+	/**
+	 * A form registers people only while the event's public page would show its form (R-EV5):
+	 * the event Open, registration opened and not closed, the event not over. The page hides the
+	 * form at other times, and this holds a form posted directly; staff still register anyone on
+	 * the Registrations tab.
+	 */
+	private static void refuseOutsideWindow(Event__c event, Datetime now) {
+		if (event.Registration_Opens__c != null && now < event.Registration_Opens__c) {
+			throw new RegistrationException(
+				BarnHelp.text('Events', 'Events_Public_RegisterNotYet')
+			);
+		}
+		Boolean over =
+			event.Status__c != EVENT_OPEN ||
+			(event.End__c != null &&
+			now > event.End__c) ||
+			(event.Registration_Closes__c != null &&
+			now > event.Registration_Closes__c);
+		if (over) {
+			throw new RegistrationException(
+				BarnHelp.text('Events', 'Events_Public_RegisterClosed')
+			);
+		}
+	}
+
 	/** The event, locked so two registrations never take its last seat twice. */
 	private static Event__c lockEvent(Id eventId) {
 		List<Event__c> events = [
-			SELECT Id, Name, Status__c, Capacity__c
+			SELECT
+				Id,
+				Name,
+				Status__c,
+				Capacity__c,
+				End__c,
+				Registration_Opens__c,
+				Registration_Closes__c
 			FROM Event__c
 			WHERE Id = :eventId
 			WITH USER_MODE

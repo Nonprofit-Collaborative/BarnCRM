@@ -278,8 +278,11 @@ see them (Events Read Only reads them; Events Staff and Events Admin change them
 **With BarnCRM Forms.** Put a Forms form's record ID in the event's **Registration Form Key**.
 Each submission of that form filled from the event registers the person Forms matched or created,
 with source **Form**; a question with the key `ticketType` (a ticket type's name) and one with the
-key `promoCode` choose the ticket and the code. A submission that cannot be registered (a used-up
-code, an unknown ticket) is kept for review in Forms. Without Forms, register people on the tab.
+key `promoCode` choose the ticket and the code. A form registers people only while the event is
+**Open**, after **Registration Opens**, before **Registration Closes** and before the event ends.
+A submission that cannot be registered (outside those times, a used-up code, an unknown ticket)
+is kept for review in Forms. Staff can still register anyone on the tab. Without Forms, register
+people on the tab.
 
 ### Public Event Page
 

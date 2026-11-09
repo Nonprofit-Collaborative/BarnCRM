@@ -268,6 +268,47 @@ private class EventRegistrationServiceTest {
 		}
 	}
 
+	/** A form posted outside the registration window registers nobody; staff still can (R-EV5). */
+	@IsTest
+	static void aFormRegistersOnlyWhileRegistrationIsOpen() {
+		System.runAs(staff()) {
+			Event__c notYet = gala(null);
+			notYet.Registration_Opens__c = Datetime.now().addDays(1);
+			Event__c closed = gala(null);
+			closed.Status__c = 'Closed';
+			update as user new List<Event__c>{ notYet, closed };
+
+			Test.startTest();
+			List<String> refusals = new List<String>();
+			for (Event__c event : new List<Event__c>{ notYet, closed }) {
+				EventRegistrationService.Request byForm = request(
+					event,
+					person('Jane', 'Doe', 'jane@example.org')
+				);
+				byForm.source = EventRegistrationService.SOURCE_FORM;
+				try {
+					EventRegistrationService.register(byForm);
+				} catch (EventRegistrationService.RegistrationException refused) {
+					refusals.add(refused.getMessage());
+				}
+			}
+			EventRegistrationService.Result byStaff = EventRegistrationService.register(
+				request(closed, person('Jane', 'Doe', 'jane@example.org'))
+			);
+			Test.stopTest();
+
+			Assert.areEqual(
+				new List<String>{
+					BarnHelp.text('Events', 'Events_Public_RegisterNotYet'),
+					BarnHelp.text('Events', 'Events_Public_RegisterClosed')
+				},
+				refusals,
+				'Not yet open, then closed'
+			);
+			Assert.areEqual(1, byStaff.registered, 'Staff register past the window');
+		}
+	}
+
 	@IsTest
 	static void pricesFollowTheTicketsModelCases() {
 		System.runAs(staff()) {

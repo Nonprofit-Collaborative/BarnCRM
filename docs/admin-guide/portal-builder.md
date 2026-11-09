@@ -96,7 +96,9 @@ licenses (where your organization has them) may be simpler than a portal.
    `barncrm-portal.zip` it makes in Plugins, Add New, Upload Plugin, activate **BarnCRM
    Portal**, and in Settings, BarnCRM Portal enter your Salesforce domain, the Consumer Key and
    Consumer Secret (kept on the server, never sent to visitors). Put the shortcode
-   `[barncrm_portal key="volunteers"]` on a page. The website must use HTTPS. For any other
+   `[barncrm_portal key="volunteers"]` on a page. The website must use HTTPS. Leave that page
+   out of any full-page cache (a caching plugin or your host's cache): a cached copy stops
+   working within a day. For any other
    website, the `portal-client/README.md` explains the small server piece you need.
 8. **Add a portal.** In the **BarnCRM Admin** (or **BarnCRM Admin Console**) app, where Portal
    Builder's **Portals** and **Portal Accesses** tabs sit before **Error Log** (it has no app of
@@ -209,8 +211,9 @@ BarnCRM Settings, Portals (every change saves for the whole org):
 | Idle Minutes | 30 | How long a session may sit unused |
 
 A limit reached when someone asks for a code sends nothing and looks the same to them, so the
-portal never reveals who is in your database. The WordPress plugin also limits requests per
-visitor address.
+portal never reveals who is in your database. The WordPress plugin also limits sign-in requests
+per visitor address (20 in ten minutes). Behind a proxy or CDN, the website must see each
+visitor's own address (most hosts set this up); otherwise every visitor shares one limit.
 
 ## Ending Sessions and Unlocking People
 

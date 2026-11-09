@@ -347,7 +347,13 @@ public without sharing class FormIntakeService {
 		}
 		Long issued = parts[1].isNumeric() ? Long.valueOf(parts[1]) : -1;
 		Long age = now() - issued;
-		if (ticketFor(version, issued) != ticket || issued < 0 || age < 0 || age > TICKET_LIFE_MS) {
+		// equals, not ==: Apex compares text with == ignoring case, and a signature must match exactly.
+		if (
+			!ticketFor(version, issued).equals(ticket) ||
+			issued < 0 ||
+			age < 0 ||
+			age > TICKET_LIFE_MS
+		) {
 			receipt.status = EXPIRED;
 			return null;
 		}
@@ -428,7 +434,7 @@ public without sharing class FormIntakeService {
 		String expected = claimFor(formId, contextId);
 		return expected != null &&
 			String.isNotBlank(claim) &&
-			expected == claim &&
+			expected.equals(claim) &&
 			FormAttachmentExtensions.formFor(contextId) == formId;
 	}
 

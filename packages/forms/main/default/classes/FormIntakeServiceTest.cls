@@ -92,6 +92,19 @@ private class FormIntakeServiceTest {
 			);
 			Assert.areEqual(
 				FormIntakeService.EXPIRED,
+				FormIntakeService.submit(
+						ticket.substringBeforeLast(':') +
+							':' +
+							ticket.substringAfterLast(':').swapCase(),
+						sam(),
+						null,
+						null
+					)
+					.status,
+				'A signature in other letter case is refused'
+			);
+			Assert.areEqual(
+				FormIntakeService.EXPIRED,
 				FormIntakeService.submit('nonsense', sam(), null, null).status,
 				'Something that is not a ticket is refused'
 			);
@@ -226,6 +239,12 @@ private class FormIntakeServiceTest {
 				FormIntakeService.CLOSED,
 				FormIntakeService.submit(ticket, sam(), null, gala.Id + '.').status,
 				'An empty signature'
+			);
+			Assert.areEqual(
+				FormIntakeService.CLOSED,
+				FormIntakeService.submit(ticket, sam(), null, gala.Id + '.' + claim.swapCase())
+					.status,
+				'The signature in other letter case'
 			);
 			Assert.areEqual(0, submissions().size(), 'Nothing was stored');
 
