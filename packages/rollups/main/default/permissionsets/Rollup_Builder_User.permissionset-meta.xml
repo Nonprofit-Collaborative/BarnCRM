@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>Rollup Builder User</label>
+  <label>Rollup Builder Read Only</label>
   <description>
     For staff and read only users: read every rollup, what it counts and when it was last
     calculated. Saving records never needs this set; the engine runs in system mode.

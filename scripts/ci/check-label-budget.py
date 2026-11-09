@@ -48,7 +48,9 @@ import sys
 # Batch C review: lowered to 3,255 after merging six labels that held the same name for the same
 # thing (Super Importer, Opportunity Mirror, Gift Transaction Mirror, Seasonal Address Swap, "or").
 # Raised by 1 for Mirror_Sync_Compare: Mirror's two pages read a Rollups label before.
-BUDGET = 3256
+# Raised by 1 for Volunteers_Access_AddOnCoordinator: Volunteers Coordinator becomes an Access page
+# extra permission (simpler permission sets, D1); the Mirror merge in the same release removes 3.
+BUDGET = 3257
 TARGET = 3000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 

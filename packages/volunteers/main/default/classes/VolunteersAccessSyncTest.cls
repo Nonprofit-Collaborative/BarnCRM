@@ -117,4 +117,21 @@ private class VolunteersAccessSyncTest {
 			);
 		}
 	}
+
+	/** ADR-NEXT D3: Fundraising Staff (Giving's role, when installed) gets Volunteers Staff. */
+	@IsTest
+	static void fundraisingStaffGetsVolunteersStaff() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			List<String> roles = VolunteersAccessSync.BY_ROLE.get('Volunteers_Staff');
+			Test.stopTest();
+
+			Assert.isTrue(roles.contains('Fundraising_Staff'), 'Fundraisers log hours');
+			Assert.isTrue(
+				VolunteersAccessSync.BY_ROLE.get('Volunteers_Coordinator')
+					.contains('Volunteer_Coordinator'),
+				'The retired Coordinator role still leads to Volunteers Coordinator this release'
+			);
+		}
+	}
 }
