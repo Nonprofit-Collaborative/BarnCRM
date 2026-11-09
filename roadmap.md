@@ -211,7 +211,7 @@ C-46 Address Verification moved to release 1.15 (Brandon, 2026-11-04, D-177).
 | V-09 | Public volunteer sign-up on the Forms engine | Major | Planned | D-157 |
 | MIG-10 | Integrations page: detected apps and migration links | Minor | Planned | D-125 |
 | PAY-01 | BarnCRM Payments (optional module, both editions; ADR first): the org's own Stripe and PayPal accounts through processor-hosted checkout and a webhook receiver; shared by Events, Giving, Memberships and Portal Builder; no money held, no card data | Major | Planned | D-190 |
-| PERM-N | Simpler permission sets, release N (ADR-NEXT, D-191): add the new sets and entries (#1047 perms-core, #1048 perms-modules, #1049 perms-mirror); goes in the next landing batch | Major | Built (PRs #1047 to #1049, not yet landed) | D-191 |
+| PERM-N | Simpler permission sets, release N (add and migrate): Coordinator retired with Team Member carry-over, Bulk Update and Bulk Delete include Find and Export, BarnCRM Admin gains Bulk Update's class, Giving Admin follows BarnCRM Admin, Fundraising Staff gets the module staff sets except Programs, Mirror sets merged into Salesforce Records Sync and Inbound Gifts, clearer set labels; nobody loses access (built as #1047 to #1049, not yet landed; next landing batch) | Major | Built | D-191 |
 | MIG-06 | Zapier recipes; the Stripe receiver (X-08) is built as part of PAY-01 | Minor | Planned | D-125, D-190 |
 | MIG-08 | DLRS and NPSP rollups into Rollup Builder | Minor | Planned | D-125 |
 | V-12 | Volunteer value rate | Minor | Planned | D-156 |
@@ -229,7 +229,7 @@ G-34 online donation page moved to release 1.15 with C-46 (D-177), as did G-21 a
 | EV-21 | Session proposal management: several presenters, reviewer assignment, multi-user scoring through a matrix (weighted criteria, optional blind review, totals, compare); extends EV-06 | Major | Planned | D-190 |
 | EV-26 | Badge overrides: badge name, title and company on the attendee | Minor | Planned | D-190 |
 | EV-27 | Per-session ratings: a short Forms rating per session reached by its QR code | Minor | Planned | D-190 |
-| PERM-N1 | Simpler permission sets, release N+1: the removals (retire the Coordinator group, merge the Mirror sets, fold Find and Export into Bulk Update and Bulk Delete; no user loses access) | Minor | Planned | D-191 |
+| PERM-N1 | Simpler permission sets, release N+1 (remove): retired Coordinator group and old Mirror sets removed after each holder is confirmed to hold the successor; Coordinator dropped from the module syncs and Health Check | Minor | Planned | D-191 |
 | G-32 | Wealth data fields and import template | Minor | Planned | D-156 |
 | G-33 | Quick Gift Entry donor panel | Minor | Planned | D-156 |
 | G-36 | One staff-facing word for Pledge versus Commitment (needs Brandon) | Minor | Planned | D-165 |
