@@ -59,6 +59,17 @@ describe('c-contact-point-sync', () => {
     expect(find(element, 'counts').textContent).toBe('c.ContactPoints_Page_Counts');
     expect(find(element, 'run').disabled).toBe(false);
     expect(find(element, 'no-manage')).toBeNull();
+    expect(find(element, 'shell').title).toBe('c.ContactPoints_Page_Title');
+    expect(find(element, 'loading')).toBeNull();
+  });
+
+  it('shows a spinner until the status arrives', async () => {
+    getStatus.mockReturnValue(new Promise(() => {}));
+    const element = createElement('c-contact-point-sync', { is: ContactPointSync });
+    document.body.appendChild(element);
+    await flush();
+    expect(find(element, 'loading')).not.toBeNull();
+    expect(find(element, 'run')).toBeNull();
   });
 
   it('disables the button and explains when the person cannot manage settings', async () => {

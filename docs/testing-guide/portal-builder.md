@@ -2,7 +2,7 @@
 
 Scripts for the optional BarnCRM Portal Builder module: signing in by emailed code, the second factor, lockout, template pages scoped to the person, and staff ending sessions. Setup detail: [Portal Builder](../admin-guide/portal-builder.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Portal Builder deployed and sample data loaded, the integration user and External Client App set up as the Admin Guide describes, and **Portal Sign-In** turned on in BarnCRM Settings, **Portals**. Calls are made with `curl` against `/services/apexrest/barncrm/portal/v1/`, using an access token from the client credentials flow, or through the WordPress plugin. Use a test inbox you can read.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Portal Builder deployed and sample data loaded, the integration user and External Client App set up as the Admin Guide describes, and **Portal sign-in** turned on in BarnCRM Settings, **Portals**. Calls are made with `curl` against `/services/apexrest/barncrm/portal/v1/`, using an access token from the client credentials flow, or through the WordPress plugin. Use a test inbox you can read.
 
 ## T-PB-01: Sign In With the Emailed Code
 
@@ -34,7 +34,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 ## T-PB-03: Wrong Codes Lock the Person
 
 **Purpose:** confirm lockout and unlocking.
-**Prerequisites:** admin; set **Failures Before Lockout** to 3 in Settings, **Portals**.
+**Prerequisites:** admin; set **Wrong codes before lockout** to 3 in Settings, **Portals**.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -42,7 +42,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 2 | Send the right code. | 400 `code_invalid`. |
 | 3 | Clear Locked Until and sign in again. | Signed in. |
 
-**Cleanup:** set Failures Before Lockout back to 10.
+**Cleanup:** set Wrong codes before lockout back to 10.
 
 ## T-PB-04: Pages Show and Change Only the Person's Own Records
 
@@ -69,9 +69,9 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 1 | Sign in with the emailed code. | `status` `enroll` with a `secret` and an `otpauth://totp/` uri. Add it to the authenticator. |
 | 2 | POST `login/second-factor` with the authenticator code. | `signedIn`; Second Factor Enrolled is ticked. |
 | 3 | Set Pat's Portal Access Status to Suspended, then GET `me` with that session. | 401 `not_signed_in`. That session now shows Stage Ended. |
-| 4 | Turn **Portal Sign-In** off and POST `login/start`. | 503 `portal_unavailable`. |
+| 4 | Turn **Portal sign-in** off and POST `login/start`. | 503 `portal_unavailable`. |
 
-**Cleanup:** set Status Active, Second Factor Off, and Portal Sign-In back on if needed.
+**Cleanup:** set Status Active, Second Factor Off, and Portal sign-in back on if needed.
 
 ## T-PB-06: Volunteer Portal Template
 
