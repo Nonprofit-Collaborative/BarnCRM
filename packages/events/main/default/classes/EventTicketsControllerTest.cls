@@ -184,6 +184,9 @@ private class EventTicketsControllerTest {
 			renamed.Name = 'early';
 
 			Test.startTest();
+			// The refusal reads the help catalog once a transaction; read it first, so only the
+			// saved codes are counted.
+			BarnHelp.text('Events', 'Events_PromoCode_Duplicate');
 			Integer atStart = Limits.getQueries();
 			EventKeyHandler.setKeys(new List<SObject>{ discounted }, before);
 			Integer forDiscount = Limits.getQueries() - atStart;

@@ -8,9 +8,31 @@
 private class ContactPointErasureExtensionTest {
 	private static final String ERASE_SET = 'BarnCRM_Erase_People';
 
+	/**
+	 * The three households of the erasure comparison are made here, in a transaction of their
+	 * own, so a preview and two whole erasures (every installed module's part) fit the method's
+	 * query limits.
+	 */
 	@TestSetup
 	static void createTestUser() {
 		TestUsers.admin();
+		System.runAs(eraser()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			household('Alder');
+			household('Birch');
+			household('Cedar');
+		}
+	}
+
+	/** Ana and Sam of a household made in the test setup, Ana first. */
+	private static List<Contact> peopleNamed(String lastName) {
+		return [
+			SELECT Id
+			FROM Contact
+			WHERE LastName = :lastName
+			WITH SYSTEM_MODE
+			ORDER BY FirstName
+		];
 	}
 
 	private static User eraser() {
@@ -128,23 +150,25 @@ private class ContactPointErasureExtensionTest {
 		List<Contact> held;
 		List<Contact> before;
 		System.runAs(admin) {
-			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-			held = household('Alder');
-			before = household('Birch');
-			List<Contact> warm = household('Cedar');
+			held = peopleNamed('Alder');
+			before = peopleNamed('Birch');
+			List<Contact> warm = peopleNamed('Cedar');
 
-			Test.startTest();
-			// Every cache of the transaction warmed by a preview, so neither erasure is charged for it.
+			// Every cache of the transaction warmed by a preview, so neither erasure is charged for
+			// it. The first erasure runs in the method's own limits and the second in the fresh
+			// limits of startTest: with every module installed, a preview and two erasures pass 100
+			// queries in one set of limits.
 			PersonErasure.preview(warm[0].Id);
 			Integer start = Limits.getQueries();
 			PersonErasure.erase(held[0].Id, nameOf(held[0].Id), null);
 			Integer withHold = Limits.getQueries() - start;
 			ContactPointSyncService.holdingForTest = false;
+			Test.startTest();
 			start = Limits.getQueries();
 			PersonErasure.erase(before[0].Id, nameOf(before[0].Id), null);
 			Integer withoutHold = Limits.getQueries() - start;
-			ContactPointSyncService.holdingForTest = true;
 			Test.stopTest();
+			ContactPointSyncService.holdingForTest = true;
 
 			Assert.areEqual(
 				state(before, 'Birch'),

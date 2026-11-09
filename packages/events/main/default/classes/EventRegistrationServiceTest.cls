@@ -273,12 +273,15 @@ private class EventRegistrationServiceTest {
 	static void aFormTakesOnlyTicketsOnSale() {
 		System.runAs(staff()) {
 			Event__c event = gala(null);
-			Ticket_Type__c early = ticket(event, 'Early', 10, null);
-			early.Sales_End__c = Datetime.now().addDays(-1);
+			Id early = ticket(event, 'Early', 10, null).Id;
 			ticket(event, 'General', 25, null);
-			Ticket_Type__c later = ticket(event, 'Later', 30, null);
-			later.Sales_Start__c = Datetime.now().addDays(1);
-			update as user new List<Ticket_Type__c>{ early, later };
+			Id later = ticket(event, 'Later', 30, null).Id;
+			// Only the sales window is saved: the event is a master-detail that cannot be
+			// reparented, so a user-mode update that carries it is refused.
+			update as user new List<Ticket_Type__c>{
+				new Ticket_Type__c(Id = early, Sales_End__c = Datetime.now().addDays(-1)),
+				new Ticket_Type__c(Id = later, Sales_Start__c = Datetime.now().addDays(1))
+			};
 
 			Test.startTest();
 			EventRegistrationService.Request firstOnSale = request(

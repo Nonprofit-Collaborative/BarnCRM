@@ -49,10 +49,15 @@ public with sharing class ContactPointAccountHandler extends TriggerHandler {
 		}
 		Set<Id> valuesOnly = new Set<Id>();
 		Set<Id> everything = new Set<Id>();
-		List<String> watched = watchedFields();
+		// Described only once a person account is in the save: a save of households alone (a
+		// household's name settled for its new members) reads no Account describe.
+		List<String> watched;
 		for (SObject record : newRecords()) {
 			if (!PersonRecordSelector.isPersonRecord(record)) {
 				continue;
+			}
+			if (watched == null) {
+				watched = watchedFields();
 			}
 			// Only the watched fields are read: copying every field of the record into a map,
 			// twice per record, cost more than the comparison itself.
