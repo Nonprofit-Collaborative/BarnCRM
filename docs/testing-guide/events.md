@@ -9,6 +9,11 @@ Management deployed. Event Management works on the platform-only shape. Give the
 roles on the **Access** page: admin (Admin role), staff (Program Staff role) and read-only (Read
 Only role). Each gets its Events permission set from the role.
 
+Messages on every Events page: a refusal shows BarnCRM's own sentence, or the org's validation
+rule wording when a save breaks one (D-191). Only an unexpected failure shows the general text,
+such as `Nothing was saved. Try again. If it happens again, ask your BarnCRM admin to check the
+Error Log.`, and the Error Log then has the detail.
+
 ## T-EV-01: Create an Event and Find It
 
 **Purpose:** confirm an event saves with its rules and shows on the Events page.
