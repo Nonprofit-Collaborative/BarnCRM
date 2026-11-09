@@ -180,7 +180,9 @@ private class MatchingGiftServiceTest {
 			Gift__c secondEmployerGift = RecognitionTestData.gift(null, data.riverbend.Id, 500);
 
 			Test.startTest();
-			Database.SaveResult result = tryMatch(data.employeeGift.Id, secondEmployerGift.Id);
+			// A second employer gift pointed at an employee gift that already has its match.
+			// (Editing the employee gift's own Matched Gift re-links it: a correction staff make.)
+			Database.SaveResult result = tryMatch(secondEmployerGift.Id, data.employeeGift.Id);
 			Test.stopTest();
 
 			assertRefused(
