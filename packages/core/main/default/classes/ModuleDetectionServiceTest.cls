@@ -94,13 +94,14 @@ private class ModuleDetectionServiceTest {
 			for (ModuleDetectionService.ModuleInfo module : modules) {
 				byName.put(module.name, module);
 			}
-			Set<String> expected = installedModules();
-			expected.add('Programs');
+			Set<String> expected = standardExtras();
+			expected.addAll(new Set<String>{ 'Core', 'Rollups', 'Programs' });
 			Assert.areEqual(
-				3 + expected.size() - 1,
-				modules.size(),
-				'Core, Rollup Builder, the announcing module and any module whose objects are here'
+				expected,
+				byName.keySet(),
+				'Core, Rollup Builder, the announcing module, every-edition modules and any module whose probe object is here'
 			);
+			Assert.areEqual(expected.size(), modules.size(), 'Each module is listed once');
 			Assert.isTrue(byName.containsKey('Programs'), 'An installed module is never hidden');
 			Assert.isTrue(byName.get('Programs').present, 'And it is shown as here');
 		}
@@ -573,7 +574,23 @@ private class ModuleDetectionServiceTest {
 				volunteers.Staff_Tabs__c,
 				'Its everyday tabs for the BarnCRM apps'
 			);
-			Assert.areEqual('Volunteer_Hours__c', volunteers.Probe_Object__c, 'Its probe object');
+			// A customer org can have its own object by a module object's name (its own Event__c or
+			// Volunteer_Hours__c), so a module that ships settings rows naming itself is found by
+			// those rows alone, never by an object name.
+			List<String> announcingModules = new List<String>{
+				'Events',
+				'Volunteers',
+				'Funders',
+				'Programs',
+				'Portal',
+				'ContactPoints'
+			};
+			for (String announcing : announcingModules) {
+				Assert.isNull(
+					shipped.get(announcing).Probe_Object__c,
+					announcing + ' is found by its own settings rows, not by an object name'
+				);
+			}
 		}
 	}
 
