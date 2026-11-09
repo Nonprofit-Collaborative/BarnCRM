@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Address_Key__c</fullName>
-  <caseSensitive>true</caseSensitive>
   <description>
     HMAC-SHA256 of the email address the link went to, keyed with the version's signing key, in hex (R-FS7): counts links per address without storing the address. No permission set reads it.
   </description>
