@@ -87,7 +87,8 @@ CAPS = {
     # Batch C wave 3 landing: 88,379 measured (FormsCatalogExtension EV-18, public event pages in
     # the intake, controller and REST EV-16), plus about 2%.
     # Batch C review: 91,118 measured (save-for-later caps per address and per form, REST
-    # failures logged and answered Failed), plus about 2%.
+    # failures logged and answered Failed), plus about 2%. Batch C review landing: 91,142
+    # measured with every review branch merged; 93,000 still leaves about 2%.
     "forms": 93_000,
     # New 2026-11-06 for Contact Point Sync (C-45, ADR-0176 contact point sync module):
     # 43,980 measured with the page and backfill, plus about 2 percent.
@@ -97,8 +98,9 @@ CAPS = {
     # no adoption lookup on Individuals it created), plus about 2%. Large saves queued (ADR-0176
     # decision 16, describe cached once a transaction): 54,759 measured, plus about 2%.
     # Batch C review: 59,043 measured (fewer queries a sync, a second change in one transaction
-    # synced, capitals counted as a change), plus about 2%.
-    "contactpoints": 60_200,
+    # synced, capitals counted as a change), plus about 2%. Batch C review landing: 59,468
+    # measured (QA's per-values claim plus perf's watched-field reads), plus about 2%.
+    "contactpoints": 60_700,
     # Event Management (ADR-0177, events module): events, tickets, agenda and speakers (EV-01,
     # EV-03 to EV-05).
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.
@@ -115,8 +117,9 @@ CAPS = {
     # Batch C wave 3 landing: 50,774 measured (PB-03, PB-07, PB-08 templates: the read-only
     # person link through one parent for the speaker's sessions), plus about 2%.
     # Batch C review: 53,465 measured (one answer for every wrong code, authenticator codes used
-    # once, where values typed at parse time), plus about 2%.
-    "portal": 54_600,
+    # once, where values typed at parse time), plus about 2%. Batch C review landing: 54,467
+    # measured (QA's sign-in fixes plus perf's and simplification's portal changes), plus about 2%.
+    "portal": 55_600,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
