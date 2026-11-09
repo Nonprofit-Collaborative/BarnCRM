@@ -1,5 +1,5 @@
 /**
- * The business logic behind the Access page: the five packaged roles, who holds them,
+ * The business logic behind the Access page: the packaged roles, who holds them,
  * and giving or taking a role away.
  *
  * A role is a packaged permission set group. Nothing here refers to a group by Id, only
@@ -16,14 +16,30 @@ public with sharing class AccessService {
 	/** The permission set inside that group, assignable before the group is calculated. */
 	public static final String ADMIN_PERMISSION_SET = 'BarnCRM_Admin';
 
-	/** The five packaged roles, in the order the page shows them. */
+	/** The packaged roles the page offers, in the order it shows them. */
 	public static final List<String> ROLE_DEVELOPER_NAMES = new List<String>{
 		ADMIN_ROLE,
 		'Fundraising_Staff',
 		'Program_Staff',
-		'Volunteer_Coordinator',
 		'Read_Only'
 	};
+
+	/**
+	 * Retired roles, each with the role that replaces it (ADR-NEXT, simpler permission sets,
+	 * D1). The page no longer offers them, but a person may still hold one until the next
+	 * release removes it, so Access Explorer still names it as a role and `RetiredRoleMigration`
+	 * gives its holders the successor.
+	 */
+	public static final Map<String, String> RETIRED_ROLES = new Map<String, String>{
+		'Volunteer_Coordinator' => 'Program_Staff'
+	};
+
+	/** Every packaged role a person may hold: the offered ones and the retired ones. */
+	public static Set<String> knownRoles() {
+		Set<String> names = new Set<String>(ROLE_DEVELOPER_NAMES);
+		names.addAll(RETIRED_ROLES.keySet());
+		return names;
+	}
 
 	/**
 	 * Core's add-on permission sets, in the order the page shows them: the packaged Core

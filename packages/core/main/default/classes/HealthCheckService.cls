@@ -162,6 +162,8 @@ public with sharing class HealthCheckService {
 	 * The developer names of the packaged permission set groups (the roles the Access page
 	 * assigns) that mean "this person uses BarnCRM", and the permission set that means
 	 * "this person administers it". See packages/core/integration/c-07-c-11.permissions.md.
+	 * Coordinator (`Volunteer_Coordinator`) is retired (`AccessService.RETIRED_ROLES`) but still
+	 * counts while anyone holds it, until the next release removes it.
 	 */
 	public static final String GROUP_ADMIN = 'BarnCRM_Admin_Group';
 	public static final String PERMISSION_SET_ADMIN = 'BarnCRM_Admin';

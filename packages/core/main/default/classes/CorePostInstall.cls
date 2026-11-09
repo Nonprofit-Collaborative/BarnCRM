@@ -205,8 +205,10 @@ public with sharing class CorePostInstall implements InstallHandler, ModuleSetup
 		ImportTemplateService.materializeDefaultsDuringInstall(TEMPLATE_CONTEXT);
 		// Every install and upgrade gives the BarnCRM Tab sets of the features that are on to
 		// whoever had those tabs before (ADR-0124); queued, since it writes setup objects. It
-		// never throws.
+		// never throws. The same job gives active Coordinator holders Team Member (ADR-NEXT,
+		// D1); inactive ones are named in the Error Log here, which only reads. Never throws.
 		TabAccessService.requestSync();
+		RetiredRoleMigration.logInactiveHolders();
 		scheduleTabAccessCheck();
 		alignSeasonalAddresses(isUpgrade);
 		// R-NJ5: the separate nightly schedules of an earlier version become the nightly run.

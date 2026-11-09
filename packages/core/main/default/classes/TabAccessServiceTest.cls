@@ -78,6 +78,24 @@ private class TabAccessServiceTest {
 	}
 
 	@IsTest
+	static void bulkUpdateAloneSeesFindsTabsToo() {
+		System.runAs(TestUsers.admin()) {
+			List<String> sets = new List<String>{ 'BarnCRM_Bulk_Update' };
+			Id ola = TestUsers.standardUserWith('Ola', sets).Id;
+
+			Test.startTest();
+			TabAccessService.syncNow();
+			Test.stopTest();
+
+			Set<String> held = tabSetsOf(ola);
+			Assert.isTrue(held.contains(TabAccessService.FIND_TAB), 'It includes Find and Export');
+			Assert.isTrue(held.contains(TabAccessService.DATA_HYGIENE_TAB), 'So Org Optimizer');
+			Assert.isTrue(held.contains(TabAccessService.BULK_UPDATE_TAB), 'And its own tab');
+			Assert.isFalse(held.contains(TabAccessService.IMPORT_TAB), 'But not Import');
+		}
+	}
+
+	@IsTest
 	static void givesTheHouseholdsTabToTheRolesWhileHouseholdUpkeepIsOn() {
 		System.runAs(TestUsers.admin()) {
 			Test.startTest();

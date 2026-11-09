@@ -4,8 +4,8 @@
   <label>BarnCRM Bulk Delete</label>
   <description>
     Bulk delete (C-37): delete the records a Find query returns, and undo from the Recycle Bin.
-    Assign with BarnCRM Find and Export. In no role. Grants read on data jobs and their journal,
-    and no record access.
+    Includes BarnCRM Find and Export's grants, so it needs no pair. In no role. Grants read on
+    data jobs and their journal, and no record access.
   </description>
   <classAccesses>
     <apexClass>BulkDeleteController</apexClass>
@@ -16,12 +16,28 @@
     <enabled>true</enabled>
   </classAccesses>
   <classAccesses>
+    <apexClass>DataHygieneController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>DataManagerController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>FindController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>QueryFieldCatalog</apexClass>
     <enabled>true</enabled>
   </classAccesses>
   <customPermissions>
     <enabled>true</enabled>
     <name>Bulk_Delete_Records</name>
+  </customPermissions>
+  <customPermissions>
+    <enabled>true</enabled>
+    <name>Find_And_Export_Records</name>
   </customPermissions>
   <fieldPermissions>
     <editable>false</editable>
@@ -193,6 +209,21 @@
     <field>Import_Journal__c.Phase__c</field>
     <readable>true</readable>
   </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Saved_Query__c.Object_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Saved_Query__c.Query_JSON__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Saved_Query__c.Shared__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
   <objectPermissions>
     <allowCreate>false</allowCreate>
     <allowDelete>false</allowDelete>
@@ -218,6 +249,15 @@
     <allowRead>true</allowRead>
     <modifyAllRecords>false</modifyAllRecords>
     <object>Import_Journal__c</object>
+    <viewAllRecords>false</viewAllRecords>
+  </objectPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>false</modifyAllRecords>
+    <object>Saved_Query__c</object>
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
 </PermissionSet>

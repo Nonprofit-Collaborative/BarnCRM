@@ -64,15 +64,16 @@ public with sharing class TabAccessService {
 	/**
 	 * Each tab set, and the permission sets whose holders see that tab while it is on.
 	 * Duplicate Review holders see Duplicate Matching, where the review list is (ADR-0139),
-	 * and so do Metadata Admin holders, who change its matching logic.
+	 * and so do Metadata Admin holders, who change its matching logic. Bulk Update and Bulk
+	 * Delete include Find and Export's grants (ADR-NEXT, D5), so their holders see its tabs.
 	 */
 	@TestVisible
 	private static final Map<String, List<String>> AUDIENCE = new Map<String, List<String>>{
 		DATA_MANAGER_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE },
 		IMPORT_TAB => new List<String>{ ADMIN },
-		FIND_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT },
+		FIND_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE },
 		BULK_UPDATE_TAB => new List<String>{ ADMIN, BULK_UPDATE, BULK_DELETE },
-		DATA_HYGIENE_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT },
+		DATA_HYGIENE_TAB => new List<String>{ ADMIN, FIND_AND_EXPORT, BULK_UPDATE, BULK_DELETE },
 		DUPLICATE_MATCHING_TAB => new List<String>{ ADMIN, DUPLICATE_REVIEW, METADATA_ADMIN },
 		HOUSEHOLDS_SET => new List<String>{ ADMIN, STAFF, READ_ONLY },
 		STANDARD_APP => new List<String>{ ADMIN, STAFF, READ_ONLY },
@@ -102,6 +103,9 @@ public with sharing class TabAccessService {
 	private static Integer rowsPerRun = 5000;
 
 	private static final String CONTEXT = 'TabAccessService.sync';
+
+	/** How many retired role holders one job carries over (`RetiredRoleMigration`). */
+	private static final Integer RETIRED_ROLE_ROWS = 1000;
 
 	/**
 	 * Every permission set Core ships is named so; `giveToHolders` refuses them. Core's own
@@ -144,6 +148,9 @@ public with sharing class TabAccessService {
 	 */
 	public with sharing class Job implements Queueable {
 		public void execute(QueueableContext jobContext) {
+			// Holders of a retired role get its successor (ADR-NEXT, D1); never throws, and
+			// its budget leaves the tab slice its 5,000 rows inside the 10,000.
+			RetiredRoleMigration.carryOver(RETIRED_ROLE_ROWS);
 			try {
 				// A test cannot chain one queued job from another.
 				if (syncOnce(rowsPerRun) && !Test.isRunningTest()) {
