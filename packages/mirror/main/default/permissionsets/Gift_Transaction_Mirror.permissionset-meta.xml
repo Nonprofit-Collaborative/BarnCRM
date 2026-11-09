@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>Gift Transaction Mirror</label>
+  <label>Gift Transaction Mirror (Retired)</label>
   <description>
-    For whoever runs the Gift Transaction mirror: edits a gift's Gift Transaction ID and a fund's
-    Gift Designation ID, and opens the mirror page. Gift Transactions themselves also need
-    Nonprofit Cloud's Fundraising User permission.
+    Retired: replaced by Salesforce Records Sync, which BarnCRM gives every holder; removed in the
+    next release. Do not assign.
   </description>
   <classAccesses>
     <apexClass>GiftTransactionMirrorController</apexClass>

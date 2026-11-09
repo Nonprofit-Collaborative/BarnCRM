@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>Record Inbound Gift Action</label>
+  <label>Record Inbound Gift Action (Retired)</label>
   <description>
-    For a flow or AI assistant's user: runs the Record Inbound Gift action and nothing else. Assign
-    with Giving Staff, which grants the records a gift needs.
+    Retired: replaced by Inbound Gifts, which BarnCRM gives every holder; removed in the next
+    release. Do not assign.
   </description>
   <classAccesses>
     <apexClass>InboundGiftAction</apexClass>

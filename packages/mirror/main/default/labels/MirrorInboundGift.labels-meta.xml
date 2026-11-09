@@ -150,7 +150,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Inbound gift: the integration user lacks access</shortDescription>
-    <value>The gift was not saved, because the integration user cannot read or write something recording it needs. Check that it has the Inbound Gift API permission set. The platform said: {0}</value>
+    <value>The gift was not saved, because the integration user cannot read or write something recording it needs. Check that it has the Inbound Gifts permission set. The platform said: {0}</value>
   </labels>
   <labels>
     <fullName>Mirror_InboundGift_ErrorFundNotApplied</fullName>

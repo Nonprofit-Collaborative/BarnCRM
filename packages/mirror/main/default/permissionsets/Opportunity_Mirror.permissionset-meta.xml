@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
   <hasActivationRequired>false</hasActivationRequired>
-  <label>Opportunity Mirror</label>
+  <label>Opportunity Mirror (Retired)</label>
   <description>
-    For whoever saves gifts or runs the Opportunity mirror: edits a gift's Opportunity ID and
-    opens the mirror page. Creating Opportunities also needs Opportunity access in Setup.
+    Retired: replaced by Salesforce Records Sync, which BarnCRM gives every holder; removed in the
+    next release. Do not assign.
   </description>
   <classAccesses>
     <apexClass>OpportunityMirrorController</apexClass>

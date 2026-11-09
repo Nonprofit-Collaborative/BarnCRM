@@ -404,6 +404,25 @@ private class AccountingExportServiceTest {
 	}
 
 	@IsTest
+	static void accountingExportAloneBuildsTheFile() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			User jen = owningAugust(
+				TestDataFactory.createUser('Jen', new List<String>{ 'Accounting_Export' })
+			);
+			System.runAs(jen) {
+				AccountingExportService.ExportFile file = AccountingExportService.build(
+					AUGUST_FIRST,
+					AUGUST_LAST,
+					null,
+					null,
+					false
+				);
+				Assert.areEqual(4, file.giftCount, 'No Giving set needed beside it: ' + file.csv);
+			}
+		}
+	}
+
+	@IsTest
 	static void theDownloadedGiftsAreMarkedAndLeftOutOfTheNextFile() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			User jen = bookkeeperOwningAugust();

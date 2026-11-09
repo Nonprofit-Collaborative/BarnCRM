@@ -110,7 +110,7 @@
     <language>en_US</language>
     <protected>true</protected>
     <shortDescription>Gift Transaction mirror: runner lacks access</shortDescription>
-    <value>You cannot create, edit or read Gift Transactions as the mirror needs, or you do not have the Gift Transaction Mirror permission set, so a run started by you would copy nothing.</value>
+    <value>You cannot create, edit or read Gift Transactions as the mirror needs, or you do not have the Salesforce Records Sync permission set, so a run started by you would copy nothing.</value>
   </labels>
   <labels>
     <fullName>Mirror_GiftTransactionMirror_RunPaused</fullName>
@@ -174,7 +174,7 @@
     <language>en_US</language>
     <protected>true</protected>
     <shortDescription>Gift Transaction mirror: compare needs link access</shortDescription>
-    <value>Comparing needs the Gift Transaction Mirror permission set, which lets you read the Gift Transaction ID on a gift.</value>
+    <value>Comparing needs the Salesforce Records Sync permission set, which lets you read the Gift Transaction ID on a gift.</value>
   </labels>
   <labels>
     <fullName>Mirror_GiftTransactionMirror_NoRead</fullName>
@@ -262,7 +262,7 @@
     <language>en_US</language>
     <protected>true</protected>
     <shortDescription>Gift Transaction mirror page: needs the permission set</shortDescription>
-    <value>The Gift Transaction mirror page needs the Gift Transaction Mirror permission set. Ask your BarnCRM admin for it.</value>
+    <value>The Gift Transaction mirror page needs the Salesforce Records Sync permission set. Ask your BarnCRM admin for it.</value>
   </labels>
   <labels>
     <fullName>Mirror_GiftTransactionMirror_ColumnGiftTransaction</fullName>
