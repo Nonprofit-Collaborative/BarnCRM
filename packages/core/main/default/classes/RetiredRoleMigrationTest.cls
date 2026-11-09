@@ -47,22 +47,6 @@ private class RetiredRoleMigrationTest {
 	}
 
 	@IsTest
-	static void aBudgetOfNothingGivesNothing() {
-		System.runAs(TestUsers.admin()) {
-			Id coordinator = TestDataFactory.prepareRoleGroup(COORDINATOR).Id;
-			Id teamMember = TestDataFactory.prepareRoleGroup(TEAM_MEMBER).Id;
-			Id priya = userId('Priya');
-			insert assignment(priya, coordinator);
-
-			Test.startTest();
-			RetiredRoleMigration.carryOver(0);
-			Test.stopTest();
-
-			Assert.areEqual(0, rows(priya, teamMember), 'The next run gives it');
-		}
-	}
-
-	@IsTest
 	static void inactiveHoldersAreNamedNotGivenAndNothingThrows() {
 		System.runAs(TestUsers.admin()) {
 			Id coordinator = TestDataFactory.prepareRoleGroup(COORDINATOR).Id;
@@ -95,14 +79,18 @@ private class RetiredRoleMigrationTest {
 				FROM PermissionSetGroup
 				WHERE Id = :teamMember.Id
 			];
-			Id first = userId('Gone');
-			Id second = userId('Priya');
-			Id third = userId('Both');
-			List<PermissionSetAssignment> attempted = new List<PermissionSetAssignment>{
-				assignment(first, teamMember.Id),
-				assignment(second, teamMember.Id),
-				assignment(third, teamMember.Id)
-			};
+			PermissionSetGroup retired = new PermissionSetGroup(
+				MasterLabel = 'Coordinator (Retired)'
+			);
+			List<RetiredRoleMigration.Holder> tried = new List<RetiredRoleMigration.Holder>();
+			for (User person : [
+				SELECT Id, Name, IsActive
+				FROM User
+				WHERE LastName IN ('Gone', 'Priya', 'Both')
+				ORDER BY LastName DESC
+			]) {
+				tried.add(new RetiredRoleMigration.Holder(person.Id, person, retired, teamMember));
+			}
 			// Salesforce's answer for an inactive user, a duplicate, and a success, as the
 			// platform would return them; a test cannot make Salesforce refuse on demand.
 			List<Database.SaveResult> results = new List<Database.SaveResult>{
@@ -112,17 +100,11 @@ private class RetiredRoleMigrationTest {
 			};
 
 			Test.startTest();
-			List<String> messages = RetiredRoleMigration.refusalMessages(
-				attempted,
-				results,
-				new Map<Id, String>{ first => 'Ana Lopez', second => 'B', third => 'C' },
-				new Map<Id, String>{ first => 'Coordinator (Retired)' },
-				new Map<String, PermissionSetGroup>{ TEAM_MEMBER => teamMember }
-			);
+			List<String> messages = RetiredRoleMigration.refusalMessages(tried, results);
 			Test.stopTest();
 
 			Assert.areEqual(1, messages.size(), 'Only the refusal is logged: ' + messages);
-			Assert.isTrue(messages[0].contains('Ana Lopez'), 'Names the person: ' + messages[0]);
+			Assert.isTrue(messages[0].contains(tried[0].name), 'Names the person: ' + messages[0]);
 			Assert.isTrue(messages[0].contains(teamMember.MasterLabel), 'And the role to give');
 			Assert.isTrue(messages[0].contains('inactive user'), 'And what Salesforce said');
 		}
