@@ -24,14 +24,8 @@ public with sharing class ContactPointAccountHandler extends TriggerHandler {
 	/** The watched fields this org's Account has, found once a transaction. */
 	private static List<String> watchedHere;
 	private static Boolean individualLinkHere;
-	/** What a sync of a person account depends on: their values and Individual. */
-	private static final List<String> SIGNATURE_FIELDS = signatureFields();
-
-	private static List<String> signatureFields() {
-		List<String> fields = new List<String>(ACCOUNT_FIELDS);
-		fields.add(INDIVIDUAL_LINK);
-		return fields;
-	}
+	/** By phase, the record each person account was last synced from in this transaction. */
+	private static final Map<String, Map<Id, SObject>> SYNCED_FROM = new Map<String, Map<Id, SObject>>();
 
 	/** Built by name from Core's dispatcher, so it needs a public constructor. */
 	@NamespaceAccessible
@@ -64,7 +58,7 @@ public with sharing class ContactPointAccountHandler extends TriggerHandler {
 			SObject before = oldRecordsById().get(record.Id);
 			if (individualLinkHere && record.get(INDIVIDUAL_LINK) != before.get(INDIVIDUAL_LINK)) {
 				everything.add(record.Id);
-			} else if (valuesChanged(record, before, watched)) {
+			} else if (ContactPointPlan.anyChanged(record, before, watched)) {
 				valuesOnly.add(record.Id);
 			}
 		}
@@ -80,13 +74,30 @@ public with sharing class ContactPointAccountHandler extends TriggerHandler {
 	 * save is synced once, a second, different change in the transaction again.
 	 */
 	private Set<Id> claimValues(String phase, Set<Id> accountIds) {
-		Set<Id> result = new Set<Id>();
+		if (accountIds.isEmpty()) {
+			return accountIds;
+		}
+		// One claim for the save; only a person account already synced in this transaction is
+		// compared with the record it was synced from, by the watched fields alone.
+		Set<Id> result = claimRunFor(phase, accountIds);
+		if (!SYNCED_FROM.containsKey(phase)) {
+			SYNCED_FROM.put(phase, new Map<Id, SObject>());
+		}
+		Map<Id, SObject> last = SYNCED_FROM.get(phase);
+		List<String> fields = new List<String>(watchedFields());
+		if (individualLinkHere) {
+			fields.add(INDIVIDUAL_LINK);
+		}
 		for (Id accountId : accountIds) {
-			String values = ContactPointPlan.signature(
-				newRecordsById().get(accountId).getPopulatedFieldsAsMap(),
-				SIGNATURE_FIELDS
-			);
-			result.addAll(claimRunFor(phase + '\n' + values, new Set<Id>{ accountId }));
+			SObject now = newRecordsById().get(accountId);
+			if (
+				result.contains(accountId) ||
+				!last.containsKey(accountId) ||
+				ContactPointPlan.anyChanged(now, last.get(accountId), fields)
+			) {
+				result.add(accountId);
+				last.put(accountId, now);
+			}
 		}
 		return result;
 	}
@@ -125,15 +136,6 @@ public with sharing class ContactPointAccountHandler extends TriggerHandler {
 			}
 		}
 		return result;
-	}
-
-	private static Boolean valuesChanged(SObject now, SObject before, List<String> watched) {
-		for (String field : watched) {
-			if (ContactPointPlan.changed(now.get(field), before.get(field))) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**

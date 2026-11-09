@@ -119,43 +119,66 @@ private class ContactPointErasureExtensionTest {
 		return [SELECT Name FROM Contact WHERE Id = :contactId WITH SYSTEM_MODE].Name;
 	}
 
+	/**
+	 * Erases Ana, with the hold or as before it, each in its own test and limits context, and
+	 * answers how many address syncs she was in. Checks the end state is settled: a full sync
+	 * of both people afterwards changes nothing, so the copies left are exactly what the final
+	 * records make, the same with the hold as without it.
+	 */
+	private static Integer eraseAna(Boolean hold, String lastName) {
+		List<Contact> people;
+		Integer syncs;
+		System.runAs(eraser()) {
+			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
+			people = household(lastName);
+			String name = nameOf(people[0].Id);
+			ContactPointSyncService.holdingForTest = hold;
+			ContactPointSyncService.addressSyncsForTest.clear();
+
+			Test.startTest();
+			PersonErasure.erase(people[0].Id, name, null);
+			Test.stopTest();
+
+			Integer counted = ContactPointSyncService.addressSyncsForTest.get(people[0].Id);
+			syncs = counted == null ? 0 : counted;
+			ContactPointSyncService.holdingForTest = true;
+		}
+		ContactPointSyncService.Result again = ContactPointSyncService.syncPeople(
+			new Set<Id>{ people[0].Id, people[1].Id },
+			null
+		);
+		Assert.areEqual(
+			0,
+			again.created + again.updated + again.deleted + again.failed,
+			'The erasure left the copies settled: ' + state(people, lastName)
+		);
+		Assert.isTrue(
+			state(new List<Contact>{ people[0] }, lastName).startsWith(' | '),
+			'Ana keeps no link and no address copy: ' + state(people, lastName)
+		);
+		return syncs;
+	}
+
 	@IsTest
-	static void anErasureCopiesAddressesOnceAndEndsWhereItAlwaysDid() {
+	static void anErasureCopiesAnErasedPersonsAddressesOnce() {
+		// runs-as: deploying user (eraseAna runs the erasure as an eraser with System.runAs)
 		if (!ready()) {
 			return;
 		}
-		User admin = eraser();
-		List<Contact> held;
-		List<Contact> before;
-		System.runAs(admin) {
-			HouseholdTestDataFactory.junctionSettingsWithoutAutomaticHouseholds();
-			held = household('Alder');
-			before = household('Birch');
-			List<Contact> warm = household('Cedar');
+		Assert.areEqual(1, eraseAna(true, 'Alder'), 'One address sync, from the final state');
+	}
 
-			Test.startTest();
-			// Every cache of the transaction warmed by a preview, so neither erasure is charged for it.
-			PersonErasure.preview(warm[0].Id);
-			Integer start = Limits.getQueries();
-			PersonErasure.erase(held[0].Id, nameOf(held[0].Id), null);
-			Integer withHold = Limits.getQueries() - start;
-			ContactPointSyncService.holdingForTest = false;
-			start = Limits.getQueries();
-			PersonErasure.erase(before[0].Id, nameOf(before[0].Id), null);
-			Integer withoutHold = Limits.getQueries() - start;
-			ContactPointSyncService.holdingForTest = true;
-			Test.stopTest();
-
-			Assert.areEqual(
-				state(before, 'Birch'),
-				state(held, 'Alder'),
-				'The Contact Points left are the same with the hold as without it'
-			);
-			Assert.isTrue(
-				withHold < withoutHold,
-				'One address sync instead of two: ' + withHold + ' against ' + withoutHold
-			);
+	@IsTest
+	static void beforeTheHoldAnErasureCopiedThemTwiceAndEndedTheSame() {
+		// runs-as: deploying user (eraseAna runs the erasure as an eraser with System.runAs)
+		if (!ready()) {
+			return;
 		}
+		Integer syncs = eraseAna(false, 'Birch');
+		Assert.isTrue(
+			syncs >= 2,
+			'Deleting the address and ending the membership each synced: ' + syncs
+		);
 	}
 
 	@IsTest

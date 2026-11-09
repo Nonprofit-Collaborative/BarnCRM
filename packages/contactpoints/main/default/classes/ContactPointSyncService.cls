@@ -344,6 +344,10 @@ public without sharing class ContactPointSyncService {
 		}
 	}
 
+	/** In a test, how many address syncs each contact has been in this transaction. */
+	@TestVisible
+	private static Map<Id, Integer> addressSyncsForTest = new Map<Id, Integer>();
+
 	/**
 	 * Makes these people's managed Contact Points match their BarnCRM values, for the kinds
 	 * given (all when null). Never throws: a failure is logged and counted.
@@ -357,6 +361,12 @@ public without sharing class ContactPointSyncService {
 		Set<Id> contactIds = contactsOnly(personIds);
 		if (kinds.isEmpty() || contactIds.isEmpty()) {
 			return result;
+		}
+		if (Test.isRunningTest() && kinds.contains(ContactPointPlan.ADDRESS)) {
+			for (Id contactId : contactIds) {
+				Integer earlier = addressSyncsForTest.get(contactId);
+				addressSyncsForTest.put(contactId, earlier == null ? 1 : earlier + 1);
+			}
 		}
 		Boolean wasRunning = running;
 		running = true;

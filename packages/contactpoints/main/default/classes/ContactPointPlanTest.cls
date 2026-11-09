@@ -136,15 +136,16 @@ private class ContactPointPlanTest {
 		Assert.isTrue(ContactPointPlan.changed('Main St', 'main st'), 'Capitals count');
 		Assert.isFalse(ContactPointPlan.changed(null, null));
 		Assert.isTrue(ContactPointPlan.changed('x', null));
-		String lower = ContactPointPlan.signature(
-			new Map<String, Object>{ 'Email' => 'a@b.example' },
-			new List<String>{ 'Email', 'Phone' }
+		List<String> compared = new List<String>{ 'Email', 'Phone' };
+		Contact lower = new Contact(Email = 'a@b.example');
+		Assert.isTrue(
+			ContactPointPlan.anyChanged(new Contact(Email = 'A@b.example'), lower, compared),
+			'Values differing only in capitals are a change'
 		);
-		String upper = ContactPointPlan.signature(
-			new Map<String, Object>{ 'Email' => 'A@b.example' },
-			new List<String>{ 'Email', 'Phone' }
+		Assert.isFalse(
+			ContactPointPlan.anyChanged(new Contact(Email = 'a@b.example'), lower, compared),
+			'The same values are not'
 		);
-		Assert.isFalse(lower.equals(upper), 'Values differing only in case sign differently');
 		Assert.areEqual(
 			'5550100001',
 			ContactPointPlan.matchKey(

@@ -20,12 +20,15 @@ public with sharing class ContactPointPersonHandler extends TriggerHandler {
 	/** Built once, not for every record of a save. */
 	private static final List<String> PERSON_FIELDS = ContactPointPlan.personFields();
 	/** What a sync of a person depends on: their values, household and Individual. */
-	private static final List<String> SIGNATURE_FIELDS = signatureFields();
+	private static final List<String> SIGNATURE_FIELDS_WITHOUT_INDIVIDUAL = signatureFields(false);
+	private static final List<String> SIGNATURE_FIELDS = signatureFields(true);
 
-	private static List<String> signatureFields() {
+	private static List<String> signatureFields(Boolean withIndividual) {
 		List<String> fields = new List<String>(PERSON_FIELDS);
 		fields.add('AccountId');
-		fields.add('IndividualId');
+		if (withIndividual) {
+			fields.add('IndividualId');
+		}
 		return fields;
 	}
 
@@ -90,16 +93,35 @@ public with sharing class ContactPointPersonHandler extends TriggerHandler {
 	 * transaction is synced again rather than left behind on the copy.
 	 */
 	private Set<Id> claimValues(String phase, Set<Id> personIds) {
-		Set<Id> result = new Set<Id>();
+		if (personIds.isEmpty()) {
+			return personIds;
+		}
+		// One claim for the save; only a person already synced in this transaction is compared
+		// with the record they were synced from (a field read each, no copy of the record).
+		Set<Id> result = claimRunFor(phase, personIds);
+		if (!SYNCED_FROM.containsKey(phase)) {
+			SYNCED_FROM.put(phase, new Map<Id, SObject>());
+		}
+		Map<Id, SObject> last = SYNCED_FROM.get(phase);
+		List<String> fields = ContactPointSyncService.individualsAvailable()
+			? SIGNATURE_FIELDS
+			: SIGNATURE_FIELDS_WITHOUT_INDIVIDUAL;
 		for (Id personId : personIds) {
-			String values = ContactPointPlan.signature(
-				newRecordsById().get(personId).getPopulatedFieldsAsMap(),
-				SIGNATURE_FIELDS
-			);
-			result.addAll(claimRunFor(phase + '\n' + values, new Set<Id>{ personId }));
+			SObject now = newRecordsById().get(personId);
+			if (
+				result.contains(personId) ||
+				!last.containsKey(personId) ||
+				ContactPointPlan.anyChanged(now, last.get(personId), fields)
+			) {
+				result.add(personId);
+				last.put(personId, now);
+			}
 		}
 		return result;
 	}
+
+	/** By phase, the record each person was last synced from in this transaction. */
+	private static final Map<String, Map<Id, SObject>> SYNCED_FROM = new Map<String, Map<Id, SObject>>();
 
 	public override void beforeDelete() {
 		ContactPointSyncService.deleteCopiesOf(oldRecordsById().keySet());
@@ -121,15 +143,7 @@ public with sharing class ContactPointPersonHandler extends TriggerHandler {
 	}
 
 	private static Boolean valuesChanged(SObject record, SObject old) {
-		if (old == null) {
-			return true;
-		}
-		for (String field : PERSON_FIELDS) {
-			if (ContactPointPlan.changed(record.get(field), old.get(field))) {
-				return true;
-			}
-		}
-		return false;
+		return old == null || ContactPointPlan.anyChanged(record, old, PERSON_FIELDS);
 	}
 
 	/** A new household (and so new household addresses) or a new Individual. */

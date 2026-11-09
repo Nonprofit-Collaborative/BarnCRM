@@ -271,16 +271,17 @@ public with sharing class ContactPointPlan {
 	}
 
 	/**
-	 * The values of these fields, as one text: a handler claims a sync of a record for this,
-	 * so the same values are synced once a transaction (a workflow or flow re-fire) while a
-	 * second, different change in the same transaction is synced too.
+	 * Whether any of these fields differs between two saves of a record (see `changed`): a
+	 * handler syncs a record a second time in a transaction only then, so a workflow or flow
+	 * re-fire is synced once while a second, different change is synced too.
 	 */
-	public static String signature(Map<String, Object> values, List<String> fields) {
-		List<String> parts = new List<String>();
+	public static Boolean anyChanged(SObject now, SObject before, List<String> fields) {
 		for (String field : fields) {
-			parts.add(blankAsEmpty(values.get(field)));
+			if (changed(now.get(field), before.get(field))) {
+				return true;
+			}
 		}
-		return String.join(parts, '\n');
+		return false;
 	}
 
 	private static String text(Object value) {
