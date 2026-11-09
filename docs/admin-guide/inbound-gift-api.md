@@ -35,7 +35,7 @@ the processor's support team.
 1. **Create the user the system signs in as.** In Setup, create a user for the integration,
    for example "Online Giving Integration". A Salesforce Integration user license is the
    usual choice where you have one. The user needs **API Enabled**.
-2. **Give it the Inbound Gift API permission set, and nothing else from BarnCRM.** It
+2. **Give it the Inbound Gifts permission set, and nothing else from BarnCRM.** It
    holds exactly what recording a gift needs: reading people, organizations, funds, appeals
    and acknowledgment rules; creating gifts, their fund allocations and the household soft
    credits Giving adds; and the web address. It cannot edit or delete a donor, edit or

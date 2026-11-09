@@ -43,9 +43,8 @@ already exported turns up in her next file instead of being missed.
 ## How to Turn It On
 
 The Mirror module has to be installed. Then give the person who runs the export the
-**Accounting Export** permission set, next to a Giving permission set that lets them see
-gifts (**Giving Read Only** is enough). Give both on the Access page, under Extra
-Permissions.
+**Accounting Export** permission set on the Access page, under Extra Permissions. It reads the
+gift, allocation and fund fields the file shows, so the person needs no Giving set beside it.
 
 **The file holds the gifts the person running it can see**, the same as any report. Gifts
 are private by default, so check that Jen can see all of them: export the same month once

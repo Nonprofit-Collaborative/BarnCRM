@@ -39,7 +39,7 @@ You need the Mirror module installed, and a Salesforce edition that has Campaign
 Cloud, Service Cloud, or Nonprofit Cloud). An org on Salesforce Platform licenses only has no
 Campaigns, and the Campaign sync page says so.
 
-1. Give yourself the **Campaign Sync** permission set on the Access page, under Extra
+1. Give yourself the **Salesforce Records Sync** permission set on the Access page, under Extra
    Permissions: the roles there do not include it.
 2. Open **BarnCRM Settings**, choose **Giving**, and switch on **Copy appeals to
    Campaigns**.

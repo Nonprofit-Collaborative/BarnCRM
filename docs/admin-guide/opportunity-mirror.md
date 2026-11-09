@@ -64,7 +64,7 @@ You need the Mirror module and a Salesforce edition with Opportunities (Sales Cl
 Cloud, NPSP or Nonprofit Cloud). An org on Salesforce Platform licenses only has none, and the
 Opportunity mirror page says so.
 
-1. Give yourself the **Opportunity Mirror** permission set on the Access page, under Extra
+1. Give yourself the **Salesforce Records Sync** permission set on the Access page, under Extra
    Permissions: the roles there do not include it.
 2. Open **BarnCRM Settings**, choose **Giving**, and set **Opportunity mirror direction**.
    For **Opportunities to Gifts**, also set **Opportunity mirror start date**: only won Opportunities closed on or after it become gifts; while it says **Not set**, none do.

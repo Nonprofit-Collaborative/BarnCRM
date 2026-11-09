@@ -46,8 +46,8 @@ than fill something in. See [Automation control](automation-control.md).
 
 ## A Five-Minute Walkthrough
 
-You need the sample data, Jen with the **Accounting Export** and **Giving Read Only** permission
-sets, and David with **Giving Staff**.
+You need the sample data, Jen with the **Accounting Export** permission set (with or without
+**Giving Read Only**), and David with **Giving Staff**.
 
 1. As Jen, open **Accounting Export**, set **From** and **To** to the first and last day of last
    month, and click **Download File**.
