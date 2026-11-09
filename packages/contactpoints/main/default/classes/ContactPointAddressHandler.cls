@@ -40,7 +40,7 @@ public with sharing class ContactPointAddressHandler extends TriggerHandler {
 		for (SObject record : newRecords()) {
 			SObject old = oldRecordsById().get(record.Id);
 			for (String field : WATCHED) {
-				if (record.get(field) != old.get(field)) {
+				if (ContactPointPlan.changed(record.get(field), old.get(field))) {
 					changed.add(record);
 					changed.add(old);
 					break;

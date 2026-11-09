@@ -24,6 +24,14 @@ public with sharing class ContactPointAccountHandler extends TriggerHandler {
 	/** The watched fields this org's Account has, found once a transaction. */
 	private static List<String> watchedHere;
 	private static Boolean individualLinkHere;
+	/** What a sync of a person account depends on: their values and Individual. */
+	private static final List<String> SIGNATURE_FIELDS = signatureFields();
+
+	private static List<String> signatureFields() {
+		List<String> fields = new List<String>(ACCOUNT_FIELDS);
+		fields.add(INDIVIDUAL_LINK);
+		return fields;
+	}
 
 	/** Built by name from Core's dispatcher, so it needs a public constructor. */
 	@NamespaceAccessible
@@ -55,11 +63,27 @@ public with sharing class ContactPointAccountHandler extends TriggerHandler {
 				valuesOnly.add(record.Id);
 			}
 		}
-		ContactPointSyncService.syncOrQueue(claimRunFor('afterUpdate', everything), null);
+		ContactPointSyncService.syncOrQueue(claimValues('afterUpdate', everything), null);
 		ContactPointSyncService.syncOrQueue(
-			claimRunFor('afterUpdateValues', valuesOnly),
+			claimValues('afterUpdateValues', valuesOnly),
 			VALUE_KINDS
 		);
+	}
+
+	/**
+	 * The person accounts not yet synced with the values they hold now: a re-fire of the same
+	 * save is synced once, a second, different change in the transaction again.
+	 */
+	private Set<Id> claimValues(String phase, Set<Id> accountIds) {
+		Set<Id> result = new Set<Id>();
+		for (Id accountId : accountIds) {
+			String values = ContactPointPlan.signature(
+				newRecordsById().get(accountId).getPopulatedFieldsAsMap(),
+				SIGNATURE_FIELDS
+			);
+			result.addAll(claimRunFor(phase + '\n' + values, new Set<Id>{ accountId }));
+		}
+		return result;
 	}
 
 	public override void beforeDelete() {
@@ -100,7 +124,7 @@ public with sharing class ContactPointAccountHandler extends TriggerHandler {
 
 	private static Boolean valuesChanged(SObject now, SObject before, List<String> watched) {
 		for (String field : watched) {
-			if (now.get(field) != before.get(field)) {
+			if (ContactPointPlan.changed(now.get(field), before.get(field))) {
 				return true;
 			}
 		}

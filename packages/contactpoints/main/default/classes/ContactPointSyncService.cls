@@ -541,7 +541,7 @@ public without sharing class ContactPointSyncService {
 			Map<Id, List<Contact_Point_Link__c>> linksByPerson = fresh
 				? new Map<Id, List<Contact_Point_Link__c>>()
 				: readLinks();
-			readAdoptable();
+			readAdoptable(linksByPerson);
 			for (SObject person : people.values()) {
 				planPerson(
 					person,
@@ -584,9 +584,7 @@ public without sharing class ContactPointSyncService {
 		/** Each person's current addresses: their own and their household's. */
 		private Map<Id, List<Map<String, Object>>> readAddresses(Set<Id> personIds) {
 			// A person account belongs to households, and owns addresses, by its account (decision 14).
-			Map<Id, Id> accountByContact = PersonRecordSelector.getAccountsBehindPersonContacts(
-				personIds
-			);
+			Map<Id, Id> accountByContact = accountsBehind(personIds);
 			Map<Id, Id> contactByAccount = new Map<Id, Id>();
 			for (Id contactId : accountByContact.keySet()) {
 				contactByAccount.put(accountByContact.get(contactId), contactId);
@@ -664,11 +662,21 @@ public without sharing class ContactPointSyncService {
 			return result;
 		}
 
-		/** The people's links for the kinds in this run, oldest first, and the copies they name. */
+		/**
+		 * The people's links for the kinds in this run, oldest first, and the copies they name.
+		 * Only a copy whose source the person still has is read: the rest are deleted by their
+		 * link alone, so a cleared value (an erase, an emptied field) reads no Contact Point.
+		 */
 		private Map<Id, List<Contact_Point_Link__c>> readLinks() {
 			Map<Id, List<Contact_Point_Link__c>> result = new Map<Id, List<Contact_Point_Link__c>>();
 			Set<Id> personIds = people.keySet();
 			Map<String, Set<Id>> copyIdsByKind = new Map<String, Set<Id>>();
+			Set<String> wantedKeys = new Set<String>();
+			for (Id personId : personIds) {
+				for (ContactPointPlan.Desired wanted : wantedByPerson.get(personId)) {
+					wantedKeys.add(personId + '|' + wanted.key());
+				}
+			}
 			for (Contact_Point_Link__c link : [
 				SELECT Id, Contact__c, Kind__c, Source__c, Contact_Point_Id__c
 				FROM Contact_Point_Link__c
@@ -680,7 +688,12 @@ public without sharing class ContactPointSyncService {
 					result.put(link.Contact__c, new List<Contact_Point_Link__c>());
 				}
 				result.get(link.Contact__c).add(link);
-				if (link.Contact_Point_Id__c != null) {
+				if (
+					link.Contact_Point_Id__c != null &&
+					wantedKeys.contains(
+						link.Contact__c + '|' + ContactPointPlan.keyOf(link.Kind__c, link.Source__c)
+					)
+				) {
 					if (!copyIdsByKind.containsKey(link.Kind__c)) {
 						copyIdsByKind.put(link.Kind__c, new Set<Id>());
 					}
@@ -696,13 +709,26 @@ public without sharing class ContactPointSyncService {
 			return result;
 		}
 
-		/** Contact Points on the people's Individuals that no link names. */
-		private void readAdoptable() {
+		/**
+		 * Contact Points on the people's Individuals that no link names. Only a wanted value with
+		 * no link of its own can adopt one, so only those people and kinds are read: a save that
+		 * changes a value already linked, or clears one, reads none.
+		 */
+		private void readAdoptable(Map<Id, List<Contact_Point_Link__c>> linksByPerson) {
 			Set<Id> parents = new Set<Id>();
+			Set<String> kindsToRead = new Set<String>();
 			for (SObject person : people.values()) {
 				Id individual = (Id) person.get(INDIVIDUAL_LINK);
-				if (individual != null && !INDIVIDUALS_CREATED_HERE.contains(individual)) {
+				if (individual == null || INDIVIDUALS_CREATED_HERE.contains(individual)) {
+					continue;
+				}
+				Set<String> unlinkedKinds = kindsWithoutLink(
+					wantedByPerson.get(person.Id),
+					linksByPerson.get(person.Id)
+				);
+				if (!unlinkedKinds.isEmpty()) {
 					parents.add(individual);
+					kindsToRead.addAll(unlinkedKinds);
 				}
 			}
 			if (parents.isEmpty()) {
@@ -710,7 +736,7 @@ public without sharing class ContactPointSyncService {
 			}
 			Map<Id, SObject> unlinked = new Map<Id, SObject>();
 			Map<Id, String> kindById = new Map<Id, String>();
-			for (String kind : kinds) {
+			for (String kind : kindsToRead) {
 				for (
 					SObject row : Database.query(
 						selectOf(kind, ' WHERE ParentId IN :parents ORDER BY CreatedDate'),
@@ -984,18 +1010,82 @@ public without sharing class ContactPointSyncService {
 			}
 			if (personId.getSObjectType() == Contact.SObjectType) {
 				result.add(personId);
+			} else if (CONTACT_BY_PERSON_ACCOUNT.containsKey(personId)) {
+				result.add(CONTACT_BY_PERSON_ACCOUNT.get(personId));
 			} else if (personId.getSObjectType() == Account.SObjectType) {
 				accounts.add(personId);
 			}
 		}
 		if (!accounts.isEmpty() && HouseholdService.isPersonAccountOrg()) {
-			result.addAll(PersonRecordSelector.getPersonContactIds(accounts).values());
+			Map<Id, Id> contactByAccount = PersonRecordSelector.getPersonContactIds(accounts);
+			for (Id accountId : contactByAccount.keySet()) {
+				ACCOUNT_BY_PERSON_CONTACT.put(contactByAccount.get(accountId), accountId);
+				CONTACT_BY_PERSON_ACCOUNT.put(accountId, contactByAccount.get(accountId));
+			}
+			result.addAll(contactByAccount.values());
+		}
+		return result;
+	}
+
+	/**
+	 * Each person account and the contact behind it, as this transaction has already looked them
+	 * up. The pair never changes, so a person account saved, its address changed and its
+	 * membership ended in one transaction (an erase does all three) is looked up once, and the
+	 * address read does not ask again.
+	 */
+	private static final Map<Id, Id> ACCOUNT_BY_PERSON_CONTACT = new Map<Id, Id>();
+	private static final Map<Id, Id> CONTACT_BY_PERSON_ACCOUNT = new Map<Id, Id>();
+
+	/** The person account behind each of these contacts that has one, asking only when unknown. */
+	private static Map<Id, Id> accountsBehind(Set<Id> contactIds) {
+		Map<Id, Id> result = new Map<Id, Id>();
+		Set<Id> unknown = new Set<Id>();
+		for (Id contactId : contactIds) {
+			if (ACCOUNT_BY_PERSON_CONTACT.containsKey(contactId)) {
+				result.put(contactId, ACCOUNT_BY_PERSON_CONTACT.get(contactId));
+			} else {
+				unknown.add(contactId);
+			}
+		}
+		if (!unknown.isEmpty()) {
+			result.putAll(PersonRecordSelector.getAccountsBehindPersonContacts(unknown));
 		}
 		return result;
 	}
 
 	private static String adoptKey(Id parentId, String kind, String matchKey) {
 		return parentId + '|' + kind + '|' + matchKey;
+	}
+
+	/**
+	 * The kinds of the wanted values left with no link once each link has been paired with a
+	 * wanted value of its key, as `planPerson` pairs them: only those can adopt a Contact Point.
+	 */
+	private static Set<String> kindsWithoutLink(
+		List<ContactPointPlan.Desired> wanted,
+		List<Contact_Point_Link__c> links
+	) {
+		Set<String> result = new Set<String>();
+		if (wanted == null || wanted.isEmpty()) {
+			return result;
+		}
+		Map<String, Integer> linksByKey = new Map<String, Integer>();
+		for (
+			Contact_Point_Link__c link : links == null ? new List<Contact_Point_Link__c>() : links
+		) {
+			String key = ContactPointPlan.keyOf(link.Kind__c, link.Source__c);
+			Integer count = linksByKey.get(key);
+			linksByKey.put(key, count == null ? 1 : count + 1);
+		}
+		for (ContactPointPlan.Desired one : wanted) {
+			Integer count = linksByKey.get(one.key());
+			if (count == null || count == 0) {
+				result.add(one.kind);
+			} else {
+				linksByKey.put(one.key(), count - 1);
+			}
+		}
+		return result;
 	}
 
 	/** The fields of a kind this org's object has and a save may set. */

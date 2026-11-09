@@ -126,6 +126,26 @@ private class ContactPointPlanTest {
 			)
 		);
 		Assert.areEqual(
+			new Set<String>{ 'EmailAddress' },
+			ContactPointPlan.differences(
+				wanted,
+				new Map<String, Object>{ 'EmailAddress' => 'A@B.example', 'IsPrimary' => true }
+			),
+			'A change of case alone reaches the copy'
+		);
+		Assert.isTrue(ContactPointPlan.changed('Main St', 'main st'), 'Capitals count');
+		Assert.isFalse(ContactPointPlan.changed(null, null));
+		Assert.isTrue(ContactPointPlan.changed('x', null));
+		String lower = ContactPointPlan.signature(
+			new Map<String, Object>{ 'Email' => 'a@b.example' },
+			new List<String>{ 'Email', 'Phone' }
+		);
+		String upper = ContactPointPlan.signature(
+			new Map<String, Object>{ 'Email' => 'A@b.example' },
+			new List<String>{ 'Email', 'Phone' }
+		);
+		Assert.isFalse(lower.equals(upper), 'Values differing only in case sign differently');
+		Assert.areEqual(
 			'5550100001',
 			ContactPointPlan.matchKey(
 				ContactPointPlan.PHONE,

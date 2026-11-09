@@ -42,16 +42,14 @@ public with sharing class LinkedRecords {
 	public static Map<String, Link> resolve(List<String> recordIds) {
 		Map<String, Link> found = new Map<String, Link>();
 		Map<Schema.SObjectType, Map<String, Id>> byType = new Map<Schema.SObjectType, Map<String, Id>>();
-		Map<String, Schema.SObjectType> present = supportedTypes();
+		Set<Schema.SObjectType> present = new Set<Schema.SObjectType>(supportedTypes().values());
 		for (String text : recordIds == null ? new List<String>() : recordIds) {
 			Id recordId = asId(text);
-			if (
-				recordId == null ||
-				!present.containsKey(recordId.getSObjectType().getDescribe().getName())
-			) {
+			// No describe per identifier; an identifier of an object the org lacks has no type.
+			Schema.SObjectType type = recordId == null ? null : recordId.getSObjectType();
+			if (type == null || !present.contains(type)) {
 				continue;
 			}
-			Schema.SObjectType type = recordId.getSObjectType();
 			if (!byType.containsKey(type)) {
 				byType.put(type, new Map<String, Id>());
 			}

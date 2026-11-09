@@ -19,6 +19,15 @@ public with sharing class ContactPointPersonHandler extends TriggerHandler {
 	};
 	/** Built once, not for every record of a save. */
 	private static final List<String> PERSON_FIELDS = ContactPointPlan.personFields();
+	/** What a sync of a person depends on: their values, household and Individual. */
+	private static final List<String> SIGNATURE_FIELDS = signatureFields();
+
+	private static List<String> signatureFields() {
+		List<String> fields = new List<String>(PERSON_FIELDS);
+		fields.add('AccountId');
+		fields.add('IndividualId');
+		return fields;
+	}
 
 	/** Built by name from Core's dispatcher, so it needs a public constructor. */
 	@NamespaceAccessible
@@ -68,11 +77,28 @@ public with sharing class ContactPointPersonHandler extends TriggerHandler {
 				valuesOnly.add(record.Id);
 			}
 		}
-		ContactPointSyncService.syncOrQueue(claimRunFor('afterUpdate', everything), null);
+		ContactPointSyncService.syncOrQueue(claimValues('afterUpdate', everything), null);
 		ContactPointSyncService.syncOrQueue(
-			claimRunFor('afterUpdateValues', valuesOnly),
+			claimValues('afterUpdateValues', valuesOnly),
 			VALUE_KINDS
 		);
+	}
+
+	/**
+	 * The people not yet synced with the values they hold now. A re-fire of the same save (a
+	 * workflow or flow update) is synced once; a second, different change in the same
+	 * transaction is synced again rather than left behind on the copy.
+	 */
+	private Set<Id> claimValues(String phase, Set<Id> personIds) {
+		Set<Id> result = new Set<Id>();
+		for (Id personId : personIds) {
+			String values = ContactPointPlan.signature(
+				newRecordsById().get(personId).getPopulatedFieldsAsMap(),
+				SIGNATURE_FIELDS
+			);
+			result.addAll(claimRunFor(phase + '\n' + values, new Set<Id>{ personId }));
+		}
+		return result;
 	}
 
 	public override void beforeDelete() {
@@ -99,7 +125,7 @@ public with sharing class ContactPointPersonHandler extends TriggerHandler {
 			return true;
 		}
 		for (String field : PERSON_FIELDS) {
-			if (record.get(field) != old.get(field)) {
+			if (ContactPointPlan.changed(record.get(field), old.get(field))) {
 				return true;
 			}
 		}
