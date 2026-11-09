@@ -1,6 +1,6 @@
 # User Guide
 
-Applies to: BarnCRM landing/batch-b (v1.0 scope, releases 0.15 to 0.17), to be set to the final main merge commit at landing. Pre-release: no package version exists yet; this tracks the newest code on main.
+Applies to: BarnCRM main 203130d9 (v1.0 and Batch C, releases 0.12 to 1.3). Pre-release: no package version exists yet; this tracks the newest code on main.
 
 ## Who This Is For
 
