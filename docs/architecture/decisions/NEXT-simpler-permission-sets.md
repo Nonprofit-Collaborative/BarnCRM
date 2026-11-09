@@ -1,6 +1,7 @@
 # ADR-NEXT: Fewer, more inclusive roles and extra permissions
 
-**Status:** Proposed (design only; decisions D1 to D5 below need Brandon)
+**Status:** Accepted (Brandon, 2026-11-09, plan D-191: D1, D2, D4 and D5 as proposed; D3
+modified so Programs is excluded; the Bulk Update class gap fix approved)
 **Date:** 2026-11-09
 **Source:** Brandon, 2026-11-09: "Please simplify permissions by combining them into more
 intuitive and inclusive sets." Builds on ADR-0013 (Core runs alone), ADR-0050 and ADR-0121
@@ -8,7 +9,7 @@ intuitive and inclusive sets." Builds on ADR-0013 (Core runs alone), ADR-0050 an
 (neutral role names), ADR-0124 and ADR-0141 (tab and app sets follow features), ADR-0127,
 ADR-0131 (module sets follow roles), ADR-0132 (Access Add-On rows), ADR-0142 (BarnCRM Admin
 sees every person), plan D-34 and D-44. Amends ADR-0123, ADR-0127 decision 3, ADR-0131 and
-ADR-0132 decision 4 where D1 to D4 say so.
+ADR-0132 decision 4 where D1 to D4 say so. Decided in plan D-191.
 
 ## Context
 
@@ -93,7 +94,7 @@ testing and contributor guides.
 - Packaged groups and sets cannot be renamed by API name (ADR-0123); a removed component needs
   a destructive deploy, and Salesforce refuses to delete a set or group that is still assigned.
 
-## Decision (proposed)
+## Decision
 
 The model admins see becomes: **four roles, each including everything that role needs in every
 installed module, plus a short list of self-sufficient extra permissions.** Sets that exist only
@@ -105,7 +106,7 @@ as plumbing are labelled as such.
 |---|---|---|---|
 | **BarnCRM Admin** (relabelled from BarnCRM Admin Group) | `BarnCRM_Admin_Group` | BarnCRM Admin Access | Every module's Admin set, Giving Admin included (D2) |
 | **Team Member** | `Program_Staff` | BarnCRM Staff Access | Every module's Staff set except Giving's |
-| **Fundraising Staff** (Giving) | `Fundraising_Staff` | BarnCRM Staff Access, Giving Staff, Rollup Builder User | Everything Team Member gets (D3) |
+| **Fundraising Staff** (Giving) | `Fundraising_Staff` | BarnCRM Staff Access, Giving Staff, Rollup Builder User | Everything Team Member gets except Programs Staff (D3) |
 | **Read Only** | `Read_Only` | BarnCRM Read Only Access | Every module's Read Only set except Giving's |
 
 **D1: Coordinator is retired.** Its holders become Team Members and keep Volunteers
@@ -163,7 +164,7 @@ roles 5 to 4, Access page extra permissions 15 to 13, "give it together with" pa
 | `Program_Staff` (Team Member) | core | Unchanged |
 | `Volunteer_Coordinator` (Coordinator) | core | **Retired**: holders get Team Member; Volunteers Coordinator stays assigned (D1) |
 | `Read_Only` | core | Unchanged |
-| `Fundraising_Staff` | giving | Unchanged group; gains the module staff sets Team Member gets (D3) |
+| `Fundraising_Staff` | giving | Unchanged group; gains the module staff sets Team Member gets, except Programs Staff (D3) |
 | `BarnCRM_Admin` | core | Same set, label BarnCRM Admin Access; gains `BulkUpdateController` |
 | `BarnCRM_Staff` | core | Same set, label BarnCRM Staff Access |
 | `BarnCRM_Read_Only` | core | Same set, label BarnCRM Read Only Access |
@@ -179,7 +180,7 @@ roles 5 to 4, Access page extra permissions 15 to 13, "give it together with" pa
 | `BarnCRM_Access_Manager` | core | Unchanged |
 | `Giving_Admin` | giving | Unchanged; also given to BarnCRM Admin holders by a new `GivingAccessSync` (D2) |
 | `Giving_Staff`, `Giving_Read_Only` | giving | Unchanged |
-| `Events_*`, `Forms_Admin`, `Forms_Staff`, `Forms_Read_Only`, `Funders_*`, `Logic_Models_*`, `Programs_*` (15) | modules | Unchanged sets; Staff sets also follow Fundraising Staff (D3) |
+| `Events_*`, `Forms_Admin`, `Forms_Staff`, `Forms_Read_Only`, `Funders_*`, `Logic_Models_*`, `Programs_*` (15) | modules | Unchanged sets; Staff sets also follow Fundraising Staff (D3), except Programs Staff, which stays per person for fundraisers |
 | `Volunteers_Admin`, `Volunteers_Staff`, `Volunteers_Read_Only` | volunteers | Unchanged; Staff also follows Fundraising Staff (D3) |
 | `Volunteers_Coordinator` | volunteers | Unchanged set; now an extra permission, no longer tied to a role (D1) |
 | `Rollup_Builder_Admin` | rollups | Unchanged |
@@ -223,21 +224,23 @@ everything it granted, and every holder receives the successor before the old as
 removed (Migration, below). Team Member grants exactly what Coordinator granted in Core and in
 five modules; the sixth (Volunteers) keeps its Coordinator set as a direct assignment.
 
-These change what some people can do **more**, so each is Brandon's call:
+These change what some people can do **more**, so each was Brandon's call (decided 2026-11-09,
+plan D-191):
 
 | Id | Expansion | Who gains what |
 |---|---|---|
 | D1 | Retire Coordinator | Former Coordinators also get Volunteers Staff (a subset of what they hold): nothing new |
 | D2 | Giving Admin follows BarnCRM Admin | Every BarnCRM Admin gets Giving Admin (gifts, funds, appeals, receipts; still no View All on gifts) |
-| D3 | Fundraising Staff gets Team Member's module sets | Fundraisers get Forms, Programs (including case notes), Logic Models and Volunteers staff sets |
+| D3 (modified) | Fundraising Staff gets Team Member's module sets except Programs | Fundraisers get Forms, Logic Models and Volunteers staff sets (Events and Funders they already had); Programs Staff, and with it case notes, stays assigned per person |
 | D4 | Mirror merges | A holder of one mirror set can open the other two pages and edit their external ID fields (each page still needs the standard object access from Setup to do anything); the flow user also gets the Inbound Gift REST class; a bookkeeper with no Giving set can read the gift fields the export already shows |
 | D5 | Bulk Update and Bulk Delete include Find and Export | A holder of either without Find and Export gets Find and Export |
 | Gap fix | `BulkUpdateController` in BarnCRM Admin | Restores what BarnCRM Admin already claims to give |
 
-D1, D4 and D5 are recommended. D2 and D3 are recommended for consistency (every module's
-Admin set follows BarnCRM Admin; Fundraising Staff reads as "Team Member plus giving"), but they
-widen access to donor records (D2) and case notes (D3), so they are presented separately and
-can be declined without affecting the rest.
+Outcome (Brandon, 2026-11-09, "Whatever you recommend", plan D-191): D1, D2, D4, D5 and the
+gap fix are approved as proposed. D3 is approved as modified: Fundraising Staff gets every
+module staff set Team Member gets except Programs Staff, so case notes do not widen to
+fundraisers; a fundraiser who works a program is given Programs Staff per person on the Access
+page, as today.
 
 ## Migration (expand, then contract)
 
@@ -261,8 +264,12 @@ Two releases, at least one deployed release apart, so no person is ever without 
    every holder of either inbound set gets `Inbound_Gifts`. Mirror names only its own sets.
 6. **Giving** (D2): new `GivingAccessSync` (found by convention, ADR-0131) gives Giving Admin to
    holders of `BarnCRM_Admin`.
-7. Events, Forms, Funders, Logic Models and Programs syncs add Fundraising Staff to their Staff
-   lines (D3); Events and Funders already have it.
+7. Forms and Logic Models syncs add Fundraising Staff to their Staff lines (D3); Events and
+   Funders already have it; Programs does not add it (D3 as modified).
+8. Steps 3 and 5 carry over active holders only. An inactive holder, or any assignment
+   Salesforce refuses, is skipped and logged to the Error Log by name with the successor to
+   give on reactivation; the post-install never fails because of it. Whether Salesforce refuses
+   a set for an inactive user is still to be confirmed in a real org.
 
 **Release N+1 (contract).**
 
@@ -292,7 +299,7 @@ old sets after N+1.
 
 ## Effects
 
-- **Access syncs.** Six syncs change one line each (D3) in N and drop Coordinator in N+1; one
+- **Access syncs.** Three syncs (Forms, Logic Models, Volunteers) change one line each (D3) in N and drop Coordinator in N+1; one
   new `GivingAccessSync` (D2). `ModuleAccessSyncBase` and `TabAccessService` are unchanged
   apart from Core's one-time group step.
 - **Tab Access Check.** AUDIENCE is unchanged: Bulk Update and Bulk Delete holders already see
@@ -329,7 +336,7 @@ Each PR under about 800 changed lines, built after the current landing batch mer
 | PR | Release | Scope | Est. files | Est. lines |
 |---|---|---|---|---|
 | 1 Core | N | Relabels (14 sets, 1 group, 2 descriptions); Bulk Update and Bulk Delete include Find and Export; Admin gets `BulkUpdateController`; Access page drops Coordinator; group migration step plus test; Health Check retired list; access, setup assistant, automatic access guides; feature catalog; overview | 30 | 650 |
-| 2 Modules | N | Volunteers Access Add-On row and label; D3 lines in five syncs plus tests; `GivingAccessSync` plus test (D2); Rollup Builder relabel; volunteers and giving guide lines | 22 | 500 |
+| 2 Modules | N | Volunteers Access Add-On row and label; D3 lines in three syncs plus tests; `GivingAccessSync` plus test (D2); Rollup Builder relabel; volunteers and giving guide lines | 22 | 500 |
 | 3 Mirror | N | Two new sets; Accounting Export reads; Access Add-On rows swapped; migration step in `MirrorPostInstall` plus test; shipped-sets list; Mirror README; testing guide | 24 | 650 |
 | 4 Contract | N+1 | Remove-old steps in Core and Mirror plus tests; drop Coordinator from six syncs, Health Check and tests; delete five sets and one group; release notes destructive step | 35 | 700 (mostly deletions) |
 
@@ -366,7 +373,7 @@ lines. Release slots: PRs 1 to 3 in the next open release's batch, PR 4 in the b
 - Admins choose from four roles and thirteen self-sufficient extra permissions; module sets
   follow the roles the same way in every module.
 - ADR-0123's Coordinator label, ADR-0127 decision 3's Coordinator line and ADR-0131's
-  Coordinator examples become history once D1 is approved; ADR-0132 decision 4 gains
+  Coordinator examples become history (D1 approved); ADR-0132 decision 4 gains
   Volunteers Coordinator as a per-person set and Giving Admin as both automatic and per person.
 - Plan Section 5 C-06 and the Access page user stories name four roles.
 - If any of D1 to D5 is declined, the rest still stands; the mapping row for a declined item
