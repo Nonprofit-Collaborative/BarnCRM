@@ -145,14 +145,6 @@
         <value>See Every Row</value>
     </labels>
     <labels>
-        <fullName>Core_Import_CardTitle</fullName>
-        <categories>Import</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Import page: card heading</shortDescription>
-        <value>Super Importer</value>
-    </labels>
-    <labels>
         <fullName>Core_Import_StepTemplate</fullName>
         <categories>Import</categories>
         <language>en_US</language>

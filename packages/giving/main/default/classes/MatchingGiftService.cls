@@ -21,8 +21,8 @@
  * Where Employer is blank the link is accepted without complaint. Filling it in is what turns a
  * silent mistake into a message.
  *
- * There are two ways in and they enforce the same rules: `link` and `unlink`, called by an action
- * with two record ids, and `applyLinkChanges`, called by the gift trigger when someone edits the
+ * There are two ways in and they enforce the same rules: `link` and `unlink`, which take two
+ * record ids (no screen calls them today; the rule tests do), and `applyLinkChanges`, called by the gift trigger when someone edits the
  * Matched Gift field on the record page.
  *
  * A refund of the employer's gift reverses that credit rather than removing it (ADR-0031). The

@@ -74,19 +74,12 @@ public with sharing class FormSubmitService {
 	}
 
 	/**
-	 * Submits answers to a form's published version.
+	 * Submits answers to a form's published version, with the files for the form's file
+	 * questions (C-42c, R-FS7).
 	 *
 	 * @param formId the form
 	 * @param answers the answers by field key, as the page sends them
 	 * @param contextRecordId the record the form was filled from, or null
-	 */
-	public static Result submit(Id formId, Map<String, Object> answers, Id contextRecordId) {
-		return submit(formId, answers, contextRecordId, null);
-	}
-
-	/**
-	 * Submits answers with the files for the form's file questions (C-42c, R-FS7).
-	 *
 	 * @param files `{ key: { name, data } }`, data in base64, or null
 	 */
 	public static Result submit(

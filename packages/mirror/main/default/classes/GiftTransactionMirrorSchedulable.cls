@@ -46,7 +46,7 @@ public with sharing class GiftTransactionMirrorSchedulable implements Schedulabl
 	public static NightlyStep step() {
 		return new NightlyStep(
 				JOB_NAME,
-				System.Label.Mirror_NightlyJob_GiftTransactionMirrorName,
+				System.Label.Mirror_GiftTransactionMirror_Title,
 				1,
 				35,
 				new GiftTransactionMirrorSchedulable()

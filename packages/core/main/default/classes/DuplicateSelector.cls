@@ -138,18 +138,8 @@ public with sharing class DuplicateSelector {
 	}
 
 	/**
-	 * The suggestions waiting to be looked at, newest first, with their records. A set written
-	 * when somebody saved past an alert and a set written by the scan are the same thing to the
-	 * person reviewing them. Sets for other objects (leads) and sets a merge has emptied down to
-	 * one record are left out.
-	 */
-	public static List<DuplicateRecordSet> openSets(Integer max) {
-		return openSetsAfter(max, null);
-	}
-
-	/**
 	 * How many suggestions are waiting, counting at most `upTo` (the weekly digest's number; a
-	 * count spends a query row per record, so it stops). Same filter as `openSets`.
+	 * count spends a query row per record, so it stops). Same filter as `openSetsAfter`.
 	 */
 	public static Integer openSetCount(Integer upTo) {
 		// Reviewing duplicates is its own permission set: whoever lacks it is told nothing.

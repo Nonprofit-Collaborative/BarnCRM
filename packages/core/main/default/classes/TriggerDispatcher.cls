@@ -95,13 +95,6 @@ public with sharing class TriggerDispatcher {
 			this.oldRecordsById = oldRecordsById;
 		}
 
-		@NamespaceAccessible
-		public Boolean isBefore() {
-			return operation == System.TriggerOperation.BEFORE_INSERT ||
-				operation == System.TriggerOperation.BEFORE_UPDATE ||
-				operation == System.TriggerOperation.BEFORE_DELETE;
-		}
-
 		/** The records a message goes on: the new ones, or the old ones of a delete. */
 		List<SObject> targets() {
 			List<SObject> records = newRecords == null ? oldRecords : newRecords;

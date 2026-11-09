@@ -120,7 +120,7 @@ private class ImportTemplateServiceTest {
 			changed.columns.add(new ImportMapping.Column('Phone', 'Contact1.Phone'));
 
 			Test.startTest();
-			ImportTemplateService.saveMapping(
+			ImportTestDataFactory.saveMapping(
 				template.Id,
 				changed.serialize(),
 				ImportTemplateService.RULE_NAME_POSTAL
@@ -156,7 +156,7 @@ private class ImportTemplateServiceTest {
 
 			Test.startTest();
 			try {
-				ImportTemplateService.saveMapping(
+				ImportTestDataFactory.saveMapping(
 					template.Id,
 					useless.serialize(),
 					ImportTemplateService.RULE_EMAIL
@@ -185,7 +185,7 @@ private class ImportTemplateServiceTest {
 
 			Test.startTest();
 			try {
-				ImportTemplateService.saveMapping(
+				ImportTestDataFactory.saveMapping(
 					templateId,
 					ImportTestDataFactory.donorMapping(),
 					ImportTemplateService.RULE_EMAIL
@@ -392,7 +392,7 @@ private class ImportTemplateServiceTest {
 			);
 
 			Test.startTest();
-			ImportTemplateService.savePaymentMatching(template.Id, 'match only', 3, 0.5);
+			ImportTestDataFactory.savePaymentMatching(template.Id, 'match only', 3, 0.5);
 			Import_Template__c saved = ImportTemplateSelector.selectById(template.Id);
 			List<String> refusals = new List<String>();
 			for (
@@ -403,7 +403,7 @@ private class ImportTemplateServiceTest {
 				}
 			) {
 				try {
-					ImportTemplateService.savePaymentMatching(
+					ImportTestDataFactory.savePaymentMatching(
 						template.Id,
 						(String) attempt[0],
 						(Integer) attempt[1],
@@ -413,7 +413,7 @@ private class ImportTemplateServiceTest {
 					refusals.add(e.getMessage());
 				}
 			}
-			ImportTemplateService.savePaymentMatching(template.Id, null, null, null);
+			ImportTestDataFactory.savePaymentMatching(template.Id, null, null, null);
 			Test.stopTest();
 
 			Assert.areEqual(

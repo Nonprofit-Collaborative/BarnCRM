@@ -153,14 +153,6 @@
         <value>Only the first {0} records, in its order, count.</value>
     </labels>
     <labels>
-        <fullName>Core_RollupEase_Or</fullName>
-        <categories>Rollups</categories>
-        <language>en_US</language>
-        <protected>false</protected>
-        <shortDescription>Rollup sentence: joins two ways the records reach the total.</shortDescription>
-        <value>or</value>
-    </labels>
-    <labels>
         <fullName>Core_RollupEase_LinkHousehold</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>

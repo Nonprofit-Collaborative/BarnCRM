@@ -133,10 +133,4 @@ public class RecognitionTestData {
 			ORDER BY Name
 		];
 	}
-
-	private static Id recordTypeId(String developerName) {
-		Schema.RecordTypeInfo info = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName()
-			.get(developerName);
-		return info == null || !info.isAvailable() ? null : info.getRecordTypeId();
-	}
 }

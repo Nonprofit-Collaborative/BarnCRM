@@ -128,6 +128,33 @@ public with sharing class NamespaceUtil {
 	}
 
 	/**
+	 * A module's class built by name for an extension seam, or null when it is not installed.
+	 * A class that does not implement `expected` or cannot be built is logged under `context` and
+	 * answered as null too, so the seam carries on as if the module were absent. The caller
+	 * casts the result to `expected`.
+	 */
+	@NamespaceAccessible
+	public static Object build(String className, Type expected, String context) {
+		Type found = resolveType(className);
+		if (found == null) {
+			return null;
+		}
+		if (!expected.isAssignableFrom(found)) {
+			ErrorLogger.log(
+				new System.TypeException(className + ' does not implement ' + expected.getName()),
+				context
+			);
+			return null;
+		}
+		try {
+			return found.newInstance();
+		} catch (Exception cannotBuild) {
+			ErrorLogger.log(cannotBuild, context);
+			return null;
+		}
+	}
+
+	/**
 	 * The key a page state parameter has to use. Lightning namespaces these too: a package
 	 * with no namespace uses the `c__` prefix, and a managed package uses its own.
 	 */

@@ -217,14 +217,6 @@
     <value>Paid Gift Transaction with no received gift visible to you</value>
   </labels>
   <labels>
-    <fullName>Mirror_NightlyJob_GiftTransactionMirrorName</fullName>
-    <categories>Mirror</categories>
-    <language>en_US</language>
-    <protected>true</protected>
-    <shortDescription>Nightly jobs list: Gift Transaction mirror</shortDescription>
-    <value>Gift Transaction Mirror</value>
-  </labels>
-  <labels>
     <fullName>Mirror_HealthCheck_GiftTransactionMirrorNotRunTitle</fullName>
     <categories>Mirror</categories>
     <language>en_US</language>

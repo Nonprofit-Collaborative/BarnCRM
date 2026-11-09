@@ -27,6 +27,7 @@ private class FormSubmissionControllerTest {
 					'last' => 'Zzpanel',
 					'email' => 'twins@example.org'
 				},
+				null,
 				null
 			);
 			FormSubmissionController.SubmissionView before = FormSubmissionController.getSubmission(

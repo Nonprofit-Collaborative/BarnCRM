@@ -221,25 +221,6 @@ public with sharing class StewardshipService {
 		return started;
 	}
 
-	/**
-	 * Closes a plan, as complete or as cancelled. Its tasks are left exactly as they are: the
-	 * package never deletes a task it created, and an open task on a cancelled plan is the
-	 * assignee's to close (R-SP8).
-	 */
-	public static void close(Id planId, String status) {
-		if (planId == null) {
-			return;
-		}
-		String resolved = STATUS_CANCELLED.equals(status) ? STATUS_CANCELLED : STATUS_COMPLETE;
-		StewardshipWriter.closePlan(
-			new Stewardship_Plan__c(
-				Id = planId,
-				Status__c = resolved,
-				Completed_Date__c = System.today()
-			)
-		);
-	}
-
 	/** The tasks one template's steps call for, dated from the day the plan starts (R-SP5). */
 	public static List<Task> tasksFor(
 		Stewardship_Plan_Template__c template,

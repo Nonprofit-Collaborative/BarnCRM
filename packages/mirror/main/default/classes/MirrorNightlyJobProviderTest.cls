@@ -32,7 +32,7 @@ private class MirrorNightlyJobProviderTest {
 			Assert.areEqual(2, steps.size(), 'The Opportunity and Gift Transaction mirrors.');
 			Assert.areEqual(90, steps[0].minute, '1:30');
 			Assert.areEqual(95, steps[1].minute, '1:35');
-			Assert.areEqual(System.Label.Mirror_NightlyJob_MirrorName, steps[0].label);
+			Assert.areEqual(System.Label.Mirror_OpportunityMirror_Title, steps[0].label);
 			Assert.isTrue(steps[0].switchDefault, 'Shipped on.');
 		}
 	}

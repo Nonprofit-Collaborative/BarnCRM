@@ -301,13 +301,13 @@ private class ImportDuplicateRuleMatchTest {
 				ImportTemplateService.MatchingChoices choices = new ImportTemplateService.MatchingChoices();
 				choices.useDuplicateRules = true;
 
-				ImportTemplateService.saveMatching(template.Id, choices);
+				ImportTestDataFactory.saveMatching(template.Id, choices);
 
 				Assert.isTrue(
 					ImportTemplateSelector.selectById(template.Id).Use_Duplicate_Rules__c
 				);
 				choices.useDuplicateRules = null;
-				ImportTemplateService.saveMatching(template.Id, choices);
+				ImportTestDataFactory.saveMatching(template.Id, choices);
 				Assert.isFalse(
 					ImportTemplateSelector.selectById(template.Id).Use_Duplicate_Rules__c
 				);

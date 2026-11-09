@@ -342,7 +342,7 @@ describe('the import wizard', () => {
 
     const shell = element.shadowRoot.querySelector('[data-id="shell"]');
     expect(shell.titleHidden).toBe(true);
-    expect(shell.title).toBe('c.Core_Import_CardTitle');
+    expect(shell.title).toBe('c.Core_DataJobs_KindImport');
     expect(element.shadowRoot.querySelector('lightning-card')).toBeNull();
   });
 

@@ -59,19 +59,10 @@ public with sharing class ImportTemplateService {
 	}
 
 	/**
-	 * Saves how a template matches people and organizations, and what happens when several
-	 * records match (R-IT2, R-IT8, R-IT9, R-IT16). A chosen field is stored as describe names it,
-	 * and one the object does not offer for matching is refused, saying which.
+	 * Sets how a template matches people and organizations, and what happens when several
+	 * records match (R-IT2, R-IT8, R-IT9, R-IT16), for `saveUpload`. A chosen field is stored as
+	 * describe names it, and one the object does not offer for matching is refused, saying which.
 	 */
-	@NamespaceAccessible
-	public static Import_Template__c saveMatching(Id templateId, MatchingChoices choices) {
-		Import_Template__c template = existing(templateId);
-		applyMatching(template, choices);
-		Database.update(template, AccessLevel.USER_MODE);
-		return template;
-	}
-
-	/** Sets a template's matching choices as `saveMatching` saves them, without saving. */
 	private static void applyMatching(Import_Template__c template, MatchingChoices choices) {
 		MatchingChoices given = choices == null ? new MatchingChoices() : choices;
 		template.Matching_Rule__c = normalizedRule(given.personRule);
@@ -251,21 +242,12 @@ public with sharing class ImportTemplateService {
 	}
 
 	/**
-	 * Saves what a one-object template does with each row (R-IT12, R-IT13, R-IT9): the
-	 * operation, the field an upsert or an update by a matching field finds records by, what a
-	 * row whose lookup finds no record does, and what a row matching several does. People and
-	 * organizations keep one of the two updates. A match field the object does not offer is
-	 * refused, naming it.
+	 * Sets what a one-object template does with each row (R-IT12, R-IT13, R-IT9), for
+	 * `saveUpload`: the operation, the field an upsert or an update by a matching field finds
+	 * records by, what a row whose lookup finds no record does, and what a row matching several
+	 * does. People and organizations keep one of the two updates. A match field the object does
+	 * not offer is refused, naming it.
 	 */
-	@NamespaceAccessible
-	public static Import_Template__c saveLoad(Id templateId, LoadChoices choices) {
-		Import_Template__c template = existing(templateId);
-		applyLoad(template, choices);
-		Database.update(template, AccessLevel.USER_MODE);
-		return template;
-	}
-
-	/** Sets a one-object template's load choices as `saveLoad` saves them, without saving. */
 	private static void applyLoad(Import_Template__c template, LoadChoices choices) {
 		LoadChoices given = choices == null ? new LoadChoices() : choices;
 		Schema.SObjectType type = ImportObjectSchema.typeOf(template);
@@ -731,22 +713,9 @@ public with sharing class ImportTemplateService {
 	}
 
 	/**
-	 * Saves the mapping the administrator built in the picker back onto its template, so the
-	 * same file next month needs no work. The mapping is validated before it is stored.
+	 * Sets the mapping the administrator built in the picker on its template, for `saveUpload`,
+	 * so the same file next month needs no work. The mapping is validated before it is set.
 	 */
-	@NamespaceAccessible
-	public static Import_Template__c saveMapping(
-		Id templateId,
-		String mappingDocument,
-		String matchingRule
-	) {
-		Import_Template__c template = existing(templateId);
-		applyMapping(template, mappingDocument, matchingRule);
-		Database.update(template, AccessLevel.USER_MODE);
-		return template;
-	}
-
-	/** Sets a template's mapping as `saveMapping` saves it, refusing as it does, without saving. */
 	private static void applyMapping(
 		Import_Template__c template,
 		String mappingDocument,
@@ -785,24 +754,11 @@ public with sharing class ImportTemplateService {
 	};
 
 	/**
-	 * Saves how this template's gifts are matched to scheduled payments (R-IT7). Core only
-	 * holds the values: an empty one means the default, and the Giving module reads them. A
-	 * behaviour Core does not know, a negative window or a negative tolerance is refused.
+	 * Sets how this template's gifts are matched to scheduled payments (R-IT7), for
+	 * `saveUpload`. Core only holds the values: an empty one means the default, and the Giving
+	 * module reads them. A behaviour Core does not know, a negative window or a negative
+	 * tolerance is refused.
 	 */
-	@NamespaceAccessible
-	public static Import_Template__c savePaymentMatching(
-		Id templateId,
-		String behaviour,
-		Integer windowDays,
-		Decimal tolerance
-	) {
-		Import_Template__c template = existing(templateId);
-		applyPaymentMatching(template, behaviour, windowDays, tolerance);
-		Database.update(template, AccessLevel.USER_MODE);
-		return template;
-	}
-
-	/** Sets a template's payment matching as `savePaymentMatching` saves it, without saving. */
 	private static void applyPaymentMatching(
 		Import_Template__c template,
 		String behaviour,

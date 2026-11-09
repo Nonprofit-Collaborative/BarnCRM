@@ -42,24 +42,10 @@ public with sharing class SetupAssistantExtensions {
 
 	@TestVisible
 	private static SetupAssistantExtension resolve(String className) {
-		Type extensionType = NamespaceUtil.resolveType(className);
-		if (extensionType == null) {
-			return null;
-		}
-		Object candidate;
-		try {
-			candidate = extensionType.newInstance();
-		} catch (Exception cannotBuild) {
-			ErrorLogger.log(cannotBuild, 'SetupAssistantExtensions.resolve');
-			return null;
-		}
-		if (candidate instanceof SetupAssistantExtension) {
-			return (SetupAssistantExtension) candidate;
-		}
-		ErrorLogger.log(
-			new System.TypeException(className + ' does not implement SetupAssistantExtension'),
+		return (SetupAssistantExtension) NamespaceUtil.build(
+			className,
+			SetupAssistantExtension.class,
 			'SetupAssistantExtensions.resolve'
 		);
-		return null;
 	}
 }

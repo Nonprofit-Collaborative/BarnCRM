@@ -2018,6 +2018,7 @@ public with sharing class HouseholdService {
 	 * names, greetings, and the empty household tidied away when the org asks for that.
 	 * R-H12.
 	 */
+	// Module API documented in packages/core/integration/c-09.permissions.md; no Core caller.
 	@NamespaceAccessible
 	public static void moveContact(Id contactId, Id targetHouseholdId) {
 		moveContact(contactId, targetHouseholdId, null);
@@ -2128,6 +2129,7 @@ public with sharing class HouseholdService {
 	 * fifty people settles once rather than fifty times. `moveContact` is that caller for a
 	 * single move. R-H12.
 	 */
+	// Module API documented in packages/core/integration/c-09.permissions.md; no Core caller.
 	@NamespaceAccessible
 	public static Set<Id> moveMembers(Set<Id> personIds, Id targetHouseholdId) {
 		return moveMembers(personIds, targetHouseholdId, null);
@@ -2934,6 +2936,7 @@ public with sharing class HouseholdService {
 	 * through `HouseholdDependentsExtensions` because Core may not know what those records
 	 * are (ADR-0070 `0070-empty-household-tidy-up-keeps-households-with-gifts.md`).
 	 */
+	// Module API named in ADR-0036, ADR-0070 and c-09.permissions.md; Core uses the private form.
 	@NamespaceAccessible
 	public static void deleteEmptyHouseholds(Set<Id> householdIds) {
 		if (householdIds == null || householdIds.isEmpty()) {

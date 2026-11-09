@@ -48,6 +48,7 @@ public with sharing class RollupEngine {
 	 * @param parentIds the target records; ids of another entity are ignored
 	 * @param targetType the entity they belong to
 	 */
+	// Module API named in ADR-0099; Rollups and Giving tests recalculate through it.
 	@NamespaceAccessible
 	public static Result recalculate(Set<Id> parentIds, Schema.SObjectType targetType) {
 		if (targetType == null || parentIds == null || parentIds.isEmpty()) {

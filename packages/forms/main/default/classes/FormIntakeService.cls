@@ -162,16 +162,6 @@ public without sharing class FormIntakeService {
 		return view;
 	}
 
-	/** Stores the answers with no files (C-42b callers). */
-	public static Receipt submit(
-		String ticket,
-		Map<String, Object> answers,
-		String trap,
-		String contextRecordId
-	) {
-		return submit(ticket, answers, trap, contextRecordId, null, null);
-	}
-
 	/**
 	 * Stores the answers and their files after the spam checks and the answer checks (R-FS5,
 	 * R-FS7), in that order, and forgets the saved answers they finish.
