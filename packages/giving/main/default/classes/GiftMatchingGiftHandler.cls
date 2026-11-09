@@ -20,19 +20,6 @@ public with sharing class GiftMatchingGiftHandler extends TriggerHandler {
 		return;
 	}
 
-	/**
-	 * A gift whose Matched Gift is itself is refused before the save, in the service's words:
-	 * the platform would refuse it anyway, but only as a "Hierarchy Constraint Violation". A new
-	 * gift has no id yet, so only an edit can name itself.
-	 */
-	public override void beforeUpdate() {
-		for (Gift__c gift : asGifts(newRecords())) {
-			if (gift.Matched_Gift__c != null && gift.Matched_Gift__c == gift.Id) {
-				gift.addError(Label.Giving_MatchingGift_SameGift);
-			}
-		}
-	}
-
 	public override void afterInsert() {
 		List<Gift__c> gifts = asGifts(newRecords());
 		MatchingGiftService.applyLinkChanges(gifts, new Map<Id, Gift__c>());

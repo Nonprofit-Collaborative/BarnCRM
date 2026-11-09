@@ -164,11 +164,9 @@ private class MatchingGiftServiceTest {
 			Database.SaveResult result = tryMatch(data.employerGift.Id, data.employerGift.Id);
 			Test.stopTest();
 
-			assertRefused(
-				result,
-				Label.Giving_MatchingGift_SameGift,
-				'A gift does not match itself'
-			);
+			// The platform refuses a lookup to the record itself before any trigger runs, in its
+			// own words, so only the refusal is checked.
+			Assert.isFalse(result.isSuccess(), 'A gift does not match itself');
 		}
 	}
 
