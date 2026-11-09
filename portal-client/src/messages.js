@@ -26,6 +26,8 @@ export const MESSAGES = {
   cancel: 'Cancel',
   edit: 'Edit',
   saved: 'Saved.',
+  yes: 'Yes',
+  no: 'No',
   nothingHere: 'Nothing to show here yet.',
   loading: 'Loading...',
   greeting: 'Hello, {0}',

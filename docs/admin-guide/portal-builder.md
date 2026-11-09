@@ -96,8 +96,10 @@ licenses (where your organization has them) may be simpler than a portal.
    `barncrm-portal.zip` it makes in Plugins, Add New, Upload Plugin, activate **BarnCRM
    Portal**, and in Settings, BarnCRM Portal enter your Salesforce domain, the Consumer Key and
    Consumer Secret (kept on the server, never sent to visitors). Put the shortcode
-   `[barncrm_portal key="volunteers"]` on a page. The website must use HTTPS. For any other
-   website, the `portal-client/README.md` explains the small server piece you need.
+   `[barncrm_portal key="volunteers"]` on a page. The website must use HTTPS. The plugin's
+   small stylesheet puts one field per line and fits a phone, in your theme's own fonts and
+   colors. For any other website, the `portal-client/README.md` explains the small server
+   piece you need.
 8. **Add a portal.** In the **BarnCRM Admin** (or **BarnCRM Admin Console**) app, where Portal
    Builder's **Portals** and **Portal Accesses** tabs sit before **Error Log** (it has no app of
    its own, D-188), Portals, New: a name people see, a

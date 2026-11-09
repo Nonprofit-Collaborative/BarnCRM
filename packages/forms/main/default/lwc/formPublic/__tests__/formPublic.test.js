@@ -211,4 +211,14 @@ describe('c-form-public', () => {
     expect(find(element, '[data-id="closed"]')).not.toBeNull();
     expect(find(element, '[data-id="title"]')).toBeNull();
   });
+
+  it('is the page with an h1 on its own, and a section with an h3 inside a public page', async () => {
+    getForm.mockResolvedValue(FORM);
+    const alone = await render({ formId: FORM.formId });
+    expect(find(alone, '[data-id="title"]').tagName).toBe('H1');
+    expect(find(alone, 'main')).toBeNull();
+
+    const inside = await render({ formId: FORM.formId, embedded: true });
+    expect(find(inside, '[data-id="title"]').tagName).toBe('H3');
+  });
 });

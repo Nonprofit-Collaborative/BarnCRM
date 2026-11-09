@@ -461,6 +461,6 @@ a Confirmed speaker and an Invited one, and the form's record ID in **Registrati
 | 7 | Open `<site address>/FormsPublic?list=events`. | **Upcoming Events** lists the event, linked to its page. |
 | 8 | Set **Registration Closes** to yesterday; reload the event page. | `Registration for this event is closed.`; no form. Set the event to **Draft**: the page is unavailable and the list no longer shows it. |
 | 9 | As the integration user (see Forms, Integrations and Portals), GET `/services/apexrest/barncrm/forms/v1/pages/<event ID>` with the event Open again. | The same page as JSON, with `formId`; no online link, codes or attendee data. |
-| 10 | In an org with Event Management and no Forms, tick **Public Page** on an Open event and run **Health Check**. | Warning `Public event pages need BarnCRM Forms`. Events, tickets and registrations work as before. |
+| 10 | In an org with Event Management and no Forms, tick **Public Page** on an Open event and run **Health Check**. | Warning **Public Event Pages Need BarnCRM Forms**. Events, tickets and registrations work as before. |
 
 **Cleanup:** delete Robin Zzpage's registration and contact; untick **Public Page**.

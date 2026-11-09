@@ -1,6 +1,6 @@
 <template>
   <template lwc:if={helpReady}>
-    <main class="slds-container_large slds-container_center slds-var-p-around_medium">
+    <div class={containerClass}>
       <template lwc:if={loading}>
         <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
       </template>
@@ -10,7 +10,12 @@
         </div>
       </template>
       <template lwc:if={form}>
-        <h1 class="slds-text-heading_large slds-var-m-bottom_small" data-id="title">{title}</h1>
+        <template lwc:if={embedded}>
+          <h3 class="slds-text-heading_medium slds-var-m-bottom_small" data-id="title">{title}</h3>
+        </template>
+        <template lwc:else>
+          <h1 class="slds-text-heading_large slds-var-m-bottom_small" data-id="title">{title}</h1>
+        </template>
         <template lwc:if={description}>
           <p class="slds-var-m-bottom_medium">{description}</p>
         </template>
@@ -89,7 +94,7 @@
                 </template>
               </template>
               <template lwc:if={question.error}>
-                <div class="slds-text-color_error" data-id="answer-problem">{question.error}</div>
+                <div class="slds-text-color_error" role="alert" data-id="answer-problem">{question.error}</div>
               </template>
             </div>
           </template>
@@ -118,7 +123,7 @@
                 onchange={handleSaveEmail}
               ></lightning-input>
               <template lwc:if={saveProblem}>
-                <div class="slds-text-color_error" data-id="save-problem">{saveProblem}</div>
+                <div class="slds-text-color_error" role="alert" data-id="save-problem">{saveProblem}</div>
               </template>
               <lightning-button
                 class="slds-var-m-top_x-small"
@@ -164,6 +169,6 @@
           <c-barn-notice variant={resultVariant} message={resultMessage}></c-barn-notice>
         </div>
       </template>
-    </main>
+    </div>
   </template>
 </template>

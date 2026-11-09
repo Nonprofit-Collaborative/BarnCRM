@@ -32,6 +32,8 @@ export default class FormPublic extends LightningElement {
   @api recordId;
   /** The emailed token of saved answers (the page's `resume` parameter). */
   @api resumeToken;
+  /** True inside a module's public page (`c/formPublicPage`), which has the page's own heading. */
+  @api embedded = false;
 
   helpReady = isHelpLoaded(HELP);
   labels = LABELS;
@@ -94,6 +96,13 @@ export default class FormPublic extends LightningElement {
 
   get title() {
     return this.form ? this.form.name : '';
+  }
+
+  /** On its own the form is the page, centered with room around it; inside a page it is a section. */
+  get containerClass() {
+    return this.embedded
+      ? 'slds-is-relative'
+      : 'slds-is-relative slds-container_large slds-container_center slds-var-p-around_medium';
   }
 
   get description() {

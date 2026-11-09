@@ -42,12 +42,12 @@ function fill(template, value) {
   return template.replace('{0}', value);
 }
 
-function display(field, value) {
+function display(field, value, messages) {
   if (value === null || value === undefined || value === '') {
     return '';
   }
   if (field.type === 'boolean') {
-    return value ? 'Yes' : 'No';
+    return value ? (messages.yes ?? MESSAGES.yes) : (messages.no ?? MESSAGES.no);
   }
   const option = (field.options || []).find((o) => o.value === value);
   return option ? option.label : String(value);
@@ -101,12 +101,16 @@ function valuesOf(form, fields) {
 export function mountPortal(root, { api, messages = MESSAGES }) {
   const state = { challenge: null, menu: null, pageKey: null };
 
-  function show(...nodes) {
-    root.replaceChildren(...nodes);
-    const focusable = root.querySelector('input, select, textarea, button');
+  function focusFirst(container) {
+    const focusable = container.querySelector('input, select, textarea, button');
     if (focusable) {
       focusable.focus();
     }
+  }
+
+  function show(...nodes) {
+    root.replaceChildren(...nodes.filter(Boolean));
+    focusFirst(root);
   }
 
   function alertBox(text) {
@@ -252,7 +256,7 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
     const list = el('dl');
     page.fields.forEach((field) => {
       list.appendChild(el('dt', { text: field.label }));
-      list.appendChild(el('dd', { text: display(field, record.values[field.field]) }));
+      list.appendChild(el('dd', { text: display(field, record.values[field.field], messages) }));
     });
     const buttons = el('div', { class: 'barn-portal-actions' });
     if (page.canUpdate && page.fields.some((f) => f.edit)) {
@@ -260,8 +264,10 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
         el('button', {
           type: 'button',
           text: messages.edit,
-          onClick: () =>
-            card.replaceChildren(recordForm(page, record, alertSlot, () => openPage(page.key)))
+          onClick: () => {
+            card.replaceChildren(recordForm(page, record, alertSlot, () => openPage(page.key)));
+            focusFirst(card);
+          }
         })
       );
     }
@@ -274,7 +280,9 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
             api
               .action(page.key, record.id, action.name)
               .then((answer) =>
-                alertSlot.replaceChildren(alertBox(answer.message || messages.saved))
+                alertSlot.replaceChildren(
+                  el('p', { role: 'status', text: answer.message || messages.saved })
+                )
               )
               .catch((error) => failed(error, alertSlot))
         })
@@ -322,19 +330,26 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
             el('button', {
               type: 'button',
               text: messages.add,
-              onClick: () =>
-                body.replaceChildren(recordForm(page, null, alertSlot, () => openPage(key)))
+              onClick: () => {
+                body.replaceChildren(recordForm(page, null, alertSlot, () => openPage(key)));
+                focusFirst(body);
+              }
             })
           );
         }
+        const heading = el('h3', { tabindex: '-1', text: page.title || page.key });
         show(
           el('h2', { text: state.menu.title }),
-          el('p', { text: fill(messages.greeting, state.menu.firstName || '') }),
+          state.menu.firstName
+            ? el('p', { text: fill(messages.greeting, state.menu.firstName) })
+            : null,
           nav(),
-          el('h3', { text: page.title || page.key }),
+          heading,
           alertSlot,
           body
         );
+        // A new page starts at its heading, so a screen reader says which page opened.
+        heading.focus();
       })
       .catch((error) => failed(error, alertSlot));
   }

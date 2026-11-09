@@ -1,0 +1,5 @@
+/* The loading spinner covers this section only, not the whole record page. */
+:host {
+  display: block;
+  position: relative;
+}

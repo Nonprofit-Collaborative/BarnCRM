@@ -125,3 +125,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 6 | POST `page/save` on `gifts` with no record, or on a gift's Id. | 403 `not_allowed`. |
 
 **Cleanup:** restore Pat's phone and city.
+
+## T-PB-09: The Portal on a WordPress Page
+
+**Purpose:** confirm the portal is usable on a phone and with a keyboard or screen reader.
+**Prerequisites:** the WordPress plugin installed as the Admin Guide describes; the `sample` portal from T-PB-01 on a page with `[barncrm_portal key="sample"]`.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the page on a phone, or narrow the browser window to phone width. | Each label sits above its box; boxes fit the screen; no sideways scrolling. Fonts and colors match the theme. |
+| 2 | Sign in with the emailed code, using only the keyboard. | Each screen starts in its first box. After sign-in, focus is on the **My Details** heading. |
+| 3 | Choose **Edit**. | Focus moves to the first box of the edit form. |
+| 4 | Enter a wrong code on a fresh sign-in. | The message is read out as an alert and marked by a bar on its left. |
+
+**Cleanup:** sign out.
