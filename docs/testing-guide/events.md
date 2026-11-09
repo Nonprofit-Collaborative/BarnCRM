@@ -317,7 +317,7 @@ attendee. A phone or laptop camera and Chrome or Edge for step 6.
 | 5 | Click the QR button beside Sam. | A QR code appears under the title `QR code for Sam Lee`. Browser network tools show no request to any outside host. **Close** hides it. |
 | 6 | Click **Scan with Camera** and show Sam's QR code from another screen. | Sam is checked in and the camera stops. In a browser with no scan support the button is absent and a note explains. |
 | 7 | Copy a QR code's ID of an attendee of the second event into **Ticket code**, click **Check In by Code**. | Refused: no attendee on this event matches that code. Nobody changes. |
-| 8 | Type Sam's code, click **Check In by Code**. | A message that Sam is already checked in. |
+| 8 | Type Sam's code and press Enter (no click). | A message that Sam is already checked in, as with **Check In by Code**. |
 | 9 | **Add Walk-In**: Last Name `Door`, **Add and Check In**. | A new row `Door`, **Attended**, though the event is at capacity. Registrations shows source **Staff**. |
 | 10 | As read-only, open **Check-In**. | The list and QR buttons show; no **Check In** buttons, **Add Walk-In** or code box. |
 

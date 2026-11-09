@@ -237,6 +237,14 @@ export default class EventCheckIn extends LightningElement {
     this.code = event.detail.value || '';
   }
 
+  /** Enter checks the code in, so a handheld scanner that types the code and Enter just works. */
+  handleCodeKey(event) {
+    if (event.key === 'Enter' && this.code && !this.busy) {
+      event.preventDefault();
+      this.handleSubmitCode();
+    }
+  }
+
   async handleSubmitCode() {
     const text = this.code;
     this.code = '';

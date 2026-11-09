@@ -189,7 +189,8 @@ the page appear on **Registrations** with source **Form**, usually within 15 min
    In**. **Undo Check-In** takes it back.
 3. With a ticket's QR code: click **Scan with Camera** and hold the code to the camera (if you
    do not see the button, your browser cannot scan; type the code into **Ticket code** and click
-   **Check In by Code** instead).
+   **Check In by Code** instead). Pressing Enter in **Ticket code** checks the person in too, so
+   a handheld barcode scanner that types the code and Enter works without clicking.
 4. To give someone their QR code, click the QR button beside their name and show or print it.
 5. Someone arrives who is not on the list: **Add Walk-In**, type their name (and email if you
    have it), choose a ticket and click **Add and Check In**. Walk-ins can take the event past its
