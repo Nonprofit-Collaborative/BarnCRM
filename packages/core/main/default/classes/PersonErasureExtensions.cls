@@ -9,12 +9,17 @@
  */
 @NamespaceAccessible
 public with sharing class PersonErasureExtensions {
-	/** The class names dependent packages register, in the order they are asked. */
+	/**
+	 * The class names dependent packages register, in the order they are asked. Contact Point
+	 * Sync is last: its one address copy is made after every other module has changed its own
+	 * records (ADR-NEXT erasure start seam).
+	 */
 	@NamespaceAccessible
 	public static final List<String> EXTENSION_CLASSES = new List<String>{
 		'GivingPersonErasureExtension',
 		'VolunteersErasureExtension',
-		'ProgramsErasureExtension'
+		'ProgramsErasureExtension',
+		'ContactPointErasureExtension'
 	};
 
 	/** Injected by Core's tests, since no other package is there to resolve. */

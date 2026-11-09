@@ -374,6 +374,70 @@ public without sharing class ContactPointSyncService {
 		return result;
 	}
 
+	// ------------------------------------------------------- an erasure's address copies held
+
+	/**
+	 * The person being erased, by each id they go by (their own and, for a person account, the
+	 * contact behind it), to the id the erasure named. While held, the address and membership
+	 * handlers leave that one person out; everyone else in a household is synced as before.
+	 */
+	private static final Map<Id, Id> HELD = new Map<Id, Id>();
+	/** The erased people a handler left out: their address copies are made when the hold ends. */
+	private static final Set<Id> HELD_AND_DUE = new Set<Id>();
+	/** Set false by a test to erase as before the hold, and compare the two. */
+	@TestVisible
+	private static Boolean holdingForTest = true;
+
+	/** Holds the person's address copies until `releaseAddresses` (ADR-NEXT erasure start seam). */
+	public static void holdAddresses(Id personId) {
+		if (personId == null || !holdingForTest) {
+			return;
+		}
+		HELD.put(personId, personId);
+		for (Id contactId : contactsOnly(new Set<Id>{ personId })) {
+			HELD.put(contactId, personId);
+		}
+	}
+
+	/**
+	 * These people without any being held. A held person a handler would have synced is noted,
+	 * so their copies are made once when the hold ends, exactly where they would have been.
+	 */
+	public static Set<Id> withoutHeld(Set<Id> personIds) {
+		if (HELD.isEmpty() || personIds == null) {
+			return personIds;
+		}
+		Set<Id> result = new Set<Id>();
+		for (Id personId : personIds) {
+			if (HELD.containsKey(personId)) {
+				HELD_AND_DUE.add(HELD.get(personId));
+			} else {
+				result.add(personId);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Ends the hold on the person. With `sync`, makes their address copies once, when a handler
+	 * left them out while held; a run that failed releases without syncing, since it is rolled
+	 * back. Never throws.
+	 */
+	public static void releaseAddresses(Id personId, Boolean sync) {
+		if (personId == null) {
+			return;
+		}
+		Boolean due = HELD_AND_DUE.remove(personId);
+		for (Id heldId : new List<Id>(HELD.keySet())) {
+			if (HELD.get(heldId) == personId) {
+				HELD.remove(heldId);
+			}
+		}
+		if (sync && due) {
+			syncOrQueue(new Set<Id>{ personId }, new Set<String>{ ContactPointPlan.ADDRESS });
+		}
+	}
+
 	/**
 	 * Deletes the managed Contact Points of people about to be deleted (R-CPL4); their links go
 	 * with them. Every kind, switched on or not, so a deleted person leaves no copy behind.

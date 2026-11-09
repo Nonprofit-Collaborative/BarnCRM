@@ -86,6 +86,10 @@ public with sharing class ContactPointAddressHandler extends TriggerHandler {
 				people.addAll(members);
 			}
 		}
-		ContactPointSyncService.syncOrQueue(people, ADDRESS_ONLY);
+		// A person being erased is synced once when the erasure ends (ADR-NEXT erasure start seam).
+		ContactPointSyncService.syncOrQueue(
+			ContactPointSyncService.withoutHeld(people),
+			ADDRESS_ONLY
+		);
 	}
 }
