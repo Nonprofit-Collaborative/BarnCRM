@@ -204,7 +204,12 @@ address, and gets a link that opens the form with their answers filled in, on th
 of the form, until it expires or they send it. Files are not saved: they choose them again.
 BarnCRM keeps the answers in a **Form Draft** but not the email address, and stores only a
 scrambled copy of the link's code, so nobody can open a draft without the email. Saved drafts
-count toward **Sends Per Hour**, and public form processing deletes expired ones. Save and
+count toward **Sends Per Hour**, and public form processing deletes expired ones. So the form
+cannot be used to flood an inbox or use up your org's daily email allowance, it sends at most
+3 links an hour to one email address and at most 100 links an hour in all (or the form's
+**Sends Per Hour**, if lower); past either, the person is told to try again later and no
+email goes out. To tell addresses apart BarnCRM keeps only a scrambled key of each, never the
+address. Save and
 Finish Later is not offered on a form opened from a record (such as an event's registration).
 
 ### Integrations and Portals

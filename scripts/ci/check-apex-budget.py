@@ -86,7 +86,9 @@ CAPS = {
     # Batch C wave 2 landing: 82,322 measured (C-42b, C-42c), plus about 2%.
     # Batch C wave 3 landing: 88,379 measured (FormsCatalogExtension EV-18, public event pages in
     # the intake, controller and REST EV-16), plus about 2%.
-    "forms": 90_100,
+    # Batch C review: 91,118 measured (save-for-later caps per address and per form, REST
+    # failures logged and answered Failed), plus about 2%.
+    "forms": 93_000,
     # New 2026-11-06 for Contact Point Sync (C-45, ADR-0176 contact point sync module):
     # 43,980 measured with the page and backfill, plus about 2 percent.
     # C-45e (D-186): 45,798 measured with person accounts and household-move sync, plus about 2%.
@@ -110,7 +112,9 @@ CAPS = {
     # Batch C wave 2 landing: 49,670 measured (PB-01 builder and client), plus about 2%.
     # Batch C wave 3 landing: 50,774 measured (PB-03, PB-07, PB-08 templates: the read-only
     # person link through one parent for the speaker's sessions), plus about 2%.
-    "portal": 51_800,
+    # Batch C review: 53,465 measured (one answer for every wrong code, authenticator codes used
+    # once, where values typed at parse time), plus about 2%.
+    "portal": 54_600,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

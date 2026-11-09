@@ -14,6 +14,9 @@ public with sharing class PortalTemplate {
 	public static final String KIND_PERSON = 'person';
 	public static final String KIND_RELATED = 'related';
 	public static final String KIND_CATALOG = 'catalog';
+	/** Where values read when the page is queried: today's date (midnight), and now. */
+	public static final String TODAY = 'TODAY';
+	public static final String NOW = 'NOW';
 	private static final Integer MAX_PAGES = 20;
 	private static final Integer MAX_FIELDS = 40;
 	private static final Integer MAX_ROWS = 200;
@@ -94,7 +97,9 @@ public with sharing class PortalTemplate {
 	public class Condition {
 		public String field;
 		public String op;
+		/** Typed for the field at parse time, or the word TODAY or NOW, read when queried. */
 		public Object value;
+		public Schema.DisplayType fieldType;
 	}
 
 	/** Parses and checks a template, or throws TemplateException saying what is wrong. */
@@ -315,7 +320,10 @@ public with sharing class PortalTemplate {
 		if (condition.field == null || !fieldMap.containsKey(condition.field.toLowerCase())) {
 			throw new TemplateException(at + 'a where test names no field of the object');
 		}
-		condition.field = fieldMap.get(condition.field.toLowerCase()).getDescribe().getName();
+		Schema.DescribeFieldResult described = fieldMap.get(condition.field.toLowerCase())
+			.getDescribe();
+		condition.field = described.getName();
+		condition.fieldType = described.getType();
 		if (!OPS.contains(condition.op)) {
 			throw new TemplateException(at + 'where op ' + condition.op + ' is not known');
 		}
@@ -332,7 +340,64 @@ public with sharing class PortalTemplate {
 				at + 'a where value must be text, a number or true or false'
 			);
 		}
+		if (value != null && condition.op != 'isBlank' && condition.op != 'isNotBlank') {
+			try {
+				condition.value = typed(condition.fieldType, value);
+			} catch (Exception unfit) {
+				throw new TemplateException(
+					at +
+						'the where value ' +
+						value +
+						' does not fit ' +
+						condition.field +
+						' (' +
+						String.valueOf(condition.fieldType).toLowerCase() +
+						')'
+				);
+			}
+		}
 		return condition;
+	}
+
+	/**
+	 * A where value as the field's type, so the query never fails on it. TODAY and NOW stay words
+	 * for a date or date and time field, read when the page is queried.
+	 */
+	@TestVisible
+	private static Object typed(Schema.DisplayType fieldType, Object value) {
+		String text = String.valueOf(value).trim();
+		Boolean word = text.equals(TODAY) || text.equals(NOW);
+		switch on fieldType {
+			when DATE, DATETIME {
+				if (word) {
+					return text;
+				}
+				if (!(value instanceof String)) {
+					throw new TemplateException('Not a date');
+				}
+				return fieldType == Schema.DisplayType.DATE
+					? (Object) Date.valueOf(text)
+					: (Object) JSON.deserialize('"' + text + '"', Datetime.class);
+			}
+			when INTEGER {
+				return Integer.valueOf(text);
+			}
+			when DOUBLE, CURRENCY, PERCENT, LONG {
+				return Decimal.valueOf(text);
+			}
+			when BOOLEAN {
+				if (!text.equalsIgnoreCase('true') && !text.equalsIgnoreCase('false')) {
+					throw new TemplateException('Not true or false');
+				}
+				return text.equalsIgnoreCase('true');
+			}
+			when else {
+				if (word) {
+					throw new TemplateException('TODAY and NOW are for dates');
+				}
+				return text;
+			}
+		}
 	}
 
 	private static void parseOrder(

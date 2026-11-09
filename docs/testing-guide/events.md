@@ -459,8 +459,11 @@ a Confirmed speaker and an Invited one, and the form's record ID in **Registrati
 | 5 | Fill in the form as `Robin Zzpage`, ticket `General`, and send. | The form's confirmation shows. Within 15 minutes (or after **Process Again** on the Received submission), **Registrations** shows Robin with source **Form**, ticket General, amount owed 25. |
 | 6 | Reload the page. | General shows `Seats left: 1`. |
 | 7 | Open `<site address>/FormsPublic?list=events`. | **Upcoming Events** lists the event, linked to its page. |
-| 8 | Set **Registration Closes** to yesterday; reload the event page. | `Registration for this event is closed.`; no form. Set the event to **Draft**: the page is unavailable and the list no longer shows it. |
-| 9 | As the integration user (see Forms, Integrations and Portals), GET `/services/apexrest/barncrm/forms/v1/pages/<event ID>` with the event Open again. | The same page as JSON, with `formId`; no online link, codes or attendee data. |
-| 10 | In an org with Event Management and no Forms, tick **Public Page** on an Open event and run **Health Check**. | Warning `Public event pages need BarnCRM Forms`. Events, tickets and registrations work as before. |
+| 7a | Set Student's **Sales End** to yesterday. Fill in the form as `Lee Zzpage`, ticket `Student`, send and process. | The submission is **Needs Review**, its message ending `The ticket type Student is not on sale now, so a form cannot register people for it.`; Lee is not registered. Clear Sales End. |
+| 8 | Open the event page in a second private window and leave it open. Set **Registration Closes** to yesterday; reload the first window. | `Registration for this event is closed.`; no form. |
+| 9 | In the second window, fill in the form as `Kim Zzpage` and send; process it. | The submission is **Needs Review**, its message ending `Registration for this event is closed.`; Kim is not registered. Set the event to **Draft**: the page is unavailable and the list no longer shows it. |
+| 10 | As the integration user (see Forms, Integrations and Portals), GET `/services/apexrest/barncrm/forms/v1/pages/<event ID>` with the event Open again. | The same page as JSON, with `formId`; no online link, codes or attendee data. |
+| 11 | In an org with Event Management and no Forms, tick **Public Page** on an Open event and run **Health Check**. | Warning `Public event pages need BarnCRM Forms`. Events, tickets and registrations work as before. |
 
-**Cleanup:** delete Robin Zzpage's registration and contact; untick **Public Page**.
+**Cleanup:** delete Robin Zzpage's registration and contact and the Kim and Lee Zzpage contacts; untick
+**Public Page**.

@@ -268,6 +268,102 @@ private class EventRegistrationServiceTest {
 		}
 	}
 
+	/** A form takes only tickets on sale now; staff may use any active ticket. */
+	@IsTest
+	static void aFormTakesOnlyTicketsOnSale() {
+		System.runAs(staff()) {
+			Event__c event = gala(null);
+			Ticket_Type__c early = ticket(event, 'Early', 10, null);
+			early.Sales_End__c = Datetime.now().addDays(-1);
+			ticket(event, 'General', 25, null);
+			Ticket_Type__c later = ticket(event, 'Later', 30, null);
+			later.Sales_Start__c = Datetime.now().addDays(1);
+			update as user new List<Ticket_Type__c>{ early, later };
+
+			Test.startTest();
+			EventRegistrationService.Request firstOnSale = request(
+				event,
+				person('Jane', 'Doe', 'jane@example.org')
+			);
+			firstOnSale.source = EventRegistrationService.SOURCE_FORM;
+			EventRegistrationService.Result byForm = EventRegistrationService.register(firstOnSale);
+			EventRegistrationService.Request notYet = request(
+				event,
+				person('Sam', 'Lee', 'sam@example.org')
+			);
+			notYet.source = EventRegistrationService.SOURCE_FORM;
+			notYet.ticketType = 'Later';
+			String refused;
+			try {
+				EventRegistrationService.register(notYet);
+			} catch (EventRegistrationService.RegistrationException e) {
+				refused = e.getMessage();
+			}
+			EventRegistrationService.Request byStaff = request(
+				event,
+				person('Sam', 'Lee', 'sam@example.org')
+			);
+			byStaff.ticketType = 'Early';
+			EventRegistrationService.Result staffResult = EventRegistrationService.register(
+				byStaff
+			);
+			Test.stopTest();
+
+			Assert.isTrue(byForm.amountOwed == 25, 'A blank ticket is the first on sale: General');
+			Assert.areEqual(
+				BarnHelp.text(
+					'Events',
+					'Events_Register_TicketNotOnSale',
+					new List<Object>{ 'Later' }
+				),
+				refused,
+				'A ticket not on sale yet is refused to a form'
+			);
+			Assert.isTrue(staffResult.amountOwed == 10, 'Staff sell a ticket past its sale');
+		}
+	}
+
+	/** A form posted outside the registration window registers nobody; staff still can (R-EV5). */
+	@IsTest
+	static void aFormRegistersOnlyWhileRegistrationIsOpen() {
+		System.runAs(staff()) {
+			Event__c notYet = gala(null);
+			notYet.Registration_Opens__c = Datetime.now().addDays(1);
+			Event__c closed = gala(null);
+			closed.Status__c = 'Closed';
+			update as user new List<Event__c>{ notYet, closed };
+
+			Test.startTest();
+			List<String> refusals = new List<String>();
+			for (Event__c event : new List<Event__c>{ notYet, closed }) {
+				EventRegistrationService.Request byForm = request(
+					event,
+					person('Jane', 'Doe', 'jane@example.org')
+				);
+				byForm.source = EventRegistrationService.SOURCE_FORM;
+				try {
+					EventRegistrationService.register(byForm);
+				} catch (EventRegistrationService.RegistrationException refused) {
+					refusals.add(refused.getMessage());
+				}
+			}
+			EventRegistrationService.Result byStaff = EventRegistrationService.register(
+				request(closed, person('Jane', 'Doe', 'jane@example.org'))
+			);
+			Test.stopTest();
+
+			Assert.areEqual(
+				new List<String>{
+					BarnHelp.text('Events', 'Events_Public_RegisterNotYet'),
+					BarnHelp.text('Events', 'Events_Public_RegisterClosed')
+				},
+				refusals,
+				'Not yet open, then closed'
+			);
+			Assert.areEqual(1, byStaff.registered, 'Staff register past the window');
+		}
+	}
+
 	@IsTest
 	static void pricesFollowTheTicketsModelCases() {
 		System.runAs(staff()) {

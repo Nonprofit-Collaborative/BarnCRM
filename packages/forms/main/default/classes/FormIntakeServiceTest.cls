@@ -92,6 +92,19 @@ private class FormIntakeServiceTest {
 			);
 			Assert.areEqual(
 				FormIntakeService.EXPIRED,
+				FormIntakeService.submit(
+						ticket.substringBeforeLast(':') +
+							':' +
+							ticket.substringAfterLast(':').swapCase(),
+						sam(),
+						null,
+						null
+					)
+					.status,
+				'A signature in other letter case is refused'
+			);
+			Assert.areEqual(
+				FormIntakeService.EXPIRED,
 				FormIntakeService.submit('nonsense', sam(), null, null).status,
 				'Something that is not a ticket is refused'
 			);
@@ -227,6 +240,12 @@ private class FormIntakeServiceTest {
 				FormIntakeService.submit(ticket, sam(), null, gala.Id + '.').status,
 				'An empty signature'
 			);
+			Assert.areEqual(
+				FormIntakeService.CLOSED,
+				FormIntakeService.submit(ticket, sam(), null, gala.Id + '.' + claim.swapCase())
+					.status,
+				'The signature in other letter case'
+			);
 			Assert.areEqual(0, submissions().size(), 'Nothing was stored');
 
 			Assert.areEqual(
@@ -279,6 +298,46 @@ private class FormIntakeServiceTest {
 			RestContext.request.requestURI = '/barncrm/forms/v1/nothing';
 			FormPublicRest.getForm();
 			Assert.areEqual(404, RestContext.response.statusCode, 'No such form');
+		}
+	}
+
+	/** A failure inside the REST API is logged and answered Failed, never as an exception. */
+	@IsTest
+	static void aRestFailureIsLoggedAndAnsweredFailed() {
+		System.runAs(admin()) {
+			Form__c form = FormsTestData.publicVolunteerInterest(50);
+			RestContext.request = new RestRequest();
+			RestContext.request.requestURI = '/barncrm/forms/v1/' + form.Id;
+			RestContext.request.requestBody = Blob.valueOf('{"ticket":"x","answers":{}}');
+			FormPublicRest.failureForTest = new System.IllegalArgumentException('Zzrest broke');
+
+			Test.startTest();
+			RestContext.response = new RestResponse();
+			FormPublicRest.submit();
+			RestResponse posted = RestContext.response;
+			RestContext.response = new RestResponse();
+			FormPublicRest.getForm();
+			RestResponse got = RestContext.response;
+			Test.stopTest();
+
+			for (RestResponse answer : new List<RestResponse>{ posted, got }) {
+				Assert.areEqual(500, answer.statusCode, 'A server failure');
+				Assert.areEqual(
+					'{"status":"Failed"}',
+					answer.responseBody.toString(),
+					'Only Failed, no exception text'
+				);
+			}
+			Assert.areEqual(
+				2,
+				[
+					SELECT COUNT()
+					FROM Error_Log__c
+					WHERE Context__c IN ('FormPublicRest.submit', 'FormPublicRest.getForm')
+					WITH SYSTEM_MODE
+				],
+				'Both are in the Error Log'
+			);
 		}
 	}
 

@@ -232,6 +232,94 @@ private class FormFilesTest {
 		}
 	}
 
+	/** Saved drafts for a form, as the intake would have left them, in the last hour. */
+	private static void draftsSent(Id formId, Integer count, String addressKey) {
+		Form_Version__c version = [
+			SELECT Id
+			FROM Form_Version__c
+			WHERE Form__c = :formId
+			WITH USER_MODE
+		];
+		List<Form_Draft__c> drafts = new List<Form_Draft__c>();
+		for (Integer i = 0; i < count; i++) {
+			drafts.add(
+				new Form_Draft__c(
+					Form__c = formId,
+					Form_Version__c = version.Id,
+					Token_Hash__c = FormIntakeService.hashOf('zzcap' + addressKey + i),
+					Address_Key__c = addressKey,
+					Expires__c = Datetime.now().addDays(7),
+					Step__c = 0
+				)
+			);
+		}
+		Database.insert(drafts, AccessLevel.SYSTEM_MODE);
+	}
+
+	/** At most 3 links an hour to one address and 100 an hour for one form (R-FS7). */
+	@IsTest
+	static void savedLinksAreCappedPerAddressAndPerForm() {
+		System.runAs(admin()) {
+			useSite();
+			Form__c form = FormsTestData.publicWithFileAndSaving();
+			Map<String, Object> busy = FormsTestData.publicDefinition(1000);
+			((Map<String, Object>) busy.get('public')).put('saveForLater', true);
+			Form__c popular = FormsTestData.publicForm(busy);
+			Form_Version__c version = [
+				SELECT Id, Signing_Key__c
+				FROM Form_Version__c
+				WHERE Form__c = :form.Id
+				WITH SYSTEM_MODE
+			];
+			String key = FormIntakeService.addressKeyOf(version, ' Lee.Zzcap@Example.org');
+			draftsSent(form.Id, FormIntakeService.LINKS_PER_ADDRESS_HOUR, key);
+			draftsSent(popular.Id, FormIntakeService.LINKS_PER_FORM_HOUR, 'zzother');
+			FormIntakeService.actAsGuest = true;
+			String ticket = FormIntakeService.load(form.Id).ticket;
+			String popularTicket = FormIntakeService.load(popular.Id).ticket;
+			FormIntakeService.clockShiftMs = 10000;
+
+			Test.startTest();
+			String toLee = FormIntakeService.saveDraft(
+					ticket,
+					lee(null),
+					'',
+					'lee.zzcap@example.org',
+					0
+				)
+				.status;
+			String toAnyone = FormIntakeService.saveDraft(
+					popularTicket,
+					lee(null),
+					'',
+					'sam.zzcap@example.org',
+					0
+				)
+				.status;
+			String toSam = FormIntakeService.saveDraft(
+					ticket,
+					lee(null),
+					'',
+					'sam.zzcap@example.org',
+					0
+				)
+				.status;
+			Test.stopTest();
+
+			Assert.areEqual(
+				key,
+				FormIntakeService.addressKeyOf(version, 'lee.zzcap@example.org'),
+				'The same address in any case is one key'
+			);
+			Assert.areEqual(FormIntakeService.BUSY, toLee, 'A fourth link to Lee in the hour');
+			Assert.areEqual(FormIntakeService.BUSY, toAnyone, 'A 101st link for one form');
+			Assert.isTrue(
+				toSam == FormIntakeService.SAVED || toSam == FormIntakeService.FAILED,
+				'Another address is still sent a link (or Failed where the org sends no email)'
+			);
+		}
+	}
+
 	@IsTest
 	static void savedAnswersOpenTheirVersionAndAreForgottenOnceSent() {
 		System.runAs(admin()) {

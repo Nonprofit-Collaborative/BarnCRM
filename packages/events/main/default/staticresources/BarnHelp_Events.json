@@ -196,6 +196,7 @@
     "Events_Register_NoEvent": "The event could not be found. It may have been deleted.",
     "Events_Register_NoPerson": "One of the people could not be found or read. Pick them again.",
     "Events_Register_NoSeat": "No seat is free on the event or on this ticket. Free a seat first, or leave them on the waitlist.",
+    "Events_Register_TicketNotOnSale": "The ticket type {0} is not on sale now, so a form cannot register people for it.",
     "Events_Register_UnknownTicket": "The ticket type {0} is not an active ticket for this event.",
     "Events_Registrations_CancelConfirm": "Cancel {0} and everyone on it? Their seats are freed. You can mark each person registered again later.",
     "Events_Registrations_Done": "Registered {0}, waitlisted {1}.",

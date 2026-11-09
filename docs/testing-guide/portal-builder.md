@@ -28,6 +28,8 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 |---|---|---|
 | 1 | POST `login/start` with `nobody@example.org`. | 200 with a challenge of the same length as in T-PB-01. No email, no new session. |
 | 2 | POST `login/verify` with that challenge and `123456`. | 400 `code_invalid`. |
+| 3 | Start a sign-in for Pat, wait past **Code Minutes**, and send a wrong code. | 400 `code_invalid`, the same as step 2. |
+| 4 | Start another sign-in for Pat, wait past **Code Minutes**, and send the right code. | 400 `code_expired`: only the inbox holder learns the code expired. |
 
 **Cleanup:** None.
 
@@ -38,9 +40,10 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Start a sign-in and send a wrong code three times. | 400 `code_invalid` each time. Pat's Portal Access shows Locked Until. |
-| 2 | Send the right code. | 400 `code_invalid`. |
-| 3 | Clear Locked Until and sign in again. | Signed in. |
+| 1 | Start two sign-ins (A and B). On B, send a wrong code three times. | 400 `code_invalid` each time. Pat's Portal Access shows Locked Until. |
+| 2 | On B, send its right code. | 400 `code_invalid`: B ended at the lockout. |
+| 3 | On A, send a wrong code, then A's right code. | 400 `code_invalid`, then 403 `locked`: the lockout is told only after the right code. |
+| 4 | Clear Locked Until and sign in again. | Signed in. |
 
 **Cleanup:** set Failures Before Lockout back to 10.
 
@@ -67,9 +70,10 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | Sign in with the emailed code. | `status` `enroll` with a `secret` and an `otpauth://totp/` uri. Add it to the authenticator. |
-| 2 | POST `login/second-factor` with the authenticator code. | `signedIn`; Second Factor Enrolled is ticked. |
-| 3 | Set Pat's Portal Access Status to Suspended, then GET `me` with that session. | 401 `not_signed_in`. That session now shows Stage Ended. |
-| 4 | Turn **Portal Sign-In** off and POST `login/start`. | 503 `portal_unavailable`. |
+| 2 | POST `login/second-factor` with the authenticator code. | `signedIn`; Second Factor Enrolled is ticked and Second Factor Last Step is filled in. |
+| 3 | Sign in again at once and send the same authenticator code before the app shows a new one. | 400 `code_invalid`: a code is used once. With the next code the app shows, `signedIn`. |
+| 4 | Set Pat's Portal Access Status to Suspended, then GET `me` with that session. | 401 `not_signed_in`. That session now shows Stage Ended. |
+| 5 | Turn **Portal Sign-In** off and POST `login/start`. | 503 `portal_unavailable`. |
 
 **Cleanup:** set Status Active, Second Factor Off, and Portal Sign-In back on if needed.
 
