@@ -224,7 +224,7 @@ public with sharing class PortalTemplate {
 	private static Schema.SObjectType customObject(String name, String at) {
 		Schema.SObjectType type = String.isBlank(name)
 			? null
-			: Schema.getGlobalDescribe().get(name.toLowerCase());
+			: NamespaceUtil.globalDescribe().get(name.toLowerCase());
 		if (
 			type == null ||
 			!type.getDescribe().isCustom() ||

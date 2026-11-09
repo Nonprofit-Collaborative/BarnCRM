@@ -62,8 +62,17 @@ private class PortalAuthTest {
 			String challenge = PortalAuth.start(PortalTestData.KEY, '  Pat.Zzportal@Example.org ');
 			String code = PortalAuth.lastCodeForTest;
 			Map<String, Object> result = PortalAuth.verifyCode(challenge, code);
+			Integer queriesBefore = Limits.getQueries();
 			PortalAuth.Session session = PortalAuth.resolve((String) result.get('session'));
+			Integer resolveQueries = Limits.getQueries() - queriesBefore;
 			Test.stopTest();
+
+			Assert.areEqual(
+				1,
+				resolveQueries,
+				'Every signed-in request reads its session, access, person and portal in one query'
+			);
+			Assert.areEqual(PortalTestData.KEY, session.portal.Key__c, 'The portal comes with it');
 
 			Assert.areEqual('signedIn', result.get('status'), 'Signed in');
 			Portal_Session__c stored = [

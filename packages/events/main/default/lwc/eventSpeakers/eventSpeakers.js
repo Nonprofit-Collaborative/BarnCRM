@@ -20,7 +20,7 @@ import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
 import ACTIONS_FOR from '@salesforce/label/c.Core_HouseholdMembersPanel_ActionsFor';
 
-const HELP_PACKAGES = ['Events', 'Core'];
+const HELP_PACKAGES = ['Events'];
 const SPEAKER_FIELDS = [
   'Name',
   'Headline__c',
