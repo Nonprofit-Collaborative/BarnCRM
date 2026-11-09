@@ -8,7 +8,7 @@ ever merged for you: every merge is a pair someone looked at and confirmed.
 Before you start: reviewing suggestions needs the **BarnCRM Duplicate Review** add-on, which
 Salesforce allows only for users with a Sales Cloud or Service Cloud license. With it you see
 the **Duplicate Matching** tab and its **Review** list. Dismissing and merging from that list,
-and running the scan, also need the admin role (**BarnCRM Admin Group** on the Access page).
+and running the scan, also need the admin role (**BarnCRM Admin** on the Access page).
 Ask your admin; see [Duplicates](../admin-guide/duplicates.md).
 
 ## To Review a Possible Duplicate Person

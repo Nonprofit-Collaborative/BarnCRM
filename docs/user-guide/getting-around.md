@@ -4,8 +4,8 @@ BarnCRM lives inside Salesforce as a few apps. This page shows you how to open t
 records open in tabs, what the home page shows you, and where to look when BarnCRM tells you
 something (a tip, a "Learn More" link, or a notification under the bell).
 
-Before you start: you need a BarnCRM role (Team Member, Coordinator, Fundraising Staff, Read
-Only or Admin). If you cannot find the apps, ask your admin. See
+Before you start: you need a BarnCRM role (Team Member, Fundraising Staff, Read Only or
+Admin). If you cannot find the apps, ask your admin. See
 [Access](../admin-guide/access.md).
 
 ## The Apps

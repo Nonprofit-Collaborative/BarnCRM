@@ -279,7 +279,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 7 | As the staff user, click **New Household** on BarnCRM Home, save, then edit the household's phone and save. | The household is created and appears on the **Households** tab; the edit saves. |
 | 8 | As the staff user, edit the account from step 6 and try to change its record type. | **Household** is not offered (Change Record Type shows no choice, or is not offered). |
 | 9 | As the staff user, open the household from step 7. On **Members** select **Add Member**, add `Zztest` `Rt`, then open the household's **Addresses** card. | Before the add the panel shows **No Members Yet**; the **Add Member** dialog opens and the new person shows as a tile. **Addresses** shows **No Addresses Yet** with **Add Address**. Nothing asks for a record type. |
-| 10 | As admin, in Setup, open the staff user's permission set assignments, then the **BarnCRM Households** permission set's record type settings. | **BarnCRM Households** is assigned; it grants no record type. |
+| 10 | As admin, in Setup, open the staff user's permission set assignments, then the **BarnCRM Auto: Households Tab** permission set's record type settings. | **BarnCRM Auto: Households Tab** is assigned; it grants no record type. |
 | 11 | In an org that already ran BarnCRM before this change, deploy it, then as admin open **BarnCRM Staff** and its record type settings. | **Household** is no longer listed; staff can still open and edit existing households. |
 
 **Cleanup:** none (Households cannot be turned off).

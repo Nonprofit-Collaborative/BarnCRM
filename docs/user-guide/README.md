@@ -8,7 +8,7 @@ This guide is for staff who use BarnCRM every day: you look people up, keep hous
 
 Each page is a set of short recipes ("To do X: 1. 2. 3.") using the names you see on screen. Where a task needs an admin (a setting, a permission, a template), the page says so and links to the [Admin Guide](../admin-guide/README.md) instead of explaining it.
 
-What you can do depends on the role your admin gave you on the Access page (for example Fundraising Staff, Team Member, Coordinator or Read Only) and on which modules your organization uses. If a tab, button or panel in this guide is missing for you, ask your admin.
+What you can do depends on the role your admin gave you on the Access page (for example Fundraising Staff, Team Member or Read Only) and on which modules your organization uses. If a tab, button or panel in this guide is missing for you, ask your admin.
 
 ## Pages
 

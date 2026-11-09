@@ -110,8 +110,8 @@ not show it to anyone who cannot use it.
 There is nothing to turn on. The apps are installed with BarnCRM Core, and BarnCRM gives each
 one to the right people itself: the everyday apps to everyone with a BarnCRM role, the admin
 apps to the **BarnCRM Admin** role only. It does this through four permission sets named
-**BarnCRM App: ...**, which it gives and takes as roles change on the Access page and again
-every night; do not assign them by hand.
+**BarnCRM Auto: ... App**, which it gives and takes as roles change on the Access page and again
+every hour; do not assign them by hand.
 
 1. Click the app launcher (the grid of dots at the top left of Salesforce).
 2. Type `BarnCRM` and choose **BarnCRM** or **BarnCRM Console** (an administrator also sees

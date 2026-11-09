@@ -136,17 +136,17 @@ single automation for fine-grained control; that is not turning the feature off.
 
 **How tab hiding works.** Salesforce shows a tab to anyone holding a permission set that
 grants it, and an app cannot hide a tab any other way. So each feature tab has its own small
-packaged permission set (for example **BarnCRM Tab: Find**) that grants only that tab, and
+packaged permission set (for example **BarnCRM Auto: Find Tab**) that grants only that tab, and
 BarnCRM gives it, once the feature is on, to the people who should see the tab: whoever holds
 a role or extra permission that used to include the tab (BarnCRM Admin for all five, Find and
-Export for Find, Data Manager and Org Optimizer, Bulk Update or Bulk Delete for Super Transformer and
-Data Manager). BarnCRM keeps these in step when a feature is turned on, when a role or extra
+Export, Bulk Update or Bulk Delete for Find, Data Manager and Org Optimizer, Bulk Update or
+Bulk Delete for Super Transformer). BarnCRM keeps these in step when a feature is turned on, when a role or extra
 permission is given or removed on the Access page, after every upgrade, and every hour (for
 roles given in Setup or by user access policies). A large org may take a few minutes to catch
-up. Do not assign the BarnCRM Tab permission sets by hand: the hourly run removes them from
+up. Do not assign the BarnCRM Auto permission sets by hand: the hourly run removes them from
 anyone who should not have them.
 
-The Households tab works the same way. **Households** carries the **BarnCRM Households**
+The Households tab works the same way. **Households** carries the **BarnCRM Auto: Households Tab**
 permission set, which shows the Households tab and nothing else (it gives no record type). Once
 the feature is on, BarnCRM gives it to everyone with a BarnCRM Admin, Staff or Read Only role.
 

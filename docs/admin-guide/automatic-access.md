@@ -76,7 +76,7 @@ are in brackets.
 | Order | 10 |
 
 The API names in brackets are the roles' original names and never change, so a policy keeps
-working across upgrades. Change the role to suit: **Coordinator** (`Volunteer_Coordinator`), **Read Only**
+working across upgrades. Change the role to suit: **Read Only**
 (`Read_Only`), **BarnCRM Admin** (`BarnCRM_Admin_Group`) or, with Giving, **Fundraising
 Staff** (`Fundraising_Staff`). With Giving, add a second action to the same policy so the new
 user gets the module's permission set at the same time, for example Grant, Permission Set,

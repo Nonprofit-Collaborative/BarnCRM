@@ -7,7 +7,7 @@ current affiliation per person can be primary, and it shows on the person as **P
 Affiliation**.
 
 Before you start: open the **BarnCRM** app. Adding, changing and removing these needs the Team
-Member, Coordinator, Fundraising Staff or Admin role. The **Relationships** card is on every
+Member, Fundraising Staff or Admin role. The **Relationships** card is on every
 person while your admin has the **Relationships** feature on, and is hidden while it is off; the
 **Affiliations** card is on every person and organization while your admin has the
 **Affiliations** feature on, and is hidden while it is off (D-185). Both are on the record's
