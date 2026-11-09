@@ -94,8 +94,6 @@ these pages, so that everyone is talking about the same person.
 
 ## Index
 
-Applies to: BarnCRM landing/batch-b (v1.0 scope, releases 0.15 to 0.17), to be set to the final main merge commit at landing. Pre-release: no package version exists yet; this tracks the newest code on main.
-
 Every page in this folder is listed once, below, grouped by what you are trying to do. A feature that adds a page adds its row here in the same pull request, and the version line is refreshed with it. For a short description of what BarnCRM is and which modules exist, read the [Overview](../overview.md). Staff who use BarnCRM daily (and are not administrators) have the [User Guide](../user-guide/README.md); someone checking a build step by step has the [Testing Guide](../testing-guide/README.md).
 
 The Package column says what has to be installed for the page to apply. BarnCRM Core on its own is the Standard Edition, the full core suite of tools for any organization, so a Core page describes only what every organization has: its wording is neutral, and anything about gifts, donors or receipts on a Core page is marked as coming from Giving (C-29), and anything about NPSP or Nonprofit Cloud is marked as applying only when that product is in the org.
