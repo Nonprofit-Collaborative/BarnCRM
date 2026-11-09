@@ -194,11 +194,6 @@ public with sharing class AddressSelector {
 		return addresses;
 	}
 
-	/** The billing address in the standard fields of these accounts. */
-	public static List<Account> selectAccountBillingAddresses(Set<Id> accountIds) {
-		return selectAccountBillingAddresses(accountIds, null);
-	}
-
 	/**
 	 * The billing address in the standard fields of these accounts, and the named extra fields.
 	 * The extra fields are a person account's mailing fields, named as strings by the caller and

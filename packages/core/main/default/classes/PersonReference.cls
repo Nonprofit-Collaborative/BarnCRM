@@ -38,11 +38,6 @@ public with sharing class PersonReference {
 	}
 
 	@NamespaceAccessible
-	public static Boolean isEmpty(Id contactId, Id accountId) {
-		return contactId == null && accountId == null;
-	}
-
-	@NamespaceAccessible
 	public static Boolean isAmbiguous(Id contactId, Id accountId) {
 		return contactId != null && accountId != null;
 	}

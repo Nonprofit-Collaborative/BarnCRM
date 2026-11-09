@@ -31,12 +31,6 @@ public with sharing class AcknowledgmentService {
 		public Integer processed = 0;
 		public Integer sent = 0;
 		public Integer errors = 0;
-
-		public void add(SendCounts other) {
-			this.processed += other.processed;
-			this.sent += other.sent;
-			this.errors += other.errors;
-		}
 	}
 
 	// ------------------------------------------------------------------ the queue (trigger side)

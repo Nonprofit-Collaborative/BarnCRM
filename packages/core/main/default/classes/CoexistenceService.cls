@@ -268,14 +268,8 @@ public with sharing class CoexistenceService {
 	/**
 	 * People stored as accounts: accounts of a record type the org describes as a person
 	 * type. Zero in any org without Person Accounts, because there is no such record type.
-	 */
-	public static Integer countPeopleStoredAsAccounts() {
-		return countPeopleStoredAsAccounts(null);
-	}
-
-	/**
-	 * The same, stopping at `cap` when one is given, so that Health Check on an org with a
-	 * great many person accounts does not count every one of them against the query row limit.
+	 * Stops at `cap` when one is given, so that Health Check on an org with a great many person
+	 * accounts does not count every one of them against the query row limit.
 	 */
 	public static Integer countPeopleStoredAsAccounts(Integer cap) {
 		Set<Id> personTypes = OrgShapeDetector.personRecordTypeIds();
