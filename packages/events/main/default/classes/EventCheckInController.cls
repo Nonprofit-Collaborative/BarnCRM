@@ -95,7 +95,10 @@ public with sharing class EventCheckInController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getCheckIn', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_CheckIn_LoadFailed'));
+			throw UserErrors.wrapShowingDml(
+				e,
+				BarnHelp.text('Events', 'Events_CheckIn_LoadFailed')
+			);
 		}
 	}
 

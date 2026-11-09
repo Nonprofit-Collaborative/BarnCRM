@@ -572,35 +572,23 @@ public with sharing class FormSubmitService {
 		return found;
 	}
 
+	/**
+	 * Core's shared person matcher (`PersonMatcher`). The name and postal code step runs only
+	 * for a form set to emailThenNamePostal, and the duplicate rules compare every mapped value.
+	 */
 	private static Id findContact(Plan entry) {
-		String first = text(entry.fields, 'FirstName');
-		ImportMatcher.forgetHeldKeys();
-		String emailKey = ImportMatcher.emailKey(text(entry.fields, 'Email'));
-		if (emailKey != null) {
-			Id found = byKey(
-				ImportMatcher.contactsByEmail(new Set<String>{ emailKey }),
-				emailKey,
-				first
-			);
-			if (found != null) {
-				return found;
-			}
+		PersonMatcher.Person person = new PersonMatcher.Person();
+		person.firstName = text(entry.fields, 'FirstName');
+		person.lastName = text(entry.fields, 'LastName');
+		person.email = text(entry.fields, 'Email');
+		person.postalCode = text(entry.fields, 'MailingPostalCode');
+		person.byNameAndPostalCode = entry.rule == 'emailThenNamePostal';
+		person.duplicateRuleValues = duplicateRuleValues(entry.fields);
+		try {
+			return PersonMatcher.find(person);
+		} catch (PersonMatcher.AmbiguousException several) {
+			throw ambiguous(Contact.SObjectType);
 		}
-		String namePostal = ImportMatcher.nameAndPostalKey(
-			text(entry.fields, 'LastName'),
-			text(entry.fields, 'MailingPostalCode')
-		);
-		if (entry.rule == 'emailThenNamePostal' && namePostal != null) {
-			Id found = byKey(
-				ImportMatcher.contactsByNameAndPostalCode(new Set<String>{ namePostal }),
-				namePostal,
-				first
-			);
-			if (found != null) {
-				return found;
-			}
-		}
-		return byDuplicateRules(Contact.SObjectType, entry.fields, null);
 	}
 
 	private static Id findOrganization(Plan entry) {
@@ -622,34 +610,16 @@ public with sharing class FormSubmitService {
 		return byDuplicateRules(Account.SObjectType, entry.fields, recordTypeId);
 	}
 
-	/**
-	 * The holder of a key. With a first name, only a holder of that first name, or one with no
-	 * first name, is taken, so one of two people sharing an email is never taken for the other
-	 * (R-IB12). Without one, a key held by several is never guessed (R-FS2).
-	 */
-	private static Id byKey(Map<String, Id> found, String key, String first) {
-		if (String.isNotBlank(first)) {
-			List<String> narrowedKeys = new List<String>{
-				ImportMatcher.firstNameKey(key, first),
-				ImportMatcher.firstNameKey(key, null)
-			};
-			for (String narrowed : narrowedKeys) {
-				if (found.containsKey(narrowed)) {
-					if (ImportMatcher.isHeldByMany(narrowed)) {
-						throw ambiguous(Contact.SObjectType);
-					}
-					return found.get(narrowed);
-				}
+	/** The answers the org's duplicate rules compare: every mapped value that is not blank. */
+	private static Map<String, String> duplicateRuleValues(Map<String, Object> fields) {
+		Map<String, String> values = new Map<String, String>();
+		for (String fieldName : fields.keySet()) {
+			Object value = fields.get(fieldName);
+			if (!FormRules.isBlank(value)) {
+				values.put(fieldName, String.valueOf(value));
 			}
-			return null;
 		}
-		if (!found.containsKey(key)) {
-			return null;
-		}
-		if (ImportMatcher.isHeldByMany(key)) {
-			throw ambiguous(Contact.SObjectType);
-		}
-		return found.get(key);
+		return values;
 	}
 
 	/** The org's own duplicate rules, when one is active: one match is taken, several held. */
@@ -658,13 +628,7 @@ public with sharing class FormSubmitService {
 		Map<String, Object> fields,
 		Id recordTypeId
 	) {
-		Map<String, String> values = new Map<String, String>();
-		for (String fieldName : fields.keySet()) {
-			Object value = fields.get(fieldName);
-			if (!FormRules.isBlank(value)) {
-				values.put(fieldName, String.valueOf(value));
-			}
-		}
+		Map<String, String> values = duplicateRuleValues(fields);
 		if (values.isEmpty()) {
 			return null;
 		}

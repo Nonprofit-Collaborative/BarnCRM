@@ -1,9 +1,9 @@
 /**
  * Finds or creates the Core person an event registration is for (ADR-0182
- * `0182-event-registrations.md`, decision 2; canonical model R-ERG1), with Core's matchers only,
- * in the order Forms uses (ADR-0175 decision 7): email, then last name and postal code, each
- * narrowed by first name, then the org's duplicate rules. A key several people hold is never
- * guessed. A guest is looked for in the registrant's household first, and a new guest joins it.
+ * `0182-event-registrations.md`, decision 2; canonical model R-ERG1), with Core's shared
+ * `PersonMatcher`, the one Forms calls (ADR-0175 decision 7): email, then last name and postal
+ * code, each narrowed by first name, then the org's duplicate rules. A key several people hold
+ * is never guessed. A guest is looked for in the registrant's household first, and a new guest joins it.
  *
  * Runs with the person's own access: every read is user mode and every write is
  * `AccessLevel.USER_MODE`.
@@ -87,71 +87,24 @@ public with sharing class EventPersonMatcher {
 		return match;
 	}
 
+	/** Core's shared person matcher (`PersonMatcher`), worded for Events when it is unsure. */
 	@TestVisible
 	private static Id find(PersonInput input) {
-		ImportMatcher.forgetHeldKeys();
-		String emailKey = ImportMatcher.emailKey(input.email);
-		if (emailKey != null) {
-			Id found = byKey(
-				ImportMatcher.contactsByEmail(new Set<String>{ emailKey }),
-				emailKey,
-				input.firstName
-			);
-			if (found != null) {
-				return found;
-			}
-		}
-		String namePostal = ImportMatcher.nameAndPostalKey(input.lastName, input.postalCode);
-		if (namePostal != null) {
-			Id found = byKey(
-				ImportMatcher.contactsByNameAndPostalCode(new Set<String>{ namePostal }),
-				namePostal,
-				input.firstName
-			);
-			if (found != null) {
-				return found;
-			}
-		}
-		return byDuplicateRules(input);
-	}
-
-	/** The holder of a key, narrowed by first name when one is given (R-IB12). */
-	private static Id byKey(Map<String, Id> found, String key, String first) {
-		List<String> keys = String.isNotBlank(first)
-			? new List<String>{
-					ImportMatcher.firstNameKey(key, first),
-					ImportMatcher.firstNameKey(key, null)
-			  }
-			: new List<String>{ key };
-		for (String candidate : keys) {
-			if (found.containsKey(candidate)) {
-				if (ImportMatcher.isHeldByMany(candidate)) {
-					throw ambiguous();
-				}
-				return found.get(candidate);
-			}
-		}
-		return null;
-	}
-
-	private static Id byDuplicateRules(PersonInput input) {
-		Map<String, String> values = new Map<String, String>();
-		putIfSet(values, 'FirstName', input.firstName);
-		putIfSet(values, 'LastName', input.lastName);
-		putIfSet(values, 'Email', input.email);
-		putIfSet(values, 'MailingPostalCode', input.postalCode);
-		SObject probe = ImportDuplicateRuleMatcher.probe(Contact.SObjectType, values, null);
-		List<List<SObject>> matches = ImportDuplicateRuleMatcher.matchesFor(
-			new List<SObject>{ probe },
-			null
-		);
-		if (matches == null || matches.isEmpty() || matches[0].isEmpty()) {
-			return null;
-		}
-		if (matches[0].size() > 1) {
+		PersonMatcher.Person person = new PersonMatcher.Person();
+		person.firstName = input.firstName;
+		person.lastName = input.lastName;
+		person.email = input.email;
+		person.postalCode = input.postalCode;
+		// The duplicate rules compare the four values a registration asks for, trimmed.
+		putIfSet(person.duplicateRuleValues, 'FirstName', input.firstName);
+		putIfSet(person.duplicateRuleValues, 'LastName', input.lastName);
+		putIfSet(person.duplicateRuleValues, 'Email', input.email);
+		putIfSet(person.duplicateRuleValues, 'MailingPostalCode', input.postalCode);
+		try {
+			return PersonMatcher.find(person);
+		} catch (PersonMatcher.AmbiguousException several) {
 			throw ambiguous();
 		}
-		return matches[0][0].Id;
 	}
 
 	/**

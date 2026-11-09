@@ -123,7 +123,7 @@ public with sharing class EventSurveyController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getSurvey', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Survey_LoadFailed'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Survey_LoadFailed'));
 		}
 	}
 
@@ -153,11 +153,9 @@ public with sharing class EventSurveyController {
 			update as user new Event__c(Id = eventId, Survey_Form_Key__c = chosen);
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.saveForm', eventId);
-			throw UserErrors.message(
-				e instanceof System.IllegalArgumentException
-					? e.getMessage()
-					: BarnHelp.text('Events', 'Events_Survey_SaveFailed')
-			);
+			throw e instanceof System.IllegalArgumentException
+				? UserErrors.message(e.getMessage())
+				: UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Survey_SaveFailed'));
 		}
 	}
 

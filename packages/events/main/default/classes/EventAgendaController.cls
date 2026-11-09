@@ -119,7 +119,7 @@ public with sharing class EventAgendaController {
 			return agenda;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getAgenda', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Agenda_LoadFailed'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Agenda_LoadFailed'));
 		}
 	}
 
@@ -142,7 +142,7 @@ public with sharing class EventAgendaController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.moveSession', sessionId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 

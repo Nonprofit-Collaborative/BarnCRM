@@ -98,7 +98,10 @@ public with sharing class EventVolunteersController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getVolunteers', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Volunteers_LoadFailed'));
+			throw UserErrors.wrapShowingDml(
+				e,
+				BarnHelp.text('Events', 'Events_Volunteers_LoadFailed')
+			);
 		}
 	}
 
@@ -168,10 +171,8 @@ public with sharing class EventVolunteersController {
 
 	private static void fail(Exception e, String method, Id eventId) {
 		ErrorLogger.log(e, CONTEXT + method, eventId);
-		throw UserErrors.message(
-			e instanceof System.IllegalArgumentException
-				? e.getMessage()
-				: BarnHelp.text('Events', 'Events_Volunteers_SaveFailed')
-		);
+		throw e instanceof System.IllegalArgumentException
+			? UserErrors.message(e.getMessage())
+			: UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Volunteers_SaveFailed'));
 	}
 }

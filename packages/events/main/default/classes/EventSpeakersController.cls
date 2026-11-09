@@ -145,7 +145,10 @@ public with sharing class EventSpeakersController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getSpeakers', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Speakers_LoadFailed'));
+			throw UserErrors.wrapShowingDml(
+				e,
+				BarnHelp.text('Events', 'Events_Speakers_LoadFailed')
+			);
 		}
 	}
 
@@ -205,7 +208,7 @@ public with sharing class EventSpeakersController {
 		} catch (Exception e) {
 			Database.rollback(savepoint);
 			ErrorLogger.log(e, CONTEXT + '.removeSpeaker', speakerId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 
@@ -216,7 +219,7 @@ public with sharing class EventSpeakersController {
 			throw UserErrors.message(e.getDmlMessage(0));
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.' + method);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Shared_NotSaved'));
+			throw UserErrors.wrapShowingDml(e, BarnHelp.text('Events', 'Events_Shared_NotSaved'));
 		}
 	}
 }

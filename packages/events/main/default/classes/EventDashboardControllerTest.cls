@@ -198,6 +198,11 @@ private class EventDashboardControllerTest {
 					[SELECT COUNT() FROM Event_Track__c WHERE Event__c = :event.Id],
 					'Rolled back'
 				);
+				Assert.areNotEqual(
+					BarnHelp.text('Events', 'Events_Dashboard_ApplyFailed'),
+					refused.getMessage(),
+					'The validation rule speaks for itself, not the generic text (D-191)'
+				);
 			}
 		}
 	}

@@ -139,7 +139,10 @@ public with sharing class EventRegistrationsController {
 			return result;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.getRegistrations', eventId);
-			throw UserErrors.message(BarnHelp.text('Events', 'Events_Registrations_LoadFailed'));
+			throw UserErrors.wrapShowingDml(
+				e,
+				BarnHelp.text('Events', 'Events_Registrations_LoadFailed')
+			);
 		}
 	}
 

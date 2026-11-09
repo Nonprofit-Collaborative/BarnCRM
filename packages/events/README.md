@@ -36,7 +36,7 @@ used, and BarnCRM takes no payment.
 - Registrations (EV-02): `Event_Registration__c` (Private) and `Event_Attendee__c` (29EV8,
   29EV9), the Registrations tab (`eventRegistrations`, `eventRegistrationsModel`,
   `EventRegistrationsController`), `EventRegistrationService` with `EventPersonMatcher` (Core's
-  matchers, household-aware) and `EventPricing`, and `EventFormAttachment`, Core's form seam
+  shared `PersonMatcher`, the one Forms calls, household-aware) and `EventPricing`, and `EventFormAttachment`, Core's form seam
   (`FormAttachmentExtensions`), used only when Forms is installed.
 - Reminders, follow-ups and No-Show (EV-14): `Events_Settings__c` (29EV25, shared with EV-06's notice templates) with its Setting
   Definitions (section Events), `EventsSettings`, the nightly step `EventEmailScheduler` given to
