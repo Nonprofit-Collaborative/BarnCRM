@@ -211,6 +211,33 @@ public class TestUsers {
 	}
 
 	/**
+	 * The user a class's `@TestSetup` built under this last name with one of the builders here
+	 * (or `TestDataFactory.createUser`), found again: for a class whose tests would otherwise
+	 * build the same person, permission sets and field access in every method. The earliest
+	 * such user is returned, so a test that builds another person of the same name still gets
+	 * the one from setup.
+	 *
+	 * @param lastName the last name the setup gave the user
+	 * @return the user, with the fields the builders set
+	 */
+	@NamespaceAccessible
+	public static User fromSetup(String lastName) {
+		List<User> found = [
+			SELECT Id, Alias, Email, FirstName, LastName, ProfileId, Username
+			FROM User
+			WHERE Username LIKE :(usernameStart(lastName) + '%') AND IsActive = TRUE
+			WITH SYSTEM_MODE
+			ORDER BY CreatedDate ASC, Id ASC
+			LIMIT 1
+		];
+		Assert.isFalse(
+			found.isEmpty(),
+			'No user named ' + lastName + ' was built in this class\'s @TestSetup.'
+		);
+		return found[0];
+	}
+
+	/**
 	 * A user who may read every account and contact but edit none of them, whatever the org's
 	 * sharing model, holding the packaged permission sets named here: for a test about a person
 	 * who can see someone and may not change them.

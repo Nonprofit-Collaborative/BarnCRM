@@ -6,10 +6,7 @@
 @IsTest(testFor='ApexClass:HealthCheckGivingChecks')
 private class HealthCheckGivingChecksTest {
 	private static User jen() {
-		return TestDataFactory.createUser(
-			'Jen',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-		);
+		return TestUsers.fromSetup('Jen');
 	}
 
 	private static User david() {
@@ -34,6 +31,8 @@ private class HealthCheckGivingChecksTest {
 			}
 			insert gifts;
 		}
+		// Built once for the class rather than in every test that runs as her.
+		TestDataFactory.createUser('Jen', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 	}
 
 	private static Date lastClosedDay() {

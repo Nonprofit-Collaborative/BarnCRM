@@ -13,11 +13,14 @@ private class ErrorDigestServiceTest {
 
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.admin();
+		// Built once for the class rather than in every test that runs as her.
+		System.runAs(TestUsers.admin()) {
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+		}
 	}
 
 	private static User maria() {
-		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+		return TestUsers.fromSetup('Maria');
 	}
 
 	private static Error_Log__c entry(String source, String severity, String status) {

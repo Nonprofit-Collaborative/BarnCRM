@@ -9,14 +9,17 @@
 private class GiftBatchServiceTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith('Giving_Admin');
+		// Built once for the class rather than in every test that runs as him.
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			TestDataFactory.createUser(
+				'David',
+				new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
+			);
+		}
 	}
 
 	private static User david() {
-		return TestDataFactory.createUser(
-			'David',
-			new List<String>{ 'BarnCRM_Staff', 'Giving_Staff' }
-		);
+		return TestUsers.fromSetup('David');
 	}
 
 	/**
