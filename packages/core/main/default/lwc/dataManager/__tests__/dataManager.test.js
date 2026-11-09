@@ -325,7 +325,6 @@ describe('c-data-manager', () => {
       'GroupFindChange',
       'GroupCheck',
       'GroupCareful',
-      'ImportTitle',
       'TaskSearch',
       'DeleteTitle',
       'MappingsHeading',

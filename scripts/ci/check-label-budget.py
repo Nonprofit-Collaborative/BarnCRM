@@ -45,7 +45,9 @@ import sys
 # Applications, EV-09 Sponsors, EV-12 Check-In and EV-15 Appointments tab titles.
 # Batch C wave 3 landing: set to the merged total, 3,261: the EV-13 Seating and EV-17 Badges tab
 # titles (a flexipage tab title cannot read the help catalog).
-BUDGET = 3261
+# Batch C review: lowered to 3,255 after merging six labels that held the same name for the same
+# thing (Super Importer, Opportunity Mirror, Gift Transaction Mirror, Seasonal Address Swap, "or").
+BUDGET = 3255
 TARGET = 3000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 

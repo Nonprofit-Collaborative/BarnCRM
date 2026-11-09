@@ -65,7 +65,6 @@ import getRowMatchFields from '@salesforce/apex/ImportController.getRowMatchFiel
 import getRelatedOptions from '@salesforce/apex/ImportController.getRelatedOptions';
 import getRelatedFields from '@salesforce/apex/ImportController.getRelatedFields';
 
-import cardTitle from '@salesforce/label/c.Core_Import_CardTitle';
 import tabLabel from '@salesforce/label/c.Core_DataJobs_KindImport';
 import tabLabelDetail from '@salesforce/label/c.Core_Format_Pair';
 import stepTemplate from '@salesforce/label/c.Core_Import_StepTemplate';
@@ -460,7 +459,7 @@ export default class ImportWizard extends LightningElement {
     },
     guessAccept,
     guessAcceptAll,
-    cardTitle,
+    cardTitle: tabLabel,
     stepTemplate,
     stepFileType,
     stepUpload,

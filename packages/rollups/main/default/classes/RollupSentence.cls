@@ -89,7 +89,7 @@ public with sharing class RollupSentence {
 		} catch (RollupPath.RollupPathException unreadable) {
 			return path;
 		}
-		return String.join(branches, ' ' + Label.Core_RollupEase_Or + ' ');
+		return String.join(branches, ' ' + Label.Core_RollupFilter_Or + ' ');
 	}
 
 	private static String branchLabel(Schema.SObjectType sourceType, List<String> segments) {

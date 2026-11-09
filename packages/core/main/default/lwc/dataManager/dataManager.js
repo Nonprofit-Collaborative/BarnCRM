@@ -16,7 +16,7 @@ import GROUP_BRING_IN from '@salesforce/label/c.Core_DataManager_GroupBringIn';
 import GROUP_FIND_CHANGE from '@salesforce/label/c.Core_DataManager_GroupFindChange';
 import GROUP_CHECK from '@salesforce/label/c.Core_DataManager_GroupCheck';
 import GROUP_CAREFUL from '@salesforce/label/c.Core_DataManager_GroupCareful';
-import IMPORT_TITLE from '@salesforce/label/c.Core_DataManager_ImportTitle';
+import IMPORT_TITLE from '@salesforce/label/c.Core_DataJobs_KindImport';
 import FIND_TITLE from '@salesforce/label/c.Core_Find_Title';
 import DUPLICATES_TITLE from '@salesforce/label/c.Core_DuplicateMatching_Title';
 import TASK_SEARCH from '@salesforce/label/c.Core_DataManager_TaskSearch';

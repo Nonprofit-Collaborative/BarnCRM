@@ -6,7 +6,7 @@ import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Setti
 import getSwap from '@salesforce/apex/SeasonalAddressController.getSwap';
 import runNow from '@salesforce/apex/SeasonalAddressController.runNow';
 
-import TITLE from '@salesforce/label/c.Core_SeasonalAddress_PageTitle';
+import TITLE from '@salesforce/label/c.Core_HealthCheck_JobSeasonalAddresses';
 import HUB_TITLE from '@salesforce/label/c.Core_SeasonalAddress_HubTitle';
 import RUN_NOW from '@salesforce/label/c.Core_SeasonalAddress_RunNow';
 import { bodyMessage } from 'c/findCsv';
