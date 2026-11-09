@@ -302,10 +302,10 @@ old sets after N+1.
 - **Access syncs.** Three syncs (Forms, Logic Models, Volunteers) change one line each (D3) in N and drop Coordinator in N+1; one
   new `GivingAccessSync` (D2). `ModuleAccessSyncBase` and `TabAccessService` are unchanged
   apart from Core's one-time group step.
-- **Tab Access Check.** AUDIENCE is unchanged: Bulk Update and Bulk Delete holders already see
-  Data Manager and Bulk Update; D5 does not add the Find tab for them (left as is; the Find tab
-  follows Find and Export holders only). Revisit only if Brandon wants Bulk Update holders to
-  see Find.
+- **Tab Access Check.** Bulk Update and Bulk Delete holders already see Data Manager and Bulk
+  Update. Built (PR 1): because D5 gives them Find and Export's permission, they are also added
+  to the Find and Org Optimizer tab audiences, or a holder given Bulk Update alone would hold the
+  Find permission with no Find tab to start a change from, and "no pair needed" would not hold.
 - **TestUsers and tests.** `TestUsers` is unchanged (module admin sets stay). About 30 test
   classes name Coordinator or a retired Mirror set: the six module sync tests, TabAccessService,
   AccessService, Health Check, Volunteers Health Check, InboundGiftAccessTest and the Mirror
