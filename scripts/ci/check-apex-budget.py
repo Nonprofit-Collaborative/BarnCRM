@@ -98,9 +98,11 @@ CAPS = {
     # no adoption lookup on Individuals it created), plus about 2%. Large saves queued (ADR-0176
     # decision 16, describe cached once a transaction): 54,759 measured, plus about 2%.
     # Batch C review: 59,043 measured (fewer queries a sync, a second change in one transaction
-    # synced, capitals counted as a change), plus about 2%. Batch C review landing: 59,468
-    # measured (QA's per-values claim plus perf's watched-field reads), plus about 2%.
-    "contactpoints": 60_700,
+    # synced, capitals counted as a change), plus about 2%. Erasure start seam (ADR-0193): 60,319
+    # measured (one address sync per erasure), plus about 2%. Batch C review landing: 61,454
+    # measured with every review branch merged (QA's per-values claim, perf's watched-field
+    # reads, the erasure start seam), plus about 2%.
+    "contactpoints": 62_700,
     # Event Management (ADR-0177, events module): events, tickets, agenda and speakers (EV-01,
     # EV-03 to EV-05).
     # Batch C landing 2026-11-07: 29,211 measured (EV-01, EV-03 to EV-05), plus about 2.5%.

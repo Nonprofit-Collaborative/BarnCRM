@@ -8960,7 +8960,10 @@ person's current name to confirm. A person with an Erasure record is not erased 
 
 **R-ER8 Modules decide about their own records.** Each installed module implementing
 `PersonErasureExtension` changes its own records in the same transaction and reports what it
-changed and kept. A module that is installed but cannot answer refuses the erasure.
+changed and kept. A module that is installed but cannot answer refuses the erasure. A module
+that also implements `PersonErasureStartExtension` is told before Core changes anything (once
+every check has passed) and always told when the run ends, succeeded or not (ADR-0193 erasure
+start seam); Contact Point Sync uses it to copy the person's addresses once, from the final state.
 
 **R-ER9 An erased person is not an orphan.** A person an Erasure record names is left out of
 "people with no household" in Health Check and data hygiene, in both membership modes.
