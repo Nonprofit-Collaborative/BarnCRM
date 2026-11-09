@@ -8,14 +8,17 @@
 private class RollupBuilderControllerTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.adminWith('Rollup_Builder_Admin');
+		// Built once for the class rather than in every test that runs as her.
+		System.runAs(TestUsers.adminWith('Rollup_Builder_Admin')) {
+			TestDataFactory.createUser(
+				'Maria',
+				new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
+			);
+		}
 	}
 
 	private static User maria() {
-		return TestDataFactory.createUser(
-			'Maria',
-			new List<String>{ 'BarnCRM_Admin', 'Rollup_Builder_Admin' }
-		);
+		return TestUsers.fromSetup('Maria');
 	}
 
 	private static RollupBuilderController.Draft childCount() {

@@ -10,7 +10,10 @@
 private class AutomationControlTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.admin();
+		// Built once for the class rather than in every test that runs as her.
+		System.runAs(TestUsers.admin()) {
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+		}
 	}
 
 	private static final String NAMING = 'Household_Naming';
@@ -18,7 +21,7 @@ private class AutomationControlTest {
 	private static final String LOCK = 'Gift_Receipt_Lock';
 
 	private static User barnCrmAdmin() {
-		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+		return TestUsers.fromSetup('Maria');
 	}
 
 	private static User staffOnly() {

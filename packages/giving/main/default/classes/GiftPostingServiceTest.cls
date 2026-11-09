@@ -8,10 +8,7 @@
 @IsTest(testFor='ApexClass:GiftPostingService')
 private class GiftPostingServiceTest {
 	private static User jen() {
-		return TestDataFactory.createUser(
-			'Jen',
-			new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' }
-		);
+		return TestUsers.fromSetup('Jen');
 	}
 
 	private static User david() {
@@ -27,6 +24,8 @@ private class GiftPostingServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			GivingTestDataFactory.insertDefaultFund();
 		}
+		// Built once for the class rather than in every test that runs as her.
+		TestDataFactory.createUser('Jen', new List<String>{ 'BarnCRM_Admin', 'Giving_Admin' });
 	}
 
 	/**

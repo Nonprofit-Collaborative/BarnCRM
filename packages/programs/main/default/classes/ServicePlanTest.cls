@@ -15,18 +15,20 @@ private class ServicePlanTest {
 		'Programs_Read_Only'
 	};
 
-	// standardUserWith inserts a new user on every call, so each test keeps the one it made.
+	// standardUserWith inserts a new user on every call, so each test keeps the one it made, and
+	// the planner, whom most tests need, is built once in setup and looked up once per test.
 	private static User plannerUser;
 	private static User readerUser;
 
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWith(ADMIN);
+		TestUsers.standardUserWith('Planner', STAFF);
 	}
 
 	private static User planner() {
 		if (plannerUser == null) {
-			plannerUser = TestUsers.standardUserWith('Planner', STAFF);
+			plannerUser = TestUsers.fromSetup('Planner');
 		}
 		return plannerUser;
 	}

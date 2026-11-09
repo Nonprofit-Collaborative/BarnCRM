@@ -20,6 +20,11 @@ private class OpportunityMirrorServiceTest {
 			GivingTestDataFactory.insertHouseholdContact('The Garcia Household', 'Luis', 'Garcia');
 			choose(OpportunityMirrorService.GIFTS_TO_OPPORTUNITIES);
 		}
+		// Built once for the class rather than in every test that runs as her.
+		TestDataFactory.createUserOnTheRunningUsersProfile(
+			'Maria',
+			new List<String>{ 'Giving_Admin', 'Opportunity_Mirror' }
+		);
 	}
 
 	private static void choose(String direction) {
@@ -30,10 +35,7 @@ private class OpportunityMirrorServiceTest {
 
 	/** Maria: an administrator who can create Opportunities. */
 	private static User maria() {
-		return TestDataFactory.createUserOnTheRunningUsersProfile(
-			'Maria',
-			new List<String>{ 'Giving_Admin', 'Opportunity_Mirror' }
-		);
+		return TestUsers.fromSetup('Maria');
 	}
 
 	private static Contact luis() {

@@ -10,7 +10,10 @@
 private class ImportObjectSchemaTest {
 	@TestSetup
 	static void createTestUser() {
-		TestUsers.admin();
+		// Built once for the class rather than in every test that runs as her.
+		System.runAs(TestUsers.admin()) {
+			TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+		}
 	}
 
 	static {
@@ -20,7 +23,7 @@ private class ImportObjectSchemaTest {
 	}
 
 	private static User admin() {
-		return TestDataFactory.createUser('Maria', new List<String>{ 'BarnCRM_Admin' });
+		return TestUsers.fromSetup('Maria');
 	}
 
 	private static List<ImportMapping.Column> suggestedForContact(List<String> headings) {

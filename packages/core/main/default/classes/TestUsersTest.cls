@@ -67,6 +67,17 @@ private class TestUsersTest {
 	}
 
 	@IsTest
+	static void aUserBuiltUnderALastNameIsFoundAgainByIt() {
+		User built = TestUsers.standardUser('Foundagain');
+
+		User found = TestUsers.fromSetup('Foundagain');
+
+		Assert.areEqual(built.Id, found.Id, 'The user built under that last name.');
+		Assert.areEqual(built.Email, found.Email, 'With the fields the builders set.');
+		Assert.areEqual(built.ProfileId, found.ProfileId, 'On the profile it was built on.');
+	}
+
+	@IsTest
 	static void otherPermissionSetsMakeAnotherUserHoldingOnlyThose() {
 		User reader = TestUsers.withPermissionSets(new List<String>{ 'BarnCRM_Read_Only' });
 

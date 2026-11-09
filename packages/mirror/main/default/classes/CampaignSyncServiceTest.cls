@@ -14,6 +14,14 @@ private class CampaignSyncServiceTest {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {
 			switchOn(true);
 		}
+		// Built once for the class rather than in every test that runs as her.
+		User maria = TestDataFactory.createUserOnTheRunningUsersProfile(
+			'Maria',
+			new List<String>{ 'Giving_Admin', 'Campaign_Sync' }
+		);
+		System.runAs(new User(Id = UserInfo.getUserId())) {
+			update new User(Id = maria.Id, UserPermissionsMarketingUser = true);
+		}
 	}
 
 	private static void switchOn(Boolean enabled) {
@@ -24,14 +32,7 @@ private class CampaignSyncServiceTest {
 
 	/** Maria: an administrator who holds Campaign access and the Marketing User box. */
 	private static User maria() {
-		User maria = TestDataFactory.createUserOnTheRunningUsersProfile(
-			'Maria',
-			new List<String>{ 'Giving_Admin', 'Campaign_Sync' }
-		);
-		System.runAs(new User(Id = UserInfo.getUserId())) {
-			update new User(Id = maria.Id, UserPermissionsMarketingUser = true);
-		}
-		return maria;
+		return TestUsers.fromSetup('Maria');
 	}
 
 	/** Campaigns read back by the name describe gives, so the class compiles without one. */
