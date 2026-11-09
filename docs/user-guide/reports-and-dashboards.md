@@ -129,7 +129,7 @@ admins only):
 5. Click **Refresh** after a change to read the totals again.
 
 The counts and the list include only the records you can open; the total includes them all.
-You need the **Rollup Builder User** permission set to see the card; ask your admin. If a
+You need the **Rollup Builder Read Only** permission set to see the card; ask your admin. If a
 total still looks wrong, tell your admin: they also see what it would be if recalculated now.
 
 ## To Get a Report by Email

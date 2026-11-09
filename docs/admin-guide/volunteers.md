@@ -77,18 +77,20 @@ menu at the top left.
 
 ## Roles and Permission Sets
 
-You never assign the Volunteers permission sets by hand. Give people their BarnCRM role on the
-[Access](access.md) page as usual, and the module gives each role its Volunteers set:
+Give people their BarnCRM role on the [Access](access.md) page as usual, and the module gives
+each role its Volunteers set:
 
 | BarnCRM role | Volunteers set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Volunteers Admin | Everything, including deleting a record entered by accident |
-| Coordinator | Volunteers Coordinator | Everything Staff does, plus see and correct everyone's hours to approve or reject them |
-| Team Member | Volunteers Staff | Set up jobs and shifts, sign people up, enter hours; never deletes |
+| Team Member, Fundraising Staff (Giving) | Volunteers Staff | Set up jobs and shifts, sign people up, enter hours; never deletes |
 | Read Only | Volunteers Read Only | Look at jobs, shifts, sign-ups and volunteer details; sees no hours entries (see below) |
 
-The Coordinator and Team Member roles give the same access to people and households, so the
-module tells them apart by the role itself.
+Whoever approves hours also needs **Volunteers Coordinator**: everything Staff does, plus see
+and correct everyone's hours to approve or reject them, and manage skills, requirements and
+onboarding steps. It is not a role: give it on the Access page under **Extra Permissions**, on
+top of the person's role (usually Team Member). The Coordinator role is retired; in this
+release its holders keep it, also get Team Member, and keep Volunteers Coordinator.
 
 When it happens:
 
@@ -721,9 +723,10 @@ click **Recalculate All** on the Rollups page. No Volunteers set is given while 
 
 Do this as Maria, who holds the Admin role, with a second user, Priya, who has none yet.
 
-1. On the [Access](access.md) page, give Priya the **Coordinator** role.
+1. On the [Access](access.md) page, give Priya the **Team Member** role, then, under **Extra
+   Permissions**, give her **Volunteers Coordinator**.
 2. In Setup, open Priya's user record and look at **Permission Set Assignments**. Within a
-   minute she holds **Volunteers Coordinator**.
+   minute she holds **Volunteers Staff** as well as **Volunteers Coordinator**.
 3. Open the **BarnCRM Volunteers** app. On **Volunteer Jobs**, create a job called "Food
    pantry" with yourself as **Coordinator**.
 4. On the job, add a shift for next Saturday from 9:00 to 12:00 with **Volunteers Needed** 3.

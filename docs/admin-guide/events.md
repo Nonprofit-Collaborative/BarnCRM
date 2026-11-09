@@ -26,7 +26,7 @@ Install the BarnCRM Event Management package after Core. The install:
 
 - gives the installing administrator the **Events Admin** permission set, and
 - gives each BarnCRM role its Event Management set: **Events Admin** to BarnCRM Admin holders,
-  **Events Staff** to the Team Member, Coordinator and Fundraising Staff roles, and **Events Read
+  **Events Staff** to the Team Member and Fundraising Staff roles, and **Events Read
   Only** to the Read Only role. Someone given a role later gets the set within the hour, or at
   once when the role is given on the **Access** page.
 

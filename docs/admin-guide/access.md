@@ -19,15 +19,15 @@ Roles ship with BarnCRM and are kept up to date for you.
 A module ships its own permission sets, and a Core role cannot include them. They reach
 people in one of two ways:
 
-- **Volunteers and Rollup Builder follow the roles for you.** Their sets are given
-  automatically to everyone holding the matching role (for example the Coordinator role gets
-  **Volunteers Coordinator**), at the latest within an hour.
-- **Giving and Mirror sets are chosen per person, on this page.** Turning a module on in the
-  [Module Manager](module-manager.md) gives its admin set (for Giving, **Giving Admin**) only to
-  you, the person who turned it on. Everyone else gets **Giving Admin**, **Giving Staff**,
-  **Giving Read Only**, **Campaign Sync**, **Opportunity Mirror**, **Accounting Export** and
-  the rest under "Extra Permissions" below, beside their role. The Fundraising Staff role
-  already includes Giving Staff.
+- **Every module's sets follow the roles for you.** Each module gives its Admin set to every
+  BarnCRM Admin (Giving Admin included), its Staff set to every Team Member, and its Read Only
+  set to every Read Only holder, at the latest within an hour. Fundraising Staff gets every
+  staff set Team Member gets except **Programs Staff**, which carries case notes: give a
+  fundraiser who works a program the Team Member role as well.
+- **A few sets are chosen per person, on this page.** Giving Staff and Giving Read Only for
+  anyone outside Fundraising Staff (donor amounts and receipts are given deliberately),
+  **Volunteers Coordinator** for whoever approves volunteer hours, and the Mirror sets are under
+  "Extra Permissions" below, beside the person's role.
 
 You never need Setup for either. If you would rather have a module set given automatically to
 every new user, a Salesforce user access policy can do it: see
@@ -192,7 +192,8 @@ A module's sets are listed after them, only where that module is installed:
 
 | Extra permission | Module | What it lets the person do |
 |---|---|---|
-| Giving Admin | Giving | Configure giving and fix mistakes: funds, appeals, gifts, refunds and write-offs, including deleting a record entered by accident. |
+| Volunteers Coordinator | Volunteers | Approve, reject and correct everyone's volunteer hours, and manage skills, requirements and onboarding steps, on top of what the person's role gives. |
+| Giving Admin | Giving | Configure giving and fix mistakes: funds, appeals, gifts, refunds and write-offs, including deleting a record entered by accident. Every BarnCRM Admin gets it automatically. |
 | Giving Staff | Giving | Enter gifts, record refunds, and set up funds and appeals, without deleting anything. Run reports and view dashboards. The Fundraising Staff role already includes it. |
 | Giving Read Only | Giving | See gifts, funds, appeals and receipts without changing them. Run reports and view dashboards. |
 | Campaign Sync | Mirror | Edit an appeal's Campaign ID and open the Campaign Sync page. Creating Campaigns also needs Campaign access and the Marketing User box on the person's user. |
@@ -201,8 +202,11 @@ A module's sets are listed after them, only where that module is installed:
 | Inbound Gift API | Mirror | For the integration user only: record gifts another system sends through the Inbound Gift API. It needs nothing else from BarnCRM. |
 | Record Inbound Gift Action | Mirror | Run the Record Inbound Gift action from a flow or an AI assistant. Give it together with Giving Staff. |
 
-The Volunteers and Rollup Builder sets are not listed, because they follow the roles
-automatically (see the top of this page): removing one here would only be undone within the hour.
+The other module sets (Volunteers Admin, Staff and Read Only, Rollup Builder, and every other
+module's) are not listed, because they follow the roles automatically (see the top of this page):
+removing one here would only be undone within the hour. The same holds for Giving Admin given to
+a BarnCRM Admin, and, this release only, for Volunteers Coordinator held by someone who still has
+the retired Coordinator role.
 
 These are the only permissions this section gives. It never lists or assigns any other
 permission set in your org, including one you created yourself with the same name as one of

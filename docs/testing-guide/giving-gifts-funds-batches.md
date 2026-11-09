@@ -233,7 +233,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 ## T-GIFT-12: Giving Access by Permission Set
 
 **Purpose:** confirm what staff and read-only users can and cannot do with gifts and funds.
-**Prerequisites:** staff, then read-only; any sample gift.
+**Prerequisites:** staff, then read-only, then admin; any sample gift; for step 6, a user with no BarnCRM role.
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -242,6 +242,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 3 | As read-only, open the **BarnCRM Fundraising** app. | No **Quick Gift Entry** tab. **Gifts**, **Funds** and **Appeals** show no **New** button. |
 | 4 | As read-only, open a gift. | No **Edit** or **Delete**. The **Soft Credits** panel's **Add Credit** is disabled. |
 | 5 | As read-only, open a person with gifts in the BarnCRM Fundraising app. | The **Giving** section and **Gifts** list show; there is no **Enter a Gift** button. |
+| 6 | As admin, on BarnCRM Settings, **Access**, give the user with no role the **BarnCRM Admin** role. Wait up to an hour, or run `new GivingAccessSync().requestSync();` in Anonymous Apex. In Setup, open the user's **Permission Set Assignments**. | **Giving Admin** is assigned, without anyone giving it. Cleanup: remove the role and Giving Admin. |
 
 **Cleanup:** none.
 
