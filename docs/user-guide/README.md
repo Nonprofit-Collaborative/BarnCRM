@@ -81,6 +81,10 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Built Components](lwc-builder.md): what a component your admin built shows, its buttons, and why a block or a record can be missing.
 
+### Project Management
+
+- [Projects](projects.md): Projects Home, new projects from templates, tasks and milestones, logging time, health and status updates.
+
 ### Scholarships and Outbound Grants
 
 - [Scholarships and Grants](scholarships.md): reviewing applications with a rubric, recusing, the review board and decisions, award letters and acceptance, disbursements and conditions, recipient reports, renewals and the disbursement export.

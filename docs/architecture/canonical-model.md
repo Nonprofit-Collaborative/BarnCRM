@@ -16840,6 +16840,206 @@ The Memberships module's org-wide settings, in the Memberships section of BarnCR
 
 ---
 
+## 29PM1. Project
+
+### Definition
+
+A piece of work with a start, a target date and an outcome: a Salesforce implementation, a program launch, internal work or work for a client (PM-02, Project Management module, ADR-NEXT `NEXT-project-management-module.md`, D-175). A project with Is Template checked is a template, never worked on itself.
+
+### Rules
+
+**R-PM1 Percent complete.** Percent Complete is Tasks Done over Tasks, where Tasks counts the project's tasks that are not Cancelled; 0 when there are none.
+
+**R-PM2 Health.** Only an Active project that is not a template has a Health; any other has none. Off Track when Target Date is before today or Actual Hours exceed Budget Hours (when Budget Hours is set). Otherwise At Risk when an open milestone (Status not Done or Cancelled) has a Due Date before today, an open task's Due Date is At Risk Days or more before today, or Actual Hours reach Budget Warning Percent of Budget Hours. Otherwise On Track. Each reason met is one line of Health Reasons. Written by the 6:40 AM nightly step and by Refresh Health.
+
+**R-PM3 New from template.** A shipped template (static resource `Projects_Templates`) places each phase and task by day offsets from the new project's Start Date. A template project is copied with its phases, tasks (Status Not Started) and assignments (role and planned hours, no person), every date moved by the new Start Date less the template's Start Date (or its earliest phase or task date). The new project is Planned, not a template, and Template Used names the source.
+
+### Salesforce implementation
+
+- **Object:** `Project__c`, label Project, name field Text (Project Name), sharing Public Read/Write.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Type | `Type__c` | Picklist (Salesforce Implementation, Program, Internal, Client, Other), restricted, required, default Internal |
+| Status | `Status__c` | Picklist (Planned, Active, On Hold, Completed, Cancelled), restricted, required, default Planned |
+| Health | `Health__c` | Picklist (On Track, At Risk, Off Track), restricted |
+| Health Reasons | `Health_Reasons__c` | Long Text Area(32768) |
+| Client Organization | `Account__c` | Lookup(Account) |
+| Client Contact | `Contact__c` | Lookup(Contact) |
+| Start Date | `Start_Date__c` | Date |
+| Target Date | `Target_Date__c` | Date |
+| Completed Date | `Completed_Date__c` | Date |
+| Description | `Description__c` | Long Text Area(32768) |
+| Is Template | `Is_Template__c` | Checkbox, default false |
+| Template Used | `Template_Key__c` | Text(80) |
+| Budget Hours | `Budget_Hours__c` | Number(8, 2) |
+| Budget Amount | `Budget_Amount__c` | Currency(16, 2) |
+| Hourly Rate | `Hourly_Rate__c` | Currency(16, 2) |
+| Tasks | `Tasks__c` | Roll-Up Summary (COUNT Project_Task__c, Status__c not equal to Cancelled) |
+| Tasks Done | `Tasks_Done__c` | Roll-Up Summary (COUNT Project_Task__c, Status__c equals Done) |
+| Percent Complete | `Percent_Complete__c` | Formula (Percent): `IF(Tasks__c = 0, 0, Tasks_Done__c / Tasks__c)` |
+| Estimated Hours | `Estimated_Hours__c` | Roll-Up Summary (SUM Project_Task__c.Estimated_Hours__c, Status__c not equal to Cancelled) |
+| Actual Hours | `Actual_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c) |
+| Billable Hours | `Billable_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c, Billable__c equals true) |
+| Actual Cost | `Actual_Cost__c` | Formula (Currency): `IF(ISBLANK(Hourly_Rate__c), NULL, Actual_Hours__c * Hourly_Rate__c)` |
+| Remaining Budget | `Remaining_Budget__c` | Formula (Currency): `IF(ISBLANK(Budget_Amount__c), NULL, Budget_Amount__c - BLANKVALUE(Actual_Cost__c, 0))` |
+
+---
+
+## 29PM2. Project Phase
+
+### Definition
+
+A stage of a project (PM-02), such as Discovery or Build, with its own dates. Its progress is its tasks' progress, worked out on the page.
+
+### Salesforce implementation
+
+- **Object:** `Project_Phase__c`, label Project Phase, name field Text (Phase Name), master-detail to Project (`Project__c`, relationship Phases), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Order | `Sort_Order__c` | Number(4, 0) |
+| Start Date | `Start_Date__c` | Date |
+| End Date | `End_Date__c` | Date |
+
+---
+
+## 29PM3. Project Task
+
+### Definition
+
+One piece of work in a project, with an owner, dates, an estimate and a status (PM-02). A task with Milestone checked is a milestone: a dated point such as Go-Live.
+
+### Rules
+
+**R-PM4 Done.** Setting a task to Done on the project page stamps Completed Date with today; setting it back clears it. The phase lookup accepts only a phase of the same project (lookup filter).
+
+### Salesforce implementation
+
+- **Object:** `Project_Task__c`, label Project Task, name field Text (Task Name), master-detail to Project (`Project__c`, relationship Tasks), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Phase | `Phase__c` | Lookup(Project_Phase__c), filtered to the same project |
+| Assigned To | `Assigned_To__c` | Lookup(User) |
+| Status | `Status__c` | Picklist (Not Started, In Progress, Blocked, Done, Cancelled), restricted, required, default Not Started |
+| Milestone | `Milestone__c` | Checkbox, default false |
+| Start Date | `Start_Date__c` | Date |
+| Due Date | `Due_Date__c` | Date |
+| Completed Date | `Completed_Date__c` | Date |
+| Estimated Hours | `Estimated_Hours__c` | Number(6, 2) |
+| Order | `Sort_Order__c` | Number(4, 0) |
+| Description | `Description__c` | Long Text Area(32768) |
+
+---
+
+## 29PM4. Project Assignment
+
+### Definition
+
+A person on a project in a role, with the hours planned for them between two dates (PM-04).
+
+### Rules
+
+**R-PM5 Utilization.** For a date range, each person's Logged Hours are their time entries' Hours in the range, Capacity is Weekly Capacity Hours times the range's days over 7, Planned Hours are each assignment's Planned Hours times the share of its days (Start Date to End Date, else the range) that fall in the range, and Utilization is Logged Hours over Capacity.
+
+### Salesforce implementation
+
+- **Object:** `Project_Assignment__c`, label Project Assignment, name field Auto Number (`PA-{00000}`, Assignment Number), master-detail to Project (`Project__c`, relationship Assignments), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Person | `Resource__c` | Lookup(User) |
+| Role | `Role__c` | Text(80) |
+| Planned Hours | `Planned_Hours__c` | Number(8, 2) |
+| Start Date | `Start_Date__c` | Date |
+| End Date | `End_Date__c` | Date |
+
+---
+
+## 29PM5. Time Entry
+
+### Definition
+
+Hours a person worked on a project on one day, optionally on one task, billable or not (PM-04).
+
+### Rules
+
+**R-PM6 Hours.** Hours must be more than 0 and at most 24 (validation rule). The task lookup accepts only a task of the same project.
+
+**R-PM7 Billable export.** Export Billable Time (Manage Projects) returns the billable entries dated in a range, not yet exported unless asked, as CSV rows built in the browser, and stamps Exported Date with today. BarnCRM makes no invoice and takes no payment.
+
+### Salesforce implementation
+
+- **Object:** `Time_Entry__c`, label Time Entry, name field Auto Number (`TE-{000000}`, Entry Number), master-detail to Project (`Project__c`, relationship Time Entries), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Task | `Task__c` | Lookup(Project_Task__c), filtered to the same project |
+| Person | `User__c` | Lookup(User) |
+| Date | `Date__c` | Date, required |
+| Hours | `Hours__c` | Number(5, 2), required |
+| Billable | `Billable__c` | Checkbox, default false |
+| Notes | `Notes__c` | Text(255) |
+| Exported Date | `Exported_Date__c` | Date |
+
+---
+
+## 29PM6. Project Status Update
+
+### Definition
+
+A dated status report on a project (PM-05): health, progress and hours as of that day, with a summary, accomplishments, next steps and risks.
+
+### Rules
+
+**R-PM8 Draft.** Draft Status Update writes an update dated today with the project's Health, Percent Complete (Tasks Done over Tasks, as a whole percent) and Actual Hours; Accomplishments lists tasks Completed since the last update's Report Date (or the project's Start Date); Next Steps lists open tasks and milestones due in the next 14 days; Risks lists the Health Reasons and Blocked tasks; Summary is one line of progress. The owner edits it before sharing.
+
+### Salesforce implementation
+
+- **Object:** `Project_Status_Update__c`, label Project Status Update, name field Auto Number (`SU-{00000}`, Update Number), master-detail to Project (`Project__c`, relationship Status Updates), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Report Date | `Report_Date__c` | Date, required |
+| Health | `Health__c` | Picklist (On Track, At Risk, Off Track), restricted |
+| Percent Complete | `Percent_Complete__c` | Percent(3, 0) |
+| Actual Hours | `Actual_Hours__c` | Number(8, 2) |
+| Summary | `Summary__c` | Long Text Area(32768) |
+| Accomplishments | `Accomplishments__c` | Long Text Area(32768) |
+| Next Steps | `Next_Steps__c` | Long Text Area(32768) |
+| Risks | `Risks__c` | Long Text Area(32768) |
+
+---
+
+## 29PM7. Projects Settings
+
+### Definition
+
+The module's org-wide settings, edited in the Projects section of BarnCRM Settings.
+
+### Rules
+
+- **Setting Definitions:** `Projects_Time_Tracking_Enabled`, `Projects_At_Risk_Days`, `Projects_Budget_Warning_Percent`, `Projects_Weekly_Capacity_Hours`, section Projects, module `Projects`. A blank or out of range number reads as its default.
+
+### Salesforce implementation
+
+- **Object:** `Projects_Settings__c`, label Projects Settings, hierarchy custom setting, visibility Protected.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Track time and budgets | `Time_Tracking_Enabled__c` | Checkbox, default true |
+| Days late before at risk | `At_Risk_Days__c` | Number(3, 0), default 7 (1 to 365) |
+| Budget warning percent | `Budget_Warning_Percent__c` | Number(3, 0), default 90 (1 to 100) |
+| Weekly capacity hours | `Weekly_Capacity_Hours__c` | Number(3, 0), default 40 (1 to 168) |
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -17250,6 +17450,7 @@ mirrors the primary member).
 | 1.22 | 2026-11-11 | Territory Management module (C-40, C-40b; ADR-NEXT `NEXT-territory-management-module.md`). New Sections 29TM1 Territory (`Territory__c`, with the Territory lookup `Territory__c` on Account and Contact), 29TM2 Territory Rule (`Territory_Rule__c`), 29TM3 Territory Member (`Territory_Member__c`) and 29TM4 Territory Run (`Territory_Run__c`); rules R-TM1 to R-TM4. |
 | 1.23 | 2026-11-11 | Memberships module (G-22a to G-22d, PAY-02, PB-09; D-157, D-190; ADR-NEXT `NEXT-memberships-module.md`). New package `packages/memberships`: Membership Level (`Membership_Level__c`, 29MEM1), Membership Benefit (`Membership_Benefit__c`, 29MEM2), Membership Term (`Membership_Term__c`, 29MEM3, R-MEM1 to R-MEM9) and Memberships Settings (`Memberships_Settings__c`, 29MEM4). No Contact or Account field, and no object named like Memberships Essentials' membership object, so both deploy together. |
 | 1.24 | 2026-11-11 | Event Management paid registration, session proposals, badge overrides and session ratings (EV-20, EV-21, EV-26, EV-27, D-190; ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`). New Sections 29EV27 Session Rating (`Session_Rating__c`, R-SRT1 to R-SRT3) and 29EV30 Proposal Presenter (`Proposal_Presenter__c`, R-PP1). `Event__c` gains `Review_Criteria__c`, `Blind_Review__c` and `Session_Rating_Form_Key__c`; `Event_Session__c` gains `Rating_Count__c`, `Rating_Total__c` and `Average_Rating__c`; `Event_Registration__c` gains status Pending Payment and `Payment_Status__c`, `Amount_Paid__c`, `Payment_Key__c` and `Payment_Link__c` (R-ERG5 to R-ERG7); `Event_Attendee__c` gains `Badge_Name__c`, `Badge_Title__c` and `Badge_Company__c` (R-EAT4); `Speaker_Application__c` gains `Weighted_Total__c` and `Weighted_Average__c` and `Review_Count__c` counts scored reviews only; `Speaker_Review__c` gains `Criteria_Scores__c` and `Weighted_Score__c` and `Score__c` is no longer required (R-SA6 to R-SA9); `Events_Settings__c` gains `Online_Payments__c` (false) and `Payment_Link_Template__c` (`BarnCRM_Event_Payment_Link`). Events reaches Payments only by name (`PaymentsApi`, `EventPaymentListener`). |
+| 1.25 | 2026-11-11 | Project Management module (PM-01 to PM-05, D-175; ADR-NEXT `NEXT-project-management-module.md`). New package `packages/projects`: Project (`Project__c`, rules R-PM1 to R-PM3), Project Phase (`Project_Phase__c`), Project Task (`Project_Task__c`, R-PM4), Project Assignment (`Project_Assignment__c`, R-PM5), Time Entry (`Time_Entry__c`, R-PM6, R-PM7), Project Status Update (`Project_Status_Update__c`, R-PM8) and settings `Projects_Settings__c` (29PM1 to 29PM7). |
 
 ---
 ## 32. Entity ownership by package
@@ -17434,6 +17635,13 @@ included; standard objects the packages extend are named by the entity that gove
 | Territory Rule | Territory Management | 1.22 (C-40) | 29TM2 |
 | Territory Member | Territory Management | 1.22 (C-40b) | 29TM3 |
 | Territory Run | Territory Management | 1.22 (C-40) | 29TM4 |
+| Project | Project Management | 1.18 (PM-02) | 29PM1 |
+| Project Phase | Project Management | 1.18 (PM-02) | 29PM2 |
+| Project Task | Project Management | 1.18 (PM-02) | 29PM3 |
+| Project Assignment | Project Management | 1.18 (PM-04) | 29PM4 |
+| Time Entry | Project Management | 1.18 (PM-04) | 29PM5 |
+| Project Status Update | Project Management | 1.18 (PM-05) | 29PM6 |
+| Projects Settings | Project Management | 1.18 (PM-02) | 29PM7 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
