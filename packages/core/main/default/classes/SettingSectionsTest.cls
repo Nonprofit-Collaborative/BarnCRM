@@ -14,9 +14,9 @@ private class SettingSectionsTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				27,
+				28,
 				sections.size(),
-				'Twenty-seven section names are agreed across the suite'
+				'Twenty-eight section names are agreed across the suite'
 			);
 			Assert.isTrue(
 				SettingSections.isKnown(SettingSections.FORMS) &&

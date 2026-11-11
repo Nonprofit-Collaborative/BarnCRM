@@ -94,8 +94,8 @@ Rules:
 | payments | Payments_Setup | Custom70: Handsaw |
 | scholarships | Award__c | Custom80: Motorcycle |
 | scholarships | Award_Application__c | Custom70: Handsaw |
-| scholarships | Award_Program__c | Custom58: Caduceus |
-| scholarships | Scholarships | Custom56: Bottle |
+| scholarships | Award_Program__c | Custom48: Trophy |
+| scholarships | Scholarships | Custom34: Insect |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |
 | mirror | Gift_Transaction_Mirror | Custom31: Car |
@@ -179,7 +179,7 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | forms | formSubmission | custom:custom51 | Form_Submission__c |
 | logicmodels | logicModelBuilder | custom:custom62 | Logic_Model__c |
 | scholarships | applicationReview | custom:custom70 | Award_Application__c |
-| scholarships | awardCycleBoard | custom:custom58 | Award_Program__c |
+| scholarships | awardCycleBoard | custom:custom48 | Award_Program__c |
 | scholarships | awardPanel | custom:custom80 | Award__c |
 | mirror | accountingExport | custom:custom21 | Accounting_Export |
 | mirror | campaignSync | custom:custom35 | Campaign_Sync |
