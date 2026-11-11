@@ -15956,6 +15956,251 @@ brand is refused by the unique field.
 
 ---
 
+## 29SG1. Award Program
+
+### Definition
+
+A scholarship, fellowship or outbound grant program the organization gives (SG-01, Scholarships and Outbound Grants module, ADR-NEXT `NEXT-scholarships-outbound-grants-module.md`, D-122). It holds the award letter template its awards use.
+
+### Rules
+
+**R-SG1 Letter merge.** Make Letter fills `{Recipient}`, `{Program}`, `{Cycle}`, `{Amount}`, `{Conditions}`, `{Organization}` and `{Date}` into the program's Letter Template (or the shipped letter when blank), HTML-escaped, renders it as a PDF and files it on the award; Letter Date is set to today.
+
+### Salesforce implementation
+
+- **Object:** `Award_Program__c`, label Award Program, name field Text (Program Name), sharing Public Read/Write.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Type | `Type__c` | Picklist (Scholarship, Grant, Fellowship, Other), restricted, required, default Scholarship |
+| Active | `Active__c` | Checkbox, default true |
+| Description | `Description__c` | Long Text Area(32768) |
+| Award Letter Template | `Letter_Template__c` | Long Text Area(32768) |
+
+---
+
+## 29SG2. Award Cycle
+
+### Definition
+
+One round of a program (SG-01): when applications are taken, who is eligible, how they are scored, who reviews them, the budget and the planned number of awards.
+
+### Rules
+
+**R-SG2 Cycle dates.** The 6:50 AM nightly step sets a Planned cycle to Open on its Open Date and an Open cycle to Reviewing the day after its Close Date.
+
+**R-SG3 Eligibility.** `Eligibility_Rules__c` is a JSON list of `{answer, op, value}` (ops `equals`, `notEquals`, `atLeast`, `atMost`, `isTrue`, `contains`) checked against the form answers when a submission arrives: all met gives Eligible, any not met gives Ineligible with each unmet rule in Eligibility Notes, no rules gives Submitted.
+
+**R-SG4 Rubric.** `Rubric__c` is a JSON list of `{key, label, max, weight}`. Blank means one criterion `overall` with max 10 and weight 1.
+
+### Salesforce implementation
+
+- **Object:** `Award_Cycle__c`, label Award Cycle, name field Text (Cycle Name), master-detail to Award Program (`Program__c`, relationship Award Cycles), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Program | `Program__c` | Master-Detail(Award_Program__c) |
+| Status | `Status__c` | Picklist (Planned, Open, Reviewing, Decided, Closed), restricted, required, default Planned |
+| Open Date | `Open_Date__c` | Date |
+| Close Date | `Close_Date__c` | Date |
+| Budget | `Budget__c` | Currency(16, 2) |
+| Planned Awards | `Award_Count__c` | Number(5, 0) |
+| Eligibility | `Eligibility__c` | Long Text Area(32768) |
+| Eligibility Rules | `Eligibility_Rules__c` | Long Text Area(32768) |
+| Rubric | `Rubric__c` | Long Text Area(32768) |
+| Blind Review | `Blind_Review__c` | Checkbox, default false |
+| Reviewers per Application | `Reviewers_Per_Application__c` | Number(2, 0), default 2 |
+| Reviewer Panel | `Reviewer_Group__c` | Text(80) |
+| Application Form | `Application_Form_Key__c` | Text(18) |
+| Report Form | `Report_Form_Key__c` | Text(18) |
+| Applications | `Applications__c` | Roll-Up Summary (COUNT) |
+| Awarded Amount | `Awarded_Amount__c` | Roll-Up Summary (SUM Award__c.Amount__c, Status__c equals Offered, Accepted, Active, Completed) |
+| Awards Made | `Awards_Made__c` | Roll-Up Summary (COUNT, Status__c equals Offered, Accepted, Active, Completed) |
+| Remaining Budget | `Remaining_Budget__c` | Formula (Currency): `IF(ISBLANK(Budget__c), NULL, Budget__c - Awarded_Amount__c)` |
+
+---
+
+## 29SG3. Award Application
+
+### Definition
+
+One application to a cycle by a Core person (Contact) or organization (Account) (SG-02). Its documents are Salesforce Files linked to the record, copied as links from the Forms submission.
+
+### Rules
+
+**R-SG5 Intake.** A Forms submission filled from a cycle creates an application with the matched Contact and Account, the answers as JSON, Submitted Date today and the status from R-SG3; its files are linked to the application. A submission filled from an applicant's own Draft application (signed claim) fills that application instead. A person with a non-Withdrawn application in the cycle gets no second one; the later submission updates it while it is Draft or Submitted.
+
+### Salesforce implementation
+
+- **Object:** `Award_Application__c`, label Award Application, name field Auto Number (APP-{000000}), master-detail to Award Cycle (`Cycle__c`, relationship Applications), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Cycle | `Cycle__c` | Master-Detail(Award_Cycle__c) |
+| Applicant | `Contact__c` | Lookup(Contact) |
+| Applicant Organization | `Organization__c` | Lookup(Account) |
+| Status | `Status__c` | Picklist (Draft, Submitted, Eligible, Ineligible, In Review, Awarded, Declined, Withdrawn), restricted, required, default Submitted |
+| Purpose | `Title__c` | Text(255) |
+| Amount Requested | `Amount_Requested__c` | Currency(16, 2) |
+| Summary | `Summary__c` | Long Text Area(32768) |
+| Form Answers | `Answers__c` | Long Text Area(131072) |
+| Eligibility Notes | `Eligibility_Notes__c` | Long Text Area(32768) |
+| Submitted Date | `Submitted_Date__c` | Date |
+| Form Submission | `Form_Submission_Key__c` | Text(18) |
+| Application Form Link | `Form_Link__c` | URL |
+| Renewal Of | `Renewal_Of__c` | Lookup(Award__c) |
+| Total Score | `Total_Score__c` | Roll-Up Summary (SUM Application_Review__c.Score__c, Status__c equals Submitted) |
+| Reviews Submitted | `Review_Count__c` | Roll-Up Summary (COUNT, Status__c equals Submitted) |
+| Average Score | `Average_Score__c` | Formula (Number): `IF(Review_Count__c = 0, NULL, Total_Score__c / Review_Count__c)` |
+
+---
+
+## 29SG4. Application Review
+
+### Definition
+
+One reviewer's scores for one application, or their recusal (SG-03).
+
+### Rules
+
+**R-SG6 Score.** Saving a review writes the weighted total of the criterion scores (each capped at its max) to `Score__c`. Only Submitted reviews count in the application's Total Score and Reviews Submitted.
+
+**R-SG7 Own review.** Only the reviewer or a holder of Manage Scholarships (`Scholarships_Manage`) changes a review's scores, status, comments or recusal reason (validation rule `Own_Review`).
+
+**R-SG8 Panel assignment.** Assign Reviewers gives each Submitted, Eligible or In Review application of the cycle reviews up to Reviewers per Application from the members of the Reviewer Panel group: each next review to the member with the fewest open (Assigned) reviews in the cycle, never to a member who already has a review of that application (recused included). An application with a review becomes In Review.
+
+### Salesforce implementation
+
+- **Object:** `Application_Review__c`, label Application Review, name field Auto Number (REV-{000000}), master-detail to Award Application (`Application__c`, relationship Reviews), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Application | `Application__c` | Master-Detail(Award_Application__c) |
+| Reviewer | `Reviewer__c` | Lookup(User) |
+| Status | `Status__c` | Picklist (Assigned, Submitted, Recused), restricted, required, default Assigned |
+| Criterion Scores | `Scores__c` | Long Text Area(32768) |
+| Score | `Score__c` | Number(7, 2) |
+| Comments | `Comments__c` | Long Text Area(32768) |
+| Recusal Reason | `Recusal_Reason__c` | Text(255) |
+
+---
+
+## 29SG5. Award
+
+### Definition
+
+A decision to give money to an applicant (SG-04): the amount, the letter, acceptance and terms.
+
+### Rules
+
+**R-SG9 Decide.** Deciding an application Awarded creates an Offered award with the applicant, organization and amount, Decision Date today, and sets the application Awarded; Declined sets the application Declined. Needs Manage Scholarships.
+
+**R-SG10 Renewal.** Start Renewal on a Renewable award creates a Draft application, Renewal Of the award, in the program's next Planned or Open cycle.
+
+### Salesforce implementation
+
+- **Object:** `Award__c`, label Award, name field Auto Number (AWD-{000000}), master-detail to Award Cycle (`Cycle__c`, relationship Awards), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Cycle | `Cycle__c` | Master-Detail(Award_Cycle__c) |
+| Application | `Application__c` | Lookup(Award_Application__c) |
+| Recipient | `Contact__c` | Lookup(Contact) |
+| Recipient Organization | `Organization__c` | Lookup(Account) |
+| Amount | `Amount__c` | Currency(16, 2), required |
+| Status | `Status__c` | Picklist (Offered, Accepted, Declined, Active, Completed, Cancelled), restricted, required, default Offered |
+| Decision Date | `Decision_Date__c` | Date |
+| Accepted Date | `Accepted_Date__c` | Date |
+| Letter Date | `Letter_Sent_Date__c` | Date |
+| Terms and Conditions | `Conditions__c` | Long Text Area(32768) |
+| Renewable | `Renewable__c` | Checkbox, default false |
+| Paid Amount | `Paid_Amount__c` | Roll-Up Summary (SUM Award_Payment__c.Amount__c, Status__c equals Paid) |
+| Scheduled Amount | `Scheduled_Amount__c` | Roll-Up Summary (SUM Award_Payment__c.Amount__c, Status__c notEqual Cancelled) |
+| Open Requirements | `Open_Requirements__c` | Roll-Up Summary (COUNT, Status__c equals Open, Submitted) |
+
+---
+
+## 29SG6. Disbursement
+
+### Definition
+
+One planned or recorded payment of an award (SG-05). A record of a payment made in the accounting system: BarnCRM moves no money (Section 1.5).
+
+### Rules
+
+**R-SG11 Paid.** A disbursement becomes Paid only for a holder of Manage Scholarships and only while no Open or Submitted Condition requirement of its award holds it back (one naming it, or one naming no disbursement); Paid Date is filled with today when blank (handler `AwardPaymentRulesHandler`, always runs).
+
+**R-SG12 Schedule.** Build Schedule splits the award's unscheduled amount into equal payments, the last taking the remainder, a chosen number of months apart, payee the recipient's name.
+
+### Salesforce implementation
+
+- **Object:** `Award_Payment__c`, label Disbursement, name field Auto Number (DSB-{000000}), master-detail to Award (`Award__c`, relationship Disbursements), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Award | `Award__c` | Master-Detail(Award__c) |
+| Amount | `Amount__c` | Currency(16, 2), required |
+| Scheduled Date | `Scheduled_Date__c` | Date |
+| Paid Date | `Paid_Date__c` | Date |
+| Status | `Status__c` | Picklist (Scheduled, Paid, Cancelled), restricted, required, default Scheduled |
+| Payee | `Payee_Name__c` | Text(255) |
+| Payment Method | `Payment_Method__c` | Picklist (Check, Bank Transfer, Card, Other), restricted |
+| Reference | `Reference__c` | Text(80) |
+| Exported Date | `Exported_Date__c` | Date |
+
+---
+
+## 29SG7. Award Requirement
+
+### Definition
+
+A condition the recipient must meet before payment, or a progress or final report they owe (SG-06, SG-09).
+
+### Rules
+
+**R-SG13 Reminders.** The nightly step sends the owner of the award's Award Program (awards and requirements are master-detail children with no owner of their own) one bell notification (type `Scholarships_Reminder`) per Due Date for each Open requirement due within the reminder days, overdue included, and stores the date in Reminded For; with Email Recipients on it also emails the award's Recipient their signed report link.
+
+### Salesforce implementation
+
+- **Object:** `Award_Requirement__c`, label Award Requirement, name field Text (Requirement), master-detail to Award (`Award__c`, relationship Requirements), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Award | `Award__c` | Master-Detail(Award__c) |
+| Type | `Type__c` | Picklist (Condition, Progress Report, Final Report), restricted, required, default Condition |
+| Due Date | `Due_Date__c` | Date |
+| Status | `Status__c` | Picklist (Open, Submitted, Met, Waived), restricted, required, default Open |
+| Blocks Disbursement | `Disbursement__c` | Lookup(Award_Payment__c) |
+| Instructions | `Instructions__c` | Long Text Area(32768) |
+| Report or Evidence | `Response__c` | Long Text Area(131072) |
+| Submitted Date | `Submitted_Date__c` | Date |
+| Report Form Link | `Form_Link__c` | URL |
+| Reminded For | `Reminded_For__c` | Date |
+
+---
+
+## 29SG8. Scholarships Settings
+
+### Definition
+
+The module's org-wide settings, edited in the Scholarships and Grants section of BarnCRM Settings.
+
+### Rules
+
+- **Setting Definitions:** `Scholarships_Reminders_Enabled`, `Scholarships_Reminder_Days`, `Scholarships_Email_Recipients`, section Scholarships and Grants, module `Scholarships`.
+
+### Salesforce implementation
+
+- **Object:** `Scholarships_Settings__c`, label Scholarships Settings, hierarchy custom setting, visibility Protected.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Send Scholarships reminders | `Reminders_Enabled__c` | Checkbox, default true |
+| Days before to remind | `Reminder_Days__c` | Number(3, 0), default 14 |
+| Email recipients about reports | `Email_Recipients__c` | Checkbox, default false |
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -16350,6 +16595,7 @@ mirrors the primary member).
 | 1.6 | 2026-11-11 | Generic Record Merge (C-62, D-156; extends ADR-0145). `BarnCRM_Settings__c` gains `Generic_Merge_Enabled__c` (false). `Merge_Rule__mdt` `Field_Name__c` may name `Object.Field`. Rules R-DP11 and R-DP12 added. No object added: merges are written to `Merge_Journal__c`. |
 | 1.7 | 2026-11-11 | Field History Keeper (C-68, D-157; ADR-NEXT `NEXT-field-history-keeper.md`). New Section 29FH1 Field History (`Field_History__c`, rules R-FH1 to R-FH5); custom metadata type `History_Field__mdt` (Section 13); `BarnCRM_Settings__c` gains `Field_History_Enabled__c` (false) and `Field_History_Retention_Days__c` (730). |
 | 1.8 | 2026-11-11 | Corporate Hub module (CH-01 to CH-04, CH-06 to CH-08, D-118; ADR-NEXT `NEXT-corporate-hub-module.md`). New package `packages/corporatehub`: Library Document (`Hub_Document__c`, 29CH1), Policy Acknowledgment (`Policy_Acknowledgment__c`, 29CH2), Compliance Obligation (`Compliance_Obligation__c`, 29CH3), Compliance Cycle (`Compliance_Cycle__c`, 29CH4), Agreement (`Agreement__c`, 29CH5) and Corporate Hub Settings (`Corporate_Hub_Settings__c`, 29CH6), with the shipped templates `BarnCorporateHubTemplates`. |
+| 1.12 | 2026-11-11 | Scholarships and Outbound Grants module (SG-01 to SG-10, PB-06, D-122, D-156; ADR-NEXT `NEXT-scholarships-outbound-grants-module.md`). New package `packages/scholarships`: Award Program (`Award_Program__c`), Award Cycle (`Award_Cycle__c`), Award Application (`Award_Application__c`), Application Review (`Application_Review__c`), Award (`Award__c`), Disbursement (`Award_Payment__c`), Award Requirement (`Award_Requirement__c`) and settings `Scholarships_Settings__c` (29SG1 to 29SG8). |
 | 1.9 | 2026-11-11 | Migration Assistant (MIG-01, MIG-10, MIG-08; ADR-NEXT `NEXT-migration-assistant.md`, D-125). New Section 29ZS Migration Run (`Migration_Run__c`, rules R-MR1 to R-MR4) and shipped type Migration Kit (`Migration_Kit__mdt`, Section 13, R-MK1). Import Batch (16) gains Migration Run (`Migration_Run__c`) and Migration Step (`Migration_Step__c`). Integration App gains rows `Nonprofit_Success_Pack` and `Nonprofit_Cloud_Fundraising` (shown only when installed) and Start Migration for a detected product with a kit. R-R16 gains NPSP customizable rollups: read by describe, imported through the DLRS import steps, covered by the same-field guard. Rollup Builder ships kits `DLRS_Rollups` and `NPSP_Rollups`. |
 | 1.10 | 2026-11-11 | Giving words and nightly jobs (G-36, G-37). No object or field added. Labels only: `Installment__c` is Scheduled Payment (plural Scheduled Payments, Name label Payment Number, list view All Scheduled Payments); the `Installment__c` lookups on Gift, Gift Batch Row and Pledge Reminder are labelled Scheduled Payment; Pledge Reminder's `Commitment__c` is labelled Commitment; `Commitment__c.Installments_Planned__c` is Payments Planned. The vocabulary is commitment (the record), pledge and recurring gift (its types), scheduled payment (each installment). The pledge reminder step (`BarnCRM Giving Pledge Reminders`, 03:15, shipped off) is now one of `GivingScheduler`'s five jobs: its Schedule and Stop switch it with the others and Run Now runs it; `GivingScheduler.isScheduled` still counts only the other four. |
 | 1.11 | 2026-11-11 | Gift details and wealth screening (G-21, G-31, G-32, D-156). Five attributes added to Gift (`Stock_Symbol__c`, `Stock_Shares__c`, `Planned_Gift_Type__c`, `Gift_Source__c`, `Gift_Source_Name__c`), rule R-G17, and the packaged report DAF and Stock Gifts This Year. New Section 25U Wealth screening data, rules R-WS1 to R-WS3: five attributes added to Contact (`Capacity_Rating__c`, `Affinity_Rating__c`, `Screening_Score__c`, `Screening_Date__c`, `Screening_Source__c`), hidden from Giving Read Only, and the shipped import template Wealth Screening. |
@@ -16528,6 +16774,14 @@ included; standard objects the packages extend are named by the entity that gove
 | Payment Event | Payments | 1.4 (PAY-01) | 29PAY2 |
 | Payments Settings | Payments | 1.4 (PAY-01) | 29PAY3 |
 | Payment Keys | Payments | 1.4 (PAY-01) | 29PAY4 |
+| Award Program | Scholarships and Outbound Grants | 1.12 (SG-01) | 29SG1 |
+| Award Cycle | Scholarships and Outbound Grants | 1.12 (SG-01) | 29SG2 |
+| Award Application | Scholarships and Outbound Grants | 1.12 (SG-02) | 29SG3 |
+| Application Review | Scholarships and Outbound Grants | 1.12 (SG-03) | 29SG4 |
+| Award | Scholarships and Outbound Grants | 1.12 (SG-04) | 29SG5 |
+| Disbursement | Scholarships and Outbound Grants | 1.12 (SG-05) | 29SG6 |
+| Award Requirement | Scholarships and Outbound Grants | 1.12 (SG-06, SG-09) | 29SG7 |
+| Scholarships Settings | Scholarships and Outbound Grants | 1.12 (SG-06) | 29SG8 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
