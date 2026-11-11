@@ -27,7 +27,7 @@ org. These kits ship:
 - **V4S Jobs, Shifts and Hours** (Volunteers): copies Volunteers for Salesforce jobs, shifts,
   sign-ups and completed hours. See [Volunteers](volunteers.md#moving-from-v4s).
 - **NPSP Funds, Levels, Recurring Donations** (Giving): copies General Accounting Units,
-  levels and recurring donations. See
+  levels, recurring donations and engagement plans, and ends with a parity report. See
   [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
 
 An app can have several kits, one for each BarnCRM module that receives its records. Its

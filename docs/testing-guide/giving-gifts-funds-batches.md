@@ -403,3 +403,17 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 5 | Open the NPSP records. | Nothing in NPSP changed. |
 
 **Cleanup:** undo the four steps in reverse order.
+
+## T-GIFT-23: NPSP Engagement Plans and the Parity Report
+
+**Purpose:** confirm the NPSP Funds, Levels, Recurring Donations kit copies engagement plans as stewardship plans and reports parity for levels and plans.
+**Prerequisites:** T-GIFT-22 done (steps 1 to 4 loaded, not undone); in NPSP, an engagement plan template "New Donor Welcome" with a task "Call to thank" 3 days after (priority Medium, assigned to you) and a task "Send impact report" 30 days after (no assignee), and a second active level "Patron" with no BarnCRM donor level of that name.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In the kit, run and load **Engagement Plans**. | An active stewardship plan template New Donor Welcome, started **Manual**. **Verified**. |
+| 2 | Run and load **Engagement Plan Tasks**. | Two steps: Call to thank, 3 days, Normal, **Specific user** you; Send impact report, 30 days, **Record owner**. **Verified**. |
+| 3 | Read **Verification** under **Levels, Engagement Plans and Rollups Parity**. | **In the other app now** counts the two active levels and one plan (3); **Done** is 2 (Friend and New Donor Welcome); **Check this step**. |
+| 4 | Create a BarnCRM donor level Patron, then **Refresh**. | **Done** is 3 and the step says **Verified**. Click **Open Stewardship Plans**: the tab opens. Click **Mark Done**. |
+
+**Cleanup:** undo the two plan steps in reverse order; delete the Patron donor level.
