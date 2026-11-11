@@ -1203,6 +1203,7 @@
     "Core_NightlyJobs_GaveUp": "Still running after {0} hours, so the nightly run moved on to the next job.",
     "Core_NightlyJobs_Intro": "BarnCRM runs its nightly jobs one at a time from one schedule. Each starts at its time or when the one before it finishes, whichever is later, so no two overlap. Times are in the time zone of the person who scheduled the run, and the run starts at midnight there. Turn a job on or off on its own page.",
     "Core_NightlyJobs_NotScheduled": "The nightly jobs are not scheduled, so none of them runs. Schedule them to run as you.",
+    "Core_NightlyJobs_StateNotScheduled": "Not Scheduled",
     "Core_NightlyJobs_Scheduled": "Scheduled: runs every night from midnight, as the person who scheduled it.",
     "Core_NightlyJobs_ScheduledNotice": "The nightly jobs are scheduled to run as you.",
     "Core_NightlyJobs_Superseded": "Still running when the next night's run started; the new run waited for it.",

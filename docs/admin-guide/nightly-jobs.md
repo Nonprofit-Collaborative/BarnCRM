@@ -53,7 +53,8 @@ Mirror, Volunteers, Logic Models, Funders). The Nightly Jobs panel lists every j
 The panel shows:
 
 - whether the nightly run is scheduled, and when it last started and how it ended;
-- every job in the order the run takes it, with its **Time**, its **Status** (On or Off), its
+- every job in the order the run takes it, with its **Time**, its **Status** (On, Off, or
+  Not Scheduled when it is on but the nightly run is not scheduled, so it does not run yet), its
   **Last Run** and its **Result**: Done, Done With Errors, Failed, Skipped (it was off),
   Gave Up Waiting, or Running.
 
