@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Answered_In_Portal__c</fullName>
+  <defaultValue>false</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>Set by the board portal when the person acknowledges there. Nobody edits it.</inlineHelpText>
+  <label>Answered in Portal</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

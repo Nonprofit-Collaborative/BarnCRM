@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Meeting_Name__c</fullName>
+  <externalId>false</externalId>
+  <formula>Motion__r.Meeting__r.Name</formula>
+  <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+  <inlineHelpText>The meeting where the motion was taken.</inlineHelpText>
+  <label>Meeting</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

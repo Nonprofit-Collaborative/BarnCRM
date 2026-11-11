@@ -80,6 +80,8 @@ Rules:
 | portal | Portal_Access__c | Custom77: Locked |
 | portal | Portal__c | Custom47: Knight |
 | corporatehub | Agreement__c | Custom93: ShoppingCart |
+| corporatehub | Board__c | Custom58: Caduceus |
+| corporatehub | Board_Meeting__c | Custom56: Bottle |
 | corporatehub | Compliance_Obligation__c | Custom97: Thermometer |
 | corporatehub | Corporate_Hub | Custom72: Helicopter |
 | corporatehub | Hub_Document__c | Custom49: CD/DVD |

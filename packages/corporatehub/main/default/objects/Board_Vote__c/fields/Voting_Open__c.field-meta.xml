@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Voting_Open__c</fullName>
+  <externalId>false</externalId>
+  <formula>ISPICKVAL(Motion__r.Status__c, 'Voting Open')</formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+  <inlineHelpText>Checked while voting on the motion is open.</inlineHelpText>
+  <label>Voting Open</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

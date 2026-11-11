@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Start__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>When the meeting starts. Leave blank while an availability poll is open.</inlineHelpText>
+  <label>Start</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>DateTime</type>
+</CustomField>

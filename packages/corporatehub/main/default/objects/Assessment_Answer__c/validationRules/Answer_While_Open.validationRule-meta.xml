@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Answer_While_Open</fullName>
+  <active>true</active>
+  <description>Answers change only while the self-assessment is Open (R-AA1).</description>
+  <errorConditionFormula>AND(NOT(ISNEW()), OR(ISCHANGED(Rating__c), ISCHANGED(Comment__c)), NOT(ISPICKVAL(Assessment__r.Status__c, 'Open')))</errorConditionFormula>
+  <errorDisplayField>Rating__c</errorDisplayField>
+  <errorMessage>This self-assessment is closed.</errorMessage>
+</ValidationRule>

@@ -89,6 +89,8 @@ const ICONS = Object.freeze({
   Portal__c: 'custom:custom47',
   // Corporate Hub
   Agreement__c: 'custom:custom93',
+  Board__c: 'custom:custom58',
+  Board_Meeting__c: 'custom:custom56',
   Compliance_Obligation__c: 'custom:custom97',
   Corporate_Hub: 'custom:custom72',
   Hub_Document__c: 'custom:custom49',

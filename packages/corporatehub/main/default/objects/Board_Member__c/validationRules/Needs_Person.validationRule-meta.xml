@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Needs_Person</fullName>
+  <active>true</active>
+  <description>A new seat names a person (R-BM3).</description>
+  <errorConditionFormula>AND(ISNEW(), ISBLANK(Person__c))</errorConditionFormula>
+  <errorDisplayField>Person__c</errorDisplayField>
+  <errorMessage>Choose the person who holds this seat.</errorMessage>
+</ValidationRule>

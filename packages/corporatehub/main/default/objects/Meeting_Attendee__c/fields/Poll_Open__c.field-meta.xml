@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Poll_Open__c</fullName>
+  <externalId>false</externalId>
+  <formula>Meeting__r.Poll_Open__c</formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+  <inlineHelpText>Checked while the meeting's availability poll is open.</inlineHelpText>
+  <label>Poll Open</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

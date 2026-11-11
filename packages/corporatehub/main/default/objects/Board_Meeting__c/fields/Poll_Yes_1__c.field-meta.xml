@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Poll_Yes_1__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Attendees available at Poll Time 1.</inlineHelpText>
+  <label>Yes for Time 1</label>
+  <trackTrending>false</trackTrending>
+  <type>Summary</type>
+  <summaryFilterItems>
+    <field>Meeting_Attendee__c.Available_1__c</field>
+    <operation>equals</operation>
+    <value>Yes</value>
+  </summaryFilterItems>
+  <summaryForeignKey>Meeting_Attendee__c.Meeting__c</summaryForeignKey>
+  <summaryOperation>count</summaryOperation>
+</CustomField>

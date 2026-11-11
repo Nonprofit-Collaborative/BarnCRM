@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Age_Range__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Optional. Shown only when Show Board Demographics is on.</inlineHelpText>
+  <label>Age Range</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Under 30</fullName>
+        <default>false</default>
+        <label>Under 30</label>
+      </value>
+      <value>
+        <fullName>30 to 44</fullName>
+        <default>false</default>
+        <label>30 to 44</label>
+      </value>
+      <value>
+        <fullName>45 to 59</fullName>
+        <default>false</default>
+        <label>45 to 59</label>
+      </value>
+      <value>
+        <fullName>60 or Over</fullName>
+        <default>false</default>
+        <label>60 or Over</label>
+      </value>
+      <value>
+        <fullName>Prefer Not to Say</fullName>
+        <default>false</default>
+        <label>Prefer Not to Say</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

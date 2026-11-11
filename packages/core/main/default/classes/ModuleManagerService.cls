@@ -145,9 +145,18 @@ public with sharing class ModuleManagerService {
 		'Portal' => new List<String>{ 'Portal__c', 'Portal_Access__c', 'Portal_Session__c' },
 		'CorporateHub' => new List<String>{
 			'Agreement__c',
+			'Assessment_Answer__c',
+			'Board__c',
+			'Board_Assessment__c',
+			'Board_Meeting__c',
+			'Board_Member__c',
+			'Board_Motion__c',
+			'Board_Vote__c',
 			'Compliance_Cycle__c',
 			'Compliance_Obligation__c',
 			'Hub_Document__c',
+			'Meeting_Action_Item__c',
+			'Meeting_Attendee__c',
 			'Policy_Acknowledgment__c'
 		}
 	};
