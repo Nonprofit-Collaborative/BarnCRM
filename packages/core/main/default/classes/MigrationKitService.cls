@@ -9,7 +9,9 @@
  * Core never names another product's schema (ADR-0013, ADR-0062). Runs are read and written in
  * the running administrator's access.
  */
+@NamespaceAccessible
 public with sharing class MigrationKitService {
+	@NamespaceAccessible
 	public static final String KIND_IMPORT = 'import';
 	public static final String KIND_TOOL = 'tool';
 	public static final String NOT_STARTED = 'NotStarted';
@@ -37,15 +39,21 @@ public with sharing class MigrationKitService {
 	}
 
 	/** One step of a kit, as its JSON writes it (R-MK1). */
+	@NamespaceAccessible
 	public class Step {
+		@NamespaceAccessible
 		public String key;
 		public String label;
+		@NamespaceAccessible
 		public String kind;
 		public String help;
 		public String source;
+		@NamespaceAccessible
 		public List<String> fields;
 		public List<Condition> filters;
+		@NamespaceAccessible
 		public List<Link> links;
+		@NamespaceAccessible
 		public String templateKey;
 		public String tab;
 		public String toolLabel;
@@ -62,8 +70,11 @@ public with sharing class MigrationKitService {
 	}
 
 	/** A column holding a source Id an earlier step moved, to be its BarnCRM record (R-MK1). */
+	@NamespaceAccessible
 	public class Link {
+		@NamespaceAccessible
 		public String column;
+		@NamespaceAccessible
 		public String step;
 	}
 
@@ -556,7 +567,8 @@ public with sharing class MigrationKitService {
 		throw refusal(BarnHelp.text('Core', 'Core_Migration_ErrorUnknownStep'), null);
 	}
 
-	/** The named step of a kit, for the staging job. */
+	/** The named step of a kit, for the staging job and a module's kit extension. */
+	@NamespaceAccessible
 	public static Step stepNamed(Migration_Kit__mdt kit, String stepKey) {
 		for (Step step : steps(kit)) {
 			if (step.key == stepKey) {
@@ -619,6 +631,7 @@ public with sharing class MigrationKitService {
 	}
 
 	/** The kit by key, whether or not its product is still detected, for the staging job. */
+	@NamespaceAccessible
 	public static Migration_Kit__mdt kitNamed(String kitKey) {
 		for (Migration_Kit__mdt kit : catalog()) {
 			if (kit.DeveloperName == kitKey) {
@@ -739,6 +752,7 @@ public with sharing class MigrationKitService {
 	 * query that reads it in the running user's access, and a record as a staged row keyed by
 	 * the field names as the step writes them. Holds only text, so a batch job can keep it.
 	 */
+	@NamespaceAccessible
 	public class Source {
 		private String objectName;
 		private List<String> written = new List<String>{ 'Id' };
@@ -746,6 +760,7 @@ public with sharing class MigrationKitService {
 		private String whereClause = '';
 		private Map<String, Object> binds = new Map<String, Object>();
 
+		@NamespaceAccessible
 		public Source(Step step) {
 			Schema.SObjectType type = NamespaceUtil.globalDescribe()
 				.get(step.source.trim().replace('.', '__').toLowerCase());
@@ -804,6 +819,7 @@ public with sharing class MigrationKitService {
 		}
 
 		/** Each record as one row, its values as text, keyed by the step's field names. */
+		@NamespaceAccessible
 		public List<Map<String, Object>> rows(List<SObject> records) {
 			List<Map<String, Object>> rows = new List<Map<String, Object>>();
 			for (SObject record : records) {
