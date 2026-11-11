@@ -23,6 +23,7 @@ import MIGRATION_PATH from '@salesforce/label/c.Core_Integrations_MigrationPath'
 import LEARN_MORE from '@salesforce/label/c.Core_Kit_LearnMore';
 import NEW_TAB from '@salesforce/label/c.Core_Kit_NewTab';
 import CHECK_AGAIN from '@salesforce/label/c.Core_SuiteChoice_CheckAgain';
+import canManageSettings from '@salesforce/customPermission/Manage_BarnCRM_Settings';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The groups in the order the page shows them, by the category a catalog row stores. */
@@ -68,12 +69,17 @@ function fill(label, value) {
  * link opened in a new tab. The catalog is custom metadata read by Apex; nothing here depends
  * on any of the products. A group with no product is not drawn, so an org without a product
  * that matches a BarnCRM module sees no heading for it.
+ *
+ * A detected product with a Migration Kit offers Start Migration (MIG-10), which shows the
+ * Migration Assistant in place of the list; Back returns to it.
  */
 export default class IntegrationsPanel extends LightningElement {
   helpReady = isHelpLoaded('Core');
 
   apps;
   errorMessage;
+  /** The Migration Kit open in the Assistant, or undefined while the list shows. */
+  migrationKit;
 
   labels = {
     get intro() {
@@ -135,6 +141,15 @@ export default class IntegrationsPanel extends LightningElement {
     return this.load();
   }
 
+  handleStartMigration(event) {
+    this.migrationKit = event.target.dataset.kit;
+  }
+
+  handleMigrationBack() {
+    this.migrationKit = undefined;
+    return this.load();
+  }
+
   get isEmpty() {
     return Array.isArray(this.apps) && this.apps.length === 0;
   }
@@ -161,6 +176,9 @@ export default class IntegrationsPanel extends LightningElement {
       licenseCostText: app.licenseCost ? fill(LICENSE_COST, app.licenseCost) : null,
       relatedModuleText: app.relatedModule ? fill(RELATED_MODULE, app.relatedModule) : null,
       migrationPathText: app.migrationPath ? fill(MIGRATION_PATH, app.migrationPath) : null,
+      // Only an administrator can run a migration; the server checks again.
+      canMigrate: Boolean(app.installed && app.migrationKit && canManageSettings),
+      startMigration: helpText('Core', 'Core_Migration_StartMigration'),
       learnMore: LEARN_MORE,
       newTab: NEW_TAB
     };

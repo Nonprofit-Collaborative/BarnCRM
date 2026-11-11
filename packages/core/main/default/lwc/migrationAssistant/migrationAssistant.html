@@ -1,0 +1,167 @@
+<template>
+    <template lwc:if={helpReady}>
+        <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
+            <lightning-button label={labels.back} icon-name="utility:back" onclick={handleBack} data-id="back"></lightning-button>
+            <lightning-button
+                class="slds-var-m-left_x-small"
+                label={labels.refresh}
+                icon-name="utility:refresh"
+                disabled={busy}
+                onclick={handleRefresh}
+                data-id="refresh"
+            ></lightning-button>
+        </div>
+        <template lwc:if={errorMessage}>
+            <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
+        </template>
+        <template lwc:if={noticeMessage}>
+            <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="info" message={noticeMessage} data-id="notice"></c-barn-notice>
+        </template>
+
+        <template lwc:if={kit}>
+            <div class="slds-grid slds-grid_vertical-align-center">
+                <h3 class="slds-text-heading_medium" data-id="title">{title}</h3>
+                <template lwc:if={isComplete}>
+                    <c-barn-status-badge class="slds-var-m-left_x-small" status="success" label={labels.complete} data-id="complete"></c-barn-status-badge>
+                </template>
+            </div>
+            <p class="slds-var-m-bottom_small" data-id="description">{kit.description}</p>
+            <template lwc:if={kit.problem}>
+                <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="warning" message={kit.problem} data-id="problem"></c-barn-notice>
+            </template>
+
+            <h4 class="slds-text-heading_small" data-id="steps-heading">{labels.steps}</h4>
+            <p class="slds-text-body_small slds-text-color_weak slds-var-m-bottom_x-small" data-id="refresh-hint">{labels.refreshHint}</p>
+            <ol class="slds-has-dividers_bottom-space">
+                <template for:each={steps} for:item="step">
+                    <li key={step.key} class="slds-item slds-var-p-vertical_small" data-step-row={step.key}>
+                        <div class="slds-grid slds-grid_vertical-align-center slds-wrap">
+                            <span class="slds-text-title_bold slds-var-m-right_x-small" data-id="step-label">{step.number} {step.label}</span>
+                            <c-barn-status-badge status={step.statusTone} label={step.statusText} data-id="step-status"></c-barn-status-badge>
+                        </div>
+                        <template lwc:if={step.help}>
+                            <p class="slds-text-body_small" data-id="step-help">{step.help}</p>
+                        </template>
+                        <div class="slds-var-m-top_x-small">
+                            <template lwc:if={step.canStart}>
+                                <lightning-button
+                                    variant="brand"
+                                    label={step.startLabel}
+                                    data-step={step.key}
+                                    data-id="start"
+                                    disabled={busy}
+                                    onclick={handleStart}
+                                ></lightning-button>
+                            </template>
+                            <template lwc:if={step.canShowResults}>
+                                <lightning-button
+                                    class="slds-var-m-left_x-small"
+                                    label={step.resultsLabel}
+                                    data-step={step.key}
+                                    data-id="results-toggle"
+                                    disabled={busy}
+                                    onclick={handleToggleResults}
+                                ></lightning-button>
+                            </template>
+                            <template lwc:if={step.canLoad}>
+                                <lightning-button
+                                    class="slds-var-m-left_x-small"
+                                    variant="brand"
+                                    label={step.loadLabel}
+                                    data-step={step.key}
+                                    data-id="load"
+                                    disabled={busy}
+                                    onclick={handleLoad}
+                                ></lightning-button>
+                            </template>
+                            <template lwc:if={step.canUndo}>
+                                <lightning-button
+                                    class="slds-var-m-left_x-small"
+                                    variant="destructive-text"
+                                    label={step.undoLabel}
+                                    data-step={step.key}
+                                    data-id="undo"
+                                    disabled={busy}
+                                    onclick={handleUndo}
+                                ></lightning-button>
+                            </template>
+                            <template lwc:if={step.canOpenTool}>
+                                <lightning-button
+                                    label={step.toolLabel}
+                                    data-step={step.key}
+                                    data-id="open-tool"
+                                    onclick={handleOpenTool}
+                                ></lightning-button>
+                            </template>
+                            <template lwc:if={step.canMarkDone}>
+                                <lightning-button
+                                    class="slds-var-m-left_x-small"
+                                    variant="brand"
+                                    label={step.markDoneLabel}
+                                    data-step={step.key}
+                                    data-done="true"
+                                    data-id="mark-done"
+                                    disabled={busy}
+                                    onclick={handleMark}
+                                ></lightning-button>
+                            </template>
+                            <template lwc:if={step.canUnmark}>
+                                <lightning-button
+                                    class="slds-var-m-left_x-small"
+                                    label={step.markNotDoneLabel}
+                                    data-step={step.key}
+                                    data-done="false"
+                                    data-id="mark-not-done"
+                                    disabled={busy}
+                                    onclick={handleMark}
+                                ></lightning-button>
+                            </template>
+                        </div>
+                        <template lwc:if={step.showVerification}>
+                            <div class="slds-var-m-top_x-small" data-id="verification">
+                                <div class="slds-grid slds-grid_vertical-align-center">
+                                    <span class="slds-text-title_bold slds-var-m-right_x-small">{labels.verification}</span>
+                                    <c-barn-status-badge status={step.verdictTone} label={step.verdict} data-id="verdict"></c-barn-status-badge>
+                                </div>
+                                <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-top_xx-small">
+                                    <template for:each={step.counts} for:item="shown">
+                                        <div key={shown.key} class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-var-m-bottom_x-small">
+                                            <c-barn-stat-tile data-id={shown.key} label={shown.label} value={shown.value} align="start" bordered></c-barn-stat-tile>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </template>
+                        <template lwc:if={step.resultsOpen}>
+                            <c-import-results
+                                class="slds-show slds-var-m-top_small"
+                                batch={batch}
+                                rejected-rows={rejectedRows}
+                                changed-values={changedValues}
+                                data-id="results"
+                            ></c-import-results>
+                        </template>
+                    </li>
+                </template>
+            </ol>
+
+            <template lwc:if={showChecklist}>
+                <section class="slds-box slds-var-m-top_medium" data-id="retire">
+                    <h4 class="slds-text-heading_small">{labels.retire}</h4>
+                    <p class="slds-var-m-bottom_x-small" data-id="retire-intro">{labels.retireIntro}</p>
+                    <template for:each={checklist} for:item="item">
+                        <lightning-input
+                            key={item.key}
+                            type="checkbox"
+                            label={item.text}
+                            checked={item.ticked}
+                            disabled={checklistDisabled}
+                            data-item={item.key}
+                            onchange={handleTick}
+                        ></lightning-input>
+                    </template>
+                </section>
+            </template>
+        </template>
+    </template>
+</template>

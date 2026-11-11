@@ -1,8 +1,15 @@
 import { createElement } from 'lwc';
 import IntegrationsPanel from 'c/integrationsPanel';
 import getApps from '@salesforce/apex/IntegrationController.getApps';
+import getKit from '@salesforce/apex/MigrationController.getKit';
 
 jest.mock('@salesforce/apex/IntegrationController.getApps', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/apex/MigrationController.getKit', () => ({ default: jest.fn() }), {
+  virtual: true
+});
+jest.mock('@salesforce/customPermission/Manage_BarnCRM_Settings', () => ({ default: true }), {
   virtual: true
 });
 
@@ -207,5 +214,28 @@ describe('c-integrations-panel', () => {
     expect(row(element, 'one').querySelector('[data-id="badge"]').label).toBe(
       'c.Core_Integrations_Installed'
     );
+  });
+
+  it('opens the Migration Assistant in place for a detected app with a kit, and comes back', async () => {
+    getApps.mockResolvedValue([
+      app('kit', 'Alternative', true, { migrationKit: 'Test_Kit' }),
+      app('plain', 'Alternative', true)
+    ]);
+    getKit.mockResolvedValue({ key: 'Test_Kit', label: 'Test Kit', steps: [], checklist: [] });
+    const element = await build();
+
+    expect(row(element, 'plain').querySelector('[data-id="start-migration"]')).toBeNull();
+    row(element, 'kit').querySelector('[data-id="start-migration"]').click();
+    await settle();
+
+    const assistant = element.shadowRoot.querySelector('[data-id="assistant"]');
+    expect(assistant.kitKey).toBe('Test_Kit');
+    expect(row(element, 'kit')).toBeNull();
+
+    assistant.dispatchEvent(new CustomEvent('back'));
+    await settle();
+    expect(element.shadowRoot.querySelector('[data-id="assistant"]')).toBeNull();
+    expect(row(element, 'kit')).not.toBeNull();
+    expect(getApps).toHaveBeenCalledTimes(2);
   });
 });
