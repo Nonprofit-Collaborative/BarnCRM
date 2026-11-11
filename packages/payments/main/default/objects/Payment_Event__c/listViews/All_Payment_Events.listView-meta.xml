@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>All_Payment_Events</fullName>
+  <columns>NAME</columns>
+  <columns>Payment__c</columns>
+  <columns>Event_Type__c</columns>
+  <columns>Processor__c</columns>
+  <columns>Status__c</columns>
+  <columns>Message__c</columns>
+  <filterScope>Everything</filterScope>
+  <label>All Payment Events</label>
+</ListView>

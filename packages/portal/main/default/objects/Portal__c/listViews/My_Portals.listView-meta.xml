@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>My_Portals</fullName>
+  <columns>NAME</columns>
+  <columns>Status__c</columns>
+  <columns>Access_Mode__c</columns>
+  <columns>Brand__c</columns>
+  <columns>Second_Factor__c</columns>
+  <columns>Session_Hours__c</columns>
+  <filterScope>Mine</filterScope>
+  <label>My Portals</label>
+</ListView>
