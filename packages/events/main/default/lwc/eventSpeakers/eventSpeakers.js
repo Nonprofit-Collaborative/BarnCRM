@@ -116,6 +116,15 @@ export default class EventSpeakers extends LightningElement {
         ...speaker,
         href: speaker.contactId ? `/lightning/r/${speaker.contactId}/view` : null,
         statusWord: STATUS_WORDS[speaker.status] || 'neutral',
+        // EV-27: the average over every rating of the sessions the speaker is in.
+        ratingText: speaker.ratingCount
+          ? helpText(
+              'Events',
+              'Events_Speakers_Rated',
+              Number(speaker.averageRating).toFixed(1),
+              speaker.ratingCount
+            )
+          : '',
         menuLabel: format(ACTIONS_FOR, speaker.name),
         menuItems: items,
         isAssigning: Boolean(this.assigning && this.assigning.speakerId === speaker.id),
