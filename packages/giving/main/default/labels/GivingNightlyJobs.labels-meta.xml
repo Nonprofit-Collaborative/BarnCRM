@@ -14,7 +14,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: the top up job and when it runs</shortDescription>
-    <value>Installment Top Up</value>
+    <value>Payment Schedule Top Up</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_OverdueName</fullName>
@@ -118,7 +118,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Nightly jobs page: the jobs have been started by hand</shortDescription>
-    <value>The top up and the overdue pass have started. Refresh this page in a minute to see what they did.</value>
+    <value>The top up, the overdue pass and the reminders that are turned on have started. Refresh this page in a minute to see what they did.</value>
   </labels>
   <labels>
     <fullName>Giving_NightlyJobs_Stale</fullName>

@@ -192,7 +192,7 @@ same gift twice by accident: once a gift is saved, Save and Save and new are gre
 until you change something or start another gift.
 
 **A check for a pledge saved as a gift on its own.** The pledge stays unpaid and the payment
-turns Overdue. Open the gift, set its **Commitment** and **Installment** to the pledge and the
+turns Overdue. Open the gift, set its **Commitment** and **Scheduled Payment** to the pledge and the
 payment it was for, and save: the payment and the balance update. Next time, look at **Pays a
 scheduled payment** before tapping Save.
 

@@ -49,7 +49,7 @@ You should see: the gift page shows an **In-kind Gift** section with **In-kind D
 
 1. Open the person, household or organization in the BarnCRM Fundraising app.
 2. Click **Enter a Gift** in the action bar. Quick Gift Entry opens in a window with the donor already filled in.
-3. Fill in the gift as in [To enter a gift with Quick Gift Entry](#to-enter-a-gift-with-quick-gift-entry): amount, date, payment method, appeal and fund, a pledge payment, goods, a tribute or a match all work here.
+3. Fill in the gift as in [To enter a gift with Quick Gift Entry](#to-enter-a-gift-with-quick-gift-entry): amount, date, payment method, appeal and fund, a scheduled payment, goods, a tribute or a match all work here.
 4. Click **Save** (the window closes) or **Save and New** (the window stays open for the next gift from this donor).
 
 You should see: the gift in the record's **Gifts** list. For money promised but not arrived yet, an admin can use **New** on the **Gifts** tab and set **Status** to `Pending`.
@@ -69,7 +69,7 @@ You should see: the card's figures move once the gift is saved and the page is r
 A gift opens on the gift record page, with three tabs: **Details** (open first), **Credits and Tributes** and **Related**. From top to bottom:
 
 - The action bar: **Edit**, **Refund or Write Off** (only while **Status** is `Received`) and **Delete**.
-- On **Details**, **Gift**: donor, **Household** (filled in from the donor, so you never set it), **Appeal**, **Commitment** and **Installment** (the pledge payment the gift pays, if any), **Amount**, **Gift Date**, **Payment Method**, **Status**, **Payment Reference**.
+- On **Details**, **Gift**: donor, **Household** (filled in from the donor, so you never set it), **Appeal**, **Commitment** and **Scheduled Payment** (the payment of a pledge or recurring gift the gift pays, if any), **Amount**, **Gift Date**, **Payment Method**, **Status**, **Payment Reference**.
 - **Acknowledgment, Receipt and Recognition**: **Acknowledgment Status**, **Acknowledgment Date**, **Receipt Number**, **Matched Gift**, **Tribute**, and on a refund, **Original Gift** and **Refund Reason**.
 - **In-kind Gift**, only on an in-kind gift.
 - Side panels: **Posting**, **Gift Allocations** (which funds the gift went to, with **Edit Funds**: see [To split a gift across funds](#to-split-a-gift-across-funds)), **Receipts** and **Activity**.

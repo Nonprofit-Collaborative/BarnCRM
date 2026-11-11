@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Installment__c</fullName>
-  <inlineHelpText>The installment being reminded about.</inlineHelpText>
-  <label>Installment</label>
+  <inlineHelpText>The scheduled payment being reminded about.</inlineHelpText>
+  <label>Scheduled Payment</label>
   <deleteConstraint>Cascade</deleteConstraint>
   <referenceTo>Installment__c</referenceTo>
   <relationshipLabel>Pledge Reminders</relationshipLabel>

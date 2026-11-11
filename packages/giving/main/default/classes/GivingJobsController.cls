@@ -21,7 +21,7 @@ public with sharing class GivingJobsController {
 	public class GivingJobsException extends Exception {
 	}
 
-	/** One of the three jobs, as the page shows it. */
+	/** One of the five jobs, as the page shows it. */
 	public class JobView {
 		@AuraEnabled
 		public String name;
@@ -58,7 +58,7 @@ public with sharing class GivingJobsController {
 		}
 	}
 
-	/** Starts or stops all three nightly jobs. */
+	/** Starts or stops all five nightly jobs. */
 	@AuraEnabled
 	public static JobsView setSchedule(Boolean scheduled) {
 		try {
@@ -75,7 +75,7 @@ public with sharing class GivingJobsController {
 	}
 
 	/**
-	 * Runs the top up and the overdue pass now. The view comes back with the previous run still
+	 * Runs the top up, the overdue pass and both reminder passes now. The view comes back with the previous run still
 	 * on it: the top up is a batch, so the page refreshes into the new last run once it ends.
 	 */
 	@AuraEnabled
@@ -120,6 +120,13 @@ public with sharing class GivingJobsController {
 				null
 			),
 			jobView(
+				statuses.get(GivingScheduler.PLEDGE_JOB_NAME),
+				System.Label.Giving_PledgeReminders_Title,
+				BarnHelp.text('Giving', 'Giving_NightlyJobs_PledgeRemindersDescription'),
+				settings.Pledge_Reminders_Last_Run__c,
+				settings.Pledge_Reminders_Last_Run_Summary__c
+			),
+			jobView(
 				statuses.get(GivingScheduler.ASK_JOB_NAME),
 				System.Label.Giving_NightlyJobs_AskRemindersName,
 				BarnHelp.text('Giving', 'Giving_NightlyJobs_AskRemindersDescription'),
@@ -127,6 +134,10 @@ public with sharing class GivingJobsController {
 				settings.Ask_Reminders_Last_Run_Summary__c
 			)
 		};
+		// A reminder pass whose setting is off fires and records nothing, by design, so it has
+		// not missed a run (G-37).
+		view.jobs[3].stale = view.jobs[3].stale && PledgeReminderService.isEnabled();
+		view.jobs[4].stale = view.jobs[4].stale && AskReminderService.isEnabled();
 		return view;
 	}
 

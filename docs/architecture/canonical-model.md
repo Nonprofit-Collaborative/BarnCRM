@@ -4704,7 +4704,7 @@ rewritten, because a gift already refers to them.
 | End Date | `End_Date__c` | Date |
 | Status | `Status__c` | Picklist: Active, Paused, Completed, Cancelled |
 | Expected Total | `Expected_Total__c` | Currency |
-| Installments Planned | `Installments_Planned__c` | Number (0 decimals) |
+| Payments Planned | `Installments_Planned__c` | Number (0 decimals) |
 | Fund | `Fund__c` | Lookup to `Fund__c` |
 | Appeal | `Appeal__c` | Lookup to `Appeal__c` |
 | Balance | `Balance__c` | Formula (Currency) |
@@ -4785,7 +4785,7 @@ carries on (R-E1).
 
 ### Salesforce implementation
 
-- **Object:** `Installment__c`, auto-number Name with format `IN-{000000}`. Labelled Pledge Payment (plural Pledge Payments) from v1.0, so its tab reads Pledge Payments; the API name is unchanged.
+- **Object:** `Installment__c`, auto-number Name with format `IN-{000000}`. Labelled Scheduled Payment (plural Scheduled Payments, Name field Payment Number) from 1.5 (G-36; Pledge Payment in v1.0), so its tab reads Scheduled Payments; the API name is unchanged.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -15294,6 +15294,7 @@ mirrors the primary member).
 | 1.7 | 2026-11-11 | Field History Keeper (C-68, D-157; ADR-NEXT `NEXT-field-history-keeper.md`). New Section 29FH1 Field History (`Field_History__c`, rules R-FH1 to R-FH5); custom metadata type `History_Field__mdt` (Section 13); `BarnCRM_Settings__c` gains `Field_History_Enabled__c` (false) and `Field_History_Retention_Days__c` (730). |
 | 1.8 | 2026-11-11 | Corporate Hub module (CH-01 to CH-04, CH-06 to CH-08, D-118; ADR-NEXT `NEXT-corporate-hub-module.md`). New package `packages/corporatehub`: Library Document (`Hub_Document__c`, 29CH1), Policy Acknowledgment (`Policy_Acknowledgment__c`, 29CH2), Compliance Obligation (`Compliance_Obligation__c`, 29CH3), Compliance Cycle (`Compliance_Cycle__c`, 29CH4), Agreement (`Agreement__c`, 29CH5) and Corporate Hub Settings (`Corporate_Hub_Settings__c`, 29CH6), with the shipped templates `BarnCorporateHubTemplates`. |
 | 1.9 | 2026-11-11 | Migration Assistant (MIG-01, MIG-10, MIG-08; ADR-NEXT `NEXT-migration-assistant.md`, D-125). New Section 29ZS Migration Run (`Migration_Run__c`, rules R-MR1 to R-MR4) and shipped type Migration Kit (`Migration_Kit__mdt`, Section 13, R-MK1). Import Batch (16) gains Migration Run (`Migration_Run__c`) and Migration Step (`Migration_Step__c`). Integration App gains rows `Nonprofit_Success_Pack` and `Nonprofit_Cloud_Fundraising` (shown only when installed) and Start Migration for a detected product with a kit. R-R16 gains NPSP customizable rollups: read by describe, imported through the DLRS import steps, covered by the same-field guard. Rollup Builder ships kits `DLRS_Rollups` and `NPSP_Rollups`. |
+| 1.10 | 2026-11-11 | Giving words and nightly jobs (G-36, G-37). No object or field added. Labels only: `Installment__c` is Scheduled Payment (plural Scheduled Payments, Name label Payment Number, list view All Scheduled Payments); the `Installment__c` lookups on Gift, Gift Batch Row and Pledge Reminder are labelled Scheduled Payment; Pledge Reminder's `Commitment__c` is labelled Commitment; `Commitment__c.Installments_Planned__c` is Payments Planned. The vocabulary is commitment (the record), pledge and recurring gift (its types), scheduled payment (each installment). The pledge reminder step (`BarnCRM Giving Pledge Reminders`, 03:15, shipped off) is now one of `GivingScheduler`'s five jobs: its Schedule and Stop switch it with the others and Run Now runs it; `GivingScheduler.isScheduled` still counts only the other four. |
 
 ---
 ## 32. Entity ownership by package

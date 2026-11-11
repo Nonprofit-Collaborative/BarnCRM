@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Commitment__c</fullName>
-  <inlineHelpText>The pledge the installment belongs to.</inlineHelpText>
-  <label>Pledge</label>
+  <inlineHelpText>The commitment (pledge or recurring gift) the scheduled payment belongs to.</inlineHelpText>
+  <label>Commitment</label>
   <deleteConstraint>SetNull</deleteConstraint>
   <referenceTo>Commitment__c</referenceTo>
   <relationshipLabel>Pledge Reminders</relationshipLabel>

@@ -5,7 +5,7 @@
   <inlineHelpText>
     The scheduled payment of a pledge or recurring gift this line's gift pays. Left empty, the gift is a gift on its own.
   </inlineHelpText>
-  <label>Installment</label>
+  <label>Scheduled Payment</label>
   <referenceTo>Installment__c</referenceTo>
   <relationshipLabel>Gift Batch Lines</relationshipLabel>
   <relationshipName>Gift_Batch_Rows</relationshipName>
