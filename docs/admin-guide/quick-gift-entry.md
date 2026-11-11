@@ -112,6 +112,23 @@ the donor's record Id as `c__donorId` in the page state (a Lightning navigation 
 `Quick_Gift_Entry` tab with `state: { c__donorId: '<Id>' }`). The form starts with that
 donor chosen, as it does on a record page.
 
+## The Donor Panel
+
+Once a donor is chosen, a small **About This Donor** panel opens under the donor picker, so
+nobody leaves the form to look things up. It shows:
+
+- the donor's household, as a link (a person only);
+- **Total giving** and **Last gift**, from the donor's rollups;
+- the last three gifts: date, amount, payment method and status, each a link;
+- up to three open pledges and recurring gifts (Active or Paused, newest first): amount and frequency, status, balance
+  left, and the next scheduled payment due.
+
+The panel only reads; it changes nothing and needs no setting. It shows only what the user
+can already see: records and fields the user cannot read are left out. If it cannot load, a
+one-line note says so and the gift can still be saved. Its wording is in the Giving help
+text (`Giving_DonorPanel_*` keys), not custom labels. Users need the Giving Staff or Giving
+Admin permission set, which grant the `GiftDonorPanelController` class.
+
 ## Tributes and Matching Gifts at Entry
 
 Two collapsed sections sit under **Fund**. Leave them closed for an ordinary gift.

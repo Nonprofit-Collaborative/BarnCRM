@@ -22,6 +22,8 @@ You should see: a green notice with a check icon saying "Gift G-000123 saved" an
 
 If the donor still owes a pledge or recurring payment, a **Pays a scheduled payment** list appears. See [To pay a scheduled payment](#to-pay-a-scheduled-payment) below.
 
+When you choose the donor, an **About This Donor** panel opens under the donor box. It shows their household, total giving, last gift, their three most recent gifts, and any open pledges or recurring gifts with the balance left and the next payment due. Click a gift or pledge to open it in a new browser tab. The panel is only for looking; if it says it could not load, carry on and save the gift as usual.
+
 ## To Pay a Scheduled Payment
 
 When you choose a donor who has an active or paused pledge or recurring gift, Quick Gift Entry shows **Pays a scheduled payment**.
