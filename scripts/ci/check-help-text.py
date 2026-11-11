@@ -41,6 +41,7 @@ PACKAGES = {
     "events": "Events",
     "portal": "Portal",
     "payments": "Payments",
+    "addressverification": "AddressVerification",
     "mirror": "Mirror",
     "corporatehub": "CorporateHub",
 }

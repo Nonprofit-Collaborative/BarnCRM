@@ -102,6 +102,8 @@ const ICONS = Object.freeze({
   Payment_Event__c: 'custom:custom95',
   Payment__c: 'custom:custom40',
   Payments_Setup: 'custom:custom70',
+  // Address Verification
+  Address_Verification_Setup: 'custom:custom73',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',

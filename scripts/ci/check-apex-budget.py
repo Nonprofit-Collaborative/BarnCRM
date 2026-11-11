@@ -156,6 +156,10 @@ CAPS = {
     # Check measured 47,575 on 2026-11-11, plus about 2 percent; raised the same day for the
     # Payments Setup page's controller, measured 52,331.
     "payments": 53_400,
+    # Address Verification (C-46, ADR-NEXT address verification module): the Smarty and Google
+    # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
+    # 2026-11-11, plus about 2 percent.
+    "addressverification": 25_300,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

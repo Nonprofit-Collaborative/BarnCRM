@@ -946,6 +946,8 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(corporatehub)
   # Payments depends on Core only (ADR-NEXT payments module).
   MODULES+=(payments)
+  # Address Verification depends on Core only (ADR-NEXT address verification module).
+  MODULES+=(addressverification)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
   RECORD_PACKAGES+=("${MODULES[@]}")
@@ -1001,7 +1003,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # modules deployed here, and a module left out has its tabs taken out (ADR-0192, Batch C
   # modules add their tabs to the BarnCRM apps). Forms, Event Management and Portal Builder
   # have no app of their own: these apps are where their tabs live (D-188).
-  deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal corporatehub payments)
+  deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal corporatehub payments addressverification)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"
   python3 scripts/org/module-app-tabs.py --all "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1
@@ -1038,7 +1040,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     if volunteers_has_metadata; then
       SETUP_MODULES+=(Volunteers)
     fi
-    SETUP_MODULES+=(Programs LogicModels Funders Forms ContactPoints Events Portal CorporateHub Payments Mirror)
+    SETUP_MODULES+=(Programs LogicModels Funders Forms ContactPoints Events Portal CorporateHub Payments AddressVerification Mirror)
     for module in "${SETUP_MODULES[@]}"; do
       echo ""
       echo "== Running the ${module} module's setup steps =="
@@ -1157,6 +1159,14 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   if ! printf '%s\n' 'new PaymentsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
     echo "The Payments access sync was not queued. Nothing else is affected: the hourly"
     echo "access check syncs the access."
+  fi
+
+  # The same gap for the Address Verification permission set (ADR-NEXT address verification).
+  echo ""
+  echo "== Queueing the Address Verification access sync =="
+  if ! printf '%s\n' 'new AddressVerificationAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Address Verification access sync was not queued. Nothing else is affected: the"
+    echo "hourly access check syncs the access."
   fi
 fi
 

@@ -178,7 +178,8 @@ public with sharing class ModuleManagerService {
 		'Events' => 'Events_Admin',
 		'Portal' => 'Portal_Admin',
 		'CorporateHub' => 'Corporate_Hub_Admin',
-		'Payments' => 'Payments_Admin'
+		'Payments' => 'Payments_Admin',
+		'AddressVerification' => 'Address_Verification_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */

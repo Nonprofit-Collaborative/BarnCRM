@@ -92,6 +92,7 @@ Rules:
 | payments | Payment__c | Custom40: Creditcard |
 | payments | Payment_Event__c | Custom95: Stopwatch |
 | payments | Payments_Setup | Custom70: Handsaw |
+| addressverification | Address_Verification_Setup | Custom73: HighwaySign |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |
 | mirror | Gift_Transaction_Mirror | Custom31: Car |
