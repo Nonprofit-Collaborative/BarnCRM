@@ -44,17 +44,21 @@ private class PmmMigrationKitTest {
 					key + ' loads one Programs object'
 				);
 				ImportMapping mapping = ImportMapping.parse(template.Column_Mapping_JSON__c);
-				for (ImportMapping.Column column : mapping.columns) {
+				for (ImportMapping.Column column : mapping.getColumns()) {
+					String heading = column.getSource();
 					Assert.isTrue(
-						column.source == 'Id' || step.fields.contains(column.source),
-						key + ' maps only what it reads: ' + column.source
+						heading == 'Id' || step.fields.contains(heading),
+						key + ' maps only what it reads: ' + heading
 					);
 				}
 				// Every step but the last is linked to by a later one.
 				if (key != 'deliveries') {
+					Map<String, Object> document = (Map<String, Object>) JSON.deserializeUntyped(
+						template.Column_Mapping_JSON__c
+					);
 					Assert.areEqual(
-						new List<String>{ 'Id' },
-						mapping.uniqueBy,
+						new List<Object>{ 'Id' },
+						document.get('uniqueBy'),
 						key + ' keeps one row per Id, so later steps find what it made'
 					);
 				}
