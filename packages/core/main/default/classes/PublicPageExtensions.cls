@@ -6,9 +6,18 @@
  */
 @NamespaceAccessible
 public with sharing class PublicPageExtensions {
-	/** The class names modules register: Event Management's event pages (EV-16). */
+	/** The class names modules register: event pages (EV-16) and volunteer shift pages (V-09). */
 	@NamespaceAccessible
-	public static final List<String> EXTENSION_CLASSES = new List<String>{ 'EventPublicPage' };
+	public static final List<String> EXTENSION_CLASSES = new List<String>{
+		'EventPublicPage',
+		'VolunteerPublicPage'
+	};
+
+	/**
+	 * Whether the page being built was asked for with a signed claim the host checked (ADR-NEXT
+	 * volunteer self-service, decision 3). A page for a person's own record shows only then.
+	 */
+	private static Boolean signedRequest = false;
 
 	/** The module key of the package that serves public pages (BarnCRM Forms). */
 	private static final String HOST_MODULE = 'Forms';
@@ -61,6 +70,30 @@ public with sharing class PublicPageExtensions {
 	/** One record's public page, or null when no module publishes it. */
 	@NamespaceAccessible
 	public static Map<String, Object> page(Id recordId) {
+		return page(recordId, false);
+	}
+
+	/**
+	 * One record's public page, saying whether the host checked a signed claim for it; a module
+	 * reads that with `isSignedRequest()` while building the page.
+	 */
+	@NamespaceAccessible
+	public static Map<String, Object> page(Id recordId, Boolean signed) {
+		signedRequest = signed == true;
+		try {
+			return findPage(recordId);
+		} finally {
+			signedRequest = false;
+		}
+	}
+
+	/** Whether the page being built was asked for with a checked signed claim. */
+	@NamespaceAccessible
+	public static Boolean isSignedRequest() {
+		return signedRequest;
+	}
+
+	private static Map<String, Object> findPage(Id recordId) {
 		if (recordId == null) {
 			return null;
 		}

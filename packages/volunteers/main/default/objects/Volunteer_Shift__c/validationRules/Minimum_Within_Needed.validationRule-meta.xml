@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Minimum_Within_Needed</fullName>
+  <active>true</active>
+  <description>R-VS6: a shift's minimum is not above Volunteers Needed, which is its most.</description>
+  <errorConditionFormula>
+AND(
+  NOT(ISBLANK(Minimum_Volunteers__c)),
+  NOT(ISBLANK(Volunteers_Needed__c)),
+  Minimum_Volunteers__c &gt; Volunteers_Needed__c
+)
+  </errorConditionFormula>
+  <errorDisplayField>Minimum_Volunteers__c</errorDisplayField>
+  <errorMessage>Minimum Volunteers can't be more than Volunteers Needed.</errorMessage>
+</ValidationRule>

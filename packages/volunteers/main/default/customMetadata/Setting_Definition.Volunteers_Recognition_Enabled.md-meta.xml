@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Send thank-you tasks</label>
+    <protected>true</protected>
+    <values>
+        <field>Setting_Key__c</field>
+        <value xsi:type="xsd:string">Recognition_Enabled__c</value>
+    </values>
+    <values>
+        <field>Settings_Object__c</field>
+        <value xsi:type="xsd:string">Volunteer_Settings__c</value>
+    </values>
+    <values>
+        <field>Section__c</field>
+        <value xsi:type="xsd:string">Volunteers</value>
+    </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Volunteers</value>
+    </values>
+    <values>
+        <field>Data_Type__c</field>
+        <value xsi:type="xsd:string">Checkbox</value>
+    </values>
+    <values>
+        <field>Sort_Order__c</field>
+        <value xsi:type="xsd:double">90</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Whether a volunteer who reaches one of the Hour Milestones, or the anniversary of their Volunteer Since date, gets a thank-you task for their contact owner. Off by default. The check runs every morning at 7:30 AM in your org time zone; a person who passes two milestones between runs gets one task, for the higher one. Contacts only.</value>
+    </values>
+    <values>
+        <field>Help_Path__c</field>
+        <value xsi:type="xsd:string">volunteers.md</value>
+    </values>
+</CustomMetadata>

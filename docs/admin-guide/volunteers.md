@@ -235,6 +235,128 @@ settings, and each saves as you change it.
 | Days before a shift to remind | 1 | How many days before a shift its reminder goes out, from 1 to 14. Default: 1. | At the next 7:00 AM run |
 | Send unfilled shift nudges | Off | Active volunteers who have helped on a job before get one email when one of its upcoming shifts is still short. See Unfilled Shift Nudges below. | At the next 7:15 AM run |
 | Days before a shift to nudge | 3 | How many days before an unfilled shift its nudge goes out, from 1 to 14. Default: 3. | At the next 7:15 AM run |
+| Value of one volunteer hour | 34.79 | What one hour is worth in your currency. See Value of Volunteer Time below. 0 hides every value. | Now |
+| Send thank-you tasks | Off | A thank-you task when a volunteer reaches an hours milestone or an anniversary. See Thank-You Tasks below. | At the next 7:30 AM run |
+| Hour milestones | 25, 50, 100, 250, 500, 1000 | The total hours that earn a thank-you task, separated by commas. | At the next 7:30 AM run |
+| Waitlist when full | Off | A full shift waitlists new sign-ups and moves them up when a place frees. See Waitlists and Shift Minimums below. | Now |
+| Guardian consent required | Off | A young volunteer's sign-up is flagged and gets a guardian consent step. See Young Volunteers below. | Now |
+| Minor age | 18 | The age below which a volunteer needs guardian consent, from 1 to 21. | Now |
+| Self-service profile form | Empty | The public form volunteers use on their personal page. See Public Sign-Up Page below. | At the next 7:00 AM reminder run |
+
+## Value of Volunteer Time
+
+**Value of one volunteer hour** turns hours into money for reports to funders and boards. The
+default, 34.79, is the national value of a volunteer hour Independent Sector published for 2024;
+change it to your state's figure or one your auditor gives you. It only displays, and nothing
+stores a value:
+
+- **Volunteers Home** shows **Value of Hours This Month**: this month's approved hours times the
+  rate, in your org's currency.
+- A volunteer's personal page (see Public Sign-Up Page) shows the value of their hours.
+- Hour letter and certificate templates can use `{HourValue}` (the rate) and `{HoursValue}` (the
+  person's hours in the letter's period times the rate).
+
+Set it to 0 to hide the figure and the personal page's value; the two tokens then merge as empty.
+
+## Thank-You Tasks
+
+With **Send thank-you tasks** on, a morning run at 7:30 AM (your org time zone) creates an open
+task due today, named for the volunteer, for each contact who:
+
+- reached one of the **Hour milestones** in their **Volunteer Hours Total** since the last
+  thank-you. A person who passes two milestones between runs gets one task, for the higher one.
+  The contact's **Last Hour Milestone** (read only) records the milestone thanked, so nobody is
+  thanked twice for the same one. Lowering a person's total never takes it back.
+- started volunteering on this day one or more years ago (**Volunteer Since**).
+
+The task goes to the contact's owner when that user is active, otherwise to the user the nightly
+run belongs to. Health Check's fix for unscheduled nightly jobs schedules the run. Contacts only:
+where your people are person accounts, add a report of milestones instead.
+
+## Waitlists and Shift Minimums
+
+**Volunteers Needed** is the most people you want on a shift; **Minimum Volunteers** (optional)
+is the fewest it needs to go ahead. While fewer places are filled than the minimum, the shift's
+**Below Minimum** is ticked, and the **Shifts Below Minimum** list view lists the open shifts still
+to come that are short. Nothing is cancelled for you. The minimum cannot be more than Volunteers
+Needed.
+
+With **Waitlist when full** off (the default), a full shift still takes sign-ups and **Slots
+Remaining** goes below zero, as before. Turn it on and:
+
+- A sign-up made as Signed up or Confirmed on a full shift is saved as **Waitlisted** instead,
+  from every screen: the Sign-Ups panel, the volunteer portal, the public sign-up page and
+  imports. A waitlisted sign-up takes no place.
+- When a place frees (a sign-up Cancelled or deleted, a group made smaller, or Volunteers Needed
+  raised) on a shift still to come, waitlisted people move up to **Signed up**, oldest first. A
+  group bigger than the places free is passed over for a smaller one behind it.
+- Moving up sends no email of its own. With **Send shift reminders** on, the person gets the usual
+  reminder before the shift.
+
+**Slots Filled** counts places, not sign-ups, and leaves out Cancelled and Waitlisted sign-ups.
+If you installed Volunteers before release 1.6, edit the **Volunteer shift slots filled** rollup
+in Rollup Builder to match: Sum of **Places**, where **Status** is not Cancelled or Waitlisted.
+
+## Group and Standing Sign-Ups
+
+**Groups.** A sign-up can hold a group: name the leader as the person, set **Group Size** to how
+many come (the leader included) and, if you like, a **Group Name** such as the company or class.
+**Places** shows how many places the booking takes, and the shift's figures count places.
+
+**Standing sign-ups.** For someone who comes every week, book them on one shift of a recurring
+schedule and tick **Standing**. BarnCRM books them on every later shift of that schedule, now and
+each time the schedule creates more shifts. Their latest sign-up on the schedule decides whether
+it continues: to end it, cancel their sign-ups from the day they stop. A standing booking does not
+keep an old shift when you change the schedule's days or times; the person moves to the new
+pattern's shifts.
+
+## Young Volunteers and Guardian Consent
+
+With **Guardian consent required** on, a sign-up for a contact younger than **Minor age** on the
+day of the shift (from their **Birthdate**), who has no current **Guardian consent** step, is
+saved with **Consent Needed** ticked and gets a **Guardian consent** onboarding step, Not
+started, unless an unfinished one is already there. Complete that step like any other: set its
+**Guardian** (the parent or guardian's contact), **Completed Date** and an **Expires** date, for
+example a year later. Nobody is refused: you decide whether they come. People with no Birthdate,
+or named by an account, are not checked.
+
+On the public sign-up page, a form that also writes the guardian as a second person, with the
+record key `guardian` (see the Forms admin guide), fills the step's **Guardian** for you.
+
+## Background Check Details
+
+A **Background check** step can say where the check is kept: **Provider** (the screening
+company), **Reference ID** (its reference for the check) and **Entry Source** (**Entered**, the
+default, or **Imported** for rows loaded from a provider's export with **Load One Object** in Data
+Manager). BarnCRM never contacts a screening provider and never stores what a check found.
+
+## Public Sign-Up Page
+
+Needs **BarnCRM Forms** set up on a Salesforce Site ([Forms](forms.md)). Volunteers works the
+same without it.
+
+1. Build a sign-up form in Forms that writes a person (name and email at least), publish it and
+   tick **Public**. The shift is passed to the form for you: add no shift question.
+2. On each job to offer, tick **Show on Public Page** and paste the form's record ID into
+   **Sign-Up Form**. Only Admins and Coordinators can change these two fields.
+3. Share `<your site address>/FormsPublic?list=volunteers`. It lists the open shifts of public,
+   active jobs that have not started, soonest first (up to 50). Each opens a page with the job's
+   description, the shift's day, time and place, how many places are left, and the form.
+
+The page never shows who is booked, the coordinator or notes. A sign-up is matched to an existing
+person the way every Forms submission is, so returning volunteers are not duplicated, and booked
+through the same rules as on the Sign-Ups panel: the waitlist, groups (a form question with the
+key `groupSize` and `groupName`) and the guardian check all apply. A full shift with **Waitlist
+when full** off says sign-up is closed.
+
+**Personal page.** Build a second public form for profile updates with the questions
+`availabilityDays`, `availabilityTimes`, `emergencyContactName` and `emergencyContactPhone`, publish
+it, and put its record ID in **Self-service profile form**. Each shift reminder then ends with a
+private link to the volunteer's own page: their upcoming shifts, approved hours this year and in
+total with their value, their last ten approved entries, and the profile form. The link is signed
+for that person and cannot be changed to show anyone else; answers update only that person's
+availability and emergency contact. With no form set, or Forms not on a Site, the line is left
+out of reminders.
 
 ## Shift Reminders
 

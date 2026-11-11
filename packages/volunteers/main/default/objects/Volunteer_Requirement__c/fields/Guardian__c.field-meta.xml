@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Guardian__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>On a Guardian consent step: the parent or guardian who gives consent for this young volunteer.</inlineHelpText>
+  <label>Guardian</label>
+  <referenceTo>Contact</referenceTo>
+  <relationshipLabel>Guardian Consents</relationshipLabel>
+  <relationshipName>Guardian_Consents</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

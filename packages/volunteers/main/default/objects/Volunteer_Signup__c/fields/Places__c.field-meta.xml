@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Places__c</fullName>
+  <externalId>false</externalId>
+  <formula>IF(OR(ISBLANK(Group_Size__c), Group_Size__c &lt; 1), 1, Group_Size__c)</formula>
+  <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+  <inlineHelpText>How many places on the shift this booking takes: its Group Size, or 1.</inlineHelpText>
+  <label>Places</label>
+  <precision>5</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+</CustomField>

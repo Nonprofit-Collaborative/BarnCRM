@@ -66,6 +66,25 @@ org-wide): how far ahead repeating session schedules keep their sessions created
 Session Schedules). Change it there and click **Save**; the next run, or **Create Sessions Now**,
 fills up to the new horizon. A shorter value deletes nothing.
 
+It also has **Waitlist when full** (off by default, saved org-wide). See Capacity and Waitlists.
+
+### Capacity and Waitlists
+
+A program's **Capacity** (optional) is how many people it can have **Enrolled** at once. Empty
+means no limit.
+
+- With **Waitlist when full** off (the default), Capacity only shows; nothing is refused or
+  waitlisted.
+- Turn it on and an enrollment saved as **Enrolled** into a full program (new, moved to Enrolled,
+  or moved from another program) is saved as **Waitlisted** instead, whichever screen or import
+  saved it. When a place frees (someone Completed, Withdrawn or deleted, or Capacity raised), the
+  oldest Waitlisted enrollments move to **Enrolled**, and their Start Date is filled in. Places
+  are counted over every enrollment in the program, private ones included.
+- **Waitlisted** counts as open: a person can have only one open enrollment per program. It is
+  not counted in the dashboard's open enrollments or the person's Programs card. **Applied** is
+  never counted or moved up: move an applicant to Enrolled when you accept them.
+- Cohorts have no capacity of their own.
+
 **Intake and Eligibility Picklists.** The page lists the three intake picklists on an enrollment
 (**Referral Source**, **Eligibility Status** and **Eligibility Basis**) with the choices each
 offers now and its default. They ship with:

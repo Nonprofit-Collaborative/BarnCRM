@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Entry_Source__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Whether this step was typed in or loaded from a provider's export file.</inlineHelpText>
+  <label>Entry Source</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Entered</fullName>
+        <default>true</default>
+        <label>Entered</label>
+      </value>
+      <value>
+        <fullName>Imported</fullName>
+        <default>false</default>
+        <label>Imported</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

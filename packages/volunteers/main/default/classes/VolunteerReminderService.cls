@@ -112,6 +112,18 @@ public with sharing class VolunteerReminderService {
 		return messageSignups.size() - unstamp.size();
 	}
 
+	/**
+	 * V-09 (R-VU10): the signed address of the person's own page for this sign-up, or null when no
+	 * Self-Service Profile Form is set or Forms has no active Site. Forms signs the address of the
+	 * form for the sign-up; the page is the same address without the form.
+	 */
+	@TestVisible
+	private static String personalPageLink(Id signupId) {
+		Id formId = VolunteerSettings.profileFormId();
+		String link = formId == null ? null : FormCatalogExtensions.publicLink(formId, signupId);
+		return link == null ? null : link.replace('form=' + formId + '&', '');
+	}
+
 	/** One reminder, addressed to the booking's Contact. */
 	@TestVisible
 	private static Messaging.SingleEmailMessage messageFor(
@@ -154,6 +166,16 @@ public with sharing class VolunteerReminderService {
 				);
 		}
 		body += '\n\n' + System.Label.Volunteers_Reminders_Closing;
+		String page = signup.Contact__c == null ? null : personalPageLink(signup.Id);
+		if (page != null) {
+			body +=
+				'\n\n' +
+				BarnHelp.text(
+					'Volunteers',
+					'Volunteers_Reminders_PersonalPage',
+					new List<Object>{ page }
+				);
+		}
 
 		Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
 		message.setToAddresses(new List<String>{ email });

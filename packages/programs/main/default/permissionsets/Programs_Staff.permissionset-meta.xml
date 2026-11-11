@@ -193,6 +193,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Program__c.Capacity__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Service__c.Active__c</field>
     <readable>true</readable>
   </fieldPermissions>

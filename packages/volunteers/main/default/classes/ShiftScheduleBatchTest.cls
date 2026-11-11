@@ -139,7 +139,7 @@ private class ShiftScheduleBatchTest {
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
 			List<NightlyStep> steps = new VolunteersNightlyJobProvider().nightlySteps();
 
-			Assert.areEqual(3, steps.size(), 'The schedule, reminder and nudge runs.');
+			Assert.areEqual(4, steps.size(), 'The schedule, reminder, nudge and thank-you runs.');
 			Assert.areEqual(
 				Label.Volunteers_NightlyJobs_SchedulesName,
 				steps[0].label,
