@@ -156,6 +156,10 @@ CAPS = {
     # Check measured 47,575 on 2026-11-11, plus about 2 percent; raised the same day for the
     # Payments Setup page's controller, measured 52,331.
     "payments": 53_400,
+    # Scholarships and Outbound Grants (SG-01 to SG-10, PB-06, ADR-NEXT scholarships module):
+    # reviews, awards, form intake, portal actions, reminders, the payment rule and the page
+    # controller, 49,326 measured (Prettier line breaks included), plus about 2%.
+    "scholarships": 50_300,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
