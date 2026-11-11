@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>V4S Migration: Volunteer Hours</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_v4s_hours</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the Volunteers for Salesforce migration kit, which reads completed V4S volunteer hours: one hours entry per completed entry (Submitted while hours require approval, otherwise Approved), for the same contact, on the job and shift the kit made, with the date, hours and comments.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "columns": [{"source": "GW_Volunteers.Contact__c", "target": "Record.Contact__c"}, {"source": "GW_Volunteers.Volunteer_Job__c", "target": "Record.Volunteer_Job__c"}, {"source": "GW_Volunteers.Volunteer_Shift__c", "target": "Record.Volunteer_Shift__c"}, {"source": "GW_Volunteers.Start_Date__c", "target": "Record.Date_Worked__c"}, {"source": "GW_Volunteers.Hours_Worked__c", "target": "Record.Hours__c"}, {"source": "GW_Volunteers.Comments__c", "target": "Record.Notes__c"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Volunteer_Hours__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>
