@@ -140,6 +140,18 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentName>grantChecklist</componentName>
+        <identifier>grantChecklistCard</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>grantDocuments</componentName>
+        <identifier>grantDocumentsCard</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>grantAnswerLibrary</componentName>
         <identifier>grantAnswerLibraryCard</identifier>
       </componentInstance>

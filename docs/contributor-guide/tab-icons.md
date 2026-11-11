@@ -138,6 +138,9 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | funders | fundersBoard | custom:custom100 | Funders_Board |
 | funders | grantAnswerLibrary | custom:custom87 | Grant_Answer__c |
 | funders | grantCalendar | custom:custom82 | Grant_Calendar |
+| funders | grantChecklist | custom:custom70 | Grant_Checklist_Item__c |
+| funders | grantDocuments | custom:custom84 | Grant_Requirement__c |
+| funders | grantFinder | custom:custom80 | Grant_Finder |
 | funders | grantLinkedRecord | custom:custom88 | Program__c |
 | funders | grantLinkedRecord | custom:custom42 | Fund__c |
 | funders | grantOutcomes | custom:custom62 | Logic_Model__c |
