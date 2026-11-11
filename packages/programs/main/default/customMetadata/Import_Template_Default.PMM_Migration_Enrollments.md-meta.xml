@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>PMM Migration: Enrollments</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_pmm_enrollments</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the PMM migration kit, which reads Program Management Module program engagements in your org: one enrollment per engagement, for the same contact, on the program and cohort the kit's earlier steps made, with stage and dates.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "uniqueBy": ["Id"], "columns": [{"source": "pmdm.Contact__c", "target": "Record.Contact__c"}, {"source": "pmdm.Program__c", "target": "Record.Program__c"}, {"source": "pmdm.ProgramCohort__c", "target": "Record.Cohort__c"}, {"source": "pmdm.Stage__c", "target": "Record.Stage__c", "transforms": [{"op": "map", "pairs": [{"text": "Applied", "value": "Applied"}, {"text": "Active", "value": "Enrolled"}, {"text": "Enrolled", "value": "Enrolled"}, {"text": "Completed", "value": "Completed"}, {"text": "Withdrawn", "value": "Withdrawn"}, {"text": "Waitlisted", "value": "Waitlisted"}], "otherwise": "Enrolled"}, {"op": "ifBlank", "value": "Enrolled"}]}, {"source": "pmdm.ApplicationDate__c", "target": "Record.Intake_Date__c"}, {"source": "pmdm.StartDate__c", "target": "Record.Start_Date__c"}, {"source": "pmdm.EndDate__c", "target": "Record.End_Date__c"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Enrollment__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

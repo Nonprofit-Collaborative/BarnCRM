@@ -28,8 +28,7 @@ everyone with a Programs permission set (the default), or only the people who ne
 - It needs BarnCRM Core and nothing else: not Giving, not Rollup Builder.
 - If the Program Management Module (PMM) is installed in your org, BarnCRM lists it on the
   **Integrations** page as an alternative. Use one or the other for the same programs, not both.
-  BarnCRM's programs, services and enrollments are laid out so a later PMM migration template
-  can move PMM's records across without new fields.
+  To move PMM's records into BarnCRM, use the PMM migration kit ([Moving From PMM](#moving-from-pmm)).
 - **Nonprofit Cloud Program Management.** A Nonprofit Cloud org has its own standard **Program**
   and **Program Enrollment** objects. BarnCRM Programs keeps its own programs, enrollments and
   service deliveries and never reads or writes those objects, so the two share no records and can
@@ -655,6 +654,41 @@ Read Only has no access. Erasing a person **deletes** their referrals (see below
   name no one and are never touched. Erasing a person account also finds the case notes, and counts the enrollments, recorded on that person account's own contact.
 - **Deleting a person** keeps their case notes on the enrollment, which no longer names anyone.
   To remove what was written about someone, erase them rather than delete them.
+
+## Moving From PMM
+
+When the Program Management Module (PMM) is installed in the same org, the **PMM Programs and
+Services** kit of the [Migration Assistant](migration-assistant.md) copies its records into
+BarnCRM Programs, step by step, with a preview, a check that the numbers match and undo. Open
+**BarnCRM Settings**, **Integrations**, find **Program Management Module (PMM)** and click
+**Start Migration**. You need Manage BarnCRM Settings and admin access to Programs (the BarnCRM Admin role has both).
+
+| Step | PMM records read | BarnCRM records made |
+|---|---|---|
+| Programs | Every program: name, status, start and end dates, description, target population | Programs. Status Inactive becomes Completed; a blank status becomes Active. |
+| Cohorts | Every program cohort | Cohorts on the program the first step made. |
+| Services | Every service: name, status, unit of measurement, description | Services on the program the first step made; Active unless PMM's status is another value. |
+| Enrollments | Every program engagement with a contact | Enrollments of the same contact, on the program and cohort the earlier steps made. Stage Active becomes Enrolled; Applied, Enrolled, Completed, Withdrawn and Waitlisted keep their names. |
+| Service Deliveries | Every service delivery to a contact for a service | Service deliveries of the same contact, on the service and enrollment the earlier steps made, with date, quantity (1 when blank) and attendance (Present when blank). |
+
+Each later step finds the record an earlier step made from the PMM record it names, so the
+steps must run in order, and an undo goes backwards from the last.
+
+What stays in PMM, with the reason:
+
+- **Engagements and deliveries with no contact** (an account only): BarnCRM records a person on
+  each. They are not read, so the counts do not include them.
+- **Service schedules, sessions and participants**: make the sessions again with
+  [Repeating Session Schedules](#repeating-session-schedules). A delivery's session is not kept.
+- **Two open engagements of one contact in one program**: BarnCRM keeps one open enrollment
+  per person per program, so the preview rejects the second, naming it. End or delete one in
+  PMM, or correct the row and retry it.
+- **Two deliveries of one service to one contact on one day**: BarnCRM keeps one; the second
+  changes the first.
+
+The retire checklist then reminds you to remove PMM's tabs and permission sets so nobody keeps
+entering records there, and to uninstall PMM when you no longer need it. BarnCRM never changes
+PMM.
 
 ## Health Check
 

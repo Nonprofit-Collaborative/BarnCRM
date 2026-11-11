@@ -442,3 +442,20 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 9 | Try to delete the cohort. | Refused while it has a session schedule. |
 
 **Cleanup:** delete the schedule (its sessions stay), then the sessions without attendance.
+
+## T-PRG-27: Moving From PMM With the Migration Assistant
+
+**Purpose:** confirm the PMM kit copies programs, cohorts, services, enrollments and deliveries in order and keeps their links ([Moving From PMM](../admin-guide/programs.md#moving-from-pmm)).
+**Prerequisites:** an org with PMM (free, from the AppExchange listing "Program Management Module") and BarnCRM Core and Programs. In PMM: program **Zztest Food** (Active) with cohort **Spring**, service **Meals** (unit Meals); contact Zztest Ana engaged in Zztest Food (stage Active, cohort Spring) with two service deliveries of Meals (quantity 2, Present; quantity blank, Unexcused Absence). Admin user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | BarnCRM Settings, **Integrations**: on **Program Management Module (PMM)**, click **Start Migration**. | **PMM Programs and Services** opens with five steps: Programs, Cohorts, Services, Enrollments, Service Deliveries; only Programs can start. |
+| 2 | Start **Programs**, **Refresh** to **Ready to Review**, **Load**. | **Done**, **Verified**. Program **Zztest Food** (Active) exists in BarnCRM. |
+| 3 | Run **Cohorts** and **Services** the same way. | Each **Verified**. Cohort **Spring** and service **Meals** (Active, unit Meals) are on the BarnCRM program, not on any PMM record. |
+| 4 | Run **Enrollments**. | **Verified**. Zztest Ana has an enrollment in Zztest Food, stage **Enrolled**, cohort Spring. |
+| 5 | Run **Service Deliveries**. | **Verified** (2 read, 2 loaded). On the enrollment: one delivery Present, quantity 2; one Unexcused Absence, quantity 0. |
+| 6 | Click **Undo** on **Service Deliveries**, then try **Undo** on **Enrollments** before it. | The deliveries are removed. Enrollments then offers **Undo**; before the deliveries were undone it did not. |
+| 7 | Start **Service Deliveries** again and load. Tick each **Retire the Old App** item. | **Complete**. PMM's records are unchanged. |
+
+**Cleanup:** undo the steps from the last to the first, then delete the PMM test records.

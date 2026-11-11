@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>PMM Programs and Services</label>
+  <protected>false</protected>
+  <values>
+    <field>Source_App__c</field>
+    <value xsi:type="xsd:string">Program_Management_Module</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Copies your Program Management Module programs, cohorts, services, program engagements and service deliveries into BarnCRM Programs, keeping which enrollment and service each delivery belongs to. Your contacts stay the same records. PMM itself is never changed.</value>
+  </values>
+  <values>
+    <field>Steps_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"programs","label":"Programs","kind":"import","help":"Copies each PMM program.","source":"pmdm.Program__c","fields":["Name","pmdm.Status__c","pmdm.StartDate__c","pmdm.EndDate__c","pmdm.Description__c","pmdm.TargetPopulation__c"],"templateKey":"kit_pmm_programs"},{"key":"cohorts","label":"Cohorts","kind":"import","help":"Copies each program cohort onto its copied program.","source":"pmdm.ProgramCohort__c","fields":["Name","pmdm.Program__c","pmdm.Status__c","pmdm.StartDate__c","pmdm.EndDate__c"],"links":[{"column":"pmdm.Program__c","step":"programs"}],"templateKey":"kit_pmm_cohorts"},{"key":"services","label":"Services","kind":"import","help":"Copies each service onto its copied program.","source":"pmdm.Service__c","fields":["Name","pmdm.Program__c","pmdm.Status__c","pmdm.UnitOfMeasurement__c","pmdm.Description__c"],"links":[{"column":"pmdm.Program__c","step":"programs"}],"templateKey":"kit_pmm_services"},{"key":"enrollments","label":"Enrollments","kind":"import","help":"Copies each program engagement as an enrollment of the same contact.","source":"pmdm.ProgramEngagement__c","fields":["pmdm.Contact__c","pmdm.Program__c","pmdm.ProgramCohort__c","pmdm.Stage__c","pmdm.ApplicationDate__c","pmdm.StartDate__c","pmdm.EndDate__c"],"filters":[{"field":"pmdm.Contact__c","value":null,"op":"notEquals"}],"links":[{"column":"pmdm.Program__c","step":"programs"},{"column":"pmdm.ProgramCohort__c","step":"cohorts"}],"templateKey":"kit_pmm_enrollments"},{"key":"deliveries","label":"Service Deliveries","kind":"import","help":"Copies each service delivery to a contact, on its copied service and enrollment.","source":"pmdm.ServiceDelivery__c","fields":["pmdm.Contact__c","pmdm.Service__c","pmdm.ProgramEngagement__c","pmdm.DeliveryDate__c","pmdm.Quantity__c","pmdm.AttendanceStatus__c"],"filters":[{"field":"pmdm.Contact__c","value":null,"op":"notEquals"},{"field":"pmdm.Service__c","value":null,"op":"notEquals"}],"links":[{"column":"pmdm.Service__c","step":"services"},{"column":"pmdm.ProgramEngagement__c","step":"enrollments"}],"templateKey":"kit_pmm_service_deliveries"}]</value>
+  </values>
+  <values>
+    <field>Retire_Checklist_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"entry","text":"Tell staff to record services in BarnCRM Programs from now on, and remove the PMM tabs (Programs, Services, Program Engagements, Service Deliveries) from your apps in Setup, App Manager."},{"key":"access","text":"In Setup, Permission Sets, remove the PMM permission sets from users who no longer need PMM, so nobody adds records there by mistake."},{"key":"uninstall","text":"When you have checked your programs in BarnCRM and no report or automation uses PMM any more, uninstall it from Setup, Installed Packages."}]</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">40</value>
+  </values>
+</CustomMetadata>

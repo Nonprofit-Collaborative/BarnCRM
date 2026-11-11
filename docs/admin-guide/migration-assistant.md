@@ -21,6 +21,9 @@ org. These kits ship:
 - **NPSP People and Addresses** (Core): adopts NPSP households in place, then copies NPSP
   relationships, affiliations and household addresses. See
   [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
+- **PMM Programs and Services** (Programs): copies Program Management Module programs, cohorts,
+  services, program engagements and service deliveries, keeping their links. See
+  [Programs](programs.md#moving-from-pmm).
 
 An app can have several kits, one for each BarnCRM module that receives its records. Its
 listing then shows one **Start Migration** button per kit, each with the kit's name. Run them
