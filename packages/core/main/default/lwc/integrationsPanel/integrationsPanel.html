@@ -49,14 +49,17 @@
                             <p class="slds-text-body_small" data-id="migration-path">{app.migrationPathText}</p>
                         </template>
                         <template lwc:if={app.canMigrate}>
-                            <lightning-button
-                                class="slds-show slds-var-m-top_x-small"
-                                variant="brand"
-                                label={app.startMigration}
-                                data-kit={app.migrationKit}
-                                data-id="start-migration"
-                                onclick={handleStartMigration}
-                            ></lightning-button>
+                            <template for:each={app.kitButtons} for:item="kit">
+                                <lightning-button
+                                    key={kit.key}
+                                    class="slds-show slds-var-m-top_x-small"
+                                    variant="brand"
+                                    label={kit.text}
+                                    data-kit={kit.key}
+                                    data-id="start-migration"
+                                    onclick={handleStartMigration}
+                                ></lightning-button>
+                            </template>
                         </template>
                         <p class="slds-var-m-top_xx-small">
                             <template lwc:if={app.linkUrl}>

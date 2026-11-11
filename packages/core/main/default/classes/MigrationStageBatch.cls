@@ -1,7 +1,8 @@
 /**
  * Reads an import step's source records into its Import Batch, page by page, in the running
  * administrator's access, then starts the batch's dry run (MIG-01, canonical model R-MR2). Each
- * record becomes one staged row, or the rows the kit's extension returns. A failure stops the
+ * record becomes one staged row, or the rows the kit's extension returns, its linked columns
+ * pointing at what earlier steps moved (R-MK1). A failure stops the
  * staging and marks the batch Failed with the reason in its run log, so the step can be started
  * again; nothing outside the batch is written.
  */
@@ -47,6 +48,12 @@ public with sharing class MigrationStageBatch implements Database.Batchable<SObj
 			if (rows == null) {
 				rows = source().rows(records);
 			}
+			MigrationKitService.link(
+				MigrationKitService.stepNamed(kit, stepKey),
+				[SELECT Migration_Run__c FROM Import_Batch__c WHERE Id = :batchId WITH USER_MODE]
+				.Migration_Run__c,
+				rows
+			);
 			ImportBatchService.stageRows(batchId, rows, nextRow);
 			nextRow += rows.size();
 		} catch (Exception stopped) {

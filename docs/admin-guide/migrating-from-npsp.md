@@ -18,6 +18,26 @@ your people are already there. Then set NPSP's Account Model to One-to-One or In
 turn on Households, in that order: BarnCRM does not let Households on while NPSP
 households are in use.
 
+## In-Org Migration Kits
+
+When NPSP is installed in the same org as BarnCRM, you do not need files at all. The
+[Migration Assistant](migration-assistant.md) reads NPSP's records directly, step by step, with
+the same preview, results and undo as a file import, and checks that the numbers match. Open
+**BarnCRM Settings**, **Integrations**, find **Nonprofit Success Pack (NPSP)** and click the
+kit's **Start Migration** button. Run the kits in the order listed.
+
+**NPSP People and Addresses** (BarnCRM Core):
+
+| Step | What it does |
+|---|---|
+| Adopt NPSP Households | Opens BarnCRM Settings, where **Adopt NPSP Households** makes your NPSP household accounts BarnCRM households in place ([Adopting Your NPSP Households](npsp-households.md)). Click **Mark Done** when it has finished. |
+| Relationships | Copies each NPSP relationship once. NPSP keeps both sides of a relationship as two records; the kit reads only the side a person entered and leaves the other side to BarnCRM, which creates it for you. Both people are the same contacts. NPSP types become BarnCRM's (Husband and Wife become Spouse, Coworker becomes Colleague, Employer and Employee become Employer contact); a type BarnCRM does not have becomes Other. |
+| Affiliations | Copies each link between a person and an organization, with its role, status, dates, description and primary. |
+| Household Addresses | Copies each NPSP address onto its household, both street lines in one, with its type (Vacation becomes Seasonal), default, seasonal months and days, and verified. |
+
+The retire checklist then reminds you to stop NPSP creating the other side of relationships,
+affiliations, household addresses and household names, so the two apps never both do it.
+
 ## 2. How to Turn It On
 
 BarnCRM brings the contacts template, and the Giving module brings the two payment templates.
@@ -173,12 +193,12 @@ These are not loaded by the three templates. Each has what to do in the meantime
 | Not loaded | What to do meanwhile |
 |---|---|
 | Households and who is in them | When BarnCRM is installed in the NPSP org itself, do not load contacts at all: adopt NPSP's households in place ([Adopting Your NPSP Households](npsp-households.md)), which keeps every family and its people as they are. When you load files into another org, each contact gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). Household names are made by BarnCRM's naming. |
-| Relationships and affiliations | No ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **One Kind of Record** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
+| Relationships and affiliations | In the NPSP org itself, the **NPSP People and Addresses** kit copies them ([In-Org Migration Kits](#in-org-migration-kits)). From files, no ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **One Kind of Record** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
 | Recurring donations and their schedules | No import yet. Create each active recurring gift by hand as a commitment ([Commitments](commitments.md)) before loading payments. With **Match or create**, a payment dated near one of its scheduled payments pays it; older payments load as gifts on their own. |
 | General accounting unit allocations | Every gift goes to the default fund. For opportunities with one allocation, export `SELECT npsp__Opportunity__c, npsp__General_Accounting_Unit__r.Name FROM npsp__Allocation__c`, add `npe01__Opportunity__c` to the payment query, and fill a new column headed `Fund` from the allocation file with a lookup on the opportunity. Delete the opportunity column before loading, and check on the column step that `Fund` reads **Gift: fund**. |
 | Soft credits (contact roles, partial and account soft credits) | A soft credit loads only on the same row as a new gift, and NPSP exports them separately. Credits between household members are made automatically; add others by hand ([Soft credits](soft-credits.md)). |
 | More than one tribute on a gift | Only the tribute on the opportunity loads. Add others by hand ([Tributes](tributes.md)). |
-| Additional and seasonal addresses | Only the mailing address loads. Add others by hand ([Addresses](addresses.md)). |
+| Additional and seasonal addresses | In the NPSP org itself, the **NPSP People and Addresses** kit copies every household address, seasonal ones included. From files, only the mailing address loads. Add others by hand ([Addresses](addresses.md)). |
 | Written-off and unpaid payments | The exports take paid payments only. Refunds are recorded in BarnCRM after the gift is loaded ([Refunds](refunds.md)). |
 | An organization's details | A payment file creates an organization with its name only. Add its address and phone by hand. |
 | In-kind gifts | Their payments have no payment method, so the rows are rejected with "The gift has no payment method. Map a column to it, or give the template a default payment method." Load them with the **Generic Gift List**, the value mapped to **Gift: fair market value** and no amount. |

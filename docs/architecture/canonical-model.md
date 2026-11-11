@@ -1700,7 +1700,9 @@ alongside itself until a row's compatibility note says otherwise.
 
 A product with a Migration Kit whose Source App is its DeveloperName, detected in the org,
 shows Start Migration to a person with Manage BarnCRM Settings, which opens the Migration
-Assistant for that kit on the same page (MIG-10, ADR-NEXT migration-assistant decision 9).
+Assistant for that kit on the same page (MIG-10, ADR-NEXT migration-assistant decision 9). A
+product with several kits (for example NPSP: people, giving setup, gifts and rollups, each in
+the module it fills) shows one button per kit, named by the kit's label, in Sort Order.
 
 ### Migration Kit
 
@@ -1727,10 +1729,18 @@ and `kind`, `import` or `tool`, plus optional `help` (one sentence).
   `namespace.Object__c` as Integration App rows do), `fields` (field paths on it, the same
   notation, at most five relationship hops; `Id` is always read), optional `filters` (a list of
   `{"field": "...", "value": ...}` conditions, all of which must hold; a JSON null value means
-  blank) and `templateKey` (the Template Key of a shipped Import Template Default whose column
-  names are the step's field paths as written). Names resolve through describe at run time,
-  trying each dot as a relationship first and then as a namespace separator; a field the org
-  lacks or the person cannot read refuses the step with its name.
+  blank; `"op": "notEquals"` turns a condition into field is not the value, or not blank),
+  optional `links` (below) and `templateKey` (the Template Key of a shipped Import Template
+  Default whose column names are the step's field paths as written). Names resolve through
+  describe at run time, trying each dot as a relationship first and then as a namespace
+  separator; a field the org lacks or the person cannot read refuses the step with its name.
+- `links` is a list of `{"column": "...", "step": "..."}`: the column holds the Id of a source
+  record an earlier import step of the kit moved, and staging puts in its place the BarnCRM
+  record that step's load created or matched (the row's resulting record), so a lookup column
+  mapped by record Id finds it. The earlier step's template must keep one row per `Id`
+  (`"uniqueBy": ["Id"]`, R-IT18), whose Row Key is how the row is found. A value the earlier
+  step did not load is left as it was, so the lookup finds nothing and Lookup Not Found decides.
+  A link naming a step that is not earlier in the kit makes the kit unreadable.
 - A `tool` step adds `tab` (an unprefixed tab API name, for example `Rollup_Builder`) and
   optional `toolLabel` (the button text). The administrator marks it done.
 A kit whose JSON cannot be read is listed with the reason and cannot be started.
@@ -12774,7 +12784,9 @@ done.
 **R-MR3 Verification.** For an import step: source count now, rows staged (Row Count), rows
 committed (Rows Created plus Updated plus Matched) and Rows Rejected; Verified when the first
 three are equal and none was rejected. A kit's extension may return its own source and done
-counts for a step, shown beside these; for a tool step they are the only check. The run is
+counts for a step, shown beside these; for a tool step they are the only check, and for an
+import step they replace the comparison of the first three numbers (an extension may reshape
+rows, so the row counts need not equal the source count), with none rejected still required. The run is
 Complete when every step is done and every checklist item ticked.
 
 **R-MR4 Administrators only, nothing outside BarnCRM changed.** Every action needs Manage BarnCRM
@@ -15135,6 +15147,7 @@ mirrors the primary member).
 | 1.7 | 2026-11-11 | Field History Keeper (C-68, D-157; ADR-NEXT `NEXT-field-history-keeper.md`). New Section 29FH1 Field History (`Field_History__c`, rules R-FH1 to R-FH5); custom metadata type `History_Field__mdt` (Section 13); `BarnCRM_Settings__c` gains `Field_History_Enabled__c` (false) and `Field_History_Retention_Days__c` (730). |
 | 1.8 | 2026-11-11 | Corporate Hub module (CH-01 to CH-04, CH-06 to CH-08, D-118; ADR-NEXT `NEXT-corporate-hub-module.md`). New package `packages/corporatehub`: Library Document (`Hub_Document__c`, 29CH1), Policy Acknowledgment (`Policy_Acknowledgment__c`, 29CH2), Compliance Obligation (`Compliance_Obligation__c`, 29CH3), Compliance Cycle (`Compliance_Cycle__c`, 29CH4), Agreement (`Agreement__c`, 29CH5) and Corporate Hub Settings (`Corporate_Hub_Settings__c`, 29CH6), with the shipped templates `BarnCorporateHubTemplates`. |
 | 1.9 | 2026-11-11 | Migration Assistant (MIG-01, MIG-10, MIG-08; ADR-NEXT `NEXT-migration-assistant.md`, D-125). New Section 29ZS Migration Run (`Migration_Run__c`, rules R-MR1 to R-MR4) and shipped type Migration Kit (`Migration_Kit__mdt`, Section 13, R-MK1). Import Batch (16) gains Migration Run (`Migration_Run__c`) and Migration Step (`Migration_Step__c`). Integration App gains rows `Nonprofit_Success_Pack` and `Nonprofit_Cloud_Fundraising` (shown only when installed) and Start Migration for a detected product with a kit. R-R16 gains NPSP customizable rollups: read by describe, imported through the DLRS import steps, covered by the same-field guard. Rollup Builder ships kits `DLRS_Rollups` and `NPSP_Rollups`. |
+| 1.9 | 2026-11-11 | Migration kits (MIG-05, MIG-09, MIG-04, MIG-02). No object or field added. R-MK1 gains a filter's `op` (`notEquals`) and a step's `links` (a source Id an earlier step moved becomes the BarnCRM record it made, found by the earlier template's one row per `Id` Row Key, R-IT18). R-MR3: an extension's check on an import step replaces the row count comparison. A product with several kits shows one button per kit. Core ships kit `NPSP_People` with templates `kit_npsp_relationships`, `kit_npsp_affiliations` and `kit_npsp_addresses` (a kit template's key starts `kit_`, so the file-export sample check, for keys starting `npsp_` or `npc_`, leaves it alone). |
 
 ---
 ## 32. Entity ownership by package

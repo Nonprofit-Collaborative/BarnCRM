@@ -165,6 +165,8 @@ export default class IntegrationsPanel extends LightningElement {
   }
 
   rowFor(app) {
+    const kits = Array.isArray(app.migrationKits) ? app.migrationKits : [];
+    const start = helpText('Core', 'Core_Migration_StartMigration');
     return {
       ...app,
       statusText: app.status === 'Available' ? STATUS_AVAILABLE : STATUS_IN_PROGRESS,
@@ -177,8 +179,12 @@ export default class IntegrationsPanel extends LightningElement {
       relatedModuleText: app.relatedModule ? fill(RELATED_MODULE, app.relatedModule) : null,
       migrationPathText: app.migrationPath ? fill(MIGRATION_PATH, app.migrationPath) : null,
       // Only an administrator can run a migration; the server checks again.
-      canMigrate: Boolean(app.installed && app.migrationKit && canManageSettings),
-      startMigration: helpText('Core', 'Core_Migration_StartMigration'),
+      canMigrate: Boolean(app.installed && kits.length > 0 && canManageSettings),
+      // One kit says Start Migration; several are told apart by their names.
+      kitButtons: kits.map((kit) => ({
+        key: kit.key,
+        text: kits.length === 1 ? start : helpText('Core', 'Core_Migration_StartKit', kit.label)
+      })),
       learnMore: LEARN_MORE,
       newTab: NEW_TAB
     };
