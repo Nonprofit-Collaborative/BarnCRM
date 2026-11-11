@@ -39,10 +39,14 @@ public with sharing class BulkDeleteService {
 		public Schema.SObjectType objectType;
 		/** The object's name field, when the person may read it; null otherwise. */
 		public String nameField;
+		/** An archive (R-BD9): when its file was started; a record changed since is kept. */
+		public Datetime notChangedAfter;
+		/** An archive (R-BD9) whose deleted records are emptied from the Recycle Bin. */
+		public Boolean emptyRecycleBin = false;
 
 		/**
-		 * What a job keeps (R-BD1, R-BD7): the query document, or the object a file names, and
-		 * the confirmed count.
+		 * What a job keeps (R-BD1, R-BD7, R-BD9): the query document, or the object a file
+		 * names, the confirmed count, and an archive's start time and Recycle Bin choice.
 		 */
 		public String definition(Integer confirmedCount) {
 			Map<String, Object> kept = new Map<String, Object>{
@@ -55,16 +59,46 @@ public with sharing class BulkDeleteService {
 			} else {
 				kept.put('query', JSON.deserializeUntyped(queryJson));
 			}
+			if (notChangedAfter != null) {
+				kept.put(
+					'archive',
+					new Map<String, Object>{
+						'notChangedAfter' => notChangedAfter,
+						'emptyRecycleBin' => emptyRecycleBin
+					}
+				);
+			}
 			return JSON.serialize(kept);
 		}
 
-		/** The fields each chunk reads: the Id and the name the journal keeps. */
+		/**
+		 * The fields each chunk reads: the Id and the name the journal keeps, and for an
+		 * archive when each record last changed.
+		 */
 		public Set<String> readFields() {
 			Set<String> names = new Set<String>{ 'Id' };
 			if (nameField != null) {
 				names.add(nameField);
 			}
+			if (notChangedAfter != null) {
+				names.add('SystemModstamp');
+			}
 			return names;
+		}
+
+		/** An archive's records changed after its file was started are left alone (R-BD9). */
+		public List<SObject> inFile(List<SObject> records) {
+			if (notChangedAfter == null) {
+				return records;
+			}
+			List<SObject> kept = new List<SObject>();
+			for (SObject record : records) {
+				Datetime changed = (Datetime) record.get('SystemModstamp');
+				if (changed != null && changed <= notChangedAfter) {
+					kept.add(record);
+				}
+			}
+			return kept;
 		}
 
 		/** A record's name for the preview and the journal, or its Id. */
@@ -166,7 +200,16 @@ public with sharing class BulkDeleteService {
 		if (SOURCE_FILE.equals(definition.get('source'))) {
 			return planForFile((String) definition.get('object'));
 		}
-		return plan(JSON.serialize(definition.get('query')));
+		Plan result = plan(JSON.serialize(definition.get('query')));
+		Map<String, Object> archive = (Map<String, Object>) definition.get('archive');
+		if (archive != null) {
+			result.notChangedAfter = (Datetime) JSON.deserialize(
+				JSON.serialize(archive.get('notChangedAfter')),
+				Datetime.class
+			);
+			result.emptyRecycleBin = archive.get('emptyRecycleBin') == true;
+		}
+		return result;
 	}
 
 	/** Why no record of this object may be bulk deleted, or null when its records may be. */
@@ -329,6 +372,13 @@ public with sharing class BulkDeleteService {
 	 */
 	public static Import_Batch__c start(String queryJson, Integer confirmedCount) {
 		Plan checked = plan(queryJson);
+		Integer count = confirmedMatches(checked, confirmedCount);
+		Import_Batch__c job = createJob(checked, count, confirmedCount);
+		return DataJobs.launch(new BulkDeleteBatch(job.Id), job);
+	}
+
+	/** How many records match now, refused past the confirmed count or the run limit (R-BD2). */
+	private static Integer confirmedMatches(Plan checked, Integer confirmedCount) {
 		if (confirmedCount == null || confirmedCount < 1) {
 			throw new BulkDeleteException(BarnHelp.text('Core', 'Core_BulkUpdate_ErrorConfirm'));
 		}
@@ -345,8 +395,101 @@ public with sharing class BulkDeleteService {
 				)
 			);
 		}
-		Import_Batch__c job = createJob(checked, count, confirmedCount);
-		return DataJobs.launch(new BulkDeleteBatch(job.Id), job);
+		return count;
+	}
+
+	/**
+	 * Starts an archive (R-BD9): the job now, and the export of every readable field to Files,
+	 * whose finish starts the delete. `emptyConfirmedCount`, the count typed a second time, asks
+	 * for the Recycle Bin to be emptied too; null leaves it.
+	 */
+	public static Import_Batch__c startArchive(
+		String queryJson,
+		Integer confirmedCount,
+		Integer emptyConfirmedCount
+	) {
+		Plan checked = plan(queryJson);
+		if (emptyConfirmedCount != null && emptyConfirmedCount != confirmedCount) {
+			throw new BulkDeleteException(BarnHelp.text('Core', 'Core_Archive_ErrorEmptyConfirm'));
+		}
+		Integer count = confirmedMatches(checked, confirmedCount);
+		checked.notChangedAfter = Datetime.now();
+		checked.emptyRecycleBin = emptyConfirmedCount != null;
+		Import_Batch__c job = jobFields(checked, count, confirmedCount);
+		job.Run_Log__c += '\n' + BarnHelp.text('Core', 'Core_Archive_LogSaving');
+		Database.insert(job, AccessLevel.SYSTEM_MODE);
+		List<String> fields = new List<String>();
+		for (Schema.DescribeFieldResult field : backupFields(checked.objectType)) {
+			fields.add(field.getName());
+		}
+		String tag = EncodingUtil.convertToHex(Crypto.generateAesKey(128)).left(6);
+		job.Job_Id__c = Database.executeBatch(
+			FindExportBatch.forArchive(queryJson, fields, tag, confirmedCount, job.Id),
+			BACKUP_PAGE_SIZE
+		);
+		Database.update(
+			new Import_Batch__c(Id = job.Id, Job_Id__c = job.Job_Id__c),
+			AccessLevel.SYSTEM_MODE
+		);
+		return job;
+	}
+
+	/**
+	 * Called by an archive's export when it finishes (R-BD9): starts the delete of at most the
+	 * rows the file holds, or, when the file was not saved in full or more records match now,
+	 * marks the job Failed with nothing deleted. Never throws.
+	 */
+	public static void afterArchiveExport(
+		Id jobId,
+		Boolean exportFailed,
+		Integer rows,
+		String file
+	) {
+		List<Import_Batch__c> found = [
+			SELECT Id, Operation_JSON__c, Run_Log__c, Chunk_Size__c
+			FROM Import_Batch__c
+			WHERE Id = :jobId
+			WITH SYSTEM_MODE
+			LIMIT 1
+		];
+		if (found.isEmpty()) {
+			return;
+		}
+		Import_Batch__c job = found[0];
+		String failure;
+		try {
+			if (exportFailed || rows == null || rows < 1) {
+				failure = BarnHelp.text('Core', 'Core_Archive_LogNoFile');
+			} else {
+				Plan checked = planFromDefinition(job.Operation_JSON__c);
+				Integer count = confirmedMatches(checked, rows);
+				job.Operation_JSON__c = checked.definition(rows);
+				job.Run_Log__c +=
+					'\n' +
+					String.format(
+						BarnHelp.text('Core', 'Core_Archive_LogSaved'),
+						new List<Object>{ rows.format(), file }
+					);
+				job.Row_Count__c = count;
+				Database.update(job, AccessLevel.SYSTEM_MODE);
+				DataJobs.launch(new BulkDeleteBatch(job.Id), job);
+				return;
+			}
+		} catch (BulkDeleteException refused) {
+			failure = refused.getMessage();
+		} catch (Exception e) {
+			ErrorLogger.log(e, 'BulkDeleteService.afterArchiveExport', jobId);
+			failure = BarnHelp.text('Core', 'Core_Archive_LogNoFile');
+		}
+		Database.update(
+			new Import_Batch__c(
+				Id = jobId,
+				Status__c = ImportBatchService.STATUS_FAILED,
+				Completed_At__c = Datetime.now(),
+				Run_Log__c = (job.Run_Log__c + '\n' + failure).right(32768)
+			),
+			AccessLevel.SYSTEM_MODE
+		);
 	}
 
 	/**
@@ -691,6 +834,9 @@ public with sharing class BulkDeleteService {
 		if (job == null) {
 			return view;
 		}
+		if (binEmptied(job)) {
+			view.reason = BarnHelp.text('Core', 'Core_Archive_UndoEmptied');
+		}
 		view.records = job.Rows_Deleted__c == null ? 0 : job.Rows_Deleted__c.intValue();
 		// A job the platform stopped before its finish counted keeps the journal's count.
 		if (view.records == 0) {
@@ -727,6 +873,12 @@ public with sharing class BulkDeleteService {
 		return Database.executeBatch(new BulkDeleteUndoBatch(jobId, view.records), 1);
 	}
 
+	/** An archive that emptied the Recycle Bin, so has nothing to undelete (R-BD9). */
+	public static Boolean binEmptied(Import_Batch__c job) {
+		return String.isNotBlank(job.Operation_JSON__c) &&
+			job.Operation_JSON__c.contains('"emptyRecycleBin":true');
+	}
+
 	/** A data job by Id, with the fields the undo guards read, in system mode (ADR-0021). */
 	private static Import_Batch__c jobById(Id jobId) {
 		List<Import_Batch__c> found = [
@@ -738,6 +890,7 @@ public with sharing class BulkDeleteService {
 				Completed_At__c,
 				Job_Id__c,
 				Operation__c,
+				Operation_JSON__c,
 				Rows_Deleted__c
 			FROM Import_Batch__c
 			WHERE Id = :jobId

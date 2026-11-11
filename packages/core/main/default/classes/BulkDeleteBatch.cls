@@ -24,6 +24,9 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
 	private Integer deletedRecords = 0;
 	private Integer noLongerMatching = 0;
 	private Integer failedRecords = 0;
+	/** An archive that empties the Recycle Bin (R-BD9), and how many records it emptied. */
+	private Boolean emptying = false;
+	private Integer emptiedRecords = 0;
 	private Boolean failed = false;
 	private Boolean journalIncomplete = false;
 	private String stoppedBecause;
@@ -43,6 +46,7 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
 		definition = DataJobs.definitionOf(jobId);
 		try {
 			BulkDeleteService.Plan checked = BulkDeleteService.planFromDefinition(definition);
+			emptying = checked.emptyRecycleBin;
 			if (checked.fromFile) {
 				// A delete by file (R-BD7): the dry run's Matched rows, the package's own
 				// bookkeeping, read in system mode; each chunk reads their records as the person.
@@ -87,6 +91,7 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
 				: QueryCompiler.run(
 						QueryCompiler.compileSelection(checked.queryJson, checked.readFields(), ids)
 				  );
+			current = checked.inFile(current);
 			noLongerMatching += ids.size() - current.size();
 			remove(checked, current, journal);
 		} catch (BulkDeleteService.BulkDeleteException refused) {
@@ -125,10 +130,12 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
 			false,
 			AccessLevel.USER_MODE
 		);
+		List<Id> deleted = new List<Id>();
 		for (Integer i = 0; i < results.size(); i++) {
 			SObject record = records[i];
 			if (results[i].isSuccess()) {
 				deletedRecords++;
+				deleted.add(record.Id);
 				journal.add(
 					ImportJournalService.deleted(
 						checked.objectName,
@@ -145,6 +152,22 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
 					results[i].getErrors()
 				);
 			}
+		}
+		if (checked.emptyRecycleBin && !deleted.isEmpty()) {
+			emptyFromBin(deleted);
+		}
+	}
+
+	/** An archive asked for it (R-BD9): empties this chunk's deleted records, as the person. */
+	private void emptyFromBin(List<Id> deleted) {
+		try {
+			for (Database.EmptyRecycleBinResult result : Database.emptyRecycleBin(deleted)) {
+				if (result.isSuccess()) {
+					emptiedRecords++;
+				}
+			}
+		} catch (Exception e) {
+			ErrorLogger.log(e, 'BulkDeleteBatch.emptyFromBin', jobId);
 		}
 	}
 
@@ -170,7 +193,17 @@ public with sharing class BulkDeleteBatch implements Database.Batchable<SObject>
 						noLongerMatching.format(),
 						failedRecords.format()
 					}
-				),
+				) +
+				(emptying
+					? '\n' +
+					  String.format(
+							BarnHelp.text('Core', 'Core_Archive_LogEmptied'),
+							new List<Object>{
+								emptiedRecords.format(),
+								(deletedRecords - emptiedRecords).format()
+							}
+					  )
+					: ''),
 				platformStopped,
 				deletedRecords + noLongerMatching + failedRecords,
 				journalIncomplete

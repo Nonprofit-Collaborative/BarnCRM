@@ -10,6 +10,10 @@ To delete the records a file lists by their record IDs instead, use **Delete the
 (which starts on **Delete by record ID**) on the Import tab ([Importing](importing.md), section 9). It needs
 **Bulk Delete Records** but not Find, and runs, journals and undoes exactly as below.
 
+To keep the records in a file in your Files before they are deleted, and free their storage,
+use **Archive Records** instead ([Archive by Query](archive-by-query.md)): the same preview and
+confirmation, the file saved first, then this delete.
+
 Before anything is deleted, BarnCRM counts the records that match and shows the first five by
 name, with the kinds of related records Salesforce deletes with them. You type that number to
 confirm. The delete then runs in the background, in chunks of up to 200 records (the **Bulk

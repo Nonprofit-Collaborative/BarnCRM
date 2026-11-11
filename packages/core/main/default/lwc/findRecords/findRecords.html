@@ -282,6 +282,12 @@
                                     label={labels.bulkDelete}
                                     prefix-icon-name="utility:delete"
                                 ></lightning-menu-item>
+                                <lightning-menu-item
+                                    data-id="archive"
+                                    value="archive"
+                                    label={labels.archive}
+                                    prefix-icon-name="utility:archive"
+                                ></lightning-menu-item>
                             </template>
                         </lightning-button-menu>
                     </template>
@@ -290,7 +296,11 @@
 
                 <template lwc:if={showBulkDelete}>
                     <div class="slds-var-m-top_medium">
-                        <c-bulk-delete query-json={deleteQueryJson} onclose={handleDeleteClose}></c-bulk-delete>
+                        <c-bulk-delete
+                            query-json={deleteQueryJson}
+                            archive={deleteArchive}
+                            onclose={handleDeleteClose}
+                        ></c-bulk-delete>
                     </div>
                 </template>
 

@@ -159,4 +159,4 @@ You should see: the builder filled in from your text, ready to run.
 - [Duplicates](duplicates.md)
 - Admin Guide: [Find and export](../admin-guide/find.md),
   [Super Transformer](../admin-guide/bulk-update.md), [Bulk delete](../admin-guide/bulk-delete.md),
-  [Access](../admin-guide/access.md)
+  [Archive by Query](../admin-guide/archive-by-query.md), [Access](../admin-guide/access.md)

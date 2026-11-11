@@ -38,6 +38,26 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 	private Integer parts = 0;
 	private Id firstDocumentId;
 	private Boolean failed = false;
+	/** An archive (R-BD9): every field it saves, headed by API name, and its bulk delete job. */
+	private Set<String> archiveFields;
+	private Id archiveJobId;
+
+	/**
+	 * An archive's export (R-BD9): the query's records with these fields, at most `rowLimit`,
+	 * whose finish hands the bulk delete job the rows written.
+	 */
+	public static FindExportBatch forArchive(
+		String queryJson,
+		List<String> fields,
+		String tag,
+		Integer rowLimit,
+		Id jobId
+	) {
+		FindExportBatch archive = new FindExportBatch(queryJson, null, tag, rowLimit);
+		archive.archiveFields = new Set<String>(fields);
+		archive.archiveJobId = jobId;
+		return archive;
+	}
 
 	/**
 	 * @param queryJson the Find query document
@@ -65,10 +85,14 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 
 	public Database.QueryLocator start(Database.BatchableContext context) {
 		try {
-			QueryCompiler.Compiled compiled = QueryCompiler.compileServerExport(
-				queryJson,
-				rowLimit
-			);
+			QueryCompiler.Compiled compiled;
+			if (archiveFields == null) {
+				compiled = QueryCompiler.compileServerExport(queryJson, rowLimit);
+			} else {
+				compiled = QueryCompiler.compileSelection(queryJson, archiveFields, null);
+				compiled.binds.put('exportLimit', rowLimit);
+				compiled.soql += ' ORDER BY Id LIMIT :exportLimit';
+			}
 			objectName = compiled.objectName;
 			paths = compiled.fields;
 			List<String> labels = new List<String>();
@@ -136,6 +160,14 @@ public with sharing class FindExportBatch implements Database.Batchable<SObject>
 			),
 			firstDocumentId
 		);
+		if (archiveJobId != null) {
+			BulkDeleteService.afterArchiveExport(
+				archiveJobId,
+				failed,
+				rowsWritten,
+				titleOf(objectName, tag, 1)
+			);
+		}
 	}
 
 	/** Writes the buffer as the next part, with the header row, as a file the person owns. */
