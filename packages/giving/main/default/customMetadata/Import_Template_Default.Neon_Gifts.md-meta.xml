@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Neon CRM: Donations</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">crm_neon_gifts</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Donations exported from Neon CRM as a donation search: one line per donation, with the account's name, email and address. The donor is found by email. The Neon fund becomes the fund and the campaign the appeal. See "Moving From Another CRM" in the admin guide for the export.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 1, "columns": [{"source": "First Name", "target": "Contact1.FirstName"}, {"source": "Last Name", "target": "Contact1.LastName"}, {"source": "Email 1", "target": "Contact1.Email"}, {"source": "Address Line 1", "target": "Contact1.MailingStreet"}, {"source": "City", "target": "Contact1.MailingCity"}, {"source": "State/Province", "target": "Contact1.MailingState"}, {"source": "Zip Code", "target": "Contact1.MailingPostalCode"}, {"source": "Country", "target": "Contact1.MailingCountry"}, {"source": "Donation ID", "target": "Gift.External_Id__c"}, {"source": "Donation Date", "target": "Gift.Gift_Date__c"}, {"source": "Donation Amount", "target": "Gift.Amount__c"}, {"source": "Tender Type", "target": "Gift.Type__c"}, {"source": "Check Number", "target": "Gift.Payment_Reference__c"}, {"source": "Campaign Name", "target": "Gift.Appeal"}, {"source": "Fund", "target": "Allocation.Fund"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Person_Mode__c</field>
+    <value xsi:type="xsd:string">Contacts</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>
