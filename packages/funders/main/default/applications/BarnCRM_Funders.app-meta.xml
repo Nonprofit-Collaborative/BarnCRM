@@ -35,6 +35,7 @@
   <tabs>Funders_Board</tabs>
   <tabs>Grant_Pipeline</tabs>
   <tabs>Grant_Calendar</tabs>
+  <tabs>Grant_Finder</tabs>
   <tabs>Grant__c</tabs>
   <tabs>Grant_Requirement__c</tabs>
   <tabs>Grant_Answer__c</tabs>
@@ -49,6 +50,9 @@
     </mappings>
     <mappings>
       <tab>Grant_Calendar</tab>
+    </mappings>
+    <mappings>
+      <tab>Grant_Finder</tab>
     </mappings>
     <mappings>
       <tab>Funder_Report_Template__c</tab>

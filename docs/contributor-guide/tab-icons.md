@@ -40,6 +40,7 @@ Rules:
 | funders | Grant_Answer__c | Custom87: Safe |
 | funders | Grant_Calendar | Custom82: Whistle |
 | funders | Grant_Checklist_Item__c | Custom70: Handsaw |
+| funders | Grant_Finder | Custom80: Motorcycle |
 | funders | Grant_Pipeline | Custom92: Ship |
 | funders | Grant_Requirement__c | Custom84: Presenter |
 | funders | Grant__c | Custom8: Diamond |

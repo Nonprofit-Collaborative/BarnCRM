@@ -388,6 +388,10 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
+    <tab>Grant_Finder</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Grant_Pipeline</tab>
     <visibility>Visible</visibility>
   </tabSettings>
