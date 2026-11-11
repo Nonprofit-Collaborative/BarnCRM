@@ -6,7 +6,10 @@ import {
   OUTCOMES,
   daysUntil,
   dueState,
+  expiringSeats,
   groupName,
+  percent,
+  skillGaps,
   todayIso
 } from 'c/corporateHubModel';
 
@@ -37,5 +40,37 @@ describe('c-corporate-hub-model', () => {
 
   it('offers the three cycle outcomes, Done first', () => {
     expect(OUTCOMES).toEqual(['Done', 'Done Late', 'Not Required']);
+  });
+
+  it('counts each skill, wanted first, and lists the wanted ones nobody holds', () => {
+    const result = skillGaps(
+      ['Finance', 'Legal'],
+      [{ values: ['Finance', 'HR'] }, { values: ['Finance'] }, {}]
+    );
+    expect(result.counts).toEqual([
+      { skill: 'Finance', count: 2 },
+      { skill: 'Legal', count: 0 },
+      { skill: 'HR', count: 1 }
+    ]);
+    expect(result.gaps).toEqual(['Legal']);
+    expect(skillGaps(undefined, undefined)).toEqual({ counts: [], gaps: [] });
+  });
+
+  it('finds the seats ending within the window, overdue included', () => {
+    const seats = [
+      { id: 'a', due: '2027-05-01' },
+      { id: 'b', due: '2027-05-20' },
+      { id: 'c', due: '2027-09-01' },
+      { id: 'd', due: null }
+    ];
+    expect(expiringSeats(seats, '2027-05-04', 30).map((s) => s.id)).toEqual(['a', 'b']);
+    expect(expiringSeats(undefined, '2027-05-04', 30)).toEqual([]);
+  });
+
+  it('rounds a percent and is 0 for an empty whole', () => {
+    expect(percent(1, 3)).toBe(33);
+    expect(percent(2, 3)).toBe(67);
+    expect(percent(5, 0)).toBe(0);
+    expect(percent(null, 4)).toBe(0);
   });
 });

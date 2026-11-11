@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+  <columns>
+    <field>Board_Member__c$Person__c</field>
+  </columns>
+  <columns>
+    <field>Board_Member__c$Role__c</field>
+  </columns>
+  <columns>
+    <field>Board_Member__c$Term_End__c</field>
+  </columns>
+  <columns>
+    <field>Board_Member__c$At_Term_Limit__c</field>
+  </columns>
+  <description>
+    Every current seat on every board and committee, grouped by board, with role and term end.
+  </description>
+  <filter>
+    <criteriaItems>
+      <column>Board_Member__c$Is_Current__c</column>
+      <operator>equals</operator>
+      <value>1</value>
+    </criteriaItems>
+  </filter>
+  <format>Summary</format>
+  <groupingsDown>
+    <field>Board_Member__c$Board__c</field>
+    <sortOrder>Asc</sortOrder>
+  </groupingsDown>
+  <name>Current Board Roster</name>
+  <reportType>Board_Members__c</reportType>
+  <scope>organization</scope>
+  <showDetails>true</showDetails>
+</Report>

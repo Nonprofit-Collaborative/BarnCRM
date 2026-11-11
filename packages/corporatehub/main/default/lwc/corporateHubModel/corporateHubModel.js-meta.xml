@@ -2,9 +2,9 @@
 <LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
   <apiVersion>67.0</apiVersion>
   <description>
-    Corporate Hub's shared logic in plain JavaScript: how far off a date is, the cycle outcomes and
-    a public group's name as typed. Imported by corporateHubHome, hubDocumentPanel and
-    hubCompleteCycle.
+    Corporate Hub's shared logic in plain JavaScript: due dates, cycle outcomes, group names, the
+    board skills matrix, ending terms and percentages. Imported by the Corporate Hub page and
+    panels.
   </description>
   <isExposed>false</isExposed>
 </LightningComponentBundle>

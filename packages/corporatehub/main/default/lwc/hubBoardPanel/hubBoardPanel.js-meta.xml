@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Board panel: current seats, terms ending soon, the skills matrix, giving participation,
+    open action items, Request From Board and Start Self-Assessment (CH-09, CH-12, CH-13, CH-15
+    to CH-17, CH-19).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Board Panel</masterLabel>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordPage">
+      <objects>
+        <object>Board__c</object>
+      </objects>
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

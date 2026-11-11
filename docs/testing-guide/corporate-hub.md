@@ -1,7 +1,8 @@
 # Corporate Hub
 
 Scripts for the optional BarnCRM Corporate Hub module: templates, Library Documents and versions,
-policy acknowledgments, the compliance calendar, agreements and reminders. Setup detail:
+policy acknowledgments, the compliance calendar, agreements, reminders and board governance.
+Setup detail:
 [Corporate Hub](../admin-guide/corporate-hub.md).
 
 Before you start: an org from [Before you test](before-you-test.md), with Core and Corporate Hub
@@ -121,5 +122,77 @@ Admin) and a second user with the Team Member role, called the staff user below.
 | 1 | Open the Corporate Hub tab. | Policies to Acknowledge, Compliance Due (the overdue one first, marked Overdue) and Agreements to Act On. No Add Missing Templates button for the staff user. |
 | 2 | Tab through the page. | Every link and button is reachable with a visible focus ring, in reading order. |
 | 3 | Open it in the Salesforce mobile app. | The lists stack in one column with no sideways scrolling. |
+
+**Cleanup:** None.
+
+## T-CH-09: Board Roster, Terms and Skills
+
+**Purpose:** confirm seats, the term limit flag, expiring-term reminders and the skills matrix (CH-09, CH-13, CH-15, CH-17).
+**Prerequisites:** admin; three people (Ade, Bea, Cy).
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create a Board or Committee "Board of Directors" (Type Board, Term Limit 2, Skills Wanted Finance and Legal) and a second, "Finance Committee", Type Committee, Parent Board the first. | Both saved; the committee shows under the board's Committees list. |
+| 2 | On the board add seats: Ade Chair, term 2, started a year ago, ends in 20 days, Skills Finance; Bea Member, term 1, ends in two years; Cy Member, ended last month. | The Board panel lists Ade and Bea only; Ade shows **At Term Limit**; a warning says one term ends within the reminder window. |
+| 3 | Read the skills matrix. | Finance 1, Legal 0; "Skills wanted that no current member holds: Legal." |
+| 4 | Run **Corporate Hub reminders** now on the Nightly Jobs page, then again. | One bell notification to the board's owner naming Ade; none the second time. |
+| 5 | With Giving installed, give Ade a gift dated this fiscal year. Reload. | "50% of current members gave this fiscal year." Without Giving the line is absent. |
+| 6 | Give Bea an age range, then turn on **Show board demographics** in Settings, **Corporate Hub**. | Bea's age range shows on the panel; turned off again, it is hidden. |
+
+**Cleanup:** None.
+
+## T-CH-10: Meetings, Quorum, Minutes and Action Items
+
+**Purpose:** confirm Invite Board, quorum, the minutes step and carried action items (CH-10, CH-16).
+**Prerequisites:** the board from T-CH-09 with Ade and Bea current and voting; the staff user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create a Board Meeting last month and add an Action Item on the board, Raised At that meeting, Open. | Saved. |
+| 2 | Create a meeting next week. Press **Invite Board** twice. | Two attendees the first time, none the second. "No quorum yet: 0 voting members present, 2 needed." |
+| 3 | Set Ade and Bea Present. | "Quorum met: 2 voting members present, 2 needed." |
+| 4 | Read **Action Items Carried Forward**. | The open item from last month is listed; mark it Done and it disappears. |
+| 5 | As the staff user press **Submit Minutes for Approval**. | Minutes Submitted for Approval; no Mark Minutes Approved button for staff. |
+| 6 | As the admin press **Mark Minutes Approved**. | Approved, with today as Minutes Approved On. |
+
+**Cleanup:** None.
+
+## T-CH-11: Motions and Votes
+
+**Purpose:** confirm voting opens, counts and closes, and closed votes stay closed (CH-11).
+**Prerequisites:** the meeting from T-CH-10 with two voting attendees; the staff user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Add a Board Motion "Approve the budget". Press **Open Voting**. | "Voting open for 2 members." Two Board Votes, blank. |
+| 2 | Set one vote For and one Against; press **Close Voting**. | "Voting closed: Failed." Decided On is today; the motion shows 1 for, 1 against. |
+| 3 | As the staff user change a vote. | Refused: "Voting on this motion is closed." As the admin it saves. |
+
+**Cleanup:** None.
+
+## T-CH-12: Disclosures and Self-Assessment
+
+**Purpose:** confirm yearly board disclosures and the self-assessment (CH-12, CH-19).
+**Prerequisites:** the board from T-CH-09; an Active Library Document "Conflict of Interest" with Needs Acknowledgment and Ask Every Year.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the Board panel choose the policy and press **Request From Board**, then again. | "2 people asked.", then "0 people asked." Each request names the person, not a user. |
+| 2 | Press **Start Self-Assessment**. | A Board Self-Assessment opens with one answer per question for Ade and Bea. |
+| 3 | Set the assessment Closed and change an answer's Rating. | Refused: "This self-assessment is closed." |
+
+**Cleanup:** None.
+
+## T-CH-13: Availability Poll and Board Dashboard
+
+**Purpose:** confirm the poll and the dashboard (CH-14, CH-20).
+**Prerequisites:** the board from T-CH-09.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Create a meeting with no start and press **Send Poll**. | Refused: fill in Poll Time 1 first. |
+| 2 | Fill in two Poll Times and press **Send Poll**. | The board is invited; Poll Open is checked; each time shows "0 available". |
+| 3 | Set Ade's Available at Time 2 to Yes; press **Choose This Time** on time 2. | Start is time 2; Poll Open is cleared. |
+| 4 | Open Dashboards, folder **BarnCRM Corporate Hub**, **Board Governance**. | Current roster, terms ending in 90 days (Ade), attendance this year and open disclosures, each opening its report. |
 
 **Cleanup:** None.

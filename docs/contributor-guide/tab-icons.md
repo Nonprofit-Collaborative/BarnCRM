@@ -156,6 +156,8 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | giving | receiptActions | custom:custom23 | Receipt__c |
 | giving | stewardshipPlans | custom:custom4 | Stewardship_Plans |
 | giving | tributeNotification | custom:custom5 | Tribute__c |
+| corporatehub | hubBoardPanel | custom:custom58 | Board__c |
+| corporatehub | hubMeetingPanel | custom:custom56 | Board_Meeting__c |
 | forms | formBuilder | custom:custom28 | Form__c |
 | forms | formRunner | custom:custom28 | Form__c |
 | forms | formSubmission | custom:custom51 | Form_Submission__c |

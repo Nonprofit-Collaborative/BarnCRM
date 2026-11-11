@@ -44,8 +44,12 @@ general guidance, not legal advice.
   Draft) and `BarnHelp_CorporateHub` (help and message text).
 - Custom notification type `Corporate_Hub_Reminder` (the bell reminders).
 - Lightning components: `corporateHubHome` (the Corporate Hub page), `hubDocumentPanel` (the
-  Policy panel), `hubCompleteCycle` (the Compliance panel) and the framework-free
-  `corporateHubModel`; record pages `Hub_Document_Record_Page` and
-  `Compliance_Obligation_Record_Page`, set as each object's default.
-- Tabs: Corporate Hub, Library Documents, Compliance Obligations and Agreements. No app of its own (ADR-0192):
+  Policy panel), `hubCompleteCycle` (the Compliance panel), `hubBoardPanel` (the Board panel),
+  `hubMeetingPanel` (the Meeting panel) and the framework-free `corporateHubModel`; record pages
+  `Hub_Document_Record_Page`, `Compliance_Obligation_Record_Page`, `Board_Record_Page` and
+  `Board_Meeting_Record_Page`, set as each object's default.
+- Reports: report types `Board_Members`, `Meeting_Attendees` and `Policy_Acknowledgments`, four
+  reports and the `Board_Governance` dashboard in the folders `BarnCRM_Corporate_Hub` (CH-14).
+- Tabs: Corporate Hub, Library Documents, Compliance Obligations, Agreements, Boards and
+  Committees and Board Meetings. No app of its own (ADR-0192):
   the tabs join BarnCRM and BarnCRM Console through the catalog row's `Staff_Tabs__c`.
