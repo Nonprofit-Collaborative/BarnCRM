@@ -162,7 +162,7 @@ private class VolunteerLetterServiceTest {
 		Volunteer_Letter_Template__c template = new Volunteer_Letter_Template__c(
 			Name = 'Proof',
 			Type__c = VolunteerLetterTemplates.TYPE_HOURS_LETTER,
-			Body__c = '{OrganizationName}|{PersonName}|{FirstName}|{Hours}|{JobList}|{Typo}',
+			Body__c = '{OrganizationName}|{PersonName}|{FirstName}|{Hours}|{HoursValue}|{HourValue}|{JobList}|{Typo}',
 			Active__c = true
 		);
 		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
@@ -193,6 +193,12 @@ private class VolunteerLetterServiceTest {
 		Assert.isTrue(body.startsWith('Barn &amp; &lt;Co&gt;|'), body);
 		Assert.isTrue(body.contains('&lt;b&gt;Ruiz&lt;/b&gt;'), 'The name is escaped: ' + body);
 		Assert.isTrue(body.contains('|{Hours}|2|'), 'A value is never merged twice: ' + body);
+		String hoursValue = VolunteerLetterService.money(2 * VolunteerSettings.DEFAULT_HOUR_VALUE);
+		String hourValue = VolunteerLetterService.money(VolunteerSettings.DEFAULT_HOUR_VALUE);
+		Assert.isTrue(
+			body.contains('|2|' + hoursValue.escapeHtml4() + '|' + hourValue.escapeHtml4() + '|'),
+			'V-12: {HoursValue} is the hours times Hour Value, {HourValue} the rate: ' + body
+		);
 		Assert.isTrue(body.contains('&lt;script&gt;'), 'The job is escaped: ' + body);
 		Assert.isFalse(body.contains('<script>'), 'No markup from a value: ' + body);
 		Assert.isTrue(body.endsWith('|{Typo}'), 'An unknown token is left as typed: ' + body);

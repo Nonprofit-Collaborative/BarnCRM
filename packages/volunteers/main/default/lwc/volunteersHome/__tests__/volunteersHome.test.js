@@ -107,6 +107,7 @@ describe('c-volunteers-home', () => {
       state: { filterName: 'All_Volunteer_Hours' }
     });
     expect(valueFor({ value: 2000, capped: true }, 'en-US')).toBe('2,000+');
+    expect(valueFor({ value: 104.37, currencyCode: 'USD' }, 'en-US')).toBe('$104.37');
     expect(badgeStatusFor({ value: 3 })).toBeUndefined();
   });
 });

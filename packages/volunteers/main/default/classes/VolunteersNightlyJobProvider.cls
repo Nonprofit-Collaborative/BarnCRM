@@ -1,7 +1,8 @@
 /**
  * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the Volunteers steps to
  * the one nightly run (ADR-0166 nightly-job-dispatcher, ADR-0128): the run that keeps recurring
- * schedules' shifts created to the horizon, and the morning shift reminders.
+ * schedules' shifts created to the horizon, the morning shift reminders and nudges, and the
+ * thank-you tasks (V-13).
  */
 @NamespaceAccessible
 public with sharing class VolunteersNightlyJobProvider implements NightlyStepProvider {
@@ -14,7 +15,8 @@ public with sharing class VolunteersNightlyJobProvider implements NightlyStepPro
 		return new List<NightlyStep>{
 			VolunteersScheduler.step(),
 			VolunteerReminderScheduler.step(),
-			VolunteerNudgeScheduler.step()
+			VolunteerNudgeScheduler.step(),
+			VolunteerRecognitionScheduler.step()
 		};
 	}
 }

@@ -38,11 +38,22 @@ private class VolunteersHomeControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				new Set<String>{ 'hoursThisMonth', 'hoursToApprove', 'shiftsNeedingPeople' },
+				new Set<String>{
+					'hoursThisMonth',
+					'hoursValueThisMonth',
+					'hoursToApprove',
+					'shiftsNeedingPeople'
+				},
 				tiles.keySet(),
 				'An administrator reads every figure.'
 			);
 			Assert.areEqual(3, tiles.get('hoursThisMonth').value, 'Only approved hours count.');
+			Assert.areEqual(
+				3 * VolunteerSettings.DEFAULT_HOUR_VALUE,
+				tiles.get('hoursValueThisMonth').value,
+				'V-12: hours times the shipped Hour Value, display only.'
+			);
+			Assert.isNotNull(tiles.get('hoursValueThisMonth').currencyCode, 'In the org currency.');
 			Assert.areEqual(1, tiles.get('hoursToApprove').value, 'One entry waits.');
 			Assert.areEqual(
 				'Volunteer_Approve_Hours',

@@ -18,6 +18,7 @@ public with sharing class VolunteerSignupTriggerHandler extends TriggerHandler {
 		List<Volunteer_Signup__c> signups = (List<Volunteer_Signup__c>) newRecords();
 		VolunteerSignupService.refuseSecondSignups(signups);
 		VolunteerCapacity.waitlistWhatDoesNotFit(signups, null);
+		VolunteerMinors.flag(signups, null);
 	}
 
 	public override void beforeUpdate() {
@@ -40,11 +41,13 @@ public with sharing class VolunteerSignupTriggerHandler extends TriggerHandler {
 			(List<Volunteer_Signup__c>) newRecords(),
 			previousById
 		);
+		VolunteerMinors.flag((List<Volunteer_Signup__c>) newRecords(), previousById);
 	}
 
 	public override void afterInsert() {
 		List<Volunteer_Signup__c> signups = (List<Volunteer_Signup__c>) newRecords();
 		VolunteerSignupService.createHoursForAttendance(signups, null);
+		VolunteerMinors.requestConsent(signups, null);
 		VolunteerStanding.extendFor(signups, null);
 	}
 
@@ -68,6 +71,7 @@ public with sharing class VolunteerSignupTriggerHandler extends TriggerHandler {
 		Map<Id, Volunteer_Signup__c> previousById = (Map<Id, Volunteer_Signup__c>) oldRecordsById();
 		VolunteerSignupService.createHoursForAttendance(signups, previousById);
 		VolunteerCapacity.promote(VolunteerCapacity.freedShifts(signups, previousById));
+		VolunteerMinors.requestConsent(signups, previousById);
 		VolunteerStanding.extendFor(signups, previousById);
 	}
 }

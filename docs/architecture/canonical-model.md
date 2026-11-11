@@ -9146,7 +9146,8 @@ whether or not Volunteer Status is set, so a walk-in is recorded in one save.
 | Last Hour Milestone | `Last_Hour_Milestone__c` | Number(6, 0), Contact only, read only in every set (V-13, R-VP4) |
 
 **R-VP4 One thank-you per milestone and anniversary (V-13).** When Send Thank-You Tasks is on
-(29N), a morning step at 7:30 AM (`VolunteerRecognitionJob`, a fourth Volunteers nightly job)
+(29N), a morning step at 7:30 AM (`VolunteerRecognitionJob`, started by
+`VolunteerRecognitionScheduler`, a fourth Volunteers nightly job)
 reads Contacts with Volunteer Hours Total at or above the lowest of Hour Milestones, or with a
 Volunteer Since: a Contact whose total reached a milestone above Last Hour Milestone gets one
 open Task for the highest milestone reached and Last Hour Milestone is set to it (so a person
@@ -9448,7 +9449,8 @@ progress). A public sign-up whose form wrote a person under the record key `guar
 person as the requirement's Guardian. The requirement is created in system mode (requirements are
 kept to coordinators, R-VQ4). Consent Needed records the check at booking; the person's
 onboarding card (R-VQ3) shows whether consent is current now. Nothing is refused: the coordinator decides (R-VQ3). A person with
-no Birthdate, or named by an Account, is not checked.
+no Birthdate, or named by an Account, is not checked. Done by `VolunteerMinors`, from the
+`Volunteer_Signup_Rules` handler; R-VU8 by `VolunteerCapacity` and R-VU9 by `VolunteerStanding`.
 
 **R-VU5 Erasing the person keeps their sign-ups.** Erasing a person (Section 29H) keeps every
 sign-up naming them, so shift counts stand, and empties its Notes. A sign-up Signed up or
