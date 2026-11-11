@@ -4,7 +4,9 @@ import getRegistrations from '@salesforce/apex/EventRegistrationsController.getR
 import register from '@salesforce/apex/EventRegistrationsController.register';
 import setStatus from '@salesforce/apex/EventRegistrationsController.setStatus';
 import cancelRegistration from '@salesforce/apex/EventRegistrationsController.cancelRegistration';
+import sendPaymentLink from '@salesforce/apex/EventRegistrationsController.sendPaymentLink';
 import BarnConfirmModal from 'c/barnConfirmModal';
+import EventRecordModal from 'c/eventRecordModal';
 
 jest.mock(
   '@salesforce/apex/EventRegistrationsController.getRegistrations',
@@ -23,6 +25,11 @@ jest.mock(
 );
 jest.mock(
   '@salesforce/apex/EventRegistrationsController.cancelRegistration',
+  () => ({ default: jest.fn() }),
+  { virtual: true }
+);
+jest.mock(
+  '@salesforce/apex/EventRegistrationsController.sendPaymentLink',
   () => ({ default: jest.fn() }),
   { virtual: true }
 );
@@ -151,6 +158,45 @@ describe('c-event-registrations', () => {
     await flush();
     await flush();
     expect(cancelRegistration).toHaveBeenCalledWith({ registrationId: 'a08000000000001AAA' });
+  });
+
+  it('edits a badge in the record form and reloads', async () => {
+    const element = await render();
+    EventRecordModal.open = jest.fn().mockResolvedValue({ id: JANE });
+    choose(all(element, 'lightning-button-menu')[0], 'editBadge');
+    await flush();
+    expect(EventRecordModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({
+        objectApiName: 'Event_Attendee__c',
+        recordId: JANE,
+        fields: ['Badge_Name__c', 'Badge_Title__c', 'Badge_Company__c']
+      })
+    );
+    expect(getRegistrations).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows payment status and sends a payment link for a registration waiting to pay', async () => {
+    const waiting = {
+      ...DATA.attendees[0],
+      registrationStatus: 'Pending Payment',
+      amountOwed: 25,
+      paymentStatus: 'Unpaid'
+    };
+    const element = await render({ ...DATA, canSendPaymentLink: true, attendees: [waiting] });
+    expect(one(element, '[data-id="pending-payment"]').label).toBe('Pending Payment');
+    expect(one(element, '[data-id="payment-status"]').label).toBe('Unpaid');
+    sendPaymentLink.mockResolvedValue('The payment link was emailed to the registrant.');
+    choose(one(element, 'lightning-button-menu'), 'sendPaymentLink');
+    await flush();
+    expect(sendPaymentLink).toHaveBeenCalledWith({ registrationId: 'a08000000000001AAA' });
+  });
+
+  it('hides the payment column and menu item when nothing is paid online', async () => {
+    const element = await render();
+    expect(one(element, '[data-id="payment-status"]')).toBeNull();
+    const values = all(element, 'lightning-menu-item').map((item) => item.value);
+    expect(values).not.toContain('sendPaymentLink');
+    expect(values).toContain('editBadge');
   });
 
   it('shows the load failure', async () => {

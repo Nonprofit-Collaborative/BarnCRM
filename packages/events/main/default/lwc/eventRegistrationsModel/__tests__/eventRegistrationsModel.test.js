@@ -2,6 +2,7 @@ import {
   actionsFor,
   buildRequest,
   canSubmit,
+  paymentWord,
   statusWord,
   summarize
 } from 'c/eventRegistrationsModel';
@@ -39,14 +40,16 @@ describe('eventRegistrationsModel', () => {
       'markAttended',
       'markNoShow',
       'cancelAttendee',
+      'editBadge',
       'cancelRegistration'
     ]);
     expect(values('Waitlisted', 'Waitlisted')).toEqual([
       'moveOffWaitlist',
       'cancelAttendee',
+      'editBadge',
       'cancelRegistration'
     ]);
-    expect(values('Cancelled', 'Cancelled')).toEqual(['markRegistered']);
+    expect(values('Cancelled', 'Cancelled')).toEqual(['markRegistered', 'editBadge']);
     expect(actionsFor({ status: 'No-Show' })[0]).toEqual({
       value: 'markAttended',
       target: 'Attended'
@@ -54,10 +57,33 @@ describe('eventRegistrationsModel', () => {
     expect(actionsFor(null)).toEqual([]);
   });
 
-  it('names a badge word per status', () => {
+  it('offers Send Payment Link only for an open, unpaid registration that owes money', () => {
+    const can = { canSendPaymentLink: true };
+    const offers = (attendee, options) =>
+      actionsFor(
+        { status: 'Registered', registrationStatus: 'Pending Payment', ...attendee },
+        options
+      )
+        .map((action) => action.value)
+        .includes('sendPaymentLink');
+    expect(offers({ amountOwed: 25, paymentStatus: 'Unpaid' }, can)).toBe(true);
+    expect(offers({ amountOwed: 25, paymentStatus: 'Failed' }, can)).toBe(true);
+    expect(offers({ amountOwed: 25, paymentStatus: 'Paid' }, can)).toBe(false);
+    expect(offers({ amountOwed: 0 }, can)).toBe(false);
+    expect(offers({ amountOwed: 25, registrationStatus: 'Cancelled' }, can)).toBe(false);
+    expect(offers({ amountOwed: 25 }, { canSendPaymentLink: false })).toBe(false);
+    expect(offers({ amountOwed: 25 })).toBe(false);
+  });
+
+  it('names a badge word per status and payment status', () => {
     expect(statusWord('Attended')).toBe('complete');
     expect(statusWord('Waitlisted')).toBe('pending');
     expect(statusWord('Unknown')).toBe('neutral');
+    expect(paymentWord('Paid')).toBe('complete');
+    expect(paymentWord('Link Sent')).toBe('pending');
+    expect(paymentWord('Failed')).toBe('not-met');
+    expect(paymentWord('Refunded')).toBe('inactive');
+    expect(paymentWord(undefined)).toBe('neutral');
   });
 
   it('builds a request from a chosen or typed person and leaves blank guests out', () => {
