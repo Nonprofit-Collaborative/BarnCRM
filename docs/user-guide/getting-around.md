@@ -66,7 +66,7 @@ you, overdue pledge payments, your asks due this month, open gift batches and ru
 stewardship plans. **Enter a Gift** opens Quick Gift Entry. Under **Fundraising Setup** are the
 setup pages that are no longer in the menu (**Donor Level Ladder**, **Stewardship Plan Setup**,
 **Pledge Reminders**, **Receipt Letters**), each shown only to people who may use it; they are
-also in the App Launcher. Below are two charts, **Giving by Month** and **Open Asks by Stage**;
+also tabs in **BarnCRM Admin** and **BarnCRM Admin Console**, and in the App Launcher. Below are two charts, **Giving by Month** and **Open Asks by Stage**;
 click a chart to open its report.
 
 The **BarnCRM Volunteers** app has **Volunteers Home**, **Volunteer Jobs**, **Volunteer
