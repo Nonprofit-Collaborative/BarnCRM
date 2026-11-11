@@ -1,0 +1,6 @@
+{
+  "languages": ["en"],
+  "texts": {
+    "AddressVerification_Error_Provider": "{0} did not answer for {1} addresses. They stay Unverified and are tried again tonight. Check your keys and your provider account's allowance."
+  }
+}
