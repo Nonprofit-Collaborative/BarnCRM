@@ -597,3 +597,15 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 5 | Open **Org Optimizer**, **Access Explorer**, and choose Staff Tester. | **Coordinator (Retired)** is listed as a BarnCRM role beside **Team Member**. |
 
 **Cleanup:** remove **Coordinator (Retired)** and **Team Member** from Staff Tester in Setup; remove the group from Gone Tester (reactivate first if Salesforce asks).
+
+## T-SET-28: Forms and Logic Models Are Found by Their Settings Rows
+
+**Purpose:** confirm Forms and Logic Models show as installed through the settings row each ships, not an object name, and the row opens the module's tab (C-72).
+**Prerequisites:** the admin user; Forms and Logic Models installed, Nonprofit Edition chosen.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Modules**. | **BarnCRM Forms** and **BarnCRM Logic Models** read **Installed**. |
+| 2 | Open the **Forms** section (under People), then select **Open Forms**. | The Forms tab opens on its list view. |
+| 3 | Open the **Logic Models** section (under Programs), then select **Open Logic Models**. | The Logic Models tab opens on its list view. |
+| 4 | In an org with Core only, open **BarnCRM Settings**. | No Forms or Logic Models section; **Modules** lists both as not installed. |

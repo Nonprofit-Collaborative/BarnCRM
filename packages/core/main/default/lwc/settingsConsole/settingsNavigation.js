@@ -29,6 +29,7 @@ const GROUPS = [
       ['People and Households', 'utility:groups'],
       ['Addresses', 'utility:location'],
       ['Contact Points', 'utility:contact_request'],
+      ['Forms', 'utility:form'],
       ['Portals', 'utility:identity']
     ]
   },
@@ -56,6 +57,7 @@ const GROUPS = [
     label: PROGRAMS,
     sections: [
       ['Programs', 'utility:education'],
+      ['Logic Models', 'utility:hierarchy'],
       ['Volunteers', 'utility:people'],
       ['Events', 'utility:event']
     ]
@@ -76,6 +78,16 @@ const GROUPS = [
 ];
 
 const OTHER_ICON = 'utility:settings';
+
+/**
+ * Where a row's Open button goes: a target that is an object (Form__c) opens that object's tab,
+ * where its records are set up (C-72); any other target is a page tab (ADR-0020).
+ */
+export function openPageReference(target) {
+  return String(target).endsWith('__c')
+    ? { type: 'standard__objectPage', attributes: { objectApiName: target, actionName: 'home' } }
+    : { type: 'standard__navItemPage', attributes: { apiName: target } };
+}
 
 /** The groups to show for these section names: `{ name, label, items: [{ name, label, iconName }] }`. */
 export function navigationGroups(sectionNames) {

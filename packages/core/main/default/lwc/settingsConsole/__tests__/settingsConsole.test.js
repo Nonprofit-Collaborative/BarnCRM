@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import SettingsConsole from 'c/settingsConsole';
+import { openPageReference } from '../settingsNavigation';
 import FeatureSettings from 'c/featureSettings';
 import getConsoleModel from '@salesforce/apex/SettingsController.getConsoleModel';
 import saveSettings from '@salesforce/apex/SettingsController.saveSettings';
@@ -731,6 +732,51 @@ describe('c-settings-console', () => {
     expect(button.label).toBe('Open Rollup Builder');
     expect(button.dataset.target).toBe('Rollup_Builder');
     expect(element.shadowRoot.querySelector('c-settings-search')).not.toBeNull();
+  });
+
+  it('opens an object tab when a module row names an object (C-72)', async () => {
+    getConsoleModel.mockResolvedValue({
+      canEdit: true,
+      sections: [
+        { name: 'General', settings: [] },
+        {
+          name: 'Forms',
+          settings: [
+            {
+              key: 'Forms_Page',
+              label: 'Forms',
+              description: null,
+              dataType: 'Component',
+              section: 'Forms',
+              module: 'Forms',
+              component: null,
+              navigationTarget: 'Form__c',
+              navigationLabel: 'Forms',
+              helpUrl: null,
+              value: null,
+              checked: false,
+              options: []
+            }
+          ]
+        }
+      ]
+    });
+    const element = createElement('c-settings-console', { is: SettingsConsole });
+    document.body.appendChild(element);
+    openSection('Forms');
+    await settle();
+
+    const button = element.shadowRoot.querySelector('lightning-button[data-target]');
+    expect(button.label).toBe('Open Forms');
+    expect(button.dataset.target).toBe('Form__c');
+    expect(openPageReference('Form__c')).toEqual({
+      type: 'standard__objectPage',
+      attributes: { objectApiName: 'Form__c', actionName: 'home' }
+    });
+    expect(openPageReference('Rollup_Builder')).toEqual({
+      type: 'standard__navItemPage',
+      attributes: { apiName: 'Rollup_Builder' }
+    });
   });
 
   it('shows a value from Setup read only, above the rows it heads, and never sends it', async () => {
