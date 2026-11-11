@@ -54,6 +54,14 @@
         <behavior>Readonly</behavior>
         <field>Slots_Filled__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Minimum_Volunteers__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Readonly</behavior>
+        <field>Below_Minimum__c</field>
+      </layoutItems>
     </layoutColumns>
     <layoutColumns>
       <layoutItems>

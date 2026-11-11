@@ -170,6 +170,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Program__c.Capacity__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Service__c.Active__c</field>
     <readable>true</readable>
   </fieldPermissions>

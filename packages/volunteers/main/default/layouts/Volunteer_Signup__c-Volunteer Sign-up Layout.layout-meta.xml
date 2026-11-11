@@ -37,6 +37,26 @@
         <behavior>Readonly</behavior>
         <field>Reminder_Sent_On__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Group_Size__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Group_Name__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Readonly</behavior>
+        <field>Places__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Standing__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Readonly</behavior>
+        <field>Consent_Needed__c</field>
+      </layoutItems>
     </layoutColumns>
   </layoutSections>
   <showEmailCheckbox>false</showEmailCheckbox>

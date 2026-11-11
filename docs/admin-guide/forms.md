@@ -227,7 +227,10 @@ checks apply.
 The same Site page and API also serve a module's public pages: an event's page with its
 registration form (`FormsPublic?record=<event ID>`, `FormsPublic?list=events`, and
 `GET .../forms/v1/pages/<event ID>` or `GET .../forms/v1/pages?kind=events`). The module
-decides what is published; see [Event Management](events.md), Public Event Page.
+decides what is published; see [Event Management](events.md), Public Event Page. Volunteers
+publishes shift pages the same way (`FormsPublic?list=volunteers`, `FormsPublic?record=<shift
+ID>`, kind `volunteers`) and a volunteer's personal page, which opens only from the signed link
+in their shift reminder; see [Volunteers](volunteers.md), Public Sign-Up Page.
 
 ## Form Submissions
 

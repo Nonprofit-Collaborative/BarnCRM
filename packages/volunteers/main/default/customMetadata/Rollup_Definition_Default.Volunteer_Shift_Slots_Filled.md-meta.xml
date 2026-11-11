@@ -4,7 +4,7 @@
     <protected>true</protected>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">How many people are signed up for this shift and have not cancelled. Slots Remaining is Volunteers Needed less this.</value>
+        <value xsi:type="xsd:string">How many places on this shift are taken: the Places (group size) of sign-ups that are not Cancelled or Waitlisted. Slots Remaining is Volunteers Needed less this.</value>
     </values>
     <values>
         <field>Definition_Key__c</field>
@@ -24,11 +24,11 @@
     </values>
     <values>
         <field>Aggregate__c</field>
-        <value xsi:type="xsd:string">COUNT</value>
+        <value xsi:type="xsd:string">SUM</value>
     </values>
     <values>
         <field>Source_Field__c</field>
-        <value xsi:nil="true" />
+        <value xsi:type="xsd:string">Places__c</value>
     </values>
     <values>
         <field>Order_By_Field__c</field>
@@ -40,7 +40,7 @@
     </values>
     <values>
         <field>Filter_JSON__c</field>
-        <value xsi:type="xsd:string">{"version": 1, "conditions": [{"id": 1, "field": "Status__c", "operator": "not equals", "value": "Cancelled"}]}</value>
+        <value xsi:type="xsd:string">{"version": 1, "conditions": [{"id": 1, "field": "Status__c", "operator": "not in", "value": ["Cancelled", "Waitlisted"]}]}</value>
     </values>
     <values>
         <field>Target_Filter_JSON__c</field>

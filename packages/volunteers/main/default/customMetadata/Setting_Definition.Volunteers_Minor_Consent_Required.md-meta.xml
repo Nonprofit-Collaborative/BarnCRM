@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Guardian consent required</label>
+    <protected>true</protected>
+    <values>
+        <field>Setting_Key__c</field>
+        <value xsi:type="xsd:string">Minor_Consent_Required__c</value>
+    </values>
+    <values>
+        <field>Settings_Object__c</field>
+        <value xsi:type="xsd:string">Volunteer_Settings__c</value>
+    </values>
+    <values>
+        <field>Section__c</field>
+        <value xsi:type="xsd:string">Volunteers</value>
+    </values>
+    <values>
+        <field>Module__c</field>
+        <value xsi:type="xsd:string">Volunteers</value>
+    </values>
+    <values>
+        <field>Data_Type__c</field>
+        <value xsi:type="xsd:string">Checkbox</value>
+    </values>
+    <values>
+        <field>Sort_Order__c</field>
+        <value xsi:type="xsd:double">120</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Whether a sign-up for a volunteer younger than Minor Age on the day of the shift, with no current Guardian consent step, is flagged Consent Needed and gets a Guardian consent step to complete. Off by default. The age comes from the contact's Birthdate; nobody is refused, you decide.</value>
+    </values>
+    <values>
+        <field>Help_Path__c</field>
+        <value xsi:type="xsd:string">volunteers.md</value>
+    </values>
+</CustomMetadata>

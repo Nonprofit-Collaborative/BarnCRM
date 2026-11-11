@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Minor_Consent_Required__c</fullName>
+  <defaultValue>false</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>Whether a sign-up for a volunteer under the minor age is flagged and gets a guardian consent step. Off by default.</inlineHelpText>
+  <label>Guardian Consent Required</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>
