@@ -4175,6 +4175,18 @@ set: every save or delete it lets through writes an Error Log entry at Warning n
 what changed. It is separate from `Override_Receipt_Lock` (R-G4), which reaches nothing but the
 receipt.
 
+**R-G17 Stock, planned and gift source details are descriptive (G-21, G-31, release 1.5).** A
+gift of stock (Payment Method Stock) may carry its Stock Symbol and Shares; the gift's Amount
+stays the value the organization records, and nothing computes it from the shares. A planned
+gift (a bequest, an annuity, a trust distribution) is an ordinary gift with a Planned Gift Type.
+Gift Source says who the money came through when that is not the donor directly (a donor-advised
+fund, a family foundation, an IRA charitable distribution, an employer giving program), with
+Gift Source Name for the sponsor or foundation, while the donor stays the person or organization
+being credited. None of the five is validated, read by a total, the accounting export or the
+lock, or printed on a receipt: the receipt wording for a donor-advised fund gift is the
+organization's own template decision (the sponsor, not the donor, is the legal donor). The
+packaged report DAF and Stock Gifts This Year lists them.
+
 ### Salesforce implementation
 
 - **Object:** `Gift__c`, auto-number Name with format `G-{000000}`, private
@@ -4209,6 +4221,11 @@ receipt.
 | Created By Import Batch | `Created_By_Import_Batch__c` | Lookup to `Import_Batch__c` |
 | Sample Data | `Sample_Data__c` | Checkbox (v0.4) |
 | Posted to Accounting | `Accounting_Posted_At__c` | Date/Time, package written (v0.6, R-G13) |
+| Stock Symbol | `Stock_Symbol__c` | Text(12) (1.5, G-21, R-G17) |
+| Shares | `Stock_Shares__c` | Number(14, 4) (1.5, G-21) |
+| Planned Gift Type | `Planned_Gift_Type__c` | Picklist: Bequest, Beneficiary Designation, Charitable Gift Annuity, Charitable Remainder Trust, Life Insurance, Other (1.5, G-21; a charitable lead trust is recorded as Other because `check-standard-objects.sh` bars the word Lead in package metadata) |
+| Gift Source | `Gift_Source__c` | Picklist: Donor-Advised Fund, Family Foundation, IRA Charitable Distribution, Employer Giving Program, Other; empty means given directly (1.5, G-31) |
+| Gift Source Name | `Gift_Source_Name__c` | Text(255): the fund sponsor or foundation (1.5, G-31) |
 | Posted to Accounting By | `Accounting_Posted_By__c` | Lookup to User, package written (v0.6, R-G13) |
 
 - **Service:** `GiftService`, `GiftTriggerHandler`, `GiftSelector`, LWC `quickGiftEntry` (G-03).
@@ -4714,7 +4731,7 @@ rewritten, because a gift already refers to them.
 | End Date | `End_Date__c` | Date |
 | Status | `Status__c` | Picklist: Active, Paused, Completed, Cancelled |
 | Expected Total | `Expected_Total__c` | Currency |
-| Installments Planned | `Installments_Planned__c` | Number (0 decimals) |
+| Payments Planned | `Installments_Planned__c` | Number (0 decimals) |
 | Fund | `Fund__c` | Lookup to `Fund__c` |
 | Appeal | `Appeal__c` | Lookup to `Appeal__c` |
 | Balance | `Balance__c` | Formula (Currency) |
@@ -4795,7 +4812,7 @@ carries on (R-E1).
 
 ### Salesforce implementation
 
-- **Object:** `Installment__c`, auto-number Name with format `IN-{000000}`. Labelled Pledge Payment (plural Pledge Payments) from v1.0, so its tab reads Pledge Payments; the API name is unchanged.
+- **Object:** `Installment__c`, auto-number Name with format `IN-{000000}`. Labelled Scheduled Payment (plural Scheduled Payments, Name field Payment Number) from 1.5 (G-36; Pledge Payment in v1.0), so its tab reads Scheduled Payments; the API name is unchanged.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -6878,6 +6895,44 @@ numbers printed beside it and an organization can change what "recent" means wit
 - **Code:** `DonorScoreService` (pure scoring in `DonorScoreMath`, a plain class with no org access),
 `DonorScoreTriggerHandler` registered for Account and Contact, and the existing
 `DonorLevelBatch` pass, which now scores the same records after placing them on the ladder.
+
+---
+
+## 25U. Wealth screening data
+
+### Definition
+
+What an outside wealth screening said about a person (G-32, D-156, release 1.5). BarnCRM buys
+nothing and calls no screening service: the organization screens its list with a vendor of its
+choice and loads the vendor's export with the packaged import template. Ratings vary by vendor,
+so the two ratings are free text; the score is a number so it sorts and filters in Find.
+
+- **R-WS1 Stored as received.** Nothing in BarnCRM reads, recalculates or rolls up these
+  attributes; Find, reports and segments may filter on them.
+- **R-WS2 Restricted to fundraisers.** Giving Admin and Giving Staff read and edit them; Giving
+  Read Only does not see them, because screening data is a judgment about a person's means.
+- **R-WS3 Import.** The shipped import template `wealth_screening` (one object, Update by a
+  matching field: Contact by `Email`, or a person account by `PersonEmail` where people are
+  accounts) fills the five attributes; a row whose email matches nobody is rejected, so screening
+  data never creates a person.
+
+### Salesforce implementation
+
+- **Fields on Contact** (shipped by Giving, in the Giving Details section of the person page):
+
+| Attribute | API name | Type |
+|---|---|---|
+| Capacity Rating | `Capacity_Rating__c` | Text(80) |
+| Affinity Rating | `Affinity_Rating__c` | Text(80) |
+| Screening Score | `Screening_Score__c` | Number(8, 2) |
+| Screening Date | `Screening_Date__c` | Date |
+| Screening Source | `Screening_Source__c` | Text(80) |
+
+- **Import templates:** `Import_Template_Default.Wealth_Screening_Contacts` (Person Mode
+  Contacts, target `Contact`, Load Match Field `Email`) and
+  `Import_Template_Default.Wealth_Screening_Person_Accounts` (Person Mode Person Accounts, target
+  `Account`, Load Match Field `PersonEmail`, the `__pc` fields), both key `wealth_screening`, Load
+  Operation Update by a matching field.
 
 ---
 
@@ -9284,6 +9339,20 @@ whether or not Volunteer Status is set, so a walk-in is recorded in one save.
 | Emergency Contact Phone | `Emergency_Contact_Phone__c` | Phone |
 | Availability Days | `Availability_Days__c` | Multi-Select Picklist, 7 values |
 | Availability Times | `Availability_Times__c` | Multi-Select Picklist, 3 values |
+| Last Hour Milestone | `Last_Hour_Milestone__c` | Number(6, 0), Contact only, read only in every set (V-13, R-VP4) |
+
+**R-VP4 One thank-you per milestone and anniversary (V-13).** When Send Thank-You Tasks is on
+(29N), a morning step at 7:30 AM (`VolunteerRecognitionJob`, started by
+`VolunteerRecognitionScheduler`, a fourth Volunteers nightly job)
+reads Contacts with Volunteer Hours Total at or above the lowest of Hour Milestones, or with a
+Volunteer Since: a Contact whose total reached a milestone above Last Hour Milestone gets one
+open Task for the highest milestone reached and Last Hour Milestone is set to it (so a person
+who passes two milestones between runs is thanked once); a Contact whose Volunteer Since falls
+on today (month and day, org time zone) one or more years ago gets one anniversary Task. A Task
+names the Contact, is due today and goes to the Contact's owner when that user is active,
+otherwise to the user the job runs as. Written in system mode by the job (Last Hour Milestone
+is read only to people). Contacts only: a person account's totals are on the Account, which
+this step does not read. Ships off.
 
 - **Shown on the person:** a **Volunteer Profile** field section (Dynamic Forms) on
   `Volunteers_Contact_Record_Page` and `Volunteers_Account_Record_Page` (ADR-0064 pattern, see
@@ -9343,6 +9412,15 @@ user cannot see.
 **R-VJ2 An inactive job keeps its history.** Clearing Active stops it being offered on a new
 shift and changes nothing already recorded, including its totals.
 
+**R-VJ3 A job is public only by choice (V-09).** A job's Open shifts that start after now are
+on the public sign-up page only while Show on Public Page and Active are both checked; its
+Sign-Up Form (a published public form's record identifier) is the form those shifts offer.
+What a guest is shown, and how a sign-up is booked, is ADR-NEXT (volunteer self-service)
+decisions 1 to 3: job name and description, shift start, end and location, and places left as
+a count; never who is booked, the coordinator or notes. The form's answers `groupSize` (a whole
+number from 1 to 50; anything else is 1) and `groupName` set the sign-up's Group Size and Group
+Name. Without BarnCRM Forms there is no public page and both fields do nothing.
+
 ### Salesforce implementation
 
 - **Object:** `Volunteer_Job__c`, name field Text, label Job Name.
@@ -9358,7 +9436,12 @@ shift and changes nothing already recorded, including its totals.
 | Last Volunteer Date | `Last_Volunteer_Date__c` | Date |
 | Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 | Sample Data | `Sample_Data__c` | Checkbox, default false (v0.8) |
+| Show on Public Page | `Public_Page__c` | Checkbox, default false (V-09, R-VJ3) |
+| Sign-Up Form | `Signup_Form_Key__c` | Text(18) (V-09, R-VJ3) |
 
+- **Public pages (V-09):** `VolunteerPublicPage` (`PublicPageExtension`, kind `volunteers`,
+  without sharing, Without Sharing Register) and `VolunteerFormAttachment`
+  (`FormAttachmentExtension`): shift pages and the list, the signed personal page (R-VU10).
 - **Event extension:** `VolunteersEventExtension` (EV-08) lists and creates an event's jobs and
   shifts for Event Management through Core's `EventVolunteerExtension`.
 - **Service:** `VolunteerJobTriggerHandler`, `VolunteerJobSelector`,
@@ -9386,7 +9469,9 @@ heads on.
 | Location | text | no | Where this shift happens, when it differs from the job's usual place. |
 | Status | picklist(Open, Cancelled, Completed) | yes (defaults Open) | Where the shift stands. A cancelled shift is kept, so the people booked on it can still be found. |
 | Shift Schedule | reference(Shift Schedule) | no | The recurring schedule that created this shift (V-07), empty for a shift created by hand. |
-| Slots Filled | integer | computed | How many people are signed up and have not cancelled. |
+| Slots Filled | integer | computed | How many places are taken: the Places of sign-ups that are not Cancelled or Waitlisted (V-16). |
+| Minimum Volunteers | integer | no | The fewest places the shift needs to go ahead (V-14, R-VS6). Empty means no minimum. |
+| Below Minimum | boolean | computed | Whether Slots Filled is under Minimum Volunteers (R-VS6). |
 | Slots Remaining | integer | computed | Volunteers Needed less Slots Filled. Negative when more came than were asked for, which is information, not an error. |
 | Total Hours | decimal | computed | Approved hours recorded against this shift. |
 | Totals Last Updated | datetime | computed | When BarnCRM last worked out this shift's totals. |
@@ -9409,7 +9494,14 @@ for example "Food pantry sort: 14 Mar 2026, 9:00 AM". A typed name is never over
 **R-VS3 A shift ends after it starts.** A validation rule, so it holds with automation off.
 
 **R-VS4 Volunteers Needed is a target, not a limit.** A sign-up is never refused because a
-shift is full; Slots Remaining goes negative and the coordinator sees it.
+shift is full; Slots Remaining goes negative and the coordinator sees it. With Waitlist When
+Full on (29N, V-14), Volunteers Needed is the maximum: a new sign-up that does not fit is saved
+as Waitlisted instead (R-VU8).
+
+**R-VS6 A minimum only shows (V-14).** Minimum Volunteers, when set, is the fewest places the
+shift needs to go ahead; Below Minimum is checked while Slots Filled is under it, and the
+Shifts Below Minimum list view lists Open shifts still to come that are. Nothing is cancelled
+or refused for it. A minimum above Volunteers Needed is refused (validation rule).
 
 **R-VS5 Cancelling is not deleting.** Status Cancelled keeps the shift and its sign-ups.
 Deleting a shift takes its sign-ups with it and leaves its hours, with the job, in place.
@@ -9433,8 +9525,14 @@ Deleting a shift takes its sign-ups with it and leaves its hours, with the job, 
 | Total Hours | `Total_Hours__c` | Number(10, 2) |
 | Totals Last Updated | `Rollups_Last_Calculated__c` | DateTime |
 | Nudge Sent On | `Nudge_Sent_On__c` | DateTime, read-only on the layout; editable (to clear) for Admin and Coordinator |
+| Minimum Volunteers | `Minimum_Volunteers__c` | Number(4, 0) (V-14) |
+| Below Minimum | `Below_Minimum__c` | Formula (Checkbox): Minimum Volunteers set and Slots Filled (blank as 0) below it (V-14) |
 
-- **Validation rules:** `End_After_Start` (R-VS3).
+- **Validation rules:** `End_After_Start` (R-VS3), `Minimum_Within_Needed` (R-VS6).
+- **List view:** `Shifts_Below_Minimum` (Open, Below Minimum, Start Time from today).
+- **Slots Filled roll-up:** `Volunteer_Shift_Slots_Filled` sums `Places__c` of sign-ups whose
+  Status is not Cancelled and not Waitlisted (V-16; was a count of sign-ups not Cancelled). An
+  org that installed the earlier definition keeps it until an admin edits it in Rollup Builder.
 - **Service:** `VolunteerShiftTriggerHandler`, `VolunteerShiftSelector`.
 
 ---
@@ -9443,8 +9541,9 @@ Deleting a shift takes its sign-ups with it and leaves its hours, with the job, 
 
 ### Definition
 
-A person booked onto a shift (V-02). It is the intention; Volunteer Hours (29M) is the record
-of what happened. Staff enter sign-ups; there is no portal (V-09 is out of scope).
+A person, or a group with its leader, booked onto a shift (V-02, V-16). It is the intention;
+Volunteer Hours (29M) is the record of what happened. Staff enter sign-ups; volunteers also sign
+up on the portal (PB-03) and on the public sign-up page (V-09, R-VJ3).
 
 ### Attributes
 
@@ -9454,8 +9553,13 @@ of what happened. Staff enter sign-ups; there is no portal (V-09 is out of scope
 | Volunteer Shift | reference(Volunteer Shift) | yes | The shift the person is booked onto. A sign-up is a detail of the shift. |
 | Contact | reference(Contact) | conditional | The person, where people are Contacts. |
 | Account | reference(Account) | conditional | The person, where people are person Accounts. |
-| Status | picklist(Signed up, Confirmed, Attended, No show, Cancelled) | yes (defaults Signed up) | Where this booking stands, up to whether the person turned up. |
+| Status | picklist(Signed up, Confirmed, Attended, No show, Cancelled, Waitlisted) | yes (defaults Signed up) | Where this booking stands, up to whether the person turned up. Waitlisted holds no place (V-14, R-VU8). |
 | Notes | text | no | Anything the coordinator needs to remember about this booking. |
+| Group Size | integer | no (defaults 1) | How many people this booking holds, the leader (the person named) included (V-16). |
+| Group Name | text | no | The group's name, such as a company or a class (V-16). |
+| Places | integer | computed | Group Size, or 1 when it is empty: the places this booking takes (V-16). |
+| Standing | boolean | no (defaults false) | Whether the person holds this shift every time its recurring schedule repeats (V-16, R-VU9). |
+| Consent Needed | boolean | computed | Set by BarnCRM when the person is a minor with no current guardian consent (V-15, R-VU11). |
 | Reminder Sent On | datetime | no | When the shift reminder email for this booking went out (V-10, R-VU6). Empty means none was sent. BarnCRM writes it; a coordinator clears it to send the reminder again. |
 
 ### Relationships
@@ -9494,8 +9598,55 @@ the hours are typed by hand. While automation is paused or the sign-up automatio
 off, marking attendance writes no hours and nothing writes them later: the coordinator enters
 them by hand (admin guide, volunteers page).
 
-**R-VU4 A cancelled sign-up stops counting.** Slots Filled counts sign-ups whose Status is not
-Cancelled, so someone who drops out frees the place without the booking being deleted.
+**R-VU4 A cancelled sign-up stops counting.** Slots Filled sums the Places of sign-ups whose
+Status is not Cancelled or Waitlisted, so someone who drops out frees the place without the
+booking being deleted.
+
+**R-VU8 Waitlist and promotion (V-14).** With Waitlist When Full on (29N, off by default), a
+sign-up saved as Signed up or Confirmed on a shift with Volunteers Needed set is checked against
+the places free, counted now from the sign-ups (not Slots Filled, which a roll-up updates a
+moment later), in the order given: one that does not fit is saved as Waitlisted, and one that
+does fit takes its places (Core `WaitlistQueue`, ADR-NEXT volunteer self-service decision 5).
+When places free up (a sign-up Cancelled or deleted, a group made smaller, or Volunteers
+Needed raised) on a shift still to come, Waitlisted sign-ups
+are promoted to Signed up, oldest first by Created Date, each that fits taking its places; a
+group too big for what is free is passed over for a smaller one behind it. Counting and
+promotion run in system mode in the same transaction, so a portal or form sign-up and one the
+user cannot see are handled alike, and send no email of their own (the shift reminder, R-VU6, goes
+out as for any booking). With the setting off nothing is waitlisted or promoted, and a sign-up
+a coordinator sets to Waitlisted by hand stays so until changed.
+
+**R-VU9 A standing sign-up repeats (V-16).** A sign-up with Standing checked on a shift of a
+recurring schedule (29T) books the same person, Group Size and Group Name on every later Open
+shift of that schedule they have no sign-up on: when the schedule creates shifts (R-SSC2) and
+when a sign-up becomes standing. The person's latest sign-up on the schedule (by shift start)
+decides: the booking continues while that one is Standing and not Cancelled, so cancelling the
+future ones from a given day ends it. Each copy goes through the sign-up rules (R-VU2, R-VU8,
+R-VU11) and is itself Standing. A standing sign-up does not keep a future shift when the
+schedule's pattern changes (R-SSC4): it is removed with the shift, and the person continues on
+the new pattern's shifts.
+
+**R-VU10 The personal page and profile (V-09).** A sign-up is the person's own record, so a
+public link to it carries a signed claim (ADR-0188). With a Self-Service Profile Form set (29N)
+and BarnCRM Forms on an active Site, the shift reminder adds the person's link; it opens a page
+with their upcoming bookings, approved hours this year and in total with their value (R-VP5) and
+their latest ten approved entries, and the profile form, whose answers `availabilityDays`,
+`availabilityTimes`, `emergencyContactName` and `emergencyContactPhone` overwrite those
+fields on the person the sign-up names (blank answers are left out), never on a person the
+answers name. Read and written in system mode by `VolunteerPublicPage` and
+`VolunteerFormAttachment`, for that person only, and only after the host checked the claim.
+
+**R-VU11 Minors and guardian consent (V-15).** With Guardian Consent Required on (29N, off by
+default), a sign-up that is new, or whose person changes, for a Contact whose Birthdate makes
+them younger than Minor Age (default 18) on the shift's day, with no current Guardian consent
+requirement (29S), is saved with Consent Needed checked, and a Guardian consent requirement Not
+started is created for them unless one that is not current is already open (Not started or In
+progress). A public sign-up whose form wrote a person under the record key `guardian` names that
+person as the requirement's Guardian. The requirement is created in system mode (requirements are
+kept to coordinators, R-VQ4). Consent Needed records the check at booking; the person's
+onboarding card (R-VQ3) shows whether consent is current now. Nothing is refused: the coordinator decides (R-VQ3). A person with
+no Birthdate, or named by an Account, is not checked. Done by `VolunteerMinors`, from the
+`Volunteer_Signup_Rules` handler; R-VU8 by `VolunteerCapacity` and R-VU9 by `VolunteerStanding`.
 
 **R-VU5 Erasing the person keeps their sign-ups.** Erasing a person (Section 29H) keeps every
 sign-up naming them, so shift counts stand, and empties its Notes. A sign-up Signed up or
@@ -9562,8 +9713,13 @@ panel books them, and one already booked on the shift by the account is left out
 | Volunteer Shift | `Volunteer_Shift__c` | Master-Detail to `Volunteer_Shift__c`, relationship name Signups |
 | Contact | `Contact__c` | Lookup to Contact, delete constraint SetNull |
 | Account | `Account__c` | Lookup to Account, delete constraint SetNull |
-| Status | `Status__c` | Picklist: Signed up, Confirmed, Attended, No show, Cancelled; required, default Signed up |
+| Status | `Status__c` | Picklist: Signed up, Confirmed, Attended, No show, Cancelled, Waitlisted; required, default Signed up |
 | Notes | `Notes__c` | Text Area(255) |
+| Group Size | `Group_Size__c` | Number(4, 0), default 1 (V-16) |
+| Group Name | `Group_Name__c` | Text(80) (V-16) |
+| Places | `Places__c` | Formula (Number, 0): `IF(OR(ISBLANK(Group_Size__c), Group_Size__c < 1), 1, Group_Size__c)` (V-16) |
+| Standing | `Standing__c` | Checkbox, default false (V-16) |
+| Consent Needed | `Consent_Needed__c` | Checkbox, default false, read only in every set (V-15) |
 | Reminder Sent On | `Reminder_Sent_On__c` | DateTime, read-only on the layout; editable (to clear) for Admin and Coordinator |
 
 - **Reminders:** `VolunteerReminderScheduler` (7:00 AM) starts `VolunteerReminderBatch` (100
@@ -9732,6 +9888,19 @@ module has no settings page of its own), never in Setup. Defaults are applied in
 | `Reminder_Lead_Days__c` | integer, 1 to 14 | 1 | How many days before a shift its reminder goes out (V-10). |
 | `Nudges_Enabled__c` | boolean | false | Whether an unfilled shift emails the job's regular volunteers once (V-10b, R-VU6a). Ships off, because turning it on emails real people. |
 | `Nudge_Lead_Days__c` | integer, 1 to 14 | 3 | How many days before an unfilled shift its nudge goes out (V-10b). |
+| `Hour_Value__c` | decimal, 0 to 9999.99 | 34.79 | The value of one volunteer hour in the org's currency (V-12, R-VP5). 0 hides every value. |
+| `Recognition_Enabled__c` | boolean | false | Whether milestone and anniversary thank-you Tasks are created (V-13, R-VP4). Ships off. |
+| `Hour_Milestones__c` | text | `25, 50, 100, 250, 500, 1000` | The total hours that earn a thank-you, separated by commas (V-13). A part that is not a whole number above 0 is ignored; with none left the shipped list applies. |
+| `Waitlist_Enabled__c` | boolean | false | Whether a full shift waitlists new sign-ups and promotes them when places free up (V-14, R-VU8). Ships off, because it changes what a sign-up on a full shift does. |
+| `Minor_Consent_Required__c` | boolean | false | Whether a minor's sign-up is flagged and gets a guardian consent step (V-15, R-VU11). Ships off. |
+| `Minor_Age__c` | integer, 1 to 21 | 18 | The age below which a volunteer is a minor (V-15). |
+| `Profile_Form_Key__c` | text | empty | The record identifier of the published public form a volunteer's personal page offers (V-09, R-VU10). Empty means no personal page; there is no form to default to. |
+
+**R-VP5 The value of hours only displays (V-12).** Hour Value times approved hours is shown as
+Value of Hours This Month on Volunteers Home, on the personal page (R-VU10) and in hour letters
+through `{HoursValue}` (the person's hours in the period times the rate) and `{HourValue}` (the
+rate), in the org's default currency. Nothing stores a value. At 0 the figure and the personal
+page's value are left out, and both tokens merge as empty.
 
 ### Salesforce implementation
 
@@ -9746,6 +9915,13 @@ module has no settings page of its own), never in Setup. Defaults are applied in
 | Days Before a Shift to Remind | `Reminder_Lead_Days__c` | Number(2, 0), default 1 |
 | Send Unfilled Shift Nudges | `Nudges_Enabled__c` | Checkbox, default false |
 | Days Before a Shift to Nudge | `Nudge_Lead_Days__c` | Number(2, 0), default 3 |
+| Value of One Volunteer Hour | `Hour_Value__c` | Number(6, 2), default 34.79 |
+| Send Thank-You Tasks | `Recognition_Enabled__c` | Checkbox, default false |
+| Hour Milestones | `Hour_Milestones__c` | Text(255), default `25, 50, 100, 250, 500, 1000` |
+| Waitlist When Full | `Waitlist_Enabled__c` | Checkbox, default false |
+| Guardian Consent Required | `Minor_Consent_Required__c` | Checkbox, default false |
+| Minor Age | `Minor_Age__c` | Number(2, 0), default 18 |
+| Self-Service Profile Form | `Profile_Form_Key__c` | Text(18) |
 
 - **Setting Definition rows:** `Settings_Object__c` `Volunteer_Settings__c`, `Module__c`
   Volunteers, `Section__c` Volunteers, one per key.
@@ -9990,17 +10166,22 @@ it is seen only by those who may see requirements and it leaves with them (R-VQ4
 | Name | text | computed | An identifier assigned automatically. |
 | Contact | reference(Contact) | conditional | The person, where people are Contacts. |
 | Person Account | reference(Organization) | conditional | The person, where people are person Accounts. |
-| Type | picklist(Application, Background check, Orientation) | yes | Which onboarding step this is. The admin may add values. |
+| Type | picklist(Application, Background check, Orientation, Guardian consent) | yes | Which onboarding step this is. The admin may add values. Guardian consent is a minor's (V-15, R-VU11). |
 | Status | picklist(Not started, In progress, Completed, Not approved) | yes (defaults Not started) | Where the step stands. |
 | Completed Date | date | conditional | The day the step was completed; required when Status is Completed. |
 | Expires | date | no | The day a completed step lapses, for example a background check valid for two years; empty means it does not lapse. |
 | Notes | text | no | A short note for the coordinator, such as the reference of the check. Never the findings of a check. |
 | Is Current | boolean | computed | True when Status is Completed and Expires is empty or not before today. |
+| Guardian | reference(Contact) | no | The parent or guardian who gives consent, on a Guardian consent step (V-15). |
+| Provider | text | no | Who ran the background check, such as the screening company (V-17). |
+| Reference ID | text | no | The provider's reference for the check, to find it in the provider's own system (V-17). Never the findings. |
+| Entry Source | picklist(Entered, Imported) | no (defaults Entered) | Whether the step was typed in or loaded from a provider's export (V-17). |
 
 ### Relationships
 
 - **Volunteer Requirement to the person**, many to one, to exactly one of Contact or Person
   Account.
+- **Volunteer Requirement to its guardian**, many to one, optional, to a Contact (V-15).
 
 ### Rules
 
@@ -10008,6 +10189,12 @@ it is seen only by those who may see requirements and it leaves with them (R-VQ4
 
 **R-VQ2 Dates.** Completed Date is required when Status is Completed and may not be in the
 future; Expires may not be earlier than Completed Date.
+
+**R-VQ6 Background check details, never a provider call (V-17).** Provider and Reference ID say
+where the check is kept; BarnCRM calls no screening provider and stores no findings. A row loaded
+through Load One Object with Entry Source Imported says it came from a provider's export; a row
+typed in is Entered. Only Background check rows use them, by convention: nothing refuses them on
+another Type.
 
 **R-VQ3 Readiness is shown, not enforced.** The volunteer profile shows each Type's most recent
 row (the one added last) and whether it is current; a Type with no row shows as not started.
@@ -10038,12 +10225,16 @@ bypass stops it (R-A4).
 |---|---|---|
 | Contact | `Contact__c` | Lookup to Contact (the platform empties it when the person is deleted, and the row is then deleted, R-VQ5) |
 | Person Account | `Account__c` | Lookup to Account (the same, R-VQ5) |
-| Type | `Type__c` | Required picklist, not restricted so the admin may add values: Application, Background check, Orientation |
+| Type | `Type__c` | Required picklist, not restricted so the admin may add values: Application, Background check, Orientation, Guardian consent |
 | Status | `Status__c` | Required restricted picklist: Not started (default), In progress, Completed, Not approved |
 | Completed Date | `Completed_Date__c` | Date |
 | Expires | `Expires__c` | Date |
 | Notes | `Notes__c` | Text (255) |
 | Is Current | `Is_Current__c` | Formula (Checkbox) |
+| Guardian | `Guardian__c` | Lookup to Contact, delete constraint SetNull, relationship name Guardian_Consents (V-15) |
+| Provider | `Provider__c` | Text(80) (V-17) |
+| Reference ID | `Reference_ID__c` | Text(80) (V-17) |
+| Entry Source | `Entry_Source__c` | Picklist, restricted: Entered (default), Imported (V-17) |
 
 - **Validation rules:** `Volunteer_Requirement_One_Person` (R-VQ1), `Volunteer_Requirement_Dates`
   (R-VQ2).
@@ -10253,7 +10444,9 @@ merged, however it was chosen).
 `Organization_Legal_Name__c` and the six address parts, `Organization_Street__c` to
 `Organization_Country__c`, on one line), `{PersonName}`, `{FirstName}` (the
 Preferred Name when set), `{Hours}`, `{FromDate}`, `{ToDate}`, `{JobList}` (each job with its
-hours in the period) and `{Today}`. Every merged value is HTML escaped. An unknown token is left
+hours in the period), `{Today}`, and since V-12 `{HourValue}` (the value of one hour, R-VP5)
+and `{HoursValue}` (Hours times it), both in the org's default currency and empty when Hour
+Value is 0. Every merged value is HTML escaped. An unknown token is left
 as typed, so a typo shows on the proof.
 
 **R-VL3 What a letter counts.** Hours is the sum of the person's hours with Status Approved and
@@ -10535,6 +10728,7 @@ its enrollments (29ZA) are who takes part.
 | End Date | date | no | When the program ended, or will end. |
 | Coordinator | reference(User) | no | The staff member who runs this program. |
 | Eligibility Rules | long text (JSON) | no | The program's eligibility screening rules (P-14, R-EN8): ordered rules over the enrollment's intake fields, in the documented format below. Edited in the Eligibility Rules panel, never by hand. |
+| Capacity | integer | no | How many people the program can have Enrolled at once (P-09, R-EN10). Empty means no limit. |
 
 **Eligibility rules format (version 1).** `{ "version": 1, "defaultResult": "Review",
 "defaultReason": "...", "rules": [ { "id": "r1", "all": [ { "field": "Referral_Source__c",
@@ -10579,6 +10773,7 @@ Planned or Completed program, so history from a spreadsheet or PMM loads as it h
 | Coordinator | `Coordinator__c` | Lookup to User, delete constraint SetNull |
 | Sample Data | `Sample_Data__c` | Checkbox, default false (release 0.12) |
 | Eligibility Rules | `Eligibility_Rules__c` | Long Text Area(32768), not required (P-14, release 0.15) |
+| Capacity | `Capacity__c` | Number(6, 0) (P-09) |
 
 - **Validation rules:** `End_After_Start` (R-PG1).
 
@@ -10639,7 +10834,7 @@ participant record; P-02 records what they attended and received.
 | Program | reference(Program) | yes | The program the person takes part in. |
 | Contact | reference(Contact) | conditional | The person, where people are Contacts. |
 | Account | reference(Account) | conditional | The person, where people are person Accounts. |
-| Stage | picklist(Applied, Enrolled, Completed, Withdrawn) | yes (defaults Enrolled) | Where the person stands in the program. Applied and Enrolled are open; Completed and Withdrawn have ended. |
+| Stage | picklist(Applied, Enrolled, Completed, Withdrawn, Waitlisted) | yes (defaults Enrolled) | Where the person stands in the program. Applied, Enrolled and Waitlisted are open; Completed and Withdrawn have ended. Waitlisted waits for a place (P-09, R-EN10). |
 | Start Date | date | no | When the person was enrolled. |
 | End Date | date | no | When the person completed or withdrew. |
 | Intake Date | date | no | When the person was first seen or applied (P-07, release 0.14). |
@@ -10737,6 +10932,19 @@ the enrollment's program (validation rule). Moving a person into or out of a coh
 one field; there is no membership record (ADR-0160 decision 10). R-EN2 already keeps a person in
 one cohort of a program at a time. A cohort deleted later empties the field (SetNull).
 
+**R-EN10 Capacity and the waitlist (P-09).** With Programs' Waitlist When Full on
+(`Programs_Settings__c.Waitlist_Enabled__c`, off by default) and Capacity set, an enrollment
+saved as Enrolled (new, or moved to Enrolled or to another program) is checked against the
+places free, counted from every Enrolled enrollment in the org in system mode, in the order
+given: one that does not fit is saved as Waitlisted instead. When places free up (an enrollment
+leaves Enrolled or is deleted, or Capacity is raised) Waitlisted enrollments are moved to
+Enrolled, oldest first by Created Date, through Core's `WaitlistQueue` (ADR-NEXT volunteer
+self-service decision 5), in system mode so one the user cannot see (R-EN7) still moves, with
+R-EN3 filling the Start Date. Applied is not counted
+and never promoted. With the setting off, Capacity only shows and nothing is waitlisted or
+promoted. Waitlisted is open for
+R-EN2, and is not counted as open on the dashboard or the person card. Cohorts have no capacity.
+
 ### Salesforce implementation
 
 - **Object:** `Enrollment__c`, name field AutoNumber `EN-{000000}`, sharing Private (Public
@@ -10747,7 +10955,7 @@ one cohort of a program at a time. A cohort deleted later empties the field (Set
 | Program | `Program__c` | Lookup to `Program__c`, required, delete constraint Restrict, relationship name Enrollments |
 | Contact | `Contact__c` | Lookup to Contact, delete constraint SetNull, relationship name Enrollments |
 | Account | `Account__c` | Lookup to Account, delete constraint SetNull, relationship name Enrollments |
-| Stage | `Stage__c` | Picklist: Applied, Enrolled, Completed, Withdrawn; required, default Enrolled |
+| Stage | `Stage__c` | Picklist: Applied, Enrolled, Completed, Withdrawn, Waitlisted; required, default Enrolled |
 | Start Date | `Start_Date__c` | Date |
 | End Date | `End_Date__c` | Date |
 | Intake Date | `Intake_Date__c` | Date |
@@ -10771,6 +10979,12 @@ one cohort of a program at a time. A cohort deleted later empties the field (Set
 - **Weeks Ahead to Create Sessions:** `Programs_Settings__c` field `Session_Horizon_Weeks__c` (Number(2, 0),
   default 8, 1 to 26), set in the Programs section of BarnCRM Settings
   (`Setting_Definition.Programs_Session_Horizon_Weeks`) and read by `SessionScheduleService.horizonWeeks` (R-SS2).
+- **Waitlist When Full (P-09):** `Programs_Settings__c` field `Waitlist_Enabled__c` (Checkbox,
+  default false), set in the Programs section of BarnCRM Settings
+  (`Setting_Definition.Programs_Waitlist_Enabled`); R-EN10 by `EnrollmentCapacity`, called from
+  the always-running `Enrollment_Rules` handler, and itself the handler of the registry row
+  `Program_Capacity` (`ProgramTrigger`, after update), which promotes when Capacity is raised or
+  cleared.
 - **Participant privacy (R-EN7, R-SD6):** the public group `Programs_Participants` (no bosses);
   the hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox,
   default unchecked, which is Shared); `ProgramsSharing` writes the shares (handler
@@ -15142,12 +15356,15 @@ mirrors the primary member).
 | 1.3 | 2026-11-07 | Portal templates for volunteers, speakers and donors (PB-03, PB-07, PB-08; ADR-0191 `0191-portal-templates-volunteer-speaker-donor.md`). No object or field added. R-PB2 gains a read-only `Parent__r.Contact__c` person link; Core's `PortalActionExtensions` lists the Volunteers and Event Management action classes. |
 | 1.3 | 2026-11-09 | Simpler permission sets, Core (ADR-NEXT, D-191, release N). No object or field added. Coordinator (`Volunteer_Coordinator`) retired: the Access page stops offering it and `RetiredRoleMigration` gives its active holders Team Member; R-BU6 and R-BD6: `BarnCRM_Bulk_Update` and `BarnCRM_Bulk_Delete` include `BarnCRM_Find_And_Export`'s grants; `BarnCRM_Admin` gains `BulkUpdateController`. Labels only: BarnCRM Admin (group), BarnCRM Admin Access, Staff Access and Read Only Access, and "BarnCRM Auto:" on the eleven tab, Households and app sets. |
 | 1.4 | 2026-11-11 | Forms and Logic Models announce themselves (C-72). No object or field added. Forms ships Setting Definition `Forms_Page` and Logic Models `Logic_Models_Page`: a Component row naming the module, in new console sections Forms and Logic Models, whose Open button opens the module's object tab. `BarnCRM_Module__mdt` `Probe_Object__c` is cleared for Forms and LogicModels, so only Rollup Builder keeps a probe. |
+| 1.5 | 2026-11-11 | Donor panel in Quick Gift Entry (G-33). No object or field added. `GiftDonorPanelController` reads, in user mode, the chosen donor's household (through `HouseholdService`), `Total_Giving__c` and `Last_Gift_Date__c`, the last three gifts, and the donor's Active or Paused commitments with each one's next open scheduled payment. Read only; it writes nothing. |
 | 1.5 | 2026-11-11 | Archive by Query (C-67, D-157). No object or field added. New rule R-BD9: a bulk delete whose records are first saved to Files by `FindExportBatch` in archive mode (every readable field, API name headings), the delete started from the export's finish on the same job, only of records not changed since the start (`archive.notChangedAfter` in the definition), and optionally emptied from the Recycle Bin after a second typed count (`archive.emptyRecycleBin`), which R-BD5's undo then refuses. |
 | 1.6 | 2026-11-11 | Generic Record Merge (C-62, D-156; extends ADR-0145). `BarnCRM_Settings__c` gains `Generic_Merge_Enabled__c` (false). `Merge_Rule__mdt` `Field_Name__c` may name `Object.Field`. Rules R-DP11 and R-DP12 added. No object added: merges are written to `Merge_Journal__c`. |
 | 1.7 | 2026-11-11 | Field History Keeper (C-68, D-157; ADR-NEXT `NEXT-field-history-keeper.md`). New Section 29FH1 Field History (`Field_History__c`, rules R-FH1 to R-FH5); custom metadata type `History_Field__mdt` (Section 13); `BarnCRM_Settings__c` gains `Field_History_Enabled__c` (false) and `Field_History_Retention_Days__c` (730). |
 | 1.8 | 2026-11-11 | Corporate Hub module (CH-01 to CH-04, CH-06 to CH-08, D-118; ADR-NEXT `NEXT-corporate-hub-module.md`). New package `packages/corporatehub`: Library Document (`Hub_Document__c`, 29CH1), Policy Acknowledgment (`Policy_Acknowledgment__c`, 29CH2), Compliance Obligation (`Compliance_Obligation__c`, 29CH3), Compliance Cycle (`Compliance_Cycle__c`, 29CH4), Agreement (`Agreement__c`, 29CH5) and Corporate Hub Settings (`Corporate_Hub_Settings__c`, 29CH6), with the shipped templates `BarnCorporateHubTemplates`. |
 | 1.9 | 2026-11-11 | Migration Assistant (MIG-01, MIG-10, MIG-08; ADR-NEXT `NEXT-migration-assistant.md`, D-125). New Section 29ZS Migration Run (`Migration_Run__c`, rules R-MR1 to R-MR4) and shipped type Migration Kit (`Migration_Kit__mdt`, Section 13, R-MK1). Import Batch (16) gains Migration Run (`Migration_Run__c`) and Migration Step (`Migration_Step__c`). Integration App gains rows `Nonprofit_Success_Pack` and `Nonprofit_Cloud_Fundraising` (shown only when installed) and Start Migration for a detected product with a kit. R-R16 gains NPSP customizable rollups: read by describe, imported through the DLRS import steps, covered by the same-field guard. Rollup Builder ships kits `DLRS_Rollups` and `NPSP_Rollups`. |
 | 1.9 | 2026-11-11 | Migration kits (MIG-05, MIG-09, MIG-04, MIG-02). No object or field added. R-MK1 gains a filter's `op` (`notEquals`) and a step's `links` (a source Id an earlier step moved becomes the BarnCRM record it made, found by the earlier template's one row per `Id` Row Key, R-IT18). R-MR3: an extension's check on an import step replaces the row count comparison. A product with several kits shows one button per kit. Core ships kit `NPSP_People` with templates `kit_npsp_relationships`, `kit_npsp_affiliations` and `kit_npsp_addresses` (a kit template's key starts `kit_`, so the file-export sample check, for keys starting `npsp_` or `npc_`, leaves it alone). |
+| 1.10 | 2026-11-11 | Giving words and nightly jobs (G-36, G-37). No object or field added. Labels only: `Installment__c` is Scheduled Payment (plural Scheduled Payments, Name label Payment Number, list view All Scheduled Payments); the `Installment__c` lookups on Gift, Gift Batch Row and Pledge Reminder are labelled Scheduled Payment; Pledge Reminder's `Commitment__c` is labelled Commitment; `Commitment__c.Installments_Planned__c` is Payments Planned. The vocabulary is commitment (the record), pledge and recurring gift (its types), scheduled payment (each installment). The pledge reminder step (`BarnCRM Giving Pledge Reminders`, 03:15, shipped off) is now one of `GivingScheduler`'s five jobs: its Schedule and Stop switch it with the others and Run Now runs it; `GivingScheduler.isScheduled` still counts only the other four. |
+| 1.11 | 2026-11-11 | Gift details and wealth screening (G-21, G-31, G-32, D-156). Five attributes added to Gift (`Stock_Symbol__c`, `Stock_Shares__c`, `Planned_Gift_Type__c`, `Gift_Source__c`, `Gift_Source_Name__c`), rule R-G17, and the packaged report DAF and Stock Gifts This Year. New Section 25U Wealth screening data, rules R-WS1 to R-WS3: five attributes added to Contact (`Capacity_Rating__c`, `Affinity_Rating__c`, `Screening_Score__c`, `Screening_Date__c`, `Screening_Source__c`), hidden from Giving Read Only, and the shipped import template Wealth Screening. |
 
 ---
 ## 32. Entity ownership by package
@@ -15219,6 +15436,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Gift Batch Row | Giving | v0.5 | 25M |
 | Donor segments (Change From Last Year on Account and Contact) | Giving | v0.13 | 25O |
 | Ask | Giving | release 0.13 (G-26) | 25R |
+| Wealth screening data (Contact fields) | Giving | release 1.5 (G-32) | 25U |
 | Gift Transaction mirror (Gift Transaction ID on Gift, Gift Designation ID on Fund) | Mirror | release 0.17 | 29C1 |
 | Opportunity mirror (Opportunity ID on Gift) | Mirror | v0.6 | 29C |
 | Campaign sync (Campaign ID on Appeal) | Mirror | v0.6 | 29B |

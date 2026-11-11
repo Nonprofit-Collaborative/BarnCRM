@@ -14,6 +14,16 @@ public with sharing class EnrollmentService {
 	public static final String STAGE_COMPLETED = 'Completed';
 	@NamespaceAccessible
 	public static final String STAGE_WITHDRAWN = 'Withdrawn';
+	/** P-09: waiting for a place in a full program (R-EN10); counts as open for R-EN2 only. */
+	@NamespaceAccessible
+	public static final String STAGE_WAITLISTED = 'Waitlisted';
+
+	/** The stages one person may hold only once per program at a time (R-EN2). */
+	public static final Set<String> ONE_PER_PERSON = new Set<String>{
+		STAGE_APPLIED,
+		STAGE_ENROLLED,
+		STAGE_WAITLISTED
+	};
 
 	/** Every stage, in the order a person moves through them. */
 	@NamespaceAccessible
@@ -58,7 +68,7 @@ public with sharing class EnrollmentService {
 		Set<Id> checkedIds = new Set<Id>();
 		List<Enrollment__c> checked = new List<Enrollment__c>();
 		for (Enrollment__c enrollment : enrollments) {
-			if (!isOpen(enrollment.Stage__c) || keyOf(enrollment) == null) {
+			if (!ONE_PER_PERSON.contains(enrollment.Stage__c) || keyOf(enrollment) == null) {
 				continue;
 			}
 			checked.add(enrollment);

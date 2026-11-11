@@ -18,6 +18,11 @@ export function valueFor(tile, locale) {
   if (tile && tile.capped) {
     return `${new Intl.NumberFormat(locale).format(value)}+`;
   }
+  if (tile && tile.currencyCode) {
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: tile.currencyCode }).format(
+      value
+    );
+  }
   return value;
 }
 

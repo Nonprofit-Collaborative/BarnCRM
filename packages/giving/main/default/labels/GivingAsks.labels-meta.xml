@@ -70,7 +70,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Asks: linking needs a gift or pledge chosen</shortDescription>
-    <value>Choose the gift or pledge this ask produced.</value>
+    <value>Choose the gift or commitment this ask produced.</value>
   </labels>
   <labels>
     <fullName>Giving_Ask_ErrorWrongDonor</fullName>
@@ -78,7 +78,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Asks: the linked gift or pledge is another donor's</shortDescription>
-    <value>That gift or pledge is from a different donor, or you cannot see it. Choose one from this ask's donor.</value>
+    <value>That gift or commitment is from a different donor, or you cannot see it. Choose one from this ask's donor.</value>
   </labels>
   <labels>
     <fullName>Giving_Ask_ErrorUnexpected</fullName>
@@ -342,7 +342,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Close Ask: link an existing gift or pledge</shortDescription>
-    <value>Link a Gift or Pledge Already Entered</value>
+    <value>Link a Gift or Commitment Already Entered</value>
   </labels>
   <labels>
     <fullName>Giving_AskPipeline_ResultLater</fullName>
@@ -414,7 +414,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Close Ask: pledge picker</shortDescription>
-    <value>Or a Pledge</value>
+    <value>Or a Commitment</value>
   </labels>
   <labels>
     <fullName>Giving_AskPipeline_FieldNextAsk</fullName>

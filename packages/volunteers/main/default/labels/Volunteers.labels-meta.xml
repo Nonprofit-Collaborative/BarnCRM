@@ -601,6 +601,14 @@
         <value>Volunteer Unfilled Shift Nudges</value>
     </labels>
     <labels>
+        <fullName>Volunteers_NightlyJobs_RecognitionName</fullName>
+        <categories>Volunteers, Nightly Jobs</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Nightly jobs: the thank-you task run (V-13)</shortDescription>
+        <value>Volunteer Thank-You Tasks</value>
+    </labels>
+    <labels>
         <fullName>Volunteers_Reminders_SendFailed</fullName>
         <categories>Volunteers</categories>
         <language>en_US</language>
@@ -1249,5 +1257,13 @@ When: {1}</value>
         <protected>true</protected>
         <shortDescription>Volunteers Home figure: approved hours worked this month</shortDescription>
         <value>Hours This Month</value>
+    </labels>
+    <labels>
+        <fullName>Volunteers_Home_HoursValueThisMonth</fullName>
+        <categories>Volunteers</categories>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Volunteers Home figure: value of approved hours this month (V-12)</shortDescription>
+        <value>Value of Hours This Month</value>
     </labels>
 </CustomLabels>

@@ -15,6 +15,16 @@ public with sharing class VolunteerSettings {
 	public static final Integer MIN_REMINDER_LEAD_DAYS = 1;
 	public static final Integer MAX_REMINDER_LEAD_DAYS = 14;
 	public static final Integer DEFAULT_NUDGE_LEAD_DAYS = 3;
+	public static final Decimal DEFAULT_HOUR_VALUE = 34.79;
+	public static final Integer DEFAULT_MINOR_AGE = 18;
+	public static final List<Integer> DEFAULT_MILESTONES = new List<Integer>{
+		25,
+		50,
+		100,
+		250,
+		500,
+		1000
+	};
 
 	/**
 	 * R-VG6: whether a new hours entry waits for a coordinator. On unless an administrator
@@ -31,20 +41,13 @@ public with sharing class VolunteerSettings {
 
 	/** V-07: how many weeks ahead recurring schedules keep their shifts, 1 to 26. */
 	public static Integer shiftHorizonWeeks() {
-		Object stored = read('Shift_Horizon_Weeks__c');
-		if (stored == null) {
-			return DEFAULT_SHIFT_HORIZON_WEEKS;
-		}
-		Integer weeks;
-		try {
-			weeks = Decimal.valueOf(String.valueOf(stored)).intValue();
-		} catch (TypeException unreadable) {
-			return DEFAULT_SHIFT_HORIZON_WEEKS;
-		}
-		if (weeks < MIN_SHIFT_HORIZON_WEEKS || weeks > MAX_SHIFT_HORIZON_WEEKS) {
-			return DEFAULT_SHIFT_HORIZON_WEEKS;
-		}
-		return weeks;
+		return bounded(
+				'Shift_Horizon_Weeks__c',
+				DEFAULT_SHIFT_HORIZON_WEEKS,
+				MIN_SHIFT_HORIZON_WEEKS,
+				MAX_SHIFT_HORIZON_WEEKS
+			)
+			.intValue();
 	}
 
 	/** V-10: whether signed-up volunteers get a reminder email before a shift. Off until turned on. */
@@ -54,20 +57,13 @@ public with sharing class VolunteerSettings {
 
 	/** V-10: how many days before a shift its reminder goes out, 1 to 14. */
 	public static Integer reminderLeadDays() {
-		Object stored = read('Reminder_Lead_Days__c');
-		if (stored == null) {
-			return DEFAULT_REMINDER_LEAD_DAYS;
-		}
-		Integer days;
-		try {
-			days = Decimal.valueOf(String.valueOf(stored)).intValue();
-		} catch (TypeException unreadable) {
-			return DEFAULT_REMINDER_LEAD_DAYS;
-		}
-		if (days < MIN_REMINDER_LEAD_DAYS || days > MAX_REMINDER_LEAD_DAYS) {
-			return DEFAULT_REMINDER_LEAD_DAYS;
-		}
-		return days;
+		return bounded(
+				'Reminder_Lead_Days__c',
+				DEFAULT_REMINDER_LEAD_DAYS,
+				MIN_REMINDER_LEAD_DAYS,
+				MAX_REMINDER_LEAD_DAYS
+			)
+			.intValue();
 	}
 
 	/** V-10b: whether volunteers are emailed about a shift that is still short. Off until turned on. */
@@ -77,20 +73,79 @@ public with sharing class VolunteerSettings {
 
 	/** V-10b: how many days before an unfilled shift its nudge goes out, 1 to 14. */
 	public static Integer nudgeLeadDays() {
-		Object stored = read('Nudge_Lead_Days__c');
-		if (stored == null) {
-			return DEFAULT_NUDGE_LEAD_DAYS;
+		return bounded(
+				'Nudge_Lead_Days__c',
+				DEFAULT_NUDGE_LEAD_DAYS,
+				MIN_REMINDER_LEAD_DAYS,
+				MAX_REMINDER_LEAD_DAYS
+			)
+			.intValue();
+	}
+
+	/** V-12: the value of one volunteer hour, 0 to 9999.99; 0 hides every value (R-VP5). */
+	public static Decimal hourValue() {
+		return bounded('Hour_Value__c', DEFAULT_HOUR_VALUE, 0, 9999.99);
+	}
+
+	/** V-13: whether milestone and anniversary thank-you tasks are created. Off until turned on. */
+	public static Boolean recognitionEnabled() {
+		return flag('Recognition_Enabled__c', false);
+	}
+
+	/**
+	 * V-13: the total hours that earn a thank-you, lowest first. A part that is not a whole
+	 * number above 0 is ignored; with none left the shipped list applies.
+	 */
+	public static List<Integer> hourMilestones() {
+		Object stored = read('Hour_Milestones__c');
+		List<Integer> milestones = new List<Integer>();
+		for (String part : String.valueOf(stored == null ? '' : stored).split(',')) {
+			if (part.trim().isNumeric() && Integer.valueOf(part.trim()) > 0) {
+				milestones.add(Integer.valueOf(part.trim()));
+			}
 		}
-		Integer days;
+		if (milestones.isEmpty()) {
+			milestones = DEFAULT_MILESTONES.clone();
+		}
+		milestones.sort();
+		return milestones;
+	}
+
+	/** V-14: whether a full shift waitlists new bookings (R-VU8). Off until turned on. */
+	public static Boolean waitlistEnabled() {
+		return flag('Waitlist_Enabled__c', false);
+	}
+
+	/** V-15: whether a minor's sign-up is flagged and gets a consent step (R-VU11). Off by default. */
+	public static Boolean minorConsentRequired() {
+		return flag('Minor_Consent_Required__c', false);
+	}
+
+	/** V-15: the age below which a volunteer is a minor, 1 to 21. */
+	public static Integer minorAge() {
+		return bounded('Minor_Age__c', DEFAULT_MINOR_AGE, 1, 21).intValue();
+	}
+
+	/** V-09: the self-service profile form's record identifier, or null when none is set (R-VU10). */
+	public static Id profileFormId() {
+		Object stored = read('Profile_Form_Key__c');
 		try {
-			days = Decimal.valueOf(String.valueOf(stored)).intValue();
+			return stored == null ? null : Id.valueOf(String.valueOf(stored).trim());
+		} catch (StringException notAnId) {
+			return null;
+		}
+	}
+
+	/** A number setting, or the shipped value when blank, unreadable or out of range. */
+	private static Decimal bounded(String key, Decimal shipped, Decimal min, Decimal max) {
+		Object stored = read(key);
+		Decimal value;
+		try {
+			value = stored == null ? null : Decimal.valueOf(String.valueOf(stored));
 		} catch (TypeException unreadable) {
-			return DEFAULT_NUDGE_LEAD_DAYS;
+			return shipped;
 		}
-		if (days < MIN_REMINDER_LEAD_DAYS || days > MAX_REMINDER_LEAD_DAYS) {
-			return DEFAULT_NUDGE_LEAD_DAYS;
-		}
-		return days;
+		return value == null || value < min || value > max ? shipped : value;
 	}
 
 	private static Boolean flag(String key, Boolean shipped) {

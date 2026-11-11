@@ -50,7 +50,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | Open the Harper Garcia card's menu. | It offers **Move to** each other stage, **Open** and **Close Ask**. |
 | 5 | Choose **Move to Ask Planned**. | The card moves to **Ask Planned**, and a screen reader hears "Moved the ask from Identified to Ask Planned." |
 | 5a | Focus the Harper Garcia card, press Space, then the Right arrow, then Enter. On a touch screen, press and hold the Luis Garcia card and drag it to **Qualified**. | Each card moves one column and the move is announced; Escape before Enter leaves the card where it was. |
-| 5b | On a card choose **Close Ask**, **Won**, **Link a Gift or Pledge Already Entered**, and type in the gift picker, then the pledge picker. Cancel. | Each gift shows its name with gift date and amount; each pledge its start date and expected total. |
+| 5b | On a card choose **Close Ask**, **Won**, **Link a Gift or Commitment Already Entered**, and type in the gift picker, then the **Or a Commitment** picker. Cancel. | Each gift shows its name with gift date and amount; each commitment its start date and expected total. |
 | 6 | Click **List**. | A table with **Ask**, **Donor**, **Stage**, **Ask Amount**, **Target Date**, **Next Step**, **Assigned To** and **Days in Stage**, in stage order. Click **Board** to return. |
 | 7 | Click **My Asks**, then **Everyone's Asks**. | **My Asks** shows only asks assigned to you; **Everyone's Asks** shows both. |
 
@@ -63,11 +63,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On card A choose **Close Ask**. **How Did It End?** `Won`. | **What Did It Produce?** shows **Record the Gift Now**, **Record a Pledge**, **Link a Gift or Pledge Already Entered** and **Record It Later**. |
+| 1 | On card A choose **Close Ask**. **How Did It End?** `Won`. | **What Did It Produce?** shows **Record the Gift Now**, **Record a Pledge**, **Link a Gift or Commitment Already Entered** and **Record It Later**. |
 | 2 | Choose **Record the Gift Now**: **Amount** `1000`, **Gift Date** today, a **How It Arrived** value. Save. | The card moves to **Recently Closed** with a **Won** badge. **Won This Fiscal Year** counts it. |
 | 3 | Open ask A. | **Outcome** Won, **Closed Date** today, **Resulting Gift** filled in. Open the gift: donor, fund and appeal match the ask, and the gift is posted as Quick Gift Entry would post it. |
 | 4 | On card B choose **Close Ask**, **Won**, **Record a Pledge**: **Pledge Total** `1200`, **First Payment Date** today, **How Often** `Monthly`, **Number of Payments** `12`. Save. | Ask B shows **Resulting Commitment**. The commitment is type Pledge with a 12 row payment schedule of 100.00 each. |
-| 5 | On card C choose **Close Ask**, **Won**, **Link a Gift or Pledge Already Entered**, and pick the 300 gift of Luis Garcia. Save. | Ask C shows that gift as **Resulting Gift**. |
+| 5 | On card C choose **Close Ask**, **Won**, **Link a Gift or Commitment Already Entered**, and pick the 300 gift of Luis Garcia. Save. | Ask C shows that gift as **Resulting Gift**. |
 | 6 | Repeat on card D but try to pick the gift of Harper Garcia. | Refused: it belongs to a different donor. Nothing is saved and the ask stays open. |
 | 7 | On card D choose **Record It Later**. Save. | Ask D is Won with no resulting gift. Edit it and set **Resulting Gift** to a Luis Garcia gift. It saves. |
 

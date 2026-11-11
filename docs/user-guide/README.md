@@ -30,7 +30,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 ### Gifts (Nonprofit Edition)
 
-- [Entering gifts](gifts.md): Quick Gift Entry, the Enter a Gift action, funds, soft credits, tributes, in-kind and matching gifts.
+- [Entering gifts](gifts.md): Quick Gift Entry, the Enter a Gift action, funds, soft credits, tributes, in-kind, stock, planned, donor-advised fund and matching gifts.
 - [Gift batches](gift-batches.md): typing a stack of checks against a deposit total.
 - [Pledges and recurring gifts](commitments.md): commitments, installments and paying them.
 - [The Ask Pipeline](ask-pipeline.md): tracking asks by step on a board, and closing them as won, declined or withdrawn.
@@ -75,7 +75,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.
 - [Donor segments](donor-segments.md): lists of donors by their giving, exported for Mailchimp or Constant Contact.
-- [Donor scores](donor-scores.md): how recently, how often and how much each donor gives, as a score and a segment on their record.
+- [Donor scores](donor-scores.md): how recently, how often and how much each donor gives, as a score and a segment on their record, and any wealth screening loaded for them.
 
 ## Report a Bug or Give Feedback
 

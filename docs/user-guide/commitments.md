@@ -1,6 +1,8 @@
 # Pledges and Recurring Gifts
 
-A commitment is a promise to give. A **Pledge** is a fixed total paid over time; a **Recurring** gift is the same amount on a schedule with no end. BarnCRM lays out the expected payments (installments), so you can see what is due, what is overdue and what is left to pay.
+A commitment is a promise to give. A **Pledge** is a fixed total paid over time; a **Recurring** gift is the same amount on a schedule with no end. BarnCRM lays out the expected payments (scheduled payments), so you can see what is due, what is overdue and what is left to pay.
+
+The words BarnCRM uses: **commitment** for the record, whichever kind it is; **pledge** and **recurring gift** for its two kinds; **scheduled payment** for each payment it expects.
 
 Before you start: open the **BarnCRM Fundraising** app, **Commitments** tab. You need the **Fundraising Staff** role (the **Giving Staff** permission set).
 
@@ -31,10 +33,10 @@ If the card says **No Payments Yet**, click **Generate Now**.
 
 ## To See What Is Overdue or Coming Up
 
-The payments are on the **Pledge Payments** tab of the BarnCRM Fundraising app. The overdue
+The payments are on the **Scheduled Payments** tab of the BarnCRM Fundraising app. The overdue
 count is also on **Fundraising Home**; click it to open the **Overdue** list.
 
-1. In **BarnCRM Fundraising**, open the **Pledge Payments** tab.
+1. In **BarnCRM Fundraising**, open the **Scheduled Payments** tab.
 2. Choose the list view **Overdue**, or **Upcoming 30 Days**. Salesforce opens the list you chose last time from then on.
 
 You should see: each payment with its commitment and what was expected. A payment turns **Overdue** a few days after its due date, overnight.
@@ -50,9 +52,9 @@ When a payment arrives, enter it as a gift and link it to the payment.
 3. In **Pays a scheduled payment**, check the chosen payment, or pick the right one. Choose **None: a new gift on its own** if the gift is not for the pledge.
 4. Click **Save**.
 
-You should see: on the commitment, the payment's **Status** turns **Paid** (or **Partially paid** if less came in), **Paid To Date** goes up and **Balance** goes down. The gift appears in the commitment's **Gifts** list, on its **Related** tab. For a stack of checks, use the **Pays** column in a [gift batch](gift-batches.md#to-mark-a-check-as-a-pledge-payment-pays).
+You should see: on the commitment, the payment's **Status** turns **Paid** (or **Partially paid** if less came in), **Paid To Date** goes up and **Balance** goes down. The gift appears in the commitment's **Gifts** list, on its **Related** tab. For a stack of checks, use the **Pays** column in a [gift batch](gift-batches.md#to-mark-a-check-as-a-scheduled-payment-pays).
 
-On the **Gifts** tab's **New** form, set **Commitment** to the pledge and **Installment** to the payment instead. Leave **Installment** empty and BarnCRM links the gift to the oldest unpaid payment, if your admin left that setting on.
+On the **Gifts** tab's **New** form, set **Commitment** to the pledge and **Scheduled Payment** to the payment instead. Leave **Scheduled Payment** empty and BarnCRM links the gift to the oldest unpaid payment, if your admin left that setting on.
 
 ## To Pause or Resume a Recurring Gift
 
@@ -94,7 +96,7 @@ If your organization has turned on pledge reminders, donors with a payment comin
 - "Enter the pledge total, above zero." or "Enter how often the donor pays, how many payments, and the date of the first one." Fill in **Pledge Total**, **How Often**, **First Payment Date**, and **Number of Payments** or **Last Payment Date**.
 - "The last payment date is before the first payment date. Change one of them." Check both dates.
 - "Choose one donor for this commitment, either a person or an account, not both." (when editing) Clear **Donor** or **Donor Account**.
-- "A pledge needs an expected total or a number of installments, so the schedule can be worked out." (when editing) Fill in **Expected Total** or **Installments Planned**.
+- "A pledge needs an expected total or a number of installments, so the schedule can be worked out." (when editing) Fill in **Expected Total** or **Payments Planned**.
 - "A recurring commitment has no expected total. Choose Pledge if the donor promised a fixed amount." (when editing) Clear **Expected Total**, or change **Type** to **Pledge**.
 - "Day of month is a day between 1 and 31, or empty to use the day of the start date." A 31 falls on the last day of a shorter month.
 - "This commitment cannot be deleted because a gift has been received against one of its payments. Cancel it instead." Use **Cancel Commitment**.
@@ -103,7 +105,7 @@ If your organization has turned on pledge reminders, donors with a payment comin
 - "A gift of goods cannot pay a scheduled payment. Choose None." In-kind gifts never pay a pledge.
 - The **Overdue** list is empty. Payments turn Overdue in a nightly job your admin switches on ([Commitments](../admin-guide/commitments.md)).
 - You cannot find a pledge a colleague entered. Commitments are private, like gifts: you see your own and those your role or sharing gives you. Ask your admin ([Access](../admin-guide/access.md)).
-- A suggested payment was wrong and the gift is saved. Open the gift, click **Edit**, and clear **Installment** and **Commitment**; the payment is owed again.
+- A suggested payment was wrong and the gift is saved. Open the gift, click **Edit**, and clear **Scheduled Payment** and **Commitment**; the payment is owed again.
 
 ## Related
 

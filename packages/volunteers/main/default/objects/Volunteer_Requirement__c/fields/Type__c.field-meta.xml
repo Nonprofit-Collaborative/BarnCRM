@@ -26,6 +26,11 @@
         <default>false</default>
         <label>Orientation</label>
       </value>
+      <value>
+        <fullName>Guardian consent</fullName>
+        <default>false</default>
+        <label>Guardian consent</label>
+      </value>
     </valueSetDefinition>
   </valueSet>
 </CustomField>

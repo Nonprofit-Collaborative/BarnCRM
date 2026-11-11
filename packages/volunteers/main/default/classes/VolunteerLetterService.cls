@@ -128,6 +128,9 @@ public with sharing class VolunteerLetterService {
 			'ToDate' => escape(toDate.format()),
 			'Today' => escape(Date.today().format())
 		};
+		// V-12 (R-VP5, R-VL2): the value of an hour and of the person's hours; empty at 0.
+		Decimal rate = VolunteerSettings.hourValue();
+		shared.put('HourValue', escape(money(rate)));
 
 		List<Letter> letters = new List<Letter>();
 		for (Id personId : people) {
@@ -147,6 +150,7 @@ public with sharing class VolunteerLetterService {
 				values.put('PersonName', escape(person.name));
 				values.put('FirstName', escape(person.firstName));
 				values.put('Hours', escape(totals.get(personId).format()));
+				values.put('HoursValue', escape(money(totals.get(personId) * rate)));
 				values.put('JobList', jobLists.get(personId) + '</ul>');
 				letter.body = mergeTokens(template.Body__c, values);
 			}
@@ -334,5 +338,31 @@ public with sharing class VolunteerLetterService {
 
 	private static String escape(String value) {
 		return value == null ? '' : value.escapeHtml4();
+	}
+
+	private static final Map<String, String> SYMBOLS = new Map<String, String>{
+		'USD' => '$',
+		'CAD' => '$',
+		'AUD' => '$',
+		'NZD' => '$',
+		'GBP' => '£',
+		'EUR' => '€'
+	};
+
+	/**
+	 * An amount in the org's default currency, such as $1,043.70: the common symbols, else the
+	 * ISO code. Null for nothing or 0, so the token merges as empty (R-VP5). The personal page
+	 * (`VolunteerPublicPage`) shows the value of hours the same way.
+	 */
+	public static String money(Decimal amount) {
+		if (amount == null || amount <= 0) {
+			return null;
+		}
+		Decimal rounded = amount.setScale(2, System.RoundingMode.HALF_UP);
+		Long whole = rounded.longValue();
+		String cents = String.valueOf(((rounded - whole) * 100).intValue()).leftPad(2, '0');
+		String code = UserInfo.getDefaultCurrency();
+		String symbol = SYMBOLS.containsKey(code) ? SYMBOLS.get(code) : code + ' ';
+		return symbol + whole.format() + '.' + cents;
 	}
 }

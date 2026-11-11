@@ -109,6 +109,12 @@ public with sharing class ShiftScheduleService {
 		}
 		if (!created.isEmpty()) {
 			insert as user created;
+			// R-VU9: the people holding a standing sign-up on these schedules join the new shifts.
+			Set<Id> extended = new Set<Id>();
+			for (Volunteer_Shift__c shift : created) {
+				extended.add(shift.Shift_Schedule__c);
+			}
+			VolunteerStanding.extend(extended);
 		}
 		if (!bookkeeping.isEmpty()) {
 			// System mode: Created Through, Shifts Kept and Rebuild Pending are read only in

@@ -45,6 +45,22 @@
         <behavior>Readonly</behavior>
         <field>Is_Current__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Guardian__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Provider__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Reference_ID__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Entry_Source__c</field>
+      </layoutItems>
     </layoutColumns>
   </layoutSections>
   <showEmailCheckbox>false</showEmailCheckbox>

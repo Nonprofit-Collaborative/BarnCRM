@@ -17,9 +17,17 @@ to a spreadsheet.
 ## How to Turn It On
 
 Commitments come with the Giving module. When Giving is on, the Commitments and
-Pledge Payments tabs are in the app and no further step is required. Pledge Payments is
-the tab for the payment (Installment) records; only its label changed, and its API name
+Scheduled Payments tabs are in the app and no further step is required. Scheduled Payments
+is the tab for the payment (Installment) records; only its label changed, and its API name
 is still `Installment__c`.
+
+**One set of words (G-36).** Staff see **Commitment** for the record of either kind,
+**Pledge** and **Recurring Gift** for its two kinds, and **Scheduled Payment** for each
+payment it expects (the Gift, Gift Batch Line and Pledge Reminder lookups to it carry that
+label too). The pledge reminders keep their name although they also remind recurring
+donors. Every one of these is a label, so an org that prefers other words renames the
+object or field in Setup (**Rename Tabs and Labels** or **Object Manager**); nothing in
+BarnCRM reads a label.
 
 **New** on Commitment opens the **New Commitment** screen, not the standard form. A pledge
 is entered as its **Pledge Total**, **How Often**, **First Payment Date** and **Number of
@@ -49,21 +57,28 @@ create or change; existing schedules are left alone until you edit them.
 
 ## Switching the Nightly Jobs On
 
-Commitments need three jobs to run overnight, and until you switch them on none of them
+Commitments need jobs to run overnight, and until you switch them on none of them
 runs. This is the step that makes a payment turn Overdue on its own.
 
 Open **BarnCRM Settings**, choose **Giving**, and choose **Open** on **Nightly Jobs**.
 The page opens with a line for each job, then one button.
 
-Choose **Schedule Nightly Run**. Three jobs are switched on at once, as steps of
+Choose **Schedule Nightly Run**. Five jobs are switched on at once, as steps of
 [BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run (the button also schedules that
 run when it is not scheduled yet):
 
 | Job | Runs at | What it does |
 |---|---|---|
-| Installment top up | 01:15 | Extends every active recurring commitment up to the generation horizon, so an open ended schedule always has the next year of payments in front of it |
+| Payment schedule top up | 01:15 | Extends every active recurring commitment up to the generation horizon, so an open ended schedule always has the next year of payments in front of it |
 | Overdue pass | 01:45 | Marks every unpaid payment Overdue once it is further past its due date than the grace period |
 | Donor levels | 03:00 | Places every donor on the rung their giving now reaches |
+| Pledge reminders | 03:15 | Sends the [pledge reminder](pledge-reminders.md) steps that are due. Sends nothing while **Send Pledge Reminders** is off, which is how it ships (D-162) |
+| Ask reminders | 03:30 | Creates a task when a donor's Next Ask Date arrives ([Ask Cadence](ask-cadence.md)); nothing while Ask Reminders is off |
+
+The pledge reminders line is on this page since 1.5 (G-37), with its last run, what it
+sent and a warning when a scheduled run recorded nothing. The Pledge Reminders page keeps
+its own **Run every night** switch for that one step; stopping it there leaves the other
+four running, and this page still reads as scheduled.
 
 The times are fixed and are chosen to keep out of the way of the two other nightly jobs
 BarnCRM ships: the seasonal address swap at 00:30 and the rollups at 02:00. The top up
@@ -72,8 +87,8 @@ levels run an hour after the rollups start so that the totals the ladder reads h
 settled.
 
 Nothing else has to be done. If you have just switched the jobs on and do not want to wait
-for tonight, choose **Run the Jobs Now**: the top up and the overdue pass start
-immediately, and the page shows what they did once they finish. (Donor levels have their
+for tonight, choose **Run the Jobs Now**: the top up, the overdue pass and both reminder
+passes (each only while its setting is on) start immediately, and the page shows what they did once they finish. (Donor levels have their
 own **Recalculate Now** button on the Donor Levels page.)
 
 ### Checking They Are Running
@@ -137,13 +152,13 @@ Start from the sample data. The first part is David's work, the last step is Jen
 
 9. Open the first payment in the list and note its due date.
 10. Open the **Gifts** tab, choose **New**, and enter a gift for Ana for 100 with the
-    same date. In **Commitment** choose the pledge you just made, and in **Installment**
+    same date. In **Commitment** choose the pledge you just made, and in **Scheduled Payment**
     choose the first payment.
 11. Choose **Save**, then go back to the commitment. The first payment now reads **Paid**,
     paid to date reads 100, and the balance reads 1,100. The gift is at the top of the
     commitment's **Gifts** list on the **Related** tab.
 
-If David had left **Installment** empty, BarnCRM would have linked the gift to the
+If David had left **Scheduled Payment** empty, BarnCRM would have linked the gift to the
 oldest unpaid payment by itself, because the automatic setting is on.
 
 If a pledge is later edited on the standard form with **Expected Total** cleared, BarnCRM
@@ -176,7 +191,7 @@ Skipped and deletes nothing.
 
 ### Jen Checks What Is Overdue
 
-14. Open the **Pledge Payments** tab and choose the **Overdue** list view. Every payment
+14. Open the **Scheduled Payments** tab and choose the **Overdue** list view. Every payment
     already marked Overdue is here, with its commitment, its donor, and what was expected.
     A payment is marked Overdue by the overdue pass, so this list fills up the first night
     after you schedule the nightly jobs (see "Switching the nightly jobs on"). If the list
@@ -188,7 +203,7 @@ Skipped and deletes nothing.
 ## List Views
 
 **Commitments** has **All Commitments**, **My Commitments**, **Active Pledges**, **Active
-Recurring Gifts** and **Paused Commitments**. **Pledge Payments** has **All Installments**,
+Recurring Gifts** and **Paused Commitments**. **Scheduled Payments** has **All Scheduled Payments**,
 **Overdue** and **Upcoming 30 Days**. Salesforce opens a tab on the list view each person
 used last (the first visit shows Recently Viewed); there is no setting that makes
 **Overdue** every person's default, so the User Guide tells staff to choose it once.

@@ -70,16 +70,29 @@ CAPS = {
     # Giving at a Glance (GivingRecordGlanceExtension, people-giving-14), and the Thank-Yous
     # page's rule reorder and missing-template reason (people-giving-18), and the Ask
     # Pipeline's Recently Closed column and Reopen Ask (people-giving-19).
-    "giving": 608_000,
+    # Combined build 2026-11-11: 610,858 measured with G-33's donor panel and G-37's pledge job,
+    # plus room for G-27 still to come.
+    "giving": 625_000,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.
     # Batch C wave 3 landing: 193,083 measured (VolunteersPortalExtension PB-03), plus about 2%.
-    "volunteers": 196_900,
+    # VOL-2 (V-14, V-16): 206,823 measured with the shift waitlist, group and standing sign-ups
+    # and the one self-booking path (VolunteerCapacity, VolunteerStanding, VolunteerBooking),
+    # plus about 2%.
+    # VOL-3 (V-12, V-13, V-15): 217,833 measured with the value of hours on Home and in letters,
+    # the thank-you run (VolunteerRecognitionJob and its scheduler) and the minors check
+    # (VolunteerMinors), plus about 2%.
+    # VOL-4 (V-09): 230,699 measured with the public shift pages and personal page
+    # (VolunteerPublicPage), the shift and profile forms (VolunteerFormAttachment) and the
+    # reminder's personal link, plus about 2%.
+    "volunteers": 235_300,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
     # Raised 2026-11-06 for repeating session schedules (modules-24, D-183): the run, nightly
     # batch, save job, trigger handler and selector, and the schedule page's controller methods.
-    "programs": 168_000,
+    # VOL-2 (P-09): 172,177 measured with program capacity and the waitlist (EnrollmentCapacity),
+    # plus about 2%.
+    "programs": 175_600,
     "logicmodels": 65_000,
     # Raised from 95,000 for the Funders usability stage: Undo for Mark Received and Mark
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).

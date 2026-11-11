@@ -56,7 +56,7 @@ jest.mock(
   '@salesforce/label/c.Giving_NightlyJobs_RunNowStarted',
   () => ({
     default:
-      'The top up and the overdue pass have started. Refresh this page in a minute to see what they did.'
+      'The top up, the overdue pass and the reminders that are turned on have started. Refresh this page in a minute to see what they did.'
   }),
   { virtual: true }
 );
@@ -224,7 +224,7 @@ describe('c-giving-nightly-jobs', () => {
 
     expect(runNow).toHaveBeenCalled();
     expect(element.shadowRoot.querySelector('[data-id="notice"]').message).toBe(
-      'The top up and the overdue pass have started. Refresh this page in a minute to see what they did.'
+      'The top up, the overdue pass and the reminders that are turned on have started. Refresh this page in a minute to see what they did.'
     );
   });
 

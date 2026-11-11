@@ -342,3 +342,35 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 6 | As a user with no Giving permission set, open Harper Garcia. | No card; the sidebar starts with the next card. |
 
 **Cleanup:** refund or delete the gift from step 3.
+
+## T-GIFT-19: Stock, Planned and Donor-Advised Fund Gift Details
+
+**Purpose:** a gift carries stock, planned gift and gift source details, the fields show when they apply, and the DAF and Stock report lists the gifts (G-21, G-31).
+**Prerequisites:** staff (Giving Staff); a read-only user with Giving Read Only; sample data loaded.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | In Quick Gift Entry, enter a gift for **Luis Garcia**: **Amount** `5000`, **Payment Method** `Stock`, today. Save and open the gift. | The **Gift** section shows **Stock Symbol** and **Shares** (empty), **Gift Source**, and **Planned Gift Type**. **Gift Source Name** is not shown. |
+| 2 | Click **Edit**, set **Stock Symbol** `ACME`, **Shares** `25.5`. Save. | Saved. **Amount** is still 5,000.00: nothing is computed from the shares. |
+| 3 | Enter a second gift for Luis Garcia: **Amount** `1000`, **Payment Method** `Check`. Edit it: **Gift Source** `Donor-Advised Fund`, **Gift Source Name** `Example Charitable Fund`. Save. | **Gift Source Name** shows once **Gift Source** is set. **Stock Symbol** and **Shares** are not shown on a check. |
+| 4 | Open Luis Garcia. | **Total Giving** went up by 6,000: the donor is still credited. |
+| 5 | Edit the check gift: **Planned Gift Type** `Bequest`. Save. | Saved; the value shows. |
+| 6 | In **Reports**, folder **BarnCRM Giving**, run **DAF and Stock Gifts This Year**. | Both gifts are listed with **Gift Source**, **Gift Source Name**, **Stock Symbol** and **Shares**; the total is 6,000. |
+| 7 | As the read-only user, open the stock gift. | The details show and cannot be edited. |
+
+**Cleanup:** delete both gifts.
+
+## T-GIFT-20: Donor Panel in Quick Gift Entry
+
+**Purpose:** choosing a donor in Quick Gift Entry shows their household, totals, recent gifts and open pledges and recurring gifts, read only.
+**Prerequisites:** staff (Giving Staff); sample data loaded; a person donor with a household, at least four gifts and an Active pledge with a scheduled payment still open.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **Quick Gift Entry** and choose that person as the donor. | **About This Donor** opens under the donor box: the household as a link, **Total giving**, **Last gift**, three **Recent Gifts** (newest first) and the pledge under **Open Pledges and Recurring Gifts** with its balance and next payment due. |
+| 2 | Click a gift in the panel. | The gift opens in a new browser tab; the form keeps what was typed. |
+| 3 | Choose **Organization** and pick an organization with no gifts. | The panel shows no household line, **No gifts yet.** and **No open pledges or recurring gifts.** |
+| 4 | Clear the donor. | The panel closes. |
+| 5 | Choose the person again and save a gift. | The gift saves as before; the panel never blocks a save. |
+
+**Cleanup:** refund or delete the gift from step 5.

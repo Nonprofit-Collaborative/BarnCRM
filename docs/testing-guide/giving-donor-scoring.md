@@ -48,3 +48,19 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 4 | Open **Automation** and turn off **Donor score assignment** for contacts. Change a donor's gift and open them. | Their scores do not change. Turn the switch back on. |
 
 **Cleanup:** Delete the saved segment.
+
+## T-RFM-04: Wealth Screening Fields and Import Template
+
+**Purpose:** Confirm the five wealth screening fields, who sees them, and that the Wealth Screening template updates people found by email and adds nobody (G-32).
+**Prerequisites:** admin; staff (Giving Staff); a read-only user with Giving Read Only; sample data loaded. A CSV with headings **Email**, **Capacity Rating**, **Affinity Rating**, **Screening Score**, **Screening Date**, **Screening Source** and two rows: Luis Garcia's email with `250,000 to 499,999`, `High`, `87.5`, today, `Example Screening Co`; and `nobody@example.invalid` with any values.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, open BarnCRM's import, upload the CSV and choose the **Wealth Screening** template. | The columns map to the five fields by their headings, and Email is the field rows are found by. |
+| 2 | Run it. | One row updated (Luis Garcia). The `nobody@example.invalid` row is reported as matching nobody; no person is created. |
+| 3 | As staff, open Luis Garcia, **Details** tab. | **Giving Details** shows **Capacity Rating** `250,000 to 499,999`, **Affinity Rating** `High`, **Screening Score** `87.50`, **Screening Date** today and **Screening Source** `Example Screening Co`. **Donor Score** is unchanged. |
+| 4 | As staff, edit **Affinity Rating** to `Medium` and save. | Saved. |
+| 5 | As the read-only user, open Luis Garcia. | None of the five fields shows. |
+| 6 | In **Find**, choose **Contacts** and filter **Screening Score** greater than `50`. | Luis Garcia is listed. |
+
+**Cleanup:** clear the five fields on Luis Garcia.

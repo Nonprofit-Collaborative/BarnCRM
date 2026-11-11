@@ -57,8 +57,15 @@ cannot be deleted.
 You should see: "Enrollment added." under the figures, the count for the stage goes up by one,
 and the person is listed with today as the Start Date (for Enrolled).
 
-Enrolling someone who already has an Applied or Enrolled enrollment in the same program is
-refused, with a message naming the program. Change the enrollment that is there instead.
+Enrolling someone who already has an Applied, Enrolled or Waitlisted enrollment in the same
+program is refused, with a message naming the program. Change the enrollment that is there
+instead.
+
+**When the program is full.** If the program has a **Capacity** and your admin turned on
+**Waitlist when full**, an enrollment into a full program is saved as **Waitlisted** instead of
+Enrolled. When someone completes or withdraws, or the capacity is raised, the person waiting
+longest moves to **Enrolled** by itself, with today as the Start Date. Without the setting,
+Capacity only shows on the program.
 
 ## To Import a Roster
 

@@ -463,6 +463,36 @@
         <identifier>RecordField_RollupsLastCalculated</identifier>
       </fieldInstance>
     </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.Capacity_Rating__c</fieldItem>
+        <identifier>RecordField_CapacityRating</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.Affinity_Rating__c</fieldItem>
+        <identifier>RecordField_AffinityRating</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.Screening_Score__c</fieldItem>
+        <identifier>RecordField_ScreeningScore</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.Screening_Date__c</fieldItem>
+        <identifier>RecordField_ScreeningDate</identifier>
+      </fieldInstance>
+    </itemInstances>
+    <itemInstances>
+      <fieldInstance>
+        <fieldItem>Record.Screening_Source__c</fieldItem>
+        <identifier>RecordField_ScreeningSource</identifier>
+      </fieldInstance>
+    </itemInstances>
     <name>Facet-givingDetails-column2</name>
     <type>Facet</type>
   </flexiPageRegions>

@@ -442,3 +442,20 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 9 | Try to delete the cohort. | Refused while it has a session schedule. |
 
 **Cleanup:** delete the schedule (its sessions stay), then the sessions without attendance.
+
+## T-PRG-26: Program Capacity and Waitlist
+
+**Purpose:** confirm Capacity only shows by default, and with the setting on a full program waitlists and promotes oldest first.
+**Prerequisites:** staff user and admin user; an Active program with Capacity 2 and nobody enrolled; four people.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As the admin, open **BarnCRM Settings**, **Programs**. | **Waitlist when full** is off. |
+| 2 | As staff, enroll persons 1, 2 and 3 as Enrolled. | All three are Enrolled: Capacity only shows. Withdraw person 3. |
+| 3 | Turn **Waitlist when full** on. Enroll person 4, then enroll person 3 again. | Both are saved as **Waitlisted**, with no Start Date. |
+| 4 | Try to enroll person 4 again. | Refused: one open enrollment per program (Waitlisted is open). |
+| 5 | Move person 1 to **Completed**. | Person 4 (waitlisted first) becomes **Enrolled** with today's Start Date; person 3 stays Waitlisted. |
+| 6 | Raise Capacity to 3. | Person 3 becomes **Enrolled**. |
+| 7 | Add an Applied enrollment for a fifth person. | Saved as Applied; nothing is moved. |
+
+**Cleanup:** turn **Waitlist when full** off; delete the test enrollments.

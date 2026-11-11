@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Standing__c</fullName>
+  <defaultValue>false</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>Check to book this person on every later shift of the same recurring schedule. Cancel their later sign-ups to end it.</inlineHelpText>
+  <label>Standing</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

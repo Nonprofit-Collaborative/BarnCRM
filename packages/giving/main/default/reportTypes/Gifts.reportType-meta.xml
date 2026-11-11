@@ -4,8 +4,8 @@
   <category>other</category>
   <deployed>true</deployed>
   <description>
-    Gifts, with their donor, date, amount, type, status and appeal, and the description and fair
-    market value an in-kind gift carries.
+    Gifts, with their donor, date, amount, type, status and appeal, the description and fair
+    market value an in-kind gift carries, and the stock, planned gift and gift source details.
   </description>
   <label>Gifts</label>
   <sections>
@@ -72,6 +72,31 @@
     <columns>
       <checkedByDefault>false</checkedByDefault>
       <field>CreatedDate</field>
+      <table>Gift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Gift_Source__c</field>
+      <table>Gift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Gift_Source_Name__c</field>
+      <table>Gift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Planned_Gift_Type__c</field>
+      <table>Gift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Stock_Symbol__c</field>
+      <table>Gift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Stock_Shares__c</field>
       <table>Gift__c</table>
     </columns>
     <masterLabel>Gift</masterLabel>

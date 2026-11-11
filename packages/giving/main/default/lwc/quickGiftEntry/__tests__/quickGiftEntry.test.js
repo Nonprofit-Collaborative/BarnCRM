@@ -53,6 +53,13 @@ jest.mock(
   { virtual: true }
 );
 
+// The donor panel child (G-33) loads on its own; the form tests only need it quiet.
+jest.mock(
+  '@salesforce/apex/GiftDonorPanelController.getPanel',
+  () => ({ default: jest.fn(() => Promise.resolve(null)) }),
+  { virtual: true }
+);
+
 const DEFAULTS = {
   giftDate: '2026-09-07',
   hasPersonAccounts: false,
