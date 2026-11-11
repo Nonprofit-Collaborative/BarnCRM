@@ -1055,7 +1055,7 @@
     "Core_MatchSource_PostalRequired": "An address source needs a postal code field: the street is compared together with it.",
     "Core_MatchSource_RowCapReached": "Match source {0} reached its limit of {1} rows in one lookup, so some duplicates may be missed. If its values are very common, consider deactivating it on the Duplicate Matching tab, Matching Logic.",
     "Core_Migration_ErrorAlreadyStarted": "This step has already started or is done. Click Refresh.",
-    "Core_Migration_ErrorKitUnreadable": "This migration's steps cannot be read: {0}",
+    "Core_Migration_ErrorKitUnreadable": "The steps of this migration cannot be read: {0}",
     "Core_Migration_ErrorLaterStepDone": "Undo or unmark the steps after this one first.",
     "Core_Migration_ErrorNoPermission": "You need Manage BarnCRM Settings to run a migration.",
     "Core_Migration_ErrorNotAllDone": "Finish every step before ticking the checklist.",
