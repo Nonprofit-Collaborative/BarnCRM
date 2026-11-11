@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Renewal_Of__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The earlier grant this one renews. Start Renewal fills it in; the Renewals card shows the grants before and after.</inlineHelpText>
+  <label>Renewal Of</label>
+  <referenceTo>Grant__c</referenceTo>
+  <relationshipLabel>Renewals</relationshipLabel>
+  <relationshipName>Renewals</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

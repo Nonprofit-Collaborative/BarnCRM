@@ -41,6 +41,10 @@
         <behavior>Readonly</behavior>
         <field>Reminder_Sent_For__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Readonly</behavior>
+        <field>Checklist_Item__c</field>
+      </layoutItems>
     </layoutColumns>
   </layoutSections>
   <layoutSections>
@@ -75,6 +79,9 @@
       </layoutItems>
     </layoutColumns>
   </layoutSections>
+  <relatedLists>
+    <relatedList>RelatedFileList</relatedList>
+  </relatedLists>
   <relatedLists>
     <relatedList>RelatedActivityList</relatedList>
   </relatedLists>

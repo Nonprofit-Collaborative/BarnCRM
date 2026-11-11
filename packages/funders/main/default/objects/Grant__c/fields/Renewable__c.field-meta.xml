@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Renewable__c</fullName>
+  <defaultValue>false</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>The funder may renew this award. An awarded grant marked Renewable with an award end date gets a Renewal requirement, so its reminder comes in time.</inlineHelpText>
+  <label>Renewable</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

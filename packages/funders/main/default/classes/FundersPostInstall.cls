@@ -35,7 +35,8 @@ public with sharing class FundersPostInstall implements InstallHandler, ModuleSe
 	 */
 	@TestVisible
 	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
-		Funders_Settings__c.Reminder_Tasks_Enabled__c
+		Funders_Settings__c.Reminder_Tasks_Enabled__c,
+		Funders_Settings__c.Grant_Finder_Enabled__c
 	};
 
 	/**

@@ -42,6 +42,7 @@ const ICONS = Object.freeze({
   Funders_Board: 'custom:custom100',
   Grant_Answer__c: 'custom:custom87',
   Grant_Calendar: 'custom:custom82',
+  Grant_Checklist_Item__c: 'custom:custom70',
   Grant_Pipeline: 'custom:custom92',
   Grant_Requirement__c: 'custom:custom84',
   Grant__c: 'custom:custom8',
