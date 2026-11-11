@@ -65,6 +65,9 @@ function checkPage(page, problems) {
   if (page.kind === 'catalog' && where.length === 0) {
     problems.push(at + 'a catalog page needs at least one where test');
   }
+  if (page.search !== undefined && typeof page.search !== 'boolean') {
+    problems.push(at + 'search must be true or false');
+  }
   if (page.orderBy !== undefined && !ORDER.test(String(page.orderBy).trim())) {
     problems.push(at + 'orderBy must be a field, then ASC or DESC');
   }

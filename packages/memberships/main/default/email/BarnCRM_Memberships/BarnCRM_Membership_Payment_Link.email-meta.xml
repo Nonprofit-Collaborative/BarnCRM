@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+  <available>true</available>
+  <description>
+    Sent when staff or the member ask for a link to pay membership dues online through BarnCRM
+    Payments. Edit it to suit your voice; keep the Payment Link merge field. The member is the
+    contact it is addressed to; the membership is the record it is about.
+  </description>
+  <encodingKey>UTF-8</encodingKey>
+  <name>BarnCRM: membership payment link</name>
+  <style>none</style>
+  <subject>Your link to pay your membership dues</subject>
+  <type>text</type>
+  <uiType>Aloha</uiType>
+</EmailTemplate>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Tier__c</fullName>
+  <externalId>false</externalId>
+  <precision>3</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <inlineHelpText>Rank within its type: 1 is the entry tier.</inlineHelpText>
+  <label>Tier</label>
+  <type>Number</type>
+</CustomField>

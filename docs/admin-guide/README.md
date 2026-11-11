@@ -299,6 +299,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | C-40 Territory Management: install, access, territories, rules and priority, preview, assign and undo, the nightly assignment; C-40b owner routing by territory owner, round robin and capacity | [territory-management.md](territory-management.md) | BarnCRM Territory Management |
 
+### Memberships
+
+| Feature | Page | Package |
+|---|---|---|
+| G-22a to G-22d, PAY-02, PB-09 Memberships: install, roles, levels and benefits, membership terms and their status, renewing by hand, from Giving gifts and recurring gifts, and online through Payments, lapse handling and reminders, the member directory portal, Memberships Essentials, erasure | [memberships.md](memberships.md) | BarnCRM Memberships (Giving, Payments and Portal Builder optional) |
+
 ### Moving From Another System
 
 | Feature | Page | Package |

@@ -168,6 +168,10 @@ CAPS = {
     # ships no Apex (0 measured). The Apex PR: access sync, post-install, routing, the run
     # batch, the page controller and the nightly step, 31,041 measured, plus about 2%.
     "territory": 31_700,
+    # Memberships (G-22a to G-22d, PAY-02, ADR-NEXT memberships module): terms, renewals, the
+    # nightly run, payment links, the Essentials kit, portal and erasure seams, 39,406 measured
+    # on 2026-11-11, plus about 2 percent. PB-09's directory adds no Apex.
+    "memberships": 40_200,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

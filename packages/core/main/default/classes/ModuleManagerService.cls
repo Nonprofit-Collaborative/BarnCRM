@@ -177,6 +177,11 @@ public with sharing class ModuleManagerService {
 			'Territory_Member__c',
 			'Territory_Rule__c',
 			'Territory_Run__c'
+		},
+		'Memberships' => new List<String>{
+			'Membership_Benefit__c',
+			'Membership_Level__c',
+			'Membership_Term__c'
 		}
 	};
 
@@ -197,7 +202,8 @@ public with sharing class ModuleManagerService {
 		'Payments' => 'Payments_Admin',
 		'LwcBuilder' => 'LWC_Builder_Admin',
 		'Scholarships' => 'Scholarships_Admin',
-		'Territory' => 'Territory_Admin'
+		'Territory' => 'Territory_Admin',
+		'Memberships' => 'Memberships_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */

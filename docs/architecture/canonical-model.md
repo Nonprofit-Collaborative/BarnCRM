@@ -16474,6 +16474,207 @@ puts back territory and owner where nobody changed them since (R-BU5). One run a
 
 ---
 
+## 29MEM1. Membership Level
+
+### Definition
+
+One kind of membership an organization sells: its type and tier, yearly dues, how long a term
+lasts and how long a lapsed member stays in grace (G-22a, Memberships module, ADR-NEXT
+`NEXT-memberships-module.md`, D-157).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The level as members see it, such as Family Gold. |
+| Type | text | no | The membership type it belongs to, such as Individual, Household or Corporate. |
+| Tier | number | no | Rank within its type; 1 is the entry tier. |
+| Dues | currency | yes | The amount a term costs. Default 0. |
+| Term Months | number | yes | How long a term lasts. Default 12; 0 means the membership does not expire. |
+| Grace Days | number | yes | Days after the end a member stays in Grace before Lapsed. Default 30. |
+| Active | boolean | yes | Offered for new terms and gift renewals. Default true. |
+| Fund Id | text | no | The Giving fund whose gifts pay for this level (R-MEM6), as a record id. |
+| Description | long text | no | What the level is, for staff and members. |
+| External Id | text | no | The record's id in the system it was imported from; unique. |
+
+### Salesforce implementation
+
+- **Object:** `Membership_Level__c`, name field Text, sharing Public Read Only.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Type | `Type__c` | Text(80) |
+| Tier | `Tier__c` | Number(3, 0) |
+| Dues | `Dues__c` | Currency(16, 2), default 0 |
+| Term Months | `Term_Months__c` | Number(3, 0), default 12 |
+| Grace Days | `Grace_Days__c` | Number(3, 0), default 30 |
+| Active | `Active__c` | Checkbox, default true |
+| Fund Id | `Fund_Id__c` | Text(18) |
+| Description | `Description__c` | Long Text Area(4000) |
+| External Id | `External_Id__c` | Text(255), unique, external ID |
+
+---
+
+## 29MEM2. Membership Benefit
+
+### Definition
+
+One benefit a level gives its members, such as free admission or a newsletter (G-22c).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Level | reference to Membership Level | yes | The level that gives it. |
+| Name | text | yes | The benefit. |
+| Description | text | no | Details members see. |
+| Quantity | number | no | How many, when counted (guest passes, say). |
+| Sort Order | number | no | Its place in the level's list. |
+
+### Salesforce implementation
+
+- **Object:** `Membership_Benefit__c`, name field Text, Master-Detail to Membership Level (sharing
+  controlled by parent).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Level | `Level__c` | Master-Detail(Membership Level), related list Benefits |
+| Description | `Description__c` | Text(255) |
+| Quantity | `Quantity__c` | Number(5, 0) |
+| Sort Order | `Sort_Order__c` | Number(3, 0) |
+
+---
+
+## 29MEM3. Membership Term
+
+### Definition
+
+One term of one membership: who the member is, at which level, from when to when, how it was
+paid and where it stands (G-22a, G-22b, PAY-02). A renewal is a new term pointing to the one it
+renews.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Level | reference to Membership Level | yes | The level held. |
+| Contact | reference to Contact | no | The person member, or the named contact of an account member. Cleared when the person is deleted. |
+| Account | reference to Account | no | The household or organization member. Cleared when it is deleted. |
+| Status | picklist | yes | Pending, Current, Grace, Lapsed, Renewed or Cancelled. Default Current. |
+| Start Date | date | no | First day of the term (R-MEM1). |
+| End Date | date | no | Last day of the term; blank means it does not expire. |
+| Member Since | date | no | Start of the member's first term, carried on each renewal. |
+| Previous Term | reference to Membership Term | no | The term this one renews. |
+| Origin | picklist | yes | New, Renewal or Rejoin (R-MEM3). Default New. |
+| Source | picklist | yes | Staff, Gift, Recurring Gift, Online Payment or Import. Default Staff. |
+| Dues | currency | no | The level's dues when the term was made. |
+| Amount Paid | currency | no | What was paid for the term. |
+| Gift Id | text | no | The Giving gift that paid it; unique (R-MEM6). |
+| Commitment Id | text | no | The Giving recurring commitment that keeps it renewing (R-MEM4). |
+| Payment Id | text | no | The Payments payment that paid it; unique (R-MEM7). |
+| Pay Link | url | no | The last hosted checkout address emailed for it (R-MEM7). |
+| Reminded For | date | no | The end date a renewal reminder was sent for (R-MEM5). |
+| Directory Opt-In | boolean | yes | The member agrees to be listed in the member directory. Default false. |
+| Directory Location | text | no | The place the member chose to show in the directory. |
+| Directory Bio | long text | no | A short text the member chose to show in the directory. |
+| Member Name | formula | no | The account's name for an account member, else the contact's first and last name. |
+| Is Active | formula | no | True while Current or Grace. |
+| External Id | text | no | The record's id in the system it was imported from; unique. |
+| Notes | long text | no | Staff notes. |
+
+### Rules
+
+**R-MEM1 Filled on save.** A new term with blank Dues takes its level's. A Current term with no
+Start Date starts today. A term with a start and no end ends Term Months later, less a day, unless
+the level's Term Months is 0. Member Since is the previous term's, else the start.
+
+**R-MEM2 A member.** A term names a contact, an account, or both; one naming neither is refused.
+
+**R-MEM3 Renewal.** A renewal is a new term at the given level (the old one's by default) that
+points to the old term, which becomes Renewed. When the old term is Current or Grace and has an
+end, the new one starts the day after it ends (Origin Renewal); otherwise it starts on the renewal
+date (Origin Rejoin). A Renewed or Cancelled term is never renewed again.
+
+**R-MEM4 Lapse.** Each night a Current term past its end becomes Grace while today is within its
+level's Grace Days of the end, else Lapsed, and a Grace term past them becomes Lapsed. A term with
+a Commitment Id whose commitment is still Active is renewed instead. A term with no end never
+lapses.
+
+**R-MEM5 Reminders.** When reminders are on, one email per term goes to its contact Reminder Days
+before its end, when the contact has an email address and has not opted out. The term is stamped
+(Reminded For) before sending and unstamped if the send fails.
+
+**R-MEM6 Gift renewals.** With Giving installed and Renew From Gifts on, each Received gift of the
+last 45 days allocated to an active level's fund, from a donor contact or account, and on no term
+yet, pays a term at the highest active level on that fund whose dues it meets (a gift on a
+Recurring commitment counts the commitment's yearly amount and the term keeps the commitment).
+The member's latest term is renewed (R-MEM3); with none, a New term starts on the gift date.
+
+**R-MEM7 Online payment.** A paid payment whose source is a Pending term makes it Current from
+the payment date; one whose source is another term renews it, the new term carrying the payment
+id. A refunded payment cancels the term it paid. Failed and cancelled payments change nothing.
+
+**R-MEM8 Erasure.** Erasing a person clears the directory listing and notes on their terms and
+turns the listing off.
+
+**R-MEM9 Directory.** The member directory lists only active terms whose member opted in, and only
+their Member Name, level, Directory Location and Directory Bio.
+
+### Salesforce implementation
+
+- **Object:** `Membership_Term__c`, name field Auto Number (MEM-{000000}), sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Level | `Level__c` | Lookup(Membership Level), Restrict delete |
+| Contact | `Contact__c` | Lookup(Contact), Clear on delete |
+| Account | `Account__c` | Lookup(Account), Clear on delete |
+| Status | `Status__c` | Picklist (Pending, Current, Grace, Lapsed, Renewed, Cancelled), restricted, default Current |
+| Start Date | `Start_Date__c` | Date |
+| End Date | `End_Date__c` | Date |
+| Member Since | `Member_Since__c` | Date |
+| Previous Term | `Previous_Term__c` | Lookup(Membership Term), Clear on delete |
+| Origin | `Origin__c` | Picklist (New, Renewal, Rejoin), restricted, default New |
+| Source | `Source__c` | Picklist (Staff, Gift, Recurring Gift, Online Payment, Import), restricted, default Staff |
+| Dues | `Dues__c` | Currency(16, 2) |
+| Amount Paid | `Amount_Paid__c` | Currency(16, 2) |
+| Gift Id | `Gift_Id__c` | Text(18), unique, external ID |
+| Commitment Id | `Commitment_Id__c` | Text(18) |
+| Payment Id | `Payment_Id__c` | Text(18), unique, external ID |
+| Pay Link | `Pay_Link__c` | URL(255) |
+| Reminded For | `Reminded_For__c` | Date |
+| Directory Opt-In | `Directory_Opt_In__c` | Checkbox, default false |
+| Directory Location | `Directory_Location__c` | Text(80) |
+| Directory Bio | `Directory_Bio__c` | Long Text Area(1000) |
+| Member Name | `Member_Name__c` | Formula (Text) |
+| Is Active | `Is_Active__c` | Formula (Checkbox) |
+| External Id | `External_Id__c` | Text(255), unique, external ID |
+| Notes | `Notes__c` | Long Text Area(4000) |
+
+---
+
+## 29MEM4. Memberships Settings
+
+### Definition
+
+The Memberships module's org-wide settings, in the Memberships section of BarnCRM Settings.
+
+### Attributes
+
+| Attribute | Type | Default | Definition |
+|---|---|---|---|
+| Send Renewal Reminders | boolean | false | Whether the morning run emails members before their term ends (R-MEM5). |
+| Reminder Days | number | 30 | Days before the end a reminder goes, 1 to 365. |
+| Reminder Template | text | `BarnCRM_Membership_Renewal` | The unique name of the reminder email template. |
+| Renew From Gifts | boolean | true | Whether Giving gifts to a level's fund pay terms (R-MEM6). |
+
+### Salesforce implementation
+
+- **Object:** `Memberships_Settings__c`, hierarchy custom setting, protected; fields
+  `Reminders_Enabled__c`, `Reminder_Days__c`, `Reminder_Template__c`, `Renew_From_Gifts__c`.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -16882,6 +17083,7 @@ mirrors the primary member).
 | 1.20 | 2026-11-11 | Scholarships and Outbound Grants module (SG-01 to SG-10, PB-06, D-122, D-156; ADR-NEXT `NEXT-scholarships-outbound-grants-module.md`). New package `packages/scholarships`: Award Program (`Award_Program__c`), Award Cycle (`Award_Cycle__c`), Award Application (`Award_Application__c`), Application Review (`Application_Review__c`), Award (`Award__c`), Disbursement (`Award_Payment__c`), Award Requirement (`Award_Requirement__c`) and settings `Scholarships_Settings__c` (29SG1 to 29SG8). |
 | 1.21 | 2026-11-11 | Grid tool and saved grids (C-41, C-41b). No object or field added. Section 29D gains rule R-SQ14: the query document's optional `grid` key, which marks a saved query saved from the Grid. The Grid (`gridTool`, `gridModel`) shows in the Find tab through the `findPage` wrapper and uses Find's own server methods. |
 | 1.22 | 2026-11-11 | Territory Management module (C-40, C-40b; ADR-NEXT `NEXT-territory-management-module.md`). New Sections 29TM1 Territory (`Territory__c`, with the Territory lookup `Territory__c` on Account and Contact), 29TM2 Territory Rule (`Territory_Rule__c`), 29TM3 Territory Member (`Territory_Member__c`) and 29TM4 Territory Run (`Territory_Run__c`); rules R-TM1 to R-TM4. |
+| 1.23 | 2026-11-11 | Memberships module (G-22a to G-22d, PAY-02, PB-09; D-157, D-190; ADR-NEXT `NEXT-memberships-module.md`). New package `packages/memberships`: Membership Level (`Membership_Level__c`, 29MEM1), Membership Benefit (`Membership_Benefit__c`, 29MEM2), Membership Term (`Membership_Term__c`, 29MEM3, R-MEM1 to R-MEM9) and Memberships Settings (`Memberships_Settings__c`, 29MEM4). No Contact or Account field, and no object named like Memberships Essentials' membership object, so both deploy together. |
 
 ---
 ## 32. Entity ownership by package
@@ -17071,6 +17273,10 @@ included; standard objects the packages extend are named by the entity that gove
 | Brand | Core | 1.13 (C-47a) | 29BR2 |
 | Brand Assignment | Core | 1.13 (C-47a) | 29BR3 |
 | Brand lookups on Gift, Appeal, Volunteer Job, Program, Portal | Giving, Volunteers, Programs, Portal Builder | 1.14 (C-47d) | 29BR2 |
+| Membership Level | Memberships | 1.8 (G-22a) | 29MEM1 |
+| Membership Benefit | Memberships | 1.8 (G-22c) | 29MEM2 |
+| Membership Term | Memberships | 1.8 (G-22a, G-22b, PAY-02) | 29MEM3 |
+| Memberships Settings | Memberships | 1.8 (G-22a, G-22b) | 29MEM4 |
 
 **Components that are not entities (C-29, ADR-0059).** Core is the Standard Edition on its own,
 so nothing below that is nonprofit-specific ships in Core.
@@ -17099,6 +17305,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Permission sets (Admin, Staff, Read Only, Webhook Guest), Payments Setup tab, webhook receiver, processing job | Payments | Metadata and `PaymentsAccessSync` (ADR-NEXT `NEXT-payments-module.md`). No app: the Payments and Payments Setup tabs join BarnCRM and BarnCRM Console at deploy |
 | Payment seam (a module starts a checkout and is told of each status change) | Payments | `PaymentsApi`, a `System.Callable` found by name; listeners are the consumers' own `System.Callable` classes (ADR-NEXT `NEXT-payments-module.md` decision 8) |
 | Permission sets (Admin, Staff, Read Only), Territory Management tab, nightly assignment step | Territory Management | Metadata, `TerritoryAccessSync` and `TerritoryNightlyJobProvider` (ADR-NEXT `NEXT-territory-management-module.md`). No app (ADR-0192): the Territory Management tab joins the BarnCRM admin apps |
+| Permission sets (Admin, Staff, Read Only), Memberships and Membership Levels tabs, term actions panel, renewal nightly step, member portal action | Memberships | Metadata and `MembershipsAccessSync` (ADR-NEXT `NEXT-memberships-module.md`). No app (ADR-0192) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror was brought forward from v0.9 to v0.6 and is built in release
