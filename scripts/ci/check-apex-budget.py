@@ -70,7 +70,9 @@ CAPS = {
     # Giving at a Glance (GivingRecordGlanceExtension, people-giving-14), and the Thank-Yous
     # page's rule reorder and missing-template reason (people-giving-18), and the Ask
     # Pipeline's Recently Closed column and Reopen Ask (people-giving-19).
-    "giving": 608_000,
+    # Combined build 2026-11-11: 610,858 measured with G-33's donor panel and G-37's pledge job,
+    # plus room for G-27 still to come.
+    "giving": 625_000,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.
