@@ -30,8 +30,13 @@ describe('c/barnIcons', () => {
     expect(iconFor('toString')).toBeUndefined();
   });
 
-  it('never gives two names the same custom motif', () => {
+  // All 100 motifs are in use, so module tabs in different packages may share one (interim rule,
+  // docs/contributor-guide/tab-icons.md); test_core_navigation.py checks the per-package rule.
+  it('names only the documented custom motifs', () => {
     const custom = Object.values(ICONS).filter((icon) => icon.startsWith('custom:'));
-    expect(new Set(custom).size).toBe(custom.length);
+    custom.forEach((icon) => {
+      const number = Number(icon.replace('custom:custom', ''));
+      expect(number >= 1 && number <= 100).toBe(true);
+    });
   });
 });
