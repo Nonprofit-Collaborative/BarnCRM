@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>NPSP Funds, Levels and Recurring Donations</label>
+  <protected>false</protected>
+  <values>
+    <field>Source_App__c</field>
+    <value xsi:type="xsd:string">Nonprofit_Success_Pack</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Copies your NPSP General Accounting Units as funds, your NPSP levels as donor levels, and your NPSP recurring donations as recurring commitments of the same people and organizations. NPSP itself is never changed.</value>
+  </values>
+  <values>
+    <field>Steps_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"funds","label":"Funds","kind":"import","help":"Copies each NPSP General Accounting Unit as a fund.","source":"npsp.General_Accounting_Unit__c","fields":["Name","npsp.Active__c","npsp.Description__c"],"templateKey":"kit_npsp_funds"},{"key":"levels","label":"Donor Levels","kind":"import","help":"Copies each NPSP level as a donor level with the same amounts.","source":"npsp.Level__c","fields":["Name","npsp.Active__c","npsp.Description__c","npsp.Minimum_Amount__c","npsp.Maximum_Amount__c"],"templateKey":"kit_npsp_levels"},{"key":"recurringPeople","label":"Recurring Donations of People","kind":"import","help":"Copies each NPSP recurring donation of a contact as a recurring commitment of that person.","source":"npe03.Recurring_Donation__c","fields":["npe03.Contact__c","npe03.Amount__c","npe03.Installment_Period__c","npe03.Date_Established__c","npe03.Next_Payment_Date__c","npsp.Status__c"],"filters":[{"field":"npe03.Contact__c","value":null,"op":"notEquals"}],"templateKey":"kit_npsp_recurring_people"},{"key":"recurringOrganizations","label":"Recurring Donations of Organizations","kind":"import","help":"Copies each NPSP recurring donation of an organization as a recurring commitment of that organization.","source":"npe03.Recurring_Donation__c","fields":["npe03.Organization__c","npe03.Amount__c","npe03.Installment_Period__c","npe03.Date_Established__c","npe03.Next_Payment_Date__c","npsp.Status__c"],"filters":[{"field":"npe03.Contact__c","value":null},{"field":"npe03.Organization__c","value":null,"op":"notEquals"}],"templateKey":"kit_npsp_recurring_organizations"}]</value>
+  </values>
+  <values>
+    <field>Retire_Checklist_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"rdBatch","text":"In NPSP Settings, Recurring Donations, stop the nightly Recurring Donations batch (Setup, Scheduled Jobs: delete the NPSP recurring donations job), so NPSP makes no more open installment Opportunities."},{"key":"levels","text":"Stop the NPSP Levels batch from moving donors between levels (Setup, Scheduled Jobs), so only BarnCRM donor levels change."},{"key":"gau","text":"Make your NPSP General Accounting Units inactive, so no new allocation is made to them."},{"key":"forms","text":"Point online giving and recurring payment processors at BarnCRM, so new recurring gifts are made only there."}]</value>
+  </values>
+  <values>
+    <field>Extension_Class__c</field>
+    <value xsi:type="xsd:string">NpspGivingKit</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">14</value>
+  </values>
+</CustomMetadata>

@@ -342,3 +342,18 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 6 | As a user with no Giving permission set, open Harper Garcia. | No card; the sidebar starts with the next card. |
 
 **Cleanup:** refund or delete the gift from step 3.
+
+## T-GIFT-22: NPSP Funds, Levels and Recurring Donations Kit
+
+**Purpose:** confirm the kit copies NPSP General Accounting Units, levels and recurring donations into Giving and never changes NPSP.
+**Prerequisites:** admin; an org with NPSP installed (a test org, never production); in NPSP, a General Accounting Unit "Building Fund", a level "Friend" (100 to 499.99), an open monthly recurring donation of 25 for a contact with a next payment date next month, and a closed yearly one of 500 for an organization.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Integrations**, NPSP. | One **Start Migration** button per kit, including **NPSP Funds, Levels and Recurring Donations**. |
+| 2 | Start it; preview and load **Funds**, then **Donor Levels**. | A fund Building Fund and a donor level Friend with the same amounts. **Check this step** matches each. |
+| 3 | Load **Recurring Donations of People**. | A recurring commitment of 25, Monthly, Active, for the same contact, starting at the NPSP next payment date; no overdue payments. |
+| 4 | Load **Recurring Donations of Organizations**. | A recurring commitment of 500, Yearly, Cancelled, for the organization. |
+| 5 | Open the NPSP records. | Nothing in NPSP changed. |
+
+**Cleanup:** undo the four steps in reverse order.

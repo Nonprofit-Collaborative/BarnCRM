@@ -21,6 +21,9 @@ org. These kits ship:
 - **NPSP People and Addresses** (Core): adopts NPSP households in place, then copies NPSP
   relationships, affiliations and household addresses. See
   [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
+- **NPSP Funds, Levels and Recurring Donations** (Giving): copies General Accounting Units,
+  levels and recurring donations. See
+  [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
 
 An app can have several kits, one for each BarnCRM module that receives its records. Its
 listing then shows one **Start Migration** button per kit, each with the kit's name. Run them
