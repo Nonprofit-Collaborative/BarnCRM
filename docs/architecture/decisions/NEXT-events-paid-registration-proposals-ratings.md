@@ -48,7 +48,8 @@ not always what an attendee wants on a badge. Sessions have no feedback of their
 4. **Staff and the portal send the same link.** Send Payment Link on the Registrations tab starts a
    checkout for any registration that owes money and is not paid (a staff registration stays
    Registered; it does not wait for payment). The portal action `Events.SendPaymentLink` emails the
-   person's own link again, or queues a new one. Payment links are never shown on a public page.
+   person's own current link again; the portal's integration user starts no checkout and queues
+   no job. Payment links are never shown on a public page.
 5. **Confirmed on payment, recorded on every change.** `EventPaymentListener` (Callable, built by
    name by Payments) hears `paymentChanged` for the registration's current payment only (the
    registration's Payment Key):
@@ -59,7 +60,10 @@ not always what an attendee wants on a badge. Sessions have no feedback of their
      that was waiting for payment is cancelled and its seats freed.
    - Refunded in part: Payment Status Partly Refunded and Amount Paid lowered.
    - Refunded in full: Payment Status Refunded, Amount Paid zero, and the registration cancelled.
-   The listener is safe to call twice with the same status.
+   The listener is safe to call twice with the same status. A payment that arrives after its
+   registration was cancelled is recorded and the registration stays cancelled, for staff to
+   refund or register again. A checkout the job cannot start marks the payment Failed and is
+   logged, so one registration never stops the queue.
 6. **BarnCRM issues no refund.** Refunds are made in the Stripe or PayPal dashboard; the
    processor's event records them here. Cancelling a paid registration says so.
 7. **Health Check** warns when Take payment online is on and Payments is not installed or its

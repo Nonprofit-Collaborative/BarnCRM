@@ -166,7 +166,7 @@ It needs BarnCRM Forms and its Salesforce Site (see [Forms](forms.md), Public Fo
 2. On the Agenda tab choose **Session Ratings**, pick the form and **Save**. It is stored in the
    event's **Session Rating Form Key**.
 3. **Print Rating Codes** opens a page with each confirmed session's title, time, room and QR
-   code, to print and put by each door; a session's menu has **Rating Code** for one.
+   code, one per half page, to print and put by each door. Codes are drawn in the browser.
 
 Each answered form adds a **Session Rating** (rating and comment, no person) to the session. A
 session card shows its **Average Rating** and how many rated it; the Speakers tab shows each
@@ -234,11 +234,11 @@ says why.
 
 **Presenters.** A session proposal can have up to 5 presenters besides the applicant: open a
 proposal's menu and choose **Add Presenter**, pick the person and their role (Speaker, Moderator or
-Panelist). **Remove Presenter** takes one off. Accepting the proposal makes the applicant and every
+Panelist). The remove button beside a presenter takes them off. Accepting the proposal makes the applicant and every
 presenter a speaker at the event.
 
-**Assigning reviewers.** Select proposals with their checkboxes and choose **Assign Reviewers**,
-then pick a user. They get the proposals to score; a reviewer already assigned or who has scored
+**Assigning reviewers.** Select proposals with their checkboxes, choose **Assign Reviewers**, pick
+a user and click **Assign to Selected**. They get the proposals to score; a reviewer already assigned or who has scored
 is not added again. **My Assignments** narrows the list to what you still have to score. An
 assignment that is not yet scored does not count in Reviews or the averages.
 
@@ -251,8 +251,8 @@ Without criteria a review is one score from 1 to 5, as before. Proposals are ran
 
 **Scoring Matrix and Compare.** **Scoring Matrix** shows every proposal with its average on each
 criterion, its weighted average, total and number of reviews. Select two to four proposals and
-choose **Compare** to see them side by side, criterion by criterion, with their abstracts and each
-reviewer's scores.
+choose **Compare** to see them side by side: applicant, weighted average, each criterion's average
+and the abstract.
 
 **Blind review.** Turn on **Blind Review** on the event (Details tab) to hide applicants',
 presenters' and reviewers' names on the Applications tab until a proposal is accepted or declined.
@@ -346,7 +346,10 @@ online** in the Events settings; it ships off.
   for any registration that owes money and is not paid. A registration made by staff is not held
   for payment: it stays Registered and only records the payment.
 - **From the portal.** A portal template can offer the action `Events.SendPaymentLink` on a
-  person's own registrations; it emails their link again, or makes a new one.
+  person's own registrations; it emails their current link again (it makes no new one).
+
+If a checkout cannot be started (for example the processor refused the keys), Payment Status
+reads **Failed** and the **Error Log** says why; fix the cause and use **Send Payment Link**.
 
 | Payment Status | What happened | The registration |
 |---|---|---|

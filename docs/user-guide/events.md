@@ -209,8 +209,8 @@ QR code.
 
 1. Open the event and click the **Agenda** tab, then **Session Ratings**. Choose the rating form
    your admin set up and click **Save**.
-2. Click **Print Rating Codes** and put each session's code by its door, or show one from a
-   session's menu with **Rating Code**.
+2. Click **Print Rating Codes** and put each session's code by its door (one code per half
+   page).
 3. Each session card shows its average rating and how many rated it. The **Speakers** tab shows
    each speaker's average.
 

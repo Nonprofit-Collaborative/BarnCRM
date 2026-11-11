@@ -493,8 +493,8 @@ address you can read.
 | 4 | Open the link and pay with Stripe's test card `4242 4242 4242 4242`. | Within 15 minutes the registration is **Registered**, Payment Status **Paid** and **Amount Paid** 25. |
 | 5 | In the Stripe dashboard, refund 10 of Sam's payment. | Within 15 minutes Payment Status **Partly Refunded**, Amount Paid 15; the registration stays Registered. Refund the rest: Payment Status **Refunded**, Amount Paid 0 and the registration **Cancelled**. |
 | 6 | Register `Ash Zzpay` (General) and process it; do not pay. Ask an admin to set the payment's created date back three days in a scratch org, or wait two days, then let processing run. | Ash's payment is Cancelled; the registration is **Cancelled**, Payment Status **Cancelled**, and the seat is free again. |
-| 7 | On **Registrations**, open the menu of Pat's registration (made with the setting off) and choose **Send Payment Link**. | `Payment link sent to Pat Zzpay.`; Payment Status **Link Sent**; the registration stays **Registered**. |
-| 8 | Choose **Send Payment Link** on a registration with nothing owed. | Refused: nothing to pay. |
+| 7 | On **Registrations**, open the menu of Pat's registration (made with the setting off) and choose **Send Payment Link**. | `The payment link was emailed to the registrant.`; Payment Status **Link Sent**; the registration stays **Registered**. |
+| 8 | Open the menu of a free registration, then of Sam's paid one. | Neither menu offers **Send Payment Link**. |
 | 9 | Uninstall or disable Payments in a scratch org with the setting on and run **Health Check**. | Warning **Event Payments Are Not Ready**; form registrations are confirmed at once as in step 1. |
 
 **Cleanup:** delete the Zzpay registrations and contacts; turn **Take payment online** off.
@@ -511,13 +511,13 @@ scoring matrix and compare on the Applications tab.
 |---|---|---|
 | 1 | As admin, choose **Scoring Criteria**, add `Relevance` weight `3` and `Delivery` weight `1`, and save. | Saved; the criteria show in that order. A weight of `11` or a label used twice is refused. |
 | 2 | Open Alpha's menu, **Add Presenter**, pick a person, role Moderator. | The presenter shows under Alpha. Adding the applicant, or a sixth presenter, is refused. |
-| 3 | Tick Alpha and Beta, choose **Assign Reviewers** and pick the staff user. | `2 assignments added.`; doing it again adds none. |
+| 3 | Tick Alpha and Beta, choose **Assign Reviewers**, pick the staff user and click **Assign to Selected**. | The message starts `2 assignments added.`; doing it again adds 0. |
 | 4 | As the staff user, tick **My Assignments**. | Alpha and Beta only. |
 | 5 | Score Alpha: Relevance `5`, Delivery `1`. | Weighted score `4.00`, score 4. Alpha leaves My Assignments; Reviews 1. |
 | 6 | As admin, score Alpha Relevance `3`, Delivery `3`, and Beta Relevance `4`, Delivery `4`. | Alpha's weighted average `3.50` (two reviews); Beta `4.00`; Beta ranks first. |
 | 7 | Choose **Scoring Matrix**. | One row per proposal: Relevance and Delivery averages (Alpha 4.0 and 2.0), weighted average, total, reviews. |
-| 8 | Tick Alpha and Beta and choose **Compare**. | Side by side, with each criterion, abstract and each reviewer's scores. Ticking a fifth proposal is refused. |
-| 9 | Tick **Blind Review** on the event's Details tab; reopen Applications. | Applicant, presenter and reviewer names show as `Hidden` on Alpha, Beta and Gamma. |
+| 8 | Tick Alpha and Beta and choose **Compare**. | Side by side: applicant, weighted average, each criterion's average and abstract. With only one, or five, ticked, Compare asks for two to four. |
+| 9 | Tick **Blind Review** on the event's Details tab; reopen Applications. | Applicant, presenter and reviewer names show as `Hidden for blind review` on Alpha, Beta and Gamma. |
 | 10 | Accept Alpha. | Alpha's names show again; the applicant and the presenter are speakers at the event. |
 
 **Cleanup:** delete the proposals, speakers and criteria; untick Blind Review.
@@ -552,8 +552,8 @@ and `Talk B` and a speaker on Talk A.
 |---|---|---|
 | 1 | On the **Agenda** tab, **Session Ratings**, choose the form and save. | Saved. |
 | 2 | **Print Rating Codes**. | A print window with Talk A and Talk B, each with title, time, room and a QR code. |
-| 3 | Scan Talk A's code with a phone (or open its link in a private window), rate `5` with a comment, send; rate again `3`. Process the submissions. | Talk A's card shows `4.0 (2)`. Two Session Ratings on Talk A with no person. |
-| 4 | Open the **Speakers** tab. | Talk A's speaker shows an average of `4.0`. |
+| 3 | Scan Talk A's code with a phone (or open its link in a private window), rate `5` with a comment, send; rate again `3`. Process the submissions. | Talk A's card shows `Rated 4.0 (2)`. Two Session Ratings on Talk A with no person. |
+| 4 | Open the **Speakers** tab. | Talk A's speaker shows `Average rating 4.0 from 2`. |
 | 5 | Send the form from Talk B's link with no rating; process it. | No rating is added to Talk B. |
 | 6 | In an org without Forms, open the Agenda tab. | No Session Ratings button and no rating codes. |
 
