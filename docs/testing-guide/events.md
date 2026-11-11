@@ -1,6 +1,7 @@
 # Event Management
 
-Scripts for events and the Events page (EV-01 to EV-06, EV-08 to EV-19) and their sample data.
+Scripts for events and the Events page (EV-01 to EV-06, EV-08 to EV-21, EV-26, EV-27) and their
+sample data.
 Setup detail:
 [Event Management](../admin-guide/events.md).
 
@@ -472,3 +473,88 @@ a Confirmed speaker and an Invited one, and the form's record ID in **Registrati
 
 **Cleanup:** delete Robin Zzpage's registration and contact and the Kim and Lee Zzpage contacts; untick
 **Public Page**.
+
+## T-EV-22: Paid Registration
+
+**Purpose:** confirm a paid public registration waits for payment with its seats held, is
+confirmed when the processor reports the payment, and is cancelled when the checkout is abandoned
+or refunded; and that nothing changes with the setting off.
+**Prerequisites:** the T-EV-21 setup (event, General ticket at `25`, public form, Site); BarnCRM
+Payments installed in **test mode** with Stripe test keys entered, its receiver address added in
+the Stripe dashboard and processing scheduled (see the Payments testing guide); a test email
+address you can read.
+**Smoke:** yes
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | With **Take payment online** off, register `Pat Zzpay` (General) through the public page and process it. | Registered at once, amount owed 25, **Payment Status** empty; no email. |
+| 2 | In **BarnCRM Settings**, Events, turn on **Take payment online**. Reload the public page. | General's note says a secure payment link is emailed after registering. |
+| 3 | Register `Sam Zzpay` (General, your test email) and process it. | Sam's registration is **Pending Payment**, Payment Status **Unpaid**, and Sam holds a seat (seats left goes down). Within two minutes Payment Status is **Link Sent**, **Payment Link** holds a `checkout.stripe.com` address and the email `Complete your registration for <event>` arrives with it. |
+| 4 | Open the link and pay with Stripe's test card `4242 4242 4242 4242`. | Within 15 minutes the registration is **Registered**, Payment Status **Paid** and **Amount Paid** 25. |
+| 5 | In the Stripe dashboard, refund 10 of Sam's payment. | Within 15 minutes Payment Status **Partly Refunded**, Amount Paid 15; the registration stays Registered. Refund the rest: Payment Status **Refunded**, Amount Paid 0 and the registration **Cancelled**. |
+| 6 | Register `Ash Zzpay` (General) and process it; do not pay. Ask an admin to set the payment's created date back three days in a scratch org, or wait two days, then let processing run. | Ash's payment is Cancelled; the registration is **Cancelled**, Payment Status **Cancelled**, and the seat is free again. |
+| 7 | On **Registrations**, open the menu of Pat's registration (made with the setting off) and choose **Send Payment Link**. | `Payment link sent to Pat Zzpay.`; Payment Status **Link Sent**; the registration stays **Registered**. |
+| 8 | Choose **Send Payment Link** on a registration with nothing owed. | Refused: nothing to pay. |
+| 9 | Uninstall or disable Payments in a scratch org with the setting on and run **Health Check**. | Warning **Event Payments Are Not Ready**; form registrations are confirmed at once as in step 1. |
+
+**Cleanup:** delete the Zzpay registrations and contacts; turn **Take payment online** off.
+
+## T-EV-23: Session Proposals and Matrix Scoring
+
+**Purpose:** confirm presenters, reviewer assignments, weighted criteria, blind review, the
+scoring matrix and compare on the Applications tab.
+**Prerequisites:** admin and staff; an Open event with three proposals `Alpha`, `Beta` and
+`Gamma` from three people; a second user with Events Staff.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As admin, choose **Scoring Criteria**, add `Relevance` weight `3` and `Delivery` weight `1`, and save. | Saved; the criteria show in that order. A weight of `11` or a label used twice is refused. |
+| 2 | Open Alpha's menu, **Add Presenter**, pick a person, role Moderator. | The presenter shows under Alpha. Adding the applicant, or a sixth presenter, is refused. |
+| 3 | Tick Alpha and Beta, choose **Assign Reviewers** and pick the staff user. | `2 assignments added.`; doing it again adds none. |
+| 4 | As the staff user, tick **My Assignments**. | Alpha and Beta only. |
+| 5 | Score Alpha: Relevance `5`, Delivery `1`. | Weighted score `4.00`, score 4. Alpha leaves My Assignments; Reviews 1. |
+| 6 | As admin, score Alpha Relevance `3`, Delivery `3`, and Beta Relevance `4`, Delivery `4`. | Alpha's weighted average `3.50` (two reviews); Beta `4.00`; Beta ranks first. |
+| 7 | Choose **Scoring Matrix**. | One row per proposal: Relevance and Delivery averages (Alpha 4.0 and 2.0), weighted average, total, reviews. |
+| 8 | Tick Alpha and Beta and choose **Compare**. | Side by side, with each criterion, abstract and each reviewer's scores. Ticking a fifth proposal is refused. |
+| 9 | Tick **Blind Review** on the event's Details tab; reopen Applications. | Applicant, presenter and reviewer names show as `Hidden` on Alpha, Beta and Gamma. |
+| 10 | Accept Alpha. | Alpha's names show again; the applicant and the presenter are speakers at the event. |
+
+**Cleanup:** delete the proposals, speakers and criteria; untick Blind Review.
+
+## T-EV-24: Badge Overrides
+
+**Purpose:** confirm badge name, title and company print and show at check-in.
+**Prerequisites:** staff; an event with a Registered attendee `Jordan Zzbadge` whose account is
+`River Org`.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Registrations**, Jordan's menu, **Edit Badge**: name `Jo`, title `Chair`, company `Lake Org`; save. | Saved. |
+| 2 | On **Badges**, **Print Badges** with Show Organization on. | Jordan's badge reads `Jo`, `Chair` and `Lake Org`. |
+| 3 | Print the sign-in sheet. | Jordan's row reads `Jo` and `Lake Org`. |
+| 4 | On **Check-In**, search `Jo`. | Jordan shows as `Jo` with `Jordan Zzbadge` beside it. |
+| 5 | Clear the three fields and print again. | `Jordan Zzbadge` and `River Org`; no title line. |
+
+**Cleanup:** delete Jordan's registration.
+
+## T-EV-25: Session Ratings
+
+**Purpose:** confirm a session's QR code opens the rating form and ratings average on the session
+and speaker.
+**Prerequisites:** admin; BarnCRM Forms with an active Site; a published public form with a
+`rating` number question and a `comment` text question; an event with Confirmed sessions `Talk A`
+and `Talk B` and a speaker on Talk A.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On the **Agenda** tab, **Session Ratings**, choose the form and save. | Saved. |
+| 2 | **Print Rating Codes**. | A print window with Talk A and Talk B, each with title, time, room and a QR code. |
+| 3 | Scan Talk A's code with a phone (or open its link in a private window), rate `5` with a comment, send; rate again `3`. Process the submissions. | Talk A's card shows `4.0 (2)`. Two Session Ratings on Talk A with no person. |
+| 4 | Open the **Speakers** tab. | Talk A's speaker shows an average of `4.0`. |
+| 5 | Send the form from Talk B's link with no rating; process it. | No rating is added to Talk B. |
+| 6 | In an org without Forms, open the Agenda tab. | No Session Ratings button and no rating codes. |
+
+**Cleanup:** delete the ratings and clear the event's rating form.
