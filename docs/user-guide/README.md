@@ -76,6 +76,10 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Payments](payments.md): finding a payment taken online, what its status means, and how refunds are made.
 
+### Scholarships and Outbound Grants
+
+- [Scholarships and Grants](scholarships.md): reviewing applications with a rubric, recusing, the review board and decisions, award letters and acceptance, disbursements and conditions, recipient reports, renewals and the disbursement export.
+
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.

@@ -813,7 +813,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Volunteer portal template | Major | Volunteers see open shifts and sign up or cancel, see their own shifts, view and log hours (a new entry follows the Volunteers hours approval setting; no edits after saving) and keep their contact, availability and emergency contact current. The `volunteer.json` template; needs Volunteers. | Shipped (#1026) | PB-03 |
 | Service portal template | Major | Clients see their program enrollments and services. Needs Programs. | Planned (1.x) | PB-04 |
 | Partner portal template | Major | Partner organizations see shared records and referrals, and grant reports where Funders is installed. | Planned (1.x) | PB-05 |
-| Applicant portal template | Major | Applicants apply, upload documents, see decisions and submit recipient reports. Needs Scholarships and Outbound Grants. | Planned (TBD) | PB-06 (D-122) |
+| Applicant portal template | Major | The `applicant` template: Open Cycles with Apply (starts a Draft application with the applicant's own signed form link, where they answer and upload files), My Applications with status and form link, My Awards with Accept Award, and My Reports with each report's signed link. Actions come from Scholarships and Outbound Grants through Core's portal action seam. | Built, in review for release 1.12 | PB-06 (D-122) |
 | Speaker portal template | Major | Speakers start a proposal for an open event, edit its title and abstract until it is decided, withdraw it, see every proposal and its decision, see their sessions with times and rooms, and keep their speaker details (headline, bio, AV and travel needs) current. The `speaker.json` template; needs Event Management. There is no call-for-speakers deadline field, so it shows event and session dates. | Shipped (#1026) | PB-07 (D-123) |
 | Donor portal template | Minor | Donors see their giving totals and pledge balance, gift history, pledges and recurring gifts with balances, and the list of issued receipts, and update their phone and mailing address. No payments, no receipt download, no other edits. The `donor.json` template; needs Giving. | Shipped (#1026) | PB-08 (D-156) |
 
@@ -838,20 +838,22 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 10. Scholarships and Outbound Grants
 
-**Edition:** Nonprofit Edition (proposed). Depends on Core only; Giving and Funders are optional links. No package directory exists yet. For organizations that give money: scholarships, fellowships, mini-grants and other outbound grants. Planned after Core QA and the current module round, release target TBD, not v1.0; a new ADR is needed before build (plan 5.11, D-122).
+**Edition:** Nonprofit Edition. Depends on Core only; Forms and Portal Builder are used when installed, Giving and Funders are not referenced. Package `packages/scholarships` (BarnCRM Scholarships and Outbound Grants), no app of its own: its Scholarships and Grants, Award Programs, Award Applications and Awards tabs are in BarnCRM and BarnCRM Console (ADR-0192, ADR-NEXT scholarships outbound grants module). Release 1.12, SG-10 from 1.10 (plan 5.11, D-122, D-156). For organizations that give money: scholarships, fellowships, mini-grants and other outbound grants. BarnCRM records payments made elsewhere and moves no money.
 
 ### 10.1 Grantmaking
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Programs and cycles | Major | A scholarship or grant program with cycles, open and close dates, eligibility rules, budget and award count. | Planned (TBD) | SG-01 |
-| Applications | Major | The applicant is a Core person or organization; application questions, documents on Salesforce Files and status. | Planned (TBD) | SG-02 |
-| Reviewers and scoring | Major | Rubrics, reviewer assignment, conflict-of-interest recusal, optional blind review, score totals and ranking. | Planned (TBD) | SG-03 |
-| Applicant portal | Major | Applicants use the applicant portal template of Portal Builder. Needs Portal Builder. | Planned (TBD) | SG-07, PB-06 |
-| Awards | Minor | Decision, award letter, acceptance and conditions. | Planned (TBD) | SG-04 |
-| Disbursements | Minor | Payment schedule, payee, status and an export for the accounting system; records payments made elsewhere, BarnCRM moves no money. | Planned (TBD) | SG-05 |
-| Recipient reporting | Minor | Progress reports, deadlines, reminders and renewal for multi-year awards. | Planned (TBD) | SG-06 |
-| Grantmaking dashboard | Minor | Applications, scores, awards and disbursements by program and cycle, in standard reports and dashboards. | Planned (TBD) | SG-08 |
+| Programs and cycles | Major | Award Programs (Scholarship, Grant, Fellowship, Other) with Award Cycles: open and close dates, status (Planned, Open, Reviewing, Decided, Closed, moved on by the nightly run), eligibility in words and as JSON rules checked against form answers, budget with awarded amount and remaining budget, and planned awards. Scholarships Admin, Staff and Read Only sets, given through BarnCRM's roles. | Built, in review for release 1.12 | SG-01 |
+| Applications | Major | Award Applications from a Core person (Contact) or organization (Account): a cycle's BarnCRM Forms form creates them with the answers, the files linked from the submission and Eligible, Ineligible (with the unmet rules) or Submitted; a second submission updates the same application; staff can add them by hand. | Built, in review for release 1.12 | SG-02 |
+| Reviewers and scoring | Major | Rubrics as JSON (criteria with a maximum and a weight); the review panel on the application with Save, Submit Review and Recuse; only the reviewer or Manage Scholarships changes a review; optional blind review (a display rule); total, count and average scores; the cycle's Review Board ranked by average score. | Built, in review for release 1.12 | SG-03 |
+| Applicant portal | Major | Applicants use the applicant portal template of Portal Builder (PB-06). | Built, in review for release 1.12 | SG-07, PB-06 |
+| Awards | Minor | Award and Decline on the Review Board (Manage Scholarships) create an Offered award or decline the application; Make Letter renders the program's letter template (merge tags) as a PDF in the award's Files; Accepted and Declined; terms and conditions. | Built, in review for release 1.12 | SG-04 |
+| Disbursements | Minor | Build Schedule splits an award into equal payments months apart; payee, scheduled and paid dates, method and reference; Mark Paid needs Manage Scholarships; Export Disbursements downloads a CSV for a date range and stamps Exported Date. Records payments made elsewhere, BarnCRM moves no money. | Built, in review for release 1.12 | SG-05 |
+| Recipient reporting | Minor | Progress and Final Report requirements with due dates and the recipient's signed report link (a Forms submission fills the report and links its files); a 6:50 AM bell reminder to the program owner once per date, and an optional email to the recipient (off by default); Start Renewal creates next cycle's Draft application for a renewable award. | Built, in review for release 1.12 | SG-06 |
+| Grantmaking dashboard | Minor | Report types, five reports (applications by cycle and status, ranked by score, awards by program, disbursements due, reports due) and the Scholarships and Grants dashboard, in the BarnCRM Scholarships folder. | Built, in review for release 1.12 | SG-08 |
+| Conditional disbursements | Minor | Condition requirements hold back one disbursement, or all of an award's, until Met or Waived; Mark Paid is refused while one is open. | Built, in review for release 1.12 | SG-09 (D-156) |
+| Reviewer panels and load balancing | Minor | A public group as the cycle's reviewer panel; Assign Reviewers gives each application its number of reviewers, each next review to the member with the fewest open reviews, never to one who recused; reviewers get a bell notification. | Built, in review for release 1.12 (planned 1.10) | SG-10 (D-156) |
 
 ---
 

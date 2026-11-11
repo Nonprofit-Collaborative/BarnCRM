@@ -280,6 +280,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | PAY-01 Payments: install, roles, the Site, connecting Stripe and PayPal, Payments Setup and keys, test and live mode, processing, payment statuses and refunds, Health Check checks, the seam for module builders | [payments.md](payments.md) | BarnCRM Payments |
 | MIG-06 Online giving through Zapier: recipes for Givebutter, Donorbox and similar tools into Giving gifts | [online-giving-zapier.md](online-giving-zapier.md) | Giving (Mirror for recipe B) |
 
+### Scholarships and Outbound Grants
+
+| Feature | Page | Package |
+|---|---|---|
+| SG-01 to SG-10, PB-06 Scholarships and Outbound Grants: install, access, settings, programs and cycles, eligibility rules, rubrics, reviewer panels and Assign Reviewers, blind review, applications from Forms, the review board and decisions, award letters, disbursements and conditions, the accounting export, recipient reports and renewals, the applicant portal, reports | [scholarships.md](scholarships.md) | BarnCRM Scholarships and Outbound Grants |
+
 ### Moving From Another System
 
 | Feature | Page | Package |
