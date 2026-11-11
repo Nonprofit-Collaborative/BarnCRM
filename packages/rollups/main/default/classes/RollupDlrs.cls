@@ -14,6 +14,11 @@ public with sharing class RollupDlrs {
 	/** Where DLRS keeps a rollup: its custom metadata type, or its older custom object. */
 	public static final String SOURCE_METADATA = 'metadata';
 	public static final String SOURCE_OBJECT = 'object';
+	/** An NPSP customizable rollup, read by `RollupNpsp` into the same shape (MIG-08). */
+	public static final String SOURCE_NPSP = 'npsp';
+	/** The tools' names, as the guard and the history name them. */
+	private static final String TOOL_DLRS = 'DLRS';
+	private static final String TOOL_NPSP = 'NPSP Customizable Rollups';
 
 	private static final String METADATA_TYPE = 'LookupRollupSummary2__mdt';
 	private static final String LEGACY_OBJECT = 'LookupRollupSummary__c';
@@ -82,6 +87,9 @@ public with sharing class RollupDlrs {
 		public String bypassPermission { get; set; }
 		@AuraEnabled
 		public String description { get; set; }
+		/** Why an NPSP rollup has no BarnCRM copy, or null. */
+		@AuraEnabled
+		public String unsupported { get; set; }
 	}
 
 	/** Reads DLRS's rollups; replaced by a test. */
@@ -91,19 +99,43 @@ public with sharing class RollupDlrs {
 
 	@TestVisible
 	private static Reader reader = new OrgReader();
+	/** Reads NPSP's customizable rollups into the same shape; replaced by a test. */
+	@TestVisible
+	private static Reader npspReader = new RollupNpsp();
 	private static List<Definition> cached;
 
-	/** Every DLRS rollup in the org, active or not; empty without DLRS. Never throws. */
+	/**
+	 * Every DLRS and NPSP customizable rollup in the org, active or not; empty without either.
+	 * Never throws: a tool that cannot be read is logged and left out.
+	 */
 	public static List<Definition> definitions() {
 		if (cached == null) {
-			try {
-				cached = reader.read();
-			} catch (Exception unreadable) {
-				ErrorLogger.log(unreadable, 'RollupDlrs');
-				cached = new List<Definition>();
+			cached = new List<Definition>();
+			for (Reader each : new List<Reader>{ reader, npspReader }) {
+				try {
+					cached.addAll(each.read());
+				} catch (Exception unreadable) {
+					ErrorLogger.log(unreadable, 'RollupDlrs');
+				}
 			}
 		}
 		return cached;
+	}
+
+	/** One tool's rollups: NPSP's when `npsp` is true, otherwise DLRS's. */
+	public static List<Definition> definitions(Boolean npsp) {
+		List<Definition> found = new List<Definition>();
+		for (Definition other : definitions()) {
+			if ((other.source == SOURCE_NPSP) == (npsp == true)) {
+				found.add(other);
+			}
+		}
+		return found;
+	}
+
+	/** The tool a rollup lives in, by name. */
+	public static String toolOf(Definition other) {
+		return other.source == SOURCE_NPSP ? TOOL_NPSP : TOOL_DLRS;
 	}
 
 	/** Forgets what was read, so the next call reads again (a test that swaps the reader). */
@@ -112,9 +144,9 @@ public with sharing class RollupDlrs {
 		cached = null;
 	}
 
-	/** Whether DLRS has an active rollup, so Import from DLRS has something to offer. */
-	public static Boolean hasActive() {
-		for (Definition other : definitions()) {
+	/** Whether the tool has an active rollup, so its import has something to offer. */
+	public static Boolean hasActive(Boolean npsp) {
+		for (Definition other : definitions(npsp)) {
 			if (other.active == true) {
 				return true;
 			}
@@ -122,7 +154,7 @@ public with sharing class RollupDlrs {
 		return false;
 	}
 
-	/** The active DLRS rollup that fills this field, or null. */
+	/** The active DLRS or NPSP customizable rollup that fills this field, or null. */
 	public static Definition activeOn(String targetObject, String targetField) {
 		if (String.isBlank(targetObject) || String.isBlank(targetField)) {
 			return null;
@@ -140,7 +172,7 @@ public with sharing class RollupDlrs {
 
 	/**
 	 * Why a BarnCRM rollup on this field cannot be turned on without the administrator's word,
-	 * or null when no active DLRS rollup fills it (R-R16).
+	 * or null when no active DLRS or NPSP customizable rollup fills it (R-R16).
 	 */
 	public static String conflict(String targetObject, String targetField) {
 		Definition other = activeOn(targetObject, targetField);
@@ -148,13 +180,13 @@ public with sharing class RollupDlrs {
 			? null
 			: String.format(
 					Label.Core_RollupBuilder_DlrsSameField,
-					new List<String>{ other.label, targetObject + '.' + targetField }
+					new List<String>{ other.label, targetObject + '.' + targetField, toolOf(other) }
 			  );
 	}
 
 	/**
-	 * Records in the settings change history that the administrator confirmed the DLRS rollup
-	 * on this field will be switched off, when one is active there. Nothing in DLRS changes.
+	 * Records in the settings change history that the administrator confirmed the other tool's
+	 * rollup on this field will be switched off, when one is active there. The tool is unchanged.
 	 */
 	public static void recordSwitchOff(String rollupName, String targetObject, String targetField) {
 		Definition other = activeOn(targetObject, targetField);
@@ -165,7 +197,7 @@ public with sharing class RollupDlrs {
 			CHANGE_PREFIX + rollupName,
 			String.format(
 				Label.Core_RollupBuilder_DlrsHistoryBefore,
-				new List<String>{ other.label, targetObject + '.' + targetField }
+				new List<String>{ other.label, targetObject + '.' + targetField, toolOf(other) }
 			),
 			Label.Core_RollupBuilder_DlrsHistoryConfirmed
 		);

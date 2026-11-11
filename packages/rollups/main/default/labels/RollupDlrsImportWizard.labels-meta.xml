@@ -61,8 +61,8 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import from DLRS line; {0} is the field, {1} is the DLRS operation</shortDescription>
-        <value>Fills {0}. DLRS operation: {1}.</value>
+        <shortDescription>Import from DLRS or NPSP line; {0} is the field, {1} the operation</shortDescription>
+        <value>Fills {0}. Operation: {1}.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_DlrsImportBecomes</fullName>
@@ -78,7 +78,7 @@
         <language>en_US</language>
         <protected>false</protected>
         <shortDescription>Import from DLRS review line when nothing changes</shortDescription>
-        <value>Copied as it is in DLRS.</value>
+        <value>Copied as it is.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_DlrsImportCopy</fullName>
@@ -183,5 +183,13 @@
         <protected>false</protected>
         <shortDescription>Import from DLRS notice; {0} is how many copies were turned on</shortDescription>
         <value>Import from DLRS finished: {0} copies turned on. Switch their DLRS rollups off in DLRS.</value>
+    </labels>
+    <labels>
+        <fullName>Core_RollupBuilder_NpspImportTitle</fullName>
+        <categories>Rollups</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Import from NPSP title and button</shortDescription>
+        <value>Import From NPSP</value>
     </labels>
 </CustomLabels>

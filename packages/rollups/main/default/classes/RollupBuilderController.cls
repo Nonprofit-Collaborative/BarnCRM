@@ -142,6 +142,9 @@ public with sharing class RollupBuilderController {
 		/** Whether to offer Import from DLRS: an active DLRS rollup, and the right to manage. */
 		@AuraEnabled
 		public Boolean canImportFromDlrs { get; set; }
+		/** The same for Import From NPSP: an active NPSP customizable rollup (MIG-08). */
+		@AuraEnabled
+		public Boolean canImportFromNpsp { get; set; }
 		/** Whether instant totals are recalculated in the save rather than after it (U10). */
 		@AuraEnabled
 		public Boolean inSave { get; set; }
@@ -206,12 +209,12 @@ public with sharing class RollupBuilderController {
 	// ----------------------------------------------------------------------------------- reads
 
 	/**
-	 * Whether DLRS has an active rollup to import (R-R16). The model is cacheable, where a
-	 * failure log cannot be written, so a failure here only hides the button.
+	 * Whether DLRS, or NPSP when `npsp` is true, has an active rollup to import (R-R16). The
+	 * model is cacheable, where a failure log cannot be written, so a failure only hides the button.
 	 */
-	private static Boolean canImportFromDlrs() {
+	private static Boolean canImportFrom(Boolean npsp) {
 		try {
-			return RollupDlrs.hasActive();
+			return RollupDlrs.hasActive(npsp);
 		} catch (Exception unreadable) {
 			return false;
 		}
@@ -245,7 +248,8 @@ public with sharing class RollupBuilderController {
 			model.directions = picklist(Rollup_Definition__c.Order_Direction__c);
 			model.modes = picklist(Rollup_Definition__c.Mode__c);
 			model.otherToolNotices = OtherRollupTools.notices();
-			model.canImportFromDlrs = model.canManage && canImportFromDlrs();
+			model.canImportFromDlrs = model.canManage && canImportFrom(false);
+			model.canImportFromNpsp = model.canManage && canImportFrom(true);
 			model.inSave = RollupService.recalculatesInTheSave();
 			model.nightlyTime = RollupScheduler.nightlyTime();
 			model.customPermissions = customPermissionOptions();
