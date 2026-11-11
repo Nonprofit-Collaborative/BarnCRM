@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Field_History_Enabled__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>Whether Field History Keeper keeps changes to the fields chosen as History Field rows (C-68, canonical model R-FH2).</description>
+  <inlineHelpText>Keep the history of the fields you choose on BarnCRM records.</inlineHelpText>
+  <label>Turn On Field History</label>
+  <type>Checkbox</type>
+</CustomField>

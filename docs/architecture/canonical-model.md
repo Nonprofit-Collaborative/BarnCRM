@@ -1321,6 +1321,8 @@ Added by architect review L-08. Each is read by the nightly run's Record Cleanup
 | `Setting_Change_Retention_Days__c` | integer | 730 | Days a Setting Change row is kept (R-S2). From 180 to 3,650. General section. |
 | `Import_History_Retention_Days__c` | integer | 365 | Days a finished import or bulk job (`Import_Batch__c`, with its rows and journal) is kept once its undo window has closed. An import left in Draft, Parsing or Dry run and never committed (an abandoned wizard) is deleted, with its rows, once it is that many days old. From 30 to 3,650. Import section. |
 | `Field_Utilization_Retention_Days__c` | integer | 730 | Days a saved Field Utilization Snapshot row is kept (R-FU7). From 90 to 3,650. Org Optimizer section. |
+| `Field_History_Enabled__c` | boolean | false | Whether Field History Keeper keeps changes to the fields in `History_Field__mdt` (R-FH2). Off on install. Field History section. |
+| `Field_History_Retention_Days__c` | integer | 730 | Days a Field History row is kept before the nightly Record Cleanup step deletes it (R-FH5). From 30 to 3,650; empty reads as 730, out of range as the nearest end. Field History section. |
 
 ### Health Check keys
 
@@ -1610,6 +1612,21 @@ field follows `Merge_Default_Rule__c` until an administrator adds a row.
 | Field Name | `Field_Name__c` | text (80) | A Contact field the merge may change, or `MailingAddress` or `OtherAddress` for a whole address; or, for Generic Record Merge (R-DP11), `Object.Field` naming a field of an object it offers, both without a namespace prefix (`Fund__c.Description__c`). One active row per field; a save is refused for a field that does not exist, cannot be edited, or is the household or owner, and for an object Generic Record Merge does not offer. |
 | Rule | `Rule__c` | picklist(Keep master, Not blank, Most recent, Oldest record, Most complete) | Which value wins (R-DP8). |
 | Active | `Active__c` | boolean, default true | Whether the rule is used. |
+| Is Shipped | `Is_Shipped__c` | boolean, default false | True on a row the package ships; none is shipped. |
+
+### History Field
+
+`History_Field__mdt` (R-FH1; C-68, ADR-NEXT `NEXT-field-history-keeper.md`): one field whose
+changes Field History Keeper keeps. Read directly by the capture, with `getAll()`, so a save
+spends no query on it. Registered with and listed on the custom metadata manager, which saves
+it; nothing is shipped.
+
+| Field | API name | Type | Definition |
+|---|---|---|---|
+| DeveloperName | `DeveloperName` | text | The stable identifier of the row. |
+| Label | `MasterLabel` | text | The field as the page names it. |
+| Field Name | `Field_Name__c` | text (120) | `Object.Field`, both without a namespace prefix (`Gift__c.Amount__c`): a stored field of an object Field History Keeper offers (R-FH1). One active row per field; a save is refused for any other. |
+| Active | `Active__c` | boolean, default true | Whether its changes are kept. |
 | Is Shipped | `Is_Shipped__c` | boolean, default false | True on a row the package ships; none is shipped. |
 
 ### Release Note
@@ -14227,6 +14244,68 @@ and answers as usual, so no answer says who is on file.
 
 ---
 
+## 29FH1. Field History
+
+### Definition
+
+One save's changes to the chosen fields of one record, kept by Field History Keeper (C-68,
+ADR-NEXT `NEXT-field-history-keeper.md`) beyond Salesforce's 20 tracked fields per object and
+18 months, for BarnCRM's own objects.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Record Id | text | yes | The record that changed. |
+| Object | text | yes | Its object, as the trigger names it (no prefix). |
+| Changes | long text | yes | JSON: each chosen field that changed in the save, with its value before and after. |
+| Changed At, Changed By | datetime, user | yes | The row's own created date and creator: the save and the person saving. |
+
+### Rules
+
+**R-FH1 Only BarnCRM's own objects, only chosen fields.** The objects offered are the custom
+objects whose trigger runs through the BarnCRM trigger dispatcher (they appear in the
+Automation Registry), less BarnCRM's own logs. An admin chooses fields as `History_Field__mdt`
+rows on the Custom Metadata page: a stored field (not a formula, roll-up summary, auto number,
+long text area or rich text) of an offered object.
+
+**R-FH2 Captured after the save, never in its way.** While `Field_History_Enabled__c` is on, the
+dispatcher hands each after update of an offered object to Field History Keeper, which compares
+each chosen field's old and new value and writes one row per changed record, in system mode (the
+person saving need not have access to the history object). It respects BarnCRM Automation
+Control: nothing is kept while automation is paused for everyone or the person saving has Bypass
+for me. A failure is logged to the Error Log and never stops the save. Creating and deleting a
+record is not history; Salesforce's own record dates cover them.
+
+**R-FH3 Compact.** One row per record per save, however many fields changed. A text value
+longer than 1,000 characters is kept cut to 1,000 and marked, and cannot be restored.
+
+**R-FH4 Viewed with the record's own access, restored by an admin.** The Field History card
+shows a record's rows only to someone who can read the record, and only the fields they can
+read. Restore (Manage BarnCRM Settings) writes a change's earlier value back onto the record,
+after a confirm, in user mode, so the person's own field access and the object's validation
+apply; the restore is itself a change and is kept.
+
+**R-FH5 Kept for a set time.** The nightly Record Cleanup step deletes rows older than
+`Field_History_Retention_Days__c`.
+
+### Salesforce implementation
+
+- **Object** `Field_History__c` (R-FH1 to R-FH5), auto number Name, private: written in system
+  mode by the capture and read in system mode by the card after the record access check;
+  BarnCRM Admin reads all of them. No tab.
+
+| Attribute | API name | Type | Notes |
+|---|---|---|---|
+| Record Id | `Record_Id__c` | Text(18), external id | Indexed, so a record's rows are found at once. |
+| Object | `Object_Name__c` | Text(80) | The object as the dispatcher names it. |
+| Changes | `Changes__c` | Long Text(131072) | JSON list: `f` field, `o` before, `n` after, `t` true when cut. |
+
+- **Setting Definitions:** `Field_History_Enabled`, `Field_History_Retention_Days`, section
+  Field History.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -14619,6 +14698,7 @@ mirrors the primary member).
 | 1.4 | 2026-11-11 | Forms and Logic Models announce themselves (C-72). No object or field added. Forms ships Setting Definition `Forms_Page` and Logic Models `Logic_Models_Page`: a Component row naming the module, in new console sections Forms and Logic Models, whose Open button opens the module's object tab. `BarnCRM_Module__mdt` `Probe_Object__c` is cleared for Forms and LogicModels, so only Rollup Builder keeps a probe. |
 | 1.5 | 2026-11-11 | Archive by Query (C-67, D-157). No object or field added. New rule R-BD9: a bulk delete whose records are first saved to Files by `FindExportBatch` in archive mode (every readable field, API name headings), the delete started from the export's finish on the same job, only of records not changed since the start (`archive.notChangedAfter` in the definition), and optionally emptied from the Recycle Bin after a second typed count (`archive.emptyRecycleBin`), which R-BD5's undo then refuses. |
 | 1.6 | 2026-11-11 | Generic Record Merge (C-62, D-156; extends ADR-0145). `BarnCRM_Settings__c` gains `Generic_Merge_Enabled__c` (false). `Merge_Rule__mdt` `Field_Name__c` may name `Object.Field`. Rules R-DP11 and R-DP12 added. No object added: merges are written to `Merge_Journal__c`. |
+| 1.7 | 2026-11-11 | Field History Keeper (C-68, D-157; ADR-NEXT `NEXT-field-history-keeper.md`). New Section 29FH1 Field History (`Field_History__c`, rules R-FH1 to R-FH5); custom metadata type `History_Field__mdt` (Section 13); `BarnCRM_Settings__c` gains `Field_History_Enabled__c` (false) and `Field_History_Retention_Days__c` (730). |
 
 ---
 ## 32. Entity ownership by package

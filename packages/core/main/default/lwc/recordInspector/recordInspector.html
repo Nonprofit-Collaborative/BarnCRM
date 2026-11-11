@@ -180,6 +180,13 @@
                 </template>
             </div>
         </lightning-card>
+        <template lwc:if={inspection}>
+            <c-field-history-panel
+                class="slds-show slds-var-m-top_small"
+                record-id={inspection.recordId}
+                data-id="field-history"
+            ></c-field-history-panel>
+        </template>
     </template>
     </template>
 </template>

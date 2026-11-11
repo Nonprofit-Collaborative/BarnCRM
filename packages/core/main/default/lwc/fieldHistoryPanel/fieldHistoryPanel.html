@@ -1,0 +1,83 @@
+<template>
+  <template lwc:if={helpReady}>
+    <template lwc:if={showCard}>
+      <lightning-card title={labels.title} icon-name="standard:record">
+        <lightning-button
+          slot="actions"
+          label={labels.refresh}
+          onclick={handleRefresh}
+          disabled={loading}
+          data-id="refresh"
+        ></lightning-button>
+        <div class="slds-var-p-horizontal_medium slds-is-relative">
+          <template lwc:if={loading}>
+            <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+          </template>
+          <template lwc:if={error}>
+            <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="error" message={error} data-id="error"></c-barn-notice>
+          </template>
+          <template lwc:if={message}>
+            <p class="slds-var-m-bottom_small" role="status" data-id="status">{message}</p>
+          </template>
+          <template lwc:if={hasRows}>
+            <table
+              class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked"
+              data-id="entries"
+            >
+              <thead>
+                <tr class="slds-line-height_reset">
+                  <th scope="col">{labels.changedAt}</th>
+                  <th scope="col">{labels.changedBy}</th>
+                  <th scope="col">{labels.field}</th>
+                  <th scope="col">{labels.before}</th>
+                  <th scope="col">{labels.after}</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <template for:each={rows} for:item="row">
+                  <tr key={row.key} data-id="entry">
+                    <td data-label={labels.changedAt}>
+                      <lightning-formatted-date-time
+                        value={row.changedAt}
+                        year="numeric"
+                        month="short"
+                        day="numeric"
+                        hour="numeric"
+                        minute="2-digit"
+                      ></lightning-formatted-date-time>
+                    </td>
+                    <td data-label={labels.changedBy}>{row.changedBy}</td>
+                    <th scope="row" data-label={labels.field}>{row.label}</th>
+                    <td data-label={labels.before}>{row.beforeText}</td>
+                    <td data-label={labels.after}>
+                      {row.afterText}
+                      <template lwc:if={row.cut}>
+                        <span class="slds-text-color_weak slds-var-m-left_xx-small" data-id="cut">{labels.cut}</span>
+                      </template>
+                    </td>
+                    <td>
+                      <template lwc:if={row.canRestore}>
+                        <lightning-button
+                          label={labels.restore}
+                          data-history={row.historyId}
+                          data-field={row.field}
+                          data-id="restore"
+                          onclick={handleRestore}
+                          disabled={loading}
+                        ></lightning-button>
+                      </template>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </template>
+          <template lwc:elseif={view}>
+            <p data-id="empty">{labels.empty}</p>
+          </template>
+        </div>
+      </lightning-card>
+    </template>
+  </template>
+</template>

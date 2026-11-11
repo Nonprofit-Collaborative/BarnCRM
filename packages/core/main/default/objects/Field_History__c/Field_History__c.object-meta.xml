@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    One save's changes to the chosen fields of one record, kept by Field History Keeper (C-68,
+    canonical model Section 29FH1). Written in system mode by the capture; read on the Field
+    History card only by someone who can read the record. Private: BarnCRM Admin reads all of
+    them. Deleted by the nightly Record Cleanup step after the retention setting.
+  </description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>false</enableReports>
+  <enableSearch>false</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Field History</label>
+  <nameField>
+    <displayFormat>FH-{0000000}</displayFormat>
+    <label>Field History Number</label>
+    <type>AutoNumber</type>
+  </nameField>
+  <pluralLabel>Field History</pluralLabel>
+  <sharingModel>Private</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

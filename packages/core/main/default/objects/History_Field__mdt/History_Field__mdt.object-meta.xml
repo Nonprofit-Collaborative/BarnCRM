@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>One field whose changes Field History Keeper keeps (C-68, canonical model R-FH1), named Object.Field without a namespace prefix. Administrators add, edit and archive rows on the Custom metadata page in BarnCRM Settings; nothing is shipped.</description>
+  <label>History Field</label>
+  <pluralLabel>History Fields</pluralLabel>
+  <visibility>Public</visibility>
+</CustomObject>
