@@ -8588,6 +8588,13 @@ Super Transformer is handed it with the filter. Typed query text reads
 `DISTANCE(f, GEOLOCATION(lat, lon), 'mi') < n` back into `radius` (R-SQ7); a second distance,
 `>`, or another unit is refused.
 
+**R-SQ14 Saved grids** (C-41, C-41b). The document has one more optional key, `grid`:
+`{ version: 1 }` (the document's version stays 1). It marks a saved query saved from the Grid,
+whose `children` (R-SQ8) are the related record tables it shows; Find and the compiler ignore
+the key, so a saved grid runs in Find as the same query. The Grid edits through R-SQ10 (one
+Update data job per save) and saves, shares and deletes through the saved query's own rules
+(R-SQ4 to R-SQ6). No object or field is added.
+
 ### Salesforce implementation
 
 - **Object:** `Saved_Query__c`, sharing model Private.
@@ -8604,8 +8611,8 @@ Super Transformer is handed it with the filter. Typed query text reads
 - **Services:** `QueryCompiler`, `QueryFieldCatalog`, `RollupFilterParser` (bound mode),
   `FindController`, `SavedQuerySharingWriter`; from C-36 `FindInlineEditService` (R-SQ10); from
   C-69 `FindRadius` (R-SQ13) and the static resource `BarnZipCentroids`.
-- **Browser modules:** `findQueryText` (R-SQ7), `xlsxWriter` (R-SQ11), `findCsv`; the component
-  `findRadiusPanel` (R-SQ13).
+- **Browser modules:** `findQueryText` (R-SQ7), `xlsxWriter` (R-SQ11), `findCsv`, `gridModel`
+  (R-SQ14); the components `findRadiusPanel` (R-SQ13), `findPage` and `gridTool` (R-SQ14).
 - **Permission:** custom permission `Find_And_Export_Records`, in `BarnCRM_Admin` and in its own
   permission set `BarnCRM_Find_And_Export`, assignable alone; `BarnCRM_Bulk_Update` and
   `BarnCRM_Bulk_Delete` include all of its grants (ADR-NEXT D5).
@@ -16692,6 +16699,7 @@ mirrors the primary member).
 | 1.18 | 2026-11-11 | Multi-brand management (C-47a to C-47f, D-119, D-120; ADR-NEXT `NEXT-brand-management-and-visibility.md`). New Sections 29BR1 Legal Entity (`Legal_Entity__c`), 29BR2 Brand (`Brand__c`, rules R-BR1 to R-BR8) and 29BR3 Brand Assignment (`Brand_Assignment__c`, rule R-BR9). `BarnCRM_Settings__c` gains `Brand_Management__c` and `Brand_Visibility__c` (both false); `Giving_Settings__c` gains `Receipt_Numbering_Scope__c` (`Organization`). `Brand__c` lookups on `Gift__c`, `Appeal__c`, `Volunteer_Job__c`, `Program__c` and `Portal__c`. |
 | 1.19 | 2026-11-11 | LWC Builder module (LB-01 to LB-06; ADR-NEXT `NEXT-lwc-builder-module.md`, D-120). New Sections 29LB1 Built Component (`Built_Component__c`, rules R-LB1 to R-LB3) and 29LB2 LWC Builder Settings (`LWC_Builder_Settings__c`). Package `packages/lwcbuilder`. |
 | 1.20 | 2026-11-11 | Scholarships and Outbound Grants module (SG-01 to SG-10, PB-06, D-122, D-156; ADR-NEXT `NEXT-scholarships-outbound-grants-module.md`). New package `packages/scholarships`: Award Program (`Award_Program__c`), Award Cycle (`Award_Cycle__c`), Award Application (`Award_Application__c`), Application Review (`Application_Review__c`), Award (`Award__c`), Disbursement (`Award_Payment__c`), Award Requirement (`Award_Requirement__c`) and settings `Scholarships_Settings__c` (29SG1 to 29SG8). |
+| 1.21 | 2026-11-11 | Grid tool and saved grids (C-41, C-41b). No object or field added. Section 29D gains rule R-SQ14: the query document's optional `grid` key, which marks a saved query saved from the Grid. The Grid (`gridTool`, `gridModel`) shows in the Find tab through the `findPage` wrapper and uses Find's own server methods. |
 
 ---
 ## 32. Entity ownership by package
