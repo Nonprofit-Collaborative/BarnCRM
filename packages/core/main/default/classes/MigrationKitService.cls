@@ -9,7 +9,9 @@
  * Core never names another product's schema (ADR-0013, ADR-0062). Runs are read and written in
  * the running administrator's access.
  */
+@NamespaceAccessible
 public with sharing class MigrationKitService {
+	@NamespaceAccessible
 	public static final String KIND_IMPORT = 'import';
 	public static final String KIND_TOOL = 'tool';
 	public static final String NOT_STARTED = 'NotStarted';
@@ -37,23 +39,51 @@ public with sharing class MigrationKitService {
 	}
 
 	/** One step of a kit, as its JSON writes it (R-MK1). */
+	@NamespaceAccessible
 	public class Step {
+		@NamespaceAccessible
 		public String key;
 		public String label;
+		@NamespaceAccessible
 		public String kind;
 		public String help;
 		public String source;
+		@NamespaceAccessible
 		public List<String> fields;
 		public List<Condition> filters;
+		@NamespaceAccessible
+		public List<Link> links;
+		@NamespaceAccessible
 		public String templateKey;
 		public String tab;
 		public String toolLabel;
 	}
 
-	/** One condition of an import step's `filters`: the field equals the value. */
+	/**
+	 * One condition of an import step's `filters`: the field equals the value, or with `op`
+	 * notEquals, does not.
+	 */
 	public class Condition {
 		public String field;
 		public Object value;
+		public String op;
+	}
+
+	/** A column holding a source Id an earlier step moved, to be its BarnCRM record (R-MK1). */
+	@NamespaceAccessible
+	public class Link {
+		@NamespaceAccessible
+		public String column;
+		@NamespaceAccessible
+		public String step;
+	}
+
+	/** A kit a product offers, as the Integrations page names it. */
+	public class KitRef {
+		@AuraEnabled
+		public String key;
+		@AuraEnabled
+		public String label;
 	}
 
 	/** One retire checklist item. */
@@ -143,13 +173,20 @@ public with sharing class MigrationKitService {
 
 	// ------------------------------------------------------------------------------- catalog
 
-	/** The kit key for each product key, for the products whose kit ships in this org. */
-	public static Map<String, String> kitKeysByApp() {
-		Map<String, String> byApp = new Map<String, String>();
+	/** The kits for each product key, in Sort Order, for the products whose kits ship here. */
+	public static Map<String, List<KitRef>> kitsByApp() {
+		Map<String, List<KitRef>> byApp = new Map<String, List<KitRef>>();
 		for (Migration_Kit__mdt kit : catalog()) {
-			if (String.isNotBlank(kit.Source_App__c) && !byApp.containsKey(kit.Source_App__c)) {
-				byApp.put(kit.Source_App__c, kit.DeveloperName);
+			if (String.isBlank(kit.Source_App__c)) {
+				continue;
 			}
+			if (!byApp.containsKey(kit.Source_App__c)) {
+				byApp.put(kit.Source_App__c, new List<KitRef>());
+			}
+			KitRef ref = new KitRef();
+			ref.key = kit.DeveloperName;
+			ref.label = kit.MasterLabel;
+			byApp.get(kit.Source_App__c).add(ref);
 		}
 		return byApp;
 	}
@@ -209,6 +246,11 @@ public with sharing class MigrationKitService {
 		Set<String> keys = new Set<String>();
 		for (Step step : parsed) {
 			Boolean known = step != null && (step.kind == KIND_IMPORT || step.kind == KIND_TOOL);
+			// A link names a column and a step before this one (R-MK1).
+			for (Link link : known && step.links != null ? step.links : new List<Link>()) {
+				known = known && link != null && String.isNotBlank(link.column);
+				known = known && keys.contains(link?.step);
+			}
 			if (!known || String.isBlank(step.key) || !keys.add(step.key)) {
 				throw refusal(
 					BarnHelp.text('Core', 'Core_Migration_ErrorKitUnreadable'),
@@ -401,12 +443,10 @@ public with sharing class MigrationKitService {
 			  whole(batch.Rows_Updated__c) +
 			  whole(batch.Rows_Matched__c);
 		shown.rejected = batch == null ? 0 : whole(batch.Rows_Rejected__c);
-		shown.verified =
-			shown.status == DONE &&
-			checkAgrees &&
-			shown.sourceCount == shown.staged &&
-			shown.staged == shown.loaded &&
-			shown.rejected == 0;
+		// A kit's own check replaces the row counts, which an extension may reshape (R-MR3).
+		Boolean countsAgree =
+			check != null || (shown.sourceCount == shown.staged && shown.staged == shown.loaded);
+		shown.verified = shown.status == DONE && checkAgrees && countsAgree && shown.rejected == 0;
 	}
 
 	private static Integer whole(Decimal value) {
@@ -527,7 +567,8 @@ public with sharing class MigrationKitService {
 		throw refusal(BarnHelp.text('Core', 'Core_Migration_ErrorUnknownStep'), null);
 	}
 
-	/** The named step of a kit, for the staging job. */
+	/** The named step of a kit, for the staging job and a module's kit extension. */
+	@NamespaceAccessible
 	public static Step stepNamed(Migration_Kit__mdt kit, String stepKey) {
 		for (Step step : steps(kit)) {
 			if (step.key == stepKey) {
@@ -537,7 +578,60 @@ public with sharing class MigrationKitService {
 		throw refusal(BarnHelp.text('Core', 'Core_Migration_ErrorUnknownStep'), null);
 	}
 
+	/**
+	 * For the staging job: puts in each linked column the BarnCRM record the earlier step's load
+	 * made from that source Id, found by the Row Key its one row per Id kept (R-MK1, R-IT18). A
+	 * value the earlier step did not load stays, so its lookup finds nothing.
+	 */
+	public static void link(Step step, Id runId, List<Map<String, Object>> rows) {
+		if (step.links == null || rows.isEmpty()) {
+			return;
+		}
+		Map<String, Import_Batch__c> batches = latestBatches(runId);
+		for (Link link : step.links) {
+			Import_Batch__c earlier = batches.get(link.step);
+			Map<String, String> valueByDigest = new Map<String, String>();
+			for (Map<String, Object> row : rows) {
+				String value = cell(row, link.column);
+				if (String.isNotBlank(value)) {
+					valueByDigest.put(
+						ImportRowFilter.digestOfValues(new List<String>{ value }),
+						value
+					);
+				}
+			}
+			if (earlier == null || valueByDigest.isEmpty()) {
+				continue;
+			}
+			Map<String, String> made = new Map<String, String>();
+			// The staged rows are the package's own bookkeeping, read in system mode (ADR-0021).
+			for (Import_Row__c staged : [
+				SELECT Row_Key__c, Gift_Id__c
+				FROM Import_Row__c
+				WHERE
+					Import_Batch__c = :earlier.Id
+					AND Row_Key__c IN :valueByDigest.keySet()
+					AND Gift_Id__c != NULL
+				WITH SYSTEM_MODE
+			]) {
+				made.put(valueByDigest.get(staged.Row_Key__c), staged.Gift_Id__c);
+			}
+			for (Map<String, Object> row : rows) {
+				String value = cell(row, link.column);
+				if (made.containsKey(value)) {
+					row.put(link.column, made.get(value));
+				}
+			}
+		}
+	}
+
+	private static String cell(Map<String, Object> row, String column) {
+		Object value = row.get(column);
+		return value == null ? null : String.valueOf(value);
+	}
+
 	/** The kit by key, whether or not its product is still detected, for the staging job. */
+	@NamespaceAccessible
 	public static Migration_Kit__mdt kitNamed(String kitKey) {
 		for (Migration_Kit__mdt kit : catalog()) {
 			if (kit.DeveloperName == kitKey) {
@@ -658,6 +752,7 @@ public with sharing class MigrationKitService {
 	 * query that reads it in the running user's access, and a record as a staged row keyed by
 	 * the field names as the step writes them. Holds only text, so a batch job can keep it.
 	 */
+	@NamespaceAccessible
 	public class Source {
 		private String objectName;
 		private List<String> written = new List<String>{ 'Id' };
@@ -665,6 +760,7 @@ public with sharing class MigrationKitService {
 		private String whereClause = '';
 		private Map<String, Object> binds = new Map<String, Object>();
 
+		@NamespaceAccessible
 		public Source(Step step) {
 			Schema.SObjectType type = NamespaceUtil.globalDescribe()
 				.get(step.source.trim().replace('.', '__').toLowerCase());
@@ -686,12 +782,13 @@ public with sharing class MigrationKitService {
 				Condition condition : step.filters == null ? new List<Condition>() : step.filters
 			) {
 				String field = path(type, condition == null ? null : condition.field, true);
+				String operator = condition.op == 'notEquals' ? ' != ' : ' = ';
 				if (condition.value == null) {
-					clauses.add(field + ' = null');
+					clauses.add(field + operator + 'null');
 				} else {
 					String name = 'w' + binds.size();
 					binds.put(name, condition.value);
-					clauses.add(field + ' = :' + name);
+					clauses.add(field + operator + ':' + name);
 				}
 			}
 			whereClause = clauses.isEmpty() ? '' : ' WHERE ' + String.join(clauses, ' AND ');
@@ -722,6 +819,7 @@ public with sharing class MigrationKitService {
 		}
 
 		/** Each record as one row, its values as text, keyed by the step's field names. */
+		@NamespaceAccessible
 		public List<Map<String, Object>> rows(List<SObject> records) {
 			List<Map<String, Object>> rows = new List<Map<String, Object>>();
 			for (SObject record : records) {

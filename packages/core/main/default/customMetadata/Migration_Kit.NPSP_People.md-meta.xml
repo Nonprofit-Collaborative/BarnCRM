@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>NPSP People and Addresses</label>
+  <protected>false</protected>
+  <values>
+    <field>Source_App__c</field>
+    <value xsi:type="xsd:string">Nonprofit_Success_Pack</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Adopts your NPSP households in place, then copies NPSP relationships, affiliations and household addresses into BarnCRM. Your contacts and accounts stay the same records. NPSP itself is never changed. Run it before the NPSP giving kits.</value>
+  </values>
+  <values>
+    <field>Steps_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"households","label":"Adopt NPSP Households","kind":"tool","help":"On BarnCRM Settings, General, use Adopt NPSP Households to make your NPSP household accounts BarnCRM households in place. Then come back here and click Mark Done.","tab":"BarnCRM_Settings","toolLabel":"Open BarnCRM Settings"},{"key":"relationships","label":"Relationships","kind":"import","help":"Copies each NPSP relationship once; BarnCRM creates the other side itself.","source":"npe4.Relationship__c","fields":["npe4.Contact__c","npe4.RelatedContact__c","npe4.Type__c","npe4.Status__c","npe4.Description__c"],"filters":[{"field":"npe4.SYSTEM_SystemCreated__c","value":false}],"templateKey":"kit_npsp_relationships"},{"key":"affiliations","label":"Affiliations","kind":"import","help":"Copies each link between a person and an organization, with its role, dates and primary.","source":"npe5.Affiliation__c","fields":["npe5.Contact__c","npe5.Organization__c","npe5.Role__c","npe5.Status__c","npe5.Primary__c","npe5.StartDate__c","npe5.EndDate__c","npe5.Description__c"],"filters":[{"field":"npe5.Contact__c","value":null,"op":"notEquals"},{"field":"npe5.Organization__c","value":null,"op":"notEquals"}],"templateKey":"kit_npsp_affiliations"},{"key":"addresses","label":"Household Addresses","kind":"import","help":"Copies each NPSP household address, seasonal ones included, onto its adopted household.","source":"npsp.Address__c","fields":["npsp.Household_Account__c","npsp.MailingStreet__c","npsp.MailingStreet2__c","npsp.MailingCity__c","npsp.MailingState__c","npsp.MailingPostalCode__c","npsp.MailingCountry__c","npsp.Address_Type__c","npsp.Default_Address__c","npsp.Seasonal_Start_Month__c","npsp.Seasonal_Start_Day__c","npsp.Seasonal_End_Month__c","npsp.Seasonal_End_Day__c","npsp.Verified__c"],"filters":[{"field":"npsp.Household_Account__c","value":null,"op":"notEquals"}],"templateKey":"kit_npsp_addresses"}]</value>
+  </values>
+  <values>
+    <field>Retire_Checklist_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"relationships","text":"In NPSP Settings, Relationships, stop NPSP creating the other side of a relationship (BarnCRM now does it), or deactivate the NPSP relationship trigger handlers under System Tools, Trigger Configuration."},{"key":"affiliations","text":"In NPSP Settings, Affiliations, turn off automatic affiliation creation, so NPSP and BarnCRM do not both add one when a person's organization changes."},{"key":"addresses","text":"In NPSP Settings, Addresses, turn off household address management, so NPSP no longer copies household addresses onto contacts."},{"key":"naming","text":"In NPSP Settings, Households, turn off automatic household naming, so NPSP no longer renames the households BarnCRM now names."}]</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">12</value>
+  </values>
+</CustomMetadata>

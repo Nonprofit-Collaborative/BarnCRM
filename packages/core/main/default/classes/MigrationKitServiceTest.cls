@@ -62,7 +62,12 @@ private class MigrationKitServiceTest {
 		System.runAs(TestUsers.admin()) {
 			useKit(TWO_TOOLS, ONE_ITEM, null);
 			List<IntegrationAppService.AppInfo> apps = IntegrationController.getApps();
-			Assert.areEqual(KIT, apps[0].migrationKit, 'The installed product links its kit');
+			Assert.areEqual(
+				KIT,
+				apps[0].migrationKits[0].key,
+				'The installed product links its kit'
+			);
+			Assert.areEqual('Test Kit', apps[0].migrationKits[0].label, 'Named by its label');
 
 			IntegrationAppService.objectNamesOverride = new Set<String>();
 			Assert.isTrue(IntegrationController.getApps().isEmpty(), 'Not installed: not listed');
@@ -299,6 +304,98 @@ private class MigrationKitServiceTest {
 				MigrationKitService.FAILED,
 				MigrationKitService.importStatus('Undo failed'),
 				'Stuck'
+			);
+		}
+	}
+
+	@IsTest
+	static void aLinkedColumnPointsAtWhatTheEarlierStepMoved() {
+		System.runAs(TestUsers.admin()) {
+			Import_Template__c template = ImportTemplateService.createObjectTemplate(
+				'Migration link test',
+				'Contact'
+			);
+			List<Contact> people = new List<Contact>{
+				new Contact(LastName = 'Source'),
+				new Contact(LastName = 'Moved'),
+				new Contact(LastName = 'Notmoved')
+			};
+			insert people;
+			Migration_Run__c run = new Migration_Run__c(Kit__c = KIT, Status__c = 'In Progress');
+			insert run;
+			Import_Batch__c batch = ImportBatchService.create(
+				template.Id,
+				null,
+				'Earlier step',
+				null,
+				null,
+				null,
+				false
+			);
+			update new Import_Batch__c(
+				Id = batch.Id,
+				Migration_Run__c = run.Id,
+				Migration_Step__c = 'first'
+			);
+			insert new Import_Row__c(
+				Import_Batch__c = batch.Id,
+				Row_Number__c = 2,
+				Status__c = 'Created',
+				Row_Key__c = ImportRowFilter.digestOfValues(
+					new List<String>{ String.valueOf(people[0].Id) }
+				),
+				Gift_Id__c = people[1].Id
+			);
+			MigrationKitService.Step step = (MigrationKitService.Step) JSON.deserialize(
+				'{"key":"second","kind":"import","links":[{"column":"Parent","step":"first"}]}',
+				MigrationKitService.Step.class
+			);
+			List<Map<String, Object>> rows = new List<Map<String, Object>>{
+				new Map<String, Object>{ 'Parent' => String.valueOf(people[0].Id) },
+				new Map<String, Object>{ 'Parent' => String.valueOf(people[2].Id) },
+				new Map<String, Object>{ 'Parent' => '' }
+			};
+
+			MigrationKitService.link(step, run.Id, rows);
+
+			Assert.areEqual(people[1].Id, rows[0].get('Parent'), 'The moved record replaces it');
+			Assert.areEqual(
+				String.valueOf(people[2].Id),
+				rows[1].get('Parent'),
+				'A source record not moved is left, so its lookup finds nothing'
+			);
+			Assert.areEqual('', rows[2].get('Parent'), 'A blank stays blank');
+		}
+	}
+
+	@IsTest
+	static void aLinkToALaterStepAndANotEqualsFilterAreRead() {
+		System.runAs(TestUsers.admin()) {
+			useKit(
+				'[{"key":"one","kind":"tool","tab":"Rollup_Builder",' +
+					'"links":[{"column":"X","step":"two"}]},' +
+					'{"key":"two","kind":"tool","tab":"Rollup_Builder"}]',
+				null,
+				null
+			);
+			Assert.isNotNull(MigrationController.getKit(KIT).problem, 'Links point backwards only');
+
+			insert new List<Contact>{
+				new Contact(FirstName = 'Keep', LastName = LAST_NAME),
+				new Contact(FirstName = 'Drop', LastName = LAST_NAME)
+			};
+			MigrationKitService.Step step = (MigrationKitService.Step) JSON.deserialize(
+				'{"key":"s","kind":"import","source":"Contact","filters":[' +
+					'{"field":"FirstName","value":"Drop","op":"notEquals"},' +
+					'{"field":"LastName","value":"' +
+					LAST_NAME +
+					'"}]}',
+				MigrationKitService.Step.class
+			);
+			Assert.areEqual(
+				1,
+				new MigrationKitService.Source(step).count(),
+				'notEquals leaves the named value out'
 			);
 		}
 	}

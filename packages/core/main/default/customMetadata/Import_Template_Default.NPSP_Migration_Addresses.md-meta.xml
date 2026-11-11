@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>NPSP Migration: Household Addresses</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_npsp_addresses</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the NPSP People and Addresses migration kit, which reads NPSP household addresses in your org: one row per address, on the household found by record ID (adopted in place by the kit's first step), with both street lines, type, default and seasonal months and days.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "columns": [{"source": "npsp.Household_Account__c", "target": "Record.Account__c"}, {"source": "npsp.MailingStreet__c", "target": "Record.Street__c", "transforms": [{"op": "append", "columns": ["npsp.MailingStreet2__c"], "separator": "\n"}]}, {"source": "npsp.MailingCity__c", "target": "Record.City__c"}, {"source": "npsp.MailingState__c", "target": "Record.State__c"}, {"source": "npsp.MailingPostalCode__c", "target": "Record.Postal_Code__c"}, {"source": "npsp.MailingCountry__c", "target": "Record.Country__c"}, {"source": "npsp.Address_Type__c", "target": "Record.Type__c", "transforms": [{"op": "map", "pairs": [{"text": "Home", "value": "Home"}, {"text": "Work", "value": "Work"}, {"text": "Mailing", "value": "Mailing"}, {"text": "Vacation", "value": "Seasonal"}, {"text": "Seasonal", "value": "Seasonal"}], "otherwise": "Other"}, {"op": "ifBlank", "value": "Home"}]}, {"source": "npsp.Default_Address__c", "target": "Record.Is_Default__c"}, {"source": "npsp.Seasonal_Start_Month__c", "target": "Record.Seasonal_Start_Month__c"}, {"source": "npsp.Seasonal_Start_Day__c", "target": "Record.Seasonal_Start_Day__c"}, {"source": "npsp.Seasonal_End_Month__c", "target": "Record.Seasonal_End_Month__c"}, {"source": "npsp.Seasonal_End_Day__c", "target": "Record.Seasonal_End_Day__c"}, {"source": "npsp.Verified__c", "target": "Record.Verification_Status__c", "transforms": [{"op": "map", "pairs": [{"text": "true", "value": "Verified"}], "otherwise": "Unverified"}]}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Address__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

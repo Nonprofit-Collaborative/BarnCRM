@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>PMM Migration: Service Deliveries</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_pmm_service_deliveries</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the PMM migration kit, which reads Program Management Module service deliveries in your org: one row per delivery to a contact, on the service and enrollment the kit's earlier steps made, with date, quantity and attendance.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "columns": [{"source": "pmdm.Contact__c", "target": "Record.Contact__c"}, {"source": "pmdm.Service__c", "target": "Record.Service__c"}, {"source": "pmdm.ProgramEngagement__c", "target": "Record.Enrollment__c"}, {"source": "pmdm.DeliveryDate__c", "target": "Record.Delivery_Date__c"}, {"source": "pmdm.Quantity__c", "target": "Record.Quantity__c", "transforms": [{"op": "ifBlank", "value": "1"}]}, {"source": "pmdm.AttendanceStatus__c", "target": "Record.Attendance__c", "transforms": [{"op": "map", "pairs": [{"text": "Present", "value": "Present"}, {"text": "Excused Absence", "value": "Excused Absence"}, {"text": "Unexcused Absence", "value": "Unexcused Absence"}], "otherwise": "Present"}, {"op": "ifBlank", "value": "Present"}]}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Service_Delivery__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

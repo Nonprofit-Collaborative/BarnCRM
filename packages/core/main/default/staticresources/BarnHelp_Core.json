@@ -1135,6 +1135,7 @@
     "Core_Migration_ShowResults": "Show Results",
     "Core_Migration_StagingFailed": "Reading the records stopped: {0}",
     "Core_Migration_Start": "Start",
+    "Core_Migration_StartKit": "Start Migration: {0}",
     "Core_Migration_StartMigration": "Start Migration",
     "Core_Migration_Started": "Started. It runs in the background: click Refresh to see progress.",
     "Core_Migration_StatusDone": "Done",

@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import IntegrationsPanel from 'c/integrationsPanel';
 import getApps from '@salesforce/apex/IntegrationController.getApps';
 import getKit from '@salesforce/apex/MigrationController.getKit';
+import { setHelpTextForTest } from 'c/barnHelpText';
 
 jest.mock('@salesforce/apex/IntegrationController.getApps', () => ({ default: jest.fn() }), {
   virtual: true
@@ -218,7 +219,7 @@ describe('c-integrations-panel', () => {
 
   it('opens the Migration Assistant in place for a detected app with a kit, and comes back', async () => {
     getApps.mockResolvedValue([
-      app('kit', 'Alternative', true, { migrationKit: 'Test_Kit' }),
+      app('kit', 'Alternative', true, { migrationKits: [{ key: 'Test_Kit', label: 'Test Kit' }] }),
       app('plain', 'Alternative', true)
     ]);
     getKit.mockResolvedValue({ key: 'Test_Kit', label: 'Test Kit', steps: [], checklist: [] });
@@ -237,5 +238,27 @@ describe('c-integrations-panel', () => {
     expect(element.shadowRoot.querySelector('[data-id="assistant"]')).toBeNull();
     expect(row(element, 'kit')).not.toBeNull();
     expect(getApps).toHaveBeenCalledTimes(2);
+  });
+
+  it('shows one button per kit, named by the kit, when a product has several', async () => {
+    getApps.mockResolvedValue([
+      app('many', 'Alternative', true, {
+        migrationKits: [
+          { key: 'Kit_One', label: 'People' },
+          { key: 'Kit_Two', label: 'Gifts' }
+        ]
+      })
+    ]);
+    getKit.mockResolvedValue({ key: 'Kit_Two', label: 'Gifts', steps: [], checklist: [] });
+    setHelpTextForTest({ Core_Migration_StartKit: 'Start Migration: {0}' });
+    const element = await build();
+
+    const buttons = row(element, 'many').querySelectorAll('[data-id="start-migration"]');
+    expect(buttons.length).toBe(2);
+    expect(buttons[0].label).toContain('People');
+    expect(buttons[1].label).toContain('Gifts');
+    buttons[1].click();
+    await settle();
+    expect(element.shadowRoot.querySelector('[data-id="assistant"]').kitKey).toBe('Kit_Two');
   });
 });

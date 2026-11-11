@@ -1700,7 +1700,9 @@ alongside itself until a row's compatibility note says otherwise.
 
 A product with a Migration Kit whose Source App is its DeveloperName, detected in the org,
 shows Start Migration to a person with Manage BarnCRM Settings, which opens the Migration
-Assistant for that kit on the same page (MIG-10, ADR-NEXT migration-assistant decision 9).
+Assistant for that kit on the same page (MIG-10, ADR-NEXT migration-assistant decision 9). A
+product with several kits (for example NPSP: people, giving setup, gifts and rollups, each in
+the module it fills) shows one button per kit, named by the kit's label, in Sort Order.
 
 ### Migration Kit
 
@@ -1727,10 +1729,18 @@ and `kind`, `import` or `tool`, plus optional `help` (one sentence).
   `namespace.Object__c` as Integration App rows do), `fields` (field paths on it, the same
   notation, at most five relationship hops; `Id` is always read), optional `filters` (a list of
   `{"field": "...", "value": ...}` conditions, all of which must hold; a JSON null value means
-  blank) and `templateKey` (the Template Key of a shipped Import Template Default whose column
-  names are the step's field paths as written). Names resolve through describe at run time,
-  trying each dot as a relationship first and then as a namespace separator; a field the org
-  lacks or the person cannot read refuses the step with its name.
+  blank; `"op": "notEquals"` turns a condition into field is not the value, or not blank),
+  optional `links` (below) and `templateKey` (the Template Key of a shipped Import Template
+  Default whose column names are the step's field paths as written). Names resolve through
+  describe at run time, trying each dot as a relationship first and then as a namespace
+  separator; a field the org lacks or the person cannot read refuses the step with its name.
+- `links` is a list of `{"column": "...", "step": "..."}`: the column holds the Id of a source
+  record an earlier import step of the kit moved, and staging puts in its place the BarnCRM
+  record that step's load created or matched (the row's resulting record), so a lookup column
+  mapped by record Id finds it. The earlier step's template must keep one row per `Id`
+  (`"uniqueBy": ["Id"]`, R-IT18), whose Row Key is how the row is found. A value the earlier
+  step did not load is left as it was, so the lookup finds nothing and Lookup Not Found decides.
+  A link naming a step that is not earlier in the kit makes the kit unreadable.
 - A `tool` step adds `tab` (an unprefixed tab API name, for example `Rollup_Builder`) and
   optional `toolLabel` (the button text). The administrator marks it done.
 A kit whose JSON cannot be read is listed with the reason and cannot be started.
@@ -13139,7 +13149,9 @@ done.
 **R-MR3 Verification.** For an import step: source count now, rows staged (Row Count), rows
 committed (Rows Created plus Updated plus Matched) and Rows Rejected; Verified when the first
 three are equal and none was rejected. A kit's extension may return its own source and done
-counts for a step, shown beside these; for a tool step they are the only check. The run is
+counts for a step, shown beside these; for a tool step they are the only check, and for an
+import step they replace the comparison of the first three numbers (an extension may reshape
+rows, so the row counts need not equal the source count), with none rejected still required. The run is
 Complete when every step is done and every checklist item ticked.
 
 **R-MR4 Administrators only, nothing outside BarnCRM changed.** Every action needs Manage BarnCRM
@@ -16138,6 +16150,7 @@ mirrors the primary member).
 | 1.12 | 2026-11-11 | Corporate Hub board governance (CH-09 to CH-20, PB-02; ADR-NEXT `NEXT-corporate-hub-board-governance.md`). New Sections 29CH7 Board (`Board__c`), 29CH8 Board Member (`Board_Member__c`), 29CH9 Board Meeting (`Board_Meeting__c`), 29CH10 Meeting Attendee (`Meeting_Attendee__c`), 29CH11 Board Motion (`Board_Motion__c`), 29CH12 Board Vote (`Board_Vote__c`), 29CH13 Action Item (`Meeting_Action_Item__c`), 29CH14 Board Self-Assessment (`Board_Assessment__c`) and 29CH15 Assessment Answer (`Assessment_Answer__c`). Library Document gains Ask Every Year (`Annual__c`); Policy Acknowledgment gains `Disclosure__c`, `Conflict_Disclosed__c` and `Answered_In_Portal__c` (R-PAK1, R-PAK3, R-PAK4); Corporate Hub Settings gains `Board_Demographics__c` (false). |
 | 1.13 | 2026-11-11 | Donor panel in Quick Gift Entry (G-33). No object or field added. `GiftDonorPanelController` reads, in user mode, the chosen donor's household (through `HouseholdService`), `Total_Giving__c` and `Last_Gift_Date__c`, the last three gifts, and the donor's Active or Paused commitments with each one's next open scheduled payment. Read only; it writes nothing. |
 | 1.14 | 2026-11-11 | Payments module (PAY-01, D-190; ADR-NEXT `NEXT-payments-module.md`). New package `packages/payments`: Payment (`Payment__c`, 29PAY1, R-PAY1 to R-PAY4), Payment Event (`Payment_Event__c`, 29PAY2, R-PEV1 to R-PEV3), Payments Settings (`Payments_Settings__c`, 29PAY3) and Payment Keys (`Payment_Keys__c`, 29PAY4, R-PK1). |
+| 1.15 | 2026-11-11 | Migration kits (MIG-05, MIG-09, MIG-04, MIG-02). No object or field added. R-MK1 gains a filter's `op` (`notEquals`) and a step's `links` (a source Id an earlier step moved becomes the BarnCRM record it made, found by the earlier template's one row per `Id` Row Key, R-IT18). R-MR3: an extension's check on an import step replaces the row count comparison. A product with several kits shows one button per kit. Core ships kit `NPSP_People` with templates `kit_npsp_relationships`, `kit_npsp_affiliations` and `kit_npsp_addresses` (a kit template's key starts `kit_`, so the file-export sample check, for keys starting `npsp_` or `npc_`, leaves it alone). Programs ships kit `PMM_Programs` (programs, cohorts, services, enrollments, service deliveries; templates `kit_pmm_*`, linked by `links`). |
 
 ---
 ## 32. Entity ownership by package

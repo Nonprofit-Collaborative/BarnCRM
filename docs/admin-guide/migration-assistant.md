@@ -13,16 +13,26 @@ off the old app's automations yourself, when you are ready, from the checklist.
 
 A migration from one app is called a **kit**. A kit ships with the BarnCRM module that receives
 the records, and the Assistant offers it only when the app it moves from is installed in your
-org. This release ships two kits, both in BarnCRM Rollup Builder:
+org. These kits ship:
 
-- **DLRS Rollups**: copies your DLRS rollups into Rollup Builder.
-- **NPSP Customizable Rollups**: copies your NPSP customizable rollups into Rollup Builder.
+- **DLRS Rollups** (Rollup Builder): copies your DLRS rollups into Rollup Builder.
+- **NPSP Customizable Rollups** (Rollup Builder): copies your NPSP customizable rollups into
+  Rollup Builder.
+- **NPSP People and Addresses** (Core): adopts NPSP households in place, then copies NPSP
+  relationships, affiliations and household addresses. See
+  [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
+- **PMM Programs and Services** (Programs): copies Program Management Module programs, cohorts,
+  services, program engagements and service deliveries, keeping their links. See
+  [Programs](programs.md#moving-from-pmm).
 
-Later releases add kits for NPSP, Nonprofit Cloud, Volunteers for Salesforce, Program
-Management Module and Outbound Funds. Until then, the import templates in
-[Migrating From NPSP](migrating-from-npsp.md) and
+An app can have several kits, one for each BarnCRM module that receives its records. Its
+listing then shows one **Start Migration** button per kit, each with the kit's name. Run them
+in the order they are listed.
+
+Kits for Volunteers for Salesforce and Outbound Funds follow in later releases. Until a kit
+covers what you need, the import templates in [Migrating From NPSP](migrating-from-npsp.md) and
 [Migrating From Nonprofit Cloud](migrating-from-nonprofit-cloud.md) move those records from a
-file, and [Adopt NPSP Households](npsp-households.md) converts NPSP households in place.
+file.
 
 ## How to Turn It On
 
@@ -135,7 +145,12 @@ A kit is data plus, only when needed, one small class. It needs no change to Cor
      ```
 
      Write a packaged name with a dot where the platform has two underscores, as Integration App
-     records do. A step done in another tool:
+     records do. A filter may add `"op": "notEquals"` (with `"value": null`, the field is not
+     blank). When a column holds the Id of a record an earlier loading step moved (a job's
+     campaign, say), add `"links": [{"column": "ns.Campaign__c", "step": "campaigns"}]`: staging
+     puts the BarnCRM record that step made in its place, so the template maps that column by
+     record Id. The earlier step's template must keep one row per `Id` (`"uniqueBy": ["Id"]`).
+     A step done in another tool:
      `{"key": "copy", "label": "Copy Rollups", "kind": "tool", "tab": "Rollup_Builder", "toolLabel": "Open Rollup Builder"}`.
    - **Retire Checklist**: a JSON array of `{"key": "...", "text": "..."}`, one per automation of
      the old app to switch off, saying where.
@@ -145,7 +160,9 @@ A kit is data plus, only when needed, one small class. It needs no change to Cor
 3. Only if rows need reshaping (one source record to several rows) or a step needs its own
    check, set **Extension Class** to a class implementing `MigrationKitExtension` (Core):
    `rows(stepKey, records)` returns the rows for a page of source records, or null to keep the
-   default; `verify(stepKey)` returns a source count and a done count, or null.
+   default; `verify(stepKey)` returns a source count and a done count, or null. For a loading
+   step, a check the extension returns replaces the comparison of the row counts (reshaped rows
+   need not match the source count); a rejected row still stops **Verified**.
 4. Document the kit in its module's admin guide and add test rows to the Testing Guide.
 
 See ADR-NEXT `NEXT-migration-assistant.md` for the design and the canonical model Section 29ZS

@@ -47,7 +47,11 @@ reversible answer is needed now. Each decision below takes the review's recommen
      Apex, and each record becomes one staged row whose columns are the field names as the step
      writes them. The template maps those columns like any file's, so a kit adds a template and
      no loader. The kit's extension may reshape rows (one source record to several rows, or
-     none).
+     none). A filter may be `notEquals`. A step's `links` name columns holding the Id of a
+     source record an earlier step moved; staging swaps in the BarnCRM record that step's load
+     made, found through the Row Key of the earlier template's one row per `Id` (R-IT18), so a
+     chain such as program, service, enrollment keeps its links with no new field on any
+     BarnCRM object (added with MIG-05 and MIG-09, release 1.9).
    - `tool`: a step done in another BarnCRM tool (Rollup Builder's Import From DLRS, Adopt NPSP
      Households). The Assistant opens the tool's tab and the administrator marks the step done.
    JSON keeps a kit portable (plan 9.9) and lets a kit change without code.
@@ -78,7 +82,8 @@ reversible answer is needed now. Each decision below takes the review's recommen
    that it lacked (NPSP and Nonprofit Cloud Fundraising, both shown only when installed), and,
    for a detected product with a kit, shows Start Migration to people who may manage settings.
    Start Migration opens the Assistant in place on the same page. A listing's status stays In
-   Progress: a migration path is not an integration.
+   Progress: a migration path is not an integration. A product whose records land in several
+   modules (NPSP) has one kit per receiving module, and its listing shows one button per kit.
 10. **No new setting.** The Assistant changes no existing behavior, appears only when a kit's
     source is detected, and does nothing until an administrator starts a step. Every step needs
     Manage BarnCRM Settings and the Import permission the Import engine already checks.

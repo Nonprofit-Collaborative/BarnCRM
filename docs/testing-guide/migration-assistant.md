@@ -85,8 +85,26 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Integrations**. | Under Alternatives to BarnCRM Modules, **Nonprofit Success Pack (NPSP)** shows **Installed in this org**, its compatibility note and **Start Migration**. |
-| 2 | Click **Start Migration**. | **NPSP Customizable Rollups** opens with one step **Copy NPSP Customizable Rollups** and **Open Rollup Builder**. **Verification** counts the active NPSP customizable rollups. |
+| 1 | Open **BarnCRM Settings**, **Integrations**. | Under Alternatives to BarnCRM Modules, **Nonprofit Success Pack (NPSP)** shows **Installed in this org**, its compatibility note and one button per NPSP kit installed, each named **Start Migration:** and the kit's name, in order (**NPSP People and Addresses** first, **NPSP Customizable Rollups** last). |
+| 2 | Click **Start Migration: NPSP Customizable Rollups**. | **NPSP Customizable Rollups** opens with one step **Copy NPSP Customizable Rollups** and **Open Rollup Builder**. **Verification** counts the active NPSP customizable rollups. |
 | 3 | Run [T-RB-49](rollup-builder.md). Come back and click **Refresh**. | **Done** counts the copies turned on. |
 
 **Cleanup:** None.
+
+## T-MIG-07: NPSP People and Addresses Moves Relationships, Affiliations and Addresses
+
+**Purpose:** confirm the NPSP People and Addresses kit runs its steps in order, copies each NPSP relationship once, and verifies.
+**Prerequisites:** the NPSP org of T-MIG-06 with Core deployed; in NPSP, a household with two contacts, Ana and Ben, a Spouse relationship between them (NPSP makes both sides), an affiliation of Ana to an organization **Test Org** as Primary, and a seasonal Vacation address on the household. Admin user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Integrations**, click **Start Migration: NPSP People and Addresses**. | Four steps: **Adopt NPSP Households** (Not Started, with **Open BarnCRM Settings**), then **Relationships**, **Affiliations** and **Household Addresses**, each Waiting. |
+| 2 | Click **Start** on **Relationships**. | Refused: "Finish the steps above this one first." |
+| 3 | Adopt the households ([T-HH-21](people-and-households.md#t-hh-21-adopt-npsp-households)). Come back and click **Mark Done** on the first step. | **Relationships** shows **Start**. |
+| 4 | Click **Start** on **Relationships**, then **Refresh** until **Ready to Review**. Click **Show Results**. | The preview creates 1 relationship (not 2): NPSP's own other side is not read. |
+| 5 | Click **Load** and confirm. **Refresh**. | **Done** and **Verified** (1 in the other app now, 1 read, 1 loaded, 0 rejected). Ana's record shows Ben as **Spouse**, and Ben's shows Ana as **Spouse**, made by BarnCRM. |
+| 6 | Run **Affiliations** and **Household Addresses** the same way. | Each **Verified**. Ana's affiliation to **Test Org** is primary. The household has a **Seasonal** address with the NPSP months and days, and both street lines. |
+| 7 | Click **Undo** on **Household Addresses**, then **Refresh**. | **Undone**; the addresses are gone. **Undo** is not offered on **Affiliations** while a later step is done; after the undo it is. |
+| 8 | Tick every item under **Retire the Old App**. | **Complete** only once every step is done again. NPSP's records are unchanged. |
+
+**Cleanup:** delete the test records, or keep them for the NPSP giving kits.
