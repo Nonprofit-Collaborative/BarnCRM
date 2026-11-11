@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>One migration from another product in the same org into BarnCRM: its ordered steps and the old product's automations to switch off (MIG-01, canonical model Section 13). Shipped by the module that receives the records; offered only when the product named in Source App is detected.</description>
+  <label>Migration Kit</label>
+  <pluralLabel>Migration Kits</pluralLabel>
+  <visibility>Public</visibility>
+</CustomObject>
