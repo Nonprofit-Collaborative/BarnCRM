@@ -65,7 +65,7 @@ Open the **Territory Management** tab (in the BarnCRM admin apps, or from BarnCR
 
 Round Robin also respects a member's capacity: a member at capacity is skipped. When every
 member is full, the record still moves to the territory and keeps its owner; the run counts it
-under **No Room**.
+as "with no member room".
 
 At most 50 active rules for each kind of record. Households are accounts of the household record
 type; organizations are accounts of your organization record type (BarnCRM Settings,
@@ -74,20 +74,24 @@ type; organizations are accounts of your organization record type (BarnCRM Setti
 ## Preview and Assign
 
 1. Press **Preview**. The run reads every person, household and organization in the background
-   and changes nothing. When it finishes the page shows how many records it checked, how many
-   would move, the count for each territory and owner, and up to 50 example changes.
-2. If the preview looks right, press **Assign**. It reads the records again and moves them, as
-   you. Records already in their territory are left alone, owner included. A record no rule
-   matches keeps the territory it has.
-3. The run's card shows what moved and how many records the save refused (for example because
+   and changes nothing. Press **Refresh** until it is done: its line under **Recent Runs** shows
+   how many records it checked and how many would move. **Show Details** lists the count for
+   each territory (and how many found no member with room) and up to 50 example changes, each
+   with its new owner.
+2. If the preview looks right, press **Assign** and confirm. It reads the records again and
+   moves them, as you. Records already in their territory are left alone, owner included. A
+   record no rule matches keeps the territory it has.
+3. The run's line shows what moved and how many records the save refused (for example because
    of a validation rule). Refused records are listed in Data Manager, **Data Jobs**, under the
    run's job.
 
-Only one run happens at a time.
+Tick **Only records with no territory** before Preview or Assign to leave records that already
+have a territory alone. Only one run happens at a time, and a kind of record with more than 50
+active rules is refused (the page warns first).
 
 ## Undo
 
-Every Assign run is one data job, operation Update. **Undo** on the run's card (or the job's
+Every Assign run is one data job, operation Update. **Undo** on the run's line (or the job's
 **Undo** in Data Manager, **Data Jobs**) puts back each record's territory and owner, except on
 records someone has changed since. Undo is available for the data jobs' undo window, as for any
 bulk update.

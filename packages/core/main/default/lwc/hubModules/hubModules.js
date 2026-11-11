@@ -36,7 +36,8 @@ function logoUrl(name) {
 const FALLBACK_TABS = {
   Portal: 'Portal__c',
   ContactPoints: 'Contact_Point_Sync',
-  CorporateHub: 'Corporate_Hub'
+  CorporateHub: 'Corporate_Hub',
+  Territory: 'Territory_Management'
 };
 const DEFAULT_ICON = 'standard:apps';
 

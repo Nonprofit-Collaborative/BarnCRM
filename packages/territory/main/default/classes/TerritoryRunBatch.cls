@@ -489,9 +489,20 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 				places.add(new Territory__c(Id = territoryId, Next_Member__c = pool.next));
 			}
 		}
+		Set<Id> owners = new Set<Id>();
+		for (Map<String, Object> entry : totals.sample) {
+			if (entry.get('owner') != null) {
+				owners.add((Id) entry.get('owner'));
+			}
+		}
+		Map<Id, User> users = new Map<Id, User>(
+			[SELECT Id, Name FROM User WHERE Id IN :owners WITH SYSTEM_MODE]
+		);
 		for (Map<String, Object> entry : totals.sample) {
 			entry.put('fromName', nameOf(territories, entry.get('from')));
 			entry.put('toName', nameOf(territories, entry.get('to')));
+			User owner = entry.get('owner') == null ? null : users.get((Id) entry.get('owner'));
+			entry.put('ownerName', owner?.Name);
 		}
 		if (!places.isEmpty()) {
 			Database.update(places, false, AccessLevel.SYSTEM_MODE);

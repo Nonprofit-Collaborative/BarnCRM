@@ -33,7 +33,7 @@ households and organizations with addresses).
 |---|---|---|
 | 1 | Create territory **Boston**, priority 10, Keep Owner, with a People rule: Mailing Postal Code starts with 021. Press **Check Rule**. | A count of people whose postal code starts with 021. |
 | 2 | Create territory **Everyone Else**, priority 900, Keep Owner, with a People rule and no conditions. | Saved. |
-| 3 | Press **Preview** and wait for it to finish. | Checked equals the number of people, households and organizations; the Boston count matches step 1; Everyone Else has the rest of the people; households and organizations are not moved (no rule). |
+| 3 | Press **Preview**, press **Refresh** until its line under **Recent Runs** reads Done, and press **Show Details**. | Checked equals the number of people (only kinds with a rule are read); the Boston count matches step 1; Everyone Else has the rest of the people; households and organizations are not moved (no rule). |
 | 4 | Open a Boston person. | Territory is still empty: Preview changed nothing. |
 
 **Cleanup:** None (T-TM-03 uses the territories).
@@ -61,10 +61,10 @@ households and organizations with addresses).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Set Boston's routing to **Round Robin** and add members User A and User B. Press **Preview**. | The Boston count is split about evenly between User A and User B. |
+| 1 | Set Boston's routing to **Round Robin** and add members User A and User B. Press **Preview**, then **Show Details** on its line. | The example changes name User A and User B in turn as the new owner. |
 | 2 | Press **Assign**. | Boston people are owned alternately by User A and User B. |
-| 3 | Undo the run. Set Boston to **Capacity**, User A capacity 2, User B blank. Preview. | User A gets 2 at most (less if they already own Boston people); User B gets the rest. |
-| 4 | Set User B's capacity to 1 and Preview again. | Records past both capacities are counted under No Room and keep their owner. |
+| 3 | Undo the run. Set Boston to **Capacity**, User A capacity 2, User B blank. Preview. | In the example changes, User A gets 2 at most (less if they already own Boston people); User B gets the rest. |
+| 4 | Set User B's capacity to 1 and Preview again. | Boston's line in **Show Details** counts the records past both capacities as "with no member room"; their example changes read "owner unchanged". |
 | 5 | Set Boston to **Territory Owner** with User A as territory owner, and Preview. | Every Boston change names User A. |
 
 **Cleanup:** Undo any Assign runs.

@@ -94,6 +94,9 @@ public with sharing class SettingSections {
 	/** The Corporate Hub module's reminder and acknowledgment settings. */
 	@NamespaceAccessible
 	public static final String CORPORATE_HUB = 'Corporate Hub';
+	/** The Territory Management module's row, which opens its Territory Management tab. */
+	@NamespaceAccessible
+	public static final String TERRITORY = 'Territory Management';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -117,6 +120,7 @@ public with sharing class SettingSections {
 			FORMS,
 			PORTALS,
 			CORPORATE_HUB,
+			TERRITORY,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,

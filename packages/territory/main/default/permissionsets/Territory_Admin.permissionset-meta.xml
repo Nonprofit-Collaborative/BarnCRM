@@ -141,4 +141,8 @@
     <object>Territory__c</object>
     <viewAllRecords>true</viewAllRecords>
   </objectPermissions>
+  <tabSettings>
+    <tab>Territory_Management</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
 </PermissionSet>
