@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Eligibility_Rules__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Optional rules checked against the application form's answers, as JSON. See the Scholarships admin guide.</inlineHelpText>
+  <label>Eligibility Rules</label>
+  <length>32768</length>
+  <required>false</required>
+  <visibleLines>4</visibleLines>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+</CustomField>
