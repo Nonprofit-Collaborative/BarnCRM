@@ -8,6 +8,7 @@ import volunteer from '../templates/volunteer.json';
 import speaker from '../templates/speaker.json';
 import donor from '../templates/donor.json';
 import board from '../templates/board.json';
+import member from '../templates/member.json';
 
 const PACKAGES = path.join(__dirname, '..', '..', 'packages');
 const BUILT_IN = ['Id', 'Name', 'CreatedDate'];
@@ -44,12 +45,14 @@ const FOLDERS = {
   Volunteers: 'volunteers',
   Events: 'events',
   Giving: 'giving',
-  CorporateHub: 'corporatehub'
+  CorporateHub: 'corporatehub',
+  Memberships: 'memberships'
 };
 const ACTION_CLASSES = {
   Volunteers: 'volunteers/main/default/classes/VolunteersPortalExtension.cls',
   Events: 'events/main/default/classes/EventsPortalExtension.cls',
-  CorporateHub: 'corporatehub/main/default/classes/CorporateHubPortalExtension.cls'
+  CorporateHub: 'corporatehub/main/default/classes/CorporateHubPortalExtension.cls',
+  Memberships: 'memberships/main/default/classes/MembershipsPortalExtension.cls'
 };
 
 function fieldFile(objectName, field) {
@@ -80,7 +83,8 @@ function cases() {
     ['volunteer', volunteer],
     ['speaker', speaker],
     ['donor', donor],
-    ['board', board]
+    ['board', board],
+    ['member', member]
   ].forEach(([name, template]) => {
     template.pages.forEach((page) => out.push([name + ' ' + page.key, template, page]));
   });
@@ -92,7 +96,8 @@ describe('shipped portal templates', () => {
     ['volunteer', volunteer],
     ['speaker', speaker],
     ['donor', donor],
-    ['board', board]
+    ['board', board],
+    ['member', member]
   ])('%s passes the shape rules and names its module', (name, template) => {
     expect(checkTemplate(template)).toEqual([]);
     expect(template.key).toBe(name);
@@ -192,7 +197,7 @@ describe('shipped portal templates', () => {
   });
 
   it('every module action a template names is offered by its module class', () => {
-    [volunteer, speaker, board].forEach((template) => {
+    [volunteer, speaker, board, member].forEach((template) => {
       const source = fs.readFileSync(
         path.join(PACKAGES, ACTION_CLASSES[template.requiresModules[0]]),
         'utf8'
@@ -210,6 +215,18 @@ describe('shipped portal templates', () => {
         .filter((f) => f.edit)
         .forEach((f) => expect(f.field).not.toMatch(/Vote__c|Minutes|Status__c|Attendance__c/));
     });
+  });
+
+  it('the member directory lists only members who opted in, and edits nothing', () => {
+    const directory = member.pages.find((page) => page.key === 'directory');
+    expect(directory.kind).toBe('catalog');
+    expect(directory.search).toBe(true);
+    expect(directory.where).toContainEqual({
+      field: 'Directory_Opt_In__c',
+      op: 'equals',
+      value: 'true'
+    });
+    expect(directory.fields.map((f) => f.field)).not.toContain('Contact__c');
   });
 
   it('titles and labels are in title case', () => {

@@ -158,6 +158,9 @@ A template is JSON in the portal's Template field. The sample in
 - **actions**: `update`, `create` (related pages: the person field is set for them), or a module's
   action such as `{ "extension": "Volunteers.SignUp", "label": "Sign Up" }` where that module offers
   it.
+- **search**: `true` shows a search box above the page's records that hides those not matching
+  every word typed. It filters only the records already shown (up to the page's `limit`), so it
+  never reads anything the page would not.
 - **requiresModules** lists module keys the portal needs; while one is not installed and on, the
   portal is unavailable.
 
@@ -179,6 +182,12 @@ marked `edit` can be changed. The portal's API user needs no access to any of th
 | Speaker Portal | `speaker.json`, Event Management | Events Open for Proposals (Propose a Talk), Open Proposals (edit, Withdraw), All My Proposals, My Sessions, My Speaker Details, My Details |
 | Donor Portal | `donor.json`, Giving | My Giving, Gift History, Pledges and Recurring Gifts, Receipts, My Contact Details |
 | Board Portal | `board.json`, Corporate Hub | My Meetings (I Have Read the Packet), Minutes (Approve Minutes), My Votes (Vote For, Vote Against, Abstain), Disclosures and Policies (edit, I Have Read and Acknowledge), Board Self-Assessment (edit), Meeting Availability (edit), My Board Seats, My Details |
+| Member Portal | `member.json`, Memberships | My Membership (Pay Dues), My Directory Listing (edit: show me to other members, where I am, about me), Member Directory (searchable) |
+
+**Member.** Pay Dues emails the member a payment link for the membership's dues, once Payments
+is ready (see [Memberships](memberships.md)). The Member Directory lists current members who
+chose to be shown, with only their name, level, location and bio, and has a search box. A member
+is never listed until they turn on Show Me to Other Members on My Directory Listing.
 
 **Volunteer.** Sign Up adds the person to an open shift that has room and has not started, once
 per shift (a cancelled sign-up is reopened). Cancel Sign-Up works until the shift starts. A new
