@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>V4S Migration: Sign-Ups</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_v4s_signups</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the Volunteers for Salesforce migration kit, which reads V4S volunteer hours that are not completed (sign-ups, confirmations, no-shows, cancellations): one sign-up per entry, for the same contact, on the shift the kit made.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "columns": [{"source": "GW_Volunteers.Contact__c", "target": "Record.Contact__c"}, {"source": "GW_Volunteers.Volunteer_Shift__c", "target": "Record.Volunteer_Shift__c"}, {"source": "GW_Volunteers.Status__c", "target": "Record.Status__c", "transforms": [{"op": "map", "pairs": [{"text": "Confirmed", "value": "Confirmed"}, {"text": "Web Sign Up", "value": "Signed up"}, {"text": "Prospect", "value": "Signed up"}, {"text": "No-Show", "value": "No show"}, {"text": "Canceled", "value": "Cancelled"}, {"text": "Cancelled", "value": "Cancelled"}], "otherwise": "Signed up"}, {"op": "ifBlank", "value": "Signed up"}]}, {"source": "GW_Volunteers.Comments__c", "target": "Record.Notes__c"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Volunteer_Signup__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

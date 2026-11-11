@@ -921,6 +921,39 @@ To import, a person needs the BarnCRM Admin role (for the Import tab) and a Volu
 that enters hours (Team Member, Coordinator or Admin), since the load runs with that person's
 own permissions.
 
+## Moving From V4S
+
+When Volunteers for Salesforce (V4S) is installed in the same org, the
+[Migration Assistant](migration-assistant.md) offers the **V4S Jobs, Shifts and Hours** kit:
+open **BarnCRM Settings**, **Integrations**, find **Volunteers for Salesforce** and select
+**Start Migration**. It reads V4S in your org and never changes it. Your volunteers stay the same
+Contact records, so nothing about the people is copied.
+
+Run the four steps in order. Each one previews, loads, can be checked against the V4S count and
+undone, like any import.
+
+| Step | Reads from V4S | Makes in BarnCRM |
+|---|---|---|
+| Volunteer Jobs | Every Volunteer Job | A Volunteer Job with the same name and description; Location is the V4S street and city; Active is the opposite of V4S Inactive. |
+| Volunteer Shifts | Every Volunteer Shift | A shift on the job the first step made. Start is the V4S start; End is the start plus the V4S Duration (one hour when blank); Volunteers Needed is the V4S Desired Number (1 when blank). A shift already started is Completed, any other is Open. |
+| Sign-Ups | V4S hours that are not Completed and are on a shift | A sign-up of the same contact on the shift the second step made. Confirmed stays Confirmed; Web Sign Up and Prospect become Signed up; No-Show becomes No show; Canceled becomes Cancelled. Comments become Notes. |
+| Completed Hours | V4S hours that are Completed | Hours of the same contact on the job and shift the kit made, with Date Worked from the V4S start date, Hours from Hours Worked and Notes from Comments. |
+
+**Hours and approval.** A load cannot approve hours while **Hours require approval** is on (the
+default), so completed V4S hours arrive **Submitted** and wait in **Approve Hours**. To bring
+them in already approved, turn the setting off in the Volunteers section of BarnCRM Settings for
+the Completed Hours step, then turn it back on.
+
+**What can be rejected.** A V4S entry with no contact, completed hours of zero, or a second
+sign-up of the same person on the same shift is rejected and listed with the reason, so you can
+fix it in V4S and load the step again. Completed V4S hours do not also become Attended sign-ups,
+so nothing is counted twice.
+
+**Not moved.** V4S recurring schedules (Job Recurrence Schedules and Volunteer Recurrence
+Schedules), the V4S site pages, and V4S settings. Set up [Recurring Shifts](#recurring-shifts)
+and the [Public Sign-Up Page](#public-sign-up-page) in BarnCRM instead; the kit's checklist lists
+what to switch off in V4S.
+
 ## Common Mistakes
 
 **Importing hours twice.** Each row becomes a new entry whether or not an identical one exists.

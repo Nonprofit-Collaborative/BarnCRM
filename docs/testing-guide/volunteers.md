@@ -469,3 +469,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 | 9 | On the real link, pick availability days and an emergency contact name and send. | C's Availability Days and Emergency Contact Name now hold those values. |
 
 **Cleanup:** untick **Show on Public Page**; clear the profile form setting; delete the test sign-ups.
+
+## T-VOL-31: Moving From V4S With the Migration Kit
+
+**Purpose:** confirm the V4S Jobs, Shifts and Hours kit copies jobs, shifts, sign-ups and completed hours, keeps which job and shift each belongs to, and never changes V4S.
+**Prerequisites:** admin; an org with Volunteers for Salesforce installed (a scratch or test org, never production); in V4S, a job J with street and city, two shifts on J (one past with Duration 3, one future with no Duration), a Confirmed and a No-Show hours entry on the future shift, and a Completed hours entry of 2.5 hours on the past shift, each for an existing contact; **Hours require approval** on.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open **BarnCRM Settings**, **Integrations**. | Volunteers for Salesforce shows **Installed in this org** and a **Start Migration** button. |
+| 2 | Select **Start Migration**, then preview and load **Volunteer Jobs**. | One job named as J, Location "street, city", Active. **Check this step** matches. |
+| 3 | Load **Volunteer Shifts**. | Two shifts on the new job: the past one ends three hours after its start and is Completed; the future one ends one hour after its start and is Open. |
+| 4 | Load **Sign-Ups**. | Two sign-ups on the new future shift: Confirmed and No show, for the same contacts. No Attended sign-up and no hours are made. |
+| 5 | Load **Completed Hours**. | One hours entry of 2.5 for the contact on the new job and past shift, Submitted, listed in **Approve Hours**. |
+| 6 | Open the V4S records. | Nothing in V4S changed. |
+| 7 | Undo **Completed Hours**, turn **Hours require approval** off, load the step again. | The entry is Approved. Turn the setting back on. |
+| 8 | Read the kit's checklist. | It names the V4S site pages, recurring schedules, tabs and permission sets, and uninstalling. |
+
+**Cleanup:** undo the four steps in reverse order.

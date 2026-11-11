@@ -21,12 +21,14 @@ org. These kits ship:
 - **NPSP People and Addresses** (Core): adopts NPSP households in place, then copies NPSP
   relationships, affiliations and household addresses. See
   [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
+- **V4S Jobs, Shifts and Hours** (Volunteers): copies Volunteers for Salesforce jobs, shifts,
+  sign-ups and completed hours. See [Volunteers](volunteers.md#moving-from-v4s).
 
 An app can have several kits, one for each BarnCRM module that receives its records. Its
 listing then shows one **Start Migration** button per kit, each with the kit's name. Run them
 in the order they are listed.
 
-Kits for Volunteers for Salesforce and Outbound Funds follow in later releases. Until a kit
+A kit for Outbound Funds follows in a later release. Until a kit
 covers what you need, the import templates in [Migrating From NPSP](migrating-from-npsp.md) and
 [Migrating From Nonprofit Cloud](migrating-from-nonprofit-cloud.md) move those records from a
 file.
