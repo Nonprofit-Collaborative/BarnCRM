@@ -13,6 +13,7 @@
  */
 public with sharing class RollupNpsp implements RollupDlrs.Reader {
 	private static final String PREFIX = 'npsp__';
+	private static final String GIFT_OBJECT = 'Opportunity'; // detection-only: compared with the Detail Object name NPSP stores; nothing reads Opportunity
 	private static final List<String> ROLLUP_FIELDS = new List<String>{
 		'Active',
 		'Description',
@@ -224,7 +225,7 @@ public with sharing class RollupNpsp implements RollupDlrs.Reader {
 		}
 		if (
 			'Contact'.equalsIgnoreCase(definition.parentObject) &&
-			'Opportunity'.equalsIgnoreCase(detail)
+			GIFT_OBJECT.equalsIgnoreCase(detail)
 		) {
 			throw unsupported(BarnHelp.text('Rollups', 'Core_RollupNpsp_ReasonContact'), null);
 		}
