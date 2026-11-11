@@ -313,6 +313,15 @@ export const PAGE_TEXT = Object.freeze({
   get register() {
     return helpText('Forms', 'Forms_Public_PageRegister');
   },
+  get toCheckout() {
+    return helpText('Forms', 'Forms_Public_ToCheckout');
+  },
+  get paymentDone() {
+    return helpText('Forms', 'Forms_Public_PaymentDone');
+  },
+  get paymentCancelled() {
+    return helpText('Forms', 'Forms_Public_PaymentCancelled');
+  },
   timeRange(start, end) {
     return helpText('Forms', 'Forms_Public_PageTimeRange', start, end);
   }

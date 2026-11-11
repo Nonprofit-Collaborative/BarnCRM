@@ -4410,6 +4410,8 @@ object means something specific and is unavailable on Platform licenses.
 | Active | boolean | yes (defaults true) | Whether the appeal is offered when entering a new gift. |
 | Net Raised | decimal | computed | Total raised less cost, calculated live from the two values. |
 | Percent To Goal | decimal | computed | Total raised as a share of goal, calculated live, empty when no goal is set. The Percent formula returns the plain ratio (0.5 for half) and Salesforce displays it as 50%. |
+| Donation Page | boolean | yes (defaults false) | Whether the appeal has a public online donation page (G-34, R-AP5). |
+| Donation Form Key | text (18) | no | The Forms form donors fill in on the donation page, by record identifier (ADR-0014). |
 
 ### Relationships
 
@@ -4438,6 +4440,14 @@ recalculation.
 Mirror (plan Section 4.12): the Campaign ID attribute and the one-way copy of Section 29B,
 both shipped by the Mirror package, so Giving itself never names Campaign.
 
+**R-AP5 Online donation page** (G-34, ADR-NEXT `NEXT-online-donation-pages.md`). An active
+appeal with Donation Page on and a Donation Form Key naming a published public form has a public
+page served by Forms (`<site>/FormsPublic?record=<appeal>`). The page shows the name,
+description and goal only. Sending the form starts a hosted checkout through Payments with the
+answer `amount`; the gift (Donor Contact the person Forms matched, Appeal, Payment Reference the
+payment's identifier) is Pending until Payments reports Paid (Received), Refunded (Refunded) or
+Cancelled (Cancelled), whichever of form processing and the payment report comes last.
+
 ### Salesforce implementation
 
 - **Object:** `Appeal__c`.
@@ -4455,6 +4465,8 @@ both shipped by the Mirror package, so Giving itself never names Campaign.
 | Net Raised | `Net_Raised__c` | Formula (Currency) |
 | Percent To Goal | `Percent_To_Goal__c` | Formula (Percent) |
 | Sample Data | `Sample_Data__c` | Checkbox (v0.4) |
+| Donation Page | `Donation_Page__c` | Checkbox, default false (G-34) |
+| Donation Form Key | `Donation_Form_Key__c` | Text(18) (G-34) |
 
 Rollup target attributes on `Appeal__c` are listed in Section 26.
 
@@ -17250,6 +17262,7 @@ mirrors the primary member).
 | 1.22 | 2026-11-11 | Territory Management module (C-40, C-40b; ADR-NEXT `NEXT-territory-management-module.md`). New Sections 29TM1 Territory (`Territory__c`, with the Territory lookup `Territory__c` on Account and Contact), 29TM2 Territory Rule (`Territory_Rule__c`), 29TM3 Territory Member (`Territory_Member__c`) and 29TM4 Territory Run (`Territory_Run__c`); rules R-TM1 to R-TM4. |
 | 1.23 | 2026-11-11 | Memberships module (G-22a to G-22d, PAY-02, PB-09; D-157, D-190; ADR-NEXT `NEXT-memberships-module.md`). New package `packages/memberships`: Membership Level (`Membership_Level__c`, 29MEM1), Membership Benefit (`Membership_Benefit__c`, 29MEM2), Membership Term (`Membership_Term__c`, 29MEM3, R-MEM1 to R-MEM9) and Memberships Settings (`Memberships_Settings__c`, 29MEM4). No Contact or Account field, and no object named like Memberships Essentials' membership object, so both deploy together. |
 | 1.24 | 2026-11-11 | Event Management paid registration, session proposals, badge overrides and session ratings (EV-20, EV-21, EV-26, EV-27, D-190; ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`). New Sections 29EV27 Session Rating (`Session_Rating__c`, R-SRT1 to R-SRT3) and 29EV30 Proposal Presenter (`Proposal_Presenter__c`, R-PP1). `Event__c` gains `Review_Criteria__c`, `Blind_Review__c` and `Session_Rating_Form_Key__c`; `Event_Session__c` gains `Rating_Count__c`, `Rating_Total__c` and `Average_Rating__c`; `Event_Registration__c` gains status Pending Payment and `Payment_Status__c`, `Amount_Paid__c`, `Payment_Key__c` and `Payment_Link__c` (R-ERG5 to R-ERG7); `Event_Attendee__c` gains `Badge_Name__c`, `Badge_Title__c` and `Badge_Company__c` (R-EAT4); `Speaker_Application__c` gains `Weighted_Total__c` and `Weighted_Average__c` and `Review_Count__c` counts scored reviews only; `Speaker_Review__c` gains `Criteria_Scores__c` and `Weighted_Score__c` and `Score__c` is no longer required (R-SA6 to R-SA9); `Events_Settings__c` gains `Online_Payments__c` (false) and `Payment_Link_Template__c` (`BarnCRM_Event_Payment_Link`). Events reaches Payments only by name (`PaymentsApi`, `EventPaymentListener`). |
+| 1.26 | 2026-11-11 | Online donation pages (G-34; ADR-NEXT `NEXT-online-donation-pages.md`). Appeal (Section 21) gains Donation Page (`Donation_Page__c`, Checkbox) and Donation Form Key (`Donation_Form_Key__c`, Text(18)); rule R-AP5. Core gains the interface `PublicCheckoutExtension` and lists `GivingDonationPage` in `PublicPageExtensions` and `FormAttachmentExtensions`; no Core object or field is added. |
 
 ---
 ## 32. Entity ownership by package

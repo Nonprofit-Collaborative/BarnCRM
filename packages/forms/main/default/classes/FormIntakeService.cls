@@ -87,7 +87,13 @@ public without sharing class FormIntakeService {
 		/** The problem code of each refused answer, by field key (Invalid only). */
 		@AuraEnabled
 		public Map<String, String> problems = new Map<String, String>();
+		/** The processor's hosted checkout to send the person to, when the page takes a payment. */
+		@AuraEnabled
+		public String checkoutUrl;
 	}
+
+	/** The reserved answer key that keeps a page's payment with its submission (G-34). */
+	public static final String PAYMENT_KEY = '_payment';
 
 	/** The form to fill in, or null when it is not published or not public. */
 	public static PublicForm load(Id formId) {
@@ -223,6 +229,9 @@ public without sharing class FormIntakeService {
 			receipt.status = INVALID;
 			return receipt;
 		}
+		if (!startCheckout(contextId, counted, receipt)) {
+			return receipt;
+		}
 		Form_Submission__c submission = new Form_Submission__c(
 			Form__c = version.Form__c,
 			Form_Version__c = version.Id,
@@ -238,6 +247,39 @@ public without sharing class FormIntakeService {
 		receipt.status = RECEIVED;
 		receipt.message = FormPublicPolicy.confirmation(definition);
 		return receipt;
+	}
+
+	/**
+	 * Asks the module whose page the form was sent from for a hosted checkout, before anything is
+	 * stored, since its payment callout must come first (ADR-NEXT `NEXT-online-donation-pages.md`,
+	 * decision 3). The payment is kept in the answers under `_payment`. A failure stores nothing
+	 * and answers Failed, so the person can send again. False when the answers must not be stored.
+	 */
+	private static Boolean startCheckout(
+		Id contextId,
+		Map<String, Object> counted,
+		Receipt receipt
+	) {
+		if (contextId == null) {
+			return true;
+		}
+		try {
+			String base = resumeBase();
+			Map<String, Object> started = PublicPageExtensions.startCheckout(
+				contextId,
+				counted,
+				base == null ? null : base + '/FormsPublic?record=' + contextId
+			);
+			if (started != null) {
+				counted.put(PAYMENT_KEY, String.valueOf(started.get('paymentId')));
+				receipt.checkoutUrl = String.valueOf(started.get('checkoutUrl'));
+			}
+			return true;
+		} catch (Exception e) {
+			ErrorLogger.log(e, CONTEXT + '.startCheckout', contextId);
+			receipt.status = FAILED;
+			return false;
+		}
 	}
 
 	/**
