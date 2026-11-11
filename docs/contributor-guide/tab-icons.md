@@ -81,6 +81,7 @@ Rules:
 | portal | Portal__c | Custom47: Knight |
 | corporatehub | Agreement__c | Custom93: ShoppingCart |
 | corporatehub | Compliance_Obligation__c | Custom97: Thermometer |
+| corporatehub | Corporate_Hub | Custom72: Helicopter |
 | corporatehub | Hub_Document__c | Custom49: CD/DVD |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |

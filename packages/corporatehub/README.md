@@ -33,5 +33,9 @@ general guidance, not legal advice.
 - Static resources: `BarnCorporateHubTemplates` (the template set: obligations Off, policies
   Draft) and `BarnHelp_CorporateHub` (help and message text).
 - Custom notification type `Corporate_Hub_Reminder` (the bell reminders).
-- Tabs: Library Documents, Compliance Obligations and Agreements. No app of its own (ADR-0192):
+- Lightning components: `corporateHubHome` (the Corporate Hub page), `hubDocumentPanel` (the
+  Policy panel), `hubCompleteCycle` (the Compliance panel) and the framework-free
+  `corporateHubModel`; record pages `Hub_Document_Record_Page` and
+  `Compliance_Obligation_Record_Page`, set as each object's default.
+- Tabs: Corporate Hub, Library Documents, Compliance Obligations and Agreements. No app of its own (ADR-0192):
   the tabs join BarnCRM and BarnCRM Console through the catalog row's `Staff_Tabs__c`.

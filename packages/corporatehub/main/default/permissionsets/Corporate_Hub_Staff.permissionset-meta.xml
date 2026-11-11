@@ -251,6 +251,10 @@
     <viewAllRecords>false</viewAllRecords>
   </objectPermissions>
   <tabSettings>
+    <tab>Corporate_Hub</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Hub_Document__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>

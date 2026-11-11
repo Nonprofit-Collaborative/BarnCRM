@@ -35,7 +35,8 @@ function logoUrl(name) {
 // Portal Builder its Portals tab, Contact Point Sync its page tab. Others keep the apps icon.
 const FALLBACK_TABS = {
   Portal: 'Portal__c',
-  ContactPoints: 'Contact_Point_Sync'
+  ContactPoints: 'Contact_Point_Sync',
+  CorporateHub: 'Corporate_Hub'
 };
 const DEFAULT_ICON = 'standard:apps';
 

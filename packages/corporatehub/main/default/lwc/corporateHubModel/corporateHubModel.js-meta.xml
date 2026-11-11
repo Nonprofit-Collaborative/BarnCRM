@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Corporate Hub's shared logic in plain JavaScript: how far off a date is, the cycle outcomes and
+    a public group's name as typed. Imported by corporateHubHome, hubDocumentPanel and
+    hubCompleteCycle.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

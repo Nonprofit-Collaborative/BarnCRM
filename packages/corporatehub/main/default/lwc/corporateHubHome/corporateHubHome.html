@@ -1,0 +1,92 @@
+<template>
+  <template lwc:if={helpReady}>
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icon} data-id="shell">
+      <div slot="actions">
+        <template lwc:if={canManage}>
+          <lightning-button
+            data-id="add-templates"
+            label={labels.addTemplates}
+            disabled={isWorking}
+            onclick={handleAddTemplates}
+          ></lightning-button>
+        </template>
+      </div>
+
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+      </template>
+
+      <template lwc:if={errorMessage}>
+        <c-barn-notice
+          variant="error"
+          message={errorMessage}
+          data-id="error-message"
+          class="slds-var-m-bottom_small"
+        ></c-barn-notice>
+      </template>
+
+      <section class="slds-var-m-bottom_medium" data-id="requests">
+        <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.requests}</h2>
+        <template lwc:if={hasRequests}>
+          <ul class="slds-has-dividers_bottom-space">
+            <template for:each={requests} for:item="row">
+              <li key={row.id} class="slds-item slds-grid slds-grid_vertical-align-center">
+                <div class="slds-col">
+                  <a href={row.href}>{row.name}</a>
+                  <div class={row.dueClass}>{row.dueText}</div>
+                </div>
+                <lightning-button
+                  data-row-id={row.id}
+                  data-id="have-read"
+                  variant="brand"
+                  label={labels.haveRead}
+                  disabled={isWorking}
+                  onclick={handleHaveRead}
+                ></lightning-button>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else>
+          <p class="slds-text-color_weak" data-id="no-requests">{labels.noRequests}</p>
+        </template>
+      </section>
+
+      <section class="slds-var-m-bottom_medium" data-id="obligations">
+        <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.obligations}</h2>
+        <template lwc:if={hasObligations}>
+          <ul class="slds-has-dividers_bottom-space">
+            <template for:each={obligations} for:item="row">
+              <li key={row.id} class="slds-item">
+                <a href={row.href}>{row.name}</a>
+                <div class={row.dueClass}>{row.dueText}</div>
+                <div class="slds-text-color_weak">{row.detail}</div>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else>
+          <p class="slds-text-color_weak" data-id="no-obligations">{labels.noObligations}</p>
+        </template>
+      </section>
+
+      <section data-id="agreements">
+        <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.agreements}</h2>
+        <template lwc:if={hasAgreements}>
+          <ul class="slds-has-dividers_bottom-space">
+            <template for:each={agreements} for:item="row">
+              <li key={row.id} class="slds-item">
+                <a href={row.href}>{row.name}</a>
+                <div class={row.dueClass}>{row.dueText}</div>
+                <div class="slds-text-color_weak">{row.status}</div>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else>
+          <p class="slds-text-color_weak" data-id="no-agreements">{labels.noAgreements}</p>
+        </template>
+      </section>
+    </c-barn-page-shell>
+  </template>
+</template>

@@ -90,6 +90,7 @@ const ICONS = Object.freeze({
   // Corporate Hub
   Agreement__c: 'custom:custom93',
   Compliance_Obligation__c: 'custom:custom97',
+  Corporate_Hub: 'custom:custom72',
   Hub_Document__c: 'custom:custom49',
   // Mirror
   Accounting_Export: 'custom:custom21',
