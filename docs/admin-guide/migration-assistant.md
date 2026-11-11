@@ -29,6 +29,9 @@ org. These kits ship:
 - **NPSP Funds, Levels, Recurring Donations** (Giving): copies General Accounting Units,
   levels and recurring donations. See
   [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
+- **NPSP Gifts and Soft Credits** (Mirror): copies Campaigns as appeals, won Opportunities as
+  gifts with their funds and tribute, and contact, partial and account soft credits. See
+  [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
 
 An app can have several kits, one for each BarnCRM module that receives its records. Its
 listing then shows one **Start Migration** button per kit, each with the kit's name. Run them

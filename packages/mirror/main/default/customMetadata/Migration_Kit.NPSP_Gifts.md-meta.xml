@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>NPSP Gifts and Soft Credits</label>
+  <protected>false</protected>
+  <values>
+    <field>Source_App__c</field>
+    <value xsi:type="xsd:string">Nonprofit_Success_Pack</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Copies your Campaigns as appeals, each won Opportunity as one gift of the same donor with its payment method, funds and tribute, and your NPSP soft credits onto those gifts. Each gift remembers its Opportunity, so the Opportunity mirror never copies it twice. NPSP itself is never changed.</value>
+  </values>
+  <values>
+    <field>Steps_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"appeals","label":"Appeals","kind":"import","help":"Copies each Campaign as an appeal, or updates the appeal already linked to it.","source":"Campaign","fields":["Name","Description","StartDate","EndDate","IsActive"],"templateKey":"kit_campaign_appeals"},{"key":"gifts","label":"Gifts","kind":"import","help":"Copies each won Opportunity as one gift of the same donor, with the payment method of its first paid payment, its General Accounting Unit allocations as funds, and its tribute.","source":"Opportunity","fields":["Amount","CloseDate","AccountId","CampaignId","npsp.Primary_Contact__c","Account.npe01.SYSTEM_IsIndividual__c","npsp.Tribute_Type__c","npsp.Honoree_Name__c","npsp.Notification_Recipient_Name__c","npsp.Notification_Message__c"],"filters":[{"field":"IsWon","value":true}],"links":[{"column":"CampaignId","step":"appeals"}],"templateKey":"kit_npsp_gifts"},{"key":"contactCredits","label":"Soft Credits","kind":"import","help":"Copies each contact role of a won Opportunity, other than its donor and household members, as a soft credit on its gift (a partial soft credit keeps its amount).","source":"OpportunityContactRole","fields":["ContactId","Role","OpportunityId","Opportunity.Amount"],"filters":[{"field":"Opportunity.IsWon","value":true},{"field":"IsPrimary","value":false},{"field":"Role","value":"Household Member","op":"notEquals"}],"links":[{"column":"OpportunityId","step":"gifts"}],"templateKey":"kit_npsp_contact_credits"},{"key":"organizationContacts","label":"Contacts of Organization Gifts","kind":"import","help":"Gives the primary contact of each won organization gift a soft credit on it, as NPSP does.","source":"OpportunityContactRole","fields":["ContactId","Role","OpportunityId","Opportunity.Amount"],"filters":[{"field":"Opportunity.IsWon","value":true},{"field":"IsPrimary","value":true},{"field":"Opportunity.Account.npe01.SYSTEM_IsIndividual__c","value":false}],"links":[{"column":"OpportunityId","step":"gifts"}],"templateKey":"kit_npsp_contact_credits"},{"key":"accountCredits","label":"Account Soft Credits","kind":"import","help":"Copies each NPSP account soft credit of a won Opportunity as a soft credit of that organization on its gift.","source":"npsp.Account_Soft_Credit__c","fields":["npsp.Account__c","npsp.Opportunity__c","npsp.Amount__c","npsp.Role__c"],"filters":[{"field":"npsp.Opportunity__r.IsWon","value":true}],"links":[{"column":"npsp.Opportunity__c","step":"gifts"}],"templateKey":"kit_npsp_account_credits"}]</value>
+  </values>
+  <values>
+    <field>Retire_Checklist_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"donations","text":"Point online giving forms, payment processors and gift entry at BarnCRM gifts, so new donations are no longer recorded as Opportunities (or turn on the Opportunity mirror direction Opportunities to Gifts, with a start date after the last gift you copied)."},{"key":"payments","text":"In NPSP Settings, Payments, turn off automatic payment creation, so NPSP makes no payments for Opportunities BarnCRM now records as gifts."},{"key":"allocations","text":"In NPSP Settings, GAU Allocations, turn off default allocations, so NPSP no longer allocates new Opportunities."},{"key":"softCredits","text":"In NPSP Settings, Contact Roles, turn off automatic household contact roles, so NPSP no longer adds soft credits BarnCRM now makes."},{"key":"rollups","text":"Stop the NPSP rollup jobs (Setup, Scheduled Jobs, the NPSP rollup batches) once BarnCRM's donor totals are what you report on."}]</value>
+  </values>
+  <values>
+    <field>Extension_Class__c</field>
+    <value xsi:type="xsd:string">NpspGiftsKit</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">16</value>
+  </values>
+</CustomMetadata>

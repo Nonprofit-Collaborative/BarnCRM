@@ -108,3 +108,19 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 | 8 | Tick every item under **Retire the Old App**. | **Complete** only once every step is done again. NPSP's records are unchanged. |
 
 **Cleanup:** delete the test records, or keep them for the NPSP giving kits.
+
+## T-MIG-08: NPSP Gifts and Soft Credits Copies Won Opportunities Once
+
+**Purpose:** confirm the NPSP Gifts and Soft Credits kit (Mirror) makes one gift per won Opportunity with its donor, method, funds, tribute and soft credits, and never duplicates.
+**Prerequisites:** the NPSP org of T-MIG-07 with Giving and Mirror deployed and T-GIFT-22 done (fund **Building Fund** exists); admin user with **Salesforce Records Sync**; **Opportunity mirror direction** Off; **Send gift acknowledgments** off. In NPSP: a Campaign **Spring Appeal**; a won Opportunity of 300 for Ana on that Campaign, paid by one Check payment with number 1201, allocated 200 to Building Fund and 100 to General Fund, tribute type Memorial for "Grace", with Ben as a contact role **Solicitor** and Ana's colleague Cara as **Soft Credit** with a partial soft credit of 50; a won Opportunity of 500 for **Test Org** with Ana as its primary contact; an open (not won) Opportunity.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Integrations**, NPSP, click **Start Migration: NPSP Gifts and Soft Credits**. | Five steps: **Appeals**, **Gifts**, **Soft Credits**, **Contacts of Organization Gifts**, **Account Soft Credits**. |
+| 2 | Run and load **Appeals**. | An appeal Spring Appeal whose Campaign ID is the Campaign's. **Verified**. |
+| 3 | Run **Gifts** and open the preview. | 2 gifts would be created, none for the open Opportunity; Ana and Test Org are matched by record ID, nobody is created. |
+| 4 | Load it. | Ana's gift of 300 by Check, reference 1201, appeal Spring Appeal, split 200 Building Fund and 100 General Fund, tribute In memory of Grace; its **Opportunity ID** and external ID are the Opportunity's. Test Org's gift of 500. **Verified**. |
+| 5 | Run and load the three soft credit steps. | On Ana's gift: Ben **Solicitor** for 300, Cara **Other** (custom role Soft Credit) for 50. On Test Org's gift: Ana with her NPSP role. No credit for Ana on her own gift. Each step **Verified**. |
+| 6 | Set **Opportunity mirror direction** to Opportunities to Gifts with a start date before the Opportunities, and click **Run Now**. | No new gift: each Opportunity already has its gift. |
+
+**Cleanup:** set the direction back to Off; undo the steps in reverse order; switch acknowledgments back on if they were on.

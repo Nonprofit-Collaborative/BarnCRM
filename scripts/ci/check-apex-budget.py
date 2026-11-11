@@ -164,7 +164,8 @@ CAPS = {
     # reviews, awards, form intake, portal actions, reminders, the payment rule and the page
     # controller, 49,326 measured (Prettier line breaks included), plus about 2%.
     "scholarships": 50_300,
-    "mirror": 182_000,
+    # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, plus about 1%.
+    "mirror": 189_200,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

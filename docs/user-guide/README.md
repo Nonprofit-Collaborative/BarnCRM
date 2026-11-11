@@ -16,7 +16,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Getting around BarnCRM](getting-around.md): the apps, tabs, Home, What's new, in-app tips and notifications.
 - [Read only access](read-only-access.md): what a person with the Read Only role can and cannot do.
-- Moving from another app: when your organization moves records from another app in the same org (for example DLRS rollups, NPSP relationships, affiliations, addresses, funds, levels and recurring donations, or Volunteers for Salesforce jobs, shifts and hours), your admin runs the [Migration Assistant](../admin-guide/migration-assistant.md). Nothing changes in your daily work until they finish; ask them when the old app's screens stop being updated.
+- Moving from another app: when your organization moves records from another app in the same org (for example DLRS rollups, NPSP relationships, affiliations, addresses, funds, levels, recurring donations, gifts and soft credits, or Volunteers for Salesforce jobs, shifts and hours), your admin runs the [Migration Assistant](../admin-guide/migration-assistant.md). Nothing changes in your daily work until they finish; ask them when the old app's screens stop being updated.
 
 ### People and Households
 

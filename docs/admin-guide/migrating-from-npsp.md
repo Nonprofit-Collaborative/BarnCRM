@@ -48,9 +48,37 @@ affiliations, household addresses and household names, so the two apps never bot
 | Recurring Donations of Organizations | The same for recurring donations of an organization, as a commitment of that account. |
 
 The kit does not copy NPSP's open installment Opportunities: BarnCRM schedules the payments of
-each commitment itself. Gifts already received stay with the gift import (section 4). The retire
+each commitment itself. Gifts already received come across with the next kit. The retire
 checklist reminds you to stop NPSP's recurring donation and levels jobs, make the General
 Accounting Units inactive, and point payment processors at BarnCRM.
+
+**NPSP Gifts and Soft Credits** (BarnCRM Mirror, because it reads Opportunities and Campaigns).
+Run it after the two kits above, so the people, households and funds are already there:
+
+| Step | What it does |
+|---|---|
+| Appeals | Copies each Campaign as an appeal with its name, description, dates and active flag. An appeal that already holds the Campaign's ID (from Campaign sync) is updated, not made twice. |
+| Gifts | Copies each won Opportunity as one gift: the amount and close date, the donor by record ID (the primary contact of an individual's gift, else the organization), the payment method and check number of its first paid payment (Other when it has none), its appeal, its General Accounting Unit allocations as the gift's funds (by fund name, so run the Funds step first), and its tribute (Honor becomes In honor of, Memorial becomes In memory of). The Opportunity's record ID becomes the gift's external ID and **Opportunity ID**, so loading again matches instead of duplicating, and the [Opportunity Mirror](opportunity-mirror.md) never copies it again in either direction. |
+| Soft Credits | Copies each contact role of a won Opportunity as a soft credit on its gift, except the donor's own role and household members (BarnCRM credits those itself). Soft Credit and other NPSP roles BarnCRM does not have become Other, keeping their name; a partial soft credit keeps its amount, any other credit is for the whole gift. |
+| Contacts of Organization Gifts | Gives the primary contact of each organization's won Opportunity a soft credit on its gift, as NPSP does. |
+| Account Soft Credits | Copies each NPSP account soft credit as a soft credit of that organization on the gift. |
+
+Before you run it:
+
+- Install BarnCRM Mirror and give yourself the **Salesforce Records Sync** permission set on the
+  Access page (it lets you write each gift's Opportunity ID and each appeal's Campaign ID).
+- Leave **Opportunity mirror direction** at **Off** while the gifts load, so no Opportunity is
+  written to. Switch it on afterwards if you want.
+- Switch **Send gift acknowledgments** off (BarnCRM Settings, Giving, Acknowledgments) so donors
+  are not thanked again for old gifts, and switch it back on after the Gifts step is done.
+
+What the gifts step leaves to you, each shown in the preview so you can correct the row on
+screen: a gift split across more than five funds (the first five are read, so the parts no longer
+add up), allocations that do not add up to the Opportunity's amount, a payment method BarnCRM does
+not know, and a fund name two funds share. An Opportunity with several paid payments becomes one
+gift for its whole amount, dated at its close date. Pending pledges (open Opportunities) and their
+unpaid payments stay in NPSP: record open pledges as commitments ([Commitments](commitments.md)).
+NPSP's separate Tribute records, beyond the one on the Opportunity, are not copied.
 
 ## 2. How to Turn It On
 
@@ -209,8 +237,8 @@ These are not loaded by the three templates. Each has what to do in the meantime
 | Households and who is in them | When BarnCRM is installed in the NPSP org itself, do not load contacts at all: adopt NPSP's households in place ([Adopting Your NPSP Households](npsp-households.md)), which keeps every family and its people as they are. When you load files into another org, each contact gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). Household names are made by BarnCRM's naming. |
 | Relationships and affiliations | In the NPSP org itself, the **NPSP People and Addresses** kit copies them ([In-Org Migration Kits](#in-org-migration-kits)). From files, no ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **One Kind of Record** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
 | Recurring donations and their schedules | No import yet. Create each active recurring gift by hand as a commitment ([Commitments](commitments.md)) before loading payments. With **Match or create**, a payment dated near one of its scheduled payments pays it; older payments load as gifts on their own. |
-| General accounting unit allocations | Every gift goes to the default fund. For opportunities with one allocation, export `SELECT npsp__Opportunity__c, npsp__General_Accounting_Unit__r.Name FROM npsp__Allocation__c`, add `npe01__Opportunity__c` to the payment query, and fill a new column headed `Fund` from the allocation file with a lookup on the opportunity. Delete the opportunity column before loading, and check on the column step that `Fund` reads **Gift: fund**. |
-| Soft credits (contact roles, partial and account soft credits) | A soft credit loads only on the same row as a new gift, and NPSP exports them separately. Credits between household members are made automatically; add others by hand ([Soft credits](soft-credits.md)). |
+| General accounting unit allocations | In the NPSP org itself, the **NPSP Gifts and Soft Credits** kit copies them ([In-Org Migration Kits](#in-org-migration-kits)). From files, every gift goes to the default fund. For opportunities with one allocation, export `SELECT npsp__Opportunity__c, npsp__General_Accounting_Unit__r.Name FROM npsp__Allocation__c`, add `npe01__Opportunity__c` to the payment query, and fill a new column headed `Fund` from the allocation file with a lookup on the opportunity. Delete the opportunity column before loading, and check on the column step that `Fund` reads **Gift: fund**. |
+| Soft credits (contact roles, partial and account soft credits) | In the NPSP org itself, the **NPSP Gifts and Soft Credits** kit copies them. From files, a soft credit loads only on the same row as a new gift, and NPSP exports them separately. Credits between household members are made automatically; add others by hand ([Soft credits](soft-credits.md)). |
 | More than one tribute on a gift | Only the tribute on the opportunity loads. Add others by hand ([Tributes](tributes.md)). |
 | Additional and seasonal addresses | In the NPSP org itself, the **NPSP People and Addresses** kit copies every household address, seasonal ones included. From files, only the mailing address loads. Add others by hand ([Addresses](addresses.md)). |
 | Written-off and unpaid payments | The exports take paid payments only. Refunds are recorded in BarnCRM after the gift is loaded ([Refunds](refunds.md)). |
