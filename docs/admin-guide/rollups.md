@@ -932,6 +932,11 @@ BarnCRM reads DLRS's rollups (never changes them) to stop the two tools filling 
 Only DLRS rollups that are active in DLRS count. Rollup Helper's rollups are not read, so
 neither the question nor the Health Check finding sees them: check those yourself.
 
+NPSP customizable rollups count the same way: in an org with NPSP, an active NPSP customizable
+rollup on the same field makes the question name NPSP ("The NPSP rollup ... also fills ...")
+and the answer is recorded the same way. NPSP's older built-in rollups (when Customizable
+Rollups is not enabled in NPSP Settings) are not read.
+
 ### Import From DLRS
 
 When DLRS has at least one active rollup, **Other Rollup Tools** on the **Rollup Builder** tab
@@ -990,6 +995,43 @@ A DLRS rollup stays in DLRS, and the wizard says why, when:
 
 Rebuild those by hand in the Builder if you want them in BarnCRM, or leave them running in
 DLRS on a field BarnCRM does not fill.
+
+### Import From NPSP Customizable Rollups
+
+In an org with NPSP's Customizable Rollups enabled and at least one active customizable rollup,
+**Other Rollup Tools** also has an **Import From NPSP** button (you need Manage BarnCRM
+Settings). It runs the same four steps as Import From DLRS, with the same compare and the same
+question before each copy is turned on, naming NPSP. Each copy's Definition Key is `NPSP_` and
+the NPSP rollup's API name, so importing again updates it. Nothing in NPSP is changed: after
+turning a copy on, deactivate the NPSP rollup in **NPSP Settings**, **Customizable Rollups**.
+The [Migration Assistant](migration-assistant.md) runs this as the NPSP Customizable Rollups
+kit, with a check and a retire checklist.
+
+How each NPSP setting is copied:
+
+| NPSP setting | In BarnCRM |
+|---|---|
+| Summary Object and Summary Field | The rollup's object and field |
+| Detail Object | The records counted, by the one lookup from them to the summary object (a standard lookup such as Account ID first when there are several) |
+| Operation | Sum, Count, Average, Largest (Max), Smallest (Min), First, Last |
+| Amount Field | The field read for Sum and Average, and for the others unless Detail Field is set |
+| Detail Field | The field read for Largest, Smallest, First and Last, when set |
+| Date Field | The order for First and Last (oldest first), and the date for a time bound |
+| Time Bound | All Time adds nothing; Years Ago 0 is this year, 1 is last year; Days Back n is the last n days |
+| Filter Group rules | Conditions joined by AND: equals, not equals, greater or less, in a list, not in a list, starts with, contains. A record type named in a rule becomes that record type |
+| Calculation | **Both** (updated as records change and every night) |
+
+An NPSP rollup stays in NPSP, and the wizard says why, when:
+
+- its operation is Years Donated, Donor Streak, Best Year or Best Year Total;
+- it reads its amount or date from another object than the records it counts, or a filter rule
+  is on another object (for example payments or soft credits);
+- it summarizes a contact from opportunities (NPSP credits contacts through contact roles,
+  which Rollup Builder does not follow);
+- it uses a fiscal year, or Years Ago above 1;
+- a filter rule uses another operator, or names a record type the org does not have;
+- the records it counts have no single lookup to its object;
+- or any check listed above for DLRS refuses it.
 
 ## Current Limits
 
