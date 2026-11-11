@@ -85,6 +85,7 @@ Rules:
 | corporatehub | Hub_Document__c | Custom49: CD/DVD |
 | payments | Payment__c | Custom56: Bottle |
 | payments | Payment_Event__c | Custom58: Caduceus |
+| payments | Payments_Setup | Custom70: Handsaw |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |
 | mirror | Gift_Transaction_Mirror | Custom31: Car |

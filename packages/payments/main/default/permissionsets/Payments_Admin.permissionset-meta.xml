@@ -7,6 +7,10 @@
     who scheduled it, record their status. Payment status is never edited by hand: the layouts
     are read only.
   </description>
+  <classAccesses>
+    <apexClass>PaymentsSetupController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Payment_Event__c.Event_Id__c</field>
@@ -166,6 +170,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Payment__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Payments_Setup</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

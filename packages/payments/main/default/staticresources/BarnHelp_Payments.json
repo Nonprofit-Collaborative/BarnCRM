@@ -35,6 +35,25 @@
     "Payments_Health_NotScheduledFix": "Schedule Payment Processing",
     "Payments_Health_NotScheduledTitle": "Payment Processing Is Not Scheduled",
     "Payments_Health_WaitingDetail": "Some payment events were received over an hour ago and are not applied yet. Check that processing is scheduled and that the person who scheduled it is still active.",
-    "Payments_Health_WaitingTitle": "Payment News Is Waiting"
+    "Payments_Health_WaitingTitle": "Payment News Is Waiting",
+    "Payments_Setup_Clear": "Clear",
+    "Payments_Setup_Addresses": "Give the processor the address for it. Each address is on the Site named beside it.",
+    "Payments_Setup_Failed": "Payments Setup could not load or save. Try again. If it happens again, check the Error Log.",
+    "Payments_Setup_Intro": "Connect your own Stripe or PayPal account. Payers pay on the processor's own page; BarnCRM keeps no card details. Keys are never shown again once saved: type a new value to change one, or leave a box empty to keep it.",
+    "Payments_Setup_KeyNotSet": "Not entered",
+    "Payments_Setup_KeySet": "Entered, ending in {0}",
+    "Payments_Setup_Mode": "Mode: {0}. Checkouts use {1} unless a module asks for the other. Change these in Settings, under Payments.",
+    "Payments_Setup_NoManage": "Saving keys needs the Manage BarnCRM Settings permission. Ask your BarnCRM admin.",
+    "Payments_Setup_NoSite": "This org has no active Salesforce Site with an address, so there is nothing to give the processor yet. Create and activate a Site in Setup, under Sites; the admin guide page Payments shows the steps.",
+    "Payments_Setup_PayPalClientId": "PayPal Client ID",
+    "Payments_Setup_PayPalClientSecret": "PayPal Secret",
+    "Payments_Setup_PayPalUrl": "PayPal address",
+    "Payments_Setup_PayPalWebhookId": "PayPal Webhook ID",
+    "Payments_Setup_Saved": "Saved.",
+    "Payments_Setup_SaveKeys": "Save Keys",
+    "Payments_Setup_StripeSecretKey": "Stripe Secret Key",
+    "Payments_Setup_StripeUrl": "Stripe address",
+    "Payments_Setup_StripeWebhookSecret": "Stripe Signing Secret",
+    "Payments_Setup_Title": "Payments Setup"
   }
 }

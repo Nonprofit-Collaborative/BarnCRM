@@ -28,7 +28,7 @@
   </values>
   <values>
     <field>Admin_Tabs__c</field>
-    <value xsi:type="xsd:string">Payment_Event__c</value>
+    <value xsi:type="xsd:string">Payments_Setup;Payment_Event__c</value>
   </values>
   <values>
     <field>Probe_Object__c</field>
