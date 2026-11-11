@@ -62,3 +62,44 @@ export function groupName(value) {
     .trim()
     .replace(/\s+/g, '_');
 }
+
+// ---- Board governance (CH-09 to CH-20; ADR-NEXT `NEXT-corporate-hub-board-governance.md`)
+
+/** Meeting Attendee Attendance values (canonical model 29CH10), in the order offered. */
+export const ATTENDANCE = ['Invited', 'Present', 'Absent', 'Excused'];
+export const MINUTES_SUBMITTED = 'Submitted for Approval';
+export const MINUTES_APPROVED = 'Approved';
+export const VOTING_OPEN = 'Voting Open';
+
+/**
+ * The skills matrix (CH-15): how many current seats hold each skill the board wants or any seat
+ * holds, wanted skills first, and the wanted skills nobody holds.
+ *
+ * @param {string[]} needed the board's Skills Wanted
+ * @param {{values: string[]}[]} seats current seats, each with its skills in `values`
+ */
+export function skillGaps(needed, seats) {
+  const counts = new Map();
+  (needed || []).forEach((skill) => counts.set(skill, 0));
+  (seats || []).forEach((seat) => {
+    (seat.values || []).forEach((skill) => counts.set(skill, (counts.get(skill) || 0) + 1));
+  });
+  return {
+    counts: [...counts.entries()].map(([skill, count]) => ({ skill, count })),
+    gaps: (needed || []).filter((skill) => counts.get(skill) === 0)
+  };
+}
+
+/** Seats whose term ends within `days` of today, overdue included (R-BM2). */
+export function expiringSeats(seats, today, days) {
+  return (seats || []).filter((seat) => {
+    const left = daysUntil(seat.due, today);
+    return left !== null && left <= (Number(days) || 0);
+  });
+}
+
+/** A whole-number percent of part in whole, 0 when whole is 0 (CH-13). */
+export function percent(part, whole) {
+  const total = Number(whole) || 0;
+  return total === 0 ? 0 : Math.round(((Number(part) || 0) * 100) / total);
+}

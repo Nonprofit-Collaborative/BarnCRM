@@ -80,6 +80,8 @@ Rules:
 | portal | Portal_Access__c | Custom77: Locked |
 | portal | Portal__c | Custom47: Knight |
 | corporatehub | Agreement__c | Custom93: ShoppingCart |
+| corporatehub | Board__c | Custom58: Caduceus |
+| corporatehub | Board_Meeting__c | Custom56: Bottle |
 | corporatehub | Compliance_Obligation__c | Custom97: Thermometer |
 | corporatehub | Corporate_Hub | Custom72: Helicopter |
 | corporatehub | Hub_Document__c | Custom49: CD/DVD |
@@ -154,6 +156,8 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | giving | receiptActions | custom:custom23 | Receipt__c |
 | giving | stewardshipPlans | custom:custom4 | Stewardship_Plans |
 | giving | tributeNotification | custom:custom5 | Tribute__c |
+| corporatehub | hubBoardPanel | custom:custom58 | Board__c |
+| corporatehub | hubMeetingPanel | custom:custom56 | Board_Meeting__c |
 | forms | formBuilder | custom:custom28 | Form__c |
 | forms | formRunner | custom:custom28 | Form__c |
 | forms | formSubmission | custom:custom51 | Form_Submission__c |

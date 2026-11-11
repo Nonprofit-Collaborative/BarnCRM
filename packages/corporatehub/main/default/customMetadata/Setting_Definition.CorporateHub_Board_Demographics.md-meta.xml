@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Show board demographics</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Board_Demographics__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Corporate_Hub_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Corporate Hub</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">CorporateHub</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">40</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">Whether the board panel shows each seat's optional age range and gender beside the skills matrix. Both fields are optional on every seat; leave this off unless your board has agreed to collect them. Default: off.</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">corporate-hub.md</value></values>
+</CustomMetadata>

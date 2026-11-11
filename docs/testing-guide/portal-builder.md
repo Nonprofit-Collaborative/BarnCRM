@@ -143,3 +143,21 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 4 | Enter a wrong code on a fresh sign-in. | The message is read out as an alert and marked by a bar on its left. |
 
 **Cleanup:** sign out.
+
+## T-PB-10: Board Portal Template
+
+**Purpose:** confirm a board member sees and acts on only their own meetings, votes and requests (PB-02, CH-18, CH-19, CH-20).
+**Prerequisites:** admin; Corporate Hub on; the board, meetings and requests from the Corporate Hub tests T-CH-09 to T-CH-13, with Ade and Bea invited; a portal with key `board`, Active, Invited, the template `portal-client/templates/board.json`; Ade signed in.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | GET `page?key=meetings`. | Ade's meetings only, with agenda and Packet Link; none of Bea's rows. |
+| 2 | POST `page/action` `CorporateHub.MarkPacketRead` on one row. | "Thank you. Your reading of the packet is recorded."; the meeting panel counts 1 packet read. |
+| 3 | With minutes Draft, GET `page?key=minutes`. Submit them as staff and GET again; run `CorporateHub.ApproveMinutes`. | Empty while Draft; then listed; the approval is recorded and counted on the meeting panel. |
+| 4 | Open voting on a motion; GET `page?key=votes`; run `CorporateHub.VoteFor`. Close voting; run `CorporateHub.VoteAgainst`. | Ade's blank vote listed; then For with Voted; after closing, "Voting on this motion is closed." and the vote stays For. |
+| 5 | GET `page?key=disclosures`; POST `page/save` with Interests Disclosed text and the conflict box; run `CorporateHub.Acknowledge`. | Ade's open request; saved; Acknowledged with Answered in Portal checked; it leaves the page. |
+| 6 | GET `page?key=assessment`; save a Rating of 4 and of 7. | 4 saves; 7 is refused (`save_failed`, the Error Log names the 1 to 5 rule). |
+| 7 | With the poll open, save Ade's Available for Time 1 as Yes; close the poll and try again. | Saved and counted; once closed the page is empty and the save is refused. |
+| 8 | POST any action with Bea's row Id. | 404 `not_found`; Bea's row is unchanged. |
+
+**Cleanup:** None.

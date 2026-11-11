@@ -17,6 +17,10 @@ organization in good standing:
   and switched off until you adapt them.
 - **Agreements** (CH-08): contracts, leases and subscriptions with their end, renewal and notice
   dates.
+- **Board governance** (CH-09 to CH-20): boards and committees with seats and terms, meetings
+  with attendance, quorum, packets, minutes approval, motions and votes, carried action items, an
+  availability poll, yearly conflict-of-interest disclosures, a board self-assessment and a board
+  dashboard. Members take part through the board portal template (PB-02).
 
 The owner of each obligation, agreement and document gets a bell notification before it is due.
 Files count against your org's file storage. Reports and dashboards are standard Salesforce ones.
@@ -37,8 +41,9 @@ page, does three things, each safe to run again:
    set to Read Only holders (see Access below).
 3. Loads the shipped templates that your org does not have yet (see Templates).
 
-The **Corporate Hub**, **Library Documents**, **Compliance Obligations** and **Agreements** tabs
-join the BarnCRM and BarnCRM Console apps before Error Log. Corporate Hub has no app of its own.
+The **Corporate Hub**, **Library Documents**, **Compliance Obligations**, **Agreements**,
+**Boards and Committees** and **Board Meetings** tabs join the BarnCRM and BarnCRM Console apps
+before Error Log. Corporate Hub has no app of its own.
 
 ## Access
 
@@ -50,7 +55,11 @@ join the BarnCRM and BarnCRM Console apps before Error Log. Corporate Hub has no
 
 Sets are given, never taken away. Library Documents and Agreements are readable by everyone and
 editable by their owner and admins; Compliance Obligations are editable by every Staff holder;
-each acknowledgment is owned by, and visible to, the person asked (and admins).
+each acknowledgment is owned by, and visible to, the person asked (and admins). Boards and
+Committees and Board Meetings are readable and editable by every holder of a Staff or Admin set;
+seats, motions, votes, attendees, action items and assessments follow their board or meeting.
+Only admins delete board records, mark minutes approved, request disclosures from the board and
+start a self-assessment.
 
 ## Settings
 
@@ -61,6 +70,7 @@ BarnCRM Settings, **Corporate Hub**:
 | Send Corporate Hub reminders | On | Whether the nightly run sends the bell reminders. |
 | Days before to remind | 30 | How many days ahead an owner is reminded, for any record that has no Reminder Days of its own (1 to 365). |
 | Days to acknowledge | 30 | The due date a new acknowledgment request gets (1 to 365). |
+| Show board demographics | Off | Whether the Board panel shows the optional age range and gender of current seats. |
 
 The reminder step is **Corporate Hub reminders** on the Nightly Jobs page, at 6:45 AM, with its
 own switch.
@@ -141,6 +151,87 @@ signed copy in Files. The owner is reminded before the notice date (or the end d
 is set). Each night an Active, auto-renewing agreement past its end date moves on by its term,
 and any other Active agreement past its end date becomes Expired.
 
+## Board Governance
+
+Board governance (CH-09 to CH-20) lets staff run the board with no portal; board members act on
+it through the [board portal template](portal-builder.md#ready-made-templates) (PB-02). A board
+member is a person (Contact) in BarnCRM and needs no Salesforce login.
+
+### Boards and Committees
+
+A **Board or Committee** record is a board of directors, committee, task force, working group,
+advisory council or chapter (Type). A committee names its **Parent Board**. Set the usual
+**Term Length (Months)**, the **Term Limit** (consecutive terms, blank for none), the **Quorum
+(Percent)** of voting members who must be present (51 when blank, a simple majority) and the
+**Skills Wanted** for the skills matrix.
+
+### Seats and Terms
+
+Add a **Board Member** for each person's term: person, role (Chair, Vice Chair, Treasurer,
+Secretary, Member, Ex Officio), term start and end, term number, and whether the seat votes. A
+seat is **Current** while today falls within its term; a new term is a new row, so the related
+list is the board's history. **At Term Limit** is checked when the term number reaches the
+board's limit. The owner of the board gets a bell reminder once for each current seat whose term
+ends within **Days before to remind** (the nightly Corporate Hub step).
+
+The **Board** panel on the board's page shows the current seats, terms ending soon, the skills
+matrix with the wanted skills nobody holds, open action items and, when BarnCRM Giving is
+installed, the share of current members who gave this fiscal year (read from Giving This Year;
+Corporate Hub never requires Giving). Age range and gender are optional on each seat and appear
+only with **Show board demographics** on (off by default); collect them only if your board has
+agreed to.
+
+### Meetings
+
+A **Board Meeting** has a start, location (or call link, or "held in writing" for a written
+consent), status, agenda, **Packet Link** and minutes. Attach the packet and papers as Files on
+the meeting; they count against your file storage. Put a link to the packet in Packet Link for
+the portal: the portal shows that link and does not serve files itself, so choose where the
+packet lives (for example a shared folder or a password-protected public link you create).
+
+On the **Meeting** panel:
+
+- **Invite Board** adds every current seat as an attendee (voting as on the seat), once each.
+  Set each attendee's attendance; the panel shows whether quorum is met (voting members present
+  against the board's quorum percent).
+- **Submit Minutes for Approval** opens the minutes to members in the portal; the panel counts
+  the members who approved them and who marked the packet read. An admin (Manage Corporate Hub)
+  then uses **Mark Minutes Approved**, after the board approves them by its own procedure.
+- **Action Items Carried Forward** lists the board's open action items raised at earlier
+  meetings, until each is Done or Dropped.
+- **Motions**: add a Board Motion to the meeting. **Open Voting** gives each voting attendee a
+  vote to cast in the portal; staff can also fill in votes. **Close Voting** records Passed (more
+  For than Against) or Failed and the date. A vote cannot change once voting closes, except by an
+  admin recording a vote taken by voice.
+- **Availability Poll**: before the time is fixed, leave Start blank, fill in up to three Poll
+  Times and use **Send Poll** (it invites the board first if needed). Members answer Yes, If
+  Needed or No for each time in the portal; **Choose This Time** sets the start and closes the
+  poll.
+
+### Disclosures
+
+Make your conflict-of-interest policy a Library Document with **Needs Acknowledgment** and **Ask
+Every Year** checked. On the board's panel choose it and use **Request From Board**: each current
+seat holder gets a request, which they answer in the portal (writing any interests and whether
+they have a conflict) or which an admin records from paper. With Ask Every Year, requesting
+again next year asks everyone again for the same version.
+
+### Self-Assessment
+
+**Start Self-Assessment** on the board's panel creates this year's self-assessment with the
+shipped questions (`BarnCorporateHubTemplates`, `board-self-assessment`) for every current seat
+holder. Members rate each statement 1 to 5 with an optional comment in the portal while it is
+Open; set it Closed to stop changes. For results, create a custom report type on Board
+Assessments with Assessment Answers and group a summary report by Question with the average
+Rating.
+
+### Board Dashboard
+
+The **Board Governance** dashboard (folder BarnCRM Corporate Hub) shows the current roster, terms
+ending in the next 90 days, attendance this year and open board disclosures. Giving
+participation is on each board's panel, not the dashboard, so the dashboard never depends on
+Giving.
+
 ## Reports
 
 Build reports on Library Documents with Policy Acknowledgments, Compliance Obligations with
@@ -148,8 +239,12 @@ Compliance Cycles, and Agreements, as standard report types allow. Useful filter
 Requested and Version equal to the document's version (outstanding), Days Until Due less than 30
 (due soon), Notice Date next 90 days.
 
+Corporate Hub also ships the report types **Board Members**, **Board Meeting Attendees** and
+**Policy Acknowledgments**, and four reports in the **BarnCRM Corporate Hub** folder: Current
+Board Roster, Terms Ending Next 90 Days, Attendance This Year and Open Board Disclosures.
+
 ## Removing the Module
 
 Uninstalling deletes every Library Document, acknowledgment, obligation, cycle and agreement
-record. Files stay in Salesforce Files, unlinked. The Module Manager's report counts the records
+record, and every board, seat, meeting, attendee, motion, vote, action item and assessment. Files stay in Salesforce Files, unlinked. The Module Manager's report counts the records
 first.

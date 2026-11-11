@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Vote_While_Open</fullName>
+  <active>true</active>
+  <description>A vote changes only while voting is open, unless the user holds Manage Corporate Hub (R-BV1).</description>
+  <errorConditionFormula>AND(OR(ISCHANGED(Vote__c), AND(ISNEW(), NOT(ISBLANK(TEXT(Vote__c))))), NOT(ISPICKVAL(Motion__r.Status__c, 'Voting Open')), NOT($Permission.Corporate_Hub_Manage))</errorConditionFormula>
+  <errorDisplayField>Vote__c</errorDisplayField>
+  <errorMessage>Voting on this motion is closed.</errorMessage>
+</ValidationRule>

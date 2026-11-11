@@ -24,7 +24,7 @@
   </values>
   <values>
     <field>Staff_Tabs__c</field>
-    <value xsi:type="xsd:string">Corporate_Hub;Hub_Document__c;Compliance_Obligation__c;Agreement__c</value>
+    <value xsi:type="xsd:string">Corporate_Hub;Hub_Document__c;Compliance_Obligation__c;Agreement__c;Board__c;Board_Meeting__c</value>
   </values>
   <values>
     <field>Admin_Tabs__c</field>

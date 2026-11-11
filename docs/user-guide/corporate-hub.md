@@ -40,10 +40,37 @@ The **Agreements** tab lists your contracts, leases and subscriptions. Keep the 
 the agreement's **Files**. If you own an agreement, you get a bell notification before its notice
 date, so there is time to renew, renegotiate or give notice.
 
+## The Board
+
+The **Boards and Committees** tab holds your board of directors and its committees. On a board's
+page the **Board** panel shows who holds a seat now, whose term ends soon (and who has reached the
+term limit), the skills the board wants that no member has, the board's open action items and,
+when your org uses BarnCRM Giving, the share of members who gave this fiscal year. Add a seat
+with **New** on the Board Members list: the person, role and term dates.
+
+## Board Meetings
+
+Create a meeting from the **Board Meetings** tab, then on its page:
+
+1. Press **Invite Board** to add everyone with a current seat.
+2. Attach the packet to the meeting's Files, and paste a link to it in **Packet Link** so
+   members can open it from the board portal.
+3. During or after the meeting set each person's attendance; the panel says whether you have a
+   quorum.
+4. Type the minutes, then press **Submit Minutes for Approval**. Members approve them in the
+   board portal; an admin marks them approved once the board has.
+5. Add motions on the meeting. **Open Voting** lets members vote in the portal; **Close Voting**
+   records whether it passed.
+
+Open action items from earlier meetings are listed on each later meeting until someone marks
+them Done. To find a time before scheduling, leave Start blank, fill in up to three Poll Times
+and press **Send Poll**; then press **Choose This Time** on the time that suits most people.
+
 ## Reminders
 
 When you own an obligation, agreement or document, a bell notification reminds you before it is
-due (30 days by default). One reminder goes per due date.
+due (30 days by default). One reminder goes per due date. When you own a board, you are reminded
+once before each member's term ends.
 
 > Templates and starter policies are general guidance, not legal advice. Check with your
 > organization's counsel or accountant.

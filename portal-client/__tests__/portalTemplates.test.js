@@ -7,6 +7,7 @@ import { checkTemplate } from '../src/portalTemplate.js';
 import volunteer from '../templates/volunteer.json';
 import speaker from '../templates/speaker.json';
 import donor from '../templates/donor.json';
+import board from '../templates/board.json';
 
 const PACKAGES = path.join(__dirname, '..', '..', 'packages');
 const BUILT_IN = ['Id', 'Name', 'CreatedDate'];
@@ -39,10 +40,16 @@ const EDITABLE_TYPES = [
   'MultiselectPicklist'
 ];
 // Module key (BarnCRM_Module row) to the package folder that holds its objects.
-const FOLDERS = { Volunteers: 'volunteers', Events: 'events', Giving: 'giving' };
+const FOLDERS = {
+  Volunteers: 'volunteers',
+  Events: 'events',
+  Giving: 'giving',
+  CorporateHub: 'corporatehub'
+};
 const ACTION_CLASSES = {
   Volunteers: 'volunteers/main/default/classes/VolunteersPortalExtension.cls',
-  Events: 'events/main/default/classes/EventsPortalExtension.cls'
+  Events: 'events/main/default/classes/EventsPortalExtension.cls',
+  CorporateHub: 'corporatehub/main/default/classes/CorporateHubPortalExtension.cls'
 };
 
 function fieldFile(objectName, field) {
@@ -72,7 +79,8 @@ function cases() {
   [
     ['volunteer', volunteer],
     ['speaker', speaker],
-    ['donor', donor]
+    ['donor', donor],
+    ['board', board]
   ].forEach(([name, template]) => {
     template.pages.forEach((page) => out.push([name + ' ' + page.key, template, page]));
   });
@@ -83,7 +91,8 @@ describe('shipped portal templates', () => {
   it.each([
     ['volunteer', volunteer],
     ['speaker', speaker],
-    ['donor', donor]
+    ['donor', donor],
+    ['board', board]
   ])('%s passes the shape rules and names its module', (name, template) => {
     expect(checkTemplate(template)).toEqual([]);
     expect(template.key).toBe(name);
@@ -183,7 +192,7 @@ describe('shipped portal templates', () => {
   });
 
   it('every module action a template names is offered by its module class', () => {
-    [volunteer, speaker].forEach((template) => {
+    [volunteer, speaker, board].forEach((template) => {
       const source = fs.readFileSync(
         path.join(PACKAGES, ACTION_CLASSES[template.requiresModules[0]]),
         'utf8'
@@ -192,6 +201,14 @@ describe('shipped portal templates', () => {
         .flatMap((page) => page.actions)
         .filter((a) => typeof a === 'object')
         .forEach((a) => expect(source).toContain("'" + a.extension + "'"));
+    });
+  });
+
+  it('the board template never lets a member edit a vote, minutes or a status', () => {
+    board.pages.forEach((page) => {
+      page.fields
+        .filter((f) => f.edit)
+        .forEach((f) => expect(f.field).not.toMatch(/Vote__c|Minutes|Status__c|Attendance__c/));
     });
   });
 

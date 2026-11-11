@@ -54,6 +54,25 @@ public with sharing class HubPolicy {
 		return ask(document, userIds, new Set<Id>());
 	}
 
+	/**
+	 * R-PAK4 (CH-12): asks the board's current seat holders, as Person rows owned by the
+	 * requester. Nobody is notified: they answer in the board portal or on paper.
+	 */
+	public static Integer requestFromBoard(Id documentId, Id boardId) {
+		requireManage();
+		Hub_Document__c document = document(documentId);
+		if (document.Status__c != 'Active' || document.Requires_Acknowledgment__c != true) {
+			throw new PolicyException(
+				BarnHelp.text('CorporateHub', 'CorporateHub_Policy_NotAskable')
+			);
+		}
+		Set<Id> personIds = new Set<Id>();
+		for (Board_Member__c seat : HubBoard.currentSeats(boardId)) {
+			personIds.add(seat.Person__c);
+		}
+		return ask(document, new Set<Id>(), personIds);
+	}
+
 	/** R-HD1: the next version, Active from today; open requests superseded and asked again. */
 	public static void publishNewVersion(Id documentId) {
 		requireManage();
@@ -170,6 +189,7 @@ public with sharing class HubPolicy {
 				Status__c,
 				Version__c,
 				Requires_Acknowledgment__c,
+				Annual__c,
 				Review_Months__c,
 				Review_Date__c,
 				Effective_Date__c
@@ -217,8 +237,15 @@ public with sharing class HubPolicy {
 		List<Policy_Acknowledgment__c> rows = new List<Policy_Acknowledgment__c>();
 		Set<Id> everyone = new Set<Id>(userIds);
 		everyone.addAll(personIds);
+		// R-PAK1: an Ask Every Year document carries the year, so the same version is asked yearly.
+		String stem =
+			document.Id +
+			':' +
+			version +
+			(document.Annual__c == true ? ':' + Date.today().year() : '') +
+			':';
 		for (Id personId : everyone) {
-			String key = document.Id + ':' + version + ':' + personId;
+			String key = stem + personId;
 			if (asked.contains(key)) {
 				continue;
 			}

@@ -14670,6 +14670,7 @@ the record; the file history is Salesforce's own.
 | Review Every (Months) | number | no | How far Mark Reviewed moves Next Review on. Default 12. |
 | Last Reviewed | date | no | When it was last marked reviewed. |
 | Needs Acknowledgment | boolean | yes (defaults false) | Whether people are asked to attest to it. |
+| Ask Every Year | boolean | yes (defaults false) | Whether the same version is asked again each year, as for an annual conflict-of-interest disclosure (R-PAK1, CH-12). |
 | Summary | long text | no | What the document covers. |
 | Retired On | date | no | Set by Retire. |
 | Template Key | text | no | The shipped template it came from (R-CT1); blank for the org's own. |
@@ -14699,6 +14700,7 @@ Every (Months). Retire sets Status Retired and Retired On; a retired document as
 | Review Every (Months) | `Review_Months__c` | Number(3, 0), default 12 |
 | Last Reviewed | `Last_Reviewed_On__c` | Date |
 | Needs Acknowledgment | `Requires_Acknowledgment__c` | Checkbox, default false |
+| Ask Every Year | `Annual__c` | Checkbox, default false |
 | Summary | `Summary__c` | Long Text Area(32768) |
 | Retired On | `Retired_On__c` | Date |
 | Template Key | `Template_Key__c` | Text(80), unique, external ID |
@@ -14726,11 +14728,19 @@ a staff user, or a Core person with no login (a board member, CH-12).
 | Due Date | date | no | Requested On plus the setting Days to Acknowledge. |
 | Acknowledged On | datetime | no | When the person attested. |
 | Key | text | yes | Document, version and person, unique (R-PAK1). |
+| Interests Disclosed | long text | no | A conflict-of-interest disclosure's text (CH-12). |
+| Conflict Disclosed | boolean | yes (defaults false) | Whether the person disclosed a conflict. |
+| Answered in Portal | boolean | yes (defaults false) | Set only by the board portal's Acknowledge (R-PAK3). |
 
 ### Rules
 
 **R-PAK1 One request per person per version.** Key is the document's Id, the version and the
-User or Person Id; it is unique, so asking twice changes nothing.
+User or Person Id; it is unique, so asking twice changes nothing. For a document with Ask Every
+Year, the key also carries the year asked, so the same version is asked again each year.
+
+**R-PAK4 Board requests (CH-12).** Request From Board asks the current seat holders of one
+board (R-BM1) as Person rows, owned by the requester; nobody is notified, since the people asked
+have no login and answer in the board portal or on paper.
 
 **R-PAK2 Who is asked.** Request Acknowledgments asks every active user holding a BarnCRM role
 (the sets `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only`), or the active users who are
@@ -14739,8 +14749,9 @@ notification. Outstanding means Requested for the document's current version.
 
 **R-PAK3 A person attests for themselves.** Status becomes Acknowledged only by the User asked,
 or by a holder of the custom permission Manage Corporate Hub (`Corporate_Hub_Manage`), who
-records a paper or Person attestation (validation rule `Own_Acknowledgment`). Exactly one of User
-and Person is set (`One_Person`).
+records a paper or Person attestation (validation rule `Own_Acknowledgment`), or by the board
+portal for a Person row, which sets Answered in Portal (`Answered_In_Portal__c`), a field no
+permission set may edit. Exactly one of User and Person is set (`One_Person`).
 
 ### Salesforce implementation
 
@@ -14758,6 +14769,9 @@ and Person is set (`One_Person`).
 | Due Date | `Due_Date__c` | Date |
 | Acknowledged On | `Acknowledged_On__c` | DateTime |
 | Key | `Key__c` | Text(120), unique, external ID |
+| Interests Disclosed | `Disclosure__c` | Long Text Area(32768) |
+| Conflict Disclosed | `Conflict_Disclosed__c` | Checkbox, default false |
+| Answered in Portal | `Answered_In_Portal__c` | Checkbox, default false |
 
 ---
 
@@ -14924,6 +14938,7 @@ its shipped templates.
 | Send Corporate Hub Reminders | boolean | yes (defaults true) | Whether the nightly run sends reminders (R-CR1). |
 | Days Before to Remind | number | no | The reminder lead time where a record has none, 1 to 365. Blank means 30. |
 | Days to Acknowledge | number | no | How long a person has to acknowledge, 1 to 365. Blank means 30. |
+| Show Board Demographics | boolean | yes (defaults false) | Whether the board panel shows the seats' age range and gender (CH-15). |
 
 ### Rules
 
@@ -14948,9 +14963,436 @@ and no legal text. Existing records are never changed.
 | Send Corporate Hub Reminders | `Reminders_Enabled__c` | Checkbox, default true |
 | Days Before to Remind | `Reminder_Days__c` | Number(3, 0), default 30 |
 | Days to Acknowledge | `Acknowledgment_Days__c` | Number(3, 0), default 30 |
+| Show Board Demographics | `Board_Demographics__c` | Checkbox, default false |
 
 - **Setting Definitions:** `CorporateHub_Reminders_Enabled`, `CorporateHub_Reminder_Days`,
-  `CorporateHub_Acknowledgment_Days`, section Corporate Hub, module `CorporateHub`.
+  `CorporateHub_Acknowledgment_Days`, `CorporateHub_Board_Demographics`, section Corporate Hub,
+  module `CorporateHub`.
+- **Templates:** `BarnCorporateHubTemplates` also lists self-assessment templates
+  (`assessments`: a key, a title and its questions), read by Start Self-Assessment (R-BA1).
+
+---
+
+## 29CH7. Board
+
+### Definition
+
+A board of directors, or a committee, task force, working group, advisory council or chapter
+(CH-09, CH-17; ADR-NEXT `NEXT-corporate-hub-board-governance.md`): one roster of dated seats,
+its meetings and votes, its action items and its self-assessments.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The board's or committee's name. |
+| Type | picklist | yes | Board, Committee, Task Force, Working Group, Advisory Council or Chapter. Default Board. |
+| Parent Board | reference to Board | no | The board a committee or task force reports to. Cleared when deleted. |
+| Status | picklist | yes | Active or Inactive. Default Active. |
+| Term Length (Months) | number | no | A usual term, used to suggest a term end. Default 36. |
+| Term Limit | number | no | The most consecutive terms a person may serve. Blank: no limit. |
+| Quorum (Percent) | number | no | The share of voting members who must be present (R-BMT2). Default 51. |
+| Skills Wanted | multi-select picklist | no | The skills the board wants among its members (CH-15). |
+| Description | long text | no | Its charge or purpose. |
+
+### Salesforce implementation
+
+- **Object:** `Board__c`, label Board or Committee, name field Text (Name), sharing Public
+  Read/Write.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Type | `Type__c` | Picklist (values above), restricted, required |
+| Parent Board | `Parent_Board__c` | Lookup(Board), Clear on delete |
+| Status | `Status__c` | Picklist (Active, Inactive), restricted, required |
+| Term Length (Months) | `Term_Months__c` | Number(3, 0), default 36 |
+| Term Limit | `Term_Limit__c` | Number(2, 0) |
+| Quorum (Percent) | `Quorum_Percent__c` | Number(3, 0), default 51 |
+| Skills Wanted | `Needed_Skills__c` | Multi-Select Picklist (the Skills values of 29CH8) |
+| Description | `Description__c` | Long Text Area(32768) |
+
+---
+
+## 29CH8. Board Member
+
+### Definition
+
+One person's seat on a board for one term (CH-09): who, in what role, from when to when. A new
+term is a new row, so the board's history is its related list.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Board | reference to Board | yes | The board (master). |
+| Person | reference to Contact | yes, when created | The member. Cleared when the person is deleted. |
+| Role | picklist | yes | Chair, Vice Chair, Treasurer, Secretary, Member or Ex Officio. Default Member. |
+| Term Start | date | yes | When the term starts. |
+| Term End | date | no | When the term ends. Blank: open-ended. |
+| Term Number | number | no | Which consecutive term this is. Default 1. |
+| Voting | boolean | yes (defaults true) | Whether the seat votes and counts for quorum. |
+| Current | boolean (formula) | no | Term Start on or before today and Term End blank or today or later (R-BM1). |
+| At Term Limit | boolean (formula) | no | Term Number at or over the board's Term Limit. |
+| Skills | multi-select picklist | no | Finance, Legal, Fundraising, Governance, Marketing and Communications, Human Resources, Technology, Program Expertise, Community Connections or Lived Experience (CH-15). |
+| Age Range | picklist | no | Optional; shown only with Show Board Demographics (CH-15). |
+| Gender | picklist | no | Optional; shown only with Show Board Demographics (CH-15). |
+| Reminded For | date | no | The term end the board's owner was last reminded about (R-BM2). |
+
+### Rules
+
+**R-BM1 Current seats.** A seat is current when its Term Start is on or before today and its
+Term End is blank or today or later. Invite Board, Request From Board, Start Self-Assessment
+and the board panel use current seats with a person.
+
+**R-BM2 Expiring terms.** The nightly Corporate Hub step (R-CR1) sends the board's owner one
+bell notification for each current seat whose Term End falls within the setting Days Before to
+Remind, and stores that date in Reminded For.
+
+**R-BM3 Dates.** Term End is on or after Term Start (validation rule `Term_End_After_Start`), and
+a new seat names a person (`Needs_Person`).
+
+### Salesforce implementation
+
+- **Object:** `Board_Member__c`, name field Auto Number (BM-{000000}), master-detail to Board
+  (`Board__c`, relationship Board Members), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Board | `Board__c` | Master-Detail(Board) |
+| Person | `Person__c` | Lookup(Contact), Clear on delete |
+| Role | `Role__c` | Picklist (values above), restricted, required |
+| Term Start | `Term_Start__c` | Date, required |
+| Term End | `Term_End__c` | Date |
+| Term Number | `Term_Number__c` | Number(2, 0), default 1 |
+| Voting | `Voting__c` | Checkbox, default true |
+| Current | `Is_Current__c` | Formula (Checkbox) |
+| At Term Limit | `At_Term_Limit__c` | Formula (Checkbox) |
+| Skills | `Skills__c` | Multi-Select Picklist (values above) |
+| Age Range | `Age_Range__c` | Picklist (Under 30, 30 to 44, 45 to 59, 60 or Over, Prefer Not to Say), restricted |
+| Gender | `Gender__c` | Picklist (Woman, Man, Non-Binary, Another Identity, Prefer Not to Say), restricted |
+| Reminded For | `Reminded_For__c` | Date |
+
+---
+
+## 29CH9. Board Meeting
+
+### Definition
+
+One meeting of a board (CH-10): when and where, its agenda, its packet, its attendance and
+quorum, its minutes and their approval, and, before a time is fixed, an availability poll
+(CH-20). Packets and papers are Salesforce Files on the meeting.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The meeting's title. |
+| Board | reference to Board | yes | The board meeting. A board with meetings cannot be deleted. |
+| Start | datetime | no | When it starts. Blank while a poll is open. |
+| Location | text | no | Where, or the call link, or "held in writing". |
+| Status | picklist | yes | Planned, Held or Cancelled. Default Planned. |
+| Agenda | long text | no | The agenda. |
+| Packet Link | URL | no | Where members open the packet; shown in the board portal (CH-18). |
+| Minutes | long text | no | The minutes. |
+| Minutes Status | picklist | yes | Draft, Submitted for Approval or Approved. Default Draft (R-BMT3). |
+| Minutes Approved On | date | no | When the minutes were marked Approved. |
+| Poll Time 1, 2, 3 | datetime | no | Candidate times for the availability poll (R-BMT4). |
+| Poll Open | boolean | yes (defaults false) | Whether members may answer the poll. |
+| Voting Invited | number (roll-up) | no | Attendees who vote. |
+| Voting Present | number (roll-up) | no | Voting attendees marked Present. |
+| Minutes Approvals | number (roll-up) | no | Attendees who approved the minutes in the portal. |
+| Packet Reads | number (roll-up) | no | Attendees who marked the packet read (CH-18). |
+| Yes for Time 1, 2, 3 | number (roll-up) | no | Attendees available at each poll time. |
+| Quorum Needed | number (formula) | no | R-BMT2. |
+| Quorum Met | boolean (formula) | no | R-BMT2. |
+
+### Rules
+
+**R-BMT1 Invite Board.** Adds one Meeting Attendee per current seat (R-BM1) of the meeting's
+board not yet invited, Voting as on the seat.
+
+**R-BMT2 Quorum.** Quorum Needed is `CEILING(Voting Invited x Quorum (Percent) / 100)`, the
+board's percent or 51 when blank; Quorum Met is true when Voting Invited is above zero and Voting
+Present reaches it.
+
+**R-BMT3 Minutes.** Staff move Draft to Submitted for Approval; members approve in the board
+portal while submitted, which stamps their attendee row; a holder of Manage Corporate Hub marks
+them Approved, which sets Minutes Approved On.
+
+**R-BMT4 Poll.** Send Poll opens it for the attendees; each answers Yes, If Needed or No for each
+time while it is open; Choose Time sets Start to the chosen time and closes it.
+
+### Salesforce implementation
+
+- **Object:** `Board_Meeting__c`, name field Text (Meeting Name), sharing Public Read/Write.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Board | `Board__c` | Lookup(Board), Restrict delete, required |
+| Start | `Start__c` | DateTime |
+| Location | `Location__c` | Text(255) |
+| Status | `Status__c` | Picklist (Planned, Held, Cancelled), restricted, required |
+| Agenda | `Agenda__c` | Long Text Area(32768) |
+| Packet Link | `Packet_Link__c` | URL |
+| Minutes | `Minutes__c` | Long Text Area(131072) |
+| Minutes Status | `Minutes_Status__c` | Picklist (Draft, Submitted for Approval, Approved), restricted, required |
+| Minutes Approved On | `Minutes_Approved_On__c` | Date |
+| Poll Time 1 | `Poll_Time_1__c` | DateTime |
+| Poll Time 2 | `Poll_Time_2__c` | DateTime |
+| Poll Time 3 | `Poll_Time_3__c` | DateTime |
+| Poll Open | `Poll_Open__c` | Checkbox, default false |
+| Voting Invited | `Voting_Count__c` | Roll-Up Summary (COUNT Meeting Attendee, Voting true) |
+| Voting Present | `Present_Count__c` | Roll-Up Summary (COUNT Meeting Attendee, Voting true, Attendance Present) |
+| Minutes Approvals | `Approvals_Count__c` | Roll-Up Summary (COUNT Meeting Attendee, Minutes Approved On not blank) |
+| Packet Reads | `Packet_Reads__c` | Roll-Up Summary (COUNT Meeting Attendee, Packet Read On not blank) |
+| Yes for Time 1 | `Poll_Yes_1__c` | Roll-Up Summary (COUNT Meeting Attendee, Available at Time 1 Yes) |
+| Yes for Time 2 | `Poll_Yes_2__c` | Roll-Up Summary (COUNT Meeting Attendee, Available at Time 2 Yes) |
+| Yes for Time 3 | `Poll_Yes_3__c` | Roll-Up Summary (COUNT Meeting Attendee, Available at Time 3 Yes) |
+| Quorum Needed | `Quorum_Needed__c` | Formula (Number) |
+| Quorum Met | `Quorum_Met__c` | Formula (Checkbox) |
+
+---
+
+## 29CH10. Meeting Attendee
+
+### Definition
+
+One person invited to one meeting (CH-10): their attendance, and what they did in the board
+portal: read the packet (CH-18), approved the minutes (PB-02), answered the poll (CH-20).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Meeting | reference to Board Meeting | yes | The meeting (master). |
+| Person | reference to Contact | yes, when created | The person. Cleared when the person is deleted. |
+| Attendance | picklist | yes | Invited, Present, Absent or Excused. Default Invited. |
+| Voting | boolean | yes (defaults false) | Whether they vote and count for quorum. |
+| Packet Read On | datetime | no | When they marked the packet read in the portal. |
+| Minutes Approved On | datetime | no | When they approved the minutes in the portal. |
+| Available at Time 1, 2, 3 | picklist | no | Yes, If Needed or No. |
+| Key | text | yes | Meeting and person, unique. |
+| Board Name, Minutes Ready, Poll Open | formula | no | The meeting's board name; whether minutes are submitted or approved; whether the poll is open: read by the portal, which reads one parent hop and filters on the row's own fields. |
+
+### Salesforce implementation
+
+- **Object:** `Meeting_Attendee__c`, name field Auto Number (MA-{000000}), master-detail to
+  Board Meeting (`Meeting__c`, relationship Attendees), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Meeting | `Meeting__c` | Master-Detail(Board Meeting) |
+| Person | `Person__c` | Lookup(Contact), Clear on delete |
+| Attendance | `Attendance__c` | Picklist (Invited, Present, Absent, Excused), restricted, required |
+| Voting | `Voting__c` | Checkbox, default false |
+| Packet Read On | `Packet_Read_On__c` | DateTime |
+| Minutes Approved On | `Minutes_Approved_On__c` | DateTime |
+| Available at Time 1 | `Available_1__c` | Picklist (Yes, If Needed, No), restricted |
+| Available at Time 2 | `Available_2__c` | Picklist (Yes, If Needed, No), restricted |
+| Available at Time 3 | `Available_3__c` | Picklist (Yes, If Needed, No), restricted |
+| Key | `Key__c` | Text(40), unique, external ID |
+| Board Name | `Board_Name__c` | Formula (Text), `Meeting__r.Board__r.Name` |
+| Minutes Ready | `Minutes_Ready__c` | Formula (Checkbox), minutes Submitted for Approval or Approved |
+| Poll Open | `Poll_Open__c` | Formula (Checkbox), `Meeting__r.Poll_Open__c` |
+
+---
+
+## 29CH11. Board Motion
+
+### Definition
+
+A motion or resolution put at a meeting (CH-11), with who moved and seconded it, its vote and
+its outcome.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Meeting | reference to Board Meeting | yes | Where it was taken (master). |
+| Title | text | yes | A short title. |
+| Text | long text | no | The motion as put. |
+| Moved By, Seconded By | reference to Contact | no | Cleared when the person is deleted. |
+| Status | picklist | yes | Proposed, Voting Open, Passed, Failed, Tabled or Withdrawn. Default Proposed. |
+| Resolution Number | text | no | The organization's own numbering. |
+| Decided On | date | no | When it passed or failed. |
+| For, Against, Abstentions | number (roll-up) | no | The votes recorded (R-MO1). |
+
+### Rules
+
+**R-MO1 Voting.** Open Voting sets Voting Open and adds one Board Vote, blank, per voting
+attendee. Close Voting sets Passed when For is greater than Against, otherwise Failed, and sets
+Decided On to today.
+
+### Salesforce implementation
+
+- **Object:** `Board_Motion__c`, name field Text (Title), master-detail to Board Meeting
+  (`Meeting__c`, relationship Motions), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Meeting | `Meeting__c` | Master-Detail(Board Meeting) |
+| Text | `Text__c` | Long Text Area(32768) |
+| Moved By | `Moved_By__c` | Lookup(Contact), Clear on delete |
+| Seconded By | `Seconded_By__c` | Lookup(Contact), Clear on delete |
+| Status | `Status__c` | Picklist (values above), restricted, required |
+| Resolution Number | `Resolution_Number__c` | Text(40) |
+| Decided On | `Decided_On__c` | Date |
+| For | `Votes_For__c` | Roll-Up Summary (COUNT Board Vote, Vote For) |
+| Against | `Votes_Against__c` | Roll-Up Summary (COUNT Board Vote, Vote Against) |
+| Abstentions | `Abstentions__c` | Roll-Up Summary (COUNT Board Vote, Vote Abstain) |
+
+---
+
+## 29CH12. Board Vote
+
+### Definition
+
+One person's vote on one motion (CH-11, PB-02).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Motion | reference to Board Motion | yes | The motion (master). |
+| Person | reference to Contact | yes, when created | The voter. Cleared when the person is deleted. |
+| Vote | picklist | no | For, Against or Abstain. Blank until cast. |
+| Voted On | datetime | no | When the vote was cast. |
+| Key | text | yes | Motion and person, unique. |
+| Meeting Name, Voting Open | formula | no | For the portal page (one parent hop, own-field filters). |
+
+### Rules
+
+**R-BV1 Votes change only while voting is open,** unless the user holds Manage Corporate Hub
+(recording a vote taken by voice); validation rule `Vote_While_Open`.
+
+### Salesforce implementation
+
+- **Object:** `Board_Vote__c`, name field Auto Number (BV-{000000}), master-detail to Board
+  Motion (`Motion__c`, relationship Votes), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Motion | `Motion__c` | Master-Detail(Board Motion) |
+| Person | `Person__c` | Lookup(Contact), Clear on delete |
+| Vote | `Vote__c` | Picklist (For, Against, Abstain), restricted |
+| Voted On | `Voted_On__c` | DateTime |
+| Key | `Key__c` | Text(40), unique, external ID |
+| Meeting Name | `Meeting_Name__c` | Formula (Text), `Motion__r.Meeting__r.Name` |
+| Voting Open | `Voting_Open__c` | Formula (Checkbox), motion Status Voting Open |
+
+---
+
+## 29CH13. Action Item
+
+### Definition
+
+Something a board meeting asked someone to do (CH-16), carried to each later meeting of the
+board until it is closed.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Board | reference to Board | yes | The board (master). |
+| Raised At | reference to Board Meeting | no | The meeting that raised it. Cleared when deleted. |
+| Action | text | yes | What is to be done. |
+| Assigned To | reference to Contact | no | Who does it. Cleared when deleted. |
+| Due Date | date | no | When it is due. |
+| Status | picklist | yes | Open, Done or Dropped. Default Open. |
+| Closed On | date | no | When it was closed. |
+
+### Rules
+
+**R-AI1 Carried forward.** A meeting's panel lists the board's Open action items raised at an
+earlier meeting (or at none), oldest first.
+
+### Salesforce implementation
+
+- **Object:** `Meeting_Action_Item__c`, label Action Item, name field Text (Action), master-detail
+  to Board (`Board__c`, relationship Action Items), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Board | `Board__c` | Master-Detail(Board) |
+| Raised At | `Meeting__c` | Lookup(Board Meeting), Clear on delete |
+| Assigned To | `Assigned_To__c` | Lookup(Contact), Clear on delete |
+| Due Date | `Due_Date__c` | Date |
+| Status | `Status__c` | Picklist (Open, Done, Dropped), restricted, required |
+| Closed On | `Closed_On__c` | Date |
+
+---
+
+## 29CH14. Board Self-Assessment
+
+### Definition
+
+One round of a board's self-assessment (CH-19), from a shipped template of questions.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Board | reference to Board | yes | The board (master). |
+| Name | text | yes | For example "Board Self-Assessment 2026". |
+| Status | picklist | yes | Open or Closed. Default Open. |
+| Template Key | text | no | The template its questions came from. |
+
+### Rules
+
+**R-BA1 Start.** Start Self-Assessment creates the assessment and one Assessment Answer per
+current seat holder (R-BM1) per question of the template, in the template's order.
+
+### Salesforce implementation
+
+- **Object:** `Board_Assessment__c`, label Board Self-Assessment, name field Text (Name),
+  master-detail to Board (`Board__c`, relationship Self-Assessments), sharing Controlled by
+  Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Board | `Board__c` | Master-Detail(Board) |
+| Status | `Status__c` | Picklist (Open, Closed), restricted, required |
+| Template Key | `Template_Key__c` | Text(80) |
+
+---
+
+## 29CH15. Assessment Answer
+
+### Definition
+
+One member's answer to one self-assessment question (CH-19).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Assessment | reference to Board Self-Assessment | yes | The round (master). |
+| Person | reference to Contact | yes, when created | Who answers. Cleared when deleted. |
+| Question | text | yes | The question. |
+| Order | number | no | Its place in the template. |
+| Rating | number | no | 1 (strongly disagree) to 5 (strongly agree). |
+| Comment | long text | no | Anything the member adds. |
+| Open | boolean (formula) | no | The assessment is Open. |
+
+### Rules
+
+**R-AA1** A Rating is 1 to 5 (`Rating_Range`), and Rating and Comment change only while the
+assessment is Open (`Answer_While_Open`).
+
+### Salesforce implementation
+
+- **Object:** `Assessment_Answer__c`, name field Auto Number (AA-{000000}), master-detail to
+  Board Self-Assessment (`Assessment__c`, relationship Answers), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Assessment | `Assessment__c` | Master-Detail(Board Self-Assessment) |
+| Person | `Person__c` | Lookup(Contact), Clear on delete |
+| Question | `Question__c` | Text(255), required |
+| Order | `Sort_Order__c` | Number(3, 0) |
+| Rating | `Rating__c` | Number(1, 0) |
+| Comment | `Comment__c` | Long Text Area(32768) |
+| Open | `Open__c` | Formula (Checkbox), assessment Status Open |
 
 ---
 
@@ -15352,6 +15794,7 @@ mirrors the primary member).
 | 1.9 | 2026-11-11 | Migration Assistant (MIG-01, MIG-10, MIG-08; ADR-NEXT `NEXT-migration-assistant.md`, D-125). New Section 29ZS Migration Run (`Migration_Run__c`, rules R-MR1 to R-MR4) and shipped type Migration Kit (`Migration_Kit__mdt`, Section 13, R-MK1). Import Batch (16) gains Migration Run (`Migration_Run__c`) and Migration Step (`Migration_Step__c`). Integration App gains rows `Nonprofit_Success_Pack` and `Nonprofit_Cloud_Fundraising` (shown only when installed) and Start Migration for a detected product with a kit. R-R16 gains NPSP customizable rollups: read by describe, imported through the DLRS import steps, covered by the same-field guard. Rollup Builder ships kits `DLRS_Rollups` and `NPSP_Rollups`. |
 | 1.10 | 2026-11-11 | Giving words and nightly jobs (G-36, G-37). No object or field added. Labels only: `Installment__c` is Scheduled Payment (plural Scheduled Payments, Name label Payment Number, list view All Scheduled Payments); the `Installment__c` lookups on Gift, Gift Batch Row and Pledge Reminder are labelled Scheduled Payment; Pledge Reminder's `Commitment__c` is labelled Commitment; `Commitment__c.Installments_Planned__c` is Payments Planned. The vocabulary is commitment (the record), pledge and recurring gift (its types), scheduled payment (each installment). The pledge reminder step (`BarnCRM Giving Pledge Reminders`, 03:15, shipped off) is now one of `GivingScheduler`'s five jobs: its Schedule and Stop switch it with the others and Run Now runs it; `GivingScheduler.isScheduled` still counts only the other four. |
 | 1.11 | 2026-11-11 | Gift details and wealth screening (G-21, G-31, G-32, D-156). Five attributes added to Gift (`Stock_Symbol__c`, `Stock_Shares__c`, `Planned_Gift_Type__c`, `Gift_Source__c`, `Gift_Source_Name__c`), rule R-G17, and the packaged report DAF and Stock Gifts This Year. New Section 25U Wealth screening data, rules R-WS1 to R-WS3: five attributes added to Contact (`Capacity_Rating__c`, `Affinity_Rating__c`, `Screening_Score__c`, `Screening_Date__c`, `Screening_Source__c`), hidden from Giving Read Only, and the shipped import template Wealth Screening. |
+| 1.12 | 2026-11-11 | Corporate Hub board governance (CH-09 to CH-20, PB-02; ADR-NEXT `NEXT-corporate-hub-board-governance.md`). New Sections 29CH7 Board (`Board__c`), 29CH8 Board Member (`Board_Member__c`), 29CH9 Board Meeting (`Board_Meeting__c`), 29CH10 Meeting Attendee (`Meeting_Attendee__c`), 29CH11 Board Motion (`Board_Motion__c`), 29CH12 Board Vote (`Board_Vote__c`), 29CH13 Action Item (`Meeting_Action_Item__c`), 29CH14 Board Self-Assessment (`Board_Assessment__c`) and 29CH15 Assessment Answer (`Assessment_Answer__c`). Library Document gains Ask Every Year (`Annual__c`); Policy Acknowledgment gains `Disclosure__c`, `Conflict_Disclosed__c` and `Answered_In_Portal__c` (R-PAK1, R-PAK3, R-PAK4); Corporate Hub Settings gains `Board_Demographics__c` (false). |
 
 ---
 ## 32. Entity ownership by package
@@ -15507,6 +15950,15 @@ included; standard objects the packages extend are named by the entity that gove
 | Compliance Cycle | Corporate Hub | 1.7 (CH-03) | 29CH4 |
 | Agreement | Corporate Hub | 1.7 (CH-08) | 29CH5 |
 | Corporate Hub Settings | Corporate Hub | 1.7 (CH-03) | 29CH6 |
+| Board | Corporate Hub | 1.10 (CH-09, CH-17) | 29CH7 |
+| Board Member | Corporate Hub | 1.10 (CH-09) | 29CH8 |
+| Board Meeting | Corporate Hub | 1.10 (CH-10) | 29CH9 |
+| Meeting Attendee | Corporate Hub | 1.10 (CH-10) | 29CH10 |
+| Board Motion | Corporate Hub | 1.10 (CH-11) | 29CH11 |
+| Board Vote | Corporate Hub | 1.10 (CH-11) | 29CH12 |
+| Action Item | Corporate Hub | 1.10 (CH-16) | 29CH13 |
+| Board Self-Assessment | Corporate Hub | 1.14 (CH-19) | 29CH14 |
+| Assessment Answer | Corporate Hub | 1.14 (CH-19) | 29CH15 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |

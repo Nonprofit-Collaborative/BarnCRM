@@ -778,12 +778,18 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Board and committee roster | Major | Members, roles, terms with start and end dates, term limits and alerts for expiring terms. | Planned (1.x) | CH-09 |
-| Board meetings | Major | Agendas, board packets on Salesforce Files, attendance, quorum check and minutes with an approval step. | Planned (1.x) | CH-10 |
-| Motions, votes and resolutions | Minor | A log of motions, votes and resolutions, linked to the meeting where each was taken. | Planned (1.x) | CH-11 |
-| Conflict-of-interest disclosures | Minor | Annual disclosures and board policy acknowledgments. | Planned (1.x) | CH-12 |
-| Board giving participation | Minor | Share of board members who gave this year, shown only when Giving is installed. | Planned (1.x) | CH-13 |
-| Governance board dashboard | Minor | Roster, expiring terms, attendance, open disclosures and, with Giving, giving participation; complements the Funders financial board dashboard (F-07). | Planned (1.x) | CH-14 |
+| Board and committee roster | Major | Boards and Committees with Board Member seats: person (a Core Contact, no login needed), role, term start and end, term number, voting; Current and At Term Limit flags; the Board panel lists current seats and terms ending soon, and the board's owner gets one bell reminder per ending term. | Built, in review for release 1.10 | CH-09 |
+| Board meetings | Major | Board Meetings with agenda, packet as Files plus a Packet Link for the portal, Invite Board, attendance, a quorum check against the board's quorum percent (51 by default), and minutes submitted for approval and marked approved by an admin. | Built, in review for release 1.10 | CH-10 |
+| Motions, votes and resolutions | Minor | Board Motions on a meeting with mover, seconder and resolution number; Open Voting gives each voting attendee a Board Vote; Close Voting records Passed or Failed; votes lock once closed. | Built, in review for release 1.10 | CH-11 |
+| Conflict-of-interest disclosures | Minor | Request From Board asks every current seat holder to acknowledge a policy and disclose interests and any conflict; Ask Every Year documents ask again each year for the same version. | Built, in review for release 1.10 | CH-12 |
+| Board giving participation | Minor | Share of current board members who gave this fiscal year on the Board panel, read from Giving by describe and shown only when Giving is installed. | Built, in review for release 1.10 | CH-13 |
+| Governance board dashboard | Minor | The Board Governance dashboard and four reports: current roster, terms ending in 90 days, attendance this year, open board disclosures; giving participation stays on the Board panel so the dashboard never needs Giving. | Built, in review for release 1.10 | CH-14 |
+| Board skills and diversity matrix | Minor | Skills Wanted on the board against each seat's skills, with the wanted skills nobody holds; optional age range and gender, shown only with Show board demographics (off by default). | Built, in review for release 1.10 | CH-15 |
+| Meeting action items | Minor | Meeting Action Items raised at a meeting, carried onto every later meeting of the board until Done or Dropped. | Built, in review for release 1.10 | CH-16 |
+| Committees and working groups | Minor | A Board or Committee's Type (board, committee, task force, working group, advisory council, chapter) and Parent Board. | Built, in review for release 1.10 | CH-17 |
+| Board packet read tracking | Minor | Members mark the packet read in the board portal; the meeting panel counts reads. | Built, in review for release 1.14 | CH-18 |
+| Board self-assessment | Minor | Start Self-Assessment creates the year's assessment from the shipped template (13 statements) for each current seat holder, rated 1 to 5 in the board portal while Open. | Built, in review for release 1.14 | CH-19 |
+| Meeting availability poll | Minor | Up to three Poll Times on a meeting; members answer Yes, If Needed or No in the board portal; Choose This Time sets the start and closes the poll. | Built, in review for release 1.17 | CH-20 |
 
 ---
 
@@ -796,7 +802,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
 | Portal Builder | Major | Portals on the organization's own website for people verified against their BarnCRM record: sign-in by a code Salesforce emails, an optional or required authenticator second factor, lockout and rate limits, sessions staff can end; a JSON template of pages, fields and actions (own record, related records, catalog); the portal API run as one integration user; a framework-free browser client and a minimal WordPress plugin that keeps the OAuth secret on the server, with a small stylesheet that fits a phone in the theme's own fonts and colors. | Shipped (#1026) | PB-01 (D-187) |
-| Board portal template | Major | Board members see meetings, agendas, packets and minutes, approve minutes, record votes, and complete disclosures and policy acknowledgments. Needs Corporate Hub. | Planned (1.x) | PB-02 |
+| Board portal template | Major | Board members see their meetings, agendas, packet links and minutes, mark packets read, approve minutes, vote on open motions, answer disclosures and policy acknowledgments, the self-assessment and availability polls, and see their seats. The `board.json` template; actions through Corporate Hub's portal extension; needs Corporate Hub. | Built, in review for release 1.11 | PB-02 |
 | Volunteer portal template | Major | Volunteers see open shifts and sign up or cancel, see their own shifts, view and log hours (a new entry follows the Volunteers hours approval setting; no edits after saving) and keep their contact, availability and emergency contact current. The `volunteer.json` template; needs Volunteers. | Shipped (#1026) | PB-03 |
 | Service portal template | Major | Clients see their program enrollments and services. Needs Programs. | Planned (1.x) | PB-04 |
 | Partner portal template | Major | Partner organizations see shared records and referrals, and grant reports where Funders is installed. | Planned (1.x) | PB-05 |

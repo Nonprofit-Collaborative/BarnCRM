@@ -96,5 +96,28 @@
       "reviewMonths": 24,
       "summary": "Starter record: attach your own policy. A gift acceptance policy usually says which gifts the organization accepts, which need review before they are accepted (real estate, securities, vehicles, restricted or named gifts), who decides, and how gifts are acknowledged. IRS Form 990, Schedule M, asks about a policy for non-standard contributions. BarnCRM supplies no legal text. Not legal advice: review your policy with your counsel."
     }
+  ],
+  "assessments": [
+    {
+      "key": "board-self-assessment",
+      "set": "CH-19",
+      "title": "Board Self-Assessment",
+      "scale": "1 strongly disagree, 5 strongly agree",
+      "questions": [
+        "The board understands the organization's mission and uses it to guide decisions.",
+        "The board reviews the organization's finances regularly and understands them.",
+        "Board members receive the packet early enough to prepare for meetings.",
+        "Meetings focus on strategy and decisions rather than reports.",
+        "Every member takes part in discussion, and differing views are welcome.",
+        "The board's committees have clear charges and report back on them.",
+        "The board oversees the executive director's performance and pay each year.",
+        "Members understand their legal duties of care, loyalty and obedience.",
+        "Conflicts of interest are disclosed and handled as the policy requires.",
+        "The board has the skills, experience and diversity of views it needs.",
+        "New members receive an orientation that prepares them to contribute.",
+        "Every member supports fundraising in a way that suits them.",
+        "I am satisfied with my own contribution to the board this year."
+      ]
+    }
   ]
 }

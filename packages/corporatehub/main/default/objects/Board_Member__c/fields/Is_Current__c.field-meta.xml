@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Is_Current__c</fullName>
+  <externalId>false</externalId>
+  <formula>AND(NOT(ISBLANK(Term_Start__c)), Term_Start__c &lt;= TODAY(), OR(ISBLANK(Term_End__c), Term_End__c &gt;= TODAY()))</formula>
+  <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+  <inlineHelpText>Checked when today falls within the term.</inlineHelpText>
+  <label>Current</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

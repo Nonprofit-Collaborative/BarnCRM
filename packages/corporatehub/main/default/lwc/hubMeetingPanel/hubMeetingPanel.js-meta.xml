@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Meeting panel: Invite Board, attendance and quorum, packet reads, minutes approval,
+    motions and voting, carried action items and the availability poll (CH-10, CH-11, CH-14,
+    CH-18, CH-20).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Board Meeting Panel</masterLabel>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordPage">
+      <objects>
+        <object>Board_Meeting__c</object>
+      </objects>
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

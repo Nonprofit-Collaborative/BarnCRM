@@ -167,7 +167,7 @@ A template is JSON in the portal's Template field. The sample in
 
 ### Ready-Made Templates
 
-Three templates ship in `portal-client/templates/`. Paste one into a portal's Template field. Each
+Four templates ship in `portal-client/templates/`. Paste one into a portal's Template field. Each
 needs its module: while the module is turned off the portal is unavailable, and where the module
 is not installed its pages fail and the Error Log says which field is missing, so install and turn
 on the module first. Every page shows only the signed-in person's own records, and only the fields
@@ -178,6 +178,7 @@ marked `edit` can be changed. The portal's API user needs no access to any of th
 | Volunteer Portal | `volunteer.json`, Volunteers | Open Shifts (Sign Up), My Shifts (Cancel Sign-Up), My Hours (view and log), My Profile |
 | Speaker Portal | `speaker.json`, Event Management | Events Open for Proposals (Propose a Talk), Open Proposals (edit, Withdraw), All My Proposals, My Sessions, My Speaker Details, My Details |
 | Donor Portal | `donor.json`, Giving | My Giving, Gift History, Pledges and Recurring Gifts, Receipts, My Contact Details |
+| Board Portal | `board.json`, Corporate Hub | My Meetings (I Have Read the Packet), Minutes (Approve Minutes), My Votes (Vote For, Vote Against, Abstain), Disclosures and Policies (edit, I Have Read and Acknowledge), Board Self-Assessment (edit), Meeting Availability (edit), My Board Seats, My Details |
 
 **Volunteer.** Sign Up adds the person to an open shift that has room and has not started, once
 per shift (a cancelled sign-up is reopened). Cancel Sign-Up works until the shift starts. A new
@@ -197,6 +198,17 @@ session's time can be public.
 not editable, because it is the person's sign-in. Receipts shows the list of issued receipts
 (number, date, amount); it does not send the document. There are no payments: BarnCRM takes no
 money. Cancelled gifts, pledges and recurring gifts are hidden.
+
+**Board.** For board and committee members (Corporate Hub board governance). My Meetings lists
+the meetings the person is invited to, with the agenda and the meeting's Packet Link shown as
+text to open; the portal does not serve files. Minutes lists meetings whose minutes are
+Submitted for Approval or Approved; Approve Minutes records the person's approval while they are
+submitted. My Votes lists the person's vote on each motion put to them; a vote is cast only while
+the motion's voting is open and cannot be changed after it closes. Disclosures and Policies lists
+open requests made to the person (for example the yearly conflict-of-interest disclosure): they
+write any interests, say whether they have a conflict, then acknowledge. Board Self-Assessment
+and Meeting Availability appear while an assessment or a poll is open. Staff run everything from
+the board and meeting pages; see [Corporate Hub](corporate-hub.md#board-governance).
 
 If your org has state and country picklists turned on, a changed State or Country must be a value
 in those lists.

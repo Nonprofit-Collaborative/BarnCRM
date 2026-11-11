@@ -144,8 +144,9 @@ CAPS = {
     "portal": 55_600,
     # Corporate Hub (CH-01 to CH-08, ADR-NEXT corporate hub module): access sync, post-install,
     # the policy, compliance, reminder and template services and the page controller, 29,744
-    # measured, plus about 2%.
-    "corporatehub": 30_400,
+    # measured, plus about 2%. Board governance (CH-09 to CH-20, PB-02): HubBoard, the board and
+    # meeting panel controller and the board portal actions, 51,443 measured, plus about 2%.
+    "corporatehub": 52_500,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

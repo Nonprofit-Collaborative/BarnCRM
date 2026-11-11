@@ -12,6 +12,18 @@ public with sharing class HubTemplates {
 	@TestVisible
 	private static String bodyOverride;
 
+	/** A self-assessment template (`assessments`, R-BA1): its title and questions, or null. */
+	public static Map<String, Object> assessment(String key) {
+		Map<String, Object> templates = (Map<String, Object>) JSON.deserializeUntyped(body());
+		for (Object item : entries(templates, 'assessments')) {
+			Map<String, Object> template = (Map<String, Object>) item;
+			if (text(template, 'key') == key) {
+				return template;
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Creates a record for each template key the org does not have.
 	 *

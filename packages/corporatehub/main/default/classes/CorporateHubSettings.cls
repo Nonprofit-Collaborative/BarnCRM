@@ -7,6 +7,12 @@ public with sharing class CorporateHubSettings {
 	public static final String SETTINGS_OBJECT = 'Corporate_Hub_Settings__c';
 	public static final Integer DEFAULT_DAYS = 30;
 
+	/** Whether the board panel shows seats' age range and gender (CH-15). Ships off. */
+	public static Boolean boardDemographics() {
+		Object stored = read('Board_Demographics__c');
+		return stored != null && Boolean.valueOf(String.valueOf(stored));
+	}
+
 	/** Whether the nightly run sends reminders. Ships on. */
 	public static Boolean remindersEnabled() {
 		Object stored = read('Reminders_Enabled__c');
