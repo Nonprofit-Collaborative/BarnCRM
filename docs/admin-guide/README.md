@@ -278,6 +278,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | NPSP import templates | [migrating-from-npsp.md](migrating-from-npsp.md) | Giving |
 | Nonprofit Cloud import templates | [migrating-from-nonprofit-cloud.md](migrating-from-nonprofit-cloud.md) | Giving |
+| DonorPerfect, Bloomerang, Little Green Light, Neon, CiviCRM and Raiser's Edge NXT gift templates | [moving-from-another-crm.md](moving-from-another-crm.md) | Giving |
 | Moving rollups from Rollup Helper by hand | [moving-from-rollup-helper.md](moving-from-rollup-helper.md) | BarnCRM Rollup Builder |
 | C-31 Moving a pilot to the managed packages | [moving-to-managed-packages.md](moving-to-managed-packages.md) | Every installed package |
 

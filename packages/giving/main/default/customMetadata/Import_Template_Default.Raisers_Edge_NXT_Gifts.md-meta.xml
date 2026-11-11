@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Raiser's Edge NXT: Gifts</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">crm_re_nxt_gifts</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Gifts exported from Raiser's Edge NXT as a gift list with constituent details: one line per gift, with the constituent's name, email and address. The donor is found by email. The fund description becomes the fund and the appeal description the appeal. See "Moving From Another CRM" in the admin guide for the export.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 1, "columns": [{"source": "First name", "target": "Contact1.FirstName"}, {"source": "Last name", "target": "Contact1.LastName"}, {"source": "Email address", "target": "Contact1.Email"}, {"source": "Address", "target": "Contact1.MailingStreet"}, {"source": "City", "target": "Contact1.MailingCity"}, {"source": "State", "target": "Contact1.MailingState"}, {"source": "ZIP", "target": "Contact1.MailingPostalCode"}, {"source": "Country", "target": "Contact1.MailingCountry"}, {"source": "Gift ID", "target": "Gift.External_Id__c"}, {"source": "Gift date", "target": "Gift.Gift_Date__c"}, {"source": "Gift amount", "target": "Gift.Amount__c"}, {"source": "Payment method", "target": "Gift.Type__c"}, {"source": "Reference", "target": "Gift.Payment_Reference__c"}, {"source": "Appeal description", "target": "Gift.Appeal"}, {"source": "Fund description", "target": "Allocation.Fund"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Person_Mode__c</field>
+    <value xsi:type="xsd:string">Contacts</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

@@ -374,3 +374,17 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 5 | Choose the person again and save a gift. | The gift saves as before; the panel never blocks a save. |
 
 **Cleanup:** refund or delete the gift from step 5.
+
+## T-GIFT-21: Gift Templates for Other CRMs
+
+**Purpose:** confirm the six off-Salesforce gift templates are listed and load a file from one of them ([Moving From Another CRM](../admin-guide/moving-from-another-crm.md)).
+**Prerequisites:** T-GIFT-01 (a default fund); funds **General** and **Building** and an appeal **Spring Appeal**. A CSV file with the Little Green Light headings of the admin guide and three rows: Zztest Ana (ana@example.invalid), 50.00, Fund General, Appeal Spring Appeal, Gift ID LGL-1; the same donor, 25.00, Fund Building, no appeal, Gift ID LGL-2; Zztest Ben (no email), 10.00, Fund Capital, Gift ID LGL-3. Admin user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Import** tab and the template list. | **DonorPerfect: Gifts**, **Bloomerang: Transactions**, **Little Green Light: Gifts**, **Neon CRM: Donations**, **CiviCRM: Contributions** and **Raiser's Edge NXT: Gifts** are listed. |
+| 2 | Choose **Little Green Light: Gifts** and the file. Run the preview. | 2 gifts to create for one new person, Zztest Ana; the third row is rejected naming the fund **Capital**. |
+| 3 | Load. Open Zztest Ana. | Two gifts: 50.00 to General with Spring Appeal, 25.00 to Building with no appeal; External ID LGL-1 and LGL-2. |
+| 4 | Load the same file again and preview. | The two gifts are matched, not created again. |
+
+**Cleanup:** undo the first load from Data Manager.
