@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Award__c</fullName>
+  <inlineHelpText>The award paid.</inlineHelpText>
+  <label>Award</label>
+  <referenceTo>Award__c</referenceTo>
+  <relationshipLabel>Disbursements</relationshipLabel>
+  <relationshipName>Disbursements</relationshipName>
+  <relationshipOrder>0</relationshipOrder>
+  <reparentableMasterDetail>false</reparentableMasterDetail>
+  <trackTrending>false</trackTrending>
+  <type>MasterDetail</type>
+  <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>
