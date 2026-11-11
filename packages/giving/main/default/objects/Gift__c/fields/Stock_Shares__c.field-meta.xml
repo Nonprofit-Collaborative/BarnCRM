@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Stock_Shares__c</fullName>
+  <description>How many shares a gift of stock was (G-21, R-G17). The gift's Amount is not computed from it.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>For a gift of stock, the number of shares. Enter the gift's value in Amount yourself, usually the average of the high and low price on the day the shares arrived.</inlineHelpText>
+  <label>Shares</label>
+  <precision>14</precision>
+  <required>false</required>
+  <scale>4</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

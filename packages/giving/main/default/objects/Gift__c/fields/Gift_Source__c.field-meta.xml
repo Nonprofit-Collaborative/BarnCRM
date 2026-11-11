@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Gift_Source__c</fullName>
+  <description>Who the money came through when it was not the donor directly (G-31, R-G17). Empty means given directly. The donor stays the person or organization credited.</description>
+  <inlineHelpText>Choose when the money came through a donor-advised fund, a family foundation, an IRA or an employer program rather than from the donor directly. Leave it empty for a direct gift.</inlineHelpText>
+  <label>Gift Source</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Donor-Advised Fund</fullName>
+        <default>false</default>
+        <label>Donor-Advised Fund</label>
+      </value>
+      <value>
+        <fullName>Family Foundation</fullName>
+        <default>false</default>
+        <label>Family Foundation</label>
+      </value>
+      <value>
+        <fullName>IRA Charitable Distribution</fullName>
+        <default>false</default>
+        <label>IRA Charitable Distribution</label>
+      </value>
+      <value>
+        <fullName>Employer Giving Program</fullName>
+        <default>false</default>
+        <label>Employer Giving Program</label>
+      </value>
+      <value>
+        <fullName>Other</fullName>
+        <default>false</default>
+        <label>Other</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

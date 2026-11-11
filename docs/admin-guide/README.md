@@ -186,6 +186,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | G-17 Gift batches | [gift-batches.md](gift-batches.md) | Giving |
 | G-04 Refunds and write-offs | [refunds.md](refunds.md) | Giving |
 | G-18 In-kind gifts | [in-kind-gifts.md](in-kind-gifts.md) | Giving |
+| G-21, G-31 Stock, planned and donor-advised fund gifts | [stock-planned-and-daf-gifts.md](stock-planned-and-daf-gifts.md) | Giving |
 | G-07, G-11 Commitments | [commitments.md](commitments.md) | Giving |
 | G-08 Soft credits | [soft-credits.md](soft-credits.md) | Giving |
 | G-09 Tributes | [tributes.md](tributes.md) | Giving |
@@ -201,6 +202,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | G-16 Retention reports | [retention-reports.md](retention-reports.md) | Giving |
 | G-28 Donor segments | [donor-segments.md](donor-segments.md) | Giving |
 | G-19 Donor scoring | [donor-scoring.md](donor-scoring.md) | Giving |
+| G-32 Wealth screening data | [wealth-screening.md](wealth-screening.md) | Giving |
 | G-20 Posting and closed periods | [posting-and-closed-periods.md](posting-and-closed-periods.md) | Giving |
 | G-02, ADR-0064 A donor's giving on their record | [donor-records.md](donor-records.md) | Giving |
 | G-06 Giving dashboard | [giving-dashboard.md](giving-dashboard.md) | Giving |

@@ -54,6 +54,26 @@
         <behavior>Edit</behavior>
         <field>Installment__c</field>
       </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Gift_Source__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Gift_Source_Name__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Planned_Gift_Type__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Stock_Symbol__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Stock_Shares__c</field>
+      </layoutItems>
     </layoutColumns>
     <layoutColumns>
       <layoutItems>

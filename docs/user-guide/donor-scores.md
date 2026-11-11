@@ -27,6 +27,14 @@ A donor with no gifts has no score.
 - **Lapsed:** has not given in a long time.
 - **Occasional:** gives now and then.
 
+## To See a Person's Wealth Screening
+
+If your organization has loaded a wealth screening, a person's **Giving Details** section also
+shows **Capacity Rating**, **Affinity Rating**, **Screening Score**, **Screening Date** and
+**Screening Source**, as the screening vendor gave them. They are separate from the donor
+score, which uses giving only. You see them with the Giving Admin or Giving Staff permission
+set, not with Giving Read Only (see [Wealth screening data](../admin-guide/wealth-screening.md)).
+
 ## To Make a List of Donors by Score
 
 - In **Donor Segments**, choose the **Champions** or **Slipping Donors** template and save it.

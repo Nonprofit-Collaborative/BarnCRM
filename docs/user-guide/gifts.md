@@ -45,6 +45,17 @@ You should see: the payment on the commitment turn **Paid** (or **Partially paid
 
 You should see: the gift page shows an **In-kind Gift** section with **In-kind Description** and **Fair Market Value**. A gift that was part money and part goods is two gifts.
 
+## To Record a Gift of Stock, a Planned Gift or a Donor-Advised Fund Gift
+
+1. Enter the gift as usual, in Quick Gift Entry or on the **Gifts** tab, with the donor you are crediting and the value you record as **Amount**. For stock, set **Payment Method** to **Stock**.
+2. Open the gift and click **Edit**.
+3. For stock, fill in **Stock Symbol** and **Shares**.
+4. For a bequest, an annuity or a trust payment, choose the **Planned Gift Type**.
+5. When the money came through a donor-advised fund, a family foundation, an IRA or an employer program, choose the **Gift Source** and type the sponsor or foundation in **Gift Source Name**.
+6. Click **Save**.
+
+You should see: the fields on the gift's **Details** tab. The gift still counts in the donor's giving. The report **DAF and Stock Gifts This Year** lists gifts of stock and gifts through a donor-advised fund.
+
 ## To Add a Gift From a Person's or Organization's Page
 
 1. Open the person, household or organization in the BarnCRM Fundraising app.

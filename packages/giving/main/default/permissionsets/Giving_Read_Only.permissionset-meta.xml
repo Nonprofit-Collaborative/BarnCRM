@@ -948,6 +948,31 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Gift__c.Gift_Source__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Gift__c.Gift_Source_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Gift__c.Planned_Gift_Type__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Gift__c.Stock_Shares__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
+    <field>Gift__c.Stock_Symbol__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Installment__c.Paid_Amount__c</field>
     <readable>true</readable>
   </fieldPermissions>

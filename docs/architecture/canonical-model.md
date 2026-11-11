@@ -4165,6 +4165,18 @@ set: every save or delete it lets through writes an Error Log entry at Warning n
 what changed. It is separate from `Override_Receipt_Lock` (R-G4), which reaches nothing but the
 receipt.
 
+**R-G17 Stock, planned and gift source details are descriptive (G-21, G-31, release 1.5).** A
+gift of stock (Payment Method Stock) may carry its Stock Symbol and Shares; the gift's Amount
+stays the value the organization records, and nothing computes it from the shares. A planned
+gift (a bequest, an annuity, a trust distribution) is an ordinary gift with a Planned Gift Type.
+Gift Source says who the money came through when that is not the donor directly (a donor-advised
+fund, a family foundation, an IRA charitable distribution, an employer giving program), with
+Gift Source Name for the sponsor or foundation, while the donor stays the person or organization
+being credited. None of the five is validated, read by a total, the accounting export or the
+lock, or printed on a receipt: the receipt wording for a donor-advised fund gift is the
+organization's own template decision (the sponsor, not the donor, is the legal donor). The
+packaged report DAF and Stock Gifts This Year lists them.
+
 ### Salesforce implementation
 
 - **Object:** `Gift__c`, auto-number Name with format `G-{000000}`, private
@@ -4199,6 +4211,11 @@ receipt.
 | Created By Import Batch | `Created_By_Import_Batch__c` | Lookup to `Import_Batch__c` |
 | Sample Data | `Sample_Data__c` | Checkbox (v0.4) |
 | Posted to Accounting | `Accounting_Posted_At__c` | Date/Time, package written (v0.6, R-G13) |
+| Stock Symbol | `Stock_Symbol__c` | Text(12) (1.5, G-21, R-G17) |
+| Shares | `Stock_Shares__c` | Number(14, 4) (1.5, G-21) |
+| Planned Gift Type | `Planned_Gift_Type__c` | Picklist: Bequest, Beneficiary Designation, Charitable Gift Annuity, Charitable Remainder Trust, Life Insurance, Other (1.5, G-21; a charitable lead trust is recorded as Other because `check-standard-objects.sh` bars the word Lead in package metadata) |
+| Gift Source | `Gift_Source__c` | Picklist: Donor-Advised Fund, Family Foundation, IRA Charitable Distribution, Employer Giving Program, Other; empty means given directly (1.5, G-31) |
+| Gift Source Name | `Gift_Source_Name__c` | Text(255): the fund sponsor or foundation (1.5, G-31) |
 | Posted to Accounting By | `Accounting_Posted_By__c` | Lookup to User, package written (v0.6, R-G13) |
 
 - **Service:** `GiftService`, `GiftTriggerHandler`, `GiftSelector`, LWC `quickGiftEntry` (G-03).
@@ -6868,6 +6885,44 @@ numbers printed beside it and an organization can change what "recent" means wit
 - **Code:** `DonorScoreService` (pure scoring in `DonorScoreMath`, a plain class with no org access),
 `DonorScoreTriggerHandler` registered for Account and Contact, and the existing
 `DonorLevelBatch` pass, which now scores the same records after placing them on the ladder.
+
+---
+
+## 25U. Wealth screening data
+
+### Definition
+
+What an outside wealth screening said about a person (G-32, D-156, release 1.5). BarnCRM buys
+nothing and calls no screening service: the organization screens its list with a vendor of its
+choice and loads the vendor's export with the packaged import template. Ratings vary by vendor,
+so the two ratings are free text; the score is a number so it sorts and filters in Find.
+
+- **R-WS1 Stored as received.** Nothing in BarnCRM reads, recalculates or rolls up these
+  attributes; Find, reports and segments may filter on them.
+- **R-WS2 Restricted to fundraisers.** Giving Admin and Giving Staff read and edit them; Giving
+  Read Only does not see them, because screening data is a judgment about a person's means.
+- **R-WS3 Import.** The shipped import template `wealth_screening` (one object, Update by a
+  matching field: Contact by `Email`, or a person account by `PersonEmail` where people are
+  accounts) fills the five attributes; a row whose email matches nobody is rejected, so screening
+  data never creates a person.
+
+### Salesforce implementation
+
+- **Fields on Contact** (shipped by Giving, in the Giving Details section of the person page):
+
+| Attribute | API name | Type |
+|---|---|---|
+| Capacity Rating | `Capacity_Rating__c` | Text(80) |
+| Affinity Rating | `Affinity_Rating__c` | Text(80) |
+| Screening Score | `Screening_Score__c` | Number(8, 2) |
+| Screening Date | `Screening_Date__c` | Date |
+| Screening Source | `Screening_Source__c` | Text(80) |
+
+- **Import templates:** `Import_Template_Default.Wealth_Screening_Contacts` (Person Mode
+  Contacts, target `Contact`, Load Match Field `Email`) and
+  `Import_Template_Default.Wealth_Screening_Person_Accounts` (Person Mode Person Accounts, target
+  `Account`, Load Match Field `PersonEmail`, the `__pc` fields), both key `wealth_screening`, Load
+  Operation Update by a matching field.
 
 ---
 
@@ -15295,6 +15350,7 @@ mirrors the primary member).
 | 1.8 | 2026-11-11 | Corporate Hub module (CH-01 to CH-04, CH-06 to CH-08, D-118; ADR-NEXT `NEXT-corporate-hub-module.md`). New package `packages/corporatehub`: Library Document (`Hub_Document__c`, 29CH1), Policy Acknowledgment (`Policy_Acknowledgment__c`, 29CH2), Compliance Obligation (`Compliance_Obligation__c`, 29CH3), Compliance Cycle (`Compliance_Cycle__c`, 29CH4), Agreement (`Agreement__c`, 29CH5) and Corporate Hub Settings (`Corporate_Hub_Settings__c`, 29CH6), with the shipped templates `BarnCorporateHubTemplates`. |
 | 1.9 | 2026-11-11 | Migration Assistant (MIG-01, MIG-10, MIG-08; ADR-NEXT `NEXT-migration-assistant.md`, D-125). New Section 29ZS Migration Run (`Migration_Run__c`, rules R-MR1 to R-MR4) and shipped type Migration Kit (`Migration_Kit__mdt`, Section 13, R-MK1). Import Batch (16) gains Migration Run (`Migration_Run__c`) and Migration Step (`Migration_Step__c`). Integration App gains rows `Nonprofit_Success_Pack` and `Nonprofit_Cloud_Fundraising` (shown only when installed) and Start Migration for a detected product with a kit. R-R16 gains NPSP customizable rollups: read by describe, imported through the DLRS import steps, covered by the same-field guard. Rollup Builder ships kits `DLRS_Rollups` and `NPSP_Rollups`. |
 | 1.10 | 2026-11-11 | Giving words and nightly jobs (G-36, G-37). No object or field added. Labels only: `Installment__c` is Scheduled Payment (plural Scheduled Payments, Name label Payment Number, list view All Scheduled Payments); the `Installment__c` lookups on Gift, Gift Batch Row and Pledge Reminder are labelled Scheduled Payment; Pledge Reminder's `Commitment__c` is labelled Commitment; `Commitment__c.Installments_Planned__c` is Payments Planned. The vocabulary is commitment (the record), pledge and recurring gift (its types), scheduled payment (each installment). The pledge reminder step (`BarnCRM Giving Pledge Reminders`, 03:15, shipped off) is now one of `GivingScheduler`'s five jobs: its Schedule and Stop switch it with the others and Run Now runs it; `GivingScheduler.isScheduled` still counts only the other four. |
+| 1.11 | 2026-11-11 | Gift details and wealth screening (G-21, G-31, G-32, D-156). Five attributes added to Gift (`Stock_Symbol__c`, `Stock_Shares__c`, `Planned_Gift_Type__c`, `Gift_Source__c`, `Gift_Source_Name__c`), rule R-G17, and the packaged report DAF and Stock Gifts This Year. New Section 25U Wealth screening data, rules R-WS1 to R-WS3: five attributes added to Contact (`Capacity_Rating__c`, `Affinity_Rating__c`, `Screening_Score__c`, `Screening_Date__c`, `Screening_Source__c`), hidden from Giving Read Only, and the shipped import template Wealth Screening. |
 
 ---
 ## 32. Entity ownership by package
@@ -15366,6 +15422,7 @@ included; standard objects the packages extend are named by the entity that gove
 | Gift Batch Row | Giving | v0.5 | 25M |
 | Donor segments (Change From Last Year on Account and Contact) | Giving | v0.13 | 25O |
 | Ask | Giving | release 0.13 (G-26) | 25R |
+| Wealth screening data (Contact fields) | Giving | release 1.5 (G-32) | 25U |
 | Gift Transaction mirror (Gift Transaction ID on Gift, Gift Designation ID on Fund) | Mirror | release 0.17 | 29C1 |
 | Opportunity mirror (Opportunity ID on Gift) | Mirror | v0.6 | 29C |
 | Campaign sync (Campaign ID on Appeal) | Mirror | v0.6 | 29B |

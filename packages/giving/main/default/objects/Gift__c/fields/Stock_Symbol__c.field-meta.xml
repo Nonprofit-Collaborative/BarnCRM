@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Stock_Symbol__c</fullName>
+  <description>The ticker symbol of a gift of stock (G-21, R-G17). Descriptive only.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>For a gift of stock, the ticker symbol, for example ACME.</inlineHelpText>
+  <label>Stock Symbol</label>
+  <length>12</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>
