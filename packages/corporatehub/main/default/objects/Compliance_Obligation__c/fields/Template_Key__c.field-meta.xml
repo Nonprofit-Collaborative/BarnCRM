@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Template_Key__c</fullName>
+  <caseSensitive>false</caseSensitive>
+  <externalId>true</externalId>
+  <inlineHelpText>The shipped template this record came from. Blank for your own. Keep it, so setup does not load the template again.</inlineHelpText>
+  <label>Template Key</label>
+  <length>80</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>true</unique>
+</CustomField>

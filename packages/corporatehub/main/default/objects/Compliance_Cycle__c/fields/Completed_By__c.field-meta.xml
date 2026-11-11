@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Completed_By__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Who recorded it.</inlineHelpText>
+  <label>Completed By</label>
+  <referenceTo>User</referenceTo>
+  <relationshipLabel>Compliance Cycles</relationshipLabel>
+  <relationshipName>Compliance_Cycles</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

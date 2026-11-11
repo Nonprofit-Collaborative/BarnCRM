@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>One_Person</fullName>
+  <active>true</active>
+  <description>Exactly one of User and Person (R-PAK3).</description>
+  <errorConditionFormula>OR(AND(ISBLANK(User__c), ISBLANK(Person__c)), AND(NOT(ISBLANK(User__c)), NOT(ISBLANK(Person__c))))</errorConditionFormula>
+  <errorDisplayField>User__c</errorDisplayField>
+  <errorMessage>Fill in User or Person, not both.</errorMessage>
+</ValidationRule>

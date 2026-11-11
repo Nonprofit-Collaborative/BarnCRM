@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Obligation__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The obligation this cycle completed.</inlineHelpText>
+  <label>Obligation</label>
+  <referenceTo>Compliance_Obligation__c</referenceTo>
+  <relationshipLabel>Compliance Cycles</relationshipLabel>
+  <relationshipName>Compliance_Cycles</relationshipName>
+  <relationshipOrder>0</relationshipOrder>
+  <reparentableMasterDetail>false</reparentableMasterDetail>
+  <trackTrending>false</trackTrending>
+  <type>MasterDetail</type>
+  <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

@@ -82,6 +82,9 @@ public with sharing class SettingSections {
 	/** The Portal Builder module's sign-in switch and limits. */
 	@NamespaceAccessible
 	public static final String PORTALS = 'Portals';
+	/** The Corporate Hub module's reminder and acknowledgment settings. */
+	@NamespaceAccessible
+	public static final String CORPORATE_HUB = 'Corporate Hub';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -102,6 +105,7 @@ public with sharing class SettingSections {
 			PROGRAMS,
 			VOLUNTEERS,
 			PORTALS,
+			CORPORATE_HUB,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,

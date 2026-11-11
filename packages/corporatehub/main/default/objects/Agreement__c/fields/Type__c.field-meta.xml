@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Type__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>What kind of agreement this is.</inlineHelpText>
+  <label>Type</label>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Service Agreement</fullName>
+        <default>false</default>
+        <label>Service Agreement</label>
+      </value>
+      <value>
+        <fullName>Vendor Contract</fullName>
+        <default>false</default>
+        <label>Vendor Contract</label>
+      </value>
+      <value>
+        <fullName>Lease</fullName>
+        <default>false</default>
+        <label>Lease</label>
+      </value>
+      <value>
+        <fullName>Grant Agreement</fullName>
+        <default>false</default>
+        <label>Grant Agreement</label>
+      </value>
+      <value>
+        <fullName>Memorandum of Understanding</fullName>
+        <default>false</default>
+        <label>Memorandum of Understanding</label>
+      </value>
+      <value>
+        <fullName>Subscription</fullName>
+        <default>false</default>
+        <label>Subscription</label>
+      </value>
+      <value>
+        <fullName>Insurance Policy</fullName>
+        <default>false</default>
+        <label>Insurance Policy</label>
+      </value>
+      <value>
+        <fullName>Other</fullName>
+        <default>true</default>
+        <label>Other</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

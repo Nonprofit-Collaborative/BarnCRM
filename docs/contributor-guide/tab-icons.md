@@ -79,6 +79,9 @@ Rules:
 | logicmodels | Logic_Model__c | Custom62: Chalkboard |
 | portal | Portal_Access__c | Custom77: Locked |
 | portal | Portal__c | Custom47: Knight |
+| corporatehub | Agreement__c | Custom93: ShoppingCart |
+| corporatehub | Compliance_Obligation__c | Custom97: Thermometer |
+| corporatehub | Hub_Document__c | Custom49: CD/DVD |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |
 | mirror | Gift_Transaction_Mirror | Custom31: Car |

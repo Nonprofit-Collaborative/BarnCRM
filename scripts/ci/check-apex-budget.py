@@ -122,6 +122,9 @@ CAPS = {
     # once, where values typed at parse time), plus about 2%. Batch C review landing: 54,467
     # measured (QA's sign-in fixes plus perf's and simplification's portal changes), plus about 2%.
     "portal": 55_600,
+    # Corporate Hub (CH-01 to CH-08, ADR-NEXT corporate hub module): access sync and post-install
+    # only in this slice, 3,858 measured, plus about 2%.
+    "corporatehub": 4_000,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

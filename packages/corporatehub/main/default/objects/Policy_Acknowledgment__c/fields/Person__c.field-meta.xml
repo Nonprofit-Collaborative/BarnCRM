@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Person__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The person asked when they have no login, such as a board member. Fill in User or Person, not both.</inlineHelpText>
+  <label>Person</label>
+  <referenceTo>Contact</referenceTo>
+  <relationshipLabel>Policy Acknowledgments</relationshipLabel>
+  <relationshipName>Policy_Acknowledgments</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

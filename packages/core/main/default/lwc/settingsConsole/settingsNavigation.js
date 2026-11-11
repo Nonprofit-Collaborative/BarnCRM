@@ -19,7 +19,8 @@ const GROUPS = [
     label: ORGANIZATION,
     sections: [
       ['General', 'utility:settings'],
-      ['Organization', 'utility:company']
+      ['Organization', 'utility:company'],
+      ['Corporate Hub', 'utility:knowledge_base']
     ]
   },
   {

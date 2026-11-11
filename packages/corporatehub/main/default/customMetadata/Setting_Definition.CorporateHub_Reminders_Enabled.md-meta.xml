@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Send Corporate Hub reminders</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Reminders_Enabled__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Corporate_Hub_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Corporate Hub</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">CorporateHub</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">10</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">Whether the morning run (6:45 AM in your org time zone) sends the owner of each active compliance obligation, agreement and library document a bell notification before it is due, once per date. Staff only; nobody outside your org is contacted. Default: on.</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">corporate-hub.md</value></values>
+</CustomMetadata>

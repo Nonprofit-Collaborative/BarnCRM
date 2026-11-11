@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Days_Until_Due__c</fullName>
+  <formula>Due_Date__c - TODAY()</formula>
+  <formulaTreatBlanksAs>BlankAsBlank</formulaTreatBlanksAs>
+  <externalId>false</externalId>
+  <inlineHelpText>Next Due Date minus today. Negative when overdue.</inlineHelpText>
+  <label>Days Until Due</label>
+  <precision>18</precision>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+</CustomField>
