@@ -150,7 +150,7 @@ and similar names. Two settings sit beside the row, each with a default you can 
 - **Exact match for auto-merge** (default **Name and email**): what two people must share
   exactly before [auto-merge](#auto-merge) takes them: **Name and email**, **Name and phone**,
   **Name, email and phone** or **Name and birthdate**.
-- **Turn on merge records** (default off): adds [Merge Records](#merge-records) to the tab.
+- **Turn On Merge Records** (default off): turns on [Merge Records](#merge-records) on the tab.
 
 ### Similar Names
 
@@ -229,8 +229,8 @@ two people are separate again; the next scan suggests them again.
 
 **Merge Records** merges two records of the same BarnCRM object: two funds, two appeals, two
 programs, two import mappings, and so on. People and households keep their own merge (above).
-It is off on a new install: turn on **Turn on merge records** in **BarnCRM Settings**,
-**Duplicate Matching**. It needs Manage BarnCRM Settings (BarnCRM Admin).
+It is off on a new install, and the area says so: turn on **Turn On Merge Records** in
+**BarnCRM Settings**, **Duplicate Matching**. It needs Manage BarnCRM Settings (BarnCRM Admin).
 
 The objects offered are BarnCRM's own objects that you may edit, delete and restore from the
 Recycle Bin. BarnCRM's logs, journals and settings objects are never offered. Where BarnCRM is
@@ -238,9 +238,9 @@ installed without a namespace (an unmanaged install), every custom object is off
 
 1. Open the **Duplicate Matching** tab, then **Merge Records**.
 2. Choose the **Object**, then the two records. Click **Compare**.
-3. Choose the **Record to keep**. The other one goes to the Recycle Bin.
+3. Choose the **Record to Keep**. The other one goes to the Recycle Bin.
 4. Read the fields side by side. For each field, the value the record keeps is selected; it
-   starts from the [merge rules](#merge-rules). Change any choice. Tick **Only differences**
+   starts from the [merge rules](#merge-rules). Change any choice. Tick **Only Differences**
    to hide the fields that already match. A unique field, the owner and the record type always
    stay the kept record's.
 5. Click **Merge** and confirm.

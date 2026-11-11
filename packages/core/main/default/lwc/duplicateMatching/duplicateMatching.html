@@ -29,6 +29,16 @@
                 <c-auto-merge-panel></c-auto-merge-panel>
               </template>
             </lightning-tab>
+            <lightning-tab
+              label={labels.mergeRecords}
+              value="mergeRecords"
+              onactive={handleActive}
+              data-id="tab-mergeRecords"
+            >
+              <template lwc:if={mergeRecordsOpened}>
+                <c-generic-merge></c-generic-merge>
+              </template>
+            </lightning-tab>
           </template>
         </lightning-tabset>
       </template>

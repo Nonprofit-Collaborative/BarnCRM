@@ -298,11 +298,11 @@ Before you start: an org from [Before you test](before-you-test.md) on the Perso
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Duplicate Matching** tab. | No **Merge Records** area while the setting is off. |
-| 2 | In **BarnCRM Settings**, **Duplicate Matching**, turn on **Turn on merge records** and save. Reopen the tab. | A **Merge Records** area with its intro, **Object**, two record pickers and **Recent Merges** reading that nothing was merged in the last 15 days. |
-| 3 | Choose **Object** Fund, pick `Zztest Fund A` and `Zztest Fund B`, click **Compare**. | The two funds side by side, `Zztest Fund A` chosen as **Record to keep**. **Description** shows the value `Merge test` selected (merge rule Not blank). No owner, record type or unique field rows. |
-| 4 | Tick **Only differences**. | Only rows whose values differ remain. |
-| 5 | Click **Merge** and confirm. | A green notice: the records were merged, 1 related record moved, 1 value changed. The comparison closes. **Recent Merges** lists `Zztest Fund B` (Fund) with **Undo**. |
+| 1 | Open the **Duplicate Matching** tab, then **Merge Records**. | The area says Merge Records is off, with nothing to choose. |
+| 2 | In **BarnCRM Settings**, **Duplicate Matching**, turn on **Turn On Merge Records** and save. Reopen the tab, then **Merge Records**. | The intro, **Object**, a disabled **Compare** and **Recent Merges** reading that nothing was merged in the last 15 days. |
+| 3 | Choose **Object** Fund, pick `Zztest Fund A` as **First Record** and `Zztest Fund B` as **Second Record**, click **Compare**. | The two funds side by side, `Zztest Fund A` chosen as **Record to Keep**. **Description** shows the value `Merge test` selected (merge rule Not blank). No owner, record type or unique field rows. |
+| 4 | Tick **Only Differences**. | Only rows whose values differ remain. |
+| 5 | Click **Merge** and confirm. | A message: merged, 1 related record moved, 1 value changed. The comparison closes. **Recent Merges** lists `Fund: Zztest Fund B` with **Undo**. |
 | 6 | Open `Zztest Fund A`. | Description reads `Merge test`; the gift that was on Fund B is on Fund A. `Zztest Fund B` is in the Recycle Bin. |
 | 7 | On **Auto-Merge**, read **Recent Runs**. | The fund merge is not listed there. |
 

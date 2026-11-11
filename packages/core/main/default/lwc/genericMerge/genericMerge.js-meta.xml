@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>The Merge Records area of the Duplicate Matching tab (C-62): compare and merge two records of one BarnCRM object, undo a recent merge.</description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>
