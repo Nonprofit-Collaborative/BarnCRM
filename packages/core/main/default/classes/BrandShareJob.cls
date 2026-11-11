@@ -129,7 +129,12 @@ public with sharing class BrandShareJob implements Queueable {
 		Set<Id> wanted = new Set<Id>();
 		Map<Id, Set<Id>> members = new Map<Id, Set<Id>>();
 		if (BrandService.visibilityOn()) {
-			for (Brand__c brand : [SELECT Id FROM Brand__c WHERE Active__c = TRUE WITH SYSTEM_MODE]) {
+			for (Brand__c brand : [
+				SELECT Id
+				FROM Brand__c
+				WHERE Active__c = TRUE
+				WITH SYSTEM_MODE
+			]) {
 				wanted.add(brand.Id);
 				members.put(brand.Id, new Set<Id>());
 			}
@@ -179,7 +184,9 @@ public with sharing class BrandShareJob implements Queueable {
 			for (Id userId : members.get(brandId)) {
 				String key = '' + groups.get(brandId) + userId;
 				if (existing.remove(key) == null) {
-					added.add(new GroupMember(GroupId = groups.get(brandId), UserOrGroupId = userId));
+					added.add(
+						new GroupMember(GroupId = groups.get(brandId), UserOrGroupId = userId)
+					);
 				}
 			}
 		}
@@ -211,7 +218,10 @@ public with sharing class BrandShareJob implements Queueable {
 		for (AccountShare share : [
 			SELECT Id, AccountId, UserOrGroupId
 			FROM AccountShare
-			WHERE AccountId IN :accountIds AND UserOrGroupId IN :groups.values() AND RowCause = 'Manual'
+			WHERE
+				AccountId IN :accountIds
+				AND UserOrGroupId IN :groups.values()
+				AND RowCause = 'Manual'
 			WITH SYSTEM_MODE
 		]) {
 			if (!wanted.remove('' + share.AccountId + share.UserOrGroupId)) {
@@ -234,7 +244,10 @@ public with sharing class BrandShareJob implements Queueable {
 					share.put(level, 'None');
 				}
 			}
-			if (fields.containsKey('ContactAccessLevel') && fields.get('ContactAccessLevel').getDescribe().isCreateable()) {
+			if (
+				fields.containsKey('ContactAccessLevel') &&
+				fields.get('ContactAccessLevel').getDescribe().isCreateable()
+			) {
 				share.put('ContactAccessLevel', 'Edit');
 			}
 			added.add(share);
@@ -253,7 +266,10 @@ public with sharing class BrandShareJob implements Queueable {
 			WITH SYSTEM_MODE
 		]) {
 			try {
-				groups.put(Id.valueOf(brandGroup.DeveloperName.removeStart(GROUP_PREFIX)), brandGroup.Id);
+				groups.put(
+					Id.valueOf(brandGroup.DeveloperName.removeStart(GROUP_PREFIX)),
+					brandGroup.Id
+				);
 			} catch (StringException notOurs) {
 				continue;
 			}
@@ -267,7 +283,12 @@ public with sharing class BrandShareJob implements Queueable {
 			if (!BrandService.visibilityOn()) {
 				return null;
 			}
-			List<Organization> org = [SELECT DefaultAccountAccess FROM Organization WITH SYSTEM_MODE LIMIT 1];
+			List<Organization> org = [
+				SELECT DefaultAccountAccess
+				FROM Organization
+				WITH SYSTEM_MODE
+				LIMIT 1
+			];
 			if (org.isEmpty() || org[0].DefaultAccountAccess == 'None') {
 				return null;
 			}

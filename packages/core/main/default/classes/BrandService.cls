@@ -80,9 +80,21 @@ public with sharing class BrandService {
 		Map<Id, Brand__c> brands = new Map<Id, Brand__c>(
 			[
 				SELECT
-					Id, Name, Legal_Entity__c, Logo_Document_Id__c, Street__c, City__c, State__c,
-					Postal_Code__c, Country__c, Phone__c, Website__c, Primary_Color__c,
-					Secondary_Color__c, Sender_Email__c, Letter_Signature__c,
+					Id,
+					Name,
+					Legal_Entity__c,
+					Logo_Document_Id__c,
+					Street__c,
+					City__c,
+					State__c,
+					Postal_Code__c,
+					Country__c,
+					Phone__c,
+					Website__c,
+					Primary_Color__c,
+					Secondary_Color__c,
+					Sender_Email__c,
+					Letter_Signature__c,
 					Receipt_Number_Prefix__c
 				FROM Brand__c
 				WHERE Id IN :brandIds
@@ -96,7 +108,14 @@ public with sharing class BrandService {
 		Map<Id, Legal_Entity__c> entities = new Map<Id, Legal_Entity__c>(
 			[
 				SELECT
-					Id, Name, Tax_Id__c, Street__c, City__c, State__c, Postal_Code__c, Country__c,
+					Id,
+					Name,
+					Tax_Id__c,
+					Street__c,
+					City__c,
+					State__c,
+					Postal_Code__c,
+					Country__c,
 					Receipt_Number_Prefix__c
 				FROM Legal_Entity__c
 				WHERE Id IN :entityIds
@@ -256,7 +275,13 @@ public with sharing class BrandService {
 		for (String part : new List<String>{ 'City__c', 'State__c', 'Postal_Code__c' }) {
 			locality += String.isBlank((String) source.get(part)) ? '' : ' ' + source.get(part);
 		}
-		for (Object line : new List<Object>{ source.get('Street__c'), locality, source.get('Country__c') }) {
+		for (
+			Object line : new List<Object>{
+				source.get('Street__c'),
+				locality,
+				source.get('Country__c')
+			}
+		) {
 			if (String.isNotBlank((String) line)) {
 				lines.add(((String) line).trim());
 			}
@@ -280,7 +305,10 @@ public with sharing class BrandService {
 		Schema.SObjectType type = records[0].getSObjectType();
 		List<SObject> others = new List<SObject>();
 		// The type is the trigger's own object.
-		String query = 'SELECT Id FROM ' + type + ' WHERE Is_Default__c = TRUE AND Id NOT IN :newDefaults';
+		String query =
+			'SELECT Id FROM ' +
+			type +
+			' WHERE Is_Default__c = TRUE AND Id NOT IN :newDefaults';
 		for (SObject other : Database.query(query, AccessLevel.SYSTEM_MODE)) {
 			other.put('Is_Default__c', false);
 			others.add(other);

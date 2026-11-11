@@ -35,7 +35,9 @@ private class BrandServiceTest {
 		System.runAs(TestUsers.admin()) {
 			Brand__c only = brand('Thrift Store', null, true);
 			insert new Brand_Assignment__c(Brand__c = only.Id, User__c = UserInfo.getUserId());
-			List<Brand_Assignment__c> records = new List<Brand_Assignment__c>{ new Brand_Assignment__c() };
+			List<Brand_Assignment__c> records = new List<Brand_Assignment__c>{
+				new Brand_Assignment__c()
+			};
 
 			Test.startTest();
 			BrandService.applyDefaults(records, null);
@@ -83,7 +85,11 @@ private class BrandServiceTest {
 			Test.startTest();
 			second.Is_Default__c = true;
 			update second;
-			insert new Brand_Assignment__c(Brand__c = second.Id, User__c = me, Is_Primary__c = true);
+			insert new Brand_Assignment__c(
+				Brand__c = second.Id,
+				User__c = me,
+				Is_Primary__c = true
+			);
 			Boolean duplicateRefused = false;
 			try {
 				insert new Brand_Assignment__c(Brand__c = second.Id, User__c = me);
@@ -98,7 +104,11 @@ private class BrandServiceTest {
 			);
 			Assert.areEqual(
 				1,
-				[SELECT COUNT() FROM Brand_Assignment__c WHERE User__c = :me AND Is_Primary__c = TRUE],
+				[
+					SELECT COUNT()
+					FROM Brand_Assignment__c
+					WHERE User__c = :me AND Is_Primary__c = TRUE
+				],
 				'One primary brand per user'
 			);
 			Assert.isTrue(duplicateRefused, 'A record is assigned to a brand once');
@@ -153,12 +163,20 @@ private class BrandServiceTest {
 		Assert.isNotNull(groupId, 'An active brand has a group');
 		Assert.areEqual(
 			1,
-			[SELECT COUNT() FROM GroupMember WHERE GroupId = :groupId AND UserOrGroupId = :admin.Id],
+			[
+				SELECT COUNT()
+				FROM GroupMember
+				WHERE GroupId = :groupId AND UserOrGroupId = :admin.Id
+			],
 			'The assigned user is a member'
 		);
 		Assert.areEqual(
 			1,
-			[SELECT COUNT() FROM AccountShare WHERE AccountId = :household.Id AND UserOrGroupId = :groupId],
+			[
+				SELECT COUNT()
+				FROM AccountShare
+				WHERE AccountId = :household.Id AND UserOrGroupId = :groupId
+			],
 			'The assigned household is shared with the brand group'
 		);
 
@@ -166,7 +184,10 @@ private class BrandServiceTest {
 			turnOn(true, false);
 			BrandShareJob.syncGroups();
 		}
-		Assert.isTrue(BrandShareJob.groupsByBrand().isEmpty(), 'Off removes the groups, and their shares');
+		Assert.isTrue(
+			BrandShareJob.groupsByBrand().isEmpty(),
+			'Off removes the groups, and their shares'
+		);
 	}
 
 	@IsTest

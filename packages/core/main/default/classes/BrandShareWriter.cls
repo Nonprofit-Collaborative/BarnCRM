@@ -19,7 +19,9 @@ public without sharing class BrandShareWriter {
 	public static void insertRows(List<SObject> rows) {
 		if (rows != null && !rows.isEmpty()) {
 			// Not all or none: one Account deleted mid run must not stop the rest.
-			for (Database.SaveResult result : Database.insert(rows, false, AccessLevel.SYSTEM_MODE)) {
+			for (
+				Database.SaveResult result : Database.insert(rows, false, AccessLevel.SYSTEM_MODE)
+			) {
 				if (!result.isSuccess()) {
 					ErrorLogger.logMessage(
 						String.valueOf(result.getErrors()[0].getMessage()),
