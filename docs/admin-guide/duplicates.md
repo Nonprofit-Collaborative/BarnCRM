@@ -150,6 +150,7 @@ and similar names. Two settings sit beside the row, each with a default you can 
 - **Exact match for auto-merge** (default **Name and email**): what two people must share
   exactly before [auto-merge](#auto-merge) takes them: **Name and email**, **Name and phone**,
   **Name, email and phone** or **Name and birthdate**.
+- **Turn on merge records** (default off): adds [Merge Records](#merge-records) to the tab.
 
 ### Similar Names
 
@@ -187,6 +188,10 @@ person, so a street never lands with the other person's city. A field with no ru
 **Merge rule for other fields**. The household and the record owner always stay the kept
 person's. Saving a rule needs BarnCRM Admin or BarnCRM Metadata Admin.
 
+For [Merge Records](#merge-records), name the object and the field with a dot and no namespace
+prefix, for example `Fund__c.Description__c`. That rule sets the starting choice for the field
+when two funds are compared; you can still change it before you merge.
+
 ### Auto-Merge
 
 The **Auto-Merge** area of the **Duplicate Matching** tab merges the obvious duplicates in one
@@ -219,6 +224,43 @@ What undo cannot put back is listed under the run: for example a person no longe
 Recycle Bin (it keeps people for 15 days, or until someone empties it), a value changed after
 the merge, or a related record deleted since. Undo is offered for 15 days. After an undo the
 two people are separate again; the next scan suggests them again.
+
+### Merge Records
+
+**Merge Records** merges two records of the same BarnCRM object: two funds, two appeals, two
+programs, two import mappings, and so on. People and households keep their own merge (above).
+It is off on a new install: turn on **Turn on merge records** in **BarnCRM Settings**,
+**Duplicate Matching**. It needs Manage BarnCRM Settings (BarnCRM Admin).
+
+The objects offered are BarnCRM's own objects that you may edit, delete and restore from the
+Recycle Bin. BarnCRM's logs, journals and settings objects are never offered. Where BarnCRM is
+installed without a namespace (an unmanaged install), every custom object is offered.
+
+1. Open the **Duplicate Matching** tab, then **Merge Records**.
+2. Choose the **Object**, then the two records. Click **Compare**.
+3. Choose the **Record to keep**. The other one goes to the Recycle Bin.
+4. Read the fields side by side. For each field, the value the record keeps is selected; it
+   starts from the [merge rules](#merge-rules). Change any choice. Tick **Only differences**
+   to hide the fields that already match. A unique field, the owner and the record type always
+   stay the kept record's.
+5. Click **Merge** and confirm.
+
+What happens, all at once or not at all, as you and with your access:
+
+- every related record (gifts, shifts, activities, anything whose link to the other record can
+  be changed) moves to the kept record;
+- the other record goes to the Recycle Bin;
+- the kept record takes the values you chose.
+
+BarnCRM does not merge, and changes nothing, when a related record would be lost: one you
+cannot read, or one under a master-detail link that cannot be changed (it would be deleted with
+the record). The message names it. Files and notes on the other record stay with it in the
+Recycle Bin and come back on undo.
+
+Under **Recent Merges**, each merge of the last 15 days is listed with **Undo**, which works as
+auto-merge's undo does: the other record comes back from the Recycle Bin, the kept record gets
+its own values back unless somebody changed them since, and the related records move back.
+What undo cannot restore is listed under the merge.
 
 ### Matching Logic
 

@@ -365,7 +365,7 @@ public with sharing class AutoMergeService {
 		for (Candidate pair : pairs) {
 			mergedIds.add(pair.mergedId);
 		}
-		Map<Id, Moved> moved = movedRecords(mergedIds);
+		Map<Id, Moved> moved = movedRecords(Contact.SObjectType, mergedIds);
 		Set<Id> survivorIds = new Set<Id>();
 		for (Candidate pair : pairs) {
 			survivorIds.add(pair.survivorId);
@@ -467,19 +467,19 @@ public with sharing class AutoMergeService {
 		return added;
 	}
 
-	/** The related records of one merged-away person, by "Object.Field", and what was missed. */
-	private class Moved {
-		Map<String, List<Id>> byLink = new Map<String, List<Id>>();
-		List<String> notes = new List<String>();
+	/** The related records of one merged-away record, by "Object.Field", and what was missed. */
+	public class Moved {
+		public Map<String, List<Id>> byLink = new Map<String, List<Id>>();
+		public List<String> notes = new List<String>();
 	}
 
 	/**
-	 * Every related record pointing at these people through a link the person merging can
-	 * change, which is what the merge will move to the kept person. One query per link for
-	 * all of them; a link that cannot be read, or would leave too few queries for the merge,
-	 * is named in the notes instead.
+	 * Every related record pointing at these records (people here, any object for Generic
+	 * Record Merge, C-62) through a link the person merging can change, which is what the merge
+	 * moves to the kept record. One query per link for all of them; a link that cannot be read,
+	 * or would leave too few queries for the merge, is named in the notes instead.
 	 */
-	private static Map<Id, Moved> movedRecords(Set<Id> mergedIds) {
+	public static Map<Id, Moved> movedRecords(Schema.SObjectType type, Set<Id> mergedIds) {
 		Map<Id, Moved> result = new Map<Id, Moved>();
 		for (Id mergedId : mergedIds) {
 			result.put(mergedId, new Moved());
@@ -487,7 +487,7 @@ public with sharing class AutoMergeService {
 		if (mergedIds.isEmpty()) {
 			return result;
 		}
-		for (Schema.ChildRelationship link : Schema.SObjectType.Contact.getChildRelationships()) {
+		for (Schema.ChildRelationship link : type.getDescribe().getChildRelationships()) {
 			Schema.DescribeFieldResult field = link.getField().getDescribe();
 			Schema.DescribeSObjectResult child = link.getChildSObject()
 				.getDescribe(SObjectDescribeOptions.DEFERRED);
@@ -619,7 +619,26 @@ public with sharing class AutoMergeService {
 		return restored;
 	}
 
+	/** Puts back the changed values, one object at a time (people, or a C-62 merge's object). */
 	private static void restoreValues(
+		List<Merge_Journal__c> journals,
+		Map<Id, List<String>> notesById
+	) {
+		Map<Schema.SObjectType, List<Merge_Journal__c>> byType = new Map<Schema.SObjectType, List<Merge_Journal__c>>();
+		for (Merge_Journal__c journal : journals) {
+			Schema.SObjectType type = Id.valueOf(journal.Survivor_Id__c).getSObjectType();
+			if (!byType.containsKey(type)) {
+				byType.put(type, new List<Merge_Journal__c>());
+			}
+			byType.get(type).add(journal);
+		}
+		for (Schema.SObjectType type : byType.keySet()) {
+			restoreValues(type, byType.get(type), notesById);
+		}
+	}
+
+	private static void restoreValues(
+		Schema.SObjectType type,
 		List<Merge_Journal__c> journals,
 		Map<Id, List<String>> notesById
 	) {
@@ -639,28 +658,31 @@ public with sharing class AutoMergeService {
 		if (changesById.isEmpty()) {
 			return;
 		}
-		// Only names that are Contact fields go into the query, whatever the row says.
-		Map<String, Schema.SObjectField> contactFields = Schema.SObjectType.Contact.fields.getMap();
+		// Only names that are fields of the object go into the query, whatever the row says.
+		Schema.DescribeSObjectResult described = type.getDescribe();
+		Map<String, Schema.SObjectField> objectFields = described.fields.getMap();
 		for (String name : new List<String>(fieldNames)) {
-			if (!contactFields.containsKey(name)) {
+			if (!objectFields.containsKey(name)) {
 				fieldNames.remove(name);
 			}
 		}
 		fieldNames.add('Id');
-		Map<Id, Contact> survivors = new Map<Id, Contact>(
-			(List<Contact>) Database.queryWithBinds(
+		Map<Id, SObject> survivors = new Map<Id, SObject>(
+			Database.queryWithBinds(
 				'SELECT ' +
 					String.join(new List<String>(fieldNames), ', ') +
-					' FROM Contact WHERE Id IN :ids',
+					' FROM ' +
+					described.getName() +
+					' WHERE Id IN :ids',
 				new Map<String, Object>{ 'ids' => survivorIds },
 				AccessLevel.USER_MODE
 			)
 		);
-		List<Contact> updates = new List<Contact>();
+		List<SObject> updates = new List<SObject>();
 		List<Merge_Journal__c> updated = new List<Merge_Journal__c>();
 		for (Merge_Journal__c journal : journals) {
 			Map<String, Object> changes = changesById.get(journal.Id);
-			Contact survivor = survivors.get(journal.Survivor_Id__c);
+			SObject survivor = survivors.get(journal.Survivor_Id__c);
 			if (changes == null) {
 				continue;
 			}
@@ -670,7 +692,7 @@ public with sharing class AutoMergeService {
 				continue;
 			}
 			Map<String, Object> putBack = new Map<String, Object>{
-				'attributes' => new Map<String, Object>{ 'type' => 'Contact' },
+				'attributes' => new Map<String, Object>{ 'type' => described.getName() },
 				'Id' => survivor.Id
 			};
 			for (String field : changes.keySet()) {
@@ -691,7 +713,7 @@ public with sharing class AutoMergeService {
 				}
 			}
 			if (putBack.size() > 2) {
-				updates.add((Contact) JSON.deserialize(JSON.serialize(putBack), Contact.class));
+				updates.add((SObject) JSON.deserialize(JSON.serialize(putBack), SObject.class));
 				updated.add(journal);
 			}
 		}
