@@ -1707,7 +1707,7 @@ its Source App is detected (Integration App Detection Objects, by describe).
 and `kind`, `import` or `tool`, plus optional `help` (one sentence).
 - An `import` step adds `source` (the object to read, a packaged name written
   `namespace.Object__c` as Integration App rows do), `fields` (field paths on it, the same
-  notation, at most five relationship hops; `Id` is always read), optional `where` (a list of
+  notation, at most five relationship hops; `Id` is always read), optional `filters` (a list of
   `{"field": "...", "value": ...}` conditions, all of which must hold; a JSON null value means
   blank) and `templateKey` (the Template Key of a shipped Import Template Default whose column
   names are the step's field paths as written). Names resolve through describe at run time,
@@ -12690,7 +12690,7 @@ run is reopened (back to In Progress) by unticking an item or undoing a step.
 
 **R-MR2 Steps in order, undone backwards.** A step starts only when every earlier step is done:
 an import step when its latest batch for the run is Complete, a tool step when State marks it
-done. Starting an import step reads the source count (user mode, the step's `where`); a count of
+done. Starting an import step reads the source count (user mode, the step's `filters`); a count of
 zero marks the step done in State with no batch. Otherwise it creates an Import Batch with the
 step's template and that Expected Count (left empty when the kit has an Extension Class, which
 may reshape rows), and queues staging in Batch Apex
@@ -12710,7 +12710,8 @@ Complete when every step is done and every checklist item ticked.
 
 **R-MR4 Administrators only, nothing outside BarnCRM changed.** Every action needs Manage BarnCRM
 Settings, and an import step also the Import permission (`ImportController`). Runs are written in
-user mode. Only `BarnCRM_Admin` is granted the object (Read, Create, Edit, Delete). BarnCRM never
+user mode. Only `BarnCRM_Admin` is granted the object (Read, Create, Edit, Delete, View All, Modify All), so one administrator
+continues a run another started. BarnCRM never
 writes, switches off or uninstalls the product migrated from.
 
 ### Salesforce implementation

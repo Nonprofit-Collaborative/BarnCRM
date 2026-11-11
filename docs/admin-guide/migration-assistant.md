@@ -129,7 +129,7 @@ A kit is data plus, only when needed, one small class. It needs no change to Cor
        "kind": "import",
        "source": "ns.Job__c",
        "fields": ["Name", "ns.Description__c", "ns.Campaign__r.Name"],
-       "where": [{ "field": "ns.Inactive__c", "value": false }],
+       "filters": [{ "field": "ns.Inactive__c", "value": false }],
        "templateKey": "migration_example_jobs"
      }
      ```
