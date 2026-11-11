@@ -146,8 +146,9 @@ CAPS = {
     # the policy, compliance, reminder and template services and the page controller, 29,744
     # measured, plus about 2%.
     "corporatehub": 30_400,
-    # Payments (PAY-01, ADR-NEXT payments module): access sync and post install only so far.
-    "payments": 8_000,
+    # Payments (PAY-01, ADR-NEXT payments module): checkout, receiver, processing and Health
+    # Check measured 47,575 on 2026-11-11, plus about 2 percent.
+    "payments": 48_600,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

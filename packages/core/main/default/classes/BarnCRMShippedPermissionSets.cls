@@ -56,6 +56,7 @@ public with sharing class BarnCRMShippedPermissionSets {
 		'Payments_Admin',
 		'Payments_Read_Only',
 		'Payments_Staff',
+		'Payments_Webhook_Guest',
 		'Portal_Admin',
 		'Portal_Integration',
 		'Programs_Admin',
