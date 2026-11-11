@@ -299,6 +299,13 @@ public with sharing class SettingsService {
 		if (changed.containsKey(BarnCRM_Settings__c.App_Navigation_Style__c)) {
 			TabAccessService.requestSync();
 		}
+		// Brand visibility follows either brand switch: groups and shares added or removed (R-BR7).
+		if (
+			changed.containsKey(BarnCRM_Settings__c.Brand_Visibility__c) ||
+			changed.containsKey(BarnCRM_Settings__c.Brand_Management__c)
+		) {
+			BrandShareJob.requestFull();
+		}
 		notifyRollupEngine(objectName, changed);
 		return orgDefault(type);
 	}

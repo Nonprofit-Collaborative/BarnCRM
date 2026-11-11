@@ -26,6 +26,7 @@ into six kinds:
 |---|---|---|---|
 | AffiliationUpkeepSelector | Integrity | Overlapping affiliations owned by someone else, so the primary-affiliation rule still refuses them | ADR-0021 category 2 |
 | AffiliationUpkeepWriter | Upkeep | The person's primary affiliation fields and their other affiliations, which the saver may not be able to edit | ADR-0021 category 2 |
+| BrandShareWriter | Platform | Brand groups, their members and Account shares granted to them, which a staff member assigning a brand cannot create; one default brand and entity and one primary assignment cleared on rows the saver may not edit | ADR-0021, ADR-NEXT brand management and visibility |
 | AutomationSettingsWriter | Platform | The automation pause on the protected org settings and the Automation Setting rows from the shipped registry | ADR-0021 |
 | EmptyHouseholdTidyBatch | Org job | Every empty household, read and deleted as the scheduler, with the dependents check reaching every child record | ADR-0021, ADR-0036 |
 | ErrorDigestWriter | Platform | The digest run record on the protected org settings | ADR-0021, ADR-0027 |
