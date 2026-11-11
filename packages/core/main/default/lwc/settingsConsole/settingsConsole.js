@@ -35,7 +35,7 @@ import SAVES_ON_ITS_OWN from '@salesforce/label/c.Core_Settings_SavesOnItsOwn';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
 import { groupRows, findBox } from './settingsGroups';
-import { navigationGroups } from './settingsNavigation';
+import { navigationGroups, openPageReference } from './settingsNavigation';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /** The page state key a link to a section uses: `c__section`, or the namespace's. */
@@ -568,17 +568,15 @@ export default class SettingsConsole extends NavigationMixin(LightningElement) {
 
   /**
    * Opens a module's own settings page, which lives on its own tab (ADR-0020), or a tool's one
-   * home in Org Optimizer at its section (admin-14), with the state key qualified in Apex.
+   * home in Org Optimizer at its section (admin-14), with the state key qualified in Apex. A
+   * target that is an object (Form__c) opens that object's tab, where its records are set up.
    */
   async handleOpenSection(event) {
     const { target, section } = event.currentTarget.dataset;
     if (!target) {
       return;
     }
-    const pageReference = {
-      type: 'standard__navItemPage',
-      attributes: { apiName: target }
-    };
+    const pageReference = openPageReference(target);
     if (section) {
       try {
         const link = await getSettingsLink();

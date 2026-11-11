@@ -45,7 +45,9 @@ all nightly jobs** fix schedules it.
 Then open the **BarnCRM Logic Models** app from the App Launcher. Its tab is **Logic Models**,
 which also joins the BarnCRM apps.
 
-Logic Models has no settings yet, so it adds no section to BarnCRM Settings.
+Logic Models has no org-wide settings yet: each logic model is set up on its own record.
+BarnCRM Settings has a **Logic Models** section with one row, **Open Logic Models**, which opens
+the Logic Models tab. That row is also how BarnCRM knows Logic Models is installed.
 
 ### Roles and Permission Sets
 

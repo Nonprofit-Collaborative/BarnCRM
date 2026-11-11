@@ -82,6 +82,12 @@ public with sharing class SettingSections {
 	/** The Portal Builder module's sign-in switch and limits. */
 	@NamespaceAccessible
 	public static final String PORTALS = 'Portals';
+	/** The Forms module's row, which opens its Forms tab and announces the module (C-72). */
+	@NamespaceAccessible
+	public static final String FORMS = 'Forms';
+	/** The Logic Models module's row, which opens its Logic Models tab (C-72). */
+	@NamespaceAccessible
+	public static final String LOGIC_MODELS = 'Logic Models';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -100,7 +106,9 @@ public with sharing class SettingSections {
 			EVENTS,
 			ROLLUPS,
 			PROGRAMS,
+			LOGIC_MODELS,
 			VOLUNTEERS,
+			FORMS,
 			PORTALS,
 			AUTOMATION,
 			ERROR_LOG,

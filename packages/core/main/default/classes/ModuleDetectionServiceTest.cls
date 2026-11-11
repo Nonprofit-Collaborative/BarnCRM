@@ -583,7 +583,9 @@ private class ModuleDetectionServiceTest {
 				'Funders',
 				'Programs',
 				'Portal',
-				'ContactPoints'
+				'ContactPoints',
+				'Forms',
+				'LogicModels'
 			};
 			for (String announcing : announcingModules) {
 				Assert.isNull(
