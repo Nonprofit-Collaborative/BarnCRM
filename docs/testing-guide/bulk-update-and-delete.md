@@ -268,7 +268,7 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **Org Optimizer**, **Storage and Limits**, and select **Archive Old Records**. | Find opens with a note that the Change Records menu offers Archive Records. As a user without BarnCRM Bulk Delete the button is not shown. |
+| 1 | Open **Org Optimizer**, **Storage and Limits**, and select **Archive Records**. | Find opens with a note that the Change Records menu offers Archive Records. As a user without BarnCRM Bulk Delete the button is not shown. |
 | 2 | Query **Contact** where **Last Name** **equals** `Arctest` and **First Name** **not equal to** `Arc4`, **Run**, open **Change Records** and choose **Archive Records**. | A panel **Archive Records** with **Preview**, **Confirm**, **Run**, and no **Download a Backup First** button. |
 | 3 | **Preview**, type `3`, and select **Archive and Delete 3 Records**. | The progress shows the file being saved, then the delete; finally "3 matched: 3 deleted, 0 refused." Two notifications: the file is saved, and the delete finished. |
 | 4 | Open **Files**. | A file `Contact-<today>-<tag>-part-1` owned by you: a heading row of field API names (`Id`, `FirstName`, `LastName` and the rest you can read) and three rows. |

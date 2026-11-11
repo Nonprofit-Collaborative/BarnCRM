@@ -8653,7 +8653,7 @@ the run limit (R-BD2), checked when it starts.
   `Database.emptyRecycleBin`, as the person. A failure there is counted in the Run Log and the
   records stay in the Recycle Bin. Such a job cannot be undone: R-BD5's preview refuses it,
   saying the records were emptied, and points to reloading the file with Load one object.
-- **Storage view.** Org Optimizer's Storage and Limits offers Archive Old Records to a person
+- **Storage view.** Org Optimizer's Storage and Limits offers Archive Records to a person
   holding R-BD6's permissions; it opens Find with `c__tool=archive`, whose Change Records menu
   then offers Archive Records.
 

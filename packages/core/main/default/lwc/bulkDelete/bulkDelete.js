@@ -5,6 +5,10 @@ import getJob from '@salesforce/apex/BulkDeleteController.getJob';
 import previewFile from '@salesforce/apex/BulkDeleteController.previewFile';
 import startFile from '@salesforce/apex/BulkDeleteController.startFile';
 import backupPage from '@salesforce/apex/BulkDeleteController.backupPage';
+import startArchive from '@salesforce/apex/BulkDeleteController.startArchive';
+import ARCHIVE_TITLE from '@salesforce/label/c.Core_Archive_Title';
+import ARCHIVE_BUTTON from '@salesforce/label/c.Core_Archive_Button';
+import EMPTY_BIN from '@salesforce/label/c.Core_Archive_EmptyBin';
 import { messageFrom, format, downloadCsv } from 'c/findCsv';
 import { startPolling } from 'c/jobPoller';
 import BACKUP from '@salesforce/label/c.Core_BulkDelete_Backup';
@@ -42,6 +46,10 @@ const STEPS = [
  *
  * Before the count is typed, "Download these records first" reads the records the delete would
  * delete, every field the person may read, page by page, and saves them as CSV (R-BD8, R-SQ3).
+ *
+ * With `archive` (C-67, R-BD9, admin guide archive-by-query.md) the same preview and count start
+ * an archive instead: the server saves every record to Files, then deletes. Emptying the Recycle
+ * Bin is a separate opt-in, sent only with the count typed a second time.
  */
 export default class BulkDelete extends LightningElement {
   helpReady = isHelpLoaded('Core');
@@ -57,6 +65,11 @@ export default class BulkDelete extends LightningElement {
   @api queryJson;
   /** A delete by file's import batch, in place of a query (R-BD7). */
   @api batchId;
+  /** Archive the query's records to Files before deleting them (R-BD9). */
+  @api archive = false;
+
+  emptyBin = false;
+  emptyConfirmText = '';
 
   labels = {
     title: TITLE,
@@ -82,8 +95,29 @@ export default class BulkDelete extends LightningElement {
     backup: BACKUP,
     get backupHelp() {
       return helpText('Core', 'Core_BulkDelete_BackupHelp');
+    },
+    emptyBin: EMPTY_BIN,
+    get emptyConfirm() {
+      return helpText('Core', 'Core_Archive_EmptyConfirm');
+    },
+    get emptyWarning() {
+      return helpText('Core', 'Core_Archive_EmptyWarning');
     }
   };
+
+  get title() {
+    return this.archive ? ARCHIVE_TITLE : TITLE;
+  }
+
+  /** An archive saves its own file, so it offers no download. */
+  get showBackup() {
+    return !this.archive;
+  }
+
+  /** No undo date once the Recycle Bin is to be emptied: nothing could be undone. */
+  get showUndoUntil() {
+    return !(this.archive && this.emptyBin);
+  }
 
   preview;
   confirmText = '';
@@ -108,6 +142,9 @@ export default class BulkDelete extends LightningElement {
   }
 
   get intro() {
+    if (this.archive) {
+      return helpText('Core', 'Core_Archive_PanelIntro');
+    }
     return this.batchId
       ? helpText('Core', 'Core_BulkDelete_FileIntro')
       : helpText('Core', 'Core_BulkDelete_PanelIntro');
@@ -154,13 +191,27 @@ export default class BulkDelete extends LightningElement {
   }
 
   get deleteLabel() {
-    return format(DELETE_BUTTON, this.preview ? this.preview.count : 0);
+    return format(
+      this.archive ? ARCHIVE_BUTTON : DELETE_BUTTON,
+      this.preview ? this.preview.count : 0
+    );
   }
 
   get startDisabled() {
-    return (
-      this.busy || !this.preview || String(this.confirmText).trim() !== String(this.preview.count)
-    );
+    if (this.busy || !this.preview) {
+      return true;
+    }
+    const count = String(this.preview.count);
+    const emptyUnconfirmed =
+      this.archive && this.emptyBin && String(this.emptyConfirmText).trim() !== count;
+    return String(this.confirmText).trim() !== count || emptyUnconfirmed;
+  }
+
+  /** The progress line: an archive's says the file is saved first. */
+  progressText(percent) {
+    return this.archive
+      ? helpText('Core', 'Core_Archive_Saving', percent)
+      : helpText('Core', 'Core_BulkDelete_Progress', percent);
   }
 
   get previewDisabled() {
@@ -182,7 +233,7 @@ export default class BulkDelete extends LightningElement {
         job.deleted,
         job.failed
       ),
-      progressLine: job.running ? helpText('Core', 'Core_BulkDelete_Progress', percent) : '',
+      progressLine: job.running ? this.progressText(percent) : '',
       progressValue: percent,
       hasFailures: Boolean(job.failures && job.failures.length),
       showUndo: Boolean(job.canUndo && !job.running)
@@ -192,6 +243,8 @@ export default class BulkDelete extends LightningElement {
   async handlePreview() {
     this.noticeMessage = undefined;
     this.confirmText = '';
+    this.emptyBin = false;
+    this.emptyConfirmText = '';
     this.preview = undefined;
     await this.work(async () => {
       this.preview = this.batchId
@@ -202,6 +255,16 @@ export default class BulkDelete extends LightningElement {
 
   handleConfirmText(event) {
     this.confirmText = event.detail.value;
+  }
+
+  /** The Recycle Bin opt-in: ticking it asks for the count again (R-BD9). */
+  handleEmptyBin(event) {
+    this.emptyBin = event.target.checked;
+    this.emptyConfirmText = '';
+  }
+
+  handleEmptyConfirmText(event) {
+    this.emptyConfirmText = event.detail.value;
   }
 
   /** Reads every record the delete would delete, page by page, and saves them as CSV (R-BD8). */
@@ -241,10 +304,20 @@ export default class BulkDelete extends LightningElement {
   async handleStart() {
     await this.work(async () => {
       const confirmedCount = this.preview.count;
-      this.job = this.batchId
-        ? await startFile({ batchId: this.batchId, confirmedCount })
-        : await startDelete({ queryJson: this.queryJson, confirmedCount });
-      this.noticeMessage = helpText('Core', 'Core_BulkDelete_Started');
+      if (this.archive) {
+        this.job = await startArchive({
+          queryJson: this.queryJson,
+          confirmedCount,
+          emptyConfirmedCount: this.emptyBin ? Number(this.emptyConfirmText) : null
+        });
+      } else {
+        this.job = this.batchId
+          ? await startFile({ batchId: this.batchId, confirmedCount })
+          : await startDelete({ queryJson: this.queryJson, confirmedCount });
+      }
+      this.noticeMessage = this.archive
+        ? helpText('Core', 'Core_Archive_Started')
+        : helpText('Core', 'Core_BulkDelete_Started');
       this.preview = undefined;
       this.confirmText = '';
       this.startPolling();

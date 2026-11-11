@@ -3,7 +3,7 @@
     <section class="slds-box slds-is-relative" aria-labelledby="bulk-delete-title" data-id="panel">
         <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
             <lightning-icon icon-name="utility:delete" size="small" class="slds-var-m-right_x-small"></lightning-icon>
-            <h2 class="slds-text-heading_small slds-col" id="bulk-delete-title">{labels.title}</h2>
+            <h2 class="slds-text-heading_small slds-col" id="bulk-delete-title" data-id="title">{title}</h2>
             <lightning-button data-id="close" label={labels.close} onclick={handleClose}></lightning-button>
         </div>
         <lightning-progress-indicator
@@ -85,31 +85,61 @@
                             </ul>
                         </c-barn-notice>
                     </template>
-                    <p class="slds-text-body_small slds-var-m-bottom_small">
-                        {labels.undoUntil}
-                        <lightning-formatted-date-time
-                            class="slds-var-m-left_xx-small"
-                            value={preview.undoDeadline}
-                            year="numeric"
-                            month="short"
-                            day="numeric"
-                        ></lightning-formatted-date-time>
-                    </p>
-                    <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
-                        <lightning-button
-                            data-id="backup"
-                            icon-name="utility:download"
-                            label={labels.backup}
-                            disabled={busy}
-                            onclick={handleBackup}
-                        ></lightning-button>
-                        <c-barn-help
-                            class="slds-var-m-left_x-small"
-                            data-id="backup-help"
-                            content={labels.backupHelp}
-                            alternative-text={labels.backup}
-                        ></c-barn-help>
-                    </div>
+                    <template lwc:if={showUndoUntil}>
+                        <p class="slds-text-body_small slds-var-m-bottom_small" data-id="undo-until">
+                            {labels.undoUntil}
+                            <lightning-formatted-date-time
+                                class="slds-var-m-left_xx-small"
+                                value={preview.undoDeadline}
+                                year="numeric"
+                                month="short"
+                                day="numeric"
+                            ></lightning-formatted-date-time>
+                        </p>
+                    </template>
+                    <template lwc:if={showBackup}>
+                        <div class="slds-grid slds-grid_vertical-align-center slds-var-m-bottom_small">
+                            <lightning-button
+                                data-id="backup"
+                                icon-name="utility:download"
+                                label={labels.backup}
+                                disabled={busy}
+                                onclick={handleBackup}
+                            ></lightning-button>
+                            <c-barn-help
+                                class="slds-var-m-left_x-small"
+                                data-id="backup-help"
+                                content={labels.backupHelp}
+                                alternative-text={labels.backup}
+                            ></c-barn-help>
+                        </div>
+                    </template>
+                    <template lwc:else>
+                        <lightning-input
+                            type="checkbox"
+                            class="slds-var-m-bottom_x-small"
+                            data-id="empty-bin"
+                            label={labels.emptyBin}
+                            checked={emptyBin}
+                            onchange={handleEmptyBin}
+                        ></lightning-input>
+                        <template lwc:if={emptyBin}>
+                            <c-barn-notice
+                                class="slds-show slds-var-m-bottom_x-small"
+                                variant="warning"
+                                message={labels.emptyWarning}
+                                data-id="empty-warning"
+                            ></c-barn-notice>
+                            <div class="slds-var-m-bottom_small slds-size_1-of-1 slds-medium-size_4-of-12">
+                                <lightning-input
+                                    data-id="empty-confirm"
+                                    label={labels.emptyConfirm}
+                                    value={emptyConfirmText}
+                                    onchange={handleEmptyConfirmText}
+                                ></lightning-input>
+                            </div>
+                        </template>
+                    </template>
                     <div class="slds-grid slds-wrap slds-gutters_x-small slds-grid_vertical-align-end">
                         <div class="slds-col slds-size_1-of-1 slds-medium-size_4-of-12">
                             <lightning-input

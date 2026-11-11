@@ -41,7 +41,7 @@ Maria's org is close to its data storage limit. She wants to keep gifts from bef
 file and take them out of Salesforce.
 
 1. Open **Org Optimizer**, **Storage and Limits**, and check **Data storage**. Select
-   **Archive Old Records**: Find opens, ready for an archive. (You can also start in **Find**
+   **Archive Records**: Find opens, ready for an archive. (You can also start in **Find**
    directly.)
 2. In Find, choose **Gift**, add the condition **Close Date**, **less than**, `2015-01-01`, and
    press **Run**. Check the results.
