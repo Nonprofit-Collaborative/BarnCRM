@@ -102,6 +102,11 @@ const ICONS = Object.freeze({
   Payment_Event__c: 'custom:custom95',
   Payment__c: 'custom:custom40',
   Payments_Setup: 'custom:custom70',
+  // Scholarships and Outbound Grants
+  Award__c: 'custom:custom80',
+  Award_Application__c: 'custom:custom70',
+  Award_Program__c: 'custom:custom58',
+  Scholarships: 'custom:custom56',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',
