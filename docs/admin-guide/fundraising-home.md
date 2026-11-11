@@ -18,7 +18,8 @@ me today" in one look, so a fundraiser no longer starts on a menu of twenty tabs
     **Running Plans**.
 - **Enter a Gift**, which opens Quick Gift Entry.
 - **Fundraising Setup**: a tile for each setup page that left the app's menu (**Donor Level
-  Ladder**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt Letters**).
+  Ladder**, **Stewardship Plan Setup**, **Pledge Reminders**, **Receipt Letters**). All four
+  are also tabs in **BarnCRM Admin** and **BarnCRM Admin Console**, before **Error Log**.
 - Two report charts: **Giving by Month** and **Open Asks by Stage**.
 
 Each figure's name is the object's own label and its status word is the picklist value's label,

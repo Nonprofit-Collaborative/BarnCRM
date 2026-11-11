@@ -86,11 +86,12 @@ public with sharing class ProgramDashboardController {
 			fillPrograms(result, byProgram);
 			return result;
 		} catch (Exception failure) {
-			ErrorLogger.log(failure, CONTEXT, null);
-			String message = BarnHelp.text('Programs', 'Programs_Fail_Dashboard');
-			AuraHandledException refused = new AuraHandledException(message);
-			refused.setMessage(message);
-			throw refused;
+			throw UserErrors.wrap(
+				failure,
+				false,
+				CONTEXT,
+				BarnHelp.text('Programs', 'Programs_Fail_Dashboard')
+			);
 		}
 	}
 

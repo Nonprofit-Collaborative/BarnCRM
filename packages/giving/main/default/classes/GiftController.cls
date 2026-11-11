@@ -71,11 +71,7 @@ public with sharing class GiftController {
 
 	private static void requireRefundAccess() {
 		if (!canRefund()) {
-			AuraHandledException refused = new AuraHandledException(
-				Label.Giving_RefundGift_NoPermission
-			);
-			refused.setMessage(Label.Giving_RefundGift_NoPermission);
-			throw refused;
+			throw UserErrors.message(Label.Giving_RefundGift_NoPermission);
 		}
 	}
 

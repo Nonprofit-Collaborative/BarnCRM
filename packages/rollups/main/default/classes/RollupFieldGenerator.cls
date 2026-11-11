@@ -123,15 +123,12 @@ public with sharing class RollupFieldGenerator {
 			};
 			return field;
 		} catch (Exception caught) {
-			String message = caught instanceof RollupService.RollupServiceException
-				? caught.getMessage()
-				: Label.Core_Rollups_UnexpectedError;
-			if (!(caught instanceof RollupService.RollupServiceException)) {
-				ErrorLogger.log(caught, 'RollupFieldGenerator');
-			}
-			AuraHandledException reported = new AuraHandledException(message);
-			reported.setMessage(message);
-			throw reported;
+			throw UserErrors.wrap(
+				caught,
+				caught instanceof RollupService.RollupServiceException,
+				'RollupFieldGenerator',
+				Label.Core_Rollups_UnexpectedError
+			);
 		}
 	}
 

@@ -28,7 +28,7 @@
   </values>
   <values>
     <field>Admin_Tabs__c</field>
-    <value xsi:type="xsd:string">Giving_Accounting_Periods:Accounting Periods;Giving_Nightly_Jobs;Donor_Levels:Donor Level Ladder;Stewardship_Plans:Stewardship Plan Setup</value>
+    <value xsi:type="xsd:string">Giving_Accounting_Periods:Accounting Periods;Giving_Nightly_Jobs;Donor_Levels:Donor Level Ladder;Stewardship_Plans:Stewardship Plan Setup;Pledge_Reminders;Receipts:Receipt Letters</value>
   </values>
   <values>
     <field>Requires__c</field>
