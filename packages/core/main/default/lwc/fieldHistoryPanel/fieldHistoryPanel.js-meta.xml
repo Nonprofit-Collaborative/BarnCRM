@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Field History card (C-68): the kept changes to the chosen fields of a BarnCRM record,
+    newest first, with Restore for admins. Shows nothing while Field History is off.
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Field History</masterLabel>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+</LightningComponentBundle>
