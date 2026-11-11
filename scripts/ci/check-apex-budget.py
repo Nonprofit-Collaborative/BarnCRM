@@ -95,7 +95,8 @@ CAPS = {
     # batch, save job, trigger handler and selector, and the schedule page's controller methods.
     # VOL-2 (P-09): 172,177 measured with program capacity and the waitlist (EnrollmentCapacity),
     # plus about 2%.
-    "programs": 175_600,
+    # Release 1.19 P-10/P-11 sample goals, cohort and sessions: 175,965 measured, plus about 1%.
+    "programs": 177_800,
     "logicmodels": 65_000,
     # Raised from 95,000 for the Funders usability stage: Undo for Mark Received and Mark
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).

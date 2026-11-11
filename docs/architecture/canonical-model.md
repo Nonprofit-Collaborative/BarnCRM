@@ -11075,13 +11075,18 @@ while the module is turned off:
 | `nonprofit_cloud_program_management_present` | Info (category OrgShape) | The org has the Nonprofit Cloud `Program` and `ProgramEnrollment` objects, found by describe only (QA-F5). Programs never reads or writes them, so the two share no records. | None: choose one for each program. The Integrations page lists Nonprofit Cloud Program Management as an Alternative (Integration App row `Nonprofit_Cloud_Program_Management`, detected by `Program`, shown only when installed). |
 
 **Sample data.** `ProgramsSampleData` implements Core's `SampleDataModule` and is registered in
-`SampleDataModules.MODULE_CLASS_NAMES` after Volunteers. Its load, three stages, builds three
+`SampleDataModules.MODULE_CLASS_NAMES` after Volunteers. Its load, five stages, builds three
 programs flagged `Sample_Data__c` (two Active, one Completed) with five services, then 18
 enrollments of up to 12 of Core's sample people (contacts), through the enrollment rules, then
 (release 0.13, P-02) 40 service deliveries (29ZB) to the people Enrolled in the two Active
-programs. Its removal, before Volunteers', Giving's and Core's, deletes one chunk per stage: the
-sample people's service deliveries and enrollments in sample programs, then the sample programs
-with no enrollment or delivery left (their services go with them). A sample program a real person
+programs, then (release 1.19, P-11) one Active cohort (29ZA5) of the people Enrolled in tutoring
+with three sessions (29ZA6) of its Homework club service (two Held, with eight attendance deliveries, one
+an Excused Absence; one Scheduled), then (P-10) one In Progress goal (29ZA3) with two steps (29ZA4) per
+person Enrolled in tutoring. Its removal, before Volunteers', Giving's and Core's, deletes one
+chunk per stage: the sample people's service deliveries and enrollments in sample programs (goals
+and steps go with them), then sample program sessions no delivery names and cohorts no session or
+schedule names, then the sample programs with no enrollment, cohort or delivery left (their
+services go with them). A sample program a real person
 is enrolled in, or has a delivery in, is kept, and so is a sample program with a sample
 enrollment that has a case note (whoever wrote it, even a note the remover cannot see: that
 enrollment is skipped and kept); one Warning in the Error Log names each one kept.
@@ -16692,6 +16697,7 @@ mirrors the primary member).
 | 1.18 | 2026-11-11 | Multi-brand management (C-47a to C-47f, D-119, D-120; ADR-NEXT `NEXT-brand-management-and-visibility.md`). New Sections 29BR1 Legal Entity (`Legal_Entity__c`), 29BR2 Brand (`Brand__c`, rules R-BR1 to R-BR8) and 29BR3 Brand Assignment (`Brand_Assignment__c`, rule R-BR9). `BarnCRM_Settings__c` gains `Brand_Management__c` and `Brand_Visibility__c` (both false); `Giving_Settings__c` gains `Receipt_Numbering_Scope__c` (`Organization`). `Brand__c` lookups on `Gift__c`, `Appeal__c`, `Volunteer_Job__c`, `Program__c` and `Portal__c`. |
 | 1.19 | 2026-11-11 | LWC Builder module (LB-01 to LB-06; ADR-NEXT `NEXT-lwc-builder-module.md`, D-120). New Sections 29LB1 Built Component (`Built_Component__c`, rules R-LB1 to R-LB3) and 29LB2 LWC Builder Settings (`LWC_Builder_Settings__c`). Package `packages/lwcbuilder`. |
 | 1.20 | 2026-11-11 | Scholarships and Outbound Grants module (SG-01 to SG-10, PB-06, D-122, D-156; ADR-NEXT `NEXT-scholarships-outbound-grants-module.md`). New package `packages/scholarships`: Award Program (`Award_Program__c`), Award Cycle (`Award_Cycle__c`), Award Application (`Award_Application__c`), Application Review (`Application_Review__c`), Award (`Award__c`), Disbursement (`Award_Payment__c`), Award Requirement (`Award_Requirement__c`) and settings `Scholarships_Settings__c` (29SG1 to 29SG8). |
+| 1.24 | 2026-11-11 | Programs sample data for goals, cohorts and sessions (release 1.19, P-10 and P-11 follow-up, D-168). 29ZA's sample data paragraph: the load gains two stages (a cohort with three sessions and attendance, then a goal with two steps per person Enrolled in tutoring); the removal deletes sample sessions and cohorts nothing refers to before the programs. No object or field added. |
 
 ---
 ## 32. Entity ownership by package

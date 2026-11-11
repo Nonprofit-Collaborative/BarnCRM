@@ -73,9 +73,34 @@ private class ProgramSampleDataTest {
 			Assert.areEqual(4, countAt('Completed'), 'Four completed summer reading.');
 			Assert.areEqual(
 				40,
-				[SELECT COUNT() FROM Service_Delivery__c WHERE Enrollment__c != NULL],
+				[
+					SELECT COUNT()
+					FROM Service_Delivery__c
+					WHERE Enrollment__c != NULL AND Session__c = NULL
+				],
 				'Four weeks of bags for eight and two sessions for four, each linked.'
 			);
+			Cohort__c cohort = [
+				SELECT Id, Status__c, (SELECT Id FROM Enrollments__r)
+				FROM Cohort__c
+				WHERE Name = 'Fall homework club'
+			];
+			Assert.areEqual('Active', cohort.Status__c, 'One active cohort.');
+			Assert.areEqual(4, cohort.Enrollments__r.size(), 'Holding the four in tutoring.');
+			Assert.areEqual(3, [SELECT COUNT() FROM Session__c WHERE Cohort__c = :cohort.Id]);
+			Assert.areEqual(1, [SELECT COUNT() FROM Session__c WHERE Status__c = 'Scheduled']);
+			Assert.areEqual(
+				8,
+				[SELECT COUNT() FROM Service_Delivery__c WHERE Session__c != NULL],
+				'Attendance for four people at two held sessions.'
+			);
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Service_Delivery__c WHERE Attendance__c = 'Excused Absence']
+			);
+			Assert.areEqual(4, [SELECT COUNT() FROM Goal__c], 'A goal for each in tutoring.');
+			Assert.areEqual(4, [SELECT COUNT() FROM Goal_Step__c WHERE Status__c = 'Done']);
+			Assert.areEqual(8, [SELECT COUNT() FROM Goal_Step__c], 'Two steps each.');
 			Assert.areEqual(
 				0,
 				[
@@ -127,6 +152,9 @@ private class ProgramSampleDataTest {
 			Assert.areEqual(0, [SELECT COUNT() FROM Service__c], 'Services went with them.');
 			Assert.areEqual(1, [SELECT COUNT() FROM Enrollment__c], 'Only the real one is left.');
 			Assert.areEqual(0, [SELECT COUNT() FROM Service_Delivery__c], 'Deliveries went first.');
+			Assert.areEqual(0, [SELECT COUNT() FROM Session__c], 'Sessions went.');
+			Assert.areEqual(0, [SELECT COUNT() FROM Cohort__c], 'The cohort went.');
+			Assert.areEqual(0, [SELECT COUNT() FROM Goal__c], 'Goals went with enrollments.');
 			Assert.isFalse(new ProgramsSampleData().hasSampleRecords(), 'Nothing left.');
 			Assert.isNull(ProgramSampleDataLoader.logWhatWasKept(), 'Nothing was kept.');
 		}
