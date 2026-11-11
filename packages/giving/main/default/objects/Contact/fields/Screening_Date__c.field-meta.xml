@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Screening_Date__c</fullName>
+  <description>When the wealth screening behind the ratings and score was run (G-32, R-WS1).</description>
+  <inlineHelpText>When the screening was run, so an old rating is not mistaken for a new one.</inlineHelpText>
+  <label>Screening Date</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Date</type>
+</CustomField>

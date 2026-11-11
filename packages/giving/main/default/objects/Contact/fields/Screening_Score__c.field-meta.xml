@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Screening_Score__c</fullName>
+  <description>The overall score from an outside wealth screening, kept as a number so it sorts and filters (G-32, R-WS1).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The overall score your wealth screening vendor gave. Higher or lower is better depending on the vendor; check their guide.</inlineHelpText>
+  <label>Screening Score</label>
+  <precision>8</precision>
+  <required>false</required>
+  <scale>2</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+  <unique>false</unique>
+</CustomField>

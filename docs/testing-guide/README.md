@@ -53,13 +53,13 @@ page, even if that puts it out of reading order.
 | [Record Inspector](record-inspector.md) | RI | 3 | Inspect This Record button, the Record Inspector page, a pasted ID or link, search fields, copy an API name, field security and permission |
 | [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 22 | Health Check findings and fixes, Org Optimizer sections, technical debt checks, storage and limits, Data Dictionary and its automation inventory, Access Explorer, Access compare and Modify All report, Field Access Manager, weekly admin summary, Setup Changes, AI-Readiness Export, Where Used and Retire a Field, NPSP households check, Report Subscriptions |
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |
-| [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 18 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import, splitting a gift across funds, gift and commitment page tabs, Giving at a Glance |
+| [Giving: gifts, funds and batches](giving-gifts-funds-batches.md) | GIFT | 19 | Funds, gifts, Quick Gift Entry, in-kind, appeals, gift batches, closed periods, gift import, splitting a gift across funds, gift and commitment page tabs, Giving at a Glance, stock, planned and donor-advised fund gift details |
 | [Giving: commitments](giving-commitments.md) | COM | 11 | Pledges, recurring gifts, payments, nightly jobs, pledge reminders |
 | [Giving: asks](giving-asks.md) | ASK | 10 | Ask stages, the Ask Pipeline board, moving and closing asks, gifts and pledges from won asks, reopening (board and ask page), history, read only access, the donor's Next Ask Date from open asks, a person account as one donor |
 | [Giving: soft credits, tributes and matching](giving-soft-credits-tributes-matching.md) | CRED | 10 | Soft credits, tributes, matching gifts |
 | [Giving: receipts and acknowledgments](giving-receipts-and-acknowledgments.md) | RCPT | 15 | Receipts, year-end statements, void and reissue, receipt lock, acknowledgments, one-step gift and plan actions |
 | [Giving: ask cadence](giving-ask-cadence.md) | ASK | 2 | Next Ask Date, nightly reminder task, Who Is Due list |
-| [Giving: donor scoring](giving-donor-scoring.md) | RFM | 3 | Scores and segment on the donor, cutoffs, segment templates |
+| [Giving: donor scoring](giving-donor-scoring.md) | RFM | 4 | Scores and segment on the donor, cutoffs, segment templates, wealth screening fields and import |
 | [Giving: refunds and write-offs](giving-refunds.md) | REF | 7 | Refunds and their effect on totals |
 | [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 9 | Giving totals, recalculation, dashboards and reports, donor segments, Fundraising Home and report charts |
 | [Contact Point Sync](contact-point-sync.md) | CPS | 5 | Copies to Contact Points, BarnCRM as the source, addresses, delete and restore, switches and Pause All, the backfill page, an org without the Individual object |

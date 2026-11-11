@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Wealth Screening</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">wealth_screening</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value
+      xsi:type="xsd:string"
+    >The export from a wealth screening vendor, one row per person already in BarnCRM, found by email address: capacity rating, affinity rating, screening score, screening date and the vendor's name. Rename the vendor's column headings to these, or map them on the next step. A row whose email finds nobody is reported, not loaded, so screening data never adds a person (G-32).</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 1, "columns": [{"source": "Email", "target": "Record.Email"}, {"source": "Capacity Rating", "target": "Record.Capacity_Rating__c"}, {"source": "Affinity Rating", "target": "Record.Affinity_Rating__c"}, {"source": "Screening Score", "target": "Record.Screening_Score__c"}, {"source": "Screening Date", "target": "Record.Screening_Date__c"}, {"source": "Screening Source", "target": "Record.Screening_Source__c"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Person_Mode__c</field>
+    <value xsi:type="xsd:string">Contacts</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Contact</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Update by a matching field</value>
+  </values>
+  <values>
+    <field>Load_Match_Field__c</field>
+    <value xsi:type="xsd:string">Email</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>
