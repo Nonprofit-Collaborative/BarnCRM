@@ -53,7 +53,8 @@ import sys
 # extra permission (simpler permission sets, D1); the Mirror merge in the same release removes 3.
 # Combined build (landing/batch-d-i): set to the merged total, 3,258, for C-62 Merge Records' three
 # labels (C-67 used the last three); AR-01b (release 1.19) moves module messages out and lowers it.
-BUDGET = 3258
+# Raised to 3,259 for the Migration Assistant (MIG-01, MIG-08) merged total.
+BUDGET = 3259
 TARGET = 3000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 
