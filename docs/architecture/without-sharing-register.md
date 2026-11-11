@@ -81,6 +81,7 @@ into six kinds:
 | VolunteerHealthCheckSelector | Org figure | Private volunteer hours for Health Check's counts | ADR-0021, ADR-0057 |
 | VolunteerIntegritySelector | Integrity | Hours, sign-ups and attendance entries another staff member made | ADR-0021 |
 | VolunteerNudgeSelector | Org job | Every unfilled shift and the email address of each volunteer who has helped on its job, for the morning nudges | ADR-0021 |
+| VolunteerPublicPage | Platform | A Site guest user or the API's integration user reads the Open shifts still to come of jobs staff marked Show on Public Page (job name, description and location, shift times and place, places left as a count), and, only behind a signed claim the host checked, one person's own upcoming bookings, approved hours and last ten entries; never who else is booked, the coordinator or notes | ADR-0190 public event pages, ADR-NEXT volunteer self-service |
 | VolunteerReminderSelector | Org job | Every booking and email address for the morning reminders | ADR-0021 |
 | VolunteersHouseholdDependentsExtension | Integrity | Private hours that keep a household from being deleted | ADR-0021 |
 | VolunteersPortalExtension | Portal | The shift a portal person signs up for and that person's own sign-up to cancel; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-0191 portal templates |

@@ -74,7 +74,10 @@ CAPS = {
     # VOL-3 (V-12, V-13, V-15): 217,833 measured with the value of hours on Home and in letters,
     # the thank-you run (VolunteerRecognitionJob and its scheduler) and the minors check
     # (VolunteerMinors), plus about 2%.
-    "volunteers": 222_200,
+    # VOL-4 (V-09): 230,699 measured with the public shift pages and personal page
+    # (VolunteerPublicPage), the shift and profile forms (VolunteerFormAttachment) and the
+    # reminder's personal link, plus about 2%.
+    "volunteers": 235_300,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
     # Raised 2026-11-06 for repeating session schedules (modules-24, D-183): the run, nightly
     # batch, save job, trigger handler and selector, and the schedule page's controller methods.

@@ -23,7 +23,10 @@ private class PublicPageExtensionsTest {
 		}
 
 		public Map<String, Object> page(Id recordId) {
-			return new Map<String, Object>{ 'title' => 'Spring Gala' };
+			return new Map<String, Object>{
+				'title' => 'Spring Gala',
+				'signed' => PublicPageExtensions.isSignedRequest()
+			};
 		}
 
 		public Map<String, Object> listPage() {
@@ -76,6 +79,24 @@ private class PublicPageExtensionsTest {
 			Assert.isNull(PublicPageExtensions.listPage(' '), 'No kind asked for');
 			Assert.isNull(PublicPageExtensions.page(null), 'No record asked for');
 			Assert.isNull(PublicPageExtensions.page(UserInfo.getUserId()), 'Not handled');
+		}
+	}
+
+	@IsTest
+	static void theModuleIsToldWhetherTheHostCheckedASignedClaim() {
+		System.runAs(TestUsers.admin()) {
+			register(new Publishing());
+			Id recordId = accountId();
+
+			Assert.isFalse(
+				(Boolean) PublicPageExtensions.page(recordId).get('signed'),
+				'Plain address'
+			);
+			Assert.isTrue(
+				(Boolean) PublicPageExtensions.page(recordId, true).get('signed'),
+				'Signed'
+			);
+			Assert.isFalse(PublicPageExtensions.isSignedRequest(), 'Only while the page is built');
 		}
 	}
 

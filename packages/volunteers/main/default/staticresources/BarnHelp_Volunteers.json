@@ -61,6 +61,27 @@
     "Volunteers_Portal_ShiftClosed": "This shift is no longer open for sign-ups.",
     "Volunteers_Portal_ShiftFull": "This shift is full.",
     "Volunteers_Portal_SignedUp": "You are signed up for this shift.",
-    "Volunteers_Portal_Waitlisted": "This shift is full, so you are on its waitlist. If a place frees up, you are moved up and signed up."
+    "Volunteers_Portal_Waitlisted": "This shift is full, so you are on its waitlist. If a place frees up, you are moved up and signed up.",
+    "Volunteers_Public_Full": "Full",
+    "Volunteers_Public_HoursEntry": "{0} hours",
+    "Volunteers_Public_HoursThisYear": "Hours This Year",
+    "Volunteers_Public_HoursTotal": "Total Hours",
+    "Volunteers_Public_HoursValue": "Value of Your Hours",
+    "Volunteers_Public_ListEmpty": "No shifts are open for sign-up right now. Please check back soon.",
+    "Volunteers_Public_ListTitle": "Volunteer Shifts",
+    "Volunteers_Public_MyTitle": "Your Volunteering",
+    "Volunteers_Public_Places": "Places",
+    "Volunteers_Public_PlacesLeft": "{0} places left",
+    "Volunteers_Public_PlacesLeftOne": "1 place left",
+    "Volunteers_Public_PlacesOpen": "No limit",
+    "Volunteers_Public_ProfileOpen": "Update your availability or emergency contact below. Leave a question blank to keep what we have.",
+    "Volunteers_Public_RecentHours": "Your Recent Hours",
+    "Volunteers_Public_SignUpClosed": "Sign-up for this shift is closed.",
+    "Volunteers_Public_SignUpOffline": "Sign-up for this shift is not taken online. Contact the volunteer coordinator.",
+    "Volunteers_Public_SignUpOpen": "Sign up below.",
+    "Volunteers_Public_SignUpWaitlist": "This shift is full. Sign up below to join its waitlist; you are signed up if a place frees.",
+    "Volunteers_Public_Upcoming": "Your Upcoming Shifts",
+    "Volunteers_Public_Where": "Where",
+    "Volunteers_Reminders_PersonalPage": "Your shifts, your hours and your availability are on your own page: {0}"
   }
 }

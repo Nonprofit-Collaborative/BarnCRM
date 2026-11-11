@@ -351,10 +351,10 @@ public with sharing class VolunteerLetterService {
 
 	/**
 	 * An amount in the org's default currency, such as $1,043.70: the common symbols, else the
-	 * ISO code. Null for nothing or 0, so the token merges as empty (R-VP5).
+	 * ISO code. Null for nothing or 0, so the token merges as empty (R-VP5). The personal page
+	 * (`VolunteerPublicPage`) shows the value of hours the same way.
 	 */
-	@TestVisible
-	private static String money(Decimal amount) {
+	public static String money(Decimal amount) {
 		if (amount == null || amount <= 0) {
 			return null;
 		}

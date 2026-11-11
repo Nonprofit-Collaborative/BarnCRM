@@ -39,7 +39,8 @@ private class FormPublicPageTest {
 				'registration' => 'Open',
 				'formId' => formId,
 				'message' => 'Register below.',
-				'offlineMessage' => 'Not taken online.'
+				'offlineMessage' => 'Not taken online.',
+				'signed' => PublicPageExtensions.isSignedRequest()
 			};
 		}
 
@@ -96,6 +97,32 @@ private class FormPublicPageTest {
 			Assert.areEqual(String.valueOf(form.Id), page.get('formId'), 'The form is shown');
 			Assert.areEqual('Open', page.get('registration'));
 			Assert.isFalse(page.containsKey('offlineMessage'), 'Used by Forms only');
+		}
+	}
+
+	/** V-09: a page for a person's own record is told the claim was checked, and only when right. */
+	@IsTest
+	static void aSignedAddressIsCheckedBeforeThePageIsTold() {
+		System.runAs(admin()) {
+			Form__c form = FormsTestData.publicVolunteerInterest(50);
+			PublicPageExtensions.useForTest(new EventLikePage(form.Id));
+			FormsTestModule.register();
+			FormsTestModule.signed = true;
+			FormsTestModule.attachedFormId = form.Id;
+			Id recordId = venue();
+			String claim = FormIntakeService.claimFor(form.Id, recordId);
+
+			Map<String, Object> right = parsed(
+				FormPublicController.getPage(recordId + '.' + claim)
+			);
+			Map<String, Object> wrong = parsed(
+				FormPublicController.getPage(recordId + '.' + claim.reverse())
+			);
+			Map<String, Object> plain = parsed(FormPublicController.getPage(recordId));
+
+			Assert.isTrue((Boolean) right.get('signed'), 'The right claim');
+			Assert.isFalse((Boolean) wrong.get('signed'), 'A wrong claim');
+			Assert.isFalse((Boolean) plain.get('signed'), 'No claim');
 		}
 	}
 
