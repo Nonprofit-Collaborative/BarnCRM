@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Legal_Entity__c</fullName>
+  <deleteConstraint>Restrict</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The legal entity this brand belongs to. Blank uses the default entity.</inlineHelpText>
+  <label>Legal Entity</label>
+  <referenceTo>Legal_Entity__c</referenceTo>
+  <relationshipLabel>Brands</relationshipLabel>
+  <relationshipName>Brands</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

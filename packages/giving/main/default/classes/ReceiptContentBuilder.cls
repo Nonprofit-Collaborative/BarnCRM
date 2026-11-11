@@ -84,6 +84,10 @@ public with sharing class ReceiptContentBuilder {
 		public String placeOfIssue;
 		public String signerName;
 		public String signerTitle;
+		/** C-47b: the brand's name, logo file and signature lines, when brands are on. */
+		public String brandName;
+		public String logoDocumentId;
+		public String signature;
 	}
 
 	/**
@@ -92,11 +96,20 @@ public with sharing class ReceiptContentBuilder {
 	 * document with a blank at the top.
 	 */
 	public static OrganizationDetails organizationDetails() {
+		return organizationDetails(null, false);
+	}
+
+	/**
+	 * C-47b, R-BR5: the brand's identity over the organization's, field by field, while brands are
+	 * on: the brand (or the default brand when `brandId` is blank and `useDefault`), then its legal
+	 * entity, then settings. Brands off, this is exactly the settings identity.
+	 */
+	public static OrganizationDetails organizationDetails(Id brandId, Boolean useDefault) {
 		BarnCRM_Settings__c core = BarnCRM_Settings__c.getOrgDefaults();
 		Giving_Settings__c giving = Giving_Settings__c.getOrgDefaults();
-		if (String.isBlank(core.Organization_Legal_Name__c)) {
-			throw new ReceiptContentException(Label.Giving_Receipt_OrganizationIncomplete);
-		}
+		BrandService.Profile brand = brandId != null || useDefault
+			? BrandService.profileFor(brandId)
+			: null;
 		OrganizationDetails details = new OrganizationDetails();
 		details.legalName = core.Organization_Legal_Name__c;
 		details.taxId = giving.Organization_EIN__c;
@@ -105,7 +118,33 @@ public with sharing class ReceiptContentBuilder {
 		details.placeOfIssue = giving.Receipt_Place_Of_Issue__c;
 		details.signerName = giving.Receipt_Signer_Name__c;
 		details.signerTitle = giving.Receipt_Signer_Title__c;
+		if (brand != null) {
+			details.brandName = brand.brandName;
+			details.logoDocumentId = brand.logoDocumentId;
+			details.signature = brand.signature;
+			details.legalName = String.isBlank(brand.legalName)
+				? details.legalName
+				: brand.legalName;
+			details.taxId = String.isBlank(brand.taxId) ? details.taxId : brand.taxId;
+			if (!brand.addressLines.isEmpty()) {
+				details.address = String.join(brand.addressLines, '\n');
+			}
+		}
+		if (String.isBlank(details.legalName)) {
+			throw new ReceiptContentException(Label.Giving_Receipt_OrganizationIncomplete);
+		}
 		return details;
+	}
+
+	/** The identity for these gifts: their one shared brand, or the organization's when mixed. */
+	private static OrganizationDetails detailsFor(List<Gift__c> gifts) {
+		Set<Id> brands = new Set<Id>();
+		for (Gift__c gift : gifts) {
+			brands.add(gift.isSet('Brand__c') ? gift.Brand__c : null);
+		}
+		return brands.size() == 1
+			? organizationDetails(new List<Id>(brands)[0], true)
+			: organizationDetails();
 	}
 
 	// -------------------------------------------------------------- the tax sentences
@@ -187,7 +226,7 @@ public with sharing class ReceiptContentBuilder {
 		Date issueDate,
 		String templateBody
 	) {
-		OrganizationDetails details = organizationDetails();
+		OrganizationDetails details = detailsFor(new List<Gift__c>{ gift });
 		Map<String, String> tokens = baseTokens(details, donorName, receiptNumber, issueDate);
 		Date giftDate = gift.Gift_Date__c == null ? issueDate : gift.Gift_Date__c;
 		tokens.put('StatementYear', String.valueOf(giftDate.year()));
@@ -221,7 +260,7 @@ public with sharing class ReceiptContentBuilder {
 		Date issueDate,
 		String templateBody
 	) {
-		OrganizationDetails details = organizationDetails();
+		OrganizationDetails details = detailsFor(gifts);
 		Map<String, String> tokens = baseTokens(details, donorName, receiptNumber, issueDate);
 		tokens.put('StatementYear', String.valueOf(statementYear));
 		tokens.put('Amount', money(cashTotalOf(gifts)));
@@ -311,6 +350,10 @@ public with sharing class ReceiptContentBuilder {
 	) {
 		Map<String, String> tokens = new Map<String, String>();
 		tokens.put('OrganizationName', details.legalName);
+		tokens.put(
+			'BrandName',
+			String.isBlank(details.brandName) ? details.legalName : details.brandName
+		);
 		tokens.put('OrganizationTaxId', blankToEmpty(details.taxId));
 		// A merge token sits inside a sentence or a line of the template, so it is one line.
 		tokens.put('OrganizationAddress', blankToEmpty(details.address).replace('\n', ', '));
@@ -379,7 +422,7 @@ public with sharing class ReceiptContentBuilder {
 	 * name, so the package does not print it twice.
 	 */
 	private static String brandingBlock(OrganizationDetails details, String templateBody) {
-		String logo = ReceiptLogoSource.imageTag();
+		String logo = ReceiptLogoSource.imageTag(details.logoDocumentId);
 		Boolean templateHasOwnLetterhead =
 			templateBody != null && templateBody.contains(LEGACY_LETTERHEAD_MARKER);
 		if (String.isBlank(logo) && templateHasOwnLetterhead) {
@@ -387,6 +430,10 @@ public with sharing class ReceiptContentBuilder {
 		}
 		String block = '<div class="branding">' + logo;
 		if (!templateHasOwnLetterhead) {
+			// C-47b: a brand prints its own name, then the legal name it receipts under.
+			if (String.isNotBlank(details.brandName) && details.brandName != details.legalName) {
+				block += '<p class="orgname">' + escape(details.brandName) + '</p>';
+			}
 			block += '<p class="orgname">' + escape(details.legalName) + '</p>';
 			if (String.isNotBlank(details.address)) {
 				block +=
@@ -425,7 +472,9 @@ public with sharing class ReceiptContentBuilder {
 		if (String.isNotBlank(details.placeOfIssue)) {
 			block += '<p>Issued at ' + escape(details.placeOfIssue) + '</p>';
 		}
-		if (String.isNotBlank(details.signerName)) {
+		if (String.isNotBlank(details.signature)) {
+			block += '<p>' + escape(details.signature).replace('\n', '<br/>') + '</p>';
+		} else if (String.isNotBlank(details.signerName)) {
 			block += '<p>' + escape(details.signerName);
 			if (String.isNotBlank(details.signerTitle)) {
 				block += ', ' + escape(details.signerTitle);

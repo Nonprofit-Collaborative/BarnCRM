@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Brand_Visibility__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>Whether BarnCRM keeps brand share rows so staff see the records of the brands they belong to (canonical model R-BR7; C-47c).</description>
+  <inlineHelpText>Share records with the staff of their brands.</inlineHelpText>
+  <label>Brand Visibility</label>
+  <type>Checkbox</type>
+</CustomField>

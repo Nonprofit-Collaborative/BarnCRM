@@ -115,7 +115,8 @@ public with sharing class ReceiptSelector {
 				Fair_Market_Value__c,
 				Benefit_Description__c,
 				Benefit_Value__c,
-				Intangible_Religious_Benefits__c
+				Intangible_Religious_Benefits__c,
+				Brand__c
 			FROM Gift__c
 			WHERE
 				Gift_Date__c >= :firstDay
@@ -146,7 +147,8 @@ public with sharing class ReceiptSelector {
 				Fair_Market_Value__c,
 				Benefit_Description__c,
 				Benefit_Value__c,
-				Intangible_Religious_Benefits__c
+				Intangible_Religious_Benefits__c,
+				Brand__c
 			FROM Gift__c
 			WHERE Id = :giftId
 			WITH USER_MODE

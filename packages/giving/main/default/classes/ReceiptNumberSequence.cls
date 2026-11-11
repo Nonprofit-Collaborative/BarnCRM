@@ -74,10 +74,57 @@ public without sharing class ReceiptNumberSequence {
 		Integer statementYear,
 		Integer howMany
 	) {
+		return allocate(
+			receiptType,
+			statementYear,
+			howMany,
+			seriesKeyFor(receiptType, statementYear)
+		);
+	}
+
+	/** The prefix a scoped series is created with (C-47f); null for the organization series. */
+	private static String scopedPrefix;
+
+	/**
+	 * C-47f, R-BR8: one number from a brand's or legal entity's own series, keyed by its ID and
+	 * created with its prefix. Without an ID or a prefix the organization series is used, so two
+	 * series never share a prefix by accident. The same all or nothing rule as `allocateOne`.
+	 */
+	public static String allocateOne(
+		String receiptType,
+		Integer statementYear,
+		Id scopeId,
+		String prefix
+	) {
+		if (scopeId == null || String.isBlank(prefix)) {
+			return allocateOne(receiptType, statementYear);
+		}
+		scopedPrefix = prefix;
+		try {
+			return allocate(
+				receiptType,
+				statementYear,
+				1,
+				scopedKey(receiptType, statementYear, scopeId)
+			)[0];
+		} finally {
+			scopedPrefix = null;
+		}
+	}
+
+	public static String scopedKey(String receiptType, Integer statementYear, Id scopeId) {
+		return seriesKeyFor(receiptType, statementYear) + (scopeId == null ? '' : '-' + scopeId);
+	}
+
+	private static List<String> allocate(
+		String receiptType,
+		Integer statementYear,
+		Integer howMany,
+		String key
+	) {
 		if (howMany == null || howMany < 1) {
 			return new List<String>();
 		}
-		String key = seriesKeyFor(receiptType, statementYear);
 		Receipt_Number_Sequence__c series = lockSeries(key);
 		if (series == null) {
 			createSeries(key, receiptType, statementYear);
@@ -221,9 +268,11 @@ public without sharing class ReceiptNumberSequence {
 	 */
 	private static void createSeries(String key, String receiptType, Integer statementYear) {
 		Giving_Settings__c settings = Giving_Settings__c.getOrgDefaults();
-		String prefix = String.isBlank(settings.Receipt_Number_Prefix__c)
-			? DEFAULT_PREFIX
-			: settings.Receipt_Number_Prefix__c.trim();
+		String prefix = String.isNotBlank(scopedPrefix)
+			? scopedPrefix.trim()
+			: String.isBlank(settings.Receipt_Number_Prefix__c)
+					? DEFAULT_PREFIX
+					: settings.Receipt_Number_Prefix__c.trim();
 		Integer start = settings.Receipt_Next_Counter__c == null
 			? 1
 			: Math.max(1, settings.Receipt_Next_Counter__c.intValue());

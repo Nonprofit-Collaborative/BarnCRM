@@ -18,6 +18,7 @@ Rules:
 | core | Automation | Custom32: Factory |
 | core | BarnCRM_Home | Custom1: Heart |
 | core | BarnCRM_Settings | Custom67: Gears |
+| core | Brand__c | Custom56: Bottle |
 | core | Bulk_Update | Custom19: Wrench |
 | core | Data_Hygiene | Custom94: Stethoscope |
 | core | Data_Manager | Custom57: BuildingBlock |
@@ -28,6 +29,7 @@ Rules:
 | core | Households | Custom15: People |
 | core | Import | Custom18: Form |
 | core | Import_Row__c | Custom83: Pencil |
+| core | Legal_Entity__c | Custom58: Caduceus |
 | core | Organizations | Custom24: Building |
 | core | Record_Inspector | Custom38: Camera |
 | core | Relationship__c | Custom37: Bridge |
@@ -82,13 +84,13 @@ Rules:
 | portal | Portal_Access__c | Custom77: Locked |
 | portal | Portal__c | Custom47: Knight |
 | corporatehub | Agreement__c | Custom93: ShoppingCart |
-| corporatehub | Board__c | Custom58: Caduceus |
-| corporatehub | Board_Meeting__c | Custom56: Bottle |
+| corporatehub | Board__c | Custom47: Knight |
+| corporatehub | Board_Meeting__c | Custom84: Presenter |
 | corporatehub | Compliance_Obligation__c | Custom97: Thermometer |
 | corporatehub | Corporate_Hub | Custom72: Helicopter |
 | corporatehub | Hub_Document__c | Custom49: CD/DVD |
-| payments | Payment__c | Custom56: Bottle |
-| payments | Payment_Event__c | Custom58: Caduceus |
+| payments | Payment__c | Custom40: Creditcard |
+| payments | Payment_Event__c | Custom95: Stopwatch |
 | payments | Payments_Setup | Custom70: Handsaw |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |
@@ -166,8 +168,8 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | giving | receiptActions | custom:custom23 | Receipt__c |
 | giving | stewardshipPlans | custom:custom4 | Stewardship_Plans |
 | giving | tributeNotification | custom:custom5 | Tribute__c |
-| corporatehub | hubBoardPanel | custom:custom58 | Board__c |
-| corporatehub | hubMeetingPanel | custom:custom56 | Board_Meeting__c |
+| corporatehub | hubBoardPanel | custom:custom47 | Board__c |
+| corporatehub | hubMeetingPanel | custom:custom84 | Board_Meeting__c |
 | forms | formBuilder | custom:custom28 | Form__c |
 | forms | formRunner | custom:custom28 | Form__c |
 | forms | formSubmission | custom:custom51 | Form_Submission__c |

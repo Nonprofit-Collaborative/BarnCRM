@@ -155,6 +155,7 @@ ALLOWED = {
     "UserRecordAccess": "sharing checks in user mode paths.",
     "Group": "the All Internal Users group a shared Find query is shared with, C-34. Platform feature, every edition.",
     "GroupMember": "All Internal Users added to or removed from the Programs Participant Records group by the participant privacy preset, P-08. Platform feature, every edition.",
+    "AccountShare": "Manual shares of an Account to a BarnCRM brand group, brand-restricted visibility C-47c (ADR-NEXT brand management). Platform feature, every edition.",
     # Async plumbing.
     "AsyncApexJob": "asserting that a queueable or batch was enqueued.",
     "BatchApexErrorEvent": "a full rollup recalculation chunk the platform stopped, queued again (R-R14). Platform feature, every edition with Apex.",

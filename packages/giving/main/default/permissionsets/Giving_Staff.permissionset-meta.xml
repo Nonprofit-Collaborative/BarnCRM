@@ -461,6 +461,11 @@
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>
+    <editable>true</editable>
+    <field>Appeal__c.Brand__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
     <editable>false</editable>
     <field>Appeal__c.Total_Raised__c</field>
     <readable>true</readable>
@@ -908,6 +913,11 @@
   <fieldPermissions>
     <editable>true</editable>
     <field>Gift__c.Appeal__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Gift__c.Brand__c</field>
     <readable>true</readable>
   </fieldPermissions>
   <fieldPermissions>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Brand__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The brand this portal shows: its name, logo and colors. Blank shows the default brand while brands are on.</inlineHelpText>
+  <label>Brand</label>
+  <referenceTo>Brand__c</referenceTo>
+  <relationshipLabel>Portals</relationshipLabel>
+  <relationshipName>Portals</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

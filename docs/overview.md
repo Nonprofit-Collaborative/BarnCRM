@@ -65,6 +65,11 @@ Add Giving and you can also record and receipt gifts, split a gift across funds 
 BarnCRM runs on Platform-only licenses, Sales and Service Cloud, an org with NPSP installed, and an org on Agentforce Nonprofit. In an org with NPSP, BarnCRM can adopt NPSP's existing households in place, with a preview and an undo, rather than create a second household for every family. BarnCRM's own Households feature waits until NPSP has stopped making households, so the two never both make one for the same person. When another app you are moving from is in the same org, the Integrations page in BarnCRM Settings offers Start Migration: the Migration Assistant then moves that app's records and setup into BarnCRM step by step, in order, with a preview, a check that the numbers match, undo, and a checklist of the old app's automations to switch off. It never changes the old app. The first kits copy DLRS and NPSP customizable rollups into Rollup Builder, adopt NPSP households and copy NPSP relationships, affiliations and household addresses, and copy PMM programs, services, enrollments and service deliveries into Programs, copy Volunteers for Salesforce jobs, shifts, sign-ups and hours into Volunteers, and copy NPSP General Accounting Units, levels and recurring donations into Giving; kits for the rest of NPSP, Nonprofit Cloud and Outbound Funds follow (built, not yet released).
 Every tab in every BarnCRM app, Core and module, has its own icon.
 
+An organization that works under several names can turn on brands (off by default): brand and
+legal entity records, people and staff assigned to brands, a Brand field on gifts, appeals,
+volunteer jobs, programs and portals, receipts printed and optionally numbered per brand, and an
+option to share households, people and organizations only with the staff of their brands.
+
 
 ## Coming Next
 

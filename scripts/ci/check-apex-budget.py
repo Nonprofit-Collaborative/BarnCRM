@@ -58,7 +58,10 @@ CAPS = {
     # Combined build (landing/batch-d-i) 2026-11-11: 2,138,788 measured with C-62 Generic Merge,
     # C-67 Archive by Query, C-68 Field History and the MIG-01 Migration Assistant framework,
     # plus about 1%; the pre-batch review's trim pass looks at Core again.
-    "core": 2_160_000,
+    # Raised 2026-11-11 for C-47 multi-brand management (BrandService seam and defaulting,
+    # BrandShareJob visibility upkeep, BrandTriggerHandler, BrandShareWriter): 2,160,448
+    # measured, plus about 0.5%.
+    "core": 2_171_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured

@@ -1,0 +1,230 @@
+/**
+ * Multi-brand management (C-47, R-BR1 to R-BR9): nothing while off, the profile seam with its
+ * entity fallback, defaulting from a parent and from the user, one default and one primary,
+ * unique assignments, and brand visibility groups, members and shares.
+ */
+@IsTest(
+	testFor='ApexClass:BrandService, ApexClass:BrandTriggerHandler, ApexClass:BrandShareJob, ApexClass:BrandShareWriter, ApexClass:BrandDefaultHandler, ApexTrigger:BrandTrigger, ApexTrigger:BrandAssignmentTrigger, ApexTrigger:LegalEntityTrigger'
+)
+private class BrandServiceTest {
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.admin();
+	}
+
+	@IsTest
+	static void theDefaultHandlerFillsTheUsersBrandWithNoBrandedParent() {
+		System.runAs(TestUsers.admin()) {
+			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+			settings.Brand_Management__c = true;
+			HouseholdTestDataFactory.save(settings);
+			Brand__c mine = new Brand__c(Name = 'Mine');
+			insert mine;
+			insert new Brand_Assignment__c(Brand__c = mine.Id, User__c = UserInfo.getUserId());
+			List<Brand_Assignment__c> records = new List<Brand_Assignment__c>{
+				new Brand_Assignment__c(),
+				new Brand_Assignment__c()
+			};
+
+			Test.startTest();
+			TriggerHandler.setTestRecords(records, null);
+			new BrandDefaultHandler().beforeInsert();
+			Test.stopTest();
+
+			Assert.isNull(
+				BrandDefaultHandler.parentField(Brand_Assignment__c.SObjectType),
+				'No lookup of a brand assignment leads to a branded parent'
+			);
+			Assert.areEqual(mine.Id, records[1].Brand__c, 'The user brand fills the blank');
+		}
+	}
+
+	private static void turnOn(Boolean brands, Boolean visibility) {
+		BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+		settings.Brand_Management__c = brands;
+		settings.Brand_Visibility__c = visibility;
+		HouseholdTestDataFactory.save(settings);
+	}
+
+	private static Brand__c brand(String name, Id entityId, Boolean isDefault) {
+		Brand__c record = new Brand__c(
+			Name = name,
+			Legal_Entity__c = entityId,
+			Is_Default__c = isDefault,
+			City__c = 'Springfield'
+		);
+		insert record;
+		return record;
+	}
+
+	@IsTest
+	static void offReadsNothingAndFillsNothing() {
+		System.runAs(TestUsers.admin()) {
+			Brand__c only = brand('Thrift Store', null, true);
+			insert new Brand_Assignment__c(Brand__c = only.Id, User__c = UserInfo.getUserId());
+			List<Brand_Assignment__c> records = new List<Brand_Assignment__c>{
+				new Brand_Assignment__c()
+			};
+
+			Test.startTest();
+			BrandService.applyDefaults(records, null);
+			BrandService.Profile profile = BrandService.profileFor(only.Id);
+			Test.stopTest();
+
+			Assert.isNull(profile, 'Brands off returns no profile');
+			Assert.isNull(records[0].Brand__c, 'Brands off fills in no brand');
+		}
+	}
+
+	@IsTest
+	static void profileFallsBackToTheEntityAndTheDefaultBrand() {
+		System.runAs(TestUsers.admin()) {
+			turnOn(true, false);
+			Legal_Entity__c entity = new Legal_Entity__c(
+				Name = 'Friends of the Barn Inc.',
+				Tax_Id__c = '12-3456789',
+				Street__c = '1 Main St',
+				Is_Default__c = true
+			);
+			insert entity;
+			Brand__c chapter = new Brand__c(Name = 'North Chapter', Is_Default__c = true);
+			insert chapter;
+
+			Test.startTest();
+			BrandService.Profile profile = BrandService.profileFor(null);
+			Test.stopTest();
+
+			Assert.areEqual(chapter.Id, profile.brandId, 'A blank brand reads the default brand');
+			Assert.areEqual('Friends of the Barn Inc.', profile.legalName, 'Default entity');
+			Assert.areEqual('12-3456789', profile.taxId, 'Tax ID from the entity');
+			Assert.areEqual('1 Main St', profile.addressLines[0], 'Address from the entity');
+		}
+	}
+
+	@IsTest
+	static void oneDefaultBrandAndOnePrimaryAssignment() {
+		System.runAs(TestUsers.admin()) {
+			Brand__c first = brand('First', null, true);
+			Brand__c second = brand('Second', null, false);
+			Id me = UserInfo.getUserId();
+			insert new Brand_Assignment__c(Brand__c = first.Id, User__c = me, Is_Primary__c = true);
+
+			Test.startTest();
+			second.Is_Default__c = true;
+			update second;
+			insert new Brand_Assignment__c(
+				Brand__c = second.Id,
+				User__c = me,
+				Is_Primary__c = true
+			);
+			Boolean duplicateRefused = false;
+			try {
+				insert new Brand_Assignment__c(Brand__c = second.Id, User__c = me);
+			} catch (DmlException refused) {
+				duplicateRefused = true;
+			}
+			Test.stopTest();
+
+			Assert.isFalse(
+				[SELECT Is_Default__c FROM Brand__c WHERE Id = :first.Id].Is_Default__c,
+				'Saving a second default clears the first'
+			);
+			Assert.areEqual(
+				1,
+				[
+					SELECT COUNT()
+					FROM Brand_Assignment__c
+					WHERE User__c = :me AND Is_Primary__c = TRUE
+				],
+				'One primary brand per user'
+			);
+			Assert.isTrue(duplicateRefused, 'A record is assigned to a brand once');
+		}
+	}
+
+	@IsTest
+	static void defaultsComeFromTheUserInBulk() {
+		System.runAs(TestUsers.admin()) {
+			turnOn(true, false);
+			Brand__c mine = brand('Mine', null, false);
+			insert new Brand_Assignment__c(Brand__c = mine.Id, User__c = UserInfo.getUserId());
+			List<Brand_Assignment__c> records = new List<Brand_Assignment__c>();
+			for (Integer i = 0; i < 200; i++) {
+				records.add(new Brand_Assignment__c());
+			}
+
+			Test.startTest();
+			BrandService.applyDefaults(records, 'Contact__c');
+			Test.stopTest();
+
+			for (Brand_Assignment__c record : records) {
+				Assert.areEqual(mine.Id, record.Brand__c, 'The user only brand fills each blank');
+			}
+		}
+	}
+
+	@IsTest
+	static void visibilityKeepsGroupsMembersAndShares() {
+		User admin = TestUsers.admin();
+		Brand__c chapter;
+		Account household;
+		System.runAs(admin) {
+			turnOn(true, true);
+			chapter = brand('Chapter', null, false);
+			household = HouseholdTestDataFactory.newHousehold('Zztest Brand');
+			insert household;
+			insert new Brand_Assignment__c(Brand__c = chapter.Id, Account__c = household.Id);
+			insert new Brand_Assignment__c(Brand__c = chapter.Id, User__c = admin.Id);
+		}
+		Map<Id, Id> groups;
+		System.runAs(admin) {
+			Test.startTest();
+			groups = BrandShareJob.syncGroups();
+			Test.stopTest();
+		}
+		System.runAs(admin) {
+			BrandShareJob.syncShares(new Set<Id>{ household.Id }, groups);
+		}
+
+		Id groupId = groups.get(chapter.Id);
+		Assert.isNotNull(groupId, 'An active brand has a group');
+		Assert.areEqual(
+			1,
+			[
+				SELECT COUNT()
+				FROM GroupMember
+				WHERE GroupId = :groupId AND UserOrGroupId = :admin.Id
+			],
+			'The assigned user is a member'
+		);
+		Assert.areEqual(
+			1,
+			[
+				SELECT COUNT()
+				FROM AccountShare
+				WHERE AccountId = :household.Id AND UserOrGroupId = :groupId
+			],
+			'The assigned household is shared with the brand group'
+		);
+
+		System.runAs(admin) {
+			turnOn(true, false);
+			BrandShareJob.syncGroups();
+		}
+		Assert.isTrue(
+			BrandShareJob.groupsByBrand().isEmpty(),
+			'Off removes the groups, and their shares'
+		);
+	}
+
+	@IsTest
+	static void healthCheckWarnsOnlyWhileVisibilityIsOn() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			HealthCheckService.Finding off = new BrandShareJob.VisibilityCheck().run();
+			Test.stopTest();
+
+			Assert.isNull(off, 'Nothing to say while visibility is off');
+		}
+	}
+}
