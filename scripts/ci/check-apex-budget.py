@@ -68,11 +68,16 @@ CAPS = {
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.
     # Batch C wave 3 landing: 193,083 measured (VolunteersPortalExtension PB-03), plus about 2%.
-    "volunteers": 196_900,
+    # VOL-2 (V-14, V-16): 206,823 measured with the shift waitlist, group and standing sign-ups
+    # and the one self-booking path (VolunteerCapacity, VolunteerStanding, VolunteerBooking),
+    # plus about 2%.
+    "volunteers": 211_000,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
     # Raised 2026-11-06 for repeating session schedules (modules-24, D-183): the run, nightly
     # batch, save job, trigger handler and selector, and the schedule page's controller methods.
-    "programs": 168_000,
+    # VOL-2 (P-09): 172,177 measured with program capacity and the waitlist (EnrollmentCapacity),
+    # plus about 2%.
+    "programs": 175_600,
     "logicmodels": 65_000,
     # Raised from 95,000 for the Funders usability stage: Undo for Mark Received and Mark
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).
