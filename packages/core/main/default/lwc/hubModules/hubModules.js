@@ -40,7 +40,8 @@ const FALLBACK_TABS = {
   CorporateHub: 'Corporate_Hub',
   Payments: 'Payment__c',
   LwcBuilder: 'LWC_Builder',
-  Scholarships: 'Scholarships'
+  Scholarships: 'Scholarships',
+  Territory: 'Territory_Management'
 };
 const DEFAULT_ICON = 'standard:apps';
 

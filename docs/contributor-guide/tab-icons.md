@@ -97,6 +97,7 @@ Rules:
 | scholarships | Award_Application__c | Custom70: Handsaw |
 | scholarships | Award_Program__c | Custom48: Trophy |
 | scholarships | Scholarships | Custom34: Insect |
+| territory | Territory_Management | Custom34: Insect |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |
 | mirror | Gift_Transaction_Mirror | Custom31: Car |

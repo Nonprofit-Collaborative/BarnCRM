@@ -85,6 +85,10 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Scholarships and Grants](scholarships.md): reviewing applications with a rubric, recusing, the review board and decisions, award letters and acceptance, disbursements and conditions, recipient reports, renewals and the disbursement export.
 
+### Territory Management
+
+- [Territory Management](territory-management.md): your records' Territory, how assignment runs change territory and owner, and who can undo them.
+
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.

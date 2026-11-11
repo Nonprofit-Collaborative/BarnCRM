@@ -103,6 +103,9 @@ public with sharing class SettingSections {
 	/** The Scholarships and Outbound Grants module's reminder settings. */
 	@NamespaceAccessible
 	public static final String SCHOLARSHIPS = 'Scholarships and Grants';
+	/** The Territory Management module's row, which opens its Territory Management tab. */
+	@NamespaceAccessible
+	public static final String TERRITORY = 'Territory Management';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -129,6 +132,7 @@ public with sharing class SettingSections {
 			PAYMENTS,
 			LWC_BUILDER,
 			SCHOLARSHIPS,
+			TERRITORY,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,

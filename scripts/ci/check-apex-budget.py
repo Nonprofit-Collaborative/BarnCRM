@@ -164,6 +164,10 @@ CAPS = {
     # reviews, awards, form intake, portal actions, reminders, the payment rule and the page
     # controller, 49,326 measured (Prettier line breaks included), plus about 2%.
     "scholarships": 50_300,
+    # Territory Management (C-40, C-40b, ADR-NEXT territory management module): the model PR
+    # ships no Apex (0 measured). The Apex PR: access sync, post-install, routing, the run
+    # batch, the page controller and the nightly step, 31,041 measured, plus about 2%.
+    "territory": 31_700,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

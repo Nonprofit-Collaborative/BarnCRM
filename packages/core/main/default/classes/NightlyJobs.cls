@@ -50,7 +50,8 @@ public with sharing class NightlyJobs {
 		'FundersNightlyJobProvider',
 		'EventsNightlyJobProvider',
 		'CorporateHubNightlyJobProvider',
-		'ScholarshipsNightlyJobProvider'
+		'ScholarshipsNightlyJobProvider',
+		'TerritoryNightlyJobProvider'
 	};
 
 	/** Separate schedules of steps that became part of another step: adopted, then aborted. */

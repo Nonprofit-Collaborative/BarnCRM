@@ -293,6 +293,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | SG-01 to SG-10, PB-06 Scholarships and Outbound Grants: install, access, settings, programs and cycles, eligibility rules, rubrics, reviewer panels and Assign Reviewers, blind review, applications from Forms, the review board and decisions, award letters, disbursements and conditions, the accounting export, recipient reports and renewals, the applicant portal, reports | [scholarships.md](scholarships.md) | BarnCRM Scholarships and Outbound Grants |
 
+### Territory Management
+
+| Feature | Page | Package |
+|---|---|---|
+| C-40 Territory Management: install, access, territories, rules and priority, preview, assign and undo, the nightly assignment; C-40b owner routing by territory owner, round robin and capacity | [territory-management.md](territory-management.md) | BarnCRM Territory Management |
+
 ### Moving From Another System
 
 | Feature | Page | Package |

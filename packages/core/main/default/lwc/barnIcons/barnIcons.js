@@ -109,6 +109,8 @@ const ICONS = Object.freeze({
   Award_Application__c: 'custom:custom70',
   Award_Program__c: 'custom:custom48',
   Scholarships: 'custom:custom34',
+  // Territory Management
+  Territory_Management: 'custom:custom34',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',

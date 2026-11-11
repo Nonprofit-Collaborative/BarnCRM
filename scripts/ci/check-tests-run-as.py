@@ -55,6 +55,7 @@ SOURCES = [
     "packages/payments/main/**/*.cls",
     "packages/lwcbuilder/main/**/*.cls",
     "packages/scholarships/main/**/*.cls",
+    "packages/territory/main/**/*.cls",
     "packages/mirror/main/**/*.cls",
 ]
 OPT_OUT = re.compile(r"//\s*runs-as:\s*deploying user\s*\(\s*\S[^\n]*\)", re.I)

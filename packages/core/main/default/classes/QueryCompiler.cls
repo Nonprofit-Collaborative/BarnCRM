@@ -235,8 +235,9 @@ public with sharing class QueryCompiler {
 	/**
 	 * The document's filter over other fields of its object, for bulk update (C-35, R-BU1): the
 	 * document's own columns, order and row count are ignored. With `onlyIds`, only those
-	 * records; the caller adds any order and row count.
+	 * records; the caller adds any order and row count. Territory Management's rules use it too.
 	 */
+	@NamespaceAccessible
 	public static Compiled compileSelection(
 		String queryJson,
 		Set<String> fieldNames,
