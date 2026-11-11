@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Receipt_Number_Prefix__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The prefix of this entity's receipt numbers when receipts are numbered per legal entity. Blank uses the organization prefix.</inlineHelpText>
+  <label>Receipt Number Prefix</label>
+  <length>10</length>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Text</type>
+  <unique>false</unique>
+</CustomField>

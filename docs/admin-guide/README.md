@@ -117,6 +117,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-08 Record pages | [record-pages.md](record-pages.md) | Core |
 | C-27 What's new after an upgrade | [whats-new.md](whats-new.md) | Core, with notes from any module |
 | Q-10 In-app tips | [in-app-guidance.md](in-app-guidance.md) | Core |
+| C-47 Brands and Legal Entities: brand records, assignments, brand-aware receipts, receipt numbering per brand, optional brand-restricted visibility | [brands.md](brands.md) | Core, with brand fields in Giving, Volunteers, Programs and Portal Builder |
 
 ### People, Households and Relationships
 

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Brand_Management__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>Whether brands are in use: new records take a brand, and receipts, letters and portals print the record's brand (canonical model Section 12, Brand keys; C-47).</description>
+  <inlineHelpText>Use brands on records and outputs.</inlineHelpText>
+  <label>Brand Management</label>
+  <type>Checkbox</type>
+</CustomField>

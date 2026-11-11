@@ -1334,6 +1334,16 @@ shows the last full Health Check result instead of running every check on each l
 | `Health_Check_Last_Run__c` | datetime | empty | When Health Check last ran in full for someone with Manage BarnCRM Settings. Written by Health Check, without an audit row. |
 | `Health_Check_Last_Result__c` | text (255) | empty | How many findings that run had, as three counts separated by commas: to fix (Error), to be aware of (Warning), for information (Info). Written by Health Check with `Health_Check_Last_Run__c`; read only to show the last result. |
 
+### Brand keys
+
+Added by C-47 (releases 1.13 and 1.14, D-119, D-120, ADR-NEXT brand management and visibility).
+Both ship off; with both off nothing anyone sees changes (Section 29BR2).
+
+| Key | Type | Default | Definition |
+|---|---|---|---|
+| `Brand_Management__c` | checkbox | false | Whether brands are in use: records take a default brand on save, and module outputs (receipts, letters, portals) print the record's brand instead of the single organization identity (R-BR4, R-BR5). |
+| `Brand_Visibility__c` | checkbox | false | Whether BarnCRM keeps brand share rows, so staff see the households, people and organizations of the brands they belong to (R-BR7). Saving it on requires `Brand_Management__c` on; turning it off removes every share row BarnCRM added. |
+
 ### Rules
 
 **R-N1 Protected and hierarchical.** The custom setting is protected (invisible to
@@ -4604,6 +4614,7 @@ these keys, which is what makes a module that is off leave nothing behind.
 | Default Fund | `Default_Fund__c` | Text(18) (v0.6, from Core) |
 | Default Appeal | `Default_Appeal__c` | Text(18) (v0.6, from Core) |
 | Ask Stages | `Ask_Stages__c` | Text(255) (release 0.13, G-26, R-SO2) |
+| Receipt Numbering Scope | `Receipt_Numbering_Scope__c` | Text(40), default `Organization` (release 1.14, C-47f, R-BR8) |
 
 - **Service:** Core `SettingsService`, reading and writing this object through the
   `Settings_Object__c` field on `Setting_Definition__mdt` (ADR-0017).
@@ -14954,6 +14965,196 @@ and no legal text. Existing records are never changed.
 
 ---
 
+## 29BR1. Legal Entity
+
+### Definition
+
+A legal body one or more brands belong to (C-47a, D-120, ADR-NEXT brand management and
+visibility): the organization itself, or a separately incorporated affiliate, chapter or
+foundation. Gifts, funds, receipts and receipt numbering belong to the receiving entity, so a
+brand that is its own legal entity issues receipts in its own legal name and tax ID. Core owns
+it; it is data an administrator keeps on the Legal Entities tab, not a setting.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Legal Name | text(80) | yes | The registered name printed on receipts and legal documents. |
+| Tax ID | text(30) | no | Tax or registration number, for example a United States EIN or a charity number. |
+| Registered Address | text parts | no | Street, city, state or region, postal code and country, as registered. |
+| Fiscal Year Start Month | number(2) | no | 1 to 12; blank reads as the organization's `Fiscal_Year_Start_Month__c` (Section 12). |
+| Receipt Number Prefix | text(10) | no | The prefix of this entity's receipt series when receipts are numbered per legal entity (R-BR8). |
+| Default | checkbox | no | The organization itself. At most one entity is the default (R-BR1). |
+
+### Salesforce implementation
+
+- **Object** `Legal_Entity__c`, Name is Legal Name (Text 80), sharing Public Read/Write
+  (object permissions decide who edits), reports on, search on, no activities, feeds or history.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Tax ID | `Tax_Id__c` | Text(30) |
+| Street | `Street__c` | Text(255) |
+| City | `City__c` | Text(80) |
+| State | `State__c` | Text(80) |
+| Postal Code | `Postal_Code__c` | Text(20) |
+| Country | `Country__c` | Text(80) |
+| Fiscal Year Start Month | `Fiscal_Year_Start_Month__c` | Number(2, 0) |
+| Receipt Number Prefix | `Receipt_Number_Prefix__c` | Text(10) |
+| Default | `Is_Default__c` | Checkbox, default false |
+
+---
+
+## 29BR2. Brand
+
+### Definition
+
+A name an organization works under (C-47, D-119, D-120): a program, chapter, affiliate, thrift
+store or DBA, with its own name, logo, contact details, colors, email sender and letter
+signature, belonging to one Legal Entity. One brand is the default. Core owns the record and
+the seam that reads it (`BrandService`); modules carry a Brand lookup on their own records and
+ask Core for the brand's printed identity, so Core names no module.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text(80) | yes | The brand name people see. |
+| Legal Entity | reference(Legal Entity) | no | The entity the brand belongs to; blank reads as the default entity, then the organization settings (R-BR5). |
+| Active | checkbox | no | Inactive brands are kept for history and are never defaulted or offered. Default true. |
+| Default | checkbox | no | The brand records fall back to and outputs print when a record has none. At most one (R-BR1). |
+| Logo | text(18) | no | The Files ID (ContentDocument) of the brand's logo, printed as the receipt logo is (Giving R-RC13). |
+| Address | text parts | no | Street, city, state, postal code, country, printed in the letterhead. |
+| Phone | phone | no | |
+| Website | url | no | |
+| Primary Color, Secondary Color | text(7) | no | Hex colors, `#RRGGBB`, for portals and documents that use color. |
+| Sender Email | email | no | The org-wide email address messages for this brand are sent from; it must be a verified Organization-Wide Email Address, checked when sending. |
+| Letter Signature | long text(2000) | no | The closing printed under letters and receipts for this brand: signer name, title, lines. Blank reads as the module's own signer settings. |
+| Receipt Number Prefix | text(10) | no | The prefix of this brand's receipt series when receipts are numbered per brand (R-BR8). |
+
+### Rules
+
+**R-BR1 One default.** Saving a brand or a legal entity as Default clears Default on every other
+one, in system mode (`BrandService`). With none, records and outputs read the organization
+settings as before C-47.
+
+**R-BR2 Off means unchanged.** With `Brand_Management__c` off (the shipped value) nothing
+defaults a brand, no output reads one and no share row is written; the objects, fields and tabs
+exist but no app shows a Brand tab and no shipped page shows a brand field.
+
+**R-BR3 The seam.** `BrandService.profileFor(Id brandId)` returns a plain `Profile` (brand name,
+legal name, tax ID, address lines, phone, website, colors, sender, signature, logo document ID,
+receipt prefixes, entity ID) for a brand, or for the default brand when the ID is blank, or null
+when brand management is off or there is no brand. `BrandService.brandFieldOf(SObjectType)`
+returns the type's `Brand__c` field by describe. Modules call these by their Core names; Core
+reads module objects only by describe.
+
+**R-BR4 Defaulting (C-47d).** On insert, a record whose Brand is blank takes, in order: its
+parent record's brand when the module names a parent field (an appeal's brand for a gift), then
+the creating user's primary brand (Brand Assignment with `User__c` and Primary), then the user's
+only brand. Never the organization default: a record left blank prints the default brand without
+being labelled with it. Bulk Update and Import set the lookup like any other lookup.
+
+**R-BR5 Brand-aware outputs (C-47b).** A module output for a record with a brand prints the
+brand's name, logo, address and signature and the brand's legal entity name and tax ID; a value
+the brand leaves blank falls back to the entity, then to the organization settings. A statement
+covering records of several brands prints the organization identity.
+
+**R-BR6 Filters (C-47e).** Every Brand lookup is a reportable field, and the report type
+`Brands_With_Assignments` lists brands with the people, organizations and staff assigned.
+
+**R-BR7 Brand-restricted visibility (C-47c, optional).** With `Brand_Visibility__c` on, each
+active brand has a public group (`BarnCRM_Brand_` plus the brand ID) whose members are the users
+assigned to the brand, and each Account with a brand (assigned directly, or through a person
+whose Account it is) is shared Read/Write with each of its brands' groups. The rows are Manual
+shares to BarnCRM's own groups, so BarnCRM can tell them from every other share and removes
+only its own. Restriction comes from the org's sharing settings: an administrator sets the
+Account default to Private in Setup, and Health Check says so while it is not. Kept by
+`BrandShareJob` after a Brand Assignment or a brand changes, and fully on turning the setting
+on; turning it off removes every row and group BarnCRM added.
+
+**R-BR8 Receipt numbering per brand (C-47f, optional).** Giving's `Receipt_Numbering_Scope__c`
+is `Organization` (shipped), `Legal Entity` or `Brand`. Under the last two a per gift receipt
+for a gift with a brand is numbered from its own series, keyed by the entity or brand ID, with
+that record's prefix (blank reads as the organization prefix). Statements stay on the
+organization series.
+
+### Salesforce implementation
+
+- **Object** `Brand__c`, Name is the brand name (Text 80), sharing Public Read/Write (object
+  permissions decide who edits), reports on, search on, no activities, feeds or history.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Legal Entity | `Legal_Entity__c` | Lookup(Legal Entity), restrict delete |
+| Active | `Active__c` | Checkbox, default true |
+| Default | `Is_Default__c` | Checkbox, default false |
+| Logo | `Logo_Document_Id__c` | Text(18) |
+| Street | `Street__c` | Text(255) |
+| City | `City__c` | Text(80) |
+| State | `State__c` | Text(80) |
+| Postal Code | `Postal_Code__c` | Text(20) |
+| Country | `Country__c` | Text(80) |
+| Phone | `Phone__c` | Phone |
+| Website | `Website__c` | URL |
+| Primary Color | `Primary_Color__c` | Text(7) |
+| Secondary Color | `Secondary_Color__c` | Text(7) |
+| Sender Email | `Sender_Email__c` | Email |
+| Letter Signature | `Letter_Signature__c` | Long Text Area(2000) |
+| Receipt Number Prefix | `Receipt_Number_Prefix__c` | Text(10) |
+
+- **Brand lookups on module records (C-47d):** `Brand__c`, Lookup(Brand), delete set null, on
+  `Gift__c` (parent `Appeal__c`) and `Appeal__c` (Giving), `Volunteer_Job__c` (Volunteers),
+  `Program__c` (Programs) and `Portal__c` (Portal Builder). A module adds the field and calls
+  `BrandService.applyDefaults` from its own before insert handler.
+- **Classes:** `BrandService` (the seam, defaulting, one default), `BrandTriggerHandler`
+  (Brand, Legal Entity and Brand Assignment), `BrandShareJob` (R-BR7, queueable),
+  `BrandShareWriter` (without sharing: groups, members and Account share rows).
+
+---
+
+## 29BR3. Brand Assignment
+
+### Definition
+
+One brand a person, household, organization or staff user belongs to (C-47a, D-120): the
+many-to-many link that lets one person relate to several brands and legal entities, and a staff
+member work for several brands.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Brand | reference(Brand) | yes | The brand. |
+| Contact | reference(Contact) | one of four | A person stored as a contact. |
+| Account | reference(Account) | one of four | A household, an organization, or a person stored as an account. |
+| User | reference(User) | one of four | A staff member who works for the brand: defaulting (R-BR4) and visibility (R-BR7). |
+| Primary | checkbox | no | The person's or user's main brand; at most one each (R-BR9). |
+| Key | text(80) | yes | Brand ID and the assigned record's ID, unique, set on save, so a record is assigned to a brand once. |
+
+### Rules
+
+**R-BR9 Exactly one side, one primary.** An assignment names exactly one of Contact, Account or
+User (a validation rule). Saving one as Primary clears Primary on the same record's other
+assignments. The Key is set on every save, so a second assignment of the same record to the same
+brand is refused by the unique field.
+
+### Salesforce implementation
+
+- **Object** `Brand_Assignment__c`, auto number Name `BA-{000000}`, Master-Detail to Brand
+  (sharing controlled by parent), reports on, no activities, feeds, history or search.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Brand | `Brand__c` | Master-Detail(Brand), related list Brand Assignments |
+| Contact | `Contact__c` | Lookup(Contact), delete set null; a row left naming nothing is ignored by every reader |
+| Account | `Account__c` | Lookup(Account), delete set null |
+| User | `User__c` | Lookup(User) |
+| Primary | `Is_Primary__c` | Checkbox, default false |
+| Key | `Assignment_Key__c` | Text(80), unique, External ID |
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -15352,6 +15553,7 @@ mirrors the primary member).
 | 1.9 | 2026-11-11 | Migration Assistant (MIG-01, MIG-10, MIG-08; ADR-NEXT `NEXT-migration-assistant.md`, D-125). New Section 29ZS Migration Run (`Migration_Run__c`, rules R-MR1 to R-MR4) and shipped type Migration Kit (`Migration_Kit__mdt`, Section 13, R-MK1). Import Batch (16) gains Migration Run (`Migration_Run__c`) and Migration Step (`Migration_Step__c`). Integration App gains rows `Nonprofit_Success_Pack` and `Nonprofit_Cloud_Fundraising` (shown only when installed) and Start Migration for a detected product with a kit. R-R16 gains NPSP customizable rollups: read by describe, imported through the DLRS import steps, covered by the same-field guard. Rollup Builder ships kits `DLRS_Rollups` and `NPSP_Rollups`. |
 | 1.10 | 2026-11-11 | Giving words and nightly jobs (G-36, G-37). No object or field added. Labels only: `Installment__c` is Scheduled Payment (plural Scheduled Payments, Name label Payment Number, list view All Scheduled Payments); the `Installment__c` lookups on Gift, Gift Batch Row and Pledge Reminder are labelled Scheduled Payment; Pledge Reminder's `Commitment__c` is labelled Commitment; `Commitment__c.Installments_Planned__c` is Payments Planned. The vocabulary is commitment (the record), pledge and recurring gift (its types), scheduled payment (each installment). The pledge reminder step (`BarnCRM Giving Pledge Reminders`, 03:15, shipped off) is now one of `GivingScheduler`'s five jobs: its Schedule and Stop switch it with the others and Run Now runs it; `GivingScheduler.isScheduled` still counts only the other four. |
 | 1.11 | 2026-11-11 | Gift details and wealth screening (G-21, G-31, G-32, D-156). Five attributes added to Gift (`Stock_Symbol__c`, `Stock_Shares__c`, `Planned_Gift_Type__c`, `Gift_Source__c`, `Gift_Source_Name__c`), rule R-G17, and the packaged report DAF and Stock Gifts This Year. New Section 25U Wealth screening data, rules R-WS1 to R-WS3: five attributes added to Contact (`Capacity_Rating__c`, `Affinity_Rating__c`, `Screening_Score__c`, `Screening_Date__c`, `Screening_Source__c`), hidden from Giving Read Only, and the shipped import template Wealth Screening. |
+| 1.13 | 2026-11-11 | Multi-brand management (C-47a to C-47f, D-119, D-120; ADR-NEXT `NEXT-brand-management-and-visibility.md`). New Sections 29BR1 Legal Entity (`Legal_Entity__c`), 29BR2 Brand (`Brand__c`, rules R-BR1 to R-BR8) and 29BR3 Brand Assignment (`Brand_Assignment__c`, rule R-BR9). `BarnCRM_Settings__c` gains `Brand_Management__c` and `Brand_Visibility__c` (both false); `Giving_Settings__c` gains `Receipt_Numbering_Scope__c` (`Organization`). `Brand__c` lookups on `Gift__c`, `Appeal__c`, `Volunteer_Job__c`, `Program__c` and `Portal__c`. |
 
 ---
 ## 32. Entity ownership by package
@@ -15510,6 +15712,10 @@ included; standard objects the packages extend are named by the entity that gove
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
+| Legal Entity | Core | 1.13 (C-47a) | 29BR1 |
+| Brand | Core | 1.13 (C-47a) | 29BR2 |
+| Brand Assignment | Core | 1.13 (C-47a) | 29BR3 |
+| Brand lookups on Gift, Appeal, Volunteer Job, Program, Portal | Giving, Volunteers, Programs, Portal Builder | 1.14 (C-47d) | 29BR2 |
 
 **Components that are not entities (C-29, ADR-0059).** Core is the Standard Edition on its own,
 so nothing below that is nonprofit-specific ships in Core.

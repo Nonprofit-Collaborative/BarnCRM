@@ -18,6 +18,7 @@ Rules:
 | core | Automation | Custom32: Factory |
 | core | BarnCRM_Home | Custom1: Heart |
 | core | BarnCRM_Settings | Custom67: Gears |
+| core | Brand__c | Custom56: Bottle |
 | core | Bulk_Update | Custom19: Wrench |
 | core | Data_Hygiene | Custom94: Stethoscope |
 | core | Data_Manager | Custom57: BuildingBlock |
@@ -28,6 +29,7 @@ Rules:
 | core | Households | Custom15: People |
 | core | Import | Custom18: Form |
 | core | Import_Row__c | Custom83: Pencil |
+| core | Legal_Entity__c | Custom58: Caduceus |
 | core | Organizations | Custom24: Building |
 | core | Record_Inspector | Custom38: Camera |
 | core | Relationship__c | Custom37: Bridge |
