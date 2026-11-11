@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Renewal reminder template</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Reminder_Template__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Memberships_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Memberships</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Memberships</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Text</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">30</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">The unique name of the email template a renewal reminder uses. Default: BarnCRM_Membership_Renewal, which BarnCRM ships for you to edit. The member is the recipient and the membership is the record the template merges.</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">memberships.md</value></values>
+</CustomMetadata>

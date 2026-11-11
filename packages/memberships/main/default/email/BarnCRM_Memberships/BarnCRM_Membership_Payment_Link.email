@@ -1,0 +1,11 @@
+Dear {!Contact.FirstName, friend},
+
+Here is your link to pay your membership dues online:
+
+{!Membership_Term__c.Pay_Link__c}
+
+The link works for a short time only (about a day). If it has stopped working, ask us for a new one.
+
+With thanks,
+
+{!Organization.Name}

@@ -102,6 +102,9 @@ const ICONS = Object.freeze({
   Payment_Event__c: 'custom:custom95',
   Payment__c: 'custom:custom40',
   Payments_Setup: 'custom:custom70',
+  // Memberships
+  Membership_Level__c: 'custom:custom48',
+  Membership_Term__c: 'custom:custom45',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',

@@ -49,7 +49,8 @@ public class TestUsers {
 		'Events_Admin',
 		'Portal_Admin',
 		'Corporate_Hub_Admin',
-		'Payments_Admin'
+		'Payments_Admin',
+		'Memberships_Admin'
 	};
 
 	/**

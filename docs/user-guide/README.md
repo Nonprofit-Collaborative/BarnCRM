@@ -76,6 +76,10 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Payments](payments.md): finding a payment taken online, what its status means, and how refunds are made.
 
+### Memberships
+
+- [Memberships](memberships.md): adding a member, what a membership's status means, renewing, sending a payment link, and the directory listing.
+
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.

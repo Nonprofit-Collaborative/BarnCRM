@@ -280,6 +280,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | PAY-01 Payments: install, roles, the Site, connecting Stripe and PayPal, Payments Setup and keys, test and live mode, processing, payment statuses and refunds, Health Check checks, the seam for module builders | [payments.md](payments.md) | BarnCRM Payments |
 | MIG-06 Online giving through Zapier: recipes for Givebutter, Donorbox and similar tools into Giving gifts | [online-giving-zapier.md](online-giving-zapier.md) | Giving (Mirror for recipe B) |
 
+### Memberships
+
+| Feature | Page | Package |
+|---|---|---|
+| G-22a to G-22d, PAY-02, PB-09 Memberships: install, roles, levels and benefits, membership terms and their status, renewing by hand, from Giving gifts and recurring gifts, and online through Payments, lapse handling and reminders, the member directory portal, Memberships Essentials, erasure | [memberships.md](memberships.md) | BarnCRM Memberships (Giving, Payments and Portal Builder optional) |
+
 ### Moving From Another System
 
 | Feature | Page | Package |

@@ -15,7 +15,8 @@ public with sharing class PortalActionExtensions {
 	public static final List<String> EXTENSION_CLASSES = new List<String>{
 		'VolunteersPortalExtension',
 		'EventsPortalExtension',
-		'CorporateHubPortalExtension'
+		'CorporateHubPortalExtension',
+		'MembershipsPortalExtension'
 	};
 
 	/** Injected by tests by class name, since no module is there to resolve. */

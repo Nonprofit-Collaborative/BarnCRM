@@ -1,0 +1,61 @@
+<template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name={icon}>
+      <div class="slds-var-p-horizontal_medium slds-is-relative">
+        <template lwc:if={working}>
+          <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+        </template>
+        <template lwc:if={error}>
+          <c-barn-notice
+            class="slds-show slds-var-m-bottom_small"
+            variant="error"
+            message={error}
+            data-id="error"
+          ></c-barn-notice>
+        </template>
+        <template lwc:if={notice}>
+          <c-barn-notice
+            class="slds-show slds-var-m-bottom_small"
+            variant="success"
+            message={notice}
+            data-id="notice"
+          ></c-barn-notice>
+        </template>
+        <template lwc:if={loaded}>
+          <template lwc:if={panel.canRenew}>
+            <lightning-combobox
+              label={labels.level}
+              options={levelOptions}
+              value={levelId}
+              data-id="level"
+              onchange={handleLevel}
+            ></lightning-combobox>
+            <lightning-button
+              class="slds-show slds-var-m-top_small"
+              variant="brand"
+              label={labels.renew}
+              data-id="renew"
+              disabled={renewLocked}
+              onclick={handleRenew}
+            ></lightning-button>
+          </template>
+          <template lwc:else>
+            <p class="slds-var-m-bottom_small" data-id="cannot-renew">{labels.cannotRenew}</p>
+          </template>
+          <template lwc:if={linkShown}>
+            <lightning-button
+              class="slds-show slds-var-m-top_small"
+              label={labels.emailLink}
+              data-id="email-link"
+              disabled={working}
+              onclick={handleEmailLink}
+            ></lightning-button>
+          </template>
+          <template lwc:else>
+            <p class="slds-var-m-top_small slds-text-color_weak" data-id="link-hint">{linkHint}</p>
+          </template>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

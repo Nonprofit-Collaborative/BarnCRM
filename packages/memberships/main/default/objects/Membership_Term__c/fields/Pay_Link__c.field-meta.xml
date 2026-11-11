@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Pay_Link__c</fullName>
+  <externalId>false</externalId>
+  <required>false</required>
+  <inlineHelpText>The last online payment link emailed for this membership. It works only for a short time.</inlineHelpText>
+  <label>Payment Link</label>
+  <type>Url</type>
+</CustomField>
