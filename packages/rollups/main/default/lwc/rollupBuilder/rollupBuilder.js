@@ -8,6 +8,7 @@ import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
 import TAB_LABEL from '@salesforce/label/c.Core_Format_Pair';
 import OTHER_TOOLS from '@salesforce/label/c.Core_OtherRollupTools_Title';
 import IMPORT_FROM_DLRS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportTitle';
+import IMPORT_FROM_NPSP from '@salesforce/label/c.Core_RollupBuilder_NpspImportTitle';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/rollupTabLabel';
 import { bodyMessage } from 'c/findCsv';
@@ -26,6 +27,7 @@ export default class RollupBuilder extends LightningElement {
     title: TITLE,
     otherTools: OTHER_TOOLS,
     importFromDlrs: IMPORT_FROM_DLRS,
+    importFromNpsp: IMPORT_FROM_NPSP,
     advanced: ADVANCED
   };
 
@@ -35,6 +37,8 @@ export default class RollupBuilder extends LightningElement {
   draft;
   editing = false;
   importing = false;
+  /** The tool being imported from: 'npsp', or null for DLRS. */
+  importTool = null;
   notice;
   error;
   enclosingTabId;
@@ -71,7 +75,7 @@ export default class RollupBuilder extends LightningElement {
   }
 
   get hasOtherTools() {
-    return this.otherToolNotices.length > 0;
+    return this.otherToolNotices.length > 0 || this.showNpspImport;
   }
 
   get listClass() {
@@ -83,9 +87,15 @@ export default class RollupBuilder extends LightningElement {
     return Boolean(this.model && this.model.canImportFromDlrs) && !this.editing && !this.importing;
   }
 
-  handleImport() {
+  /** Import From NPSP, the same when NPSP has an active customizable rollup (MIG-08). */
+  get showNpspImport() {
+    return Boolean(this.model && this.model.canImportFromNpsp) && !this.editing && !this.importing;
+  }
+
+  handleImport(event) {
     this.notice = undefined;
     this.error = undefined;
+    this.importTool = event.target.dataset.tool || null;
     this.importing = true;
   }
 

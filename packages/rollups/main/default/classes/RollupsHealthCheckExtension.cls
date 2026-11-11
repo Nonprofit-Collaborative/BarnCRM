@@ -220,7 +220,8 @@ public with sharing class RollupsHealthCheckExtension implements HealthCheckExte
 								'.' +
 								definition.Target_Field__c,
 								definition.Name,
-								other.label
+								other.label,
+								RollupDlrs.toolOf(other)
 							}
 						)
 					);

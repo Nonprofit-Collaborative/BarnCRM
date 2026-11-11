@@ -1695,8 +1695,45 @@ alongside itself until a row's compatibility note says otherwise.
 | Related Module | `Related_Module__c` | text (80) | Optional. The BarnCRM module the product overlaps, by its name shown, for example BarnCRM Volunteers. Empty for a complement. |
 | Compatibility | `Compatibility__c` | long text (1000) | What BarnCRM knows about using the two together, written honestly: tested or not, and what to watch for. |
 | Show Only When Installed | `Show_Only_When_Installed__c` | checkbox, default false | When true, the product is listed only in an org where it is detected, so a product that matches one of BarnCRM's own modules is mentioned only to someone who already has it (owner rule, 2026-10-26). A group left with no product is not shown at all. |
-| Migration Path | `Migration_Path__c` | text (255) | Optional. A short line saying where to find BarnCRM's migration to the matching module, once one exists; shown under the compatibility note. Empty for every product today. |
+| Migration Path | `Migration_Path__c` | text (255) | Optional. A short line saying where to find BarnCRM's migration to the matching module, once one exists; shown under the compatibility note. |
 | Sort Order | `Sort_Order__c` | number | The order within its group, lowest first. |
+
+A product with a Migration Kit whose Source App is its DeveloperName, detected in the org,
+shows Start Migration to a person with Manage BarnCRM Settings, which opens the Migration
+Assistant for that kit on the same page (MIG-10, ADR-NEXT migration-assistant decision 9).
+
+### Migration Kit
+
+`Migration_Kit__mdt` (MIG-01, ADR-NEXT `NEXT-migration-assistant.md`): one migration from a
+product in the same org into BarnCRM, read as shipped and never materialized. A kit ships in the
+module that owns the destination records (Mirror when the source is a standard object), so a
+row exists only where that module is installed. The Migration Assistant offers a kit only when
+its Source App is detected (Integration App Detection Objects, by describe).
+
+| Field | API name | Type | Definition |
+|---|---|---|---|
+| DeveloperName | `DeveloperName` | text | The kit's stable key; a Migration Run stores it. |
+| Label | `MasterLabel` | text | The kit's name as the Assistant shows it, for example `DLRS Rollups`. |
+| Source App | `Source_App__c` | text (80) | The DeveloperName of the Integration App row of the product migrated from. Its detection decides whether the kit is offered. |
+| Description | `Description__c` | long text (1000) | One or two sentences: what moves, into which BarnCRM module, and what stays. Plain text. |
+| Steps | `Steps_JSON__c` | long text (32768) | The steps in run order, a JSON array (R-MK1). |
+| Retire Checklist | `Retire_Checklist_JSON__c` | long text (32768) | The old product's automations to switch off once the steps are done, a JSON array of `{"key": "...", "text": "..."}`. Empty means none. |
+| Extension Class | `Extension_Class__c` | text (80) | Optional. A class implementing Core's `MigrationKitExtension`, found by name (ADR-0057), that reshapes an import step's rows or checks a step. Empty means none. |
+| Sort Order | `Sort_Order__c` | number | The order kits are listed in, lowest first. |
+
+**R-MK1 Steps.** Each step is an object with `key` (unique in the kit), `label` (Title Case)
+and `kind`, `import` or `tool`, plus optional `help` (one sentence).
+- An `import` step adds `source` (the object to read, a packaged name written
+  `namespace.Object__c` as Integration App rows do), `fields` (field paths on it, the same
+  notation, at most five relationship hops; `Id` is always read), optional `filters` (a list of
+  `{"field": "...", "value": ...}` conditions, all of which must hold; a JSON null value means
+  blank) and `templateKey` (the Template Key of a shipped Import Template Default whose column
+  names are the step's field paths as written). Names resolve through describe at run time,
+  trying each dot as a relationship first and then as a namespace separator; a field the org
+  lacks or the person cannot read refuses the step with its name.
+- A `tool` step adds `tab` (an unprefixed tab API name, for example `Rollup_Builder`) and
+  optional `toolLabel` (the button text). The administrator marks it done.
+A kit whose JSON cannot be read is listed with the reason and cannot be started.
 
 ### Rules
 
@@ -2223,6 +2260,27 @@ its copy is already switched on. Nothing is refused silently: each refusal and e
 said in words. A compare step shows, for up to five target records, the value the record holds
 (DLRS wrote it) beside the value the copy calculates, writing nothing. A copy is switched on
 only with the confirmation above, recorded the same way. DLRS is read, never changed.
+
+*NPSP customizable rollups (MIG-08, ADR-NEXT migration-assistant decision 11).* NPSP's
+customizable rollups (its custom metadata types Rollup and Filter Rule, `Rollup` and `Filter_Rule` with the `__mdt` suffix, in
+namespace `npsp`, names built at run time, read by describe in system mode, only the fields the
+installed version has) are read into the same definition shape and pass through the same import
+steps, compare and confirmation as DLRS's, with Definition Key `NPSP_` and the NPSP rollup's
+developer name. A rollup is active when Active is true and Is Deleted is not. Summary Object and
+Field become Target Entity and Attribute; Detail Object becomes Source Entity, by the one lookup
+from it to the summary object (a standard lookup first when there are several); Operation Sum,
+Count, Average, Largest, Smallest, First and Last become SUM, COUNT, AVG, MAX, MIN, FIRST and LAST,
+reading Amount Field (Detail Field, when set, for Largest, Smallest, First and Last) and ordering
+First and Last by Date Field. Time Bound All Time adds nothing, Years Ago 0 and 1 add Date Field
+this year and last year, Days Back n adds the last n days. Each filter rule on the detail object
+becomes a condition, joined by AND (Equals, Not Equals, Greater, Less, Greater or Equal, Less or
+Equal, In List, Not In List, Starts With, Contains; a record type named by developer name or name
+becomes its Id). Refused with the reason, so the rollup stays in NPSP: Years Donated, Donor
+Streak, Best Year and Best Year Total; Amount or Date read from another object; a filter rule on
+another object or with another operator; fiscal years; Years Ago above 1; a contact summarized
+from Opportunity (NPSP credits contacts through contact roles); no single lookup to the summary
+object. The same-field guard applies to active NPSP customizable rollups as to DLRS's, with the
+other tool named. NPSP is read, never changed.
 
 ### Salesforce implementation
 
@@ -3156,6 +3214,8 @@ unchanged.
 | Rows Deleted | integer | computed | How many records a bulk delete deleted (R-BD3); empty for any other data job. |
 | Trial Rows | integer | computed | How many of the file's first rows a trial import committed (R-IB16); empty when the file was committed whole. |
 | Retry After Row | integer | computed | While a retry of the import's rejected rows is open, the highest row number before it: the fixed rows are numbered after it, and the retry's dry run and commit read only them (R-IB17). Empty otherwise. |
+| Migration Run | reference(Migration Run) | no | The Migration Assistant run this batch is a step of (Section 29ZS); empty for a file import. |
+| Migration Step | text | no | The key of the kit step this batch loads (R-MK1); empty for a file import. |
 
 ### Relationships
 
@@ -3538,6 +3598,8 @@ them (R-IB8, R-IB9).
 | Rows Deleted | `Rows_Deleted__c` | Number (9, 0) |
 | Trial Rows | `Trial_Rows__c` | Number (9, 0) |
 | Retry After Row | `Retry_After_Row__c` | Number (9, 0) |
+| Migration Run | `Migration_Run__c` | Lookup(Migration Run), cleared when the run is deleted |
+| Migration Step | `Migration_Step__c` | Text (80) |
 
 - **Batch tag on other objects:** `Created_By_Import_Batch__c`, a Lookup to
   `Import_Batch__c`, on Account (households and organizations), on Contact, and on
@@ -12673,6 +12735,72 @@ pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
 
 ---
 
+## 29ZS. Migration Run
+
+### Definition
+
+One administrator's progress through one Migration Kit (Section 13, MIG-01, ADR-NEXT
+`NEXT-migration-assistant.md`): which tool steps are done and which retire checklist items are
+ticked. Import steps are not stored here; each is the Import Batch that points at the run.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | computed | Auto number. |
+| Kit | text(80) | yes | The Migration Kit DeveloperName. |
+| Status | picklist(In Progress, Complete) | yes | Complete once every step is done and every checklist item ticked (R-MR3). |
+| State | long text(32768) | no | JSON: `{"done": {"<step key>": true}, "ticked": {"<checklist key>": true}}`: tool steps marked done and import steps whose source was empty. |
+
+### Rules
+
+**R-MR1 One open run per kit.** Opening a kit returns its latest run, or starts one. A Complete
+run is reopened (back to In Progress) by unticking an item or undoing a step.
+
+**R-MR2 Steps in order, undone backwards.** A step starts only when every earlier step is done:
+an import step when its latest batch for the run is Complete, a tool step when State marks it
+done. Starting an import step reads the source count (user mode, the step's `filters`); a count of
+zero marks the step done in State with no batch. Otherwise it creates an Import Batch with the
+step's template and that Expected Count (left empty when the kit has an Extension Class, which
+may reshape rows), and queues staging in Batch Apex
+(chunks of the import chunk size): each source record becomes a row keyed by the step's field
+paths as written, or the rows the kit's extension returns. When staging ends the batch's dry
+run starts; a failure marks the batch Failed with the reason in its Run Log. Commit, trial,
+retry, results and undo are the Import engine's own (R-IB1 to R-IB17). Only the latest done
+import step offers Undo, and only while no later step is done; an Undone or Failed step can be
+started again, which makes a new batch. A tool step can be unmarked only while no later step is
+done.
+
+**R-MR3 Verification.** For an import step: source count now, rows staged (Row Count), rows
+committed (Rows Created plus Updated plus Matched) and Rows Rejected; Verified when the first
+three are equal and none was rejected. A kit's extension may return its own source and done
+counts for a step, shown beside these; for a tool step they are the only check. The run is
+Complete when every step is done and every checklist item ticked.
+
+**R-MR4 Administrators only, nothing outside BarnCRM changed.** Every action needs Manage BarnCRM
+Settings, and an import step also the Import permission (`ImportController`). Runs are written in
+user mode. Only `BarnCRM_Admin` is granted the object (Read, Create, Edit, Delete, View All, Modify All), so one administrator
+continues a run another started. BarnCRM never
+writes, switches off or uninstalls the product migrated from.
+
+### Salesforce implementation
+
+- **Object** `Migration_Run__c`, auto number Name `MR-{0000}`, sharing Private, reports on, no
+  activities, feeds, history or search.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Kit | `Kit__c` | Text(80), required |
+| Status | `Status__c` | Picklist, restricted: `In Progress` (default), `Complete` |
+| State | `State_JSON__c` | Long Text Area(32768) |
+
+- **Classes:** `MigrationKitService` (catalog, run state, order, verification),
+  `MigrationStageBatch` (reads the source, stages rows, starts the dry run),
+  `MigrationKitExtension` (the seam), `MigrationController` (thin, plain JSON shapes). The panel
+  is `migrationAssistant`, opened from Start Migration on the Integrations page.
+
+---
+
 ## 29ZW. Form
 
 ### Definition
@@ -15006,6 +15134,7 @@ mirrors the primary member).
 | 1.6 | 2026-11-11 | Generic Record Merge (C-62, D-156; extends ADR-0145). `BarnCRM_Settings__c` gains `Generic_Merge_Enabled__c` (false). `Merge_Rule__mdt` `Field_Name__c` may name `Object.Field`. Rules R-DP11 and R-DP12 added. No object added: merges are written to `Merge_Journal__c`. |
 | 1.7 | 2026-11-11 | Field History Keeper (C-68, D-157; ADR-NEXT `NEXT-field-history-keeper.md`). New Section 29FH1 Field History (`Field_History__c`, rules R-FH1 to R-FH5); custom metadata type `History_Field__mdt` (Section 13); `BarnCRM_Settings__c` gains `Field_History_Enabled__c` (false) and `Field_History_Retention_Days__c` (730). |
 | 1.8 | 2026-11-11 | Corporate Hub module (CH-01 to CH-04, CH-06 to CH-08, D-118; ADR-NEXT `NEXT-corporate-hub-module.md`). New package `packages/corporatehub`: Library Document (`Hub_Document__c`, 29CH1), Policy Acknowledgment (`Policy_Acknowledgment__c`, 29CH2), Compliance Obligation (`Compliance_Obligation__c`, 29CH3), Compliance Cycle (`Compliance_Cycle__c`, 29CH4), Agreement (`Agreement__c`, 29CH5) and Corporate Hub Settings (`Corporate_Hub_Settings__c`, 29CH6), with the shipped templates `BarnCorporateHubTemplates`. |
+| 1.9 | 2026-11-11 | Migration Assistant (MIG-01, MIG-10, MIG-08; ADR-NEXT `NEXT-migration-assistant.md`, D-125). New Section 29ZS Migration Run (`Migration_Run__c`, rules R-MR1 to R-MR4) and shipped type Migration Kit (`Migration_Kit__mdt`, Section 13, R-MK1). Import Batch (16) gains Migration Run (`Migration_Run__c`) and Migration Step (`Migration_Step__c`). Integration App gains rows `Nonprofit_Success_Pack` and `Nonprofit_Cloud_Fundraising` (shown only when installed) and Start Migration for a detected product with a kit. R-R16 gains NPSP customizable rollups: read by describe, imported through the DLRS import steps, covered by the same-field guard. Rollup Builder ships kits `DLRS_Rollups` and `NPSP_Rollups`. |
 
 ---
 ## 32. Entity ownership by package
@@ -15116,6 +15245,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Indicator Period | Logic Models | 0.14 (L-02) | 29ZG |
 | Household Adoption | Core | 0.17 (X-05) | 29ZQ |
 | Nightly Job | Core | v1.0 (architect review RT-10) | 29ZR |
+| Migration Run | Core | 1.4 (MIG-01) | 29ZS |
+| Migration Kit (shipped default) | Core type; rows in the owning module | 1.4 (MIG-01) | 13 |
 | Form | Forms | release 1.1 (C-42a) | 29ZW |
 | Form Version | Forms | release 1.1 (C-42a) | 29ZX |
 | Form Submission | Forms | release 1.1 (C-42a) | 29ZY |

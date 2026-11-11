@@ -19,6 +19,15 @@
                             onclick={handleImport}
                         ></lightning-button>
                     </template>
+                    <template lwc:if={showNpspImport}>
+                        <lightning-button
+                            class="slds-var-m-top_x-small slds-var-m-left_x-small"
+                            data-id="import-from-npsp"
+                            data-tool="npsp"
+                            label={labels.importFromNpsp}
+                            onclick={handleImport}
+                        ></lightning-button>
+                    </template>
                 </c-barn-notice>
             </template>
             <template lwc:if={notice}>
@@ -41,7 +50,7 @@
                 <c-rollup-wizard model={model} draft={draft} onsaved={handleSaved} oncancel={handleCancel}></c-rollup-wizard>
             </template>
             <template lwc:if={importing}>
-                <c-rollup-dlrs-import model={model} onclose={handleImportClosed}></c-rollup-dlrs-import>
+                <c-rollup-dlrs-import model={model} tool={importTool} onclose={handleImportClosed}></c-rollup-dlrs-import>
             </template>
         </div>
         <div class={listClass}>

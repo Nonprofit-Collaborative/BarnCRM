@@ -1,5 +1,8 @@
 <template>
-    <template lwc:if={helpReady}>
+    <template lwc:if={migrationKit}>
+        <c-migration-assistant kit-key={migrationKit} onback={handleMigrationBack} data-id="assistant"></c-migration-assistant>
+    </template>
+    <template lwc:elseif={helpReady}>
     <template lwc:if={errorMessage}>
         <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="error" message={errorMessage} data-id="error"></c-barn-notice>
     </template>
@@ -44,6 +47,16 @@
                         </p>
                         <template lwc:if={app.migrationPathText}>
                             <p class="slds-text-body_small" data-id="migration-path">{app.migrationPathText}</p>
+                        </template>
+                        <template lwc:if={app.canMigrate}>
+                            <lightning-button
+                                class="slds-show slds-var-m-top_x-small"
+                                variant="brand"
+                                label={app.startMigration}
+                                data-kit={app.migrationKit}
+                                data-id="start-migration"
+                                onclick={handleStartMigration}
+                            ></lightning-button>
                         </template>
                         <p class="slds-var-m-top_xx-small">
                             <template lwc:if={app.linkUrl}>

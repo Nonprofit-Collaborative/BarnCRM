@@ -5,16 +5,16 @@
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Import from DLRS: turning a copy on needs the confirmation</shortDescription>
-        <value>Confirm you will switch the DLRS rollup off in DLRS before turning its copy on.</value>
+        <shortDescription>Import from DLRS or NPSP: turning a copy on needs the confirmation</shortDescription>
+        <value>Confirm you will switch the other rollup off in its own tool before turning its copy on.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_DlrsImportedFrom</fullName>
         <categories>Rollups</categories>
         <language>en_US</language>
         <protected>false</protected>
-        <shortDescription>Description of an imported rollup; {0} the DLRS rollup's name</shortDescription>
-        <value>Imported from the DLRS rollup {0}.</value>
+        <shortDescription>Description of an imported rollup; {0} the rollup's name, {1} its tool</shortDescription>
+        <value>Imported from the {1} rollup {0}.</value>
     </labels>
     <labels>
         <fullName>Core_RollupBuilder_DlrsNoteSystemMode</fullName>

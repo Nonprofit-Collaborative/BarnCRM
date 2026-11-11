@@ -58,14 +58,30 @@ public with sharing class IntegrationAppService {
 		/** True when one of the product's objects is in this org. */
 		@AuraEnabled
 		public Boolean installed;
+		/** The Migration Kit that moves this installed product into BarnCRM (MIG-10), or null. */
+		@AuraEnabled
+		public String migrationKit;
+	}
+
+	/** The keys of the catalog's products detected in this org, listed or not. */
+	public static Set<String> detectedKeys() {
+		Set<String> keys = new Set<String>();
+		for (Integration_App__mdt row : catalog()) {
+			if (isDetected(row)) {
+				keys.add(row.DeveloperName);
+			}
+		}
+		return keys;
 	}
 
 	/**
-	 * Every product the page lists, lowest Sort Order first, each saying whether it is here. A
-	 * product marked Show Only When Installed is left out of an org that does not have it.
+	 * Every product the page lists, lowest Sort Order first, each saying whether it is here and,
+	 * when it is and a kit ships for it, which Migration Kit moves it. A product marked Show Only
+	 * When Installed is left out of an org that does not have it.
 	 */
 	public static List<AppInfo> getApps() {
 		List<AppInfo> apps = new List<AppInfo>();
+		Map<String, String> kits = MigrationKitService.kitKeysByApp();
 		for (Integration_App__mdt row : catalog()) {
 			Boolean installed = isDetected(row);
 			if (row.Show_Only_When_Installed__c == true && !installed) {
@@ -86,6 +102,7 @@ public with sharing class IntegrationAppService {
 			info.compatibility = row.Compatibility__c;
 			info.migrationPath = row.Migration_Path__c;
 			info.installed = installed;
+			info.migrationKit = installed ? kits.get(row.DeveloperName) : null;
 			apps.add(info);
 		}
 		return apps;

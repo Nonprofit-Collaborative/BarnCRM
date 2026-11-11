@@ -36,6 +36,7 @@ import RESULT from '@salesforce/label/c.Core_Find_Result';
 import SAME from '@salesforce/label/c.Core_RollupBuilder_DlrsImportSame';
 import NO_RECORDS from '@salesforce/label/c.Core_RollupBuilder_DlrsImportNoRecords';
 import FINISHED from '@salesforce/label/c.Core_RollupBuilder_DlrsImportFinished';
+import NPSP_TITLE from '@salesforce/label/c.Core_RollupBuilder_NpspImportTitle';
 import CONFIRM_TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmTitle';
 import CONFIRM_QUESTION from '@salesforce/label/c.Core_RollupBuilder_DlrsConfirmQuestion';
 import UNEXPECTED_ERROR from '@salesforce/label/c.Core_Rollups_UnexpectedError';
@@ -62,6 +63,8 @@ const format = (template, ...values) =>
  * each becomes, copy them switched off, compare their values with the ones DLRS wrote, then turn
  * each on with the admin's word that she will switch the DLRS rollup off. Finish waits until
  * every copy is on; Close leaves the copies switched off. DLRS itself is never changed.
+ *
+ * With `tool` 'npsp' the same steps import NPSP's customizable rollups (MIG-08), naming NPSP.
  */
 export default class RollupDlrsImport extends LightningElement {
   helpReady = isHelpLoaded('Rollups');
@@ -69,14 +72,28 @@ export default class RollupDlrsImport extends LightningElement {
   /** The Builder's model, for the names of the totals. */
   @api model;
 
+  /** 'npsp' for NPSP customizable rollups; DLRS otherwise. */
+  @api tool;
+
   labels = {
-    title: TITLE,
+    npsp: false,
+    get title() {
+      return this.npsp ? NPSP_TITLE : TITLE;
+    },
     get intro() {
-      return helpText('Rollups', 'Core_RollupBuilder_DlrsImportIntro');
+      return this.npsp
+        ? helpText('Rollups', 'Core_RollupBuilder_NpspImportIntro')
+        : helpText('Rollups', 'Core_RollupBuilder_DlrsImportIntro');
     },
     canCopy: CAN_COPY,
-    stays: STAYS,
-    noneActive: NONE_ACTIVE,
+    get stays() {
+      return this.npsp ? helpText('Rollups', 'Core_RollupBuilder_NpspImportStays') : STAYS;
+    },
+    get noneActive() {
+      return this.npsp
+        ? helpText('Rollups', 'Core_RollupBuilder_NpspImportNoneActive')
+        : NONE_ACTIVE;
+    },
     noChanges: NO_CHANGES,
     copy: COPY,
     next: NEXT,
@@ -87,7 +104,9 @@ export default class RollupDlrsImport extends LightningElement {
     turnOn: TURN_ON,
     nothingCopied: NOTHING_COPIED,
     record: RECORD,
-    valueNow: VALUE_NOW,
+    get valueNow() {
+      return this.npsp ? helpText('Rollups', 'Core_RollupBuilder_NpspImportValueNow') : VALUE_NOW;
+    },
     valueBarn: VALUE_BARN,
     result: RESULT,
     noRecords: NO_RECORDS,
@@ -118,7 +137,8 @@ export default class RollupDlrsImport extends LightningElement {
         this.helpReady = true;
       });
     }
-    getCandidates()
+    this.labels.npsp = this.tool === 'npsp';
+    getCandidates({ tool: this.tool || null })
       .then((candidates) => {
         this.candidates = candidates || [];
         this.chosen = new Set(this.candidates.filter((c) => c.importable).map((c) => c.key));
@@ -266,7 +286,7 @@ export default class RollupDlrsImport extends LightningElement {
   handleCopy() {
     this.busy = true;
     this.error = undefined;
-    importRollups({ keys: [...this.chosen] })
+    importRollups({ keys: [...this.chosen], tool: this.tool || null })
       .then((rows) => {
         this.rows = rows || [];
         this.step = COMPARE_STEP;
@@ -321,7 +341,15 @@ export default class RollupDlrsImport extends LightningElement {
   handleFinish() {
     this.dispatchEvent(
       new CustomEvent('close', {
-        detail: { notice: format(FINISHED, String(this.copies.length)) }
+        detail: {
+          notice: this.labels.npsp
+            ? helpText(
+                'Rollups',
+                'Core_RollupBuilder_NpspImportFinished',
+                String(this.copies.length)
+              )
+            : format(FINISHED, String(this.copies.length))
+        }
       })
     );
   }

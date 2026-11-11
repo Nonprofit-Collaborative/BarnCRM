@@ -15,9 +15,17 @@ public class RollupDlrsFake implements RollupDlrs.Reader {
 		return rows;
 	}
 
-	/** Makes `RollupDlrs` read these rows from now on in this test. */
+	/** Makes `RollupDlrs` read these rows, and no NPSP rollups, from now on in this test. */
 	public static void use(List<RollupDlrs.Definition> rows) {
 		RollupDlrs.reader = new RollupDlrsFake(rows);
+		RollupDlrs.npspReader = new RollupDlrsFake(new List<RollupDlrs.Definition>());
+		RollupDlrs.reset();
+	}
+
+	/** Makes `RollupDlrs` read these NPSP rollups, and no DLRS ones, from now on in this test. */
+	public static void useNpsp(List<RollupDlrs.Definition> rows) {
+		RollupDlrs.reader = new RollupDlrsFake(new List<RollupDlrs.Definition>());
+		RollupDlrs.npspReader = new RollupDlrsFake(rows);
 		RollupDlrs.reset();
 	}
 

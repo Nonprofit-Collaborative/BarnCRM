@@ -641,3 +641,19 @@ The **Records to count** option in step 2 is named from your org's object and fi
 | 5 | As the admin, click **Recalculate All** on the **Rollup Builder** tab. | The run finishes as before; shipped rollups and their last calculated times are unaffected. |
 
 **Cleanup:** None.
+
+## T-RB-49: Import From NPSP Copies Customizable Rollups and Says Why Others Stay
+
+**Purpose:** confirm NPSP customizable rollups are read, copied switched off, compared and turned on with the NPSP question, and that NPSP is never changed.
+**Prerequisites:** an org with NPSP, Customizable Rollups enabled, Core and Rollup Builder deployed; admin user with Manage BarnCRM Settings; NPSP's shipped customizable rollups active.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Rollup Builder** tab. | **Import From NPSP** is shown. |
+| 2 | Click it. | Step 1 lists the active NPSP rollups. Under **Can Be Copied**, account rollups from opportunities (for example Total Gifts on Account) and General Accounting Unit rollups from allocations. Under **Stays in NPSP**, contact rollups from opportunities ("NPSP credits contacts through contact roles"), soft credit and payment rollups, Years Donated, Donor Streak and Best Year, each with its reason. |
+| 3 | Leave one account rollup ticked (untick the rest), click **Next**, then **Copy Switched Off**. | "Copied, switched off." The Rollup Builder list shows it switched off, with Definition Key starting `NPSP_`. |
+| 4 | Click **Compare**. | Up to five accounts: **Value Now** (NPSP wrote it) beside **BarnCRM Value**, mostly **Same**. |
+| 5 | Click **Next**, then **Turn On**. | The question names the NPSP rollup and the field. **OK** turns it on; **Recent Changes** has the answer. |
+| 6 | Open **NPSP Settings**, **Customizable Rollups**. | The NPSP rollup is unchanged and still active. |
+
+**Cleanup:** delete the copy (keep values), or deactivate the NPSP rollup if you keep the copy.
