@@ -156,6 +156,10 @@ CAPS = {
     # Check measured 47,575 on 2026-11-11, plus about 2 percent; raised the same day for the
     # Payments Setup page's controller, measured 52,331.
     "payments": 53_400,
+    # LWC Builder (LB-01 to LB-06, ADR-NEXT lwc builder module): the builder and renderer
+    # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
+    # about 2%.
+    "lwcbuilder": 17_700,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}

@@ -92,6 +92,7 @@ Rules:
 | payments | Payment__c | Custom40: Creditcard |
 | payments | Payment_Event__c | Custom95: Stopwatch |
 | payments | Payments_Setup | Custom70: Handsaw |
+| lwcbuilder | LWC_Builder | Custom34: Insect |
 | mirror | Accounting_Export | Custom21: Computer |
 | mirror | Campaign_Sync | Custom35: Microphone |
 | mirror | Gift_Transaction_Mirror | Custom31: Car |
@@ -170,6 +171,7 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | giving | tributeNotification | custom:custom5 | Tribute__c |
 | corporatehub | hubBoardPanel | custom:custom47 | Board__c |
 | corporatehub | hubMeetingPanel | custom:custom84 | Board_Meeting__c |
+| lwcbuilder | lwcBuilderStudio | custom:custom34 | LWC_Builder |
 | forms | formBuilder | custom:custom28 | Form__c |
 | forms | formRunner | custom:custom28 | Form__c |
 | forms | formSubmission | custom:custom51 | Form_Submission__c |

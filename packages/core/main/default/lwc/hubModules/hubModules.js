@@ -38,7 +38,8 @@ const FALLBACK_TABS = {
   Portal: 'Portal__c',
   ContactPoints: 'Contact_Point_Sync',
   CorporateHub: 'Corporate_Hub',
-  Payments: 'Payment__c'
+  Payments: 'Payment__c',
+  LwcBuilder: 'LWC_Builder'
 };
 const DEFAULT_ICON = 'standard:apps';
 

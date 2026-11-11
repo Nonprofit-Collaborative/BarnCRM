@@ -97,6 +97,9 @@ public with sharing class SettingSections {
 	/** The Payments module's processor, mode and currency, and the link to Payments Setup. */
 	@NamespaceAccessible
 	public static final String PAYMENTS = 'Payments';
+	/** The LWC Builder module's built component settings. */
+	@NamespaceAccessible
+	public static final String LWC_BUILDER = 'LWC Builder';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -121,6 +124,7 @@ public with sharing class SettingSections {
 			PORTALS,
 			CORPORATE_HUB,
 			PAYMENTS,
+			LWC_BUILDER,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+  <hasActivationRequired>false</hasActivationRequired>
+  <label>LWC Builder Admin</label>
+  <description>
+    The LWC Builder tab: create, edit, delete and export built components, and see them where
+    they are placed. Given to BarnCRM Admin holders.
+  </description>
+  <classAccesses>
+    <apexClass>LwcBuilderComponentPicklist</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
+    <apexClass>LwcBuilderController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Built_Component__c.Active__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Built_Component__c.Definition__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Built_Component__c.Description__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Built_Component__c.Object_Name__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Built_Component__c.Version__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <objectPermissions>
+    <allowCreate>true</allowCreate>
+    <allowDelete>true</allowDelete>
+    <allowEdit>true</allowEdit>
+    <allowRead>true</allowRead>
+    <modifyAllRecords>true</modifyAllRecords>
+    <object>Built_Component__c</object>
+    <viewAllRecords>true</viewAllRecords>
+  </objectPermissions>
+  <tabSettings>
+    <tab>LWC_Builder</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+</PermissionSet>

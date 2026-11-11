@@ -15956,6 +15956,91 @@ brand is refused by the unique field.
 
 ---
 
+## 29LB1. Built Component
+
+### Definition
+
+A component an admin built in the LWC Builder (LB-01 to LB-06; ADR-NEXT
+`NEXT-lwc-builder-module.md`): a named layout of sections, rows, columns and blocks, stored as a
+JSON document and shown on a Lightning page by the packaged renderer. A definition is data, never
+deployed metadata.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What admins call the component, shown in the builder and in Lightning App Builder. |
+| Key | text | yes | Unique, stable name a Lightning page stores to find the component (letters, digits and underscores). |
+| Description | text | no | What the component is for. |
+| Object | text | no | API name of the object whose record pages it is built for; blank for app and home pages. |
+| Active | boolean | yes (defaults true) | Whether the renderer shows it. |
+| Version | number | no | Raised by one on each save from the builder. |
+| Definition | text (JSON) | yes | The definition document, schema version 1 (R-LB1). |
+
+### Rules
+
+**R-LB1 The definition document.** `{schemaVersion: 1, sections: [{id, title, rows: [{id,
+columns: [{id, width, blocks: [block]}]}]}]}`. A row's column widths are twelfths and add up to
+12. A block is `{id, type, title, visibility}` plus its type's properties: `fields` (page
+record fields), `relatedList` (object, parent field, fields, sort), `recordList` (object,
+fields, one optional filter, sort), `chart` (report API name), `text` (rich text), `image`
+(address, alternative text) and `action` (quick action or screen flow). Ids are unique within
+the document. The `lwcBuilderModel` module validates it; Apex checks only that it is a JSON
+object with a known schema version.
+
+**R-LB2 Reads are the viewer's.** Every block reads in user mode or through Lightning Data
+Service, so object, field and record access apply. List queries name only fields the schema
+holds, bind the filter value and stop at the Rows per List setting (at most 200) and six
+columns.
+
+**R-LB3 Visibility is a display rule.** A block's optional rule (page record field equals, does
+not equal, contains, is blank, is not blank; user holds or lacks a custom permission) only hides
+it. A field the viewer cannot read counts as blank.
+
+### Salesforce implementation
+
+- **Object:** `Built_Component__c`, label Built Component, Name field Text(80), sharing Public
+  Read Only, no tab (the LWC Builder tab lists them).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Key | `Key__c` | Text(80), required, unique (case-insensitive), external ID |
+| Description | `Description__c` | Text Area(255) |
+| Object | `Object_Name__c` | Text(80) |
+| Active | `Active__c` | Checkbox, default true |
+| Version | `Version__c` | Number(6, 0) |
+| Definition | `Definition__c` | Long Text Area(131072), required |
+
+## 29LB2. LWC Builder Settings
+
+### Definition
+
+The LWC Builder module's org-wide settings, edited in the LWC Builder section of BarnCRM
+Settings.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Show Built Components | boolean | yes (defaults true) | Whether placed built components render at all; off hides every one at once. |
+| Rows per List | number | no | Rows a Related List or Record List block shows, 1 to 200. Blank means 10. |
+| Allow Source Export | boolean | yes (defaults true) | Whether the builder offers Export as LWC Source (LB-06). |
+
+### Salesforce implementation
+
+- **Object:** `LWC_Builder_Settings__c`, hierarchy custom setting, visibility Protected.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Show Built Components | `Components_Enabled__c` | Checkbox, default true |
+| Rows per List | `Rows_Per_List__c` | Number(3, 0), default 10 |
+| Allow Source Export | `Source_Export__c` | Checkbox, default true |
+
+- **Setting Definitions:** `LwcBuilder_Components_Enabled`, `LwcBuilder_Rows_Per_List`,
+  `LwcBuilder_Source_Export`, section LWC Builder, module `LwcBuilder`.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -16360,6 +16445,7 @@ mirrors the primary member).
 | 1.16 | 2026-11-11 | V4S migration kit (MIG-03). No object or field added. Volunteers ships kit `V4S_Volunteers` (source `Volunteers_for_Salesforce`) with templates `kit_v4s_jobs`, `kit_v4s_shifts`, `kit_v4s_signups` and `kit_v4s_hours`, and extension `V4sMigrationKit` (a shift's End and Status from the V4S start and Duration). Sign-ups exclude Completed V4S hours, so R-VU3 never makes hours twice; hours load through R-VG5 and R-VG6 (Submitted while approval is required). The members of `MigrationKitService` a module's kit extension or test reads are `@NamespaceAccessible` (ADR-0017). |
 | 1.17 | 2026-11-11 | NPSP giving setup kit (MIG-05). No object or field added. Giving ships kit `NPSP_Giving_Setup` (source `Nonprofit_Success_Pack`) with templates `kit_npsp_funds` (Fund), `kit_npsp_levels` (Donor Level), `kit_npsp_recurring_people` and `kit_npsp_recurring_organizations` (Commitment, Type Recurring), and extension `NpspGivingKit` (a commitment starts at NPSP's next payment date, else the date established). The members of `MigrationKitService` a module's kit extension or test reads are `@NamespaceAccessible` (ADR-0017). |
 | 1.18 | 2026-11-11 | Multi-brand management (C-47a to C-47f, D-119, D-120; ADR-NEXT `NEXT-brand-management-and-visibility.md`). New Sections 29BR1 Legal Entity (`Legal_Entity__c`), 29BR2 Brand (`Brand__c`, rules R-BR1 to R-BR8) and 29BR3 Brand Assignment (`Brand_Assignment__c`, rule R-BR9). `BarnCRM_Settings__c` gains `Brand_Management__c` and `Brand_Visibility__c` (both false); `Giving_Settings__c` gains `Receipt_Numbering_Scope__c` (`Organization`). `Brand__c` lookups on `Gift__c`, `Appeal__c`, `Volunteer_Job__c`, `Program__c` and `Portal__c`. |
+| 1.19 | 2026-11-11 | LWC Builder module (LB-01 to LB-06; ADR-NEXT `NEXT-lwc-builder-module.md`, D-120). New Sections 29LB1 Built Component (`Built_Component__c`, rules R-LB1 to R-LB3) and 29LB2 LWC Builder Settings (`LWC_Builder_Settings__c`). Package `packages/lwcbuilder`. |
 
 ---
 ## 32. Entity ownership by package
@@ -16528,6 +16614,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Payment Event | Payments | 1.4 (PAY-01) | 29PAY2 |
 | Payments Settings | Payments | 1.4 (PAY-01) | 29PAY3 |
 | Payment Keys | Payments | 1.4 (PAY-01) | 29PAY4 |
+| Built Component | LWC Builder | 1.19 (LB-01, LB-02) | 29LB1 |
+| LWC Builder Settings | LWC Builder | 1.19 (LB-01, LB-02) | 29LB2 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
