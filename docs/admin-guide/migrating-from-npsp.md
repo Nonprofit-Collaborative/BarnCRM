@@ -38,7 +38,7 @@ kit's **Start Migration** button. Run the kits in the order listed.
 The retire checklist then reminds you to stop NPSP creating the other side of relationships,
 affiliations, household addresses and household names, so the two apps never both do it.
 
-**NPSP Funds, Levels and Recurring Donations** (BarnCRM Giving):
+**NPSP Funds, Levels, Recurring Donations** (BarnCRM Giving):
 
 | Step | What it does |
 |---|---|

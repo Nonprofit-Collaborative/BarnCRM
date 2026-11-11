@@ -350,7 +350,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open **BarnCRM Settings**, **Integrations**, NPSP. | One **Start Migration** button per kit, including **NPSP Funds, Levels and Recurring Donations**. |
+| 1 | Open **BarnCRM Settings**, **Integrations**, NPSP. | One **Start Migration** button per kit, including **Start Migration: NPSP Funds, Levels, Recurring Donations**. |
 | 2 | Start it; preview and load **Funds**, then **Donor Levels**. | A fund Building Fund and a donor level Friend with the same amounts. **Check this step** matches each. |
 | 3 | Load **Recurring Donations of People**. | A recurring commitment of 25, Monthly, Active, for the same contact, starting at the NPSP next payment date; no overdue payments. |
 | 4 | Load **Recurring Donations of Organizations**. | A recurring commitment of 500, Yearly, Cancelled, for the organization. |

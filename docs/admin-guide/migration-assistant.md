@@ -21,7 +21,7 @@ org. These kits ship:
 - **NPSP People and Addresses** (Core): adopts NPSP households in place, then copies NPSP
   relationships, affiliations and household addresses. See
   [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
-- **NPSP Funds, Levels and Recurring Donations** (Giving): copies General Accounting Units,
+- **NPSP Funds, Levels, Recurring Donations** (Giving): copies General Accounting Units,
   levels and recurring donations. See
   [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
 
