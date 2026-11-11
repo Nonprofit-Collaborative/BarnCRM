@@ -109,6 +109,7 @@ there:
 | Grant requirements | 3 | On the Youth Programs Award: **Site visit** (Accepted, 10 days ago), **Quarter 1 financial report** (In Progress, due in 10 days) and **Interim narrative report** (Not Started, due in 75 days). With reminders on, the next morning's run reminds you about the financial report. |
 | Grant payments | 2 | On the Youth Programs Award, which is **Restricted**: 17,500 at the award start (Received) and 17,500 six months later (Expected). |
 | Restricted fund entries | 2 | On the same award: the first payment's **Received** entry (17,500) and **Spent** 6,000 on tutor stipends, so the **Restricted Balance** is 11,500. |
+| Grant budget lines | 2 | On the same award: Tutor stipends (30,000 requested, 28,000 awarded), which the Spent entry is on, and Books and supplies (10,000 requested, 7,000 awarded). |
 
 Removal deletes the sample grants with their requirements, payments and entries; your own grants are never touched. Nothing is loaded for
 Funders when the core sample organizations are not there.
