@@ -72,6 +72,9 @@ public with sharing class OrgOptimizerStorageController {
 		public List<OwnObject> ownObjects = new List<OwnObject>();
 		@AuraEnabled
 		public Integer countCap = COUNT_CAP;
+		/** Whether the person may archive old records to free storage (R-BD9). */
+		@AuraEnabled
+		public Boolean canArchive = BulkDeleteController.hasPermission();
 	}
 
 	@AuraEnabled
