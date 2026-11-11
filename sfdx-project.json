@@ -99,6 +99,14 @@
       "dependencies": [{ "package": "BarnCRM Core" }]
     },
     {
+      "path": "packages/lwcbuilder",
+      "default": false,
+      "package": "BarnCRM LWC Builder",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
       "path": "packages/mirror",
       "default": false,
       "package": "BarnCRM Mirror",

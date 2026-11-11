@@ -96,6 +96,8 @@ const ICONS = Object.freeze({
   Compliance_Obligation__c: 'custom:custom97',
   Corporate_Hub: 'custom:custom72',
   Hub_Document__c: 'custom:custom49',
+  // LWC Builder
+  LWC_Builder: 'custom:custom34',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',

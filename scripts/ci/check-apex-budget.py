@@ -149,6 +149,10 @@ CAPS = {
     # measured, plus about 2%. Board governance (CH-09 to CH-20, PB-02): HubBoard, the board and
     # meeting panel controller and the board portal actions, 51,443 measured, plus about 2%.
     "corporatehub": 52_500,
+    # LWC Builder (LB-01 to LB-06, ADR-NEXT lwc builder module): the builder and renderer
+    # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
+    # about 2%.
+    "lwcbuilder": 17_700,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
