@@ -814,18 +814,18 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 
 ## 9. LWC Builder
 
-**Edition:** Both editions. Depends on Core only. No package directory exists yet. Admins build their own components on a drag-and-drop grid canvas; one packaged component placed in Lightning App Builder shows each saved design, reading as the viewing user so permissions and sharing apply, and nothing is deployed at run time. Planned after v1.0, not scheduled to an iteration; a new ADR is needed before build (plan 5.10, D-120).
+**Edition:** Both editions. Depends on Core only. Package `packages/lwcbuilder` (BarnCRM LWC Builder), no app of its own: its LWC Builder tab is in BarnCRM and BarnCRM Console for admins (ADR-0192, ADR-NEXT lwc builder module). Admins build their own components on a drag-and-drop grid canvas; one packaged component placed in Lightning App Builder (BarnCRM Built Component) shows each saved design, reading as the viewing user so permissions and sharing apply, and nothing is deployed at run time. A design is a Built Component record holding JSON. Releases 1.14 and 1.16 (plan 5.10, D-120).
 
 ### 9.1 Component building
 
 | Feature | Type | What it does | Status | Feature ID |
 |---|---|---|---|---|
-| Grid canvas builder | Major | Drag-and-drop layout of rows, columns and sections, with preview, saved as a named component design. | Planned (after v1.0) | LB-01 |
-| Runtime component | Major | One packaged component placed on record, app and home pages that shows a chosen design, honouring the user's object, field and record access. | Planned (after v1.0) | LB-02 |
-| Building blocks | Major | Record fields, related lists, record lists, charts from standard reports, text and images. | Planned (after v1.0) | LB-03 |
-| Action buttons | Minor | Buttons that launch a quick action or a flow. | Planned (after v1.0) | LB-04 |
-| Conditional visibility | Minor | Show or hide each block by field value or by permission. | Planned (after v1.0) | LB-05 |
-| Export as source | Minor | Export a design as LWC source for developers. | Planned (later) | LB-06 |
+| Grid canvas builder | Major | Drag-and-drop layout of sections, rows (12-column presets) and columns, with keyboard moves, preview with a chosen record, saved as a named component design with a unique key and a version number. | Built, in review for release 1.14 | LB-01 |
+| Runtime component | Major | One packaged component placed on record, app and home pages that shows a chosen design, honouring the user's object, field and record access; a setting hides every built component at once. | Built, in review for release 1.14 | LB-02 |
+| Building blocks | Major | Record fields, related lists, record lists with one filter and a sort, charts from standard summary reports, text and images; list rows capped by a setting. | Built, in review for release 1.16 | LB-03 |
+| Action buttons | Minor | Buttons that open a quick action or run a screen flow inside the component, optionally passing the record Id; the user's own permissions apply. | Built, in review for release 1.16 | LB-04 |
+| Conditional visibility | Minor | Show or hide each block by a page record field value or by a custom permission; a display rule, not a security control. | Built, in review for release 1.16 | LB-05 |
+| Export as source | Minor | Export a design as an LWC bundle (HTML, JavaScript, metadata) for developers; list and chart blocks export as placeholders to wire. | Built, in review for release 1.16 | LB-06 |
 
 ---
 

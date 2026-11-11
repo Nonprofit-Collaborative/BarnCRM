@@ -71,6 +71,10 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Corporate Hub](corporate-hub.md): acknowledging policies, what is due on the Corporate Hub page, Library Documents and their versions, completing a compliance obligation with its evidence, agreements and reminders.
 
+### LWC Builder
+
+- [Built Components](lwc-builder.md): what a component your admin built shows, its buttons, and why a block or a record can be missing.
+
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.

@@ -272,6 +272,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | CH-01 to CH-04, CH-06 to CH-08 Corporate Hub: install, access, settings, the shipped templates (not legal advice), Library Documents and versions, policy acknowledgments, the compliance calendar and completed cycles, agreements and renewals, reminders, reports | [corporate-hub.md](corporate-hub.md) | BarnCRM Corporate Hub |
 
+### LWC Builder
+
+| Feature | Page | Package |
+|---|---|---|
+| LB-01 to LB-06 LWC Builder: install, access, settings, the grid canvas builder, placing the packaged component, blocks, buttons, visibility rules, export as LWC source, moving components between orgs | [lwc-builder.md](lwc-builder.md) | BarnCRM LWC Builder |
+
 ### Moving From Another System
 
 | Feature | Page | Package |
