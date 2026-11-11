@@ -10745,7 +10745,7 @@ its enrollments (29ZA) are who takes part.
 | Start Date | date | no | When the program began, or will begin. |
 | End Date | date | no | When the program ended, or will end. |
 | Coordinator | reference(User) | no | The staff member who runs this program. |
-| Eligibility Rules | long text (JSON) | no | The program's eligibility screening rules (P-14, R-EN8): ordered rules over the enrollment's intake fields, in the documented format below. Edited in the Eligibility Rules panel, never by hand. |
+| Eligibility Rules | long text (JSON) | no | The program's eligibility screening rules (P-14, R-EN8): ordered rules over the enrollment's intake fields and, through its Contact lookup, the person's Contact fields (P-14b), in the documented format below. Edited in the Eligibility Rules panel, never by hand. |
 | Capacity | integer | no | How many people the program can have Enrolled at once (P-09, R-EN10). Empty means no limit. |
 
 **Eligibility rules format (version 1).** `{ "version": 1, "defaultResult": "Review",
@@ -10911,7 +10911,9 @@ of the switchable `Enrollment_Dates` automation (R-EN3), so an import of history
 
 **R-EN8 Screening sets the eligibility fields from the program's rules (P-14).** Screening an
 enrollment (one, or the program's open ones, Applied or Enrolled, up to 200 a run) evaluates the
-program's eligibility rules (Section 29Y) over the enrollment's intake fields: the first rule
+program's eligibility rules (Section 29Y) over the enrollment's intake fields and (release 1.19,
+P-14b) the person's Contact fields, named by a path such as `Contact__r.Birthdate` and read
+blank for an enrollment of an Account: the first rule
 whose conditions all hold decides, else the rules' default (Review unless set). The result sets
 Eligibility Status (Eligible, Not Eligible or Review), Eligibility Reason, and Eligibility Basis
 when the rule names one. When the status changes, Eligibility Date becomes today for Eligible
@@ -16882,6 +16884,7 @@ mirrors the primary member).
 | 1.20 | 2026-11-11 | Scholarships and Outbound Grants module (SG-01 to SG-10, PB-06, D-122, D-156; ADR-NEXT `NEXT-scholarships-outbound-grants-module.md`). New package `packages/scholarships`: Award Program (`Award_Program__c`), Award Cycle (`Award_Cycle__c`), Award Application (`Award_Application__c`), Application Review (`Application_Review__c`), Award (`Award__c`), Disbursement (`Award_Payment__c`), Award Requirement (`Award_Requirement__c`) and settings `Scholarships_Settings__c` (29SG1 to 29SG8). |
 | 1.21 | 2026-11-11 | Grid tool and saved grids (C-41, C-41b). No object or field added. Section 29D gains rule R-SQ14: the query document's optional `grid` key, which marks a saved query saved from the Grid. The Grid (`gridTool`, `gridModel`) shows in the Find tab through the `findPage` wrapper and uses Find's own server methods. |
 | 1.22 | 2026-11-11 | Territory Management module (C-40, C-40b; ADR-NEXT `NEXT-territory-management-module.md`). New Sections 29TM1 Territory (`Territory__c`, with the Territory lookup `Territory__c` on Account and Contact), 29TM2 Territory Rule (`Territory_Rule__c`), 29TM3 Territory Member (`Territory_Member__c`) and 29TM4 Territory Run (`Territory_Run__c`); rules R-TM1 to R-TM4. |
+| 1.26 | 2026-11-11 | Person-field eligibility rules (release 1.19, P-14b, D-168 follow-up). R-EN8 and 29Y's Eligibility Rules: a condition's `field` may also be a path through the enrollment's Contact lookup (`Contact__r.<Contact field>`), offered for every readable Contact field of a rule type and read blank for an enrollment of an Account. Where Used matches rule fields as paths. No object or field added. |
 
 ---
 ## 32. Entity ownership by package

@@ -229,6 +229,54 @@ private class EligibilityControllerTest {
 	}
 
 	@IsTest
+	static void aRuleCanReadAFieldOnThePerson() {
+		System.runAs(TestUsers.adminWith(ADMIN)) {
+			Program__c program = programWith(null, new List<String>{ 'Self', 'School' });
+			List<Contact> people = [
+				SELECT Id, FirstName
+				FROM Contact
+				WHERE LastName = 'Screen'
+				ORDER BY FirstName
+			];
+			people[0].Birthdate = Date.newInstance(1980, 5, 1);
+			people[1].Birthdate = Date.newInstance(2015, 5, 1);
+			update people;
+			String rules =
+				'{"version":1,"defaultResult":"Not Eligible","defaultReason":"Under 18",' +
+				'"rules":[{"id":"r1","all":[{"field":"Contact__r.Birthdate","operator":' +
+				'"lessThan","value":"2008-01-01"}],"result":"Eligible","reason":"Adult",' +
+				'"basis":""}]}';
+
+			Map<String, String> labels = new Map<String, String>();
+			EligibilityController.State state = EligibilityController.getState(program.Id);
+			for (EligibilityController.Field field : state.fields) {
+				labels.put(field.apiName, field.label);
+			}
+			List<String> problems = EligibilityController.saveRules(program.Id, rules);
+			EligibilityController.Summary summary = EligibilityController.screen(
+				program.Id,
+				null,
+				true
+			);
+
+			Assert.areEqual(
+				Schema.SObjectType.Contact.getLabel() +
+					': ' +
+					Schema.SObjectType.Contact.fields.Birthdate.getLabel(),
+				labels.get('Contact__r.Birthdate'),
+				'Person fields are offered, named by their object.'
+			);
+			Assert.isTrue(labels.containsKey('Referral_Source__c'), 'Intake fields still are.');
+			Assert.isTrue(problems.isEmpty(), 'A person field is accepted: ' + problems);
+			Assert.areEqual(1, summary.eligible, 'The adult is eligible.');
+			Assert.areEqual(1, summary.notEligible, 'The child is not.');
+			Map<String, Enrollment__c> screened = bySource(program.Id);
+			Assert.areEqual('Eligible', screened.get('Self').Eligibility_Status__c, 'Person0.');
+			Assert.areEqual('Under 18', screened.get('School').Eligibility_Reason__c, 'Person1.');
+		}
+	}
+
+	@IsTest
 	static void aProgramWithoutRulesScreensNothing() {
 		System.runAs(TestUsers.adminWith(ADMIN)) {
 			Program__c program = programWith(null, new List<String>{ 'Self' });

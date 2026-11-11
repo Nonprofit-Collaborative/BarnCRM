@@ -330,6 +330,7 @@ Note: Core's sample set has more than 12 people, so every count above holds; wit
 | 9 | Move rule 2 above rule 1, save, and preview Self. | Unchanged result (the rules do not overlap); with a rule 1 of **Referral Source** not blank, moving it first decides every row. |
 | 10 | Drag rule 2 by its handle above rule 1 with the mouse; then do the same on a phone (press and hold the handle); then by keyboard (Tab to the handle, Space, Up Arrow, Space). | Each time the rules swap, a line shows where the rule will land while dragging, **Unsaved changes** shows, and a screen reader hears "Moved Rule 2 to Eligibility Rules." Escape during a drag puts the rule back. **Move Up** and **Move Down** still work. |
 | 11 | As the staff user, open the program. | The rules show but cannot be changed and have no drag handles; **Screen Open Enrollments** works. |
+| 12 | As the admin, give the Self person a **Birthdate** of 1980-05-01 and the School person 2015-05-01. Add a rule and move it first: **Field** **Contact: Birthdate** less than 2008-01-01, **Result** Eligible, **Reason** "Adult". Save and preview each person. | **Contact: Birthdate** is offered after the enrollment fields, with a date box. Self: Eligible, "Adult"; School: the next rule decides (Eligible, "Referred by a partner"); Other (no birthdate): the rules after it decide, as before. In BarnCRM Settings, Where Used for Contact's **Birthdate** lists the program's Eligibility Rules. |
 
 **Cleanup:** clear the rules (remove each rule and **Save Rules**) and reset the enrollments' eligibility.
 
