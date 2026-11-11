@@ -4,7 +4,9 @@
  * `Enrollment_Rules`, which always runs: it enforces a rule rather than doing work for anyone, so
  * no switch, pause or bypass reaches it (ADR-0024). A second open enrollment for the same person
  * in the same program is refused on insert, on undelete, and on an update that changes the
- * program, the person or the stage of an enrollment that is open after the save.
+ * program, the person or the stage of an enrollment that is open after the save. It also keeps
+ * program capacity (P-09, R-EN10) through `EnrollmentCapacity`, which does nothing while
+ * Waitlist When Full is off.
  */
 @NamespaceAccessible
 public with sharing class EnrollmentRulesHandler extends TriggerHandler {
@@ -19,12 +21,30 @@ public with sharing class EnrollmentRulesHandler extends TriggerHandler {
 
 	public override void beforeInsert() {
 		ProgramPersonRule.refuseNonPersonAccounts(newRecords(), null);
+		EnrollmentCapacity.waitlistWhatDoesNotFit((List<Enrollment__c>) newRecords(), null);
 		EnrollmentService.refuseSecondOpenEnrollments((List<Enrollment__c>) newRecords());
+	}
+
+	/** P-09 (R-EN10): places freed by an enrollment leaving Enrolled go to the waitlist. */
+	public override void afterUpdate() {
+		EnrollmentCapacity.promote(
+			EnrollmentCapacity.freedPrograms(
+				(List<Enrollment__c>) newRecords(),
+				(Map<Id, Enrollment__c>) oldRecordsById()
+			)
+		);
+	}
+
+	public override void afterDelete() {
+		EnrollmentCapacity.promote(
+			EnrollmentCapacity.freedPrograms((List<Enrollment__c>) oldRecords(), null)
+		);
 	}
 
 	public override void beforeUpdate() {
 		ProgramPersonRule.refuseNonPersonAccounts(newRecords(), oldRecordsById());
 		Map<Id, Enrollment__c> previousById = (Map<Id, Enrollment__c>) oldRecordsById();
+		EnrollmentCapacity.waitlistWhatDoesNotFit((List<Enrollment__c>) newRecords(), previousById);
 		List<Enrollment__c> changed = new List<Enrollment__c>();
 		for (Enrollment__c enrollment : (List<Enrollment__c>) newRecords()) {
 			Enrollment__c previous = previousById.get(enrollment.Id);

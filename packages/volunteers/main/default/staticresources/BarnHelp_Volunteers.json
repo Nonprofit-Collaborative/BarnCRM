@@ -56,6 +56,7 @@
     "Volunteers_Portal_CannotCancel": "This sign-up can no longer be cancelled here. Contact the volunteer coordinator.",
     "Volunteers_Portal_ShiftClosed": "This shift is no longer open for sign-ups.",
     "Volunteers_Portal_ShiftFull": "This shift is full.",
-    "Volunteers_Portal_SignedUp": "You are signed up for this shift."
+    "Volunteers_Portal_SignedUp": "You are signed up for this shift.",
+    "Volunteers_Portal_Waitlisted": "This shift is full, so you are on its waitlist. If a place frees up, you are moved up and signed up."
   }
 }

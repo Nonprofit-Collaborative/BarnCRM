@@ -20,7 +20,7 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Refuses a second sign-up for the same person on the same shift, and, when Attendance Creates Hours is on, writes the hours for a sign-up marked Attended, once. Switching it off leaves the coordinator to type those hours and to catch double bookings.</value>
+        <value xsi:type="xsd:string">Refuses a second sign-up for the same person on the same shift; writes the hours for a sign-up marked Attended once (Attendance Creates Hours); runs the waitlist (Waitlist When Full) and standing sign-ups. Switching it off leaves all of these to the coordinator.</value>
     </values>
     <values>
         <field>Module__c</field>

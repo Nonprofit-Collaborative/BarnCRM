@@ -10784,7 +10784,9 @@ R-EN2, and is not counted as open on the dashboard or the person card. Cohorts h
 - **Waitlist When Full (P-09):** `Programs_Settings__c` field `Waitlist_Enabled__c` (Checkbox,
   default false), set in the Programs section of BarnCRM Settings
   (`Setting_Definition.Programs_Waitlist_Enabled`); R-EN10 by `EnrollmentCapacity`, called from
-  the always-running `Enrollment_Rules` handler.
+  the always-running `Enrollment_Rules` handler, and itself the handler of the registry row
+  `Program_Capacity` (`ProgramTrigger`, after update), which promotes when Capacity is raised or
+  cleared.
 - **Participant privacy (R-EN7, R-SD6):** the public group `Programs_Participants` (no bosses);
   the hierarchy custom setting `Programs_Settings__c` with `Private_Participants__c` (Checkbox,
   default unchecked, which is Shared); `ProgramsSharing` writes the shares (handler

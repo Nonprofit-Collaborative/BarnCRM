@@ -24,7 +24,9 @@
     </values>
     <values>
         <field>Description__c</field>
-        <value xsi:type="xsd:string">Refuses a second open enrollment (Applied or Enrolled) for the same person in the same program, counting enrollments you cannot see, and says to change the one that is there instead. This automation enforces a rule rather than doing work for you, so it cannot be switched off here and pausing automation does not suspend it.</value>
+        <value
+      xsi:type="xsd:string"
+    >Refuses a second open enrollment (Applied, Enrolled or Waitlisted) for the same person in the same program, counting enrollments you cannot see, and says to change the one that is there instead. With Waitlist when full on, it also waitlists an enrollment into a full program and moves the waitlist up when places free. This automation enforces a rule rather than doing work for you, so it cannot be switched off here and pausing automation does not suspend it.</value>
     </values>
     <values>
         <field>Module__c</field>
