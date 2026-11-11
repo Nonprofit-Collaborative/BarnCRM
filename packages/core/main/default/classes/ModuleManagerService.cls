@@ -160,7 +160,8 @@ public with sharing class ModuleManagerService {
 			'Meeting_Action_Item__c',
 			'Meeting_Attendee__c',
 			'Policy_Acknowledgment__c'
-		}
+		},
+		'Payments' => new List<String>{ 'Payment__c', 'Payment_Event__c' }
 	};
 
 	/** The permission set Turn on gives the person who turned the module on. */
@@ -176,7 +177,8 @@ public with sharing class ModuleManagerService {
 		'ContactPoints' => 'Contact_Point_Sync_Admin',
 		'Events' => 'Events_Admin',
 		'Portal' => 'Portal_Admin',
-		'CorporateHub' => 'Corporate_Hub_Admin'
+		'CorporateHub' => 'Corporate_Hub_Admin',
+		'Payments' => 'Payments_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */

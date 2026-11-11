@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customSettingsType>Hierarchy</customSettingsType>
+  <description>
+    The Payments module's org-wide settings (processor, mode, default currency), edited in the
+    BarnCRM Settings console (canonical model 29PAY3). ADR-0017 gives each package its own
+    settings object.
+  </description>
+  <enableFeeds>false</enableFeeds>
+  <label>Payments Settings</label>
+  <visibility>Protected</visibility>
+</CustomObject>

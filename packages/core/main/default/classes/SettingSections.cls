@@ -94,6 +94,9 @@ public with sharing class SettingSections {
 	/** The Corporate Hub module's reminder and acknowledgment settings. */
 	@NamespaceAccessible
 	public static final String CORPORATE_HUB = 'Corporate Hub';
+	/** The Payments module's processor, mode and currency, and the link to Payments Setup. */
+	@NamespaceAccessible
+	public static final String PAYMENTS = 'Payments';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -117,6 +120,7 @@ public with sharing class SettingSections {
 			FORMS,
 			PORTALS,
 			CORPORATE_HUB,
+			PAYMENTS,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,

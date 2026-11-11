@@ -40,6 +40,7 @@ PACKAGES = {
     "contactpoints": "ContactPoints",
     "events": "Events",
     "portal": "Portal",
+    "payments": "Payments",
     "mirror": "Mirror",
     "corporatehub": "CorporateHub",
 }

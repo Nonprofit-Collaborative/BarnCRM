@@ -71,6 +71,10 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Corporate Hub](corporate-hub.md): acknowledging policies, what is due on the Corporate Hub page, Library Documents and their versions, completing a compliance obligation with its evidence, agreements and reminders.
 
+### Payments
+
+- [Payments](payments.md): finding a payment taken online, what its status means, and how refunds are made.
+
 ### Reports
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.

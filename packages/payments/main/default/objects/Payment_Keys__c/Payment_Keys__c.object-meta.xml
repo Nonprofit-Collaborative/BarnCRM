@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customSettingsType>Hierarchy</customSettingsType>
+  <description>
+    The org's own Stripe and PayPal keys, written on the Payments Setup page and never shown again
+    (canonical model 29PAY4, R-PK1). Granted to no permission set; read only by Payments' Apex.
+  </description>
+  <enableFeeds>false</enableFeeds>
+  <label>Payment Keys</label>
+  <visibility>Protected</visibility>
+</CustomObject>

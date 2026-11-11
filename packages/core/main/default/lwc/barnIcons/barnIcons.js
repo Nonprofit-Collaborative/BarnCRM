@@ -96,6 +96,10 @@ const ICONS = Object.freeze({
   Compliance_Obligation__c: 'custom:custom97',
   Corporate_Hub: 'custom:custom72',
   Hub_Document__c: 'custom:custom49',
+  // Payments
+  Payment_Event__c: 'custom:custom58',
+  Payment__c: 'custom:custom56',
+  Payments_Setup: 'custom:custom70',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',

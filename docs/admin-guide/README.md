@@ -272,6 +272,13 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | CH-01 to CH-04, CH-06 to CH-08 Corporate Hub: install, access, settings, the shipped templates (not legal advice), Library Documents and versions, policy acknowledgments, the compliance calendar and completed cycles, agreements and renewals, reminders, reports | [corporate-hub.md](corporate-hub.md) | BarnCRM Corporate Hub |
 
+### Payments
+
+| Feature | Page | Package |
+|---|---|---|
+| PAY-01 Payments: install, roles, the Site, connecting Stripe and PayPal, Payments Setup and keys, test and live mode, processing, payment statuses and refunds, Health Check checks, the seam for module builders | [payments.md](payments.md) | BarnCRM Payments |
+| MIG-06 Online giving through Zapier: recipes for Givebutter, Donorbox and similar tools into Giving gifts | [online-giving-zapier.md](online-giving-zapier.md) | Giving (Mirror for recipe B) |
+
 ### Moving From Another System
 
 | Feature | Page | Package |

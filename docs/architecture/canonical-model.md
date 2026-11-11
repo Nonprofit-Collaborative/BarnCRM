@@ -15547,6 +15547,197 @@ assessment is Open (`Answer_While_Open`).
 
 ---
 
+## 29PAY1. Payment
+
+### Definition
+
+One online payment taken through the organization's own Stripe or PayPal account on the
+processor's hosted checkout page (PAY-01, Payments module, ADR-NEXT `NEXT-payments-module.md`,
+D-190): how much, for what, from whom, for which record, and where it stands. BarnCRM never holds
+the money or any card or account number.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Status | picklist | yes | Pending, Paid, Failed, Refunded or Cancelled. Default Pending. Set only from processor events (R-PAY1). |
+| Processor | picklist | yes | Stripe or PayPal. |
+| Mode | picklist | yes | Test or Live, from the setting when the checkout started. |
+| Amount | currency | yes | The amount asked, over zero, in the payment's currency. |
+| Amount Refunded | currency | no | The total refunded so far (R-PAY2). Default 0. |
+| Currency | text | yes | Three-letter ISO code, upper case. |
+| Description | text | yes | What the payer sees on the checkout page. |
+| Payer Name | text | no | As the consumer passed it. |
+| Payer Email | email | no | As the consumer passed it; prefilled on Stripe's page. |
+| Person | reference to Contact | no | The person paying, when the consumer knows them. Cleared when the person is deleted. |
+| Source Record Id | text | no | The consumer's record the payment is for (a registration, a gift, a membership), as text so Payments names no consumer object (ADR-0014). |
+| Listener | text | no | The consumer's class told of each change (ADR-NEXT payments module, decision 8). |
+| Reference | text | yes | A random identifier sent to the processor and matched on its events; unique. |
+| Checkout Id | text | no | The Stripe Checkout Session id or the PayPal Order id. |
+| Processor Payment Id | text | no | The Stripe payment intent id or the PayPal capture id, once known. |
+| Checkout Url | long text | no | The hosted checkout page address. |
+| Paid At | datetime | no | When the processor reported the money captured. |
+| Detail | text | no | The last failure, refund or cancellation reason the processor gave. |
+
+### Rules
+
+**R-PAY1 Status moves.** Pending may move to any status. Failed may move to Paid (a retried
+card), Cancelled to Paid (a late capture) and Paid to Refunded. Any other move is ignored and
+the event recorded Ignored with the reason, so a late or replayed event never takes a payment
+back.
+
+**R-PAY2 Refunds.** Amount Refunded is the processor's total refunded, never more than Amount.
+A partial refund keeps Paid; a refund of the whole amount sets Refunded.
+
+**R-PAY3 Abandoned checkouts.** A payment still Pending with no Processor Payment Id two days
+after it was created is set Cancelled with the detail that the checkout expired.
+
+**R-PAY4 No card data.** No field holds a card, bank account or PayPal sign-in; the processor's
+page takes them.
+
+### Salesforce implementation
+
+- **Object:** `Payment__c`, name field Auto Number (PAY-{000000}), sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Status | `Status__c` | Picklist (Pending, Paid, Failed, Refunded, Cancelled), restricted, default Pending |
+| Processor | `Processor__c` | Picklist (Stripe, PayPal), restricted |
+| Mode | `Mode__c` | Picklist (Test, Live), restricted |
+| Amount | `Amount__c` | Currency(16, 2); required by `PaymentService`, not by the field, so the read-only layout deploys |
+| Amount Refunded | `Amount_Refunded__c` | Currency(16, 2), default 0 |
+| Currency | `Currency_Code__c` | Text(3) |
+| Description | `Description__c` | Text(255) |
+| Payer Name | `Payer_Name__c` | Text(255) |
+| Payer Email | `Payer_Email__c` | Email |
+| Person | `Person__c` | Lookup(Contact), Clear on delete |
+| Source Record Id | `Source_Record_Id__c` | Text(18), external ID |
+| Listener | `Listener__c` | Text(255) |
+| Reference | `Reference__c` | Text(36), unique, external ID |
+| Checkout Id | `Checkout_Id__c` | Text(255), external ID |
+| Processor Payment Id | `Processor_Payment_Id__c` | Text(255), external ID |
+| Checkout Url | `Checkout_Url__c` | Long Text Area(2048) |
+| Paid At | `Paid_At__c` | DateTime |
+| Detail | `Detail__c` | Text(255) |
+
+---
+
+## 29PAY2. Payment Event
+
+### Definition
+
+One notification a processor sent to the webhook receiver, kept so each is used once and so an
+administrator can see what the processor said.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Event Key | text | no | The processor and its event id (`stripe:evt_...`, `paypal:WH-...`), unique (R-PEV1). |
+| Processor | picklist | yes | Stripe or PayPal. |
+| Event Id | text | no | The processor's event id. |
+| Event Type | text | no | The processor's event type, such as `checkout.session.completed`. |
+| Status | picklist | yes | Received, Applied, Ignored, Rejected or Failed. Default Received. |
+| Payload | long text | yes | The event body exactly as received. |
+| Headers | long text | no | PayPal's transmission headers, as JSON, for verification. |
+| Payment | reference to Payment | no | The payment the event was matched to. |
+| Message | text | no | Why it was ignored, rejected or failed. |
+
+### Rules
+
+**R-PEV1 Used once.** A Stripe event takes its key on arrival, after its signature is checked; a
+PayPal event takes it only after PayPal confirms it. A second event with a key already used is
+dropped (Stripe) or marked Ignored (PayPal).
+
+**R-PEV2 Verified before use.** Only a verified event changes a payment. A PayPal event PayPal
+does not confirm is Rejected.
+
+**R-PEV3 The guest only stores.** The receiver inserts the event and reads nothing; processing
+runs as the administrator who scheduled it.
+
+### Salesforce implementation
+
+- **Object:** `Payment_Event__c`, name field Auto Number (PEV-{000000}), sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event Key | `Event_Key__c` | Text(255), unique, external ID |
+| Processor | `Processor__c` | Picklist (Stripe, PayPal), restricted |
+| Event Id | `Event_Id__c` | Text(255) |
+| Event Type | `Event_Type__c` | Text(100) |
+| Status | `Status__c` | Picklist (Received, Applied, Ignored, Rejected, Failed), restricted, default Received |
+| Payload | `Payload__c` | Long Text Area(131072) |
+| Headers | `Headers__c` | Long Text Area(4000) |
+| Payment | `Payment__c` | Lookup(Payment), Clear on delete |
+| Message | `Message__c` | Text(255) |
+
+---
+
+## 29PAY3. Payments Settings
+
+### Definition
+
+The Payments module's org-wide choices, edited in the Payments section of BarnCRM Settings.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Processor | text | yes (defaults Stripe) | Stripe or PayPal: used when a module does not name one. |
+| Mode | text | yes (defaults Test) | Test or Live. Test takes no real money. |
+| Currency | text | yes (defaults USD) | The three-letter currency used when a module does not name one. |
+
+### Salesforce implementation
+
+- **Object:** `Payments_Settings__c`, hierarchy custom setting, visibility Protected.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Processor | `Processor__c` | Text(20), default "Stripe" |
+| Mode | `Mode__c` | Text(10), default "Test" |
+| Currency | `Currency__c` | Text(3), default "USD" |
+
+- **Setting Definitions:** `Payments_Processor`, `Payments_Mode`, `Payments_Currency`,
+  `Payments_Setup_Page`, section Payments.
+
+---
+
+## 29PAY4. Payment Keys
+
+### Definition
+
+The organization's own processor keys, written on the Payments Setup page and never shown again
+(only whether each is set and its last four characters).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Stripe Secret Key | text | for Stripe | `sk_test_...` or `sk_live_...` (or a restricted `rk_` key). |
+| Stripe Webhook Secret | text | for Stripe | The endpoint's signing secret, `whsec_...`. |
+| PayPal Client Id | text | for PayPal | The REST app's client id. |
+| PayPal Client Secret | text | for PayPal | The REST app's secret. |
+| PayPal Webhook Id | text | for PayPal | The id PayPal gives the webhook, used to verify events. |
+
+### Rules
+
+**R-PK1 Granted to no one.** No permission set grants the setting; only Payments' Apex reads it,
+and the setup page never returns a key.
+
+### Salesforce implementation
+
+- **Object:** `Payment_Keys__c`, hierarchy custom setting, visibility Protected.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Stripe Secret Key | `Stripe_Secret_Key__c` | Text(255) |
+| Stripe Webhook Secret | `Stripe_Webhook_Secret__c` | Text(255) |
+| PayPal Client Id | `PayPal_Client_Id__c` | Text(255) |
+| PayPal Client Secret | `PayPal_Client_Secret__c` | Text(255) |
+| PayPal Webhook Id | `PayPal_Webhook_Id__c` | Text(64) |
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -15946,6 +16137,7 @@ mirrors the primary member).
 | 1.11 | 2026-11-11 | Gift details and wealth screening (G-21, G-31, G-32, D-156). Five attributes added to Gift (`Stock_Symbol__c`, `Stock_Shares__c`, `Planned_Gift_Type__c`, `Gift_Source__c`, `Gift_Source_Name__c`), rule R-G17, and the packaged report DAF and Stock Gifts This Year. New Section 25U Wealth screening data, rules R-WS1 to R-WS3: five attributes added to Contact (`Capacity_Rating__c`, `Affinity_Rating__c`, `Screening_Score__c`, `Screening_Date__c`, `Screening_Source__c`), hidden from Giving Read Only, and the shipped import template Wealth Screening. |
 | 1.12 | 2026-11-11 | Corporate Hub board governance (CH-09 to CH-20, PB-02; ADR-NEXT `NEXT-corporate-hub-board-governance.md`). New Sections 29CH7 Board (`Board__c`), 29CH8 Board Member (`Board_Member__c`), 29CH9 Board Meeting (`Board_Meeting__c`), 29CH10 Meeting Attendee (`Meeting_Attendee__c`), 29CH11 Board Motion (`Board_Motion__c`), 29CH12 Board Vote (`Board_Vote__c`), 29CH13 Action Item (`Meeting_Action_Item__c`), 29CH14 Board Self-Assessment (`Board_Assessment__c`) and 29CH15 Assessment Answer (`Assessment_Answer__c`). Library Document gains Ask Every Year (`Annual__c`); Policy Acknowledgment gains `Disclosure__c`, `Conflict_Disclosed__c` and `Answered_In_Portal__c` (R-PAK1, R-PAK3, R-PAK4); Corporate Hub Settings gains `Board_Demographics__c` (false). |
 | 1.13 | 2026-11-11 | Donor panel in Quick Gift Entry (G-33). No object or field added. `GiftDonorPanelController` reads, in user mode, the chosen donor's household (through `HouseholdService`), `Total_Giving__c` and `Last_Gift_Date__c`, the last three gifts, and the donor's Active or Paused commitments with each one's next open scheduled payment. Read only; it writes nothing. |
+| 1.14 | 2026-11-11 | Payments module (PAY-01, D-190; ADR-NEXT `NEXT-payments-module.md`). New package `packages/payments`: Payment (`Payment__c`, 29PAY1, R-PAY1 to R-PAY4), Payment Event (`Payment_Event__c`, 29PAY2, R-PEV1 to R-PEV3), Payments Settings (`Payments_Settings__c`, 29PAY3) and Payment Keys (`Payment_Keys__c`, 29PAY4, R-PK1). |
 
 ---
 ## 32. Entity ownership by package
@@ -16110,6 +16302,10 @@ included; standard objects the packages extend are named by the entity that gove
 | Action Item | Corporate Hub | 1.10 (CH-16) | 29CH13 |
 | Board Self-Assessment | Corporate Hub | 1.14 (CH-19) | 29CH14 |
 | Assessment Answer | Corporate Hub | 1.14 (CH-19) | 29CH15 |
+| Payment | Payments | 1.4 (PAY-01) | 29PAY1 |
+| Payment Event | Payments | 1.4 (PAY-01) | 29PAY2 |
+| Payments Settings | Payments | 1.4 (PAY-01) | 29PAY3 |
+| Payment Keys | Payments | 1.4 (PAY-01) | 29PAY4 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
@@ -16138,6 +16334,8 @@ so nothing below that is nonprofit-specific ships in Core.
 | Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and `FormsAccessSync` (ADR-0175 `0175-forms-module.md`). No app (D-188, ADR-0192 module tabs in the BarnCRM apps): the Forms and Form Submissions tabs join BarnCRM and BarnCRM Console at deploy; the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
 | Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-0175 `0175-forms-module.md` decision 9) |
 | Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and `CorporateHubAccessSync` (ADR-NEXT `NEXT-corporate-hub-module.md`). No app (ADR-0192): the Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs join BarnCRM and BarnCRM Console |
+| Permission sets (Admin, Staff, Read Only, Webhook Guest), Payments Setup tab, webhook receiver, processing job | Payments | Metadata and `PaymentsAccessSync` (ADR-NEXT `NEXT-payments-module.md`). No app: the Payments and Payments Setup tabs join BarnCRM and BarnCRM Console at deploy |
+| Payment seam (a module starts a checkout and is told of each status change) | Payments | `PaymentsApi`, a `System.Callable` found by name; listeners are the consumers' own `System.Callable` classes (ADR-NEXT `NEXT-payments-module.md` decision 8) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror was brought forward from v0.9 to v0.6 and is built in release

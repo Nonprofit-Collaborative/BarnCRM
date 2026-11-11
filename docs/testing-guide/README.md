@@ -75,6 +75,7 @@ page, even if that puts it out of reading order.
 | [Portal Builder](portal-builder.md) | PB | 9 | Sign-in by emailed code, no user enumeration, lockout, the second factor, template pages and edits scoped to the person, staff ending sessions, the volunteer, speaker and donor templates, the portal on a WordPress page at phone width and by keyboard |
 | [Corporate Hub](corporate-hub.md) | CH | 8 | Install and access, templates loaded once, Library Documents and versions, acknowledgments requested and answered, only the person attests, completing a compliance cycle with evidence, agreements renewing and expiring, nightly reminders once per date |
 | [Rollup Builder](rollup-builder.md) | RB | 40 | Building, recalculating and switching rollups, standard objects, parity options, export and import, instant totals on other objects, Import From NPSP |
+| [Payments](payments.md) | PAY | 8 | Settings and Health Check, write-only keys and the mode check, Stripe and PayPal test payments end to end, partial and full refunds, each event used once and forged events refused, abandoned checkouts, staff and read only access |
 | [Accessibility and mobile](accessibility-and-mobile.md) | A11Y | 9 | Keyboard, focus, screen reader labels, zoom, Salesforce mobile app |
 
 ## Smoke List (Every Build, About One Hour)

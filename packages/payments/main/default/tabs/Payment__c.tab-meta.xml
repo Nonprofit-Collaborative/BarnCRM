@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customObject>true</customObject>
+  <description>
+    Payments taken through the org's own Stripe or PayPal account, with their status from the
+    processor.
+  </description>
+  <motif>Custom56: Bottle</motif>
+</CustomTab>
