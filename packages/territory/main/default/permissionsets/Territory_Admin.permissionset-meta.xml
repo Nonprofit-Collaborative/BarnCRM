@@ -6,6 +6,10 @@
     Sets up territories, rules and members, previews and runs assignments and undoes them, and
     edits the Territory of people, households and organizations.
   </description>
+  <classAccesses>
+    <apexClass>TerritoryController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Account.Territory__c</field>

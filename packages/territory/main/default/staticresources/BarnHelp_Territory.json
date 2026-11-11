@@ -1,0 +1,13 @@
+{
+  "languages": ["en"],
+  "texts": {
+    "Territory_Error_Busy": "A territory run is already queued or running. Wait for it to finish, then try again.",
+    "Territory_Error_NoJob": "Only an Assign run can be undone, and this run has no Data job.",
+    "Territory_Error_NothingToRun": "No active rule of an active territory: add or turn on a rule, then run again.",
+    "Territory_Error_Rule": "Rule {0} cannot run: {1} Fix or turn off the rule, then run again.",
+    "Territory_Error_TooManyRules": "{0} have more than {1} active rules. Turn some off, or merge them, then run again.",
+    "Territory_Log_Finished": "Territory run finished: {0} records checked, {1} moved, {2} refused.",
+    "Territory_Log_Started": "Territory run started by {0} on {1}.",
+    "Territory_Nightly_StepName": "Territory assignment"
+  }
+}
