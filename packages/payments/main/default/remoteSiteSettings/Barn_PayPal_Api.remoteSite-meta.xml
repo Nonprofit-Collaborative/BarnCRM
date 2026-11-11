@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<RemoteSiteSetting xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    BarnCRM Payments: the org's own PayPal account in live mode: orders, capture and webhook
+    verification (PAY-01).
+  </description>
+  <disableProtocolSecurity>false</disableProtocolSecurity>
+  <isActive>true</isActive>
+  <url>https://api-m.paypal.com</url>
+</RemoteSiteSetting>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>
+    One online payment through the org's own Stripe or PayPal hosted checkout: amount, payer, the
+    record it is for and its status from processor events (canonical model 29PAY1). No card data.
+  </description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>true</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Payment</label>
+  <nameField>
+    <displayFormat>PAY-{000000}</displayFormat>
+    <label>Payment Number</label>
+    <trackHistory>false</trackHistory>
+    <type>AutoNumber</type>
+  </nameField>
+  <pluralLabel>Payments</pluralLabel>
+  <searchLayouts>
+    <searchResultsAdditionalFields>Status__c</searchResultsAdditionalFields>
+    <searchResultsAdditionalFields>Amount__c</searchResultsAdditionalFields>
+    <searchResultsAdditionalFields>Payer_Name__c</searchResultsAdditionalFields>
+    <searchResultsAdditionalFields>Payer_Email__c</searchResultsAdditionalFields>
+  </searchLayouts>
+  <sharingModel>Private</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

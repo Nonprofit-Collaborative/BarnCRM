@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Default currency</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Currency__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Payments_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Payments</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Payments</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Text</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">30</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">The three-letter currency a payment is taken in when the module taking it does not name one, such as USD, CAD or EUR. Your processor account must accept it. Default USD.</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">payments.md</value></values>
+</CustomMetadata>

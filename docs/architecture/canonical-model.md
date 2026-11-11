@@ -15011,7 +15011,7 @@ page takes them.
 | Status | `Status__c` | Picklist (Pending, Paid, Failed, Refunded, Cancelled), restricted, default Pending |
 | Processor | `Processor__c` | Picklist (Stripe, PayPal), restricted |
 | Mode | `Mode__c` | Picklist (Test, Live), restricted |
-| Amount | `Amount__c` | Currency(16, 2), required |
+| Amount | `Amount__c` | Currency(16, 2); required by `PaymentService`, not by the field, so the read-only layout deploys |
 | Amount Refunded | `Amount_Refunded__c` | Currency(16, 2), default 0 |
 | Currency | `Currency_Code__c` | Text(3) |
 | Description | `Description__c` | Text(255) |
