@@ -11,6 +11,8 @@
     "Funders_Calendar_LoadFailed": "The Grant Calendar did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Funders_Fund_LoadFailed": "The Giving Fund card did not load. Try again. If it happens again, ask your BarnCRM admin to check the Error Log.",
     "Funders_Home_AnswersTile": "The application answers you reuse, ready to copy.",
+    "Funders_Finder_Off": "The Grant Finder is turned off. An admin can turn it on in BarnCRM Settings, Funders.",
+    "Funders_Finder_SearchFailed": "Grants.gov did not answer. Try again in a few minutes. If it keeps happening, ask your BarnCRM admin to check the Error Log and that the BarnCRM_Grants_Gov remote site is active.",
     "Funders_Home_CalendarTile": "Deadlines, requirements and payments by month.",
     "Funders_Home_GrantsTile": "Every grant: open, awarded or closed.",
     "Funders_Home_PipelineTile": "Open grants by stage, and what is due soon.",
