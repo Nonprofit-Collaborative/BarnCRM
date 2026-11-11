@@ -41,6 +41,7 @@ PACKAGES = {
     "events": "Events",
     "portal": "Portal",
     "mirror": "Mirror",
+    "corporatehub": "CorporateHub",
 }
 DASHES = (chr(0x2014), chr(0x2013))  # em and en dash, written by code point
 LOADER_FILES = (

@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "notice": "General guidance for US nonprofits, not legal advice. Review with your counsel or accountant; rules differ by country, state and type of organization.",
+  "obligations": [
+    {
+      "key": "ch04_annual_report",
+      "set": "CH-04",
+      "name": "Corporate or state annual report",
+      "category": "Corporate Filing",
+      "jurisdiction": "Your state of incorporation",
+      "recurrence": "Yearly",
+      "referenceUrl": null,
+      "instructions": "Most US states ask nonprofit corporations to file an annual or biennial report with the Secretary of State (or the state's corporations division) to stay in good standing: usually the officers and directors, the registered agent and the principal address, sometimes with a small fee. Look up your state's due date (often the anniversary month of incorporation or a fixed date), set it as the Next Due Date, and set Recurrence to Every Two Years if your state asks for a biennial report. Add one obligation for each other state where you are registered to do business. General guidance, not legal advice: review with your counsel."
+    },
+    {
+      "key": "ch04_annual_tax_return",
+      "set": "CH-04",
+      "name": "Annual tax return (US: IRS Form 990 series)",
+      "category": "Tax Filing",
+      "jurisdiction": "US federal (IRS)",
+      "recurrence": "Yearly",
+      "referenceUrl": "https://www.irs.gov/charities-non-profits/annual-filing-and-forms",
+      "instructions": "US tax-exempt organizations file one return of the Form 990 series each year, which one depending on size and type: Form 990-N (e-Postcard) for small organizations, Form 990-EZ, Form 990, or Form 990-PF for private foundations. It is generally due by the 15th day of the 5th month after your fiscal year ends (15 May for a calendar year), and Form 8868 gives an automatic extension. An organization that does not file for three consecutive years loses its exemption automatically. Many states also ask for a copy or their own annual charity report. Outside the US, rename this obligation and its instructions for your country's equivalent. General guidance, not legal advice: confirm with your accountant."
+    },
+    {
+      "key": "ch06_charitable_solicitation",
+      "set": "CH-06",
+      "name": "Charitable solicitation registration",
+      "category": "Charitable Registration",
+      "jurisdiction": "Each state where you ask for donations",
+      "recurrence": "Yearly",
+      "referenceUrl": null,
+      "instructions": "Many US states ask a charity to register before it asks their residents for donations, and to renew each year, often with financial statements and a fee. Some states exempt small or religious organizations. Copy this obligation for each state where you solicit, with that state in Jurisdiction and its renewal date as the Next Due Date. General guidance, not legal advice: review with your counsel."
+    },
+    {
+      "key": "ch06_insurance_renewals",
+      "set": "CH-06",
+      "name": "Insurance renewals",
+      "category": "Insurance",
+      "jurisdiction": null,
+      "recurrence": "Yearly",
+      "referenceUrl": null,
+      "instructions": "Review and renew the organization's insurance before each policy ends: commonly general liability, directors and officers (D and O), property, workers' compensation where you have employees, and any coverage a funder, landlord or partner requires. Keep each policy's declarations page in this obligation's completed cycles, or record each policy as an Agreement of type Insurance Policy. General guidance, not legal advice."
+    },
+    {
+      "key": "ch06_financial_audit",
+      "set": "CH-06",
+      "name": "Annual financial audit or review",
+      "category": "Financial Review",
+      "jurisdiction": null,
+      "recurrence": "Yearly",
+      "referenceUrl": null,
+      "instructions": "An independent audit or review of the year's financial statements, when your state's charity registration, a funder or your bylaws ask for one, often above a revenue threshold. Organizations spending a large amount of US federal awards in a year may need a Single Audit. Set the Next Due Date from the deadline that applies to you and keep the final report as evidence. General guidance, not legal advice: confirm with your accountant."
+    },
+    {
+      "key": "ch06_registered_agent",
+      "set": "CH-06",
+      "name": "Registered agent renewal",
+      "category": "Corporate Filing",
+      "jurisdiction": "Your state of incorporation",
+      "recurrence": "Yearly",
+      "referenceUrl": null,
+      "instructions": "Each state where the organization is incorporated or registered needs a registered agent with an address in that state to receive legal papers. If you pay a registered agent service, renew it before it ends; if the agent or address changes, file the change with the state. General guidance, not legal advice."
+    }
+  ],
+  "policies": [
+    {
+      "key": "ch07_conflict_of_interest",
+      "set": "CH-07",
+      "name": "Conflict of interest policy",
+      "requiresAcknowledgment": true,
+      "reviewMonths": 12,
+      "summary": "Starter record: attach your own policy. A conflict of interest policy usually says what a conflict is, how directors, officers and key staff disclose one (often in a yearly statement), how the board decides on a matter where someone has a conflict, and how that is recorded in the minutes. IRS Form 990, Part VI, asks whether the organization has one and how it is monitored. BarnCRM supplies no legal text. Not legal advice: review your policy with your counsel."
+    },
+    {
+      "key": "ch07_whistleblower",
+      "set": "CH-07",
+      "name": "Whistleblower policy",
+      "requiresAcknowledgment": true,
+      "reviewMonths": 24,
+      "summary": "Starter record: attach your own policy. A whistleblower policy usually says how staff, volunteers and directors can report suspected wrongdoing, who receives reports, how the reporter is protected from retaliation and how reports are investigated. IRS Form 990, Part VI, asks whether the organization has one. BarnCRM supplies no legal text. Not legal advice: review your policy with your counsel."
+    },
+    {
+      "key": "ch07_document_retention",
+      "set": "CH-07",
+      "name": "Document retention and destruction policy",
+      "requiresAcknowledgment": false,
+      "reviewMonths": 24,
+      "summary": "Starter record: attach your own policy. A document retention and destruction policy usually lists kinds of records (governing documents, minutes, tax returns, financial and personnel records, donor records) with how long each is kept, how records are destroyed, and how destruction stops when legal action is expected. IRS Form 990, Part VI, asks whether the organization has one. BarnCRM supplies no legal text. Not legal advice: review your policy with your counsel."
+    },
+    {
+      "key": "ch07_gift_acceptance",
+      "set": "CH-07",
+      "name": "Gift acceptance policy",
+      "requiresAcknowledgment": false,
+      "reviewMonths": 24,
+      "summary": "Starter record: attach your own policy. A gift acceptance policy usually says which gifts the organization accepts, which need review before they are accepted (real estate, securities, vehicles, restricted or named gifts), who decides, and how gifts are acknowledged. IRS Form 990, Schedule M, asks about a policy for non-standard contributions. BarnCRM supplies no legal text. Not legal advice: review your policy with your counsel."
+    }
+  ]
+}

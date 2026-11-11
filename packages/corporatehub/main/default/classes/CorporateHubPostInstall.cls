@@ -5,7 +5,9 @@
  * Each step is safe to run twice and none can abort an install, since every failure is written
  * to the Error Log instead:
  *
- * 1. Turn on, once, a ship-on setting added in an upgrade (Core's `ShippedDefaultUpgrades`).
+ * 1. Turn on, once, a ship-on setting added in an upgrade (Core's `ShippedDefaultUpgrades`), and
+ *    load each shipped template the org has no record for (`HubTemplates`, R-CT1), owned by the
+ *    installer: obligations Off, policies Draft. An upgrade adds new templates only.
  * 2. Queue the job that gives the installer Corporate Hub Admin (a permission set assignment is a
  *    setup object write, and this transaction may already have written ordinary records).
  * 3. Give the Corporate Hub sets to BarnCRM's roles (`CorporateHubAccessSync`), queued for the
@@ -19,6 +21,7 @@ public with sharing class CorporateHubPostInstall implements InstallHandler, Mod
 	private static final String MODULE_KEY = 'CorporateHub';
 	@TestVisible
 	private static final String ACCESS_CONTEXT = 'CorporateHubPostInstall.grantInstallerAccess';
+	private static final String TEMPLATE_CONTEXT = 'CorporateHubPostInstall.loadTemplates';
 
 	/**
 	 * Checkboxes that ship on, each turned on once in an org that saved the settings before it
@@ -53,6 +56,11 @@ public with sharing class CorporateHubPostInstall implements InstallHandler, Mod
 			Corporate_Hub_Settings__c.SObjectType,
 			SHIPPED_ON_ADDED_IN_UPGRADES
 		);
+		try {
+			HubTemplates.loadMissing(installerId, true);
+		} catch (Exception e) {
+			ErrorLogger.log(e, TEMPLATE_CONTEXT);
+		}
 		ModuleSetups.markRan(MODULE_KEY);
 		if (installerId == null) {
 			new CorporateHubAccessSync().requestSync();

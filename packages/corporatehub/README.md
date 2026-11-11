@@ -26,5 +26,12 @@ general guidance, not legal advice.
   the settings `Corporate_Hub_Settings__c` (29CH6) and its Setting Definition rows (section
   Corporate Hub).
 - Custom permission `Corporate_Hub_Manage`.
+- Apex: `HubPolicy` (versions, reviews, acknowledgments), `HubCompliance` (completing a cycle),
+  `HubReminders` (the nightly step, through `CorporateHubNightlyJobProvider`), `HubTemplates`
+  (loads the shipped templates once per key), `CorporateHubSettings`, `CorporateHubController`
+  (the page and panels), `CorporateHubAccessSync` and `CorporateHubPostInstall`.
+- Static resources: `BarnCorporateHubTemplates` (the template set: obligations Off, policies
+  Draft) and `BarnHelp_CorporateHub` (help and message text).
+- Custom notification type `Corporate_Hub_Reminder` (the bell reminders).
 - Tabs: Library Documents, Compliance Obligations and Agreements. No app of its own (ADR-0192):
   the tabs join BarnCRM and BarnCRM Console through the catalog row's `Staff_Tabs__c`.

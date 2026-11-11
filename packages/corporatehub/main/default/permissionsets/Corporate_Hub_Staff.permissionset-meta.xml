@@ -6,6 +6,10 @@
     Creates and edits library documents, compliance obligations and cycles, and agreements, never
     deletes; answers their own policy acknowledgments.
   </description>
+  <classAccesses>
+    <apexClass>CorporateHubController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Hub_Document__c.Effective_Date__c</field>
