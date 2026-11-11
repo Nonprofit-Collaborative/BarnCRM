@@ -148,6 +148,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-35 Super Transformer runs and undo | [bulk-update.md](bulk-update.md) | Core |
 | C-50 Super Transformer (bulk change without a file or a Find query) | [super-transform.md](super-transform.md) | Core |
 | C-37 Bulk delete | [bulk-delete.md](bulk-delete.md) | Core |
+| C-67 Archive by Query (save old records to a file in Files, then delete them; optionally empty the Recycle Bin) | [archive-by-query.md](archive-by-query.md) | Core |
 | Org Optimizer (Data Quality, Field Use, Data Dictionary, Health Check, Errors, Storage and Limits, Unused Setup, Setup Changes, Access Explorer) | [org-optimizer.md](org-optimizer.md) | Core |
 | C-28 Data Quality (the Data Quality section of Org Optimizer) | [data-hygiene.md](data-hygiene.md) | Core |
 | C-20 Duplicates (the Duplicate Matching tab: review and matching logic) | [duplicates.md](duplicates.md) | Core |

@@ -8627,6 +8627,36 @@ Nothing is written on the server and nothing is deleted; the download is optiona
 change the count to type. It needs what the delete's preview needs (R-BD6). Child records the
 platform deletes with a parent are not in it.
 
+**R-BD9 Archive by Query** (C-67, D-157). A bulk delete from a query whose records are saved to
+Files first. Same permission (R-BD6), refusals (R-BD4), preview and typed count, counted within
+the run limit (R-BD2), checked when it starts.
+
+- **The job first.** The start creates the R-BD1 job at once, with Status Committing and a
+  definition that adds `"archive": { "notChangedAfter": "<start time, GMT>",
+  "emptyRecycleBin": false }` to R-BD1's. Its Job Id is the export's Apex job until the delete
+  starts, so the job reads as running and can be polled as any bulk delete.
+- **The file.** `FindExportBatch` in archive mode reads, in user mode, Id order and at most the
+  confirmed count, every field the person may read (R-BD8's columns: Id first, no compound or
+  binary fields) of the records the query matches, and writes R-SQ3 CSV parts owned by the
+  person (C-36's part sizes and titles). The heading row is the field API names, so a one-object
+  template (R-IT12) maps every column. The Q-04 notification opens the first part.
+- **Then the delete.** The export's finish starts `BulkDeleteBatch` on the same job only when
+  the export wrote every part and at least one row; the delete's confirmed count is the rows
+  written, counted again as R-BD2 (more matching now refuses it). Otherwise the job is Failed,
+  its Run Log saying no record was deleted, and the parts written are kept. The Run Log names
+  the first part's title.
+- **Only records in the file.** Each delete chunk also reads `SystemModstamp`, and a record
+  changed after `notChangedAfter` is left alone and counted as no longer matching (R-BD3). The
+  start time is taken before the export reads, so every record deleted was in the file.
+- **Emptying the Recycle Bin.** Only when the person asked for it and typed the count a second
+  time: after each chunk's delete, the records it deleted are passed to
+  `Database.emptyRecycleBin`, as the person. A failure there is counted in the Run Log and the
+  records stay in the Recycle Bin. Such a job cannot be undone: R-BD5's preview refuses it,
+  saying the records were emptied, and points to reloading the file with Load one object.
+- **Storage view.** Org Optimizer's Storage and Limits offers Archive Old Records to a person
+  holding R-BD6's permissions; it opens Find with `c__tool=archive`, whose Change Records menu
+  then offers Archive Records.
+
 ### Salesforce implementation
 
 - **Objects:** none of its own; `Import_Batch__c` (`Operation__c`, `Operation_JSON__c`,
@@ -14564,6 +14594,7 @@ mirrors the primary member).
 | 1.3 | 2026-11-09 | Module detection by announcement (mwdbdevsb validation). No object or field added. `BarnCRM_Module__mdt` `Probe_Object__c` is cleared for every module that ships Setting Definition rows naming itself (Events, Volunteers, Funders, Programs, Portal, Contact Points): a customer org's own `Event__c` and `Volunteer_Hours__c` made Events and Volunteers read as installed. Forms and Logic Models, which ship no settings rows, probe `Form_Version__c` and `Logic_Model_Element__c` in place of `Form__c` and `Logic_Model__c`. Rollup Builder keeps `Rollup_Definition__c`. |
 | 1.3 | 2026-11-07 | Portal templates for volunteers, speakers and donors (PB-03, PB-07, PB-08; ADR-0191 `0191-portal-templates-volunteer-speaker-donor.md`). No object or field added. R-PB2 gains a read-only `Parent__r.Contact__c` person link; Core's `PortalActionExtensions` lists the Volunteers and Event Management action classes. |
 | 1.3 | 2026-11-09 | Simpler permission sets, Core (ADR-NEXT, D-191, release N). No object or field added. Coordinator (`Volunteer_Coordinator`) retired: the Access page stops offering it and `RetiredRoleMigration` gives its active holders Team Member; R-BU6 and R-BD6: `BarnCRM_Bulk_Update` and `BarnCRM_Bulk_Delete` include `BarnCRM_Find_And_Export`'s grants; `BarnCRM_Admin` gains `BulkUpdateController`. Labels only: BarnCRM Admin (group), BarnCRM Admin Access, Staff Access and Read Only Access, and "BarnCRM Auto:" on the eleven tab, Households and app sets. |
+| 1.6 | 2026-11-11 | Archive by Query (C-67, D-157). No object or field added. New rule R-BD9: a bulk delete whose records are first saved to Files by `FindExportBatch` in archive mode (every readable field, API name headings), the delete started from the export's finish on the same job, only of records not changed since the start (`archive.notChangedAfter` in the definition), and optionally emptied from the Recycle Bin after a second typed count (`archive.emptyRecycleBin`), which R-BD5's undo then refuses. |
 
 ---
 ## 32. Entity ownership by package
