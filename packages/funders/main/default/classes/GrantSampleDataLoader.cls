@@ -80,23 +80,40 @@ public with sharing class GrantSampleDataLoader {
 	}
 
 	/**
-	 * F-03: one Spent entry in the restricted award's ledger. Its Received entry comes from the
-	 * received payment (R-GP3). It goes with its grant when the sample data is removed.
+	 * F-03 and F-12: the award's two budget lines and one Spent entry against the first, in the
+	 * restricted ledger. Its Received entry comes from the received payment (R-GP3). They go with
+	 * their grant when the sample data is removed.
 	 */
 	private static void loadSpending(Id grantId, Date today) {
 		if (!Schema.SObjectType.Grant_Fund_Entry__c.isCreateable()) {
 			return;
 		}
-		Database.insert(
-			new Grant_Fund_Entry__c(
-				Grant__c = grantId,
-				Type__c = 'Spent',
-				Amount__c = 6000,
-				Entry_Date__c = today.addDays(-5),
-				Description__c = 'Tutor stipends'
-			),
-			AccessLevel.USER_MODE
+		Grant_Fund_Entry__c spent = new Grant_Fund_Entry__c(
+			Grant__c = grantId,
+			Type__c = 'Spent',
+			Amount__c = 6000,
+			Entry_Date__c = today.addDays(-5),
+			Description__c = 'Tutor stipends'
 		);
+		if (Schema.SObjectType.Grant_Budget_Line__c.isCreateable()) {
+			List<Grant_Budget_Line__c> lines = new List<Grant_Budget_Line__c>{
+				new Grant_Budget_Line__c(
+					Grant__c = grantId,
+					Name = 'Tutor stipends',
+					Amount_Requested__c = 30000,
+					Amount_Awarded__c = 28000
+				),
+				new Grant_Budget_Line__c(
+					Grant__c = grantId,
+					Name = 'Books and supplies',
+					Amount_Requested__c = 10000,
+					Amount_Awarded__c = 7000
+				)
+			};
+			Database.insert(lines, AccessLevel.USER_MODE);
+			spent.Budget_Line__c = lines[0].Id;
+		}
+		Database.insert(spent, AccessLevel.USER_MODE);
 	}
 
 	/**

@@ -47,6 +47,10 @@
     <apexClass>GrantFinderController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>GrantManagementController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Grant_Fund_Entry__c.Description__c</field>
