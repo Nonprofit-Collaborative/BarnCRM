@@ -97,3 +97,20 @@ best); for step 5, an org where first-run setup is not finished.
 | 7 | Open **BarnCRM Settings**, **Integrations**, in an org without DLRS. | DLRS is not listed. In an org with DLRS installed, it is listed under **Complementary Apps** as **Installed in this org**. |
 
 **Cleanup:** none.
+
+## T-APP-06: Households and Organizations Tabs Open Full List Views
+
+**Purpose:** confirm the tabs open the standard Account list page with its list view menu, and
+that My list views exist.
+**Prerequisites:** staff user with the **BarnCRM Households** tab; more than 25 households; a
+household and an organization owned by that user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Open the **Households** tab. | The standard Account list page opens on **Households** with every household (pages of rows, not a short card) and the list view menu. |
+| 2 | Select the browser Back button. | You return to the page before the tab, not to a blank tab page. |
+| 3 | In the list view menu, choose **My Households**. | Only households the user owns. |
+| 4 | Open the **Organizations** tab, then choose **My Organizations**. | The **Organizations** list opens with the menu; **My Organizations** lists only the user's own. |
+| 5 | Open the **Brands**, **Payments** and **Boards and Committees** tabs (where installed). | Each has **All** and **My** lists; **Brands** also has **Active Brands** and **Inactive Brands**. |
+
+**Cleanup:** none.
