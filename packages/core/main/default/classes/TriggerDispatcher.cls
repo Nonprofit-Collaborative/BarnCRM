@@ -114,6 +114,10 @@ public with sharing class TriggerDispatcher {
 		// Before and after: a partial save's retry is told apart from the attempt it repeats.
 		TriggerHandler.noteTriggerProgress();
 		run(objectApiName, currentContext());
+		// Field History Keeper (C-68, ADR-NEXT): kept after the handlers, never in their way.
+		if (Trigger.isAfter && Trigger.isUpdate) {
+			FieldHistoryService.capture(objectApiName, Trigger.new, Trigger.oldMap);
+		}
 		TriggerHandler.noteTriggerProgress();
 	}
 

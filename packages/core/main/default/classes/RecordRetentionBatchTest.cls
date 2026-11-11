@@ -301,6 +301,24 @@ private class RecordRetentionBatchTest {
 	}
 
 	@IsTest
+	static void fieldHistoryPastItsDaysIsDeleted() {
+		System.runAs(TestUsers.admin()) {
+			Field_History__c old = new Field_History__c(Record_Id__c = 'old', Changes__c = '[]');
+			Field_History__c recent = new Field_History__c(Record_Id__c = 'new', Changes__c = '[]');
+			insert as system new List<Field_History__c>{ old, recent };
+			Test.setCreatedDate(old.Id, Datetime.now().addDays(-731));
+
+			Test.startTest();
+			runPass(RecordRetentionBatch.FIELD_HISTORY);
+			Test.stopTest();
+
+			List<Field_History__c> left = [SELECT Id FROM Field_History__c WITH SYSTEM_MODE];
+			Assert.areEqual(1, left.size(), 'Only the change past 730 days is deleted (R-FH5)');
+			Assert.areEqual(recent.Id, left[0].Id, 'The recent change is kept');
+		}
+	}
+
+	@IsTest
 	static void daysFallBackToDefaultsAndStayInBounds() {
 		System.runAs(TestUsers.admin()) {
 			Assert.areEqual(365, RecordRetentionBatch.mergeJournalDays(), 'Merge journal default');

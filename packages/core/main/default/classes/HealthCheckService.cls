@@ -544,6 +544,7 @@ public with sharing class HealthCheckService {
 		}
 
 		steps.add(new CheckStep('automation', new HealthCheckSettingsChecks.AutomationCheck()));
+		steps.add(new CheckStep('field_history', new FieldHistoryService.HealthCheck()));
 		steps.add(new CheckStep('fiscal_year', new HealthCheckSettingsChecks.FiscalYearCheck()));
 		steps.add(
 			new CheckStep(

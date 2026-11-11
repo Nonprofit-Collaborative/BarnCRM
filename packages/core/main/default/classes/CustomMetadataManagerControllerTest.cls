@@ -73,9 +73,9 @@ private class CustomMetadataManagerControllerTest {
 		Test.stopTest();
 
 		Assert.areEqual(
-			2,
+			3,
 			types.size(),
-			'Relationship types and merge rules: match sources have their own page'
+			'Relationship types, merge rules and history fields: match sources have their own page'
 		);
 		Assert.areEqual(TYPE_NAME, types[0].typeName, 'The relationship types are listed');
 		Assert.areEqual(String.valueOf(JOB), jobId, 'The deployment Id comes back');
