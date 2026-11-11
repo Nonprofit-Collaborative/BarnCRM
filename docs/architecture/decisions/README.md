@@ -205,6 +205,7 @@ the plan gets an ADR recording the workaround (see `../README.md` for the full r
 | [NEXT](NEXT-brand-management-and-visibility.md) | Brand management in Core behind two off switches, a seam modules call, and brand-restricted visibility through Account shares to BarnCRM-owned brand groups | Proposed (builder decision) |
 | [NEXT](NEXT-corporate-hub-module.md) | The Corporate Hub module: document and policy library on Files, acknowledgments, compliance calendar, agreements, templates shipped as data | Accepted (builder decision) |
 | [NEXT](NEXT-lwc-builder-module.md) | The LWC Builder module: component definitions as JSON records, one packaged renderer reading in user mode, nothing deployed at run time | Accepted (builder decision) |
+| [NEXT](NEXT-scholarships-outbound-grants-module.md) | The Scholarships and Outbound Grants module: applications on Forms, rubric reviews with panels, awards, conditional disbursements recorded only, recipient reports, applicant portal template | Accepted (builder decision) |
 
 ADRs 0001 to 0012 correspond to decisions D-01 to D-12 in the product plan's decision log
 (Section 12). ADR-0013, ADR-0014, ADR-0018, ADR-0019, ADR-0020 and ADR-0021 are builder decisions

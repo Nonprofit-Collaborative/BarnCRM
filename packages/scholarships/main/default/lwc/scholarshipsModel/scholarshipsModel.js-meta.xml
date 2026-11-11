@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Scholarships' shared logic in plain JavaScript: a review's weighted total and the disbursement
+    export as CSV. Imported by applicationReview and scholarshipsHome.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

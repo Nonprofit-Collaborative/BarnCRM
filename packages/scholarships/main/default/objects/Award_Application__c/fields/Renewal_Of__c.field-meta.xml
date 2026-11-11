@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Renewal_Of__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The award this application renews.</inlineHelpText>
+  <label>Renewal Of</label>
+  <referenceTo>Award__c</referenceTo>
+  <relationshipLabel>Renewal Applications</relationshipLabel>
+  <relationshipName>Renewal_Applications</relationshipName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

@@ -286,6 +286,12 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | LB-01 to LB-06 LWC Builder: install, access, settings, the grid canvas builder, placing the packaged component, blocks, buttons, visibility rules, export as LWC source, moving components between orgs | [lwc-builder.md](lwc-builder.md) | BarnCRM LWC Builder |
 
+### Scholarships and Outbound Grants
+
+| Feature | Page | Package |
+|---|---|---|
+| SG-01 to SG-10, PB-06 Scholarships and Outbound Grants: install, access, settings, programs and cycles, eligibility rules, rubrics, reviewer panels and Assign Reviewers, blind review, applications from Forms, the review board and decisions, award letters, disbursements and conditions, the accounting export, recipient reports and renewals, the applicant portal, reports | [scholarships.md](scholarships.md) | BarnCRM Scholarships and Outbound Grants |
+
 ### Moving From Another System
 
 | Feature | Page | Package |

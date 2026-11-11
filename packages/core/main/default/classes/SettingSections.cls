@@ -100,6 +100,9 @@ public with sharing class SettingSections {
 	/** The LWC Builder module's built component settings. */
 	@NamespaceAccessible
 	public static final String LWC_BUILDER = 'LWC Builder';
+	/** The Scholarships and Outbound Grants module's reminder settings. */
+	@NamespaceAccessible
+	public static final String SCHOLARSHIPS = 'Scholarships and Grants';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -125,6 +128,7 @@ public with sharing class SettingSections {
 			CORPORATE_HUB,
 			PAYMENTS,
 			LWC_BUILDER,
+			SCHOLARSHIPS,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,

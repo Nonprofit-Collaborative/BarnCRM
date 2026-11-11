@@ -1,0 +1,52 @@
+/**
+ * What the BarnCRM Scholarships and Outbound Grants module does at install and at every upgrade
+ * (ADR-NEXT `NEXT-scholarships-outbound-grants-module.md`). Each step is safe to run twice and
+ * none can abort an install, since every failure is written to the Error Log instead:
+ *
+ * 1. Turn on, once, a ship-on setting added in an upgrade (Core's `ShippedDefaultUpgrades`).
+ * 2. Queue `ScholarshipsAccessSync`, which gives Scholarships Admin to every BarnCRM Admin holder
+ *    (the installer among them, given BarnCRM Admin by Core's own install) and the other sets to
+ *    BarnCRM's roles. Queued, since a permission set assignment is a setup object write.
+ *
+ * The steps are `runSetup`, which also adds the module to Core's setup marker and is what Finish
+ * Setup runs for a module copied into an org by hand (`ModuleSetups`).
+ */
+@NamespaceAccessible
+public with sharing class ScholarshipsPostInstall implements InstallHandler, ModuleSetup {
+	private static final String MODULE_KEY = 'Scholarships';
+	/**
+	 * Checkboxes that ship on, each turned on once in an org that saved the settings before it
+	 * existed (QA-F2). Append only; `scripts/ci/check-setting-defaults.py` checks it.
+	 */
+	@TestVisible
+	private static final List<Schema.SObjectField> SHIPPED_ON_ADDED_IN_UPGRADES = new List<Schema.SObjectField>{
+		Scholarships_Settings__c.Reminders_Enabled__c
+	};
+
+	@NamespaceAccessible
+	public ScholarshipsPostInstall() {
+		// Built by name from Core (`ModuleSetups`) for Finish Setup, so it needs a public constructor.
+	}
+
+	/** Called by the platform after the module is installed or upgraded. */
+	public void onInstall(InstallContext context) {
+		if (context != null) {
+			runSetup(context.installerId());
+		}
+	}
+
+	/** The install's steps, then the module's key added to the setup marker. Never throws. */
+	public void runSetup(Id installerId) {
+		ShippedDefaultUpgrades.apply(
+			MODULE_KEY,
+			Scholarships_Settings__c.SObjectType,
+			SHIPPED_ON_ADDED_IN_UPGRADES
+		);
+		ModuleSetups.markRan(MODULE_KEY);
+		try {
+			new ScholarshipsAccessSync().requestSync();
+		} catch (Exception e) {
+			ErrorLogger.log(e, 'ScholarshipsPostInstall');
+		}
+	}
+}

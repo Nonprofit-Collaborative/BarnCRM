@@ -1,0 +1,86 @@
+<template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="custom:custom80" data-id="card">
+      <div slot="actions">
+        <lightning-button-group>
+          <lightning-button data-id="letter" label={labels.letter} disabled={isWorking} onclick={handleLetter}></lightning-button>
+          <lightning-button data-id="accepted" label={labels.accepted} disabled={isWorking} onclick={handleAccepted}></lightning-button>
+          <lightning-button data-id="declined" label={labels.declined} disabled={isWorking} onclick={handleDeclined}></lightning-button>
+          <lightning-button data-id="schedule" label={labels.schedule} disabled={isWorking} onclick={handleStartSchedule}></lightning-button>
+          <lightning-button data-id="renewal" label={labels.renewal} disabled={isWorking} onclick={handleRenewal}></lightning-button>
+        </lightning-button-group>
+      </div>
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={errorMessage}>
+          <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-var-m-bottom_small"></c-barn-notice>
+        </template>
+        <template lwc:if={notice}>
+          <c-barn-notice variant="success" message={notice} data-id="notice" class="slds-var-m-bottom_small"></c-barn-notice>
+        </template>
+        <template lwc:if={scheduling}>
+          <div class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end slds-var-m-bottom_small" data-id="schedule-form">
+            <lightning-input class="slds-col" type="number" min="1" max="60" label={labels.count} value={count} data-field="count" onchange={handleField}></lightning-input>
+            <lightning-input class="slds-col" type="date" label={labels.firstDate} value={firstDate} data-field="firstDate" onchange={handleField}></lightning-input>
+            <lightning-input class="slds-col" type="number" min="0" max="24" label={labels.monthsApart} value={monthsApart} data-field="monthsApart" onchange={handleField}></lightning-input>
+            <lightning-button class="slds-col" variant="brand" label={labels.save} disabled={isWorking} onclick={handleSchedule} data-id="save-schedule"></lightning-button>
+            <lightning-button class="slds-col" label={labels.cancel} onclick={handleCancel}></lightning-button>
+          </div>
+        </template>
+
+        <h2 class="slds-text-heading_small slds-var-m-vertical_x-small">{labels.payments}</h2>
+        <template lwc:if={hasPayments}>
+          <ul class="slds-has-dividers_bottom-space" data-id="payments">
+            <template for:each={payments} for:item="p">
+              <li key={p.id} class="slds-item">
+                <a href={p.href}>{p.name}</a>
+                <span class="slds-var-m-left_x-small"><lightning-formatted-number value={p.amount} format-style="currency"></lightning-formatted-number></span>
+                <span class="slds-var-m-left_x-small">{p.status}</span>
+                <lightning-formatted-date-time value={p.scheduled} class="slds-var-m-left_x-small"></lightning-formatted-date-time>
+                <span class="slds-var-m-left_x-small">{p.payee}</span>
+                <template lwc:if={p.held}><span class="slds-badge slds-var-m-left_x-small" data-id="held">{labels.held}</span></template>
+                <template lwc:if={p.isPaying}>
+                  <div class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end">
+                    <lightning-input class="slds-col" type="date" label={labels.paidOn} value={paidOn} data-field="paidOn" onchange={handleField}></lightning-input>
+                    <lightning-combobox class="slds-col" label={labels.method} value={method} options={methodOptions} data-field="method" onchange={handleField}></lightning-combobox>
+                    <lightning-input class="slds-col" label={labels.reference} value={reference} data-field="reference" onchange={handleField}></lightning-input>
+                    <lightning-button class="slds-col" variant="brand" label={labels.save} disabled={isWorking} onclick={handlePaid} data-id="save-paid"></lightning-button>
+                    <lightning-button class="slds-col" label={labels.cancel} onclick={handleCancel}></lightning-button>
+                  </div>
+                </template>
+                <template lwc:elseif={p.payable}>
+                  <lightning-button class="slds-var-m-left_x-small" data-row-id={p.id} data-id="mark-paid" label={labels.markPaid} onclick={handleStartPaid}></lightning-button>
+                </template>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else><p class="slds-text-color_weak">{labels.noPayments}</p></template>
+
+        <h2 class="slds-text-heading_small slds-var-m-vertical_x-small">{labels.requirements}</h2>
+        <template lwc:if={hasRequirements}>
+          <ul class="slds-has-dividers_bottom-space" data-id="requirements">
+            <template for:each={requirements} for:item="r">
+              <li key={r.Id} class="slds-item">
+                <a href={r.href}>{r.Name}</a>
+                <span class="slds-var-m-left_x-small">{r.Type__c}</span>
+                <span class="slds-var-m-left_x-small">{r.Status__c}</span>
+                <lightning-formatted-date-time value={r.Due_Date__c} class="slds-var-m-left_x-small"></lightning-formatted-date-time>
+                <span class="slds-var-m-left_x-small slds-text-color_weak">{r.blocks}</span>
+                <template lwc:if={r.Form_Link__c}>
+                  <a href={r.Form_Link__c} target="_blank" class="slds-var-m-left_x-small">{labels.reportLink}</a>
+                </template>
+                <template lwc:if={r.isOpen}>
+                  <lightning-button class="slds-var-m-left_x-small" data-row-id={r.Id} data-status="Met" data-id="met" label={labels.met} disabled={isWorking} onclick={handleRequirement}></lightning-button>
+                  <template lwc:if={canManage}>
+                    <lightning-button class="slds-var-m-left_x-small" data-row-id={r.Id} data-status="Waived" data-id="waive" label={labels.waive} disabled={isWorking} onclick={handleRequirement}></lightning-button>
+                  </template>
+                </template>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else><p class="slds-text-color_weak">{labels.noRequirements}</p></template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

@@ -39,7 +39,8 @@ const FALLBACK_TABS = {
   ContactPoints: 'Contact_Point_Sync',
   CorporateHub: 'Corporate_Hub',
   Payments: 'Payment__c',
-  LwcBuilder: 'LWC_Builder'
+  LwcBuilder: 'LWC_Builder',
+  Scholarships: 'Scholarships'
 };
 const DEFAULT_ICON = 'standard:apps';
 

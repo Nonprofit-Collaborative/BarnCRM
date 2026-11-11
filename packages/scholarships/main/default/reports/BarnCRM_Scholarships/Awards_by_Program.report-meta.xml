@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Report xmlns="http://soap.sforce.com/2006/04/metadata">
+  <chart>
+    <chartSummaries>
+      <aggregate>Sum</aggregate>
+      <axisBinding>y</axisBinding>
+      <column>Award__c$Amount__c</column>
+    </chartSummaries>
+    <chartType>HorizontalBar</chartType>
+    <enableHoverLabels>true</enableHoverLabels>
+    <expandOthers>true</expandOthers>
+    <groupingColumn>Award__c$Cycle__c.Program__c</groupingColumn>
+    <location>CHART_TOP</location>
+    <showAxisLabels>true</showAxisLabels>
+    <showPercentage>false</showPercentage>
+    <showTotal>false</showTotal>
+    <showValues>true</showValues>
+    <size>Medium</size>
+    <summaryAxisRange>Auto</summaryAxisRange>
+  </chart>
+  <columns>
+    <aggregateTypes>Sum</aggregateTypes>
+    <field>Award__c$Amount__c</field>
+  </columns>
+  <columns>
+    <aggregateTypes>Sum</aggregateTypes>
+    <field>Award__c$Paid_Amount__c</field>
+  </columns>
+  <description>
+    Amounts awarded and paid by award program, for awards that are Offered, Accepted, Active or
+    Completed.
+  </description>
+  <filter>
+    <criteriaItems>
+      <column>Award__c$Status__c</column>
+      <operator>equals</operator>
+      <value>Offered,Accepted,Active,Completed</value>
+    </criteriaItems>
+  </filter>
+  <format>Summary</format>
+  <groupingsDown>
+    <field>Award__c$Cycle__c.Program__c</field>
+    <sortOrder>Asc</sortOrder>
+  </groupingsDown>
+  <name>Awards by Program</name>
+  <reportType>Awards_with_Program__c</reportType>
+  <scope>organization</scope>
+  <showDetails>false</showDetails>
+</Report>

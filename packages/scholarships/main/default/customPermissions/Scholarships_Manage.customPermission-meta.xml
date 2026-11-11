@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Decide awards, assign reviewers, waive conditions and mark disbursements paid in Scholarships
+    and Outbound Grants. In Scholarships Admin.
+  </description>
+  <isLicensed>false</isLicensed>
+  <label>Manage Scholarships</label>
+</CustomPermission>

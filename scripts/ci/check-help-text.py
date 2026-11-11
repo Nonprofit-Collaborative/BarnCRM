@@ -44,6 +44,7 @@ PACKAGES = {
     "mirror": "Mirror",
     "corporatehub": "CorporateHub",
     "lwcbuilder": "LwcBuilder",
+    "scholarships": "Scholarships",
 }
 DASHES = (chr(0x2014), chr(0x2013))  # em and en dash, written by code point
 LOADER_FILES = (

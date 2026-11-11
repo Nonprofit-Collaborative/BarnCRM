@@ -226,6 +226,30 @@ describe('mountPortal', () => {
     expect(root.querySelector('[role="status"]').textContent).toBe('Thanks sent');
   });
 
+  it('opens a secure web address as a link and shows any other address as text', async () => {
+    const page = {
+      ...PROFILE,
+      fields: [
+        { field: 'Form_Link__c', label: 'Application Form', type: 'url', edit: false },
+        { field: 'Site__c', label: 'Site', type: 'url', edit: false }
+      ],
+      records: [
+        {
+          id: '003A',
+          values: { Form_Link__c: 'https://example.org/f?t=1', Site__c: 'javascript:alert(1)' }
+        }
+      ]
+    };
+    const api = fakeApi({ page: jest.fn(() => Promise.resolve(page)) });
+    await mountPortal(root, { api });
+
+    const links = root.querySelectorAll('dd a');
+    expect(links).toHaveLength(1);
+    expect(links[0].getAttribute('href')).toBe('https://example.org/f?t=1');
+    expect(links[0].textContent).toBe('Application Form');
+    expect(root.querySelectorAll('dd')[1].textContent).toBe('javascript:alert(1)');
+  });
+
   it('signs out back to the email screen', async () => {
     const api = fakeApi();
     await mountPortal(root, { api });

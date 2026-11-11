@@ -104,6 +104,11 @@ const ICONS = Object.freeze({
   Payments_Setup: 'custom:custom70',
   // LWC Builder
   LWC_Builder: 'custom:custom34',
+  // Scholarships and Outbound Grants
+  Award__c: 'custom:custom80',
+  Award_Application__c: 'custom:custom70',
+  Award_Program__c: 'custom:custom48',
+  Scholarships: 'custom:custom34',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',
