@@ -15076,8 +15076,10 @@ on; turning it off removes every row and group BarnCRM added.
 **R-BR8 Receipt numbering per brand (C-47f, optional).** Giving's `Receipt_Numbering_Scope__c`
 is `Organization` (shipped), `Legal Entity` or `Brand`. Under the last two a per gift receipt
 for a gift with a brand is numbered from its own series, keyed by the entity or brand ID, with
-that record's prefix (blank reads as the organization prefix). Statements stay on the
-organization series.
+that record's prefix. With no prefix on that record the gift is numbered from the organization
+series, so two series never share a prefix by accident. Statements stay on the organization
+series. Receipt letters may also use the merge token `{{BrandName}}` (the brand name, else the
+legal name).
 
 ### Salesforce implementation
 
@@ -15105,11 +15107,14 @@ organization series.
 
 - **Brand lookups on module records (C-47d):** `Brand__c`, Lookup(Brand), delete set null, on
   `Gift__c` (parent `Appeal__c`) and `Appeal__c` (Giving), `Volunteer_Job__c` (Volunteers),
-  `Program__c` (Programs) and `Portal__c` (Portal Builder). A module adds the field and calls
-  `BrandService.applyDefaults` from its own before insert handler.
+  `Program__c` (Programs) and `Portal__c` (Portal Builder). A module adds the field and an
+  Automation Registry row for its object naming Core's `BrandDefaultHandler`, which finds the
+  parent by describe (the first custom lookup to an object with a Brand); no module Apex.
+  Portals have no trigger, so a portal's brand is set by hand.
 - **Classes:** `BrandService` (the seam, defaulting, one default), `BrandTriggerHandler`
-  (Brand, Legal Entity and Brand Assignment), `BrandShareJob` (R-BR7, queueable),
-  `BrandShareWriter` (without sharing: groups, members and Account share rows).
+  (Brand, Legal Entity and Brand Assignment), `BrandDefaultHandler` (R-BR4 for module objects),
+  `BrandShareJob` (R-BR7, queueable), `BrandShareWriter` (without sharing: groups, members and
+  Account share rows).
 
 ---
 

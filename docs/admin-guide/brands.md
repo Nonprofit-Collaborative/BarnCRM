@@ -13,6 +13,7 @@ With brands on:
   several brands, through **Brand Assignments**.
 - Gifts, appeals, volunteer jobs, programs and portals carry a **Brand** field. A new record takes
   its parent's brand (a gift takes its appeal's), else the brand of the person creating it.
+  A portal's brand is set by hand.
 - Receipts print the gift's brand: its name, logo, address and signature, and its legal entity's
   legal name and tax ID. A value the brand leaves blank comes from its legal entity, then from your
   organization settings.
@@ -70,9 +71,13 @@ people and organizations.
 
 In **BarnCRM Settings**, **Receipts**, **Number receipts by**: **Organization** (the default),
 **Legal Entity** or **Brand**. With **Legal Entity** or **Brand**, a receipt for a gift with a
-brand is numbered in its own series, using the entity's or brand's **Receipt Number Prefix**
-(blank uses your organization prefix). Year-end statements stay on the organization series.
-Existing receipts and series are never renumbered.
+brand is numbered in its own series, using the entity's or brand's **Receipt Number Prefix**.
+An entity or brand with no prefix stays on the organization series, so two series never share a
+prefix. Year-end statements stay on the organization series. Existing receipts and series are
+never renumbered.
+
+Receipt templates can print the brand name with the merge token `{{BrandName}}` (the legal name
+when there is no brand).
 
 ## Settings
 

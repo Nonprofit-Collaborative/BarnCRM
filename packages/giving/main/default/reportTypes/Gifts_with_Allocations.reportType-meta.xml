@@ -59,6 +59,11 @@
     </columns>
     <columns>
       <checkedByDefault>false</checkedByDefault>
+      <field>Brand__c</field>
+      <table>Gift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
       <field>Payment_Reference__c</field>
       <table>Gift__c</table>
     </columns>

@@ -340,6 +340,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Volunteer_Job__c.Brand__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Volunteer_Shift__c.Below_Minimum__c</field>
     <readable>true</readable>
   </fieldPermissions>

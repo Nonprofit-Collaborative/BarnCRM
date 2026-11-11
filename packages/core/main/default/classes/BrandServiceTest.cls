@@ -4,12 +4,39 @@
  * unique assignments, and brand visibility groups, members and shares.
  */
 @IsTest(
-	testFor='ApexClass:BrandService, ApexClass:BrandTriggerHandler, ApexClass:BrandShareJob, ApexClass:BrandShareWriter, ApexTrigger:BrandTrigger, ApexTrigger:BrandAssignmentTrigger, ApexTrigger:LegalEntityTrigger'
+	testFor='ApexClass:BrandService, ApexClass:BrandTriggerHandler, ApexClass:BrandShareJob, ApexClass:BrandShareWriter, ApexClass:BrandDefaultHandler, ApexTrigger:BrandTrigger, ApexTrigger:BrandAssignmentTrigger, ApexTrigger:LegalEntityTrigger'
 )
 private class BrandServiceTest {
 	@TestSetup
 	static void createTestUser() {
 		TestUsers.admin();
+	}
+
+	@IsTest
+	static void theDefaultHandlerFillsTheUsersBrandWithNoBrandedParent() {
+		System.runAs(TestUsers.admin()) {
+			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+			settings.Brand_Management__c = true;
+			HouseholdTestDataFactory.save(settings);
+			Brand__c mine = new Brand__c(Name = 'Mine');
+			insert mine;
+			insert new Brand_Assignment__c(Brand__c = mine.Id, User__c = UserInfo.getUserId());
+			List<Brand_Assignment__c> records = new List<Brand_Assignment__c>{
+				new Brand_Assignment__c(),
+				new Brand_Assignment__c()
+			};
+
+			Test.startTest();
+			TriggerHandler.setTestRecords(records, null);
+			new BrandDefaultHandler().beforeInsert();
+			Test.stopTest();
+
+			Assert.isNull(
+				BrandDefaultHandler.parentField(Brand_Assignment__c.SObjectType),
+				'No lookup of a brand assignment leads to a branded parent'
+			);
+			Assert.areEqual(mine.Id, records[1].Brand__c, 'The user brand fills the blank');
+		}
 	}
 
 	private static void turnOn(Boolean brands, Boolean visibility) {

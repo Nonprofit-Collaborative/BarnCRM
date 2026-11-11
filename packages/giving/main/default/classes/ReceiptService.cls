@@ -60,9 +60,28 @@ public with sharing class ReceiptService {
 		Integer statementYear = gift.Gift_Date__c == null
 			? Date.today().year()
 			: gift.Gift_Date__c.year();
+		// C-47f: a brand's or legal entity's own series when the organization numbers that way.
+		Id scopeId;
+		String scopePrefix;
+		BrandService.Profile brand = gift.Brand__c == null
+			? null
+			: BrandService.profileFor(gift.Brand__c);
+		String scope = Giving_Settings__c.getOrgDefaults().Receipt_Numbering_Scope__c;
+		if (brand != null && scope == 'Brand') {
+			scopeId = brand.brandId;
+			scopePrefix = brand.brandReceiptPrefix;
+		} else if (brand != null && scope == 'Legal Entity') {
+			scopeId = brand.legalEntityId;
+			scopePrefix = brand.entityReceiptPrefix;
+		}
+		if (String.isBlank(scopePrefix)) {
+			scopeId = null;
+		}
 		String allocated = ReceiptNumberSequence.allocateOne(
 			ReceiptNumberSequence.TYPE_PER_GIFT,
-			statementYear
+			statementYear,
+			scopeId,
+			scopePrefix
 		);
 
 		String donorName = donorNameFor(gift.Donor_Contact__c, gift.Donor_Account__c);
@@ -87,9 +106,10 @@ public with sharing class ReceiptService {
 			// (R-RC12). The value the organization recorded stays on the gift.
 			Total_Amount__c = ReceiptContentBuilder.statedAmountOf(gift),
 			Issue_Date__c = Date.today(),
-			Series_Key__c = ReceiptNumberSequence.seriesKeyFor(
+			Series_Key__c = ReceiptNumberSequence.scopedKey(
 				ReceiptNumberSequence.TYPE_PER_GIFT,
-				statementYear
+				statementYear,
+				scopeId
 			)
 		);
 		ReceiptWriter.insertReceipts(new List<Receipt__c>{ receipt });

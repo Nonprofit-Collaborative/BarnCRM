@@ -56,6 +56,11 @@
     </columns>
     <columns>
       <checkedByDefault>false</checkedByDefault>
+      <field>Brand__c</field>
+      <table>Gift__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
       <field>In_Kind_Description__c</field>
       <table>Gift__c</table>
     </columns>

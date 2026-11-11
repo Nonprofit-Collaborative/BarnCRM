@@ -59,6 +59,8 @@ copy pauses and bypasses exactly as BarnCRM's own automation does. Keep that ste
 | Keep one default brand | None | Clearing Default on every other brand, and refreshing brand visibility, need writes and sharing upkeep a flow cannot do safely in bulk. Mark the default brand by hand instead. |
 | Keep one default legal entity | None | The same rule for legal entities. Mark the default entity by hand instead. |
 | Keep brand assignments unique | None | The unique key, one primary per record and the brand visibility refresh run together; a copy that missed one would let duplicates in or leave shares stale. |
+| Fill in a new program's brand | None | It runs only while **Use brands** is on and only fills a blank Brand, from the parent record or the creating user's primary brand. Switch it off and set the brand by hand, or with your own flow, instead. |
+| Fill in a new volunteer job's brand | None | The same rule for volunteer jobs. |
 | Addresses of a deleted account | None | The same, for households, organizations and person accounts, and the people deleted with a household. |
 | Copy preferred email on a person | None | Which of a person's three addresses is the preferred one, and the standard email it fills, are fixed by BarnCRM. It has its own switch, separate from the household automations, so switching those off does not stop it. Switch this one off to leave the standard email as typed. |
 | Copy preferred phone on a person | None | Which of a person's numbers (home, mobile, work or other) is the preferred one, and the standard phone it fills, are fixed by BarnCRM. It has its own switch, separate from the household automations. Switch this one off to leave the standard phone as typed. |
