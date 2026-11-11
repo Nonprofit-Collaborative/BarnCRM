@@ -47,10 +47,11 @@ private class CrmGiftTemplatesTest {
 				Set<String> sources = new Set<String>();
 				for (
 					ImportMapping.Column column : ImportMapping.parse(copied.Column_Mapping_JSON__c)
-						.columns
+						.getColumns()
 				) {
-					targets.add(column.target.toLowerCase());
-					Assert.isTrue(sources.add(column.source), key + ' names each heading once');
+					targets.add(column.getTarget().toLowerCase());
+					String heading = column.getSource();
+					Assert.isTrue(sources.add(heading), key + ' names each heading once');
 				}
 				Assert.isTrue(targets.containsAll(NEEDED), key + ' maps what a gift needs');
 			}
