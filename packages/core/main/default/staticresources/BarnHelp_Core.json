@@ -1383,7 +1383,7 @@
     "Core_SetupChanges_NotScheduled": "The nightly copy is not scheduled. Copy New Changes Now schedules it, and so does Health Check.",
     "Core_SetupChanges_NothingKept": "Nothing is kept yet. Press Copy New Changes Now to copy the last 180 days of Setup changes.",
     "Core_SetupChanges_ScanStopped": "This search looked at the newest {0} kept changes and stopped. Narrow the dates or the section to search older ones.",
-    "Core_SetupChanges_Scheduled": "New changes are copied every night at 1:30 and kept for {0} days.",
+    "Core_SetupChanges_Scheduled": "This shows changes up to the last copy. New changes are copied every night at 1:30 and kept for {0} days. To see changes made since then, press Copy New Changes Now.",
     "Core_SetupChanges_SearchHelp": "Words that must all appear in What Changed, Section, Changed By, Logged In As or Action, ignoring capitals. Try a field or object name, a user, or a permission set.",
     "Core_SetupNote_Duplicates_Steps": "Click Standard Contact Duplicate Rule.|If it says Inactive, click Activate.|Do the same for Standard Account Duplicate Rule.",
     "Core_SetupNote_Duplicates_What": "To review duplicates, keep the standard duplicate rules active. Give the people who will review them Duplicate Review on the Access page, under Extra Permissions.",
