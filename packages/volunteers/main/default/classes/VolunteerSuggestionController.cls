@@ -97,11 +97,13 @@ public with sharing class VolunteerSuggestionController {
 			suggestPersonAccountsAsAccounts(result, shiftId);
 			return result;
 		} catch (Exception failure) {
-			ErrorLogger.log(failure, CONTEXT, shiftId);
-			String loadFailed = BarnHelp.text('Volunteers', 'Volunteers_Suggestions_LoadFailed');
-			AuraHandledException refused = new AuraHandledException(loadFailed);
-			refused.setMessage(loadFailed);
-			throw refused;
+			throw UserErrors.wrap(
+				failure,
+				false,
+				CONTEXT,
+				shiftId,
+				BarnHelp.text('Volunteers', 'Volunteers_Suggestions_LoadFailed')
+			);
 		}
 	}
 

@@ -61,11 +61,13 @@ public with sharing class PersonEnrollmentsController {
 			return read(result, personId);
 		} catch (Exception failure) {
 			// Anything unexpected is in the Error Log before the card says it could not load.
-			ErrorLogger.log(failure, CONTEXT, personId);
-			String message = BarnHelp.text('Programs', 'Programs_Fail_PersonCard');
-			AuraHandledException refused = new AuraHandledException(message);
-			refused.setMessage(message);
-			throw refused;
+			throw UserErrors.wrap(
+				failure,
+				false,
+				CONTEXT,
+				personId,
+				BarnHelp.text('Programs', 'Programs_Fail_PersonCard')
+			);
 		}
 	}
 
