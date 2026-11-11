@@ -52,8 +52,9 @@ private class NpspGivingKitTest {
 
 	@IsTest
 	static void aRecurringDonationStartsAtItsNextPayment() {
-		Date established = Date.newInstance(2019, 1, 15);
-		Date nextPayment = Date.newInstance(2026, 12, 15);
+		// runs-as: deploying user (text choice only, no record or permission is read)
+		String established = '2019-01-15';
+		String nextPayment = '2026-12-15';
 		Assert.areEqual('2026-12-15', NpspGivingKit.startOf(nextPayment, established), 'next');
 		Assert.areEqual('2019-01-15', NpspGivingKit.startOf(null, established), 'closed one');
 		Assert.areEqual('', NpspGivingKit.startOf(null, null), 'neither');

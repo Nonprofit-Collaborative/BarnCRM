@@ -14,8 +14,9 @@ public with sharing class NpspGivingKit implements MigrationKitExtension {
 	/** The column the recurring templates map to Start Date, which NPSP has no one field for. */
 	@TestVisible
 	private static final String START_COLUMN = 'Start';
-	private static final String NEXT_FIELD = 'npe03__Next_Payment_Date__c';
-	private static final String ESTABLISHED_FIELD = 'npe03__Date_Established__c';
+	/** The recurring steps' columns as the kit writes them, read from the default rows. */
+	private static final String NEXT_FIELD = 'npe03.Next_Payment_Date__c';
+	private static final String ESTABLISHED_FIELD = 'npe03.Date_Established__c';
 
 	@NamespaceAccessible
 	public NpspGivingKit() {
@@ -32,15 +33,11 @@ public with sharing class NpspGivingKit implements MigrationKitExtension {
 			MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), stepKey)
 		);
 		List<Map<String, Object>> rows = source.rows(records);
-		for (Integer index = 0; index < rows.size(); index++) {
-			rows[index]
-				.put(
-					START_COLUMN,
-					startOf(
-						(Date) records[index].get(NEXT_FIELD),
-						(Date) records[index].get(ESTABLISHED_FIELD)
-					)
-				);
+		for (Map<String, Object> row : rows) {
+			row.put(
+				START_COLUMN,
+				startOf((String) row.get(NEXT_FIELD), (String) row.get(ESTABLISHED_FIELD))
+			);
 		}
 		return rows;
 	}
@@ -52,8 +49,10 @@ public with sharing class NpspGivingKit implements MigrationKitExtension {
 
 	/** The next payment date, else the date established, as a file would hold it. */
 	@TestVisible
-	private static String startOf(Date nextPayment, Date established) {
-		Date starts = nextPayment != null ? nextPayment : established;
-		return starts == null ? '' : String.valueOf(starts).left(10);
+	private static String startOf(String nextPayment, String established) {
+		if (String.isNotBlank(nextPayment)) {
+			return nextPayment;
+		}
+		return String.isBlank(established) ? '' : established;
 	}
 }
