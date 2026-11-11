@@ -16,7 +16,9 @@
   </values>
   <values>
     <field>Retire_Checklist_JSON__c</field>
-    <value xsi:type="xsd:string">[{"key":"deactivate","text":"In DLRS (the Manage Lookup Rollup Summaries tab), clear Active on each rollup that now has a BarnCRM copy turned on."},{"key":"triggers","text":"In DLRS, remove the child triggers (Manage Child Trigger, Remove) of objects that no longer have an active DLRS rollup."},{"key":"jobs","text":"In Setup, Scheduled Jobs, delete the DLRS scheduled jobs of rollups now kept by BarnCRM."},{"key":"uninstall","text":"When nothing uses DLRS any more, uninstall it from Setup, Installed Packages."}]</value>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"deactivate","text":"In DLRS (the Manage Lookup Rollup Summaries tab), clear Active on each rollup that now has a BarnCRM copy turned on."},{"key":"triggers","text":"In DLRS, remove the child triggers (Manage Child Trigger, Remove) of objects that no longer have an active DLRS rollup."},{"key":"jobs","text":"In Setup, Scheduled Jobs, delete the DLRS scheduled jobs of rollups now kept by BarnCRM."},{"key":"uninstall","text":"When nothing uses DLRS any more, uninstall it from Setup, Installed Packages."}]</value>
   </values>
   <values>
     <field>Extension_Class__c</field>
