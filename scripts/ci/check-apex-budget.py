@@ -56,7 +56,11 @@ CAPS = {
     # registry PB-03 and PB-07), plus about 2%. Main's D-185 feature-off cards and the
     # Automation page's stopped marker merged in within that margin.
     "core": 2_114_900,
-    "rollups": 374_000,
+    # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
+    # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
+    # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
+    # before the kit check, plus about 1%.
+    "rollups": 386_000,
     # Giving raised for the v1.0 usability work: Edit Funds (GiftAllocationController),
     # Quick Gift Entry tribute, match and split (people-giving-13, 16, 23), and the New
     # Commitment screen's shared pledge builder (CommitmentEntry, people-giving-11), and

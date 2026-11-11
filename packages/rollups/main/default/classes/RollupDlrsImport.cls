@@ -8,10 +8,18 @@
  * does), with the Definition Key `DLRS_` and the DLRS rollup's name, so importing again updates
  * the copy rather than adding a second. What BarnCRM cannot express stays in DLRS, and the
  * candidate says why in words; what changes in the copy is said as a note.
+ *
+ * Import From NPSP (MIG-08) is the same steps over NPSP's customizable rollups, which
+ * `RollupNpsp` reads into the DLRS shape: `tool` 'npsp' picks them, and their copies are keyed
+ * `NPSP_` and the NPSP rollup's name. NPSP is never changed either.
  */
 public with sharing class RollupDlrsImport {
 	/** What a copy's Definition Key starts with, before the DLRS rollup's name. */
 	public static final String KEY_PREFIX = 'DLRS_';
+	/** The same for a copy of an NPSP customizable rollup. */
+	public static final String NPSP_KEY_PREFIX = 'NPSP_';
+	/** The `tool` that picks NPSP's rollups; anything else is DLRS. */
+	public static final String TOOL_NPSP = 'npsp';
 	public static final String CREATED = 'created';
 	public static final String UPDATED = 'updated';
 	public static final String REFUSED = 'refused';
@@ -54,6 +62,9 @@ public with sharing class RollupDlrsImport {
 		public String key { get; set; }
 		@AuraEnabled
 		public String label { get; set; }
+		/** Where the rollup lives (`RollupDlrs` source), which picks its copy's key prefix. */
+		@AuraEnabled
+		public String source { get; set; }
 		@AuraEnabled
 		public String parentObject { get; set; }
 		@AuraEnabled
@@ -115,12 +126,16 @@ public with sharing class RollupDlrsImport {
 
 	// ---------------------------------------------------------------------------- the steps
 
-	/** Steps 1 and 2: every active DLRS rollup, with its copy or why it stays in DLRS. */
+	/**
+	 * Steps 1 and 2: every active rollup of the tool, with its copy or why it stays there.
+	 *
+	 * @param tool 'npsp' for NPSP customizable rollups; blank or anything else for DLRS
+	 */
 	@AuraEnabled
-	public static List<Candidate> getCandidates() {
+	public static List<Candidate> getCandidates(String tool) {
 		try {
 			requirePermission();
-			return candidates(null);
+			return candidates(null, tool == TOOL_NPSP);
 		} catch (Exception caught) {
 			throw asUserError(caught);
 		}
@@ -130,10 +145,11 @@ public with sharing class RollupDlrsImport {
 	 * Step 3: copies the chosen DLRS rollups, switched off. Each goes through the Builder's
 	 * checks on its own, so one that fails stops nothing else.
 	 *
-	 * @param keys the chosen DLRS rollups' keys
+	 * @param keys the chosen rollups' keys
+	 * @param tool as for `getCandidates`
 	 */
 	@AuraEnabled
-	public static List<ImportRow> importRollups(List<String> keys) {
+	public static List<ImportRow> importRollups(List<String> keys, String tool) {
 		try {
 			requirePermission();
 			Set<String> wanted = new Set<String>();
@@ -143,7 +159,7 @@ public with sharing class RollupDlrsImport {
 				}
 			}
 			List<ImportRow> rows = new List<ImportRow>();
-			for (Candidate candidate : candidates(wanted)) {
+			for (Candidate candidate : candidates(wanted, tool == TOOL_NPSP)) {
 				rows.add(copy(candidate));
 			}
 			return rows;
@@ -205,9 +221,9 @@ public with sharing class RollupDlrsImport {
 
 	// ------------------------------------------------------------------------------ mapping
 
-	/** The active DLRS rollups, all or those keyed in `keys` (lower case), as candidates. */
+	/** The tool's active rollups, all or those keyed in `keys` (lower case), as candidates. */
 	@TestVisible
-	private static List<Candidate> candidates(Set<String> keys) {
+	private static List<Candidate> candidates(Set<String> keys, Boolean npsp) {
 		List<Rollup_Definition__c> existing = RollupSelector.selectAllAsUser();
 		Map<String, Rollup_Definition__c> byKey = new Map<String, Rollup_Definition__c>();
 		for (Rollup_Definition__c definition : existing) {
@@ -217,7 +233,7 @@ public with sharing class RollupDlrsImport {
 		}
 		Map<String, List<RollupBuilderController.SourceOption>> sourcesByParent = new Map<String, List<RollupBuilderController.SourceOption>>();
 		List<Candidate> found = new List<Candidate>();
-		for (RollupDlrs.Definition dlrs : RollupDlrs.definitions()) {
+		for (RollupDlrs.Definition dlrs : RollupDlrs.definitions(npsp)) {
 			if (dlrs.active == true && (keys == null || keys.contains(dlrs.key.toLowerCase()))) {
 				Candidate candidate = toCandidate(dlrs);
 				checkAgainstOrg(candidate, dlrs, byKey, existing, sourcesByParent);
@@ -232,6 +248,7 @@ public with sharing class RollupDlrsImport {
 	private static Candidate toCandidate(RollupDlrs.Definition dlrs) {
 		Candidate candidate = new Candidate();
 		candidate.key = dlrs.key;
+		candidate.source = dlrs.source;
 		candidate.label = dlrs.label;
 		candidate.parentObject = dlrs.parentObject;
 		candidate.targetField = dlrs.aggregateResultField;
@@ -245,7 +262,7 @@ public with sharing class RollupDlrsImport {
 		draft.name = dlrs.label.left(80);
 		String imported = String.format(
 			Label.Core_RollupBuilder_DlrsImportedFrom,
-			new List<String>{ dlrs.key }
+			new List<String>{ dlrs.key, RollupDlrs.toolOf(dlrs) }
 		);
 		draft.description = (String.isBlank(dlrs.description)
 				? imported
@@ -263,6 +280,10 @@ public with sharing class RollupDlrsImport {
 			candidate.notes.add(Label.Core_RollupBuilder_DlrsNoteSystemMode);
 		}
 
+		if (String.isNotBlank(dlrs.unsupported)) {
+			candidate.reasons.add(dlrs.unsupported);
+			return candidate;
+		}
 		String aggregate = AGGREGATE_BY_OPERATION.get(normalized(dlrs.aggregateOperation));
 		if (aggregate == null) {
 			reason(
@@ -445,7 +466,7 @@ public with sharing class RollupDlrsImport {
 				)
 			);
 		}
-		Rollup_Definition__c earlier = byKey.get(definitionKey(dlrs.key).toLowerCase());
+		Rollup_Definition__c earlier = byKey.get(definitionKey(dlrs).toLowerCase());
 		if (earlier != null) {
 			candidate.existingId = earlier.Id;
 			candidate.draft.recordId = earlier.Id;
@@ -529,7 +550,7 @@ public with sharing class RollupDlrsImport {
 		try {
 			Rollup_Definition__c record = RollupBuilderController.checkedRecord(candidate.draft);
 			if (candidate.existingId == null) {
-				record.Definition_Key__c = definitionKey(candidate.key);
+				record.Definition_Key__c = keyFor(candidate.source, candidate.key);
 			}
 			RollupWriter.saveAsUser(record);
 			row.recordId = record.Id;
@@ -545,9 +566,13 @@ public with sharing class RollupDlrsImport {
 		return row;
 	}
 
-	@TestVisible
-	private static String definitionKey(String dlrsKey) {
-		return (KEY_PREFIX + dlrsKey).left(80);
+	/** The copy's Definition Key: the tool's prefix and the rollup's name. */
+	public static String definitionKey(RollupDlrs.Definition other) {
+		return keyFor(other.source, other.key);
+	}
+
+	private static String keyFor(String source, String key) {
+		return ((source == RollupDlrs.SOURCE_NPSP ? NPSP_KEY_PREFIX : KEY_PREFIX) + key).left(80);
 	}
 
 	// ----------------------------------------------------------------------------- comparing

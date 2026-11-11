@@ -72,9 +72,9 @@ private class RollupDlrsImportTest {
 		System.runAs(maria()) {
 			OtherRollupTools.overrideForTest(new Set<String>());
 
-			Assert.isTrue(RollupDlrsImport.getCandidates().isEmpty(), 'Nothing to import');
+			Assert.isTrue(RollupDlrsImport.getCandidates(null).isEmpty(), 'Nothing to import');
 			Assert.isTrue(
-				RollupDlrsImport.importRollups(new List<String>{ 'Anything' }).isEmpty(),
+				RollupDlrsImport.importRollups(new List<String>{ 'Anything' }, null).isEmpty(),
 				'Nothing copied'
 			);
 			Assert.isFalse(
@@ -95,7 +95,7 @@ private class RollupDlrsImportTest {
 			String message;
 			System.runAs(david) {
 				try {
-					RollupDlrsImport.getCandidates();
+					RollupDlrsImport.getCandidates(null);
 				} catch (AuraHandledException refused) {
 					message = refused.getMessage();
 				}
@@ -192,7 +192,9 @@ private class RollupDlrsImportTest {
 				}
 			);
 
-			Map<String, RollupDlrsImport.Candidate> found = byKey(RollupDlrsImport.getCandidates());
+			Map<String, RollupDlrsImport.Candidate> found = byKey(
+				RollupDlrsImport.getCandidates(null)
+			);
 
 			Map<String, String> aggregateByKey = new Map<String, String>{
 				'R_Sum' => 'SUM',
@@ -230,7 +232,7 @@ private class RollupDlrsImportTest {
 					.draft.description.startsWith(
 						String.format(
 							Label.Core_RollupBuilder_DlrsImportedFrom,
-							new List<String>{ 'R_Sum' }
+							new List<String>{ 'R_Sum', 'DLRS' }
 						)
 					),
 				'The description names the DLRS rollup'
@@ -326,7 +328,9 @@ private class RollupDlrsImportTest {
 				}
 			);
 
-			Map<String, RollupDlrsImport.Candidate> found = byKey(RollupDlrsImport.getCandidates());
+			Map<String, RollupDlrsImport.Candidate> found = byKey(
+				RollupDlrsImport.getCandidates(null)
+			);
 
 			RollupDlrsImport.Candidate counted = found.get('Counted_Field');
 			Assert.isTrue(counted.importable, String.valueOf(counted.reasons));
@@ -496,7 +500,9 @@ private class RollupDlrsImportTest {
 				}
 			);
 
-			Map<String, RollupDlrsImport.Candidate> found = byKey(RollupDlrsImport.getCandidates());
+			Map<String, RollupDlrsImport.Candidate> found = byKey(
+				RollupDlrsImport.getCandidates(null)
+			);
 
 			Map<String, String> templateByKey = new Map<String, String>{
 				'Median' => Label.Core_RollupBuilder_DlrsReasonOperation,
@@ -519,7 +525,8 @@ private class RollupDlrsImportTest {
 			}
 
 			List<RollupDlrsImport.ImportRow> rows = RollupDlrsImport.importRollups(
-				new List<String>(templateByKey.keySet())
+				new List<String>(templateByKey.keySet()),
+				null
 			);
 			Assert.areEqual(templateByKey.size(), rows.size(), 'Each one answered');
 			for (RollupDlrsImport.ImportRow row : rows) {
@@ -547,10 +554,12 @@ private class RollupDlrsImportTest {
 			);
 
 			List<RollupDlrsImport.ImportRow> first = RollupDlrsImport.importRollups(
-				new List<String>{ 'child_total' }
+				new List<String>{ 'child_total' },
+				null
 			);
 			List<RollupDlrsImport.ImportRow> again = RollupDlrsImport.importRollups(
-				new List<String>{ 'Child_Total' }
+				new List<String>{ 'Child_Total' },
+				null
 			);
 
 			Assert.areEqual(1, first.size(), 'Only the chosen one');
@@ -591,7 +600,7 @@ private class RollupDlrsImportTest {
 				new Account(Name = 'Child 1', ParentId = parent.Id),
 				new Account(Name = 'Child 2', ParentId = parent.Id)
 			};
-			Id copyId = RollupDlrsImport.importRollups(new List<String>{ 'Child_Total' })[0]
+			Id copyId = RollupDlrsImport.importRollups(new List<String>{ 'Child_Total' }, null)[0]
 				.recordId;
 
 			Test.startTest();
@@ -622,7 +631,7 @@ private class RollupDlrsImportTest {
 			RollupDlrsFake.use(
 				new List<RollupDlrs.Definition>{ dlrs('Child_Total', 'Count', COUNT_FIELD, null) }
 			);
-			Id copyId = RollupDlrsImport.importRollups(new List<String>{ 'Child_Total' })[0]
+			Id copyId = RollupDlrsImport.importRollups(new List<String>{ 'Child_Total' }, null)[0]
 				.recordId;
 
 			String refusal;
@@ -657,7 +666,7 @@ private class RollupDlrsImportTest {
 				changes[0].New_Value__c,
 				'As confirmed'
 			);
-			RollupDlrsImport.Candidate again = RollupDlrsImport.getCandidates()[0];
+			RollupDlrsImport.Candidate again = RollupDlrsImport.getCandidates(null)[0];
 			Assert.isFalse(again.importable, 'Not copied twice');
 			Assert.isTrue(
 				again.reasons.contains(Label.Core_RollupBuilder_DlrsReasonAlreadyOn),

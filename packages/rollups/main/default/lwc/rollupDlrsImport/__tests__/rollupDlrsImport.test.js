@@ -151,6 +151,20 @@ describe('c-rollup-dlrs-import', () => {
     expect($(element, 'next').disabled).toBe(true);
   });
 
+  it('imports NPSP customizable rollups the same way, naming NPSP', async () => {
+    getCandidates.mockResolvedValue(CANDIDATES);
+    const element = createElement('c-rollup-dlrs-import', { is: RollupDlrsImport });
+    element.model = MODEL;
+    element.tool = 'npsp';
+    document.body.appendChild(element);
+    await flush();
+
+    expect(getCandidates).toHaveBeenCalledWith({ tool: 'npsp' });
+    expect($(element, 'title').textContent).toBe('c.Core_RollupBuilder_NpspImportTitle');
+    await copied(element);
+    expect(importRollups).toHaveBeenCalledWith({ keys: ['Child_Count'], tool: 'npsp' });
+  });
+
   it('reviews what each becomes, then copies the chosen ones switched off', async () => {
     const element = await build();
     await click(element, 'next');
@@ -161,7 +175,8 @@ describe('c-rollup-dlrs-import', () => {
     importRollups.mockResolvedValue(COPIED);
     await click(element, 'copy');
 
-    expect(importRollups).toHaveBeenCalledWith({ keys: ['Child_Count'] });
+    expect(getCandidates).toHaveBeenCalledWith({ tool: null });
+    expect(importRollups).toHaveBeenCalledWith({ keys: ['Child_Count'], tool: null });
     expect($(element, 'outcome').textContent).toBe('c.Core_RollupBuilder_DlrsImportCreated');
   });
 
