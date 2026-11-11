@@ -30,7 +30,7 @@ describe('c/barnIcons', () => {
     expect(iconFor('toString')).toBeUndefined();
   });
 
-  // All 100 motifs are in use, so module tabs in different packages may share one (interim rule,
+  // All 100 motifs are in use, so module tabs in different packages may share one (D-193,
   // docs/contributor-guide/tab-icons.md); test_core_navigation.py checks the per-package rule.
   it('names only the documented custom motifs', () => {
     const custom = Object.values(ICONS).filter((icon) => icon.startsWith('custom:'));

@@ -5,7 +5,7 @@ Every BarnCRM tab, Core and module, carries a motif whose number matches the ico
 Rules:
 
 - Write the motif as `CustomN: Name`, with the name the documented list gives for N.
-- No two Core tabs share a number, and no two tabs in one package share a number, so each tab is recognizable in the navigation, the page header and a console tab. Salesforce documents only 100 motifs and BarnCRM had used all of them by the combined build (2026-11-11), so a module tab may reuse a number another module uses, never a Core tab's (interim rule, pending Brandon's decision).
+- No two Core tabs share a number, and no two tabs in one package share a number, so each tab is recognizable in the navigation, the page header and a console tab. Salesforce documents only 100 motifs and BarnCRM had used all of them by the combined build (2026-11-11), so a module tab may reuse a number another module uses, never a Core tab's (D-193).
 - A new tab takes a number no Core tab and no tab in its own package uses; prefer one no tab uses. Add it to the table below; `scripts/ci/tests/test_core_navigation.py` fails if it is invalid or reused against these rules.
 - Add the tab to the icon registry, `packages/core/main/default/lwc/barnIcons/barnIcons.js`, keyed by the tab's API name, in the same PR. The same test fails when a tab is missing from the registry or listed with another number.
 - Navigation icon equals tab icon: a link or tile that opens a tab takes its icon from `iconFor('<tab API name>')` (c/barnIcons). See the [Visual Standard](ux-kit.md#visual-standard).

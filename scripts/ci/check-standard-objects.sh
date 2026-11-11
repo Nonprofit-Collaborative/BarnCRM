@@ -78,7 +78,7 @@
 # 0133-related-record-matching.md). These files are listed with the template headings, by
 # path, on the same terms: safe only while Match_Source has no MetadataRelationship field.
 #
-# A shipped Integration App (customMetadata/Integration_App.*.md-meta.xml) names the other
+# D-194: a shipped Integration App (customMetadata/Integration_App.*.md-meta.xml) names the other
 # product's objects in Detection Objects as text, such as GiftTransaction for Nonprofit Cloud
 # Fundraising. IntegrationAppService only looks the names up in the global describe to tell
 # whether the product is installed (MIG-10), so the word refuses no deployment. Listed by path

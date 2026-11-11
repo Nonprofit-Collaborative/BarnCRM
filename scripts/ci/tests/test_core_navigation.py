@@ -44,7 +44,7 @@ class CoreTabMotifs(unittest.TestCase):
         # Every package's tabs (UX-F3): module tabs follow the Core rule. Salesforce has only 100
         # motifs and BarnCRM used them all in the combined build (2026-11-11), so a module tab may
         # share a number with a tab in another module, never with a Core tab and never within its
-        # own package (interim rule pending Brandon's decision; docs/contributor-guide/tab-icons.md).
+        # own package (D-193; docs/contributor-guide/tab-icons.md).
         pattern = os.path.join(ROOT, "packages", "*", "main", "default", "tabs", "*.tab-meta.xml")
         for path in sorted(glob.glob(pattern)):
             name = os.path.basename(path).replace(".tab-meta.xml", "")
