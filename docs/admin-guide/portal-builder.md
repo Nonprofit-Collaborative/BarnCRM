@@ -167,7 +167,7 @@ A template is JSON in the portal's Template field. The sample in
 
 ### Ready-Made Templates
 
-Four templates ship in `portal-client/templates/`. Paste one into a portal's Template field. Each
+Five templates ship in `portal-client/templates/`. Paste one into a portal's Template field. Each
 needs its module: while the module is turned off the portal is unavailable, and where the module
 is not installed its pages fail and the Error Log says which field is missing, so install and turn
 on the module first. Every page shows only the signed-in person's own records, and only the fields
@@ -179,6 +179,7 @@ marked `edit` can be changed. The portal's API user needs no access to any of th
 | Speaker Portal | `speaker.json`, Event Management | Events Open for Proposals (Propose a Talk), Open Proposals (edit, Withdraw), All My Proposals, My Sessions, My Speaker Details, My Details |
 | Donor Portal | `donor.json`, Giving | My Giving, Gift History, Pledges and Recurring Gifts, Receipts, My Contact Details |
 | Board Portal | `board.json`, Corporate Hub | My Meetings (I Have Read the Packet), Minutes (Approve Minutes), My Votes (Vote For, Vote Against, Abstain), Disclosures and Policies (edit, I Have Read and Acknowledge), Board Self-Assessment (edit), Meeting Availability (edit), My Board Seats, My Details |
+| Applicant Portal | `applicant.json`, Scholarships | Open Cycles (Apply), My Applications (Withdraw), My Awards (Accept Award), My Reports and Conditions, My Details |
 
 **Volunteer.** Sign Up adds the person to an open shift that has room and has not started, once
 per shift (a cancelled sign-up is reopened). Cancel Sign-Up works until the shift starts. A new
@@ -209,6 +210,15 @@ open requests made to the person (for example the yearly conflict-of-interest di
 write any interests, say whether they have a conflict, then acknowledge. Board Self-Assessment
 and Meeting Availability appear while an assessment or a poll is open. Staff run everything from
 the board and meeting pages; see [Corporate Hub](corporate-hub.md#board-governance).
+
+**Applicant.** Open Cycles lists cycles whose Status is Open. Apply starts one Draft application
+per person per cycle (a withdrawn one does not count) while the cycle is open and its close date
+has not passed. The person fills in the application through its form link on My Applications,
+which opens the cycle's application form; if the link cannot be made at once, the nightly
+Scholarships run adds it. Withdraw works until the application is decided. Accept Award accepts
+an Offered award. My Reports and Conditions lists the open requirements on the person's awards,
+with a report form link where one is set. Read only otherwise; payments are not shown. See
+[Scholarships and Grants](scholarships.md).
 
 If your org has state and country picklists turned on, a changed State or Country must be a value
 in those lists.

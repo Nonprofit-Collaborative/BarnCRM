@@ -1,6 +1,6 @@
-/* The shipped templates (PB-03, PB-07, PB-08) checked offline against the package metadata in this
- * repository: Salesforce re-checks every call against the org, so a template that fails here
- * would be refused there. Also the person-scoped rules the templates must keep. */
+/* The shipped templates (PB-03, PB-06, PB-07, PB-08) checked offline against the package metadata
+ * in this repository: Salesforce re-checks every call against the org, so a template that fails
+ * here would be refused there. Also the person-scoped rules the templates must keep. */
 import fs from 'fs';
 import path from 'path';
 import { checkTemplate } from '../src/portalTemplate.js';
@@ -8,6 +8,7 @@ import volunteer from '../templates/volunteer.json';
 import speaker from '../templates/speaker.json';
 import donor from '../templates/donor.json';
 import board from '../templates/board.json';
+import applicant from '../templates/applicant.json';
 
 const PACKAGES = path.join(__dirname, '..', '..', 'packages');
 const BUILT_IN = ['Id', 'Name', 'CreatedDate'];
@@ -44,12 +45,14 @@ const FOLDERS = {
   Volunteers: 'volunteers',
   Events: 'events',
   Giving: 'giving',
-  CorporateHub: 'corporatehub'
+  CorporateHub: 'corporatehub',
+  Scholarships: 'scholarships'
 };
 const ACTION_CLASSES = {
   Volunteers: 'volunteers/main/default/classes/VolunteersPortalExtension.cls',
   Events: 'events/main/default/classes/EventsPortalExtension.cls',
-  CorporateHub: 'corporatehub/main/default/classes/CorporateHubPortalExtension.cls'
+  CorporateHub: 'corporatehub/main/default/classes/CorporateHubPortalExtension.cls',
+  Scholarships: 'scholarships/main/default/classes/ScholarshipsPortalExtension.cls'
 };
 
 function fieldFile(objectName, field) {
@@ -80,7 +83,8 @@ function cases() {
     ['volunteer', volunteer],
     ['speaker', speaker],
     ['donor', donor],
-    ['board', board]
+    ['board', board],
+    ['applicant', applicant]
   ].forEach(([name, template]) => {
     template.pages.forEach((page) => out.push([name + ' ' + page.key, template, page]));
   });
@@ -92,7 +96,8 @@ describe('shipped portal templates', () => {
     ['volunteer', volunteer],
     ['speaker', speaker],
     ['donor', donor],
-    ['board', board]
+    ['board', board],
+    ['applicant', applicant]
   ])('%s passes the shape rules and names its module', (name, template) => {
     expect(checkTemplate(template)).toEqual([]);
     expect(template.key).toBe(name);
@@ -192,7 +197,7 @@ describe('shipped portal templates', () => {
   });
 
   it('every module action a template names is offered by its module class', () => {
-    [volunteer, speaker, board].forEach((template) => {
+    [volunteer, speaker, board, applicant].forEach((template) => {
       const source = fs.readFileSync(
         path.join(PACKAGES, ACTION_CLASSES[template.requiresModules[0]]),
         'utf8'

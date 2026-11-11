@@ -311,7 +311,15 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
     const list = el('dl');
     page.fields.forEach((field) => {
       list.appendChild(el('dt', { text: field.label }));
-      list.appendChild(el('dd', { text: display(field, record.values[field.field], messages) }));
+      const value = record.values[field.field];
+      // A secure link (a signed form link, for example) opens; any other address stays text.
+      const secure =
+        field.type === 'url' && typeof value === 'string' && value.startsWith('https://');
+      list.appendChild(
+        secure
+          ? el('dd', {}, [el('a', { href: value, text: field.label })])
+          : el('dd', { text: display(field, value, messages) })
+      );
     });
     const buttons = el('div', { class: 'barn-portal-actions' });
     if (page.canUpdate && page.fields.some((f) => f.edit)) {
