@@ -87,6 +87,7 @@ and applies to the whole organization:
 | Setting | Section | Default | Accepted | What is deleted |
 |---|---|---|---|---|
 | **Days to keep merge history** | Duplicate Matching | 365 | 30 to 3650 | Merge Journal entries (undo is offered for 15 days, so this does not shorten it) |
+| **Days to keep field history** | Field History | 730 | 30 to 3650 | The changes [Field History](field-history.md) kept |
 | **Days to keep settings changes** | General | 730 | 180 to 3650 | The record of who changed which setting |
 | **Days to keep import history** | Import | 365 | 30 to 3650 | Finished imports and bulk jobs, with their rows and journal, once they can no longer be undone; and imports abandoned in Draft, Parsing or Preview (started and never committed), with their staged rows |
 | **Days to keep field use counts** | Org Optimizer | 730 | 90 to 3650 | Saved Field Utilization counts |

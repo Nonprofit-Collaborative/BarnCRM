@@ -38,6 +38,7 @@ const GROUPS = [
     sections: [
       ['Import', 'utility:upload'],
       ['Duplicate Matching', 'utility:merge'],
+      ['Field History', 'utility:clock'],
       ['Rollups', 'utility:summary'],
       ['Org Optimizer', 'utility:magicwand']
     ]

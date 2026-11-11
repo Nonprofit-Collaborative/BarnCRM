@@ -50,6 +50,7 @@ page, even if that puts it out of reading order.
 | [Data Manager and job history](data-manager-and-job-history.md) | DM | 13 | Data Manager, data jobs and undo, data quality checks, Field Use, picklist value usage and its snapshot history |
 | [Super Transformer and bulk delete](bulk-update-and-delete.md) | BULK | 15 | Super Transformer runs from Find, bulk delete, edit in Find, undo, the bulk path, Super Transformer, saved step lists, phone format |
 | [Duplicates](duplicates.md) | DUP | 19 | Duplicate scan, review and merge, match sources, similar names, merge rules, auto-merge and its undo, city-only household pairs, the Duplicate Rules Starter |
+| [Field History](field-history.md) | FH | 3 | Turning Field History on, choosing fields, the Field History card, restore, Automation Control, retention and Health Check |
 | [Record Inspector](record-inspector.md) | RI | 3 | Inspect This Record button, the Record Inspector page, a pasted ID or link, search fields, copy an API name, field security and permission |
 | [Org Optimizer and Health Check](org-optimizer-and-health-check.md) | HC | 22 | Health Check findings and fixes, Org Optimizer sections, technical debt checks, storage and limits, Data Dictionary and its automation inventory, Access Explorer, Access compare and Modify All report, Field Access Manager, weekly admin summary, Setup Changes, AI-Readiness Export, Where Used and Retire a Field, NPSP households check, Report Subscriptions |
 | [Erase a person](erase-a-person.md) | ERASE | 8 | Person erasure, preview, permission |

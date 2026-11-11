@@ -45,6 +45,9 @@ public with sharing class SettingSections {
 	public static final String HEALTH = 'Health';
 	@NamespaceAccessible
 	public static final String IMPORTING = 'Import';
+	/** Field History Keeper (C-68): its switch and retention, in the Data group. */
+	@NamespaceAccessible
+	public static final String FIELD_HISTORY = 'Field History';
 	@NamespaceAccessible
 	public static final String ORGANIZATION = 'Organization';
 	@NamespaceAccessible
@@ -106,6 +109,7 @@ public with sharing class SettingSections {
 			ERROR_LOG,
 			ACCESS,
 			IMPORTING,
+			FIELD_HISTORY,
 			ORG_OPTIMIZER,
 			INTEGRATIONS,
 			HEALTH

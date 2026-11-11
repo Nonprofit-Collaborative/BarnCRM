@@ -158,6 +158,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 | C-56 Setup Changes (who changed what in Setup, kept beyond 180 days; the Setup Changes section of Org Optimizer) | [setup-changes.md](setup-changes.md) | Core |
 | C-55 Record Inspector (every readable field of one record, on a page of its own opened from record pages) | [record-inspector.md](record-inspector.md) | Core |
 | C-59 Where Used and Retire a Field (which BarnCRM setup uses a field or object; from the Data Dictionary, Field Use and the Record Inspector) | [where-used.md](where-used.md) | Core |
+| C-68 Field History (changes to chosen fields of BarnCRM's own objects, beyond 20 fields, with restore) | [field-history.md](field-history.md) | Core |
 | AIR-01 AI-Readiness Export (the AI-Readiness Export section of Org Optimizer) | [ai-readiness-export.md](ai-readiness-export.md) | Core |
 
 ### Automation, Totals and Health
