@@ -14306,6 +14306,312 @@ apply; the restore is itself a change and is kept.
 
 ---
 
+## 29CH1. Library Document
+
+### Definition
+
+One document or policy in the organization's library (CH-01, Corporate Hub module, ADR-NEXT
+`NEXT-corporate-hub-module.md`, D-118): what it is, its status, its current version, when it is
+next reviewed and whether people must acknowledge it. Its files are Salesforce Files linked to
+the record; the file history is Salesforce's own.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Title | text | yes | The document's name. |
+| Type | picklist | yes | Policy, Procedure, Governing Document, Plan, Form or Other. Default Policy. |
+| Status | picklist | yes | Draft, Active or Retired. Default Draft. |
+| Version | number | yes | The current version people acknowledge. Default 1 (R-HD1). |
+| Effective Date | date | no | When the current version took effect. |
+| Next Review | date | no | When the document is next due for review (R-HD2). |
+| Review Every (Months) | number | no | How far Mark Reviewed moves Next Review on. Default 12. |
+| Last Reviewed | date | no | When it was last marked reviewed. |
+| Needs Acknowledgment | boolean | yes (defaults false) | Whether people are asked to attest to it. |
+| Summary | long text | no | What the document covers. |
+| Retired On | date | no | Set by Retire. |
+| Template Key | text | no | The shipped template it came from (R-CT1); blank for the org's own. |
+| Reminded For | date | no | The review date the owner was last reminded about (R-CR1). |
+
+### Rules
+
+**R-HD1 A version is published, never edited back.** Publish New Version adds one to Version,
+sets Effective Date to today and Status to Active, marks every Requested acknowledgment of the
+older version Superseded and asks the same people again for the new one (R-PAK2).
+
+**R-HD2 Review.** Mark Reviewed sets Last Reviewed to today and Next Review to today plus Review
+Every (Months). Retire sets Status Retired and Retired On; a retired document asks no one.
+
+### Salesforce implementation
+
+- **Object:** `Hub_Document__c`, label Library Document, name field Text (Title), sharing
+  Public Read Only.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Type | `Type__c` | Picklist (Policy, Procedure, Governing Document, Plan, Form, Other), restricted, required |
+| Status | `Status__c` | Picklist (Draft, Active, Retired), restricted, required |
+| Version | `Version__c` | Number(4, 0), default 1, required |
+| Effective Date | `Effective_Date__c` | Date |
+| Next Review | `Review_Date__c` | Date |
+| Review Every (Months) | `Review_Months__c` | Number(3, 0), default 12 |
+| Last Reviewed | `Last_Reviewed_On__c` | Date |
+| Needs Acknowledgment | `Requires_Acknowledgment__c` | Checkbox, default false |
+| Summary | `Summary__c` | Long Text Area(32768) |
+| Retired On | `Retired_On__c` | Date |
+| Template Key | `Template_Key__c` | Text(80), unique, external ID |
+| Reminded For | `Reminded_For__c` | Date |
+
+---
+
+## 29CH2. Policy Acknowledgment
+
+### Definition
+
+One person asked to attest that they have read one version of one library document (CH-02):
+a staff user, or a Core person with no login (a board member, CH-12).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Document | reference to Library Document | yes | The document. A document with acknowledgments cannot be deleted: retire it. |
+| Version | number | yes | The version asked about. |
+| User | reference to User | one of User or Person | The staff member asked. |
+| Person | reference to Contact | one of User or Person | The person asked, when they have no login. Cleared when the person is deleted. |
+| Status | picklist | yes | Requested, Acknowledged or Superseded. Default Requested. |
+| Requested On | date | no | When it was asked. |
+| Due Date | date | no | Requested On plus the setting Days to Acknowledge. |
+| Acknowledged On | datetime | no | When the person attested. |
+| Key | text | yes | Document, version and person, unique (R-PAK1). |
+
+### Rules
+
+**R-PAK1 One request per person per version.** Key is the document's Id, the version and the
+User or Person Id; it is unique, so asking twice changes nothing.
+
+**R-PAK2 Who is asked.** Request Acknowledgments asks every active user holding a BarnCRM role
+(the sets `BarnCRM_Admin`, `BarnCRM_Staff`, `BarnCRM_Read_Only`), or the active users who are
+direct members of a public group. The request is owned by the person asked, who gets a bell
+notification. Outstanding means Requested for the document's current version.
+
+**R-PAK3 A person attests for themselves.** Status becomes Acknowledged only by the User asked,
+or by a holder of the custom permission Manage Corporate Hub (`Corporate_Hub_Manage`), who
+records a paper or Person attestation (validation rule `Own_Acknowledgment`). Exactly one of User
+and Person is set (`One_Person`).
+
+### Salesforce implementation
+
+- **Object:** `Policy_Acknowledgment__c`, name field Auto Number (ACK-{000000}), sharing
+  Private (the owner is the person asked).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Document | `Document__c` | Lookup(Library Document), Restrict delete, required |
+| Version | `Version__c` | Number(4, 0), required |
+| User | `User__c` | Lookup(User) |
+| Person | `Person__c` | Lookup(Contact), Clear on delete |
+| Status | `Status__c` | Picklist (Requested, Acknowledged, Superseded), restricted, required |
+| Requested On | `Requested_On__c` | Date |
+| Due Date | `Due_Date__c` | Date |
+| Acknowledged On | `Acknowledged_On__c` | DateTime |
+| Key | `Key__c` | Text(120), unique, external ID |
+
+---
+
+## 29CH3. Compliance Obligation
+
+### Definition
+
+Something the organization must do by a date, once or again and again (CH-03): a filing, a
+registration, a renewal, an audit. Shipped templates (CH-04, CH-06) arrive as obligations that
+are Off until the admin sets a date and turns them on.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What has to be done. |
+| Category | picklist | yes | Corporate Filing, Tax Filing, Charitable Registration, Insurance, Financial Review, Governance, Data Protection or Other. |
+| Jurisdiction | text | no | Where it applies, for example a country, state or agency. |
+| Status | picklist | yes | Off, Active or Done. Default Active; templates load Off. |
+| Next Due Date | date | yes, when Active | When the current cycle is due. |
+| Recurrence | picklist | yes | One Time, Monthly, Quarterly, Twice a Year, Yearly or Every Two Years. Default Yearly. |
+| Reminder Days | number | no | Days before the due date the owner is reminded. Blank: the setting (30). |
+| Instructions | long text | no | What to do and where to file. |
+| Reference Link | URL | no | The agency's page. |
+| Template Key | text | no | The shipped template it came from (R-CT1). |
+| Last Completed | date | no | When the last cycle was completed. |
+| Reminded For | date | no | The due date the owner was last reminded about (R-CR1). |
+| Days Until Due | number (formula) | no | Next Due Date minus today; negative when overdue. |
+
+### Rules
+
+**R-CO1 Completing a cycle.** Complete This Cycle writes a Compliance Cycle for the current Next
+Due Date, sets Last Completed, and moves Next Due Date on by the recurrence (1, 3, 6, 12 or 24
+months); a One Time obligation becomes Done instead. A month end due date stays a month end.
+
+**R-CO2 Active needs a date.** An Active obligation has a Next Due Date (validation rule
+`Active_Needs_Due_Date`).
+
+### Salesforce implementation
+
+- **Object:** `Compliance_Obligation__c`, name field Text (Obligation Name), sharing Public
+  Read/Write.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Category | `Category__c` | Picklist (values above), restricted, required |
+| Jurisdiction | `Jurisdiction__c` | Text(80) |
+| Status | `Status__c` | Picklist (Off, Active, Done), restricted, required |
+| Next Due Date | `Due_Date__c` | Date |
+| Recurrence | `Recurrence__c` | Picklist (One Time, Monthly, Quarterly, Twice a Year, Yearly, Every Two Years), restricted, required |
+| Reminder Days | `Reminder_Days__c` | Number(3, 0) |
+| Instructions | `Instructions__c` | Long Text Area(32768) |
+| Reference Link | `Reference_Url__c` | URL |
+| Template Key | `Template_Key__c` | Text(80), unique, external ID |
+| Last Completed | `Last_Completed_On__c` | Date |
+| Reminded For | `Reminded_For__c` | Date |
+| Days Until Due | `Days_Until_Due__c` | Formula (Number), `Due_Date__c - TODAY()` |
+
+---
+
+## 29CH4. Compliance Cycle
+
+### Definition
+
+One completed cycle of an obligation: the history of when each filing or renewal was done, by
+whom, and its evidence as Salesforce Files on the record.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Obligation | reference to Compliance Obligation | yes | The obligation. |
+| Due Date | date | no | The due date this cycle was for. |
+| Completed On | date | yes | When it was done. |
+| Completed By | reference to User | no | Who recorded it. |
+| Outcome | picklist | yes | Done, Done Late or Not Required. Default Done. |
+| Notes | long text | no | Confirmation numbers, what was filed. |
+
+### Salesforce implementation
+
+- **Object:** `Compliance_Cycle__c`, label Compliance Cycle, name field Auto Number
+  (CYC-{000000}), master-detail to Compliance Obligation (`Obligation__c`, relationship
+  Compliance Cycles), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Obligation | `Obligation__c` | Master-Detail(Compliance Obligation) |
+| Due Date | `Due_Date__c` | Date |
+| Completed On | `Completed_On__c` | Date, required |
+| Completed By | `Completed_By__c` | Lookup(User) |
+| Outcome | `Outcome__c` | Picklist (Done, Done Late, Not Required), restricted, required |
+| Notes | `Notes__c` | Long Text Area(32768) |
+
+---
+
+## 29CH5. Agreement
+
+### Definition
+
+A contract the organization is party to (CH-08): a lease, a vendor or service contract, a
+memorandum of understanding, a subscription. Its signed copies are Salesforce Files on the
+record. Labelled Agreement because Contract is a standard object's label.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | What the agreement is. |
+| Type | picklist | yes | Service Agreement, Vendor Contract, Lease, Grant Agreement, Memorandum of Understanding, Subscription, Insurance Policy or Other. |
+| Status | picklist | yes | Draft, Active, Expired or Ended. Default Draft. |
+| Other Party | reference to Organization (Account) | no | The organization on the other side. Cleared when deleted. |
+| Other Party Contact | reference to Contact | no | Their contact. Cleared when deleted. |
+| Start Date | date | no | When it starts. |
+| End Date | date | no | When it ends or renews. |
+| Auto-Renews | boolean | yes (defaults false) | Whether it renews unless notice is given (R-AG1). |
+| Renewal Term (Months) | number | no | How long each renewal runs. Default 12. |
+| Notice Days | number | no | Days before the end date notice must be given. Default 30. |
+| Notice Date | date (formula) | no | End Date minus Notice Days. |
+| Value | currency | no | What it is worth or costs. |
+| Terms | long text | no | Key terms to remember. |
+| Reminder Days | number | no | Days before the notice date the owner is reminded. Blank: the setting (30). |
+| Reminded For | date | no | The date the owner was last reminded about (R-CR1). |
+
+### Rules
+
+**R-AG1 Renewal.** The nightly run moves an Active, auto-renewing agreement's End Date on by
+Renewal Term (Months) until it is today or later; any other Active agreement whose End Date has
+passed becomes Expired. End Date is on or after Start Date (validation rule `End_After_Start`).
+
+### Salesforce implementation
+
+- **Object:** `Agreement__c`, name field Text (Agreement Name), sharing Public Read Only.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Type | `Type__c` | Picklist (values above), restricted, required |
+| Status | `Status__c` | Picklist (Draft, Active, Expired, Ended), restricted, required |
+| Other Party | `Organization__c` | Lookup(Account), Clear on delete |
+| Other Party Contact | `Contact__c` | Lookup(Contact), Clear on delete |
+| Start Date | `Start_Date__c` | Date |
+| End Date | `End_Date__c` | Date |
+| Auto-Renews | `Auto_Renews__c` | Checkbox, default false |
+| Renewal Term (Months) | `Renewal_Months__c` | Number(3, 0), default 12 |
+| Notice Days | `Notice_Days__c` | Number(3, 0), default 30 |
+| Notice Date | `Notice_Date__c` | Formula (Date), `End_Date__c - BLANKVALUE(Notice_Days__c, 0)` |
+| Value | `Value__c` | Currency(16, 2) |
+| Terms | `Terms__c` | Long Text Area(32768) |
+| Reminder Days | `Reminder_Days__c` | Number(3, 0) |
+| Reminded For | `Reminded_For__c` | Date |
+
+---
+
+## 29CH6. Corporate Hub Settings and templates
+
+### Definition
+
+Corporate Hub's org-wide settings, edited in the Corporate Hub section of BarnCRM Settings, and
+its shipped templates.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Send Corporate Hub Reminders | boolean | yes (defaults true) | Whether the nightly run sends reminders (R-CR1). |
+| Days Before to Remind | number | no | The reminder lead time where a record has none, 1 to 365. Blank means 30. |
+| Days to Acknowledge | number | no | How long a person has to acknowledge, 1 to 365. Blank means 30. |
+
+### Rules
+
+**R-CR1 One reminder per date.** At 6:45 AM the nightly step (key `BarnCRM Corporate Hub
+Reminders`) sends the owner a bell notification (type `Corporate_Hub_Reminder`) for each Active
+obligation whose Next Due Date, Active agreement whose Notice Date (or End Date) and Active
+document whose Next Review is within its reminder days, overdue included, and stores that date in
+Reminded For, so the next reminder waits for a new date.
+
+**R-CT1 Templates load once per key.** The JSON static resource `BarnCorporateHubTemplates`
+(`schemaVersion` 1) lists obligation templates (`obligations`) and starter policies
+(`policies`), each with a unique `key`. The setup step and Add Missing Templates create a record
+for each key no record carries in Template Key: obligations Off, policies Draft with a summary
+and no legal text. Existing records are never changed.
+
+### Salesforce implementation
+
+- **Object:** `Corporate_Hub_Settings__c`, hierarchy custom setting, visibility Protected.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Send Corporate Hub Reminders | `Reminders_Enabled__c` | Checkbox, default true |
+| Days Before to Remind | `Reminder_Days__c` | Number(3, 0), default 30 |
+| Days to Acknowledge | `Acknowledgment_Days__c` | Number(3, 0), default 30 |
+
+- **Setting Definitions:** `CorporateHub_Reminders_Enabled`, `CorporateHub_Reminder_Days`,
+  `CorporateHub_Acknowledgment_Days`, section Corporate Hub, module `CorporateHub`.
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -14699,6 +15005,7 @@ mirrors the primary member).
 | 1.5 | 2026-11-11 | Archive by Query (C-67, D-157). No object or field added. New rule R-BD9: a bulk delete whose records are first saved to Files by `FindExportBatch` in archive mode (every readable field, API name headings), the delete started from the export's finish on the same job, only of records not changed since the start (`archive.notChangedAfter` in the definition), and optionally emptied from the Recycle Bin after a second typed count (`archive.emptyRecycleBin`), which R-BD5's undo then refuses. |
 | 1.6 | 2026-11-11 | Generic Record Merge (C-62, D-156; extends ADR-0145). `BarnCRM_Settings__c` gains `Generic_Merge_Enabled__c` (false). `Merge_Rule__mdt` `Field_Name__c` may name `Object.Field`. Rules R-DP11 and R-DP12 added. No object added: merges are written to `Merge_Journal__c`. |
 | 1.7 | 2026-11-11 | Field History Keeper (C-68, D-157; ADR-NEXT `NEXT-field-history-keeper.md`). New Section 29FH1 Field History (`Field_History__c`, rules R-FH1 to R-FH5); custom metadata type `History_Field__mdt` (Section 13); `BarnCRM_Settings__c` gains `Field_History_Enabled__c` (false) and `Field_History_Retention_Days__c` (730). |
+| 1.8 | 2026-11-11 | Corporate Hub module (CH-01 to CH-04, CH-06 to CH-08, D-118; ADR-NEXT `NEXT-corporate-hub-module.md`). New package `packages/corporatehub`: Library Document (`Hub_Document__c`, 29CH1), Policy Acknowledgment (`Policy_Acknowledgment__c`, 29CH2), Compliance Obligation (`Compliance_Obligation__c`, 29CH3), Compliance Cycle (`Compliance_Cycle__c`, 29CH4), Agreement (`Agreement__c`, 29CH5) and Corporate Hub Settings (`Corporate_Hub_Settings__c`, 29CH6), with the shipped templates `BarnCorporateHubTemplates`. |
 
 ---
 ## 32. Entity ownership by package
@@ -14845,6 +15152,12 @@ included; standard objects the packages extend are named by the entity that gove
 | Portal Access | Portal Builder | 1.3 (PB-01) | 29PB2 |
 | Portal Session | Portal Builder | 1.3 (PB-01) | 29PB3 |
 | Portal Settings | Portal Builder | 1.3 (PB-01) | 29PB4 |
+| Library Document | Corporate Hub | 1.7 (CH-01) | 29CH1 |
+| Policy Acknowledgment | Corporate Hub | 1.7 (CH-02) | 29CH2 |
+| Compliance Obligation | Corporate Hub | 1.7 (CH-03) | 29CH3 |
+| Compliance Cycle | Corporate Hub | 1.7 (CH-03) | 29CH4 |
+| Agreement | Corporate Hub | 1.7 (CH-08) | 29CH5 |
+| Corporate Hub Settings | Corporate Hub | 1.7 (CH-03) | 29CH6 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
@@ -14872,6 +15185,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
 | Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and `FormsAccessSync` (ADR-0175 `0175-forms-module.md`). No app (D-188, ADR-0192 module tabs in the BarnCRM apps): the Forms and Form Submissions tabs join BarnCRM and BarnCRM Console at deploy; the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
 | Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-0175 `0175-forms-module.md` decision 9) |
+| Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and `CorporateHubAccessSync` (ADR-NEXT `NEXT-corporate-hub-module.md`). No app (ADR-0192): the Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs join BarnCRM and BarnCRM Console |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror was brought forward from v0.9 to v0.6 and is built in release

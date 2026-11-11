@@ -1,0 +1,54 @@
+<template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name="standard:task" data-id="card">
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={errorMessage}>
+          <c-barn-notice
+            variant="error"
+            message={errorMessage}
+            data-id="error-message"
+            class="slds-var-m-bottom_small"
+          ></c-barn-notice>
+        </template>
+        <lightning-input
+          type="date"
+          data-id="completed-on"
+          data-field="completedOn"
+          label={labels.completedOn}
+          value={completedOn}
+          onchange={handleChange}
+        ></lightning-input>
+        <lightning-combobox
+          data-id="outcome"
+          data-field="outcome"
+          label={labels.outcome}
+          value={outcome}
+          options={outcomeOptions}
+          onchange={handleChange}
+        ></lightning-combobox>
+        <lightning-textarea
+          data-id="notes"
+          data-field="notes"
+          label={labels.notes}
+          value={notes}
+          onchange={handleChange}
+        ></lightning-textarea>
+        <lightning-button
+          data-id="complete"
+          class="slds-var-m-vertical_small"
+          variant="brand"
+          label={labels.complete}
+          disabled={isWorking}
+          onclick={handleComplete}
+        ></lightning-button>
+        <template lwc:if={cycleId}>
+          <lightning-file-upload
+            data-id="evidence"
+            label={labels.evidence}
+            record-id={cycleId}
+          ></lightning-file-upload>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

@@ -48,7 +48,8 @@ public with sharing class NightlyJobs {
 		'ProgramsNightlyJobProvider',
 		'LogicModelsNightlyJobProvider',
 		'FundersNightlyJobProvider',
-		'EventsNightlyJobProvider'
+		'EventsNightlyJobProvider',
+		'CorporateHubNightlyJobProvider'
 	};
 
 	/** Separate schedules of steps that became part of another step: adopted, then aborted. */

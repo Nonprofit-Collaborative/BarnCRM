@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomNotificationType xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customNotifTypeName>Corporate Hub reminder</customNotifTypeName>
+  <description>
+    Reminds the owner of a compliance obligation, agreement or library document before it is due,
+    and asks a person to acknowledge a policy. Sent by Corporate Hub; turned off in BarnCRM
+    Settings, Corporate Hub.
+  </description>
+  <desktop>true</desktop>
+  <masterLabel>Corporate Hub reminder</masterLabel>
+  <mobile>true</mobile>
+</CustomNotificationType>

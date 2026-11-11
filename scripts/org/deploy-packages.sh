@@ -942,6 +942,8 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(events)
   # Portal Builder depends on Core only (ADR-0185, portal builder).
   MODULES+=(portal)
+  # Corporate Hub depends on Core only (ADR-NEXT, corporate hub module).
+  MODULES+=(corporatehub)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
   RECORD_PACKAGES+=("${MODULES[@]}")
@@ -997,7 +999,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   # modules deployed here, and a module left out has its tabs taken out (ADR-0192, Batch C
   # modules add their tabs to the BarnCRM apps). Forms, Event Management and Portal Builder
   # have no app of their own: these apps are where their tabs live (D-188).
-  deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal)
+  deployed_modules=(rollups giving mirror programs logicmodels funders forms contactpoints events portal corporatehub)
   volunteers_has_metadata && deployed_modules+=(volunteers)
   APP_TABS_DIR="$(mktemp -d)"
   python3 scripts/org/module-app-tabs.py --all "$APP_TABS_DIR" "${deployed_modules[@]}" || exit 1
@@ -1034,7 +1036,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     if volunteers_has_metadata; then
       SETUP_MODULES+=(Volunteers)
     fi
-    SETUP_MODULES+=(Programs LogicModels Funders Forms ContactPoints Events Portal Mirror)
+    SETUP_MODULES+=(Programs LogicModels Funders Forms ContactPoints Events Portal CorporateHub Mirror)
     for module in "${SETUP_MODULES[@]}"; do
       echo ""
       echo "== Running the ${module} module's setup steps =="
@@ -1136,6 +1138,14 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   echo "== Queueing the Portal Builder access sync =="
   if ! printf '%s\n' 'new PortalAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
     echo "The Portal Builder access sync was not queued. Nothing else is affected: the hourly"
+    echo "access check syncs the access."
+  fi
+
+  # The same gap for the Corporate Hub permission sets (ADR-NEXT, corporate hub module, decision 10).
+  echo ""
+  echo "== Queueing the Corporate Hub access sync =="
+  if ! printf '%s\n' 'new CorporateHubAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
+    echo "The Corporate Hub access sync was not queued. Nothing else is affected: the hourly"
     echo "access check syncs the access."
   fi
 fi

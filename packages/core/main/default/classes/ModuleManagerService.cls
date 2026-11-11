@@ -142,7 +142,14 @@ public with sharing class ModuleManagerService {
 			'Event_Table__c',
 			'Ticket_Type__c'
 		},
-		'Portal' => new List<String>{ 'Portal__c', 'Portal_Access__c', 'Portal_Session__c' }
+		'Portal' => new List<String>{ 'Portal__c', 'Portal_Access__c', 'Portal_Session__c' },
+		'CorporateHub' => new List<String>{
+			'Agreement__c',
+			'Compliance_Cycle__c',
+			'Compliance_Obligation__c',
+			'Hub_Document__c',
+			'Policy_Acknowledgment__c'
+		}
 	};
 
 	/** The permission set Turn on gives the person who turned the module on. */
@@ -157,7 +164,8 @@ public with sharing class ModuleManagerService {
 		'Forms' => 'Forms_Admin',
 		'ContactPoints' => 'Contact_Point_Sync_Admin',
 		'Events' => 'Events_Admin',
-		'Portal' => 'Portal_Admin'
+		'Portal' => 'Portal_Admin',
+		'CorporateHub' => 'Corporate_Hub_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */

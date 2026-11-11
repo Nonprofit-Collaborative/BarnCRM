@@ -91,6 +91,9 @@ public with sharing class SettingSections {
 	/** The Logic Models module's row, which opens its Logic Models tab (C-72). */
 	@NamespaceAccessible
 	public static final String LOGIC_MODELS = 'Logic Models';
+	/** The Corporate Hub module's reminder and acknowledgment settings. */
+	@NamespaceAccessible
+	public static final String CORPORATE_HUB = 'Corporate Hub';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -113,6 +116,7 @@ public with sharing class SettingSections {
 			VOLUNTEERS,
 			FORMS,
 			PORTALS,
+			CORPORATE_HUB,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,
