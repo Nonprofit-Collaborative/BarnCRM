@@ -51,7 +51,9 @@ import sys
 # Lowered to 3,254 after merging two more same-text pairs (Households, Choose a kind of record).
 # Raised by 1 for Volunteers_Access_AddOnCoordinator: Volunteers Coordinator becomes an Access page
 # extra permission (simpler permission sets, D1); the Mirror merge in the same release removes 3.
-BUDGET = 3255
+# Combined build (landing/batch-d-i): set to the merged total, 3,258, for C-62 Merge Records' three
+# labels (C-67 used the last three); AR-01b (release 1.19) moves module messages out and lowers it.
+BUDGET = 3258
 TARGET = 3000
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 

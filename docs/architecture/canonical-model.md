@@ -1308,6 +1308,7 @@ default; the two choices are stored as text (ADR-0019).
 | `Fuzzy_Match_Threshold__c` | integer | 90 | How alike two names must be, in percent, before the scan pairs two people by name (R-DP7). From 80 to 100; out of range reads as the nearest end. |
 | `Merge_Default_Rule__c` | picklist(Keep master, Not blank, Most recent, Oldest record, Most complete) | Not blank | The merge rule of every person field with no active Merge Rule row (R-DP8). |
 | `Auto_Merge_Exact_Match__c` | picklist(Name and email, Name and phone, Name, email and phone, Name and birthdate) | Name and email | What two people must share exactly before auto-merge takes them (R-DP9). |
+| `Generic_Merge_Enabled__c` | boolean | false | Whether the Merge Records area of the Duplicate Matching tab is offered (R-DP11). Off on install; nothing else changes while it is off. |
 | `Merge_Journal_Retention_Days__c` | integer | 365 | Days a Merge Journal row is kept before the nightly Record Cleanup step deletes it (architect review L-08); an older merge can no longer be undone. From 30 to 3,650; empty reads as 365, out of range as the nearest end. |
 
 ### Record retention keys
@@ -1606,7 +1607,7 @@ field follows `Merge_Default_Rule__c` until an administrator adds a row.
 |---|---|---|---|
 | DeveloperName | `DeveloperName` | text | The stable identifier of the rule. |
 | Label | `MasterLabel` | text | The rule as the page names it. |
-| Field Name | `Field_Name__c` | text (80) | A Contact field the merge may change, or `MailingAddress` or `OtherAddress` for a whole address. One active row per field; a save is refused for a field that does not exist, cannot be edited, or is the household or owner. |
+| Field Name | `Field_Name__c` | text (80) | A Contact field the merge may change, or `MailingAddress` or `OtherAddress` for a whole address; or, for Generic Record Merge (R-DP11), `Object.Field` naming a field of an object it offers, both without a namespace prefix (`Fund__c.Description__c`). One active row per field; a save is refused for a field that does not exist, cannot be edited, or is the household or owner, and for an object Generic Record Merge does not offer. |
 | Rule | `Rule__c` | picklist(Keep master, Not blank, Most recent, Oldest record, Most complete) | Which value wins (R-DP8). |
 | Active | `Active__c` | boolean, default true | Whether the rule is used. |
 | Is Shipped | `Is_Shipped__c` | boolean, default false | True on a row the package ships; none is shipped. |
@@ -7616,6 +7617,27 @@ copy), puts back each changed value still as the merge left it and moves each re
 record still on the survivor back. What it cannot restore (no longer in the Recycle Bin, a value
 changed since, a related record deleted or refused) is written on the row as Partly Undone or
 Undo Failed. Undo is offered while the run is no more than 15 days old.
+
+**R-DP11 Generic Record Merge merges two records of one BarnCRM object** (C-62, extends R-DP8
+to R-DP10). Offered while `Generic_Merge_Enabled__c` is on, to holders of Manage BarnCRM
+Settings. The objects offered are BarnCRM's own custom objects (those carrying the package
+prefix; every custom object where BarnCRM runs without a namespace) that the person may read,
+edit, delete and undelete, never Contact or Account (people and households have their own
+merge) and never BarnCRM's own logs, journals and configuration objects. The person picks the
+record to keep and, field by field, which value it keeps; the starting choice is the one the
+merge rules give (R-DP8: a `Merge_Rule__mdt` row named `Object.Field`, else
+`Merge_Default_Rule__c`). The owner and record type stay the kept record's. The platform's
+merge serves only people, households, leads and cases, so BarnCRM merges in user mode, in one
+transaction: it writes the chosen values on the kept record, moves every related record whose
+link can be changed onto it, then deletes the other record (to the Recycle Bin). It refuses,
+changing nothing, when a related record could not be read (it would lose its link) or sits under
+a master-detail link that cannot be changed (it would be deleted with the record).
+
+**R-DP12 Every Generic Record Merge is journaled and can be undone.** The merge writes one
+Merge Journal row as R-DP10 describes, with its own Run Id, so undo works on that one merge.
+The Merge Records area lists the last 15 days of these merges with Undo, which works as R-DP10
+does. Auto-merge's Recent Runs lists only people merges. Files and notes stay with the deleted
+record and return with it on undo.
 
 ### Salesforce implementation
 
@@ -14596,6 +14618,7 @@ mirrors the primary member).
 | 1.3 | 2026-11-09 | Simpler permission sets, Core (ADR-NEXT, D-191, release N). No object or field added. Coordinator (`Volunteer_Coordinator`) retired: the Access page stops offering it and `RetiredRoleMigration` gives its active holders Team Member; R-BU6 and R-BD6: `BarnCRM_Bulk_Update` and `BarnCRM_Bulk_Delete` include `BarnCRM_Find_And_Export`'s grants; `BarnCRM_Admin` gains `BulkUpdateController`. Labels only: BarnCRM Admin (group), BarnCRM Admin Access, Staff Access and Read Only Access, and "BarnCRM Auto:" on the eleven tab, Households and app sets. |
 | 1.4 | 2026-11-11 | Forms and Logic Models announce themselves (C-72). No object or field added. Forms ships Setting Definition `Forms_Page` and Logic Models `Logic_Models_Page`: a Component row naming the module, in new console sections Forms and Logic Models, whose Open button opens the module's object tab. `BarnCRM_Module__mdt` `Probe_Object__c` is cleared for Forms and LogicModels, so only Rollup Builder keeps a probe. |
 | 1.5 | 2026-11-11 | Archive by Query (C-67, D-157). No object or field added. New rule R-BD9: a bulk delete whose records are first saved to Files by `FindExportBatch` in archive mode (every readable field, API name headings), the delete started from the export's finish on the same job, only of records not changed since the start (`archive.notChangedAfter` in the definition), and optionally emptied from the Recycle Bin after a second typed count (`archive.emptyRecycleBin`), which R-BD5's undo then refuses. |
+| 1.6 | 2026-11-11 | Generic Record Merge (C-62, D-156; extends ADR-0145). `BarnCRM_Settings__c` gains `Generic_Merge_Enabled__c` (false). `Merge_Rule__mdt` `Field_Name__c` may name `Object.Field`. Rules R-DP11 and R-DP12 added. No object added: merges are written to `Merge_Journal__c`. |
 
 ---
 ## 32. Entity ownership by package

@@ -145,10 +145,13 @@ public with sharing class AutoMergeController {
 		view.running = DuplicateSelector.scanRunning(JOB_CLASS);
 		Datetime since = Datetime.now().addDays(-AutoMergeService.UNDO_DAYS);
 		Map<String, RunView> byRun = new Map<String, RunView>();
+		// People merges only: Merge Records (C-62) lists its own.
+		String people =
+			Contact.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() + '%';
 		for (Merge_Journal__c journal : [
 			SELECT Run_Id__c, Status__c, Merged_Name__c, Notes__c, CreatedDate
 			FROM Merge_Journal__c
-			WHERE CreatedDate >= :since
+			WHERE CreatedDate >= :since AND Survivor_Id__c LIKE :people
 			WITH USER_MODE
 			ORDER BY CreatedDate DESC
 			LIMIT 5000

@@ -1,0 +1,170 @@
+<template>
+  <template lwc:if={helpReady}>
+    <div class="slds-is-relative">
+      <p class="slds-var-m-bottom_small" data-id="intro">{labels.intro}</p>
+      <template lwc:if={error}>
+        <c-barn-notice class="slds-show slds-var-m-bottom_small" variant="error" message={error} data-id="error"></c-barn-notice>
+      </template>
+      <template lwc:if={message}>
+        <p class="slds-var-m-bottom_small" role="status" data-id="status">{message}</p>
+      </template>
+      <template lwc:if={loading}>
+        <lightning-spinner alternative-text={labels.loading} size="small"></lightning-spinner>
+      </template>
+      <template lwc:if={showOff}>
+        <p class="slds-var-m-bottom_small" role="status" data-id="off">{labels.off}</p>
+      </template>
+      <template lwc:if={enabled}>
+        <div class="slds-grid slds-wrap slds-gutters_x-small slds-var-m-bottom_small">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+            <lightning-combobox
+              label={labels.object}
+              options={objectOptions}
+              value={objectName}
+              onchange={handleObject}
+              data-id="object"
+            ></lightning-combobox>
+          </div>
+          <template lwc:if={objectName}>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+              <lightning-record-picker
+                label={labels.first}
+                object-api-name={objectName}
+                value={firstId}
+                data-side="first"
+                data-id="first"
+                onchange={handleRecord}
+              ></lightning-record-picker>
+            </div>
+            <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3">
+              <lightning-record-picker
+                label={labels.second}
+                object-api-name={objectName}
+                value={secondId}
+                data-side="second"
+                data-id="second"
+                onchange={handleRecord}
+              ></lightning-record-picker>
+            </div>
+          </template>
+        </div>
+        <div class="slds-var-m-bottom_medium">
+          <lightning-button
+            label={labels.compare}
+            onclick={handleCompare}
+            disabled={compareDisabled}
+            data-id="compare"
+          ></lightning-button>
+        </div>
+        <template lwc:if={comparison}>
+          <lightning-radio-group
+            class="slds-var-m-bottom_small"
+            label={labels.keep}
+            options={keepOptions}
+            value={keep}
+            onchange={handleKeep}
+            data-id="keep"
+          ></lightning-radio-group>
+          <lightning-input
+            class="slds-var-m-bottom_small"
+            type="checkbox"
+            label={labels.onlyDifferences}
+            checked={onlyDifferences}
+            onchange={handleOnlyDifferences}
+            data-id="only-differences"
+          ></lightning-input>
+          <table
+            class="slds-table slds-table_bordered slds-table_cell-buffer slds-max-medium-table_stacked slds-var-m-bottom_small"
+            data-id="fields"
+          >
+            <thead>
+              <tr class="slds-line-height_reset">
+                <th scope="col">{labels.field}</th>
+                <th scope="col">{comparison.firstName}</th>
+                <th scope="col">{comparison.secondName}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={rows} for:item="row">
+                <tr key={row.name} class={row.rowClass} data-id="field-row">
+                  <th scope="row" data-label={labels.field}>{row.label}</th>
+                  <td data-label={comparison.firstName}>
+                    <label class="slds-radio">
+                      <input
+                        type="radio"
+                        name={row.name}
+                        checked={row.firstChosen}
+                        data-field={row.name}
+                        data-side="first"
+                        onchange={handleChoice}
+                      />
+                      <span class="slds-var-m-left_xx-small">{row.firstText}</span>
+                    </label>
+                  </td>
+                  <td data-label={comparison.secondName}>
+                    <label class="slds-radio">
+                      <input
+                        type="radio"
+                        name={row.name}
+                        checked={row.secondChosen}
+                        data-field={row.name}
+                        data-side="second"
+                        onchange={handleChoice}
+                      />
+                      <span class="slds-var-m-left_xx-small">{row.secondText}</span>
+                    </label>
+                  </td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+          <lightning-button
+            variant="brand"
+            label={labels.merge}
+            onclick={handleMerge}
+            disabled={loading}
+            data-id="merge"
+          ></lightning-button>
+        </template>
+        <h3 class="slds-text-heading_small slds-var-m-top_medium slds-var-m-bottom_small">{labels.recentMerges}</h3>
+        <template lwc:if={hasMerges}>
+          <ul data-id="merges">
+            <template for:each={mergeRows} for:item="merged">
+              <li key={merged.journalId} class="slds-var-m-bottom_small">
+                <p>
+                  <lightning-formatted-date-time
+                    value={merged.mergedAt}
+                    year="numeric"
+                    month="short"
+                    day="numeric"
+                    hour="numeric"
+                    minute="2-digit"
+                  ></lightning-formatted-date-time>
+                  <span class="slds-var-m-left_small">{merged.title}</span>
+                  <span class="slds-var-m-left_small slds-text-color_weak">{merged.status}</span>
+                </p>
+                <template lwc:if={merged.hasNotes}>
+                  <p class="slds-text-color_weak">{merged.notes}</p>
+                </template>
+                <template lwc:if={merged.canUndo}>
+                  <lightning-button
+                    label={labels.undo}
+                    data-journal={merged.journalId}
+                    data-id="undo"
+                    onclick={handleUndo}
+                  ></lightning-button>
+                </template>
+              </li>
+            </template>
+          </ul>
+        </template>
+        <template lwc:else>
+          <p data-id="no-merges">{labels.noMerges}</p>
+        </template>
+      </template>
+      <div class="slds-var-m-top_small">
+        <lightning-button label={labels.refresh} onclick={handleRefresh} data-id="refresh"></lightning-button>
+      </div>
+    </div>
+  </template>
+</template>

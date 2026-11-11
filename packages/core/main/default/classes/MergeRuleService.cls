@@ -88,8 +88,13 @@ public with sharing class MergeRuleService {
 	 * (not formula or auto number), and not the household, owner or record type.
 	 */
 	public static List<String> mergeableFields() {
+		return mergeableFields(Contact.SObjectType);
+	}
+
+	/** The same, for any object Generic Record Merge offers (C-62, R-DP11). */
+	public static List<String> mergeableFields(Schema.SObjectType type) {
 		List<String> names = new List<String>();
-		for (Schema.SObjectField token : Schema.SObjectType.Contact.fields.getMap().values()) {
+		for (Schema.SObjectField token : type.getDescribe().fields.getMap().values()) {
 			Schema.DescribeFieldResult field = token.getDescribe();
 			if (
 				field.isAccessible() &&
@@ -115,12 +120,25 @@ public with sharing class MergeRuleService {
 		SObject other,
 		List<String> fields
 	) {
+		return winningValues(master, other, fields, '');
+	}
+
+	/**
+	 * The same, reading the rules a scope names: empty for people, `object__c.` (lower case,
+	 * no namespace prefix) for a Generic Record Merge object, whose rows are `Object.Field`.
+	 */
+	public static Map<String, Object> winningValues(
+		SObject master,
+		SObject other,
+		List<String> fields,
+		String scope
+	) {
 		Map<String, String> rules = rulesByField();
 		String fallback = defaultRule();
 		Map<String, Object> result = new Map<String, Object>();
 		Map<String, List<String>> addressParts = new Map<String, List<String>>();
 		for (String field : fields) {
-			String address = addressOf(field);
+			String address = scope == '' ? addressOf(field) : null;
 			if (address != null) {
 				if (!addressParts.containsKey(address)) {
 					addressParts.put(address, new List<String>());
@@ -128,9 +146,8 @@ public with sharing class MergeRuleService {
 				addressParts.get(address).add(field);
 				continue;
 			}
-			String rule = rules.containsKey(field.toLowerCase())
-				? rules.get(field.toLowerCase())
-				: fallback;
+			String key = scope + bare(field).toLowerCase();
+			String rule = rules.containsKey(key) ? rules.get(key) : fallback;
 			Boolean takeOther = takesOther(
 				rule,
 				master.get(field),
@@ -226,6 +243,14 @@ public with sharing class MergeRuleService {
 		return first == second;
 	}
 
+	/** An API name without this package's namespace prefix, as merge rule rows name it. */
+	public static String bare(String name) {
+		String prefix = NamespaceUtil.prefix();
+		return prefix != '' && name.startsWithIgnoreCase(prefix)
+			? name.substring(prefix.length())
+			: name;
+	}
+
 	// ------------------------------------------------------------------ saving a rule
 
 	/** The custom metadata manager's check of a Merge Rule save (ADR-0085). */
@@ -237,7 +262,8 @@ public with sharing class MergeRuleService {
 
 	/**
 	 * Refuses a rule for a field that does not exist on people, that the merge never changes
-	 * (the household, owner, record type) or that cannot be edited, and an unknown rule.
+	 * (the household, owner, record type) or that cannot be edited, and an unknown rule. A name
+	 * `Object.Field` is a field of an object Generic Record Merge offers (C-62).
 	 */
 	public static void validate(Map<String, Object> values) {
 		String fieldName = values == null ? null : (String) values.get('Field_Name__c');
@@ -251,7 +277,14 @@ public with sharing class MergeRuleService {
 		if (ADDRESSES.containsKey(name)) {
 			return;
 		}
-		Schema.SObjectField token = Schema.SObjectType.Contact.fields.getMap().get(name);
+		Schema.SObjectType type = Contact.SObjectType;
+		if (name.contains('.')) {
+			type = GenericMergeService.offeredType(name.substringBefore('.'));
+			name = name.substringAfter('.');
+		}
+		Schema.SObjectField token = type == null
+			? null
+			: type.getDescribe().fields.getMap().get(name);
 		Schema.DescribeFieldResult field = token == null ? null : token.getDescribe();
 		if (
 			field == null ||

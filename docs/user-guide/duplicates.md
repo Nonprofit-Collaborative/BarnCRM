@@ -72,6 +72,10 @@ To merge the obvious duplicates in one go, an admin opens **Auto-Merge** on the 
 **Preview Exact Matches**, reads the pairs and confirms. A run can be undone for 15 days from
 **Recent Runs**. See [Auto-Merge](../admin-guide/duplicates.md#auto-merge).
 
+Two copies of something else (two funds, two appeals, two programs) can be merged by an admin
+in **Merge Records** on the same tab, once it is turned on. Ask your admin; see
+[Merge Records](../admin-guide/duplicates.md#merge-records).
+
 ## Why a Pair Is Suggested
 
 Each pair shows a short reason:
