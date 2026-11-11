@@ -26,6 +26,9 @@ org. These kits ship:
   [Programs](programs.md#moving-from-pmm).
 - **V4S Jobs, Shifts and Hours** (Volunteers): copies Volunteers for Salesforce jobs, shifts,
   sign-ups and completed hours. See [Volunteers](volunteers.md#moving-from-v4s).
+- **NPSP Funds, Levels, Recurring Donations** (Giving): copies General Accounting Units,
+  levels and recurring donations. See
+  [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
 
 An app can have several kits, one for each BarnCRM module that receives its records. Its
 listing then shows one **Start Migration** button per kit, each with the kit's name. Run them

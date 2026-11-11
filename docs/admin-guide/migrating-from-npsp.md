@@ -38,6 +38,20 @@ kit's **Start Migration** button. Run the kits in the order listed.
 The retire checklist then reminds you to stop NPSP creating the other side of relationships,
 affiliations, household addresses and household names, so the two apps never both do it.
 
+**NPSP Funds, Levels, Recurring Donations** (BarnCRM Giving):
+
+| Step | What it does |
+|---|---|
+| Funds | Copies each General Accounting Unit as a fund with its name, description and active flag. A unit whose name is already a BarnCRM fund makes a second fund of that name, so check **Funds** in the preview first. |
+| Donor Levels | Copies each NPSP level as a donor level with its name, description, minimum and maximum amounts and active flag. |
+| Recurring Donations of People | Copies each recurring donation of a contact as a recurring commitment of that person: amount, start (NPSP's next payment date, or the date established when there is none, so no run of overdue payments is made), frequency (1st and 15th becomes Every two weeks; any other period not in BarnCRM becomes Monthly) and status (Lapsed becomes Paused, Closed becomes Cancelled). |
+| Recurring Donations of Organizations | The same for recurring donations of an organization, as a commitment of that account. |
+
+The kit does not copy NPSP's open installment Opportunities: BarnCRM schedules the payments of
+each commitment itself. Gifts already received stay with the gift import (section 4). The retire
+checklist reminds you to stop NPSP's recurring donation and levels jobs, make the General
+Accounting Units inactive, and point payment processors at BarnCRM.
+
 ## 2. How to Turn It On
 
 BarnCRM brings the contacts template, and the Giving module brings the two payment templates.
