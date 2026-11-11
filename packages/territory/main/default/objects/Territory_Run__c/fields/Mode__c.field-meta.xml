@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Mode__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Preview changes nothing; Assign moves records and can be undone.</inlineHelpText>
+  <label>Mode</label>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Preview</fullName>
+        <default>true</default>
+        <label>Preview</label>
+      </value>
+      <value>
+        <fullName>Assign</fullName>
+        <default>false</default>
+        <label>Assign</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

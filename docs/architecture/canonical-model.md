@@ -15547,6 +15547,187 @@ assessment is Open (`Answer_While_Open`).
 
 ---
 
+## 29TM1. Territory
+
+Package: BarnCRM Territory Management (C-40, ADR-NEXT `NEXT-territory-management-module.md`).
+
+### Definition
+
+A named area of responsibility, such as a region, a set of postal codes or a donor tier, that
+people, households and organizations are assigned to by rules, with the owner each assigned
+record should get.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The territory's name. |
+| Active | boolean | yes (defaults true) | Whether its rules are used by a run. |
+| Priority | number | yes (defaults 100) | Lower is checked first; the first matching territory wins (R-TM1). |
+| Routing | picklist | yes | Keep Owner (default), Territory Owner, Round Robin or Capacity (R-TM2). |
+| Territory Owner | reference(User) | no | The owner Territory Owner routing gives. |
+| Next Member | number | no | Where round robin continues on the next run. Written by the module. |
+| Description | long text | no | What the territory covers. |
+
+A record's territory is the attribute Territory on Account (households and organizations) and on
+Contact (people).
+
+### Rules
+
+**R-TM1 First match wins.** A run checks each record of a kind against the active rules for
+that kind of active territories, by Priority then Name, and takes the first territory with a
+matching rule. A record already in that territory is left as it is, owner included. A record no
+rule matches keeps its territory. People are Contacts, households Accounts of the household
+record type, organizations Accounts of the organization record type (`AccountKinds`) or of none.
+
+**R-TM2 Owner routing.** Keep Owner changes the territory only. Territory Owner sets the owner to
+the Territory Owner. Round Robin gives the next active member in turn, from Next Member, skipping
+a member at capacity. Capacity gives the active member with the most room: Capacity minus the
+records of the territory they own when the run first needs it, plus what the run has given; a
+member with no Capacity is never full. With every member full the record moves and keeps its
+owner, counted as No Room.
+
+### Salesforce implementation
+
+- **Object:** `Territory__c`, name field Text (Territory Name), sharing Public Read Only.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Active | `Active__c` | Checkbox, default true |
+| Priority | `Priority__c` | Number(4, 0), required, default 100 |
+| Routing | `Routing__c` | Picklist (Keep Owner, Territory Owner, Round Robin, Capacity), restricted, required |
+| Territory Owner | `Owner_User__c` | Lookup(User) |
+| Next Member | `Next_Member__c` | Number(6, 0) |
+| Description | `Description__c` | Long Text Area(32768) |
+
+- **Account:** households and organizations.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Territory | `Territory__c` | Lookup(Territory), Clear on delete, relationship Accounts |
+
+- **Contact:** people.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Territory | `Territory__c` | Lookup(Territory), Clear on delete, relationship People |
+
+---
+
+## 29TM2. Territory Rule
+
+### Definition
+
+One condition set that puts records of one kind into a territory.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Territory | reference to Territory | yes | The territory. |
+| Applies To | picklist | yes | People, Households or Organizations. Default People. |
+| Filter | long text | no | A filter document (R-R2) over Contact or Account; empty matches every record of the kind. |
+| Summary | text | no | The filter as a sentence, written by the page. |
+| Active | boolean | yes (defaults true) | Whether a run uses it. |
+
+### Rules
+
+**R-TM3 Rules compile as Find queries.** A rule's filter is checked and run by Core's
+`QueryCompiler` (ADR-0076) in user mode, with the chunk's record Ids added as one more
+condition. At most 50 active rules per kind.
+
+### Salesforce implementation
+
+- **Object:** `Territory_Rule__c`, name field Auto Number (TR-{000000}), master-detail to
+  Territory (`Territory__c`, relationship Rules), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Territory | `Territory__c` | Master-Detail(Territory) |
+| Applies To | `Applies_To__c` | Picklist (People, Households, Organizations), restricted, required |
+| Filter | `Filter_JSON__c` | Long Text Area(32768) |
+| Summary | `Summary__c` | Text(255) |
+| Active | `Active__c` | Checkbox, default true |
+
+---
+
+## 29TM3. Territory Member
+
+### Definition
+
+A user who takes records in a Round Robin or Capacity territory (C-40b).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Territory | reference to Territory | yes | The territory. |
+| User | reference(User) | yes | The member. Inactive users are skipped. |
+| Capacity | number | no | The most records of the territory they should own. Blank: no limit. |
+| Active | boolean | yes (defaults true) | Whether they take new records. |
+
+### Salesforce implementation
+
+- **Object:** `Territory_Member__c`, name field Auto Number (TM-{000000}), master-detail to
+  Territory (`Territory__c`, relationship Members), sharing Controlled by Parent. Members take
+  turns in name order.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Territory | `Territory__c` | Master-Detail(Territory) |
+| User | `User__c` | Lookup(User), required |
+| Capacity | `Capacity__c` | Number(9, 0) |
+| Active | `Active__c` | Checkbox, default true |
+
+---
+
+## 29TM4. Territory Run
+
+### Definition
+
+One preview or assignment of territories and owners, and what it found or did.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Mode | picklist | yes | Preview or Assign. |
+| Only Unassigned | boolean | yes (defaults false) | Checks only records with no territory (the nightly step). |
+| Status | picklist | yes | Queued, Running, Done or Failed. |
+| Checked | number | no | Records read. |
+| Changes | number | no | Records that would change (Preview) or changed (Assign). |
+| Failed | number | no | Records the platform refused. |
+| Summary | long text | no | Counts by territory and owner, No Room, and up to 50 sample changes, as JSON. |
+| Data Job | text | no | The Core data job (`Import_Batch__c`) an Assign run wrote, for its undo. |
+| Message | text | no | Why a run failed. |
+| Completed At | datetime | no | When it finished. |
+
+### Rules
+
+**R-TM4 Assign is undoable.** An Assign run writes each change's before and after values to the
+import journal (R-IJ2) under one data job, operation Update, so Undo (here or in Data Manager)
+puts back territory and owner where nobody changed them since (R-BU5). One run at a time.
+
+### Salesforce implementation
+
+- **Object:** `Territory_Run__c`, name field Auto Number (RUN-{000000}), sharing Public Read
+  Only.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Mode | `Mode__c` | Picklist (Preview, Assign), restricted, required |
+| Only Unassigned | `Only_Unassigned__c` | Checkbox, default false |
+| Status | `Status__c` | Picklist (Queued, Running, Done, Failed), restricted, required |
+| Checked | `Checked__c` | Number(9, 0) |
+| Changes | `Changes__c` | Number(9, 0) |
+| Failed | `Failed__c` | Number(9, 0) |
+| Summary | `Summary_JSON__c` | Long Text Area(131072) |
+| Data Job | `Data_Job_Id__c` | Text(18) |
+| Message | `Message__c` | Text(255) |
+| Completed At | `Completed_At__c` | Date/Time |
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -15946,6 +16127,7 @@ mirrors the primary member).
 | 1.11 | 2026-11-11 | Gift details and wealth screening (G-21, G-31, G-32, D-156). Five attributes added to Gift (`Stock_Symbol__c`, `Stock_Shares__c`, `Planned_Gift_Type__c`, `Gift_Source__c`, `Gift_Source_Name__c`), rule R-G17, and the packaged report DAF and Stock Gifts This Year. New Section 25U Wealth screening data, rules R-WS1 to R-WS3: five attributes added to Contact (`Capacity_Rating__c`, `Affinity_Rating__c`, `Screening_Score__c`, `Screening_Date__c`, `Screening_Source__c`), hidden from Giving Read Only, and the shipped import template Wealth Screening. |
 | 1.12 | 2026-11-11 | Corporate Hub board governance (CH-09 to CH-20, PB-02; ADR-NEXT `NEXT-corporate-hub-board-governance.md`). New Sections 29CH7 Board (`Board__c`), 29CH8 Board Member (`Board_Member__c`), 29CH9 Board Meeting (`Board_Meeting__c`), 29CH10 Meeting Attendee (`Meeting_Attendee__c`), 29CH11 Board Motion (`Board_Motion__c`), 29CH12 Board Vote (`Board_Vote__c`), 29CH13 Action Item (`Meeting_Action_Item__c`), 29CH14 Board Self-Assessment (`Board_Assessment__c`) and 29CH15 Assessment Answer (`Assessment_Answer__c`). Library Document gains Ask Every Year (`Annual__c`); Policy Acknowledgment gains `Disclosure__c`, `Conflict_Disclosed__c` and `Answered_In_Portal__c` (R-PAK1, R-PAK3, R-PAK4); Corporate Hub Settings gains `Board_Demographics__c` (false). |
 | 1.13 | 2026-11-11 | Donor panel in Quick Gift Entry (G-33). No object or field added. `GiftDonorPanelController` reads, in user mode, the chosen donor's household (through `HouseholdService`), `Total_Giving__c` and `Last_Gift_Date__c`, the last three gifts, and the donor's Active or Paused commitments with each one's next open scheduled payment. Read only; it writes nothing. |
+| 1.16 | 2026-11-11 | Territory Management module (C-40, C-40b; ADR-NEXT `NEXT-territory-management-module.md`). New Sections 29TM1 Territory (`Territory__c`, with the Territory lookup `Territory__c` on Account and Contact), 29TM2 Territory Rule (`Territory_Rule__c`), 29TM3 Territory Member (`Territory_Member__c`) and 29TM4 Territory Run (`Territory_Run__c`); rules R-TM1 to R-TM4. |
 
 ---
 ## 32. Entity ownership by package
@@ -16110,6 +16292,10 @@ included; standard objects the packages extend are named by the entity that gove
 | Action Item | Corporate Hub | 1.10 (CH-16) | 29CH13 |
 | Board Self-Assessment | Corporate Hub | 1.14 (CH-19) | 29CH14 |
 | Assessment Answer | Corporate Hub | 1.14 (CH-19) | 29CH15 |
+| Territory | Territory Management | 1.16 (C-40) | 29TM1 |
+| Territory Rule | Territory Management | 1.16 (C-40) | 29TM2 |
+| Territory Member | Territory Management | 1.16 (C-40b) | 29TM3 |
+| Territory Run | Territory Management | 1.16 (C-40) | 29TM4 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
@@ -16138,6 +16324,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and `FormsAccessSync` (ADR-0175 `0175-forms-module.md`). No app (D-188, ADR-0192 module tabs in the BarnCRM apps): the Forms and Form Submissions tabs join BarnCRM and BarnCRM Console at deploy; the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
 | Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-0175 `0175-forms-module.md` decision 9) |
 | Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and `CorporateHubAccessSync` (ADR-NEXT `NEXT-corporate-hub-module.md`). No app (ADR-0192): the Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs join BarnCRM and BarnCRM Console |
+| Permission sets (Admin, Staff, Read Only), Territory Management tab, nightly assignment step | Territory Management | Metadata, `TerritoryAccessSync` and `TerritoryNightlyJobProvider` (ADR-NEXT `NEXT-territory-management-module.md`). No app (ADR-0192): the Territory Management tab joins the BarnCRM admin apps |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror was brought forward from v0.9 to v0.6 and is built in release

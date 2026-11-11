@@ -160,6 +160,12 @@ public with sharing class ModuleManagerService {
 			'Meeting_Action_Item__c',
 			'Meeting_Attendee__c',
 			'Policy_Acknowledgment__c'
+		},
+		'Territory' => new List<String>{
+			'Territory__c',
+			'Territory_Member__c',
+			'Territory_Rule__c',
+			'Territory_Run__c'
 		}
 	};
 
@@ -176,7 +182,8 @@ public with sharing class ModuleManagerService {
 		'ContactPoints' => 'Contact_Point_Sync_Admin',
 		'Events' => 'Events_Admin',
 		'Portal' => 'Portal_Admin',
-		'CorporateHub' => 'Corporate_Hub_Admin'
+		'CorporateHub' => 'Corporate_Hub_Admin',
+		'Territory' => 'Territory_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */

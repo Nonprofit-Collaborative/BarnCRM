@@ -48,7 +48,8 @@ public class TestUsers {
 		'Contact_Point_Sync_Admin',
 		'Events_Admin',
 		'Portal_Admin',
-		'Corporate_Hub_Admin'
+		'Corporate_Hub_Admin',
+		'Territory_Admin'
 	};
 
 	/**

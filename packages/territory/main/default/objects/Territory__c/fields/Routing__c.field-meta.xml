@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Routing__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Who owns a record that moves into this territory: its owner stays, the territory owner, the members in turn, or the member with the most room.</inlineHelpText>
+  <label>Routing</label>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Keep Owner</fullName>
+        <default>true</default>
+        <label>Keep Owner</label>
+      </value>
+      <value>
+        <fullName>Territory Owner</fullName>
+        <default>false</default>
+        <label>Territory Owner</label>
+      </value>
+      <value>
+        <fullName>Round Robin</fullName>
+        <default>false</default>
+        <label>Round Robin</label>
+      </value>
+      <value>
+        <fullName>Capacity</fullName>
+        <default>false</default>
+        <label>Capacity</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

@@ -149,6 +149,9 @@ CAPS = {
     # measured, plus about 2%. Board governance (CH-09 to CH-20, PB-02): HubBoard, the board and
     # meeting panel controller and the board portal actions, 51,443 measured, plus about 2%.
     "corporatehub": 52_500,
+    # Territory Management (C-40, C-40b, ADR-NEXT territory management module): the model PR
+    # ships no Apex (0 measured); the Apex PR sets the cap from its measured size.
+    "territory": 1_000,
     "mirror": 182_000,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
