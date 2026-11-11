@@ -12171,6 +12171,9 @@ government award fields (F-04) describe a government award (R-GN10).
 | Federal Agency | text | no | The federal agency the money comes from, also when it reaches the organization through a pass-through. |
 | Indirect Cost Rate | percent | no | The indirect (overhead) rate the award allows, from 0 to 100 (R-GN10). |
 | Match Required | currency | no | The cost share or match the award requires the organization to put in; blank when none (R-GN10). |
+| Funding Listing Link | url | no | The opportunity's page on Grants.gov, set by Save to Pipeline in the Grant Finder (F-09, R-GN11). |
+| Renewable | boolean | yes (defaults false) | The funder may renew the award; an awarded grant marked Renewable gets a renewal requirement (F-13, R-GN12). |
+| Renewal Of | reference(Grant) | no | The earlier grant this one renews (F-13, R-GN12). |
 
 ### Relationships
 
@@ -12180,6 +12183,8 @@ government award fields (F-04) describe a government award (R-GN10).
 - **Grant to Grant Requirement**, one to many; the requirement is a detail of the grant (R-GN6).
 - **Grant to Restricted Fund Entry** (29ZL) and **Grant to Grant Payment** (29ZM), one to many,
   each a detail of the grant (R-GN6).
+- **Grant to Grant Budget Line** (29ZO2), one to many, a detail of the grant (R-GN6).
+- **Grant to Grant** (Renewal Of), many to one, optional; deleting the earlier grant empties it.
 
 ### Rules
 
@@ -12237,6 +12242,25 @@ current fiscal year from records already kept, with no object of its own:
 Giving is read by describe only; without it, or without access to it, the dashboard shows the
 grant figures alone. Every read runs in user mode, so a person sees totals of what they can read.
 
+**R-GN11 The Grant Finder saves a prospect (F-09, ADR-NEXT funders grant finder and grant
+management).** A search runs against the public Grants.gov search API, no key, only while the
+Grant Finder setting is on (R-FS2). Save to Pipeline makes a grant at Prospect: the opportunity's
+title (cut to 80 characters), close date as Application Deadline, Funding Source Federal, the
+agency as Federal Agency, the first assistance listing number when it has the R-GN10 shape, and
+the opportunity's page as Funding Listing Link. The funder is the organization of the agency's
+exact name the person can read, or a new organization on the organization record type. A result
+whose link is already on a grant shows as saved.
+
+**R-GN12 Renewals (F-13).** An Awarded grant marked Renewable with an Award End Date has one open
+requirement of type Renewal, due Renewal Lead Days (R-FS2) before the end date and never before
+today; a moved end date moves its due date. A switchable automation (registry row
+`Grant_Renewal`); a grant that already has a renewal gets none. Start Renewal makes the next grant
+at Prospect: same funder, funder contact, purpose, program, Giving fund, funding source,
+restricted flag, payment frequency and government award fields, Renewable on, Amount Requested
+the amount awarded (or requested when none was awarded), Renewal Of this grant, and a copy of the
+budget lines with the awarded amount as the new request. The open Renewal requirement becomes
+Done. The renewal history is the chain of Renewal Of links both ways, at most 20 grants.
+
 ### Salesforce implementation
 
 - **Object:** `Grant__c`, name field Text, label Grant Name, sharing Public Read/Write, field
@@ -12273,7 +12297,18 @@ grant figures alone. Every read runs in user mode, so a person sees totals of wh
 | Federal Agency | `Federal_Agency__c` | Text(255) |
 | Indirect Cost Rate | `Indirect_Cost_Rate__c` | Percent(5, 2) |
 | Match Required | `Match_Required__c` | Currency(16, 2) |
+| Funding Listing Link | `Opportunity_Url__c` | URL(255) |
+| Renewable | `Renewable__c` | Checkbox, default false |
+| Renewal Of | `Renewal_Of__c` | Lookup to `Grant__c`, delete constraint SetNull, relationship name Renewals |
 
+- **Grant management (F-09 to F-13):** `GrantFinder` (the Grants.gov callout through the packaged
+  Remote Site Setting `BarnCRM_Grants_Gov`, and Save to Pipeline) and `GrantFinderController`
+  serve the `grantFinder` component on the `Grant_Finder` tab; `GrantManagementService`
+  (checklists, renewal requirements, Start Renewal) runs from `GrantChecklistHandler` (registry
+  row `Grant_Checklist`) and `GrantRenewalHandler` (registry row `Grant_Renewal`), both switchable;
+  `GrantManagementController` (thin) serves the `grantChecklist`, `grantDocuments`, `grantBudget`
+  and `grantRenewals` cards on the Grant record page; their arithmetic is in the framework-free
+  `grantManagementModel.js`.
 - **Validation rules:** `Amounts_Not_Negative`, `Award_End_After_Start` (R-GN2);
   `Assistance_Listing_Format`, `Indirect_Cost_Rate_In_Range`, `Match_Not_Negative` (R-GN10). The
   government award fields sit in a Government Award section of the page layout.
@@ -12310,18 +12345,23 @@ member assigned, and BarnCRM reminds that person before it is due.
 |---|---|---|---|
 | Name | text | yes | What is due, for example "Year 1 interim report". |
 | Grant | reference(Grant) | yes | The grant it belongs to. A requirement is a detail of its grant. |
-| Type | picklist(Narrative Report, Financial Report, Deliverable, Site Visit, Other) | yes (defaults Narrative Report) | What kind of obligation it is. |
+| Type | picklist(Narrative Report, Financial Report, Deliverable, Site Visit, Letter of Inquiry, Application, Task, Renewal, Other) | yes (defaults Narrative Report) | What kind of obligation it is. Letter of Inquiry, Application and the two reports are documents (R-GQ8); Task is a checklist step (R-GQ7); Renewal is the renewal application (R-GN12). |
 | Due Date | date | yes | When the funder expects it. |
-| Status | picklist(Not Started, In Progress, Submitted, Accepted, Waived) | yes (defaults Not Started) | Where it stands. Not Started and In Progress are open (R-GQ1). |
+| Status | picklist(Not Started, In Progress, Submitted, Accepted, Waived, Done) | yes (defaults Not Started) | Where it stands. Not Started and In Progress are open (R-GQ1). |
 | Submitted Date | date | no | When it went to the funder (R-GQ2). |
 | Assigned To | reference(User) | no | The staff member doing it. Reminders go to them, or to the grant's owner (R-GQ3). |
 | Instructions | long text | no | What the funder asks for: the template, the portal, the questions. |
 | Reminder Sent For | date | no (set by BarnCRM) | The due date the last reminder was made for (R-GQ3). |
 | Logic Model Outcome | record identifier (text) | no | The Logic Models outcome or output this requirement reports on, when Logic Models is installed (L-06, R-GQ6). A record identifier, not a reference: neither module depends on the other. |
+| Checklist Item | reference(Grant Checklist Item) | no (set by BarnCRM) | The checklist item this task was made from (R-GQ7). |
 
 ### Relationships
 
 - **Grant Requirement to Grant**, many to one, as a detail of the grant.
+- **Grant Requirement to Grant Checklist Item** (29ZO1), many to one, optional; deleting the item
+  empties it and keeps the task.
+- **Grant Requirement to Salesforce Files**: a document's files are Files linked to the
+  requirement (R-GQ8).
 - **Grant Requirement to Logic Model Element** (29ZD), many to one, optional, by record
   identifier only (R-GQ6); many requirements, across grants, can name one outcome.
 - **Grant Requirement to User** (Assigned To), many to one, optional; a deactivated user stays
@@ -12329,8 +12369,8 @@ member assigned, and BarnCRM reminds that person before it is due.
 
 ### Rules
 
-**R-GQ1 Open and done.** Not Started and In Progress are open; Submitted, Accepted and Waived are
-done. Only open requirements are reminded, counted overdue or listed as upcoming.
+**R-GQ1 Open and done.** Not Started and In Progress are open; Submitted, Accepted, Waived and Done
+are done. Only open requirements are reminded, counted overdue or listed as upcoming.
 
 **R-GQ2 The submitted date is stamped.** Moving to Submitted or Accepted fills an empty Submitted
 Date with today. A switchable automation of its own, `Grant_Requirement_Dates`, beside the
@@ -12362,6 +12402,19 @@ targets and results for the periods that overlap the award period (all periods w
 no award period), and shows an outcome it cannot find as missing. Any requirement type can name an
 outcome; Deliverable and Narrative Report are the usual ones.
 
+**R-GQ7 Checklists by stage (F-10).** When a grant is created at, or moves to, a stage, each active
+Grant Checklist Item of that stage not already on the grant becomes a requirement of type Task:
+the item's name and instructions, Assigned To the item's person (blank: none, so reminders go to
+the grant's owner), due Days Before Deadline before the Application Deadline and never before
+today, or 14 days from today when the grant has no deadline. A switchable automation (registry row
+`Grant_Checklist`); Add Checklist Tasks on the Checklist card does the same for the grant's current
+stage. Ticking a task there sets Done; unticking it sets Not Started.
+
+**R-GQ8 Documents are requirements with files (F-11).** Letter of Inquiry, Application, Narrative
+Report and Financial Report requirements are the grant's documents. Their files are Salesforce
+Files linked to the requirement, read in user mode; the version shown is the latest file's own
+version number. Uploading needs edit access to the requirement.
+
 ### Salesforce implementation
 
 - **Object:** `Grant_Requirement__c`, name field Text, label Requirement Name, sharing Controlled
@@ -12370,14 +12423,15 @@ outcome; Deliverable and Narrative Report are the usual ones.
 | Attribute | API name | Type |
 |---|---|---|
 | Grant | `Grant__c` | Master-Detail to `Grant__c`, relationship name Requirements |
-| Type | `Type__c` | Picklist (restricted): Narrative Report (default), Financial Report, Deliverable, Site Visit, Other; required |
+| Type | `Type__c` | Picklist (restricted): Narrative Report (default), Financial Report, Deliverable, Site Visit, Letter of Inquiry, Application, Task, Renewal, Other; required |
 | Due Date | `Due_Date__c` | Date, required |
-| Status | `Status__c` | Picklist (restricted): Not Started (default), In Progress, Submitted, Accepted, Waived; required |
+| Status | `Status__c` | Picklist (restricted): Not Started (default), In Progress, Submitted, Accepted, Waived, Done; required |
 | Submitted Date | `Submitted_Date__c` | Date |
 | Assigned To | `Assigned_To__c` | Lookup to User, delete constraint SetNull, relationship name Grant_Requirements |
 | Instructions | `Instructions__c` | Long Text Area(32768) |
 | Reminder Sent For | `Reminder_Sent_For__c` | Date, read only in every permission set but Funders Admin |
 | Logic Model Outcome | `Outcome_Id__c` | Text(18) |
+| Checklist Item | `Checklist_Item__c` | Lookup to `Grant_Checklist_Item__c`, delete constraint SetNull, relationship name Tasks; read only in every permission set but Funders Admin |
 
 - **Trigger:** `GrantRequirementTrigger`, through the Core dispatcher; handlers
   `GrantRequirementDatesHandler` (R-GQ2, registry row `Grant_Requirement_Dates`, switchable) and
@@ -12405,11 +12459,16 @@ The Funders module's org-wide settings (F-02), edited in the Funders section of 
 | Create reminder tasks | boolean | yes (defaults true) | Whether the morning job makes a task for each requirement coming due (R-GQ3). |
 | Email reminders | boolean | yes (defaults false) | Whether the morning job also emails the person reminded. |
 | Days before a deadline to remind | number | yes (defaults 14) | The lead time, from 1 to 90 days (R-FS1). |
+| Grant Finder | boolean | yes (defaults true) | Whether the Grant Finder tab searches Grants.gov (R-GN11). |
+| Days before an award ends to renew | number | yes (defaults 90) | When the renewal requirement is due, from 1 to 365 days before the award ends (R-GN12). |
 
 ### Rules
 
 **R-FS1 A value out of range reads as the default.** A blank or out of range lead time reads as
 14; a never-saved setting reads as its shipped value.
+
+**R-FS2 The grant management settings (F-09, F-13).** Grant Finder off: the tab says it is off and
+searches nothing. A blank or out of range renewal lead time reads as 90.
 
 ### Salesforce implementation
 
@@ -12421,9 +12480,12 @@ The Funders module's org-wide settings (F-02), edited in the Funders section of 
 | Create reminder tasks | `Reminder_Tasks_Enabled__c` | Checkbox, default true |
 | Email reminders | `Reminder_Emails_Enabled__c` | Checkbox, default false |
 | Days before a deadline to remind | `Reminder_Lead_Days__c` | Number(2, 0), default 14 |
+| Grant Finder | `Grant_Finder_Enabled__c` | Checkbox, default true |
+| Days before an award ends to renew | `Renewal_Lead_Days__c` | Number(3, 0), default 90 |
 
 - **Setting Definitions:** `Funders_Reminder_Tasks_Enabled`, `Funders_Reminder_Emails_Enabled`,
-  `Funders_Reminder_Lead_Days`, section Funders.
+  `Funders_Reminder_Lead_Days`, `Funders_Grant_Finder_Enabled`, `Funders_Renewal_Lead_Days`,
+  section Funders.
 
 ---
 
@@ -12448,6 +12510,7 @@ postings.
 | Entry Date | date | yes (defaults today) | When it happened. |
 | Description | text | no | What it was, for example "Q1 tutor salaries". |
 | Payment | reference(Grant Payment) | no (set by BarnCRM) | The received payment this entry records (R-GP3). Empty on an entry typed by hand. |
+| Budget Line | reference(Grant Budget Line) | no | The budget line a Spent entry pays for (F-12, R-FE3). |
 
 ### Relationships
 
@@ -12464,6 +12527,9 @@ from the balance.
 of the entries of each type, kept by the platform; the balance is Received minus Spent minus
 Released and may be below zero (a reimbursement grant is spent before it is paid).
 
+**R-FE3 A budget line is the same grant's.** An entry's Budget Line belongs to the entry's grant
+(a validation rule); only Spent entries count toward a line (R-BL2).
+
 ### Salesforce implementation
 
 - **Object:** `Grant_Fund_Entry__c`, label Restricted Fund Entry, name field Auto Number
@@ -12478,8 +12544,9 @@ Released and may be below zero (a reimbursement grant is spent before it is paid
 | Entry Date | `Entry_Date__c` | Date, required, default today |
 | Description | `Description__c` | Text(255) |
 | Payment | `Grant_Payment__c` | Lookup to `Grant_Payment__c`, delete constraint SetNull, relationship name Fund_Entries; read only in every permission set but Funders Admin |
+| Budget Line | `Budget_Line__c` | Lookup to `Grant_Budget_Line__c`, delete constraint SetNull, relationship name Fund_Entries |
 
-- **Validation rule:** `Amount_Above_Zero` (R-FE1).
+- **Validation rules:** `Amount_Above_Zero` (R-FE1), `Budget_Line_Same_Grant` (R-FE3).
 
 ---
 
@@ -12669,6 +12736,90 @@ template is never changed by an upgrade (plan Section 4.8), so an edited one is 
   downloads the file. Nothing is saved.
 - **Permission sets:** Funders Admin creates, edits and deletes templates; Funders Staff and
   Funders Read Only read them and merge reports.
+
+---
+
+## 29ZO1. Grant Checklist Item
+
+### Definition
+
+One step of an application checklist, kept once and added to each grant that reaches its stage
+(F-10, ADR-NEXT funders grant finder and grant management): for example "Ask the program officer
+about fit" at Prospect, or "Upload the board list" at Applied.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The task, as it appears on the grant. |
+| Stage | picklist(Prospect, Letter of Inquiry, Invited to Apply, Applied, Awarded) | yes (defaults Prospect) | The grant stage that adds it. |
+| Days Before Deadline | number | no | How many days before the Application Deadline it is due; blank is the deadline itself (R-GQ7). |
+| Assigned To | reference(User) | no | Who does it; blank leaves the task unassigned, so reminders go to the grant's owner. |
+| Instructions | long text | no | Copied to the task. |
+| Active | boolean | yes (defaults true) | Only active items are added. |
+
+### Rules
+
+Added to grants by R-GQ7. Changing or deleting an item leaves the tasks already made alone.
+
+### Salesforce implementation
+
+- **Object:** `Grant_Checklist_Item__c`, name field Text (label Task), sharing Public Read Only,
+  tab Grant Checklist (in the Funders app).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Stage | `Stage__c` | Picklist (restricted): Prospect (default), Letter of Inquiry, Invited to Apply, Applied, Awarded; required |
+| Days Before Deadline | `Days_Before_Deadline__c` | Number(3, 0) |
+| Assigned To | `Assigned_To__c` | Lookup to User, delete constraint SetNull, relationship name Grant_Checklist_Items |
+| Instructions | `Instructions__c` | Long Text Area(32768) |
+| Active | `Active__c` | Checkbox, default true |
+
+- **Permission sets:** Funders Admin creates, edits and deletes items; Funders Staff and Funders
+  Read Only read them.
+
+---
+
+## 29ZO2. Grant Budget Line
+
+### Definition
+
+One line of a grant's budget (F-12): what was asked for and what the funder awarded for, for
+example Personnel or Supplies. Spent restricted fund entries (29ZL) may name their line, so the
+grant's Budget card shows spending against each line.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The budget category. |
+| Grant | reference(Grant) | yes | The grant. A detail of the grant. |
+| Amount Requested | currency | no | What the application asked for on this line. |
+| Amount Awarded | currency | no | What the funder awarded for it. |
+
+### Rules
+
+**R-BL1 Amounts are not negative.** A validation rule.
+
+**R-BL2 Spent is summed, not stored.** A line's spent is the sum of the grant's Spent entries
+that name it, worked out when the card loads in user mode. The card compares the lines' totals
+with the grant's Amount Requested and Amount Awarded and shows Spent entries naming no line as
+unassigned.
+
+### Salesforce implementation
+
+- **Object:** `Grant_Budget_Line__c`, label Grant Budget Line, name field Text (label Line), sharing
+  Controlled By Parent, no tab (the grant's related list).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Grant | `Grant__c` | Master-Detail to `Grant__c`, relationship name Budget_Lines, not reparentable |
+| Amount Requested | `Amount_Requested__c` | Currency(16, 2) |
+| Amount Awarded | `Amount_Awarded__c` | Currency(16, 2) |
+
+- **Validation rule:** `Amounts_Not_Negative` (R-BL1).
+- **Permission sets:** Funders Admin and Funders Staff create, edit and delete lines; Funders Read
+  Only reads them.
 
 ---
 
@@ -15786,7 +15937,6 @@ mirrors the primary member).
 | 1.3 | 2026-11-07 | Portal templates for volunteers, speakers and donors (PB-03, PB-07, PB-08; ADR-0191 `0191-portal-templates-volunteer-speaker-donor.md`). No object or field added. R-PB2 gains a read-only `Parent__r.Contact__c` person link; Core's `PortalActionExtensions` lists the Volunteers and Event Management action classes. |
 | 1.3 | 2026-11-09 | Simpler permission sets, Core (ADR-NEXT, D-191, release N). No object or field added. Coordinator (`Volunteer_Coordinator`) retired: the Access page stops offering it and `RetiredRoleMigration` gives its active holders Team Member; R-BU6 and R-BD6: `BarnCRM_Bulk_Update` and `BarnCRM_Bulk_Delete` include `BarnCRM_Find_And_Export`'s grants; `BarnCRM_Admin` gains `BulkUpdateController`. Labels only: BarnCRM Admin (group), BarnCRM Admin Access, Staff Access and Read Only Access, and "BarnCRM Auto:" on the eleven tab, Households and app sets. |
 | 1.4 | 2026-11-11 | Forms and Logic Models announce themselves (C-72). No object or field added. Forms ships Setting Definition `Forms_Page` and Logic Models `Logic_Models_Page`: a Component row naming the module, in new console sections Forms and Logic Models, whose Open button opens the module's object tab. `BarnCRM_Module__mdt` `Probe_Object__c` is cleared for Forms and LogicModels, so only Rollup Builder keeps a probe. |
-| 1.5 | 2026-11-11 | Donor panel in Quick Gift Entry (G-33). No object or field added. `GiftDonorPanelController` reads, in user mode, the chosen donor's household (through `HouseholdService`), `Total_Giving__c` and `Last_Gift_Date__c`, the last three gifts, and the donor's Active or Paused commitments with each one's next open scheduled payment. Read only; it writes nothing. |
 | 1.5 | 2026-11-11 | Archive by Query (C-67, D-157). No object or field added. New rule R-BD9: a bulk delete whose records are first saved to Files by `FindExportBatch` in archive mode (every readable field, API name headings), the delete started from the export's finish on the same job, only of records not changed since the start (`archive.notChangedAfter` in the definition), and optionally emptied from the Recycle Bin after a second typed count (`archive.emptyRecycleBin`), which R-BD5's undo then refuses. |
 | 1.6 | 2026-11-11 | Generic Record Merge (C-62, D-156; extends ADR-0145). `BarnCRM_Settings__c` gains `Generic_Merge_Enabled__c` (false). `Merge_Rule__mdt` `Field_Name__c` may name `Object.Field`. Rules R-DP11 and R-DP12 added. No object added: merges are written to `Merge_Journal__c`. |
 | 1.7 | 2026-11-11 | Field History Keeper (C-68, D-157; ADR-NEXT `NEXT-field-history-keeper.md`). New Section 29FH1 Field History (`Field_History__c`, rules R-FH1 to R-FH5); custom metadata type `History_Field__mdt` (Section 13); `BarnCRM_Settings__c` gains `Field_History_Enabled__c` (false) and `Field_History_Retention_Days__c` (730). |
@@ -15795,6 +15945,7 @@ mirrors the primary member).
 | 1.10 | 2026-11-11 | Giving words and nightly jobs (G-36, G-37). No object or field added. Labels only: `Installment__c` is Scheduled Payment (plural Scheduled Payments, Name label Payment Number, list view All Scheduled Payments); the `Installment__c` lookups on Gift, Gift Batch Row and Pledge Reminder are labelled Scheduled Payment; Pledge Reminder's `Commitment__c` is labelled Commitment; `Commitment__c.Installments_Planned__c` is Payments Planned. The vocabulary is commitment (the record), pledge and recurring gift (its types), scheduled payment (each installment). The pledge reminder step (`BarnCRM Giving Pledge Reminders`, 03:15, shipped off) is now one of `GivingScheduler`'s five jobs: its Schedule and Stop switch it with the others and Run Now runs it; `GivingScheduler.isScheduled` still counts only the other four. |
 | 1.11 | 2026-11-11 | Gift details and wealth screening (G-21, G-31, G-32, D-156). Five attributes added to Gift (`Stock_Symbol__c`, `Stock_Shares__c`, `Planned_Gift_Type__c`, `Gift_Source__c`, `Gift_Source_Name__c`), rule R-G17, and the packaged report DAF and Stock Gifts This Year. New Section 25U Wealth screening data, rules R-WS1 to R-WS3: five attributes added to Contact (`Capacity_Rating__c`, `Affinity_Rating__c`, `Screening_Score__c`, `Screening_Date__c`, `Screening_Source__c`), hidden from Giving Read Only, and the shipped import template Wealth Screening. |
 | 1.12 | 2026-11-11 | Corporate Hub board governance (CH-09 to CH-20, PB-02; ADR-NEXT `NEXT-corporate-hub-board-governance.md`). New Sections 29CH7 Board (`Board__c`), 29CH8 Board Member (`Board_Member__c`), 29CH9 Board Meeting (`Board_Meeting__c`), 29CH10 Meeting Attendee (`Meeting_Attendee__c`), 29CH11 Board Motion (`Board_Motion__c`), 29CH12 Board Vote (`Board_Vote__c`), 29CH13 Action Item (`Meeting_Action_Item__c`), 29CH14 Board Self-Assessment (`Board_Assessment__c`) and 29CH15 Assessment Answer (`Assessment_Answer__c`). Library Document gains Ask Every Year (`Annual__c`); Policy Acknowledgment gains `Disclosure__c`, `Conflict_Disclosed__c` and `Answered_In_Portal__c` (R-PAK1, R-PAK3, R-PAK4); Corporate Hub Settings gains `Board_Demographics__c` (false). |
+| 1.13 | 2026-11-11 | Donor panel in Quick Gift Entry (G-33). No object or field added. `GiftDonorPanelController` reads, in user mode, the chosen donor's household (through `HouseholdService`), `Total_Giving__c` and `Last_Gift_Date__c`, the last three gifts, and the donor's Active or Paused commitments with each one's next open scheduled payment. Read only; it writes nothing. |
 
 ---
 ## 32. Entity ownership by package

@@ -112,6 +112,8 @@ public with sharing class ModuleManagerService {
 			'Funder_Report_Template__c',
 			'Grant__c',
 			'Grant_Answer__c',
+			'Grant_Budget_Line__c',
+			'Grant_Checklist_Item__c',
 			'Grant_Fund_Entry__c',
 			'Grant_Payment__c',
 			'Grant_Requirement__c'

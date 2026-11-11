@@ -96,7 +96,9 @@ CAPS = {
     "logicmodels": 65_000,
     # Raised from 95,000 for the Funders usability stage: Undo for Mark Received and Mark
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).
-    "funders": 100_500,
+    # Grant management (F-09 to F-13, release 1.11): 124,151 measured with the Grant Finder,
+    # checklists, documents, budget lines and renewals, plus about 2%.
+    "funders": 126_700,
     # Forms engine and builder (C-42a, D-157): submit service, server rules, thin controllers.
     # Batch C landing 2026-11-07: 42,867 measured (C-42a), plus about 2.5%.
     # C-42b public forms (guest intake, allowlist, processor, Health Check, REST): 70,142

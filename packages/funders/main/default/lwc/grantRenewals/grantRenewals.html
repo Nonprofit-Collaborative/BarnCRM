@@ -1,0 +1,56 @@
+<template>
+  <lightning-card title={t.title} icon-name={icon}>
+    <template lwc:if={canStart}>
+      <lightning-button
+        slot="actions"
+        data-id="start"
+        label={t.start}
+        disabled={starting}
+        onclick={handleStart}
+      ></lightning-button>
+    </template>
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={t.title} size="small"></lightning-spinner>
+      </template>
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
+      </template>
+      <template lwc:if={hasHistory}>
+        <ul class="slds-has-dividers_bottom-space">
+          <template for:each={chain} for:item="grant">
+            <li key={grant.id} data-id="grant" class="slds-item">
+              <template lwc:if={grant.current}>
+                <span class="slds-text-title_bold">{grant.name}</span>
+                <span data-id="this-grant" class="slds-text-color_weak"> ({t.thisGrant})</span>
+              </template>
+              <template lwc:else>
+                <a href={grant.url}>{grant.name}</a>
+              </template>
+              <p class="slds-text-body_small">
+                {grant.stage}.
+                <lightning-formatted-date-time
+                  value={grant.startDate}
+                  time-zone="UTC"
+                ></lightning-formatted-date-time>
+                {t.to}
+                <lightning-formatted-date-time
+                  value={grant.endDate}
+                  time-zone="UTC"
+                ></lightning-formatted-date-time
+                >.
+                <lightning-formatted-number
+                  value={grant.awarded}
+                  format-style="currency"
+                ></lightning-formatted-number>
+              </p>
+            </li>
+          </template>
+        </ul>
+      </template>
+      <template lwc:elseif={card}>
+        <p data-id="empty" class="slds-text-body_regular">{t.empty}</p>
+      </template>
+    </div>
+  </lightning-card>
+</template>

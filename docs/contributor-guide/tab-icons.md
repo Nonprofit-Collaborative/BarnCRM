@@ -39,6 +39,8 @@ Rules:
 | funders | Funders_Board | Custom100: TVWidescreen |
 | funders | Grant_Answer__c | Custom87: Safe |
 | funders | Grant_Calendar | Custom82: Whistle |
+| funders | Grant_Checklist_Item__c | Custom70: Handsaw |
+| funders | Grant_Finder | Custom80: Motorcycle |
 | funders | Grant_Pipeline | Custom92: Ship |
 | funders | Grant_Requirement__c | Custom84: Presenter |
 | funders | Grant__c | Custom8: Diamond |
@@ -137,9 +139,14 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | core | relationshipPanel | custom:custom37 | Relationship__c |
 | funders | fundersBoard | custom:custom100 | Funders_Board |
 | funders | grantAnswerLibrary | custom:custom87 | Grant_Answer__c |
+| funders | grantBudget | custom:custom8 | Grant__c |
 | funders | grantCalendar | custom:custom82 | Grant_Calendar |
+| funders | grantChecklist | custom:custom70 | Grant_Checklist_Item__c |
+| funders | grantDocuments | custom:custom84 | Grant_Requirement__c |
+| funders | grantFinder | custom:custom80 | Grant_Finder |
 | funders | grantLinkedRecord | custom:custom88 | Program__c |
 | funders | grantLinkedRecord | custom:custom42 | Fund__c |
+| funders | grantRenewals | custom:custom8 | Grant__c |
 | funders | grantOutcomes | custom:custom62 | Logic_Model__c |
 | funders | grantPipeline | custom:custom92 | Grant_Pipeline |
 | funders | grantReport | custom:custom99 | Funder_Report_Template__c |

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Amounts_Not_Negative</fullName>
+  <active>true</active>
+  <description>R-BL1: a budget line's amounts are not negative.</description>
+  <errorConditionFormula>OR(Amount_Requested__c &lt; 0, Amount_Awarded__c &lt; 0)</errorConditionFormula>
+  <errorMessage>A budget line's amounts can't be below zero.</errorMessage>
+</ValidationRule>

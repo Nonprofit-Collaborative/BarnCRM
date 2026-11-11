@@ -25,6 +25,14 @@ template](#funder-report-templates) turns a grant into a printable report, and t
 Dashboard](#the-board-dashboard-tab) shows your board the year's revenue mix, how concentrated it
 is and the restricted balances.
 
+To find and manage grants, the [Grant Finder](#the-grant-finder-tab) searches open federal
+opportunities on Grants.gov and saves one as a prospect, [application
+checklists](#application-checklists) add the same steps to every grant at each stage, the
+[Documents](#grant-documents) card keeps letters of inquiry, applications and reports with their
+files, the [Budget](#budget-lines) card compares the budget asked for with the award and the
+spending, and [Renewals](#renewals) remind you before a renewable award ends and start next
+year's application from it.
+
 ## Before You Install
 
 - Funders is offered in the **Nonprofit Edition** only (see [Editions](editions.md)).
@@ -44,8 +52,8 @@ finishes, BarnCRM does three things on its own:
 
 Then open the **BarnCRM Funders** app from the App Launcher. It opens on the **Board Dashboard**,
 the module's home. Its tabs are **Board Dashboard**, **Grant Pipeline**, **Grant Calendar**,
-**Grants**, **Grant Requirements**, **Grant Answers**,
-**Funder Report Templates** (admins only), **Reports** and **Error Log**; Grant Pipeline and
+**Grant Finder**, **Grants**, **Grant Requirements**, **Grant Answers**,
+**Funder Report Templates** (admins only), **Grant Checklist**, **Reports** and **Error Log**; Grant Pipeline and
 Grants also join the BarnCRM apps. The morning reminder job is a step of
 [BarnCRM Nightly Jobs](nightly-jobs.md), which a new install schedules; if Health Check says
 the nightly run is not scheduled, run its **Schedule all nightly jobs** fix once (see
@@ -246,15 +254,15 @@ page, in the **Requirements** list, click **New**:
 | Field | What to put |
 |---|---|
 | Requirement Name | What is due, for example "Year 1 interim report". |
-| Type | Narrative Report (the default), Financial Report, Deliverable, Site Visit or Other. |
+| Type | Narrative Report (the default), Financial Report, Deliverable, Site Visit, Letter of Inquiry, Application, Task (a checklist step), Renewal or Other. |
 | Due Date | When the funder expects it. Required. |
-| Status | Not Started (the default), In Progress, Submitted, Accepted or Waived. |
+| Status | Not Started (the default), In Progress, Submitted, Accepted, Waived or Done. |
 | Assigned To | The staff member doing it. Reminders go to them. |
 | Instructions | What the funder asks for: the template, the portal, the questions. |
 | Submitted Date | Filled in with today when the status becomes Submitted or Accepted, unless you typed a date. |
 | Reminder Sent For | Set by BarnCRM: the due date the last reminder was made for. |
 
-Not Started and In Progress are open; Submitted, Accepted and Waived are done. The automation
+Not Started and In Progress are open; Submitted, Accepted, Waived and Done are done. The automation
 **Requirement: fill in the submitted date** on the [Automation](automation-control.md) page fills in the
 Submitted Date; switch it off while you load past requirements with their own dates.
 
@@ -340,6 +348,81 @@ Every value is written as text, so a grant name with `<` or `&` cannot break the
 with no value becomes empty, and anything else in braces stays as you typed it. An upgrade never
 changes a template you already have; delete the shipped one and run Finish Setup to get it back.
 
+## The Grant Finder Tab
+
+The **Grant Finder** tab searches open federal funding opportunities on
+[Grants.gov](https://www.grants.gov), a free public service that needs no account or key. Type
+words (for example "literacy" or "after school"), choose **Posted** (open now), **Forecasted**
+(announced, not open yet) or both, and click **Search**. Each result shows its title, agency,
+opportunity number, open and close dates and assistance listing number, with a link to its
+Grants.gov page.
+
+**Save to Pipeline** makes a grant at **Prospect** with the title as its name, the close date as
+**Application Deadline**, **Funding Source** Federal, the agency as **Federal Agency** and the
+first assistance listing number. The funder is the organization with the agency's exact name, or
+a new organization when you have none. A result already saved shows **Saved** with a link to its
+grant. Saving needs permission to create grants (Funders Admin or Staff).
+
+Only the words you search leave your org. BarnCRM installs the Remote Site Setting
+**BarnCRM_Grants_Gov** (`https://api.grants.gov`) so the search works without a Setup step; keep
+it active in Setup, **Remote Site Settings**. To hide the search, turn **Grant Finder** off in
+[Settings](#settings). Paid grant directories are not built in: BarnCRM adds no paid service.
+
+## Application Checklists
+
+A **Grant Checklist Item** is one step you take on every application at a stage, for example
+"Ask the program officer about fit" at Prospect or "Attach the board list" at Applied. Admins
+keep them on the **Grant Checklist** tab:
+
+| Field | What to put |
+|---|---|
+| Task | The step, as it appears on each grant. |
+| Stage | Prospect, Letter of Inquiry, Invited to Apply, Applied or Awarded. |
+| Days Before Deadline | How many days before the grant's Application Deadline it is due; blank is the deadline itself. |
+| Assigned To | Who does it on every grant; blank leaves it to the grant's owner. |
+| Instructions | Copied to each task. |
+| Active | Only active items are added. |
+
+When a grant is created at, or moves to, a stage, BarnCRM adds each active item of that stage as
+a requirement of type **Task**, once per grant. A task is never due before today, and a grant
+with no deadline gets it due in 14 days. Tasks are reminded like any requirement. The automation
+**Grant: add checklist tasks** on the [Automation](automation-control.md) page does this; switch
+it off while you import grants. **Add Checklist Tasks** on a grant's **Checklist** card adds any
+missing ones for its current stage. Changing or deleting an item leaves tasks already made alone.
+
+## Grant Documents
+
+Letters of inquiry, applications and reports are requirements of type **Letter of Inquiry**,
+**Application**, **Narrative Report** or **Financial Report**. Their files are Salesforce Files on
+the requirement. The **Documents** card on a grant's **Writing** tab lists them with their status,
+due and submitted dates and latest file, with the file's version number; **Upload** adds a file.
+For a new draft, open the file and use **Upload New Version**, so the version number goes up and
+the history stays on the file. Files count against your org's file storage. Uploading needs edit
+access to the requirement.
+
+## Budget Lines
+
+On a grant's **Money** tab, add the budget's lines in the **Budget Lines** list (for example
+Personnel, Supplies), each with **Amount Requested** and, once awarded, **Amount Awarded**. A
+**Spent** restricted fund entry can name its **Budget Line**. The **Budget** card shows each
+line's requested, awarded, spent and remaining amounts, the line totals against the grant's
+Amount Requested and Amount Awarded (flagged when they differ), and spending not on a line.
+Funders Admin and Staff add and change lines; Read Only sees them.
+
+## Renewals
+
+Tick **Renewable** on an award the funder may renew. Once the grant is **Awarded** and has an
+**Award End Date**, BarnCRM adds one **Renewal** requirement due 90 days before the end date (the
+**Days before an award ends to renew** setting; never before today), so it is reminded
+like any requirement; moving the end date moves it. The automation is **Grant: add the renewal
+requirement** on the Automation page.
+
+**Start Renewal** on the grant's **Renewals** card makes next cycle's grant at Prospect: the same
+funder, contact, purpose, program, Giving fund, funding source, restricted flag, payment frequency
+and government award fields, the amount awarded as the new request, a copy of the budget lines,
+and **Renewal Of** naming this grant. The Renewal requirement becomes Done. The card lists every
+grant in the chain, earlier and later, with its award period and amounts.
+
 ## Settings
 
 Open **BarnCRM Settings**, **Funders** (under Fundraising). Each setting saves for the whole
@@ -350,6 +433,8 @@ organization.
 | Create reminder tasks | On | Makes the reminder task. |
 | Email reminders | Off | Also sends the reminder email. |
 | Days before a deadline to remind | 14 | How many days before a requirement is due its reminder goes out, from 1 to 90. |
+| Grant Finder | On | Whether the Grant Finder tab searches Grants.gov. |
+| Days before an award ends to renew | 90 | When a renewable award's Renewal requirement is due, from 1 to 365 days before the award ends. |
 
 Tasks ship on, because a missed funder report can cost the next award and a task goes only to the
 person doing the work. Emails ship off, like shift and pledge reminders: BarnCRM sends no email
@@ -439,7 +524,8 @@ without the app's header and navigation.
 **Load Sample Data** in BarnCRM Settings also loads three sample grants to Core's sample
 organizations (one Applied, one Awarded, one Prospect), three requirements on the award, a
 two-payment schedule with the first payment received, and a restricted ledger with that payment's
-Received entry and one Spent entry. **Remove Sample Data** takes them away again. See
+Received entry and one Spent entry, and two budget lines on the award (the Spent entry is on
+the first). **Remove Sample Data** takes them away again. See
 [Sample data](sample-data.md).
 
 ## Turning It Off
@@ -476,6 +562,14 @@ Do this as Maria, who holds the Admin role, with a second user, Dana, who has no
 12. Back on the grant, click **Mark Received** on the first payment. **Amount Received** and
     **Restricted Received** show 12,500, and the **Restricted Fund Entries** list has its Received
     entry. Add a Spent entry of 2,000: **Restricted Balance** shows 10,500.
+13. On **Grant Checklist**, add "Ask the program officer about fit", Stage **Prospect**, Days
+    Before Deadline 7. Open **Grant Finder**, search "literacy" and click **Save to Pipeline** on
+    a result: the new grant is at Prospect and its **Checklist** card shows the task.
+14. On the 2027 Literacy Grant, add a budget line "Tutors", requested and awarded 20,000, and set
+    the Spent entry's **Budget Line** to it: the **Budget** card shows 2,000 spent of 20,000.
+15. Tick **Renewable**: a **Renewal** requirement appears, due 90 days before the award ends.
+    Click **Start Renewal** on the **Renewals** card: the new grant is at Prospect, asks 25,000
+    and both grants are listed on its Renewals card.
 
 ## Common Mistakes
 
@@ -483,3 +577,7 @@ Do this as Maria, who holds the Admin role, with a second user, Dana, who has no
   foundation as an organization, with the family members as its contacts.
 - **Deleting a declined request.** Set Declined instead: the history is what tells you whom to ask
   again and when.
+- **Uploading each draft as a new file.** Use **Upload New Version** on the file instead, so the
+  Documents card shows one file with its version number.
+- **Creating next year's grant by hand.** Use **Start Renewal**, so the grants stay linked and the
+  Renewals card shows the history.

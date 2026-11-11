@@ -9,6 +9,18 @@ public with sharing class GrantRequirementService {
 	public static final String STATUS_SUBMITTED = 'Submitted';
 	public static final String STATUS_ACCEPTED = 'Accepted';
 	public static final String STATUS_WAIVED = 'Waived';
+	public static final String STATUS_DONE = 'Done';
+	/** R-GQ7: a checklist step. */
+	public static final String TYPE_TASK = 'Task';
+	/** R-GN12: the renewal application. */
+	public static final String TYPE_RENEWAL = 'Renewal';
+	/** R-GQ8: the requirement types that are documents with files. */
+	public static final List<String> DOCUMENT_TYPES = new List<String>{
+		'Letter of Inquiry',
+		'Application',
+		'Narrative Report',
+		'Financial Report'
+	};
 
 	/** R-GQ1: the open statuses; only these are reminded, counted overdue or listed. */
 	public static final List<String> OPEN_STATUSES = new List<String>{

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Checklist_Item__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The checklist item this task was made from, set by BarnCRM, so a grant gets each item once.</inlineHelpText>
+  <label>Checklist Item</label>
+  <referenceTo>Grant_Checklist_Item__c</referenceTo>
+  <relationshipLabel>Tasks</relationshipLabel>
+  <relationshipName>Tasks</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Open federal funding listings from Grants.gov, saved to the pipeline in one click.
+  </description>
+  <flexiPage>Grant_Finder</flexiPage>
+  <label>Grant Finder</label>
+  <motif>Custom80: Motorcycle</motif>
+</CustomTab>

@@ -1,0 +1,85 @@
+<template>
+  <lightning-card title={t.title} icon-name={icon} data-id="card">
+    <div class="slds-var-p-horizontal_medium">
+      <template lwc:if={isLoading}>
+        <lightning-spinner alternative-text={t.title} size="small"></lightning-spinner>
+      </template>
+      <template lwc:if={errorMessage}>
+        <p role="alert" data-id="error-message" class="slds-text-color_error">{errorMessage}</p>
+      </template>
+      <template lwc:if={isOff}>
+        <p data-id="off" class="slds-text-body_regular">{t.off}</p>
+      </template>
+      <template lwc:if={isOn}>
+        <p class="slds-text-body_small slds-var-m-bottom_small">{t.intro}</p>
+        <div class="slds-grid slds-wrap slds-grid_vertical-align-end slds-gutters_x-small">
+          <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2">
+            <lightning-input
+              type="search"
+              data-id="keyword"
+              label={t.search}
+              value={keyword}
+              onchange={handleKeyword}
+              onkeyup={handleKeyUp}
+            ></lightning-input>
+          </div>
+          <div class="slds-col">
+            <lightning-checkbox-group
+              data-id="statuses"
+              label={t.show}
+              options={statusOptions}
+              value={statuses}
+              onchange={handleStatuses}
+            ></lightning-checkbox-group>
+          </div>
+          <div class="slds-col">
+            <lightning-button
+              data-id="search"
+              variant="brand"
+              label={t.search}
+              disabled={searchDisabled}
+              onclick={handleSearch}
+            ></lightning-button>
+          </div>
+        </div>
+        <template lwc:if={noResults}>
+          <p data-id="empty" class="slds-var-m-top_medium slds-text-body_regular">{t.empty}</p>
+        </template>
+        <ul class="slds-has-dividers_bottom-space slds-var-m-top_medium">
+          <template for:each={rows} for:item="row">
+            <li key={row.key} data-id="listing" class="slds-item">
+              <div class="slds-grid slds-wrap slds-grid_align-spread">
+                <div class="slds-col slds-size_1-of-1 slds-medium-size_3-of-4">
+                  <a href={row.url} target="_blank" rel="noopener noreferrer" class="slds-text-title_bold">{row.title}</a>
+                  <p class="slds-text-body_small">{t.agency}: {row.agency}</p>
+                  <p class="slds-text-body_small slds-text-color_weak">
+                    {t.number}: {row.listingNumber}. {t.listing}: {row.assistanceListing}
+                  </p>
+                  <p class="slds-text-body_small slds-text-color_weak">
+                    {t.opens}:
+                    <lightning-formatted-date-time value={row.openDate} time-zone="UTC"></lightning-formatted-date-time>.
+                    {t.closes}:
+                    <lightning-formatted-date-time value={row.closeDate} time-zone="UTC"></lightning-formatted-date-time>
+                  </p>
+                </div>
+                <div class="slds-col slds-var-m-top_x-small">
+                  <template lwc:if={row.grantUrl}>
+                    <a data-id="saved" href={row.grantUrl}>{t.saved}</a>
+                  </template>
+                  <template lwc:elseif={row.canSave}>
+                    <lightning-button
+                      data-id={row.id}
+                      label={row.saveLabel}
+                      disabled={row.saving}
+                      onclick={handleSave}
+                    ></lightning-button>
+                  </template>
+                </div>
+              </div>
+            </li>
+          </template>
+        </ul>
+      </template>
+    </div>
+  </lightning-card>
+</template>
