@@ -423,6 +423,16 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Appeal__c.Donation_Form_Key__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
+    <field>Appeal__c.Donation_Page__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Appeal__c.Cost__c</field>
     <readable>true</readable>
   </fieldPermissions>

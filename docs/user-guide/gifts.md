@@ -153,6 +153,20 @@ You should see: on the employer's gift, the employee in **Soft Credits** as **Ma
 
 Quicker, when you enter the employer's gift in Quick Gift Entry: with the organization as donor, open **Matches an Employee's Gift** under **Fund** and choose the employee's gift from the list (gifts from people whose **Employer** is this organization, not matched yet, newest first). Saving the gift links both sides.
 
+## To Find Gifts Made on a Donation Page
+
+When your admin has given an appeal an online donation page, BarnCRM writes each online gift
+for you once the donor's form is processed.
+
+1. Open the appeal and look at its gifts.
+2. An online gift has a **Payment Reference** and a **Payment Method** of **Card** (Stripe) or
+   **Other** (PayPal).
+
+You should see: **Pending** while the payment is being confirmed, then **Received**, dated the
+day it was paid. **Cancelled** means the donor left the checkout without paying; you can keep
+or delete it. A refund made at Stripe or PayPal sets the gift to **Refunded** by itself, so do
+not record that refund again.
+
 ## Common Problems
 
 - "This gift has a receipt number, so its amount, date, donor and in-kind description cannot change. Void the receipt and reissue it, or record a refund." The donor holds a receipt for this gift. Use **Void and Reissue** ([Receipts and acknowledgments](receipts-and-acknowledgments.md)) or record a refund.

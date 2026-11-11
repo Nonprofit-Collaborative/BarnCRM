@@ -496,6 +496,7 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Appeals | Major | Names each fundraising effort with goal, cost, dates and a parent appeal, with total raised and gift count calculated from gifts. | Shipped | G-05 |
 | Net raised and percent to goal | Minor | Calculated as formulas, so they are never stale. | Shipped | G-05 |
 | Default appeal | Minor | A default appeal chosen in setup fills in on new gifts. | Shipped | G-03, C-12 |
+| Online donation page | Major | An appeal with Donation Page on and a Forms form named in Donation Form Key has a public page on the Forms Site: name, description and goal, then the form under Give Now. Sending it goes straight to the org's own Stripe or PayPal hosted checkout through Payments (the answer `amount`); the gift is written for the person Forms matched, Pending until paid, then Received, Refunded or Cancelled from the payment's outcome. BarnCRM holds no money or card data. Without Payments keys the page says online giving is not open. | Built, not merged (release 1.15) | G-34, D-157, D-190 |
 
 ### 2.5 Donor Stewardship
 
