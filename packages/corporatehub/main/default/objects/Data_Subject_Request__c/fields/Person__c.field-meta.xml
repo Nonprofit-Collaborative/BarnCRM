@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Person__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The person the request is about, once you have found them. Blank when you hold no data on them.</inlineHelpText>
+  <label>Person</label>
+  <referenceTo>Contact</referenceTo>
+  <relationshipLabel>Data Subject Requests</relationshipLabel>
+  <relationshipName>Data_Subject_Requests</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

@@ -88,7 +88,10 @@ Rules:
 | corporatehub | Board_Meeting__c | Custom84: Presenter |
 | corporatehub | Compliance_Obligation__c | Custom97: Thermometer |
 | corporatehub | Corporate_Hub | Custom72: Helicopter |
+| corporatehub | Data_Breach__c | Custom86: RedCross |
+| corporatehub | Data_Subject_Request__c | Custom91: Shield |
 | corporatehub | Hub_Document__c | Custom49: CD/DVD |
+| corporatehub | Processing_Activity__c | Custom55: Books |
 | payments | Payment__c | Custom40: Creditcard |
 | payments | Payment_Event__c | Custom95: Stopwatch |
 | payments | Payments_Setup | Custom70: Handsaw |

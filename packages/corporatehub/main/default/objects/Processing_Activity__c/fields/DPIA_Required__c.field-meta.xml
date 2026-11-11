@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>DPIA_Required__c</fullName>
+  <defaultValue>false</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>Checked when this processing is likely to be high risk and needs a data protection impact assessment (DPIA). Keep the assessment as a file on this record.</inlineHelpText>
+  <label>DPIA Required</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

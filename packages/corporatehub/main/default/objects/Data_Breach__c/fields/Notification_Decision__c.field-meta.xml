@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Notification_Decision__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Why you did or did not report to the authority and tell the people affected, and any delay.</inlineHelpText>
+  <label>Notification Decision</label>
+  <length>32768</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>

@@ -15127,13 +15127,16 @@ its shipped templates.
 Reminders`) sends the owner a bell notification (type `Corporate_Hub_Reminder`) for each Active
 obligation whose Next Due Date, Active agreement whose Notice Date (or End Date) and Active
 document whose Next Review is within its reminder days, overdue included, and stores that date in
-Reminded For, so the next reminder waits for a new date.
+Reminded For, so the next reminder waits for a new date. The same applies to the GDPR records
+(CH-05): DPIA reviews (R-PA1), open data subject requests (R-DS1) and unreported breaches
+(R-DB1); the step also links erasures to their requests (R-DS2).
 
 **R-CT1 Templates load once per key.** The JSON static resource `BarnCorporateHubTemplates`
-(`schemaVersion` 1) lists obligation templates (`obligations`) and starter policies
-(`policies`), each with a unique `key`. The setup step and Add Missing Templates create a record
-for each key no record carries in Template Key: obligations Off, policies Draft with a summary
-and no legal text. Existing records are never changed.
+(`schemaVersion` 1) lists obligation templates (`obligations`), starter policies (`policies`)
+and starter processing activities (`processingActivities`, CH-05), each with a unique `key`.
+The setup step and Add Missing Templates create a record for each key no record carries in
+Template Key: obligations Off, policies and processing activities Draft with a summary and no
+legal text. Existing records are never changed.
 
 ### Salesforce implementation
 
@@ -15574,6 +15577,184 @@ assessment is Open (`Answer_While_Open`).
 | Rating | `Rating__c` | Number(1, 0) |
 | Comment | `Comment__c` | Long Text Area(32768) |
 | Open | `Open__c` | Formula (Checkbox), assessment Status Open |
+
+---
+
+## 29CH16. Processing Activity
+
+### Definition
+
+One line of the record of processing activities (CH-05, GDPR Article 30): a purpose for which
+the organization holds personal data, on what basis, about whom, who receives it, where it goes
+and how long it is kept, with its data protection impact assessment (DPIA) review dates. The
+DPIA itself is a Salesforce File on the record. Country-neutral: nothing here applies only under
+the GDPR, and the shipped rows are starting points.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The activity, for example Donor records. |
+| Status | picklist | yes | Draft, Active or Retired. Default Draft. |
+| Purpose | long text | no | Why the data is held and used. |
+| Lawful Basis | picklist | no | Consent, Contract, Legal Obligation, Vital Interests, Public Task or Legitimate Interests. |
+| People Concerned | text | no | Whose data it is. |
+| Personal Data Held | long text | no | The kinds of data. |
+| Special Category Data | boolean | yes (defaults false) | The data includes special category data. |
+| Recipients | long text | no | Processors, partners and authorities that receive it. |
+| Transfers Abroad | long text | no | Countries it goes to and the safeguard used. |
+| Retention Period | text | no | How long it is kept. |
+| Security Measures | long text | no | How it is protected. |
+| DPIA Required | boolean | yes (defaults false) | The processing needs a DPIA. |
+| DPIA Last Reviewed | date | no | When the DPIA was last done or reviewed. |
+| Next DPIA Review | date | no | When it is next due (R-PA1). |
+| Template Key | text | no | The shipped row it came from (R-CT1). |
+| Reminded For | date | no | The review date the owner was last reminded about (R-CR1). |
+
+### Rules
+
+**R-PA1 DPIA review reminders.** The nightly step reminds the owner of an Active activity with
+DPIA Required whose Next DPIA Review is within the reminder days (R-CR1). Marking the review done
+is an edit: set DPIA Last Reviewed and move Next DPIA Review on.
+
+### Salesforce implementation
+
+- **Object:** `Processing_Activity__c`, name field Text (Activity Name), sharing Public Read
+  Only.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Status | `Status__c` | Picklist (Draft, Active, Retired), restricted, required |
+| Purpose | `Purpose__c` | Long Text Area(32768) |
+| Lawful Basis | `Lawful_Basis__c` | Picklist (values above), restricted |
+| People Concerned | `Data_Subjects__c` | Text(255) |
+| Personal Data Held | `Data_Categories__c` | Long Text Area(32768) |
+| Special Category Data | `Special_Category__c` | Checkbox, default false |
+| Recipients | `Recipients__c` | Long Text Area(32768) |
+| Transfers Abroad | `Transfers__c` | Long Text Area(32768) |
+| Retention Period | `Retention__c` | Text(255) |
+| Security Measures | `Security_Measures__c` | Long Text Area(32768) |
+| DPIA Required | `DPIA_Required__c` | Checkbox, default false |
+| DPIA Last Reviewed | `DPIA_Reviewed_On__c` | Date |
+| Next DPIA Review | `DPIA_Review_Date__c` | Date |
+| Template Key | `Template_Key__c` | Text(80), unique, external ID |
+| Reminded For | `Reminded_For__c` | Date |
+
+---
+
+## 29CH17. Data Subject Request
+
+### Definition
+
+A request from a person about their own data (CH-05): access, rectification, erasure,
+restriction, portability, objection or other, with when it arrived, when it is due, how identity
+was checked and what was done. An erasure is carried out with Core's Erase Person (D-52,
+Section 29H), which writes an Erasure record; the request links to it.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Request Number | auto number | yes | DSR-00001. |
+| Request Type | picklist | yes | Access (default), Rectification, Erasure, Restriction, Portability, Objection or Other. |
+| Status | picklist | yes | Received (default), In Progress, Completed, Refused or Withdrawn. |
+| Person | reference to Contact | no | Who the request is about. Cleared when deleted. |
+| Requester Name | text | no | Who asked. |
+| Requester Email | email | no | Where to answer. |
+| Received Date | date | yes | Default today. |
+| Due Date | date | no | Default today plus 30 days; editable for the law that applies or an extension. |
+| Identity Verified | boolean | yes (defaults false) | Identity was checked. |
+| Completed Date | date | no | When it was answered, completed or refused. |
+| Response and Actions | long text | no | What was done and said. |
+| Erasure Record | reference to Erasure | no | Core's Erasure record for an erasure. Cleared when deleted. |
+| Reminded For | date | no | The due date the owner was last reminded about (R-CR1). |
+
+### Rules
+
+**R-DS1 Dates.** Due Date is on or after Received Date (`Due_After_Received`); a Completed or
+Refused request has a Completed Date (`Closed_Needs_Date`). The nightly step reminds the owner of
+a Received or In Progress request whose Due Date is within the reminder days (R-CR1).
+
+**R-DS2 Erasure link.** Erase Person asks for a reference (`Erasure__c.Request_Reference__c`).
+When it equals a request's number, ignoring case, the nightly step fills that request's Erasure
+Record, once, for an Erasure request with none. It never changes Status: the person completes
+the request.
+
+### Salesforce implementation
+
+- **Object:** `Data_Subject_Request__c`, name field Auto Number (DSR-{00000}), sharing Private,
+  activities on.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Request Type | `Request_Type__c` | Picklist (values above), restricted, required |
+| Status | `Status__c` | Picklist (values above), restricted, required |
+| Person | `Person__c` | Lookup(Contact), Clear on delete |
+| Requester Name | `Requester_Name__c` | Text(255) |
+| Requester Email | `Requester_Email__c` | Email |
+| Received Date | `Received_Date__c` | Date, required, default `TODAY()` |
+| Due Date | `Due_Date__c` | Date, default `TODAY() + 30` |
+| Identity Verified | `Identity_Verified__c` | Checkbox, default false |
+| Completed Date | `Completed_Date__c` | Date |
+| Response and Actions | `Response__c` | Long Text Area(32768) |
+| Erasure Record | `Erasure_Record__c` | Lookup(Erasure, `Erasure__c`), Clear on delete |
+| Reminded For | `Reminded_For__c` | Date |
+
+---
+
+## 29CH18. Data Breach
+
+### Definition
+
+One entry of the personal data breach log (CH-05, GDPR Article 33(5)): what happened, the data
+and people affected, the assessed risk, the 72-hour authority deadline and when the authority
+and the people were told, or why not. Every breach is logged, reported or not.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | A short title. |
+| Status | picklist | yes | Open (default), Contained or Closed. |
+| Discovered At | date and time | yes | When the organization became aware. Default now. |
+| Occurred At | date and time | no | When it happened, if known. |
+| What Happened | long text | no | The description. |
+| Personal Data Affected | long text | no | The kinds of data and whose; never the data itself. |
+| People Affected | number | no | About how many people. |
+| Risk to People | picklist | yes | Not Yet Assessed (default), Unlikely to Result in Risk, Risk or High Risk. |
+| Authority Deadline | date and time (formula) | no | Discovered At plus 72 hours. |
+| Authority Notified At | date and time | no | When the supervisory authority was told. |
+| People Notified At | date and time | no | When the people affected were told. |
+| Notification Decision | long text | no | Why it was or was not reported, and any delay. |
+| Actions Taken | long text | no | Containment and prevention. |
+| Reminded For | date | no | The deadline date the owner was last reminded about (R-CR1). |
+
+### Rules
+
+**R-DB1 Deadline reminders.** The nightly step reminds the owner of an Open or Contained breach
+whose risk is not Unlikely to Result in Risk and whose Authority Notified At is blank, once for
+its Authority Deadline date (within the reminder days, so on the first night). A Closed breach
+has its risk assessed (`Closed_Needs_Assessment`).
+
+### Salesforce implementation
+
+- **Object:** `Data_Breach__c`, name field Text (Breach Title), sharing Private, activities on.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Status | `Status__c` | Picklist (Open, Contained, Closed), restricted, required |
+| Discovered At | `Discovered_At__c` | Date/Time, required, default `NOW()` |
+| Occurred At | `Occurred_At__c` | Date/Time |
+| What Happened | `Description__c` | Long Text Area(32768) |
+| Personal Data Affected | `Data_Affected__c` | Long Text Area(32768) |
+| People Affected | `People_Affected__c` | Number(9, 0) |
+| Risk to People | `Risk__c` | Picklist (API values Not Yet Assessed, Unlikely, Risk, High Risk; Unlikely labelled Unlikely to Result in Risk), restricted, required |
+| Authority Deadline | `Authority_Deadline__c` | Formula (Date/Time), `Discovered_At__c + 3` |
+| Authority Notified At | `Authority_Notified_At__c` | Date/Time |
+| People Notified At | `People_Notified_At__c` | Date/Time |
+| Notification Decision | `Notification_Decision__c` | Long Text Area(32768) |
+| Actions Taken | `Actions_Taken__c` | Long Text Area(32768) |
+| Reminded For | `Reminded_For__c` | Date |
 
 ---
 
@@ -16882,6 +17063,7 @@ mirrors the primary member).
 | 1.20 | 2026-11-11 | Scholarships and Outbound Grants module (SG-01 to SG-10, PB-06, D-122, D-156; ADR-NEXT `NEXT-scholarships-outbound-grants-module.md`). New package `packages/scholarships`: Award Program (`Award_Program__c`), Award Cycle (`Award_Cycle__c`), Award Application (`Award_Application__c`), Application Review (`Application_Review__c`), Award (`Award__c`), Disbursement (`Award_Payment__c`), Award Requirement (`Award_Requirement__c`) and settings `Scholarships_Settings__c` (29SG1 to 29SG8). |
 | 1.21 | 2026-11-11 | Grid tool and saved grids (C-41, C-41b). No object or field added. Section 29D gains rule R-SQ14: the query document's optional `grid` key, which marks a saved query saved from the Grid. The Grid (`gridTool`, `gridModel`) shows in the Find tab through the `findPage` wrapper and uses Find's own server methods. |
 | 1.22 | 2026-11-11 | Territory Management module (C-40, C-40b; ADR-NEXT `NEXT-territory-management-module.md`). New Sections 29TM1 Territory (`Territory__c`, with the Territory lookup `Territory__c` on Account and Contact), 29TM2 Territory Rule (`Territory_Rule__c`), 29TM3 Territory Member (`Territory_Member__c`) and 29TM4 Territory Run (`Territory_Run__c`); rules R-TM1 to R-TM4. |
+| 1.29 | 2026-11-11 | Corporate Hub GDPR template set (CH-05, D-118). New Sections 29CH16 Processing Activity (`Processing_Activity__c`, R-PA1), 29CH17 Data Subject Request (`Data_Subject_Request__c`, R-DS1, R-DS2, linking to Core's `Erasure__c`) and 29CH18 Data Breach (`Data_Breach__c`, R-DB1). R-CR1 extends to the three; R-CT1 gains `processingActivities` templates. |
 
 ---
 ## 32. Entity ownership by package
@@ -17046,6 +17228,9 @@ included; standard objects the packages extend are named by the entity that gove
 | Action Item | Corporate Hub | 1.10 (CH-16) | 29CH13 |
 | Board Self-Assessment | Corporate Hub | 1.14 (CH-19) | 29CH14 |
 | Assessment Answer | Corporate Hub | 1.14 (CH-19) | 29CH15 |
+| Processing Activity | Corporate Hub | 1.8 (CH-05) | 29CH16 |
+| Data Subject Request | Corporate Hub | 1.8 (CH-05) | 29CH17 |
+| Data Breach | Corporate Hub | 1.8 (CH-05) | 29CH18 |
 | Payment | Payments | 1.4 (PAY-01) | 29PAY1 |
 | Payment Event | Payments | 1.4 (PAY-01) | 29PAY2 |
 | Payments Settings | Payments | 1.4 (PAY-01) | 29PAY3 |

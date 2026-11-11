@@ -97,7 +97,10 @@ const ICONS = Object.freeze({
   Board_Meeting__c: 'custom:custom84',
   Compliance_Obligation__c: 'custom:custom97',
   Corporate_Hub: 'custom:custom72',
+  Data_Breach__c: 'custom:custom86',
+  Data_Subject_Request__c: 'custom:custom91',
   Hub_Document__c: 'custom:custom49',
+  Processing_Activity__c: 'custom:custom55',
   // Payments
   Payment_Event__c: 'custom:custom95',
   Payment__c: 'custom:custom40',
