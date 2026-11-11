@@ -16,8 +16,9 @@ public with sharing class V4sMigrationKit implements MigrationKitExtension {
 	private static final String END_COLUMN = 'End';
 	@TestVisible
 	private static final String STATUS_COLUMN = 'Status';
-	private static final String START_FIELD = 'GW_Volunteers__Start_Date_Time__c';
-	private static final String DURATION_FIELD = 'GW_Volunteers__Duration__c';
+	/** The shift step's columns as the kit writes them, read from the default rows. */
+	private static final String START_FIELD = 'GW_Volunteers.Start_Date_Time__c';
+	private static final String DURATION_FIELD = 'GW_Volunteers.Duration__c';
 
 	@NamespaceAccessible
 	public V4sMigrationKit() {
@@ -34,11 +35,15 @@ public with sharing class V4sMigrationKit implements MigrationKitExtension {
 			MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), stepKey)
 		);
 		List<Map<String, Object>> rows = source.rows(records);
-		for (Integer index = 0; index < rows.size(); index++) {
-			Datetime starts = (Datetime) records[index].get(START_FIELD);
-			Decimal hours = (Decimal) records[index].get(DURATION_FIELD);
-			rows[index].put(END_COLUMN, endOf(starts, hours));
-			rows[index].put(STATUS_COLUMN, statusOf(starts, System.now()));
+		for (Map<String, Object> row : rows) {
+			String startText = (String) row.get(START_FIELD);
+			String hoursText = (String) row.get(DURATION_FIELD);
+			Datetime starts = String.isBlank(startText)
+				? null
+				: (Datetime) JSON.deserialize('"' + startText + '"', Datetime.class);
+			Decimal hours = String.isBlank(hoursText) ? null : Decimal.valueOf(hoursText);
+			row.put(END_COLUMN, endOf(starts, hours));
+			row.put(STATUS_COLUMN, statusOf(starts, System.now()));
 		}
 		return rows;
 	}

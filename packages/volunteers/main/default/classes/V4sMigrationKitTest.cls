@@ -62,6 +62,7 @@ private class V4sMigrationKitTest {
 
 	@IsTest
 	static void aShiftEndsItsLengthAfterItStartsAndIsCompletedOnceStarted() {
+		// runs-as: deploying user (pure date arithmetic, no record or permission is read)
 		Datetime starts = Datetime.newInstanceGmt(2026, 3, 14, 9, 0, 0);
 		Assert.areEqual(
 			JSON.serialize(starts.addMinutes(150)).remove('"'),
@@ -84,6 +85,7 @@ private class V4sMigrationKitTest {
 
 	@IsTest
 	static void otherStepsKeepTheDefaultRowsAndTheKitHasNoCheckOfItsOwn() {
+		// runs-as: deploying user (returns before any record or permission is read)
 		V4sMigrationKit extension = new V4sMigrationKit();
 		Assert.isNull(extension.rows('jobs', new List<SObject>()), 'default rows');
 		Assert.isNull(extension.verify('hours'), 'counts are compared');
