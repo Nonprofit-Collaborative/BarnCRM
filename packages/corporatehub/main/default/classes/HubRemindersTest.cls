@@ -54,6 +54,40 @@ private class HubRemindersTest {
 	}
 
 	@IsTest
+	static void theBoardOwnerHearsOfATermEndingOnce() {
+		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
+			Board__c board = new Board__c(Name = 'Board', Type__c = 'Board', Status__c = 'Active');
+			insert board;
+			Contact ade = new Contact(FirstName = 'Ade', LastName = 'Member');
+			insert ade;
+			Board_Member__c seat = new Board_Member__c(
+				Board__c = board.Id,
+				Person__c = ade.Id,
+				Role__c = 'Member',
+				Term_Start__c = Date.today().addYears(-3),
+				Term_End__c = Date.today().addDays(20)
+			);
+			insert seat;
+
+			new HubReminders().execute(null);
+			new HubReminders().execute(null);
+
+			Assert.areEqual(
+				1,
+				HubReminders.sentTitles.size(),
+				'One reminder for the ending term (R-BM2)'
+			);
+			Assert.isTrue(HubReminders.sentTitles[0].contains('Ade Member'), 'Names the member');
+			Assert.areEqual(
+				seat.Term_End__c,
+				[SELECT Reminded_For__c FROM Board_Member__c WHERE Id = :seat.Id WITH USER_MODE]
+				.Reminded_For__c,
+				'Marked'
+			);
+		}
+	}
+
+	@IsTest
 	static void eachOwnerIsRemindedOncePerDueDate() {
 		System.runAs(TestUsers.adminWith(ADMIN_SET)) {
 			Compliance_Obligation__c report = obligation('Annual report', Date.today().addDays(10));

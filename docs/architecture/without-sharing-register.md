@@ -146,6 +146,7 @@ Attended attendee's event names; it returns only that form identifier, never a r
 | Class | Kind | What it reaches past sharing for | Authority |
 |---|---|---|---|
 | EventsPortalExtension | Portal | The open event a portal person proposes a talk for and that person's own proposal to withdraw; the integration user has no object access, and each write names only the person Portal Builder verified | ADR-0021, ADR-0191 portal templates |
+| CorporateHubPortalExtension | Portal | A board member's own attendee row (packet read, minutes approved while submitted), own vote (only while voting is open) and own open policy or disclosure request; the integration user has no object access, and each action re-reads the row by the person Portal Builder verified | ADR-0021, ADR-NEXT corporate hub board governance |
 
 ## Mirror
 

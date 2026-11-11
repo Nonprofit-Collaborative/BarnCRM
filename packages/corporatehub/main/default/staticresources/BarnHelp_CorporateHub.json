@@ -49,6 +49,16 @@
     "CorporateHub_Cycle_Notes": "Notes",
     "CorporateHub_Cycle_Complete": "Complete This Cycle",
     "CorporateHub_Cycle_Done": "Cycle recorded and the due date moved on.",
-    "CorporateHub_Cycle_Evidence": "Add evidence to this cycle"
+    "CorporateHub_Cycle_Evidence": "Add evidence to this cycle",
+    "CorporateHub_Reminder_TermTitle": "Term ends {2}: {0}, {1}",
+    "CorporateHub_Board_NotAllowed": "That change is not allowed here.",
+    "CorporateHub_Board_NoPollTimes": "Fill in at least Poll Time 1 before sending the poll or choosing a time.",
+    "CorporateHub_Board_NothingToAsk": "A self-assessment needs current seats with a person and the shipped question template.",
+    "CorporateHub_Portal_PacketRead": "Thank you. Your reading of the packet is recorded.",
+    "CorporateHub_Portal_MinutesApproved": "Your approval of the minutes is recorded.",
+    "CorporateHub_Portal_MinutesClosed": "These minutes are not open for approval.",
+    "CorporateHub_Portal_Voted": "Your vote ({0}) is recorded.",
+    "CorporateHub_Portal_VotingClosed": "Voting on this motion is closed.",
+    "CorporateHub_Portal_Acknowledged": "Thank you. Your acknowledgment is recorded."
   }
 }

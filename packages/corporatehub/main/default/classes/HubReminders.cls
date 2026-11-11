@@ -50,13 +50,16 @@ public with sharing class HubReminders implements Schedulable {
 			List<Agreement__c> agreements = agreements(remind);
 			List<Compliance_Obligation__c> obligations = new List<Compliance_Obligation__c>();
 			List<Hub_Document__c> documents = new List<Hub_Document__c>();
+			List<Board_Member__c> seats = new List<Board_Member__c>();
 			if (remind) {
 				obligations = obligations();
 				documents = documents();
+				seats = seats();
 			}
 			update as system agreements;
 			update as system obligations;
 			update as system documents;
+			update as system seats;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT);
 		}
@@ -181,6 +184,40 @@ public with sharing class HubReminders implements Schedulable {
 				)
 			) {
 				row.Reminded_For__c = row.Review_Date__c;
+				changed.add(row);
+			}
+		}
+		return changed;
+	}
+
+	/** R-BM2: the board's owner hears of each current seat whose term ends soon. */
+	private List<Board_Member__c> seats() {
+		List<Board_Member__c> changed = new List<Board_Member__c>();
+		for (Board_Member__c row : [
+			SELECT Id, Person__r.Name, Board__r.Name, Board__r.OwnerId, Term_End__c, Reminded_For__c
+			FROM Board_Member__c
+			WHERE Is_Current__c = TRUE AND Term_End__c != NULL AND Board__r.Status__c = :ACTIVE
+			WITH SYSTEM_MODE
+			ORDER BY Term_End__c
+			LIMIT :MAX_ROWS
+		]) {
+			if (
+				due(row.Term_End__c, null, row.Reminded_For__c) &&
+				send(
+					row.Board__r.OwnerId,
+					BarnHelp.text(
+						'CorporateHub',
+						'CorporateHub_Reminder_TermTitle',
+						new List<Object>{
+							row.Person__r?.Name,
+							row.Board__r.Name,
+							row.Term_End__c.format()
+						}
+					),
+					row.Id
+				)
+			) {
+				row.Reminded_For__c = row.Term_End__c;
 				changed.add(row);
 			}
 		}
