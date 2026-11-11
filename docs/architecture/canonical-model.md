@@ -8567,6 +8567,13 @@ Super Transformer is handed it with the filter. Typed query text reads
 `DISTANCE(f, GEOLOCATION(lat, lon), 'mi') < n` back into `radius` (R-SQ7); a second distance,
 `>`, or another unit is refused.
 
+**R-SQ14 Saved grids** (C-41, C-41b). The document has one more optional key, `grid`:
+`{ version: 1 }` (the document's version stays 1). It marks a saved query saved from the Grid,
+whose `children` (R-SQ8) are the related record tables it shows; Find and the compiler ignore
+the key, so a saved grid runs in Find as the same query. The Grid edits through R-SQ10 (one
+Update data job per save) and saves, shares and deletes through the saved query's own rules
+(R-SQ4 to R-SQ6). No object or field is added.
+
 ### Salesforce implementation
 
 - **Object:** `Saved_Query__c`, sharing model Private.
@@ -8583,8 +8590,8 @@ Super Transformer is handed it with the filter. Typed query text reads
 - **Services:** `QueryCompiler`, `QueryFieldCatalog`, `RollupFilterParser` (bound mode),
   `FindController`, `SavedQuerySharingWriter`; from C-36 `FindInlineEditService` (R-SQ10); from
   C-69 `FindRadius` (R-SQ13) and the static resource `BarnZipCentroids`.
-- **Browser modules:** `findQueryText` (R-SQ7), `xlsxWriter` (R-SQ11), `findCsv`; the component
-  `findRadiusPanel` (R-SQ13).
+- **Browser modules:** `findQueryText` (R-SQ7), `xlsxWriter` (R-SQ11), `findCsv`, `gridModel`
+  (R-SQ14); the components `findRadiusPanel` (R-SQ13), `findPage` and `gridTool` (R-SQ14).
 - **Permission:** custom permission `Find_And_Export_Records`, in `BarnCRM_Admin` and in its own
   permission set `BarnCRM_Find_And_Export`, assignable alone; `BarnCRM_Bulk_Update` and
   `BarnCRM_Bulk_Delete` include all of its grants (ADR-NEXT D5).
@@ -15946,6 +15953,7 @@ mirrors the primary member).
 | 1.11 | 2026-11-11 | Gift details and wealth screening (G-21, G-31, G-32, D-156). Five attributes added to Gift (`Stock_Symbol__c`, `Stock_Shares__c`, `Planned_Gift_Type__c`, `Gift_Source__c`, `Gift_Source_Name__c`), rule R-G17, and the packaged report DAF and Stock Gifts This Year. New Section 25U Wealth screening data, rules R-WS1 to R-WS3: five attributes added to Contact (`Capacity_Rating__c`, `Affinity_Rating__c`, `Screening_Score__c`, `Screening_Date__c`, `Screening_Source__c`), hidden from Giving Read Only, and the shipped import template Wealth Screening. |
 | 1.12 | 2026-11-11 | Corporate Hub board governance (CH-09 to CH-20, PB-02; ADR-NEXT `NEXT-corporate-hub-board-governance.md`). New Sections 29CH7 Board (`Board__c`), 29CH8 Board Member (`Board_Member__c`), 29CH9 Board Meeting (`Board_Meeting__c`), 29CH10 Meeting Attendee (`Meeting_Attendee__c`), 29CH11 Board Motion (`Board_Motion__c`), 29CH12 Board Vote (`Board_Vote__c`), 29CH13 Action Item (`Meeting_Action_Item__c`), 29CH14 Board Self-Assessment (`Board_Assessment__c`) and 29CH15 Assessment Answer (`Assessment_Answer__c`). Library Document gains Ask Every Year (`Annual__c`); Policy Acknowledgment gains `Disclosure__c`, `Conflict_Disclosed__c` and `Answered_In_Portal__c` (R-PAK1, R-PAK3, R-PAK4); Corporate Hub Settings gains `Board_Demographics__c` (false). |
 | 1.13 | 2026-11-11 | Donor panel in Quick Gift Entry (G-33). No object or field added. `GiftDonorPanelController` reads, in user mode, the chosen donor's household (through `HouseholdService`), `Total_Giving__c` and `Last_Gift_Date__c`, the last three gifts, and the donor's Active or Paused commitments with each one's next open scheduled payment. Read only; it writes nothing. |
+| 1.16 | 2026-11-11 | Grid tool and saved grids (C-41, C-41b). No object or field added. Section 29D gains rule R-SQ14: the query document's optional `grid` key, which marks a saved query saved from the Grid. The Grid (`gridTool`, `gridModel`) shows in the Find tab through the `findPage` wrapper and uses Find's own server methods. |
 
 ---
 ## 32. Entity ownership by package

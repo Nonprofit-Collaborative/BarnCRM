@@ -21,6 +21,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 ### People and Households
 
 - [Finding people and records](find.md): search, list views and the Find tab.
+- [Editing many records in a grid](grid.md): a saved search and its related records in tables you change on screen, and saved grids.
 - [Changing many records at once](super-transform.md): Super Transformer, with a preview and an undo, saved lists and a phone format.
 - [Field history](field-history.md): who changed a field on a record, when, and what it was before.
 - [People and households](people-and-households.md): adding people, household members, names and greetings, merge and split, interaction notes.
