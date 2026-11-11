@@ -4624,7 +4624,7 @@ rewritten, because a gift already refers to them.
 | End Date | `End_Date__c` | Date |
 | Status | `Status__c` | Picklist: Active, Paused, Completed, Cancelled |
 | Expected Total | `Expected_Total__c` | Currency |
-| Installments Planned | `Installments_Planned__c` | Number (0 decimals) |
+| Payments Planned | `Installments_Planned__c` | Number (0 decimals) |
 | Fund | `Fund__c` | Lookup to `Fund__c` |
 | Appeal | `Appeal__c` | Lookup to `Appeal__c` |
 | Balance | `Balance__c` | Formula (Currency) |
@@ -4705,7 +4705,7 @@ carries on (R-E1).
 
 ### Salesforce implementation
 
-- **Object:** `Installment__c`, auto-number Name with format `IN-{000000}`. Labelled Pledge Payment (plural Pledge Payments) from v1.0, so its tab reads Pledge Payments; the API name is unchanged.
+- **Object:** `Installment__c`, auto-number Name with format `IN-{000000}`. Labelled Scheduled Payment (plural Scheduled Payments, Name field Payment Number) from 1.5 (G-36; Pledge Payment in v1.0), so its tab reads Scheduled Payments; the API name is unchanged.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -14596,6 +14596,7 @@ mirrors the primary member).
 | 1.3 | 2026-11-09 | Simpler permission sets, Core (ADR-NEXT, D-191, release N). No object or field added. Coordinator (`Volunteer_Coordinator`) retired: the Access page stops offering it and `RetiredRoleMigration` gives its active holders Team Member; R-BU6 and R-BD6: `BarnCRM_Bulk_Update` and `BarnCRM_Bulk_Delete` include `BarnCRM_Find_And_Export`'s grants; `BarnCRM_Admin` gains `BulkUpdateController`. Labels only: BarnCRM Admin (group), BarnCRM Admin Access, Staff Access and Read Only Access, and "BarnCRM Auto:" on the eleven tab, Households and app sets. |
 | 1.4 | 2026-11-11 | Forms and Logic Models announce themselves (C-72). No object or field added. Forms ships Setting Definition `Forms_Page` and Logic Models `Logic_Models_Page`: a Component row naming the module, in new console sections Forms and Logic Models, whose Open button opens the module's object tab. `BarnCRM_Module__mdt` `Probe_Object__c` is cleared for Forms and LogicModels, so only Rollup Builder keeps a probe. |
 | 1.5 | 2026-11-11 | Archive by Query (C-67, D-157). No object or field added. New rule R-BD9: a bulk delete whose records are first saved to Files by `FindExportBatch` in archive mode (every readable field, API name headings), the delete started from the export's finish on the same job, only of records not changed since the start (`archive.notChangedAfter` in the definition), and optionally emptied from the Recycle Bin after a second typed count (`archive.emptyRecycleBin`), which R-BD5's undo then refuses. |
+| 1.5 | 2026-11-11 | Giving words and nightly jobs (G-36, G-37). No object or field added. Labels only: `Installment__c` is Scheduled Payment (plural Scheduled Payments, Name label Payment Number, list view All Scheduled Payments); the `Installment__c` lookups on Gift, Gift Batch Row and Pledge Reminder are labelled Scheduled Payment; Pledge Reminder's `Commitment__c` is labelled Commitment; `Commitment__c.Installments_Planned__c` is Payments Planned. The vocabulary is commitment (the record), pledge and recurring gift (its types), scheduled payment (each installment). The pledge reminder step (`BarnCRM Giving Pledge Reminders`, 03:15, shipped off) is now one of `GivingScheduler`'s five jobs: its Schedule and Stop switch it with the others and Run Now runs it; `GivingScheduler.isScheduled` still counts only the other four. |
 
 ---
 ## 32. Entity ownership by package

@@ -35,7 +35,7 @@ You should see: the card in its new column, the counts and totals updated, and "
 3. For **Won**, choose **What Did It Produce?**:
    - **Record the Gift Now**: type the **Amount**, **Gift Date** and **How It Arrived**. The gift is saved the same way Quick Gift Entry saves one, with the ask's donor, fund and appeal.
    - **Record a Pledge**: type the **Pledge Total**, **First Payment Date**, **How Often** and **Number of Payments**. BarnCRM creates a pledge in equal payments (the last payment takes up any rounding) and lays out its payment schedule.
-   - **Link a Gift or Pledge Already Entered**: pick one that belongs to the same donor. Another donor's is refused.
+   - **Link a Gift or Commitment Already Entered**: pick one that belongs to the same donor. Another donor's is refused.
    - **Record It Later**: close the ask now and link a gift or pledge afterward, by editing the ask's **Resulting Gift** or **Resulting Commitment**.
 4. Optionally type a **Next Ask Date**, the day to ask this donor again.
 5. Click **Save**.

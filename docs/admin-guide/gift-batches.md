@@ -65,7 +65,7 @@ Do this as David, with the Tuesday mail: three checks and a deposit slip that sa
 
 ## Checks That Pay a Pledge
 
-A check is often a pledge payment. Each line has a **Pays** column for that. Once a line has
+A check is often a scheduled payment of a pledge or recurring gift. Each line has a **Pays** column for that. Once a line has
 a donor, **Pays** lists that donor's payments still owed: scheduled, overdue or partly paid,
 on pledges and recurring gifts that are active or paused, including the ones made in the name
 of the donor's household. **None: a new gift on its own** is always there, and is what a line
@@ -141,8 +141,8 @@ line, or a saved line whose donor you change, gets a suggestion as described abo
 
 **A suggestion chosen for the wrong pledge.** A suggestion is only a suggestion: check the
 **Pays** cell of every line that shows one before you choose Create Gifts, and choose
-**None** where the check is not a pledge payment. If its gift was created anyway, open the gift and clear its
-**Installment** and **Commitment**; the payment is owed again.
+**None** where the check is not a scheduled payment. If its gift was created anyway, open the gift and clear its
+**Scheduled Payment** and **Commitment**; the payment is owed again.
 
 **Typing a batch on a phone.** The grid has ten columns, so on a phone it scrolls sideways
 and the screen says **Batches are easier on a computer.** It still works. For one gift on a

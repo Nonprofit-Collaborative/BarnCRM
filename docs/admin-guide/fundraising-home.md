@@ -8,8 +8,8 @@ me today" in one look, so a fundraiser no longer starts on a menu of twenty tabs
 - Five figures, each a link to the list behind it:
   - **Gifts** with **To acknowledge**: received gifts waiting for a thank you. Opens the
     **Thank-Yous** page.
-  - **Installments** with **Overdue**: pledge payments past due. Opens the Installments list
-    view **Overdue**.
+  - **Scheduled Payments** with **Overdue**: scheduled payments past due. Opens the Scheduled
+    Payments list view **Overdue**.
   - **My Asks Due This Month**: your own open asks whose Target Date falls this month. Opens the
     Asks list view of the same name.
   - **Gift Batches** with **Open**: batches still being keyed. Opens the list view **Open
@@ -39,7 +39,7 @@ Nothing to turn on. The page and its tab come with the Giving module, and the **
 
 ## What Changed in the App's Menu
 
-The app's navigation now opens on **Fundraising Home** and adds **Installments** after
+The app's navigation now opens on **Fundraising Home** and adds **Scheduled Payments** after
 **Commitments**. Four setup pages left the default menu: **Donor Level Ladder**, **Stewardship
 Plan Setup**, **Pledge Reminders** and **Receipt Letters**. Nothing was removed: each is a tile
 under **Fundraising Setup** on Fundraising Home, is still in the App Launcher, and the first two
@@ -72,7 +72,7 @@ region and pick a report). The figures and setup tiles are one component, **Fund
 ## A Five-Minute Walkthrough
 
 1. Open **BarnCRM Fundraising**. It opens on **Fundraising Home**.
-2. Read the five figures. Click **Installments** with **Overdue**: the Overdue list view opens.
+2. Read the five figures. Click **Scheduled Payments** with **Overdue**: the Overdue list view opens.
 3. Go back and click **Enter a Gift**: Quick Gift Entry opens.
 4. As an administrator, open **Donor Level Ladder** from **Fundraising Setup**.
 5. Scroll to the charts and click one to open its report.

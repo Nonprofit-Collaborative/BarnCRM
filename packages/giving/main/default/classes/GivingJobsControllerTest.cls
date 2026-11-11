@@ -39,7 +39,11 @@ private class GivingJobsControllerTest {
 				view.nextRunAt,
 				'There is no next run to show when nothing is scheduled.'
 			);
-			Assert.areEqual(4, view.jobs.size(), 'The page lists all four nightly jobs.');
+			Assert.areEqual(
+				5,
+				view.jobs.size(),
+				'The page lists all five nightly jobs, the pledge reminders included (G-37).'
+			);
 			for (GivingJobsController.JobView job : view.jobs) {
 				Assert.isFalse(
 					job.stale,
@@ -77,7 +81,7 @@ private class GivingJobsControllerTest {
 			for (GivingJobsController.JobView job : view.jobs) {
 				Assert.isTrue(
 					job.scheduled,
-					'Every one of the three jobs is scheduled: ' + job.name
+					'Every one of the five jobs is scheduled: ' + job.name
 				);
 			}
 		}
@@ -129,6 +133,8 @@ private class GivingJobsControllerTest {
 			settings.Installment_Overdue_Last_Run__c = Datetime.now().addHours(-8);
 			settings.Installment_Overdue_Last_Run_Summary__c = 'Marked 2 payments Overdue.';
 			settings.Donor_Levels_Last_Recalculated__c = Datetime.now().addHours(-7);
+			settings.Pledge_Reminders_Last_Run__c = Datetime.now().addHours(-6);
+			settings.Pledge_Reminders_Last_Run_Summary__c = 'Sent 3 reminders.';
 			insert settings;
 
 			Test.startTest();
@@ -136,6 +142,11 @@ private class GivingJobsControllerTest {
 			Test.stopTest();
 
 			Map<String, GivingJobsController.JobView> byName = byName(view);
+			Assert.areEqual(
+				'Sent 3 reminders.',
+				view.jobs[3].lastRunSummary,
+				'The pledge reminders have their own line on the page (G-37).'
+			);
 			Assert.areEqual(
 				'Marked 2 payments Overdue.',
 				byName.get(OVERDUE).lastRunSummary,

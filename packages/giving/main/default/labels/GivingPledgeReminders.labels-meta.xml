@@ -22,7 +22,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Pledge reminders: pledges with nobody to email {0}</shortDescription>
-    <value>{0} pledge installments are due an email reminder, but the pledge has no donor contact with an email address. Add a donor contact or a primary contact.</value>
+    <value>{0} scheduled payments are due an email reminder, but the commitment has no donor contact with an email address. Add a donor contact or a primary contact.</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_TemplateNotFound</fullName>
@@ -318,7 +318,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Pledge reminders page: column pledge</shortDescription>
-    <value>Pledge</value>
+    <value>Commitment</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_ColumnInstallment</fullName>
@@ -326,7 +326,7 @@
     <language>en_US</language>
     <protected>false</protected>
     <shortDescription>Pledge reminders page: column installment</shortDescription>
-    <value>Installment</value>
+    <value>Scheduled Payment</value>
   </labels>
   <labels>
     <fullName>Giving_PledgeReminders_ColumnSentOn</fullName>

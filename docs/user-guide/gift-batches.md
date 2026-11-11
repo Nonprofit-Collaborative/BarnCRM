@@ -27,7 +27,7 @@ You should see: **Entered** go up with each line, and the balance line change. W
 
 To remove a line before its gift is created, click the delete icon at the end of its row.
 
-## To Mark a Check as a Pledge Payment (Pays)
+## To Mark a Check as a Scheduled Payment (Pays)
 
 Once a line has a donor who owes a pledge or recurring payment, the **Pays** column shows a list.
 

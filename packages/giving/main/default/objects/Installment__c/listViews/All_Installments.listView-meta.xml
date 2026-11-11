@@ -8,5 +8,5 @@
   <columns>Paid_Amount__c</columns>
   <columns>Status__c</columns>
   <filterScope>Everything</filterScope>
-  <label>All Installments</label>
+  <label>All Scheduled Payments</label>
 </ListView>
