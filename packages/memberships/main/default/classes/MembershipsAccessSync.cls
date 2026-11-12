@@ -2,8 +2,7 @@
  * Gives the Memberships permission sets to BarnCRM's roles (ADR-0206
  * `0206-memberships-module.md`, decision 10; ADR-0131 module access sync by role): Memberships
  * Admin to everyone holding BarnCRM Admin, Memberships Staff to the Team Member role and Giving's
- * Fundraising Staff role, Memberships Read Only to the Read Only role. Coordinator is retired (ADR-0194 simpler permission sets, D1)
- * and is not given anything new.
+ * Fundraising Staff role, Memberships Read Only to the Read Only role.
  *
  * It only gives, never takes away. It runs at install (`MembershipsPostInstall`), and Core asks it
  * when a role is given on the Access page, at each Turn on and with the hourly access check. Core

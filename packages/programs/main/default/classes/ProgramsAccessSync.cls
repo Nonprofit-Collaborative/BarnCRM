@@ -1,7 +1,7 @@
 /**
  * Gives the Programs permission sets to BarnCRM's roles (ADR-0151 `0151-programs-module.md`,
  * decision 7): Programs Admin to everyone holding BarnCRM Admin, directly or through a role,
- * Programs Staff to the Team Member and Coordinator roles, and Programs Read Only to the Read
+ * Programs Staff to the Team Member role, and Programs Read Only to the Read
  * Only role. The roles are permission set groups, followed through
  * `TabAccessService.giveToGroupHolders` (ADR-0131 `0131-module-access-sync-by-role.md`).
  *
@@ -31,7 +31,7 @@ public with sharing class ProgramsAccessSync extends ModuleAccessSyncBase {
 	 */
 	@TestVisible
 	private static final Map<String, List<String>> BY_ROLE = new Map<String, List<String>>{
-		'Programs_Staff' => new List<String>{ 'Program_Staff', 'Volunteer_Coordinator' },
+		'Programs_Staff' => new List<String>{ 'Program_Staff' },
 		'Programs_Read_Only' => new List<String>{ 'Read_Only' }
 	};
 

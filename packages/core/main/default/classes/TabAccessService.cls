@@ -133,9 +133,6 @@ public with sharing class TabAccessService {
 
 	private static final String CONTEXT = 'TabAccessService.sync';
 
-	/** How many retired role holders one job carries over (`RetiredRoleMigration`). */
-	private static final Integer RETIRED_ROLE_ROWS = 1000;
-
 	/**
 	 * Every permission set Core ships is named so; `giveToHolders` refuses them. Core's own
 	 * tests, which can name no module set, change it to give a tab set instead.
@@ -177,9 +174,6 @@ public with sharing class TabAccessService {
 	 */
 	public with sharing class Job implements Queueable {
 		public void execute(QueueableContext jobContext) {
-			// Holders of a retired role get its successor (ADR-0194, D1); never throws, and
-			// its budget leaves the tab slice its 5,000 rows inside the 10,000.
-			RetiredRoleMigration.carryOver(RETIRED_ROLE_ROWS);
 			try {
 				// A test cannot chain one queued job from another.
 				if (syncOnce(rowsPerRun) && !Test.isRunningTest()) {

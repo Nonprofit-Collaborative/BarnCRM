@@ -583,21 +583,6 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 3 | In Setup, make that Status value inactive; reload the setting. | The dropdown still shows the saved value, and saving the section keeps it. |
 | 4 | In an org without Nonprofit Cloud, open the same setting. | A text box showing `Paid`; any text saves. |
 
-## T-SET-27: Coordinator Holders Become Team Members
-
-**Purpose:** confirm the retired Coordinator role carries over to Team Member without taking anything away, and an inactive holder is named in the Error Log instead.
-**Prerequisites:** admin user with permission to run anonymous Apex; the staff user and a third user, Gone Tester, neither holding Team Member. Not on mwdbdevsb.
-
-| Step | Action | Expected result |
-|---|---|---|
-| 1 | In Setup, **Users**, open Staff Tester, **Permission Set Group Assignments**, and add **Coordinator (Retired)**. Do the same for Gone Tester, then deactivate Gone Tester. | Both hold the group. |
-| 2 | Open **BarnCRM Settings**, **Access**. | No **Coordinator** card; neither person is on the **Team Member** card. |
-| 3 | In the Developer Console, run `TabAccessService.requestSync();` as anonymous Apex. Wait a minute and reload **Access**. | **Staff Tester** is on the **Team Member** card. In Setup, Staff Tester still holds **Coordinator (Retired)**. Gone Tester holds no Team Member. |
-| 4 | Run `CorePostInstall.runAsSourceDeploy();` as anonymous Apex, then open the **Error Log**. | A Warning: "Gone Tester is inactive and holds the Coordinator (Retired) role, so BarnCRM did not give them Team Member. ..." The run finished without an error. |
-| 5 | Open **Org Optimizer**, **Access Explorer**, and choose Staff Tester. | **Coordinator (Retired)** is listed as a BarnCRM role beside **Team Member**. |
-
-**Cleanup:** remove **Coordinator (Retired)** and **Team Member** from Staff Tester in Setup; remove the group from Gone Tester (reactivate first if Salesforce asks).
-
 ## T-SET-28: Forms and Logic Models Are Found by Their Settings Rows
 
 **Purpose:** confirm Forms and Logic Models show as installed through the settings row each ships, not an object name, and the row opens the module's tab (C-72).

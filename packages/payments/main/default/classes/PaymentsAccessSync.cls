@@ -2,8 +2,7 @@
  * Gives the Payments permission sets to BarnCRM's roles (ADR-0201 `0201-payments-module.md`,
  * decision 9; ADR-0131 module access sync by role): Payments Admin to everyone holding BarnCRM
  * Admin, Payments Staff to the Team Member role and Giving's Fundraising Staff role, Payments
- * Read Only to the Read Only role. Coordinator is retired (ADR-0194 simpler permission sets, D1)
- * and is not given anything new.
+ * Read Only to the Read Only role.
  *
  * It only gives, never takes away. It runs at install (`PaymentsPostInstall`), and Core asks it
  * when a role is given on the Access page, at each Turn on and with the hourly access check. Core

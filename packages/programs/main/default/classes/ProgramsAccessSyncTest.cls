@@ -1,6 +1,6 @@
 /**
  * BarnCRM's roles get the Programs sets (ADR-0151 decision 7): BarnCRM Admin holders Programs
- * Admin, the Team Member and Coordinator roles Programs Staff and the Read Only role Programs Read
+ * Admin, the Team Member role Programs Staff and the Read Only role Programs Read
  * Only, at install, at Turn on and with the hourly access check.
  */
 @IsTest(testFor='ApexClass:ProgramsAccessSync')
@@ -16,7 +16,6 @@ private class ProgramsAccessSyncTest {
 			'Outsider' => TestUsers.standardUser('Outsider').Id
 		};
 		Map<String, String> groupByName = new Map<String, String>{
-			'Coordinator' => 'Volunteer_Coordinator',
 			'Member' => 'Program_Staff',
 			'Reader' => 'Read_Only',
 			'Boss' => 'BarnCRM_Admin_Group'
@@ -63,7 +62,6 @@ private class ProgramsAccessSyncTest {
 			Assert.isFalse(more, 'A small org is done in one pass');
 			Assert.isFalse(again, 'And a second pass finds nothing to give');
 			Map<String, String> expected = new Map<String, String>{
-				'Coordinator' => 'Programs_Staff',
 				'Member' => 'Programs_Staff',
 				'Reader' => 'Programs_Read_Only',
 				'Boss' => ProgramsAccessSync.ADMIN_SET

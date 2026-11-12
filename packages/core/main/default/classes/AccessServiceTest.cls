@@ -283,14 +283,6 @@ private class AccessServiceTest {
 				'The BarnCRM Admin role should be one of the packaged roles.'
 			);
 			Assert.isTrue(names.contains(PROGRAM_ROLE), 'The Team Member role should be packaged.');
-			Assert.isFalse(
-				names.contains('Volunteer_Coordinator'),
-				'The retired Coordinator role is no longer offered.'
-			);
-			Assert.isTrue(
-				AccessService.knownRoles().contains('Volunteer_Coordinator'),
-				'But it is still known, for Access Explorer and the carry-over.'
-			);
 		}
 	}
 
