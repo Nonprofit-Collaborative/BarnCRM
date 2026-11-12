@@ -83,7 +83,7 @@ page, even if that puts it out of reading order.
 | [Project Management](projects.md) | PM | 8 | Install and access, a project from the Salesforce Implementation template, tasks and progress, a template of your own, health and the Projects at Risk card, time, budget and utilization, Export Billable Time, Draft Status Update, reports |
 | [Rollup Builder](rollup-builder.md) | RB | 40 | Building, recalculating and switching rollups, standard objects, parity options, export and import, instant totals on other objects, Import From NPSP |
 | [Payments](payments.md) | PAY | 8 | Settings and Health Check, write-only keys and the mode check, Stripe and PayPal test payments end to end, partial and full refunds, each event used once and forged events refused, abandoned checkouts, staff and read only access |
-| [Memberships](memberships.md) | MEM | 9 | Levels, benefits and access, dates filled on save, renewing by hand, gift and recurring gift renewals, lapse to Grace and Lapsed, reminders, dues paid online, the member directory portal, the Memberships Essentials kit, erasure |
+| [Memberships](memberships.md) | MEM | 11 | Levels, benefits and access, dates filled on save, renewing by hand, gift and recurring gift renewals, lapse to Grace and Lapsed, reminders, dues paid online, the member directory portal, the Memberships Essentials kit, erasure, certifications and continuing credits, certification expiry |
 | [Accessibility and mobile](accessibility-and-mobile.md) | A11Y | 9 | Keyboard, focus, screen reader labels, zoom, Salesforce mobile app |
 
 ## Smoke List (Every Build, About One Hour)

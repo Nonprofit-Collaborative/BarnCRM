@@ -7,6 +7,10 @@
     levels, benefits and certifications. Given to Team Member and Fundraising Staff.
   </description>
   <classAccesses>
+    <apexClass>CertificationController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>MembershipController</apexClass>
     <enabled>true</enabled>
   </classAccesses>

@@ -186,8 +186,10 @@ CAPS = {
     "territory": 31_700,
     # Memberships (G-22a to G-22d, PAY-02, ADR-NEXT memberships module): terms, renewals, the
     # nightly run, payment links, the Essentials kit, portal and erasure seams, 39,406 measured
-    # on 2026-11-11, plus about 2 percent. PB-09's directory adds no Apex.
-    "memberships": 40_200,
+    # on 2026-11-11, plus about 2 percent. PB-09's directory adds no Apex. Raised 2026-11-11 for
+    # G-22e certifications (CertificationService, CertificationController, the erasure and
+    # nightly expiry hooks): 47,443 measured, plus about 1 percent.
+    "memberships": 48_000,
     # Project Management (PM-01 to PM-05, ADR-NEXT project management module): access sync,
     # post-install, health, templates, reporting and the page controller, 32,637 measured,
     # plus about 2%.

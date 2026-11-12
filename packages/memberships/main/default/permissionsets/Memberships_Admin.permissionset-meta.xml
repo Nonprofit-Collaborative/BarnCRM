@@ -7,6 +7,10 @@
     and member certification. Given to BarnCRM Admin holders.
   </description>
   <classAccesses>
+    <apexClass>CertificationController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
+  <classAccesses>
     <apexClass>MembershipController</apexClass>
     <enabled>true</enabled>
   </classAccesses>

@@ -1,0 +1,64 @@
+<template>
+  <template lwc:if={helpReady}>
+    <lightning-card title={labels.title} icon-name={icon}>
+      <div class="slds-var-p-horizontal_medium slds-is-relative">
+        <template lwc:if={working}>
+          <lightning-spinner alternative-text={labels.title} size="small"></lightning-spinner>
+        </template>
+        <template lwc:if={error}>
+          <c-barn-notice
+            class="slds-show slds-var-m-bottom_small"
+            variant="error"
+            message={error}
+            data-id="error"
+          ></c-barn-notice>
+        </template>
+        <template lwc:if={notice}>
+          <c-barn-notice
+            class="slds-show slds-var-m-bottom_small"
+            variant="success"
+            message={notice}
+            data-id="notice"
+          ></c-barn-notice>
+        </template>
+        <template lwc:if={loaded}>
+          <p data-id="credits">{creditsText}</p>
+          <p class="slds-text-color_weak" data-id="expires">{expiresText}</p>
+          <div class="slds-var-m-top_small">
+            <template lwc:if={panel.canGrant}>
+              <lightning-button
+                class="slds-var-m-right_x-small"
+                variant="brand"
+                label={labels.grant}
+                data-id="grant"
+                disabled={working}
+                onclick={handleGrant}
+              ></lightning-button>
+            </template>
+            <template lwc:if={canRenew}>
+              <lightning-button
+                class="slds-var-m-right_x-small"
+                variant="brand"
+                label={labels.renew}
+                data-id="renew"
+                disabled={working}
+                onclick={handleRenew}
+              ></lightning-button>
+            </template>
+            <template lwc:if={panel.canRevoke}>
+              <lightning-button
+                label={labels.revoke}
+                data-id="revoke"
+                disabled={working}
+                onclick={handleRevoke}
+              ></lightning-button>
+            </template>
+          </div>
+          <template lwc:if={renewHint}>
+            <p class="slds-var-m-top_small slds-text-color_weak" data-id="renew-hint">{renewHint}</p>
+          </template>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>
