@@ -4,12 +4,10 @@
  * the panel's sentences.
  */
 
-/** "{0} of {1}" with the values put in. */
-export function format(template, ...values) {
-  return String(template || '').replace(/\{(\d+)\}/g, (match, index) => {
-    return values[index] === undefined ? match : String(values[index]);
-  });
-}
+import { format } from 'c/barnFormat';
+
+/** "{0} of {1}" with the values put in (shared, UTIL-01). */
+export { format };
 
 /** The picked people with this one added at the end, once. */
 export function withPerson(picked, person) {

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Shared framework-free helpers (UTIL-01): format a label with values, and a date as
+    YYYY-MM-DD. Exposed so every package can import it.
+  </description>
+  <isExposed>true</isExposed>
+</LightningComponentBundle>

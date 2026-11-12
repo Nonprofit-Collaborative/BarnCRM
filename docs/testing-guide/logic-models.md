@@ -59,7 +59,7 @@ role) and read-only (Read Only role). Each gets its Logic Models permission set 
 | 2 | Click `Reads at home`. Click **Add Indicator**: name `Students reading daily`, unit `students`, baseline `10`, **Save**. | The indicator shows `Unit: students. Better when Higher. Baseline: 10.` `Reads at home has no indicator.` leaves **Things to Look At**. |
 | 3 | Under it click **Add Period**: `2026 Q1`, 1 January 2026 to 31 March 2026, target `30`, result `20`. **Save**. | **Progress** shows a half bar with `50%`. Target and result are right-aligned. |
 | 4 | Click **Edit** on the row, change the result to `30`, **Save**. | **Progress** shows a full bar with `Met`. |
-| 5 | Add another period with the same dates. | Refused: `This indicator already has a period with these dates. Change that row instead.` |
+| 5 | Add another period with the same dates. | As soon as both dates are picked the form shows, in red under the dates, `This indicator already has a period with these dates. Change that row instead.` and **Save** is disabled. Change the end date: the message goes and **Save** is enabled. Edit the existing row: no message (its own dates). |
 | 6 | Add a period with an end date before its start date. | The save is refused with the end date message. |
 | 7 | Click **Edit** on `Reads at home` and open **Column**. | Only output and outcome columns are offered. |
 

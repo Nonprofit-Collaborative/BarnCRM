@@ -229,6 +229,32 @@ describe('c-logic-model-indicators', () => {
     expect(failures.mock.calls[0][0].detail.message).toBe('That period exists.');
   });
 
+  it('says when a period has the dates of another and holds Save (R-IP2)', async () => {
+    const { element } = await render();
+    q(element, 'add-period').click();
+    await flush();
+    change(q(element, 'period-name'), 'Again');
+    change(q(element, 'period-start'), '2026-01-01');
+    change(q(element, 'period-end'), '2026-03-31');
+    await flush();
+    expect(q(element, 'period-duplicate').textContent).toContain(
+      'c.LogicModels_Builder_PeriodExists'
+    );
+    expect(q(element, 'period-save').disabled).toBe(true);
+
+    change(q(element, 'period-end'), '2026-04-30');
+    await flush();
+    expect(q(element, 'period-duplicate')).toBeNull();
+    expect(q(element, 'period-save').disabled).toBe(false);
+
+    // A period keeps its own dates when edited.
+    q(element, 'period-cancel').click();
+    await flush();
+    qa(element, 'period-edit')[0].click();
+    await flush();
+    expect(q(element, 'period-duplicate')).toBeNull();
+  });
+
   it('edits and deletes a period', async () => {
     const { element } = await render();
     savePeriod.mockResolvedValue(MODEL);

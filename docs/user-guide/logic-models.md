@@ -96,7 +96,7 @@ You should see: the period in the indicator's table. **Progress** is a bar with 
 result reaches the target, or how far it got from the baseline, for example 50%.
 
 To record a result later, click **Edit** on the period's row. Each indicator has one row for the
-same start and end dates.
+same start and end dates: the form tells you when the dates you pick are already used.
 
 ## To Use the Same Periods for Every Indicator
 

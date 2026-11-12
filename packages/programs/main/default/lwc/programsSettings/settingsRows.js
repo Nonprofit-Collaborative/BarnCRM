@@ -3,13 +3,10 @@
  * settings the server returns into what the page shows. No Lightning or Salesforce import.
  */
 
-/** Replaces {0}, {1} and so on in a label with the values given. */
-export function format(template, ...values) {
-  return values.reduce(
-    (text, value, index) => text.split(`{${index}}`).join(value),
-    template || ''
-  );
-}
+import { format } from 'c/barnFormat';
+
+/** Replaces {0}, {1} and so on in a label with the values given (shared, UTIL-01). */
+export { format };
 
 /** The Participant Privacy presets (P-08), as the server names them. */
 export const SHARED = 'Shared';

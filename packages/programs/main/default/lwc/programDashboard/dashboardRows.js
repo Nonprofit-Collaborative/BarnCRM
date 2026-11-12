@@ -3,17 +3,14 @@
  * rate, and the tiles and rows the page shows, from the plain figures the server returns. No
  * Lightning or Salesforce import.
  */
+import { isoDate } from 'c/barnFormat';
 
 /** The periods offered, in the order the picker lists them; the first is the default. */
 export const PERIODS = ['thisMonth', 'lastMonth', 'thisYear', 'lastYear', 'last12Months'];
 export const DEFAULT_PERIOD = PERIODS[0];
 
-/** A local date as YYYY-MM-DD, the form Apex takes for a Date. */
-export function isoDate(date) {
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${date.getFullYear()}-${month}-${day}`;
-}
+/** A local date as YYYY-MM-DD, the form Apex takes for a Date (shared, UTIL-01). */
+export { isoDate };
 
 /** The first and last day of a period, both included, as of `today`. */
 export function periodRange(period, today) {

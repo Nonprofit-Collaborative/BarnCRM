@@ -170,6 +170,8 @@ asks first, in a dialog with a red **Delete** button.
 
 You can add as many periods as you need, and they may overlap (a year and its four quarters).
 The same start and end dates twice for one indicator are refused: change the row that is there.
+The period form says so under the dates as soon as you pick them, and holds **Save** until the
+dates differ.
 
 A part with indicators cannot be moved to the Inputs, Activities or Impact column; delete or
 move its indicators first.
