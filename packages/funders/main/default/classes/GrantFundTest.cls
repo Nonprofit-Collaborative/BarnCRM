@@ -15,6 +15,11 @@ private class GrantFundTest {
 			'Gfundstaff',
 			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Staff' }
 		);
+		TestUsers.standardUserWith(
+			'Gfundreader',
+			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' }
+		);
+		TestUsers.standardUser('Gfundnoaccess');
 	}
 
 	private static Grant__c restrictedAward() {
@@ -245,6 +250,84 @@ private class GrantFundTest {
 				[SELECT Fund_Id__c FROM Grant__c WHERE Id = :grant.Id WITH SYSTEM_MODE].Fund_Id__c,
 				'Cleared'
 			);
+		}
+	}
+
+	@IsTest
+	static void aReaderIsRefusedSavingTheFund() {
+		Grant__c grant;
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			grant = restrictedAward();
+		}
+		User reader = [SELECT Id FROM User WHERE LastName = 'Gfundreader' WITH SYSTEM_MODE LIMIT 1];
+		System.runAs(reader) {
+			Test.startTest();
+			GrantFundController.FundCard card = GrantFundController.getFund(grant.Id);
+			String refusal;
+			try {
+				GrantFundController.setFund(grant.Id, '');
+			} catch (AuraHandledException e) {
+				refusal = e.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.isFalse(card.canEdit, 'A reader cannot edit the card');
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'),
+				refusal,
+				'A reader is refused'
+			);
+		}
+	}
+
+	@IsTest
+	static void aPersonWithoutAccessGetsTheLoadFailureMessage() {
+		Grant__c grant;
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			grant = restrictedAward();
+		}
+		User nobody = [
+			SELECT Id
+			FROM User
+			WHERE LastName = 'Gfundnoaccess'
+			WITH SYSTEM_MODE
+			LIMIT 1
+		];
+		System.runAs(nobody) {
+			Test.startTest();
+			String message;
+			try {
+				GrantFundController.getFund(grant.Id);
+			} catch (AuraHandledException e) {
+				message = e.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Fund_LoadFailed'),
+				message,
+				'The card says it did not load'
+			);
+		}
+	}
+
+	@IsTest
+	static void savingToAGrantThatHasGoneShowsTheDatabaseMessage() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			Grant__c grant = restrictedAward();
+			Id gone = grant.Id;
+			delete grant;
+
+			Test.startTest();
+			String message;
+			try {
+				GrantFundController.setFund(gone, '');
+			} catch (AuraHandledException e) {
+				message = e.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.isNotNull(message, 'Saving to a deleted grant is refused with a message');
 		}
 	}
 
