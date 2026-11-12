@@ -363,10 +363,21 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 				removals.add(member);
 			}
 		}
-		Database.delete(removals, false, AccessLevel.USER_MODE);
+		Map<Id, String> kept = deleteFailures(
+			removals,
+			Database.delete(removals, false, AccessLevel.USER_MODE)
+		);
 		for (Id accountId : rowByAccount.keySet()) {
 			Household_Adoption__c row = rowByAccount.get(accountId);
-			if (refusals.containsKey(accountId)) {
+			if (kept.containsKey(accountId)) {
+				notRestored(
+					row,
+					String.format(
+						BarnHelp.text('Core', 'Core_NpspAdoption_NoteMembersKept'),
+						new List<Object>{ kept.get(accountId) }
+					)
+				);
+			} else if (refusals.containsKey(accountId)) {
 				notRestored(
 					row,
 					String.format(
@@ -381,6 +392,21 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 			}
 		}
 		Database.update(rows, false, AccessLevel.SYSTEM_MODE);
+	}
+
+	/** The first delete error per household, for the membership rows whose delete failed. */
+	@TestVisible
+	private static Map<Id, String> deleteFailures(
+		List<Household_Member__c> removals,
+		List<Database.DeleteResult> results
+	) {
+		Map<Id, String> failed = new Map<Id, String>();
+		for (Integer i = 0; i < results.size(); i++) {
+			if (!results[i].isSuccess() && !failed.containsKey(removals[i].Household__c)) {
+				failed.put(removals[i].Household__c, results[i].getErrors()[0].getMessage());
+			}
+		}
+		return failed;
 	}
 
 	/** The membership rows an NPC conversion journaled on this row (R-HA9). */

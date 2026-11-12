@@ -46,6 +46,57 @@ private class NpcHouseholdSourceTest {
 	}
 
 	@IsTest
+	static void theSelectNamesOnlyReadableFieldsAndDropsWhatIsMissing() {
+		// runs-as: deploying user (no record or permission is read)
+		Set<String> all = new Set<String>{
+			'accountid',
+			'contactid',
+			'isprimarymember',
+			'roles',
+			'isactive',
+			'startdate',
+			'enddate'
+		};
+		Assert.areEqual(
+			'SELECT AccountId, ContactId, IsPrimaryMember, Roles, IsActive, StartDate, EndDate',
+			NpcHouseholdSource.memberSelect(all),
+			'everything readable'
+		);
+		Set<String> noFlag = all.clone();
+		noFlag.remove('isprimarymember');
+		noFlag.remove('roles');
+		Assert.areEqual(
+			'SELECT AccountId, ContactId, IsActive, StartDate, EndDate',
+			NpcHouseholdSource.memberSelect(noFlag),
+			'the primary flag and role are dropped, members still join'
+		);
+		Set<String> noContact = all.clone();
+		noContact.remove('contactid');
+		Assert.isNull(NpcHouseholdSource.memberSelect(noContact), 'members cannot be joined');
+		Assert.isNull(NpcHouseholdSource.memberSelect(new Set<String>()), 'nothing readable');
+	}
+
+	@IsTest
+	static void theCountFilterMatchesTheMemberRule() {
+		// runs-as: deploying user (no record or permission is read)
+		Assert.areEqual(
+			' AND (IsActive = true OR EndDate != null)',
+			NpcHouseholdSource.memberFilter(new Set<String>{ 'isactive', 'enddate' }),
+			'inactive with no end date is not counted'
+		);
+		Assert.areEqual(
+			' AND IsActive = true',
+			NpcHouseholdSource.memberFilter(new Set<String>{ 'isactive' }),
+			'without End Date only active rows count'
+		);
+		Assert.areEqual(
+			'',
+			NpcHouseholdSource.memberFilter(new Set<String>{ 'enddate' }),
+			'without Is Active nothing can be filtered'
+		);
+	}
+
+	@IsTest
 	static void membershipRowsBecomeMembersWithRolesAndDates() {
 		// runs-as: deploying user (rows only, no record or permission is read)
 		Id lee = Id.valueOf('001000000000001');

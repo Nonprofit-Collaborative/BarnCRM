@@ -1320,6 +1320,7 @@
     "Core_NpspAdoption_NoteGone": "The account no longer exists.",
     "Core_NpspAdoption_NoteHasMembers": "The household still has household member records. Undo the members step of the migration, or remove them, then undo again.",
     "Core_NpspAdoption_NoteNoAccess": "You cannot edit this account.",
+    "Core_NpspAdoption_NoteMembersKept": "The account was put back, but the household member records the migration made could not be removed: {0}",
     "Core_NpspAdoption_NoteNotHousehold": "The account is no longer a household, so it was left as it is.",
     "Core_NpspAdoption_NoteRefused": "Salesforce refused the change: {0}",
     "Core_NpspAdoption_RunSummary": "NPSP household adoption finished: {0} adopted, {1} skipped because you cannot edit them, {2} refused (each refusal has its own Error Log entry).",

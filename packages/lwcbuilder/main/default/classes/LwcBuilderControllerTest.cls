@@ -346,4 +346,119 @@ private class LwcBuilderControllerTest {
 			Assert.areEqual('Donor_Snapshot', first.getValue(), 'The picklist stores the key');
 		}
 	}
+
+	private static Map<String, Object> group(
+		String key,
+		String label,
+		List<Map<String, Object>> children
+	) {
+		return new Map<String, Object>{ 'key' => key, 'label' => label, 'children' => children };
+	}
+
+	private static List<Object> one(Object value) {
+		return new List<Object>{
+			new Map<String, Object>{ 'value' => value, 'label' => String.valueOf(value) }
+		};
+	}
+
+	@IsTest
+	static void aSummaryChartHasOneCellPerGroup() {
+		// runs-as: deploying user (plain inputs, no record or report is read)
+		List<String> series = new List<String>();
+		List<Map<String, Object>> rows = LwcBuilderController.chartRows(
+			new List<Map<String, Object>>{
+				group('0', 'Alpha', new List<Map<String, Object>>()),
+				group('1', 'Beta', null)
+			},
+			null,
+			new Map<String, List<Object>>{ '0!T' => one(5) },
+			series
+		);
+		Assert.areEqual(2, rows.size(), 'A row per group');
+		Assert.areEqual('Alpha', rows[0].get('label'), 'The group label');
+		Assert.areEqual(1, ((List<Object>) rows[0].get('cells')).size(), 'One cell');
+		Assert.areEqual(
+			0,
+			((List<Object>) ((List<Object>) rows[1].get('cells'))[0]).size(),
+			'A group with no fact has an empty cell'
+		);
+		Assert.isTrue(series.isEmpty(), 'One grouping has no series');
+	}
+
+	@IsTest
+	static void aSecondGroupingBecomesTheSeriesInTheOrderMet() {
+		// runs-as: deploying user (plain inputs, no record or report is read)
+		List<String> series = new List<String>();
+		List<Map<String, Object>> rows = LwcBuilderController.chartRows(
+			new List<Map<String, Object>>{
+				group(
+					'0',
+					'Alpha',
+					new List<Map<String, Object>>{
+						new Map<String, Object>{ 'key' => '0_0', 'label' => 'Open' },
+						new Map<String, Object>{ 'key' => '0_1', 'label' => 'Closed' }
+					}
+				),
+				group(
+					'1',
+					'Beta',
+					new List<Map<String, Object>>{
+						new Map<String, Object>{ 'key' => '1_1', 'label' => 'Closed' }
+					}
+				)
+			},
+			null,
+			new Map<String, List<Object>>{
+				'0_0!T' => one(1),
+				'0_1!T' => one(2),
+				'1_1!T' => one(3)
+			},
+			series
+		);
+		Assert.areEqual(new List<String>{ 'Open', 'Closed' }, series, 'Series in the order met');
+		List<Object> beta = (List<Object>) rows[1].get('cells');
+		Assert.areEqual(2, beta.size(), 'The lane Beta lacks is filled');
+		Assert.isNull(beta[0], 'Beta has no Open');
+		Assert.isNotNull(beta[1], 'Beta has Closed');
+	}
+
+	@IsTest
+	static void aMatrixChartUsesItsColumnsAsSeriesAndCapsThemAtTwelve() {
+		// runs-as: deploying user (plain inputs, no record or report is read)
+		List<Map<String, Object>> across = new List<Map<String, Object>>();
+		Map<String, List<Object>> cells = new Map<String, List<Object>>();
+		for (Integer i = 0; i < 14; i++) {
+			across.add(new Map<String, Object>{ 'key' => String.valueOf(i), 'label' => 'C' + i });
+			cells.put('0!' + i, one(i));
+		}
+		List<String> series = new List<String>();
+		List<Map<String, Object>> rows = LwcBuilderController.chartRows(
+			new List<Map<String, Object>>{ group('0', 'Alpha', null) },
+			across,
+			cells,
+			series
+		);
+		Assert.areEqual(12, series.size(), 'At most twelve series');
+		Assert.areEqual(12, ((List<Object>) rows[0].get('cells')).size(), 'A cell per column');
+	}
+
+	@IsTest
+	static void aChartHasAtMostTwoHundredRows() {
+		// runs-as: deploying user (plain inputs, no record or report is read)
+		List<Map<String, Object>> groups = new List<Map<String, Object>>();
+		for (Integer i = 0; i < 205; i++) {
+			groups.add(group(String.valueOf(i), 'G' + i, null));
+		}
+		Assert.areEqual(
+			200,
+			LwcBuilderController.chartRows(
+					groups,
+					null,
+					new Map<String, List<Object>>(),
+					new List<String>()
+				)
+				.size(),
+			'Capped'
+		);
+	}
 }

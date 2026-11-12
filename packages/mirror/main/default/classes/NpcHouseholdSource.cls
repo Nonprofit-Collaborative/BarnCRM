@@ -65,19 +65,28 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 			return result;
 		}
 		Map<Id, List<NpspHouseholdSource.Member>> members = new Map<Id, List<NpspHouseholdSource.Member>>();
-		if (available() && hasField(MEMBER_OBJECT, PRIMARY_FIELD)) {
-			List<Map<String, Object>> rows = new List<Map<String, Object>>();
-			for (
-				SObject row : Database.queryWithBinds(
-					'SELECT AccountId, ContactId, IsPrimaryMember, Roles, IsActive, StartDate, EndDate' +
-					' FROM AccountContactRelation WHERE AccountId IN :accountIds ORDER BY Id', // detection-only: text
-					new Map<String, Object>{ 'accountIds' => accountIds },
-					AccessLevel.USER_MODE
-				)
-			) {
-				rows.add(row.getPopulatedFieldsAsMap());
+		if (available()) {
+			String memberQuery = memberSelect(readableMemberFields());
+			if (memberQuery == null) {
+				ErrorLogger.logMessage(
+					BarnHelp.text('Mirror', 'Mirror_NpcHouseholds_MembersUnreadable'),
+					'NpcHouseholdSource',
+					ErrorLogger.SEVERITY_WARNING
+				);
+			} else {
+				List<Map<String, Object>> rows = new List<Map<String, Object>>();
+				for (
+					SObject row : Database.queryWithBinds(
+						memberQuery +
+						' FROM AccountContactRelation WHERE AccountId IN :accountIds ORDER BY Id', // detection-only: text
+						new Map<String, Object>{ 'accountIds' => accountIds },
+						AccessLevel.USER_MODE
+					)
+				) {
+					rows.add(row.getPopulatedFieldsAsMap());
+				}
+				members = members(rows);
 			}
-			members = members(rows);
 		}
 		for (Account account : [
 			SELECT Id, Name, RecordTypeId
@@ -101,6 +110,76 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 			result.add(household);
 		}
 		return result;
+	}
+
+	private static final List<String> OPTIONAL_MEMBER_FIELDS = new List<String>{
+		PRIMARY_FIELD,
+		'Roles',
+		'IsActive',
+		'StartDate',
+		'EndDate'
+	};
+
+	/** The membership fields the running user can read, lower case. */
+	private static Set<String> readableMemberFields() {
+		Set<String> result = new Set<String>();
+		Schema.SObjectType type = NamespaceUtil.globalDescribe().get(MEMBER_OBJECT);
+		if (type == null) {
+			return result;
+		}
+		Map<String, Schema.SObjectField> fields = type.getDescribe(SObjectDescribeOptions.DEFERRED)
+			.fields.getMap();
+		for (String field : new List<String>{ 'AccountId', 'ContactId' }) {
+			addIfReadable(result, fields, field);
+		}
+		for (String field : OPTIONAL_MEMBER_FIELDS) {
+			addIfReadable(result, fields, field);
+		}
+		return result;
+	}
+
+	private static void addIfReadable(
+		Set<String> result,
+		Map<String, Schema.SObjectField> fields,
+		String field
+	) {
+		Schema.SObjectField found = fields.get(field.toLowerCase());
+		if (found != null && found.getDescribe().isAccessible()) {
+			result.add(field.toLowerCase());
+		}
+	}
+
+	/**
+	 * The SELECT list over the readable fields, or null when the Account or Contact of a
+	 * membership cannot be read and members cannot be joined. A missing primary flag or role is
+	 * dropped, so the members still come across.
+	 */
+	@TestVisible
+	private static String memberSelect(Set<String> readable) {
+		if (!readable.contains('accountid') || !readable.contains('contactid')) {
+			return null;
+		}
+		List<String> columns = new List<String>{ 'AccountId', 'ContactId' };
+		for (String field : OPTIONAL_MEMBER_FIELDS) {
+			if (readable.contains(field.toLowerCase())) {
+				columns.add(field);
+			}
+		}
+		return 'SELECT ' + String.join(columns, ', ');
+	}
+
+	/**
+	 * The count's filter, the one `members` applies: a row inactive with no End Date is not a
+	 * member. Only what the user can read is named.
+	 */
+	@TestVisible
+	private static String memberFilter(Set<String> readable) {
+		if (!readable.contains('isactive')) {
+			return '';
+		}
+		return readable.contains('enddate')
+			? ' AND (IsActive = true OR EndDate != null)'
+			: ' AND IsActive = true';
 	}
 
 	/** Native roles to Household Member roles (ADR-NEXT conversion decision 4). */
@@ -160,7 +239,9 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 		for (
 			SObject row : Database.queryWithBinds(
 				'SELECT AccountId, COUNT(Id) n FROM AccountContactRelation' + // detection-only: text
-				' WHERE AccountId IN :accountIds GROUP BY AccountId',
+					' WHERE AccountId IN :accountIds' +
+					memberFilter(readableMemberFields()) +
+					' GROUP BY AccountId',
 				new Map<String, Object>{ 'accountIds' => accountIds },
 				AccessLevel.USER_MODE
 			)
@@ -292,13 +373,5 @@ public with sharing class NpcHouseholdSource extends NpspHouseholdSource impleme
 	private static Boolean readable(String objectName) {
 		Schema.SObjectType type = NamespaceUtil.globalDescribe().get(objectName);
 		return type != null && type.getDescribe(SObjectDescribeOptions.DEFERRED).isAccessible();
-	}
-
-	private static Boolean hasField(String objectName, String field) {
-		Schema.SObjectType type = NamespaceUtil.globalDescribe().get(objectName);
-		return type != null &&
-			type.getDescribe(SObjectDescribeOptions.DEFERRED)
-				.fields.getMap()
-				.containsKey(field.toLowerCase());
 	}
 }

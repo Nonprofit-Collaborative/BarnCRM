@@ -278,8 +278,9 @@ On the **Meeting** panel:
   For than Against) or Failed and the date. When the meeting has not reached quorum, the outcome
   is recorded the same way, a warning says to check your bylaws before relying on the vote, and
   the motion's **Closed Without Quorum** box is ticked and shown under the motion in the panel
-  (D-196). A vote cannot change once voting closes, except by an admin recording a vote taken by
-  voice.
+  (D-196). A meeting with no attendance recorded has not reached quorum, so closing voting on it
+  always warns and ticks **Closed Without Quorum**: record attendance before closing. A vote
+  cannot change once voting closes, except by an admin recording a vote taken by voice.
 - **Availability Poll**: before the time is fixed, leave Start blank, fill in up to three Poll
   Times and use **Send Poll** (it invites the board first if needed). Members answer Yes, If
   Needed or No for each time in the portal; **Choose This Time** sets the start and closes the

@@ -85,6 +85,7 @@
     "Mirror_InboundGift_ErrorTooLong": "{0} is longer than {1} characters.",
     "Mirror_InboundGift_Existing": "This gift was already recorded. Nothing was changed.",
     "Mirror_InboundGift_LogRefused": "Inbound gift {0} was refused ({1}). The sending system was told why; the reason is not logged, because it can carry what the donor sent.",
+    "Mirror_NpcHouseholds_MembersUnreadable": "The Nonprofit Cloud household members could not be joined to their households: the running user cannot read Account Contact Relation Account or Contact. The households were read without members. Give the user read access to those fields and run the preview again.",
     "Mirror_OpportunityMirror_AmountNotAboveZero": "The Opportunity has no amount above zero, so no gift was made from it.",
     "Mirror_OpportunityMirror_ContactRole": "The Opportunity was written, but its primary contact role could not be: {0}",
     "Mirror_OpportunityMirror_CopyAgainGiftsOnly": "Copy These Gifts Again works only in Gifts to Opportunities: a gift is never changed from its Opportunity.",

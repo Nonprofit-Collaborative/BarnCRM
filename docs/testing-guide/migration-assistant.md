@@ -168,7 +168,7 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 | 5 | Open Lee Household's Party Relationship Group and account contact relations. | Unchanged: same rows, same values, same last modified dates. |
 | 6 | Run step 1 again. | "Every Nonprofit Cloud household you can see is already a BarnCRM household or marked to stay in Nonprofit Cloud." |
 | 7 | Open **Health**. | No **Household Model Disagrees With Nonprofit Cloud** warning. Then set Cho Household's Household Model to **Automatic** and refresh: the warning names Cho Household. Set it back to **Converted**. |
-| 8 | Add a household member to Cho Household by hand, then click **Undo This Conversion**, type **2** and confirm. | **Last conversion**: 1 undone, 1 not put back. Lee Household has its old record type, Household Model **Automatic**, and no BarnCRM members; Cho Household is still a Household and its Household Adoption record says it has other members. No Nonprofit Cloud record changed. |
+| 8 | Add a household member to Cho Household by hand, then click **Undo This Conversion**, type **2** and confirm. | **Last conversion**: 1 undone, 1 not put back. Lee Household has its old record type, its earlier Household Model (blank or **Automatic**), and no BarnCRM members; Cho Household is still a Household and its Household Adoption record says it has other members. No Nonprofit Cloud record changed. |
 | 9 | As a staff user without **Manage BarnCRM Settings**, open BarnCRM Settings, **General**. | **Convert Nonprofit Cloud Households** is not shown. |
 
 **Cleanup:** remove Cho Household's hand-added member and undo again, then delete the test records.
