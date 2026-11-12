@@ -1,4 +1,4 @@
-# ADR-NEXT: Event Management: paid registration through Payments, session proposal scoring, badge overrides and per-session ratings
+# ADR-0207: Event Management: paid registration through Payments, session proposal scoring, badge overrides and per-session ratings
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-11
@@ -7,8 +7,8 @@ org's own Stripe and PayPal for events; session proposal management with multi-u
 scoring; the Midwest Dreamin' and Whova comparison), Section 5.12. Builds on ADR-0177 (events
 module), ADR-0180 (call for speakers), ADR-0182 (registrations), ADR-0184 (a guest only stores, a
 staff job processes), ADR-0185 (portal actions), ADR-0188 (post-event survey), ADR-0190 (public
-event pages), ADR-0017 (cross-package mechanisms by name) and ADR-NEXT
-`NEXT-payments-module.md` (the payment seam).
+event pages), ADR-0017 (cross-package mechanisms by name) and ADR-0201
+`0201-payments-module.md` (the payment seam).
 
 ## Context
 

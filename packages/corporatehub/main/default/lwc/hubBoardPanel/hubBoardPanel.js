@@ -11,8 +11,8 @@ import { expiringSeats, percent, skillGaps, todayIso } from 'c/corporateHubModel
 const HELP_PACKAGES = ['CorporateHub'];
 
 /**
- * The Board panel (CH-09, CH-12, CH-13, CH-15, CH-16, CH-17, CH-19; ADR-NEXT
- * `NEXT-corporate-hub-board-governance.md` decision 13): current seats with term ends and the
+ * The Board panel (CH-09, CH-12, CH-13, CH-15, CH-16, CH-17, CH-19; ADR-0199
+ * `0199-corporate-hub-board-governance.md` decision 13): current seats with term ends and the
  * term-limit flag, terms ending soon, the skills matrix and its gaps, giving participation when
  * Giving is installed, open action items, and for a holder of Manage Corporate Hub, Request From
  * Board (a disclosure or policy) and Start Self-Assessment.

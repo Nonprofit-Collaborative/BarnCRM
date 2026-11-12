@@ -1,5 +1,5 @@
 /**
- * What the Project Management classes share (ADR-NEXT `NEXT-project-management-module.md`): the
+ * What the Project Management classes share (ADR-0208 `0208-project-management-module.md`): the
  * module key, the Manage Projects check and the refusal a person reads as written.
  */
 public with sharing class Projects {

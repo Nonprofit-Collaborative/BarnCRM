@@ -9,7 +9,7 @@ import { isVisible, normalize, ruleFields, rulePermissions } from 'c/lwcBuilderM
 const HELP_PACKAGES = ['LwcBuilder'];
 
 /**
- * BarnCRM Built Component (LB-02; ADR-NEXT `NEXT-lwc-builder-module.md`, decision 4): the one
+ * BarnCRM Built Component (LB-02; ADR-0203 `0203-lwc-builder-module.md`, decision 4): the one
  * packaged component that shows a component built in the LWC Builder, placed on record, app and
  * home pages. It reads the definition by key as the viewing user and lays it out on the SLDS
  * grid; each block reads its own data (c/lwcBuilderBlock). Nothing is generated or deployed.

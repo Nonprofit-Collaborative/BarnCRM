@@ -1,4 +1,4 @@
-# ADR-NEXT: Brand management in Core, and brand-restricted visibility through BarnCRM-owned groups
+# ADR-0202: Brand management in Core, and brand-restricted visibility through BarnCRM-owned groups
 
 **Status:** Proposed (build agent, 2026-11-11; for the integrator and Brandon)
 **Date:** 2026-11-11

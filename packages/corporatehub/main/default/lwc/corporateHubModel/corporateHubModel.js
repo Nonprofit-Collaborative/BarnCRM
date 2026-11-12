@@ -1,6 +1,6 @@
 /**
- * Framework-free logic for the Corporate Hub page and panels (ADR-NEXT
- * `NEXT-corporate-hub-module.md` decision 11; plan Section 9.9): how far off a date is and the
+ * Framework-free logic for the Corporate Hub page and panels (ADR-0196
+ * `0196-corporate-hub-module.md` decision 11; plan Section 9.9): how far off a date is and the
  * help key that says so, and the outcomes a completed cycle can have. No Salesforce imports, so
  * a browser page outside Salesforce can use it as it is.
  */
@@ -63,7 +63,7 @@ export function groupName(value) {
     .replace(/\s+/g, '_');
 }
 
-// ---- Board governance (CH-09 to CH-20; ADR-NEXT `NEXT-corporate-hub-board-governance.md`)
+// ---- Board governance (CH-09 to CH-20; ADR-0199 `0199-corporate-hub-board-governance.md`)
 
 /** Meeting Attendee Attendance values (canonical model 29CH10), in the order offered. */
 export const ATTENDANCE = ['Invited', 'Present', 'Absent', 'Excused'];

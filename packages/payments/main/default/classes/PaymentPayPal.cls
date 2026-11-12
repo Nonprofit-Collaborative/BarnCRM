@@ -1,5 +1,5 @@
 /**
- * The org's own PayPal account (ADR-NEXT `NEXT-payments-module.md`, decisions 2, 4 and 5):
+ * The org's own PayPal account (ADR-0201 `0201-payments-module.md`, decisions 2, 4 and 5):
  * Orders with an approve link, PayPal's own webhook verification, and capture of an approved
  * order. Every callout here runs before any write of the transaction it is in.
  */
@@ -217,7 +217,7 @@ public with sharing class PaymentPayPal {
 	}
 
 	// The org's own PayPal keys live in the protected setting Payment_Keys__c, not a Named
-	// Credential (ADR-NEXT payments module, decision 7): the same setting holds the webhook id
+	// Credential (ADR-0201 payments module, decision 7): the same setting holds the webhook id
 	// and Stripe's signing secret, which Apex must read, so one write-only place holds them all.
 	@SuppressWarnings('PMD.ApexSuggestUsingNamedCred')
 	private static HttpResponse send(String path, String body, String requestId) {

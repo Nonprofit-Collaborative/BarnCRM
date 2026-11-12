@@ -25,7 +25,7 @@ public with sharing class FormsAccessSync extends ModuleAccessSyncBase {
 
 	/**
 	 * Each other set, and the BarnCRM roles (permission set groups) whose holders get it. Fundraising
-	 * Staff is Giving's role, named as text: a role that is not installed is skipped (ADR-NEXT D3).
+	 * Staff is Giving's role, named as text: a role that is not installed is skipped (ADR-0194 D3).
 	 * Coordinator is retired and dropped in the next release (D1).
 	 */
 	@TestVisible

@@ -9,7 +9,7 @@
  * where: [{ field, op, value }], orderBy, limit, search, download, calendar: { title, start, end,
  * location }, personScope: { field, object, personField, valueField, where }, actions: ["update",
  * "create", { extension, label }] }] }`. `personScope`, `calendar`, `download` and `scan` are
- * ADR-NEXT `NEXT-events-attendee-app-operations-portal-templates.md`, decisions 1 and 2.
+ * ADR-0215 `0215-events-attendee-app-operations-portal-templates.md`, decisions 1 and 2.
  */
 public with sharing class PortalTemplate {
 	public static final Integer SCHEMA_VERSION = 1;

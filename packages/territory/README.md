@@ -3,8 +3,8 @@
 ## Purpose
 
 Assigns people, households and organizations to territories and owners by rules, with a preview
-before anything changes and undo afterwards (plan C-40 and C-40b, ADR-NEXT
-`NEXT-territory-management-module.md`, D-98, D-120, D-156). Never uses Salesforce's Enterprise
+before anything changes and undo afterwards (plan C-40 and C-40b, ADR-0205
+`0205-territory-management-module.md`, D-98, D-120, D-156). Never uses Salesforce's Enterprise
 Territory Management, so it runs on a Platform-only org.
 
 ## First ships in

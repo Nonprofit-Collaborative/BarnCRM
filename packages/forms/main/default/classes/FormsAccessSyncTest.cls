@@ -96,7 +96,7 @@ private class FormsAccessSyncTest {
 		}
 	}
 
-	/** ADR-NEXT D3: Fundraising Staff (Giving's role, when installed) gets Forms Staff. */
+	/** ADR-0194 D3: Fundraising Staff (Giving's role, when installed) gets Forms Staff. */
 	@IsTest
 	static void fundraisingStaffGetsFormsStaff() {
 		System.runAs(TestUsers.admin()) {

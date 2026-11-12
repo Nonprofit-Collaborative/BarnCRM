@@ -1,5 +1,5 @@
 /**
- * The first-fit rule both waitlists share (ADR-NEXT volunteer self-service and waitlists,
+ * The first-fit rule both waitlists share (ADR-0198 volunteer self-service and waitlists,
  * decision 5), on records held in memory: Core has no module object, so accounts stand in, the
  * parent account as the shift or program and Number of Employees as a group's size.
  */

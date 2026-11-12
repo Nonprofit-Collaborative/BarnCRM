@@ -21,7 +21,7 @@ Builder; those links go through Core extension points when their items are built
 used. Paid registration (EV-20) reaches the optional BarnCRM Payments module only by name:
 `EventPayments` builds `PaymentsApi` with `NamespaceUtil.build`, and Payments builds
 `EventPaymentListener` by the name stored on each payment, so neither package depends on the other
-(ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`).
+(ADR-0207 `0207-events-paid-registration-proposals-ratings.md`).
 
 ## Contents
 

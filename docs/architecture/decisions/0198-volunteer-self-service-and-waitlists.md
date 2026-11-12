@@ -1,4 +1,4 @@
-# ADR-NEXT: Volunteer self-service, capacity and waitlists: public shift pages on the Forms host, a signed personal page, one first-fit waitlist rule in Core
+# ADR-0198: Volunteer self-service, capacity and waitlists: public shift pages on the Forms host, a signed personal page, one first-fit waitlist rule in Core
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-11

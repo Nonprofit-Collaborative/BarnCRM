@@ -1,6 +1,6 @@
 /**
- * What the BarnCRM LWC Builder module does at install and at every upgrade (ADR-NEXT
- * `NEXT-lwc-builder-module.md`).
+ * What the BarnCRM LWC Builder module does at install and at every upgrade (ADR-0203
+ * `0203-lwc-builder-module.md`).
  *
  * Each step is safe to run twice and none can abort an install, since every failure is written
  * to the Error Log instead:

@@ -1,11 +1,11 @@
-# ADR-NEXT: The BarnCRM LWC Builder module: component definitions as JSON records, one packaged renderer reading in user mode, nothing deployed at run time
+# ADR-0203: The BarnCRM LWC Builder module: component definitions as JSON records, one packaged renderer reading in user mode, nothing deployed at run time
 
 **Status:** Accepted (builder decision; LB-01 to LB-06 built as recommended, for Brandon to confirm)
 **Date:** 2026-11-11
 **Source:** plan Section 5.10 (LB-01 to LB-06), Section 6.0a releases 1.14 and 1.16, D-120,
 Section 6.1.2 item 19, Section 1.5 (self-service, nothing paid), Section 9.9 (portability);
 builds on ADR-0013, ADR-0017, ADR-0131, ADR-0164 (help text JSON), ADR-0192 (module tabs in the
-BarnCRM apps) and ADR-NEXT `NEXT-corporate-hub-module.md` (module skeleton).
+BarnCRM apps) and ADR-0196 `0196-corporate-hub-module.md` (module skeleton).
 
 ## Context
 

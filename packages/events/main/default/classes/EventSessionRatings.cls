@@ -1,5 +1,5 @@
 /**
- * Per-session ratings (EV-27; ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`,
+ * Per-session ratings (EV-27; ADR-0207 `0207-events-paid-registration-proposals-ratings.md`,
  * decisions 14 and 15; canonical model 29EV27, R-SRT1 to R-SRT3). An event names one published
  * public Forms form (`Session_Rating_Form_Key__c`); each session's QR code opens it tied to the
  * session, and each processed submission with a `rating` from 1 to 5 adds one anonymous

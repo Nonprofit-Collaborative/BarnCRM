@@ -1,4 +1,4 @@
-# ADR-NEXT: Online donation pages: an appeal's public page with a Forms form, handing off to the org's own Stripe or PayPal hosted checkout, with the gift written from the payment's outcome
+# ADR-0211: Online donation pages: an appeal's public page with a Forms form, handing off to the org's own Stripe or PayPal hosted checkout, with the gift written from the payment's outcome
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-11
@@ -6,8 +6,8 @@
 donation page), D-177 (moved to 1.15), D-190 (payments through the org's own Stripe and PayPal;
 payment processing stays out of Core). Builds on ADR-0017 (cross-package mechanisms by name),
 ADR-0175 (the Forms seam `FormAttachmentExtension`), ADR-0184 (a guest only stores, a staff job
-processes), ADR-0190 (public pages through `PublicPageExtension`) and ADR-NEXT
-`NEXT-payments-module.md` (the Payments seam).
+processes), ADR-0190 (public pages through `PublicPageExtension`) and ADR-0201
+`0201-payments-module.md` (the Payments seam).
 
 ## Context
 
@@ -16,7 +16,7 @@ donor to the organization's own Stripe or PayPal checkout and writes the gift ba
 Payments receiver, with BarnCRM holding no money. The pieces exist: Forms serves a module's
 public page for a record with its form (ADR-0190), Forms stores a guest's answers and processes
 them later as staff (ADR-0184), and Payments starts a hosted checkout and tells a named listener
-how the payment ended (`NEXT-payments-module.md`, decision 8). What is missing is the hand-off:
+how the payment ended (`0201-payments-module.md`, decision 8). What is missing is the hand-off:
 the checkout must start while the donor is still on the page, and the gift must end up right
 whichever comes first, the form's processing or the processor's report.
 

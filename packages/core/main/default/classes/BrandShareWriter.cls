@@ -1,5 +1,5 @@
 /**
- * The system mode writes of multi-brand management (C-47, ADR-NEXT brand management and
+ * The system mode writes of multi-brand management (C-47, ADR-0202 brand management and
  * visibility): one-default and one-primary upkeep on Brand, Legal Entity and Brand Assignment,
  * and the brand groups, their members and the Account shares granted to them (R-BR7).
  *

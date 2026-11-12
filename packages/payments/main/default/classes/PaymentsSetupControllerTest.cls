@@ -1,5 +1,5 @@
 /**
- * Payments Setup (ADR-NEXT payments module, decision 7): it shows each Site's receiver
+ * Payments Setup (ADR-0201 payments module, decision 7): it shows each Site's receiver
  * addresses and only the last four characters of each key; saving keeps keys left blank;
  * clearing removes one processor's keys; someone who cannot manage settings cannot change them.
  */

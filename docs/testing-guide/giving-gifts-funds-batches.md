@@ -2,7 +2,7 @@
 
 Scripts for entering gifts (Gifts tab, Quick Gift Entry, gift batches, import), funds, appeals, in-kind gifts and closed accounting periods. Setup detail: [Gifts](../admin-guide/gifts.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app (app launcher). Sample data makes no fund the default, so run T-GIFT-01 first (a new org's own starting **General Fund** is already the default: see T-GIFT-14). Related admin-guide pages: [Quick Gift Entry](../admin-guide/quick-gift-entry.md), [Funds](../admin-guide/funds.md), [Appeals](../admin-guide/appeals.md), [Gift batches](../admin-guide/gift-batches.md), [In-kind gifts](../admin-guide/in-kind-gifts.md), [Posting and closed periods](../admin-guide/posting-and-closed-periods.md), [Importing gifts](../admin-guide/gift-import.md), [A donor's giving on their record](../admin-guide/donor-records.md). Refunds, receipts and the receipt lock have their own pages.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Giving deployed and sample data loaded unless a script says otherwise. Work in the **BarnCRM Fundraising** app (app launcher). Sample data makes no fund the default, so run T-GIFT-01 first (a new org's own starting **General Fund** is already the default: see T-GIFT-13). Related admin-guide pages: [Quick Gift Entry](../admin-guide/quick-gift-entry.md), [Funds](../admin-guide/funds.md), [Appeals](../admin-guide/appeals.md), [Gift batches](../admin-guide/gift-batches.md), [In-kind gifts](../admin-guide/in-kind-gifts.md), [Posting and closed periods](../admin-guide/posting-and-closed-periods.md), [Importing gifts](../admin-guide/gift-import.md), [A donor's giving on their record](../admin-guide/donor-records.md). Refunds, receipts and the receipt lock have their own pages.
 
 ## T-GIFT-01: Funds and the Default Fund
 
@@ -11,7 +11,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the **Funds** tab, list view **All Funds**. | **General Fund** to **Memorial Fund** show, 8 funds in all. On an org that started with a default fund (a new org's own starting **General Fund**, T-GIFT-14), that fund is the only **General Fund** and the other 7 are sample funds. |
+| 1 | Open the **Funds** tab, list view **All Funds**. | **General Fund** to **Memorial Fund** show, 8 funds in all. On an org that started with a default fund (a new org's own starting **General Fund**, T-GIFT-13), that fund is the only **General Fund** and the other 7 are sample funds. |
 | 2 | Open **General Fund**. If **Is Default** is not ticked, click **Edit**, tick it, and save. | **Is Default** is ticked. **Total Raised**, **Gift Count**, **Last Gift Date** and **Totals Last Updated** are read only. |
 | 3 | Open **BarnCRM Settings**, **Giving**. | **Default fund** shows General Fund. |
 | 4 | On the **Funds** tab click **New**. Name `Test Fund`, tick **Active** and **Is Default**, and save. | Saved. |
@@ -246,7 +246,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 **Cleanup:** none.
 
-## T-GIFT-14: A New Org Starts with a Default Fund
+## T-GIFT-13: A New Org Starts with a Default Fund
 
 **Purpose:** a freshly deployed Giving org already has one default fund, so the first gift works without any setup.
 **Prerequisites:** a new org deployed with `scripts/org/deploy-packages.sh` (default settings) or installed as packages, with no fund created by hand and no sample data loaded. Admin user.
@@ -262,7 +262,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 
 **Cleanup:** none (or delete the gift from step 4 and the fund).
 
-## T-GIFT-13: List Views for Gifts, Funds, Appeals, Donor Levels and Batches
+## T-GIFT-14: List Views for Gifts, Funds, Appeals, Donor Levels and Batches
 
 **Purpose:** each giving object opens with an All view and the status views an admin expects.
 **Prerequisites:** staff user, sample data loaded (the Inactive views are empty until you switch something off).
@@ -280,7 +280,7 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 ## T-GIFT-15: Sample Data Reuses the Org's Default Fund
 
 **Purpose:** loading sample data on an org that already has a default fund does not add a second General Fund, and removing it leaves the org's fund.
-**Prerequisites:** admin; a new Giving org with its starting **General Fund** as the default (T-GIFT-14), no sample data loaded.
+**Prerequisites:** admin; a new Giving org with its starting **General Fund** as the default (T-GIFT-13), no sample data loaded.
 
 | Step | Action | Expected result |
 |---|---|---|

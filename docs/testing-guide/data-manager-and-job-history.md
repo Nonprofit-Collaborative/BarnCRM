@@ -44,7 +44,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** None.
 
-## T-DM-13: What Do You Want to Do? Finds the Tool for a Task
+## T-DM-03: What Do You Want to Do? Finds the Tool for a Task
 
 **Purpose:** Confirm the task search above the tiles lists the tools for a typed task, opens them, and offers only tools the person may use.
 **Prerequisites:** admin; staff with the **BarnCRM Find and Export** permission set only.
@@ -61,7 +61,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** None.
 
-## T-DM-12: Find, Import and Super Transformer Open From Data Manager Only
+## T-DM-04: Find, Import and Super Transformer Open From Data Manager Only
 
 **Purpose:** Confirm Find, Import and Super Transformer are not in any app's navigation, and open from their Data Manager tiles and from links elsewhere.
 **Prerequisites:** admin, and staff with the **BarnCRM Find and Export** permission set.
@@ -76,7 +76,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** None.
 
-## T-DM-03: A Super Transformer Run Appears in Data Jobs, with a Notification
+## T-DM-05: A Super Transformer Run Appears in Data Jobs, with a Notification
 
 **Purpose:** Confirm a Super Transformer run is listed newest first with its counts, the filter works, and the starter gets one bell notification.
 **Prerequisites:** admin. In **BarnCRM Settings**, **General**, **Send long job notifications** is ticked.
@@ -91,12 +91,12 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 6 | In **Show**, choose **Imports**. | The Super Transformer run is no longer listed. |
 | 7 | In **Show**, choose **Super Transformer runs**, then **All**. | The Super Transformer run is listed again each time. |
 
-**Cleanup:** Leave the job for T-DM-04.
+**Cleanup:** Leave the job for T-DM-06.
 
-## T-DM-04: Undo a Super Transformer Run From Data Jobs
+## T-DM-06: Undo a Super Transformer Run From Data Jobs
 
 **Purpose:** Confirm the typed-count confirmation guards the undo and the values go back.
-**Prerequisites:** admin; T-DM-03 done.
+**Prerequisites:** admin; T-DM-05 done.
 **Smoke:** yes
 
 | Step | Action | Expected result |
@@ -111,7 +111,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** None.
 
-## T-DM-05: Undo a Bulk Delete From Data Jobs
+## T-DM-07: Undo a Bulk Delete From Data Jobs
 
 **Purpose:** Confirm a bulk delete is listed and its undo brings the record back from the Recycle Bin.
 **Prerequisites:** admin (holds **BarnCRM Bulk Delete** from the create script). Create a contact `Dana Deletetest`.
@@ -126,7 +126,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Delete `Dana Deletetest`.
 
-## T-DM-06: Who Sees Data Manager and What
+## T-DM-08: Who Sees Data Manager and What
 
 **Purpose:** Confirm the tab, tiles and job kinds follow each person's permissions.
 **Prerequisites:** staff; admin to give and take permissions.
@@ -138,11 +138,11 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 3 | As staff, wait a minute and reload. Open **Data Manager**. | The tab is there. Only two tiles: **Find** under **Find and Change** and **Org Optimizer** under **Check and Tidy**. There is no **Bring Data In** or **Careful** group. |
 | 4 | Look for **Import Templates**, **Data Jobs** and **Salesforce's Own Tools**. | None of them is shown. |
 | 5 | As admin, also give the staff user **BarnCRM Bulk Update**. As staff, reload **Data Manager**. | A third tile, **Super Transformer**, appears after **Find**, and **Data Jobs** appears with the line **Start a change with Super Transformer above, or from a saved query in Find (Change Records, Super Transformer). Recent Super Transformer runs and their undo are listed here.** There is no **Show** list (one kind of job only) and no **Show everyone's jobs**. |
-| 6 | As staff, check whether the admin's Super Transformer run from T-DM-03 is listed. | It is not: staff see their own jobs only. |
+| 6 | As staff, check whether the admin's Super Transformer run from T-DM-05 is listed. | It is not: staff see their own jobs only. |
 
 **Cleanup:** As admin, remove both extra permissions from the staff user on the **Access** page.
 
-## T-DM-07: Data Quality Checks and Open in Find
+## T-DM-09: Data Quality Checks and Open in Find
 
 **Purpose:** Confirm the Data Quality section counts each check and opens a check's records in Find.
 **Prerequisites:** admin.
@@ -158,7 +158,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Delete the saved query **Data Quality: Deceased People Who Can Still Be Emailed** in Find if you want a tidy org.
 
-## T-DM-08: An Empty Household Is Counted, and the Years Setting Is Bounded
+## T-DM-10: An Empty Household Is Counted, and the Years Setting Is Bounded
 
 **Purpose:** Confirm a new problem shows after **Recount**, and an out-of-range setting is refused.
 **Prerequisites:** admin.
@@ -173,7 +173,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Set the years back to `5`. Keep `Empty Test Household` if you run T-HC-05 next; otherwise delete it.
 
-## T-DM-09: Field Use Counts, Saves and Compares
+## T-DM-11: Field Use Counts, Saves and Compares
 
 **Purpose:** Confirm the on-demand count, the saved counts, the change column, the technical names toggle, and the Required, Default Value and At Default columns.
 **Prerequisites:** admin.
@@ -192,7 +192,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Clear the Website you added. Delete the **Field Utilization Snapshot** records if you want a tidy org.
 
-## T-DM-10: Job Notifications Can Be Turned Off
+## T-DM-12: Job Notifications Can Be Turned Off
 
 **Purpose:** Confirm the one setting stops notifications while jobs still run.
 **Prerequisites:** admin.
@@ -200,16 +200,16 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | In **BarnCRM Settings**, **General**, clear **Send long job notifications** and click **Save**. | **Your settings are saved.** |
-| 2 | Run a Super Transformer run as in T-DM-03, steps 1 and 2, setting **Title** to `Quiet`. | The job completes and is listed in **Data Jobs**. |
+| 2 | Run a Super Transformer run as in T-DM-05, steps 1 and 2, setting **Title** to `Quiet`. | The job completes and is listed in **Data Jobs**. |
 | 3 | Check the bell. | No new notification. |
-| 4 | Undo the job as in T-DM-04 (type `6`). | The job reaches undone; no notification. |
+| 4 | Undo the job as in T-DM-06 (type `6`). | The job reaches undone; no notification. |
 
 **Cleanup:** Tick **Send long job notifications** again and save.
 
-## T-DM-11: Snapshot History Compares, Shows and Deletes Saved Counts
+## T-DM-13: Snapshot History Compares, Shows and Deletes Saved Counts
 
 **Purpose:** Confirm the Snapshot History list, the compare choice, the saved rows and the delete.
-**Prerequisites:** admin; T-DM-09 done (one saved count for **Account**).
+**Prerequisites:** admin; T-DM-11 done (one saved count for **Account**).
 
 | Step | Action | Expected result |
 |---|---|---|
@@ -225,7 +225,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** Delete the remaining snapshot with **Delete** if you want a tidy org.
 
-## T-DM-13: Picklist Value Usage Lists Values, Records and Last Used
+## T-DM-14: Picklist Value Usage Lists Values, Records and Last Used
 
 **Purpose:** Confirm Picklist Value Usage reads on request and marks used, unused and retired values.
 **Prerequisites:** admin; sample data loaded; at least one sample address (its **Status** picklist has **Current**, **Former** and **Undeliverable**).

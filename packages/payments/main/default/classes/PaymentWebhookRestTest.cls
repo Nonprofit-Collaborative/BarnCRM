@@ -1,5 +1,5 @@
 /**
- * The webhook receiver (ADR-NEXT payments module, decisions 4 and 5; R-PEV1, R-PEV3): a Stripe
+ * The webhook receiver (ADR-0201 payments module, decisions 4 and 5; R-PEV1, R-PEV3): a Stripe
  * event is stored only with a good, recent signature and only once; a PayPal event is stored
  * with its transmission headers for verification later; anything else is refused.
  */

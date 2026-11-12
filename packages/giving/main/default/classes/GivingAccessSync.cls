@@ -1,6 +1,6 @@
 /**
  * Gives Giving Admin to everyone holding BarnCRM Admin, directly or through the BarnCRM Admin
- * role, as every other module gives its Admin set (ADR-NEXT, simpler permission sets, D2).
+ * role, as every other module gives its Admin set (ADR-0194, simpler permission sets, D2).
  * Giving Staff and Giving Read Only stay per person on the Access page, except Giving Staff inside
  * the Fundraising Staff role: donor amounts, receipts and tax statements are given deliberately.
  *

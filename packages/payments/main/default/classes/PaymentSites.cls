@@ -1,6 +1,6 @@
 /**
- * The org's active Salesforce Sites, for the webhook receiver (ADR-NEXT
- * `NEXT-payments-module.md`, decision 4): their guest users, for Health Check, and their secure
+ * The org's active Salesforce Sites, for the webhook receiver (ADR-0201
+ * `0201-payments-module.md`, decision 4): their guest users, for Health Check, and their secure
  * addresses, for the receiver addresses on Payments Setup. Experience Cloud sites are left out
  * (ADR-0009). The same reading as Forms' `FormsSites`, kept here because Payments depends on
  * Core only.

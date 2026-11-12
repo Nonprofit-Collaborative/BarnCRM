@@ -18,7 +18,7 @@ public with sharing class PublicPageExtensions {
 	};
 
 	/**
-	 * Whether the page being built was asked for with a signed claim the host checked (ADR-NEXT
+	 * Whether the page being built was asked for with a signed claim the host checked (ADR-0198
 	 * volunteer self-service, decision 3). A page for a person's own record shows only then.
 	 */
 	private static Boolean signedRequest = false;
@@ -136,7 +136,7 @@ public with sharing class PublicPageExtensions {
 
 	/**
 	 * Starts the checkout of the module whose page the record is on, when that module takes
-	 * payments (ADR-NEXT `NEXT-online-donation-pages.md`, decision 2). Null when no module
+	 * payments (ADR-0211 `0211-online-donation-pages.md`, decision 2). Null when no module
 	 * publishes the record or it takes no payment. A failure is raised for the host to log and
 	 * answer, since the form must then not be stored.
 	 */

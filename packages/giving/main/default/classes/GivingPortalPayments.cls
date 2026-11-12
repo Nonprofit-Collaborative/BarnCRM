@@ -1,5 +1,5 @@
 /**
- * The donor portal's Pay Online action (PAY-03; ADR-NEXT `NEXT-donor-portal-payments.md`,
+ * The donor portal's Pay Online action (PAY-03; ADR-0210 `0210-donor-portal-payments.md`,
  * decisions 2 and 3): `Giving.PayOnline` on a pledge or recurring gift emails the donor a link to
  * the organization's own hosted checkout for the next payment due. Portal Builder calls `run`
  * only for a verified person and a commitment it found on that person's page; the commitment is

@@ -1,5 +1,5 @@
 /**
- * One territory run (canonical model R-TM3, R-TM4; ADR-NEXT `NEXT-territory-management-module.md`,
+ * One territory run (canonical model R-TM3, R-TM4; ADR-0205 `0205-territory-management-module.md`,
  * decisions 3 to 5), run as the person who started it.
  *
  * - **One kind at a time.** People, then households, then organizations: each kind with active

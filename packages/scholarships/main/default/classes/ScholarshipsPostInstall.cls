@@ -1,6 +1,6 @@
 /**
  * What the BarnCRM Scholarships and Outbound Grants module does at install and at every upgrade
- * (ADR-NEXT `NEXT-scholarships-outbound-grants-module.md`). Each step is safe to run twice and
+ * (ADR-0204 `0204-scholarships-outbound-grants-module.md`). Each step is safe to run twice and
  * none can abort an install, since every failure is written to the Error Log instead:
  *
  * 1. Turn on, once, a ship-on setting added in an upgrade (Core's `ShippedDefaultUpgrades`).

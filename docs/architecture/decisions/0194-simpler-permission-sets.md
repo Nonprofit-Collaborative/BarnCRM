@@ -1,4 +1,4 @@
-# ADR-NEXT: Fewer, more inclusive roles and extra permissions
+# ADR-0194: Fewer, more inclusive roles and extra permissions
 
 **Status:** Accepted (Brandon, 2026-11-09, plan D-191: D1, D2, D4 and D5 as proposed; D3
 modified so Programs is excluded; the Bulk Update class gap fix approved)

@@ -1,6 +1,6 @@
 /**
- * Looks addresses up with the org's own provider and writes what it learned (ADR-NEXT
- * `NEXT-address-verification-module.md`, decisions 2 to 5; canonical model R-AV1 to R-AV3).
+ * Looks addresses up with the org's own provider and writes what it learned (ADR-0209
+ * `0209-address-verification-module.md`, decisions 2 to 5; canonical model R-AV1 to R-AV3).
  *
  * Every callout is made first and every write after, since Salesforce allows no callout after a
  * write in one transaction. Only Verification Status and Latest Verified Date are written, plus

@@ -1,6 +1,6 @@
 /**
  * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the project health
- * check to the one nightly run (ADR-0166; ADR-NEXT `NEXT-project-management-module.md`
+ * check to the one nightly run (ADR-0166; ADR-0208 `0208-project-management-module.md`
  * decision 5).
  */
 @NamespaceAccessible

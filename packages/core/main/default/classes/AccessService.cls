@@ -25,7 +25,7 @@ public with sharing class AccessService {
 	};
 
 	/**
-	 * Retired roles, each with the role that replaces it (ADR-NEXT, simpler permission sets,
+	 * Retired roles, each with the role that replaces it (ADR-0194, simpler permission sets,
 	 * D1). The page no longer offers them, but a person may still hold one until the next
 	 * release removes it, so Access Explorer still names it as a role and `RetiredRoleMigration`
 	 * gives its holders the successor.

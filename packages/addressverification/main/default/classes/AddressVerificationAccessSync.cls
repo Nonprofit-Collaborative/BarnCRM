@@ -1,6 +1,6 @@
 /**
- * Gives Address Verification Admin to everyone holding BarnCRM Admin (ADR-NEXT
- * `NEXT-address-verification-module.md`, decision 8; ADR-0131 module access sync by role). The
+ * Gives Address Verification Admin to everyone holding BarnCRM Admin (ADR-0209
+ * `0209-address-verification-module.md`, decision 8; ADR-0131 module access sync by role). The
  * module has no record of its own, so there is no staff or read only set.
  *
  * It only gives, never takes away. It runs at install, and Core asks it when a role is given on

@@ -1,6 +1,6 @@
 /**
- * Gives the Territory Management permission sets to BarnCRM's roles (ADR-NEXT
- * `NEXT-territory-management-module.md`, decision 7): Territory Admin to everyone holding BarnCRM
+ * Gives the Territory Management permission sets to BarnCRM's roles (ADR-0205
+ * `0205-territory-management-module.md`, decision 7): Territory Admin to everyone holding BarnCRM
  * Admin, Territory Staff to the Team Member and Fundraising Staff roles, and Territory Read Only
  * to the Read Only role (ADR-0131, D-191).
  *

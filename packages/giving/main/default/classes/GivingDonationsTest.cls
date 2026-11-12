@@ -1,5 +1,5 @@
 /**
- * An appeal's online donation page (G-34; ADR-NEXT online donation pages, decisions 1 to 5;
+ * An appeal's online donation page (G-34; ADR-0211 online donation pages, decisions 1 to 5;
  * R-AP5): only an active appeal with Donation Page on is published, with no gift or total; the
  * checkout is asked of Payments with the answer `amount`; the gift is right whichever comes
  * first, form processing or the payment report, and neither writes it twice.

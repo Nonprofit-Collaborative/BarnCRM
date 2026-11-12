@@ -2,7 +2,7 @@
 <FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
   <description>
     The Territory Management page: territories, rules and members, Preview and Assign runs, and
-    Undo (C-40, C-40b; ADR-NEXT territory management module).
+    Undo (C-40, C-40b; ADR-0205 territory management module).
   </description>
   <flexiPageRegions>
     <itemInstances>

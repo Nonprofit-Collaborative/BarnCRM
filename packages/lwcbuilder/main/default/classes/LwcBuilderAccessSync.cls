@@ -1,5 +1,5 @@
 /**
- * Gives the LWC Builder permission sets to BarnCRM's roles (ADR-NEXT `NEXT-lwc-builder-module.md`,
+ * Gives the LWC Builder permission sets to BarnCRM's roles (ADR-0203 `0203-lwc-builder-module.md`,
  * decision 9): LWC Builder Admin to everyone holding BarnCRM Admin, directly or through a role,
  * LWC Builder Staff to the Team Member and Fundraising Staff roles, and LWC Builder Read Only to
  * the Read Only role (ADR-0131, D-191).

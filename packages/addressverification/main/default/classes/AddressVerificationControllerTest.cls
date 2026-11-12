@@ -1,5 +1,5 @@
 /**
- * Address Verification Setup, Health Check and the nightly step (ADR-NEXT address verification
+ * Address Verification Setup, Health Check and the nightly step (ADR-0209 address verification
  * module, decisions 3, 5 and 7; R-AV4): only the last four characters of a key are shown; a blank
  * box keeps a saved key; clearing removes one provider's keys; someone who cannot manage settings
  * changes nothing; Health Check reports missing keys; the nightly step runs only once keys are in.

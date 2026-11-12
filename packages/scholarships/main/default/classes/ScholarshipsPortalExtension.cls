@@ -1,6 +1,6 @@
 /**
- * The applicant portal's actions (PB-06, SG-07; ADR-0185 decision 9; ADR-NEXT
- * `NEXT-scholarships-outbound-grants-module.md` decision 12): `Scholarships.Apply` on an open
+ * The applicant portal's actions (PB-06, SG-07; ADR-0185 decision 9; ADR-0204
+ * `0204-scholarships-outbound-grants-module.md` decision 12): `Scholarships.Apply` on an open
  * cycle starts a Draft application for the verified person, with their signed form link where it
  * can be made now (the nightly run fills any left blank); `Scholarships.Withdraw` withdraws one of
  * their own not yet decided; `Scholarships.AcceptAward` accepts one of their own Offered awards.

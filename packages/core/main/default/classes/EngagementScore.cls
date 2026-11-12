@@ -1,5 +1,5 @@
 /**
- * The engagement score (C-64, canonical model Section 7A, ADR-NEXT `NEXT-engagement-score.md`):
+ * The engagement score (C-64, canonical model Section 7A, ADR-0212 `0212-engagement-score.md`):
  * the settings, the module signals found by name, and the arithmetic.
  *
  * Each part is a share from 0 to 1 (R-ES2); the score is the weighted shares over the weights of

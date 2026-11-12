@@ -75,7 +75,7 @@ public with sharing class TabAccessService {
 	 * Each tab set, and the permission sets whose holders see that tab while it is on.
 	 * Duplicate Review holders see Duplicate Matching, where the review list is (ADR-0139),
 	 * and so do Metadata Admin holders, who change its matching logic. Bulk Update and Bulk
-	 * Delete include Find and Export's grants (ADR-NEXT, D5), so their holders see its tabs.
+	 * Delete include Find and Export's grants (ADR-0194, D5), so their holders see its tabs.
 	 */
 	@TestVisible
 	private static final Map<String, List<String>> AUDIENCE = new Map<String, List<String>>{
@@ -177,7 +177,7 @@ public with sharing class TabAccessService {
 	 */
 	public with sharing class Job implements Queueable {
 		public void execute(QueueableContext jobContext) {
-			// Holders of a retired role get its successor (ADR-NEXT, D1); never throws, and
+			// Holders of a retired role get its successor (ADR-0194, D1); never throws, and
 			// its budget leaves the tab slice its 5,000 rows inside the 10,000.
 			RetiredRoleMigration.carryOver(RETIRED_ROLE_ROWS);
 			try {

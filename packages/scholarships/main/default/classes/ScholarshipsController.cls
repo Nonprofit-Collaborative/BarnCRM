@@ -1,6 +1,6 @@
 /**
  * The Scholarships and Grants page, the review board, the review panel and the award panel
- * (ADR-NEXT `NEXT-scholarships-outbound-grants-module.md`). Thin by design (plan Section 9.9): it
+ * (ADR-0204 `0204-scholarships-outbound-grants-module.md`). Thin by design (plan Section 9.9): it
  * returns plain shapes and leaves the work to `ScholarshipReviews` and `ScholarshipAwards`, in
  * user mode. A refusal written for the person, or a save's own message, is shown as it is;
  * anything else is logged and shown as one message.

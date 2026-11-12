@@ -1,6 +1,6 @@
 /**
- * Events' listener on the payment seam (EV-20; ADR-NEXT `NEXT-payments-module.md`, decision 8;
- * ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`, decision 5). BarnCRM Payments
+ * Events' listener on the payment seam (EV-20; ADR-0201 `0201-payments-module.md`, decision 8;
+ * ADR-0207 `0207-events-paid-registration-proposals-ratings.md`, decision 5). BarnCRM Payments
  * builds it by the name stored on each payment Events started and calls `paymentChanged` when the
  * payment's status or refunded amount changes; the work is `EventPayments.apply`.
  *

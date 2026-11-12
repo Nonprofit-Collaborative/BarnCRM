@@ -1,5 +1,5 @@
 /**
- * Volunteers' side of Core's form seam (ADR-0175 decision 9; ADR-NEXT volunteer self-service,
+ * Volunteers' side of Core's form seam (ADR-0175 decision 9; ADR-0198 volunteer self-service,
  * decisions 2 and 3). Core finds this class by name (`FormAttachmentExtensions.EXTENSION_CLASSES`);
  * without Forms it is never called.
  *

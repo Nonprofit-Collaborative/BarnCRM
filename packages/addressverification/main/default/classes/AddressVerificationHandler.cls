@@ -1,6 +1,6 @@
 /**
- * Address Verification on `Address__c` (registry row `Address_Verification`; ADR-NEXT
- * `NEXT-address-verification-module.md`, decision 5; canonical model R-AV2, R-AV3). A switch on
+ * Address Verification on `Address__c` (registry row `Address_Verification`; ADR-0209
+ * `0209-address-verification-module.md`, decision 5; canonical model R-AV2, R-AV3). A switch on
  * the Automation page that Pause All covers; the dispatcher skips it while the module is off.
  *
  * Before a change to the street, city, state, postal code or country is saved, the address goes

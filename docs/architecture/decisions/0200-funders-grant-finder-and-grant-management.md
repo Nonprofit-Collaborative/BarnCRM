@@ -1,4 +1,4 @@
-# ADR-NEXT: Funders Grant Finder and grant management
+# ADR-0200: Funders Grant Finder and grant management
 
 **Status:** Proposed (built for release 1.11, F-09 to F-13; awaits owner confirmation)
 **Date:** 2026-11-11

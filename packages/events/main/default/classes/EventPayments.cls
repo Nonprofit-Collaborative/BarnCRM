@@ -1,5 +1,5 @@
 /**
- * Paid event registration (EV-20; ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`,
+ * Paid event registration (EV-20; ADR-0207 `0207-events-paid-registration-proposals-ratings.md`,
  * decisions 1 to 7; canonical model R-ERG5 to R-ERG7). BarnCRM Payments is reached only by name:
  * this class builds `PaymentsApi` with `NamespaceUtil.build` (null when Payments is not
  * installed), and Payments builds `EventPaymentListener` by the name stored on each payment, so
@@ -184,7 +184,7 @@ public with sharing class EventPayments {
 	 * R-ERG6: applies what Payments reported about a payment to its registration, when it is the
 	 * registration's current payment. Safe to call twice with the same status.
 	 *
-	 * @param payment the seam's payment map (ADR-NEXT `NEXT-payments-module.md`, decision 8)
+	 * @param payment the seam's payment map (ADR-0201 `0201-payments-module.md`, decision 8)
 	 */
 	public static void apply(Map<String, Object> payment) {
 		Id registrationId = idOf(payment.get('sourceRecordId'));

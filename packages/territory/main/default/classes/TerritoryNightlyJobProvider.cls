@@ -1,6 +1,6 @@
 /**
  * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add territory assignment to
- * the one nightly run (ADR-0166; ADR-NEXT `NEXT-territory-management-module.md`, decision 6). The
+ * the one nightly run (ADR-0166; ADR-0205 `0205-territory-management-module.md`, decision 6). The
  * step ships off: an administrator turns it on from the Nightly Jobs panel once the rules are
  * right. It assigns only records with no territory, so a person's own moves are kept.
  */

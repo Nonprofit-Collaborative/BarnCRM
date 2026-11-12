@@ -1,5 +1,5 @@
 /**
- * Brand-restricted visibility upkeep (C-47c, canonical model R-BR7, ADR-NEXT brand management
+ * Brand-restricted visibility upkeep (C-47c, canonical model R-BR7, ADR-0202 brand management
  * and visibility, decisions 4 to 6).
  *
  * Two phases, because groups and group members are setup objects and Account shares are not,
@@ -277,7 +277,7 @@ public with sharing class BrandShareJob implements Queueable {
 		return groups;
 	}
 
-	/** Health Check (ADR-NEXT decision 5): visibility restricts nothing until Accounts are Private. */
+	/** Health Check (ADR-0202 decision 5): visibility restricts nothing until Accounts are Private. */
 	public with sharing class VisibilityCheck implements HealthCheckService.Check {
 		public HealthCheckService.Finding run() {
 			if (!BrandService.visibilityOn()) {

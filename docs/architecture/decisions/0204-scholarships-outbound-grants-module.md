@@ -1,4 +1,4 @@
-# ADR-NEXT: The BarnCRM Scholarships and Outbound Grants module: its own package on Core, applications on the Forms engine, reviews with rubrics and panels, awards, conditional disbursements recorded only, recipient reports and an applicant portal template
+# ADR-0204: The BarnCRM Scholarships and Outbound Grants module: its own package on Core, applications on the Forms engine, reviews with rubrics and panels, awards, conditional disbursements recorded only, recipient reports and an applicant portal template
 
 **Status:** Accepted (builder decision, for Brandon to confirm)
 **Date:** 2026-11-11

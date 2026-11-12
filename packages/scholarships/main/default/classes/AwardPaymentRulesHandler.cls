@@ -1,7 +1,7 @@
 /**
  * R-SG11 for Award_Payment__c, run by the Core trigger dispatcher through the registry row
- * `Award_Payment_Rules`, which always runs since it enforces a rule (ADR-0017; ADR-NEXT
- * `NEXT-scholarships-outbound-grants-module.md` decision 10): a disbursement becomes Paid only for
+ * `Award_Payment_Rules`, which always runs since it enforces a rule (ADR-0017; ADR-0204
+ * `0204-scholarships-outbound-grants-module.md` decision 10): a disbursement becomes Paid only for
  * a holder of Manage Scholarships and only while no open condition of its award holds it back;
  * an empty Paid Date is filled with today.
  */

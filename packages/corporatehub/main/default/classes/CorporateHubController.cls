@@ -1,6 +1,6 @@
 /**
- * The Corporate Hub page and the document and obligation panels (ADR-NEXT
- * `NEXT-corporate-hub-module.md` decision 11). Thin by design (plan Section 9.9): it returns plain
+ * The Corporate Hub page and the document and obligation panels (ADR-0196
+ * `0196-corporate-hub-module.md` decision 11). Thin by design (plan Section 9.9): it returns plain
  * shapes and leaves the work to `HubPolicy`, `HubCompliance` and `HubTemplates`, all in user
  * mode. A refusal written for the person, or a validation rule's own words, is shown as it is;
  * anything else is logged and shown as one message.

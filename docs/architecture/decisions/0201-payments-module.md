@@ -1,4 +1,4 @@
-# ADR-NEXT: BarnCRM Payments: the org's own Stripe and PayPal through hosted checkout, one payment record, a verified webhook receiver and a Callable seam for the modules that charge
+# ADR-0201: BarnCRM Payments: the org's own Stripe and PayPal through hosted checkout, one payment record, a verified webhook receiver and a Callable seam for the modules that charge
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-11

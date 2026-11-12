@@ -227,7 +227,7 @@ describe('shipped portal templates', () => {
         expect(page.kind).toBe('person');
         expect(page.key).toBe('contact');
       }
-      // PAY-03 (ADR-NEXT donor portal payments): the one module action, on pledges only.
+      // PAY-03 (ADR-0210 donor portal payments): the one module action, on pledges only.
       modules.forEach((action) => {
         expect(action.extension).toBe('Giving.PayOnline');
         expect(page.key).toBe('pledges');

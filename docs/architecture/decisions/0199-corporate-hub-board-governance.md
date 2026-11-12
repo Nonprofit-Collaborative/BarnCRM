@@ -1,10 +1,10 @@
-# ADR-NEXT: Corporate Hub board governance: boards and committees, meetings, motions and votes, disclosures, and the board portal template
+# ADR-0199: Corporate Hub board governance: boards and committees, meetings, motions and votes, disclosures, and the board portal template
 
 **Status:** Accepted (builder decision; reversible calls listed under Consequences)
 **Date:** 2026-11-11
 **Source:** plan Section 5.8 (CH-09 to CH-20), Section 5.9 (PB-02), Section 6.0a releases 1.10,
-1.11, 1.14 and 1.17, D-118, D-156, D-178, D-186, D-187; builds on ADR-NEXT
-`NEXT-corporate-hub-module.md` (its extension points), ADR-0185 (Portal Builder), ADR-0191
+1.11, 1.14 and 1.17, D-118, D-156, D-178, D-186, D-187; builds on ADR-0196
+`0196-corporate-hub-module.md` (its extension points), ADR-0185 (Portal Builder), ADR-0191
 (portal templates), ADR-0013, ADR-0017, ADR-0021 and Section 9.9 (portability).
 
 ## Context

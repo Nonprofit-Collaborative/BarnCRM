@@ -252,7 +252,7 @@ If step 1 answers `donor_not_found`, the API user cannot see contacts: see [Inbo
 
 ## T-MIR-16: Retired Mirror Sets Carry Over
 
-**Purpose:** confirm holders of the five retired Mirror sets get Salesforce Records Sync or Inbound Gifts, keep the old set, and an inactive holder is named instead (ADR-NEXT, simpler permission sets).
+**Purpose:** confirm holders of the five retired Mirror sets get Salesforce Records Sync or Inbound Gifts, keep the old set, and an inactive holder is named instead (ADR-0194, simpler permission sets).
 **Prerequisites:** admin; two spare users, one active and one you will deactivate.
 
 | Step | Action | Expected result |

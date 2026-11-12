@@ -1,5 +1,5 @@
 /**
- * Looking addresses up (ADR-NEXT address verification module, decisions 2 to 5; R-AV1 to R-AV3):
+ * Looking addresses up (ADR-0209 address verification module, decisions 2 to 5; R-AV1 to R-AV3):
  * a Smarty match writes only Verified and today's date; Google's standardized parts are taken
  * only with Apply Corrections on; a vague answer is Failed and keeps the last date; Smarty never
  * looks up a non-US address; a provider error changes nothing and is logged; a change makes an

@@ -3,7 +3,7 @@
 ## Purpose
 
 Admins build their own Lightning components on a drag-and-drop grid and place them on record,
-app and home pages (LB-01 to LB-06, D-120, ADR-NEXT `NEXT-lwc-builder-module.md`). A component
+app and home pages (LB-01 to LB-06, D-120, ADR-0203 `0203-lwc-builder-module.md`). A component
 is a `Built_Component__c` record holding a JSON definition; one packaged component,
 `lwcBuilderRenderer` (BarnCRM Built Component), draws it as the viewing user. Nothing is
 generated or deployed at run time.

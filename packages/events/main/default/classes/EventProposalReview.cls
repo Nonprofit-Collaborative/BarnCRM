@@ -1,5 +1,5 @@
 /**
- * Session proposal management (EV-21; ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`,
+ * Session proposal management (EV-21; ADR-0207 `0207-events-paid-registration-proposals-ratings.md`,
  * decisions 8 to 12; canonical model R-SA6 to R-SA9, R-PP1): weighted review criteria per event,
  * co-presenters, and reviewer assignments. An assignment is a Speaker Review with a reviewer and no
  * score yet; only scored reviews count in the roll-ups.

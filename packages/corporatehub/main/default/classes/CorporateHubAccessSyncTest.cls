@@ -1,5 +1,5 @@
 /**
- * BarnCRM's roles get the Corporate Hub sets (ADR-NEXT corporate hub module, decision 10): BarnCRM
+ * BarnCRM's roles get the Corporate Hub sets (ADR-0196 corporate hub module, decision 10): BarnCRM
  * Admin holders Corporate Hub Admin, Team Member Corporate Hub Staff and Read Only Corporate Hub
  * Read Only, at install, at Turn on and with the hourly access check.
  */

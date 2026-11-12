@@ -1,6 +1,6 @@
 /**
- * What the BarnCRM Territory Management module does at install and at every upgrade (ADR-NEXT
- * `NEXT-territory-management-module.md`). Nothing here changes a record: territories are the
+ * What the BarnCRM Territory Management module does at install and at every upgrade (ADR-0205
+ * `0205-territory-management-module.md`). Nothing here changes a record: territories are the
  * admin's, and the nightly step ships off.
  *
  * 1. Add the module to Core's setup marker (`ModuleSetups`), which Finish Setup also runs.

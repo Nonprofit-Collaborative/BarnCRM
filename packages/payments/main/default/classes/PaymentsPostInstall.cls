@@ -1,6 +1,6 @@
 /**
- * What the BarnCRM Payments module does at install and at every upgrade (ADR-NEXT
- * `NEXT-payments-module.md`).
+ * What the BarnCRM Payments module does at install and at every upgrade (ADR-0201
+ * `0201-payments-module.md`).
  *
  * Each step is safe to run twice and none can abort an install, since every failure is written
  * to the Error Log instead:

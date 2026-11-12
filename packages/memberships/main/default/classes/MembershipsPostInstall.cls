@@ -1,6 +1,6 @@
 /**
- * What the BarnCRM Memberships module does at install and at every upgrade (ADR-NEXT
- * `NEXT-memberships-module.md`).
+ * What the BarnCRM Memberships module does at install and at every upgrade (ADR-0206
+ * `0206-memberships-module.md`).
  *
  * Each step is safe to run twice and none can abort an install, since every failure is written
  * to the Error Log instead:

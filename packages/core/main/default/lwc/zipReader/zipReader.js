@@ -1,8 +1,8 @@
 /**
  * Reads a zip file in the browser: its central directory, then any entry, inflated with the
  * browser's own DecompressionStream. Framework-free, so the import wizard's workbook reader
- * (an .xlsx file is a zip) and Import Files share one copy (ADR-0049; ADR-NEXT
- * `NEXT-files-import.md`). Reads the classic zip format, not ZIP64: an entry or a zip past
+ * (an .xlsx file is a zip) and Import Files share one copy (ADR-0049; ADR-0214
+ * `0214-files-import.md`). Reads the classic zip format, not ZIP64: an entry or a zip past
  * 4 GB is far past what either reader takes.
  */
 

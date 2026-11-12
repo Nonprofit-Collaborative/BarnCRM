@@ -1,6 +1,6 @@
 /**
- * Gives the Scholarships permission sets to BarnCRM's roles (ADR-NEXT
- * `NEXT-scholarships-outbound-grants-module.md`, decision 13): Scholarships Admin to everyone
+ * Gives the Scholarships permission sets to BarnCRM's roles (ADR-0204
+ * `0204-scholarships-outbound-grants-module.md`, decision 13): Scholarships Admin to everyone
  * holding BarnCRM Admin, directly or through a role, Scholarships Staff to the Team Member and
  * Fundraising Staff roles, and Scholarships Read Only to the Read Only role (ADR-0131, D-191).
  *

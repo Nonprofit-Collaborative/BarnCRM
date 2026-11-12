@@ -1,5 +1,5 @@
 /**
- * BarnCRM Admin holders get Giving Admin (ADR-NEXT, simpler permission sets, D2), at install, at
+ * BarnCRM Admin holders get Giving Admin (ADR-0194, simpler permission sets, D2), at install, at
  * Turn on and with the hourly access check; nobody else gets a Giving set from it.
  */
 @IsTest(testFor='ApexClass:GivingAccessSync')

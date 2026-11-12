@@ -1,5 +1,5 @@
 /**
- * Told by BarnCRM Payments when a membership payment changes (ADR-NEXT `NEXT-payments-module.md`,
+ * Told by BarnCRM Payments when a membership payment changes (ADR-0201 `0201-payments-module.md`,
  * decision 8; canonical model R-MEM7). Paid: a Pending term becomes Current from the payment
  * date, any other term is renewed with the payment on the new term. Refunded: the term the
  * payment made is Cancelled. A notice already applied (the payment id is on a term) changes

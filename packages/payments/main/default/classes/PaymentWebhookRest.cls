@@ -1,5 +1,5 @@
 /**
- * The webhook receiver (ADR-NEXT `NEXT-payments-module.md`, decisions 4 and 5; R-PEV1, R-PEV3),
+ * The webhook receiver (ADR-0201 `0201-payments-module.md`, decisions 4 and 5; R-PEV1, R-PEV3),
  * on the org's Salesforce Site for its guest user (`Payments_Webhook_Guest`):
  *
  *   POST <site URL>/services/apexrest/barncrm/payments/v1/stripe

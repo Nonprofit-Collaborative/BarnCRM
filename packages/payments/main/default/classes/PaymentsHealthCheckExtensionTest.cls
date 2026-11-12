@@ -1,5 +1,5 @@
 /**
- * Payments' Health Check (ADR-NEXT payments module, decision 7): it reports keys not entered, a
+ * Payments' Health Check (ADR-0201 payments module, decision 7): it reports keys not entered, a
  * Stripe key for the other mode, no Site, a guest user without the receiver set (and gives it),
  * processing not scheduled (and schedules it) and events waiting; it is quiet when Payments is
  * turned off.

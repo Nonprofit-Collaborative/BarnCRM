@@ -16,8 +16,8 @@ import { ATTENDANCE, MINUTES_SUBMITTED, MINUTES_APPROVED, VOTING_OPEN } from 'c/
 const HELP_PACKAGES = ['CorporateHub'];
 
 /**
- * The Board Meeting panel (CH-10, CH-11, CH-16, CH-18, CH-20; ADR-NEXT
- * `NEXT-corporate-hub-board-governance.md` decision 13): Invite Board and attendance with the
+ * The Board Meeting panel (CH-10, CH-11, CH-16, CH-18, CH-20; ADR-0199
+ * `0199-corporate-hub-board-governance.md` decision 13): Invite Board and attendance with the
  * quorum, the minutes' approval step with the members' portal approvals and packet reads, the
  * open action items carried from earlier meetings, the motions with Open Voting and Close Voting,
  * and the availability poll with Send Poll and Choose Time. The packet itself is Files on the

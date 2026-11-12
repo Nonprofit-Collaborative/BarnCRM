@@ -1,5 +1,5 @@
 /**
- * An appeal's online donation page (G-34; ADR-NEXT `NEXT-online-donation-pages.md`, decisions
+ * An appeal's online donation page (G-34; ADR-0211 `0211-online-donation-pages.md`, decisions
  * 1 to 4; canonical model R-AP5). Core finds this class by name in `PublicPageExtensions` and
  * `FormAttachmentExtensions`; BarnCRM Forms serves the page with the appeal's form and, when the
  * form is sent, asks `startCheckout` before it stores anything. Without Forms nothing calls it.

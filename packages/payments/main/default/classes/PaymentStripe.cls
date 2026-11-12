@@ -1,5 +1,5 @@
 /**
- * The org's own Stripe account (ADR-NEXT `NEXT-payments-module.md`, decisions 2, 4 and 5):
+ * The org's own Stripe account (ADR-0201 `0201-payments-module.md`, decisions 2, 4 and 5):
  * Checkout Sessions, the Stripe-Signature check on arrival, and reading a verified event into a
  * `PaymentService.Change`. Stripe API version: the account's default.
  */
@@ -13,7 +13,7 @@ public with sharing class PaymentStripe {
 	/**
 	 * Starts a Checkout Session and sets its id and page address on the payment. The org's own
 	 * secret key comes from the protected setting Payment_Keys__c, not a Named Credential
-	 * (ADR-NEXT payments module, decision 7): its signing secret must be readable by Apex for
+	 * (ADR-0201 payments module, decision 7): its signing secret must be readable by Apex for
 	 * the HMAC check, so both Stripe keys are kept in the one write-only place.
 	 */
 	@SuppressWarnings('PMD.ApexSuggestUsingNamedCred')

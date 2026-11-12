@@ -1,8 +1,8 @@
 /**
  * Reviews (SG-03) and reviewer panels (SG-10): the rubric (R-SG4), a review's weighted score
  * (R-SG6), saving, submitting and recusing one's own review (R-SG7), Assign Reviewers (R-SG8)
- * and the cycle's ranked review board. User mode throughout (ADR-NEXT
- * `NEXT-scholarships-outbound-grants-module.md`, decisions 6 and 7).
+ * and the cycle's ranked review board. User mode throughout (ADR-0204
+ * `0204-scholarships-outbound-grants-module.md`, decisions 6 and 7).
  */
 public with sharing class ScholarshipReviews {
 	public static final String ASSIGNED = 'Assigned';

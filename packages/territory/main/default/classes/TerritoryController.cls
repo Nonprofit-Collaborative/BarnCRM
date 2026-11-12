@@ -1,6 +1,6 @@
 /**
- * The Territory Management page's server side (C-40, C-40b; ADR-NEXT
- * `NEXT-territory-management-module.md`, decision 8). Thin: territories, rules and members are
+ * The Territory Management page's server side (C-40, C-40b; ADR-0205
+ * `0205-territory-management-module.md`, decision 8). Thin: territories, rules and members are
  * read here and saved by the page through Lightning Data Service; a run is started, counted and
  * undone here. Answers are plain JSON maps (plan 9.9). Access to this class, given by Territory
  * Admin, is what lets a person use the page.

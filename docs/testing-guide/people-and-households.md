@@ -238,7 +238,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** as admin, delete the Mergetest household and The Otherowner Family.
 
-## T-HH-17: A Person in a Household Is Not Pointed at an Organization
+## T-HH-16: A Person in a Household Is Not Pointed at an Organization
 
 **Purpose:** in the simple way of belonging, changing a household member's Account Name to an organization is refused, while a person already at an organization can still be moved between organizations.
 **Prerequisites:** admin, the simple way of belonging. Two organizations (of the record type chosen in **Record type for organizations**) `Zztest Library` and `Zztest Trust`.
@@ -252,7 +252,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 
 **Cleanup:** delete Hana, Omar, The Hhsixteen Family and both organizations.
 
-## T-HH-16: A Blocking Account Duplicate Rule Does Not Stop a New Person
+## T-HH-17: A Blocking Account Duplicate Rule Does Not Stop a New Person
 
 **Purpose:** households BarnCRM creates are saved past the org's Account duplicate rules, so adding a person never fails over a look-alike household.
 **Prerequisites:** admin; in Setup, an active Account duplicate rule on the standard account matching rule with **Action On Create** set to **Block**. Contact `Ana Duptest` already saved, with her household **The Duptest Family**.

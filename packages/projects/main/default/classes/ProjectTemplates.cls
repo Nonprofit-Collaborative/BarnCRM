@@ -1,5 +1,5 @@
 /**
- * Project templates (PM-03, canonical model R-PM3; ADR-NEXT `NEXT-project-management-module.md`
+ * Project templates (PM-03, canonical model R-PM3; ADR-0208 `0208-project-management-module.md`
  * decision 4): the shipped templates in the `Projects_Templates` static resource, placed by day
  * offsets from a start date, and any project marked Is Template, copied with its dates moved to
  * the new start. Both become one plan of offsets, which `create` builds in user mode.

@@ -1,5 +1,5 @@
 /**
- * The Grant Finder (F-09, canonical model R-GN11, ADR-NEXT funders grant finder and grant
+ * The Grant Finder (F-09, canonical model R-GN11, ADR-0200 funders grant finder and grant
  * management): searches open federal funding listings on the public Grants.gov search API, which
  * needs no account or key, and saves one as a Prospect grant.
  *

@@ -2,8 +2,8 @@
  * Awards (SG-04), disbursements (SG-05), conditions (SG-09) and renewals (SG-06): decisions
  * (R-SG9), the award letter (R-SG1), schedules (R-SG12), Mark Paid (R-SG11 is enforced by
  * `AwardPaymentRulesHandler`), requirements, Start Renewal (R-SG10) and the accounting export.
- * Records only: BarnCRM moves no money. User mode throughout (ADR-NEXT
- * `NEXT-scholarships-outbound-grants-module.md`, decisions 8 to 11).
+ * Records only: BarnCRM moves no money. User mode throughout (ADR-0204
+ * `0204-scholarships-outbound-grants-module.md`, decisions 8 to 11).
  */
 public with sharing class ScholarshipAwards {
 	public static final String PAID = 'Paid';

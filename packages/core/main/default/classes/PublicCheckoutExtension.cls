@@ -1,6 +1,6 @@
 /**
- * The seam a module's public page uses to take a payment when its form is sent (ADR-NEXT
- * `NEXT-online-donation-pages.md`, decision 2). A `PublicPageExtension` may also implement this;
+ * The seam a module's public page uses to take a payment when its form is sent (ADR-0211
+ * `0211-online-donation-pages.md`, decision 2). A `PublicPageExtension` may also implement this;
  * `PublicPageExtensions.startCheckout` finds it for the record's type and the host (BarnCRM
  * Forms) asks it before storing anything, so a module's payment callout comes before any write.
  *

@@ -1,5 +1,5 @@
 /**
- * Holders of the retired Coordinator role are given Team Member (ADR-NEXT, simpler permission
+ * Holders of the retired Coordinator role are given Team Member (ADR-0194, simpler permission
  * sets, D1): active ones by the tab access job, inactive ones only named in the Error Log, and
  * nothing is ever taken away.
  */

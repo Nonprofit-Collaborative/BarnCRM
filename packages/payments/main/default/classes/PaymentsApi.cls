@@ -1,5 +1,5 @@
 /**
- * The payment seam (ADR-NEXT `NEXT-payments-module.md`, decision 8; the module README, "The
+ * The payment seam (ADR-0201 `0201-payments-module.md`, decision 8; the module README, "The
  * Payment Seam"). A module that charges builds this class by name
  * (`NamespaceUtil.build('PaymentsApi', Callable.class, context)`) and calls:
  *

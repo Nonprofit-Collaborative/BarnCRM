@@ -1,4 +1,4 @@
-# ADR-NEXT: The BarnCRM Territory Management module: territories and rules as records, a batch that previews then assigns, owner routing by territory owner, round robin or capacity, and undo through Core's data jobs
+# ADR-0205: The BarnCRM Territory Management module: territories and rules as records, a batch that previews then assigns, owner routing by territory owner, round robin or capacity, and undo through Core's data jobs
 
 **Status:** Accepted (builder decision, for Brandon to confirm)
 **Date:** 2026-11-11

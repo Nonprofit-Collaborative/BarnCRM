@@ -1,4 +1,4 @@
-# ADR-NEXT: The BarnCRM Memberships module: its own package on Core, one record per membership term, renewals from Giving and from online payments, and a member directory portal
+# ADR-0206: The BarnCRM Memberships module: its own package on Core, one record per membership term, renewals from Giving and from online payments, and a member directory portal
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-11
@@ -8,7 +8,7 @@ Stripe or PayPal), Section 6.1.1 item 5 and Section 6.1.5 (Memberships Essential
 Nimble AMS), Section 9.9 (portability). Builds on ADR-0013 (Core runs alone), ADR-0017
 (cross-package mechanisms by name), ADR-0110 (erase a person), ADR-0131 (module access by role),
 ADR-0164 (help text JSON), ADR-0166 (nightly dispatcher), ADR-0185 and ADR-0191 (portal templates)
-and ADR-NEXT `NEXT-payments-module.md` (the payment seam).
+and ADR-0201 `0201-payments-module.md` (the payment seam).
 
 ## Context
 

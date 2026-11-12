@@ -125,7 +125,7 @@ add_shortcode('barncrm_portal', function ($atts) {
     wp_enqueue_style('barncrm-portal', plugins_url('css/portal.css', __FILE__), array(), BARNCRM_PORTAL_VERSION);
     $app = '';
     if ($atts['app'] === 'yes') {
-        // An installable web app (ADR-NEXT events attendee app, decision 3): a manifest for this
+        // An installable web app (ADR-0215 events attendee app, decision 3): a manifest for this
         // page and a service worker at the site root that caches only this plugin's own files.
         $manifest = add_query_arg(array(
             'barncrm_portal_manifest' => $key,

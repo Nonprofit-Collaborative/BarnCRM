@@ -1,5 +1,5 @@
 /**
- * The gifts online donation pages write (G-34; ADR-NEXT `NEXT-online-donation-pages.md`,
+ * The gifts online donation pages write (G-34; ADR-0211 `0211-online-donation-pages.md`,
  * decision 5; canonical model R-AP5). Two paths reach the same gift, found by Payment Reference
  * (the payment's identifier), and whichever comes second settles it:
  * - `record`, when Forms processes a donation page's submission as staff: writes the gift for
@@ -85,7 +85,7 @@ public with sharing class GivingDonations implements Callable {
 		insert as user gift;
 	}
 
-	/** The Payments listener (`NEXT-payments-module.md`, decision 8). */
+	/** The Payments listener (`0201-payments-module.md`, decision 8). */
 	public Object call(String action, Map<String, Object> args) {
 		if (action != 'paymentChanged' || args == null || args.get('paymentId') == null) {
 			return null;
@@ -113,7 +113,7 @@ public with sharing class GivingDonations implements Callable {
 	}
 
 	/**
-	 * A donor portal payment (PAY-03; ADR-NEXT `NEXT-donor-portal-payments.md`, decision 4): the
+	 * A donor portal payment (PAY-03; ADR-0210 `0210-donor-portal-payments.md`, decision 4): the
 	 * first Paid report for a payment whose source is a commitment writes its Received gift, and
 	 * Giving's commitment rule links it to the earliest unpaid payment.
 	 */

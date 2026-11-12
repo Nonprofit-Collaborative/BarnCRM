@@ -1,4 +1,4 @@
-# ADR-NEXT: Event Management attendee app, personal agenda, event operations, and the service and partner portal templates
+# ADR-0215: Event Management attendee app, personal agenda, event operations, and the service and partner portal templates
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-11
@@ -7,7 +7,7 @@ PB-04, PB-05), D-190 (the networking app as an installable web app on the org's 
 no app store; the Midwest Dreamin' and Whova comparison), D-118 (Portal Builder templates),
 Section 5.9, Section 5.12, Section 9.9. Builds on ADR-0177 (events module), ADR-0185 (Portal
 Builder), ADR-0191 (portal templates and module actions), ADR-0187 (badges and their QR code),
-ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md` (session ratings), ADR-0017,
+ADR-0207 `0207-events-paid-registration-proposals-ratings.md` (session ratings), ADR-0017,
 ADR-0021 and ADR-0024.
 
 ## Context
