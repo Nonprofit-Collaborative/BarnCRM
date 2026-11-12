@@ -337,4 +337,49 @@ private class HouseholdSelectorTest {
 			);
 		}
 	}
+
+	@IsTest
+	static void householdModelDecidesBeforeDetection() {
+		System.runAs(TestUsers.admin()) {
+			Account converted = HouseholdTestDataFactory.newHousehold('Converted Household');
+			converted.Household_Model__c = HouseholdSelector.MODEL_CONVERTED;
+			Account pinned = HouseholdTestDataFactory.newHousehold('Pinned Household');
+			pinned.Household_Model__c = HouseholdSelector.MODEL_NATIVE;
+			Account detected = HouseholdTestDataFactory.newHousehold('Detected Household');
+			Account plain = HouseholdTestDataFactory.newHousehold('Plain Household');
+			Database.insert(
+				new List<Account>{ converted, pinned, detected, plain },
+				AccessLevel.SYSTEM_MODE
+			);
+			Set<Id> ids = new Set<Id>{ converted.Id, pinned.Id, detected.Id, plain.Id };
+			HouseholdSelector.accountsWithNativeDependentsOverride = new Set<Id>{
+				converted.Id,
+				detected.Id
+			};
+			OrgShapeDetector.reset();
+			OrgShapeSelector.nativeHouseholdGroupCountOverride = 2;
+
+			Test.startTest();
+			Set<Id> among = HouseholdSelector.nativeHouseholdAccountsAmong(ids);
+			Set<Id> dependents = HouseholdSelector.getAccountsWithNativeDependents(ids);
+			OrgShapeDetector.reset();
+			OrgShapeSelector.nativeHouseholdGroupCountOverride = 0;
+			Set<Id> noNativeOrg = HouseholdSelector.nativeHouseholdAccountsAmong(ids);
+			Test.stopTest();
+
+			Assert.areEqual(
+				new Set<Id>{ pinned.Id, detected.Id },
+				among,
+				'Converted is never native, Nonprofit Cloud always is, Automatic asks detection'
+			);
+			Assert.isTrue(
+				dependents.contains(converted.Id),
+				'The delete guard still protects the native group a converted household keeps'
+			);
+			Assert.isTrue(
+				noNativeOrg.isEmpty(),
+				'An org without native household groups is not queried for the field'
+			);
+		}
+	}
 }
