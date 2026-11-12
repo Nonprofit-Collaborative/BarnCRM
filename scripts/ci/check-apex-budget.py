@@ -163,7 +163,10 @@ CAPS = {
     # Batch C review: 53,465 measured (one answer for every wrong code, authenticator codes used
     # once, where values typed at parse time), plus about 2%. Batch C review landing: 54,467
     # measured (QA's sign-in fixes plus perf's and simplification's portal changes), plus about 2%.
-    "portal": 55_600,
+    # Releases 1.11 to 1.13 EVT-B (branch feature/evt-b-r1-11-portal-engine): 59,734 measured
+    # (personScope catalogs read and checked in Apex, calendar, download and scan options), plus
+    # about 2%.
+    "portal": 61_000,
     # Corporate Hub (CH-01 to CH-08, ADR-NEXT corporate hub module): access sync, post-install,
     # the policy, compliance, reminder and template services and the page controller, 29,744
     # measured, plus about 2%. Board governance (CH-09 to CH-20, PB-02): HubBoard, the board and
