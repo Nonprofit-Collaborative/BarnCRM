@@ -246,6 +246,33 @@ private class HealthCheckGivingChecksTest {
 		return null;
 	}
 
+	/** D-200 P12: a fund past the skew threshold is linked, with advice to load serially. */
+	@IsTest
+	static void aFundWithVeryManyGiftsIsLinked() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			quietReceiptChecks();
+			Fund__c busy = new Fund__c(
+				Name = 'General Operating',
+				Active__c = true,
+				Gift_Count__c = HealthCheckSkew.threshold() + 1
+			);
+			insert as system new List<Fund__c>{
+				busy,
+				new Fund__c(Name = 'Quiet', Active__c = true, Gift_Count__c = 3)
+			};
+			System.runAs(jen()) {
+				Map<String, Object> finding = findByKey(
+					HealthCheckGivingChecks.findings(),
+					'gift_lookup_skew'
+				);
+
+				Assert.isNotNull(finding, 'The busy fund is reported');
+				List<Object> links = (List<Object>) finding.get('links');
+				Assert.areEqual(1, links.size(), 'Only the busy fund is linked: ' + links);
+			}
+		}
+	}
+
 	@IsTest
 	static void someoneHoldingTheReceiptLockOverrideIsNamed() {
 		System.runAs(TestUsers.adminWith('Giving_Admin')) {

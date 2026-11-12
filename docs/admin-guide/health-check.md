@@ -142,6 +142,9 @@ Nothing is broken today.
 | Settings | With Volunteers: hours waiting more than 14 days for approval, past shifts nobody closed, shift schedules that have not created shifts far enough ahead, and shipped volunteer totals turned off. See [Volunteers, Health Check findings](volunteers.md#health-check-findings). |
 | Settings | With Programs: enrollments still open in a program that has ended. See [Programs, Health Check](programs.md#health-check). |
 | Your Org | With Programs: whether your org also has Nonprofit Cloud Program Management. Information only: choose one for each program. See [Programs, Health Check](programs.md#health-check). |
+| Settings | Whether one user who has a role owns more than 10,000 households (**One User Owns Too Many Accounts**, a warning), and with Giving the same for gifts. A role or sharing change then recalculates access to all of those records at once, which can lock them and slow saves. Give some of them to other owners or to a user with no role. Health Check samples the owners of the newest 200 records and counts at most three of them, so a very large org is checked without reading every record. |
+| Settings | With Giving: whether any fund or appeal has more than 10,000 gifts (**Funds or Appeals With Very Many Gifts**, information only), read from their Gift Count totals. Each gift saved against one briefly locks it, so load their gifts serially or in smaller batches. |
+| Settings | **Not Checked, Run Again** (a warning): Health Check stopped early to stay inside the limits Salesforce sets on one request, and names the checks it left. The findings above it are still accurate; run Health Check again. A very large org may see this every time for its last few checks. |
 
 Five of those need a module: the Override Receipt Lock permission, the failed receipts, the
 unposted gifts in a closed period (all with Giving), and the stalled Opportunity and Gift

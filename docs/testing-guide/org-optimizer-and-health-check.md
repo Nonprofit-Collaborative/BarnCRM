@@ -383,3 +383,17 @@ Before you start: an org from [Before you test](before-you-test.md), with Core d
 | 6 | With 7 subscriptions of your own, subscribe to another report. | A red notice: you already have 7 report subscriptions, the most Salesforce allows. |
 
 **Cleanup:** Remove the test subscriptions from each report's **Subscribe** button.
+
+## T-HC-23: Skew Findings and a Report That Stops Early
+
+**Purpose:** Confirm Health Check reports a fund with very many gifts, and that a run near Salesforce's limits reports the checks it left instead of failing.
+**Prerequisites:** admin with BarnCRM Admin; Giving installed; a test fund you may change. Workbench or the Developer Console to set a field the page does not show.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Set the test fund's **Gift Count** to `10001` (Workbench or the Developer Console), then run Health Check. | **Funds or Appeals With Very Many Gifts**, information only, links the test fund and advises loading its gifts serially or in smaller batches. |
+| 2 | Set **Gift Count** back to what it was and **Run Again**. | The finding is gone. |
+| 3 | In an org where one user with a role owns more than 10,000 households or gifts (a large sandbox), run Health Check. | **One User Owns Too Many Accounts** (or **Gifts**), a warning, names that user. |
+| 4 | In a large sandbox where Health Check takes many seconds, run it. | Either every finding, or the findings that ran plus **Not Checked, Run Again** naming the checks it left. The page never shows a load failure. |
+
+**Cleanup:** Put the test fund's Gift Count back.

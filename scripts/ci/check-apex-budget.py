@@ -69,6 +69,7 @@ CAPS = {
     # Raised 2026-11-12 for R1.21 namespace readiness (D-199, D-200: BarnInstallCheck, the setup
     # bootstrap and revisions, SetupObjectSelector, NamespaceUtil.field and describe; the
     # modules shrank by moving their lookups onto Core): 2,233,198 measured, plus about 0.3%.
+    # W15 R1.22 (D-200 P5, P7, P12, P13) fit under it: 2,230,377 measured with them.
     "core": 2_240_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
@@ -99,8 +100,9 @@ CAPS = {
     # W14 QA defect D6: donor levels compare totals and rungs in the corporate currency in a
     # multi-currency org (reusing RollupCurrency), 672,127 measured 2026-11-12; raised by the
     # 2,546 added, plus about 2%. Plus 140 for PD3: the gift import's undo logs its failed
-    # deletes in one statement (ErrorLogger.logEach).
-    "giving": 672_340,
+    # deletes in one statement (ErrorLogger.logEach). Plus 1,680 for W15 R1.22 (D-200 P12):
+    # Health Check lookup skew on funds and appeals, gift ownership skew.
+    "giving": 674_020,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.

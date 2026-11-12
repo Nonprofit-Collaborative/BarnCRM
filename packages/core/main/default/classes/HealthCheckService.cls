@@ -204,6 +204,18 @@ public with sharing class HealthCheckService {
 	private static Exception loggerFault;
 
 	/**
+	 * Past these, the remaining checks are left for another run (D-200 P7): about 80 of the
+	 * 100 queries, 7 of the 10 seconds of CPU, 40,000 of the 50,000 query rows. A test
+	 * lowers them.
+	 */
+	@TestVisible
+	private static Integer queryBudget = 80;
+	@TestVisible
+	private static Integer cpuBudget = 7000;
+	@TestVisible
+	private static Integer rowBudget = 40000;
+
+	/**
 	 * Where the two access counts come from. Injected in tests so that the findings are
 	 * asserted against numbers the test chose, not against whichever people and permission
 	 * sets happen to exist in the org the tests run in.
@@ -424,8 +436,13 @@ public with sharing class HealthCheckService {
 	@NamespaceAccessible
 	public static List<Finding> run() {
 		List<Finding> findings = new List<Finding>();
+		List<String> skipped = new List<String>();
 
 		for (CheckStep step : steps()) {
+			if (!skipped.isEmpty() || nearLimits()) {
+				skipped.add(step.key);
+				continue;
+			}
 			try {
 				Finding finding = step.check.run();
 				if (finding != null) {
@@ -436,9 +453,38 @@ public with sharing class HealthCheckService {
 			}
 		}
 
-		findings.addAll(extensionFindings());
+		findings.addAll(extensionFindings(skipped));
+		if (!skipped.isEmpty()) {
+			findings.add(notChecked(skipped));
+		}
 
 		return findings;
+	}
+
+	/**
+	 * Whether the run has used so much of this transaction's limits that the next check could
+	 * hit one. A limit exception cannot be caught, so it would lose the whole report rather
+	 * than one finding (D-200 P7). Public so an extension can stop between its own checks.
+	 */
+	@NamespaceAccessible
+	public static Boolean nearLimits() {
+		return Limits.getQueries() > queryBudget ||
+			Limits.getCpuTime() > cpuBudget ||
+			Limits.getQueryRows() > rowBudget;
+	}
+
+	/** One finding naming the checks that were left for another run. */
+	private static Finding notChecked(List<String> keys) {
+		return new Finding(
+			'not_checked',
+			BarnHelp.text('Core', 'Core_HealthCheck_NotCheckedTitle'),
+			String.format(
+				BarnHelp.text('Core', 'Core_HealthCheck_NotCheckedDetail'),
+				new List<Object>{ keys.size(), String.join(keys, ', ') }
+			),
+			SEVERITY_WARNING,
+			CATEGORY_SETTINGS
+		);
 	}
 
 	/**
@@ -447,10 +493,14 @@ public with sharing class HealthCheckService {
 	 * stands, and the failure is written to the Error Log rather than shown as this package's
 	 * own answer.
 	 */
-	private static List<Finding> extensionFindings() {
+	private static List<Finding> extensionFindings(List<String> skipped) {
 		List<Finding> all = new List<Finding>();
 		Map<String, HealthCheckExtension> byKey = HealthCheckExtensions.findAll();
 		for (String key : byKey.keySet()) {
+			if (!skipped.isEmpty() || nearLimits()) {
+				skipped.add(key);
+				continue;
+			}
 			try {
 				List<Finding> extra = byKey.get(key).findings();
 				if (extra != null) {
@@ -566,6 +616,12 @@ public with sharing class HealthCheckService {
 				new CheckStep(
 					'households_without_members',
 					new HealthCheckHouseholdChecks.HouseholdsWithoutMembersCheck()
+				)
+			);
+			steps.add(
+				new CheckStep(
+					'household_ownership_skew',
+					new HealthCheckSkew.HouseholdOwnershipCheck()
 				)
 			);
 			steps.add(
