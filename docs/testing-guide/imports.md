@@ -220,7 +220,7 @@ Jana,Stone,jana.stone@example.org,77 Match Lane,Springfield,IL,62702
 | 1 | Log in as staff. Open the App Launcher and search for "Import" and "Data Manager". | Neither BarnCRM tab is found. |
 | 2 | Log in as read-only and repeat. | Neither tab is found. |
 | 3 | As admin, on **BarnCRM Settings**, **Access**, give staff the **BarnCRM Find and Export** extra permission. Log in as staff and open **Data Manager**. | The tab opens. There is no **Import a File** card and no **Import Templates** list. |
-| 4 | Still as staff, search the App Launcher for "Import". | No Import tab. |
+| 4 | Still as staff, search the App Launcher for "Import". | No **Super Importer** tab. |
 
 **Cleanup:** as admin, remove **BarnCRM Find and Export** from staff on the **Access** page.
 

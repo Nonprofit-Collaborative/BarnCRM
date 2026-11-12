@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import GiftSoftCredits from 'c/giftSoftCredits';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import getCredits from '@salesforce/apex/SoftCreditController.getCredits';
 import addCredit from '@salesforce/apex/SoftCreditController.addCredit';
 import removeCredit from '@salesforce/apex/SoftCreditController.removeCredit';
@@ -175,7 +176,8 @@ describe('c-gift-soft-credits', () => {
     expect(element.shadowRoot.querySelector('[data-id="save-button"]').disabled).toBe(true);
   });
 
-  it('removes a credit a person entered', async () => {
+  it('removes a credit a person entered after confirmation', async () => {
+    BarnConfirmModal.open.mockResolvedValue(true);
     removeCredit.mockResolvedValue({ credits: [LUIS], canAdd: true, canRemove: true });
     const element = createComponent();
     getCredits.emit(PANEL);
@@ -184,11 +186,27 @@ describe('c-gift-soft-credits', () => {
     element.shadowRoot.querySelector('.remove-button').click();
     await flush();
 
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ confirmVariant: 'destructive' })
+    );
     expect(removeCredit).toHaveBeenCalledWith({ softCreditId: SOLICITOR.recordId });
     expect(element.shadowRoot.querySelectorAll('[data-id="credit-list"] li').length).toBe(1);
   });
 
+  it('keeps the credit when the confirmation is cancelled', async () => {
+    BarnConfirmModal.open.mockResolvedValue(false);
+    const element = createComponent();
+    getCredits.emit(PANEL);
+    await flush();
+
+    element.shadowRoot.querySelector('.remove-button').click();
+    await flush();
+
+    expect(removeCredit).not.toHaveBeenCalled();
+  });
+
   it('shows the message the server sends when an action is refused', async () => {
+    BarnConfirmModal.open.mockResolvedValue(true);
     removeCredit.mockRejectedValue({
       body: { message: 'BarnCRM created this credit and keeps it up to date.' }
     });

@@ -1,5 +1,6 @@
 import { LightningElement, api, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import { getObjectInfo, getPicklistValues } from 'lightning/uiObjectInfoApi';
 import SOFT_CREDIT_OBJECT from '@salesforce/schema/Soft_Credit__c';
 import ROLE_FIELD from '@salesforce/schema/Soft_Credit__c.Role__c';
@@ -207,8 +208,24 @@ export default class GiftSoftCredits extends LightningElement {
       });
   }
 
-  handleRemove(event) {
+  async handleRemove(event) {
     const softCreditId = event.target.dataset.credit;
+    const credit = this.credits.find((candidate) => candidate.recordId === softCreditId);
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: helpText('Giving', 'Giving_SoftCredits_RemoveTitle'),
+      message: helpText(
+        'Giving',
+        'Giving_SoftCredits_RemoveConfirm',
+        credit ? credit.personName : ''
+      ),
+      confirmLabel: REMOVE,
+      confirmVariant: 'destructive',
+      cancelLabel: CANCEL
+    });
+    if (!confirmed) {
+      return undefined;
+    }
     this.busy = true;
     this.errorMessage = undefined;
     return removeCredit({ softCreditId })

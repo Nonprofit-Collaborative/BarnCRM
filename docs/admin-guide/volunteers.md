@@ -871,7 +871,7 @@ Do this as Maria, who holds the Admin role, with a second user, Priya, who has n
 
 ## Importing Volunteer Hours
 
-To bring in hours kept in a spreadsheet, use the **Volunteer Hours** template on the Import tab.
+To bring in hours kept in a spreadsheet, use the **Volunteer Hours** template on the **Super Importer** tab.
 It is added when Volunteers is installed and appears only where Volunteers is. It loads one
 Volunteer Hours record per row, using the Core import's **One Kind of Record** (see
 [Importing](importing.md), section 9), so the preview, results, rejected rows download and undo
@@ -918,7 +918,7 @@ they are kept and listed in the import's journal. With **Require hours approval*
 imported entry is Approved at once, so check the file before you import: taking one back means
 a coordinator reopens it (back to Submitted) and then deletes it.
 
-To import, a person needs the BarnCRM Admin role (for the Import tab) and a Volunteers role
+To import, a person needs the BarnCRM Admin role (for the **Super Importer** tab) and a Volunteers role
 that enters hours (Team Member, Coordinator or Admin), since the load runs with that person's
 own permissions.
 

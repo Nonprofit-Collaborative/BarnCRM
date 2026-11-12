@@ -67,7 +67,7 @@ file and take them out of Salesforce.
   **Data Jobs**, and select **Undo** beside the job, as for any bulk delete. The records come
   back with their Ids, relationships and related records.
 - **Later, or after emptying the Recycle Bin:** load the file with **Load one object** on the
-  Import tab ([Importing](importing.md)). The file's headings are field API names, so each
+  **Super Importer** tab ([Importing](importing.md)). The file's headings are field API names, so each
   column maps to its field. The records come back as new records with new Ids: fields Salesforce
   sets itself (Id, Created Date, Last Modified By and the like) are not loaded, and lookups to
   records that no longer exist stay empty. Related records Salesforce deleted with them are not

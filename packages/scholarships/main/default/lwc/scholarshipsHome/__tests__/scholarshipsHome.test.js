@@ -51,6 +51,28 @@ describe('c-scholarships-home', () => {
     expect(exportDisbursements).toHaveBeenCalled();
   });
 
+  it('starts the export range on the local day, not the UTC day', async () => {
+    jest.useFakeTimers({
+      now: new Date(2026, 10, 12, 23, 30),
+      doNotFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'setImmediate']
+    });
+    try {
+      getHome.mockResolvedValue({ canManage: true, reviews: [], cycles: [], due: [] });
+      exportDisbursements.mockResolvedValue([]);
+      const element = mount();
+      await flush();
+      await flush();
+      find(element, 'export-button').click();
+      await flush();
+      expect(exportDisbursements).toHaveBeenCalledWith({
+        fromDate: '2026-11-01',
+        toDate: '2026-11-12'
+      });
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it('hides the export from staff and shows an error', async () => {
     getHome.mockRejectedValue({ body: { message: 'No access' } });
     const element = mount();

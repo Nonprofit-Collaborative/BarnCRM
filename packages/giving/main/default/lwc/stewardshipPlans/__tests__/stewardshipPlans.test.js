@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import StewardshipPlans from 'c/stewardshipPlans';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import getPage from '@salesforce/apex/StewardshipPlanController.getPage';
 import saveTemplate from '@salesforce/apex/StewardshipPlanController.saveTemplate';
 import setActive from '@salesforce/apex/StewardshipPlanController.setActive';
@@ -389,7 +390,8 @@ describe('c-stewardship-plans', () => {
     expect(down[1].disabled).toBe(true);
   });
 
-  it('removes a step from the recipe', async () => {
+  it('removes a step from the recipe after confirmation', async () => {
+    BarnConfirmModal.open.mockResolvedValue(true);
     deleteStep.mockResolvedValue(undefined);
     const element = createComponent();
     getPage.emit(PAGE);
@@ -399,7 +401,23 @@ describe('c-stewardship-plans', () => {
     element.shadowRoot.querySelectorAll('[data-id="delete-step"]')[0].click();
     await flush();
 
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ confirmVariant: 'destructive' })
+    );
     expect(deleteStep).toHaveBeenCalledWith({ stepId: STEP_ONE });
+  });
+
+  it('keeps the step when the confirmation is cancelled', async () => {
+    BarnConfirmModal.open.mockResolvedValue(false);
+    const element = createComponent();
+    getPage.emit(PAGE);
+    await flush();
+    await select(element, 0);
+
+    element.shadowRoot.querySelectorAll('[data-id="delete-step"]')[0].click();
+    await flush();
+
+    expect(deleteStep).not.toHaveBeenCalled();
   });
 
   it('lets a reader read but not change', async () => {

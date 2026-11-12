@@ -14,7 +14,7 @@
 
     <div class="slds-var-m-top_small">
         <template lwc:if={loading}>
-            <lightning-spinner size="small"></lightning-spinner>
+            <lightning-spinner size="small" alternative-text={labels.loading}></lightning-spinner>
         </template>
 
         <template lwc:elseif={isChoose}>

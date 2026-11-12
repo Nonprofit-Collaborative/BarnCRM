@@ -6,7 +6,8 @@ import { iconFor } from 'c/barnIcons';
 import { initialsOf, opensElsewhere, recordHref } from 'c/recordRows';
 import { followLinkInWorkspace } from 'c/workspaceTabs';
 import { refreshApex } from '@salesforce/apex';
-import { getRecord, updateRecord } from 'lightning/uiRecordApi';
+import { getFieldValue, getRecord, updateRecord } from 'lightning/uiRecordApi';
+import PRIMARY_CONTACT_FIELD from '@salesforce/schema/Account.Primary_Contact__c';
 import { getObjectInfo, getObjectInfos } from 'lightning/uiObjectInfoApi';
 import Toast from 'lightning/toast';
 import CONTACT_SCHEMA from '@salesforce/schema/Contact';
@@ -30,7 +31,6 @@ import LOADING from '@salesforce/label/c.Core_HouseholdPanel_Loading';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const RECORD_TYPE_FIELD = 'Account.RecordType.DeveloperName';
-const PRIMARY_CONTACT_FIELD = 'Account.Primary_Contact__c';
 const HOUSEHOLD = 'Household';
 const JUNCTION = 'Junction';
 const SOURCE_ACCOUNT = 'Account';
@@ -104,8 +104,7 @@ export default class HouseholdMembersPanel extends NavigationMixin(LightningElem
         recordType && recordType.value ? recordType.value.fields.DeveloperName.value : undefined;
       // In the simple way of belonging the primary contact is the household's own field, which
       // the server does not put on a member, so the badge is worked out here.
-      const primary = data.fields.Primary_Contact__c;
-      this.primaryContactId = primary ? primary.value : undefined;
+      this.primaryContactId = getFieldValue(data, PRIMARY_CONTACT_FIELD) || undefined;
     } else if (error) {
       this.errorMessage = this.readError(error);
     }

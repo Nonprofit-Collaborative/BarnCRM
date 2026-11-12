@@ -1,5 +1,6 @@
 import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import CohortMembers from 'c/cohortMembers';
 import getMembers from '@salesforce/apex/CohortController.getMembers';
 import addMembers from '@salesforce/apex/CohortController.addMembers';
@@ -186,6 +187,7 @@ describe('c-cohort-members', () => {
     getMembers.mockResolvedValue(membersOf());
     getPersonName.mockRejectedValue({});
     removeMember.mockResolvedValue(membersOf({ members: [] }));
+    BarnConfirmModal.open.mockResolvedValue(true);
     const element = await render();
     q(element, 'person-picker').dispatchEvent(
       new CustomEvent('change', { detail: { recordId: '003000000000009AAA' } })
@@ -204,7 +206,21 @@ describe('c-cohort-members', () => {
       cohortId: COHORT_ID,
       enrollmentId: ANA.enrollmentId
     });
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ confirmVariant: 'destructive' })
+    );
     expect(q(element, 'members-empty')).not.toBeNull();
+  });
+
+  it('keeps the member when the removal is not confirmed', async () => {
+    getMembers.mockResolvedValue(membersOf());
+    BarnConfirmModal.open.mockResolvedValue(false);
+    const element = await render();
+
+    q(element, 'remove').click();
+    await flush();
+
+    expect(removeMember).not.toHaveBeenCalled();
   });
 
   it('is read only without edit access and reports failures', async () => {

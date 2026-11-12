@@ -1,5 +1,6 @@
 import { createElement } from 'lwc';
 import EventSeating from 'c/eventSeating';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import getSeating from '@salesforce/apex/EventSeatingController.getSeating';
 import saveTable from '@salesforce/apex/EventSeatingController.saveTable';
 import deleteTable from '@salesforce/apex/EventSeatingController.deleteTable';
@@ -123,11 +124,23 @@ describe('c-event-seating', () => {
     expect(sent).toMatchObject({ eventId: EVENT_ID, name: 'Table 9', capacity: 10 });
   });
 
-  it('removes a table', async () => {
+  it('removes a table after the person confirms', async () => {
+    BarnConfirmModal.open.mockResolvedValue(true);
     const element = await render();
     one(element, '[data-action="delete-table"][data-id="t2"]').click();
     await flush();
+    expect(BarnConfirmModal.open).toHaveBeenCalledWith(
+      expect.objectContaining({ confirmVariant: 'destructive' })
+    );
     expect(deleteTable).toHaveBeenCalledWith({ tableId: 't2' });
+  });
+
+  it('keeps the table when the confirmation is cancelled', async () => {
+    BarnConfirmModal.open.mockResolvedValue(false);
+    const element = await render();
+    one(element, '[data-action="delete-table"][data-id="t2"]').click();
+    await flush();
+    expect(deleteTable).not.toHaveBeenCalled();
   });
 
   it('saves dietary needs when the field is left', async () => {

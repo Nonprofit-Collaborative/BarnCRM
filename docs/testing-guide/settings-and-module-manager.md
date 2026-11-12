@@ -158,7 +158,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 4 | Select **Remove** on Sam's row, then **Catch Up Now**. Wait a minute and open `Test Bypassed`. | Sam's row is gone and the page says the catch-up has started. Selecting **Catch Up Now** again at once says "A catch-up is already running." `Test Bypassed` now has a household. |
 | 5 | Tick **Pause All** on **Whole Organization**. | A yellow bar at the top says automation is paused for everyone, with **Turn Off**. Create a person: no household. |
 | 6 | Add your own profile, untick its **Bypass**, and create a person. | The person gets a household: your profile's row (both off) replaces the organization's for you. |
-| 7 | Remove your profile's row and select **Turn Off** in the yellow bar. | The bar is gone and **Pause All** is off on **Whole Organization**. |
+| 7 | Select **Remove** on your profile's row, choose **Cancel** in the **Remove Automation Settings** window (the row stays), then **Remove** again and confirm. Select **Turn Off** in the yellow bar. | The bar is gone and **Pause All** is off on **Whole Organization**. |
 | 8 | As a user without **Manage BarnCRM Settings**, open the page. | The rows show, but the boxes, **Add**, **Remove** and **Catch Up Now** are disabled. |
 
 **Cleanup:** delete the test people and their households.
@@ -173,7 +173,7 @@ The BarnCRM Admin role card on the Access page is headed **BarnCRM Admin**, the 
 | 1 | Open **BarnCRM Settings**, **Automation**. Under **Your Own Flows**, pick `My_Test_Flow` and select **Add**. | The flow joins the automation list, switched on, with a description naming `Flow:My_Test_Flow`, and a **Remove** button. It is no longer offered in the picker. |
 | 2 | Save a record the flow runs on. | The flow sets its field. |
 | 3 | Switch the flow's row **Off** and save another record. | The flow does not set its field. |
-| 4 | Select **Remove** on the row. | The row is gone and the flow is offered again. The flow itself is unchanged and still active. |
+| 4 | Select **Remove** on the row. In the **Remove Flow** window choose **Cancel** (the row stays), then **Remove** again and confirm. | The row is gone and the flow is offered again. The flow itself is unchanged and still active. |
 
 **Cleanup:** deactivate or delete `My_Test_Flow`.
 

@@ -7,7 +7,7 @@ clearing out what should not be there: a test load, a list of contacts a partner
 last year's event sign-ups.
 
 To delete the records a file lists by their record IDs instead, use **Delete the Records a File Lists**
-(which starts on **Delete by record ID**) on the Import tab ([Importing](importing.md), section 9). It needs
+(which starts on **Delete by record ID**) on the **Super Importer** tab ([Importing](importing.md), section 9). It needs
 **Bulk Delete Records** but not Find, and runs, journals and undoes exactly as below.
 
 To keep the records in a file in your Files before they are deleted, and free their storage,
@@ -46,7 +46,7 @@ refused is listed with the reason; the rest are still deleted.
    who should have it (BarnCRM Settings, Access, Extra Permissions), with
    **BarnCRM Find and Export** if they do not have it already. Neither grants access to any
    record. Seeing the list of recent bulk deletes, and undoing one, needs only **Bulk Delete
-   Records**, as does deleting by file from the Import tab.
+   Records**, as does deleting by file from the **Super Importer** tab.
 2. Optional: open **BarnCRM Settings**, choose **Import**, and set **Bulk delete run limit**
    (default 10,000). A bulk delete that matches more records than this is refused before it
    starts. It cannot be set higher than 48,000, because one Salesforce request can count just

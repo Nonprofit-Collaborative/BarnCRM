@@ -6,6 +6,7 @@ import compare from '@salesforce/apex/RollupDlrsImport.compare';
 import turnOn from '@salesforce/apex/RollupDlrsImport.turnOn';
 
 import TITLE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportTitle';
+import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import STEP_CHOOSE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStepChoose';
 import STEP_REVIEW from '@salesforce/label/c.Core_DuplicateMatching_Review';
 import STEP_COMPARE from '@salesforce/label/c.Core_RollupBuilder_DlrsImportStepCompare';
@@ -71,6 +72,7 @@ export default class RollupDlrsImport extends LightningElement {
 
   labels = {
     npsp: false,
+    loading: LOADING,
     get title() {
       return this.npsp ? NPSP_TITLE : TITLE;
     },

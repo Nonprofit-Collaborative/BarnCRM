@@ -119,8 +119,11 @@ sf org assign permset --name BarnCRM_Admin --target-org myorg
 echo 'CorePostInstall.runAsSourceDeploy();' | sf apex run --target-org myorg
 ```
 
-Then open **BarnCRM Settings**, **Modules**, and choose **Finish Setup** on each module you
-installed (see [Module Manager](module-manager.md#when-a-modules-setup-never-ran)).
+Then open **Health Check** in **Org Optimizer** ([Health Check](health-check.md)). Its **Settings**
+finding, **Setup never ran for**, names Core and every module whose setup steps have not run;
+choose **Finish Setup** there to run them for all of them at once. The same button is on each
+module's row in **BarnCRM Settings**, **Modules**
+(see [Module Manager](module-manager.md#when-a-modules-setup-never-ran)).
 
 ### Step 3: Set It Up
 

@@ -1,7 +1,7 @@
 import { LightningElement } from 'lwc';
 import getHome from '@salesforce/apex/ScholarshipsController.getHome';
 import exportDisbursements from '@salesforce/apex/ScholarshipsController.exportDisbursements';
-import { messageFrom } from 'c/findCsv';
+import { localIsoDate, messageFrom } from 'c/findCsv';
 import { iconFor } from 'c/barnIcons';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { toCsv } from 'c/scholarshipsModel';
@@ -31,8 +31,8 @@ export default class ScholarshipsHome extends LightningElement {
       });
     }
     const today = new Date();
-    this.exportFrom = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().slice(0, 10);
-    this.exportTo = today.toISOString().slice(0, 10);
+    this.exportFrom = localIsoDate(new Date(today.getFullYear(), today.getMonth(), 1));
+    this.exportTo = localIsoDate(today);
     this.load();
   }
 
