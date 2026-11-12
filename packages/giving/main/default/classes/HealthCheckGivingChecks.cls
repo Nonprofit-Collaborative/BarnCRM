@@ -171,8 +171,9 @@ public with sharing class HealthCheckGivingChecks {
 			return null;
 		}
 		Set<Id> formIds = byForm.keySet();
-		String version = NamespaceUtil.qualify('Published_Version__r');
-		String definition = NamespaceUtil.qualify('Definition__c');
+		String version = String.escapeSingleQuotes(NamespaceUtil.qualify('Published_Version__r'));
+		String definition = String.escapeSingleQuotes(NamespaceUtil.qualify('Definition__c'));
+		String formName = String.escapeSingleQuotes(String.valueOf(formType));
 		List<HealthCheckService.Link> links = new List<HealthCheckService.Link>();
 		for (
 			SObject form : Database.query(
@@ -181,7 +182,7 @@ public with sharing class HealthCheckGivingChecks {
 					'.' +
 					definition +
 					' FROM ' +
-					formType +
+					formName +
 					' WHERE Id IN :formIds',
 				AccessLevel.SYSTEM_MODE
 			)

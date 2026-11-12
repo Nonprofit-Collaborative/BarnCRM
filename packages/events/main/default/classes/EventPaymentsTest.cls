@@ -215,7 +215,8 @@ private class EventPaymentsTest {
 			Assert.isTrue(EventCheckoutJob.markFailed(waiting), 'A saved mark is reported');
 			Assert.areEqual(EventPayments.FAILED, reload(waiting).Payment_Status__c, 'Failed');
 			Id gone = Id.valueOf(
-				Event_Registration__c.SObjectType.getDescribe().getKeyPrefix() + '000000000000AAA'
+				Event_Registration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+					.getKeyPrefix() + '000000000000AAA'
 			);
 			Assert.isFalse(
 				EventCheckoutJob.markFailed(gone),

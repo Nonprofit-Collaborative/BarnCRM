@@ -83,7 +83,9 @@ private class FieldHistoryServiceTest {
 			turnOn(true, new List<String>{ CITY });
 			noAccess = TestUsers.minimumAccessUserWith('Zztest NoFls', new List<String>());
 		}
-		Id recordId = Address__c.SObjectType.getDescribe().getKeyPrefix() + '000000000001';
+		Id recordId =
+			Address__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED).getKeyPrefix() +
+			'000000000001';
 		Test.startTest();
 		System.runAs(noAccess) {
 			FieldHistoryService.capture(

@@ -105,8 +105,10 @@ public with sharing class BrandShareJob implements Queueable {
 				Id floor = cursor != null
 					? cursor
 					: Id.valueOf(
-							Brand_Assignment__c.SObjectType.getDescribe().getKeyPrefix() +
-							'000000000000'
+							Brand_Assignment__c.SObjectType.getDescribe(
+									SObjectDescribeOptions.DEFERRED
+								)
+								.getKeyPrefix() + '000000000000'
 					  );
 				for (Brand_Assignment__c row : [
 					SELECT Id, Account__c, Contact__r.AccountId
