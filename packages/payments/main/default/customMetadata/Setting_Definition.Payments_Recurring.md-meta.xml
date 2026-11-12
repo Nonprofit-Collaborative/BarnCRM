@@ -8,6 +8,8 @@
     <values><field>Module__c</field><value xsi:type="xsd:string">Payments</value></values>
     <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
     <values><field>Sort_Order__c</field><value xsi:type="xsd:double">40</value></values>
-    <values><field>Description__c</field><value xsi:type="xsd:string">When on, a donor who pays a recurring gift online sets up automatic payments: Stripe or PayPal saves the card and charges it each period, and the donor can update the card from the donor portal. Add the subscription events to your processor's webhook first. Off by default: each payment is paid through its own link.</value></values>
+    <values><field>Description__c</field><value
+      xsi:type="xsd:string"
+    >When on, a donor who pays a recurring gift online sets up automatic payments: Stripe or PayPal saves the card and charges it each period, and the donor can update the card from the donor portal. Add the subscription events to your processor's webhook first. Off by default: each payment is paid through its own link.</value></values>
     <values><field>Help_Path__c</field><value xsi:type="xsd:string">payments.md</value></values>
 </CustomMetadata>
