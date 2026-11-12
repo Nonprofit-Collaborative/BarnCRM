@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <isExposed>true</isExposed>
+  <masterLabel>Engagement Meter</masterLabel>
+  <description>A person's engagement score from 0 to 100 as a meter, with the day it was set. Shows nothing while Engagement Score is off in BarnCRM Settings or the person has no score yet. For a contact page.</description>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordPage">
+      <objects>
+        <object>Contact</object>
+      </objects>
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

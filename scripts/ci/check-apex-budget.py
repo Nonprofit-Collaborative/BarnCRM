@@ -61,7 +61,9 @@ CAPS = {
     # Raised 2026-11-11 for C-47 multi-brand management (BrandService seam and defaulting,
     # BrandShareJob visibility upkeep, BrandTriggerHandler, BrandShareWriter): 2,160,448
     # measured, plus about 0.5%.
-    "core": 2_171_000,
+    # Raised 2026-11-11 for C-64 engagement score (EngagementScore, EngagementScoreJob, the
+    # EngagementSignalExtension seam, EngagementScoreController): 2,175,829 measured, plus about 2%.
+    "core": 2_219_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -77,7 +79,9 @@ CAPS = {
     # plus room for G-27 still to come.
     # Release 1.15: G-34 donation pages and PAY-03 portal payments, 630,018 measured 2026-11-11,
     # plus room for G-27.
-    "giving": 645_000,
+    # With G-27, C-47b/d/e brands and the C-64 signal: 645,083 measured 2026-11-11, plus about
+    # 0.5%; the pre-batch review trims it.
+    "giving": 648_300,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.
@@ -91,7 +95,8 @@ CAPS = {
     # VOL-4 (V-09): 230,699 measured with the public shift pages and personal page
     # (VolunteerPublicPage), the shift and profile forms (VolunteerFormAttachment) and the
     # reminder's personal link, plus about 2%.
-    "volunteers": 235_300,
+    # C-47b brand letters and the C-64 signal: 235,670 measured 2026-11-11, plus about 0.5%.
+    "volunteers": 236_900,
     # Raised 2026-11-05 for the Record Service action (modules-14, RecordServiceController).
     # Raised 2026-11-06 for repeating session schedules (modules-24, D-183): the run, nightly
     # batch, save job, trigger handler and selector, and the schedule page's controller methods.

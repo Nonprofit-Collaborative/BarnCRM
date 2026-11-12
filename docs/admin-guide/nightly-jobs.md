@@ -20,6 +20,7 @@ The jobs in the run, by time of night:
 | 1:20 | Record Cleanup | Core | Always on; how long each kind of history is kept is set as below (the staged rows of finished imports follow **Delete Import Rows**, Import section) |
 | 1:30 | Setup Changes Copy | Core | Org Optimizer on or off |
 | 1:45 | Empty Household Tidy-Up | Core | **Delete Empty Households**, People and Households section |
+| 2:30 | Engagement Score | Core | **Turn on engagement score**, People and Households section (off until turned on); see [Engagement Score](engagement-score.md) |
 | 7:00 | Error Log digest | Core | **Schedule Daily Run** and **Stop Daily Run**, Error Log section |
 
 With modules installed, these join the run (Schedule and Stop on each job's page now switch it

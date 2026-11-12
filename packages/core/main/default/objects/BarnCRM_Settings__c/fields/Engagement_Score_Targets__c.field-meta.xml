@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Engagement_Score_Targets__c</fullName>
+  <defaultValue>&quot;Gifts 1000, Hours 40, Events 4, Activity 90, Months 12&quot;</defaultValue>
+  <description>The engagement score targets: gift amount, volunteer hours and events in the window that earn a part's whole weight, days over which an activity's credit falls to nothing, and the window in months (C-64, canonical model R-ES2).</description>
+  <inlineHelpText>What earns each part its whole weight, and how many months are counted.</inlineHelpText>
+  <label>Engagement Score Targets</label>
+  <length>255</length>
+  <required>false</required>
+  <type>Text</type>
+</CustomField>

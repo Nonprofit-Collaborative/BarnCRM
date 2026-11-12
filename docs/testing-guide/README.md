@@ -39,7 +39,7 @@ page, even if that puts it out of reading order.
 |---|---|---|---|
 | [Before you test](before-you-test.md) | | | Test org, modules, sample data, test users, editions, recording and reporting results |
 | [Installing](installing.md) | INST | 3 | The install pre-check (edition, Apex, labels, objects, name collisions, test fit), the production test list, the release destructive manifest |
-| [People and households](people-and-households.md) | HH | 21 | Households, members, naming and greetings, merge and split, preferred phone, interactions, record pages, record types, adopting NPSP households |
+| [People and households](people-and-households.md) | HH | 23 | Households, members, naming and greetings, merge and split, preferred phone, interactions, record pages, record types, adopting NPSP households, the engagement score |
 | [Addresses](addresses.md) | ADDR | 21 | Address records, primary address, the Address Updates setting, Move the Household Here and Give This Address to Members, seasonal addresses and the nightly swap, address history (status, dates, former addresses, undeliverable), Address Card Fields and the addresses of deleted records |
 | [Relationships and affiliations](relationships-and-affiliations.md) | REL | 12 | Two-sided relationships, affiliations, primary affiliation, turning shipped types off, hiding while off |
 | [Apps and Navigation](apps-and-navigation.md) | APP | 7 | The four BarnCRM apps, who sees each, their tabs, App Navigation Style, module pages in them, full list views behind the Households and Organizations tabs, the Account Tabs setting |
