@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Requests_External_Enabled__c</fullName>
+  <defaultValue>false</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>Requests from the portal and from other organizations' connections. Needs Track requests and issues. Default: off.</inlineHelpText>
+  <label>Take requests from outside</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

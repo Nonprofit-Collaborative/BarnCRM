@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Resolution_Needed</fullName>
+    <active>true</active>
+    <description>A request is marked Resolved only with a resolution, which the requester sees.</description>
+    <errorConditionFormula>ISPICKVAL(Status__c, 'Resolved') &amp;&amp; ISBLANK(Resolution__c)</errorConditionFormula>
+    <errorDisplayField>Resolution__c</errorDisplayField>
+    <errorMessage>Enter a resolution before marking the request Resolved.</errorMessage>
+</ValidationRule>

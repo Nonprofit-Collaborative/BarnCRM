@@ -211,6 +211,8 @@ public with sharing class ModuleManagerService {
 			'Project_Invoice_Line__c',
 			'Project_Phase__c',
 			'Project_Rate__c',
+			'Project_Request__c',
+			'Project_Request_Comment__c',
 			'Project_Resource__c',
 			'Project_Revenue__c',
 			'Project_Status_Update__c',
