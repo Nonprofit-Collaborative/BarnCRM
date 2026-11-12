@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Partner_Organization__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The partner organization this referral is shared with in the partner portal, when Shared With Partner is on.</inlineHelpText>
+  <label>Partner Organization</label>
+  <referenceTo>Account</referenceTo>
+  <relationshipLabel>Partner Referrals</relationshipLabel>
+  <relationshipName>Partner_Referrals</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>

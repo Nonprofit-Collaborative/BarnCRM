@@ -120,4 +120,50 @@ public class PortalTestData {
 		Map<String, Object> result = PortalAuth.verifyCode(challenge, PortalAuth.lastCodeForTest);
 		return (String) result.get('session');
 	}
+
+	/** A catalog of affiliations at the organizations where the person has a current role. */
+	public static Map<String, Object> scopedPage(Map<String, Object> scope) {
+		return new Map<String, Object>{
+			'key' => 'colleagues',
+			'title' => 'Colleagues',
+			'kind' => 'catalog',
+			'object' => 'Affiliation__c',
+			'fields' => new List<Object>{
+				new Map<String, Object>{ 'field' => 'Role__c' },
+				new Map<String, Object>{ 'field' => 'Start_Date__c' },
+				new Map<String, Object>{ 'field' => 'Organization__r.Name' }
+			},
+			'where' => new List<Object>{
+				new Map<String, Object>{
+					'field' => 'Status__c',
+					'op' => 'equals',
+					'value' => 'Current'
+				}
+			},
+			'calendar' => new Map<String, Object>{
+				'title' => 'Role__c',
+				'start' => 'Start_Date__c',
+				'location' => 'Organization__r.Name'
+			},
+			'download' => true,
+			'personScope' => scope
+		};
+	}
+
+	/** A scope through the person's current affiliations. */
+	public static Map<String, Object> scope(String field, String valueField) {
+		return new Map<String, Object>{
+			'field' => field,
+			'object' => 'Affiliation__c',
+			'personField' => 'Contact__c',
+			'valueField' => valueField,
+			'where' => new List<Object>{
+				new Map<String, Object>{
+					'field' => 'Status__c',
+					'op' => 'equals',
+					'value' => 'Current'
+				}
+			}
+		};
+	}
 }

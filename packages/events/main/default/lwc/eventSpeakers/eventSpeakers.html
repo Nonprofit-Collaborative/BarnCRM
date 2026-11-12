@@ -50,6 +50,9 @@
               </th>
               <td data-label={fieldLabels.Headline__c}>
                 {row.headline}
+                <p class="slds-text-body_small slds-text-color_weak" data-id="checklist">
+                  {row.checklistText}
+                </p>
                 <template lwc:if={row.ratingText}>
                   <p class="slds-text-body_small slds-text-color_weak" data-id="rating">
                     {row.ratingText}

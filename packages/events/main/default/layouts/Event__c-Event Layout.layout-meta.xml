@@ -52,6 +52,10 @@
     <layoutColumns>
       <layoutItems>
         <behavior>Edit</behavior>
+        <field>Venue__c</field>
+      </layoutItems>
+      <layoutItems>
+        <behavior>Edit</behavior>
         <field>Venue_Name__c</field>
       </layoutItems>
       <layoutItems>
@@ -144,6 +148,13 @@
     <fields>Start__c</fields>
     <fields>Status__c</fields>
     <relatedList>Event__c.Series__c</relatedList>
+  </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Publish_At__c</fields>
+    <relatedList>Event_Announcement__c.Event__c</relatedList>
+    <sortField>Publish_At__c</sortField>
+    <sortOrder>Desc</sortOrder>
   </relatedLists>
   <showEmailCheckbox>false</showEmailCheckbox>
   <showHighlightsPanel>false</showHighlightsPanel>

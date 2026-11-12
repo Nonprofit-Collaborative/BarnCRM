@@ -252,3 +252,39 @@ QR code.
 4. For a sign-in sheet: choose **Whole Event** or a session under **Sheet For** and click **Print
    Sign-In Sheet**. People sign in the last column; the blank lines at the bottom are for people
    who were not registered.
+
+## Keep Venues and Rooms
+
+1. Open the **Venues** tab and click **New**: name, address, capacity, a map link and notes.
+2. On the venue, add its rooms in the **Rooms** list, each with capacity, setup and where it is.
+3. On an event, pick the **Venue**: a blank venue name and address fill in when you save.
+4. On the **Agenda** tab, a session's **Edit** has **Room Record**: pick a room and save. The
+   session's room and, if blank, its capacity come from the room.
+
+## Add Session and Speaker Details
+
+- A session's **Edit** on the **Agenda** tab also has **Level**, **Slides Link**, **Recording
+  Link** and **Sponsored By**.
+- A speaker's **Edit** on the **Speakers** tab has **Headshot Link**, **LinkedIn**, **Website**
+  and the checklist **Agreement Signed**, **Slides Received** and **Dry Run Done**. The speaker's
+  row shows how many of the three are done.
+
+## Track the Budget
+
+1. Open the event. On the **Details** tab, the **Budget** panel is under the dashboard.
+2. **Add Expense** for each line: item, category, budgeted amount, vendor, status and due date.
+   Fill in **Actual** as bills come in.
+3. **Add Funding** for money from sponsors and partners: source, type, expected and received.
+   Record a sponsor's payment here (type Sponsorship) when it arrives.
+4. The panel compares budgeted and actual by category and shows **Net Cost**: actual spend less
+   funding received and registration payments. The dashboard shows it too.
+
+## Post Announcements
+
+On the event, in the **Announcements** list, click **New**: a title, the message and when to
+publish it. The attendee app shows it from then on.
+
+## Download Sponsor Leads
+
+On the **Sponsors** tab, a sponsor's menu has **Download Leads**: a CSV of the attendees the
+sponsor's staff scanned who chose to share their details.

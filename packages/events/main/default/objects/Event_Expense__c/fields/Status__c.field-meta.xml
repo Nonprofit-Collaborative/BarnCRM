@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Status__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Planned, Committed (agreed with the vendor) or Paid.</inlineHelpText>
+  <label>Status</label>
+  <required>true</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Planned</fullName>
+        <default>true</default>
+        <label>Planned</label>
+      </value>
+      <value>
+        <fullName>Committed</fullName>
+        <default>false</default>
+        <label>Committed</label>
+      </value>
+      <value>
+        <fullName>Paid</fullName>
+        <default>false</default>
+        <label>Paid</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

@@ -58,6 +58,27 @@ private class EventSpeakersControllerTest {
 			Assert.areEqual('Invited', result.speakers[0].status, 'Invited by default');
 			Assert.isTrue(result.canAdd && result.canAssign, 'Staff may add and assign');
 			Assert.isFalse(result.roles.isEmpty(), 'Roles to choose from');
+			Assert.areEqual(0, result.speakers[0].checklistDone, 'Nothing ticked yet');
+		}
+	}
+
+	@IsTest
+	static void countsTheSpeakerChecklist() {
+		System.runAs(staff()) {
+			Event__c event = conference('Community Dreamin');
+			Id speakerId = EventSpeakersController.addSpeaker(event.Id, person().Id);
+			update as user new Event_Speaker__c(
+				Id = speakerId,
+				Agreement_Signed__c = true,
+				Dry_Run_Done__c = true,
+				Headshot_URL__c = 'https://example.org/ana.jpg'
+			);
+
+			Test.startTest();
+			EventSpeakersController.Speakers result = EventSpeakersController.getSpeakers(event.Id);
+			Test.stopTest();
+
+			Assert.areEqual(2, result.speakers[0].checklistDone, 'Two of three ticked (EV-25)');
 		}
 	}
 

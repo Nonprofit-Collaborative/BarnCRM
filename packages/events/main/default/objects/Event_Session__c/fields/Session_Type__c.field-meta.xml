@@ -37,6 +37,16 @@
         <label>Break</label>
       </value>
       <value>
+        <fullName>Lightning Talk</fullName>
+        <default>false</default>
+        <label>Lightning Talk</label>
+      </value>
+      <value>
+        <fullName>Roundtable</fullName>
+        <default>false</default>
+        <label>Roundtable</label>
+      </value>
+      <value>
         <fullName>Other</fullName>
         <default>false</default>
         <label>Other</label>

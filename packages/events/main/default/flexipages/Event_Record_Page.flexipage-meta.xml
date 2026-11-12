@@ -31,6 +31,12 @@
     </itemInstances>
     <itemInstances>
       <componentInstance>
+        <componentName>eventBudget</componentName>
+        <identifier>eventBudget</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>eventVolunteers</componentName>
         <identifier>eventVolunteers</identifier>
       </componentInstance>

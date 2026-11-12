@@ -150,7 +150,10 @@ CAPS = {
     # Release 1.5 EVT-A (branch feature/evt-a-ev20-21-26-27): 217,924 measured (EV-20 paid
     # registration through Payments, EV-21 proposal scoring, EV-26 badge overrides, EV-27
     # session ratings), plus about 2%.
-    "events": 222_300,
+    # Releases 1.11 to 1.13 EVT-B (branches feature/evt-b-*): 247,001 measured (EV-22 attendee
+    # app actions, EV-23 budget, EV-24 venue and room fills, EV-25 speaker checklist, EV-28
+    # booth scans, EV-29 agenda picks and ratings), plus about 2%.
+    "events": 252_000,
     # Portal Builder (PB-01, ADR-0185 portal builder): sign-in, sessions, template checks and the
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.
@@ -160,7 +163,10 @@ CAPS = {
     # Batch C review: 53,465 measured (one answer for every wrong code, authenticator codes used
     # once, where values typed at parse time), plus about 2%. Batch C review landing: 54,467
     # measured (QA's sign-in fixes plus perf's and simplification's portal changes), plus about 2%.
-    "portal": 55_600,
+    # Releases 1.11 to 1.13 EVT-B (branch feature/evt-b-r1-11-portal-engine): 59,734 measured
+    # (personScope catalogs read and checked in Apex, calendar, download and scan options), plus
+    # about 2%.
+    "portal": 61_000,
     # Corporate Hub (CH-01 to CH-08, ADR-NEXT corporate hub module): access sync, post-install,
     # the policy, compliance, reminder and template services and the page controller, 29,744
     # measured, plus about 2%. Board governance (CH-09 to CH-20, PB-02): HubBoard, the board and

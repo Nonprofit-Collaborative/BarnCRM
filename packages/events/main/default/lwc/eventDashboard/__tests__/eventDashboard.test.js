@@ -2,6 +2,7 @@ import { createElement } from 'lwc';
 import EventDashboard from 'c/eventDashboard';
 import getDashboard from '@salesforce/apex/EventDashboardController.getDashboard';
 import applyPlan from '@salesforce/apex/EventDashboardController.applyPlan';
+import { setHelpTextForTest } from 'c/barnHelpText';
 
 jest.mock(
   '@salesforce/apex/EventDashboardController.getDashboard',
@@ -84,6 +85,14 @@ describe('c-event-dashboard', () => {
       'active',
       'active'
     ]);
+  });
+
+  it('shows Net Cost only when the event has a budget (EV-23)', async () => {
+    setHelpTextForTest({ Events_Budget_NetCost: 'Net Cost: {0}' });
+    const without = await render(dataWith());
+    expect(one(without, '[data-id="net-cost"]')).toBeNull();
+    const withBudget = await render(dataWith({ netCost: 800 }));
+    expect(one(withBudget, '[data-id="net-cost"]').textContent.trim()).toBe('Net Cost: 800');
   });
 
   it('offers a template to an empty event and previews it without adding anything', async () => {

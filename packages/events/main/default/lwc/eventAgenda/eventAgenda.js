@@ -37,11 +37,16 @@ const SESSION_FIELDS = [
   'Track__c',
   'Start__c',
   'End__c',
+  'Venue_Room__c',
   'Room__c',
   'Session_Type__c',
+  'Level__c',
   'Status__c',
   'Capacity__c',
-  'Description__c'
+  'Description__c',
+  'Slides_URL__c',
+  'Recording_URL__c',
+  'Sponsor__c'
 ];
 const MOVE_PREFIX = 'move:';
 

@@ -30,6 +30,12 @@ export const MESSAGES = {
   no: 'No',
   nothingHere: 'Nothing to show here yet.',
   search: 'Search',
+  addToCalendar: 'Add to Calendar',
+  downloadCsv: 'Download CSV',
+  scan: 'Scan',
+  stopScan: 'Stop Scanning',
+  scanHint: 'Point the camera at the QR code.',
+  scanFailed: 'The camera could not be used. Type the code instead.',
   loading: 'Loading...',
   greeting: 'Hello, {0}',
   errors: {

@@ -2,7 +2,8 @@
  * What a signed-in portal person sees and changes (ADR-0185
  * `0185-portal-builder-off-platform-portal-api.md`, decisions 3, 8 and 9; canonical model R-PB2,
  * R-PB3). Every read and write is the verified person's and only what their portal's template
- * allows: a related page is filtered by its person field, an update re-reads the record through
+ * allows: a related page is filtered by its person field, a scoped catalog by the values its
+ * `personScope` reads for the person, an update re-reads the record through
  * the same filter, a create always sets the person field, and only `edit` fields are written.
  *
  * Runs `without sharing` in system mode, because the integration user that calls it has no object
@@ -10,6 +11,8 @@
  */
 public without sharing class PortalData {
 	private static final String CONTEXT = 'PortalData';
+	/** At most this many scope records are read for a personScope page. */
+	private static final Integer MAX_SCOPE_ROWS = 200;
 
 	/** The portal's title, the person's first name, and its pages, for the client's menu. */
 	public static Map<String, Object> describe(PortalAuth.Session session) {
@@ -78,6 +81,8 @@ public without sharing class PortalData {
 			'canUpdate' => page.canUpdate,
 			'canCreate' => page.canCreate,
 			'search' => page.search,
+			'download' => page.download,
+			'calendar' => page.calendar,
 			'actions' => extensionList(page),
 			'fields' => fields,
 			'records' => records
@@ -213,6 +218,15 @@ public without sharing class PortalData {
 		} else if (page.kind == PortalTemplate.KIND_RELATED) {
 			filters.add(page.personField + ' = :personId');
 		}
+		if (page.scope != null) {
+			// personScope: the values are read first and bound, so no semi-join limit applies.
+			Set<Id> scopeValues = scopeValues(page.scope, personId);
+			if (scopeValues.isEmpty()) {
+				return new List<SObject>();
+			}
+			binds.put('scopeValues', scopeValues);
+			filters.add(page.scope.field + ' IN :scopeValues');
+		}
 		Integer index = 0;
 		for (PortalTemplate.Condition condition : page.conditions) {
 			filters.add(conditionSoql(condition, 'v' + index, binds));
@@ -232,6 +246,34 @@ public without sharing class PortalData {
 			' LIMIT ' +
 			page.rowLimit;
 		return Database.queryWithBinds(soql, binds, AccessLevel.SYSTEM_MODE);
+	}
+
+	/** The `valueField` values of the person's scope records that pass the scope's tests. */
+	private static Set<Id> scopeValues(PortalTemplate.ScopeSpec scope, Id personId) {
+		Map<String, Object> binds = new Map<String, Object>{ 'personId' => personId };
+		List<String> filters = new List<String>{
+			scope.personField + ' = :personId',
+			scope.valueField + ' != null'
+		};
+		Integer index = 0;
+		for (PortalTemplate.Condition condition : scope.conditions) {
+			filters.add(conditionSoql(condition, 's' + index, binds));
+			index++;
+		}
+		String soql =
+			'SELECT ' +
+			scope.valueField +
+			' FROM ' +
+			scope.objectType.getDescribe().getName() +
+			' WHERE ' +
+			String.join(filters, ' AND ') +
+			' LIMIT ' +
+			MAX_SCOPE_ROWS;
+		Set<Id> values = new Set<Id>();
+		for (SObject row : Database.queryWithBinds(soql, binds, AccessLevel.SYSTEM_MODE)) {
+			values.add((Id) valueAt(row, scope.valueField));
+		}
+		return values;
 	}
 
 	@TestVisible
@@ -306,7 +348,8 @@ public without sharing class PortalData {
 			'label' => spec.label,
 			'type' => String.valueOf(spec.describe.getType()).toLowerCase(),
 			'edit' => spec.edit,
-			'required' => spec.required
+			'required' => spec.required,
+			'scan' => spec.scan
 		};
 		if (!spec.describe.getPicklistValues().isEmpty()) {
 			List<Map<String, String>> options = new List<Map<String, String>>();

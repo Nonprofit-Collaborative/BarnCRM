@@ -17,6 +17,66 @@ function isObject(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
+/** Each calendar entry names a field on the page; a title and a start are needed. */
+function checkCalendar(page, fields, at, problems) {
+  if (page.calendar === undefined) {
+    return;
+  }
+  if (!isObject(page.calendar)) {
+    problems.push(at + 'calendar needs a title and a start');
+    return;
+  }
+  const onPage = new Set(fields.filter(isObject).map((field) => field.field));
+  ['title', 'start', 'end', 'location'].forEach((part) => {
+    const path = page.calendar[part];
+    if (path !== undefined && !onPage.has(path)) {
+      problems.push(at + 'calendar ' + part + ' must be a field on the page');
+    }
+  });
+  if (!page.calendar.title || !page.calendar.start) {
+    problems.push(at + 'calendar needs a title and a start');
+  }
+}
+
+/** A field name, or one parent hop (`Parent__r.Field__c`). */
+function isPath(value) {
+  return typeof value === 'string' && /^[A-Za-z0-9_]+(\.[A-Za-z0-9_]+)?$/.test(value);
+}
+
+/** `personScope` narrows a catalog page to records tied to the person (Salesforce checks types). */
+function checkScope(page, at, problems) {
+  const scope = page.personScope;
+  if (scope === undefined) {
+    return;
+  }
+  if (page.kind !== 'catalog') {
+    problems.push(at + 'personScope is for catalog pages');
+    return;
+  }
+  if (!isObject(scope)) {
+    problems.push(at + 'personScope must be a JSON object');
+    return;
+  }
+  const scopeAt = at + 'personScope ';
+  if (!isPath(scope.field)) {
+    problems.push(scopeAt + 'field must be a lookup or Id');
+  }
+  if (typeof scope.object !== 'string' || scope.object === '') {
+    problems.push(scopeAt + 'object must be a custom object of this org');
+  }
+  if (!isPath(scope.personField)) {
+    problems.push(scopeAt + 'personField must be a lookup to Contact');
+  }
+  if (!isPath(scope.valueField)) {
+    problems.push(scopeAt + 'valueField must be a lookup to what field names');
+  }
+  (Array.isArray(scope.where) ? scope.where : []).forEach((test) => {
+    if (!isObject(test) || typeof test.field !== 'string' || !OPS.includes(test.op)) {
+      problems.push(scopeAt + 'a where test names no field of the object');
+    }
+  });
+}
+
 function checkPage(page, problems) {
   if (!isObject(page)) {
     problems.push('Each page must be a JSON object');
@@ -50,8 +110,15 @@ function checkPage(page, problems) {
       problems.push(at + field.field + ' cannot be edited in a portal');
     } else if (field.edit === true && (viaParent || field.field === page.personField)) {
       problems.push(at + field.field + ' cannot be edited in a portal');
+    } else if (field.scan === true && field.edit !== true) {
+      problems.push(at + field.field + ' can be scanned only as an edited text field');
     }
   });
+  checkCalendar(page, fields, at, problems);
+  checkScope(page, at, problems);
+  if (page.download !== undefined && typeof page.download !== 'boolean') {
+    problems.push(at + 'download must be true or false');
+  }
   const where = Array.isArray(page.where) ? page.where : [];
   where.forEach((test) => {
     if (!isObject(test) || typeof test.field !== 'string') {

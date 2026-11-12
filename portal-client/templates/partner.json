@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "key": "partner",
+  "title": "Partner Portal",
+  "requiresModules": ["Programs"],
+  "pages": [
+    {
+      "key": "referrals",
+      "title": "Shared Referrals",
+      "kind": "catalog",
+      "object": "Referral__c",
+      "fields": [
+        { "field": "Name", "label": "Referral" },
+        { "field": "Referral_Date__c", "label": "Date" },
+        { "field": "Contact__r.FirstName", "label": "First Name" },
+        { "field": "Contact__r.LastName", "label": "Last Name" },
+        { "field": "Status__c" },
+        { "field": "Outcome__c", "label": "Outcome" },
+        { "field": "Partner_Organization__r.Name", "label": "Shared With" }
+      ],
+      "where": [{ "field": "Shared_With_Partner__c", "op": "equals", "value": "true" }],
+      "personScope": {
+        "field": "Partner_Organization__c",
+        "object": "Affiliation__c",
+        "personField": "Contact__c",
+        "valueField": "Organization__c",
+        "where": [{ "field": "Status__c", "op": "equals", "value": "Current" }]
+      },
+      "orderBy": "Referral_Date__c DESC",
+      "limit": 200,
+      "search": true,
+      "download": true,
+      "actions": []
+    },
+    {
+      "key": "profile",
+      "title": "My Details",
+      "kind": "person",
+      "fields": [
+        { "field": "FirstName" },
+        { "field": "LastName" },
+        { "field": "Email" },
+        { "field": "Phone", "edit": true },
+        { "field": "MobilePhone", "label": "Mobile", "edit": true }
+      ],
+      "actions": ["update"]
+    }
+  ]
+}

@@ -542,6 +542,117 @@ or on the attendee record. The sign-in sheet and Check-In use the same badge nam
 In the browser's print dialog choose Letter paper and turn off headers and footers for the
 cleanest badges. Events Read Only can print.
 
+### Venues and Rooms
+
+The **Venues** tab keeps each place you hold events once: its **Address**, **Capacity**, a **Map
+Link** (a map or floor plan the attendee app shows) and **Notes**. A venue's **Rooms** list holds
+its rooms, each with a **Capacity**, a **Setup** (Theater, Classroom, Banquet, Boardroom,
+Reception, U-Shape, Other) and **Where** (floor or wing, shown to attendees). The tab has All
+Venues and My Venues list views.
+
+Pick a **Venue** on the event (its Details) and, when you save, a blank **Venue Name** and **Venue
+Address** are filled from it. Pick a **Room Record** on a session (**Agenda** tab, the session's
+**Edit**): saving copies the room's name into the session's **Room**, and its capacity into a
+blank **Capacity**, so room clash flags, the public page and badges read the room as before. A
+later change to a venue or room is not pushed to events already saved; edit those, or pick the
+room again. Typing a room without a room record still works.
+
+### Session and Speaker Details
+
+Each session (**Agenda** tab, **Edit**) has a **Level** (All Levels, Beginner, Intermediate,
+Advanced), a **Slides Link**, a **Recording Link** and **Sponsored By**, a sponsor of the same
+event for a sponsored session. The session's format is its **Session Type**, which includes
+Lightning Talk and Roundtable.
+
+Each speaker (**Speakers** tab, **Edit**) has a **Headshot Link**, **LinkedIn** and **Website**,
+and a checklist: **Agreement Signed**, **Slides Received** and **Dry Run Done**. The Speakers tab
+shows how many of the three are done for each speaker. Speakers can keep their headshot and links
+current themselves in the speaker portal (see [Portal Builder](portal-builder.md)).
+
+### Budget and Funding
+
+The **Budget** panel on the event's **Details** tab, under the dashboard, tracks the money:
+
+- **Expenses** are the budget's lines. Each has an **Item**, a **Category** (Venue, Food and
+  Beverage, Audio Visual, Speakers, Travel, Marketing, Printing, Staff, Technology, Other), a
+  **Budgeted** amount, the **Actual** spent, a **Vendor**, a **Status** (Planned, Committed, Paid)
+  and a **Due Date**. **Add Expense** adds one; a line's menu edits or removes it.
+- **Funding** is money a sponsor or partner gives toward the event: its **Source**, a **Type**
+  (Sponsorship, Partner Funds (MDF), Grant, In-Kind, Other), an optional **Partner Organization**
+  and **Sponsor**, what is **Expected** and what is **Received**. **Add Funding** adds one.
+- The panel shows budgeted against actual for each category, funding expected against received,
+  and **Net Cost**: actual spend less funding received and the registrations' amount paid. Below
+  it, **Budgeted Net Cost** uses budgeted spend and expected funding. The event dashboard shows Net
+  Cost too.
+
+A sponsor's amount on the Sponsors tab is what they agreed to give; it is not counted until you
+record the money as funding (Type Sponsorship, with the sponsor picked), so nothing is counted
+twice. Events Read Only see the panel; Events Staff and Admin add and change lines.
+
+### Announcements
+
+Add news for attendees from the event's **Announcements** related list: a **Title**, the
+**Message** and **Publish At** (now by default). The attendee app shows each announcement once its
+time has come, newest first. Change Publish At to schedule one.
+
+## Attendee App
+
+The attendee app is a portal (see [Portal Builder](portal-builder.md)) that attendees save to their
+phone's home screen from your WordPress site: no app store, nothing to pay. It needs Portal
+Builder and its WordPress plugin. Paste `portal-client/templates/attendee.json` into a portal's
+Template field and put the shortcode on a page with `app="yes"`:
+`[barncrm_portal key="attendees" app="yes" name="Spring Summit"]`. People sign in with the email
+they registered with; with an Any Matching Person portal every registrant can sign in at once.
+
+What attendees see, always only for events they are registered for and not cancelled from:
+
+| Page | What it does |
+|---|---|
+| My Events | Their attendee rows. Here they choose **Show Me in the Attendee List**, write a **Headline**, **About Me** and **How to Reach Me**, and choose **Share My Details With Sponsors**. All off or blank until they choose. |
+| Agenda | The event's Confirmed sessions with time, room, track, type, level and description. **Add to My Agenda** picks one. |
+| My Agenda | Their picks, **Add to Calendar** (an .ics file for their phone's calendar), **Remove from My Agenda**, and **My Rating** with a comment once a session has started. |
+| Attendees | Attendees who chose to be listed: name, badge title and company, headline and about. Searchable. **Connect** asks to connect. |
+| Connections | Requests and connections. **Accept** or **Decline** a request; once connected, each sees the other's How to Reach Me. A private **Note** and a **Message to Send** with **Send Message**. |
+| Messages and Sent | Messages from connections, with **Reply**; and what they sent. |
+| Announcements | Your announcements, once their time has come. |
+| Sponsors | Confirmed sponsors with their level and booth. |
+| Event Info | Dates, venue, the venue's map link and the online link. |
+| My Details | Their name and phone. |
+
+Rules that protect attendees:
+
+- Nobody is listed until they turn on Show Me in the Attendee List, and the list never shows an
+  email, phone or address. How to Reach Me is shown only to people they accepted.
+- **Messages are off until you turn on Attendee messages** in Settings. Then a person can message
+  only someone they are connected with, up to 50 messages a day. Messages are Salesforce records
+  your event staff can read; say so in your event's code of conduct.
+- **Personal agenda.** A person picks a session once. A session whose picks reach its **Capacity**
+  is full. A session that overlaps one already picked is refused, unless you turn on **Allow
+  overlapping picks**; then it is added and marked Overlaps. The session's **Agenda Picks** shows
+  how many picked it.
+- **Ratings stay anonymous.** A rating from My Agenda adds one Session Rating with no name, the
+  same as the rating form's (see Session Ratings). It is sent once and cannot be changed.
+
+### Sponsor Lead Scanning
+
+Sponsors collect leads by scanning attendees' badge QR codes (the same code Check-In reads). Paste
+`portal-client/templates/sponsor.json` into a portal (Invited works well: add a Portal Access for
+each sponsor contact and booth staff member) and put its shortcode on a page, with `app="yes"` if
+sponsors should install it.
+
+- Who can scan: the sponsor's **Contact** on the Sponsors tab, and any attendee whose **Booth Staff
+  For** names the sponsor (set it with **Edit Badge** on the Registrations tab).
+- **Scan** reads the code with the phone's camera where the browser can (Chrome and Edge on
+  Android, for example); elsewhere the person types the code printed under it, or uses the
+  phone's camera app and pastes it.
+- Each scan is saved as a Booth Scan on the sponsorship at the scanned attendee's event. Only an
+  attendee who turned on **Share My Details With Sponsors** is **Shared**, with name, email,
+  title and company. Otherwise the scan is **Not Shared** and keeps nothing about the person; an
+  unknown code is **Not Found**; a second scan is **Already Scanned**.
+- The rep adds notes and an interest (Hot, Warm, Cold) and can **Download CSV** of their leads.
+  Staff use **Download Leads** in a sponsor's menu on the Sponsors tab: a CSV of that sponsor's
+  Shared scans.
+
 ## Settings
 
 As an admin, open the **Events** section of **BarnCRM Settings**. Each setting saves org-wide as
@@ -561,6 +672,8 @@ you change it.
 | Public page payment note | Pay at the door or by arrangement with us. | Shown beside each ticket with a price on a public event page while payment is not taken online. | At once |
 | Take payment online | Off | A form registration that owes money waits for an online payment through BarnCRM Payments, with its seats held (see Paid Registration). Needs Payments with its keys entered. | At the next registration |
 | Payment link email template | BarnCRM_Event_Payment_Link | The unique name of the email template that sends a registrant their payment link. | At the next link |
+| Attendee messages | Off | Connected attendees can message each other in the attendee app (see Attendee App). | At once |
+| Allow overlapping picks | Off | A person may add a session that overlaps one already on their agenda; it is marked Overlaps. | At the next pick |
 
 ## Reminders, Follow-Ups and No-Shows
 
@@ -639,5 +752,5 @@ is left alone.
 
 ## Not Yet
 
-Session sign-up, speaker portal and ticket emails with the QR code for an
-event come in later releases.
+Ticket emails with the QR code for an event come in a later release. Push notifications to the
+attendee app are not offered: announcements show when the app is opened.

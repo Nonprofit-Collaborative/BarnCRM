@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>My_Venues</fullName>
+  <columns>NAME</columns>
+  <columns>Venue_Address__c</columns>
+  <columns>Capacity__c</columns>
+  <filterScope>Mine</filterScope>
+  <label>My Venues</label>
+</ListView>

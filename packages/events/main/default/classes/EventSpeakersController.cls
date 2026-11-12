@@ -49,6 +49,9 @@ public with sharing class EventSpeakersController {
 		@AuraEnabled
 		public Decimal ratingCount = 0;
 		private Decimal ratingTotal = 0;
+		/** EV-25: how many of agreement signed, slides received and dry run done are ticked. */
+		@AuraEnabled
+		public Integer checklistDone = 0;
 	}
 
 	/** A speaker's place in a session. */
@@ -119,7 +122,15 @@ public with sharing class EventSpeakersController {
 			}
 			Map<Id, SpeakerRow> byId = new Map<Id, SpeakerRow>();
 			for (Event_Speaker__c speaker : [
-				SELECT Id, Name, Contact__c, Headline__c, Status__c
+				SELECT
+					Id,
+					Name,
+					Contact__c,
+					Headline__c,
+					Status__c,
+					Agreement_Signed__c,
+					Slides_Received__c,
+					Dry_Run_Done__c
 				FROM Event_Speaker__c
 				WHERE Event__c = :eventId
 				WITH USER_MODE
@@ -132,6 +143,10 @@ public with sharing class EventSpeakersController {
 				row.contactId = speaker.Contact__c;
 				row.headline = speaker.Headline__c;
 				row.status = speaker.Status__c;
+				row.checklistDone =
+					(speaker.Agreement_Signed__c ? 1 : 0) +
+					(speaker.Slides_Received__c ? 1 : 0) +
+					(speaker.Dry_Run_Done__c ? 1 : 0);
 				byId.put(speaker.Id, row);
 				result.speakers.add(row);
 			}
