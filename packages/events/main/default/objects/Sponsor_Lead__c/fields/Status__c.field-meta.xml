@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Status__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Set when the scan is saved: Lead only when the attendee shares their details.</inlineHelpText>
+  <label>Status</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Picklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetDefinition>
+      <sorted>false</sorted>
+      <value>
+        <fullName>Lead</fullName>
+        <default>false</default>
+        <label>Lead</label>
+      </value>
+      <value>
+        <fullName>Not Shared</fullName>
+        <default>false</default>
+        <label>Not Shared</label>
+      </value>
+      <value>
+        <fullName>Not Found</fullName>
+        <default>false</default>
+        <label>Not Found</label>
+      </value>
+      <value>
+        <fullName>Already Scanned</fullName>
+        <default>false</default>
+        <label>Already Scanned</label>
+      </value>
+    </valueSetDefinition>
+  </valueSet>
+</CustomField>

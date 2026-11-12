@@ -149,6 +149,13 @@
     <fields>Status__c</fields>
     <relatedList>Event__c.Series__c</relatedList>
   </relatedLists>
+  <relatedLists>
+    <fields>NAME</fields>
+    <fields>Publish_At__c</fields>
+    <relatedList>Event_Announcement__c.Event__c</relatedList>
+    <sortField>Publish_At__c</sortField>
+    <sortOrder>Desc</sortOrder>
+  </relatedLists>
   <showEmailCheckbox>false</showEmailCheckbox>
   <showHighlightsPanel>false</showHighlightsPanel>
   <showInteractionLogPanel>false</showInteractionLogPanel>

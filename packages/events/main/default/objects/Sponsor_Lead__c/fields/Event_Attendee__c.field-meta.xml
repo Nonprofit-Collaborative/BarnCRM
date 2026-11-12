@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Event_Attendee__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>Set only when the attendee shares their details with sponsors.</inlineHelpText>
+  <label>Attendee</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+  <referenceTo>Event_Attendee__c</referenceTo>
+  <relationshipLabel>Sponsor Leads</relationshipLabel>
+  <relationshipName>Sponsor_Leads</relationshipName>
+</CustomField>
