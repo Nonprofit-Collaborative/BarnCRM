@@ -285,6 +285,4 @@ Any other org (including other mwd sandboxes) needs owner approval. Agents share
 - Payment page layout related list name is `Payment_Event__c.Payment__c`.
 - Large parallel release runs on both orgs can fail with "Too many concurrent Apex compilations" or `LIMIT_EXCEEDED` on inserts (26 classes on `oi-test` at a712e6a43); rerun the failed classes, they pass.
 - `barn-npc` release now sets 24 objects Public (was 12) and uses an 840-label post-destructive list since 6da9f882.
-- A SOQL cursor `Id > null` matches no rows; start a full first page from the key prefix plus zeros (`BrandShareJob`).
-- Giving, Memberships and other nightly steps are staggered by time of day: Core nightly 2:30 engagement score, Projects health 6:40, Memberships 6:50 (certifications) and 6:55, Scholarships 6:50.
-- Coverage floor exceptions (release gate `--release`): only `InstallmentTopUpSchedulable` (60%) remains after W12 coverage tests; gate at a712e6a43 had 0 classes under the floor on `barn-sales`.
+- A SOQL cursor `Id > null` matches no rows; start a full first page from the key prefix plus zeros (`BrandShareJob`).- Coverage floor exceptions (release gate `--release`): only `InstallmentTopUpSchedulable` (60%) remains after W12 coverage tests; gate at a712e6a43 had 0 classes under the floor on `barn-sales`.
