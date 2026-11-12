@@ -373,4 +373,161 @@ private class ProjectBillingTest {
 			Assert.areEqual(1, included.size(), 'Unless asked');
 		}
 	}
+
+	private static Id missingInvoiceId() {
+		return Id.valueOf(
+			Project_Invoice__c.SObjectType.getDescribe().getKeyPrefix() + '000000000001'
+		);
+	}
+
+	@IsTest
+	static void exportRefusesWhenOffOrWhenTheRangeIsWrong() {
+		System.runAs(ProjectsTestData.admin()) {
+			String off;
+			try {
+				ProjectBillingController.exportInvoices(Date.today(), Date.today(), false);
+			} catch (AuraHandledException e) {
+				off = e.getMessage();
+			}
+			Assert.isTrue(off.contains('Create invoices'), 'Off says how to turn it on: ' + off);
+
+			billing(true);
+			Map<String, List<Date>> ranges = new Map<String, List<Date>>{
+				'missing from' => new List<Date>{ null, Date.today() },
+				'missing to' => new List<Date>{ Date.today(), null },
+				'reversed' => new List<Date>{ Date.today(), Date.today().addDays(-1) }
+			};
+			for (String label : ranges.keySet()) {
+				String refused;
+				try {
+					ProjectBillingController.exportInvoices(
+						ranges.get(label)[0],
+						ranges.get(label)[1],
+						null
+					);
+				} catch (AuraHandledException e) {
+					refused = e.getMessage();
+				}
+				Assert.areEqual(
+					BarnHelp.text('Projects', 'Projects_Range_Invalid'),
+					refused,
+					'A ' + label + ' range is refused in words'
+				);
+			}
+			Assert.areEqual(
+				0,
+				ProjectBillingController.exportInvoices(Date.today(), Date.today(), null).size(),
+				'A valid range with nothing billed exports nothing'
+			);
+		}
+	}
+
+	@IsTest
+	static void theBillingPartsShowTheProjectsTypeAndHomeShowsOnlyTheSwitches() {
+		System.runAs(ProjectsTestData.admin()) {
+			billing(true);
+			Project__c project = project(null);
+
+			Map<String, Object> onProject = ProjectBillingController.getProjectBilling(project.Id);
+			Map<String, Object> onHome = ProjectBillingController.getProjectBilling(null);
+
+			Assert.areEqual(true, onProject.get('enabled'), 'Invoices are on');
+			Assert.areEqual(true, onProject.get('canManage'), 'The admin manages projects');
+			Assert.areEqual(
+				ProjectBilling.billingType(
+					[SELECT Billing_Type__c FROM Project__c WHERE Id = :project.Id]
+				),
+				onProject.get('billingType'),
+				'The type the project bills by'
+			);
+			Assert.areEqual(true, onHome.get('enabled'), 'Projects Home: on');
+			Assert.isNull(onHome.get('billingType'), 'Projects Home has no project type');
+		}
+	}
+
+	@IsTest
+	static void theInvoicePageShowsItsActionsForADraft() {
+		System.runAs(ProjectsTestData.admin()) {
+			billing(true);
+			Project__c project = project(null);
+			insert entry(project.Id, 2, 100, Date.today());
+			Id invoiceId = ProjectBilling.build(project.Id, Date.today(), Date.today());
+
+			Map<String, Object> actions = ProjectBillingController.getInvoiceActions(invoiceId);
+
+			Assert.areEqual(true, actions.get('enabled'), 'Invoices are on');
+			Assert.areEqual(true, actions.get('canManage'), 'The admin may act');
+			Assert.areEqual(
+				ProjectBilling.DRAFT,
+				actions.get('status'),
+				'A new invoice is a draft'
+			);
+			Assert.areEqual(200, (Decimal) actions.get('balance'), 'Nothing paid yet');
+		}
+	}
+
+	@IsTest
+	static void anInvoiceThatCannotBeFoundIsSaidInOneMessageForEveryAction() {
+		System.runAs(ProjectsTestData.admin()) {
+			billing(true);
+			Id missing = missingInvoiceId();
+			Map<String, Boolean> failed = new Map<String, Boolean>();
+			Test.startTest();
+			try {
+				ProjectBillingController.getInvoiceActions(missing);
+			} catch (AuraHandledException e) {
+				failed.put(
+					'actions',
+					e.getMessage() == BarnHelp.text('Projects', 'Projects_Error_Generic')
+				);
+			}
+			try {
+				ProjectBillingController.sendInvoice(missing);
+			} catch (AuraHandledException e) {
+				failed.put('send', true);
+			}
+			try {
+				ProjectBillingController.markPaid(missing, Date.today());
+			} catch (AuraHandledException e) {
+				failed.put('paid', true);
+			}
+			try {
+				ProjectBillingController.voidInvoice(missing);
+			} catch (AuraHandledException e) {
+				failed.put('void', true);
+			}
+			try {
+				ProjectBillingController.printInvoice(missing);
+			} catch (AuraHandledException e) {
+				failed.put('print', true);
+			}
+			try {
+				ProjectBillingController.sendPaymentLink(missing);
+			} catch (AuraHandledException e) {
+				failed.put('link', true);
+			}
+			Test.stopTest();
+
+			Assert.areEqual(6, failed.size(), 'Every action answers with a message, not a stack');
+			Assert.isTrue(failed.get('actions'), 'An unexpected error shows the generic message');
+		}
+	}
+
+	@IsTest
+	static void recognizeRevenueAnswersInWordsWhenRevenueIsOff() {
+		System.runAs(ProjectsTestData.admin()) {
+			Project__c project = project(null);
+			String refused;
+			try {
+				ProjectBillingController.recognizeRevenue(project.Id, Date.today().addMonths(-1));
+			} catch (AuraHandledException e) {
+				refused = e.getMessage();
+			}
+			Assert.areEqual(
+				BarnHelp.text('Projects', 'Projects_Revenue_Off'),
+				refused,
+				'Recognize Revenue says it is off'
+			);
+		}
+	}
 }
