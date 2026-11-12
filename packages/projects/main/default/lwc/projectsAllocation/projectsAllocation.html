@@ -1,0 +1,45 @@
+<template>
+  <template lwc:if={helpReady}>
+    <c-barn-page-shell title={labels.title} purpose={labels.intro} icon-name={icon} data-id="shell">
+      <template lwc:if={errorMessage}>
+        <c-barn-notice variant="error" message={errorMessage} data-id="error-message" class="slds-var-m-bottom_small"></c-barn-notice>
+      </template>
+      <div class="slds-grid slds-gutters slds-wrap slds-grid_vertical-align-end slds-var-m-bottom_small">
+        <lightning-input class="slds-col" type="date" label={labels.from} value={start} data-field="start" onchange={handleField} data-id="start"></lightning-input>
+        <lightning-combobox class="slds-col" label={labels.weeks} options={weekOptions} value={weeks} data-field="weeks" onchange={handleField} data-id="weeks"></lightning-combobox>
+        <lightning-button class="slds-col" label={labels.show} onclick={load} data-id="show"></lightning-button>
+      </div>
+      <template lwc:if={hasPeople}>
+        <div class="slds-scrollable_x">
+          <table class="slds-table slds-table_bordered slds-table_cell-buffer" data-id="grid" data-wide-table>
+            <thead>
+              <tr>
+                <th scope="col">{labels.person}</th>
+                <template for:each={heads} for:item="head">
+                  <th key={head.week} scope="col">{head.label}</th>
+                </template>
+              </tr>
+            </thead>
+            <tbody>
+              <template for:each={rows} for:item="row">
+                <tr key={row.id} data-id="person">
+                  <th scope="row">{row.name}</th>
+                  <template for:each={row.cells} for:item="cell">
+                    <td key={cell.key} class={cell.className} title={cell.title} data-id="cell">{cell.text}</td>
+                  </template>
+                </tr>
+              </template>
+              <tr data-id="demand">
+                <th scope="row">{labels.demand}</th>
+                <template for:each={demandCells} for:item="cell">
+                  <td key={cell.key}>{cell.hours}</td>
+                </template>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </template>
+      <template lwc:else><p class="slds-text-color_weak">{labels.none}</p></template>
+    </c-barn-page-shell>
+  </template>
+</template>

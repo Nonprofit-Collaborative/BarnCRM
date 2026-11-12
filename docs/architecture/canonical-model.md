@@ -18222,7 +18222,7 @@ A project's need for a role with skills, for some hours between two dates, fille
 
 ### Rules
 
-**R-PM15 Filling.** Fill (Staffing page) lists active resources, those whose Skills include every requested skill first, then by free capacity (R-PM14) in the dates; the chosen person gets a new Project Assignment with the request's Role, Hours as Planned Hours, and dates; the request links it and becomes Filled. End Date on or after Start Date (`Dates_In_Order`); Hours more than 0 (`Hours_Positive`). The Assignment lookup accepts only an assignment on the same project.
+**R-PM15 Filling.** Fill (Staffing page) lists active resources, those whose Skills include every requested skill first, then those whose Default Role equals the request's Role (ignoring case), then by free capacity in the dates (Weekly Capacity Hours for the request's working days less the Planned Hours of their assignments in those days, spread as R-PM14), then by name; the ranking is worked out in the browser and the chosen person gets a new Project Assignment with the request's Role, Hours as Planned Hours, and dates; the request links it and becomes Filled. End Date on or after Start Date (`Dates_In_Order`); Hours more than 0 (`Hours_Positive`). The Assignment lookup accepts only an assignment on the same project.
 
 ### Salesforce implementation
 

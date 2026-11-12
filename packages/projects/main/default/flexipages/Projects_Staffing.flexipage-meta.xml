@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Staffing: open resource requests with Fill, the people who can be staffed and the weekly
+    allocation against capacity, a tab in the BarnCRM apps (PM-09; ADR-0192).
+  </description>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>projectsStaffing</componentName>
+        <identifier>projectsStaffingPageComponent</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>projectsAllocation</componentName>
+        <identifier>projectsAllocationPageComponent</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>main</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <masterLabel>Projects Staffing</masterLabel>
+  <template>
+    <name>flexipage:defaultAppHomeTemplate</name>
+  </template>
+  <type>AppPage</type>
+</FlexiPage>

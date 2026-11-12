@@ -120,3 +120,25 @@ Management deployed and the module turned on in BarnCRM Settings, **Modules**. Y
 | 2 | Run Time by Person This Month. | Hours grouped by person, with totals. |
 
 **Cleanup:** None.
+
+## T-PM-15: Resource Management and Staffing (PM-09, D-197)
+
+**Purpose:** confirm R-PM14 and R-PM15: nothing changes while Manage resources is off, people are
+kept one row each, Fill ranks by skills, role and free capacity, and the allocation view works.
+**Prerequisites:** admin, staff A and a second user (staff B); a project with a Data Migration
+resource request of 20 hours for next Monday to Friday, skills Data Migration and Training.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | With Manage resources off, open the Staffing tab. | Only the message that resource management is off. |
+| 2 | In BarnCRM Settings, Projects, turn Manage resources on. Open Staffing. | The open request, People Who Can Be Staffed (empty) and Weekly Allocation. |
+| 3 | Add staff A: skills Data Migration and Training, Weekly Capacity Hours 40, Default Role Data Migration. Add staff B: skills Training, capacity 10. Save each. | Both are listed. Saving staff A again edits the same row. |
+| 4 | Plan 30 hours for staff A on another active project in the request week (a Project Assignment with those dates). | The assignment shows in Weekly Allocation for that week as 30 / 40. |
+| 5 | Choose Fill on the request. | Staff A first (every skill and the role) with 10 free hours; staff B second with 1 of 2 skills. The help line explains the order. |
+| 6 | Assign staff A. | A message says staff A is assigned. The request is Filled and linked to a new Project Assignment with the request's role, hours and dates. |
+| 7 | Open Weekly Allocation for that week. | Staff A shows 50 / 40 in red (over capacity); Unfilled Requests shows 0. |
+| 8 | Set staff B to inactive. | Staff B leaves Weekly Allocation and the Fill list. |
+| 9 | On Projects Home, show utilization for the week. | Staff A's capacity is 40; staff B's own capacity applies if staff B logged time. |
+| 10 | Turn Manage resources off again. | The Staffing tab shows the off message; records are kept. |
+
+**Cleanup:** Delete the test assignment and request, and the Project Resource rows.
