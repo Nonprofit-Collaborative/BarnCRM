@@ -271,6 +271,10 @@
         <identifier>addressPanel</identifier>
       </componentInstance>
     </itemInstances>
+    <name>Facet-connectionsTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <componentInstance>
         <componentInstanceProperties>
@@ -306,16 +310,96 @@
         </visibilityRule>
       </componentInstance>
     </itemInstances>
+    <name>Facet-detailsTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
     <itemInstances>
       <componentInstance>
         <componentName>force:relatedListContainer</componentName>
         <identifier>force_relatedListContainer</identifier>
       </componentInstance>
     </itemInstances>
+    <name>Facet-relatedTab</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>active</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>Facet-detailsTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Standard.Tab.detail</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>detailsTab</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>Facet-connectionsTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>{!$Label.Core_Section_Connections}</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>connectionsTab</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>body</name>
+          <value>Facet-relatedTab</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>title</name>
+          <value>Standard.Tab.relatedLists</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tab</componentName>
+        <identifier>relatedTab</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>Facet-recordTabs</name>
+    <type>Facet</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>tabs</name>
+          <value>Facet-recordTabs</value>
+        </componentInstanceProperties>
+        <componentName>flexipage:tabset</componentName>
+        <identifier>recordTabs</identifier>
+      </componentInstance>
+    </itemInstances>
     <name>main</name>
     <type>Region</type>
   </flexiPageRegions>
   <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>recordInspectorButton</componentName>
+        <identifier>recordInspectorButton</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>recordGlance</componentName>
+        <identifier>recordGlance</identifier>
+      </componentInstance>
+    </itemInstances>
     <itemInstances>
       <componentInstance>
         <componentName>personEnrollments</componentName>

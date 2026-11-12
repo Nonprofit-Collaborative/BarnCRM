@@ -184,7 +184,12 @@
                               <div
                                 class={column.zoneCss}
                                 data-column={column.id}
+                                role="button"
+                                tabindex="0"
+                                aria-label={column.zoneLabel}
+                                aria-pressed={column.isSelected}
                                 onclick={handleSelectColumn}
+                                onkeydown={handleColumnKey}
                                 ondragover={handleDragOver}
                                 ondrop={handleDrop}
                                 data-id="column"

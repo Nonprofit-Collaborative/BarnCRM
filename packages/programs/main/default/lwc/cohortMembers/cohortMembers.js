@@ -1,4 +1,5 @@
 import { LightningElement, api } from 'lwc';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import getMembers from '@salesforce/apex/CohortController.getMembers';
 import addMembers from '@salesforce/apex/CohortController.addMembers';
 import removeMember from '@salesforce/apex/CohortController.removeMember';
@@ -7,6 +8,7 @@ import getPersonName from '@salesforce/apex/CohortController.getPersonName';
 import TITLE from '@salesforce/label/c.Programs_Cohort_Title';
 import MEMBER_COUNT from '@salesforce/label/c.Programs_Cohort_MemberCount';
 import REMOVE from '@salesforce/label/c.Core_Find_Remove';
+import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
 import REMOVE_FOR from '@salesforce/label/c.Programs_Cohort_RemoveFor';
 import ADD_PEOPLE from '@salesforce/label/c.Programs_Cohort_AddPeople';
 import CANDIDATES from '@salesforce/label/c.Programs_Cohort_Candidates';
@@ -327,8 +329,25 @@ export default class CohortMembers extends LightningElement {
       });
   }
 
-  handleRemove(event) {
+  async handleRemove(event) {
     const enrollmentId = event.target.dataset.enrollment;
+    const members = (this.data && this.data.members) || [];
+    const member = members.find((candidate) => candidate.enrollmentId === enrollmentId);
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: helpText('Programs', 'Programs_Cohort_RemoveTitle'),
+      message: helpText(
+        'Programs',
+        'Programs_Cohort_RemoveConfirm',
+        member ? member.personName : ''
+      ),
+      confirmLabel: REMOVE,
+      confirmVariant: 'destructive',
+      cancelLabel: CANCEL
+    });
+    if (!confirmed) {
+      return undefined;
+    }
     this.clearMessages();
     this.busy = true;
     return removeMember({ cohortId: this.recordId, enrollmentId })

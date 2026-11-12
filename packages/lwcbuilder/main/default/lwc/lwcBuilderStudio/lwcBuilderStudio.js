@@ -276,8 +276,10 @@ export default class LwcBuilderStudio extends LightningElement {
         layout: layoutOf(row),
         isFirst: rowIndex === 0,
         isLast: rowIndex === rows.length - 1,
-        columns: row.columns.map((column) => ({
+        columns: row.columns.map((column, columnIndex) => ({
           id: column.id,
+          zoneLabel: helpText('LwcBuilder', 'LwcBuilder_Studio_ColumnLabel', columnIndex + 1),
+          isSelected: column.id === this.selectedColumnId,
           css: `slds-col slds-size_${column.width}-of-12 slds-var-p-around_xx-small`,
           zoneCss: `slds-box slds-box_x-small lb-zone${column.id === this.selectedColumnId ? ' lb-zone_selected' : ''}`,
           isEmpty: column.blocks.length === 0,
@@ -446,6 +448,17 @@ export default class LwcBuilderStudio extends LightningElement {
 
   handleSelectColumn(event) {
     this.selectedColumnId = event.currentTarget.dataset.column;
+  }
+
+  /** Enter or Space on the column itself selects it; keys pressed inside a block are its own. */
+  handleColumnKey(event) {
+    if (event.target !== event.currentTarget) {
+      return;
+    }
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.selectedColumnId = event.currentTarget.dataset.column;
+    }
   }
 
   handleSelectBlock(event) {

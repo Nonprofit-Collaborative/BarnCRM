@@ -89,6 +89,26 @@ describe('c-award-panel', () => {
     expect(makeLetter).toHaveBeenCalled();
   });
 
+  it('starts the paid date on the local day, not the UTC day', async () => {
+    jest.useFakeTimers({
+      now: new Date(2026, 10, 12, 23, 30),
+      doNotFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'setImmediate']
+    });
+    try {
+      getAward.mockResolvedValue(PANEL);
+      markPaid.mockResolvedValue();
+      const element = mount();
+      await flush();
+      find(element, 'mark-paid').click();
+      await flush();
+      find(element, 'save-paid').click();
+      await flush();
+      expect(markPaid).toHaveBeenCalledWith(expect.objectContaining({ paidOn: '2026-11-12' }));
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it('builds a schedule and shows a refusal', async () => {
     getAward.mockResolvedValue({ ...PANEL, canManage: false });
     buildSchedule.mockRejectedValue({ body: { message: 'Nothing left to schedule' } });

@@ -110,6 +110,30 @@ describe('c-volunteer-readiness', () => {
     expect(element.shadowRoot.querySelectorAll('li.step')).toHaveLength(0);
   });
 
+  it('treats a step that expires today as not yet expired, in the local day', async () => {
+    jest.useFakeTimers({
+      now: new Date(2026, 10, 12, 23, 30),
+      doNotFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'setImmediate']
+    });
+    try {
+      const element = render();
+      getReadiness.emit({
+        canSee: true,
+        steps: [
+          { ...READY.steps[1], isCurrent: false, expires: '2026-11-12' },
+          { ...READY.steps[1], typeLabel: 'Other', isCurrent: false, expires: '2026-11-11' }
+        ]
+      });
+      await flush();
+
+      const states = element.shadowRoot.querySelectorAll('li.step .state');
+      expect(states[0].status).toBe('attention');
+      expect(states[1].status).toBe('expired');
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
   it('lists each type with its latest step or Not started, and whether it is current', async () => {
     const element = render();
     getReadiness.emit(READY);

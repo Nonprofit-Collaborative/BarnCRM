@@ -1,5 +1,6 @@
 import { LightningElement, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
+import BarnConfirmModal from 'c/barnConfirmModal';
 import getPage from '@salesforce/apex/StewardshipPlanController.getPage';
 import saveTemplate from '@salesforce/apex/StewardshipPlanController.saveTemplate';
 import setActive from '@salesforce/apex/StewardshipPlanController.setActive';
@@ -439,8 +440,21 @@ export default class StewardshipPlans extends LightningElement {
     );
   }
 
-  handleDeleteStep(event) {
-    return this.run(deleteStep({ stepId: event.currentTarget.dataset.recordId }));
+  async handleDeleteStep(event) {
+    const stepId = event.currentTarget.dataset.recordId;
+    const step = this.steps.find((candidate) => candidate.recordId === stepId);
+    const confirmed = await BarnConfirmModal.open({
+      size: 'small',
+      label: helpText('Giving', 'Giving_Stewardship_RemoveStepTitle'),
+      message: helpText('Giving', 'Giving_Stewardship_RemoveStepConfirm', step ? step.subject : ''),
+      confirmLabel: REMOVE_STEP,
+      confirmVariant: 'destructive',
+      cancelLabel: CANCEL
+    });
+    if (!confirmed) {
+      return undefined;
+    }
+    return this.run(deleteStep({ stepId }));
   }
 
   handleMoveUp(event) {

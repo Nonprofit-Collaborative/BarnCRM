@@ -130,12 +130,12 @@ Test contacts for the delete scripts: create three contacts with first names `De
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Open the Import tab (Data Manager, **Import a File**, **Open**). Under **What Are You Importing?**, choose **Delete the Records a File Lists**, choose **Contact**, name the template `Test delete by file`, and select **Create**. | The new template is chosen, already on **Delete by record ID**, and the line under it reads "Deletes: Contact". |
+| 1 | Open the **Super Importer** tab (Data Manager, **Import a File**, **Open**). Under **What Are You Importing?**, choose **Delete the Records a File Lists**, choose **Contact**, name the template `Test delete by file`, and select **Create**. | The new template is chosen, already on **Delete by record ID**, and the line under it reads "Deletes: Contact". |
 | 2 | Select **Next**, upload `delete-ids.csv`, map **Id** to **Salesforce record ID** if needed, and select **Next**. | **What each row does** includes **Delete by record ID**, with its risk text ending "undo from Data Jobs on the Data Manager tab within 15 days." |
 | 3 | Choose **Delete by record ID** and select **Preview**. | The preview finds 1 record. A delete panel opens: "Delete every record the preview found, with your own access..." with **Download these records first**, **Type the number of records to confirm** and the delete button. |
 | 4 | Type `1` and select **Delete 1 records**. | "1 matched: 1 deleted, 0 refused." Del1 is gone; Del2 and Del3 remain. |
 | 5 | Undo the job from **Data Jobs** on the **Data Manager** tab (type `1`, **Undo Bulk Delete**, **Refresh**). | **Undone**. Del1 is back. |
-| 6 | On the Import tab, check **Recent Imports**. | The import's own Undo never undoes a delete: the job is either not offered there, or its Undo is refused with "This is a bulk delete. Undo it from Data Jobs on the Data Manager tab, which brings the records back from the Recycle Bin." |
+| 6 | On the **Super Importer** tab, check **Recent Imports**. | The import's own Undo never undoes a delete: the job is either not offered there, or its Undo is refused with "This is a bulk delete. Undo it from Data Jobs on the Data Manager tab, which brings the records back from the Recycle Bin." |
 
 **Cleanup:** delete the three `Bulkdeltest` contacts and their households; remove **BarnCRM Bulk Delete** from admin.
 
@@ -275,7 +275,7 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 5 | Open **Data Manager**, **Data Jobs**, and **Undo** the job. | The three contacts come back. |
 | 6 | Run the query again, choose **Archive Records**, **Preview**, type `3`, tick **Also empty them from the Recycle Bin**. | A warning that this cannot be undone, and a second box **Type the number again to empty the Recycle Bin**; the start button stays disabled until it holds `3`. |
 | 7 | Type `3` in the second box and start. When it finishes, open **Data Jobs**. | The job shows 3 deleted and no **Undo**. Its run log says the records were emptied from the Recycle Bin. The Recycle Bin does not list them. |
-| 8 | On the Import tab, **Load one object**, **Contact**, insert, with the step 7 file. | Every column with a field you can create maps by its heading; the three contacts come back as new records. |
+| 8 | On the **Super Importer** tab, **Load one object**, **Contact**, insert, with the step 7 file. | Every column with a field you can create maps by its heading; the three contacts come back as new records. |
 
 **Cleanup:** delete the Arctest contacts, their households and the archive files.
 
@@ -290,9 +290,9 @@ Test contacts for the delete scripts: create three contacts with first names `De
 | 2 | As the admin, select **Backup Sets**. | The tiles are replaced by the Backup Sets panel with **Back to Data Manager** above it; "No Backup Sets yet", and **Add a Backup Set** offers `Baktest people`. |
 | 3 | Choose `Baktest people` and press **Add**, then **Run Now**. | The set is listed; "Run started" shows and **Recent Runs** lists the run as Committing, then Complete with 3 records and a file name. A notification opens the file. |
 | 4 | Select the file name. | A file `Contact-<today>-<tag>-part-1` owned by you: a heading row of field API names (`Id` first) and three rows with every field you can read. The three contacts are unchanged. |
-| 5 | Open **Data Jobs** (Data Manager, Back). Filter by **Backup Set runs**. | The run is listed with "3 records saved to Files." and no **Undo**. It is not in the import history on the Import tab. |
+| 5 | Open **Data Jobs** (Data Manager, Back). Filter by **Backup Set runs**. | The run is listed with "3 records saved to Files." and no **Undo**. It is not in the import history on the **Super Importer** tab. |
 | 6 | In Find, open `Baktest people`, change a column, and **Save**. Reopen Backup Sets. | `Baktest people` is still a Backup Set. |
-| 7 | Change the three contacts' Title to `After`. On the Import tab choose **One Kind of Record**, **Contact**, **Update by record ID**, and load the step 4 file with only the **Id** and **Title** columns mapped. | The preview shows three updates to `Before`; after the load the three contacts' Title is `Before`. |
+| 7 | Change the three contacts' Title to `After`. On the **Super Importer** tab choose **One Kind of Record**, **Contact**, **Update by record ID**, and load the step 4 file with only the **Id** and **Title** columns mapped. | The preview shows three updates to `Before`; after the load the three contacts' Title is `Before`. |
 | 8 | In Backup Sets, press **Remove** beside `Baktest people`. | It moves back to **Add a Backup Set**; the saved query and the run's file remain. |
 
 **Cleanup:** delete the Baktest contacts, their households, the saved query and the run's file.

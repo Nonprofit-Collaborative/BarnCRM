@@ -32,7 +32,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 | 3 | Choose **Why they are recognized** `Other` and enter **Amount** `500`, leave **Your own wording** empty, click **Save**. | Refused: "Type your own wording in Custom Role, or choose one of the roles in the list." |
 | 4 | Choose `Solicitor` again, **Amount** `500`, click **Save**. | Maria Whitfield, Solicitor, 500.00, with no **Automatic** badge and a **Remove** button. |
 | 5 | Edit the gift **Amount** to `600`, save. | The automatic credits read 600.00; Maria's stays 500.00. |
-| 6 | Click **Remove** beside Maria's credit. | It is gone. The automatic credits stay. |
+| 6 | Click **Remove** beside Maria's credit. Choose **Cancel** in the **Remove Soft Credit** window, then click **Remove** again and confirm. | **Cancel** leaves the credit in place. Confirming removes it. The automatic credits stay. |
 
 **Cleanup:** none.
 

@@ -47,7 +47,7 @@ Maria imported 200 contacts; 3 were rejected.
    moment: the row now reads **Created**, and the import's counts and run log include it.
 5. Correct the other two rows the same way, saving each. Then, on any of them, select **Retry
    All Fixed Rows** to retry every corrected rejected row of the import at once.
-6. Changed your mind? **Undo** on the import (Import tab or Data Manager) removes what the
+6. Changed your mind? **Undo** on the import (**Super Importer** tab or Data Manager) removes what the
    import and its retries created.
 
 ## 4. Common Mistakes

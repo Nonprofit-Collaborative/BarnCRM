@@ -32,6 +32,7 @@
     "LwcBuilder_Studio_AddRow": "Add Row",
     "LwcBuilder_Studio_SectionTitle": "Section title",
     "LwcBuilder_Studio_Layout": "Columns",
+    "LwcBuilder_Studio_ColumnLabel": "Column {0}",
     "LwcBuilder_Studio_Remove": "Remove",
     "LwcBuilder_Studio_DropHere": "Drop a block here",
     "LwcBuilder_Studio_EmptyCanvas": "Start with Add Section, or press a block to start a section with it.",

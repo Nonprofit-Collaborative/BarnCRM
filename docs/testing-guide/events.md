@@ -369,7 +369,7 @@ sponsor `Acme` added on the Sponsors tab.
 | 7 | Type `Vegetarian` in Sam's **Dietary Needs**, click elsewhere. | Saved; reload and it is still there; it shows beside Sam on the chart once seated. |
 | 8 | Click **Suggest Seating**. | Sam is seated at the first table with room; no one is placed at Acme Table. |
 | 9 | Click **Export Seating Chart**. | A CSV downloads with a header row, one row per guest, `Vegetarian` in Sam's row, and the table, host and sponsor columns filled. Opening it in a spreadsheet shows no formula. |
-| 10 | **Remove** Table 2. | The card goes; its guests remain in the list with **No Table**. |
+| 10 | **Remove** Table 2. In the **Remove Table** window choose **Cancel** (nothing changes), then **Remove** again and confirm. | The card goes; its guests remain in the list with **No Table**. |
 | 11 | As read-only, open **Seating**. | The chart and export show; no **Add Table**, **Suggest Seating**, **Edit** or **Remove**, and the **Table** menus cannot save. |
 
 **Cleanup:** None.

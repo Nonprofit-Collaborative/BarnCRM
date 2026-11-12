@@ -13,6 +13,7 @@ import COMPLETED from '@salesforce/label/c.Core_Shared_Completed';
 import EXPIRES from '@salesforce/label/c.Volunteers_Readiness_Expires';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
+import { localIsoDate } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 /**
@@ -24,7 +25,7 @@ function toneOf(step) {
   if (step.isCurrent) {
     return 'current';
   }
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localIsoDate();
   return step.expires && step.expires < today ? 'expired' : 'attention';
 }
 

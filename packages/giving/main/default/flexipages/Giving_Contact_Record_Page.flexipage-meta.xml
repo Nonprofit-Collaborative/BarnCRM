@@ -1118,8 +1118,20 @@
   <flexiPageRegions>
     <itemInstances>
       <componentInstance>
+        <componentName>recordInspectorButton</componentName>
+        <identifier>recordInspectorButton</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
         <componentName>recordGlance</componentName>
         <identifier>recordGlance</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>engagementMeter</componentName>
+        <identifier>engagementMeter</identifier>
       </componentInstance>
     </itemInstances>
     <itemInstances>

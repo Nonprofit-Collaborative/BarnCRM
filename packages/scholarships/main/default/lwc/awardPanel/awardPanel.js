@@ -6,7 +6,7 @@ import buildSchedule from '@salesforce/apex/ScholarshipsController.buildSchedule
 import markPaid from '@salesforce/apex/ScholarshipsController.markPaid';
 import setRequirement from '@salesforce/apex/ScholarshipsController.setRequirement';
 import startRenewal from '@salesforce/apex/ScholarshipsController.startRenewal';
-import { messageFrom } from 'c/findCsv';
+import { localIsoDate, messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const PKG = 'Scholarships';
@@ -50,7 +50,7 @@ export default class AwardPanel extends LightningElement {
         this.helpReady = true;
       });
     }
-    this.firstDate = new Date().toISOString().slice(0, 10);
+    this.firstDate = localIsoDate();
     this.load();
   }
 
@@ -184,7 +184,7 @@ export default class AwardPanel extends LightningElement {
 
   handleStartPaid(event) {
     this.payingId = event.target.dataset.rowId;
-    this.paidOn = new Date().toISOString().slice(0, 10);
+    this.paidOn = localIsoDate();
   }
 
   handlePaid() {

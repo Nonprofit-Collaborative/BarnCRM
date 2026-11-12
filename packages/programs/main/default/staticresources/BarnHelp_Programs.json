@@ -5,6 +5,8 @@
     "Programs_Cohort_AddedOne": "1 person added.",
     "Programs_Cohort_DragHint": "You can also drag a person, or everyone ticked, onto the member list above.",
     "Programs_Cohort_MembersEmpty": "Nobody is in this cohort yet.",
+    "Programs_Cohort_RemoveConfirm": "{0} is taken out of this cohort. Their enrollment in the program does not change.",
+    "Programs_Cohort_RemoveTitle": "Remove Member",
     "Programs_Cohort_MoreThanShown": "Only the first 200 members are listed. The Enrollments tab lists them all.",
     "Programs_Cohort_NoCandidates": "Everyone enrolled in the program is already in a cohort.",
     "Programs_Cohort_NobodyChosen": "Choose at least one person to add.",

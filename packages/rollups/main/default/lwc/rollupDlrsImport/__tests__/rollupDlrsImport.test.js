@@ -105,6 +105,17 @@ describe('c-rollup-dlrs-import', () => {
     jest.clearAllMocks();
   });
 
+  it('names the spinner while the candidates load', async () => {
+    getCandidates.mockReturnValue(new Promise(() => {}));
+    const element = createElement('c-rollup-dlrs-import', { is: RollupDlrsImport });
+    element.model = MODEL;
+    document.body.appendChild(element);
+    await flush();
+
+    const spinner = element.shadowRoot.querySelector('lightning-spinner');
+    expect(spinner.alternativeText).toBe('c.Core_AccessExplorer_Loading');
+  });
+
   it('lists what can be copied, ticked, and what stays in DLRS with why', async () => {
     const element = await build();
 
