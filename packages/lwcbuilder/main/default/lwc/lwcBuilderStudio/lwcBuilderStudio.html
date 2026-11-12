@@ -257,7 +257,7 @@
                 </template>
 
                 <template lwc:if={form.isChart}>
-                  <lightning-input label={labels.report} value={form.report} data-prop="report" onchange={handleBlockProp} data-id="prop-report"></lightning-input>
+                  <lightning-input label={labels.report} field-level-help={labels.reportHelp} value={form.report} data-prop="report" onchange={handleBlockProp} data-id="prop-report"></lightning-input>
                 </template>
 
                 <template lwc:if={form.isText}>

@@ -168,6 +168,8 @@ Admin) and a second user with the Team Member role, called the staff user below.
 | 1 | Add a Board Motion "Approve the budget". Press **Open Voting**. | "Voting open for 2 members." Two Board Votes, blank. |
 | 2 | Set one vote For and one Against; press **Close Voting**. | "Voting closed: Failed." Decided On is today; the motion shows 1 for, 1 against. |
 | 3 | As the staff user change a vote. | Refused: "Voting on this motion is closed." As the admin it saves. |
+| 4 | Press **Close Voting** again on the closed motion. | Refused: "Voting is not open on this motion, so it cannot be closed." Status and Decided On are unchanged. |
+| 5 | On a motion that was never opened, press **Close Voting**. | The same refusal. |
 
 **Cleanup:** None.
 
@@ -206,6 +208,7 @@ Admin) and a second user with the Team Member role, called the staff user below.
 | Step | Action | Expected result |
 |---|---|---|
 | 1 | As staff, open **Data Subject Requests** from the App Launcher and create one: Request Type **Erasure**, Person the test Contact. | It is numbered DSR-nnnnn, Status Received, Received Date today, Due Date 30 days from today. |
+| 1a | Create another request with Received Date 10 days ago and Due Date blank. Then change its Received Date to 20 days ago. | Due Date is 20 days from today after the first save, then 10 days from today after the change. A request whose Due Date you typed keeps it when the Received Date changes. |
 | 2 | Set Due Date before Received Date and save. | Refused: the due date cannot be before the date received. |
 | 3 | Set Status to Completed with no Completed Date and save. | Refused until Completed Date is filled in. Set Status back to Received. |
 | 4 | Open the Corporate Hub tab. | A **Data Protection** section lists "Data subject request: DSR-nnnnn" with its due date and type. |

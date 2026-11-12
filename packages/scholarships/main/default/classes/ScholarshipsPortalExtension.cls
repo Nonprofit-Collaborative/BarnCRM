@@ -41,12 +41,16 @@ public without sharing class ScholarshipsPortalExtension implements PortalAction
 	}
 
 	private static String apply(Id personId, Id cycleId) {
-		Award_Cycle__c cycle = [
+		List<Award_Cycle__c> cycles = [
 			SELECT Id, Status__c, Close_Date__c
 			FROM Award_Cycle__c
 			WHERE Id = :cycleId
 			WITH SYSTEM_MODE
 		];
+		if (cycles.isEmpty()) {
+			return BarnHelp.text('Scholarships', 'Scholarships_Portal_Closed');
+		}
+		Award_Cycle__c cycle = cycles[0];
 		if (
 			cycle.Status__c != 'Open' ||
 			(cycle.Close_Date__c != null &&
@@ -93,6 +97,7 @@ public without sharing class ScholarshipsPortalExtension implements PortalAction
 		if (
 			rows[0].Status__c == 'Awarded' ||
 			rows[0].Status__c == 'Declined' ||
+			rows[0].Status__c == 'Ineligible' ||
 			rows[0].Status__c == 'Withdrawn'
 		) {
 			return BarnHelp.text('Scholarships', 'Scholarships_Portal_CannotWithdraw');

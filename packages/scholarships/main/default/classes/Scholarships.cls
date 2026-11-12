@@ -7,8 +7,6 @@ public with sharing class Scholarships {
 	public static final String MODULE = 'Scholarships';
 	public static final String MANAGE = 'Scholarships_Manage';
 	private static final String NOTIFICATION_TYPE = 'Scholarships_Reminder';
-	private static Id typeId;
-	private static Boolean typeLookedUp = false;
 
 	/** Every notification handed to the platform this transaction, by title, for the tests. */
 	@TestVisible
@@ -46,27 +44,13 @@ public with sharing class Scholarships {
 			return;
 		}
 		sentTitles.add(title);
-		try {
-			if (!typeLookedUp) {
-				typeLookedUp = true;
-				List<SObject> types = Database.queryWithBinds(
-					'SELECT Id FROM CustomNotificationType WHERE DeveloperName = :name LIMIT 1', // detection-only: dynamic, and an org without it is caught below
-					new Map<String, Object>{ 'name' => NOTIFICATION_TYPE },
-					AccessLevel.SYSTEM_MODE
-				);
-				typeId = types.isEmpty() ? null : types[0].Id;
-			}
-			if (typeId == null) {
-				return;
-			}
-			Messaging.CustomNotification notification = new Messaging.CustomNotification();
-			notification.setNotificationTypeId(typeId);
-			notification.setTitle(title.abbreviate(250));
-			notification.setBody(BarnHelp.text('Scholarships', 'Scholarships_Notify_Body'));
-			notification.setTargetId(targetId);
-			notification.send(recipientIds);
-		} catch (Exception refused) {
-			ErrorLogger.log(refused, 'Scholarships.notify', targetId);
-		}
+		JobNotifier.ownType(
+			NOTIFICATION_TYPE,
+			recipientIds,
+			title,
+			BarnHelp.text('Scholarships', 'Scholarships_Notify_Body'),
+			targetId,
+			'Scholarships.notify'
+		);
 	}
 }

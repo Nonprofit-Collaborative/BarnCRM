@@ -57,7 +57,8 @@ import sys
 # Volunteers hour value card and thank-you nightly step name (V-12, V-13).
 # AR-01b (release 1.19, D-172): 834 module messages moved to the help catalogs; lowered to the
 # merged total, 2,427. TARGET follows plan AR-01's expected suite of about 2,400.
-BUDGET = 2427
+# W10: Programs_NightlyJobs_SchedulesName moved to the Programs help catalog; lowered to 2,426.
+BUDGET = 2426
 TARGET = 2400
 LABEL_FILES = "packages/*/main/default/labels/*.labels-meta.xml"
 

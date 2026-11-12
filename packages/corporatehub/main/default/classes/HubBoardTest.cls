@@ -144,6 +144,31 @@ private class HubBoardTest {
 			];
 			Assert.areEqual(Date.today(), closed.Decided_On__c, 'Decided today');
 			Assert.areEqual(2, closed.Votes_For__c, 'Counted by roll-up');
+			try {
+				HubBoard.closeVoting(motion.Id);
+				Assert.fail('A closed motion cannot be closed again');
+			} catch (HubPolicy.PolicyException expected) {
+				Assert.isNotNull(expected.getMessage(), 'Told why');
+			}
+		}
+	}
+
+	@IsTest
+	static void aMotionNotOpenForVotingCannotBeClosed() {
+		System.runAs(maria()) {
+			Board_Meeting__c meeting = meeting(board().Id, 0);
+			Board_Motion__c motion = new Board_Motion__c(
+				Meeting__c = meeting.Id,
+				Name = 'Approve the budget',
+				Status__c = 'Proposed'
+			);
+			insert as user motion;
+			try {
+				HubBoard.closeVoting(motion.Id);
+				Assert.fail('Voting was never opened');
+			} catch (HubPolicy.PolicyException expected) {
+				Assert.isNotNull(expected.getMessage(), 'Told why');
+			}
 		}
 	}
 

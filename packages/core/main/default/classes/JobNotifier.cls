@@ -53,6 +53,9 @@ public with sharing class JobNotifier {
 	@TestVisible
 	private static Boolean refuseNextSend = false;
 
+	/** A module's own types looked up, by developer name; null where the org lacks the type. */
+	private static final Map<String, Id> ownTypeIds = new Map<String, Id>();
+
 	private static Id cachedTypeId;
 	private static Boolean typeLookedUp = false;
 
@@ -131,6 +134,57 @@ public with sharing class JobNotifier {
 		Notice notice = notice(recipientId, jobName, stopped, body);
 		notice.section = section;
 		send(notice);
+	}
+
+	/**
+	 * Sends a module's own bell notification of its own type, for the module's reminders. Never
+	 * throws: an org whose edition has no custom notifications, or lacks the type, sends nothing,
+	 * and a refused send is written to the Error Log under `logContext`.
+	 *
+	 * @param typeDeveloperName the module's notification type
+	 * @param recipientIds who to tell; none sends nothing
+	 * @param title the title, shortened to the platform's limit
+	 * @param body the body, shortened to the platform's limit
+	 * @param targetId the record it opens
+	 * @param logContext the Error Log context for a refused send
+	 */
+	@NamespaceAccessible
+	public static void ownType(
+		String typeDeveloperName,
+		Set<String> recipientIds,
+		String title,
+		String body,
+		Id targetId,
+		String logContext
+	) {
+		if (recipientIds == null || recipientIds.isEmpty()) {
+			return;
+		}
+		try {
+			if (!ownTypeIds.containsKey(typeDeveloperName)) {
+				List<SObject> types = Database.queryWithBinds(
+					'SELECT Id FROM CustomNotificationType WHERE DeveloperName = :typeDeveloperName LIMIT 1', // detection-only: dynamic, and an org without it is caught below
+					new Map<String, Object>{ 'typeDeveloperName' => typeDeveloperName },
+					AccessLevel.SYSTEM_MODE
+				);
+				ownTypeIds.put(typeDeveloperName, types.isEmpty() ? null : types[0].Id);
+			}
+			Id typeId = ownTypeIds.get(typeDeveloperName);
+			if (typeId == null) {
+				return;
+			}
+			Messaging.CustomNotification notification = new Messaging.CustomNotification();
+			notification.setNotificationTypeId(typeId);
+			notification.setTitle(title.abbreviate(TITLE_LIMIT));
+			notification.setBody(body.abbreviate(BODY_LIMIT));
+			notification.setTargetId(targetId);
+			notification.send(recipientIds);
+		} catch (QueryException notInThisEdition) {
+			// No custom notifications in this org: the feature is simply absent, not broken.
+			ownTypeIds.put(typeDeveloperName, null);
+		} catch (Exception refused) {
+			ErrorLogger.log(refused, logContext, targetId);
+		}
 	}
 
 	private static Notice notice(Id recipientId, String jobName, Boolean stopped, String body) {

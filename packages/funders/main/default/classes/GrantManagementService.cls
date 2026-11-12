@@ -241,6 +241,19 @@ public with sharing class GrantManagementService {
 			WITH USER_MODE
 			LIMIT 1
 		];
+		if (
+			[
+				SELECT COUNT()
+				FROM Grant__c
+				WHERE Renewal_Of__c = :grant.Id
+				WITH USER_MODE
+				LIMIT 1
+			] > 0
+		) {
+			throw new GrantService.GrantException(
+				BarnHelp.text('Funders', 'Funders_Renewals_AlreadyStarted')
+			);
+		}
 		Grant__c next = new Grant__c(
 			Name = grant.Name,
 			Stage__c = GrantService.STAGE_PROSPECT,

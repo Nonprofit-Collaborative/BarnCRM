@@ -35,6 +35,9 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 	private static final Integer RULES_READ = MAX_RULES + 1;
 	/** Records a chunk reads. */
 	public static final Integer CHUNK = 200;
+	/** Records a chunk reads for a kind with more than `MANY_RULES` rules: one query per rule. */
+	public static final Integer CHUNK_MANY_RULES = 50;
+	public static final Integer MANY_RULES = 10;
 	/** Changes the run keeps to show. */
 	public static final Integer SAMPLE_SIZE = 50;
 	private static final String CONTEXT = 'TerritoryRunBatch';
@@ -110,7 +113,7 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 				Rows_Updated__c = 0,
 				Rows_Matched__c = 0,
 				Rows_Rejected__c = 0,
-				Chunk_Size__c = CHUNK,
+				Chunk_Size__c = chunkFor(kinds[0]),
 				Started_At__c = now,
 				Committed_By__c = UserInfo.getUserId(),
 				Undo_Deadline__c = now.addDays(ImportBatchService.undoWindowDays()),
@@ -125,8 +128,16 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 			run.Data_Job_Id__c = job.Id;
 			Database.update(run, AccessLevel.SYSTEM_MODE);
 		}
-		Database.executeBatch(new TerritoryRunBatch(kinds, 0, totals), CHUNK);
+		Database.executeBatch(new TerritoryRunBatch(kinds, 0, totals), chunkFor(kinds[0]));
 		return run.Id;
+	}
+
+	/**
+	 * Records a chunk reads for a kind: each active rule is one query per chunk, so a kind with
+	 * many rules reads fewer records to stay inside the query limit.
+	 */
+	public static Integer chunkFor(String kind) {
+		return activeRules(kind).size() > MANY_RULES ? CHUNK_MANY_RULES : CHUNK;
 	}
 
 	/** The object a kind's records are. */
@@ -441,7 +452,10 @@ public with sharing class TerritoryRunBatch implements Database.Batchable<SObjec
 	public void finish(Database.BatchableContext context) {
 		if (kindIndex + 1 < kinds.size() && String.isBlank(totals.stoppedBecause)) {
 			try {
-				Database.executeBatch(new TerritoryRunBatch(kinds, kindIndex + 1, totals), CHUNK);
+				Database.executeBatch(
+					new TerritoryRunBatch(kinds, kindIndex + 1, totals),
+					chunkFor(kinds[kindIndex + 1])
+				);
 				return;
 			} catch (Exception e) {
 				stop(e);

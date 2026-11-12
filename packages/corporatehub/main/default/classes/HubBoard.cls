@@ -129,11 +129,16 @@ public with sharing class HubBoard {
 	/** R-MO1: Passed when For is greater than Against, otherwise Failed; decided today. */
 	public static String closeVoting(Id motionId) {
 		Board_Motion__c motion = [
-			SELECT Id, Votes_For__c, Votes_Against__c
+			SELECT Id, Status__c, Votes_For__c, Votes_Against__c
 			FROM Board_Motion__c
 			WHERE Id = :motionId
 			WITH USER_MODE
 		];
+		if (motion.Status__c != VOTING_OPEN) {
+			throw new HubPolicy.PolicyException(
+				BarnHelp.text('CorporateHub', 'CorporateHub_Board_NotVoting')
+			);
+		}
 		Decimal votesFor = motion.Votes_For__c == null ? 0 : motion.Votes_For__c;
 		Decimal against = motion.Votes_Against__c == null ? 0 : motion.Votes_Against__c;
 		motion.Status__c = votesFor > against ? 'Passed' : 'Failed';

@@ -12620,7 +12620,8 @@ at Prospect: same funder, funder contact, purpose, program, Giving fund, funding
 restricted flag, payment frequency and government award fields, Renewable on, Amount Requested
 the amount awarded (or requested when none was awarded), Renewal Of this grant, and a copy of the
 budget lines with the awarded amount as the new request. The open Renewal requirement becomes
-Done. The renewal history is the chain of Renewal Of links both ways, at most 20 grants.
+Done. A grant that already has a renewal (a grant whose Renewal Of is this grant) is refused a
+second one. The renewal history is the chain of Renewal Of links both ways, at most 20 grants.
 
 ### Salesforce implementation
 
@@ -16312,7 +16313,7 @@ its outcome.
 
 **R-MO1 Voting.** Open Voting sets Voting Open and adds one Board Vote, blank, per voting
 attendee. Close Voting sets Passed when For is greater than Against, otherwise Failed, and sets
-Decided On to today.
+Decided On to today. Close Voting is refused unless the motion's Status is Voting Open.
 
 ### Salesforce implementation
 
@@ -16569,7 +16570,7 @@ Section 29H), which writes an Erasure record; the request links to it.
 | Requester Name | text | no | Who asked. |
 | Requester Email | email | no | Where to answer. |
 | Received Date | date | yes | Default today. |
-| Due Date | date | no | Default today plus 30 days; editable for the law that applies or an extension. |
+| Due Date | date | no | Blank on entry; filled with Received Date plus 30 days (R-DS1); editable for the law that applies or an extension. |
 | Identity Verified | boolean | yes (defaults false) | Identity was checked. |
 | Completed Date | date | no | When it was answered, completed or refused. |
 | Response and Actions | long text | no | What was done and said. |
@@ -16578,7 +16579,10 @@ Section 29H), which writes an Erasure record; the request links to it.
 
 ### Rules
 
-**R-DS1 Dates.** Due Date is on or after Received Date (`Due_After_Received`); a Completed or
+**R-DS1 Dates.** A blank Due Date is filled with Received Date plus 30 days on save; when
+Received Date changes and Due Date is still the old Received Date plus 30 (never edited), it
+follows the new date; a Due Date a person set stays. A switchable automation (registry row
+`Data_Subject_Request_Due`, handler `DataSubjectRequestHandler`). Due Date is on or after Received Date (`Due_After_Received`); a Completed or
 Refused request has a Completed Date (`Closed_Needs_Date`). The nightly step reminds the owner of
 a Received or In Progress request whose Due Date is within the reminder days (R-CR1).
 
@@ -16600,7 +16604,7 @@ the request.
 | Requester Name | `Requester_Name__c` | Text(255) |
 | Requester Email | `Requester_Email__c` | Email |
 | Received Date | `Received_Date__c` | Date, required, default `TODAY()` |
-| Due Date | `Due_Date__c` | Date, default `TODAY() + 30` |
+| Due Date | `Due_Date__c` | Date, no default (R-DS1 fills it) |
 | Identity Verified | `Identity_Verified__c` | Checkbox, default false |
 | Completed Date | `Completed_Date__c` | Date |
 | Response and Actions | `Response__c` | Long Text Area(32768) |
@@ -18616,6 +18620,7 @@ mirrors the primary member).
 | 1.43 | 2026-11-11 | Evidence log (L-05). New Section 29ZE1 Assumption Evidence (`Assumption_Evidence__c`, a detail of `Logic_Model_Link__c`, rules R-AE1 to R-AE3): what it shows, source, source link, date and strength. Logic Models Admin and Staff edit it, Read Only reads it; the builder reads it with each arrow and `LogicModelBuilderController.saveEvidence` saves it. |
 | 1.44 | 2026-11-11 | Backup Sets, files import and certifications (C-66, C-70, G-22e, D-157; ADR-0213 `0213-backup-sets.md`, ADR-0214 `0214-files-import.md`). `Import_Batch__c.Operation__c` gains Backup and Files (Section 16). Section 29D gains rule R-SQ15: the query document's optional `backup` key marks a saved query as a Backup Set, run on demand as a Backup data job writing R-BD9's file to Files. New Section 29FI Files import (no object, rules R-FI1 to R-FI5): a zip with `manifest.csv` loaded as `ContentVersion` linked to records, journaled per group and undone by deleting the documents. Memberships gains Sections 29MEM5 Certification (`Certification__c`), 29MEM6 Member Certification (`Member_Certification__c`, rules R-MEM10 to R-MEM13, validation rule `Needs_Contact`) and 29MEM7 Continuing Credit (`Continuing_Credit__c`, master-detail to Member Certification, rolled up into `Open_Credits__c`). |
 | 1.45 | 2026-11-11 | Event Management attendee app, personal agenda and event operations, and the service and partner portal templates (EV-22 to EV-25, EV-28, EV-29, PB-04, PB-05, D-190, D-118; ADR-0215 `0215-events-attendee-app-operations-portal-templates.md`). New Sections 29EV31 Event Venue (`Event_Venue__c`, R-EVN1), 29EV32 Event Room (`Event_Room__c`), 29EV33 Event Expense (`Event_Expense__c`, R-EXP1), 29EV34 Event Funding (`Event_Funding__c`), 29EV35 Sponsor Lead (`Sponsor_Lead__c`, R-SLD1, R-SLD2), 29EV36 Agenda Item (`Agenda_Item__c`, R-AGI1, R-AGI2), 29EV37 Attendee Connection (`Attendee_Connection__c`, R-ACN1, R-ACN2), 29EV38 Attendee Message (`Attendee_Message__c`, R-AMS1) and 29EV39 Event Announcement (`Event_Announcement__c`). `Event__c` gains `Venue__c`; `Event_Session__c` gains `Venue_Room__c`, `Level__c`, `Slides_URL__c`, `Recording_URL__c`, `Sponsor__c` and `Agenda_Picks__c`, and Session Type gains Lightning Talk and Roundtable; `Event_Speaker__c` gains `Headshot_URL__c`, `LinkedIn_URL__c`, `Website_URL__c`, `Agreement_Signed__c`, `Slides_Received__c` and `Dry_Run_Done__c`; `Event_Attendee__c` gains `Networking_Opt_In__c`, `Networking_Headline__c`, `Networking_Bio__c`, `Networking_Contact__c`, `Share_With_Sponsors__c`, `Sponsor__c` and `Attendee_Name__c` (R-EAT5); `Event_Sponsor__c` gains `Booth__c`; `Events_Settings__c` gains `Attendee_Messages__c` and `Allow_Agenda_Overlaps__c` (both false); `Referral__c` gains `Partner_Organization__c` and `Shared_With_Partner__c` (R-RF5). R-PB2 gains a catalog page's `personScope` and the `calendar`, `download` and `scan` client options. |
+| 1.46 | 2026-11-12 | Programs and other modules review fixes (W10). No object added. R-DS1: Due Date has no field default and is filled by a registry automation (`Data_Subject_Request_Due`). R-GN12: a second Start Renewal is refused. R-MO1: Close Voting needs Voting Open. Territory runs read 50 records a chunk when a kind has more than 10 active rules (R-TM3). |
 
 ---
 ## 32. Entity ownership by package

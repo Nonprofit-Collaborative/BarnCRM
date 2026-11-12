@@ -79,4 +79,49 @@ private class ScholarshipsPortalExtensionTest {
 			);
 		}
 	}
+
+	@IsTest
+	static void aMissingCycleIsClosedNotAnError() {
+		System.runAs(ScholarshipsTestData.admin()) {
+			Contact lee = ScholarshipsTestData.person('Lee');
+			Award_Cycle__c cycle = ScholarshipsTestData.cycle(null, null);
+			Id gone = cycle.Id;
+			delete cycle;
+
+			Assert.areEqual(
+				BarnHelp.text('Scholarships', 'Scholarships_Portal_Closed'),
+				new ScholarshipsPortalExtension()
+					.run(ScholarshipsPortalExtension.APPLY, lee.Id, gone),
+				'Closed'
+			);
+		}
+	}
+
+	@IsTest
+	static void anIneligibleApplicationCannotBeWithdrawn() {
+		System.runAs(ScholarshipsTestData.admin()) {
+			Award_Cycle__c cycle = ScholarshipsTestData.cycle(null, null);
+			Contact lee = ScholarshipsTestData.person('Lee');
+			ScholarshipsPortalExtension actions = new ScholarshipsPortalExtension();
+			actions.run(ScholarshipsPortalExtension.APPLY, lee.Id, cycle.Id);
+			Award_Application__c application = [
+				SELECT Id
+				FROM Award_Application__c
+				WHERE Contact__c = :lee.Id
+			];
+			application.Status__c = 'Ineligible';
+			update application;
+
+			Assert.areEqual(
+				BarnHelp.text('Scholarships', 'Scholarships_Portal_CannotWithdraw'),
+				actions.run(ScholarshipsPortalExtension.WITHDRAW, lee.Id, application.Id),
+				'Refused'
+			);
+			Assert.areEqual(
+				'Ineligible',
+				[SELECT Status__c FROM Award_Application__c WHERE Id = :application.Id].Status__c,
+				'Unchanged'
+			);
+		}
+	}
 }

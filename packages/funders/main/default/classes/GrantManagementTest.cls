@@ -307,6 +307,17 @@ private class GrantManagementTest {
 				next.Budget_Lines__r[0].Amount_Requested__c,
 				'Lines ask the awarded amounts'
 			);
+			try {
+				GrantManagementService.startRenewal(grant.Id);
+				Assert.fail('A second renewal is refused');
+			} catch (GrantService.GrantException expected) {
+				Assert.isNotNull(expected.getMessage(), 'Told why');
+			}
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Grant__c WHERE Renewal_Of__c = :grant.Id WITH SYSTEM_MODE],
+				'Still one renewal'
+			);
 			Map<String, Object> history = GrantManagementController.getRenewals(nextId);
 			Assert.areEqual(2, ((List<Object>) history.get('chain')).size(), 'Both years');
 			Assert.isFalse(

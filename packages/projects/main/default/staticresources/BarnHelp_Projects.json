@@ -2,6 +2,7 @@
   "languages": ["en"],
   "texts": {
     "Projects_Nightly_StepName": "Project health",
+    "Projects_Health_CapReached": "The nightly health check reached its limit of {0} projects. Projects beyond it (latest target dates first) were not checked tonight; use Refresh Health on a project to check it.",
     "Projects_Error_Generic": "Projects could not do that. The details are in the Error Log.",
     "Projects_Error_NoPermission": "You need the Manage Projects permission (in Projects Admin) to do this.",
     "Projects_Health_TargetPassed": "The target date {0} has passed.",
