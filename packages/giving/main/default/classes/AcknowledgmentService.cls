@@ -248,6 +248,7 @@ public with sharing class AcknowledgmentService {
 		List<Acknowledgment__c> unsendable = new List<Acknowledgment__c>();
 		List<Gift__c> stamped = new List<Gift__c>();
 		Id fromAddressId = fromAddressId();
+		Map<Id, Id> brandSenders = brandSenders(sendable);
 
 		for (Integer index = 0; index < claimed.size(); index++) {
 			if (!claimed[index].isSuccess()) {
@@ -277,7 +278,9 @@ public with sharing class AcknowledgmentService {
 					sendable[index].Id,
 					row.Recipient_Contact__c,
 					templateId,
-					fromAddressId
+					brandSenders.containsKey(sendable[index].Id)
+						? brandSenders.get(sendable[index].Id)
+						: fromAddressId
 				)
 			);
 			messageRows.add(row);
@@ -432,6 +435,32 @@ public with sharing class AcknowledgmentService {
 			LIMIT 1
 		];
 		return addresses.isEmpty() ? null : addresses[0].Id;
+	}
+
+	/**
+	 * C-47b, R-BR5: the gift's brand sends its thank you from the brand's Sender Email, by gift
+	 * ID. A gift with no brand, or a brand without a set-up address, keeps the From Address
+	 * above. Empty while brands are off.
+	 */
+	@TestVisible
+	private static Map<Id, Id> brandSenders(List<Gift__c> gifts) {
+		Set<Id> brandIds = new Set<Id>();
+		for (Gift__c gift : gifts) {
+			if (gift.isSet('Brand__c') && gift.Brand__c != null) {
+				brandIds.add(gift.Brand__c);
+			}
+		}
+		Map<Id, Id> byGift = new Map<Id, Id>();
+		if (brandIds.isEmpty()) {
+			return byGift;
+		}
+		Map<Id, Id> byBrand = BrandService.senderIdsFor(brandIds);
+		for (Gift__c gift : gifts) {
+			if (gift.isSet('Brand__c') && byBrand.containsKey(gift.Brand__c)) {
+				byGift.put(gift.Id, byBrand.get(gift.Brand__c));
+			}
+		}
+		return byGift;
 	}
 
 	/** Records what the last run did, so the page can say so without opening a run (R-AK12). */

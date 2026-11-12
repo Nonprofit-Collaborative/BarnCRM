@@ -320,4 +320,27 @@ describe('mountPortal', () => {
     expect(root.querySelector('[role="status"]').textContent).toBe('Thanks sent');
     expect(root.querySelector('[role="alert"]')).toBeNull();
   });
+
+  it('shows the brand footer and colors, and skips a color that is not hex', async () => {
+    const brand = {
+      name: 'Barn Thrift',
+      primaryColor: '#1B5E20',
+      secondaryColor: 'red;}',
+      phone: '555-0100',
+      address: ['1 Main St', 'Shelbyville IL'],
+      website: null
+    };
+    const api = fakeApi({ me: jest.fn(() => Promise.resolve({ ...MENU, brand })) });
+    await mountPortal(root, { api });
+
+    const lines = Array.from(root.querySelectorAll('footer p')).map((p) => p.textContent);
+    expect(lines).toEqual(['Barn Thrift', '1 Main St', 'Shelbyville IL', '555-0100']);
+    expect(root.style.getPropertyValue('--barn-portal-primary')).toBe('#1B5E20');
+    expect(root.style.getPropertyValue('--barn-portal-secondary')).toBe('');
+  });
+
+  it('shows no footer for a portal without a brand', async () => {
+    await mountPortal(root, { api: fakeApi() });
+    expect(root.querySelector('footer')).toBeNull();
+  });
 });

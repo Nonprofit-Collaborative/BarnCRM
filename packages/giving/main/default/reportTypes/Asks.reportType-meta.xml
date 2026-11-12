@@ -56,6 +56,11 @@
     </columns>
     <columns>
       <checkedByDefault>false</checkedByDefault>
+      <field>Appeal__c.Brand__c</field>
+      <table>Ask__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
       <field>Fund__c</field>
       <table>Ask__c</table>
     </columns>

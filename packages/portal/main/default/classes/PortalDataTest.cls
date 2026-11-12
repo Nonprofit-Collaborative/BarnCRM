@@ -99,6 +99,37 @@ private class PortalDataTest {
 				((Map<String, Object>) people[0]).get('id'),
 				'Their own record'
 			);
+			Assert.isNull(menu.get('brand'), 'No brand while brands are off');
+		}
+	}
+
+	@IsTest
+	static void aBrandedPortalSendsItsBrandToTheClient() {
+		System.runAs(TestUsers.adminWith('Portal_Admin')) {
+			Fixture f = fixture();
+			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+			settings.Brand_Management__c = true;
+			upsert settings;
+			Brand__c thrift = new Brand__c(
+				Name = 'Barn Thrift',
+				Primary_Color__c = '#1B5E20',
+				City__c = 'Shelbyville'
+			);
+			insert thrift;
+			f.session.portal.Brand__c = thrift.Id;
+
+			Test.startTest();
+			Map<String, Object> brand = (Map<String, Object>) PortalData.describe(f.session)
+				.get('brand');
+			Test.stopTest();
+
+			Assert.areEqual('Barn Thrift', brand.get('name'), 'The brand name');
+			Assert.areEqual('#1B5E20', brand.get('primaryColor'), 'The brand color');
+			Assert.areEqual(
+				new List<String>{ 'Shelbyville' },
+				brand.get('address'),
+				'The address lines'
+			);
 		}
 	}
 

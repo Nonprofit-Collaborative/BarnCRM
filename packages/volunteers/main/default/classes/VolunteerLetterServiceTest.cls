@@ -438,4 +438,72 @@ private class VolunteerLetterServiceTest {
 		Assert.isNull(letter.skipReason, 'A person account is a person: ' + letter.skipReason);
 		Assert.isTrue(letter.body.contains(' 6 hours'), letter.body);
 	}
+
+	@IsTest
+	static void aLetterForOneBrandsJobsPrintsThatBrandAndMixedBrandsPrintTheOrganization() {
+		List<Contact> people;
+		Volunteer_Letter_Template__c template = new Volunteer_Letter_Template__c(
+			Name = 'Brand Proof',
+			Type__c = VolunteerLetterTemplates.TYPE_HOURS_LETTER,
+			Body__c = '{BrandName}|{OrganizationName}|{OrganizationAddress}|{BrandPhone}|{BrandSignature}|{BrandLogo}',
+			Active__c = true
+		);
+		System.runAs(TestUsers.adminWith(VolunteersTestData.ADMIN)) {
+			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+			settings.Brand_Management__c = true;
+			TestDataFactory.saveSettings(settings);
+			Legal_Entity__c entity = new Legal_Entity__c(Name = 'Thrift LLC');
+			insert entity;
+			Brand__c thrift = new Brand__c(
+				Name = 'Barn Thrift',
+				Legal_Entity__c = entity.Id,
+				Phone__c = '555-0100',
+				City__c = 'Shelbyville',
+				Letter_Signature__c = 'Ana Ruiz\nManager'
+			);
+			insert thrift;
+			Volunteer_Job__c sorting = VolunteersTestData.job('Sorting');
+			sorting.Brand__c = thrift.Id;
+			update sorting;
+			people = ownedContacts(2);
+			insert new List<Volunteer_Hours__c>{
+				VolunteersTestData.newHours(people[0].Id, sorting.Id, 3),
+				VolunteersTestData.newHours(people[1].Id, sorting.Id, 1),
+				VolunteersTestData.newHours(
+					people[1].Id,
+					[SELECT Id FROM Volunteer_Job__c WHERE Name = 'Food pantry'].Id,
+					2
+				)
+			};
+			insert template;
+		}
+		Map<Id, String> bodies = new Map<Id, String>();
+
+		Test.startTest();
+		System.runAs(user(COORDINATOR)) {
+			for (
+				VolunteerLetterService.Letter letter : VolunteerLetterService.mergeLetters(
+					idsOf(people),
+					template.Id,
+					FROM_DATE,
+					TO_DATE
+				)
+			) {
+				bodies.put(letter.personId, letter.body);
+			}
+		}
+		Test.stopTest();
+
+		Assert.areEqual(
+			'Barn Thrift|Thrift LLC|Shelbyville|555-0100|Ana Ruiz<br/>Manager|',
+			bodies.get(people[0].Id),
+			'One brand prints its name, entity, address, phone and signature'
+		);
+		Assert.isTrue(
+			bodies.get(people[1].Id)
+				.startsWith('Barn &amp; &lt;Co&gt;|Barn &amp; &lt;Co&gt;|1 Main St'),
+			'Jobs of two brands (one unbranded, no default) print the organization: ' +
+			bodies.get(people[1].Id)
+		);
+	}
 }

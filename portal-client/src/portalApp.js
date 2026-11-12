@@ -142,6 +142,35 @@ function valuesOf(form, fields, before) {
   return values;
 }
 
+const HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
+
+/**
+ * The portal's brand (C-47b): its colors as CSS variables on the root, and its name and contact
+ * lines in a footer. Null when the portal has no brand.
+ * @param {HTMLElement} root the portal's element
+ * @param {object} [brand] the brand from the menu
+ * @returns {HTMLElement|null} the footer
+ */
+export function brandFooter(root, brand) {
+  if (!brand) {
+    return null;
+  }
+  [
+    ['--barn-portal-primary', brand.primaryColor],
+    ['--barn-portal-secondary', brand.secondaryColor]
+  ].forEach(([name, value]) => {
+    if (HEX_COLOR.test(value || '')) {
+      root.style.setProperty(name, value);
+    }
+  });
+  const lines = [brand.name, ...(brand.address || []), brand.phone, brand.website];
+  return el(
+    'footer',
+    { class: 'barn-portal-brand' },
+    lines.filter(Boolean).map((line) => el('p', { text: line }))
+  );
+}
+
 /**
  * Shows the portal in `root`.
  * @param {HTMLElement} root the element to fill
@@ -427,7 +456,8 @@ export function mountPortal(root, { api, messages = MESSAGES }) {
           nav(),
           heading,
           alertSlot,
-          body
+          body,
+          brandFooter(root, state.menu.brand)
         );
         // A new page starts at its heading, so a screen reader says which page opened.
         heading.focus();

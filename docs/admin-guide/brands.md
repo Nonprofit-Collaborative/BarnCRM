@@ -17,6 +17,17 @@ With brands on:
 - Receipts print the gift's brand: its name, logo, address and signature, and its legal entity's
   legal name and tax ID. A value the brand leaves blank comes from its legal entity, then from your
   organization settings.
+- Thank-you emails for a gift with a brand come from the brand's **Sender Email** (when it is a
+  set-up Organization-Wide Address), else from the Acknowledgments from address.
+- Volunteer hour letters and certificates print the brand of the jobs the hours were for:
+  `{OrganizationName}` and `{OrganizationAddress}` become the brand's legal entity and address,
+  and `{BrandName}`, `{BrandLogo}`, `{BrandSignature}`, `{BrandPhone}` and `{BrandWebsite}` can be
+  added to a template. A person whose hours span several brands gets your organization's identity.
+- Portals show their brand's colors and a footer with its name, address, phone and website, and
+  send sign-in codes from its Sender Email when the portal has no Sender Address of its own. A
+  portal with no brand uses the default brand. The board portal is a portal, so Corporate Hub
+  board members see the brand of their portal; Corporate Hub prints no documents of its own.
+- Records with no brand print the **default brand**, without being labelled with it.
 - Receipts can be numbered per brand or per legal entity (optional).
 - Every Brand field can be filtered on in list views, reports and dashboards, and the report type
   **Brands with Brand Assignments** lists who belongs to each brand.
@@ -46,6 +57,27 @@ details as before, and no app shows a Brands tab.
 
 Brand assignments can also be loaded with **Import** (map the Brand column to the brand's record
 ID) and changed in bulk with **Bulk Update**.
+
+## Brands on Records: Import and Bulk Update
+
+- **Gift import**: map a column to **Gift: brand** (offered while brands are on). Each value is a
+  brand name or record ID; a name two brands share, or one that matches none, rejects the row.
+  An empty value lets the gift take its appeal's brand, else the importing user's.
+- **Import** of appeals, volunteer jobs, programs or portals: map the **Brand** column to the
+  brand's record ID, like any other lookup.
+- **Bulk Update**: pick the object (Gifts, Appeals, Volunteer Jobs, Programs or Portals), the
+  records, and set **Brand** to the brand's record ID.
+
+## Brand Filters in List Views, Reports and Dashboards
+
+- **List views**: on any Gifts, Appeals, Volunteer Jobs, Programs or Portals list, open the
+  filter panel and add **Brand** equals the brand name. Save it as a new view, such as
+  "Barn Thrift Gifts", and share it with that brand's staff.
+- **Reports**: Gifts, Gifts with Allocations and every standard report type on these objects
+  carry **Brand**. Asks carry their appeal's brand (**Appeal: Brand**), and Volunteer Hours,
+  Volunteer Shifts and Volunteer Signups their job's brand (**Volunteer Job: Brand**).
+- **Dashboards**: open a dashboard, **Edit**, **+ Filter**, choose **Brand** (or **Volunteer
+  Job: Brand**) and add a value per brand. Every component's report must include that field.
 
 ## Brand-Restricted Visibility (Optional)
 

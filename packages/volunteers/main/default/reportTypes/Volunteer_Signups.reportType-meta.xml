@@ -29,6 +29,11 @@
       <table>Volunteer_Signup__c</table>
     </columns>
     <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Volunteer_Shift__c.Volunteer_Job__c.Brand__c</field>
+      <table>Volunteer_Signup__c</table>
+    </columns>
+    <columns>
       <checkedByDefault>true</checkedByDefault>
       <field>Status__c</field>
       <table>Volunteer_Signup__c</table>

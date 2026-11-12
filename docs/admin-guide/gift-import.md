@@ -186,6 +186,7 @@ to **Gift: external ID** from now on.
 |---|---|
 | Gift: amount, date, payment method, payment reference, external ID, in-kind description, fair market value, benefit description | The gift's field of the same name |
 | Gift: appeal | The appeal with that name |
+| Gift: brand | With brands on, the brand with that name or record ID. Left empty, the gift takes its appeal's brand, else yours |
 | Gift: donor | Which record on the row gave the gift: `Contact1`, `Organization` or `Household` |
 | Gift: fund, Fund 1 to Fund 5, Amount 1 to Amount 5, Percent 1 to Percent 5 | The gift's allocations |
 | Soft credit: role, custom role, amount, credit whom | One soft credit on the gift |

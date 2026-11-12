@@ -73,7 +73,8 @@ Every tab in every BarnCRM app, Core and module, has its own icon.
 
 An organization that works under several names can turn on brands (off by default): brand and
 legal entity records, people and staff assigned to brands, a Brand field on gifts, appeals,
-volunteer jobs, programs and portals, receipts printed and optionally numbered per brand, and an
+volunteer jobs, programs and portals, receipts printed and optionally numbered per brand,
+volunteer letters, thank-you emails and portals in the brand's name, colors and sender, and an
 option to share households, people and organizations only with the staff of their brands.
 
 

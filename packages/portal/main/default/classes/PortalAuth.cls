@@ -191,6 +191,7 @@ public without sharing class PortalAuth {
 				Portal_Access__r.Portal__r.Second_Factor__c,
 				Portal_Access__r.Portal__r.Session_Hours__c,
 				Portal_Access__r.Portal__r.Sender_Address__c,
+				Portal_Access__r.Portal__r.Brand__c,
 				Portal_Access__r.Portal__r.Template__c
 			FROM Portal_Session__c
 			WHERE Token_Hash__c = :PortalTokens.hash(token)
@@ -286,6 +287,7 @@ public without sharing class PortalAuth {
 				Second_Factor__c,
 				Session_Hours__c,
 				Sender_Address__c,
+				Brand__c,
 				Template__c
 			FROM Portal__c
 			WHERE Key__c = :portalKey.trim()
@@ -390,7 +392,13 @@ public without sharing class PortalAuth {
 		);
 		message.setSubject(String.isBlank(subject) ? portal.Name : subject);
 		message.setPlainTextBody(String.isBlank(body) ? code : body);
-		Id sender = senderId(portal.Sender_Address__c);
+		String senderAddress = portal.Sender_Address__c;
+		if (String.isBlank(senderAddress)) {
+			// C-47b, R-BR5: a portal with no sender of its own sends from its brand's.
+			BrandService.Profile brand = BrandService.profileFor(portal.Brand__c);
+			senderAddress = brand == null ? null : brand.senderEmail;
+		}
+		Id sender = senderId(senderAddress);
 		if (sender != null) {
 			message.setOrgWideEmailAddressId(sender);
 		}
@@ -466,6 +474,7 @@ public without sharing class PortalAuth {
 				Second_Factor__c,
 				Session_Hours__c,
 				Sender_Address__c,
+				Brand__c,
 				Template__c
 			FROM Portal__c
 			WHERE Id = :access.Portal__c

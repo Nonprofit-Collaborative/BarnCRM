@@ -15,6 +15,7 @@ public with sharing class GiftImportRow {
 
 	public static final String ATTRIBUTE_DONOR = 'Donor';
 	public static final String ATTRIBUTE_APPEAL = 'Appeal';
+	public static final String ATTRIBUTE_BRAND = 'Brand';
 	public static final String ATTRIBUTE_FUND = 'Fund';
 	public static final String ATTRIBUTE_AMOUNT = 'Amount';
 	public static final String ATTRIBUTE_PERCENT = 'Percent';
@@ -92,6 +93,9 @@ public with sharing class GiftImportRow {
 	public String externalId;
 	public String appeal;
 	public Id appealId;
+	/** C-47d: the brand named with `Gift.Brand`, and the one it was found to be. */
+	public String brand;
+	public Id brandId;
 	public String donorChoice;
 	/** The single fund named with `Allocation.Fund`, or null. */
 	public Part singleFund;
@@ -285,6 +289,7 @@ public with sharing class GiftImportRow {
 	 */
 	private void readGiftValues() {
 		appeal = value(ENTITY_GIFT, ATTRIBUTE_APPEAL);
+		brand = value(ENTITY_GIFT, ATTRIBUTE_BRAND);
 		externalId = value(ENTITY_GIFT, 'External_Id__c');
 		Map<String, String> held = entities.get(ENTITY_GIFT.toLowerCase());
 		if (held == null) {
@@ -298,7 +303,8 @@ public with sharing class GiftImportRow {
 				attribute == 'amount__c' ||
 				attribute == 'gift_date__c' ||
 				attribute == ATTRIBUTE_DONOR.toLowerCase() ||
-				attribute == ATTRIBUTE_APPEAL.toLowerCase()
+				attribute == ATTRIBUTE_APPEAL.toLowerCase() ||
+				attribute == ATTRIBUTE_BRAND.toLowerCase()
 			) {
 				continue;
 			}

@@ -6251,7 +6251,10 @@ Type is matched to its picklist ignoring case, with a short list of the words pa
 use ("credit card" is Card, "cheque" is Check, "bank transfer" is ACH, "in kind" is In-kind);
 anything else rejects the row and names the accepted values. The virtual attribute
 `Gift.Appeal` names an appeal by name or identifier; an appeal that does not exist rejects the
-row. The gift carries Created By Import Batch (R-IB3).
+row. Likewise `Gift.Brand` (C-47d, offered in the picker only while `Brand_Management__c` is on)
+names a brand by name or identifier, read in user mode; none or two of one name rejects the row,
+and an empty value leaves the gift to R-BR4 defaulting. The gift carries Created By Import
+Batch (R-IB3).
 
 **R-GI4 The allocations.** `Allocation.Fund` names one fund, by name, accounting code or
 identifier; an inactive fund is accepted, because a migration names funds that have since
@@ -10575,8 +10578,13 @@ merged, however it was chosen).
 Preferred Name when set), `{Hours}`, `{FromDate}`, `{ToDate}`, `{JobList}` (each job with its
 hours in the period), `{Today}`, and since V-12 `{HourValue}` (the value of one hour, R-VP5)
 and `{HoursValue}` (Hours times it), both in the org's default currency and empty when Hour
-Value is 0. Every merged value is HTML escaped. An unknown token is left
-as typed, so a typo shows on the proof.
+Value is 0. Since C-47b also `{BrandName}`, `{BrandPhone}`, `{BrandWebsite}`, `{BrandSignature}`
+(its line breaks as `<br/>`) and `{BrandLogo}` (an `img` of the brand's logo file, or empty);
+with brands on, a person whose hours in the period are all for jobs of one brand (no brand
+reads as the default brand) gets that brand's identity, and `{OrganizationName}` and
+`{OrganizationAddress}` become its legal entity name and address (R-BR5). Otherwise
+`{BrandName}` is the organization name and the other brand tokens are empty. Every merged value
+is HTML escaped. An unknown token is left as typed, so a typo shows on the proof.
 
 **R-VL3 What a letter counts.** Hours is the sum of the person's hours with Status Approved and
 a Date Worked from From Date to To Date, read in the user's own access. A person with no
@@ -16328,10 +16336,26 @@ being labelled with it. Bulk Update and Import set the lookup like any other loo
 **R-BR5 Brand-aware outputs (C-47b).** A module output for a record with a brand prints the
 brand's name, logo, address and signature and the brand's legal entity name and tax ID; a value
 the brand leaves blank falls back to the entity, then to the organization settings. A statement
-covering records of several brands prints the organization identity.
+covering records of several brands prints the organization identity. A record with no brand
+prints the default brand. The outputs: Giving receipts (Giving R-RC13) and thank-you emails (a
+gift's brand sends from its Sender Email when that is an Organization-Wide Email Address, else
+the Acknowledgment From Address; `BrandService.senderIdsFor`), Volunteers hour letters and
+certificates (R-VL2; the logo through `BrandService.logoPath`, the latest version's download
+path read in user mode), and Portal Builder portals (`PortalData.describe` returns `brand`:
+name, colors, phone, website and address lines, no logo since the file is not reachable off the
+platform; with no Sender Address of its own a portal sends codes from its brand's Sender
+Email). Corporate Hub renders no documents; its board portal is a portal.
 
 **R-BR6 Filters (C-47e).** Every Brand lookup is a reportable field, and the report type
 `Brands_With_Assignments` lists brands with the people, organizations and staff assigned.
+Packaged report types on a branded record or its child carry the brand: `Gifts` and
+`Gifts_with_Allocations` (`Brand__c`), `Asks` (`Appeal__c.Brand__c`),
+`Volunteer_Hours_with_Job_and_Shift` and `Volunteer_Shifts_with_Job`
+(`Volunteer_Job__c.Brand__c`) and `Volunteer_Signups`
+(`Volunteer_Shift__c.Volunteer_Job__c.Brand__c`), none checked by default. No list view or
+dashboard filter is shipped (a shipped brand column would show a brand field while brands are
+off, R-BR2, and filter values are the org's own brand names); list views and dashboards filter
+on the field as the admin guide describes.
 
 **R-BR7 Brand-restricted visibility (C-47c, optional).** With `Brand_Visibility__c` on, each
 active brand has a public group (`BarnCRM_Brand_` plus the brand ID) whose members are the users
@@ -17843,6 +17867,8 @@ mirrors the primary member).
 | 1.32 | 2026-11-11 | Donor portal payments (PAY-03; ADR-NEXT `NEXT-donor-portal-payments.md`). No object or field added. A donor portal payment is a Received gift with Commitment and Payment Reference (the payment's identifier), written when Payments reports it Paid. Core lists `GivingPortalPayments` in `PortalActionExtensions`; the donor template gains `Giving.PayOnline` on Pledges and Recurring Gifts. |
 | 1.33 | 2026-11-11 | Corporate Hub GDPR template set (CH-05, D-118). New Sections 29CH16 Processing Activity (`Processing_Activity__c`, R-PA1), 29CH17 Data Subject Request (`Data_Subject_Request__c`, R-DS1, R-DS2, linking to Core's `Erasure__c`) and 29CH18 Data Breach (`Data_Breach__c`, R-DB1). R-CR1 extends to the three; R-CT1 gains `processingActivities` templates. |
 | 1.34 | 2026-11-11 | Recurring donor health (G-27, D-156). New Section 25V: Recurring Gift Event (`Recurring_Gift_Event__c`), five health fields on `Commitment__c` (`Processor_Subscription_Id__c`, `Failed_Charges__c`, `Last_Failed_Charge__c`, `Card_Expires__c`, `Processor_Cancelled__c`) and `Giving_Settings__c.Recurring_Card_Expiry_Days__c`; rules R-RH1 to R-RH4. |
+| 1.35 | 2026-11-11 | Brand-aware letters, thank yous and portals (C-47b, D-119, D-120). No object or field added. R-BR5 names every output and adds `BrandService.senderIdsFor` and `BrandService.logoPath`; R-VL2 gains `{BrandName}`, `{BrandPhone}`, `{BrandWebsite}`, `{BrandSignature}` and `{BrandLogo}`; the portal menu (`PortalData.describe`) gains `brand`. |
+| 1.36 | 2026-11-11 | Brand in gift import and report types (C-47d, C-47e, D-119). No object or field added. R-GI3 gains the virtual attribute `Gift.Brand`; R-BR6 names the report types that carry the brand. |
 
 ---
 ## 32. Entity ownership by package
