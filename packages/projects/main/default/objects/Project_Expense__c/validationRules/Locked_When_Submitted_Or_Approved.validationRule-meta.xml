@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Locked_When_Submitted_Or_Approved</fullName>
+  <active>true</active>
+  <description>R-PM11: submitted entries change only by the project owner or Projects Admin, approved ones only by Projects Admin.</description>
+  <errorConditionFormula
+  >AND(NOT(ISNEW()), OR(AND(ISPICKVAL(PRIORVALUE(Status__c), "Approved"), NOT($Permission.Projects_Manage), OR(ISCHANGED(Status__c), ISCHANGED(Amount__c), ISCHANGED(Date__c), ISCHANGED(User__c), ISCHANGED(Category__c), ISCHANGED(Billable__c))), AND(ISPICKVAL(PRIORVALUE(Status__c), "Submitted"), Project__r.OwnerId &lt;&gt; $User.Id, NOT($Permission.Projects_Manage), OR(ISCHANGED(Amount__c), ISCHANGED(Date__c), ISCHANGED(User__c), ISCHANGED(Category__c), ISCHANGED(Billable__c)))))</errorConditionFormula>
+  <errorMessage>These expenses are locked: recall submitted expenses to change them, or ask a Projects admin to change approved expenses.</errorMessage>
+</ValidationRule>

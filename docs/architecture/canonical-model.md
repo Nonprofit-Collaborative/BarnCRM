@@ -17928,10 +17928,21 @@ A piece of work with a start, a target date and an outcome: a Salesforce impleme
 | Tasks Done | `Tasks_Done__c` | Roll-Up Summary (COUNT Project_Task__c, Status__c equals Done) |
 | Percent Complete | `Percent_Complete__c` | Formula (Percent): `IF(Tasks__c = 0, 0, Tasks_Done__c / Tasks__c)` |
 | Estimated Hours | `Estimated_Hours__c` | Roll-Up Summary (SUM Project_Task__c.Estimated_Hours__c, Status__c not equal to Cancelled) |
-| Actual Hours | `Actual_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c) |
-| Billable Hours | `Billable_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c, Billable__c equals true) |
-| Actual Cost | `Actual_Cost__c` | Formula (Currency): `IF(ISBLANK(Hourly_Rate__c), NULL, Actual_Hours__c * Hourly_Rate__c)` |
-| Remaining Budget | `Remaining_Budget__c` | Formula (Currency): `IF(ISBLANK(Budget_Amount__c), NULL, Budget_Amount__c - BLANKVALUE(Actual_Cost__c, 0))` |
+| Actual Hours | `Actual_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c, counted: Status__c not equal to Open, Submitted, Rejected; R-PM10) |
+| Billable Hours | `Billable_Hours__c` | Roll-Up Summary (SUM Time_Entry__c.Hours__c, Billable__c equals true, counted) |
+| Actual Cost | `Actual_Cost__c` | Formula (Currency): `IF($Setup.Projects_Settings__c.Rates_Enabled__c, Time_Amount__c, IF(ISBLANK(Hourly_Rate__c), NULL, Actual_Hours__c * Hourly_Rate__c))` |
+| Remaining Budget | `Remaining_Budget__c` | Formula (Currency): `IF(ISBLANK(Budget_Amount__c), NULL, Budget_Amount__c + Change_Amount__c - BLANKVALUE(Actual_Cost__c, 0))` |
+| Billing Type | `Billing_Type__c` | Picklist (Time and Materials, Fixed Fee, Retainer, Not Billed), restricted, default Time and Materials; blank reads as Time and Materials (PM-10) |
+| Retainer Amount | `Retainer_Amount__c` | Currency(16, 2): Retainer, billed each month |
+| Time Amount | `Time_Amount__c` | Roll-Up Summary (SUM Time_Entry__c.Amount__c, counted; PM-06) |
+| Billable Amount | `Billable_Amount__c` | Roll-Up Summary (SUM Time_Entry__c.Amount__c, Billable__c equals true, counted) |
+| Labor Cost | `Labor_Cost__c` | Roll-Up Summary (SUM Time_Entry__c.Cost_Amount__c, counted); Projects Admin only |
+| Expense Amount | `Expense_Amount__c` | Roll-Up Summary (SUM Project_Expense__c.Amount__c, counted; PM-08) |
+| Change Hours | `Change_Hours__c` | Roll-Up Summary (SUM Project_Change_Request__c.Hours__c, Status__c equals Approved; PM-12) |
+| Change Amount | `Change_Amount__c` | Roll-Up Summary (SUM Project_Change_Request__c.Amount__c, Status__c equals Approved) |
+| Recognized Revenue | `Recognized_Revenue__c` | Roll-Up Summary (SUM Project_Revenue__c.Recognized_Amount__c; PM-11) |
+
+The project manager, who approves time, expenses and change requests (R-PM11, R-PM20), is the project's owner (`OwnerId`). With change requests, the budget measured against is Budget Hours plus Change Hours and Budget Amount plus Change Amount; R-PM2 compares Actual Hours with Budget Hours plus Change Hours.
 
 ---
 
@@ -17981,6 +17992,10 @@ One piece of work in a project, with an owner, dates, an estimate and a status (
 | Estimated Hours | `Estimated_Hours__c` | Number(6, 2) |
 | Order | `Sort_Order__c` | Number(4, 0) |
 | Description | `Description__c` | Long Text Area(32768) |
+| Billing Amount | `Billing_Amount__c` | Currency(16, 2): Fixed Fee, billed once the milestone is Done (R-PM18) |
+| Invoice Line | `Invoice_Line__c` | Lookup(Project_Invoice_Line__c), Set Null: filled means invoiced (R-PM12) |
+
+**R-PM18 Milestone billing.** Billing Amount is 0 or more and only on a milestone (validation rule `Billing_Amount_On_Milestone`); once on an invoice line, Billing Amount and Milestone do not change until the invoice is voided (`Billing_Locked_When_Invoiced`).
 
 ---
 
@@ -18019,7 +18034,15 @@ Hours a person worked on a project on one day, optionally on one task, billable 
 
 **R-PM6 Hours.** Hours must be more than 0 and at most 24 (validation rule). The task lookup accepts only a task of the same project.
 
-**R-PM7 Billable export.** Export Billable Time (Manage Projects) returns the billable entries dated in a range, not yet exported unless asked, as CSV rows built in the browser, and stamps Exported Date with today. BarnCRM makes no invoice and takes no payment.
+**R-PM7 Billable export.** Export Billable Time (Manage Projects) returns the counted (R-PM10) billable entries dated in a range, not yet exported unless asked, as CSV rows built in the browser, and stamps Exported Date with today.
+
+**R-PM9 Rate resolution (PM-06).** With Use rate cards on, an entry's Bill Rate and Cost Rate are written on insert, and again when its Date, Person, Project or Task changes while it is neither Approved nor invoiced, each resolved separately for the entry's person and date: (1) the person's Project Rate whose Effective From is on or before the date and whose Effective To is blank or on or after it (latest Effective From wins); else (2) the role's rate, for the person's Project Assignment role on that project (the assignment covering the date, else any), else their Project Resource's Default Role; else (3) the project's Hourly Rate as Bill Rate, with no Cost Rate. A rate is never re-resolved because a Project Rate changed. Apply Rates (Manage Projects) fills entries whose Bill Rate is blank and that are not invoiced. With rate cards off nothing is written.
+
+**R-PM10 Counted.** An entry or expense counts as actual, billable, exportable and invoiceable when Status is blank (logged while approvals were off, or before 1.20) or Approved. Open, Submitted and Rejected do not count; the roll-ups filter Status not equal to Open, Submitted, Rejected.
+
+**R-PM11 Approval (PM-07).** With approvals on, a new entry with a blank Status is saved Open (entry handler). The person submits a week (Open and Rejected entries of that Monday to Sunday week become Submitted) and may recall it (Submitted to Open). Only the project's owner or a holder of Manage Projects sets Approved or Rejected (`Approval_By_Manager`), stamping Approved By; Rejected needs a Rejection Reason (`Rejection_Needs_Reason`). Status is never set back to blank (`Status_Not_Cleared`). A Submitted entry's Hours, Date, Person, Task, Billable and (once set) rates change only by the project owner or Manage Projects; an Approved entry's, and its Status, only by Manage Projects (`Locked_When_Submitted_Or_Approved`). A rate written where it was blank passes both locks.
+
+**R-PM12 Invoiced.** An entry, expense or milestone whose Invoice Line is filled is invoiced. It does not change (Status, the fields in R-PM11) until the Invoice Line is cleared, by anyone (`Locked_When_Invoiced`). Deleting the line (deleting a Draft invoice) clears it by Set Null; voiding the invoice clears it (R-PM17).
 
 ### Salesforce implementation
 
@@ -18035,6 +18058,16 @@ Hours a person worked on a project on one day, optionally on one task, billable 
 | Billable | `Billable__c` | Checkbox, default false |
 | Notes | `Notes__c` | Text(255) |
 | Exported Date | `Exported_Date__c` | Date |
+| Status | `Status__c` | Picklist (Open, Submitted, Approved, Rejected), restricted, not required, no default (R-PM10, R-PM11) |
+| Bill Rate | `Bill_Rate__c` | Currency(16, 2), written by R-PM9 |
+| Cost Rate | `Cost_Rate__c` | Currency(16, 2), written by R-PM9; Projects Admin only |
+| Amount | `Amount__c` | Formula (Currency): `Hours__c * Bill_Rate__c` |
+| Cost Amount | `Cost_Amount__c` | Formula (Currency): `Hours__c * Cost_Rate__c`; Projects Admin only |
+| Approved By | `Approved_By__c` | Lookup(User), relationship Approved_Time_Entries |
+| Rejection Reason | `Rejection_Reason__c` | Text(255) |
+| Invoice Line | `Invoice_Line__c` | Lookup(Project_Invoice_Line__c), Set Null (R-PM12) |
+
+Validation rules: `Hours_In_Range`, `Approval_By_Manager`, `Rejection_Needs_Reason`, `Status_Not_Cleared`, `Locked_When_Submitted_Or_Approved`, `Locked_When_Invoiced`.
 
 ---
 
@@ -18074,7 +18107,8 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 
 ### Rules
 
-- **Setting Definitions:** `Projects_Time_Tracking_Enabled`, `Projects_At_Risk_Days`, `Projects_Budget_Warning_Percent`, `Projects_Weekly_Capacity_Hours`, section Projects, module `Projects`. A blank or out of range number reads as its default.
+- **Setting Definitions:** `Projects_Time_Tracking_Enabled`, `Projects_At_Risk_Days`, `Projects_Budget_Warning_Percent`, `Projects_Weekly_Capacity_Hours`, and for the PSA (ADR-NEXT `NEXT-projects-psa.md`, Help Path `projects-psa.md`) `Projects_Rates_Enabled`, `Projects_Approvals_Enabled`, `Projects_Expenses_Enabled`, `Projects_Resources_Enabled`, `Projects_Billing_Enabled`, `Projects_Online_Payments_Enabled`, `Projects_Invoice_Return_Url`, `Projects_Invoice_Due_Days`, `Projects_Revenue_Enabled`, `Projects_Change_Requests_Enabled`, section Projects, module `Projects`. A blank or out of range number reads as its default.
+- **PSA switches.** Every PSA switch ships off and reads off while Track time and budgets is off. Take invoice payments online also needs Create invoices and the Payments module.
 
 ### Salesforce implementation
 
@@ -18086,6 +18120,242 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 | Days late before at risk | `At_Risk_Days__c` | Number(3, 0), default 7 (1 to 365) |
 | Budget warning percent | `Budget_Warning_Percent__c` | Number(3, 0), default 90 (1 to 100) |
 | Weekly capacity hours | `Weekly_Capacity_Hours__c` | Number(3, 0), default 40 (1 to 168) |
+| Use rate cards | `Rates_Enabled__c` | Checkbox, default false (PM-06) |
+| Approve time and expenses | `Approvals_Enabled__c` | Checkbox, default false (PM-07) |
+| Track expenses | `Expenses_Enabled__c` | Checkbox, default false (PM-08) |
+| Manage resources | `Resources_Enabled__c` | Checkbox, default false (PM-09) |
+| Create invoices | `Billing_Enabled__c` | Checkbox, default false (PM-10) |
+| Take invoice payments online | `Online_Payments_Enabled__c` | Checkbox, default false (PM-10, R-PM22) |
+| Invoice payment return page | `Invoice_Return_Url__c` | URL(255); blank returns the payer to the org's My Domain address |
+| Invoice due days | `Invoice_Due_Days__c` | Number(3, 0), default 30 (1 to 365) |
+| Show financials and recognize revenue | `Revenue_Enabled__c` | Checkbox, default false (PM-11) |
+| Track change requests | `Change_Requests_Enabled__c` | Checkbox, default false (PM-12) |
+
+---
+
+## 29PM8. Project Rate
+
+### Definition
+
+A bill rate and an optional cost rate for one person or one role, from a date (PM-06, ADR-NEXT `NEXT-projects-psa.md`, D-197). Org-wide; resolved for each time entry by R-PM9 (29PM5).
+
+### Rules
+
+- Person or Role, never both and never neither (validation rule `Person_Or_Role`); Effective To blank or on or after Effective From (`Dates_In_Order`); rates 0 or more (`Rates_Not_Negative`).
+- Cost Rate is readable only with Projects Admin.
+
+### Salesforce implementation
+
+- **Object:** `Project_Rate__c`, label Project Rate, name field Auto Number (`RATE-{00000}`, Rate Number), sharing Public Read/Write (edited only with Projects Admin's object access).
+
+| Attribute | API name | Type |
+|---|---|---|
+| Person | `User__c` | Lookup(User), relationship Project_Rates |
+| Role | `Role__c` | Text(80), as on Project Assignments |
+| Bill Rate | `Bill_Rate__c` | Currency(16, 2), required |
+| Cost Rate | `Cost_Rate__c` | Currency(16, 2) |
+| Effective From | `Effective_From__c` | Date, required |
+| Effective To | `Effective_To__c` | Date |
+
+---
+
+## 29PM9. Project Expense
+
+### Definition
+
+Money spent on a project by a person, billable or not, with the receipt as a file on the record (PM-08).
+
+### Rules
+
+**R-PM13 Expenses.** Amount more than 0 (`Amount_Positive`). Status, approval, locks and invoicing follow R-PM10 to R-PM12 with Amount, Date, Person, Category and Billable as the locked fields (validation rules `Approval_By_Manager`, `Rejection_Needs_Reason`, `Status_Not_Cleared`, `Locked_When_Submitted_Or_Approved`, `Locked_When_Invoiced`). The receipt is a Salesforce File linked to the expense.
+
+### Salesforce implementation
+
+- **Object:** `Project_Expense__c`, label Project Expense, name field Auto Number (`EXP-{000000}`, Expense Number), master-detail to Project (`Project__c`, relationship Expenses), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Person | `User__c` | Lookup(User), relationship Project_Expenses |
+| Date | `Date__c` | Date, required |
+| Category | `Category__c` | Picklist (Travel, Lodging, Meals, Mileage, Software, Supplies, Other), not restricted |
+| Amount | `Amount__c` | Currency(16, 2), required |
+| Billable | `Billable__c` | Checkbox, default false |
+| Description | `Description__c` | Text(255) |
+| Status | `Status__c` | Picklist (Open, Submitted, Approved, Rejected), restricted, not required |
+| Approved By | `Approved_By__c` | Lookup(User), relationship Approved_Project_Expenses |
+| Rejection Reason | `Rejection_Reason__c` | Text(255) |
+| Invoice Line | `Invoice_Line__c` | Lookup(Project_Invoice_Line__c), Set Null |
+
+---
+
+## 29PM10. Project Resource
+
+### Definition
+
+A person who can be staffed on projects, with skills, weekly capacity and a default role (PM-09). One per person: the Staffing page edits the existing row; if a second is made by hand, the oldest wins.
+
+### Rules
+
+**R-PM14 Allocation (computed, not stored).** For each active resource and each week (Monday to Sunday) in a range: Allocated Hours are the sum over their Project Assignments of Planned Hours times the assignment's working days (Monday to Friday, Start Date to End Date, else the range) in the week over its working days in all; Capacity is Weekly Capacity Hours, else the Weekly capacity hours setting; Logged Hours are their counted time entries in the week. Open Resource Requests show as unfilled demand by week, spread the same way. Worked out in the browser in a framework-free module. Weekly Capacity Hours is blank or 1 to 168 (`Capacity_In_Range`).
+
+### Salesforce implementation
+
+- **Object:** `Project_Resource__c`, label Project Resource, name field Text (Resource Name), sharing Public Read/Write.
+- **Value set:** global value set `Project_Skills` (Project Skills), edited in Setup, used by both Skills fields.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Person | `User__c` | Lookup(User), required, relationship Project_Resources |
+| Skills | `Skills__c` | Multi-Select Picklist (`Project_Skills`) |
+| Weekly Capacity Hours | `Weekly_Capacity_Hours__c` | Number(3, 0) |
+| Default Role | `Default_Role__c` | Text(80) |
+| Active | `Active__c` | Checkbox, default true |
+
+---
+
+## 29PM11. Resource Request
+
+### Definition
+
+A project's need for a role with skills, for some hours between two dates, filled by a Project Assignment (PM-09).
+
+### Rules
+
+**R-PM15 Filling.** Fill (Staffing page) lists active resources, those whose Skills include every requested skill first, then by free capacity (R-PM14) in the dates; the chosen person gets a new Project Assignment with the request's Role, Hours as Planned Hours, and dates; the request links it and becomes Filled. End Date on or after Start Date (`Dates_In_Order`); Hours more than 0 (`Hours_Positive`). The Assignment lookup accepts only an assignment on the same project.
+
+### Salesforce implementation
+
+- **Object:** `Resource_Request__c`, label Resource Request, name field Auto Number (`RR-{00000}`, Request Number), master-detail to Project (`Project__c`, relationship Resource_Requests), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Role | `Role__c` | Text(80), required |
+| Skills | `Skills__c` | Multi-Select Picklist (`Project_Skills`) |
+| Hours | `Hours__c` | Number(8, 2), required |
+| Start Date | `Start_Date__c` | Date, required |
+| End Date | `End_Date__c` | Date, required |
+| Status | `Status__c` | Picklist (Open, Filled, Cancelled), restricted, required, default Open |
+| Assignment | `Assignment__c` | Lookup(Project_Assignment__c), filtered to the same project, Set Null |
+| Notes | `Notes__c` | Long Text Area(32768) |
+
+---
+
+## 29PM12. Project Invoice
+
+### Definition
+
+An invoice record for one project, for the organization's own accounting (PM-10). Projects processes no payment; with the Payments module installed, the client may pay online through Payments' hosted checkout (R-PM22).
+
+### Rules
+
+**R-PM16 Building.** New Invoice (Manage Projects) for a project that is not Not Billed and a period adds a Draft invoice with Bill To and Bill To Contact from the project's client and lines: Time and Materials (or blank): counted billable time entries dated in the period with no Invoice Line, one Time line per person and Bill Rate (Quantity the hours, Unit Price the rate; an entry with no Bill Rate uses the project's Hourly Rate); Fixed Fee: each milestone that is Done, has a Billing Amount, a Completed Date on or before Period End and no Invoice Line, one Milestone line each; Retainer: one Retainer line per calendar month of the period with no Retainer line of that Service Date on an invoice that is not Void, at the Retainer Amount; and for every billing type, counted billable expenses dated in the period with no Invoice Line, one Expense line each. Each source record's Invoice Line is filled with its line. Period End on or after Period Start (`Period_In_Order`).
+
+**R-PM17 Status.** Draft, then Send (Invoice Date today and Due Date Invoice Date plus Invoice due days, each when blank), then Paid (Mark Paid with a Paid Date, or R-PM22), or Void from any of them. Void clears the Invoice Line of every time entry, expense and milestone on its lines, so the work can be billed again, and keeps the lines. A Void invoice never changes status again (`Void_Is_Final`). Lines are added, changed or removed only while Draft (29PM13). Export Invoices (Manage Projects) returns Sent and Paid invoices with an Invoice Date in a range, not yet exported unless asked, and their lines, as CSV built in the browser, and stamps Exported Date.
+
+**R-PM22 Online payment (D-197 as amended 2026-11-12).** With the Payments module installed and Take invoice payments online on, Send Payment Link (Manage Projects) on a Sent invoice with Total less Amount Paid more than 0 calls Payments' `startCheckout` by name (`PaymentsApi`, built with `NamespaceUtil.build`; the action is hidden when it is null) with that amount, `sourceRecordId` the invoice, `listener` `ProjectInvoicePaymentListener`, the Bill To Contact as payer and the Invoice payment return page (else the My Domain address) as success and cancel address; it stores the payment's id in Payment Key and the checkout address in Payment Link, then emails the link to the Bill To Contact. A new link replaces the key, so a report about an older payment changes nothing. Payments reports changes to the listener (`paymentsChanged`): for the invoice's current Payment Key only, Paid adds the amount to Amount Paid and, once Amount Paid reaches Total, sets Status Paid and Paid Date to the payment's paid date; a refund lowers Amount Paid by the refunded amount and sets a Paid invoice whose Amount Paid falls below Total back to Sent; Failed and Cancelled change nothing. A Void invoice is never changed by a report. Projects names no Payments class or object.
+
+### Salesforce implementation
+
+- **Object:** `Project_Invoice__c`, label Project Invoice, name field Auto Number (`INV-{000000}`, Invoice Number), master-detail to Project (`Project__c`, relationship Invoices), sharing Controlled by Parent, field history on.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Bill To | `Account__c` | Lookup(Account), relationship Project_Invoices |
+| Bill To Contact | `Contact__c` | Lookup(Contact), relationship Project_Invoices |
+| Status | `Status__c` | Picklist (Draft, Sent, Paid, Void), restricted, required, default Draft, history tracked |
+| Invoice Date | `Invoice_Date__c` | Date |
+| Due Date | `Due_Date__c` | Date |
+| Period Start | `Period_Start__c` | Date |
+| Period End | `Period_End__c` | Date |
+| Paid Date | `Paid_Date__c` | Date |
+| Exported Date | `Exported_Date__c` | Date |
+| Notes | `Notes__c` | Long Text Area(32768), printed |
+| Amount Paid | `Amount_Paid__c` | Currency(16, 2), written by R-PM22 |
+| Payment Key | `Payment_Key__c` | Text(18): the current Payments payment's record id, as text |
+| Payment Link | `Payment_Link__c` | Long Text Area(1000): the processor's hosted checkout address |
+| Total | `Total__c` | Roll-Up Summary (SUM Project_Invoice_Line__c.Amount__c) |
+
+---
+
+## 29PM13. Project Invoice Line
+
+### Definition
+
+One line of a project invoice: time, an expense, a milestone, a retainer month or anything else (PM-10).
+
+### Rules
+
+- Added, changed or removed only while the invoice is Draft (validation rule `Draft_Invoice_Only` on add and change; Staff cannot delete). Time entries, expenses and milestone tasks point to their line through Invoice Line (R-PM12).
+
+### Salesforce implementation
+
+- **Object:** `Project_Invoice_Line__c`, label Project Invoice Line, name field Auto Number (`IL-{000000}`, Line Number), master-detail to Project Invoice (`Invoice__c`, relationship Lines), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Invoice | `Invoice__c` | Master-Detail(Project_Invoice__c) |
+| Type | `Line_Type__c` | Picklist (Time, Expense, Milestone, Retainer, Other), restricted, required, default Other |
+| Description | `Description__c` | Text(255), required |
+| Service Date | `Service_Date__c` | Date: the work's date, or a retainer month's first day |
+| Quantity | `Quantity__c` | Number(10, 2), required, default 1 |
+| Unit Price | `Unit_Price__c` | Currency(16, 2), required |
+| Amount | `Amount__c` | Formula (Currency): `Quantity__c * Unit_Price__c` |
+
+---
+
+## 29PM14. Project Revenue
+
+### Definition
+
+Revenue and cost recognized for a project in one closed month, stored so a closed month does not move (PM-11).
+
+### Rules
+
+**R-PM19 Recognition.** For a project that is not Not Billed and a closed month M: Recognized Amount is revenue earned through M's last day, as counted at the run, less the Recognized Amount of every earlier row; Cost Amount is labor cost (time entries' Cost Amount) and counted expenses dated through M's last day, less every earlier row's Cost Amount. Earned: Time and Materials, counted billable time Amount and counted billable expenses dated through the month end; Fixed Fee, (Budget Amount plus Change Amount) times Percent Complete at the run, plus counted billable expenses; Retainer, Retainer Amount for each month from Start Date's month to M (to Completed Date's month when set), plus counted billable expenses. Late approved time and a falling percent complete land in the next closed month (a negative amount is allowed). Rows are written by the nightly step Project revenue (6:42 AM, its own switch) on its first run of a month for Active and On Hold projects and those Completed in M, up to 2,000 projects (an Error Log warning past it), or by Recognize Revenue on the project; Month Key (project id, `-`, `YYYY-MM`) makes a rerun update the row. The open month is computed on the financials card, never stored. Cost Amount is readable only with Projects Admin.
+
+**R-PM21 Financials (computed).** The project's financials card shows budget (Budget Amount plus Change Amount), revenue to date (as R-PM19's earned, through today), cost (Labor Cost plus Expense Amount, Projects Admin only), margin and margin percent, invoiced (Total of Sent and Paid invoices), unbilled (revenue less invoiced), and a table of the stored months plus the open month.
+
+### Salesforce implementation
+
+- **Object:** `Project_Revenue__c`, label Project Revenue, name field Auto Number (`REV-{000000}`, Revenue Number), master-detail to Project (`Project__c`, relationship Revenue), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Month | `Month__c` | Date, required: the month's first day |
+| Method | `Method__c` | Picklist (Time and Materials, Fixed Fee, Retainer), restricted |
+| Recognized Amount | `Recognized_Amount__c` | Currency(16, 2) |
+| Cost Amount | `Cost_Amount__c` | Currency(16, 2) |
+| Percent Complete | `Percent_Complete__c` | Percent(5, 2): Fixed Fee, at the run |
+| Month Key | `Month_Key__c` | Text(40), unique (case insensitive), external ID |
+
+---
+
+## 29PM15. Change Request
+
+### Definition
+
+A requested change of a project's scope with its hours and amount; approved ones add to the budget the project is measured against (PM-12).
+
+### Rules
+
+**R-PM20 Change requests.** Status Draft, Submitted, Approved or Rejected. Only the project's owner or a holder of Manage Projects sets Approved or Rejected (`Decision_By_Manager`). An Approved request's Status, Hours and Amount change only with Manage Projects (`Approved_Locked`). Approved requests are summed into the project's Change Hours and Change Amount (29PM1), so approval and its undoing move the budget with no Apex; Budget Hours and Budget Amount stay the original budget. Hours and Amount may be negative. Field history tracks Status, Hours and Amount.
+
+### Salesforce implementation
+
+- **Object:** `Project_Change_Request__c`, label Change Request, name field Text (Change Title), master-detail to Project (`Project__c`, relationship Change_Requests), sharing Controlled by Parent, field history on.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Project | `Project__c` | Master-Detail(Project__c) |
+| Description | `Description__c` | Long Text Area(32768) |
+| Hours | `Hours__c` | Number(8, 2), history tracked |
+| Amount | `Amount__c` | Currency(16, 2), history tracked |
+| Status | `Status__c` | Picklist (Draft, Submitted, Approved, Rejected), restricted, required, default Draft, history tracked |
+
 ## 29AV1. Address Verification Settings
 
 ### Definition
@@ -18732,6 +19002,7 @@ mirrors the primary member).
 | 1.49 | 2026-11-12 | LWC Builder charts with two groupings and three totals (LB-07, D-196; ADR-0203 amendment of 2026-11-12). No object or field added. R-LB1: a `chart` block gains the optional `display` property (`grouped` or `stacked`, blank read as `grouped`); the definition stays schema version 1, and an additive property with a meaning-keeping default does not raise it. |
 | 1.50 | 2026-11-12 | Nonprofit Cloud household coexistence and conversion (MIG-02b, D-196; ADR-NEXT `NEXT-household-model-coexistence.md`, ADR-NEXT `NEXT-npc-household-conversion.md`). Account gains `Household_Model__c` (Automatic, Nonprofit Cloud, Converted; rule R-H15), read by the mutual exclusion guards before detection. Household Adoption (Section 29ZQ) gains rules R-HA7 to R-HA9: a Nonprofit Cloud source supplied by Mirror, NPC run ids, Junction members joined with primary, role and dates, `Household_Model__c` and the new membership rows journaled and undone. Mirror ships kit `NPC_Households` (one tool step) and a Health Check drift report. No object added. |
 | 1.51 | 2026-11-12 | Payments subscriptions (PAY-04, D-196, release 1.20; ADR-NEXT `NEXT-payments-subscriptions.md`). `Payment__c` gains `Subscription_Id__c` (Text(100), external ID; R-PAY6); `Payments_Settings__c` gains `Recurring_Payments__c` (Checkbox, false; Setting Definition `Payments_Recurring`); `Commitment__c` gains `Processor_Customer_Id__c` (Text(100), external ID); rule R-RH5. The seam gains `updateCard`, `isReady { recurring }`, the `startCheckout` keys `interval` and `intervalCount`, and the listener action `subscriptionsChanged`; the donor template gains `Giving.UpdateCard`. No object added. |
+| 1.52 | 2026-11-12 | Projects PSA (PM-06 to PM-12, D-197 as amended 2026-11-12, release 1.20; ADR-NEXT `NEXT-projects-psa.md`, superseding ADR-0208 decisions 6 and 7 where they conflict). New Sections 29PM8 Project Rate (`Project_Rate__c`), 29PM9 Project Expense (`Project_Expense__c`, R-PM13), 29PM10 Project Resource (`Project_Resource__c`, R-PM14, global value set `Project_Skills`), 29PM11 Resource Request (`Resource_Request__c`, R-PM15), 29PM12 Project Invoice (`Project_Invoice__c`, R-PM16, R-PM17, R-PM22 online payment through the Payments seam by name), 29PM13 Project Invoice Line (`Project_Invoice_Line__c`), 29PM14 Project Revenue (`Project_Revenue__c`, R-PM19, R-PM21) and 29PM15 Change Request (`Project_Change_Request__c`, R-PM20). `Time_Entry__c` gains Status, Bill Rate, Cost Rate, Amount, Cost Amount, Approved By, Rejection Reason and Invoice Line (R-PM9 to R-PM12); `Project_Task__c` gains Billing Amount and Invoice Line (R-PM18); `Project__c` gains Billing Type, Retainer Amount and roll-ups Time Amount, Billable Amount, Labor Cost, Expense Amount, Change Hours, Change Amount and Recognized Revenue, Actual Hours and Billable Hours count only counted time (R-PM10), Actual Cost follows rate cards and Remaining Budget adds approved changes; `Projects_Settings__c` gains ten PSA settings, all switches off. |
 
 ---
 ## 32. Entity ownership by package
@@ -18936,6 +19207,14 @@ included; standard objects the packages extend are named by the entity that gove
 | Time Entry | Project Management | 1.18 (PM-04) | 29PM5 |
 | Project Status Update | Project Management | 1.18 (PM-05) | 29PM6 |
 | Projects Settings | Project Management | 1.18 (PM-02) | 29PM7 |
+| Project Rate | Project Management | 1.20 (PM-06) | 29PM8 |
+| Project Expense | Project Management | 1.20 (PM-08) | 29PM9 |
+| Project Resource | Project Management | 1.20 (PM-09) | 29PM10 |
+| Resource Request | Project Management | 1.20 (PM-09) | 29PM11 |
+| Project Invoice | Project Management | 1.20 (PM-10) | 29PM12 |
+| Project Invoice Line | Project Management | 1.20 (PM-10) | 29PM13 |
+| Project Revenue | Project Management | 1.20 (PM-11) | 29PM14 |
+| Change Request | Project Management | 1.20 (PM-12) | 29PM15 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |

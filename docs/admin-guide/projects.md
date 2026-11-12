@@ -17,10 +17,13 @@ program launch, internal work or client work.
 - **Time and budgets** (PM-04): time entries (billable or not), people assigned to a project
   with a role and planned hours, budget hours and amount against actual hours and cost,
   utilization by person, and a CSV of billable time for your own accounting or invoicing system.
-  **BarnCRM makes no invoices and takes no payments.**
 - **Health and status updates** (PM-05): each active project is On Track, At Risk or Off Track
   by a rule you tune, with its reasons; a status update drafted from the project for you to edit;
   a Projects at Risk card for any home page; and four reports.
+- **PSA** (PM-06 to PM-12, release 1.20): rate cards, timesheets and approvals, expenses,
+  resource management, invoices (with Pay Online through BarnCRM Payments when installed),
+  financials and recognized revenue, and change requests, each behind its own setting and off
+  until you turn it on. See [Project Management PSA](projects-psa.md).
 
 ## Install and Turn On
 

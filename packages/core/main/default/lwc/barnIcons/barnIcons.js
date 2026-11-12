@@ -128,6 +128,10 @@ const ICONS = Object.freeze({
   Project__c: 'custom:custom62',
   Projects_Home: 'custom:custom64',
   Time_Entry__c: 'custom:custom95',
+  Project_Expense__c: 'custom:custom93',
+  Project_Invoice__c: 'custom:custom41',
+  Project_Rate__c: 'custom:custom17',
+  Project_Resource__c: 'custom:custom47',
   // Mirror
   Accounting_Export: 'custom:custom21',
   Campaign_Sync: 'custom:custom35',

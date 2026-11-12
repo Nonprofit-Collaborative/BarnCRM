@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Remaining_Budget__c</fullName>
-  <formula>IF(ISBLANK(Budget_Amount__c), NULL, Budget_Amount__c - BLANKVALUE(Actual_Cost__c, 0))</formula>
+  <formula>IF(ISBLANK(Budget_Amount__c), NULL, Budget_Amount__c + Change_Amount__c - BLANKVALUE(Actual_Cost__c, 0))</formula>
   <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
-  <inlineHelpText>The Budget Amount less the Actual Cost.</inlineHelpText>
+  <inlineHelpText>The Budget Amount plus approved change requests, less the Actual Cost.</inlineHelpText>
   <label>Remaining Budget</label>
   <precision>18</precision>
   <scale>2</scale>

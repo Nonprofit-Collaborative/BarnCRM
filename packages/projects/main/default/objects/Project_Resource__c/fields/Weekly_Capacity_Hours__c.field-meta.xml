@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Weekly_Capacity_Hours__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>Hours a week this person can work on projects, 1 to 168. Blank: the Weekly capacity hours setting.</inlineHelpText>
+  <label>Weekly Capacity Hours</label>
+  <precision>3</precision>
+  <required>false</required>
+  <scale>0</scale>
+  <trackTrending>false</trackTrending>
+  <type>Number</type>
+</CustomField>

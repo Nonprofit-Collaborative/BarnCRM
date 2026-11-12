@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Resources_Enabled__c</fullName>
+  <defaultValue>false</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>Skills and capacity per person, resource requests on projects, the Staffing page and weekly allocation against capacity. Needs Track time and budgets. Default: off.</inlineHelpText>
+  <label>Manage resources</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

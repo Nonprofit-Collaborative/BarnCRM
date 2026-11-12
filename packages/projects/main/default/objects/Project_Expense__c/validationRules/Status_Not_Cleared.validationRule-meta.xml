@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Status_Not_Cleared</fullName>
+  <active>true</active>
+  <description>R-PM11: Status is blank only for entries made while approvals were off.</description>
+  <errorConditionFormula>AND(NOT(ISNEW()), ISCHANGED(Status__c), ISBLANK(TEXT(Status__c)))</errorConditionFormula>
+  <errorDisplayField>Status__c</errorDisplayField>
+  <errorMessage>Status cannot be cleared. Choose Open to reopen it.</errorMessage>
+</ValidationRule>

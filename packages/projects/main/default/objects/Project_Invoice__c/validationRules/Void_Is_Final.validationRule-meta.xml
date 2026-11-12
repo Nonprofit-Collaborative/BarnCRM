@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Void_Is_Final</fullName>
+  <active>true</active>
+  <description>R-PM17: a void invoice stays void.</description>
+  <errorConditionFormula>AND(ISCHANGED(Status__c), ISPICKVAL(PRIORVALUE(Status__c), "Void"))</errorConditionFormula>
+  <errorDisplayField>Status__c</errorDisplayField>
+  <errorMessage>A void invoice cannot change status. Build a new invoice instead.</errorMessage>
+</ValidationRule>

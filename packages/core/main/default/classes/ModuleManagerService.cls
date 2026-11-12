@@ -205,9 +205,17 @@ public with sharing class ModuleManagerService {
 		'Projects' => new List<String>{
 			'Project__c',
 			'Project_Assignment__c',
+			'Project_Change_Request__c',
+			'Project_Expense__c',
+			'Project_Invoice__c',
+			'Project_Invoice_Line__c',
 			'Project_Phase__c',
+			'Project_Rate__c',
+			'Project_Resource__c',
+			'Project_Revenue__c',
 			'Project_Status_Update__c',
 			'Project_Task__c',
+			'Resource_Request__c',
 			'Time_Entry__c'
 		}
 	};

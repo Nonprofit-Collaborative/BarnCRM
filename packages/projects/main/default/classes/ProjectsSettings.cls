@@ -27,6 +27,62 @@ public with sharing class ProjectsSettings {
 		return number('Weekly_Capacity_Hours__c', 40, 168);
 	}
 
+	/** PM-06: rate cards. Each PSA part ships off and needs time tracking on (ADR-NEXT projects-psa). */
+	public static Boolean ratesEnabled() {
+		return part('Rates_Enabled__c');
+	}
+
+	/** PM-07: time and expense approvals. */
+	public static Boolean approvalsEnabled() {
+		return part('Approvals_Enabled__c');
+	}
+
+	/** PM-08: expenses. */
+	public static Boolean expensesEnabled() {
+		return part('Expenses_Enabled__c');
+	}
+
+	/** PM-09: resources, requests, staffing and allocation. */
+	public static Boolean resourcesEnabled() {
+		return part('Resources_Enabled__c');
+	}
+
+	/** PM-10: billing types and invoices. */
+	public static Boolean billingEnabled() {
+		return part('Billing_Enabled__c');
+	}
+
+	/** PM-10: Pay Online on invoices through BarnCRM Payments; needs billing on. */
+	public static Boolean onlinePaymentsEnabled() {
+		return billingEnabled() && part('Online_Payments_Enabled__c');
+	}
+
+	/** PM-11: the financials card and recognized revenue. */
+	public static Boolean revenueEnabled() {
+		return part('Revenue_Enabled__c');
+	}
+
+	/** PM-12: change requests. */
+	public static Boolean changeRequestsEnabled() {
+		return part('Change_Requests_Enabled__c');
+	}
+
+	/** Days from an invoice's date to its due date. */
+	public static Integer invoiceDueDays() {
+		return number('Invoice_Due_Days__c', 30, 365);
+	}
+
+	/** Where a client lands after paying online; blank when not set (the caller uses My Domain). */
+	public static String invoiceReturnUrl() {
+		Object stored = read('Invoice_Return_Url__c');
+		return stored == null ? null : String.valueOf(stored).trim();
+	}
+
+	private static Boolean part(String key) {
+		Object stored = read(key);
+		return timeTracking() && stored != null && Boolean.valueOf(String.valueOf(stored));
+	}
+
 	private static Integer number(String key, Integer shipped, Integer max) {
 		Object stored = read(key);
 		Integer value;
