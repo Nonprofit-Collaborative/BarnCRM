@@ -72,7 +72,7 @@ private class HubTemplatesTest {
 	@IsTest
 	static void aDeletedTemplateComesBackAndAnOwnerCanBeGiven() {
 		HubTemplates.bodyOverride =
-			'{"obligations":[{"key":"test_filing","name":"Test filing","recurrence":"Yearly"}],' +
+			'{"obligations":[{"key":"test_filing","name":"Test filing","category":"Other","recurrence":"Yearly"}],' +
 			'"policies":[{"key":"test_policy","name":"Test policy","requiresAcknowledgment":true,"reviewMonths":24}]}';
 		User installer = TestUsers.adminWith(ADMIN_SET);
 		System.runAs(installer) {

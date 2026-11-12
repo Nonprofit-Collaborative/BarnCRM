@@ -75,7 +75,10 @@ private class EventPaymentsTest {
 			LastName = 'Payer',
 			Email = 'jane@example.org'
 		);
-		insert as user jane;
+		// An org's duplicate rule must not stop a test person sharing an email.
+		Database.DMLOptions options = new Database.DMLOptions();
+		options.DuplicateRuleHeader.allowSave = true;
+		Database.insert(jane, options, AccessLevel.USER_MODE);
 		EventRegistrationService.Request request = new EventRegistrationService.Request();
 		request.eventId = event.Id;
 		request.registrant = new EventPersonMatcher.PersonInput();
@@ -216,7 +219,7 @@ private class EventPaymentsTest {
 			Assert.areEqual(EventPayments.FAILED, reload(waiting).Payment_Status__c, 'Failed');
 			Id gone = Id.valueOf(
 				Event_Registration__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
-					.getKeyPrefix() + '000000000000AAA'
+					.getKeyPrefix() + '000000000001'
 			);
 			Assert.isFalse(
 				EventCheckoutJob.markFailed(gone),

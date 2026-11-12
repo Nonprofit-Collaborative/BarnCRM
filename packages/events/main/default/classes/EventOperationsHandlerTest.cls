@@ -106,16 +106,14 @@ private class EventOperationsHandlerTest {
 			);
 			Test.startTest();
 			insert as user new List<Event_Session__c>{ open, sized };
-			open.Room__c = 'Typed Room';
-			update as user open;
+			update as user new Event_Session__c(Id = open.Id, Room__c = 'Typed Room');
 			Event_Session__c kept = [
 				SELECT Room__c
 				FROM Event_Session__c
 				WHERE Id = :open.Id
 				WITH USER_MODE
 			];
-			open.Venue_Room__c = roomB.Id;
-			update as user open;
+			update as user new Event_Session__c(Id = open.Id, Venue_Room__c = roomB.Id);
 			Test.stopTest();
 			Assert.areEqual(
 				'Typed Room',

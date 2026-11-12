@@ -120,8 +120,8 @@ public with sharing class HubBoard {
 				);
 			}
 		}
-		motion.Status__c = VOTING_OPEN;
-		update as user motion;
+		// Only the changed field: the loaded row's Meeting field is not one a user may write.
+		update as user new Board_Motion__c(Id = motionId, Status__c = VOTING_OPEN);
 		insert as user votes;
 		return votes.size();
 	}
@@ -141,10 +141,14 @@ public with sharing class HubBoard {
 		}
 		Decimal votesFor = motion.Votes_For__c == null ? 0 : motion.Votes_For__c;
 		Decimal against = motion.Votes_Against__c == null ? 0 : motion.Votes_Against__c;
-		motion.Status__c = votesFor > against ? 'Passed' : 'Failed';
-		motion.Decided_On__c = Date.today();
-		update as user motion;
-		return motion.Status__c;
+		String outcome = votesFor > against ? 'Passed' : 'Failed';
+		// Only the changed fields: the vote totals are not ones a user may write.
+		update as user new Board_Motion__c(
+			Id = motionId,
+			Status__c = outcome,
+			Decided_On__c = Date.today()
+		);
+		return outcome;
 	}
 
 	/** R-BMT4: opens the poll, inviting the board first when nobody is invited yet. */

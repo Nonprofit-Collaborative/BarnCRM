@@ -140,9 +140,12 @@ public with sharing class HubPolicy {
 		if (row.User__c != UserInfo.getUserId()) {
 			requireManage();
 		}
-		row.Status__c = ACKNOWLEDGED;
-		row.Acknowledged_On__c = System.now();
-		update as user row;
+		// Only the changed fields: the loaded row's User field is not one a user may write.
+		update as user new Policy_Acknowledgment__c(
+			Id = row.Id,
+			Status__c = ACKNOWLEDGED,
+			Acknowledged_On__c = System.now()
+		);
 	}
 
 	/** The current user's open requests, soonest due first. */

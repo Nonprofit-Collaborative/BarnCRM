@@ -110,6 +110,7 @@ private class PortalDataTest {
 			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
 			settings.Brand_Management__c = true;
 			upsert settings;
+			SettingsService.clearCaches();
 			Brand__c thrift = new Brand__c(
 				Name = 'Barn Thrift',
 				Primary_Color__c = '#1B5E20',

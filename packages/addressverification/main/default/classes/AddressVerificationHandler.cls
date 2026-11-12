@@ -84,7 +84,7 @@ public with sharing class AddressVerificationHandler extends TriggerHandler {
 			return;
 		}
 		try {
-			System.enqueueJob(new AddressVerificationJob(ids));
+			System.enqueueJob(new AddressVerificationJob.OnSave(ids));
 		} catch (Exception failed) {
 			// Left Unverified: the nightly step looks them up.
 			ErrorLogger.log(failed, CONTEXT + '.queue');
