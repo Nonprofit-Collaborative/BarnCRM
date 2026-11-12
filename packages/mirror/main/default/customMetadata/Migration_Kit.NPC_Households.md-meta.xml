@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>NPC Households</label>
+  <protected>false</protected>
+  <values>
+    <field>Source_App__c</field>
+    <value xsi:type="xsd:string">Nonprofit_Cloud_Fundraising</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Makes your Nonprofit Cloud households (Party Relationship Groups of type Household) BarnCRM households on the same accounts, once, with a preview, a confirmed count and an undo. Nonprofit Cloud groups, memberships and accounts are never deleted or changed.</value>
+  </values>
+  <values>
+    <field>Steps_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"households","label":"Convert Nonprofit Cloud Households","kind":"tool","help":"On BarnCRM Settings, General, use Convert Nonprofit Cloud Households: preview, confirm the number and run it. Each household account becomes a BarnCRM household in place, and with household membership set to membership records each member joins it. Then come back here and click Mark Done.","tab":"BarnCRM_Settings","toolLabel":"Open BarnCRM Settings"}]</value>
+  </values>
+  <values>
+    <field>Retire_Checklist_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"entry","text":"Ask staff to add and change household members on the BarnCRM household, so households are no longer kept in both places."},{"key":"naming","text":"If you use Nonprofit Cloud's automatic household naming, turn it off, so BarnCRM alone names the converted households."},{"key":"layouts","text":"Remove the Nonprofit Cloud household and group membership related lists from the page layouts staff use, once the BarnCRM household cards are on them."},{"key":"drift","text":"Open Health Check and settle any account it lists under Household Model Disagrees With Nonprofit Cloud."}]</value>
+  </values>
+  <values>
+    <field>Extension_Class__c</field>
+    <value xsi:type="xsd:string">NpcHouseholdSource</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">15</value>
+  </values>
+</CustomMetadata>

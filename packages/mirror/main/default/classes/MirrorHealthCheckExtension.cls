@@ -8,7 +8,8 @@
  * has completed for more than two days. The run executes
  * as the person who scheduled it, so when that person is deactivated or loses access every run
  * fails before it starts and nothing else says so. Asked only of a viewer who may manage
- * settings, as Core's own settings checks are.
+ * settings, as Core's own settings checks are. A third finding is the household drift report
+ * (MIG-02b): Accounts whose Household Model and Nonprofit Cloud household group disagree.
  *
  * `@NamespaceAccessible` for the reason `GivingHealthCheckExtension` is: Core resolves it with
  * `Type.forName` under ADR-0017.
@@ -17,6 +18,7 @@
 public with sharing class MirrorHealthCheckExtension implements HealthCheckExtension {
 	public static final String MIRROR_STALE_KEY = 'opportunity_mirror_not_run';
 	public static final String GIFT_TRANSACTION_MIRROR_STALE_KEY = 'gift_transaction_mirror_not_run';
+	public static final String HOUSEHOLD_DRIFT_KEY = 'household_model_drift';
 	private static final Integer STALE_DAYS = 2;
 
 	/** Test seam: the moment the report is read. */
@@ -33,7 +35,8 @@ public with sharing class MirrorHealthCheckExtension implements HealthCheckExten
 		for (
 			HealthCheckService.Finding stale : new List<HealthCheckService.Finding>{
 				staleMirrorRun(),
-				staleGiftTransactionMirrorRun()
+				staleGiftTransactionMirrorRun(),
+				householdDrift()
 			}
 		) {
 			if (stale != null) {
@@ -68,6 +71,35 @@ public with sharing class MirrorHealthCheckExtension implements HealthCheckExten
 					HealthCheckService.SEVERITY_WARNING,
 					HealthCheckService.CATEGORY_SETTINGS
 			  );
+	}
+
+	/**
+	 * The household drift report (MIG-02b, ADR-NEXT `NEXT-npc-household-conversion.md` decision
+	 * 8): Accounts whose Household Model and native household group disagree, counted and the
+	 * first ten named. A warning that changes nothing; a failed read is reported as such.
+	 */
+	private static HealthCheckService.Finding householdDrift() {
+		if (!HealthCheckService.canManageSettings()) {
+			return null;
+		}
+		try {
+			NpcHouseholdSource.Drift drift = NpcHouseholdSource.drift(10);
+			return drift.count == 0
+				? null
+				: new HealthCheckService.Finding(
+						HOUSEHOLD_DRIFT_KEY,
+						BarnHelp.text('Mirror', 'Mirror_HealthCheck_HouseholdDriftTitle'),
+						BarnHelp.text(
+							'Mirror',
+							'Mirror_HealthCheck_HouseholdDriftDetail',
+							new List<Object>{ drift.count, String.join(drift.names, ', ') }
+						),
+						HealthCheckService.SEVERITY_WARNING,
+						HealthCheckService.CATEGORY_SETTINGS
+				  );
+		} catch (Exception e) {
+			return HealthCheckService.checkFailed(HOUSEHOLD_DRIFT_KEY, e);
+		}
 	}
 
 	/** The same finding for the Gift Transaction mirror (X-07, R-GT6). */

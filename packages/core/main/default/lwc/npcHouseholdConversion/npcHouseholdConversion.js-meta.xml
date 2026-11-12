@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    Convert Nonprofit Cloud Households on the General page of the BarnCRM Settings console: the
+    household adoption panel with source NPC. Shown only where the Nonprofit Cloud source is
+    installed and available, or conversion runs exist.
+  </description>
+  <isExposed>false</isExposed>
+  <masterLabel>Convert Nonprofit Cloud Households</masterLabel>
+</LightningComponentBundle>

@@ -173,6 +173,12 @@ Erasing a person on request is admin work. See [Erase a person](../admin-guide/e
 - Problem: in an org that also has NPSP, a household's name and greetings are the ones NPSP
   had, and **Custom Name** is ticked. Your admin adopted NPSP's households and kept their
   wording. Untick **Custom Name** if you want BarnCRM to name it from its members.
+- Problem: in an org with Nonprofit Cloud, BarnCRM does not rename a household, change its
+  greetings or address, or add its people to another household. Its **Household Model** reads
+  **Nonprofit Cloud**, or it is still a Nonprofit Cloud household nobody has converted. Keep
+  it up to date in Nonprofit Cloud, or ask your admin to convert it. A household whose
+  **Household Model** reads **Converted** is a BarnCRM household now: change it in BarnCRM,
+  because changes no longer flow between the two.
 - Problem: there is no **Households** tab. Your organization has not turned households on
   yet. Ask your admin.
 - Problem: **Household** is not offered when you click **New**. That is expected: use **New

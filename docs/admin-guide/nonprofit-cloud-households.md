@@ -1,43 +1,86 @@
 # Households You Already Have in Nonprofit Cloud
 
+**Feature:** X-09 Nonprofit Cloud household guards; MIG-02b Household Model and conversion (D-196)
+**Package:** Core (guards, Household Model, the conversion section); Mirror (the conversion's source, its Migration Assistant kit and the drift report)
+**Iteration:** release 1.20 (conversion); guards since v0.4
+
 This page applies only to an org with Salesforce Nonprofit Cloud. In any other org, BarnCRM
 shows nothing described here.
 
 ## What It Does
 
-Salesforce Nonprofit Cloud has its own way of grouping people into a household, and BarnCRM has its own way. If your org is already using the Nonprofit Cloud way, both kinds of
-household can end up on the same record, pulling in different directions. BarnCRM looks
-for the households Nonprofit Cloud built, tells you what it found, and, since this release,
-stays out of their way automatically: it never renames such a household, never rewrites its
-formal or informal greeting, never writes its address, and never creates a second, duplicate
-BarnCRM household for someone already grouped by Nonprofit Cloud.
+Salesforce Nonprofit Cloud has its own way of grouping people into a household (a Party
+Relationship Group of type Household on an account, with the people on account contact
+relationships), and BarnCRM has its own way. One account has exactly one household model, and
+BarnCRM gives you three things to keep it that way.
 
-Nothing is moved, merged, or taken over. Each guard only ever leaves a record alone; none of
-them changes what Nonprofit Cloud already has.
+**The guards.** BarnCRM looks for the households Nonprofit Cloud built and stays out of their
+way automatically: it never renames such a household, never rewrites its formal or informal
+greeting, never writes its address, and never creates a second, duplicate BarnCRM household for
+someone already grouped by Nonprofit Cloud. Each guard only ever leaves a record alone.
+
+**Household Model.** Every account has a **Household Model** field that says which model owns
+it:
+
+| Value | What it means |
+|---|---|
+| **Automatic** (the default) | BarnCRM decides from what it finds, exactly as the guards always have. |
+| **Nonprofit Cloud** | This account is a Nonprofit Cloud household and stays one. The guards leave it alone even where BarnCRM cannot see its group, and the conversion never picks it. |
+| **Converted** | BarnCRM owns this household now. It was converted from Nonprofit Cloud; its Nonprofit Cloud group is still there, untouched, but BarnCRM names, greets and addresses it like any BarnCRM household. |
+
+**Convert Nonprofit Cloud Households.** A supervised, one-time conversion that makes each
+Nonprofit Cloud household a BarnCRM household on the same account: the same record, its name,
+gifts, activities and files. For each household, BarnCRM:
+
+- makes the account a BarnCRM household (its record type becomes Household) and sets
+  Household Model to **Converted**;
+- keeps the household's name as your team typed it (you can choose to let BarnCRM name it
+  instead);
+- with household membership set to membership records (Junction), adds each member as a
+  BarnCRM household member, marking Nonprofit Cloud's primary member as primary and carrying
+  over the role (Husband and Wife become Spouse or Partner, Son and Daughter become Child,
+  Father and Mother become Head, Other stays Other) and the start and end dates. A former
+  member with no end date is left out. A person account joins as itself;
+- fills the greetings from the members and counts them.
+
+With household membership set to Contact, nobody is moved: a person belongs to the household
+their contact names, which in most Nonprofit Cloud orgs without person accounts is already the
+household.
+
+BarnCRM never deletes, changes or creates a Nonprofit Cloud group, membership relationship or
+account. Merging and the empty-household tidy-up still leave converted households alone,
+because their Nonprofit Cloud group would be deleted with them. There is no sync afterwards in
+either direction.
+
+**The drift report.** Health Check lists accounts whose Household Model and Nonprofit Cloud
+group disagree, so you can settle each one. It changes nothing for you.
 
 ## How to Turn It On
 
-There is nothing to turn on. The guards run automatically, every time the naming batch runs,
-every time a household's membership changes, every time an address is saved, and every time a
-new person would otherwise get a household of their own. Health Check reads your org every
-time it runs.
+There is nothing to turn on. The guards and the Household Model field work in every org. The
+**Convert Nonprofit Cloud Households** section appears on the **General** page of BarnCRM
+Settings when BarnCRM Mirror is installed and your org has Nonprofit Cloud's household objects,
+or when households were converted before (so an undo is never hidden). It is also a step of the
+**NPC Households** kit in the Migration Assistant (see [Migration Assistant](migration-assistant.md)).
 
-1. Open the **BarnCRM Admin** app.
-2. Click the **BarnCRM Settings** tab.
-3. Choose **Health** in the left navigation.
-4. Read the **What We Found in Your Org** card. If your org has households built the
-   Nonprofit Cloud way, the card says so and gives you the number it counted, as information:
-   this is expected, and it is BarnCRM leaving those households alone.
-5. If any Account is both a BarnCRM household and a Nonprofit Cloud household at once,
-   a separate warning names how many. That is the one case worth looking at: pick one model
-   for each of those Accounts.
+Before you convert:
 
-If BarnCRM cannot count native households, it says that instead of showing you a number.
-That happens when your own permissions do not let you read them, which is common and is not a
-problem with your org. When the answer is not certain, BarnCRM assumes the households are
-there and stays out of their way. It would rather leave your data alone than tidy up something
-that was never its to tidy. An org without Nonprofit Cloud has no native households to count,
-and BarnCRM treats it that way.
+1. **Choose household membership** (BarnCRM Settings, **General**). Membership records
+   (Junction) is the usual choice for Nonprofit Cloud, where people can belong to more than one
+   account and are often person accounts; members are added only in that mode.
+2. **Turn off Nonprofit Cloud's automatic household naming** if your org has it, so the two do
+   not both name the same households. BarnCRM cannot change Nonprofit Cloud's settings for you.
+3. **Mark any household you want to keep in Nonprofit Cloud**: open the account and set
+   **Household Model** to **Nonprofit Cloud**. The conversion passes it over.
+4. You need the **Manage BarnCRM Settings** permission, and read access to Nonprofit Cloud's
+   household groups and memberships (the Group Membership permission set). Each household is
+   converted only if you can edit its account; the rest are skipped and counted.
+
+There is nothing to do in Salesforce Setup.
+
+Health Check's **What We Found in Your Org** card (BarnCRM Settings, **Health**) says how many
+Nonprofit Cloud households BarnCRM found, as information. If it cannot count them, it says that
+instead, and BarnCRM assumes they are there and stays out of their way.
 
 **Contacts to Multiple Accounts.** With this Salesforce setting on, every contact gets an
 account relationship record, and moving a person to another household leaves an indirect one
@@ -59,51 +102,71 @@ a Nonprofit Cloud household: naming, greetings, addresses and memberships work a
 
 ## A Five-Minute Walkthrough
 
-Maria has installed BarnCRM into an org that has been running Nonprofit Cloud for two
-years. Her colleagues have been grouping families there the whole time.
+Maria has installed BarnCRM into an org that has been running Nonprofit Cloud for two years.
+Her colleagues have grouped 1,240 families there.
 
-1. Maria opens the **BarnCRM Admin** app, clicks **BarnCRM Settings**, and chooses
-   **Health**.
-2. The **What We Found in Your Org** card tells her that this org already has households
-   built the Nonprofit Cloud way, and how many.
-3. She decides which way her organization is going to group families from now on. She picks
-   one, and only one.
-4. If she keeps using the Nonprofit Cloud households, she leaves BarnCRM's household
-   features alone and does not create BarnCRM households for those families.
-5. If she moves to BarnCRM households, she does it for families that do not already have a
-   Nonprofit Cloud household, and she leaves the ones that do until a migration is available.
-6. She writes down which choice she made, so that the next person to enter a family knows
-   where it goes.
+1. Maria opens the **BarnCRM Admin** app, clicks the **BarnCRM Settings** tab, and chooses
+   **General** in the left navigation. Household membership is already set to membership
+   records.
+2. Two families should stay in Nonprofit Cloud for now. She opens each account and sets
+   **Household Model** to **Nonprofit Cloud**.
+3. In **Convert Nonprofit Cloud Households** she reads "1,238 Nonprofit Cloud households can be
+   converted" and the first ten, with each household's primary member and how many members it
+   has. She leaves **Keep Nonprofit Cloud's household names** checked.
+4. She clicks **Convert Households**, types **1238** and clicks **Convert**. The section says it
+   has started and updates by itself.
+5. When it finishes, **Last conversion** shows 1,238 converted. She opens the Lee household:
+   it is a BarnCRM household with Sam Lee as its primary member and greetings filled in, and
+   Household Model reads Converted.
+6. She opens **Health** and sees no **Household Model Disagrees With Nonprofit Cloud** warning.
+7. In the Migration Assistant she marks the **NPC Households** step done and ticks the retire
+   checklist.
 
-Total time: about five minutes, and the only real work is step 3.
+Total time: about five minutes, plus the conversion's own run.
+
+## Undoing a Conversion
+
+**Undo This Conversion** under **Last conversion** puts each household back: its record type,
+Household Model, name setting, greetings and primary contact as they were, and it removes the
+household member records the conversion added. Type the number to confirm. A household that has
+gained another member since, or that you can no longer edit, is not put back; the reason is on
+its Household Adoption record. Remove that member and undo again.
+
+## The Drift Report
+
+Health Check shows **Household Model Disagrees With Nonprofit Cloud** when any account is:
+
+- a BarnCRM household with a Nonprofit Cloud household group, not marked **Converted** (both
+  models claim it);
+- marked **Nonprofit Cloud** with no Nonprofit Cloud household group;
+- marked **Converted** but no longer a BarnCRM household.
+
+It names up to ten of them. Settle each one: set Household Model to the model that owns it, run
+the conversion, or undo it. The warning goes when nothing disagrees.
 
 ## Common Mistakes
 
-**Expecting BarnCRM to take the households over.** It does not. An account that already
-carries a Nonprofit Cloud household is left to Nonprofit Cloud: BarnCRM will not name it,
-will not rewrite its greetings, will not write its address, will not tidy it up, and will not
-delete it when it looks empty, because to BarnCRM it always looks empty.
+**Expecting the conversion to keep running.** It is one-time. A household created in Nonprofit
+Cloud after the conversion stays a Nonprofit Cloud household, guarded as before, until you run
+the conversion again. Running it again is safe: converted households and members already added
+are left as they are.
 
-**Waiting for the migration.** A tool to move households from one model to the other is
-planned, but it does not exist yet, and there is no date for it. Nothing in this version
-moves them. If you need them moved today, that is manual work.
+**Expecting changes to flow back to Nonprofit Cloud.** They do not, and Nonprofit Cloud's
+changes do not flow into BarnCRM. A converted household's Nonprofit Cloud group still lists its
+old members; ask staff to keep households in BarnCRM from then on.
 
-**Running both models on the same family.** This is the one the collision warning on the
-Health page exists to catch, and it is still worth avoiding: the family is grouped in
-Nonprofit Cloud, someone else groups it again in BarnCRM, and now two records disagree
-about who lives in that house. BarnCRM's guards leave that Account's name, greetings and
-address exactly as they are rather than guess which model should win, but reports can still
-double up and letters can still go out twice while both models stand. Pick one model per
-household and stay with it.
+**Converting with Contact membership in a person account org.** A person account cannot belong
+to a household by reference, so nobody is added. Set membership to membership records first.
 
-**Expecting the guard to catch every native household.** It only recognizes an Account that
-already carries a native household group, or, in an org that has Nonprofit Cloud households,
-native membership rows. A person who belongs to a
-Nonprofit Cloud household only through membership data BarnCRM cannot see, and whose own
-record carries no link to that Account yet, can still be given a BarnCRM household. This
-is deliberate: the alternative would be a query against `AccountContactRelation`, which Core
-cannot run on a Platform-only org.
+**Running both models on the same family.** The drift report exists to catch it. Pick one model
+per household; Household Model records the choice.
 
-**Reading a missing number as a zero.** If the card cannot give you a count, that means
-nobody could count them, not that there are none. Ask a colleague with fuller access to look,
-or ask whoever set up your Nonprofit Cloud org.
+**Expecting the guard to catch every native household.** On an account marked Automatic it
+only recognizes an account that already carries a Nonprofit Cloud household group, or, in an
+org that has Nonprofit Cloud households, native membership rows. A person who belongs to a
+Nonprofit Cloud household only through membership data BarnCRM cannot see can still be given a
+BarnCRM household. Setting Household Model to **Nonprofit Cloud** on that household's account
+makes the guards leave it alone whatever they can see.
+
+**Reading a missing number as a zero.** If Health Check cannot count Nonprofit Cloud households,
+nobody could count them, not that there are none. Ask a colleague with fuller access to look.

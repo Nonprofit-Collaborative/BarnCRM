@@ -63,7 +63,10 @@ CAPS = {
     # measured, plus about 0.5%.
     # Raised 2026-11-11 for C-64 engagement score (EngagementScore, EngagementScoreJob, the
     # EngagementSignalExtension seam, EngagementScoreController): 2,175,829 measured, plus about 2%.
-    "core": 2_219_000,
+    # Raised 2026-11-12 for MIG-02b Nonprofit Cloud household conversion (the adoption service
+    # and batch take a source key, join members in Junction mode and undo them; the Household
+    # Model guard in HouseholdSelector): 2,221,240 measured, plus about 0.5%.
+    "core": 2_232_000,
     # Raised 2026-11-11 for MIG-08 Import From NPSP (RollupNpsp reads NPSP customizable rollups
     # into the DLRS shape, so the import, compare and same-field guard are reused, not copied)
     # and the rollup Migration Kits' check (RollupsMigrationKit, MIG-01): 381,657 measured
@@ -230,8 +233,9 @@ CAPS = {
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.
     # AR-01 (D-172): Opportunity mirror messages read with BarnHelp.text instead of Label;
     # 202,751 measured, plus about 0.5%. With the other Mirror messages: 204,549 measured, plus
-    # about 0.5%.
-    "mirror": 205_600,
+    # about 0.5%. MIG-02b Nonprofit Cloud households (NpcHouseholdSource, the drift finding):
+    # 214,101 measured, plus about 0.5%.
+    "mirror": 215_200,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

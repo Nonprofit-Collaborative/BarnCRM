@@ -185,7 +185,7 @@ funds, appeals, commitments, soft credits and tributes.
 
 | Not loaded | What to do meanwhile |
 |---|---|
-| Households and who is in them | Each person gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). In the org Nonprofit Cloud is in, households (Party Relationship Groups) are not converted either: see [Nonprofit Cloud Households](nonprofit-cloud-households.md). |
+| Households and who is in them | Each person gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). In the org Nonprofit Cloud is in, use the NPC Households kit instead: see [The Nonprofit Cloud Households Kit](#the-nonprofit-cloud-households-kit). |
 | Relationships and affiliations | In the org Nonprofit Cloud is in, use the kit below. For a new org, no ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **One Kind of Record** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
 | Gift commitments (pledges and recurring gifts) and their schedules | No import yet. Create each active commitment by hand ([Commitments](commitments.md)) before loading gifts. With **Match or create**, a gift dated near one of its scheduled payments pays it; older gifts load as gifts on their own. |
 | Soft credits | A soft credit loads only on the same row as a new gift, and Nonprofit Cloud exports them separately. Credits between household members are made automatically; add others by hand ([Soft credits](soft-credits.md)). |
@@ -209,9 +209,8 @@ preview, a check and an undo:
 | Affiliations | Every account contact relation with an organization | One affiliation per link, with its roles as text (Employee, Board Member), Current or Former from active, and its dates. Links to a household (an account with a Party Relationship Group of type Household) or to a person account are skipped. The check counts links to organizations. |
 
 Before you run it, open one relationship in the preview and check its type reads the right
-way round (the related person's role). Households themselves are not converted: BarnCRM keeps
-its guards for accounts that carry a Party Relationship Group (see
-[Nonprofit Cloud Households](nonprofit-cloud-households.md)). The Nonprofit Cloud field names
+way round (the related person's role). Households themselves are converted by the NPC
+Households kit, below. The Nonprofit Cloud field names
 the kit reads come from Salesforce's documentation and are not yet checked against a live org;
 if your org differs, a step reports the missing field by name and copies nothing.
 
@@ -257,10 +256,21 @@ Before you run it:
 Limits: Nonprofit Cloud is read in your access, so a record you cannot see is not counted or
 copied. Commitments are copied but gifts are not linked to them. A refund stays on the
 transaction and is not copied; record it in BarnCRM ([Refunds](refunds.md)). Households
-(Party Relationship Groups) are not converted: see
-[Nonprofit Cloud Households](nonprofit-cloud-households.md). The Nonprofit Cloud field names
+are converted by the NPC Households kit, below. The Nonprofit Cloud field names
 the kit reads come from Salesforce's documentation and are not yet checked against a live org;
 if your org differs, a step reports the missing field by name and copies nothing.
+
+### The Nonprofit Cloud Households Kit
+
+With BarnCRM Mirror installed in the same org, on **Integrations**, Nonprofit Cloud
+Fundraising, click **Start Migration: NPC Households**. Its one step, **Convert Nonprofit Cloud
+Households**, opens BarnCRM Settings, **General**, where you preview, confirm the count, run
+and, if you need to, undo the conversion. Each Nonprofit Cloud household becomes a BarnCRM
+household on the same account, with its members when household membership is set to
+membership records; no Nonprofit Cloud record is changed. The step's check counts accounts with a
+Nonprofit Cloud household group (less any you mark to stay in Nonprofit Cloud) against those
+converted. Everything else, including the Household Model field, undo and the drift report, is
+in [Nonprofit Cloud Households](nonprofit-cloud-households.md).
 
 ## 8. Common Mistakes
 

@@ -25,10 +25,103 @@ import CONFIRM_UNDO from '@salesforce/label/c.Core_AutoMerge_Undo';
 import REFRESH from '@salesforce/label/c.Core_OrgOptimizer_Refresh';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
+/** The source key of Nonprofit Cloud households (R-HA7); anything else is NPSP. */
+const NPC = 'NPC';
+
+/** The NPSP panel's words. */
+const NPSP_LABELS = {
+  title: TITLE,
+  get intro() {
+    return helpText('Core', 'Core_NpspAdoption_Intro');
+  },
+  get notAvailable() {
+    return helpText('Core', 'Core_NpspAdoption_NotAvailable');
+  },
+  get noneLeft() {
+    return helpText('Core', 'Core_NpspAdoption_NoneLeft');
+  },
+  get keepNamesHelp() {
+    return helpText('Core', 'Core_NpspAdoption_KeepNamesHelp');
+  },
+  get candidateCount() {
+    return helpText('Core', 'Core_NpspAdoption_CandidateCount');
+  },
+  get confirmMessage() {
+    return helpText('Core', 'Core_NpspAdoption_ConfirmMessage');
+  },
+  get undoMessage() {
+    return helpText('Core', 'Core_NpspAdoption_UndoMessage');
+  },
+  get lastRunCounts() {
+    return helpText('Core', 'Core_NpspAdoption_LastRunCounts');
+  },
+  sampleCaption: SAMPLE_CAPTION,
+  keepNames: KEEP_NAMES,
+  adoptButton: ADOPT_BUTTON,
+  typeToAdopt: TYPE_TO_ADOPT,
+  confirmAdopt: CONFIRM_ADOPT,
+  lastRun: LAST_RUN,
+  undoButton: UNDO_BUTTON
+};
+
+/** The same panel converting Nonprofit Cloud households (MIG-02b): its own words only. */
+const NPC_LABELS = {
+  get title() {
+    return helpText('Core', 'Core_NpcConversion_Title');
+  },
+  get intro() {
+    return helpText('Core', 'Core_NpcConversion_Intro');
+  },
+  get notAvailable() {
+    return helpText('Core', 'Core_NpcConversion_NotAvailable');
+  },
+  get noneLeft() {
+    return helpText('Core', 'Core_NpcConversion_NoneLeft');
+  },
+  get keepNamesHelp() {
+    return helpText('Core', 'Core_NpcConversion_KeepNamesHelp');
+  },
+  get candidateCount() {
+    return helpText('Core', 'Core_NpcConversion_CandidateCount');
+  },
+  get confirmMessage() {
+    return helpText('Core', 'Core_NpcConversion_ConfirmMessage');
+  },
+  get undoMessage() {
+    return helpText('Core', 'Core_NpcConversion_UndoMessage');
+  },
+  get lastRunCounts() {
+    return helpText('Core', 'Core_NpcConversion_LastRunCounts');
+  },
+  get sampleCaption() {
+    return helpText('Core', 'Core_NpcConversion_SampleCaption');
+  },
+  get keepNames() {
+    return helpText('Core', 'Core_NpcConversion_KeepNames');
+  },
+  get adoptButton() {
+    return helpText('Core', 'Core_NpcConversion_ConvertButton');
+  },
+  get typeToAdopt() {
+    return helpText('Core', 'Core_NpcConversion_TypeToConvert');
+  },
+  get confirmAdopt() {
+    return helpText('Core', 'Core_NpcConversion_ConfirmConvert');
+  },
+  get lastRun() {
+    return helpText('Core', 'Core_NpcConversion_LastRun');
+  },
+  get undoButton() {
+    return helpText('Core', 'Core_NpcConversion_UndoButton');
+  }
+};
+
 /**
  * Adopt NPSP Households, on the General page of BarnCRM Settings (X-05, admin guide
- * npsp-households.md). The settings console shows this row only where NPSP applies and only to
- * holders of Manage BarnCRM Settings; the controller checks the permission again on every call.
+ * npsp-households.md), and, with `source` NPC, Convert Nonprofit Cloud Households (MIG-02b,
+ * admin guide nonprofit-cloud-households.md, placed by `npcHouseholdConversion`). The settings
+ * console shows each row only where its product applies and only to holders of Manage BarnCRM
+ * Settings; the controller checks the permission again on every call.
  *
  * It shows what would be adopted, starts a run after the person types the count, polls while a
  * run or an undo is going, and offers the undo of the newest run. Every rule lives in Apex.
@@ -36,35 +129,44 @@ import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 export default class NpspHouseholdAdoption extends LightningElement {
   helpReady = isHelpLoaded('Core');
 
-  labels = {
-    title: TITLE,
-    get intro() {
-      return helpText('Core', 'Core_NpspAdoption_Intro');
-    },
-    get notAvailable() {
-      return helpText('Core', 'Core_NpspAdoption_NotAvailable');
-    },
-    get noneLeft() {
-      return helpText('Core', 'Core_NpspAdoption_NoneLeft');
-    },
-    sampleCaption: SAMPLE_CAPTION,
-    columnName: COLUMN_NAME,
-    columnFormal: COLUMN_FORMAL,
-    columnInformal: COLUMN_INFORMAL,
-    columnPrimary: COLUMN_PRIMARY,
-    columnContacts: COLUMN_CONTACTS,
-    keepNames: KEEP_NAMES,
-    get keepNamesHelp() {
-      return helpText('Core', 'Core_NpspAdoption_KeepNamesHelp');
-    },
-    adoptButton: ADOPT_BUTTON,
-    get running() {
-      return helpText('Core', 'Core_NpspAdoption_Running');
-    },
-    lastRun: LAST_RUN,
-    undoButton: UNDO_BUTTON,
-    refresh: REFRESH
-  };
+  /** NPSP (the default) or NPC. */
+  @api source;
+
+  get isNpc() {
+    return this.source === NPC;
+  }
+
+  /** NPC households have no greetings, so their sample leaves those columns out. */
+  get showGreetings() {
+    return !this.isNpc;
+  }
+
+  get labels() {
+    const words = this.isNpc ? NPC_LABELS : NPSP_LABELS;
+    return {
+      title: words.title,
+      intro: words.intro,
+      notAvailable: words.notAvailable,
+      noneLeft: words.noneLeft,
+      sampleCaption: words.sampleCaption,
+      columnName: COLUMN_NAME,
+      columnFormal: COLUMN_FORMAL,
+      columnInformal: COLUMN_INFORMAL,
+      columnPrimary: COLUMN_PRIMARY,
+      columnContacts: COLUMN_CONTACTS,
+      keepNames: words.keepNames,
+      keepNamesHelp: words.keepNamesHelp,
+      adoptButton: words.adoptButton,
+      running: helpText('Core', 'Core_NpspAdoption_Running'),
+      lastRun: words.lastRun,
+      undoButton: words.undoButton,
+      refresh: REFRESH
+    };
+  }
+
+  get words() {
+    return this.isNpc ? NPC_LABELS : NPSP_LABELS;
+  }
 
   status;
   keepNames = true;
@@ -94,7 +196,7 @@ export default class NpspHouseholdAdoption extends LightningElement {
 
   async load() {
     try {
-      this.status = await getStatus();
+      this.status = await getStatus({ source: this.source });
       this.errorMessage = undefined;
       if (this.status.running) {
         this.poll();
@@ -111,7 +213,7 @@ export default class NpspHouseholdAdoption extends LightningElement {
     }
     this.stopPolling = startPolling(
       async () => {
-        this.status = await getStatus();
+        this.status = await getStatus({ source: this.source });
         if (!this.status.running) {
           this.stop();
           return true;
@@ -158,10 +260,7 @@ export default class NpspHouseholdAdoption extends LightningElement {
   }
 
   get candidateMessage() {
-    return format(
-      helpText('Core', 'Core_NpspAdoption_CandidateCount'),
-      this.runCount.toLocaleString()
-    );
+    return format(this.words.candidateCount, this.runCount.toLocaleString());
   }
 
   get moreThanLimitMessage() {
@@ -188,12 +287,7 @@ export default class NpspHouseholdAdoption extends LightningElement {
   get lastRunCounts() {
     const run = this.lastRun;
     return run
-      ? format(
-          helpText('Core', 'Core_NpspAdoption_LastRunCounts'),
-          run.adopted,
-          run.undone,
-          run.notRestored
-        )
+      ? format(this.words.lastRunCounts, run.adopted, run.undone, run.notRestored)
       : undefined;
   }
 
@@ -222,28 +316,27 @@ export default class NpspHouseholdAdoption extends LightningElement {
     const count = this.runCount;
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
-      label: TITLE,
-      message: format(helpText('Core', 'Core_NpspAdoption_ConfirmMessage'), count.toLocaleString()),
+      label: this.words.title,
+      message: format(this.words.confirmMessage, count.toLocaleString()),
       typeToConfirm: String(count),
-      typeToConfirmLabel: format(TYPE_TO_ADOPT, count),
-      confirmLabel: CONFIRM_ADOPT,
+      typeToConfirmLabel: format(this.words.typeToAdopt, count),
+      confirmLabel: this.words.confirmAdopt,
       cancelLabel: CANCEL
     });
     if (!confirmed) {
       return;
     }
-    await this.start(() => adopt({ keepNames: this.keepNames, confirmedCount: count }));
+    await this.start(() =>
+      adopt({ source: this.source, keepNames: this.keepNames, confirmedCount: count })
+    );
   }
 
   async handleUndo() {
     const run = this.lastRun;
     const confirmed = await BarnConfirmModal.open({
       size: 'small',
-      label: UNDO_BUTTON,
-      message: format(
-        helpText('Core', 'Core_NpspAdoption_UndoMessage'),
-        run.adopted.toLocaleString()
-      ),
+      label: this.words.undoButton,
+      message: format(this.words.undoMessage, run.adopted.toLocaleString()),
       typeToConfirm: String(run.adopted),
       typeToConfirmLabel: format(TYPE_TO_UNDO, run.adopted),
       confirmLabel: CONFIRM_UNDO,

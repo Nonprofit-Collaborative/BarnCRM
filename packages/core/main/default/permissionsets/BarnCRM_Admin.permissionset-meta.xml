@@ -479,6 +479,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Account.Household_Model__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Account.Household_Role__c</field>
     <readable>true</readable>
   </fieldPermissions>
