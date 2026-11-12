@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The project invoice actions: Send, Mark Paid, Send Payment Link (with BarnCRM Payments), Print
+    to a PDF in Files, and Void (PM-10).
+  </description>
+  <isExposed>true</isExposed>
+  <masterLabel>Project Invoice Actions</masterLabel>
+  <targets>
+    <target>lightning__RecordPage</target>
+  </targets>
+  <targetConfigs>
+    <targetConfig targets="lightning__RecordPage">
+      <objects>
+        <object>Project_Invoice__c</object>
+      </objects>
+    </targetConfig>
+  </targetConfigs>
+</LightningComponentBundle>

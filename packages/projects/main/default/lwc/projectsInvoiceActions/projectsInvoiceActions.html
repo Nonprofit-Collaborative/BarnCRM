@@ -1,0 +1,37 @@
+<template>
+  <template lwc:if={isShown}>
+    <lightning-card title={labels.title} icon-name={icon} data-id="card">
+      <div class="slds-var-p-horizontal_medium">
+        <template lwc:if={errorMessage}>
+          <c-barn-notice variant="error" message={errorMessage} data-id="error-message"></c-barn-notice>
+        </template>
+        <template lwc:if={notice}>
+          <c-barn-notice variant="success" message={notice} data-id="notice"></c-barn-notice>
+        </template>
+        <template lwc:if={isDraft}>
+          <lightning-button variant="brand" label={labels.send} disabled={isWorking} onclick={handleSend} data-id="send"></lightning-button>
+        </template>
+        <template lwc:if={isSent}>
+          <lightning-input type="date" label={labels.paidDate} value={paidDate} onchange={handlePaidDate} data-id="paid-date"></lightning-input>
+          <lightning-button class="slds-var-m-top_x-small" variant="brand" label={labels.markPaid} disabled={isWorking} onclick={handleMarkPaid} data-id="mark-paid"></lightning-button>
+          <template lwc:if={canPayOnline}>
+            <lightning-button class="slds-var-m-top_x-small slds-var-m-left_x-small" label={labels.payLink} disabled={isWorking} onclick={handlePayLink} data-id="pay-link"></lightning-button>
+          </template>
+        </template>
+        <template lwc:if={isOpen}>
+          <div class="slds-var-m-top_small">
+            <lightning-button label={labels.print} disabled={isWorking} onclick={handlePrint} data-id="print"></lightning-button>
+            <template lwc:if={confirmingVoid}>
+              <p class="slds-var-m-vertical_x-small" data-id="void-confirm">{labels.voidConfirm}</p>
+              <lightning-button variant="destructive" label={labels.voidInvoice} disabled={isWorking} onclick={handleVoid} data-id="void-yes"></lightning-button>
+              <lightning-button class="slds-var-m-left_x-small" label={labels.cancel} onclick={handleCancelVoid} data-id="void-no"></lightning-button>
+            </template>
+            <template lwc:else>
+              <lightning-button class="slds-var-m-left_x-small" label={labels.voidInvoice} disabled={isWorking} onclick={handleAskVoid} data-id="void"></lightning-button>
+            </template>
+          </div>
+        </template>
+      </div>
+    </lightning-card>
+  </template>
+</template>

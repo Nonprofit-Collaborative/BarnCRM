@@ -202,6 +202,21 @@
     "Projects_Revenue_StepName": "Project revenue",
     "Projects_Revenue_CapReached": "The monthly revenue run reached its limit of {0} projects. Use Recognize Revenue on the projects beyond it.",
     "Projects_Revenue_Off": "Revenue is off. Turn on Show financials and recognize revenue in BarnCRM Settings, Projects.",
-    "Projects_Revenue_OpenMonth": "Choose a month that has closed. The current month is shown on the Financials card and stored once it ends."
+    "Projects_Revenue_OpenMonth": "Choose a month that has closed. The current month is shown on the Financials card and stored once it ends.",
+    "Projects_Invoice_NewTitle": "New Invoice",
+    "Projects_Invoice_NewIntro": "Builds a Draft from this project's approved billable time, expenses, Done milestones or retainer months in the period that are not invoiced yet.",
+    "Projects_Invoice_PeriodStart": "Period Start",
+    "Projects_Invoice_PeriodEnd": "Period End",
+    "Projects_Invoice_Build": "Create Draft Invoice",
+    "Projects_Invoice_ActionsTitle": "Invoice Actions",
+    "Projects_Invoice_Send": "Send",
+    "Projects_Invoice_MarkPaid": "Mark Paid",
+    "Projects_Invoice_PaidDate": "Paid Date",
+    "Projects_Invoice_Print": "Print",
+    "Projects_Invoice_Void": "Void",
+    "Projects_Invoice_VoidConfirm": "Void this invoice? Its work becomes billable again, and a void invoice can never change status again.",
+    "Projects_Invoice_SendLink": "Send Payment Link",
+    "Projects_Invoice_Done": "Done.",
+    "Projects_Invoice_Printed": "The PDF is saved in this invoice's Files."
   }
 }
