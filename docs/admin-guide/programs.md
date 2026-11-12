@@ -722,7 +722,8 @@ people who can manage BarnCRM Settings and not while Programs is turned off:
 ## Sample Data
 
 **Load Sample Data** in BarnCRM Settings also loads three sample programs, five services, 18
-enrollments and 40 service deliveries, and **Remove Sample Data** takes them away again, keeping
+enrollments, 40 service deliveries, a cohort with three sessions and their attendance, and four
+service plan goals with two steps each, and **Remove Sample Data** takes them away again, keeping
 a sample program that has real enrollments or service deliveries, or a sample enrollment with a
 case note. See
 [Sample data](sample-data.md#with-programs-installed).

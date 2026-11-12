@@ -11082,13 +11082,18 @@ while the module is turned off:
 | `nonprofit_cloud_program_management_present` | Info (category OrgShape) | The org has the Nonprofit Cloud `Program` and `ProgramEnrollment` objects, found by describe only (QA-F5). Programs never reads or writes them, so the two share no records. | None: choose one for each program. The Integrations page lists Nonprofit Cloud Program Management as an Alternative (Integration App row `Nonprofit_Cloud_Program_Management`, detected by `Program`, shown only when installed). |
 
 **Sample data.** `ProgramsSampleData` implements Core's `SampleDataModule` and is registered in
-`SampleDataModules.MODULE_CLASS_NAMES` after Volunteers. Its load, three stages, builds three
+`SampleDataModules.MODULE_CLASS_NAMES` after Volunteers. Its load, five stages, builds three
 programs flagged `Sample_Data__c` (two Active, one Completed) with five services, then 18
 enrollments of up to 12 of Core's sample people (contacts), through the enrollment rules, then
 (release 0.13, P-02) 40 service deliveries (29ZB) to the people Enrolled in the two Active
-programs. Its removal, before Volunteers', Giving's and Core's, deletes one chunk per stage: the
-sample people's service deliveries and enrollments in sample programs, then the sample programs
-with no enrollment or delivery left (their services go with them). A sample program a real person
+programs, then (release 1.19, P-11) one Active cohort (29ZA5) of the people Enrolled in tutoring
+with three sessions (29ZA6) of its Homework club service (two Held, with eight attendance deliveries, one
+an Excused Absence; one Scheduled), then (P-10) one In Progress goal (29ZA3) with two steps (29ZA4) per
+person Enrolled in tutoring. Its removal, before Volunteers', Giving's and Core's, deletes one
+chunk per stage: the sample people's service deliveries and enrollments in sample programs (goals
+and steps go with them), then sample program sessions no delivery names and cohorts no session or
+schedule names, then the sample programs with no enrollment, cohort or delivery left (their
+services go with them). A sample program a real person
 is enrolled in, or has a delivery in, is kept, and so is a sample program with a sample
 enrollment that has a case note (whoever wrote it, even a note the remover cannot see: that
 enrollment is skipped and kept); one Warning in the Error Log names each one kept.
@@ -17250,6 +17255,7 @@ mirrors the primary member).
 | 1.22 | 2026-11-11 | Territory Management module (C-40, C-40b; ADR-NEXT `NEXT-territory-management-module.md`). New Sections 29TM1 Territory (`Territory__c`, with the Territory lookup `Territory__c` on Account and Contact), 29TM2 Territory Rule (`Territory_Rule__c`), 29TM3 Territory Member (`Territory_Member__c`) and 29TM4 Territory Run (`Territory_Run__c`); rules R-TM1 to R-TM4. |
 | 1.23 | 2026-11-11 | Memberships module (G-22a to G-22d, PAY-02, PB-09; D-157, D-190; ADR-NEXT `NEXT-memberships-module.md`). New package `packages/memberships`: Membership Level (`Membership_Level__c`, 29MEM1), Membership Benefit (`Membership_Benefit__c`, 29MEM2), Membership Term (`Membership_Term__c`, 29MEM3, R-MEM1 to R-MEM9) and Memberships Settings (`Memberships_Settings__c`, 29MEM4). No Contact or Account field, and no object named like Memberships Essentials' membership object, so both deploy together. |
 | 1.24 | 2026-11-11 | Event Management paid registration, session proposals, badge overrides and session ratings (EV-20, EV-21, EV-26, EV-27, D-190; ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`). New Sections 29EV27 Session Rating (`Session_Rating__c`, R-SRT1 to R-SRT3) and 29EV30 Proposal Presenter (`Proposal_Presenter__c`, R-PP1). `Event__c` gains `Review_Criteria__c`, `Blind_Review__c` and `Session_Rating_Form_Key__c`; `Event_Session__c` gains `Rating_Count__c`, `Rating_Total__c` and `Average_Rating__c`; `Event_Registration__c` gains status Pending Payment and `Payment_Status__c`, `Amount_Paid__c`, `Payment_Key__c` and `Payment_Link__c` (R-ERG5 to R-ERG7); `Event_Attendee__c` gains `Badge_Name__c`, `Badge_Title__c` and `Badge_Company__c` (R-EAT4); `Speaker_Application__c` gains `Weighted_Total__c` and `Weighted_Average__c` and `Review_Count__c` counts scored reviews only; `Speaker_Review__c` gains `Criteria_Scores__c` and `Weighted_Score__c` and `Score__c` is no longer required (R-SA6 to R-SA9); `Events_Settings__c` gains `Online_Payments__c` (false) and `Payment_Link_Template__c` (`BarnCRM_Event_Payment_Link`). Events reaches Payments only by name (`PaymentsApi`, `EventPaymentListener`). |
+| 1.25 | 2026-11-11 | Programs sample data for goals, cohorts and sessions (release 1.19, P-10 and P-11 follow-up, D-168). 29ZA's sample data paragraph: the load gains two stages (a cohort with three sessions and attendance, then a goal with two steps per person Enrolled in tutoring); the removal deletes sample sessions and cohorts nothing refers to before the programs. No object or field added. |
 
 ---
 ## 32. Entity ownership by package

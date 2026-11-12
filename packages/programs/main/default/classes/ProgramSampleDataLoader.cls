@@ -2,11 +2,13 @@
  * Builds and removes the Programs sample data set (C-10, canonical model 29ZA "On a person,
  * Health Check and sample data"): three programs flagged `Sample_Data__c` (After-school
  * tutoring and Food pantry, Active; Summer reading, Completed), five services, and 18
- * enrollments of up to 12 of Core's sample people. Every record is saved in user mode through the
- * enrollment rules, as an administrator's would be.
+ * enrollments of up to 12 of Core's sample people, a cohort with three sessions and attendance
+ * (P-11), and a service plan goal with two steps for each person in tutoring (P-10). Every record
+ * is saved in user mode through the enrollment rules, as an administrator's would be.
  *
- * Removal deletes, one chunk per call: the sample people's enrollments in the sample programs,
- * then the sample programs no enrollment names any more (their services go with them). A sample
+ * Removal deletes, one chunk per call: the sample people's deliveries and enrollments in the
+ * sample programs (goals go with them), the sessions and cohorts nothing refers to any more, then
+ * the sample programs no enrollment names any more (their services go with them). A sample
  * program one of the org's own people is enrolled in is kept, since its enrollment's lookup
  * refuses the delete, and so is a sample enrollment with a case note, with its program;
  * `logWhatWasKept`, at the end, names each kept program in one Warning.
@@ -25,6 +27,7 @@ public with sharing class ProgramSampleDataLoader {
 	private static final String TUTORING = 'After-school tutoring';
 	private static final String PANTRY = 'Food pantry';
 	private static final String READING = 'Summer reading';
+	private static final String COHORT = 'Fall homework club';
 
 	// ------------------------------------------------------------------------- load
 
@@ -177,6 +180,124 @@ public with sharing class ProgramSampleDataLoader {
 		Database.insert(deliveries, AccessLevel.USER_MODE);
 	}
 
+	/**
+	 * The cohort and its sessions (P-11): an Active "Fall homework club" cohort in tutoring
+	 * holding the people Enrolled there, two Held sessions of the Homework club service with
+	 * attendance (everyone Present, except one Excused Absence) and one Scheduled next week.
+	 */
+	public static void loadCohort() {
+		List<Enrollment__c> members = openTutoring();
+		List<Service__c> services = [
+			SELECT Id, Program__c
+			FROM Service__c
+			WHERE Name = 'Homework club session' AND Program__r.Sample_Data__c = TRUE
+			WITH USER_MODE
+			LIMIT 1
+		];
+		if (members.isEmpty() || services.isEmpty()) {
+			return;
+		}
+		Date today = Date.today();
+		Cohort__c cohort = new Cohort__c(
+			Name = COHORT,
+			Program__c = services[0].Program__c,
+			Status__c = 'Active',
+			Start_Date__c = today.addDays(-30)
+		);
+		Database.insert(cohort, AccessLevel.USER_MODE);
+		List<Session__c> sessions = new List<Session__c>();
+		for (Integer i = 0; i < 3; i++) {
+			sessions.add(
+				new Session__c(
+					Name = 'Homework club ' + (i + 1),
+					Cohort__c = cohort.Id,
+					Service__c = services[0].Id,
+					Session_Date__c = today.addDays(7 * i - 14),
+					Start_Time__c = Time.newInstance(16, 0, 0, 0),
+					End_Time__c = Time.newInstance(17, 30, 0, 0),
+					Status__c = i < 2 ? 'Held' : 'Scheduled'
+				)
+			);
+		}
+		Database.insert(sessions, AccessLevel.USER_MODE);
+		List<Service_Delivery__c> attendance = new List<Service_Delivery__c>();
+		for (Enrollment__c member : members) {
+			member.Cohort__c = cohort.Id;
+			for (Integer i = 0; i < 2; i++) {
+				Boolean excused = i == 1 && attendance.size() == 1;
+				attendance.add(
+					new Service_Delivery__c(
+						Service__c = services[0].Id,
+						Session__c = sessions[i].Id,
+						Contact__c = member.Contact__c,
+						Delivery_Date__c = sessions[i].Session_Date__c,
+						Attendance__c = excused ? 'Excused Absence' : 'Present',
+						Quantity__c = excused ? 0 : 1
+					)
+				);
+			}
+		}
+		Database.update(members, AccessLevel.USER_MODE);
+		Database.insert(attendance, AccessLevel.USER_MODE);
+	}
+
+	/**
+	 * The service plans (P-10): a goal for each person Enrolled in tutoring, In Progress with a
+	 * review due, each with two steps, one Done and one In Progress.
+	 */
+	public static void loadGoals() {
+		Date today = Date.today();
+		List<Goal__c> goals = new List<Goal__c>();
+		for (Enrollment__c member : openTutoring()) {
+			goals.add(
+				new Goal__c(
+					Name = 'Read one grade level higher',
+					Enrollment__c = member.Id,
+					Status__c = 'In Progress',
+					Target_Date__c = today.addDays(90),
+					Last_Review_Date__c = today.addDays(-14),
+					Next_Review_Date__c = today.addDays(16)
+				)
+			);
+		}
+		Database.insert(goals, AccessLevel.USER_MODE);
+		List<Goal_Step__c> steps = new List<Goal_Step__c>();
+		for (Goal__c goal : goals) {
+			steps.add(
+				new Goal_Step__c(
+					Name = 'Take the reading assessment',
+					Goal__c = goal.Id,
+					Status__c = 'Done',
+					Completed_Date__c = today.addDays(-21)
+				)
+			);
+			steps.add(
+				new Goal_Step__c(
+					Name = 'Read 20 minutes each school day',
+					Goal__c = goal.Id,
+					Status__c = 'In Progress',
+					Target_Date__c = today.addDays(30)
+				)
+			);
+		}
+		Database.insert(steps, AccessLevel.USER_MODE);
+	}
+
+	/** The sample people Enrolled in the sample tutoring program. */
+	private static List<Enrollment__c> openTutoring() {
+		return [
+			SELECT Id, Contact__c
+			FROM Enrollment__c
+			WHERE
+				Program__r.Name = :TUTORING
+				AND Program__r.Sample_Data__c = TRUE
+				AND Stage__c = :EnrollmentService.STAGE_ENROLLED
+				AND Contact__r.Sample_Data__c = TRUE
+			WITH USER_MODE
+			ORDER BY Name
+		];
+	}
+
 	// ------------------------------------------------------------------------- status card
 
 	/** The sample people's enrollments in sample programs. */
@@ -225,6 +346,18 @@ public with sharing class ProgramSampleDataLoader {
 					WITH USER_MODE
 				],
 				countRemovableEnrollments(),
+				[
+					SELECT COUNT()
+					FROM Session__c
+					WHERE Service__r.Program__r.Sample_Data__c = TRUE
+					WITH USER_MODE
+				],
+				[
+					SELECT COUNT()
+					FROM Cohort__c
+					WHERE Program__r.Sample_Data__c = TRUE
+					WITH USER_MODE
+				],
 				[SELECT COUNT() FROM Program__c WHERE Sample_Data__c = TRUE WITH USER_MODE]
 			}
 		) {
@@ -265,8 +398,38 @@ public with sharing class ProgramSampleDataLoader {
 			LIMIT :removeChunkSize
 		];
 		if (!enrollments.isEmpty()) {
+			// Their goals and steps go with them (master-detail).
 			Database.delete(enrollments, AccessLevel.USER_MODE);
 			return enrollments.size();
+		}
+		// Sessions and cohorts in sample programs, except a session a real person's attendance is
+		// on and a cohort a session or a repeating schedule still names (both refuse the delete).
+		List<Session__c> sessions = [
+			SELECT Id
+			FROM Session__c
+			WHERE
+				Service__r.Program__r.Sample_Data__c = TRUE
+				AND Id NOT IN (SELECT Session__c FROM Service_Delivery__c)
+			WITH USER_MODE
+			LIMIT :removeChunkSize
+		];
+		if (!sessions.isEmpty()) {
+			Database.delete(sessions, AccessLevel.USER_MODE);
+			return sessions.size();
+		}
+		List<Cohort__c> cohorts = [
+			SELECT Id
+			FROM Cohort__c
+			WHERE
+				Program__r.Sample_Data__c = TRUE
+				AND Id NOT IN (SELECT Cohort__c FROM Session__c)
+				AND Id NOT IN (SELECT Cohort__c FROM Session_Schedule__c)
+			WITH USER_MODE
+			LIMIT :removeChunkSize
+		];
+		if (!cohorts.isEmpty()) {
+			Database.delete(cohorts, AccessLevel.USER_MODE);
+			return cohorts.size();
 		}
 		// A program a real person's delivery is on stays: the delivery's lookup refuses it.
 		Set<Id> inUse = new Set<Id>();
@@ -285,6 +448,7 @@ public with sharing class ProgramSampleDataLoader {
 			WHERE
 				Sample_Data__c = TRUE
 				AND Id NOT IN (SELECT Program__c FROM Enrollment__c)
+				AND Id NOT IN (SELECT Program__c FROM Cohort__c)
 				AND Id NOT IN :inUse
 			WITH USER_MODE
 			LIMIT :removeChunkSize

@@ -53,8 +53,9 @@ public with sharing class ProgramsSampleData implements SampleDataModule {
 	}
 
 	/**
-	 * The load, one stage per transaction: the programs and services, the enrollments, then the
-	 * service deliveries.
+	 * The load, one stage per transaction: the programs and services, the enrollments, the
+	 * service deliveries, the cohort with its sessions and attendance (P-11), then the goals and
+	 * steps (P-10).
 	 */
 	public class LoadStages implements SampleDataStages {
 		public String name() {
@@ -62,7 +63,7 @@ public with sharing class ProgramsSampleData implements SampleDataModule {
 		}
 
 		public Integer stageCount() {
-			return 3;
+			return 5;
 		}
 
 		public void runStage(Integer stage) {
@@ -70,8 +71,12 @@ public with sharing class ProgramsSampleData implements SampleDataModule {
 				ProgramSampleDataLoader.loadPrograms();
 			} else if (stage == 1) {
 				ProgramSampleDataLoader.loadEnrollments();
-			} else {
+			} else if (stage == 2) {
 				ProgramSampleDataLoader.loadDeliveries();
+			} else if (stage == 3) {
+				ProgramSampleDataLoader.loadCohort();
+			} else {
+				ProgramSampleDataLoader.loadGoals();
 			}
 		}
 
