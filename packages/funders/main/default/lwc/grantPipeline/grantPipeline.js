@@ -29,9 +29,6 @@ import TILE_OPEN from '@salesforce/label/c.Funders_Pipeline_TileOpen';
 import TILE_REQUESTED from '@salesforce/label/c.Funders_Pipeline_TileRequested';
 import TILE_AWARDED from '@salesforce/label/c.Funders_Pipeline_TileAwarded';
 import AWARDED_DETAIL from '@salesforce/label/c.Funders_Pipeline_AwardedDetail';
-import COLUMN_EMPTY from '@salesforce/label/c.Funders_Pipeline_ColumnEmpty';
-import TRUNCATED from '@salesforce/label/c.Funders_Pipeline_Truncated';
-import READ_ONLY from '@salesforce/label/c.Funders_Pipeline_ReadOnly';
 import NO_FUNDER from '@salesforce/label/c.Funders_Pipeline_NoFunder';
 import NO_GRANTS from '@salesforce/label/c.Funders_Pipeline_NoGrants';
 import NO_DEADLINES from '@salesforce/label/c.Funders_Pipeline_NoDeadlines';
@@ -96,10 +93,14 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
     tileOpen: TILE_OPEN,
     tileRequested: TILE_REQUESTED,
     tileAwarded: TILE_AWARDED,
-    columnEmpty: COLUMN_EMPTY,
+    get columnEmpty() {
+      return helpText('Funders', 'Funders_Pipeline_ColumnEmpty');
+    },
     noGrants: NO_GRANTS,
     noDeadlines: NO_DEADLINES,
-    readOnly: READ_ONLY,
+    get readOnly() {
+      return helpText('Funders', 'Funders_Pipeline_ReadOnly');
+    },
     deadlines: DEADLINES,
     markSubmitted: MARK_SUBMITTED,
     markedSubmitted: MARKED_SUBMITTED,
@@ -316,7 +317,9 @@ export default class GrantPipeline extends NavigationMixin(LightningElement) {
   }
 
   get truncatedMessage() {
-    return this.board && this.board.truncated ? format(TRUNCATED, this.board.cards.length) : null;
+    return this.board && this.board.truncated
+      ? format(helpText('Funders', 'Funders_Pipeline_Truncated'), this.board.cards.length)
+      : null;
   }
 
   get awardedDetail() {

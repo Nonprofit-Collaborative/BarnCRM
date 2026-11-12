@@ -8,17 +8,16 @@ import setFund from '@salesforce/apex/GrantFundController.setFund';
 
 import PROGRAM_TITLE from '@salesforce/label/c.Core_Shared_Program';
 import PROGRAM_NONE from '@salesforce/label/c.Funders_Program_None';
-import PROGRAM_MISSING from '@salesforce/label/c.Funders_Program_Missing';
 import PROGRAM_SAVED from '@salesforce/label/c.Funders_Program_Saved';
 import FUND_NONE from '@salesforce/label/c.Funders_Fund_None';
-import FUND_MISSING from '@salesforce/label/c.Funders_Fund_Missing';
 import FUND_SAVED from '@salesforce/label/c.Core_Shared_Saved';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
-import ERROR_ACTION from '@salesforce/label/c.Funders_Pipeline_ErrorUnexpected';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const NONE_VALUE = '';
 
-const messageOf = (error) => messageFrom(error, ERROR_ACTION);
+const messageOf = (error) =>
+  messageFrom(error, helpText('Funders', 'Funders_Pipeline_ErrorUnexpected'));
 
 /**
  * What each kind of linked record differs in. Program (F-01, canonical model 29ZH R-GN4): the
@@ -37,7 +36,9 @@ const KINDS = {
     nameOf: (card) => card.programName,
     labels: {
       none: PROGRAM_NONE,
-      missing: PROGRAM_MISSING,
+      get missing() {
+        return helpText('Funders', 'Funders_Program_Missing');
+      },
       saved: PROGRAM_SAVED
     }
   },
@@ -51,7 +52,9 @@ const KINDS = {
     nameOf: (card) => card.fundName,
     labels: {
       none: FUND_NONE,
-      missing: FUND_MISSING,
+      get missing() {
+        return helpText('Funders', 'Funders_Fund_Missing');
+      },
       saved: FUND_SAVED
     }
   }
@@ -65,6 +68,8 @@ const KINDS = {
  * so.
  */
 export default class GrantLinkedRecord extends LightningElement {
+  helpReady = isHelpLoaded('Funders');
+
   @api recordId;
   /** Program or Fund, set on the record page. */
   @api kind = 'Program';
@@ -101,6 +106,11 @@ export default class GrantLinkedRecord extends LightningElement {
   }
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Funders').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 

@@ -82,7 +82,7 @@ public with sharing class GrantAnswerController {
 			return today;
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT + '.markUsed', answerId);
-			throw UserErrors.message(Label.Funders_Answers_ErrorStamp);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Answers_ErrorStamp'));
 		}
 	}
 }

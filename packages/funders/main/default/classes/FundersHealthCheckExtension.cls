@@ -83,7 +83,7 @@ public with sharing class FundersHealthCheckExtension implements HealthCheckExte
 			late,
 			Label.Funders_HealthCheck_OverdueTitleOne,
 			Label.Funders_HealthCheck_OverdueTitle,
-			Label.Funders_HealthCheck_OverdueDetail
+			BarnHelp.text('Funders', 'Funders_HealthCheck_OverdueDetail')
 		);
 	}
 
@@ -106,7 +106,7 @@ public with sharing class FundersHealthCheckExtension implements HealthCheckExte
 			late,
 			Label.Funders_HealthCheck_PastDeadlineTitleOne,
 			Label.Funders_HealthCheck_PastDeadlineTitle,
-			Label.Funders_HealthCheck_PastDeadlineDetail
+			BarnHelp.text('Funders', 'Funders_HealthCheck_PastDeadlineDetail')
 		);
 	}
 

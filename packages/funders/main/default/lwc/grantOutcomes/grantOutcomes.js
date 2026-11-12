@@ -6,15 +6,12 @@ import { indicatorLines } from 'c/grantReportModel';
 import { messageFrom as messageOf } from 'c/findCsv';
 
 import TITLE from '@salesforce/label/c.Funders_Outcomes_Title';
-import NO_REQUIREMENTS from '@salesforce/label/c.Funders_Outcomes_NoRequirements';
 import NONE from '@salesforce/label/c.Core_Shared_NoOutcome';
-import MISSING from '@salesforce/label/c.Funders_Outcomes_Missing';
 import SAVED from '@salesforce/label/c.Funders_Outcomes_Saved';
-import NO_INDICATORS from '@salesforce/label/c.Funders_Outcomes_NoIndicators';
 import PERIOD_LINE from '@salesforce/label/c.Funders_Outcomes_PeriodLine';
 import NOT_SET from '@salesforce/label/c.Funders_Outcomes_NotSet';
-import ERROR_LOAD from '@salesforce/label/c.Funders_Outcomes_ErrorLoad';
 import SAVE from '@salesforce/label/c.Core_Kit_Save';
+import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const NONE_VALUE = '';
 
@@ -25,9 +22,16 @@ const NONE_VALUE = '';
  * Models the card is not drawn at all (modules-6).
  */
 export default class GrantOutcomes extends LightningElement {
+  helpReady = isHelpLoaded('Funders');
+
   @api recordId;
 
-  labels = { title: TITLE, noRequirements: NO_REQUIREMENTS };
+  labels = {
+    title: TITLE,
+    get noRequirements() {
+      return helpText('Funders', 'Funders_Outcomes_NoRequirements');
+    }
+  };
 
   card;
   choices = {};
@@ -36,6 +40,11 @@ export default class GrantOutcomes extends LightningElement {
   isLoading = true;
 
   connectedCallback() {
+    if (!this.helpReady) {
+      loadHelp('Funders').then(() => {
+        this.helpReady = true;
+      });
+    }
     this.load();
   }
 
@@ -47,7 +56,7 @@ export default class GrantOutcomes extends LightningElement {
       this.errorMessage = undefined;
     } catch (error) {
       this.card = undefined;
-      this.errorMessage = messageOf(error, ERROR_LOAD);
+      this.errorMessage = messageOf(error, helpText('Funders', 'Funders_Outcomes_ErrorLoad'));
     } finally {
       this.isLoading = false;
     }
@@ -89,10 +98,10 @@ export default class GrantOutcomes extends LightningElement {
         saveLabel: SAVE,
         saveDisabled: value === saved || this.savingId === row.requirementId,
         missing: row.missing,
-        missingText: MISSING,
+        missingText: helpText('Funders', 'Funders_Outcomes_Missing'),
         indicators,
         noIndicators: Boolean(row.outcome) && indicators.length === 0,
-        noIndicatorsText: NO_INDICATORS
+        noIndicatorsText: helpText('Funders', 'Funders_Outcomes_NoIndicators')
       };
     });
   }
@@ -110,7 +119,10 @@ export default class GrantOutcomes extends LightningElement {
       await this.load();
     } catch (error) {
       this.dispatchEvent(
-        new ShowToastEvent({ message: messageOf(error, ERROR_LOAD), variant: 'error' })
+        new ShowToastEvent({
+          message: messageOf(error, helpText('Funders', 'Funders_Outcomes_ErrorLoad')),
+          variant: 'error'
+        })
       );
     } finally {
       this.savingId = undefined;

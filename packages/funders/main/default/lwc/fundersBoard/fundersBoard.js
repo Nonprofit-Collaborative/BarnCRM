@@ -13,9 +13,6 @@ import MIX from '@salesforce/label/c.Funders_Board_Mix';
 import GIFTS from '@salesforce/label/c.Funders_Board_Gifts';
 import NOT_SET from '@salesforce/label/c.Core_Settings_NotSet';
 import CONCENTRATION from '@salesforce/label/c.Funders_Board_Concentration';
-import SINGLE_RISK from '@salesforce/label/c.Funders_Board_SingleRisk';
-import TOP_FIVE_RISK from '@salesforce/label/c.Funders_Board_TopFiveRisk';
-import NO_RISK from '@salesforce/label/c.Funders_Board_NoRisk';
 import RESTRICTED from '@salesforce/label/c.Funders_Board_Restricted';
 import FUNDS from '@salesforce/label/c.Funders_Board_Funds';
 import GRANTS from '@salesforce/label/c.Funders_Board_Grants';
@@ -251,11 +248,19 @@ export default class FundersBoard extends NavigationMixin(LightningElement) {
     if (spread.singleRisk) {
       flags.push({
         key: 'single',
-        text: fill(SINGLE_RISK, [spread.largest.name, showShare(spread.largest.share)])
+        text: fill(helpText('Funders', 'Funders_Board_SingleRisk'), [
+          spread.largest.name,
+          showShare(spread.largest.share)
+        ])
       });
     }
     if (spread.topFiveRisk) {
-      flags.push({ key: 'five', text: fill(TOP_FIVE_RISK, [showShare(spread.topFiveShare)]) });
+      flags.push({
+        key: 'five',
+        text: fill(helpText('Funders', 'Funders_Board_TopFiveRisk'), [
+          showShare(spread.topFiveShare)
+        ])
+      });
     }
     return flags;
   }
@@ -265,7 +270,7 @@ export default class FundersBoard extends NavigationMixin(LightningElement) {
   }
 
   get noRiskText() {
-    return fill(NO_RISK, [showShare(this.spread.topFiveShare)]);
+    return fill(helpText('Funders', 'Funders_Board_NoRisk'), [showShare(this.spread.topFiveShare)]);
   }
 
   rows(slices) {

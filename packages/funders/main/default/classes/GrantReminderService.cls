@@ -117,7 +117,7 @@ public with sharing class GrantReminderService {
 				}
 			}
 			logShortfall(
-				Label.Funders_Reminder_TaskFailed,
+				BarnHelp.text('Funders', 'Funders_Reminder_TaskFailed'),
 				due.size() - ready.size(),
 				due,
 				failure
@@ -153,7 +153,7 @@ public with sharing class GrantReminderService {
 			}
 		}
 		logShortfall(
-			Label.Funders_Reminder_StampFailed,
+			BarnHelp.text('Funders', 'Funders_Reminder_StampFailed'),
 			ready.size() - reminded,
 			ready,
 			stampFailure
@@ -179,7 +179,7 @@ public with sharing class GrantReminderService {
 			failed = messages.size();
 			failure = refused.getMessage();
 		}
-		logShortfall(Label.Funders_Reminder_SendFailed, failed, due, failure);
+		logShortfall(BarnHelp.text('Funders', 'Funders_Reminder_SendFailed'), failed, due, failure);
 	}
 
 	private static void logShortfall(
@@ -206,7 +206,7 @@ public with sharing class GrantReminderService {
 	private static Task taskFor(Grant_Requirement__c requirement, Id recipient) {
 		return new Task(
 			Subject = String.format(
-				Label.Funders_Reminder_TaskSubject,
+				BarnHelp.text('Funders', 'Funders_Reminder_TaskSubject'),
 				new List<Object>{ requirement.Name, grantName(requirement) }
 			),
 			Description = describe(requirement),
@@ -229,7 +229,7 @@ public with sharing class GrantReminderService {
 		message.setSaveAsActivity(false);
 		message.setSubject(
 			String.format(
-				Label.Funders_Reminder_EmailSubject,
+				BarnHelp.text('Funders', 'Funders_Reminder_EmailSubject'),
 				new List<Object>{ requirement.Name, grantName(requirement) }
 			)
 		);
@@ -253,7 +253,7 @@ public with sharing class GrantReminderService {
 			? ''
 			: requirement.Grant__r.Funder__r.Name;
 		return String.format(
-			Label.Funders_Reminder_Body,
+			BarnHelp.text('Funders', 'Funders_Reminder_Body'),
 			new List<Object>{
 				requirement.Name,
 				grantName(requirement),

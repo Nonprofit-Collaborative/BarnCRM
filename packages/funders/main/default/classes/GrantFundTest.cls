@@ -201,8 +201,16 @@ private class GrantFundTest {
 			if (fundType == null) {
 				Test.stopTest();
 				Assert.isFalse(card.available, 'Without Giving there is nothing to choose');
-				Assert.areEqual(Label.Funders_Grant_BadFund, refusedText, 'Text is refused');
-				Assert.areEqual(Label.Funders_Grant_BadFund, refusedGrant, 'And so is saving');
+				Assert.areEqual(
+					BarnHelp.text('Funders', 'Funders_Grant_BadFund'),
+					refusedText,
+					'Text is refused'
+				);
+				Assert.areEqual(
+					BarnHelp.text('Funders', 'Funders_Grant_BadFund'),
+					refusedGrant,
+					'And so is saving'
+				);
 				return;
 			}
 			SObject fund = fundType.newSObject();
@@ -220,8 +228,16 @@ private class GrantFundTest {
 				card.title,
 				'Titled by the field label'
 			);
-			Assert.areEqual(Label.Funders_Grant_BadFund, refusedText, 'Text is refused');
-			Assert.areEqual(Label.Funders_Grant_BadFund, refusedGrant, 'A grant is not a fund');
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Grant_BadFund'),
+				refusedText,
+				'Text is refused'
+			);
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Grant_BadFund'),
+				refusedGrant,
+				'A grant is not a fund'
+			);
 			Assert.areEqual(String.valueOf(fund.Id), chosen.fundId, 'Stored in 18 characters');
 			Assert.areEqual('Literacy Fund', chosen.fundName, 'Shown by name');
 			Assert.isFalse(chosen.missing, 'It is there');

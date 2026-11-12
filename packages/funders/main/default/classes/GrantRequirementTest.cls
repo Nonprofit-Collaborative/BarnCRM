@@ -193,7 +193,11 @@ private class GrantRequirementTest {
 				'Not offered to a reader'
 			);
 		}
-		Assert.areEqual(Label.Funders_Pipeline_ErrorNoPermission, refusal, 'Refused');
+		Assert.areEqual(
+			BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'),
+			refusal,
+			'Refused'
+		);
 		System.runAs(TestUsers.adminWith(GrantTestData.ADMIN)) {
 			delete grant;
 		}

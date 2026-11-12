@@ -104,7 +104,7 @@ private class GrantReminderTest {
 			Assert.areEqual(today.addDays(5), made[0].ActivityDate, 'Due on the due date');
 			Assert.areEqual(
 				String.format(
-					Label.Funders_Reminder_TaskSubject,
+					BarnHelp.text('Funders', 'Funders_Reminder_TaskSubject'),
 					new List<Object>{ 'Year 1 report', 'Literacy' }
 				),
 				made[0].Subject,

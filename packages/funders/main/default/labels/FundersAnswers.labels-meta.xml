@@ -41,22 +41,6 @@
         <value>All topics</value>
     </labels>
     <labels>
-        <fullName>Funders_Answers_Copied</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Answer Library: answer copied to the clipboard</shortDescription>
-        <value>Copied. Paste it into the application.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Answers_CopyFailed</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Answer Library: the browser refused the clipboard</shortDescription>
-        <value>Your browser did not allow copying. Click Show All, select the text and copy it.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Answers_ShowAll</fullName>
         <categories>Funders</categories>
         <language>en_US</language>
@@ -97,35 +81,11 @@
         <value>Never used</value>
     </labels>
     <labels>
-        <fullName>Funders_Answers_NoMatch</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Answer Library: search and topic match nothing</shortDescription>
-        <value>No answer matches. Try other words or another topic.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Answers_New</fullName>
         <categories>Funders</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Answer Library: add an answer</shortDescription>
         <value>New Answer</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Answers_ErrorLoad</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Answer Library could not load</shortDescription>
-        <value>The answer library could not be loaded. Reload the page; if it happens again, tell your BarnCRM admin.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Answers_ErrorStamp</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Answer copied but its last used date not saved</shortDescription>
-        <value>The answer was copied, but its last used date could not be saved.</value>
     </labels>
 </CustomLabels>

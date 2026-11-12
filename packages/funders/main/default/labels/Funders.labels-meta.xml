@@ -1,14 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
     <labels>
-        <fullName>Funders_Grant_BadProgram</fullName>
-        <categories>Funders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Grant Program field holds something that is not a program</shortDescription>
-        <value>Choose the program in the Program card on the grant's page. This is not a program.</value>
-    </labels>
-    <labels>
         <fullName>Funders_GrantTab_Overview</fullName>
         <categories>GrantPage</categories>
         <language>en_US</language>
@@ -55,14 +47,6 @@
         <protected>true</protected>
         <shortDescription>Health Check: open applications past deadline; {0} is how many</shortDescription>
         <value>{0} Grant Applications Are Past Their Deadline</value>
-    </labels>
-    <labels>
-        <fullName>Funders_HealthCheck_PastDeadlineDetail</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Health Check: what open applications past deadline mean</shortDescription>
-        <value>These grants are still at Prospect, Letter of Inquiry or Invited to Apply, but their Application Deadline has passed. Move each to Applied if it went in, set it to Withdrawn if you did not apply, or change the deadline if the funder extended it. The first ones are linked below.</value>
     </labels>
     <labels>
         <fullName>Funders_SampleData_CountLabel</fullName>
@@ -135,30 +119,6 @@
         <protected>true</protected>
         <shortDescription>Under the awarded total; {0} is how many grants</shortDescription>
         <value>{0} grants awarded</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Pipeline_ColumnEmpty</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>A stage column with no grants</shortDescription>
-        <value>No grants at this stage.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Pipeline_Truncated</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Board shows only some cards; {0} is how many</shortDescription>
-        <value>Showing the first {0} grants. The totals count every open grant.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Pipeline_ReadOnly</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Shown to someone who cannot edit grants</shortDescription>
-        <value>You can look at the pipeline but not change it.</value>
     </labels>
     <labels>
         <fullName>Funders_Pipeline_NoFunder</fullName>
@@ -241,44 +201,12 @@
         <value>Print</value>
     </labels>
     <labels>
-        <fullName>Funders_Pipeline_ErrorNoPermission</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The person cannot edit grants</shortDescription>
-        <value>You do not have permission to change grants. Ask your admin for a Funders role.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Pipeline_ErrorStage</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>A move named an unknown stage</shortDescription>
-        <value>Choose one of the grant stages.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Pipeline_ErrorUnexpected</fullName>
-        <categories>GrantPipeline</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Something unexpected went wrong</shortDescription>
-        <value>Something went wrong and the change was not saved. Try again, or ask your admin to look at the Error Log.</value>
-    </labels>
-    <labels>
         <fullName>Funders_Program_None</fullName>
         <categories>GrantProgram</categories>
         <language>en_US</language>
         <protected>true</protected>
         <shortDescription>Choice: no program</shortDescription>
         <value>No program</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Program_Missing</fullName>
-        <categories>GrantProgram</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>The named program cannot be found</shortDescription>
-        <value>The program this grant named has been deleted or you cannot see it. Choose another, or No program.</value>
     </labels>
     <labels>
         <fullName>Funders_Program_Saved</fullName>
@@ -297,54 +225,6 @@
         <value>Grant Requirement Reminders</value>
     </labels>
     <labels>
-        <fullName>Funders_Reminder_TaskSubject</fullName>
-        <categories>Reminders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Reminder task subject; {0} requirement, {1} grant</shortDescription>
-        <value>{0} due for {1}</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Reminder_EmailSubject</fullName>
-        <categories>Reminders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Reminder email subject; {0} requirement, {1} grant</shortDescription>
-        <value>Coming due: {0} for {1}</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Reminder_Body</fullName>
-        <categories>Reminders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Reminder text; {0} requirement, {1} grant, {2} funder, {3} due date</shortDescription>
-        <value>{0} for the grant {1} from {2} is due on {3}. Open the grant for the instructions, and mark the requirement Submitted when it goes in.</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Reminder_TaskFailed</fullName>
-        <categories>Reminders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Error Log: tasks not saved; {0} failed, {1} total, {2} reason</shortDescription>
-        <value>{0} of {1} grant requirement reminder tasks could not be saved and will be tried again tomorrow: {2}</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Reminder_StampFailed</fullName>
-        <categories>Reminders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Error Log: reminders not stamped; {0} failed, {1} total, {2} reason</shortDescription>
-        <value>{0} of {1} grant requirements could not be marked as reminded and may be reminded again: {2}</value>
-    </labels>
-    <labels>
-        <fullName>Funders_Reminder_SendFailed</fullName>
-        <categories>Reminders</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Error Log: emails not sent; {0} failed, {1} total, {2} reason</shortDescription>
-        <value>{0} of {1} grant requirement reminder emails could not be sent: {2}</value>
-    </labels>
-    <labels>
         <fullName>Funders_HealthCheck_OverdueTitleOne</fullName>
         <categories>HealthCheck</categories>
         <language>en_US</language>
@@ -359,14 +239,6 @@
         <protected>true</protected>
         <shortDescription>Health Check: overdue grant requirements; {0} is how many</shortDescription>
         <value>{0} Grant Requirements Are Overdue</value>
-    </labels>
-    <labels>
-        <fullName>Funders_HealthCheck_OverdueDetail</fullName>
-        <categories>HealthCheck</categories>
-        <language>en_US</language>
-        <protected>true</protected>
-        <shortDescription>Health Check: what overdue grant requirements mean</shortDescription>
-        <value>These reports or deliverables are Not Started or In Progress and their due date has passed. Open each: mark it Submitted if it went in, Waived if the funder excused it, or move the due date if the funder agreed a new one.</value>
     </labels>
     <labels>
         <fullName>Funders_Pipeline_MarkSubmitted</fullName>

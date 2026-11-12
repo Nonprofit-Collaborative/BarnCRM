@@ -208,10 +208,12 @@ public with sharing class GrantPipelineController {
 	@AuraEnabled
 	public static void moveStage(Id grantId, String stage, Decimal amountAwarded) {
 		if (!Schema.SObjectType.Grant__c.isUpdateable()) {
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
+			throw UserErrors.message(
+				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
+			);
 		}
 		if (grantId == null || !GrantService.STAGES.contains(stage)) {
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorStage);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorStage'));
 		}
 		try {
 			Grant__c grant = new Grant__c(Id = grantId, Stage__c = stage);
@@ -242,10 +244,12 @@ public with sharing class GrantPipelineController {
 		Boolean restricted
 	) {
 		if (!Schema.SObjectType.Grant__c.isUpdateable()) {
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
+			throw UserErrors.message(
+				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
+			);
 		}
 		if (grantId == null) {
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorStage);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Pipeline_ErrorStage'));
 		}
 		try {
 			Grant__c grant = new Grant__c(Id = grantId, Stage__c = GrantService.STAGE_AWARDED);
@@ -293,7 +297,9 @@ public with sharing class GrantPipelineController {
 	@AuraEnabled
 	public static FundersUndoState markSubmitted(Id requirementId) {
 		if (!Schema.SObjectType.Grant_Requirement__c.fields.Status__c.isUpdateable()) {
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
+			throw UserErrors.message(
+				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
+			);
 		}
 		try {
 			return GrantRequirementService.markSubmitted(requirementId);
@@ -309,7 +315,9 @@ public with sharing class GrantPipelineController {
 	@AuraEnabled
 	public static void undoSubmitted(Id requirementId, String status, Date submittedDate) {
 		if (!Schema.SObjectType.Grant_Requirement__c.fields.Status__c.isUpdateable()) {
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
+			throw UserErrors.message(
+				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
+			);
 		}
 		Boolean undone;
 		try {
