@@ -158,10 +158,13 @@ public with sharing class ModuleManagerService {
 			'Board_Vote__c',
 			'Compliance_Cycle__c',
 			'Compliance_Obligation__c',
+			'Data_Breach__c',
+			'Data_Subject_Request__c',
 			'Hub_Document__c',
 			'Meeting_Action_Item__c',
 			'Meeting_Attendee__c',
-			'Policy_Acknowledgment__c'
+			'Policy_Acknowledgment__c',
+			'Processing_Activity__c'
 		},
 		'Payments' => new List<String>{ 'Payment__c', 'Payment_Event__c' },
 		'LwcBuilder' => new List<String>{ 'Built_Component__c' },

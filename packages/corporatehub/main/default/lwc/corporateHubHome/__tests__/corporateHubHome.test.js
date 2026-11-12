@@ -67,6 +67,31 @@ describe('c-corporate-hub-home', () => {
     expect(find(element, 'obligations').textContent).toContain('Annual report');
     expect(find(element, 'no-agreements')).not.toBeNull();
     expect(find(element, 'add-templates')).not.toBeNull();
+    expect(find(element, 'privacy')).toBeNull();
+  });
+
+  it('shows open data subject requests and unreported breaches under Data Protection', async () => {
+    getHome.mockResolvedValue({
+      ...HOME,
+      privacy: [
+        {
+          id: 'a05000000000001AAA',
+          name: 'Data subject request: DSR-00001',
+          due: '2000-01-01',
+          status: 'Access'
+        }
+      ]
+    });
+    const element = mount();
+    await flush();
+
+    const privacy = find(element, 'privacy');
+    expect(privacy.textContent).toContain('c.CorporateHub_Home_Privacy');
+    expect(privacy.textContent).toContain('DSR-00001');
+    expect(privacy.querySelector('a').getAttribute('href')).toBe(
+      '/lightning/r/a05000000000001AAA/view'
+    );
+    expect(privacy.querySelector('div.slds-text-color_error')).not.toBeNull();
   });
 
   it('records I Have Read This and reloads', async () => {

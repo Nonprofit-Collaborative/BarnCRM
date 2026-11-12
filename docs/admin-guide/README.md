@@ -273,7 +273,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 
 | Feature | Page | Package |
 |---|---|---|
-| CH-01 to CH-04, CH-06 to CH-08 Corporate Hub: install, access, settings, the shipped templates (not legal advice), Library Documents and versions, policy acknowledgments, the compliance calendar and completed cycles, agreements and renewals, reminders, reports | [corporate-hub.md](corporate-hub.md) | BarnCRM Corporate Hub |
+| CH-01 to CH-08 Corporate Hub: install, access, settings, the shipped templates (not legal advice), Library Documents and versions, policy acknowledgments, the compliance calendar and completed cycles, agreements and renewals, data protection (processing activities, data subject requests, breaches), reminders, reports | [corporate-hub.md](corporate-hub.md) | BarnCRM Corporate Hub |
 
 ### Payments
 

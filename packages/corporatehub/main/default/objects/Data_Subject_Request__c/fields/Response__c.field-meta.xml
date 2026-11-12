@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Response__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>What you did and told the person, how identity was checked, and any reason for refusal or extension.</inlineHelpText>
+  <label>Response and Actions</label>
+  <length>32768</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>6</visibleLines>
+</CustomField>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Authority_Notified_At__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>When you reported the breach to the supervisory authority. Reminders continue until this is filled, the risk is Unlikely to Result in Risk, or the entry is Closed.</inlineHelpText>
+  <label>Authority Notified At</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>DateTime</type>
+</CustomField>

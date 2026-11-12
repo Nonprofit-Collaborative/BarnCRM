@@ -61,6 +61,26 @@
       "recurrence": "Yearly",
       "referenceUrl": null,
       "instructions": "Each state where the organization is incorporated or registered needs a registered agent with an address in that state to receive legal papers. If you pay a registered agent service, renew it before it ends; if the agent or address changes, file the change with the state. General guidance, not legal advice."
+    },
+    {
+      "key": "ch05_processing_record_review",
+      "set": "CH-05",
+      "name": "Record of processing review",
+      "category": "Data Protection",
+      "jurisdiction": "Where the GDPR or a similar law applies (EU, EEA, UK)",
+      "recurrence": "Yearly",
+      "referenceUrl": null,
+      "instructions": "The GDPR asks an organization to keep a record of its processing activities: why it holds personal data, about whom, on what lawful basis, who receives it, where it goes and how long it is kept. Keep one Processing Activity per purpose on the Processing Activities tab (starter rows arrive as Draft). Once a year, and whenever you start something new, check each one, set it Active or Retired and complete this cycle. Turn this obligation on only if the GDPR or a similar law applies to you. General guidance, not legal advice: review with your counsel or data protection officer."
+    },
+    {
+      "key": "ch05_dpia_review",
+      "set": "CH-05",
+      "name": "Data protection impact assessment (DPIA) reviews",
+      "category": "Data Protection",
+      "jurisdiction": "Where the GDPR or a similar law applies (EU, EEA, UK)",
+      "recurrence": "Yearly",
+      "referenceUrl": null,
+      "instructions": "Processing that is likely to be high risk to people (large amounts of special category data, monitoring, new technology) needs a DPIA before it starts, kept up to date. Check DPIA Required on those Processing Activities, keep the assessment as a file on the record and set Next DPIA Review: the owner is reminded before it. Use this obligation for the yearly look across all of them. General guidance, not legal advice: review with your counsel or data protection officer."
     }
   ],
   "policies": [
@@ -95,6 +115,95 @@
       "requiresAcknowledgment": false,
       "reviewMonths": 24,
       "summary": "Starter record: attach your own policy. A gift acceptance policy usually says which gifts the organization accepts, which need review before they are accepted (real estate, securities, vehicles, restricted or named gifts), who decides, and how gifts are acknowledged. IRS Form 990, Schedule M, asks about a policy for non-standard contributions. BarnCRM supplies no legal text. Not legal advice: review your policy with your counsel."
+    },
+    {
+      "key": "ch05_data_protection",
+      "set": "CH-05",
+      "name": "Data protection policy",
+      "requiresAcknowledgment": true,
+      "reviewMonths": 12,
+      "summary": "Starter record: attach your own policy. A data protection policy usually says what personal data the organization holds and why, who is responsible (and any data protection officer), how staff and volunteers keep data safe, how long it is kept, and how people use their rights. BarnCRM supplies no legal text. Not legal advice: review your policy with your counsel or data protection officer."
+    },
+    {
+      "key": "ch05_privacy_notice",
+      "set": "CH-05",
+      "name": "Privacy notice",
+      "requiresAcknowledgment": false,
+      "reviewMonths": 12,
+      "summary": "Starter record: attach your own notice. A privacy notice tells donors, volunteers, participants and others what data you collect, why and on what lawful basis, who receives it, how long you keep it and how to use their rights or complain. Keep it in step with your record of processing. BarnCRM supplies no legal text. Not legal advice: review your notice with your counsel."
+    },
+    {
+      "key": "ch05_subject_requests",
+      "set": "CH-05",
+      "name": "Data subject request procedure",
+      "requiresAcknowledgment": false,
+      "reviewMonths": 24,
+      "summary": "Starter record: attach your own procedure. It usually says how a request is recognized and logged (a Data Subject Request record), how identity is checked, who answers and by when (one month under the GDPR), and how an erasure is done (Erase Person on the person, with the request number as the reference). BarnCRM supplies no legal text. Not legal advice: review with your counsel."
+    },
+    {
+      "key": "ch05_breach_response",
+      "set": "CH-05",
+      "name": "Personal data breach response procedure",
+      "requiresAcknowledgment": true,
+      "reviewMonths": 24,
+      "summary": "Starter record: attach your own procedure. It usually says how staff and volunteers report a suspected breach at once, who assesses the risk, how it is contained, when the supervisory authority is told (within 72 hours under the GDPR, unless it is unlikely to result in a risk) and when the people affected are told. Log every breach as a Data Breach record, reported or not. BarnCRM supplies no legal text. Not legal advice: review with your counsel."
+    }
+  ],
+  "processingActivities": [
+    {
+      "key": "ch05_pa_donors",
+      "set": "CH-05",
+      "name": "Donor records and fundraising",
+      "purpose": "Recording gifts and pledges, thanking and receipting donors, and asking for further support.",
+      "lawfulBasis": "Legitimate Interests",
+      "dataSubjects": "Donors and prospective donors",
+      "dataCategories": "Name, contact details, gift history, communication preferences, notes from contact.",
+      "recipients": "Your payment processor, email service and mailing house, where you use them.",
+      "retention": "Set your own, for example gifts kept for the years tax law asks."
+    },
+    {
+      "key": "ch05_pa_newsletter",
+      "set": "CH-05",
+      "name": "Email newsletter",
+      "purpose": "Sending news and appeals by email to people who asked for them.",
+      "lawfulBasis": "Consent",
+      "dataSubjects": "Newsletter subscribers",
+      "dataCategories": "Name, email address, sign-up date and source, opt-out.",
+      "recipients": "Your email service.",
+      "retention": "Until the person unsubscribes, plus a suppression record."
+    },
+    {
+      "key": "ch05_pa_volunteers",
+      "set": "CH-05",
+      "name": "Volunteer management",
+      "purpose": "Recruiting, scheduling and thanking volunteers, and recording their hours and checks.",
+      "lawfulBasis": "Legitimate Interests",
+      "dataSubjects": "Volunteers and applicants",
+      "dataCategories": "Name, contact details, availability, skills, hours, onboarding and check results.",
+      "recipients": "Any screening provider you use.",
+      "retention": "Set your own, for example for a set time after the last shift."
+    },
+    {
+      "key": "ch05_pa_participants",
+      "set": "CH-05",
+      "name": "Program participants",
+      "purpose": "Delivering services and recording enrollments, attendance and outcomes.",
+      "lawfulBasis": null,
+      "dataSubjects": "Program participants and their contacts",
+      "dataCategories": "Name, contact details, enrollment and attendance, case notes; may include special category data such as health.",
+      "recipients": "Funders receive totals only, unless you agree otherwise.",
+      "retention": "Set your own, often tied to funder or legal requirements."
+    },
+    {
+      "key": "ch05_pa_staff",
+      "set": "CH-05",
+      "name": "Staff and board records",
+      "purpose": "Employing staff and running the board.",
+      "lawfulBasis": "Contract",
+      "dataSubjects": "Staff, applicants and board members",
+      "dataCategories": "Name, contact details, role, terms, conflict-of-interest disclosures.",
+      "recipients": "Payroll provider, pension provider, authorities as the law requires.",
+      "retention": "Set your own, as employment and tax law ask."
     }
   ],
   "assessments": [

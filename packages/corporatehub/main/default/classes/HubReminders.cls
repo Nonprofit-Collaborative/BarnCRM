@@ -1,11 +1,14 @@
 /**
  * The Corporate Hub step of BarnCRM's nightly run (ADR-NEXT `NEXT-corporate-hub-module.md`
  * decision 7; canonical model R-AG1, R-CR1): renews or expires agreements past their end date,
- * then sends each owner one bell reminder per date for the obligations, agreements and document
- * reviews coming due. It is also the module's one way to send a bell notification (`notify`).
+ * then sends each owner one bell reminder per date for the obligations, agreements, document
+ * reviews, board terms and the GDPR records (CH-05: DPIA reviews, data subject requests, unreported
+ * breaches) coming due, and links each erasure to its request (R-DS2). It is also the module's one
+ * way to send a bell notification (`notify`).
  *
  * It runs as whoever scheduled the nightly run, in system mode (ADR-0021): it reads every active
- * record and writes only the module's bookkeeping (Reminded For, a renewed End Date, Expired).
+ * record and writes only the module's bookkeeping (Reminded For, a renewed End Date, Expired, the
+ * Erasure Record link).
  */
 public with sharing class HubReminders implements Schedulable {
 	/** The step's key on the Nightly Jobs page. */
@@ -51,15 +54,20 @@ public with sharing class HubReminders implements Schedulable {
 			List<Compliance_Obligation__c> obligations = new List<Compliance_Obligation__c>();
 			List<Hub_Document__c> documents = new List<Hub_Document__c>();
 			List<Board_Member__c> seats = new List<Board_Member__c>();
+			List<SObject> privacy = new List<SObject>();
 			if (remind) {
 				obligations = obligations();
 				documents = documents();
 				seats = seats();
+				privacy.addAll(dpiaReviews());
+				privacy.addAll(breaches());
 			}
 			update as system agreements;
 			update as system obligations;
 			update as system documents;
 			update as system seats;
+			update as system privacy;
+			update as system requests(remind);
 		} catch (Exception e) {
 			ErrorLogger.log(e, CONTEXT);
 		}
@@ -222,6 +230,133 @@ public with sharing class HubReminders implements Schedulable {
 			}
 		}
 		return changed;
+	}
+
+	/** R-PA1: the owner of an Active processing activity that needs a DPIA, before its review. */
+	private List<SObject> dpiaReviews() {
+		return remindEach(
+			[
+				SELECT Id, Name, OwnerId, DPIA_Review_Date__c, Reminded_For__c
+				FROM Processing_Activity__c
+				WHERE
+					Status__c = :ACTIVE
+					AND DPIA_Required__c = TRUE
+					AND DPIA_Review_Date__c != NULL
+				WITH SYSTEM_MODE
+				ORDER BY DPIA_Review_Date__c
+				LIMIT :MAX_ROWS
+			],
+			'DPIA_Review_Date__c',
+			BarnHelp.text('CorporateHub', 'CorporateHub_Reminder_DpiaTitle')
+		);
+	}
+
+	/** R-DB1: the owner of a breach not yet reported, and not assessed as unlikely to be a risk. */
+	private List<SObject> breaches() {
+		return remindEach(
+			[
+				SELECT Id, Name, OwnerId, Authority_Deadline__c, Reminded_For__c
+				FROM Data_Breach__c
+				WHERE
+					Status__c != 'Closed'
+					AND Risk__c != 'Unlikely'
+					AND Authority_Notified_At__c = NULL
+				WITH SYSTEM_MODE
+				ORDER BY Discovered_At__c
+				LIMIT :MAX_ROWS
+			],
+			'Authority_Deadline__c',
+			BarnHelp.text('CorporateHub', 'CorporateHub_Reminder_BreachTitle')
+		);
+	}
+
+	/**
+	 * R-DS2, then R-DS1: an open erasure request whose number Erase Person was given as the
+	 * reference gets its Erasure Record, whether or not reminders are on; then the owner of each
+	 * open request is reminded before its due date.
+	 */
+	private List<Data_Subject_Request__c> requests(Boolean remind) {
+		List<Data_Subject_Request__c> open = [
+			SELECT
+				Id,
+				Name,
+				OwnerId,
+				Due_Date__c,
+				Reminded_For__c,
+				Request_Type__c,
+				Erasure_Record__c
+			FROM Data_Subject_Request__c
+			WHERE Status__c IN ('Received', 'In Progress')
+			WITH SYSTEM_MODE
+			ORDER BY Due_Date__c
+			LIMIT :MAX_ROWS
+		];
+		Set<String> names = new Set<String>();
+		for (Data_Subject_Request__c row : open) {
+			if (row.Request_Type__c == 'Erasure' && row.Erasure_Record__c == null) {
+				names.add(row.Name);
+			}
+		}
+		Map<String, Id> erasures = new Map<String, Id>();
+		if (!names.isEmpty()) {
+			for (Erasure__c erasure : [
+				SELECT Id, Request_Reference__c
+				FROM Erasure__c
+				WHERE Request_Reference__c IN :names
+				WITH SYSTEM_MODE
+				ORDER BY CreatedDate
+			]) {
+				erasures.put(erasure.Request_Reference__c.trim().toLowerCase(), erasure.Id);
+			}
+		}
+		Map<Id, Data_Subject_Request__c> changed = new Map<Id, Data_Subject_Request__c>();
+		for (Data_Subject_Request__c row : open) {
+			Id erasure = names.contains(row.Name) ? erasures.get(row.Name.toLowerCase()) : null;
+			if (erasure != null) {
+				row.Erasure_Record__c = erasure;
+				changed.put(row.Id, row);
+			}
+			if (
+				remind &&
+				remindRow(
+					row,
+					row.Due_Date__c,
+					BarnHelp.text('CorporateHub', 'CorporateHub_Reminder_RequestTitle')
+				)
+			) {
+				changed.put(row.Id, row);
+			}
+		}
+		return changed.values();
+	}
+
+	/** One reminder per date for each row, the date read from `dateField` (a date or a date and time). */
+	private List<SObject> remindEach(List<SObject> rows, String dateField, String title) {
+		List<SObject> changed = new List<SObject>();
+		for (SObject row : rows) {
+			Object value = row.get(dateField);
+			Date target = value instanceof Datetime ? ((Datetime) value).date() : (Date) value;
+			if (remindRow(row, target, title)) {
+				changed.add(row);
+			}
+		}
+		return changed;
+	}
+
+	/** Reminds the row's owner about `target` once; `title` takes the row's name and the date. */
+	private Boolean remindRow(SObject row, Date target, String title) {
+		if (
+			due(target, null, (Date) row.get('Reminded_For__c')) &&
+			send(
+				(Id) row.get('OwnerId'),
+				String.format(title, new List<Object>{ row.get('Name'), target.format() }),
+				row.Id
+			)
+		) {
+			row.put('Reminded_For__c', target);
+			return true;
+		}
+		return false;
 	}
 
 	/** Within the record's reminder days (or the setting's), overdue included, not yet reminded. */
