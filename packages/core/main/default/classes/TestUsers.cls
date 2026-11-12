@@ -54,7 +54,8 @@ public class TestUsers {
 		'Scholarships_Admin',
 		'Territory_Admin',
 		'Memberships_Admin',
-		'Projects_Admin'
+		'Projects_Admin',
+		'Address_Verification_Admin'
 	};
 
 	/**

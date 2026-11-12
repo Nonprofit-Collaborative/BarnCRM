@@ -147,6 +147,14 @@
       "dependencies": [{ "package": "BarnCRM Core" }]
     },
     {
+      "path": "packages/addressverification",
+      "default": false,
+      "package": "BarnCRM Address Verification",
+      "versionName": "v0.1",
+      "versionNumber": "0.1.0.NEXT",
+      "dependencies": [{ "package": "BarnCRM Core" }]
+    },
+    {
       "path": "packages/mirror",
       "default": false,
       "package": "BarnCRM Mirror",

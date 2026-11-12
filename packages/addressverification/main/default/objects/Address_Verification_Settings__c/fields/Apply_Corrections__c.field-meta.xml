@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Apply_Corrections__c</fullName>
+  <defaultValue>false</defaultValue>
+  <description>A verified address also takes the provider's standardized street, city, state and postal code; the country never changes (R-AV1).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Replace the street, city, state and postal code with the provider's standardized form.</inlineHelpText>
+  <label>Apply Corrections</label>
+  <type>Checkbox</type>
+</CustomField>

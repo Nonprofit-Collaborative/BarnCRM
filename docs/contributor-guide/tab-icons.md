@@ -93,6 +93,7 @@ Rules:
 | payments | Payment_Event__c | Custom95: Stopwatch |
 | memberships | Membership_Level__c | Custom48: Trophy |
 | memberships | Membership_Term__c | Custom45: Ticket |
+| addressverification | Address_Verification_Setup | Custom73: HighwaySign |
 | payments | Payments_Setup | Custom70: Handsaw |
 | lwcbuilder | LWC_Builder | Custom34: Insect |
 | scholarships | Award__c | Custom80: Motorcycle |

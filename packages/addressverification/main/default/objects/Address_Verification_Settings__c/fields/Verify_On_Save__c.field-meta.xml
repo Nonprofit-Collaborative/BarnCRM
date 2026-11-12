@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Verify_On_Save__c</fullName>
+  <defaultValue>true</defaultValue>
+  <description>Look up a Current address soon after it is added or its street, city, state, postal code or country changes (R-AV3).</description>
+  <externalId>false</externalId>
+  <inlineHelpText>Look up an address soon after it is added or changed.</inlineHelpText>
+  <label>Verify On Save</label>
+  <type>Checkbox</type>
+</CustomField>

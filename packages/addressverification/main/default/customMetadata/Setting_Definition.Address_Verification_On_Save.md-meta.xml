@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Verify addresses when saved</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Verify_On_Save__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Address_Verification_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Addresses</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">AddressVerification</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">110</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">Checks a current address within moments of it being added or its street, city, state, postal code or country changing. Addresses saved by an import wait for the nightly check. On by default.</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">address-verification.md</value></values>
+</CustomMetadata>

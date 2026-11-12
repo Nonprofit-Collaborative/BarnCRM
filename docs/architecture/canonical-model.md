@@ -7511,9 +7511,10 @@ The setting is explained in those words in the settings console, not in terms of
 and the console shows a blank as the shipped choice, never an empty box.
 
 **R-AD6 Verification is a placeholder.** Verification Status and Latest Verified Date are
-never written by packaged code. They exist so that a third-party verification app can
-write them and so that a report can find unverified addresses. Third-party verification is
-out of scope (plan Section 4.7).
+never written by Core's code. They exist so that a verification app can write them and so
+that a report can find unverified addresses. The optional Address Verification module (C-46,
+29AV1, R-AV1 to R-AV4) is such an app; without it, or with its handler switched off, any
+third-party app can own them.
 
 **R-AD7 History is kept.** Moving a household creates a new address and clears the old
 one's primary flag. The old address is not deleted, so a mailing sent last year can still
@@ -17055,6 +17056,87 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 | Days late before at risk | `At_Risk_Days__c` | Number(3, 0), default 7 (1 to 365) |
 | Budget warning percent | `Budget_Warning_Percent__c` | Number(3, 0), default 90 (1 to 100) |
 | Weekly capacity hours | `Weekly_Capacity_Hours__c` | Number(3, 0), default 40 (1 to 168) |
+## 29AV1. Address Verification Settings
+
+### Definition
+
+The Address Verification module's org-wide choices (C-46, D-112; ADR-NEXT
+`NEXT-address-verification-module.md`), edited in the Addresses section of BarnCRM Settings.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Provider | text | yes (defaults Smarty) | Smarty (United States only) or Google. |
+| Verify On Save | boolean | yes (defaults true) | Look up a Current address soon after it is added or its street, city, state, postal code or country changes. |
+| Apply Corrections | boolean | yes (defaults false) | A verified address also takes the provider's standardized street, city, state and postal code. |
+| Re-Check After (Months) | number | yes (defaults 12) | A verified address is looked up again after this many months; 0 never. |
+| Nightly Limit | number | yes (defaults 200) | The most addresses the nightly step looks up in one night. |
+
+### Rules
+
+**R-AV1 Only the two fields, unless corrections are on.** The module writes Verification Status
+and Latest Verified Date (Verified: both, the date today; Failed: the status only). With Apply
+Corrections on, a Verified address also takes the standardized street, city, state and postal
+code; the country never changes. Writes run in user mode as the saving user or the job's user.
+
+**R-AV2 A change makes an address Unverified.** Before a change to the street, city, state,
+postal code or country is saved, Verification Status goes back to Unverified; Latest Verified
+Date keeps the last success. A save the module makes itself is never looked up again.
+
+**R-AV3 Lookups are bounded.** Only Current addresses are looked up; Smarty only those with a
+blank or United States country. On save, one queued job takes up to 50; the nightly step takes
+Unverified addresses and Verified ones older than Re-Check After, oldest first, at most Nightly
+Limit. A provider error leaves the address Unverified.
+
+**R-AV4 Keys are never shown.** The keys live in 29AV2, granted to no permission set; the setup
+page returns only whether each is set and its last four characters.
+
+### Salesforce implementation
+
+- **Object:** `Address_Verification_Settings__c`, hierarchy custom setting, visibility Protected.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Provider | `Provider__c` | Text(20), default "Smarty" |
+| Verify On Save | `Verify_On_Save__c` | Checkbox, default true |
+| Apply Corrections | `Apply_Corrections__c` | Checkbox, default false |
+| Re-Check After (Months) | `Recheck_Months__c` | Number(3, 0), default 12 |
+| Nightly Limit | `Nightly_Limit__c` | Number(5, 0), default 200 |
+
+- **Setting Definitions:** `Address_Verification_Provider`, `Address_Verification_On_Save`,
+  `Address_Verification_Corrections`, `Address_Verification_Recheck`,
+  `Address_Verification_Nightly_Limit`, `Address_Verification_Setup_Page`, section Addresses.
+- **Automation Registry:** `Address_Verification` on `Address__c`, handler
+  `AddressVerificationHandler`, order 95, enabled by default.
+- **Nightly step:** key `AddressVerification`, 03:30, switch shipped on.
+
+---
+
+## 29AV2. Address Verification Keys
+
+### Definition
+
+The organization's own provider keys, written on the Address Verification Setup page and never
+shown again (R-AV4).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Smarty Auth ID | text | for Smarty | The secret key pair's Auth ID. |
+| Smarty Auth Token | text | for Smarty | The secret key pair's Auth Token. |
+| Google API Key | text | for Google | A key with the Address Validation API enabled. |
+
+### Salesforce implementation
+
+- **Object:** `Address_Verification_Keys__c`, hierarchy custom setting, visibility Protected.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Smarty Auth ID | `Smarty_Auth_Id__c` | Text(255) |
+| Smarty Auth Token | `Smarty_Auth_Token__c` | Text(255) |
+| Google API Key | `Google_Api_Key__c` | Text(255) |
 
 ---
 
@@ -17473,6 +17555,7 @@ mirrors the primary member).
 | 1.27 | 2026-11-11 | Logic model report PDF (release 1.19, L-04b, D-168 follow-up). R-IN7: the printable page also downloads as a PDF rendered by `Blob.toPdf` through `LogicModelBuilderController.reportPdf`; the page prints landscape. No object or field added. |
 | 1.28 | 2026-11-11 | Account Tabs (C-73, D-195, release 1.19). `BarnCRM_Settings__c` gains `Account_Tabs__c` (text, default Organizations and Households; Section 12 Account Tabs Key). New Core permission sets `BarnCRM_Organizations_Tab` and `BarnCRM_Accounts_Tab`; the Organizations tab leaves the three role sets. The BarnCRM and BarnCRM Console apps list the standard Accounts tab. |
 | 1.29 | 2026-11-11 | Project Management module (PM-01 to PM-05, D-175; ADR-NEXT `NEXT-project-management-module.md`). New package `packages/projects`: Project (`Project__c`, rules R-PM1 to R-PM3), Project Phase (`Project_Phase__c`), Project Task (`Project_Task__c`, R-PM4), Project Assignment (`Project_Assignment__c`, R-PM5), Time Entry (`Time_Entry__c`, R-PM6, R-PM7), Project Status Update (`Project_Status_Update__c`, R-PM8) and settings `Projects_Settings__c` (29PM1 to 29PM7). |
+| 1.30 | 2026-11-11 | Address Verification module (C-46, D-112; ADR-NEXT `NEXT-address-verification-module.md`). New package `packages/addressverification`: Address Verification Settings (`Address_Verification_Settings__c`, 29AV1, R-AV1 to R-AV4) and Address Verification Keys (`Address_Verification_Keys__c`, 29AV2). No object added to Core; R-AD6 now says Core's code never writes the two verification fields and the module does. |
 
 ---
 ## 32. Entity ownership by package
@@ -17675,6 +17758,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Membership Benefit | Memberships | 1.8 (G-22c) | 29MEM2 |
 | Membership Term | Memberships | 1.8 (G-22a, G-22b, PAY-02) | 29MEM3 |
 | Memberships Settings | Memberships | 1.8 (G-22a, G-22b) | 29MEM4 |
+| Address Verification Settings | Address Verification | 1.15 (C-46) | 29AV1 |
+| Address Verification Keys | Address Verification | 1.15 (C-46) | 29AV2 |
 
 **Components that are not entities (C-29, ADR-0059).** Core is the Standard Edition on its own,
 so nothing below that is nonprofit-specific ships in Core.

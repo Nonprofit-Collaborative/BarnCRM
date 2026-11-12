@@ -42,6 +42,7 @@ PACKAGES = {
     "portal": "Portal",
     "payments": "Payments",
     "memberships": "Memberships",
+    "addressverification": "AddressVerification",
     "mirror": "Mirror",
     "corporatehub": "CorporateHub",
     "lwcbuilder": "LwcBuilder",

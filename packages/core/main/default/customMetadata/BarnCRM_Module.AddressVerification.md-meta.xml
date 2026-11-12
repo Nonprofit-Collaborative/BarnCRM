@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>BarnCRM Address Verification</label>
+  <protected>false</protected>
+  <values>
+    <field>Editions__c</field>
+    <value xsi:type="xsd:string">Standard;Nonprofit</value>
+  </values>
+  <values>
+    <field>Package_Folder__c</field>
+    <value xsi:type="xsd:string">addressverification</value>
+  </values>
+  <values>
+    <field>Install_Version_Id__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">46</value>
+  </values>
+  <values>
+    <field>App_Name__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Staff_Tabs__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Admin_Tabs__c</field>
+    <value xsi:type="xsd:string">Address_Verification_Setup</value>
+  </values>
+  <values>
+    <field>Probe_Object__c</field>
+    <value xsi:nil="true" />
+  </values>
+  <values>
+    <field>Requires__c</field>
+    <value xsi:nil="true" />
+  </values>
+</CustomMetadata>

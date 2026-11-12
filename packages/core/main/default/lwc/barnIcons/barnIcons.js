@@ -111,6 +111,8 @@ const ICONS = Object.freeze({
   Scholarships: 'custom:custom34',
   // Territory Management
   Territory_Management: 'custom:custom34',
+  // Address Verification
+  Address_Verification_Setup: 'custom:custom73',
   // Memberships
   Membership_Level__c: 'custom:custom48',
   Membership_Term__c: 'custom:custom45',

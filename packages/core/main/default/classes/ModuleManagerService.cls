@@ -214,7 +214,8 @@ public with sharing class ModuleManagerService {
 		'Scholarships' => 'Scholarships_Admin',
 		'Territory' => 'Territory_Admin',
 		'Memberships' => 'Memberships_Admin',
-		'Projects' => 'Projects_Admin'
+		'Projects' => 'Projects_Admin',
+		'AddressVerification' => 'Address_Verification_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */
