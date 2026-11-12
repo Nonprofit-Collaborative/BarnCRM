@@ -298,6 +298,7 @@ The Package column says what has to be installed for the page to apply. BarnCRM 
 |---|---|---|
 | PM-01 to PM-05 Project Management: install, access, settings, projects, phases, tasks and milestones, templates (Salesforce Implementation, Program Launch, your own), time entries, assignments, budgets, utilization, Export Billable Time, health, status updates, the Projects at Risk card, reports | [projects.md](projects.md) | BarnCRM Project Management |
 | PM-06 to PM-12 Project Management PSA: settings per part, who approves, rate cards, timesheets and approvals, expenses, resources and staffing, billing types and invoices, Pay Online through BarnCRM Payments, financials and recognized revenue, change requests | [projects-psa.md](projects-psa.md) | BarnCRM Project Management |
+| D-201 Project Management requests and issues: settings, assigning and queues, the request life cycle, shared and internal comments, Create Task and Create Change Request, requesters in the portal, requests from another organization, reports | [projects-requests.md](projects-requests.md) | BarnCRM Project Management |
 
 ### Scholarships and Outbound Grants
 

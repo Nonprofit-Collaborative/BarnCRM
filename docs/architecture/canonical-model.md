@@ -18090,6 +18090,7 @@ Hours a person worked on a project on one day, optionally on one task, billable 
 | Approved By | `Approved_By__c` | Lookup(User), relationship Approved_Time_Entries |
 | Rejection Reason | `Rejection_Reason__c` | Text(255) |
 | Invoice Line | `Invoice_Line__c` | Lookup(Project_Invoice_Line__c), Set Null (R-PM12) |
+| Request | `Request__c` | Lookup(Project_Request__c), Set Null, relationship Time_Entries: the request the hours were spent on (29PM16) |
 
 Validation rules: `Hours_In_Range`, `Approval_By_Manager`, `Rejection_Needs_Reason`, `Status_Not_Cleared`, `Locked_When_Submitted_Or_Approved`, `Locked_When_Invoiced`.
 
@@ -18131,7 +18132,8 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 
 ### Rules
 
-- **Setting Definitions:** `Projects_Time_Tracking_Enabled`, `Projects_At_Risk_Days`, `Projects_Budget_Warning_Percent`, `Projects_Weekly_Capacity_Hours`, and for the PSA (ADR-0219 `0219-projects-psa.md`, Help Path `projects-psa.md`) `Projects_Rates_Enabled`, `Projects_Approvals_Enabled`, `Projects_Expenses_Enabled`, `Projects_Resources_Enabled`, `Projects_Billing_Enabled`, `Projects_Online_Payments_Enabled`, `Projects_Invoice_Return_Url`, `Projects_Invoice_Due_Days`, `Projects_Revenue_Enabled`, `Projects_Change_Requests_Enabled`, section Projects, module `Projects`. A blank or out of range number reads as its default.
+- **Setting Definitions:** `Projects_Time_Tracking_Enabled`, `Projects_At_Risk_Days`, `Projects_Budget_Warning_Percent`, `Projects_Weekly_Capacity_Hours`, and for the PSA (ADR-0219 `0219-projects-psa.md`, Help Path `projects-psa.md`) `Projects_Rates_Enabled`, `Projects_Approvals_Enabled`, `Projects_Expenses_Enabled`, `Projects_Resources_Enabled`, `Projects_Billing_Enabled`, `Projects_Online_Payments_Enabled`, `Projects_Invoice_Return_Url`, `Projects_Invoice_Due_Days`, `Projects_Revenue_Enabled`, `Projects_Change_Requests_Enabled`, and for requests (ADR-NEXT `NEXT-projects-requests-and-issues.md`, Help Path `projects-requests.md`) `Projects_Requests_Enabled`, `Projects_Requests_External_Enabled`, `Projects_Request_Days_Urgent`, `Projects_Request_Days_High`, `Projects_Request_Days_Medium`, `Projects_Request_Days_Low`, section Projects, module `Projects`. A blank or out of range number reads as its default.
+- **Request switches.** Track requests and issues does not need Track time and budgets. Take requests from outside reads off while Track requests and issues is off.
 - **PSA switches.** Every PSA switch ships off and reads off while Track time and budgets is off. Take invoice payments online also needs Create invoices and the Payments module.
 
 ### Salesforce implementation
@@ -18154,6 +18156,12 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 | Invoice due days | `Invoice_Due_Days__c` | Number(3, 0), default 30 (1 to 365) |
 | Show financials and recognize revenue | `Revenue_Enabled__c` | Checkbox, default false (PM-11) |
 | Track change requests | `Change_Requests_Enabled__c` | Checkbox, default false (PM-12) |
+| Track requests and issues | `Requests_Enabled__c` | Checkbox, default false (D-201) |
+| Take requests from outside | `Requests_External_Enabled__c` | Checkbox, default false (D-201): the portal and request connections |
+| Urgent request due days | `Request_Days_Urgent__c` | Number(3, 0), default 1 (1 to 365), weekdays |
+| High request due days | `Request_Days_High__c` | Number(3, 0), default 2 (1 to 365), weekdays |
+| Medium request due days | `Request_Days_Medium__c` | Number(3, 0), default 5 (1 to 365), weekdays |
+| Low request due days | `Request_Days_Low__c` | Number(3, 0), default 10 (1 to 365), weekdays |
 
 ---
 
@@ -18379,6 +18387,68 @@ A requested change of a project's scope with its hours and amount; approved ones
 | Hours | `Hours__c` | Number(8, 2), history tracked |
 | Amount | `Amount__c` | Currency(16, 2), history tracked |
 | Status | `Status__c` | Picklist (Draft, Submitted, Approved, Rejected), restricted, required, default Draft, history tracked |
+
+## 29PM16. Request
+
+### Definition
+
+A request or issue someone raised with the organization: logged by staff, sent by a requester through the portal, or sent by another organization; triaged, assigned, resolved and linked to the project work it caused (D-201, ADR-NEXT `NEXT-projects-requests-and-issues.md`). Off until Track requests and issues is on.
+
+### Rules
+
+**R-PM23 Before save** (registry row `Project_Request_Rules`, Always Runs). A blank Channel is Staff when the saving user can create requests and Portal otherwise. A Portal or Partner Organization request is refused unless Track requests and issues and Take requests from outside are both on. A blank Due Date is the creation date plus the priority's due days, counted in weekdays. A blank Requesting Organization takes the requester's Account. Resolved or Closed stamps Resolved Date when blank; any other status clears it. A save by a user who cannot edit requests (the portal's integration user) keeps Subject, Description, Type, Category and Priority as they were. Validation rules: `Requests_Turned_On` (no new request while the feature is off), `Resolution_Needed` (Resolved needs a Resolution).
+
+**R-PM24 Requester replies.** A non-blank Reply is moved into a new Request Comment marked From Requester and Shared, and cleared; a Waiting on Requester or Resolved request returns to In Progress.
+
+**R-PM25 Notifications.** A bell notice (type `Projects_Request`) to a new user owner, unless they assigned it to themselves; to the owner on a requester's reply and on a request that arrived from outside. An email to the requester, when they have an email address, on a shared comment from staff and when the request becomes Resolved.
+
+Overdue is true while New or In Progress past the Due Date; Waiting on Requester pauses it. Owner is the assignee, a user or a queue.
+
+### Salesforce implementation
+
+- **Object:** `Project_Request__c`, label Request, name field Auto Number `REQ-{000000}` (Request Number), sharing Read/Write, field history on.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Subject | `Subject__c` | Text(255), required |
+| Description | `Description__c` | Long Text Area(32768) |
+| Type | `Type__c` | Picklist (Question, Problem, Service Request, Change), restricted, default Service Request |
+| Category | `Category__c` | Picklist (General, Technology, Data and Reports, Facilities, Other), open, default General |
+| Priority | `Priority__c` | Picklist (Low, Medium, High, Urgent), restricted, required, default Medium, history tracked |
+| Status | `Status__c` | Picklist (New, In Progress, Waiting on Requester, Resolved, Closed, Cancelled), restricted, required, default New, history tracked |
+| Channel | `Channel__c` | Picklist (Staff, Portal, Partner Organization), restricted, set by R-PM23 |
+| Requester | `Requester__c` | Lookup(Contact), Set Null, relationship Requests |
+| Requesting Organization | `Account__c` | Lookup(Account), Set Null, relationship Requests |
+| Project | `Project__c` | Lookup(Project__c), Set Null, relationship Requests |
+| Project Task | `Project_Task__c` | Lookup(Project_Task__c), Set Null, filtered to the request's project |
+| Change Request | `Change_Request__c` | Lookup(Project_Change_Request__c), Set Null |
+| Due Date | `Due_Date__c` | Date |
+| Resolved Date | `Resolved_Date__c` | Date/Time |
+| Resolution | `Resolution__c` | Long Text Area(32768); the requester sees it |
+| Overdue | `Overdue__c` | Formula (Checkbox) |
+| Satisfaction | `Satisfaction__c` | Picklist (Satisfied, Not Satisfied), restricted |
+| Reply | `Reply__c` | Long Text Area(32768); a portal reply, emptied by R-PM24 |
+
+## 29PM17. Request Comment
+
+### Definition
+
+A note on a request, internal unless shared with the requester (D-201).
+
+### Rules
+
+Shared With Requester ships off, so a comment is internal unless staff share it; the portal shows only shared comments of the person's own requests. From Requester is set only by R-PM24. Validation rule `Body_Needed`.
+
+### Salesforce implementation
+
+- **Object:** `Project_Request_Comment__c`, label Request Comment, name field Auto Number `RC-{000000}`, master-detail to Request (`Request__c`, relationship Comments), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Request | `Request__c` | Master-Detail(Project_Request__c) |
+| Comment | `Body__c` | Long Text Area(32768) |
+| Shared With Requester | `Shared__c` | Checkbox, default false |
+| From Requester | `From_Requester__c` | Checkbox, default false |
 
 ## 29AV1. Address Verification Settings
 
@@ -19028,6 +19098,7 @@ mirrors the primary member).
 | 1.51 | 2026-11-12 | Payments subscriptions (PAY-04, D-196, release 1.20; ADR-0218 `0218-payments-subscriptions.md`). `Payment__c` gains `Subscription_Id__c` (Text(100), external ID; R-PAY6); `Payments_Settings__c` gains `Recurring_Payments__c` (Checkbox, false; Setting Definition `Payments_Recurring`); `Commitment__c` gains `Processor_Customer_Id__c` (Text(100), external ID); rule R-RH5. The seam gains `updateCard`, `isReady { recurring }`, the `startCheckout` keys `interval` and `intervalCount`, and the listener action `subscriptionsChanged`; the donor template gains `Giving.UpdateCard`. No object added. |
 | 1.52 | 2026-11-12 | Projects PSA (PM-06 to PM-12, D-197 as amended 2026-11-12, release 1.20; ADR-0219 `0219-projects-psa.md`, superseding ADR-0208 decisions 6 and 7 where they conflict). New Sections 29PM8 Project Rate (`Project_Rate__c`), 29PM9 Project Expense (`Project_Expense__c`, R-PM13), 29PM10 Project Resource (`Project_Resource__c`, R-PM14, global value set `Project_Skills`), 29PM11 Resource Request (`Resource_Request__c`, R-PM15), 29PM12 Project Invoice (`Project_Invoice__c`, R-PM16, R-PM17, R-PM22 online payment through the Payments seam by name), 29PM13 Project Invoice Line (`Project_Invoice_Line__c`), 29PM14 Project Revenue (`Project_Revenue__c`, R-PM19, R-PM21) and 29PM15 Change Request (`Project_Change_Request__c`, R-PM20). `Time_Entry__c` gains Status, Bill Rate, Cost Rate, Amount, Cost Amount, Approved By, Rejection Reason and Invoice Line (R-PM9 to R-PM12); `Project_Task__c` gains Billing Amount and Invoice Line (R-PM18); `Project__c` gains Billing Type, Retainer Amount and roll-ups Time Amount, Billable Amount, Labor Cost, Expense Amount, Change Hours, Change Amount and Recognized Revenue, Actual Hours and Billable Hours count only counted time (R-PM10), Actual Cost follows rate cards and Remaining Budget adds approved changes; `Projects_Settings__c` gains ten PSA settings, all switches off. |
 | 1.53 | 2026-11-12 | PayPal plan reuse (PAY-04b, D-198, release 1.20; ADR-0218 amendment of 2026-11-12). `Payment__c` gains `Plan_Key__c` (Text(50), external ID) and `Plan_Id__c` (Text(50)); `Payment_Keys__c` gains `PayPal_Product_Id__c` (Text(50)); rule R-PAY7: a PayPal subscription checkout reuses one product per account and one plan per mode, currency, amount and interval, each payer keeping a subscription of their own. No object added. |
+| 1.54 | 2026-11-12 | Projects requests and issues (D-201, release 1.21; ADR-NEXT `NEXT-projects-requests-and-issues.md`). New Sections 29PM16 Request (`Project_Request__c`, R-PM23 to R-PM25) and 29PM17 Request Comment (`Project_Request_Comment__c`); `Time_Entry__c` gains Request; `Projects_Settings__c` gains Track requests and issues, Take requests from outside and four due day settings, all switches off. |
 
 ---
 ## 32. Entity ownership by package
@@ -19240,6 +19311,8 @@ included; standard objects the packages extend are named by the entity that gove
 | Project Invoice Line | Project Management | 1.20 (PM-10) | 29PM13 |
 | Project Revenue | Project Management | 1.20 (PM-11) | 29PM14 |
 | Change Request | Project Management | 1.20 (PM-12) | 29PM15 |
+| Request | Project Management | 1.21 (D-201) | 29PM16 |
+| Request Comment | Project Management | 1.21 (D-201) | 29PM17 |
 | NPSP household adoption | Mirror | v0.9 | 30 |
 | Organization legal name and address keys | Core | v0.2 | 12 |
 | Default fund and appeal, tax identification number, receipt signer and file keys | Giving (Core until v0.6) | v0.2, moved v0.6 | 21A |
