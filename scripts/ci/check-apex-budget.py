@@ -202,7 +202,10 @@ CAPS = {
     # PAY-04 subscriptions (D-196, ADR-0218 payments subscriptions): Stripe and PayPal
     # subscription checkouts, renewals, subscription news to listeners and Update Card:
     # 69,202 measured 2026-11-12, plus about 0.5%.
-    "payments": 69_600,
+    # PayPal plan reuse (D-198, ADR-0218 amendment): one shared product, plans found by key and
+    # replaced when PayPal refuses them, 72,087 measured 2026-11-12; raised by the 2,702 added,
+    # plus about 2%.
+    "payments": 72_400,
     # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus

@@ -16780,6 +16780,8 @@ the money or any card or account number.
 | Checkout Url | long text | no | The hosted checkout page address. |
 | Paid At | datetime | no | When the processor reported the money captured. |
 | Subscription Id | text | no | The processor's subscription (Stripe `sub_...`, PayPal `I-...`) this payment started or renewed (R-PAY6). |
+| Plan Key | text | no | For a PayPal subscription's first payment: the mode, currency, amount and interval its billing plan charges, such as `Test:USD:25.00:MONTH:1` (R-PAY7). |
+| Plan Id | text | no | For a PayPal subscription's first payment: the PayPal billing plan (`P-...`) its subscription uses (R-PAY7). |
 | Detail | text | no | The last failure, refund or cancellation reason the processor gave; until then, what the consumer passed as `detail` (Giving: the scheduled payment charged). |
 
 ### Rules
@@ -16813,6 +16815,16 @@ mode; never its detail), with a new reference and the charged amount. A failed c
 update and a cancellation change no payment; with each paid charge they are told to the first
 payment's listener as `subscriptionsChanged`, once per run, inside a savepoint.
 
+**R-PAY7 PayPal plans reused** (D-198; ADR-0218 amendment of 2026-11-12). A PayPal subscription
+checkout reuses one catalog product per PayPal account (Payment Keys' PayPal Product Id) and one
+billing plan per Plan Key; each payer still gets a subscription of their own, so renewals,
+failures, cancellations and Update Card track to their own first payment as before. The plan is
+the Plan Id of the newest payment with the same Plan Key, read past sharing (a donor page's
+guest starts checkouts). With none, or when PayPal refuses a subscription on the remembered plan
+(missing or inactive), a new plan is made and this payment carries it, so it replaces the old one
+from then on; a product PayPal refuses a plan for is replaced the same way. Every PayPal callout
+comes first; the payment and the product id are written after.
+
 ### Salesforce implementation
 
 - **Object:** `Payment__c`, name field Auto Number (PAY-{000000}), sharing Private.
@@ -16837,6 +16849,8 @@ payment's listener as `subscriptionsChanged`, once per run, inside a savepoint.
 | Checkout Url | `Checkout_Url__c` | Long Text Area(2048) |
 | Paid At | `Paid_At__c` | DateTime |
 | Subscription Id | `Subscription_Id__c` | Text(100), external ID |
+| Plan Key | `Plan_Key__c` | Text(50), external ID (indexed: the plan is found by it) |
+| Plan Id | `Plan_Id__c` | Text(50) |
 | Detail | `Detail__c` | Text(255) |
 
 ---
@@ -16933,7 +16947,8 @@ The Payments module's org-wide choices, edited in the Payments section of BarnCR
 ### Definition
 
 The organization's own processor keys, written on the Payments Setup page and never shown again
-(only whether each is set and its last four characters).
+(only whether each is set and its last four characters), and the PayPal catalog product the
+account's subscription plans share (R-PAY7).
 
 ### Attributes
 
@@ -16944,6 +16959,7 @@ The organization's own processor keys, written on the Payments Setup page and ne
 | PayPal Client Id | text | for PayPal | The REST app's client id. |
 | PayPal Client Secret | text | for PayPal | The REST app's secret. |
 | PayPal Webhook Id | text | for PayPal | The id PayPal gives the webhook, used to verify events. |
+| PayPal Product Id | text | no | The PayPal catalog product every PayPal subscription plan belongs to, made at the first PayPal subscription checkout and written by Payments only (R-PAY7). Not a secret, and not shown on the setup page. |
 
 ### Rules
 
@@ -16961,6 +16977,7 @@ and the setup page never returns a key.
 | PayPal Client Id | `PayPal_Client_Id__c` | Text(255) |
 | PayPal Client Secret | `PayPal_Client_Secret__c` | Text(255) |
 | PayPal Webhook Id | `PayPal_Webhook_Id__c` | Text(64) |
+| PayPal Product Id | `PayPal_Product_Id__c` | Text(50) |
 
 ---
 
@@ -19003,6 +19020,7 @@ mirrors the primary member).
 | 1.50 | 2026-11-12 | Nonprofit Cloud household coexistence and conversion (MIG-02b, D-196; ADR-0216 `0216-household-model-coexistence.md`, ADR-0217 `0217-npc-household-conversion.md`). Account gains `Household_Model__c` (Automatic, Nonprofit Cloud, Converted; rule R-H15), read by the mutual exclusion guards before detection. Household Adoption (Section 29ZQ) gains rules R-HA7 to R-HA9: a Nonprofit Cloud source supplied by Mirror, NPC run ids, Junction members joined with primary, role and dates, `Household_Model__c` and the new membership rows journaled and undone. Mirror ships kit `NPC_Households` (one tool step) and a Health Check drift report. No object added. |
 | 1.51 | 2026-11-12 | Payments subscriptions (PAY-04, D-196, release 1.20; ADR-0218 `0218-payments-subscriptions.md`). `Payment__c` gains `Subscription_Id__c` (Text(100), external ID; R-PAY6); `Payments_Settings__c` gains `Recurring_Payments__c` (Checkbox, false; Setting Definition `Payments_Recurring`); `Commitment__c` gains `Processor_Customer_Id__c` (Text(100), external ID); rule R-RH5. The seam gains `updateCard`, `isReady { recurring }`, the `startCheckout` keys `interval` and `intervalCount`, and the listener action `subscriptionsChanged`; the donor template gains `Giving.UpdateCard`. No object added. |
 | 1.52 | 2026-11-12 | Projects PSA (PM-06 to PM-12, D-197 as amended 2026-11-12, release 1.20; ADR-0219 `0219-projects-psa.md`, superseding ADR-0208 decisions 6 and 7 where they conflict). New Sections 29PM8 Project Rate (`Project_Rate__c`), 29PM9 Project Expense (`Project_Expense__c`, R-PM13), 29PM10 Project Resource (`Project_Resource__c`, R-PM14, global value set `Project_Skills`), 29PM11 Resource Request (`Resource_Request__c`, R-PM15), 29PM12 Project Invoice (`Project_Invoice__c`, R-PM16, R-PM17, R-PM22 online payment through the Payments seam by name), 29PM13 Project Invoice Line (`Project_Invoice_Line__c`), 29PM14 Project Revenue (`Project_Revenue__c`, R-PM19, R-PM21) and 29PM15 Change Request (`Project_Change_Request__c`, R-PM20). `Time_Entry__c` gains Status, Bill Rate, Cost Rate, Amount, Cost Amount, Approved By, Rejection Reason and Invoice Line (R-PM9 to R-PM12); `Project_Task__c` gains Billing Amount and Invoice Line (R-PM18); `Project__c` gains Billing Type, Retainer Amount and roll-ups Time Amount, Billable Amount, Labor Cost, Expense Amount, Change Hours, Change Amount and Recognized Revenue, Actual Hours and Billable Hours count only counted time (R-PM10), Actual Cost follows rate cards and Remaining Budget adds approved changes; `Projects_Settings__c` gains ten PSA settings, all switches off. |
+| 1.53 | 2026-11-12 | PayPal plan reuse (PAY-04b, D-198, release 1.20; ADR-0218 amendment of 2026-11-12). `Payment__c` gains `Plan_Key__c` (Text(50), external ID) and `Plan_Id__c` (Text(50)); `Payment_Keys__c` gains `PayPal_Product_Id__c` (Text(50)); rule R-PAY7: a PayPal subscription checkout reuses one product per account and one plan per mode, currency, amount and interval, each payer keeping a subscription of their own. No object added. |
 
 ---
 ## 32. Entity ownership by package

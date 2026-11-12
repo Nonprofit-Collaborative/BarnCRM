@@ -152,3 +152,17 @@ Open the debug log and copy the `checkoutUrl` value into a browser.
 | 3 | In the sandbox merchant account, cancel the subscription; process. | `BILLING.SUBSCRIPTION.CANCELLED` **Applied**; no payment changes. |
 
 **Cleanup:** turn Automatic Recurring Payments off.
+
+## T-PAY-11: PayPal Payers Share One Plan
+
+**Purpose:** confirm that PayPal subscriptions reuse one product and one plan per amount and schedule, while each payer keeps a subscription of their own (D-198).
+**Prerequisites:** T-PAY-10's setup; Automatic Recurring Payments on.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Run the snippet twice with `'processor' => 'PayPal', 'interval' => 'month', 'intervalCount' => 1` (amount 25), the second time with `'payerEmail' => 'tester2@example.org'`. Open each payment. | Two payments with the same **Plan Id** (`P-...`) and two different **Subscription Id** values (`I-...`). In the PayPal sandbox merchant account, **Subscriptions**, **Plans** shows one plan, "25.00 USD every month". |
+| 2 | Open each `checkoutUrl`, agree as the sandbox buyer, and process. | Each payment is **Paid** by its own `PAYMENT.SALE.COMPLETED` event. |
+| 3 | Run the snippet again with `'amount' => 30` and the same interval. | A third payment with a new **Plan Id**; PayPal shows a second plan, "30.00 USD every month", under the same product. |
+| 4 | In PayPal, deactivate the 25.00 plan, then repeat step 1 once. | The checkout still starts. The new payment has a new **Plan Id**, and the next 25.00 monthly checkout uses that new plan. |
+
+**Cleanup:** cancel the sandbox subscriptions; turn Automatic Recurring Payments off.

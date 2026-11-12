@@ -34,7 +34,8 @@ number and runs no charging job of its own.
      saves the card; Stripe charges each period and retries a failed charge on its own schedule.
    - **PayPal:** a product, a plan with one fixed-price regular cycle, then a subscription whose
      `custom_id` is the reference; the payer approves on PayPal's page. PayPal charges each
-     period from the payer's PayPal account.
+     period from the payer's PayPal account. (Amended 2026-11-12, D-198: the product and plans
+     are shared and reused; see the amendment below.)
 2. **The first payment is the subscription's record.** The Pending payment the checkout wrote
    becomes Paid as today and gains the processor's subscription id
    (`Payment__c.Subscription_Id__c`, 29PAY1). Each later charge the processor reports as paid
@@ -117,3 +118,46 @@ number and runs no charging job of its own.
   Stripe and adjust the gift by hand).
 - Cancelling a subscription is done in the processor's dashboard (or by the donor at PayPal);
   BarnCRM records it as Cancelled at Processor and never changes the commitment's Status.
+
+## Amendment 2026-11-12: PayPal products and plans reused (D-198)
+
+**Source:** plan decision D-198 (Brandon, 2026-11-12): "It definitely needs to reuse products,
+plans, and whatever is applicable to be reused while allowing accurate tracking." Amends
+decision 1 (PayPal). Canonical model R-PAY7, version 1.53.
+
+Decision 1 made a PayPal catalog product and a billing plan for every recurring checkout (three
+callouts and two catalog objects per payer). Instead:
+
+1. **One product per PayPal account.** Its id is kept in `Payment_Keys__c.PayPal_Product_Id__c`,
+   beside the account's keys (named "{organization} recurring payments"). It is made at the first
+   PayPal subscription checkout with PayPal-Request-Id `product-{mode}`.
+2. **One plan per Plan Key** (mode, currency, amount, interval unit and count, such as
+   `Test:USD:25.00:MONTH:1`), named "25.00 USD every month". The subscription's first payment
+   keeps the key and the plan (`Payment__c.Plan_Key__c`, external ID, and `Plan_Id__c`); a
+   checkout reuses the Plan Id of the newest payment with the same key. That read runs past
+   sharing (a private inner reader, one field by key), because a donor page's guest or a portal
+   person starts checkouts and can see no other payment. A plan is made with PayPal-Request-Id
+   `plan-{key}-{product}`, so checkouts at the same moment make one plan.
+3. **Each payer keeps their own subscription**, its `custom_id` their payment's reference, so
+   renewals, failures, cancellations and Update Card track exactly as before (decisions 2 to 5).
+4. **Replaced when PayPal refuses it.** When PayPal refuses (4xx) a subscription on the
+   remembered plan (missing, inactive, another account), a new plan is made and the
+   subscription asked again (request ids gain the payment's reference); this payment carries the
+   new plan, so it replaces the old from then on. A plan refused for its product (new keys, the
+   other mode) makes a new product first, which replaces the stored one.
+5. **Callouts first.** A reused plan costs one callout (the subscription). The payment and, when
+   a product was made, the product id are written after the last callout.
+
+**Stripe is unchanged:** its Checkout Session prices inline (`price_data` with `product_data`),
+so BarnCRM makes and keeps no Stripe product or price to reuse.
+
+**Alternatives considered:** a list custom setting of plans (sharing-free, but creating list
+custom settings is off by default in new orgs and a source deploy may be refused); a Payment
+Plan object (a second object, permissions and sharing for one id per key); finding the plan by
+listing PayPal's plans (paged callouts on every checkout); checking the remembered plan with a
+GET first (one more callout on every checkout, where a refusal is already the signal).
+
+**Consequences:** the payer sees the shared plan's name on PayPal's page, not the payment's
+description. A mode switch makes a new product the first time each way. A subscription refused
+for another reason (for example a bad return address) makes one unused plan before it is
+refused.

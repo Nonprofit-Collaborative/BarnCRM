@@ -39,6 +39,8 @@
     "Payments_Health_NotScheduledTitle": "Payment Processing Is Not Scheduled",
     "Payments_Health_WaitingDetail": "Some payment events were received over an hour ago and are not applied yet. Check that processing is scheduled and that the person who scheduled it is still active.",
     "Payments_Health_WaitingTitle": "Payment News Is Waiting",
+    "Payments_PayPal_PlanName": "{0} {1} every {2}",
+    "Payments_PayPal_ProductName": "{0} recurring payments",
     "Payments_Setup_Clear": "Clear",
     "Payments_Setup_Addresses": "Give the processor the address for it. Each address is on the Site named beside it.",
     "Payments_Setup_Failed": "Payments Setup could not load or save. Try again. If it happens again, check the Error Log.",
