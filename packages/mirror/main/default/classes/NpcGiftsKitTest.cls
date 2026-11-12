@@ -8,6 +8,18 @@
  */
 @IsTest(testFor='ApexClass:NpcGiftsKit, ApexClass:MigrationKitService')
 private class NpcGiftsKitTest {
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.withPermissionSets(
+			new List<String>{
+				TestUsers.CORE_ADMIN,
+				'Rollup_Builder_Admin',
+				'Giving_Admin',
+				'Salesforce_Records_Sync'
+			}
+		);
+	}
+
 	private static final Set<String> ADDED = new Set<String>{
 		'Id',
 		'Donor',
@@ -166,6 +178,169 @@ private class NpcGiftsKitTest {
 		Assert.areEqual('Quarterly', NpcGiftsKit.frequency('Monthly', '3'), 'every 3 months');
 		Assert.areEqual('Twice a year', NpcGiftsKit.frequency('Monthly', '6'), 'every 6 months');
 		Assert.areEqual('Yearly', NpcGiftsKit.frequency('Annually', 'x'), 'annual');
+	}
+
+	@IsTest
+	static void everyStepIsRefusedWithoutNonprofitCloudAndTheFundsCheckCountsNothing() {
+		System.runAs(TestUsers.withPermissionSets(
+			new List<String>{
+				TestUsers.CORE_ADMIN,
+				'Rollup_Builder_Admin',
+				'Giving_Admin',
+				'Salesforce_Records_Sync'
+			}
+		)) {
+			NpcGiftsKit extension = new NpcGiftsKit();
+			for (String key : new List<String>{ 'funds', 'gifts', 'commitments', 'credits' }) {
+				try {
+					Assert.isNotNull(extension.rows(key, new List<SObject>()), key);
+				} catch (Exception refused) {
+					Assert.isTrue(
+						refused.getMessage().contains('this org does not have'),
+						key + ' names what is missing: ' + refused.getMessage()
+					);
+				}
+			}
+			MigrationCheck funds = extension.verify('funds');
+			Assert.areEqual(0, funds.source, 'no designations without Nonprofit Cloud');
+		}
+	}
+
+	@IsTest
+	static void everyStepsRowsAreShapedWhenNonprofitCloudHoldsNoSplitsOrTributes() {
+		System.runAs(TestUsers.withPermissionSets(
+			new List<String>{
+				TestUsers.CORE_ADMIN,
+				'Rollup_Builder_Admin',
+				'Giving_Admin',
+				'Salesforce_Records_Sync'
+			}
+		)) {
+			List<Map<String, Object>> gifts = NpcGiftsKit.shape(
+				'gifts',
+				new List<Map<String, Object>>{
+					new Map<String, Object>{
+						'Id' => '0gt000000000001AAA',
+						'DonorId' => '001000000000005AAA',
+						'OriginalAmount' => '20'
+					}
+				}
+			);
+			Assert.areEqual('Organization', gifts[0].get('Donor'), 'an account donor');
+			Assert.areEqual('0gt000000000001AAA', gifts[0].get('GiftTransactionId'), 'its link');
+			Assert.areEqual('', gifts[0].get('TributeType'), 'no tribute');
+			Assert.isFalse(gifts[0].containsKey('Fund1'), 'no designations, no split');
+
+			List<Map<String, Object>> commitments = NpcGiftsKit.shape(
+				'commitments',
+				new List<Map<String, Object>>{
+					new Map<String, Object>{
+						'Id' => '0gc000000000001AAA',
+						'DonorId' => '001000000000005AAA',
+						'ScheduleType' => 'Recurring',
+						'NextTransactionAmount' => '25',
+						'ExpectedTotalCmtAmount' => '300',
+						'EffectiveTransactionPeriod' => 'Month',
+						'EffectiveTransactionInterval' => '1'
+					}
+				}
+			);
+			Assert.areEqual('Recurring', commitments[0].get('Type'), 'a recurring commitment');
+			Assert.areEqual('25', commitments[0].get('Amount'), 'the next transaction amount');
+			Assert.areEqual('Monthly', commitments[0].get('Frequency'), 'monthly');
+
+			List<Map<String, Object>> credits = NpcGiftsKit.shape(
+				'credits',
+				new List<Map<String, Object>>{
+					new Map<String, Object>{
+						'RecipientId' => '001000000000005AAA',
+						'Role' => 'Honoree',
+						'GiftTransaction.OriginalAmount' => '10'
+					}
+				}
+			);
+			Assert.areEqual('Honoree', credits[0].get('CreditRole'), 'BarnCRM role');
+			Assert.areEqual('10', credits[0].get('Amount'), 'the gift amount');
+
+			List<Map<String, Object>> funds = NpcGiftsKit.shape(
+				'funds',
+				new List<Map<String, Object>>{
+					new Map<String, Object>{
+						'Id' => '0gd000000000009AAA',
+						'Name' => 'Zzz Unmatched Designation'
+					}
+				}
+			);
+			Assert.areEqual(1, funds.size(), 'no fund has it yet');
+		}
+	}
+
+	@IsTest
+	static void aReadReturnsWhatTheObjectHoldsAndNothingForAnUnknownFieldOrObject() {
+		System.runAs(TestUsers.withPermissionSets(
+			new List<String>{
+				TestUsers.CORE_ADMIN,
+				'Rollup_Builder_Admin',
+				'Giving_Admin',
+				'Salesforce_Records_Sync'
+			}
+		)) {
+			Contact ana = new Contact(LastName = 'Giftskit');
+			insert ana;
+			Assert.areEqual(
+				1,
+				NpcGiftsKit.read(
+						'SELECT Id FROM Contact WHERE Id IN :ids',
+						new Set<String>{ ana.Id }
+					)
+					.size(),
+				'a present object is read'
+			);
+			Assert.isTrue(
+				NpcGiftsKit.read('SELECT Id FROM Contact WHERE Id IN :ids', new Set<String>())
+					.isEmpty(),
+				'no ids, no query'
+			);
+			Assert.isTrue(
+				NpcGiftsKit.read('SELECT Id FROM NoSuchObject__x', null).isEmpty(),
+				'an absent object reads as none'
+			);
+			Assert.isTrue(
+				NpcGiftsKit.read(
+						'SELECT No_Such_Field__c FROM Contact WHERE Id IN :ids',
+						new Set<String>{ ana.Id }
+					)
+					.isEmpty(),
+				'a field the object lacks reads as none'
+			);
+		}
+	}
+
+	@IsTest
+	static void aPeriodAndIntervalChooseBarnFrequencyAndAPersonRecipientIsAContact() {
+		// runs-as: deploying user (text rows only, no record or permission is read)
+		Assert.areEqual('Weekly', NpcGiftsKit.frequency('Weeks', '1'), 'every week');
+		Assert.areEqual('Every two weeks', NpcGiftsKit.frequency('Weekly', '2'), 'two weeks');
+		Assert.areEqual('Quarterly', NpcGiftsKit.frequency('Quarterly', null), 'quarters');
+		Assert.areEqual('Yearly', NpcGiftsKit.frequency('Year', '1'), 'a year');
+		Assert.areEqual('Monthly', NpcGiftsKit.frequency(null, null), 'unknown');
+		Map<String, Object> credit = new Map<String, Object>{
+			'RecipientId' => '001000000000004AAA',
+			'Role' => null,
+			'SoftCreditAmount' => '75'
+		};
+		NpcGiftsKit.creditRow(
+			credit,
+			new Map<String, String>{ '001000000000004AAA' => '003000000000004AAA' }
+		);
+		Assert.areEqual(
+			'003000000000004AAA',
+			credit.get('ContactId'),
+			'the person account contact'
+		);
+		Assert.areEqual('', credit.get('AccountId'), 'not an organization');
+		Assert.areEqual('Soft Credit', credit.get('CustomRole'), 'blank role');
+		Assert.areEqual('75', credit.get('Amount'), 'its own amount');
 	}
 
 	@IsTest

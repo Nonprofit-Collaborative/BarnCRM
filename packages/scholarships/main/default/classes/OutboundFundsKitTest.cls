@@ -7,6 +7,11 @@
  */
 @IsTest(testFor='ApexClass:OutboundFundsKit, ApexClass:MigrationKitService')
 private class OutboundFundsKitTest {
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.adminWith(ScholarshipsTestData.ADMIN_SET);
+	}
+
 	private static final Map<String, String> TARGET_BY_STEP = new Map<String, String>{
 		'programs' => 'Award_Program__c',
 		'cycles' => 'Award_Cycle__c',
@@ -44,6 +49,40 @@ private class OutboundFundsKitTest {
 					Assert.isTrue(
 						step.fields.contains(heading) || heading == OutboundFundsKit.PARENT_COLUMN,
 						key + ' maps only what it reads: ' + heading
+					);
+				}
+			}
+		}
+	}
+
+	@IsTest
+	static void everyRowKeepsItsIdAsTheParentColumn() {
+		// runs-as: deploying user (text rows only, no record or permission is read)
+		List<Map<String, Object>> rows = new List<Map<String, Object>>{
+			new Map<String, Object>{ 'Id' => 'a0x000000000001AAA' },
+			new Map<String, Object>{ 'Id' => 'a0x000000000002AAA' }
+		};
+		OutboundFundsKit.linkToParent(rows);
+		Assert.areEqual('a0x000000000001AAA', rows[0].get(OutboundFundsKit.PARENT_COLUMN), 'first');
+		Assert.areEqual(
+			'a0x000000000002AAA',
+			rows[1].get(OutboundFundsKit.PARENT_COLUMN),
+			'second'
+		);
+	}
+
+	@IsTest
+	static void cycleAndAwardStepsAreRefusedWithoutOutboundFunds() {
+		System.runAs(TestUsers.adminWith(ScholarshipsTestData.ADMIN_SET)) {
+			for (String key : new List<String>{ 'cycles', 'awards' }) {
+				try {
+					List<Map<String, Object>> rows = new OutboundFundsKit()
+						.rows(key, new List<SObject>());
+					Assert.isTrue(rows.isEmpty(), key + ': no records, no rows');
+				} catch (Exception refused) {
+					Assert.isTrue(
+						refused.getMessage().contains('this org does not have'),
+						key + ' names what is missing: ' + refused.getMessage()
 					);
 				}
 			}

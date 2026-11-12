@@ -28,6 +28,12 @@ public with sharing class NpcGiftsKit implements MigrationKitExtension {
 				MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), stepKey)
 			)
 			.rows(records);
+		return shape(stepKey, rows);
+	}
+
+	/** One step's rows as the kit's templates read them. */
+	@TestVisible
+	private static List<Map<String, Object>> shape(String stepKey, List<Map<String, Object>> rows) {
 		if (stepKey == 'funds') {
 			return newFunds(rows, fundKeys());
 		}
@@ -288,6 +294,7 @@ public with sharing class NpcGiftsKit implements MigrationKitExtension {
 	 * The records of a Nonprofit Cloud object, in the user's access; none when the org lacks
 	 * the object or the query names a field it does not have.
 	 */
+	@TestVisible
 	private static List<SObject> read(String query, Set<String> ids) {
 		String objectName = query.substringAfter(' FROM ').substringBefore(' ').trim();
 		if (

@@ -410,6 +410,73 @@ private class MigrationKitServiceTest {
 		}
 	}
 
+	@IsTest
+	static void aStagingJobThatCannotReadItsSourceMarksTheBatchFailedWithTheReason() {
+		System.runAs(TestUsers.admin()) {
+			Import_Template__c template = ImportTemplateService.createObjectTemplate(
+				'Migration failure',
+				'Contact'
+			);
+			Import_Batch__c batch = ImportTestDataFactory.batch(template);
+			useKit(importStep(template.Template_Key__c, LAST_NAME, '["Email"]'), null, null);
+
+			// A kit the catalog does not hold: the locator cannot be built.
+			MigrationStageBatch job = new MigrationStageBatch(batch.Id, 'No_Such_Kit', 'people');
+			Database.QueryLocator locator = job.start(null);
+			Assert.isNotNull(locator, 'An empty locator keeps the job running to finish');
+			job.execute(null, new List<SObject>());
+			job.finish(null);
+
+			Import_Batch__c failed = [
+				SELECT Status__c, Run_Log__c
+				FROM Import_Batch__c
+				WHERE Id = :batch.Id
+			];
+			Assert.areEqual(ImportBatchService.STATUS_FAILED, failed.Status__c, 'Failed');
+			Assert.isTrue(
+				failed.Run_Log__c.startsWith('Reading the records stopped:'),
+				'The reason is in the run log: ' + failed.Run_Log__c
+			);
+		}
+	}
+
+	@IsTest
+	static void aPageThatCannotBeStagedStopsTheJobAndFailsTheBatch() {
+		System.runAs(TestUsers.admin()) {
+			Import_Template__c template = ImportTemplateService.createObjectTemplate(
+				'Migration page failure',
+				'Contact'
+			);
+			Import_Batch__c batch = ImportTestDataFactory.batch(template);
+			insert new Contact(LastName = LAST_NAME);
+			useKit(importStep(template.Template_Key__c, LAST_NAME, '["Email"]'), null, null);
+
+			MigrationStageBatch job = new MigrationStageBatch(batch.Id, KIT, 'people');
+			Assert.isNotNull(job.start(null), 'The source is readable');
+			// The page lacks the step's Email column, so reading its rows fails.
+			job.execute(null, [SELECT Id FROM Contact WHERE LastName = :LAST_NAME]);
+			// Once stopped, later pages are skipped.
+			job.execute(null, [SELECT Id, Email FROM Contact WHERE LastName = :LAST_NAME]);
+			job.finish(null);
+
+			Import_Batch__c failed = [
+				SELECT Status__c, Run_Log__c, Row_Count__c
+				FROM Import_Batch__c
+				WHERE Id = :batch.Id
+			];
+			Assert.areEqual(ImportBatchService.STATUS_FAILED, failed.Status__c, 'Failed');
+			Assert.isTrue(
+				failed.Run_Log__c.startsWith('Reading the records stopped:'),
+				'The reason is in the run log: ' + failed.Run_Log__c
+			);
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Import_Row__c WHERE Import_Batch__c = :batch.Id],
+				'Nothing was staged'
+			);
+		}
+	}
+
 	/** A kit extension that checks only the step named one. */
 	private class FakeExtension implements MigrationKitExtension {
 		public List<Map<String, Object>> rows(String stepKey, List<SObject> records) {

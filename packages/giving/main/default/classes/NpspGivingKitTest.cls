@@ -84,6 +84,91 @@ private class NpspGivingKitTest {
 	}
 
 	@IsTest
+	static void aRecurringFrequencyKeepsThePeriodUnlessMonthlyCountsMatch() {
+		// runs-as: deploying user (text values only, no record or permission is read)
+		Assert.areEqual('Yearly', NpspGivingKit.frequencyOf('Monthly', '12'), 'every 12 months');
+		Assert.areEqual('Monthly', NpspGivingKit.frequencyOf('Monthly', '5'), 'other count');
+		Assert.areEqual('Monthly', NpspGivingKit.frequencyOf('Monthly', 'often'), 'not a number');
+		Assert.areEqual('Quarterly', NpspGivingKit.frequencyOf('Monthly', ' 3 '), 'padded');
+		Assert.areEqual('Yearly', NpspGivingKit.frequencyOf('Yearly', ''), 'kept');
+	}
+
+	@IsTest
+	static void recurringAndPlanStepRowsGetTheirComputedColumns() {
+		// runs-as: deploying user (text rows only, no record or permission is read)
+		List<Map<String, Object>> recurring = new List<Map<String, Object>>{
+			new Map<String, Object>{
+				'npe03.Next_Payment_Date__c' => '2026-12-15',
+				'npe03.Date_Established__c' => '2019-01-15',
+				'npe03.Installment_Period__c' => 'Monthly',
+				'npsp.InstallmentFrequency__c' => '3',
+				'npsp.Status__c' => '',
+				'npe03.Open_Ended_Status__c' => 'Open'
+			},
+			new Map<String, Object>{
+				'npe03.Date_Established__c' => '2019-01-15',
+				'npe03.Installment_Period__c' => 'Weekly',
+				'npsp.Status__c' => 'Closed'
+			}
+		};
+		NpspGivingKit.shapeRows('recurringPeople', recurring);
+		Assert.areEqual('2026-12-15', recurring[0].get(NpspGivingKit.START_COLUMN), 'next payment');
+		Assert.areEqual('Quarterly', recurring[0].get(NpspGivingKit.FREQUENCY_COLUMN), 'every 3');
+		Assert.areEqual('Open', recurring[0].get(NpspGivingKit.STATUS_COLUMN), 'open ended');
+		Assert.areEqual('2019-01-15', recurring[1].get(NpspGivingKit.START_COLUMN), 'established');
+		Assert.areEqual('Closed', recurring[1].get(NpspGivingKit.STATUS_COLUMN), 'its own status');
+
+		List<Map<String, Object>> steps = new List<Map<String, Object>>{
+			new Map<String, Object>{ 'npsp.Days_After__c' => '7' }
+		};
+		NpspGivingKit.shapeRows('planSteps', steps);
+		Assert.areEqual('7', steps[0].get('Order'), 'ordered by days after');
+		Assert.areEqual('Record owner', steps[0].get('AssignTo'), 'no assigned user');
+	}
+
+	@IsTest
+	static void namesReadOneFieldOfEveryRecordAndNothingWithoutTheObject() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			insert new List<Account>{
+				new Account(Name = 'Kit One'),
+				new Account(Name = 'Kit Two')
+			};
+			Set<String> found = NpspGivingKit.names(
+				'SELECT Name FROM Account WHERE Name LIKE \'Kit %\'',
+				'Name'
+			);
+			Assert.areEqual(new Set<String>{ 'Kit One', 'Kit Two' }, found, 'both accounts');
+			Assert.isTrue(
+				NpspGivingKit.names('SELECT Name FROM npsp~Level__c', 'Name').isEmpty(),
+				'no NPSP, no names'
+			);
+		}
+	}
+
+	@IsTest
+	static void stepsReadingNpspObjectsAreRefusedWithoutThem() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			NpspGivingKit extension = new NpspGivingKit();
+			for (
+				String key : new List<String>{
+					'recurringPeople',
+					'recurringOrganizations',
+					'planSteps'
+				}
+			) {
+				try {
+					Assert.isNotNull(extension.rows(key, new List<SObject>()), key);
+				} catch (Exception refused) {
+					Assert.isTrue(
+						refused.getMessage().contains('this org does not have'),
+						key + ' names what is missing: ' + refused.getMessage()
+					);
+				}
+			}
+		}
+	}
+
+	@IsTest
 	static void anEngagementPlanTaskGetsOrderAndAssignment() {
 		// runs-as: deploying user (text rows only, no record or permission is read)
 		Map<String, Object> assigned = new Map<String, Object>{

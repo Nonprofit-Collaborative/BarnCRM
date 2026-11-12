@@ -35,6 +35,13 @@ public with sharing class V4sMigrationKit implements MigrationKitExtension {
 			MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), stepKey)
 		);
 		List<Map<String, Object>> rows = source.rows(records);
+		shapeShifts(rows);
+		return rows;
+	}
+
+	/** Each shift row's End and Status columns, from its V4S start and length. */
+	@TestVisible
+	private static void shapeShifts(List<Map<String, Object>> rows) {
 		for (Map<String, Object> row : rows) {
 			String startText = (String) row.get(START_FIELD);
 			String hoursText = (String) row.get(DURATION_FIELD);
@@ -45,7 +52,6 @@ public with sharing class V4sMigrationKit implements MigrationKitExtension {
 			row.put(END_COLUMN, endOf(starts, hours));
 			row.put(STATUS_COLUMN, statusOf(starts, System.now()));
 		}
-		return rows;
 	}
 
 	@NamespaceAccessible

@@ -31,7 +31,13 @@ public with sharing class EssentialsMigrationKit implements MigrationKitExtensio
 			MigrationKitService.stepNamed(MigrationKitService.kitNamed(KIT), stepKey)
 		);
 		List<Map<String, Object>> rows = source.rows(records);
-		Date today = MembershipService.today();
+		shapeRows(stepKey, rows, MembershipService.today());
+		return rows;
+	}
+
+	/** A level's Months, or a membership's Ends and Status as of today. */
+	@TestVisible
+	private static void shapeRows(String stepKey, List<Map<String, Object>> rows, Date today) {
 		for (Map<String, Object> row : rows) {
 			if (stepKey == LEVELS) {
 				row.put(
@@ -45,7 +51,6 @@ public with sharing class EssentialsMigrationKit implements MigrationKitExtensio
 				row.put('Status', statusOf(ends, today));
 			}
 		}
-		return rows;
 	}
 
 	@NamespaceAccessible
