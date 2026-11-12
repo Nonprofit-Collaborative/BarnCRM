@@ -28,8 +28,9 @@ private class FieldHistoryServiceTest {
 	}
 
 	private static List<Address__c> addresses(Integer howMany) {
-		Account household = HouseholdTestDataFactory.newHousehold('Zztest History');
-		insert household;
+		Account household = HouseholdTestDataFactory.insertHouseholds(
+			new List<Account>{ HouseholdTestDataFactory.newHousehold('Zztest History') }
+		)[0];
 		List<Address__c> result = new List<Address__c>();
 		for (Integer i = 0; i < howMany; i++) {
 			result.add(

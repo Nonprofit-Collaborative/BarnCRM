@@ -31,6 +31,10 @@
     <value xsi:type="xsd:string">Membership__c</value>
   </values>
   <values>
+    <field>Show_Only_When_Installed__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+  <values>
     <field>Related_Module__c</field>
     <value xsi:type="xsd:string">BarnCRM Memberships</value>
   </values>

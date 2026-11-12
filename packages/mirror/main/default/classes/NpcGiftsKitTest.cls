@@ -40,7 +40,15 @@ private class NpcGiftsKitTest {
 
 	@IsTest
 	static void eachStepHasItsTemplateAndNamesOnlyWhatItReads() {
-		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+		// The kit reads Mirror's Gift Designation ID on Fund, which Salesforce Records Sync grants.
+		System.runAs(TestUsers.withPermissionSets(
+			new List<String>{
+				TestUsers.CORE_ADMIN,
+				'Rollup_Builder_Admin',
+				'Giving_Admin',
+				'Salesforce_Records_Sync'
+			}
+		)) {
 			Migration_Kit__mdt kit = MigrationKitService.kitNamed(NpcGiftsKit.KIT);
 			ImportTemplateService.materializeDefaults();
 			Map<String, String> targetByStep = new Map<String, String>{
