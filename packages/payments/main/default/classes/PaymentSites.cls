@@ -43,6 +43,13 @@ public with sharing class PaymentSites {
 			ORDER BY MasterLabel
 			LIMIT :SITE_LIMIT
 		];
+		cached = describe(sites);
+		return cached;
+	}
+
+	/** The Sites with their secure addresses. Test-visible because a test cannot create a Site. */
+	@TestVisible
+	private static List<SiteInfo> describe(List<Site> sites) {
 		Set<String> durableIds = new Set<String>();
 		for (Site one : sites) {
 			durableIds.add(String.valueOf(one.Id).left(15));
@@ -59,16 +66,16 @@ public with sharing class PaymentSites {
 				urlByShortId.put(detail.DurableId.left(15), detail.SecureUrl);
 			}
 		}
-		cached = new List<SiteInfo>();
+		List<SiteInfo> infos = new List<SiteInfo>();
 		for (Site one : sites) {
 			SiteInfo info = new SiteInfo();
 			info.name = one.MasterLabel;
 			info.guestUserId = one.GuestUserId;
 			String url = urlByShortId.get(String.valueOf(one.Id).left(15));
 			info.url = url == null ? null : url.removeEnd('/');
-			cached.add(info);
+			infos.add(info);
 		}
-		return cached;
+		return infos;
 	}
 
 	/** The guest users of the active Sites. */
