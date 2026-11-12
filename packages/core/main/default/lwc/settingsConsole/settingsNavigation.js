@@ -60,6 +60,7 @@ const GROUPS = [
     label: PROGRAMS,
     sections: [
       ['Programs', 'utility:education'],
+      ['Territory Management', 'utility:world'],
       ['Logic Models', 'utility:hierarchy'],
       ['Volunteers', 'utility:people'],
       ['Events', 'utility:event']

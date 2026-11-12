@@ -35,6 +35,7 @@ on and off; a job without a switch runs whenever its module is on):
 | 3:00 | Volunteer schedules | Volunteers | No switch |
 | 3:15 | Pledge reminders | Giving | Pledge Reminders page (off until switched on) |
 | 3:30 | Indicator results | Logic Models | No switch |
+| 5:45 | Territory assignment (records with no territory yet) | Territory Management | **Nightly Jobs** panel (off until switched on) |
 | 6:00 | Grant reminders | Funders | No switch |
 | 7:00 | Volunteer shift reminders | Volunteers | No switch |
 | 7:15 | Volunteer unfilled shift nudges | Volunteers | No switch (the **Send unfilled shift nudges** setting decides) |
@@ -52,7 +53,8 @@ Mirror, Volunteers, Logic Models, Funders). The Nightly Jobs panel lists every j
 The panel shows:
 
 - whether the nightly run is scheduled, and when it last started and how it ended;
-- every job in the order the run takes it, with its **Time**, its **Status** (On or Off), its
+- every job in the order the run takes it, with its **Time**, its **Status** (On, Off, or
+  Not Scheduled when it is on but the nightly run is not scheduled, so it does not run yet), its
   **Last Run** and its **Result**: Done, Done With Errors, Failed, Skipped (it was off),
   Gave Up Waiting, or Running.
 

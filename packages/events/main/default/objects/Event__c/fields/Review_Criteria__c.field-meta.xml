@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Review_Criteria__c</fullName>
+  <description>EV-21, R-SA6: the call for speakers' weighted criteria as JSON, a list of up to 10 { "label", "weight" }. Set from Scoring Criteria on the Applications tab.</description>
+  <externalId>false</externalId>
+  <inlineHelpText>The criteria reviewers score proposals on, with their weights. Set them with Scoring Criteria on the Applications tab.</inlineHelpText>
+  <label>Review Criteria</label>
+  <length>5000</length>
+  <trackTrending>false</trackTrending>
+  <type>LongTextArea</type>
+  <visibleLines>3</visibleLines>
+</CustomField>

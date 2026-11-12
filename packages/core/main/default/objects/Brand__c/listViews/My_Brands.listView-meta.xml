@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>My_Brands</fullName>
+  <columns>NAME</columns>
+  <columns>Active__c</columns>
+  <columns>Is_Default__c</columns>
+  <columns>Legal_Entity__c</columns>
+  <columns>Sender_Email__c</columns>
+  <filterScope>Mine</filterScope>
+  <label>My Brands</label>
+</ListView>

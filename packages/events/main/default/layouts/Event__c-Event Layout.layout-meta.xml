@@ -116,6 +116,20 @@
     <customLabel>true</customLabel>
     <detailHeading>true</detailHeading>
     <editHeading>true</editHeading>
+    <label>Call for Speakers</label>
+    <style>TwoColumnsTopToBottom</style>
+    <layoutColumns>
+      <layoutItems>
+        <behavior>Edit</behavior>
+        <field>Blind_Review__c</field>
+      </layoutItems>
+    </layoutColumns>
+    <layoutColumns />
+  </layoutSections>
+  <layoutSections>
+    <customLabel>true</customLabel>
+    <detailHeading>true</detailHeading>
+    <editHeading>true</editHeading>
     <label>Description</label>
     <style>OneColumn</style>
     <layoutColumns>

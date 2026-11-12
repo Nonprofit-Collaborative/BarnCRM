@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<EmailTemplate xmlns="http://soap.sforce.com/2006/04/metadata">
+  <available>true</available>
+  <description>
+    A renewal reminder BarnCRM ships to start from, sent before a membership ends when reminders are
+    on in Memberships settings. Edit it, or write your own and name it there. The member is the
+    contact it is addressed to; the membership is the record it is about.
+  </description>
+  <encodingKey>UTF-8</encodingKey>
+  <name>BarnCRM: membership renewal reminder</name>
+  <style>none</style>
+  <subject>Your {!Membership_Term__c.Member_Name__c} membership ends soon</subject>
+  <type>text</type>
+  <uiType>Aloha</uiType>
+</EmailTemplate>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>
+    The Grid tool (C-41, C-41b): a saved Find query's records in an editable table, with up to two
+    kinds of related record on the same screen, saved as a named grid. Shown by c/findPage.
+  </description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

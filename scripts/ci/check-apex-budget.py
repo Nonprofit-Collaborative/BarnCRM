@@ -136,7 +136,10 @@ CAPS = {
     # Batch C wave 3 landing: 186,595 measured (sample data C-10, EV-13 seating, EV-17 badges,
     # EV-18 survey, EV-19 calendar, EV-16 public pages, PB-07 EventsPortalExtension), plus
     # about 2%.
-    "events": 190_300,
+    # Release 1.5 EVT-A (branch feature/evt-a-ev20-21-26-27): 217,924 measured (EV-20 paid
+    # registration through Payments, EV-21 proposal scoring, EV-26 badge overrides, EV-27
+    # session ratings), plus about 2%.
+    "events": 222_300,
     # Portal Builder (PB-01, ADR-0185 portal builder): sign-in, sessions, template checks and the
     # person-scoped portal API. 49,205 measured at first build (the API is the security boundary,
     # so every check stays in Apex), plus about 2%.
@@ -164,6 +167,14 @@ CAPS = {
     # reviews, awards, form intake, portal actions, reminders, the payment rule and the page
     # controller, 49,326 measured (Prettier line breaks included), plus about 2%.
     "scholarships": 50_300,
+    # Territory Management (C-40, C-40b, ADR-NEXT territory management module): the model PR
+    # ships no Apex (0 measured). The Apex PR: access sync, post-install, routing, the run
+    # batch, the page controller and the nightly step, 31,041 measured, plus about 2%.
+    "territory": 31_700,
+    # Memberships (G-22a to G-22d, PAY-02, ADR-NEXT memberships module): terms, renewals, the
+    # nightly run, payment links, the Essentials kit, portal and erasure seams, 39,406 measured
+    # on 2026-11-11, plus about 2 percent. PB-09's directory adds no Apex.
+    "memberships": 40_200,
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, plus about 1%.
     "mirror": 189_200,
 }

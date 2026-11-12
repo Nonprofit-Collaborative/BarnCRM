@@ -6,7 +6,8 @@
  * Asked only while an Open or Closed event has Public Page on, of a viewer who may manage
  * settings:
  * - no package that serves public pages (BarnCRM Forms) is installed: the pages cannot be shown;
- * - an Open public event names no registration form: its page shows details only.
+ * - an Open public event names no registration form: its page shows details only;
+ * - Take payment online is on but BarnCRM Payments is not installed or its keys are missing (EV-20).
  *
  * `@NamespaceAccessible`, public, with a public no-argument constructor, because Core resolves it
  * with `Type.forName` under ADR-0017.
@@ -17,6 +18,8 @@ public with sharing class EventsHealthCheckExtension implements HealthCheckExten
 	private static final String NO_HOST = 'events_public_no_host';
 	@TestVisible
 	private static final String NO_FORM = 'events_public_no_form';
+	@TestVisible
+	private static final String PAYMENTS_NOT_READY = 'events_payments_not_ready';
 	private static final Set<String> SHOWN_STATUSES = new Set<String>{ 'Open', 'Closed' };
 
 	@NamespaceAccessible
@@ -37,6 +40,18 @@ public with sharing class EventsHealthCheckExtension implements HealthCheckExten
 			addFindings(found);
 		} catch (Exception e) {
 			found.add(HealthCheckService.checkFailed('events_public', e));
+		}
+		// EV-20: Take payment online is on but Payments cannot take the payment.
+		if (EventsSettings.onlinePayments() && !EventPayments.takesOnline()) {
+			found.add(
+				new HealthCheckService.Finding(
+					PAYMENTS_NOT_READY,
+					BarnHelp.text('Events', 'Events_Health_PaymentsNotReadyTitle'),
+					BarnHelp.text('Events', 'Events_Health_PaymentsNotReadyDetail'),
+					HealthCheckService.SEVERITY_WARNING,
+					HealthCheckService.CATEGORY_SETTINGS
+				)
+			);
 		}
 		return found;
 	}
