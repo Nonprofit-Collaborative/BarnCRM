@@ -3304,7 +3304,7 @@ unchanged.
 | Job Id | text | computed | The job running the current dry run or commit, so a pass still running can be told from one the platform aborted (R-IB13). |
 | File Values | long text | no | Values applied to every row of this file that does not carry its own, held as the defaults half of a mapping document (R-IT1, R-IB14). |
 | Match Only | boolean | yes (defaults false) | When true, this file only matches: a row whose person or organization matches no record is rejected rather than creating one (R-IB15). |
-| Operation | picklist(Import, Update, Delete, Access) | yes (defaults Import) | What kind of data job this is: a file import, a bulk update (R-BU1), a bulk delete (R-BD1) or a field access change (R-FA1). Empty on a batch created before v0.7, which reads as Import. |
+| Operation | picklist(Import, Update, Delete, Access, Backup, Files) | yes (defaults Import) | What kind of data job this is: a file import, a bulk update (R-BU1), a bulk delete (R-BD1), a field access change (R-FA1), a Backup Set run (R-SQ15) or a files import (R-FI1). Empty on a batch created before v0.7, which reads as Import. |
 | Bulk Update Definition | long text | conditional | For a bulk update, the query document, the changes and the confirmed count it ran with (R-BU1); for a bulk delete, the query document and the confirmed count (R-BD1); empty for an import. |
 | Rows Deleted | integer | computed | How many records a bulk delete deleted (R-BD3); empty for any other data job. |
 | Trial Rows | integer | computed | How many of the file's first rows a trial import committed (R-IB16); empty when the file was committed whole. |
@@ -3688,7 +3688,7 @@ them (R-IB8, R-IB9).
 | Job Id | `Job_Id__c` | Text (18) |
 | File Values | `File_Values_JSON__c` | Long Text Area (32768) |
 | Match Only | `Match_Only__c` | Checkbox (default false) |
-| Operation | `Operation__c` | Picklist: Import, Update, Delete, Access (default Import) |
+| Operation | `Operation__c` | Picklist: Import, Update, Delete, Access, Backup, Files (default Import) |
 | Bulk Update Definition | `Operation_JSON__c` | Long Text Area (131072) |
 | Rows Deleted | `Rows_Deleted__c` | Number (9, 0) |
 | Trial Rows | `Trial_Rows__c` | Number (9, 0) |
@@ -8776,6 +8776,27 @@ the key, so a saved grid runs in Find as the same query. The Grid edits through 
 Update data job per save) and saves, shares and deletes through the saved query's own rules
 (R-SQ4 to R-SQ6). No object or field is added.
 
+**R-SQ15 Backup Sets** (C-66, D-157; ADR-NEXT `NEXT-backup-sets.md`). The document has one more
+optional key, `backup`: `{ "version": 1 }`. It marks a saved query as a Backup Set; Find and the
+compiler ignore it. Only the query's owner adds or removes it, and only a person holding both
+Manage BarnCRM Settings and Find and Export Records may see the Backup Sets panel or run a set.
+
+- **A run.** Running a set the person may read (their own or a shared one) compiles it, then
+  creates an `Import_Batch__c` with Operation Backup, Status Committing, Committed By the person
+  and the definition `{ "version": 1, "savedQueryId", "name", "object" }`, and starts
+  `FindExportBatch` in backup mode: R-BD9's file (every readable field, API name headings, Id
+  order, user mode, C-36's parts and titles) at most Find's export row limit, with no delete.
+- **Its finish.** The job becomes Complete, or Failed when a part could not be written or the
+  query could not run, with Completed At, Row Count (rows written), File Id (the first part's
+  document), File Name (its title) and a Run Log line naming the parts. A run that wrote exactly
+  the limit says in its log that the set may hold more. The Q-04 notification opens the first
+  part. Nothing is deleted, by the run or later: the files are the person's.
+- **The run list.** The person's own Backup jobs, newest first (`DataJobs.read`); Data Jobs lists
+  them too. A Backup job has no undo and is not listed as an import.
+- **Restore.** No code: the file is loaded with Load one object as Update by record ID (values of
+  records that still exist) or Create (records since deleted, as new records), as R-BD9's file is.
+- **Schedule.** None until C-38 (D-39).
+
 ### Salesforce implementation
 
 - **Object:** `Saved_Query__c`, sharing model Private.
@@ -8801,6 +8822,63 @@ Update data job per save) and saves, shares and deletes through the saved query'
 - **Data hygiene (R-SQ6):** services `DataHygieneService`, `DataHygieneController`; UI the Data quality section
   of the Org Optimizer tab (app page `Data_Hygiene`, shell `orgOptimizer`, component
   `dataHygieneConsole`).
+- **Backup Sets (R-SQ15):** services `BackupSetService`, `BackupSetController`; UI the Backup Sets
+  panel of the Data Manager tab (component `backupSets`).
+
+---
+
+## 29FI. Files import
+
+### Definition
+
+Files and attachments from another system loaded into Salesforce Files, each linked to a record,
+from a zip that carries a manifest (C-70, D-157; ADR-NEXT `NEXT-files-import.md`). No object of
+its own: a data job (`Import_Batch__c`, Operation Files), its journal (Section 17A) and the
+platform's `ContentVersion` and `ContentDocument`.
+
+### Rules
+
+**R-FI1 The zip.** A `.zip` whose root holds `manifest.csv`, with a heading row and one row per
+file. Headings are matched ignoring case and spaces: `File` (required, the file's path in the
+zip), `Record Id` (required, a 15 or 18 character Salesforce record Id), `Title` (optional,
+default the file name less its extension, at most 255 characters) and `Description` (optional, at
+most 1,000 characters). Other columns are ignored. A manifest with more than 2,000 rows is
+refused. The zip and the manifest are read in the browser (`c/zipReader`, `c/csvParser`).
+
+**R-FI2 Dry run.** Loads nothing. Each row is refused, with its reason, when the file is not in
+the zip, is empty or larger than 2 MB, its Record Id is blank or not an Id, the same file and
+record are on an earlier row, or (checked on the server, in user mode) no record with that Id
+exists that the person can see. The page shows the counts and every refused row, and offers the
+rows as a CSV.
+
+**R-FI3 Load.** Only the rows the dry run accepted. The start creates the job (Operation Files,
+Status Committing, Row Count the rows to load, Undo Deadline the import undo window from now,
+R-IB7). The page then sends the files in groups of at most 2 MB or 20 files; each is inserted as
+the person as a `ContentVersion` with `FirstPublishLocationId` its record, so the person owns
+the document and the record shows it. A file the platform refuses is counted as rejected with
+the platform's reason. Each group writes one journal page (R-IJ1): a Created entry
+(`object` ContentDocument, `id`, `row`, `recordId`) per file saved and a Failed entry per file
+refused, and adds to the job's Rows Created and Rows Rejected. The finish makes the job
+Complete with a Run Log summary. A page closed in the middle leaves the job Committing with what
+was sent, read as Failed (R-IB13) and undoable.
+
+**R-FI4 Undo.** Within the Undo Deadline, once, by the person who loaded it or someone managing
+BarnCRM Settings: every document the journal lists as Created is deleted as the person, except
+one whose latest version is not the one the import saved (it changed since), which is kept and
+counted. The job becomes Undone with a Run Log line of what was deleted and kept. Synchronous: a
+job holds at most 2,000 files.
+
+**R-FI5 Permission.** Manage BarnCRM Settings, as for every import; the files are created and
+deleted with the person's own access.
+
+### Salesforce implementation
+
+- **Objects:** none of its own; `Import_Batch__c` (Operation Files) and `Import_Journal__c`.
+- **Services:** `FilesImportService`, `FilesImportController`.
+- **Browser modules:** `zipReader` (moved out of the import wizard's workbook reader),
+  `csvParser` (moved out of the import wizard), `filesImportModel` (manifest reading, the
+  browser checks and the groups); UI the Import Files panel of the Data Manager tab (component
+  `filesImport`).
 
 ---
 
@@ -17567,6 +17645,131 @@ shown again (R-AV4).
 
 ---
 
+## 29MEM5. Certification
+
+### Definition
+
+One credential the organization grants, such as Certified Volunteer Trainer, with the continuing
+credits it takes to renew and how long it lasts (G-22e, D-157).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | The certification as holders see it. |
+| Credits Required | number | yes | Continuing credits needed to renew. Default 0. |
+| Valid Months | number | yes | How long it lasts once granted or renewed. Default 24; 0 means it does not expire. |
+| Active | boolean | yes | Offered for new holders. Default true. |
+| Description | long text | no | What it is and how it is earned. |
+
+### Salesforce implementation
+
+- **Object:** `Certification__c`, name field Text, sharing Public Read Only.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Credits Required | `Credits_Required__c` | Number(5, 1), default 0 |
+| Valid Months | `Valid_Months__c` | Number(3, 0), default 24 |
+| Active | `Active__c` | Checkbox, default true |
+| Description | `Description__c` | Long Text Area(4000) |
+
+---
+
+## 29MEM6. Member Certification
+
+### Definition
+
+One person's hold on one certification: when it was earned, when it expires, where it stands, and
+the credits they have earned toward renewing it (G-22e).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Certification | reference to Certification | yes | The certification held. |
+| Contact | reference to Contact | no | The holder. Required on create (rule Needs_Contact); cleared when the person is deleted. |
+| Status | picklist | yes | Pending, Active, Expired or Revoked. Default Pending. |
+| Earned On | date | no | The day it was first granted (R-MEM10). |
+| Expires On | date | no | The last day it is valid; blank means it does not expire. |
+| Credits Toward Renewal | roll-up | no | The sum of its continuing credits not yet used by a renewal. |
+| Credits Required | formula | no | The certification's Credits Required. |
+| Notes | long text | no | Staff notes. |
+
+### Rules
+
+**R-MEM10 Grant.** Granting a Pending, Expired or Revoked certification makes it Active: Earned On
+becomes today when blank, and Expires On becomes Valid Months after today, less a day (blank when
+Valid Months is 0). Granting needs no credits: it is how a first certification, earned by an
+exam or a course, is recorded.
+
+**R-MEM11 Renew.** An Active or Expired certification with an Expires On is renewed when its Credits
+Toward Renewal reach Credits Required: the new period starts the day after Expires On while it is
+Active and not past, else today, and ends Valid Months later less a day; the status becomes Active
+and every credit not yet used is marked Used, so the next renewal starts from none. A Pending or
+Revoked certification, or one that never expires, is not renewed.
+
+**R-MEM12 Expiry.** Each night, in the Memberships step, an Active certification whose Expires On is
+before today becomes Expired, up to 2,000 a night.
+
+**R-MEM13 Erasure.** Erasing a person clears the notes on their member certifications and the
+activity text of their credits.
+
+### Salesforce implementation
+
+- **Object:** `Member_Certification__c`, name field Auto Number (CERT-{000000}), sharing Private.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Certification | `Certification__c` | Lookup(Certification), required, Restrict delete, related list Holders |
+| Contact | `Contact__c` | Lookup(Contact), Clear on delete, related list Certifications |
+| Status | `Status__c` | Picklist (Pending, Active, Expired, Revoked), restricted, default Pending |
+| Earned On | `Earned_On__c` | Date |
+| Expires On | `Expires_On__c` | Date |
+| Credits Toward Renewal | `Open_Credits__c` | Roll-Up Summary (SUM `Continuing_Credit__c.Credits__c` where `Used__c` is false) |
+| Credits Required | `Credits_Required__c` | Formula (Number), `Certification__r.Credits_Required__c` |
+| Notes | `Notes__c` | Long Text Area(4000) |
+
+- **Services:** `CertificationService` (R-MEM10 to R-MEM12), `CertificationController` (the
+  `certificationActions` panel on the record page).
+
+---
+
+## 29MEM7. Continuing Credit
+
+### Definition
+
+Credits a holder earned toward renewing one certification: a course, a conference session, an
+event (G-22e).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Member Certification | reference to Member Certification | yes | The certification the credits count toward. |
+| Credits | number | yes | How many credits. |
+| Earned On | date | yes | The day they were earned. Default today. |
+| Activity | text | no | What earned them, such as a course name. |
+| Source | picklist | yes | Event, Course, Conference, Self Study or Other. Default Other. |
+| Source Record Id | text | no | The record that earned them (an event, say), as a record id. |
+| Used | boolean | yes | Used by a renewal (R-MEM11); no longer counted. Default false. |
+
+### Salesforce implementation
+
+- **Object:** `Continuing_Credit__c`, name field Auto Number (CR-{000000}), Master-Detail to Member
+  Certification (sharing controlled by parent), no tab.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Member Certification | `Member_Certification__c` | Master-Detail(Member Certification), related list Continuing Credits |
+| Credits | `Credits__c` | Number(5, 1), required |
+| Earned On | `Earned_On__c` | Date, required, default today |
+| Activity | `Activity__c` | Text(255) |
+| Source | `Source__c` | Picklist (Event, Course, Conference, Self Study, Other), restricted, default Other |
+| Source Record Id | `Source_Record_Id__c` | Text(18) |
+| Used | `Used__c` | Checkbox, default false |
+
+---
+
 ## 30. Deferred to later iterations
 
 These entities exist in the product plan but are deliberately **not** part of v0.1, v0.2,
@@ -17996,6 +18199,7 @@ mirrors the primary member).
 | 1.41 | 2026-11-11 | Outbound Funds migration kit (MIG-11, D-156). No object or field added. Scholarships and Outbound Grants ships kit `Outbound_Funds` (source `Outbound_Funds_Module`, now related to this module, not Funders) with templates `kit_ofm_programs` (Award Program, Type Grant), `kit_ofm_cycles` (one Award Cycle per funding program), `kit_ofm_applications` (Award Application), `kit_ofm_awards` (Award, from requests with an awarded amount), `kit_ofm_disbursements` (Award Payment) and `kit_ofm_requirements` (Award Requirement), linked by `links`; extension `OutboundFundsKit` adds a `Parent` column (the record's own Id) so a cycle links to its program and an award to its application while the row keeps its Id as the key later steps link to. |
 | 1.42 | 2026-11-11 | Nonprofit Cloud relationships and affiliations kit (MIG-02, relations part). No object or field added. Mirror ships kit `NPC_Relations` (source `Nonprofit_Cloud_Fundraising`) with templates `kit_npc_relationships` (Relationship from `ContactContactRelation`, type from the related role, one side per pair; BarnCRM writes the reciprocal) and `kit_npc_affiliations` (Affiliation from `AccountContactRelation`, skipping households, meaning accounts with a `PartyRelationshipGroup` of type Household, and person accounts), and extension `NpcRelationsKit` (one side per pair, roles as text, checks counting pairs and organization links). Party Relationship Group households are not converted (plan Section 11.2 item 9: guards only; conversion needs two ADRs and `Account.Household_Model__c`). |
 | 1.43 | 2026-11-11 | Evidence log (L-05). New Section 29ZE1 Assumption Evidence (`Assumption_Evidence__c`, a detail of `Logic_Model_Link__c`, rules R-AE1 to R-AE3): what it shows, source, source link, date and strength. Logic Models Admin and Staff edit it, Read Only reads it; the builder reads it with each arrow and `LogicModelBuilderController.saveEvidence` saves it. |
+| 1.44 | 2026-11-11 | Backup Sets, files import and certifications (C-66, C-70, G-22e, D-157; ADR-NEXT `NEXT-backup-sets.md`, ADR-NEXT `NEXT-files-import.md`). `Import_Batch__c.Operation__c` gains Backup and Files (Section 16). Section 29D gains rule R-SQ15: the query document's optional `backup` key marks a saved query as a Backup Set, run on demand as a Backup data job writing R-BD9's file to Files. New Section 29FI Files import (no object, rules R-FI1 to R-FI5): a zip with `manifest.csv` loaded as `ContentVersion` linked to records, journaled per group and undone by deleting the documents. Memberships gains Sections 29MEM5 Certification (`Certification__c`), 29MEM6 Member Certification (`Member_Certification__c`, rules R-MEM10 to R-MEM13, validation rule `Needs_Contact`) and 29MEM7 Continuing Credit (`Continuing_Credit__c`, master-detail to Member Certification, rolled up into `Open_Credits__c`). |
 
 ---
 ## 32. Entity ownership by package
@@ -18202,6 +18406,9 @@ included; standard objects the packages extend are named by the entity that gove
 | Membership Benefit | Memberships | 1.8 (G-22c) | 29MEM2 |
 | Membership Term | Memberships | 1.8 (G-22a, G-22b, PAY-02) | 29MEM3 |
 | Memberships Settings | Memberships | 1.8 (G-22a, G-22b) | 29MEM4 |
+| Certification | Memberships | 1.17 (G-22e) | 29MEM5 |
+| Member Certification | Memberships | 1.17 (G-22e) | 29MEM6 |
+| Continuing Credit | Memberships | 1.17 (G-22e) | 29MEM7 |
 | Address Verification Settings | Address Verification | 1.15 (C-46) | 29AV1 |
 | Address Verification Keys | Address Verification | 1.15 (C-46) | 29AV2 |
 
