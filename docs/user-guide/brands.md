@@ -10,7 +10,10 @@ your admin may have turned on brands. You will then see:
   staff that belong to it. One person can belong to several brands. To add someone, open the
   brand, click **New** on Brand Assignments, and fill in the Contact, the Account or the User
   (only one). Check **Primary** for their main brand.
-- Receipts and letters printed with the brand's own name, logo, address and signature.
+- Receipts, volunteer hour letters and certificates printed with the brand's own name, logo,
+  address and signature, thank-you emails sent from the brand's address, and portals in the
+  brand's colors. A volunteer letter takes the brand of the jobs the hours were for; hours for
+  jobs of several brands print your organization instead.
 - In reports and list views, a **Brand** filter, so you can see one brand's gifts or people.
 
 If your admin also turned on **Share records by brand**, you see the households, people and

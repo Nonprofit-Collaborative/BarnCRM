@@ -17,6 +17,17 @@ With brands on:
 - Receipts print the gift's brand: its name, logo, address and signature, and its legal entity's
   legal name and tax ID. A value the brand leaves blank comes from its legal entity, then from your
   organization settings.
+- Thank-you emails for a gift with a brand come from the brand's **Sender Email** (when it is a
+  set-up Organization-Wide Address), else from the Acknowledgments from address.
+- Volunteer hour letters and certificates print the brand of the jobs the hours were for:
+  `{OrganizationName}` and `{OrganizationAddress}` become the brand's legal entity and address,
+  and `{BrandName}`, `{BrandLogo}`, `{BrandSignature}`, `{BrandPhone}` and `{BrandWebsite}` can be
+  added to a template. A person whose hours span several brands gets your organization's identity.
+- Portals show their brand's colors and a footer with its name, address, phone and website, and
+  send sign-in codes from its Sender Email when the portal has no Sender Address of its own. A
+  portal with no brand uses the default brand. The board portal is a portal, so Corporate Hub
+  board members see the brand of their portal; Corporate Hub prints no documents of its own.
+- Records with no brand print the **default brand**, without being labelled with it.
 - Receipts can be numbered per brand or per legal entity (optional).
 - Every Brand field can be filtered on in list views, reports and dashboards, and the report type
   **Brands with Brand Assignments** lists who belongs to each brand.

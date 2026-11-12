@@ -59,7 +59,10 @@ Everything is in the app, with one exception noted at step 3.
    - **first gift only**, for a welcome letter that goes to a donor's very first gift.
 5. Set **Acknowledgments from address** if your thank yous should come from
    `giving@yourorg.org` rather than from whoever pressed Send. The address has to be one
-   your org has already verified as an organization wide address.
+   your org has already verified as an organization wide address. With brands on, a gift whose
+   brand has a **Sender Email** set up as an organization wide address is thanked from that
+   address instead. For brand-specific wording, add a rule per brand (match on the appeal) with
+   its own template.
 6. If you want emailed thank yous to go out overnight without anybody pressing anything,
    turn on **Send emails nightly** on the same page. That switches on the acknowledgments step
    of [BarnCRM Nightly Jobs](nightly-jobs.md), the one nightly run, at 2:45 in the morning. Leave

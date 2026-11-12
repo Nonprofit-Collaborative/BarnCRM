@@ -102,6 +102,38 @@ private class BrandServiceTest {
 	}
 
 	@IsTest
+	static void senderAndLogoReadOnlyWhatIsThere() {
+		System.runAs(TestUsers.admin()) {
+			Brand__c store = new Brand__c(Name = 'Store', Sender_Email__c = 'store@example.org');
+			insert store;
+			ContentVersion logo = new ContentVersion(
+				Title = 'logo',
+				PathOnClient = 'logo.png',
+				VersionData = Blob.valueOf('png')
+			);
+			insert logo;
+			Id documentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :logo.Id]
+			.ContentDocumentId;
+
+			Test.startTest();
+			Map<Id, Id> whileOff = BrandService.senderIdsFor(new Set<Id>{ store.Id });
+			turnOn(true, false);
+			Map<Id, Id> notSetUp = BrandService.senderIdsFor(new Set<Id>{ store.Id });
+			String path = BrandService.logoPath(documentId);
+			String badId = BrandService.logoPath('not an id');
+			Test.stopTest();
+
+			Assert.isTrue(whileOff.isEmpty(), 'Brands off name no sender');
+			Assert.isFalse(
+				notSetUp.containsKey(store.Id),
+				'An address that is not an organization-wide address is left out'
+			);
+			Assert.isTrue(path.endsWith(logo.Id), 'The latest version of the logo file');
+			Assert.isNull(badId, 'A value that is not a file ID prints no logo');
+		}
+	}
+
+	@IsTest
 	static void oneDefaultBrandAndOnePrimaryAssignment() {
 		System.runAs(TestUsers.admin()) {
 			Brand__c first = brand('First', null, true);

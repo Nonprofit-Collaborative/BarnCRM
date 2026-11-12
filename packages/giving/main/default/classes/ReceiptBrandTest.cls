@@ -4,7 +4,7 @@
  * off the receipt is the organization's as before; a new gift takes its appeal's brand (C-47d).
  */
 @IsTest(
-	testFor='ApexClass:ReceiptService, ApexClass:ReceiptContentBuilder, ApexClass:ReceiptNumberSequence, ApexClass:BrandDefaultHandler, ApexTrigger:GiftTrigger'
+	testFor='ApexClass:ReceiptService, ApexClass:ReceiptContentBuilder, ApexClass:ReceiptNumberSequence, ApexClass:BrandDefaultHandler, ApexClass:AcknowledgmentService, ApexTrigger:GiftTrigger'
 )
 private class ReceiptBrandTest {
 	private static final Date GIFT_DATE = Date.newInstance(2026, 4, 12);
@@ -119,6 +119,35 @@ private class ReceiptBrandTest {
 				50,
 				[SELECT COUNT() FROM Gift__c WHERE Brand__c = :thrift.Id],
 				'Every gift takes the appeal brand'
+			);
+		}
+	}
+
+	@IsTest
+	static void aThankYouUsesTheBrandSenderOnlyWhenItIsSetUp() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			ReceiptTestDataFactory.setUpReceipting();
+			Brand__c thrift = brandsOn('Organization');
+			List<OrgWideEmailAddress> setUp = [SELECT Id, Address FROM OrgWideEmailAddress LIMIT 1];
+			thrift.Sender_Email__c = setUp.isEmpty() ? 'thrift@example.org' : setUp[0].Address;
+			update thrift;
+			Gift__c branded = gift(thrift.Id);
+			Gift__c plain = gift(null);
+
+			Test.startTest();
+			Map<Id, Id> senders = AcknowledgmentService.brandSenders(
+				[SELECT Id, Brand__c FROM Gift__c WHERE Id IN (:branded.Id, :plain.Id)]
+			);
+			Test.stopTest();
+
+			Assert.isFalse(
+				senders.containsKey(plain.Id),
+				'A gift with no brand keeps the From Address'
+			);
+			Assert.areEqual(
+				setUp.isEmpty() ? null : setUp[0].Id,
+				senders.get(branded.Id),
+				'The brand sender when it is an organization-wide address, else none'
 			);
 		}
 	}

@@ -10464,8 +10464,13 @@ merged, however it was chosen).
 Preferred Name when set), `{Hours}`, `{FromDate}`, `{ToDate}`, `{JobList}` (each job with its
 hours in the period), `{Today}`, and since V-12 `{HourValue}` (the value of one hour, R-VP5)
 and `{HoursValue}` (Hours times it), both in the org's default currency and empty when Hour
-Value is 0. Every merged value is HTML escaped. An unknown token is left
-as typed, so a typo shows on the proof.
+Value is 0. Since C-47b also `{BrandName}`, `{BrandPhone}`, `{BrandWebsite}`, `{BrandSignature}`
+(its line breaks as `<br/>`) and `{BrandLogo}` (an `img` of the brand's logo file, or empty);
+with brands on, a person whose hours in the period are all for jobs of one brand (no brand
+reads as the default brand) gets that brand's identity, and `{OrganizationName}` and
+`{OrganizationAddress}` become its legal entity name and address (R-BR5). Otherwise
+`{BrandName}` is the organization name and the other brand tokens are empty. Every merged value
+is HTML escaped. An unknown token is left as typed, so a typo shows on the proof.
 
 **R-VL3 What a letter counts.** Hours is the sum of the person's hours with Status Approved and
 a Date Worked from From Date to To Date, read in the user's own access. A person with no
@@ -16026,7 +16031,15 @@ being labelled with it. Bulk Update and Import set the lookup like any other loo
 **R-BR5 Brand-aware outputs (C-47b).** A module output for a record with a brand prints the
 brand's name, logo, address and signature and the brand's legal entity name and tax ID; a value
 the brand leaves blank falls back to the entity, then to the organization settings. A statement
-covering records of several brands prints the organization identity.
+covering records of several brands prints the organization identity. A record with no brand
+prints the default brand. The outputs: Giving receipts (Giving R-RC13) and thank-you emails (a
+gift's brand sends from its Sender Email when that is an Organization-Wide Email Address, else
+the Acknowledgment From Address; `BrandService.senderIdsFor`), Volunteers hour letters and
+certificates (R-VL2; the logo through `BrandService.logoPath`, the latest version's download
+path read in user mode), and Portal Builder portals (`PortalData.describe` returns `brand`:
+name, colors, phone, website and address lines, no logo since the file is not reachable off the
+platform; with no Sender Address of its own a portal sends codes from its brand's Sender
+Email). Corporate Hub renders no documents; its board portal is a portal.
 
 **R-BR6 Filters (C-47e).** Every Brand lookup is a reportable field, and the report type
 `Brands_With_Assignments` lists brands with the people, organizations and staff assigned.
@@ -17250,6 +17263,7 @@ mirrors the primary member).
 | 1.22 | 2026-11-11 | Territory Management module (C-40, C-40b; ADR-NEXT `NEXT-territory-management-module.md`). New Sections 29TM1 Territory (`Territory__c`, with the Territory lookup `Territory__c` on Account and Contact), 29TM2 Territory Rule (`Territory_Rule__c`), 29TM3 Territory Member (`Territory_Member__c`) and 29TM4 Territory Run (`Territory_Run__c`); rules R-TM1 to R-TM4. |
 | 1.23 | 2026-11-11 | Memberships module (G-22a to G-22d, PAY-02, PB-09; D-157, D-190; ADR-NEXT `NEXT-memberships-module.md`). New package `packages/memberships`: Membership Level (`Membership_Level__c`, 29MEM1), Membership Benefit (`Membership_Benefit__c`, 29MEM2), Membership Term (`Membership_Term__c`, 29MEM3, R-MEM1 to R-MEM9) and Memberships Settings (`Memberships_Settings__c`, 29MEM4). No Contact or Account field, and no object named like Memberships Essentials' membership object, so both deploy together. |
 | 1.24 | 2026-11-11 | Event Management paid registration, session proposals, badge overrides and session ratings (EV-20, EV-21, EV-26, EV-27, D-190; ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`). New Sections 29EV27 Session Rating (`Session_Rating__c`, R-SRT1 to R-SRT3) and 29EV30 Proposal Presenter (`Proposal_Presenter__c`, R-PP1). `Event__c` gains `Review_Criteria__c`, `Blind_Review__c` and `Session_Rating_Form_Key__c`; `Event_Session__c` gains `Rating_Count__c`, `Rating_Total__c` and `Average_Rating__c`; `Event_Registration__c` gains status Pending Payment and `Payment_Status__c`, `Amount_Paid__c`, `Payment_Key__c` and `Payment_Link__c` (R-ERG5 to R-ERG7); `Event_Attendee__c` gains `Badge_Name__c`, `Badge_Title__c` and `Badge_Company__c` (R-EAT4); `Speaker_Application__c` gains `Weighted_Total__c` and `Weighted_Average__c` and `Review_Count__c` counts scored reviews only; `Speaker_Review__c` gains `Criteria_Scores__c` and `Weighted_Score__c` and `Score__c` is no longer required (R-SA6 to R-SA9); `Events_Settings__c` gains `Online_Payments__c` (false) and `Payment_Link_Template__c` (`BarnCRM_Event_Payment_Link`). Events reaches Payments only by name (`PaymentsApi`, `EventPaymentListener`). |
+| 1.25 | 2026-11-11 | Brand-aware letters, thank yous and portals (C-47b, D-119, D-120). No object or field added. R-BR5 names every output and adds `BrandService.senderIdsFor` and `BrandService.logoPath`; R-VL2 gains `{BrandName}`, `{BrandPhone}`, `{BrandWebsite}`, `{BrandSignature}` and `{BrandLogo}`; the portal menu (`PortalData.describe`) gains `brand`. |
 
 ---
 ## 32. Entity ownership by package

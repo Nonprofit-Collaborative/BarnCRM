@@ -117,13 +117,20 @@ public with sharing class VolunteerLetterService {
 		Map<Id, Person> found = readPeople(people);
 		Map<Id, Decimal> totals = new Map<Id, Decimal>();
 		Map<Id, String> jobLists = new Map<Id, String>();
-		collectHours(people, fromDate, toDate, totals, jobLists);
+		Map<Id, Set<Id>> brandsByPerson = new Map<Id, Set<Id>>();
+		collectHours(people, fromDate, toDate, totals, jobLists, brandsByPerson);
 
+		String organizationName = escape(
+			BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c
+		);
 		Map<String, String> shared = new Map<String, String>{
-			'OrganizationName' => escape(
-				BarnCRM_Settings__c.getOrgDefaults().Organization_Legal_Name__c
-			),
+			'OrganizationName' => organizationName,
 			'OrganizationAddress' => escape(OrganizationAddress.oneLine()),
+			'BrandName' => organizationName,
+			'BrandPhone' => '',
+			'BrandWebsite' => '',
+			'BrandSignature' => '',
+			'BrandLogo' => '',
 			'FromDate' => escape(fromDate.format()),
 			'ToDate' => escape(toDate.format()),
 			'Today' => escape(Date.today().format())
@@ -131,6 +138,7 @@ public with sharing class VolunteerLetterService {
 		// V-12 (R-VP5, R-VL2): the value of an hour and of the person's hours; empty at 0.
 		Decimal rate = VolunteerSettings.hourValue();
 		shared.put('HourValue', escape(money(rate)));
+		Map<Id, Map<String, String>> brandTokens = brandTokens(brandsByPerson);
 
 		List<Letter> letters = new List<Letter>();
 		for (Id personId : people) {
@@ -147,6 +155,9 @@ public with sharing class VolunteerLetterService {
 			} else {
 				letter.personName = person.name;
 				Map<String, String> values = new Map<String, String>(shared);
+				if (brandTokens.containsKey(personId)) {
+					values.putAll(brandTokens.get(personId));
+				}
 				values.put('PersonName', escape(person.name));
 				values.put('FirstName', escape(person.firstName));
 				values.put('Hours', escape(totals.get(personId).format()));
@@ -273,7 +284,8 @@ public with sharing class VolunteerLetterService {
 		Date fromDate,
 		Date toDate,
 		Map<Id, Decimal> totals,
-		Map<Id, String> jobLists
+		Map<Id, String> jobLists,
+		Map<Id, Set<Id>> brandsByPerson
 	) {
 		if (people.isEmpty()) {
 			return;
@@ -294,6 +306,10 @@ public with sharing class VolunteerLetterService {
 				continue;
 			}
 			String job = (String) row.get('jobName');
+			if (!brandsByPerson.containsKey(personId)) {
+				brandsByPerson.put(personId, new Set<Id>());
+			}
+			brandsByPerson.get(personId).add((Id) row.get('brandId'));
 			totals.put(personId, (totals.containsKey(personId) ? totals.get(personId) : 0) + hours);
 			String opening = jobLists.containsKey(personId) ? jobLists.get(personId) : '<ul>';
 			jobLists.put(
@@ -312,6 +328,58 @@ public with sharing class VolunteerLetterService {
 					'</li>'
 			);
 		}
+	}
+
+	/**
+	 * C-47b, R-BR5: the letterhead tokens of each person whose hours in the period are all for
+	 * jobs of one brand (no brand reads as the default brand). A person whose jobs span brands, or
+	 * any person while brands are off, keeps the organization's identity. Read once per call.
+	 */
+	private static Map<Id, Map<String, String>> brandTokens(Map<Id, Set<Id>> brandsByPerson) {
+		Map<Id, Map<String, String>> result = new Map<Id, Map<String, String>>();
+		if (!BrandService.isEnabled()) {
+			return result;
+		}
+		Set<Id> brandIds = new Set<Id>();
+		for (Set<Id> brands : brandsByPerson.values()) {
+			brandIds.addAll(brands);
+		}
+		brandIds.remove(null);
+		Map<Id, BrandService.Profile> profiles = BrandService.profilesFor(brandIds);
+		profiles.put(null, BrandService.profileFor(null));
+		Map<String, String> logos = new Map<String, String>();
+		for (Id personId : brandsByPerson.keySet()) {
+			Set<Id> brands = brandsByPerson.get(personId);
+			BrandService.Profile brand = brands.size() == 1
+				? profiles.get(new List<Id>(brands)[0])
+				: null;
+			if (brand == null) {
+				continue;
+			}
+			Map<String, String> tokens = new Map<String, String>{
+				'BrandName' => escape(brand.brandName),
+				'BrandPhone' => escape(brand.phone),
+				'BrandWebsite' => escape(brand.website),
+				'BrandSignature' => escape(brand.signature).replace('\n', '<br/>')
+			};
+			if (String.isNotBlank(brand.legalName)) {
+				tokens.put('OrganizationName', escape(brand.legalName));
+			}
+			if (!brand.addressLines.isEmpty()) {
+				tokens.put('OrganizationAddress', escape(String.join(brand.addressLines, ', ')));
+			}
+			String logoId = brand.logoDocumentId;
+			if (String.isNotBlank(logoId) && !logos.containsKey(logoId)) {
+				String path = BrandService.logoPath(logoId);
+				logos.put(
+					logoId,
+					path == null ? '' : '<img class="logo" src="' + escape(path) + '" alt=""/>'
+				);
+			}
+			tokens.put('BrandLogo', String.isBlank(logoId) ? '' : logos.get(logoId));
+			result.put(personId, tokens);
+		}
+		return result;
 	}
 
 	private static final Pattern TOKEN = Pattern.compile('\\{(\\w+)\\}');

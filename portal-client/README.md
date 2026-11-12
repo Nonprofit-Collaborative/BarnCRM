@@ -53,7 +53,7 @@ Paths under `/services/apexrest/barncrm/portal/v1/`; every answer is JSON with `
 | `POST login/start` | `portal`, `email` | `challenge` (the same answer whether or not the email is on file) |
 | `POST login/verify` | `challenge`, `code` | `status`: `signedIn` (with `session`, `expires`), `secondFactor`, or `enroll` (with `secret`, `uri`) |
 | `POST login/second-factor` | `challenge`, `code` | `status` `signedIn`, `session`, `expires` |
-| `GET me` | | `title`, `firstName`, `secondFactor`, `pages` |
+| `GET me` | | `title`, `firstName`, `secondFactor`, `pages`, `brand` (null, or `name`, `primaryColor`, `secondaryColor`, `phone`, `website`, `address` lines, while brands are on) |
 | `GET page` | `key` | `fields`, `records` (`id`, `values`), `canUpdate`, `canCreate`, `actions` |
 | `POST page/save` | `page`, `recordId` (blank to add), `values` | `id` |
 | `POST page/action` | `page`, `recordId`, `action` | `message` |

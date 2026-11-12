@@ -525,7 +525,8 @@ made:
 
 | Token | Filled with |
 |---|---|
-| `{OrganizationName}`, `{OrganizationAddress}` | The organization's legal name and address from BarnCRM Settings (the address on one line, its parts separated by commas) |
+| `{OrganizationName}`, `{OrganizationAddress}` | The organization's legal name and address from BarnCRM Settings (the address on one line, its parts separated by commas). With brands on, the brand's legal entity and address (see below) |
+| `{BrandName}`, `{BrandPhone}`, `{BrandWebsite}`, `{BrandSignature}`, `{BrandLogo}` | With brands on, the brand's name, phone, website, letter signature (one line per line) and logo; with brands off or no brand, `{BrandName}` is the organization name and the others are empty |
 | `{PersonName}`, `{FirstName}` | The person's name, and their preferred name (or first name) |
 | `{Hours}` | Their approved hours in the period |
 | `{JobList}` | A list of each job with its hours in the period |

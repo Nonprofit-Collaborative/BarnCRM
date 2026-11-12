@@ -106,7 +106,10 @@ licenses (where your organization has them) may be simpler than a portal.
    Builder's **Portals** and **Portal Accesses** tabs sit before **Error Log** (it has no app of
    its own, D-188), Portals, New: a name people see, a
    **Key** matching the shortcode, **Access Mode**, **Second Factor**, **Session Hours**,
-   **Sender Address**, and the **Template** (below). Set **Status** to Active.
+   **Sender Address**, and the **Template** (below). Set **Status** to Active. With brands on
+   ([Brands and Legal Entities](brands.md)), also pick the portal's **Brand**: the portal shows
+   the brand's colors and a footer with its name, address, phone and website, and with no
+   Sender Address its codes come from the brand's Sender Email.
 9. **Let people in.** For an Invited portal, add a Portal Access for each person (Portal
    Accesses, New, or the Portal Accesses list on the portal). For Any Matching Person, anyone
    whose email matches exactly one person in BarnCRM can sign in.

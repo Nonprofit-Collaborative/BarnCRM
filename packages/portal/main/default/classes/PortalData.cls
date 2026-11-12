@@ -35,7 +35,28 @@ public without sharing class PortalData {
 				'policy' => session.portal.Second_Factor__c,
 				'enrolled' => session.access.Second_Factor_Enrolled__c == true
 			},
+			'brand' => brandOf(session.portal.Brand__c),
 			'pages' => pages
+		};
+	}
+
+	/**
+	 * C-47b, R-BR5: the portal's brand (the default brand when it has none) for the client's
+	 * header and footer, or null while brands are off. No logo: the file is not reachable from
+	 * off the platform, so the site shows its own.
+	 */
+	private static Map<String, Object> brandOf(Id brandId) {
+		BrandService.Profile brand = BrandService.profileFor(brandId);
+		if (brand == null) {
+			return null;
+		}
+		return new Map<String, Object>{
+			'name' => brand.brandName,
+			'primaryColor' => brand.primaryColor,
+			'secondaryColor' => brand.secondaryColor,
+			'phone' => brand.phone,
+			'website' => brand.website,
+			'address' => brand.addressLines
 		};
 	}
 

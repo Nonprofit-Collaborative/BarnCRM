@@ -153,6 +153,65 @@ public with sharing class BrandService {
 	}
 
 	/**
+	 * R-BR5: the Organization-Wide Email Address each brand sends from, by brand ID. A brand whose
+	 * Sender Email is blank or not set up as an organization-wide address is left out, so the
+	 * caller keeps its own sender. Empty while brands are off.
+	 */
+	@NamespaceAccessible
+	public static Map<Id, Id> senderIdsFor(Set<Id> brandIds) {
+		Map<String, Set<Id>> brandsByAddress = new Map<String, Set<Id>>();
+		for (Profile profile : profilesFor(brandIds).values()) {
+			if (String.isNotBlank(profile.senderEmail)) {
+				String key = profile.senderEmail.trim().toLowerCase();
+				if (!brandsByAddress.containsKey(key)) {
+					brandsByAddress.put(key, new Set<Id>());
+				}
+				brandsByAddress.get(key).add(profile.brandId);
+			}
+		}
+		Map<Id, Id> senders = new Map<Id, Id>();
+		if (brandsByAddress.isEmpty()) {
+			return senders;
+		}
+		for (OrgWideEmailAddress address : [
+			SELECT Id, Address
+			FROM OrgWideEmailAddress
+			WHERE Address IN :brandsByAddress.keySet()
+			WITH SYSTEM_MODE
+		]) {
+			for (Id brandId : brandsByAddress.get(address.Address.toLowerCase())) {
+				senders.put(brandId, address.Id);
+			}
+		}
+		return senders;
+	}
+
+	/**
+	 * R-BR5: the download path of the latest version of a brand's logo file, for an `img` in a
+	 * document the PDF service renders (the receipt logo's shipped route, Giving R-RC13). Read in
+	 * user mode: a file the user cannot see prints no logo. Null when there is none.
+	 */
+	@NamespaceAccessible
+	public static String logoPath(String documentId) {
+		Id fileId;
+		try {
+			fileId = Id.valueOf(documentId.trim());
+		} catch (Exception notAnId) {
+			return null;
+		}
+		List<ContentVersion> versions = [
+			SELECT Id
+			FROM ContentVersion
+			WHERE ContentDocumentId = :fileId AND IsLatest = TRUE
+			WITH USER_MODE
+			LIMIT 1
+		];
+		return versions.isEmpty()
+			? null
+			: '/sfc/servlet.shepherd/version/download/' + versions[0].Id;
+	}
+
+	/**
 	 * R-BR4: fills a blank `Brand__c` on new records from the parent's brand, then the creating
 	 * user's primary or only brand. Call from a module's before insert. Does nothing while brands
 	 * are off, or for a type without the field.

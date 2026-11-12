@@ -1,7 +1,8 @@
 # Brands
 
 Scripts for multi-brand management (C-47): brands, legal entities, brand assignments, brand
-defaulting, brand-aware receipts and numbering, and brand-restricted visibility. Setup detail:
+defaulting, brand-aware receipts and numbering, brand-restricted visibility, and brand-aware
+letters, thank yous and portals. Setup detail:
 [Brands and Legal Entities](../admin-guide/brands.md).
 
 Before you start: an org from [Before you test](before-you-test.md) with Core and Giving deployed,
@@ -83,3 +84,19 @@ organization legal name filled in.
 | 5 | Turn **Share records by brand** off. Wait a minute. | The BarnCRM brand groups are gone, and with them the shares. |
 
 **Cleanup:** restore your org's Account sharing default and turn **Use brands** off.
+
+## T-BRAND-06: Brand-Aware Letters, Thank Yous and Portals
+
+**Purpose:** confirm volunteer letters, thank-you emails and portals use the record's brand.
+**Prerequisites:** T-BRAND-02 with **Use brands** on; Volunteers, Giving acknowledgments and Portal Builder set up; `Barn Thrift` has a phone, a **Letter Signature**, a **Primary Color** and a **Sender Email** that is a verified Organization-Wide Address.
+**Smoke:** no
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Set a volunteer job's **Brand** to `Barn Thrift`. Log approved hours on it for a person with no other hours. Add `{BrandName}`, `{BrandPhone}` and `{BrandSignature}` to the active Hours letter template and make a letter for the person. | The letter prints `Barn Thrift`, its phone and its signature; `{OrganizationName}` prints `Barn Thrift LLC`. |
+| 2 | Log approved hours for the same person on a job of another brand, and make the letter again. | The letter prints your organization's legal name and address; `{BrandPhone}` and `{BrandSignature}` print nothing. |
+| 3 | Queue a thank-you email for a `Barn Thrift` gift and send. | The email comes from the brand's Sender Email. A gift with no brand comes from the Acknowledgments from address. |
+| 4 | Set a portal's **Brand** to `Barn Thrift`, clear its **Sender Address**, and sign in to the portal. | The code email comes from the brand's Sender Email; the portal heading is in the brand color and a footer shows `Barn Thrift`, its address and phone. |
+| 5 | Turn **Use brands** off and reload the portal; make the letter of step 1 again. | No brand footer or color; the letter prints the organization and `{BrandName}` prints its legal name. |
+
+**Cleanup:** restore the Hours letter template and the portal's Sender Address.
