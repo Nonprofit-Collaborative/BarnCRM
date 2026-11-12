@@ -67,10 +67,10 @@ public with sharing class GiftTransactionMirrorBatch implements Database.Batchab
 	/** Why a chunk must not work now, or null when it may. */
 	private static String pauseReason() {
 		if (AutomationControl.isPaused()) {
-			return Label.Mirror_GiftTransactionMirror_RunPaused;
+			return BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_RunPaused');
 		}
 		if (!AutomationControl.isEnabled(GiftTransactionMirrorService.AUTOMATION_NAME)) {
-			return Label.Mirror_GiftTransactionMirror_RunSwitchedOff;
+			return BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_RunSwitchedOff');
 		}
 		return null;
 	}
@@ -78,16 +78,16 @@ public with sharing class GiftTransactionMirrorBatch implements Database.Batchab
 	/** Why the run cannot copy anything at all, or null when it can. */
 	private String notReadyReason() {
 		if (!GiftTransactionMirrorService.isAvailable()) {
-			return Label.Mirror_GiftTransactionMirror_Unavailable;
+			return BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_Unavailable');
 		}
 		String notReady = GiftTransactionMirrorService.notReadyReason();
 		if (notReady == null && !GiftTransactionMirrorService.canRun()) {
-			notReady = Label.Mirror_GiftTransactionMirror_NoAccess;
+			notReady = BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_NoAccess');
 		}
 		return notReady == null
 			? null
 			: String.format(
-					Label.Mirror_GiftTransactionMirror_RunNotReady,
+					BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_RunNotReady'),
 					new List<Object>{ notReady }
 			  );
 	}
@@ -161,7 +161,7 @@ public with sharing class GiftTransactionMirrorBatch implements Database.Batchab
 		totals.writeRefusals();
 		if (noHeadroom) {
 			ErrorLogger.logMessage(
-				Label.Mirror_GiftTransactionMirror_LogNoHeadroom,
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_LogNoHeadroom'),
 				LOG_CONTEXT,
 				ErrorLogger.SEVERITY_WARNING
 			);
@@ -183,7 +183,7 @@ public with sharing class GiftTransactionMirrorBatch implements Database.Batchab
 	@TestVisible
 	private static String summaryOf(GiftTransactionMirrorService.Result totals) {
 		String summary = String.format(
-			Label.Mirror_GiftTransactionMirror_LogRun,
+			BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_LogRun'),
 			new List<Object>{
 				totals.created,
 				totals.updated,
@@ -195,7 +195,9 @@ public with sharing class GiftTransactionMirrorBatch implements Database.Batchab
 			}
 		);
 		return totals.designationsUnavailable
-			? summary + ' ' + Label.Mirror_GiftTransactionMirror_DesignationsUnavailable
+			? summary +
+			  ' ' +
+			  BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_DesignationsUnavailable')
 			: summary;
 	}
 }

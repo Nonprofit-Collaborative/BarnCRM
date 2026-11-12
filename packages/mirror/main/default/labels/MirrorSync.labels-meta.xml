@@ -9,14 +9,6 @@
     <value>Compare</value>
   </labels>
   <labels>
-    <fullName>Mirror_Sync_OtherMessages</fullName>
-    <categories>Mirror</categories>
-    <language>en_US</language>
-    <protected>false</protected>
-    <shortDescription>Grouped refusals past the kept message count</shortDescription>
-    <value>Refused for other reasons, too many different ones to list one by one. Save one of these records by hand to see why it was refused.</value>
-  </labels>
-  <labels>
     <fullName>Mirror_Sync_AndMore</fullName>
     <categories>Mirror</categories>
     <language>en_US</language>

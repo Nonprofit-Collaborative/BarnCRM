@@ -1,9 +1,19 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import OpportunityMirror from 'c/opportunityMirror';
 import getStatus from '@salesforce/apex/OpportunityMirrorController.getStatus';
 import runNow from '@salesforce/apex/OpportunityMirrorController.runNow';
 import compare from '@salesforce/apex/OpportunityMirrorController.compare';
 import copyRangeAgain from '@salesforce/apex/OpportunityMirrorController.copyRangeAgain';
+
+setHelpTextForTest({
+  Mirror_OpportunityMirror_DirectionOpportunities:
+    'Won Opportunities closed on or after {0} become gifts.',
+  Mirror_OpportunityMirror_DifferenceCount: 'Differences found: {0}. The first {1} are listed.',
+  Mirror_OpportunityMirror_DifferenceCountAll: 'Differences found: {0}. All are listed.',
+  Mirror_OpportunityMirror_LastRun: 'Last completed run: started {0}. {1}',
+  Mirror_OpportunityMirror_ErrorFailed: 'Something went wrong.'
+});
 
 jest.mock(
   '@salesforce/apex/OpportunityMirrorController.getStatus',
@@ -27,31 +37,6 @@ jest.mock('@salesforce/apex/OpportunityMirrorController.compare', () => ({ defau
 jest.mock(
   '@salesforce/apex/OpportunityMirrorController.copyRangeAgain',
   () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Mirror_OpportunityMirror_DirectionOpportunities',
-  () => ({ default: 'Won Opportunities closed on or after {0} become gifts.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Mirror_OpportunityMirror_DifferenceCount',
-  () => ({ default: 'Differences found: {0}. The first {1} are listed.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Mirror_OpportunityMirror_DifferenceCountAll',
-  () => ({ default: 'Differences found: {0}. All are listed.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Mirror_OpportunityMirror_LastRun',
-  () => ({ default: 'Last completed run: started {0}. {1}' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Mirror_OpportunityMirror_ErrorFailed',
-  () => ({ default: 'Something went wrong.' }),
   { virtual: true }
 );
 

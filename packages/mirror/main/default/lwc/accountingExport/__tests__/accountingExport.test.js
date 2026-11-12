@@ -1,8 +1,16 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import AccountingExport from 'c/accountingExport';
 import getPaymentMethods from '@salesforce/apex/AccountingExportController.getPaymentMethods';
 import exportGifts from '@salesforce/apex/AccountingExportController.exportGifts';
 import markPosted from '@salesforce/apex/AccountingExportController.markPosted';
+
+setHelpTextForTest({
+  Mirror_AccountingExport_Marked: 'Marked {0} gifts posted.',
+  Mirror_AccountingExport_Summary: '{0} rows from {1} gifts. Net total {2}.',
+  Mirror_AccountingExport_NoGifts: 'No gifts in this range.',
+  Mirror_AccountingExport_ErrorDatesRequired: 'Choose a From date and a To date.'
+});
 
 jest.mock(
   '@salesforce/apex/AccountingExportController.getPaymentMethods',
@@ -30,30 +38,6 @@ jest.mock(
 jest.mock('@salesforce/customPermission/Post_Gifts', () => ({ default: true }), {
   virtual: true
 });
-
-jest.mock(
-  '@salesforce/label/c.Mirror_AccountingExport_Marked',
-  () => ({ default: 'Marked {0} gifts posted.' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Mirror_AccountingExport_Summary',
-  () => ({ default: '{0} rows from {1} gifts. Net total {2}.' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Mirror_AccountingExport_NoGifts',
-  () => ({ default: 'No gifts in this range.' }),
-  { virtual: true }
-);
-
-jest.mock(
-  '@salesforce/label/c.Mirror_AccountingExport_ErrorDatesRequired',
-  () => ({ default: 'Choose a From date and a To date.' }),
-  { virtual: true }
-);
 
 jest.mock('@salesforce/i18n/locale', () => ({ default: 'en-US' }), { virtual: true });
 jest.mock('@salesforce/i18n/currency', () => ({ default: 'USD' }), { virtual: true });

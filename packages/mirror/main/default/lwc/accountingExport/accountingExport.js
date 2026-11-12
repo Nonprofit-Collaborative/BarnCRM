@@ -16,14 +16,8 @@ import allFunds from '@salesforce/label/c.Mirror_AccountingExport_AllFunds';
 import paymentMethod from '@salesforce/label/c.Giving_QuickGiftEntry_TypeLabel';
 import allMethods from '@salesforce/label/c.Mirror_AccountingExport_AllMethods';
 import download from '@salesforce/label/c.Mirror_AccountingExport_Download';
-import summary from '@salesforce/label/c.Mirror_AccountingExport_Summary';
-import noGifts from '@salesforce/label/c.Mirror_AccountingExport_NoGifts';
-import errorDatesRequired from '@salesforce/label/c.Mirror_AccountingExport_ErrorDatesRequired';
-import errorFailed from '@salesforce/label/c.Mirror_AccountingExport_ErrorFailed';
 import onlyUnposted from '@salesforce/label/c.Mirror_AccountingExport_OnlyUnposted';
 import markPostedLabel from '@salesforce/label/c.Mirror_AccountingExport_MarkPosted';
-import marked from '@salesforce/label/c.Mirror_AccountingExport_Marked';
-import markNeedsAllFunds from '@salesforce/label/c.Mirror_AccountingExport_MarkNeedsAllFunds';
 import { BYTE_ORDER_MARK, bodyMessage, saveBlob } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
@@ -72,7 +66,9 @@ export default class AccountingExport extends LightningElement {
     get markPostedHelp() {
       return helpText('Mirror', 'Mirror_AccountingExport_MarkPostedHelp');
     },
-    markNeedsAllFunds
+    get markNeedsAllFunds() {
+      return helpText('Mirror', 'Mirror_AccountingExport_MarkNeedsAllFunds');
+    }
   };
 
   fromDate;
@@ -99,7 +95,7 @@ export default class AccountingExport extends LightningElement {
     if (data) {
       this.methods = data.map((option) => ({ label: option.label, value: option.value }));
     } else if (error) {
-      this.error = errorFailed;
+      this.error = helpText('Mirror', 'Mirror_AccountingExport_ErrorFailed');
     }
   }
 
@@ -155,7 +151,7 @@ export default class AccountingExport extends LightningElement {
     this.message = undefined;
     this.downloaded = undefined;
     if (!this.fromDate || !this.toDate) {
-      this.error = errorDatesRequired;
+      this.error = helpText('Mirror', 'Mirror_AccountingExport_ErrorDatesRequired');
       return;
     }
     this.working = true;
@@ -163,17 +159,17 @@ export default class AccountingExport extends LightningElement {
       const choices = this.choices;
       const view = await exportGifts(choices);
       if (!view || !view.rowCount) {
-        this.message = noGifts;
+        this.message = helpText('Mirror', 'Mirror_AccountingExport_NoGifts');
         return;
       }
       this.save(view.fileName, view.csv);
       this.downloaded = { choices, digest: view.digest };
-      this.message = summary
+      this.message = helpText('Mirror', 'Mirror_AccountingExport_Summary')
         .replace('{0}', view.rowCount)
         .replace('{1}', view.giftCount)
         .replace('{2}', this.money(view.total));
     } catch (failure) {
-      this.error = bodyMessage(failure, errorFailed);
+      this.error = bodyMessage(failure, helpText('Mirror', 'Mirror_AccountingExport_ErrorFailed'));
     } finally {
       this.working = false;
     }
@@ -189,9 +185,9 @@ export default class AccountingExport extends LightningElement {
         digest: this.downloaded.digest
       });
       this.downloaded = undefined;
-      this.message = marked.replace('{0}', count);
+      this.message = helpText('Mirror', 'Mirror_AccountingExport_Marked').replace('{0}', count);
     } catch (failure) {
-      this.error = bodyMessage(failure, errorFailed);
+      this.error = bodyMessage(failure, helpText('Mirror', 'Mirror_AccountingExport_ErrorFailed'));
     } finally {
       this.working = false;
     }

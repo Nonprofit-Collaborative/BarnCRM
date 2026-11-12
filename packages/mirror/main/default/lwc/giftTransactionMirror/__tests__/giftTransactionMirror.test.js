@@ -1,3 +1,4 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import GiftTransactionMirror from 'c/giftTransactionMirror';
 import getStatus from '@salesforce/apex/GiftTransactionMirrorController.getStatus';
@@ -5,6 +6,15 @@ import runNow from '@salesforce/apex/GiftTransactionMirrorController.runNow';
 import compare from '@salesforce/apex/GiftTransactionMirrorController.compare';
 import copyRangeAgain from '@salesforce/apex/GiftTransactionMirrorController.copyRangeAgain';
 import { differenceTextOf, fill, isoDate, rowsOf, viewOf } from '../mirrorView';
+
+setHelpTextForTest({
+  Mirror_GiftTransactionMirror_DirectionGifts:
+    'Direction: Gifts to Gift Transactions. Received gifts dated on or after {0} get a matching Gift Transaction with status {1}.'
+});
+
+setHelpTextForTest({
+  Mirror_OpportunityMirror_DifferenceCountAll: 'Differences found: {0}. All are listed.'
+});
 
 jest.mock(
   '@salesforce/apex/GiftTransactionMirrorController.getStatus',
@@ -32,19 +42,6 @@ jest.mock(
 jest.mock(
   '@salesforce/apex/GiftTransactionMirrorController.copyRangeAgain',
   () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Mirror_GiftTransactionMirror_DirectionGifts',
-  () => ({
-    default:
-      'Direction: Gifts to Gift Transactions. Received gifts dated on or after {0} get a matching Gift Transaction with status {1}.'
-  }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Mirror_OpportunityMirror_DifferenceCountAll',
-  () => ({ default: 'Differences found: {0}. All are listed.' }),
   { virtual: true }
 );
 

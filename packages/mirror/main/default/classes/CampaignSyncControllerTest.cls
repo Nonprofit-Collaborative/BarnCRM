@@ -127,8 +127,8 @@ private class CampaignSyncControllerTest {
 			Test.stopTest();
 			Assert.areEqual(
 				CampaignSyncService.isAvailable()
-					? Label.Mirror_CampaignSync_SwitchedOff
-					: Label.Mirror_CampaignSync_Unavailable,
+					? BarnHelp.text('Mirror', 'Mirror_CampaignSync_SwitchedOff')
+					: BarnHelp.text('Mirror', 'Mirror_CampaignSync_Unavailable'),
 				message,
 				'Nothing starts, and the page says why.'
 			);
@@ -147,22 +147,22 @@ private class CampaignSyncControllerTest {
 			);
 			status.canSync = false;
 			Assert.areEqual(
-				Label.Mirror_CampaignSync_NoCampaignAccess,
+				BarnHelp.text('Mirror', 'Mirror_CampaignSync_NoCampaignAccess'),
 				CampaignSyncController.refusal(status)
 			);
 			status.canManage = false;
 			Assert.areEqual(
-				Label.Mirror_CampaignSync_NoManagePermission,
+				BarnHelp.text('Mirror', 'Mirror_CampaignSync_NoManagePermission'),
 				CampaignSyncController.refusal(status)
 			);
 			status.switchedOn = false;
 			Assert.areEqual(
-				Label.Mirror_CampaignSync_SwitchedOff,
+				BarnHelp.text('Mirror', 'Mirror_CampaignSync_SwitchedOff'),
 				CampaignSyncController.refusal(status)
 			);
 			status.available = false;
 			Assert.areEqual(
-				Label.Mirror_CampaignSync_Unavailable,
+				BarnHelp.text('Mirror', 'Mirror_CampaignSync_Unavailable'),
 				CampaignSyncController.refusal(status)
 			);
 		}

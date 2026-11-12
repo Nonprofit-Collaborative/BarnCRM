@@ -10,26 +10,16 @@ import compare from '@salesforce/apex/OpportunityMirrorController.compare';
 import copyRangeAgain from '@salesforce/apex/OpportunityMirrorController.copyRangeAgain';
 import { localIsoDate } from 'c/findCsv';
 import title from '@salesforce/label/c.Mirror_OpportunityMirror_Title';
-import unavailable from '@salesforce/label/c.Mirror_OpportunityMirror_Unavailable';
-import switchedOff from '@salesforce/label/c.Mirror_OpportunityMirror_SwitchedOff';
-import directionOpportunities from '@salesforce/label/c.Mirror_OpportunityMirror_DirectionOpportunities';
-import noStartDate from '@salesforce/label/c.Mirror_OpportunityMirror_NoStartDate';
-import noManagePermission from '@salesforce/label/c.Mirror_OpportunityMirror_NoManagePermission';
-import noOpportunityAccess from '@salesforce/label/c.Mirror_OpportunityMirror_NoOpportunityAccess';
 import runNowLabel from '@salesforce/label/c.Core_HealthCheck_RunNowButton';
 import scheduleNightly from '@salesforce/label/c.Giving_NightlyJobs_ScheduleButton';
 import stopSchedule from '@salesforce/label/c.Giving_NightlyJobs_StopButton';
 import nextRun from '@salesforce/label/c.Mirror_OpportunityMirror_NextRun';
-import notScheduled from '@salesforce/label/c.Mirror_OpportunityMirror_NotScheduled';
-import running from '@salesforce/label/c.Mirror_OpportunityMirror_Running';
-import started from '@salesforce/label/c.Mirror_OpportunityMirror_Started';
 import reconciliationTitle from '@salesforce/label/c.Mirror_OpportunityMirror_ReconciliationTitle';
 import fromDate from '@salesforce/label/c.Mirror_OpportunityMirror_FromDate';
 import toDate from '@salesforce/label/c.Mirror_OpportunityMirror_ToDate';
 import compareLabel from '@salesforce/label/c.Mirror_Sync_Compare';
 import copyAgain from '@salesforce/label/c.Mirror_OpportunityMirror_CopyAgain';
 import noDifferences from '@salesforce/label/c.Core_AccessCompare_NoDifferences';
-import differenceCount from '@salesforce/label/c.Mirror_OpportunityMirror_DifferenceCount';
 import columnGift from '@salesforce/label/c.Giving_Section_Gift';
 import columnGiftAmount from '@salesforce/label/c.Mirror_OpportunityMirror_ColumnGiftAmount';
 import columnGiftDate from '@salesforce/label/c.Giving_AskPipeline_FieldGiftDate';
@@ -37,10 +27,6 @@ import columnOpportunity from '@salesforce/label/c.Mirror_OpportunityMirror_Colu
 import columnOpportunityAmount from '@salesforce/label/c.Mirror_OpportunityMirror_ColumnOpportunityAmount';
 import columnCloseDate from '@salesforce/label/c.Mirror_OpportunityMirror_ColumnCloseDate';
 import columnDifference from '@salesforce/label/c.Core_AccessCompare_ColDifference';
-import errorFailed from '@salesforce/label/c.Mirror_OpportunityMirror_ErrorFailed';
-import differenceCountAll from '@salesforce/label/c.Mirror_OpportunityMirror_DifferenceCountAll';
-import lastRun from '@salesforce/label/c.Mirror_OpportunityMirror_LastRun';
-import noLastRun from '@salesforce/label/c.Mirror_OpportunityMirror_NoLastRun';
 import loading from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
@@ -87,10 +73,18 @@ export default class OpportunityMirror extends LightningElement {
     get intro() {
       return helpText('Mirror', 'Mirror_OpportunityMirror_Intro');
     },
-    unavailable,
-    switchedOff,
-    noManagePermission,
-    noOpportunityAccess,
+    get unavailable() {
+      return helpText('Mirror', 'Mirror_OpportunityMirror_Unavailable');
+    },
+    get switchedOff() {
+      return helpText('Mirror', 'Mirror_OpportunityMirror_SwitchedOff');
+    },
+    get noManagePermission() {
+      return helpText('Mirror', 'Mirror_OpportunityMirror_NoManagePermission');
+    },
+    get noOpportunityAccess() {
+      return helpText('Mirror', 'Mirror_OpportunityMirror_NoOpportunityAccess');
+    },
     runNow: runNowLabel,
     scheduleNightly,
     stopSchedule,
@@ -237,8 +231,11 @@ export default class OpportunityMirror extends LightningElement {
       return helpText('Mirror', 'Mirror_OpportunityMirror_DirectionGifts');
     }
     return this.status.startDate
-      ? fill(directionOpportunities, this.day(this.status.startDate))
-      : noStartDate;
+      ? fill(
+          helpText('Mirror', 'Mirror_OpportunityMirror_DirectionOpportunities'),
+          this.day(this.status.startDate)
+        )
+      : helpText('Mirror', 'Mirror_OpportunityMirror_NoStartDate');
   }
 
   get scheduled() {
@@ -246,13 +243,19 @@ export default class OpportunityMirror extends LightningElement {
   }
 
   get scheduleText() {
-    return this.scheduled ? fill(nextRun, this.moment(this.status.nextRunAt)) : notScheduled;
+    return this.scheduled
+      ? fill(nextRun, this.moment(this.status.nextRunAt))
+      : helpText('Mirror', 'Mirror_OpportunityMirror_NotScheduled');
   }
 
   get lastRunText() {
     return this.status.lastRunAt
-      ? fill(lastRun, this.moment(this.status.lastRunAt), this.status.lastSummary || '')
-      : noLastRun;
+      ? fill(
+          helpText('Mirror', 'Mirror_OpportunityMirror_LastRun'),
+          this.moment(this.status.lastRunAt),
+          this.status.lastSummary || ''
+        )
+      : helpText('Mirror', 'Mirror_OpportunityMirror_NoLastRun');
   }
 
   get noManageShown() {
@@ -268,7 +271,9 @@ export default class OpportunityMirror extends LightningElement {
   }
 
   get runningText() {
-    return this.justStarted ? started : running;
+    return this.justStarted
+      ? helpText('Mirror', 'Mirror_OpportunityMirror_Started')
+      : helpText('Mirror', 'Mirror_OpportunityMirror_Running');
   }
 
   get manageDisabled() {
@@ -306,8 +311,12 @@ export default class OpportunityMirror extends LightningElement {
     }
     const { differenceCount: count, differences } = this.comparison;
     return count > differences.length
-      ? fill(differenceCount, count, differences.length)
-      : fill(differenceCountAll, count);
+      ? fill(
+          helpText('Mirror', 'Mirror_OpportunityMirror_DifferenceCount'),
+          count,
+          differences.length
+        )
+      : fill(helpText('Mirror', 'Mirror_OpportunityMirror_DifferenceCountAll'), count);
   }
 
   get rows() {
@@ -374,6 +383,9 @@ export default class OpportunityMirror extends LightningElement {
   }
 
   messageOf(failure) {
-    return (failure && failure.body && failure.body.message) || errorFailed;
+    return (
+      (failure && failure.body && failure.body.message) ||
+      helpText('Mirror', 'Mirror_OpportunityMirror_ErrorFailed')
+    );
   }
 }

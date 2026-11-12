@@ -53,7 +53,7 @@ public with sharing class InboundGiftService {
 			InboundGiftResult refused = InboundGiftResult.rejected(
 				InboundGiftResult.ERROR_INVALID_REQUEST,
 				String.format(
-					Label.Mirror_InboundGift_ErrorInvalidRequest,
+					BarnHelp.text('Mirror', 'Mirror_InboundGift_ErrorInvalidRequest'),
 					new List<String>{ String.valueOf(problem).abbreviate(MAX_PARSER_MESSAGE) }
 				)
 			);
@@ -84,7 +84,7 @@ public with sharing class InboundGiftService {
 				results.add(
 					InboundGiftResult.rejected(
 						InboundGiftResult.ERROR_INTERNAL,
-						Label.Mirror_InboundGift_ErrorInternal
+						BarnHelp.text('Mirror', 'Mirror_InboundGift_ErrorInternal')
 					)
 				);
 			}
@@ -135,7 +135,7 @@ public with sharing class InboundGiftService {
 			if (first.recordedGiftId == null) {
 				item.result = InboundGiftResult.rejected(
 					InboundGiftResult.ERROR_INVALID_FIELD,
-					Label.Mirror_InboundGift_ErrorRepeated
+					BarnHelp.text('Mirror', 'Mirror_InboundGift_ErrorRepeated')
 				);
 			} else {
 				answerFromRecordedGift(
@@ -225,11 +225,14 @@ public with sharing class InboundGiftService {
 					: (donorByContact.containsKey(named)
 							? donorByContact.get(named)
 							: (visibleAccounts.contains(named) ? named : null));
-				donorMissing = Label.Mirror_InboundGift_ErrorDonorIdNotFound;
+				donorMissing = BarnHelp.text('Mirror', 'Mirror_InboundGift_ErrorDonorIdNotFound');
 			} else {
 				Id contactId = contactByEmail.get(ImportMatcher.emailKey(request.donorEmail));
 				donor = contactId == null ? null : donorByContact.get(contactId);
-				donorMissing = Label.Mirror_InboundGift_ErrorDonorEmailNotFound;
+				donorMissing = BarnHelp.text(
+					'Mirror',
+					'Mirror_InboundGift_ErrorDonorEmailNotFound'
+				);
 			}
 			if (donor == null) {
 				item.result = InboundGiftResult.rejected(
@@ -255,7 +258,7 @@ public with sharing class InboundGiftService {
 			if (fundNamed && item.fundId == null) {
 				item.result = InboundGiftResult.rejected(
 					InboundGiftResult.ERROR_FUND_NOT_FOUND,
-					Label.Mirror_InboundGift_ErrorFundNotFound
+					BarnHelp.text('Mirror', 'Mirror_InboundGift_ErrorFundNotFound')
 				);
 				continue;
 			}
@@ -265,7 +268,7 @@ public with sharing class InboundGiftService {
 				if (!visibleAppeals.contains(named)) {
 					item.result = InboundGiftResult.rejected(
 						InboundGiftResult.ERROR_APPEAL_NOT_FOUND,
-						Label.Mirror_InboundGift_ErrorAppealNotFound
+						BarnHelp.text('Mirror', 'Mirror_InboundGift_ErrorAppealNotFound')
 					);
 					continue;
 				}
@@ -365,7 +368,7 @@ public with sharing class InboundGiftService {
 					item.result = platformMessage == null
 						? InboundGiftResult.rejected(
 								InboundGiftResult.ERROR_NOT_SAVED,
-								Label.Mirror_InboundGift_ErrorFundNotApplied
+								BarnHelp.text('Mirror', 'Mirror_InboundGift_ErrorFundNotApplied')
 						  )
 						: notSaved(platformMessage);
 				} else {
@@ -379,7 +382,7 @@ public with sharing class InboundGiftService {
 			if (item.result == null) {
 				item.result = InboundGiftResult.rejected(
 					InboundGiftResult.ERROR_NOT_SAVED,
-					Label.Mirror_InboundGift_ErrorFundNotApplied
+					BarnHelp.text('Mirror', 'Mirror_InboundGift_ErrorFundNotApplied')
 				);
 			}
 		}
@@ -418,7 +421,7 @@ public with sharing class InboundGiftService {
 			} else {
 				item.result = InboundGiftResult.rejected(
 					InboundGiftResult.ERROR_CONFLICT,
-					Label.Mirror_InboundGift_ErrorConflictUnseen
+					BarnHelp.text('Mirror', 'Mirror_InboundGift_ErrorConflictUnseen')
 				);
 			}
 		}
@@ -432,12 +435,12 @@ public with sharing class InboundGiftService {
 			item.result = InboundGiftResult.recorded(
 				InboundGiftResult.OUTCOME_EXISTING,
 				found.Id,
-				Label.Mirror_InboundGift_Existing
+				BarnHelp.text('Mirror', 'Mirror_InboundGift_Existing')
 			);
 		} else {
 			item.result = InboundGiftResult.rejected(
 				InboundGiftResult.ERROR_CONFLICT,
-				Label.Mirror_InboundGift_ErrorConflict
+				BarnHelp.text('Mirror', 'Mirror_InboundGift_ErrorConflict')
 			);
 			item.result.giftId = found.Id;
 		}
@@ -462,7 +465,7 @@ public with sharing class InboundGiftService {
 				: request.externalId.trim().abbreviate(MAX_EXTERNAL_ID);
 			lines.add(
 				String.format(
-					Label.Mirror_InboundGift_LogRefused,
+					BarnHelp.text('Mirror', 'Mirror_InboundGift_LogRefused'),
 					new List<String>{ externalId, result.errorCode }
 				)
 			);
@@ -522,7 +525,7 @@ public with sharing class InboundGiftService {
 		return InboundGiftResult.rejected(
 			InboundGiftResult.ERROR_NOT_SAVED,
 			String.format(
-				Label.Mirror_InboundGift_ErrorAccess,
+				BarnHelp.text('Mirror', 'Mirror_InboundGift_ErrorAccess'),
 				new List<String>{ refused.getMessage() }
 			)
 		);
@@ -532,7 +535,7 @@ public with sharing class InboundGiftService {
 		return InboundGiftResult.rejected(
 			InboundGiftResult.ERROR_NOT_SAVED,
 			String.format(
-				Label.Mirror_InboundGift_ErrorNotSaved,
+				BarnHelp.text('Mirror', 'Mirror_InboundGift_ErrorNotSaved'),
 				new List<String>{ platformMessage }
 			)
 		);

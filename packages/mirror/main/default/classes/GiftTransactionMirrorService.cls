@@ -68,8 +68,8 @@ public with sharing class GiftTransactionMirrorService {
 		public void writeRefusals() {
 			refusals.write(
 				CONTEXT,
-				Label.Mirror_GiftTransactionMirror_LogOne,
-				Label.Mirror_GiftTransactionMirror_LogMany
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_LogOne'),
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_LogMany')
 			);
 		}
 	}
@@ -132,12 +132,12 @@ public with sharing class GiftTransactionMirrorService {
 		String status = paidStatus();
 		if (!GiftTransactionMirrorSchema.isActiveStatus(status)) {
 			return String.format(
-				Label.Mirror_GiftTransactionMirror_UnknownStatus,
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_UnknownStatus'),
 				new List<Object>{ status }
 			);
 		}
 		if (startDate() == null) {
-			return Label.Mirror_GiftTransactionMirror_NoStartDate;
+			return BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_NoStartDate');
 		}
 		return null;
 	}
@@ -204,7 +204,7 @@ public with sharing class GiftTransactionMirrorService {
 			Id typed = MirrorSync.idOf(gift.Gift_Transaction_Id__c, giftTransaction);
 			if (typed == null) {
 				gift.Gift_Transaction_Id__c.addError(
-					Label.Mirror_GiftTransactionMirror_InvalidGiftTransactionId
+					BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_InvalidGiftTransactionId')
 				);
 			} else {
 				gift.Gift_Transaction_Id__c = String.valueOf(typed);
@@ -232,15 +232,15 @@ public with sharing class GiftTransactionMirrorService {
 		MirrorSync.Warnings warnings = new MirrorSync.Warnings();
 		for (Gift__c gift : linked) {
 			warnings.add(
-				Label.Mirror_GiftTransactionMirror_DeletedKept,
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_DeletedKept'),
 				gift.Name + ' (' + gift.Gift_Transaction_Id__c + ')',
 				gift.Id
 			);
 		}
 		warnings.write(
 			CONTEXT,
-			Label.Mirror_GiftTransactionMirror_LogDeletedOne,
-			Label.Mirror_GiftTransactionMirror_LogDeletedMany
+			BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_LogDeletedOne'),
+			BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_LogDeletedMany')
 		);
 	}
 
@@ -281,7 +281,10 @@ public with sharing class GiftTransactionMirrorService {
 			if (typed == null) {
 				result.failed++;
 				result.refusals.add(
-					Label.Mirror_GiftTransactionMirror_InvalidGiftTransactionId,
+					BarnHelp.text(
+						'Mirror',
+						'Mirror_GiftTransactionMirror_InvalidGiftTransactionId'
+					),
 					gift.Name,
 					gift.Id
 				);
@@ -391,7 +394,7 @@ public with sharing class GiftTransactionMirrorService {
 			if (donorOf(gift) == null) {
 				result.failed++;
 				result.refusals.add(
-					Label.Mirror_GiftTransactionMirror_NoAccount,
+					BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_NoAccount'),
 					gift.Name,
 					gift.Id
 				);
@@ -405,7 +408,11 @@ public with sharing class GiftTransactionMirrorService {
 			SObject existing = current.get(Id.valueOf(gift.Gift_Transaction_Id__c));
 			if (existing == null) {
 				result.failed++;
-				result.refusals.add(Label.Mirror_GiftTransactionMirror_Missing, gift.Name, gift.Id);
+				result.refusals.add(
+					BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_Missing'),
+					gift.Name,
+					gift.Id
+				);
 				continue;
 			}
 			Map<String, Object> desired = desiredValues(gift, false, updatable);
@@ -531,7 +538,7 @@ public with sharing class GiftTransactionMirrorService {
 			if (!deleted[i].isSuccess()) {
 				result.refusals.add(
 					String.format(
-						Label.Mirror_GiftTransactionMirror_LogOrphan,
+						BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_LogOrphan'),
 						new List<Object>{
 							String.valueOf(orphans[i].Id),
 							messageOf(deleted[i].getErrors())
@@ -609,7 +616,7 @@ public with sharing class GiftTransactionMirrorService {
 			} else {
 				result.refusals.add(
 					String.format(
-						Label.Mirror_GiftTransactionMirror_DesignationRefused,
+						BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_DesignationRefused'),
 						new List<Object>{ messageOf(saved[i].getErrors()) }
 					),
 					insertedFor[i].Name,

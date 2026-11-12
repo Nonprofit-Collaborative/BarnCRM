@@ -184,7 +184,7 @@ private class GiftTransactionMirrorServiceTest {
 			settings.Gift_Transaction_Mirror_Direction__c = 'Backwards';
 			upsert as system settings;
 			Assert.areEqual(
-				Label.Mirror_GiftTransactionMirror_NoStartDate,
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_NoStartDate'),
 				GiftTransactionMirrorService.notReadyReason()
 			);
 			Assert.areEqual(
@@ -360,7 +360,7 @@ private class GiftTransactionMirrorServiceTest {
 				'A typed value that is not a Gift Transaction is refused (R-GT9).'
 			);
 			Assert.areEqual(
-				Label.Mirror_GiftTransactionMirror_InvalidGiftTransactionId,
+				BarnHelp.text('Mirror', 'Mirror_GiftTransactionMirror_InvalidGiftTransactionId'),
 				refused.getErrors()[0].getMessage()
 			);
 

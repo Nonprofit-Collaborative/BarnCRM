@@ -40,7 +40,7 @@ public with sharing class CampaignSyncController {
 			return status();
 		} catch (Exception unexpected) {
 			ErrorLogger.log(unexpected, CONTEXT);
-			throw UserErrors.message(Label.Mirror_CampaignSync_ErrorFailed);
+			throw UserErrors.message(BarnHelp.text('Mirror', 'Mirror_CampaignSync_ErrorFailed'));
 		}
 	}
 
@@ -52,7 +52,7 @@ public with sharing class CampaignSyncController {
 			current = status();
 		} catch (Exception unexpected) {
 			ErrorLogger.log(unexpected, CONTEXT);
-			throw UserErrors.message(Label.Mirror_CampaignSync_ErrorFailed);
+			throw UserErrors.message(BarnHelp.text('Mirror', 'Mirror_CampaignSync_ErrorFailed'));
 		}
 		String refusal = refusal(current);
 		if (refusal != null) {
@@ -62,7 +62,7 @@ public with sharing class CampaignSyncController {
 			CampaignSyncBatch.start();
 		} catch (Exception unexpected) {
 			ErrorLogger.log(unexpected, CONTEXT);
-			throw UserErrors.message(Label.Mirror_CampaignSync_ErrorFailed);
+			throw UserErrors.message(BarnHelp.text('Mirror', 'Mirror_CampaignSync_ErrorFailed'));
 		}
 		current.running = true;
 		return current;
@@ -71,16 +71,16 @@ public with sharing class CampaignSyncController {
 	@TestVisible
 	private static String refusal(Status current) {
 		if (!current.available) {
-			return Label.Mirror_CampaignSync_Unavailable;
+			return BarnHelp.text('Mirror', 'Mirror_CampaignSync_Unavailable');
 		}
 		if (!current.switchedOn) {
-			return Label.Mirror_CampaignSync_SwitchedOff;
+			return BarnHelp.text('Mirror', 'Mirror_CampaignSync_SwitchedOff');
 		}
 		if (!current.canManage) {
-			return Label.Mirror_CampaignSync_NoManagePermission;
+			return BarnHelp.text('Mirror', 'Mirror_CampaignSync_NoManagePermission');
 		}
 		if (!current.canSync) {
-			return Label.Mirror_CampaignSync_NoCampaignAccess;
+			return BarnHelp.text('Mirror', 'Mirror_CampaignSync_NoCampaignAccess');
 		}
 		if (current.running) {
 			return BarnHelp.text('Mirror', 'Mirror_CampaignSync_Running');

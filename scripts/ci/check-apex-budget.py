@@ -211,7 +211,10 @@ CAPS = {
     # Mirror: the NPSP gifts migration kit's extension (MIG-05), 187,295 measured, then the
     # Nonprofit Cloud gifts kit's (MIG-04), 195,957 measured, then the Nonprofit Cloud
     # relationships kit's (MIG-02), about 200,500 combined, plus about 1%.
-    "mirror": 202_500,
+    # AR-01 (D-172): Opportunity mirror messages read with BarnHelp.text instead of Label;
+    # 202,751 measured, plus about 0.5%. With the other Mirror messages: 204,549 measured, plus
+    # about 0.5%.
+    "mirror": 205_600,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

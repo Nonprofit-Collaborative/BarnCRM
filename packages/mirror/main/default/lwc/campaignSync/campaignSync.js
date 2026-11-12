@@ -2,14 +2,7 @@ import { LightningElement } from 'lwc';
 import getStatus from '@salesforce/apex/CampaignSyncController.getStatus';
 import syncAll from '@salesforce/apex/CampaignSyncController.syncAll';
 import title from '@salesforce/label/c.Mirror_CampaignSync_Title';
-import unavailable from '@salesforce/label/c.Mirror_CampaignSync_Unavailable';
-import switchedOff from '@salesforce/label/c.Mirror_CampaignSync_SwitchedOff';
-import switchedOn from '@salesforce/label/c.Mirror_CampaignSync_SwitchedOn';
-import counts from '@salesforce/label/c.Mirror_CampaignSync_Counts';
-import noCampaignAccess from '@salesforce/label/c.Mirror_CampaignSync_NoCampaignAccess';
-import noManagePermission from '@salesforce/label/c.Mirror_CampaignSync_NoManagePermission';
 import syncAllLabel from '@salesforce/label/c.Mirror_CampaignSync_SyncAll';
-import errorFailed from '@salesforce/label/c.Mirror_CampaignSync_ErrorFailed';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { iconFor } from 'c/barnIcons';
 
@@ -58,11 +51,21 @@ export default class CampaignSync extends LightningElement {
     get intro() {
       return helpText('Mirror', 'Mirror_CampaignSync_Intro');
     },
-    unavailable,
-    switchedOff,
-    switchedOn,
-    noCampaignAccess,
-    noManagePermission,
+    get unavailable() {
+      return helpText('Mirror', 'Mirror_CampaignSync_Unavailable');
+    },
+    get switchedOff() {
+      return helpText('Mirror', 'Mirror_CampaignSync_SwitchedOff');
+    },
+    get switchedOn() {
+      return helpText('Mirror', 'Mirror_CampaignSync_SwitchedOn');
+    },
+    get noCampaignAccess() {
+      return helpText('Mirror', 'Mirror_CampaignSync_NoCampaignAccess');
+    },
+    get noManagePermission() {
+      return helpText('Mirror', 'Mirror_CampaignSync_NoManagePermission');
+    },
     syncAll: syncAllLabel,
     get running() {
       return helpText('Mirror', 'Mirror_CampaignSync_Running');
@@ -115,7 +118,9 @@ export default class CampaignSync extends LightningElement {
     }
     const linked = `${this.status.linkedCount}${this.status.linkedCountCapped ? '+' : ''}`;
     const appeals = `${this.status.appealCount}${this.status.appealCountCapped ? '+' : ''}`;
-    return counts.replace('{0}', linked).replace('{1}', appeals);
+    return helpText('Mirror', 'Mirror_CampaignSync_Counts')
+      .replace('{0}', linked)
+      .replace('{1}', appeals);
   }
 
   get linkedCount() {
@@ -161,6 +166,9 @@ export default class CampaignSync extends LightningElement {
   }
 
   messageOf(failure) {
-    return (failure && failure.body && failure.body.message) || errorFailed;
+    return (
+      (failure && failure.body && failure.body.message) ||
+      helpText('Mirror', 'Mirror_CampaignSync_ErrorFailed')
+    );
   }
 }

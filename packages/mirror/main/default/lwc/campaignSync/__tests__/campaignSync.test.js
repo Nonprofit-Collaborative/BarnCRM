@@ -1,7 +1,13 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 import CampaignSync from 'c/campaignSync';
 import getStatus from '@salesforce/apex/CampaignSyncController.getStatus';
 import syncAll from '@salesforce/apex/CampaignSyncController.syncAll';
+
+setHelpTextForTest({
+  Mirror_CampaignSync_Counts: '{0} of {1} appeals have a Campaign.',
+  Mirror_CampaignSync_ErrorFailed: 'Something went wrong.'
+});
 
 jest.mock('@salesforce/apex/CampaignSyncController.getStatus', () => ({ default: jest.fn() }), {
   virtual: true
@@ -9,16 +15,6 @@ jest.mock('@salesforce/apex/CampaignSyncController.getStatus', () => ({ default:
 jest.mock('@salesforce/apex/CampaignSyncController.syncAll', () => ({ default: jest.fn() }), {
   virtual: true
 });
-jest.mock(
-  '@salesforce/label/c.Mirror_CampaignSync_Counts',
-  () => ({ default: '{0} of {1} appeals have a Campaign.' }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Mirror_CampaignSync_ErrorFailed',
-  () => ({ default: 'Something went wrong.' }),
-  { virtual: true }
-);
 
 const READY = {
   available: true,
