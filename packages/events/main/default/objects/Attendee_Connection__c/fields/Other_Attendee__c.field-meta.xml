@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Other_Attendee__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The other person's attendee row, for their headline.</inlineHelpText>
+  <label>Other Attendee</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+  <referenceTo>Event_Attendee__c</referenceTo>
+  <relationshipLabel>Connections</relationshipLabel>
+  <relationshipName>Connections</relationshipName>
+</CustomField>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Agenda_Picks__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>How many attendees put this session on their own agenda.</inlineHelpText>
+  <label>Agenda Picks</label>
+  <summaryForeignKey>Agenda_Item__c.Event_Session__c</summaryForeignKey>
+  <summaryOperation>count</summaryOperation>
+  <trackTrending>false</trackTrending>
+  <type>Summary</type>
+</CustomField>

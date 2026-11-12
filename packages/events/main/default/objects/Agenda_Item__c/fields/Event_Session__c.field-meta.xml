@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Event_Session__c</fullName>
+  <inlineHelpText>The session picked.</inlineHelpText>
+  <label>Session</label>
+  <trackTrending>false</trackTrending>
+  <type>MasterDetail</type>
+  <referenceTo>Event_Session__c</referenceTo>
+  <relationshipLabel>Agenda Items</relationshipLabel>
+  <relationshipName>Agenda_Items</relationshipName>
+  <relationshipOrder>0</relationshipOrder>
+  <reparentableMasterDetail>false</reparentableMasterDetail>
+  <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

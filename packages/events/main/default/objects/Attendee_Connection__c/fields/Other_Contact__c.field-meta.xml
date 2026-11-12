@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Other_Contact__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>Who they connect with.</inlineHelpText>
+  <label>Other Person</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+  <referenceTo>Contact</referenceTo>
+  <relationshipLabel>Connected By</relationshipLabel>
+  <relationshipName>Connected_By</relationshipName>
+</CustomField>
