@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>NPSP Migration: Account Soft Credits</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_npsp_account_credits</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the NPSP Gifts and Soft Credits migration kit, which reads NPSP account soft credits of won Opportunities: one soft credit of the same organization per record, on the gift the kit made from that Opportunity, with its amount and BarnCRM's role.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 2, "columns": [{"source": "npsp.Opportunity__c", "target": "Record.Gift__c"}, {"source": "npsp.Account__c", "target": "Record.Account__c"}, {"source": "CreditRole", "target": "Record.Role__c"}, {"source": "CustomRole", "target": "Record.Custom_Role__c"}, {"source": "npsp.Amount__c", "target": "Record.Amount__c"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Soft_Credit__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Insert</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

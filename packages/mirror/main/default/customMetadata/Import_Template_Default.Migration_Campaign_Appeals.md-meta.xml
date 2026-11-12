@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Migration: Campaigns as Appeals</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_campaign_appeals</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the Mirror gift migration kits (NPSP and Nonprofit Cloud), which read your Campaigns: one appeal per Campaign with its name, description, dates and active flag, matched on the appeal's Campaign ID so an appeal already linked to the Campaign is updated, not made twice.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "uniqueBy": ["Id"], "columns": [{"source": "Id", "target": "Record.Campaign_Id__c"}, {"source": "Name", "target": "Record.Name"}, {"source": "Description", "target": "Record.Description__c"}, {"source": "StartDate", "target": "Record.Start_Date__c"}, {"source": "EndDate", "target": "Record.End_Date__c"}, {"source": "IsActive", "target": "Record.Active__c", "transforms": [{"op": "ifBlank", "value": "true"}]}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Target_Object__c</field>
+    <value xsi:type="xsd:string">Appeal__c</value>
+  </values>
+  <values>
+    <field>Load_Operation__c</field>
+    <value xsi:type="xsd:string">Upsert by external ID</value>
+  </values>
+  <values>
+    <field>Load_Match_Field__c</field>
+    <value xsi:type="xsd:string">Campaign_Id__c</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>

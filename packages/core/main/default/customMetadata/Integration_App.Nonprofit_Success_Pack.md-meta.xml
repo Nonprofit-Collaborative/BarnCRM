@@ -36,11 +36,13 @@
   </values>
   <values>
     <field>Compatibility__c</field>
-    <value xsi:type="xsd:string">BarnCRM runs beside NPSP: BarnCRM never changes NPSP records or settings. Move one area at a time. Rollups: the NPSP Customizable Rollups kit copies them into Rollup Builder; never let both fill the same field. Households: Adopt NPSP Households converts them in place. Gifts and other records: the NPSP import templates load them from a file.</value>
+    <value
+      xsi:type="xsd:string"
+    >BarnCRM runs beside NPSP: BarnCRM never changes NPSP records or settings. Move one area at a time. Rollups: the NPSP Customizable Rollups kit copies them into Rollup Builder; never let both fill the same field. Households: Adopt NPSP Households converts them in place. Gifts: with Mirror installed, the NPSP Gifts and Soft Credits kit copies won Opportunities as gifts that remember their Opportunity.</value>
   </values>
   <values>
     <field>Migration_Path__c</field>
-    <value xsi:type="xsd:string">Start Migration for rollups; the Migrating From NPSP admin guide page for households and gifts.</value>
+    <value xsi:type="xsd:string">Start Migration, one kit per receiving module, in the order listed; the Migrating From NPSP admin guide page.</value>
   </values>
   <values>
     <field>Show_Only_When_Installed__c</field>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Nonprofit Cloud Gifts and Soft Credits</label>
+  <protected>false</protected>
+  <values>
+    <field>Source_App__c</field>
+    <value xsi:type="xsd:string">Nonprofit_Cloud_Fundraising</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Copies Nonprofit Cloud campaigns, gift designations, gift commitments, paid gift transactions and gift soft credits into BarnCRM Giving, in this org. Each gift keeps its Gift Transaction ID, so the Gift Transaction mirror never copies it back. Nonprofit Cloud itself is never changed.</value>
+  </values>
+  <values>
+    <field>Steps_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"appeals","label":"Appeals","kind":"import","help":"Copies each Campaign as an appeal, or updates the appeal already linked to it.","source":"Campaign","fields":["Name","Description","StartDate","EndDate","IsActive"],"templateKey":"kit_campaign_appeals"},{"key":"funds","label":"Funds","kind":"import","help":"Copies each gift designation as a fund, linked to it for the Gift Transaction mirror. A designation that already has a fund, by link or by name, is skipped.","source":"GiftDesignation","fields":["Name","Description","IsActive"],"templateKey":"kit_npc_funds"},{"key":"commitments","label":"Commitments","kind":"import","help":"Copies each gift commitment as a recurring commitment or a pledge of the same donor.","source":"GiftCommitment","fields":["DonorId","Status","ScheduleType","ExpectedTotalCmtAmount","NextTransactionAmount","EffectiveStartDate","ExpectedEndDate","EffectiveTransactionPeriod","EffectiveTransactionInterval","CampaignId"],"links":[{"column":"CampaignId","step":"appeals"}],"templateKey":"kit_npc_commitments"},{"key":"gifts","label":"Gifts","kind":"import","help":"Copies each paid gift transaction as one gift of the same donor, with its payment method, its designations as funds and its tribute.","source":"GiftTransaction","fields":["DonorId","OriginalAmount","TransactionDate","PaymentMethod","PaymentIdentifier","CampaignId"],"filters":[{"field":"Status","value":"Paid"}],"links":[{"column":"CampaignId","step":"appeals"}],"templateKey":"kit_npc_gifts"},{"key":"credits","label":"Soft Credits","kind":"import","help":"Copies each soft credit of a paid gift transaction as a soft credit on its gift, with its amount, or the gift's when it has none.","source":"GiftSoftCredit","fields":["GiftTransactionId","RecipientId","Role","SoftCreditAmount","GiftTransaction.OriginalAmount"],"filters":[{"field":"GiftTransaction.Status","value":"Paid"}],"links":[{"column":"GiftTransactionId","step":"gifts"}],"templateKey":"kit_npc_soft_credits"}]</value>
+  </values>
+  <values>
+    <field>Retire_Checklist_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"entry","text":"Record new gifts in BarnCRM Giving only: point online giving, payment processors and gift entry at BarnCRM, so no gift is recorded in both."},{"key":"mirror","text":"In BarnCRM Settings, keep the Gift Transaction mirror on (Gifts to Gift Transactions) only if Nonprofit Cloud donor summaries must stay current; copied gifts already carry their Gift Transaction ID and are never copied back."},{"key":"commitments","text":"Stop any processor or schedule that creates gift transactions for Nonprofit Cloud gift commitments once their BarnCRM commitments take over."},{"key":"rollups","text":"Review Data Processing Engine definitions and reports that read gift transactions, once BarnCRM's donor totals are what you report on."}]</value>
+  </values>
+  <values>
+    <field>Extension_Class__c</field>
+    <value xsi:type="xsd:string">NpcGiftsKit</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">18</value>
+  </values>
+</CustomMetadata>

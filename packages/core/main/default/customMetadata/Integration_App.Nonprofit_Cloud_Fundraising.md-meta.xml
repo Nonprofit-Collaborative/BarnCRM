@@ -32,11 +32,11 @@
   </values>
   <values>
     <field>Compatibility__c</field>
-    <value xsi:type="xsd:string">BarnCRM runs beside Nonprofit Cloud and never changes its records. Avoid recording the same gift in both. A migration kit for gifts is planned; until then the Nonprofit Cloud import templates load them from a file.</value>
+    <value xsi:type="xsd:string">BarnCRM runs beside Nonprofit Cloud and never changes its records. Avoid recording the same gift in both. With Giving and Mirror installed, the Nonprofit Cloud gifts kit copies designations, commitments, paid gift transactions and soft credits in this org, each gift linked to its transaction so the Gift Transaction mirror never copies it back.</value>
   </values>
   <values>
     <field>Migration_Path__c</field>
-    <value xsi:type="xsd:string">The Migrating From Nonprofit Cloud admin guide page.</value>
+    <value xsi:type="xsd:string">Start Migration (with Giving and Mirror installed); the Migrating From Nonprofit Cloud admin guide page.</value>
   </values>
   <values>
     <field>Show_Only_When_Installed__c</field>

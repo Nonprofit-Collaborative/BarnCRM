@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>Nonprofit Cloud Migration: Gifts</label>
+  <protected>true</protected>
+  <values>
+    <field>Template_Key__c</field>
+    <value xsi:type="xsd:string">kit_npc_gifts</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Used by the Nonprofit Cloud Gifts and Soft Credits migration kit, which reads paid gift transactions: one gift per transaction, keyed and linked by its Gift Transaction ID, with the donor by record ID, amount, date, payment method and reference, appeal, designations as funds and tribute.</value>
+  </values>
+  <values>
+    <field>Column_Mapping_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >{"version": 2, "uniqueBy": ["Id"], "columns": [{"source": "Id", "target": "Gift.External_Id__c"}, {"source": "GiftTransactionId", "target": "Gift.Gift_Transaction_Id__c"}, {"source": "OriginalAmount", "target": "Gift.Amount__c"}, {"source": "TransactionDate", "target": "Gift.Gift_Date__c"}, {"source": "PaymentMethod", "target": "Gift.Type__c", "transforms": [{"op": "map", "pairs": [{"text": "Cash", "value": "Cash"}, {"text": "Check", "value": "Check"}, {"text": "Credit Card", "value": "Card"}, {"text": "Debit Card", "value": "Card"}, {"text": "Card", "value": "Card"}, {"text": "ACH", "value": "ACH"}, {"text": "EFT", "value": "ACH"}, {"text": "Bank Transfer", "value": "ACH"}, {"text": "Stock", "value": "Stock"}, {"text": "Securities", "value": "Stock"}], "otherwise": "Other"}, {"op": "ifBlank", "value": "Other"}]}, {"source": "PaymentIdentifier", "target": "Gift.Payment_Reference__c"}, {"source": "CampaignId", "target": "Gift.Appeal"}, {"source": "Donor", "target": "Gift.Donor"}, {"source": "ContactId", "target": "Contact1.Id"}, {"source": "OrganizationId", "target": "Organization.Id"}, {"source": "Fund1", "target": "Allocation.Fund1"}, {"source": "Amount1", "target": "Allocation.Amount1"}, {"source": "Fund2", "target": "Allocation.Fund2"}, {"source": "Amount2", "target": "Allocation.Amount2"}, {"source": "Fund3", "target": "Allocation.Fund3"}, {"source": "Amount3", "target": "Allocation.Amount3"}, {"source": "Fund4", "target": "Allocation.Fund4"}, {"source": "Amount4", "target": "Allocation.Amount4"}, {"source": "Fund5", "target": "Allocation.Fund5"}, {"source": "Amount5", "target": "Allocation.Amount5"}, {"source": "TributeType", "target": "Tribute.Type__c", "transforms": [{"op": "map", "pairs": [{"text": "Honor", "value": "In honor of"}, {"text": "In Honor Of", "value": "In honor of"}, {"text": "Memorial", "value": "In memory of"}, {"text": "In Memory Of", "value": "In memory of"}]}]}, {"source": "HonoreeName", "target": "Tribute.Honoree_Name__c"}, {"source": "NotifyName", "target": "Tribute.Notification_Recipient_Name__c"}, {"source": "NotifyMessage", "target": "Tribute.Message__c"}]}</value>
+  </values>
+  <values>
+    <field>Default_Values_JSON__c</field>
+    <value xsi:type="xsd:string">{"version": 1, "defaults": []}</value>
+  </values>
+  <values>
+    <field>Matching_Rule__c</field>
+    <value xsi:type="xsd:string">Email exact</value>
+  </values>
+  <values>
+    <field>Person_Mode__c</field>
+    <value xsi:type="xsd:string">Contacts</value>
+  </values>
+  <values>
+    <field>Default_Active__c</field>
+    <value xsi:type="xsd:boolean">true</value>
+  </values>
+</CustomMetadata>
