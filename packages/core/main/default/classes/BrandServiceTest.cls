@@ -198,8 +198,9 @@ private class BrandServiceTest {
 			turnOn(true, false);
 			Brand__c mine = brand('Mine', null, false);
 			insert new Brand_Assignment__c(Brand__c = mine.Id, User__c = UserInfo.getUserId());
-			Account household = HouseholdTestDataFactory.newHousehold('Zztest Parent');
-			insert household;
+			Account household = HouseholdTestDataFactory.insertHouseholds(
+				new List<Account>{ HouseholdTestDataFactory.newHousehold('Zztest Parent') }
+			)[0];
 			Contact person = new Contact(LastName = 'Zztest Parent');
 			insert person;
 			List<Brand_Assignment__c> records = new List<Brand_Assignment__c>{
@@ -226,6 +227,10 @@ private class BrandServiceTest {
 	static void aFullSharePageQueuesTheNextWhateverItsScope() {
 		System.runAs(TestUsers.admin()) {
 			turnOn(true, true);
+			// Without this, Core gives the new person a household and the page scope is not empty.
+			BarnCRM_Settings__c settings = BarnCRM_Settings__c.getOrgDefaults();
+			settings.Auto_Create_Households__c = false;
+			HouseholdTestDataFactory.save(settings);
 			Brand__c chapter = brand('Chapter', null, false);
 			Contact person = new Contact(LastName = 'Zztest Alone');
 			insert person;
@@ -275,8 +280,9 @@ private class BrandServiceTest {
 		System.runAs(admin) {
 			turnOn(true, true);
 			chapter = brand('Chapter', null, false);
-			household = HouseholdTestDataFactory.newHousehold('Zztest Brand');
-			insert household;
+			household = HouseholdTestDataFactory.insertHouseholds(
+				new List<Account>{ HouseholdTestDataFactory.newHousehold('Zztest Brand') }
+			)[0];
 			insert new Brand_Assignment__c(Brand__c = chapter.Id, Account__c = household.Id);
 			insert new Brand_Assignment__c(Brand__c = chapter.Id, User__c = admin.Id);
 		}

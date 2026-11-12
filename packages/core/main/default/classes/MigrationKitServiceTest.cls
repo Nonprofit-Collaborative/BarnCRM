@@ -154,6 +154,12 @@ private class MigrationKitServiceTest {
 				'Migration test',
 				'Contact'
 			);
+			// A kit's template maps its columns; an unmapped one fails the dry run that follows.
+			ImportMapping mapping = new ImportMapping();
+			mapping.columns.add(new ImportMapping.Column('Id', 'Record.Id'));
+			mapping.columns.add(new ImportMapping.Column('FirstName', 'Record.FirstName'));
+			mapping.columns.add(new ImportMapping.Column('Email', 'Record.Email'));
+			ImportTestDataFactory.saveMapping(template.Id, mapping.serialize(), null);
 			insert new List<Contact>{
 				new Contact(FirstName = 'Ana', LastName = LAST_NAME, Email = 'ana@example.invalid'),
 				new Contact(FirstName = 'Ben', LastName = LAST_NAME),
@@ -199,7 +205,10 @@ private class MigrationKitServiceTest {
 			Assert.areNotEqual(MigrationKitService.NOT_STARTED, view.steps[0].status, 'Started');
 			Assert.areEqual(2, view.steps[0].sourceCount, 'Verification counts the source');
 			Assert.areEqual(2, view.steps[0].staged, 'And what was read');
-			Assert.isFalse(view.steps[0].canStart, 'A started step cannot start again');
+			Assert.isFalse(
+				view.steps[0].canStart,
+				'A started step cannot start again: ' + view.steps[0].status
+			);
 		}
 	}
 
@@ -337,7 +346,8 @@ private class MigrationKitServiceTest {
 				Migration_Run__c = run.Id,
 				Migration_Step__c = 'first'
 			);
-			insert new Import_Row__c(
+			// Rows are written by the data job in system mode; admins only read them.
+			insert as system new Import_Row__c(
 				Import_Batch__c = batch.Id,
 				Row_Number__c = 2,
 				Status__c = 'Created',

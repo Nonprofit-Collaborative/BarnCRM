@@ -61,11 +61,12 @@ public with sharing class MigrationKitService {
 
 	/**
 	 * One condition of an import step's `filters`: the field equals the value, or with `op`
-	 * notEquals, does not.
+	 * notEquals, does not. The value is held as text, since JSON cannot read into an Object
+	 * field, and is bound as the field's own type when the source is read.
 	 */
 	public class Condition {
 		public String field;
-		public Object value;
+		public String value;
 		public String op;
 	}
 
@@ -234,7 +235,7 @@ public with sharing class MigrationKitService {
 		List<Step> parsed;
 		try {
 			parsed = (List<Step>) JSON.deserialize(
-				String.isBlank(kit.Steps_JSON__c) ? '[]' : kit.Steps_JSON__c,
+				filterValuesAsText(String.isBlank(kit.Steps_JSON__c) ? '[]' : kit.Steps_JSON__c),
 				List<Step>.class
 			);
 		} catch (JSONException unreadable) {
@@ -265,6 +266,30 @@ public with sharing class MigrationKitService {
 			}
 		}
 		return parsed;
+	}
+
+	/** The steps JSON with each filter value written as text (true becomes "true"). */
+	private static String filterValuesAsText(String stepsJson) {
+		Object read = JSON.deserializeUntyped(stepsJson);
+		for (
+			Object step : read instanceof List<Object> ? (List<Object>) read : new List<Object>()
+		) {
+			Object filters = step instanceof Map<String, Object>
+				? ((Map<String, Object>) step).get('filters')
+				: null;
+			for (
+				Object condition : filters instanceof List<Object>
+					? (List<Object>) filters
+					: new List<Object>()
+			) {
+				if (condition instanceof Map<String, Object>) {
+					Map<String, Object> written = (Map<String, Object>) condition;
+					Object value = written.get('value');
+					written.put('value', value == null ? null : String.valueOf(value));
+				}
+			}
+		}
+		return JSON.serialize(read);
 	}
 
 	private static List<Item> checklist(Migration_Kit__mdt kit) {
@@ -787,7 +812,7 @@ public with sharing class MigrationKitService {
 					clauses.add(field + operator + 'null');
 				} else {
 					String name = 'w' + binds.size();
-					binds.put(name, condition.value);
+					binds.put(name, typed(lastResolved, condition));
 					clauses.add(field + operator + ':' + name);
 				}
 			}
@@ -837,7 +862,8 @@ public with sharing class MigrationKitService {
 	 * A field path as the platform names it. Each dot is first read as a relationship, then as
 	 * a namespace separator (`ns.Field__c`), so `npsp.Primary_Contact__r.Email` and
 	 * `Account.npsp.Code__c` both resolve. Refused, naming the path, when any part is missing or
-	 * unreadable, or when a filter field cannot be filtered on.
+	 * unreadable, or when a filter field cannot be filtered on. Keeps the field it ends on in
+	 * lastResolved, so a filter value can be bound as that field's type.
 	 */
 	@TestVisible
 	private static String path(Schema.SObjectType start, String written, Boolean filter) {
@@ -877,12 +903,50 @@ public with sharing class MigrationKitService {
 			index += used;
 			if (last) {
 				resolved.add(found.getName());
+				lastResolved = found;
 			} else {
 				resolved.add(found.getRelationshipName());
 				at = found.getReferenceTo()[0];
 			}
 		}
 		return String.join(resolved, '.');
+	}
+
+	private static Schema.DescribeFieldResult lastResolved;
+
+	/** A filter's text value as its field's type, so the bind matches the column. */
+	private static Object typed(Schema.DescribeFieldResult field, Condition condition) {
+		String value = condition.value;
+		try {
+			switch on field.getType() {
+				when BOOLEAN {
+					return Boolean.valueOf(value);
+				}
+				when INTEGER {
+					return Integer.valueOf(value);
+				}
+				when LONG {
+					return Long.valueOf(value);
+				}
+				when DOUBLE, CURRENCY, PERCENT {
+					return Decimal.valueOf(value);
+				}
+				when DATE {
+					return Date.valueOf(value);
+				}
+				when DATETIME {
+					return (Datetime) JSON.deserialize('"' + value + '"', Datetime.class);
+				}
+				when else {
+					return value;
+				}
+			}
+		} catch (Exception unreadable) {
+			throw refusal(
+				BarnHelp.text('Core', 'Core_Migration_ErrorKitUnreadable'),
+				condition.field
+			);
+		}
 	}
 
 	private static Schema.DescribeFieldResult fieldNamed(

@@ -88,13 +88,17 @@ private class ArchiveByQueryTest {
 			Test.stopTest();
 
 			job = reread(job.Id);
-			ContentVersion file = [
-				SELECT Title, VersionData
-				FROM ContentVersion
-				WHERE Title LIKE 'Contact-%-part-1'
-				WITH SYSTEM_MODE
-				LIMIT 1
-			];
+			// The file is the deleter's: a file is read by those it is shared with, even in system mode.
+			ContentVersion file;
+			System.runAs(deleter()) {
+				file = [
+					SELECT Title, VersionData
+					FROM ContentVersion
+					WHERE Title LIKE 'Contact-%-part-1'
+					WITH SYSTEM_MODE
+					LIMIT 1
+				];
+			}
 			List<String> lines = file.VersionData.toString().split('\r\n');
 			System.Assert.areEqual(4, lines.size(), 'A heading row and the three records');
 			List<String> heading = lines[0].substring(1).split(',');
@@ -156,11 +160,15 @@ private class ArchiveByQueryTest {
 			job = reread(job.Id);
 
 			System.Assert.areEqual(3, job.Rows_Deleted__c, job.Run_Log__c);
-			System.Assert.areEqual(
-				0,
-				[SELECT COUNT() FROM Contact WHERE IsDeleted = TRUE ALL ROWS],
-				'Emptied from the Recycle Bin'
-			);
+			// In a test an emptied record still answers ALL ROWS, so emptied is proved by the
+			// deleter no longer being able to undelete any of them.
+			System.runAs(deleter()) {
+				List<Contact> binned = [SELECT Id FROM Contact WHERE IsDeleted = TRUE ALL ROWS];
+				System.Assert.areEqual(3, binned.size(), 'The three deleted records');
+				for (Database.UndeleteResult result : Database.undelete(binned, false)) {
+					System.Assert.isFalse(result.isSuccess(), 'Emptied from the Recycle Bin');
+				}
+			}
 			System.Assert.isTrue(
 				job.Run_Log__c.contains(
 					String.format(

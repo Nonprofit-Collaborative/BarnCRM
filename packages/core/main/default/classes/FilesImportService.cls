@@ -459,8 +459,24 @@ public with sharing class FilesImportService {
 	/** The person's own load that is still running, locked; anything else is refused. */
 	private static Import_Batch__c loading(Id jobId) {
 		Id me = UserInfo.getUserId();
+		// Every field view() reads, since finish() answers the job it locked here (JOB_FIELDS).
 		for (Import_Batch__c job : [
-			SELECT Id, Status__c, Rows_Created__c, Rows_Rejected__c, Run_Log__c
+			SELECT
+				Id,
+				Name,
+				Status__c,
+				File_Name__c,
+				Started_At__c,
+				Completed_At__c,
+				Undo_Deadline__c,
+				Row_Count__c,
+				Rows_Created__c,
+				Rows_Rejected__c,
+				Rows_Deleted__c,
+				Run_Log__c,
+				Is_Dry_Run__c,
+				Job_Id__c,
+				Committed_By__c
 			FROM Import_Batch__c
 			WHERE
 				Id = :jobId

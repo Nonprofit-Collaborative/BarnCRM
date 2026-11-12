@@ -262,7 +262,15 @@ private class GenericMergeServiceTest {
 			Assert.isTrue(filesOn(keep.Id).contains(onlyOther), 'The kept record has the file');
 			Assert.isTrue(filesOn(keep.Id).contains(shared), 'The shared file is still there');
 			Merge_Journal__c journal = [
-				SELECT Id, Survivor_Id__c, Merged_Id__c, Merged_Name__c, Moved_Records__c, Notes__c
+				SELECT
+					Id,
+					Survivor_Id__c,
+					Merged_Id__c,
+					Merged_Name__c,
+					Status__c,
+					Changed_Values__c,
+					Moved_Records__c,
+					Notes__c
 				FROM Merge_Journal__c
 				WHERE Merged_Id__c = :other.Id
 				WITH SYSTEM_MODE
