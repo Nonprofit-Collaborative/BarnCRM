@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
   <fullName>Actual_Cost__c</fullName>
-  <formula>IF(ISBLANK(Hourly_Rate__c), NULL, Actual_Hours__c * Hourly_Rate__c)</formula>
+  <formula>IF($Setup.Projects_Settings__c.Rates_Enabled__c, Time_Amount__c, IF(ISBLANK(Hourly_Rate__c), NULL, Actual_Hours__c * Hourly_Rate__c))</formula>
   <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
-  <inlineHelpText>Actual Hours times the Hourly Rate.</inlineHelpText>
+  <inlineHelpText>Actual Hours times the Hourly Rate; with rate cards on, the hours times the rate each entry was logged at.</inlineHelpText>
   <label>Actual Cost</label>
   <precision>18</precision>
   <scale>2</scale>

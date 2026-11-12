@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Manage resources</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Resources_Enabled__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Projects_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Projects</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Projects</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Checkbox</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">80</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">Skills and capacity per person, resource requests on projects, the Staffing page and weekly allocation against capacity. Needs Track time and budgets. Default: off.</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">projects-psa.md</value></values>
+</CustomMetadata>

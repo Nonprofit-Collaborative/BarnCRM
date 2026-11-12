@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Skills__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>What the person can do. The list is the Project Skills picklist value set in Setup.</inlineHelpText>
+  <label>Skills</label>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>MultiselectPicklist</type>
+  <valueSet>
+    <restricted>true</restricted>
+    <valueSetName>Project_Skills</valueSetName>
+  </valueSet>
+  <visibleLines>4</visibleLines>
+</CustomField>

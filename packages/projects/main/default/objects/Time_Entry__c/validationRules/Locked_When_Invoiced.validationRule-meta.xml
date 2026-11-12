@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Locked_When_Invoiced</fullName>
+  <active>true</active>
+  <description>R-PM12: invoiced entries do not change until the invoice is voided.</description>
+  <errorConditionFormula>AND(NOT(ISBLANK(PRIORVALUE(Invoice_Line__c))), NOT(ISCHANGED(Invoice_Line__c)), OR(ISCHANGED(Status__c), ISCHANGED(Hours__c), ISCHANGED(Date__c), ISCHANGED(User__c), ISCHANGED(Task__c), ISCHANGED(Billable__c), AND(ISCHANGED(Bill_Rate__c), NOT(ISBLANK(PRIORVALUE(Bill_Rate__c)))), AND(ISCHANGED(Cost_Rate__c), NOT(ISBLANK(PRIORVALUE(Cost_Rate__c))))))</errorConditionFormula>
+  <errorMessage>These hours are on an invoice. Void the invoice to change them.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ListView xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Expenses_This_Month</fullName>
+  <columns>NAME</columns>
+  <columns>Project__c</columns>
+  <columns>User__c</columns>
+  <columns>Date__c</columns>
+  <columns>Category__c</columns>
+  <columns>Amount__c</columns>
+  <columns>Billable__c</columns>
+  <columns>Status__c</columns>
+  <filterScope>Everything</filterScope>
+  <filters>
+    <field>Date__c</field>
+    <operation>equals</operation>
+    <value>THIS_MONTH</value>
+  </filters>
+  <label>This Month</label>
+</ListView>

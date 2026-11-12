@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>Revenue recognized for a project in one closed month, kept so closed months do not move (canonical model 29PM14, PM-11).</description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>false</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>true</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Project Revenue</label>
+  <nameField>
+    <displayFormat>REV-{000000}</displayFormat>
+    <label>Revenue Number</label>
+    <trackHistory>false</trackHistory>
+    <type>AutoNumber</type>
+  </nameField>
+  <pluralLabel>Project Revenue</pluralLabel>
+  <sharingModel>ControlledByParent</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>

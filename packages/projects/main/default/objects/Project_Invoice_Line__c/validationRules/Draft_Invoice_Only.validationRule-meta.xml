@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Draft_Invoice_Only</fullName>
+  <active>true</active>
+  <description>R-PM16: lines change only while the invoice is Draft.</description>
+  <errorConditionFormula>NOT(ISPICKVAL(Invoice__r.Status__c, "Draft"))</errorConditionFormula>
+  <errorMessage>Lines can be added or changed only while the invoice is Draft.</errorMessage>
+</ValidationRule>

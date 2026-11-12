@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Person_Or_Role</fullName>
+  <active>true</active>
+  <description>R-PM9: a rate is for a person or a role, not both.</description>
+  <errorConditionFormula>OR(AND(ISBLANK(User__c), ISBLANK(Role__c)), AND(NOT(ISBLANK(User__c)), NOT(ISBLANK(Role__c))))</errorConditionFormula>
+  <errorMessage>Fill in either Person or Role, not both.</errorMessage>
+</ValidationRule>

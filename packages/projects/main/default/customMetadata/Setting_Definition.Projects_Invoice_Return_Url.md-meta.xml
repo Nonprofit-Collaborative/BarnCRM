@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Invoice payment return page</label>
+    <protected>true</protected>
+    <values><field>Setting_Key__c</field><value xsi:type="xsd:string">Invoice_Return_Url__c</value></values>
+    <values><field>Settings_Object__c</field><value xsi:type="xsd:string">Projects_Settings__c</value></values>
+    <values><field>Section__c</field><value xsi:type="xsd:string">Projects</value></values>
+    <values><field>Module__c</field><value xsi:type="xsd:string">Projects</value></values>
+    <values><field>Data_Type__c</field><value xsi:type="xsd:string">Text</value></values>
+    <values><field>Sort_Order__c</field><value xsi:type="xsd:double">93</value></values>
+    <values><field>Description__c</field><value xsi:type="xsd:string">The https page a client returns to after paying an invoice online, such as your website's thank you page. Default: blank, which returns them to your Salesforce My Domain address.</value></values>
+    <values><field>Help_Path__c</field><value xsi:type="xsd:string">projects-psa.md</value></values>
+</CustomMetadata>

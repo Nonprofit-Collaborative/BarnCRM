@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Online_Payments_Enabled__c</fullName>
+  <defaultValue>false</defaultValue>
+  <externalId>false</externalId>
+  <inlineHelpText>Pay Online on a sent invoice through BarnCRM Payments (your own Stripe or PayPal); a paid payment marks the invoice Paid. Needs Create invoices and the Payments module. Default: off.</inlineHelpText>
+  <label>Take invoice payments online</label>
+  <trackTrending>false</trackTrending>
+  <type>Checkbox</type>
+</CustomField>

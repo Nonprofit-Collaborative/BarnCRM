@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+  <deploymentStatus>Deployed</deploymentStatus>
+  <description>An invoice record for one project, for the organization's own accounting; BarnCRM takes no payment (canonical model 29PM12, PM-10).</description>
+  <enableActivities>false</enableActivities>
+  <enableBulkApi>true</enableBulkApi>
+  <enableFeeds>false</enableFeeds>
+  <enableHistory>true</enableHistory>
+  <enableReports>true</enableReports>
+  <enableSearch>true</enableSearch>
+  <enableSharing>true</enableSharing>
+  <enableStreamingApi>true</enableStreamingApi>
+  <label>Project Invoice</label>
+  <nameField>
+    <displayFormat>INV-{000000}</displayFormat>
+    <label>Invoice Number</label>
+    <trackHistory>false</trackHistory>
+    <type>AutoNumber</type>
+  </nameField>
+  <pluralLabel>Project Invoices</pluralLabel>
+  <sharingModel>ControlledByParent</sharingModel>
+  <visibility>Public</visibility>
+</CustomObject>
