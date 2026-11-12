@@ -22,9 +22,7 @@
   </values>
   <values>
     <field>Picklist_Values__c</field>
-    <value
-      xsi:type="xsd:string"
-    >Organizations and Households:Organization and Household Tabs;Accounts:Accounts Tab (Standard);Both:Both</value>
+    <value xsi:type="xsd:string">Organizations and Households:Organization and Household Tabs;Accounts:Accounts Tab (Standard);Both:Both</value>
   </values>
   <values>
     <field>Section__c</field>
