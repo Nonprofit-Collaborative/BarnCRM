@@ -11,6 +11,10 @@
     <apexClass>ProjectsController</apexClass>
     <enabled>true</enabled>
   </classAccesses>
+  <classAccesses>
+    <apexClass>ProjectStaffingController</apexClass>
+    <enabled>true</enabled>
+  </classAccesses>
   <fieldPermissions>
     <editable>true</editable>
     <field>Project__c.Health__c</field>
@@ -685,6 +689,10 @@
   </tabSettings>
   <tabSettings>
     <tab>Project_Resource__c</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
+    <tab>Projects_Staffing</tab>
     <visibility>Visible</visibility>
   </tabSettings>
 </PermissionSet>

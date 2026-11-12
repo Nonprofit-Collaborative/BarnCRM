@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ReportType xmlns="http://soap.sforce.com/2006/04/metadata">
+  <baseObject>Resource_Request__c</baseObject>
+  <category>other</category>
+  <deployed>true</deployed>
+  <description>
+    Resource requests: the role, skills, hours and dates a project needs, and their status.
+  </description>
+  <label>Resource Requests</label>
+  <sections>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Name</field>
+      <table>Resource_Request__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Project__c</field>
+      <table>Resource_Request__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Role__c</field>
+      <table>Resource_Request__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Skills__c</field>
+      <table>Resource_Request__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Hours__c</field>
+      <table>Resource_Request__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Start_Date__c</field>
+      <table>Resource_Request__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>End_Date__c</field>
+      <table>Resource_Request__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>true</checkedByDefault>
+      <field>Status__c</field>
+      <table>Resource_Request__c</table>
+    </columns>
+    <columns>
+      <checkedByDefault>false</checkedByDefault>
+      <field>Assignment__c</field>
+      <table>Resource_Request__c</table>
+    </columns>
+    <masterLabel>Resource Request</masterLabel>
+  </sections>
+</ReportType>

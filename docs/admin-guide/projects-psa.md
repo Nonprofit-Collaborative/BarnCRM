@@ -108,10 +108,18 @@ With **Manage resources** on:
   their own) and a **Default Role**. Edit the skills list in Setup, Picklist Value Sets,
   **Project Skills**.
 - **Resource Requests** on a project: a role, skills, hours and dates the project needs.
-- The **Staffing** page lists open requests; **Fill** shows people with all the requested skills
-  first, then by free capacity, and creates the Project Assignment for the one you pick.
-- The **allocation** view shows, week by week, each person's planned hours (assignments spread
-  over their working days) against capacity, with unfilled requests as demand.
+- The **Staffing** tab lists open requests and the people who can be staffed (add or edit a
+  person there; each person has one row). **Fill** shows people with all the requested skills
+  first, then those whose Default Role is the requested role, then those with the most free
+  capacity in the request's dates (their capacity for its working days less the hours already
+  planned on their assignments), and creates the Project Assignment for the one you pick. People
+  with only some of the skills are still listed, with the count.
+- The **Weekly Allocation** view (below Staffing, 4 to 26 weeks) shows, week by week, each
+  person's planned hours (assignments spread over their working days) against capacity, red when
+  over, with logged hours on hover and unfilled requests as demand. Only active people with a
+  Project Resource row appear; assignments of people without one are not shown.
+- Utilization on Projects Home uses a person's own Weekly Capacity Hours when this is on, and
+  counts only approved time as logged when approvals are on.
 
 ## Billing and Invoices (PM-10)
 

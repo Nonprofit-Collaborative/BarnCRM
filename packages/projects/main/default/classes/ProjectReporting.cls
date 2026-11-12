@@ -128,23 +128,41 @@ public with sharing class ProjectReporting {
 		checkRange(fromDate, toDate);
 		Map<Id, Utilization> byUser = new Map<Id, Utilization>();
 		Integer days = fromDate.daysBetween(toDate) + 1;
-		Decimal capacity = (Decimal.valueOf(ProjectsSettings.weeklyCapacity()) *
-			days /
-			7)
-			.setScale(2);
+		// PM-09 (R-PM14): with Manage resources on, a person's own Weekly Capacity Hours.
+		Map<Id, Decimal> weekly = new Map<Id, Decimal>();
+		if (ProjectsSettings.resourcesEnabled()) {
+			for (Project_Resource__c resource : [
+				SELECT User__c, Weekly_Capacity_Hours__c
+				FROM Project_Resource__c
+				WHERE Weekly_Capacity_Hours__c != NULL
+				WITH USER_MODE
+				ORDER BY CreatedDate DESC
+				LIMIT 2000
+			]) {
+				weekly.put(resource.User__c, resource.Weekly_Capacity_Hours__c);
+			}
+		}
+		Decimal standard = Decimal.valueOf(ProjectsSettings.weeklyCapacity());
+		// Logged hours are counted time only (R-PM10): a blank Status counts; Open, Submitted
+		// and Rejected do not.
 		for (AggregateResult row : [
 			SELECT User__c userId, User__r.Name name, Billable__c billable, SUM(Hours__c) hours
 			FROM Time_Entry__c
-			WHERE User__c != NULL AND Date__c >= :fromDate AND Date__c <= :toDate
+			WHERE
+				User__c != NULL
+				AND Date__c >= :fromDate
+				AND Date__c <= :toDate
+				AND Status__c NOT IN ('Open', 'Submitted', 'Rejected')
 			WITH USER_MODE
 			GROUP BY User__c, User__r.Name, Billable__c
 			LIMIT 2000
 		]) {
+			Id userId = (Id) row.get('userId');
 			Utilization person = person(
 				byUser,
-				(Id) row.get('userId'),
+				userId,
 				(String) row.get('name'),
-				capacity
+				capacity(weekly.get(userId), standard, days)
 			);
 			Decimal hours = (Decimal) row.get('hours');
 			person.logged += hours;
@@ -177,7 +195,12 @@ public with sharing class ProjectReporting {
 			Decimal share =
 				Decimal.valueOf(overlapStart.daysBetween(overlapEnd) + 1) /
 				(starts.daysBetween(ends) + 1);
-			person(byUser, assignment.Resource__c, assignment.Resource__r.Name, capacity)
+			person(
+					byUser,
+					assignment.Resource__c,
+					assignment.Resource__r.Name,
+					capacity(weekly.get(assignment.Resource__c), standard, days)
+				)
 				.planned += (assignment.Planned_Hours__c * share).setScale(2);
 		}
 		return byUser.values();
@@ -243,6 +266,10 @@ public with sharing class ProjectReporting {
 		}
 		update as user stamps;
 		return rows;
+	}
+
+	private static Decimal capacity(Decimal own, Decimal standard, Integer days) {
+		return ((own == null ? standard : own) * days / 7).setScale(2);
 	}
 
 	private static Utilization person(
