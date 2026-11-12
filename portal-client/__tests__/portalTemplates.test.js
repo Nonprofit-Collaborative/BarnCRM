@@ -216,8 +216,9 @@ describe('shipped portal templates', () => {
       });
   });
 
-  it('the donor template edits only contact details and pays only through Pay Online on pledges', () => {
-    const text = JSON.stringify(donor);
+  it('the donor template edits only contact details and pays only through Pay Online and Update Card on pledges', () => {
+    // No card field and no create: the card is only ever typed on the processor's page.
+    const text = JSON.stringify(donor).replace('"Giving.UpdateCard","label":"Update Card"', '');
     expect(text).not.toMatch(/Card|create/);
     donor.pages.forEach((page) => {
       const updates = page.actions.filter((a) => a === 'update');
@@ -227,9 +228,10 @@ describe('shipped portal templates', () => {
         expect(page.kind).toBe('person');
         expect(page.key).toBe('contact');
       }
-      // PAY-03 (ADR-0210 donor portal payments): the one module action, on pledges only.
+      // PAY-03 (ADR-0210) and PAY-04 (ADR-NEXT payments subscriptions): the two module
+      // actions, on pledges only.
       modules.forEach((action) => {
-        expect(action.extension).toBe('Giving.PayOnline');
+        expect(['Giving.PayOnline', 'Giving.UpdateCard']).toContain(action.extension);
         expect(page.key).toBe('pledges');
       });
     });

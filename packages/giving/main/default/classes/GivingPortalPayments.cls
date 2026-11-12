@@ -27,24 +27,42 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 	@TestVisible
 	private static EmailSender emailSender = new MessagingEmailSender();
 
+	/** Update Card (PAY-04; ADR-NEXT `NEXT-payments-subscriptions.md`, decision 6). */
+	public static final String UPDATE_CARD = 'Giving.UpdateCard';
+	/** A recurring gift's Frequency as the processor's interval and count (PAY-04). */
+	private static final Map<String, List<Object>> EVERY = new Map<String, List<Object>>{
+		'Weekly' => new List<Object>{ 'week', 1 },
+		'Every two weeks' => new List<Object>{ 'week', 2 },
+		'Monthly' => new List<Object>{ 'month', 1 },
+		'Quarterly' => new List<Object>{ 'month', 3 },
+		'Twice a year' => new List<Object>{ 'month', 6 },
+		'Yearly' => new List<Object>{ 'year', 1 }
+	};
+
 	private Id commitmentId;
+	private Boolean card = false;
 
 	@NamespaceAccessible
 	public GivingPortalPayments() {
 		// Built by name from Core (PortalActionExtensions), so it needs a public constructor.
 	}
 
-	private GivingPortalPayments(Id commitmentId) {
+	private GivingPortalPayments(Id commitmentId, Boolean card) {
 		this.commitmentId = commitmentId;
+		this.card = card;
 	}
 
 	public Set<String> actionNames() {
-		return new Set<String>{ PAY_ONLINE };
+		return new Set<String>{ PAY_ONLINE, UPDATE_CARD };
 	}
 
-	/** Checks the commitment and queues the checkout; the message is shown to the donor. */
+	/**
+	 * Checks the commitment and queues the checkout or the card update; the message is shown to
+	 * the donor. Pay Online is refused on a gift charged automatically, Update Card on any other.
+	 */
 	public String run(String actionName, Id personId, Id recordId) {
-		Commitment__c commitment = actionName == PAY_ONLINE ? load(recordId) : null;
+		Commitment__c commitment = actionNames().contains(actionName) ? load(recordId) : null;
+		Boolean card = actionName == UPDATE_CARD;
 		String problem;
 		if (commitment == null || personId == null || commitment.Donor_Contact__c != personId) {
 			problem = BarnHelp.text('Giving', 'Giving_PayOnline_NotFound');
@@ -52,7 +70,11 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 			problem = BarnHelp.text('Giving', 'Giving_PayOnline_NotActive');
 		} else if (String.isBlank(commitment.Donor_Contact__r.Email)) {
 			problem = BarnHelp.text('Giving', 'Giving_PayOnline_NoEmail');
-		} else if (amountDue(commitment) <= 0) {
+		} else if (card && !automatic(commitment)) {
+			problem = BarnHelp.text('Giving', 'Giving_UpdateCard_NoSubscription');
+		} else if (!card && automatic(commitment)) {
+			problem = BarnHelp.text('Giving', 'Giving_PayOnline_Automatic');
+		} else if (!card && amountDue(commitment) <= 0) {
 			problem = BarnHelp.text('Giving', 'Giving_PayOnline_NothingDue');
 		} else if (!GivingDonations.paymentsReady()) {
 			problem = BarnHelp.text('Giving', 'Giving_PayOnline_NotReady');
@@ -60,21 +82,74 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 		if (problem != null) {
 			throw new PortalPaymentException(problem);
 		}
-		System.enqueueJob(new GivingPortalPayments(commitment.Id));
-		return BarnHelp.text('Giving', 'Giving_PayOnline_Sent');
+		System.enqueueJob(new GivingPortalPayments(commitment.Id, card));
+		return card
+			? BarnHelp.text('Giving', 'Giving_UpdateCard_Sent')
+			: BarnHelp.text('Giving', 'Giving_PayOnline_Sent');
 	}
 
-	/** Starts the checkout, then emails its address to the donor. */
+	/** A recurring gift the processor charges automatically (PAY-04). */
+	private static Boolean automatic(Commitment__c commitment) {
+		return commitment.Type__c == 'Recurring' &&
+			String.isNotBlank(commitment.Processor_Subscription_Id__c) &&
+			commitment.Processor_Cancelled__c == null;
+	}
+
+	/** Starts the checkout (or gets the card page), then emails its address to the donor. */
 	public void execute(QueueableContext queued) {
 		Commitment__c commitment = load(commitmentId);
-		Decimal amount = commitment == null ? 0 : amountDue(commitment);
-		if (amount <= 0 || String.isBlank(commitment.Donor_Contact__r.Email)) {
+		if (commitment == null || String.isBlank(commitment.Donor_Contact__r.Email)) {
+			return;
+		}
+		if (card) {
+			try {
+				Map<String, Object> page = (Map<String, Object>) GivingDonations.payments()
+					.call(
+						'updateCard',
+						new Map<String, Object>{
+							'subscriptionId' => commitment.Processor_Subscription_Id__c,
+							'customerId' => commitment.Processor_Customer_Id__c,
+							'returnUrl' => GivingDonations.returnUrl()
+						}
+					);
+				email(
+					commitment,
+					BarnHelp.text('Giving', 'Giving_UpdateCard_EmailSubject'),
+					BarnHelp.text('Giving', 'Giving_UpdateCard_EmailBody'),
+					new List<Object>{ commitment.Name, page.get('url') }
+				);
+			} catch (Exception e) {
+				ErrorLogger.log(e, CONTEXT, commitment.Id);
+			}
+			return;
+		}
+		Decimal amount = amountDue(commitment);
+		if (amount <= 0) {
 			return;
 		}
 		String url;
-		String amountText = amount.setScale(2).format();
+		String subject = BarnHelp.text('Giving', 'Giving_PayOnline_EmailSubject');
+		String body = BarnHelp.text('Giving', 'Giving_PayOnline_EmailBody');
+		String amountText;
 		try {
 			Callable payments = GivingDonations.payments();
+			// PAY-04: with Automatic Recurring Payments on, a recurring gift sets up automatic
+			// payments of its own amount, each period (Payments ignores the interval otherwise).
+			List<Object> every = commitment.Type__c == 'Recurring'
+				? EVERY.get(commitment.Frequency__c)
+				: null;
+			if (
+				every != null &&
+				(commitment.Amount__c ?? 0) > 0 &&
+				payments.call('isReady', new Map<String, Object>{ 'recurring' => true }) == true
+			) {
+				subject = BarnHelp.text('Giving', 'Giving_AutoPay_EmailSubject');
+				body = BarnHelp.text('Giving', 'Giving_AutoPay_EmailBody');
+				amount = commitment.Amount__c;
+			} else {
+				every = null;
+			}
+			amountText = amount.setScale(2).format();
 			Object recent = payments.call(
 				'countRecent',
 				new Map<String, Object>{
@@ -106,7 +181,9 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 						'sourceRecordId' => commitment.Id,
 						'listener' => GivingDonations.LISTENER,
 						// The scheduled payment charged, so the gift pays that one (GivingDonations).
-						'detail' => nextDue(commitment)?.Id
+						'detail' => nextDue(commitment)?.Id,
+						'interval' => every?.get(0),
+						'intervalCount' => every?.get(1)
 					}
 				);
 			url = String.valueOf(started.get('checkoutUrl'));
@@ -125,21 +202,21 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 			ErrorLogger.log(e, CONTEXT, commitment.Id);
 			return;
 		}
+		email(commitment, subject, body, new List<Object>{ amountText, commitment.Name, url });
+	}
+
+	/** Emails the donor `subject` and `body`, its {0} the first name and {1} on the `words`. */
+	private static void email(
+		Commitment__c commitment,
+		String subject,
+		String body,
+		List<Object> words
+	) {
+		words.add(0, commitment.Donor_Contact__r.FirstName ?? '');
 		Messaging.SingleEmailMessage message = new Messaging.SingleEmailMessage();
 		message.setToAddresses(new List<String>{ commitment.Donor_Contact__r.Email });
-		message.setSubject(BarnHelp.text('Giving', 'Giving_PayOnline_EmailSubject'));
-		message.setPlainTextBody(
-			BarnHelp.text(
-				'Giving',
-				'Giving_PayOnline_EmailBody',
-				new List<Object>{
-					commitment.Donor_Contact__r.FirstName ?? '',
-					amountText,
-					commitment.Name,
-					url
-				}
-			)
-		);
+		message.setSubject(subject);
+		message.setPlainTextBody(String.format(body, words));
 		message.setSaveAsActivity(false);
 		List<Messaging.SingleEmailMessage> messages = new List<Messaging.SingleEmailMessage>{
 			message
@@ -193,6 +270,10 @@ public with sharing class GivingPortalPayments implements PortalActionExtension,
 				Type__c,
 				Amount__c,
 				Balance__c,
+				Frequency__c,
+				Processor_Subscription_Id__c,
+				Processor_Customer_Id__c,
+				Processor_Cancelled__c,
 				Donor_Contact__c,
 				Donor_Contact__r.Name,
 				Donor_Contact__r.FirstName,

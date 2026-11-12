@@ -88,7 +88,9 @@ CAPS = {
     # Giving and Money review fixes (bulk payment listener, status stepping, card-testing
     # limits, portal payment guard, donation form Health Check): 663,899 measured 2026-11-12,
     # plus about 0.5%.
-    "giving": 667_300,
+    # PAY-04 (D-196): the subscriptions listener and Update Card / automatic Pay Online,
+    # 669,581 measured 2026-11-12, plus a small margin; both reuse the PAY-03 classes.
+    "giving": 670_000,
     # 2026-11-05: Log Hours, Create Shifts Now, Volunteer Letters (modules-14, 15, 20), Home.
     # Batch C landing 2026-11-07: 187,048 measured with the shift nudge (V-10b), plus 1.5%.
     # Batch C wave 2 landing: 189,775 measured (VolunteersEventExtension EV-08), plus about 2%.
