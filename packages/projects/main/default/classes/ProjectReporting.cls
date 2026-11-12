@@ -220,6 +220,9 @@ public with sharing class ProjectReporting {
 		}
 		List<Map<String, Object>> rows = new List<Map<String, Object>>();
 		Date today = Date.today();
+		// Only the stamp is saved: a row read with its Project would send the parent link back,
+		// and a master-detail field cannot be written on update.
+		List<Time_Entry__c> stamps = new List<Time_Entry__c>();
 		for (Time_Entry__c entry : entries) {
 			Decimal rate = entry.Project__r.Hourly_Rate__c;
 			rows.add(
@@ -236,9 +239,9 @@ public with sharing class ProjectReporting {
 					'notes' => entry.Notes__c
 				}
 			);
-			entry.Exported_Date__c = today;
+			stamps.add(new Time_Entry__c(Id = entry.Id, Exported_Date__c = today));
 		}
-		update as user entries;
+		update as user stamps;
 		return rows;
 	}
 

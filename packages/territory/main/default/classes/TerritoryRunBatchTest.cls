@@ -72,7 +72,11 @@ private class TerritoryRunBatchTest {
 			Test.stopTest();
 
 			Territory_Run__c run = runOf(runId);
-			Assert.areEqual(TerritoryRunBatch.STATUS_DONE, run.Status__c, run.Message__c);
+			Assert.areEqual(
+				TerritoryRunBatch.STATUS_DONE,
+				run.Status__c,
+				'Run ' + run.Status__c + ': ' + run.Message__c
+			);
 			Assert.areEqual(2, run.Changes__c, 'Both would move');
 			Assert.isNull(run.Data_Job_Id__c, 'A preview has no Data job');
 			Assert.isTrue(run.Summary_JSON__c.contains('North'), 'Named in the summary');
@@ -106,7 +110,11 @@ private class TerritoryRunBatchTest {
 			Test.stopTest();
 
 			Territory_Run__c run = runOf(runId);
-			Assert.areEqual(TerritoryRunBatch.STATUS_DONE, run.Status__c, run.Message__c);
+			Assert.areEqual(
+				TerritoryRunBatch.STATUS_DONE,
+				run.Status__c,
+				'Run ' + run.Status__c + ': ' + run.Message__c
+			);
 			Assert.areEqual(1, run.Changes__c, 'Only Alvarez matches');
 			Contact moved = [
 				SELECT Territory__c, OwnerId
@@ -163,7 +171,8 @@ private class TerritoryRunBatchTest {
 				rule(wide, lastNameIs('NoMatch' + i));
 			}
 			List<Contact> people = new List<Contact>();
-			for (Integer i = 0; i < 200; i++) {
+			// One chunk: a test method may run only one executeBatch scope.
+			for (Integer i = 0; i < TerritoryRunBatch.CHUNK_MANY_RULES; i++) {
 				people.add(new Contact(LastName = 'Person' + i));
 			}
 			insert as user people;
@@ -182,7 +191,11 @@ private class TerritoryRunBatchTest {
 			Test.stopTest();
 
 			Territory_Run__c run = runOf(runId);
-			Assert.areEqual(TerritoryRunBatch.STATUS_DONE, run.Status__c, run.Message__c);
+			Assert.areEqual(
+				TerritoryRunBatch.STATUS_DONE,
+				run.Status__c,
+				'Run ' + run.Status__c + ': ' + run.Message__c
+			);
 			Assert.isTrue(run.Checked__c <= TerritoryRunBatch.CHUNK_MANY_RULES, 'One small chunk');
 		}
 	}

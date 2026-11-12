@@ -76,7 +76,10 @@ public without sharing class ScholarshipsPortalExtension implements PortalAction
 		try {
 			draft.Form_Link__c = ScholarshipFormAttachment.linkFor(draft.Id);
 			if (draft.Form_Link__c != null) {
-				update as system draft;
+				update as system new Award_Application__c(
+					Id = draft.Id,
+					Form_Link__c = draft.Form_Link__c
+				);
 			}
 		} catch (Exception notNow) {
 			ErrorLogger.log(notNow, 'ScholarshipsPortalExtension.apply', draft.Id);
