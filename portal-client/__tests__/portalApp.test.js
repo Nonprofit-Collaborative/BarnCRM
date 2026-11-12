@@ -276,6 +276,107 @@ describe('mountPortal', () => {
   it('shows no search box on a page that does not ask for one', async () => {
     await mountPortal(root, { api: fakeApi() });
     expect(root.querySelector('input[type="search"]')).toBeNull();
+    expect(buttonNamed(root, 'Add to Calendar')).toBeUndefined();
+    expect(buttonNamed(root, 'Download CSV')).toBeUndefined();
+  });
+
+  it('hands the person a calendar file and a CSV of the records shown', async () => {
+    const agenda = {
+      ...PROFILE,
+      kind: 'related',
+      canUpdate: false,
+      search: true,
+      download: true,
+      calendar: { title: 'Name', start: 'Starts__c' },
+      fields: [
+        { field: 'Name', label: 'Session', type: 'string', edit: false },
+        { field: 'Starts__c', label: 'Starts', type: 'datetime', edit: false }
+      ],
+      records: [
+        { id: 'a01', values: { Name: 'Keynote', Starts__c: '2026-11-20T15:00:00.000Z' } },
+        { id: 'a02', values: { Name: 'Lunch', Starts__c: '2026-11-20T17:00:00.000Z' } }
+      ]
+    };
+    const files = [];
+    const realCreate = URL.createObjectURL;
+    const realRevoke = URL.revokeObjectURL;
+    URL.createObjectURL = jest.fn((blob) => {
+      files.push(blob);
+      return 'blob:portal';
+    });
+    URL.revokeObjectURL = jest.fn();
+    const click = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+    try {
+      await mountPortal(root, { api: fakeApi({ page: jest.fn(() => Promise.resolve(agenda)) }) });
+      const box = root.querySelector('input[type="search"]');
+      box.value = 'lunch';
+      box.dispatchEvent(new Event('input'));
+      buttonNamed(root, 'Add to Calendar').click();
+      buttonNamed(root, 'Download CSV').click();
+      const read = (blob) =>
+        new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.readAsText(blob);
+        });
+      const [ics, csv] = await Promise.all(files.map(read));
+      await flush();
+      expect(files[0].type).toBe('text/calendar');
+      expect(ics).toContain('SUMMARY:Lunch');
+      expect(ics).not.toContain('Keynote');
+      expect(csv.startsWith('Session,Starts\r\nLunch,')).toBe(true);
+      expect(click).toHaveBeenCalledTimes(2);
+    } finally {
+      URL.createObjectURL = realCreate;
+      URL.revokeObjectURL = realRevoke;
+      click.mockRestore();
+    }
+  });
+
+  it('offers Scan only where the browser reads QR codes, and fills the field', async () => {
+    const leads = {
+      ...PROFILE,
+      kind: 'related',
+      canUpdate: false,
+      canCreate: true,
+      fields: [
+        { field: 'Badge_Code__c', label: 'Badge Code', type: 'string', edit: true, scan: true }
+      ],
+      records: []
+    };
+    const api = fakeApi({ page: jest.fn(() => Promise.resolve(leads)) });
+    await mountPortal(root, { api });
+    buttonNamed(root, 'Add').click();
+    expect(buttonNamed(root, 'Scan')).toBeUndefined();
+
+    const stopTrack = jest.fn();
+    window.BarcodeDetector = jest.fn(() => ({
+      detect: jest.fn(() => Promise.resolve([{ rawValue: 'a0BXYZ' }]))
+    }));
+    Object.defineProperty(navigator, 'mediaDevices', {
+      configurable: true,
+      value: {
+        getUserMedia: jest.fn(() => Promise.resolve({ getTracks: () => [{ stop: stopTrack }] }))
+      }
+    });
+    jest.useFakeTimers();
+    try {
+      await mountPortal(root, { api });
+      buttonNamed(root, 'Add').click();
+      buttonNamed(root, 'Scan').click();
+      await Promise.resolve();
+      await Promise.resolve();
+      jest.advanceTimersByTime(300);
+      await Promise.resolve();
+      await Promise.resolve();
+      expect(root.querySelector('[name="Badge_Code__c"]').value).toBe('a0BXYZ');
+      expect(stopTrack).toHaveBeenCalled();
+      expect(buttonNamed(root, 'Scan')).toBeDefined();
+    } finally {
+      jest.useRealTimers();
+      delete window.BarcodeDetector;
+      delete navigator.mediaDevices;
+    }
   });
 
   it('signs out back to the email screen', async () => {

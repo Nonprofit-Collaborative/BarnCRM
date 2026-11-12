@@ -10,7 +10,8 @@ work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 
 cp -R "$here/wordpress/barncrm-portal" "$work/barncrm-portal"
-cp "$here/src/portalApi.js" "$here/src/portalApp.js" "$here/src/messages.js" "$work/barncrm-portal/js/"
+cp "$here/src/portalApi.js" "$here/src/portalApp.js" "$here/src/messages.js" "$here/src/pageFiles.js" \
+  "$work/barncrm-portal/js/"
 rm -f "$out"
 (cd "$work" && zip -qr "$out" barncrm-portal)
 echo "Built $out"

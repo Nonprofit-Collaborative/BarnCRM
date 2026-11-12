@@ -46,4 +46,50 @@ describe('checkTemplate', () => {
       'Page roles: orderBy must be a field, then ASC or DESC'
     ]);
   });
+
+  it('checks personScope, calendar, download and scan', () => {
+    const scope = {
+      field: 'Event_Registration__r.Event__c',
+      object: 'Event_Attendee__c',
+      personField: 'Contact__c',
+      valueField: 'Event_Registration__r.Event__c',
+      where: [{ field: 'Status__c', op: 'notEquals', value: 'Cancelled' }]
+    };
+    const good = copy();
+    good.pages.push({
+      key: 'people',
+      kind: 'catalog',
+      object: 'Event_Attendee__c',
+      fields: [{ field: 'Badge_Name__c' }, { field: 'Starts__c' }],
+      where: [{ field: 'Networking_Opt_In__c', op: 'equals', value: true }],
+      personScope: scope,
+      calendar: { title: 'Badge_Name__c', start: 'Starts__c' },
+      download: true
+    });
+    good.pages[1].fields[1].scan = true;
+    expect(checkTemplate(good)).toEqual([]);
+
+    const bad = copy();
+    bad.pages[1].personScope = scope;
+    bad.pages[1].fields.push({ field: 'Status__c', scan: true });
+    bad.pages[1].calendar = { title: 'Role__c', start: 'Nope__c' };
+    bad.pages[1].download = 'yes';
+    bad.pages.push({
+      key: 'people',
+      kind: 'catalog',
+      object: 'Event_Attendee__c',
+      fields: [{ field: 'Name' }],
+      where: [{ field: 'Name', op: 'isNotBlank' }],
+      personScope: { field: 'Event__c; DELETE', object: 'Event_Attendee__c', valueField: 'a.b.c' }
+    });
+    expect(checkTemplate(bad)).toEqual([
+      'Page roles: Status__c can be scanned only as an edited text field',
+      'Page roles: calendar start must be a field on the page',
+      'Page roles: personScope is for catalog pages',
+      'Page roles: download must be true or false',
+      'Page people: personScope field must be a lookup or Id',
+      'Page people: personScope personField must be a lookup to Contact',
+      'Page people: personScope valueField must be a lookup to what field names'
+    ]);
+  });
 });
