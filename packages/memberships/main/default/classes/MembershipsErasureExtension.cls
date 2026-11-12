@@ -16,13 +16,24 @@ public with sharing class MembershipsErasureExtension implements PersonErasureEx
 	}
 
 	public List<PersonErasure.Change> erase(Id personId) {
-		List<PersonErasure.Change> changes = eraseCertifications(personId);
+		// Rows are found in system mode, so a person with no memberships erases for any eraser;
+		// only when there is something to clear must the eraser hold Memberships access.
 		List<Membership_Term__c> terms = [
 			SELECT Id
 			FROM Membership_Term__c
 			WHERE Contact__c = :personId OR Account__c = :personId
-			WITH USER_MODE
+			WITH SYSTEM_MODE
 		];
+		List<Member_Certification__c> holdings = [
+			SELECT Id, (SELECT Id FROM Continuing_Credits__r)
+			FROM Member_Certification__c
+			WHERE Contact__c = :personId
+			WITH SYSTEM_MODE
+		];
+		if (!(terms.isEmpty() && holdings.isEmpty())) {
+			requireMembershipsAccess();
+		}
+		List<PersonErasure.Change> changes = eraseCertifications(holdings);
 		if (terms.isEmpty()) {
 			return changes;
 		}
@@ -52,15 +63,31 @@ public with sharing class MembershipsErasureExtension implements PersonErasureEx
 		return changes;
 	}
 
+	/**
+	 * Clearing needs edit on terms, certifications and credits and their cleared fields. Without
+	 * it the platform would refuse part way, with its own wording.
+	 */
+	private static void requireMembershipsAccess() {
+		Boolean allowed =
+			Schema.SObjectType.Membership_Term__c.isUpdateable() &&
+			Schema.SObjectType.Membership_Term__c.fields.Notes__c.isUpdateable() &&
+			Schema.SObjectType.Membership_Term__c.fields.Directory_Bio__c.isUpdateable() &&
+			Schema.SObjectType.Member_Certification__c.isUpdateable() &&
+			Schema.SObjectType.Member_Certification__c.fields.Notes__c.isUpdateable() &&
+			Schema.SObjectType.Continuing_Credit__c.isUpdateable() &&
+			Schema.SObjectType.Continuing_Credit__c.fields.Activity__c.isUpdateable();
+		if (!allowed) {
+			throw new PersonErasure.ErasureException(
+				BarnHelp.text('Memberships', 'Memberships_Erase_NeedAccess')
+			);
+		}
+	}
+
 	/** R-MEM13: the notes on the person's certifications and the activity text of their credits. */
-	private static List<PersonErasure.Change> eraseCertifications(Id personId) {
+	private static List<PersonErasure.Change> eraseCertifications(
+		List<Member_Certification__c> holdings
+	) {
 		List<PersonErasure.Change> changes = new List<PersonErasure.Change>();
-		List<Member_Certification__c> holdings = [
-			SELECT Id, (SELECT Id FROM Continuing_Credits__r)
-			FROM Member_Certification__c
-			WHERE Contact__c = :personId
-			WITH USER_MODE
-		];
 		if (holdings.isEmpty()) {
 			return changes;
 		}

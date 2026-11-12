@@ -3,6 +3,7 @@
   "texts": {
     "Memberships_Cert_Credits": "Credits toward renewal: {0} of {1}.",
     "Memberships_Cert_Done": "Saved.",
+    "Memberships_Erase_NeedAccess": "To erase a member you also need Memberships Admin or Memberships Staff. Nothing was erased.",
     "Memberships_Cert_ErrorActive": "This certification is already active.",
     "Memberships_Cert_ErrorCredits": "Not enough credits to renew: {0} earned, {1} needed.",
     "Memberships_Cert_ErrorNeverExpires": "This certification does not expire, so there is nothing to renew.",
