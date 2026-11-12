@@ -14,7 +14,15 @@ import {
   readFiles,
   visibleSteps
 } from 'c/formRules';
-import { HELP, LABELS, SAVE_TEXT, answerText, publicResultText, trapLabel } from 'c/formText';
+import {
+  HELP,
+  LABELS,
+  PAGE_TEXT,
+  SAVE_TEXT,
+  answerText,
+  publicResultText,
+  trapLabel
+} from 'c/formText';
 import { isHelpLoaded, loadHelp } from 'c/barnHelpText';
 import { nameTab } from 'c/formPublicPageModel';
 
@@ -285,6 +293,12 @@ export default class FormPublic extends LightningElement {
     }
     this.done = receipt.status === finished;
     this.saving = false;
+    if (this.done && receipt.checkoutUrl) {
+      // A page that takes a payment (G-34): the processor's own hosted checkout.
+      this.resultMessage = PAGE_TEXT.toCheckout;
+      window.location.assign(receipt.checkoutUrl);
+      return;
+    }
     this.resultMessage = publicResultText(receipt.status, receipt.message);
   }
 

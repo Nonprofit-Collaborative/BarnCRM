@@ -41,12 +41,42 @@ You are David, and the spring letter goes out on Monday.
    Appeal** to `Spring appeal`, so the phone effort is reported inside the campaign it
    belongs to.
 
+## Online Donation Page
+
+An appeal can have its own public donation page (G-34). Donors fill in a BarnCRM Forms form
+on your Salesforce Site and pay on your own Stripe or PayPal checkout page; BarnCRM holds no
+money and never sees card details. It needs the **Forms** and **Payments** modules, a public
+Site for Forms, and your processor keys entered on Payments Setup (see
+[Payments](payments.md) and [Forms](forms.md)).
+
+1. Build a public form in the **Form Builder**. Give it a **Number** question with the key
+   `amount` (the gift amount) and the person questions Forms needs to match the donor (first
+   name, last name, email). Keys `email`, `firstName` and `lastName` also fill in the
+   processor's page. Publish it and turn on **Public**.
+2. On the appeal, paste the form's record ID into **Donation Form Key** and tick **Donation
+   Page**. The appeal must be **Active**.
+3. Share `<your Site address>/FormsPublic?record=<the appeal's record ID>`. The page shows
+   the appeal's name, description and goal, then the form under **Give Now**.
+
+When a donor sends the form, they go straight to the processor's checkout. Their gift
+appears on the appeal once Forms has processed the submission: **Pending** until the payment
+is confirmed, then **Received** (dated the day it was paid), or **Cancelled** if they left the
+checkout without paying. A refund made at the processor sets the gift to **Refunded**. The
+payment's identifier is in the gift's **Payment Reference**.
+
+If Payments is not installed or its keys are missing, the page shows the appeal and says online
+giving is not open. Recurring online gifts are not offered yet.
+
 ## List Views
 
 **Appeals** has **All Appeals**, **Active Appeals** and **Inactive Appeals**.
 
 ## Common Mistakes
 
+- **A donation form without an `amount` question.** The donor is told something went wrong
+  and nothing is stored. Add a Number question with the key `amount`.
+- **Payments still in Test mode.** Donors reach the processor's test checkout and no money
+  moves. Switch Payments to Live when you are ready.
 - **Making an appeal its own parent, or a loop.** BarnCRM refuses the save with "An
   appeal cannot be its own parent appeal." Choose the larger effort instead, or leave
   **Parent Appeal** empty.

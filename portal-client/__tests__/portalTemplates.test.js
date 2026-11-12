@@ -55,7 +55,8 @@ const ACTION_CLASSES = {
   Events: 'events/main/default/classes/EventsPortalExtension.cls',
   CorporateHub: 'corporatehub/main/default/classes/CorporateHubPortalExtension.cls',
   Scholarships: 'scholarships/main/default/classes/ScholarshipsPortalExtension.cls',
-  Memberships: 'memberships/main/default/classes/MembershipsPortalExtension.cls'
+  Memberships: 'memberships/main/default/classes/MembershipsPortalExtension.cls',
+  Giving: 'giving/main/default/classes/GivingPortalPayments.cls'
 };
 
 function fieldFile(objectName, field) {
@@ -189,20 +190,27 @@ describe('shipped portal templates', () => {
       });
   });
 
-  it('the donor template takes no payments and changes only contact details', () => {
+  it('the donor template edits only contact details and pays only through Pay Online on pledges', () => {
     const text = JSON.stringify(donor);
-    expect(text).not.toMatch(/Payment|Card|create/);
+    expect(text).not.toMatch(/Card|create/);
     donor.pages.forEach((page) => {
-      expect(page.actions.filter((a) => typeof a !== 'string' || a !== 'update')).toEqual([]);
-      if (page.actions.length > 0) {
+      const updates = page.actions.filter((a) => a === 'update');
+      const modules = page.actions.filter((a) => typeof a === 'object');
+      expect(page.actions.length).toBe(updates.length + modules.length);
+      if (updates.length > 0) {
         expect(page.kind).toBe('person');
         expect(page.key).toBe('contact');
       }
+      // PAY-03 (ADR-NEXT donor portal payments): the one module action, on pledges only.
+      modules.forEach((action) => {
+        expect(action.extension).toBe('Giving.PayOnline');
+        expect(page.key).toBe('pledges');
+      });
     });
   });
 
   it('every module action a template names is offered by its module class', () => {
-    [volunteer, speaker, board, applicant, member].forEach((template) => {
+    [volunteer, speaker, board, applicant, member, donor].forEach((template) => {
       const source = fs.readFileSync(
         path.join(PACKAGES, ACTION_CLASSES[template.requiresModules[0]]),
         'utf8'

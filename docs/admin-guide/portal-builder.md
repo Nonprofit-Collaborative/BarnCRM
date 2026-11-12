@@ -206,8 +206,18 @@ session's time can be public.
 
 **Donor.** Read only, except phone and mailing address on My Contact Details. Email is shown but
 not editable, because it is the person's sign-in. Receipts shows the list of issued receipts
-(number, date, amount); it does not send the document. There are no payments: BarnCRM takes no
-money. Cancelled gifts, pledges and recurring gifts are hidden.
+(number, date, amount); it does not send the document. Cancelled gifts, pledges and recurring
+gifts are hidden.
+
+**Pay Online (donor template, PAY-03).** On Pledges and Recurring Gifts, **Pay Online** emails the
+donor a secure link to pay the next payment due (the earliest unpaid scheduled payment, or the
+pledge balance) on your own Stripe or PayPal checkout page. BarnCRM holds no money and never sees
+a card. It needs the **Payments** module with your keys entered; without them the donor is told
+paying online isn't available. When the processor reports the payment, a **Received** gift
+appears on the pledge, dated the day it was paid, and is linked to the payment it covers. A
+refund at the processor sets it to **Refunded**. Changing the card on a recurring gift is not
+offered: each payment is paid through Pay Online. A portal saved before this release keeps its
+template: paste the new `donor.json` to add the button.
 
 **Board.** For board and committee members (Corporate Hub board governance). My Meetings lists
 the meetings the person is invited to, with the agenda and the meeting's Packet Link shown as

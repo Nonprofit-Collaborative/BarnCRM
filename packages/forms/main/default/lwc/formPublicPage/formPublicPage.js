@@ -18,6 +18,8 @@ export default class FormPublicPage extends LightningElement {
   @api recordId;
   /** The kind of list shown when no record is named, such as `events` (the `list` parameter). */
   @api listKind;
+  /** `done` or `cancelled` when the processor sends the person back from checkout (G-34). */
+  @api payment;
 
   helpReady = isHelpLoaded(HELP);
   labels = LABELS;
@@ -73,6 +75,17 @@ export default class FormPublicPage extends LightningElement {
   }
 
   get registerText() {
-    return PAGE_TEXT.register;
+    return (this.page && this.page.formTitle) || PAGE_TEXT.register;
+  }
+
+  /** The notice shown on return from a processor's checkout, or null. */
+  get paymentNotice() {
+    if (this.payment === 'done') {
+      return { variant: 'success', message: PAGE_TEXT.paymentDone };
+    }
+    if (this.payment === 'cancelled') {
+      return { variant: 'info', message: PAGE_TEXT.paymentCancelled };
+    }
+    return null;
   }
 }

@@ -4418,6 +4418,8 @@ object means something specific and is unavailable on Platform licenses.
 | Active | boolean | yes (defaults true) | Whether the appeal is offered when entering a new gift. |
 | Net Raised | decimal | computed | Total raised less cost, calculated live from the two values. |
 | Percent To Goal | decimal | computed | Total raised as a share of goal, calculated live, empty when no goal is set. The Percent formula returns the plain ratio (0.5 for half) and Salesforce displays it as 50%. |
+| Donation Page | boolean | yes (defaults false) | Whether the appeal has a public online donation page (G-34, R-AP5). |
+| Donation Form Key | text (18) | no | The Forms form donors fill in on the donation page, by record identifier (ADR-0014). |
 
 ### Relationships
 
@@ -4446,6 +4448,14 @@ recalculation.
 Mirror (plan Section 4.12): the Campaign ID attribute and the one-way copy of Section 29B,
 both shipped by the Mirror package, so Giving itself never names Campaign.
 
+**R-AP5 Online donation page** (G-34, ADR-NEXT `NEXT-online-donation-pages.md`). An active
+appeal with Donation Page on and a Donation Form Key naming a published public form has a public
+page served by Forms (`<site>/FormsPublic?record=<appeal>`). The page shows the name,
+description and goal only. Sending the form starts a hosted checkout through Payments with the
+answer `amount`; the gift (Donor Contact the person Forms matched, Appeal, Payment Reference the
+payment's identifier) is Pending until Payments reports Paid (Received), Refunded (Refunded) or
+Cancelled (Cancelled), whichever of form processing and the payment report comes last.
+
 ### Salesforce implementation
 
 - **Object:** `Appeal__c`.
@@ -4463,6 +4473,8 @@ both shipped by the Mirror package, so Giving itself never names Campaign.
 | Net Raised | `Net_Raised__c` | Formula (Currency) |
 | Percent To Goal | `Percent_To_Goal__c` | Formula (Percent) |
 | Sample Data | `Sample_Data__c` | Checkbox (v0.4) |
+| Donation Page | `Donation_Page__c` | Checkbox, default false (G-34) |
+| Donation Form Key | `Donation_Form_Key__c` | Text(18) (G-34) |
 
 Rollup target attributes on `Appeal__c` are listed in Section 26.
 
@@ -17556,6 +17568,8 @@ mirrors the primary member).
 | 1.28 | 2026-11-11 | Account Tabs (C-73, D-195, release 1.19). `BarnCRM_Settings__c` gains `Account_Tabs__c` (text, default Organizations and Households; Section 12 Account Tabs Key). New Core permission sets `BarnCRM_Organizations_Tab` and `BarnCRM_Accounts_Tab`; the Organizations tab leaves the three role sets. The BarnCRM and BarnCRM Console apps list the standard Accounts tab. |
 | 1.29 | 2026-11-11 | Project Management module (PM-01 to PM-05, D-175; ADR-NEXT `NEXT-project-management-module.md`). New package `packages/projects`: Project (`Project__c`, rules R-PM1 to R-PM3), Project Phase (`Project_Phase__c`), Project Task (`Project_Task__c`, R-PM4), Project Assignment (`Project_Assignment__c`, R-PM5), Time Entry (`Time_Entry__c`, R-PM6, R-PM7), Project Status Update (`Project_Status_Update__c`, R-PM8) and settings `Projects_Settings__c` (29PM1 to 29PM7). |
 | 1.30 | 2026-11-11 | Address Verification module (C-46, D-112; ADR-NEXT `NEXT-address-verification-module.md`). New package `packages/addressverification`: Address Verification Settings (`Address_Verification_Settings__c`, 29AV1, R-AV1 to R-AV4) and Address Verification Keys (`Address_Verification_Keys__c`, 29AV2). No object added to Core; R-AD6 now says Core's code never writes the two verification fields and the module does. |
+| 1.31 | 2026-11-11 | Online donation pages (G-34; ADR-NEXT `NEXT-online-donation-pages.md`). Appeal (Section 21) gains Donation Page (`Donation_Page__c`, Checkbox) and Donation Form Key (`Donation_Form_Key__c`, Text(18)); rule R-AP5. Core gains the interface `PublicCheckoutExtension` and lists `GivingDonationPage` in `PublicPageExtensions` and `FormAttachmentExtensions`; no Core object or field is added. |
+| 1.32 | 2026-11-11 | Donor portal payments (PAY-03; ADR-NEXT `NEXT-donor-portal-payments.md`). No object or field added. A donor portal payment is a Received gift with Commitment and Payment Reference (the payment's identifier), written when Payments reports it Paid. Core lists `GivingPortalPayments` in `PortalActionExtensions`; the donor template gains `Giving.PayOnline` on Pledges and Recurring Gifts. |
 
 ---
 ## 32. Entity ownership by package

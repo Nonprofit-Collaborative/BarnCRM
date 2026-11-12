@@ -129,4 +129,21 @@ describe('c-form-public-page', () => {
     const element = await render({ listKind: 'events' });
     expect(find(element, '[data-id="list-empty"]').textContent).toBe('None right now.');
   });
+
+  it('says a payment is being confirmed on return from checkout, under the page form title', async () => {
+    getPage.mockResolvedValue(JSON.stringify({ ...PAGE, kind: 'appeals', formTitle: 'Give Now' }));
+    const element = await render({ recordId: 'a01000000000001', payment: 'done' });
+
+    expect(find(element, '[data-id="payment"] c-barn-notice').variant).toBe('success');
+    expect(find(element, '[data-id="registration"] h2').textContent).toBe('Give Now');
+  });
+
+  it('says a cancelled payment charged nothing, and shows no notice otherwise', async () => {
+    getPage.mockResolvedValue(JSON.stringify(PAGE));
+    const cancelled = await render({ recordId: 'a01000000000001', payment: 'cancelled' });
+    expect(find(cancelled, '[data-id="payment"] c-barn-notice').variant).toBe('info');
+
+    const plain = await render({ recordId: 'a01000000000001', payment: 'other' });
+    expect(find(plain, '[data-id="payment"]')).toBeNull();
+  });
 });

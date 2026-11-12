@@ -67,6 +67,7 @@ into six kinds:
 | AskReminderWriter | Upkeep | Reminder tasks assigned to the donor's owner | ADR-0021 |
 | DonorLevelWriter | Upkeep | The two donor level fields | ADR-0021 |
 | GiftImportIntegritySelector | Integrity | A gift already loaded under an external ID, or a receipt that keeps a gift on undo | ADR-0021, ADR-0052 |
+| GivingDonationPage | Platform | A Site guest user or the API's integration user reads one active appeal staff marked Donation Page: its name, description, goal and donation form key; never a gift, a donor or a total. It starts the hosted checkout through Payments and writes nothing itself | ADR-0190 public event pages, ADR-NEXT online donation pages |
 | GivingHouseholdDependentsExtension | Integrity | Gifts that keep a household from being deleted | ADR-0021 |
 | HealthCheckGivingSelector | Org figure | Every gift for Health Check's counts | ADR-0021, ADR-0057 |
 | PledgeReminderWriter | Org job | Reminds donors the scheduling user may not see | ADR-0021 |

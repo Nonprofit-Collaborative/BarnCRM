@@ -403,3 +403,33 @@ Hal,Badfund,hal.badfund@example.org,30,2026-10-05,Cash,,Genral Fund,TX-T-3
 | 5 | Open the NPSP records. | Nothing in NPSP changed. |
 
 **Cleanup:** undo the four steps in reverse order.
+
+## T-GIFT-23: Online Donation Page, Paid
+
+**Purpose:** confirm an appeal's donation page sends the donor to the org's own checkout and the gift ends Received (G-34).
+**Prerequisites:** admin; Forms and Payments deployed, a public Forms Site, Payments in Test mode with Stripe test keys (see [Payments](payments.md)); a published public form "Give" with First Name, Last Name, Email and a Number question keyed `amount`; an active appeal "Winter Coats" with a Goal of 5,000.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Winter Coats**, paste the form's ID into **Donation Form Key** and tick **Donation Page**. Save. | Saved. |
+| 2 | In a private browser window open `<Site>/FormsPublic?record=<appeal ID>`. | The appeal's name, description, **Our Goal** with 5,000, and the form under **Give Now**. No gift, donor or total shows. |
+| 3 | Fill in Dana Zzdonor, an email and amount 40. Send. | "Taking you to the secure payment page", then Stripe's test checkout for 40. |
+| 4 | Pay with the card 4242 4242 4242 4242. | Back on the appeal page with "Thank you. Your payment is being confirmed". |
+| 5 | Wait for the Forms and Payments processing runs (about 15 minutes), then open the appeal's gifts. | One gift from Dana Zzdonor of 40, **Received**, **Payment Method** Card, dated today, with a **Payment Reference**. |
+| 6 | Refund it in the Stripe dashboard; wait for the Payments run. | The gift is **Refunded**. |
+
+**Cleanup:** delete the gift and Dana Zzdonor; untick **Donation Page**.
+
+## T-GIFT-24: Online Donation Page, Cancelled and Not Ready
+
+**Purpose:** confirm a cancelled checkout charges nothing, and the page says giving is not open without Payments keys.
+**Prerequisites:** T-GIFT-23 steps 1 and 2.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Send the form for amount 25, then choose the back link on Stripe's checkout. | Back on the appeal page with "Your payment was cancelled and nothing was charged". |
+| 2 | Wait for processing; open the appeal's gifts. | A **Pending** gift of 25 with a **Payment Reference**; after Payments cancels the abandoned checkout, **Cancelled**. |
+| 3 | Send the form with the amount blank or 0. | The form refuses a blank amount; for 0, "something went wrong" and nothing is stored. |
+| 4 | On Payments Setup, clear the Stripe keys; reload the page. | The appeal shows with "Online giving for this appeal is not open right now" and no form. |
+
+**Cleanup:** enter the Stripe test keys again; delete the gifts; untick **Donation Page**.

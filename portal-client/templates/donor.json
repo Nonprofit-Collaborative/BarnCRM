@@ -59,7 +59,7 @@
       "where": [{ "field": "Status__c", "op": "notEquals", "value": "Cancelled" }],
       "orderBy": "Start_Date__c DESC",
       "limit": 50,
-      "actions": []
+      "actions": [{ "extension": "Giving.PayOnline", "label": "Pay Online" }]
     },
     {
       "key": "receipts",
