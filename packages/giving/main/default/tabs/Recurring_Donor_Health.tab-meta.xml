@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Recurring donor health: monthly recurring revenue and the Save the Sustainer list of recurring
+    gifts with failed charges, expiring cards, cancellations or missed payments (G-27).
+  </description>
+  <flexiPage>Recurring_Donor_Health</flexiPage>
+  <label>Recurring Donor Health</label>
+  <motif>Custom86: RedCross</motif>
+</CustomTab>

@@ -76,6 +76,7 @@ const ICONS = Object.freeze({
   Receipt_Run__c: 'custom:custom36',
   Receipt__c: 'custom:custom23',
   Receipts: 'custom:custom27',
+  Recurring_Donor_Health: 'custom:custom86',
   Recurring_Gift_Event__c: 'custom:custom21',
   Soft_Credit__c: 'custom:custom26',
   Stewardship_Plan_Template__c: 'custom:custom7',

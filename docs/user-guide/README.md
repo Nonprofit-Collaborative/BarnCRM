@@ -97,6 +97,7 @@ What you can do depends on the role your admin gave you on the Access page (for 
 
 - [Reports and dashboards](reports-and-dashboards.md): the reports and dashboards BarnCRM ships, and the totals on records.
 - [Donor segments](donor-segments.md): lists of donors by their giving, exported for Mailchimp or Constant Contact.
+- [Recurring donor health](recurring-donor-health.md): monthly recurring revenue and the recurring donors who may be about to stop.
 - [Donor scores](donor-scores.md): how recently, how often and how much each donor gives, as a score and a segment on their record, and any wealth screening loaded for them.
 
 ## Report a Bug or Give Feedback

@@ -1767,6 +1767,10 @@
     <visibility>Visible</visibility>
   </tabSettings>
   <tabSettings>
+    <tab>Recurring_Donor_Health</tab>
+    <visibility>Visible</visibility>
+  </tabSettings>
+  <tabSettings>
     <tab>Recurring_Gift_Event__c</tab>
     <visibility>Visible</visibility>
   </tabSettings>

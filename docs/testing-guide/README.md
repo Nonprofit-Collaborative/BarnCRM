@@ -65,7 +65,7 @@ page, even if that puts it out of reading order.
 | [Giving: ask cadence](giving-ask-cadence.md) | ASK | 2 | Next Ask Date, nightly reminder task, Who Is Due list |
 | [Giving: donor scoring](giving-donor-scoring.md) | RFM | 4 | Scores and segment on the donor, cutoffs, segment templates, wealth screening fields and import |
 | [Giving: refunds and write-offs](giving-refunds.md) | REF | 7 | Refunds and their effect on totals |
-| [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 9 | Giving totals, recalculation, dashboards and reports, donor segments, Fundraising Home and report charts |
+| [Giving: rollups and dashboards](giving-rollups-and-dashboards.md) | GRD | 10 | Giving totals, recalculation, dashboards and reports, donor segments, Fundraising Home and report charts, recurring donor health |
 | [Contact Point Sync](contact-point-sync.md) | CPS | 5 | Copies to Contact Points, BarnCRM as the source, addresses, delete and restore, switches and Pause All, the backfill page, an org without the Individual object |
 | [Mirror](mirror.md) | MIR | 16 | Campaign sync, Opportunity mirror, accounting export, Inbound Gift API, Gift Transaction mirror, retired sets carried over |
 | [Volunteers](volunteers.md) | VOL | 31 | Jobs, shifts, sign-ups, hours and approval, skills, shift reminders and unfilled shift nudges, suggested volunteers, person accounts, moving from V4S |
