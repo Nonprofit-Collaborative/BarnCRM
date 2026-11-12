@@ -172,9 +172,10 @@ A template is JSON in the portal's Template field. The sample in
   shows records, never edits or adds them.
 - **personScope** narrows a `catalog` page to records tied to the person through another object:
   `{ "field": "Event__c", "object": "Event_Attendee__c", "personField": "Contact__c",
-  "valueField": "Event__c", "where": [ ...tests on that object... ] }` shows only records whose
-  Event is one of the events the person has an attendee row for (and that row passes the tests).
-  `field` is a lookup or `Id`; `valueField` a lookup on the scope object; the scope object a custom
+  "valueField": "Event_Registration__r.Event__c", "where": [ ...tests on that object... ] }` shows
+  only records whose Event is one of the events the person has an attendee row for (and that row
+  passes the tests). `field` is a lookup or `Id`; `valueField` a lookup on the scope object; either
+  may go through one parent (`Event_Registration__r.Event__c`); the scope object a custom
   object with `personField` a lookup to the person. Actions on the page see only those records.
 - **calendar** `{ "title": ..., "start": ..., "end": ..., "location": ... }`, each a field already
   on the page, adds **Add to Calendar**: an .ics file of the page's records, made in the browser.

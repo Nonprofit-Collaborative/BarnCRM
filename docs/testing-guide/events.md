@@ -611,12 +611,12 @@ room or capacity.
 ## T-EV-29: Sponsor Lead Export
 
 **Purpose:** confirm staff download a sponsor's leads (EV-28).
-**Prerequisites:** T-PB-13 done, so the sponsor has a Lead and a Not Shared scan.
+**Prerequisites:** T-PB-13 done, so the sponsor has a Shared and a Not Shared scan.
 **Smoke:** no
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On **Sponsors**, the sponsor's menu, **Download Leads**. | A CSV with one row: name, email, title, company, interest, notes and scan time of the Lead; no Not Shared row. |
+| 1 | On **Sponsors**, the sponsor's menu, **Download Leads**. | A CSV with one row: name, email, title, company, interest, notes and scan time of the Shared scan; no Not Shared row. |
 | 2 | Do the same for a sponsor with no leads. | A message that there are no leads to download; no file. |
 
 **Cleanup:** none.

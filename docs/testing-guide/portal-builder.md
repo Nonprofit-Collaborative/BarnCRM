@@ -224,7 +224,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | On My Leads, **Add**, **Scan**, scan Pat's badge QR code; save. | A lead, Lead, with Pat's name, email, title and company. |
+| 1 | On My Leads, **Add**, **Scan**, scan Pat's badge QR code; save. | A Shared scan with Pat's name, email, title and company. |
 | 2 | Scan Pat again. | Already Scanned; no new details. |
 | 3 | Scan Sam's badge. | Not Shared; no name or email kept. |
 | 4 | Type `abc` as the code. | Not Found. |

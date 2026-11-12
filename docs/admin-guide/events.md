@@ -645,13 +645,13 @@ sponsors should install it.
 - **Scan** reads the code with the phone's camera where the browser can (Chrome and Edge on
   Android, for example); elsewhere the person types the code printed under it, or uses the
   phone's camera app and pastes it.
-- Each scan is saved as a Sponsor Lead on the sponsorship at the scanned attendee's event. Only an
-  attendee who turned on **Share My Details With Sponsors** becomes a **Lead**, with name, email,
+- Each scan is saved as a Booth Scan on the sponsorship at the scanned attendee's event. Only an
+  attendee who turned on **Share My Details With Sponsors** is **Shared**, with name, email,
   title and company. Otherwise the scan is **Not Shared** and keeps nothing about the person; an
   unknown code is **Not Found**; a second scan is **Already Scanned**.
 - The rep adds notes and an interest (Hot, Warm, Cold) and can **Download CSV** of their leads.
   Staff use **Download Leads** in a sponsor's menu on the Sponsors tab: a CSV of that sponsor's
-  Lead rows.
+  Shared scans.
 
 ## Settings
 
