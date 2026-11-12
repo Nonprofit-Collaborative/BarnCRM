@@ -10,6 +10,7 @@ const lwcConfig = require('@salesforce/eslint-config-lwc/recommended');
 // docs/contributor-guide/ci.md, static step 3.
 const PURE_MODULES = [
   'packages/core/main/default/lwc/csvParser/csvParser.js',
+  'packages/core/main/default/lwc/filesImportModel/filesImportModel.js',
   'packages/core/main/default/lwc/importWizard/xlsx.js',
   'packages/core/main/default/lwc/zipReader/zipReader.js'
 ];

@@ -21,7 +21,7 @@ Salesforce org is needed for this job. Steps:
 2. `npm run prettier:verify`
 3. `npm run lint`. Besides the LWC rules, it holds the pure modules to plain JavaScript:
    each file in `PURE_MODULES` at the top of `eslint.config.js` (today `c/csvParser`,
-   `c/zipReader` and the import wizard's `xlsx.js`) fails
+   `c/zipReader`, `c/filesImportModel` and the import wizard's `xlsx.js`) fails
    lint if it imports `lwc`, `lightning/*` or `@salesforce/*`. A pure module is a helper inside
    a component bundle (its file name differs from the bundle's), or a shared service module,
    that works on plain values only; add each new one to the list, and the config
