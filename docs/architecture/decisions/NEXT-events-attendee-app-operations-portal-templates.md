@@ -31,11 +31,13 @@ and a partner every organization's referrals), and a page cannot hand the person
 ### Portal engine additions (Portal Builder, both templates and the attendee app)
 
 1. **A catalog page may be scoped to the person (`personScope`).** `{ "field": "Event__c",
-   "object": "Event_Attendee__c", "personField": "Contact__c", "valueField": "Event__c", "where":
-   [..] }` limits the page to records whose `field` is one of the values of `valueField` on the
-   scope object's records whose `personField` is the verified person and that pass the scope's
-   own fixed `where` tests. `field` is a lookup or `Id`; `valueField` a lookup to the same object
-   (or the page's object for `Id`); `personField` a lookup to Contact; the scope object a custom
+   "object": "Event_Attendee__c", "personField": "Contact__c", "valueField":
+   "Event_Registration__r.Event__c", "where": [..] }` limits the page to records whose `field` is
+   one of the values of `valueField` on the scope object's records whose `personField` is the
+   verified person and that pass the scope's own fixed `where` tests. `field` is a lookup or
+   `Id`; `valueField` a lookup to the same object (or the page's object for `Id`); either may be
+   one parent hop (`Event_Registration__r.Event__c`), as an attendee reaches its event through
+   its registration; `personField` a lookup to Contact; the scope object a custom
    object (the same rules as a page's object). The server reads the values first (at most 200)
    and binds them, so no semi-join limit applies and the page and scope may be the same object.
    Every read, action and record check goes through the same filter, so a module action on a
@@ -106,17 +108,19 @@ and a partner every organization's referrals), and a page cannot hand the person
 12. **A sponsor portal template, `sponsor.json`, requires Events.** A sponsor's contact (Event
     Sponsor's Contact) or a booth staff member (an Event Attendee whose new Sponsor field names
     the sponsor) signs in and adds a lead by scanning or typing an attendee's badge QR code (the
-    attendee's record identifier, ADR-0187). The page is a `related` page on Sponsor Lead whose
+    attendee's record identifier, ADR-0187). The page is a `related` page on Booth Scan whose
     person is the scanner; `create` sets the scanner, the code is the only editable field besides
     notes and a rating.
 13. **The scan is resolved on save, in system mode.** A before-insert handler finds the attendee
     by the code and the scanner's sponsorship at that attendee's event, and sets the lead's
-    sponsor (master-detail), attendee and status: Lead (the attendee opted in: name, email, title
+    sponsor (master-detail), attendee and status: Shared (the attendee opted in: name, email, title
     and company are copied), Not Shared (the attendee did not opt in: nothing about them is kept
     and the attendee link stays empty), Not Found (no such attendee: the lead stays on the
     scanner's latest sponsorship) or Already Scanned. A scanner with no sponsorship at all is
     refused. Leads are exported per sponsor from the Sponsors tab (Download Leads) and by the rep
-    from the portal page (decision 2), Lead status only.
+    from the portal page (decision 2), Shared status only. Because Core and the modules may not
+    name the standard Lead object even in a label (`check-standard-objects.sh` matches the word),
+    the object's label is Booth Scan and its status values avoid the word.
 
 ### Event operations
 

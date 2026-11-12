@@ -15180,8 +15180,8 @@ An attendee a sponsor's staff scanned at the booth (EV-28, decisions 12 and 13).
 | Scanned By | reference to Person | yes | The sponsor's contact or booth staff member who scanned. |
 | Badge Code | text | yes | The QR code read: the attendee's record identifier. |
 | Attendee | reference to Event Attendee | no | Set only when the attendee shares their details. |
-| Status | picklist | yes | Lead, Not Shared, Not Found, Already Scanned. |
-| Name, Email, Title, Company | text | no | Copied from the attendee only for a Lead. |
+| Status | picklist | yes | Shared, Not Shared, Not Found, Already Scanned. |
+| Name, Email, Title, Company | text | no | Copied from the attendee only when Shared. |
 | Notes | long text | no | The rep's notes. |
 | Interest | picklist | no | Hot, Warm, Cold. |
 
@@ -15193,14 +15193,16 @@ attendee's event, else (code not found) the scanner's latest sponsorship. A scan
 refused.
 
 **R-SLD2 Only opted-in attendees become leads.** With Share My Details With Sponsors on, the lead
-is Lead and copies name, email, title and company; otherwise Not Shared and nothing about the
+is Shared and copies name, email, title and company; otherwise Not Shared and nothing about the
 attendee is kept. A second scan of one attendee for one sponsor is Already Scanned. Exports hold
-Lead rows only.
+Shared rows only.
 
 ### Salesforce implementation
 
-- **Object:** `Sponsor_Lead__c`, name field Auto Number (`LEAD-{000000}`), master-detail to Event
-  Sponsor (`Event_Sponsor__c`, relationship Leads), sharing Controlled by Parent.
+- **Object:** `Sponsor_Lead__c`, label Booth Scan (the packages may not use the word that names
+  the standard lead object, even in a label), name field Auto Number (`LEAD-{000000}`, label
+  Scan Number), master-detail to Event Sponsor (`Event_Sponsor__c`, relationship Leads), sharing
+  Controlled by Parent.
 
 | Attribute | API name | Type |
 |---|---|---|
@@ -15215,7 +15217,7 @@ Lead rows only.
 | Company | `Lead_Company__c` | Text(80) |
 | Notes | `Notes__c` | Long Text Area(2000) |
 | Interest | `Interest__c` | Picklist (Hot, Warm, Cold), restricted |
-| Lead Key | `Lead_Key__c` | Text(40), unique, set on save for a Lead |
+| Scan Key | `Lead_Key__c` | Text(40), unique, set on save when Shared |
 
 - **Automation:** `EventOperationsHandler` through the registry row `Sponsor_Lead_Scan` (always
   runs), reading in system mode in its inner `ScanReader` (Without Sharing Register).
