@@ -175,7 +175,9 @@ CAPS = {
     # nightly run, payment links, the Essentials kit, portal and erasure seams, 39,406 measured
     # on 2026-11-11, plus about 2 percent. PB-09's directory adds no Apex.
     "memberships": 40_200,
-    "mirror": 182_000,
+    # Mirror: the Nonprofit Cloud relationships kit's extension (MIG-02), 186,548 measured,
+    # plus about 1%.
+    "mirror": 188_400,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

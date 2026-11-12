@@ -108,3 +108,17 @@ active and its BarnCRM copy not yet made. T-MIG-06 needs an org with NPSP.
 | 8 | Tick every item under **Retire the Old App**. | **Complete** only once every step is done again. NPSP's records are unchanged. |
 
 **Cleanup:** delete the test records, or keep them for the NPSP giving kits.
+
+## T-MIG-10: Nonprofit Cloud Relationships and Affiliations Copies Each Pair Once and Skips Households
+
+**Purpose:** confirm the Nonprofit Cloud Relationships and Affiliations kit (Mirror) copies relationships once per pair of people and affiliations with organizations only.
+**Prerequisites:** an org with Nonprofit Cloud (person accounts on) and Core and Mirror deployed; admin user with **Salesforce Records Sync**. In Nonprofit Cloud: person accounts Ana and Ben related as Wife and Husband; Ana linked to business account **Test Org** with roles Employee and Board Member; Ana a member of a household account that has a Party Relationship Group of type Household.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | On **Integrations**, Nonprofit Cloud Fundraising, click **Start Migration: NPC Relationships and Affiliations**. | Two steps: **Relationships**, **Affiliations**. |
+| 2 | Run **Relationships**, preview and load it. | One relationship staged for Ana and Ben, even if Nonprofit Cloud holds it both ways round. Ana's **Relationships** card shows Ben, Spouse; Ben's shows Ana, Spouse. **Verified** (1 of 1 pairs). |
+| 3 | Run **Affiliations**, preview and load it. | One affiliation: Ana at Test Org, role "Employee, Board Member", Current. None for the household. **Verified**. |
+| 4 | Click **Undo** on both steps, in reverse order. | **Undone**; Nonprofit Cloud's records are unchanged. |
+
+**Cleanup:** delete the test records.

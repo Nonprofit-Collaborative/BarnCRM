@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <label>NPC Relationships and Affiliations</label>
+  <protected>false</protected>
+  <values>
+    <field>Source_App__c</field>
+    <value xsi:type="xsd:string">Nonprofit_Cloud_Fundraising</value>
+  </values>
+  <values>
+    <field>Description__c</field>
+    <value xsi:type="xsd:string">Copies Nonprofit Cloud relationships between people and their links to organizations into BarnCRM relationships and affiliations, in this org. Households (Party Relationship Groups) are not converted, and Nonprofit Cloud itself is never changed.</value>
+  </values>
+  <values>
+    <field>Steps_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"relationships","label":"Relationships","kind":"import","help":"Copies each relationship between two people once; BarnCRM creates the other side itself.","source":"ContactContactRelation","fields":["ContactId","RelatedContactId","PartyRoleRelation.RelatedRoleName","IsActive","StartDate","EndDate"],"filters":[{"field":"ContactId","value":null,"op":"notEquals"},{"field":"RelatedContactId","value":null,"op":"notEquals"}],"templateKey":"kit_npc_relationships"},{"key":"affiliations","label":"Affiliations","kind":"import","help":"Copies each link between a person and an organization, with its roles and dates. Links to households and person accounts are skipped.","source":"AccountContactRelation","fields":["ContactId","AccountId","Roles","IsActive","StartDate","EndDate"],"templateKey":"kit_npc_affiliations"}]</value>
+  </values>
+  <values>
+    <field>Retire_Checklist_JSON__c</field>
+    <value
+      xsi:type="xsd:string"
+    >[{"key":"entry","text":"Ask staff to add new relationships and organization links on BarnCRM's Relationships and Affiliations cards, so they are no longer entered in both places."},{"key":"layouts","text":"Remove the Nonprofit Cloud relationship and account contact relationship related lists from the page layouts staff use, once the BarnCRM cards are on them."}]</value>
+  </values>
+  <values>
+    <field>Extension_Class__c</field>
+    <value xsi:type="xsd:string">NpcRelationsKit</value>
+  </values>
+  <values>
+    <field>Sort_Order__c</field>
+    <value xsi:type="xsd:double">17</value>
+  </values>
+</CustomMetadata>

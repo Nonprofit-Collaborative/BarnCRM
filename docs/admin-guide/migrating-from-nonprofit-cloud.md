@@ -183,8 +183,8 @@ These are not loaded by the four templates. Each has what to do in the meantime.
 
 | Not loaded | What to do meanwhile |
 |---|---|
-| Households and who is in them | Each person gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). |
-| Relationships and affiliations | No ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **One Kind of Record** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
+| Households and who is in them | Each person gets a household of their own. Merge the households of people who live together ([Household merge and split](household-merge-split.md)), or load couples in one row with the second person's columns mapped to **Contact 2** ([Importing](importing.md), section 4). In the org Nonprofit Cloud is in, households (Party Relationship Groups) are not converted either: see [Nonprofit Cloud Households](nonprofit-cloud-households.md). |
+| Relationships and affiliations | In the org Nonprofit Cloud is in, use the kit below. For a new org, no ready-made template ships for them. After the people and organizations are loaded, load each as a file of its own with **One Kind of Record** ([Importing](importing.md), section 9), naming each person and organization by Salesforce record ID or by name. Or enter the ones you need by hand ([Relationships](relationships.md), [Affiliations](affiliations.md)). |
 | Gift commitments (pledges and recurring gifts) and their schedules | No import yet. Create each active commitment by hand ([Commitments](commitments.md)) before loading gifts. With **Match or create**, a gift dated near one of its scheduled payments pays it; older gifts load as gifts on their own. |
 | Soft credits | A soft credit loads only on the same row as a new gift, and Nonprofit Cloud exports them separately. Credits between household members are made automatically; add others by hand ([Soft credits](soft-credits.md)). |
 | Tributes | Same: add them by hand to the gift ([Tributes](tributes.md)). |
@@ -193,6 +193,25 @@ These are not loaded by the four templates. Each has what to do in the meantime.
 | Funds and appeals | Create them by hand first (section 4, step 1). |
 | An organization's details | A gift file creates an organization with its name only. Add its address and phone by hand. |
 | In-kind gifts (payment method In-kind) | BarnCRM wants an in-kind gift's value as its fair market value, with no amount, so these rows are rejected. Load them with the **Generic Gift List**, the value mapped to **Gift: fair market value**. |
+
+### The Nonprofit Cloud Relationships and Affiliations Kit
+
+With BarnCRM Mirror installed in the same org, on **Integrations**, Nonprofit Cloud
+Fundraising, click **Start Migration: NPC Relationships and Affiliations**. The
+Migration Assistant ([Migration Assistant](migration-assistant.md)) runs two steps, each with a
+preview, a check and an undo:
+
+| Step | Reads | Makes |
+|---|---|---|
+| Relationships | Every contact contact relation | One BarnCRM relationship per pair of people, with the related person's role as its type (Husband and Wife become Spouse, Mother and Father Parent, and so on; another role becomes Other), Current or Former from active, and its dates. BarnCRM writes the other side itself; where Nonprofit Cloud holds the pair both ways round, only one is copied. The check counts pairs of people. |
+| Affiliations | Every account contact relation with an organization | One affiliation per link, with its roles as text (Employee, Board Member), Current or Former from active, and its dates. Links to a household (an account with a Party Relationship Group of type Household) or to a person account are skipped. The check counts links to organizations. |
+
+Before you run it, open one relationship in the preview and check its type reads the right
+way round (the related person's role). Households themselves are not converted: BarnCRM keeps
+its guards for accounts that carry a Party Relationship Group (see
+[Nonprofit Cloud Households](nonprofit-cloud-households.md)). The Nonprofit Cloud field names
+the kit reads come from Salesforce's documentation and are not yet checked against a live org;
+if your org differs, a step reports the missing field by name and copies nothing.
 
 ## 7. Loading Into the Org Nonprofit Cloud Is In
 

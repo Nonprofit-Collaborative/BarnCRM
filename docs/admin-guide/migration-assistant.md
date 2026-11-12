@@ -29,6 +29,9 @@ org. These kits ship:
 - **NPSP Funds, Levels, Recurring Donations** (Giving): copies General Accounting Units,
   levels and recurring donations. See
   [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
+- **NPC Relationships and Affiliations** (Mirror): copies relationships between
+  people and links to organizations (not households). See
+  [Migrating From Nonprofit Cloud](migrating-from-nonprofit-cloud.md#the-nonprofit-cloud-relationships-and-affiliations-kit).
 
 An app can have several kits, one for each BarnCRM module that receives its records. Its
 listing then shows one **Start Migration** button per kit, each with the kit's name. Run them
