@@ -184,6 +184,14 @@ public with sharing class ModuleManagerService {
 			'Membership_Benefit__c',
 			'Membership_Level__c',
 			'Membership_Term__c'
+		},
+		'Projects' => new List<String>{
+			'Project__c',
+			'Project_Assignment__c',
+			'Project_Phase__c',
+			'Project_Status_Update__c',
+			'Project_Task__c',
+			'Time_Entry__c'
 		}
 	};
 
@@ -205,7 +213,8 @@ public with sharing class ModuleManagerService {
 		'LwcBuilder' => 'LWC_Builder_Admin',
 		'Scholarships' => 'Scholarships_Admin',
 		'Territory' => 'Territory_Admin',
-		'Memberships' => 'Memberships_Admin'
+		'Memberships' => 'Memberships_Admin',
+		'Projects' => 'Projects_Admin'
 	};
 
 	/** Raised for a module the org does not have, or one that cannot be switched. */

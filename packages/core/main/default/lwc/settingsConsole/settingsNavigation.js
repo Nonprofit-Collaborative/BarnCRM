@@ -63,7 +63,8 @@ const GROUPS = [
       ['Territory Management', 'utility:world'],
       ['Logic Models', 'utility:hierarchy'],
       ['Volunteers', 'utility:people'],
-      ['Events', 'utility:event']
+      ['Events', 'utility:event'],
+      ['Projects', 'utility:task']
     ]
   },
   { name: 'more', label: MORE, sections: [] },

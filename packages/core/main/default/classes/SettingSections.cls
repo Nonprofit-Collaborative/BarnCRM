@@ -109,6 +109,9 @@ public with sharing class SettingSections {
 	/** The Memberships module's renewal reminders and gift renewals. */
 	@NamespaceAccessible
 	public static final String MEMBERSHIPS = 'Memberships';
+	/** The Project Management module's time tracking and health settings. */
+	@NamespaceAccessible
+	public static final String PROJECTS = 'Projects';
 
 	/** Every section name a package may use, in the order the console lists them. */
 	@NamespaceAccessible
@@ -137,6 +140,7 @@ public with sharing class SettingSections {
 			SCHOLARSHIPS,
 			TERRITORY,
 			MEMBERSHIPS,
+			PROJECTS,
 			AUTOMATION,
 			ERROR_LOG,
 			ACCESS,

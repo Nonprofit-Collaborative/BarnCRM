@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Hourly_Rate__c</fullName>
+  <externalId>false</externalId>
+  <inlineHelpText>The rate for every hour logged on this project, for Actual Cost and the billable export.</inlineHelpText>
+  <label>Hourly Rate</label>
+  <precision>16</precision>
+  <required>false</required>
+  <scale>2</scale>
+  <trackTrending>false</trackTrending>
+  <type>Currency</type>
+</CustomField>

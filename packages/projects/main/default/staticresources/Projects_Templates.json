@@ -1,0 +1,142 @@
+{
+  "templates": [
+    {
+      "key": "salesforce_implementation",
+      "name": "Salesforce Implementation",
+      "type": "Salesforce Implementation",
+      "days": 98,
+      "phases": [
+        {
+          "name": "Discovery",
+          "start": 0,
+          "end": 13,
+          "tasks": [
+            { "name": "Kickoff meeting", "start": 0, "due": 0, "hours": 2 },
+            { "name": "Stakeholder interviews", "start": 1, "due": 7, "hours": 12 },
+            { "name": "Current systems and data inventory", "start": 3, "due": 10, "hours": 8 },
+            { "name": "Goals and success measures agreed", "start": 8, "due": 13, "hours": 4 },
+            { "name": "Discovery sign-off", "start": 13, "due": 13, "milestone": true }
+          ]
+        },
+        {
+          "name": "Design",
+          "start": 14,
+          "end": 27,
+          "tasks": [
+            { "name": "Data model and object design", "start": 14, "due": 20, "hours": 12 },
+            { "name": "Security, roles and sharing design", "start": 16, "due": 22, "hours": 6 },
+            { "name": "Automation and integration design", "start": 18, "due": 25, "hours": 10 },
+            { "name": "Design sign-off", "start": 27, "due": 27, "milestone": true }
+          ]
+        },
+        {
+          "name": "Build",
+          "start": 28,
+          "end": 55,
+          "tasks": [
+            { "name": "Configure objects, fields and pages", "start": 28, "due": 41, "hours": 24 },
+            { "name": "Build automation", "start": 35, "due": 49, "hours": 24 },
+            { "name": "Reports and dashboards", "start": 42, "due": 52, "hours": 12 },
+            { "name": "Integrations", "start": 42, "due": 55, "hours": 16 },
+            { "name": "Build complete", "start": 55, "due": 55, "milestone": true }
+          ]
+        },
+        {
+          "name": "Data Migration",
+          "start": 42,
+          "end": 69,
+          "tasks": [
+            { "name": "Data mapping", "start": 42, "due": 48, "hours": 8 },
+            { "name": "Data cleanup in the old system", "start": 45, "due": 55, "hours": 12 },
+            { "name": "Test load into a sandbox", "start": 56, "due": 62, "hours": 8 },
+            { "name": "Final data load", "start": 66, "due": 69, "hours": 6 }
+          ]
+        },
+        {
+          "name": "Testing",
+          "start": 56,
+          "end": 76,
+          "tasks": [
+            { "name": "Test scripts", "start": 56, "due": 60, "hours": 8 },
+            { "name": "System testing", "start": 61, "due": 69, "hours": 16 },
+            { "name": "User acceptance testing", "start": 70, "due": 76, "hours": 16 },
+            { "name": "Fix list closed", "start": 74, "due": 76, "hours": 8 }
+          ]
+        },
+        {
+          "name": "Training",
+          "start": 70,
+          "end": 90,
+          "tasks": [
+            { "name": "Training plan and materials", "start": 70, "due": 80, "hours": 12 },
+            { "name": "Admin training", "start": 81, "due": 84, "hours": 6 },
+            { "name": "User training", "start": 84, "due": 90, "hours": 12 }
+          ]
+        },
+        {
+          "name": "Go-Live",
+          "start": 88,
+          "end": 98,
+          "tasks": [
+            { "name": "Cutover plan", "start": 88, "due": 91, "hours": 4 },
+            { "name": "Go-Live", "start": 92, "due": 92, "milestone": true },
+            { "name": "Support after go-live", "start": 92, "due": 98, "hours": 16 },
+            { "name": "Project close and lessons learned", "start": 98, "due": 98, "hours": 2 }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "program_launch",
+      "name": "Program Launch",
+      "type": "Program",
+      "days": 70,
+      "phases": [
+        {
+          "name": "Plan",
+          "start": 0,
+          "end": 20,
+          "tasks": [
+            {
+              "name": "Define outcomes and who the program serves",
+              "start": 0,
+              "due": 7,
+              "hours": 6
+            },
+            { "name": "Budget and staffing", "start": 3, "due": 14, "hours": 6 },
+            { "name": "Plan approved", "start": 20, "due": 20, "milestone": true }
+          ]
+        },
+        {
+          "name": "Prepare",
+          "start": 21,
+          "end": 48,
+          "tasks": [
+            { "name": "Materials and curriculum", "start": 21, "due": 41, "hours": 20 },
+            { "name": "Recruit participants", "start": 28, "due": 48, "hours": 12 },
+            { "name": "Train staff and volunteers", "start": 35, "due": 45, "hours": 8 },
+            { "name": "Ready to launch", "start": 48, "due": 48, "milestone": true }
+          ]
+        },
+        {
+          "name": "Launch",
+          "start": 49,
+          "end": 55,
+          "tasks": [
+            { "name": "First session", "start": 49, "due": 49, "milestone": true },
+            { "name": "Collect first feedback", "start": 50, "due": 55, "hours": 4 }
+          ]
+        },
+        {
+          "name": "Review",
+          "start": 56,
+          "end": 70,
+          "tasks": [
+            { "name": "Review results against outcomes", "start": 56, "due": 66, "hours": 6 },
+            { "name": "Report to stakeholders", "start": 63, "due": 70, "hours": 4 }
+          ]
+        }
+      ]
+    }
+  ]
+}

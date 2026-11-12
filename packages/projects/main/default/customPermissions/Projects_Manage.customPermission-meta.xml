@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomPermission xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    Export billable time and stamp its Exported Date in Project Management. In Projects Admin.
+  </description>
+  <isLicensed>false</isLicensed>
+  <label>Manage Projects</label>
+</CustomPermission>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+  <fullName>Task__c</fullName>
+  <deleteConstraint>SetNull</deleteConstraint>
+  <externalId>false</externalId>
+  <inlineHelpText>The task the hours were worked on, on the same project.</inlineHelpText>
+  <label>Task</label>
+  <lookupFilter>
+    <active>true</active>
+    <filterItems>
+      <field>Project_Task__c.Project__c</field>
+      <operation>equals</operation>
+      <valueField>$Source.Project__c</valueField>
+    </filterItems>
+    <isOptional>false</isOptional>
+  </lookupFilter>
+  <referenceTo>Project_Task__c</referenceTo>
+  <relationshipLabel>Time Entries</relationshipLabel>
+  <relationshipName>Time_Entries</relationshipName>
+  <required>false</required>
+  <trackTrending>false</trackTrending>
+  <type>Lookup</type>
+</CustomField>
