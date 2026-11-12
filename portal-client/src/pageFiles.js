@@ -1,6 +1,6 @@
 /**
  * Files a portal page hands the person, built in the browser from the records already sent
- * (ADR-NEXT `NEXT-events-attendee-app-operations-portal-templates.md`, decision 2): an iCalendar
+ * (ADR-0215 `0215-events-attendee-app-operations-portal-templates.md`, decision 2): an iCalendar
  * file for Add to Calendar and a CSV for Download CSV. Framework-free and free of the DOM, so the
  * same code serves any portal client.
  */

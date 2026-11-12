@@ -1,5 +1,5 @@
 /**
- * The membership panel's controller (`membershipActions`; ADR-NEXT `NEXT-memberships-module.md`,
+ * The membership panel's controller (`membershipActions`; ADR-0206 `0206-memberships-module.md`,
  * decision 11): what a term can do, renewing it, and emailing a payment link. Thin: plain shapes,
  * user mode, the rules in `MembershipService` and `MembershipPayments`.
  */

@@ -1,5 +1,5 @@
 /**
- * The member portal's action (PB-09, PAY-02; ADR-NEXT `NEXT-memberships-module.md`, decisions 6
+ * The member portal's action (PB-09, PAY-02; ADR-0206 `0206-memberships-module.md`, decisions 6
  * and 7): `Memberships.PayDues` emails the member a link to pay their dues online. Portal Builder
  * calls it only for a verified person and a membership it found on that person's page; the term
  * is read again by that person before anything is queued. The checkout is started by a queued

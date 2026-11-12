@@ -1,6 +1,6 @@
 /**
- * What the BarnCRM Address Verification module does at install and at every upgrade (ADR-NEXT
- * `NEXT-address-verification-module.md`). Safe to run twice; a failure is logged, never raised:
+ * What the BarnCRM Address Verification module does at install and at every upgrade (ADR-0209
+ * `0209-address-verification-module.md`). Safe to run twice; a failure is logged, never raised:
  * the installer gets Address Verification Admin, then BarnCRM Admin holders do
  * (`AddressVerificationAccessSync`), both queued because an assignment is a setup object write.
  *

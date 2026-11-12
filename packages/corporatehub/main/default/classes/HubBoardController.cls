@@ -1,5 +1,5 @@
 /**
- * The Board and Meeting panels (CH-09 to CH-20; ADR-NEXT `NEXT-corporate-hub-board-governance.md`
+ * The Board and Meeting panels (CH-09 to CH-20; ADR-0199 `0199-corporate-hub-board-governance.md`
  * decision 13). Thin by design (plan Section 9.9): plain shapes out, the work in `HubBoard` and
  * `HubPolicy`, all in user mode. Skills gaps, expiring terms and percentages are worked out in
  * the framework-free `corporateHubModel` module.

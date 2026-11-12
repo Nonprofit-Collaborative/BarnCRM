@@ -1,5 +1,5 @@
 /**
- * Board governance (CH-09 to CH-20; ADR-NEXT `NEXT-corporate-hub-board-governance.md`, canonical
+ * Board governance (CH-09 to CH-20; ADR-0199 `0199-corporate-hub-board-governance.md`, canonical
  * model R-BM1, R-BMT1 to R-BMT4, R-MO1, R-AI1, R-BA1): current seats, inviting the board to a
  * meeting, minutes, voting, the availability poll, carried action items, self-assessments and
  * giving participation. Everything runs as the person, in user mode; approving minutes and

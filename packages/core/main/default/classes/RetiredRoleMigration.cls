@@ -1,5 +1,5 @@
 /**
- * Carries the holders of a retired BarnCRM role over to the role that replaces it (ADR-NEXT,
+ * Carries the holders of a retired BarnCRM role over to the role that replaces it (ADR-0194,
  * simpler permission sets, D1): every holder of Coordinator (`Volunteer_Coordinator`) is given
  * Team Member (`Program_Staff`), which grants exactly what Coordinator granted in Core.
  *

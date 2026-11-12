@@ -177,40 +177,40 @@ CAPS = {
     # (personScope catalogs read and checked in Apex, calendar, download and scan options), plus
     # about 2%.
     "portal": 61_000,
-    # Corporate Hub (CH-01 to CH-08, ADR-NEXT corporate hub module): access sync, post-install,
+    # Corporate Hub (CH-01 to CH-08, ADR-0196 corporate hub module): access sync, post-install,
     # the policy, compliance, reminder and template services and the page controller, 29,744
     # measured, plus about 2%. Board governance (CH-09 to CH-20, PB-02): HubBoard, the board and
     # meeting panel controller and the board portal actions, 51,443 measured, plus about 2%.
     # GDPR set (CH-05): processing activity templates, DPIA, request and breach reminders, the
     # erasure link and the page's Data Protection rows, about 57,100 measured, plus about 2%.
     "corporatehub": 58_300,
-    # Payments (PAY-01, ADR-NEXT payments module): checkout, receiver, processing and Health
+    # Payments (PAY-01, ADR-0201 payments module): checkout, receiver, processing and Health
     # Check measured 47,575 on 2026-11-11, plus about 2 percent; raised the same day for the
     # Payments Setup page's controller, measured 52,331.
     "payments": 53_400,
-    # LWC Builder (LB-01 to LB-06, ADR-NEXT lwc builder module): the builder and renderer
+    # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%.
     "lwcbuilder": 17_700,
-    # Scholarships and Outbound Grants (SG-01 to SG-10, PB-06, ADR-NEXT scholarships module):
+    # Scholarships and Outbound Grants (SG-01 to SG-10, PB-06, ADR-0204 scholarships module):
     # reviews, awards, form intake, portal actions, reminders, the payment rule and the page
     # controller, 49,326 measured (Prettier line breaks included), plus about 2%.
     "scholarships": 50_300,
-    # Territory Management (C-40, C-40b, ADR-NEXT territory management module): the model PR
+    # Territory Management (C-40, C-40b, ADR-0205 territory management module): the model PR
     # ships no Apex (0 measured). The Apex PR: access sync, post-install, routing, the run
     # batch, the page controller and the nightly step, 31,041 measured, plus about 2%.
     "territory": 31_700,
-    # Memberships (G-22a to G-22d, PAY-02, ADR-NEXT memberships module): terms, renewals, the
+    # Memberships (G-22a to G-22d, PAY-02, ADR-0206 memberships module): terms, renewals, the
     # nightly run, payment links, the Essentials kit, portal and erasure seams, 39,406 measured
     # on 2026-11-11, plus about 2 percent. PB-09's directory adds no Apex. Raised 2026-11-11 for
     # G-22e certifications (CertificationService, CertificationController, the erasure and
     # nightly expiry hooks): 47,443 measured, plus about 1 percent.
     "memberships": 48_000,
-    # Project Management (PM-01 to PM-05, ADR-NEXT project management module): access sync,
+    # Project Management (PM-01 to PM-05, ADR-0208 project management module): access sync,
     # post-install, health, templates, reporting and the page controller, 32,637 measured,
     # plus about 2%.
     "projects": 33_300,
-    # Address Verification (C-46, ADR-NEXT address verification module): the Smarty and Google
+    # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
     # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
     # 2026-11-11, plus about 2 percent.
     "addressverification": 25_300,

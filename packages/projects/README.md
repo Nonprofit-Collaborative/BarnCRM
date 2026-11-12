@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Projects of any kind for any organization (D-175, ADR-NEXT `NEXT-project-management-module.md`):
+Projects of any kind for any organization (D-175, ADR-0208 `0208-project-management-module.md`):
 projects with phases, tasks and milestones, templates (a shipped Salesforce Implementation and
 Program Launch template, and any project marked Is Template), a light PSA layer (time entries,
 assignments, budgets against actuals, utilization, a billable time CSV; no invoices or payments),

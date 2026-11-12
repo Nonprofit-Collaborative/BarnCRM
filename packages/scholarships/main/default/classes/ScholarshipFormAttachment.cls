@@ -1,6 +1,6 @@
 /**
- * Scholarships' side of Core's form seam (ADR-0175 decision 9; ADR-NEXT
- * `NEXT-scholarships-outbound-grants-module.md` decisions 4 and 5): a cycle names its application
+ * Scholarships' side of Core's form seam (ADR-0175 decision 9; ADR-0204
+ * `0204-scholarships-outbound-grants-module.md` decisions 4 and 5): a cycle names its application
  * form, and its report form, by record ID as text. A submission filled from a cycle creates or
  * updates the person's application (R-SG5) with its eligibility (R-SG3); one filled from a Draft
  * application fills it; one filled from a requirement is the recipient's report. The last two

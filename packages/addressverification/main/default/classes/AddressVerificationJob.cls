@@ -1,5 +1,5 @@
 /**
- * The module's background work (ADR-NEXT `NEXT-address-verification-module.md`, decision 5;
+ * The module's background work (ADR-0209 `0209-address-verification-module.md`, decision 5;
  * canonical model R-AV3):
  * - queued with addresses just saved (`AddressVerificationHandler`), it looks them up;
  * - as the nightly step (`AddressVerificationNightlyJobProvider`) or Verify Waiting Addresses,

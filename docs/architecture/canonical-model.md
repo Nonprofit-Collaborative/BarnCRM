@@ -683,8 +683,8 @@ does with the person name fields (Section 4 "Person references", ADR-0009).
 ### Definition
 
 How engaged a person has been lately, from 0 to 100, across gifts, volunteer hours, event
-attendance and activity recency, weighted by the admin (C-64, D-157, release 1.15; ADR-NEXT
-`NEXT-engagement-score.md`). Core scores it; gifts, hours and attendance come from Giving,
+attendance and activity recency, weighted by the admin (C-64, D-157, release 1.15; ADR-0212
+`0212-engagement-score.md`). Core scores it; gifts, hours and attendance come from Giving,
 Volunteers and Event Management when they are installed. Giving's donor score (Section 25T,
 G-19) stays the gifts-only rating.
 
@@ -1411,7 +1411,7 @@ shows the last full Health Check result instead of running every check on each l
 
 ### Brand keys
 
-Added by C-47 (releases 1.13 and 1.14, D-119, D-120, ADR-NEXT brand management and visibility).
+Added by C-47 (releases 1.13 and 1.14, D-119, D-120, ADR-0202 brand management and visibility).
 Both ship off; with both off nothing anyone sees changes (Section 29BR2).
 
 | Key | Type | Default | Definition |
@@ -1701,7 +1701,7 @@ field follows `Merge_Default_Rule__c` until an administrator adds a row.
 
 ### History Field
 
-`History_Field__mdt` (R-FH1; C-68, ADR-NEXT `NEXT-field-history-keeper.md`): one field whose
+`History_Field__mdt` (R-FH1; C-68, ADR-0195 `0195-field-history-keeper.md`): one field whose
 changes Field History Keeper keeps. Read directly by the capture, with `getAll()`, so a save
 spends no query on it. Registered with and listed on the custom metadata manager, which saves
 it; nothing is shipped.
@@ -1785,13 +1785,13 @@ alongside itself until a row's compatibility note says otherwise.
 
 A product with a Migration Kit whose Source App is its DeveloperName, detected in the org,
 shows Start Migration to a person with Manage BarnCRM Settings, which opens the Migration
-Assistant for that kit on the same page (MIG-10, ADR-NEXT migration-assistant decision 9). A
+Assistant for that kit on the same page (MIG-10, ADR-0197 migration-assistant decision 9). A
 product with several kits (for example NPSP: people, giving setup, gifts and rollups, each in
 the module it fills) shows one button per kit, named by the kit's label, in Sort Order.
 
 ### Migration Kit
 
-`Migration_Kit__mdt` (MIG-01, ADR-NEXT `NEXT-migration-assistant.md`): one migration from a
+`Migration_Kit__mdt` (MIG-01, ADR-0197 `0197-migration-assistant.md`): one migration from a
 product in the same org into BarnCRM, read as shipped and never materialized. A kit ships in the
 module that owns the destination records (Mirror when the source is a standard object), so a
 row exists only where that module is installed. The Migration Assistant offers a kit only when
@@ -2356,7 +2356,7 @@ said in words. A compare step shows, for up to five target records, the value th
 (DLRS wrote it) beside the value the copy calculates, writing nothing. A copy is switched on
 only with the confirmation above, recorded the same way. DLRS is read, never changed.
 
-*NPSP customizable rollups (MIG-08, ADR-NEXT migration-assistant decision 11).* NPSP's
+*NPSP customizable rollups (MIG-08, ADR-0197 migration-assistant decision 11).* NPSP's
 customizable rollups (its custom metadata types Rollup and Filter Rule, `Rollup` and `Filter_Rule` with the `__mdt` suffix, in
 namespace `npsp`, names built at run time, read by describe in system mode, only the fields the
 installed version has) are read into the same definition shape and pass through the same import
@@ -4515,7 +4515,7 @@ recalculation.
 Mirror (plan Section 4.12): the Campaign ID attribute and the one-way copy of Section 29B,
 both shipped by the Mirror package, so Giving itself never names Campaign.
 
-**R-AP5 Online donation page** (G-34, ADR-NEXT `NEXT-online-donation-pages.md`). An active
+**R-AP5 Online donation page** (G-34, ADR-0211 `0211-online-donation-pages.md`). An active
 appeal with Donation Page on and a Donation Form Key naming a published public form has a public
 page served by Forms (`<site>/FormsPublic?record=<appeal>`). The page shows the name,
 description and goal only. Sending the form starts a hosted checkout through Payments with the
@@ -8192,7 +8192,7 @@ Campaign of the gift's appeal, which is why it is an indexed external identifier
   reads, Campaign by dynamic query only), `CampaignSyncBatch` (R-CS6),
   `CampaignSyncController` and the `campaignSync` page reached from the Giving section of
   BarnCRM Settings. Permission set: `Salesforce_Records_Sync` (retired `Campaign_Sync` until the
-  next release, ADR-NEXT D4).
+  next release, ADR-0194 D4).
 
 ## 29C. Opportunity Mirror
 
@@ -8384,7 +8384,7 @@ only, because a gift is never edited from its Opportunity.
   of BarnCRM Settings, `MirrorSettingsWriter` (the runs' record of their last completed run)
   and `MirrorHealthCheckExtension` (the stale run finding, through the ADR-0057 seam).
   Permission set: `Salesforce_Records_Sync` (retired `Opportunity_Mirror` until the next
-  release, ADR-NEXT D4), which also carries the custom permission
+  release, ADR-0194 D4), which also carries the custom permission
   `Use_Opportunity_Mirror`: the page's reads require it, and the console shows the page's row
   only to someone who has it (the Setting Definition's `Required_Permission__c`).
 - **List view** `Gifts_And_Opportunities` on Gift, shipped by Mirror, where Opportunity ID is
@@ -8591,7 +8591,7 @@ range that are dated on or after the start date.
   `MirrorSettingsWriter` (the runs' record of their last completed run),
   `MirrorHealthCheckExtension` (the stale run finding) and `MirrorNightlyJobProvider` (the
   nightly jobs list). Permission set: `Salesforce_Records_Sync` (retired `Gift_Transaction_Mirror`
-  until the next release, ADR-NEXT D4), which also carries the custom
+  until the next release, ADR-0194 D4), which also carries the custom
   permission `Use_Gift_Transaction_Mirror`: the page's reads require it, and the console shows
   the page's row only to someone who has it. It is offered on the Access page through an
   `Access_Add_On__mdt` row.
@@ -8776,7 +8776,7 @@ the key, so a saved grid runs in Find as the same query. The Grid edits through 
 Update data job per save) and saves, shares and deletes through the saved query's own rules
 (R-SQ4 to R-SQ6). No object or field is added.
 
-**R-SQ15 Backup Sets** (C-66, D-157; ADR-NEXT `NEXT-backup-sets.md`). The document has one more
+**R-SQ15 Backup Sets** (C-66, D-157; ADR-0213 `0213-backup-sets.md`). The document has one more
 optional key, `backup`: `{ "version": 1 }`. It marks a saved query as a Backup Set; Find and the
 compiler ignore it. Only the query's owner adds or removes it, and only a person holding both
 Manage BarnCRM Settings and Find and Export Records may see the Backup Sets panel or run a set.
@@ -8817,7 +8817,7 @@ Manage BarnCRM Settings and Find and Export Records may see the Backup Sets pane
   (R-SQ14); the components `findRadiusPanel` (R-SQ13), `findPage` and `gridTool` (R-SQ14).
 - **Permission:** custom permission `Find_And_Export_Records`, in `BarnCRM_Admin` and in its own
   permission set `BarnCRM_Find_And_Export`, assignable alone; `BarnCRM_Bulk_Update` and
-  `BarnCRM_Bulk_Delete` include all of its grants (ADR-NEXT D5).
+  `BarnCRM_Bulk_Delete` include all of its grants (ADR-0194 D5).
 - **UI:** the Find tab (app page `Find`, component `findRecords`), built on `filterBuilder`.
 - **Data hygiene (R-SQ6):** services `DataHygieneService`, `DataHygieneController`; UI the Data quality section
   of the Org Optimizer tab (app page `Data_Hygiene`, shell `orgOptimizer`, component
@@ -8832,7 +8832,7 @@ Manage BarnCRM Settings and Find and Export Records may see the Backup Sets pane
 ### Definition
 
 Files and attachments from another system loaded into Salesforce Files, each linked to a record,
-from a zip that carries a manifest (C-70, D-157; ADR-NEXT `NEXT-files-import.md`). No object of
+from a zip that carries a manifest (C-70, D-157; ADR-0214 `0214-files-import.md`). No object of
 its own: a data job (`Import_Batch__c`, Operation Files), its journal (Section 17A) and the
 platform's `ContentVersion` and `ContentDocument`.
 
@@ -8967,7 +8967,7 @@ holds the value the bulk update wrote; anything else is journaled as not put bac
 **R-BU6 Permission.** Every bulk update action requires the `Bulk_Update_Records` custom
 permission and, because every bulk update starts from a Find query, `Find_And_Export_Records`
 (R-SQ5). Neither grants record access. `BarnCRM_Bulk_Update` carries both, with every grant of
-`BarnCRM_Find_And_Export` (ADR-NEXT, simpler permission sets, D5), so it needs no pair.
+`BarnCRM_Find_And_Export` (ADR-0194, simpler permission sets, D5), so it needs no pair.
 
 **R-BU7 Change with steps.** A change whose action is `transform` carries `transforms`, a list
 of steps in the transform document of R-IT15 (ADR-0081), and changes each record's own value.
@@ -9034,7 +9034,7 @@ NotRestored with the reason, and the Run Log says how many were restored, purged
 **R-BD6 Permission.** Every bulk delete action requires the `Bulk_Delete_Records` custom
 permission and `Find_And_Export_Records`. `Bulk_Delete_Records` is in its own permission set
 only, `BarnCRM_Bulk_Delete`, and in no role; that set also carries every grant of
-`BarnCRM_Find_And_Export` (ADR-NEXT D5), so it needs no pair. Neither grants record access. What reads no query
+`BarnCRM_Find_And_Export` (ADR-0194 D5), so it needs no pair. Neither grants record access. What reads no query
 needs only `Bulk_Delete_Records`: the list of jobs, a job's progress, the undo, and a delete by
 file (R-BD7), which needs import access instead of Find.
 
@@ -9116,7 +9116,7 @@ the run limit (R-BD2), checked when it starts.
   chunk read; `ImportUndoService` and `ImportUndoBatch` handle the Update operation.
 - **Permission:** custom permission `Bulk_Update_Records`, in `BarnCRM_Admin` and in its own
   permission set `BarnCRM_Bulk_Update`, which includes `BarnCRM_Find_And_Export`'s grants. The
-  `BulkUpdateController` class is in both sets (ADR-NEXT, gap fix).
+  `BulkUpdateController` class is in both sets (ADR-0194, gap fix).
 - **UI:** component `superTransform` on the Super Transformer tab (app page `Bulk_Update`),
   listing recent Super Transformer runs with their progress and undo. Find's Change Records menu
   opens that tab with the query's object, filter and `related` conditions in the page state key
@@ -9493,8 +9493,8 @@ gives Modify All only with Delete.
 | Permission set | Given to | Job, Shift, Sign-up, Shift Schedule | Hours | Person attributes |
 |---|---|---|---|---|
 | `Volunteers_Admin` | holders of `BarnCRM_Admin` | create, edit, delete | create, edit, delete; view and modify all; Household editable | edit |
-| `Volunteers_Coordinator` | per person on the Access page (Access Add-On row `Volunteers_Coordinator`, ADR-NEXT D1), and holders of the retired Coordinator role (`Volunteer_Coordinator`) until the next release | create, edit | create, edit, delete; view and modify all, to approve and correct anyone's entry (R-VG7); Rejection Reason editable; custom permission `Manage_Volunteers` (see below) | edit |
-| `Volunteers_Staff` | the Team Member role (`Program_Staff`) and Giving's Fundraising Staff role (`Fundraising_Staff`, ADR-NEXT D3) | create, edit | create, edit their own entries (sharing Private) | edit |
+| `Volunteers_Coordinator` | per person on the Access page (Access Add-On row `Volunteers_Coordinator`, ADR-0194 D1), and holders of the retired Coordinator role (`Volunteer_Coordinator`) until the next release | create, edit | create, edit, delete; view and modify all, to approve and correct anyone's entry (R-VG7); Rejection Reason editable; custom permission `Manage_Volunteers` (see below) | edit |
+| `Volunteers_Staff` | the Team Member role (`Program_Staff`) and Giving's Fundraising Staff role (`Fundraising_Staff`, ADR-0194 D3) | create, edit | create, edit their own entries (sharing Private) | edit |
 | `Volunteers_Read_Only` | the Read Only role (`Read_Only`) | read | read, though none is visible: it creates none and sharing is Private | read |
 
 Each set shows the BarnCRM Volunteers app and the Jobs, Shifts, Hours and Skills tabs; only the
@@ -9692,7 +9692,7 @@ shift and changes nothing already recorded, including its totals.
 **R-VJ3 A job is public only by choice (V-09).** A job's Open shifts that start after now are
 on the public sign-up page only while Show on Public Page and Active are both checked; its
 Sign-Up Form (a published public form's record identifier) is the form those shifts offer.
-What a guest is shown, and how a sign-up is booked, is ADR-NEXT (volunteer self-service)
+What a guest is shown, and how a sign-up is booked, is ADR-0198 (volunteer self-service)
 decisions 1 to 3: job name and description, shift start, end and location, and places left as
 a count; never who is booked, the coordinator or notes. The form's answers `groupSize` (a whole
 number from 1 to 50; anything else is 1) and `groupName` set the sign-up's Group Size and Group
@@ -9883,7 +9883,7 @@ booking being deleted.
 sign-up saved as Signed up or Confirmed on a shift with Volunteers Needed set is checked against
 the places free, counted now from the sign-ups (not Slots Filled, which a roll-up updates a
 moment later), in the order given: one that does not fit is saved as Waitlisted, and one that
-does fit takes its places (Core `WaitlistQueue`, ADR-NEXT volunteer self-service decision 5).
+does fit takes its places (Core `WaitlistQueue`, ADR-0198 volunteer self-service decision 5).
 When places free up (a sign-up Cancelled or deleted, a group made smaller, or Volunteers
 Needed raised) on a shift still to come, Waitlisted sign-ups
 are promoted to Signed up, oldest first by Created Date, each that fits taking its places; a
@@ -11222,7 +11222,7 @@ saved as Enrolled (new, or moved to Enrolled or to another program) is checked a
 places free, counted from every Enrolled enrollment in the org in system mode, in the order
 given: one that does not fit is saved as Waitlisted instead. When places free up (an enrollment
 leaves Enrolled or is deleted, or Capacity is raised) Waitlisted enrollments are moved to
-Enrolled, oldest first by Created Date, through Core's `WaitlistQueue` (ADR-NEXT volunteer
+Enrolled, oldest first by Created Date, through Core's `WaitlistQueue` (ADR-0198 volunteer
 self-service decision 5), in system mode so one the user cannot see (R-EN7) still moves, with
 R-EN3 filling the Start Date. Applied is not counted
 and never promoted. With the setting off, Capacity only shows and nothing is waitlisted or
@@ -12603,7 +12603,7 @@ current fiscal year from records already kept, with no object of its own:
 Giving is read by describe only; without it, or without access to it, the dashboard shows the
 grant figures alone. Every read runs in user mode, so a person sees totals of what they can read.
 
-**R-GN11 The Grant Finder saves a prospect (F-09, ADR-NEXT funders grant finder and grant
+**R-GN11 The Grant Finder saves a prospect (F-09, ADR-0200 funders grant finder and grant
 management).** A search runs against the public Grants.gov search API, no key, only while the
 Grant Finder setting is on (R-FS2). Save to Pipeline makes a grant at Prospect: the opportunity's
 title (cut to 80 characters), close date as Application Deadline, Funding Source Federal, the
@@ -13105,7 +13105,7 @@ template is never changed by an upgrade (plan Section 4.8), so an edited one is 
 ### Definition
 
 One step of an application checklist, kept once and added to each grant that reaches its stage
-(F-10, ADR-NEXT funders grant finder and grant management): for example "Ask the program officer
+(F-10, ADR-0200 funders grant finder and grant management): for example "Ask the program officer
 about fit" at Prospect, or "Upload the board list" at Applied.
 
 ### Attributes
@@ -13465,8 +13465,8 @@ pages' Schedule and Stop buttons, which require Manage BarnCRM Settings.
 
 ### Definition
 
-One administrator's progress through one Migration Kit (Section 13, MIG-01, ADR-NEXT
-`NEXT-migration-assistant.md`): which tool steps are done and which retire checklist items are
+One administrator's progress through one Migration Kit (Section 13, MIG-01, ADR-0197
+`0197-migration-assistant.md`): which tool steps are done and which retire checklist items are
 ticked. Import steps are not stored here; each is the Import Batch that points at the run.
 
 ### Attributes
@@ -14343,8 +14343,8 @@ a second assignment of the same speaker to the same session.
 One booking for an event (EV-02): the person who registered, the attendees it holds, the promo
 code used and what is owed. BarnCRM holds no money: with Take payment online on and BarnCRM
 Payments installed, the amount owed is paid on the org's own Stripe or PayPal hosted checkout and
-recorded here (EV-20). Design: ADR-0182 `0182-event-registrations.md`; payment: ADR-NEXT
-`NEXT-events-paid-registration-proposals-ratings.md`.
+recorded here (EV-20). Design: ADR-0182 `0182-event-registrations.md`; payment: ADR-0207
+`0207-events-paid-registration-proposals-ratings.md`.
 
 ### Attributes
 
@@ -14972,8 +14972,8 @@ reads as its shipped value.
 
 ### Definition
 
-One anonymous rating of a session (EV-27, ADR-NEXT
-`NEXT-events-paid-registration-proposals-ratings.md`), from the event's session rating form,
+One anonymous rating of a session (EV-27, ADR-0207
+`0207-events-paid-registration-proposals-ratings.md`), from the event's session rating form,
 opened by the session's QR code. Numbered for its plan item.
 
 ### Attributes
@@ -15098,8 +15098,8 @@ that off; Suggest Seating places whole parties and never fills a sponsor table.
 
 ### Definition
 
-A place events are held, kept once and picked on each event (EV-24, ADR-NEXT
-`NEXT-events-attendee-app-operations-portal-templates.md`, decision 14).
+A place events are held, kept once and picked on each event (EV-24, ADR-0215
+`0215-events-attendee-app-operations-portal-templates.md`, decision 14).
 
 ### Attributes
 
@@ -15499,7 +15499,7 @@ object whose `personField` looks up to Contact) or `catalog` (a custom object, r
 `where` tests). Editable fields are updateable, of a safe type, never a lookup. A related page's
 `personField` may be `Parent__r.Contact__c` (one parent hop to a lookup to Contact, ADR-0191
 `0191-portal-templates-volunteer-speaker-donor.md`): such a page is read only. A catalog page may
-name a `personScope` (ADR-NEXT `NEXT-events-attendee-app-operations-portal-templates.md`): only
+name a `personScope` (ADR-0215 `0215-events-attendee-app-operations-portal-templates.md`): only
 records whose field is one of the values a custom scope object holds for the person (its own
 lookup to Contact, its own fixed tests, at most 200 values) are shown or acted on. A page may name
 a `calendar` (title, start, end and location, each a field on the page) or `download: true`, and an
@@ -15679,7 +15679,7 @@ and answers as usual, so no answer says who is on file.
 ### Definition
 
 One save's changes to the chosen fields of one record, kept by Field History Keeper (C-68,
-ADR-NEXT `NEXT-field-history-keeper.md`) beyond Salesforce's 20 tracked fields per object and
+ADR-0195 `0195-field-history-keeper.md`) beyond Salesforce's 20 tracked fields per object and
 18 months, for BarnCRM's own objects.
 
 ### Attributes
@@ -15740,8 +15740,8 @@ apply; the restore is itself a change and is kept.
 
 ### Definition
 
-One document or policy in the organization's library (CH-01, Corporate Hub module, ADR-NEXT
-`NEXT-corporate-hub-module.md`, D-118): what it is, its status, its current version, when it is
+One document or policy in the organization's library (CH-01, Corporate Hub module, ADR-0196
+`0196-corporate-hub-module.md`, D-118): what it is, its status, its current version, when it is
 next reviewed and whether people must acknowledge it. Its files are Salesforce Files linked to
 the record; the file history is Salesforce's own.
 
@@ -16069,7 +16069,7 @@ legal text. Existing records are never changed.
 ### Definition
 
 A board of directors, or a committee, task force, working group, advisory council or chapter
-(CH-09, CH-17; ADR-NEXT `NEXT-corporate-hub-board-governance.md`): one roster of dated seats,
+(CH-09, CH-17; ADR-0199 `0199-corporate-hub-board-governance.md`): one roster of dated seats,
 its meetings and votes, its action items and its self-assessments.
 
 ### Attributes
@@ -16670,7 +16670,7 @@ has its risk assessed (`Closed_Needs_Assessment`).
 ### Definition
 
 One online payment taken through the organization's own Stripe or PayPal account on the
-processor's hosted checkout page (PAY-01, Payments module, ADR-NEXT `NEXT-payments-module.md`,
+processor's hosted checkout page (PAY-01, Payments module, ADR-0201 `0201-payments-module.md`,
 D-190): how much, for what, from whom, for which record, and where it stands. BarnCRM never holds
 the money or any card or account number.
 
@@ -16689,7 +16689,7 @@ the money or any card or account number.
 | Payer Email | email | no | As the consumer passed it; prefilled on Stripe's page. |
 | Person | reference to Contact | no | The person paying, when the consumer knows them. Cleared when the person is deleted. |
 | Source Record Id | text | no | The consumer's record the payment is for (a registration, a gift, a membership), as text so Payments names no consumer object (ADR-0014). |
-| Listener | text | no | The consumer's class told of each change (ADR-NEXT payments module, decision 8). |
+| Listener | text | no | The consumer's class told of each change (ADR-0201 payments module, decision 8). |
 | Reference | text | yes | A random identifier sent to the processor and matched on its events; unique. |
 | Checkout Id | text | no | The Stripe Checkout Session id or the PayPal Order id. |
 | Processor Payment Id | text | no | The Stripe payment intent id or the PayPal capture id, once known. |
@@ -16860,7 +16860,7 @@ and the setup page never returns a key.
 
 ### Definition
 
-A legal body one or more brands belong to (C-47a, D-120, ADR-NEXT brand management and
+A legal body one or more brands belong to (C-47a, D-120, ADR-0202 brand management and
 visibility): the organization itself, or a separately incorporated affiliate, chapter or
 foundation. Gifts, funds, receipts and receipt numbering belong to the receiving entity, so a
 brand that is its own legal entity issues receipts in its own legal name and tax ID. Core owns
@@ -17071,8 +17071,8 @@ brand is refused by the unique field.
 
 ### Definition
 
-A component an admin built in the LWC Builder (LB-01 to LB-06; ADR-NEXT
-`NEXT-lwc-builder-module.md`): a named layout of sections, rows, columns and blocks, stored as a
+A component an admin built in the LWC Builder (LB-01 to LB-06; ADR-0203
+`0203-lwc-builder-module.md`): a named layout of sections, rows, columns and blocks, stored as a
 JSON document and shown on a Lightning page by the packaged renderer. A definition is data, never
 deployed metadata.
 
@@ -17156,7 +17156,7 @@ Settings.
 
 ### Definition
 
-A scholarship, fellowship or outbound grant program the organization gives (SG-01, Scholarships and Outbound Grants module, ADR-NEXT `NEXT-scholarships-outbound-grants-module.md`, D-122). It holds the award letter template its awards use.
+A scholarship, fellowship or outbound grant program the organization gives (SG-01, Scholarships and Outbound Grants module, ADR-0204 `0204-scholarships-outbound-grants-module.md`, D-122). It holds the award letter template its awards use.
 
 ### Rules
 
@@ -17399,7 +17399,7 @@ The module's org-wide settings, edited in the Scholarships and Grants section of
 
 ## 29TM1. Territory
 
-Package: BarnCRM Territory Management (C-40, ADR-NEXT `NEXT-territory-management-module.md`).
+Package: BarnCRM Territory Management (C-40, ADR-0205 `0205-territory-management-module.md`).
 
 ### Definition
 
@@ -17583,8 +17583,8 @@ puts back territory and owner where nobody changed them since (R-BU5). One run a
 ### Definition
 
 One kind of membership an organization sells: its type and tier, yearly dues, how long a term
-lasts and how long a lapsed member stays in grace (G-22a, Memberships module, ADR-NEXT
-`NEXT-memberships-module.md`, D-157).
+lasts and how long a lapsed member stays in grace (G-22a, Memberships module, ADR-0206
+`0206-memberships-module.md`, D-157).
 
 ### Attributes
 
@@ -17783,7 +17783,7 @@ The Memberships module's org-wide settings, in the Memberships section of BarnCR
 
 ### Definition
 
-A piece of work with a start, a target date and an outcome: a Salesforce implementation, a program launch, internal work or work for a client (PM-02, Project Management module, ADR-NEXT `NEXT-project-management-module.md`, D-175). A project with Is Template checked is a template, never worked on itself.
+A piece of work with a start, a target date and an outcome: a Salesforce implementation, a program launch, internal work or work for a client (PM-02, Project Management module, ADR-0208 `0208-project-management-module.md`, D-175). A project with Is Template checked is a template, never worked on itself.
 
 ### Rules
 
@@ -17980,8 +17980,8 @@ The module's org-wide settings, edited in the Projects section of BarnCRM Settin
 
 ### Definition
 
-The Address Verification module's org-wide choices (C-46, D-112; ADR-NEXT
-`NEXT-address-verification-module.md`), edited in the Addresses section of BarnCRM Settings.
+The Address Verification module's org-wide choices (C-46, D-112; ADR-0209
+`0209-address-verification-module.md`), edited in the Addresses section of BarnCRM Settings.
 
 ### Attributes
 
@@ -18566,56 +18566,56 @@ mirrors the primary member).
 | 1.3 | 2026-11-07 | Post-event survey (EV-18, D-186, ADR-0188). New Section 29EV18 Event Survey Response (`Event_Survey_Response__c`, R-ESV1 to R-ESV3); `Event__c` gains `Survey_Form_Key__c`, `Event_Attendee__c` gains `Survey_Link__c`, `Events_Settings__c` gains `Survey_Template__c`. Core gains the `FormCatalogExtension` seam (no object or field). |
 | 1.2 | 2026-11-07 | Event calendar (EV-19, D-186, ADR-0189). No object or field added: the Event Calendar tab reads `Event__c` (29EV1) and `Event_Session__c` (29EV5) and builds an `.ics` file per entry in the browser. |
 | 1.2 | 2026-11-07 | Public event pages (EV-16, D-186, ADR-0190 public event pages). `Event__c` (29EV1) gains `Public_Page__c`, `Public_Speakers__c` and `Public_Seats__c` (Checkbox, default false) and rule R-EV5; `Events_Settings__c` (29EV25) gains `Public_Payment_Note__c` (setting `Events_Public_Payment_Note`, sort 90). Core gains the `PublicPageExtension` seam (no object or field). |
-| 1.3 | 2026-11-09 | Simpler permission sets, Mirror (ADR-NEXT D4, D-191, release N). No object or field added. New permission sets `Salesforce_Records_Sync` (the grants of `Campaign_Sync`, `Opportunity_Mirror` and `Gift_Transaction_Mirror` together) and `Inbound_Gifts` (`Inbound_Gift_API` plus the `InboundGiftAction` class); the five old sets are labelled Retired and removed in the next release. `Accounting_Export` gains read on `Gift__c`, `Gift_Allocation__c`, `Fund__c`, Account and Contact and on the fields the export reads (`Fund__c.Accounting_Code__c`, `Gift_Allocation__c.Amount__c`, `Gift__c.Accounting_Posted_At__c`, `Accounting_Posted_By__c`, `Donor_Account__c`, `Donor_Contact__c`, `Original_Gift__c`, `Payment_Reference__c`). Mirror's `Access_Add_On__mdt` rows become `Salesforce_Records_Sync` (210), `Accounting_Export` (230) and `Inbound_Gifts` (240). New `MirrorAccessSync` gives the new sets to active holders of the old ones. |
+| 1.3 | 2026-11-09 | Simpler permission sets, Mirror (ADR-0194 D4, D-191, release N). No object or field added. New permission sets `Salesforce_Records_Sync` (the grants of `Campaign_Sync`, `Opportunity_Mirror` and `Gift_Transaction_Mirror` together) and `Inbound_Gifts` (`Inbound_Gift_API` plus the `InboundGiftAction` class); the five old sets are labelled Retired and removed in the next release. `Accounting_Export` gains read on `Gift__c`, `Gift_Allocation__c`, `Fund__c`, Account and Contact and on the fields the export reads (`Fund__c.Accounting_Code__c`, `Gift_Allocation__c.Amount__c`, `Gift__c.Accounting_Posted_At__c`, `Accounting_Posted_By__c`, `Donor_Account__c`, `Donor_Contact__c`, `Original_Gift__c`, `Payment_Reference__c`). Mirror's `Access_Add_On__mdt` rows become `Salesforce_Records_Sync` (210), `Accounting_Export` (230) and `Inbound_Gifts` (240). New `MirrorAccessSync` gives the new sets to active holders of the old ones. |
 | 1.3 | 2026-11-07 | Portal Builder module (PB-01, D-118, D-178, D-187; ADR-0185 `0185-portal-builder-off-platform-portal-api.md`). New package `packages/portal`: Portal (`Portal__c`, 29PB1), Portal Access (`Portal_Access__c`, 29PB2), Portal Session (`Portal_Session__c`, 29PB3) and Portal Settings (`Portal_Settings__c`, 29PB4), rules R-PB1 to R-PB4, R-PA1, R-PA2, R-PS1, R-PS2 and R-PST1. Core gains no object or field: only the `PortalActionExtension` seam, the Portals settings section and the catalog row `BarnCRM_Module.Portal`. |
 | 1.3 | 2026-11-09 | Batch C review: Form Draft (29ZY1) gains Address Key (`Address_Key__c`, Text(64)); R-FS7 caps save-for-later links at 3 an hour per address and 100 an hour per form. |
-| 1.3 | 2026-11-09 | Simpler permission sets, modules (ADR-NEXT, D-191, release N). No object or field added. D1: Volunteers ships the Access Add-On row `Volunteers_Coordinator` (sort 100), so Volunteers Coordinator is given per person on the Access page; the Coordinator role line stays in `VolunteersAccessSync` this release. D2: new `GivingAccessSync` gives `Giving_Admin` to holders of `BarnCRM_Admin`, queued by `GivingPostInstall`. D3 as modified: `Fundraising_Staff` is added to the Forms, Logic Models and Volunteers Staff lines (Events and Funders had it); Programs deliberately not. Label only: `Rollup_Builder_User` reads Rollup Builder Read Only. |
+| 1.3 | 2026-11-09 | Simpler permission sets, modules (ADR-0194, D-191, release N). No object or field added. D1: Volunteers ships the Access Add-On row `Volunteers_Coordinator` (sort 100), so Volunteers Coordinator is given per person on the Access page; the Coordinator role line stays in `VolunteersAccessSync` this release. D2: new `GivingAccessSync` gives `Giving_Admin` to holders of `BarnCRM_Admin`, queued by `GivingPostInstall`. D3 as modified: `Fundraising_Staff` is added to the Forms, Logic Models and Volunteers Staff lines (Events and Funders had it); Programs deliberately not. Label only: `Rollup_Builder_User` reads Rollup Builder Read Only. |
 | 1.3 | 2026-11-09 | Batch C review: Portal Access (29PB2) gains Second Factor Last Step (`Second_Factor_Last_Step__c`, Number(18, 0)) and rule R-PA3, an authenticator code is used once. |
 | 1.3 | 2026-11-09 | Module detection by announcement (mwdbdevsb validation). No object or field added. `BarnCRM_Module__mdt` `Probe_Object__c` is cleared for every module that ships Setting Definition rows naming itself (Events, Volunteers, Funders, Programs, Portal, Contact Points): a customer org's own `Event__c` and `Volunteer_Hours__c` made Events and Volunteers read as installed. Forms and Logic Models, which ship no settings rows, probe `Form_Version__c` and `Logic_Model_Element__c` in place of `Form__c` and `Logic_Model__c`. Rollup Builder keeps `Rollup_Definition__c`. |
 | 1.3 | 2026-11-07 | Portal templates for volunteers, speakers and donors (PB-03, PB-07, PB-08; ADR-0191 `0191-portal-templates-volunteer-speaker-donor.md`). No object or field added. R-PB2 gains a read-only `Parent__r.Contact__c` person link; Core's `PortalActionExtensions` lists the Volunteers and Event Management action classes. |
-| 1.3 | 2026-11-09 | Simpler permission sets, Core (ADR-NEXT, D-191, release N). No object or field added. Coordinator (`Volunteer_Coordinator`) retired: the Access page stops offering it and `RetiredRoleMigration` gives its active holders Team Member; R-BU6 and R-BD6: `BarnCRM_Bulk_Update` and `BarnCRM_Bulk_Delete` include `BarnCRM_Find_And_Export`'s grants; `BarnCRM_Admin` gains `BulkUpdateController`. Labels only: BarnCRM Admin (group), BarnCRM Admin Access, Staff Access and Read Only Access, and "BarnCRM Auto:" on the eleven tab, Households and app sets. |
+| 1.3 | 2026-11-09 | Simpler permission sets, Core (ADR-0194, D-191, release N). No object or field added. Coordinator (`Volunteer_Coordinator`) retired: the Access page stops offering it and `RetiredRoleMigration` gives its active holders Team Member; R-BU6 and R-BD6: `BarnCRM_Bulk_Update` and `BarnCRM_Bulk_Delete` include `BarnCRM_Find_And_Export`'s grants; `BarnCRM_Admin` gains `BulkUpdateController`. Labels only: BarnCRM Admin (group), BarnCRM Admin Access, Staff Access and Read Only Access, and "BarnCRM Auto:" on the eleven tab, Households and app sets. |
 | 1.4 | 2026-11-11 | Forms and Logic Models announce themselves (C-72). No object or field added. Forms ships Setting Definition `Forms_Page` and Logic Models `Logic_Models_Page`: a Component row naming the module, in new console sections Forms and Logic Models, whose Open button opens the module's object tab. `BarnCRM_Module__mdt` `Probe_Object__c` is cleared for Forms and LogicModels, so only Rollup Builder keeps a probe. |
 | 1.5 | 2026-11-11 | Archive by Query (C-67, D-157). No object or field added. New rule R-BD9: a bulk delete whose records are first saved to Files by `FindExportBatch` in archive mode (every readable field, API name headings), the delete started from the export's finish on the same job, only of records not changed since the start (`archive.notChangedAfter` in the definition), and optionally emptied from the Recycle Bin after a second typed count (`archive.emptyRecycleBin`), which R-BD5's undo then refuses. |
 | 1.6 | 2026-11-11 | Generic Record Merge (C-62, D-156; extends ADR-0145). `BarnCRM_Settings__c` gains `Generic_Merge_Enabled__c` (false). `Merge_Rule__mdt` `Field_Name__c` may name `Object.Field`. Rules R-DP11 and R-DP12 added. No object added: merges are written to `Merge_Journal__c`. |
-| 1.7 | 2026-11-11 | Field History Keeper (C-68, D-157; ADR-NEXT `NEXT-field-history-keeper.md`). New Section 29FH1 Field History (`Field_History__c`, rules R-FH1 to R-FH5); custom metadata type `History_Field__mdt` (Section 13); `BarnCRM_Settings__c` gains `Field_History_Enabled__c` (false) and `Field_History_Retention_Days__c` (730). |
-| 1.8 | 2026-11-11 | Corporate Hub module (CH-01 to CH-04, CH-06 to CH-08, D-118; ADR-NEXT `NEXT-corporate-hub-module.md`). New package `packages/corporatehub`: Library Document (`Hub_Document__c`, 29CH1), Policy Acknowledgment (`Policy_Acknowledgment__c`, 29CH2), Compliance Obligation (`Compliance_Obligation__c`, 29CH3), Compliance Cycle (`Compliance_Cycle__c`, 29CH4), Agreement (`Agreement__c`, 29CH5) and Corporate Hub Settings (`Corporate_Hub_Settings__c`, 29CH6), with the shipped templates `BarnCorporateHubTemplates`. |
-| 1.9 | 2026-11-11 | Migration Assistant (MIG-01, MIG-10, MIG-08; ADR-NEXT `NEXT-migration-assistant.md`, D-125). New Section 29ZS Migration Run (`Migration_Run__c`, rules R-MR1 to R-MR4) and shipped type Migration Kit (`Migration_Kit__mdt`, Section 13, R-MK1). Import Batch (16) gains Migration Run (`Migration_Run__c`) and Migration Step (`Migration_Step__c`). Integration App gains rows `Nonprofit_Success_Pack` and `Nonprofit_Cloud_Fundraising` (shown only when installed) and Start Migration for a detected product with a kit. R-R16 gains NPSP customizable rollups: read by describe, imported through the DLRS import steps, covered by the same-field guard. Rollup Builder ships kits `DLRS_Rollups` and `NPSP_Rollups`. |
+| 1.7 | 2026-11-11 | Field History Keeper (C-68, D-157; ADR-0195 `0195-field-history-keeper.md`). New Section 29FH1 Field History (`Field_History__c`, rules R-FH1 to R-FH5); custom metadata type `History_Field__mdt` (Section 13); `BarnCRM_Settings__c` gains `Field_History_Enabled__c` (false) and `Field_History_Retention_Days__c` (730). |
+| 1.8 | 2026-11-11 | Corporate Hub module (CH-01 to CH-04, CH-06 to CH-08, D-118; ADR-0196 `0196-corporate-hub-module.md`). New package `packages/corporatehub`: Library Document (`Hub_Document__c`, 29CH1), Policy Acknowledgment (`Policy_Acknowledgment__c`, 29CH2), Compliance Obligation (`Compliance_Obligation__c`, 29CH3), Compliance Cycle (`Compliance_Cycle__c`, 29CH4), Agreement (`Agreement__c`, 29CH5) and Corporate Hub Settings (`Corporate_Hub_Settings__c`, 29CH6), with the shipped templates `BarnCorporateHubTemplates`. |
+| 1.9 | 2026-11-11 | Migration Assistant (MIG-01, MIG-10, MIG-08; ADR-0197 `0197-migration-assistant.md`, D-125). New Section 29ZS Migration Run (`Migration_Run__c`, rules R-MR1 to R-MR4) and shipped type Migration Kit (`Migration_Kit__mdt`, Section 13, R-MK1). Import Batch (16) gains Migration Run (`Migration_Run__c`) and Migration Step (`Migration_Step__c`). Integration App gains rows `Nonprofit_Success_Pack` and `Nonprofit_Cloud_Fundraising` (shown only when installed) and Start Migration for a detected product with a kit. R-R16 gains NPSP customizable rollups: read by describe, imported through the DLRS import steps, covered by the same-field guard. Rollup Builder ships kits `DLRS_Rollups` and `NPSP_Rollups`. |
 | 1.10 | 2026-11-11 | Giving words and nightly jobs (G-36, G-37). No object or field added. Labels only: `Installment__c` is Scheduled Payment (plural Scheduled Payments, Name label Payment Number, list view All Scheduled Payments); the `Installment__c` lookups on Gift, Gift Batch Row and Pledge Reminder are labelled Scheduled Payment; Pledge Reminder's `Commitment__c` is labelled Commitment; `Commitment__c.Installments_Planned__c` is Payments Planned. The vocabulary is commitment (the record), pledge and recurring gift (its types), scheduled payment (each installment). The pledge reminder step (`BarnCRM Giving Pledge Reminders`, 03:15, shipped off) is now one of `GivingScheduler`'s five jobs: its Schedule and Stop switch it with the others and Run Now runs it; `GivingScheduler.isScheduled` still counts only the other four. |
 | 1.11 | 2026-11-11 | Gift details and wealth screening (G-21, G-31, G-32, D-156). Five attributes added to Gift (`Stock_Symbol__c`, `Stock_Shares__c`, `Planned_Gift_Type__c`, `Gift_Source__c`, `Gift_Source_Name__c`), rule R-G17, and the packaged report DAF and Stock Gifts This Year. New Section 25U Wealth screening data, rules R-WS1 to R-WS3: five attributes added to Contact (`Capacity_Rating__c`, `Affinity_Rating__c`, `Screening_Score__c`, `Screening_Date__c`, `Screening_Source__c`), hidden from Giving Read Only, and the shipped import template Wealth Screening. |
-| 1.12 | 2026-11-11 | Corporate Hub board governance (CH-09 to CH-20, PB-02; ADR-NEXT `NEXT-corporate-hub-board-governance.md`). New Sections 29CH7 Board (`Board__c`), 29CH8 Board Member (`Board_Member__c`), 29CH9 Board Meeting (`Board_Meeting__c`), 29CH10 Meeting Attendee (`Meeting_Attendee__c`), 29CH11 Board Motion (`Board_Motion__c`), 29CH12 Board Vote (`Board_Vote__c`), 29CH13 Action Item (`Meeting_Action_Item__c`), 29CH14 Board Self-Assessment (`Board_Assessment__c`) and 29CH15 Assessment Answer (`Assessment_Answer__c`). Library Document gains Ask Every Year (`Annual__c`); Policy Acknowledgment gains `Disclosure__c`, `Conflict_Disclosed__c` and `Answered_In_Portal__c` (R-PAK1, R-PAK3, R-PAK4); Corporate Hub Settings gains `Board_Demographics__c` (false). |
+| 1.12 | 2026-11-11 | Corporate Hub board governance (CH-09 to CH-20, PB-02; ADR-0199 `0199-corporate-hub-board-governance.md`). New Sections 29CH7 Board (`Board__c`), 29CH8 Board Member (`Board_Member__c`), 29CH9 Board Meeting (`Board_Meeting__c`), 29CH10 Meeting Attendee (`Meeting_Attendee__c`), 29CH11 Board Motion (`Board_Motion__c`), 29CH12 Board Vote (`Board_Vote__c`), 29CH13 Action Item (`Meeting_Action_Item__c`), 29CH14 Board Self-Assessment (`Board_Assessment__c`) and 29CH15 Assessment Answer (`Assessment_Answer__c`). Library Document gains Ask Every Year (`Annual__c`); Policy Acknowledgment gains `Disclosure__c`, `Conflict_Disclosed__c` and `Answered_In_Portal__c` (R-PAK1, R-PAK3, R-PAK4); Corporate Hub Settings gains `Board_Demographics__c` (false). |
 | 1.13 | 2026-11-11 | Donor panel in Quick Gift Entry (G-33). No object or field added. `GiftDonorPanelController` reads, in user mode, the chosen donor's household (through `HouseholdService`), `Total_Giving__c` and `Last_Gift_Date__c`, the last three gifts, and the donor's Active or Paused commitments with each one's next open scheduled payment. Read only; it writes nothing. |
-| 1.14 | 2026-11-11 | Payments module (PAY-01, D-190; ADR-NEXT `NEXT-payments-module.md`). New package `packages/payments`: Payment (`Payment__c`, 29PAY1, R-PAY1 to R-PAY4), Payment Event (`Payment_Event__c`, 29PAY2, R-PEV1 to R-PEV3), Payments Settings (`Payments_Settings__c`, 29PAY3) and Payment Keys (`Payment_Keys__c`, 29PAY4, R-PK1). |
+| 1.14 | 2026-11-11 | Payments module (PAY-01, D-190; ADR-0201 `0201-payments-module.md`). New package `packages/payments`: Payment (`Payment__c`, 29PAY1, R-PAY1 to R-PAY4), Payment Event (`Payment_Event__c`, 29PAY2, R-PEV1 to R-PEV3), Payments Settings (`Payments_Settings__c`, 29PAY3) and Payment Keys (`Payment_Keys__c`, 29PAY4, R-PK1). |
 | 1.15 | 2026-11-11 | Migration kits (MIG-05, MIG-09, MIG-04, MIG-02). No object or field added. R-MK1 gains a filter's `op` (`notEquals`) and a step's `links` (a source Id an earlier step moved becomes the BarnCRM record it made, found by the earlier template's one row per `Id` Row Key, R-IT18). R-MR3: an extension's check on an import step replaces the row count comparison. A product with several kits shows one button per kit. Core ships kit `NPSP_People` with templates `kit_npsp_relationships`, `kit_npsp_affiliations` and `kit_npsp_addresses` (a kit template's key starts `kit_`, so the file-export sample check, for keys starting `npsp_` or `npc_`, leaves it alone). Programs ships kit `PMM_Programs` (programs, cohorts, services, enrollments, service deliveries; templates `kit_pmm_*`, linked by `links`). |
 | 1.16 | 2026-11-11 | V4S migration kit (MIG-03). No object or field added. Volunteers ships kit `V4S_Volunteers` (source `Volunteers_for_Salesforce`) with templates `kit_v4s_jobs`, `kit_v4s_shifts`, `kit_v4s_signups` and `kit_v4s_hours`, and extension `V4sMigrationKit` (a shift's End and Status from the V4S start and Duration). Sign-ups exclude Completed V4S hours, so R-VU3 never makes hours twice; hours load through R-VG5 and R-VG6 (Submitted while approval is required). The members of `MigrationKitService` a module's kit extension or test reads are `@NamespaceAccessible` (ADR-0017). |
 | 1.17 | 2026-11-11 | NPSP giving setup kit (MIG-05). No object or field added. Giving ships kit `NPSP_Giving_Setup` (source `Nonprofit_Success_Pack`) with templates `kit_npsp_funds` (Fund), `kit_npsp_levels` (Donor Level), `kit_npsp_recurring_people` and `kit_npsp_recurring_organizations` (Commitment, Type Recurring), and extension `NpspGivingKit` (a commitment starts at NPSP's next payment date, else the date established). The members of `MigrationKitService` a module's kit extension or test reads are `@NamespaceAccessible` (ADR-0017). |
-| 1.18 | 2026-11-11 | Multi-brand management (C-47a to C-47f, D-119, D-120; ADR-NEXT `NEXT-brand-management-and-visibility.md`). New Sections 29BR1 Legal Entity (`Legal_Entity__c`), 29BR2 Brand (`Brand__c`, rules R-BR1 to R-BR8) and 29BR3 Brand Assignment (`Brand_Assignment__c`, rule R-BR9). `BarnCRM_Settings__c` gains `Brand_Management__c` and `Brand_Visibility__c` (both false); `Giving_Settings__c` gains `Receipt_Numbering_Scope__c` (`Organization`). `Brand__c` lookups on `Gift__c`, `Appeal__c`, `Volunteer_Job__c`, `Program__c` and `Portal__c`. |
-| 1.19 | 2026-11-11 | LWC Builder module (LB-01 to LB-06; ADR-NEXT `NEXT-lwc-builder-module.md`, D-120). New Sections 29LB1 Built Component (`Built_Component__c`, rules R-LB1 to R-LB3) and 29LB2 LWC Builder Settings (`LWC_Builder_Settings__c`). Package `packages/lwcbuilder`. |
-| 1.20 | 2026-11-11 | Scholarships and Outbound Grants module (SG-01 to SG-10, PB-06, D-122, D-156; ADR-NEXT `NEXT-scholarships-outbound-grants-module.md`). New package `packages/scholarships`: Award Program (`Award_Program__c`), Award Cycle (`Award_Cycle__c`), Award Application (`Award_Application__c`), Application Review (`Application_Review__c`), Award (`Award__c`), Disbursement (`Award_Payment__c`), Award Requirement (`Award_Requirement__c`) and settings `Scholarships_Settings__c` (29SG1 to 29SG8). |
+| 1.18 | 2026-11-11 | Multi-brand management (C-47a to C-47f, D-119, D-120; ADR-0202 `0202-brand-management-and-visibility.md`). New Sections 29BR1 Legal Entity (`Legal_Entity__c`), 29BR2 Brand (`Brand__c`, rules R-BR1 to R-BR8) and 29BR3 Brand Assignment (`Brand_Assignment__c`, rule R-BR9). `BarnCRM_Settings__c` gains `Brand_Management__c` and `Brand_Visibility__c` (both false); `Giving_Settings__c` gains `Receipt_Numbering_Scope__c` (`Organization`). `Brand__c` lookups on `Gift__c`, `Appeal__c`, `Volunteer_Job__c`, `Program__c` and `Portal__c`. |
+| 1.19 | 2026-11-11 | LWC Builder module (LB-01 to LB-06; ADR-0203 `0203-lwc-builder-module.md`, D-120). New Sections 29LB1 Built Component (`Built_Component__c`, rules R-LB1 to R-LB3) and 29LB2 LWC Builder Settings (`LWC_Builder_Settings__c`). Package `packages/lwcbuilder`. |
+| 1.20 | 2026-11-11 | Scholarships and Outbound Grants module (SG-01 to SG-10, PB-06, D-122, D-156; ADR-0204 `0204-scholarships-outbound-grants-module.md`). New package `packages/scholarships`: Award Program (`Award_Program__c`), Award Cycle (`Award_Cycle__c`), Award Application (`Award_Application__c`), Application Review (`Application_Review__c`), Award (`Award__c`), Disbursement (`Award_Payment__c`), Award Requirement (`Award_Requirement__c`) and settings `Scholarships_Settings__c` (29SG1 to 29SG8). |
 | 1.21 | 2026-11-11 | Grid tool and saved grids (C-41, C-41b). No object or field added. Section 29D gains rule R-SQ14: the query document's optional `grid` key, which marks a saved query saved from the Grid. The Grid (`gridTool`, `gridModel`) shows in the Find tab through the `findPage` wrapper and uses Find's own server methods. |
-| 1.22 | 2026-11-11 | Territory Management module (C-40, C-40b; ADR-NEXT `NEXT-territory-management-module.md`). New Sections 29TM1 Territory (`Territory__c`, with the Territory lookup `Territory__c` on Account and Contact), 29TM2 Territory Rule (`Territory_Rule__c`), 29TM3 Territory Member (`Territory_Member__c`) and 29TM4 Territory Run (`Territory_Run__c`); rules R-TM1 to R-TM4. |
-| 1.23 | 2026-11-11 | Memberships module (G-22a to G-22d, PAY-02, PB-09; D-157, D-190; ADR-NEXT `NEXT-memberships-module.md`). New package `packages/memberships`: Membership Level (`Membership_Level__c`, 29MEM1), Membership Benefit (`Membership_Benefit__c`, 29MEM2), Membership Term (`Membership_Term__c`, 29MEM3, R-MEM1 to R-MEM9) and Memberships Settings (`Memberships_Settings__c`, 29MEM4). No Contact or Account field, and no object named like Memberships Essentials' membership object, so both deploy together. |
-| 1.24 | 2026-11-11 | Event Management paid registration, session proposals, badge overrides and session ratings (EV-20, EV-21, EV-26, EV-27, D-190; ADR-NEXT `NEXT-events-paid-registration-proposals-ratings.md`). New Sections 29EV27 Session Rating (`Session_Rating__c`, R-SRT1 to R-SRT3) and 29EV30 Proposal Presenter (`Proposal_Presenter__c`, R-PP1). `Event__c` gains `Review_Criteria__c`, `Blind_Review__c` and `Session_Rating_Form_Key__c`; `Event_Session__c` gains `Rating_Count__c`, `Rating_Total__c` and `Average_Rating__c`; `Event_Registration__c` gains status Pending Payment and `Payment_Status__c`, `Amount_Paid__c`, `Payment_Key__c` and `Payment_Link__c` (R-ERG5 to R-ERG7); `Event_Attendee__c` gains `Badge_Name__c`, `Badge_Title__c` and `Badge_Company__c` (R-EAT4); `Speaker_Application__c` gains `Weighted_Total__c` and `Weighted_Average__c` and `Review_Count__c` counts scored reviews only; `Speaker_Review__c` gains `Criteria_Scores__c` and `Weighted_Score__c` and `Score__c` is no longer required (R-SA6 to R-SA9); `Events_Settings__c` gains `Online_Payments__c` (false) and `Payment_Link_Template__c` (`BarnCRM_Event_Payment_Link`). Events reaches Payments only by name (`PaymentsApi`, `EventPaymentListener`). |
+| 1.22 | 2026-11-11 | Territory Management module (C-40, C-40b; ADR-0205 `0205-territory-management-module.md`). New Sections 29TM1 Territory (`Territory__c`, with the Territory lookup `Territory__c` on Account and Contact), 29TM2 Territory Rule (`Territory_Rule__c`), 29TM3 Territory Member (`Territory_Member__c`) and 29TM4 Territory Run (`Territory_Run__c`); rules R-TM1 to R-TM4. |
+| 1.23 | 2026-11-11 | Memberships module (G-22a to G-22d, PAY-02, PB-09; D-157, D-190; ADR-0206 `0206-memberships-module.md`). New package `packages/memberships`: Membership Level (`Membership_Level__c`, 29MEM1), Membership Benefit (`Membership_Benefit__c`, 29MEM2), Membership Term (`Membership_Term__c`, 29MEM3, R-MEM1 to R-MEM9) and Memberships Settings (`Memberships_Settings__c`, 29MEM4). No Contact or Account field, and no object named like Memberships Essentials' membership object, so both deploy together. |
+| 1.24 | 2026-11-11 | Event Management paid registration, session proposals, badge overrides and session ratings (EV-20, EV-21, EV-26, EV-27, D-190; ADR-0207 `0207-events-paid-registration-proposals-ratings.md`). New Sections 29EV27 Session Rating (`Session_Rating__c`, R-SRT1 to R-SRT3) and 29EV30 Proposal Presenter (`Proposal_Presenter__c`, R-PP1). `Event__c` gains `Review_Criteria__c`, `Blind_Review__c` and `Session_Rating_Form_Key__c`; `Event_Session__c` gains `Rating_Count__c`, `Rating_Total__c` and `Average_Rating__c`; `Event_Registration__c` gains status Pending Payment and `Payment_Status__c`, `Amount_Paid__c`, `Payment_Key__c` and `Payment_Link__c` (R-ERG5 to R-ERG7); `Event_Attendee__c` gains `Badge_Name__c`, `Badge_Title__c` and `Badge_Company__c` (R-EAT4); `Speaker_Application__c` gains `Weighted_Total__c` and `Weighted_Average__c` and `Review_Count__c` counts scored reviews only; `Speaker_Review__c` gains `Criteria_Scores__c` and `Weighted_Score__c` and `Score__c` is no longer required (R-SA6 to R-SA9); `Events_Settings__c` gains `Online_Payments__c` (false) and `Payment_Link_Template__c` (`BarnCRM_Event_Payment_Link`). Events reaches Payments only by name (`PaymentsApi`, `EventPaymentListener`). |
 | 1.25 | 2026-11-11 | Programs sample data for goals, cohorts and sessions (release 1.19, P-10 and P-11 follow-up, D-168). 29ZA's sample data paragraph: the load gains two stages (a cohort with three sessions and attendance, then a goal with two steps per person Enrolled in tutoring); the removal deletes sample sessions and cohorts nothing refers to before the programs. No object or field added. |
 | 1.26 | 2026-11-11 | Person-field eligibility rules (release 1.19, P-14b, D-168 follow-up). R-EN8 and 29Y's Eligibility Rules: a condition's `field` may also be a path through the enrollment's Contact lookup (`Contact__r.<Contact field>`), offered for every readable Contact field of a rule type and read blank for an enrollment of an Account. Where Used matches rule fields as paths. No object or field added. |
 | 1.27 | 2026-11-11 | Logic model report PDF (release 1.19, L-04b, D-168 follow-up). R-IN7: the printable page also downloads as a PDF rendered by `Blob.toPdf` through `LogicModelBuilderController.reportPdf`; the page prints landscape. No object or field added. |
 | 1.28 | 2026-11-11 | Account Tabs (C-73, D-195, release 1.19). `BarnCRM_Settings__c` gains `Account_Tabs__c` (text, default Organizations and Households; Section 12 Account Tabs Key). New Core permission sets `BarnCRM_Organizations_Tab` and `BarnCRM_Accounts_Tab`; the Organizations tab leaves the three role sets. The BarnCRM and BarnCRM Console apps list the standard Accounts tab. |
-| 1.29 | 2026-11-11 | Project Management module (PM-01 to PM-05, D-175; ADR-NEXT `NEXT-project-management-module.md`). New package `packages/projects`: Project (`Project__c`, rules R-PM1 to R-PM3), Project Phase (`Project_Phase__c`), Project Task (`Project_Task__c`, R-PM4), Project Assignment (`Project_Assignment__c`, R-PM5), Time Entry (`Time_Entry__c`, R-PM6, R-PM7), Project Status Update (`Project_Status_Update__c`, R-PM8) and settings `Projects_Settings__c` (29PM1 to 29PM7). |
-| 1.30 | 2026-11-11 | Address Verification module (C-46, D-112; ADR-NEXT `NEXT-address-verification-module.md`). New package `packages/addressverification`: Address Verification Settings (`Address_Verification_Settings__c`, 29AV1, R-AV1 to R-AV4) and Address Verification Keys (`Address_Verification_Keys__c`, 29AV2). No object added to Core; R-AD6 now says Core's code never writes the two verification fields and the module does. |
-| 1.31 | 2026-11-11 | Online donation pages (G-34; ADR-NEXT `NEXT-online-donation-pages.md`). Appeal (Section 21) gains Donation Page (`Donation_Page__c`, Checkbox) and Donation Form Key (`Donation_Form_Key__c`, Text(18)); rule R-AP5. Core gains the interface `PublicCheckoutExtension` and lists `GivingDonationPage` in `PublicPageExtensions` and `FormAttachmentExtensions`; no Core object or field is added. |
-| 1.32 | 2026-11-11 | Donor portal payments (PAY-03; ADR-NEXT `NEXT-donor-portal-payments.md`). No object or field added. A donor portal payment is a Received gift with Commitment and Payment Reference (the payment's identifier), written when Payments reports it Paid. Core lists `GivingPortalPayments` in `PortalActionExtensions`; the donor template gains `Giving.PayOnline` on Pledges and Recurring Gifts. |
+| 1.29 | 2026-11-11 | Project Management module (PM-01 to PM-05, D-175; ADR-0208 `0208-project-management-module.md`). New package `packages/projects`: Project (`Project__c`, rules R-PM1 to R-PM3), Project Phase (`Project_Phase__c`), Project Task (`Project_Task__c`, R-PM4), Project Assignment (`Project_Assignment__c`, R-PM5), Time Entry (`Time_Entry__c`, R-PM6, R-PM7), Project Status Update (`Project_Status_Update__c`, R-PM8) and settings `Projects_Settings__c` (29PM1 to 29PM7). |
+| 1.30 | 2026-11-11 | Address Verification module (C-46, D-112; ADR-0209 `0209-address-verification-module.md`). New package `packages/addressverification`: Address Verification Settings (`Address_Verification_Settings__c`, 29AV1, R-AV1 to R-AV4) and Address Verification Keys (`Address_Verification_Keys__c`, 29AV2). No object added to Core; R-AD6 now says Core's code never writes the two verification fields and the module does. |
+| 1.31 | 2026-11-11 | Online donation pages (G-34; ADR-0211 `0211-online-donation-pages.md`). Appeal (Section 21) gains Donation Page (`Donation_Page__c`, Checkbox) and Donation Form Key (`Donation_Form_Key__c`, Text(18)); rule R-AP5. Core gains the interface `PublicCheckoutExtension` and lists `GivingDonationPage` in `PublicPageExtensions` and `FormAttachmentExtensions`; no Core object or field is added. |
+| 1.32 | 2026-11-11 | Donor portal payments (PAY-03; ADR-0210 `0210-donor-portal-payments.md`). No object or field added. A donor portal payment is a Received gift with Commitment and Payment Reference (the payment's identifier), written when Payments reports it Paid. Core lists `GivingPortalPayments` in `PortalActionExtensions`; the donor template gains `Giving.PayOnline` on Pledges and Recurring Gifts. |
 | 1.33 | 2026-11-11 | Corporate Hub GDPR template set (CH-05, D-118). New Sections 29CH16 Processing Activity (`Processing_Activity__c`, R-PA1), 29CH17 Data Subject Request (`Data_Subject_Request__c`, R-DS1, R-DS2, linking to Core's `Erasure__c`) and 29CH18 Data Breach (`Data_Breach__c`, R-DB1). R-CR1 extends to the three; R-CT1 gains `processingActivities` templates. |
 | 1.34 | 2026-11-11 | Recurring donor health (G-27, D-156). New Section 25V: Recurring Gift Event (`Recurring_Gift_Event__c`), five health fields on `Commitment__c` (`Processor_Subscription_Id__c`, `Failed_Charges__c`, `Last_Failed_Charge__c`, `Card_Expires__c`, `Processor_Cancelled__c`) and `Giving_Settings__c.Recurring_Card_Expiry_Days__c`; rules R-RH1 to R-RH4. |
 | 1.35 | 2026-11-11 | Brand-aware letters, thank yous and portals (C-47b, D-119, D-120). No object or field added. R-BR5 names every output and adds `BrandService.senderIdsFor` and `BrandService.logoPath`; R-VL2 gains `{BrandName}`, `{BrandPhone}`, `{BrandWebsite}`, `{BrandSignature}` and `{BrandLogo}`; the portal menu (`PortalData.describe`) gains `brand`. |
 | 1.36 | 2026-11-11 | Brand in gift import and report types (C-47d, C-47e, D-119). No object or field added. R-GI3 gains the virtual attribute `Gift.Brand`; R-BR6 names the report types that carry the brand. |
-| 1.37 | 2026-11-11 | Engagement score (C-64, D-157, release 1.15; ADR-NEXT `NEXT-engagement-score.md`). New Section 7A, rules R-ES1 to R-ES5. Contact gains `Engagement_Score__c` (Number(3, 0)) and `Engagement_Scored_On__c` (Date); `BarnCRM_Settings__c` gains `Engagement_Score_Enabled__c` (false), `Engagement_Score_Weights__c` and `Engagement_Score_Targets__c` (Section 12 Engagement Score keys). Core gains the `EngagementSignalExtension` seam and the nightly step `BarnCRM Engagement Score`; Giving, Volunteers and Event Management each add a signal class. No object added. |
+| 1.37 | 2026-11-11 | Engagement score (C-64, D-157, release 1.15; ADR-0212 `0212-engagement-score.md`). New Section 7A, rules R-ES1 to R-ES5. Contact gains `Engagement_Score__c` (Number(3, 0)) and `Engagement_Scored_On__c` (Date); `BarnCRM_Settings__c` gains `Engagement_Score_Enabled__c` (false), `Engagement_Score_Weights__c` and `Engagement_Score_Targets__c` (Section 12 Engagement Score keys). Core gains the `EngagementSignalExtension` seam and the nightly step `BarnCRM Engagement Score`; Giving, Volunteers and Event Management each add a signal class. No object added. |
 | 1.38 | 2026-11-11 | NPSP gifts kit (MIG-05). No object or field added. Mirror ships kit `NPSP_Gifts` (source `Nonprofit_Success_Pack`; Mirror because its sources are Campaign, Opportunity and OpportunityContactRole) with templates `kit_campaign_appeals` (Appeal, upsert on `Campaign_Id__c`; shared with the Nonprofit Cloud gifts kit), `kit_npsp_gifts` (gift template, one gift per won Opportunity, donor by record ID, `External_Id__c` and `Opportunity_Id__c` both the Opportunity's ID so neither a reload nor the Opportunity mirror duplicates it), `kit_npsp_contact_credits` and `kit_npsp_account_credits` (Soft Credit, `Gift__c` linked to the gifts step), and extension `NpspGiftsKit` (donor choice, first paid payment's method and reference, allocations as up to five fund parts, BarnCRM soft credit roles, partial soft credit amounts). |
 | 1.39 | 2026-11-11 | Nonprofit Cloud gifts kit (MIG-04). No object or field added. Mirror ships kit `NPC_Gifts` (source `Nonprofit_Cloud_Fundraising`) with templates `kit_campaign_appeals` (shared with `NPSP_Gifts`), `kit_npc_funds` (Fund, `Gift_Designation_Id__c` = the designation's ID; designations a fund already has by that ID or by name are skipped), `kit_npc_commitments` (Commitment, Recurring or Pledge), `kit_npc_gifts` (gift template, one gift per paid Gift Transaction, donor by record ID, `External_Id__c` and `Gift_Transaction_Id__c` both the transaction's ID so neither a reload nor the Gift Transaction mirror duplicates it) and `kit_npc_soft_credits` (Soft Credit, `Gift__c` linked to the gifts step), and extension `NpcGiftsKit` (person account to contact, designations as fund parts, tribute, commitment type and frequency, soft credit recipient, role and amount; `verify('funds')`). `NpspGiftsKit` exposes `Part`, `putSplit`, `putRole` and `column` to it. Party Relationship Group households are not converted (plan Section 11.2 item 9: guards only). |
 | 1.40 | 2026-11-11 | NPSP engagement plans and parity report (MIG-05, D-156). No object or field added. Kit `NPSP_Giving_Setup` gains steps `planTemplates` (template `kit_npsp_plan_templates`, Stewardship Plan Template upserted on `Plan_Key__c` = the NPSP template ID, Trigger Event Manual), `planSteps` (template `kit_npsp_plan_steps`, Stewardship Plan Step linked to `planTemplates`; `NpspGivingKit` sets Order from days after and Assign To Specific user or Record owner) and the tool step `parity`, whose check (`NpspGivingKit.verify`) counts active NPSP levels and engagement plan templates against donor levels of the same name and stewardship templates keyed by their ID. |
 | 1.41 | 2026-11-11 | Outbound Funds migration kit (MIG-11, D-156). No object or field added. Scholarships and Outbound Grants ships kit `Outbound_Funds` (source `Outbound_Funds_Module`, now related to this module, not Funders) with templates `kit_ofm_programs` (Award Program, Type Grant), `kit_ofm_cycles` (one Award Cycle per funding program), `kit_ofm_applications` (Award Application), `kit_ofm_awards` (Award, from requests with an awarded amount), `kit_ofm_disbursements` (Award Payment) and `kit_ofm_requirements` (Award Requirement), linked by `links`; extension `OutboundFundsKit` adds a `Parent` column (the record's own Id) so a cycle links to its program and an award to its application while the row keeps its Id as the key later steps link to. |
 | 1.42 | 2026-11-11 | Nonprofit Cloud relationships and affiliations kit (MIG-02, relations part). No object or field added. Mirror ships kit `NPC_Relations` (source `Nonprofit_Cloud_Fundraising`) with templates `kit_npc_relationships` (Relationship from `ContactContactRelation`, type from the related role, one side per pair; BarnCRM writes the reciprocal) and `kit_npc_affiliations` (Affiliation from `AccountContactRelation`, skipping households, meaning accounts with a `PartyRelationshipGroup` of type Household, and person accounts), and extension `NpcRelationsKit` (one side per pair, roles as text, checks counting pairs and organization links). Party Relationship Group households are not converted (plan Section 11.2 item 9: guards only; conversion needs two ADRs and `Account.Household_Model__c`). |
 | 1.43 | 2026-11-11 | Evidence log (L-05). New Section 29ZE1 Assumption Evidence (`Assumption_Evidence__c`, a detail of `Logic_Model_Link__c`, rules R-AE1 to R-AE3): what it shows, source, source link, date and strength. Logic Models Admin and Staff edit it, Read Only reads it; the builder reads it with each arrow and `LogicModelBuilderController.saveEvidence` saves it. |
-| 1.44 | 2026-11-11 | Backup Sets, files import and certifications (C-66, C-70, G-22e, D-157; ADR-NEXT `NEXT-backup-sets.md`, ADR-NEXT `NEXT-files-import.md`). `Import_Batch__c.Operation__c` gains Backup and Files (Section 16). Section 29D gains rule R-SQ15: the query document's optional `backup` key marks a saved query as a Backup Set, run on demand as a Backup data job writing R-BD9's file to Files. New Section 29FI Files import (no object, rules R-FI1 to R-FI5): a zip with `manifest.csv` loaded as `ContentVersion` linked to records, journaled per group and undone by deleting the documents. Memberships gains Sections 29MEM5 Certification (`Certification__c`), 29MEM6 Member Certification (`Member_Certification__c`, rules R-MEM10 to R-MEM13, validation rule `Needs_Contact`) and 29MEM7 Continuing Credit (`Continuing_Credit__c`, master-detail to Member Certification, rolled up into `Open_Credits__c`). |
-| 1.45 | 2026-11-11 | Event Management attendee app, personal agenda and event operations, and the service and partner portal templates (EV-22 to EV-25, EV-28, EV-29, PB-04, PB-05, D-190, D-118; ADR-NEXT `NEXT-events-attendee-app-operations-portal-templates.md`). New Sections 29EV31 Event Venue (`Event_Venue__c`, R-EVN1), 29EV32 Event Room (`Event_Room__c`), 29EV33 Event Expense (`Event_Expense__c`, R-EXP1), 29EV34 Event Funding (`Event_Funding__c`), 29EV35 Sponsor Lead (`Sponsor_Lead__c`, R-SLD1, R-SLD2), 29EV36 Agenda Item (`Agenda_Item__c`, R-AGI1, R-AGI2), 29EV37 Attendee Connection (`Attendee_Connection__c`, R-ACN1, R-ACN2), 29EV38 Attendee Message (`Attendee_Message__c`, R-AMS1) and 29EV39 Event Announcement (`Event_Announcement__c`). `Event__c` gains `Venue__c`; `Event_Session__c` gains `Venue_Room__c`, `Level__c`, `Slides_URL__c`, `Recording_URL__c`, `Sponsor__c` and `Agenda_Picks__c`, and Session Type gains Lightning Talk and Roundtable; `Event_Speaker__c` gains `Headshot_URL__c`, `LinkedIn_URL__c`, `Website_URL__c`, `Agreement_Signed__c`, `Slides_Received__c` and `Dry_Run_Done__c`; `Event_Attendee__c` gains `Networking_Opt_In__c`, `Networking_Headline__c`, `Networking_Bio__c`, `Networking_Contact__c`, `Share_With_Sponsors__c`, `Sponsor__c` and `Attendee_Name__c` (R-EAT5); `Event_Sponsor__c` gains `Booth__c`; `Events_Settings__c` gains `Attendee_Messages__c` and `Allow_Agenda_Overlaps__c` (both false); `Referral__c` gains `Partner_Organization__c` and `Shared_With_Partner__c` (R-RF5). R-PB2 gains a catalog page's `personScope` and the `calendar`, `download` and `scan` client options. |
+| 1.44 | 2026-11-11 | Backup Sets, files import and certifications (C-66, C-70, G-22e, D-157; ADR-0213 `0213-backup-sets.md`, ADR-0214 `0214-files-import.md`). `Import_Batch__c.Operation__c` gains Backup and Files (Section 16). Section 29D gains rule R-SQ15: the query document's optional `backup` key marks a saved query as a Backup Set, run on demand as a Backup data job writing R-BD9's file to Files. New Section 29FI Files import (no object, rules R-FI1 to R-FI5): a zip with `manifest.csv` loaded as `ContentVersion` linked to records, journaled per group and undone by deleting the documents. Memberships gains Sections 29MEM5 Certification (`Certification__c`), 29MEM6 Member Certification (`Member_Certification__c`, rules R-MEM10 to R-MEM13, validation rule `Needs_Contact`) and 29MEM7 Continuing Credit (`Continuing_Credit__c`, master-detail to Member Certification, rolled up into `Open_Credits__c`). |
+| 1.45 | 2026-11-11 | Event Management attendee app, personal agenda and event operations, and the service and partner portal templates (EV-22 to EV-25, EV-28, EV-29, PB-04, PB-05, D-190, D-118; ADR-0215 `0215-events-attendee-app-operations-portal-templates.md`). New Sections 29EV31 Event Venue (`Event_Venue__c`, R-EVN1), 29EV32 Event Room (`Event_Room__c`), 29EV33 Event Expense (`Event_Expense__c`, R-EXP1), 29EV34 Event Funding (`Event_Funding__c`), 29EV35 Sponsor Lead (`Sponsor_Lead__c`, R-SLD1, R-SLD2), 29EV36 Agenda Item (`Agenda_Item__c`, R-AGI1, R-AGI2), 29EV37 Attendee Connection (`Attendee_Connection__c`, R-ACN1, R-ACN2), 29EV38 Attendee Message (`Attendee_Message__c`, R-AMS1) and 29EV39 Event Announcement (`Event_Announcement__c`). `Event__c` gains `Venue__c`; `Event_Session__c` gains `Venue_Room__c`, `Level__c`, `Slides_URL__c`, `Recording_URL__c`, `Sponsor__c` and `Agenda_Picks__c`, and Session Type gains Lightning Talk and Roundtable; `Event_Speaker__c` gains `Headshot_URL__c`, `LinkedIn_URL__c`, `Website_URL__c`, `Agreement_Signed__c`, `Slides_Received__c` and `Dry_Run_Done__c`; `Event_Attendee__c` gains `Networking_Opt_In__c`, `Networking_Headline__c`, `Networking_Bio__c`, `Networking_Contact__c`, `Share_With_Sponsors__c`, `Sponsor__c` and `Attendee_Name__c` (R-EAT5); `Event_Sponsor__c` gains `Booth__c`; `Events_Settings__c` gains `Attendee_Messages__c` and `Allow_Agenda_Overlaps__c` (both false); `Referral__c` gains `Partner_Organization__c` and `Shared_With_Partner__c` (R-RF5). R-PB2 gains a catalog page's `personScope` and the `calendar`, `download` and `scan` client options. |
 
 ---
 ## 32. Entity ownership by package
@@ -18848,7 +18848,7 @@ so nothing below that is nonprofit-specific ships in Core.
 | Setup Assistant: fund and appeal step, receipt fields and wording of the identity step, first gift check | Giving | `GivingSetupAssistantExtension` through `SetupAssistantExtensions` |
 | Health Check: household, access, settings, org shape findings | Core | `HealthCheckService` |
 | Health Check: receipt generation, receipt lock override, unposted gifts in a closed period | Giving | `GivingHealthCheckExtension` (ADR-0057) |
-| Roles: BarnCRM Admin (`BarnCRM_Admin_Group`), Team Member (`Program_Staff`), Read Only; Coordinator (`Volunteer_Coordinator`) retired, its holders given Team Member by `RetiredRoleMigration` (ADR-NEXT D1) | Core | Permission set groups |
+| Roles: BarnCRM Admin (`BarnCRM_Admin_Group`), Team Member (`Program_Staff`), Read Only; Coordinator (`Volunteer_Coordinator`) retired, its holders given Team Member by `RetiredRoleMigration` (ADR-0194 D1) | Core | Permission set groups |
 | Role: Fundraising Staff | Giving | Permission set group |
 | Custom permission Manage BarnCRM Settings | Core | Metadata |
 | Custom permissions for gifts, receipts, posting and acknowledgments | Giving | Metadata |
@@ -18860,11 +18860,11 @@ so nothing below that is nonprofit-specific ships in Core.
 | Grant Calendar tab, Giving Fund card, Award Schedule card | Funders | Metadata (ADR-0162 `0162-funders-restricted-funds-schedules-calendar.md`). The Grant Calendar tab (`grantCalendar`) in the Funders app after Grant Pipeline; the Grant record page carries the Giving Fund card (`grantLinkedRecord`, kind Fund) and the Award Schedule card (`grantSchedule`) |
 | Permission sets (Admin, Staff, Read Only), Form Builder, Form Runner and Submission panels | Forms | Metadata and `FormsAccessSync` (ADR-0175 `0175-forms-module.md`). No app (D-188, ADR-0192 module tabs in the BarnCRM apps): the Forms and Form Submissions tabs join BarnCRM and BarnCRM Console at deploy; the Form record page (org default) carries the builder and the runner, the Form Submission page the submission panel |
 | Form attachment seam (a module attaches a form to its own record and receives submissions) | Core | `FormAttachmentExtension`, `FormAttachmentExtensions`, `FormSubmissionReceipt` (ADR-0175 `0175-forms-module.md` decision 9) |
-| Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and `CorporateHubAccessSync` (ADR-NEXT `NEXT-corporate-hub-module.md`). No app (ADR-0192): the Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs join BarnCRM and BarnCRM Console |
-| Permission sets (Admin, Staff, Read Only, Webhook Guest), Payments Setup tab, webhook receiver, processing job | Payments | Metadata and `PaymentsAccessSync` (ADR-NEXT `NEXT-payments-module.md`). No app: the Payments and Payments Setup tabs join BarnCRM and BarnCRM Console at deploy |
-| Payment seam (a module starts a checkout and is told of each status change) | Payments | `PaymentsApi`, a `System.Callable` found by name; listeners are the consumers' own `System.Callable` classes (ADR-NEXT `NEXT-payments-module.md` decision 8) |
-| Permission sets (Admin, Staff, Read Only), Territory Management tab, nightly assignment step | Territory Management | Metadata, `TerritoryAccessSync` and `TerritoryNightlyJobProvider` (ADR-NEXT `NEXT-territory-management-module.md`). No app (ADR-0192): the Territory Management tab joins the BarnCRM admin apps |
-| Permission sets (Admin, Staff, Read Only), Memberships and Membership Levels tabs, term actions panel, renewal nightly step, member portal action | Memberships | Metadata and `MembershipsAccessSync` (ADR-NEXT `NEXT-memberships-module.md`). No app (ADR-0192) |
+| Permission sets (Admin, Staff, Read Only), custom permission Manage Corporate Hub, Corporate Hub tab, acknowledgment and cycle panels, reminder notification type | Corporate Hub | Metadata and `CorporateHubAccessSync` (ADR-0196 `0196-corporate-hub-module.md`). No app (ADR-0192): the Corporate Hub, Library Documents, Compliance Obligations and Agreements tabs join BarnCRM and BarnCRM Console |
+| Permission sets (Admin, Staff, Read Only, Webhook Guest), Payments Setup tab, webhook receiver, processing job | Payments | Metadata and `PaymentsAccessSync` (ADR-0201 `0201-payments-module.md`). No app: the Payments and Payments Setup tabs join BarnCRM and BarnCRM Console at deploy |
+| Payment seam (a module starts a checkout and is told of each status change) | Payments | `PaymentsApi`, a `System.Callable` found by name; listeners are the consumers' own `System.Callable` classes (ADR-0201 `0201-payments-module.md` decision 8) |
+| Permission sets (Admin, Staff, Read Only), Territory Management tab, nightly assignment step | Territory Management | Metadata, `TerritoryAccessSync` and `TerritoryNightlyJobProvider` (ADR-0205 `0205-territory-management-module.md`). No app (ADR-0192): the Territory Management tab joins the BarnCRM admin apps |
+| Permission sets (Admin, Staff, Read Only), Memberships and Membership Levels tabs, term actions panel, renewal nightly step, member portal action | Memberships | Metadata and `MembershipsAccessSync` (ADR-0206 `0206-memberships-module.md`). No app (ADR-0192) |
 
 Two rows differ from plan Section 6 because the first customers are now Nonprofit Cloud
 orgs: the Gift Transaction mirror was brought forward from v0.9 to v0.6 and is built in release

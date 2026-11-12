@@ -4,7 +4,7 @@
 
 Takes payments through the organization's own Stripe or PayPal account on the processor's hosted
 checkout page, records each as a `Payment__c` with one status flow, and receives the processors'
-webhooks on the org's Salesforce Site (PAY-01, D-190, ADR-NEXT `NEXT-payments-module.md`).
+webhooks on the org's Salesforce Site (PAY-01, D-190, ADR-0201 `0201-payments-module.md`).
 BarnCRM holds no money and stores no card data. Setup and use:
 [Admin Guide, Payments](../../docs/admin-guide/payments.md).
 

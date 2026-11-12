@@ -94,7 +94,7 @@ public with sharing class EventBadgesController {
 			for (Integer i = 0; i < Math.min(rows.size(), ROW_LIMIT); i++) {
 				Person person = new Person();
 				person.id = rows[i].Id;
-				// EV-26: the badge overrides win when set (ADR-NEXT decision 13).
+				// EV-26: the badge overrides win when set (ADR-0207 decision 13).
 				person.name = String.isNotBlank(rows[i].Badge_Name__c)
 					? rows[i].Badge_Name__c
 					: rows[i].Name;

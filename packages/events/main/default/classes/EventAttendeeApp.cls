@@ -1,6 +1,6 @@
 /**
- * The attendee app's actions (EV-22, EV-29; ADR-NEXT
- * `NEXT-events-attendee-app-operations-portal-templates.md`, decisions 6 to 8 and 11; canonical
+ * The attendee app's actions (EV-22, EV-29; ADR-0215
+ * `0215-events-attendee-app-operations-portal-templates.md`, decisions 6 to 8 and 11; canonical
  * model R-ACN1, R-ACN2, R-AMS1, R-AGI1): connect with another attendee, accept or decline,
  * message a connection and reply, and add a session to or remove it from the person's agenda.
  * Reached only through `EventsPortalExtension`, after Portal Builder has checked the record is on

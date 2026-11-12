@@ -1,5 +1,5 @@
 /**
- * The shift waitlist (V-14, canonical model R-VU8; ADR-NEXT volunteer self-service and
+ * The shift waitlist (V-14, canonical model R-VU8; ADR-0198 volunteer self-service and
  * waitlists, decision 5). With Waitlist When Full on, a booking that does not fit its shift is
  * saved as Waitlisted, and Waitlisted bookings move up to Signed up, oldest first, when places
  * free. Core's `WaitlistQueue` decides who fits; a group takes its Group Size (V-16).

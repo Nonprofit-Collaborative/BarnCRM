@@ -1,5 +1,5 @@
 /**
- * The LWC Builder's Apex (LB-01 to LB-05; ADR-NEXT `NEXT-lwc-builder-module.md`): the builder's
+ * The LWC Builder's Apex (LB-01 to LB-05; ADR-0203 `0203-lwc-builder-module.md`): the builder's
  * list and save, and what the packaged renderer reads for a built component and its blocks.
  *
  * Every read and write is the running user's (user mode, with sharing), so a built component

@@ -1,5 +1,5 @@
 /**
- * Payments' checks in Health Check, in the Settings console (ADR-NEXT `NEXT-payments-module.md`,
+ * Payments' checks in Health Check, in the Settings console (ADR-0201 `0201-payments-module.md`,
  * decision 7; ADR-0057's extension seam, ADR-0125's fixes). Core finds this class by name
  * (`HealthCheckExtensions.EXTENSION_CLASSES`).
  *

@@ -1,6 +1,6 @@
 /**
- * Event Management's save-time upkeep for venues and rooms (EV-24; ADR-NEXT
- * `NEXT-events-attendee-app-operations-portal-templates.md`, decision 14; canonical model
+ * Event Management's save-time upkeep for venues and rooms (EV-24; ADR-0215
+ * `0215-events-attendee-app-operations-portal-templates.md`, decision 14; canonical model
  * R-EVN1), run by the Core trigger dispatcher through the registry rows `Event_Venue_Fill` and
  * `Session_Room_Fill`.
  *

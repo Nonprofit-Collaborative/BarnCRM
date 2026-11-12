@@ -1,6 +1,6 @@
 /**
- * Payments' one status flow (canonical model 29PAY1, R-PAY1 to R-PAY3; ADR-NEXT
- * `NEXT-payments-module.md`, decisions 3, 6 and 8): starting a checkout, applying what a
+ * Payments' one status flow (canonical model 29PAY1, R-PAY1 to R-PAY3; ADR-0201
+ * `0201-payments-module.md`, decisions 3, 6 and 8): starting a checkout, applying what a
  * processor reported, cancelling abandoned checkouts and telling each payment's listener.
  */
 public with sharing class PaymentService {

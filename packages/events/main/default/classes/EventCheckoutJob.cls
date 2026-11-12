@@ -1,6 +1,6 @@
 /**
- * Starts the checkouts of form registrations waiting for payment (EV-20, R-ERG5; ADR-NEXT
- * `NEXT-events-paid-registration-proposals-ratings.md`, decision 3). Payments allows one checkout
+ * Starts the checkouts of form registrations waiting for payment (EV-20, R-ERG5; ADR-0207
+ * `0207-events-paid-registration-proposals-ratings.md`, decision 3). Payments allows one checkout
  * per transaction (callout, then write), so each run takes the oldest Pending Payment registration
  * still Unpaid and queues the next run while more wait. A checkout that cannot be started marks
  * the registration's payment Failed and is logged, so staff can send a link from the

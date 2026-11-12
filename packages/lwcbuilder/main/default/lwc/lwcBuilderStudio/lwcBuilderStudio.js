@@ -95,7 +95,7 @@ function problemText(code) {
 }
 
 /**
- * The LWC Builder page (LB-01, LB-05, LB-06; ADR-NEXT `NEXT-lwc-builder-module.md`): pick or
+ * The LWC Builder page (LB-01, LB-05, LB-06; ADR-0203 `0203-lwc-builder-module.md`): pick or
  * start a component, lay out sections, rows and columns on the grid, drag blocks in (or add and
  * move them with buttons), set each block's properties and visibility rule, preview it with a
  * record, save it, and export it as LWC source. The document logic is c/lwcBuilderModel's.

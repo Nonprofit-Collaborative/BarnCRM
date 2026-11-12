@@ -1,6 +1,6 @@
 /**
- * The Scholarships step of BarnCRM's nightly run (ADR-NEXT
- * `NEXT-scholarships-outbound-grants-module.md` decision 11): moves cycles on by their dates
+ * The Scholarships step of BarnCRM's nightly run (ADR-0204
+ * `0204-scholarships-outbound-grants-module.md` decision 11): moves cycles on by their dates
  * (R-SG2), fills the signed form links still blank on Draft applications and open requirements,
  * and sends the program owner one bell reminder per due date for each open requirement coming
  * due, with an optional email to the recipient (R-SG13).

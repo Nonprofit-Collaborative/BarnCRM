@@ -1,5 +1,5 @@
 /**
- * Dues paid online through BarnCRM Payments (PAY-02; ADR-NEXT `NEXT-memberships-module.md`,
+ * Dues paid online through BarnCRM Payments (PAY-02; ADR-0206 `0206-memberships-module.md`,
  * decision 6; canonical model R-MEM7). `request` checks the term and that Payments is ready, then
  * queues this job, because the staff page and the portal both write before a callout could run.
  * The job asks `PaymentsApi` (found by name, so Memberships never depends on Payments) for a

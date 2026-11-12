@@ -1,5 +1,5 @@
 /**
- * The one first-fit rule both waitlists use (ADR-NEXT volunteer self-service and waitlists,
+ * The one first-fit rule both waitlists use (ADR-0198 volunteer self-service and waitlists,
  * decision 5): a full shift in Volunteers (V-14) and a full program in Programs (P-09). Plain
  * Apex with no query or save, so each module counts its own places and saves its own records,
  * and Core names no module object. The same rule decides who is waitlisted on save and who is

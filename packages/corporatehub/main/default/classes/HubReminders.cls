@@ -1,5 +1,5 @@
 /**
- * The Corporate Hub step of BarnCRM's nightly run (ADR-NEXT `NEXT-corporate-hub-module.md`
+ * The Corporate Hub step of BarnCRM's nightly run (ADR-0196 `0196-corporate-hub-module.md`
  * decision 7; canonical model R-AG1, R-CR1): renews or expires agreements past their end date,
  * then sends each owner one bell reminder per date for the obligations, agreements, document
  * reviews, board terms and the GDPR records (CH-05: DPIA reviews, data subject requests, unreported

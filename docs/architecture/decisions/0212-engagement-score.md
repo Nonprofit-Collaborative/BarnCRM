@@ -1,4 +1,4 @@
-# ADR-NEXT: Engagement score: a nightly Core score on Contact from admin weights, with module signals found by name
+# ADR-0212: Engagement score: a nightly Core score on Contact from admin weights, with module signals found by name
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-11

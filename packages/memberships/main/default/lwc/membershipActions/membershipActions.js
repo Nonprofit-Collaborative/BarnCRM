@@ -9,7 +9,7 @@ import { iconFor } from 'c/barnIcons';
 const PACKAGE = 'Memberships';
 
 /**
- * The membership panel (G-22b, PAY-02; ADR-NEXT `NEXT-memberships-module.md`, decision 11):
+ * The membership panel (G-22b, PAY-02; ADR-0206 `0206-memberships-module.md`, decision 11):
  * Renew at a chosen level, and Email Payment Link when Payments is ready and the member has an
  * email. The rules live in `MembershipService` and `MembershipPayments`; this only asks.
  */

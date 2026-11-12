@@ -1,5 +1,5 @@
 /**
- * Membership terms (canonical model 29MEM3; ADR-NEXT `NEXT-memberships-module.md`, decisions 3
+ * Membership terms (canonical model 29MEM3; ADR-0206 `0206-memberships-module.md`, decisions 3
  * and 4): what a new term fills on save (R-MEM1) and how a term is renewed (R-MEM3). Every
  * renewal path, staff, gifts, recurring gifts and online payments, comes through `renew`, so a
  * new term is always made the same way.

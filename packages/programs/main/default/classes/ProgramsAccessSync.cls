@@ -27,7 +27,7 @@ public with sharing class ProgramsAccessSync extends ModuleAccessSyncBase {
 	/**
 	 * Each other set, and the BarnCRM roles (permission set groups) whose holders get it. Unlike
 	 * the other modules, Fundraising Staff is deliberately absent: Programs Staff carries case
-	 * notes, so a fundraiser gets it per person (ADR-NEXT D3 as modified, D-191).
+	 * notes, so a fundraiser gets it per person (ADR-0194 D3 as modified, D-191).
 	 */
 	@TestVisible
 	private static final Map<String, List<String>> BY_ROLE = new Map<String, List<String>>{

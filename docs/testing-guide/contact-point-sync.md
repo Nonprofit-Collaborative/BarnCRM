@@ -2,7 +2,7 @@
 
 Scripts for the optional BarnCRM Contact Point Sync module: copying a person's email addresses, phone numbers and current addresses to Salesforce Contact Points, the backfill page, and orgs without the objects. Setup detail: [Contact Point Sync](../admin-guide/contact-point-sync.md).
 
-Before you start: an org from [Before you test](before-you-test.md), with Core and Contact Point Sync deployed and sample data loaded. In Setup, **Data Protection and Privacy**, tick **Make data protection details available in records** so the Individual object is on (T-CPS-05 needs it off). To see the copies, open the App Launcher and search **Contact Point Emails**, **Contact Point Phones** and **Contact Point Addresses**, or add the Individual's related lists.
+Before you start: an org from [Before you test](before-you-test.md), with Core and Contact Point Sync deployed and sample data loaded. In Setup, **Data Protection and Privacy**, tick **Make data protection details available in records** so the Individual object is on (T-CPS-07 needs it off). To see the copies, open the App Launcher and search **Contact Point Emails**, **Contact Point Phones** and **Contact Point Addresses**, or add the Individual's related lists.
 
 ## T-CPS-01: The Page and the Backfill
 
@@ -62,7 +62,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 **Cleanup:** Make sure automation is resumed.
 
-## T-CPS-06: Household Moves and Person Accounts
+## T-CPS-05: Household Moves and Person Accounts
 
 **Purpose:** confirm a household move is copied at once, and that person accounts are copied like contacts where the org has them.
 **Prerequisites:** admin; two households with different current addresses; a person with an email who belongs to the first household. For step 3, an org with Person Accounts turned on (skip it in any other org).
@@ -75,7 +75,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 **Cleanup:** Switch **Household Moves** back on; delete the test people.
 
-## T-CPS-07: A Large Save Is Copied by a Background Job
+## T-CPS-06: A Large Save Is Copied by a Background Job
 
 **Purpose:** confirm a save of more than 50 people finishes without copying inside it and every person is still copied moments later, while a smaller save is copied at once.
 **Prerequisites:** admin; a CSV of 60 new people, each with a Last Name and an Email, and one of 10 more; Data Loader, Data Import Wizard or Workbench to insert them (not a BarnCRM import, which copies inside its own background job).
@@ -88,7 +88,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 
 **Cleanup:** Delete the test people; make sure **Contact Point Sync: People** is on.
 
-## T-CPS-05: An Org Without the Individual Object, and a Person Without the Permission
+## T-CPS-07: An Org Without the Individual Object, and a Person Without the Permission
 
 **Purpose:** confirm the module explains instead of failing, and the backfill needs Manage BarnCRM Settings.
 **Prerequisites:** admin; a second user with the Staff role, given **Contact Point Sync Admin** through **BarnCRM Settings**, **Access**, **Extra Permissions**, and without **Manage BarnCRM Settings**.

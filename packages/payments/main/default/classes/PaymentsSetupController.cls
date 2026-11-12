@@ -1,5 +1,5 @@
 /**
- * The Payments Setup page (ADR-NEXT `NEXT-payments-module.md`, decision 7): the receiver address
+ * The Payments Setup page (ADR-0201 `0201-payments-module.md`, decision 7): the receiver address
  * of each active Site, for each processor, and whether each key is entered, showing only its
  * last four characters. Keys are write-only: a saved key is never returned. Thin: plain JSON and
  * every text the page shows (plan 9.9).

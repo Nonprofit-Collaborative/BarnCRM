@@ -1,6 +1,6 @@
 /**
- * The board portal's actions (PB-02, CH-18; ADR-0185 decision 9, ADR-0191 and ADR-NEXT
- * `NEXT-corporate-hub-board-governance.md` decision 12): mark the packet read and approve the
+ * The board portal's actions (PB-02, CH-18; ADR-0185 decision 9, ADR-0191 and ADR-0199
+ * `0199-corporate-hub-board-governance.md` decision 12): mark the packet read and approve the
  * minutes on the person's own attendee row, vote on their own vote row, and acknowledge their own
  * policy or disclosure request. Core finds this class by name
  * (`PortalActionExtensions.EXTENSION_CLASSES`); Portal Builder has already checked that the

@@ -1,4 +1,4 @@
-# ADR-NEXT: The BarnCRM Project Management module: its own package on Core for every edition, projects with phases, tasks and milestones, templates, a light PSA layer (time, assignments, budgets against actuals, billable export) and status updates
+# ADR-0208: The BarnCRM Project Management module: its own package on Core for every edition, projects with phases, tasks and milestones, templates, a light PSA layer (time, assignments, budgets against actuals, billable export) and status updates
 
 **Status:** Accepted (builder decision, for Brandon to confirm)
 **Date:** 2026-11-11

@@ -1,6 +1,6 @@
 /**
- * What the Scholarships and Outbound Grants classes share (ADR-NEXT
- * `NEXT-scholarships-outbound-grants-module.md`): the Manage Scholarships check, the
+ * What the Scholarships and Outbound Grants classes share (ADR-0204
+ * `0204-scholarships-outbound-grants-module.md`): the Manage Scholarships check, the
  * module's bell notification and the refusal a person reads as written.
  */
 public with sharing class Scholarships {

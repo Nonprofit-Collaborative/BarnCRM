@@ -1,6 +1,6 @@
 /**
- * What the BarnCRM Project Management module does at install and at every upgrade (ADR-NEXT
- * `NEXT-project-management-module.md`). Each step is safe to run twice and none can abort an
+ * What the BarnCRM Project Management module does at install and at every upgrade (ADR-0208
+ * `0208-project-management-module.md`). Each step is safe to run twice and none can abort an
  * install, since every failure is written to the Error Log instead:
  *
  * 1. Turn on, once, a ship-on setting added in an upgrade (Core's `ShippedDefaultUpgrades`).

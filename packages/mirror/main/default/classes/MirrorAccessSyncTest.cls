@@ -1,6 +1,6 @@
 /**
  * Holders of Mirror's retired sets get the sets that replace them, keep the old ones, and an
- * inactive holder is named rather than given (ADR-NEXT, simpler permission sets, D4).
+ * inactive holder is named rather than given (ADR-0194, simpler permission sets, D4).
  */
 @IsTest(testFor='ApexClass:MirrorAccessSync')
 private class MirrorAccessSyncTest {

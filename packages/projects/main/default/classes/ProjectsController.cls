@@ -1,6 +1,6 @@
 /**
- * Projects Home, the project board and the Projects at Risk card (ADR-NEXT
- * `NEXT-project-management-module.md`). Thin by design (plan Section 9.9): it returns plain
+ * Projects Home, the project board and the Projects at Risk card (ADR-0208
+ * `0208-project-management-module.md`). Thin by design (plan Section 9.9): it returns plain
  * records and shapes, in user mode, and leaves grouping, progress and the timeline to
  * `c/projectsModel`. A refusal written for the person, or a save's own message, is shown as it
  * is; anything else is logged and shown as one message.

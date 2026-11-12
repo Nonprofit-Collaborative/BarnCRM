@@ -1,5 +1,5 @@
 /**
- * The seam a migration kit uses when its JSON steps are not enough (MIG-01, ADR-NEXT
+ * The seam a migration kit uses when its JSON steps are not enough (MIG-01, ADR-0197
  * migration-assistant decision 3, the shape of ADR-0057). A kit names the class in its Extension
  * Class field; Core finds it by name with `NamespaceUtil.build` and calls it only when it is
  * installed, so Core never depends on the module that ships the kit.

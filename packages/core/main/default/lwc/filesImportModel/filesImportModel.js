@@ -1,6 +1,6 @@
 /**
- * Import Files' browser logic (C-70, canonical model R-FI1 to R-FI3; ADR-NEXT
- * `NEXT-files-import.md`): reading `manifest.csv` from the zip, the checks that need no server,
+ * Import Files' browser logic (C-70, canonical model R-FI1 to R-FI3; ADR-0214
+ * `0214-files-import.md`): reading `manifest.csv` from the zip, the checks that need no server,
  * and the groups the files are sent in. Plain JavaScript on plain values, so it is tested
  * without the platform and ports as is (plan 9.9).
  */

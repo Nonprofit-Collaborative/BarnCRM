@@ -1,4 +1,4 @@
-# ADR-NEXT: BarnCRM Address Verification: the org's own Smarty or Google key, verified on save and nightly, writing only the two R-AD6 fields unless corrections are switched on
+# ADR-0209: BarnCRM Address Verification: the org's own Smarty or Google key, verified on save and nightly, writing only the two R-AD6 fields unless corrections are switched on
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-11
@@ -7,7 +7,7 @@ module, the admin brings their own provider key set in the BarnCRM Settings cons
 bundled, no paid service), D-177, D-178, Section 4.7 (addresses), Section 4.13 (security), Section
 9.9 (portability). Builds on ADR-0013 (Core runs alone), ADR-0017 (cross-package mechanisms by
 name), ADR-0057 (Health Check extensions), ADR-0131 (module access by role), ADR-0166 (the nightly
-run) and the Payments ADR-NEXT `NEXT-payments-module.md` (write-only keys entered in the app).
+run) and the Payments ADR-0201 `0201-payments-module.md` (write-only keys entered in the app).
 
 ## Context
 

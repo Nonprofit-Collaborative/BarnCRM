@@ -315,7 +315,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** set Weeks Ahead to Create Shifts back to 8; delete the schedule and its shifts.
 
-## T-VOL-22: Shift Schedule Form Preview
+## T-VOL-21: Shift Schedule Form Preview
 
 **Purpose:** confirm New Shift Schedule and Edit Schedule say how many shifts the pattern makes as the fields change (modules-24, D-183).
 **Prerequisites:** coordinator; a job; Weeks Ahead to Create Shifts at 8.
@@ -332,7 +332,7 @@ Before you start: an org from [Before you test](before-you-test.md), with Core, 
 
 **Cleanup:** delete the schedule and its shifts.
 
-## T-VOL-21: Volunteer Letters for Many People
+## T-VOL-22: Volunteer Letters for Many People
 
 **Purpose:** confirm Volunteer Letters on Approve Hours makes letters for everyone with approved hours, or for chosen people, without Flow Builder.
 **Prerequisites:** coordinator; two people with approved hours this year and one with none; an active Hours letter template.

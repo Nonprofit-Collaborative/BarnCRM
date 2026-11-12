@@ -1,5 +1,5 @@
 /**
- * The Memberships step of the nightly run (ADR-0166; ADR-NEXT `NEXT-memberships-module.md`,
+ * The Memberships step of the nightly run (ADR-0166; ADR-0206 `0206-memberships-module.md`,
  * decision 5), in order: renewals from Giving gifts (R-MEM6), renewals from active recurring
  * gifts and lapse handling (R-MEM4), reminders (R-MEM5), then certification expiry (R-MEM12). Each phase takes up to `ROWS`
  * terms a night; the rest wait for the next. It acts for the organization, in system mode.

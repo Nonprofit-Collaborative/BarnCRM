@@ -1,6 +1,6 @@
 /**
- * Gives the Project Management permission sets to BarnCRM's roles (ADR-NEXT
- * `NEXT-project-management-module.md`, decision 9): Projects Admin to everyone holding BarnCRM
+ * Gives the Project Management permission sets to BarnCRM's roles (ADR-0208
+ * `0208-project-management-module.md`, decision 9): Projects Admin to everyone holding BarnCRM
  * Admin, directly or through a role, Projects Staff to the Team Member and Fundraising Staff
  * roles, and Projects Read Only to the Read Only role (ADR-0131, D-191).
  *

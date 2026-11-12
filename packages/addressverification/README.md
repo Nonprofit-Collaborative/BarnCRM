@@ -4,8 +4,8 @@
 
 Checks `Address__c` records with the organization's own Smarty or Google account and writes
 Verification Status and Latest Verified Date, plus the standardized street, city, state and
-postal code when Apply Corrections is on (C-46, D-112, ADR-NEXT
-`NEXT-address-verification-module.md`). No provider is bundled and BarnCRM holds no key. Setup and
+postal code when Apply Corrections is on (C-46, D-112, ADR-0209
+`0209-address-verification-module.md`). No provider is bundled and BarnCRM holds no key. Setup and
 use: [Admin Guide, Address Verification](../../docs/admin-guide/address-verification.md).
 
 ## First ships in

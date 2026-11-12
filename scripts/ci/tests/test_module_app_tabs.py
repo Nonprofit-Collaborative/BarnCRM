@@ -227,7 +227,7 @@ class CoreAppsTest(unittest.TestCase):
     # Import_Row__c opens from Super Importer's results (admin-22), not from an app's nav.
     # Record_Inspector opens from the Inspect This Record button only (D-183).
     # Brand__c and Legal_Entity__c open from BarnCRM Settings, Organization (C-47): brands ship
-    # off, so no app gains a tab an org that never uses brands would see (ADR-NEXT brand management).
+    # off, so no app gains a tab an org that never uses brands would see (ADR-0202 brand management).
     DATA_MANAGER_ONLY = {
         "Find", "Import", "Bulk_Update", "Import_Row__c", "Record_Inspector", "Brand__c", "Legal_Entity__c"
     }

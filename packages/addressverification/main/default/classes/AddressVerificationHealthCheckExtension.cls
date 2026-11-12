@@ -1,5 +1,5 @@
 /**
- * Address Verification's checks in Health Check (ADR-NEXT `NEXT-address-verification-module.md`,
+ * Address Verification's checks in Health Check (ADR-0209 `0209-address-verification-module.md`,
  * decision 7; ADR-0057's extension seam). Core finds this class by name
  * (`HealthCheckExtensions.EXTENSION_CLASSES`). Asked only while the module is on, of a viewer
  * who may manage settings:

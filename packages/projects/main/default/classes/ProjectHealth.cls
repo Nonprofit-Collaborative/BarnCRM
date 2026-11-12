@@ -1,5 +1,5 @@
 /**
- * Project health (canonical model R-PM2; ADR-NEXT `NEXT-project-management-module.md` decision
+ * Project health (canonical model R-PM2; ADR-0208 `0208-project-management-module.md` decision
  * 5): On Track, At Risk or Off Track for each Active project that is not a template, with one
  * line of Health Reasons per reason, and none for any other project.
  *

@@ -1,5 +1,5 @@
 /**
- * Multi-brand management (C-47, canonical model 29BR1 to 29BR3, ADR-NEXT brand management and
+ * Multi-brand management (C-47, canonical model 29BR1 to 29BR3, ADR-0202 brand management and
  * visibility): the seam modules call, defaulting, and the rules the Brand triggers run.
  *
  * Off (`Brand_Management__c`, shipped false) every module-facing method returns without reading a

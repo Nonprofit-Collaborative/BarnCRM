@@ -942,21 +942,21 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
   MODULES+=(events)
   # Portal Builder depends on Core only (ADR-0185, portal builder).
   MODULES+=(portal)
-  # Corporate Hub depends on Core only (ADR-NEXT, corporate hub module).
+  # Corporate Hub depends on Core only (ADR-0196, corporate hub module).
   MODULES+=(corporatehub)
-  # Payments depends on Core only (ADR-NEXT payments module).
+  # Payments depends on Core only (ADR-0201 payments module).
   MODULES+=(payments)
-  # LWC Builder depends on Core only (ADR-NEXT, lwc builder module).
+  # LWC Builder depends on Core only (ADR-0203, lwc builder module).
   MODULES+=(lwcbuilder)
-  # Scholarships and Outbound Grants depends on Core only (ADR-NEXT, scholarships module).
+  # Scholarships and Outbound Grants depends on Core only (ADR-0204, scholarships module).
   MODULES+=(scholarships)
-  # Territory Management depends on Core only (ADR-NEXT, territory management module).
+  # Territory Management depends on Core only (ADR-0205, territory management module).
   MODULES+=(territory)
-  # Memberships depends on Core only; Giving and Payments are read by name (ADR-NEXT memberships module).
+  # Memberships depends on Core only; Giving and Payments are read by name (ADR-0206 memberships module).
   MODULES+=(memberships)
-  # Project Management depends on Core only (ADR-NEXT, project management module).
+  # Project Management depends on Core only (ADR-0208, project management module).
   MODULES+=(projects)
-  # Address Verification depends on Core only (ADR-NEXT address verification module).
+  # Address Verification depends on Core only (ADR-0209 address verification module).
   MODULES+=(addressverification)
   # Mirror depends on Core and Giving (plan Section 4.1), so it goes last.
   MODULES+=(mirror)
@@ -1155,7 +1155,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "access check syncs the access."
   fi
 
-  # The same gap for the Corporate Hub permission sets (ADR-NEXT, corporate hub module, decision 10).
+  # The same gap for the Corporate Hub permission sets (ADR-0196, corporate hub module, decision 10).
   echo ""
   echo "== Queueing the Corporate Hub access sync =="
   if ! printf '%s\n' 'new CorporateHubAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
@@ -1163,7 +1163,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "access check syncs the access."
   fi
 
-  # The same gap for the Payments permission sets (ADR-NEXT payments module, decision 9).
+  # The same gap for the Payments permission sets (ADR-0201 payments module, decision 9).
   echo ""
   echo "== Queueing the Payments access sync =="
   if ! printf '%s\n' 'new PaymentsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
@@ -1171,7 +1171,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "access check syncs the access."
   fi
 
-  # The same gap for the LWC Builder permission sets (ADR-NEXT, lwc builder module, decision 9).
+  # The same gap for the LWC Builder permission sets (ADR-0203, lwc builder module, decision 9).
   echo ""
   echo "== Queueing the LWC Builder access sync =="
   if ! printf '%s\n' 'new LwcBuilderAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
@@ -1179,7 +1179,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "access check syncs the access."
   fi
 
-  # The same gap for the Scholarships permission sets (ADR-NEXT, scholarships module, decision 13).
+  # The same gap for the Scholarships permission sets (ADR-0204, scholarships module, decision 13).
   echo ""
   echo "== Queueing the Scholarships access sync =="
   if ! printf '%s\n' 'new ScholarshipsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
@@ -1187,7 +1187,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "access check syncs the access."
   fi
 
-  # The same gap for the Territory Management permission sets (ADR-NEXT, territory management
+  # The same gap for the Territory Management permission sets (ADR-0205, territory management
   # module, decision 7).
   echo ""
   echo "== Queueing the Territory Management access sync =="
@@ -1196,7 +1196,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "hourly access check syncs the access."
   fi
 
-  # The same gap for the Memberships permission sets (ADR-NEXT memberships module, decision 10).
+  # The same gap for the Memberships permission sets (ADR-0206 memberships module, decision 10).
   echo ""
   echo "== Queueing the Memberships access sync =="
   if ! printf '%s\n' 'new MembershipsAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then
@@ -1204,7 +1204,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "access check syncs the access."
   fi
 
-  # The same gap for the Project Management permission sets (ADR-NEXT, project management
+  # The same gap for the Project Management permission sets (ADR-0208, project management
   # module, decision 9).
   echo ""
   echo "== Queueing the Project Management access sync =="
@@ -1213,7 +1213,7 @@ if [[ "$CORE_ONLY" -eq 0 ]]; then
     echo "hourly access check syncs the access."
   fi
 
-  # The same gap for the Address Verification permission set (ADR-NEXT address verification).
+  # The same gap for the Address Verification permission set (ADR-0209 address verification).
   echo ""
   echo "== Queueing the Address Verification access sync =="
   if ! printf '%s\n' 'new AddressVerificationAccessSync().requestSync();' | sf apex run --target-org "$ALIAS"; then

@@ -1,5 +1,5 @@
 /**
- * The donor portal's Pay Online (PAY-03; ADR-NEXT donor portal payments, decisions 2 to 4): only
+ * The donor portal's Pay Online (PAY-03; ADR-0210 donor portal payments, decisions 2 to 4): only
  * the person's own active commitment with something due queues a checkout; the job asks Payments
  * for the next payment's amount with Giving listening and emails the link; the Paid report writes
  * one Received gift on the commitment, and a second report writes nothing more.

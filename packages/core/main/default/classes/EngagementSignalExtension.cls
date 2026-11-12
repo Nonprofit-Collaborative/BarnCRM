@@ -1,6 +1,6 @@
 /**
  * The seam a module uses to add a part to the engagement score (C-64, canonical model R-ES4,
- * ADR-NEXT `NEXT-engagement-score.md`), under the cross-package mechanism ADR-0017 settled.
+ * ADR-0212 `0212-engagement-score.md`), under the cross-package mechanism ADR-0017 settled.
  * Core finds an implementation by class name (`EngagementScore.SIGNAL_CLASSES`) and asks it
  * only when it is installed, so Core names no module.
  */

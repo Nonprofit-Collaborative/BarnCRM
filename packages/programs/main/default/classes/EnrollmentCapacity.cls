@@ -1,5 +1,5 @@
 /**
- * Program capacity and the waitlist (P-09, canonical model R-EN10; ADR-NEXT volunteer
+ * Program capacity and the waitlist (P-09, canonical model R-EN10; ADR-0198 volunteer
  * self-service and waitlists, decision 5). With Waitlist When Full on and Capacity set, an
  * enrollment saved as Enrolled into a full program is saved as Waitlisted, and Waitlisted
  * enrollments move to Enrolled, oldest first, when places free. Core's `WaitlistQueue` decides who

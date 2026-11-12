@@ -118,7 +118,7 @@ private class VolunteersAccessSyncTest {
 		}
 	}
 
-	/** ADR-NEXT D3: Fundraising Staff (Giving's role, when installed) gets Volunteers Staff. */
+	/** ADR-0194 D3: Fundraising Staff (Giving's role, when installed) gets Volunteers Staff. */
 	@IsTest
 	static void fundraisingStaffGetsVolunteersStaff() {
 		System.runAs(TestUsers.admin()) {

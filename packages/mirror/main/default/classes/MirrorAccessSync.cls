@@ -1,6 +1,6 @@
 /**
  * Carries the holders of Mirror's retired permission sets over to the sets that replace them
- * (ADR-NEXT, simpler permission sets, D4): every holder of Campaign Sync, Opportunity Mirror or
+ * (ADR-0194, simpler permission sets, D4): every holder of Campaign Sync, Opportunity Mirror or
  * Gift Transaction Mirror gets Salesforce Records Sync, and every holder of Inbound Gift API or
  * Record Inbound Gift Action gets Inbound Gifts.
  *

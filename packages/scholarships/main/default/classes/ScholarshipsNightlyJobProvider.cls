@@ -1,7 +1,7 @@
 /**
  * The class Core finds by name (in `NightlyJobs.PROVIDER_CLASSES`) to add the Scholarships
- * reminders and cycle dates to the one nightly run (ADR-0166; ADR-NEXT
- * `NEXT-scholarships-outbound-grants-module.md` decision 11).
+ * reminders and cycle dates to the one nightly run (ADR-0166; ADR-0204
+ * `0204-scholarships-outbound-grants-module.md` decision 11).
  */
 @NamespaceAccessible
 public with sharing class ScholarshipsNightlyJobProvider implements NightlyStepProvider {

@@ -107,7 +107,7 @@ private class BulkUpdateControllerTest {
 		}
 	}
 
-	/** ADR-NEXT D5: Bulk Update and Bulk Delete each include Find and Export, no pair needed. */
+	/** ADR-0194 D5: Bulk Update and Bulk Delete each include Find and Export, no pair needed. */
 	@IsTest
 	static void bulkUpdateOrBulkDeleteAloneIncludesFindAndExport() {
 		System.runAs(TestUsers.admin()) {

@@ -1,5 +1,5 @@
 /**
- * The Address Verification Setup page (ADR-NEXT `NEXT-address-verification-module.md`,
+ * The Address Verification Setup page (ADR-0209 `0209-address-verification-module.md`,
  * decisions 3 and 5; canonical model R-AV4): which provider is chosen, whether each key is
  * entered (its last four characters only), Save Keys, Clear and Verify Waiting Addresses. Keys
  * are write-only. Thin: plain values and every text from the help catalog (plan 9.9).

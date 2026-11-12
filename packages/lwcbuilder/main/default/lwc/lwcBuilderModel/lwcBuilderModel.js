@@ -1,5 +1,5 @@
 /**
- * The LWC Builder's definition document (LB-01 to LB-06; ADR-NEXT `NEXT-lwc-builder-module.md`,
+ * The LWC Builder's definition document (LB-01 to LB-06; ADR-0203 `0203-lwc-builder-module.md`,
  * decision 3; canonical model R-LB1), with no Salesforce dependency so the same logic can serve
  * another platform (plan 9.9).
  *
@@ -546,7 +546,7 @@ function blockMarkup(block, pad, js) {
 }
 
 /**
- * The definition as an LWC bundle for a developer (LB-06; ADR-NEXT decision 8):
+ * The definition as an LWC bundle for a developer (LB-06; ADR-0203 decision 8):
  * `{bundle, files: [{name, content}]}`. Record Fields, Text, Image and Button blocks become
  * working markup; list and chart blocks a placeholder with a comment, since their data comes
  * from this module's Apex; visibility rules become comments. Nothing is deployed.

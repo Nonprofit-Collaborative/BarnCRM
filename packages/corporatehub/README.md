@@ -3,10 +3,10 @@
 ## Purpose
 
 An organization's documents, policies, compliance obligations and contracts (plan Section 5.8,
-ADR-NEXT `NEXT-corporate-hub-module.md`, D-118): a library of documents on Salesforce Files,
+ADR-0196 `0196-corporate-hub-module.md`, D-118): a library of documents on Salesforce Files,
 policy acknowledgments, a compliance calendar with the history of each completed cycle,
 agreements with renewal and notice dates, and templates shipped as data. Board governance
-(CH-09 to CH-20; ADR-NEXT `NEXT-corporate-hub-board-governance.md`): boards and committees,
+(CH-09 to CH-20; ADR-0199 `0199-corporate-hub-board-governance.md`): boards and committees,
 seats and terms, meetings with attendance, quorum, minutes, motions and votes, disclosures,
 action items, self-assessments and an availability poll; members act through the board portal
 template (PB-02). The GDPR set (CH-05): a record of processing activities, data subject

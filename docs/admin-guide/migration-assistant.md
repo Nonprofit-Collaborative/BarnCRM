@@ -184,5 +184,5 @@ A kit is data plus, only when needed, one small class. It needs no change to Cor
    need not match the source count); a rejected row still stops **Verified**.
 4. Document the kit in its module's admin guide and add test rows to the Testing Guide.
 
-See ADR-NEXT `NEXT-migration-assistant.md` for the design and the canonical model Section 29ZS
+See ADR-0197 `0197-migration-assistant.md` for the design and the canonical model Section 29ZS
 and R-MK1 for the rules.

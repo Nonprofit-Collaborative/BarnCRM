@@ -1,5 +1,5 @@
 /**
- * Payments' status flow (canonical model 29PAY1, R-PAY1 to R-PAY3; ADR-NEXT payments module,
+ * Payments' status flow (canonical model 29PAY1, R-PAY1 to R-PAY3; ADR-0201 payments module,
  * decisions 2, 3, 5, 6 and 8): a checkout starts at Stripe or PayPal through the seam, processor
  * events move payments once each, refunds and failures are recorded, abandoned checkouts are
  * cancelled, and each change reaches its listener, whose failure is rolled back on its own.

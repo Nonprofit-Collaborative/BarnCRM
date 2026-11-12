@@ -1,6 +1,6 @@
 /**
- * Gives the Corporate Hub permission sets to BarnCRM's roles (ADR-NEXT
- * `NEXT-corporate-hub-module.md`, decision 10): Corporate Hub Admin to everyone holding BarnCRM
+ * Gives the Corporate Hub permission sets to BarnCRM's roles (ADR-0196
+ * `0196-corporate-hub-module.md`, decision 10): Corporate Hub Admin to everyone holding BarnCRM
  * Admin, directly or through a role, Corporate Hub Staff to the Team Member and Fundraising Staff
  * roles, and Corporate Hub Read Only to the Read Only role (ADR-0131, D-191).
  *

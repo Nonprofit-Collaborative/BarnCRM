@@ -96,7 +96,7 @@ private class LogicModelsAccessSyncTest {
 		}
 	}
 
-	/** ADR-NEXT D3: Fundraising Staff (Giving's role, when installed) gets Logic Models Staff. */
+	/** ADR-0194 D3: Fundraising Staff (Giving's role, when installed) gets Logic Models Staff. */
 	@IsTest
 	static void fundraisingStaffGetsLogicModelsStaff() {
 		System.runAs(TestUsers.admin()) {

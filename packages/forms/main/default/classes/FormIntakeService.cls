@@ -107,7 +107,7 @@ public without sharing class FormIntakeService {
 	 * this class only checks that the form the page names is published and public, and when it
 	 * is not, the page shows no form and the module's offline message. An address
 	 * `<id>.<signed claim>` whose claim is right for the record's attached form tells the module
-	 * the request is signed (ADR-NEXT volunteer self-service, decision 3).
+	 * the request is signed (ADR-0198 volunteer self-service, decision 3).
 	 */
 	public static String publicPage(String recordId) {
 		Id given = idOrNull(idPart(recordId));
@@ -251,7 +251,7 @@ public without sharing class FormIntakeService {
 
 	/**
 	 * Asks the module whose page the form was sent from for a hosted checkout, before anything is
-	 * stored, since its payment callout must come first (ADR-NEXT `NEXT-online-donation-pages.md`,
+	 * stored, since its payment callout must come first (ADR-0211 `0211-online-donation-pages.md`,
 	 * decision 3). The payment is kept in the answers under `_payment`. A failure stores nothing
 	 * and answers Failed, so the person can send again. False when the answers must not be stored.
 	 */

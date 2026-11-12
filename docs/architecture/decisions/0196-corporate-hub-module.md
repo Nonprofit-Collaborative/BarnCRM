@@ -1,4 +1,4 @@
-# ADR-NEXT: The BarnCRM Corporate Hub module: its own package on Core, a document and policy library on Salesforce Files, acknowledgments, a compliance calendar, contracts, and templates shipped as data
+# ADR-0196: The BarnCRM Corporate Hub module: its own package on Core, a document and policy library on Salesforce Files, acknowledgments, a compliance calendar, contracts, and templates shipped as data
 
 **Status:** Accepted (builder decision; CH-06 to CH-08 built as recommended, for Brandon to confirm)
 **Date:** 2026-11-11

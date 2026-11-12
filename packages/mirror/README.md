@@ -30,7 +30,7 @@ Built so far (iteration 0.6):
   record grant).
 - **Accounting export (X-04).** Permission set: `Accounting_Export`, which also reads the gift,
   allocation and fund fields the file shows. See `docs/admin-guide/accounting-export.md`.
-- **Access (ADR-NEXT, simpler permission sets, D4).** `MirrorAccessSync` (a Core module access
+- **Access (ADR-0194, simpler permission sets, D4).** `MirrorAccessSync` (a Core module access
   sync, found by name) gives `Salesforce_Records_Sync` to holders of the retired `Campaign_Sync`,
   `Opportunity_Mirror` and `Gift_Transaction_Mirror`, and `Inbound_Gifts` to holders of the
   retired `Inbound_Gift_API` and `Record_Inbound_Gift_Action`: active users only, at install,

@@ -1,5 +1,5 @@
 /**
- * Processes received processor events (ADR-NEXT `NEXT-payments-module.md`, decision 6; R-PEV2,
+ * Processes received processor events (ADR-0201 `0201-payments-module.md`, decision 6; R-PEV2,
  * R-PEV3). Scheduled from Health Check by an administrator, it runs as them, in user mode.
  *
  * Four scheduled jobs, at :00, :15, :30 and :45. Each cancels abandoned checkouts (R-PAY3) and

@@ -1,6 +1,6 @@
 /**
- * The Memberships Essentials kit's rows (canonical model R-MEM9; ADR-NEXT
- * `NEXT-memberships-module.md`, decision 8), named by the kit `Memberships_Essentials`. Essentials
+ * The Memberships Essentials kit's rows (canonical model R-MEM9; ADR-0206
+ * `0206-memberships-module.md`, decision 8), named by the kit `Memberships_Essentials`. Essentials
  * keeps a membership product's term as a number and a unit, and a membership's state in its own
  * formulas, so this class works out the two columns the templates map that no one field holds:
  * `Months` for a level and `Ends` and `Status` for a membership. Essentials is read by describe

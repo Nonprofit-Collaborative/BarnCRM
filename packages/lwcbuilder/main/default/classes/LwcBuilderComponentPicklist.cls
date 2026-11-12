@@ -1,6 +1,6 @@
 /**
- * The Component property of BarnCRM Built Component in Lightning App Builder (LB-02; ADR-NEXT
- * `NEXT-lwc-builder-module.md`, decision 4): every built component the admin can read, by name,
+ * The Component property of BarnCRM Built Component in Lightning App Builder (LB-02; ADR-0203
+ * `0203-lwc-builder-module.md`, decision 4): every built component the admin can read, by name,
  * storing its key, so a page keeps finding it after the component is moved to another org.
  */
 public with sharing class LwcBuilderComponentPicklist extends VisualEditor.DynamicPickList {

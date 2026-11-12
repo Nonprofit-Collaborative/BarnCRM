@@ -1,13 +1,13 @@
-# ADR-NEXT: Donor portal payments: a Pay Online action on a pledge or recurring gift that emails the donor the org's own hosted checkout, with the gift written from the payment's outcome
+# ADR-0210: Donor portal payments: a Pay Online action on a pledge or recurring gift that emails the donor the org's own hosted checkout, with the gift written from the payment's outcome
 
 **Status:** Accepted (builder decision)
 **Date:** 2026-11-11
 **Source:** plan Section 6.0a release 1.15 (PAY-03, extends PB-08), D-190 (payments through the
 org's own Stripe and PayPal). Amends ADR-0191 decision 4 (the donor template took no payment).
 Builds on ADR-0017 (cross-package mechanisms by name), ADR-0185 decision 9 (portal module
-actions through `PortalActionExtension`), ADR-NEXT `NEXT-payments-module.md` (the Payments
-seam), ADR-NEXT `NEXT-memberships-module.md` decisions 6 and 7 (dues paid from the portal by an
-emailed link) and ADR-NEXT `NEXT-online-donation-pages.md` (the Giving listener).
+actions through `PortalActionExtension`), ADR-0201 `0201-payments-module.md` (the Payments
+seam), ADR-0206 `0206-memberships-module.md` decisions 6 and 7 (dues paid from the portal by an
+emailed link) and ADR-0211 `0211-online-donation-pages.md` (the Giving listener).
 
 ## Context
 

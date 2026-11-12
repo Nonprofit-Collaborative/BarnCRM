@@ -2,8 +2,8 @@
 
 ## Purpose
 
-Grantmaking for organizations that give money (D-122, plan Section 5.11, ADR-NEXT
-`NEXT-scholarships-outbound-grants-module.md`): programs and cycles, applications through BarnCRM
+Grantmaking for organizations that give money (D-122, plan Section 5.11, ADR-0204
+`0204-scholarships-outbound-grants-module.md`): programs and cycles, applications through BarnCRM
 Forms, rubric reviews with reviewer panels, awards and letters, disbursements recorded only
 (BarnCRM moves no money), conditions, recipient reports and the applicant portal template.
 
