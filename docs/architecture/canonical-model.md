@@ -13386,13 +13386,21 @@ runs. R-HA2's Junction refusal applies to NPSP only.
 **R-HA8 What an NPC conversion writes.** As R-HA3, except: `Household_Model__c` becomes
 Converted; both greetings are blank (Nonprofit Cloud has none, upkeep fills them);
 `Primary_Contact__c` is the member whose `AccountContactRelation.IsPrimaryMember` is true when
-that contact's Account is the household, else blank. Previous Values also holds the previous
-`Household_Model__c`. No native row or field is written, and nothing is deleted.
+that contact's Account is the household, else blank. In Junction mode, in the same savepoint,
+each membership row on the household (except one inactive with no End Date) joins its person
+through `HouseholdService.addMembers` (R-M5), the person account standing in for its own
+contact, and each new `Household_Member__c` row takes `Is_Primary__c` from `IsPrimaryMember`,
+`Role__c` from the first of `Roles` that maps (Husband, Wife to Spouse or Partner; Son,
+Daughter to Child; Father, Mother to Head; Other to Other) and `Start_Date__c` and
+`End_Date__c` from `StartDate` and `EndDate`; in Contact mode nobody is moved. Previous Values
+also holds the previous `Household_Model__c` and, under `members`, the ids of the membership
+rows the run created. No native row or field is written, and nothing is deleted.
 
-**R-HA9 Undo waits for the members.** Undo also puts back `Household_Model__c` when Previous
-Values holds it (NPSP rows do not). An Account that still has Household Member rows is Not
-Restored with the reason, because a household with members cannot stop being one; the
-Migration Assistant undoes the members step (`kit_npc_household_members`) first.
+**R-HA9 Undo of an NPC conversion.** Undo also puts back `Household_Model__c` when Previous
+Values holds it (NPSP rows do not), then removes the membership rows the run created, after the
+record type is back so the emptied Account is never tidied away. An Account with any other
+Household Member row is Not Restored with the reason, because a household with members cannot
+stop being one.
 
 ### Salesforce implementation
 
@@ -13419,10 +13427,11 @@ Migration Assistant undoes the members step (`kit_npc_household_members`) first.
   panel is `npspHouseholdAdoption`, shown on the General page of BarnCRM Settings only when
   NPSP is detected, the coexistence mode is NPSP, or rows exist.
 - **Nonprofit Cloud source (R-HA7):** Mirror's `NpcHouseholdSource` extends
-  `NpspHouseholdSource`; Mirror's kit `NPC_Households` (extension `NpcHouseholdsKit`) has the
-  tool step `households` and the import step `members`, whose template
-  `kit_npc_household_members` loads `Household_Member__c`. Native names read as text, never
-  written: `PartyRelationshipGroup` (`AccountId`, `Type`) and `AccountContactRelation`
+  `NpspHouseholdSource` and is also the extension of Mirror's kit `NPC_Households`, whose one
+  tool step `households` opens this panel and whose check counts native household Accounts
+  against converted ones. It also answers Mirror's Health Check drift report (R-H15). Native
+  names read as text, never written: `PartyRelationshipGroup` (`AccountId`, `Type`) and
+  `AccountContactRelation`
   (`AccountId`, `ContactId`, `IsPrimaryMember`, `Roles`, `IsActive`, `StartDate`, `EndDate`). The
   same panel with the NPC source is the General settings row `NPC_Household_Conversion`, shown
   only when that source is available or NPC rows exist.
@@ -18686,7 +18695,7 @@ mirrors the primary member).
 | 1.45 | 2026-11-11 | Event Management attendee app, personal agenda and event operations, and the service and partner portal templates (EV-22 to EV-25, EV-28, EV-29, PB-04, PB-05, D-190, D-118; ADR-0215 `0215-events-attendee-app-operations-portal-templates.md`). New Sections 29EV31 Event Venue (`Event_Venue__c`, R-EVN1), 29EV32 Event Room (`Event_Room__c`), 29EV33 Event Expense (`Event_Expense__c`, R-EXP1), 29EV34 Event Funding (`Event_Funding__c`), 29EV35 Sponsor Lead (`Sponsor_Lead__c`, R-SLD1, R-SLD2), 29EV36 Agenda Item (`Agenda_Item__c`, R-AGI1, R-AGI2), 29EV37 Attendee Connection (`Attendee_Connection__c`, R-ACN1, R-ACN2), 29EV38 Attendee Message (`Attendee_Message__c`, R-AMS1) and 29EV39 Event Announcement (`Event_Announcement__c`). `Event__c` gains `Venue__c`; `Event_Session__c` gains `Venue_Room__c`, `Level__c`, `Slides_URL__c`, `Recording_URL__c`, `Sponsor__c` and `Agenda_Picks__c`, and Session Type gains Lightning Talk and Roundtable; `Event_Speaker__c` gains `Headshot_URL__c`, `LinkedIn_URL__c`, `Website_URL__c`, `Agreement_Signed__c`, `Slides_Received__c` and `Dry_Run_Done__c`; `Event_Attendee__c` gains `Networking_Opt_In__c`, `Networking_Headline__c`, `Networking_Bio__c`, `Networking_Contact__c`, `Share_With_Sponsors__c`, `Sponsor__c` and `Attendee_Name__c` (R-EAT5); `Event_Sponsor__c` gains `Booth__c`; `Events_Settings__c` gains `Attendee_Messages__c` and `Allow_Agenda_Overlaps__c` (both false); `Referral__c` gains `Partner_Organization__c` and `Shared_With_Partner__c` (R-RF5). R-PB2 gains a catalog page's `personScope` and the `calendar`, `download` and `scan` client options. |
 | 1.46 | 2026-11-12 | Programs and other modules review fixes (W10). No object added. R-DS1: Due Date has no field default and is filled by a registry automation (`Data_Subject_Request_Due`). R-GN12: a second Start Renewal is refused. R-MO1: Close Voting needs Voting Open. Territory runs read 50 records a chunk when a kind has more than 10 active rules (R-TM3). |
 | 1.47 | 2026-11-12 | Giving and money review fixes (W10). No object added. `Giving_Settings__c.Donation_Page_Minimum_Amount__c` (Currency, default 5) and a cap of 30 checkouts per appeal per hour (R-AP5). `Gift__c.Payment_Reference__c` becomes an external ID; `Appeal__c.Donation_Form_Key__c` is labelled Donation Form ID. Payments listeners may answer `paymentsChanged` with every changed payment of a run; a gift moves through Pending or Received one step per update when the status rules require it (R-G16, R-G3). |
-| 1.48 | 2026-11-12 | Nonprofit Cloud household coexistence and conversion (MIG-02b, D-196; ADR-NEXT `NEXT-household-model-coexistence.md`, ADR-NEXT `NEXT-npc-household-conversion.md`). Account gains `Household_Model__c` (Automatic, Nonprofit Cloud, Converted; rule R-H15), read by the mutual exclusion guards before detection. Household Adoption (Section 29ZQ) gains rules R-HA7 to R-HA9: a Nonprofit Cloud source supplied by Mirror, NPC run ids, `Household_Model__c` journaled and put back, undo waits for members. Mirror ships kit `NPC_Households` with template `kit_npc_household_members`. No object added. |
+| 1.48 | 2026-11-12 | Nonprofit Cloud household coexistence and conversion (MIG-02b, D-196; ADR-NEXT `NEXT-household-model-coexistence.md`, ADR-NEXT `NEXT-npc-household-conversion.md`). Account gains `Household_Model__c` (Automatic, Nonprofit Cloud, Converted; rule R-H15), read by the mutual exclusion guards before detection. Household Adoption (Section 29ZQ) gains rules R-HA7 to R-HA9: a Nonprofit Cloud source supplied by Mirror, NPC run ids, Junction members joined with primary, role and dates, `Household_Model__c` and the new membership rows journaled and undone. Mirror ships kit `NPC_Households` (one tool step) and a Health Check drift report. No object added. |
 
 ---
 ## 32. Entity ownership by package
