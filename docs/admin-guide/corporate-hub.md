@@ -17,6 +17,9 @@ organization in good standing:
   and switched off until you adapt them.
 - **Agreements** (CH-08): contracts, leases and subscriptions with their end, renewal and notice
   dates.
+- **Data protection** (CH-05): a record of processing activities, data subject requests linked
+  to Core's Erase a Person, DPIA review dates and a personal data breach log with its 72-hour
+  deadline, plus GDPR starter templates.
 - **Board governance** (CH-09 to CH-20): boards and committees with seats and terms, meetings
   with attendance, quorum, packets, minutes approval, motions and votes, carried action items, an
   availability poll, yearly conflict-of-interest disclosures, a board self-assessment and a board
@@ -43,7 +46,10 @@ page, does three things, each safe to run again:
 
 The **Corporate Hub**, **Library Documents**, **Compliance Obligations**, **Agreements**,
 **Boards and Committees** and **Board Meetings** tabs join the BarnCRM and BarnCRM Console apps
-before Error Log. Corporate Hub has no app of its own.
+before Error Log. Corporate Hub has no app of its own. The **Processing Activities**, **Data
+Subject Requests** and **Data Breaches** tabs are not added to the apps' menus (most
+organizations open them rarely): find them in the App Launcher, or add them to an app's
+navigation yourself.
 
 ## Access
 
@@ -59,7 +65,10 @@ each acknowledgment is owned by, and visible to, the person asked (and admins). 
 Committees and Board Meetings are readable and editable by every holder of a Staff or Admin set;
 seats, motions, votes, attendees, action items and assessments follow their board or meeting.
 Only admins delete board records, mark minutes approved, request disclosures from the board and
-start a self-assessment.
+start a self-assessment. Processing Activities are readable by everyone and editable by their
+owner and admins. Data Subject Requests and Data Breaches are private: each is visible to its
+owner and to admins (Corporate Hub Admin sees and edits every one); Staff create and edit their
+own, Read Only reads their own.
 
 ## Settings
 
@@ -92,6 +101,13 @@ records you can change:
 | Whistleblower policy | Library Document, Draft, needs acknowledgment | CH-07 |
 | Document retention and destruction policy | Library Document, Draft | CH-07 |
 | Gift acceptance policy | Library Document, Draft | CH-07 |
+| Record of processing review | Compliance Obligation, Off, yearly, category Data Protection | CH-05 |
+| Data protection impact assessment (DPIA) reviews | Compliance Obligation, Off, yearly, category Data Protection | CH-05 |
+| Data protection policy | Library Document, Draft, needs acknowledgment | CH-05 |
+| Privacy notice | Library Document, Draft | CH-05 |
+| Data subject request procedure | Library Document, Draft | CH-05 |
+| Personal data breach response procedure | Library Document, Draft, needs acknowledgment | CH-05 |
+| Donor records and fundraising, Email newsletter, Volunteer management, Program participants, Staff and board records | Processing Activity, Draft (one each) | CH-05 |
 
 To use an obligation template: open it, set **Next Due Date**, the owner and the jurisdiction,
 adjust the recurrence (for example Every Two Years for a biennial state report), then set
@@ -150,6 +166,56 @@ its renewal term, **Notice Days** (the **Notice Date** is worked out), value, te
 signed copy in Files. The owner is reminded before the notice date (or the end date when no notice
 is set). Each night an Active, auto-renewing agreement past its end date moves on by its term,
 and any other Active agreement past its end date becomes Expired.
+
+## Data Protection
+
+The data protection set (CH-05) is for organizations under the GDPR or a similar law (UK GDPR,
+for example). It records what you do; it decides nothing for you and sends nothing outside
+Salesforce.
+
+### Processing Activities
+
+A **Processing Activity** is one line of your record of processing: its purpose, **Lawful
+Basis** (Consent, Contract, Legal Obligation, Vital Interests, Public Task or Legitimate
+Interests), the data subjects and categories of data, any special category data, recipients,
+transfers outside the country, retention and security measures. Status is Draft, Active or
+Retired. The five starter activities load as Draft with suggested wording; check each against
+what you really do, fill in the lawful basis where it is blank, and set it Active.
+
+Tick **DPIA Required** for an activity that needs a data protection impact assessment, record
+**DPIA Reviewed On** and set the **DPIA Review Date**: the owner of an Active activity gets one
+bell reminder before that date.
+
+### Data Subject Requests
+
+Log each request a person makes about their data as a **Data Subject Request** (numbered
+DSR-00001 on): the **Request Type** (Access, Rectification, Erasure, Restriction, Portability,
+Objection or Other), the person (a Contact, when you have one) or the requester's name and email,
+the date received (today by default) and the **Due Date** (received plus 30 days by default;
+change it when you extend the deadline). Tick **Identity Verified** once checked. Status is
+Received, In Progress, Completed, Refused or Withdrawn; a closed request needs its **Completed
+Date**. The owner gets one bell reminder before the due date.
+
+For an erasure request, run Core's **Erase a Person** on the person and enter the request
+number (for example DSR-00001) as its **Request Reference**. That night the request's **Erasure
+Record** is filled with the erasure, so the request shows what was done. Its status is not
+changed: close it yourself once you have replied.
+
+### Data Breaches
+
+Log every personal data breach as a **Data Breach**, even one you will not report:
+**Discovered At** (now by default), when it happened, what data and how many people are affected,
+the **Risk** (Not Yet Assessed, Unlikely to Result in Risk, Risk or High Risk), the decision on
+notifying and the actions taken. **Authority Deadline** is 72 hours after discovery. Until you
+record **Authority Notified At**, the owner of an open breach whose risk is not Unlikely to
+Result in Risk gets a bell reminder before the deadline, and the breach shows on the Corporate
+Hub page. Record **People Notified At** when you tell the people affected. A breach cannot be
+closed while its risk is Not Yet Assessed.
+
+### On the Corporate Hub Page
+
+A **Data Protection** section lists open data subject requests by due date and breaches not
+yet reported, for the people who can see them. It does not show when there are none.
 
 ## Board Governance
 
@@ -246,5 +312,5 @@ Board Roster, Terms Ending Next 90 Days, Attendance This Year and Open Board Dis
 ## Removing the Module
 
 Uninstalling deletes every Library Document, acknowledgment, obligation, cycle and agreement
-record, and every board, seat, meeting, attendee, motion, vote, action item and assessment. Files stay in Salesforce Files, unlinked. The Module Manager's report counts the records
+record, every processing activity, data subject request and data breach, and every board, seat, meeting, attendee, motion, vote, action item and assessment. Files stay in Salesforce Files, unlinked. The Module Manager's report counts the records
 first.

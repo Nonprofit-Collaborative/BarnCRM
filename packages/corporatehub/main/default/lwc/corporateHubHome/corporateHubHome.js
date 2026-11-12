@@ -61,6 +61,7 @@ export default class CorporateHubHome extends LightningElement {
       noObligations: helpText('CorporateHub', 'CorporateHub_Home_NoObligations'),
       agreements: helpText('CorporateHub', 'CorporateHub_Home_Agreements'),
       noAgreements: helpText('CorporateHub', 'CorporateHub_Home_NoAgreements'),
+      privacy: helpText('CorporateHub', 'CorporateHub_Home_Privacy'),
       haveRead: helpText('CorporateHub', 'CorporateHub_Home_HaveRead'),
       addTemplates: helpText('CorporateHub', 'CorporateHub_Home_AddTemplates')
     };
@@ -114,6 +115,15 @@ export default class CorporateHubHome extends LightningElement {
 
   get hasAgreements() {
     return this.agreements.length > 0;
+  }
+
+  /** CH-05: open data subject requests and unreported breaches; the section hides when empty. */
+  get privacy() {
+    return this.decorate(this.home && this.home.privacy);
+  }
+
+  get hasPrivacy() {
+    return this.privacy.length > 0;
   }
 
   get canManage() {

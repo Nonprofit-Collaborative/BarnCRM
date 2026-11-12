@@ -13,6 +13,8 @@ Open the **Corporate Hub** tab. It shows:
 - **Compliance Due**: obligations that are overdue or due in the next 60 days, soonest first,
   with their owner.
 - **Agreements to Act On**: agreements whose notice date (or end date) is in the next 90 days.
+- **Data Protection**: open data subject requests by due date and personal data breaches not yet
+  reported to the authority, when there are any you can see.
 
 Admins also see **Add Missing Templates**, which loads any shipped template the org does not
 have yet.
@@ -66,11 +68,28 @@ Open action items from earlier meetings are listed on each later meeting until s
 them Done. To find a time before scheduling, leave Start blank, fill in up to three Poll Times
 and press **Send Poll**; then press **Choose This Time** on the time that suits most people.
 
+## Data Protection
+
+Open these from the App Launcher:
+
+- **Data Subject Requests**: when someone asks to see, correct, delete or move their data, or
+  objects to how it is used, create a request with its type and the person. The due date is 30
+  days after it was received. Tick **Identity Verified** once you have checked who they are,
+  write your reply in **Response**, and set the status to Completed (with the date) or Refused.
+  For a deletion, your admin runs **Erase a Person** with the request number as the reference;
+  the request then shows the erasure.
+- **Data Breaches**: log any loss or leak of personal data straight away, even a small one.
+  **Authority Deadline** is 72 hours after you found it. Record the risk, whether and when you
+  told the authority and the people affected, and what you did.
+- **Processing Activities**: your organization's record of why it uses personal data, and on
+  what lawful basis.
+
 ## Reminders
 
 When you own an obligation, agreement or document, a bell notification reminds you before it is
 due (30 days by default). One reminder goes per due date. When you own a board, you are reminded
-once before each member's term ends.
+once before each member's term ends. When you own a data subject request, a breach not yet
+reported, or a processing activity with a DPIA review date, you are reminded before its date.
 
 > Templates and starter policies are general guidance, not legal advice. Check with your
 > organization's counsel or accountant.

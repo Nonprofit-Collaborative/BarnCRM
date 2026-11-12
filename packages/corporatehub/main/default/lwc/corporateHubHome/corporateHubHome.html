@@ -87,6 +87,21 @@
           <p class="slds-text-color_weak" data-id="no-agreements">{labels.noAgreements}</p>
         </template>
       </section>
+
+      <template lwc:if={hasPrivacy}>
+        <section class="slds-var-m-top_medium" data-id="privacy">
+          <h2 class="slds-text-heading_small slds-var-m-bottom_x-small">{labels.privacy}</h2>
+          <ul class="slds-has-dividers_bottom-space">
+            <template for:each={privacy} for:item="row">
+              <li key={row.id} class="slds-item">
+                <a href={row.href}>{row.name}</a>
+                <div class={row.dueClass}>{row.dueText}</div>
+                <div class="slds-text-color_weak">{row.status}</div>
+              </li>
+            </template>
+          </ul>
+        </section>
+      </template>
     </c-barn-page-shell>
   </template>
 </template>
