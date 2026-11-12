@@ -11427,6 +11427,12 @@ Deleting a person, not erasing them, keeps the referral, which no longer names t
 | Status | `Status__c` | Picklist, restricted, required, default Open |
 | Outcome | `Outcome__c` | Picklist, restricted, not required |
 | Notes | `Notes__c` | Long Text Area(32768) |
+| Partner Organization | `Partner_Organization__c` | Lookup to Account, delete constraint SetNull, relationship name Partner_Referrals (PB-05, R-RF5) |
+| Shared With Partner | `Shared_With_Partner__c` | Checkbox, default false (PB-05, R-RF5) |
+
+**R-RF5 A partner sees only what is shared (PB-05).** The partner portal shows a referral to a
+person with a Current affiliation to its Partner Organization only while Shared With Partner is on,
+and never its notes.
 
 - **Validation rules:** `Exactly_One_Person` (R-RF1).
 - **Erasure:** `ProgramsErasureExtension` with `ReferralSelector` (without sharing, system mode
@@ -13921,6 +13927,7 @@ registration form is shown while the status is Open and now is inside the regist
 | Review Criteria | `Review_Criteria__c` | Long Text Area(5000), JSON (EV-21) |
 | Blind Review | `Blind_Review__c` | Checkbox, default false (EV-21) |
 | Session Rating Form Key | `Session_Rating_Form_Key__c` | Text(18): the Forms form for session ratings, by record identifier (EV-27, ADR-0014) |
+| Venue | `Venue__c` | Lookup(Event Venue), Clear on delete (EV-24): saving fills a blank Venue Name and Venue Address from it (R-EVN1) |
 
 - **Validation rules:** `End_After_Start` (R-EV1), `Capacity_Above_Zero` (R-EV2),
   `Registration_Closes_After_Opens` (R-EV3).
@@ -14135,6 +14142,14 @@ by drag and drop or by keyboard saves its Track and nothing else.
 | Ratings | `Rating_Count__c` | Roll-Up Summary (COUNT Session Rating) (EV-27) |
 | Rating Total | `Rating_Total__c` | Roll-Up Summary (SUM Session Rating Rating) (EV-27) |
 | Average Rating | `Average_Rating__c` | Formula (Number, 1 decimal) (EV-27) |
+| Room Record | `Venue_Room__c` | Lookup(Event Room), Clear on delete (EV-24): saving copies the room's name into Room and its capacity into a blank Capacity (R-EVN1) |
+| Level | `Level__c` | Picklist (All Levels, Beginner, Intermediate, Advanced), restricted (EV-25) |
+| Slides Link | `Slides_URL__c` | URL(255) (EV-25) |
+| Recording Link | `Recording_URL__c` | URL(255) (EV-25) |
+| Sponsored By | `Sponsor__c` | Lookup(Event Sponsor), Clear on delete, filter: same event (EV-25) |
+| Agenda Picks | `Agenda_Picks__c` | Roll-Up Summary (COUNT Agenda Item) (EV-29, R-AGI1) |
+
+Session Type is the session's format (EV-25) and gains Lightning Talk and Roundtable.
 
 - **Validation rules:** `Start_And_End_Together`, `End_After_Start` (R-ESN1),
   `Inside_Event_Dates` (R-ESN2), `Capacity_Above_Zero`.
@@ -14191,6 +14206,12 @@ which the Agenda Builder does not show.
 | Travel Needs | `Travel_Needs__c` | Text Area(255) |
 | AV Needs | `AV_Needs__c` | Text Area(255) |
 | Speaker Key | `Speaker_Key__c` | Text(40), unique, set by BarnCRM |
+| Headshot Link | `Headshot_URL__c` | URL(255) (EV-25) |
+| LinkedIn | `LinkedIn_URL__c` | URL(255) (EV-25) |
+| Website | `Website_URL__c` | URL(255) (EV-25) |
+| Agreement Signed | `Agreement_Signed__c` | Checkbox, default false (EV-25) |
+| Slides Received | `Slides_Received__c` | Checkbox, default false (EV-25) |
+| Dry Run Done | `Dry_Run_Done__c` | Checkbox, default false (EV-25) |
 
 - **Validation rule:** `Person_Required_When_Created` (R-ESP1).
 - **Automation:** `EventKeyHandler` through the registry row `Event_Speaker_Key` (always runs).
@@ -14383,6 +14404,17 @@ that is not cancelled is not added again.
 | Badge Name | `Badge_Name__c` | Text(80) (EV-26) |
 | Badge Title | `Badge_Title__c` | Text(80) (EV-26) |
 | Badge Company | `Badge_Company__c` | Text(80) (EV-26) |
+| Show Me in the Attendee List | `Networking_Opt_In__c` | Checkbox, default false (EV-22, R-EAT5) |
+| Headline | `Networking_Headline__c` | Text(120) (EV-22) |
+| About Me | `Networking_Bio__c` | Long Text Area(1000) (EV-22) |
+| How to Reach Me | `Networking_Contact__c` | Text(255), copied only to accepted connections (EV-22, R-ACN2) |
+| Share My Details With Sponsors | `Share_With_Sponsors__c` | Checkbox, default false (EV-28, R-SLD2) |
+| Booth Staff For | `Sponsor__c` | Lookup(Event Sponsor), Clear on delete (EV-28, R-SLD1) |
+| Attendee Name | `Attendee_Name__c` | Formula (Text): the person's first and last name, for the attendee list (EV-22) |
+
+**R-EAT5 The attendee list is opt-in (EV-22).** Only attendees who are not Cancelled and have Show
+Me in the Attendee List on are listed, only to people attending the same event, and only by name,
+badge title and company, headline and about; never email, phone or address.
 
 **R-EAT3 Each email goes once.** The morning run stamps an attendee before emailing it and clears
 the stamp when the send fails; clearing a stamp by hand sends that email again.
@@ -14740,6 +14772,7 @@ object of another module.
 | Notes | `Notes__c` | Text Area(255) |
 | Deliverables | `Deliverables_Total__c` | Roll-Up Summary (COUNT Sponsor Deliverable) |
 | Deliverables Done | `Deliverables_Done__c` | Roll-Up Summary (COUNT Sponsor Deliverable, Status = Done) |
+| Booth | `Booth__c` | Text(80): where the sponsor's booth or table is, for the attendee app (EV-22) |
 
 - **Core seam:** `LinkedRecords` (R-SP4).
 - **Panel:** the Sponsors tab of the event page (`eventSponsors`), with `EventSponsorsController`
@@ -14839,13 +14872,16 @@ reads as its shipped value.
 | Payment note | `Public_Payment_Note__c` | Text(255), default "Pay at the door or by arrangement with us." |
 | Take payment online | `Online_Payments__c` | Checkbox, default false (EV-20) |
 | Payment link email template | `Payment_Link_Template__c` | Text(80), default BarnCRM_Event_Payment_Link (EV-20) |
+| Attendee messages | `Attendee_Messages__c` | Checkbox, default false (EV-22, R-AMS1) |
+| Allow overlapping picks | `Allow_Agenda_Overlaps__c` | Checkbox, default false (EV-29, R-AGI1) |
 
 - **Setting Definitions:** `Events_Reminders_Enabled`, `Events_Reminder_Lead_Days`,
   `Events_Reminder_Template`, `Events_Follow_Ups_Enabled`, `Events_Follow_Up_Template`,
   `Events_Mark_No_Shows` (sort 10 to 60), `Events_Accept_Notice_Template` (70),
   `Events_Decline_Notice_Template` (80), `Events_Survey_Template` (55),
   `Events_Public_Payment_Note` (90), `Events_Online_Payments` (92),
-  `Events_Payment_Link_Template` (94), section Events (Core's `SettingSections.EVENTS`).
+  `Events_Payment_Link_Template` (94), `Events_Attendee_Messages` (96),
+  `Events_Allow_Agenda_Overlaps` (98), section Events (Core's `SettingSections.EVENTS`).
 - **Automation:** the nightly step `EventEmailScheduler` (7:30 AM, through
   `EventsNightlyJobProvider`) starts `EventEmailBatch`; the work is `EventEmailService`. Email
   templates `BarnCRM_Event_Reminder`, `BarnCRM_Event_Follow_Up`, `BarnCRM_Event_Survey`,
@@ -14980,6 +15016,377 @@ that off; Suggest Seating places whole parties and never fills a sponsor table.
 
 ---
 
+## 29EV31. Event Venue
+
+### Definition
+
+A place events are held, kept once and picked on each event (EV-24, ADR-NEXT
+`NEXT-events-attendee-app-operations-portal-templates.md`, decision 14).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Venue Name | text | yes | The venue's name. |
+| Address | text | no | The street address, as written on a page or badge. |
+| Capacity | number | no | The most people the venue holds. |
+| Map Link | URL | no | A map or floor plan, shown in the attendee app. |
+| Notes | long text | no | Parking, access, loading and contacts. |
+
+### Rules
+
+**R-EVN1 Picking fills what is blank.** Saving an event with a venue fills its blank Venue Name
+and Venue Address from the venue; saving a session with a room fills its Room text with the
+room's name and a blank Capacity with the room's capacity (`EventOperationsHandler`, registry row
+`Event_Venue_Fill`, and `Session_Room_Fill`). Later changes to a venue or room are not pushed to
+events already saved.
+
+### Salesforce implementation
+
+- **Object:** `Event_Venue__c`, name field Text, label Venue Name, sharing Public Read/Write, tab
+  Venues with list views All Venues and My Venues.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Address | `Address__c` | Text Area(255) |
+| Capacity | `Capacity__c` | Number(7, 0) |
+| Map Link | `Map_URL__c` | URL(255) |
+| Notes | `Notes__c` | Long Text Area(5000) |
+
+---
+
+## 29EV32. Event Room
+
+### Definition
+
+A room in a venue (EV-24), with its capacity and setup, picked on sessions.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Room Name | text | yes | The room's name, as the agenda shows it. |
+| Venue | reference to Event Venue | yes | The venue. |
+| Capacity | number | no | The seats in its usual setup. |
+| Setup | picklist | no | Theater, Classroom, Banquet, Boardroom, Reception, U-Shape, Other. |
+| Where | text | no | How to find it (floor, wing), shown in the attendee app. |
+
+### Salesforce implementation
+
+- **Object:** `Event_Room__c`, name field Text, label Room Name, master-detail to Event Venue
+  (`Venue__c`, relationship Rooms), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Venue | `Venue__c` | Master-Detail(Event Venue) |
+| Capacity | `Capacity__c` | Number(6, 0) |
+| Setup | `Setup__c` | Picklist, restricted |
+| Where | `Location__c` | Text(255) |
+
+---
+
+## 29EV33. Event Expense
+
+### Definition
+
+One line of an event's budget (EV-23, decision 16): what it is for, what was budgeted and what
+was actually spent.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Item | text | yes | What the money is for. |
+| Event | reference to Event | yes | The event. |
+| Category | picklist | yes | Venue, Food and Beverage, Audio Visual, Speakers, Travel, Marketing, Printing, Staff, Technology, Other. |
+| Budgeted | currency | no | The planned amount. |
+| Actual | currency | no | What was spent. |
+| Vendor | text | no | Who is paid. |
+| Status | picklist | yes | Planned, Committed or Paid. Default Planned. |
+| Due Date | date | no | When payment is due. |
+
+### Rules
+
+**R-EXP1 Net cost.** The Budget panel and the dashboard show Net Cost: the event's actual spend
+less its funding received (29EV34) and its registrations' Amount Paid. Budgeted Net Cost uses
+budgeted spend and expected funding. Computed on read, never stored.
+
+### Salesforce implementation
+
+- **Object:** `Event_Expense__c`, name field Text, label Item, master-detail to Event (`Event__c`,
+  relationship Expenses), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Category | `Category__c` | Picklist, restricted, required |
+| Budgeted | `Budgeted__c` | Currency(16, 2) |
+| Actual | `Actual__c` | Currency(16, 2) |
+| Vendor | `Vendor__c` | Text(120) |
+| Status | `Status__c` | Picklist (Planned, Committed, Paid), restricted, required, default Planned |
+| Due Date | `Due_Date__c` | Date |
+
+- **Panel:** the Budget panel on the Details tab (`eventBudget`), with `EventBudgetController`
+  (thin, user mode) and the framework-free `eventBudgetModel`.
+
+---
+
+## 29EV34. Event Funding
+
+### Definition
+
+Money a sponsor or partner gives toward the event (EV-23): sponsorship payments, partner or
+market development funds (MDF), grants and in-kind value, expected and received.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Source | text | yes | Who gives it. |
+| Event | reference to Event | yes | The event. |
+| Type | picklist | yes | Sponsorship, Partner Funds (MDF), Grant, In-Kind, Other. |
+| Partner Organization | reference to Account | no | The organization, when it is a record. |
+| Sponsor | reference to Event Sponsor | no | The sponsor of this event it comes from. |
+| Expected | currency | no | What was promised. |
+| Received | currency | no | What has arrived. |
+
+### Salesforce implementation
+
+- **Object:** `Event_Funding__c`, name field Text, label Source, master-detail to Event
+  (`Event__c`, relationship Funding), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Type | `Type__c` | Picklist, restricted, required |
+| Partner Organization | `Account__c` | Lookup(Account), Clear on delete |
+| Sponsor | `Event_Sponsor__c` | Lookup(Event Sponsor), Clear on delete, filter: same event |
+| Expected | `Expected__c` | Currency(16, 2) |
+| Received | `Received__c` | Currency(16, 2) |
+
+---
+
+## 29EV35. Sponsor Lead
+
+### Definition
+
+An attendee a sponsor's staff scanned at the booth (EV-28, decisions 12 and 13).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Sponsor | reference to Event Sponsor | yes | The sponsorship the lead belongs to. |
+| Scanned By | reference to Person | yes | The sponsor's contact or booth staff member who scanned. |
+| Badge Code | text | yes | The QR code read: the attendee's record identifier. |
+| Attendee | reference to Event Attendee | no | Set only when the attendee shares their details. |
+| Status | picklist | yes | Lead, Not Shared, Not Found, Already Scanned. |
+| Name, Email, Title, Company | text | no | Copied from the attendee only for a Lead. |
+| Notes | long text | no | The rep's notes. |
+| Interest | picklist | no | Hot, Warm, Cold. |
+
+### Rules
+
+**R-SLD1 A scanner belongs to a sponsorship.** The scanner is the sponsor's Contact or an attendee
+whose Booth Staff For names the sponsor; the lead goes to the scanner's sponsorship at the scanned
+attendee's event, else (code not found) the scanner's latest sponsorship. A scanner with none is
+refused.
+
+**R-SLD2 Only opted-in attendees become leads.** With Share My Details With Sponsors on, the lead
+is Lead and copies name, email, title and company; otherwise Not Shared and nothing about the
+attendee is kept. A second scan of one attendee for one sponsor is Already Scanned. Exports hold
+Lead rows only.
+
+### Salesforce implementation
+
+- **Object:** `Sponsor_Lead__c`, name field Auto Number (`LEAD-{000000}`), master-detail to Event
+  Sponsor (`Event_Sponsor__c`, relationship Leads), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Sponsor | `Event_Sponsor__c` | Master-Detail(Event Sponsor), set on save |
+| Scanned By | `Scanned_By__c` | Lookup(Contact), Clear on delete |
+| Badge Code | `Badge_Code__c` | Text(40) |
+| Attendee | `Event_Attendee__c` | Lookup(Event Attendee), Clear on delete |
+| Status | `Status__c` | Picklist, restricted, set on save |
+| Name | `Lead_Name__c` | Text(121) |
+| Email | `Lead_Email__c` | Email |
+| Title | `Lead_Title__c` | Text(80) |
+| Company | `Lead_Company__c` | Text(80) |
+| Notes | `Notes__c` | Long Text Area(2000) |
+| Interest | `Interest__c` | Picklist (Hot, Warm, Cold), restricted |
+| Lead Key | `Lead_Key__c` | Text(40), unique, set on save for a Lead |
+
+- **Automation:** `EventOperationsHandler` through the registry row `Sponsor_Lead_Scan` (always
+  runs), reading in system mode in its inner `ScanReader` (Without Sharing Register).
+
+---
+
+## 29EV36. Agenda Item
+
+### Definition
+
+A session an attendee picked for their own agenda (EV-29, decisions 8 and 9).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Session | reference to Event Session | yes | The session. |
+| Person | reference to Person | yes | Who picked it. |
+| Overlaps | checkbox | no | Set when overlapping picks are allowed and it overlaps another. |
+| My Rating | picklist | no | 1 to 5, once the session has started. |
+| My Comment | long text | no | Sent with the rating. |
+| Rated | checkbox | no | Set once the rating was sent. |
+
+### Rules
+
+**R-AGI1 A pick fits.** A person picks a session once; not when its Agenda Picks have reached its
+Capacity; not when it overlaps another of their picks unless Allow overlapping picks is on, and
+then it is marked Overlaps.
+
+**R-AGI2 A rating is sent once and names no one.** The first My Rating saved after the session
+starts adds one Session Rating (29EV27) with the comment and sets Rated; a rating before the
+start, or a change after Rated, is refused.
+
+### Salesforce implementation
+
+- **Object:** `Agenda_Item__c`, name field Auto Number (`AGI-{000000}`), master-detail to Event
+  Session (`Event_Session__c`, relationship Agenda_Items), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Session | `Event_Session__c` | Master-Detail(Event Session) |
+| Person | `Contact__c` | Lookup(Contact), Clear on delete |
+| Overlaps | `Overlaps__c` | Checkbox, default false |
+| My Rating | `My_Rating__c` | Picklist (1 to 5), restricted |
+| My Comment | `My_Comment__c` | Long Text Area(2000) |
+| Rated | `Rated__c` | Checkbox, default false |
+| Pick Key | `Pick_Key__c` | Text(40), unique, set by BarnCRM |
+
+- **Automation:** `EventOperationsHandler` through the registry row `Agenda_Item_Rating` (always
+  runs).
+
+---
+
+## 29EV37. Attendee Connection
+
+### Definition
+
+One side of a connection between two attendees of an event (EV-22, decision 6): each person has
+their own row.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Event | reference to Event | yes | The event they met at. |
+| Person | reference to Person | yes | Whose row it is. |
+| Other Person | reference to Person | yes | Who they connect with. |
+| Other Attendee | reference to Event Attendee | no | The other person's attendee row, for their headline. |
+| Status | picklist | yes | Requested, Wants to Connect, Connected, Declined. |
+| How to Reach Them | text | no | The other's How to Reach Me, copied on accept. |
+| Note | long text | no | The person's private note. |
+| Message to Send | long text | no | A draft that Send Message sends. |
+
+### Rules
+
+**R-ACN1 One pair once per event.** The pair key (event, person, other person) is unique.
+
+**R-ACN2 Contact details only between accepted connections.** How to Reach Them is filled on
+both rows when accepted and never before; Declined hides both rows and blocks a new request.
+
+### Salesforce implementation
+
+- **Object:** `Attendee_Connection__c`, name field Auto Number (`CON-{000000}`), master-detail to
+  Event (`Event__c`, relationship Attendee_Connections), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Person | `Contact__c` | Lookup(Contact), Clear on delete |
+| Other Person | `Other_Contact__c` | Lookup(Contact), Clear on delete |
+| Other Attendee | `Other_Attendee__c` | Lookup(Event Attendee), Clear on delete |
+| Status | `Status__c` | Picklist, restricted, required |
+| How to Reach Them | `Contact_Details__c` | Text(255) |
+| Note | `Note__c` | Long Text Area(1000) |
+| Message to Send | `Draft_Message__c` | Long Text Area(2000) |
+| Pair Key | `Pair_Key__c` | Text(60), unique, set by BarnCRM |
+
+---
+
+## 29EV38. Attendee Message
+
+### Definition
+
+A message one attendee sent another they are connected with (EV-22, decision 7).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Event | reference to Event | yes | The event. |
+| From | reference to Person | yes | The sender. |
+| To | reference to Person | yes | The recipient. |
+| Message | long text | yes | What was sent. |
+| Sent At | date and time | yes | When. |
+| Reply | long text | no | The recipient's draft reply, which Reply sends as a new message. |
+
+### Rules
+
+**R-AMS1 Messages are off until turned on, and only between connections.** With Attendee messages
+off nothing is sent; on, a person sends only to a Connected connection, at most 50 a day.
+
+### Salesforce implementation
+
+- **Object:** `Attendee_Message__c`, name field Auto Number (`MSG-{000000}`), master-detail to
+  Event (`Event__c`, relationship Attendee_Messages), sharing Controlled by Parent.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| From | `From_Contact__c` | Lookup(Contact), Clear on delete |
+| To | `To_Contact__c` | Lookup(Contact), Clear on delete |
+| Message | `Body__c` | Long Text Area(2000) |
+| Sent At | `Sent_At__c` | DateTime |
+| Reply | `Reply__c` | Long Text Area(2000) |
+
+---
+
+## 29EV39. Event Announcement
+
+### Definition
+
+News for an event's attendees, shown in the attendee app once its time comes (EV-22, decision 10).
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Title | text | yes | The headline. |
+| Event | reference to Event | yes | The event. |
+| Message | long text | yes | The announcement. |
+| Publish At | date and time | yes | Shown from then on. Default now. |
+
+### Salesforce implementation
+
+- **Object:** `Event_Announcement__c`, name field Text, label Title, master-detail to Event
+  (`Event__c`, relationship Announcements), sharing Controlled by Parent; a related list on the
+  event page.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Event | `Event__c` | Master-Detail(Event) |
+| Message | `Body__c` | Long Text Area(5000), required |
+| Publish At | `Publish_At__c` | DateTime, required, default `NOW()` |
+
+- **Actions:** the attendee app's actions (`Events.Connect`, `Events.AcceptConnection`,
+  `Events.DeclineConnection`, `Events.SendMessage`, `Events.SendReply`, `Events.AddToAgenda`,
+  `Events.RemoveFromAgenda`) are `EventAttendeeApp`, reached through `EventsPortalExtension`
+  (Without Sharing Register, Portal).
+
+---
+
 ## 29PB1. Portal
 
 ### Definition
@@ -15011,7 +15418,13 @@ logged, never partly used. Pages are `person` (Contact, the verified person), `r
 object whose `personField` looks up to Contact) or `catalog` (a custom object, read only, with fixed
 `where` tests). Editable fields are updateable, of a safe type, never a lookup. A related page's
 `personField` may be `Parent__r.Contact__c` (one parent hop to a lookup to Contact, ADR-0191
-`0191-portal-templates-volunteer-speaker-donor.md`): such a page is read only.
+`0191-portal-templates-volunteer-speaker-donor.md`): such a page is read only. A catalog page may
+name a `personScope` (ADR-NEXT `NEXT-events-attendee-app-operations-portal-templates.md`): only
+records whose field is one of the values a custom scope object holds for the person (its own
+lookup to Contact, its own fixed tests, at most 200 values) are shown or acted on. A page may name
+a `calendar` (title, start, end and location, each a field on the page) or `download: true`, and an
+editable text field `scan: true`; these only tell the client to offer Add to Calendar, Download
+CSV or Scan.
 
 **R-PB3 Every read and write is the verified person's.** A related page reads and updates only
 records whose `personField` is the person and creates records with it set; a person page only
@@ -17996,6 +18409,7 @@ mirrors the primary member).
 | 1.41 | 2026-11-11 | Outbound Funds migration kit (MIG-11, D-156). No object or field added. Scholarships and Outbound Grants ships kit `Outbound_Funds` (source `Outbound_Funds_Module`, now related to this module, not Funders) with templates `kit_ofm_programs` (Award Program, Type Grant), `kit_ofm_cycles` (one Award Cycle per funding program), `kit_ofm_applications` (Award Application), `kit_ofm_awards` (Award, from requests with an awarded amount), `kit_ofm_disbursements` (Award Payment) and `kit_ofm_requirements` (Award Requirement), linked by `links`; extension `OutboundFundsKit` adds a `Parent` column (the record's own Id) so a cycle links to its program and an award to its application while the row keeps its Id as the key later steps link to. |
 | 1.42 | 2026-11-11 | Nonprofit Cloud relationships and affiliations kit (MIG-02, relations part). No object or field added. Mirror ships kit `NPC_Relations` (source `Nonprofit_Cloud_Fundraising`) with templates `kit_npc_relationships` (Relationship from `ContactContactRelation`, type from the related role, one side per pair; BarnCRM writes the reciprocal) and `kit_npc_affiliations` (Affiliation from `AccountContactRelation`, skipping households, meaning accounts with a `PartyRelationshipGroup` of type Household, and person accounts), and extension `NpcRelationsKit` (one side per pair, roles as text, checks counting pairs and organization links). Party Relationship Group households are not converted (plan Section 11.2 item 9: guards only; conversion needs two ADRs and `Account.Household_Model__c`). |
 | 1.43 | 2026-11-11 | Evidence log (L-05). New Section 29ZE1 Assumption Evidence (`Assumption_Evidence__c`, a detail of `Logic_Model_Link__c`, rules R-AE1 to R-AE3): what it shows, source, source link, date and strength. Logic Models Admin and Staff edit it, Read Only reads it; the builder reads it with each arrow and `LogicModelBuilderController.saveEvidence` saves it. |
+| 1.44 | 2026-11-11 | Event Management attendee app, personal agenda and event operations, and the service and partner portal templates (EV-22 to EV-25, EV-28, EV-29, PB-04, PB-05, D-190, D-118; ADR-NEXT `NEXT-events-attendee-app-operations-portal-templates.md`). New Sections 29EV31 Event Venue (`Event_Venue__c`, R-EVN1), 29EV32 Event Room (`Event_Room__c`), 29EV33 Event Expense (`Event_Expense__c`, R-EXP1), 29EV34 Event Funding (`Event_Funding__c`), 29EV35 Sponsor Lead (`Sponsor_Lead__c`, R-SLD1, R-SLD2), 29EV36 Agenda Item (`Agenda_Item__c`, R-AGI1, R-AGI2), 29EV37 Attendee Connection (`Attendee_Connection__c`, R-ACN1, R-ACN2), 29EV38 Attendee Message (`Attendee_Message__c`, R-AMS1) and 29EV39 Event Announcement (`Event_Announcement__c`). `Event__c` gains `Venue__c`; `Event_Session__c` gains `Venue_Room__c`, `Level__c`, `Slides_URL__c`, `Recording_URL__c`, `Sponsor__c` and `Agenda_Picks__c`, and Session Type gains Lightning Talk and Roundtable; `Event_Speaker__c` gains `Headshot_URL__c`, `LinkedIn_URL__c`, `Website_URL__c`, `Agreement_Signed__c`, `Slides_Received__c` and `Dry_Run_Done__c`; `Event_Attendee__c` gains `Networking_Opt_In__c`, `Networking_Headline__c`, `Networking_Bio__c`, `Networking_Contact__c`, `Share_With_Sponsors__c`, `Sponsor__c` and `Attendee_Name__c` (R-EAT5); `Event_Sponsor__c` gains `Booth__c`; `Events_Settings__c` gains `Attendee_Messages__c` and `Allow_Agenda_Overlaps__c` (both false); `Referral__c` gains `Partner_Organization__c` and `Shared_With_Partner__c` (R-RF5). R-PB2 gains a catalog page's `personScope` and the `calendar`, `download` and `scan` client options. |
 
 ---
 ## 32. Entity ownership by package
@@ -18144,6 +18558,15 @@ included; standard objects the packages extend are named by the entity that gove
 | Event Table | Event Management | 1.3 (EV-13) | 29EV26 |
 | Session Rating | Event Management | 1.5 (EV-27) | 29EV27 |
 | Proposal Presenter | Event Management | 1.5 (EV-21) | 29EV30 |
+| Event Venue | Event Management | 1.13 (EV-24) | 29EV31 |
+| Event Room | Event Management | 1.13 (EV-24) | 29EV32 |
+| Event Expense | Event Management | 1.13 (EV-23) | 29EV33 |
+| Event Funding | Event Management | 1.13 (EV-23) | 29EV34 |
+| Sponsor Lead | Event Management | 1.13 (EV-28) | 29EV35 |
+| Agenda Item | Event Management | 1.11 (EV-29) | 29EV36 |
+| Attendee Connection | Event Management | 1.11 (EV-22) | 29EV37 |
+| Attendee Message | Event Management | 1.11 (EV-22) | 29EV38 |
+| Event Announcement | Event Management | 1.11 (EV-22) | 29EV39 |
 | Portal | Portal Builder | 1.3 (PB-01) | 29PB1 |
 | Portal Access | Portal Builder | 1.3 (PB-01) | 29PB2 |
 | Portal Session | Portal Builder | 1.3 (PB-01) | 29PB3 |
