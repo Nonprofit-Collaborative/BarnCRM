@@ -850,8 +850,9 @@ BarnCRM is one suite of tools in two editions, and both editions include the ful
 | Building blocks | Major | Record fields, related lists, record lists with one filter and a sort, charts from standard summary reports, text and images; list rows capped by a setting. | Built, in review for release 1.16 | LB-03 |
 | Action buttons | Minor | Buttons that open a quick action or run a screen flow inside the component, optionally passing the record Id; the user's own permissions apply. | Built, in review for release 1.16 | LB-04 |
 | Conditional visibility | Minor | Show or hide each block by a page record field value or by a custom permission; a display rule, not a security control. | Built, in review for release 1.16 | LB-05 |
-| Export as source | Minor | Export a design as an LWC bundle (HTML, JavaScript, metadata) for developers; list and chart blocks export as placeholders to wire. | Built, in review for release 1.16 | LB-06 |
+| Export as source | Minor | Export a design as an LWC bundle (HTML, JavaScript, metadata) for developers; list and chart blocks export as placeholders to wire (working since LB-07). | Built, in review for release 1.16 | LB-06 |
 | Charts by two groupings and totals | Minor | A report chart block draws a summary report's first two groupings (or a matrix report's rows and columns) with up to three of its totals, as grouped or stacked bars with a legend and a data table viewers can show; still one report run as the viewer (D-196). | Built | LB-07 |
+| Working list and chart export | Minor | Export as LWC Source writes working related list, record list and report chart blocks: the bundle comes with its own small Apex controller and test class (read as the user, same fields, filter, sort, row limit and report) and chart styles, and does not depend on BarnCRM; a component without them gets no Apex (D-196). | Built | LB-07 |
 
 ---
 

@@ -51,6 +51,7 @@ public with sharing class LwcBuilderController {
 			return new Map<String, Object>{
 				'components' => rows,
 				'sourceExport' => flag('Source_Export__c'),
+				'rowsPerList' => rowsPerList(),
 				'canEdit' => Schema.SObjectType.Built_Component__c.isUpdateable()
 			};
 		} catch (Exception e) {

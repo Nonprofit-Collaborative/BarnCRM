@@ -84,7 +84,8 @@ Metadata from Non-Certified Package Versions via Apex" org setting.
    offered as three files to download or copy. Record Fields, Text, Image and Action blocks
    export working markup; Related List, Record List and Report Chart blocks export a card with
    a comment naming what to wire, because their data comes from this module's Apex, which an
-   exported bundle must not depend on. Visibility rules export as comments. The bundle is the
+   exported bundle must not depend on (since the 2026-11-12 amendment, D-196, they export
+   working, with an Apex controller of their own). Visibility rules export as comments. The bundle is the
    developer's to deploy and maintain (Section 5.10); nothing is deployed for them. The setting
    Allow Source Export (on) hides the panel.
 9. **Access (ADR-0131, D-191).** `LWC_Builder_Admin` (create, edit and delete built components,
@@ -145,3 +146,27 @@ Decision 5's Report Chart block no longer stops at the first grouping and first 
   same logic serves WordPress (plan 9.9). Bars use SLDS 2 styling hooks with fallbacks. The
   drawn chart is hidden from screen readers and a data table carries the same values, visible
   through Show Table.
+
+## Amendment, 2026-11-12 (D-196, LB-07, release 1.20): list and chart blocks export working
+
+Decision 8's placeholders are replaced: Export as LWC Source writes working Related List,
+Record List and Report Chart blocks.
+
+- **A small Apex controller of the bundle's own.** When a component has a list or chart block,
+  the export adds `<Name>Controller` (`records(requestJson)` and `chart(reportName)`, `with
+  sharing`, every query `WITH USER_MODE` with names checked against the schema and the filter
+  value bound by the field's type) and `<Name>ControllerTest`, with their metadata. A component
+  with neither gets no Apex. The source text lives in the framework-free module
+  `lwcBuilderExportKit`, so it adds nothing to the package's Apex.
+- **Why Apex, not `lightning/uiListsApi` or `lightning/graphql`.** A report can only be run
+  from Apex, so a chart needs Apex in any case. `uiListsApi` reads list views, not a builder
+  list's object, fields and filter. `graphql` could read the lists without Apex, but a filter
+  value must be typed in the query (text, number, boolean or date), which the browser does not
+  know at export time, and the related list would differ from the chart's way of reading. One
+  controller for both keeps the export self-contained with the least code to maintain.
+- **The same data.** The exported JavaScript holds each block's object, fields, parent field,
+  filter, sort, report, display and the org's Rows per List at export time, and lays charts out
+  with a copy of `chartView` (a Jest test keeps the two equal); a CSS file carries the chart
+  styles.
+- **Still the developer's.** The bundle and controller do not depend on BarnCRM; the developer
+  deploys and maintains them (Section 5.10). Nothing is deployed for them.

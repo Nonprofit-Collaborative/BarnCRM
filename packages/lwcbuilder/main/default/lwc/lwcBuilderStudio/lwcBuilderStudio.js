@@ -104,6 +104,7 @@ export default class LwcBuilderStudio extends LightningElement {
   helpReady = isHelpLoaded(HELP_PACKAGES);
   components = [];
   sourceExport = true;
+  rowsPerList;
   canEdit = false;
   selectedId = NEW;
   details = this.blankDetails();
@@ -137,6 +138,7 @@ export default class LwcBuilderStudio extends LightningElement {
       const studio = await getStudio();
       this.components = studio.components || [];
       this.sourceExport = studio.sourceExport !== false;
+      this.rowsPerList = studio.rowsPerList;
       this.canEdit = studio.canEdit === true;
       this.errorMessage = undefined;
     } catch (error) {
@@ -609,7 +611,10 @@ export default class LwcBuilderStudio extends LightningElement {
   }
 
   handleExport() {
-    const { files } = exportSource(this.definition, this.details);
+    const { files } = exportSource(this.definition, {
+      ...this.details,
+      rowLimit: this.rowsPerList
+    });
     this.exportFiles = files.map((file) => ({ ...file, key: file.name }));
   }
 

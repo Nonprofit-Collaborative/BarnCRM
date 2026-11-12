@@ -136,11 +136,17 @@ record can still see its data elsewhere. Use permission sets and sharing to rest
 ## Export as LWC Source
 
 In the builder, **Export** turns the open component into an LWC bundle: an HTML file, a
-JavaScript file and a `js-meta.xml` file, to download or copy. Record Fields, Text, Image and
-Button blocks export as working markup. Related List, Record List and Report Chart blocks
-export as a card with a comment saying what to connect, because their data comes from this
-module. Visibility rules export as comments. The exported bundle is for a developer to finish,
-deploy and maintain; BarnCRM does not deploy it.
+JavaScript file and a `js-meta.xml` file, to download or copy. Every block exports working.
+
+When the component has a Related List, Record List or Report Chart block (release 1.20,
+D-196), the export also holds a small Apex controller named after the component (for example
+`DonorSnapshotController`) with its test class, and a CSS file when there is a chart. The
+blocks read through that controller as the viewer, with the same fields, filter, sort and
+report, and as many rows as **Rows per list** allows when you export. The bundle does not
+depend on BarnCRM: deploy the controller and its test with it.
+
+Visibility rules export as comments. The exported bundle is for a developer to deploy and
+maintain; BarnCRM does not deploy it.
 
 ## Moving a Component Between Orgs
 

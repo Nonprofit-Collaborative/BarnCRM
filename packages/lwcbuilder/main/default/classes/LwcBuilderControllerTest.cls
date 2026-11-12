@@ -69,6 +69,11 @@ private class LwcBuilderControllerTest {
 				'One row in the builder'
 			);
 			Assert.areEqual(true, studio.get('sourceExport'), 'Source export ships on');
+			Assert.areEqual(
+				LwcBuilderController.rowsPerList(),
+				studio.get('rowsPerList'),
+				'Export uses the Rows per List setting (LB-07)'
+			);
 		}
 	}
 

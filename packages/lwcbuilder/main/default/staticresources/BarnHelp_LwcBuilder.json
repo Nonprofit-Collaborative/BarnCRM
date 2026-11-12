@@ -116,7 +116,7 @@
     "LwcBuilder_Problem_RuleField": "the visibility rule needs a field API name and a condition.",
     "LwcBuilder_Problem_RulePermission": "the visibility rule needs a custom permission API name.",
     "LwcBuilder_Problem_Other": "this block cannot be shown. Remove it.",
-    "LwcBuilder_Export_Intro": "The component as an LWC bundle for a developer to finish, deploy and maintain. List and chart blocks are placeholders with a comment saying what to connect. Nothing is deployed for you.",
+    "LwcBuilder_Export_Intro": "The component as an LWC bundle for a developer to deploy and maintain. List and chart blocks work as they do here: they come with a small Apex controller and its test, which read as the user with the same fields, filter, sort, row limit and report. Deploy the controller with the bundle. Nothing is deployed for you.",
     "LwcBuilder_Export_Download": "Download",
     "LwcBuilder_Export_Close": "Close"
   }

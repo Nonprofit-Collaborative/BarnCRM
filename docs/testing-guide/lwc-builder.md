@@ -110,8 +110,10 @@ a field).
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | Press **Export**. | Three files: `donorSnapshot.html`, `donorSnapshot.js`, `donorSnapshot.js-meta.xml`, each with Download. |
-| 2 | Read the HTML. | `lightning-output-field` for each Record Fields field; a comment for each list or chart block. |
-| 3 | Turn **Allow source export** off in Settings and reload the builder. | No Export button. Turn it back on. |
+| 1 | Press **Export** (the component has the list and chart blocks from T-LB-04). | `donorSnapshot.html`, `donorSnapshot.js`, `donorSnapshot.js-meta.xml`, `donorSnapshot.css`, `DonorSnapshotController.cls`, `DonorSnapshotControllerTest.cls` and their `cls-meta.xml` files, each with Download. |
+| 2 | Read the HTML and JavaScript. | `lightning-output-field` for each Record Fields field; a `lightning-datatable` for each list block and bars with a table for the chart; the JavaScript names each list's object, fields, filter and sort, the report, and a row limit equal to **Rows per list**. |
+| 3 | In a scratch org or sandbox of your own, deploy the downloaded files (bundle in `lwc/donorSnapshot`, classes in `classes`), run `DonorSnapshotControllerTest`, and place the component on a contact page. | The test passes; the lists and the chart show the same rows and totals as the built component for the same user. |
+| 4 | Remove the list and chart blocks from a copy of the component and export it. | Only the three bundle files; no Apex. |
+| 5 | Turn **Allow source export** off in Settings and reload the builder. | No Export button. Turn it back on. |
 
 **Cleanup:** None.
