@@ -12180,6 +12180,59 @@ the same direction.
 
 ---
 
+## 29ZE1. Assumption Evidence
+
+### Definition
+
+One piece of evidence for an arrow's assumption (L-05): what it shows and where it comes from (a
+study, an evaluation, the organization's own survey, staff observation), so a funder can see
+why the organization believes one part leads to the next.
+
+### Attributes
+
+| Attribute | Type | Required | Definition |
+|---|---|---|---|
+| Name | text | yes | An auto number. |
+| Arrow | reference(Logic Model Link) | yes | The arrow whose assumption it supports. |
+| What It Shows | text(255) | yes | What the evidence shows, in a sentence. |
+| Source | text(255) | no | Where it comes from. |
+| Source Link | url | no | A link to the source, if it is online. |
+| Date | date | no | When it was published or gathered. |
+| Strength | picklist | yes | Strong, Moderate (default), Limited or Challenges. |
+
+### Relationships
+
+- **Evidence to Logic Model Link**, many to one, as a detail of the arrow. Deleting the arrow
+  deletes its evidence.
+
+### Rules
+
+**R-AE1 Newest first.** The builder lists an arrow's evidence by date, newest first, undated
+evidence last, in the order it was added.
+
+**R-AE2 Strength.** Strong: a rigorous study or several sources agree. Moderate: one good
+source. Limited: anecdote or early results. Challenges: it points the other way. Moderate when
+none is given.
+
+**R-AE3 Who changes it.** Logic Models Admin and Staff add, change and remove evidence; Logic
+Models Read Only sees it.
+
+### Salesforce implementation
+
+- **Object:** `Assumption_Evidence__c`, name field AutoNumber `AEV-{000000}`, sharing Controlled
+  By Parent. Not tabbed: it is kept in the builder, on each arrow.
+
+| Attribute | API name | Type |
+|---|---|---|
+| Arrow | `Link__c` | Master-Detail to `Logic_Model_Link__c`, relationship name Evidence |
+| What It Shows | `Summary__c` | Text(255), required |
+| Source | `Source__c` | Text(255) |
+| Source Link | `Source_Url__c` | URL |
+| Date | `Evidence_Date__c` | Date |
+| Strength | `Strength__c` | Picklist, restricted: Strong, Moderate (default), Limited, Challenges; required |
+
+---
+
 ## 29ZF. Indicator
 
 ### Definition
@@ -17942,6 +17995,7 @@ mirrors the primary member).
 | 1.40 | 2026-11-11 | NPSP engagement plans and parity report (MIG-05, D-156). No object or field added. Kit `NPSP_Giving_Setup` gains steps `planTemplates` (template `kit_npsp_plan_templates`, Stewardship Plan Template upserted on `Plan_Key__c` = the NPSP template ID, Trigger Event Manual), `planSteps` (template `kit_npsp_plan_steps`, Stewardship Plan Step linked to `planTemplates`; `NpspGivingKit` sets Order from days after and Assign To Specific user or Record owner) and the tool step `parity`, whose check (`NpspGivingKit.verify`) counts active NPSP levels and engagement plan templates against donor levels of the same name and stewardship templates keyed by their ID. |
 | 1.41 | 2026-11-11 | Outbound Funds migration kit (MIG-11, D-156). No object or field added. Scholarships and Outbound Grants ships kit `Outbound_Funds` (source `Outbound_Funds_Module`, now related to this module, not Funders) with templates `kit_ofm_programs` (Award Program, Type Grant), `kit_ofm_cycles` (one Award Cycle per funding program), `kit_ofm_applications` (Award Application), `kit_ofm_awards` (Award, from requests with an awarded amount), `kit_ofm_disbursements` (Award Payment) and `kit_ofm_requirements` (Award Requirement), linked by `links`; extension `OutboundFundsKit` adds a `Parent` column (the record's own Id) so a cycle links to its program and an award to its application while the row keeps its Id as the key later steps link to. |
 | 1.42 | 2026-11-11 | Nonprofit Cloud relationships and affiliations kit (MIG-02, relations part). No object or field added. Mirror ships kit `NPC_Relations` (source `Nonprofit_Cloud_Fundraising`) with templates `kit_npc_relationships` (Relationship from `ContactContactRelation`, type from the related role, one side per pair; BarnCRM writes the reciprocal) and `kit_npc_affiliations` (Affiliation from `AccountContactRelation`, skipping households, meaning accounts with a `PartyRelationshipGroup` of type Household, and person accounts), and extension `NpcRelationsKit` (one side per pair, roles as text, checks counting pairs and organization links). Party Relationship Group households are not converted (plan Section 11.2 item 9: guards only; conversion needs two ADRs and `Account.Household_Model__c`). |
+| 1.43 | 2026-11-11 | Evidence log (L-05). New Section 29ZE1 Assumption Evidence (`Assumption_Evidence__c`, a detail of `Logic_Model_Link__c`, rules R-AE1 to R-AE3): what it shows, source, source link, date and strength. Logic Models Admin and Staff edit it, Read Only reads it; the builder reads it with each arrow and `LogicModelBuilderController.saveEvidence` saves it. |
 
 ---
 ## 32. Entity ownership by package

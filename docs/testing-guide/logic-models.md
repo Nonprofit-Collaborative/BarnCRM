@@ -212,3 +212,20 @@ periods `2026 Q2` (1 April to 30 June 2026, target 30, result 25), `2026 Q3`, `2
 | 8 | As read-only, open the model. | No handles and no drag hint. |
 
 **Cleanup:** Delete `Books` and the arrow, if saved.
+
+## T-LM-13: Evidence for an Assumption
+
+**Purpose:** confirm an arrow's evidence log adds, lists, changes and removes evidence, and that read-only users only see it (L-05).
+**Prerequisites:** staff, the model from T-LM-02 with the arrow `Weekly sessions` to `Sessions held`; a read-only user.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Select `Weekly sessions`. Under the arrow to `Sessions held`, click **Assumption Evidence (0)**. | The log opens and says no evidence is recorded yet. **Add** shows. |
+| 2 | Click **Add**, type What It Shows `Staff saw more reading logs`, Source `Staff observation`, leave Date blank, and **Save**. | The status says `Saved.`; the log shows **Moderate** and the text. The toggle reads **Assumption Evidence (1)**. |
+| 3 | Add another: What It Shows `Attendance doubled`, Source `2025 program records`, Source Link `https://example.org`, Date 30 June 2025, Strength **Strong**. | It is listed first, with **Strong**, the source, the date and a **Source Link** that opens in a new tab. |
+| 4 | Click **Save** with What It Shows empty on a new piece. | Refused in the form: the field is required. |
+| 5 | **Edit** the first piece and set Strength **Challenges**; then **Remove** the other and confirm. | One piece left, with **Challenges**. |
+| 6 | As read-only, open the model and the same arrow's **Assumption Evidence**. | The piece shows; no **Add**, **Edit** or **Remove**. |
+| 7 | As staff, remove the arrow. | The arrow and its evidence are gone. |
+
+**Cleanup:** Add the arrow back if later scripts need it.

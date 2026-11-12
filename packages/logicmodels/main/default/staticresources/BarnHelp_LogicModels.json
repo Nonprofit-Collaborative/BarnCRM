@@ -12,6 +12,8 @@
     "LogicModels_Drag_ArrowPosition": "Leads to {0}.",
     "LogicModels_Drag_Hint": "Drag a part by its handle to reorder it or move it to another column, or drag its arrow handle onto a later part to link them. Edit, Move Up, Move Down and Add Arrow still work.",
     "LogicModels_Drag_MoveHandle": "Move {0}",
+    "LogicModels_Evidence_None": "No evidence recorded for this assumption yet. Add a study, an evaluation, a survey or what staff have seen.",
+    "LogicModels_Evidence_RemoveConfirm": "Remove this evidence? The assumption itself stays.",
     "LogicModels_Part_NoTargets": "No later part to link to yet. Add one in a column to the right.",
     "LogicModels_Part_RemoveArrowConfirm": "Remove the arrow from {0} to {1}? Its assumption is deleted too.",
     "LogicModels_Period_DeleteConfirm": "Delete the period {0} with its target and result?",

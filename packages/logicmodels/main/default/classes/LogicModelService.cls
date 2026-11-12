@@ -54,6 +54,7 @@ public with sharing class LogicModelService {
 				.isUpdateable(),
 			'elements' => elementsOf(modelId),
 			'links' => linksOf(modelId),
+			'evidenceText' => evidenceText(),
 			'indicators' => indicatorsOf(modelId),
 			'periods' => LogicModelPeriodService.periodsOf(model.Periods__c),
 			'canEditPeriods' => Schema.SObjectType.Logic_Model__c.fields.Periods__c.isUpdateable()
@@ -90,7 +91,16 @@ public with sharing class LogicModelService {
 	private static List<Map<String, Object>> linksOf(Id modelId) {
 		List<Map<String, Object>> rows = new List<Map<String, Object>>();
 		for (Logic_Model_Link__c link : [
-			SELECT Id, From_Element__c, To_Element__c, Assumption__c
+			SELECT
+				Id,
+				From_Element__c,
+				To_Element__c,
+				Assumption__c,
+				(
+					SELECT Id, Summary__c, Source__c, Source_Url__c, Evidence_Date__c, Strength__c
+					FROM Evidence__r
+					ORDER BY Evidence_Date__c DESC NULLS LAST, CreatedDate
+				)
 			FROM Logic_Model_Link__c
 			WHERE Logic_Model__c = :modelId
 			WITH USER_MODE
@@ -101,11 +111,90 @@ public with sharing class LogicModelService {
 					'id' => link.Id,
 					'fromId' => link.From_Element__c,
 					'toId' => link.To_Element__c,
-					'assumption' => link.Assumption__c
+					'assumption' => link.Assumption__c,
+					'evidence' => evidenceOf(link.Evidence__r)
 				}
 			);
 		}
 		return rows;
+	}
+
+	/**
+	 * The evidence log's words from the platform's describe, already in the user's language:
+	 * the object's name, each field's label and the strengths in the field's order (R-AE2).
+	 */
+	private static Map<String, Object> evidenceText() {
+		List<Map<String, String>> strengths = new List<Map<String, String>>();
+		for (
+			Schema.PicklistEntry entry : Schema.SObjectType.Assumption_Evidence__c.fields.Strength__c.getPicklistValues()
+		) {
+			if (entry.isActive()) {
+				strengths.add(
+					new Map<String, String>{
+						'value' => entry.getValue(),
+						'label' => entry.getLabel()
+					}
+				);
+			}
+		}
+		return new Map<String, Object>{
+			'title' => Schema.SObjectType.Assumption_Evidence__c.getLabelPlural(),
+			'summary' => Schema.SObjectType.Assumption_Evidence__c.fields.Summary__c.getLabel(),
+			'source' => Schema.SObjectType.Assumption_Evidence__c.fields.Source__c.getLabel(),
+			'sourceUrl' => Schema.SObjectType.Assumption_Evidence__c.fields.Source_Url__c.getLabel(),
+			'date' => Schema.SObjectType.Assumption_Evidence__c.fields.Evidence_Date__c.getLabel(),
+			'strength' => Schema.SObjectType.Assumption_Evidence__c.fields.Strength__c.getLabel(),
+			'strengths' => strengths
+		};
+	}
+
+	/** An arrow's evidence log (L-05, R-AE1): newest first, undated last. */
+	private static List<Map<String, Object>> evidenceOf(List<Assumption_Evidence__c> records) {
+		List<Map<String, Object>> rows = new List<Map<String, Object>>();
+		for (Assumption_Evidence__c evidence : records) {
+			rows.add(
+				new Map<String, Object>{
+					'id' => evidence.Id,
+					'summary' => evidence.Summary__c,
+					'source' => evidence.Source__c,
+					'sourceUrl' => evidence.Source_Url__c,
+					'date' => evidence.Evidence_Date__c,
+					'strength' => evidence.Strength__c
+				}
+			);
+		}
+		return rows;
+	}
+
+	/**
+	 * Adds evidence to an arrow, or changes it (L-05, R-AE1, R-AE2). A blank strength is
+	 * Moderate, the field's default.
+	 *
+	 * @param fields id (blank to add), linkId, summary, source, sourceUrl, date, strength
+	 * @return the model the arrow belongs to
+	 */
+	public static Id saveEvidence(Map<String, Object> fields) {
+		Assumption_Evidence__c evidence = new Assumption_Evidence__c(
+			Id = idOf(fields, 'id'),
+			Summary__c = text(fields, 'summary'),
+			Source__c = text(fields, 'source'),
+			Source_Url__c = text(fields, 'sourceUrl'),
+			Evidence_Date__c = day(fields, 'date'),
+			Strength__c = text(fields, 'strength') == null ? 'Moderate' : text(fields, 'strength')
+		);
+		if (evidence.Id == null) {
+			evidence.Link__c = idOf(fields, 'linkId');
+			insert as user evidence;
+		} else {
+			update as user evidence;
+		}
+		return [
+			SELECT Link__r.Logic_Model__c
+			FROM Assumption_Evidence__c
+			WHERE Id = :evidence.Id
+			WITH USER_MODE
+		]
+		.Link__r.Logic_Model__c;
 	}
 
 	private static List<Map<String, Object>> indicatorsOf(Id modelId) {
@@ -584,7 +673,7 @@ public with sharing class LogicModelService {
 
 	/**
 	 * Deletes an element (its arrows first, then it, with its indicators and their periods), an
-	 * arrow, an indicator or a period.
+	 * arrow (with its evidence), evidence, an indicator or a period.
 	 *
 	 * @param recordId the record to delete
 	 * @return the model it belonged to
@@ -608,6 +697,14 @@ public with sharing class LogicModelService {
 				WITH USER_MODE
 			]
 			.Logic_Model__c;
+		} else if (type == Assumption_Evidence__c.SObjectType) {
+			modelId = [
+				SELECT Link__r.Logic_Model__c
+				FROM Assumption_Evidence__c
+				WHERE Id = :recordId
+				WITH USER_MODE
+			]
+			.Link__r.Logic_Model__c;
 		} else if (type == Indicator__c.SObjectType) {
 			modelId = [
 				SELECT Element__r.Logic_Model__c

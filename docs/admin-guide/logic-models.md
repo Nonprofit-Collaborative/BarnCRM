@@ -57,8 +57,8 @@ You never assign the Logic Models permission sets by hand. Give people their Bar
 | BarnCRM role | Logic Models set they get | What they can do |
 |---|---|---|
 | Admin (anyone holding BarnCRM Admin) | Logic Models Admin | Everything, including deleting a whole logic model and choosing where an indicator's results come from |
-| Team Member, Fundraising Staff (Giving) | Logic Models Staff | Create logic models and build them: add, change and remove parts, arrows, indicators and periods; never deletes a whole model |
-| Read Only | Logic Models Read Only | Look at logic models, indicators and results |
+| Team Member, Fundraising Staff (Giving) | Logic Models Staff | Create logic models and build them: add, change and remove parts, arrows, evidence, indicators and periods; never deletes a whole model |
+| Read Only | Logic Models Read Only | Look at logic models, evidence, indicators and results |
 
 The sets are given at install, when you give a role on the Access page (within a minute), when
 you turn the module back on, and every hour with BarnCRM's access check, for roles given in
@@ -125,6 +125,26 @@ and the same arrow cannot be added twice.
 
 Under **Comes From** the builder lists the arrows that point at the selected part. Click an
 arrow's assumption to change it, or **Remove** to delete the arrow (the builder asks first).
+
+### Evidence for an Assumption
+
+Under each arrow, **Assumption Evidence** (with its count) opens the arrow's evidence log: what
+supports its assumption and where that comes from. Click **Add** and fill in:
+
+- **What It Shows** (required): the finding in a sentence, for example "Families who attended
+  six or more sessions read with their children twice as often".
+- **Source**: a study, an evaluation, your own survey or staff observation.
+- **Source Link**: a link, if the source is online.
+- **Date**: when it was published or gathered.
+- **Strength**: **Strong** (a rigorous study, or several sources agree), **Moderate** (one good
+  source; the starting value), **Limited** (anecdote or early results) or **Challenges** (it
+  points the other way). Keep evidence that challenges an assumption: it is what tells you an
+  arrow needs another look.
+
+The log lists the newest first, with undated evidence last. **Edit** changes a piece and
+**Remove** deletes it (the builder asks first). Removing an arrow removes its evidence. Staff and
+admins add and change evidence; Read Only sees it. Evidence is stored as Assumption Evidence
+records, one per piece, under the arrow; there is no tab for them.
 
 ### Things to Look At
 

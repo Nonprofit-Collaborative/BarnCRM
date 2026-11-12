@@ -104,7 +104,10 @@ CAPS = {
     # plus about 2%.
     # Release 1.19 P-10/P-11 sample goals, cohort and sessions: 175,965 measured, plus about 1%.
     "programs": 177_800,
-    "logicmodels": 65_000,
+    # Raised for the assumption evidence log (L-05): saveEvidence, evidence on each arrow and
+    # the describe-built evidence words; 65,800 measured, plus about 1%. With L-04b's PDF method:
+    # 66,645 measured 2026-11-11, plus about 0.5%.
+    "logicmodels": 67_000,
     # Raised from 95,000 for the Funders usability stage: Undo for Mark Received and Mark
     # Submitted, and the award period and Restricted in Record the Award (modules-16, 17).
     # Grant management (F-09 to F-13, release 1.11): 124,151 measured with the Grant Finder,
