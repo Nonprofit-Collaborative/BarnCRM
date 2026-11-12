@@ -1,6 +1,8 @@
 {
   "languages": ["en"],
   "texts": {
+    "Giving_RecurringHealth_TaskSubject": "Save the sustainer: {0}",
+    "Giving_RecurringHealth_Unexpected": "Recurring Donor Health could not do that. The details are in the Error Log.",
     "Giving_Acknowledgment_TemplateNotFound": "The email template {0} for rule {1} is missing. Edit the rule on the Thank-Yous page and choose another template.",
     "Giving_Acknowledgments_ErrorReorderNotPermitted": "Changing the order of the rules needs the Manage BarnCRM Settings permission.",
     "Giving_Acknowledgments_Intro": "What is waiting to be thanked and the buttons that send it. Emails send from here or overnight. Letters come out as a spreadsheet you merge with your own letter and print.",
