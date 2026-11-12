@@ -11,7 +11,9 @@
  */
 @NamespaceAccessible
 public with sharing class AddressVerificationHealthCheckExtension implements HealthCheckExtension {
-	private static final Integer WAIT_DAYS = 30;
+	/** Days an address may wait unverified before Health Check counts it (a test moves it). */
+	@TestVisible
+	private static Integer waitDays = 30;
 
 	@NamespaceAccessible
 	public AddressVerificationHealthCheckExtension() {
@@ -70,7 +72,7 @@ public with sharing class AddressVerificationHealthCheckExtension implements Hea
 
 	@TestVisible
 	private static Integer waitingCount() {
-		DateTime before = DateTime.now().addDays(-WAIT_DAYS);
+		DateTime before = DateTime.now().addDays(-waitDays);
 		return [
 			SELECT COUNT()
 			FROM Address__c

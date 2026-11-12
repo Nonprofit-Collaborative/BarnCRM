@@ -337,4 +337,76 @@ private class BrandServiceTest {
 			Assert.isNull(off, 'Nothing to say while visibility is off');
 		}
 	}
+
+	@IsTest
+	static void anAssignmentChangeAndDeleteQueueTheShareUpkeep() {
+		System.runAs(TestUsers.admin()) {
+			turnOn(true, true);
+			Brand__c chapter = brand('Chapter', null, true);
+			Brand_Assignment__c assignment = new Brand_Assignment__c(
+				Brand__c = chapter.Id,
+				User__c = UserInfo.getUserId(),
+				Is_Primary__c = true
+			);
+			insert assignment;
+
+			Test.startTest();
+			update new Brand_Assignment__c(Id = assignment.Id, Is_Primary__c = false);
+			delete assignment;
+			Test.stopTest();
+
+			Assert.areEqual(
+				0,
+				[SELECT COUNT() FROM Brand_Assignment__c WHERE Id = :assignment.Id],
+				'The assignment is gone'
+			);
+		}
+	}
+
+	@IsTest
+	static void anAssignmentThatIsRestoredIsBack() {
+		System.runAs(TestUsers.admin()) {
+			turnOn(true, true);
+			Brand__c chapter = brand('Chapter', null, true);
+			Brand_Assignment__c assignment = new Brand_Assignment__c(
+				Brand__c = chapter.Id,
+				User__c = UserInfo.getUserId()
+			);
+			insert assignment;
+			delete assignment;
+
+			Test.startTest();
+			undelete assignment;
+			Test.stopTest();
+
+			Assert.areEqual(
+				1,
+				[SELECT COUNT() FROM Brand_Assignment__c WHERE Id = :assignment.Id],
+				'The assignment is back'
+			);
+		}
+	}
+
+	@IsTest
+	static void aBrandThatChangesIsDeletedAndRestoredKeepsItsDefault() {
+		System.runAs(TestUsers.admin()) {
+			turnOn(true, true);
+			Brand__c chapter = brand('Chapter', null, true);
+
+			Test.startTest();
+			chapter.City__c = 'Shelbyville';
+			update chapter;
+			delete chapter;
+			undelete chapter;
+			Test.stopTest();
+
+			Brand__c restored = [
+				SELECT City__c, Is_Default__c
+				FROM Brand__c
+				WHERE Id = :chapter.Id
+			];
+			Assert.areEqual('Shelbyville', restored.City__c, 'The change stayed');
+			Assert.isTrue(restored.Is_Default__c, 'Still the one default brand');
+		}
+	}
 }

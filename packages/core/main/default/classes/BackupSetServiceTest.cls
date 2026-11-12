@@ -165,4 +165,76 @@ private class BackupSetServiceTest {
 			}
 		}
 	}
+
+	@IsTest
+	static void theRunListIsForSomeoneWhoMayUseBackupSetsAndNullForAnyoneElse() {
+		User staff = TestUsers.standardUserWith(
+			'BackupRunsStaff',
+			new List<String>{ 'BarnCRM_Find_And_Export' }
+		);
+		System.runAs(TestUsers.admin()) {
+			Saved_Query__c query = savedQuery();
+			BackupSetController.setBackup(query.Id, true);
+			Test.startTest();
+			BackupSetController.runNow(query.Id);
+			Test.stopTest();
+
+			List<BackupSetService.RunView> runs = BackupSetController.getRuns();
+			Assert.isNotNull(runs, 'An admin sees the runs');
+			Assert.areEqual(1, runs.size(), 'The one run');
+			Assert.isFalse(runs[0].running, 'It finished');
+		}
+		System.runAs(staff) {
+			Assert.isNull(BackupSetController.getRuns(), 'No list for someone who may not use it');
+		}
+	}
+
+	@IsTest
+	static void aQueryThatIsNotThereIsRefusedWithAMessage() {
+		System.runAs(TestUsers.admin()) {
+			Id missing =
+				Saved_Query__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+					.getKeyPrefix() + '000000000001';
+			try {
+				BackupSetController.setBackup(missing, true);
+				Assert.fail('Nothing to mark');
+			} catch (AuraHandledException refused) {
+				Assert.isTrue(String.isNotBlank(refused.getMessage()), 'Told why');
+			}
+			try {
+				BackupSetController.runNow(missing);
+				Assert.fail('Nothing to run');
+			} catch (AuraHandledException refused) {
+				Assert.isTrue(String.isNotBlank(refused.getMessage()), 'Told why');
+			}
+		}
+	}
+
+	@IsTest
+	static void someoneWithoutManageSettingsCannotMarkOrRunAQuery() {
+		User staff = TestUsers.standardUserWith(
+			'BackupNoManage',
+			new List<String>{ 'BarnCRM_Find_And_Export' }
+		);
+		System.runAs(staff) {
+			try {
+				BackupSetController.setBackup(null, true);
+				Assert.fail('Refused');
+			} catch (AuraHandledException refused) {
+				Assert.areEqual(
+					BarnHelp.text('Core', 'Core_BackupSets_ErrorNoPermission'),
+					refused.getMessage()
+				);
+			}
+			try {
+				BackupSetController.runNow(null);
+				Assert.fail('Refused');
+			} catch (AuraHandledException refused) {
+				Assert.areEqual(
+					BarnHelp.text('Core', 'Core_BackupSets_ErrorNoPermission'),
+					refused.getMessage()
+				);
+			}
+		}
+	}
 }
