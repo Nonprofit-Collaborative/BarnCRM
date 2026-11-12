@@ -11,8 +11,22 @@ private class NpspGivingKitTest {
 		'funds' => 'Fund__c',
 		'levels' => 'Donor_Level__c',
 		'recurringPeople' => 'Commitment__c',
-		'recurringOrganizations' => 'Commitment__c'
+		'recurringOrganizations' => 'Commitment__c',
+		'planTemplates' => 'Stewardship_Plan_Template__c',
+		'planSteps' => 'Stewardship_Plan_Step__c'
 	};
+	/** Columns the extension adds or the template keys on, beyond the fields a step reads. */
+	private static final Set<String> ADDED = new Set<String>{
+		NpspGivingKit.START_COLUMN,
+		'Id',
+		'Order',
+		'AssignTo'
+	};
+
+	@TestSetup
+	static void createTestUser() {
+		TestUsers.adminWith('Giving_Admin');
+	}
 
 	@IsTest
 	static void eachStepHasItsTemplateAndLoadsItsGivingObject() {
@@ -36,7 +50,7 @@ private class NpspGivingKitTest {
 				for (ImportMapping.Column column : mapping.getColumns()) {
 					String heading = column.getSource();
 					Assert.isTrue(
-						step.fields.contains(heading) || heading == NpspGivingKit.START_COLUMN,
+						step.fields.contains(heading) || ADDED.contains(heading),
 						key + ' maps only what it reads: ' + heading
 					);
 				}
@@ -61,5 +75,35 @@ private class NpspGivingKitTest {
 		NpspGivingKit extension = new NpspGivingKit();
 		Assert.isNull(extension.rows('funds', new List<SObject>()), 'default rows');
 		Assert.isNull(extension.verify('levels'), 'counts are compared');
+	}
+
+	@IsTest
+	static void anEngagementPlanTaskGetsOrderAndAssignment() {
+		// runs-as: deploying user (text rows only, no record or permission is read)
+		Map<String, Object> assigned = new Map<String, Object>{
+			'npsp.Days_After__c' => '14',
+			'npsp.Assigned_To__c' => '005000000000001AAA'
+		};
+		NpspGivingKit.planStep(assigned);
+		Assert.areEqual('14', assigned.get('Order'), 'ordered by days after');
+		Assert.areEqual('Specific user', assigned.get('AssignTo'), 'its user');
+		Map<String, Object> unassigned = new Map<String, Object>{ 'npsp.Days_After__c' => '' };
+		NpspGivingKit.planStep(unassigned);
+		Assert.areEqual('0', unassigned.get('Order'), 'no days after');
+		Assert.areEqual('Record owner', unassigned.get('AssignTo'), 'the record owner');
+	}
+
+	@IsTest
+	static void theParityStepCountsNothingWithoutNpsp() {
+		System.runAs(TestUsers.adminWith('Giving_Admin')) {
+			MigrationKitService.Step step = MigrationKitService.stepNamed(
+				MigrationKitService.kitNamed(KIT),
+				'parity'
+			);
+			Assert.areEqual('tool', step.kind, 'a tool step');
+			MigrationCheck check = new NpspGivingKit().verify('parity');
+			Assert.areEqual(0, check.source, 'no NPSP levels or plans in a test org');
+			Assert.areEqual(0, check.done, 'nothing to match');
+		}
 	}
 }

@@ -27,7 +27,7 @@ org. These kits ship:
 - **V4S Jobs, Shifts and Hours** (Volunteers): copies Volunteers for Salesforce jobs, shifts,
   sign-ups and completed hours. See [Volunteers](volunteers.md#moving-from-v4s).
 - **NPSP Funds, Levels, Recurring Donations** (Giving): copies General Accounting Units,
-  levels and recurring donations. See
+  levels, recurring donations and engagement plans, and ends with a parity report. See
   [Migrating From NPSP](migrating-from-npsp.md#in-org-migration-kits).
 - **NPSP Gifts and Soft Credits** (Mirror): copies Campaigns as appeals, won Opportunities as
   gifts with their funds and tribute, and contact, partial and account soft credits. See

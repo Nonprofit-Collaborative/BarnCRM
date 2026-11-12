@@ -46,11 +46,31 @@ affiliations, household addresses and household names, so the two apps never bot
 | Donor Levels | Copies each NPSP level as a donor level with its name, description, minimum and maximum amounts and active flag. |
 | Recurring Donations of People | Copies each recurring donation of a contact as a recurring commitment of that person: amount, start (NPSP's next payment date, or the date established when there is none, so no run of overdue payments is made), frequency (1st and 15th becomes Every two weeks; any other period not in BarnCRM becomes Monthly) and status (Lapsed becomes Paused, Closed becomes Cancelled). |
 | Recurring Donations of Organizations | The same for recurring donations of an organization, as a commitment of that account. |
+| Engagement Plans | Copies each NPSP engagement plan template as an active stewardship plan template with its name and description, started by hand (**Manual**). Loading again updates the same template. |
+| Engagement Plan Tasks | Copies each task of those templates as a step of its stewardship plan: the subject, days after the start (also the step order), priority (Medium becomes Normal), comments, and the assigned user (**Specific user**) or else the record owner. |
+| Levels, Engagement Plans and Rollups Parity | The parity report, done on the **Stewardship Plans** tab. Its check counts your active NPSP levels and engagement plan templates, and how many have a BarnCRM counterpart (a donor level of the same name, a stewardship plan template copied from it). Read the table below, set up what you still need, and click **Mark Done**. |
 
 The kit does not copy NPSP's open installment Opportunities: BarnCRM schedules the payments of
 each commitment itself. Gifts already received come across with the next kit. The retire
 checklist reminds you to stop NPSP's recurring donation and levels jobs, make the General
-Accounting Units inactive, and point payment processors at BarnCRM.
+Accounting Units inactive, stop applying NPSP engagement plans, and point payment processors at
+BarnCRM.
+
+### Parity Report: Levels, Engagement Plans and Rollups
+
+What NPSP does in these three areas, and where it lives in BarnCRM after the kits run:
+
+| NPSP | BarnCRM | What to do |
+|---|---|---|
+| Levels on contacts or accounts, with a minimum and maximum | Donor levels, one ladder ([Donor Levels](donor-levels.md)) | Copied by **Donor Levels**. Choose what the ladder is measured on in Giving settings. |
+| A level's source field (any rollup field) | The ladder's measure: total giving, giving this or last fiscal year, or largest single gift | Pick the measure closest to your NPSP source field. A level on another field has no counterpart. |
+| More than one ladder (contacts and accounts, or several fields) | One ladder | Keep the main ladder; recreate others as a rollup plus a report if you need them. |
+| Previous level field | **Previous donor level** on the person | Kept by BarnCRM from now on; NPSP's history is not copied. |
+| A level that applies an engagement plan | A stewardship plan started by hand or by **First gift**, **Gift received** or **Commitment started** ([Stewardship Plans](stewardship-plans.md)) | Start the copied plan from those events, or by hand when a donor reaches a level. |
+| Engagement plan templates and tasks | Stewardship plan templates and steps | Copied by **Engagement Plans** and **Engagement Plan Tasks**. |
+| Dependent tasks, skip weekends, reschedule, reminders, send email | Steps by days after the start | Not copied; set due dates and reminders on the tasks a plan makes. |
+| Engagement plans already applied to records, and their open tasks | Plans started in BarnCRM | Not copied: the open NPSP tasks stay as ordinary tasks. |
+| Customizable rollups | Rollup Builder ([Rollups](rollups.md)) | The **NPSP Customizable Rollups** kit copies them and checks each. What Rollup Builder cannot express (soft credit, contact role and payment paths, fiscal years, Years Donated, Donor Streak, Best Year, more than one year back, filter rules on another object) stays in NPSP, named with its reason. |
 
 **NPSP Gifts and Soft Credits** (BarnCRM Mirror, because it reads Opportunities and Campaigns).
 Run it after the two kits above, so the people, households and funds are already there:
