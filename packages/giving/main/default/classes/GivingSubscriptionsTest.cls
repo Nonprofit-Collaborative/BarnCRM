@@ -117,21 +117,40 @@ private class GivingSubscriptionsTest {
 	@IsTest
 	static void aRunOfManyChangesIsOneWrite() {
 		System.runAs(admin()) {
+			List<Commitment__c> gifts = recurring(41);
 			List<Map<String, Object>> changes = new List<Map<String, Object>>();
-			Integer i = 0;
-			for (Commitment__c gift : recurring(40)) {
-				changes.add(change(gift.Id, 'chargeSucceeded', 'paypal:WH-' + i++));
+			for (Integer i = 1; i < gifts.size(); i++) {
+				changes.add(change(gifts[i].Id, 'chargeSucceeded', 'paypal:WH-' + i));
 			}
 
 			Test.startTest();
+			tell(
+				new List<Map<String, Object>>{
+					change(gifts[0].Id, 'chargeSucceeded', 'paypal:WH-0')
+				}
+			);
+			Integer oneDml = Limits.getDmlStatements();
+			Integer oneQueries = Limits.getQueries();
 			tell(changes);
-			Integer dml = Limits.getDmlStatements();
-			Integer queries = Limits.getQueries();
+			Integer manyDml = Limits.getDmlStatements() - oneDml;
+			Integer manyQueries = Limits.getQueries() - oneQueries;
 			Test.stopTest();
 
-			Assert.isTrue(dml < 20 && queries < 20, 'not one write per change: ' + dml);
+			// Other modules' Commitment handlers add a fixed cost per run, so the check is that
+			// forty changes cost what one does, not an absolute ceiling.
+			Assert.isTrue(
+				manyDml <= oneDml + 2 && manyQueries <= oneQueries + 2,
+				'not one write per change: dml ' +
+					manyDml +
+					' vs ' +
+					oneDml +
+					', queries ' +
+					manyQueries +
+					' vs ' +
+					oneQueries
+			);
 			Assert.areEqual(
-				40,
+				41,
 				[
 					SELECT COUNT()
 					FROM Recurring_Gift_Event__c

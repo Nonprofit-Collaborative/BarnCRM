@@ -125,48 +125,97 @@ public with sharing class ${name} {
         List<Reports.GroupingValue> across = metadata.getReportFormat() == Reports.ReportFormat.MATRIX
             ? results.getGroupingsAcross().getGroupings()
             : null;
-        across = across == null ? new List<Reports.GroupingValue>() : across;
-        while (across.size() > 12) {
-            across.remove(across.size() - 1);
+        Map<String, List<Object>> cellsByKey = new Map<String, List<Object>>();
+        for (String key : facts.keySet()) {
+            cellsByKey.put(key, cell(facts.get(key), measures.size()));
         }
-        for (Reports.GroupingValue column : across) {
-            series.add(column.getLabel());
-        }
-        List<Map<String, Object>> rows = new List<Map<String, Object>>();
-        for (Reports.GroupingValue grouping : groups) {
-            if (rows.size() == 200) {
-                break;
-            }
-            List<Object> cells = new List<Object>();
-            if (!across.isEmpty()) {
-                for (Reports.GroupingValue column : across) {
-                    cells.add(cell(facts.get(grouping.getKey() + '!' + column.getKey()), measures.size()));
-                }
-            } else if (grouping.getGroupings() != null && !grouping.getGroupings().isEmpty()) {
-                for (Reports.GroupingValue child : grouping.getGroupings()) {
-                    Integer lane = series.indexOf(child.getLabel());
-                    if (lane < 0 && series.size() < 12) {
-                        series.add(child.getLabel());
-                        lane = series.size() - 1;
-                    }
-                    while (lane >= 0 && cells.size() <= lane) {
-                        cells.add(null);
-                    }
-                    if (lane >= 0) {
-                        cells[lane] = cell(facts.get(child.getKey() + '!T'), measures.size());
-                    }
-                }
-            } else {
-                cells.add(cell(facts.get(grouping.getKey() + '!T'), measures.size()));
-            }
-            rows.add(new Map<String, Object>{ 'label' => grouping.getLabel(), 'cells' => cells });
-        }
+        List<Map<String, Object>> rows = walk(plain(groups), plain(across), cellsByKey, series);
         return new Map<String, Object>{
             'title' => found[0].get('Name'),
             'measures' => measures,
             'series' => series,
             'groups' => rows
         };
+    }
+
+    /** Report groupings as plain maps {key, label, children}, one level of children. */
+    private static List<Map<String, Object>> plain(List<Reports.GroupingValue> values) {
+        List<Map<String, Object>> result = new List<Map<String, Object>>();
+        for (Reports.GroupingValue value : values == null ? new List<Reports.GroupingValue>() : values) {
+            result.add(new Map<String, Object>{
+                'key' => value.getKey(),
+                'label' => value.getLabel(),
+                'children' => value.getGroupings() == null
+                    ? new List<Map<String, Object>>()
+                    : plainLeaves(value.getGroupings())
+            });
+        }
+        return result;
+    }
+
+    private static List<Map<String, Object>> plainLeaves(List<Reports.GroupingValue> values) {
+        List<Map<String, Object>> result = new List<Map<String, Object>>();
+        for (Reports.GroupingValue value : values) {
+            result.add(new Map<String, Object>{ 'key' => value.getKey(), 'label' => value.getLabel() });
+        }
+        return result;
+    }
+
+    /**
+     * The rows of a chart from plain inputs: groupings down and across as {key, label, children},
+     * and each fact's cells by fact key. A matrix's columns are the series; a second grouping's
+     * values are the series otherwise (up to 12, added to series as met); up to 200 rows.
+     */
+    @TestVisible
+    private static List<Map<String, Object>> walk(
+        List<Map<String, Object>> groups,
+        List<Map<String, Object>> across,
+        Map<String, List<Object>> cellsByKey,
+        List<String> series
+    ) {
+        List<Map<String, Object>> columns = new List<Map<String, Object>>();
+        for (Map<String, Object> column : across == null ? new List<Map<String, Object>>() : across) {
+            if (columns.size() < 12) {
+                columns.add(column);
+                series.add((String) column.get('label'));
+            }
+        }
+        List<Map<String, Object>> rows = new List<Map<String, Object>>();
+        for (Map<String, Object> grouping : groups) {
+            if (rows.size() == 200) {
+                break;
+            }
+            List<Object> cells = new List<Object>();
+            List<Map<String, Object>> children = (List<Map<String, Object>>) grouping.get('children');
+            if (!columns.isEmpty()) {
+                for (Map<String, Object> column : columns) {
+                    cells.add(found(cellsByKey, grouping.get('key') + '!' + column.get('key')));
+                }
+            } else if (children != null && !children.isEmpty()) {
+                for (Map<String, Object> child : children) {
+                    Integer lane = series.indexOf((String) child.get('label'));
+                    if (lane < 0 && series.size() < 12) {
+                        series.add((String) child.get('label'));
+                        lane = series.size() - 1;
+                    }
+                    while (lane >= 0 && cells.size() <= lane) {
+                        cells.add(null);
+                    }
+                    if (lane >= 0) {
+                        cells[lane] = found(cellsByKey, child.get('key') + '!T');
+                    }
+                }
+            } else {
+                cells.add(found(cellsByKey, grouping.get('key') + '!T'));
+            }
+            rows.add(new Map<String, Object>{ 'label' => grouping.get('label'), 'cells' => cells });
+        }
+        return rows;
+    }
+
+    private static List<Object> found(Map<String, List<Object>> cellsByKey, Object key) {
+        List<Object> cells = cellsByKey.get(String.valueOf(key));
+        return cells == null ? new List<Object>() : cells;
     }
 
     @TestVisible
@@ -193,6 +242,7 @@ public with sharing class ${name} {
     }
 
     /** The filter value as the field's type, so the bind compares like with like. */
+    @TestVisible
     private static Object typed(Schema.DescribeFieldResult field, String value) {
         if (String.isBlank(value)) {
             return null;
@@ -246,6 +296,119 @@ private class ${name} {
             Assert.isNotNull(e.getMessage(), 'Says so');
         }
         Assert.areEqual(0, ${controller}.cell(null, 3).size(), 'An empty cell');
+    }
+
+    @IsTest
+    static void listFollowsAParentAndNotEquals() {
+        Account parent = new Account(Name = 'Exported Parent');
+        insert parent;
+        insert new List<Account>{
+            new Account(Name = 'Exported Child A', ParentId = parent.Id),
+            new Account(Name = 'Exported Child B', ParentId = parent.Id)
+        };
+        Map<String, Object> result = ${controller}.records(JSON.serialize(new Map<String, Object>{
+            'object' => 'Account',
+            'fields' => new List<String>{ 'Name', 'ParentId' },
+            'parentField' => 'ParentId',
+            'recordId' => parent.Id,
+            'filterField' => 'Name',
+            'filterOperator' => 'notEquals',
+            'filterValue' => 'Exported Child A'
+        }));
+        Assert.areEqual(1, ((List<SObject>) result.get('rows')).size(), 'Only the other child');
+    }
+
+    @IsTest
+    static void aFilterValueTakesTheFieldsType() {
+        Map<String, Schema.SObjectField> fields = Schema.SObjectType.Account.fields.getMap();
+        Assert.isNull(${controller}.typed(fields.get('name').getDescribe(), ' '), 'Blank is null');
+        Assert.areEqual('Acme', ${controller}.typed(fields.get('name').getDescribe(), 'Acme'), 'Text');
+        Assert.areEqual(true, ${controller}.typed(fields.get('isdeleted').getDescribe(), 'true'), 'Boolean');
+        Assert.areEqual(12.5, ${controller}.typed(fields.get('annualrevenue').getDescribe(), '12.5'), 'Currency');
+        Assert.areEqual(40, ${controller}.typed(fields.get('numberofemployees').getDescribe(), '40'), 'Integer');
+        Assert.areEqual(
+            Date.newInstance(2026, 1, 31),
+            ${controller}.typed(Schema.SObjectType.Contact.fields.getMap().get('birthdate').getDescribe(), '2026-01-31'),
+            'Date'
+        );
+    }
+
+    private static Map<String, Object> group(String key, String label, List<Map<String, Object>> children) {
+        return new Map<String, Object>{ 'key' => key, 'label' => label, 'children' => children };
+    }
+
+    private static List<Object> one(Object value) {
+        return new List<Object>{ new Map<String, Object>{ 'value' => value, 'label' => String.valueOf(value) } };
+    }
+
+    @IsTest
+    static void aSummaryReportHasOneCellPerGroup() {
+        List<String> series = new List<String>();
+        List<Map<String, Object>> rows = ${controller}.walk(
+            new List<Map<String, Object>>{
+                group('0', 'Alpha', new List<Map<String, Object>>()),
+                group('1', 'Beta', null)
+            },
+            null,
+            new Map<String, List<Object>>{ '0!T' => one(5) },
+            series
+        );
+        Assert.areEqual(2, rows.size(), 'A row per group');
+        Assert.areEqual(1, ((List<Object>) rows[0].get('cells')).size(), 'One cell');
+        Assert.areEqual(0, ((List<Object>) ((List<Object>) rows[1].get('cells'))[0]).size(), 'No fact, empty cell');
+        Assert.isTrue(series.isEmpty(), 'No series');
+    }
+
+    @IsTest
+    static void twoGroupingsMakeTheSecondTheSeries() {
+        List<String> series = new List<String>();
+        List<Map<String, Object>> rows = ${controller}.walk(
+            new List<Map<String, Object>>{
+                group('0', 'Alpha', new List<Map<String, Object>>{
+                    new Map<String, Object>{ 'key' => '0_0', 'label' => 'Open' },
+                    new Map<String, Object>{ 'key' => '0_1', 'label' => 'Closed' }
+                }),
+                group('1', 'Beta', new List<Map<String, Object>>{
+                    new Map<String, Object>{ 'key' => '1_1', 'label' => 'Closed' }
+                })
+            },
+            null,
+            new Map<String, List<Object>>{ '0_0!T' => one(1), '0_1!T' => one(2), '1_1!T' => one(3) },
+            series
+        );
+        Assert.areEqual(new List<String>{ 'Open', 'Closed' }, series, 'Series in the order met');
+        List<Object> beta = (List<Object>) rows[1].get('cells');
+        Assert.areEqual(2, beta.size(), 'A gap is filled');
+        Assert.isNull(beta[0], 'Beta has no Open');
+        Assert.isNotNull(beta[1], 'Beta has Closed');
+    }
+
+    @IsTest
+    static void aMatrixUsesItsColumnsAsTheSeriesAndCapsThem() {
+        List<Map<String, Object>> across = new List<Map<String, Object>>();
+        Map<String, List<Object>> cells = new Map<String, List<Object>>();
+        for (Integer i = 0; i < 14; i++) {
+            across.add(new Map<String, Object>{ 'key' => String.valueOf(i), 'label' => 'C' + i });
+            cells.put('0!' + i, one(i));
+        }
+        List<String> series = new List<String>();
+        List<Map<String, Object>> rows = ${controller}.walk(
+            new List<Map<String, Object>>{ group('0', 'Alpha', null) },
+            across,
+            cells,
+            series
+        );
+        Assert.areEqual(12, series.size(), 'At most twelve series');
+        Assert.areEqual(12, ((List<Object>) rows[0].get('cells')).size(), 'A cell per column');
+    }
+
+    @IsTest
+    static void aChartHasAtMostTwoHundredRows() {
+        List<Map<String, Object>> groups = new List<Map<String, Object>>();
+        for (Integer i = 0; i < 205; i++) {
+            groups.add(group(String.valueOf(i), 'G' + i, null));
+        }
+        Assert.areEqual(200, ${controller}.walk(groups, null, new Map<String, List<Object>>(), new List<String>()).size(), 'Capped');
     }
 }
 `;

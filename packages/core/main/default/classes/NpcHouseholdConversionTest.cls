@@ -156,6 +156,8 @@ private class NpcHouseholdConversionTest {
 			Account lee = accounts[0];
 			Account kim = accounts[1];
 			String runId = 'NPC-' + '0'.repeat(32);
+			String leeModelBefore = [SELECT Household_Model__c FROM Account WHERE Id = :lee.Id]
+			.Household_Model__c;
 			NpspHouseholdAdoptionBatch.adopt(runId, true, 2).execute(null, accounts);
 			Contact ann = new Contact(LastName = 'Kim', FirstName = 'Ann');
 			insert ann;
@@ -171,7 +173,11 @@ private class NpcHouseholdConversionTest {
 				after.get(lee.Id).RecordTypeId,
 				'Lee is no longer a household'
 			);
-			Assert.isNull(after.get(lee.Id).Household_Model__c, 'Lee had no model');
+			Assert.areEqual(
+				leeModelBefore,
+				after.get(lee.Id).Household_Model__c,
+				'Lee gets the model it had before the run'
+			);
 			Assert.isTrue(membersOf(lee.Id).isEmpty(), 'the membership the run made is removed');
 			Assert.areEqual('Converted', after.get(kim.Id).Household_Model__c, 'Kim kept');
 			Household_Adoption__c kept = [
@@ -187,5 +193,37 @@ private class NpcHouseholdConversionTest {
 				'why'
 			);
 		}
+	}
+
+	@IsTest
+	static void aFailedMembershipDeleteIsReportedPerHousehold() {
+		// runs-as: deploying user (plain in-memory results, no record or permission is read)
+		Id first = '001000000000001AAA';
+		Id second = '001000000000002AAA';
+		List<Household_Member__c> removals = new List<Household_Member__c>{
+			new Household_Member__c(Household__c = first),
+			new Household_Member__c(Household__c = second),
+			new Household_Member__c(Household__c = second)
+		};
+		List<Database.DeleteResult> results = new List<Database.DeleteResult>{
+			(Database.DeleteResult) JSON.deserialize(
+				'{"success":true}',
+				Database.DeleteResult.class
+			),
+			(Database.DeleteResult) JSON.deserialize(
+				'{"success":false,"errors":[{"message":"locked","statusCode":"ENTITY_IS_LOCKED"}]}',
+				Database.DeleteResult.class
+			),
+			(Database.DeleteResult) JSON.deserialize(
+				'{"success":false,"errors":[{"message":"again","statusCode":"ENTITY_IS_LOCKED"}]}',
+				Database.DeleteResult.class
+			)
+		};
+
+		Map<Id, String> failed = NpspHouseholdAdoptionBatch.deleteFailures(removals, results);
+
+		Assert.areEqual(1, failed.size(), 'only the household with a failed delete');
+		Assert.areEqual('locked', failed.get(second), 'the first error is kept');
+		Assert.isFalse(failed.containsKey(first), 'a clean delete is not reported');
 	}
 }

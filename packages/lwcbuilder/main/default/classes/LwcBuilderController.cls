@@ -347,45 +347,16 @@ public with sharing class LwcBuilderController {
 				Reports.ReportFormat.MATRIX
 				? results.getGroupingsAcross().getGroupings()
 				: null;
-			across = across == null ? new List<Reports.GroupingValue>() : across;
-			while (across.size() > MAX_SERIES) {
-				across.remove(across.size() - 1);
+			Map<String, List<Object>> cellsByKey = new Map<String, List<Object>>();
+			for (String key : facts.keySet()) {
+				cellsByKey.put(key, cell(facts.get(key), measures.size()));
 			}
-			for (Reports.GroupingValue column : across) {
-				series.add(column.getLabel());
-			}
-			List<Map<String, Object>> rows = new List<Map<String, Object>>();
-			for (Reports.GroupingValue grouping : groups) {
-				if (rows.size() == MAX_ROWS) {
-					break;
-				}
-				List<Object> cells = new List<Object>();
-				if (!across.isEmpty()) {
-					for (Reports.GroupingValue column : across) {
-						String key = grouping.getKey() + '!' + column.getKey();
-						cells.add(cell(facts.get(key), measures.size()));
-					}
-				} else if (grouping.getGroupings() != null && !grouping.getGroupings().isEmpty()) {
-					for (Reports.GroupingValue child : grouping.getGroupings()) {
-						Integer lane = series.indexOf(child.getLabel());
-						if (lane < 0 && series.size() < MAX_SERIES) {
-							series.add(child.getLabel());
-							lane = series.size() - 1;
-						}
-						while (lane >= 0 && cells.size() <= lane) {
-							cells.add(null);
-						}
-						if (lane >= 0) {
-							cells[lane] = cell(facts.get(child.getKey() + '!T'), measures.size());
-						}
-					}
-				} else {
-					cells.add(cell(facts.get(grouping.getKey() + '!T'), measures.size()));
-				}
-				rows.add(
-					new Map<String, Object>{ 'label' => grouping.getLabel(), 'cells' => cells }
-				);
-			}
+			List<Map<String, Object>> rows = chartRows(
+				plainGroupings(groups),
+				plainGroupings(across),
+				cellsByKey,
+				series
+			);
 			return new Map<String, Object>{
 				'title' => title,
 				'measures' => measures,
@@ -395,6 +366,97 @@ public with sharing class LwcBuilderController {
 		} catch (Exception e) {
 			throw failure(e);
 		}
+	}
+
+	/** Report groupings as plain maps `{key, label, children}`, with one level of children. */
+	private static List<Map<String, Object>> plainGroupings(List<Reports.GroupingValue> values) {
+		List<Map<String, Object>> result = new List<Map<String, Object>>();
+		for (
+			Reports.GroupingValue value : values == null
+				? new List<Reports.GroupingValue>()
+				: values
+		) {
+			List<Map<String, Object>> children = new List<Map<String, Object>>();
+			for (
+				Reports.GroupingValue child : value.getGroupings() == null
+					? new List<Reports.GroupingValue>()
+					: value.getGroupings()
+			) {
+				children.add(
+					new Map<String, Object>{ 'key' => child.getKey(), 'label' => child.getLabel() }
+				);
+			}
+			result.add(
+				new Map<String, Object>{
+					'key' => value.getKey(),
+					'label' => value.getLabel(),
+					'children' => children
+				}
+			);
+		}
+		return result;
+	}
+
+	/**
+	 * The chart's rows from plain inputs: the groupings down and across as `{key, label,
+	 * children}` and each fact's cells by fact key. A matrix's columns are the series (up to 12);
+	 * otherwise a second grouping's values are, added to `series` as they are first met. At most
+	 * 200 rows. A fact with no cells gives an empty cell.
+	 */
+	@TestVisible
+	private static List<Map<String, Object>> chartRows(
+		List<Map<String, Object>> groups,
+		List<Map<String, Object>> across,
+		Map<String, List<Object>> cellsByKey,
+		List<String> series
+	) {
+		List<Map<String, Object>> columns = new List<Map<String, Object>>();
+		for (
+			Map<String, Object> column : across == null ? new List<Map<String, Object>>() : across
+		) {
+			if (columns.size() < MAX_SERIES) {
+				columns.add(column);
+				series.add((String) column.get('label'));
+			}
+		}
+		List<Map<String, Object>> rows = new List<Map<String, Object>>();
+		for (Map<String, Object> grouping : groups) {
+			if (rows.size() == MAX_ROWS) {
+				break;
+			}
+			List<Object> cells = new List<Object>();
+			List<Map<String, Object>> children = (List<Map<String, Object>>) grouping.get(
+				'children'
+			);
+			if (!columns.isEmpty()) {
+				for (Map<String, Object> column : columns) {
+					cells.add(cellFor(cellsByKey, grouping.get('key') + '!' + column.get('key')));
+				}
+			} else if (children != null && !children.isEmpty()) {
+				for (Map<String, Object> child : children) {
+					Integer lane = series.indexOf((String) child.get('label'));
+					if (lane < 0 && series.size() < MAX_SERIES) {
+						series.add((String) child.get('label'));
+						lane = series.size() - 1;
+					}
+					while (lane >= 0 && cells.size() <= lane) {
+						cells.add(null);
+					}
+					if (lane >= 0) {
+						cells[lane] = cellFor(cellsByKey, child.get('key') + '!T');
+					}
+				}
+			} else {
+				cells.add(cellFor(cellsByKey, grouping.get('key') + '!T'));
+			}
+			rows.add(new Map<String, Object>{ 'label' => grouping.get('label'), 'cells' => cells });
+		}
+		return rows;
+	}
+
+	private static List<Object> cellFor(Map<String, List<Object>> cellsByKey, Object key) {
+		List<Object> cells = cellsByKey.get(String.valueOf(key));
+		return cells == null ? new List<Object>() : cells;
 	}
 
 	/** One report cell as `[{value, label}]`, one per measure; an empty cell is an empty list. */

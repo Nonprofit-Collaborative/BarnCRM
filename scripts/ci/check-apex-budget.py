@@ -206,8 +206,9 @@ CAPS = {
     # LWC Builder (LB-01 to LB-06, ADR-0203 lwc builder module): the builder and renderer
     # controller, the App Builder picklist, access sync and post-install, 17,322 measured, plus
     # about 2%. LB-07 (D-196) charts by two groupings and three totals: 19,741 measured, plus
-    # about 1%.
-    "lwcbuilder": 20_000,
+    # about 1%. Release 1.20 review: the chart walk over plain inputs so it can be unit tested:
+    # 21,351 measured, plus about 2%.
+    "lwcbuilder": 21_800,
     # Scholarships and Outbound Grants (SG-01 to SG-10, PB-06, ADR-0204 scholarships module):
     # reviews, awards, form intake, portal actions, reminders, the payment rule and the page
     # controller, 49,326 measured (Prettier line breaks included), plus about 2%.
@@ -247,8 +248,9 @@ CAPS = {
     # AR-01 (D-172): Opportunity mirror messages read with BarnHelp.text instead of Label;
     # 202,751 measured, plus about 0.5%. With the other Mirror messages: 204,549 measured, plus
     # about 0.5%. MIG-02b Nonprofit Cloud households (NpcHouseholdSource, the drift finding):
-    # 214,101 measured, plus about 0.5%.
-    "mirror": 215_200,
+    # 214,101 measured, plus about 0.5%. Release 1.20 review: per-field readable membership
+    # reads and the member-count filter: 215,838 measured, plus about 2%.
+    "mirror": 220_200,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 

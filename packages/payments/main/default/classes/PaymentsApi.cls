@@ -11,12 +11,12 @@
  *                  entered (and, with recurring true, Automatic Recurring Payments is on)
  *   updateCard     { subscriptionId, customerId?, returnUrl } returns { url }, the processor's
  *                  own page for a new card (ADR-NEXT `NEXT-payments-subscriptions.md`)
+ *   countRecent    { sourceRecordId, minutes?, status? } returns how many payments for that
+ *                  record were started in the last minutes (default 60), of that status if given
  *
  * startCheckout also takes interval (week, month, year) and intervalCount (1 to 12): a
  * subscription when Automatic Recurring Payments is on. A listener with subscriptions is told
  * `subscriptionsChanged { changes: [...] }` once per run (the module README).
- *   countRecent    { sourceRecordId, minutes?, status? } returns how many payments for that
- *                  record were started in the last minutes (default 60), of that status if given
  *
  * A listener named on a payment is told `paymentsChanged { payments: [payment map, ...] }`
  * once per run and answers true when it handled them; otherwise it is told
