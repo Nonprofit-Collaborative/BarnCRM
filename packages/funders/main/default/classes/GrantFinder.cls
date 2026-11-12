@@ -11,7 +11,8 @@ public with sharing class GrantFinder {
 	/** A listing's page on Grants.gov, followed by its id. */
 	public static final String LISTING_PAGE = 'https://www.grants.gov/search-results-detail/';
 	public static final Integer ROWS = 25;
-	private static final Set<String> STATUSES = new Set<String>{ 'posted', 'forecasted' };
+	/** Named apart from `search`'s `statuses` parameter: Apex names ignore case, so the two collided. */
+	private static final Set<String> KNOWN_STATUSES = new Set<String>{ 'posted', 'forecasted' };
 	private static final Pattern ALN_FORMAT = Pattern.compile('^\\d{2}\\.[0-9A-Z]{3}$');
 	private static final Pattern US_DATE = Pattern.compile('^(\\d{2})/(\\d{2})/(\\d{4})$');
 
@@ -54,7 +55,7 @@ public with sharing class GrantFinder {
 	public static List<Listing> search(String keyword, List<String> statuses) {
 		List<String> wanted = new List<String>();
 		for (String status : statuses == null ? new List<String>() : statuses) {
-			if (status != null && STATUSES.contains(status.toLowerCase())) {
+			if (status != null && KNOWN_STATUSES.contains(status.toLowerCase())) {
 				wanted.add(status.toLowerCase());
 			}
 		}

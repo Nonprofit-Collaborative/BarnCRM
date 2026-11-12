@@ -110,8 +110,7 @@ private class ScholarshipReviewsTest {
 		}
 		System.runAs(admin) {
 			Award_Cycle__c cycle = ScholarshipsTestData.cycle(null, null);
-			cycle.Reviewer_Group__c = 'Test_Scholarship_Panel';
-			update cycle;
+			update new Award_Cycle__c(Id = cycle.Id, Reviewer_Group__c = 'Test_Scholarship_Panel');
 			List<Award_Application__c> applications = new List<Award_Application__c>();
 			for (Integer i = 0; i < 4; i++) {
 				applications.add(ScholarshipsTestData.application(cycle.Id, null, 'Submitted'));

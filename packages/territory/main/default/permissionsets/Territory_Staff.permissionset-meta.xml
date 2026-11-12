@@ -28,6 +28,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>false</editable>
+    <field>Territory_Member__c.User__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>false</editable>
     <field>Territory_Rule__c.Active__c</field>
     <readable>true</readable>
   </fieldPermissions>

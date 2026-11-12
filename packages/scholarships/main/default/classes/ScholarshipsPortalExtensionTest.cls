@@ -56,8 +56,7 @@ private class ScholarshipsPortalExtensionTest {
 			);
 
 			Award__c award = ScholarshipsTestData.award(cycle.Id, null, lee.Id, 500);
-			award.Status__c = 'Offered';
-			update award;
+			update new Award__c(Id = award.Id, Status__c = 'Offered');
 			actions.run(ScholarshipsPortalExtension.ACCEPT, lee.Id, award.Id);
 			Assert.areEqual(
 				'Accepted',
@@ -70,8 +69,7 @@ private class ScholarshipsPortalExtensionTest {
 				'Only once'
 			);
 
-			cycle.Status__c = 'Closed';
-			update cycle;
+			update new Award_Cycle__c(Id = cycle.Id, Status__c = 'Closed');
 			Assert.areEqual(
 				BarnHelp.text('Scholarships', 'Scholarships_Portal_Closed'),
 				actions.run(ScholarshipsPortalExtension.APPLY, kim.Id, cycle.Id),
@@ -109,8 +107,7 @@ private class ScholarshipsPortalExtensionTest {
 				FROM Award_Application__c
 				WHERE Contact__c = :lee.Id
 			];
-			application.Status__c = 'Ineligible';
-			update application;
+			update new Award_Application__c(Id = application.Id, Status__c = 'Ineligible');
 
 			Assert.areEqual(
 				BarnHelp.text('Scholarships', 'Scholarships_Portal_CannotWithdraw'),

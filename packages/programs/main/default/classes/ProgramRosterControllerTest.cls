@@ -73,7 +73,7 @@ private class ProgramRosterControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual('Tutoring', open.programName, 'The program is named.');
-			Assert.areEqual(4, open.stages.size(), 'Every stage has a figure.');
+			Assert.areEqual(5, open.stages.size(), 'Every stage has a figure.');
 			Assert.areEqual(1, countAt(open, 'Enrolled'), 'One enrolled.');
 			Assert.areEqual(1, countAt(open, 'Completed'), 'One completed.');
 			Assert.areEqual(1, open.enrollments.size(), 'Only the open one is listed.');

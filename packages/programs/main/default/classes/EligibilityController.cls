@@ -352,7 +352,8 @@ public with sharing class EligibilityController {
 			Object value = source?.get(name);
 			values.put(
 				field.apiName,
-				value instanceof Date ? (Object) String.valueOf(value) : value
+				// String.valueOf(Date) reads `yyyy-MM-dd 00:00:00`; the rules compare `yyyy-MM-dd`.
+				value instanceof Date ? (Object) String.valueOf(value).left(10) : value
 			);
 		}
 		return values;

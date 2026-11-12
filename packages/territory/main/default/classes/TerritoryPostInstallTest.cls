@@ -36,7 +36,7 @@ private class TerritoryPostInstallTest {
 
 			Assert.areEqual(1, setsHeldBy(fresh, TerritoryAccessSync.ADMIN_SET), 'Installer');
 			Assert.areEqual(1, setsHeldBy(alreadyHolding, TerritoryAccessSync.ADMIN_SET), 'Once');
-			Assert.isTrue(ModuleSetups.ran().contains('Territory'), 'Setup is marked as run');
+			Assert.isTrue(ModuleSetups.ran().contains('territory'), 'Setup is marked as run');
 		}
 	}
 

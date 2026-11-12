@@ -15,8 +15,7 @@ private class ScholarshipRemindersTest {
 	static void cyclesMoveOnAndEachDueDateIsRemindedOnce() {
 		System.runAs(ScholarshipsTestData.admin()) {
 			Award_Cycle__c open = ScholarshipsTestData.cycle(null, null);
-			open.Close_Date__c = Date.today().addDays(-1);
-			update open;
+			update new Award_Cycle__c(Id = open.Id, Close_Date__c = Date.today().addDays(-1));
 			Award_Cycle__c planned = new Award_Cycle__c(
 				Name = 'Next',
 				Program__c = [SELECT Program__c FROM Award_Cycle__c WHERE Id = :open.Id]

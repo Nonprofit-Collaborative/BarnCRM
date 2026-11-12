@@ -79,8 +79,7 @@ private class ProjectsControllerTest {
 				Date.today().addDays(-10),
 				false
 			);
-			blocked.Status__c = 'Blocked';
-			update blocked;
+			update new Project_Task__c(Id = blocked.Id, Status__c = 'Blocked');
 
 			Test.startTest();
 			ProjectsController.setTaskStatus(finished.Id, 'Done');
