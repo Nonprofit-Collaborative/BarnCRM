@@ -13,6 +13,7 @@
  */
 public with sharing class RollupNpsp implements RollupDlrs.Reader {
 	private static final String PREFIX = 'npsp__';
+	private static final String MERGE_SURVIVOR_FIELD = 'MasterRecordId';
 	private static final String GIFT_OBJECT = 'Opportunity'; // detection-only: compared with the Detail Object name NPSP stores; nothing reads Opportunity
 	private static final List<String> ROLLUP_FIELDS = new List<String>{
 		'Active',
@@ -366,7 +367,12 @@ public with sharing class RollupNpsp implements RollupDlrs.Reader {
 		return ids;
 	}
 
-	/** The single lookup from the counted records to the summary object, standard first. */
+	/**
+	 * The single lookup from the counted records to the summary object, standard first.
+	 * `MasterRecordId` is not a parent: the platform fills it only on a record deleted by a
+	 * merge, naming the survivor, so an Account or Contact rolling up into its own object is not
+	 * refused for having two standard lookups.
+	 */
 	private static String lookupTo(Schema.SObjectType detailType, String summary) {
 		Schema.SObjectType summaryType = SettingsService.typeByName(summary);
 		if (detailType == null || summaryType == null) {
@@ -380,7 +386,10 @@ public with sharing class RollupNpsp implements RollupDlrs.Reader {
 				.values()
 		) {
 			Schema.DescribeFieldResult field = token.getDescribe();
-			if (field.getReferenceTo().contains(summaryType)) {
+			if (
+				field.getReferenceTo().contains(summaryType) &&
+				field.getName() != MERGE_SURVIVOR_FIELD
+			) {
 				if (field.isCustom()) {
 					custom.add(field.getName());
 				} else {

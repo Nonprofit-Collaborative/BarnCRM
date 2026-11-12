@@ -6,7 +6,8 @@
  */
 @IsTest(testFor='ApexClass:GivingDonationPage, ApexClass:GivingDonations')
 private class GivingDonationsTest {
-	private static final String FORM_KEY = 'a0B000000000001AAA';
+	// A well-formed 18-character ID: the suffix is the checksum of the 15 (EAA, the B is upper case).
+	private static final String FORM_KEY = 'a0B000000000001EAA';
 
 	@TestSetup
 	static void makeData() {

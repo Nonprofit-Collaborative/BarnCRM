@@ -217,7 +217,11 @@ private class RollupNpspTest {
 				new List<String>{ 'Child_Count' },
 				RollupDlrsImport.TOOL_NPSP
 			);
-			Assert.areEqual(RollupDlrsImport.CREATED, rows[0].outcome, rows[0].reason);
+			Assert.areEqual(
+				RollupDlrsImport.CREATED,
+				rows[0].outcome,
+				'Copied, with no refusal: ' + rows[0].reason
+			);
 			Rollup_Definition__c copy = [
 				SELECT Definition_Key__c, Active__c
 				FROM Rollup_Definition__c
