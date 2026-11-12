@@ -254,6 +254,128 @@ private class HubBoardTest {
 	}
 
 	@IsTest
+	static void thePanelsShowDemographicsActionItemsAttendeeMarksAndMotions() {
+		System.runAs(maria()) {
+			insert new Corporate_Hub_Settings__c(
+				SetupOwnerId = UserInfo.getOrganizationId(),
+				Board_Demographics__c = true
+			);
+			SettingsService.clearCaches();
+			Board__c board = board();
+			Board_Member__c seat = [
+				SELECT Id, Person__c
+				FROM Board_Member__c
+				WHERE Board__c = :board.Id AND Role__c = 'Chair'
+				WITH USER_MODE
+			];
+			update as user new Board_Member__c(
+				Id = seat.Id,
+				Age_Range__c = '45 to 59',
+				Gender__c = 'Woman'
+			);
+			Board_Meeting__c meeting = meeting(board.Id, 0);
+			HubBoard.inviteBoard(meeting.Id);
+			insert as user new Meeting_Action_Item__c(
+				Board__c = board.Id,
+				Meeting__c = meeting.Id,
+				Name = 'File the 990',
+				Status__c = 'Open',
+				Assigned_To__c = seat.Person__c,
+				Due_Date__c = Date.today().addDays(10)
+			);
+			insert as user new Board_Motion__c(
+				Meeting__c = meeting.Id,
+				Name = 'Approve the budget',
+				Status__c = 'Proposed'
+			);
+			Meeting_Attendee__c attendee = [
+				SELECT Id
+				FROM Meeting_Attendee__c
+				WHERE Meeting__c = :meeting.Id
+				WITH USER_MODE
+				LIMIT 1
+			];
+			update as user new Meeting_Attendee__c(
+				Id = attendee.Id,
+				Packet_Read_On__c = Date.today(),
+				Minutes_Approved_On__c = Date.today()
+			);
+
+			HubBoardController.BoardView boardView = HubBoardController.getBoard(board.Id);
+			HubBoardController.MeetingView meetingView = HubBoardController.getMeeting(meeting.Id);
+
+			Assert.isTrue(boardView.showDemographics, 'The setting is on');
+			Boolean shown = false;
+			for (HubBoardController.Line line : boardView.seats) {
+				shown = shown || line.detail == '45 to 59, Woman';
+			}
+			Assert.isTrue(shown, 'The seat shows age range and gender');
+			Assert.areEqual(1, boardView.actionItems.size(), 'The open item');
+			Assert.areEqual('File the 990', boardView.actionItems[0].name, 'By name');
+			Assert.isNotNull(boardView.actionItems[0].status, 'Shows who it is assigned to');
+			Assert.areEqual(1, meetingView.motions.size(), 'The motion');
+			Assert.areEqual(
+				new List<String>{ '0', '0', '0' },
+				meetingView.motions[0].values,
+				'No votes counted yet'
+			);
+			Boolean marked = false;
+			for (HubBoardController.Line line : meetingView.attendees) {
+				marked = marked || line.values == new List<String>{ 'packet', 'minutes' };
+			}
+			Assert.isTrue(marked, 'The attendee read the packet and approved the minutes');
+		}
+	}
+
+	@IsTest
+	static void staffSeeNoDisclosureListAndCannotApproveMinutes() {
+		Board__c board;
+		Board_Meeting__c meeting;
+		System.runAs(maria()) {
+			board = board();
+			meeting = meeting(board.Id, 3);
+		}
+		User sam = TestUsers.standardUserWith(
+			'Sam',
+			new List<String>{ 'BarnCRM_Staff', 'Corporate_Hub_Staff' }
+		);
+		System.runAs(sam) {
+			HubBoardController.BoardView view = HubBoardController.getBoard(board.Id);
+			String refusal;
+			try {
+				HubBoardController.setMinutesStatus(meeting.Id, HubBoard.MINUTES_APPROVED);
+			} catch (AuraHandledException expected) {
+				refusal = expected.getMessage();
+			}
+
+			Assert.isFalse(view.canManage, 'Staff do not manage the hub');
+			Assert.isTrue(view.documents.isEmpty(), 'No disclosure list for staff');
+			Assert.isNotNull(refusal, 'Approving minutes is refused in words');
+		}
+	}
+
+	@IsTest
+	static void anUnexpectedFailureIsShownAsOneMessage() {
+		System.runAs(maria()) {
+			Contact notABoard = new Contact(LastName = 'Member');
+			insert as user notABoard;
+
+			String message;
+			try {
+				HubBoardController.getBoard(notABoard.Id);
+			} catch (AuraHandledException expected) {
+				message = expected.getMessage();
+			}
+
+			Assert.areEqual(
+				BarnHelp.text('CorporateHub', 'CorporateHub_Error_Generic'),
+				message,
+				'One message for anything unexpected'
+			);
+		}
+	}
+
+	@IsTest
 	static void theAnnualDisclosureAsksTheBoardOncePerYear() {
 		System.runAs(maria()) {
 			Board__c board = board();

@@ -7,6 +7,11 @@ private class GrantProgramControllerTest {
 	@TestSetup
 	static void createTestUsers() {
 		TestUsers.adminWithInstalledModules();
+		TestUsers.standardUserWith(
+			'Gpcreader',
+			new List<String>{ 'BarnCRM_Read_Only', 'Funders_Read_Only' }
+		);
+		TestUsers.standardUser('Gpcnoaccess');
 	}
 
 	private static Grant__c grant() {
@@ -78,6 +83,78 @@ private class GrantProgramControllerTest {
 				refusal,
 				'A grant is not a program'
 			);
+		}
+	}
+
+	@IsTest
+	static void aReaderIsRefusedSavingAndSeesACardThatCannotBeEdited() {
+		Grant__c grant;
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			grant = grant();
+		}
+		User reader = [SELECT Id FROM User WHERE LastName = 'Gpcreader' WITH SYSTEM_MODE LIMIT 1];
+		System.runAs(reader) {
+			Test.startTest();
+			GrantProgramController.ProgramCard card = GrantProgramController.getProgram(grant.Id);
+			String refusal;
+			try {
+				GrantProgramController.setProgram(grant.Id, '');
+			} catch (AuraHandledException e) {
+				refusal = e.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.isFalse(card.canEdit, 'A reader cannot edit the card');
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'),
+				refusal,
+				'A reader is refused'
+			);
+		}
+	}
+
+	@IsTest
+	static void aPersonWithoutAccessGetsTheLoadFailureMessage() {
+		Grant__c grant;
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			grant = grant();
+		}
+		User nobody = [SELECT Id FROM User WHERE LastName = 'Gpcnoaccess' WITH SYSTEM_MODE LIMIT 1];
+		System.runAs(nobody) {
+			Test.startTest();
+			String message;
+			try {
+				GrantProgramController.getProgram(grant.Id);
+			} catch (AuraHandledException e) {
+				message = e.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Program_LoadFailed'),
+				message,
+				'The card says it did not load'
+			);
+		}
+	}
+
+	@IsTest
+	static void savingToAGrantThatHasGoneShowsTheDatabaseMessage() {
+		System.runAs(TestUsers.adminWithInstalledModules()) {
+			Grant__c grant = grant();
+			Id gone = grant.Id;
+			delete grant;
+
+			Test.startTest();
+			String message;
+			try {
+				GrantProgramController.setProgram(gone, '');
+			} catch (AuraHandledException e) {
+				message = e.getMessage();
+			}
+			Test.stopTest();
+
+			Assert.isNotNull(message, 'Saving to a deleted grant is refused with a message');
 		}
 	}
 
