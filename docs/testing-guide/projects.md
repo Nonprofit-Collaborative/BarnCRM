@@ -120,3 +120,61 @@ Management deployed and the module turned on in BarnCRM Settings, **Modules**. Y
 | 2 | Run Time by Person This Month. | Hours grouped by person, with totals. |
 
 **Cleanup:** None.
+
+## T-PM-09: Rate Cards (PM-06)
+
+**Purpose:** confirm R-PM9: rates by person and role, kept on the entry.
+**Prerequisites:** T-PM-05; admin; staff A with a Project Assignment on the project, Role
+Developer; the project's Hourly Rate 100.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | Log 2 hours as staff A. Turn on **Use rate cards** in BarnCRM Settings, Projects, after step 1 only. | The entry from step 1 has no Bill Rate. |
+| 2 | Project Rates tab: add a Role rate Developer, Bill Rate 150, Cost Rate 80, Effective From 60 days ago. Add a Person rate for staff A, Bill Rate 175, no Cost Rate, Effective From 30 days ago. | Both saved. A rate with both a Person and a Role is refused. |
+| 3 | Projects Home, **Apply Rates**. | "Rates applied to 1 time entries." The step 1 entry now has Bill Rate 175 and Amount 350; Cost Rate is visible to admin only (80). |
+| 4 | As staff A, log 1 hour today. As the admin, log 1 hour. | Staff A: Bill Rate 175, Cost Rate 80. Admin: Bill Rate 100 (the project rate), no Cost Rate. |
+| 5 | Change staff A's Person rate to 999. Open the step 4 entry. | Still 175: a rate change never reprices logged time. |
+| 6 | Change the step 4 entry's Date to 45 days ago. | Bill Rate 150 (the Role rate): a new date prices it again. |
+| 7 | As staff A, open a Project Rate and an entry. | Bill rates visible; no Cost Rate or Cost Amount fields. |
+| 8 | Turn **Use rate cards** off and log 1 hour. | No rates written; Actual Cost is Actual Hours times the Hourly Rate again. No Apply Rates button. |
+
+**Cleanup:** keep the project for T-PM-10.
+
+## T-PM-10: Timesheets and Approvals (PM-07)
+
+**Purpose:** confirm R-PM10 and R-PM11.
+**Prerequisites:** T-PM-09; admin owns the project; staff A and staff B (no owner, no admin).
+Turn on **Approve time and expenses**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff A, open the **Timesheet** tab. Add a row for the project, enter 4 on Monday and 3 on Tuesday, Save. | Two entries, each Open. The project's Actual Hours has not changed (Open time does not count). Older entries with no status still count. |
+| 2 | Log Time on the project page. | "Time logged as Open." and the entry is in this week's grid. |
+| 3 | Empty a saved cell and Save. | Refused with the message that a cell cannot be emptied. |
+| 4 | **Submit Week**. Try to change Monday to 5. | Entries are Submitted; the cell is locked. **Recall Week** unlocks them; submit again. |
+| 5 | As staff B, open **Approvals**. Try to approve through the Time Entries list edit. | The queue is empty (not owner); the edit is refused: only the owner or a Projects admin approves. |
+| 6 | As the admin, open **Approvals**. | One group, staff A, this week. |
+| 7 | Reject the week with no reason. | Refused: a reason is needed. |
+| 8 | Reject with the reason "Wrong task". | Entries are Rejected with the reason. As staff A the Timesheet shows the reason; change Monday and submit again. |
+| 9 | As the admin, Approve the week. | Entries are Approved with Approved By. Actual Hours and Billable Hours now include them. |
+| 10 | As staff A, try to change an approved entry. As the admin, change its hours. | Staff A is refused (locked); the admin can. |
+| 11 | Projects Home, Export Billable Time. | Only approved billable entries, at the rate each was logged at. |
+| 12 | Turn **Approve time and expenses** off and reload. | The Timesheet and Approvals pages say the setting is off; Log Time and totals behave as before 1.20 (approved and unstatused time counts). |
+
+**Cleanup:** keep the project for T-PM-11.
+
+## T-PM-11: Expenses (PM-08)
+
+**Purpose:** confirm R-PM13.
+**Prerequisites:** T-PM-10; turn on **Track expenses** and **Approve time and expenses**.
+
+| Step | Action | Expected result |
+|---|---|---|
+| 1 | As staff A, project page, **Add Expense**: Travel, 42.50, billable. | "Expense added." The expense is Open. |
+| 2 | On the Timesheet, add another expense and attach a receipt file when prompted. | The file is in the expense's Files list. |
+| 3 | An expense of 0. | Refused: Amount must be more than 0. |
+| 4 | **Submit Week**, then as the admin open **Approvals**. | The expenses are in staff A's week with the amount; approve. They are Approved and count in the project's Expense Amount. |
+| 5 | Run Expenses This Month, and Time Awaiting Approval (with some time Submitted). | Each lists the right rows grouped as described. |
+| 6 | Turn **Track expenses** off. | No Add Expense button and no expenses section on the Timesheet; existing expenses remain. |
+
+**Cleanup:** None.
