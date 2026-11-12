@@ -190,7 +190,11 @@ private class GrantPipelineControllerTest {
 				GrantPipelineController.moveStage(grantId, 'Nowhere', null);
 				Assert.fail('An unknown stage is refused');
 			} catch (AuraHandledException e) {
-				Assert.areEqual(Label.Funders_Pipeline_ErrorStage, e.getMessage(), 'Says why');
+				Assert.areEqual(
+					BarnHelp.text('Funders', 'Funders_Pipeline_ErrorStage'),
+					e.getMessage(),
+					'Says why'
+				);
 			}
 		}
 		User reader = [SELECT Id FROM User WHERE LastName = 'Gpreader' WITH SYSTEM_MODE LIMIT 1];
@@ -211,7 +215,7 @@ private class GrantPipelineControllerTest {
 			Test.stopTest();
 			Assert.areEqual(refusal, awardRefusal, 'Record the Award is refused the same way');
 			Assert.areEqual(
-				Label.Funders_Pipeline_ErrorNoPermission,
+				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission'),
 				refusal,
 				'A reader is refused'
 			);

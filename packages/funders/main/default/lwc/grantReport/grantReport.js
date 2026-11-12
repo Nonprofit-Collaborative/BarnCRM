@@ -6,9 +6,7 @@ import { mergeReport, reportDocument } from 'c/grantReportModel';
 import TITLE from '@salesforce/label/c.Funders_Report_Title';
 import TEMPLATE from '@salesforce/label/c.Core_Import_StepTemplate';
 import DOWNLOAD from '@salesforce/label/c.Funders_Report_Download';
-import NO_TEMPLATES from '@salesforce/label/c.Funders_Report_NoTemplates';
 import DOWNLOADED from '@salesforce/label/c.Core_Shared_ReportDownloaded';
-import ERROR_LOAD from '@salesforce/label/c.Funders_Report_ErrorLoad';
 import PERIOD_LINE from '@salesforce/label/c.Funders_Outcomes_PeriodLine';
 import NOT_SET from '@salesforce/label/c.Funders_Outcomes_NotSet';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -32,7 +30,9 @@ export default class GrantReport extends LightningElement {
     get help() {
       return helpText('Funders', 'Funders_Report_Help');
     },
-    noTemplates: NO_TEMPLATES
+    get noTemplates() {
+      return helpText('Funders', 'Funders_Report_NoTemplates');
+    }
   };
 
   data;
@@ -59,7 +59,7 @@ export default class GrantReport extends LightningElement {
       this.errorMessage = undefined;
     } catch (error) {
       this.data = undefined;
-      this.errorMessage = messageOf(error, ERROR_LOAD);
+      this.errorMessage = messageOf(error, helpText('Funders', 'Funders_Report_ErrorLoad'));
     } finally {
       this.isLoading = false;
     }

@@ -70,7 +70,10 @@ private class GrantRulesTest {
 			Test.stopTest();
 
 			Assert.isFalse(saved.isSuccess(), 'Not a record identifier');
-			Assert.areEqual(Label.Funders_Grant_BadProgram, saved.getErrors()[0].getMessage());
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Grant_BadProgram'),
+				saved.getErrors()[0].getMessage()
+			);
 		}
 	}
 
@@ -140,7 +143,11 @@ private class GrantRulesTest {
 			Test.stopTest();
 
 			Assert.isNull(reread(grant.Id).Program_Id__c, 'Cleared');
-			Assert.areEqual(Label.Funders_Grant_BadProgram, refusal, 'An organization is refused');
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Grant_BadProgram'),
+				refusal,
+				'An organization is refused'
+			);
 		}
 	}
 

@@ -73,7 +73,11 @@ private class GrantProgramControllerTest {
 			Test.stopTest();
 
 			Assert.isNull(storedProgram(grant.Id), 'Cleared');
-			Assert.areEqual(Label.Funders_Grant_BadProgram, refusal, 'A grant is not a program');
+			Assert.areEqual(
+				BarnHelp.text('Funders', 'Funders_Grant_BadProgram'),
+				refusal,
+				'A grant is not a program'
+			);
 		}
 	}
 

@@ -12,17 +12,13 @@ import SEARCH from '@salesforce/label/c.Funders_Answers_Search';
 import TOPIC from '@salesforce/label/c.Funders_Answers_Topic';
 import ALL_TOPICS from '@salesforce/label/c.Funders_Answers_AllTopics';
 import COPY from '@salesforce/label/c.Core_RecordInspector_Copy';
-import COPIED from '@salesforce/label/c.Funders_Answers_Copied';
-import COPY_FAILED from '@salesforce/label/c.Funders_Answers_CopyFailed';
 import SHOW_ALL from '@salesforce/label/c.Funders_Answers_ShowAll';
 import SHOW_LESS from '@salesforce/label/c.Funders_Answers_ShowLess';
 import WORDS from '@salesforce/label/c.Funders_Answers_Words';
 import LAST_USED from '@salesforce/label/c.Funders_Answers_LastUsed';
 import NEVER_USED from '@salesforce/label/c.Funders_Answers_NeverUsed';
-import NO_MATCH from '@salesforce/label/c.Funders_Answers_NoMatch';
 import NO_ANSWERS from '@salesforce/label/c.Funders_Answers_NoAnswers';
 import NEW_ANSWER from '@salesforce/label/c.Funders_Answers_New';
-import ERROR_LOAD from '@salesforce/label/c.Funders_Answers_ErrorLoad';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 const PREVIEW_LENGTH = 240;
@@ -46,7 +42,9 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
     get empty() {
       return helpText('Funders', 'Funders_Answers_Empty');
     },
-    noMatch: NO_MATCH,
+    get noMatch() {
+      return helpText('Funders', 'Funders_Answers_NoMatch');
+    },
     noAnswers: NO_ANSWERS
   };
 
@@ -73,7 +71,7 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
       this.errorMessage = undefined;
     } catch (error) {
       this.library = undefined;
-      this.errorMessage = messageOf(error, ERROR_LOAD);
+      this.errorMessage = messageOf(error, helpText('Funders', 'Funders_Answers_ErrorLoad'));
     } finally {
       this.isLoading = false;
     }
@@ -173,10 +171,10 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
     try {
       await navigator.clipboard.writeText(answer.text);
     } catch {
-      this.toast(COPY_FAILED, 'warning');
+      this.toast(helpText('Funders', 'Funders_Answers_CopyFailed'), 'warning');
       return;
     }
-    this.toast(COPIED, 'success');
+    this.toast(helpText('Funders', 'Funders_Answers_Copied'), 'success');
     try {
       const stamped = await markUsed({ answerId: id });
       if (stamped) {
@@ -184,7 +182,7 @@ export default class GrantAnswerLibrary extends NavigationMixin(LightningElement
         this.library = { ...this.library, answers: this.answers.map(withDate) };
       }
     } catch (error) {
-      this.toast(messageOf(error, ERROR_LOAD), 'error');
+      this.toast(messageOf(error, helpText('Funders', 'Funders_Answers_ErrorLoad')), 'error');
     }
   }
 

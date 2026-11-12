@@ -103,7 +103,9 @@ public with sharing class GrantOutcomeController {
 	@AuraEnabled
 	public static void setOutcome(Id requirementId, String outcomeId) {
 		if (!Schema.SObjectType.Grant_Requirement__c.fields.Outcome_Id__c.isUpdateable()) {
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
+			throw UserErrors.message(
+				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
+			);
 		}
 		try {
 			GrantOutcomeService.setOutcome(requirementId, outcomeId);

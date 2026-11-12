@@ -100,7 +100,7 @@ public with sharing class GrantService {
 				(programType != null &&
 				programId.getSObjectType() != programType)
 			) {
-				grant.Program_Id__c.addError(Label.Funders_Grant_BadProgram);
+				grant.Program_Id__c.addError(BarnHelp.text('Funders', 'Funders_Grant_BadProgram'));
 				continue;
 			}
 			grant.Program_Id__c = String.valueOf(programId);
@@ -200,7 +200,7 @@ public with sharing class GrantService {
 			Schema.SObjectType type = programType();
 			Id parsed = asId(programId);
 			if (type == null || parsed == null || parsed.getSObjectType() != type) {
-				throw new GrantException(Label.Funders_Grant_BadProgram);
+				throw new GrantException(BarnHelp.text('Funders', 'Funders_Grant_BadProgram'));
 			}
 			value = String.valueOf(parsed);
 		}

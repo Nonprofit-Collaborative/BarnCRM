@@ -177,7 +177,9 @@ public with sharing class GrantScheduleController {
 	@AuraEnabled
 	public static void saveSchedule(Id grantId, String frequency, String paymentsJson) {
 		if (!Schema.SObjectType.Grant_Payment__c.isCreateable()) {
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
+			throw UserErrors.message(
+				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
+			);
 		}
 		List<GrantPaymentService.Row> rows;
 		try {
@@ -186,7 +188,7 @@ public with sharing class GrantScheduleController {
 				List<GrantPaymentService.Row>.class
 			);
 		} catch (Exception unreadable) {
-			throw UserErrors.message(Label.Funders_Schedule_ErrorRows);
+			throw UserErrors.message(BarnHelp.text('Funders', 'Funders_Schedule_ErrorRows'));
 		}
 		try {
 			GrantPaymentService.saveSchedule(grantId, frequency, rows);
@@ -207,7 +209,9 @@ public with sharing class GrantScheduleController {
 	@AuraEnabled
 	public static FundersUndoState markReceived(Id paymentId) {
 		if (!Schema.SObjectType.Grant_Payment__c.isUpdateable()) {
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
+			throw UserErrors.message(
+				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
+			);
 		}
 		try {
 			return GrantPaymentService.markReceived(paymentId);
@@ -226,7 +230,9 @@ public with sharing class GrantScheduleController {
 	@AuraEnabled
 	public static void undoReceived(Id paymentId, String status, Date receivedDate) {
 		if (!Schema.SObjectType.Grant_Payment__c.isUpdateable()) {
-			throw UserErrors.message(Label.Funders_Pipeline_ErrorNoPermission);
+			throw UserErrors.message(
+				BarnHelp.text('Funders', 'Funders_Pipeline_ErrorNoPermission')
+			);
 		}
 		Boolean undone;
 		try {

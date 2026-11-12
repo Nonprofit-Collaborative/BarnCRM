@@ -11,17 +11,16 @@ import { messageFrom } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
 
 import TITLE from '@salesforce/label/c.Funders_Schedule_Title';
-import CANNOT_BUILD from '@salesforce/label/c.Funders_Schedule_CannotBuild';
 import BUILD from '@salesforce/label/c.Funders_Schedule_Build';
 import SAVED from '@salesforce/label/c.Core_Shared_Saved';
 import MARK_RECEIVED from '@salesforce/label/c.Funders_Schedule_MarkReceived';
 import UNDO from '@salesforce/label/c.Core_AutoMerge_Undo';
-import ERROR_ACTION from '@salesforce/label/c.Funders_Pipeline_ErrorUnexpected';
 
 const EXPECTED = 'Expected';
 const DEFAULT_FREQUENCY = 'Annual';
 
-const messageOf = (error) => messageFrom(error, ERROR_ACTION);
+const messageOf = (error) =>
+  messageFrom(error, helpText('Funders', 'Funders_Pipeline_ErrorUnexpected'));
 
 /** "A, B and C" in the person's language; plain commas where the browser cannot. */
 function listOf(words) {
@@ -128,7 +127,7 @@ export default class GrantSchedule extends LightningElement {
   /** Only what this grant still lacks (modules-16); the full rule when nothing is missing. */
   get cannotBuildText() {
     if (!this.helpReady) {
-      return CANNOT_BUILD;
+      return helpText('Funders', 'Funders_Schedule_CannotBuild');
     }
     const needs = buildNeeds(this.schedule);
     const names = this.heading;
@@ -145,7 +144,7 @@ export default class GrantSchedule extends LightningElement {
     if (needs.reversed) {
       return helpText('Funders', 'Funders_Schedule_DatesReversed', names.endDate, names.startDate);
     }
-    return CANNOT_BUILD;
+    return helpText('Funders', 'Funders_Schedule_CannotBuild');
   }
 
   get frequencyOptions() {
