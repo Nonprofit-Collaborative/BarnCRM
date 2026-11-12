@@ -50,3 +50,21 @@ renewed.
 A member chooses whether they appear in your online member directory, from your member portal.
 On the membership, **Listed in Directory**, **Directory Location** and **Directory Bio** show
 what they chose. Change them only when the member asks you to.
+
+## Certifications and Continuing Credits
+
+When your organization certifies people (a trainer, a counselor, a docent), each person's
+certification is a **Member Certification**, on the **Member Certifications** tab.
+
+1. Click **New**, choose the **Certification** and the **Contact**, and save. It starts
+   **Pending**.
+2. When they qualify, press **Grant** in the **Certification** panel on the right. It becomes
+   **Active** with an **Expires On** date.
+3. Add each **Continuing Credit** they earn from the **Continuing Credits** list: the credits, the
+   date, what earned them and the kind of activity. The panel shows the credits toward renewal.
+4. When they have enough, press **Renew**. The certification runs for another period and those
+   credits are marked **Used**. Until then the panel says how many more are needed.
+5. **Revoke** ends a certification at once; **Grant** makes it Active again.
+
+An Active certification past its Expires On becomes **Expired** the next morning. Renew it the
+same way once the credits are in.

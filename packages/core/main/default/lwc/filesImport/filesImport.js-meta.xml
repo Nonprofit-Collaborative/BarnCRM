@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+  <apiVersion>67.0</apiVersion>
+  <description>Import Files (C-70): documents from a zip with a manifest loaded into Files, with dry run and undo.</description>
+  <isExposed>false</isExposed>
+</LightningComponentBundle>

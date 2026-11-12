@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+  <description>
+    The member certification record page: its details and continuing credits in the main column,
+    the certification panel (Grant, Renew, Revoke) beside them (G-22e).
+  </description>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentInstanceProperties>
+          <name>collapsed</name>
+          <value>false</value>
+        </componentInstanceProperties>
+        <componentInstanceProperties>
+          <name>hideChatterActions</name>
+          <value>true</value>
+        </componentInstanceProperties>
+        <componentName>force:highlightsPanel</componentName>
+        <identifier>certificationHighlightsPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>header</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>force:detailPanel</componentName>
+        <identifier>certificationDetailPanel</identifier>
+      </componentInstance>
+    </itemInstances>
+    <itemInstances>
+      <componentInstance>
+        <componentName>force:relatedListContainer</componentName>
+        <identifier>certificationRelatedLists</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>main</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <flexiPageRegions>
+    <itemInstances>
+      <componentInstance>
+        <componentName>certificationActions</componentName>
+        <identifier>certificationActions</identifier>
+      </componentInstance>
+    </itemInstances>
+    <name>sidebar</name>
+    <type>Region</type>
+  </flexiPageRegions>
+  <masterLabel>Member Certification Record Page</masterLabel>
+  <sobjectType>Member_Certification__c</sobjectType>
+  <template>
+    <name>flexipage:recordHomeTemplateDesktop</name>
+  </template>
+  <type>RecordPage</type>
+</FlexiPage>
