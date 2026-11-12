@@ -249,18 +249,19 @@ What happens, all at once or not at all, as you and with your access:
 
 - every related record (gifts, shifts, activities, anything whose link to the other record can
   be changed) moves to the kept record;
+- every file and note on the other record is also linked to the kept record (one already linked
+  there is left as it is);
 - the other record goes to the Recycle Bin;
 - the kept record takes the values you chose.
 
 BarnCRM does not merge, and changes nothing, when a related record would be lost: one you
 cannot read, or one under a master-detail link that cannot be changed (it would be deleted with
-the record). The message names it. Files and notes on the other record stay with it in the
-Recycle Bin and come back on undo.
+the record). The message names it.
 
 Under **Recent Merges**, each merge of the last 15 days is listed with **Undo**, which works as
 auto-merge's undo does: the other record comes back from the Recycle Bin, the kept record gets
-its own values back unless somebody changed them since, and the related records move back.
-What undo cannot restore is listed under the merge.
+its own values back unless somebody changed them since, the related records move back, and the
+file links the merge added are removed from the kept record. What undo cannot restore is listed under the merge.
 
 ### Matching Logic
 

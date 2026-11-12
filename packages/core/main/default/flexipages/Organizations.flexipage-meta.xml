@@ -11,10 +11,6 @@
           <name>filterName</name>
           <value>Organizations</value>
         </componentInstanceProperties>
-        <componentInstanceProperties>
-          <name>linkLabel</name>
-          <value>Open Organizations</value>
-        </componentInstanceProperties>
         <componentName>accountListRedirect</componentName>
         <identifier>accountListRedirectOrganizations</identifier>
       </componentInstance>

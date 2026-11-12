@@ -170,7 +170,8 @@ It no longer does: the Households and Organizations tabs open the standard Accou
 **"We would rather use the standard Accounts tab."**
 Set **Account Tabs** on **General** in BarnCRM Settings to **Accounts Tab (Standard)**: people
 see the Accounts tab, with the same Households and Organizations list views in its menu, and the
-Households and Organizations tabs go. **Both** keeps all three. See
+Households and Organizations tabs go. **Both: Organization, Household and Accounts Tabs** keeps
+all three. See
 [Account Tabs](barncrm-settings.md#account-tabs).
 
 **"There is no Households tab."**

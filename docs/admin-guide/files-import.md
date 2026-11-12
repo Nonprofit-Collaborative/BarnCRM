@@ -17,6 +17,8 @@ Limits:
 
 - at most 2,000 files in one zip;
 - each file at most 2 MB (a larger file can be added to its record by hand);
+- each group of files sent together at most 2 MB in all: a file that would overflow a group is
+  refused with "This group is full. Load again." (it is not too large; load it again);
 - a browser that can unzip files (any current Chrome, Edge, Firefox or Safari).
 
 ## 3. Making the Zip

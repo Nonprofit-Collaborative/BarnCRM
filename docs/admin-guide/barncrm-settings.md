@@ -159,7 +159,7 @@ households and organizations:
 |---|---|
 | **Organization and Household Tabs** (the default) | **Households** and **Organizations**, as before |
 | **Accounts Tab (Standard)** | Salesforce's own **Accounts** tab, instead of Households and Organizations. Its list view menu already holds **Households**, **My Households**, **Organizations** and **My Organizations** |
-| **Both** | All three |
+| **Both: Organization, Household and Accounts Tabs** | All three |
 
 It works like the Households tab: **BarnCRM Auto: Organizations Tab** and **BarnCRM Auto:
 Accounts Tab** each show one tab, and BarnCRM gives the chosen ones to everyone with a BarnCRM

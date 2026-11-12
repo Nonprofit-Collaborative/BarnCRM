@@ -128,7 +128,8 @@ the record can read it, so write accordingly.
 ## To Read a Person's Engagement Score
 
 When your admin has turned Engagement Score on, a person's page shows an **Engagement Score**
-meter from 0 to 100 and the day it was scored.
+meter from 0 to 100 and the day it was scored. A person who has not been scored yet shows
+**Not scored yet** in place of the meter.
 
 1. Open the person. The meter is on the right of the page.
 2. Click the help icon beside the title to see what goes into the score.

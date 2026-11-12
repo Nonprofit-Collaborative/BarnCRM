@@ -122,7 +122,7 @@ household and an organization owned by that user.
 
 | Step | Action | Expected result |
 |---|---|---|
-| 1 | As admin, open **BarnCRM Settings**, **General**. | An **Account Tabs** row shows **Organization and Household Tabs** with its help, and the choices **Organization and Household Tabs**, **Accounts Tab (Standard)** and **Both**. |
+| 1 | As admin, open **BarnCRM Settings**, **General**. | An **Account Tabs** row shows **Organization and Household Tabs** with its help, and the choices **Organization and Household Tabs**, **Accounts Tab (Standard)** and **Both: Organization, Household and Accounts Tabs**. |
 | 2 | As staff, open **BarnCRM**. | **Households** and **Organizations** show; **Accounts** does not. |
 | 3 | As admin, choose **Accounts Tab (Standard)** and **Save**. Wait a minute. | "Your settings are saved." **Recent changes** shows the change. |
 | 4 | As staff, reload **BarnCRM** and **BarnCRM Console**. | **Accounts** shows after **Contacts**; **Households** and **Organizations** are gone from both apps and the App Launcher. In **Accounts**, the list view menu holds **Households**, **My Households**, **Organizations** and **My Organizations**. |

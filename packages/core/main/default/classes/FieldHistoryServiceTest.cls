@@ -77,6 +77,33 @@ private class FieldHistoryServiceTest {
 	}
 
 	@IsTest
+	static void keepsAChangeWhoeverSavesIt() {
+		User noAccess;
+		System.runAs(TestUsers.admin()) {
+			turnOn(true, new List<String>{ CITY });
+			noAccess = TestUsers.minimumAccessUserWith('Zztest NoFls', new List<String>());
+		}
+		Id recordId = Address__c.SObjectType.getDescribe().getKeyPrefix() + '000000000001';
+		Test.startTest();
+		System.runAs(noAccess) {
+			FieldHistoryService.capture(
+				'Address__c',
+				new List<SObject>{ new Address__c(Id = recordId, City__c = 'Shelbyville') },
+				new Map<Id, SObject>{
+					recordId => new Address__c(Id = recordId, City__c = 'Springfield')
+				}
+			);
+		}
+		Test.stopTest();
+
+		Assert.areEqual(
+			1,
+			[SELECT COUNT() FROM Field_History__c WHERE Record_Id__c = :recordId WITH SYSTEM_MODE],
+			'A person with no access to the field still has the change kept'
+		);
+	}
+
+	@IsTest
 	static void keepsNothingWhileOffOrPaused() {
 		System.runAs(TestUsers.admin()) {
 			turnOn(false, new List<String>{ CITY });

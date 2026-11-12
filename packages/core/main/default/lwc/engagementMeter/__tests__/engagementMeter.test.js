@@ -78,13 +78,14 @@ describe('c-engagement-meter', () => {
     expect(find(element, 'meter')).toBeNull();
   });
 
-  it('draws nothing for a person not scored yet, and a score of 0 still shows', async () => {
+  it('says Not scored yet for a person with no score, and a score of 0 still shows a meter', async () => {
     const element = build();
     isFeatureOn.emit(true);
     getObjectInfo.emit(CONTACT_INFO);
     getRecord.emit(personWith(null, null));
     await flush();
     expect(find(element, 'meter')).toBeNull();
+    expect(find(element, 'not-scored').textContent).toBe('c.Core_EngagementMeter_NotScored');
 
     getRecord.emit(personWith(0, '2026-11-11'));
     await flush();

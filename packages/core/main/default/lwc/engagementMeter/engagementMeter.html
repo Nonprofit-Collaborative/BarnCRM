@@ -6,12 +6,17 @@
         <c-barn-help help-key="Core_EngagementMeter_Help" alternative-text={title} data-id="help"></c-barn-help>
       </div>
       <div class="slds-var-p-horizontal_medium">
-        <c-barn-meter label={title} value={score} max="100" value-text={scoreText} data-id="meter"></c-barn-meter>
-        <template lwc:if={scoredOn}>
-          <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small" data-id="scored-on">
-            {scoredOnLabel}
-            <lightning-formatted-date-time value={scoredOn} class="slds-var-m-left_xx-small"></lightning-formatted-date-time>
-          </p>
+        <template lwc:if={scored}>
+          <c-barn-meter label={title} value={score} max="100" value-text={scoreText} data-id="meter"></c-barn-meter>
+          <template lwc:if={scoredOn}>
+            <p class="slds-text-body_small slds-text-color_weak slds-var-m-top_x-small" data-id="scored-on">
+              {scoredOnLabel}
+              <lightning-formatted-date-time value={scoredOn} class="slds-var-m-left_xx-small"></lightning-formatted-date-time>
+            </p>
+          </template>
+        </template>
+        <template lwc:else>
+          <p class="slds-text-body_regular slds-text-color_weak" data-id="not-scored">{notScoredText}</p>
         </template>
       </div>
     </lightning-card>

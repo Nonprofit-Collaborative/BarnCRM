@@ -7972,8 +7972,11 @@ a master-detail link that cannot be changed (it would be deleted with the record
 **R-DP12 Every Generic Record Merge is journaled and can be undone.** The merge writes one
 Merge Journal row as R-DP10 describes, with its own Run Id, so undo works on that one merge.
 The Merge Records area lists the last 15 days of these merges with Undo, which works as R-DP10
-does. Auto-merge's Recent Runs lists only people merges. Files and notes stay with the deleted
-record and return with it on undo.
+does. Auto-merge's Recent Runs lists only people merges. Files and notes linked to the other
+record are also linked to the kept record (a file already linked there is skipped), in the
+same transaction; the journal's moved-records list keeps the new `ContentDocumentLink` Ids
+under the key `ContentDocumentLink+`, and undo deletes those links. The file itself is never
+copied or changed.
 
 ### Salesforce implementation
 

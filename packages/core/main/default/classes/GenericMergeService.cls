@@ -204,6 +204,11 @@ public with sharing class GenericMergeService {
 		Savepoint before = Database.setSavepoint();
 		try {
 			outcome.moved = moveRelated(moved.byLink, keepId);
+			List<Id> files = AutoMergeService.shareFiles(keepId, otherId);
+			if (!files.isEmpty()) {
+				moved.byLink.put(AutoMergeService.ADDED_FILES, files);
+				outcome.moved += files.size();
+			}
 			Database.delete(type.newSObject(otherId), AccessLevel.USER_MODE);
 			SObject keep = type.newSObject(keepId);
 			Map<String, Object> changed = new Map<String, Object>();
@@ -240,21 +245,30 @@ public with sharing class GenericMergeService {
 	}
 
 	/** Points every recorded related record at the kept record; answers how many moved. */
+	@TestVisible
 	private static Integer moveRelated(Map<String, List<Id>> byLink, Id keepId) {
 		Integer count = 0;
+		// One update per object, a record linked through several fields changing in one row.
+		Map<Schema.SObjectType, Map<Id, SObject>> byType = new Map<Schema.SObjectType, Map<Id, SObject>>();
 		for (String key : byLink.keySet()) {
 			String field = key.substringAfter('.');
-			List<SObject> moves = new List<SObject>();
 			for (Id recordId : byLink.get(key)) {
 				// The kept record linked to the other is left: it cannot point at itself.
 				if (recordId != keepId) {
-					SObject move = recordId.getSObjectType().newSObject(recordId);
-					move.put(field, keepId);
-					moves.add(move);
+					Schema.SObjectType type = recordId.getSObjectType();
+					if (!byType.containsKey(type)) {
+						byType.put(type, new Map<Id, SObject>());
+					}
+					if (!byType.get(type).containsKey(recordId)) {
+						byType.get(type).put(recordId, type.newSObject(recordId));
+					}
+					byType.get(type).get(recordId).put(field, keepId);
+					count++;
 				}
 			}
-			Database.update(moves, AccessLevel.USER_MODE);
-			count += moves.size();
+		}
+		for (Map<Id, SObject> moves : byType.values()) {
+			Database.update(moves.values(), AccessLevel.USER_MODE);
 		}
 		return count;
 	}

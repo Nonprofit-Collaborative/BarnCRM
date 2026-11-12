@@ -175,6 +175,80 @@ private class BrandServiceTest {
 	}
 
 	@IsTest
+	static void severalDefaultsSavedTogetherKeepTheLast() {
+		System.runAs(TestUsers.admin()) {
+			Test.startTest();
+			List<Brand__c> together = new List<Brand__c>{
+				new Brand__c(Name = 'One', Is_Default__c = true),
+				new Brand__c(Name = 'Two', Is_Default__c = true),
+				new Brand__c(Name = 'Three', Is_Default__c = true)
+			};
+			insert together;
+			Test.stopTest();
+
+			List<Brand__c> defaults = [SELECT Id FROM Brand__c WHERE Is_Default__c = TRUE];
+			Assert.areEqual(1, defaults.size(), 'One default after a batch of three');
+			Assert.areEqual(together[2].Id, defaults[0].Id, 'The last one saved stays');
+		}
+	}
+
+	@IsTest
+	static void parentsWithoutABrandFallBackToTheUsersBrand() {
+		System.runAs(TestUsers.admin()) {
+			turnOn(true, false);
+			Brand__c mine = brand('Mine', null, false);
+			insert new Brand_Assignment__c(Brand__c = mine.Id, User__c = UserInfo.getUserId());
+			Account household = HouseholdTestDataFactory.newHousehold('Zztest Parent');
+			insert household;
+			Contact person = new Contact(LastName = 'Zztest Parent');
+			insert person;
+			List<Brand_Assignment__c> records = new List<Brand_Assignment__c>{
+				new Brand_Assignment__c(Account__c = household.Id),
+				new Brand_Assignment__c(Contact__c = person.Id)
+			};
+
+			Test.startTest();
+			BrandService.applyDefaults(records, 'Account__c');
+			BrandService.applyDefaults(records, 'Contact__c');
+			Test.stopTest();
+
+			for (Brand_Assignment__c record : records) {
+				Assert.areEqual(
+					mine.Id,
+					record.Brand__c,
+					'A parent with no brand field is skipped'
+				);
+			}
+		}
+	}
+
+	@IsTest
+	static void aFullSharePageQueuesTheNextWhateverItsScope() {
+		System.runAs(TestUsers.admin()) {
+			turnOn(true, true);
+			Brand__c chapter = brand('Chapter', null, false);
+			Contact person = new Contact(LastName = 'Zztest Alone');
+			insert person;
+			Assert.isNull(
+				[SELECT AccountId FROM Contact WHERE Id = :person.Id].AccountId,
+				'A contact with no account adds nothing to the page scope'
+			);
+			insert new Brand_Assignment__c(Brand__c = chapter.Id, Contact__c = person.Id);
+			Id start = Id.valueOf(
+				Brand_Assignment__c.SObjectType.getDescribe().getKeyPrefix() + '000000000000'
+			);
+
+			Test.startTest();
+			Integer before = Limits.getQueueableJobs();
+			new BrandShareJob(true, true, null, start).execute(null);
+			Integer queued = Limits.getQueueableJobs() - before;
+			Test.stopTest();
+
+			Assert.areEqual(1, queued, 'The page had a row, so the next page is queued');
+		}
+	}
+
+	@IsTest
 	static void defaultsComeFromTheUserInBulk() {
 		System.runAs(TestUsers.admin()) {
 			turnOn(true, false);

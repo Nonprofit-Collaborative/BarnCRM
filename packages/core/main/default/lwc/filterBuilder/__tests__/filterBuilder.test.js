@@ -317,6 +317,22 @@ describe('c-filter-builder', () => {
     const values = (changes) =>
       JSON.parse(changes[changes.length - 1].value).conditions.map((entry) => entry.value);
 
+    it('keeps Move and Remove in a fixed column beside a wrapping grid of the pickers', async () => {
+      const { element } = await threeConditions();
+      const row = all(element, 'condition')[0];
+      const field = row.querySelector('[data-id="field"]');
+      const wrapping = field.closest('.slds-wrap');
+      expect(wrapping).not.toBeNull();
+      const trailing = row.querySelector('[data-id="remove"]').parentElement;
+      expect(trailing.classList.contains('slds-shrink-none')).toBe(true);
+      expect(trailing.classList.contains('slds-grow-none')).toBe(true);
+      expect(trailing.contains(row.querySelector('[data-id="move-up"]'))).toBe(true);
+      expect(trailing.contains(field)).toBe(false);
+      // The outer grid does not wrap, so the column cannot drop under the pickers.
+      expect(trailing.parentElement.classList.contains('slds-wrap')).toBe(false);
+      expect(trailing.parentElement.contains(wrapping)).toBe(true);
+    });
+
     it('offers no handle or move buttons for a single condition', async () => {
       const { element } = await render();
       one(element, 'add').click();
