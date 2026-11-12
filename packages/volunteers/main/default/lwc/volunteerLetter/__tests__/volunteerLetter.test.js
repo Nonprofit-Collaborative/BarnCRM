@@ -4,9 +4,11 @@ import VolunteerLetter from 'c/volunteerLetter';
 import getActionContext from '@salesforce/apex/VolunteerLetterController.getActionContext';
 import previewLetter from '@salesforce/apex/VolunteerLetterController.preview';
 import generateLetter from '@salesforce/apex/VolunteerLetterController.generate';
-import BAD_PERIOD from '@salesforce/label/c.Volunteers_Letter_BadPeriod';
-import NO_ACTIVE_TEMPLATE from '@salesforce/label/c.Volunteers_Letter_NoActiveTemplate';
 import { periodDates, THIS_YEAR, LAST_YEAR } from 'c/volunteerPeriods';
+
+// Help catalog texts read as "c.<key>" in Jest (jest.config.js, c/barnHelpText).
+const BAD_PERIOD = 'c.Volunteers_Letter_BadPeriod';
+const NO_ACTIVE_TEMPLATE = 'c.Volunteers_Letter_NoActiveTemplate';
 
 jest.mock(
   '@salesforce/apex/VolunteerLetterController.getActionContext',

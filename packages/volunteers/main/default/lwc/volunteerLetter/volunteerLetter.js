@@ -14,12 +14,6 @@ import TO_DATE from '@salesforce/label/c.Core_SetupChanges_To';
 import PREVIEW from '@salesforce/label/c.Core_BulkUpdate_Preview';
 import GENERATE from '@salesforce/label/c.Core_Shared_Generate';
 import CANCEL from '@salesforce/label/c.Core_CmdtManager_CancelButton';
-import SAVED from '@salesforce/label/c.Volunteers_LetterAction_Saved';
-import NOT_A_PERSON from '@salesforce/label/c.Volunteers_Letter_NotAPerson';
-import NEED_PERMISSION from '@salesforce/label/c.Volunteers_Letter_NeedManagePermission';
-import NO_TEMPLATE from '@salesforce/label/c.Volunteers_Letter_NoActiveTemplate';
-import BAD_PERIOD from '@salesforce/label/c.Volunteers_Letter_BadPeriod';
-import NO_LEGAL_NAME from '@salesforce/label/c.Volunteers_LetterAction_NoLegalName';
 import PERIOD from '@salesforce/label/c.Core_Shared_Period';
 import THIS_YEAR_LABEL from '@salesforce/label/c.Volunteers_Shared_ThisYear';
 import LAST_YEAR_LABEL from '@salesforce/label/c.Volunteers_Shared_LastYear';
@@ -46,7 +40,9 @@ export default class VolunteerLetter extends LightningElement {
     generate: GENERATE,
     cancel: CANCEL,
     loading: LOADING,
-    noLegalName: NO_LEGAL_NAME
+    get noLegalName() {
+      return helpText('Volunteers', 'Volunteers_LetterAction_NoLegalName');
+    }
   };
 
   periodOptions = periodOptions({
@@ -106,13 +102,13 @@ export default class VolunteerLetter extends LightningElement {
       return this.notice;
     }
     if (!this.context.isPerson) {
-      return NOT_A_PERSON;
+      return helpText('Volunteers', 'Volunteers_Letter_NotAPerson');
     }
     if (!this.context.canManage) {
-      return NEED_PERMISSION;
+      return helpText('Volunteers', 'Volunteers_Letter_NeedManagePermission');
     }
     if (!this.context.templates || this.context.templates.length === 0) {
-      return NO_TEMPLATE;
+      return helpText('Volunteers', 'Volunteers_Letter_NoActiveTemplate');
     }
     return undefined;
   }
@@ -177,14 +173,17 @@ export default class VolunteerLetter extends LightningElement {
       this.notice = result.skipReason;
       return;
     }
-    Toast.show({ label: SAVED, variant: 'success' }, this);
+    Toast.show(
+      { label: helpText('Volunteers', 'Volunteers_LetterAction_Saved'), variant: 'success' },
+      this
+    );
     this.dispatchEvent(new CloseActionScreenEvent());
   }
 
   /** True when the period can be sent; otherwise shows why, with no server call. */
   periodIsValid() {
     if (!this.fromDate || !this.toDate || this.fromDate > this.toDate) {
-      this.notice = BAD_PERIOD;
+      this.notice = helpText('Volunteers', 'Volunteers_Letter_BadPeriod');
       this.previewBody = undefined;
       return false;
     }

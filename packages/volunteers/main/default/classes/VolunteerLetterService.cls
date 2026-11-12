@@ -53,12 +53,14 @@ public with sharing class VolunteerLetterService {
 			? null
 			: VolunteerLetterSelector.template(templateId);
 		if (template == null || String.isBlank(template.Body__c)) {
-			throw new VolunteerLetterException(Label.Volunteers_Letter_TemplateNotFound);
+			throw new VolunteerLetterException(
+				BarnHelp.text('Volunteers', 'Volunteers_Letter_TemplateNotFound')
+			);
 		}
 		if (template.Active__c != true) {
 			throw new VolunteerLetterException(
 				String.format(
-					Label.Volunteers_Letter_TemplateInactive,
+					BarnHelp.text('Volunteers', 'Volunteers_Letter_TemplateInactive'),
 					new List<Object>{ template.Name }
 				)
 			);
@@ -73,7 +75,9 @@ public with sharing class VolunteerLetterService {
 	public static Id activeTemplateIdForType(String letterType) {
 		requireManage();
 		if (String.isBlank(letterType)) {
-			throw new VolunteerLetterException(Label.Volunteers_Letter_TypeRequired);
+			throw new VolunteerLetterException(
+				BarnHelp.text('Volunteers', 'Volunteers_Letter_TypeRequired')
+			);
 		}
 		Volunteer_Letter_Template__c template = VolunteerLetterSelector.activeTemplateOfType(
 			letterType.trim()
@@ -81,7 +85,7 @@ public with sharing class VolunteerLetterService {
 		if (template == null || String.isBlank(template.Body__c)) {
 			throw new VolunteerLetterException(
 				String.format(
-					Label.Volunteers_Letter_NoActiveTemplateForType,
+					BarnHelp.text('Volunteers', 'Volunteers_Letter_NoActiveTemplateForType'),
 					new List<Object>{ letterType.trim() }
 				)
 			);
@@ -101,7 +105,9 @@ public with sharing class VolunteerLetterService {
 
 	private static void requirePeriod(Date fromDate, Date toDate) {
 		if (fromDate == null || toDate == null || fromDate > toDate) {
-			throw new VolunteerLetterException(Label.Volunteers_Letter_BadPeriod);
+			throw new VolunteerLetterException(
+				BarnHelp.text('Volunteers', 'Volunteers_Letter_BadPeriod')
+			);
 		}
 	}
 
@@ -147,11 +153,11 @@ public with sharing class VolunteerLetterService {
 			Person person = found.get(personId);
 			if (person == null) {
 				letter.skipReason = personId.getSObjectType() == Account.SObjectType
-					? Label.Volunteers_Letter_NotAPerson
-					: Label.Volunteers_Letter_PersonNotVisible;
+					? BarnHelp.text('Volunteers', 'Volunteers_Letter_NotAPerson')
+					: BarnHelp.text('Volunteers', 'Volunteers_Letter_PersonNotVisible');
 			} else if (!totals.containsKey(personId)) {
 				letter.personName = person.name;
-				letter.skipReason = Label.Volunteers_Letter_NoHours;
+				letter.skipReason = BarnHelp.text('Volunteers', 'Volunteers_Letter_NoHours');
 			} else {
 				letter.personName = person.name;
 				Map<String, String> values = new Map<String, String>(shared);
@@ -232,7 +238,9 @@ public with sharing class VolunteerLetterService {
 
 	public static void requireManage() {
 		if (!VolunteerHoursService.canManage()) {
-			throw new VolunteerLetterException(Label.Volunteers_Letter_NeedManagePermission);
+			throw new VolunteerLetterException(
+				BarnHelp.text('Volunteers', 'Volunteers_Letter_NeedManagePermission')
+			);
 		}
 	}
 

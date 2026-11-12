@@ -118,7 +118,7 @@ private class VolunteerHoursServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				Label.Volunteers_Hours_StatusThroughApproval,
+				BarnHelp.text('Volunteers', 'Volunteers_Hours_StatusThroughApproval'),
 				message,
 				'New hours cannot arrive already approved while approval is on.'
 			);
@@ -143,12 +143,12 @@ private class VolunteerHoursServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				Label.Volunteers_Hours_StatusThroughApproval,
+				BarnHelp.text('Volunteers', 'Volunteers_Hours_StatusThroughApproval'),
 				byStatus,
 				'Even an administrator approves through the service (R-VG5).'
 			);
 			Assert.areEqual(
-				Label.Volunteers_Hours_StatusThroughApproval,
+				BarnHelp.text('Volunteers', 'Volunteers_Hours_StatusThroughApproval'),
 				byApprover,
 				'Approved By is the service\'s to write.'
 			);
@@ -200,7 +200,7 @@ private class VolunteerHoursServiceTest {
 				'An approved entry is locked (R-VG7): ' + locked
 			);
 			Assert.areEqual(
-				Label.Volunteers_Hours_ApprovedNotDeletable,
+				BarnHelp.text('Volunteers', 'Volunteers_Hours_ApprovedNotDeletable'),
 				deleted,
 				'An approved entry is not deleted, even by an administrator (R-VG9).'
 			);
@@ -231,7 +231,7 @@ private class VolunteerHoursServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				Label.Volunteers_Hours_RejectionReasonRequired,
+				BarnHelp.text('Volunteers', 'Volunteers_Hours_RejectionReasonRequired'),
 				message,
 				'Rejecting says why (R-VG8).'
 			);
@@ -264,7 +264,7 @@ private class VolunteerHoursServiceTest {
 		Test.stopTest();
 
 		Assert.areEqual(
-			Label.Volunteers_Hours_NeedManagePermission,
+			BarnHelp.text('Volunteers', 'Volunteers_Hours_NeedManagePermission'),
 			message,
 			'Approving needs Manage Volunteers (R-VG5).'
 		);

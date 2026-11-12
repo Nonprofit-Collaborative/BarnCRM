@@ -302,7 +302,10 @@ private class VolunteerHoursImportTest {
 			Assert.areEqual(0, outcome.created, 'Nothing loads Approved: ' + rejections());
 			Assert.areEqual(2, outcome.rejected, 'Each row is refused.');
 			Assert.isTrue(
-				rejections().contains(Label.Volunteers_Hours_StatusThroughApproval),
+				rejections()
+					.contains(
+						BarnHelp.text('Volunteers', 'Volunteers_Hours_StatusThroughApproval')
+					),
 				'Says approval goes through a coordinator: ' + rejections()
 			);
 		}

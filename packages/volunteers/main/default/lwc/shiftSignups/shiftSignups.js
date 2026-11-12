@@ -28,9 +28,6 @@ import CLOSE_MARK_NO_SHOW from '@salesforce/label/c.Volunteers_Signups_CloseMark
 import CLOSE_KEEP from '@salesforce/label/c.Volunteers_Signups_CloseKeep';
 import ADDED from '@salesforce/label/c.Volunteers_Signups_Added';
 import CHANGED from '@salesforce/label/c.Core_Format_PairSentence';
-import HOURS_WRITTEN from '@salesforce/label/c.Volunteers_Signups_HoursWritten';
-import MORE_THAN_SHOWN from '@salesforce/label/c.Volunteers_Signups_MoreThanShown';
-import NO_HOURS_WARNING from '@salesforce/label/c.Volunteers_Signups_NoHoursWarning';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import { bodyMessage, format } from 'c/findCsv';
 import { helpText, isHelpLoaded, loadHelp } from 'c/barnHelpText';
@@ -246,7 +243,7 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
   }
 
   get moreThanShownText() {
-    return format(MORE_THAN_SHOWN, MAX_SHOWN);
+    return format(helpText('Volunteers', 'Volunteers_Signups_MoreThanShown'), MAX_SHOWN);
   }
 
   get hasError() {
@@ -336,12 +333,15 @@ export default class ShiftSignups extends NavigationMixin(LightningElement) {
       const option = panel.statusOptions.find((candidate) => candidate.value === status);
       const changed = format(CHANGED, who, option ? option.label : status);
       if (panel.hoursWritten) {
-        return { text: `${changed} ${HOURS_WRITTEN}` };
+        return { text: `${changed} ${helpText('Volunteers', 'Volunteers_Signups_HoursWritten')}` };
       }
       // Attended with no hours entry at all (a shift with no end time, or the setting off):
       // say so by name, because nothing else tells the coordinator the hours are missing.
       if (status === STATUS_ATTENDED && !panel.hoursExist) {
-        return { text: `${changed} ${format(NO_HOURS_WARNING, who)}`, warning: true };
+        return {
+          text: `${changed} ${format(helpText('Volunteers', 'Volunteers_Signups_NoHoursWarning'), who)}`,
+          warning: true
+        };
       }
       return { text: changed };
     });

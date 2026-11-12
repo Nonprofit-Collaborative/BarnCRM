@@ -1,3 +1,4 @@
+import { setHelpTextForTest } from 'c/barnHelpText';
 import { createElement } from 'lwc';
 
 const mockNavigate = jest.fn();
@@ -24,6 +25,10 @@ import approveHours from '@salesforce/apex/VolunteerHoursApprovalController.appr
 import rejectHours from '@salesforce/apex/VolunteerHoursApprovalController.reject';
 import reopenHours from '@salesforce/apex/VolunteerHoursApprovalController.reopen';
 
+setHelpTextForTest({
+  Volunteers_Approve_DoneApprove: 'Entries approved: {0}.'
+});
+
 jest.mock(
   '@salesforce/apex/VolunteerHoursApprovalController.getHours',
   () => ({ default: jest.fn() }),
@@ -42,11 +47,6 @@ jest.mock(
 jest.mock(
   '@salesforce/apex/VolunteerHoursApprovalController.reopen',
   () => ({ default: jest.fn() }),
-  { virtual: true }
-);
-jest.mock(
-  '@salesforce/label/c.Volunteers_Approve_DoneApprove',
-  () => ({ default: 'Entries approved: {0}.' }),
   { virtual: true }
 );
 jest.mock(

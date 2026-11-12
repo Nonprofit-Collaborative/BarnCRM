@@ -182,7 +182,7 @@ private class VolunteerHoursApprovalControllerTest {
 		Test.stopTest();
 
 		Assert.areEqual(
-			Label.Volunteers_Hours_RejectionReasonRequired,
+			BarnHelp.text('Volunteers', 'Volunteers_Hours_RejectionReasonRequired'),
 			noReason,
 			'A rejection needs a reason.'
 		);
@@ -234,12 +234,12 @@ private class VolunteerHoursApprovalControllerTest {
 
 		Assert.isFalse(stafferPage.canManage, 'A staffer may not approve.');
 		Assert.areEqual(
-			Label.Volunteers_Hours_NeedManagePermission,
+			BarnHelp.text('Volunteers', 'Volunteers_Hours_NeedManagePermission'),
 			stafferApprove,
 			'Approving is refused, naming the permission.'
 		);
 		Assert.areEqual(
-			Label.Volunteers_Hours_NeedManagePermission,
+			BarnHelp.text('Volunteers', 'Volunteers_Hours_NeedManagePermission'),
 			stafferReopen,
 			'So is reopening.'
 		);
@@ -277,7 +277,11 @@ private class VolunteerHoursApprovalControllerTest {
 		}
 		Test.stopTest();
 
-		Assert.areEqual(Label.Volunteers_Approve_NothingSelected, nothing, 'Nothing selected.');
+		Assert.areEqual(
+			BarnHelp.text('Volunteers', 'Volunteers_Approve_NothingSelected'),
+			nothing,
+			'Nothing selected.'
+		);
 		Assert.isTrue(
 			overLimit.contains(String.valueOf(VolunteerHoursApprovalController.MAX_PER_CALL)),
 			'Too many names the limit: ' + overLimit

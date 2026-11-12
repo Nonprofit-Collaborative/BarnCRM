@@ -227,12 +227,12 @@ private class VolunteerLetterServiceTest {
 
 		Assert.isTrue(outcome.versionIds.isEmpty(), 'No file is made.');
 		Assert.areEqual(
-			Label.Volunteers_Letter_NoHours,
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_NoHours'),
 			outcome.skipped.get(person.Id),
 			'No hours.'
 		);
 		Assert.areEqual(
-			Label.Volunteers_Letter_NotAPerson,
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_NotAPerson'),
 			outcome.skipped.get(household.Id),
 			'A household is not a person.'
 		);
@@ -277,9 +277,21 @@ private class VolunteerLetterServiceTest {
 		}
 		Test.stopTest();
 
-		Assert.areEqual(Label.Volunteers_Letter_NeedManagePermission, byStaff, 'Staff cannot.');
-		Assert.areEqual(Label.Volunteers_Letter_NeedManagePermission, flow, 'Nor from a flow.');
-		Assert.areEqual(Label.Volunteers_Letter_BadPeriod, reversed, 'From after To is refused.');
+		Assert.areEqual(
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_NeedManagePermission'),
+			byStaff,
+			'Staff cannot.'
+		);
+		Assert.areEqual(
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_NeedManagePermission'),
+			flow,
+			'Nor from a flow.'
+		);
+		Assert.areEqual(
+			BarnHelp.text('Volunteers', 'Volunteers_Letter_BadPeriod'),
+			reversed,
+			'From after To is refused.'
+		);
 	}
 
 	@IsTest
@@ -322,7 +334,7 @@ private class VolunteerLetterServiceTest {
 
 		Assert.areEqual(6, refusals.size(), 'Every bad period is refused by both entry points.');
 		Assert.areEqual(
-			new Set<String>{ Label.Volunteers_Letter_BadPeriod },
+			new Set<String>{ BarnHelp.text('Volunteers', 'Volunteers_Letter_BadPeriod') },
 			new Set<String>(refusals),
 			'With the plain period message.'
 		);

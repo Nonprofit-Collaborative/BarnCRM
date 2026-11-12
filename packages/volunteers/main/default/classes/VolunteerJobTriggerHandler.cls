@@ -24,7 +24,7 @@ public with sharing class VolunteerJobTriggerHandler extends TriggerHandler {
 		Set<Id> inUse = VolunteerIntegritySelector.selectJobIdsInUse(jobIds);
 		for (Volunteer_Job__c job : jobs) {
 			if (inUse.contains(job.Id)) {
-				job.addError(Label.Volunteers_Job_InUseNotDeletable);
+				job.addError(BarnHelp.text('Volunteers', 'Volunteers_Job_InUseNotDeletable'));
 			}
 		}
 	}

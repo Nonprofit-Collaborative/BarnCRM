@@ -320,7 +320,7 @@ private class VolunteerSampleDataTest {
 			Assert.isTrue(
 				warning.contains(
 					String.format(
-						Label.Volunteers_SampleData_KeptShift,
+						BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptShift'),
 						new List<Object>{
 							nameOf(booked.Id),
 							person,
@@ -333,7 +333,7 @@ private class VolunteerSampleDataTest {
 			Assert.isTrue(
 				warning.contains(
 					String.format(
-						Label.Volunteers_SampleData_KeptShift,
+						BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptShift'),
 						new List<Object>{
 							nameOf(worked.Id),
 							person,
@@ -346,14 +346,14 @@ private class VolunteerSampleDataTest {
 			Assert.isTrue(
 				warning.contains(
 					String.format(
-						Label.Volunteers_SampleData_KeptJobShifts,
+						BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptJobShifts'),
 						new List<Object>{ job.Name }
 					)
 				),
 				'It names the job kept with them: ' + warning
 			);
 			Assert.isTrue(
-				warning.endsWith(Label.Volunteers_SampleData_KeptNext),
+				warning.endsWith(BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptNext')),
 				'It says what to do'
 			);
 			Assert.areEqual(
@@ -449,7 +449,7 @@ private class VolunteerSampleDataTest {
 				log[0]
 					.Message__c.contains(
 						String.format(
-							Label.Volunteers_SampleData_KeptSkillPerson,
+							BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptSkillPerson'),
 							new List<Object>{ skill.Name, person }
 						)
 					),
@@ -459,7 +459,7 @@ private class VolunteerSampleDataTest {
 				log[0]
 					.Message__c.contains(
 						String.format(
-							Label.Volunteers_SampleData_KeptSkillJob,
+							BarnHelp.text('Volunteers', 'Volunteers_SampleData_KeptSkillJob'),
 							new List<Object>{ asked.Name, realJob.Name }
 						)
 					),
