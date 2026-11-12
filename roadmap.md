@@ -2,7 +2,7 @@
 
 Purpose: planned work with status, by release. Mirrors Section 6 (6.0a release plan, 6.1.5 competitive research) of the BMemory plan `specification/open-impact-product-plan.md`, which is canonical: change BMemory first, then this file and `docs/product-plan.md`. Feature status detail lives in `docs/barncrm-features.md`.
 
-Status as of 2026-11-09: the Batch C whole-solution review (plan 9.8, five reviewers including the new performance reviewer) landed as #1041 (squash 6da9f882) with the review PRs #1030 to #1040, #1035, the erasure start seam #1042 (ADR-0193) and the D-191 follow-ups #1044 to #1046; release gate at a3c103e6 passed on `barn-sales` and `oi-test` (5,323 of 5,323 each, coverage 93%); `barn-npc` (all packages) and `mwdbdevsb` (Core only, pre-approved at the end of every batch, D-192) check-only validations run in parallel with the gate (D-191), deploys follow when they pass; the simpler permission sets release N is built as #1047 to #1049, not yet landed, and goes in the next landing batch (D). Payments (PAY-01 to PAY-03) and the event additions (EV-20 to EV-29) are placed in releases 1.4, 1.5, 1.8, 1.11, 1.13 and 1.15 (D-190). Earlier, status as of 2026-11-08: Batch C (releases 1.1 to 1.3) is in `main`: landing #1026 (e4069239) after the release gate passed on `oi-test` and `barn-sales` (5,296 of 5,296), then #1027 (Contact Point Sync bulk CPU) and #1028 (barn-npc-only test fixes); released to `barn-npc` at 2c26fd7b with the module tabs in the BarnCRM apps (D-188); next: `mwdbdevsb` Core deploy (owner approval), QA and UX, then statuses move to Shipped. Earlier, status as of 2026-11-07: Batch B is finished: `main` 4ca13cb2 (#1002, D-185) released to `barn-npc` and `mwdbdevsb`. Batch C waves 1 and 2 are built and integrated on `landing/batch-c` (ec73c41e, ADR-0175 to ADR-0185); the batch gate on `barn-sales` stopped at the org's custom app limit (owner decision pending); wave 3 (EV-13, EV-16 to EV-19, PB-03, PB-07, PB-08, Events sample data) is being built. Earlier, status as of 2026-11-06 (later): Batch B follow-ups 2 (D-184) landed as #979 (cd1410ae): vis-modules-18 module record pages, Households rename, Match Sources off by a setting, address deletion setting, shipped Organization record type, Relationships hidden while off, C-60 Automation tab, inventory, scan and deactivate tool; `mwdbdevsb` released with Batch B Core (ca99c753, Rollups removed per D-179); next: `barn-npc` release of #979, `mwdbdevsb` Core release on approval, then Batch C. Earlier, status as of 2026-11-06: all of Batch B is in `main`: the nonprofit stage (Giving, Programs, Volunteers, Funders, Logic Models usability and visual rollout, release 0.18) landed as #958 (ca99c753) after the owner QA fixes; the release gate passed on `barn-sales` and `oi-test` (4,914 of 4,914); released to `barn-npc` (all packages); `mwdbdevsb` not yet deployed (needs approval and the D-179 scope); next Batch C (Forms, Contact Point Sync, Events, Portal Builder). Earlier, status as of 2026-11-05: the Batch B Core stage (#912) and stage 2, Core follow-ups, Rollups and Mirror (#918) are in `main`; released to `barn-npc` (Core and universal modules) and `mwdbdevsb` (Core and Rollups); the owner QA round landed #923 to #930 in `main`, not yet deployed (D-179 to D-182); the nonprofit stage of Batch B is held until the QA fixes are done; then Batch C (Forms, Contact Point Sync, Events, Portal Builder). Earlier, status as of 2026-11-04: releases 0.15 to 0.17 (batch B) built and integrated on `landing/batch-b`; release 0.18 (usability and visual polish, architect-review fixes; D-170 to D-173) added to v1.0 and partly built: UX kit, help catalogs, logos, Core and Logic Models rollouts and the install and automation stack merged into `landing/batch-b` through #898; the nonprofit module rollouts (Giving, Programs, Volunteers, Funders, Logic Models part 3) are on hold behind Core, then universal modules, then nonprofit modules; messages move (AR-01) and the Apex trim pass still to build; Project Management module placed in release 1.17, Batch I (D-175). Nothing of batch B is in `main` yet. Earlier, status as of 2026-11-02: every v1.0 item (releases 0.15 to 0.17, batch B) built and integrated on `landing/batch-b`, not yet in `main` (status Built until the landing gate passes and it is squash-merged; D-167: all of v1.0 built before any testing cycle). Landing batch A (releases 0.12 to 0.14) landed in `main` (status Landed until the batch's release gate, deploys and QA are done); last shipped version 0.11; release plan adopted (D-155); competitive research added 48 features (D-156); the eleven research proposals approved and placed, v1.0 after Brandon's initial QA (D-157). History: `changelog.md` (newest first) and this file's earlier versions in git (`git log -p -- roadmap.md`; the last iteration-based version is at ef92381b).
+Status as of 2026-11-12: landing batch D to I (releases 1.4 to 1.18 and permission set release N) is in `main`: landing #1235 squash-merged as 2efde31d4 after the release gate passed on `barn-sales` and `oi-test` (5,900 of 5,900 each); #1043 and #1047 to #1049 closed as landed. Deployed to `barn-npc` (all 20 packages, from 8242fe12e) and `mwdbdevsb` (Core and Rollups, a712e6a43). Brandon's QA and UX of the batch have not happened yet, so releases 1.4 to 1.18 read Landed, not Shipped. Release 1.20 (MIG-02b, PAY-04, LB-07, CH-21, CH-22 and the full PSA, PM-06 to PM-12; D-196, D-197) is built on `landing/batch-j` and in testing; release 1.19 (remaining approved items) is still Planned except C-73. Decisions D-193 to D-197 recorded. Earlier, status as of 2026-11-09: the Batch C whole-solution review (plan 9.8, five reviewers including the new performance reviewer) landed as #1041 (squash 6da9f882) with the review PRs #1030 to #1040, #1035, the erasure start seam #1042 (ADR-0193) and the D-191 follow-ups #1044 to #1046; release gate at a3c103e6 passed on `barn-sales` and `oi-test` (5,323 of 5,323 each, coverage 93%); `barn-npc` (all packages) and `mwdbdevsb` (Core only, pre-approved at the end of every batch, D-192) check-only validations run in parallel with the gate (D-191), deploys follow when they pass; the simpler permission sets release N is built as #1047 to #1049, not yet landed, and goes in the next landing batch (D). Payments (PAY-01 to PAY-03) and the event additions (EV-20 to EV-29) are placed in releases 1.4, 1.5, 1.8, 1.11, 1.13 and 1.15 (D-190). Earlier, status as of 2026-11-08: Batch C (releases 1.1 to 1.3) is in `main`: landing #1026 (e4069239) after the release gate passed on `oi-test` and `barn-sales` (5,296 of 5,296), then #1027 (Contact Point Sync bulk CPU) and #1028 (barn-npc-only test fixes); released to `barn-npc` at 2c26fd7b with the module tabs in the BarnCRM apps (D-188); next: `mwdbdevsb` Core deploy (owner approval), QA and UX, then statuses move to Shipped. Earlier, status as of 2026-11-07: Batch B is finished: `main` 4ca13cb2 (#1002, D-185) released to `barn-npc` and `mwdbdevsb`. Batch C waves 1 and 2 are built and integrated on `landing/batch-c` (ec73c41e, ADR-0175 to ADR-0185); the batch gate on `barn-sales` stopped at the org's custom app limit (owner decision pending); wave 3 (EV-13, EV-16 to EV-19, PB-03, PB-07, PB-08, Events sample data) is being built. Earlier, status as of 2026-11-06 (later): Batch B follow-ups 2 (D-184) landed as #979 (cd1410ae): vis-modules-18 module record pages, Households rename, Match Sources off by a setting, address deletion setting, shipped Organization record type, Relationships hidden while off, C-60 Automation tab, inventory, scan and deactivate tool; `mwdbdevsb` released with Batch B Core (ca99c753, Rollups removed per D-179); next: `barn-npc` release of #979, `mwdbdevsb` Core release on approval, then Batch C. Earlier, status as of 2026-11-06: all of Batch B is in `main`: the nonprofit stage (Giving, Programs, Volunteers, Funders, Logic Models usability and visual rollout, release 0.18) landed as #958 (ca99c753) after the owner QA fixes; the release gate passed on `barn-sales` and `oi-test` (4,914 of 4,914); released to `barn-npc` (all packages); `mwdbdevsb` not yet deployed (needs approval and the D-179 scope); next Batch C (Forms, Contact Point Sync, Events, Portal Builder). Earlier, status as of 2026-11-05: the Batch B Core stage (#912) and stage 2, Core follow-ups, Rollups and Mirror (#918) are in `main`; released to `barn-npc` (Core and universal modules) and `mwdbdevsb` (Core and Rollups); the owner QA round landed #923 to #930 in `main`, not yet deployed (D-179 to D-182); the nonprofit stage of Batch B is held until the QA fixes are done; then Batch C (Forms, Contact Point Sync, Events, Portal Builder). Earlier, status as of 2026-11-04: releases 0.15 to 0.17 (batch B) built and integrated on `landing/batch-b`; release 0.18 (usability and visual polish, architect-review fixes; D-170 to D-173) added to v1.0 and partly built: UX kit, help catalogs, logos, Core and Logic Models rollouts and the install and automation stack merged into `landing/batch-b` through #898; the nonprofit module rollouts (Giving, Programs, Volunteers, Funders, Logic Models part 3) are on hold behind Core, then universal modules, then nonprofit modules; messages move (AR-01) and the Apex trim pass still to build; Project Management module placed in release 1.17, Batch I (D-175). Nothing of batch B is in `main` yet. Earlier, status as of 2026-11-02: every v1.0 item (releases 0.15 to 0.17, batch B) built and integrated on `landing/batch-b`, not yet in `main` (status Built until the landing gate passes and it is squash-merged; D-167: all of v1.0 built before any testing cycle). Landing batch A (releases 0.12 to 0.14) landed in `main` (status Landed until the batch's release gate, deploys and QA are done); last shipped version 0.11; release plan adopted (D-155); competitive research added 48 features (D-156); the eleven research proposals approved and placed, v1.0 after Brandon's initial QA (D-157). History: `changelog.md` (newest first) and this file's earlier versions in git (`git log -p -- roadmap.md`; the last iteration-based version is at ef92381b).
 
 ## Rules (D-155 to D-157, plan 9.7 to 9.9)
 
@@ -203,213 +203,280 @@ Batch C whole-solution review (plan 9.8, 2026-11-09): all review items Landed (#
 
 ### 1.4 (Batch D): Migration Assistant, volunteer self-service
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
+
 C-46 Address Verification moved to release 1.15 (Brandon, 2026-11-04, D-177).
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| MIG-01 | Migration Assistant framework (plan 11.2 item 32 decisions first) | Major | Planned | D-125 |
-| V-09 | Public volunteer sign-up on the Forms engine | Major | Planned | D-157 |
-| MIG-10 | Integrations page: detected apps and migration links | Minor | Planned | D-125 |
-| PAY-01 | BarnCRM Payments (optional module, both editions; ADR first): the org's own Stripe and PayPal accounts through processor-hosted checkout and a webhook receiver; shared by Events, Giving, Memberships and Portal Builder; no money held, no card data | Major | Planned | D-190 |
-| PERM-N | Simpler permission sets, release N (add and migrate): Coordinator retired with Team Member carry-over, Bulk Update and Bulk Delete include Find and Export, BarnCRM Admin gains Bulk Update's class, Giving Admin follows BarnCRM Admin, Fundraising Staff gets the module staff sets except Programs, Mirror sets merged into Salesforce Records Sync and Inbound Gifts, clearer set labels; nobody loses access (built as #1047 to #1049, not yet landed; next landing batch) | Major | Built | D-191 |
-| MIG-06 | Zapier recipes; the Stripe receiver (X-08) is built as part of PAY-01 | Minor | Planned | D-125, D-190 |
-| MIG-08 | DLRS and NPSP rollups into Rollup Builder | Minor | Planned | D-125 |
-| V-12 | Volunteer value rate | Minor | Planned | D-156 |
-| V-13 | Volunteer recognition and milestones | Minor | Planned | D-156 |
-| G-35 | Giving setup tabs move to Admin_Tabs | Minor | Planned | D-165 |
+| MIG-01 | Migration Assistant framework (plan 11.2 item 32 decisions first) | Major | Landed (#1235) | D-125 |
+| V-09 | Public volunteer sign-up on the Forms engine | Major | Landed (#1235) | D-157 |
+| MIG-10 | Integrations page: detected apps and migration links | Minor | Landed (#1235) | D-125 |
+| PAY-01 | BarnCRM Payments (optional module, both editions; ADR first): the org's own Stripe and PayPal accounts through processor-hosted checkout and a webhook receiver; shared by Events, Giving, Memberships and Portal Builder; no money held, no card data | Major | Landed (#1235) | D-190 |
+| PERM-N | Simpler permission sets, release N (add and migrate): Coordinator retired with Team Member carry-over, Bulk Update and Bulk Delete include Find and Export, BarnCRM Admin gains Bulk Update's class, Giving Admin follows BarnCRM Admin, Fundraising Staff gets the module staff sets except Programs, Mirror sets merged into Salesforce Records Sync and Inbound Gifts, clearer set labels; nobody loses access (built as #1047 to #1049, not yet landed; next landing batch) | Major | Landed (#1235) | D-191 |
+| C-72 | Module detection without object names: Forms and Logic Models ship a Setting Definition row naming themselves so they need no probe object, like the six modules fixed in #1053 (a customer org's own same-named object, such as mwdbdevsb's Event__c and Volunteer_Hours__c, made modules read as installed while the namespace is deferred) | Minor | Landed (#1235) | #1053 |
+| MIG-06 | Zapier recipes; the Stripe receiver (X-08) is built as part of PAY-01 | Minor | Landed (#1235) | D-125, D-190 |
+| MIG-08 | DLRS and NPSP rollups into Rollup Builder | Minor | Landed (#1235) | D-125 |
+| V-12 | Volunteer value rate | Minor | Landed (#1235) | D-156 |
+| V-13 | Volunteer recognition and milestones | Minor | Landed (#1235) | D-156 |
+| G-35 | Giving setup tabs move to Admin_Tabs | Minor | Landed (#1235) | D-165 |
 
 ### 1.5 (Batch D): Recurring donor health, paid event registration, session proposals, Giving minors
+
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
 
 G-34 online donation page moved to release 1.15 with C-46 (D-177), as did G-21 and G-31. G-27 stays here, after MIG-06 in 1.4. C-64 moved to 1.15 to make room for event payments (D-190). Release N+1 of the simpler permission sets (the removals, ADR-0194, D-191) goes in this release, after release N (1.4).
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| G-27 | Recurring donor health | Major | Planned | D-156 |
-| EV-20 | Paid event registration: ticket prices and promo codes charged through PAY-01 (Stripe or PayPal hosted checkout) on the public page and portal, confirmed on payment, refunds and cancellations recorded | Major | Planned | D-190 |
-| EV-21 | Session proposal management: several presenters, reviewer assignment, multi-user scoring through a matrix (weighted criteria, optional blind review, totals, compare); extends EV-06 | Major | Planned | D-190 |
-| EV-26 | Badge overrides: badge name, title and company on the attendee | Minor | Planned | D-190 |
-| EV-27 | Per-session ratings: a short Forms rating per session reached by its QR code | Minor | Planned | D-190 |
-| PERM-N1 | Simpler permission sets, release N+1 (remove): retired Coordinator group and old Mirror sets removed after each holder is confirmed to hold the successor; Coordinator dropped from the module syncs and Health Check | Minor | Planned | D-191 |
-| G-32 | Wealth data fields and import template | Minor | Planned | D-156 |
-| G-33 | Quick Gift Entry donor panel | Minor | Planned | D-156 |
-| G-36 | One staff-facing word for Pledge versus Commitment (needs Brandon) | Minor | Planned | D-165 |
-| G-37 | Pledge reminders on the GivingScheduler Nightly Jobs path (needs Brandon) | Minor | Planned | D-165 |
+| G-27 | Recurring donor health | Major | Landed (#1235) | D-156 |
+| EV-20 | Paid event registration: ticket prices and promo codes charged through PAY-01 (Stripe or PayPal hosted checkout) on the public page and portal, confirmed on payment, refunds and cancellations recorded | Major | Landed (#1235) | D-190 |
+| EV-21 | Session proposal management: several presenters, reviewer assignment, multi-user scoring through a matrix (weighted criteria, optional blind review, totals, compare); extends EV-06 | Major | Landed (#1235) | D-190 |
+| EV-26 | Badge overrides: badge name, title and company on the attendee | Minor | Landed (#1235) | D-190 |
+| EV-27 | Per-session ratings: a short Forms rating per session reached by its QR code | Minor | Landed (#1235) | D-190 |
+| PERM-N1 | Simpler permission sets, release N+1 (remove): retired Coordinator group and old Mirror sets removed after each holder is confirmed to hold the successor; Coordinator dropped from the module syncs and Health Check | Minor | Landed (#1235) | D-191 |
+| G-32 | Wealth data fields and import template | Minor | Landed (#1235) | D-156 |
+| G-33 | Quick Gift Entry donor panel | Minor | Landed (#1235) | D-156 |
+| G-36 | One staff-facing word for Pledge versus Commitment (needs Brandon) | Minor | Landed (#1235) | D-165 |
+| G-37 | Pledge reminders on the GivingScheduler Nightly Jobs path (needs Brandon) | Minor | Landed (#1235) | D-165 |
 
 ### 1.6 (Batch D): Archive, generic merge, field history, Volunteers minors
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
+
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| C-67 | Archive by Query (uses shipped tools; defines the file format Backup Sets reuse) | Major | Planned | D-157 |
-| C-62 | Generic Record Merge | Major | Planned | D-156 |
-| C-68 | Field History Keeper | Major | Planned | D-157 |
-| V-14 | Shift minimum, maximum and waitlist | Minor | Planned | D-156 |
-| V-15 | Minor volunteers and guardian consent | Minor | Planned | D-156 |
-| V-16 | Group and standing sign-ups | Minor | Planned | D-156 |
-| V-17 | Background check details on onboarding | Minor | Planned | D-156 |
-| P-09 | Waitlists and capacity | Minor | Planned | Plan 5.4 |
-| C-71 | Fold the remaining inline AuraHandledException blocks into UserErrors | Minor | Planned | D-165 |
+| C-67 | Archive by Query (uses shipped tools; defines the file format Backup Sets reuse) | Major | Landed (#1235) | D-157 |
+| C-62 | Generic Record Merge | Major | Landed (#1235) | D-156 |
+| C-68 | Field History Keeper | Major | Landed (#1235) | D-157 |
+| V-14 | Shift minimum, maximum and waitlist | Minor | Landed (#1235) | D-156 |
+| V-15 | Minor volunteers and guardian consent | Minor | Landed (#1235) | D-156 |
+| V-16 | Group and standing sign-ups | Minor | Landed (#1235) | D-156 |
+| V-17 | Background check details on onboarding | Minor | Landed (#1235) | D-156 |
+| P-09 | Waitlists and capacity | Minor | Landed (#1235) | Plan 5.4 |
+| C-71 | Fold the remaining inline AuraHandledException blocks into UserErrors | Minor | Landed (#1235) | D-165 |
 
 ### 1.7 (Batch E): Corporate Hub, documents and compliance
+
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
 
 C-46 Address Verification is not a prerequisite (D-178): hub addresses are unverified until C-46 ships in 1.15.
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| CH-01 | Document and policy library (ADR first) | Major | Planned | D-118 |
-| CH-03 | Compliance calendar | Major | Planned | D-118 |
-| CH-04 | Shipped compliance templates | Major | Planned | D-118 |
-| CH-02 | Policy acknowledgments | Minor | Planned | D-118 |
-| CH-06 | Extra templates | Minor | Planned | D-118 |
-| CH-07 | Required-policies set | Minor | Planned | D-118 |
-| CH-08 | Contracts and renewals | Minor | Planned | D-118 |
+| CH-01 | Document and policy library (ADR first) | Major | Landed (#1235) | D-118 |
+| CH-03 | Compliance calendar | Major | Landed (#1235) | D-118 |
+| CH-04 | Shipped compliance templates | Major | Landed (#1235) | D-118 |
+| CH-02 | Policy acknowledgments | Minor | Landed (#1235) | D-118 |
+| CH-06 | Extra templates | Minor | Landed (#1235) | D-118 |
+| CH-07 | Required-policies set | Minor | Landed (#1235) | D-118 |
+| CH-08 | Contracts and renewals | Minor | Landed (#1235) | D-118 |
 
 ### 1.8 (Batch E): Memberships, GDPR
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
+
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| G-22a | Memberships module: types, tiers, members (ADR first) | Major | Planned | D-157 |
-| G-22b | Memberships: renewals, reminders, lapse handling | Major | Planned | D-157 |
-| CH-05 | GDPR template set | Major | Planned | D-118 |
-| G-22c | Memberships: benefits per tier | Minor | Planned | D-157 |
-| G-22d | Memberships Essentials compatibility | Minor | Planned | D-157 |
-| PAY-02 | Membership dues and renewals paid online through PAY-01, membership dated on payment | Minor | Planned | D-190 |
-| MIG-03 | V4S to Volunteers adapter | Minor | Planned | D-125 |
+| G-22a | Memberships module: types, tiers, members (ADR first) | Major | Landed (#1235) | D-157 |
+| G-22b | Memberships: renewals, reminders, lapse handling | Major | Landed (#1235) | D-157 |
+| CH-05 | GDPR template set | Major | Landed (#1235) | D-118 |
+| G-22c | Memberships: benefits per tier | Minor | Landed (#1235) | D-157 |
+| G-22d | Memberships Essentials compatibility | Minor | Landed (#1235) | D-157 |
+| PAY-02 | Membership dues and renewals paid online through PAY-01, membership dated on payment | Minor | Landed (#1235) | D-190 |
+| MIG-03 | V4S to Volunteers adapter | Minor | Landed (#1235) | D-125 |
 
 ### 1.9 (Batch E): Migrations
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
+
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| MIG-02 | NPC Party Relationship Groups to households | Major | Planned | D-125 |
-| MIG-04 | NPC gifts to Giving | Major | Planned | D-125 |
-| MIG-05 | NPSP migration kit, with a Levels, Engagement Plans and rollups parity report | Major | Planned | D-125, D-156 |
-| MIG-09 | PMM to Programs | Minor | Planned | D-125 |
-| MIG-07 | DonorPerfect, Bloomerang, Little Green Light templates, then Neon, CiviCRM, Raiser's Edge NXT | Minor | Planned | D-125 |
-| L-05 | Evidence log | Minor | Planned | Plan 5.7 |
+| MIG-02 | NPC Party Relationship Groups to households | Major | Landed (#1235) | D-125 |
+| MIG-04 | NPC gifts to Giving | Major | Landed (#1235) | D-125 |
+| MIG-05 | NPSP migration kit, with a Levels, Engagement Plans and rollups parity report | Major | Landed (#1235) | D-125, D-156 |
+| MIG-09 | PMM to Programs | Minor | Landed (#1235) | D-125 |
+| MIG-07 | DonorPerfect, Bloomerang, Little Green Light templates, then Neon, CiviCRM, Raiser's Edge NXT | Minor | Landed (#1235) | D-125 |
+| L-05 | Evidence log | Minor | Landed (#1235) | Plan 5.7 |
 
 ### 1.10 (Batch F): Board governance
+
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
 
 Portal Builder (PB-01) moved to release 1.3 (D-178); the board portal template (PB-02) follows in 1.11. CH-17 moved here from 1.2 with the board roster it generalizes (CH-09) (Brandon, 2026-11-07, D-186).
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| CH-09 | Board governance | Major | Planned | D-118 |
-| CH-10 | Board meetings | Major | Planned | D-118 |
-| CH-11 | Motions, votes and resolutions | Minor | Planned | D-118 |
-| CH-12 | Conflict-of-interest disclosures | Minor | Planned | D-118 |
-| CH-13 | Board giving participation | Minor | Planned | D-118 |
-| CH-14 | Board dashboard | Minor | Planned | D-118 |
-| CH-15 | Board skills and diversity matrix | Minor | Planned | D-156 |
-| CH-16 | Meeting action items | Minor | Planned | D-156 |
-| CH-17 | Committees and working groups (moved from 1.2, D-186) | Minor | Planned | D-156, D-186 |
+| CH-09 | Board governance | Major | Landed (#1235) | D-118 |
+| CH-10 | Board meetings | Major | Landed (#1235) | D-118 |
+| CH-11 | Motions, votes and resolutions | Minor | Landed (#1235) | D-118 |
+| CH-12 | Conflict-of-interest disclosures | Minor | Landed (#1235) | D-118 |
+| CH-13 | Board giving participation | Minor | Landed (#1235) | D-118 |
+| CH-14 | Board dashboard | Minor | Landed (#1235) | D-118 |
+| CH-15 | Board skills and diversity matrix | Minor | Landed (#1235) | D-156 |
+| CH-16 | Meeting action items | Minor | Landed (#1235) | D-156 |
+| CH-17 | Committees and working groups (moved from 1.2, D-186) | Minor | Landed (#1235) | D-156, D-186 |
 
 ### 1.11 (Batch F): Board and member portals, grant management
+
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
 
 PB-03 moved to release 1.3 (D-178). PB-02 needs Portal Builder (1.3) and board governance (1.10); PB-09 needs Portal Builder (1.3) and Memberships (1.8).
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| PB-02 | Board portal template | Major | Planned | D-118 |
-| F-09 | Grant Finder | Major | Planned | D-121 |
-| EV-22 | Attendee networking app: installable web app (PWA, no app store) on the org's WordPress site through BarnCRM for WordPress and the portal client: profiles with opt-in, connections, messages, announcements, sponsors, maps, ratings | Major | Planned | D-190 |
-| PB-09 | Member directory portal template | Minor | Planned | D-157 |
-| EV-29 | Personal agenda: attendees pick sessions with conflicts, capacity and an .ics export | Minor | Planned | D-190 |
-| F-10 | Application tasks and checklists | Minor | Planned | D-121 |
-| F-11 | Document tracking | Minor | Planned | D-121 |
-| F-12 | Budget versus awarded | Minor | Planned | D-121 |
-| F-13 | Renewals | Minor | Planned | D-121 |
+| PB-02 | Board portal template | Major | Landed (#1235) | D-118 |
+| F-09 | Grant Finder | Major | Landed (#1235) | D-121 |
+| EV-22 | Attendee networking app: installable web app (PWA, no app store) on the org's WordPress site through BarnCRM for WordPress and the portal client: profiles with opt-in, connections, messages, announcements, sponsors, maps, ratings | Major | Landed (#1235) | D-190 |
+| PB-09 | Member directory portal template | Minor | Landed (#1235) | D-157 |
+| EV-29 | Personal agenda: attendees pick sessions with conflicts, capacity and an .ics export | Minor | Landed (#1235) | D-190 |
+| F-10 | Application tasks and checklists | Minor | Landed (#1235) | D-121 |
+| F-11 | Document tracking | Minor | Landed (#1235) | D-121 |
+| F-12 | Budget versus awarded | Minor | Landed (#1235) | D-121 |
+| F-13 | Renewals | Minor | Landed (#1235) | D-121 |
 
 ### 1.12 (Batch F): Scholarships and Outbound Grants
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
+
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| SG-01 | Programs and cycles (ADR first) | Major | Planned | D-122 |
-| SG-02 | Applications on the Forms engine | Major | Planned | D-122 |
-| SG-03 | Reviewers and scoring | Major | Planned | D-122 |
-| SG-04 | Awards | Minor | Planned | D-122 |
-| SG-05 | Disbursements | Minor | Planned | D-122 |
-| SG-06 | Recipient reporting | Minor | Planned | D-122 |
-| SG-08 | Grantmaking dashboard | Minor | Planned | D-122 |
-| PB-06 | Applicant portal template (SG-07) | Minor | Planned | D-122 |
-| SG-09 | Conditional disbursements | Minor | Planned | D-156 |
+| SG-01 | Programs and cycles (ADR first) | Major | Landed (#1235) | D-122 |
+| SG-02 | Applications on the Forms engine | Major | Landed (#1235) | D-122 |
+| SG-03 | Reviewers and scoring | Major | Landed (#1235) | D-122 |
+| SG-04 | Awards | Minor | Landed (#1235) | D-122 |
+| SG-05 | Disbursements | Minor | Landed (#1235) | D-122 |
+| SG-06 | Recipient reporting | Minor | Landed (#1235) | D-122 |
+| SG-08 | Grantmaking dashboard | Minor | Landed (#1235) | D-122 |
+| PB-06 | Applicant portal template (SG-07) | Minor | Landed (#1235) | D-122 |
+| SG-09 | Conditional disbursements | Minor | Landed (#1235) | D-156 |
 
 ### 1.13 (Batch G): Multi-brand management, event operations, portal templates
+
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
 
 PB-07 and PB-08 moved to release 1.3 (D-178). PB-04 and PB-05 need Portal Builder (1.3) and their data modules.
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| C-47a | Brand and Legal Entity records, many-to-many assignment | Major | Planned | D-119, D-120 |
-| C-47b | Brand-aware outputs | Major | Planned | D-119, D-120 |
-| EV-23 | Event budget, expenses and partner funding: budget and actual by category, expense records, expected and received sponsor funds (MDF), net cost on the dashboard | Major | Planned | D-190 |
-| EV-24 | Reusable venues and rooms with capacity and setup, rooms picked on sessions | Minor | Planned | D-190 |
-| EV-25 | Session and speaker details: level, format, slides and recording links, sponsored session; speaker headshot, social links, checklist | Minor | Planned | D-190 |
-| EV-28 | Sponsor lead scanning: sponsors scan attendee QR codes (EV-12) in the portal, opted-in leads exported per sponsor | Minor | Planned | D-190 |
-| PB-04 | Service portal template | Minor | Planned | D-118 |
-| PB-05 | Partner portal template | Minor | Planned | D-118 |
-| SG-10 | Reviewer panels and load balancing | Minor | Planned | D-156 |
+| C-47a | Brand and Legal Entity records, many-to-many assignment | Major | Landed (#1235) | D-119, D-120 |
+| C-47b | Brand-aware outputs | Major | Landed (#1235) | D-119, D-120 |
+| EV-23 | Event budget, expenses and partner funding: budget and actual by category, expense records, expected and received sponsor funds (MDF), net cost on the dashboard | Major | Landed (#1235) | D-190 |
+| EV-24 | Reusable venues and rooms with capacity and setup, rooms picked on sessions | Minor | Landed (#1235) | D-190 |
+| EV-25 | Session and speaker details: level, format, slides and recording links, sponsored session; speaker headshot, social links, checklist | Minor | Landed (#1235) | D-190 |
+| EV-28 | Sponsor lead scanning: sponsors scan attendee QR codes (EV-12) in the portal, opted-in leads exported per sponsor | Minor | Landed (#1235) | D-190 |
+| PB-04 | Service portal template | Minor | Landed (#1235) | D-118 |
+| PB-05 | Partner portal template | Minor | Landed (#1235) | D-118 |
+| SG-10 | Reviewer panels and load balancing | Minor | Landed (#1235) | D-156 |
 
 ### 1.14 (Batch G): Brand visibility, LWC Builder start, board portal follow-ups
+
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
 
 CH-18 and CH-19 came from the old 1.12 (D-177): they need the board portal (PB-02, 1.11) and stay with the portal releases.
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| C-47c | Brand-restricted visibility (optional; ADR first) | Major | Planned | D-120 |
-| LB-01 | Grid canvas builder (ADR first) | Major | Planned | D-120 |
-| LB-02 | Runtime renderer | Major | Planned | D-120 |
-| C-47d | Brand lookup in modules, Bulk Update and import mapping | Minor | Planned | D-119 |
-| C-47e | Brand filters on list views, reports and dashboards | Minor | Planned | D-119 |
-| C-47f | Receipt numbering per brand | Minor | Planned | D-119 |
-| CH-18 | Board packet read tracking | Minor | Planned | D-156 |
-| CH-19 | Board self-assessment | Minor | Planned | D-156 |
+| C-47c | Brand-restricted visibility (optional; ADR first) | Major | Landed (#1235) | D-120 |
+| LB-01 | Grid canvas builder (ADR first) | Major | Landed (#1235) | D-120 |
+| LB-02 | Runtime renderer | Major | Landed (#1235) | D-120 |
+| C-47d | Brand lookup in modules, Bulk Update and import mapping | Minor | Landed (#1235) | D-119 |
+| C-47e | Brand filters on list views, reports and dashboards | Minor | Landed (#1235) | D-119 |
+| C-47f | Receipt numbering per brand | Minor | Landed (#1235) | D-119 |
+| CH-18 | Board packet read tracking | Minor | Landed (#1235) | D-156 |
+| CH-19 | Board self-assessment | Minor | Landed (#1235) | D-156 |
 
 ### 1.15 (Batch G): Address Verification, online donations
+
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
 
 Moved later by Brandon (2026-11-04, D-177). G-34 still needs MIG-06 (1.4) and the Forms engine (1.1); G-27 stays in 1.5. G-21 and G-31 came from the old 1.3. C-46 is no longer a prerequisite of Corporate Hub or Portal Builder (D-178), so their addresses are unverified until it ships here.
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| C-46 | Address Verification module (ADR first) | Major | Planned | D-112 |
-| G-34 | Online donation page handing off to the org's own Stripe or PayPal checkout; gift written back through the PAY-01 receiver | Major | Planned | D-157, D-190 |
-| C-64 | Engagement score (moved from 1.5 to make room for event payments, D-190) | Major | Planned | D-157, D-190 |
-| PAY-03 | Donor portal payments: pledge payments and recurring gift card updates through PAY-01 (extends PB-08) | Minor | Planned | D-190 |
-| G-21 | Stock and planned gift types | Minor | Planned | Plan 5.2 |
-| G-31 | Donor-advised fund and gift-source fields | Minor | Planned | D-156 |
+| C-46 | Address Verification module (ADR first) | Major | Landed (#1235) | D-112 |
+| G-34 | Online donation page handing off to the org's own Stripe or PayPal checkout; gift written back through the PAY-01 receiver | Major | Landed (#1235) | D-157, D-190 |
+| C-64 | Engagement score (moved from 1.5 to make room for event payments, D-190) | Major | Landed (#1235) | D-157, D-190 |
+| PAY-03 | Donor portal payments: pledge payments and recurring gift card updates through PAY-01 (extends PB-08) | Minor | Landed (#1235) | D-190 |
+| G-21 | Stock and planned gift types | Minor | Landed (#1235) | Plan 5.2 |
+| G-31 | Donor-advised fund and gift-source fields | Minor | Landed (#1235) | D-156 |
 
 ### 1.16 (Batch H): LWC Builder complete, Territory Management, Grid tool
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
+
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| LB-03 | Building blocks | Major | Planned | D-120 |
-| C-40 | Territory Management module (ADR first) | Major | Planned | D-98, D-120 |
-| C-41 | Grid tool | Major | Planned | D-98 |
-| LB-04 | Quick action and flow buttons | Minor | Planned | D-120 |
-| LB-05 | Conditional visibility per block | Minor | Planned | D-120 |
-| LB-06 | Export as LWC source | Minor | Planned | D-120 |
-| C-41b | Saved grids | Minor | Planned | D-98 |
-| C-40b | Round-robin and capacity routing | Minor | Planned | D-156 |
+| LB-03 | Building blocks | Major | Landed (#1235) | D-120 |
+| C-40 | Territory Management module (ADR first) | Major | Landed (#1235) | D-98, D-120 |
+| C-41 | Grid tool | Major | Landed (#1235) | D-98 |
+| LB-04 | Quick action and flow buttons | Minor | Landed (#1235) | D-120 |
+| LB-05 | Conditional visibility per block | Minor | Landed (#1235) | D-120 |
+| LB-06 | Export as LWC source | Minor | Landed (#1235) | D-120 |
+| C-41b | Saved grids | Minor | Landed (#1235) | D-98 |
+| C-40b | Round-robin and capacity routing | Minor | Landed (#1235) | D-156 |
 
 ### 1.17 (Batch H): Backup Sets and files import (late by Brandon's direction)
 
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
+
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| C-66 | Backup Sets (on demand; scheduled runs wait for C-38; ADR first) | Major | Planned | D-157 |
-| C-70 | Import files and attachments (ADR first) | Major | Planned | D-157 |
-| G-22e | Memberships: certifications and continuing credits | Minor | Planned | D-157 |
-| CH-20 | Meeting availability poll | Minor | Planned | D-156 |
-| MIG-11 | Outbound Funds importer (only when installed) | Minor | Planned | D-156 |
+| C-66 | Backup Sets (on demand; scheduled runs wait for C-38; ADR first) | Major | Landed (#1235) | D-157 |
+| C-70 | Import files and attachments (ADR first) | Major | Landed (#1235) | D-157 |
+| G-22e | Memberships: certifications and continuing credits | Minor | Landed (#1235) | D-157 |
+| CH-20 | Meeting availability poll | Minor | Landed (#1235) | D-156 |
+| MIG-11 | Outbound Funds importer (only when installed) | Minor | Landed (#1235) | D-156 |
 
 ### 1.18 (Batch I): Project Management module (later by Brandon's direction)
+
+Status (2026-11-12): Landed (#1235, `main` 2efde31d4), deployed to `barn-npc` and `mwdbdevsb`; QA and UX pending.
 
 Brandon (2026-11-04, D-175): a PM module that handles projects in various ways, including Salesforce implementation projects, perhaps a PSA tool. A universal module (both editions proposed), so it follows the Core, universal, nonprofit order (D-38). The item list is provisional until the spec is written.
 
 | ID | Item | Size | Status | Source |
 |---|---|---|---|---|
-| PM-01 | Module spec (Section 5) and ADR: project types, canonical model entries, whether it grows into a PSA tool | Major | Planned | D-175 |
-| PM-02 | Projects, phases or milestones, and tasks with owners, dates, status and a progress view; any Account or Contact as client or stakeholder | Major | Planned | D-175 |
-| PM-03 | Project templates, starting with a Salesforce implementation template | Major | Planned | D-175 |
-| PM-04 | PSA layer, if the spec keeps it: time entries, resource assignment and utilization, budgets against actuals; billing only where it stays free of payment processing | Minor | Planned | D-175 |
-| PM-05 | Project status report and a home card of open projects at risk | Minor | Planned | D-175 |
+| PM-01 | Module spec (Section 5) and ADR: project types, canonical model entries, whether it grows into a PSA tool | Major | Landed (#1235) | D-175 |
+| PM-02 | Projects, phases or milestones, and tasks with owners, dates, status and a progress view; any Account or Contact as client or stakeholder | Major | Landed (#1235) | D-175 |
+| PM-03 | Project templates, starting with a Salesforce implementation template | Major | Landed (#1235) | D-175 |
+| PM-04 | PSA layer, if the spec keeps it: time entries, resource assignment and utilization, budgets against actuals; billing only where it stays free of payment processing | Minor | Landed (#1235) | D-175 |
+| PM-05 | Project status report and a home card of open projects at risk | Minor | Landed (#1235) | D-175 |
+
+### 1.19 (Batch I): Remaining approved items
+
+Added 2026-11-11 by the integrator so the combined build (Brandon's goal, 2026-11-11: build all remaining batches, then test once) covers every approved item that had no release: the AR-01 module part and the Later items from Batch B. Built last, after every module build is integrated, so AR-01 also covers the labels those builds add.
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| AR-01b | AR-01 for the modules: messages (errors, toasts, confirmations, run results) in every module package move from labels to the package help catalogs, as Core did in #907 | Major | Planned | D-172 |
+| P-10 | Sample data for program goals (the built feature ships without sample records) | Minor | Planned | D-168 |
+| P-11 | Sample data for cohorts and sessions | Minor | Planned | D-168 |
+| P-14b | Person-field eligibility rules: rules over fields on the person, beyond the intake fields | Minor | Planned | D-168 |
+| L-04b | Logic model report as a PDF, beside the CSV and printable page | Minor | Planned | D-168 |
+| UTIL-01 | One shared framework-free utility module for the format and isoDate helper copies (plan 9.9), and the Logic Models samePeriodExists check wired into the period form or removed | Minor | Planned | D-168 |
+| C-73 | Account Tabs setting: Accounts Tab (Standard), Organization and Household Tabs (default) or Both, through tab permission sets | Minor | Built | D-195 |
+
+### 1.20 (after Batch I): Batch D to I review decisions
+
+Status (2026-11-12): Built on `landing/batch-j`, in testing.
+
+
+Added 2026-11-12 (D-196). Built now on their own branches, outside the Batch D to I landing; tested and deployed after the current batches are completely done.
+
+| ID | Item | Size | Status | Source |
+|---|---|---|---|---|
+| MIG-02b | Nonprofit Cloud Party Relationship Groups to BarnCRM households: `Account.Household_Model__c`, two ADRs, supervised reversible one-time conversion in Mirror (Section 11.2 item 9) | Major | Planned | D-196 |
+| PAY-04 | Payments subscription extension: recurring gifts store the processor's customer and subscription ids; donors update their card on the processor's own page from the portal; failed and renewed charge events | Major | Planned | D-196 |
+| LB-07 | LWC Builder charts with several groupings and totals; export writes working list and chart blocks | Major | Planned | D-196 |
+| CH-21 | Quorum warning when voting closes on a meeting without quorum (amends R-MO1) | Minor | Planned | D-196 |
+| CH-22 | Breach bell sent when a breach is logged, not only nightly | Minor | Planned | D-196 |
+| PM-06 | PSA rates: rate card by role and by person (bill and cost rates, effective dates); each time entry keeps the rate it was logged at, so revenue, cost and margin are right when people bill differently | Major | Planned | D-197 |
+| PM-07 | Timesheets and approvals: weekly timesheet grid, submit, approve or reject by the project manager, approved time locked; only approved time is billed, exported or counted as actual | Major | Planned | D-197 |
+| PM-08 | Project expenses: category, amount, billable, receipt on Files, same approval flow | Minor | Planned | D-197 |
+| PM-09 | Resource management: skills, resource requests (role, skills, hours, dates) filled by staffing, and a weekly allocation against capacity view | Major | Planned | D-197 |
+| PM-10 | Billing: billing type per project (time and materials, fixed fee by milestone, retainer), invoice records with lines built from approved time, expenses and milestones, printable invoice, Draft, Sent, Paid and Void, CSV export for accounting; with the Payments module installed, Pay Online on an invoice through the organization's own Stripe or PayPal and a paid payment marks the invoice Paid (Projects has no payment processing of its own) | Major | Planned | D-197 |
+| PM-11 | Project financials and revenue: revenue, cost and margin against budget, monthly recognized revenue (approved time for time and materials, percent complete for fixed fee) | Minor | Planned | D-197 |
+| PM-12 | Change requests: a requested scope change with its hours and amount, approved changes adjust the budget | Minor | Planned | D-197 |
 
 ## Held
 
