@@ -1,7 +1,7 @@
 import { LightningElement, wire } from 'lwc';
 import { EnclosingTabId } from 'lightning/platformWorkspaceApi';
 import { labelTab } from 'c/workspaceTabs';
-import { toRecords } from './csv';
+import { toRecords } from 'c/csvParser';
 import { createDragController } from 'c/barnDrag';
 import { dragMessages } from 'c/barnDragText';
 import { suggestFields } from 'c/importFieldPicker';

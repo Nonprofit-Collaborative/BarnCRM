@@ -16,6 +16,7 @@ public with sharing class MembershipsErasureExtension implements PersonErasureEx
 	}
 
 	public List<PersonErasure.Change> erase(Id personId) {
+		List<PersonErasure.Change> changes = eraseCertifications(personId);
 		List<Membership_Term__c> terms = [
 			SELECT Id
 			FROM Membership_Term__c
@@ -23,7 +24,7 @@ public with sharing class MembershipsErasureExtension implements PersonErasureEx
 			WITH USER_MODE
 		];
 		if (terms.isEmpty()) {
-			return new List<PersonErasure.Change>();
+			return changes;
 		}
 		List<Id> ids = new List<Id>();
 		for (Membership_Term__c term : terms) {
@@ -34,7 +35,7 @@ public with sharing class MembershipsErasureExtension implements PersonErasureEx
 			ids.add(term.Id);
 		}
 		update as user terms;
-		return new List<PersonErasure.Change>{
+		changes.add(
 			new PersonErasure.Change(
 				PersonErasure.CLEARED,
 				Membership_Term__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
@@ -47,6 +48,57 @@ public with sharing class MembershipsErasureExtension implements PersonErasureEx
 					'Notes__c'
 				}
 			)
-		};
+		);
+		return changes;
+	}
+
+	/** R-MEM13: the notes on the person's certifications and the activity text of their credits. */
+	private static List<PersonErasure.Change> eraseCertifications(Id personId) {
+		List<PersonErasure.Change> changes = new List<PersonErasure.Change>();
+		List<Member_Certification__c> holdings = [
+			SELECT Id, (SELECT Id FROM Continuing_Credits__r)
+			FROM Member_Certification__c
+			WHERE Contact__c = :personId
+			WITH USER_MODE
+		];
+		if (holdings.isEmpty()) {
+			return changes;
+		}
+		List<Id> holdingIds = new List<Id>();
+		List<Continuing_Credit__c> credits = new List<Continuing_Credit__c>();
+		for (Member_Certification__c holding : holdings) {
+			holding.Notes__c = null;
+			holdingIds.add(holding.Id);
+			for (Continuing_Credit__c credit : holding.Continuing_Credits__r) {
+				credits.add(new Continuing_Credit__c(Id = credit.Id, Activity__c = null));
+			}
+		}
+		update as user holdings;
+		changes.add(
+			new PersonErasure.Change(
+				PersonErasure.CLEARED,
+				Member_Certification__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+					.getLabelPlural(),
+				holdingIds,
+				new List<String>{ 'Notes__c' }
+			)
+		);
+		if (!credits.isEmpty()) {
+			update as user credits;
+			List<Id> creditIds = new List<Id>();
+			for (Continuing_Credit__c credit : credits) {
+				creditIds.add(credit.Id);
+			}
+			changes.add(
+				new PersonErasure.Change(
+					PersonErasure.CLEARED,
+					Continuing_Credit__c.SObjectType.getDescribe(SObjectDescribeOptions.DEFERRED)
+						.getLabelPlural(),
+					creditIds,
+					new List<String>{ 'Activity__c' }
+				)
+			);
+		}
+		return changes;
 	}
 }

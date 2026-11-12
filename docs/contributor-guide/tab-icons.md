@@ -98,6 +98,8 @@ Rules:
 | payments | Payment_Event__c | Custom95: Stopwatch |
 | memberships | Membership_Level__c | Custom48: Trophy |
 | memberships | Membership_Term__c | Custom45: Ticket |
+| memberships | Certification__c | Custom8: Diamond |
+| memberships | Member_Certification__c | Custom46: Stamp |
 | addressverification | Address_Verification_Setup | Custom73: HighwaySign |
 | payments | Payments_Setup | Custom70: Handsaw |
 | lwcbuilder | LWC_Builder | Custom34: Insect |
@@ -193,6 +195,7 @@ Every card with a `custom:*` icon is listed here. `scripts/ci/tests/test_core_na
 | forms | formRunner | custom:custom28 | Form__c |
 | forms | formSubmission | custom:custom51 | Form_Submission__c |
 | logicmodels | logicModelBuilder | custom:custom62 | Logic_Model__c |
+| memberships | certificationActions | custom:custom46 | Member_Certification__c |
 | scholarships | applicationReview | custom:custom70 | Award_Application__c |
 | scholarships | awardCycleBoard | custom:custom48 | Award_Program__c |
 | scholarships | awardPanel | custom:custom80 | Award__c |
