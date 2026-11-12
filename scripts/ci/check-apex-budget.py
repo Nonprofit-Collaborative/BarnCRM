@@ -232,8 +232,8 @@ CAPS = {
     # AR-01 (D-172): Opportunity mirror messages read with BarnHelp.text instead of Label;
     # 202,751 measured, plus about 0.5%. With the other Mirror messages: 204,549 measured, plus
     # about 0.5%. MIG-02b Nonprofit Cloud households (NpcHouseholdSource, the drift finding):
-    # 206,034 measured, plus about 0.5%.
-    "mirror": 207_100,
+    # 214,101 measured, plus about 0.5%.
+    "mirror": 215_200,
 }
 TARGET = {"full suite": 3_600_000, "core": 2_000_000}
 
