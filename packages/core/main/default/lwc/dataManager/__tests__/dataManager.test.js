@@ -131,8 +131,10 @@ describe('c-data-manager', () => {
     // Bulk Update Records is off in this test, so there is no Update Many Records tile.
     expect(tiles(element).map((tile) => tile.name)).toEqual([
       'import',
+      'files',
       'find',
       'grid',
+      'backup',
       'optimizer',
       'duplicates',
       'delete'
@@ -140,6 +142,22 @@ describe('c-data-manager', () => {
     const titles = Object.fromEntries(tiles(element).map((tile) => [tile.name, tile.label]));
     expect(titles.find).toBe('c.Core_Find_Title');
     expect(titles.duplicates).toBe('c.Core_DuplicateMatching_Title');
+    expect(titles.backup).toBe('c.Core_DataManager_BackupTitle');
+  });
+
+  it('opens Backup Sets on this page, with a way back to the hub', async () => {
+    const element = await render();
+    select(element, 'backup');
+    await flush();
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(one(element, 'tools')).toBeNull();
+    expect(one(element, 'panel').querySelector('c-backup-sets')).not.toBeNull();
+    expect(one(element, 'panel').querySelector('c-files-import')).toBeNull();
+
+    one(element, 'back').click();
+    await flush();
+    expect(one(element, 'panel')).toBeNull();
+    expect(one(element, 'tools')).not.toBeNull();
   });
 
   it('opens Duplicate Matching from its tile', async () => {

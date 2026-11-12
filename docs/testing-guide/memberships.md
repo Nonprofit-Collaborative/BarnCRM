@@ -65,4 +65,18 @@ Before you start: an org from [Before you test](before-you-test.md), with Core a
 **Purpose:** confirm erasing a person clears their listing (R-MEM8).
 **Prerequisites:** a member listed in the directory with notes on the membership.
 **Steps:** 1. Erase the person.
-**Expected:** 1. The membership stays; Listed in Directory off, Directory Location, Directory Bio and Notes blank.
+**Expected:** 1. The membership stays; Listed in Directory off, Directory Location, Directory Bio and Notes blank. A member certification of the person stays, with Notes blank and each continuing credit's Activity blank (R-MEM13).
+
+## T-MEM-10: Certifications and Continuing Credits
+
+**Purpose:** confirm granting, credits and renewing a certification (G-22e, R-MEM10, R-MEM11).
+**Prerequisites:** a Memberships Admin and a Memberships Staff user; a contact.
+**Steps:** 1. As the admin, create a Certification with Credits Required 10 and Valid Months 24. 2. As staff, create a Member Certification for the contact. 3. Press Grant. 4. Add a Continuing Credit of 6. 5. Add another of 4, then press Renew. 6. Press Revoke, then Grant.
+**Expected:** 2. Status Pending; the panel shows Grant only. 3. Active, Earned On today, Expires On 24 months on. 4. Credits toward renewal 6 of 10; no Renew, the panel says 6 earned, 10 needed. 5. Expires On moves 24 months past the old date; both credits Used; credits toward renewal 0 of 10. 6. Revoked, then Active again. A Memberships Read Only user sees the panel with no buttons.
+
+## T-MEM-11: Certification Expiry
+
+**Purpose:** confirm the nightly run expires certifications (R-MEM12).
+**Prerequisites:** an Active member certification with Expires On set to yesterday (as an admin).
+**Steps:** 1. Wait for the next nightly run. 2. Open the member certification.
+**Expected:** 2. Status Expired. Renew is offered again once the credits are in.

@@ -29,6 +29,12 @@ export const TASKS = Object.freeze([
     text: 'Update records from a spreadsheet',
     words: 'change edit file csv excel'
   },
+  // Import Files (C-70)
+  {
+    tool: 'files',
+    text: 'Load documents and attachments into Files',
+    words: 'files attachments documents zip pdf scans letters photos upload migrate'
+  },
   {
     tool: 'import',
     text: 'Delete the records a file lists',
@@ -54,6 +60,12 @@ export const TASKS = Object.freeze([
     tool: 'find',
     text: 'Find households in a city',
     words: 'search address location state zip postal'
+  },
+  // Backup Sets (C-66)
+  {
+    tool: 'backup',
+    text: 'Back up records to a file',
+    words: 'backup copy keep snapshot save restore before cleanup'
   },
   // Super Transformer
   {
