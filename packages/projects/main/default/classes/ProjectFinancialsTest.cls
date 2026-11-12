@@ -94,7 +94,8 @@ private class ProjectFinancialsTest {
 				WHERE Id = :project.Id
 			];
 			Assert.isFalse(
-				String.valueOf(checked.Health_Reasons__c).contains('logged against'),
+				checked.Health_Reasons__c != null &&
+				checked.Health_Reasons__c.contains('logged against'),
 				'12 of 20 hours is not over budget'
 			);
 		}

@@ -109,6 +109,7 @@ private class ProjectTimesheetControllerTest {
 			);
 
 			Assert.areEqual(2, ProjectTimesheetController.submitWeek(monday), 'Both submitted');
+			edit.hours = 6;
 			try {
 				ProjectTimesheetController.saveWeek(
 					new List<ProjectTimesheetController.Cell>{ edit }
@@ -128,7 +129,7 @@ private class ProjectTimesheetControllerTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				5,
+				6,
 				[SELECT Hours__c FROM Time_Entry__c WHERE Id = :edit.id WITH SYSTEM_MODE].Hours__c,
 				'The change was kept'
 			);

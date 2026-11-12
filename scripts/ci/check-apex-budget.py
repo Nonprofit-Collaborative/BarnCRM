@@ -236,8 +236,10 @@ CAPS = {
     # ProjectInvoiceDocument, the return page default): +17,760. Pay Online through Payments by
     # name (ProjectInvoicePayments and its listener, R-PM22): +7,302. Financials and recognized
     # revenue (PM-11: ProjectFinancials, ProjectRevenue and its nightly step, health with change
-    # hours): +12,766. 97,102 measured, plus about 2%.
-    "projects": 99_100,
+    # hours): +12,766. 97,102 measured, plus about 2%. Review fixes (#1237: invoice delete guard,
+    # row cap, resources helper) and the release-gate fixes (revenue Chunk queueable, rate query):
+    # 99,230 measured, plus about 2%.
+    "projects": 101_200,
     # Address Verification (C-46, ADR-0209 address verification module): the Smarty and Google
     # lookups, the handler, the job, setup page controller and Health Check, measured 24,710 on
     # 2026-11-11, plus about 2 percent.

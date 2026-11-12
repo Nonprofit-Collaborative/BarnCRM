@@ -239,7 +239,7 @@ public with sharing class NpspHouseholdAdoptionBatch implements Database.Batchab
 		Map<Id, Id> personAccounts = PersonRecordSelector.getAccountsBehindPersonContacts(
 			contactIds
 		);
-		Set<String> held = memberKeys(people.keySet()).keySet();
+		Set<String> held = new Set<String>(memberKeys(people.keySet()).keySet());
 		HouseholdService.addMembers(people);
 		Map<String, Household_Member__c> now = memberKeys(people.keySet());
 		List<Household_Member__c> created = new List<Household_Member__c>();

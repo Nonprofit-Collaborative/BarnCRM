@@ -369,6 +369,11 @@
   </fieldPermissions>
   <fieldPermissions>
     <editable>true</editable>
+    <field>Project_Resource__c.User__c</field>
+    <readable>true</readable>
+  </fieldPermissions>
+  <fieldPermissions>
+    <editable>true</editable>
     <field>Project_Resource__c.Weekly_Capacity_Hours__c</field>
     <readable>true</readable>
   </fieldPermissions>

@@ -67,7 +67,13 @@ public with sharing class ProjectRates {
 		List<Project_Rate__c> rates = new List<Project_Rate__c>();
 		if (earliest != null) {
 			rates = [
-				SELECT User__c, Role__c, Bill_Rate__c, Cost_Rate__c, Effective_From__c
+				SELECT
+					User__c,
+					Role__c,
+					Bill_Rate__c,
+					Cost_Rate__c,
+					Effective_From__c,
+					Effective_To__c
 				FROM Project_Rate__c
 				WHERE
 					(User__c IN :users

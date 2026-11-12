@@ -225,12 +225,18 @@ private class ProjectBillingTest {
 			billing(true);
 			Project__c fixed = project('Fixed Fee');
 			Project_Task__c golive = ProjectsTestData.task(fixed.Id, 'Go-Live', Date.today(), true);
-			golive.Status__c = 'Done';
-			golive.Completed_Date__c = Date.today();
-			golive.Billing_Amount__c = 1000;
 			Project_Task__c later = ProjectsTestData.task(fixed.Id, 'Phase 2', Date.today(), true);
-			later.Billing_Amount__c = 2000;
-			update new List<Project_Task__c>{ golive, later };
+			// Fresh rows with only the changed fields: the inserted ones carry the master-detail
+			// Project, which a user-mode update refuses to write.
+			update new List<Project_Task__c>{
+				new Project_Task__c(
+					Id = golive.Id,
+					Status__c = 'Done',
+					Completed_Date__c = Date.today(),
+					Billing_Amount__c = 1000
+				),
+				new Project_Task__c(Id = later.Id, Billing_Amount__c = 2000)
+			};
 			Project__c retainer = project('Retainer');
 			Date start = Date.today().toStartOfMonth().addMonths(-1);
 

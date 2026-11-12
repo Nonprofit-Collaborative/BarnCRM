@@ -9,7 +9,7 @@
  * just closed of each project that has none yet, 100 projects per queued job, up to 2,000.
  * Recognize Revenue on the project redoes one month in user mode, with Manage Projects.
  */
-public with sharing class ProjectRevenue implements Schedulable, Queueable {
+public with sharing class ProjectRevenue implements Schedulable {
 	public static final String JOB_NAME = 'BarnCRM Projects Revenue';
 	private static final Integer CHUNK = 100;
 	private static final Integer MAX_ROWS = 2000;
@@ -46,9 +46,27 @@ public with sharing class ProjectRevenue implements Schedulable, Queueable {
 	/** Starts the month just closed. */
 	public void execute(SchedulableContext context) {
 		if (ProjectsSettings.revenueEnabled()) {
-			System.enqueueJob(
-				new ProjectRevenue(Date.today().toStartOfMonth().addMonths(-1), null, 0)
-			);
+			System.enqueueJob(new Chunk(Date.today().toStartOfMonth().addMonths(-1), null, 0));
+		}
+	}
+
+	/**
+	 * The queued job for one chunk. A class that is Schedulable cannot also be queued, so the
+	 * chunk runs through this nested class.
+	 */
+	public with sharing class Chunk implements Queueable {
+		private final Date month;
+		private final Id afterId;
+		private final Integer done;
+
+		public Chunk(Date month, Id afterId, Integer done) {
+			this.month = month;
+			this.afterId = afterId;
+			this.done = done;
+		}
+
+		public void execute(QueueableContext context) {
+			new ProjectRevenue(month, afterId, done).execute(context);
 		}
 	}
 
@@ -100,7 +118,7 @@ public with sharing class ProjectRevenue implements Schedulable, Queueable {
 					ErrorLogger.SEVERITY_WARNING
 				);
 			} else if (more && !Test.isRunningTest()) {
-				System.enqueueJob(new ProjectRevenue(month, batch[CHUNK - 1].Id, total));
+				System.enqueueJob(new Chunk(month, batch[CHUNK - 1].Id, total));
 			}
 		} catch (Exception e) {
 			ErrorLogger.log(e, 'ProjectRevenue');
