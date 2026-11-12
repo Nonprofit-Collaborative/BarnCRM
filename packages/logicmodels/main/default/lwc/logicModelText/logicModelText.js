@@ -18,17 +18,11 @@ import REMOVE from '@salesforce/label/c.Core_Find_Remove';
 import NAME from '@salesforce/label/c.Core_CmdtManager_NameField';
 import DESCRIPTION from '@salesforce/label/c.Core_Shared_Description';
 import COLUMN from '@salesforce/label/c.Core_ImportRow_ColumnHeader';
-import EMPTY_COLUMN from '@salesforce/label/c.LogicModels_Builder_EmptyColumn';
 import LOOK_AT from '@salesforce/label/c.LogicModels_Builder_LookAt';
-import FINDING_EMPTY from '@salesforce/label/c.LogicModels_Builder_FindingEmptyStage';
-import FINDING_NO_IN from '@salesforce/label/c.LogicModels_Builder_FindingNoArrowIn';
-import FINDING_NO_OUT from '@salesforce/label/c.LogicModels_Builder_FindingNoArrowOut';
-import FINDING_NO_INDICATOR from '@salesforce/label/c.LogicModels_Builder_FindingNoIndicator';
 import OUTCOMES from '@salesforce/label/c.LogicModels_Builder_Outcomes';
 import SAVED from '@salesforce/label/c.Core_Shared_Saved';
 import DELETED from '@salesforce/label/c.LogicModels_Builder_Deleted';
 import ARROW_PAIR from '@salesforce/label/c.Core_Address_DateRange';
-import BACKWARD_ARROWS from '@salesforce/label/c.LogicModels_Builder_BackwardArrows';
 import LOADING from '@salesforce/label/c.Core_AccessExplorer_Loading';
 import STAGE_INPUT from '@salesforce/label/c.LogicModels_Stage_Input';
 import STAGE_ACTIVITY from '@salesforce/label/c.LogicModels_Stage_Activity';
@@ -40,14 +34,12 @@ import STAGE_IMPACT from '@salesforce/label/c.LogicModels_Stage_Impact';
 import SELECTED_PART from '@salesforce/label/c.LogicModels_Part_Title';
 import MOVE_UP from '@salesforce/label/c.Core_Shared_MoveUp';
 import MOVE_DOWN from '@salesforce/label/c.Core_Shared_MoveDown';
-import DELETE_PART_CONFIRM from '@salesforce/label/c.LogicModels_Part_DeleteConfirm';
 import LEADS_TO from '@salesforce/label/c.LogicModels_Part_LeadsTo';
 import COMES_FROM from '@salesforce/label/c.LogicModels_Part_ComesFrom';
 import ADD_ARROW from '@salesforce/label/c.LogicModels_Part_AddArrow';
 import ARROW_TARGET from '@salesforce/label/c.LogicModels_Part_ArrowTarget';
 import ASSUMPTION from '@salesforce/label/c.LogicModels_Part_Assumption';
 import NO_ARROWS from '@salesforce/label/c.LogicModels_Part_NoArrows';
-import NO_ASSUMPTION from '@salesforce/label/c.LogicModels_Part_NoAssumption';
 import INDICATORS from '@salesforce/label/c.LogicModels_Indicator_Title';
 import ADD_INDICATOR from '@salesforce/label/c.LogicModels_Indicator_Add';
 import INDICATOR_NAME from '@salesforce/label/c.LogicModels_Indicator_Name';
@@ -57,12 +49,8 @@ import HIGHER from '@salesforce/label/c.LogicModels_Indicator_Higher';
 import LOWER from '@salesforce/label/c.LogicModels_Indicator_Lower';
 import BASELINE from '@salesforce/label/c.LogicModels_Indicator_Baseline';
 import BASELINE_DATE from '@salesforce/label/c.LogicModels_Indicator_BaselineDate';
-import NO_INDICATORS from '@salesforce/label/c.LogicModels_Indicator_None';
-import DELETE_INDICATOR_CONFIRM from '@salesforce/label/c.LogicModels_Indicator_DeleteConfirm';
 import UNIT_IS from '@salesforce/label/c.LogicModels_Indicator_UnitIs';
-import BETTER_WHEN_IS from '@salesforce/label/c.LogicModels_Indicator_BetterWhenIs';
 import BASELINE_IS from '@salesforce/label/c.LogicModels_Indicator_BaselineIs';
-import BASELINE_ON from '@salesforce/label/c.LogicModels_Indicator_BaselineOn';
 import ADD_PERIOD from '@salesforce/label/c.LogicModels_Period_Add';
 import PERIOD from '@salesforce/label/c.Core_Shared_Period';
 import START_DATE from '@salesforce/label/c.Core_Shared_StartDate';
@@ -73,19 +61,14 @@ import NOTES from '@salesforce/label/c.LogicModels_Period_Notes';
 import PROGRESS from '@salesforce/label/c.LogicModels_Period_Progress';
 import MET from '@salesforce/label/c.LogicModels_Period_Met';
 import PERCENT from '@salesforce/label/c.LogicModels_Period_Percent';
-import NO_PERIODS from '@salesforce/label/c.LogicModels_Period_None';
 import ACTIONS from '@salesforce/label/c.Core_Shared_Actions';
 import SOURCE from '@salesforce/label/c.LogicModels_Source_Title';
 import SOURCE_MANUAL from '@salesforce/label/c.LogicModels_Source_Manual';
 import SOURCE_IMPORT from '@salesforce/label/c.LogicModels_Source_Import';
 import SOURCE_COMPUTED from '@salesforce/label/c.LogicModels_Source_Computed';
 import RESULTS_ARE from '@salesforce/label/c.LogicModels_Source_ResultsAre';
-import COMPUTED_FROM from '@salesforce/label/c.LogicModels_Source_ComputedFrom';
 import SOME_QUERY from '@salesforce/label/c.LogicModels_Source_SomeQuery';
-import LAST_RUN from '@salesforce/label/c.LogicModels_Source_LastRun';
-import NOT_RUN_YET from '@salesforce/label/c.LogicModels_Source_NotRunYet';
 import SAVED_QUERY from '@salesforce/label/c.LogicModels_Source_Query';
-import NO_QUERIES from '@salesforce/label/c.LogicModels_Source_NoQueries';
 import DATE_FIELD from '@salesforce/label/c.LogicModels_Source_DateFieldLabel';
 import WORK_OUT from '@salesforce/label/c.LogicModels_Source_Function';
 import COUNT from '@salesforce/label/c.LogicModels_Source_Count';
@@ -93,15 +76,12 @@ import SUM from '@salesforce/label/c.LogicModels_Source_Sum';
 import UNIQUE from '@salesforce/label/c.LogicModels_Source_Unique';
 import FIELD from '@salesforce/label/c.Core_AccessExplorer_Field';
 import REFRESH from '@salesforce/label/c.LogicModels_Source_Refresh';
-import RESULT_COMPUTED from '@salesforce/label/c.LogicModels_Source_ResultComputed';
 import COUNT_OF from '@salesforce/label/c.LogicModels_Source_CountOf';
 import SUM_OF from '@salesforce/label/c.LogicModels_Source_SumOf';
 import UNIQUE_OF from '@salesforce/label/c.LogicModels_Source_UniqueOf';
 import DOWNLOAD_RESULTS from '@salesforce/label/c.LogicModels_Results_Download';
-import NO_RESULT_ROWS from '@salesforce/label/c.LogicModels_Results_None';
 import REPORT_TITLE from '@salesforce/label/c.LogicModels_Report_Title';
 import REPORT_PERIODS from '@salesforce/label/c.LogicModels_Report_Periods';
-import REPORT_CHOOSE_ONE from '@salesforce/label/c.LogicModels_Report_ChooseOne';
 import REPORT_DOWNLOAD_CSV from '@salesforce/label/c.Core_AccessExplorer_Download';
 import REPORT_PRINTABLE from '@salesforce/label/c.LogicModels_Report_Printable';
 import REPORT_PART from '@salesforce/label/c.LogicModels_Report_Part';
@@ -120,12 +100,13 @@ import STARTER_PEOPLE_SERVED from '@salesforce/label/c.LogicModels_Starter_Peopl
 import STARTER_SERVICES_DELIVERED from '@salesforce/label/c.LogicModels_Starter_ServicesDelivered';
 import STARTER_VOLUNTEER_HOURS from '@salesforce/label/c.LogicModels_Starter_VolunteerHours';
 import STARTER_GRANTS_AWARDED from '@salesforce/label/c.LogicModels_Starter_GrantsAwarded';
-import PERIOD_EXISTS from '@salesforce/label/c.LogicModels_Builder_PeriodExists';
 import { helpText } from 'c/barnHelpText';
 
 export const LABELS = Object.freeze({
   title: TITLE,
-  periodExists: PERIOD_EXISTS,
+  get periodExists() {
+    return helpText('LogicModels', 'LogicModels_Builder_PeriodExists');
+  },
   forLabel: FOR_LABEL,
   wholeOrganization: WHOLE_ORGANIZATION,
   programMissing: PROGRAM_MISSING,
@@ -140,7 +121,9 @@ export const LABELS = Object.freeze({
   name: NAME,
   description: DESCRIPTION,
   column: COLUMN,
-  emptyColumn: EMPTY_COLUMN,
+  get emptyColumn() {
+    return helpText('LogicModels', 'LogicModels_Builder_EmptyColumn');
+  },
   get selectHint() {
     return helpText('LogicModels', 'LogicModels_Builder_SelectHint');
   },
@@ -148,10 +131,18 @@ export const LABELS = Object.freeze({
   get lookAtNone() {
     return helpText('LogicModels', 'LogicModels_Builder_LookAtNone');
   },
-  findingEmpty: FINDING_EMPTY,
-  findingNoIn: FINDING_NO_IN,
-  findingNoOut: FINDING_NO_OUT,
-  findingNoIndicator: FINDING_NO_INDICATOR,
+  get findingEmpty() {
+    return helpText('LogicModels', 'LogicModels_Builder_FindingEmptyStage');
+  },
+  get findingNoIn() {
+    return helpText('LogicModels', 'LogicModels_Builder_FindingNoArrowIn');
+  },
+  get findingNoOut() {
+    return helpText('LogicModels', 'LogicModels_Builder_FindingNoArrowOut');
+  },
+  get findingNoIndicator() {
+    return helpText('LogicModels', 'LogicModels_Builder_FindingNoIndicator');
+  },
   outcomes: OUTCOMES,
   saved: SAVED,
   deleted: DELETED,
@@ -173,12 +164,16 @@ export const LABELS = Object.freeze({
     return helpText('LogicModels', 'LogicModels_Source_StillWorking');
   },
   arrowPair: ARROW_PAIR,
-  backwardArrows: BACKWARD_ARROWS,
+  get backwardArrows() {
+    return helpText('LogicModels', 'LogicModels_Builder_BackwardArrows');
+  },
   loading: LOADING,
   selectedPart: SELECTED_PART,
   moveUp: MOVE_UP,
   moveDown: MOVE_DOWN,
-  deletePartConfirm: DELETE_PART_CONFIRM,
+  get deletePartConfirm() {
+    return helpText('LogicModels', 'LogicModels_Part_DeleteConfirm');
+  },
   leadsTo: LEADS_TO,
   comesFrom: COMES_FROM,
   addArrow: ADD_ARROW,
@@ -188,7 +183,9 @@ export const LABELS = Object.freeze({
   get noTargets() {
     return helpText('LogicModels', 'LogicModels_Part_NoTargets');
   },
-  noAssumption: NO_ASSUMPTION,
+  get noAssumption() {
+    return helpText('LogicModels', 'LogicModels_Part_NoAssumption');
+  },
   indicators: INDICATORS,
   addIndicator: ADD_INDICATOR,
   indicatorName: INDICATOR_NAME,
@@ -198,12 +195,20 @@ export const LABELS = Object.freeze({
   lower: LOWER,
   baseline: BASELINE,
   baselineDate: BASELINE_DATE,
-  noIndicators: NO_INDICATORS,
-  deleteIndicatorConfirm: DELETE_INDICATOR_CONFIRM,
+  get noIndicators() {
+    return helpText('LogicModels', 'LogicModels_Indicator_None');
+  },
+  get deleteIndicatorConfirm() {
+    return helpText('LogicModels', 'LogicModels_Indicator_DeleteConfirm');
+  },
   unitIs: UNIT_IS,
-  betterWhenIs: BETTER_WHEN_IS,
+  get betterWhenIs() {
+    return helpText('LogicModels', 'LogicModels_Indicator_BetterWhenIs');
+  },
   baselineIs: BASELINE_IS,
-  baselineOn: BASELINE_ON,
+  get baselineOn() {
+    return helpText('LogicModels', 'LogicModels_Indicator_BaselineOn');
+  },
   addPeriod: ADD_PERIOD,
   period: PERIOD,
   startDate: START_DATE,
@@ -214,22 +219,32 @@ export const LABELS = Object.freeze({
   progress: PROGRESS,
   met: MET,
   percent: PERCENT,
-  noPeriods: NO_PERIODS,
+  get noPeriods() {
+    return helpText('LogicModels', 'LogicModels_Period_None');
+  },
   actions: ACTIONS,
   source: SOURCE,
   sourceManual: SOURCE_MANUAL,
   sourceImport: SOURCE_IMPORT,
   sourceComputed: SOURCE_COMPUTED,
   resultsAre: RESULTS_ARE,
-  computedFrom: COMPUTED_FROM,
+  get computedFrom() {
+    return helpText('LogicModels', 'LogicModels_Source_ComputedFrom');
+  },
   someQuery: SOME_QUERY,
-  lastRun: LAST_RUN,
-  notRunYet: NOT_RUN_YET,
+  get lastRun() {
+    return helpText('LogicModels', 'LogicModels_Source_LastRun');
+  },
+  get notRunYet() {
+    return helpText('LogicModels', 'LogicModels_Source_NotRunYet');
+  },
   savedQuery: SAVED_QUERY,
   get savedQueryHelp() {
     return helpText('LogicModels', 'LogicModels_Source_QueryHelp');
   },
-  noQueries: NO_QUERIES,
+  get noQueries() {
+    return helpText('LogicModels', 'LogicModels_Source_NoQueries');
+  },
   dateField: DATE_FIELD,
   workOut: WORK_OUT,
   count: COUNT,
@@ -240,12 +255,16 @@ export const LABELS = Object.freeze({
   get refreshing() {
     return helpText('LogicModels', 'LogicModels_Source_Working');
   },
-  resultComputed: RESULT_COMPUTED,
+  get resultComputed() {
+    return helpText('LogicModels', 'LogicModels_Source_ResultComputed');
+  },
   countOf: COUNT_OF,
   sumOf: SUM_OF,
   uniqueOf: UNIQUE_OF,
   downloadResults: DOWNLOAD_RESULTS,
-  noResultRows: NO_RESULT_ROWS,
+  get noResultRows() {
+    return helpText('LogicModels', 'LogicModels_Results_None');
+  },
   reportTitle: REPORT_TITLE,
   reportPeriods: REPORT_PERIODS,
   get reportNoPeriods() {
@@ -254,7 +273,9 @@ export const LABELS = Object.freeze({
   get reportNoIndicators() {
     return helpText('LogicModels', 'LogicModels_Report_NoIndicators');
   },
-  reportChooseOne: REPORT_CHOOSE_ONE,
+  get reportChooseOne() {
+    return helpText('LogicModels', 'LogicModels_Report_ChooseOne');
+  },
   reportDownloadCsv: REPORT_DOWNLOAD_CSV,
   reportPrintable: REPORT_PRINTABLE,
   get reportPdf() {

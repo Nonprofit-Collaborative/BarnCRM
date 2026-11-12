@@ -210,11 +210,15 @@ private class LogicModelPeriodServiceTest {
 			Test.stopTest();
 
 			Assert.areEqual(
-				Label.LogicModels_Builder_NotFound,
+				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound'),
 				unknownPeriod,
 				'Not a model period'
 			);
-			Assert.areEqual(Label.LogicModels_Builder_NotFound, goneIndicator, 'Not found');
+			Assert.areEqual(
+				BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound'),
+				goneIndicator,
+				'Not found'
+			);
 		}
 	}
 

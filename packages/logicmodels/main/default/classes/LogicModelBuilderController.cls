@@ -411,7 +411,7 @@ public with sharing class LogicModelBuilderController {
 		} else if (e instanceof LogicModelService.BuilderException) {
 			message = e.getMessage();
 		} else if (e instanceof QueryException || e instanceof System.NoAccessException) {
-			message = Label.LogicModels_Builder_NotFound;
+			message = BarnHelp.text('LogicModels', 'LogicModels_Builder_NotFound');
 		} else {
 			ErrorLogger.log(e, 'LogicModelBuilderController');
 		}
